@@ -123,7 +123,8 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
                 "desertNormalMetallicMap",
                 "desertAlbedoRoughnessMap",
 
-                "snowNormalMap",
+                "snowNormalMetallicMap",
+                "snowAlbedoRoughnessMap",
 
                 "steepNormalMetallicMap",
                 "steepAlbedoRoughnessMap",
@@ -150,7 +151,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
 
             beachSize: 100 + 50 * centeredRand(model.rng, 85),
             steepSharpness: 2,
-            normalSharpness: 0.5
+            normalSharpness: 2
         };
 
         if (model.physicalProperties.oceanLevel === 0) {
@@ -212,7 +213,9 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
         this.setTexture("plainNormalMetallicMap", Assets.GRASS_NORMAL_METALLIC_MAP);
         this.setTexture("plainAlbedoRoughnessMap", Assets.GRASS_ALBEDO_ROUGHNESS_MAP);
 
-        this.setTexture("snowNormalMap", Assets.SNOW_NORMAL_MAP_1);
+        this.setTexture("snowNormalMetallicMap", Assets.SNOW_NORMAL_METALLIC_MAP);
+        this.setTexture("snowAlbedoRoughnessMap", Assets.SNOW_ALBEDO_ROUGHNESS_MAP);
+
         this.setTexture("beachNormalMap", Assets.SAND_NORMAL_METALLIC_MAP);
 
         // Desert material

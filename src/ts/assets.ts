@@ -28,8 +28,8 @@ import bottomNormalMap from "../asset/textures/crackednormal.jpg";
 import grassNormalMetallicMap from "../asset/grassMaterial/wispy-grass-meadow_normal_metallic.png";
 import grassAlbedoRoughnessMap from "../asset/grassMaterial/wispy-grass-meadow_albedo_roughness.png";
 
-import snowNormalMap1 from "../asset/textures/snow/Snow_002_NORM.jpg";
-import snowNormalMap2 from "../asset/textures/snowNormalMap2.png";
+import snowNormalMetallicMap from "../asset/iceMaterial/ice_field_normal_metallic.png";
+import snowAlbedoRoughnessMap from "../asset/iceMaterial/ice_field_albedo_roughness.png";
 
 import sandNormalMetallicMap from "../asset/sandMaterial/wavy-sand_normal_metallic.png";
 import sandAlbedoRoughnessMap from "../asset/sandMaterial/wavy-sand_albedo_roughness.png";
@@ -110,8 +110,8 @@ export class Assets {
     static GRASS_NORMAL_METALLIC_MAP: Texture;
     static GRASS_ALBEDO_ROUGHNESS_MAP: Texture;
 
-    static SNOW_NORMAL_MAP_1: Texture;
-    static SNOW_NORMAL_MAP_2: Texture;
+    static SNOW_NORMAL_METALLIC_MAP: Texture;
+    static SNOW_ALBEDO_ROUGHNESS_MAP: Texture;
 
     static SAND_NORMAL_METALLIC_MAP: Texture;
     static SAND_ALBEDO_ROUGHNESS_MAP: Texture;
@@ -193,8 +193,8 @@ export class Assets {
         Assets.MANAGER.addTextureTask("GrassNormalMetallicMap", grassNormalMetallicMap).onSuccess = (task) => (Assets.GRASS_NORMAL_METALLIC_MAP = task.texture);
         Assets.MANAGER.addTextureTask("GrassAlbedoRoughnessMap", grassAlbedoRoughnessMap).onSuccess = (task) => (Assets.GRASS_ALBEDO_ROUGHNESS_MAP = task.texture);
 
-        Assets.MANAGER.addTextureTask("SnowNormalMap1", snowNormalMap1).onSuccess = (task) => (Assets.SNOW_NORMAL_MAP_1 = task.texture);
-        Assets.MANAGER.addTextureTask("SnowNormalMap2", snowNormalMap2).onSuccess = (task) => (Assets.SNOW_NORMAL_MAP_2 = task.texture);
+        Assets.MANAGER.addTextureTask("SnowNormalMetallicMap", snowNormalMetallicMap).onSuccess = (task) => (Assets.SNOW_NORMAL_METALLIC_MAP = task.texture);
+        Assets.MANAGER.addTextureTask("SnowAlbedoRoughness", snowAlbedoRoughnessMap).onSuccess = (task) => (Assets.SNOW_ALBEDO_ROUGHNESS_MAP = task.texture);
 
         Assets.MANAGER.addTextureTask("SandNormalMetallicMap", sandNormalMetallicMap).onSuccess = (task) => (Assets.SAND_NORMAL_METALLIC_MAP = task.texture);
         Assets.MANAGER.addTextureTask("SandAlbedoRoughnessMap", sandAlbedoRoughnessMap).onSuccess = (task) => (Assets.SAND_ALBEDO_ROUGHNESS_MAP = task.texture);

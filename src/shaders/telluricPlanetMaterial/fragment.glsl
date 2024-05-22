@@ -55,7 +55,8 @@ uniform sampler2D beachNormalMap;
 uniform sampler2D desertNormalMetallicMap;
 uniform sampler2D desertAlbedoRoughnessMap;
 
-uniform sampler2D snowNormalMap;
+uniform sampler2D snowNormalMetallicMap;
+uniform sampler2D snowAlbedoRoughnessMap;
 
 uniform sampler2D steepNormalMetallicMap;
 uniform sampler2D steepAlbedoRoughnessMap;
@@ -170,7 +171,7 @@ void main() {
 
 
     vec3 blendingNormal = vNormal;
-    blendingNormal = triplanarNormal(vSamplePointScaled, blendingNormal, snowNormalMap, 0.0001 * 1000e3, normalSharpness, 1.0);
+    //blendingNormal = triplanarNormal(vSamplePointScaled, blendingNormal, snowNormalMap, 0.0001 * 1000e3, normalSharpness, 1.0);
 
 
     // calcul de la couleur et de la normale
@@ -226,85 +227,50 @@ void main() {
     snowFactor *= 1.0 - bottomFactor;
     desertFactor *= 1.0 - bottomFactor;
 
-    // template:
-    // small scale
-    // large scale
-
-    /*float normalStrengthNear = 1.0;
-    float normalStrengthFar = 1.0;
-
-    normalStrengthFar = smoothstep(0.0, 1.0, pow(length(cameraPosition - vPositionW) / 5e3, 2.0));
-    normalStrengthNear = 1.0 - normalStrengthFar;
-
-    const float nearScale = 0.3 * 1000e3;
-    const float farScale = 0.00001 * 1000e3;
-
-    normal = triplanarNormal(vSamplePointScaled, normal, bottomNormalMap, nearScale, normalSharpness, bottomFactor * normalStrengthNear);
-    normal = triplanarNormal(vSamplePointScaled, normal, bottomNormalMap, farScale, normalSharpness, bottomFactor * normalStrengthFar);
-
-    normal = triplanarNormal(vSamplePointScaled, normal, beachNormalMap, nearScale, normalSharpness, beachFactor * normalStrengthNear);
-    normal = triplanarNormal(vSamplePointScaled, normal, beachNormalMap, farScale, normalSharpness, beachFactor * normalStrengthFar);
-
-    normal = triplanarNormal(vSamplePointScaled, normal, plainNormalMap, nearScale, normalSharpness, plainFactor * normalStrengthNear);
-    normal = triplanarNormal(vSamplePointScaled, normal, plainNormalMap, farScale, normalSharpness, plainFactor * normalStrengthFar);
-
-    normal = triplanarNormal(vSamplePointScaled, normal, desertNormalMap, nearScale, normalSharpness, desertFactor * normalStrengthNear);
-    normal = triplanarNormal(vSamplePointScaled, normal, desertNormalMap, farScale, normalSharpness, desertFactor * normalStrengthFar);
-
-    normal = triplanarNormal(vSamplePointScaled, normal, snowNormalMap, nearScale, normalSharpness, snowFactor * normalStrengthNear);
-    normal = triplanarNormal(vSamplePointScaled, normal, snowNormalMap, farScale, normalSharpness, snowFactor * normalStrengthFar);
-
-    normal = triplanarNormal(vSamplePointScaled, normal, steepNormalMap, nearScale, normalSharpness, steepFactor * normalStrengthNear);
-    normal = triplanarNormal(vSamplePointScaled, normal, steepNormalMap, farScale, normalSharpness, steepFactor * normalStrengthFar);
-
-    normal = normalize(normal);
-
-    vec3 color = steepFactor * steepColor
-    + beachFactor * beachColor
-    + desertFactor * desertColor
-    + plainFactor * plainColor
-    + snowFactor * snowColor
-    + bottomFactor * bottomColor;*/
-
     // Steep material
     float steepScale = 0.5 * 1000e3;
-    float steepSharpness = 2.0;
-    float steepNormalStrength = steepSharpness;
+    float steepSharpness = 0.5;
+    float steepNormalStrength = normalSharpness;
     vec3 steepAlbedo;
     vec3 steepNormal = vNormal;
     float steepRoughness, steepMetallic;
-    triPlanarMaterial(vSamplePointScaled, steepNormal, steepAlbedoRoughnessMap, steepNormalMetallicMap, steepScale, steepSharpness, steepNormalStrength, steepAlbedo, steepNormal, steepRoughness, steepMetallic);
+    triPlanarMaterial(vSamplePointScaled, vNormal, steepAlbedoRoughnessMap, steepNormalMetallicMap, steepScale, steepSharpness, steepNormalStrength, steepAlbedo, steepNormal, steepRoughness, steepMetallic);
 
     // Plain material
     float plainScale = 0.5 * 1000e3;
-    float plainSharpness = 2.0;
-    float plainNormalStrength = steepSharpness;
+    float plainSharpness = 0.5;
+    float plainNormalStrength = normalSharpness;
     vec3 plainAlbedo;
     vec3 plainNormal = vNormal;
     float plainRoughness, plainMetallic;
-    triPlanarMaterial(vSamplePointScaled, plainNormal, plainAlbedoRoughnessMap, plainNormalMetallicMap, plainScale, plainSharpness, plainNormalStrength, plainAlbedo, plainNormal, plainRoughness, plainMetallic);
+    triPlanarMaterial(vSamplePointScaled, vNormal, plainAlbedoRoughnessMap, plainNormalMetallicMap, plainScale, plainSharpness, plainNormalStrength, plainAlbedo, plainNormal, plainRoughness, plainMetallic);
 
     // Desert material
     float desertScale = 0.5 * 1000e3;
-    float desertSharpness = 2.0;
-    float desertNormalStrength = steepSharpness;
+    float desertSharpness = 0.5;
+    float desertNormalStrength = normalSharpness;
     vec3 desertAlbedo;
     vec3 desertNormal = vNormal;
     float desertRoughness, desertMetallic;
-    triPlanarMaterial(vSamplePointScaled, desertNormal, desertAlbedoRoughnessMap, desertNormalMetallicMap, desertScale, desertSharpness, desertNormalStrength, desertAlbedo, desertNormal, desertRoughness, desertMetallic);
+    triPlanarMaterial(vSamplePointScaled, vNormal, desertAlbedoRoughnessMap, desertNormalMetallicMap, desertScale, desertSharpness, desertNormalStrength, desertAlbedo, desertNormal, desertRoughness, desertMetallic);
 
-    vec3 albedo = steepFactor * steepAlbedo + plainFactor * plainAlbedo + (desertFactor+beachFactor) * desertAlbedo;
-    /*+ beachFactor * beachColor
-    + desertFactor * desertColor
-    + plainFactor * plainColor
-    + snowFactor * snowColor
-    + bottomFactor * bottomColor;*/
+    // Snow material
+    float snowScale = 0.5 * 1000e3;
+    float snowSharpness = 0.5;
+    float snowNormalStrength = normalSharpness;
+    vec3 snowAlbedo;
+    vec3 snowNormal = vNormal;
+    float snowRoughness, snowMetallic;
+    triPlanarMaterial(vSamplePointScaled, vNormal, snowAlbedoRoughnessMap, snowNormalMetallicMap, snowScale, snowSharpness, snowNormalStrength, snowAlbedo, snowNormal, snowRoughness, snowMetallic);
 
-    vec3 normal = steepFactor * steepNormal + plainFactor * plainNormal + (desertFactor+beachFactor) * desertNormal;
+    vec3 albedo = steepFactor * steepAlbedo + plainFactor * plainAlbedo + (desertFactor+beachFactor) * desertAlbedo + snowFactor * snowAlbedo;
 
-    float roughness = steepFactor * steepRoughness + plainFactor * plainRoughness + (desertFactor+beachFactor) * desertRoughness;
+    vec3 normal = steepFactor * steepNormal + plainFactor * plainNormal + (desertFactor+beachFactor) * desertNormal + snowFactor * snowNormal;
+    normal = normalize(normal);
 
-    float metallic = steepFactor * steepMetallic + plainFactor * plainMetallic + (desertFactor+beachFactor) * desertMetallic;
+    float roughness = steepFactor * steepRoughness + plainFactor * plainRoughness + (desertFactor+beachFactor) * desertRoughness + snowFactor * snowRoughness;
+
+    float metallic = steepFactor * steepMetallic + plainFactor * plainMetallic + (desertFactor+beachFactor) * desertMetallic + snowFactor * snowMetallic;
 
     vec3 N = mat3(normalMatrix) * normal;
 

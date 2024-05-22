@@ -76,8 +76,8 @@ export class SurfacePanel extends EditorPanel {
                 colorSettings.steepSharpness = val / 10;
                 material.updateConstants();
             }),
-            new Slider("normalSharpness", document.getElementById("normalSharpness") as HTMLElement, 0, 100, planet.material.colorSettings.normalSharpness * 100, (val: number) => {
-                colorSettings.normalSharpness = val / 100;
+            new Slider("normalSharpness", document.getElementById("normalSharpness") as HTMLElement, 0, 100, planet.material.colorSettings.normalSharpness * 10, (val: number) => {
+                colorSettings.normalSharpness = val / 10;
                 material.updateConstants();
             })
         ];
