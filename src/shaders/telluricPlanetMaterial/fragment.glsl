@@ -27,7 +27,6 @@ varying vec3 vSamplePoint;
 
 varying vec3 vPosition;// position of the vertex varyingchunk
 varying vec3 vNormal;// normal of the vertex varyingsphere space
-varying vec3 vLocalPosition;
 
 varying vec3 cameraPosition;// camera position in world space
 uniform float cameraNear;
@@ -122,7 +121,7 @@ void main() {
     ndl1 = clamp(ndl1, 0.0, 1.0);
 
     //FIXME: should use the angle between the axis and the normal
-    float latitude = acos(vUnitSamplePoint.y) - 3.1415 / 2.0;
+    float latitude = acos(clamp(vUnitSamplePoint.y, -1.0, 1.0)) - 3.1415 / 2.0;
     //float latitude = vUnitSamplePoint.y;
     float absLatitude01 = abs(latitude);
 

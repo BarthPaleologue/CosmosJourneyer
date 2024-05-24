@@ -40,8 +40,6 @@ varying vec3 vPosition;
 varying vec3 vUnitSamplePoint;
 varying vec3 vSamplePoint;
 
-varying vec3 vLocalPosition;
-
 varying vec3 cameraPosition;
 
 void main() {
@@ -55,7 +53,6 @@ void main() {
     vNormalW = vec3(world * vec4(normal, 0.0));
 
 	vPosition = chunkPositionPlanetSpace + position;
-	vLocalPosition = position;
 
 	vUnitSamplePoint = normalize(vPosition);
     vSphereNormalW = vec3(planetWorldMatrix * vec4(vUnitSamplePoint, 0.0));
