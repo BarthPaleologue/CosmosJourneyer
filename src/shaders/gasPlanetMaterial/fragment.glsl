@@ -47,27 +47,20 @@ uniform float seed;
 
 #include "../utils/smoothSharpener.glsl";
 
-void main() {
-    vec3 viewRayW = normalize(cameraPosition - vPositionW);// view direction in world space
+#include "../utils/pbr.glsl";
 
+void main() {
     vec3 normalW = vNormalW;
 
-    vec3 ndl = vec3(0.0);
-    float specComp = 0.0;
+    float ndl = 0.0;
     for (int i = 0; i < nbStars; i++) {
         vec3 starLightRayW = normalize(star_positions[i] - vPositionW);// light ray direction in world space
-        ndl += max(0.0, dot(normalW, starLightRayW)) * star_colors[i];// diffuse lighting
-
-        vec3 angleW = normalize(viewRayW + starLightRayW);
-        specComp += max(0.0, dot(normalW, angleW));
+        ndl = max(ndl, max(0.0, dot(normalW, starLightRayW)));
     }
-    ndl = clamp(ndl, 0.0, 1.0);
-    specComp = saturate(specComp);
-    specComp = pow(specComp, 128.0);
 
-    vec3 color = vec3(0.0);
+    vec3 Lo = vec3(0.0);
 
-    if (ndl.x > 0.0 || ndl.y > 0.0 || ndl.z > 0.0) {
+    if (ndl > 0.0) {
         vec4 seededSamplePoint = vec4(vUnitSamplePoint * 2.0, mod(seed, 1e3));
 
         seededSamplePoint.y *= 2.5;
@@ -83,14 +76,21 @@ void main() {
 
         float colorDecision2 = fractalSimplex4(vec4(latitude - warping, seedImpact, -seedImpact, seedImpact), 3, 2.0, 2.0);
 
-        color = mix(color2, color1, smoothstep(0.4, 0.6, colorDecision1));
+        vec3 albedo = 3.0 * mix(color2, color1, smoothstep(0.4, 0.6, colorDecision1));
 
-        color = mix(color3, color, smoothSharpener(colorDecision2, colorSharpness));
+        albedo = mix(color3, albedo, smoothSharpener(colorDecision2, colorSharpness));
+
+        float roughness = 0.4;
+        float metallic = 0.0;
+
+        // pbr accumulation
+        vec3 viewRayW = normalize(cameraPosition - vPositionW);
+        for (int i = 0; i < nbStars; i++) {
+            vec3 L = normalize(star_positions[i] - vPositionW);
+
+            Lo += calculateLight(albedo, normalW, roughness, metallic, L, viewRayW, star_colors[i]);
+        }
     }
 
-    specComp /= 2.0;
-
-    vec3 finalColor = color.rgb * (ndl + specComp * ndl);
-
-    gl_FragColor = vec4(finalColor, 1.0);
+    gl_FragColor = vec4(Lo, 1.0);
 }
