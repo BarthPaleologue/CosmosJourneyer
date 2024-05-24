@@ -105,7 +105,7 @@ void main() {
 
     vPosition = position;
 
-    normalMatrix = transpose(inverse(finalWorld));
+    normalMatrix = finalWorld;
 
     vNormal = leaningNormal;
 
