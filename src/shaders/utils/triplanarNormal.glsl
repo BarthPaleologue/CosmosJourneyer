@@ -51,7 +51,7 @@ vec3 triplanarNormal(vec3 position, vec3 surfaceNormal, sampler2D normalMap, flo
 }
 
 #define inline
-void triPlanarMaterial(vec3 position, vec3 surfaceNormal, sampler2D albedoRoughnessMap, sampler2D normalMetallicMap, float scale, float sharpness, float normalStrength, out vec3 albedo, out vec3 normal, out float roughness, out float metallic) {
+void triPlanarMaterial(vec3 position, vec3 surfaceNormal, sampler2D albedoRoughnessMap, sampler2D normalMetallicMap, float scale, out vec3 albedo, out vec3 normal, out float roughness, out float metallic) {
     vec2 uvX = vec3(position).zy * scale;
     vec2 uvY = vec3(position).xz * scale;
     vec2 uvZ = vec3(position).xy * scale;

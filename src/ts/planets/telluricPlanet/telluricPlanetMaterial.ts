@@ -33,7 +33,6 @@ import lutFragment from "../../../shaders/telluricPlanetMaterial/utils/lut.glsl"
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import { Transformable } from "../../architecture/transformable";
 import { Scene } from "@babylonjs/core/scene";
-import { Matrix } from "@babylonjs/core/Maths/math";
 
 /**
  * The material for telluric planets.
@@ -100,14 +99,6 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
                 "waterLevel",
                 "beachSize",
                 "steepSharpness",
-                "normalSharpness",
-
-                "snowColor",
-                "steepColor",
-                "plainColor",
-                "beachColor",
-                "desertColor",
-                "bottomColor",
 
                 "maxElevation",
 
@@ -121,8 +112,6 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
 
                 "plainAlbedoRoughnessMap",
                 "plainNormalMetallicMap",
-
-                "beachNormalMap",
 
                 "desertNormalMetallicMap",
                 "desertAlbedoRoughnessMap",
@@ -141,18 +130,6 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
         this.colorSettings = {
             mode: ColorMode.DEFAULT,
 
-            snowColor: new Color3(0.9, 0.9, 0.9),
-            steepColor: new Color3(60, 60, 60).scaleInPlace(1.5 / 255),
-            plainColor: new Color3(
-                //TODO: make this better
-                1.5 * Math.max(0.22 + centeredRand(model.rng, 82) / 20, 0),
-                1.5 * Math.max(0.37 + centeredRand(model.rng, 83) / 20, 0),
-                1.5 * Math.max(0.024 + centeredRand(model.rng, 84) / 20, 0)
-            ),
-            beachColor: new Color3(132, 114, 46).scaleInPlace(1 / 255),
-            desertColor: new Color3(232, 142, 59).scaleInPlace(1 / 255),
-            bottomColor: new Color3(0.5, 0.5, 0.5),
-
             beachSize: 100 + 50 * centeredRand(model.rng, 85),
             steepSharpness: 2,
             normalSharpness: 2.5
@@ -160,22 +137,12 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
 
         if (model.physicalProperties.oceanLevel === 0) {
             // sterile world
-            this.colorSettings.plainColor = Color3.FromHSV(model.rng(666) * 360, 0.2, normalRandom(0.3, 0.1, model.rng, 86) * 0.5 + 0.5);
-            this.colorSettings.beachColor = this.colorSettings.plainColor.scale(0.9);
-            this.colorSettings.desertColor = this.colorSettings.plainColor.clone();
-            this.colorSettings.bottomColor = this.colorSettings.plainColor.scale(0.8);
+            // TODO: choose sterile textures
         }
 
         this.setFloat("seed", model.seed);
 
         if (!Assets.IS_READY) throw new Error("You must initialize your assets using the AssetsManager");
-
-        this.setColor3("snowColor", this.colorSettings.snowColor);
-        this.setColor3("steepColor", this.colorSettings.steepColor);
-        this.setColor3("plainColor", this.colorSettings.plainColor);
-        this.setColor3("beachColor", this.colorSettings.beachColor);
-        this.setColor3("desertColor", this.colorSettings.desertColor);
-        this.setColor3("bottomColor", this.colorSettings.bottomColor);
 
         this.setVector3("planetPosition", this.planetTransform.getAbsolutePosition());
 
@@ -192,6 +159,20 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
         lut.executeWhenReady(() => {
             this.setTexture("lut", lut);
         });
+
+        this.setTexture("bottomNormalMap", Assets.BOTTOM_NORMAL_MAP);
+
+        this.setTexture("steepNormalMetallicMap", Assets.ROCK_NORMAL_METALLIC_MAP);
+        this.setTexture("steepAlbedoRoughnessMap", Assets.ROCK_ALBEDO_ROUGHNESS_MAP);
+
+        this.setTexture("plainNormalMetallicMap", Assets.GRASS_NORMAL_METALLIC_MAP);
+        this.setTexture("plainAlbedoRoughnessMap", Assets.GRASS_ALBEDO_ROUGHNESS_MAP);
+
+        this.setTexture("snowNormalMetallicMap", Assets.SNOW_NORMAL_METALLIC_MAP);
+        this.setTexture("snowAlbedoRoughnessMap", Assets.SNOW_ALBEDO_ROUGHNESS_MAP);
+
+        this.setTexture("desertNormalMetallicMap", Assets.SAND_NORMAL_METALLIC_MAP);
+        this.setTexture("desertAlbedoRoughnessMap", Assets.SAND_ALBEDO_ROUGHNESS_MAP);
 
         this.updateConstants();
 
@@ -211,27 +192,6 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
         this.setFloat("waterLevel", this.planetModel.physicalProperties.oceanLevel);
         this.setFloat("beachSize", this.colorSettings.beachSize);
         this.setFloat("steepSharpness", this.colorSettings.steepSharpness);
-
-        this.setFloat("normalSharpness", this.colorSettings.normalSharpness);
-
-        this.setTexture("bottomNormalMap", Assets.BOTTOM_NORMAL_MAP);
-
-        // Steep material
-        this.setTexture("steepNormalMetallicMap", Assets.ROCK_NORMAL_METALLIC_MAP);
-        this.setTexture("steepAlbedoRoughnessMap", Assets.ROCK_ALBEDO_ROUGHNESS_MAP);
-
-        // Plain material
-        this.setTexture("plainNormalMetallicMap", Assets.GRASS_NORMAL_METALLIC_MAP);
-        this.setTexture("plainAlbedoRoughnessMap", Assets.GRASS_ALBEDO_ROUGHNESS_MAP);
-
-        this.setTexture("snowNormalMetallicMap", Assets.SNOW_NORMAL_METALLIC_MAP);
-        this.setTexture("snowAlbedoRoughnessMap", Assets.SNOW_ALBEDO_ROUGHNESS_MAP);
-
-        this.setTexture("beachNormalMap", Assets.SAND_NORMAL_METALLIC_MAP);
-
-        // Desert material
-        this.setTexture("desertNormalMetallicMap", Assets.SAND_NORMAL_METALLIC_MAP);
-        this.setTexture("desertAlbedoRoughnessMap", Assets.SAND_ALBEDO_ROUGHNESS_MAP);
 
         this.setFloat("minTemperature", this.planetModel.physicalProperties.minTemperature);
         this.setFloat("maxTemperature", this.planetModel.physicalProperties.maxTemperature);
