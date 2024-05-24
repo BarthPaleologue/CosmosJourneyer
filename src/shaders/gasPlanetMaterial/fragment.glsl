@@ -39,6 +39,8 @@ uniform float time;
 
 uniform float seed;
 
+#include "../utils/pi.glsl";
+
 #include "../utils/simplex4.glsl";
 
 #include "../utils/saturate.glsl";

@@ -85,6 +85,8 @@ uniform float maxTemperature;
 
 uniform float waterAmount;
 
+#include "../utils/pi.glsl";
+
 #include "../utils/toUV.glsl";
 
 #include "../utils/triplanarNormal.glsl";
