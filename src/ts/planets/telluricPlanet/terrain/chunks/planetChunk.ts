@@ -228,12 +228,13 @@ export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
             const conservativeSphereNormal = closestPointToCamera.subtract(this.parent.getAbsolutePosition()).normalizeToNew();
             const observerToCenter = camera.globalPosition.subtract(this.parent.getAbsolutePosition()).normalizeToNew();
             if (Vector3.Dot(observerToCenter, conservativeSphereNormal) < 0) {
-                isVisible = isVisible || false;
                 continue;
             }
 
-            // chunks are only rendered if they are big enough on screen
-            isVisible = isVisible || isSizeOnScreenEnough(this, camera);
+            if(isSizeOnScreenEnough(this, camera, 0.002 / 5)) {
+                isVisible = true;
+                break;
+            }
         }
 
         this.mesh.setEnabled(isVisible);
