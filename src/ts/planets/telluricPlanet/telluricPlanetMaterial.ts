@@ -33,6 +33,7 @@ import lutFragment from "../../../shaders/telluricPlanetMaterial/utils/lut.glsl"
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import { Transformable } from "../../architecture/transformable";
 import { Scene } from "@babylonjs/core/scene";
+import { Matrix } from "@babylonjs/core/Maths/math";
 
 /**
  * The material for telluric planets.
@@ -76,7 +77,6 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
                 "worldViewProjection",
                 "projection",
                 "view",
-                "normalMatrix",
 
                 "colorMode",
 
@@ -91,7 +91,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
                 "star_colors",
                 "nbStars",
 
-                "inversePlanetWorldMatrix",
+                "chunkPositionPlanetSpace",
 
                 "waterLevel",
                 "beachSize",
@@ -190,6 +190,10 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
         });
 
         this.updateConstants();
+
+        this.onBindObservable.add((mesh) => {
+            this.getEffect().setVector3("chunkPositionPlanetSpace",  mesh.position);
+        });
     }
 
     public updateConstants(): void {
@@ -237,12 +241,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
         this.stellarObjects = stellarObjects;
 
         // The add once is important because the material will be bound for every chunk of the planet
-        // we don't want to compute the same matrix inverse for every chunk
         this.onBindObservable.addOnce(() => {
-            const inversePlanetWorldMatrix = this.planetTransform.getWorldMatrix().clone().invert();
-            this.getEffect().setMatrix("normalMatrix", inversePlanetWorldMatrix.transpose());
-            this.getEffect().setMatrix("inversePlanetWorldMatrix", inversePlanetWorldMatrix);
-
             this.getEffect().setArray3("star_positions", flattenVector3Array(this.stellarObjects.map((star) => star.getTransform().getAbsolutePosition())));
             this.getEffect().setArray3("star_colors", flattenColor3Array(this.stellarObjects.map((star) => (star instanceof Star ? star.model.color : Color3.White()))));
             this.getEffect().setInt("nbStars", this.stellarObjects.length);

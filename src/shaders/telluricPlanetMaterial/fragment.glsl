@@ -17,6 +17,8 @@
 
 precision highp float;
 
+uniform mat4 world;
+
 varying vec3 vPositionW;
 varying vec3 vNormalW;
 varying vec3 vUnitSamplePoint;
@@ -27,8 +29,6 @@ varying vec3 vSamplePointScaled;
 varying vec3 vPosition;// position of the vertex varyingchunk
 varying vec3 vNormal;// normal of the vertex varyingsphere space
 varying vec3 vLocalPosition;
-
-uniform mat4 normalMatrix;
 
 varying vec3 cameraPosition;// camera position in world space
 uniform float cameraNear;
@@ -274,7 +274,7 @@ void main() {
 
     float metallic = steepFactor * steepMetallic + plainFactor * plainMetallic + (desertFactor+beachFactor) * desertMetallic + snowFactor * snowMetallic;
 
-    vec3 normalW = mat3(normalMatrix) * normal;
+    vec3 normalW = vec3(world * vec4(normal, 0.0));
 
     // pbr accumulation
     vec3 Lo = vec3(0.0);

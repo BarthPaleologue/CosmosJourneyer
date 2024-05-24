@@ -27,7 +27,7 @@ uniform mat4 normalMatrix;
 
 uniform vec3 planetPosition;
 
-uniform mat4 inversePlanetWorldMatrix;
+uniform vec3 chunkPositionPlanetSpace;
 
 varying vec3 vPositionW;
 varying vec3 vNormalW;
@@ -52,9 +52,9 @@ void main() {
 	cameraPosition = view[3].xyz;
     
     vPositionW = vec3(world * vec4(position, 1.0));
-    vNormalW = normalize(mat3(normalMatrix) * normal);
+    vNormalW = vec3(world * vec4(normal, 0.0));
 
-	vPosition = vec3(inversePlanetWorldMatrix * vec4(vPositionW, 1.0));
+	vPosition = chunkPositionPlanetSpace + position;
 	vLocalPosition = position;
 
 	vUnitSamplePoint = normalize(vPosition);
