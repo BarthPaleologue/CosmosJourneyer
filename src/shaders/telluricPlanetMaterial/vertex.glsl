@@ -43,11 +43,11 @@ varying vec3 vSamplePoint;
 varying vec3 cameraPosition;
 
 void main() {
-
     vec4 outPosition = worldViewProjection * vec4(position, 1.0);
     gl_Position = outPosition;
 
-	cameraPosition = view[3].xyz;
+    //FIXME: this must be changed
+	cameraPosition = inverse(view)[3].xyz;
     
     vPositionW = vec3(world * vec4(position, 1.0));
     vNormalW = vec3(world * vec4(normal, 0.0));
