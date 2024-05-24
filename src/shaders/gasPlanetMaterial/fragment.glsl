@@ -70,7 +70,7 @@ void main() {
         float seedImpact = mod(seed, 1e3);
 
         float warpingStrength = 2.0;
-        float warping = fractalSimplex4(seededSamplePoint + vec4(seedImpact, 0.0, 0.0, time * 0.0001), 5, 2.0, 2.0) * warpingStrength;
+        float warping = fractalSimplex4(seededSamplePoint + vec4(seedImpact, 0.0, 0.0, time * 0.01), 5, 2.0, 2.0) * warpingStrength;
 
         float colorDecision1 = fractalSimplex4(vec4(latitude + warping, seedImpact, -seedImpact, seedImpact), 3, 2.0, 2.0);
 
