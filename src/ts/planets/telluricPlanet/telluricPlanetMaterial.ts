@@ -93,6 +93,8 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
 
                 "chunkPositionPlanetSpace",
 
+                "planetWorldMatrix",
+
                 "waterLevel",
                 "beachSize",
                 "steepSharpness",
@@ -242,6 +244,8 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
 
         // The add once is important because the material will be bound for every chunk of the planet
         this.onBindObservable.addOnce(() => {
+            this.getEffect().setMatrix("planetWorldMatrix", this.planetTransform.getWorldMatrix());
+
             this.getEffect().setArray3("star_positions", flattenVector3Array(this.stellarObjects.map((star) => star.getTransform().getAbsolutePosition())));
             this.getEffect().setArray3("star_colors", flattenColor3Array(this.stellarObjects.map((star) => (star instanceof Star ? star.model.color : Color3.White()))));
             this.getEffect().setInt("nbStars", this.stellarObjects.length);

@@ -23,11 +23,12 @@ attribute vec3 normal;
 uniform mat4 world;
 uniform mat4 view;
 uniform mat4 worldViewProjection;
-uniform mat4 normalMatrix;
 
 uniform vec3 planetPosition;
 
 uniform vec3 chunkPositionPlanetSpace;
+
+uniform mat4 planetWorldMatrix;
 
 varying vec3 vPositionW;
 varying vec3 vNormalW;
@@ -38,7 +39,6 @@ varying vec3 vPosition;
 
 varying vec3 vUnitSamplePoint;
 varying vec3 vSamplePoint;
-varying vec3 vSamplePointScaled;
 
 varying vec3 vLocalPosition;
 
@@ -58,8 +58,7 @@ void main() {
 	vLocalPosition = position;
 
 	vUnitSamplePoint = normalize(vPosition);
-	vSamplePointScaled = vPosition / 1000e3;
-    vSphereNormalW = normalize(vPosition);
+    vSphereNormalW = vec3(planetWorldMatrix * vec4(vUnitSamplePoint, 0.0));
 	vSamplePoint = vPosition;
 
 	vNormal = normal;
