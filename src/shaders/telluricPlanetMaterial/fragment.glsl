@@ -89,6 +89,8 @@ uniform float waterAmount;
 
 #include "../utils/toUV.glsl";
 
+#include "../utils/textureNoTile.glsl";
+
 #include "../utils/triplanarNormal.glsl";
 
 //https://www.desmos.com/calculator/8etk6vdfzi
@@ -229,41 +231,51 @@ void main() {
     snowFactor *= 1.0 - bottomFactor;
     desertFactor *= 1.0 - bottomFactor;
 
+    float scale = 0.2 * 1000e3;
+
     // Steep material
-    float steepScale = 0.5 * 1000e3;
+    float steepScale = scale;
     float steepSharpness = 0.5;
     float steepNormalStrength = normalSharpness;
     vec3 steepAlbedo;
     vec3 steepNormal = vNormal;
     float steepRoughness, steepMetallic;
-    triPlanarMaterial(vSamplePointScaled, vNormal, steepAlbedoRoughnessMap, steepNormalMetallicMap, steepScale, steepSharpness, steepNormalStrength, steepAlbedo, steepNormal, steepRoughness, steepMetallic);
+    if(steepFactor > 0.01) {
+        triPlanarMaterial(vSamplePointScaled, vNormal, steepAlbedoRoughnessMap, steepNormalMetallicMap, steepScale, steepSharpness, steepNormalStrength, steepAlbedo, steepNormal, steepRoughness, steepMetallic);
+    }
 
     // Plain material
-    float plainScale = 0.5 * 1000e3;
+    float plainScale = scale;
     float plainSharpness = 0.5;
     float plainNormalStrength = normalSharpness;
     vec3 plainAlbedo;
     vec3 plainNormal = vNormal;
     float plainRoughness, plainMetallic;
-    triPlanarMaterial(vSamplePointScaled, vNormal, plainAlbedoRoughnessMap, plainNormalMetallicMap, plainScale, plainSharpness, plainNormalStrength, plainAlbedo, plainNormal, plainRoughness, plainMetallic);
+    if(plainFactor > 0.01) {
+        triPlanarMaterial(vSamplePointScaled, vNormal, plainAlbedoRoughnessMap, plainNormalMetallicMap, plainScale, plainSharpness, plainNormalStrength, plainAlbedo, plainNormal, plainRoughness, plainMetallic);
+    }
 
     // Desert material
-    float desertScale = 0.5 * 1000e3;
+    float desertScale = scale;
     float desertSharpness = 0.5;
     float desertNormalStrength = normalSharpness;
     vec3 desertAlbedo;
     vec3 desertNormal = vNormal;
     float desertRoughness, desertMetallic;
-    triPlanarMaterial(vSamplePointScaled, vNormal, desertAlbedoRoughnessMap, desertNormalMetallicMap, desertScale, desertSharpness, desertNormalStrength, desertAlbedo, desertNormal, desertRoughness, desertMetallic);
+    if(desertFactor + beachFactor > 0.01) {
+        triPlanarMaterial(vSamplePointScaled, vNormal, desertAlbedoRoughnessMap, desertNormalMetallicMap, desertScale, desertSharpness, desertNormalStrength, desertAlbedo, desertNormal, desertRoughness, desertMetallic);
+    }
 
     // Snow material
-    float snowScale = 0.5 * 1000e3;
+    float snowScale = scale;
     float snowSharpness = 0.5;
     float snowNormalStrength = normalSharpness;
     vec3 snowAlbedo;
     vec3 snowNormal = vNormal;
     float snowRoughness, snowMetallic;
-    triPlanarMaterial(vSamplePointScaled, vNormal, snowAlbedoRoughnessMap, snowNormalMetallicMap, snowScale, snowSharpness, snowNormalStrength, snowAlbedo, snowNormal, snowRoughness, snowMetallic);
+    if(snowFactor > 0.01) {
+        triPlanarMaterial(vSamplePointScaled, vNormal, snowAlbedoRoughnessMap, snowNormalMetallicMap, snowScale, snowSharpness, snowNormalStrength, snowAlbedo, snowNormal, snowRoughness, snowMetallic);
+    }
 
     vec3 albedo = steepFactor * steepAlbedo + plainFactor * plainAlbedo + (desertFactor+beachFactor) * desertAlbedo + snowFactor * snowAlbedo;
 

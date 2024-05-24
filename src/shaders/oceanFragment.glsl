@@ -49,6 +49,8 @@ uniform float time;
 
 #include "./utils/rayIntersectSphere.glsl";
 
+#include "./utils/textureNoTile.glsl";
+
 #include "./utils/triplanarNormal.glsl";
 
 #include "./utils/saturate.glsl";

@@ -24,9 +24,9 @@ vec3 triplanarNormal(vec3 position, vec3 surfaceNormal, sampler2D normalMap, flo
 
     // get the normal from the normal map
 
-    vec3 tNormalX = texture2D(normalMap, uvX).rgb;
-    vec3 tNormalY = texture2D(normalMap, uvY).rgb;
-    vec3 tNormalZ = texture2D(normalMap, uvZ).rgb;
+    vec3 tNormalX = textureNoTile(normalMap, uvX).rgb;
+    vec3 tNormalY = textureNoTile(normalMap, uvY).rgb;
+    vec3 tNormalZ = textureNoTile(normalMap, uvZ).rgb;
 
     tNormalX = normalize(tNormalX * 2.0 - 1.0);
     tNormalY = normalize(tNormalY * 2.0 - 1.0);
@@ -57,39 +57,47 @@ void triPlanarMaterial(vec3 position, vec3 surfaceNormal, sampler2D albedoRoughn
     vec2 uvZ = vec3(position).xy * scale;
 
     // get the normal from the normal map
-    vec4 tNormalMetallicX = texture2D(normalMetallicMap, uvX);
-    vec4 tNormalMetallicY = texture2D(normalMetallicMap, uvY);
-    vec4 tNormalMetallicZ = texture2D(normalMetallicMap, uvZ);
+    vec4 tNormalMetallicX = textureNoTile(normalMetallicMap, uvX);
+    vec4 tNormalMetallicY = textureNoTile(normalMetallicMap, uvY);
+    vec4 tNormalMetallicZ = textureNoTile(normalMetallicMap, uvZ);
 
     vec3 tNormalX = tNormalMetallicX.rgb;
     vec3 tNormalY = tNormalMetallicY.rgb;
     vec3 tNormalZ = tNormalMetallicZ.rgb;
 
-    tNormalX = normalize(tNormalX * 2.0 - 1.0);
-    tNormalY = normalize(tNormalY * 2.0 - 1.0);
-    tNormalZ = normalize(tNormalZ * 2.0 - 1.0);
+    tNormalX = tNormalX * 2.0 - 1.0;
+    tNormalY = tNormalY * 2.0 - 1.0;
+    tNormalZ = tNormalZ * 2.0 - 1.0;
 
-    // Swizzle tangemt normals into world space and zero out "z"
-    tNormalX = vec3(0.0, tNormalX.yx);
-    tNormalY = vec3(tNormalY.x, 0.0, tNormalY.y);
-    tNormalZ = vec3(tNormalZ.xy, 0.0);
-
-    vec3 blendWeight = pow(abs(surfaceNormal), vec3(sharpness));
+    vec3 blendWeight = abs(surfaceNormal);
+    blendWeight = pow(blendWeight, vec3(2.0));
     blendWeight /= (blendWeight.x + blendWeight.y + blendWeight.z);
-    blendWeight *= normalStrength;
+    blendWeight *= 2.5;
+
+    vec3 axis = sign(surfaceNormal);
+    vec3 tangentX = normalize(cross(surfaceNormal, vec3(0.0, axis.x, 0.0)));
+    vec3 bitangentX = normalize(cross(tangentX, surfaceNormal)) * axis.x;
+    mat3 tbnX = mat3(tangentX, bitangentX, surfaceNormal);
+
+    vec3 tangentY = normalize(cross(surfaceNormal, vec3(0.0, 0.0, axis.y)));
+    vec3 bitangentY = normalize(cross(tangentY, surfaceNormal)) * axis.y;
+    mat3 tbnY = mat3(tangentY, bitangentY, surfaceNormal);
+
+    vec3 tangentZ = normalize(cross(surfaceNormal, vec3(0.0, -axis.z, 0.0)));
+    vec3 bitangentZ = normalize(-cross(tangentZ, surfaceNormal)) * axis.z;
+    mat3 tbnZ = mat3(tangentZ, bitangentZ, surfaceNormal);
 
     // Triblend normals and add to world normal
     normal = normalize(
-        tNormalX.xyz * blendWeight.x +
-        tNormalY.xyz * blendWeight.y +
-        tNormalZ.xyz * blendWeight.z +
-        surfaceNormal
+        clamp(tbnX * tNormalX, -1.0, 1.0) * blendWeight.x +
+        clamp(tbnY * tNormalY, -1.0, 1.0) * blendWeight.y +
+        clamp(tbnZ * tNormalZ, -1.0, 1.0) * blendWeight.z
     );
 
     // tri planar mapping of albedo
-    vec4 tAlbedoRoughnessX = texture2D(albedoRoughnessMap, uvX);
-    vec4 tAlbedoRoughnessY = texture2D(albedoRoughnessMap, uvY);
-    vec4 tAlbedoRoughnessZ = texture2D(albedoRoughnessMap, uvZ);
+    vec4 tAlbedoRoughnessX = textureNoTile(albedoRoughnessMap, uvX);
+    vec4 tAlbedoRoughnessY = textureNoTile(albedoRoughnessMap, uvY);
+    vec4 tAlbedoRoughnessZ = textureNoTile(albedoRoughnessMap, uvZ);
 
     vec3 tAlbedoX = tAlbedoRoughnessX.rgb;
     vec3 tAlbedoY = tAlbedoRoughnessY.rgb;
