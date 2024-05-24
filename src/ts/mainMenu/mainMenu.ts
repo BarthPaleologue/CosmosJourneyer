@@ -196,8 +196,7 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
             const targetObject = this.starSystemController.planets.length > 0 ? this.starSystemController.planets[0] : this.starSystemController.stellarObjects[0];
             positionNearObjectWithStarVisible(this.controls, targetObject, this.starSystemController, nbRadius);
 
-            if (targetObject instanceof GasPlanet) Settings.TIME_MULTIPLIER = 30;
-            else Settings.TIME_MULTIPLIER = 3;
+            Settings.TIME_MULTIPLIER = 3;
 
             Assets.MAIN_MENU_BACKGROUND_MUSIC.play();
         });
