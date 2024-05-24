@@ -33,6 +33,7 @@ import lutFragment from "../../../shaders/telluricPlanetMaterial/utils/lut.glsl"
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import { Transformable } from "../../architecture/transformable";
 import { Scene } from "@babylonjs/core/scene";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 
 /**
  * The material for telluric planets.
@@ -52,6 +53,18 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
     private readonly planetModel: TelluricPlanetModel;
 
     private stellarObjects: Transformable[] = [];
+
+    private plainNormalMetallicMap: Texture;
+    private plainAlbedoRoughnessMap: Texture;
+
+    private desertNormalMetallicMap: Texture;
+    private desertAlbedoRoughnessMap: Texture;
+
+    private snowNormalMetallic: Texture;
+    private snowAlbedoRoughnessMap: Texture;
+
+    private steepNormalMetallic: Texture;
+    private steepAlbedoRoughnessMap: Texture;
 
     /**
      * Creates a new telluric planet material
@@ -135,14 +148,27 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
             normalSharpness: 2.5
         };
 
+        if (!Assets.IS_READY) throw new Error("You must initialize your assets using the AssetsManager");
+
+        this.plainNormalMetallicMap = Assets.GRASS_NORMAL_METALLIC_MAP;
+        this.plainAlbedoRoughnessMap = Assets.GRASS_ALBEDO_ROUGHNESS_MAP;
+
+        this.desertNormalMetallicMap = Assets.SAND_NORMAL_METALLIC_MAP;
+        this.desertAlbedoRoughnessMap = Assets.SAND_ALBEDO_ROUGHNESS_MAP;
+
+        this.snowNormalMetallic = Assets.SNOW_NORMAL_METALLIC_MAP;
+        this.snowAlbedoRoughnessMap = Assets.SNOW_ALBEDO_ROUGHNESS_MAP;
+
+        this.steepNormalMetallic = Assets.ROCK_NORMAL_METALLIC_MAP;
+        this.steepAlbedoRoughnessMap = Assets.ROCK_ALBEDO_ROUGHNESS_MAP;
+
         if (model.physicalProperties.oceanLevel === 0) {
             // sterile world
-            // TODO: choose sterile textures
+            this.plainNormalMetallicMap = Assets.ROCK_NORMAL_METALLIC_MAP;
+            this.plainAlbedoRoughnessMap = Assets.ROCK_ALBEDO_ROUGHNESS_MAP;
         }
 
         this.setFloat("seed", model.seed);
-
-        if (!Assets.IS_READY) throw new Error("You must initialize your assets using the AssetsManager");
 
         this.setVector3("planetPosition", this.planetTransform.getAbsolutePosition());
 
@@ -160,19 +186,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
             this.setTexture("lut", lut);
         });
 
-        this.setTexture("bottomNormalMap", Assets.BOTTOM_NORMAL_MAP);
-
-        this.setTexture("steepNormalMetallicMap", Assets.ROCK_NORMAL_METALLIC_MAP);
-        this.setTexture("steepAlbedoRoughnessMap", Assets.ROCK_ALBEDO_ROUGHNESS_MAP);
-
-        this.setTexture("plainNormalMetallicMap", Assets.GRASS_NORMAL_METALLIC_MAP);
-        this.setTexture("plainAlbedoRoughnessMap", Assets.GRASS_ALBEDO_ROUGHNESS_MAP);
-
-        this.setTexture("snowNormalMetallicMap", Assets.SNOW_NORMAL_METALLIC_MAP);
-        this.setTexture("snowAlbedoRoughnessMap", Assets.SNOW_ALBEDO_ROUGHNESS_MAP);
-
-        this.setTexture("desertNormalMetallicMap", Assets.SAND_NORMAL_METALLIC_MAP);
-        this.setTexture("desertAlbedoRoughnessMap", Assets.SAND_ALBEDO_ROUGHNESS_MAP);
+        this.updateTextures();
 
         this.updateConstants();
 
@@ -182,6 +196,22 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
             this.getEffect().setVector3("cameraPosition", activeCamera.globalPosition);
             this.getEffect().setVector3("chunkPositionPlanetSpace",  mesh.position);
         });
+    }
+
+    public updateTextures() {
+        this.setTexture("bottomNormalMap", Assets.BOTTOM_NORMAL_MAP);
+
+        this.setTexture("steepNormalMetallicMap", this.steepNormalMetallic);
+        this.setTexture("steepAlbedoRoughnessMap", this.steepAlbedoRoughnessMap);
+
+        this.setTexture("plainNormalMetallicMap", this.plainNormalMetallicMap);
+        this.setTexture("plainAlbedoRoughnessMap", this.plainAlbedoRoughnessMap);
+
+        this.setTexture("snowNormalMetallicMap", this.snowNormalMetallic);
+        this.setTexture("snowAlbedoRoughnessMap", this.snowAlbedoRoughnessMap);
+
+        this.setTexture("desertNormalMetallicMap", this.desertNormalMetallicMap);
+        this.setTexture("desertAlbedoRoughnessMap", this.desertAlbedoRoughnessMap);
     }
 
     public updateConstants(): void {
