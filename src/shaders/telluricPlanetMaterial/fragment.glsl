@@ -272,35 +272,15 @@ void main() {
 
     float metallic = steepFactor * steepMetallic + plainFactor * plainMetallic + (desertFactor+beachFactor) * desertMetallic + snowFactor * snowMetallic;
 
-    vec3 N = mat3(normalMatrix) * normal;
+    vec3 normalW = mat3(normalMatrix) * normal;
 
-    // pbr magic
+    // pbr accumulation
     vec3 Lo = vec3(0.0);
-    vec3 F0 = vec3(0.04);
-    F0 = mix(F0, albedo, metallic);
-
     vec3 V = normalize(cameraPosition - vPositionW);
     for (int i = 0; i < nbStars; i++) {
         vec3 L = normalize(star_positions[i] - vPositionW);
-        vec3 H = normalize(V + L);
 
-        vec3 F  = fresnelSchlick(max(dot(H, V), 0.0), F0);
-        float NDF = DistributionGGX(N, H, roughness);
-        float G   = GeometrySmith(N, V, L, roughness);
-
-        vec3 numerator    = NDF * G * F;
-        float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0)  + 0.0001;
-        vec3 specular     = numerator / denominator;
-
-        vec3 kS = F;
-        vec3 kD = vec3(1.0) - kS;
-
-        kD *= 1.0 - metallic;
-
-        vec3 radiance = star_colors[i];
-
-        float NdotL = max(dot(N, L), 0.01);
-        Lo += (kD * albedo / PI + specular) * radiance * NdotL;
+        Lo += calculateLight(albedo, normalW, roughness, metallic, L, V, star_colors[i]);
     }
 
     vec3 screenColor = Lo;
