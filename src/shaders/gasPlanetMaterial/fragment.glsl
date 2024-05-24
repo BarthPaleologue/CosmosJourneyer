@@ -28,7 +28,7 @@ varying vec3 vUnitSamplePoint;
 
 varying vec3 vPosition;// position of the vertex varyingsphere space
 
-varying vec3 cameraPosition;// camera position in world space
+uniform vec3 cameraPosition;// camera position in world space
 
 uniform vec3 color1;
 uniform vec3 color2;

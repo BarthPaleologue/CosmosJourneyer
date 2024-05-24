@@ -30,6 +30,8 @@ uniform vec3 chunkPositionPlanetSpace;
 
 uniform mat4 planetWorldMatrix;
 
+uniform vec3 cameraPosition;
+
 varying vec3 vPositionW;
 varying vec3 vNormalW;
 varying vec3 vSphereNormalW;
@@ -40,14 +42,9 @@ varying vec3 vPosition;
 varying vec3 vUnitSamplePoint;
 varying vec3 vSamplePoint;
 
-varying vec3 cameraPosition;
-
 void main() {
     vec4 outPosition = worldViewProjection * vec4(position, 1.0);
     gl_Position = outPosition;
-
-    //FIXME: this must be changed
-	cameraPosition = inverse(view)[3].xyz;
     
     vPositionW = vec3(world * vec4(position, 1.0));
     vNormalW = vec3(world * vec4(normal, 0.0));

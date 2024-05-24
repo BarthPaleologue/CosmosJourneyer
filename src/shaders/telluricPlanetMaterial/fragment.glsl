@@ -28,7 +28,7 @@ varying vec3 vSamplePoint;
 varying vec3 vPosition;// position of the vertex varyingchunk
 varying vec3 vNormal;// normal of the vertex varyingsphere space
 
-varying vec3 cameraPosition;// camera position in world space
+uniform vec3 cameraPosition;// camera position in world space
 uniform float cameraNear;
 uniform float cameraFar;
 

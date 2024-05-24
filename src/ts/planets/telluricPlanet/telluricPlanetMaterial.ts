@@ -93,6 +93,8 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
 
                 "chunkPositionPlanetSpace",
 
+                "cameraPosition",
+
                 "planetWorldMatrix",
 
                 "waterLevel",
@@ -194,6 +196,9 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
         this.updateConstants();
 
         this.onBindObservable.add((mesh) => {
+            const activeCamera = mesh.getScene().activeCamera;
+            if(activeCamera === null) throw new Error("No active camera in the scene");
+            this.getEffect().setVector3("cameraPosition", activeCamera.globalPosition);
             this.getEffect().setVector3("chunkPositionPlanetSpace",  mesh.position);
         });
     }
