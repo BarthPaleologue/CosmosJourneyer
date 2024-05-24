@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // taken from https://github.com/BarthPaleologue/feather/blob/main/assets/shaders/pbr/fragment.glsl
+// based on https://learnopengl.com/PBR/Lighting
 
 float DistributionGGX(vec3 N, vec3 H, float roughness) {
     float a      = roughness*roughness;
@@ -49,7 +50,7 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
 }
 
 vec3 fresnelSchlick(float cosTheta, vec3 F0) {
-    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+    return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
 vec3 calculateLight(vec3 albedo, vec3 normal, float roughness, float metallic, vec3 lightDir, vec3 viewDir, vec3 lightColor) {
@@ -67,12 +68,14 @@ vec3 calculateLight(vec3 albedo, vec3 normal, float roughness, float metallic, v
     vec3 specular     = numerator / denominator;
 
     vec3 kS = F;
-    vec3 kD = vec3(1.0) - kS;
+    vec3 kD = 1.0 - kS;
 
     kD *= 1.0 - metallic;
 
     vec3 radiance = lightColor;
 
     float NdotL = max(dot(normal, lightDir), 0.01);
-    return (kD * albedo / PI + specular) * radiance * NdotL;
+
+    vec3 diffuse = kD * (albedo)/ PI;
+    return (diffuse + specular) * radiance * NdotL;
 }
