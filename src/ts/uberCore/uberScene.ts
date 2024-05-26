@@ -21,6 +21,7 @@ import { Engine } from "@babylonjs/core/Engines/engine";
 import "@babylonjs/core/Rendering/depthRendererSceneComponent";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
+import { DepthRenderer } from "@babylonjs/core";
 
 /**
  * A very thin wrapper around Babylon's Scene class to add some convenience methods.
@@ -33,6 +34,8 @@ export class UberScene extends Scene {
      */
     private activeControls: Controls | null = null;
 
+    private readonly depthRenderers: DepthRenderer[] = [];
+
     /**
      * Creates a new UberScene.
      * @param engine The BabylonJS engine.
@@ -42,6 +45,12 @@ export class UberScene extends Scene {
         super(engine);
         this.performancePriority = performancePriority;
         this.clearColor = new Color4(0, 0, 0, 0);
+
+        this.onNewCameraAddedObservable.add((camera) => {
+            const depthRenderer = this.enableDepthRenderer(camera, false, true);
+            depthRenderer.getDepthMap().activeCamera = camera;
+            this.depthRenderers.push(depthRenderer);
+        });
     }
 
     /**
@@ -63,26 +72,13 @@ export class UberScene extends Scene {
 
         if (cameras.length === 1) cameras[0].attachControl(true);
 
-        if (this._depthRenderer === undefined || this._depthRenderer === null) {
-            this._depthRenderer = {};
-        }
-
-        const depthRenderers = Object.values(this._depthRenderer);
-
-        // for each camera, if it has no depth renderer, create one
-        cameras.forEach((camera) => {
-            if (depthRenderers.find((depthRenderer) => depthRenderer.getDepthMap().activeCamera === camera) === undefined) {
-                const depthRenderer = this.enableDepthRenderer(camera, false, true);
-                depthRenderer.useOnlyInActiveCamera = true;
+        for(const depthRenderer of this.depthRenderers) {
+            const depthRendererCamera = depthRenderer.getDepthMap().activeCamera;
+            if(depthRendererCamera === null) {
+                throw new Error("Depth renderer camera is null: " + depthRenderer);
             }
-        });
-
-        // for each depth renderer, if its active camera is not in the list of active cameras, disable it
-        depthRenderers.forEach((depthRenderer) => {
-            const camera = depthRenderer.getDepthMap().activeCamera;
-            if (camera === null) throw new Error("Found a depth renderer with no camera attached! Log: " + depthRenderer);
-            depthRenderer.enabled = cameras.includes(camera);
-        });
+            depthRenderer.enabled = cameras.includes(depthRendererCamera);
+        }
     }
 
     /**

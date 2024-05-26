@@ -45,6 +45,8 @@ uniform sampler2D clouds_lut;
 
 uniform float time;
 
+#include "./utils/pi.glsl";
+
 #include "./utils/saturate.glsl";
 
 #include "./utils/remap.glsl";
