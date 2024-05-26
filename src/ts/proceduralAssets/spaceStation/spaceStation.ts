@@ -8,6 +8,7 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { UtilitySection } from "./utilitySection";
 
 export class SpaceStation implements Transformable {
+    utilitySections: UtilitySection[] = [];
     helixHabitats: HelixHabitat[] = [];
     ringHabitats: RingHabitat[] = [];
 
@@ -29,6 +30,7 @@ export class SpaceStation implements Transformable {
 
             if (nodeType === SpaceStationNodeType.UTILITY_SECTION) {
                 const utilitySection = new UtilitySection(scene);
+                this.utilitySections.push(utilitySection);
                 newNode = utilitySection.getTransform();
             } else if (nodeType === SpaceStationNodeType.HELIX_HABITAT) {
                 const helixHabitat = new HelixHabitat(scene);
@@ -65,6 +67,7 @@ export class SpaceStation implements Transformable {
     }
 
     update(stellarObjects: Transformable[], deltaSeconds: number) {
+        this.utilitySections.forEach((utilitySection) => utilitySection.update(stellarObjects));
         this.helixHabitats.forEach((helixHabitat) => helixHabitat.update(stellarObjects, deltaSeconds));
         this.ringHabitats.forEach((ringHabitat) => ringHabitat.update(stellarObjects, deltaSeconds));
     }
@@ -74,6 +77,8 @@ export class SpaceStation implements Transformable {
     }
 
     dispose() {
+        this.root.dispose();
+        this.utilitySections.forEach((utilitySection) => utilitySection.dispose());
         this.helixHabitats.forEach((helixHabitat) => helixHabitat.dispose());
         this.ringHabitats.forEach((ringHabitat) => ringHabitat.dispose());
     }

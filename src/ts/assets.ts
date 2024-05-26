@@ -47,6 +47,11 @@ import spaceStationMetallic from "../asset/spaceStationMaterial/spaceship-panels
 import spaceStationNormal from "../asset/spaceStationMaterial/spaceship-panels1-normal-dx.png";
 import spaceStationAmbientOcclusion from "../asset/spaceStationMaterial/spaceship-panels1-ao.png";
 
+import solarPanelAlbedo from "../asset/SolarPanelMaterial/SolarPanel002_2K-PNG_Color.png";
+import solarPanelNormal from "../asset/SolarPanelMaterial/SolarPanel002_2K-PNG_NormalGL.png";
+import solarPanelMetallic from "../asset/SolarPanelMaterial/SolarPanel002_2K-PNG_Metalness.png";
+import solarPanelRoughness from "../asset/SolarPanelMaterial/SolarPanel002_2K-PNG_Roughness.png";
+
 import atmosphereLUT from "../shaders/textures/atmosphereLUT.glsl";
 
 import seamlessPerlin from "../asset/perlin.png";
@@ -94,7 +99,6 @@ import "@babylonjs/core/Audio/audioEngine";
 import "@babylonjs/core/Audio/audioSceneComponent";
 import { Sound } from "@babylonjs/core/Audio/sound";
 
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import { createButterfly } from "./proceduralAssets/butterfly/butterfly";
 import { createGrassBlade } from "./proceduralAssets/grass/grassBlade";
@@ -156,9 +160,13 @@ export class Assets {
     public static SPACE_STATION_NORMAL: Texture;
     public static SPACE_STATION_AMBIENT_OCCLUSION: Texture;
 
+    public static SOLAR_PANEL_ALBEDO: Texture;
+    public static SOLAR_PANEL_NORMAL: Texture;
+    public static SOLAR_PANEL_METALLIC: Texture;
+    public static SOLAR_PANEL_ROUGHNESS: Texture;
+
     public static ROCK: Mesh;
     public static TREE: Mesh;
-    public static SCATTER_CUBE: Mesh;
 
     public static BUTTERFLY: Mesh;
     public static GRASS_BLADE: Mesh;
@@ -224,6 +232,11 @@ export class Assets {
         Assets.MANAGER.addTextureTask("SpaceStationMetallic", spaceStationMetallic).onSuccess = (task) => (Assets.SPACE_STATION_METALLIC = task.texture);
         Assets.MANAGER.addTextureTask("SpaceStationNormal", spaceStationNormal).onSuccess = (task) => (Assets.SPACE_STATION_NORMAL = task.texture);
         Assets.MANAGER.addTextureTask("SpaceStationAmbientOcclusion", spaceStationAmbientOcclusion).onSuccess = (task) => (Assets.SPACE_STATION_AMBIENT_OCCLUSION = task.texture);
+
+        Assets.MANAGER.addTextureTask("SolarPanelAlbedo", solarPanelAlbedo).onSuccess = (task) => (Assets.SOLAR_PANEL_ALBEDO = task.texture);
+        Assets.MANAGER.addTextureTask("SolarPanelNormal", solarPanelNormal).onSuccess = (task) => (Assets.SOLAR_PANEL_NORMAL = task.texture);
+        Assets.MANAGER.addTextureTask("SolarPanelMetallic", solarPanelMetallic).onSuccess = (task) => (Assets.SOLAR_PANEL_METALLIC = task.texture);
+        Assets.MANAGER.addTextureTask("SolarPanelRoughness", solarPanelRoughness).onSuccess = (task) => (Assets.SOLAR_PANEL_ROUGHNESS = task.texture);
 
         Assets.MANAGER.addTextureTask("Starfield", starfield).onSuccess = (task) => (Assets.STAR_FIELD = task.texture);
 
@@ -532,11 +545,6 @@ export class Assets {
                 loadingScreen.loadingUIText = i18next.t("common:loading") + " " + ((100 * (totalCount - remainingCount)) / totalCount).toFixed(0) + "%";
             }
         };
-
-        Assets.SCATTER_CUBE = MeshBuilder.CreateBox("cube", { size: 1 }, scene);
-        Assets.SCATTER_CUBE.position.y = 0.5;
-        Assets.SCATTER_CUBE.bakeCurrentTransformIntoVertices();
-        Assets.SCATTER_CUBE.isVisible = false;
 
         Assets.MANAGER.onFinish = () => {
             console.log("Assets loaded");
