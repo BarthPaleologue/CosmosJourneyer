@@ -45,7 +45,7 @@ void main() {
 
     vec3 albedo = texture2D(albedoMap, vUV).rgb;
     float roughness = textureNoTile(roughnessMap, vUV).r;
-    float metallic = texture2D(metallicMap, vUV).r;
+    float metallic = textureNoTile(metallicMap, vUV).r;
 
     vec3 tangent1 = normalize(dFdx(vPositionW));
     vec3 tangent2 = normalize(dFdy(vPositionW));
