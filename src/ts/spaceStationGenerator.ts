@@ -34,6 +34,7 @@ import { sigmoid } from "./utils/math";
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
 import { AttachmentType, SpaceStationNode, SpaceStationNodeType } from "./proceduralAssets/spaceStation/spaceStationNode";
 import { createHelix } from "./utils/helixBuilder";
+import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 /*import { ShipControls } from "./spaceship/shipControls";
 import HavokPhysics from "@babylonjs/havok";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";*/
@@ -126,7 +127,10 @@ function updateStation(stationNode: SpaceStationNode | null, deltaSeconds: numbe
     stationNode.sideNodes.forEach((sideNode) => updateStation(sideNode, deltaSeconds));
 }
 
-const light = new HemisphericLight("Sun", Vector3.Up(), scene);
+const ambient = new HemisphericLight("Sun", Vector3.Up(), scene);
+ambient.intensity = 0.4;
+
+const sun = new DirectionalLight("Sun", new Vector3(1, -1, 1), scene);
 
 scene.onBeforeRenderObservable.add(() => {
     const deltaSeconds = engine.getDeltaTime() / 1000;

@@ -3,6 +3,7 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Axis } from "@babylonjs/core";
 import { Space } from "@babylonjs/core/Maths/math.axis";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { RingHabitatMaterial } from "./ringHabitatMaterial";
 
 export function createRingHabitat(scene: Scene): TransformNode {
     const root = new TransformNode("HelixHabitatRoot");
@@ -29,7 +30,7 @@ export function createRingHabitat(scene: Scene): TransformNode {
     attachment.parent = root;
 
     const ring = MeshBuilder.CreateTorus(
-        "HelixHabitat",
+        "RingHabitat",
         {
             diameter: 2 * radius,
             thickness: tubeDiameter,
@@ -37,6 +38,8 @@ export function createRingHabitat(scene: Scene): TransformNode {
         },
         scene
     );
+
+    ring.material = new RingHabitatMaterial(scene);
 
     ring.parent = root;
 
