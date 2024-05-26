@@ -17,10 +17,7 @@
 
 precision highp float;
 
-#define MAX_STARS 5
-uniform int nbStars;// number of stars
-uniform vec3 star_positions[MAX_STARS];
-uniform vec3 star_colors[MAX_STARS];
+#include "../utils/stars.glsl";
 
 varying vec3 vPositionW;
 varying vec3 vNormalW;

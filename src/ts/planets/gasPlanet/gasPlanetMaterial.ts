@@ -25,14 +25,25 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import { Scene } from "@babylonjs/core/scene";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { Star } from "../../stellarObjects/star/star";
-import { flattenColor3Array, flattenVector3Array } from "../../utils/algebra";
 import { Transformable } from "../../architecture/transformable";
+import { setStellarObjectUniforms, StellarObjectUniformNames } from "../../postProcesses/uniforms/stellarObjectUniforms";
+
+const GasPlanetMaterialUniformNames = {
+    WORLD: "world",
+    WORLD_VIEW_PROJECTION: "worldViewProjection",
+    CAMERA_POSITION: "cameraPosition",
+    SEED: "seed",
+    TIME: "time",
+    COLOR1: "color1",
+    COLOR2: "color2",
+    COLOR3: "color3",
+    COLOR_SHARPNESS: "colorSharpness"
+};
 
 export class GasPlanetMaterial extends ShaderMaterial {
     readonly planet: TransformNode;
     readonly colorSettings: GazColorSettings;
-    private clock = 0;
+    private elapsedSeconds = 0;
 
     private stellarObjects: Transformable[] = [];
 
@@ -47,21 +58,7 @@ export class GasPlanetMaterial extends ShaderMaterial {
 
         super(`${planetName}GasSurfaceColor`, scene, shaderName, {
             attributes: ["position", "normal"],
-            uniforms: [
-                "world",
-                "view",
-                "worldViewProjection",
-                "cameraPosition",
-                "seed",
-                "star_positions",
-                "star_colors",
-                "nbStars",
-                "color1",
-                "color2",
-                "color3",
-                "colorSharpness",
-                "time"
-            ]
+            uniforms: [...Object.values(GasPlanetMaterialUniformNames), ...Object.values(StellarObjectUniformNames)]
         });
 
         this.planet = planet;
@@ -82,35 +79,32 @@ export class GasPlanetMaterial extends ShaderMaterial {
             colorSharpness: randRangeInt(40, 80, model.rng, 80) / 10
         };
 
-        this.setFloat("seed", model.seed);
+        this.setFloat(GasPlanetMaterialUniformNames.SEED, model.seed);
 
-        this.setColor3("color1", this.colorSettings.color1);
-        this.setColor3("color2", this.colorSettings.color2);
-        this.setColor3("color3", this.colorSettings.color3);
+        this.setColor3(GasPlanetMaterialUniformNames.COLOR1, this.colorSettings.color1);
+        this.setColor3(GasPlanetMaterialUniformNames.COLOR2, this.colorSettings.color2);
+        this.setColor3(GasPlanetMaterialUniformNames.COLOR3, this.colorSettings.color3);
 
         this.updateConstants();
 
         this.onBindObservable.add((mesh) => {
             const activeCamera = mesh.getScene().activeCamera;
-            if(activeCamera === null) throw new Error("No active camera in the scene");
-            this.getEffect().setVector3("cameraPosition", activeCamera.globalPosition);
+            if (activeCamera === null) throw new Error("No active camera in the scene");
+            this.getEffect().setVector3(GasPlanetMaterialUniformNames.CAMERA_POSITION, activeCamera.globalPosition);
         });
     }
 
     public updateConstants(): void {
-        this.setFloat("colorSharpness", this.colorSettings.colorSharpness);
+        this.setFloat(GasPlanetMaterialUniformNames.COLOR_SHARPNESS, this.colorSettings.colorSharpness);
     }
 
-    public update(stellarObjects: Transformable[], deltaTime: number) {
-        this.clock += deltaTime;
+    public update(stellarObjects: Transformable[], deltaSeconds: number) {
+        this.elapsedSeconds += deltaSeconds;
         this.stellarObjects = stellarObjects;
 
         this.onBindObservable.addOnce(() => {
-            this.getEffect().setArray3("star_positions", flattenVector3Array(this.stellarObjects.map((star) => star.getTransform().getAbsolutePosition())));
-            this.getEffect().setArray3("star_colors", flattenColor3Array(this.stellarObjects.map((star) => (star instanceof Star ? star.model.color : Color3.White()))));
-            this.getEffect().setInt("nbStars", this.stellarObjects.length);
-
-            this.getEffect().setFloat("time", this.clock % 100000);
+            setStellarObjectUniforms(this.getEffect(), this.stellarObjects);
+            this.getEffect().setFloat(GasPlanetMaterialUniformNames.TIME, this.elapsedSeconds % 100000);
         });
     }
 }
