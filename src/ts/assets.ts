@@ -34,6 +34,10 @@ import starfield from "../asset/textures/milkyway.jpg";
 import plumeParticle from "../asset/textures/plume.png";
 import flareParticle from "../asset/flare.png";
 
+import spaceStationAlbedo from "../asset/spaceStationMaterial/spaceship-panels1-albedo.png";
+import spaceStationRoughness from "../asset/spaceStationMaterial/spaceship-panels1-roughness.png";
+import spaceStationMetallic from "../asset/spaceStationMaterial/spaceship-panels1-metallic.png";
+
 import atmosphereLUT from "../shaders/textures/atmosphereLUT.glsl";
 
 import seamlessPerlin from "../asset/perlin.png";
@@ -130,6 +134,10 @@ export class Assets {
 
     public static SPACE_STATION_ASSETS: SpaceStationAssets;
 
+    public static SPACE_STATION_ALBEDO: Texture;
+    public static SPACE_STATION_ROUGHNESS: Texture;
+    public static SPACE_STATION_METALLIC: Texture;
+
     public static ROCK: Mesh;
     public static TREE: Mesh;
     public static SCATTER_CUBE: Mesh;
@@ -185,6 +193,10 @@ export class Assets {
         Assets.MANAGER.addTextureTask("SandNormalMap2", sandNormalMap2).onSuccess = (task) => (Assets.SAND_NORMAL_MAP_2 = task.texture);
         Assets.MANAGER.addTextureTask("WaterNormalMap1", waterNormal1).onSuccess = (task) => (Assets.WATER_NORMAL_MAP_1 = task.texture);
         Assets.MANAGER.addTextureTask("WaterNormalMap2", waterNormal2).onSuccess = (task) => (Assets.WATER_NORMAL_MAP_2 = task.texture);
+
+        Assets.MANAGER.addTextureTask("SpaceStationAlbedo", spaceStationAlbedo).onSuccess = (task) => (Assets.SPACE_STATION_ALBEDO = task.texture);
+        Assets.MANAGER.addTextureTask("SpaceStationRoughness", spaceStationRoughness).onSuccess = (task) => (Assets.SPACE_STATION_ROUGHNESS = task.texture);
+        Assets.MANAGER.addTextureTask("SpaceStationMetallic", spaceStationMetallic).onSuccess = (task) => (Assets.SPACE_STATION_METALLIC = task.texture);
 
         Assets.MANAGER.addTextureTask("Starfield", starfield).onSuccess = (task) => (Assets.STAR_FIELD = task.texture);
 
