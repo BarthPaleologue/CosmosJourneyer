@@ -20,7 +20,7 @@ import { ColorMode, ColorSettings } from "./colorSettingsInterface";
 import surfaceMaterialFragment from "../../../shaders/telluricPlanetMaterial/fragment.glsl";
 import surfaceMaterialVertex from "../../../shaders/telluricPlanetMaterial/vertex.glsl";
 import { Assets } from "../../assets";
-import { centeredRand, normalRandom } from "extended-random";
+import { centeredRand } from "extended-random";
 import { TelluricPlanetModel } from "./telluricPlanetModel";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
@@ -54,17 +54,17 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
 
     private stellarObjects: Transformable[] = [];
 
-    private plainNormalMetallicMap: Texture;
-    private plainAlbedoRoughnessMap: Texture;
+    private readonly plainNormalMetallicMap: Texture;
+    private readonly plainAlbedoRoughnessMap: Texture;
 
-    private desertNormalMetallicMap: Texture;
-    private desertAlbedoRoughnessMap: Texture;
+    private readonly desertNormalMetallicMap: Texture;
+    private readonly desertAlbedoRoughnessMap: Texture;
 
-    private snowNormalMetallic: Texture;
-    private snowAlbedoRoughnessMap: Texture;
+    private readonly snowNormalMetallic: Texture;
+    private readonly snowAlbedoRoughnessMap: Texture;
 
-    private steepNormalMetallic: Texture;
-    private steepAlbedoRoughnessMap: Texture;
+    private readonly steepNormalMetallic: Texture;
+    private readonly steepAlbedoRoughnessMap: Texture;
 
     /**
      * Creates a new telluric planet material
