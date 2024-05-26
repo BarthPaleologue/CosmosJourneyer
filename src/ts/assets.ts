@@ -37,6 +37,8 @@ import flareParticle from "../asset/flare.png";
 import spaceStationAlbedo from "../asset/spaceStationMaterial/spaceship-panels1-albedo.png";
 import spaceStationRoughness from "../asset/spaceStationMaterial/spaceship-panels1-roughness.png";
 import spaceStationMetallic from "../asset/spaceStationMaterial/spaceship-panels1-metallic.png";
+import spaceStationNormal from "../asset/spaceStationMaterial/spaceship-panels1-normal-dx.png";
+import spaceStationAmbientOcclusion from "../asset/spaceStationMaterial/spaceship-panels1-ao.png";
 
 import atmosphereLUT from "../shaders/textures/atmosphereLUT.glsl";
 
@@ -137,6 +139,8 @@ export class Assets {
     public static SPACE_STATION_ALBEDO: Texture;
     public static SPACE_STATION_ROUGHNESS: Texture;
     public static SPACE_STATION_METALLIC: Texture;
+    public static SPACE_STATION_NORMAL: Texture;
+    public static SPACE_STATION_AMBIENT_OCCLUSION: Texture;
 
     public static ROCK: Mesh;
     public static TREE: Mesh;
@@ -197,6 +201,8 @@ export class Assets {
         Assets.MANAGER.addTextureTask("SpaceStationAlbedo", spaceStationAlbedo).onSuccess = (task) => (Assets.SPACE_STATION_ALBEDO = task.texture);
         Assets.MANAGER.addTextureTask("SpaceStationRoughness", spaceStationRoughness).onSuccess = (task) => (Assets.SPACE_STATION_ROUGHNESS = task.texture);
         Assets.MANAGER.addTextureTask("SpaceStationMetallic", spaceStationMetallic).onSuccess = (task) => (Assets.SPACE_STATION_METALLIC = task.texture);
+        Assets.MANAGER.addTextureTask("SpaceStationNormal", spaceStationNormal).onSuccess = (task) => (Assets.SPACE_STATION_NORMAL = task.texture);
+        Assets.MANAGER.addTextureTask("SpaceStationAmbientOcclusion", spaceStationAmbientOcclusion).onSuccess = (task) => (Assets.SPACE_STATION_AMBIENT_OCCLUSION = task.texture);
 
         Assets.MANAGER.addTextureTask("Starfield", starfield).onSuccess = (task) => (Assets.STAR_FIELD = task.texture);
 
