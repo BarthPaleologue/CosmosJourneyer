@@ -21,10 +21,7 @@ attribute vec3 position;
 attribute vec3 normal;
 
 uniform mat4 world;
-uniform mat4 view;
 uniform mat4 worldViewProjection;
-
-uniform vec3 planetPosition;
 
 uniform vec3 chunkPositionPlanetSpace;
 

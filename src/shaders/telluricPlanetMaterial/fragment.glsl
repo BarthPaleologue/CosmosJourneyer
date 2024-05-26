@@ -29,10 +29,6 @@ varying vec3 vPosition;// position of the vertex varyingchunk
 varying vec3 vNormal;// normal of the vertex varyingsphere space
 
 uniform vec3 cameraPosition;// camera position in world space
-uniform float cameraNear;
-uniform float cameraFar;
-
-uniform vec3 planetPosition;
 
 #define MAX_STARS 5
 uniform int nbStars;// number of stars
@@ -56,8 +52,6 @@ uniform sampler2D snowAlbedoRoughnessMap;
 
 uniform sampler2D steepNormalMetallicMap;
 uniform sampler2D steepAlbedoRoughnessMap;
-
-uniform float seed;
 
 uniform float planetRadius;// planet radius
 uniform float waterLevel;// controls sand layer
