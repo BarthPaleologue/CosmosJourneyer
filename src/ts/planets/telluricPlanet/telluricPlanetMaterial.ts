@@ -163,9 +163,15 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
         this.steepAlbedoRoughnessMap = Assets.ROCK_ALBEDO_ROUGHNESS_MAP;
 
         if (model.physicalProperties.oceanLevel === 0) {
-            // sterile world
-            this.plainNormalMetallicMap = Assets.ROCK_NORMAL_METALLIC_MAP;
-            this.plainAlbedoRoughnessMap = Assets.ROCK_ALBEDO_ROUGHNESS_MAP;
+            if(model.physicalProperties.pressure > 0) {
+                // desert world
+                this.plainNormalMetallicMap = Assets.SAND_NORMAL_METALLIC_MAP;
+                this.plainAlbedoRoughnessMap = Assets.SAND_ALBEDO_ROUGHNESS_MAP;
+            } else {
+                // sterile world
+                this.plainNormalMetallicMap = Assets.ROCK_NORMAL_METALLIC_MAP;
+                this.plainAlbedoRoughnessMap = Assets.ROCK_ALBEDO_ROUGHNESS_MAP;
+            }
         }
 
         this.setFloat("seed", model.seed);
