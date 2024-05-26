@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ColorMode, ColorSettings } from "./colorSettingsInterface";
+import { ColorMode } from "./colorSettingsInterface";
 
 import surfaceMaterialFragment from "../../../shaders/telluricPlanetMaterial/fragment.glsl";
 import surfaceMaterialVertex from "../../../shaders/telluricPlanetMaterial/vertex.glsl";
@@ -73,8 +73,6 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
      */
     private readonly planetTransform: TransformNode;
 
-    readonly colorSettings: ColorSettings;
-
     /**
      * The model of the planet associated with this material
      */
@@ -93,6 +91,10 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
 
     private readonly steepNormalMetallic: Texture;
     private readonly steepAlbedoRoughnessMap: Texture;
+
+    private colorMode: ColorMode;
+    private beachSize: number;
+    private steepSharpness: number;
 
     /**
      * Creates a new telluric planet material
@@ -119,13 +121,9 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
         this.planetModel = model;
         this.planetTransform = planet;
 
-        this.colorSettings = {
-            mode: ColorMode.DEFAULT,
-
-            beachSize: 100 + 50 * centeredRand(model.rng, 85),
-            steepSharpness: 2,
-            normalSharpness: 2.5
-        };
+        this.beachSize = 100 + 50 * centeredRand(model.rng, 85);
+        this.colorMode = ColorMode.DEFAULT;
+        this.steepSharpness = 2;
 
         if (!Assets.IS_READY) throw new Error("You must initialize your assets using the AssetsManager");
 
@@ -200,11 +198,11 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
     public updateConstants(): void {
         this.setFloat(TelluricPlanetMaterialUniformNames.PLANET_RADIUS, this.planetModel.radius);
 
-        this.setInt(TelluricPlanetMaterialUniformNames.COLOR_MODE, this.colorSettings.mode);
+        this.setInt(TelluricPlanetMaterialUniformNames.COLOR_MODE, this.colorMode);
 
         this.setFloat(TelluricPlanetMaterialUniformNames.WATER_LEVEL, this.planetModel.physicalProperties.oceanLevel);
-        this.setFloat(TelluricPlanetMaterialUniformNames.BEACH_SIZE, this.colorSettings.beachSize);
-        this.setFloat(TelluricPlanetMaterialUniformNames.STEEP_SHARPNESS, this.colorSettings.steepSharpness);
+        this.setFloat(TelluricPlanetMaterialUniformNames.BEACH_SIZE, this.beachSize);
+        this.setFloat(TelluricPlanetMaterialUniformNames.STEEP_SHARPNESS, this.steepSharpness);
 
         this.setFloat(TelluricPlanetMaterialUniformNames.MIN_TEMPERATURE, this.planetModel.physicalProperties.minTemperature);
         this.setFloat(TelluricPlanetMaterialUniformNames.MAX_TEMPERATURE, this.planetModel.physicalProperties.maxTemperature);
@@ -225,5 +223,32 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
             this.getEffect().setMatrix(TelluricPlanetMaterialUniformNames.PLANET_WORLD_MATRIX, this.planetTransform.getWorldMatrix());
             setStellarObjectUniforms(this.getEffect(), this.stellarObjects);
         });
+    }
+
+    public setBeachSize(beachSize: number) {
+        this.beachSize = beachSize;
+        this.updateConstants();
+    }
+
+    public getBeachSize(): number {
+        return this.beachSize;
+    }
+
+    public setColorMode(colorMode: ColorMode) {
+        this.colorMode = colorMode;
+        this.updateConstants();
+    }
+
+    public getColorMode(): ColorMode {
+        return this.colorMode;
+    }
+
+    public setSteepSharpness(steepSharpness: number) {
+        this.steepSharpness = steepSharpness;
+        this.updateConstants();
+    }
+
+    public getSteepSharpness(): number {
+        return this.steepSharpness;
     }
 }
