@@ -28,24 +28,54 @@ uniform sampler2D metallic;
 uniform sampler2D roughness;
 uniform sampler2D occlusion;
 
-#define PI 3.1415
+uniform vec3 cameraPosition;
 
-float atan2(in float y, in float x)
-{
+#include "../utils/pi.glsl";
+
+#include "../utils/stars.glsl";
+
+float atan2(in float y, in float x) {
     bool s = (abs(x) > abs(y));
     return mix(PI/2.0 - atan(x,y), atan(y,x), s);
 }
 
 #include "../utils/remap.glsl";
 
+#include "../utils/pbr.glsl";
+
 void main() {
+    vec3 viewDirectionW = normalize(cameraPosition - vPositionW);
+
     float theta = atan2(vPosition.z, vPosition.x);
 
     theta = remap(theta, 0.0, 1.0, -3.14/2.0, 3.14/2.0);
 
-    vec2 ringUV = vec2(theta * 4.0, vUV.y);
+    vec2 ringUV = vec2(theta * 2.0, vUV.y);
 
-    vec3 albedoColor = texture2D(albedo, ringUV).rgb;
+    vec3 albedoColor = texture2D(albedo, ringUV).rgb * 3.0;
+    float roughnessColor = texture2D(roughness, ringUV).r;
+    float metallicColor = texture2D(metallic, ringUV).r;
+    float occlusionColor = texture2D(occlusion, ringUV).r;
 
-    gl_FragColor = vec4(albedoColor, 1.0);
+    vec3 tangent1 = normalize(dFdx(vPositionW));
+    vec3 tangent2 = normalize(dFdy(vPositionW));
+    vec3 normalW = normalize(vNormalW);
+    vec3 bitangent = cross(normalW, tangent1);
+    mat3 TBN = mat3(tangent1, tangent2, normalW);
+
+    vec3 normalMap = texture2D(normal, ringUV).rgb;
+    normalMap = normalize(normalMap * 2.0 - 1.0);
+    normalW = normalize(TBN * normalMap);
+
+
+    vec3 Lo = vec3(0.0);
+    /*for(int i = 0; i < nbStars; i++) {
+        vec3 lightDirectionW = normalize(star_positions[i] - vPositionW);
+        Lo += calculateLight(albedoColor, vNormalW, roughnessColor, metallicColor, lightDirectionW, viewDirectionW, star_colors[i]);
+    }*/
+
+    vec3 lightDirectionW = vec3(0.0, 1.0, 0.0);
+    Lo += calculateLight(albedoColor, normalW, roughnessColor, metallicColor, lightDirectionW, viewDirectionW, vec3(1.0));
+
+    gl_FragColor = vec4(Lo, 1.0);
 }
