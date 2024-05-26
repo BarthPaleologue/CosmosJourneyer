@@ -65,8 +65,8 @@ export class SpaceStation implements Transformable {
     }
 
     update(stellarObjects: Transformable[], deltaSeconds: number) {
-        this.helixHabitats.forEach((helixHabitat) => helixHabitat.update(deltaSeconds));
-        this.ringHabitats.forEach((ringHabitat) => ringHabitat.update(deltaSeconds));
+        this.helixHabitats.forEach((helixHabitat) => helixHabitat.update(stellarObjects, deltaSeconds));
+        this.ringHabitats.forEach((ringHabitat) => ringHabitat.update(stellarObjects, deltaSeconds));
     }
 
     getTransform(): TransformNode {

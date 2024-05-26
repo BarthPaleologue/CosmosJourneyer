@@ -4,14 +4,13 @@ import { Axis } from "@babylonjs/core";
 import { Space } from "@babylonjs/core/Maths/math.axis";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { RingHabitatMaterial } from "./ringHabitatMaterial";
-import { Updatable } from "../../utils/updatable";
 import { Transformable } from "../../architecture/transformable";
 import { computeRingRotationPeriod } from "../../utils/ringRotation";
 import { Settings } from "../../settings";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 
-export class RingHabitat implements Transformable, Updatable {
-    
+export class RingHabitat implements Transformable {
+
     private readonly root: TransformNode;
 
     private readonly radius: number;
@@ -86,8 +85,9 @@ export class RingHabitat implements Transformable, Updatable {
         }
     }
 
-    update(deltaSeconds: number) {
+    update(stellarObjects: Transformable[], deltaSeconds: number) {
         this.getTransform().rotate(Axis.Y, deltaSeconds / computeRingRotationPeriod(this.radius, Settings.G_EARTH));
+        this.ringMaterial.update(stellarObjects);
     }
 
     getTransform(): TransformNode {

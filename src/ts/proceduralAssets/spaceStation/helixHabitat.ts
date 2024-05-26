@@ -7,11 +7,10 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { RingHabitatMaterial } from "./ringHabitatMaterial";
 import { Transformable } from "../../architecture/transformable";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { Updatable } from "../../utils/updatable";
 import { computeRingRotationPeriod } from "../../utils/ringRotation";
 import { Settings } from "../../settings";
 
-export class HelixHabitat implements Transformable, Updatable {
+export class HelixHabitat implements Transformable {
     private readonly root: TransformNode;
 
     private readonly radius: number;
@@ -112,8 +111,9 @@ export class HelixHabitat implements Transformable, Updatable {
         }
     }
 
-    update(deltaSeconds: number) {
+    update(stellarObjects: Transformable[], deltaSeconds: number) {
         this.getTransform().rotate(Axis.Y, deltaSeconds / computeRingRotationPeriod(this.radius, Settings.G_EARTH));
+        this.helixMaterial.update(stellarObjects);
     }
 
     getTransform(): TransformNode {

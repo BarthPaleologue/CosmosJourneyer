@@ -31,6 +31,11 @@ import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { SpaceStation } from "./proceduralAssets/spaceStation/spaceStation";
+import { Star } from "./stellarObjects/star/star";
+import { TransformNodeWrapper } from "./utils/wrappers";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { Light } from "@babylonjs/core/Lights/light";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -68,15 +73,19 @@ camera.attachPostProcess(starfieldPostProcess);
 const spaceStation = new SpaceStation(scene);
 
 const ambient = new HemisphericLight("Sun", Vector3.Up(), scene);
-ambient.intensity = 0.4;
+ambient.intensity = 0.1;
 
-const sun = new DirectionalLight("Sun", new Vector3(1, -1, 1), scene);
+const sun = new TransformNodeWrapper(new TransformNode("Sun"), 1);
+sun.getTransform().position = new Vector3(-100e6, 20e6, 50e6);
+const pointLight = new PointLight("SunLight", Vector3.Zero(), scene);
+pointLight.falloffType = Light.FALLOFF_STANDARD;
+pointLight.parent = sun.getTransform();
 
 scene.onBeforeRenderObservable.add(() => {
     const deltaSeconds = engine.getDeltaTime() / 1000;
     defaultControls.update(deltaSeconds);
 
-    spaceStation.update([], deltaSeconds);
+    spaceStation.update([sun], deltaSeconds);
 });
 
 scene.executeWhenReady(() => {

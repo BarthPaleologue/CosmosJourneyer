@@ -72,13 +72,10 @@ void main() {
     normalW = normalize(TBN * normalMap);
 
     vec3 Lo = vec3(0.0);
-    /*for(int i = 0; i < nbStars; i++) {
+    for(int i = 0; i < nbStars; i++) {
         vec3 lightDirectionW = normalize(star_positions[i] - vPositionW);
-        Lo += calculateLight(albedoColor, vNormalW, roughnessColor, metallicColor, lightDirectionW, viewDirectionW, star_colors[i]);
-    }*/
-
-    vec3 lightDirectionW = vec3(0.0, 1.0, 0.0);
-    Lo += calculateLight(albedoColor, normalW, roughnessColor, metallicColor, lightDirectionW, viewDirectionW, vec3(1.0));
+        Lo += calculateLight(albedoColor, normalW, roughnessColor, metallicColor, lightDirectionW, viewDirectionW, star_colors[i]);
+    }
 
     float noiseValue = textureNoTile(perlin, ringUV).r;
     Lo += (smoothstep(0.75, 0.75, noiseValue) + smoothstep(0.75, 0.75, 1.0 - noiseValue)) * vec3(1.0, 1.0, 0.4) * 2.0;
