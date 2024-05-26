@@ -51,7 +51,7 @@ export class GasPlanetMaterial extends ShaderMaterial {
                 "world",
                 "view",
                 "worldViewProjection",
-                "normalMatrix",
+                "cameraPosition",
                 "seed",
                 "star_positions",
                 "star_colors",
@@ -89,6 +89,12 @@ export class GasPlanetMaterial extends ShaderMaterial {
         this.setColor3("color3", this.colorSettings.color3);
 
         this.updateConstants();
+
+        this.onBindObservable.add((mesh) => {
+            const activeCamera = mesh.getScene().activeCamera;
+            if(activeCamera === null) throw new Error("No active camera in the scene");
+            this.getEffect().setVector3("cameraPosition", activeCamera.globalPosition);
+        });
     }
 
     public updateConstants(): void {
@@ -100,8 +106,6 @@ export class GasPlanetMaterial extends ShaderMaterial {
         this.stellarObjects = stellarObjects;
 
         this.onBindObservable.addOnce(() => {
-            this.getEffect().setMatrix("normalMatrix", this.planet.getWorldMatrix().clone().invert().transpose());
-
             this.getEffect().setArray3("star_positions", flattenVector3Array(this.stellarObjects.map((star) => star.getTransform().getAbsolutePosition())));
             this.getEffect().setArray3("star_colors", flattenColor3Array(this.stellarObjects.map((star) => (star instanceof Star ? star.model.color : Color3.White()))));
             this.getEffect().setInt("nbStars", this.stellarObjects.length);

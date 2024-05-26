@@ -26,6 +26,7 @@ import { getRotationQuaternion, rotate } from "../../../uberCore/transforms/basi
 import { BoundingSphere } from "../../../architecture/boundingSphere";
 import { Transformable } from "../../../architecture/transformable";
 import { Scene } from "@babylonjs/core/scene";
+import { Tools } from "@babylonjs/core/Misc/tools";
 
 export class GeneralPanel extends EditorPanel {
     constructor() {
@@ -43,19 +44,20 @@ export class GeneralPanel extends EditorPanel {
         const power = 2.0;
 
         this.sliders = [
-            new Slider("axialTiltX", document.getElementById("axialTiltX") as HTMLElement, -180, 180, Math.round((180 * axialTiltX) / Math.PI), (val: number) => {
-                const newAxialTilt = (val * Math.PI) / 180;
+            new Slider("axialTiltX", document.getElementById("axialTiltX") as HTMLElement, -180, 180, Math.round(Tools.ToDegrees(axialTiltX)), (val: number) => {
+                const newAxialTilt = Tools.ToRadians(val);
                 rotate(body.getTransform(), Axis.X, newAxialTilt - axialTiltX);
                 axialTiltX = newAxialTilt;
             }),
-            new Slider("axialTiltZ", document.getElementById("axialTiltZ") as HTMLElement, -180, 180, Math.round((180 * axialTiltZ) / Math.PI), (val: number) => {
-                const newAxialTilt = (val * Math.PI) / 180;
+            new Slider("axialTiltZ", document.getElementById("axialTiltZ") as HTMLElement, -180, 180, Math.round(Tools.ToDegrees(axialTiltZ)), (val: number) => {
+                const newAxialTilt = Tools.ToRadians(val);
                 rotate(body.getTransform(), Axis.Z, newAxialTilt - axialTiltZ);
                 axialTiltZ = newAxialTilt;
             }),
-            new Slider("cameraFOV", document.getElementById("cameraFOV") as HTMLElement, 0, 360, (scene.cameras[0].fov * 360) / Math.PI, (val: number) => {
-                scene.cameras.forEach((camera) => (camera.fov = (val * Math.PI) / 360));
-                Settings.FOV = (val * Math.PI) / 360;
+            new Slider("cameraFOV", document.getElementById("cameraFOV") as HTMLElement, 0, 360, Tools.ToDegrees(Settings.FOV), (val: number) => {
+                scene.cameras.forEach((camera) => (camera.fov = Tools.ToRadians(val)));
+                console.log(val);
+                Settings.FOV = Tools.ToRadians(val);
             }),
             new Slider("timeModifier", document.getElementById("timeModifier") as HTMLElement, -200, 400, Math.pow(Settings.TIME_MULTIPLIER, 1 / power), (val: number) => {
                 Settings.TIME_MULTIPLIER = Math.sign(val) * Math.pow(Math.abs(val), power);

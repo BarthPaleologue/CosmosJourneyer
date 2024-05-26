@@ -18,7 +18,7 @@
 import "../styles/index.scss";
 
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Engine } from "@babylonjs/core/Engines/engine";
+import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
 import "@babylonjs/core/Materials/standardMaterial";
 import "@babylonjs/core/Loading/loadingScreen";
 import "@babylonjs/core/Misc/screenshotTools";
@@ -26,29 +26,43 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import "@babylonjs/core/Meshes/thinInstanceMesh";
 import { BlackHolePostProcess } from "./stellarObjects/blackHole/blackHolePostProcess";
 import { BlackHole } from "./stellarObjects/blackHole/blackHole";
-import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
-import { Axis } from "@babylonjs/core";
+import { Axis, Color4, HemisphericLight, MeshBuilder } from "@babylonjs/core";
 import { translate } from "./uberCore/transforms/basicTransform";
 import { Assets } from "./assets";
-import { Mandelbulb } from "./mandelbulb/mandelbulb";
-import { MandelbulbPostProcess } from "./mandelbulb/mandelbulbPostProcess";
+import { Mandelbulb } from "./anomalies/mandelbulb/mandelbulb";
+import { MandelbulbPostProcess } from "./anomalies/mandelbulb/mandelbulbPostProcess";
 import { StereoCameras } from "./utils/stereoCameras";
 import { Scene } from "@babylonjs/core/scene";
+import { JuliaSet } from "./anomalies/julia/juliaSet";
+import { JuliaSetPostProcess } from "./anomalies/julia/juliaSetPostProcess";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
+canvas.addEventListener(
+    "click",
+    (e) => {
+        canvas.requestPointerLock = canvas.requestPointerLock || canvas.msRequestPointerLock || canvas.mozRequestPointerLock || canvas.webkitRequestPointerLock;
+        if (canvas.requestPointerLock) {
+            canvas.requestPointerLock();
+        }
+    },
+    false
+);
 
-const engine = new Engine(canvas, true);
+const engine = await EngineFactory.CreateAsync(canvas, {
+    antialias: true
+});
 engine.useReverseDepthBuffer = true;
 engine.displayLoadingUI();
 
 const scene = new Scene(engine);
 scene.useRightHandedSystem = true;
+scene.clearColor = new Color4(0, 0, 0, 0);
 
 await Assets.Init(scene);
 
-const stereoCameras = new StereoCameras(canvas, engine, scene);
+const stereoCameras = new StereoCameras(scene);
 
 const leftEye = stereoCameras.leftEye;
 const rightEye = stereoCameras.rightEye;
@@ -57,10 +71,6 @@ scene.activeCameras = [leftEye, rightEye];
 
 scene.enableDepthRenderer(leftEye, false, true);
 scene.enableDepthRenderer(rightEye, false, true);
-
-const starfieldPostProcess = new StarfieldPostProcess(scene, [], [], Quaternion.Identity());
-leftEye.attachPostProcess(starfieldPostProcess);
-rightEye.attachPostProcess(starfieldPostProcess);
 
 function createBlackHole(): TransformNode {
     const blackHole = new BlackHole("hole", scene, 0, null);
@@ -81,8 +91,7 @@ function createBlackHole(): TransformNode {
 
 function createMandelbulb(): TransformNode {
     const mandelbulb = new Mandelbulb("bulb", scene, Math.random() * 10000, null);
-    mandelbulb.getTransform().setAbsolutePosition(new Vector3(0, 0, 20));
-    mandelbulb.getTransform().scalingDeterminant = 1 / 100e3;
+    mandelbulb.getTransform().scalingDeterminant = 1 / 5000e3;
 
     const mandelbulbPP = new MandelbulbPostProcess(mandelbulb, scene, []);
     leftEye.attachPostProcess(mandelbulbPP);
@@ -96,7 +105,36 @@ function createMandelbulb(): TransformNode {
     return mandelbulb.getTransform();
 }
 
-const targetObject = createMandelbulb();
+function createJulia(): TransformNode {
+    const julia = new JuliaSet("Julia", scene, Math.random() * 10000, null);
+    julia.getTransform().scalingDeterminant = 1 / 5000e3;
+
+    const juliaPP = new JuliaSetPostProcess(julia, scene, []);
+    leftEye.attachPostProcess(juliaPP);
+    rightEye.attachPostProcess(juliaPP);
+
+    scene.onBeforeRenderObservable.add(() => {
+        const deltaSeconds = engine.getDeltaTime() / 1000;
+        juliaPP.update(deltaSeconds);
+    });
+
+    return julia.getTransform();
+}
+
+let targetObject: TransformNode;
+
+const urlParams = new URLSearchParams(window.location.search);
+const sceneType = urlParams.get("scene");
+
+if (sceneType === "mandelbulb") {
+    targetObject = createMandelbulb();
+} else if (sceneType === "julia") {
+    targetObject = createJulia();
+} else {
+    targetObject = createMandelbulb();
+}
+
+const sun = new HemisphericLight("sun", new Vector3(0.5, 1, 0.5), scene);
 
 stereoCameras.getTransform().rotateAround(targetObject.getAbsolutePosition(), Axis.X, 0.2);
 
@@ -117,26 +155,63 @@ document.addEventListener("pointermove", (e) => {
 
     if (mousePressed) {
         stereoCameras.getTransform().rotateAround(targetObject.getAbsolutePosition(), Axis.Y, 0.001 * mouseDX);
-        stereoCameras.getTransform().computeWorldMatrix(true);
         stereoCameras.getTransform().rotateAround(targetObject.getAbsolutePosition(), stereoCameras.getTransform().getDirection(Axis.X), -0.001 * mouseDY);
-        stereoCameras.getTransform().computeWorldMatrix(true);
 
         applyFloatingOrigin();
     }
 });
 
+let ipdFactor = 1.0;
+const defaultIPD = 0.065;
+document.addEventListener("keydown", (e) => {
+    if (e.key === "+") {
+        ipdFactor += 0.1;
+    } else if (e.key === "-") {
+        ipdFactor -= 0.1;
+    }
+});
+
+// Create WebSocket connection to retrieve the eye positions
+const port = 4242;
+const socket = new WebSocket(`ws://localhost:${port}`);
+
+const leftEyePosition = Vector3.Zero();
+const rightEyePosition = Vector3.Zero();
+
+socket.addEventListener("open", () => {
+    stereoCameras.setEyeTrackingEnabled(true);
+});
+
+socket.addEventListener("message", async (event) => {
+    const blob = event.data as Blob;
+
+    const buffer = await blob.arrayBuffer();
+    const bufferView = new Float64Array(buffer);
+
+    leftEyePosition.copyFromFloats(bufferView[0], bufferView[1], bufferView[2]).scaleInPlace(0.001);
+    rightEyePosition.copyFromFloats(bufferView[3], bufferView[4], bufferView[5]).scaleInPlace(0.001);
+});
+
 scene.onBeforeRenderObservable.add(() => {
     const deltaSeconds = engine.getDeltaTime() / 1000;
-
-    // our eyes will focus on the center where the object is
-    const focalPoint = targetObject.getAbsolutePosition().negate();
-
-    stereoCameras.getTransform().lookAt(focalPoint);
 
     stereoCameras.getTransform().rotateAround(targetObject.getAbsolutePosition(), Axis.X, 0.02 * deltaSeconds);
     stereoCameras.getTransform().computeWorldMatrix(true);
     stereoCameras.getTransform().rotateAround(targetObject.getAbsolutePosition(), Axis.Y, 0.1 * deltaSeconds);
     stereoCameras.getTransform().computeWorldMatrix(true);
+
+    const eyeDistance = defaultIPD * ipdFactor;
+    stereoCameras.setDefaultIPD(eyeDistance);
+
+    const averageEyePosition = leftEyePosition.add(rightEyePosition).scaleInPlace(0.5);
+
+    const trueEyeDistance = Math.abs(leftEyePosition.x - rightEyePosition.x);
+
+    leftEyePosition.copyFrom(averageEyePosition.add(new Vector3(-trueEyeDistance * 0.5 * ipdFactor, 0, 0)));
+    rightEyePosition.copyFrom(averageEyePosition.add(new Vector3(trueEyeDistance * 0.5 * ipdFactor, 0, 0)));
+    stereoCameras.setEyeTrackingPositions(leftEyePosition, rightEyePosition);
+
+    stereoCameras.updateCameraProjections();
 
     applyFloatingOrigin();
 });

@@ -1,11 +1,11 @@
 {
-  "starSystem": "Système Solaire",
-  "star": "Etoile de type {{stellarType}}",
-  "neutronStar": "Etoile à Neutrons",
-  "blackHole": "Trou Noir",
-  "gasPlanet": "Planète Gazeuse",
-  "telluricPlanet": "Planète Tellurique",
-  "telluricMoon": "Lune Tellurique",
-  "spaceStation": "Station Spatiale",
-  "anomaly": "Anomalie"
+    "starSystem": "Système Solaire",
+    "star": "Etoile de type {{stellarType}}",
+    "neutronStar": "Etoile à Neutrons",
+    "blackHole": "Trou Noir",
+    "gasPlanet": "Planète Gazeuse",
+    "telluricPlanet": "Planète Tellurique",
+    "telluricMoon": "Lune Tellurique",
+    "spaceStation": "Station Spatiale",
+    "anomaly": "Anomalie"
 }

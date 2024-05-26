@@ -27,6 +27,8 @@ uniform float seed;
 
 uniform sampler2D lut;
 
+#include "../utils/pi.glsl";
+
 #include "../utils/rotateAround.glsl";
 
 #include "../utils/toUV.glsl";

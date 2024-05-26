@@ -17,6 +17,7 @@
 
 import { seededSquirrelNoise } from "squirrel-noise";
 import { makeNoise3D } from "fast-simplex-noise";
+import { Tools } from "@babylonjs/core/Misc/tools";
 
 export const Settings = {
     UNIVERSE_SEED: Math.PI,
@@ -69,7 +70,7 @@ export const Settings = {
      */
     G_EARTH: 9.81,
 
-    FOV: (92 * Math.PI) / 180,
+    FOV: Tools.ToRadians(60),
 
     MAIN_FONT: "Nasalization"
 };

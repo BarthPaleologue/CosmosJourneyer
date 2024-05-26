@@ -41,11 +41,9 @@ void main() {
 
     vec3 finalColor = mix(baseColor, tipColor, pow(vPosition.y, 4.0));
 
-    vec3 normalW = normalize((normalMatrix * vec4(vNormal, 0.0)).xyz);
+    vec3 normalW = normalize(vec3(normalMatrix * vec4(vNormal, 0.0)));
 
-    float ndl1 = max(dot(normalW, lightDirection), 0.0);
-    float ndl2 = max(dot(-normalW, lightDirection), 0.0);
-    float ndl = ndl1 + ndl2;
+    float ndl = abs(dot(normalW, lightDirection));
 
     // ambient lighting
     ndl = clamp(ndl + 0.1, 0.0, 1.0);
