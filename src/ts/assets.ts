@@ -47,6 +47,8 @@ import seamlessPerlin from "../asset/perlin.png";
 
 import empty from "../asset/oneBlackPixel.png";
 
+import skyBox from "../asset/skybox/milkyway.dds";
+
 import spaceship from "../asset/spaceship/spaceship2.glb";
 import shipCarrier from "../asset/spacestation/shipcarrier.glb";
 import banana from "../asset/banana/banana.glb";
@@ -96,6 +98,7 @@ import { ButterflyMaterial } from "./proceduralAssets/butterfly/butterflyMateria
 import { GrassMaterial } from "./proceduralAssets/grass/grassMaterial";
 import { LoadingScreen } from "./uberCore/loadingScreen";
 import i18next from "./i18n";
+import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 
 export class Assets {
     static IS_READY = false;
@@ -129,6 +132,8 @@ export class Assets {
     static ATMOSPHERE_LUT: ProceduralTexture;
 
     static SEAMLESS_PERLIN: Texture;
+
+    static SKY_BOX: CubeTexture;
 
     private static SPACESHIP: Mesh;
     private static ENDEAVOR_SPACESHIP: Mesh;
@@ -208,6 +213,8 @@ export class Assets {
         Assets.MANAGER.addTextureTask("FlareTexture", flareParticle).onSuccess = (task) => (Assets.FLARE_TEXTURE = task.texture);
 
         Assets.MANAGER.addTextureTask("SeamlessPerlin", seamlessPerlin).onSuccess = (task) => (Assets.SEAMLESS_PERLIN = task.texture);
+
+        Assets.MANAGER.addCubeTextureTask("SkyBox", skyBox).onSuccess = (task) => (Assets.SKY_BOX = task.texture);
 
         Assets.ATMOSPHERE_LUT = new ProceduralTexture("atmosphereLUT", 100, { fragmentSource: atmosphereLUT }, scene, undefined, false, false);
         Assets.ATMOSPHERE_LUT.refreshRate = 0;
