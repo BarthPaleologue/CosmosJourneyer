@@ -52,7 +52,6 @@ const TelluricPlanetMaterialUniformNames = {
 
 const TelluricPlanetMaterialSamplerNames = {
     LUT: "lut",
-    BOTTOM_NORMAL_MAP: "bottomNormalMap",
     PLAIN_NORMAL_METALLIC_MAP: "plainNormalMetallicMap",
     PLAIN_ALBEDO_ROUGHNESS_MAP: "plainAlbedoRoughnessMap",
     DESERT_NORMAL_METALLIC_MAP: "desertNormalMetallicMap",
@@ -180,8 +179,6 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
     }
 
     public updateTextures() {
-        this.setTexture(TelluricPlanetMaterialSamplerNames.BOTTOM_NORMAL_MAP, Assets.BOTTOM_NORMAL_MAP);
-
         this.setTexture(TelluricPlanetMaterialSamplerNames.STEEP_NORMAL_METALLIC_MAP, this.steepNormalMetallic);
         this.setTexture(TelluricPlanetMaterialSamplerNames.STEEP_ALBEDO_ROUGHNESS_MAP, this.steepAlbedoRoughnessMap);
 

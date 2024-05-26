@@ -39,8 +39,6 @@ uniform int colorMode;
 
 uniform sampler2D lut;
 
-uniform sampler2D bottomNormalMap;
-
 uniform sampler2D plainAlbedoRoughnessMap;
 uniform sampler2D plainNormalMetallicMap;
 
@@ -218,7 +216,7 @@ void main() {
     vec3 steepAlbedo;
     vec3 steepNormal = vNormal;
     float steepRoughness, steepMetallic;
-    if(steepFactor > 0.01) {
+    if (steepFactor > 0.01) {
         triPlanarMaterial(vSamplePoint, vNormal, steepAlbedoRoughnessMap, steepNormalMetallicMap, steepScale, steepAlbedo, steepNormal, steepRoughness, steepMetallic);
     }
 
@@ -227,7 +225,7 @@ void main() {
     vec3 plainAlbedo;
     vec3 plainNormal = vNormal;
     float plainRoughness, plainMetallic;
-    if(plainFactor > 0.01) {
+    if (plainFactor > 0.01) {
         triPlanarMaterial(vSamplePoint, vNormal, plainAlbedoRoughnessMap, plainNormalMetallicMap, plainScale, plainAlbedo, plainNormal, plainRoughness, plainMetallic);
     }
 
@@ -236,7 +234,7 @@ void main() {
     vec3 desertAlbedo;
     vec3 desertNormal = vNormal;
     float desertRoughness, desertMetallic;
-    if(desertFactor + beachFactor > 0.01) {
+    if (desertFactor + beachFactor > 0.01) {
         triPlanarMaterial(vSamplePoint, vNormal, desertAlbedoRoughnessMap, desertNormalMetallicMap, desertScale, desertAlbedo, desertNormal, desertRoughness, desertMetallic);
     }
 
@@ -245,18 +243,18 @@ void main() {
     vec3 snowAlbedo;
     vec3 snowNormal = vNormal;
     float snowRoughness, snowMetallic;
-    if(snowFactor > 0.01) {
+    if (snowFactor > 0.01) {
         triPlanarMaterial(vSamplePoint, vNormal, snowAlbedoRoughnessMap, snowNormalMetallicMap, snowScale, snowAlbedo, snowNormal, snowRoughness, snowMetallic);
     }
 
-    vec3 albedo = steepFactor * steepAlbedo + plainFactor * plainAlbedo + (desertFactor+beachFactor) * desertAlbedo + snowFactor * snowAlbedo;
+    vec3 albedo = steepFactor * steepAlbedo + plainFactor * plainAlbedo + (desertFactor+beachFactor+bottomFactor) * desertAlbedo + snowFactor * snowAlbedo;
 
-    vec3 normal = steepFactor * steepNormal + plainFactor * plainNormal + (desertFactor+beachFactor) * desertNormal + snowFactor * snowNormal;
+    vec3 normal = steepFactor * steepNormal + plainFactor * plainNormal + (desertFactor+beachFactor+bottomFactor) * desertNormal + snowFactor * snowNormal;
     normal = normalize(normal);
 
-    float roughness = steepFactor * steepRoughness + plainFactor * plainRoughness + (desertFactor+beachFactor) * desertRoughness + snowFactor * snowRoughness;
+    float roughness = steepFactor * steepRoughness + plainFactor * plainRoughness + (desertFactor+beachFactor+bottomFactor) * desertRoughness + snowFactor * snowRoughness;
 
-    float metallic = steepFactor * steepMetallic + plainFactor * plainMetallic + (desertFactor+beachFactor) * desertMetallic + snowFactor * snowMetallic;
+    float metallic = steepFactor * steepMetallic + plainFactor * plainMetallic + (desertFactor+beachFactor+bottomFactor) * desertMetallic + snowFactor * snowMetallic;
 
     vec3 normalW = vec3(world * vec4(normal, 0.0));
 
