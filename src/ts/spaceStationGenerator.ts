@@ -62,8 +62,8 @@ scene.enableDepthRenderer(camera, false, true);
 defaultControls.getTransform().setAbsolutePosition(new Vector3(0, 2, -3).normalize().scaleInPlace(40e3));
 defaultControls.getTransform().lookAt(Vector3.Zero());
 
-//const starfieldPostProcess = new StarfieldPostProcess(scene, [], [], Quaternion.Identity());
-//camera.attachPostProcess(starfieldPostProcess);
+const starfieldPostProcess = new StarfieldPostProcess(scene, [], [], Quaternion.Identity());
+camera.attachPostProcess(starfieldPostProcess);
 
 const spaceStation = new SpaceStation(scene);
 

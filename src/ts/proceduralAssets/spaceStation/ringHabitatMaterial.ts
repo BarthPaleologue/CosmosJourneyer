@@ -23,6 +23,7 @@ const RingHabitatSamplerNames = {
     METALLIC: "metallic",
     ROUGHNESS: "roughness",
     OCCLUSION: "occlusion",
+    PERLIN: "perlin",
 }
 
 export class RingHabitatMaterial extends ShaderMaterial {
@@ -63,6 +64,7 @@ export class RingHabitatMaterial extends ShaderMaterial {
             this.getEffect().setTexture(RingHabitatSamplerNames.METALLIC, Assets.SPACE_STATION_METALLIC);
             this.getEffect().setTexture(RingHabitatSamplerNames.ROUGHNESS, Assets.SPACE_STATION_ROUGHNESS);
             this.getEffect().setTexture(RingHabitatSamplerNames.OCCLUSION, Assets.SPACE_STATION_AMBIENT_OCCLUSION);
+            this.getEffect().setTexture(RingHabitatSamplerNames.PERLIN, Assets.SEAMLESS_PERLIN);
         });
     }
 

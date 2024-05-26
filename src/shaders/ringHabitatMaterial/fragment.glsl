@@ -28,6 +28,8 @@ uniform sampler2D metallic;
 uniform sampler2D roughness;
 uniform sampler2D occlusion;
 
+uniform sampler2D perlin;
+
 uniform vec3 cameraPosition;
 
 #include "../utils/pi.glsl";
@@ -43,6 +45,8 @@ float atan2(in float y, in float x) {
 
 #include "../utils/pbr.glsl";
 
+#include "../utils/textureNoTile.glsl";
+
 void main() {
     vec3 viewDirectionW = normalize(cameraPosition - vPositionW);
 
@@ -50,7 +54,7 @@ void main() {
 
     theta = remap(theta, 0.0, 1.0, -3.14/2.0, 3.14/2.0);
 
-    vec2 ringUV = vec2(theta * 2.0, vUV.y);
+    vec2 ringUV = vec2(theta, vUV.y);
 
     vec3 albedoColor = 1.0 - texture2D(albedo, ringUV).rgb;
     float roughnessColor = texture2D(roughness, ringUV).r;
@@ -67,7 +71,6 @@ void main() {
     normalMap = normalize(normalMap * 2.0 - 1.0);
     normalW = normalize(TBN * normalMap);
 
-
     vec3 Lo = vec3(0.0);
     /*for(int i = 0; i < nbStars; i++) {
         vec3 lightDirectionW = normalize(star_positions[i] - vPositionW);
@@ -76,6 +79,9 @@ void main() {
 
     vec3 lightDirectionW = vec3(0.0, 1.0, 0.0);
     Lo += calculateLight(albedoColor, normalW, roughnessColor, metallicColor, lightDirectionW, viewDirectionW, vec3(1.0));
+
+    float noiseValue = textureNoTile(perlin, ringUV).r;
+    Lo += (smoothstep(0.75, 0.75, noiseValue) + smoothstep(0.75, 0.75, 1.0 - noiseValue)) * vec3(1.0, 1.0, 0.4) * 2.0;
 
     gl_FragColor = vec4(Lo, 1.0);
 }
