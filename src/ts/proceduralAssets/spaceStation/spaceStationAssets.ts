@@ -2,33 +2,15 @@ import { Scene } from "@babylonjs/core/scene";
 import { AssetsManager, MeshAssetTask } from "@babylonjs/core/Misc/assetsManager";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 
-import squareSection from "../../../asset/SpaceStationParts/squareSection.glb";
-
 import solarPanel from "../../../asset/SpaceStationParts/solarPanel.glb";
 import sphericalTank from "../../../asset/SpaceStationParts/sphericalTank.glb";
 
 export class SpaceStationAssets {
-    public static SQUARE_SECTION: Mesh;
 
     public static SOLAR_PANEL: Mesh;
     public static SPHERICAL_TANK: Mesh;
 
     constructor(scene: Scene, assetsManager: AssetsManager) {
-        const squareSectionTask = assetsManager.addMeshTask("SquareSectionTask", "", "", squareSection);
-        squareSectionTask.onSuccess = (task: MeshAssetTask) => {
-            SpaceStationAssets.SQUARE_SECTION = (task.loadedMeshes[0]).getChildMeshes()[0] as Mesh;
-            SpaceStationAssets.SQUARE_SECTION.parent = null;
-            SpaceStationAssets.SQUARE_SECTION.isVisible = false;
-
-            const boundingBox = SpaceStationAssets.SQUARE_SECTION.getBoundingInfo().boundingBox;
-            const maxDimension = Math.max(boundingBox.extendSize.x, boundingBox.extendSize.y, boundingBox.extendSize.z);
-
-            SpaceStationAssets.SQUARE_SECTION.scalingDeterminant = 60 / maxDimension;
-            SpaceStationAssets.SQUARE_SECTION.bakeCurrentTransformIntoVertices();
-
-            console.log("SquareSection loaded");
-        };
-
         const solarPanelTask = assetsManager.addMeshTask("SolarPanelTask", "", "", solarPanel);
         solarPanelTask.onSuccess = (task: MeshAssetTask) => {
             SpaceStationAssets.SOLAR_PANEL = (task.loadedMeshes[0]).getChildMeshes()[0] as Mesh;

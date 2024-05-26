@@ -5,91 +5,127 @@ import { Axis } from "@babylonjs/core";
 import { Space } from "@babylonjs/core/Maths/math.axis";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { RingHabitatMaterial } from "./ringHabitatMaterial";
+import { Transformable } from "../../architecture/transformable";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { Updatable } from "../../utils/updatable";
+import { computeRingRotationPeriod } from "../../utils/ringRotation";
+import { Settings } from "../../settings";
 
-export function createHelixHabitat(scene: Scene): TransformNode {
-    const root = new TransformNode("HelixHabitatRoot");
+export class HelixHabitat implements Transformable, Updatable {
+    private readonly root: TransformNode;
 
-    const nbSpires = 2 + Math.floor(Math.random() * 2)
+    private readonly radius: number;
 
-    const pitch = 4e3 * (1 + 0.3 * (Math.random() * 2 - 1))
+    private readonly attachment: Mesh;
 
-    const radius = 2e3 + Math.random() * 2e3;
+    private readonly helix1: Mesh;
+    private readonly helix2: Mesh;
 
-    const tubeDiameter = 100 + Math.random() * 100;
+    private readonly helixMaterial: RingHabitatMaterial;
 
-    const totalLength = pitch * nbSpires;
+    private readonly arms: Mesh[] = [];
 
-    const attachmentNbSides = 6 + 2 * Math.floor(Math.random() * 2);
+    constructor(scene: Scene) {
+        this.root = new TransformNode("HelixHabitatRoot");
 
-    const tesselation = attachmentNbSides * 8;
+        const nbSpires = 2 + Math.floor(Math.random() * 2);
 
-    const attachment = MeshBuilder.CreateCylinder(
-        "HelixHabitatAttachment",
-        {
-            diameterTop: 100,
-            diameterBottom: 100,
-            height: totalLength,
-            tessellation: attachmentNbSides
-        },
-        scene
-    );
-    attachment.rotate(Axis.Y, Math.PI / attachmentNbSides, Space.WORLD);
-    attachment.parent = root;
+        const pitch = 4e3 * (1 + 0.3 * (Math.random() * 2 - 1));
 
-    const helix1 = createHelix(
-        "HelixHabitat",
-        {
-            radius: radius,
-            tubeDiameter: tubeDiameter,
-            tessellation: tesselation,
-            pitch: pitch,
-            spires: nbSpires
-        },
-        scene
-    );
-    const helix2 = createHelix(
-        "HelixHabitat",
-        {
-            radius: radius,
-            tubeDiameter: tubeDiameter,
-            tessellation: tesselation,
-            pitch: pitch,
-            spires: nbSpires
-        },
-        scene
-    );
-    helix2.rotate(Axis.Y, Math.PI, Space.WORLD);
+        this.radius = 2e3 + Math.random() * 2e3;
 
-    helix1.parent = root;
-    helix2.parent = root;
+        const tubeDiameter = 100 + Math.random() * 100;
 
+        const totalLength = pitch * nbSpires;
 
-    const helixMaterial = new RingHabitatMaterial(scene);
+        const attachmentNbSides = 6 + 2 * Math.floor(Math.random() * 2);
 
-    helix1.material = helixMaterial;
-    helix2.material = helixMaterial;
+        const tesselation = attachmentNbSides * 8;
 
-    const nbArms = (attachmentNbSides * nbSpires) / 2;
-    for (let i = 0; i <= nbArms; i++) {
-        const arm = MeshBuilder.CreateBox(
-            "HelixHabitatArm",
+        this.attachment = MeshBuilder.CreateCylinder(
+            "HelixHabitatAttachment",
             {
-                width: 2 * radius,
-                depth: tubeDiameter / 3,
-                height: tubeDiameter / 3
+                diameterTop: 100,
+                diameterBottom: 100,
+                height: totalLength,
+                tessellation: attachmentNbSides
             },
             scene
         );
+        this.attachment.rotate(Axis.Y, Math.PI / attachmentNbSides, Space.WORLD);
+        this.attachment.parent = this.getTransform();
 
-        const y = (i / nbArms) * totalLength - totalLength / 2;
+        this.helix1 = createHelix(
+            "HelixHabitat",
+            {
+                radius: this.radius,
+                tubeDiameter: tubeDiameter,
+                tessellation: tesselation,
+                pitch: pitch,
+                spires: nbSpires
+            },
+            scene
+        );
+        this.helix2 = createHelix(
+            "HelixHabitat",
+            {
+                radius: this.radius,
+                tubeDiameter: tubeDiameter,
+                tessellation: tesselation,
+                pitch: pitch,
+                spires: nbSpires
+            },
+            scene
+        );
+        this.helix2.rotate(Axis.Y, Math.PI, Space.WORLD);
 
-        const theta = (y / pitch) * Math.PI * 2;
+        this.helix1.parent = this.getTransform();
+        this.helix2.parent = this.getTransform();
 
-        arm.position.y = y;
-        arm.rotate(Axis.Y, theta, Space.WORLD);
+        this.helixMaterial = new RingHabitatMaterial(scene);
 
-        arm.parent = root;
+        this.helix1.material = this.helixMaterial;
+        this.helix2.material = this.helixMaterial;
+
+        const nbArms = (attachmentNbSides * nbSpires) / 2;
+        for (let i = 0; i <= nbArms; i++) {
+            const arm = MeshBuilder.CreateBox(
+                "HelixHabitatArm",
+                {
+                    width: 2 * this.radius,
+                    depth: tubeDiameter / 3,
+                    height: tubeDiameter / 3
+                },
+                scene
+            );
+
+            const y = (i / nbArms) * totalLength - totalLength / 2;
+
+            const theta = (y / pitch) * Math.PI * 2;
+
+            arm.position.y = y;
+            arm.rotate(Axis.Y, theta, Space.WORLD);
+
+            arm.parent = this.getTransform();
+
+            this.arms.push(arm);
+        }
     }
 
-    return root;
+    update(deltaSeconds: number) {
+        this.getTransform().rotate(Axis.Y, deltaSeconds / computeRingRotationPeriod(this.radius, Settings.G_EARTH));
+    }
+
+    getTransform(): TransformNode {
+        return this.root;
+    }
+
+    dispose() {
+        this.root.dispose();
+        this.attachment.dispose();
+        this.helixMaterial.dispose();
+        this.helix1.dispose();
+        this.helix2.dispose();
+        this.arms.forEach((arm) => arm.dispose());
+    }
 }

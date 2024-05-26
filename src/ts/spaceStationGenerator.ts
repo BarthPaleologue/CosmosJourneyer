@@ -23,21 +23,14 @@ import "@babylonjs/core/Loading/loadingScreen";
 import "@babylonjs/core/Misc/screenshotTools";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import "@babylonjs/core/Meshes/thinInstanceMesh";
-import { Axis, Scene } from "@babylonjs/core";
+import { Scene } from "@babylonjs/core";
 import { Assets } from "./assets";
 import { DefaultControls } from "./defaultControls/defaultControls";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
-import { computeRingRotationPeriod } from "./utils/ringRotation";
-import { Settings } from "./settings";
-import { sigmoid } from "./utils/math";
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
-import { AttachmentType, SpaceStationNode, SpaceStationNodeType } from "./proceduralAssets/spaceStation/spaceStationNode";
-import { createHelix } from "./utils/helixBuilder";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
-/*import { ShipControls } from "./spaceship/shipControls";
-import HavokPhysics from "@babylonjs/havok";
-import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";*/
+import { SpaceStation } from "./proceduralAssets/spaceStation/spaceStation";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -69,63 +62,10 @@ scene.enableDepthRenderer(camera, false, true);
 defaultControls.getTransform().setAbsolutePosition(new Vector3(0, 2, -3).normalize().scaleInPlace(40e3));
 defaultControls.getTransform().lookAt(Vector3.Zero());
 
-const starfieldPostProcess = new StarfieldPostProcess(scene, [], [], Quaternion.Identity());
-camera.attachPostProcess(starfieldPostProcess);
+//const starfieldPostProcess = new StarfieldPostProcess(scene, [], [], Quaternion.Identity());
+//camera.attachPostProcess(starfieldPostProcess);
 
-let lastNode: SpaceStationNode | null = null;
-let firstNode: SpaceStationNode | null = null;
-
-let urgeToCreateHabitat = 0;
-for (let i = 0; i < 20; i++) {
-    let nodeType = SpaceStationNodeType.SQUARE_SECTION;
-    if (Math.random() < sigmoid(urgeToCreateHabitat - 6) && urgeToCreateHabitat > 0) {
-        nodeType = Math.random() < 0.5 ? SpaceStationNodeType.RING_HABITAT : SpaceStationNodeType.HELIX_HABITAT;
-    }
-
-    const newNode: SpaceStationNode = new SpaceStationNode(lastNode, nodeType, AttachmentType.NEXT, scene);
-    if (i === 0) firstNode = newNode;
-
-    switch (nodeType) {
-        case SpaceStationNodeType.SQUARE_SECTION:
-            urgeToCreateHabitat += 1;
-            break;
-        case SpaceStationNodeType.HELIX_HABITAT:
-        case SpaceStationNodeType.RING_HABITAT:
-            urgeToCreateHabitat = 0;
-            break;
-    }
-
-    if (nodeType === SpaceStationNodeType.SQUARE_SECTION && Math.random() < 0.4) {
-        const sideNode1 = new SpaceStationNode(newNode, SpaceStationNodeType.SOLAR_PANEL, AttachmentType.SIDE, scene);
-        newNode.sideNodes.push(sideNode1);
-
-        const sideNode2 = new SpaceStationNode(newNode, SpaceStationNodeType.SOLAR_PANEL, AttachmentType.SIDE, scene);
-        newNode.sideNodes.push(sideNode2);
-        sideNode2.transform.rotateAround(newNode.transform.position, Axis.Y, Math.PI);
-    } else if (nodeType === SpaceStationNodeType.SQUARE_SECTION && Math.random() < 0.3) {
-        for(let ring = -1; ring <= 1; ring++) {
-            for (let sideIndex = 0; sideIndex < 4; sideIndex++) {
-                const tank = new SpaceStationNode(newNode, SpaceStationNodeType.SPHERICAL_TANK, AttachmentType.SIDE, scene);
-                newNode.sideNodes.push(tank);
-                tank.transform.rotateAround(newNode.transform.position, Axis.Y, (Math.PI / 2) * sideIndex);
-                tank.transform.translate(Axis.Y, ring * 40);
-            }
-        }
-    }
-
-    lastNode = newNode;
-}
-
-function updateStation(stationNode: SpaceStationNode | null, deltaSeconds: number) {
-    if (stationNode === null) return;
-
-    if (stationNode.type === SpaceStationNodeType.RING_HABITAT || stationNode.type === SpaceStationNodeType.HELIX_HABITAT) {
-        stationNode.transform.rotate(Axis.Y, ((stationNode.index % 2 === 0 ? -1 : 1) * deltaSeconds) / computeRingRotationPeriod(stationNode.transform.scalingDeterminant, Settings.G_EARTH));
-    }
-
-    updateStation(stationNode.next, deltaSeconds);
-    stationNode.sideNodes.forEach((sideNode) => updateStation(sideNode, deltaSeconds));
-}
+const spaceStation = new SpaceStation(scene);
 
 const ambient = new HemisphericLight("Sun", Vector3.Up(), scene);
 ambient.intensity = 0.4;
@@ -136,7 +76,7 @@ scene.onBeforeRenderObservable.add(() => {
     const deltaSeconds = engine.getDeltaTime() / 1000;
     defaultControls.update(deltaSeconds);
 
-    updateStation(firstNode, deltaSeconds);
+    spaceStation.update([], deltaSeconds);
 });
 
 scene.executeWhenReady(() => {

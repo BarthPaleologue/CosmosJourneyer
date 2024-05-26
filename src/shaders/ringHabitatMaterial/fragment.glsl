@@ -52,7 +52,7 @@ void main() {
 
     vec2 ringUV = vec2(theta * 2.0, vUV.y);
 
-    vec3 albedoColor = texture2D(albedo, ringUV).rgb * 3.0;
+    vec3 albedoColor = 1.0 - texture2D(albedo, ringUV).rgb;
     float roughnessColor = texture2D(roughness, ringUV).r;
     float metallicColor = texture2D(metallic, ringUV).r;
     float occlusionColor = texture2D(occlusion, ringUV).r;

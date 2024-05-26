@@ -4,63 +4,100 @@ import { Axis } from "@babylonjs/core";
 import { Space } from "@babylonjs/core/Maths/math.axis";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { RingHabitatMaterial } from "./ringHabitatMaterial";
+import { Updatable } from "../../utils/updatable";
+import { Transformable } from "../../architecture/transformable";
+import { computeRingRotationPeriod } from "../../utils/ringRotation";
+import { Settings } from "../../settings";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
 
-export function createRingHabitat(scene: Scene): TransformNode {
-    const root = new TransformNode("HelixHabitatRoot");
+export class RingHabitat implements Transformable, Updatable {
+    
+    private readonly root: TransformNode;
 
-    const radius = 2e3 + Math.random() * 2e3;
+    private readonly radius: number;
 
-    const tubeDiameter = 100 + Math.random() * 100;
+    private readonly ringMaterial: RingHabitatMaterial;
 
-    const attachmentNbSides = 4 + 2 * Math.floor(Math.random() * 4);
+    private readonly ring: Mesh;
 
-    const tesselation = attachmentNbSides * 8;
+    private readonly attachment: Mesh;
 
-    const attachment = MeshBuilder.CreateCylinder(
-        "HelixHabitatAttachment",
-        {
-            diameterTop: 100,
-            diameterBottom: 100,
-            height: tubeDiameter * 3,
-            tessellation: attachmentNbSides
-        },
-        scene
-    );
-    attachment.rotate(Axis.Y, Math.PI / attachmentNbSides, Space.WORLD);
-    attachment.parent = root;
+    private readonly arms: Mesh[] = [];
 
-    const ring = MeshBuilder.CreateTorus(
-        "RingHabitat",
-        {
-            diameter: 2 * radius,
-            thickness: tubeDiameter,
-            tessellation: tesselation
-        },
-        scene
-    );
+    constructor(scene: Scene) {
+        this.root = new TransformNode("HelixHabitatRoot");
 
-    ring.material = new RingHabitatMaterial(scene);
+        this.radius = 2e3 + Math.random() * 2e3;
 
-    ring.parent = root;
+        const tubeDiameter = 100 + Math.random() * 100;
 
-    const nbArms = attachmentNbSides / 2;
-    for (let i = 0; i <= nbArms; i++) {
-        const arm = MeshBuilder.CreateBox(
-            "HelixHabitatArm",
+        const attachmentNbSides = 4 + 2 * Math.floor(Math.random() * 4);
+
+        const tesselation = attachmentNbSides * 8;
+
+        this.attachment = MeshBuilder.CreateCylinder(
+            "HelixHabitatAttachment",
             {
-                width: 2 * radius,
-                depth: tubeDiameter / 3,
-                height: tubeDiameter / 3
+                diameterTop: 100,
+                diameterBottom: 100,
+                height: tubeDiameter * 3,
+                tessellation: attachmentNbSides
+            },
+            scene
+        );
+        this.attachment.rotate(Axis.Y, Math.PI / attachmentNbSides, Space.WORLD);
+        this.attachment.parent = this.getTransform();
+
+        this.ring = MeshBuilder.CreateTorus(
+            "RingHabitat",
+            {
+                diameter: 2 * this.radius,
+                thickness: tubeDiameter,
+                tessellation: tesselation
             },
             scene
         );
 
-        const theta = (i / nbArms) * Math.PI * 2;
+        this.ringMaterial = new RingHabitatMaterial(scene);
 
-        arm.rotate(Axis.Y, theta, Space.WORLD);
+        this.ring.material = this.ringMaterial;
 
-        arm.parent = root;
+        this.ring.parent = this.getTransform();
+
+        const nbArms = attachmentNbSides / 2;
+        for (let i = 0; i <= nbArms; i++) {
+            const arm = MeshBuilder.CreateBox(
+                "HelixHabitatArm",
+                {
+                    width: 2 * this.radius,
+                    depth: tubeDiameter / 3,
+                    height: tubeDiameter / 3
+                },
+                scene
+            );
+
+            const theta = (i / nbArms) * Math.PI * 2;
+
+            arm.rotate(Axis.Y, theta, Space.WORLD);
+
+            arm.parent = this.getTransform();
+
+            this.arms.push(arm);
+        }
     }
 
-    return root;
+    update(deltaSeconds: number) {
+        this.getTransform().rotate(Axis.Y, deltaSeconds / computeRingRotationPeriod(this.radius, Settings.G_EARTH));
+    }
+
+    getTransform(): TransformNode {
+        return this.root;
+    }
+
+    dispose() {
+        this.root.dispose();
+        this.attachment.dispose();
+        this.ring.dispose();
+        this.arms.forEach((arm) => arm.dispose());
+    }
 }
