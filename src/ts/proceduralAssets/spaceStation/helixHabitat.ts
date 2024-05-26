@@ -4,6 +4,7 @@ import { createHelix } from "../../utils/helixBuilder";
 import { Axis } from "@babylonjs/core";
 import { Space } from "@babylonjs/core/Maths/math.axis";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { RingHabitatMaterial } from "./ringHabitatMaterial";
 
 export function createHelixHabitat(scene: Scene): TransformNode {
     const root = new TransformNode("HelixHabitatRoot");
@@ -61,6 +62,12 @@ export function createHelixHabitat(scene: Scene): TransformNode {
 
     helix1.parent = root;
     helix2.parent = root;
+
+
+    const helixMaterial = new RingHabitatMaterial(scene);
+
+    helix1.material = helixMaterial;
+    helix2.material = helixMaterial;
 
     const nbArms = (attachmentNbSides * nbSpires) / 2;
     for (let i = 0; i <= nbArms; i++) {
