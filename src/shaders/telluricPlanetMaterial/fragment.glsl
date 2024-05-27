@@ -273,7 +273,7 @@ void main() {
     if (colorMode == 2) screenColor = mix(vec3(0.1, 0.2, 1.0), vec3(1.0, 0.0, 0.0), temperature01);
     if (colorMode == 3) screenColor = normal * 0.5 + 0.5;
     if (colorMode == 4) screenColor = vec3(elevation01);
-    if (colorMode == 5) screenColor = vec3(1.0 - dot(normal, normalize(vSamplePoint)));
+    if (colorMode == 5) screenColor = vec3(1.0 - dot(normal, normalize(vPosition)));
     if (colorMode == 6) screenColor = vec3(1.0 - slope);
 
     gl_FragColor = vec4(screenColor, 1.0);// apply color and lighting

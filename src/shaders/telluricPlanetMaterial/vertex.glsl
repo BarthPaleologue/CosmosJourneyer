@@ -50,7 +50,10 @@ void main() {
 
 	vUnitSamplePoint = normalize(vPosition);
     vSphereNormalW = vec3(planetWorldMatrix * vec4(vUnitSamplePoint, 0.0));
-	vSamplePoint = vPosition;
+
+    float a = 512.0;
+    float p = 4.0 * a;
+    vSamplePoint = (4.0 * a / p) * abs(mod(vPosition, p) - p * 0.5);
 
 	vNormal = normal;
 }
