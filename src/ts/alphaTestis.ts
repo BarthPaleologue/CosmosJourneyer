@@ -50,7 +50,7 @@ starSystem.model.setName("Alpha Testis");
 
 await starSystemView.loadStarSystem(starSystem, false);
 
-const sunModel = new StarModel(0.51);
+const sunModel = new StarModel(4413.641464990006);
 const sun = StarSystemHelper.MakeStar(starSystem, sunModel);
 sun.model.orbit.period = 60 * 60 * 24;
 
