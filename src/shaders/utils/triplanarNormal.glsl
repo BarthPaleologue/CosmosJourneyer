@@ -17,7 +17,7 @@
 
 // https://bgolus.medium.com/normal-mapping-for-a-triplanar-shader-10bf39dca05a
 #define inline
-vec3 triplanarNormal(vec3 position, vec3 surfaceNormal, sampler2D normalMap, float scale, float sharpness, float normalStrength) {
+vec3 triplanarNormal(vec3 position, vec3 surfaceNormal, sampler2D normalMap, float scale) {
     vec2 uvX = vec3(position).zy * scale;
     vec2 uvY = vec3(position).xz * scale;
     vec2 uvZ = vec3(position).xy * scale;
@@ -28,25 +28,28 @@ vec3 triplanarNormal(vec3 position, vec3 surfaceNormal, sampler2D normalMap, flo
     vec3 tNormalY = textureNoTile(normalMap, uvY).rgb;
     vec3 tNormalZ = textureNoTile(normalMap, uvZ).rgb;
 
-    tNormalX = normalize(tNormalX * 2.0 - 1.0);
-    tNormalY = normalize(tNormalY * 2.0 - 1.0);
-    tNormalZ = normalize(tNormalZ * 2.0 - 1.0);
+    tNormalX.g = 1.0 - tNormalX.g;
+    tNormalY.g = 1.0 - tNormalY.g;
+    tNormalZ.g = 1.0 - tNormalZ.g;
 
-    // Swizzle tangemt normals into world space and zero out "z"
-    tNormalX = vec3(0.0, tNormalX.yx);
-    tNormalY = vec3(tNormalY.x, 0.0, tNormalY.y);
-    tNormalZ = vec3(tNormalZ.xy, 0.0);
+    tNormalX = tNormalX * 2.0 - 1.0;
+    tNormalY = tNormalY * 2.0 - 1.0;
+    tNormalZ = tNormalZ * 2.0 - 1.0;
 
-    vec3 blendWeight = pow(abs(surfaceNormal), vec3(sharpness));
+    // Swizzle world normals into tangent space and apply Whiteout blend
+    tNormalX = vec3(tNormalX.xy + surfaceNormal.zy, abs(tNormalX.z) * surfaceNormal.x);
+    tNormalY = vec3(tNormalY.xy + surfaceNormal.xz, abs(tNormalY.z) * surfaceNormal.y);
+    tNormalZ = vec3(tNormalZ.xy + surfaceNormal.xy, abs(tNormalZ.z) * surfaceNormal.z);
+
+    vec3 blendWeight = pow(abs(surfaceNormal), vec3(2.0));
     blendWeight /= (blendWeight.x + blendWeight.y + blendWeight.z);
-    blendWeight *= normalStrength;
+    blendWeight *= 2.5;
 
-    // Triblend normals and add to world normal
+    // Swizzle tangent normals to match world orientation and triblend
     return normalize(
-        tNormalX.xyz * blendWeight.x +
-        tNormalY.xyz * blendWeight.y +
-        tNormalZ.xyz * blendWeight.z +
-        surfaceNormal
+    tNormalX.zyx * blendWeight.x +
+    tNormalY.xzy * blendWeight.y +
+    tNormalZ.xyz * blendWeight.z
     );
 }
 
@@ -89,9 +92,9 @@ void triPlanarMaterial(vec3 position, vec3 surfaceNormal, sampler2D albedoRoughn
 
     // Triblend normals and add to world normal
     normal = normalize(
-        clamp(tbnX * tNormalX, -1.0, 1.0) * blendWeight.x +
-        clamp(tbnY * tNormalY, -1.0, 1.0) * blendWeight.y +
-        clamp(tbnZ * tNormalZ, -1.0, 1.0) * blendWeight.z
+    clamp(tbnX * tNormalX, -1.0, 1.0) * blendWeight.x +
+    clamp(tbnY * tNormalY, -1.0, 1.0) * blendWeight.y +
+    clamp(tbnZ * tNormalZ, -1.0, 1.0) * blendWeight.z
     );
 
     // tri planar mapping of albedo
@@ -104,9 +107,9 @@ void triPlanarMaterial(vec3 position, vec3 surfaceNormal, sampler2D albedoRoughn
     vec3 tAlbedoZ = tAlbedoRoughnessZ.rgb;
 
     albedo =
-        tAlbedoX * blendWeight.x +
-        tAlbedoY * blendWeight.y +
-        tAlbedoZ * blendWeight.z;
+    tAlbedoX * blendWeight.x +
+    tAlbedoY * blendWeight.y +
+    tAlbedoZ * blendWeight.z;
 
     // tri planar mapping of roughness
     float tRoughnessX = tAlbedoRoughnessX.a;
@@ -114,9 +117,9 @@ void triPlanarMaterial(vec3 position, vec3 surfaceNormal, sampler2D albedoRoughn
     float tRoughnessZ = tAlbedoRoughnessZ.a;
 
     roughness =
-        tRoughnessX * blendWeight.x +
-        tRoughnessY * blendWeight.y +
-        tRoughnessZ * blendWeight.z;
+    tRoughnessX * blendWeight.x +
+    tRoughnessY * blendWeight.y +
+    tRoughnessZ * blendWeight.z;
 
     // tri planar mapping of metallic
     float tMetallicX = tNormalMetallicX.a;
@@ -124,7 +127,7 @@ void triPlanarMaterial(vec3 position, vec3 surfaceNormal, sampler2D albedoRoughn
     float tMetallicZ = tNormalMetallicZ.a;
 
     metallic =
-        tMetallicX * blendWeight.x +
-        tMetallicY * blendWeight.y +
-        tMetallicZ * blendWeight.z;
+    tMetallicX * blendWeight.x +
+    tMetallicY * blendWeight.y +
+    tMetallicZ * blendWeight.z;
 }

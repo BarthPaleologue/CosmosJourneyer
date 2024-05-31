@@ -92,12 +92,12 @@ void main() {
 
         vec3 samplePointPlanetSpace = mat3(planetInverseRotationMatrix) * samplePoint;
 
-        vec3 normalSamplePoint1 = triangleWave(10.0 * samplePointPlanetSpace + vec3(time, -time, -time) * 30.0, 512.0);
-        vec3 normalSamplePoint2 = triangleWave(10.0 * samplePointPlanetSpace + vec3(-time, time, time) * 30.0, 512.0);
+        vec3 normalSamplePoint1 = triangleWave(samplePointPlanetSpace, 512.0);
+        vec3 normalSamplePoint2 = triangleWave(samplePointPlanetSpace, 512.0);
 
         vec3 normalWave = planetNormal;
-        normalWave = triplanarNormal(normalSamplePoint1, normalWave, normalMap2, 0.010, ocean_waveBlendingSharpness, 0.5);
-        normalWave = triplanarNormal(normalSamplePoint2, normalWave, normalMap1, 0.005, ocean_waveBlendingSharpness, 0.5);
+        normalWave = triplanarNormal(normalSamplePoint1 + vec3(time, -time, -time) * 1.0, normalWave, normalMap2, 0.1);
+        normalWave = triplanarNormal(normalSamplePoint2 + vec3(-time, time, time) * 1.0, normalWave, normalMap1, 0.05);
 
         float opticalDepth01 = 1.0 - exp(-distanceThroughOcean * ocean_depthModifier);
         float alpha = exp(-distanceThroughOcean * ocean_alphaModifier);
