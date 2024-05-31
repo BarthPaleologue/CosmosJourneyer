@@ -91,9 +91,10 @@ void triPlanarMaterial(vec3 position, vec3 surfaceNormal, sampler2D albedoRoughn
     vec4 tAlbedoRoughnessY = textureNoTile(albedoRoughnessMap, uvY);
     vec4 tAlbedoRoughnessZ = textureNoTile(albedoRoughnessMap, uvZ);
 
-    vec3 tAlbedoX = pow(tAlbedoRoughnessX.rgb, vec3(2.2));
-    vec3 tAlbedoY = pow(tAlbedoRoughnessY.rgb, vec3(2.2));
-    vec3 tAlbedoZ = pow(tAlbedoRoughnessZ.rgb, vec3(2.2));
+    float gamma = 2.2;
+    vec3 tAlbedoX = pow(tAlbedoRoughnessX.rgb, vec3(gamma));
+    vec3 tAlbedoY = pow(tAlbedoRoughnessY.rgb, vec3(gamma));
+    vec3 tAlbedoZ = pow(tAlbedoRoughnessZ.rgb, vec3(gamma));
 
     albedo =
     tAlbedoX * blendWeight.x +
