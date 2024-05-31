@@ -61,6 +61,7 @@ uniform float time;
 
 #include "./utils/refraction.glsl";
 
+#include "./utils/triangleWave.glsl";
 
 void main() {
     vec4 screenColor = texture2D(textureSampler, vUV);// the current screen color
@@ -87,19 +88,16 @@ void main() {
 
         vec3 samplePoint = camera_position + impactPoint * rayDir - object_position;
 
-        vec3 samplePointPlanetSpace = mat3(planetInverseRotationMatrix) * samplePoint;
-        vec3 unitSamplePoint = normalize(samplePointPlanetSpace);
         vec3 planetNormal = normalize(samplePoint);
 
+        vec3 samplePointPlanetSpace = mat3(planetInverseRotationMatrix) * samplePoint;
+
+        vec3 normalSamplePoint1 = triangleWave(10.0 * samplePointPlanetSpace + vec3(time, -time, -time) * 30.0, 512.0);
+        vec3 normalSamplePoint2 = triangleWave(10.0 * samplePointPlanetSpace + vec3(-time, time, time) * 30.0, 512.0);
+
         vec3 normalWave = planetNormal;
-        /*normalWave = triplanarNormal(samplePointPlanetSpace + vec3(time, time, -time) * 0.2, normalWave, normalMap2, 0.15, ocean_waveBlendingSharpness, 1.0);
-        normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, time, -time) * 0.2, normalWave, normalMap1, 0.1, ocean_waveBlendingSharpness, 1.0);
-
-        normalWave = triplanarNormal(samplePointPlanetSpace + vec3(time, -time, -time) * 0.6, normalWave, normalMap1, 0.025, ocean_waveBlendingSharpness, 0.5);
-        normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, -time, time) * 0.6, normalWave, normalMap2, 0.02, ocean_waveBlendingSharpness, 0.5);*/
-
-        normalWave = triplanarNormal(samplePointPlanetSpace + vec3(time, -time, -time) * 10.0, normalWave, normalMap2, 0.010, ocean_waveBlendingSharpness, 0.5);
-        normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, -time, time) * 10.0, normalWave, normalMap1, 0.005, ocean_waveBlendingSharpness, 0.5);
+        normalWave = triplanarNormal(normalSamplePoint1, normalWave, normalMap2, 0.010, ocean_waveBlendingSharpness, 0.5);
+        normalWave = triplanarNormal(normalSamplePoint2, normalWave, normalMap1, 0.005, ocean_waveBlendingSharpness, 0.5);
 
         float opticalDepth01 = 1.0 - exp(-distanceThroughOcean * ocean_depthModifier);
         float alpha = exp(-distanceThroughOcean * ocean_alphaModifier);
