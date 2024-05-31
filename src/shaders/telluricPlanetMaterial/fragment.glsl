@@ -248,7 +248,6 @@ void main() {
     }
 
     vec3 albedo = steepFactor * steepAlbedo + plainFactor * plainAlbedo + (desertFactor+beachFactor+bottomFactor) * desertAlbedo + snowFactor * snowAlbedo;
-    albedo *= 2.5;
 
     vec3 normal = steepFactor * steepNormal + plainFactor * plainNormal + (desertFactor+beachFactor+bottomFactor) * desertNormal + snowFactor * snowNormal;
     normal = normalize(normal);
@@ -267,6 +266,8 @@ void main() {
 
         Lo += calculateLight(albedo, normalW, roughness, metallic, L, V, star_colors[i]);
     }
+
+    Lo = pow(Lo, vec3(1.0 / 2.2));
 
     vec3 screenColor = Lo;
 

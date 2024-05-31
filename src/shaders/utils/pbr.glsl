@@ -76,7 +76,7 @@ vec3 calculateLight(vec3 albedo, vec3 normal, float roughness, float metallic, v
 
     vec3 radiance = lightColor;
 
-    float NdotL = max(dot(normal, lightDir), 0.05);
+    float NdotL = max(dot(normal, lightDir), 0.002);
 
     vec3 diffuse = kD * (albedo)/ PI;
     return (diffuse + specular) * radiance * NdotL;
