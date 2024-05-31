@@ -76,7 +76,7 @@ const ambient = new HemisphericLight("Sun", Vector3.Up(), scene);
 ambient.intensity = 0.1;
 
 const sun = new TransformNodeWrapper(new TransformNode("Sun"), 1);
-sun.getTransform().position = new Vector3(-100e6, 20e6, 50e6);
+sun.getTransform().position = new Vector3(100e6, -20e6, -50e6);
 const pointLight = new PointLight("SunLight", Vector3.Zero(), scene);
 pointLight.falloffType = Light.FALLOFF_STANDARD;
 pointLight.parent = sun.getTransform();

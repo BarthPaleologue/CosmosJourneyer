@@ -43,7 +43,9 @@ void main() {
 
     vec2 vUV = vPosition.xy * 0.01;
 
-    vec3 albedo = texture2D(albedoMap, vUV).rgb;
+    float gamma = 2.2;
+
+    vec3 albedo = pow(texture2D(albedoMap, vUV).rgb, vec3(gamma));
     float roughness = textureNoTile(roughnessMap, vUV).r;
     float metallic = textureNoTile(metallicMap, vUV).r;
 
@@ -62,6 +64,8 @@ void main() {
         vec3 lightDirectionW = normalize(star_positions[i] - vPositionW);
         Lo += calculateLight(albedo, normalW, roughness, metallic, lightDirectionW, viewDirectionW, star_colors[i]);
     }
+
+    Lo = pow(Lo, vec3(1.0 / gamma));
 
     gl_FragColor = vec4(Lo, 1.0);
 }

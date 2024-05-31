@@ -56,7 +56,9 @@ void main() {
 
     vec2 ringUV = vec2(theta, vUV.y);
 
-    vec3 albedoColor = 1.0 - texture2D(albedo, ringUV).rgb;
+    float gamma = 2.2;
+
+    vec3 albedoColor = pow(texture2D(albedo, ringUV).rgb, vec3(gamma));
     float roughnessColor = texture2D(roughness, ringUV).r;
     float metallicColor = texture2D(metallic, ringUV).r;
     float occlusionColor = texture2D(occlusion, ringUV).r;
@@ -79,6 +81,11 @@ void main() {
 
     float noiseValue = textureNoTile(perlin, ringUV).r;
     Lo += (smoothstep(0.75, 0.75, noiseValue) + smoothstep(0.75, 0.75, 1.0 - noiseValue)) * vec3(1.0, 1.0, 0.4) * 2.0;
+
+    // occlusion
+    //Lo *= mix(1.0, occlusionColor, 0.5);
+
+    Lo = pow(Lo, vec3(1.0/gamma));
 
     gl_FragColor = vec4(Lo, 1.0);
 }
