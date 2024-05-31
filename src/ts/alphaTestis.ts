@@ -20,7 +20,6 @@ import "../styles/index.scss";
 import { StarSystemController } from "./starSystem/starSystemController";
 
 import { Settings } from "./settings";
-import { Assets } from "./assets";
 import { positionNearObjectBrightSide } from "./utils/positionNearObject";
 import { CosmosJourneyer } from "./cosmosJourneyer";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -94,9 +93,6 @@ moonModel.orbit.radius = 8 * planet.getRadius();
 moonModel.orbit.normalToPlane = Vector3.Up();
 
 const moon = StarSystemHelper.MakeSatellite(starSystem, planet, moonModel);
-moon.material.setTexture("plainNormalMap", Assets.DIRT_NORMAL_MAP);
-moon.material.setTexture("bottomNormalMap", Assets.DIRT_NORMAL_MAP);
-moon.material.updateConstants();
 
 const aresModel = new TelluricPlanetModel(0.3725, sunModel);
 aresModel.physicalProperties.mass = 7;

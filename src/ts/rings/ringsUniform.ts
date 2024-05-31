@@ -20,8 +20,8 @@ import { Scene } from "@babylonjs/core/scene";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import ringsLUT from "../../shaders/textures/ringsLUT.glsl";
-import { Assets } from "../assets";
 import { RingsModel } from "./ringsModel";
+import { Textures } from "../assets/textures";
 
 export const RingsUniformNames = {
     RING_START: "rings_start",
@@ -96,6 +96,6 @@ export class RingsUniforms {
     }
 
     public static SetEmptySamplers(effect: Effect) {
-        effect.setTexture(RingsSamplerNames.RING_LUT, Assets.EMPTY_TEXTURE);
+        effect.setTexture(RingsSamplerNames.RING_LUT, Textures.EMPTY_TEXTURE);
     }
 }

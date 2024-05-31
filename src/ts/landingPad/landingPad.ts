@@ -1,9 +1,9 @@
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { Assets } from "../assets";
 import { Scene } from "@babylonjs/core/scene";
 import { Transformable } from "../architecture/transformable";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
+import { Objects } from "../assets/objects";
 
 export class LandingPad implements Transformable {
     readonly instanceRoot: TransformNode;
@@ -12,7 +12,7 @@ export class LandingPad implements Transformable {
 
     constructor(scene: Scene, existingMesh: AbstractMesh | null = null) {
         if (existingMesh === null) {
-            this.instanceRoot = Assets.CreateLandingPadInstance();
+            this.instanceRoot = Objects.CreateLandingPadInstance();
         } else {
             this.instanceRoot = existingMesh;
         }

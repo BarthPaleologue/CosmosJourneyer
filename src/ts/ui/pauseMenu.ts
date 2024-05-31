@@ -17,8 +17,8 @@
 
 import { Observable } from "@babylonjs/core/Misc/observable";
 import pauseMenuHTML from "../../html/pauseMenu.html";
-import { Assets } from "../assets";
 import i18n from "../i18n";
+import { Sounds } from "../assets/sounds";
 
 export class PauseMenu {
     private readonly rootNode: HTMLElement;
@@ -55,7 +55,7 @@ export class PauseMenu {
 
         this.contributeButton = document.getElementById("pauseContributeButton") as HTMLElement;
         this.contributeButton.addEventListener("click", () => {
-            Assets.MENU_SELECT_SOUND.play();
+            Sounds.MENU_SELECT_SOUND.play();
 
             this.setActivePanel(this.activePanel === this.contibutePanel ? null : this.contibutePanel);
         });
@@ -63,7 +63,7 @@ export class PauseMenu {
 
         this.settingsButton = document.getElementById("pauseSettingsButton") as HTMLElement;
         this.settingsButton.addEventListener("click", () => {
-            Assets.MENU_SELECT_SOUND.play();
+            Sounds.MENU_SELECT_SOUND.play();
 
             this.setActivePanel(this.activePanel === this.settingsPanel ? null : this.settingsPanel);
         });
@@ -80,12 +80,12 @@ export class PauseMenu {
         document.querySelectorAll("#pauseMenu li").forEach((li) => {
             // play a sound when hovering over a button
             li.addEventListener("mouseenter", () => {
-                Assets.MENU_HOVER_SOUND.play();
+                Sounds.MENU_HOVER_SOUND.play();
             });
 
             // play a sound when clicking on a button
             li.addEventListener("click", () => {
-                Assets.MENU_SELECT_SOUND.play();
+                Sounds.MENU_SELECT_SOUND.play();
             });
         });
 

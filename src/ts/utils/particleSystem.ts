@@ -19,8 +19,8 @@ import { Axis, Vector3 } from "@babylonjs/core/Maths/math";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { ParticleSystem } from "@babylonjs/core/Particles/particleSystem";
-import { Assets } from "../assets";
 import { Particle } from "@babylonjs/core/Particles/particle";
+import { Textures } from "../assets/textures";
 
 function randomNumber(min: number, max: number): number {
     return Math.random() * (max - min) + min;
@@ -43,7 +43,7 @@ export class DirectionalParticleSystem extends ParticleSystem {
         this.direction = direction;
         this.emitter = mesh;
 
-        this.particleTexture = Assets.PLUME_PARTICLE;
+        this.particleTexture = Textures.PLUME_PARTICLE;
         this.particleTexture.hasAlpha = true;
 
         this.emitter = mesh;

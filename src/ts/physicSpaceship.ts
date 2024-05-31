@@ -35,7 +35,7 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 
 import "../styles/index.scss";
-import { Assets } from "./assets";
+import { Assets } from "./assets/assets";
 import { PhysicsViewer } from "@babylonjs/core/Debug/physicsViewer";
 import { Spaceship } from "./spaceshipExtended/spaceship";
 import { TelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModel";
@@ -46,6 +46,7 @@ import { translate } from "./uberCore/transforms/basicTransform";
 import { StarModel } from "./stellarObjects/star/starModel";
 import { Star } from "./stellarObjects/star/star";
 import { ChunkForgeWorkers } from "./planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
+import { Materials } from "./assets/materials";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -84,13 +85,13 @@ const chunkForge = new ChunkForgeWorkers(Settings.VERTEX_RESOLUTION);
 const sphere = MeshBuilder.CreateSphere("sphere", { diameter: 2, segments: 32 }, scene);
 sphere.position.y = 4;
 sphere.position.x = 4;
-sphere.material = Assets.DebugMaterial("sphere", true, false, scene);
+sphere.material = Materials.DebugMaterial("sphere", true, false, scene);
 shadowGenerator.addShadowCaster(sphere);
 
 const box = MeshBuilder.CreateBox("box", { size: 2 }, scene);
 box.position.y = 4;
 box.position.x = -4;
-box.material = Assets.DebugMaterial("box", true, false, scene);
+box.material = Materials.DebugMaterial("box", true, false, scene);
 shadowGenerator.addShadowCaster(box);
 
 const spaceship = new Spaceship(scene);
@@ -103,7 +104,7 @@ const capsule = MeshBuilder.CreateCapsule("capsule", { radius: 0.6, height: 2 },
 capsule.position.y = 4;
 capsule.position.x = -4;
 capsule.position.z = 4;
-capsule.material = Assets.DebugMaterial("capsule", true, false, scene);
+capsule.material = Materials.DebugMaterial("capsule", true, false, scene);
 capsule.visibility = 0.5;
 shadowGenerator.addShadowCaster(capsule);
 

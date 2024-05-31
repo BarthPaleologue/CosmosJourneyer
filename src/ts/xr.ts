@@ -17,7 +17,7 @@
 
 import "../styles/index.scss";
 
-import { Assets } from "./assets";
+import { Assets } from "./assets/assets";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Scene } from "@babylonjs/core/scene";
