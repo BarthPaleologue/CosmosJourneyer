@@ -232,7 +232,7 @@ export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
                 continue;
             }
 
-            if(isSizeOnScreenEnough(this, camera, 0.002 / 5)) {
+            if (isSizeOnScreenEnough(this, camera, 0.002 / 5)) {
                 isVisible = true;
                 break;
             }
