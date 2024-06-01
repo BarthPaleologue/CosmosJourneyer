@@ -41,8 +41,8 @@ void main() {
     #ifdef FORDEPTH
     gl_FragColor = vec4(vDepthMetric, 0.0, 0.0, 1.0);
     #else
-    vec3 baseColor = 4.0 * vec3(0.05, 0.2, 0.01);
-    vec3 tipColor = 1.5 * vec3(0.5, 0.5, 0.1);
+    vec3 baseColor = 3.0 * vec3(0.05, 0.2, 0.01);
+    vec3 tipColor = vec3(0.5, 0.5, 0.1);
 
     vec3 albedo = mix(baseColor, tipColor, pow(vPosition.y, 4.0));
 
