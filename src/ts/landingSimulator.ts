@@ -6,7 +6,7 @@ import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { setMaxLinVel } from "./utils/havok";
 import { UberScene } from "./uberCore/uberScene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Assets } from "./assets";
+import { Assets } from "./assets/assets";
 import { roll, setRotationQuaternion, translate } from "./uberCore/transforms/basicTransform";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { Color4 } from "@babylonjs/core/Maths/math.color";

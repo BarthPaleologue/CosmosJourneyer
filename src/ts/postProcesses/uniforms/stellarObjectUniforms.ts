@@ -31,8 +31,8 @@ export function setStellarObjectUniforms(effect: Effect, stellarObjects: Transfo
     effect.setInt(StellarObjectUniformNames.NB_STARS, stellarObjects.length);
 
     if (stellarObjects.length === 0) {
-        effect.setArray3(StellarObjectUniformNames.STAR_POSITIONS, [0,0,0]);
-        effect.setArray3(StellarObjectUniformNames.STAR_COLORS, [1,1,1]);
+        effect.setArray3(StellarObjectUniformNames.STAR_POSITIONS, [0, 0, 0]);
+        effect.setArray3(StellarObjectUniformNames.STAR_COLORS, [1, 1, 1]);
         return;
     }
 

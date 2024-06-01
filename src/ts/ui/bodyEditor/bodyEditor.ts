@@ -246,26 +246,20 @@ export class BodyEditor {
 
     public initToolbar(planet: TelluricPlanet) {
         const material = planet.material;
-        const colorSettings = material.colorSettings;
         document.getElementById("defaultMapButton")?.addEventListener("click", () => {
-            colorSettings.mode = ColorMode.DEFAULT;
-            material.updateConstants();
+            material.setColorMode(ColorMode.DEFAULT);
         });
         document.getElementById("moistureMapButton")?.addEventListener("click", () => {
-            colorSettings.mode = colorSettings.mode !== ColorMode.MOISTURE ? ColorMode.MOISTURE : ColorMode.DEFAULT;
-            material.updateConstants();
+            material.setColorMode(material.getColorMode() !== ColorMode.MOISTURE ? ColorMode.MOISTURE : ColorMode.DEFAULT);
         });
         document.getElementById("temperatureMapButton")?.addEventListener("click", () => {
-            colorSettings.mode = colorSettings.mode !== ColorMode.TEMPERATURE ? ColorMode.TEMPERATURE : ColorMode.DEFAULT;
-            material.updateConstants();
+            material.setColorMode(material.getColorMode() !== ColorMode.TEMPERATURE ? ColorMode.TEMPERATURE : ColorMode.DEFAULT);
         });
         document.getElementById("normalMapButton")?.addEventListener("click", () => {
-            colorSettings.mode = colorSettings.mode !== ColorMode.NORMAL ? ColorMode.NORMAL : ColorMode.DEFAULT;
-            material.updateConstants();
+            material.setColorMode(material.getColorMode() !== ColorMode.NORMAL ? ColorMode.NORMAL : ColorMode.DEFAULT);
         });
         document.getElementById("heightMapButton")?.addEventListener("click", () => {
-            colorSettings.mode = colorSettings.mode !== ColorMode.HEIGHT ? ColorMode.HEIGHT : ColorMode.DEFAULT;
-            material.updateConstants();
+            material.setColorMode(material.getColorMode() !== ColorMode.HEIGHT ? ColorMode.HEIGHT : ColorMode.DEFAULT);
         });
     }
 

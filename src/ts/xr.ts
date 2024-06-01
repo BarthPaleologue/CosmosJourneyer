@@ -17,14 +17,14 @@
 
 import "../styles/index.scss";
 
-import { Assets } from "./assets";
+import { Assets } from "./assets/assets";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Scene } from "@babylonjs/core/scene";
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { Mandelbulb } from "./mandelbulb/mandelbulb";
-import { MandelbulbPostProcess } from "./mandelbulb/mandelbulbPostProcess";
+import { Mandelbulb } from "./anomalies/mandelbulb/mandelbulb";
+import { MandelbulbPostProcess } from "./anomalies/mandelbulb/mandelbulbPostProcess";
 import "@babylonjs/core";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 

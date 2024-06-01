@@ -21,13 +21,13 @@ attribute vec3 position;
 attribute vec3 normal;
 
 uniform mat4 world;
-uniform mat4 view;
 uniform mat4 worldViewProjection;
-uniform mat4 normalMatrix;
 
-uniform vec3 planetPosition;
+uniform vec3 chunkPositionPlanetSpace;
 
-uniform mat4 inversePlanetWorldMatrix;
+uniform mat4 planetWorldMatrix;
+
+uniform vec3 cameraPosition;
 
 varying vec3 vPositionW;
 varying vec3 vNormalW;
@@ -38,29 +38,25 @@ varying vec3 vPosition;
 
 varying vec3 vUnitSamplePoint;
 varying vec3 vSamplePoint;
-varying vec3 vSamplePointScaled;
-
-varying vec3 vLocalPosition;
-
-varying vec3 cameraPosition;
 
 void main() {
-
     vec4 outPosition = worldViewProjection * vec4(position, 1.0);
     gl_Position = outPosition;
-
-	cameraPosition = view[3].xyz;
     
     vPositionW = vec3(world * vec4(position, 1.0));
-    vNormalW = normalize(mat3(normalMatrix) * normal);
+    vNormalW = vec3(world * vec4(normal, 0.0));
 
-	vPosition = vec3(inversePlanetWorldMatrix * vec4(vPositionW, 1.0));
-	vLocalPosition = position;
+	vPosition = chunkPositionPlanetSpace + position;
 
 	vUnitSamplePoint = normalize(vPosition);
-	vSamplePointScaled = vPosition / 1000e3;
-    vSphereNormalW = normalize(vPosition);
-	vSamplePoint = vPosition;
+    vSphereNormalW = vec3(planetWorldMatrix * vec4(vUnitSamplePoint, 0.0));
+
+    // Use a triangle wave to clamp our sample coordinates to the range [0, 1] in a periodic way
+    float a = 512.0;
+    float p = 4.0 * a;
+    // the phase is completely arbitrary, but it is an attempt to minimize the visual artifacts
+    vec3 phase = vec3(-132.0, 17.0, 53.0);
+    vSamplePoint = (4.0 * a / p) * abs(mod(vPosition + phase, p) - p * 0.5);
 
 	vNormal = normal;
 }

@@ -19,7 +19,7 @@ import "../styles/index.scss";
 
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Scene } from "@babylonjs/core/scene";
-import { Assets } from "./assets";
+import { Assets } from "./assets/assets";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";

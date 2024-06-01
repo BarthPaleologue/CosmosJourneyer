@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#define PI 3.1415926535897932384626433832795
+#include "./pi.glsl";
 
 vec2 toUV(in vec3 n)
 {

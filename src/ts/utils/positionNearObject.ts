@@ -77,7 +77,7 @@ export function positionNearObjectWithStarVisible(transformable: Controls, objec
             .getTransform()
             .getAbsolutePosition()
             .add(dirBodyToStar.scale(distBodyToStar + 1.5 * object.getBoundingRadius()))
-            .add(lateralDirection.scale(3 * object.getBoundingRadius()));
+            .add(lateralDirection.scale(4 * object.getBoundingRadius()));
         //.add(upDirection.scale(1 * object.getBoundingRadius()));
         transformable.getTransform().setAbsolutePosition(displacement);
 

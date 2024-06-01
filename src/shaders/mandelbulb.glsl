@@ -89,38 +89,6 @@ vec2 sdf(vec3 pos) {
     return vec2(distance, colorIndex);
 }
 
-vec2 sdf2(vec3 pos)
-{
-    float t = power * 2.0;
-    
-	vec4 c = 0.5*vec4(cos(t),cos(t*1.1),cos(t*2.3),cos(t*3.1));
-    vec4 z = vec4(pos, 0.0 );
-	vec4 nz;
-    
-	float md2 = 1.0;
-	float mz2 = dot(z,z);
-
-	for(int i=0;i<MANDELBROTSTEPS;i++)
-	{
-		md2*=4.0*mz2;
-	    nz.x=z.x*z.x-dot(z.yzw,z.yzw);
-		nz.yzw=2.0*z.x*z.yzw;
-		z=nz+c;
-
-		mz2 = dot(z,z);
-		if(mz2>4.0)
-        {
-			break;
-        }
-	}
-
-    float colorIndex = 50.0 * pow(md2, 0.128 / float(MARCHINGITERATIONS));
-
-    float distance = 0.25*sqrt(mz2/md2)*log(mz2);
-
-	return vec2(distance, colorIndex);
-}
-
 // TRACING A PATH : 
 // measuring the distance to the nearest object on the x coordinate
 // and returning the color index on the y coordinate

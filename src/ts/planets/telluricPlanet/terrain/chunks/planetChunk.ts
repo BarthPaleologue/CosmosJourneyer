@@ -24,10 +24,8 @@ import { Scene } from "@babylonjs/core/scene";
 import "@babylonjs/core/Engines/Extensions/engine.query";
 import { TransformNode, VertexData } from "@babylonjs/core/Meshes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { Observable } from "@babylonjs/core/Misc/observable";
 import { ThinInstancePatch } from "../instancePatch/thinInstancePatch";
 import { randomDownSample } from "../instancePatch/matrixBuffer";
-import { Assets } from "../../../../assets";
 import { isSizeOnScreenEnough } from "../../../../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { IPatch } from "../instancePatch/iPatch";
@@ -39,6 +37,8 @@ import { CollisionMask } from "../../../../settings";
 import { InstancePatch } from "../instancePatch/instancePatch";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Cullable } from "../../../../utils/cullable";
+import { Materials } from "../../../../assets/materials";
+import { Objects } from "../../../../assets/objects";
 
 export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
     public readonly mesh: Mesh;
@@ -55,9 +55,6 @@ export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
     private readonly parent: TransformNode;
 
     readonly instancePatches: IPatch[] = [];
-
-    readonly onReceiveVertexDataObservable = new Observable<void>();
-    readonly onDisposeObservable = new Observable<void>();
 
     private aggregate: PhysicsAggregate | null = null;
 
@@ -151,12 +148,10 @@ export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
 
         this.averageHeight = averageHeight;
 
-        this.onReceiveVertexDataObservable.notifyObservers();
-
         if (instancesMatrixBuffer.length === 0) return;
 
         const rockPatch = new InstancePatch(this.parent, randomDownSample(alignedInstancesMatrixBuffer, 3200));
-        rockPatch.createInstances(Assets.ROCK);
+        rockPatch.createInstances(Objects.ROCK);
         this.instancePatches.push(rockPatch);
 
         if (
@@ -165,20 +160,20 @@ export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
             this.getAverageHeight() > this.planetModel.physicalProperties.oceanLevel + 50
         ) {
             const treePatch = new InstancePatch(this.parent, randomDownSample(instancesMatrixBuffer, 4800));
-            treePatch.createInstances(Assets.TREE);
+            treePatch.createInstances(Objects.TREE);
             this.instancePatches.push(treePatch);
 
             const butterflyPatch = new ThinInstancePatch(this.parent, randomDownSample(instancesMatrixBuffer, 800));
-            butterflyPatch.createInstances(Assets.BUTTERFLY);
+            butterflyPatch.createInstances(Objects.BUTTERFLY);
             this.instancePatches.push(butterflyPatch);
 
             const grassPatch = new ThinInstancePatch(this.parent, instancesMatrixBuffer);
-            grassPatch.createInstances(Assets.GRASS_BLADE);
+            grassPatch.createInstances(Objects.GRASS_BLADE);
             this.instancePatches.push(grassPatch);
 
             for (const depthRenderer of Object.values(this.scene._depthRenderer)) {
-                depthRenderer.setMaterialForRendering([butterflyPatch.getBaseMesh()], Assets.BUTTERFLY_DEPTH_MATERIAL);
-                depthRenderer.setMaterialForRendering([grassPatch.getBaseMesh()], Assets.GRASS_DEPTH_MATERIAL);
+                depthRenderer.setMaterialForRendering([butterflyPatch.getBaseMesh()], Materials.BUTTERFLY_DEPTH_MATERIAL);
+                depthRenderer.setMaterialForRendering([grassPatch.getBaseMesh()], Materials.GRASS_DEPTH_MATERIAL);
             }
         }
     }
@@ -204,7 +199,7 @@ export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
      * Returns true if the chunk is ready to be enabled (i.e if the chunk has recieved its vertex data)
      * @returns true if the chunk is ready to be enabled (i.e if the chunk has recieved its vertex data)
      */
-    public isReady() {
+    public isLoaded() {
         return this.loaded;
     }
 
@@ -213,20 +208,16 @@ export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
     }
 
     public dispose() {
-        this.onDisposeObservable.notifyObservers();
-
         this.aggregate?.dispose();
         this.helpers.forEach((helper) => helper.dispose());
         this.instancePatches.forEach((patch) => patch.dispose());
         this.mesh.dispose();
-        this.onReceiveVertexDataObservable.clear();
-        this.onDisposeObservable.clear();
 
         this.disposed = true;
     }
 
     computeCulling(cameras: Camera[]) {
-        if (!this.isReady()) return;
+        if (!this.isLoaded()) return;
 
         let isVisible = false;
 
@@ -238,12 +229,13 @@ export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
             const conservativeSphereNormal = closestPointToCamera.subtract(this.parent.getAbsolutePosition()).normalizeToNew();
             const observerToCenter = camera.globalPosition.subtract(this.parent.getAbsolutePosition()).normalizeToNew();
             if (Vector3.Dot(observerToCenter, conservativeSphereNormal) < 0) {
-                isVisible = isVisible || false;
                 continue;
             }
 
-            // chunks are only rendered if they are big enough on screen
-            isVisible = isVisible || isSizeOnScreenEnough(this, camera);
+            if(isSizeOnScreenEnough(this, camera, 0.002 / 5)) {
+                isVisible = true;
+                break;
+            }
         }
 
         this.mesh.setEnabled(isVisible);
