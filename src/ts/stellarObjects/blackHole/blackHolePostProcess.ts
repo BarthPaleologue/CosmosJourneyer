@@ -17,7 +17,6 @@
 
 import blackHoleFragment from "../../../shaders/blackhole.glsl";
 import { ObjectPostProcess } from "../../postProcesses/objectPostProcess";
-import { Assets } from "../../assets";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { getForwardDirection } from "../../uberCore/transforms/basicTransform";
 import { Matrix, Quaternion } from "@babylonjs/core/Maths/math";
@@ -30,6 +29,7 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Scene } from "@babylonjs/core/scene";
+import { Textures } from "../../assets/textures";
 
 export type BlackHoleUniforms = {
     accretionDiskRadius: number;
@@ -108,7 +108,7 @@ export class BlackHolePostProcess extends PostProcess implements ObjectPostProce
             effect.setVector3(BlackHoleUniformNames.FORWARD_AXIS, getForwardDirection(blackHole.getTransform()));
 
             setSamplerUniforms(effect, this.activeCamera, scene);
-            effect.setTexture(BlackHoleSamplerNames.STARFIELD_TEXTURE, Assets.STAR_FIELD);
+            effect.setTexture(BlackHoleSamplerNames.STARFIELD_TEXTURE, Textures.STAR_FIELD);
         });
     }
 

@@ -39,7 +39,7 @@ import { HavokPhysicsWithBindings } from "@babylonjs/havok";
 import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge";
 import { DefaultControls } from "../defaultControls/defaultControls";
 import { CharacterControls } from "../characterControls/characterControls";
-import { Assets } from "../assets";
+import { Assets } from "../assets/assets";
 import { getForwardDirection, getRotationQuaternion, setRotationQuaternion, translate } from "../uberCore/transforms/basicTransform";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
@@ -67,6 +67,8 @@ import { BodyType } from "../architecture/bodyType";
 import { AnomalyType } from "../anomalies/anomalyType";
 import { Anomaly } from "../anomalies/anomaly";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { Sounds } from "../assets/sounds";
+import { Materials } from "../assets/materials";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -188,16 +190,16 @@ export class StarSystemView implements View {
 
         StarSystemInputs.map.toggleOverlay.on("complete", () => {
             const enabled = !this.ui.isEnabled();
-            if (enabled) Assets.MENU_HOVER_SOUND.play();
-            else Assets.MENU_HOVER_SOUND.play();
+            if (enabled) Sounds.MENU_HOVER_SOUND.play();
+            else Sounds.MENU_HOVER_SOUND.play();
             this.ui.setEnabled(enabled);
             this.helmetOverlay.setVisibility(enabled);
         });
 
         StarSystemInputs.map.toggleOrbitsAndAxis.on("complete", () => {
             const enabled = !this.orbitRenderer.isVisible();
-            if (enabled) Assets.MENU_HOVER_SOUND.play();
-            else Assets.MENU_HOVER_SOUND.play();
+            if (enabled) Sounds.MENU_HOVER_SOUND.play();
+            else Sounds.MENU_HOVER_SOUND.play();
             this.orbitRenderer.setVisibility(enabled);
             this.axisRenderer.setVisibility(enabled);
         });
@@ -222,7 +224,7 @@ export class StarSystemView implements View {
             if (this.ui.getTarget() === closestObjectToCenter) {
                 this.helmetOverlay.setTarget(null);
                 this.ui.setTarget(null);
-                Assets.TARGET_UNLOCK_SOUND.play();
+                Sounds.TARGET_UNLOCK_SOUND.play();
                 return;
             }
 
@@ -230,7 +232,7 @@ export class StarSystemView implements View {
 
             this.helmetOverlay.setTarget(closestObjectToCenter.getTransform());
             this.ui.setTarget(closestObjectToCenter);
-            Assets.TARGET_LOCK_SOUND.play();
+            Sounds.TARGET_LOCK_SOUND.play();
         });
 
         StarSystemInputs.map.jumpToSystem.on("complete", async () => {
@@ -551,10 +553,10 @@ export class StarSystemView implements View {
 
         this.orbitRenderer.update();
 
-        Assets.BUTTERFLY_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
-        Assets.BUTTERFLY_DEPTH_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
-        Assets.GRASS_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
-        Assets.GRASS_DEPTH_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
+        Materials.BUTTERFLY_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
+        Materials.BUTTERFLY_DEPTH_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
+        Materials.GRASS_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
+        Materials.GRASS_DEPTH_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
     }
 
     /**

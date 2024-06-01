@@ -10,8 +10,8 @@ import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import warpConeFragment from "../../shaders/warpConeMaterial/fragment.glsl";
 import warpConeVertex from "../../shaders/warpConeMaterial/vertex.glsl";
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { Assets } from "../assets";
 import { Transformable } from "../architecture/transformable";
+import { Textures } from "../assets/textures";
 
 /**
  * @see https://playground.babylonjs.com/#W9LE0U#28
@@ -105,7 +105,7 @@ export class HyperSpaceTunnel implements Transformable {
             uniforms: ["worldViewProjection", "time"],
             samplers: ["warpNoise"]
         });
-        this.warpConeMaterial.setTexture("warpNoise", Assets.SEAMLESS_PERLIN);
+        this.warpConeMaterial.setTexture("warpNoise", Textures.SEAMLESS_PERLIN);
 
         this.warpCone.material = this.warpConeMaterial;
     }

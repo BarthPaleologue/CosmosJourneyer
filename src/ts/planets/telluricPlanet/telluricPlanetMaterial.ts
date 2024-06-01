@@ -19,7 +19,7 @@ import { ColorMode } from "./colorSettingsInterface";
 
 import surfaceMaterialFragment from "../../../shaders/telluricPlanetMaterial/fragment.glsl";
 import surfaceMaterialVertex from "../../../shaders/telluricPlanetMaterial/vertex.glsl";
-import { Assets } from "../../assets";
+import { Assets } from "../../assets/assets";
 import { centeredRand } from "extended-random";
 import { TelluricPlanetModel } from "./telluricPlanetModel";
 import { Effect } from "@babylonjs/core/Materials/effect";
@@ -31,6 +31,7 @@ import { Transformable } from "../../architecture/transformable";
 import { Scene } from "@babylonjs/core/scene";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { setStellarObjectUniforms, StellarObjectUniformNames } from "../../postProcesses/uniforms/stellarObjectUniforms";
+import { Textures } from "../../assets/textures";
 
 const TelluricPlanetMaterialUniformNames = {
     WORLD: "world",
@@ -126,27 +127,27 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
 
         if (!Assets.IS_READY) throw new Error("You must initialize your assets using the AssetsManager");
 
-        this.plainNormalMetallicMap = Assets.GRASS_NORMAL_METALLIC_MAP;
-        this.plainAlbedoRoughnessMap = Assets.GRASS_ALBEDO_ROUGHNESS_MAP;
+        this.plainNormalMetallicMap = Textures.GRASS_NORMAL_METALLIC_MAP;
+        this.plainAlbedoRoughnessMap = Textures.GRASS_ALBEDO_ROUGHNESS_MAP;
 
-        this.desertNormalMetallicMap = Assets.SAND_NORMAL_METALLIC_MAP;
-        this.desertAlbedoRoughnessMap = Assets.SAND_ALBEDO_ROUGHNESS_MAP;
+        this.desertNormalMetallicMap = Textures.SAND_NORMAL_METALLIC_MAP;
+        this.desertAlbedoRoughnessMap = Textures.SAND_ALBEDO_ROUGHNESS_MAP;
 
-        this.snowNormalMetallic = Assets.SNOW_NORMAL_METALLIC_MAP;
-        this.snowAlbedoRoughnessMap = Assets.SNOW_ALBEDO_ROUGHNESS_MAP;
+        this.snowNormalMetallic = Textures.SNOW_NORMAL_METALLIC_MAP;
+        this.snowAlbedoRoughnessMap = Textures.SNOW_ALBEDO_ROUGHNESS_MAP;
 
-        this.steepNormalMetallic = Assets.ROCK_NORMAL_METALLIC_MAP;
-        this.steepAlbedoRoughnessMap = Assets.ROCK_ALBEDO_ROUGHNESS_MAP;
+        this.steepNormalMetallic = Textures.ROCK_NORMAL_METALLIC_MAP;
+        this.steepAlbedoRoughnessMap = Textures.ROCK_ALBEDO_ROUGHNESS_MAP;
 
         if (model.physicalProperties.oceanLevel === 0) {
             if (model.physicalProperties.pressure > 0) {
                 // desert world
-                this.plainNormalMetallicMap = Assets.SAND_NORMAL_METALLIC_MAP;
-                this.plainAlbedoRoughnessMap = Assets.SAND_ALBEDO_ROUGHNESS_MAP;
+                this.plainNormalMetallicMap = Textures.SAND_NORMAL_METALLIC_MAP;
+                this.plainAlbedoRoughnessMap = Textures.SAND_ALBEDO_ROUGHNESS_MAP;
             } else {
                 // sterile world
-                this.plainNormalMetallicMap = Assets.ROCK_NORMAL_METALLIC_MAP;
-                this.plainAlbedoRoughnessMap = Assets.ROCK_ALBEDO_ROUGHNESS_MAP;
+                this.plainNormalMetallicMap = Textures.ROCK_NORMAL_METALLIC_MAP;
+                this.plainAlbedoRoughnessMap = Textures.ROCK_ALBEDO_ROUGHNESS_MAP;
             }
         }
 
@@ -156,7 +157,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
             Effect.ShadersStore["telluricPlanetLutFragmentShader"] = lutFragment;
         }
 
-        this.setTexture("lut", Assets.EMPTY_TEXTURE);
+        this.setTexture("lut", Textures.EMPTY_TEXTURE);
         const lut = new ProceduralTexture("lut", 4096, "telluricPlanetLut", scene, null, true, false);
         lut.setFloat(TelluricPlanetMaterialUniformNames.MIN_TEMPERATURE, this.planetModel.physicalProperties.minTemperature);
         lut.setFloat(TelluricPlanetMaterialUniformNames.MAX_TEMPERATURE, this.planetModel.physicalProperties.maxTemperature);

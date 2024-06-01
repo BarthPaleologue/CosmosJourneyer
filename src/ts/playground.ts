@@ -30,7 +30,7 @@ import { BlackHole } from "./stellarObjects/blackHole/blackHole";
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
 import { Axis, Scene } from "@babylonjs/core";
 import { translate } from "./uberCore/transforms/basicTransform";
-import { Assets } from "./assets";
+import { Assets } from "./assets/assets";
 import { DefaultControls } from "./defaultControls/defaultControls";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;

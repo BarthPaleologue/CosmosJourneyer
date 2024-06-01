@@ -28,7 +28,7 @@ import { BlackHolePostProcess } from "./stellarObjects/blackHole/blackHolePostPr
 import { BlackHole } from "./stellarObjects/blackHole/blackHole";
 import { Axis, Color4, HemisphericLight, MeshBuilder } from "@babylonjs/core";
 import { translate } from "./uberCore/transforms/basicTransform";
-import { Assets } from "./assets";
+import { Assets } from "./assets/assets";
 import { Mandelbulb } from "./anomalies/mandelbulb/mandelbulb";
 import { MandelbulbPostProcess } from "./anomalies/mandelbulb/mandelbulbPostProcess";
 import { StereoCameras } from "./utils/stereoCameras";
