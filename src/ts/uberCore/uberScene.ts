@@ -47,8 +47,9 @@ export class UberScene extends Scene {
         this.clearColor = new Color4(0, 0, 0, 0);
 
         this.onNewCameraAddedObservable.add((camera) => {
-            const depthRenderer = this.enableDepthRenderer(camera, false, true);
+            const depthRenderer = this.enableDepthRenderer(camera, true, true);
             depthRenderer.getDepthMap().activeCamera = camera;
+            depthRenderer.clearColor = new Color4(0, 0, 0, 1);
             this.depthRenderers.push(depthRenderer);
         });
     }
