@@ -74,7 +74,7 @@ planetModel.orbit.normalToPlane = Vector3.Up();
 
 const planet = StarSystemHelper.MakeTelluricPlanet(starSystem, planetModel);
 
-const [spaceStation] = StarSystemHelper.MakeSpaceStations(starSystem, planet, 1);
+//const [spaceStation] = StarSystemHelper.MakeSpaceStations(starSystem, planet, 1);
 
 //physicsViewer.showBody(spaceStation.aggregate.body);
 /*for(const landingpad of spaceStation.landingPads) {
@@ -145,12 +145,12 @@ if (aresAtmosphere) {
 document.addEventListener("keydown", (e) => {
     if (engine.isPaused()) return;
 
-    if (e.key === "o") {
+    /*if (e.key === "o") {
         const landingPad = spaceStation.handleDockingRequest();
         if (landingPad !== null && starSystemView.scene.getActiveControls() === spaceshipController) {
             spaceshipController.spaceship.engageLandingOnPad(landingPad);
         }
-    }
+    }*/
 
     if (e.key === "x") {
         let nbVertices = 0;

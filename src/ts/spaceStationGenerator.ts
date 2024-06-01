@@ -82,7 +82,7 @@ pointLight.falloffType = Light.FALLOFF_STANDARD;
 pointLight.parent = sun.getTransform();
 
 let elapsedSeconds = 0;
-scene.onBeforeRenderObservable.add(() => {
+scene.onBeforePhysicsObservable.add(() => {
     const deltaSeconds = engine.getDeltaTime() / 1000;
     elapsedSeconds += deltaSeconds;
 

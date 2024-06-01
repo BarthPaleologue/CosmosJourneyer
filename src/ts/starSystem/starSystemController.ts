@@ -352,11 +352,11 @@ export class StarSystemController {
     /**
      * Updates the system and all its orbital objects forward in time by the given delta time.
      * The nearest object is kept in place and the other objects are updated accordingly.
-     * @param deltaTime The time elapsed since the last update
+     * @param deltaSeconds The time elapsed since the last update
      * @param chunkForge The chunk forge used to update the LOD of the telluric planets
      * @param postProcessManager
      */
-    public update(deltaTime: number, chunkForge: ChunkForge, postProcessManager: PostProcessManager): void {
+    public update(deltaSeconds: number, chunkForge: ChunkForge, postProcessManager: PostProcessManager): void {
         const controller = this.scene.getActiveControls();
         this.computeNearestOrbitalObject(controller.getTransform().getAbsolutePosition());
         this.computeClosestToScreenCenterOrbitalObject();
@@ -382,7 +382,7 @@ export class StarSystemController {
         // By doing so, their rotation axis on themselves except the fixed one must as well be rotated in the same way.
         // Last but not least, the background starfield must be rotated in the opposite direction to give the impression the moon is rotating.
         if (shouldCompensateRotation) {
-            const dthetaNearest = OrbitalObjectUtils.GetRotationAngle(nearestBody, deltaTime);
+            const dthetaNearest = OrbitalObjectUtils.GetRotationAngle(nearestBody, deltaSeconds);
 
             for (const object of this.orbitalObjects) {
                 const orbit = object.getOrbitProperties();
@@ -406,7 +406,7 @@ export class StarSystemController {
             this.universeRotation.copyFrom(starfieldAdditionalRotation.multiply(this.universeRotation));
         } else {
             // if we don't compensate the rotation of the nearest body, we must simply update its rotation
-            OrbitalObjectUtils.UpdateRotation(nearestBody, deltaTime);
+            OrbitalObjectUtils.UpdateRotation(nearestBody, deltaSeconds);
         }
 
         // TRANSLATION COMPENSATION
@@ -414,7 +414,7 @@ export class StarSystemController {
         // compute what would be its next position if it were to move normally.
         // This gives us a translation vector that we can negate and apply to all other bodies.
         const initialPosition = nearestBody.getTransform().getAbsolutePosition().clone();
-        const newPosition = OrbitalObjectUtils.GetNextOrbitalPosition(nearestBody, deltaTime);
+        const newPosition = OrbitalObjectUtils.GetNextOrbitalPosition(nearestBody, deltaSeconds);
         const nearestBodyDisplacement = newPosition.subtract(initialPosition);
         if (shouldCompensateTranslation) {
             const negatedDisplacement = nearestBodyDisplacement.negate();
@@ -437,11 +437,11 @@ export class StarSystemController {
         for (const object of this.orbitalObjects) {
             if (object === nearestBody) continue;
 
-            OrbitalObjectUtils.UpdateOrbitalPosition(object, deltaTime);
-            OrbitalObjectUtils.UpdateRotation(object, deltaTime);
+            OrbitalObjectUtils.UpdateOrbitalPosition(object, deltaSeconds);
+            OrbitalObjectUtils.UpdateRotation(object, deltaSeconds);
         }
 
-        controller.update(deltaTime);
+        controller.update(deltaSeconds);
 
         for (const body of this.telluricPlanets) {
             // Meshes with LOD are updated (surface quadtrees)
@@ -453,15 +453,15 @@ export class StarSystemController {
             object.computeCulling(controller.getActiveCameras());
         }
 
-        for (const object of this.spaceStations) {
-            object.update(this.stellarObjects, deltaTime);
-            object.computeCulling(controller.getActiveCameras());
+        for (const spaceStation of this.spaceStations) {
+            spaceStation.update(this.stellarObjects, deltaSeconds);
+            spaceStation.computeCulling(controller.getActiveCameras());
         }
 
         // floating origin
         this.applyFloatingOrigin();
 
-        this.updateShaders(deltaTime, postProcessManager);
+        this.updateShaders(deltaSeconds, postProcessManager);
     }
 
     public applyFloatingOrigin() {

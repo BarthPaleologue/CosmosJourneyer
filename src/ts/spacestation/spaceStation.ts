@@ -28,7 +28,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { OrbitalObjectPhysicalProperties } from "../architecture/physicalProperties";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { LandingPad } from "../landingPad/landingPad";
-import { CollisionMask, Settings } from "../settings";
+import { CollisionMask } from "../settings";
 import { CelestialBody } from "../architecture/celestialBody";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { generateSpaceStationName } from "../utils/spaceStationNameGenerator";
@@ -116,8 +116,6 @@ export class SpaceStation implements OrbitalObject, Cullable {
         }
 
         this.rootAggregate.body.disablePreStep = false;
-
-        console.log("found", this.landingPads.length, "landing pads");
     }
 
     handleDockingRequest(): LandingPad | null {
@@ -163,7 +161,7 @@ export class SpaceStation implements OrbitalObject, Cullable {
         let lastNode: TransformNode | null = null;
 
         let urgeToCreateHabitat = 0;
-        for (let i = 0; i < 20; i++) {
+        for (let i = 0; i < 1; i++) {
             let nodeType = SpaceStationNodeType.UTILITY_SECTION;
             if (Math.random() < sigmoid(urgeToCreateHabitat - 6) && urgeToCreateHabitat > 0) {
                 nodeType = Math.random() < 0.5 ? SpaceStationNodeType.RING_HABITAT : SpaceStationNodeType.HELIX_HABITAT;
@@ -218,13 +216,16 @@ export class SpaceStation implements OrbitalObject, Cullable {
         this.helixHabitats.forEach((helixHabitat) => helixHabitat.update(stellarObjects, deltaSeconds));
         this.ringHabitats.forEach((ringHabitat) => ringHabitat.update(stellarObjects, deltaSeconds));
 
-        const worldMatrix = this.getTransform().getWorldMatrix();
+        const worldMatrix = this.getTransform().computeWorldMatrix(true);
         for (let i = 0; i < this.childAggregates.length; i++) {
             const childAggregate = this.childAggregates[i];
             const localPosition = this.childLocalPositions[i];
 
             // this is necessary because Havok ignores regular parenting
             childAggregate.transformNode.setAbsolutePosition(Vector3.TransformCoordinates(localPosition, worldMatrix));
+            if(i===0) {
+                console.log("childAggregate", childAggregate.transformNode.getAbsolutePosition());
+            }
         }
     }
 
