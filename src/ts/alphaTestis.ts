@@ -74,7 +74,7 @@ planetModel.orbit.normalToPlane = Vector3.Up();
 
 const planet = StarSystemHelper.MakeTelluricPlanet(starSystem, planetModel);
 
-//const [spaceStation] = StarSystemHelper.MakeSpaceStations(starSystem, planet, 1);
+const [spaceStation] = StarSystemHelper.MakeSpaceStations(starSystem, planet, 1);
 
 //physicsViewer.showBody(spaceStation.aggregate.body);
 /*for(const landingpad of spaceStation.landingPads) {

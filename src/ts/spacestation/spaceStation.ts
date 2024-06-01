@@ -62,9 +62,6 @@ export class SpaceStation implements OrbitalObject, Cullable {
 
     private readonly root: TransformNode;
 
-    //private readonly nodes: TransformNode[] = [];
-    //private readonly nodeLocalPositions: Vector3[] = [];
-
     private readonly scene: Scene;
 
     constructor(scene: Scene, model: SpaceStationModel | number, parentBody: CelestialBody | null = null) {
@@ -100,7 +97,7 @@ export class SpaceStation implements OrbitalObject, Cullable {
 
         this.rootAggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
 
-        const inverseWorldMatrix = this.getTransform().getWorldMatrix().clone().invert();
+        /*const inverseWorldMatrix = this.getTransform().getWorldMatrix().clone().invert();
         for (const mesh of this.getTransform().getChildMeshes()) {
             const childAggregate = new PhysicsAggregate(mesh, PhysicsShapeType.MESH, {
                 mass: 0,
@@ -113,7 +110,7 @@ export class SpaceStation implements OrbitalObject, Cullable {
             const localPosition = Vector3.TransformCoordinates(worldPosition, inverseWorldMatrix);
 
             this.childLocalPositions.push(localPosition);
-        }
+        }*/
 
         this.rootAggregate.body.disablePreStep = false;
     }
@@ -161,7 +158,7 @@ export class SpaceStation implements OrbitalObject, Cullable {
         let lastNode: TransformNode | null = null;
 
         let urgeToCreateHabitat = 0;
-        for (let i = 0; i < 1; i++) {
+        for (let i = 0; i < 10; i++) {
             let nodeType = SpaceStationNodeType.UTILITY_SECTION;
             if (Math.random() < sigmoid(urgeToCreateHabitat - 6) && urgeToCreateHabitat > 0) {
                 nodeType = Math.random() < 0.5 ? SpaceStationNodeType.RING_HABITAT : SpaceStationNodeType.HELIX_HABITAT;
@@ -202,8 +199,6 @@ export class SpaceStation implements OrbitalObject, Cullable {
                 newNode.position = lastNode.position.add(lastNode.up.scale(previousSectionSizeY + newSectionY));
             }
 
-            //this.nodes.push(newNode);
-            //this.nodeLocalPositions.push(newNode.position.clone());
             newNode.parent = this.root;
 
             lastNode = newNode;
@@ -216,17 +211,14 @@ export class SpaceStation implements OrbitalObject, Cullable {
         this.helixHabitats.forEach((helixHabitat) => helixHabitat.update(stellarObjects, deltaSeconds));
         this.ringHabitats.forEach((ringHabitat) => ringHabitat.update(stellarObjects, deltaSeconds));
 
-        const worldMatrix = this.getTransform().computeWorldMatrix(true);
+        /*const worldMatrix = this.getTransform().computeWorldMatrix(true);
         for (let i = 0; i < this.childAggregates.length; i++) {
             const childAggregate = this.childAggregates[i];
             const localPosition = this.childLocalPositions[i];
 
             // this is necessary because Havok ignores regular parenting
             childAggregate.transformNode.setAbsolutePosition(Vector3.TransformCoordinates(localPosition, worldMatrix));
-            if(i===0) {
-                console.log("childAggregate", childAggregate.transformNode.getAbsolutePosition());
-            }
-        }
+        }*/
     }
 
     getTransform(): TransformNode {
@@ -238,5 +230,8 @@ export class SpaceStation implements OrbitalObject, Cullable {
         this.utilitySections.forEach((utilitySection) => utilitySection.dispose());
         this.helixHabitats.forEach((helixHabitat) => helixHabitat.dispose());
         this.ringHabitats.forEach((ringHabitat) => ringHabitat.dispose());
+
+        this.rootAggregate.dispose();
+        this.childAggregates.forEach((childAggregate) => childAggregate.dispose());
     }
 }
