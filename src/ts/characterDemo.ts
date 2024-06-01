@@ -34,7 +34,7 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 
 import "../styles/index.scss";
-import { Assets } from "./assets";
+import { Assets } from "./assets/assets";
 import { CharacterControls } from "./characterControls/characterControls";
 import { TransformNodeWrapper } from "./utils/wrappers";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";

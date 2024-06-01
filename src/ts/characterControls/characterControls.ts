@@ -20,7 +20,6 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { setRotationQuaternion, setUpVector, translate } from "../uberCore/transforms/basicTransform";
-import { Assets } from "../assets";
 import { AnimationGroup } from "@babylonjs/core/Animations/animationGroup";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { CollisionMask, Settings } from "../settings";
@@ -33,6 +32,7 @@ import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { Transformable } from "../architecture/transformable";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { CharacterInputs } from "./characterControlsInputs";
+import { Objects } from "../assets/objects";
 
 class AnimationGroupWrapper {
     name: string;
@@ -110,7 +110,7 @@ export class CharacterControls implements Controls {
     constructor(scene: Scene) {
         this.scene = scene;
 
-        this.character = Assets.CreateCharacterInstance();
+        this.character = Objects.CreateCharacterInstance();
         setRotationQuaternion(this.character, Quaternion.Identity());
 
         const walkAnim = scene.getAnimationGroupByName("WalkingForward");

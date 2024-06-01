@@ -42,7 +42,6 @@ import { encodeBase64 } from "./utils/base64";
 import { UniverseCoordinates } from "./saveFile/universeCoordinates";
 import { View } from "./utils/view";
 import { updateInputDevices } from "./inputs/devices";
-import { Assets } from "./assets";
 import { AudioManager } from "./audio/audioManager";
 import { AudioMasks } from "./audio/audioMasks";
 import { GeneralInputs } from "./inputs/generalInputs";
@@ -51,6 +50,7 @@ import { StarSystemInputs } from "./inputs/starSystemInputs";
 import { pressInteractionToStrings } from "./utils/inputControlsString";
 import { LoadingScreen } from "./uberCore/loadingScreen";
 import i18n from "./i18n";
+import { Sounds } from "./assets/sounds";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -226,13 +226,13 @@ export class CosmosJourneyer {
 
         if (this.activeView === this.starSystemView) this.starSystemView.stopBackgroundSounds();
 
-        Assets.OPEN_PAUSE_MENU_SOUND.play();
+        Sounds.OPEN_PAUSE_MENU_SOUND.play();
         this.pauseMenu.setVisibility(true);
     }
 
     public resume(): void {
         this.state = EngineState.RUNNING;
-        Assets.MENU_SELECT_SOUND.play();
+        Sounds.MENU_SELECT_SOUND.play();
         this.pauseMenu.setVisibility(false);
     }
 

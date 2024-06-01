@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include "./pi.glsl";
+
 vec2 toUV(in vec3 n)
 {
     vec2 uv;

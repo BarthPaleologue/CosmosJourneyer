@@ -13,12 +13,11 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { SystemSeed } from "../utils/systemSeed";
 import { parseSaveFileData, SaveFileData } from "../saveFile/saveFileData";
 import packageInfo from "../../../package.json";
-import { Assets } from "../assets";
 import { Settings } from "../settings";
-import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { initSettingsPanel } from "./settingsPanel";
 import i18n from "../i18n";
 import { BodyType } from "../architecture/bodyType";
+import { Sounds } from "../assets/sounds";
 
 export class MainMenu {
     readonly scene: UberScene;
@@ -106,12 +105,12 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
         document.querySelectorAll("#menuItems li").forEach((li) => {
             // on mouse hover, play a sound
             li.addEventListener("mouseenter", () => {
-                Assets.MENU_HOVER_SOUND.play();
+                Sounds.MENU_HOVER_SOUND.play();
             });
 
             // on click, play a sound
             li.addEventListener("click", () => {
-                Assets.MENU_SELECT_SOUND.play();
+                Sounds.MENU_SELECT_SOUND.play();
             });
         });
 
@@ -198,7 +197,7 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
 
             Settings.TIME_MULTIPLIER = 3;
 
-            Assets.MAIN_MENU_BACKGROUND_MUSIC.play();
+            Sounds.MAIN_MENU_BACKGROUND_MUSIC.play();
         });
 
         this.starSystemView.ui.setEnabled(false);
@@ -335,14 +334,14 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
                 this.scene.onBeforePhysicsObservable.removeCallback(animationCallback);
                 if (this.htmlRoot === null) throw new Error("MainMenu is null");
                 this.htmlRoot.style.display = "none";
-                Assets.MAIN_MENU_BACKGROUND_MUSIC.stop();
+                Sounds.MAIN_MENU_BACKGROUND_MUSIC.stop();
                 onAnimationFinished();
 
                 return;
             }
 
             const currentProgress = translationAnimation.getProgress();
-            Assets.MAIN_MENU_BACKGROUND_MUSIC.setVolume(1 - currentProgress);
+            Sounds.MAIN_MENU_BACKGROUND_MUSIC.setVolume(1 - currentProgress);
 
             this.controls.getActiveCameras().forEach((camera) => camera.getViewMatrix());
 

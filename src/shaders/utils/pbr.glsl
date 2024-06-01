@@ -18,6 +18,8 @@
 // taken from https://github.com/BarthPaleologue/feather/blob/main/assets/shaders/pbr/fragment.glsl
 // based on https://learnopengl.com/PBR/Lighting
 
+#include "./pi.glsl";
+
 float DistributionGGX(vec3 N, vec3 H, float roughness) {
     float a      = roughness*roughness;
     float a2     = a*a;
@@ -40,6 +42,7 @@ float GeometrySchlickGGX(float NdotV, float roughness) {
 
     return num / denom;
 }
+
 float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
     float NdotV = max(dot(N, V), 0.0);
     float NdotL = max(dot(N, L), 0.0);
@@ -64,7 +67,7 @@ vec3 calculateLight(vec3 albedo, vec3 normal, float roughness, float metallic, v
     float G   = GeometrySmith(normal, viewDir, lightDir, roughness);
 
     vec3 numerator    = NDF * G * F;
-    float denominator = 4.0 * max(dot(normal, viewDir), 0.0) * max(dot(normal, lightDir), 0.0)  + 0.0001;
+    float denominator = 4.0 * max(dot(normal, viewDir), 0.0) * max(dot(normal, lightDir), 0.0)  + 1.0; // + 1.0 to prevent division by zero at glancing angles
     vec3 specular     = numerator / denominator;
 
     vec3 kS = F;
@@ -74,8 +77,9 @@ vec3 calculateLight(vec3 albedo, vec3 normal, float roughness, float metallic, v
 
     vec3 radiance = lightColor;
 
-    float NdotL = max(dot(normal, lightDir), 0.01);
+    float NdotL = max(dot(normal, lightDir), 0.0);
 
+    vec3 ambient = vec3(0.005) * albedo * radiance;
     vec3 diffuse = kD * (albedo)/ PI;
-    return (diffuse + specular) * radiance * NdotL;
+    return (diffuse + specular) * radiance * NdotL + ambient;
 }

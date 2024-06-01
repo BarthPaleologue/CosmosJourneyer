@@ -70,7 +70,7 @@ export class GasPlanet implements Planet, Cullable {
             name,
             {
                 diameter: this.model.radius * 2,
-                segments: 32
+                segments: 64
             },
             scene
         );

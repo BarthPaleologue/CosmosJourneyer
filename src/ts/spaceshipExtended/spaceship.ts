@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { AbstractMesh, InstancedMesh, Mesh, MeshBuilder } from "@babylonjs/core/Meshes";
-import { Assets } from "../assets";
+import { Assets } from "../assets/assets";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { IPhysicsCollisionEvent, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
@@ -28,6 +28,9 @@ import { Matrix, inverse } from "ml-matrix";
 import { buildThrusterMatrix, getThrusterConfiguration } from "./thrusterMatrix";
 import { clamp } from "terrain-generation";
 import { PhysicsSpaceShipControlsInputs } from "./physicsSpaceshipInputs";
+import { Objects } from "../assets/objects";
+import { Materials } from "../assets/materials";
+import { Sounds } from "../assets/sounds";
 
 export class Spaceship {
     readonly instanceRoot: InstancedMesh;
@@ -55,7 +58,7 @@ export class Spaceship {
 
     constructor(scene: Scene) {
         if (!Assets.IS_READY) throw new Error("Assets are not ready yet!");
-        this.instanceRoot = Assets.CreateEndeavorSpaceShipInstance();
+        this.instanceRoot = Objects.CreateEndeavorSpaceShipInstance();
 
         /*const centerHelper = MeshBuilder.CreateBox("centerHelper", { size: 0.5 }, scene);
 centerHelper.parent = this.instanceRoot;
@@ -81,7 +84,7 @@ this.centerOfMassHelper.material = Assets.DebugMaterial("centerOfMassHelper", tr
                     scene
                 );
                 helperLine.scaling.scaleInPlace(5);
-                helperLine.material = Assets.DebugMaterial(`helperLine${child.name}`, true, false, scene);
+                helperLine.material = Materials.DebugMaterial(`helperLine${child.name}`, true, false, scene);
 
                 helperLine.parent = child;
             } else if (child.name.includes("mainThruster")) {
@@ -98,7 +101,7 @@ this.centerOfMassHelper.material = Assets.DebugMaterial("centerOfMassHelper", tr
                     scene
                 );
                 helperLine.scaling.scaleInPlace(5);
-                helperLine.material = Assets.DebugMaterial(`helperLine${child.name}`, true, false, scene);
+                helperLine.material = Materials.DebugMaterial(`helperLine${child.name}`, true, false, scene);
 
                 helperLine.parent = child;
             } else {
@@ -140,7 +143,7 @@ this.centerOfMassHelper.material = Assets.DebugMaterial("centerOfMassHelper", tr
         this.collisionObservable = this.aggregate.body.getCollisionObservable();
         this.collisionObservable.add((collisionEvent: IPhysicsCollisionEvent) => {
             if (collisionEvent.impulse < 0.8) return;
-            Assets.OUCH_SOUND.play();
+            Sounds.OUCH_SOUND.play();
         });
     }
 
@@ -177,15 +180,15 @@ this.centerOfMassHelper.material = Assets.DebugMaterial("centerOfMassHelper", tr
         const forwardPressed = PhysicsSpaceShipControlsInputs.forward.value > 0;
 
         if (spacePressed !== this.hoverThrustersRunning) {
-            if (spacePressed) Assets.ENGINE_RUNNING_SOUND.play();
-            else Assets.ENGINE_RUNNING_SOUND.stop();
+            if (spacePressed) Sounds.ENGINE_RUNNING_SOUND.play();
+            else Sounds.ENGINE_RUNNING_SOUND.stop();
 
             this.hoverThrustersRunning = spacePressed;
         }
 
         if (forwardPressed !== this.mainThrustersRunning) {
-            if (forwardPressed) Assets.ENGINE_RUNNING_SOUND.play();
-            else Assets.ENGINE_RUNNING_SOUND.stop();
+            if (forwardPressed) Sounds.ENGINE_RUNNING_SOUND.play();
+            else Sounds.ENGINE_RUNNING_SOUND.stop();
 
             this.mainThrustersRunning = forwardPressed;
         }
@@ -217,7 +220,7 @@ targetTorqueLocal.addInPlace(targetTorque2Local).normalize();*/
                 },
                 this.instanceRoot.getScene()
             );
-            this.targetThrustHelper.material = Assets.DebugMaterial("targetThrustHelper", true, false, this.instanceRoot.getScene());
+            this.targetThrustHelper.material = Materials.DebugMaterial("targetThrustHelper", true, false, this.instanceRoot.getScene());
 
             const thrusterConfiguration = getThrusterConfiguration(targetThrustLocal, targetTorqueLocal, this.inverseHoverThrusterMatrix);
             for (let i = 0; i < thrusterConfiguration.length; i++) {

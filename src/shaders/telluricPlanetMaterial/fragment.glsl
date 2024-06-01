@@ -29,10 +29,6 @@ varying vec3 vPosition;// position of the vertex varyingchunk
 varying vec3 vNormal;// normal of the vertex varyingsphere space
 
 uniform vec3 cameraPosition;// camera position in world space
-uniform float cameraNear;
-uniform float cameraFar;
-
-uniform vec3 planetPosition;
 
 #define MAX_STARS 5
 uniform int nbStars;// number of stars
@@ -42,8 +38,6 @@ uniform vec3 star_colors[MAX_STARS];
 uniform int colorMode;
 
 uniform sampler2D lut;
-
-uniform sampler2D bottomNormalMap;
 
 uniform sampler2D plainAlbedoRoughnessMap;
 uniform sampler2D plainNormalMetallicMap;
@@ -56,8 +50,6 @@ uniform sampler2D snowAlbedoRoughnessMap;
 
 uniform sampler2D steepNormalMetallicMap;
 uniform sampler2D steepAlbedoRoughnessMap;
-
-uniform float seed;
 
 uniform float planetRadius;// planet radius
 uniform float waterLevel;// controls sand layer
@@ -167,19 +159,13 @@ void main() {
     // calcul de la couleur et de la normale
     float plainFactor = 0.0,
     desertFactor = 0.0,
-    bottomFactor = 0.0,
     snowFactor = 0.0;
 
     // hard separation between wet and dry
     float moistureSharpness = 10.0;
     float moistureFactor = smoothSharpener(moisture01, moistureSharpness);
 
-    //vec3 plainColor = plainColor * (moisture01 * 0.5 + 0.5);
-
-    float beachFactor = min(
-    smoothstep(waterLevel01 - beachSize / maxElevation, waterLevel01, elevation01),
-    smoothstep(waterLevel01 + beachSize / maxElevation, waterLevel01, elevation01)
-    );
+    float beachFactor = smoothstep(waterLevel01 + beachSize / maxElevation, waterLevel01, elevation01);
     beachFactor = smoothSharpener(beachFactor, 2.0);
 
     plainFactor = 1.0;//- steepFactor;
@@ -209,14 +195,6 @@ void main() {
     beachFactor *= 1.0 - steepFactor;
     desertFactor *= 1.0 - steepFactor;
 
-    // blend with bottom factor when under water
-    bottomFactor = smoothstep(waterLevel01, waterLevel01 - 1e-2, elevation01);
-    bottomFactor = smoothSharpener(bottomFactor, 2.0);
-    plainFactor *= 1.0 - bottomFactor;
-    beachFactor *= 1.0 - bottomFactor;
-    snowFactor *= 1.0 - bottomFactor;
-    desertFactor *= 1.0 - bottomFactor;
-
     float scale = 0.05;
 
     // Steep material
@@ -224,7 +202,7 @@ void main() {
     vec3 steepAlbedo;
     vec3 steepNormal = vNormal;
     float steepRoughness, steepMetallic;
-    if(steepFactor > 0.01) {
+    if (steepFactor > 0.01) {
         triPlanarMaterial(vSamplePoint, vNormal, steepAlbedoRoughnessMap, steepNormalMetallicMap, steepScale, steepAlbedo, steepNormal, steepRoughness, steepMetallic);
     }
 
@@ -233,7 +211,7 @@ void main() {
     vec3 plainAlbedo;
     vec3 plainNormal = vNormal;
     float plainRoughness, plainMetallic;
-    if(plainFactor > 0.01) {
+    if (plainFactor > 0.01) {
         triPlanarMaterial(vSamplePoint, vNormal, plainAlbedoRoughnessMap, plainNormalMetallicMap, plainScale, plainAlbedo, plainNormal, plainRoughness, plainMetallic);
     }
 
@@ -242,7 +220,7 @@ void main() {
     vec3 desertAlbedo;
     vec3 desertNormal = vNormal;
     float desertRoughness, desertMetallic;
-    if(desertFactor + beachFactor > 0.01) {
+    if (desertFactor + beachFactor > 0.01) {
         triPlanarMaterial(vSamplePoint, vNormal, desertAlbedoRoughnessMap, desertNormalMetallicMap, desertScale, desertAlbedo, desertNormal, desertRoughness, desertMetallic);
     }
 
@@ -251,7 +229,7 @@ void main() {
     vec3 snowAlbedo;
     vec3 snowNormal = vNormal;
     float snowRoughness, snowMetallic;
-    if(snowFactor > 0.01) {
+    if (snowFactor > 0.01) {
         triPlanarMaterial(vSamplePoint, vNormal, snowAlbedoRoughnessMap, snowNormalMetallicMap, snowScale, snowAlbedo, snowNormal, snowRoughness, snowMetallic);
     }
 
@@ -275,13 +253,15 @@ void main() {
         Lo += calculateLight(albedo, normalW, roughness, metallic, L, V, star_colors[i]);
     }
 
+    Lo = pow(Lo, vec3(1.0 / 2.2));
+
     vec3 screenColor = Lo;
 
     if (colorMode == 1) screenColor = mix(vec3(1.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0), moisture01);
     if (colorMode == 2) screenColor = mix(vec3(0.1, 0.2, 1.0), vec3(1.0, 0.0, 0.0), temperature01);
     if (colorMode == 3) screenColor = normal * 0.5 + 0.5;
     if (colorMode == 4) screenColor = vec3(elevation01);
-    if (colorMode == 5) screenColor = vec3(1.0 - dot(normal, normalize(vSamplePoint)));
+    if (colorMode == 5) screenColor = vec3(1.0 - dot(normal, normalize(vPosition)));
     if (colorMode == 6) screenColor = vec3(1.0 - slope);
 
     gl_FragColor = vec4(screenColor, 1.0);// apply color and lighting

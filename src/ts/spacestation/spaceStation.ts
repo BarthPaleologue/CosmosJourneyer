@@ -21,7 +21,6 @@ import { isSizeOnScreenEnough } from "../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { SpaceStationModel } from "./spacestationModel";
 import { PostProcessType } from "../postProcesses/postProcessTypes";
-import { Assets } from "../assets";
 import { OrbitalObject } from "../architecture/orbitalObject";
 import { Cullable } from "../utils/cullable";
 import { TransformNode } from "@babylonjs/core/Meshes";
@@ -38,6 +37,7 @@ import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/
 import { generateSpaceStationName } from "../utils/spaceStationNameGenerator";
 import i18n from "../i18n";
 import { computeRingRotationPeriod } from "../utils/ringRotation";
+import { Objects } from "../assets/objects";
 
 export class SpaceStation implements OrbitalObject, Cullable {
     readonly name: string;
@@ -66,7 +66,7 @@ export class SpaceStation implements OrbitalObject, Cullable {
 
         this.parent = parentBody;
 
-        this.instance = Assets.CreateSpaceStationInstance();
+        this.instance = Objects.CreateSpaceStationInstance();
         this.instance.name = this.name;
 
         this.aggregate = new PhysicsAggregate(

@@ -21,10 +21,7 @@ attribute vec3 position;
 attribute vec3 normal;
 
 uniform mat4 world;
-uniform mat4 view;
 uniform mat4 worldViewProjection;
-
-uniform vec3 planetPosition;
 
 uniform vec3 chunkPositionPlanetSpace;
 
@@ -53,7 +50,13 @@ void main() {
 
 	vUnitSamplePoint = normalize(vPosition);
     vSphereNormalW = vec3(planetWorldMatrix * vec4(vUnitSamplePoint, 0.0));
-	vSamplePoint = vPosition;
+
+    // Use a triangle wave to clamp our sample coordinates to the range [0, 1] in a periodic way
+    float a = 512.0;
+    float p = 4.0 * a;
+    // the phase is completely arbitrary, but it is an attempt to minimize the visual artifacts
+    vec3 phase = vec3(-132.0, 17.0, 53.0);
+    vSamplePoint = (4.0 * a / p) * abs(mod(vPosition + phase, p) - p * 0.5);
 
 	vNormal = normal;
 }

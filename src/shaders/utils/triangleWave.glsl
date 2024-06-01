@@ -13,21 +13,9 @@
 //  GNU General Public License for more details.
 //
 //  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-import { Color3 } from "@babylonjs/core/Maths/math.color";
-
-export const enum ColorMode {
-    DEFAULT,
-    MOISTURE,
-    TEMPERATURE,
-    NORMAL,
-    HEIGHT
-}
-
-export interface GazColorSettings {
-    color1: Color3;
-    color2: Color3;
-    color3: Color3;
-    colorSharpness: number;
+vec3 triangleWave(vec3 x, float a) {
+    float p = 4.0 * a;
+    return (4.0 * a / p) * abs(mod(x, p) - p * 0.5);
 }
