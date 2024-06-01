@@ -39,6 +39,11 @@ import seamlessPerlin from "../../asset/perlin.png";
 import atmosphereLUT from "../../shaders/textures/atmosphereLUT.glsl";
 import empty from "../../asset/oneBlackPixel.png";
 
+import solarPanelAlbedo from "../../asset/SolarPanelMaterial/SolarPanel002_2K-PNG_Color.png";
+import solarPanelNormal from "../../asset/SolarPanelMaterial/SolarPanel002_2K-PNG_NormalDX.png";
+import solarPanelMetallic from "../../asset/SolarPanelMaterial/SolarPanel002_2K-PNG_Metalness.png";
+import solarPanelRoughness from "../../asset/SolarPanelMaterial/SolarPanel002_2K-PNG_Roughness.png";
+
 export class Textures {
     static ROCK_NORMAL_METALLIC_MAP: Texture;
     static ROCK_ALBEDO_ROUGHNESS_MAP: Texture;
@@ -68,6 +73,11 @@ export class Textures {
     static ATMOSPHERE_LUT: ProceduralTexture;
 
     static SEAMLESS_PERLIN: Texture;
+
+    static SOLAR_PANEL_ALBEDO: Texture;
+    static SOLAR_PANEL_NORMAL: Texture;
+    static SOLAR_PANEL_METALLIC: Texture;
+    static SOLAR_PANEL_ROUGHNESS: Texture;
     
     static EnqueueTasks(manager: AssetsManager, scene: Scene) {
         manager.addTextureTask("RockNormalMetallicMap", rockNormalMetallicMap).onSuccess = (task) => (Textures.ROCK_NORMAL_METALLIC_MAP = task.texture);
@@ -94,6 +104,11 @@ export class Textures {
         manager.addTextureTask("FlareTexture", flareParticle).onSuccess = (task) => (Textures.FLARE_TEXTURE = task.texture);
 
         manager.addTextureTask("SeamlessPerlin", seamlessPerlin).onSuccess = (task) => (Textures.SEAMLESS_PERLIN = task.texture);
+
+        manager.addTextureTask("SolarPanelAlbedo", solarPanelAlbedo).onSuccess = (task) => (Textures.SOLAR_PANEL_ALBEDO = task.texture);
+        manager.addTextureTask("SolarPanelNormal", solarPanelNormal).onSuccess = (task) => (Textures.SOLAR_PANEL_NORMAL = task.texture);
+        manager.addTextureTask("SolarPanelMetallic", solarPanelMetallic).onSuccess = (task) => (Textures.SOLAR_PANEL_METALLIC = task.texture);
+        manager.addTextureTask("SolarPanelRoughness", solarPanelRoughness).onSuccess = (task) => (Textures.SOLAR_PANEL_ROUGHNESS = task.texture);
 
         Textures.ATMOSPHERE_LUT = new ProceduralTexture("atmosphereLUT", 100, { fragmentSource: atmosphereLUT }, scene, undefined, false, false);
         Textures.ATMOSPHERE_LUT.refreshRate = 0;

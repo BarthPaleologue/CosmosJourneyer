@@ -6,6 +6,7 @@ import { Transformable } from "../../../architecture/transformable";
 
 import solarPanelMaterialFragment from "../../../../shaders/solarPanelMaterial/fragment.glsl";
 import solarPanelMaterialVertex from "../../../../shaders/solarPanelMaterial/vertex.glsl";
+import { Textures } from "../../textures";
 
 const SolarPanelUniformNames = {
     WORLD: "world",
@@ -46,10 +47,10 @@ export class SolarPanelMaterial extends ShaderMaterial {
 
             this.getEffect().setVector3(SolarPanelUniformNames.CAMERA_POSITION, activeCamera.globalPosition);
 
-            this.getEffect().setTexture(SolarPanelSamplerNames.ALBEDO_MAP, Assets.SOLAR_PANEL_ALBEDO);
-            this.getEffect().setTexture(SolarPanelSamplerNames.NORMAL_MAP, Assets.SOLAR_PANEL_NORMAL);
-            this.getEffect().setTexture(SolarPanelSamplerNames.METALLIC_MAP, Assets.SOLAR_PANEL_METALLIC);
-            this.getEffect().setTexture(SolarPanelSamplerNames.ROUGHNESS_MAP, Assets.SOLAR_PANEL_ROUGHNESS);
+            this.getEffect().setTexture(SolarPanelSamplerNames.ALBEDO_MAP, Textures.SOLAR_PANEL_ALBEDO);
+            this.getEffect().setTexture(SolarPanelSamplerNames.NORMAL_MAP, Textures.SOLAR_PANEL_NORMAL);
+            this.getEffect().setTexture(SolarPanelSamplerNames.METALLIC_MAP, Textures.SOLAR_PANEL_METALLIC);
+            this.getEffect().setTexture(SolarPanelSamplerNames.ROUGHNESS_MAP, Textures.SOLAR_PANEL_ROUGHNESS);
 
             setStellarObjectUniforms(this.getEffect(), this.stellarObjects);
         });
