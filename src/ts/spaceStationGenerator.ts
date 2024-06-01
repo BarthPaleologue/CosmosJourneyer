@@ -34,6 +34,8 @@ import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Light } from "@babylonjs/core/Lights/light";
 import { Assets } from "./assets/assets";
 import { SpaceStation } from "./spacestation/spaceStation";
+import HavokPhysics from "@babylonjs/havok";
+import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -46,10 +48,10 @@ engine.displayLoadingUI();
 const scene = new Scene(engine);
 scene.useRightHandedSystem = true;
 
-/*const havokInstance = await HavokPhysics();
+const havokInstance = await HavokPhysics();
 console.log(`Havok initialized`);
 const havokPlugin = new HavokPlugin(true, havokInstance);
-scene.enablePhysics(Vector3.Zero(), havokPlugin);*/
+scene.enablePhysics(Vector3.Zero(), havokPlugin);
 
 await Assets.Init(scene);
 
@@ -79,8 +81,11 @@ const pointLight = new PointLight("SunLight", Vector3.Zero(), scene);
 pointLight.falloffType = Light.FALLOFF_STANDARD;
 pointLight.parent = sun.getTransform();
 
+let elapsedSeconds = 0;
 scene.onBeforeRenderObservable.add(() => {
     const deltaSeconds = engine.getDeltaTime() / 1000;
+    elapsedSeconds += deltaSeconds;
+
     defaultControls.update(deltaSeconds);
 
     //const controlsPosition = defaultControls.getTransform().getAbsolutePosition().clone();
@@ -89,6 +94,8 @@ scene.onBeforeRenderObservable.add(() => {
     //translate(defaultControls.getTransform(), controlsPosition.negate());
 
     spaceStation.update([sun], deltaSeconds);
+
+    spaceStation.getTransform().position.y = Math.sin(elapsedSeconds / 5) * 10000;
 });
 
 scene.executeWhenReady(() => {

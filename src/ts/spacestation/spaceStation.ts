@@ -45,12 +45,12 @@ export class SpaceStation implements OrbitalObject, Cullable {
 
     readonly model: SpaceStationModel;
 
-    //readonly rootAggregate: PhysicsAggregate;
+    readonly rootAggregate: PhysicsAggregate;
 
     readonly postProcesses: PostProcessType[] = [];
 
-    //readonly childAggregates: PhysicsAggregate[] = [];
-    //readonly childLocalPositions: Vector3[] = [];
+    readonly childAggregates: PhysicsAggregate[] = [];
+    readonly childLocalPositions: Vector3[] = [];
 
     readonly landingPads: LandingPad[] = [];
 
@@ -62,7 +62,8 @@ export class SpaceStation implements OrbitalObject, Cullable {
 
     private readonly root: TransformNode;
 
-    private readonly nodes: TransformNode[] = [];
+    //private readonly nodes: TransformNode[] = [];
+    //private readonly nodeLocalPositions: Vector3[] = [];
 
     private readonly scene: Scene;
 
@@ -78,7 +79,7 @@ export class SpaceStation implements OrbitalObject, Cullable {
 
         this.generate();
 
-        /*this.rootAggregate = new PhysicsAggregate(
+        this.rootAggregate = new PhysicsAggregate(
             this.getTransform(),
             PhysicsShapeType.CONTAINER,
             {
@@ -99,17 +100,22 @@ export class SpaceStation implements OrbitalObject, Cullable {
 
         this.rootAggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
 
-        for (const mesh of this.nodes) {
+        const inverseWorldMatrix = this.getTransform().getWorldMatrix().clone().invert();
+        for (const mesh of this.getTransform().getChildMeshes()) {
             const childAggregate = new PhysicsAggregate(mesh, PhysicsShapeType.MESH, {
                 mass: 0,
                 restitution: 0.2
             }, scene);
             childAggregate.body.disablePreStep = false;
             this.childAggregates.push(childAggregate);
-            this.childLocalPositions.push(mesh.position.clone());
+
+            const worldPosition = mesh.getAbsolutePosition();
+            const localPosition = Vector3.TransformCoordinates(worldPosition, inverseWorldMatrix);
+
+            this.childLocalPositions.push(localPosition);
         }
 
-        this.rootAggregate.body.disablePreStep = false;*/
+        this.rootAggregate.body.disablePreStep = false;
 
         console.log("found", this.landingPads.length, "landing pads");
     }
@@ -198,7 +204,8 @@ export class SpaceStation implements OrbitalObject, Cullable {
                 newNode.position = lastNode.position.add(lastNode.up.scale(previousSectionSizeY + newSectionY));
             }
 
-            this.nodes.push(newNode);
+            //this.nodes.push(newNode);
+            //this.nodeLocalPositions.push(newNode.position.clone());
             newNode.parent = this.root;
 
             lastNode = newNode;
@@ -211,15 +218,14 @@ export class SpaceStation implements OrbitalObject, Cullable {
         this.helixHabitats.forEach((helixHabitat) => helixHabitat.update(stellarObjects, deltaSeconds));
         this.ringHabitats.forEach((ringHabitat) => ringHabitat.update(stellarObjects, deltaSeconds));
 
-        /*const worldMatrix = this.getTransform().getWorldMatrix();
+        const worldMatrix = this.getTransform().getWorldMatrix();
         for (let i = 0; i < this.childAggregates.length; i++) {
             const childAggregate = this.childAggregates[i];
             const localPosition = this.childLocalPositions[i];
 
             // this is necessary because Havok ignores regular parenting
             childAggregate.transformNode.setAbsolutePosition(Vector3.TransformCoordinates(localPosition, worldMatrix));
-            console.log("child position", childAggregate.transformNode.position);
-        }*/
+        }
     }
 
     getTransform(): TransformNode {
