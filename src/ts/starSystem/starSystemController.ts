@@ -454,7 +454,7 @@ export class StarSystemController {
         }
 
         for (const object of this.spaceStations) {
-            object.updateRings(deltaTime);
+            object.update(this.stellarObjects, deltaTime);
             object.computeCulling(controller.getActiveCameras());
         }
 

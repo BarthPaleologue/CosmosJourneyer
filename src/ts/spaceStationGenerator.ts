@@ -28,12 +28,12 @@ import { DefaultControls } from "./defaultControls/defaultControls";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
-import { SpaceStation } from "./assets/procedural/spaceStation/spaceStation";
 import { TransformNodeWrapper } from "./utils/wrappers";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Light } from "@babylonjs/core/Lights/light";
 import { Assets } from "./assets/assets";
+import { SpaceStation } from "./spacestation/spaceStation";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -68,7 +68,7 @@ defaultControls.getTransform().lookAt(Vector3.Zero());
 const starfieldPostProcess = new StarfieldPostProcess(scene, [], [], Quaternion.Identity());
 camera.attachPostProcess(starfieldPostProcess);
 
-const spaceStation = new SpaceStation(scene);
+const spaceStation = new SpaceStation(scene, 42, null);
 
 const ambient = new HemisphericLight("Sun", Vector3.Up(), scene);
 ambient.intensity = 0.1;
@@ -82,6 +82,11 @@ pointLight.parent = sun.getTransform();
 scene.onBeforeRenderObservable.add(() => {
     const deltaSeconds = engine.getDeltaTime() / 1000;
     defaultControls.update(deltaSeconds);
+
+    //const controlsPosition = defaultControls.getTransform().getAbsolutePosition().clone();
+    //translate(spaceStation.getTransform(), controlsPosition.negate());
+    //translate(sun.getTransform(), controlsPosition.negate());
+    //translate(defaultControls.getTransform(), controlsPosition.negate());
 
     spaceStation.update([sun], deltaSeconds);
 });

@@ -21,7 +21,6 @@ import { Scene } from "@babylonjs/core/scene";
 import spaceship from "../../asset/spaceship/spaceship2.glb";
 import endeavorSpaceship from "../../asset/spaceship/endeavour.glb";
 import wanderer from "../../asset/spaceship/wanderer.glb";
-import shipCarrier from "../../asset/spacestation/shipcarrier.glb";
 import banana from "../../asset/banana/banana.glb";
 import character from "../../asset/character/character.glb";
 import rock from "../../asset/rock.glb";
@@ -44,7 +43,6 @@ export class Objects {
     private static SPACESHIP: Mesh;
     private static ENDEAVOR_SPACESHIP: Mesh;
     private static WANDERER: Mesh;
-    private static SPACE_STATION: Mesh;
     private static BANANA: Mesh;
     private static CHARACTER: Mesh;
 
@@ -90,19 +88,6 @@ export class Objects {
             }
 
             console.log("Wanderer loaded");
-        };
-
-        const spacestationTask = manager.addMeshTask("spacestationTask", "", "", shipCarrier);
-        spacestationTask.onSuccess = function (task: MeshAssetTask) {
-            Objects.SPACE_STATION = task.loadedMeshes[0] as Mesh;
-
-            for (const mesh of Objects.SPACE_STATION.getChildMeshes()) {
-                mesh.isVisible = false;
-                //pbr._reflectionTexture = new Texture(starfield, scene);
-                //pbr._reflectionTexture.coordinatesMode = Texture.SPHERICAL_MODE;
-            }
-
-            console.log("Spacestation loaded");
         };
 
         const bananaTask = manager.addMeshTask("bananaTask", "", "", banana);
@@ -226,10 +211,6 @@ export class Objects {
         return Objects.WANDERER.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
     }
 
-    static CreateSpaceStationInstance(): InstancedMesh {
-        return Objects.SPACE_STATION.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
-    }
-
     static CreateBananaInstance(): InstancedMesh {
         return Objects.BANANA.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
     }
@@ -245,10 +226,6 @@ export class Objects {
 
     static CreateCharacterInstance(): InstancedMesh {
         return Objects.CHARACTER.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
-    }
-
-    static CreateRockInstance(): InstancedMesh {
-        return Objects.ROCK.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
     }
 
     static CreateLandingPadInstance(): InstancedMesh {

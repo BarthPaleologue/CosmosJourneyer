@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { Scene } from "@babylonjs/core/scene";
 import { isSizeOnScreenEnough } from "../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
@@ -29,35 +28,43 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { OrbitalObjectPhysicalProperties } from "../architecture/physicalProperties";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { LandingPad } from "../landingPad/landingPad";
-import { PhysicsShapeConvexHull, PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { CollisionMask, Settings } from "../settings";
 import { CelestialBody } from "../architecture/celestialBody";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { generateSpaceStationName } from "../utils/spaceStationNameGenerator";
 import i18n from "../i18n";
-import { computeRingRotationPeriod } from "../utils/ringRotation";
-import { Objects } from "../assets/objects";
+import { SpaceStationNodeType } from "../assets/procedural/spaceStation/spaceStationNode";
+import { sigmoid } from "../utils/math";
+import { UtilitySection } from "../assets/procedural/spaceStation/utilitySection";
+import { HelixHabitat } from "../assets/procedural/spaceStation/helixHabitat";
+import { RingHabitat } from "../assets/procedural/spaceStation/ringHabitat";
+import { Transformable } from "../architecture/transformable";
 
 export class SpaceStation implements OrbitalObject, Cullable {
     readonly name: string;
 
     readonly model: SpaceStationModel;
 
-    readonly aggregate: PhysicsAggregate;
+    //readonly rootAggregate: PhysicsAggregate;
 
     readonly postProcesses: PostProcessType[] = [];
 
-    readonly instance: InstancedMesh;
-
-    readonly ringInstances: InstancedMesh[] = [];
-    readonly ringAggregates: PhysicsAggregate[] = [];
-    readonly ringsLocalPosition: Vector3[] = [];
-    readonly ringsRadius: number[] = [];
+    //readonly childAggregates: PhysicsAggregate[] = [];
+    //readonly childLocalPositions: Vector3[] = [];
 
     readonly landingPads: LandingPad[] = [];
 
     readonly parent: OrbitalObject | null = null;
+
+    utilitySections: UtilitySection[] = [];
+    helixHabitats: HelixHabitat[] = [];
+    ringHabitats: RingHabitat[] = [];
+
+    private readonly root: TransformNode;
+
+    private readonly nodes: TransformNode[] = [];
+
+    private readonly scene: Scene;
 
     constructor(scene: Scene, model: SpaceStationModel | number, parentBody: CelestialBody | null = null) {
         this.model = model instanceof SpaceStationModel ? model : new SpaceStationModel(model, parentBody?.model);
@@ -66,10 +73,12 @@ export class SpaceStation implements OrbitalObject, Cullable {
 
         this.parent = parentBody;
 
-        this.instance = Objects.CreateSpaceStationInstance();
-        this.instance.name = this.name;
+        this.root = new TransformNode(this.name, scene);
+        this.scene = scene;
 
-        this.aggregate = new PhysicsAggregate(
+        this.generate();
+
+        /*this.rootAggregate = new PhysicsAggregate(
             this.getTransform(),
             PhysicsShapeType.CONTAINER,
             {
@@ -79,70 +88,30 @@ export class SpaceStation implements OrbitalObject, Cullable {
             scene
         );
 
-        this.aggregate.body.setMotionType(PhysicsMotionType.STATIC);
-        this.aggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
-        this.aggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
+        this.rootAggregate.body.setMotionType(PhysicsMotionType.STATIC);
+        this.rootAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+        this.rootAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
 
-        this.aggregate.body.setCollisionCallbackEnabled(true);
-        this.aggregate.body.getCollisionObservable().add(() => {
+        this.rootAggregate.body.setCollisionCallbackEnabled(true);
+        this.rootAggregate.body.getCollisionObservable().add(() => {
             console.log("collision!");
         });
 
-        this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
+        this.rootAggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
 
-        for (const mesh of this.instance.getChildMeshes()) {
-            if (mesh.name.toLowerCase().includes("landingpad")) {
-                const childShape = new PhysicsShapeConvexHull(mesh as Mesh, scene);
-                childShape.filterMembershipMask = CollisionMask.ENVIRONMENT;
-                childShape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
-                this.aggregate.shape.addChildFromParent(this.getTransform(), childShape, mesh);
-
-                const landingPad = new LandingPad(scene, mesh);
-                this.landingPads.push(landingPad);
-
-                continue;
-            }
-
-            if (mesh.name.toLowerCase().includes("ring")) {
-                this.ringInstances.push(mesh as InstancedMesh);
-
-                const ringAggregate = new PhysicsAggregate(mesh, PhysicsShapeType.MESH, { mass: 0, restitution: 0.2 }, scene);
-                ringAggregate.body.disablePreStep = false;
-                this.ringAggregates.push(ringAggregate);
-
-                this.ringsRadius.push(mesh.getBoundingInfo().boundingSphere.radius);
-
-                this.ringsLocalPosition.push(mesh.position.clone());
-
-                continue;
-            }
-
-            const childShape = new PhysicsShapeMesh(mesh as Mesh, scene);
-            childShape.filterMembershipMask = CollisionMask.ENVIRONMENT;
-            childShape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
-            this.aggregate.shape.addChildFromParent(this.getTransform(), childShape, mesh);
+        for (const mesh of this.nodes) {
+            const childAggregate = new PhysicsAggregate(mesh, PhysicsShapeType.MESH, {
+                mass: 0,
+                restitution: 0.2
+            }, scene);
+            childAggregate.body.disablePreStep = false;
+            this.childAggregates.push(childAggregate);
+            this.childLocalPositions.push(mesh.position.clone());
         }
 
-        this.aggregate.body.disablePreStep = false;
+        this.rootAggregate.body.disablePreStep = false;*/
 
         console.log("found", this.landingPads.length, "landing pads");
-    }
-
-    updateRings(deltaSeconds: number): void {
-        for (let i = 0; i < this.ringInstances.length; i++) {
-            const ringAggregate = this.ringAggregates[i];
-            const localPosition = this.ringsLocalPosition[i];
-            const ringRadius = this.ringsRadius[i];
-
-            const rotationPeriod = computeRingRotationPeriod(ringRadius, Settings.G_EARTH);
-
-            const clockwise = i % 2 === 0 ? 1 : -1;
-
-            ringAggregate.transformNode.rotate(Vector3.Up(), deltaSeconds * clockwise * ((2 * Math.PI) / rotationPeriod));
-
-            // this is necessary because Havok ignores regular parenting
-            ringAggregate.transformNode.setAbsolutePosition(Vector3.TransformCoordinates(localPosition, this.getTransform().getWorldMatrix()));
-        }
     }
 
     handleDockingRequest(): LandingPad | null {
@@ -152,10 +121,6 @@ export class SpaceStation implements OrbitalObject, Cullable {
         if (nbPads === 0) return null;
 
         return availableLandingPads[Math.floor(Math.random() * nbPads)];
-    }
-
-    getTransform(): TransformNode {
-        return this.instance;
     }
 
     getRotationAxis(): Vector3 {
@@ -183,12 +148,88 @@ export class SpaceStation implements OrbitalObject, Cullable {
         for (const camera of cameras) {
             isVisible = isVisible || isSizeOnScreenEnough(this, camera);
         }
-        for (const mesh of this.instance.getChildMeshes()) {
+        for (const mesh of this.root.getChildMeshes()) {
             mesh.isVisible = isVisible;
         }
     }
 
-    public dispose(): void {
-        this.instance.dispose();
+    private generate() {
+        let lastNode: TransformNode | null = null;
+
+        let urgeToCreateHabitat = 0;
+        for (let i = 0; i < 20; i++) {
+            let nodeType = SpaceStationNodeType.UTILITY_SECTION;
+            if (Math.random() < sigmoid(urgeToCreateHabitat - 6) && urgeToCreateHabitat > 0) {
+                nodeType = Math.random() < 0.5 ? SpaceStationNodeType.RING_HABITAT : SpaceStationNodeType.HELIX_HABITAT;
+            }
+
+            let newNode: TransformNode | null = null;
+
+            if (nodeType === SpaceStationNodeType.UTILITY_SECTION) {
+                const utilitySection = new UtilitySection(this.scene);
+                this.utilitySections.push(utilitySection);
+                newNode = utilitySection.getTransform();
+            } else if (nodeType === SpaceStationNodeType.HELIX_HABITAT) {
+                const helixHabitat = new HelixHabitat(this.scene);
+                this.helixHabitats.push(helixHabitat);
+                newNode = helixHabitat.getTransform();
+                urgeToCreateHabitat = 0;
+            } else if (nodeType === SpaceStationNodeType.RING_HABITAT) {
+                const ringHabitat = new RingHabitat(this.scene);
+                this.ringHabitats.push(ringHabitat);
+                newNode = ringHabitat.getTransform();
+                urgeToCreateHabitat = 0;
+            }
+
+            if (newNode === null) {
+                throw new Error("Node creation failed");
+            }
+
+            if (lastNode !== null) {
+                const previousBoundingVectors = lastNode.getHierarchyBoundingVectors();
+                const previousBoundingExtendSize = previousBoundingVectors.max.subtract(previousBoundingVectors.min).scale(0.5);
+
+                const newBoundingVectors = newNode.getHierarchyBoundingVectors();
+                const newBoundingExtendSize = newBoundingVectors.max.subtract(newBoundingVectors.min).scale(0.5);
+
+                const previousSectionSizeY = previousBoundingExtendSize.y;
+                const newSectionY = newBoundingExtendSize.y;
+
+                newNode.position = lastNode.position.add(lastNode.up.scale(previousSectionSizeY + newSectionY));
+            }
+
+            this.nodes.push(newNode);
+            newNode.parent = this.root;
+
+            lastNode = newNode;
+            urgeToCreateHabitat++;
+        }
+    }
+
+    update(stellarObjects: Transformable[], deltaSeconds: number) {
+        this.utilitySections.forEach((utilitySection) => utilitySection.update(stellarObjects));
+        this.helixHabitats.forEach((helixHabitat) => helixHabitat.update(stellarObjects, deltaSeconds));
+        this.ringHabitats.forEach((ringHabitat) => ringHabitat.update(stellarObjects, deltaSeconds));
+
+        /*const worldMatrix = this.getTransform().getWorldMatrix();
+        for (let i = 0; i < this.childAggregates.length; i++) {
+            const childAggregate = this.childAggregates[i];
+            const localPosition = this.childLocalPositions[i];
+
+            // this is necessary because Havok ignores regular parenting
+            childAggregate.transformNode.setAbsolutePosition(Vector3.TransformCoordinates(localPosition, worldMatrix));
+            console.log("child position", childAggregate.transformNode.position);
+        }*/
+    }
+
+    getTransform(): TransformNode {
+        return this.root;
+    }
+
+    dispose() {
+        this.root.dispose();
+        this.utilitySections.forEach((utilitySection) => utilitySection.dispose());
+        this.helixHabitats.forEach((helixHabitat) => helixHabitat.dispose());
+        this.ringHabitats.forEach((ringHabitat) => ringHabitat.dispose());
     }
 }

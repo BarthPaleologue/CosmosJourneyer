@@ -94,12 +94,6 @@ scene.onBeforeRenderObservable.add(() => {
     const deltaTime = scene.deltaTime / 1000;
     scene.getActiveControls().update(deltaTime);
     spaceship.update(deltaTime);
-
-    //OrbitalObject.UpdateRotation(spacestation, deltaTime);
-
-    spacestation.ringInstances.forEach((mesh) => {
-        mesh.rotate(Axis.Y, 0.01 * deltaTime);
-    });
 });
 
 scene.executeWhenReady(() => {
