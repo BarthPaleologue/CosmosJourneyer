@@ -1,16 +1,16 @@
 import { Scene } from "@babylonjs/core/scene";
-import { SpaceStationAssets } from "./spaceStationAssets";
 import { Transformable } from "../../../architecture/transformable";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { SolarPanelMaterial } from "../solarPanel/solarPanelMaterial";
+import { Objects } from "../../objects";
 
 export class UtilitySection implements Transformable {
     private readonly node: TransformNode;
 
-    private solarPanelMaterial: SolarPanelMaterial | null = null;
+    private readonly solarPanelMaterial: SolarPanelMaterial | null = null;
 
     constructor(scene: Scene) {
         this.node = MeshBuilder.CreateBox("UtilitySectionRoot", {
@@ -28,7 +28,7 @@ export class UtilitySection implements Transformable {
             const solarPanel1 = MeshBuilder.CreateBox("SolarPanel", {
                 height: 300,
                 width: 1500,
-                depth: 10
+                depth: 0.3
             }, scene);
             solarPanel1.material = this.solarPanelMaterial;
             solarPanel1.parent = this.getTransform();
@@ -44,7 +44,7 @@ export class UtilitySection implements Transformable {
             const solarPanel2 = MeshBuilder.CreateBox("SolarPanel", {
                 height: 300,
                 width: 1500,
-                depth: 10
+                depth: 0.3
             }, scene);
             solarPanel2.material = this.solarPanelMaterial;
             solarPanel2.parent = this.getTransform();
@@ -54,7 +54,7 @@ export class UtilitySection implements Transformable {
         } else if(Math.random() < 0.3) {
             for (let ring = -1; ring <= 1; ring++) {
                 for (let sideIndex = 0; sideIndex < 4; sideIndex++) {
-                    const tank = SpaceStationAssets.SPHERICAL_TANK.createInstance("SphericalTank");
+                    const tank = Objects.SPHERICAL_TANK.createInstance("SphericalTank");
                     tank.scalingDeterminant = 5;
 
                     const newBoundingVectors = tank.getHierarchyBoundingVectors();
