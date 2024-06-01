@@ -25,10 +25,7 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import perlinNoise from "../../../../asset/perlin.png";
 import { Transformable } from "../../../architecture/transformable";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import {
-    setStellarObjectUniforms,
-    StellarObjectUniformNames
-} from "../../../postProcesses/uniforms/stellarObjectUniforms";
+import { setStellarObjectUniforms, StellarObjectUniformNames } from "../../../postProcesses/uniforms/stellarObjectUniforms";
 
 const GrassMaterialUniformNames = {
     WORLD: "world",

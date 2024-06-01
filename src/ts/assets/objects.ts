@@ -53,9 +53,9 @@ export class Objects {
 
     public static BUTTERFLY: Mesh;
     public static GRASS_BLADE: Mesh;
-    
+
     public static SPHERICAL_TANK: Mesh;
-    
+
     public static EnqueueTasks(manager: AssetsManager, scene: Scene) {
         const spaceshipTask = manager.addMeshTask("spaceshipTask", "", "", spaceship);
         spaceshipTask.onSuccess = function (task: MeshAssetTask) {
@@ -184,7 +184,6 @@ export class Objects {
 
         Objects.GRASS_BLADE = createGrassBlade(scene, 3);
         Objects.GRASS_BLADE.isVisible = false;
-
 
         manager.onProgress = (remainingCount, totalCount) => {
             const loadingScreen = scene.getEngine().loadingScreen;
