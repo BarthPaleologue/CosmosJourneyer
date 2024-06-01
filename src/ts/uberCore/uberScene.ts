@@ -17,11 +17,11 @@
 
 import { Scene, ScenePerformancePriority } from "@babylonjs/core/scene";
 import { Controls } from "./controls";
-import { Engine } from "@babylonjs/core/Engines/engine";
 import "@babylonjs/core/Rendering/depthRendererSceneComponent";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
-import { DepthRenderer } from "@babylonjs/core";
+import { DepthRenderer } from "@babylonjs/core/Rendering/depthRenderer";
+import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 
 /**
  * A very thin wrapper around Babylon's Scene class to add some convenience methods.
@@ -41,7 +41,7 @@ export class UberScene extends Scene {
      * @param engine The BabylonJS engine.
      * @param performancePriority The performance priority of the scene (default: ScenePerformancePriority.BackwardCompatible).
      */
-    constructor(engine: Engine, performancePriority = ScenePerformancePriority.BackwardCompatible) {
+    constructor(engine: AbstractEngine, performancePriority = ScenePerformancePriority.BackwardCompatible) {
         super(engine);
         this.performancePriority = performancePriority;
         this.clearColor = new Color4(0, 0, 0, 0);

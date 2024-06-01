@@ -22,10 +22,8 @@ import { AxisRenderer } from "../orbit/axisRenderer";
 import { SystemUI } from "../ui/systemUI";
 import { Animation } from "@babylonjs/core/Animations/animation";
 import { StarSystemController } from "./starSystemController";
-import { Engine } from "@babylonjs/core/Engines/engine";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { ScenePerformancePriority } from "@babylonjs/core/scene";
-import { Color4 } from "@babylonjs/core/Maths/math.color";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { Settings } from "../settings";
@@ -64,11 +62,11 @@ import { TransformRotationAnimation } from "../uberCore/transforms/animations/ro
 import { PostProcessManager } from "../postProcesses/postProcessManager";
 import { wait } from "../utils/wait";
 import { CharacterInputs } from "../characterControls/characterControlsInputs";
-import { DefaultControlsInputs } from "../defaultControls/defaultControlsInputs";
 import i18n from "../i18n";
 import { BodyType } from "../architecture/bodyType";
 import { AnomalyType } from "../anomalies/anomalyType";
 import { Anomaly } from "../anomalies/anomaly";
+import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -169,7 +167,7 @@ export class StarSystemView implements View {
      * @param engine The BabylonJS engine
      * @param havokInstance The Havok physics instance
      */
-    constructor(engine: Engine, havokInstance: HavokPhysicsWithBindings) {
+    constructor(engine: AbstractEngine, havokInstance: HavokPhysicsWithBindings) {
         this.helmetOverlay = new HelmetOverlay();
         this.bodyEditor = new BodyEditor(EditorVisibility.HIDDEN);
 

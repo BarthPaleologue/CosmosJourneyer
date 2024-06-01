@@ -1,11 +1,11 @@
 import { Transformable } from "../architecture/transformable";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
-import { Engine } from "@babylonjs/core/Engines/engine";
-import { Scene, Tools } from "@babylonjs/core";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Viewport } from "@babylonjs/core/Maths/math.viewport";
 import { Camera } from "@babylonjs/core/Cameras/camera";
+import { Scene } from "@babylonjs/core/scene";
+import { Tools } from "@babylonjs/core/Misc/tools";
 
 export class StereoCameras implements Transformable {
     private readonly transform: TransformNode;

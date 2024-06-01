@@ -29,10 +29,8 @@ import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { ColorCorrection } from "./colorCorrection";
 import { makeSplitRenderEffects } from "../utils/extractRelevantPostProcesses";
 import { CloudsPostProcess } from "../clouds/volumetricCloudsPostProcess";
-import { Engine } from "@babylonjs/core/Engines/engine";
 import { FxaaPostProcess } from "@babylonjs/core/PostProcesses/fxaaPostProcess";
 import { PostProcessRenderEffect } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderEffect";
-//import { BloomEffect } from "@babylonjs/core/PostProcesses/bloomEffect";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManagerSceneComponent";
 import { PostProcessType } from "./postProcessTypes";
@@ -53,7 +51,8 @@ import { PostProcessRenderPipeline } from "@babylonjs/core/PostProcesses/RenderP
 import { PostProcessRenderPipelineManager } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManager";
 import { JuliaSetPostProcess } from "../anomalies/julia/juliaSetPostProcess";
 import { JuliaSet } from "../anomalies/julia/juliaSet";
-import { PostProcess } from "@babylonjs/core";
+import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 
 /**
  * The order in which the post processes are rendered when away from a planet
@@ -94,7 +93,7 @@ export class PostProcessManager {
     /**
      * The BabylonJS engine
      */
-    readonly engine: Engine;
+    readonly engine: AbstractEngine;
 
     /**
      * The scene where the solar system is rendered.

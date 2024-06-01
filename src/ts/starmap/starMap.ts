@@ -28,7 +28,6 @@ import { Scene, ScenePerformancePriority } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
-import { Engine } from "@babylonjs/core/Engines/engine";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
@@ -59,6 +58,7 @@ import { parseDistance } from "../utils/parseToStrings";
 import { StarMapInputs } from "../inputs/starMapInputs";
 import i18n from "../i18n";
 import { BodyType } from "../architecture/bodyType";
+import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 
 export class StarMap implements View {
     readonly scene: Scene;
@@ -120,7 +120,7 @@ export class StarMap implements View {
     private static readonly SHIMMER_ANIMATION = new Animation("shimmer", "instancedBuffers.color.a", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
     private static readonly SHIMMER_DURATION = 1000;
 
-    constructor(engine: Engine) {
+    constructor(engine: AbstractEngine) {
         this.scene = new Scene(engine);
         this.scene.clearColor = new Color4(0, 0, 0, 1);
         this.scene.performancePriority = ScenePerformancePriority.Intermediate;

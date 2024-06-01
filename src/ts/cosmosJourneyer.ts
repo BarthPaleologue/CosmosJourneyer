@@ -51,6 +51,7 @@ import { StarSystemInputs } from "./inputs/starSystemInputs";
 import { pressInteractionToStrings } from "./utils/inputControlsString";
 import { LoadingScreen } from "./uberCore/loadingScreen";
 import i18n from "./i18n";
+import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -64,7 +65,7 @@ const enum EngineState {
  * It also handles the pause menu.
  */
 export class CosmosJourneyer {
-    readonly engine: Engine;
+    readonly engine: AbstractEngine;
 
     readonly starSystemView: StarSystemView;
     readonly starMap: StarMap;
@@ -78,7 +79,7 @@ export class CosmosJourneyer {
 
     private videoRecorder: VideoRecorder | null = null;
 
-    private constructor(engine: Engine, starSystemView: StarSystemView, starMap: StarMap) {
+    private constructor(engine: AbstractEngine, starSystemView: StarSystemView, starMap: StarMap) {
         this.engine = engine;
 
         this.starSystemView = starSystemView;
@@ -203,7 +204,7 @@ export class CosmosJourneyer {
 
         // Log informations about the gpu and the api used
         console.log(`API: ${engine.isWebGPU ? "WebGPU" : "WebGL" + engine.version}`);
-        console.log(`GPU detected: ${engine.getGlInfo().renderer}`);
+        console.log(`GPU detected: ${engine.extractDriverInfo()}`);
 
         // Init Havok physics engine
         const havokInstance = await HavokPhysics();
