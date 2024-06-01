@@ -60,7 +60,6 @@ export class Sounds {
     public static MAIN_MENU_BACKGROUND_MUSIC: Sound;
 
     public static EnqueueTasks(manager: AssetsManager, scene: Scene) {
-
         const ouchSoundTask = manager.addBinaryFileTask("ouchSoundTask", ouchSound);
         ouchSoundTask.onSuccess = (task) => {
             Sounds.OUCH_SOUND = new Sound("OuchSound", task.data, scene);
@@ -195,15 +194,9 @@ export class Sounds {
 
         const mainMenuBackgroundMusicTask = manager.addBinaryFileTask("mainMenuBackgroundMusicTask", starMapBackgroundMusic);
         mainMenuBackgroundMusicTask.onSuccess = (task) => {
-            Sounds.MAIN_MENU_BACKGROUND_MUSIC = new Sound(
-                "MainMenuBackgroundMusic",
-                task.data,
-                scene,
-                null,
-                {
-                    loop: true
-                }
-            );
+            Sounds.MAIN_MENU_BACKGROUND_MUSIC = new Sound("MainMenuBackgroundMusic", task.data, scene, null, {
+                loop: true
+            });
 
             console.log("Main menu background music loaded");
         };

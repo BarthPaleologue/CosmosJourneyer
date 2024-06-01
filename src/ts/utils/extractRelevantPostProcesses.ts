@@ -30,7 +30,12 @@ export function extractRelevantPostProcesses(postProcesses: ObjectPostProcess[],
     return [relevant, notRelevant];
 }
 
-export function makeSplitRenderEffects(name: string, body: CelestialBody, postProcesses: ObjectPostProcess[], engine: AbstractEngine): [PostProcessRenderEffect, PostProcessRenderEffect] {
+export function makeSplitRenderEffects(
+    name: string,
+    body: CelestialBody,
+    postProcesses: ObjectPostProcess[],
+    engine: AbstractEngine
+): [PostProcessRenderEffect, PostProcessRenderEffect] {
     const [bodyRings, otherRings] = extractRelevantPostProcesses(postProcesses, body);
     const otherRingsRenderEffect = new PostProcessRenderEffect(engine, `other${name}RenderEffect`, () => {
         return otherRings;

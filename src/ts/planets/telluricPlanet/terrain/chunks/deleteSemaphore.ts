@@ -70,8 +70,8 @@ export class DeleteSemaphore {
 
     public isReadyToResolve() {
         let flag = this.newChunks.length;
-        this.newChunks.forEach(chunk => {
-            if(chunk.isLoaded()) {
+        this.newChunks.forEach((chunk) => {
+            if (chunk.isLoaded()) {
                 flag--;
             }
         });

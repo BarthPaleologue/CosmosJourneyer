@@ -72,9 +72,9 @@ export class UberScene extends Scene {
 
         if (cameras.length === 1) cameras[0].attachControl(true);
 
-        for(const depthRenderer of this.depthRenderers) {
+        for (const depthRenderer of this.depthRenderers) {
             const depthRendererCamera = depthRenderer.getDepthMap().activeCamera;
-            if(depthRendererCamera === null) {
+            if (depthRendererCamera === null) {
                 throw new Error("Depth renderer camera is null: " + depthRenderer);
             }
             depthRenderer.enabled = cameras.includes(depthRendererCamera);
