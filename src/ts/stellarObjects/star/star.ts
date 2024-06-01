@@ -20,7 +20,6 @@ import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { StarMaterial } from "./starMaterial";
 import { StarModel } from "./starModel";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { Assets } from "../../assets";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getRgbFromTemperature } from "../../utils/specrend";
 import { Light } from "@babylonjs/core/Lights/light";
@@ -43,6 +42,7 @@ import { RingsUniforms } from "../../rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import i18n from "../../i18n";
 import { Scene } from "@babylonjs/core/scene";
+import { Objects } from "../../assets/objects";
 
 export class Star implements StellarObject, Cullable {
     readonly name: string;
@@ -86,7 +86,7 @@ export class Star implements StellarObject, Cullable {
                   },
                   scene
               )
-            : Assets.CreateBananaClone(2 * this.model.radius);
+            : Objects.CreateBananaClone(2 * this.model.radius);
         this.mesh.name = name; // enforce name in the case of cloning the banana
 
         this.aggregate = new PhysicsAggregate(
@@ -105,7 +105,7 @@ export class Star implements StellarObject, Cullable {
         this.aggregate.shape.addChildFromParent(this.getTransform(), physicsShape, this.mesh);
 
         this.light = new PointLight(`${name}Light`, Vector3.Zero(), scene);
-        this.light.diffuse.fromArray(getRgbFromTemperature(this.model.physicalProperties.temperature).asArray());
+        this.light.diffuse.copyFrom(this.model.color);
         this.light.falloffType = Light.FALLOFF_STANDARD;
         this.light.parent = this.getTransform();
 

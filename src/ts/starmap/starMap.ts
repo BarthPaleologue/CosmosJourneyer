@@ -49,7 +49,6 @@ import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { SystemSeed } from "../utils/systemSeed";
 import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 import { View } from "../utils/view";
-import { Assets } from "../assets";
 import { syncCamera } from "../utils/cameraSyncing";
 import { AudioInstance } from "../utils/audioInstance";
 import { AudioManager } from "../audio/audioManager";
@@ -59,6 +58,7 @@ import { parseDistance } from "../utils/parseToStrings";
 import { StarMapInputs } from "../inputs/starMapInputs";
 import i18n from "../i18n";
 import { BodyType } from "../architecture/bodyType";
+import { Sounds } from "../assets/sounds";
 
 export class StarMap implements View {
     readonly scene: Scene;
@@ -133,14 +133,14 @@ export class StarMap implements View {
 
         this.controls.getActiveCameras()[0].attachControl();
 
-        this.backgroundMusic = new AudioInstance(Assets.STAR_MAP_BACKGROUND_MUSIC, AudioMasks.STAR_MAP_VIEW, 1, false, null);
+        this.backgroundMusic = new AudioInstance(Sounds.STAR_MAP_BACKGROUND_MUSIC, AudioMasks.STAR_MAP_VIEW, 1, false, null);
         AudioManager.RegisterSound(this.backgroundMusic);
         this.backgroundMusic.sound.play();
 
         this.starMapUI = new StarMapUI(engine);
 
         this.starMapUI.warpButton.onPointerClickObservable.add(() => {
-            Assets.MENU_SELECT_SOUND.play();
+            Sounds.MENU_SELECT_SOUND.play();
             this.currentSystemSeed = this.selectedSystemSeed;
             if (this.currentSystemSeed !== null) this.starMapUI.setCurrentStarSystemMesh(this.seedToInstanceMap.get(this.currentSystemSeed.toString()) as InstancedMesh);
             this.dispatchWarpCallbacks();
@@ -451,7 +451,7 @@ export class StarMap implements View {
                 new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, () => {
                     if (this.starMapUI.isHovered()) return;
                     this.starMapUI.setHoveredStarSystemMesh(initializedInstance);
-                    Assets.MENU_HOVER_SOUND.play();
+                    Sounds.MENU_HOVER_SOUND.play();
                 })
             );
 
@@ -469,7 +469,7 @@ export class StarMap implements View {
             new ExecuteCodeAction(ActionManager.OnPickTrigger, () => {
                 if (this.starMapUI.isHovered()) return;
 
-                Assets.STAR_MAP_CLICK_SOUND.play();
+                Sounds.STAR_MAP_CLICK_SOUND.play();
 
                 let text = "";
                 if (this.currentSystemSeed !== null) {

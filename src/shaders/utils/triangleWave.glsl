@@ -13,18 +13,9 @@
 //  GNU General Public License for more details.
 //
 //  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-#include "./pi.glsl";
-
-vec2 toUV(in vec3 n)
-{
-    vec2 uv;
-
-    uv.x = atan(-n.x, n.z);
-    uv.x = (uv.x + PI / 2.0) / (PI * 2.0) + PI * (28.670 / 360.0);
-
-    uv.y = acos(n.y) / PI;
-
-    return uv;
+vec3 triangleWave(vec3 x, float a) {
+    float p = 4.0 * a;
+    return (4.0 * a / p) * abs(mod(x, p) - p * 0.5);
 }

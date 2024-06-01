@@ -21,10 +21,10 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { Assets } from "../../assets";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import lutFragment from "../../../shaders/starMaterial/utils/lut.glsl";
 import { StellarObjectModel } from "../../architecture/stellarObject";
+import { Textures } from "../../assets/textures";
 
 const StarMaterialUniformNames = {
     WORLD: "world",
@@ -64,7 +64,7 @@ export class StarMaterial extends ShaderMaterial {
             Effect.ShadersStore["starLutFragmentShader"] = lutFragment;
         }
 
-        this.setTexture("lut", Assets.EMPTY_TEXTURE);
+        this.setTexture("lut", Textures.EMPTY_TEXTURE);
         const lut = new ProceduralTexture("lut", 4096, "starLut", scene, null, true, false);
         lut.refreshRate = 0;
         lut.executeWhenReady(() => {
