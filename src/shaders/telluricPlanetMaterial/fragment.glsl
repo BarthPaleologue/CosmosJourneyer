@@ -17,6 +17,8 @@
 
 precision highp float;
 
+#define DISABLE_UNIFORMITY_ANALYSIS
+
 uniform mat4 world;
 
 varying vec3 vPositionW;
