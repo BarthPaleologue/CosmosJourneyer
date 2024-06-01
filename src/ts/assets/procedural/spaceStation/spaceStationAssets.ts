@@ -2,8 +2,8 @@ import { Scene } from "@babylonjs/core/scene";
 import { AssetsManager, MeshAssetTask } from "@babylonjs/core/Misc/assetsManager";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 
-import solarPanel from "../../../asset/SpaceStationParts/solarPanel.glb";
-import sphericalTank from "../../../asset/SpaceStationParts/sphericalTank.glb";
+import solarPanel from "../../../../asset/SpaceStationParts/solarPanel.glb";
+import sphericalTank from "../../../../asset/SpaceStationParts/sphericalTank.glb";
 
 export class SpaceStationAssets {
 

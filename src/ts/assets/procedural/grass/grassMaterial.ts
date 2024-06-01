@@ -19,16 +19,16 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Scene } from "@babylonjs/core/scene";
 
-import grassFragment from "../../../shaders/grassMaterial/grassFragment.glsl";
-import grassVertex from "../../../shaders/grassMaterial/grassVertex.glsl";
+import grassFragment from "../../../../shaders/grassMaterial/grassFragment.glsl";
+import grassVertex from "../../../../shaders/grassMaterial/grassVertex.glsl";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import perlinNoise from "../../../asset/perlin.png";
-import { Transformable } from "../../architecture/transformable";
+import perlinNoise from "../../../../asset/perlin.png";
+import { Transformable } from "../../../architecture/transformable";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import {
     setStellarObjectUniforms,
     StellarObjectUniformNames
-} from "../../postProcesses/uniforms/stellarObjectUniforms";
+} from "../../../postProcesses/uniforms/stellarObjectUniforms";
 
 const GrassMaterialUniformNames = {
     WORLD: "world",

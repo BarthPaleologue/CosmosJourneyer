@@ -1,43 +1,36 @@
 import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { createHelix } from "../../utils/helixBuilder";
 import { Axis } from "@babylonjs/core";
 import { Space } from "@babylonjs/core/Maths/math.axis";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { RingHabitatMaterial } from "./ringHabitatMaterial";
-import { Transformable } from "../../architecture/transformable";
+import { Transformable } from "../../../architecture/transformable";
+import { computeRingRotationPeriod } from "../../../utils/ringRotation";
+import { Settings } from "../../../settings";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { computeRingRotationPeriod } from "../../utils/ringRotation";
-import { Settings } from "../../settings";
 
-export class HelixHabitat implements Transformable {
+export class RingHabitat implements Transformable {
+
     private readonly root: TransformNode;
 
     private readonly radius: number;
 
+    private readonly ringMaterial: RingHabitatMaterial;
+
+    private readonly ring: Mesh;
+
     private readonly attachment: Mesh;
-
-    private readonly helix1: Mesh;
-    private readonly helix2: Mesh;
-
-    private readonly helixMaterial: RingHabitatMaterial;
 
     private readonly arms: Mesh[] = [];
 
     constructor(scene: Scene) {
         this.root = new TransformNode("HelixHabitatRoot");
 
-        const nbSpires = 2 + Math.floor(Math.random() * 2);
-
-        const pitch = 4e3 * (1 + 0.3 * (Math.random() * 2 - 1));
-
         this.radius = 2e3 + Math.random() * 2e3;
 
         const tubeDiameter = 100 + Math.random() * 100;
 
-        const totalLength = pitch * nbSpires;
-
-        const attachmentNbSides = 6 + 2 * Math.floor(Math.random() * 2);
+        const attachmentNbSides = 4 + 2 * Math.floor(Math.random() * 4);
 
         const tesselation = attachmentNbSides * 8;
 
@@ -46,7 +39,7 @@ export class HelixHabitat implements Transformable {
             {
                 diameterTop: 100,
                 diameterBottom: 100,
-                height: totalLength,
+                height: tubeDiameter * 3,
                 tessellation: attachmentNbSides
             },
             scene
@@ -54,39 +47,23 @@ export class HelixHabitat implements Transformable {
         this.attachment.rotate(Axis.Y, Math.PI / attachmentNbSides, Space.WORLD);
         this.attachment.parent = this.getTransform();
 
-        this.helix1 = createHelix(
-            "HelixHabitat",
+        this.ring = MeshBuilder.CreateTorus(
+            "RingHabitat",
             {
-                radius: this.radius,
-                tubeDiameter: tubeDiameter,
-                tessellation: tesselation,
-                pitch: pitch,
-                spires: nbSpires
+                diameter: 2 * this.radius,
+                thickness: tubeDiameter,
+                tessellation: tesselation
             },
             scene
         );
-        this.helix2 = createHelix(
-            "HelixHabitat",
-            {
-                radius: this.radius,
-                tubeDiameter: tubeDiameter,
-                tessellation: tesselation,
-                pitch: pitch,
-                spires: nbSpires
-            },
-            scene
-        );
-        this.helix2.rotate(Axis.Y, Math.PI, Space.WORLD);
 
-        this.helix1.parent = this.getTransform();
-        this.helix2.parent = this.getTransform();
+        this.ringMaterial = new RingHabitatMaterial(scene);
 
-        this.helixMaterial = new RingHabitatMaterial(scene);
+        this.ring.material = this.ringMaterial;
 
-        this.helix1.material = this.helixMaterial;
-        this.helix2.material = this.helixMaterial;
+        this.ring.parent = this.getTransform();
 
-        const nbArms = (attachmentNbSides * nbSpires) / 2;
+        const nbArms = attachmentNbSides / 2;
         for (let i = 0; i <= nbArms; i++) {
             const arm = MeshBuilder.CreateBox(
                 "HelixHabitatArm",
@@ -98,11 +75,8 @@ export class HelixHabitat implements Transformable {
                 scene
             );
 
-            const y = (i / nbArms) * totalLength - totalLength / 2;
+            const theta = (i / nbArms) * Math.PI * 2;
 
-            const theta = (y / pitch) * Math.PI * 2;
-
-            arm.position.y = y;
             arm.rotate(Axis.Y, theta, Space.WORLD);
 
             arm.parent = this.getTransform();
@@ -113,7 +87,7 @@ export class HelixHabitat implements Transformable {
 
     update(stellarObjects: Transformable[], deltaSeconds: number) {
         this.getTransform().rotate(Axis.Y, deltaSeconds / computeRingRotationPeriod(this.radius, Settings.G_EARTH));
-        this.helixMaterial.update(stellarObjects);
+        this.ringMaterial.update(stellarObjects);
     }
 
     getTransform(): TransformNode {
@@ -123,9 +97,7 @@ export class HelixHabitat implements Transformable {
     dispose() {
         this.root.dispose();
         this.attachment.dispose();
-        this.helixMaterial.dispose();
-        this.helix1.dispose();
-        this.helix2.dispose();
+        this.ring.dispose();
         this.arms.forEach((arm) => arm.dispose());
     }
 }

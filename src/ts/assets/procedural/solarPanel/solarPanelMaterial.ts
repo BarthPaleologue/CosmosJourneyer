@@ -1,12 +1,11 @@
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Scene } from "@babylonjs/core/scene";
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { setStellarObjectUniforms, StellarObjectUniformNames } from "../../postProcesses/uniforms/stellarObjectUniforms";
-import { Transformable } from "../../architecture/transformable";
+import { setStellarObjectUniforms, StellarObjectUniformNames } from "../../../postProcesses/uniforms/stellarObjectUniforms";
+import { Transformable } from "../../../architecture/transformable";
 
-import solarPanelMaterialFragment from "../../../shaders/solarPanelMaterial/fragment.glsl";
-import solarPanelMaterialVertex from "../../../shaders/solarPanelMaterial/vertex.glsl";
-import { Assets } from "../../assets";
+import solarPanelMaterialFragment from "../../../../shaders/solarPanelMaterial/fragment.glsl";
+import solarPanelMaterialVertex from "../../../../shaders/solarPanelMaterial/vertex.glsl";
 
 const SolarPanelUniformNames = {
     WORLD: "world",

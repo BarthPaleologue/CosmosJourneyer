@@ -1,6 +1,6 @@
 import { Scene } from "@babylonjs/core/scene";
 import { SpaceStationAssets } from "./spaceStationAssets";
-import { Transformable } from "../../architecture/transformable";
+import { Transformable } from "../../../architecture/transformable";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Axis } from "@babylonjs/core/Maths/math.axis";

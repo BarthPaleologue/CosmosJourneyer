@@ -1,9 +1,9 @@
 import { HelixHabitat } from "./helixHabitat";
 import { RingHabitat } from "./ringHabitat";
-import { Transformable } from "../../architecture/transformable";
+import { Transformable } from "../../../architecture/transformable";
 import { Scene } from "@babylonjs/core/scene";
 import { SpaceStationNodeType } from "./spaceStationNode";
-import { sigmoid } from "../../utils/math";
+import { sigmoid } from "../../../utils/math";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { UtilitySection } from "./utilitySection";
 

@@ -18,13 +18,13 @@
 import { Scene } from "@babylonjs/core/scene";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
-import butterflyFragment from "../../../shaders/butterflyMaterial/butterflyFragment.glsl";
-import butterflyVertex from "../../../shaders/butterflyMaterial/butterflyVertex.glsl";
+import butterflyFragment from "../../../../shaders/butterflyMaterial/butterflyFragment.glsl";
+import butterflyVertex from "../../../../shaders/butterflyMaterial/butterflyVertex.glsl";
 
-import butterflyTexture from "../../../asset/butterfly.png";
+import butterflyTexture from "../../../../asset/butterfly.png";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Transformable } from "../../architecture/transformable";
+import { Transformable } from "../../../architecture/transformable";
 
 export class ButterflyMaterial extends ShaderMaterial {
     private elapsedSeconds = 0;

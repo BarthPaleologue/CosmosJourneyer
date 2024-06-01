@@ -30,7 +30,7 @@ import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
-import { SpaceStation } from "./proceduralAssets/spaceStation/spaceStation";
+import { SpaceStation } from "./assets/procedural/spaceStation/spaceStation";
 import { Star } from "./stellarObjects/star/star";
 import { TransformNodeWrapper } from "./utils/wrappers";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
