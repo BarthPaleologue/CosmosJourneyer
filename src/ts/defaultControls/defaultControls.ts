@@ -42,7 +42,7 @@ export class DefaultControls implements Controls {
         this.camera = new FreeCamera("defaultFirstPersonCamera", Vector3.Zero(), scene);
         this.camera.parent = this.transform;
         this.camera.speed = 0;
-        this.camera.fov = Settings.FOV
+        this.camera.fov = Settings.FOV;
     }
 
     public getActiveCameras(): Camera[] {

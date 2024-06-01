@@ -32,11 +32,11 @@ const StarMaterialUniformNames = {
     SEED: "seed",
     STAR_COLOR: "starColor",
     TIME: "time"
-}
+};
 
 const StarMaterialSamplerNames = {
     LUT: "lut"
-}
+};
 
 export class StarMaterial extends ShaderMaterial {
     star: TransformNode;

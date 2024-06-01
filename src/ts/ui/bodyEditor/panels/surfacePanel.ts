@@ -34,7 +34,7 @@ export class SurfacePanel extends EditorPanel {
             }),
             new Slider("steepSharpness", document.getElementById("steepSharpness") as HTMLElement, 0, 100, planet.material.getSteepSharpness() * 10, (val: number) => {
                 material.setSteepSharpness(val / 10);
-            }),
+            })
         ];
     }
 }
