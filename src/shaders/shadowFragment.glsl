@@ -17,7 +17,7 @@
 
 precision lowp float;
 
-/* disable_uniformity_analysis */
+#define DISABLE_UNIFORMITY_ANALYSIS
 
 varying vec2 vUV;// screen coordinates
 

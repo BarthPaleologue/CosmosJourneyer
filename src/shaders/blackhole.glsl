@@ -1,6 +1,6 @@
 precision highp float;
 
-/* disable_uniformity_analysis */
+#define DISABLE_UNIFORMITY_ANALYSIS
 
 // based on https://www.shadertoy.com/view/tsBXW3
 

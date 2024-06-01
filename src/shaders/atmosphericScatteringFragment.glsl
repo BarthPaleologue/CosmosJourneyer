@@ -17,7 +17,7 @@
 
 precision highp float;
 
-/* disable_uniformity_analysis */
+#define DISABLE_UNIFORMITY_ANALYSIS
 
 #define PI 3.1415926535897932
 #define POINTS_FROM_CAMERA 12// number sample points along camera ray
