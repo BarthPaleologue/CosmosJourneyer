@@ -25,7 +25,7 @@ export class HelixHabitat implements Transformable {
     private readonly arms: Mesh[] = [];
 
     constructor(scene: Scene) {
-        this.root = new TransformNode("HelixHabitatRoot");
+        this.root = new TransformNode("HelixHabitatRoot", scene);
 
         const nbSpires = 2 + Math.floor(Math.random() * 2);
 
@@ -89,7 +89,7 @@ export class HelixHabitat implements Transformable {
         const nbArms = (attachmentNbSides * nbSpires) / 2;
         for (let i = 0; i <= nbArms; i++) {
             const arm = MeshBuilder.CreateBox(
-                "HelixHabitatArm",
+                `HelixHabitatArm${i}`,
                 {
                     width: 2 * this.radius,
                     depth: tubeDiameter / 3,

@@ -24,7 +24,7 @@ export class RingHabitat implements Transformable {
     private readonly arms: Mesh[] = [];
 
     constructor(scene: Scene) {
-        this.root = new TransformNode("HelixHabitatRoot");
+        this.root = new TransformNode("RingHabitatRoot", scene);
 
         this.radius = 2e3 + Math.random() * 2e3;
 
@@ -35,7 +35,7 @@ export class RingHabitat implements Transformable {
         const tesselation = attachmentNbSides * 8;
 
         this.attachment = MeshBuilder.CreateCylinder(
-            "HelixHabitatAttachment",
+            "RingHabitatAttachment",
             {
                 diameterTop: 100,
                 diameterBottom: 100,
@@ -66,7 +66,7 @@ export class RingHabitat implements Transformable {
         const nbArms = attachmentNbSides / 2;
         for (let i = 0; i <= nbArms; i++) {
             const arm = MeshBuilder.CreateBox(
-                "HelixHabitatArm",
+                `RingHabitatArm${i}`,
                 {
                     width: 2 * this.radius,
                     depth: tubeDiameter / 3,
@@ -98,6 +98,7 @@ export class RingHabitat implements Transformable {
         this.root.dispose();
         this.attachment.dispose();
         this.ring.dispose();
+        this.ringMaterial.dispose();
         this.arms.forEach((arm) => arm.dispose());
     }
 }
