@@ -89,6 +89,12 @@ the project.
 
 To build it locally, run `npm run docs` and then `npm run serve:docs` to serve it at `localhost:8081`.
 
+## Roadmap
+
+You can have a look at the roadmap of the project on the website at https://cosmosjourneyer.com/
+
+The deadlines are not set in stone and can be moved around as I am not working full time on the project.
+
 ## Features
 
 Every telluric planet and moon has a surface that can be explored by the player using a spaceship, or by foot!
@@ -144,3 +150,4 @@ All credits can be found in [the credits panel](./src/html/mainMenu.html) of the
 - Martin Molli for his fearless refactoring of the messy code base in its early days
 - The people from [BabylonJS](https://www.babylonjs.com/) for their amazing work on the BabylonJS framework and their
   help on the forum
+- My family for their continuous support
