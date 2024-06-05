@@ -18,37 +18,35 @@
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { AbstractMesh, MeshBuilder } from "@babylonjs/core/Meshes";
+import { AbstractMesh, TrailMesh } from "@babylonjs/core/Meshes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { SolidPlume } from "../utils/solidPlume";
 
 export abstract class AbstractThruster {
     readonly mesh: AbstractMesh;
 
-    readonly helperMesh: AbstractMesh;
-
     protected throttle = 0;
 
-    readonly plume: SolidPlume;
+    readonly trail: TrailMesh;
 
     readonly parentAggregate: PhysicsAggregate;
 
     protected constructor(mesh: AbstractMesh, direction: Vector3, parentAggregate: PhysicsAggregate) {
         this.mesh = mesh;
 
-        this.plume = new SolidPlume(mesh, mesh.getScene());
+        this.trail = new TrailMesh("EngineTrail", mesh, mesh.getScene(), {
+            diameter: 0.3,
+            length: 15,
+            sections: 16,
+            autoStart: true,
+        });
+
+        const trailMaterial = new StandardMaterial("trailMat", mesh.getScene());
+        trailMaterial.emissiveColor = Color3.White();
+        trailMaterial.diffuseColor = Color3.White();
+
+        this.trail.material = trailMaterial;
 
         this.parentAggregate = parentAggregate;
-
-        const thrusterHelper = MeshBuilder.CreateCylinder(this.mesh.name + "Helper", { height: 0.5, diameterTop: 0, diameterBottom: 0.5 }, mesh.getScene());
-        const cubeMaterial = new StandardMaterial("cubeMat", mesh.getScene());
-        cubeMaterial.diffuseColor = Color3.White();
-        cubeMaterial.emissiveColor = Color3.White();
-        thrusterHelper.material = cubeMaterial;
-        thrusterHelper.parent = mesh;
-
-        this.helperMesh = thrusterHelper;
-        this.helperMesh.isVisible = false;
     }
 
     public getThrottle(): number {
@@ -56,14 +54,8 @@ export abstract class AbstractThruster {
     }
 
     public update(deltaSeconds: number): void {
-        this.plume.update(deltaSeconds);
-
-        this.plume.setThrottle(this.throttle);
-
-        if (this.throttle > 0) {
-            this.helperMesh.scaling = new Vector3(0.8, 0.8, 0.8);
-        } else {
-            this.helperMesh.scaling = new Vector3(0.5, 0.5, 0.5);
-        }
+        //this.plume.setThrottle(this.throttle);
+        this.trail.setEnabled(this.throttle > 0);
+        this.trail.update();
     }
 }
