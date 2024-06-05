@@ -30,7 +30,7 @@ import { Settings } from "../settings";
 
 export class DefaultControls implements Controls {
     private readonly transform: TransformNode;
-    readonly camera: FreeCamera;
+    private readonly camera: FreeCamera;
 
     speed = 1;
     rotationSpeed = Math.PI / 4;

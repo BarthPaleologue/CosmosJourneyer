@@ -3,7 +3,6 @@ import Action from "@brianchirls/game-input/Action";
 import { InputDevices } from "../inputs/devices";
 import { AxisComposite } from "@brianchirls/game-input/browser";
 import { InputMap } from "../inputs/inputMap";
-import PressInteraction from "@brianchirls/game-input/interactions/PressInteraction";
 
 const gamepad = InputDevices.GAMEPAD;
 const keyboard = InputDevices.KEYBOARD;
@@ -84,5 +83,5 @@ export const DefaultControlsInputs = new InputMap<{
     changeSpeed: changeSpeedAction,
     roll: rollAction,
     pitch: pitchAction,
-    yaw: yawAction,
+    yaw: yawAction
 });
