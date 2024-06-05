@@ -20,6 +20,7 @@ import colorCorrectionFragment from "../../shaders/colorCorrection.glsl";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Scene } from "@babylonjs/core/scene";
+import { GlowLayer } from "@babylonjs/core";
 
 const shaderName = "colorCorrection";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = colorCorrectionFragment;
@@ -31,11 +32,18 @@ export class ColorCorrection extends PostProcess {
     gamma = 1;
     saturation = 1;
 
+    private readonly glowLayer: GlowLayer;
+
     constructor(name: string, scene: Scene) {
-        super(name, shaderName, ["brightness", "contrast", "exposure", "gamma", "saturation"], ["textureSampler"], 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine());
+        super(name, shaderName, ["brightness", "contrast", "exposure", "gamma", "saturation"], ["textureSampler", "glowSampler"], 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine());
 
         // This is necessary because BabylonJS post process sets the scene using the camera. However, I don't pass a camera to the constructor as I use a PostProcessRenderPipeline.
         this._scene = scene;
+
+        this.glowLayer = new GlowLayer("glow", scene, {});
+        this.glowLayer.onAfterComposeObservable.add(() => {
+            this.getEffect().setTexture("glowSampler", this.glowLayer.mainTexture);
+        });
 
         this.onApplyObservable.add((effect: Effect) => {
             effect.setFloat("brightness", this.brightness);

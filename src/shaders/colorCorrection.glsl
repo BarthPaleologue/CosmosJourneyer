@@ -24,6 +24,7 @@ uniform float saturation;
 uniform float brightness;
 
 uniform sampler2D textureSampler;
+uniform sampler2D glowSampler;
 
 varying vec2 vUV;
 
@@ -31,8 +32,11 @@ varying vec2 vUV;
 
 void main() {
     vec3 color = texture2D(textureSampler, vUV).rgb;
-
     float alpha = texture2D(textureSampler, vUV).a;
+
+    vec3 glow = texture2D(glowSampler, vUV).rgb;
+
+    color += glow;
 
     color = acesTonemap(color);
 
@@ -47,6 +51,8 @@ void main() {
     color = clamp(color, 0.0, 1.0);
 
     color = pow(color, vec3(gamma));
+
+    color = glow;
 
     gl_FragColor = vec4(color, alpha);
 }

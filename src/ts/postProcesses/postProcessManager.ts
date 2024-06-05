@@ -53,6 +53,7 @@ import { JuliaSetPostProcess } from "../anomalies/julia/juliaSetPostProcess";
 import { JuliaSet } from "../anomalies/julia/juliaSet";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
+import { GlowLayer } from "@babylonjs/core";
 
 /**
  * The order in which the post processes are rendered when away from a planet
