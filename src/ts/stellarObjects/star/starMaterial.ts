@@ -21,10 +21,22 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { Assets } from "../../assets";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import lutFragment from "../../../shaders/starMaterial/utils/lut.glsl";
 import { StellarObjectModel } from "../../architecture/stellarObject";
+import { Textures } from "../../assets/textures";
+
+const StarMaterialUniformNames = {
+    WORLD: "world",
+    WORLD_VIEW_PROJECTION: "worldViewProjection",
+    SEED: "seed",
+    STAR_COLOR: "starColor",
+    TIME: "time"
+};
+
+const StarMaterialSamplerNames = {
+    LUT: "lut"
+};
 
 export class StarMaterial extends ShaderMaterial {
     star: TransformNode;
@@ -44,19 +56,19 @@ export class StarMaterial extends ShaderMaterial {
 
         super("starColor", scene, shaderName, {
             attributes: ["position"],
-            uniforms: ["world", "worldViewProjection", "seed", "starColor", "starPosition", "time"],
-            samplers: ["lut"]
+            uniforms: [...Object.values(StarMaterialUniformNames)],
+            samplers: [...Object.values(StarMaterialSamplerNames)]
         });
 
         if (Effect.ShadersStore["starLutFragmentShader"] === undefined) {
             Effect.ShadersStore["starLutFragmentShader"] = lutFragment;
         }
 
-        this.setTexture("lut", Assets.EMPTY_TEXTURE);
+        this.setTexture("lut", Textures.EMPTY_TEXTURE);
         const lut = new ProceduralTexture("lut", 4096, "starLut", scene, null, true, false);
         lut.refreshRate = 0;
         lut.executeWhenReady(() => {
-            this.setTexture("lut", lut);
+            this.setTexture(StarMaterialSamplerNames.LUT, lut);
         });
 
         this.star = star;
@@ -64,10 +76,9 @@ export class StarMaterial extends ShaderMaterial {
         this.starSeed = model.seed;
 
         this.onBindObservable.add(() => {
-            this.getEffect().setFloat("time", this.elapsedSeconds % 100000);
-            this.getEffect().setColor3("starColor", this.starModel.color);
-            this.getEffect().setFloat("seed", this.starSeed);
-            this.getEffect().setVector3("starPosition", this.star.getAbsolutePosition());
+            this.getEffect().setFloat(StarMaterialUniformNames.TIME, this.elapsedSeconds % 100000);
+            this.getEffect().setColor3(StarMaterialUniformNames.STAR_COLOR, this.starModel.color);
+            this.getEffect().setFloat(StarMaterialUniformNames.SEED, this.starSeed);
         });
     }
 

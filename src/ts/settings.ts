@@ -65,7 +65,7 @@ export const Settings = {
      */
     SOLAR_RADIUS: 696340e3,
 
-    FOV: Tools.ToRadians(92),
+    FOV: Tools.ToRadians(60),
 
     /**
      * Half the physical height of your display in meters.

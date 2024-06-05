@@ -1,4 +1,4 @@
-import { Assets } from "../assets";
+import { Sounds } from "../assets/sounds";
 
 export function createNotification(text: string, duration: number) {
     const container = document.getElementById("notificationContainer");
@@ -23,7 +23,7 @@ export function createNotification(text: string, duration: number) {
 
     container.appendChild(newNotification);
 
-    Assets.MENU_SELECT_SOUND.play();
+    Sounds.MENU_SELECT_SOUND.play();
 
     // animate progress bar
     progressBar.style.animation = `progress ${duration}ms linear`;

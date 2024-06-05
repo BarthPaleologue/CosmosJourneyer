@@ -22,25 +22,14 @@ import { PlanetChunk } from "./planetChunk";
  * Each time a replacement chunk is set ready, we decrement the countdown. When it reaches 0 the old chunks can be deleted
  */
 export class DeleteSemaphore {
-    private flag: number;
     readonly chunksToDelete: PlanetChunk[];
     readonly newChunks: PlanetChunk[];
 
+    private resolved = false;
+
     constructor(newChunks: PlanetChunk[], chunksToDelete: PlanetChunk[]) {
-        this.flag = newChunks.length;
         this.newChunks = newChunks;
         this.chunksToDelete = chunksToDelete;
-
-        for (const chunk of newChunks) {
-            chunk.onReceiveVertexDataObservable.add(() => this.countdown());
-        }
-    }
-
-    private countdown() {
-        this.flag--;
-        if (this.flag === 0) {
-            this.resolve();
-        }
     }
 
     private resolve() {
@@ -50,28 +39,47 @@ export class DeleteSemaphore {
 
         this.chunksToDelete.length = 0;
         this.newChunks.length = 0;
+
+        this.resolved = true;
+    }
+
+    /**
+     * Updates the state of the semaphore
+     */
+    public update() {
+        if (this.isReadyToResolve()) {
+            this.resolve();
+        }
+
+        this.resolveIfZombie();
     }
 
     /**
      * Checks if the semaphore is a zombie (it can't be resolved anymore).
      * This happens when one of the new chunks has been disposed before receiving its vertex data.
-     * If this is the case, we resolve the mutex immediately
+     * If this is the case, we resolve the semaphore immediately
      */
     public resolveIfZombie() {
-        let anyNewChunkDisposed = false;
         for (const chunk of this.newChunks) {
             if (chunk.hasBeenDisposed()) {
-                anyNewChunkDisposed = true;
-                break;
+                this.resolve();
+                return;
             }
         }
-        if (!anyNewChunkDisposed) return;
+    }
 
-        this.flag = 0;
-        this.resolve();
+    public isReadyToResolve() {
+        let flag = this.newChunks.length;
+        this.newChunks.forEach((chunk) => {
+            if (chunk.isLoaded()) {
+                flag--;
+            }
+        });
+
+        return flag === 0;
     }
 
     public isResolved() {
-        return this.flag === 0;
+        return this.resolved;
     }
 }

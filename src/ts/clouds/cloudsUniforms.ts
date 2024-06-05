@@ -20,8 +20,8 @@ import { gcd } from "terrain-generation";
 import { Scene } from "@babylonjs/core/scene";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import flatCloudLUT from "../../shaders/textures/flatCloudLUT.glsl";
-import { Assets } from "../assets";
 import { CloudsModel } from "./cloudsModel";
+import { Textures } from "../assets/textures";
 
 export const CloudsUniformNames = {
     LAYER_RADIUS: "clouds_layerRadius",
@@ -92,7 +92,7 @@ export class CloudsUniforms {
         if (this.isLutReady) {
             effect.setTexture(CloudsSamplerNames.LUT, this.lut);
         } else {
-            effect.setTexture(CloudsSamplerNames.LUT, Assets.EMPTY_TEXTURE);
+            effect.setTexture(CloudsSamplerNames.LUT, Textures.EMPTY_TEXTURE);
         }
     }
 }

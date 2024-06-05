@@ -31,6 +31,7 @@ uniform float time;
 uniform sampler2D perlinNoise;
 
 varying vec3 vPosition;
+varying vec3 vPositionW;
 
 varying mat4 normalMatrix;
 varying vec3 vNormal;
@@ -104,8 +105,9 @@ void main() {
     gl_Position = outPosition;
 
     vPosition = position;
+    vPositionW = worldPosition.xyz;
 
-    normalMatrix = transpose(inverse(finalWorld));
+    normalMatrix = finalWorld;
 
     vNormal = leaningNormal;
 

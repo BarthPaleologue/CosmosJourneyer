@@ -29,8 +29,6 @@ import { ChunkTree } from "./terrain/chunks/chunkTree";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Transformable } from "../../architecture/transformable";
 import { ChunkForge } from "./terrain/chunks/chunkForge";
-import { Observable } from "@babylonjs/core/Misc/observable";
-import { PlanetChunk } from "./terrain/chunks/planetChunk";
 import { Planet } from "../../architecture/planet";
 import { Cullable } from "../../utils/cullable";
 import { TransformNode } from "@babylonjs/core/Meshes";
@@ -54,8 +52,6 @@ export class TelluricPlanet implements Planet, Cullable {
     readonly material: TelluricPlanetMaterial;
 
     readonly model: TelluricPlanetModel;
-
-    readonly onChunkCreatedObservable = new Observable<PlanetChunk>();
 
     private readonly transform: TransformNode;
     readonly aggregate: PhysicsAggregate;
@@ -140,8 +136,6 @@ export class TelluricPlanet implements Planet, Cullable {
             new ChunkTree(Direction.RIGHT, this.name, this.model, this.aggregate, this.material, scene),
             new ChunkTree(Direction.LEFT, this.name, this.model, this.aggregate, this.material, scene)
         ];
-
-        this.sides.forEach((side) => side.onChunkCreatedObservable.add((chunk) => this.onChunkCreatedObservable.notifyObservers(chunk)));
     }
 
     getTransform(): TransformNode {

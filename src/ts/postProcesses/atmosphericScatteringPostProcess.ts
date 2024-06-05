@@ -18,7 +18,6 @@
 import atmosphericScatteringFragment from "../../shaders/atmosphericScatteringFragment.glsl";
 
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { Assets } from "../assets";
 import { centeredRand } from "extended-random";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
@@ -33,6 +32,7 @@ import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUnifo
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { Scene } from "@babylonjs/core/scene";
+import { Textures } from "../assets/textures";
 
 export interface AtmosphereUniforms {
     atmosphereRadius: number;
@@ -127,7 +127,7 @@ export class AtmosphericScatteringPostProcess extends PostProcess implements Obj
             effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_BLUE_WAVE_LENGTH, atmosphereUniforms.blueWaveLength);
             effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_MIE_HALO_RADIUS, atmosphereUniforms.mieHaloRadius);
 
-            effect.setTexture(AtmosphereSamplerNames.ATMOSPHERE_LUT, Assets.ATMOSPHERE_LUT);
+            effect.setTexture(AtmosphereSamplerNames.ATMOSPHERE_LUT, Textures.ATMOSPHERE_LUT);
 
             setSamplerUniforms(effect, this.activeCamera, scene);
         });

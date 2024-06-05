@@ -17,24 +17,20 @@
 
 precision highp float;
 
+#define DISABLE_UNIFORMITY_ANALYSIS
+
+uniform mat4 world;
+
 varying vec3 vPositionW;
 varying vec3 vNormalW;
 varying vec3 vUnitSamplePoint;
 varying vec3 vSphereNormalW;
 varying vec3 vSamplePoint;
-varying vec3 vSamplePointScaled;
 
 varying vec3 vPosition;// position of the vertex varyingchunk
 varying vec3 vNormal;// normal of the vertex varyingsphere space
-varying vec3 vLocalPosition;
-
-uniform mat4 normalMatrix;
 
 uniform vec3 cameraPosition;// camera position in world space
-uniform float cameraNear;
-uniform float cameraFar;
-
-uniform vec3 planetPosition;
 
 #define MAX_STARS 5
 uniform int nbStars;// number of stars
@@ -43,33 +39,27 @@ uniform vec3 star_colors[MAX_STARS];
 
 uniform int colorMode;
 
-uniform sampler2D bottomNormalMap;
-uniform sampler2D plainNormalMap;
+uniform sampler2D lut;
 
-uniform sampler2D beachNormalMap;
-uniform sampler2D desertNormalMap;
+uniform sampler2D plainAlbedoRoughnessMap;
+uniform sampler2D plainNormalMetallicMap;
 
-uniform sampler2D snowNormalMap;
+uniform sampler2D desertNormalMetallicMap;
+uniform sampler2D desertAlbedoRoughnessMap;
 
-uniform sampler2D steepNormalMap;
+uniform sampler2D snowNormalMetallicMap;
+uniform sampler2D snowAlbedoRoughnessMap;
 
-uniform float seed;
+uniform sampler2D steepNormalMetallicMap;
+uniform sampler2D steepAlbedoRoughnessMap;
 
 uniform float planetRadius;// planet radius
 uniform float waterLevel;// controls sand layer
 uniform float beachSize;
 
 uniform float steepSharpness;// sharpness of demaracation between steepColor and normal colors
-uniform float normalSharpness;
 
 uniform float maxElevation;
-
-uniform vec3 snowColor;// the color of the snow layer
-uniform vec3 steepColor;// the color of steep slopes
-uniform vec3 plainColor;// the color of plains at the bottom of moutains
-uniform vec3 beachColor;// the color of the sand
-uniform vec3 desertColor;
-uniform vec3 bottomColor;
 
 uniform float pressure;
 uniform float minTemperature;
@@ -77,9 +67,11 @@ uniform float maxTemperature;
 
 uniform float waterAmount;
 
-uniform sampler2D lut;
+#include "../utils/pi.glsl";
 
 #include "../utils/toUV.glsl";
+
+#include "../utils/textureNoTile.glsl";
 
 #include "../utils/triplanarNormal.glsl";
 
@@ -97,6 +89,8 @@ vec3 saturate(vec3 color) {
 
 #include "./utils/computeTemperature01.glsl";
 
+#include "../utils/pbr.glsl";
+
 void main() {
     vec3 viewRayW = normalize(cameraPosition - vPositionW);// view direction in world space
 
@@ -111,7 +105,7 @@ void main() {
     ndl1 = clamp(ndl1, 0.0, 1.0);
 
     //FIXME: should use the angle between the axis and the normal
-    float latitude = acos(vUnitSamplePoint.y) - 3.1415 / 2.0;
+    float latitude = acos(clamp(vUnitSamplePoint.y, -1.0, 1.0)) - 3.1415 / 2.0;
     //float latitude = vUnitSamplePoint.y;
     float absLatitude01 = abs(latitude);
 
@@ -163,27 +157,17 @@ void main() {
 
 
     vec3 blendingNormal = vNormal;
-    blendingNormal = triplanarNormal(vSamplePointScaled, blendingNormal, snowNormalMap, 0.0001 * 1000e3, normalSharpness, 1.0);
-
 
     // calcul de la couleur et de la normale
-    vec3 normal = vNormal;
-
     float plainFactor = 0.0,
     desertFactor = 0.0,
-    bottomFactor = 0.0,
     snowFactor = 0.0;
 
     // hard separation between wet and dry
     float moistureSharpness = 10.0;
     float moistureFactor = smoothSharpener(moisture01, moistureSharpness);
 
-    vec3 plainColor = plainColor * (moisture01 * 0.5 + 0.5);
-
-    float beachFactor = min(
-    smoothstep(waterLevel01 - beachSize / maxElevation, waterLevel01, elevation01),
-    smoothstep(waterLevel01 + beachSize / maxElevation, waterLevel01, elevation01)
-    );
+    float beachFactor = smoothstep(waterLevel01 + beachSize / maxElevation, waterLevel01, elevation01);
     beachFactor = smoothSharpener(beachFactor, 2.0);
 
     plainFactor = 1.0;//- steepFactor;
@@ -213,86 +197,73 @@ void main() {
     beachFactor *= 1.0 - steepFactor;
     desertFactor *= 1.0 - steepFactor;
 
-    // blend with bottom factor when under water
-    bottomFactor = smoothstep(waterLevel01, waterLevel01 - 1e-2, elevation01);
-    bottomFactor = smoothSharpener(bottomFactor, 2.0);
-    plainFactor *= 1.0 - bottomFactor;
-    beachFactor *= 1.0 - bottomFactor;
-    snowFactor *= 1.0 - bottomFactor;
-    desertFactor *= 1.0 - bottomFactor;
+    float scale = 0.05;
 
-    // template:
-    // small scale
-    // large scale
+    // Steep material
+    float steepScale = scale;
+    vec3 steepAlbedo;
+    vec3 steepNormal = vNormal;
+    float steepRoughness, steepMetallic;
+    if (steepFactor > 0.01) {
+        triPlanarMaterial(vSamplePoint, vNormal, steepAlbedoRoughnessMap, steepNormalMetallicMap, steepScale, steepAlbedo, steepNormal, steepRoughness, steepMetallic);
+    }
 
-    // TODO: make uniforms
-    const float normalStrengthNear = 0.5;
-    const float normalStrengthFar = 0.2;
+    // Plain material
+    float plainScale = scale;
+    vec3 plainAlbedo;
+    vec3 plainNormal = vNormal;
+    float plainRoughness, plainMetallic;
+    if (plainFactor > 0.01) {
+        triPlanarMaterial(vSamplePoint, vNormal, plainAlbedoRoughnessMap, plainNormalMetallicMap, plainScale, plainAlbedo, plainNormal, plainRoughness, plainMetallic);
+    }
 
-    const float nearScale = 0.1 * 1000e3;
-    const float farScale = 0.00001 * 1000e3;
+    // Desert material
+    float desertScale = scale;
+    vec3 desertAlbedo;
+    vec3 desertNormal = vNormal;
+    float desertRoughness, desertMetallic;
+    if (desertFactor + beachFactor > 0.01) {
+        triPlanarMaterial(vSamplePoint, vNormal, desertAlbedoRoughnessMap, desertNormalMetallicMap, desertScale, desertAlbedo, desertNormal, desertRoughness, desertMetallic);
+    }
 
-    normal = triplanarNormal(vSamplePointScaled, normal, bottomNormalMap, nearScale, normalSharpness, bottomFactor * normalStrengthNear);
-    normal = triplanarNormal(vSamplePointScaled, normal, bottomNormalMap, farScale, normalSharpness, bottomFactor * normalStrengthFar);
+    // Snow material
+    float snowScale = scale;
+    vec3 snowAlbedo;
+    vec3 snowNormal = vNormal;
+    float snowRoughness, snowMetallic;
+    if (snowFactor > 0.01) {
+        triPlanarMaterial(vSamplePoint, vNormal, snowAlbedoRoughnessMap, snowNormalMetallicMap, snowScale, snowAlbedo, snowNormal, snowRoughness, snowMetallic);
+    }
 
-    normal = triplanarNormal(vSamplePointScaled, normal, beachNormalMap, nearScale, normalSharpness, beachFactor * normalStrengthNear);
-    normal = triplanarNormal(vSamplePointScaled, normal, beachNormalMap, farScale, normalSharpness, beachFactor * normalStrengthFar);
+    vec3 albedo = steepFactor * steepAlbedo + plainFactor * plainAlbedo + (desertFactor+beachFactor) * desertAlbedo + snowFactor * snowAlbedo;
 
-    normal = triplanarNormal(vSamplePointScaled, normal, plainNormalMap, nearScale, normalSharpness, plainFactor * normalStrengthNear);
-    normal = triplanarNormal(vSamplePointScaled, normal, plainNormalMap, farScale, normalSharpness, plainFactor * normalStrengthFar);
-
-    normal = triplanarNormal(vSamplePointScaled, normal, desertNormalMap, nearScale, normalSharpness, desertFactor * normalStrengthNear);
-    normal = triplanarNormal(vSamplePointScaled, normal, desertNormalMap, farScale, normalSharpness, desertFactor * normalStrengthFar);
-
-    normal = triplanarNormal(vSamplePointScaled, normal, snowNormalMap, nearScale, normalSharpness, snowFactor * normalStrengthNear);
-    normal = triplanarNormal(vSamplePointScaled, normal, snowNormalMap, farScale, normalSharpness, snowFactor * normalStrengthFar);
-
-    normal = triplanarNormal(vSamplePointScaled, normal, steepNormalMap, nearScale, normalSharpness, steepFactor * normalStrengthNear);
-    normal = triplanarNormal(vSamplePointScaled, normal, steepNormalMap, farScale, normalSharpness, steepFactor * normalStrengthFar);
-
+    vec3 normal = steepFactor * steepNormal + plainFactor * plainNormal + (desertFactor+beachFactor) * desertNormal + snowFactor * snowNormal;
     normal = normalize(normal);
 
-    vec3 color = steepFactor * steepColor
-    + beachFactor * beachColor
-    + desertFactor * desertColor
-    + plainFactor * plainColor
-    + snowFactor * snowColor
-    + bottomFactor * bottomColor;
+    float roughness = steepFactor * steepRoughness + plainFactor * plainRoughness + (desertFactor+beachFactor) * desertRoughness + snowFactor * snowRoughness;
 
-    vec3 normalW = mat3(normalMatrix) * normal;
+    float metallic = steepFactor * steepMetallic + plainFactor * plainMetallic + (desertFactor+beachFactor) * desertMetallic + snowFactor * snowMetallic;
 
+    vec3 normalW = vec3(world * vec4(normal, 0.0));
 
-    vec3 ndl2 = vec3(0.0);// dimming factor due to light inclination relative to vertex normal in world space
-    vec3 specComp = vec3(0.0);
+    // pbr accumulation
+    vec3 Lo = vec3(0.0);
+    vec3 V = normalize(cameraPosition - vPositionW);
     for (int i = 0; i < nbStars; i++) {
-        vec3 starLightRayW = normalize(star_positions[i] - vPositionW);
-        vec3 ndl2part = max(0.0, dot(normalW, starLightRayW)) * star_colors[i];
-        ndl2 += ndl2part;
+        vec3 L = normalize(star_positions[i] - vPositionW);
 
-        vec3 angleW = normalize(viewRayW + starLightRayW);
-        specComp += max(0.0, dot(normalW, angleW)) * star_colors[i];
+        Lo += calculateLight(albedo, normalW, roughness, metallic, L, V, star_colors[i]);
     }
-    ndl2 = saturate(ndl2);
-    specComp = saturate(specComp);
-    specComp = pow(specComp, vec3(32.0));
 
-    // TODO: finish this (uniforms...)
-    //float smoothness = 0.7;
-    //float specularAngle = fastAcos(dot(normalize(viewRayW + lightRayW), normalW));
-    //float specularExponent = specularAngle / (1.0 - smoothness);
-    //float specComp = exp(-specularExponent * specularExponent);
+    Lo = pow(Lo, vec3(1.0 / 2.2));
 
-    // suppresion du reflet partout hors la neige
-    specComp *= (color.r + color.g + color.b) / 3.0;
-    specComp /= 2.0;
-
-    vec3 screenColor = color.rgb * (ndl2 + specComp*ndl1);
+    vec3 screenColor = Lo;
 
     if (colorMode == 1) screenColor = mix(vec3(1.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0), moisture01);
     if (colorMode == 2) screenColor = mix(vec3(0.1, 0.2, 1.0), vec3(1.0, 0.0, 0.0), temperature01);
     if (colorMode == 3) screenColor = normal * 0.5 + 0.5;
     if (colorMode == 4) screenColor = vec3(elevation01);
-    if (colorMode == 5) screenColor = vec3(1.0 - dot(normal, normalize(vSamplePoint)));
+    if (colorMode == 5) screenColor = vec3(1.0 - dot(normal, normalize(vPosition)));
     if (colorMode == 6) screenColor = vec3(1.0 - slope);
 
     gl_FragColor = vec4(screenColor, 1.0);// apply color and lighting

@@ -46,10 +46,10 @@ export class DefaultControls implements Controls {
         this.transform = new TransformNode("playerController", scene);
         setRotationQuaternion(this.getTransform(), Quaternion.Identity());
 
-        this.monoCamera = new FreeCamera("firstPersonCamera", Vector3.Zero(), scene);
+        this.monoCamera = new FreeCamera("defaultFirstPersonCamera", Vector3.Zero(), scene);
         this.monoCamera.parent = this.transform;
         this.monoCamera.speed = 0;
-        this.monoCamera.fov = Tools.ToRadians(80);
+        this.monoCamera.fov = Settings.FOV;
 
         this.stereoCameras = new StereoCameras(Settings.SCREEN_HALF_SIZE, scene);
         this.stereoCameras.getTransform().parent = this.getTransform();

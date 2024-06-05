@@ -20,11 +20,9 @@ import "../styles/index.scss";
 import { StarSystemController } from "./starSystem/starSystemController";
 
 import { Settings } from "./settings";
-import { Assets } from "./assets";
 import { positionNearObjectBrightSide } from "./utils/positionNearObject";
 import { CosmosJourneyer } from "./cosmosJourneyer";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { PostProcessType } from "./postProcesses/postProcessTypes";
 import { TelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModel";
 import { GasPlanetModel } from "./planets/gasPlanet/gasPlanetModel";
@@ -32,7 +30,6 @@ import { StarSystemHelper } from "./starSystem/starSystemHelper";
 import { StarModel } from "./stellarObjects/star/starModel";
 import { getMoonSeed } from "./planets/common";
 import { SystemSeed } from "./utils/systemSeed";
-import { RingsModel } from "./rings/ringsModel";
 
 const engine = await CosmosJourneyer.CreateAsync();
 
@@ -53,7 +50,7 @@ starSystem.model.setName("Alpha Testis");
 
 await starSystemView.loadStarSystem(starSystem, false);
 
-const sunModel = new StarModel(0.51);
+const sunModel = new StarModel(4413.641464990006);
 const sun = StarSystemHelper.MakeStar(starSystem, sunModel);
 sun.model.orbit.period = 60 * 60 * 24;
 
@@ -97,14 +94,6 @@ moonModel.orbit.normalToPlane = Vector3.Up();
 
 const moon = StarSystemHelper.MakeSatellite(starSystem, planet, moonModel);
 
-moon.material.colorSettings.plainColor.copyFromFloats(0.67, 0.67, 0.67);
-moon.material.colorSettings.desertColor.copyFrom(new Color3(116, 134, 121).scale(1 / 255));
-moon.material.colorSettings.steepColor.copyFrom(new Color3(92, 92, 92).scale(1 / 255));
-
-moon.material.setTexture("plainNormalMap", Assets.DIRT_NORMAL_MAP);
-moon.material.setTexture("bottomNormalMap", Assets.DIRT_NORMAL_MAP);
-moon.material.updateConstants();
-
 const aresModel = new TelluricPlanetModel(0.3725, sunModel);
 aresModel.physicalProperties.mass = 7;
 aresModel.physicalProperties.rotationPeriod = (24 * 60 * 60) / 30;
@@ -125,11 +114,6 @@ aresModel.orbit.normalToPlane = Vector3.Up();
 const ares = StarSystemHelper.MakeTelluricPlanet(starSystem, aresModel);
 ares.postProcesses.splice(ares.postProcesses.indexOf(PostProcessType.OCEAN), 1);
 ares.postProcesses.splice(ares.postProcesses.indexOf(PostProcessType.CLOUDS), 1);
-
-ares.material.colorSettings.plainColor.copyFromFloats(139 / 255, 59 / 255, 24 / 255);
-ares.material.colorSettings.desertColor.copyFromFloats(178 / 255, 107 / 255, 42 / 255);
-ares.material.colorSettings.beachColor.copyFrom(ares.material.colorSettings.plainColor);
-ares.material.colorSettings.bottomColor.copyFrom(ares.material.colorSettings.plainColor.scale(0.9));
 
 ares.material.updateConstants();
 

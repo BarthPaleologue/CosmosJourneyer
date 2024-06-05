@@ -17,7 +17,7 @@
 
 precision lowp float;
 
-/* disable_uniformity_analysis */
+#define DISABLE_UNIFORMITY_ANALYSIS
 
 varying vec2 vUV;// screen coordinates
 
@@ -44,6 +44,8 @@ uniform float clouds_smoothness;
 uniform sampler2D clouds_lut;
 
 uniform float time;
+
+#include "./utils/pi.glsl";
 
 #include "./utils/saturate.glsl";
 

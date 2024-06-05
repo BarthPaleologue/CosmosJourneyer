@@ -47,11 +47,14 @@ export function createGrassBlade(scene: Scene, nbStacks: number) {
     let indexIndex = 0;
     const step = 1 / nbStacks;
     for (let i = 0; i < nbStacks; i++) {
-        positions[vertexIndex++] = -0.05 * (nbStacks - i) * step;
+        // the square root makes the blade rounder
+        const x = 0.05 * Math.sqrt((nbStacks - i) * step);
+
+        positions[vertexIndex++] = -x;
         positions[vertexIndex++] = i * step;
         positions[vertexIndex++] = 0;
 
-        positions[vertexIndex++] = 0.05 * (nbStacks - i) * step;
+        positions[vertexIndex++] = x;
         positions[vertexIndex++] = i * step;
         positions[vertexIndex++] = 0;
 

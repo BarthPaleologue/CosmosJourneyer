@@ -27,7 +27,6 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { Observable } from "@babylonjs/core/Misc/observable";
 import { DeleteSemaphore } from "./deleteSemaphore";
 import { getRotationQuaternion } from "../../../../uberCore/transforms/basicTransform";
 import { ChunkForge } from "./chunkForge";
@@ -65,8 +64,6 @@ export class ChunkTree implements Cullable {
 
     readonly parent: TransformNode;
     readonly parentAggregate: PhysicsAggregate;
-
-    readonly onChunkCreatedObservable = new Observable<PlanetChunk>();
 
     readonly material: Material;
 
@@ -113,7 +110,7 @@ export class ChunkTree implements Cullable {
     }
 
     /**
-     * Creates deletion mutexes for the tree (we will delete the chunks only when the new ones are ready)
+     * Creates deletion semaphores for the tree (we will delete the chunks only when the new ones are ready)
      * @param tree The tree to delete
      * @param newChunks
      */
@@ -134,10 +131,9 @@ export class ChunkTree implements Cullable {
      * @param chunkForge
      */
     public update(observerPosition: Vector3, chunkForge: ChunkForge): void {
-        // remove zombie mutexes
-        this.deleteSemaphores.forEach((mutex) => mutex.resolveIfZombie());
-        // remove delete mutexes that have been resolved
-        this.deleteSemaphores = this.deleteSemaphores.filter((mutex) => !mutex.isResolved());
+        this.deleteSemaphores.forEach((semaphore) => semaphore.update());
+        // remove delete semaphores that have been resolved
+        this.deleteSemaphores = this.deleteSemaphores.filter((semaphore) => !semaphore.isResolved());
 
         this.tree = this.updateLODRecursively(observerPosition, chunkForge);
 
@@ -203,7 +199,7 @@ export class ChunkTree implements Cullable {
         const targetLOD = clamp(Math.floor(kernel), this.minDepth, this.maxDepth);
 
         if (tree instanceof PlanetChunk && targetLOD > walked.length) {
-            if (!tree.isReady()) return tree;
+            if (!tree.isLoaded()) return tree;
             if (!tree.mesh.isVisible) return tree;
             if (!tree.mesh.isEnabled()) return tree;
 
@@ -244,10 +240,6 @@ export class ChunkTree implements Cullable {
     private createChunk(path: number[], chunkForge: ChunkForge): PlanetChunk {
         const chunk = new PlanetChunk(path, this.direction, this.parentAggregate, this.material, this.planetModel, this.rootChunkLength, this.scene);
 
-        chunk.onReceiveVertexDataObservable.add(() => {
-            this.onChunkCreatedObservable.notifyObservers(chunk);
-        });
-
         const buildTask: BuildTask = {
             type: TaskType.BUILD,
             planetName: this.planetName,
@@ -275,8 +267,8 @@ export class ChunkTree implements Cullable {
         this.executeOnEveryChunk((chunk: PlanetChunk) => {
             chunk.dispose();
         });
-        for (const mutex of this.deleteSemaphores) {
-            for (const chunk of mutex.chunksToDelete) {
+        for (const deleteSemaphore of this.deleteSemaphores) {
+            for (const chunk of deleteSemaphore.chunksToDelete) {
                 chunk.dispose();
             }
         }

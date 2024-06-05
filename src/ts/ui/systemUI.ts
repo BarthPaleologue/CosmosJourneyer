@@ -19,12 +19,12 @@ import { Scene } from "@babylonjs/core/scene";
 import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
 import { ObjectOverlay } from "./objectOverlay";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { Engine } from "@babylonjs/core/Engines/engine";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Transformable } from "../architecture/transformable";
 import { BoundingSphere } from "../architecture/boundingSphere";
 import { TypedObject } from "../architecture/typedObject";
+import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 
 export class SystemUI {
     readonly scene: Scene;
@@ -34,7 +34,7 @@ export class SystemUI {
 
     private target: (Transformable & BoundingSphere & TypedObject) | null = null;
 
-    constructor(engine: Engine) {
+    constructor(engine: AbstractEngine) {
         this.scene = new Scene(engine);
         this.scene.useRightHandedSystem = true;
         this.scene.autoClear = false;
