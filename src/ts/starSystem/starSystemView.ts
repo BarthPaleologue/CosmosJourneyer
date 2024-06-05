@@ -69,8 +69,6 @@ import { Anomaly } from "../anomalies/anomaly";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Sounds } from "../assets/sounds";
 import { Materials } from "../assets/materials";
-import "@babylonjs/core/XR/index";
-import "@babylonjs/core/Helpers/sceneHelpers";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -510,15 +508,6 @@ export class StarSystemView implements View {
         this.characterControls.getActiveCameras().forEach((camera) => (camera.maxZ = maxZ));
 
         this.scene.setActiveControls(this.spaceshipControls);
-
-        this.scene.createDefaultXRExperienceAsync().then(xr => {
-            if (!xr.baseExperience) {
-                console.log("Starmap cannot use XR");
-            }
-            // web xr code goes here
-            const xrCamera = xr.baseExperience.camera;
-            xrCamera.parent = this.scene.getActiveControls().getTransform();
-        });
     }
 
     /**
