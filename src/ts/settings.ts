@@ -67,13 +67,6 @@ export const Settings = {
 
     FOV: Tools.ToRadians(60),
 
-    /**
-     * Half the physical height of your display in meters.
-     * 
-     * Example: screen of dimensions 60cm x 34cm => half screen height is 17cm => 0.17m
-     */
-    SCREEN_HALF_SIZE: 0.17,
-
     MAIN_FONT: "Nasalization"
 };
 

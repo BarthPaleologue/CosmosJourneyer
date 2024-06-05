@@ -69,6 +69,8 @@ import { Anomaly } from "../anomalies/anomaly";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Sounds } from "../assets/sounds";
 import { Materials } from "../assets/materials";
+import "@babylonjs/core/XR/index";
+import "@babylonjs/core/Helpers/sceneHelpers";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -498,11 +500,7 @@ export class StarSystemView implements View {
 
         this.defaultControls = new DefaultControls(this.scene);
         this.defaultControls.speed = 0.2 * Settings.EARTH_RADIUS;
-        this.defaultControls.monoCamera.maxZ = maxZ;
-        this.defaultControls.stereoCameras.leftEye.minZ = this.defaultControls.monoCamera.minZ;
-        this.defaultControls.stereoCameras.rightEye.minZ = this.defaultControls.monoCamera.minZ;
-        this.defaultControls.stereoCameras.leftEye.maxZ = maxZ;
-        this.defaultControls.stereoCameras.rightEye.maxZ = maxZ;
+        this.defaultControls.camera.maxZ = maxZ;
 
         this.spaceshipControls = new ShipControls(this.scene);
         this.spaceshipControls.getActiveCameras().forEach((camera) => (camera.maxZ = maxZ));
@@ -512,6 +510,15 @@ export class StarSystemView implements View {
         this.characterControls.getActiveCameras().forEach((camera) => (camera.maxZ = maxZ));
 
         this.scene.setActiveControls(this.spaceshipControls);
+
+        this.scene.createDefaultXRExperienceAsync().then(xr => {
+            if (!xr.baseExperience) {
+                console.log("Starmap cannot use XR");
+            }
+            // web xr code goes here
+            const xrCamera = xr.baseExperience.camera;
+            xrCamera.parent = this.scene.getActiveControls().getTransform();
+        });
     }
 
     /**

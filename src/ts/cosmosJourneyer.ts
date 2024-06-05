@@ -50,8 +50,6 @@ import { StarSystemInputs } from "./inputs/starSystemInputs";
 import { pressInteractionToStrings } from "./utils/inputControlsString";
 import { LoadingScreen } from "./uberCore/loadingScreen";
 import i18n from "./i18n";
-import { EyeTracking } from "./utils/eyeTracking";
-import { Settings } from "./settings";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Sounds } from "./assets/sounds";
 
@@ -74,8 +72,6 @@ export class CosmosJourneyer {
 
     readonly mainMenu: MainMenu;
     readonly pauseMenu: PauseMenu;
-
-    private readonly eyeTracking: EyeTracking;
 
     private activeView: View;
 
@@ -142,10 +138,6 @@ export class CosmosJourneyer {
             });
         });
         this.pauseMenu.onSave.add(() => this.downloadSaveFile());
-
-        this.eyeTracking = new EyeTracking("localhost", 4242);
-        const urlParams = new URLSearchParams(window.location.search);
-        if(urlParams.get("screenHalfHeight") !== null) Settings.SCREEN_HALF_SIZE = Number(urlParams.get("screenHalfHeight")); 
 
         window.addEventListener("blur", () => {
             if (!this.mainMenu?.isVisible()) this.pause();

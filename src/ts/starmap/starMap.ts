@@ -129,9 +129,7 @@ export class StarMap implements View {
 
         this.controls = new DefaultControls(this.scene);
         this.controls.speed /= 5;
-        this.controls.monoCamera.minZ = 0.01;
-        this.controls.stereoCameras.leftEye.minZ = 0.01;
-        this.controls.stereoCameras.rightEye.minZ = 0.01;
+        this.controls.camera.minZ = 0.01;
 
         this.controls.getActiveCameras()[0].attachControl();
 

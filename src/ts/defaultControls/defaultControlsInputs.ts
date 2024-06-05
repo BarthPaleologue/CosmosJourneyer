@@ -71,12 +71,6 @@ const yawAction = new Action({
     bindings: [yaw]
 });
 
-const toggleStereoAction = new Action({
-    bindings: [keyboard.getControl("KeyG")]
-});
-
-const toggleStereoInteraction = new PressInteraction(toggleStereoAction);
-
 export const DefaultControlsInputs = new InputMap<{
     move: Action<[number, number]>;
     upDown: Action<number>;
@@ -84,7 +78,6 @@ export const DefaultControlsInputs = new InputMap<{
     roll: Action<number>;
     pitch: Action<number>;
     yaw: Action<number>;
-    toggleStereo: PressInteraction
 }>("DefaultControlsInputs", {
     move: moveAction,
     upDown: upDownAction,
@@ -92,5 +85,4 @@ export const DefaultControlsInputs = new InputMap<{
     roll: rollAction,
     pitch: pitchAction,
     yaw: yawAction,
-    toggleStereo: toggleStereoInteraction
 });
