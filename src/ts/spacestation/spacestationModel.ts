@@ -34,6 +34,9 @@ export class SpaceStationModel implements OrbitalObjectModel {
     readonly parentBody: OrbitalObjectModel | null;
     readonly childrenBodies: OrbitalObjectModel[] = [];
 
+    readonly population: number;
+    readonly energyConsumptionPerCapita: number;
+
     constructor(seed: number, parentBody?: CelestialBodyModel) {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed);
@@ -56,5 +59,9 @@ export class SpaceStationModel implements OrbitalObjectModel {
             rotationPeriod: 0,
             axialTilt: 2 * this.rng(GenerationSteps.AXIAL_TILT) * Math.PI
         };
+
+        //TODO: make this dependent on economic model
+        this.population = 300_000;
+        this.energyConsumptionPerCapita = 40_000;
     }
 }
