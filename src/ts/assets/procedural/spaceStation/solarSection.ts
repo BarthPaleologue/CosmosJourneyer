@@ -5,11 +5,14 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Axis, Scene } from "@babylonjs/core";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Space } from "@babylonjs/core/Maths/math.axis";
+import { SolarPanelMaterial } from "../solarPanel/solarPanelMaterial";
 
 export class SolarSection implements Transformable {
     private readonly attachment: Mesh;
 
     private readonly arms: Mesh[] = [];
+
+    private readonly solarPanelMaterial: SolarPanelMaterial;
 
     constructor(requiredSurface: number, scene: Scene) {
         const nbArms = wheelOfFortune(
@@ -43,6 +46,8 @@ export class SolarSection implements Transformable {
             scene
         );
 
+        this.solarPanelMaterial = new SolarPanelMaterial(scene);
+
         console.log("Nb arms", nbArms);
 
         if(nbArms > 1) {
@@ -66,7 +71,22 @@ export class SolarSection implements Transformable {
                 arm.translate(Axis.X, armLength / 2, Space.LOCAL);
                 arm.parent = this.getTransform();
                 this.arms.push(arm);
+
+                const solarPanel1 = MeshBuilder.CreateBox("SolarPanel1", {
+                    height: armLength,
+                    width: surfacePerArm / armLength,
+                    depth: 0.3
+                }, scene);
+                solarPanel1.parent = arm;
+                solarPanel1.translate(Axis.X, 0.5 * surfacePerArm / armLength);
+                solarPanel1.material = this.solarPanelMaterial;
             }
+        }
+    }
+
+    update(stellarObjects: Transformable[]) {
+        if(this.solarPanelMaterial !== null) {
+            this.solarPanelMaterial.update(stellarObjects);
         }
     }
 
@@ -76,5 +96,7 @@ export class SolarSection implements Transformable {
 
     public dispose() {
         this.getTransform().dispose();
+        this.arms.forEach(arm => arm.dispose());
+        this.solarPanelMaterial.dispose();
     }
 }

@@ -4,13 +4,10 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { SolarPanelMaterial } from "../solarPanel/solarPanelMaterial";
 import { Objects } from "../../objects";
 
 export class UtilitySection implements Transformable {
     private readonly node: TransformNode;
-
-    private readonly solarPanelMaterial: SolarPanelMaterial | null = null;
 
     constructor(scene: Scene) {
         this.node = MeshBuilder.CreateBox("UtilitySectionRoot", {
@@ -22,36 +19,7 @@ export class UtilitySection implements Transformable {
         const boundingVectors = this.node.getHierarchyBoundingVectors();
         const boundingExtendSize = boundingVectors.max.subtract(boundingVectors.min).scale(0.5);
 
-        if(Math.random() < 0.4) {
-            this.solarPanelMaterial = new SolarPanelMaterial(scene);
-
-            const solarPanel1 = MeshBuilder.CreateBox("SolarPanel", {
-                height: 300,
-                width: 1500,
-                depth: 0.3
-            }, scene);
-            solarPanel1.material = this.solarPanelMaterial;
-            solarPanel1.parent = this.getTransform();
-
-            const newBoundingVectors = solarPanel1.getHierarchyBoundingVectors();
-            const newBoundingExtendSize = newBoundingVectors.max.subtract(newBoundingVectors.min).scale(0.5);
-
-            const previousSectionSizeX = boundingExtendSize.x;
-            const newSectionX = newBoundingExtendSize.x;
-            solarPanel1.position.x = previousSectionSizeX + newSectionX;
-
-
-            const solarPanel2 = MeshBuilder.CreateBox("SolarPanel", {
-                height: 300,
-                width: 1500,
-                depth: 0.3
-            }, scene);
-            solarPanel2.material = this.solarPanelMaterial;
-            solarPanel2.parent = this.getTransform();
-            solarPanel2.position.x = solarPanel1.position.x;
-            solarPanel2.rotateAround(Vector3.Zero(), Axis.Y, Math.PI);
-
-        } else if(Math.random() < 0.3) {
+        if(Math.random() < 0.3) {
             for (let ring = -1; ring <= 1; ring++) {
                 for (let sideIndex = 0; sideIndex < 4; sideIndex++) {
                     const tank = Objects.SPHERICAL_TANK.createInstance("SphericalTank");
@@ -71,9 +39,7 @@ export class UtilitySection implements Transformable {
     }
 
     update(stellarObjects: Transformable[]) {
-        if(this.solarPanelMaterial !== null) {
-            this.solarPanelMaterial.update(stellarObjects);
-        }
+
     }
 
     getTransform(): TransformNode {

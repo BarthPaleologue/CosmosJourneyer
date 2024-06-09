@@ -59,6 +59,7 @@ export class SpaceStation implements OrbitalObject, Cullable {
 
     readonly parent: OrbitalObject | null = null;
 
+    solarSections: SolarSection[] = [];
     utilitySections: UtilitySection[] = [];
     helixHabitats: HelixHabitat[] = [];
     ringHabitats: RingHabitat[] = [];
@@ -191,6 +192,7 @@ export class SpaceStation implements OrbitalObject, Cullable {
 
         const solarSection = new SolarSection(solarPanelSurface, this.scene);
         lastNode = solarSection.getTransform();
+        this.solarSections.push(solarSection);
 
         let urgeToCreateHabitat = 0;
         for (let i = 0; i < 10; i++) {
@@ -246,6 +248,7 @@ export class SpaceStation implements OrbitalObject, Cullable {
     }
 
     update(stellarObjects: Transformable[], deltaSeconds: number) {
+        this.solarSections.forEach(solarSection => solarSection.update(stellarObjects));
         this.utilitySections.forEach((utilitySection) => utilitySection.update(stellarObjects));
         this.helixHabitats.forEach((helixHabitat) => helixHabitat.update(stellarObjects, deltaSeconds));
         this.ringHabitats.forEach((ringHabitat) => ringHabitat.update(stellarObjects, deltaSeconds));
