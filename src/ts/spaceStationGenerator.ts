@@ -36,6 +36,7 @@ import { Assets } from "./assets/assets";
 import { SpaceStation } from "./spacestation/spaceStation";
 import HavokPhysics from "@babylonjs/havok";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
+import { Star } from "./stellarObjects/star/star";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -67,19 +68,20 @@ scene.enableDepthRenderer(camera, false, true);
 defaultControls.getTransform().setAbsolutePosition(new Vector3(0, 2, -3).normalize().scaleInPlace(40e3));
 defaultControls.getTransform().lookAt(Vector3.Zero());
 
-const starfieldPostProcess = new StarfieldPostProcess(scene, [], [], Quaternion.Identity());
-camera.attachPostProcess(starfieldPostProcess);
-
-const spaceStation = new SpaceStation(scene, 42, null);
-
-const ambient = new HemisphericLight("Sun", Vector3.Up(), scene);
-ambient.intensity = 0.1;
-
-const sun = new TransformNodeWrapper(new TransformNode("Sun"), 1);
+const sun = new Star("Sun", scene, 0);
 sun.getTransform().position = new Vector3(100e6, -20e6, -50e6);
 const pointLight = new PointLight("SunLight", Vector3.Zero(), scene);
 pointLight.falloffType = Light.FALLOFF_STANDARD;
 pointLight.parent = sun.getTransform();
+
+const starfieldPostProcess = new StarfieldPostProcess(scene, [sun], [], Quaternion.Identity());
+camera.attachPostProcess(starfieldPostProcess);
+
+const spaceStation = new SpaceStation(scene, 42, sun);
+
+const ambient = new HemisphericLight("Sun", Vector3.Up(), scene);
+ambient.intensity = 0.1;
+
 
 let elapsedSeconds = 0;
 scene.onBeforePhysicsObservable.add(() => {
@@ -95,7 +97,7 @@ scene.onBeforePhysicsObservable.add(() => {
 
     spaceStation.update([sun], deltaSeconds);
 
-    spaceStation.getTransform().position.y = Math.sin(elapsedSeconds / 5) * 10000;
+    //spaceStation.getTransform().position.y = Math.sin(elapsedSeconds / 5) * 10000;
 });
 
 scene.executeWhenReady(() => {

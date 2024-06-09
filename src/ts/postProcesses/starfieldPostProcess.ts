@@ -87,19 +87,21 @@ export class StarfieldPostProcess extends PostProcess {
                 }
                 vis = 0.5 + vis * 0.5;
                 let vis2 = 1.0;
-                const nearest = nearestBody(this.activeCamera.globalPosition, bodies);
-                if (nearest instanceof TelluricPlanet) {
-                    const planet = nearest as TelluricPlanet;
-                    if (planet.postProcesses.includes(PostProcessType.ATMOSPHERE)) {
-                        const height = planet.getTransform().getAbsolutePosition().length();
-                        //FIXME: has to be dynamic
-                        const maxHeight = Settings.ATMOSPHERE_HEIGHT;
-                        for (const star of stellarObjects) {
-                            const sunDir = planet.getTransform().getAbsolutePosition().subtract(star.getTransform().getAbsolutePosition()).normalize();
-                            vis2 = Math.min(
-                                vis2,
-                                (height / maxHeight) ** 128 + Math.max(Vector3.Dot(sunDir, planet.getTransform().getAbsolutePosition().negate().normalize()), 0.0) ** 0.5
-                            );
+                if(bodies.length > 0) {
+                    const nearest = nearestBody(this.activeCamera.globalPosition, bodies);
+                    if (nearest instanceof TelluricPlanet) {
+                        const planet = nearest as TelluricPlanet;
+                        if (planet.postProcesses.includes(PostProcessType.ATMOSPHERE)) {
+                            const height = planet.getTransform().getAbsolutePosition().length();
+                            //FIXME: has to be dynamic
+                            const maxHeight = Settings.ATMOSPHERE_HEIGHT;
+                            for (const star of stellarObjects) {
+                                const sunDir = planet.getTransform().getAbsolutePosition().subtract(star.getTransform().getAbsolutePosition()).normalize();
+                                vis2 = Math.min(
+                                    vis2,
+                                    (height / maxHeight) ** 128 + Math.max(Vector3.Dot(sunDir, planet.getTransform().getAbsolutePosition().negate().normalize()), 0.0) ** 0.5
+                                );
+                            }
                         }
                     }
                 }

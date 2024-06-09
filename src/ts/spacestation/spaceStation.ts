@@ -39,6 +39,9 @@ import { UtilitySection } from "../assets/procedural/spaceStation/utilitySection
 import { HelixHabitat } from "../assets/procedural/spaceStation/helixHabitat";
 import { RingHabitat } from "../assets/procedural/spaceStation/ringHabitat";
 import { Transformable } from "../architecture/transformable";
+import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
+import { StellarObject, StellarObjectModel } from "../architecture/stellarObject";
+import { SolarSection } from "../assets/procedural/spaceStation/solarSection";
 
 export class SpaceStation implements OrbitalObject, Cullable {
     readonly name: string;
@@ -155,7 +158,39 @@ export class SpaceStation implements OrbitalObject, Cullable {
     }
 
     private generate() {
+
+        // find distance to star
+        let distanceToStar: number | null = null;
+        let parent = this.parent;
+        let stellarObject: StellarObject | null = null;
+        while (parent !== null) {
+            distanceToStar = parent.getOrbitProperties().radius;
+            if (parent.parent === null) {
+                stellarObject = parent as StellarObject;
+                break;
+            }
+            parent = parent.parent;
+        }
+
+        if (stellarObject === null) {
+            throw new Error("No stellar object found");
+        }
+
+        if (distanceToStar === null) {
+            throw new Error("No distance to star found");
+        }
+
+        const starRadius = stellarObject.model.radius;
+        const starTemperature = stellarObject.model.temperature;
+        const energyRequirement = this.model.population * this.model.energyConsumptionPerCapita;
+
+        const solarPanelSurface = getSolarPanelSurfaceFromEnergyRequirement(0.4, distanceToStar, starTemperature, starRadius, energyRequirement, 0.5);
+
+
         let lastNode: TransformNode | null = null;
+
+        const solarSection = new SolarSection(solarPanelSurface, this.scene);
+        lastNode = solarSection.getTransform();
 
         let urgeToCreateHabitat = 0;
         for (let i = 0; i < 10; i++) {
@@ -187,16 +222,7 @@ export class SpaceStation implements OrbitalObject, Cullable {
             }
 
             if (lastNode !== null) {
-                const previousBoundingVectors = lastNode.getHierarchyBoundingVectors();
-                const previousBoundingExtendSize = previousBoundingVectors.max.subtract(previousBoundingVectors.min).scale(0.5);
-
-                const newBoundingVectors = newNode.getHierarchyBoundingVectors();
-                const newBoundingExtendSize = newBoundingVectors.max.subtract(newBoundingVectors.min).scale(0.5);
-
-                const previousSectionSizeY = previousBoundingExtendSize.y;
-                const newSectionY = newBoundingExtendSize.y;
-
-                newNode.position = lastNode.position.add(lastNode.up.scale(previousSectionSizeY + newSectionY));
+                this.placeNode(newNode, lastNode);
             }
 
             newNode.parent = this.root;
@@ -204,6 +230,19 @@ export class SpaceStation implements OrbitalObject, Cullable {
             lastNode = newNode;
             urgeToCreateHabitat++;
         }
+    }
+
+    private placeNode(node: TransformNode, parent: TransformNode) {
+        const previousBoundingVectors = parent.getHierarchyBoundingVectors();
+        const previousBoundingExtendSize = previousBoundingVectors.max.subtract(previousBoundingVectors.min).scale(0.5);
+
+        const newBoundingVectors = node.getHierarchyBoundingVectors();
+        const newBoundingExtendSize = newBoundingVectors.max.subtract(newBoundingVectors.min).scale(0.5);
+
+        const previousSectionSizeY = previousBoundingExtendSize.y;
+        const newSectionY = newBoundingExtendSize.y;
+
+        node.position = parent.position.add(parent.up.scale(previousSectionSizeY + newSectionY));
     }
 
     update(stellarObjects: Transformable[], deltaSeconds: number) {
