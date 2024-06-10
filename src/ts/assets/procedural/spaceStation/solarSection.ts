@@ -54,14 +54,15 @@ export class SolarSection implements Transformable {
             // there will be two solar array per arm, so the surface is distributed over 2*nbArms
             const surfacePerArm = requiredSurface / (2 * nbArms);
             const squareSideSize = Math.sqrt(surfacePerArm);
-            const armLength = squareSideSize * 1.618;
+            const armLength = squareSideSize * 2.618;
             for (let i = 0; i <= nbArms; i++) {
+                const armThickness = 100;
                 const arm = MeshBuilder.CreateBox(
                     `RingHabitatArm${i}`,
                     {
                         width: armLength,
-                        depth: 100,
-                        height: 100
+                        depth: armThickness,
+                        height: armThickness
                     },
                     scene
                 );
@@ -72,14 +73,27 @@ export class SolarSection implements Transformable {
                 arm.parent = this.getTransform();
                 this.arms.push(arm);
 
+                const armOffset = nbArms * 0.3 * surfacePerArm / armLength;
+
                 const solarPanel1 = MeshBuilder.CreateBox("SolarPanel1", {
-                    height: armLength,
-                    width: surfacePerArm / armLength,
-                    depth: 0.3
+                    height: 0.3,
+                    width: armLength,
+                    depth: surfacePerArm / armLength
                 }, scene);
                 solarPanel1.parent = arm;
-                solarPanel1.translate(Axis.X, 0.5 * surfacePerArm / armLength);
+                solarPanel1.translate(Axis.X, armOffset);
+                solarPanel1.translate(Axis.Z, 0.5 * (surfacePerArm / armLength + armThickness));
                 solarPanel1.material = this.solarPanelMaterial;
+
+                const solarPanel2 = MeshBuilder.CreateBox("SolarPanel2", {
+                    height: 0.3,
+                    width: armLength,
+                    depth: surfacePerArm / armLength
+                }, scene);
+                solarPanel2.parent = arm;
+                solarPanel2.translate(Axis.X, armOffset);
+                solarPanel2.translate(Axis.Z, -0.5 * (surfacePerArm / armLength + armThickness));
+                solarPanel2.material = this.solarPanelMaterial;
             }
         }
     }
