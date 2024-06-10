@@ -38,6 +38,7 @@ import HavokPhysics from "@babylonjs/havok";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { Star } from "./stellarObjects/star/star";
 import { Settings } from "./settings";
+import { SpaceStationModel } from "./spacestation/spacestationModel";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -66,16 +67,21 @@ camera.attachControl(canvas, true);
 
 scene.enableDepthRenderer(camera, false, true);
 
+const distanceToStar = 25000 * Settings.EARTH_RADIUS;
+
 defaultControls.getTransform().setAbsolutePosition(new Vector3(0, 2, -3).normalize().scaleInPlace(40e3));
 defaultControls.getTransform().lookAt(Vector3.Zero());
 
-const sun = new Star("Sun", scene, Math.random() * 1e6);
-sun.getTransform().position = new Vector3(7, 2, 5).normalize().scaleInPlace(Settings.AU);
+const sun = new Star("Sun", scene, 4413.641464990006);
+sun.getTransform().position = new Vector3(7, 2, 5).normalize().scaleInPlace(distanceToStar);
 
 const starfieldPostProcess = new StarfieldPostProcess(scene, [sun], [], Quaternion.Identity());
 camera.attachPostProcess(starfieldPostProcess);
 
-const spaceStation = new SpaceStation(scene, 42, sun);
+const spaceStationModel = new SpaceStationModel(42, sun.model);
+spaceStationModel.orbit.radius = distanceToStar;
+
+const spaceStation = new SpaceStation(scene, spaceStationModel, sun);
 
 const ambient = new HemisphericLight("Sun", Vector3.Up(), scene);
 ambient.intensity = 0.1;
