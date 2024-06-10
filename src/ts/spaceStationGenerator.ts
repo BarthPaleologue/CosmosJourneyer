@@ -69,7 +69,7 @@ defaultControls.getTransform().setAbsolutePosition(new Vector3(0, 2, -3).normali
 defaultControls.getTransform().lookAt(Vector3.Zero());
 
 const sun = new Star("Sun", scene, 0);
-sun.getTransform().position = new Vector3(100e6, -20e6, -50e6);
+sun.getTransform().position = new Vector3(10e6, 20e6, 50e6);
 const pointLight = new PointLight("SunLight", Vector3.Zero(), scene);
 pointLight.falloffType = Light.FALLOFF_STANDARD;
 pointLight.parent = sun.getTransform();
