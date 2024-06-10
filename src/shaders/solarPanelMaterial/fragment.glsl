@@ -41,7 +41,7 @@ uniform vec3 cameraPosition;
 void main() {
     vec3 viewDirectionW = normalize(cameraPosition - vPositionW);
 
-    vec2 vUV = vPosition.xy * 0.01;
+    vec2 vUV = vPosition.xz * 0.01;
 
     float gamma = 2.2;
 
