@@ -34,13 +34,17 @@ export class SolarSection implements Transformable {
             const squareSideSize = Math.sqrt(sideSurface);
 
             attachmentLength = squareSideSize * 1.618;
+        } else if(nbArms === 2) {
+            attachmentLength = Math.sqrt(requiredSurface) * 1.2;
         }
+
+        const attachmentThickness = 100;
 
         this.attachment = MeshBuilder.CreateCylinder(
             "SolarSectionAttachment",
             {
-                diameterTop: 100,
-                diameterBottom: 100,
+                diameterTop: attachmentThickness,
+                diameterBottom: attachmentThickness,
                 height: attachmentLength,
                 tessellation: nbArms < 3 ? 6 : nbArms * 2
             },
@@ -53,42 +57,72 @@ export class SolarSection implements Transformable {
         console.log("Nb arms", nbArms);
 
         if (nbArms === 1) {
-            const halfRequiredSurface = requiredSurface / 2;
-            const armSize = attachmentLength;
-            const nbPanelsPerSide = Math.ceil(armSize / 1000);
-
-            const gap = 200;
-
-            const panelDimensionY = (armSize / nbPanelsPerSide) - gap;
-            const panelDimensionX = halfRequiredSurface / armSize;
-
-            for(let i = 0; i < nbPanelsPerSide; i++) {
-                const panel1 = MeshBuilder.CreateBox("SolarPanel1", {
-                    height: 0.3,
-                    width: panelDimensionY,
-                    depth: panelDimensionX 
-                });
-                panel1.parent = this.getTransform();
-                panel1.material = this.solarPanelMaterial;
-                panel1.translate(Axis.Y, (panelDimensionY + gap) * (i - (nbPanelsPerSide-1) / 2));
-                panel1.translate(Axis.Z, panelDimensionX / 2);
-                panel1.rotate(Axis.Z, Math.PI / 2);
-
-                const panel2 = MeshBuilder.CreateBox("SolarPanel2", {
-                    height: 0.3,
-                    width: panelDimensionY,
-                    depth: panelDimensionX 
-                });
-                panel2.parent = this.getTransform();
-                panel2.material = this.solarPanelMaterial;
-                panel2.translate(Axis.Y, (panelDimensionY + gap) * (i - (nbPanelsPerSide-1) / 2));
-                panel2.translate(Axis.Z, -panelDimensionX / 2);
-                panel2.rotate(Axis.Z, Math.PI / 2);
-            }
+            this.generateSpikePattern(this.getTransform(), attachmentLength, attachmentThickness, requiredSurface);
         } else if (nbArms === 2) {
+            const surfacePerArray = requiredSurface / 4;
+            const squareSideSize = Math.sqrt(surfacePerArray);
+            const armLength = attachmentLength / 2.5;
+
+            const arm1 = MeshBuilder.CreateBox("Arm1", {
+                height: armLength,
+                width: attachmentThickness / 2,
+                depth: attachmentThickness / 2
+            }, scene);
+            arm1.parent = this.getTransform();
+            arm1.rotate(Axis.X, Math.PI / 2);
+            arm1.translate(Axis.Y, (armLength + attachmentThickness) / 2);
+
+            this.generateSpikePattern(arm1, armLength, attachmentThickness / 2, requiredSurface / 2);
+
+            const arm2 = MeshBuilder.CreateBox("Arm1", {
+                height: armLength,
+                width: attachmentThickness / 2,
+                depth: attachmentThickness / 2
+            }, scene);
+            arm2.parent = this.getTransform();
+            arm2.rotate(Axis.X, -Math.PI / 2);
+            arm2.translate(Axis.Y, (armLength + attachmentThickness) / 2);
+
+            this.generateSpikePattern(arm2, armLength, attachmentThickness / 2, requiredSurface / 2);
 
         } else if (nbArms >= 3) {
             this.generateStarPattern(nbArms, requiredSurface);
+        }
+    }
+
+    private generateSpikePattern(arm: TransformNode, armLength: number, armThickness: number, requiredSurface: number) {
+        const scene = this.getTransform().getScene();
+        const halfRequiredSurface = requiredSurface / 2;
+        const armSize = armLength;
+        const nbPanelsPerSide = Math.ceil(armSize / 1000);
+
+        const gap = 200;
+
+        const panelDimensionY = (armSize / nbPanelsPerSide) - gap;
+        const panelDimensionX = halfRequiredSurface / armSize;
+
+        for (let i = 0; i < nbPanelsPerSide; i++) {
+            const panel1 = MeshBuilder.CreateBox("SolarPanel1", {
+                height: 0.3,
+                width: panelDimensionY,
+                depth: panelDimensionX
+            }, scene);
+            panel1.parent = arm;
+            panel1.material = this.solarPanelMaterial;
+            panel1.translate(Axis.Y, (panelDimensionY + gap) * (i - (nbPanelsPerSide - 1) / 2));
+            panel1.translate(Axis.Z, (panelDimensionX + armThickness) / 2);
+            panel1.rotate(Axis.Z, Math.PI / 2);
+
+            const panel2 = MeshBuilder.CreateBox("SolarPanel2", {
+                height: 0.3,
+                width: panelDimensionY,
+                depth: panelDimensionX
+            }, scene);
+            panel2.parent = arm;
+            panel2.material = this.solarPanelMaterial;
+            panel2.translate(Axis.Y, (panelDimensionY + gap) * (i - (nbPanelsPerSide - 1) / 2));
+            panel2.translate(Axis.Z, -(panelDimensionX + armThickness) / 2);
+            panel2.rotate(Axis.Z, Math.PI / 2);
         }
     }
 

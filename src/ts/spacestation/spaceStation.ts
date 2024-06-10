@@ -191,6 +191,7 @@ export class SpaceStation implements OrbitalObject, Cullable {
         let lastNode: TransformNode | null = null;
 
         const solarSection = new SolarSection(solarPanelSurface, this.scene);
+        solarSection.getTransform().parent = this.getTransform();
         lastNode = solarSection.getTransform();
         this.solarSections.push(solarSection);
 

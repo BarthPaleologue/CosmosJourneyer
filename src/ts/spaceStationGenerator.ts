@@ -37,6 +37,7 @@ import { SpaceStation } from "./spacestation/spaceStation";
 import HavokPhysics from "@babylonjs/havok";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { Star } from "./stellarObjects/star/star";
+import { Settings } from "./settings";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -69,10 +70,7 @@ defaultControls.getTransform().setAbsolutePosition(new Vector3(0, 2, -3).normali
 defaultControls.getTransform().lookAt(Vector3.Zero());
 
 const sun = new Star("Sun", scene, Math.random() * 1e6);
-sun.getTransform().position = new Vector3(70e6, 20e6, 50e6);
-const pointLight = new PointLight("SunLight", Vector3.Zero(), scene);
-pointLight.falloffType = Light.FALLOFF_STANDARD;
-pointLight.parent = sun.getTransform();
+sun.getTransform().position = new Vector3(7, 2, 5).normalize().scaleInPlace(Settings.AU);
 
 const starfieldPostProcess = new StarfieldPostProcess(scene, [sun], [], Quaternion.Identity());
 camera.attachPostProcess(starfieldPostProcess);
