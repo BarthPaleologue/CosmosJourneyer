@@ -6,12 +6,14 @@ import { Axis, Scene } from "@babylonjs/core";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Space } from "@babylonjs/core/Maths/math.axis";
 import { SolarPanelMaterial } from "../solarPanel/solarPanelMaterial";
+import { MetalSectionMaterial } from "./metalSectionMaterial";
 
 export class SolarSection implements Transformable {
     private readonly attachment: Mesh;
 
     private readonly arms: Mesh[] = [];
 
+    private readonly metalSectionMaterial: MetalSectionMaterial;
     private readonly solarPanelMaterial: SolarPanelMaterial;
 
     constructor(requiredSurface: number, scene: Scene) {
@@ -52,9 +54,10 @@ export class SolarSection implements Transformable {
         );
         this.attachment.convertToFlatShadedMesh();
 
-        this.solarPanelMaterial = new SolarPanelMaterial(scene);
+        this.metalSectionMaterial = new MetalSectionMaterial(scene);
+        this.attachment.material = this.metalSectionMaterial;
 
-        console.log("Nb arms", nbArms);
+        this.solarPanelMaterial = new SolarPanelMaterial(scene);
 
         if (nbArms === 1) {
             this.generateSpikePattern(this.getTransform(), attachmentLength, attachmentThickness, requiredSurface);
@@ -69,6 +72,7 @@ export class SolarSection implements Transformable {
                 depth: attachmentThickness / 2
             }, scene);
             arm1.parent = this.getTransform();
+            arm1.material = this.metalSectionMaterial;
             arm1.rotate(Axis.X, Math.PI / 2);
             arm1.translate(Axis.Y, (armLength + attachmentThickness) / 2);
 
@@ -80,6 +84,7 @@ export class SolarSection implements Transformable {
                 depth: attachmentThickness / 2
             }, scene);
             arm2.parent = this.getTransform();
+            arm2.material = this.metalSectionMaterial;
             arm2.rotate(Axis.X, -Math.PI / 2);
             arm2.translate(Axis.Y, (armLength + attachmentThickness) / 2);
 
@@ -149,6 +154,7 @@ export class SolarSection implements Transformable {
             arm.rotate(Axis.Y, theta, Space.WORLD);
             arm.translate(Axis.X, armLength / 2, Space.LOCAL);
             arm.parent = this.getTransform();
+            arm.material = this.metalSectionMaterial;
             this.arms.push(arm);
 
             const armOffset = nbArms * 0.3 * surfacePerArm / armLength;
@@ -176,9 +182,8 @@ export class SolarSection implements Transformable {
     }
 
     update(stellarObjects: Transformable[]) {
-        if (this.solarPanelMaterial !== null) {
-            this.solarPanelMaterial.update(stellarObjects);
-        }
+        this.solarPanelMaterial.update(stellarObjects);
+        this.metalSectionMaterial.update(stellarObjects);
     }
 
     public getTransform(): TransformNode {
@@ -189,5 +194,6 @@ export class SolarSection implements Transformable {
         this.getTransform().dispose();
         this.arms.forEach(arm => arm.dispose());
         this.solarPanelMaterial.dispose();
+        this.metalSectionMaterial.dispose();
     }
 }

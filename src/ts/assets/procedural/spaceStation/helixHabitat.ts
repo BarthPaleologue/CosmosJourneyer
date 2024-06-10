@@ -9,6 +9,7 @@ import { Transformable } from "../../../architecture/transformable";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { computeRingRotationPeriod } from "../../../utils/ringRotation";
 import { Settings } from "../../../settings";
+import { MetalSectionMaterial } from "./metalSectionMaterial";
 
 export class HelixHabitat implements Transformable {
     private readonly root: TransformNode;
@@ -21,6 +22,7 @@ export class HelixHabitat implements Transformable {
     private readonly helix2: Mesh;
 
     private readonly helixMaterial: RingHabitatMaterial;
+    private readonly metalSectionMaterial: MetalSectionMaterial;
 
     private readonly arms: Mesh[] = [];
 
@@ -41,6 +43,8 @@ export class HelixHabitat implements Transformable {
 
         const tesselation = attachmentNbSides * 8;
 
+        this.metalSectionMaterial = new MetalSectionMaterial(scene);
+
         this.attachment = MeshBuilder.CreateCylinder(
             "HelixHabitatAttachment",
             {
@@ -51,6 +55,8 @@ export class HelixHabitat implements Transformable {
             },
             scene
         );
+        this.attachment.convertToFlatShadedMesh();
+        this.attachment.material = this.metalSectionMaterial;
         this.attachment.rotate(Axis.Y, Math.PI / attachmentNbSides, Space.WORLD);
         this.attachment.parent = this.getTransform();
 
@@ -97,6 +103,7 @@ export class HelixHabitat implements Transformable {
                 },
                 scene
             );
+            arm.material = this.metalSectionMaterial;
 
             const y = (i / nbArms) * totalLength - totalLength / 2;
 
@@ -114,6 +121,7 @@ export class HelixHabitat implements Transformable {
     update(stellarObjects: Transformable[], deltaSeconds: number) {
         this.getTransform().rotate(Axis.Y, deltaSeconds / computeRingRotationPeriod(this.radius, Settings.G_EARTH));
         this.helixMaterial.update(stellarObjects);
+        this.metalSectionMaterial.update(stellarObjects);
     }
 
     getTransform(): TransformNode {
@@ -124,6 +132,7 @@ export class HelixHabitat implements Transformable {
         this.root.dispose();
         this.attachment.dispose();
         this.helixMaterial.dispose();
+        this.metalSectionMaterial.dispose();
         this.helix1.dispose();
         this.helix2.dispose();
         this.arms.forEach((arm) => arm.dispose());

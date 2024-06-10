@@ -50,6 +50,12 @@ import spaceStationMetallic from "../../asset/spaceStationMaterial/spaceship-pan
 import spaceStationRoughness from "../../asset/spaceStationMaterial/spaceship-panels1-roughness.png";
 import spaceStationAmbientOcclusion from "../../asset/spaceStationMaterial/spaceship-panels1-ao.png";
 
+import metalPanelsAlbdeo from "../../asset/metalPanelMaterial/sci-fi-panel1-albedo.png";
+import metalPanelsNormal from "../../asset/metalPanelMaterial/sci-fi-panel1-normal-dx.png";
+import metalPanelsRoughness from "../../asset/metalPanelMaterial/sci-fi-panel1-roughness.png";
+import metalPanelsMetallic from "../../asset/metalPanelMaterial/sci-fi-panel1-metallic.png";
+import metalPanelsAmbientOcclusion from "../../asset/spaceStationMaterial/spaceship-panels1-ao.png";
+
 export class Textures {
     static ROCK_NORMAL_METALLIC_MAP: Texture;
     static ROCK_ALBEDO_ROUGHNESS_MAP: Texture;
@@ -91,6 +97,12 @@ export class Textures {
     static SPACE_STATION_ROUGHNESS: Texture;
     static SPACE_STATION_AMBIENT_OCCLUSION: Texture;
 
+    static METAL_PANELS_ALBEDO: Texture;
+    static METAL_PANELS_NORMAL: Texture;
+    static METAL_PANELS_METALLIC: Texture;
+    static METAL_PANELS_ROUGHNESS: Texture;
+    static METAL_PANELS_AMBIENT_OCCLUSION: Texture;
+
     static EnqueueTasks(manager: AssetsManager, scene: Scene) {
         manager.addTextureTask("RockNormalMetallicMap", rockNormalMetallicMap).onSuccess = (task) => (Textures.ROCK_NORMAL_METALLIC_MAP = task.texture);
         manager.addTextureTask("RockAlbedoRoughnessMap", rockAlbedoRoughnessMap).onSuccess = (task) => (Textures.ROCK_ALBEDO_ROUGHNESS_MAP = task.texture);
@@ -127,6 +139,12 @@ export class Textures {
         manager.addTextureTask("SpaceStationMetallic", spaceStationMetallic).onSuccess = (task) => (Textures.SPACE_STATION_METALLIC = task.texture);
         manager.addTextureTask("SpaceStationRoughness", spaceStationRoughness).onSuccess = (task) => (Textures.SPACE_STATION_ROUGHNESS = task.texture);
         manager.addTextureTask("SpaceStationAmbientOcclusion", spaceStationAmbientOcclusion).onSuccess = (task) => (Textures.SPACE_STATION_AMBIENT_OCCLUSION = task.texture);
+        
+        manager.addTextureTask("MetalPanelsAlbedo", metalPanelsAlbdeo).onSuccess = (task) => (Textures.METAL_PANELS_ALBEDO = task.texture);
+        manager.addTextureTask("MetalPanelsNormal", metalPanelsNormal).onSuccess = (task) => (Textures.METAL_PANELS_NORMAL = task.texture);
+        manager.addTextureTask("MetalPanelsMetallic", metalPanelsMetallic).onSuccess = (task) => (Textures.METAL_PANELS_METALLIC = task.texture);
+        manager.addTextureTask("MetalPanelsRoughness", metalPanelsRoughness).onSuccess = (task) => (Textures.METAL_PANELS_ROUGHNESS = task.texture);
+        manager.addTextureTask("MetalPanelsAmbientOcclusion", metalPanelsAmbientOcclusion).onSuccess = (task) => (Textures.METAL_PANELS_AMBIENT_OCCLUSION = task.texture);
 
         Textures.ATMOSPHERE_LUT = new ProceduralTexture("atmosphereLUT", 100, { fragmentSource: atmosphereLUT }, scene, undefined, false, false);
         Textures.ATMOSPHERE_LUT.refreshRate = 0;

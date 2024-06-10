@@ -5,16 +5,25 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Objects } from "../../objects";
+import { MetalSectionMaterial } from "./metalSectionMaterial";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
 
 export class UtilitySection implements Transformable {
-    private readonly node: TransformNode;
+    private readonly node: Mesh;
+
+    private readonly metalSectionMaterial: MetalSectionMaterial;
 
     constructor(scene: Scene) {
+        this.metalSectionMaterial = new MetalSectionMaterial(scene);
+
         this.node = MeshBuilder.CreateBox("UtilitySectionRoot", {
             height: 700,
             width: 100,
             depth: 100
         }, scene);
+        this.node.convertToFlatShadedMesh();
+        this.node.material = this.metalSectionMaterial;
+
 
         const boundingVectors = this.node.getHierarchyBoundingVectors();
         const boundingExtendSize = boundingVectors.max.subtract(boundingVectors.min).scale(0.5);
@@ -39,7 +48,7 @@ export class UtilitySection implements Transformable {
     }
 
     update(stellarObjects: Transformable[]) {
-
+        this.metalSectionMaterial.update(stellarObjects);
     }
 
     getTransform(): TransformNode {
@@ -48,5 +57,6 @@ export class UtilitySection implements Transformable {
 
     dispose() {
         this.node.dispose();
+        this.metalSectionMaterial.dispose();
     }
 }

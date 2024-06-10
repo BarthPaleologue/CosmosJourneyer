@@ -8,6 +8,7 @@ import { Transformable } from "../../../architecture/transformable";
 import { computeRingRotationPeriod } from "../../../utils/ringRotation";
 import { Settings } from "../../../settings";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { MetalSectionMaterial } from "./metalSectionMaterial";
 
 export class RingHabitat implements Transformable {
 
@@ -16,6 +17,7 @@ export class RingHabitat implements Transformable {
     private readonly radius: number;
 
     private readonly ringMaterial: RingHabitatMaterial;
+    private readonly metalSectionMaterial: MetalSectionMaterial;
 
     private readonly ring: Mesh;
 
@@ -34,6 +36,8 @@ export class RingHabitat implements Transformable {
 
         const tesselation = attachmentNbSides * 8;
 
+        this.metalSectionMaterial = new MetalSectionMaterial(scene);
+
         this.attachment = MeshBuilder.CreateCylinder(
             "RingHabitatAttachment",
             {
@@ -44,6 +48,8 @@ export class RingHabitat implements Transformable {
             },
             scene
         );
+        this.attachment.convertToFlatShadedMesh();
+        this.attachment.material = this.metalSectionMaterial;
         this.attachment.rotate(Axis.Y, Math.PI / attachmentNbSides, Space.WORLD);
         this.attachment.parent = this.getTransform();
 
@@ -74,6 +80,7 @@ export class RingHabitat implements Transformable {
                 },
                 scene
             );
+            arm.material = this.metalSectionMaterial;
 
             const theta = (i / nbArms) * Math.PI * 2;
 
@@ -88,6 +95,7 @@ export class RingHabitat implements Transformable {
     update(stellarObjects: Transformable[], deltaSeconds: number) {
         this.getTransform().rotate(Axis.Y, deltaSeconds / computeRingRotationPeriod(this.radius, Settings.G_EARTH));
         this.ringMaterial.update(stellarObjects);
+        this.metalSectionMaterial.update(stellarObjects);
     }
 
     getTransform(): TransformNode {
@@ -99,6 +107,7 @@ export class RingHabitat implements Transformable {
         this.attachment.dispose();
         this.ring.dispose();
         this.ringMaterial.dispose();
+        this.metalSectionMaterial.dispose();
         this.arms.forEach((arm) => arm.dispose());
     }
 }
