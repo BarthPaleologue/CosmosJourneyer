@@ -69,7 +69,7 @@ planetModel.physicalProperties.minTemperature = -40;
 planetModel.physicalProperties.maxTemperature = 30;
 
 planetModel.orbit.period = 60 * 60 * 24 * 365.25;
-planetModel.orbit.radius = 4000 * planetModel.radius;
+planetModel.orbit.radius = 25000 * planetModel.radius;
 planetModel.orbit.normalToPlane = Vector3.Up();
 
 const planet = StarSystemHelper.MakeTelluricPlanet(starSystem, planetModel);
@@ -104,7 +104,7 @@ aresModel.physicalProperties.waterAmount = 0.2;
 aresModel.physicalProperties.oceanLevel = 0;
 
 aresModel.orbit.period = 60 * 60 * 24 * 365.24;
-aresModel.orbit.radius = 4020 * planet.getRadius();
+aresModel.orbit.radius = 25020 * planet.getRadius();
 aresModel.orbit.normalToPlane = Vector3.Up();
 
 //aresModel.terrainSettings.continents_fragmentation = 0.0;
@@ -119,7 +119,7 @@ ares.material.updateConstants();
 
 const andromaqueModel = new GasPlanetModel(0.28711440474126226, sunModel);
 andromaqueModel.orbit.period = 60 * 60 * 24 * 365.25;
-andromaqueModel.orbit.radius = 4300 * ares.getRadius();
+andromaqueModel.orbit.radius = 25300 * ares.getRadius();
 andromaqueModel.orbit.normalToPlane = Vector3.Up();
 
 const andromaque = StarSystemHelper.MakeGasPlanet(starSystem, andromaqueModel);
