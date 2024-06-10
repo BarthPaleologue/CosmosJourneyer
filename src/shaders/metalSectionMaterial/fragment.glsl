@@ -101,10 +101,6 @@ void triPlanarMaterial(vec3 position, vec3 surfaceNormal, sampler2D albedoMap, s
 void main() {
     vec3 viewDirectionW = normalize(cameraPosition - vPositionW);
 
-    vec2 vUV = vPosition.xy * 0.01;
-
-    float gamma = 2.2;
-
     vec3 albedo = vec3(0.0);
     vec3 normalW = vec3(0.0);
     float roughness = 0.0;
@@ -118,7 +114,7 @@ void main() {
         Lo += calculateLight(albedo, normalW, roughness, metallic, lightDirectionW, viewDirectionW, star_colors[i]);
     }
 
-    Lo = pow(Lo, vec3(1.0 / gamma));
+    Lo = pow(Lo, vec3(1.0 / 2.2));
 
     gl_FragColor = vec4(Lo, 1.0);
 }
