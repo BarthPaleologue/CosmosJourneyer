@@ -68,8 +68,8 @@ scene.enableDepthRenderer(camera, false, true);
 defaultControls.getTransform().setAbsolutePosition(new Vector3(0, 2, -3).normalize().scaleInPlace(40e3));
 defaultControls.getTransform().lookAt(Vector3.Zero());
 
-const sun = new Star("Sun", scene, 0);
-sun.getTransform().position = new Vector3(10e6, 20e6, 50e6);
+const sun = new Star("Sun", scene, Math.random() * 1e6);
+sun.getTransform().position = new Vector3(70e6, 20e6, 50e6);
 const pointLight = new PointLight("SunLight", Vector3.Zero(), scene);
 pointLight.falloffType = Light.FALLOFF_STANDARD;
 pointLight.parent = sun.getTransform();
