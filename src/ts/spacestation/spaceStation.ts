@@ -42,6 +42,7 @@ import { Transformable } from "../architecture/transformable";
 import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
 import { StellarObject, StellarObjectModel } from "../architecture/stellarObject";
 import { SolarSection } from "../assets/procedural/spaceStation/solarSection";
+import { Axis } from "@babylonjs/core/Maths/math.axis";
 
 export class SpaceStation implements OrbitalObject, Cullable {
     readonly name: string;
@@ -117,6 +118,8 @@ export class SpaceStation implements OrbitalObject, Cullable {
         }*/
 
         this.rootAggregate.body.disablePreStep = false;
+        
+        this.root.rotate(Axis.X, this.model.physicalProperties.axialTilt);
     }
 
     handleDockingRequest(): LandingPad | null {
@@ -161,24 +164,20 @@ export class SpaceStation implements OrbitalObject, Cullable {
     private generate() {
 
         // find distance to star
-        let distanceToStar: number | null = null;
+        let distanceToStar = this.model.orbit.radius;
         let parent = this.parent;
         let stellarObject: StellarObject | null = null;
         while (parent !== null) {
-            distanceToStar = parent.getOrbitProperties().radius;
             if (parent.parent === null) {
                 stellarObject = parent as StellarObject;
                 break;
             }
+            distanceToStar += parent.getOrbitProperties().radius;
             parent = parent.parent;
         }
 
         if (stellarObject === null) {
             throw new Error("No stellar object found");
-        }
-
-        if (distanceToStar === null) {
-            throw new Error("No distance to star found");
         }
 
         const starRadius = stellarObject.model.radius;
