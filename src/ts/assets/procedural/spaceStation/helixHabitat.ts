@@ -97,12 +97,13 @@ export class HelixHabitat implements Transformable {
             const arm = MeshBuilder.CreateBox(
                 `HelixHabitatArm${i}`,
                 {
-                    width: 2 * this.radius,
+                    height: 2 * this.radius,
                     depth: tubeDiameter / 3,
-                    height: tubeDiameter / 3
+                    width: tubeDiameter / 3
                 },
                 scene
             );
+            arm.rotate(Axis.Z, Math.PI / 2, Space.LOCAL);
             arm.material = this.metalSectionMaterial;
 
             const y = (i / nbArms) * totalLength - totalLength / 2;

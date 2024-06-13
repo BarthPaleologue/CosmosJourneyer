@@ -11,7 +11,6 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 
 export class RingHabitat implements Transformable {
-
     private readonly root: TransformNode;
 
     private readonly radius: number;
@@ -74,12 +73,13 @@ export class RingHabitat implements Transformable {
             const arm = MeshBuilder.CreateBox(
                 `RingHabitatArm${i}`,
                 {
-                    width: 2 * this.radius,
+                    height: 2 * this.radius,
                     depth: tubeDiameter / 3,
-                    height: tubeDiameter / 3
+                    width: tubeDiameter / 3
                 },
                 scene
             );
+            arm.rotate(Axis.Z, Math.PI / 2, Space.LOCAL);
             arm.material = this.metalSectionMaterial;
 
             const theta = (i / nbArms) * Math.PI * 2;
