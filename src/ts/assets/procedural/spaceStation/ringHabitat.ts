@@ -70,15 +70,16 @@ export class RingHabitat implements Transformable {
 
         const nbArms = attachmentNbSides / 2;
         for (let i = 0; i <= nbArms; i++) {
-            const arm = MeshBuilder.CreateBox(
+            const arm = MeshBuilder.CreateCylinder(
                 `RingHabitatArm${i}`,
                 {
                     height: 2 * this.radius,
-                    depth: tubeDiameter / 3,
-                    width: tubeDiameter / 3
+                    diameter: tubeDiameter / 3,
+                    tessellation: 6
                 },
                 scene
             );
+            arm.convertToFlatShadedMesh();
             arm.rotate(Axis.Z, Math.PI / 2, Space.LOCAL);
             arm.material = this.metalSectionMaterial;
 

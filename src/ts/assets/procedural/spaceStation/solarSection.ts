@@ -45,8 +45,7 @@ export class SolarSection implements Transformable {
         this.attachment = MeshBuilder.CreateCylinder(
             "SolarSectionAttachment",
             {
-                diameterTop: attachmentThickness,
-                diameterBottom: attachmentThickness,
+                diameter: attachmentThickness,
                 height: attachmentLength,
                 tessellation: nbArms < 3 ? 6 : nbArms * 2
             },
@@ -59,6 +58,8 @@ export class SolarSection implements Transformable {
 
         this.solarPanelMaterial = new SolarPanelMaterial(scene);
 
+        const hexagonOffset = attachmentThickness * (1 - Math.sqrt(3) / 2);
+
         if (nbArms === 1) {
             this.generateSpikePattern(this.getTransform(), attachmentLength, attachmentThickness, requiredSurface);
         } else if (nbArms === 2) {
@@ -66,27 +67,29 @@ export class SolarSection implements Transformable {
             const squareSideSize = Math.sqrt(surfacePerArray);
             const armLength = attachmentLength / 2.5;
 
-            const arm1 = MeshBuilder.CreateBox("Arm1", {
+            const arm1 = MeshBuilder.CreateCylinder("Arm1", {
                 height: armLength,
-                width: attachmentThickness / 2,
-                depth: attachmentThickness / 2
+                diameterBottom: attachmentThickness / 2,
+                tessellation: 6
             }, scene);
+            arm1.convertToFlatShadedMesh();
             arm1.parent = this.getTransform();
             arm1.material = this.metalSectionMaterial;
             arm1.rotate(Axis.X, Math.PI / 2);
-            arm1.translate(Axis.Y, (armLength + attachmentThickness) / 2);
+            arm1.translate(Axis.Y, (armLength + attachmentThickness - hexagonOffset) / 2);
 
             this.generateSpikePattern(arm1, armLength, attachmentThickness / 2, requiredSurface / 2);
 
-            const arm2 = MeshBuilder.CreateBox("Arm1", {
+            const arm2 = MeshBuilder.CreateCylinder("Arm1", {
                 height: armLength,
-                width: attachmentThickness / 2,
-                depth: attachmentThickness / 2
+                diameter: attachmentThickness / 2,
+                tessellation: 6
             }, scene);
+            arm2.convertToFlatShadedMesh();
             arm2.parent = this.getTransform();
             arm2.material = this.metalSectionMaterial;
             arm2.rotate(Axis.X, -Math.PI / 2);
-            arm2.translate(Axis.Y, (armLength + attachmentThickness) / 2);
+            arm2.translate(Axis.Y, (armLength + attachmentThickness - hexagonOffset) / 2);
 
             this.generateSpikePattern(arm2, armLength, attachmentThickness / 2, requiredSurface / 2);
 
@@ -106,6 +109,8 @@ export class SolarSection implements Transformable {
         const panelDimensionY = (armSize / nbPanelsPerSide) - gap;
         const panelDimensionX = halfRequiredSurface / armSize;
 
+        const hexagonOffset = armThickness * (1 - Math.sqrt(3) / 2);
+
         for (let i = 0; i < nbPanelsPerSide; i++) {
             const panel1 = MeshBuilder.CreateBox("SolarPanel1", {
                 height: 0.3,
@@ -115,7 +120,7 @@ export class SolarSection implements Transformable {
             panel1.parent = arm;
             panel1.material = this.solarPanelMaterial;
             panel1.translate(Axis.Y, (panelDimensionY + gap) * (i - (nbPanelsPerSide - 1) / 2));
-            panel1.translate(Axis.Z, (panelDimensionX + armThickness) / 2);
+            panel1.translate(Axis.Z, (panelDimensionX + armThickness - hexagonOffset) / 2);
             panel1.rotate(Axis.Z, Math.PI / 2);
 
             const panel2 = MeshBuilder.CreateBox("SolarPanel2", {
@@ -126,7 +131,7 @@ export class SolarSection implements Transformable {
             panel2.parent = arm;
             panel2.material = this.solarPanelMaterial;
             panel2.translate(Axis.Y, (panelDimensionY + gap) * (i - (nbPanelsPerSide - 1) / 2));
-            panel2.translate(Axis.Z, -(panelDimensionX + armThickness) / 2);
+            panel2.translate(Axis.Z, -(panelDimensionX + armThickness - hexagonOffset) / 2);
             panel2.rotate(Axis.Z, Math.PI / 2);
         }
     }
@@ -140,15 +145,16 @@ export class SolarSection implements Transformable {
         const armLength = squareSideSize * 2.618;
         for (let i = 0; i <= nbArms; i++) {
             const armThickness = 100;
-            const arm = MeshBuilder.CreateBox(
+            const arm = MeshBuilder.CreateCylinder(
                 `RingHabitatArm${i}`,
                 {
                     height: armLength,
-                    depth: armThickness,
-                    width: armThickness
+                    diameter: armThickness,
+                    tessellation: 6
                 },
                 scene
             );
+            arm.convertToFlatShadedMesh();
             arm.rotate(Axis.Z, Math.PI / 2, Space.LOCAL);
 
             const theta = (i / nbArms) * Math.PI * 2;
@@ -159,6 +165,7 @@ export class SolarSection implements Transformable {
             this.arms.push(arm);
 
             const armOffset = nbArms * 0.3 * surfacePerArm / armLength;
+            const hexagonOffset = armThickness * (1 - Math.sqrt(3) / 2);
 
             const solarPanel1 = MeshBuilder.CreateBox("SolarPanel1", {
                 height: 0.3,
@@ -168,7 +175,7 @@ export class SolarSection implements Transformable {
             solarPanel1.rotate(Axis.Z, Math.PI / 2, Space.LOCAL);
             solarPanel1.parent = arm;
             solarPanel1.translate(Axis.X, armOffset);
-            solarPanel1.translate(Axis.Z, 0.5 * (surfacePerArm / armLength + armThickness));
+            solarPanel1.translate(Axis.Z, 0.5 * (surfacePerArm / armLength + armThickness - hexagonOffset));
             solarPanel1.material = this.solarPanelMaterial;
 
             const solarPanel2 = MeshBuilder.CreateBox("SolarPanel2", {
@@ -179,7 +186,7 @@ export class SolarSection implements Transformable {
             solarPanel2.rotate(Axis.Z, Math.PI / 2, Space.LOCAL);
             solarPanel2.parent = arm;
             solarPanel2.translate(Axis.X, armOffset);
-            solarPanel2.translate(Axis.Z, -0.5 * (surfacePerArm / armLength + armThickness));
+            solarPanel2.translate(Axis.Z, -0.5 * (surfacePerArm / armLength + armThickness - hexagonOffset));
             solarPanel2.material = this.solarPanelMaterial;
         }
     }

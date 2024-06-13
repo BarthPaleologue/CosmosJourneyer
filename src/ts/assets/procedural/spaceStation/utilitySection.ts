@@ -16,10 +16,10 @@ export class UtilitySection implements Transformable {
     constructor(scene: Scene) {
         this.metalSectionMaterial = new MetalSectionMaterial(scene);
 
-        this.node = MeshBuilder.CreateBox("UtilitySectionRoot", {
+        this.node = MeshBuilder.CreateCylinder("UtilitySectionRoot", {
             height: 700,
-            width: 100,
-            depth: 100
+            diameter: 100,
+            tessellation: 6
         }, scene);
         this.node.convertToFlatShadedMesh();
         this.node.material = this.metalSectionMaterial;

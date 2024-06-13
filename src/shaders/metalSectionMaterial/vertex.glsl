@@ -19,19 +19,25 @@ precision highp float;
 
 attribute vec3 position;
 attribute vec3 normal;
+attribute vec2 uv;
 
 uniform mat4 world;
 uniform mat4 view;
 uniform mat4 worldViewProjection;
 
 varying vec3 vPositionW;
-varying vec3 vNormalW;
+varying mat3 vTBN;
 varying vec3 vPosition;
+varying vec2 vUV;
 
 void main() {
     gl_Position = worldViewProjection * vec4(position, 1.0);
 
     vPositionW = vec3(world * vec4(position, 1.0));
-    vNormalW = vec3(world * vec4(normal, 0.0));
+    vec3 normalW = vec3(world * vec4(normal, 0.0));
+    vec3 tangentW = vec3(world * vec4(vec3(0.0, 1.0, 0.0), 0.0));
+    vec3 biTangentW = normalize(cross(normalW, tangentW));
+    vTBN = mat3(tangentW, biTangentW, normalW);
     vPosition = position;
+    vUV = uv;
 }

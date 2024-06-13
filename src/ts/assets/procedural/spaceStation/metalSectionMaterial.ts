@@ -34,7 +34,7 @@ export class MetalSectionMaterial extends ShaderMaterial {
         }
 
         super(`MetalSectionMaterial`, scene, shaderName, {
-            attributes: ["position", "normal"],
+            attributes: ["position", "normal", "uv"],
             uniforms: [...Object.values(MetalSectionUniformNames), ...Object.values(StellarObjectUniformNames)],
             samplers: [...Object.values(MetalSectionSamplerNames)]
         });
