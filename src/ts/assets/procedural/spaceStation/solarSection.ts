@@ -143,16 +143,17 @@ export class SolarSection implements Transformable {
             const arm = MeshBuilder.CreateBox(
                 `RingHabitatArm${i}`,
                 {
-                    width: armLength,
+                    height: armLength,
                     depth: armThickness,
-                    height: armThickness
+                    width: armThickness
                 },
                 scene
             );
+            arm.rotate(Axis.Z, Math.PI / 2, Space.LOCAL);
 
             const theta = (i / nbArms) * Math.PI * 2;
             arm.rotate(Axis.Y, theta, Space.WORLD);
-            arm.translate(Axis.X, armLength / 2, Space.LOCAL);
+            arm.translate(Axis.Y, armLength / 2, Space.LOCAL);
             arm.parent = this.getTransform();
             arm.material = this.metalSectionMaterial;
             this.arms.push(arm);
@@ -164,6 +165,7 @@ export class SolarSection implements Transformable {
                 width: armLength,
                 depth: surfacePerArm / armLength
             }, scene);
+            solarPanel1.rotate(Axis.Z, Math.PI / 2, Space.LOCAL);
             solarPanel1.parent = arm;
             solarPanel1.translate(Axis.X, armOffset);
             solarPanel1.translate(Axis.Z, 0.5 * (surfacePerArm / armLength + armThickness));
@@ -174,6 +176,7 @@ export class SolarSection implements Transformable {
                 width: armLength,
                 depth: surfacePerArm / armLength
             }, scene);
+            solarPanel2.rotate(Axis.Z, Math.PI / 2, Space.LOCAL);
             solarPanel2.parent = arm;
             solarPanel2.translate(Axis.X, armOffset);
             solarPanel2.translate(Axis.Z, -0.5 * (surfacePerArm / armLength + armThickness));
