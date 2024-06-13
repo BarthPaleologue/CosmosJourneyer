@@ -52,9 +52,7 @@ void main() {
 
     float theta = atan2(vPosition.z, vPosition.x);
 
-    theta = remap(theta, 0.0, 1.0, -3.14/2.0, 3.14/2.0);
-
-    vec2 ringUV = vec2(theta, vUV.y);
+    vec2 ringUV = vec2(10.0 * theta, vUV.y);
 
     float gamma = 2.2;
 
