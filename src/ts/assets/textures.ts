@@ -39,6 +39,8 @@ import seamlessPerlin from "../../asset/perlin.png";
 import atmosphereLUT from "../../shaders/textures/atmosphereLUT.glsl";
 import empty from "../../asset/oneBlackPixel.png";
 
+import cursorImage from "../../asset/textures/hoveredCircle.png";
+
 export class Textures {
     static ROCK_NORMAL_METALLIC_MAP: Texture;
     static ROCK_ALBEDO_ROUGHNESS_MAP: Texture;
@@ -64,6 +66,8 @@ export class Textures {
     static FLARE_TEXTURE: Texture;
 
     static EMPTY_TEXTURE: Texture;
+
+    static CURSOR_IMAGE_URL: string;
 
     static ATMOSPHERE_LUT: ProceduralTexture;
 
@@ -97,6 +101,8 @@ export class Textures {
 
         Textures.ATMOSPHERE_LUT = new ProceduralTexture("atmosphereLUT", 100, { fragmentSource: atmosphereLUT }, scene, undefined, false, false);
         Textures.ATMOSPHERE_LUT.refreshRate = 0;
+
+        this.CURSOR_IMAGE_URL = cursorImage;
 
         manager.addTextureTask("EmptyTexture", empty).onSuccess = (task) => (Textures.EMPTY_TEXTURE = task.texture);
     }
