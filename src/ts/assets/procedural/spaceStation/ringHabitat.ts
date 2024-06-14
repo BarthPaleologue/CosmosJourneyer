@@ -31,7 +31,7 @@ export class RingHabitat implements Transformable {
 
         const tubeDiameter = 100 + Math.random() * 100;
 
-        const attachmentNbSides = 4 + 2 * Math.floor(Math.random() * 4);
+        const attachmentNbSides = 4 + 2 * Math.floor(Math.random() * 2);
 
         const tesselation = attachmentNbSides * 8;
 
