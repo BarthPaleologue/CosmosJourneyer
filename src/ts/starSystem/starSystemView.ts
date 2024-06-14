@@ -345,7 +345,12 @@ export class StarSystemView implements View {
         // main update loop for the star system
         this.scene.onBeforePhysicsObservable.add(() => {
             const deltaSeconds = engine.getDeltaTime() / 1000;
-            this.update(deltaSeconds * Settings.TIME_MULTIPLIER);
+            this.updateBeforePhysics(deltaSeconds * Settings.TIME_MULTIPLIER);
+        });
+
+        this.scene.onBeforeRenderObservable.add(() => {
+            const deltaSeconds = engine.getDeltaTime() * Settings.TIME_MULTIPLIER / 1000;
+            this.updateBeforeRender(deltaSeconds);
         });
 
         window.addEventListener("resize", () => {
@@ -514,7 +519,7 @@ export class StarSystemView implements View {
      * Updates the system view. It updates the underlying star system, the UI, the chunk forge and the controls
      * @param deltaSeconds the time elapsed since the last update in seconds
      */
-    public update(deltaSeconds: number) {
+    public updateBeforePhysics(deltaSeconds: number) {
         if (this.isLoadingSystem) return;
 
         const starSystem = this.getStarSystem();
@@ -522,7 +527,12 @@ export class StarSystemView implements View {
         this.chunkForge.update();
 
         starSystem.update(deltaSeconds, this.chunkForge, this.postProcessManager);
+    }
 
+    public updateBeforeRender(deltaSeconds: number) {
+        if (this.isLoadingSystem) return;
+
+        const starSystem = this.getStarSystem();
         if (this.spaceshipControls === null) throw new Error("Spaceship controls is null");
         if (this.characterControls === null) throw new Error("Character controls is null");
 
