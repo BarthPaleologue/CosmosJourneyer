@@ -29,10 +29,10 @@ export class UtilitySection implements Transformable {
         const boundingExtendSize = boundingVectors.max.subtract(boundingVectors.min).scale(0.5);
 
         if(Math.random() < 0.3) {
-            for (let ring = -1; ring <= 1; ring++) {
-                for (let sideIndex = 0; sideIndex < 4; sideIndex++) {
+            for (let ring = -3; ring <= 3; ring++) {
+                for (let sideIndex = 0; sideIndex < 6; sideIndex++) {
                     const tank = Objects.SPHERICAL_TANK.createInstance("SphericalTank");
-                    tank.scalingDeterminant = 5;
+                    tank.scalingDeterminant = 2.4;
 
                     const newBoundingVectors = tank.getHierarchyBoundingVectors();
                     const newBoundingExtendSize = newBoundingVectors.max.subtract(newBoundingVectors.min).scale(0.5);
@@ -40,7 +40,7 @@ export class UtilitySection implements Transformable {
                     tank.position.x = boundingExtendSize.x + newBoundingExtendSize.x;
                     tank.parent = this.getTransform();
 
-                    tank.rotateAround(Vector3.Zero(), Axis.Y, (Math.PI / 2) * sideIndex);
+                    tank.rotateAround(Vector3.Zero(), Axis.Y, Math.PI / 6 + (Math.PI / 3) * sideIndex);
                     tank.translate(Axis.Y, ring * 40);
                 }
             }
