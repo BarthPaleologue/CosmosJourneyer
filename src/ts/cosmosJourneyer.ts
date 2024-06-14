@@ -189,7 +189,8 @@ export class CosmosJourneyer {
         // Init BabylonJS engine
         const engine = new WebGPUEngine(canvas, {
             antialias: true,
-            audioEngine: true
+            audioEngine: true,
+            useHighPrecisionMatrix: true
         });
         await engine.initAsync(undefined, {
             wasmPath: new URL("./utils/TWGSL/twgsl.wasm", import.meta.url).href,
