@@ -39,6 +39,8 @@ import seamlessPerlin from "../../asset/perlin.png";
 import atmosphereLUT from "../../shaders/textures/atmosphereLUT.glsl";
 import empty from "../../asset/oneBlackPixel.png";
 
+import cursorImage from "../../asset/textures/hoveredCircle.png";
+
 import solarPanelAlbedo from "../../asset/SolarPanelMaterial/SolarPanel002_2K-PNG_Color.png";
 import solarPanelNormal from "../../asset/SolarPanelMaterial/SolarPanel002_2K-PNG_NormalDX.png";
 import solarPanelMetallic from "../../asset/SolarPanelMaterial/SolarPanel002_2K-PNG_Metalness.png";
@@ -55,6 +57,7 @@ import metalPanelsNormal from "../../asset/metalPanelMaterial/sci-fi-panel1-norm
 import metalPanelsRoughness from "../../asset/metalPanelMaterial/sci-fi-panel1-roughness.png";
 import metalPanelsMetallic from "../../asset/metalPanelMaterial/sci-fi-panel1-metallic.png";
 import metalPanelsAmbientOcclusion from "../../asset/spaceStationMaterial/spaceship-panels1-ao.png";
+import { Image } from "@babylonjs/gui/2D/controls/image";
 
 export class Textures {
     static ROCK_NORMAL_METALLIC_MAP: Texture;
@@ -81,6 +84,8 @@ export class Textures {
     static FLARE_TEXTURE: Texture;
 
     static EMPTY_TEXTURE: Texture;
+
+    static CURSOR_IMAGE_URL: string;
 
     static ATMOSPHERE_LUT: ProceduralTexture;
 
@@ -148,6 +153,8 @@ export class Textures {
 
         Textures.ATMOSPHERE_LUT = new ProceduralTexture("atmosphereLUT", 100, { fragmentSource: atmosphereLUT }, scene, undefined, false, false);
         Textures.ATMOSPHERE_LUT.refreshRate = 0;
+
+        this.CURSOR_IMAGE_URL = cursorImage;
 
         manager.addTextureTask("EmptyTexture", empty).onSuccess = (task) => (Textures.EMPTY_TEXTURE = task.texture);
     }
