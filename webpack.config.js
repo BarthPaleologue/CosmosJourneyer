@@ -16,7 +16,6 @@ const config = {
         landingSimulator: "./src/ts/landingSimulator.ts",
         playground: "./src/ts/playground.ts",
         xr: "./src/ts/xr.ts",
-        stereo: "./src/ts/stereo.ts",
         debugAssets: "./src/ts/debugAssets.ts"
     },
     output: {
@@ -90,12 +89,6 @@ const config = {
             filename: "xr.html",
             template: path.join(htmlPath, "index.html"),
             chunks: ["xr"]
-        }),
-        new HtmlWebpackPlugin({
-            title: "3D Stereo",
-            filename: "stereo.html",
-            template: path.join(htmlPath, "index.html"),
-            chunks: ["stereo"]
         }),
         new HtmlWebpackPlugin({
             title: "Debug Texture",
