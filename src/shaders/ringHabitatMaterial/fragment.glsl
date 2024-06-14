@@ -28,8 +28,6 @@ uniform sampler2D metallic;
 uniform sampler2D roughness;
 uniform sampler2D occlusion;
 
-uniform sampler2D perlin;
-
 uniform vec3 cameraPosition;
 
 #include "../utils/pi.glsl";
@@ -77,9 +75,7 @@ void main() {
         Lo += calculateLight(albedoColor, normalW, roughnessColor, metallicColor, lightDirectionW, viewDirectionW, star_colors[i]);
     }
 
-    //float noiseValue = textureNoTile(perlin, ringUV).r;
-    //Lo += (smoothstep(0.75, 0.75, noiseValue) + smoothstep(0.75, 0.75, 1.0 - noiseValue)) * vec3(1.0, 1.0, 0.4) * 2.0;
-    Lo += smoothstep(0.48, 0.5, ringUV.y) * smoothstep(0.5, 0.52, ringUV.y) * smoothstep(0.4, 0.45, fract(ringUV.x)) * smoothstep(0.55, 0.6, fract(ringUV.x)) * vec3(1.0, 1.0, 0.4);
+    Lo += smoothstep(0.48, 0.5, ringUV.y) * smoothstep(0.52, 0.5, ringUV.y) * smoothstep(0.4, 0.45, fract(ringUV.x)) * smoothstep(0.6, 0.55, fract(ringUV.x)) * vec3(1.0, 1.0, 0.4);
 
     // occlusion
     //Lo *= mix(1.0, occlusionColor, 0.5);
