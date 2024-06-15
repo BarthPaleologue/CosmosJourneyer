@@ -34,6 +34,7 @@ import { Star } from "./stellarObjects/star/star";
 import { Settings } from "./settings";
 import { LandingPad } from "./assets/procedural/landingPad/landingPad";
 import { Spaceship } from "./spaceship/spaceship";
+import { PhysicsViewer } from "@babylonjs/core/Debug/physicsViewer";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -49,7 +50,7 @@ scene.useRightHandedSystem = true;
 const havokInstance = await HavokPhysics();
 console.log(`Havok initialized`);
 const havokPlugin = new HavokPlugin(true, havokInstance);
-scene.enablePhysics(Vector3.Zero(), havokPlugin);
+scene.enablePhysics(new Vector3(0, -9.81, 0), havokPlugin);
 
 await Assets.Init(scene);
 
@@ -92,6 +93,11 @@ scene.executeWhenReady(() => {
         scene.render();
     });
 });
+
+/*const physicsViewer = new PhysicsViewer(scene);
+scene.meshes.forEach((mesh) => {
+   if(mesh.physicsBody) physicsViewer.showBody(mesh.physicsBody);
+});*/
 
 window.addEventListener("resize", () => {
     canvas.width = window.innerWidth;

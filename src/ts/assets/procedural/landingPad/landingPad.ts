@@ -1,18 +1,21 @@
 import { Transformable } from "../../../architecture/transformable";
 import { Mesh } from "@babylonjs/core/Meshes";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { PBRMetallicRoughnessMaterial, Scene } from "@babylonjs/core";
+import { PBRMetallicRoughnessMaterial, PhysicsShapeType, Scene } from "@babylonjs/core";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { LandingPadMaterial } from "./landingPadMaterial";
 import { Textures } from "../../textures";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 
 export class LandingPad implements Transformable {
     private readonly deck: Mesh;
+    private readonly deckAggregate: PhysicsAggregate;
 
-    private readonly material: LandingPadMaterial;
+    private readonly deckMaterial: LandingPadMaterial;
 
     private readonly crates: Mesh[] = [];
+    private readonly crateAggregates: PhysicsAggregate[] = [];
     private readonly crateMaterial: PBRMetallicRoughnessMaterial;
 
     constructor(padNumber: number, scene: Scene) {
@@ -20,10 +23,12 @@ export class LandingPad implements Transformable {
         const depth = width * 1.618;
         const aspectRatio = width / depth;
 
-        this.material = new LandingPadMaterial(padNumber, aspectRatio, scene);
+        this.deckMaterial = new LandingPadMaterial(padNumber, aspectRatio, scene);
 
         this.deck = MeshBuilder.CreateBox("LandingPad", { width: width, depth: depth, height: 0.5 }, scene);
-        this.deck.material = this.material;
+        this.deck.material = this.deckMaterial;
+
+        this.deckAggregate = new PhysicsAggregate(this.deck, PhysicsShapeType.BOX, { mass: 0, friction: 10 }, scene);
 
         this.crateMaterial = new PBRMetallicRoughnessMaterial("crateMaterial", scene);
         this.crateMaterial.baseTexture = Textures.CRATE_ALBEDO;
@@ -38,6 +43,7 @@ export class LandingPad implements Transformable {
 
             const crateSize = Math.random() < 0.2 ? 0.5 : 1;
             const crate = MeshBuilder.CreateBox("crate", { size: crateSize }, scene);
+            crate.material = this.crateMaterial;
             crate.parent = this.deck;
             crate.position.y += 0.25 + crateSize / 2;
 
@@ -47,14 +53,15 @@ export class LandingPad implements Transformable {
                 crate.rotation.y = Math.random() * Math.PI * 2;
             } while (!this.crates.every((otherCrate) => Vector3.Distance(crate.position, otherCrate.position) > 1.5));
 
-            crate.material = this.crateMaterial;
+            const crateAggregate = new PhysicsAggregate(crate, PhysicsShapeType.BOX, { mass: 100 + Math.random() * 300 }, scene);
 
             this.crates.push(crate);
+            this.crateAggregates.push(crateAggregate);
         }
     }
 
     update(stellarObjects: Transformable[]): void {
-        this.material.update(stellarObjects);
+        this.deckMaterial.update(stellarObjects);
     }
 
     getTransform(): TransformNode {
@@ -63,8 +70,10 @@ export class LandingPad implements Transformable {
 
     dispose() {
         this.deck.dispose();
-        this.material.dispose();
+        this.deckAggregate.dispose();
+        this.deckMaterial.dispose();
         this.crates.forEach((box) => box.dispose());
+        this.crateAggregates.forEach((crateAggregate) => crateAggregate.dispose());
         this.crateMaterial.dispose();
     }
 }
