@@ -18,6 +18,7 @@ const config = {
         xr: "./src/ts/xr.ts",
         stereo: "./src/ts/stereo.ts",
         spaceStationGenerator: "./src/ts/spaceStationGenerator.ts",
+        landingPad: "./src/ts/landingPad.ts",
         debugAssets: "./src/ts/debugAssets.ts"
     },
     output: {
@@ -103,6 +104,12 @@ const config = {
             filename: "spaceStationGenerator.html",
             template: path.join(htmlPath, "index.html"),
             chunks: ["spaceStationGenerator"]
+        }),
+        new HtmlWebpackPlugin({
+            title: "Landing pad",
+            filename: "landingPad.html",
+            template: path.join(htmlPath, "index.html"),
+            chunks: ["landingPad"]
         }),
         new HtmlWebpackPlugin({
             title: "Debug Texture",
