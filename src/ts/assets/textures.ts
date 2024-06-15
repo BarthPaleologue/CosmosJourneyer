@@ -57,7 +57,11 @@ import metalPanelsNormal from "../../asset/metalPanelMaterial/sci-fi-panel1-norm
 import metalPanelsRoughness from "../../asset/metalPanelMaterial/sci-fi-panel1-roughness.png";
 import metalPanelsMetallic from "../../asset/metalPanelMaterial/sci-fi-panel1-metallic.png";
 import metalPanelsAmbientOcclusion from "../../asset/spaceStationMaterial/spaceship-panels1-ao.png";
-import { Image } from "@babylonjs/gui/2D/controls/image";
+
+import crateAlbedo from "../../asset/crateMaterial/space-crate1-albedo.png";
+import crateNormal from "../../asset/crateMaterial/space-crate1-normal-dx.png";
+import crateMetallicRoughness from "../../asset/crateMaterial/space-crate1-metallic-roughness.png";
+import crateAmbientOcclusion from "../../asset/crateMaterial/space-crate1-ao.png";
 
 export class Textures {
     static ROCK_NORMAL_METALLIC_MAP: Texture;
@@ -108,6 +112,11 @@ export class Textures {
     static METAL_PANELS_ROUGHNESS: Texture;
     static METAL_PANELS_AMBIENT_OCCLUSION: Texture;
 
+    static CRATE_ALBEDO: Texture;
+    static CRATE_NORMAL: Texture;
+    static CRATE_METALLIC_ROUGHNESS: Texture;
+    static CRATE_AMBIENT_OCCLUSION: Texture;
+
     static EnqueueTasks(manager: AssetsManager, scene: Scene) {
         manager.addTextureTask("RockNormalMetallicMap", rockNormalMetallicMap).onSuccess = (task) => (Textures.ROCK_NORMAL_METALLIC_MAP = task.texture);
         manager.addTextureTask("RockAlbedoRoughnessMap", rockAlbedoRoughnessMap).onSuccess = (task) => (Textures.ROCK_ALBEDO_ROUGHNESS_MAP = task.texture);
@@ -150,6 +159,11 @@ export class Textures {
         manager.addTextureTask("MetalPanelsMetallic", metalPanelsMetallic).onSuccess = (task) => (Textures.METAL_PANELS_METALLIC = task.texture);
         manager.addTextureTask("MetalPanelsRoughness", metalPanelsRoughness).onSuccess = (task) => (Textures.METAL_PANELS_ROUGHNESS = task.texture);
         manager.addTextureTask("MetalPanelsAmbientOcclusion", metalPanelsAmbientOcclusion).onSuccess = (task) => (Textures.METAL_PANELS_AMBIENT_OCCLUSION = task.texture);
+
+        manager.addTextureTask("CrateAlbedo", crateAlbedo).onSuccess = (task) => (Textures.CRATE_ALBEDO = task.texture);
+        manager.addTextureTask("CrateNormal", crateNormal).onSuccess = (task) => (Textures.CRATE_NORMAL = task.texture);
+        manager.addTextureTask("CrateMetallicRoughness", crateMetallicRoughness).onSuccess = (task) => (Textures.CRATE_METALLIC_ROUGHNESS = task.texture);
+        manager.addTextureTask("CrateAmbientOcclusion", crateAmbientOcclusion).onSuccess = (task) => (Textures.CRATE_AMBIENT_OCCLUSION = task.texture);
 
         Textures.ATMOSPHERE_LUT = new ProceduralTexture("atmosphereLUT", 100, { fragmentSource: atmosphereLUT }, scene, undefined, false, false);
         Textures.ATMOSPHERE_LUT.refreshRate = 0;

@@ -72,7 +72,7 @@ const sun = new Star("Sun", scene, 4413.641464990006);
 sun.getTransform().position = new Vector3(1, 2, 1).normalize().scaleInPlace(distanceToStar);
 
 const spaceShip = new Spaceship(scene);
-spaceShip.getTransform().position.y = 5;
+spaceShip.getTransform().position.y = 2;
 
 const landingPad = new LandingPad(Math.floor(Math.random() * 50), scene);
 
