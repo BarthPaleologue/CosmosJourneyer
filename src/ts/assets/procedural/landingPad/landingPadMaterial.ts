@@ -8,6 +8,7 @@ import landingPadMaterialFragment from "../../../../shaders/landingPadMaterial/f
 import landingPadMaterialVertex from "../../../../shaders/landingPadMaterial/vertex.glsl";
 import { Textures } from "../../textures";
 import { DynamicTexture } from "@babylonjs/core";
+import { Settings } from "../../../settings";
 
 const LandingPadUniformNames = {
     WORLD: "world",
@@ -53,7 +54,7 @@ export class LandingPadMaterial extends ShaderMaterial {
         );
 
         //Add text to dynamic texture
-        const font = "bold 512px monospace";
+        const font = `bold 512px ${Settings.MAIN_FONT}`;
         numberTexture.drawText(`${padNumber}`, null, null, font, "white", null, true, true);
 
         this.onBindObservable.add(() => {

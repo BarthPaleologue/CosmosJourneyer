@@ -49,9 +49,9 @@ void main() {
     float roughness = texture(roughnessMap, uv).r;
     float metallic = texture(metallicMap, uv).r;
 
-    float paintWeight = texture(numberTexture, vec2(vUV.y, vUV.x)).a;
+    float paintWeight = texture(numberTexture, vec2(vUV.y, vUV.x + 0.03)).a;
     vec3 paintColor = vec3(1.0);
-    float borderThickness = 0.05;
+    float borderThickness = 0.03;
     if(vUV.x < borderThickness * aspectRatio || vUV.x > (1.0 - borderThickness * aspectRatio) || vUV.y < borderThickness || vUV.y > (1.0 - borderThickness)) {
         paintWeight = 1.0;
     }

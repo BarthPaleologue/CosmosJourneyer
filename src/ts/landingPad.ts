@@ -74,7 +74,7 @@ sun.getTransform().position = new Vector3(1, 2, 1).normalize().scaleInPlace(dist
 const spaceShip = new Spaceship(scene);
 spaceShip.getTransform().position.y = 5;
 
-const landingPad = new LandingPad(scene);
+const landingPad = new LandingPad(Math.floor(Math.random() * 50), scene);
 
 let elapsedSeconds = 0;
 scene.onBeforePhysicsObservable.add(() => {

@@ -10,12 +10,12 @@ export class LandingPad implements Transformable {
 
     private readonly material: LandingPadMaterial;
 
-    constructor(scene: Scene) {
+    constructor(padNumber: number, scene: Scene) {
         const width = 40;
         const depth = 60;
         const aspectRatio = width / depth;
 
-        this.material = new LandingPadMaterial(42, aspectRatio, scene);
+        this.material = new LandingPadMaterial(padNumber, aspectRatio, scene);
 
         this.deck = MeshBuilder.CreateBox("LandingPad", { width: width, depth: depth, height: 0.5 }, scene);
         this.deck.material = this.material;
