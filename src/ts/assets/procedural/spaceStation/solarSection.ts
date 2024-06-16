@@ -63,13 +63,11 @@ export class SolarSection implements Transformable {
         if (nbArms === 1) {
             this.generateSpikePattern(this.getTransform(), attachmentLength, attachmentThickness, requiredSurface);
         } else if (nbArms === 2) {
-            const surfacePerArray = requiredSurface / 4;
-            const squareSideSize = Math.sqrt(surfacePerArray);
             const armLength = attachmentLength / 2.5;
 
             const arm1 = MeshBuilder.CreateCylinder("Arm1", {
                 height: armLength,
-                diameterBottom: attachmentThickness / 2,
+                diameter: attachmentThickness / 2,
                 tessellation: 6
             }, scene);
             arm1.convertToFlatShadedMesh();
