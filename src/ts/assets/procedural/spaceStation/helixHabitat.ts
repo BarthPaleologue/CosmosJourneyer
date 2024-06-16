@@ -33,9 +33,10 @@ export class HelixHabitat implements Transformable {
 
         const nbSpires = 2 + Math.floor(Math.random() * 2);
 
-        const pitch = 4e3 * (1 + 0.3 * (Math.random() * 2 - 1));
 
-        this.radius = 2e3 + Math.random() * 2e3;
+        this.radius = 5e3 + Math.random() * 10e3;
+
+        const pitch = 2 * this.radius * (1 + 0.3 * (Math.random() * 2 - 1));
 
         const tubeThickness = 400 + Math.random() * 100;
 

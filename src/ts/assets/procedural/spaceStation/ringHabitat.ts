@@ -29,7 +29,7 @@ export class RingHabitat implements Transformable {
     constructor(scene: Scene) {
         this.root = new TransformNode("RingHabitatRoot", scene);
 
-        this.radius = 2e3 + Math.random() * 2e3;
+        this.radius = 5e3 + Math.random() * 10e3;
 
         const deltaRadius = 500;
 
@@ -54,9 +54,13 @@ export class RingHabitat implements Transformable {
         this.attachment.rotate(Axis.Y, Math.PI / attachmentNbSides, Space.WORLD);
         this.attachment.parent = this.getTransform();
 
-        const path = [];
-        for (let i = 0; i <= 2 * Math.PI; i += (2 * Math.PI) / 360) {
-            path.push(new Vector3(this.radius * Math.sin(i), 0, this.radius * Math.cos(i)));
+        const circumference = 2 * Math.PI * this.radius;
+
+        const path: Vector3[] = [];
+        const nbSteps = circumference / deltaRadius;
+        for (let i = 0; i <= nbSteps; i++) {
+            const theta = 2 * Math.PI * i / (nbSteps - 1);
+            path.push(new Vector3(this.radius * Math.sin(theta), 0, this.radius * Math.cos(theta)));
         }
 
 
@@ -73,7 +77,6 @@ export class RingHabitat implements Transformable {
         this.ring.bakeCurrentTransformIntoVertices();
         this.ring.convertToFlatShadedMesh();
 
-        const circumference = 2 * Math.PI * this.radius;
 
         this.ringMaterial = new RingHabitatMaterial(circumference, deltaRadius, heightFactor, scene);
 
