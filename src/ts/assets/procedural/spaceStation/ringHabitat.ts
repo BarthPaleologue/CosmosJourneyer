@@ -9,6 +9,8 @@ import { computeRingRotationPeriod } from "../../../utils/ringRotation";
 import { Settings } from "../../../settings";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MetalSectionMaterial } from "./metalSectionMaterial";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { createTube } from "../../../utils/tubeBuilder";
 
 export class RingHabitat implements Transformable {
     private readonly root: TransformNode;
@@ -29,20 +31,20 @@ export class RingHabitat implements Transformable {
 
         this.radius = 2e3 + Math.random() * 2e3;
 
-        const tubeDiameter = 100 + Math.random() * 100;
+        const deltaRadius = 500;
 
         const attachmentNbSides = 4 + 2 * Math.floor(Math.random() * 2);
 
-        const tesselation = attachmentNbSides * 8;
-
         this.metalSectionMaterial = new MetalSectionMaterial(scene);
+
+        const heightFactor = 1 + Math.floor(Math.random() * 5);
 
         this.attachment = MeshBuilder.CreateCylinder(
             "RingHabitatAttachment",
             {
                 diameterTop: 100,
                 diameterBottom: 100,
-                height: tubeDiameter * 3,
+                height: deltaRadius * heightFactor * 1.5,
                 tessellation: attachmentNbSides
             },
             scene
@@ -52,17 +54,28 @@ export class RingHabitat implements Transformable {
         this.attachment.rotate(Axis.Y, Math.PI / attachmentNbSides, Space.WORLD);
         this.attachment.parent = this.getTransform();
 
-        this.ring = MeshBuilder.CreateTorus(
+        const path = [];
+        for (let i = 0; i <= 2 * Math.PI; i += (2 * Math.PI) / 360) {
+            path.push(new Vector3(this.radius * Math.sin(i), 0, this.radius * Math.cos(i)));
+        }
+
+
+        this.ring = createTube(
             "RingHabitat",
             {
-                diameter: 2 * this.radius,
-                thickness: tubeDiameter,
-                tessellation: tesselation
+                path: path,
+                radius: Math.sqrt(2) * deltaRadius / 2,
+                tessellation: 4
             },
             scene
         );
+        this.ring.scaling.y = heightFactor;
+        this.ring.bakeCurrentTransformIntoVertices();
+        this.ring.convertToFlatShadedMesh();
 
-        this.ringMaterial = new RingHabitatMaterial(scene);
+        const circumference = 2 * Math.PI * this.radius;
+
+        this.ringMaterial = new RingHabitatMaterial(circumference, deltaRadius, heightFactor, scene);
 
         this.ring.material = this.ringMaterial;
 
@@ -74,7 +87,7 @@ export class RingHabitat implements Transformable {
                 `RingHabitatArm${i}`,
                 {
                     height: 2 * this.radius,
-                    diameter: tubeDiameter / 3,
+                    diameter: deltaRadius / 3,
                     tessellation: 6
                 },
                 scene

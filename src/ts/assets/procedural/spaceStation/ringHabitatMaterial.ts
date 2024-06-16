@@ -15,6 +15,9 @@ const RingHabitatUniformNames = {
     WORLD: "world",
     WORLD_VIEW_PROJECTION: "worldViewProjection",
     CAMERA_POSITION: "cameraPosition",
+    CIRCUMFERENCE: "circumference",
+    DELTA_RADIUS: "deltaRadius",
+    HEIGHT: "height"
 }
 
 const RingHabitatSamplerNames = {
@@ -28,7 +31,7 @@ const RingHabitatSamplerNames = {
 export class RingHabitatMaterial extends ShaderMaterial {
     private stellarObjects: Transformable[] = [];
 
-    constructor(scene: Scene) {
+    constructor(circumference: number, deltaRadius: number, height: number, scene: Scene) {
         const shaderName = "ringHabitatMaterial";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = ringHabitatMaterialFragment;
@@ -55,6 +58,9 @@ export class RingHabitatMaterial extends ShaderMaterial {
             }
 
             this.getEffect().setVector3(RingHabitatUniformNames.CAMERA_POSITION, activeCamera.globalPosition);
+            this.getEffect().setFloat(RingHabitatUniformNames.CIRCUMFERENCE, circumference);
+            this.getEffect().setFloat(RingHabitatUniformNames.DELTA_RADIUS, deltaRadius);
+            this.getEffect().setFloat(RingHabitatUniformNames.HEIGHT, height);
 
             setStellarObjectUniforms(this.getEffect(), this.stellarObjects);
 

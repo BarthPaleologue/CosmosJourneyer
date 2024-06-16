@@ -198,7 +198,7 @@ export class SpaceStation implements OrbitalObject, Cullable {
         for (let i = 0; i < 10; i++) {
             let nodeType = SpaceStationNodeType.UTILITY_SECTION;
             if (Math.random() < sigmoid(urgeToCreateHabitat - 6) && urgeToCreateHabitat > 0) {
-                nodeType = Math.random() < 0.5 ? SpaceStationNodeType.RING_HABITAT : SpaceStationNodeType.HELIX_HABITAT;
+                nodeType = Math.random() < 0.6 ? SpaceStationNodeType.RING_HABITAT : SpaceStationNodeType.HELIX_HABITAT;
             }
 
             let newNode: TransformNode | null = null;

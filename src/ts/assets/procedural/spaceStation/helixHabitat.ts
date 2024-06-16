@@ -10,6 +10,8 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { computeRingRotationPeriod } from "../../../utils/ringRotation";
 import { Settings } from "../../../settings";
 import { MetalSectionMaterial } from "./metalSectionMaterial";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { createTube } from "../../../utils/tubeBuilder";
 
 export class HelixHabitat implements Transformable {
     private readonly root: TransformNode;
@@ -35,7 +37,7 @@ export class HelixHabitat implements Transformable {
 
         this.radius = 2e3 + Math.random() * 2e3;
 
-        const tubeDiameter = 100 + Math.random() * 100;
+        const tubeThickness = 400 + Math.random() * 100;
 
         const totalLength = pitch * nbSpires;
 
@@ -60,34 +62,46 @@ export class HelixHabitat implements Transformable {
         this.attachment.rotate(Axis.Y, Math.PI / attachmentNbSides, Space.WORLD);
         this.attachment.parent = this.getTransform();
 
-        this.helix1 = createHelix(
+        const path = [];
+        const tessellation = 360;
+        const turns = nbSpires * tessellation;
+        for (let i = 0; i < turns; i++) {
+            const angle = Math.PI / 2 + (i * Math.PI * 2.0) / tessellation;
+            const y = (i * pitch) / tessellation;
+            path.push(new Vector3(this.radius * Math.sin(angle), y - (nbSpires * pitch) / 2, this.radius * Math.cos(angle)));
+        }
+
+        this.helix1 = createTube(
             "HelixHabitat",
             {
-                radius: this.radius,
-                tubeDiameter: tubeDiameter,
-                tessellation: tesselation,
-                pitch: pitch,
-                spires: nbSpires
+                path: path,
+                radius: Math.sqrt(2) * tubeThickness / 2,
+                tessellation: 4,
+                cap: Mesh.CAP_ALL
             },
             scene
         );
-        this.helix2 = createHelix(
+        this.helix1.convertToFlatShadedMesh();
+
+        this.helix2 = createTube(
             "HelixHabitat",
             {
-                radius: this.radius,
-                tubeDiameter: tubeDiameter,
-                tessellation: tesselation,
-                pitch: pitch,
-                spires: nbSpires
+                path: path,
+                radius: Math.sqrt(2) * tubeThickness / 2,
+                tessellation: 4,
+                cap: Mesh.CAP_ALL
             },
             scene
         );
+        this.helix2.convertToFlatShadedMesh();
         this.helix2.rotate(Axis.Y, Math.PI, Space.WORLD);
 
         this.helix1.parent = this.getTransform();
         this.helix2.parent = this.getTransform();
 
-        this.helixMaterial = new RingHabitatMaterial(scene);
+        const circumference = 2 * Math.PI * this.radius * nbSpires;
+
+        this.helixMaterial = new RingHabitatMaterial(circumference, tubeThickness, tubeThickness, scene);
 
         this.helix1.material = this.helixMaterial;
         this.helix2.material = this.helixMaterial;
@@ -98,7 +112,7 @@ export class HelixHabitat implements Transformable {
                 `HelixHabitatArm${i}`,
                 {
                     height: 2 * this.radius,
-                    diameter: tubeDiameter / 3,
+                    diameter: tubeThickness / 3,
                     tessellation: 6
                 },
                 scene
