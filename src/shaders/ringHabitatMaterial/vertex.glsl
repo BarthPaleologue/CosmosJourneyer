@@ -49,7 +49,7 @@ void main() {
     vUV.y *= circumference / deltaRadius;
 
     // if we are on the interior or exterior of the ring, we account for the vertical stretch
-    if(abs(normal.y) < 0.1) {
+    if(abs(normal.y) < 0.02) {
         vUV.x *= height;
     }
 }
