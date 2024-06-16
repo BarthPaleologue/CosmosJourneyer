@@ -53,7 +53,7 @@ export class HelixHabitat implements Transformable {
             {
                 diameterTop: 100,
                 diameterBottom: 100,
-                height: totalLength,
+                height: totalLength + tubeThickness * 4,
                 tessellation: attachmentNbSides
             },
             scene
