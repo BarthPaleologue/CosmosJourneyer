@@ -33,8 +33,6 @@ export class CylinderHabitat implements Transformable {
             },
             scene
         );
-
-        this.cylinder.bakeCurrentTransformIntoVertices();
         this.cylinder.convertToFlatShadedMesh();
 
         this.cylinderMaterial = new CylinderHabitatMaterial(this.radius, height, scene);
