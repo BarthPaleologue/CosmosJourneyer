@@ -43,8 +43,6 @@ export class HelixHabitat implements Transformable {
 
         const attachmentNbSides = 6 + 2 * Math.floor(Math.random() * 2);
 
-        const tesselation = attachmentNbSides * 8;
-
         this.metalSectionMaterial = new MetalSectionMaterial(scene);
 
         this.attachment = MeshBuilder.CreateCylinder(
