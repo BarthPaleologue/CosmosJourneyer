@@ -32,7 +32,7 @@ export class HelixHabitatMaterial extends ShaderMaterial {
     private stellarObjects: Transformable[] = [];
 
     constructor(meanRadius: number, deltaRadius: number, scene: Scene) {
-        const shaderName = "ringHabitatMaterial";
+        const shaderName = "helixHabitatMaterial";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = helixHabitatMaterialFragment;
         }
