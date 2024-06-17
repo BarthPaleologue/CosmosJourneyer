@@ -32,6 +32,8 @@ varying vec3 vNormalW;
 varying vec3 vPosition;
 varying vec2 vUV;
 
+#include "../utils/pi.glsl";
+
 void main() {
     vec4 outPosition = worldViewProjection * vec4(position, 1.0);
     gl_Position = outPosition;
@@ -44,6 +46,10 @@ void main() {
     // as the ring is has a square section, we multiply by 4 to repeat the texture on each side
     vUV.x *= 4.0;
 
+    vec3 positionPlane = normalize(vec3(position.x, 0.0, position.z));
+    float angle = atan(positionPlane.z, positionPlane.x); // [-PI PI]
+    float angle01 = (angle + PI) / (2.0 * PI);
+
     // we then repeat the texture around the circle
-    vUV.y *= circumference / deltaRadius;
+    vUV.y = angle01 * circumference / deltaRadius;
 }

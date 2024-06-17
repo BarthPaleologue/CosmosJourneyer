@@ -37,7 +37,7 @@ export class HelixHabitat implements Transformable {
 
         const pitch = 2 * this.radius * (1 + 0.3 * (Math.random() * 2 - 1));
 
-        const tubeThickness = 400 + Math.random() * 100;
+        const deltaRadius = 400 + Math.random() * 100;
 
         const totalLength = pitch * nbSpires;
 
@@ -52,7 +52,7 @@ export class HelixHabitat implements Transformable {
             {
                 diameterTop: 100,
                 diameterBottom: 100,
-                height: totalLength + tubeThickness * 4,
+                height: totalLength + deltaRadius * 4,
                 tessellation: attachmentNbSides
             },
             scene
@@ -75,7 +75,7 @@ export class HelixHabitat implements Transformable {
             "HelixHabitat",
             {
                 path: path,
-                radius: Math.sqrt(2) * tubeThickness / 2,
+                radius: Math.sqrt(2) * deltaRadius / 2,
                 tessellation: 4,
                 cap: Mesh.CAP_ALL
             },
@@ -87,7 +87,7 @@ export class HelixHabitat implements Transformable {
             "HelixHabitat",
             {
                 path: path,
-                radius: Math.sqrt(2) * tubeThickness / 2,
+                radius: Math.sqrt(2) * deltaRadius / 2,
                 tessellation: 4,
                 cap: Mesh.CAP_ALL
             },
@@ -99,9 +99,9 @@ export class HelixHabitat implements Transformable {
         this.helix1.parent = this.getTransform();
         this.helix2.parent = this.getTransform();
 
-        const circumference = 2 * Math.PI * this.radius * nbSpires;
+        const circumference = 2 * Math.PI * this.radius;
 
-        this.helixMaterial = new HelixHabitatMaterial(circumference, tubeThickness, scene);
+        this.helixMaterial = new HelixHabitatMaterial(circumference, deltaRadius, scene);
 
         this.helix1.material = this.helixMaterial;
         this.helix2.material = this.helixMaterial;
@@ -112,7 +112,7 @@ export class HelixHabitat implements Transformable {
                 `HelixHabitatArm${i}`,
                 {
                     height: 2 * this.radius,
-                    diameter: tubeThickness / 3,
+                    diameter: deltaRadius / 3,
                     tessellation: 6
                 },
                 scene
