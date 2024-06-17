@@ -15,10 +15,30 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export const enum SpaceStationNodeType {
-    UTILITY_SECTION,
-    SOLAR_SECTION,
-    RING_HABITAT,
-    HELIX_HABITAT,
-    CYLINDER_HABITAT
+precision highp float;
+
+attribute vec3 position;
+attribute vec3 normal;
+attribute vec2 uv;
+
+uniform mat4 world;
+uniform mat4 view;
+uniform mat4 worldViewProjection;
+uniform float radius;
+uniform float height;
+
+varying vec3 vPositionW;
+varying vec3 vNormalW;
+varying vec3 vPosition;
+varying vec2 vUV;
+
+void main() {
+    vec4 outPosition = worldViewProjection * vec4(position, 1.0);
+    gl_Position = outPosition;
+
+    vPositionW = vec3(world * vec4(position, 1.0));
+    vNormalW = vec3(world * vec4(normal, 0.0));
+    vPosition = position;
+
+    vUV = uv;
 }

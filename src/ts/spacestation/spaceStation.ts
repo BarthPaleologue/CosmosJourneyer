@@ -43,6 +43,8 @@ import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels"
 import { StellarObject, StellarObjectModel } from "../architecture/stellarObject";
 import { SolarSection } from "../assets/procedural/spaceStation/solarSection";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
+import { wheelOfFortune } from "../utils/wheelOfFortune";
+import { CylinderHabitat } from "../assets/procedural/spaceStation/cylinderHabitat";
 
 export class SpaceStation implements OrbitalObject, Cullable {
     readonly name: string;
@@ -64,6 +66,7 @@ export class SpaceStation implements OrbitalObject, Cullable {
     utilitySections: UtilitySection[] = [];
     helixHabitats: HelixHabitat[] = [];
     ringHabitats: RingHabitat[] = [];
+    cylinderHabitats: CylinderHabitat[] = [];
 
     private readonly root: TransformNode;
 
@@ -198,7 +201,11 @@ export class SpaceStation implements OrbitalObject, Cullable {
         for (let i = 0; i < 10; i++) {
             let nodeType = SpaceStationNodeType.UTILITY_SECTION;
             if (Math.random() < sigmoid(urgeToCreateHabitat - 6) && urgeToCreateHabitat > 0) {
-                nodeType = Math.random() < 0.6 ? SpaceStationNodeType.RING_HABITAT : SpaceStationNodeType.HELIX_HABITAT;
+                nodeType = wheelOfFortune([
+                    [SpaceStationNodeType.RING_HABITAT, 0.5],
+                    [SpaceStationNodeType.HELIX_HABITAT, 0.2],
+                    [SpaceStationNodeType.CYLINDER_HABITAT, 0.3]
+                ], Math.random());
             }
 
             let newNode: TransformNode | null = null;
@@ -216,6 +223,11 @@ export class SpaceStation implements OrbitalObject, Cullable {
                 const ringHabitat = new RingHabitat(this.scene);
                 this.ringHabitats.push(ringHabitat);
                 newNode = ringHabitat.getTransform();
+                urgeToCreateHabitat = 0;
+            } else if (nodeType === SpaceStationNodeType.CYLINDER_HABITAT) {
+                const cylinderHabitat = new CylinderHabitat(this.scene);
+                this.cylinderHabitats.push(cylinderHabitat);
+                newNode = cylinderHabitat.getTransform();
                 urgeToCreateHabitat = 0;
             }
 
@@ -252,6 +264,7 @@ export class SpaceStation implements OrbitalObject, Cullable {
         this.utilitySections.forEach((utilitySection) => utilitySection.update(stellarObjects));
         this.helixHabitats.forEach((helixHabitat) => helixHabitat.update(stellarObjects, deltaSeconds));
         this.ringHabitats.forEach((ringHabitat) => ringHabitat.update(stellarObjects, deltaSeconds));
+        this.cylinderHabitats.forEach((cylinderHabitat) => cylinderHabitat.update(stellarObjects, deltaSeconds));
 
         /*const worldMatrix = this.getTransform().computeWorldMatrix(true);
         for (let i = 0; i < this.childAggregates.length; i++) {
@@ -272,6 +285,7 @@ export class SpaceStation implements OrbitalObject, Cullable {
         this.utilitySections.forEach((utilitySection) => utilitySection.dispose());
         this.helixHabitats.forEach((helixHabitat) => helixHabitat.dispose());
         this.ringHabitats.forEach((ringHabitat) => ringHabitat.dispose());
+        this.cylinderHabitats.forEach((cylinderHabitat) => cylinderHabitat.dispose());
 
         this.rootAggregate.dispose();
         this.childAggregates.forEach((childAggregate) => childAggregate.dispose());
