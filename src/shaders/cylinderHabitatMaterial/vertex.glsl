@@ -46,7 +46,20 @@ void main() {
     vUV = uv;
 
     float texturePeriod = 500.0;
-    
+
     vUV.x *= 2.0 * PI * radius / texturePeriod;
     vUV.y *= height / texturePeriod;
+
+    if(abs(normal.y) > 0.02) {
+        vec3 positionPlane = vec3(position.x, 0.0, position.z);
+        float radius = length(positionPlane);
+        
+        vec3 positionPlaneNormalized = positionPlane / radius;
+
+        float angle = atan(positionPlaneNormalized.z, positionPlaneNormalized.x); // [-PI PI]
+        float angle01 = (angle + PI) / (2.0 * PI);
+
+        vUV.x = angle01 * radius / texturePeriod;
+        vUV.y = radius / texturePeriod;
+    }
 }
