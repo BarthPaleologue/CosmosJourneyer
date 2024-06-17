@@ -81,17 +81,7 @@ export class HelixHabitat implements Transformable {
         );
         this.helix1.convertToFlatShadedMesh();
 
-        this.helix2 = createTube(
-            "HelixHabitat",
-            {
-                path: path,
-                radius: Math.sqrt(2) * deltaRadius / 2,
-                tessellation: 4,
-                cap: Mesh.CAP_ALL
-            },
-            scene
-        );
-        this.helix2.convertToFlatShadedMesh();
+        this.helix2 = this.helix1.clone();
         this.helix2.rotate(Axis.Y, Math.PI, Space.WORLD);
 
         this.helix1.parent = this.getTransform();
