@@ -24,7 +24,7 @@ attribute vec2 uv;
 uniform mat4 world;
 uniform mat4 view;
 uniform mat4 worldViewProjection;
-uniform float circumference;
+uniform float meanRadius;
 uniform float deltaRadius;
 
 varying vec3 vPositionW;
@@ -51,5 +51,5 @@ void main() {
     float angle01 = (angle + PI) / (2.0 * PI);
 
     // we then repeat the texture around the circle
-    vUV.y = angle01 * circumference / deltaRadius;
+    vUV.y = angle01 * 2.0 * PI * meanRadius / deltaRadius;
 }

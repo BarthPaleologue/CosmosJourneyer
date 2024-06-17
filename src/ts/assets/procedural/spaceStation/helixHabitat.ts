@@ -99,9 +99,7 @@ export class HelixHabitat implements Transformable {
         this.helix1.parent = this.getTransform();
         this.helix2.parent = this.getTransform();
 
-        const circumference = 2 * Math.PI * this.radius;
-
-        this.helixMaterial = new HelixHabitatMaterial(circumference, deltaRadius, scene);
+        this.helixMaterial = new HelixHabitatMaterial(this.radius, deltaRadius, scene);
 
         this.helix1.material = this.helixMaterial;
         this.helix2.material = this.helixMaterial;
