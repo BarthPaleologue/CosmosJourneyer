@@ -18,14 +18,14 @@ export class CylinderHabitat implements Transformable {
     private readonly cylinder: Mesh;
 
     constructor(scene: Scene) {
-        this.root = new TransformNode("ONeillCylinderHabitatRoot", scene);
+        this.root = new TransformNode("CylinderHabitatRoot", scene);
 
         this.radius = 5e3 + Math.random() * 10e3;
 
         const height = 30e3 + Math.random() * 10e3;
 
         this.cylinder = MeshBuilder.CreateCylinder(
-            "RingHabitat",
+            "CylinderHabitat",
             {
                 diameter: this.radius * 2,
                 height: height,
