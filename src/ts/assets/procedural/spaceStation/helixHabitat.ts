@@ -1,10 +1,8 @@
 import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { createHelix } from "../../../utils/helixBuilder";
 import { Axis } from "@babylonjs/core";
 import { Space } from "@babylonjs/core/Maths/math.axis";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { RingHabitatMaterial } from "./ringHabitatMaterial";
 import { Transformable } from "../../../architecture/transformable";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { computeRingRotationPeriod } from "../../../utils/ringRotation";
@@ -12,6 +10,7 @@ import { Settings } from "../../../settings";
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { createTube } from "../../../utils/tubeBuilder";
+import { HelixHabitatMaterial } from "./helixHabitatMaterial";
 
 export class HelixHabitat implements Transformable {
     private readonly root: TransformNode;
@@ -23,7 +22,7 @@ export class HelixHabitat implements Transformable {
     private readonly helix1: Mesh;
     private readonly helix2: Mesh;
 
-    private readonly helixMaterial: RingHabitatMaterial;
+    private readonly helixMaterial: HelixHabitatMaterial;
     private readonly metalSectionMaterial: MetalSectionMaterial;
 
     private readonly arms: Mesh[] = [];
@@ -102,7 +101,7 @@ export class HelixHabitat implements Transformable {
 
         const circumference = 2 * Math.PI * this.radius * nbSpires;
 
-        this.helixMaterial = new RingHabitatMaterial(circumference, tubeThickness, tubeThickness, scene);
+        this.helixMaterial = new HelixHabitatMaterial(circumference, tubeThickness, scene);
 
         this.helix1.material = this.helixMaterial;
         this.helix2.material = this.helixMaterial;
