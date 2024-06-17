@@ -24,6 +24,7 @@ attribute vec2 uv;
 uniform mat4 world;
 uniform mat4 view;
 uniform mat4 worldViewProjection;
+
 uniform float radius;
 uniform float height;
 
@@ -31,6 +32,8 @@ varying vec3 vPositionW;
 varying vec3 vNormalW;
 varying vec3 vPosition;
 varying vec2 vUV;
+
+#include "../utils/pi.glsl";
 
 void main() {
     vec4 outPosition = worldViewProjection * vec4(position, 1.0);
@@ -41,4 +44,9 @@ void main() {
     vPosition = position;
 
     vUV = uv;
+
+    float texturePeriod = 500.0;
+    
+    vUV.x *= 2.0 * PI * radius / texturePeriod;
+    vUV.y *= height / texturePeriod;
 }
