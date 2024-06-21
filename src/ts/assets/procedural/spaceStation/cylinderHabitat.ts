@@ -20,7 +20,7 @@ export class CylinderHabitat implements Transformable {
     constructor(scene: Scene) {
         this.root = new TransformNode("CylinderHabitatRoot", scene);
 
-        this.radius = 5e3 + Math.random() * 10e3;
+        this.radius = 1e3 + Math.random() * 2e3;
 
         const height = 30e3 + Math.random() * 10e3;
 
