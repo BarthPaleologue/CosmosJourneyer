@@ -69,6 +69,7 @@ import { Anomaly } from "../anomalies/anomaly";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Sounds } from "../assets/sounds";
 import { Materials } from "../assets/materials";
+import { SpaceStation } from "../spacestation/spaceStation";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -554,6 +555,12 @@ export class StarSystemView implements View {
         
         const nearestOrbitalObject = starSystem.getNearestOrbitalObject();
         const nearestCelestialBody = starSystem.getNearestCelestialBody(this.scene.getActiveControls().getTransform().getAbsolutePosition());
+
+        if(nearestOrbitalObject instanceof SpaceStation) {
+            this.spaceshipControls.setClosestDockingFacility(nearestOrbitalObject);
+        } else {
+            this.spaceshipControls.setClosestDockingFacility(null);
+        }
 
         this.bodyEditor.update(nearestCelestialBody, this.postProcessManager, this.scene);
 

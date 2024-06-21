@@ -27,7 +27,6 @@ import { OrbitProperties } from "../orbit/orbitProperties";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { OrbitalObjectPhysicalProperties } from "../architecture/physicalProperties";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { LandingPad } from "../landingPad/landingPad";
 import { CollisionMask } from "../settings";
 import { CelestialBody } from "../architecture/celestialBody";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
@@ -40,14 +39,16 @@ import { HelixHabitat } from "../assets/procedural/spaceStation/helixHabitat";
 import { RingHabitat } from "../assets/procedural/spaceStation/ringHabitat";
 import { Transformable } from "../architecture/transformable";
 import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
-import { StellarObject, StellarObjectModel } from "../architecture/stellarObject";
+import { StellarObject } from "../architecture/stellarObject";
 import { SolarSection } from "../assets/procedural/spaceStation/solarSection";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { wheelOfFortune } from "../utils/wheelOfFortune";
 import { CylinderHabitat } from "../assets/procedural/spaceStation/cylinderHabitat";
 import { DockingBay } from "../assets/procedural/spaceStation/dockingBay";
+import { LandingPad } from "../assets/procedural/landingPad/landingPad";
+import { Dockable } from "../utils/dockable";
 
-export class SpaceStation implements OrbitalObject, Cullable {
+export class SpaceStation implements OrbitalObject, Cullable, Dockable {
     readonly name: string;
 
     readonly model: SpaceStationModel;
@@ -58,8 +59,6 @@ export class SpaceStation implements OrbitalObject, Cullable {
 
     readonly childAggregates: PhysicsAggregate[] = [];
     readonly childLocalPositions: Vector3[] = [];
-
-    readonly landingPads: LandingPad[] = [];
 
     readonly parent: OrbitalObject | null = null;
 
@@ -128,7 +127,9 @@ export class SpaceStation implements OrbitalObject, Cullable {
     }
 
     handleDockingRequest(): LandingPad | null {
-        const availableLandingPads = this.landingPads;
+        const availableLandingPads = this.dockingBays.flatMap((dockingBay) => {
+            return dockingBay.landingPads;
+        });
         const nbPads = availableLandingPads.length;
 
         if (nbPads === 0) return null;

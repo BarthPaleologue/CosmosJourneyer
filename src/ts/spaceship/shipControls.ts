@@ -30,6 +30,8 @@ import { createNotification } from "../utils/notification";
 import { StarSystemInputs } from "../inputs/starSystemInputs";
 import { pressInteractionToStrings } from "../utils/inputControlsString";
 import i18n from "../i18n";
+import { Transformable } from "../architecture/transformable";
+import { Dockable } from "../utils/dockable";
 
 export class ShipControls implements Controls {
     readonly spaceship: Spaceship;
@@ -45,6 +47,8 @@ export class ShipControls implements Controls {
 
     private baseFov: number;
     private targetFov: number;
+
+    private closestDockingFacility: (Transformable & Dockable) | null = null;
 
     constructor(scene: Scene) {
         this.spaceship = new Spaceship(scene);
@@ -68,6 +72,18 @@ export class ShipControls implements Controls {
             if (this.spaceship.getClosestWalkableObject() !== null) {
                 this.spaceship.engageLanding(null);
             }
+        });
+
+        SpaceShipControlsInputs.map.emitDockingRequest.on("complete", () => {
+            if(this.closestDockingFacility === null) return;
+            const landingPad = this.closestDockingFacility.handleDockingRequest();
+            if(landingPad === null) {
+                createNotification("Docking request rejected", 2000);
+                return;
+            }
+
+            createNotification(`Docking request granted. Proceed to pad ${landingPad.padNumber}`, 10000);
+            this.spaceship.engageLandingOnPad(landingPad);
         });
 
         SpaceShipControlsInputs.map.throttleToZero.on("complete", () => {
@@ -112,6 +128,10 @@ export class ShipControls implements Controls {
 
     public getActiveCameras(): Camera[] {
         return [this.thirdPersonCamera];
+    }
+
+    public setClosestDockingFacility(facility: (Transformable & Dockable) | null) {
+        this.closestDockingFacility = facility;
     }
 
     public update(deltaTime: number): Vector3 {

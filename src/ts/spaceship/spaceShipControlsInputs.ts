@@ -14,6 +14,10 @@ const landingAction = new Action({
 
 const landingInteraction = new PressInteraction(landingAction);
 
+const emitDockingRequest = new PressInteraction(new Action({
+    bindings: [keyboard.getControl("keyY")]
+}));
+
 const upDown = new AxisComposite({
     positive: keyboard.getControl("KeyR"),
     negative: keyboard.getControl("KeyF")
@@ -79,6 +83,7 @@ const throttleToZeroInteraction = new PressInteraction(throttleToZero);
 
 export const SpaceShipControlsInputs = new InputMap<{
     landing: PressInteraction;
+    emitDockingRequest: PressInteraction;
     upDown: Action<number>;
     throttle: Action<number>;
     rollPitch: Action<[number, number]>;
@@ -87,6 +92,7 @@ export const SpaceShipControlsInputs = new InputMap<{
     throttleToZero: PressInteraction;
 }>("SpaceShipInputs", {
     landing: landingInteraction,
+    emitDockingRequest: emitDockingRequest,
     upDown: upDownAction,
     throttle: throttleAction,
     rollPitch: rollPitch,

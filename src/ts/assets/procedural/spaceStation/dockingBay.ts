@@ -25,7 +25,7 @@ export class DockingBay {
 
     private readonly arms: Mesh[] = [];
 
-    private readonly landingPads: LandingPad[] = [];
+    readonly landingPads: LandingPad[] = [];
 
     constructor(scene: Scene) {
         this.root = new TransformNode("DockingBayRoot", scene);

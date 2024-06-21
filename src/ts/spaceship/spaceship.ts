@@ -34,7 +34,6 @@ import { CollisionMask } from "../settings";
 import { Transformable } from "../architecture/transformable";
 import { WarpTunnel } from "../utils/warpTunnel";
 import { Quaternion } from "@babylonjs/core/Maths/math";
-import { LandingPad } from "../landingPad/landingPad";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { HyperSpaceTunnel } from "../utils/hyperSpaceTunnel";
 import { AudioInstance } from "../utils/audioInstance";
@@ -43,6 +42,7 @@ import { MainThruster } from "./mainThruster";
 import { AudioMasks } from "../audio/audioMasks";
 import { Objects } from "../assets/objects";
 import { Sounds } from "../assets/sounds";
+import { LandingPad } from "../assets/procedural/landingPad/landingPad";
 
 const enum ShipState {
     FLYING,
@@ -249,8 +249,6 @@ export class Spaceship implements Transformable {
 
     public engageLandingOnPad(landingPad: LandingPad) {
         console.log("Landing on pad", landingPad.getTransform().name);
-        this.aggregate.body.setMotionType(PhysicsMotionType.ANIMATED);
-        this.state = ShipState.LANDING;
         this.targetLandingPad = landingPad;
     }
 
@@ -259,6 +257,7 @@ export class Spaceship implements Transformable {
         this.state = ShipState.LANDED;
         this.aggregate.body.setMotionType(PhysicsMotionType.STATIC);
         this.landingTarget = null;
+        this.targetLandingPad = null;
 
         this.onLandingObservable.notifyObservers();
     }
@@ -273,10 +272,6 @@ export class Spaceship implements Transformable {
     }
 
     private land(deltaTime: number) {
-        if (this.targetLandingPad !== null) {
-            this.landOnPad(this.targetLandingPad, deltaTime);
-        }
-
         if (this.landingTarget !== null) {
             const gravityDir = this.landingTarget.getTransform().getAbsolutePosition().subtract(this.getTransform().getAbsolutePosition()).normalize();
             const start = this.getTransform().getAbsolutePosition().add(gravityDir.scale(-50e3));
@@ -308,31 +303,56 @@ export class Spaceship implements Transformable {
     }
 
     private landOnPad(landingPad: LandingPad, deltaTime: number) {
+        this.setMainEngineThrottle(0);
+
+        const shipUp = this.getTransform().up;
         const padUp = landingPad.getTransform().up;
 
         const targetPosition = landingPad.getTransform().getAbsolutePosition();
-        targetPosition.addInPlace(padUp.scale(2));
+        targetPosition.addInPlace(padUp.scale(1));
+
         const currentPosition = this.getTransform().getAbsolutePosition();
 
         const distance = Vector3.Distance(targetPosition, currentPosition);
+
+        console.log("Landing", distance);
+
+        const directionToTarget = targetPosition.subtract(currentPosition).normalize();
+
+        //const currentVelocity = this.aggregate.body.getLinearVelocity();
+        //const unwantedVelocity = currentVelocity.subtract(directionToTarget.scale(Vector3.Dot(directionToTarget, currentVelocity)));
+        //this.aggregate.body.applyForce(unwantedVelocity.scale(-1), currentPosition);
+        //const forceMag = 2000;
+        //this.aggregate.body.applyForce(directionToTarget.scale(forceMag), currentPosition);
+        this.aggregate.body.setLinearVelocity(directionToTarget.scale(Math.min(Math.max(1, distance), 20)));
 
         if (distance < 0.01) {
             this.completeLanding();
             return;
         }
 
-        const targetOrientation = landingPad.getTransform().absoluteRotationQuaternion;
-        const currentOrientation = getRotationQuaternion(this.getTransform());
+        const upRotationAxis = Vector3.Cross(shipUp, padUp);
+        const upRotationAngle = Math.acos(Vector3.Dot(shipUp, padUp));
 
-        translate(
-            this.getTransform(),
-            targetPosition
-                .subtract(currentPosition)
-                .normalize()
-                .scaleInPlace(Math.min(distance, 20 * deltaTime))
+        this.aggregate.body.applyAngularImpulse(upRotationAxis.scale(upRotationAngle * 0.5));
+
+        const shipForward = getForwardDirection(this.getTransform());
+        const padForward = getForwardDirection(landingPad.getTransform());
+
+        const forwardRotationAxis = Vector3.Cross(shipForward, padForward);
+        const forwardRotationAngle = Math.acos(Vector3.Dot(shipForward, padForward));
+
+        this.aggregate.body.applyAngularImpulse(forwardRotationAxis.scale(forwardRotationAngle * 0.5));
+
+        // dampen rotation that is not along any of the rotation axis
+        const angularVelocity = this.aggregate.body.getAngularVelocity();
+        const noiseAngularVelocity = angularVelocity.subtract(
+            upRotationAxis.scale(Vector3.Dot(angularVelocity, upRotationAxis))
         );
-
-        this.getTransform().rotationQuaternion = Quaternion.Slerp(currentOrientation, targetOrientation, deltaTime);
+        noiseAngularVelocity.subtractInPlace(
+            forwardRotationAxis.scale(Vector3.Dot(noiseAngularVelocity, forwardRotationAxis))
+        );
+        this.aggregate.body.applyAngularImpulse(noiseAngularVelocity.scale(-0.1));
     }
 
     public update(deltaTime: number) {
@@ -376,6 +396,14 @@ export class Spaceship implements Transformable {
 
             this.acceleratingWarpDriveSound.setTargetVolume(0);
             this.deceleratingWarpDriveSound.setTargetVolume(0);
+
+            if (this.targetLandingPad !== null) {
+                const distanceToPad = Vector3.Distance(this.getTransform().getAbsolutePosition(), this.targetLandingPad.getTransform().getAbsolutePosition());
+                if(distanceToPad < 600) {
+                    this.state = ShipState.LANDING;
+                    this.landOnPad(this.targetLandingPad, deltaTime);
+                }
+            }
         } else {
             this.mainThrusters.forEach((thruster) => {
                 thruster.setThrottle(0);
