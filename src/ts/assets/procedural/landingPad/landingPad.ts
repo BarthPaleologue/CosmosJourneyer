@@ -7,6 +7,7 @@ import { LandingPadMaterial } from "./landingPadMaterial";
 import { Textures } from "../../textures";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { CollisionMask } from "../../../settings";
 
 export class LandingPad implements Transformable {
     private readonly deck: Mesh;
@@ -15,7 +16,6 @@ export class LandingPad implements Transformable {
     private readonly deckMaterial: LandingPadMaterial;
 
     private readonly crates: Mesh[] = [];
-    private readonly crateAggregates: PhysicsAggregate[] = [];
     private readonly crateMaterial: PBRMetallicRoughnessMaterial;
 
     constructor(padNumber: number, scene: Scene) {
@@ -29,6 +29,9 @@ export class LandingPad implements Transformable {
         this.deck.material = this.deckMaterial;
 
         this.deckAggregate = new PhysicsAggregate(this.deck, PhysicsShapeType.BOX, { mass: 0, friction: 10 }, scene);
+        this.deckAggregate.body.disablePreStep = false;
+        this.deckAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+        this.deckAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
 
         this.crateMaterial = new PBRMetallicRoughnessMaterial("crateMaterial", scene);
         this.crateMaterial.baseTexture = Textures.CRATE_ALBEDO;
@@ -53,10 +56,7 @@ export class LandingPad implements Transformable {
                 crate.rotation.y = Math.random() * Math.PI * 2;
             } while (!this.crates.every((otherCrate) => Vector3.Distance(crate.position, otherCrate.position) > 1.5));
 
-            const crateAggregate = new PhysicsAggregate(crate, PhysicsShapeType.BOX, { mass: 100 + Math.random() * 300 }, scene);
-
             this.crates.push(crate);
-            this.crateAggregates.push(crateAggregate);
         }
     }
 
@@ -73,7 +73,6 @@ export class LandingPad implements Transformable {
         this.deckAggregate.dispose();
         this.deckMaterial.dispose();
         this.crates.forEach((box) => box.dispose());
-        this.crateAggregates.forEach((crateAggregate) => crateAggregate.dispose());
         this.crateMaterial.dispose();
     }
 }
