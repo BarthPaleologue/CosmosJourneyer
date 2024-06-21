@@ -13,7 +13,6 @@ const config = {
         main: "./src/ts/index.ts",
         alphaTestis: "./src/ts/alphaTestis.ts",
         blackHole: "./src/ts/blackHoleDemo.ts",
-        landingSimulator: "./src/ts/landingSimulator.ts",
         playground: "./src/ts/playground.ts",
         xr: "./src/ts/xr.ts",
         spaceStationGenerator: "./src/ts/spaceStationGenerator.ts",
@@ -73,12 +72,6 @@ const config = {
             filename: "blackhole.html",
             template: path.join(htmlPath, "index.html"),
             chunks: ["blackHole"]
-        }),
-        new HtmlWebpackPlugin({
-            title: "Landing Simulator",
-            filename: "landingSimulator.html",
-            template: path.join(htmlPath, "index.html"),
-            chunks: ["landingSimulator"]
         }),
         new HtmlWebpackPlugin({
             title: "Playground",
