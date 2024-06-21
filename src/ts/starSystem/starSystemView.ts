@@ -551,9 +551,7 @@ export class StarSystemView implements View {
 
         this.characterControls.setClosestWalkableObject(nearestBody);
         this.spaceshipControls.spaceship.setClosestWalkableObject(nearestBody);
-
-        this.ui.update(this.scene.getActiveCameras()[0]);
-
+        
         const nearestOrbitalObject = starSystem.getNearestOrbitalObject();
         const nearestCelestialBody = starSystem.getNearestCelestialBody(this.scene.getActiveControls().getTransform().getAbsolutePosition());
 
