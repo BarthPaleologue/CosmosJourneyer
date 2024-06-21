@@ -18,7 +18,6 @@
 import { Scene } from "@babylonjs/core/scene";
 import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
 import { ObjectOverlay } from "./objectOverlay";
-import { Camera } from "@babylonjs/core/Cameras/camera";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Transformable } from "../architecture/transformable";
@@ -42,6 +41,12 @@ export class SystemUI {
         this.camera = new FreeCamera("UiCamera", Vector3.Zero(), this.scene);
 
         this.gui = AdvancedDynamicTexture.CreateFullscreenUI("SystemUI", true, this.scene);
+
+        this.scene.onBeforeRenderObservable.add(() => {
+            for (const overlay of this.objectOverlays) {
+                overlay.update(this.camera, this.target);
+            }
+        });
     }
 
     public setEnabled(enabled: boolean) {
@@ -73,12 +78,6 @@ export class SystemUI {
             overlay.dispose();
         }
         this.objectOverlays = [];
-    }
-
-    public update(camera: Camera) {
-        for (const overlay of this.objectOverlays) {
-            overlay.update(camera, this.target);
-        }
     }
 
     public setTarget(object: (Transformable & BoundingSphere & TypedObject) | null) {
