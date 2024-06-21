@@ -18,10 +18,14 @@ export class LandingPad implements Transformable {
     private readonly crates: Mesh[] = [];
     private readonly crateMaterial: PBRMetallicRoughnessMaterial;
 
+    readonly padNumber: number;
+
     constructor(padNumber: number, scene: Scene) {
         const width = 40;
         const depth = width * 1.618;
         const aspectRatio = width / depth;
+
+        this.padNumber = padNumber;
 
         this.deckMaterial = new LandingPadMaterial(padNumber, aspectRatio, scene);
 
