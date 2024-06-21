@@ -105,7 +105,7 @@ export class StarMap implements View {
     /**
      * The position of the star sector the player is currently in (relative to the global node).
      */
-    private currentStarSectorPosition = Vector3.Zero();
+    private currentStarSectorCoordinates = Vector3.Zero();
 
     private cameraPositionToCenter = Vector3.Zero();
 
@@ -272,7 +272,7 @@ export class StarMap implements View {
         }
 
         this.cameraPositionToCenter = this.controls.getTransform().getAbsolutePosition().subtract(this.starMapCenterPosition);
-        this.currentStarSectorPosition = new Vector3(
+        this.currentStarSectorCoordinates = new Vector3(
             Math.round(this.cameraPositionToCenter.x / StarSector.SIZE),
             Math.round(this.cameraPositionToCenter.y / StarSector.SIZE),
             Math.round(this.cameraPositionToCenter.z / StarSector.SIZE)
@@ -293,12 +293,12 @@ export class StarMap implements View {
     }
 
     /**
-     * Register a star sector at the given position, it will be added to the generation queue
-     * @param position The position of the sector
+     * Register a star sector at the given coordinates, it will be added to the generation queue
+     * @param coordinates The coordinates of the sector
      * @param generateNow
      */
-    private registerStarSector(position: Vector3, generateNow = false): StarSector {
-        const starSector = new StarSector(position);
+    private registerStarSector(coordinates: Vector3, generateNow = false): StarSector {
+        const starSector = new StarSector(coordinates);
         this.loadedStarSectors.set(starSector.getKey(), starSector);
 
         if (!generateNow) this.starBuildStack.push(...starSector.generate());
@@ -325,7 +325,7 @@ export class StarMap implements View {
         this.registerStarSector(sectorCoordinates, true);
         this.starMapUI.setCurrentStarSystemMesh(this.seedToInstanceMap.get(this.currentSystemSeed.toString()) as InstancedMesh);
 
-        const translation = sectorCoordinates.subtract(this.currentStarSectorPosition).scaleInPlace(StarSector.SIZE);
+        const translation = sectorCoordinates.subtract(this.currentStarSectorCoordinates).scaleInPlace(StarSector.SIZE);
         translate(this.controls.getTransform(), translation);
         this.controls.getActiveCameras().forEach((camera) => camera.getViewMatrix(true));
         this.acknowledgeCameraMovement();
@@ -342,7 +342,7 @@ export class StarMap implements View {
             if (selectedSystemInstance !== null && starSector.starInstances.concat(starSector.blackHoleInstances).includes(selectedSystemInstance)) continue; // don't remove star sector that contains the selected system
 
             const position = starSector.position;
-            if (position.subtract(this.cameraPositionToCenter).length() > StarMap.RENDER_RADIUS + 1) {
+            if (position.subtract(this.cameraPositionToCenter).length() / StarSector.SIZE > StarMap.RENDER_RADIUS + 1) {
                 for (const starInstance of starSector.starInstances) this.fadeOutThenRecycle(starInstance, this.recycledStars);
                 for (const blackHoleInstance of starSector.blackHoleInstances) this.fadeOutThenRecycle(blackHoleInstance, this.recycledBlackHoles);
 
@@ -352,20 +352,20 @@ export class StarMap implements View {
 
         // then generate missing sectors
         for (const relativeCoordinate of this.allowedStarSectorRelativeCoordinates) {
-            const position = this.currentStarSectorPosition.add(relativeCoordinate);
-            const sectorKey = vector3ToString(position);
+            const coordinates = this.currentStarSectorCoordinates.add(relativeCoordinate);
+            const sectorKey = vector3ToString(coordinates);
 
             if (this.loadedStarSectors.has(sectorKey)) continue; // already generated
 
             // don't generate star sectors that are not in the frustum
-            const bb = StarSector.GetBoundingBox(position, this.starMapCenterPosition);
+            const bb = StarSector.GetBoundingBox(coordinates.scale(StarSector.SIZE), this.starMapCenterPosition);
             let isInFrustrum = false;
             this.controls.getActiveCameras().forEach((camera) => {
                 isInFrustrum = isInFrustrum || camera.isInFrustum(bb);
             });
             if (!isInFrustrum) continue;
 
-            this.registerStarSector(position);
+            this.registerStarSector(coordinates);
         }
 
         this.buildNextStars(Math.min(2000, StarMap.GENERATION_RATE * this.controls.speed));
@@ -508,7 +508,7 @@ export class StarMap implements View {
     }
 
     public static StarMapDistanceToLy(distance: number): number {
-        return distance * 15 * Settings.LIGHT_YEAR;
+        return distance * 2 * Settings.LIGHT_YEAR;
     }
 
     private focusCameraOnStar(starInstance: InstancedMesh, skipAnimation = false) {

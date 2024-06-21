@@ -44,6 +44,8 @@ export class StarSector {
 
     readonly blackHoleInstances: InstancedMesh[] = [];
 
+    readonly coordinates: Vector3;
+
     /**
      * The position of the sector relative to the center of the starmap
      */
@@ -52,7 +54,7 @@ export class StarSector {
     /**
      * The size of all sectors
      */
-    static readonly SIZE = 1;
+    static readonly SIZE = 3;
 
     readonly density;
 
@@ -63,11 +65,12 @@ export class StarSector {
      */
     readonly rng: (step: number) => number;
 
-    constructor(positionInStarMap: Vector3) {
-        this.position = positionInStarMap;
-        this.rng = seededSquirrelNoise(hashVec3(positionInStarMap.x, positionInStarMap.y, positionInStarMap.z));
+    constructor(coordinates: Vector3) {
+        this.coordinates = coordinates;
+        this.position = coordinates.scale(StarSector.SIZE);
+        this.rng = seededSquirrelNoise(hashVec3(coordinates.x, coordinates.y, coordinates.z));
 
-        this.density = UniverseDensity(positionInStarMap.x, positionInStarMap.y, positionInStarMap.z);
+        this.density = UniverseDensity(coordinates.x, coordinates.y, coordinates.z);
 
         this.nbStars = 40 * this.density * this.rng(0);
     }
@@ -76,9 +79,9 @@ export class StarSector {
         const sectorString = this.getKey();
         const data: BuildData[] = [];
         for (let i = 0; i < this.nbStars; i++) {
-            const systemSeed = new SystemSeed(this.position.x, this.position.y, this.position.z, i);
+            const systemSeed = new SystemSeed(this.coordinates.x, this.coordinates.y, this.coordinates.z, i);
             data.push({
-                name: `starInstance|${this.position.x}|${this.position.y}|${this.position.z}|${i}`,
+                name: `starInstance|${this.coordinates.x}|${this.coordinates.y}|${this.coordinates.z}|${i}`,
                 seed: systemSeed,
                 sectorString: sectorString,
                 scale: 0.5 + this.rng(100 * i) / 2,
@@ -89,12 +92,12 @@ export class StarSector {
     }
 
     getPositionOfStar(starIndex: number): Vector3 {
-        if (starIndex >= this.nbStars) throw new Error(`Star index ${starIndex} is out of bounds for sector ${this.position}`);
+        if (starIndex >= this.nbStars) throw new Error(`Star index ${starIndex} is out of bounds for sector ${this.coordinates}`);
         return new Vector3(
             centeredRand(this.rng, 10 * starIndex + 1) / 2,
             centeredRand(this.rng, 10 * starIndex + 2) / 2,
             centeredRand(this.rng, 10 * starIndex + 3) / 2
-        ).addInPlace(this.position);
+        ).scaleInPlace(StarSector.SIZE).addInPlace(this.position);
     }
 
     /**
@@ -102,7 +105,7 @@ export class StarSector {
      * @returns a string that uniquely identifies this sector
      */
     getKey(): string {
-        return vector3ToString(this.position);
+        return vector3ToString(this.coordinates);
     }
 
     static GetBoundingBox(position: Vector3, globalNodePosition: Vector3): BoundingBox {
