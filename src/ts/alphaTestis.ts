@@ -30,6 +30,7 @@ import { StarSystemHelper } from "./starSystem/starSystemHelper";
 import { StarModel } from "./stellarObjects/star/starModel";
 import { getMoonSeed } from "./planets/common";
 import { SystemSeed } from "./utils/systemSeed";
+import { SpaceShipControlsInputs } from "./spaceship/spaceShipControlsInputs";
 
 const engine = await CosmosJourneyer.CreateAsync();
 
@@ -170,3 +171,4 @@ document.addEventListener("keydown", (e) => {
 starSystemView.ui.setEnabled(true);
 starSystemView.showHtmlUI();
 starSystemView.getSpaceshipControls().spaceship.enableWarpDrive();
+SpaceShipControlsInputs.setEnabled(true);
