@@ -34,7 +34,7 @@ export class UberScene extends Scene {
      */
     private activeControls: Controls | null = null;
 
-    private readonly depthRenderers: DepthRenderer[] = [];
+    private depthRenderer: DepthRenderer | null = null;
 
     /**
      * Creates a new UberScene.
@@ -47,9 +47,16 @@ export class UberScene extends Scene {
         this.clearColor = new Color4(0, 0, 0, 0);
 
         this.onNewCameraAddedObservable.add((camera) => {
-            const depthRenderer = this.enableDepthRenderer(camera, false, true);
-            depthRenderer.getDepthMap().activeCamera = camera;
-            this.depthRenderers.push(depthRenderer);
+            if(this.depthRenderer === null) {
+                this.depthRenderer = this.enableDepthRenderer(camera, false, true);
+            }
+        });
+        
+        this.onBeforeCameraRenderObservable.add((camera) => {
+            if(this.depthRenderer === null) {
+                throw new Error("Depth renderer is null!");
+            }
+            this.depthRenderer.getDepthMap().activeCamera = camera;
         });
     }
 
@@ -69,16 +76,7 @@ export class UberScene extends Scene {
     public setActiveCameras(cameras: Camera[]) {
         if (this.activeCameras !== null) this.activeCameras.forEach((camera) => camera.detachControl());
         this.activeCameras = cameras;
-
-        if (cameras.length === 1) cameras[0].attachControl(true);
-
-        for (const depthRenderer of this.depthRenderers) {
-            const depthRendererCamera = depthRenderer.getDepthMap().activeCamera;
-            if (depthRendererCamera === null) {
-                throw new Error("Depth renderer camera is null: " + depthRenderer);
-            }
-            depthRenderer.enabled = cameras.includes(depthRendererCamera);
-        }
+        this.activeCameras.forEach((camera) => camera.attachControl(true));
     }
 
     /**
