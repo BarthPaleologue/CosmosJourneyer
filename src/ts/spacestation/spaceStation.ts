@@ -45,6 +45,7 @@ import { SolarSection } from "../assets/procedural/spaceStation/solarSection";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { wheelOfFortune } from "../utils/wheelOfFortune";
 import { CylinderHabitat } from "../assets/procedural/spaceStation/cylinderHabitat";
+import { DockingBay } from "../assets/procedural/spaceStation/dockingBay";
 
 export class SpaceStation implements OrbitalObject, Cullable {
     readonly name: string;
@@ -62,11 +63,12 @@ export class SpaceStation implements OrbitalObject, Cullable {
 
     readonly parent: OrbitalObject | null = null;
 
-    solarSections: SolarSection[] = [];
-    utilitySections: UtilitySection[] = [];
-    helixHabitats: HelixHabitat[] = [];
-    ringHabitats: RingHabitat[] = [];
-    cylinderHabitats: CylinderHabitat[] = [];
+    readonly solarSections: SolarSection[] = [];
+    readonly utilitySections: UtilitySection[] = [];
+    readonly helixHabitats: HelixHabitat[] = [];
+    readonly ringHabitats: RingHabitat[] = [];
+    readonly cylinderHabitats: CylinderHabitat[] = [];
+    readonly dockingBays: DockingBay[] = [];
 
     private readonly root: TransformNode;
 
@@ -121,7 +123,7 @@ export class SpaceStation implements OrbitalObject, Cullable {
         }*/
 
         this.rootAggregate.body.disablePreStep = false;
-        
+
         this.root.rotate(Axis.X, this.model.physicalProperties.axialTilt);
     }
 
@@ -165,7 +167,6 @@ export class SpaceStation implements OrbitalObject, Cullable {
     }
 
     private generate() {
-
         // find distance to star
         let distanceToStar = this.model.orbit.radius;
         let parent = this.parent;
@@ -189,7 +190,6 @@ export class SpaceStation implements OrbitalObject, Cullable {
 
         const solarPanelSurface = getSolarPanelSurfaceFromEnergyRequirement(0.4, distanceToStar, starTemperature, starRadius, energyRequirement, 0.5);
 
-
         let lastNode: TransformNode | null = null;
 
         const solarSection = new SolarSection(solarPanelSurface, this.scene);
@@ -201,11 +201,14 @@ export class SpaceStation implements OrbitalObject, Cullable {
         for (let i = 0; i < 10; i++) {
             let nodeType = SpaceStationNodeType.UTILITY_SECTION;
             if (Math.random() < sigmoid(urgeToCreateHabitat - 6) && urgeToCreateHabitat > 0) {
-                nodeType = wheelOfFortune([
-                    [SpaceStationNodeType.RING_HABITAT, 0.5],
-                    [SpaceStationNodeType.HELIX_HABITAT, 0.2],
-                    [SpaceStationNodeType.CYLINDER_HABITAT, 0.3]
-                ], Math.random());
+                nodeType = wheelOfFortune(
+                    [
+                        [SpaceStationNodeType.RING_HABITAT, 0.5],
+                        [SpaceStationNodeType.HELIX_HABITAT, 0.2],
+                        [SpaceStationNodeType.CYLINDER_HABITAT, 0.3]
+                    ],
+                    Math.random()
+                );
             }
 
             let newNode: TransformNode | null = null;
@@ -244,6 +247,11 @@ export class SpaceStation implements OrbitalObject, Cullable {
             lastNode = newNode;
             urgeToCreateHabitat++;
         }
+
+        const dockingBay = new DockingBay(this.scene);
+        this.dockingBays.push(dockingBay);
+        this.placeNode(dockingBay.getTransform(), lastNode);
+        dockingBay.getTransform().parent = this.root;
     }
 
     private placeNode(node: TransformNode, parent: TransformNode) {
@@ -260,11 +268,12 @@ export class SpaceStation implements OrbitalObject, Cullable {
     }
 
     update(stellarObjects: Transformable[], deltaSeconds: number) {
-        this.solarSections.forEach(solarSection => solarSection.update(stellarObjects));
+        this.solarSections.forEach((solarSection) => solarSection.update(stellarObjects));
         this.utilitySections.forEach((utilitySection) => utilitySection.update(stellarObjects));
         this.helixHabitats.forEach((helixHabitat) => helixHabitat.update(stellarObjects, deltaSeconds));
         this.ringHabitats.forEach((ringHabitat) => ringHabitat.update(stellarObjects, deltaSeconds));
         this.cylinderHabitats.forEach((cylinderHabitat) => cylinderHabitat.update(stellarObjects, deltaSeconds));
+        this.dockingBays.forEach((dockingBay) => dockingBay.update(stellarObjects, deltaSeconds));
 
         /*const worldMatrix = this.getTransform().computeWorldMatrix(true);
         for (let i = 0; i < this.childAggregates.length; i++) {
@@ -286,6 +295,7 @@ export class SpaceStation implements OrbitalObject, Cullable {
         this.helixHabitats.forEach((helixHabitat) => helixHabitat.dispose());
         this.ringHabitats.forEach((ringHabitat) => ringHabitat.dispose());
         this.cylinderHabitats.forEach((cylinderHabitat) => cylinderHabitat.dispose());
+        this.dockingBays.forEach((dockingBay) => dockingBay.dispose());
 
         this.rootAggregate.dispose();
         this.childAggregates.forEach((childAggregate) => childAggregate.dispose());
