@@ -327,7 +327,7 @@ export class CosmosJourneyer {
         const seed = currentStarSystem.model.seed;
 
         // Finding the index of the nearest orbital object
-        const nearestOrbitalObject = currentStarSystem.getNearestOrbitalObject();
+        const nearestOrbitalObject = currentStarSystem.getNearestOrbitalObject(this.starSystemView.scene.getActiveControls().getTransform().getAbsolutePosition());
         const nearestOrbitalObjectIndex = currentStarSystem.getOrbitalObjects().indexOf(nearestOrbitalObject);
         if (nearestOrbitalObjectIndex === -1) throw new Error("Nearest orbital object not found");
 

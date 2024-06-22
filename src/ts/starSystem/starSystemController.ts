@@ -87,8 +87,6 @@ export class StarSystemController {
      */
     readonly model: StarSystemModel;
 
-    private nearestOrbitalObject: OrbitalObject | null = null;
-
     private closestToScreenCenterOrbitalObject: OrbitalObject | null = null;
 
     constructor(model: StarSystemModel | SystemSeed, scene: UberScene) {
@@ -191,29 +189,6 @@ export class StarSystemController {
         return objects;
     }
 
-    public computeNearestOrbitalObject(position: Vector3): void {
-        if (this.celestialBodies.length + this.spaceStations.length === 0) throw new Error("There are no bodies or spacestation in the solar system");
-        let nearest = null;
-        let smallerDistance = -1;
-        for (const body of this.celestialBodies) {
-            const distance = body.getTransform().getAbsolutePosition().subtract(position).length() - body.getRadius();
-            if (nearest === null || distance < smallerDistance) {
-                nearest = body;
-                smallerDistance = distance;
-            }
-        }
-
-        smallerDistance = -1;
-        for (const spacestation of this.spaceStations) {
-            const distance = spacestation.getTransform().getAbsolutePosition().subtract(position).length() - spacestation.getBoundingRadius() * 100;
-            if (distance < smallerDistance && distance < 0) {
-                nearest = spacestation;
-                smallerDistance = distance;
-            }
-        }
-        this.nearestOrbitalObject = nearest;
-    }
-
     public computeClosestToScreenCenterOrbitalObject() {
         let nearest = null;
         let closestDistance = Number.POSITIVE_INFINITY;
@@ -245,9 +220,27 @@ export class StarSystemController {
     /**
      * Returns the nearest orbital object to the origin
      */
-    public getNearestOrbitalObject(): OrbitalObject {
-        const nearest = this.nearestOrbitalObject;
-        if (nearest === null) throw new Error("There are no bodies in the solar system");
+    public getNearestOrbitalObject(position: Vector3): OrbitalObject {
+        if (this.orbitalObjects.length) throw new Error("There are no orbital objects in the solar system");
+        let nearest: OrbitalObject = this.orbitalObjects[0];
+        let smallerDistance = -1;
+        for (const body of this.celestialBodies) {
+            const distance = body.getTransform().getAbsolutePosition().subtract(position).length() - body.getRadius();
+            if (nearest === null || distance < smallerDistance) {
+                nearest = body;
+                smallerDistance = distance;
+            }
+        }
+
+        smallerDistance = -1;
+        for (const spacestation of this.spaceStations) {
+            const distance = spacestation.getTransform().getAbsolutePosition().subtract(position).length() - spacestation.getBoundingRadius() * 100;
+            if (distance < smallerDistance && distance < 0) {
+                nearest = spacestation;
+                smallerDistance = distance;
+            }
+        }
+
         return nearest;
     }
 
@@ -358,12 +351,11 @@ export class StarSystemController {
      */
     public update(deltaTime: number, chunkForge: ChunkForge, postProcessManager: PostProcessManager): void {
         const controller = this.scene.getActiveControls();
-        this.computeNearestOrbitalObject(controller.getTransform().getAbsolutePosition());
         this.computeClosestToScreenCenterOrbitalObject();
 
-        // The nearest body might have to be treated separatly
+        // The nearest body might have to be treated separately
         // The first step is to find the nearest body
-        const nearestBody = this.getNearestOrbitalObject();
+        const nearestBody = this.getNearestOrbitalObject(controller.getTransform().getAbsolutePosition());
 
         // Depending on the distance to the nearest body, we might have to compensate its translation and/or rotation
         // If we are very close, we want both translation and rotation to be compensated, so that the body appears to be fixed
