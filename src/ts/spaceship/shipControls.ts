@@ -149,6 +149,7 @@ export class ShipControls implements Controls {
             if (SpaceShipControlsInputs.map.upDown.value !== 0) {
                 if (this.spaceship.isLanded()) {
                     this.spaceship.takeOff();
+                    createNotification("Takeoff successful", 2000);
                 }
                 this.spaceship.aggregate.body.applyForce(
                     getUpwardDirection(this.getTransform()).scale(9.8 * 10 * SpaceShipControlsInputs.map.upDown.value),
