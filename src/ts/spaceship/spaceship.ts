@@ -316,8 +316,6 @@ export class Spaceship implements Transformable {
 
         const distance = Vector3.Distance(targetPosition, currentPosition);
 
-        console.log("Landing", distance);
-
         const directionToTarget = targetPosition.subtract(currentPosition).normalize();
 
         //const currentVelocity = this.aggregate.body.getLinearVelocity();
@@ -325,6 +323,7 @@ export class Spaceship implements Transformable {
         //this.aggregate.body.applyForce(unwantedVelocity.scale(-1), currentPosition);
         //const forceMag = 2000;
         //this.aggregate.body.applyForce(directionToTarget.scale(forceMag), currentPosition);
+
         this.aggregate.body.setLinearVelocity(directionToTarget.scale(Math.min(Math.max(1, distance), 20)));
 
         if (distance < 3.0) {
@@ -376,12 +375,13 @@ export class Spaceship implements Transformable {
 
             if (forwardSpeed < this.mainEngineTargetSpeed) {
                 this.aggregate.body.applyForce(forwardDirection.scale(3000), this.aggregate.body.getObjectCenterWorld());
-                this.mainThrusters.forEach((thruster) => {
-                    thruster.setThrottle(this.mainEngineThrottle);
-                });
             } else {
                 this.aggregate.body.applyForce(forwardDirection.scale(-3000), this.aggregate.body.getObjectCenterWorld());
             }
+
+            this.mainThrusters.forEach((thruster) => {
+                thruster.setThrottle(this.mainEngineThrottle);
+            });
 
             // damp other speed
             this.aggregate.body.applyForce(otherSpeed.scale(-10), this.aggregate.body.getObjectCenterWorld());
@@ -395,8 +395,10 @@ export class Spaceship implements Transformable {
             this.deceleratingWarpDriveSound.setTargetVolume(0);
 
             if (this.targetLandingPad !== null) {
-                const distanceToPad = Vector3.Distance(this.getTransform().getAbsolutePosition(), this.targetLandingPad.getTransform().getAbsolutePosition());
-                if (distanceToPad < 600) {
+                const shipRelativePosition = this.getTransform().getAbsolutePosition().subtract(this.targetLandingPad.getTransform().getAbsolutePosition());
+                const distanceToPad = shipRelativePosition.length();
+                const verticalDistance = Vector3.Dot(shipRelativePosition, this.targetLandingPad.getTransform().up);
+                if (distanceToPad < 600 && verticalDistance > 0) {
                     if (this.state !== ShipState.LANDING) {
                         createNotification("Automatic landing procedure engaged", 10000);
                     }
