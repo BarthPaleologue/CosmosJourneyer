@@ -42,7 +42,7 @@ export class DockingBay {
 
         const path: Vector3[] = [];
         const nbSteps = circumference / deltaRadius;
-        for (let i = 0; i <= nbSteps+1; i++) {
+        for (let i = 0; i <= nbSteps + 1; i++) {
             const theta = (2 * Math.PI * i) / nbSteps;
             path.push(new Vector3(this.radius * Math.sin(theta), 0, this.radius * Math.cos(theta)));
         }
@@ -103,7 +103,7 @@ export class DockingBay {
 
             landingPad.getTransform().rotate(Axis.Z, Math.PI / 2, Space.LOCAL);
 
-            landingPad.getTransform().rotate(Axis.X, (i * 2.0 * Math.PI) / nbPads, Space.LOCAL);
+            landingPad.getTransform().rotate(Axis.X, ((i + 0.5) * 2.0 * Math.PI) / nbPads, Space.LOCAL);
 
             landingPad.getTransform().rotate(Axis.Y, Math.PI / 2, Space.LOCAL);
 
