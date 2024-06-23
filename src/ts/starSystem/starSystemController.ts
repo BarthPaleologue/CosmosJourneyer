@@ -221,21 +221,20 @@ export class StarSystemController {
      * Returns the nearest orbital object to the origin
      */
     public getNearestOrbitalObject(position: Vector3): OrbitalObject {
-        if (this.orbitalObjects.length) throw new Error("There are no orbital objects in the solar system");
+        if (this.orbitalObjects.length === 0) throw new Error("There are no orbital objects in the solar system");
         let nearest: OrbitalObject = this.orbitalObjects[0];
-        let smallerDistance = -1;
+        let smallerDistance = Number.POSITIVE_INFINITY;
         for (const body of this.celestialBodies) {
             const distance = body.getTransform().getAbsolutePosition().subtract(position).length() - body.getRadius();
-            if (nearest === null || distance < smallerDistance) {
+            if (distance < smallerDistance) {
                 nearest = body;
                 smallerDistance = distance;
             }
         }
 
-        smallerDistance = -1;
         for (const spacestation of this.spaceStations) {
             const distance = spacestation.getTransform().getAbsolutePosition().subtract(position).length() - spacestation.getBoundingRadius() * 100;
-            if (distance < smallerDistance && distance < 0) {
+            if (distance < smallerDistance && distance < spacestation.getBoundingRadius() * 500) {
                 nearest = spacestation;
                 smallerDistance = distance;
             }

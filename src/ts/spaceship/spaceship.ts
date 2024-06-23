@@ -69,7 +69,7 @@ export class Spaceship implements Transformable {
     private state = ShipState.FLYING;
 
     private closestObject = {
-        distance: Infinity,
+        distance: 0,
         radius: 1
     };
 
