@@ -3,15 +3,16 @@ import { RingHabitatMaterial } from "./ringHabitatMaterial";
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Scene } from "@babylonjs/core/scene";
-import { Axis } from "@babylonjs/core";
+import { Axis, PhysicsShapeType } from "@babylonjs/core";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { createTube } from "../../../utils/tubeBuilder";
 import { Transformable } from "../../../architecture/transformable";
 import { computeRingRotationPeriod } from "../../../utils/ringRotation";
-import { Settings } from "../../../settings";
+import { CollisionMask, Settings } from "../../../settings";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Space } from "@babylonjs/core/Maths/math.axis";
 import { LandingPad } from "../landingPad/landingPad";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 
 export class DockingBay {
     private readonly root: TransformNode;
@@ -22,8 +23,10 @@ export class DockingBay {
     private readonly metalSectionMaterial: MetalSectionMaterial;
 
     private readonly ring: Mesh;
+    private readonly ringAggregate: PhysicsAggregate;
 
     private readonly arms: Mesh[] = [];
+    private readonly armAggregates: PhysicsAggregate[] = [];
 
     readonly landingPads: LandingPad[] = [];
 
@@ -60,13 +63,17 @@ export class DockingBay {
         this.ring.bakeCurrentTransformIntoVertices();
         this.ring.convertToFlatShadedMesh();
 
-        const yExtent = this.ring.getBoundingInfo().boundingBox.extendSize.y;
-
         this.ringMaterial = new RingHabitatMaterial(circumference, deltaRadius, heightFactor, scene);
-
         this.ring.material = this.ringMaterial;
 
         this.ring.parent = this.getTransform();
+
+        this.ringAggregate = new PhysicsAggregate(this.ring, PhysicsShapeType.MESH, { mass: 0 });
+        this.ringAggregate.body.disablePreStep = false;
+        this.ringAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+        this.ringAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
+
+        const yExtent = this.ring.getBoundingInfo().boundingBox.extendSize.y;
 
         const nbArms = 6;
         for (let i = 0; i <= nbArms; i++) {
@@ -93,6 +100,13 @@ export class DockingBay {
             arm.parent = this.getTransform();
 
             this.arms.push(arm);
+
+            const armAggregate = new PhysicsAggregate(arm, PhysicsShapeType.BOX, { mass: 0 });
+            armAggregate.body.disablePreStep = false;
+            armAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+            armAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
+
+            this.armAggregates.push(armAggregate);
         }
 
         const nbPads = nbSteps;
@@ -127,9 +141,11 @@ export class DockingBay {
     dispose() {
         this.root.dispose();
         this.ring.dispose();
+        this.ringAggregate.dispose();
         this.ringMaterial.dispose();
         this.metalSectionMaterial.dispose();
         this.arms.forEach((arm) => arm.dispose());
+        this.armAggregates.forEach((armAggregate) => armAggregate.dispose());
         this.landingPads.forEach((landingPad) => landingPad.dispose());
     }
 }
