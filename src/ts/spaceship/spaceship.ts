@@ -382,7 +382,7 @@ export class Spaceship implements Transformable {
         if (this.warpDrive.isEnabled()) this.warpTunnel.setThrottle(1 - 1 / (1.1 * (1 + 1e-7 * this.warpDrive.getWarpSpeed())));
         else this.warpTunnel.setThrottle(0);
 
-        if (this.warpDrive.isDisabled()) {
+        if (this.warpDrive.isDisabled() && this.state !== ShipState.LANDED) {
             const linearVelocity = this.aggregate.body.getLinearVelocity();
             const forwardDirection = getForwardDirection(this.getTransform());
             const forwardSpeed = Vector3.Dot(linearVelocity, forwardDirection);
