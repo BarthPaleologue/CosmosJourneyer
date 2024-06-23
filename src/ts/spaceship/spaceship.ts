@@ -257,6 +257,18 @@ export class Spaceship implements Transformable {
         console.log("Landing sequence complete");
         this.state = ShipState.LANDED;
         this.aggregate.body.setMotionType(PhysicsMotionType.STATIC);
+        if(this.targetLandingPad !== null) {
+            const currentPosition = this.getTransform().getAbsolutePosition().clone();
+            const currentRotation = this.getTransform().absoluteRotationQuaternion.clone();
+            const padRotation = this.targetLandingPad.getTransform().absoluteRotationQuaternion.clone();
+            if(padRotation === null) {
+                throw new Error("Landing pad's rotation quaternion is null!");
+            }
+            this.getTransform().parent = this.targetLandingPad.getTransform();
+            this.getTransform().setAbsolutePosition(currentPosition);
+            this.getTransform().rotationQuaternion = padRotation.invert().multiply(currentRotation);
+        }
+
         this.landingTarget = null;
         this.targetLandingPad = null;
 
