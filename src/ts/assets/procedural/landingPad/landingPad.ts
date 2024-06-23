@@ -54,13 +54,22 @@ export class LandingPad implements Transformable {
             crate.parent = this.deck;
             crate.position.y += 0.25 + crateSize / 2;
 
+            let nbTries = 0;
+            const maxTries = 10;
             do {
                 crate.position.x = (corner1 * (width - 10 * Math.random() - 3)) / 2;
                 crate.position.z = (corner2 * (depth - 10 * Math.random() - 3)) / 2;
                 crate.rotation.y = Math.random() * Math.PI * 2;
+                nbTries++;
+                if (nbTries > maxTries) {
+                    crate.dispose();
+                    break;
+                }
             } while (!this.crates.every((otherCrate) => Vector3.Distance(crate.position, otherCrate.position) > 1.5));
 
-            this.crates.push(crate);
+            if (nbTries <= maxTries) {
+                this.crates.push(crate);
+            }
         }
     }
 
