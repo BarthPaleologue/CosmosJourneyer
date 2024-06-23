@@ -27,9 +27,7 @@ import { OrbitProperties } from "../orbit/orbitProperties";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { OrbitalObjectPhysicalProperties } from "../architecture/physicalProperties";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { CollisionMask } from "../settings";
 import { CelestialBody } from "../architecture/celestialBody";
-import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { generateSpaceStationName } from "../utils/spaceStationNameGenerator";
 import i18n from "../i18n";
 import { SpaceStationNodeType } from "../assets/procedural/spaceStation/spaceStationNode";
@@ -52,8 +50,6 @@ export class SpaceStation implements OrbitalObject, Cullable, Dockable {
     readonly name: string;
 
     readonly model: SpaceStationModel;
-
-    readonly rootAggregate: PhysicsAggregate;
 
     readonly postProcesses: PostProcessType[] = [];
 
@@ -85,27 +81,6 @@ export class SpaceStation implements OrbitalObject, Cullable, Dockable {
 
         this.generate();
 
-        this.rootAggregate = new PhysicsAggregate(
-            this.getTransform(),
-            PhysicsShapeType.CONTAINER,
-            {
-                mass: 0,
-                restitution: 0.2
-            },
-            scene
-        );
-
-        this.rootAggregate.body.setMotionType(PhysicsMotionType.STATIC);
-        this.rootAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
-        this.rootAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
-
-        this.rootAggregate.body.setCollisionCallbackEnabled(true);
-        this.rootAggregate.body.getCollisionObservable().add(() => {
-            console.log("collision!");
-        });
-
-        this.rootAggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
-
         /*const inverseWorldMatrix = this.getTransform().getWorldMatrix().clone().invert();
         for (const mesh of this.getTransform().getChildMeshes()) {
             const childAggregate = new PhysicsAggregate(mesh, PhysicsShapeType.MESH, {
@@ -120,8 +95,6 @@ export class SpaceStation implements OrbitalObject, Cullable, Dockable {
 
             this.childLocalPositions.push(localPosition);
         }*/
-
-        this.rootAggregate.body.disablePreStep = false;
 
         this.root.rotate(Axis.X, this.model.physicalProperties.axialTilt);
     }
@@ -250,6 +223,7 @@ export class SpaceStation implements OrbitalObject, Cullable, Dockable {
         }
 
         const dockingBay = new DockingBay(this.scene);
+
         this.dockingBays.push(dockingBay);
         this.placeNode(dockingBay.getTransform(), lastNode);
         dockingBay.getTransform().parent = this.root;
@@ -298,7 +272,6 @@ export class SpaceStation implements OrbitalObject, Cullable, Dockable {
         this.cylinderHabitats.forEach((cylinderHabitat) => cylinderHabitat.dispose());
         this.dockingBays.forEach((dockingBay) => dockingBay.dispose());
 
-        this.rootAggregate.dispose();
         this.childAggregates.forEach((childAggregate) => childAggregate.dispose());
     }
 }
