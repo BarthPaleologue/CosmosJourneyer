@@ -538,9 +538,9 @@ export class StarSystemView implements View {
         if (this.characterControls === null) throw new Error("Character controls is null");
 
         const shipPosition = this.spaceshipControls.getTransform().getAbsolutePosition();
-        const nearestBody = starSystem.getNearestOrbitalObject();
-        const distance = nearestBody.getTransform().getAbsolutePosition().subtract(shipPosition).length();
-        const radius = nearestBody.getBoundingRadius();
+        const nearestOrbitalObject = starSystem.getNearestOrbitalObject(this.scene.getActiveControls().getTransform().getAbsolutePosition());
+        const distance = nearestOrbitalObject.getTransform().getAbsolutePosition().subtract(shipPosition).length();
+        const radius = nearestOrbitalObject.getBoundingRadius();
         this.spaceshipControls.spaceship.registerClosestObject(distance, radius);
 
         const warpDrive = this.spaceshipControls.spaceship.getWarpDrive();
@@ -550,10 +550,10 @@ export class StarSystemView implements View {
             this.helmetOverlay.displaySpeed(this.spaceshipControls.spaceship.getThrottle(), this.spaceshipControls.spaceship.getSpeed());
         }
 
-        this.characterControls.setClosestWalkableObject(nearestBody);
-        this.spaceshipControls.spaceship.setClosestWalkableObject(nearestBody);
-        
-        const nearestOrbitalObject = starSystem.getNearestOrbitalObject();
+
+        this.characterControls.setClosestWalkableObject(nearestOrbitalObject);
+        this.spaceshipControls.spaceship.setClosestWalkableObject(nearestOrbitalObject);
+
         const nearestCelestialBody = starSystem.getNearestCelestialBody(this.scene.getActiveControls().getTransform().getAbsolutePosition());
 
         if(nearestOrbitalObject instanceof SpaceStation) {
