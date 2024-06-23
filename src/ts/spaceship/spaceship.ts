@@ -256,7 +256,11 @@ export class Spaceship implements Transformable {
     private completeLanding() {
         console.log("Landing sequence complete");
         this.state = ShipState.LANDED;
+
         this.aggregate.body.setMotionType(PhysicsMotionType.STATIC);
+        this.aggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
+        this.aggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+
         if(this.targetLandingPad !== null) {
             const currentPosition = this.getTransform().getAbsolutePosition().clone();
             const currentRotation = this.getTransform().absoluteRotationQuaternion.clone();
@@ -281,7 +285,10 @@ export class Spaceship implements Transformable {
 
     public takeOff() {
         this.state = ShipState.FLYING;
-        this.aggregate.body.setMotionType(PhysicsMotionType.DYNAMIC);
+        this.aggregate.body.setMotionType(PhysicsMotionType.STATIC);
+        this.aggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS | CollisionMask.ENVIRONMENT;
+        this.aggregate.shape.filterMembershipMask = CollisionMask.DYNAMIC_OBJECTS;
+
     }
 
     private land(deltaTime: number) {
