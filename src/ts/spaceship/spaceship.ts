@@ -261,11 +261,11 @@ export class Spaceship implements Transformable {
         this.aggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
         this.aggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
 
-        if(this.targetLandingPad !== null) {
+        if (this.targetLandingPad !== null) {
             const currentPosition = this.getTransform().getAbsolutePosition().clone();
             const currentRotation = this.getTransform().absoluteRotationQuaternion.clone();
             const padRotation = this.targetLandingPad.getTransform().absoluteRotationQuaternion.clone();
-            if(padRotation === null) {
+            if (padRotation === null) {
                 throw new Error("Landing pad's rotation quaternion is null!");
             }
             this.getTransform().parent = this.targetLandingPad.getTransform();
@@ -285,10 +285,15 @@ export class Spaceship implements Transformable {
 
     public takeOff() {
         this.state = ShipState.FLYING;
-        this.aggregate.body.setMotionType(PhysicsMotionType.STATIC);
+        this.aggregate.body.setMotionType(PhysicsMotionType.DYNAMIC);
         this.aggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS | CollisionMask.ENVIRONMENT;
         this.aggregate.shape.filterMembershipMask = CollisionMask.DYNAMIC_OBJECTS;
 
+        const currentPosition = this.getTransform().getAbsolutePosition().clone();
+        const currentRotation = this.getTransform().absoluteRotationQuaternion.clone();
+        this.getTransform().parent = null;
+        this.getTransform().setAbsolutePosition(currentPosition);
+        this.getTransform().rotationQuaternion = currentRotation;
     }
 
     private land(deltaTime: number) {
