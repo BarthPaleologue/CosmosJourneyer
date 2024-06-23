@@ -43,6 +43,7 @@ import { AudioMasks } from "../audio/audioMasks";
 import { Objects } from "../assets/objects";
 import { Sounds } from "../assets/sounds";
 import { LandingPad } from "../assets/procedural/landingPad/landingPad";
+import { createNotification } from "../utils/notification";
 
 const enum ShipState {
     FLYING,
@@ -302,7 +303,7 @@ export class Spaceship implements Transformable {
         }
     }
 
-    private landOnPad(landingPad: LandingPad, deltaTime: number) {
+    private landOnPad(landingPad: LandingPad) {
         this.setMainEngineThrottle(0);
 
         const shipUp = this.getTransform().up;
@@ -326,7 +327,7 @@ export class Spaceship implements Transformable {
         //this.aggregate.body.applyForce(directionToTarget.scale(forceMag), currentPosition);
         this.aggregate.body.setLinearVelocity(directionToTarget.scale(Math.min(Math.max(1, distance), 20)));
 
-        if (distance < 0.01) {
+        if (distance < 3.0) {
             this.completeLanding();
             return;
         }
@@ -337,21 +338,17 @@ export class Spaceship implements Transformable {
         this.aggregate.body.applyAngularImpulse(upRotationAxis.scale(upRotationAngle * 0.5));
 
         const shipForward = getForwardDirection(this.getTransform());
-        const padForward = getForwardDirection(landingPad.getTransform());
+        const padBackward = getForwardDirection(landingPad.getTransform()).negateInPlace();
 
-        const forwardRotationAxis = Vector3.Cross(shipForward, padForward);
-        const forwardRotationAngle = Math.acos(Vector3.Dot(shipForward, padForward));
+        const forwardRotationAxis = Vector3.Cross(shipForward, padBackward);
+        const forwardRotationAngle = Math.acos(Vector3.Dot(shipForward, padBackward));
 
         this.aggregate.body.applyAngularImpulse(forwardRotationAxis.scale(forwardRotationAngle * 0.5));
 
         // dampen rotation that is not along any of the rotation axis
         const angularVelocity = this.aggregate.body.getAngularVelocity();
-        const noiseAngularVelocity = angularVelocity.subtract(
-            upRotationAxis.scale(Vector3.Dot(angularVelocity, upRotationAxis))
-        );
-        noiseAngularVelocity.subtractInPlace(
-            forwardRotationAxis.scale(Vector3.Dot(noiseAngularVelocity, forwardRotationAxis))
-        );
+        const noiseAngularVelocity = angularVelocity.subtract(upRotationAxis.scale(Vector3.Dot(angularVelocity, upRotationAxis)));
+        noiseAngularVelocity.subtractInPlace(forwardRotationAxis.scale(Vector3.Dot(noiseAngularVelocity, forwardRotationAxis)));
         this.aggregate.body.applyAngularImpulse(noiseAngularVelocity.scale(-0.1));
     }
 
@@ -399,9 +396,12 @@ export class Spaceship implements Transformable {
 
             if (this.targetLandingPad !== null) {
                 const distanceToPad = Vector3.Distance(this.getTransform().getAbsolutePosition(), this.targetLandingPad.getTransform().getAbsolutePosition());
-                if(distanceToPad < 600) {
+                if (distanceToPad < 600) {
+                    if (this.state !== ShipState.LANDING) {
+                        createNotification("Automatic landing procedure engaged", 10000);
+                    }
                     this.state = ShipState.LANDING;
-                    this.landOnPad(this.targetLandingPad, deltaTime);
+                    this.landOnPad(this.targetLandingPad);
                 }
             }
         } else {
