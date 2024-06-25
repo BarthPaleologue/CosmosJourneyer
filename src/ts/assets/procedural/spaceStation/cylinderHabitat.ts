@@ -21,9 +21,10 @@ import { Axis, PhysicsAggregate, PhysicsShapeType } from "@babylonjs/core";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Transformable } from "../../../architecture/transformable";
 import { computeRingRotationPeriod } from "../../../utils/ringRotation";
-import { CollisionMask, Settings } from "../../../settings";
+import { Settings } from "../../../settings";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { CylinderHabitatMaterial } from "./cylinderHabitatMaterial";
+import { createEnvironmentAggregate } from "../../../utils/physics";
 
 export class CylinderHabitat implements Transformable {
     private readonly root: TransformNode;
@@ -59,10 +60,7 @@ export class CylinderHabitat implements Transformable {
 
         this.cylinder.parent = this.getTransform();
 
-        this.cylinderAggregate = new PhysicsAggregate(this.cylinder, PhysicsShapeType.MESH, { mass: 0 });
-        this.cylinderAggregate.body.disablePreStep = false;
-        this.cylinderAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
-        this.cylinderAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
+        this.cylinderAggregate = createEnvironmentAggregate(this.cylinder, PhysicsShapeType.MESH);
     }
 
     update(stellarObjects: Transformable[], deltaSeconds: number) {

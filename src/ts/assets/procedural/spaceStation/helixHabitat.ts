@@ -23,11 +23,12 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Transformable } from "../../../architecture/transformable";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { computeRingRotationPeriod } from "../../../utils/ringRotation";
-import { CollisionMask, Settings } from "../../../settings";
+import { Settings } from "../../../settings";
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { createTube } from "../../../utils/tubeBuilder";
 import { HelixHabitatMaterial } from "./helixHabitatMaterial";
+import { createEnvironmentAggregate } from "../../../utils/physics";
 
 export class HelixHabitat implements Transformable {
     private readonly root: TransformNode;
@@ -82,10 +83,7 @@ export class HelixHabitat implements Transformable {
         this.attachment.rotate(Axis.Y, Math.PI / attachmentNbSides, Space.WORLD);
         this.attachment.parent = this.getTransform();
         
-        this.attachmentAggregate = new PhysicsAggregate(this.attachment, PhysicsShapeType.MESH, { mass: 0 });
-        this.attachmentAggregate.body.disablePreStep = false;
-        this.attachmentAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
-        this.attachmentAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
+        this.attachmentAggregate = createEnvironmentAggregate(this.attachment, PhysicsShapeType.MESH);
 
         const path = [];
         const tessellation = 360;
@@ -119,15 +117,8 @@ export class HelixHabitat implements Transformable {
         this.helix1.material = this.helixMaterial;
         this.helix2.material = this.helixMaterial;
 
-        this.helix1Aggregate = new PhysicsAggregate(this.helix1, PhysicsShapeType.MESH, { mass: 0 });
-        this.helix1Aggregate.body.disablePreStep = false;
-        this.helix1Aggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
-        this.helix1Aggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
-
-        this.helix2Aggregate = new PhysicsAggregate(this.helix2, PhysicsShapeType.MESH, { mass: 0 });
-        this.helix2Aggregate.body.disablePreStep = false;
-        this.helix2Aggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
-        this.helix2Aggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
+        this.helix1Aggregate = createEnvironmentAggregate(this.helix1, PhysicsShapeType.MESH);
+        this.helix2Aggregate = createEnvironmentAggregate(this.helix2, PhysicsShapeType.MESH);
 
         const nbArms = (attachmentNbSides * nbSpires) / 2;
         for (let i = 0; i <= nbArms; i++) {
@@ -155,11 +146,7 @@ export class HelixHabitat implements Transformable {
 
             this.arms.push(arm);
 
-            const armAggregate = new PhysicsAggregate(arm, PhysicsShapeType.MESH, { mass: 0 });
-            armAggregate.body.disablePreStep = false;
-            armAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
-            armAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
-
+            const armAggregate = createEnvironmentAggregate(arm, PhysicsShapeType.MESH);
             this.armAggregates.push(armAggregate);
         }
     }

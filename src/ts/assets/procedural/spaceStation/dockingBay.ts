@@ -25,11 +25,12 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { createTube } from "../../../utils/tubeBuilder";
 import { Transformable } from "../../../architecture/transformable";
 import { computeRingRotationPeriod } from "../../../utils/ringRotation";
-import { CollisionMask, Settings } from "../../../settings";
+import { Settings } from "../../../settings";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Space } from "@babylonjs/core/Maths/math.axis";
 import { LandingPad } from "../landingPad/landingPad";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { createEnvironmentAggregate } from "../../../utils/physics";
 
 export class DockingBay {
     private readonly root: TransformNode;
@@ -85,10 +86,7 @@ export class DockingBay {
 
         this.ring.parent = this.getTransform();
 
-        this.ringAggregate = new PhysicsAggregate(this.ring, PhysicsShapeType.MESH, { mass: 0 });
-        this.ringAggregate.body.disablePreStep = false;
-        this.ringAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
-        this.ringAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
+        this.ringAggregate = createEnvironmentAggregate(this.ring, PhysicsShapeType.MESH);
 
         const yExtent = this.ring.getBoundingInfo().boundingBox.extendSize.y;
 
@@ -118,11 +116,7 @@ export class DockingBay {
 
             this.arms.push(arm);
 
-            const armAggregate = new PhysicsAggregate(arm, PhysicsShapeType.BOX, { mass: 0 });
-            armAggregate.body.disablePreStep = false;
-            armAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
-            armAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
-
+            const armAggregate = createEnvironmentAggregate(arm, PhysicsShapeType.BOX);
             this.armAggregates.push(armAggregate);
         }
 

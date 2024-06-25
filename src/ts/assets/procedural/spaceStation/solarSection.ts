@@ -24,7 +24,7 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Space } from "@babylonjs/core/Maths/math.axis";
 import { SolarPanelMaterial } from "../solarPanel/solarPanelMaterial";
 import { MetalSectionMaterial } from "./metalSectionMaterial";
-import { CollisionMask } from "../../../settings";
+import { createEnvironmentAggregate } from "../../../utils/physics";
 
 export class SolarSection implements Transformable {
     private readonly attachment: Mesh;
@@ -79,10 +79,7 @@ export class SolarSection implements Transformable {
         this.metalSectionMaterial = new MetalSectionMaterial(scene);
         this.attachment.material = this.metalSectionMaterial;
 
-        this.attachmentAggregate = new PhysicsAggregate(this.attachment, PhysicsShapeType.MESH, { mass: 0 });
-        this.attachmentAggregate.body.disablePreStep = false;
-        this.attachmentAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
-        this.attachmentAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
+        this.attachmentAggregate = createEnvironmentAggregate(this.attachment, PhysicsShapeType.MESH);
 
         this.solarPanelMaterial = new SolarPanelMaterial(scene);
 
@@ -236,24 +233,14 @@ export class SolarSection implements Transformable {
     }
 
     private createSolarPanelAggregate(panel: Mesh): PhysicsAggregate {
-        const panelAggregate = new PhysicsAggregate(panel, PhysicsShapeType.BOX, { mass: 0 });
-        panelAggregate.body.disablePreStep = false;
-        panelAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
-        panelAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
-
+        const panelAggregate = createEnvironmentAggregate(panel, PhysicsShapeType.BOX);
         this.solarPanelAggregates.push(panelAggregate);
-
         return panelAggregate;
     }
 
     private createArmAggregate(arm: Mesh): PhysicsAggregate {
-        const armAggregate = new PhysicsAggregate(arm, PhysicsShapeType.MESH, { mass: 0 });
-        armAggregate.body.disablePreStep = false;
-        armAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
-        armAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
-
+        const armAggregate = createEnvironmentAggregate(arm, PhysicsShapeType.MESH);
         this.armAggregates.push(armAggregate);
-
         return armAggregate;
     }
 
