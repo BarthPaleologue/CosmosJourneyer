@@ -1,17 +1,23 @@
 import { wheelOfFortune } from "../../../utils/wheelOfFortune";
 import { Transformable } from "../../../architecture/transformable";
-import { Mesh } from "@babylonjs/core/Meshes";
+import { AbstractMesh, Mesh } from "@babylonjs/core/Meshes";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { Axis, Scene } from "@babylonjs/core";
+import { Axis, PhysicsAggregate, PhysicsShapeType, Scene } from "@babylonjs/core";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Space } from "@babylonjs/core/Maths/math.axis";
 import { SolarPanelMaterial } from "../solarPanel/solarPanelMaterial";
 import { MetalSectionMaterial } from "./metalSectionMaterial";
+import { CollisionMask } from "../../../settings";
 
 export class SolarSection implements Transformable {
     private readonly attachment: Mesh;
+    private readonly attachmentAggregate: PhysicsAggregate;
 
     private readonly arms: Mesh[] = [];
+    private readonly armAggregates: PhysicsAggregate[] = [];
+
+    private readonly solarPanels: AbstractMesh[] = [];
+    private readonly solarPanelAggregates: PhysicsAggregate[] = [];
 
     private readonly metalSectionMaterial: MetalSectionMaterial;
     private readonly solarPanelMaterial: SolarPanelMaterial;
@@ -36,7 +42,7 @@ export class SolarSection implements Transformable {
             const squareSideSize = Math.sqrt(sideSurface);
 
             attachmentLength = squareSideSize * 1.618;
-        } else if(nbArms === 2) {
+        } else if (nbArms === 2) {
             attachmentLength = Math.sqrt(requiredSurface) * 1.2;
         }
 
@@ -55,6 +61,11 @@ export class SolarSection implements Transformable {
 
         this.metalSectionMaterial = new MetalSectionMaterial(scene);
         this.attachment.material = this.metalSectionMaterial;
+
+        this.attachmentAggregate = new PhysicsAggregate(this.attachment, PhysicsShapeType.MESH, { mass: 0 });
+        this.attachmentAggregate.body.disablePreStep = false;
+        this.attachmentAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+        this.attachmentAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
 
         this.solarPanelMaterial = new SolarPanelMaterial(scene);
 
@@ -76,9 +87,11 @@ export class SolarSection implements Transformable {
             arm1.rotate(Axis.X, Math.PI / 2);
             arm1.translate(Axis.Y, (armLength + attachmentThickness - hexagonOffset) / 2);
 
+            this.createArmAggregate(arm1);
+
             this.generateSpikePattern(arm1, armLength, attachmentThickness / 2, requiredSurface / 2);
 
-            const arm2 = MeshBuilder.CreateCylinder("Arm1", {
+            const arm2 = MeshBuilder.CreateCylinder("Arm2", {
                 height: armLength,
                 diameter: attachmentThickness / 2,
                 tessellation: 6
@@ -90,6 +103,8 @@ export class SolarSection implements Transformable {
             arm2.translate(Axis.Y, (armLength + attachmentThickness - hexagonOffset) / 2);
 
             this.generateSpikePattern(arm2, armLength, attachmentThickness / 2, requiredSurface / 2);
+
+            this.createArmAggregate(arm2);
 
         } else if (nbArms >= 3) {
             this.generateStarPattern(nbArms, requiredSurface);
@@ -121,6 +136,10 @@ export class SolarSection implements Transformable {
             panel1.translate(Axis.Z, (panelDimensionX + armThickness - hexagonOffset) / 2);
             panel1.rotate(Axis.Z, Math.PI / 2);
 
+            this.solarPanels.push(panel1);
+
+            this.createSolarPanelAggregate(panel1);
+
             const panel2 = MeshBuilder.CreateBox("SolarPanel2", {
                 height: 0.3,
                 width: panelDimensionY,
@@ -131,6 +150,10 @@ export class SolarSection implements Transformable {
             panel2.translate(Axis.Y, (panelDimensionY + gap) * (i - (nbPanelsPerSide - 1) / 2));
             panel2.translate(Axis.Z, -(panelDimensionX + armThickness - hexagonOffset) / 2);
             panel2.rotate(Axis.Z, Math.PI / 2);
+
+            this.solarPanels.push(panel2);
+
+            this.createSolarPanelAggregate(panel2);
         }
     }
 
@@ -162,6 +185,8 @@ export class SolarSection implements Transformable {
             arm.material = this.metalSectionMaterial;
             this.arms.push(arm);
 
+            this.createArmAggregate(arm);
+
             const armOffset = nbArms * 0.3 * surfacePerArm / armLength;
             const hexagonOffset = armThickness * (1 - Math.sqrt(3) / 2);
 
@@ -176,6 +201,8 @@ export class SolarSection implements Transformable {
             solarPanel1.translate(Axis.Z, 0.5 * (surfacePerArm / armLength + armThickness - hexagonOffset));
             solarPanel1.material = this.solarPanelMaterial;
 
+            this.createSolarPanelAggregate(solarPanel1);
+
             const solarPanel2 = MeshBuilder.CreateBox("SolarPanel2", {
                 height: 0.3,
                 width: armLength,
@@ -186,7 +213,31 @@ export class SolarSection implements Transformable {
             solarPanel2.translate(Axis.X, armOffset);
             solarPanel2.translate(Axis.Z, -0.5 * (surfacePerArm / armLength + armThickness - hexagonOffset));
             solarPanel2.material = this.solarPanelMaterial;
+
+            this.createSolarPanelAggregate(solarPanel2);
         }
+    }
+
+    private createSolarPanelAggregate(panel: Mesh): PhysicsAggregate {
+        const panelAggregate = new PhysicsAggregate(panel, PhysicsShapeType.BOX, { mass: 0 });
+        panelAggregate.body.disablePreStep = false;
+        panelAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+        panelAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
+
+        this.solarPanelAggregates.push(panelAggregate);
+
+        return panelAggregate;
+    }
+
+    private createArmAggregate(arm: Mesh): PhysicsAggregate {
+        const armAggregate = new PhysicsAggregate(arm, PhysicsShapeType.MESH, { mass: 0 });
+        armAggregate.body.disablePreStep = false;
+        armAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+        armAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
+
+        this.armAggregates.push(armAggregate);
+
+        return armAggregate;
     }
 
     update(stellarObjects: Transformable[]) {
@@ -199,8 +250,15 @@ export class SolarSection implements Transformable {
     }
 
     public dispose() {
-        this.getTransform().dispose();
+        this.attachment.dispose();
+        this.attachmentAggregate.dispose();
+
         this.arms.forEach(arm => arm.dispose());
+        this.armAggregates.forEach(armAggregate => armAggregate.dispose());
+
+        this.solarPanels.forEach(solarPanel => solarPanel.dispose());
+        this.solarPanelAggregates.forEach(solarPanelAggregate => solarPanelAggregate.dispose());
+
         this.solarPanelMaterial.dispose();
         this.metalSectionMaterial.dispose();
     }
