@@ -17,13 +17,13 @@
 
 import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { Axis } from "@babylonjs/core";
+import { Axis, PhysicsAggregate, PhysicsShapeType } from "@babylonjs/core";
 import { Space } from "@babylonjs/core/Maths/math.axis";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Transformable } from "../../../architecture/transformable";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { computeRingRotationPeriod } from "../../../utils/ringRotation";
-import { Settings } from "../../../settings";
+import { CollisionMask, Settings } from "../../../settings";
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { createTube } from "../../../utils/tubeBuilder";
@@ -35,14 +35,19 @@ export class HelixHabitat implements Transformable {
     private readonly radius: number;
 
     private readonly attachment: Mesh;
+    private readonly attachmentAggregate: PhysicsAggregate;
 
     private readonly helix1: Mesh;
     private readonly helix2: Mesh;
+
+    private readonly helix1Aggregate: PhysicsAggregate;
+    private readonly helix2Aggregate: PhysicsAggregate;
 
     private readonly helixMaterial: HelixHabitatMaterial;
     private readonly metalSectionMaterial: MetalSectionMaterial;
 
     private readonly arms: Mesh[] = [];
+    private readonly armAggregates: PhysicsAggregate[] = [];
 
     constructor(scene: Scene) {
         this.root = new TransformNode("HelixHabitatRoot", scene);
@@ -76,6 +81,11 @@ export class HelixHabitat implements Transformable {
         this.attachment.material = this.metalSectionMaterial;
         this.attachment.rotate(Axis.Y, Math.PI / attachmentNbSides, Space.WORLD);
         this.attachment.parent = this.getTransform();
+        
+        this.attachmentAggregate = new PhysicsAggregate(this.attachment, PhysicsShapeType.MESH, { mass: 0 });
+        this.attachmentAggregate.body.disablePreStep = false;
+        this.attachmentAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+        this.attachmentAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
 
         const path = [];
         const tessellation = 360;
@@ -109,6 +119,16 @@ export class HelixHabitat implements Transformable {
         this.helix1.material = this.helixMaterial;
         this.helix2.material = this.helixMaterial;
 
+        this.helix1Aggregate = new PhysicsAggregate(this.helix1, PhysicsShapeType.MESH, { mass: 0 });
+        this.helix1Aggregate.body.disablePreStep = false;
+        this.helix1Aggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+        this.helix1Aggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
+
+        this.helix2Aggregate = new PhysicsAggregate(this.helix2, PhysicsShapeType.MESH, { mass: 0 });
+        this.helix2Aggregate.body.disablePreStep = false;
+        this.helix2Aggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+        this.helix2Aggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
+
         const nbArms = (attachmentNbSides * nbSpires) / 2;
         for (let i = 0; i <= nbArms; i++) {
             const arm = MeshBuilder.CreateCylinder(
@@ -134,6 +154,13 @@ export class HelixHabitat implements Transformable {
             arm.parent = this.getTransform();
 
             this.arms.push(arm);
+
+            const armAggregate = new PhysicsAggregate(arm, PhysicsShapeType.MESH, { mass: 0 });
+            armAggregate.body.disablePreStep = false;
+            armAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+            armAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
+
+            this.armAggregates.push(armAggregate);
         }
     }
 
@@ -149,11 +176,20 @@ export class HelixHabitat implements Transformable {
 
     dispose() {
         this.root.dispose();
+
         this.attachment.dispose();
+        this.attachmentAggregate.dispose();
+
         this.helixMaterial.dispose();
         this.metalSectionMaterial.dispose();
+        
         this.helix1.dispose();
         this.helix2.dispose();
+        
+        this.helix1Aggregate.dispose();
+        this.helix2Aggregate.dispose();
+
         this.arms.forEach((arm) => arm.dispose());
+        this.armAggregates.forEach(armAggregate => armAggregate.dispose());
     }
 }
