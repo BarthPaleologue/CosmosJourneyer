@@ -7,25 +7,36 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Objects } from "../../objects";
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { AbstractMesh, PhysicsAggregate, PhysicsShapeType } from "@babylonjs/core";
+import { CollisionMask } from "../../../settings";
 
 export class UtilitySection implements Transformable {
-    private readonly node: Mesh;
+    private readonly attachment: Mesh;
+
+    private readonly attachmentAggregate: PhysicsAggregate;
 
     private readonly metalSectionMaterial: MetalSectionMaterial;
+
+    private readonly tanks: AbstractMesh[] = [];
+    private readonly tankAggregates: PhysicsAggregate[] = [];
 
     constructor(scene: Scene) {
         this.metalSectionMaterial = new MetalSectionMaterial(scene);
 
-        this.node = MeshBuilder.CreateCylinder("UtilitySectionRoot", {
+        this.attachment = MeshBuilder.CreateCylinder("UtilitySectionRoot", {
             height: 700,
             diameter: 100,
             tessellation: 6
         }, scene);
-        this.node.convertToFlatShadedMesh();
-        this.node.material = this.metalSectionMaterial;
+        this.attachment.convertToFlatShadedMesh();
+        this.attachment.material = this.metalSectionMaterial;
 
+        this.attachmentAggregate = new PhysicsAggregate(this.attachment, PhysicsShapeType.MESH, { mass: 0 });
+        this.attachmentAggregate.body.disablePreStep = false;
+        this.attachmentAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+        this.attachmentAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
 
-        const boundingVectors = this.node.getHierarchyBoundingVectors();
+        const boundingVectors = this.attachment.getHierarchyBoundingVectors();
         const boundingExtendSize = boundingVectors.max.subtract(boundingVectors.min).scale(0.5);
 
         if(Math.random() < 0.3) {
@@ -42,6 +53,15 @@ export class UtilitySection implements Transformable {
 
                     tank.rotateAround(Vector3.Zero(), Axis.Y, Math.PI / 6 + (Math.PI / 3) * sideIndex);
                     tank.translate(Axis.Y, ring * 40);
+
+                    this.tanks.push(tank);
+
+                    const tankAggregate = new PhysicsAggregate(tank, PhysicsShapeType.SPHERE, { mass: 0 });
+                    tankAggregate.body.disablePreStep = false;
+                    tankAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+                    tankAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
+
+                    this.tankAggregates.push(tankAggregate);
                 }
             }
         }
@@ -52,11 +72,14 @@ export class UtilitySection implements Transformable {
     }
 
     getTransform(): TransformNode {
-        return this.node;
+        return this.attachment;
     }
 
     dispose() {
-        this.node.dispose();
+        this.attachment.dispose();
+        this.attachmentAggregate.dispose();
         this.metalSectionMaterial.dispose();
+        this.tanks.forEach(tank => tank.dispose());
+        this.tankAggregates.forEach(tankAggregate => tankAggregate.dispose());
     }
 }
