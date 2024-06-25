@@ -81,20 +81,12 @@ export class SpaceStation implements OrbitalObject, Cullable, Dockable {
 
         this.generate();
 
-        /*const inverseWorldMatrix = this.getTransform().getWorldMatrix().clone().invert();
-        for (const mesh of this.getTransform().getChildMeshes()) {
-            const childAggregate = new PhysicsAggregate(mesh, PhysicsShapeType.MESH, {
-                mass: 0,
-                restitution: 0.2
-            }, scene);
-            childAggregate.body.disablePreStep = false;
-            this.childAggregates.push(childAggregate);
+        // center the space station on its center of mass
+        const boundingVectors = this.getTransform().getHierarchyBoundingVectors();
+        const centerWorld = boundingVectors.max.add(boundingVectors.min).scale(0.5);
+        const deltaPosition = this.getTransform().getAbsolutePosition().subtract(centerWorld);
 
-            const worldPosition = mesh.getAbsolutePosition();
-            const localPosition = Vector3.TransformCoordinates(worldPosition, inverseWorldMatrix);
-
-            this.childLocalPositions.push(localPosition);
-        }*/
+        this.getTransform().getChildTransformNodes(true).forEach(transform => transform.position.addInPlace(deltaPosition));
 
         this.root.rotate(Axis.X, this.model.physicalProperties.axialTilt);
     }
