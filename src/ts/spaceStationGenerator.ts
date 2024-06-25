@@ -23,7 +23,7 @@ import "@babylonjs/core/Loading/loadingScreen";
 import "@babylonjs/core/Misc/screenshotTools";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import "@babylonjs/core/Meshes/thinInstanceMesh";
-import { Scene } from "@babylonjs/core";
+import { PhysicsViewer, Scene } from "@babylonjs/core";
 import { DefaultControls } from "./defaultControls/defaultControls";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
@@ -35,6 +35,7 @@ import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { Star } from "./stellarObjects/star/star";
 import { Settings } from "./settings";
 import { SpaceStationModel } from "./spacestation/spacestationModel";
+import { SpaceStationUI } from "./ui/spaceStationUI";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -99,6 +100,11 @@ scene.onBeforePhysicsObservable.add(() => {
 
     //spaceStation.getTransform().position.y = Math.sin(elapsedSeconds / 5) * 10000;
 });
+
+const viewer = new PhysicsViewer(scene);
+scene.meshes.forEach(mesh => {if(mesh.physicsBody) viewer.showBody(mesh.physicsBody)});
+
+const spaceStationUI = new SpaceStationUI();
 
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
