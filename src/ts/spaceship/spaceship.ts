@@ -468,5 +468,11 @@ export class Spaceship implements Transformable {
         this.hyperSpaceTunnel.dispose();
         this.aggregate.dispose();
         this.instanceRoot.dispose();
+
+        this.onWarpDriveEnabled.clear();
+        this.onWarpDriveDisabled.clear();
+    
+        this.onLandingEngaged.clear();
+        this.onLandingObservable.clear();
     }
 }
