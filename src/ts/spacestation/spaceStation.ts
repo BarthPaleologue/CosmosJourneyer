@@ -115,7 +115,10 @@ export class SpaceStation implements OrbitalObject, Cullable, Dockable {
     }
 
     public getBoundingRadius(): number {
-        return 2e3;
+        const boundingVectors = this.getTransform().getHierarchyBoundingVectors();
+        const extendSize = boundingVectors.max.subtract(boundingVectors.min).scale(0.5);
+
+        return Math.max(extendSize.x, extendSize.y, extendSize.z);
     }
 
     getTypeName(): string {
