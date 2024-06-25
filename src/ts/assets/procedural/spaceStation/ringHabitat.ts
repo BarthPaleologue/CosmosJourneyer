@@ -1,12 +1,12 @@
 import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { Axis } from "@babylonjs/core";
+import { Axis, PhysicsAggregate, PhysicsShapeType } from "@babylonjs/core";
 import { Space } from "@babylonjs/core/Maths/math.axis";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { RingHabitatMaterial } from "./ringHabitatMaterial";
 import { Transformable } from "../../../architecture/transformable";
 import { computeRingRotationPeriod } from "../../../utils/ringRotation";
-import { Settings } from "../../../settings";
+import { CollisionMask, Settings } from "../../../settings";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -21,10 +21,13 @@ export class RingHabitat implements Transformable {
     private readonly metalSectionMaterial: MetalSectionMaterial;
 
     private readonly ring: Mesh;
+    private readonly ringAggregate: PhysicsAggregate;
 
     private readonly attachment: Mesh;
+    private readonly attachmentAggregate: PhysicsAggregate;
 
     private readonly arms: Mesh[] = [];
+    private readonly armAggregates: PhysicsAggregate[] = [];
 
     constructor(scene: Scene) {
         this.root = new TransformNode("RingHabitatRoot", scene);
@@ -53,6 +56,11 @@ export class RingHabitat implements Transformable {
         this.attachment.material = this.metalSectionMaterial;
         this.attachment.rotate(Axis.Y, Math.PI / attachmentNbSides, Space.WORLD);
         this.attachment.parent = this.getTransform();
+        
+        this.attachmentAggregate = new PhysicsAggregate(this.attachment, PhysicsShapeType.MESH, { mass: 0 });
+        this.attachmentAggregate.body.disablePreStep = false;
+        this.attachmentAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+        this.attachmentAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
 
         const circumference = 2 * Math.PI * this.radius;
 
@@ -77,12 +85,16 @@ export class RingHabitat implements Transformable {
         this.ring.bakeCurrentTransformIntoVertices();
         this.ring.convertToFlatShadedMesh();
 
-
         this.ringMaterial = new RingHabitatMaterial(circumference, deltaRadius, heightFactor, scene);
 
         this.ring.material = this.ringMaterial;
 
         this.ring.parent = this.getTransform();
+
+        this.ringAggregate = new PhysicsAggregate(this.ring, PhysicsShapeType.MESH, { mass: 0 });
+        this.ringAggregate.body.disablePreStep = false;
+        this.ringAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+        this.ringAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
 
         const nbArms = attachmentNbSides / 2;
         for (let i = 0; i <= nbArms; i++) {
@@ -106,6 +118,14 @@ export class RingHabitat implements Transformable {
             arm.parent = this.getTransform();
 
             this.arms.push(arm);
+
+                
+            const armAggregate = new PhysicsAggregate(arm, PhysicsShapeType.MESH, { mass: 0 });
+            armAggregate.body.disablePreStep = false;
+            armAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+            armAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
+
+            this.armAggregates.push(armAggregate);
         }
     }
 
@@ -122,9 +142,12 @@ export class RingHabitat implements Transformable {
     dispose() {
         this.root.dispose();
         this.attachment.dispose();
+        this.attachmentAggregate.dispose();
         this.ring.dispose();
+        this.ringAggregate.dispose();
         this.ringMaterial.dispose();
         this.metalSectionMaterial.dispose();
         this.arms.forEach((arm) => arm.dispose());
+        this.armAggregates.forEach((armAggregate) => armAggregate.dispose());
     }
 }
