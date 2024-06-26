@@ -71,8 +71,8 @@ const torus = MeshBuilder.CreateTorus("torus", { diameter: 100, thickness: 10, t
 torus.visibility = 0.1;
 torus.parent = sphere;
 
-const resolution = 10;
-const patchSize = 15;
+const resolution = 4;
+const patchSize = 5;
 
 function squareBuffer(position: Vector3): Float32Array {
     const matrixBuffer = new Float32Array(resolution * resolution * 16);
@@ -100,6 +100,9 @@ function squareBuffer(position: Vector3): Float32Array {
 
     return matrixBuffer;
 }
+
+const beltMinRadius = 45;
+const beltMaxRadius = 55;
 
 const patches = new Map<string, { patch: IPatch, cell: [number, number] }>();
 
@@ -130,15 +133,18 @@ scene.onBeforeRenderObservable.add(() => {
             const cellX = cameraCellX + x;
             const cellZ = cameraCellZ + z;
 
+            const radiusSquared = (cellX * patchSize) ** 2 + (cellZ * patchSize) ** 2;
+            if (radiusSquared < beltMinRadius * beltMinRadius || radiusSquared > beltMaxRadius * beltMaxRadius) continue;
+
             if (patches.has(`${cellX};${cellZ}`)) continue;
 
-            if ((cameraCellX - cellX) ** 2 + (cameraCellZ - cellZ) ** 2 < maxRadius * maxRadius) {
-                const matrixBuffer = squareBuffer(new Vector3(cellX * patchSize, 0, cellZ * patchSize));
-                const patch = new InstancePatch(sphere, matrixBuffer);
-                patch.createInstances(Objects.ROCK);
+            if ((cameraCellX - cellX) ** 2 + (cameraCellZ - cellZ) ** 2 >= maxRadius * maxRadius) continue;
 
-                patches.set(`${cellX};${cellZ}`, { patch: patch, cell: [cellX, cellZ] });
-            }
+            const matrixBuffer = squareBuffer(new Vector3(cellX * patchSize, 0, cellZ * patchSize));
+            const patch = new InstancePatch(sphere, matrixBuffer);
+            patch.createInstances(Objects.ROCK);
+
+            patches.set(`${cellX};${cellZ}`, { patch: patch, cell: [cellX, cellZ] });
         }
     }
 });
