@@ -18,7 +18,7 @@ export class AsteroidBelt {
 
     readonly windowMaxRadius = 4;
 
-    private readonly patches = new Map<string, { patch: IPatch, cell: [number, number] }>();
+    private readonly patches = new Map<string, { patch: IPatch, cellX: number, cellZ: number }>();
     
     constructor(parent: TransformNode, averageRadius: number, spread: number) {
         this.parent = parent;
@@ -41,7 +41,8 @@ export class AsteroidBelt {
     
         // remove patches too far away
         for (const [key, value] of this.patches) {
-            const [patchCellX, patchCellZ] = value.cell;
+            const patchCellX = value.cellX;
+            const patchCellZ = value.cellZ;
             const patch = value.patch;
     
             if ((cameraCellX - patchCellX) ** 2 + cameraCellY * cameraCellY + (cameraCellZ - patchCellZ) ** 2 >= this.windowMaxRadius * this.windowMaxRadius) {
@@ -69,7 +70,7 @@ export class AsteroidBelt {
                 const patch = new InstancePatch(this.parent, matrixBuffer);
                 patch.createInstances(Objects.ROCK);
     
-                this.patches.set(`${cellX};${cellZ}`, { patch: patch, cell: [cellX, cellZ] });
+                this.patches.set(`${cellX};${cellZ}`, { patch: patch, cellX: cellX, cellZ: cellZ });
             }
         }
     }
@@ -89,7 +90,7 @@ export class AsteroidBelt {
     
                 const matrix = Matrix.Compose(
                     new Vector3(scaling, scaling, scaling),
-                    Quaternion.RotationAxis(Vector3.Up(), Math.random() * 2 * Math.PI),
+                    Quaternion.RotationAxis(new Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize(), Math.random() * 2 * Math.PI),
                     new Vector3(positionX, positionY, positionZ)
                 );
                 matrix.copyToArray(matrixBuffer, 16 * index);
