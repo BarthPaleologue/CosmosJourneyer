@@ -1,7 +1,7 @@
 import { Matrix, Quaternion, TransformNode, Vector3 } from "@babylonjs/core";
 import { IPatch } from "../planets/telluricPlanet/terrain/instancePatch/iPatch";
-import { InstancePatch } from "../planets/telluricPlanet/terrain/instancePatch/instancePatch";
 import { Objects } from "../assets/objects";
+import { ThinInstancePatch } from "../planets/telluricPlanet/terrain/instancePatch/thinInstancePatch";
 
 export class AsteroidBelt {
     
@@ -67,7 +67,7 @@ export class AsteroidBelt {
                 if ((cameraCellX - cellX) ** 2 + cameraCellY * cameraCellY + (cameraCellZ - cellZ) ** 2 >= this.windowMaxRadius * this.windowMaxRadius) continue;
     
                 const matrixBuffer = AsteroidBelt.CreateAsteroidBuffer(new Vector3(cellX * this.patchSize, 0, cellZ * this.patchSize), this.resolution, this.patchSize);
-                const patch = new InstancePatch(this.parent, matrixBuffer);
+                const patch = new ThinInstancePatch(this.parent, matrixBuffer);
                 patch.createInstances(Objects.ROCK);
     
                 this.patches.set(`${cellX};${cellZ}`, { patch: patch, cellX: cellX, cellZ: cellZ });
