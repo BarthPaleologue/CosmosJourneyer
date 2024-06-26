@@ -17,7 +17,7 @@
 
 import "../styles/index.scss";
 
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import "@babylonjs/core/Materials/standardMaterial";
 import "@babylonjs/core/Loading/loadingScreen";
@@ -28,10 +28,13 @@ import "@babylonjs/core/Meshes/thinInstanceMesh";
 import { BlackHolePostProcess } from "./stellarObjects/blackHole/blackHolePostProcess";
 import { BlackHole } from "./stellarObjects/blackHole/blackHole";
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
-import { Axis, Scene } from "@babylonjs/core";
+import { Axis, DirectionalLight, HemisphericLight, MeshBuilder, Scene } from "@babylonjs/core";
 import { translate } from "./uberCore/transforms/basicTransform";
 import { Assets } from "./assets/assets";
 import { DefaultControls } from "./defaultControls/defaultControls";
+import { InstancePatch } from "./planets/telluricPlanet/terrain/instancePatch/instancePatch";
+import { Objects } from "./assets/objects";
+import { IPatch } from "./planets/telluricPlanet/terrain/instancePatch/iPatch";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -45,58 +48,99 @@ const scene = new Scene(engine);
 scene.useRightHandedSystem = true;
 
 const defaultControls = new DefaultControls(scene);
-defaultControls.speed = 4_000_000;
+
+defaultControls.getTransform().position.z = -200;
+defaultControls.getTransform().position.y = 20;
 
 const camera = defaultControls.getActiveCameras()[0];
-camera.maxZ = 100_000e3;
 camera.attachControl(canvas, true);
 
 scene.enableDepthRenderer(camera, false, true);
 
 await Assets.Init(scene);
 
-const starfieldPostProcess = new StarfieldPostProcess(scene, [], [], Quaternion.Identity());
-camera.attachPostProcess(starfieldPostProcess);
+const directionalLight = new DirectionalLight("sun", new Vector3(1, -1, 0), scene);
+directionalLight.intensity = 0.7;
 
-function createBlackHole(): TransformNode {
-    const blackHole = new BlackHole("hole", scene, 0, null);
-    blackHole.getTransform().setAbsolutePosition(new Vector3(0, 0, 15000e3));
+const hemi = new HemisphericLight("hemi", Vector3.Up(), scene);
+hemi.intensity = 0.4;
 
-    const blackHolePP = new BlackHolePostProcess(blackHole, scene, Quaternion.Identity());
-    camera.attachPostProcess(blackHolePP);
+const sphere = MeshBuilder.CreateSphere("box", { diameter: 20 }, scene);
 
-    scene.onBeforeRenderObservable.add(() => {
-        const deltaSeconds = engine.getDeltaTime() / 1000;
-        blackHolePP.update(deltaSeconds);
-    });
+const torus = MeshBuilder.CreateTorus("torus", { diameter: 100, thickness: 10, tessellation: 32 }, scene);
+torus.visibility = 0.1;
+torus.parent = sphere;
 
-    return blackHole.getTransform();
+const resolution = 10;
+const patchSize = 15;
+
+function squareBuffer(position: Vector3): Float32Array {
+    const matrixBuffer = new Float32Array(resolution * resolution * 16);
+    const cellSize = patchSize / resolution;
+    let index = 0;
+    for (let x = 0; x < resolution; x++) {
+        for (let z = 0; z < resolution; z++) {
+            const randomCellPositionX = Math.random() * cellSize;
+            const randomCellPositionZ = Math.random() * cellSize;
+            const positionX = position.x + x * cellSize - patchSize / 2 + randomCellPositionX;
+            const positionZ = position.z + z * cellSize - patchSize / 2 + randomCellPositionZ;
+            const positionY = (Math.random() - 0.5) * 3.0;
+            const scaling = 0.7 + Math.random() * 0.6;
+
+            const matrix = Matrix.Compose(
+                new Vector3(scaling, scaling, scaling),
+                Quaternion.RotationAxis(Vector3.Up(), Math.random() * 2 * Math.PI),
+                new Vector3(positionX, positionY, positionZ)
+            );
+            matrix.copyToArray(matrixBuffer, 16 * index);
+
+            index += 1;
+        }
+    }
+
+    return matrixBuffer;
 }
 
-const targetObject = createBlackHole();
-
-defaultControls.getTransform().rotateAround(targetObject.getAbsolutePosition(), Axis.X, 0.2);
-
-function applyFloatingOrigin() {
-    const playerPosition = defaultControls.getTransform().getAbsolutePosition().clone();
-
-    translate(defaultControls.getTransform(), playerPosition.negate());
-    translate(targetObject, playerPosition.negate());
-}
+const patches = new Map<string, { patch: IPatch, cell: [number, number] }>();
 
 scene.onBeforeRenderObservable.add(() => {
-    const deltaSeconds = engine.getDeltaTime() / 1000;
+    defaultControls.update(engine.getDeltaTime() / 1000);
 
-    defaultControls.update(deltaSeconds);
+    const maxRadius = 3;
 
-    defaultControls.getTransform().lookAt(targetObject.getAbsolutePosition());
+    const cameraCellX = Math.round(defaultControls.getTransform().position.x / patchSize);
+    const cameraCellZ = Math.round(defaultControls.getTransform().position.z / patchSize);
 
-    defaultControls.getTransform().rotateAround(targetObject.getAbsolutePosition(), Axis.X, 0.02 * deltaSeconds);
-    defaultControls.getTransform().computeWorldMatrix(true);
-    defaultControls.getTransform().rotateAround(targetObject.getAbsolutePosition(), Axis.Y, 0.1 * deltaSeconds);
-    defaultControls.getTransform().computeWorldMatrix(true);
+    // remove patches too far away
+    for (const [key, value] of patches) {
+        const [patchCellX, patchCellZ] = value.cell;
+        const patch = value.patch;
 
-    applyFloatingOrigin();
+        if ((cameraCellX - patchCellX) ** 2 + (cameraCellZ - patchCellZ) ** 2 >= maxRadius * maxRadius) {
+            patch.clearInstances();
+            patch.dispose();
+
+            patches.delete(key);
+        }
+    }
+
+    // create new patches
+    for (let x = -maxRadius; x <= maxRadius; x++) {
+        for (let z = -maxRadius; z <= maxRadius; z++) {
+            const cellX = cameraCellX + x;
+            const cellZ = cameraCellZ + z;
+
+            if (patches.has(`${cellX};${cellZ}`)) continue;
+
+            if ((cameraCellX - cellX) ** 2 + (cameraCellZ - cellZ) ** 2 < maxRadius * maxRadius) {
+                const matrixBuffer = squareBuffer(new Vector3(cellX * patchSize, 0, cellZ * patchSize));
+                const patch = new InstancePatch(sphere, matrixBuffer);
+                patch.createInstances(Objects.ROCK);
+
+                patches.set(`${cellX};${cellZ}`, { patch: patch, cell: [cellX, cellZ] });
+            }
+        }
+    }
 });
 
 scene.executeWhenReady(() => {
