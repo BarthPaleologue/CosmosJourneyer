@@ -24,6 +24,10 @@ import { IPatch } from "../planets/telluricPlanet/terrain/instancePatch/iPatch";
 import { Objects } from "../assets/objects";
 import { AsteroidPatch } from "./asteroidPatch";
 
+/**
+ * An asteroid belts is basically a collection of thin instance chunks that can be created and destroyed depending on where the player is.
+ * This allows to only render the asteroids close to the player, saving immense resources.
+ */
 export class AsteroidBelt {
 
     readonly parent: TransformNode;
@@ -37,7 +41,7 @@ export class AsteroidBelt {
     readonly resolution = 5;
     readonly patchSize = 12;
 
-    readonly windowMaxRadius = 4;
+    readonly neighborCellsRenderRadius = 4;
 
     readonly fadeSpeed = 1;
 
@@ -45,6 +49,13 @@ export class AsteroidBelt {
 
     readonly scene: Scene;
 
+    /**
+     * Creates a new asteroid belt around a given transform
+     * @param parent A parent transform node for the asteroids
+     * @param averageRadius The average distance to the parent of the asteroids
+     * @param spread The spread of the distance to the parent around the average distance
+     * @param scene The scene where the asteroid belt exists
+     */
     constructor(parent: TransformNode, averageRadius: number, spread: number, scene: Scene) {
         this.parent = parent;
 
@@ -57,6 +68,12 @@ export class AsteroidBelt {
         this.scene = scene;
     }
 
+    /**
+     * Updates the asteroid belt. The position of the camera is used to determine which chunks to load and unload.
+     * The delta seconds are used to fade in and out the chunks
+     * @param cameraWorldPosition The position of the camera in world space
+     * @param deltaSeconds The seconds elapsed since last frame
+     */
     public update(cameraWorldPosition: Vector3, deltaSeconds: number) {
         const planetInverseWorld = this.parent.getWorldMatrix().clone().invert();
 
@@ -73,7 +90,7 @@ export class AsteroidBelt {
             const patch = value.patch;
             const patchPhysicsAggregate = value.patchPhysicsAggregate;
 
-            if ((cameraCellX - patchCellX) ** 2 + cameraCellY * cameraCellY + (cameraCellZ - patchCellZ) ** 2 >= this.windowMaxRadius * this.windowMaxRadius) {
+            if ((cameraCellX - patchCellX) ** 2 + cameraCellY * cameraCellY + (cameraCellZ - patchCellZ) ** 2 >= this.neighborCellsRenderRadius * this.neighborCellsRenderRadius) {
                 patch.getBaseMesh().visibility = Math.max(0, patch.getBaseMesh().visibility - deltaSeconds * this.fadeSpeed);
                 if (patch.getBaseMesh().visibility === 0) {
                     patch.clearInstances();
@@ -89,8 +106,8 @@ export class AsteroidBelt {
         }
 
         // create new patches
-        for (let x = -this.windowMaxRadius; x <= this.windowMaxRadius; x++) {
-            for (let z = -this.windowMaxRadius; z <= this.windowMaxRadius; z++) {
+        for (let x = -this.neighborCellsRenderRadius; x <= this.neighborCellsRenderRadius; x++) {
+            for (let z = -this.neighborCellsRenderRadius; z <= this.neighborCellsRenderRadius; z++) {
                 const cellX = cameraCellX + x;
                 const cellZ = cameraCellZ + z;
 
@@ -99,7 +116,7 @@ export class AsteroidBelt {
 
                 if (this.patches.has(`${cellX};${cellZ}`)) continue;
 
-                if ((cameraCellX - cellX) ** 2 + cameraCellY * cameraCellY + (cameraCellZ - cellZ) ** 2 >= this.windowMaxRadius * this.windowMaxRadius) continue;
+                if ((cameraCellX - cellX) ** 2 + cameraCellY * cameraCellY + (cameraCellZ - cellZ) ** 2 >= this.neighborCellsRenderRadius * this.neighborCellsRenderRadius) continue;
 
                 const matrixBuffer = AsteroidBelt.CreateAsteroidBuffer(new Vector3(cellX * this.patchSize, 0, cellZ * this.patchSize), this.resolution, this.patchSize, this.minRadius, this.maxRadius);
                 const patch = new AsteroidPatch(matrixBuffer);
@@ -120,6 +137,15 @@ export class AsteroidBelt {
         }
     }
 
+    /**
+     * Creates a matrix buffer for an asteroid patch. The patch has a given square size, subdivided in cells by the resolution parameter. Each cell contains one instance. The min and max radius ensure the asteroid don't spread to far
+     * @param position The position of the patch in the local space of the parent transform of any belt
+     * @param resolution The subdivision of the chunk, each cell contains a single instance
+     * @param patchSize The overall planar size of the patch
+     * @param minRadius The minimum radius at which the belt starts
+     * @param maxRadius The maximum radius at which the belt ends
+     * @returns A new matrix 4x4 buffer
+     */
     static CreateAsteroidBuffer(position: Vector3, resolution: number, patchSize: number, minRadius: number, maxRadius: number): Float32Array {
         const matrixBuffer = new Float32Array(resolution * resolution * 16);
         const cellSize = patchSize / resolution;
