@@ -17,7 +17,7 @@
 
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { IDisposable } from "@babylonjs/core";
+import { IDisposable } from "@babylonjs/core/scene";
 
 export interface IPatch extends IDisposable {
     /**
