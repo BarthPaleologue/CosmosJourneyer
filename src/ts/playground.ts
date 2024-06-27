@@ -24,10 +24,11 @@ import "@babylonjs/core/Loading/loadingScreen";
 import "@babylonjs/core/Misc/screenshotTools";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import "@babylonjs/core/Meshes/thinInstanceMesh";
-import { DirectionalLight, HemisphericLight, MeshBuilder, Scene } from "@babylonjs/core";
+import { DirectionalLight, HavokPlugin, HemisphericLight, MeshBuilder, PhysicsAggregate, PhysicsShapeType, PhysicsViewer, Scene } from "@babylonjs/core";
 import { Assets } from "./assets/assets";
 import { DefaultControls } from "./defaultControls/defaultControls";
 import { AsteroidBelt } from "./utils/asteroidBelt";
+import HavokPhysics from "@babylonjs/havok";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -37,8 +38,13 @@ const engine = new Engine(canvas, true);
 engine.useReverseDepthBuffer = true;
 engine.displayLoadingUI();
 
+const havokInstance = await HavokPhysics();
+
 const scene = new Scene(engine);
 scene.useRightHandedSystem = true;
+
+const havokPlugin = new HavokPlugin(true, havokInstance);
+scene.enablePhysics(new Vector3(0, 0, 0), havokPlugin);
 
 const defaultControls = new DefaultControls(scene);
 
@@ -46,7 +52,7 @@ defaultControls.getTransform().position.z = -200;
 defaultControls.getTransform().position.y = 20;
 
 const camera = defaultControls.getActiveCameras()[0];
-camera.attachControl(canvas, true);
+camera.attachControl();
 
 scene.enableDepthRenderer(camera, false, true);
 
@@ -60,19 +66,28 @@ hemi.intensity = 0.4;
 
 const sphere = MeshBuilder.CreateSphere("box", { diameter: 20 }, scene);
 
+const sphereAggregate = new PhysicsAggregate(sphere, PhysicsShapeType.SPHERE, {mass:0}, scene);
+
 const beltRadius = 100;
 const beltSpread = 20;
 
-const belt = new AsteroidBelt(sphere, beltRadius, beltSpread);
+const belt = new AsteroidBelt(sphere, beltRadius, beltSpread, scene);
 
 const torus = MeshBuilder.CreateTorus("torus", { diameter: 2 * beltRadius, thickness: 2 * beltSpread, tessellation: 32 }, scene);
 torus.visibility = 0.1;
 torus.parent = sphere;
 
+
+const physicsViewer = new PhysicsViewer(scene);
+
 scene.onBeforeRenderObservable.add(() => {
     defaultControls.update(engine.getDeltaTime() / 1000);
 
     belt.update(defaultControls.getTransform().getAbsolutePosition());
+
+    /*scene.meshes.forEach((mesh) => {
+        if (mesh.physicsBody) physicsViewer.showBody(mesh.physicsBody);
+    });*/
 });
 
 scene.executeWhenReady(() => {
