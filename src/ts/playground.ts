@@ -24,10 +24,10 @@ import "@babylonjs/core/Loading/loadingScreen";
 import "@babylonjs/core/Misc/screenshotTools";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import "@babylonjs/core/Meshes/thinInstanceMesh";
-import { DirectionalLight, HavokPlugin, HemisphericLight, MeshBuilder, PhysicsAggregate, PhysicsShapeType, PhysicsViewer, Scene } from "@babylonjs/core";
+import { Axis, DirectionalLight, HavokPlugin, HemisphericLight, MeshBuilder, PhysicsAggregate, PhysicsShapeType, PhysicsViewer, Scene } from "@babylonjs/core";
 import { Assets } from "./assets/assets";
 import { DefaultControls } from "./defaultControls/defaultControls";
-import { AsteroidBelt } from "./utils/asteroidBelt";
+import { AsteroidBelt } from "./asteroidBelts/asteroidBelt";
 import HavokPhysics from "@babylonjs/havok";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
@@ -85,6 +85,7 @@ scene.onBeforeRenderObservable.add(() => {
 
     belt.update(defaultControls.getTransform().getAbsolutePosition());
 
+    sphere.rotate(Axis.Y, 0.0002);
     /*scene.meshes.forEach((mesh) => {
         if (mesh.physicsBody) physicsViewer.showBody(mesh.physicsBody);
     });*/

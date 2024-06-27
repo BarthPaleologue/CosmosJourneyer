@@ -17,8 +17,9 @@
 
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { IDisposable } from "@babylonjs/core";
 
-export interface IPatch {
+export interface IPatch extends IDisposable {
     /**
      * Clears all instances from the patch. They will be disposed and will not render anymore.
      * The copy of the given base mesh will also be disposed.
@@ -42,9 +43,4 @@ export interface IPatch {
     getBaseMesh(): Mesh;
 
     setEnabled(enabled: boolean): void;
-
-    /**
-     * Disposes the patch and all its instances and buffers.
-     */
-    dispose(): void;
 }

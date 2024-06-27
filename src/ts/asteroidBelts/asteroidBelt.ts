@@ -1,7 +1,7 @@
 import { Matrix, PhysicsAggregate, PhysicsBody, PhysicsMotionType, PhysicsShapeType, Quaternion, Scene, TransformNode, Vector3 } from "@babylonjs/core";
 import { IPatch } from "../planets/telluricPlanet/terrain/instancePatch/iPatch";
 import { Objects } from "../assets/objects";
-import { ThinInstancePatch } from "../planets/telluricPlanet/terrain/instancePatch/thinInstancePatch";
+import { AsteroidPatch } from "./asteroidPatch";
 
 export class AsteroidBelt {
 
@@ -73,10 +73,12 @@ export class AsteroidBelt {
                 if ((cameraCellX - cellX) ** 2 + cameraCellY * cameraCellY + (cameraCellZ - cellZ) ** 2 >= this.windowMaxRadius * this.windowMaxRadius) continue;
 
                 const matrixBuffer = AsteroidBelt.CreateAsteroidBuffer(new Vector3(cellX * this.patchSize, 0, cellZ * this.patchSize), this.resolution, this.patchSize, this.minRadius, this.maxRadius);
-                const patch = new ThinInstancePatch(this.parent, matrixBuffer);
+                const patch = new AsteroidPatch(matrixBuffer);
                 patch.createInstances(Objects.ROCK);
+                patch.getTransform().parent = this.parent;
 
                 const patchPhysicsAggregate = new PhysicsAggregate(patch.getBaseMesh(), PhysicsShapeType.MESH, { mass: 10 }, this.scene);
+                patchPhysicsAggregate.body.disablePreStep = false;
                 patchPhysicsAggregate.body.updateBodyInstances();
                 patchPhysicsAggregate.body.setAngularDamping(0);
                 for(let i = 0; i < patch.getNbInstances(); i++) {
