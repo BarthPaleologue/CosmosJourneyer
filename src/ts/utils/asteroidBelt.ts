@@ -72,7 +72,7 @@ export class AsteroidBelt {
 
                 if ((cameraCellX - cellX) ** 2 + cameraCellY * cameraCellY + (cameraCellZ - cellZ) ** 2 >= this.windowMaxRadius * this.windowMaxRadius) continue;
 
-                const matrixBuffer = AsteroidBelt.CreateAsteroidBuffer(new Vector3(cellX * this.patchSize, 0, cellZ * this.patchSize), this.resolution, this.patchSize);
+                const matrixBuffer = AsteroidBelt.CreateAsteroidBuffer(new Vector3(cellX * this.patchSize, 0, cellZ * this.patchSize), this.resolution, this.patchSize, this.minRadius, this.maxRadius);
                 const patch = new ThinInstancePatch(this.parent, matrixBuffer);
                 patch.createInstances(Objects.ROCK);
 
@@ -88,7 +88,7 @@ export class AsteroidBelt {
         }
     }
 
-    static CreateAsteroidBuffer(position: Vector3, resolution: number, patchSize: number): Float32Array {
+    static CreateAsteroidBuffer(position: Vector3, resolution: number, patchSize: number, minRadius: number, maxRadius: number): Float32Array {
         const matrixBuffer = new Float32Array(resolution * resolution * 16);
         const cellSize = patchSize / resolution;
         let index = 0;
@@ -98,6 +98,10 @@ export class AsteroidBelt {
                 const randomCellPositionZ = Math.random() * cellSize;
                 const positionX = position.x + x * cellSize - patchSize / 2 + randomCellPositionX;
                 const positionZ = position.z + z * cellSize - patchSize / 2 + randomCellPositionZ;
+
+                if(positionX * positionX + positionZ * positionZ < minRadius * minRadius) continue;
+                if(positionX * positionX + positionZ * positionZ > maxRadius * maxRadius) continue;
+
                 const positionY = position.y + (Math.random() - 0.5) * 3.0;
                 const scaling = 1; //0.7 + Math.random() * 0.6; see https://forum.babylonjs.com/t/havok-instances-break-when-changing-the-scaling-of-individual-instances/51632
 
@@ -112,6 +116,6 @@ export class AsteroidBelt {
             }
         }
 
-        return matrixBuffer;
+        return matrixBuffer.subarray(0, index * 16);
     }
 }
