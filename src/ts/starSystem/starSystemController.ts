@@ -434,6 +434,10 @@ export class StarSystemController {
 
         controller.update(deltaTime);
 
+        for (const object of this.celestialBodies) {
+            object.getAsteroidBelt()?.update(controller.getActiveCameras()[0].globalPosition, deltaTime);
+        }
+
         for (const body of this.telluricPlanets) {
             // Meshes with LOD are updated (surface quadtrees)
             body.updateLOD(controller.getTransform().getAbsolutePosition(), chunkForge);

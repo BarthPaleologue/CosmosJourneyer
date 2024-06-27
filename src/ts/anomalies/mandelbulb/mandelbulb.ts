@@ -30,6 +30,7 @@ import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProp
 import i18n from "../../i18n";
 import { Anomaly } from "../anomaly";
 import { AnomalyType } from "../anomalyType";
+import { AsteroidBelt } from "../../asteroidBelts/asteroidBelt";
 
 export class Mandelbulb implements Anomaly, Cullable {
     readonly name: string;
@@ -82,7 +83,11 @@ export class Mandelbulb implements Anomaly, Cullable {
     }
 
     getRingsUniforms(): RingsUniforms | null {
-        return this.model.ringsUniforms;
+        return null;
+    }
+
+    getAsteroidBelt(): AsteroidBelt | null {
+        return null;
     }
 
     getRadius(): number {

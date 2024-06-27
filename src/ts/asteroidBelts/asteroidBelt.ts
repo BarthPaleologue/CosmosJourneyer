@@ -55,7 +55,7 @@ export class AsteroidBelt {
         this.scene = scene;
     }
 
-    public update(cameraWorldPosition: Vector3) {
+    public update(cameraWorldPosition: Vector3, deltaSeconds: number) {
         const planetInverseWorld = this.parent.getWorldMatrix().clone().invert();
 
         const cameraLocalPosition = Vector3.TransformCoordinates(cameraWorldPosition, planetInverseWorld);

@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { AsteroidBelt } from "../asteroidBelts/asteroidBelt";
 import { RingsUniforms } from "../rings/ringsUniform";
 
 /**
@@ -25,4 +26,9 @@ export interface CanHaveRings {
      * Returns the uniforms used to render the rings, or null if the object has no rings
      */
     getRingsUniforms(): RingsUniforms | null;
+
+    /**
+     * Returns the asteroid belt of the object's ring, or null if the object has no rings
+     */
+    getAsteroidBelt(): AsteroidBelt | null;
 }
