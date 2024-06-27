@@ -38,8 +38,8 @@ export class AsteroidBelt {
     readonly minRadius: number;
     readonly maxRadius: number;
 
-    readonly resolution = 5;
-    readonly patchSize = 12;
+    readonly resolution = 20;
+    readonly patchSize = 120;
 
     readonly neighborCellsRenderRadius = 4;
 
@@ -160,7 +160,7 @@ export class AsteroidBelt {
                 if (positionX * positionX + positionZ * positionZ < minRadius * minRadius) continue;
                 if (positionX * positionX + positionZ * positionZ > maxRadius * maxRadius) continue;
 
-                const positionY = position.y + (Math.random() - 0.5) * 3.0;
+                const positionY = position.y + (Math.random() - 0.5) * 30.0;
                 const scaling = 1; //0.7 + Math.random() * 0.6; see https://forum.babylonjs.com/t/havok-instances-break-when-changing-the-scaling-of-individual-instances/51632
 
                 const matrix = Matrix.Compose(

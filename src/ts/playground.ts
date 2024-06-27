@@ -48,8 +48,6 @@ scene.enablePhysics(new Vector3(0, 0, 0), havokPlugin);
 
 const defaultControls = new DefaultControls(scene);
 
-defaultControls.getTransform().position.z = -200;
-defaultControls.getTransform().position.y = 20;
 
 const camera = defaultControls.getActiveCameras()[0];
 camera.attachControl();
@@ -64,12 +62,18 @@ directionalLight.intensity = 0.7;
 const hemi = new HemisphericLight("hemi", Vector3.Up(), scene);
 hemi.intensity = 0.4;
 
-const sphere = MeshBuilder.CreateSphere("box", { diameter: 20 }, scene);
+const scaler = 10;
+
+defaultControls.getTransform().position.z = -200 * scaler;
+defaultControls.getTransform().position.y = 20 * scaler;
+defaultControls.speed *= scaler;
+
+const sphere = MeshBuilder.CreateSphere("box", { diameter: 20 * scaler }, scene);
 
 const sphereAggregate = new PhysicsAggregate(sphere, PhysicsShapeType.SPHERE, {mass:0}, scene);
 
-const beltRadius = 100;
-const beltSpread = 20;
+const beltRadius = 100 * scaler;
+const beltSpread = 20 * scaler;
 
 const belt = new AsteroidBelt(sphere, beltRadius, beltSpread, scene);
 
