@@ -83,7 +83,7 @@ const physicsViewer = new PhysicsViewer(scene);
 scene.onBeforeRenderObservable.add(() => {
     defaultControls.update(engine.getDeltaTime() / 1000);
 
-    belt.update(defaultControls.getTransform().getAbsolutePosition());
+    belt.update(defaultControls.getTransform().getAbsolutePosition(), engine.getDeltaTime() / 1000);
 
     sphere.rotate(Axis.Y, 0.0002);
     /*scene.meshes.forEach((mesh) => {

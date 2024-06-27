@@ -39,6 +39,8 @@ export class AsteroidBelt {
 
     readonly windowMaxRadius = 4;
 
+    readonly fadeSpeed = 1;
+
     private readonly patches = new Map<string, { patch: IPatch, patchPhysicsAggregate: PhysicsAggregate, cellX: number, cellZ: number }>();
 
     readonly scene: Scene;
@@ -72,11 +74,17 @@ export class AsteroidBelt {
             const patchPhysicsAggregate = value.patchPhysicsAggregate;
 
             if ((cameraCellX - patchCellX) ** 2 + cameraCellY * cameraCellY + (cameraCellZ - patchCellZ) ** 2 >= this.windowMaxRadius * this.windowMaxRadius) {
-                patch.clearInstances();
-                patch.dispose();
-                patchPhysicsAggregate.dispose();
+                patch.getBaseMesh().visibility = Math.max(0, patch.getBaseMesh().visibility - deltaSeconds * this.fadeSpeed);
+                if (patch.getBaseMesh().visibility === 0) {
+                    patch.clearInstances();
+                    patch.dispose();
+                    patchPhysicsAggregate.dispose();
 
-                this.patches.delete(key);
+                    this.patches.delete(key);
+                }
+            } else {
+
+                patch.getBaseMesh().visibility = Math.min(1, patch.getBaseMesh().visibility + deltaSeconds * this.fadeSpeed);
             }
         }
 
@@ -97,12 +105,13 @@ export class AsteroidBelt {
                 const patch = new AsteroidPatch(matrixBuffer);
                 patch.createInstances(Objects.ROCK);
                 patch.getTransform().parent = this.parent;
+                patch.getBaseMesh().visibility = 0.0;
 
                 const patchPhysicsAggregate = new PhysicsAggregate(patch.getBaseMesh(), PhysicsShapeType.MESH, { mass: 10 }, this.scene);
                 patchPhysicsAggregate.body.disablePreStep = false;
                 patchPhysicsAggregate.body.updateBodyInstances();
                 patchPhysicsAggregate.body.setAngularDamping(0);
-                for(let i = 0; i < patch.getNbInstances(); i++) {
+                for (let i = 0; i < patch.getNbInstances(); i++) {
                     patchPhysicsAggregate.body.setAngularVelocity(new Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5), i);
                 }
 
@@ -122,8 +131,8 @@ export class AsteroidBelt {
                 const positionX = position.x + x * cellSize - patchSize / 2 + randomCellPositionX;
                 const positionZ = position.z + z * cellSize - patchSize / 2 + randomCellPositionZ;
 
-                if(positionX * positionX + positionZ * positionZ < minRadius * minRadius) continue;
-                if(positionX * positionX + positionZ * positionZ > maxRadius * maxRadius) continue;
+                if (positionX * positionX + positionZ * positionZ < minRadius * minRadius) continue;
+                if (positionX * positionX + positionZ * positionZ > maxRadius * maxRadius) continue;
 
                 const positionY = position.y + (Math.random() - 0.5) * 3.0;
                 const scaling = 1; //0.7 + Math.random() * 0.6; see https://forum.babylonjs.com/t/havok-instances-break-when-changing-the-scaling-of-individual-instances/51632
