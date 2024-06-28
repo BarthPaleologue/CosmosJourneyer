@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AsteroidBelt } from "../asteroidBelts/asteroidBelt";
+import { AsteroidField } from "../asteroidFields/asteroidField";
 import { RingsUniforms } from "../rings/ringsUniform";
 
 /**
@@ -30,5 +30,5 @@ export interface CanHaveRings {
     /**
      * Returns the asteroid belt of the object's ring, or null if the object has no rings
      */
-    getAsteroidBelt(): AsteroidBelt | null;
+    getAsteroidField(): AsteroidField | null;
 }

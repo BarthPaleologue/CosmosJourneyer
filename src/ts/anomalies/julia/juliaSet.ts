@@ -30,7 +30,7 @@ import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProp
 import i18n from "../../i18n";
 import { Anomaly } from "../anomaly";
 import { AnomalyType } from "../anomalyType";
-import { AsteroidBelt } from "../../asteroidBelts/asteroidBelt";
+import { AsteroidField } from "../../asteroidFields/asteroidField";
 
 export class JuliaSet implements Anomaly, Cullable {
     readonly name: string;
@@ -86,7 +86,7 @@ export class JuliaSet implements Anomaly, Cullable {
         return null;
     }
 
-    getAsteroidBelt(): AsteroidBelt | null {
+    getAsteroidField(): AsteroidField | null {
         return null;
     }
 

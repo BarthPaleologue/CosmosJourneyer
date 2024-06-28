@@ -43,7 +43,7 @@ import i18n from "../../i18n";
 import { CloudsUniforms } from "../../clouds/cloudsUniforms";
 import { Scene } from "@babylonjs/core/scene";
 import { BodyType } from "../../architecture/bodyType";
-import { AsteroidBelt } from "../../asteroidBelts/asteroidBelt";
+import { AsteroidField } from "../../asteroidFields/asteroidField";
 
 export class TelluricPlanet implements Planet, Cullable {
     readonly name: string;
@@ -60,7 +60,7 @@ export class TelluricPlanet implements Planet, Cullable {
     readonly postProcesses: PostProcessType[] = [];
 
     readonly ringsUniforms: RingsUniforms | null;
-    private readonly asteroidBelt: AsteroidBelt | null;
+    private readonly asteroidField: AsteroidField | null;
 
     readonly cloudsUniforms: CloudsUniforms | null;
 
@@ -121,10 +121,10 @@ export class TelluricPlanet implements Planet, Cullable {
 
             const averageRadius = this.model.radius * (this.model.rings.ringStart + this.model.rings.ringEnd) / 2;
             const spread = this.model.radius * (this.model.rings.ringEnd - this.model.rings.ringStart) / 2;
-            this.asteroidBelt = new AsteroidBelt(this.getTransform(), averageRadius, spread, scene);
+            this.asteroidField = new AsteroidField(this.getTransform(), averageRadius, spread, scene);
         } else {
             this.ringsUniforms = null;
-            this.asteroidBelt = null;
+            this.asteroidField = null;
         }
 
         if (this.model.clouds !== null) {
@@ -166,8 +166,8 @@ export class TelluricPlanet implements Planet, Cullable {
         return this.ringsUniforms;
     }
 
-    getAsteroidBelt(): AsteroidBelt | null {
-        return this.asteroidBelt;
+    getAsteroidField(): AsteroidField | null {
+        return this.asteroidField;
     }
 
     getCloudsUniforms(): CloudsUniforms | null {

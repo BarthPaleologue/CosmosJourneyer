@@ -28,7 +28,7 @@ import { AsteroidPatch } from "./asteroidPatch";
  * An asteroid belts is basically a collection of thin instance chunks that can be created and destroyed depending on where the player is.
  * This allows to only render the asteroids close to the player, saving immense resources.
  */
-export class AsteroidBelt {
+export class AsteroidField {
 
     readonly parent: TransformNode;
 
@@ -118,7 +118,7 @@ export class AsteroidBelt {
 
                 if ((cameraCellX - cellX) ** 2 + cameraCellY * cameraCellY + (cameraCellZ - cellZ) ** 2 >= this.neighborCellsRenderRadius * this.neighborCellsRenderRadius) continue;
 
-                const matrixBuffer = AsteroidBelt.CreateAsteroidBuffer(new Vector3(cellX * this.patchSize, 0, cellZ * this.patchSize), this.resolution, this.patchSize, this.minRadius, this.maxRadius);
+                const matrixBuffer = AsteroidField.CreateAsteroidBuffer(new Vector3(cellX * this.patchSize, 0, cellZ * this.patchSize), this.resolution, this.patchSize, this.minRadius, this.maxRadius);
                 const patch = new AsteroidPatch(matrixBuffer);
                 patch.createInstances(Objects.ROCK);
                 patch.getTransform().parent = this.parent;

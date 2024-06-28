@@ -27,7 +27,7 @@ import "@babylonjs/core/Meshes/thinInstanceMesh";
 import { Axis, DirectionalLight, HavokPlugin, HemisphericLight, MeshBuilder, PhysicsAggregate, PhysicsShapeType, PhysicsViewer, Scene } from "@babylonjs/core";
 import { Assets } from "./assets/assets";
 import { DefaultControls } from "./defaultControls/defaultControls";
-import { AsteroidBelt } from "./asteroidBelts/asteroidBelt";
+import { AsteroidField } from "./asteroidFields/asteroidField";
 import HavokPhysics from "@babylonjs/havok";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
@@ -75,7 +75,7 @@ const sphereAggregate = new PhysicsAggregate(sphere, PhysicsShapeType.SPHERE, {m
 const beltRadius = 100 * scaler;
 const beltSpread = 20 * scaler;
 
-const belt = new AsteroidBelt(sphere, beltRadius, beltSpread, scene);
+const belt = new AsteroidField(sphere, beltRadius, beltSpread, scene);
 
 const torus = MeshBuilder.CreateTorus("torus", { diameter: 2 * beltRadius, thickness: 2 * beltSpread, tessellation: 32 }, scene);
 torus.visibility = 0.1;
