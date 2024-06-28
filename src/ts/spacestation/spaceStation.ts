@@ -172,55 +172,67 @@ export class SpaceStation implements OrbitalObject, Cullable, Dockable {
         lastNode = solarSection.getTransform();
         this.solarSections.push(solarSection);
 
-        let urgeToCreateHabitat = 0;
-        for (let i = 0; i < 10; i++) {
-            let nodeType = SpaceStationNodeType.UTILITY_SECTION;
-            if (Math.random() < sigmoid(urgeToCreateHabitat - 6) && urgeToCreateHabitat > 0) {
-                nodeType = wheelOfFortune(
-                    [
-                        [SpaceStationNodeType.RING_HABITAT, 0.5],
-                        [SpaceStationNodeType.HELIX_HABITAT, 0.2],
-                        [SpaceStationNodeType.CYLINDER_HABITAT, 0.3]
-                    ],
-                    Math.random()
-                );
-            }
 
-            let newNode: TransformNode | null = null;
-
-            if (nodeType === SpaceStationNodeType.UTILITY_SECTION) {
-                const utilitySection = new UtilitySection(this.scene);
-                this.utilitySections.push(utilitySection);
-                newNode = utilitySection.getTransform();
-            } else if (nodeType === SpaceStationNodeType.HELIX_HABITAT) {
-                const helixHabitat = new HelixHabitat(this.scene);
-                this.helixHabitats.push(helixHabitat);
-                newNode = helixHabitat.getTransform();
-                urgeToCreateHabitat = 0;
-            } else if (nodeType === SpaceStationNodeType.RING_HABITAT) {
-                const ringHabitat = new RingHabitat(this.scene);
-                this.ringHabitats.push(ringHabitat);
-                newNode = ringHabitat.getTransform();
-                urgeToCreateHabitat = 0;
-            } else if (nodeType === SpaceStationNodeType.CYLINDER_HABITAT) {
-                const cylinderHabitat = new CylinderHabitat(this.scene);
-                this.cylinderHabitats.push(cylinderHabitat);
-                newNode = cylinderHabitat.getTransform();
-                urgeToCreateHabitat = 0;
-            }
-
-            if (newNode === null) {
-                throw new Error("Node creation failed");
-            }
+        for (let i = 0; i < 10 + Math.floor(Math.random() * 10); i++) {
+            const utilitySection = new UtilitySection(this.scene);
+            this.utilitySections.push(utilitySection);
 
             if (lastNode !== null) {
-                this.placeNode(newNode, lastNode);
+                this.placeNode(utilitySection.getTransform(), lastNode);
             }
 
-            newNode.parent = this.root;
+            utilitySection.getTransform().parent = this.root;
 
-            lastNode = newNode;
-            urgeToCreateHabitat++;
+            lastNode = utilitySection.getTransform();
+        }
+
+        const habitatType = wheelOfFortune(
+            [
+                [SpaceStationNodeType.RING_HABITAT, 0.5],
+                [SpaceStationNodeType.HELIX_HABITAT, 0.2],
+                [SpaceStationNodeType.CYLINDER_HABITAT, 0.3]
+            ],
+            Math.random()
+        );
+
+        let newNode: TransformNode | null = null;
+        if (habitatType === SpaceStationNodeType.HELIX_HABITAT) {
+            const helixHabitat = new HelixHabitat(this.scene);
+            this.helixHabitats.push(helixHabitat);
+            newNode = helixHabitat.getTransform();
+        } else if (habitatType === SpaceStationNodeType.RING_HABITAT) {
+            const ringHabitat = new RingHabitat(this.scene);
+            this.ringHabitats.push(ringHabitat);
+            newNode = ringHabitat.getTransform();
+        } else if (habitatType === SpaceStationNodeType.CYLINDER_HABITAT) {
+            const cylinderHabitat = new CylinderHabitat(this.scene);
+            this.cylinderHabitats.push(cylinderHabitat);
+            newNode = cylinderHabitat.getTransform();
+        }
+
+        if (newNode === null) {
+            throw new Error("Node creation failed");
+        }
+
+        if (lastNode !== null) {
+            this.placeNode(newNode, lastNode);
+        }
+
+        newNode.parent = this.root;
+
+        lastNode = newNode;
+
+        for (let i = 0; i < 5 + Math.floor(Math.random() * 5); i++) {
+            const utilitySection = new UtilitySection(this.scene);
+            this.utilitySections.push(utilitySection);
+
+            if (lastNode !== null) {
+                this.placeNode(utilitySection.getTransform(), lastNode);
+            }
+
+            utilitySection.getTransform().parent = this.root;
+
+            lastNode = utilitySection.getTransform();
         }
 
         const dockingBay = new DockingBay(this.scene);
