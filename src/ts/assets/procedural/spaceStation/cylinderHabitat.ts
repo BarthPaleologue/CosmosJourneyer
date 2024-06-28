@@ -36,12 +36,17 @@ export class CylinderHabitat implements Transformable {
     private readonly cylinder: Mesh;
     private readonly cylinderAggregate: PhysicsAggregate;
 
-    constructor(scene: Scene) {
+    readonly habitableSurface: number;
+
+    constructor(requiredHabitableSurface: number, scene: Scene) {
         this.root = new TransformNode("CylinderHabitatRoot", scene);
 
-        this.radius = 7e3 + Math.random() * 2e3;
+        this.radius = 2e3 + Math.random() * 2e3;
 
-        const height = 40e3 + Math.random() * 10e3;
+        const requiredHeight = requiredHabitableSurface / (2 * Math.PI * (this.radius / 2));
+        const height = requiredHeight;
+
+        this.habitableSurface = height * 2 * Math.PI * (this.radius / 2);
 
         this.cylinder = MeshBuilder.CreateCylinder(
             "CylinderHabitat",

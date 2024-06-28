@@ -205,7 +205,7 @@ export class SpaceStation implements OrbitalObject, Cullable, Dockable {
             this.ringHabitats.push(ringHabitat);
             newNode = ringHabitat.getTransform();
         } else if (habitatType === SpaceStationNodeType.CYLINDER_HABITAT) {
-            const cylinderHabitat = new CylinderHabitat(this.scene);
+            const cylinderHabitat = new CylinderHabitat(habitatSurface, this.scene);
             this.cylinderHabitats.push(cylinderHabitat);
             newNode = cylinderHabitat.getTransform();
         }
