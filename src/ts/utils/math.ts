@@ -18,3 +18,7 @@
 export function clamp(value: number, min: number, max: number) {
     return Math.min(Math.max(value, min), max);
 }
+
+export function sigmoid(x: number): number {
+    return 1 / (1 + Math.exp(-x));
+}

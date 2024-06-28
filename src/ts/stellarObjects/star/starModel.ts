@@ -25,7 +25,7 @@ import { OrbitProperties } from "../../orbit/orbitProperties";
 import { StellarType } from "../common";
 import { StarPhysicalProperties } from "../../architecture/physicalProperties";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
-import { wheelOfFortune } from "../../utils/wheelOfFortune";
+import { wheelOfFortune } from "../../utils/random";
 import { StellarObjectModel } from "../../architecture/stellarObject";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { RingsModel } from "../../rings/ringsModel";

@@ -25,6 +25,7 @@ import { CelestialBodyModel } from "../architecture/celestialBody";
 import { normalRandom } from "extended-random";
 import { clamp } from "../utils/math";
 import { GenerationSteps } from "../utils/generationSteps";
+import { CropType } from "../utils/agriculture";
 
 export class SpaceStationModel implements OrbitalObjectModel {
     readonly seed: number;
@@ -33,6 +34,18 @@ export class SpaceStationModel implements OrbitalObjectModel {
     readonly physicalProperties: OrbitalObjectPhysicalProperties;
     readonly parentBody: OrbitalObjectModel | null;
     readonly childrenBodies: OrbitalObjectModel[] = [];
+
+    readonly population: number;
+    readonly energyConsumptionPerCapita: number;
+
+    /**
+     * The number of inhabitants per square kilometer in the habitat
+     */
+    readonly populationDensity: number;
+
+    readonly agricultureMix: [number, CropType][];
+
+    readonly nbHydroponicLayers: number;
 
     constructor(seed: number, parentBody?: CelestialBodyModel) {
         this.seed = seed;
@@ -56,5 +69,17 @@ export class SpaceStationModel implements OrbitalObjectModel {
             rotationPeriod: 0,
             axialTilt: 2 * this.rng(GenerationSteps.AXIAL_TILT) * Math.PI
         };
+
+        //TODO: make this dependent on economic model
+        this.population = 2_000_000;
+        this.energyConsumptionPerCapita = 40_000;
+
+        this.populationDensity = 4_000;
+
+        this.agricultureMix = [
+            [1, CropType.POTATO] // true ireland moment
+        ];
+
+        this.nbHydroponicLayers = 10;
     }
 }

@@ -91,11 +91,6 @@ export class WarpDrive implements ReadonlyWarpDrive {
     private readonly throttleUpdateSpeed = 0.2;
 
     /**
-     * Maximum speed of the warp drive in m/s. It can be reached when the ship is far from any body and the user throttle is set to 1.
-     */
-    private readonly maxWarpSpeed = 10 * Settings.C;
-
-    /**
      * Target speed of the warp drive in m/s. It is computed based on the distance to the closest body and the user throttle.
      */
     private targetSpeed = 0;
@@ -110,7 +105,12 @@ export class WarpDrive implements ReadonlyWarpDrive {
      */
     private state = WarpDriveState.DISABLED;
 
-    private static MIN_SPEED = 2000;
+    /**
+     * Maximum speed of the warp drive in m/s. It can be reached when the ship is far from any body and the user throttle is set to 1.
+     */
+    private static readonly MAX_SPEED = 10 * Settings.C;
+
+    private static readonly MIN_SPEED = 5e3;
 
     constructor(enabledByDefault = false) {
         this.state = enabledByDefault ? WarpDriveState.ENABLED : WarpDriveState.DISABLED;
@@ -162,7 +162,8 @@ export class WarpDrive implements ReadonlyWarpDrive {
         const speedThreshold = 10e3;
         const closeSpeed = (speedThreshold * 0.05 * Math.max(0, closestObjectDistance - closestObjectRadius)) / speedThreshold;
         const deepSpaceSpeed = speedThreshold * ((0.05 * Math.max(0, closestObjectDistance - closestObjectRadius)) / speedThreshold) ** 1.2;
-        this.targetSpeed = Math.min(this.maxWarpSpeed, Math.max(closeSpeed, deepSpaceSpeed));
+        this.targetSpeed = Math.min(WarpDrive.MAX_SPEED, Math.max(closeSpeed, deepSpaceSpeed));
+        this.targetSpeed = Math.max(WarpDrive.MIN_SPEED, this.targetSpeed);
         return this.targetThrottle * this.targetSpeed;
     }
 
@@ -192,7 +193,7 @@ export class WarpDrive implements ReadonlyWarpDrive {
 
         this.currentThrottle = moveTowards(this.currentThrottle, this.targetThrottle, deltaThrottle);
 
-        this.currentSpeed = Math.max(WarpDrive.MIN_SPEED, this.currentThrottle * this.targetSpeed);
+        this.currentSpeed = this.currentThrottle * this.targetSpeed;
     }
 
     /**

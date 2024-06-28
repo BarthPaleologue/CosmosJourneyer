@@ -28,7 +28,7 @@ import { PlanetPhysicalProperties } from "../../architecture/physicalProperties"
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { BodyType } from "../../architecture/bodyType";
 import { GenerationSteps } from "../../utils/generationSteps";
-import { wheelOfFortune } from "../../utils/wheelOfFortune";
+import { wheelOfFortune } from "../../utils/random";
 
 export class MandelbulbModel implements PlanetModel {
     readonly bodyType = BodyType.MANDELBULB;

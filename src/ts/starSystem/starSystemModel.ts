@@ -21,7 +21,7 @@ import { Settings } from "../settings";
 import { generateStarName } from "../utils/starNameGenerator";
 import { SystemSeed } from "../utils/systemSeed";
 import { BodyType } from "../architecture/bodyType";
-import { wheelOfFortune } from "../utils/wheelOfFortune";
+import { wheelOfFortune } from "../utils/random";
 import { AnomalyType } from "../anomalies/anomalyType";
 
 const enum GenerationSteps {

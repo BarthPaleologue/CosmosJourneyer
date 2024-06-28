@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { Scene } from "@babylonjs/core/scene";
 import { isSizeOnScreenEnough } from "../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
@@ -28,35 +27,47 @@ import { OrbitProperties } from "../orbit/orbitProperties";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { OrbitalObjectPhysicalProperties } from "../architecture/physicalProperties";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { LandingPad } from "../landingPad/landingPad";
-import { PhysicsShapeConvexHull, PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { CollisionMask } from "../settings";
 import { CelestialBody } from "../architecture/celestialBody";
-import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { generateSpaceStationName } from "../utils/spaceStationNameGenerator";
 import i18n from "../i18n";
-import { Objects } from "../assets/objects";
+import { SpaceStationNodeType } from "../assets/procedural/spaceStation/spaceStationNode";
+import { UtilitySection } from "../assets/procedural/spaceStation/utilitySection";
+import { HelixHabitat } from "../assets/procedural/spaceStation/helixHabitat";
+import { RingHabitat } from "../assets/procedural/spaceStation/ringHabitat";
+import { Transformable } from "../architecture/transformable";
+import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
+import { StellarObject } from "../architecture/stellarObject";
+import { SolarSection } from "../assets/procedural/spaceStation/solarSection";
+import { Axis } from "@babylonjs/core/Maths/math.axis";
+import { wheelOfFortune } from "../utils/random";
+import { CylinderHabitat } from "../assets/procedural/spaceStation/cylinderHabitat";
+import { DockingBay } from "../assets/procedural/spaceStation/dockingBay";
+import { LandingPad } from "../assets/procedural/landingPad/landingPad";
+import { Dockable } from "../utils/dockable";
+import { getEdibleEnergyPerHaPerDay } from "../utils/agriculture";
+import { Settings } from "../settings";
 
-export class SpaceStation implements OrbitalObject, Cullable {
+export class SpaceStation implements OrbitalObject, Cullable, Dockable {
     readonly name: string;
 
     readonly model: SpaceStationModel;
 
-    readonly aggregate: PhysicsAggregate;
-
     readonly postProcesses: PostProcessType[] = [];
 
-    readonly instance: InstancedMesh;
-
-    readonly ringInstances: InstancedMesh[] = [];
-    readonly ringAggregates: PhysicsAggregate[] = [];
-    readonly ringsLocalPosition: Vector3[] = [];
-    readonly ringsRadius: number[] = [];
-
-    readonly landingPads: LandingPad[] = [];
+    readonly childAggregates: PhysicsAggregate[] = [];
 
     readonly parent: OrbitalObject | null = null;
+
+    readonly solarSections: SolarSection[] = [];
+    readonly utilitySections: UtilitySection[] = [];
+    readonly helixHabitats: HelixHabitat[] = [];
+    readonly ringHabitats: RingHabitat[] = [];
+    readonly cylinderHabitats: CylinderHabitat[] = [];
+    readonly dockingBays: DockingBay[] = [];
+
+    private readonly root: TransformNode;
+
+    private readonly scene: Scene;
 
     constructor(scene: Scene, model: SpaceStationModel | number, parentBody: CelestialBody | null = null) {
         this.model = model instanceof SpaceStationModel ? model : new SpaceStationModel(model, parentBody?.model);
@@ -65,97 +76,30 @@ export class SpaceStation implements OrbitalObject, Cullable {
 
         this.parent = parentBody;
 
-        this.instance = Objects.CreateSpaceStationInstance();
-        this.instance.name = this.name;
+        this.root = new TransformNode(this.name, scene);
+        this.scene = scene;
 
-        this.aggregate = new PhysicsAggregate(
-            this.getTransform(),
-            PhysicsShapeType.CONTAINER,
-            {
-                mass: 0,
-                restitution: 0.2
-            },
-            scene
-        );
+        this.generate();
 
-        this.aggregate.body.setMotionType(PhysicsMotionType.STATIC);
-        this.aggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
-        this.aggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
+        // center the space station on its center of mass
+        const boundingVectors = this.getTransform().getHierarchyBoundingVectors();
+        const centerWorld = boundingVectors.max.add(boundingVectors.min).scale(0.5);
+        const deltaPosition = this.getTransform().getAbsolutePosition().subtract(centerWorld);
 
-        this.aggregate.body.setCollisionCallbackEnabled(true);
-        this.aggregate.body.getCollisionObservable().add(() => {
-            console.log("collision!");
-        });
+        this.getTransform().getChildTransformNodes(true).forEach(transform => transform.position.addInPlace(deltaPosition));
 
-        this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
-
-        for (const mesh of this.instance.getChildMeshes()) {
-            if (mesh.name.toLowerCase().includes("landingpad")) {
-                const childShape = new PhysicsShapeConvexHull(mesh as Mesh, scene);
-                childShape.filterMembershipMask = CollisionMask.ENVIRONMENT;
-                childShape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
-                this.aggregate.shape.addChildFromParent(this.getTransform(), childShape, mesh);
-
-                const landingPad = new LandingPad(scene, mesh);
-                this.landingPads.push(landingPad);
-
-                continue;
-            }
-
-            if (mesh.name.toLowerCase().includes("ring")) {
-                this.ringInstances.push(mesh as InstancedMesh);
-
-                const ringAggregate = new PhysicsAggregate(mesh, PhysicsShapeType.MESH, { mass: 0, restitution: 0.2 }, scene);
-                ringAggregate.body.disablePreStep = false;
-                this.ringAggregates.push(ringAggregate);
-
-                this.ringsRadius.push(mesh.getBoundingInfo().boundingSphere.radius);
-
-                this.ringsLocalPosition.push(mesh.position.clone());
-
-                continue;
-            }
-
-            const childShape = new PhysicsShapeMesh(mesh as Mesh, scene);
-            childShape.filterMembershipMask = CollisionMask.ENVIRONMENT;
-            childShape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
-            this.aggregate.shape.addChildFromParent(this.getTransform(), childShape, mesh);
-        }
-
-        this.aggregate.body.disablePreStep = false;
-
-        console.log("found", this.landingPads.length, "landing pads");
-    }
-
-    updateRings(deltaSeconds: number): void {
-        for (let i = 0; i < this.ringInstances.length; i++) {
-            const ringAggregate = this.ringAggregates[i];
-            const localPosition = this.ringsLocalPosition[i];
-            const ringRadius = this.ringsRadius[i];
-
-            // g = v * v / r and T = 2 * pi * r / v => v = sqrt(g * r) and T = 2 * pi * r / sqrt(g * r) = 2 * pi * sqrt(r / g)
-            const rotationPeriod = 2 * Math.PI * Math.sqrt(ringRadius / 9.81);
-
-            const clockwise = i % 2 === 0 ? 1 : -1;
-
-            ringAggregate.transformNode.rotate(Vector3.Up(), deltaSeconds * clockwise * ((2 * Math.PI) / rotationPeriod));
-
-            // this is necessary because Havok ignores regular parenting
-            ringAggregate.transformNode.setAbsolutePosition(Vector3.TransformCoordinates(localPosition, this.getTransform().getWorldMatrix()));
-        }
+        this.root.rotate(Axis.X, this.model.physicalProperties.axialTilt);
     }
 
     handleDockingRequest(): LandingPad | null {
-        const availableLandingPads = this.landingPads;
+        const availableLandingPads = this.dockingBays.flatMap((dockingBay) => {
+            return dockingBay.landingPads;
+        });
         const nbPads = availableLandingPads.length;
 
         if (nbPads === 0) return null;
 
         return availableLandingPads[Math.floor(Math.random() * nbPads)];
-    }
-
-    getTransform(): TransformNode {
-        return this.instance;
     }
 
     getRotationAxis(): Vector3 {
@@ -171,7 +115,10 @@ export class SpaceStation implements OrbitalObject, Cullable {
     }
 
     public getBoundingRadius(): number {
-        return 2e3;
+        const boundingVectors = this.getTransform().getHierarchyBoundingVectors();
+        const extendSize = boundingVectors.max.subtract(boundingVectors.min).scale(0.5);
+
+        return Math.max(extendSize.x, extendSize.y, extendSize.z);
     }
 
     getTypeName(): string {
@@ -183,12 +130,152 @@ export class SpaceStation implements OrbitalObject, Cullable {
         for (const camera of cameras) {
             isVisible = isVisible || isSizeOnScreenEnough(this, camera);
         }
-        for (const mesh of this.instance.getChildMeshes()) {
+        for (const mesh of this.root.getChildMeshes()) {
             mesh.isVisible = isVisible;
         }
     }
 
-    public dispose(): void {
-        this.instance.dispose();
+    private generate() {
+        // find distance to star
+        let distanceToStar = this.model.orbit.radius;
+        let parent = this.parent;
+        let stellarObject: StellarObject | null = null;
+        while (parent !== null) {
+            if (parent.parent === null) {
+                stellarObject = parent as StellarObject;
+                break;
+            }
+            distanceToStar += parent.getOrbitProperties().radius;
+            parent = parent.parent;
+        }
+
+        if (stellarObject === null) {
+            throw new Error("No stellar object found");
+        }
+
+        const starRadius = stellarObject.model.radius;
+        const starTemperature = stellarObject.model.temperature;
+        const energyRequirement = this.model.population * this.model.energyConsumptionPerCapita;
+
+        const solarPanelSurface = getSolarPanelSurfaceFromEnergyRequirement(0.4, distanceToStar, starTemperature, starRadius, energyRequirement, 0.5);
+
+        let habitatSurfaceHa = 100 * this.model.population / this.model.populationDensity;
+        this.model.agricultureMix.forEach(([fraction, cropType]) => {
+            habitatSurfaceHa += fraction * this.model.population * Settings.INDIVIDUAL_AVERAGE_DAILY_INTAKE / (Settings.HYDROPONIC_TO_CONVENTIONAL_RATIO * this.model.nbHydroponicLayers * getEdibleEnergyPerHaPerDay(cropType));
+        });
+        const habitatSurface = habitatSurfaceHa * 1000;
+
+        let lastNode: TransformNode | null = null;
+
+        const solarSection = new SolarSection(solarPanelSurface, this.scene);
+        solarSection.getTransform().parent = this.getTransform();
+        lastNode = solarSection.getTransform();
+        this.solarSections.push(solarSection);
+
+
+        for (let i = 0; i < 10 + Math.floor(Math.random() * 10); i++) {
+            const utilitySection = new UtilitySection(this.scene);
+            this.utilitySections.push(utilitySection);
+
+            if (lastNode !== null) {
+                this.placeNode(utilitySection.getTransform(), lastNode);
+            }
+
+            utilitySection.getTransform().parent = this.root;
+
+            lastNode = utilitySection.getTransform();
+        }
+
+        const habitatType = wheelOfFortune(
+            [
+                [SpaceStationNodeType.RING_HABITAT, 0.5],
+                [SpaceStationNodeType.HELIX_HABITAT, 0.2],
+                [SpaceStationNodeType.CYLINDER_HABITAT, 0.3]
+            ],
+            Math.random()
+        );
+
+        let newNode: TransformNode | null = null;
+        if (habitatType === SpaceStationNodeType.HELIX_HABITAT) {
+            const helixHabitat = new HelixHabitat(this.scene);
+            this.helixHabitats.push(helixHabitat);
+            newNode = helixHabitat.getTransform();
+        } else if (habitatType === SpaceStationNodeType.RING_HABITAT) {
+            const ringHabitat = new RingHabitat(habitatSurface, this.scene);
+            this.ringHabitats.push(ringHabitat);
+            newNode = ringHabitat.getTransform();
+        } else if (habitatType === SpaceStationNodeType.CYLINDER_HABITAT) {
+            const cylinderHabitat = new CylinderHabitat(habitatSurface, this.scene);
+            this.cylinderHabitats.push(cylinderHabitat);
+            newNode = cylinderHabitat.getTransform();
+        }
+
+        if (newNode === null) {
+            throw new Error("Node creation failed");
+        }
+
+        if (lastNode !== null) {
+            this.placeNode(newNode, lastNode);
+        }
+
+        newNode.parent = this.root;
+
+        lastNode = newNode;
+
+        for (let i = 0; i < 5 + Math.floor(Math.random() * 5); i++) {
+            const utilitySection = new UtilitySection(this.scene);
+            this.utilitySections.push(utilitySection);
+
+            if (lastNode !== null) {
+                this.placeNode(utilitySection.getTransform(), lastNode);
+            }
+
+            utilitySection.getTransform().parent = this.root;
+
+            lastNode = utilitySection.getTransform();
+        }
+
+        const dockingBay = new DockingBay(this.scene);
+
+        this.dockingBays.push(dockingBay);
+        this.placeNode(dockingBay.getTransform(), lastNode);
+        dockingBay.getTransform().parent = this.root;
+    }
+
+    private placeNode(node: TransformNode, parent: TransformNode) {
+        const previousBoundingVectors = parent.getHierarchyBoundingVectors();
+        const previousBoundingExtendSize = previousBoundingVectors.max.subtract(previousBoundingVectors.min).scale(0.5);
+
+        const newBoundingVectors = node.getHierarchyBoundingVectors();
+        const newBoundingExtendSize = newBoundingVectors.max.subtract(newBoundingVectors.min).scale(0.5);
+
+        const previousSectionSizeY = previousBoundingExtendSize.y;
+        const newSectionY = newBoundingExtendSize.y;
+
+        node.position = parent.position.add(parent.up.scale(previousSectionSizeY + newSectionY));
+    }
+
+    update(stellarObjects: Transformable[], deltaSeconds: number) {
+        this.solarSections.forEach((solarSection) => solarSection.update(stellarObjects));
+        this.utilitySections.forEach((utilitySection) => utilitySection.update(stellarObjects));
+        this.helixHabitats.forEach((helixHabitat) => helixHabitat.update(stellarObjects, deltaSeconds));
+        this.ringHabitats.forEach((ringHabitat) => ringHabitat.update(stellarObjects, deltaSeconds));
+        this.cylinderHabitats.forEach((cylinderHabitat) => cylinderHabitat.update(stellarObjects, deltaSeconds));
+        this.dockingBays.forEach((dockingBay) => dockingBay.update(stellarObjects, deltaSeconds));
+    }
+
+    getTransform(): TransformNode {
+        return this.root;
+    }
+
+    dispose() {
+        this.root.dispose();
+        this.utilitySections.forEach((utilitySection) => utilitySection.dispose());
+        this.helixHabitats.forEach((helixHabitat) => helixHabitat.dispose());
+        this.ringHabitats.forEach((ringHabitat) => ringHabitat.dispose());
+        this.cylinderHabitats.forEach((cylinderHabitat) => cylinderHabitat.dispose());
+        this.dockingBays.forEach((dockingBay) => dockingBay.dispose());
+
+        this.childAggregates.forEach((childAggregate) => childAggregate.dispose());
     }
 }

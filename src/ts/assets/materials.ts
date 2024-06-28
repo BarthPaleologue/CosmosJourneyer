@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ButterflyMaterial } from "../proceduralAssets/butterfly/butterflyMaterial";
-import { GrassMaterial } from "../proceduralAssets/grass/grassMaterial";
+import { ButterflyMaterial } from "./procedural/butterfly/butterflyMaterial";
+import { GrassMaterial } from "./procedural/grass/grassMaterial";
 import { Scene } from "@babylonjs/core/scene";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";

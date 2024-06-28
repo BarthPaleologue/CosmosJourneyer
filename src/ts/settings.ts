@@ -41,6 +41,17 @@ export const Settings = {
     SEED_HALF_RANGE: 1e4,
 
     /**
+     * The average daily intake for a human being in kcal/day
+     * It is 2500 for males and 2000 for females, hence 2250.
+     */
+    INDIVIDUAL_AVERAGE_DAILY_INTAKE: 2250,
+
+    /**
+     * Hydroponic agriculture can be 250% more productive than conventional agriculture.
+     */
+    HYDROPONIC_TO_CONVENTIONAL_RATIO: 3.5,
+
+    /**
      * The speed of light in meters per second.
      */
     C: 299792458,
@@ -64,6 +75,11 @@ export const Settings = {
      * The radius of the sun in meters.
      */
     SOLAR_RADIUS: 696340e3,
+
+    /**
+     * The gravitational acceleration in m/s^2.
+     */
+    G_EARTH: 9.81,
 
     FOV: Tools.ToRadians(60),
 
