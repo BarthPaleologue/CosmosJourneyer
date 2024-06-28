@@ -38,6 +38,11 @@ export class SpaceStationModel implements OrbitalObjectModel {
     readonly population: number;
     readonly energyConsumptionPerCapita: number;
 
+    /**
+     * The number of inhabitants per square kilometer in the habitat
+     */
+    readonly populationDensity: number;
+
     readonly agricultureMix: [number, CropType][];
 
     constructor(seed: number, parentBody?: CelestialBodyModel) {
@@ -66,6 +71,8 @@ export class SpaceStationModel implements OrbitalObjectModel {
         //TODO: make this dependent on economic model
         this.population = 300_000;
         this.energyConsumptionPerCapita = 40_000;
+
+        this.populationDensity = 4000;
 
         this.agricultureMix = [
             [1, CropType.POTATO] // true ireland moment

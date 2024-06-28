@@ -45,7 +45,7 @@ import { CylinderHabitat } from "../assets/procedural/spaceStation/cylinderHabit
 import { DockingBay } from "../assets/procedural/spaceStation/dockingBay";
 import { LandingPad } from "../assets/procedural/landingPad/landingPad";
 import { Dockable } from "../utils/dockable";
-import { getEdibleEnergy } from "../utils/agriculture";
+import { getEdibleEnergyPerHaPerDay } from "../utils/agriculture";
 import { Settings } from "../settings";
 
 export class SpaceStation implements OrbitalObject, Cullable, Dockable {
@@ -160,9 +160,9 @@ export class SpaceStation implements OrbitalObject, Cullable, Dockable {
 
         const solarPanelSurface = getSolarPanelSurfaceFromEnergyRequirement(0.4, distanceToStar, starTemperature, starRadius, energyRequirement, 0.5);
 
-        let habitatSurface = 0;
+        let habitatSurfaceHa = 10 * this.model.population / this.model.populationDensity;
         this.model.agricultureMix.forEach(([fraction, cropType]) => {
-            habitatSurface += fraction * this.model.population * Settings.INDIVIDUAL_AVERAGE_DAILY_INTAKE / (Settings.HYDROPONIC_TO_CONVENTIONAL_RATIO * getEdibleEnergy(cropType));
+            habitatSurfaceHa += fraction * this.model.population * Settings.INDIVIDUAL_AVERAGE_DAILY_INTAKE / (Settings.HYDROPONIC_TO_CONVENTIONAL_RATIO * getEdibleEnergyPerHaPerDay(cropType));
         });
 
         let lastNode: TransformNode | null = null;

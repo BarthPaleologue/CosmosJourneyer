@@ -13,7 +13,7 @@ export const enum CropType {
  * Edible energy in kcal/ha/day for different plant species
  * @see https://www.fao.org/4/t0207e/T0207E04.htm#4.%20Nutritive%20value
  */
-export function getEdibleEnergy(cropType: CropType): number {
+export function getEdibleEnergyPerHaPerDay(cropType: CropType): number {
     switch (cropType) {
         case CropType.POTATO:
             return 54_000;
