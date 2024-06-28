@@ -25,6 +25,7 @@ import { CelestialBodyModel } from "../architecture/celestialBody";
 import { normalRandom } from "extended-random";
 import { clamp } from "../utils/math";
 import { GenerationSteps } from "../utils/generationSteps";
+import { CropType } from "../utils/agriculture";
 
 export class SpaceStationModel implements OrbitalObjectModel {
     readonly seed: number;
@@ -36,6 +37,8 @@ export class SpaceStationModel implements OrbitalObjectModel {
 
     readonly population: number;
     readonly energyConsumptionPerCapita: number;
+
+    readonly agricultureMix: [number, CropType][];
 
     constructor(seed: number, parentBody?: CelestialBodyModel) {
         this.seed = seed;
@@ -63,5 +66,9 @@ export class SpaceStationModel implements OrbitalObjectModel {
         //TODO: make this dependent on economic model
         this.population = 300_000;
         this.energyConsumptionPerCapita = 40_000;
+
+        this.agricultureMix = [
+            [1, CropType.POTATO] // true ireland moment
+        ]
     }
 }
