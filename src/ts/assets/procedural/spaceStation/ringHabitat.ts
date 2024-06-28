@@ -47,25 +47,31 @@ export class RingHabitat implements Transformable {
     private readonly arms: Mesh[] = [];
     private readonly armAggregates: PhysicsAggregate[] = [];
 
-    constructor(scene: Scene) {
+    readonly habitableSurface: number;
+
+    constructor(requiredHabitableSurface: number, scene: Scene) {
         this.root = new TransformNode("RingHabitatRoot", scene);
 
         this.radius = 5e3 + Math.random() * 10e3;
 
         const deltaRadius = 500;
 
+        const requiredHeight = requiredHabitableSurface / (2 * Math.PI * (this.radius + deltaRadius / 2));
+        const yScaling = Math.ceil(requiredHeight / deltaRadius);
+        const height = yScaling * deltaRadius;
+
         const attachmentNbSides = 4 + 2 * Math.floor(Math.random() * 2);
 
         this.metalSectionMaterial = new MetalSectionMaterial(scene);
 
-        const heightFactor = 1 + Math.floor(Math.random() * 5);
+        this.habitableSurface = height * (2 * Math.PI * (this.radius + deltaRadius / 2));
 
         this.attachment = MeshBuilder.CreateCylinder(
             "RingHabitatAttachment",
             {
                 diameterTop: 100,
                 diameterBottom: 100,
-                height: deltaRadius * heightFactor * 1.5,
+                height: height * 1.5,
                 tessellation: attachmentNbSides
             },
             scene
@@ -96,11 +102,11 @@ export class RingHabitat implements Transformable {
             },
             scene
         );
-        this.ring.scaling.y = heightFactor;
+        this.ring.scaling.y = yScaling;
         this.ring.bakeCurrentTransformIntoVertices();
         this.ring.convertToFlatShadedMesh();
 
-        this.ringMaterial = new RingHabitatMaterial(circumference, deltaRadius, heightFactor, scene);
+        this.ringMaterial = new RingHabitatMaterial(circumference, deltaRadius, yScaling, scene);
 
         this.ring.material = this.ringMaterial;
 

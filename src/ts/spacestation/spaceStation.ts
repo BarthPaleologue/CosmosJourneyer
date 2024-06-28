@@ -31,7 +31,6 @@ import { CelestialBody } from "../architecture/celestialBody";
 import { generateSpaceStationName } from "../utils/spaceStationNameGenerator";
 import i18n from "../i18n";
 import { SpaceStationNodeType } from "../assets/procedural/spaceStation/spaceStationNode";
-import { sigmoid } from "../utils/math";
 import { UtilitySection } from "../assets/procedural/spaceStation/utilitySection";
 import { HelixHabitat } from "../assets/procedural/spaceStation/helixHabitat";
 import { RingHabitat } from "../assets/procedural/spaceStation/ringHabitat";
@@ -164,6 +163,7 @@ export class SpaceStation implements OrbitalObject, Cullable, Dockable {
         this.model.agricultureMix.forEach(([fraction, cropType]) => {
             habitatSurfaceHa += fraction * this.model.population * Settings.INDIVIDUAL_AVERAGE_DAILY_INTAKE / (Settings.HYDROPONIC_TO_CONVENTIONAL_RATIO * this.model.nbHydroponicLayers * getEdibleEnergyPerHaPerDay(cropType));
         });
+        const habitatSurface = habitatSurfaceHa * 1000;
 
         let lastNode: TransformNode | null = null;
 
@@ -201,7 +201,7 @@ export class SpaceStation implements OrbitalObject, Cullable, Dockable {
             this.helixHabitats.push(helixHabitat);
             newNode = helixHabitat.getTransform();
         } else if (habitatType === SpaceStationNodeType.RING_HABITAT) {
-            const ringHabitat = new RingHabitat(this.scene);
+            const ringHabitat = new RingHabitat(habitatSurface, this.scene);
             this.ringHabitats.push(ringHabitat);
             newNode = ringHabitat.getTransform();
         } else if (habitatType === SpaceStationNodeType.CYLINDER_HABITAT) {
