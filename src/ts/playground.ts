@@ -62,11 +62,12 @@ directionalLight.intensity = 0.7;
 const hemi = new HemisphericLight("hemi", Vector3.Up(), scene);
 hemi.intensity = 0.4;
 
-const scaler = 10;
+const scaler = 500;
 
 defaultControls.getTransform().position.z = -200 * scaler;
 defaultControls.getTransform().position.y = 20 * scaler;
 defaultControls.speed *= scaler;
+camera.maxZ *= scaler;
 
 const sphere = MeshBuilder.CreateSphere("box", { diameter: 20 * scaler }, scene);
 
@@ -80,7 +81,7 @@ const belt = new AsteroidField(sphere, beltRadius, beltSpread, scene);
 const torus = MeshBuilder.CreateTorus("torus", { diameter: 2 * beltRadius, thickness: 2 * beltSpread, tessellation: 32 }, scene);
 torus.visibility = 0.1;
 torus.parent = sphere;
-
+torus.scaling.y = 0.1 / scaler;
 
 const physicsViewer = new PhysicsViewer(scene);
 

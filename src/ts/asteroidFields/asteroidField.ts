@@ -39,9 +39,11 @@ export class AsteroidField {
     readonly maxRadius: number;
 
     readonly resolution = 20;
-    readonly patchSize = 120;
+    readonly patchSize = 25000;
 
-    readonly neighborCellsRenderRadius = 4;
+    readonly patchThickness = 1000;
+
+    readonly neighborCellsRenderRadius = 2;
 
     readonly fadeSpeed = 1;
 
@@ -100,7 +102,6 @@ export class AsteroidField {
                     this.patches.delete(key);
                 }
             } else {
-
                 patch.getBaseMesh().visibility = Math.min(1, patch.getBaseMesh().visibility + deltaSeconds * this.fadeSpeed);
             }
         }
@@ -118,9 +119,9 @@ export class AsteroidField {
 
                 if ((cameraCellX - cellX) ** 2 + cameraCellY * cameraCellY + (cameraCellZ - cellZ) ** 2 >= this.neighborCellsRenderRadius * this.neighborCellsRenderRadius) continue;
 
-                const matrixBuffer = AsteroidField.CreateAsteroidBuffer(new Vector3(cellX * this.patchSize, 0, cellZ * this.patchSize), this.resolution, this.patchSize, this.minRadius, this.maxRadius);
+                const matrixBuffer = AsteroidField.CreateAsteroidBuffer(new Vector3(cellX * this.patchSize, 0, cellZ * this.patchSize), this.resolution, this.patchSize, this.patchThickness, this.minRadius, this.maxRadius);
                 const patch = new AsteroidPatch(matrixBuffer);
-                patch.createInstances(Objects.ROCK);
+                patch.createInstances(Objects.ASTEROID);
                 patch.getTransform().parent = this.parent;
                 patch.getBaseMesh().visibility = 0.0;
 
@@ -142,11 +143,12 @@ export class AsteroidField {
      * @param position The position of the patch in the local space of the parent transform of any belt
      * @param resolution The subdivision of the chunk, each cell contains a single instance
      * @param patchSize The overall planar size of the patch
+     * @param patchThickness The vertical spread of the patch
      * @param minRadius The minimum radius at which the belt starts
      * @param maxRadius The maximum radius at which the belt ends
      * @returns A new matrix 4x4 buffer
      */
-    static CreateAsteroidBuffer(position: Vector3, resolution: number, patchSize: number, minRadius: number, maxRadius: number): Float32Array {
+    static CreateAsteroidBuffer(position: Vector3, resolution: number, patchSize: number, patchThickness: number, minRadius: number, maxRadius: number): Float32Array {
         const matrixBuffer = new Float32Array(resolution * resolution * 16);
         const cellSize = patchSize / resolution;
         let index = 0;
@@ -160,7 +162,7 @@ export class AsteroidField {
                 if (positionX * positionX + positionZ * positionZ < minRadius * minRadius) continue;
                 if (positionX * positionX + positionZ * positionZ > maxRadius * maxRadius) continue;
 
-                const positionY = position.y + (Math.random() - 0.5) * 30.0;
+                const positionY = position.y + (Math.random() - 0.5) * 2 * patchThickness;
                 const scaling = 1; //0.7 + Math.random() * 0.6; see https://forum.babylonjs.com/t/havok-instances-break-when-changing-the-scaling-of-individual-instances/51632
 
                 const matrix = Matrix.Compose(
