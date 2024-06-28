@@ -54,7 +54,6 @@ export class SpaceStation implements OrbitalObject, Cullable, Dockable {
     readonly postProcesses: PostProcessType[] = [];
 
     readonly childAggregates: PhysicsAggregate[] = [];
-    readonly childLocalPositions: Vector3[] = [];
 
     readonly parent: OrbitalObject | null = null;
 
@@ -244,15 +243,6 @@ export class SpaceStation implements OrbitalObject, Cullable, Dockable {
         this.ringHabitats.forEach((ringHabitat) => ringHabitat.update(stellarObjects, deltaSeconds));
         this.cylinderHabitats.forEach((cylinderHabitat) => cylinderHabitat.update(stellarObjects, deltaSeconds));
         this.dockingBays.forEach((dockingBay) => dockingBay.update(stellarObjects, deltaSeconds));
-
-        /*const worldMatrix = this.getTransform().computeWorldMatrix(true);
-        for (let i = 0; i < this.childAggregates.length; i++) {
-            const childAggregate = this.childAggregates[i];
-            const localPosition = this.childLocalPositions[i];
-
-            // this is necessary because Havok ignores regular parenting
-            childAggregate.transformNode.setAbsolutePosition(Vector3.TransformCoordinates(localPosition, worldMatrix));
-        }*/
     }
 
     getTransform(): TransformNode {
