@@ -71,14 +71,13 @@ export class SpaceStationModel implements OrbitalObjectModel {
         };
 
         //TODO: make this dependent on economic model
-        this.population = 300_000;
+        this.population = 2_000_000;
         this.energyConsumptionPerCapita = 40_000;
 
-        this.populationDensity = 4000;
+        this.populationDensity = 4_000;
 
         this.agricultureMix = [
             [1, CropType.POTATO] // true ireland moment
-        ]
         ];
 
         this.nbHydroponicLayers = 10;
