@@ -162,7 +162,7 @@ export class SpaceStation implements OrbitalObject, Cullable, Dockable {
 
         let habitatSurfaceHa = 10 * this.model.population / this.model.populationDensity;
         this.model.agricultureMix.forEach(([fraction, cropType]) => {
-            habitatSurfaceHa += fraction * this.model.population * Settings.INDIVIDUAL_AVERAGE_DAILY_INTAKE / (Settings.HYDROPONIC_TO_CONVENTIONAL_RATIO * getEdibleEnergyPerHaPerDay(cropType));
+            habitatSurfaceHa += fraction * this.model.population * Settings.INDIVIDUAL_AVERAGE_DAILY_INTAKE / (Settings.HYDROPONIC_TO_CONVENTIONAL_RATIO * this.model.nbHydroponicLayers * getEdibleEnergyPerHaPerDay(cropType));
         });
 
         let lastNode: TransformNode | null = null;

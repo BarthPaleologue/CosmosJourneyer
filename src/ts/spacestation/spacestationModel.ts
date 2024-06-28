@@ -45,6 +45,8 @@ export class SpaceStationModel implements OrbitalObjectModel {
 
     readonly agricultureMix: [number, CropType][];
 
+    readonly nbHydroponicLayers: number;
+
     constructor(seed: number, parentBody?: CelestialBodyModel) {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed);
@@ -77,5 +79,8 @@ export class SpaceStationModel implements OrbitalObjectModel {
         this.agricultureMix = [
             [1, CropType.POTATO] // true ireland moment
         ]
+        ];
+
+        this.nbHydroponicLayers = 10;
     }
 }
