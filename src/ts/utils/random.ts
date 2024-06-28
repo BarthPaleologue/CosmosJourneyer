@@ -32,3 +32,14 @@ export function wheelOfFortune<T>(options: [T, number][], randomValue: number): 
     }
     throw new Error("Wheel of fortune failed");
 }
+
+export function pickPseudoRandomItems<T>(items: T[], nbItemsToPick: number, rng: (index: number) => number, baseIndex: number): T[] {
+    const itemsCopy = Array.from(items);
+    const results: T[] = [];
+    for(let i = 0; i < nbItemsToPick; i++) {
+        const randomIndex = Math.floor(rng(baseIndex + i) * itemsCopy.length);
+        results.push(...itemsCopy.splice(randomIndex, 1));
+    }
+
+    return results;
+}

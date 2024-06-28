@@ -39,7 +39,7 @@ import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels"
 import { StellarObject } from "../architecture/stellarObject";
 import { SolarSection } from "../assets/procedural/spaceStation/solarSection";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
-import { wheelOfFortune } from "../utils/wheelOfFortune";
+import { wheelOfFortune } from "../utils/random";
 import { CylinderHabitat } from "../assets/procedural/spaceStation/cylinderHabitat";
 import { DockingBay } from "../assets/procedural/spaceStation/dockingBay";
 import { LandingPad } from "../assets/procedural/landingPad/landingPad";

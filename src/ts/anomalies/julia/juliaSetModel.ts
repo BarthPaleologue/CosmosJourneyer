@@ -27,7 +27,7 @@ import { PlanetPhysicalProperties } from "../../architecture/physicalProperties"
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { BodyType } from "../../architecture/bodyType";
 import { GenerationSteps } from "../../utils/generationSteps";
-import { wheelOfFortune } from "../../utils/wheelOfFortune";
+import { wheelOfFortune } from "../../utils/random";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 
 export class JuliaSetModel implements PlanetModel {

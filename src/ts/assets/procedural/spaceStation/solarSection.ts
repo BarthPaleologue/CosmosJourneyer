@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { wheelOfFortune } from "../../../utils/wheelOfFortune";
+import { wheelOfFortune } from "../../../utils/random";
 import { Transformable } from "../../../architecture/transformable";
 import { AbstractMesh, Mesh } from "@babylonjs/core/Meshes";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
