@@ -15,13 +15,13 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { pickPseudoRandomItems } from "../src/ts/utils/random";
+import { pickPseudoRandomItems, randomPieChart } from "../src/ts/utils/random";
 
 test("pickPseudoRandomItems", () => {
     const items = [0, 1, 2, 3, 4, 5];
+    const rng = (index: number) => Math.random();
     for (let i = 0; i < 1000; i++) {
         const nbItemsToPick = Math.floor(Math.random() * 5);
-        const rng = (index: number) => Math.random();
         const results = pickPseudoRandomItems(items, nbItemsToPick, rng, 0);
 
         // check we get the expected number of items
@@ -32,5 +32,19 @@ test("pickPseudoRandomItems", () => {
             const nbOccurence = results.filter((otherResult) => otherResult === result).length;
             expect(nbOccurence).toBe(1);
         }
+    }
+});
+
+test("randomPieChart", () => {
+    const rng = (index: number) => Math.random();
+    for(let i = 0; i < 1000; i++) {
+        const nbSlices = 1 + Math.floor(Math.random() * 20)
+        const pieChart = randomPieChart(nbSlices, rng, 0);
+
+        expect(pieChart.length).toBe(nbSlices);
+
+        let sum = 0;
+        pieChart.forEach(slice => sum += slice);
+        expect(sum).toBeCloseTo(1.0);
     }
 });
