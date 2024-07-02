@@ -90,10 +90,10 @@ scene.onBeforeRenderObservable.add(() => {
 
     belt.update(defaultControls.getTransform().getAbsolutePosition(), engine.getDeltaTime() / 1000);
 
-    sphere.rotate(Axis.Y, 0.0002);
-    /*scene.meshes.forEach((mesh) => {
+    sphere.rotate(Axis.Y, 0.002);
+    scene.meshes.forEach((mesh) => {
         if (mesh.physicsBody) physicsViewer.showBody(mesh.physicsBody);
-    });*/
+    });
 });
 
 scene.executeWhenReady(() => {

@@ -19,20 +19,36 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import "@babylonjs/core/Meshes/thinInstanceMesh";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { IPatch } from "../planets/telluricPlanet/terrain/instancePatch/iPatch";
-import { Transformable } from "../architecture/transformable";
+import { InstancedMesh, PhysicsAggregate, PhysicsMotionType, PhysicsShapeType, Quaternion, Vector3 } from "@babylonjs/core";
 
-export class AsteroidPatch implements IPatch, Transformable {
+export class AsteroidPatch implements IPatch {
     private baseMesh: Mesh | null = null;
-    readonly matrixBuffer: Float32Array;
 
-    constructor(matrixBuffer: Float32Array) {
-        this.matrixBuffer = matrixBuffer;
+    readonly parent: TransformNode;
+
+    readonly instances: InstancedMesh[] = [];
+    readonly instanceAggregates: PhysicsAggregate[] = [];
+
+    private positions: Vector3[];
+    private rotations: Quaternion[];
+    private scalings: Vector3[];
+
+    constructor(positions: Vector3[], rotations: Quaternion[], scalings: Vector3[], parent: TransformNode) {
+        this.parent = parent;
+
+        this.positions = positions;
+        this.rotations = rotations;
+        this.scalings = scalings;
     }
 
     public clearInstances(): void {
         if (this.baseMesh === null) return;
-        this.baseMesh.thinInstanceCount = 0;
-        this.baseMesh.dispose();
+        this.instanceAggregates.forEach(aggregate => aggregate.dispose());
+        this.instances.forEach(instance => instance.dispose());
+
+        this.instanceAggregates.length = 0;
+        this.instances.length = 0;
+        
         this.baseMesh = null;
     }
 
@@ -41,11 +57,23 @@ export class AsteroidPatch implements IPatch, Transformable {
         if (!(baseMesh instanceof Mesh)) {
             throw new Error("Tried to create instances from a non-mesh object. Try using HierarchyInstancePatch instead if you want to use a TransformNode.");
         }
-        this.baseMesh = baseMesh.clone();
-        this.baseMesh.makeGeometryUnique();
+        this.baseMesh = baseMesh as Mesh;
 
-        this.baseMesh.isVisible = true;
-        this.baseMesh.thinInstanceSetBuffer("matrix", this.matrixBuffer, 16, false);
+        for (let i = 0; i < this.positions.length; i++) {
+            const instance = this.baseMesh.createInstance(`instance${i}`);
+            instance.position.copyFrom(this.positions[i]);
+            instance.rotationQuaternion = this.rotations[i];
+            instance.scaling.copyFrom(this.scalings[i]);
+            this.instances.push(instance);
+
+            instance.parent = this.parent;
+
+            const instanceAggregate = new PhysicsAggregate(instance, PhysicsShapeType.CONVEX_HULL, { mass: 0 }, this.baseMesh.getScene());
+            instanceAggregate.body.setMotionType(PhysicsMotionType.STATIC);
+            instanceAggregate.body.disablePreStep = false;
+            this.instanceAggregates.push(instanceAggregate);
+
+        }
     }
 
     public getNbInstances(): number {
@@ -60,13 +88,6 @@ export class AsteroidPatch implements IPatch, Transformable {
 
     public getBaseMesh(): Mesh {
         if (this.baseMesh === null) throw new Error("Tried to get base mesh but no base mesh was set.");
-        return this.baseMesh;
-    }
-
-    public getTransform(): TransformNode {
-        if(this.baseMesh === null) {
-            throw new Error("Patch is not instanciated, the baseMesh is null!");
-        }
         return this.baseMesh;
     }
 

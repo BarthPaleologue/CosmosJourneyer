@@ -47,7 +47,7 @@ export class AsteroidField {
 
     readonly fadeSpeed = 1;
 
-    private readonly patches = new Map<string, { patch: IPatch, patchPhysicsAggregate: PhysicsAggregate, cellX: number, cellZ: number }>();
+    private readonly patches = new Map<string, { patch: IPatch, cellX: number, cellZ: number }>();
 
     readonly scene: Scene;
 
@@ -90,19 +90,12 @@ export class AsteroidField {
             const patchCellX = value.cellX;
             const patchCellZ = value.cellZ;
             const patch = value.patch;
-            const patchPhysicsAggregate = value.patchPhysicsAggregate;
 
             if ((cameraCellX - patchCellX) ** 2 + cameraCellY * cameraCellY + (cameraCellZ - patchCellZ) ** 2 >= this.neighborCellsRenderRadius * this.neighborCellsRenderRadius) {
-                patch.getBaseMesh().visibility = Math.max(0, patch.getBaseMesh().visibility - deltaSeconds * this.fadeSpeed);
-                if (patch.getBaseMesh().visibility === 0) {
-                    patch.clearInstances();
-                    patch.dispose();
-                    patchPhysicsAggregate.dispose();
+                patch.clearInstances();
+                patch.dispose();
 
-                    this.patches.delete(key);
-                }
-            } else {
-                patch.getBaseMesh().visibility = Math.min(1, patch.getBaseMesh().visibility + deltaSeconds * this.fadeSpeed);
+                this.patches.delete(key);
             }
         }
 
@@ -119,21 +112,12 @@ export class AsteroidField {
 
                 if ((cameraCellX - cellX) ** 2 + cameraCellY * cameraCellY + (cameraCellZ - cellZ) ** 2 >= this.neighborCellsRenderRadius * this.neighborCellsRenderRadius) continue;
 
-                const matrixBuffer = AsteroidField.CreateAsteroidBuffer(new Vector3(cellX * this.patchSize, 0, cellZ * this.patchSize), this.resolution, this.patchSize, this.patchThickness, this.minRadius, this.maxRadius);
-                const patch = new AsteroidPatch(matrixBuffer);
+                const [positions, rotations, scalings] = AsteroidField.CreateAsteroidBuffer(new Vector3(cellX * this.patchSize, 0, cellZ * this.patchSize), this.resolution, this.patchSize, this.patchThickness, this.minRadius, this.maxRadius);
+                const patch = new AsteroidPatch(positions, rotations, scalings, this.parent);
                 patch.createInstances(Objects.ASTEROID);
-                patch.getTransform().parent = this.parent;
-                patch.getBaseMesh().visibility = 0.0;
 
-                const patchPhysicsAggregate = new PhysicsAggregate(patch.getBaseMesh(), PhysicsShapeType.MESH, { mass: 10 }, this.scene);
-                patchPhysicsAggregate.body.disablePreStep = false;
-                patchPhysicsAggregate.body.updateBodyInstances();
-                patchPhysicsAggregate.body.setAngularDamping(0);
-                for (let i = 0; i < patch.getNbInstances(); i++) {
-                    patchPhysicsAggregate.body.setAngularVelocity(new Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5), i);
-                }
 
-                this.patches.set(`${cellX};${cellZ}`, { patch: patch, patchPhysicsAggregate: patchPhysicsAggregate, cellX: cellX, cellZ: cellZ });
+                this.patches.set(`${cellX};${cellZ}`, { patch: patch, cellX: cellX, cellZ: cellZ });
             }
         }
     }
@@ -148,8 +132,11 @@ export class AsteroidField {
      * @param maxRadius The maximum radius at which the belt ends
      * @returns A new matrix 4x4 buffer
      */
-    static CreateAsteroidBuffer(position: Vector3, resolution: number, patchSize: number, patchThickness: number, minRadius: number, maxRadius: number): Float32Array {
-        const matrixBuffer = new Float32Array(resolution * resolution * 16);
+    static CreateAsteroidBuffer(position: Vector3, resolution: number, patchSize: number, patchThickness: number, minRadius: number, maxRadius: number): [Vector3[], Quaternion[], Vector3[]] {
+        const positions = [];
+        const rotations = [];
+        const scalings = [];
+
         const cellSize = patchSize / resolution;
         let index = 0;
         for (let x = 0; x < resolution; x++) {
@@ -163,19 +150,16 @@ export class AsteroidField {
                 if (positionX * positionX + positionZ * positionZ > maxRadius * maxRadius) continue;
 
                 const positionY = position.y + (Math.random() - 0.5) * 2 * patchThickness;
-                const scaling = 1; //0.7 + Math.random() * 0.6; see https://forum.babylonjs.com/t/havok-instances-break-when-changing-the-scaling-of-individual-instances/51632
+                const scaling = 0.7 + Math.random() * 0.6;
 
-                const matrix = Matrix.Compose(
-                    new Vector3(scaling, scaling, scaling),
-                    Quaternion.RotationAxis(new Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize(), Math.random() * 2 * Math.PI),
-                    new Vector3(positionX, positionY, positionZ)
-                );
-                matrix.copyToArray(matrixBuffer, 16 * index);
+                positions.push(new Vector3(positionX, positionY, positionZ));
+                rotations.push(Quaternion.RotationAxis(new Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize(), Math.random() * 2 * Math.PI));
+                scalings.push(new Vector3(scaling, scaling, scaling));
 
                 index += 1;
             }
         }
 
-        return matrixBuffer.subarray(0, index * 16);
+        return [positions, rotations, scalings];
     }
 }
