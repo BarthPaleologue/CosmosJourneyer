@@ -47,8 +47,6 @@ export class JuliaSetModel implements PlanetModel {
 
     readonly nbMoons: number;
 
-    readonly ringsUniforms = null;
-
     readonly accentColor: Color3;
 
     constructor(seed: number, parentBody?: CelestialBodyModel) {

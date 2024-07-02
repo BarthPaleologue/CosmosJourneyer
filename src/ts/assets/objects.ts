@@ -50,6 +50,8 @@ export class Objects {
     private static LANDING_PAD: Mesh;
 
     public static ROCK: Mesh;
+    public static ASTEROID: Mesh;
+
     public static TREE: Mesh;
 
     public static BUTTERFLY: Mesh;
@@ -134,6 +136,12 @@ export class Objects {
             Objects.ROCK.bakeCurrentTransformIntoVertices();
             Objects.ROCK.checkCollisions = true;
             Objects.ROCK.isVisible = false;
+
+            Objects.ASTEROID = Objects.ROCK.clone();
+            Objects.ASTEROID.makeGeometryUnique();
+            Objects.ASTEROID.scaling.scaleInPlace(200);
+            Objects.ASTEROID.bakeCurrentTransformIntoVertices();
+            Objects.ASTEROID.isVisible = false;
 
             console.log("Rock loaded");
         };
