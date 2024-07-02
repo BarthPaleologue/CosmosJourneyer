@@ -35,6 +35,8 @@ export class AsteroidPatch implements IPatch {
 
     private nbInstances = 0;
 
+    private readonly batchSize = 5;
+
     constructor(positions: Vector3[], rotations: Quaternion[], scalings: Vector3[], parent: TransformNode) {
         this.parent = parent;
 
@@ -64,24 +66,26 @@ export class AsteroidPatch implements IPatch {
     }
 
     public update(): void {
-
         if (this.baseMesh === null) return;
-        if (this.nbInstances === this.positions.length) return;
 
-        const instance = this.baseMesh.createInstance(`instance${this.nbInstances}`);
-        instance.position.copyFrom(this.positions[this.nbInstances]);
-        instance.rotationQuaternion = this.rotations[this.nbInstances];
-        instance.scaling.copyFrom(this.scalings[this.nbInstances]);
-        this.instances.push(instance);
+        for (let i = 0; i < this.batchSize; i++) {
+            if (this.nbInstances === this.positions.length) return;
 
-        instance.parent = this.parent;
+            const instance = this.baseMesh.createInstance(`instance${this.nbInstances}`);
+            instance.position.copyFrom(this.positions[this.nbInstances]);
+            instance.rotationQuaternion = this.rotations[this.nbInstances];
+            instance.scaling.copyFrom(this.scalings[this.nbInstances]);
+            this.instances.push(instance);
 
-        const instanceAggregate = new PhysicsAggregate(instance, PhysicsShapeType.MESH, { mass: 1 }, this.baseMesh.getScene());
-        instanceAggregate.body.setAngularVelocity(new Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5));
-        instanceAggregate.body.disablePreStep = false;
-        this.instanceAggregates.push(instanceAggregate);
+            instance.parent = this.parent;
 
-        this.nbInstances++;
+            const instanceAggregate = new PhysicsAggregate(instance, PhysicsShapeType.MESH, { mass: 1 }, this.baseMesh.getScene());
+            instanceAggregate.body.setAngularVelocity(new Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5));
+            instanceAggregate.body.disablePreStep = false;
+            this.instanceAggregates.push(instanceAggregate);
+
+            this.nbInstances++;
+        }
     }
 
     public getNbInstances(): number {
