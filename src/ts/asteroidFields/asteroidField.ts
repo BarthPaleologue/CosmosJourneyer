@@ -47,7 +47,7 @@ export class AsteroidField {
 
     readonly fadeSpeed = 1;
 
-    private readonly patches = new Map<string, { patch: IPatch, cellX: number, cellZ: number }>();
+    private readonly patches = new Map<string, { patch: AsteroidPatch, cellX: number, cellZ: number }>();
 
     readonly scene: Scene;
 
@@ -96,6 +96,8 @@ export class AsteroidField {
                 patch.dispose();
 
                 this.patches.delete(key);
+            } else {
+                patch.update();
             }
         }
 

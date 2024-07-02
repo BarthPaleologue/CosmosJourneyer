@@ -33,6 +33,8 @@ export class AsteroidPatch implements IPatch {
     private rotations: Quaternion[];
     private scalings: Vector3[];
 
+    private nbInstances = 0;
+
     constructor(positions: Vector3[], rotations: Quaternion[], scalings: Vector3[], parent: TransformNode) {
         this.parent = parent;
 
@@ -48,8 +50,9 @@ export class AsteroidPatch implements IPatch {
 
         this.instanceAggregates.length = 0;
         this.instances.length = 0;
-        
+
         this.baseMesh = null;
+        this.nbInstances = 0;
     }
 
     public createInstances(baseMesh: TransformNode): void {
@@ -58,22 +61,27 @@ export class AsteroidPatch implements IPatch {
             throw new Error("Tried to create instances from a non-mesh object. Try using HierarchyInstancePatch instead if you want to use a TransformNode.");
         }
         this.baseMesh = baseMesh as Mesh;
+    }
 
-        for (let i = 0; i < this.positions.length; i++) {
-            const instance = this.baseMesh.createInstance(`instance${i}`);
-            instance.position.copyFrom(this.positions[i]);
-            instance.rotationQuaternion = this.rotations[i];
-            instance.scaling.copyFrom(this.scalings[i]);
-            this.instances.push(instance);
+    public update(): void {
 
-            instance.parent = this.parent;
+        if (this.baseMesh === null) return;
+        if (this.nbInstances === this.positions.length) return;
 
-            const instanceAggregate = new PhysicsAggregate(instance, PhysicsShapeType.CONVEX_HULL, { mass: 0 }, this.baseMesh.getScene());
-            instanceAggregate.body.setMotionType(PhysicsMotionType.STATIC);
-            instanceAggregate.body.disablePreStep = false;
-            this.instanceAggregates.push(instanceAggregate);
+        const instance = this.baseMesh.createInstance(`instance${this.nbInstances}`);
+        instance.position.copyFrom(this.positions[this.nbInstances]);
+        instance.rotationQuaternion = this.rotations[this.nbInstances];
+        instance.scaling.copyFrom(this.scalings[this.nbInstances]);
+        this.instances.push(instance);
 
-        }
+        instance.parent = this.parent;
+
+        const instanceAggregate = new PhysicsAggregate(instance, PhysicsShapeType.MESH, { mass: 1 }, this.baseMesh.getScene());
+        instanceAggregate.body.setAngularVelocity(new Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5));
+        instanceAggregate.body.disablePreStep = false;
+        this.instanceAggregates.push(instanceAggregate);
+
+        this.nbInstances++;
     }
 
     public getNbInstances(): number {
