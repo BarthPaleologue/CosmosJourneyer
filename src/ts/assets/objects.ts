@@ -141,7 +141,7 @@ export class Objects {
             Objects.ASTEROID.makeGeometryUnique();
             Objects.ASTEROID.scaling.scaleInPlace(200);
             Objects.ASTEROID.bakeCurrentTransformIntoVertices();
-            Objects.ROCK.isVisible = false;
+            Objects.ASTEROID.isVisible = false;
 
             console.log("Rock loaded");
         };
