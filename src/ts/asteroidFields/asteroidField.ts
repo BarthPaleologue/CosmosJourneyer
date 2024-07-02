@@ -16,11 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { Scene } from "@babylonjs/core/scene";
-import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
-import { IPatch } from "../planets/telluricPlanet/terrain/instancePatch/iPatch";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Objects } from "../assets/objects";
 import { AsteroidPatch } from "./asteroidPatch";
 
@@ -38,8 +35,8 @@ export class AsteroidField {
     readonly minRadius: number;
     readonly maxRadius: number;
 
-    readonly resolution = 20;
-    readonly patchSize = 25000;
+    readonly resolution = 15;
+    readonly patchSize = 20000;
 
     readonly patchThickness = 1000;
 

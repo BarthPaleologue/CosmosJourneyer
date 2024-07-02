@@ -84,6 +84,7 @@ export class AsteroidPatch implements IPatch {
 
             const instanceAggregate = new PhysicsAggregate(instance, PhysicsShapeType.MESH, { mass: 1 }, this.baseMesh.getScene());
             instanceAggregate.body.setAngularVelocity(new Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5));
+            instanceAggregate.body.setAngularDamping(0);
             instanceAggregate.body.disablePreStep = false;
             this.instanceAggregates.push(instanceAggregate);
 
