@@ -75,6 +75,9 @@ export class AsteroidPatch implements IPatch {
             instance.position.copyFrom(this.positions[this.nbInstances]);
             instance.rotationQuaternion = this.rotations[this.nbInstances];
             instance.scaling.copyFrom(this.scalings[this.nbInstances]);
+            instance.alwaysSelectAsActiveMesh = true;
+            instance.isPickable = false;
+            
             this.instances.push(instance);
 
             instance.parent = this.parent;
