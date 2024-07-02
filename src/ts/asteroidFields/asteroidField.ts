@@ -36,7 +36,7 @@ export class AsteroidField {
     readonly maxRadius: number;
 
     readonly resolution = 15;
-    readonly patchSize = 20000;
+    readonly patchSize = 30000;
 
     readonly patchThickness = 1000;
 
