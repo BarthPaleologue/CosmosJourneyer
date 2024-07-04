@@ -130,6 +130,10 @@ export class WarpDrive implements ReadonlyWarpDrive {
         this.state = WarpDriveState.DESENGAGING;
     }
 
+    public emergencyStop(): void {
+        this.disable();
+    }
+
     /**
      * Disables the warp drive: the target speed, the current speed and the internal throttle are set to 0.
      */
