@@ -35,7 +35,9 @@ export class AsteroidPatch implements IPatch {
 
     private nbInstances = 0;
 
-    private readonly batchSize = 5;
+    private readonly physicsRadius = 10000;
+
+    private readonly batchSize = 1;
 
     constructor(positions: Vector3[], rotations: Quaternion[], scalings: Vector3[], parent: TransformNode) {
         this.parent = parent;
@@ -65,8 +67,27 @@ export class AsteroidPatch implements IPatch {
         this.baseMesh = baseMesh as Mesh;
     }
 
-    public update(): void {
+    public update(controlsPosition: Vector3): void {
         if (this.baseMesh === null) return;
+
+        this.instances.forEach((instance) => {
+            const distanceToCamera = Vector3.Distance(controlsPosition, instance.getAbsolutePosition());
+            if(distanceToCamera < this.physicsRadius && (instance.physicsBody === null || instance.physicsBody === undefined)) {
+                const instanceAggregate = new PhysicsAggregate(instance, PhysicsShapeType.CONVEX_HULL, { mass: 1000 }, this.baseMesh?.getScene());
+                instanceAggregate.body.setAngularVelocity(new Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5));
+                instanceAggregate.body.setAngularDamping(0);
+                instanceAggregate.body.disablePreStep = false;
+                this.instanceAggregates.push(instanceAggregate);
+            } else if(distanceToCamera > this.physicsRadius + 1000 && instance.physicsBody !== null && instance.physicsBody !== undefined) {
+                const aggregate = this.instanceAggregates.find(aggregate => aggregate.body === instance.physicsBody);
+                if(aggregate) {
+                    aggregate.dispose();
+                    this.instanceAggregates.splice(this.instanceAggregates.indexOf(aggregate), 1);
+                } else {
+                    throw new Error("Physics body not found in instance aggregates.");
+                }
+            }
+        });
 
         for (let i = 0; i < this.batchSize; i++) {
             if (this.nbInstances === this.positions.length) return;
@@ -77,16 +98,9 @@ export class AsteroidPatch implements IPatch {
             instance.scaling.copyFrom(this.scalings[this.nbInstances]);
             instance.alwaysSelectAsActiveMesh = true;
             instance.isPickable = false;
+            instance.parent = this.parent;
             
             this.instances.push(instance);
-
-            instance.parent = this.parent;
-
-            const instanceAggregate = new PhysicsAggregate(instance, PhysicsShapeType.MESH, { mass: 1 }, this.baseMesh.getScene());
-            instanceAggregate.body.setAngularVelocity(new Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5));
-            instanceAggregate.body.setAngularDamping(0);
-            instanceAggregate.body.disablePreStep = false;
-            this.instanceAggregates.push(instanceAggregate);
 
             this.nbInstances++;
         }

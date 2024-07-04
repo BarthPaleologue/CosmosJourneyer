@@ -94,7 +94,7 @@ export class AsteroidField {
 
                 this.patches.delete(key);
             } else {
-                patch.update();
+                patch.update(cameraWorldPosition);
             }
         }
 
