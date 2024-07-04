@@ -35,9 +35,9 @@ export class AsteroidPatch implements IPatch {
 
     private nbInstances = 0;
 
-    private readonly physicsRadius = 10000;
+    private readonly physicsRadius = 10e3;
 
-    private readonly batchSize = 1;
+    private readonly batchSize = 3;
 
     constructor(positions: Vector3[], rotations: Quaternion[], scalings: Vector3[], parent: TransformNode) {
         this.parent = parent;
