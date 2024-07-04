@@ -20,6 +20,7 @@ import "@babylonjs/core/Meshes/thinInstanceMesh";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { IPatch } from "../planets/telluricPlanet/terrain/instancePatch/iPatch";
 import { InstancedMesh, PhysicsAggregate, PhysicsShapeType, Quaternion, Space, Vector3 } from "@babylonjs/core";
+import { CollisionMask } from "../settings";
 
 export class AsteroidPatch implements IPatch {
     private baseMesh: Mesh | null = null;
@@ -83,6 +84,8 @@ export class AsteroidPatch implements IPatch {
                 instanceAggregate.body.setAngularVelocity(this.rotationAxes[index].scale(this.rotationSpeeds[index]));
                 instanceAggregate.body.setAngularDamping(0);
                 instanceAggregate.body.disablePreStep = false;
+                instanceAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+                instanceAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
                 this.instanceAggregates.push(instanceAggregate);
             } else if(distanceToCamera > this.physicsRadius + 1000 && instance.physicsBody !== null && instance.physicsBody !== undefined) {
                 const aggregate = this.instanceAggregates.find(aggregate => aggregate.body === instance.physicsBody);
