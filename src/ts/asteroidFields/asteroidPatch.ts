@@ -19,7 +19,7 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import "@babylonjs/core/Meshes/thinInstanceMesh";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { IPatch } from "../planets/telluricPlanet/terrain/instancePatch/iPatch";
-import { InstancedMesh, PhysicsAggregate, PhysicsShapeType, Quaternion, Vector3 } from "@babylonjs/core";
+import { InstancedMesh, PhysicsAggregate, PhysicsShapeType, Quaternion, Space, Vector3 } from "@babylonjs/core";
 
 export class AsteroidPatch implements IPatch {
     private baseMesh: Mesh | null = null;
@@ -33,18 +33,24 @@ export class AsteroidPatch implements IPatch {
     private rotations: Quaternion[];
     private scalings: Vector3[];
 
+    private rotationAxes: Vector3[] = [];
+    private rotationSpeeds: number[] = [];
+
     private nbInstances = 0;
 
     private readonly physicsRadius = 10e3;
 
     private readonly batchSize = 3;
 
-    constructor(positions: Vector3[], rotations: Quaternion[], scalings: Vector3[], parent: TransformNode) {
+    constructor(positions: Vector3[], rotations: Quaternion[], scalings: Vector3[], rotationAxes: Vector3[], rotationSpeeds: number[], parent: TransformNode) {
         this.parent = parent;
 
         this.positions = positions;
         this.rotations = rotations;
         this.scalings = scalings;
+
+        this.rotationAxes = rotationAxes;
+        this.rotationSpeeds = rotationSpeeds;
     }
 
     public clearInstances(): void {
@@ -67,14 +73,14 @@ export class AsteroidPatch implements IPatch {
         this.baseMesh = baseMesh as Mesh;
     }
 
-    public update(controlsPosition: Vector3): void {
+    public update(controlsPosition: Vector3, deltaSeconds: number): void {
         if (this.baseMesh === null) return;
 
-        this.instances.forEach((instance) => {
+        this.instances.forEach((instance, index) => {
             const distanceToCamera = Vector3.Distance(controlsPosition, instance.getAbsolutePosition());
             if(distanceToCamera < this.physicsRadius && (instance.physicsBody === null || instance.physicsBody === undefined)) {
                 const instanceAggregate = new PhysicsAggregate(instance, PhysicsShapeType.CONVEX_HULL, { mass: 1000 }, this.baseMesh?.getScene());
-                instanceAggregate.body.setAngularVelocity(new Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).scale(0.2));
+                instanceAggregate.body.setAngularVelocity(this.rotationAxes[index].scale(this.rotationSpeeds[index]));
                 instanceAggregate.body.setAngularDamping(0);
                 instanceAggregate.body.disablePreStep = false;
                 this.instanceAggregates.push(instanceAggregate);
@@ -86,6 +92,10 @@ export class AsteroidPatch implements IPatch {
                 } else {
                     throw new Error("Physics body not found in instance aggregates.");
                 }
+            }
+
+            if(instance.physicsBody === null || instance.physicsBody === undefined) {
+                instance.rotate(this.rotationAxes[index], this.rotationSpeeds[index] * deltaSeconds, Space.WORLD);
             }
         });
 

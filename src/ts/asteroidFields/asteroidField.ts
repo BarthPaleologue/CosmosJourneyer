@@ -94,7 +94,7 @@ export class AsteroidField {
 
                 this.patches.delete(key);
             } else {
-                patch.update(cameraWorldPosition);
+                patch.update(cameraWorldPosition, deltaSeconds);
             }
         }
 
@@ -111,8 +111,8 @@ export class AsteroidField {
 
                 if ((cameraCellX - cellX) ** 2 + cameraCellY * cameraCellY + (cameraCellZ - cellZ) ** 2 >= this.neighborCellsRenderRadius * this.neighborCellsRenderRadius) continue;
 
-                const [positions, rotations, scalings] = AsteroidField.CreateAsteroidBuffer(new Vector3(cellX * this.patchSize, 0, cellZ * this.patchSize), this.resolution, this.patchSize, this.patchThickness, this.minRadius, this.maxRadius);
-                const patch = new AsteroidPatch(positions, rotations, scalings, this.parent);
+                const [positions, rotations, scalings, rotationAxes, rotationSpeeds] = AsteroidField.CreateAsteroidBuffer(new Vector3(cellX * this.patchSize, 0, cellZ * this.patchSize), this.resolution, this.patchSize, this.patchThickness, this.minRadius, this.maxRadius);
+                const patch = new AsteroidPatch(positions, rotations, scalings, rotationAxes, rotationSpeeds, this.parent);
                 patch.createInstances(Objects.ASTEROID);
 
 
@@ -131,10 +131,13 @@ export class AsteroidField {
      * @param maxRadius The maximum radius at which the belt ends
      * @returns A new matrix 4x4 buffer
      */
-    static CreateAsteroidBuffer(position: Vector3, resolution: number, patchSize: number, patchThickness: number, minRadius: number, maxRadius: number): [Vector3[], Quaternion[], Vector3[]] {
+    static CreateAsteroidBuffer(position: Vector3, resolution: number, patchSize: number, patchThickness: number, minRadius: number, maxRadius: number): [Vector3[], Quaternion[], Vector3[], Vector3[], number[]] {
         const positions = [];
         const rotations = [];
         const scalings = [];
+
+        const rotationAxes = [];
+        const rotationSpeeds = [];
 
         const cellSize = patchSize / resolution;
         let index = 0;
@@ -155,10 +158,13 @@ export class AsteroidField {
                 rotations.push(Quaternion.RotationAxis(new Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize(), Math.random() * 2 * Math.PI));
                 scalings.push(new Vector3(scaling, scaling, scaling));
 
+                rotationAxes.push(new Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize());
+                rotationSpeeds.push(Math.random() * 0.5);
+
                 index += 1;
             }
         }
 
-        return [positions, rotations, scalings];
+        return [positions, rotations, scalings, rotationAxes, rotationSpeeds];
     }
 }
