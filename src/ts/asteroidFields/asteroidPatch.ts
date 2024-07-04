@@ -19,7 +19,7 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import "@babylonjs/core/Meshes/thinInstanceMesh";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { IPatch } from "../planets/telluricPlanet/terrain/instancePatch/iPatch";
-import { InstancedMesh, PhysicsAggregate, PhysicsMotionType, PhysicsShapeType, Quaternion, Vector3 } from "@babylonjs/core";
+import { InstancedMesh, PhysicsAggregate, PhysicsShapeType, Quaternion, Vector3 } from "@babylonjs/core";
 
 export class AsteroidPatch implements IPatch {
     private baseMesh: Mesh | null = null;
@@ -74,7 +74,7 @@ export class AsteroidPatch implements IPatch {
             const distanceToCamera = Vector3.Distance(controlsPosition, instance.getAbsolutePosition());
             if(distanceToCamera < this.physicsRadius && (instance.physicsBody === null || instance.physicsBody === undefined)) {
                 const instanceAggregate = new PhysicsAggregate(instance, PhysicsShapeType.CONVEX_HULL, { mass: 1000 }, this.baseMesh?.getScene());
-                instanceAggregate.body.setAngularVelocity(new Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5));
+                instanceAggregate.body.setAngularVelocity(new Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).scale(0.2));
                 instanceAggregate.body.setAngularDamping(0);
                 instanceAggregate.body.disablePreStep = false;
                 this.instanceAggregates.push(instanceAggregate);
