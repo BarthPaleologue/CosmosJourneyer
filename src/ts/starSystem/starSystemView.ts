@@ -338,7 +338,7 @@ export class StarSystemView implements View {
 
         // small ambient light helps with seeing dark objects. This is unrealistic but I feel it is better.
         const ambientLight = new HemisphericLight("ambientLight", Vector3.Zero(), this.scene);
-        ambientLight.intensity = 0.3;
+        ambientLight.intensity = 0.02;
 
         this.postProcessManager = new PostProcessManager(this.scene);
 
