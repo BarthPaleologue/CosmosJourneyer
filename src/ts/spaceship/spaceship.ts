@@ -354,34 +354,47 @@ export class Spaceship implements Transformable {
 
         const currentForwardSpeed = Vector3.Dot(warpSpeed, this.aggregate.transformNode.getDirection(Axis.Z));
 
-        if (this.nearestOrbitalObject !== null) {
-            const distanceToClosestOrbitalObject = Vector3.Distance(this.getTransform().getAbsolutePosition(), this.nearestOrbitalObject.getTransform().getAbsolutePosition());
-            const orbitalObjectRadius = this.nearestOrbitalObject.getBoundingRadius();
+        if (this.warpDrive.isEnabled()) {
+            let closestDistance = Number.POSITIVE_INFINITY;
+            let objectHalfThickness = 0;
 
-            this.warpDrive.update(currentForwardSpeed, distanceToClosestOrbitalObject, orbitalObjectRadius, deltaSeconds);
-        }
+            if (this.nearestOrbitalObject !== null) {
+                const distanceToClosestOrbitalObject = Vector3.Distance(this.getTransform().getAbsolutePosition(), this.nearestOrbitalObject.getTransform().getAbsolutePosition());
+                const orbitalObjectRadius = this.nearestOrbitalObject.getBoundingRadius();
+
+                closestDistance = Math.min(closestDistance, distanceToClosestOrbitalObject);
+                objectHalfThickness = Math.max(orbitalObjectRadius, objectHalfThickness);
+            }
+
+            if (this.warpDrive.isEnabled() && this.nearestCelestialBody !== null) {
+                // if the spaceship goes too close to planetary rings, stop the warp drive to avoid collision with asteroids
+                const ringsUniforms = this.nearestCelestialBody.getRingsUniforms();
+                const asteroidField = this.nearestCelestialBody.getAsteroidField();
+
+                if (ringsUniforms !== null && asteroidField !== null) {
+                    const relativePosition = this.getTransform().getAbsolutePosition().subtract(this.nearestCelestialBody.getTransform().getAbsolutePosition());
+                    const distanceAboveRings = Vector3.Dot(relativePosition, this.nearestCelestialBody.getRotationAxis());
+                    const planarDistance = relativePosition.subtract(this.nearestCelestialBody.getRotationAxis().scale(distanceAboveRings)).length();
+
+                    const ringsMinDistance = ringsUniforms.model.ringStart * this.nearestCelestialBody.getBoundingRadius();
+                    const ringsMaxDistance = ringsUniforms.model.ringEnd * this.nearestCelestialBody.getBoundingRadius();
+
+                    if(distanceAboveRings < asteroidField.patchThickness * 500 && planarDistance > ringsMinDistance && planarDistance < ringsMaxDistance) {
+                        closestDistance = distanceAboveRings
+                        objectHalfThickness = asteroidField.patchThickness / 2;
+                    }
 
 
-        
-        if (this.warpDrive.isEnabled() && this.nearestCelestialBody !== null) {
-            // if the spaceship goes too close to planetary rings, stop the warp drive to avoid collision with asteroids
-            const ringsUniforms = this.nearestCelestialBody.getRingsUniforms();
-
-            if (ringsUniforms !== null) {
-                const relativePosition = this.getTransform().getAbsolutePosition().subtract(this.nearestCelestialBody.getTransform().getAbsolutePosition());
-                const distanceAboveRings = Vector3.Dot(relativePosition, this.nearestCelestialBody.getRotationAxis());
-                const planarDistance = relativePosition.subtract(this.nearestCelestialBody.getRotationAxis().scale(distanceAboveRings)).length();
-
-                const ringsMinDistance = ringsUniforms.model.ringStart * this.nearestCelestialBody.getBoundingRadius();
-                const ringsMaxDistance = ringsUniforms.model.ringEnd * this.nearestCelestialBody.getBoundingRadius();
-
-                if (distanceAboveRings < 1000 && planarDistance > ringsMinDistance && planarDistance < ringsMaxDistance) {
-                    this.emergencyStopWarpDrive();
+                    if (distanceAboveRings < asteroidField.patchThickness && planarDistance > ringsMinDistance && planarDistance < ringsMaxDistance) {
+                        this.emergencyStopWarpDrive();
+                    }
                 }
             }
+
+            this.warpDrive.update(currentForwardSpeed, closestDistance, objectHalfThickness, deltaSeconds);
         }
 
-        
+
 
         // the warp throttle goes from 0.1 to 1 smoothly using an inverse function
         if (this.warpDrive.isEnabled()) this.warpTunnel.setThrottle(1 - 1 / (1.1 * (1 + 1e-7 * this.warpDrive.getWarpSpeed())));
