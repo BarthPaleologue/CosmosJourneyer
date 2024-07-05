@@ -76,7 +76,7 @@ const sphereAggregate = new PhysicsAggregate(sphere, PhysicsShapeType.SPHERE, {m
 const beltRadius = 100 * scaler;
 const beltSpread = 20 * scaler;
 
-const belt = new AsteroidField(sphere, beltRadius, beltSpread, scene);
+const belt = new AsteroidField(42, sphere, beltRadius, beltSpread, scene);
 
 const torus = MeshBuilder.CreateTorus("torus", { diameter: 2 * beltRadius, thickness: 2 * beltSpread, tessellation: 32 }, scene);
 torus.visibility = 0.1;

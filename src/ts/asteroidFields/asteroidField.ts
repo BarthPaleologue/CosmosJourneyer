@@ -20,12 +20,15 @@ import { Scene } from "@babylonjs/core/scene";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Objects } from "../assets/objects";
 import { AsteroidPatch } from "./asteroidPatch";
+import { seededSquirrelNoise } from "squirrel-noise";
 
 /**
- * An asteroid belts is basically a collection of thin instance chunks that can be created and destroyed depending on where the player is.
+ * An asteroid field is basically a collection of instance chunks that can be created and destroyed depending on where the player is.
  * This allows to only render the asteroids close to the player, saving immense resources.
  */
 export class AsteroidField {
+    readonly seed: number;
+    readonly rng: (step: number) => number;
 
     readonly parent: TransformNode;
 
@@ -49,13 +52,17 @@ export class AsteroidField {
     readonly scene: Scene;
 
     /**
-     * Creates a new asteroid belt around a given transform
+     * Creates a new asteroid field around a given transform
+     * @param seed The seed of the asteroid field
      * @param parent A parent transform node for the asteroids
      * @param averageRadius The average distance to the parent of the asteroids
      * @param spread The spread of the distance to the parent around the average distance
-     * @param scene The scene where the asteroid belt exists
+     * @param scene The scene where the asteroid field exists
      */
-    constructor(parent: TransformNode, averageRadius: number, spread: number, scene: Scene) {
+    constructor(seed: number, parent: TransformNode, averageRadius: number, spread: number, scene: Scene) {
+        this.seed = seed;
+        this.rng = seededSquirrelNoise(this.seed);
+
         this.parent = parent;
 
         this.averageRadius = averageRadius;
@@ -68,7 +75,7 @@ export class AsteroidField {
     }
 
     /**
-     * Updates the asteroid belt. The position of the camera is used to determine which chunks to load and unload.
+     * Updates the asteroid field. The position of the camera is used to determine which chunks to load and unload.
      * The delta seconds are used to fade in and out the chunks
      * @param cameraWorldPosition The position of the camera in world space
      * @param deltaSeconds The seconds elapsed since last frame
@@ -111,7 +118,9 @@ export class AsteroidField {
 
                 if ((cameraCellX - cellX) ** 2 + cameraCellY * cameraCellY + (cameraCellZ - cellZ) ** 2 >= this.neighborCellsRenderRadius * this.neighborCellsRenderRadius) continue;
 
-                const [positions, rotations, scalings, rotationAxes, rotationSpeeds] = AsteroidField.CreateAsteroidBuffer(new Vector3(cellX * this.patchSize, 0, cellZ * this.patchSize), this.resolution, this.patchSize, this.patchThickness, this.minRadius, this.maxRadius);
+                const cellCoords = new Vector3(cellX * this.patchSize, 0, cellZ * this.patchSize);
+
+                const [positions, rotations, scalings, rotationAxes, rotationSpeeds] = AsteroidField.CreateAsteroidBuffer(cellCoords, this.resolution, this.patchSize, this.patchThickness, this.minRadius, this.maxRadius, this.rng);
                 const patch = new AsteroidPatch(positions, rotations, scalings, rotationAxes, rotationSpeeds, this.parent);
                 patch.createInstances(Objects.ASTEROID);
 
@@ -123,15 +132,16 @@ export class AsteroidField {
 
     /**
      * Creates a matrix buffer for an asteroid patch. The patch has a given square size, subdivided in cells by the resolution parameter. Each cell contains one instance. The min and max radius ensure the asteroid don't spread to far
-     * @param position The position of the patch in the local space of the parent transform of any belt
+     * @param position The position of the patch in the local space of the parent transform of any field
      * @param resolution The subdivision of the chunk, each cell contains a single instance
      * @param patchSize The overall planar size of the patch
      * @param patchThickness The vertical spread of the patch
-     * @param minRadius The minimum radius at which the belt starts
-     * @param maxRadius The maximum radius at which the belt ends
+     * @param minRadius The minimum radius at which the field starts
+     * @param maxRadius The maximum radius at which the field ends
+     * @param rng A random number generator
      * @returns A new matrix 4x4 buffer
      */
-    static CreateAsteroidBuffer(position: Vector3, resolution: number, patchSize: number, patchThickness: number, minRadius: number, maxRadius: number): [Vector3[], Quaternion[], Vector3[], Vector3[], number[]] {
+    static CreateAsteroidBuffer(position: Vector3, resolution: number, patchSize: number, patchThickness: number, minRadius: number, maxRadius: number, rng: (index: number) => number): [Vector3[], Quaternion[], Vector3[], Vector3[], number[]] {
         const positions = [];
         const rotations = [];
         const scalings = [];
@@ -139,29 +149,33 @@ export class AsteroidField {
         const rotationAxes = [];
         const rotationSpeeds = [];
 
+        const cellIndex = position.x * maxRadius * 2 + position.z;
+
         const cellSize = patchSize / resolution;
-        let index = 0;
         for (let x = 0; x < resolution; x++) {
             for (let z = 0; z < resolution; z++) {
-                const randomCellPositionX = Math.random() * cellSize;
-                const randomCellPositionZ = Math.random() * cellSize;
+                const asteroidIndex = cellIndex + (x * resolution + z) / 1000;
+                const randomCellPositionX = rng(asteroidIndex) * cellSize;
+                const randomCellPositionZ = rng(asteroidIndex + 4621) * cellSize;
                 const positionX = position.x + x * cellSize - patchSize / 2 + randomCellPositionX;
                 const positionZ = position.z + z * cellSize - patchSize / 2 + randomCellPositionZ;
 
                 if (positionX * positionX + positionZ * positionZ < minRadius * minRadius) continue;
                 if (positionX * positionX + positionZ * positionZ > maxRadius * maxRadius) continue;
 
-                const positionY = position.y + (Math.random() - 0.5) * 2 * patchThickness;
-                const scaling = 0.7 + Math.random() * 0.6;
+                const positionY = position.y + (rng(asteroidIndex + 8781) - 0.5) * 2 * patchThickness;
+                const scaling = 0.7 + rng(asteroidIndex + 6549) * 0.6;
 
                 positions.push(new Vector3(positionX, positionY, positionZ));
-                rotations.push(Quaternion.RotationAxis(new Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize(), Math.random() * 2 * Math.PI));
+
+                const initialRotationAxis = new Vector3(rng(asteroidIndex + 9512) - 0.5, rng(asteroidIndex + 7456) - 0.5, rng(asteroidIndex + 7410) - 0.5).normalize();
+                const initialRotationAngle = rng(asteroidIndex + 4239) * 2 * Math.PI;
+
+                rotations.push(Quaternion.RotationAxis(initialRotationAxis, initialRotationAngle));
                 scalings.push(new Vector3(scaling, scaling, scaling));
 
-                rotationAxes.push(new Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize());
-                rotationSpeeds.push(Math.random() * 0.5);
-
-                index += 1;
+                rotationAxes.push(new Vector3(rng(asteroidIndex + 9630) - 0.5, rng(asteroidIndex + 3256) - 0.5, rng(asteroidIndex + 8520) - 0.5).normalize());
+                rotationSpeeds.push(rng(asteroidIndex + 1569) * 0.5);
             }
         }
 
