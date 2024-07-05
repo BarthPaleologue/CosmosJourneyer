@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { Scene } from "@babylonjs/core/scene";
+import { IDisposable, Scene } from "@babylonjs/core/scene";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Objects } from "../assets/objects";
 import { AsteroidPatch } from "./asteroidPatch";
@@ -26,7 +26,7 @@ import { seededSquirrelNoise } from "squirrel-noise";
  * An asteroid field is basically a collection of instance chunks that can be created and destroyed depending on where the player is.
  * This allows to only render the asteroids close to the player, saving immense resources.
  */
-export class AsteroidField {
+export class AsteroidField implements IDisposable {
     readonly seed: number;
     readonly rng: (step: number) => number;
 
@@ -44,8 +44,6 @@ export class AsteroidField {
     readonly patchThickness = 1000;
 
     readonly neighborCellsRenderRadius = 2;
-
-    readonly fadeSpeed = 1;
 
     private readonly patches = new Map<string, { patch: AsteroidPatch, cellX: number, cellZ: number }>();
 
@@ -127,6 +125,12 @@ export class AsteroidField {
 
                 this.patches.set(`${cellX};${cellZ}`, { patch: patch, cellX: cellX, cellZ: cellZ });
             }
+        }
+    }
+
+    dispose() {
+        for (const value of this.patches.values()) {
+            value.patch.dispose();
         }
     }
 

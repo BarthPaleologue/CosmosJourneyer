@@ -30,12 +30,12 @@ export class AsteroidPatch implements IPatch {
     readonly instances: InstancedMesh[] = [];
     readonly instanceAggregates: PhysicsAggregate[] = [];
 
-    private positions: Vector3[];
-    private rotations: Quaternion[];
-    private scalings: Vector3[];
+    private readonly positions: Vector3[];
+    private readonly rotations: Quaternion[];
+    private readonly scalings: Vector3[];
 
-    private rotationAxes: Vector3[] = [];
-    private rotationSpeeds: number[] = [];
+    private readonly rotationAxes: Vector3[] = [];
+    private readonly rotationSpeeds: number[] = [];
 
     private nbInstances = 0;
 
@@ -136,6 +136,10 @@ export class AsteroidPatch implements IPatch {
 
     public dispose() {
         this.clearInstances();
-        if (this.baseMesh !== null) this.baseMesh.dispose();
+        this.positions.length = 0;
+        this.rotations.length = 0;
+        this.scalings.length = 0;
+        this.rotationAxes.length = 0;
+        this.rotationSpeeds.length = 0;
     }
 }
