@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { Scene } from "@babylonjs/core/scene";
+import { IDisposable, Scene } from "@babylonjs/core/scene";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Objects } from "../assets/objects";
 import { AsteroidPatch } from "./asteroidPatch";
@@ -26,7 +26,7 @@ import { seededSquirrelNoise } from "squirrel-noise";
  * An asteroid field is basically a collection of instance chunks that can be created and destroyed depending on where the player is.
  * This allows to only render the asteroids close to the player, saving immense resources.
  */
-export class AsteroidField {
+export class AsteroidField implements IDisposable {
     readonly seed: number;
     readonly rng: (step: number) => number;
 
@@ -44,8 +44,6 @@ export class AsteroidField {
     readonly patchThickness = 1000;
 
     readonly neighborCellsRenderRadius = 2;
-
-    readonly fadeSpeed = 1;
 
     private readonly patches = new Map<string, { patch: AsteroidPatch, cellX: number, cellZ: number }>();
 
@@ -130,6 +128,12 @@ export class AsteroidField {
         }
     }
 
+    dispose() {
+        for (const value of this.patches.values()) {
+            value.patch.dispose();
+        }
+    }
+
     /**
      * Creates a matrix buffer for an asteroid patch. The patch has a given square size, subdivided in cells by the resolution parameter. Each cell contains one instance. The min and max radius ensure the asteroid don't spread to far
      * @param position The position of the patch in the local space of the parent transform of any field
@@ -154,7 +158,7 @@ export class AsteroidField {
         const cellSize = patchSize / resolution;
         for (let x = 0; x < resolution; x++) {
             for (let z = 0; z < resolution; z++) {
-                const asteroidIndex = cellIndex + (x * resolution + z) / 1000;
+                const asteroidIndex = (cellIndex / 1000e3) + (x * resolution + z) / 1000;
                 const randomCellPositionX = rng(asteroidIndex) * cellSize;
                 const randomCellPositionZ = rng(asteroidIndex + 4621) * cellSize;
                 const positionX = position.x + x * cellSize - patchSize / 2 + randomCellPositionX;

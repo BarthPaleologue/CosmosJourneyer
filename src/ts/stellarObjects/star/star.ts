@@ -188,5 +188,6 @@ export class Star implements StellarObject, Cullable {
         this.mesh.dispose();
         this.material.dispose();
         this.light.dispose();
+        this.asteroidField?.dispose();
     }
 }

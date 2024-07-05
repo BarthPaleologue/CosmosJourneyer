@@ -211,5 +211,6 @@ export class TelluricPlanet implements Planet, Cullable {
         this.material.dispose();
         this.aggregate.dispose();
         this.transform.dispose();
+        this.asteroidField?.dispose();
     }
 }
