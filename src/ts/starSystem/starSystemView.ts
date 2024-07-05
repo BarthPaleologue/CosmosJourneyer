@@ -338,7 +338,7 @@ export class StarSystemView implements View {
 
         // small ambient light helps with seeing dark objects. This is unrealistic but I feel it is better.
         const ambientLight = new HemisphericLight("ambientLight", Vector3.Zero(), this.scene);
-        ambientLight.intensity = 0.3;
+        ambientLight.intensity = 0.02;
 
         this.postProcessManager = new PostProcessManager(this.scene);
 
@@ -536,11 +536,11 @@ export class StarSystemView implements View {
         if (this.spaceshipControls === null) throw new Error("Spaceship controls is null");
         if (this.characterControls === null) throw new Error("Character controls is null");
 
-        const shipPosition = this.spaceshipControls.getTransform().getAbsolutePosition();
         const nearestOrbitalObject = starSystem.getNearestOrbitalObject(this.scene.getActiveControls().getTransform().getAbsolutePosition());
-        const distance = nearestOrbitalObject.getTransform().getAbsolutePosition().subtract(shipPosition).length();
-        const radius = nearestOrbitalObject.getBoundingRadius();
-        this.spaceshipControls.spaceship.registerClosestObject(distance, radius);
+        const nearestCelestialBody = starSystem.getNearestCelestialBody(this.scene.getActiveControls().getTransform().getAbsolutePosition());
+
+        this.spaceshipControls.spaceship.setNearestOrbitalObject(nearestOrbitalObject);
+        this.spaceshipControls.spaceship.setNearestCelestialBody(nearestCelestialBody);
 
         const warpDrive = this.spaceshipControls.spaceship.getWarpDrive();
         if (warpDrive.isEnabled()) {
@@ -551,8 +551,6 @@ export class StarSystemView implements View {
 
         this.characterControls.setClosestWalkableObject(nearestOrbitalObject);
         this.spaceshipControls.spaceship.setClosestWalkableObject(nearestOrbitalObject);
-
-        const nearestCelestialBody = starSystem.getNearestCelestialBody(this.scene.getActiveControls().getTransform().getAbsolutePosition());
 
         this.bodyEditor.update(nearestCelestialBody, this.postProcessManager, this.scene);
 

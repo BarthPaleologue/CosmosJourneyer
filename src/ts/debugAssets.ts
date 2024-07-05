@@ -77,6 +77,8 @@ for (let i = 0; i < scene.textures.length; i++) {
     showTexture(scene.textures[i], new Vector3((i % sideLength) - sideLength / 2, 0, Math.floor(i / sideLength) - sideLength / 2));
 }
 
+engine.hideLoadingUI();
+
 engine.runRenderLoop(() => {
     scene.render();
 });
