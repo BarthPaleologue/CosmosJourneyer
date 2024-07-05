@@ -38,6 +38,7 @@ import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProp
 import { Transformable } from "../../architecture/transformable";
 import i18n from "../../i18n";
 import { Scene } from "@babylonjs/core/scene";
+import { AsteroidField } from "../../asteroidFields/asteroidField";
 
 export class GasPlanet implements Planet, Cullable {
     private readonly mesh: Mesh;
@@ -51,6 +52,7 @@ export class GasPlanet implements Planet, Cullable {
     postProcesses: PostProcessType[] = [];
 
     readonly ringsUniforms: RingsUniforms | null;
+    private readonly asteroidField: AsteroidField | null;
 
     /**
      * New Gas Planet
@@ -96,8 +98,13 @@ export class GasPlanet implements Planet, Cullable {
         if (this.model.rings !== null) {
             this.postProcesses.push(PostProcessType.RING);
             this.ringsUniforms = new RingsUniforms(this.model.rings, scene);
+
+            const averageRadius = this.model.radius * (this.model.rings.ringStart + this.model.rings.ringEnd) / 2;
+            const spread = this.model.radius * (this.model.rings.ringEnd - this.model.rings.ringStart) / 2;
+            this.asteroidField = new AsteroidField(this.model.rng(84133), this.getTransform(), averageRadius, spread, scene);
         } else {
             this.ringsUniforms = null;
+            this.asteroidField = null;
         }
 
         this.getTransform().rotate(Axis.X, this.model.physicalProperties.axialTilt);
@@ -121,6 +128,10 @@ export class GasPlanet implements Planet, Cullable {
 
     getRingsUniforms(): RingsUniforms | null {
         return this.ringsUniforms;
+    }
+
+    getAsteroidField(): AsteroidField | null {
+        return this.asteroidField;
     }
 
     getTypeName(): string {

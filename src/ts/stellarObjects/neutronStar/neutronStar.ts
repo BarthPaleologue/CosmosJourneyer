@@ -41,6 +41,7 @@ import { Camera } from "@babylonjs/core/Cameras/camera";
 import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
 import i18n from "../../i18n";
 import { Scene } from "@babylonjs/core/scene";
+import { AsteroidField } from "../../asteroidFields/asteroidField";
 
 export class NeutronStar implements StellarObject, Cullable {
     readonly model: NeutronStarModel;
@@ -57,6 +58,8 @@ export class NeutronStar implements StellarObject, Cullable {
     readonly postProcesses: PostProcessType[] = [];
 
     readonly ringsUniforms: RingsUniforms | null;
+
+    private readonly asteroidField: AsteroidField | null;
 
     readonly parent: OrbitalObject | null;
 
@@ -111,8 +114,13 @@ export class NeutronStar implements StellarObject, Cullable {
             this.postProcesses.push(PostProcessType.RING);
 
             this.ringsUniforms = new RingsUniforms(this.model.rings, scene);
+
+            const averageRadius = this.model.radius * (this.model.rings.ringStart + this.model.rings.ringEnd) / 2;
+            const spread = this.model.radius * (this.model.rings.ringEnd - this.model.rings.ringStart) / 2;
+            this.asteroidField = new AsteroidField(this.model.rng(84133), this.getTransform(), averageRadius, spread, scene);
         } else {
             this.ringsUniforms = null;
+            this.asteroidField = null;
         }
     }
 
@@ -142,6 +150,10 @@ export class NeutronStar implements StellarObject, Cullable {
 
     getRingsUniforms(): RingsUniforms | null {
         return this.ringsUniforms;
+    }
+
+    getAsteroidField(): AsteroidField | null {
+        return this.asteroidField;
     }
 
     public updateMaterial(deltaTime: number): void {

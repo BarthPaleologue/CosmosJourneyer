@@ -354,14 +354,25 @@ export class StarSystemController {
 
         // The nearest body might have to be treated separately
         // The first step is to find the nearest body
-        const nearestBody = this.getNearestOrbitalObject(controller.getTransform().getAbsolutePosition());
+        const nearestOrbitalObject = this.getNearestOrbitalObject(controller.getTransform().getAbsolutePosition());
+        const nearestCelestialBody = this.getNearestCelestialBody(controller.getTransform().getAbsolutePosition());
+        const ringUniforms = nearestCelestialBody.getRingsUniforms();
 
         // Depending on the distance to the nearest body, we might have to compensate its translation and/or rotation
         // If we are very close, we want both translation and rotation to be compensated, so that the body appears to be fixed
         // When we are a bit further, we only need to compensate the translation as it would be unnatural not to see the body rotating
-        const distanceOfNearestToControls = Vector3.Distance(nearestBody.getTransform().getAbsolutePosition(), controller.getTransform().getAbsolutePosition());
-        const shouldCompensateTranslation = distanceOfNearestToControls < nearestBody.getBoundingRadius() * (nearestBody instanceof SpaceStation ? 80 : 10);
-        const shouldCompensateRotation = !(nearestBody instanceof SpaceStation) && distanceOfNearestToControls < nearestBody.getBoundingRadius() * 3;
+        const distanceOfNearestToControls = Vector3.Distance(nearestOrbitalObject.getTransform().getAbsolutePosition(), controller.getTransform().getAbsolutePosition());
+        
+        const shouldCompensateTranslation = distanceOfNearestToControls < nearestOrbitalObject.getBoundingRadius() * (nearestOrbitalObject instanceof SpaceStation ? 80 : 10);
+
+        // compensate rotation when close to the body
+        let shouldCompensateRotation = distanceOfNearestToControls < nearestOrbitalObject.getBoundingRadius() * 3;
+        if(nearestOrbitalObject === nearestCelestialBody && ringUniforms !== null) {
+            // or in the vicinity of the rings
+            shouldCompensateRotation = shouldCompensateRotation || distanceOfNearestToControls < ringUniforms.model.ringEnd * nearestOrbitalObject.getBoundingRadius();
+        }
+        // and never compensate the rotation of a space station
+        shouldCompensateRotation = shouldCompensateRotation && !(nearestOrbitalObject instanceof SpaceStation);
 
         // ROTATION COMPENSATION
         // If we have to compensate the rotation of the nearest body, there are multiple things to take into account
@@ -373,44 +384,45 @@ export class StarSystemController {
         // By doing so, their rotation axis on themselves except the fixed one must as well be rotated in the same way.
         // Last but not least, the background starfield must be rotated in the opposite direction to give the impression the moon is rotating.
         if (shouldCompensateRotation) {
-            const dthetaNearest = OrbitalObjectUtils.GetRotationAngle(nearestBody, deltaSeconds);
+            const dthetaNearest = OrbitalObjectUtils.GetRotationAngle(nearestOrbitalObject, deltaSeconds);
 
             for (const object of this.orbitalObjects) {
                 const orbit = object.getOrbitProperties();
 
                 // the normal to the orbit planes must be rotated as well (even the one of the nearest body)
-                const rotation = Quaternion.RotationAxis(nearestBody.getRotationAxis(), -dthetaNearest);
+                const rotation = Quaternion.RotationAxis(nearestOrbitalObject.getRotationAxis(), -dthetaNearest);
                 orbit.normalToPlane.applyRotationQuaternionInPlace(rotation);
 
-                if (object === nearestBody) continue;
+                if (object === nearestOrbitalObject) continue;
 
                 // All other bodies must revolve around it for consistency (finally we can say the sun revolves around the earth!)
-                rotateAround(object.getTransform(), nearestBody.getTransform().getAbsolutePosition(), nearestBody.getRotationAxis(), -dthetaNearest);
+                rotateAround(object.getTransform(), nearestOrbitalObject.getTransform().getAbsolutePosition(), nearestOrbitalObject.getRotationAxis(), -dthetaNearest);
             }
 
             this.systemTargets.forEach((target) => {
-                rotateAround(target.getTransform(), nearestBody.getTransform().getAbsolutePosition(), nearestBody.getRotationAxis(), -dthetaNearest);
+                rotateAround(target.getTransform(), nearestOrbitalObject.getTransform().getAbsolutePosition(), nearestOrbitalObject.getRotationAxis(), -dthetaNearest);
             });
 
             // the starfield is rotated to give the impression the nearest body is rotating, which is only an illusion
-            const starfieldAdditionalRotation = Quaternion.RotationAxis(nearestBody.getRotationAxis(), dthetaNearest);
+            const starfieldAdditionalRotation = Quaternion.RotationAxis(nearestOrbitalObject.getRotationAxis(), dthetaNearest);
             this.universeRotation.copyFrom(starfieldAdditionalRotation.multiply(this.universeRotation));
         } else {
             // if we don't compensate the rotation of the nearest body, we must simply update its rotation
-            OrbitalObjectUtils.UpdateRotation(nearestBody, deltaSeconds);
+            OrbitalObjectUtils.UpdateRotation(nearestOrbitalObject, deltaSeconds);
         }
 
         // TRANSLATION COMPENSATION
         // Compensating the translation is much easier in comparison. We save the initial position of the nearest body and
         // compute what would be its next position if it were to move normally.
         // This gives us a translation vector that we can negate and apply to all other bodies.
-        const initialPosition = nearestBody.getTransform().getAbsolutePosition().clone();
-        const newPosition = OrbitalObjectUtils.GetNextOrbitalPosition(nearestBody, deltaSeconds);
+        const initialPosition = nearestOrbitalObject.getTransform().getAbsolutePosition().clone();
+        const newPosition = OrbitalObjectUtils.GetNextOrbitalPosition(nearestOrbitalObject, deltaSeconds);
+
         const nearestBodyDisplacement = newPosition.subtract(initialPosition);
         if (shouldCompensateTranslation) {
             const negatedDisplacement = nearestBodyDisplacement.negate();
             for (const object of this.orbitalObjects) {
-                if (object === nearestBody) continue;
+                if (object === nearestOrbitalObject) continue;
 
                 // the body is translated so that the nearest body can stay in place
                 translate(object.getTransform(), negatedDisplacement);
@@ -421,18 +433,22 @@ export class StarSystemController {
             });
         } else {
             // if we don't compensate the translation of the nearest body, we must simply update its position
-            translate(nearestBody.getTransform(), nearestBodyDisplacement);
+            translate(nearestOrbitalObject.getTransform(), nearestBodyDisplacement);
         }
 
         // finally, all other objects are updated normally
         for (const object of this.orbitalObjects) {
-            if (object === nearestBody) continue;
+            if (object === nearestOrbitalObject) continue;
 
             OrbitalObjectUtils.UpdateOrbitalPosition(object, deltaSeconds);
             OrbitalObjectUtils.UpdateRotation(object, deltaSeconds);
         }
 
         controller.update(deltaSeconds);
+
+        for (const object of this.celestialBodies) {
+            object.getAsteroidField()?.update(controller.getActiveCameras()[0].globalPosition, deltaSeconds);
+        }
 
         for (const body of this.telluricPlanets) {
             // Meshes with LOD are updated (surface quadtrees)

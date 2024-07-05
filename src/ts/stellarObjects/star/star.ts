@@ -43,6 +43,7 @@ import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProp
 import i18n from "../../i18n";
 import { Scene } from "@babylonjs/core/scene";
 import { Objects } from "../../assets/objects";
+import { AsteroidField } from "../../asteroidFields/asteroidField";
 
 export class Star implements StellarObject, Cullable {
     readonly name: string;
@@ -56,6 +57,8 @@ export class Star implements StellarObject, Cullable {
     readonly postProcesses: PostProcessType[] = [];
 
     readonly ringsUniforms: RingsUniforms | null;
+
+    private readonly asteroidField: AsteroidField | null;
 
     readonly model: StarModel;
 
@@ -119,8 +122,13 @@ export class Star implements StellarObject, Cullable {
             this.postProcesses.push(PostProcessType.RING);
 
             this.ringsUniforms = new RingsUniforms(this.model.rings, scene);
+            
+            const averageRadius = this.model.radius * (this.model.rings.ringStart + this.model.rings.ringEnd) / 2;
+            const spread = this.model.radius * (this.model.rings.ringEnd - this.model.rings.ringStart) / 2;
+            this.asteroidField = new AsteroidField(this.model.rng(84133), this.getTransform(), averageRadius, spread, scene);
         } else {
             this.ringsUniforms = null;
+            this.asteroidField = null;
         }
     }
 
@@ -146,6 +154,10 @@ export class Star implements StellarObject, Cullable {
 
     getRingsUniforms(): RingsUniforms | null {
         return this.ringsUniforms;
+    }
+
+    getAsteroidField(): AsteroidField | null {
+        return this.asteroidField;
     }
 
     getTypeName(): string {

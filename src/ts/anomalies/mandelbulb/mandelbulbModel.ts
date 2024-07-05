@@ -47,8 +47,6 @@ export class MandelbulbModel implements PlanetModel {
 
     readonly nbMoons: number;
 
-    readonly ringsUniforms = null;
-
     readonly power: number;
     readonly accentColor: Color3;
 

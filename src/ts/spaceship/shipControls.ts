@@ -88,7 +88,7 @@ export class ShipControls implements Controls {
 
         SpaceShipControlsInputs.map.throttleToZero.on("complete", () => {
             this.spaceship.setMainEngineThrottle(0);
-            this.spaceship.getWarpDrive().increaseTargetThrottle(-this.spaceship.getWarpDrive().getThrottle());
+            this.spaceship.getWarpDrive().increaseThrottle(-this.spaceship.getWarpDrive().getThrottle());
         });
 
         this.baseFov = this.thirdPersonCamera.fov;
@@ -157,7 +157,7 @@ export class ShipControls implements Controls {
                 );
             }
         } else {
-            this.spaceship.getWarpDrive().increaseTargetThrottle(0.5 * deltaTime * SpaceShipControlsInputs.map.throttle.value);
+            this.spaceship.getWarpDrive().increaseThrottle(0.5 * deltaTime * SpaceShipControlsInputs.map.throttle.value);
         }
 
         if (!this.spaceship.isLanded()) {
