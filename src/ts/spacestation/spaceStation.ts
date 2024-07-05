@@ -89,6 +89,7 @@ export class SpaceStation implements OrbitalObject, Cullable, Dockable {
         this.getTransform().getChildTransformNodes(true).forEach(transform => transform.position.addInPlace(deltaPosition));
 
         this.root.rotate(Axis.X, this.model.physicalProperties.axialTilt);
+        this.root.rotate(Axis.Z, this.model.physicalProperties.axialTilt);
     }
 
     handleDockingRequest(): LandingPad | null {

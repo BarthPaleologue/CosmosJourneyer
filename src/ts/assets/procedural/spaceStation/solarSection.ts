@@ -89,11 +89,15 @@ export class SolarSection implements Transformable {
         } else if (nbArms === 2) {
             const armLength = attachmentLength / 2.5;
 
-            const arm1 = MeshBuilder.CreateCylinder("Arm1", {
-                height: armLength,
-                diameter: attachmentThickness / 2,
-                tessellation: 6
-            }, scene);
+            const arm1 = MeshBuilder.CreateCylinder(
+                "Arm1",
+                {
+                    height: armLength,
+                    diameter: attachmentThickness / 2,
+                    tessellation: 6
+                },
+                scene
+            );
             arm1.convertToFlatShadedMesh();
             arm1.parent = this.getTransform();
             arm1.material = this.metalSectionMaterial;
@@ -102,11 +106,15 @@ export class SolarSection implements Transformable {
 
             this.generateSpikePattern(arm1, armLength, attachmentThickness / 2, requiredSurface / 2);
 
-            const arm2 = MeshBuilder.CreateCylinder("Arm2", {
-                height: armLength,
-                diameter: attachmentThickness / 2,
-                tessellation: 6
-            }, scene);
+            const arm2 = MeshBuilder.CreateCylinder(
+                "Arm2",
+                {
+                    height: armLength,
+                    diameter: attachmentThickness / 2,
+                    tessellation: 6
+                },
+                scene
+            );
             arm2.convertToFlatShadedMesh();
             arm2.parent = this.getTransform();
             arm2.material = this.metalSectionMaterial;
@@ -114,7 +122,6 @@ export class SolarSection implements Transformable {
             arm2.translate(Axis.Y, (armLength + attachmentThickness - hexagonOffset) / 2);
 
             this.generateSpikePattern(arm2, armLength, attachmentThickness / 2, requiredSurface / 2);
-
         } else if (nbArms >= 3) {
             this.generateStarPattern(nbArms, requiredSurface);
         }
@@ -128,17 +135,21 @@ export class SolarSection implements Transformable {
 
         const gap = 200;
 
-        const panelDimensionY = (armSize / nbPanelsPerSide) - gap;
+        const panelDimensionY = armSize / nbPanelsPerSide - gap;
         const panelDimensionX = halfRequiredSurface / armSize;
 
         const hexagonOffset = armThickness * (1 - Math.sqrt(3) / 2);
 
         for (let i = 0; i < nbPanelsPerSide; i++) {
-            const panel1 = MeshBuilder.CreateBox("SolarPanel1", {
-                height: 0.3,
-                width: panelDimensionY,
-                depth: panelDimensionX
-            }, scene);
+            const panel1 = MeshBuilder.CreateBox(
+                "SolarPanel1",
+                {
+                    height: 0.3,
+                    width: panelDimensionY,
+                    depth: panelDimensionX
+                },
+                scene
+            );
             panel1.parent = arm;
             panel1.material = this.solarPanelMaterial;
             panel1.translate(Axis.Y, (panelDimensionY + gap) * (i - (nbPanelsPerSide - 1) / 2));
@@ -147,11 +158,15 @@ export class SolarSection implements Transformable {
 
             this.solarPanels.push(panel1);
 
-            const panel2 = MeshBuilder.CreateBox("SolarPanel2", {
-                height: 0.3,
-                width: panelDimensionY,
-                depth: panelDimensionX
-            }, scene);
+            const panel2 = MeshBuilder.CreateBox(
+                "SolarPanel2",
+                {
+                    height: 0.3,
+                    width: panelDimensionY,
+                    depth: panelDimensionX
+                },
+                scene
+            );
             panel2.parent = arm;
             panel2.material = this.solarPanelMaterial;
             panel2.translate(Axis.Y, (panelDimensionY + gap) * (i - (nbPanelsPerSide - 1) / 2));
@@ -190,43 +205,43 @@ export class SolarSection implements Transformable {
             arm.material = this.metalSectionMaterial;
             this.arms.push(arm);
 
-            const armOffset = nbArms * 0.3 * surfacePerArm / armLength;
+            const armOffset = (nbArms * 0.3 * surfacePerArm) / armLength;
             const hexagonOffset = armThickness * (1 - Math.sqrt(3) / 2);
 
-            const solarPanel1 = MeshBuilder.CreateBox("SolarPanel1", {
-                height: 0.3,
-                width: armLength,
-                depth: surfacePerArm / armLength
-            }, scene);
+            const solarPanel1 = MeshBuilder.CreateBox(
+                "SolarPanel1",
+                {
+                    height: 0.3,
+                    width: armLength,
+                    depth: surfacePerArm / armLength
+                },
+                scene
+            );
             solarPanel1.rotate(Axis.Z, Math.PI / 2, Space.LOCAL);
             solarPanel1.parent = arm;
             solarPanel1.translate(Axis.X, armOffset);
             solarPanel1.translate(Axis.Z, 0.5 * (surfacePerArm / armLength + armThickness - hexagonOffset));
             solarPanel1.material = this.solarPanelMaterial;
 
-            const solarPanel2 = MeshBuilder.CreateBox("SolarPanel2", {
-                height: 0.3,
-                width: armLength,
-                depth: surfacePerArm / armLength
-            }, scene);
+            this.solarPanels.push(solarPanel1);
+
+            const solarPanel2 = MeshBuilder.CreateBox(
+                "SolarPanel2",
+                {
+                    height: 0.3,
+                    width: armLength,
+                    depth: surfacePerArm / armLength
+                },
+                scene
+            );
             solarPanel2.rotate(Axis.Z, Math.PI / 2, Space.LOCAL);
             solarPanel2.parent = arm;
             solarPanel2.translate(Axis.X, armOffset);
             solarPanel2.translate(Axis.Z, -0.5 * (surfacePerArm / armLength + armThickness - hexagonOffset));
             solarPanel2.material = this.solarPanelMaterial;
+
+            this.solarPanels.push(solarPanel2);
         }
-    }
-
-    private createSolarPanelAggregate(panel: AbstractMesh): PhysicsAggregate {
-        const panelAggregate = createEnvironmentAggregate(panel, PhysicsShapeType.BOX);
-        this.solarPanelAggregates.push(panelAggregate);
-        return panelAggregate;
-    }
-
-    private createArmAggregate(arm: Mesh): PhysicsAggregate {
-        const armAggregate = createEnvironmentAggregate(arm, PhysicsShapeType.MESH);
-        this.armAggregates.push(armAggregate);
-        return armAggregate;
     }
 
     update(stellarObjects: Transformable[], cameraWorldPosition: Vector3) {
@@ -237,22 +252,22 @@ export class SolarSection implements Transformable {
 
         if (distanceToCamera < 350e3 && this.attachmentAggregate === null) {
             this.attachmentAggregate = createEnvironmentAggregate(this.attachment, PhysicsShapeType.MESH);
-            this.arms.forEach(arm => {
-                const armAggregate = this.createArmAggregate(arm);
+            this.arms.forEach((arm) => {
+                const armAggregate = createEnvironmentAggregate(arm, PhysicsShapeType.MESH);
                 this.armAggregates.push(armAggregate);
             });
-            this.solarPanels.forEach(solarPanel => {
-                const solarPanelAggregate = this.createSolarPanelAggregate(solarPanel);
+            this.solarPanels.forEach((solarPanel) => {
+                const solarPanelAggregate = createEnvironmentAggregate(solarPanel, PhysicsShapeType.BOX);
                 this.solarPanelAggregates.push(solarPanelAggregate);
             });
         } else if (distanceToCamera > 360e3 && this.attachmentAggregate !== null) {
             this.attachmentAggregate?.dispose();
             this.attachmentAggregate = null;
 
-            this.armAggregates.forEach(armAggregate => armAggregate.dispose());
+            this.armAggregates.forEach((armAggregate) => armAggregate.dispose());
             this.armAggregates.length = 0;
 
-            this.solarPanelAggregates.forEach(solarPanelAggregate => solarPanelAggregate.dispose());
+            this.solarPanelAggregates.forEach((solarPanelAggregate) => solarPanelAggregate.dispose());
             this.solarPanelAggregates.length = 0;
         }
     }
@@ -266,11 +281,11 @@ export class SolarSection implements Transformable {
         this.attachmentAggregate?.dispose();
         this.attachmentAggregate = null;
 
-        this.arms.forEach(arm => arm.dispose());
-        this.armAggregates.forEach(armAggregate => armAggregate.dispose());
+        this.arms.forEach((arm) => arm.dispose());
+        this.armAggregates.forEach((armAggregate) => armAggregate.dispose());
 
-        this.solarPanels.forEach(solarPanel => solarPanel.dispose());
-        this.solarPanelAggregates.forEach(solarPanelAggregate => solarPanelAggregate.dispose());
+        this.solarPanels.forEach((solarPanel) => solarPanel.dispose());
+        this.solarPanelAggregates.forEach((solarPanelAggregate) => solarPanelAggregate.dispose());
 
         this.solarPanelMaterial.dispose();
         this.metalSectionMaterial.dispose();
