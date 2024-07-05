@@ -44,8 +44,7 @@ export class CylinderHabitat implements Transformable {
 
         this.radius = 2e3 + Math.random() * 2e3;
 
-        const requiredHeight = requiredHabitableSurface / (2 * Math.PI * (this.radius / 2));
-        const height = requiredHeight;
+        const height = requiredHabitableSurface / (2 * Math.PI * (this.radius / 2));
 
         this.habitableSurface = height * 2 * Math.PI * (this.radius / 2);
 
