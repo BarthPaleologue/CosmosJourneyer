@@ -24,11 +24,25 @@ import "@babylonjs/core/Loading/loadingScreen";
 import "@babylonjs/core/Misc/screenshotTools";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import "@babylonjs/core/Meshes/thinInstanceMesh";
-import { Axis, DirectionalLight, HavokPlugin, HemisphericLight, MeshBuilder, PhysicsAggregate, PhysicsShapeType, PhysicsViewer, Scene } from "@babylonjs/core";
+import {
+    Axis,
+    DirectionalLight,
+    HavokPlugin,
+    HemisphericLight,
+    MeshBuilder,
+    PhysicsAggregate,
+    PhysicsShapeType,
+    PhysicsViewer,
+    Scene,
+    VertexBuffer
+} from "@babylonjs/core";
 import { Assets } from "./assets/assets";
 import { DefaultControls } from "./defaultControls/defaultControls";
 import { AsteroidField } from "./asteroidFields/asteroidField";
 import HavokPhysics from "@babylonjs/havok";
+import { Mesh } from "@babylonjs/core/Meshes";
+import { createRingVertexData } from "./utils/ringBuilder";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -62,38 +76,44 @@ directionalLight.intensity = 0.7;
 const hemi = new HemisphericLight("hemi", Vector3.Up(), scene);
 hemi.intensity = 0.4;
 
-const scaler = 500;
+function showNormals(mesh: Mesh, size: number, color: Color3, sc: Scene) {
+    const normals = mesh.getVerticesData(VertexBuffer.NormalKind);
+    const positions = mesh.getVerticesData(VertexBuffer.PositionKind);
+    color = color || Color3.White();
+    sc = sc || scene;
+    size = size || 1;
 
-defaultControls.getTransform().position.z = -200 * scaler;
-defaultControls.getTransform().position.y = 20 * scaler;
+    if(normals === null || positions === null) {
+        return null;
+    }
+
+    const lines = [];
+    for (let i = 0; i < normals.length; i += 3) {
+        const v1 = Vector3.FromArray(positions, i);
+        const v2 = v1.add(Vector3.FromArray(normals, i).scaleInPlace(size));
+        lines.push([v1.add(mesh.position), v2.add(mesh.position)]);
+    }
+    const normalLines = MeshBuilder.CreateLineSystem("normalLines", { lines: lines }, sc);
+    normalLines.color = color;
+    return normalLines;
+}
+
+const scaler = 1000;
+
+const ring = new Mesh("ring", scene);
+const ringVertexData = createRingVertexData(5 * scaler, 1 * scaler, 3 * scaler, 20);
+ringVertexData.applyToMesh(ring);
+
+ring.convertToFlatShadedMesh();
+
+showNormals(ring, 1 * scaler, Color3.Red(), scene);
+
 defaultControls.speed *= scaler;
-camera.maxZ *= scaler;
-
-const sphere = MeshBuilder.CreateSphere("box", { diameter: 20 * scaler }, scene);
-
-const sphereAggregate = new PhysicsAggregate(sphere, PhysicsShapeType.SPHERE, {mass:0}, scene);
-
-const beltRadius = 100 * scaler;
-const beltSpread = 20 * scaler;
-
-const belt = new AsteroidField(42, sphere, beltRadius, beltSpread, scene);
-
-const torus = MeshBuilder.CreateTorus("torus", { diameter: 2 * beltRadius, thickness: 2 * beltSpread, tessellation: 32 }, scene);
-torus.visibility = 0.1;
-torus.parent = sphere;
-torus.scaling.y = 0.1 / scaler;
-
-const physicsViewer = new PhysicsViewer(scene);
+defaultControls.getTransform().position.scaleInPlace(scaler);
+defaultControls.getActiveCameras()[0].maxZ *= scaler;
 
 scene.onBeforeRenderObservable.add(() => {
     defaultControls.update(engine.getDeltaTime() / 1000);
-
-    belt.update(defaultControls.getTransform().getAbsolutePosition(), engine.getDeltaTime() / 1000);
-
-    //sphere.rotate(Axis.Y, 0.002);
-    scene.meshes.forEach((mesh) => {
-        if (mesh.physicsBody) physicsViewer.showBody(mesh.physicsBody);
-    });
 });
 
 scene.executeWhenReady(() => {

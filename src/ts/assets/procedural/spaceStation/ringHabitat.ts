@@ -27,8 +27,8 @@ import { Settings } from "../../../settings";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { createTube } from "../../../utils/tubeBuilder";
 import { createEnvironmentAggregate } from "../../../utils/physics";
+import { createRing } from "../../../utils/ringBuilder";
 
 export class RingHabitat implements Transformable {
     private readonly root: TransformNode;
@@ -86,26 +86,8 @@ export class RingHabitat implements Transformable {
 
         const circumference = 2 * Math.PI * this.radius;
 
-        const path: Vector3[] = [];
-        const nbSteps = circumference / deltaRadius;
-        for (let i = 0; i <= nbSteps; i++) {
-            const theta = 2 * Math.PI * i / (nbSteps - 1);
-            path.push(new Vector3(this.radius * Math.sin(theta), 0, this.radius * Math.cos(theta)));
-        }
-
-
-        this.ring = createTube(
-            "RingHabitat",
-            {
-                path: path,
-                radius: Math.sqrt(2) * deltaRadius / 2,
-                tessellation: 4
-            },
-            scene
-        );
-        this.ring.scaling.y = yScaling;
-        this.ring.bakeCurrentTransformIntoVertices();
-        this.ring.convertToFlatShadedMesh();
+        const nbSteps = Math.ceil(circumference / deltaRadius);
+        this.ring = createRing(this.radius, deltaRadius, height, nbSteps, scene);
 
         this.ringMaterial = new RingHabitatMaterial(circumference, deltaRadius, yScaling, scene);
 

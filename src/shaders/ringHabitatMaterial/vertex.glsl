@@ -43,13 +43,13 @@ void main() {
 
     vUV = uv;
     // as the ring is has a square section, we multiply by 4 to repeat the texture on each side
-    vUV.x *= 4.0;
+    //vUV.x *= 4.0;
 
     // we then repeat the texture around the circle
-    vUV.y *= circumference / deltaRadius;
+    vUV.x *= circumference / deltaRadius;
 
     // if we are on the interior or exterior of the ring, we account for the vertical stretch
     if(abs(normal.y) < 0.02) {
-        vUV.x *= height;
+        vUV.y *= height;
     }
 }

@@ -22,7 +22,6 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Scene } from "@babylonjs/core/scene";
 import { Axis, PhysicsShapeType } from "@babylonjs/core";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { createTube } from "../../../utils/tubeBuilder";
 import { Transformable } from "../../../architecture/transformable";
 import { computeRingRotationPeriod } from "../../../utils/ringRotation";
 import { Settings } from "../../../settings";
@@ -31,6 +30,7 @@ import { Space } from "@babylonjs/core/Maths/math.axis";
 import { LandingPad } from "../landingPad/landingPad";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { createEnvironmentAggregate } from "../../../utils/physics";
+import { createRing } from "../../../utils/ringBuilder";
 
 export class DockingBay {
     private readonly root: TransformNode;
@@ -61,25 +61,8 @@ export class DockingBay {
 
         const circumference = 2 * Math.PI * this.radius;
 
-        const path: Vector3[] = [];
-        const nbSteps = circumference / deltaRadius;
-        for (let i = 0; i <= nbSteps + 1; i++) {
-            const theta = (2 * Math.PI * i) / nbSteps;
-            path.push(new Vector3(this.radius * Math.sin(theta), 0, this.radius * Math.cos(theta)));
-        }
-
-        this.ring = createTube(
-            "DockingBay",
-            {
-                path: path,
-                radius: (Math.sqrt(2) * deltaRadius) / 2,
-                tessellation: 4
-            },
-            scene
-        );
-        this.ring.scaling.y = heightFactor;
-        this.ring.bakeCurrentTransformIntoVertices();
-        this.ring.convertToFlatShadedMesh();
+        const nbSteps = Math.ceil(circumference / deltaRadius);
+        this.ring = createRing(this.radius, deltaRadius, heightFactor * deltaRadius, nbSteps, scene);
 
         this.ringMaterial = new RingHabitatMaterial(circumference, deltaRadius, heightFactor, scene);
         this.ring.material = this.ringMaterial;
