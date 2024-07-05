@@ -9,6 +9,17 @@ export const enum CropType {
     CASSAVA
 }
 
+export const CropTypes: CropType[] = [
+    CropType.POTATO,
+    CropType.YAM,
+    CropType.SWEET_POTATO,
+    CropType.RICE,
+    CropType.PEANUT,
+    CropType.WHEAT,
+    CropType.LENTIL,
+    CropType.CASSAVA
+];
+
 /**
  * Edible energy in kcal/ha/day for different plant species
  * @see https://www.fao.org/4/t0207e/T0207E04.htm#4.%20Nutritive%20value
@@ -31,6 +42,29 @@ export function getEdibleEnergyPerHaPerDay(cropType: CropType): number {
             return 23_000;
         case CropType.CASSAVA:
             return 27_000;
+        default:
+            throw new Error("Unknown crop type");
+    }
+}
+
+export function cropTypeToString(cropType: CropType): string {
+    switch (cropType) {
+        case CropType.POTATO:
+            return "Potato";
+        case CropType.YAM:
+            return "Yam";
+        case CropType.SWEET_POTATO:
+            return "Sweet potato";
+        case CropType.RICE:
+            return "Rice";
+        case CropType.PEANUT:
+            return "Peanut";
+        case CropType.WHEAT:
+            return "Wheat";
+        case CropType.LENTIL:
+            return "Lentil";
+        case CropType.CASSAVA:
+            return "Cassava";
         default:
             throw new Error("Unknown crop type");
     }

@@ -25,7 +25,8 @@ import { CelestialBodyModel } from "../architecture/celestialBody";
 import { normalRandom } from "extended-random";
 import { clamp } from "../utils/math";
 import { GenerationSteps } from "../utils/generationSteps";
-import { CropType } from "../utils/agriculture";
+import { CropType, CropTypes } from "../utils/agriculture";
+import { randomPieChart } from "../utils/random";
 
 export class SpaceStationModel implements OrbitalObjectModel {
     readonly seed: number;
@@ -76,9 +77,8 @@ export class SpaceStationModel implements OrbitalObjectModel {
 
         this.populationDensity = 4_000;
 
-        this.agricultureMix = [
-            [1, CropType.POTATO] // true ireland moment
-        ];
+        const mix = randomPieChart(CropTypes.length, this.rng, 498);
+        this.agricultureMix = mix.map((proportion, index) => [proportion, CropTypes[index]]);
 
         this.nbHydroponicLayers = 10;
     }
