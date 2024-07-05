@@ -255,13 +255,13 @@ export class SpaceStation implements OrbitalObject, Cullable, Dockable {
         node.position = parent.position.add(parent.up.scale(previousSectionSizeY + newSectionY));
     }
 
-    update(stellarObjects: Transformable[], deltaSeconds: number) {
-        this.solarSections.forEach((solarSection) => solarSection.update(stellarObjects));
-        this.utilitySections.forEach((utilitySection) => utilitySection.update(stellarObjects));
-        this.helixHabitats.forEach((helixHabitat) => helixHabitat.update(stellarObjects, deltaSeconds));
-        this.ringHabitats.forEach((ringHabitat) => ringHabitat.update(stellarObjects, deltaSeconds));
-        this.cylinderHabitats.forEach((cylinderHabitat) => cylinderHabitat.update(stellarObjects, deltaSeconds));
-        this.dockingBays.forEach((dockingBay) => dockingBay.update(stellarObjects, deltaSeconds));
+    update(stellarObjects: Transformable[], cameraWorldPosition: Vector3, deltaSeconds: number) {
+        this.solarSections.forEach((solarSection) => solarSection.update(stellarObjects, cameraWorldPosition));
+        this.utilitySections.forEach((utilitySection) => utilitySection.update(stellarObjects, cameraWorldPosition));
+        this.helixHabitats.forEach((helixHabitat) => helixHabitat.update(stellarObjects, cameraWorldPosition, deltaSeconds));
+        this.ringHabitats.forEach((ringHabitat) => ringHabitat.update(stellarObjects, cameraWorldPosition, deltaSeconds));
+        this.cylinderHabitats.forEach((cylinderHabitat) => cylinderHabitat.update(stellarObjects, cameraWorldPosition, deltaSeconds));
+        this.dockingBays.forEach((dockingBay) => dockingBay.update(stellarObjects, cameraWorldPosition, deltaSeconds));
     }
 
     getTransform(): TransformNode {

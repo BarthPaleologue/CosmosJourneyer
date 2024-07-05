@@ -39,10 +39,10 @@ export class RingHabitat implements Transformable {
     private readonly metalSectionMaterial: MetalSectionMaterial;
 
     private readonly ring: Mesh;
-    private readonly ringAggregate: PhysicsAggregate;
+    private ringAggregate: PhysicsAggregate | null = null;
 
     private readonly attachment: Mesh;
-    private readonly attachmentAggregate: PhysicsAggregate;
+    private attachmentAggregate: PhysicsAggregate | null = null;
 
     private readonly arms: Mesh[] = [];
     private readonly armAggregates: PhysicsAggregate[] = [];
@@ -80,8 +80,6 @@ export class RingHabitat implements Transformable {
         this.attachment.material = this.metalSectionMaterial;
         this.attachment.rotate(Axis.Y, Math.PI / attachmentNbSides, Space.WORLD);
         this.attachment.parent = this.getTransform();
-        
-        this.attachmentAggregate = createEnvironmentAggregate(this.attachment, PhysicsShapeType.MESH);
 
         const circumference = 2 * Math.PI * this.radius;
 
@@ -112,8 +110,6 @@ export class RingHabitat implements Transformable {
 
         this.ring.parent = this.getTransform();
 
-        this.ringAggregate = createEnvironmentAggregate(this.ring, PhysicsShapeType.MESH);
-
         const nbArms = attachmentNbSides / 2;
         for (let i = 0; i <= nbArms; i++) {
             const arm = MeshBuilder.CreateCylinder(
@@ -136,18 +132,32 @@ export class RingHabitat implements Transformable {
             arm.parent = this.getTransform();
 
             this.arms.push(arm);
-
-                
-            const armAggregate = createEnvironmentAggregate(arm, PhysicsShapeType.MESH);
-
-            this.armAggregates.push(armAggregate);
         }
     }
 
-    update(stellarObjects: Transformable[], deltaSeconds: number) {
+    update(stellarObjects: Transformable[], cameraWorldPosition: Vector3, deltaSeconds: number) {
         this.getTransform().rotate(Axis.Y, deltaSeconds / computeRingRotationPeriod(this.radius, Settings.G_EARTH));
         this.ringMaterial.update(stellarObjects);
         this.metalSectionMaterial.update(stellarObjects);
+
+        const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
+        if(distanceToCamera < 350e3 && this.attachmentAggregate === null) {
+            this.attachmentAggregate = createEnvironmentAggregate(this.attachment, PhysicsShapeType.MESH);
+            this.arms.forEach(arm => {
+                const armAggregate = createEnvironmentAggregate(arm, PhysicsShapeType.MESH);
+                this.armAggregates.push(armAggregate);
+            });
+            this.ringAggregate = createEnvironmentAggregate(this.ring, PhysicsShapeType.MESH);
+        } else if(distanceToCamera > 360e3 && this.attachmentAggregate !== null) {
+            this.attachmentAggregate?.dispose();
+            this.attachmentAggregate = null;
+
+            this.armAggregates.forEach(armAggregate => armAggregate.dispose());
+            this.armAggregates.length = 0;
+
+            this.ringAggregate?.dispose();
+            this.ringAggregate = null;
+        }
     }
 
     getTransform(): TransformNode {
@@ -157,9 +167,9 @@ export class RingHabitat implements Transformable {
     dispose() {
         this.root.dispose();
         this.attachment.dispose();
-        this.attachmentAggregate.dispose();
+        this.attachmentAggregate?.dispose();
         this.ring.dispose();
-        this.ringAggregate.dispose();
+        this.ringAggregate?.dispose();
         this.ringMaterial.dispose();
         this.metalSectionMaterial.dispose();
         this.arms.forEach((arm) => arm.dispose());

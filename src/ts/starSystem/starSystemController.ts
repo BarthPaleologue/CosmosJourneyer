@@ -460,8 +460,9 @@ export class StarSystemController {
             object.computeCulling(controller.getActiveCameras());
         }
 
+        const cameraWorldPosition = controller.getTransform().getAbsolutePosition();
         for (const spaceStation of this.spaceStations) {
-            spaceStation.update(this.stellarObjects, deltaSeconds);
+            spaceStation.update(this.stellarObjects, cameraWorldPosition, deltaSeconds);
             spaceStation.computeCulling(controller.getActiveCameras());
         }
 

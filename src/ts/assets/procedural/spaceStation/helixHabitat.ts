@@ -36,13 +36,13 @@ export class HelixHabitat implements Transformable {
     private readonly radius: number;
 
     private readonly attachment: Mesh;
-    private readonly attachmentAggregate: PhysicsAggregate;
+    private attachmentAggregate: PhysicsAggregate | null = null;
 
     private readonly helix1: Mesh;
     private readonly helix2: Mesh;
 
-    private readonly helix1Aggregate: PhysicsAggregate;
-    private readonly helix2Aggregate: PhysicsAggregate;
+    private helix1Aggregate: PhysicsAggregate | null = null;
+    private helix2Aggregate: PhysicsAggregate | null = null;
 
     private readonly helixMaterial: HelixHabitatMaterial;
     private readonly metalSectionMaterial: MetalSectionMaterial;
@@ -82,8 +82,6 @@ export class HelixHabitat implements Transformable {
         this.attachment.material = this.metalSectionMaterial;
         this.attachment.rotate(Axis.Y, Math.PI / attachmentNbSides, Space.WORLD);
         this.attachment.parent = this.getTransform();
-        
-        this.attachmentAggregate = createEnvironmentAggregate(this.attachment, PhysicsShapeType.MESH);
 
         const path = [];
         const tessellation = 360;
@@ -117,9 +115,6 @@ export class HelixHabitat implements Transformable {
         this.helix1.material = this.helixMaterial;
         this.helix2.material = this.helixMaterial;
 
-        this.helix1Aggregate = createEnvironmentAggregate(this.helix1, PhysicsShapeType.MESH);
-        this.helix2Aggregate = createEnvironmentAggregate(this.helix2, PhysicsShapeType.MESH);
-
         const nbArms = (attachmentNbSides * nbSpires) / 2;
         for (let i = 0; i <= nbArms; i++) {
             const arm = MeshBuilder.CreateCylinder(
@@ -145,16 +140,38 @@ export class HelixHabitat implements Transformable {
             arm.parent = this.getTransform();
 
             this.arms.push(arm);
-
-            const armAggregate = createEnvironmentAggregate(arm, PhysicsShapeType.MESH);
-            this.armAggregates.push(armAggregate);
         }
     }
 
-    update(stellarObjects: Transformable[], deltaSeconds: number) {
+    update(stellarObjects: Transformable[], cameraWorldPosition: Vector3, deltaSeconds: number) {
         this.getTransform().rotate(Axis.Y, deltaSeconds / computeRingRotationPeriod(this.radius, Settings.G_EARTH));
         this.helixMaterial.update(stellarObjects);
         this.metalSectionMaterial.update(stellarObjects);
+
+        const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
+
+        if (distanceToCamera < 350e3 && this.attachmentAggregate === null) {
+            this.attachmentAggregate = createEnvironmentAggregate(this.attachment, PhysicsShapeType.MESH);
+            this.helix1Aggregate = createEnvironmentAggregate(this.helix1, PhysicsShapeType.MESH);
+            this.helix2Aggregate = createEnvironmentAggregate(this.helix2, PhysicsShapeType.MESH);
+
+            this.arms.forEach(arm => {
+                const armAggregate = createEnvironmentAggregate(arm, PhysicsShapeType.MESH);
+                this.armAggregates.push(armAggregate);
+            });
+        } else if (distanceToCamera > 360e3 && this.attachmentAggregate !== null) {
+            this.attachmentAggregate?.dispose();
+            this.attachmentAggregate = null;
+
+            this.helix1Aggregate?.dispose();
+            this.helix1Aggregate = null;
+
+            this.helix2Aggregate?.dispose();
+            this.helix2Aggregate = null;
+
+            this.armAggregates.forEach(armAggregate => armAggregate.dispose());
+            this.armAggregates.length = 0;
+        }
     }
 
     getTransform(): TransformNode {
@@ -165,7 +182,9 @@ export class HelixHabitat implements Transformable {
         this.root.dispose();
 
         this.attachment.dispose();
-        this.attachmentAggregate.dispose();
+
+        this.attachmentAggregate?.dispose();
+        this.attachmentAggregate = null;
 
         this.helixMaterial.dispose();
         this.metalSectionMaterial.dispose();
@@ -173,10 +192,16 @@ export class HelixHabitat implements Transformable {
         this.helix1.dispose();
         this.helix2.dispose();
         
-        this.helix1Aggregate.dispose();
-        this.helix2Aggregate.dispose();
+        this.helix1Aggregate?.dispose();
+        this.helix1Aggregate = null;
+
+        this.helix2Aggregate?.dispose();
+        this.helix2Aggregate = null;
 
         this.arms.forEach((arm) => arm.dispose());
+        this.arms.length = 0;
+
         this.armAggregates.forEach(armAggregate => armAggregate.dispose());
+        this.armAggregates.length = 0;
     }
 }

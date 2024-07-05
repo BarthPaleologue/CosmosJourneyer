@@ -83,6 +83,7 @@ const spaceStation = new SpaceStation(scene, spaceStationModel, sun);
 const ambient = new HemisphericLight("Sun", Vector3.Up(), scene);
 ambient.intensity = 0.1;
 
+const viewer = new PhysicsViewer(scene);
 
 let elapsedSeconds = 0;
 scene.onBeforePhysicsObservable.add(() => {
@@ -96,13 +97,14 @@ scene.onBeforePhysicsObservable.add(() => {
     //translate(sun.getTransform(), controlsPosition.negate());
     //translate(defaultControls.getTransform(), controlsPosition.negate());
 
-    spaceStation.update([sun], deltaSeconds);
+    const cameraWorldPosition = camera.globalPosition;
 
+    spaceStation.update([sun], cameraWorldPosition, deltaSeconds);
+
+    scene.meshes.forEach(mesh => {if(mesh.physicsBody) viewer.showBody(mesh.physicsBody)});
     //spaceStation.getTransform().position.y = Math.sin(elapsedSeconds / 5) * 10000;
 });
 
-const viewer = new PhysicsViewer(scene);
-scene.meshes.forEach(mesh => {if(mesh.physicsBody) viewer.showBody(mesh.physicsBody)});
 
 const spaceStationUI = new SpaceStationUI();
 

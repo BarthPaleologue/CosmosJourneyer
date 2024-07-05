@@ -41,7 +41,7 @@ export class DockingBay {
     private readonly metalSectionMaterial: MetalSectionMaterial;
 
     private readonly ring: Mesh;
-    private readonly ringAggregate: PhysicsAggregate;
+    private ringAggregate: PhysicsAggregate | null = null;
 
     private readonly arms: Mesh[] = [];
     private readonly armAggregates: PhysicsAggregate[] = [];
@@ -138,11 +138,27 @@ export class DockingBay {
         }
     }
 
-    update(stellarObjects: Transformable[], deltaSeconds: number) {
+    update(stellarObjects: Transformable[], cameraWorldPosition: Vector3, deltaSeconds: number) {
         this.getTransform().rotate(Axis.Y, deltaSeconds / computeRingRotationPeriod(this.radius, Settings.G_EARTH * 0.1));
         this.ringMaterial.update(stellarObjects);
         this.metalSectionMaterial.update(stellarObjects);
         this.landingPads.forEach((landingPad) => landingPad.update(stellarObjects));
+
+        const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
+
+        if (distanceToCamera < 350e3 && this.ringAggregate === null) {
+            this.ringAggregate = createEnvironmentAggregate(this.ring, PhysicsShapeType.MESH);
+            this.arms.forEach((arm) => {
+                const armAggregate = createEnvironmentAggregate(arm, PhysicsShapeType.BOX);
+                this.armAggregates.push(armAggregate);
+            });
+        } else if (distanceToCamera > 360e3 && this.ringAggregate !== null) {
+            this.ringAggregate.dispose();
+            this.ringAggregate = null;
+
+            this.armAggregates.forEach((armAggregate) => armAggregate.dispose());
+            this.armAggregates.length = 0;
+        }
     }
 
     getTransform(): TransformNode {
@@ -152,11 +168,17 @@ export class DockingBay {
     dispose() {
         this.root.dispose();
         this.ring.dispose();
-        this.ringAggregate.dispose();
+
+        this.ringAggregate?.dispose();
+        this.ringAggregate = null;
+
         this.ringMaterial.dispose();
         this.metalSectionMaterial.dispose();
         this.arms.forEach((arm) => arm.dispose());
+
         this.armAggregates.forEach((armAggregate) => armAggregate.dispose());
+        this.armAggregates.length = 0;
+
         this.landingPads.forEach((landingPad) => landingPad.dispose());
     }
 }

@@ -1,10 +1,10 @@
 
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { CollisionMask } from "../settings";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 
-export function createEnvironmentAggregate(mesh: Mesh, physicsShapeType: PhysicsShapeType): PhysicsAggregate {
+export function createEnvironmentAggregate(mesh: AbstractMesh, physicsShapeType: PhysicsShapeType): PhysicsAggregate {
     const aggregate = new PhysicsAggregate(mesh, physicsShapeType, { mass: 0 });
     aggregate.body.disablePreStep = false;
     aggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;

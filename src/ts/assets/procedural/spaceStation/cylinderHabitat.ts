@@ -25,6 +25,7 @@ import { Settings } from "../../../settings";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { CylinderHabitatMaterial } from "./cylinderHabitatMaterial";
 import { createEnvironmentAggregate } from "../../../utils/physics";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export class CylinderHabitat implements Transformable {
     private readonly root: TransformNode;
@@ -34,7 +35,7 @@ export class CylinderHabitat implements Transformable {
     private readonly cylinderMaterial: CylinderHabitatMaterial;
 
     private readonly cylinder: Mesh;
-    private readonly cylinderAggregate: PhysicsAggregate;
+    private cylinderAggregate: PhysicsAggregate | null = null;
 
     readonly habitableSurface: number;
 
@@ -64,13 +65,20 @@ export class CylinderHabitat implements Transformable {
         this.cylinder.material = this.cylinderMaterial;
 
         this.cylinder.parent = this.getTransform();
-
-        this.cylinderAggregate = createEnvironmentAggregate(this.cylinder, PhysicsShapeType.MESH);
     }
 
-    update(stellarObjects: Transformable[], deltaSeconds: number) {
+    update(stellarObjects: Transformable[], cameraWorldPosition: Vector3, deltaSeconds: number) {
         this.getTransform().rotate(Axis.Y, deltaSeconds / computeRingRotationPeriod(this.radius, Settings.G_EARTH));
         this.cylinderMaterial.update(stellarObjects);
+
+        const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
+
+        if (distanceToCamera < 350e3 && this.cylinderAggregate === null) {
+            this.cylinderAggregate = createEnvironmentAggregate(this.cylinder, PhysicsShapeType.MESH);
+        } else if (distanceToCamera > 360e3 && this.cylinderAggregate !== null) {
+            this.cylinderAggregate.dispose();
+            this.cylinderAggregate = null;
+        }
     }
 
     getTransform(): TransformNode {
@@ -80,7 +88,10 @@ export class CylinderHabitat implements Transformable {
     dispose() {
         this.root.dispose();
         this.cylinder.dispose();
-        this.cylinderAggregate.dispose();
+
+        this.cylinderAggregate?.dispose();
+        this.cylinderAggregate = null;
+
         this.cylinderMaterial.dispose();
     }
 }

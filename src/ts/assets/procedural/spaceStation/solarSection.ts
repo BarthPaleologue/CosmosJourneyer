@@ -25,10 +25,11 @@ import { Space } from "@babylonjs/core/Maths/math.axis";
 import { SolarPanelMaterial } from "../solarPanel/solarPanelMaterial";
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 import { createEnvironmentAggregate } from "../../../utils/physics";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export class SolarSection implements Transformable {
     private readonly attachment: Mesh;
-    private readonly attachmentAggregate: PhysicsAggregate;
+    private attachmentAggregate: PhysicsAggregate | null = null;
 
     private readonly arms: Mesh[] = [];
     private readonly armAggregates: PhysicsAggregate[] = [];
@@ -79,8 +80,6 @@ export class SolarSection implements Transformable {
         this.metalSectionMaterial = new MetalSectionMaterial(scene);
         this.attachment.material = this.metalSectionMaterial;
 
-        this.attachmentAggregate = createEnvironmentAggregate(this.attachment, PhysicsShapeType.MESH);
-
         this.solarPanelMaterial = new SolarPanelMaterial(scene);
 
         const hexagonOffset = attachmentThickness * (1 - Math.sqrt(3) / 2);
@@ -101,8 +100,6 @@ export class SolarSection implements Transformable {
             arm1.rotate(Axis.X, Math.PI / 2);
             arm1.translate(Axis.Y, (armLength + attachmentThickness - hexagonOffset) / 2);
 
-            this.createArmAggregate(arm1);
-
             this.generateSpikePattern(arm1, armLength, attachmentThickness / 2, requiredSurface / 2);
 
             const arm2 = MeshBuilder.CreateCylinder("Arm2", {
@@ -117,8 +114,6 @@ export class SolarSection implements Transformable {
             arm2.translate(Axis.Y, (armLength + attachmentThickness - hexagonOffset) / 2);
 
             this.generateSpikePattern(arm2, armLength, attachmentThickness / 2, requiredSurface / 2);
-
-            this.createArmAggregate(arm2);
 
         } else if (nbArms >= 3) {
             this.generateStarPattern(nbArms, requiredSurface);
@@ -152,8 +147,6 @@ export class SolarSection implements Transformable {
 
             this.solarPanels.push(panel1);
 
-            this.createSolarPanelAggregate(panel1);
-
             const panel2 = MeshBuilder.CreateBox("SolarPanel2", {
                 height: 0.3,
                 width: panelDimensionY,
@@ -166,8 +159,6 @@ export class SolarSection implements Transformable {
             panel2.rotate(Axis.Z, Math.PI / 2);
 
             this.solarPanels.push(panel2);
-
-            this.createSolarPanelAggregate(panel2);
         }
     }
 
@@ -199,8 +190,6 @@ export class SolarSection implements Transformable {
             arm.material = this.metalSectionMaterial;
             this.arms.push(arm);
 
-            this.createArmAggregate(arm);
-
             const armOffset = nbArms * 0.3 * surfacePerArm / armLength;
             const hexagonOffset = armThickness * (1 - Math.sqrt(3) / 2);
 
@@ -215,8 +204,6 @@ export class SolarSection implements Transformable {
             solarPanel1.translate(Axis.Z, 0.5 * (surfacePerArm / armLength + armThickness - hexagonOffset));
             solarPanel1.material = this.solarPanelMaterial;
 
-            this.createSolarPanelAggregate(solarPanel1);
-
             const solarPanel2 = MeshBuilder.CreateBox("SolarPanel2", {
                 height: 0.3,
                 width: armLength,
@@ -227,12 +214,10 @@ export class SolarSection implements Transformable {
             solarPanel2.translate(Axis.X, armOffset);
             solarPanel2.translate(Axis.Z, -0.5 * (surfacePerArm / armLength + armThickness - hexagonOffset));
             solarPanel2.material = this.solarPanelMaterial;
-
-            this.createSolarPanelAggregate(solarPanel2);
         }
     }
 
-    private createSolarPanelAggregate(panel: Mesh): PhysicsAggregate {
+    private createSolarPanelAggregate(panel: AbstractMesh): PhysicsAggregate {
         const panelAggregate = createEnvironmentAggregate(panel, PhysicsShapeType.BOX);
         this.solarPanelAggregates.push(panelAggregate);
         return panelAggregate;
@@ -244,9 +229,32 @@ export class SolarSection implements Transformable {
         return armAggregate;
     }
 
-    update(stellarObjects: Transformable[]) {
+    update(stellarObjects: Transformable[], cameraWorldPosition: Vector3) {
         this.solarPanelMaterial.update(stellarObjects);
         this.metalSectionMaterial.update(stellarObjects);
+
+        const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
+
+        if (distanceToCamera < 350e3 && this.attachmentAggregate === null) {
+            this.attachmentAggregate = createEnvironmentAggregate(this.attachment, PhysicsShapeType.MESH);
+            this.arms.forEach(arm => {
+                const armAggregate = this.createArmAggregate(arm);
+                this.armAggregates.push(armAggregate);
+            });
+            this.solarPanels.forEach(solarPanel => {
+                const solarPanelAggregate = this.createSolarPanelAggregate(solarPanel);
+                this.solarPanelAggregates.push(solarPanelAggregate);
+            });
+        } else if (distanceToCamera > 360e3 && this.attachmentAggregate !== null) {
+            this.attachmentAggregate?.dispose();
+            this.attachmentAggregate = null;
+
+            this.armAggregates.forEach(armAggregate => armAggregate.dispose());
+            this.armAggregates.length = 0;
+
+            this.solarPanelAggregates.forEach(solarPanelAggregate => solarPanelAggregate.dispose());
+            this.solarPanelAggregates.length = 0;
+        }
     }
 
     public getTransform(): TransformNode {
@@ -255,7 +263,8 @@ export class SolarSection implements Transformable {
 
     public dispose() {
         this.attachment.dispose();
-        this.attachmentAggregate.dispose();
+        this.attachmentAggregate?.dispose();
+        this.attachmentAggregate = null;
 
         this.arms.forEach(arm => arm.dispose());
         this.armAggregates.forEach(armAggregate => armAggregate.dispose());

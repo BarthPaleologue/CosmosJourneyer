@@ -30,7 +30,7 @@ import { CollisionMask } from "../../../settings";
 export class UtilitySection implements Transformable {
     private readonly attachment: Mesh;
 
-    private readonly attachmentAggregate: PhysicsAggregate;
+    private attachmentAggregate: PhysicsAggregate | null = null;
 
     private readonly metalSectionMaterial: MetalSectionMaterial;
 
@@ -47,11 +47,6 @@ export class UtilitySection implements Transformable {
         }, scene);
         this.attachment.convertToFlatShadedMesh();
         this.attachment.material = this.metalSectionMaterial;
-
-        this.attachmentAggregate = new PhysicsAggregate(this.attachment, PhysicsShapeType.MESH, { mass: 0 });
-        this.attachmentAggregate.body.disablePreStep = false;
-        this.attachmentAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
-        this.attachmentAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
 
         const boundingVectors = this.attachment.getHierarchyBoundingVectors();
         const boundingExtendSize = boundingVectors.max.subtract(boundingVectors.min).scale(0.5);
@@ -72,20 +67,37 @@ export class UtilitySection implements Transformable {
                     tank.translate(Axis.Y, ring * 40);
 
                     this.tanks.push(tank);
-
-                    const tankAggregate = new PhysicsAggregate(tank, PhysicsShapeType.SPHERE, { mass: 0 });
-                    tankAggregate.body.disablePreStep = false;
-                    tankAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
-                    tankAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
-
-                    this.tankAggregates.push(tankAggregate);
                 }
             }
         }
     }
 
-    update(stellarObjects: Transformable[]) {
+    update(stellarObjects: Transformable[], cameraWorldPosition: Vector3) {
         this.metalSectionMaterial.update(stellarObjects);
+
+        const distanceToCamera = cameraWorldPosition.subtract(this.getTransform().getAbsolutePosition()).length();
+
+        if(distanceToCamera < 350e3 && this.attachmentAggregate === null) {
+            this.attachmentAggregate = new PhysicsAggregate(this.attachment, PhysicsShapeType.MESH, { mass: 0 });
+            this.attachmentAggregate.body.disablePreStep = false;
+            this.attachmentAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+            this.attachmentAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
+
+            this.tanks.forEach(tank => {
+                const tankAggregate = new PhysicsAggregate(tank, PhysicsShapeType.SPHERE, { mass: 0 });
+                tankAggregate.body.disablePreStep = false;
+                tankAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+                tankAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
+
+                this.tankAggregates.push(tankAggregate);
+            });
+        } else if(distanceToCamera > 360e3 && this.attachmentAggregate !== null) {
+            this.attachmentAggregate?.dispose();
+            this.attachmentAggregate = null;
+
+            this.tankAggregates.forEach(tankAggregate => tankAggregate.dispose());
+            this.tankAggregates.length = 0;
+        }
     }
 
     getTransform(): TransformNode {
@@ -94,7 +106,7 @@ export class UtilitySection implements Transformable {
 
     dispose() {
         this.attachment.dispose();
-        this.attachmentAggregate.dispose();
+        this.attachmentAggregate?.dispose();
         this.metalSectionMaterial.dispose();
         this.tanks.forEach(tank => tank.dispose());
         this.tankAggregates.forEach(tankAggregate => tankAggregate.dispose());
