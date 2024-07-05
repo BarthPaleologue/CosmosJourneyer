@@ -555,9 +555,9 @@ export class StarSystemView implements View {
         this.spaceshipControls.spaceship.setClosestWalkableObject(nearestOrbitalObject);
 
         if(nearestOrbitalObject instanceof SpaceStation) {
-            this.spaceshipControls.setClosestDockingFacility(nearestOrbitalObject);
+            this.spaceshipControls.setClosestLandableFacility(nearestOrbitalObject);
         } else {
-            this.spaceshipControls.setClosestDockingFacility(null);
+            this.spaceshipControls.setClosestLandableFacility(null);
         }
 
         this.bodyEditor.update(nearestCelestialBody, this.postProcessManager, this.scene);

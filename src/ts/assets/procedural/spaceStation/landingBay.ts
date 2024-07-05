@@ -32,7 +32,7 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { createEnvironmentAggregate } from "../../../utils/physics";
 import { createRing } from "../../../utils/ringBuilder";
 
-export class DockingBay {
+export class LandingBay {
     private readonly root: TransformNode;
 
     private readonly radius: number;
@@ -49,7 +49,7 @@ export class DockingBay {
     readonly landingPads: LandingPad[] = [];
 
     constructor(scene: Scene) {
-        this.root = new TransformNode("DockingBayRoot", scene);
+        this.root = new TransformNode("LandingBayRoot", scene);
 
         this.radius = 500;
 

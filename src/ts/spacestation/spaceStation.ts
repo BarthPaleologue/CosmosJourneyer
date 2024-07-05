@@ -41,13 +41,13 @@ import { SolarSection } from "../assets/procedural/spaceStation/solarSection";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { wheelOfFortune } from "../utils/random";
 import { CylinderHabitat } from "../assets/procedural/spaceStation/cylinderHabitat";
-import { DockingBay } from "../assets/procedural/spaceStation/dockingBay";
+import { LandingBay } from "../assets/procedural/spaceStation/landingBay";
 import { LandingPad } from "../assets/procedural/landingPad/landingPad";
-import { Dockable } from "../utils/dockable";
+import { ManagesLandingPads } from "../utils/managesLandingPads";
 import { getEdibleEnergyPerHaPerDay } from "../utils/agriculture";
 import { Settings } from "../settings";
 
-export class SpaceStation implements OrbitalObject, Cullable, Dockable {
+export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads {
     readonly name: string;
 
     readonly model: SpaceStationModel;
@@ -63,7 +63,7 @@ export class SpaceStation implements OrbitalObject, Cullable, Dockable {
     readonly helixHabitats: HelixHabitat[] = [];
     readonly ringHabitats: RingHabitat[] = [];
     readonly cylinderHabitats: CylinderHabitat[] = [];
-    readonly dockingBays: DockingBay[] = [];
+    readonly landingBays: LandingBay[] = [];
 
     private readonly root: TransformNode;
 
@@ -92,9 +92,9 @@ export class SpaceStation implements OrbitalObject, Cullable, Dockable {
         this.root.rotate(Axis.Z, this.model.physicalProperties.axialTilt);
     }
 
-    handleDockingRequest(): LandingPad | null {
-        const availableLandingPads = this.dockingBays.flatMap((dockingBay) => {
-            return dockingBay.landingPads;
+    handleLandingRequest(): LandingPad | null {
+        const availableLandingPads = this.landingBays.flatMap((landingBay) => {
+            return landingBay.landingPads;
         });
         const nbPads = availableLandingPads.length;
 
@@ -236,11 +236,11 @@ export class SpaceStation implements OrbitalObject, Cullable, Dockable {
             lastNode = utilitySection.getTransform();
         }
 
-        const dockingBay = new DockingBay(this.scene);
+        const landingBay = new LandingBay(this.scene);
 
-        this.dockingBays.push(dockingBay);
-        this.placeNode(dockingBay.getTransform(), lastNode);
-        dockingBay.getTransform().parent = this.root;
+        this.landingBays.push(landingBay);
+        this.placeNode(landingBay.getTransform(), lastNode);
+        landingBay.getTransform().parent = this.root;
     }
 
     private placeNode(node: TransformNode, parent: TransformNode) {
@@ -262,7 +262,7 @@ export class SpaceStation implements OrbitalObject, Cullable, Dockable {
         this.helixHabitats.forEach((helixHabitat) => helixHabitat.update(stellarObjects, cameraWorldPosition, deltaSeconds));
         this.ringHabitats.forEach((ringHabitat) => ringHabitat.update(stellarObjects, cameraWorldPosition, deltaSeconds));
         this.cylinderHabitats.forEach((cylinderHabitat) => cylinderHabitat.update(stellarObjects, cameraWorldPosition, deltaSeconds));
-        this.dockingBays.forEach((dockingBay) => dockingBay.update(stellarObjects, cameraWorldPosition, deltaSeconds));
+        this.landingBays.forEach((landingBay) => landingBay.update(stellarObjects, cameraWorldPosition, deltaSeconds));
     }
 
     getTransform(): TransformNode {
@@ -275,7 +275,7 @@ export class SpaceStation implements OrbitalObject, Cullable, Dockable {
         this.helixHabitats.forEach((helixHabitat) => helixHabitat.dispose());
         this.ringHabitats.forEach((ringHabitat) => ringHabitat.dispose());
         this.cylinderHabitats.forEach((cylinderHabitat) => cylinderHabitat.dispose());
-        this.dockingBays.forEach((dockingBay) => dockingBay.dispose());
+        this.landingBays.forEach((landingBay) => landingBay.dispose());
 
         this.childAggregates.forEach((childAggregate) => childAggregate.dispose());
     }

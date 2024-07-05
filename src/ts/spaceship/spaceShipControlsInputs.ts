@@ -14,7 +14,7 @@ const landingAction = new Action({
 
 const landingInteraction = new PressInteraction(landingAction);
 
-const emitDockingRequest = new PressInteraction(new Action({
+const emitLandingRequest = new PressInteraction(new Action({
     bindings: [keyboard.getControl("keyY")]
 }));
 
@@ -83,7 +83,7 @@ const throttleToZeroInteraction = new PressInteraction(throttleToZero);
 
 export const SpaceShipControlsInputs = new InputMap<{
     landing: PressInteraction;
-    emitDockingRequest: PressInteraction;
+    emitLandingRequest: PressInteraction;
     upDown: Action<number>;
     throttle: Action<number>;
     rollPitch: Action<[number, number]>;
@@ -92,7 +92,7 @@ export const SpaceShipControlsInputs = new InputMap<{
     throttleToZero: PressInteraction;
 }>("SpaceShipInputs", {
     landing: landingInteraction,
-    emitDockingRequest: emitDockingRequest,
+    emitLandingRequest: emitLandingRequest,
     upDown: upDownAction,
     throttle: throttleAction,
     rollPitch: rollPitch,

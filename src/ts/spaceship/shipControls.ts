@@ -31,7 +31,7 @@ import { StarSystemInputs } from "../inputs/starSystemInputs";
 import { pressInteractionToStrings } from "../utils/inputControlsString";
 import i18n from "../i18n";
 import { Transformable } from "../architecture/transformable";
-import { Dockable } from "../utils/dockable";
+import { ManagesLandingPads } from "../utils/managesLandingPads";
 
 export class ShipControls implements Controls {
     readonly spaceship: Spaceship;
@@ -48,7 +48,7 @@ export class ShipControls implements Controls {
     private baseFov: number;
     private targetFov: number;
 
-    private closestDockingFacility: (Transformable & Dockable) | null = null;
+    private closestLandableFacility: (Transformable & ManagesLandingPads) | null = null;
 
     constructor(scene: Scene) {
         this.spaceship = new Spaceship(scene);
@@ -74,15 +74,15 @@ export class ShipControls implements Controls {
             }
         });
 
-        SpaceShipControlsInputs.map.emitDockingRequest.on("complete", () => {
-            if(this.closestDockingFacility === null) return;
-            const landingPad = this.closestDockingFacility.handleDockingRequest();
+        SpaceShipControlsInputs.map.emitLandingRequest.on("complete", () => {
+            if(this.closestLandableFacility === null) return;
+            const landingPad = this.closestLandableFacility.handleLandingRequest();
             if(landingPad === null) {
-                createNotification("Docking request rejected", 2000);
+                createNotification("Landing request rejected", 2000);
                 return;
             }
 
-            createNotification(`Docking request granted. Proceed to pad ${landingPad.padNumber}`, 10000);
+            createNotification(`Landing request granted. Proceed to pad ${landingPad.padNumber}`, 10000);
             this.spaceship.engageLandingOnPad(landingPad);
         });
 
@@ -130,8 +130,8 @@ export class ShipControls implements Controls {
         return [this.thirdPersonCamera];
     }
 
-    public setClosestDockingFacility(facility: (Transformable & Dockable) | null) {
-        this.closestDockingFacility = facility;
+    public setClosestLandableFacility(facility: (Transformable & ManagesLandingPads) | null) {
+        this.closestLandableFacility = facility;
     }
 
     public update(deltaTime: number): Vector3 {
