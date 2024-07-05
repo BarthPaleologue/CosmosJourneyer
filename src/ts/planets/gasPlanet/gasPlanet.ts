@@ -152,6 +152,7 @@ export class GasPlanet implements Planet, Cullable {
         this.mesh.dispose();
         this.aggregate.dispose();
         this.material.dispose();
+        this.asteroidField?.dispose();
     }
 
     getOrbitProperties(): OrbitProperties {
