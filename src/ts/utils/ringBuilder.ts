@@ -45,8 +45,8 @@ export function createRingVertexData(radius: number, thickness: number, height: 
         positions.push(outerTopPosition.x, outerTopPosition.y, outerTopPosition.z);
         normals.push(0, 1, 0);
 
-        uvs.push(i / tesselation, 0);
         uvs.push(i / tesselation, 1);
+        uvs.push(i / tesselation, 0);
 
         // outer strip
         positions.push(outerBottomPosition.x, outerBottomPosition.y, outerBottomPosition.z);
@@ -63,8 +63,8 @@ export function createRingVertexData(radius: number, thickness: number, height: 
         positions.push(innerTopPosition.x, innerTopPosition.y, innerTopPosition.z);
         normals.push(-dx, 0, -dz);
 
-        uvs.push(i / tesselation, 0);
         uvs.push(i / tesselation, 1);
+        uvs.push(i / tesselation, 0);
 
         if (i === 0) continue;
 
