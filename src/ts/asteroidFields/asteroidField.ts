@@ -154,7 +154,7 @@ export class AsteroidField {
         const cellSize = patchSize / resolution;
         for (let x = 0; x < resolution; x++) {
             for (let z = 0; z < resolution; z++) {
-                const asteroidIndex = cellIndex + (x * resolution + z) / 1000;
+                const asteroidIndex = (cellIndex / 1000e3) + (x * resolution + z) / 1000;
                 const randomCellPositionX = rng(asteroidIndex) * cellSize;
                 const randomCellPositionZ = rng(asteroidIndex + 4621) * cellSize;
                 const positionX = position.x + x * cellSize - patchSize / 2 + randomCellPositionX;
