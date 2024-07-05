@@ -60,6 +60,9 @@ export class RingHabitat implements Transformable {
         const yScaling = Math.ceil(requiredHeight / deltaRadius);
         const height = yScaling * deltaRadius;
 
+        // adjust the radius to fit the required habitable surface
+        this.radius = requiredHabitableSurface / (height * 2 * Math.PI) - deltaRadius / 2;
+
         const attachmentNbSides = 4 + 2 * Math.floor(Math.random() * 2);
 
         this.metalSectionMaterial = new MetalSectionMaterial(scene);
