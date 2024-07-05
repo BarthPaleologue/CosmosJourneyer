@@ -197,7 +197,7 @@ export class SpaceStation implements OrbitalObject, Cullable, Dockable {
 
         let newNode: TransformNode | null = null;
         if (habitatType === SpaceStationNodeType.HELIX_HABITAT) {
-            const helixHabitat = new HelixHabitat(this.scene);
+            const helixHabitat = new HelixHabitat(habitatSurface, this.scene);
             this.helixHabitats.push(helixHabitat);
             newNode = helixHabitat.getTransform();
         } else if (habitatType === SpaceStationNodeType.RING_HABITAT) {

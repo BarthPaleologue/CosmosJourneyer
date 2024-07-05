@@ -50,17 +50,19 @@ export class HelixHabitat implements Transformable {
     private readonly arms: Mesh[] = [];
     private readonly armAggregates: PhysicsAggregate[] = [];
 
-    constructor(scene: Scene) {
+    constructor(requiredHabitableSurface: number, scene: Scene) {
         this.root = new TransformNode("HelixHabitatRoot", scene);
 
-        const nbSpires = 2 + Math.floor(Math.random() * 2);
-
-
         this.radius = 5e3 + Math.random() * 10e3;
+        const deltaRadius = 400 + Math.random() * 100;
+
+        const requiredHabitableSurfacePerHelix = requiredHabitableSurface / 2;
+
+        const nbSpires = Math.ceil(requiredHabitableSurfacePerHelix / (2 * Math.PI * this.radius * deltaRadius));
+
+        this.radius = requiredHabitableSurfacePerHelix / (2 * Math.PI * nbSpires * deltaRadius);
 
         const pitch = 2 * this.radius * (1 + 0.3 * (Math.random() * 2 - 1));
-
-        const deltaRadius = 400 + Math.random() * 100;
 
         const totalLength = pitch * nbSpires;
 
