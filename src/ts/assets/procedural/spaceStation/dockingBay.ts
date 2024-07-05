@@ -115,7 +115,7 @@ export class DockingBay {
 
             landingPad.getTransform().rotate(Axis.Y, Math.PI / 2, Space.LOCAL);
 
-            landingPad.getTransform().translate(Vector3.Up(), -this.radius + deltaRadius / 2 + 10, Space.LOCAL);
+            landingPad.getTransform().translate(Vector3.Up(), -(this.radius - deltaRadius / 2) * Math.cos(Math.PI / nbPads), Space.LOCAL);
 
             this.landingPads.push(landingPad);
         }
