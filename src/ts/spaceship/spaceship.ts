@@ -295,6 +295,10 @@ export class Spaceship implements Transformable {
         return this.state === ShipState.LANDED;
     }
 
+    public isLanding(): boolean {
+        return this.state === ShipState.LANDING;
+    }
+
     public takeOff() {
         this.state = ShipState.FLYING;
         this.aggregate.body.setMotionType(PhysicsMotionType.DYNAMIC);

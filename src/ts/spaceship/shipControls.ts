@@ -32,6 +32,7 @@ import { pressInteractionToStrings } from "../utils/inputControlsString";
 import i18n from "../i18n";
 import { Transformable } from "../architecture/transformable";
 import { ManagesLandingPads } from "../utils/managesLandingPads";
+import { Sounds } from "../assets/sounds";
 
 export class ShipControls implements Controls {
     readonly spaceship: Spaceship;
@@ -75,13 +76,15 @@ export class ShipControls implements Controls {
         });
 
         SpaceShipControlsInputs.map.emitLandingRequest.on("complete", () => {
-            if(this.closestLandableFacility === null) return;
+            if (this.spaceship.isLanded() || this.spaceship.isLanding()) return;
+            if (this.closestLandableFacility === null) return;
             const landingPad = this.closestLandableFacility.handleLandingRequest();
-            if(landingPad === null) {
+            if (landingPad === null) {
                 createNotification("Landing request rejected", 2000);
                 return;
             }
 
+            Sounds.LANDING_REQUEST_GRANTED.play();
             createNotification(`Landing request granted. Proceed to pad ${landingPad.padNumber}`, 10000);
             this.spaceship.engageLandingOnPad(landingPad);
         });

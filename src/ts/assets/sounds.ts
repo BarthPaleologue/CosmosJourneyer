@@ -33,6 +33,7 @@ import hyperSpaceSound from "../../asset/sound/539503__timbre_endless-decelerati
 import thrusterSound from "../../asset/sound/318688__limitsnap_creations__rocket-thrust-effect.mp3";
 import starMapBackgroundMusic from "../../asset/sound/455855__andrewkn__wandering.mp3";
 
+import landingRequestSound from "../../asset/sound/voice/LandingRequestGrantedCharlotte.mp3";
 export class Sounds {
     public static OUCH_SOUND: Sound;
     public static ENGINE_RUNNING_SOUND: Sound;
@@ -58,6 +59,8 @@ export class Sounds {
 
     public static STAR_MAP_BACKGROUND_MUSIC: Sound;
     public static MAIN_MENU_BACKGROUND_MUSIC: Sound;
+
+    public static LANDING_REQUEST_GRANTED: Sound;
 
     public static EnqueueTasks(manager: AssetsManager, scene: Scene) {
         const ouchSoundTask = manager.addBinaryFileTask("ouchSoundTask", ouchSound);
@@ -199,6 +202,12 @@ export class Sounds {
             });
 
             console.log("Main menu background music loaded");
+        };
+
+        const landingRequestSoundTask = manager.addBinaryFileTask("landingRequestSoundTask", landingRequestSound);
+        landingRequestSoundTask.onSuccess = (task) => {
+            Sounds.LANDING_REQUEST_GRANTED = new Sound("LandingRequestGranted", task.data, scene);
+            console.log("Landing request sound loaded");
         };
     }
 }
