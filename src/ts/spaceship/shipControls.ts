@@ -108,6 +108,8 @@ export class ShipControls implements Controls {
         });
 
         this.spaceship.onLandingObservable.add(() => {
+            Sounds.LANDING_COMPLETE.play();
+
             const bindingsString = pressInteractionToStrings(StarSystemInputs.map.toggleSpaceShipCharacter).join(", ");
             createNotification(i18n.t("notifications:landingComplete", { bindingsString: bindingsString }), 5000);
         });
