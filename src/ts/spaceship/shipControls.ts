@@ -67,6 +67,21 @@ export class ShipControls implements Controls {
 
         SpaceShipControlsInputs.map.toggleWarpDrive.on("complete", () => {
             this.spaceship.toggleWarpDrive();
+            if(this.spaceship.getWarpDrive().isEnabled()) {
+                this.shakeCamera(1500);
+                this.targetFov = this.baseFov * 3.0;
+            } else {
+                this.shakeCamera(1500);
+                this.targetFov = this.baseFov * 0.5;
+
+                if(this.closestLandableFacility !== null) {
+                    const distanceToLandingFacility = Vector3.Distance(this.getTransform().getAbsolutePosition(), this.closestLandableFacility.getTransform().getAbsolutePosition());
+                    if(distanceToLandingFacility < 500e3) {
+                        const bindingsString = pressInteractionToStrings(SpaceShipControlsInputs.map.emitLandingRequest).join(", ");
+                        createNotification(`Don't forget to send a landing request with ${bindingsString} before approaching the facility`, 5000);
+                    }
+                }
+            }
         });
 
         SpaceShipControlsInputs.map.landing.on("complete", () => {
@@ -85,7 +100,7 @@ export class ShipControls implements Controls {
             }
 
             Sounds.LANDING_REQUEST_GRANTED.play();
-            createNotification(`Landing request granted. Proceed to pad ${landingPad.padNumber}`, 10000);
+            createNotification(`Landing request granted. Proceed to pad ${landingPad.padNumber}`, 30000);
             this.spaceship.engageLandingOnPad(landingPad);
         });
 
@@ -97,24 +112,16 @@ export class ShipControls implements Controls {
         this.baseFov = this.thirdPersonCamera.fov;
         this.targetFov = this.baseFov;
 
-        this.spaceship.onWarpDriveEnabled.add(() => {
-            this.shakeCamera(2000);
-            this.targetFov = this.baseFov * 3.0;
-        });
-
-        this.spaceship.onWarpDriveDisabled.add(() => {
-            this.shakeCamera(2500);
-            this.targetFov = this.baseFov * 0.5;
-        });
-
         this.spaceship.onLandingObservable.add(() => {
             Sounds.LANDING_COMPLETE.play();
+            Sounds.STRAUSS_BLUE_DANUBE.stop();
 
             const bindingsString = pressInteractionToStrings(StarSystemInputs.map.toggleSpaceShipCharacter).join(", ");
             createNotification(i18n.t("notifications:landingComplete", { bindingsString: bindingsString }), 5000);
         });
 
         this.spaceship.onLandingEngaged.add(() => {
+            Sounds.STRAUSS_BLUE_DANUBE.play();
             createNotification(i18n.t("notifications:landingSequenceEngaged"), 5000);
         });
     }

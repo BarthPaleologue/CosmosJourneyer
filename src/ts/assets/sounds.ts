@@ -36,6 +36,8 @@ import starMapBackgroundMusic from "../../asset/sound/455855__andrewkn__wanderin
 import landingRequestSound from "../../asset/sound/voice/LandingRequestGrantedCharlotte.mp3";
 import landingCompleteSound from "../../asset/sound/voice/LandingCompleteCharlotte.mp3";
 
+import straussBlueDanube from "../../asset/sound/Strauss_The_Blue_Danube_Waltz.mp3";
+
 export class Sounds {
     public static OUCH_SOUND: Sound;
     public static ENGINE_RUNNING_SOUND: Sound;
@@ -65,6 +67,7 @@ export class Sounds {
     public static LANDING_REQUEST_GRANTED: Sound;
     public static LANDING_COMPLETE: Sound;
 
+    public static STRAUSS_BLUE_DANUBE: Sound;
 
     public static EnqueueTasks(manager: AssetsManager, scene: Scene) {
         const ouchSoundTask = manager.addBinaryFileTask("ouchSoundTask", ouchSound);
@@ -218,6 +221,12 @@ export class Sounds {
         landingCompleteSoundTask.onSuccess = (task) => {
             Sounds.LANDING_COMPLETE = new Sound("LandingComplete", task.data, scene);
             console.log("Landing complete sound loaded");
+        };
+
+        const straussBlueDanubeTask = manager.addBinaryFileTask("straussBlueDanubeTask", straussBlueDanube);
+        straussBlueDanubeTask.onSuccess = (task) => {
+            Sounds.STRAUSS_BLUE_DANUBE = new Sound("StraussBlueDanube", task.data, scene);
+            console.log("Strauss Blue Danube sound loaded");
         };
     }
 }
