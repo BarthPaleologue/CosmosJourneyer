@@ -1,15 +1,20 @@
 import { Transformable } from "../../../architecture/transformable";
 import { Mesh } from "@babylonjs/core/Meshes";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { PBRMetallicRoughnessMaterial, PhysicsShapeType, Scene } from "@babylonjs/core";
+import { PBRMetallicRoughnessMaterial } from "@babylonjs/core/Materials/PBR/pbrMetallicRoughnessMaterial";
+import { Scene } from "@babylonjs/core/scene";
+import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { LandingPadMaterial } from "./landingPadMaterial";
 import { Textures } from "../../textures";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { CollisionMask } from "../../../settings";
+import { TypedObject } from "../../../architecture/typedObject";
+import i18n from "../../../i18n";
+import { BoundingSphere } from "../../../architecture/boundingSphere";
 
-export class LandingPad implements Transformable {
+export class LandingPad implements Transformable, TypedObject, BoundingSphere {
     private readonly deck: Mesh;
     private readonly deckAggregate: PhysicsAggregate;
 
@@ -20,10 +25,14 @@ export class LandingPad implements Transformable {
 
     readonly padNumber: number;
 
+    private readonly boundingRadius: number;
+
     constructor(padNumber: number, scene: Scene) {
         const width = 40;
         const depth = width * 1.618;
         const aspectRatio = width / depth;
+
+        this.boundingRadius = depth / 2;
 
         this.padNumber = padNumber;
 
@@ -81,11 +90,19 @@ export class LandingPad implements Transformable {
         return this.deck;
     }
 
+    getBoundingRadius(): number {
+        return this.boundingRadius;
+    }
+
     dispose() {
         this.deck.dispose();
         this.deckAggregate.dispose();
         this.deckMaterial.dispose();
         this.crates.forEach((box) => box.dispose());
         this.crateMaterial.dispose();
+    }
+
+    getTypeName(): string {
+        return i18n.t("objectTypes:landingPad");
     }
 }
