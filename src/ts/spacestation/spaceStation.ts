@@ -43,7 +43,7 @@ import { wheelOfFortune } from "../utils/random";
 import { CylinderHabitat } from "../assets/procedural/spaceStation/cylinderHabitat";
 import { LandingBay } from "../assets/procedural/spaceStation/landingBay";
 import { LandingPad } from "../assets/procedural/landingPad/landingPad";
-import { ManagesLandingPads } from "../utils/managesLandingPads";
+import { LandingRequest, ManagesLandingPads } from "../utils/managesLandingPads";
 import { getEdibleEnergyPerHaPerDay } from "../utils/agriculture";
 import { Settings } from "../settings";
 
@@ -86,21 +86,29 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
         const centerWorld = boundingVectors.max.add(boundingVectors.min).scale(0.5);
         const deltaPosition = this.getTransform().getAbsolutePosition().subtract(centerWorld);
 
-        this.getTransform().getChildTransformNodes(true).forEach(transform => transform.position.addInPlace(deltaPosition));
+        this.getTransform()
+            .getChildTransformNodes(true)
+            .forEach((transform) => transform.position.addInPlace(deltaPosition));
 
         this.root.rotate(Axis.X, this.model.physicalProperties.axialTilt);
         this.root.rotate(Axis.Z, this.model.physicalProperties.axialTilt);
     }
 
-    handleLandingRequest(): LandingPad | null {
-        const availableLandingPads = this.landingBays.flatMap((landingBay) => {
-            return landingBay.landingPads;
-        });
-        const nbPads = availableLandingPads.length;
+    handleLandingRequest(request: LandingRequest): LandingPad | null {
+        const availableLandingPads = this.landingBays
+            .flatMap((landingBay) => {
+                return landingBay.landingPads;
+            })
+            .filter((landingPad) => {
+                return landingPad.padSize >= request.minimumPadSize;
+            })
+            .sort((a, b) => {
+                return a.padSize - b.padSize;
+            });
 
-        if (nbPads === 0) return null;
+        if (availableLandingPads.length === 0) return null;
 
-        return availableLandingPads[Math.floor(Math.random() * nbPads)];
+        return availableLandingPads[0];
     }
 
     getRotationAxis(): Vector3 {
@@ -160,9 +168,11 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
 
         const solarPanelSurface = getSolarPanelSurfaceFromEnergyRequirement(0.4, distanceToStar, starTemperature, starRadius, energyRequirement, 0.5);
 
-        let habitatSurfaceHa = 100 * this.model.population / this.model.populationDensity;
+        let habitatSurfaceHa = (100 * this.model.population) / this.model.populationDensity;
         this.model.agricultureMix.forEach(([fraction, cropType]) => {
-            habitatSurfaceHa += fraction * this.model.population * Settings.INDIVIDUAL_AVERAGE_DAILY_INTAKE / (Settings.HYDROPONIC_TO_CONVENTIONAL_RATIO * this.model.nbHydroponicLayers * getEdibleEnergyPerHaPerDay(cropType));
+            habitatSurfaceHa +=
+                (fraction * this.model.population * Settings.INDIVIDUAL_AVERAGE_DAILY_INTAKE) /
+                (Settings.HYDROPONIC_TO_CONVENTIONAL_RATIO * this.model.nbHydroponicLayers * getEdibleEnergyPerHaPerDay(cropType));
         });
         const habitatSurface = habitatSurfaceHa * 1000;
 
@@ -172,7 +182,6 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
         solarSection.getTransform().parent = this.getTransform();
         lastNode = solarSection.getTransform();
         this.solarSections.push(solarSection);
-
 
         for (let i = 0; i < 10 + Math.floor(Math.random() * 10); i++) {
             const utilitySection = new UtilitySection(this.scene);

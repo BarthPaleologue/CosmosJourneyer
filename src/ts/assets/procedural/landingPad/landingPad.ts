@@ -14,6 +14,12 @@ import { TypedObject } from "../../../architecture/typedObject";
 import i18n from "../../../i18n";
 import { BoundingSphere } from "../../../architecture/boundingSphere";
 
+export const enum LandingPadSize {
+    SMALL = 1,
+    MEDIUM = 2,
+    LARGE = 3
+}
+
 export class LandingPad implements Transformable, TypedObject, BoundingSphere {
     private readonly deck: Mesh;
     private readonly deckAggregate: PhysicsAggregate;
@@ -24,11 +30,14 @@ export class LandingPad implements Transformable, TypedObject, BoundingSphere {
     private readonly crateMaterial: PBRMetallicRoughnessMaterial;
 
     readonly padNumber: number;
+    readonly padSize: LandingPadSize;
 
     private readonly boundingRadius: number;
 
-    constructor(padNumber: number, scene: Scene) {
-        const width = 40;
+    constructor(padNumber: number, padSize: LandingPadSize, scene: Scene) {
+        this.padSize = padSize;
+
+        const width = 40 * padSize;
         const depth = width * 1.618;
         const aspectRatio = width / depth;
 

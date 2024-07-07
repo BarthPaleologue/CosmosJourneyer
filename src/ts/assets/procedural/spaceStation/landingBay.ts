@@ -27,7 +27,7 @@ import { computeRingRotationPeriod } from "../../../utils/ringRotation";
 import { Settings } from "../../../settings";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Space } from "@babylonjs/core/Maths/math.axis";
-import { LandingPad } from "../landingPad/landingPad";
+import { LandingPad, LandingPadSize } from "../landingPad/landingPad";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { createEnvironmentAggregate } from "../../../utils/physics";
 import { createRing } from "../../../utils/ringBuilder";
@@ -106,7 +106,7 @@ export class LandingBay {
         const nbPads = nbSteps;
         let padNumber = 0;
         for (let i = 0; i < nbPads; i++) {
-            const landingPad = new LandingPad(padNumber++, scene);
+            const landingPad = new LandingPad(padNumber++, i % 2 === 0 ? LandingPadSize.SMALL : LandingPadSize.MEDIUM, scene);
             landingPad.getTransform().parent = this.getTransform();
 
             landingPad.getTransform().rotate(Axis.Z, Math.PI / 2, Space.LOCAL);

@@ -33,6 +33,7 @@ import i18n from "../i18n";
 import { Transformable } from "../architecture/transformable";
 import { ManagesLandingPads } from "../utils/managesLandingPads";
 import { Sounds } from "../assets/sounds";
+import { LandingPadSize } from "../assets/procedural/landingPad/landingPad";
 
 export class ShipControls implements Controls {
     readonly spaceship: Spaceship;
@@ -67,16 +68,19 @@ export class ShipControls implements Controls {
 
         SpaceShipControlsInputs.map.toggleWarpDrive.on("complete", () => {
             this.spaceship.toggleWarpDrive();
-            if(this.spaceship.getWarpDrive().isEnabled()) {
+            if (this.spaceship.getWarpDrive().isEnabled()) {
                 this.shakeCamera(1500);
                 this.targetFov = this.baseFov * 3.0;
             } else {
                 this.shakeCamera(1500);
                 this.targetFov = this.baseFov * 0.5;
 
-                if(this.closestLandableFacility !== null) {
-                    const distanceToLandingFacility = Vector3.Distance(this.getTransform().getAbsolutePosition(), this.closestLandableFacility.getTransform().getAbsolutePosition());
-                    if(distanceToLandingFacility < 500e3) {
+                if (this.closestLandableFacility !== null) {
+                    const distanceToLandingFacility = Vector3.Distance(
+                        this.getTransform().getAbsolutePosition(),
+                        this.closestLandableFacility.getTransform().getAbsolutePosition()
+                    );
+                    if (distanceToLandingFacility < 500e3) {
                         const bindingsString = pressInteractionToStrings(SpaceShipControlsInputs.map.emitLandingRequest).join(", ");
                         createNotification(`Don't forget to send a landing request with ${bindingsString} before approaching the facility`, 5000);
                     }
@@ -93,7 +97,7 @@ export class ShipControls implements Controls {
         SpaceShipControlsInputs.map.emitLandingRequest.on("complete", () => {
             if (this.spaceship.isLanded() || this.spaceship.isLanding()) return;
             if (this.closestLandableFacility === null) return;
-            const landingPad = this.closestLandableFacility.handleLandingRequest();
+            const landingPad = this.closestLandableFacility.handleLandingRequest({ minimumPadSize: LandingPadSize.SMALL });
             if (landingPad === null) {
                 createNotification("Landing request rejected", 2000);
                 return;

@@ -1,5 +1,9 @@
-import { LandingPad } from "../assets/procedural/landingPad/landingPad";
+import { LandingPad, LandingPadSize } from "../assets/procedural/landingPad/landingPad";
+
+export type LandingRequest = {
+    minimumPadSize: LandingPadSize;
+}
 
 export interface ManagesLandingPads {
-    handleLandingRequest(): LandingPad | null;
+    handleLandingRequest(request: LandingRequest): LandingPad | null;
 }
