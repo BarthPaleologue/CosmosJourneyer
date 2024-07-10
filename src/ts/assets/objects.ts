@@ -3,16 +3,16 @@
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
@@ -25,6 +25,7 @@ import shipCarrier from "../../asset/spacestation/shipcarrier.glb";
 import banana from "../../asset/banana/banana.glb";
 import character from "../../asset/character/character.glb";
 import rock from "../../asset/rock.glb";
+import asteroid from "../../asset/asteroid/asteroid.glb";
 import landingPad from "../../asset/landingpad.glb";
 import tree from "../../asset/tree/tree.babylon";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
@@ -50,6 +51,9 @@ export class Objects {
     private static LANDING_PAD: Mesh;
 
     public static ROCK: Mesh;
+
+    public static ASTEROID: Mesh;
+
     public static TREE: Mesh;
 
     public static BUTTERFLY: Mesh;
@@ -129,6 +133,7 @@ export class Objects {
         const rockTask = manager.addMeshTask("rockTask", "", "", rock);
         rockTask.onSuccess = function (task: MeshAssetTask) {
             Objects.ROCK = task.loadedMeshes[0].getChildMeshes()[0] as Mesh;
+            Objects.ROCK.setParent(null);
             Objects.ROCK.position.y = 0.1;
             Objects.ROCK.scaling.scaleInPlace(0.2);
             Objects.ROCK.bakeCurrentTransformIntoVertices();
@@ -136,6 +141,17 @@ export class Objects {
             Objects.ROCK.isVisible = false;
 
             console.log("Rock loaded");
+        };
+
+        const asteroidTask = manager.addMeshTask("asteroidTask", "", "", asteroid);
+        asteroidTask.onSuccess = function (task: MeshAssetTask) {
+            Objects.ASTEROID = task.loadedMeshes[0].getChildMeshes()[0] as Mesh;
+            Objects.ASTEROID.setParent(null);
+            Objects.ASTEROID.scaling.scaleInPlace(100);
+            Objects.ASTEROID.bakeCurrentTransformIntoVertices();
+            Objects.ASTEROID.setEnabled(false);
+
+            console.log("Asteroid loaded");
         };
 
         const landingPadTask = manager.addMeshTask("landingPadTask", "", "", landingPad);

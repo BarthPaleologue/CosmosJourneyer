@@ -3,35 +3,32 @@
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import "../styles/index.scss";
 
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import "@babylonjs/core/Materials/standardMaterial";
 import "@babylonjs/core/Loading/loadingScreen";
 import "@babylonjs/core/Misc/screenshotTools";
 import { Tools } from "@babylonjs/core/Misc/tools";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import "@babylonjs/core/Meshes/thinInstanceMesh";
-import { BlackHolePostProcess } from "./stellarObjects/blackHole/blackHolePostProcess";
-import { BlackHole } from "./stellarObjects/blackHole/blackHole";
-import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
-import { Axis, Scene } from "@babylonjs/core";
-import { translate } from "./uberCore/transforms/basicTransform";
+import { Axis, DirectionalLight, HavokPlugin, HemisphericLight, MeshBuilder, PhysicsAggregate, PhysicsShapeType, PhysicsViewer, Scene } from "@babylonjs/core";
 import { Assets } from "./assets/assets";
 import { DefaultControls } from "./defaultControls/defaultControls";
+import { AsteroidField } from "./asteroidFields/asteroidField";
+import HavokPhysics from "@babylonjs/havok";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -41,62 +38,62 @@ const engine = new Engine(canvas, true);
 engine.useReverseDepthBuffer = true;
 engine.displayLoadingUI();
 
+const havokInstance = await HavokPhysics();
+
 const scene = new Scene(engine);
 scene.useRightHandedSystem = true;
 
+const havokPlugin = new HavokPlugin(true, havokInstance);
+scene.enablePhysics(new Vector3(0, 0, 0), havokPlugin);
+
 const defaultControls = new DefaultControls(scene);
-defaultControls.speed = 4_000_000;
+
 
 const camera = defaultControls.getActiveCameras()[0];
-camera.maxZ = 100_000e3;
-camera.attachControl(canvas, true);
+camera.attachControl();
 
 scene.enableDepthRenderer(camera, false, true);
 
 await Assets.Init(scene);
 
-const starfieldPostProcess = new StarfieldPostProcess(scene, [], [], Quaternion.Identity());
-camera.attachPostProcess(starfieldPostProcess);
+const directionalLight = new DirectionalLight("sun", new Vector3(1, -1, 0), scene);
+directionalLight.intensity = 0.7;
 
-function createBlackHole(): TransformNode {
-    const blackHole = new BlackHole("hole", scene, 0, null);
-    blackHole.getTransform().setAbsolutePosition(new Vector3(0, 0, 15000e3));
+const hemi = new HemisphericLight("hemi", Vector3.Up(), scene);
+hemi.intensity = 0.4;
 
-    const blackHolePP = new BlackHolePostProcess(blackHole, scene, Quaternion.Identity());
-    camera.attachPostProcess(blackHolePP);
+const scaler = 500;
 
-    scene.onBeforeRenderObservable.add(() => {
-        const deltaSeconds = engine.getDeltaTime() / 1000;
-        blackHolePP.update(deltaSeconds);
-    });
+defaultControls.getTransform().position.z = -200 * scaler;
+defaultControls.getTransform().position.y = 20 * scaler;
+defaultControls.speed *= scaler;
+camera.maxZ *= scaler;
 
-    return blackHole.getTransform();
-}
+const sphere = MeshBuilder.CreateSphere("box", { diameter: 20 * scaler }, scene);
 
-const targetObject = createBlackHole();
+const sphereAggregate = new PhysicsAggregate(sphere, PhysicsShapeType.SPHERE, {mass:0}, scene);
 
-defaultControls.getTransform().rotateAround(targetObject.getAbsolutePosition(), Axis.X, 0.2);
+const beltRadius = 100 * scaler;
+const beltSpread = 20 * scaler;
 
-function applyFloatingOrigin() {
-    const playerPosition = defaultControls.getTransform().getAbsolutePosition().clone();
+const belt = new AsteroidField(42, sphere, beltRadius, beltSpread, scene);
 
-    translate(defaultControls.getTransform(), playerPosition.negate());
-    translate(targetObject, playerPosition.negate());
-}
+const torus = MeshBuilder.CreateTorus("torus", { diameter: 2 * beltRadius, thickness: 2 * beltSpread, tessellation: 32 }, scene);
+torus.visibility = 0.1;
+torus.parent = sphere;
+torus.scaling.y = 0.1 / scaler;
+
+const physicsViewer = new PhysicsViewer(scene);
 
 scene.onBeforeRenderObservable.add(() => {
-    const deltaSeconds = engine.getDeltaTime() / 1000;
+    defaultControls.update(engine.getDeltaTime() / 1000);
 
-    defaultControls.update(deltaSeconds);
+    belt.update(defaultControls.getTransform().getAbsolutePosition(), engine.getDeltaTime() / 1000);
 
-    defaultControls.getTransform().lookAt(targetObject.getAbsolutePosition());
-
-    defaultControls.getTransform().rotateAround(targetObject.getAbsolutePosition(), Axis.X, 0.02 * deltaSeconds);
-    defaultControls.getTransform().computeWorldMatrix(true);
-    defaultControls.getTransform().rotateAround(targetObject.getAbsolutePosition(), Axis.Y, 0.1 * deltaSeconds);
-    defaultControls.getTransform().computeWorldMatrix(true);
-
-    applyFloatingOrigin();
+    //sphere.rotate(Axis.Y, 0.002);
+    scene.meshes.forEach((mesh) => {
+        if (mesh.physicsBody) physicsViewer.showBody(mesh.physicsBody);
+    });
 });
 
 scene.executeWhenReady(() => {

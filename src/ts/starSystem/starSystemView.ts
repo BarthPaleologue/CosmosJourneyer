@@ -3,16 +3,16 @@
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { HelmetOverlay } from "../ui/helmetOverlay";
@@ -338,7 +338,7 @@ export class StarSystemView implements View {
 
         // small ambient light helps with seeing dark objects. This is unrealistic but I feel it is better.
         const ambientLight = new HemisphericLight("ambientLight", Vector3.Zero(), this.scene);
-        ambientLight.intensity = 0.3;
+        ambientLight.intensity = 0.02;
 
         this.postProcessManager = new PostProcessManager(this.scene);
 
@@ -536,11 +536,11 @@ export class StarSystemView implements View {
         if (this.spaceshipControls === null) throw new Error("Spaceship controls is null");
         if (this.characterControls === null) throw new Error("Character controls is null");
 
-        const shipPosition = this.spaceshipControls.getTransform().getAbsolutePosition();
         const nearestOrbitalObject = starSystem.getNearestOrbitalObject(this.scene.getActiveControls().getTransform().getAbsolutePosition());
-        const distance = nearestOrbitalObject.getTransform().getAbsolutePosition().subtract(shipPosition).length();
-        const radius = nearestOrbitalObject.getBoundingRadius();
-        this.spaceshipControls.spaceship.registerClosestObject(distance, radius);
+        const nearestCelestialBody = starSystem.getNearestCelestialBody(this.scene.getActiveControls().getTransform().getAbsolutePosition());
+
+        this.spaceshipControls.spaceship.setNearestOrbitalObject(nearestOrbitalObject);
+        this.spaceshipControls.spaceship.setNearestCelestialBody(nearestCelestialBody);
 
         const warpDrive = this.spaceshipControls.spaceship.getWarpDrive();
         if (warpDrive.isEnabled()) {
@@ -551,8 +551,6 @@ export class StarSystemView implements View {
 
         this.characterControls.setClosestWalkableObject(nearestOrbitalObject);
         this.spaceshipControls.spaceship.setClosestWalkableObject(nearestOrbitalObject);
-
-        const nearestCelestialBody = starSystem.getNearestCelestialBody(this.scene.getActiveControls().getTransform().getAbsolutePosition());
 
         this.bodyEditor.update(nearestCelestialBody, this.postProcessManager, this.scene);
 

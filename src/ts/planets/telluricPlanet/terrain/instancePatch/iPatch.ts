@@ -3,22 +3,23 @@
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { IDisposable } from "@babylonjs/core/scene";
 
-export interface IPatch {
+export interface IPatch extends IDisposable {
     /**
      * Clears all instances from the patch. They will be disposed and will not render anymore.
      * The copy of the given base mesh will also be disposed.
@@ -42,9 +43,4 @@ export interface IPatch {
     getBaseMesh(): Mesh;
 
     setEnabled(enabled: boolean): void;
-
-    /**
-     * Disposes the patch and all its instances and buffers.
-     */
-    dispose(): void;
 }

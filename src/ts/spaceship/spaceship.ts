@@ -3,16 +3,16 @@
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Scene } from "@babylonjs/core/scene";
@@ -43,6 +43,8 @@ import { MainThruster } from "./mainThruster";
 import { AudioMasks } from "../audio/audioMasks";
 import { Objects } from "../assets/objects";
 import { Sounds } from "../assets/sounds";
+import { OrbitalObject } from "../architecture/orbitalObject";
+import { CelestialBody } from "../architecture/celestialBody";
 
 const enum ShipState {
     FLYING,
@@ -68,10 +70,8 @@ export class Spaceship implements Transformable {
 
     private state = ShipState.FLYING;
 
-    private closestObject = {
-        distance: 0,
-        radius: 1
-    };
+    private nearestOrbitalObject: OrbitalObject | null = null;
+    private nearestCelestialBody: CelestialBody | null = null;
 
     readonly warpTunnel: WarpTunnel;
     readonly hyperSpaceTunnel: HyperSpaceTunnel;
@@ -171,8 +171,12 @@ export class Spaceship implements Transformable {
         setEnabledBody(this.aggregate.body, enabled, havokPlugin);
     }
 
-    public registerClosestObject(distance: number, radius: number) {
-        this.closestObject = { distance, radius };
+    public setNearestOrbitalObject(orbitalObject: OrbitalObject) {
+        this.nearestOrbitalObject = orbitalObject;
+    }
+
+    public setNearestCelestialBody(celestialBody: CelestialBody) {
+        this.nearestCelestialBody = celestialBody;
     }
 
     public enableWarpDrive() {
@@ -189,7 +193,15 @@ export class Spaceship implements Transformable {
     }
 
     public disableWarpDrive() {
-        this.warpDrive.desengage();
+        this.warpDrive.disengage();
+        this.aggregate.body.setMotionType(PhysicsMotionType.DYNAMIC);
+
+        this.disableWarpDriveSound.sound.play();
+        this.onWarpDriveDisabled.notifyObservers();
+    }
+
+    public emergencyStopWarpDrive() {
+        this.warpDrive.emergencyStop();
         this.aggregate.body.setMotionType(PhysicsMotionType.DYNAMIC);
 
         this.disableWarpDriveSound.sound.play();
@@ -335,13 +347,55 @@ export class Spaceship implements Transformable {
         this.getTransform().rotationQuaternion = Quaternion.Slerp(currentOrientation, targetOrientation, deltaTime);
     }
 
-    public update(deltaTime: number) {
+    public update(deltaSeconds: number) {
         this.mainEngineTargetSpeed = Math.sign(this.mainEngineThrottle) * this.mainEngineThrottle ** 2 * 500;
 
         const warpSpeed = getForwardDirection(this.aggregate.transformNode).scale(this.warpDrive.getWarpSpeed());
 
         const currentForwardSpeed = Vector3.Dot(warpSpeed, this.aggregate.transformNode.getDirection(Axis.Z));
-        this.warpDrive.update(currentForwardSpeed, this.closestObject.distance, this.closestObject.radius, deltaTime);
+
+        let closestDistance = Number.POSITIVE_INFINITY;
+        let objectHalfThickness = 0;
+
+        if (this.warpDrive.isEnabled()) {
+
+            if (this.nearestOrbitalObject !== null) {
+                const distanceToClosestOrbitalObject = Vector3.Distance(this.getTransform().getAbsolutePosition(), this.nearestOrbitalObject.getTransform().getAbsolutePosition());
+                const orbitalObjectRadius = this.nearestOrbitalObject.getBoundingRadius();
+
+                closestDistance = Math.min(closestDistance, distanceToClosestOrbitalObject);
+                objectHalfThickness = Math.max(orbitalObjectRadius, objectHalfThickness);
+            }
+
+            if (this.nearestCelestialBody !== null) {
+                // if the spaceship goes too close to planetary rings, stop the warp drive to avoid collision with asteroids
+                const ringsUniforms = this.nearestCelestialBody.getRingsUniforms();
+                const asteroidField = this.nearestCelestialBody.getAsteroidField();
+
+                if (ringsUniforms !== null && asteroidField !== null) {
+                    const relativePosition = this.getTransform().getAbsolutePosition().subtract(this.nearestCelestialBody.getTransform().getAbsolutePosition());
+                    const distanceAboveRings = Math.abs(Vector3.Dot(relativePosition, this.nearestCelestialBody.getRotationAxis()));
+                    const planarDistance = relativePosition.subtract(this.nearestCelestialBody.getRotationAxis().scale(distanceAboveRings)).length();
+
+                    const ringsMinDistance = ringsUniforms.model.ringStart * this.nearestCelestialBody.getBoundingRadius();
+                    const ringsMaxDistance = ringsUniforms.model.ringEnd * this.nearestCelestialBody.getBoundingRadius();
+
+                    if(distanceAboveRings < asteroidField.patchThickness * 1000 && planarDistance > ringsMinDistance - 100e3 && planarDistance < ringsMaxDistance + 100e3) {
+                        closestDistance = distanceAboveRings
+                        objectHalfThickness = asteroidField.patchThickness / 2;
+                    }
+
+
+                    if (distanceAboveRings < asteroidField.patchThickness * 1.5 && planarDistance > ringsMinDistance && planarDistance < ringsMaxDistance) {
+                        console.log(distanceAboveRings);
+                        this.emergencyStopWarpDrive();
+                    }
+                }
+            }
+
+        }
+
+        this.warpDrive.update(currentForwardSpeed, closestDistance, objectHalfThickness, deltaSeconds);
 
         // the warp throttle goes from 0.1 to 1 smoothly using an inverse function
         if (this.warpDrive.isEnabled()) this.warpTunnel.setThrottle(1 - 1 / (1.1 * (1 + 1e-7 * this.warpDrive.getWarpSpeed())));
@@ -381,7 +435,7 @@ export class Spaceship implements Transformable {
                 thruster.setThrottle(0);
             });
 
-            translate(this.getTransform(), warpSpeed.scale(deltaTime));
+            translate(this.getTransform(), warpSpeed.scale(deltaSeconds));
 
             this.thrusterSound.setTargetVolume(0);
 
@@ -395,11 +449,11 @@ export class Spaceship implements Transformable {
         }
 
         this.mainThrusters.forEach((thruster) => {
-            thruster.update(deltaTime);
+            thruster.update(deltaSeconds);
         });
 
         if (this.state === ShipState.LANDING) {
-            this.land(deltaTime);
+            this.land(deltaSeconds);
         }
     }
 
