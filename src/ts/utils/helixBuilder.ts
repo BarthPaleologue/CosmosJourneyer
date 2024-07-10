@@ -27,7 +27,7 @@ export function createHelixVertexData(radius: number, thickness: number, height:
             const dx = Math.cos(angle);
             const dz = Math.sin(angle);
 
-            const yOffset = (spire + i / tesselation) * pitch;
+            const yOffset = (spire + i / tesselation) * pitch - nbSpires * pitch / 2;
 
             const bottomY = yOffset - height / 2;
             const topY = yOffset + height / 2;
