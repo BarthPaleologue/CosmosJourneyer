@@ -57,7 +57,7 @@ export class LandingBay {
 
         this.metalSectionMaterial = new MetalSectionMaterial(scene);
 
-        const heightFactor = 2 + Math.floor(Math.random() * 5);
+        const heightFactor = 2 + Math.floor(Math.random() * 3);
 
         const circumference = 2 * Math.PI * this.radius;
 
