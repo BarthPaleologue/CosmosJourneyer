@@ -61,7 +61,11 @@ export class LandingBay {
 
         const circumference = 2 * Math.PI * this.radius;
 
-        const nbSteps = Math.ceil(circumference / deltaRadius);
+        let nbSteps = Math.ceil(circumference / deltaRadius);
+        if (nbSteps % 2 !== 0) {
+            nbSteps += 1;
+        }
+
         this.ring = createRing(this.radius, deltaRadius, heightFactor * deltaRadius, nbSteps, scene);
 
         this.ringMaterial = new RingHabitatMaterial(circumference, deltaRadius, heightFactor, scene);
