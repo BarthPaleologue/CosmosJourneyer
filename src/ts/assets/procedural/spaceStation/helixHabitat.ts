@@ -26,9 +26,9 @@ import { computeRingRotationPeriod } from "../../../utils/ringRotation";
 import { Settings } from "../../../settings";
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { createTube } from "../../../utils/tubeBuilder";
 import { HelixHabitatMaterial } from "./helixHabitatMaterial";
 import { createEnvironmentAggregate } from "../../../utils/physics";
+import { createHelix } from "../../../utils/helixBuilder";
 
 export class HelixHabitat implements Transformable {
     private readonly root: TransformNode;
@@ -56,11 +56,13 @@ export class HelixHabitat implements Transformable {
         this.radius = 5e3 + Math.random() * 10e3;
         const deltaRadius = 400 + Math.random() * 100;
 
+        const thicknessMultipler = 1.0 + Math.floor(Math.random() * 2);
+
         const requiredHabitableSurfacePerHelix = requiredHabitableSurface / 2;
 
-        const nbSpires = Math.ceil(requiredHabitableSurfacePerHelix / (2 * Math.PI * this.radius * deltaRadius));
+        const nbSpires = Math.ceil(requiredHabitableSurfacePerHelix / (2 * Math.PI * this.radius * deltaRadius * thicknessMultipler));
 
-        this.radius = requiredHabitableSurfacePerHelix / (2 * Math.PI * nbSpires * deltaRadius);
+        this.radius = requiredHabitableSurfacePerHelix / (2 * Math.PI * nbSpires * deltaRadius * thicknessMultipler);
 
         const pitch = 2 * this.radius * (1 + 0.3 * (Math.random() * 2 - 1));
 
@@ -94,17 +96,7 @@ export class HelixHabitat implements Transformable {
             path.push(new Vector3(this.radius * Math.sin(angle), y - (nbSpires * pitch) / 2, this.radius * Math.cos(angle)));
         }
 
-        this.helix1 = createTube(
-            "HelixHabitat",
-            {
-                path: path,
-                radius: Math.sqrt(2) * deltaRadius / 2,
-                tessellation: 4,
-                cap: Mesh.CAP_ALL
-            },
-            scene
-        );
-        this.helix1.convertToFlatShadedMesh();
+        this.helix1 = createHelix(this.radius, deltaRadius, deltaRadius * thicknessMultipler, tessellation, nbSpires, pitch, scene);
 
         this.helix2 = this.helix1.clone();
         this.helix2.rotate(Axis.Y, Math.PI, Space.WORLD);
@@ -112,7 +104,7 @@ export class HelixHabitat implements Transformable {
         this.helix1.parent = this.getTransform();
         this.helix2.parent = this.getTransform();
 
-        this.helixMaterial = new HelixHabitatMaterial(this.radius, deltaRadius, scene);
+        this.helixMaterial = new HelixHabitatMaterial(this.radius, deltaRadius, thicknessMultipler, scene);
 
         this.helix1.material = this.helixMaterial;
         this.helix2.material = this.helixMaterial;

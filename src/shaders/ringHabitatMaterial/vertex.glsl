@@ -42,8 +42,6 @@ void main() {
     vPosition = position;
 
     vUV = uv;
-    // as the ring is has a square section, we multiply by 4 to repeat the texture on each side
-    //vUV.x *= 4.0;
 
     // we then repeat the texture around the circle
     vUV.x *= circumference / deltaRadius;

@@ -26,6 +26,7 @@ uniform mat4 view;
 uniform mat4 worldViewProjection;
 uniform float meanRadius;
 uniform float deltaRadius;
+uniform float thicknessMultiplier;
 
 varying vec3 vPositionW;
 varying vec3 vNormalW;
@@ -43,13 +44,12 @@ void main() {
     vPosition = position;
 
     vUV = uv;
-    // as the ring is has a square section, we multiply by 4 to repeat the texture on each side
-    vUV.x *= 4.0;
-
-    vec3 positionPlane = normalize(vec3(position.x, 0.0, position.z));
-    float angle = atan(positionPlane.z, positionPlane.x); // [-PI PI]
-    float angle01 = (angle + PI) / (2.0 * PI);
 
     // we then repeat the texture around the circle
-    vUV.y = angle01 * 2.0 * PI * meanRadius / deltaRadius;
+    vUV.x *= 2.0 * PI * meanRadius / deltaRadius;
+
+    // if we are on the interior or exterior of the ring, we account for the vertical stretch
+    if(abs(normal.y) < 0.02) {
+        vUV.y *= thicknessMultiplier;
+    }
 }

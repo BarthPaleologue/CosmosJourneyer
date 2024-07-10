@@ -1,109 +1,118 @@
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
-import { Scene } from "@babylonjs/core/scene";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { Vector2, Vector3, Vector4 } from "@babylonjs/core/Maths/math.vector";
-import { Matrix } from "@babylonjs/core/Maths/math";
-import { CompatibilityOptions } from "@babylonjs/core/Compat/compatibilityOptions";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Scene } from "@babylonjs/core";
+import { Mesh } from "@babylonjs/core/Meshes";
 
 /**
- * Creates the VertexData for a helix
- * @param options an object used to set the following optional parameters for the helix, required but can be empty
- * * radius the radius of the helix, optional default 1
- * * tubeDiameter the diameter of the tube forming the helix, optional default 0.1
- * * tessellation the number of sides for the tube, optional default 24
- * * spires the number of spires in the helix, optional default 5
- * * pitch the distance between successive turns of the helix, optional default 1
- * * sideOrientation optional and takes the values : Mesh.FRONTSIDE (default), Mesh.BACKSIDE or Mesh.DOUBLESIDE
- * * frontUVs only usable when you create a double-sided mesh, used to choose what parts of the texture image to crop and apply on the front side, optional, default vector4 (0, 0, 1, 1)
- * * backUVs only usable when you create a double-sided mesh, used to choose what parts of the texture image to crop and apply on the back side, optional, default vector4 (0, 0, 1, 1)
- * @param options.radius
- * @param options.tubeDiameter
- * @param options.tessellation
- * @param options.spires
- * @param options.pitch
- * @param options.sideOrientation
- * @param options.frontUVs
- * @param options.backUVs
- * @returns the VertexData of the helix
+ * Create two walled spiral.
+ * @param radius The radius of the spiral between the two walls.
+ * @param thickness The separation between the two walls.
+ * @param height The height of the spiral.
+ * @param nbSpires The number of spires of the spiral.
+ * @param pitch The distance between two spires.
+ * @param tesselation The number of sides of the spiral.
  */
-export function createHelixVertexData(options: { radius?: number; tubeDiameter?: number; tessellation?: number; spires?: number; pitch?: number; sideOrientation?: number; frontUVs?: Vector4; backUVs?: Vector4 }) {
-    const indices = [];
-    const positions = [];
-    const normals = [];
+export function createHelixVertexData(radius: number, thickness: number, height: number, nbSpires: number, pitch: number, tesselation: number) {
+    const indices: number[] = [];
+    const positions: number[] = [];
+    const normals: number[] = [];
     const uvs = [];
 
-    const radius = options.radius || 1;
-    const tubeDiameter = options.tubeDiameter || 0.1;
-    const tessellation = (options.tessellation || 24) | 0;
-    const spires = options.spires || 5;
-    const pitch = options.pitch || 1;
-    const sideOrientation = options.sideOrientation === 0 ? 0 : options.sideOrientation || VertexData.DEFAULTSIDE;
+    const innerRadius = radius - thickness / 2;
+    const outerRadius = radius + thickness / 2;
 
-    const turns = spires * tessellation;
+    for (let spire = 0; spire < nbSpires; spire++) {
+        for (let i = 0; i <= tesselation; i++) {
+            const angle = (i * Math.PI * 2.0) / tesselation;
+            const dx = Math.cos(angle);
+            const dz = Math.sin(angle);
 
-    for (let i = 0; i <= turns; i++) {
-        const u = i / tessellation;
+            const yOffset = (spire + i / tesselation) * pitch;
 
-        const angle = (i * Math.PI * 2.0) / tessellation;
-        const y = (i * pitch) / tessellation;
+            const bottomY = yOffset - height / 2;
+            const topY = yOffset + height / 2;
 
-        const transform = Matrix.Translation(radius, y - spires * pitch / 2, 0).multiply(Matrix.RotationY(angle));
+            // bottom strip
+            const innerBottomPosition = new Vector3(innerRadius * dx, bottomY, innerRadius * dz);
+            positions.push(innerBottomPosition.x, innerBottomPosition.y, innerBottomPosition.z);
+            normals.push(0, -1, 0);
+            const outerBottomPosition = new Vector3(outerRadius * dx, bottomY, outerRadius * dz);
+            positions.push(outerBottomPosition.x, outerBottomPosition.y, outerBottomPosition.z);
+            normals.push(0, -1, 0);
 
-        for (let j = 0; j <= tessellation; j++) {
-            const v = 1 - j / tessellation;
+            uvs.push(i / tesselation, 0);
+            uvs.push(i / tesselation, 1);
 
-            const innerAngle = (j * Math.PI * 2.0) / tessellation;
-            const dx = Math.cos(innerAngle);
-            const dy = Math.sin(innerAngle);
+            // top strip
+            const innerTopPosition = new Vector3(innerRadius * dx, topY, innerRadius * dz);
+            positions.push(innerTopPosition.x, innerTopPosition.y, innerTopPosition.z);
+            normals.push(0, 1, 0);
+            const outerTopPosition = new Vector3(outerRadius * dx, topY, outerRadius * dz);
+            positions.push(outerTopPosition.x, outerTopPosition.y, outerTopPosition.z);
+            normals.push(0, 1, 0);
 
-            // Create a vertex.
-            let normal = new Vector3(dx, dy, 0);
-            let position = normal.scale(tubeDiameter / 2);
-            const textureCoordinate = new Vector2(u, v);
+            uvs.push(i / tesselation, 1);
+            uvs.push(i / tesselation, 0);
 
-            position = Vector3.TransformCoordinates(position, transform);
-            normal = Vector3.TransformNormal(normal, transform);
+            // outer strip
+            positions.push(outerBottomPosition.x, outerBottomPosition.y, outerBottomPosition.z);
+            normals.push(dx, 0, dz);
+            positions.push(outerTopPosition.x, outerTopPosition.y, outerTopPosition.z);
+            normals.push(dx, 0, dz);
 
-            positions.push(position.x, position.y, position.z);
-            normals.push(normal.x, normal.y, normal.z);
-            uvs.push(textureCoordinate.x, CompatibilityOptions.UseOpenGLOrientationForUV ? 1.0 - textureCoordinate.y : textureCoordinate.y);
+            uvs.push(i / tesselation, 0);
+            uvs.push(i / tesselation, 1);
+
+            // inner strip
+            positions.push(innerBottomPosition.x, innerBottomPosition.y, innerBottomPosition.z);
+            normals.push(-dx, 0, -dz);
+            positions.push(innerTopPosition.x, innerTopPosition.y, innerTopPosition.z);
+            normals.push(-dx, 0, -dz);
+
+            uvs.push(i / tesselation, 1);
+            uvs.push(i / tesselation, 0);
+
+            if (spire === 0 && i === 0) continue;
+
+            const stride = 8;
+            const spiralIndexOffset = spire * stride * tesselation;
+
+            const previousBottomIndex = spiralIndexOffset + stride * (i - 1) + 0;
+            const currentBottomIndex = spiralIndexOffset + stride * i + 0;
+
+            indices.push(currentBottomIndex + 1, previousBottomIndex + 1, previousBottomIndex);
+            indices.push(currentBottomIndex, currentBottomIndex + 1, previousBottomIndex);
+
+            const previousTopIndex = spiralIndexOffset + stride * (i - 1) + 2;
+            const currentTopIndex = spiralIndexOffset + stride * i + 2;
+
+            indices.push(previousTopIndex, previousTopIndex + 1, currentTopIndex + 1);
+            indices.push(previousTopIndex, currentTopIndex + 1, currentTopIndex);
+
+            const previousOuterIndex = spiralIndexOffset + stride * (i - 1) + 4;
+            const currentOuterIndex = spiralIndexOffset + stride * i + 4;
+
+            indices.push(currentOuterIndex + 1, previousOuterIndex + 1, previousOuterIndex);
+            indices.push(currentOuterIndex, currentOuterIndex + 1, previousOuterIndex);
+
+            const previousInnerIndex = spiralIndexOffset + stride * (i - 1) + 6;
+            const currentInnerIndex = spiralIndexOffset + stride * i + 6;
+
+            indices.push(previousInnerIndex, previousInnerIndex + 1, currentInnerIndex + 1);
+            indices.push(previousInnerIndex, currentInnerIndex + 1, currentInnerIndex);
         }
     }
 
-    for (let i = 0; i < turns; i++) {
-        for (let j = 0; j < tessellation; j++) {
-            const first = (i * (tessellation + 1)) + j;
-            const second = first + tessellation + 1;
+    // caps
+    indices.push(0, 1, 2);
+    indices.push(2, 1, 3);
 
-            indices.push(first);
-            indices.push(first + 1);
-            indices.push(second);
+    const spiralIndexOffset = (positions.length) / 3 - 4 * 3;
 
-            indices.push(second);
-            indices.push(first + 1);
-            indices.push(second + 1);
-        }
-    }
+    indices.push(spiralIndexOffset, spiralIndexOffset + 2, spiralIndexOffset + 1);
+    indices.push(spiralIndexOffset + 2, spiralIndexOffset + 3, spiralIndexOffset + 1);
 
-    // Add caps at the ends of the helix
-    addDisc(positions, normals, uvs, indices, tessellation, tubeDiameter, new Vector3(radius, (-pitch * spires) / 2, 0), Vector3.Left(), true);
-    addDisc(
-        positions,
-        normals,
-        uvs,
-        indices,
-        tessellation,
-        tubeDiameter,
-        new Vector3(radius * Math.cos(spires * 2 * Math.PI), (pitch * spires) / 2, radius * Math.sin(spires * 2 * Math.PI)),
-        Vector3.Right(), false
-    );
-
-    // Sides
-    VertexData._ComputeSides(sideOrientation, positions, indices, normals, uvs, options.frontUVs, options.backUVs);
-
-    // Result
     const vertexData = new VertexData();
-
     vertexData.indices = indices;
     vertexData.positions = positions;
     vertexData.normals = normals;
@@ -112,81 +121,10 @@ export function createHelixVertexData(options: { radius?: number; tubeDiameter?:
     return vertexData;
 }
 
-
-/**
- * Adds a disc to the mesh to cap the ends of the helix
- * @param positions array of vertex positions
- * @param normals array of vertex normals
- * @param uvs array of vertex uvs
- * @param indices array of vertex indices
- * @param tessellation number of sides for the disc
- * @param tubeDiameter diameter of the tube forming the helix
- * @param center center position of the disc
- * @param normal normal direction of the disc
- */
-function addDisc(positions: number[], normals: number[], uvs: number[], indices: number[], tessellation: number, tubeDiameter: number, center: Vector3, normal: Vector3, invertWinding: boolean) {
-    const baseIndex = positions.length / 3;
-    const angleStep = (Math.PI * 2) / tessellation;
-
-    // Center vertex
-    positions.push(center.x, center.y, center.z);
-    normals.push(normal.x, normal.y, normal.z);
-    uvs.push(0.5, 0.5);
-
-    for (let i = 0; i <= tessellation; i++) {
-        const angle = i * angleStep;
-        const x = center.x + (tubeDiameter / 2) * Math.cos(angle);
-        const z = center.z + (tubeDiameter / 2) * Math.sin(angle);
-
-        positions.push(x, center.y + z, 0);
-        normals.push(normal.x, normal.y, normal.z);
-        uvs.push(0.5 + 0.5 * Math.cos(angle), 0.5 + 0.5 * Math.sin(angle));
-
-        if (i > 0) {
-            if(!invertWinding) indices.push(baseIndex, baseIndex + i, baseIndex + i + 1);
-            else indices.push(baseIndex, baseIndex + i + 1, baseIndex + i);
-        }
-    }
-}
-
-/**
- * Creates a helix mesh
- * * The parameter `radius` sets the radius of the helix (default 1)
- * * The parameter `tubeDiameter` sets the diameter size of the tube of the helix (float, default 0.1)
- * * The parameter `tessellation` sets the number of sides for the tube (positive integer, default 24)
- * * The parameter `spires` sets the number of spires in the helix (positive integer, default 5)
- * * The parameter `pitch` sets the distance between successive turns of the helix (float, default 1)
- * * You can also set the mesh side orientation with the values : BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or BABYLON.Mesh.DOUBLESIDE
- * * If you create a double-sided mesh, you can choose what parts of the texture image to crop and stick respectively on the front and the back sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here : https://doc.babylonjs.com/features/featuresDeepDive/mesh/creation/set#side-orientation
- * * The mesh can be set to updatable with the boolean parameter `updatable` (default false) if its internal geometry is supposed to change once created.
- * @param name defines the name of the mesh
- * @param options defines the options used to create the mesh
- * @param options.radius
- * @param options.tubeDiameter
- * @param options.tessellation
- * @param options.spires
- * @param options.pitch
- * @param options.updatable
- * @param options.sideOrientation
- * @param options.frontUVs
- * @param options.backUVs
- * @param scene defines the hosting scene
- * @returns the helix mesh
- * @see https://doc.babylonjs.com/features/featuresDeepDive/mesh/creation/set#helix
- */
-export function createHelix(
-    name: string,
-    options: { radius?: number; tubeDiameter?: number; tessellation?: number; spires?: number; pitch?: number; updatable?: boolean; sideOrientation?: number; frontUVs?: Vector4; backUVs?: Vector4 } = {},
-    scene?: Scene
-): Mesh {
-    const helix = new Mesh(name, scene);
-
-    options.sideOrientation = Mesh._GetDefaultSideOrientation(options.sideOrientation);
-    helix._originalBuilderSideOrientation = options.sideOrientation;
-
-    const vertexData = createHelixVertexData(options);
-
-    vertexData.applyToMesh(helix, options.updatable);
-
-    return helix;
+export function createHelix(radius: number, thickness: number, height: number, tesselation: number, nbSpires: number, pitch: number, scene: Scene) {
+    const vertexData = createHelixVertexData(radius, thickness, height, nbSpires, pitch, tesselation);
+    const ring = new Mesh("ring", scene);
+    vertexData.applyToMesh(ring);
+    ring.convertToFlatShadedMesh();
+    return ring;
 }

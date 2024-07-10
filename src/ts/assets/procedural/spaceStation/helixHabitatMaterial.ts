@@ -34,7 +34,7 @@ const HelixHabitatUniformNames = {
     CAMERA_POSITION: "cameraPosition",
     MEAN_RADIUS: "meanRadius",
     DELTA_RADIUS: "deltaRadius",
-    HEIGHT: "height"
+    THICKNESS_MULTIPLIER: "thicknessMultiplier",
 }
 
 const HelixHabitatSamplerNames = {
@@ -48,7 +48,7 @@ const HelixHabitatSamplerNames = {
 export class HelixHabitatMaterial extends ShaderMaterial {
     private stellarObjects: Transformable[] = [];
 
-    constructor(meanRadius: number, deltaRadius: number, scene: Scene) {
+    constructor(meanRadius: number, deltaRadius: number, thicknessMultiplier: number, scene: Scene) {
         const shaderName = "helixHabitatMaterial";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = helixHabitatMaterialFragment;
@@ -77,6 +77,7 @@ export class HelixHabitatMaterial extends ShaderMaterial {
             this.getEffect().setVector3(HelixHabitatUniformNames.CAMERA_POSITION, activeCamera.globalPosition);
             this.getEffect().setFloat(HelixHabitatUniformNames.MEAN_RADIUS, meanRadius);
             this.getEffect().setFloat(HelixHabitatUniformNames.DELTA_RADIUS, deltaRadius);
+            this.getEffect().setFloat(HelixHabitatUniformNames.THICKNESS_MULTIPLIER, thicknessMultiplier);
 
             setStellarObjectUniforms(this.getEffect(), this.stellarObjects);
 

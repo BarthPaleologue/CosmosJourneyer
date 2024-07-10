@@ -24,8 +24,6 @@ export function createRingVertexData(radius: number, thickness: number, height: 
         const dx = Math.cos(angle);
         const dz = Math.sin(angle);
 
-        const normal = new Vector3(dx, 0, dz);
-
         // bottom strip
         const innerBottomPosition = new Vector3(innerRadius * dx, -height / 2, innerRadius * dz);
         positions.push(innerBottomPosition.x, innerBottomPosition.y, innerBottomPosition.z);
