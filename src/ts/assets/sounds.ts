@@ -36,6 +36,9 @@ import starMapBackgroundMusic from "../../asset/sound/455855__andrewkn__wanderin
 import landingRequestSound from "../../asset/sound/voice/LandingRequestGrantedCharlotte.mp3";
 import landingCompleteSound from "../../asset/sound/voice/LandingCompleteCharlotte.mp3";
 
+import warpDriveDisengagedSound from "../../asset/sound/voice/WarpDriveDisengagedCharlotte.mp3";
+import engagingWarpDriveSound from "../../asset/sound/voice/EngagingWarpDriveCharlotte.mp3";
+
 import straussBlueDanube from "../../asset/sound/Strauss_The_Blue_Danube_Waltz.mp3";
 
 export class Sounds {
@@ -66,6 +69,9 @@ export class Sounds {
 
     public static LANDING_REQUEST_GRANTED: Sound;
     public static LANDING_COMPLETE: Sound;
+
+    public static WARP_DRIVE_DISENGAGED: Sound;
+    public static ENGAGING_WARP_DRIVE: Sound;
 
     public static STRAUSS_BLUE_DANUBE: Sound;
 
@@ -227,6 +233,18 @@ export class Sounds {
         straussBlueDanubeTask.onSuccess = (task) => {
             Sounds.STRAUSS_BLUE_DANUBE = new Sound("StraussBlueDanube", task.data, scene);
             console.log("Strauss Blue Danube sound loaded");
+        };
+
+        const warpDriveDisengagedSoundTask = manager.addBinaryFileTask("warpDriveDisengagedSoundTask", warpDriveDisengagedSound);
+        warpDriveDisengagedSoundTask.onSuccess = (task) => {
+            Sounds.WARP_DRIVE_DISENGAGED = new Sound("WarpDriveDisengaged", task.data, scene);
+            console.log("Warp drive disengaged sound loaded");
+        };
+
+        const engagingWarpDriveSoundTask = manager.addBinaryFileTask("engagingWarpDriveSoundTask", engagingWarpDriveSound);
+        engagingWarpDriveSoundTask.onSuccess = (task) => {
+            Sounds.ENGAGING_WARP_DRIVE = new Sound("EngagingWarpDrive", task.data, scene);
+            console.log("Engaging warp drive sound loaded");
         };
     }
 }

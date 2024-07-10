@@ -69,9 +69,11 @@ export class ShipControls implements Controls {
         SpaceShipControlsInputs.map.toggleWarpDrive.on("complete", () => {
             this.spaceship.toggleWarpDrive();
             if (this.spaceship.getWarpDrive().isEnabled()) {
+                Sounds.ENGAGING_WARP_DRIVE.play();
                 this.shakeCamera(1500);
                 this.targetFov = this.baseFov * 3.0;
             } else {
+                Sounds.WARP_DRIVE_DISENGAGED.play();
                 this.shakeCamera(1500);
                 this.targetFov = this.baseFov * 0.5;
 
