@@ -29,9 +29,12 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { HelixHabitatMaterial } from "./helixHabitatMaterial";
 import { createEnvironmentAggregate } from "../../../utils/physics";
 import { createHelix } from "../../../utils/helixBuilder";
+import { seededSquirrelNoise } from "squirrel-noise";
 
 export class HelixHabitat implements Transformable {
     private readonly root: TransformNode;
+
+    private readonly rng: (index: number) => number;
 
     private readonly radius: number;
 
@@ -50,13 +53,15 @@ export class HelixHabitat implements Transformable {
     private readonly arms: Mesh[] = [];
     private readonly armAggregates: PhysicsAggregate[] = [];
 
-    constructor(requiredHabitableSurface: number, scene: Scene) {
+    constructor(requiredHabitableSurface: number, seed: number, scene: Scene) {
         this.root = new TransformNode("HelixHabitatRoot", scene);
 
-        this.radius = 5e3 + Math.random() * 10e3;
-        const deltaRadius = 400 + Math.random() * 100;
+        this.rng = seededSquirrelNoise(seed);
 
-        const thicknessMultipler = 1.0 + Math.floor(Math.random() * 2);
+        this.radius = 5e3 + this.rng(0) * 10e3;
+        const deltaRadius = 400 + this.rng(1) * 100;
+
+        const thicknessMultipler = 1.0 + Math.floor(this.rng(3) * 2);
 
         const requiredHabitableSurfacePerHelix = requiredHabitableSurface / 2;
 
@@ -64,11 +69,11 @@ export class HelixHabitat implements Transformable {
 
         this.radius = requiredHabitableSurfacePerHelix / (2 * Math.PI * nbSpires * deltaRadius * thicknessMultipler);
 
-        const pitch = 2 * this.radius * (1 + 0.3 * (Math.random() * 2 - 1));
+        const pitch = 2 * this.radius * (1 + 0.3 * (this.rng(2) * 2 - 1));
 
         const totalLength = pitch * nbSpires;
 
-        const attachmentNbSides = 6 + 2 * Math.floor(Math.random() * 2);
+        const attachmentNbSides = 6 + 2 * Math.floor(this.rng(4) * 2);
 
         this.metalSectionMaterial = new MetalSectionMaterial(scene);
 

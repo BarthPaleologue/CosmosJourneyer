@@ -26,9 +26,12 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { CylinderHabitatMaterial } from "./cylinderHabitatMaterial";
 import { createEnvironmentAggregate } from "../../../utils/physics";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { seededSquirrelNoise } from "squirrel-noise";
 
 export class CylinderHabitat implements Transformable {
     private readonly root: TransformNode;
+
+    private readonly rng: (index: number) => number;
 
     private readonly radius: number;
 
@@ -39,10 +42,12 @@ export class CylinderHabitat implements Transformable {
 
     readonly habitableSurface: number;
 
-    constructor(requiredHabitableSurface: number, scene: Scene) {
+    constructor(requiredHabitableSurface: number, seed: number, scene: Scene) {
         this.root = new TransformNode("CylinderHabitatRoot", scene);
 
-        this.radius = 2e3 + Math.random() * 2e3;
+        this.rng = seededSquirrelNoise(seed);
+
+        this.radius = 2e3 + this.rng(0) * 2e3;
 
         const height = requiredHabitableSurface / (2 * Math.PI * (this.radius / 2));
 

@@ -199,23 +199,23 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
         const habitatType = wheelOfFortune(
             [
                 [SpaceStationNodeType.RING_HABITAT, 0.5],
-                [SpaceStationNodeType.HELIX_HABITAT, 0.2],
-                [SpaceStationNodeType.CYLINDER_HABITAT, 0.3]
+                [SpaceStationNodeType.HELIX_HABITAT, 0.3],
+                [SpaceStationNodeType.CYLINDER_HABITAT, 0.2]
             ],
-            Math.random()
+            this.model.rng(17)
         );
 
         let newNode: TransformNode | null = null;
         if (habitatType === SpaceStationNodeType.HELIX_HABITAT) {
-            const helixHabitat = new HelixHabitat(habitatSurface, this.scene);
+            const helixHabitat = new HelixHabitat(habitatSurface, this.model.rng(19), this.scene);
             this.helixHabitats.push(helixHabitat);
             newNode = helixHabitat.getTransform();
         } else if (habitatType === SpaceStationNodeType.RING_HABITAT) {
-            const ringHabitat = new RingHabitat(habitatSurface, this.scene);
+            const ringHabitat = new RingHabitat(habitatSurface, this.model.rng(27), this.scene);
             this.ringHabitats.push(ringHabitat);
             newNode = ringHabitat.getTransform();
         } else if (habitatType === SpaceStationNodeType.CYLINDER_HABITAT) {
-            const cylinderHabitat = new CylinderHabitat(habitatSurface, this.scene);
+            const cylinderHabitat = new CylinderHabitat(habitatSurface, this.model.rng(13), this.scene);
             this.cylinderHabitats.push(cylinderHabitat);
             newNode = cylinderHabitat.getTransform();
         }

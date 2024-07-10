@@ -75,7 +75,7 @@ sun.getTransform().position = new Vector3(7, 2, 5).normalize().scaleInPlace(dist
 const starfieldPostProcess = new StarfieldPostProcess(scene, [sun], [], Quaternion.Identity());
 camera.attachPostProcess(starfieldPostProcess);
 
-const spaceStationModel = new SpaceStationModel(42, sun.model);
+const spaceStationModel = new SpaceStationModel(Math.random() * 69420, sun.model);
 spaceStationModel.orbit.radius = distanceToStar;
 
 const spaceStation = new SpaceStation(scene, spaceStationModel, sun);
@@ -101,12 +101,12 @@ scene.onBeforePhysicsObservable.add(() => {
 
     spaceStation.update([sun], cameraWorldPosition, deltaSeconds);
 
-    scene.meshes.forEach(mesh => {if(mesh.physicsBody) viewer.showBody(mesh.physicsBody)});
+    //scene.meshes.forEach(mesh => {if(mesh.physicsBody) viewer.showBody(mesh.physicsBody)});
     //spaceStation.getTransform().position.y = Math.sin(elapsedSeconds / 5) * 10000;
 });
 
 
-const spaceStationUI = new SpaceStationUI();
+//const spaceStationUI = new SpaceStationUI();
 
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();

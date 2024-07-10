@@ -29,9 +29,12 @@ import { MetalSectionMaterial } from "./metalSectionMaterial";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { createEnvironmentAggregate } from "../../../utils/physics";
 import { createRing } from "../../../utils/ringBuilder";
+import { seededSquirrelNoise } from "squirrel-noise";
 
 export class RingHabitat implements Transformable {
     private readonly root: TransformNode;
+
+    private readonly rng: (index: number) => number;
 
     private readonly radius: number;
 
@@ -49,10 +52,12 @@ export class RingHabitat implements Transformable {
 
     readonly habitableSurface: number;
 
-    constructor(requiredHabitableSurface: number, scene: Scene) {
+    constructor(requiredHabitableSurface: number, seed: number, scene: Scene) {
         this.root = new TransformNode("RingHabitatRoot", scene);
 
-        this.radius = 5e3 + Math.random() * 10e3;
+        this.rng = seededSquirrelNoise(seed);
+
+        this.radius = 5e3 + this.rng(0) * 10e3;
 
         const deltaRadius = 500;
 
@@ -63,7 +68,7 @@ export class RingHabitat implements Transformable {
         // adjust the radius to fit the required habitable surface
         this.radius = requiredHabitableSurface / (height * 2 * Math.PI) - deltaRadius / 2;
 
-        const attachmentNbSides = 4 + 2 * Math.floor(Math.random() * 2);
+        const attachmentNbSides = 4 + 2 * Math.floor(this.rng(1) * 2);
 
         this.metalSectionMaterial = new MetalSectionMaterial(scene);
 
