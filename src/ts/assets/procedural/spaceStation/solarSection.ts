@@ -26,10 +26,13 @@ import { SolarPanelMaterial } from "../solarPanel/solarPanelMaterial";
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 import { createEnvironmentAggregate } from "../../../utils/physics";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { seededSquirrelNoise } from "squirrel-noise";
 
 export class SolarSection implements Transformable {
     private readonly attachment: Mesh;
     private attachmentAggregate: PhysicsAggregate | null = null;
+
+    private readonly rng: (index: number) => number;
 
     private readonly arms: Mesh[] = [];
     private readonly armAggregates: PhysicsAggregate[] = [];
@@ -40,7 +43,9 @@ export class SolarSection implements Transformable {
     private readonly metalSectionMaterial: MetalSectionMaterial;
     private readonly solarPanelMaterial: SolarPanelMaterial;
 
-    constructor(requiredSurface: number, scene: Scene) {
+    constructor(requiredSurface: number, seed: number, scene: Scene) {
+        this.rng = seededSquirrelNoise(seed);
+
         const nbArms = wheelOfFortune(
             [
                 [1, 0.2],
@@ -49,7 +54,7 @@ export class SolarSection implements Transformable {
                 [4, 0.2],
                 [5, 0.1]
             ],
-            Math.random()
+            this.rng(0)
         );
 
         let attachmentLength = 200;

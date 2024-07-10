@@ -178,12 +178,12 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
 
         let lastNode: TransformNode | null = null;
 
-        const solarSection = new SolarSection(solarPanelSurface, this.scene);
+        const solarSection = new SolarSection(solarPanelSurface, this.model.rng(31), this.scene);
         solarSection.getTransform().parent = this.getTransform();
         lastNode = solarSection.getTransform();
         this.solarSections.push(solarSection);
 
-        for (let i = 0; i < 10 + Math.floor(Math.random() * 10); i++) {
+        for (let i = 0; i < 10 + Math.floor(this.model.rng(66) * 10); i++) {
             const utilitySection = new UtilitySection(this.scene);
             this.utilitySections.push(utilitySection);
 
@@ -232,7 +232,7 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
 
         lastNode = newNode;
 
-        for (let i = 0; i < 5 + Math.floor(Math.random() * 5); i++) {
+        for (let i = 0; i < 5 + Math.floor(this.model.rng(23) * 5); i++) {
             const utilitySection = new UtilitySection(this.scene);
             this.utilitySections.push(utilitySection);
 
