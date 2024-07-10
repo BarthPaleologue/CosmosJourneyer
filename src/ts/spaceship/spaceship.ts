@@ -286,7 +286,6 @@ export class Spaceship implements Transformable {
         }
 
         this.landingTarget = null;
-        this.targetLandingPad = null;
 
         this.onLandingObservable.notifyObservers();
     }
@@ -299,7 +298,13 @@ export class Spaceship implements Transformable {
         return this.state === ShipState.LANDING;
     }
 
+    public isLandedAtFacility(): boolean {
+        return this.isLanded() && this.targetLandingPad !== null;
+    }
+
     public takeOff() {
+        this.targetLandingPad = null;
+
         this.state = ShipState.FLYING;
         this.aggregate.body.setMotionType(PhysicsMotionType.DYNAMIC);
         this.aggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS | CollisionMask.ENVIRONMENT;

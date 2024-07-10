@@ -120,8 +120,10 @@ export class ShipControls implements Controls {
             Sounds.LANDING_COMPLETE.play();
             Sounds.STRAUSS_BLUE_DANUBE.stop();
 
-            const bindingsString = pressInteractionToStrings(StarSystemInputs.map.toggleSpaceShipCharacter).join(", ");
-            createNotification(i18n.t("notifications:landingComplete", { bindingsString: bindingsString }), 5000);
+            if(!this.spaceship.isLandedAtFacility()) {
+                const bindingsString = pressInteractionToStrings(StarSystemInputs.map.toggleSpaceShipCharacter).join(", ");
+                createNotification(i18n.t("notifications:landingComplete", { bindingsString: bindingsString }), 5000);
+            }
         });
 
         this.spaceship.onLandingEngaged.add(() => {
