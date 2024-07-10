@@ -57,7 +57,7 @@ export class LandingBay {
 
         this.metalSectionMaterial = new MetalSectionMaterial(scene);
 
-        const heightFactor = 2 + Math.floor(Math.random() * 2);
+        const heightFactor = 2 + Math.floor(Math.random() * 5);
 
         const circumference = 2 * Math.PI * this.radius;
 
@@ -105,19 +105,23 @@ export class LandingBay {
 
         const nbPads = nbSteps;
         let padNumber = 0;
-        for (let i = 0; i < nbPads; i++) {
-            const landingPad = new LandingPad(padNumber++, i % 2 === 0 ? LandingPadSize.SMALL : LandingPadSize.MEDIUM, scene);
-            landingPad.getTransform().parent = this.getTransform();
+        for (let row = 0; row < heightFactor; row++) {
+            for (let i = 0; i < nbPads; i++) {
+                const landingPad = new LandingPad(padNumber++, (i + row) % 2 === 0 ? LandingPadSize.SMALL : LandingPadSize.MEDIUM, scene);
+                landingPad.getTransform().parent = this.getTransform();
 
-            landingPad.getTransform().rotate(Axis.Z, Math.PI / 2, Space.LOCAL);
+                landingPad.getTransform().rotate(Axis.Z, Math.PI / 2, Space.LOCAL);
 
-            landingPad.getTransform().rotate(Axis.X, ((i + 0.5) * 2.0 * Math.PI) / nbPads, Space.LOCAL);
+                landingPad.getTransform().rotate(Axis.X, ((i + 0.5) * 2.0 * Math.PI) / nbPads, Space.LOCAL);
 
-            landingPad.getTransform().rotate(Axis.Y, Math.PI / 2, Space.LOCAL);
+                landingPad.getTransform().rotate(Axis.Y, Math.PI / 2, Space.LOCAL);
 
-            landingPad.getTransform().translate(Vector3.Up(), -(this.radius - deltaRadius / 2) * Math.cos(Math.PI / nbPads), Space.LOCAL);
+                landingPad.getTransform().translate(Vector3.Up(), -(this.radius - deltaRadius / 2) * Math.cos(Math.PI / nbPads), Space.LOCAL);
 
-            this.landingPads.push(landingPad);
+                landingPad.getTransform().translate(Vector3.Forward(scene.useRightHandedSystem), row * deltaRadius - ((heightFactor - 1) * deltaRadius) / 2, Space.LOCAL);
+
+                this.landingPads.push(landingPad);
+            }
         }
     }
 
