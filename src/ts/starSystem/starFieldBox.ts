@@ -5,6 +5,7 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Scene } from "@babylonjs/core/scene";
 import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
+import { Matrix, Quaternion } from "@babylonjs/core/Maths/math.vector";
 
 export class StarFieldBox {
     readonly mesh: Mesh;
@@ -26,5 +27,14 @@ export class StarFieldBox {
         
         this.mesh.material = this.material;
         this.mesh.infiniteDistance = true;
+
+        scene.environmentTexture = texture;
+    }
+
+    setRotationQuaternion(quaternion: Quaternion): void {
+        const rotationMatrix = new Matrix();
+        quaternion.toRotationMatrix(rotationMatrix);
+
+		this.texture.setReflectionTextureMatrix(rotationMatrix);
     }
 }
