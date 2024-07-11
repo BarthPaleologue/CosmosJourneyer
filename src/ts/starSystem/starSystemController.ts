@@ -41,7 +41,6 @@ import { SystemTarget } from "../utils/systemTarget";
 import { JuliaSet } from "../anomalies/julia/juliaSet";
 import { Anomaly } from "../anomalies/anomaly";
 import { StarFieldBox } from "./starFieldBox";
-import { Textures } from "../assets/textures";
 
 export class StarSystemController {
     readonly scene: UberScene;
