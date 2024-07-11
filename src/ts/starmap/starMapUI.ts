@@ -3,16 +3,16 @@
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
@@ -28,10 +28,10 @@ import selectedCircle from "../../asset/textures/selectedCircle.png";
 import { Animation } from "@babylonjs/core/Animations/animation";
 import { Scene } from "@babylonjs/core/scene";
 import { Settings } from "../settings";
-import { Engine } from "@babylonjs/core/Engines/engine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import i18n from "../i18n";
+import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 
 export class StarMapUI {
     readonly gui: AdvancedDynamicTexture;
@@ -51,7 +51,7 @@ export class StarMapUI {
 
     private _isHovered = false;
 
-    constructor(engine: Engine) {
+    constructor(engine: AbstractEngine) {
         this.scene = new Scene(engine);
         this.scene.useRightHandedSystem = true;
         this.scene.autoClear = false;

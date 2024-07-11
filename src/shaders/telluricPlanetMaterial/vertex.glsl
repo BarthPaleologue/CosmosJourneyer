@@ -3,16 +3,16 @@
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 precision highp float;
@@ -50,7 +50,13 @@ void main() {
 
 	vUnitSamplePoint = normalize(vPosition);
     vSphereNormalW = vec3(planetWorldMatrix * vec4(vUnitSamplePoint, 0.0));
-	vSamplePoint = vPosition;
+
+    // Use a triangle wave to clamp our sample coordinates to the range [0, 1] in a periodic way
+    float a = 512.0;
+    float p = 4.0 * a;
+    // the phase is completely arbitrary, but it is an attempt to minimize the visual artifacts
+    vec3 phase = vec3(-132.0, 17.0, 53.0);
+    vSamplePoint = (4.0 * a / p) * abs(mod(vPosition + phase, p) - p * 0.5);
 
 	vNormal = normal;
 }

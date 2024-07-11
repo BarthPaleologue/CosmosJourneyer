@@ -3,16 +3,16 @@
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Direction, getQuaternionFromDirection } from "../../../../utils/direction";
@@ -26,7 +26,6 @@ import { TransformNode, VertexData } from "@babylonjs/core/Meshes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { ThinInstancePatch } from "../instancePatch/thinInstancePatch";
 import { randomDownSample } from "../instancePatch/matrixBuffer";
-import { Assets } from "../../../../assets";
 import { isSizeOnScreenEnough } from "../../../../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { IPatch } from "../instancePatch/iPatch";
@@ -38,6 +37,8 @@ import { CollisionMask } from "../../../../settings";
 import { InstancePatch } from "../instancePatch/instancePatch";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Cullable } from "../../../../utils/cullable";
+import { Materials } from "../../../../assets/materials";
+import { Objects } from "../../../../assets/objects";
 
 export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
     public readonly mesh: Mesh;
@@ -84,8 +85,8 @@ export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
 
         this.mesh.parent = parentAggregate.transformNode;
 
-        this.mesh.occlusionQueryAlgorithmType = AbstractMesh.OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE;
-        this.mesh.occlusionType = AbstractMesh.OCCLUSION_TYPE_OPTIMISTIC;
+        //this.mesh.occlusionQueryAlgorithmType = AbstractMesh.OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE;
+        //this.mesh.occlusionType = AbstractMesh.OCCLUSION_TYPE_OPTIMISTIC;
 
         this.parent = parentAggregate.transformNode;
 
@@ -150,7 +151,7 @@ export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
         if (instancesMatrixBuffer.length === 0) return;
 
         const rockPatch = new InstancePatch(this.parent, randomDownSample(alignedInstancesMatrixBuffer, 3200));
-        rockPatch.createInstances(Assets.ROCK);
+        rockPatch.createInstances(Objects.ROCK);
         this.instancePatches.push(rockPatch);
 
         if (
@@ -159,20 +160,20 @@ export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
             this.getAverageHeight() > this.planetModel.physicalProperties.oceanLevel + 50
         ) {
             const treePatch = new InstancePatch(this.parent, randomDownSample(instancesMatrixBuffer, 4800));
-            treePatch.createInstances(Assets.TREE);
+            treePatch.createInstances(Objects.TREE);
             this.instancePatches.push(treePatch);
 
             const butterflyPatch = new ThinInstancePatch(this.parent, randomDownSample(instancesMatrixBuffer, 800));
-            butterflyPatch.createInstances(Assets.BUTTERFLY);
+            butterflyPatch.createInstances(Objects.BUTTERFLY);
             this.instancePatches.push(butterflyPatch);
 
             const grassPatch = new ThinInstancePatch(this.parent, instancesMatrixBuffer);
-            grassPatch.createInstances(Assets.GRASS_BLADE);
+            grassPatch.createInstances(Objects.GRASS_BLADE);
             this.instancePatches.push(grassPatch);
 
             for (const depthRenderer of Object.values(this.scene._depthRenderer)) {
-                depthRenderer.setMaterialForRendering([butterflyPatch.getBaseMesh()], Assets.BUTTERFLY_DEPTH_MATERIAL);
-                depthRenderer.setMaterialForRendering([grassPatch.getBaseMesh()], Assets.GRASS_DEPTH_MATERIAL);
+                depthRenderer.setMaterialForRendering([butterflyPatch.getBaseMesh()], Materials.BUTTERFLY_DEPTH_MATERIAL);
+                depthRenderer.setMaterialForRendering([grassPatch.getBaseMesh()], Materials.GRASS_DEPTH_MATERIAL);
             }
         }
     }
@@ -231,7 +232,7 @@ export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
                 continue;
             }
 
-            if(isSizeOnScreenEnough(this, camera, 0.002 / 5)) {
+            if (isSizeOnScreenEnough(this, camera, 0.002 / 5)) {
                 isVisible = true;
                 break;
             }

@@ -3,16 +3,16 @@
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { DefaultControls } from "../defaultControls/defaultControls";
@@ -28,7 +28,6 @@ import { Scene, ScenePerformancePriority } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
-import { Engine } from "@babylonjs/core/Engines/engine";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
@@ -49,7 +48,6 @@ import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { SystemSeed } from "../utils/systemSeed";
 import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 import { View } from "../utils/view";
-import { Assets } from "../assets";
 import { syncCamera } from "../utils/cameraSyncing";
 import { AudioInstance } from "../utils/audioInstance";
 import { AudioManager } from "../audio/audioManager";
@@ -59,6 +57,8 @@ import { parseDistance } from "../utils/parseToStrings";
 import { StarMapInputs } from "../inputs/starMapInputs";
 import i18n from "../i18n";
 import { BodyType } from "../architecture/bodyType";
+import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { Sounds } from "../assets/sounds";
 
 export class StarMap implements View {
     readonly scene: Scene;
@@ -105,7 +105,7 @@ export class StarMap implements View {
     /**
      * The position of the star sector the player is currently in (relative to the global node).
      */
-    private currentStarSectorPosition = Vector3.Zero();
+    private currentStarSectorCoordinates = Vector3.Zero();
 
     private cameraPositionToCenter = Vector3.Zero();
 
@@ -120,7 +120,7 @@ export class StarMap implements View {
     private static readonly SHIMMER_ANIMATION = new Animation("shimmer", "instancedBuffers.color.a", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
     private static readonly SHIMMER_DURATION = 1000;
 
-    constructor(engine: Engine) {
+    constructor(engine: AbstractEngine) {
         this.scene = new Scene(engine);
         this.scene.clearColor = new Color4(0, 0, 0, 1);
         this.scene.performancePriority = ScenePerformancePriority.Intermediate;
@@ -133,14 +133,14 @@ export class StarMap implements View {
 
         this.controls.getActiveCameras()[0].attachControl();
 
-        this.backgroundMusic = new AudioInstance(Assets.STAR_MAP_BACKGROUND_MUSIC, AudioMasks.STAR_MAP_VIEW, 1, false, null);
+        this.backgroundMusic = new AudioInstance(Sounds.STAR_MAP_BACKGROUND_MUSIC, AudioMasks.STAR_MAP_VIEW, 1, false, null);
         AudioManager.RegisterSound(this.backgroundMusic);
         this.backgroundMusic.sound.play();
 
         this.starMapUI = new StarMapUI(engine);
 
         this.starMapUI.warpButton.onPointerClickObservable.add(() => {
-            Assets.MENU_SELECT_SOUND.play();
+            Sounds.MENU_SELECT_SOUND.play();
             this.currentSystemSeed = this.selectedSystemSeed;
             if (this.currentSystemSeed !== null) this.starMapUI.setCurrentStarSystemMesh(this.seedToInstanceMap.get(this.currentSystemSeed.toString()) as InstancedMesh);
             this.dispatchWarpCallbacks();
@@ -272,7 +272,7 @@ export class StarMap implements View {
         }
 
         this.cameraPositionToCenter = this.controls.getTransform().getAbsolutePosition().subtract(this.starMapCenterPosition);
-        this.currentStarSectorPosition = new Vector3(
+        this.currentStarSectorCoordinates = new Vector3(
             Math.round(this.cameraPositionToCenter.x / StarSector.SIZE),
             Math.round(this.cameraPositionToCenter.y / StarSector.SIZE),
             Math.round(this.cameraPositionToCenter.z / StarSector.SIZE)
@@ -293,12 +293,12 @@ export class StarMap implements View {
     }
 
     /**
-     * Register a star sector at the given position, it will be added to the generation queue
-     * @param position The position of the sector
+     * Register a star sector at the given coordinates, it will be added to the generation queue
+     * @param coordinates The coordinates of the sector
      * @param generateNow
      */
-    private registerStarSector(position: Vector3, generateNow = false): StarSector {
-        const starSector = new StarSector(position);
+    private registerStarSector(coordinates: Vector3, generateNow = false): StarSector {
+        const starSector = new StarSector(coordinates);
         this.loadedStarSectors.set(starSector.getKey(), starSector);
 
         if (!generateNow) this.starBuildStack.push(...starSector.generate());
@@ -325,7 +325,7 @@ export class StarMap implements View {
         this.registerStarSector(sectorCoordinates, true);
         this.starMapUI.setCurrentStarSystemMesh(this.seedToInstanceMap.get(this.currentSystemSeed.toString()) as InstancedMesh);
 
-        const translation = sectorCoordinates.subtract(this.currentStarSectorPosition).scaleInPlace(StarSector.SIZE);
+        const translation = sectorCoordinates.subtract(this.currentStarSectorCoordinates).scaleInPlace(StarSector.SIZE);
         translate(this.controls.getTransform(), translation);
         this.controls.getActiveCameras().forEach((camera) => camera.getViewMatrix(true));
         this.acknowledgeCameraMovement();
@@ -342,7 +342,7 @@ export class StarMap implements View {
             if (selectedSystemInstance !== null && starSector.starInstances.concat(starSector.blackHoleInstances).includes(selectedSystemInstance)) continue; // don't remove star sector that contains the selected system
 
             const position = starSector.position;
-            if (position.subtract(this.cameraPositionToCenter).length() > StarMap.RENDER_RADIUS + 1) {
+            if (position.subtract(this.cameraPositionToCenter).length() / StarSector.SIZE > StarMap.RENDER_RADIUS + 1) {
                 for (const starInstance of starSector.starInstances) this.fadeOutThenRecycle(starInstance, this.recycledStars);
                 for (const blackHoleInstance of starSector.blackHoleInstances) this.fadeOutThenRecycle(blackHoleInstance, this.recycledBlackHoles);
 
@@ -352,20 +352,20 @@ export class StarMap implements View {
 
         // then generate missing sectors
         for (const relativeCoordinate of this.allowedStarSectorRelativeCoordinates) {
-            const position = this.currentStarSectorPosition.add(relativeCoordinate);
-            const sectorKey = vector3ToString(position);
+            const coordinates = this.currentStarSectorCoordinates.add(relativeCoordinate);
+            const sectorKey = vector3ToString(coordinates);
 
             if (this.loadedStarSectors.has(sectorKey)) continue; // already generated
 
             // don't generate star sectors that are not in the frustum
-            const bb = StarSector.GetBoundingBox(position, this.starMapCenterPosition);
+            const bb = StarSector.GetBoundingBox(coordinates.scale(StarSector.SIZE), this.starMapCenterPosition);
             let isInFrustrum = false;
             this.controls.getActiveCameras().forEach((camera) => {
                 isInFrustrum = isInFrustrum || camera.isInFrustum(bb);
             });
             if (!isInFrustrum) continue;
 
-            this.registerStarSector(position);
+            this.registerStarSector(coordinates);
         }
 
         this.buildNextStars(Math.min(2000, StarMap.GENERATION_RATE * this.controls.speed));
@@ -451,7 +451,7 @@ export class StarMap implements View {
                 new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, () => {
                     if (this.starMapUI.isHovered()) return;
                     this.starMapUI.setHoveredStarSystemMesh(initializedInstance);
-                    Assets.MENU_HOVER_SOUND.play();
+                    Sounds.MENU_HOVER_SOUND.play();
                 })
             );
 
@@ -469,7 +469,7 @@ export class StarMap implements View {
             new ExecuteCodeAction(ActionManager.OnPickTrigger, () => {
                 if (this.starMapUI.isHovered()) return;
 
-                Assets.STAR_MAP_CLICK_SOUND.play();
+                Sounds.STAR_MAP_CLICK_SOUND.play();
 
                 let text = "";
                 if (this.currentSystemSeed !== null) {
@@ -508,7 +508,7 @@ export class StarMap implements View {
     }
 
     public static StarMapDistanceToLy(distance: number): number {
-        return distance * 15 * Settings.LIGHT_YEAR;
+        return distance * 2 * Settings.LIGHT_YEAR;
     }
 
     private focusCameraOnStar(starInstance: InstancedMesh, skipAnimation = false) {

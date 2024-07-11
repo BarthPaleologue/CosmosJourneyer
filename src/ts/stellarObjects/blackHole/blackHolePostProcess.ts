@@ -3,21 +3,20 @@
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import blackHoleFragment from "../../../shaders/blackhole.glsl";
 import { ObjectPostProcess } from "../../postProcesses/objectPostProcess";
-import { Assets } from "../../assets";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { getForwardDirection } from "../../uberCore/transforms/basicTransform";
 import { Matrix, Quaternion } from "@babylonjs/core/Maths/math";
@@ -30,6 +29,7 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Scene } from "@babylonjs/core/scene";
+import { Textures } from "../../assets/textures";
 
 export type BlackHoleUniforms = {
     accretionDiskRadius: number;
@@ -108,7 +108,7 @@ export class BlackHolePostProcess extends PostProcess implements ObjectPostProce
             effect.setVector3(BlackHoleUniformNames.FORWARD_AXIS, getForwardDirection(blackHole.getTransform()));
 
             setSamplerUniforms(effect, this.activeCamera, scene);
-            effect.setTexture(BlackHoleSamplerNames.STARFIELD_TEXTURE, Assets.STAR_FIELD);
+            effect.setTexture(BlackHoleSamplerNames.STARFIELD_TEXTURE, Textures.STAR_FIELD);
         });
     }
 

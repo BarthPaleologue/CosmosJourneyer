@@ -3,23 +3,22 @@
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Effect } from "@babylonjs/core/Materials/effect";
 
 import oceanFragment from "../../shaders/oceanFragment.glsl";
 import { ObjectPostProcess, UpdatablePostProcess } from "./objectPostProcess";
-import { Assets } from "../assets";
 import { Transformable } from "../architecture/transformable";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
@@ -31,6 +30,7 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Scene } from "@babylonjs/core/scene";
+import { Textures } from "../assets/textures";
 
 export type OceanUniforms = {
     smoothness: number;
@@ -113,8 +113,8 @@ export class OceanPostProcess extends PostProcess implements ObjectPostProcess, 
             effect.setFloat(OceanUniformNames.TIME, oceanUniforms.time % 100000); //TODO: do not hardcode the 100000
 
             setSamplerUniforms(effect, this.activeCamera, scene);
-            effect.setTexture(OceanSamplerNames.NORMAL_MAP_1, Assets.WATER_NORMAL_MAP_1);
-            effect.setTexture(OceanSamplerNames.NORMAL_MAP_2, Assets.WATER_NORMAL_MAP_2);
+            effect.setTexture(OceanSamplerNames.NORMAL_MAP_1, Textures.WATER_NORMAL_MAP_1);
+            effect.setTexture(OceanSamplerNames.NORMAL_MAP_2, Textures.WATER_NORMAL_MAP_2);
         });
     }
 

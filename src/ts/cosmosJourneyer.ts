@@ -3,16 +3,16 @@
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import projectInfo from "../../package.json";
@@ -42,7 +42,6 @@ import { encodeBase64 } from "./utils/base64";
 import { UniverseCoordinates } from "./saveFile/universeCoordinates";
 import { View } from "./utils/view";
 import { updateInputDevices } from "./inputs/devices";
-import { Assets } from "./assets";
 import { AudioManager } from "./audio/audioManager";
 import { AudioMasks } from "./audio/audioMasks";
 import { GeneralInputs } from "./inputs/generalInputs";
@@ -51,6 +50,8 @@ import { StarSystemInputs } from "./inputs/starSystemInputs";
 import { pressInteractionToStrings } from "./utils/inputControlsString";
 import { LoadingScreen } from "./uberCore/loadingScreen";
 import i18n from "./i18n";
+import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { Sounds } from "./assets/sounds";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -64,7 +65,7 @@ const enum EngineState {
  * It also handles the pause menu.
  */
 export class CosmosJourneyer {
-    readonly engine: Engine;
+    readonly engine: AbstractEngine;
 
     readonly starSystemView: StarSystemView;
     readonly starMap: StarMap;
@@ -78,7 +79,7 @@ export class CosmosJourneyer {
 
     private videoRecorder: VideoRecorder | null = null;
 
-    private constructor(engine: Engine, starSystemView: StarSystemView, starMap: StarMap) {
+    private constructor(engine: AbstractEngine, starSystemView: StarSystemView, starMap: StarMap) {
         this.engine = engine;
 
         this.starSystemView = starSystemView;
@@ -191,7 +192,8 @@ export class CosmosJourneyer {
               })
             : new Engine(canvas, true, {
                   // the preserveDrawingBuffer option is required for the screenshot feature to work
-                  preserveDrawingBuffer: true
+                  preserveDrawingBuffer: true,
+                  useHighPrecisionMatrix: true
               });
 
         engine.useReverseDepthBuffer = true;
@@ -203,7 +205,7 @@ export class CosmosJourneyer {
 
         // Log informations about the gpu and the api used
         console.log(`API: ${engine.isWebGPU ? "WebGPU" : "WebGL" + engine.version}`);
-        console.log(`GPU detected: ${engine.getGlInfo().renderer}`);
+        console.log(`GPU detected: ${engine.extractDriverInfo()}`);
 
         // Init Havok physics engine
         const havokInstance = await HavokPhysics();
@@ -226,13 +228,13 @@ export class CosmosJourneyer {
 
         if (this.activeView === this.starSystemView) this.starSystemView.stopBackgroundSounds();
 
-        Assets.OPEN_PAUSE_MENU_SOUND.play();
+        Sounds.OPEN_PAUSE_MENU_SOUND.play();
         this.pauseMenu.setVisibility(true);
     }
 
     public resume(): void {
         this.state = EngineState.RUNNING;
-        Assets.MENU_SELECT_SOUND.play();
+        Sounds.MENU_SELECT_SOUND.play();
         this.pauseMenu.setVisibility(false);
     }
 
@@ -325,7 +327,7 @@ export class CosmosJourneyer {
         const seed = currentStarSystem.model.seed;
 
         // Finding the index of the nearest orbital object
-        const nearestOrbitalObject = currentStarSystem.getNearestOrbitalObject();
+        const nearestOrbitalObject = currentStarSystem.getNearestOrbitalObject(this.starSystemView.scene.getActiveControls().getTransform().getAbsolutePosition());
         const nearestOrbitalObjectIndex = currentStarSystem.getOrbitalObjects().indexOf(nearestOrbitalObject);
         if (nearestOrbitalObjectIndex === -1) throw new Error("Nearest orbital object not found");
 

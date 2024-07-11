@@ -3,16 +3,16 @@
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { UberScene } from "../uberCore/uberScene";
@@ -29,10 +29,8 @@ import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { ColorCorrection } from "./colorCorrection";
 import { makeSplitRenderEffects } from "../utils/extractRelevantPostProcesses";
 import { CloudsPostProcess } from "../clouds/volumetricCloudsPostProcess";
-import { Engine } from "@babylonjs/core/Engines/engine";
 import { FxaaPostProcess } from "@babylonjs/core/PostProcesses/fxaaPostProcess";
 import { PostProcessRenderEffect } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderEffect";
-//import { BloomEffect } from "@babylonjs/core/PostProcesses/bloomEffect";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManagerSceneComponent";
 import { PostProcessType } from "./postProcessTypes";
@@ -53,7 +51,8 @@ import { PostProcessRenderPipeline } from "@babylonjs/core/PostProcesses/RenderP
 import { PostProcessRenderPipelineManager } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManager";
 import { JuliaSetPostProcess } from "../anomalies/julia/juliaSetPostProcess";
 import { JuliaSet } from "../anomalies/julia/juliaSet";
-import { PostProcess } from "@babylonjs/core";
+import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 
 /**
  * The order in which the post processes are rendered when away from a planet
@@ -94,7 +93,7 @@ export class PostProcessManager {
     /**
      * The BabylonJS engine
      */
-    readonly engine: Engine;
+    readonly engine: AbstractEngine;
 
     /**
      * The scene where the solar system is rendered.

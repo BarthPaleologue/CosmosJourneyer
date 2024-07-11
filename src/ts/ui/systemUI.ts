@@ -3,28 +3,27 @@
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Scene } from "@babylonjs/core/scene";
 import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
 import { ObjectOverlay } from "./objectOverlay";
-import { Camera } from "@babylonjs/core/Cameras/camera";
-import { Engine } from "@babylonjs/core/Engines/engine";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Transformable } from "../architecture/transformable";
 import { BoundingSphere } from "../architecture/boundingSphere";
 import { TypedObject } from "../architecture/typedObject";
+import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 
 export class SystemUI {
     readonly scene: Scene;
@@ -34,7 +33,7 @@ export class SystemUI {
 
     private target: (Transformable & BoundingSphere & TypedObject) | null = null;
 
-    constructor(engine: Engine) {
+    constructor(engine: AbstractEngine) {
         this.scene = new Scene(engine);
         this.scene.useRightHandedSystem = true;
         this.scene.autoClear = false;
@@ -42,6 +41,12 @@ export class SystemUI {
         this.camera = new FreeCamera("UiCamera", Vector3.Zero(), this.scene);
 
         this.gui = AdvancedDynamicTexture.CreateFullscreenUI("SystemUI", true, this.scene);
+
+        this.scene.onBeforeRenderObservable.add(() => {
+            for (const overlay of this.objectOverlays) {
+                overlay.update(this.camera, this.target);
+            }
+        });
     }
 
     public setEnabled(enabled: boolean) {
@@ -73,12 +78,6 @@ export class SystemUI {
             overlay.dispose();
         }
         this.objectOverlays = [];
-    }
-
-    public update(camera: Camera) {
-        for (const overlay of this.objectOverlays) {
-            overlay.update(camera, this.target);
-        }
     }
 
     public setTarget(object: (Transformable & BoundingSphere & TypedObject) | null) {

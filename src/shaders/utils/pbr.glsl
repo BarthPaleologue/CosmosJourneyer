@@ -3,20 +3,22 @@
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // taken from https://github.com/BarthPaleologue/feather/blob/main/assets/shaders/pbr/fragment.glsl
 // based on https://learnopengl.com/PBR/Lighting
+
+#include "./pi.glsl";
 
 float DistributionGGX(vec3 N, vec3 H, float roughness) {
     float a      = roughness*roughness;
@@ -40,6 +42,7 @@ float GeometrySchlickGGX(float NdotV, float roughness) {
 
     return num / denom;
 }
+
 float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
     float NdotV = max(dot(N, V), 0.0);
     float NdotL = max(dot(N, L), 0.0);
@@ -64,7 +67,7 @@ vec3 calculateLight(vec3 albedo, vec3 normal, float roughness, float metallic, v
     float G   = GeometrySmith(normal, viewDir, lightDir, roughness);
 
     vec3 numerator    = NDF * G * F;
-    float denominator = 4.0 * max(dot(normal, viewDir), 0.0) * max(dot(normal, lightDir), 0.0)  + 0.0001;
+    float denominator = 4.0 * max(dot(normal, viewDir), 0.0) * max(dot(normal, lightDir), 0.0)  + 1.0; // + 1.0 to prevent division by zero at glancing angles
     vec3 specular     = numerator / denominator;
 
     vec3 kS = F;
@@ -74,8 +77,9 @@ vec3 calculateLight(vec3 albedo, vec3 normal, float roughness, float metallic, v
 
     vec3 radiance = lightColor;
 
-    float NdotL = max(dot(normal, lightDir), 0.05);
+    float NdotL = max(dot(normal, lightDir), 0.0);
 
+    vec3 ambient = vec3(0.005) * albedo * radiance;
     vec3 diffuse = kD * (albedo)/ PI;
-    return (diffuse + specular) * radiance * NdotL;
+    return (diffuse + specular) * radiance * NdotL + ambient;
 }

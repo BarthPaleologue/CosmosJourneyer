@@ -3,24 +3,24 @@
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Axis, Vector3 } from "@babylonjs/core/Maths/math";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { ParticleSystem } from "@babylonjs/core/Particles/particleSystem";
-import { Assets } from "../assets";
 import { Particle } from "@babylonjs/core/Particles/particle";
+import { Textures } from "../assets/textures";
 
 function randomNumber(min: number, max: number): number {
     return Math.random() * (max - min) + min;
@@ -43,7 +43,7 @@ export class DirectionalParticleSystem extends ParticleSystem {
         this.direction = direction;
         this.emitter = mesh;
 
-        this.particleTexture = Assets.PLUME_PARTICLE;
+        this.particleTexture = Textures.PLUME_PARTICLE;
         this.particleTexture.hasAlpha = true;
 
         this.emitter = mesh;

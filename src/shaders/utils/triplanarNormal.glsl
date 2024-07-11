@@ -3,24 +3,27 @@
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // https://bgolus.medium.com/normal-mapping-for-a-triplanar-shader-10bf39dca05a
 #define inline
-vec3 triplanarNormal(vec3 position, vec3 surfaceNormal, sampler2D normalMap, float scale, float sharpness, float normalStrength) {
+vec3 triplanarNormal(vec3 position, vec3 surfaceNormal, sampler2D normalMap, float scale) {
     vec2 uvX = vec3(position).zy * scale;
     vec2 uvY = vec3(position).xz * scale;
     vec2 uvZ = vec3(position).xy * scale;
+
+    vec3 blendWeight = pow(abs(surfaceNormal), vec3(2.0));
+    blendWeight /= (blendWeight.x + blendWeight.y + blendWeight.z);
 
     // get the normal from the normal map
 
@@ -28,25 +31,24 @@ vec3 triplanarNormal(vec3 position, vec3 surfaceNormal, sampler2D normalMap, flo
     vec3 tNormalY = textureNoTile(normalMap, uvY).rgb;
     vec3 tNormalZ = textureNoTile(normalMap, uvZ).rgb;
 
-    tNormalX = normalize(tNormalX * 2.0 - 1.0);
-    tNormalY = normalize(tNormalY * 2.0 - 1.0);
-    tNormalZ = normalize(tNormalZ * 2.0 - 1.0);
+    tNormalX.g = 1.0 - tNormalX.g;
+    tNormalY.g = 1.0 - tNormalY.g;
+    tNormalZ.g = 1.0 - tNormalZ.g;
 
-    // Swizzle tangemt normals into world space and zero out "z"
-    tNormalX = vec3(0.0, tNormalX.yx);
-    tNormalY = vec3(tNormalY.x, 0.0, tNormalY.y);
-    tNormalZ = vec3(tNormalZ.xy, 0.0);
+    tNormalX = tNormalX * 2.0 - 1.0;
+    tNormalY = tNormalY * 2.0 - 1.0;
+    tNormalZ = tNormalZ * 2.0 - 1.0;
 
-    vec3 blendWeight = pow(abs(surfaceNormal), vec3(sharpness));
-    blendWeight /= (blendWeight.x + blendWeight.y + blendWeight.z);
-    blendWeight *= normalStrength;
+    // Swizzle world normals into tangent space and apply Whiteout blend
+    tNormalX = vec3(tNormalX.xy + surfaceNormal.zy, abs(tNormalX.z) * surfaceNormal.x);
+    tNormalY = vec3(tNormalY.xy + surfaceNormal.xz, abs(tNormalY.z) * surfaceNormal.y);
+    tNormalZ = vec3(tNormalZ.xy + surfaceNormal.xy, abs(tNormalZ.z) * surfaceNormal.z);
 
-    // Triblend normals and add to world normal
+    // Swizzle tangent normals to match world orientation and triblend
     return normalize(
-        tNormalX.xyz * blendWeight.x +
-        tNormalY.xyz * blendWeight.y +
-        tNormalZ.xyz * blendWeight.z +
-        surfaceNormal
+    tNormalX.zyx * blendWeight.x +
+    tNormalY.xzy * blendWeight.y +
+    tNormalZ.xyz * blendWeight.z
     );
 }
 
@@ -72,26 +74,16 @@ void triPlanarMaterial(vec3 position, vec3 surfaceNormal, sampler2D albedoRoughn
     vec3 blendWeight = abs(surfaceNormal);
     blendWeight = pow(blendWeight, vec3(2.0));
     blendWeight /= (blendWeight.x + blendWeight.y + blendWeight.z);
-    blendWeight *= 2.5;
 
-    vec3 axis = sign(surfaceNormal);
-    vec3 tangentX = normalize(cross(surfaceNormal, vec3(0.0, axis.x, 0.0)));
-    vec3 bitangentX = normalize(cross(tangentX, surfaceNormal)) * axis.x;
-    mat3 tbnX = mat3(tangentX, bitangentX, surfaceNormal);
+    // Swizzle world normals into tangent space and apply Whiteout blend
+    tNormalX = vec3(tNormalX.xy + surfaceNormal.zy, abs(tNormalX.z) * surfaceNormal.x);
+    tNormalY = vec3(tNormalY.xy + surfaceNormal.xz, abs(tNormalY.z) * surfaceNormal.y);
+    tNormalZ = vec3(tNormalZ.xy + surfaceNormal.xy, abs(tNormalZ.z) * surfaceNormal.z);
 
-    vec3 tangentY = normalize(cross(surfaceNormal, vec3(0.0, 0.0, axis.y)));
-    vec3 bitangentY = normalize(cross(tangentY, surfaceNormal)) * axis.y;
-    mat3 tbnY = mat3(tangentY, bitangentY, surfaceNormal);
-
-    vec3 tangentZ = normalize(cross(surfaceNormal, vec3(0.0, -axis.z, 0.0)));
-    vec3 bitangentZ = normalize(-cross(tangentZ, surfaceNormal)) * axis.z;
-    mat3 tbnZ = mat3(tangentZ, bitangentZ, surfaceNormal);
-
-    // Triblend normals and add to world normal
     normal = normalize(
-        clamp(tbnX * tNormalX, -1.0, 1.0) * blendWeight.x +
-        clamp(tbnY * tNormalY, -1.0, 1.0) * blendWeight.y +
-        clamp(tbnZ * tNormalZ, -1.0, 1.0) * blendWeight.z
+    tNormalX.zyx * blendWeight.x +
+    tNormalY.xzy * blendWeight.y +
+    tNormalZ.xyz * blendWeight.z
     );
 
     // tri planar mapping of albedo
@@ -99,14 +91,15 @@ void triPlanarMaterial(vec3 position, vec3 surfaceNormal, sampler2D albedoRoughn
     vec4 tAlbedoRoughnessY = textureNoTile(albedoRoughnessMap, uvY);
     vec4 tAlbedoRoughnessZ = textureNoTile(albedoRoughnessMap, uvZ);
 
-    vec3 tAlbedoX = tAlbedoRoughnessX.rgb;
-    vec3 tAlbedoY = tAlbedoRoughnessY.rgb;
-    vec3 tAlbedoZ = tAlbedoRoughnessZ.rgb;
+    float gamma = 2.2;
+    vec3 tAlbedoX = pow(tAlbedoRoughnessX.rgb, vec3(gamma));
+    vec3 tAlbedoY = pow(tAlbedoRoughnessY.rgb, vec3(gamma));
+    vec3 tAlbedoZ = pow(tAlbedoRoughnessZ.rgb, vec3(gamma));
 
     albedo =
-        tAlbedoX * blendWeight.x +
-        tAlbedoY * blendWeight.y +
-        tAlbedoZ * blendWeight.z;
+    tAlbedoX * blendWeight.x +
+    tAlbedoY * blendWeight.y +
+    tAlbedoZ * blendWeight.z;
 
     // tri planar mapping of roughness
     float tRoughnessX = tAlbedoRoughnessX.a;
@@ -114,9 +107,9 @@ void triPlanarMaterial(vec3 position, vec3 surfaceNormal, sampler2D albedoRoughn
     float tRoughnessZ = tAlbedoRoughnessZ.a;
 
     roughness =
-        tRoughnessX * blendWeight.x +
-        tRoughnessY * blendWeight.y +
-        tRoughnessZ * blendWeight.z;
+    tRoughnessX * blendWeight.x +
+    tRoughnessY * blendWeight.y +
+    tRoughnessZ * blendWeight.z;
 
     // tri planar mapping of metallic
     float tMetallicX = tNormalMetallicX.a;
@@ -124,7 +117,7 @@ void triPlanarMaterial(vec3 position, vec3 surfaceNormal, sampler2D albedoRoughn
     float tMetallicZ = tNormalMetallicZ.a;
 
     metallic =
-        tMetallicX * blendWeight.x +
-        tMetallicY * blendWeight.y +
-        tMetallicZ * blendWeight.z;
+    tMetallicX * blendWeight.x +
+    tMetallicY * blendWeight.y +
+    tMetallicZ * blendWeight.z;
 }

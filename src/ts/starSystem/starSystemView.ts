@@ -3,16 +3,16 @@
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { HelmetOverlay } from "../ui/helmetOverlay";
@@ -22,10 +22,8 @@ import { AxisRenderer } from "../orbit/axisRenderer";
 import { SystemUI } from "../ui/systemUI";
 import { Animation } from "@babylonjs/core/Animations/animation";
 import { StarSystemController } from "./starSystemController";
-import { Engine } from "@babylonjs/core/Engines/engine";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { ScenePerformancePriority } from "@babylonjs/core/scene";
-import { Color4 } from "@babylonjs/core/Maths/math.color";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { Settings } from "../settings";
@@ -41,7 +39,7 @@ import { HavokPhysicsWithBindings } from "@babylonjs/havok";
 import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge";
 import { DefaultControls } from "../defaultControls/defaultControls";
 import { CharacterControls } from "../characterControls/characterControls";
-import { Assets } from "../assets";
+import { Assets } from "../assets/assets";
 import { getForwardDirection, getRotationQuaternion, setRotationQuaternion, translate } from "../uberCore/transforms/basicTransform";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
@@ -64,11 +62,13 @@ import { TransformRotationAnimation } from "../uberCore/transforms/animations/ro
 import { PostProcessManager } from "../postProcesses/postProcessManager";
 import { wait } from "../utils/wait";
 import { CharacterInputs } from "../characterControls/characterControlsInputs";
-import { DefaultControlsInputs } from "../defaultControls/defaultControlsInputs";
 import i18n from "../i18n";
 import { BodyType } from "../architecture/bodyType";
 import { AnomalyType } from "../anomalies/anomalyType";
 import { Anomaly } from "../anomalies/anomaly";
+import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { Sounds } from "../assets/sounds";
+import { Materials } from "../assets/materials";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -169,7 +169,7 @@ export class StarSystemView implements View {
      * @param engine The BabylonJS engine
      * @param havokInstance The Havok physics instance
      */
-    constructor(engine: Engine, havokInstance: HavokPhysicsWithBindings) {
+    constructor(engine: AbstractEngine, havokInstance: HavokPhysicsWithBindings) {
         this.helmetOverlay = new HelmetOverlay();
         this.bodyEditor = new BodyEditor(EditorVisibility.HIDDEN);
 
@@ -190,16 +190,16 @@ export class StarSystemView implements View {
 
         StarSystemInputs.map.toggleOverlay.on("complete", () => {
             const enabled = !this.ui.isEnabled();
-            if (enabled) Assets.MENU_HOVER_SOUND.play();
-            else Assets.MENU_HOVER_SOUND.play();
+            if (enabled) Sounds.MENU_HOVER_SOUND.play();
+            else Sounds.MENU_HOVER_SOUND.play();
             this.ui.setEnabled(enabled);
             this.helmetOverlay.setVisibility(enabled);
         });
 
         StarSystemInputs.map.toggleOrbitsAndAxis.on("complete", () => {
             const enabled = !this.orbitRenderer.isVisible();
-            if (enabled) Assets.MENU_HOVER_SOUND.play();
-            else Assets.MENU_HOVER_SOUND.play();
+            if (enabled) Sounds.MENU_HOVER_SOUND.play();
+            else Sounds.MENU_HOVER_SOUND.play();
             this.orbitRenderer.setVisibility(enabled);
             this.axisRenderer.setVisibility(enabled);
         });
@@ -224,7 +224,7 @@ export class StarSystemView implements View {
             if (this.ui.getTarget() === closestObjectToCenter) {
                 this.helmetOverlay.setTarget(null);
                 this.ui.setTarget(null);
-                Assets.TARGET_UNLOCK_SOUND.play();
+                Sounds.TARGET_UNLOCK_SOUND.play();
                 return;
             }
 
@@ -232,7 +232,7 @@ export class StarSystemView implements View {
 
             this.helmetOverlay.setTarget(closestObjectToCenter.getTransform());
             this.ui.setTarget(closestObjectToCenter);
-            Assets.TARGET_LOCK_SOUND.play();
+            Sounds.TARGET_LOCK_SOUND.play();
         });
 
         StarSystemInputs.map.jumpToSystem.on("complete", async () => {
@@ -338,14 +338,19 @@ export class StarSystemView implements View {
 
         // small ambient light helps with seeing dark objects. This is unrealistic but I feel it is better.
         const ambientLight = new HemisphericLight("ambientLight", Vector3.Zero(), this.scene);
-        ambientLight.intensity = 0.3;
+        ambientLight.intensity = 0.02;
 
         this.postProcessManager = new PostProcessManager(this.scene);
 
         // main update loop for the star system
         this.scene.onBeforePhysicsObservable.add(() => {
             const deltaSeconds = engine.getDeltaTime() / 1000;
-            this.update(deltaSeconds * Settings.TIME_MULTIPLIER);
+            this.updateBeforePhysics(deltaSeconds * Settings.TIME_MULTIPLIER);
+        });
+
+        this.scene.onBeforeRenderObservable.add(() => {
+            const deltaSeconds = engine.getDeltaTime() * Settings.TIME_MULTIPLIER / 1000;
+            this.updateBeforeRender(deltaSeconds);
         });
 
         window.addEventListener("resize", () => {
@@ -514,7 +519,7 @@ export class StarSystemView implements View {
      * Updates the system view. It updates the underlying star system, the UI, the chunk forge and the controls
      * @param deltaSeconds the time elapsed since the last update in seconds
      */
-    public update(deltaSeconds: number) {
+    public updateBeforePhysics(deltaSeconds: number) {
         if (this.isLoadingSystem) return;
 
         const starSystem = this.getStarSystem();
@@ -522,15 +527,20 @@ export class StarSystemView implements View {
         this.chunkForge.update();
 
         starSystem.update(deltaSeconds, this.chunkForge, this.postProcessManager);
+    }
 
+    public updateBeforeRender(deltaSeconds: number) {
+        if (this.isLoadingSystem) return;
+
+        const starSystem = this.getStarSystem();
         if (this.spaceshipControls === null) throw new Error("Spaceship controls is null");
         if (this.characterControls === null) throw new Error("Character controls is null");
 
-        const shipPosition = this.spaceshipControls.getTransform().getAbsolutePosition();
-        const nearestBody = starSystem.getNearestOrbitalObject();
-        const distance = nearestBody.getTransform().getAbsolutePosition().subtract(shipPosition).length();
-        const radius = nearestBody.getBoundingRadius();
-        this.spaceshipControls.spaceship.registerClosestObject(distance, radius);
+        const nearestOrbitalObject = starSystem.getNearestOrbitalObject(this.scene.getActiveControls().getTransform().getAbsolutePosition());
+        const nearestCelestialBody = starSystem.getNearestCelestialBody(this.scene.getActiveControls().getTransform().getAbsolutePosition());
+
+        this.spaceshipControls.spaceship.setNearestOrbitalObject(nearestOrbitalObject);
+        this.spaceshipControls.spaceship.setNearestCelestialBody(nearestCelestialBody);
 
         const warpDrive = this.spaceshipControls.spaceship.getWarpDrive();
         if (warpDrive.isEnabled()) {
@@ -539,13 +549,8 @@ export class StarSystemView implements View {
             this.helmetOverlay.displaySpeed(this.spaceshipControls.spaceship.getThrottle(), this.spaceshipControls.spaceship.getSpeed());
         }
 
-        this.characterControls.setClosestWalkableObject(nearestBody);
-        this.spaceshipControls.spaceship.setClosestWalkableObject(nearestBody);
-
-        this.ui.update(this.scene.getActiveCameras()[0]);
-
-        const nearestOrbitalObject = starSystem.getNearestOrbitalObject();
-        const nearestCelestialBody = starSystem.getNearestCelestialBody(this.scene.getActiveControls().getTransform().getAbsolutePosition());
+        this.characterControls.setClosestWalkableObject(nearestOrbitalObject);
+        this.spaceshipControls.spaceship.setClosestWalkableObject(nearestOrbitalObject);
 
         this.bodyEditor.update(nearestCelestialBody, this.postProcessManager, this.scene);
 
@@ -553,10 +558,10 @@ export class StarSystemView implements View {
 
         this.orbitRenderer.update();
 
-        Assets.BUTTERFLY_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
-        Assets.BUTTERFLY_DEPTH_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
-        Assets.GRASS_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
-        Assets.GRASS_DEPTH_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
+        Materials.BUTTERFLY_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
+        Materials.BUTTERFLY_DEPTH_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
+        Materials.GRASS_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
+        Materials.GRASS_DEPTH_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
     }
 
     /**

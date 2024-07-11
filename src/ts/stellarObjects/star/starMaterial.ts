@@ -3,16 +3,16 @@
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import starMaterialFragment from "../../../shaders/starMaterial/fragment.glsl";
@@ -21,10 +21,10 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { Assets } from "../../assets";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import lutFragment from "../../../shaders/starMaterial/utils/lut.glsl";
 import { StellarObjectModel } from "../../architecture/stellarObject";
+import { Textures } from "../../assets/textures";
 
 const StarMaterialUniformNames = {
     WORLD: "world",
@@ -32,11 +32,11 @@ const StarMaterialUniformNames = {
     SEED: "seed",
     STAR_COLOR: "starColor",
     TIME: "time"
-}
+};
 
 const StarMaterialSamplerNames = {
     LUT: "lut"
-}
+};
 
 export class StarMaterial extends ShaderMaterial {
     star: TransformNode;
@@ -64,7 +64,7 @@ export class StarMaterial extends ShaderMaterial {
             Effect.ShadersStore["starLutFragmentShader"] = lutFragment;
         }
 
-        this.setTexture("lut", Assets.EMPTY_TEXTURE);
+        this.setTexture("lut", Textures.EMPTY_TEXTURE);
         const lut = new ProceduralTexture("lut", 4096, "starLut", scene, null, true, false);
         lut.refreshRate = 0;
         lut.executeWhenReady(() => {

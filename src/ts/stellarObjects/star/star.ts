@@ -3,16 +3,16 @@
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
@@ -20,7 +20,6 @@ import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { StarMaterial } from "./starMaterial";
 import { StarModel } from "./starModel";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { Assets } from "../../assets";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getRgbFromTemperature } from "../../utils/specrend";
 import { Light } from "@babylonjs/core/Lights/light";
@@ -43,6 +42,8 @@ import { RingsUniforms } from "../../rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import i18n from "../../i18n";
 import { Scene } from "@babylonjs/core/scene";
+import { Objects } from "../../assets/objects";
+import { AsteroidField } from "../../asteroidFields/asteroidField";
 
 export class Star implements StellarObject, Cullable {
     readonly name: string;
@@ -56,6 +57,8 @@ export class Star implements StellarObject, Cullable {
     readonly postProcesses: PostProcessType[] = [];
 
     readonly ringsUniforms: RingsUniforms | null;
+
+    private readonly asteroidField: AsteroidField | null;
 
     readonly model: StarModel;
 
@@ -86,7 +89,7 @@ export class Star implements StellarObject, Cullable {
                   },
                   scene
               )
-            : Assets.CreateBananaClone(2 * this.model.radius);
+            : Objects.CreateBananaClone(2 * this.model.radius);
         this.mesh.name = name; // enforce name in the case of cloning the banana
 
         this.aggregate = new PhysicsAggregate(
@@ -105,7 +108,7 @@ export class Star implements StellarObject, Cullable {
         this.aggregate.shape.addChildFromParent(this.getTransform(), physicsShape, this.mesh);
 
         this.light = new PointLight(`${name}Light`, Vector3.Zero(), scene);
-        this.light.diffuse.fromArray(getRgbFromTemperature(this.model.physicalProperties.temperature).asArray());
+        this.light.diffuse.copyFrom(this.model.color);
         this.light.falloffType = Light.FALLOFF_STANDARD;
         this.light.parent = this.getTransform();
 
@@ -119,8 +122,13 @@ export class Star implements StellarObject, Cullable {
             this.postProcesses.push(PostProcessType.RING);
 
             this.ringsUniforms = new RingsUniforms(this.model.rings, scene);
+            
+            const averageRadius = this.model.radius * (this.model.rings.ringStart + this.model.rings.ringEnd) / 2;
+            const spread = this.model.radius * (this.model.rings.ringEnd - this.model.rings.ringStart) / 2;
+            this.asteroidField = new AsteroidField(this.model.rng(84133), this.getTransform(), averageRadius, spread, scene);
         } else {
             this.ringsUniforms = null;
+            this.asteroidField = null;
         }
     }
 
@@ -146,6 +154,10 @@ export class Star implements StellarObject, Cullable {
 
     getRingsUniforms(): RingsUniforms | null {
         return this.ringsUniforms;
+    }
+
+    getAsteroidField(): AsteroidField | null {
+        return this.asteroidField;
     }
 
     getTypeName(): string {
@@ -176,5 +188,6 @@ export class Star implements StellarObject, Cullable {
         this.mesh.dispose();
         this.material.dispose();
         this.light.dispose();
+        this.asteroidField?.dispose();
     }
 }

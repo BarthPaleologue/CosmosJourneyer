@@ -3,16 +3,16 @@
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
@@ -21,7 +21,6 @@ import { isSizeOnScreenEnough } from "../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { SpaceStationModel } from "./spacestationModel";
 import { PostProcessType } from "../postProcesses/postProcessTypes";
-import { Assets } from "../assets";
 import { OrbitalObject } from "../architecture/orbitalObject";
 import { Cullable } from "../utils/cullable";
 import { TransformNode } from "@babylonjs/core/Meshes";
@@ -37,6 +36,7 @@ import { CelestialBody } from "../architecture/celestialBody";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { generateSpaceStationName } from "../utils/spaceStationNameGenerator";
 import i18n from "../i18n";
+import { Objects } from "../assets/objects";
 
 export class SpaceStation implements OrbitalObject, Cullable {
     readonly name: string;
@@ -65,7 +65,7 @@ export class SpaceStation implements OrbitalObject, Cullable {
 
         this.parent = parentBody;
 
-        this.instance = Assets.CreateSpaceStationInstance();
+        this.instance = Objects.CreateSpaceStationInstance();
         this.instance.name = this.name;
 
         this.aggregate = new PhysicsAggregate(

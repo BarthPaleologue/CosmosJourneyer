@@ -3,16 +3,16 @@
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import "../styles/index.scss";
@@ -20,7 +20,6 @@ import "../styles/index.scss";
 import { StarSystemController } from "./starSystem/starSystemController";
 
 import { Settings } from "./settings";
-import { Assets } from "./assets";
 import { positionNearObjectBrightSide } from "./utils/positionNearObject";
 import { CosmosJourneyer } from "./cosmosJourneyer";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -51,7 +50,7 @@ starSystem.model.setName("Alpha Testis");
 
 await starSystemView.loadStarSystem(starSystem, false);
 
-const sunModel = new StarModel(0.51);
+const sunModel = new StarModel(4413.641464990006);
 const sun = StarSystemHelper.MakeStar(starSystem, sunModel);
 sun.model.orbit.period = 60 * 60 * 24;
 
@@ -94,9 +93,6 @@ moonModel.orbit.radius = 8 * planet.getRadius();
 moonModel.orbit.normalToPlane = Vector3.Up();
 
 const moon = StarSystemHelper.MakeSatellite(starSystem, planet, moonModel);
-moon.material.setTexture("plainNormalMap", Assets.DIRT_NORMAL_MAP);
-moon.material.setTexture("bottomNormalMap", Assets.DIRT_NORMAL_MAP);
-moon.material.updateConstants();
 
 const aresModel = new TelluricPlanetModel(0.3725, sunModel);
 aresModel.physicalProperties.mass = 7;

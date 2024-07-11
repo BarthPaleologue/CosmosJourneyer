@@ -12,14 +12,10 @@ const config = {
     entry: {
         main: "./src/ts/index.ts",
         alphaTestis: "./src/ts/alphaTestis.ts",
-        random: "./src/ts/randomizer.ts",
         blackHole: "./src/ts/blackHoleDemo.ts",
-        physicSpaceship: "./src/ts/physicSpaceship.ts",
         landingSimulator: "./src/ts/landingSimulator.ts",
-        characterDemo: "./src/ts/characterDemo.ts",
         playground: "./src/ts/playground.ts",
         xr: "./src/ts/xr.ts",
-        stereo: "./src/ts/stereo.ts",
         debugAssets: "./src/ts/debugAssets.ts"
     },
     output: {
@@ -44,16 +40,16 @@ const config = {
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
         `,
             stage: webpack.Compilation.PROCESS_ASSETS_STAGE_REPORT
@@ -71,34 +67,16 @@ const config = {
             chunks: ["alphaTestis"]
         }),
         new HtmlWebpackPlugin({
-            title: "Randomizer",
-            filename: "random.html",
-            template: path.join(htmlPath, "index.html"),
-            chunks: ["random"]
-        }),
-        new HtmlWebpackPlugin({
             title: "BlackHole Demo",
             filename: "blackhole.html",
             template: path.join(htmlPath, "index.html"),
             chunks: ["blackHole"]
         }),
         new HtmlWebpackPlugin({
-            title: "Physics Spaceship",
-            filename: "physicSpaceship.html",
-            template: path.join(htmlPath, "index.html"),
-            chunks: ["physicSpaceship"]
-        }),
-        new HtmlWebpackPlugin({
             title: "Landing Simulator",
             filename: "landingSimulator.html",
             template: path.join(htmlPath, "index.html"),
             chunks: ["landingSimulator"]
-        }),
-        new HtmlWebpackPlugin({
-            title: "Character demo",
-            filename: "characterdemo.html",
-            template: path.join(htmlPath, "index.html"),
-            chunks: ["characterDemo"]
         }),
         new HtmlWebpackPlugin({
             title: "Playground",
@@ -111,12 +89,6 @@ const config = {
             filename: "xr.html",
             template: path.join(htmlPath, "index.html"),
             chunks: ["xr"]
-        }),
-        new HtmlWebpackPlugin({
-            title: "3D Stereo",
-            filename: "stereo.html",
-            template: path.join(htmlPath, "index.html"),
-            chunks: ["stereo"]
         }),
         new HtmlWebpackPlugin({
             title: "Debug Texture",
