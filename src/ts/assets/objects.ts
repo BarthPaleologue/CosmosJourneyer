@@ -25,7 +25,6 @@ import banana from "../../asset/banana/banana.glb";
 import character from "../../asset/character/character.glb";
 import rock from "../../asset/rock.glb";
 import asteroid from "../../asset/asteroid/asteroid.glb";
-import landingPad from "../../asset/landingpad.glb";
 import tree from "../../asset/tree/tree.babylon";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
@@ -46,9 +45,7 @@ export class Objects {
     private static WANDERER: Mesh;
     private static BANANA: Mesh;
     private static CHARACTER: Mesh;
-
-    private static LANDING_PAD: Mesh;
-
+    
     public static ROCK: Mesh;
 
     public static ASTEROID: Mesh;
@@ -142,18 +139,6 @@ export class Objects {
             console.log("Asteroid loaded");
         };
 
-        const landingPadTask = manager.addMeshTask("landingPadTask", "", "", landingPad);
-        landingPadTask.onSuccess = function (task: MeshAssetTask) {
-            Objects.LANDING_PAD = task.loadedMeshes[0] as Mesh;
-            Objects.LANDING_PAD.isVisible = false;
-
-            for (const mesh of Objects.LANDING_PAD.getChildMeshes()) {
-                mesh.isVisible = false;
-            }
-
-            console.log("LandingPad loaded");
-        };
-
         const treeTask = manager.addMeshTask("treeTask", "", "", tree);
         treeTask.onSuccess = function (task: MeshAssetTask) {
             Objects.TREE = task.loadedMeshes[0] as Mesh;
@@ -241,9 +226,5 @@ export class Objects {
 
     static CreateCharacterInstance(): InstancedMesh {
         return Objects.CHARACTER.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
-    }
-
-    static CreateLandingPadInstance(): InstancedMesh {
-        return Objects.LANDING_PAD.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
     }
 }
