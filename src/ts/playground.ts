@@ -17,7 +17,7 @@
 
 import "../styles/index.scss";
 
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import "@babylonjs/core/Materials/standardMaterial";
 import "@babylonjs/core/Loading/loadingScreen";
@@ -73,7 +73,7 @@ defaultControls.getTransform().position.y = 20 * scaler;
 defaultControls.speed *= scaler;
 camera.maxZ *= scaler;
 
-const skybox = new StarFieldBox(camera.maxZ / 3, Textures.MILKY_WAY, scene);
+const skybox = new StarFieldBox(scene);
 
 const sphere = MeshBuilder.CreateSphere("box", { diameter: 20 * scaler }, scene);
 
@@ -98,16 +98,16 @@ torus.scaling.y = 0.1 / scaler;
 
 const physicsViewer = new PhysicsViewer(scene);
 
-const rotation = Quaternion.Identity();
+const rotation = Matrix.Identity();
 
 scene.onBeforeRenderObservable.add(() => {
     defaultControls.update(engine.getDeltaTime() / 1000);
 
     belt.update(defaultControls.getTransform().getAbsolutePosition(), engine.getDeltaTime() / 1000);
 
-    rotation.copyFrom(Quaternion.RotationAxis(Vector3.Up(), 0.001).multiply(rotation));
+    rotation.copyFrom(rotation.multiply(Matrix.RotationAxis(Vector3.Up(), 0.001)));
 
-    skybox.setRotationQuaternion(rotation);
+    skybox.setRotationMatrix(rotation);
 
     //sphere.rotate(Axis.Y, 0.002);
     /*scene.meshes.forEach((mesh) => {

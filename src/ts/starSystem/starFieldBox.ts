@@ -5,22 +5,26 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Scene } from "@babylonjs/core/scene";
 import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
-import { Matrix, Quaternion } from "@babylonjs/core/Maths/math.vector";
+import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Transformable } from "../architecture/transformable";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { Textures } from "../assets/textures";
 
-export class StarFieldBox {
+export class StarFieldBox implements Transformable {
     readonly mesh: Mesh;
     readonly material: StandardMaterial;
     readonly texture: CubeTexture;
 
-    constructor(size: number, texture: CubeTexture, scene: Scene) {
-        this.mesh = MeshBuilder.CreateBox("skybox", { size: size }, scene);
+    constructor(scene: Scene) {
+        this.mesh = MeshBuilder.CreateBox("skybox", { size: Number.MAX_SAFE_INTEGER }, scene);
 
-        this.texture = texture;
+        this.texture = Textures.MILKY_WAY;
+        this.texture.setReflectionTextureMatrix(Matrix.Identity());
 
         this.material = new StandardMaterial("skyboxMat", scene);
         this.material.backFaceCulling = false;
         this.material.disableDepthWrite = true;
-        this.material.reflectionTexture = texture;
+        this.material.reflectionTexture = this.texture;
         this.material.reflectionTexture.gammaSpace = true;
         this.material.reflectionTexture.coordinatesMode = Texture.SKYBOX_MODE;
         this.material.disableLighting = true;
@@ -28,13 +32,23 @@ export class StarFieldBox {
         this.mesh.material = this.material;
         this.mesh.infiniteDistance = true;
 
-        scene.environmentTexture = texture;
+        scene.environmentTexture = this.texture;
     }
 
-    setRotationQuaternion(quaternion: Quaternion): void {
-        const rotationMatrix = new Matrix();
-        quaternion.toRotationMatrix(rotationMatrix);
-
+    setRotationMatrix(rotationMatrix: Matrix): void {
 		this.texture.setReflectionTextureMatrix(rotationMatrix);
+    }
+
+    getRotationMatrix(): Matrix {
+        return this.texture.getReflectionTextureMatrix();
+    }
+
+    getTransform(): TransformNode {
+        return this.mesh;
+    }
+
+    dispose(): void {
+        this.mesh.dispose();
+        this.material.dispose();
     }
 }

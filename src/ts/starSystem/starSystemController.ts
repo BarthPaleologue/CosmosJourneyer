@@ -40,11 +40,13 @@ import { Planet } from "../architecture/planet";
 import { SystemTarget } from "../utils/systemTarget";
 import { JuliaSet } from "../anomalies/julia/juliaSet";
 import { Anomaly } from "../anomalies/anomaly";
+import { StarFieldBox } from "./starFieldBox";
+import { Textures } from "../assets/textures";
 
 export class StarSystemController {
     readonly scene: UberScene;
 
-    readonly universeRotation: Quaternion = Quaternion.Identity();
+    readonly starFieldBox: StarFieldBox;
 
     private readonly orbitalObjects: OrbitalObject[] = [];
 
@@ -91,6 +93,8 @@ export class StarSystemController {
 
     constructor(model: StarSystemModel | SystemSeed, scene: UberScene) {
         this.scene = scene;
+
+        this.starFieldBox = new StarFieldBox(scene);
 
         this.model = model instanceof StarSystemModel ? model : new StarSystemModel(model);
     }
@@ -286,7 +290,6 @@ export class StarSystemController {
      * This method cannot be awaited as its completion depends on the execution of BabylonJS that happens afterward.
      */
     public async initPostProcesses(postProcessManager: PostProcessManager): Promise<void> {
-        postProcessManager.addStarField(this.stellarObjects, this.celestialBodies, this.universeRotation);
         for (const object of this.celestialBodies) {
             for (const postProcess of object.postProcesses) {
                 switch (postProcess) {
@@ -321,7 +324,7 @@ export class StarSystemController {
                         break;
                     case PostProcessType.BLACK_HOLE:
                         if (!(object instanceof BlackHole)) throw new Error("Black hole post process can only be added to black holes. Source:" + object.name);
-                        postProcessManager.addBlackHole(object as BlackHole, this.universeRotation);
+                        postProcessManager.addBlackHole(object as BlackHole);
                         break;
                     case PostProcessType.MATTER_JETS:
                         if (!(object instanceof NeutronStar)) throw new Error("Matter jets post process can only be added to neutron stars. Source:" + object.name);
@@ -404,8 +407,8 @@ export class StarSystemController {
             });
 
             // the starfield is rotated to give the impression the nearest body is rotating, which is only an illusion
-            const starfieldAdditionalRotation = Quaternion.RotationAxis(nearestOrbitalObject.getRotationAxis(), dthetaNearest);
-            this.universeRotation.copyFrom(starfieldAdditionalRotation.multiply(this.universeRotation));
+            const starfieldAdditionalRotation = Matrix.RotationAxis(nearestOrbitalObject.getRotationAxis(), dthetaNearest);
+            this.starFieldBox.setRotationMatrix(this.starFieldBox.getRotationMatrix().multiply(starfieldAdditionalRotation));
         } else {
             // if we don't compensate the rotation of the nearest body, we must simply update its rotation
             OrbitalObjectUtils.UpdateRotation(nearestOrbitalObject, deltaTime);
@@ -517,6 +520,8 @@ export class StarSystemController {
     public dispose() {
         for (const object of this.orbitalObjects) object.dispose();
         this.systemTargets.forEach((target) => target.dispose());
+
+        this.starFieldBox.dispose();
 
         this.systemTargets = [];
 

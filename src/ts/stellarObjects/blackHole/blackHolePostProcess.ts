@@ -19,7 +19,6 @@ import blackHoleFragment from "../../../shaders/blackhole.glsl";
 import { ObjectPostProcess } from "../../postProcesses/objectPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { getForwardDirection } from "../../uberCore/transforms/basicTransform";
-import { Matrix, Quaternion } from "@babylonjs/core/Maths/math";
 import { BlackHole } from "./blackHole";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { ObjectUniformNames, setObjectUniforms } from "../../postProcesses/uniforms/objectUniforms";
@@ -44,7 +43,7 @@ export class BlackHolePostProcess extends PostProcess implements ObjectPostProce
 
     private activeCamera: Camera | null = null;
 
-    constructor(blackHole: BlackHole, scene: Scene, starfieldRotation: Quaternion) {
+    constructor(blackHole: BlackHole, scene: Scene) {
         const shaderName = "blackhole";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = blackHoleFragment;
@@ -94,9 +93,7 @@ export class BlackHolePostProcess extends PostProcess implements ObjectPostProce
             setCameraUniforms(effect, this.activeCamera);
             setObjectUniforms(effect, blackHole);
 
-            const rotationMatrix = new Matrix();
-            starfieldRotation.toRotationMatrix(rotationMatrix);
-            effect.setMatrix(BlackHoleUniformNames.STARFIELD_ROTATION, rotationMatrix);
+            effect.setMatrix(BlackHoleUniformNames.STARFIELD_ROTATION, Textures.MILKY_WAY.getReflectionTextureMatrix());
 
             effect.setFloat(BlackHoleUniformNames.TIME, blackHoleUniforms.time % (blackHoleUniforms.rotationPeriod * 10000));
             effect.setFloat(BlackHoleUniformNames.SCHWARZSCHILD_RADIUS, blackHole.model.getSchwarzschildRadius());

@@ -328,7 +328,7 @@ export class StarSystemView implements View {
             }
         });
 
-        this.scene = new UberScene(engine, ScenePerformancePriority.Intermediate);
+        this.scene = new UberScene(engine, ScenePerformancePriority.BackwardCompatible);
         // The right-handed system allows to use directly GLTF models without having to flip them with a transform
         this.scene.useRightHandedSystem = true;
 
@@ -721,7 +721,7 @@ export class StarSystemView implements View {
         const targetSystemUniversePosition = targetSystemStarSector.getPositionOfStar(targetSeed.index);
 
         const direction = targetSystemUniversePosition.subtract(currentSystemUniversePosition).normalize();
-        direction.applyRotationQuaternionInPlace(currentSystem.universeRotation);
+        Vector3.TransformCoordinatesToRef(direction, currentSystem.starFieldBox.getRotationMatrix(), direction);
 
         const distance = StarMap.StarMapDistanceToLy(Vector3.Distance(currentSystemUniversePosition, targetSystemUniversePosition));
 
