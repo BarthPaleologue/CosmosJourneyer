@@ -39,7 +39,7 @@ import seamlessPerlin from "../../asset/perlin.png";
 import atmosphereLUT from "../../shaders/textures/atmosphereLUT.glsl";
 import empty from "../../asset/oneBlackPixel.png";
 
-import skyBox from "../asset/skybox/milkyway.dds";
+import skyBox from "../../asset/skybox/milkyway.env";
 
 import cursorImage from "../../asset/textures/hoveredCircle.png";
 import { CubeTexture } from "@babylonjs/core";

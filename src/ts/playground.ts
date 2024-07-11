@@ -24,11 +24,14 @@ import "@babylonjs/core/Loading/loadingScreen";
 import "@babylonjs/core/Misc/screenshotTools";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import "@babylonjs/core/Meshes/thinInstanceMesh";
-import { Axis, DirectionalLight, HavokPlugin, HemisphericLight, MeshBuilder, PhysicsAggregate, PhysicsShapeType, PhysicsViewer, Scene } from "@babylonjs/core";
+import { Axis, Color3, DirectionalLight, HavokPlugin, HemisphericLight, MeshBuilder, PhysicsAggregate, PhysicsShapeType, PhysicsViewer, Texture } from "@babylonjs/core";
 import { Assets } from "./assets/assets";
+import { Scene, StandardMaterial } from "@babylonjs/core";
+import { translate } from "./uberCore/transforms/basicTransform";
 import { DefaultControls } from "./defaultControls/defaultControls";
 import { AsteroidField } from "./asteroidFields/asteroidField";
 import HavokPhysics from "@babylonjs/havok";
+import { Textures } from "./assets/textures";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -68,6 +71,19 @@ defaultControls.getTransform().position.z = -200 * scaler;
 defaultControls.getTransform().position.y = 20 * scaler;
 defaultControls.speed *= scaler;
 camera.maxZ *= scaler;
+
+const skybox = MeshBuilder.CreateBox("skybox", { size: camera.maxZ / 3 }, scene);
+
+const skyBoxMat = new StandardMaterial("skyboxMat", scene);
+skyBoxMat.backFaceCulling = false;
+skyBoxMat.disableDepthWrite = true;
+skyBoxMat.reflectionTexture = Textures.MILKY_WAY;
+skyBoxMat.reflectionTexture.gammaSpace = true;
+skyBoxMat.reflectionTexture.coordinatesMode = Texture.SKYBOX_MODE;
+skyBoxMat.disableLighting = true;
+
+skybox.material = skyBoxMat;
+skybox.infiniteDistance = true;
 
 const sphere = MeshBuilder.CreateSphere("box", { diameter: 20 * scaler }, scene);
 
