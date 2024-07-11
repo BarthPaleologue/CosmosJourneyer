@@ -1,7 +1,6 @@
 declare module "*.png";
 declare module "*.jpg";
 declare module "*.env";
-declare module "*.dds";
 
 declare module "*.html";
 
