@@ -39,7 +39,10 @@ import seamlessPerlin from "../../asset/perlin.png";
 import atmosphereLUT from "../../shaders/textures/atmosphereLUT.glsl";
 import empty from "../../asset/oneBlackPixel.png";
 
+import skyBox from "../asset/skybox/milkyway.dds";
+
 import cursorImage from "../../asset/textures/hoveredCircle.png";
+import { CubeTexture } from "@babylonjs/core";
 
 export class Textures {
     static ROCK_NORMAL_METALLIC_MAP: Texture;
@@ -73,6 +76,8 @@ export class Textures {
 
     static SEAMLESS_PERLIN: Texture;
 
+    static MILKY_WAY: CubeTexture;
+
     static EnqueueTasks(manager: AssetsManager, scene: Scene) {
         manager.addTextureTask("RockNormalMetallicMap", rockNormalMetallicMap).onSuccess = (task) => (Textures.ROCK_NORMAL_METALLIC_MAP = task.texture);
         manager.addTextureTask("RockAlbedoRoughnessMap", rockAlbedoRoughnessMap).onSuccess = (task) => (Textures.ROCK_ALBEDO_ROUGHNESS_MAP = task.texture);
@@ -98,6 +103,8 @@ export class Textures {
         manager.addTextureTask("FlareTexture", flareParticle).onSuccess = (task) => (Textures.FLARE_TEXTURE = task.texture);
 
         manager.addTextureTask("SeamlessPerlin", seamlessPerlin).onSuccess = (task) => (Textures.SEAMLESS_PERLIN = task.texture);
+
+        manager.addCubeTextureTask("SkyBox", skyBox).onSuccess = (task) => (Textures.MILKY_WAY = task.texture);
 
         Textures.ATMOSPHERE_LUT = new ProceduralTexture("atmosphereLUT", 100, { fragmentSource: atmosphereLUT }, scene, undefined, false, false);
         Textures.ATMOSPHERE_LUT.refreshRate = 0;
