@@ -32,6 +32,7 @@ import { DefaultControls } from "./defaultControls/defaultControls";
 import { AsteroidField } from "./asteroidFields/asteroidField";
 import HavokPhysics from "@babylonjs/havok";
 import { Textures } from "./assets/textures";
+import { StarFieldBox } from "./starSystem/starFieldBox";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -72,18 +73,7 @@ defaultControls.getTransform().position.y = 20 * scaler;
 defaultControls.speed *= scaler;
 camera.maxZ *= scaler;
 
-const skybox = MeshBuilder.CreateBox("skybox", { size: camera.maxZ / 3 }, scene);
-
-const skyBoxMat = new StandardMaterial("skyboxMat", scene);
-skyBoxMat.backFaceCulling = false;
-skyBoxMat.disableDepthWrite = true;
-skyBoxMat.reflectionTexture = Textures.MILKY_WAY;
-skyBoxMat.reflectionTexture.gammaSpace = true;
-skyBoxMat.reflectionTexture.coordinatesMode = Texture.SKYBOX_MODE;
-skyBoxMat.disableLighting = true;
-
-skybox.material = skyBoxMat;
-skybox.infiniteDistance = true;
+const skybox = new StarFieldBox(camera.maxZ / 3, Textures.MILKY_WAY, scene);
 
 const sphere = MeshBuilder.CreateSphere("box", { diameter: 20 * scaler }, scene);
 
