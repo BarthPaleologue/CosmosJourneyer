@@ -118,9 +118,9 @@ export class AsteroidField implements IDisposable {
 
                 const cellCoords = new Vector3(cellX * this.patchSize, 0, cellZ * this.patchSize);
 
-                const [positions, rotations, scalings, rotationAxes, rotationSpeeds] = AsteroidField.CreateAsteroidBuffer(cellCoords, this.resolution, this.patchSize, this.patchThickness, this.minRadius, this.maxRadius, this.rng);
-                const patch = new AsteroidPatch(positions, rotations, scalings, rotationAxes, rotationSpeeds, this.parent);
-                patch.createInstances(Objects.ASTEROID);
+                const [positions, rotations, typeIndices, rotationAxes, rotationSpeeds] = AsteroidField.CreateAsteroidBuffer(cellCoords, this.resolution, this.patchSize, this.patchThickness, this.minRadius, this.maxRadius, this.rng);
+                const patch = new AsteroidPatch(positions, rotations, typeIndices, rotationAxes, rotationSpeeds, this.parent);
+                patch.createInstances();
 
 
                 this.patches.set(`${cellX};${cellZ}`, { patch: patch, cellX: cellX, cellZ: cellZ });
@@ -145,10 +145,10 @@ export class AsteroidField implements IDisposable {
      * @param rng A random number generator
      * @returns A new matrix 4x4 buffer
      */
-    static CreateAsteroidBuffer(position: Vector3, resolution: number, patchSize: number, patchThickness: number, minRadius: number, maxRadius: number, rng: (index: number) => number): [Vector3[], Quaternion[], Vector3[], Vector3[], number[]] {
+    static CreateAsteroidBuffer(position: Vector3, resolution: number, patchSize: number, patchThickness: number, minRadius: number, maxRadius: number, rng: (index: number) => number): [Vector3[], Quaternion[], number[], Vector3[], number[]] {
         const positions = [];
         const rotations = [];
-        const scalings = [];
+        const asteroidTypeIndices = [];
 
         const rotationAxes = [];
         const rotationSpeeds = [];
@@ -168,7 +168,8 @@ export class AsteroidField implements IDisposable {
                 if (positionX * positionX + positionZ * positionZ > maxRadius * maxRadius) continue;
 
                 const positionY = position.y + (rng(asteroidIndex + 8781) - 0.5) * 2 * patchThickness;
-                const scaling = 0.7 + rng(asteroidIndex + 6549) * 0.6;
+
+                const asteroidTypeIndex = Math.floor(rng(asteroidIndex + 6549) * Objects.ASTEROIDS.length);
 
                 positions.push(new Vector3(positionX, positionY, positionZ));
 
@@ -176,13 +177,13 @@ export class AsteroidField implements IDisposable {
                 const initialRotationAngle = rng(asteroidIndex + 4239) * 2 * Math.PI;
 
                 rotations.push(Quaternion.RotationAxis(initialRotationAxis, initialRotationAngle));
-                scalings.push(new Vector3(scaling, scaling, scaling));
+                asteroidTypeIndices.push(asteroidTypeIndex);
 
                 rotationAxes.push(new Vector3(rng(asteroidIndex + 9630) - 0.5, rng(asteroidIndex + 3256) - 0.5, rng(asteroidIndex + 8520) - 0.5).normalize());
                 rotationSpeeds.push(rng(asteroidIndex + 1569) * 0.5);
             }
         }
 
-        return [positions, rotations, scalings, rotationAxes, rotationSpeeds];
+        return [positions, rotations, asteroidTypeIndices, rotationAxes, rotationSpeeds];
     }
 }
