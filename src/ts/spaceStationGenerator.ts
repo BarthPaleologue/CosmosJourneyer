@@ -27,7 +27,6 @@ import { PhysicsViewer, Scene } from "@babylonjs/core";
 import { DefaultControls } from "./defaultControls/defaultControls";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
-import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
 import { Assets } from "./assets/assets";
 import { SpaceStation } from "./spacestation/spaceStation";
 import HavokPhysics from "@babylonjs/havok";
@@ -36,6 +35,7 @@ import { Star } from "./stellarObjects/star/star";
 import { Settings } from "./settings";
 import { SpaceStationModel } from "./spacestation/spacestationModel";
 import { SpaceStationUI } from "./ui/spaceStationUI";
+import { StarFieldBox } from "./starSystem/starFieldBox";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -72,8 +72,7 @@ defaultControls.getTransform().lookAt(Vector3.Zero());
 const sun = new Star("Sun", scene, 4413.641464990006);
 sun.getTransform().position = new Vector3(7, 2, 5).normalize().scaleInPlace(distanceToStar);
 
-const starfieldPostProcess = new StarfieldPostProcess(scene, [sun], [], Quaternion.Identity());
-camera.attachPostProcess(starfieldPostProcess);
+const starfieldBox = new StarFieldBox(scene);
 
 const spaceStationModel = new SpaceStationModel(Math.random() * 69420, sun.model);
 spaceStationModel.orbit.radius = distanceToStar;
