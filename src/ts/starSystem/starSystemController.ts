@@ -479,7 +479,9 @@ export class StarSystemController {
         if (controller.getTransform().getAbsolutePosition().length() > 500) {
             const displacementTranslation = controller.getTransform().getAbsolutePosition().negate();
             this.translateEverythingNow(displacementTranslation);
-            translate(controller.getTransform(), displacementTranslation);
+            if(controller.getTransform().parent === null) {
+                translate(controller.getTransform(), displacementTranslation);
+            }
         }
     }
 
