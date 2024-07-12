@@ -97,8 +97,6 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
 
         const extendSize = boundingVectors.max.subtract(boundingVectors.min).scale(0.5);
         this.boundingRadius = Math.max(extendSize.x, extendSize.y, extendSize.z);
-
-        console.log(this.boundingRadius);
     }
 
     handleLandingRequest(request: LandingRequest): LandingPad | null {
@@ -143,9 +141,8 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
         for (const camera of cameras) {
             isVisible = isVisible || isSizeOnScreenEnough(this, camera);
         }
-        for (const mesh of this.root.getChildMeshes()) {
-            mesh.isVisible = isVisible;
-        }
+
+        this.getTransform().setEnabled(isVisible);
     }
 
     private generate() {
