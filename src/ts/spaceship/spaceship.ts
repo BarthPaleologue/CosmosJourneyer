@@ -490,7 +490,9 @@ export class Spaceship implements Transformable {
                     this.landOnPad(this.targetLandingPad);
                 }
             }
-        } else {
+        }
+
+        if(this.warpDrive.isEnabled()) {
             this.mainThrusters.forEach((thruster) => {
                 thruster.setThrottle(0);
             });
