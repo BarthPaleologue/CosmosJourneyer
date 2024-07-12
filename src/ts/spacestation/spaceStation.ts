@@ -69,6 +69,8 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
 
     private readonly scene: Scene;
 
+    private readonly boundingRadius: number;
+
     constructor(scene: Scene, model: SpaceStationModel | number, parentBody: CelestialBody | null = null) {
         this.model = model instanceof SpaceStationModel ? model : new SpaceStationModel(model, parentBody?.model);
 
@@ -92,6 +94,11 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
 
         this.root.rotate(Axis.X, this.model.physicalProperties.axialTilt);
         this.root.rotate(Axis.Z, this.model.physicalProperties.axialTilt);
+
+        const extendSize = boundingVectors.max.subtract(boundingVectors.min).scale(0.5);
+        this.boundingRadius = Math.max(extendSize.x, extendSize.y, extendSize.z);
+
+        console.log(this.boundingRadius);
     }
 
     handleLandingRequest(request: LandingRequest): LandingPad | null {
@@ -124,10 +131,7 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
     }
 
     public getBoundingRadius(): number {
-        const boundingVectors = this.getTransform().getHierarchyBoundingVectors();
-        const extendSize = boundingVectors.max.subtract(boundingVectors.min).scale(0.5);
-
-        return Math.max(extendSize.x, extendSize.y, extendSize.z);
+        return this.boundingRadius;
     }
 
     getTypeName(): string {
