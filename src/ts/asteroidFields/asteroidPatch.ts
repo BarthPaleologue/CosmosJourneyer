@@ -16,7 +16,12 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { InstancedMesh, PhysicsBody, PhysicsMotionType, Quaternion, Space, Vector3 } from "@babylonjs/core";
+import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
+import { Quaternion } from "@babylonjs/core/Maths/math";
+import { PhysicsMotionType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { Space } from "@babylonjs/core/Maths/math.axis";
 import { Objects } from "../assets/objects";
 
 export class AsteroidPatch {

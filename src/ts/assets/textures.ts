@@ -19,6 +19,7 @@ import { AssetsManager } from "@babylonjs/core/Misc/assetsManager";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import { Scene } from "@babylonjs/core/scene";
+import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 
 import rockNormalMetallicMap from "../../asset/rockMaterial/layered-planetary_normal_metallic.png";
 import rockAlbedoRoughnessMap from "../../asset/rockMaterial/layered-planetary_albedo_roughness.png";
@@ -41,7 +42,6 @@ import empty from "../../asset/oneBlackPixel.png";
 import skyBox from "../../asset/skybox/milkyway.env";
 
 import cursorImage from "../../asset/textures/hoveredCircle.png";
-import { CubeTexture } from "@babylonjs/core";
 
 export class Textures {
     static ROCK_NORMAL_METALLIC_MAP: Texture;
