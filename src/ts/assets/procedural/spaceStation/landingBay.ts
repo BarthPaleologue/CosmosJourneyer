@@ -78,26 +78,30 @@ export class LandingBay {
         const yExtent = this.ring.getBoundingInfo().boundingBox.extendSize.y;
 
         const nbArms = 6;
+        const armDiameter = deltaRadius / 4;
+        const armHeight = this.radius * 1.618;
+        const armRotation = 2 * Math.asin((0.5 * this.radius) / armHeight);
+        const armOffset = Math.sqrt(armHeight * armHeight - this.radius * this.radius);
         for (let i = 0; i <= nbArms; i++) {
-            const armDiameter = deltaRadius / 4;
             const arm = MeshBuilder.CreateCylinder(
                 `RingHabitatArm${i}`,
                 {
-                    height: 2 * this.radius,
+                    height: armHeight,
                     diameter: armDiameter,
                     tessellation: 4
                 },
                 scene
             );
             arm.convertToFlatShadedMesh();
-            arm.rotate(Axis.Z, Math.PI / 2, Space.LOCAL);
+            arm.rotate(Axis.Z, armRotation, Space.LOCAL);
             arm.material = this.metalSectionMaterial;
 
             const theta = (i / nbArms) * Math.PI * 2;
 
             arm.rotate(Axis.Y, theta, Space.WORLD);
 
-            arm.translate(Axis.Y, -yExtent + armDiameter / 2, Space.WORLD);
+            arm.translate(Axis.Y, -armOffset - yExtent, Space.WORLD);
+            arm.translate(Axis.Y, armHeight / 2, Space.LOCAL);
 
             arm.parent = this.getTransform();
 
@@ -127,6 +131,16 @@ export class LandingBay {
                 this.landingPads.push(landingPad);
             }
         }
+
+        this.getTransform().computeWorldMatrix(true);
+
+        const bb = this.getTransform().getHierarchyBoundingVectors();
+        const extend = bb.max.subtract(bb.min);
+        const center = bb.min.add(extend.scale(0.5));
+
+        this.getTransform().getChildMeshes(true).forEach((mesh) => {
+            mesh.position.subtractInPlace(center);
+        });
     }
 
     update(stellarObjects: Transformable[], cameraWorldPosition: Vector3, deltaSeconds: number) {
