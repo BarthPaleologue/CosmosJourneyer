@@ -328,7 +328,7 @@ export class StarSystemView implements View {
             }
         });
 
-        this.scene = new UberScene(engine, ScenePerformancePriority.BackwardCompatible);
+        this.scene = new UberScene(engine, ScenePerformancePriority.Intermediate);
         // The right-handed system allows to use directly GLTF models without having to flip them with a transform
         this.scene.useRightHandedSystem = true;
 
