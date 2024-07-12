@@ -19,6 +19,8 @@ import { AssetsManager } from "@babylonjs/core/Misc/assetsManager";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import { Scene } from "@babylonjs/core/scene";
+import '@babylonjs/core/Materials/Textures/Loaders/envTextureLoader';
+import '@babylonjs/core/Helpers/sceneHelpers';
 import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 
 import rockNormalMetallicMap from "../../asset/rockMaterial/layered-planetary_normal_metallic.png";
