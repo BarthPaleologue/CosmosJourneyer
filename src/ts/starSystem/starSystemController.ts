@@ -40,11 +40,12 @@ import { Planet } from "../architecture/planet";
 import { SystemTarget } from "../utils/systemTarget";
 import { JuliaSet } from "../anomalies/julia/juliaSet";
 import { Anomaly } from "../anomalies/anomaly";
+import { StarFieldBox } from "./starFieldBox";
 
 export class StarSystemController {
     readonly scene: UberScene;
 
-    readonly universeRotation: Quaternion = Quaternion.Identity();
+    readonly starFieldBox: StarFieldBox;
 
     private readonly orbitalObjects: OrbitalObject[] = [];
 
@@ -91,6 +92,8 @@ export class StarSystemController {
 
     constructor(model: StarSystemModel | SystemSeed, scene: UberScene) {
         this.scene = scene;
+
+        this.starFieldBox = new StarFieldBox(scene);
 
         this.model = model instanceof StarSystemModel ? model : new StarSystemModel(model);
     }
@@ -286,7 +289,6 @@ export class StarSystemController {
      * This method cannot be awaited as its completion depends on the execution of BabylonJS that happens afterward.
      */
     public async initPostProcesses(postProcessManager: PostProcessManager): Promise<void> {
-        postProcessManager.addStarField(this.stellarObjects, this.celestialBodies, this.universeRotation);
         for (const object of this.celestialBodies) {
             for (const postProcess of object.postProcesses) {
                 switch (postProcess) {
@@ -309,7 +311,7 @@ export class StarSystemController {
                     case PostProcessType.VOLUMETRIC_LIGHT:
                         if (!(object instanceof Star) && !(object instanceof NeutronStar))
                             throw new Error("Volumetric light post process can only be added to stars and neutron stars. Source:" + object.name);
-                        postProcessManager.addVolumetricLight(object);
+                        postProcessManager.addVolumetricLight(object, [this.starFieldBox.mesh]);
                         break;
                     case PostProcessType.MANDELBULB:
                         if (!(object instanceof Mandelbulb)) throw new Error("Mandelbulb post process can only be added to mandelbulbs. Source:" + object.name);
@@ -321,7 +323,7 @@ export class StarSystemController {
                         break;
                     case PostProcessType.BLACK_HOLE:
                         if (!(object instanceof BlackHole)) throw new Error("Black hole post process can only be added to black holes. Source:" + object.name);
-                        postProcessManager.addBlackHole(object as BlackHole, this.universeRotation);
+                        postProcessManager.addBlackHole(object as BlackHole);
                         break;
                     case PostProcessType.MATTER_JETS:
                         if (!(object instanceof NeutronStar)) throw new Error("Matter jets post process can only be added to neutron stars. Source:" + object.name);
@@ -362,12 +364,12 @@ export class StarSystemController {
         // If we are very close, we want both translation and rotation to be compensated, so that the body appears to be fixed
         // When we are a bit further, we only need to compensate the translation as it would be unnatural not to see the body rotating
         const distanceOfNearestToControls = Vector3.Distance(nearestOrbitalObject.getTransform().getAbsolutePosition(), controller.getTransform().getAbsolutePosition());
-        
+
         const shouldCompensateTranslation = distanceOfNearestToControls < nearestOrbitalObject.getBoundingRadius() * (nearestOrbitalObject instanceof SpaceStation ? 80 : 10);
 
         // compensate rotation when close to the body
         let shouldCompensateRotation = distanceOfNearestToControls < nearestOrbitalObject.getBoundingRadius() * 3;
-        if(nearestOrbitalObject === nearestCelestialBody && ringUniforms !== null) {
+        if (nearestOrbitalObject === nearestCelestialBody && ringUniforms !== null) {
             // or in the vicinity of the rings
             shouldCompensateRotation = shouldCompensateRotation || distanceOfNearestToControls < ringUniforms.model.ringEnd * nearestOrbitalObject.getBoundingRadius();
         }
@@ -404,8 +406,8 @@ export class StarSystemController {
             });
 
             // the starfield is rotated to give the impression the nearest body is rotating, which is only an illusion
-            const starfieldAdditionalRotation = Quaternion.RotationAxis(nearestOrbitalObject.getRotationAxis(), dthetaNearest);
-            this.universeRotation.copyFrom(starfieldAdditionalRotation.multiply(this.universeRotation));
+            const starfieldAdditionalRotation = Matrix.RotationAxis(nearestOrbitalObject.getRotationAxis(), dthetaNearest);
+            this.starFieldBox.setRotationMatrix(this.starFieldBox.getRotationMatrix().multiply(starfieldAdditionalRotation));
         } else {
             // if we don't compensate the rotation of the nearest body, we must simply update its rotation
             OrbitalObjectUtils.UpdateRotation(nearestOrbitalObject, deltaSeconds);
@@ -519,6 +521,8 @@ export class StarSystemController {
     public dispose() {
         for (const object of this.orbitalObjects) object.dispose();
         this.systemTargets.forEach((target) => target.dispose());
+
+        this.starFieldBox.dispose();
 
         this.systemTargets = [];
 

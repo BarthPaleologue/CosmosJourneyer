@@ -407,7 +407,6 @@ export class Spaceship implements Transformable {
         let objectHalfThickness = 0;
 
         if (this.warpDrive.isEnabled()) {
-
             if (this.nearestOrbitalObject !== null) {
                 const distanceToClosestOrbitalObject = Vector3.Distance(this.getTransform().getAbsolutePosition(), this.nearestOrbitalObject.getTransform().getAbsolutePosition());
                 const orbitalObjectRadius = this.nearestOrbitalObject.getBoundingRadius();
@@ -429,11 +428,10 @@ export class Spaceship implements Transformable {
                     const ringsMinDistance = ringsUniforms.model.ringStart * this.nearestCelestialBody.getBoundingRadius();
                     const ringsMaxDistance = ringsUniforms.model.ringEnd * this.nearestCelestialBody.getBoundingRadius();
 
-                    if(distanceAboveRings < asteroidField.patchThickness * 1000 && planarDistance > ringsMinDistance - 100e3 && planarDistance < ringsMaxDistance + 100e3) {
-                        closestDistance = distanceAboveRings
+                    if (distanceAboveRings < asteroidField.patchThickness * 1000 && planarDistance > ringsMinDistance - 100e3 && planarDistance < ringsMaxDistance + 100e3) {
+                        closestDistance = distanceAboveRings;
                         objectHalfThickness = asteroidField.patchThickness / 2;
                     }
-
 
                     if (distanceAboveRings < asteroidField.patchThickness * 1.5 && planarDistance > ringsMinDistance && planarDistance < ringsMaxDistance) {
                         console.log(distanceAboveRings);
@@ -441,7 +439,6 @@ export class Spaceship implements Transformable {
                     }
                 }
             }
-
         }
 
         this.warpDrive.update(currentForwardSpeed, closestDistance, objectHalfThickness, deltaSeconds);

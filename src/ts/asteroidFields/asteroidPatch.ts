@@ -16,7 +16,12 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { InstancedMesh, PhysicsBody, PhysicsMotionType, Quaternion, Space, Vector3 } from "@babylonjs/core";
+import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
+import { Quaternion } from "@babylonjs/core/Maths/math";
+import { PhysicsMotionType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { Space } from "@babylonjs/core/Maths/math.axis";
 import { Objects } from "../assets/objects";
 
 export class AsteroidPatch {
@@ -50,8 +55,8 @@ export class AsteroidPatch {
     }
 
     public clearInstances(): void {
-        this.instancePhysicsBodies.forEach(body => body.dispose());
-        this.instances.forEach(instance => instance.dispose());
+        this.instancePhysicsBodies.forEach((body) => body.dispose());
+        this.instances.forEach((instance) => instance.dispose());
 
         this.instancePhysicsBodies.length = 0;
         this.instances.length = 0;
@@ -66,17 +71,17 @@ export class AsteroidPatch {
     public update(controlsPosition: Vector3, deltaSeconds: number): void {
         this.instances.forEach((instance, index) => {
             const distanceToCamera = Vector3.Distance(controlsPosition, instance.getAbsolutePosition());
-            if(distanceToCamera < this.physicsRadius && (instance.physicsBody === null || instance.physicsBody === undefined)) {
+            if (distanceToCamera < this.physicsRadius && (instance.physicsBody === null || instance.physicsBody === undefined)) {
                 const instancePhysicsBody = new PhysicsBody(instance, PhysicsMotionType.DYNAMIC, false, this.parent.getScene());
-                instancePhysicsBody.setMassProperties({mass: 1000});
+                instancePhysicsBody.setMassProperties({ mass: 1000 });
                 instancePhysicsBody.setAngularVelocity(this.rotationAxes[index].scale(this.rotationSpeeds[index]));
                 instancePhysicsBody.setAngularDamping(0);
                 instancePhysicsBody.disablePreStep = false;
                 instancePhysicsBody.shape = Objects.ASTEROID_PHYSICS_SHAPES[this.typeIndices[index]];
                 this.instancePhysicsBodies.push(instancePhysicsBody);
-            } else if(distanceToCamera > this.physicsRadius + 1000 && instance.physicsBody !== null && instance.physicsBody !== undefined) {
-                const body = this.instancePhysicsBodies.find(body => body === instance.physicsBody);
-                if(body) {
+            } else if (distanceToCamera > this.physicsRadius + 1000 && instance.physicsBody !== null && instance.physicsBody !== undefined) {
+                const body = this.instancePhysicsBodies.find((body) => body === instance.physicsBody);
+                if (body) {
                     body.dispose();
                     this.instancePhysicsBodies.splice(this.instancePhysicsBodies.indexOf(body), 1);
                 } else {
@@ -84,7 +89,7 @@ export class AsteroidPatch {
                 }
             }
 
-            if(instance.physicsBody === null || instance.physicsBody === undefined) {
+            if (instance.physicsBody === null || instance.physicsBody === undefined) {
                 instance.rotate(this.rotationAxes[index], this.rotationSpeeds[index] * deltaSeconds, Space.WORLD);
             }
         });
@@ -98,7 +103,7 @@ export class AsteroidPatch {
             instance.alwaysSelectAsActiveMesh = true;
             instance.isPickable = false;
             instance.parent = this.parent;
-            
+
             this.instances.push(instance);
 
             this.nbInstances++;
@@ -110,7 +115,7 @@ export class AsteroidPatch {
     }
 
     public setEnabled(enabled: boolean) {
-        this.instances.forEach(instance => instance.setEnabled(enabled));
+        this.instances.forEach((instance) => instance.setEnabled(enabled));
     }
 
     public dispose() {

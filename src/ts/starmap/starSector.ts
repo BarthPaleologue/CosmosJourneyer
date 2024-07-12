@@ -93,11 +93,9 @@ export class StarSector {
 
     getPositionOfStar(starIndex: number): Vector3 {
         if (starIndex >= this.nbStars) throw new Error(`Star index ${starIndex} is out of bounds for sector ${this.coordinates}`);
-        return new Vector3(
-            centeredRand(this.rng, 10 * starIndex + 1) / 2,
-            centeredRand(this.rng, 10 * starIndex + 2) / 2,
-            centeredRand(this.rng, 10 * starIndex + 3) / 2
-        ).scaleInPlace(StarSector.SIZE).addInPlace(this.position);
+        return new Vector3(centeredRand(this.rng, 10 * starIndex + 1) / 2, centeredRand(this.rng, 10 * starIndex + 2) / 2, centeredRand(this.rng, 10 * starIndex + 3) / 2)
+            .scaleInPlace(StarSector.SIZE)
+            .addInPlace(this.position);
     }
 
     /**

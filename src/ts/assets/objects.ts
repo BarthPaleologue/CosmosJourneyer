@@ -25,6 +25,7 @@ import banana from "../../asset/banana/banana.glb";
 import character from "../../asset/character/character.glb";
 import rock from "../../asset/rock.glb";
 import asteroid from "../../asset/asteroid/asteroid.glb";
+import asteroid2 from "../../asset/asteroid/asteroid2.glb";
 import tree from "../../asset/tree/tree.babylon";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
@@ -38,8 +39,9 @@ import "@babylonjs/loaders";
 import "@babylonjs/core/Loading/Plugins/babylonFileLoader";
 import "@babylonjs/core/Animations/animatable";
 import sphericalTank from "../../asset/SpaceStationParts/sphericalTank.glb";
-import { PhysicsShape, PhysicsShapeMesh } from "@babylonjs/core";
+
 import { CollisionMask } from "../settings";
+import { PhysicsShape, PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
 
 export class Objects {
     private static SPACESHIP: Mesh;
@@ -131,42 +133,46 @@ export class Objects {
             console.log("Rock loaded");
         };
 
-        const asteroidTask = manager.addMeshTask("asteroidTask", "", "", asteroid);
-        asteroidTask.onSuccess = function (task: MeshAssetTask) {
-            const asteroid = task.loadedMeshes[0].getChildMeshes()[0] as Mesh;
-            asteroid.setParent(null);
-            asteroid.scaling.scaleInPlace(100);
-            asteroid.bakeCurrentTransformIntoVertices();
-            asteroid.setEnabled(false);
+        const asteroidUrls = [asteroid, asteroid2];
 
-            Objects.ASTEROIDS.push(asteroid);
+        asteroidUrls.forEach((url, index) => {
+            const asteroidTask = manager.addMeshTask(`asteroidTask${index}`, "", "", url);
+            asteroidTask.onSuccess = function (task: MeshAssetTask) {
+                const asteroid = task.loadedMeshes[0].getChildMeshes()[0] as Mesh;
+                asteroid.setParent(null);
+                asteroid.scaling.scaleInPlace(100);
+                asteroid.bakeCurrentTransformIntoVertices();
+                asteroid.setEnabled(false);
 
-            const physicsShape = new PhysicsShapeMesh(asteroid, scene);
-            physicsShape.filterMembershipMask = CollisionMask.ENVIRONMENT;
-            physicsShape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
+                Objects.ASTEROIDS.push(asteroid);
 
-            Objects.ASTEROID_PHYSICS_SHAPES.push(physicsShape);
+                const physicsShape = new PhysicsShapeMesh(asteroid, scene);
+                physicsShape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+                physicsShape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
 
-            const scalings = [0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7, 1.9, 2.1, 2.3]
-            for(let i = 0; i < scalings.length; i++) {
-                const asteroidClone = asteroid.clone("asteroidClone" + i);
-                asteroidClone.makeGeometryUnique();
-                asteroidClone.setParent(null);
-                asteroidClone.scaling.scaleInPlace(scalings[i]);
-                asteroidClone.bakeCurrentTransformIntoVertices();
-                asteroidClone.setEnabled(false);
+                Objects.ASTEROID_PHYSICS_SHAPES.push(physicsShape);
 
-                Objects.ASTEROIDS.push(asteroidClone);
+                const scalings = [0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7, 1.9, 2.1];
+                for (let i = 0; i < scalings.length; i++) {
+                    const asteroidClone = asteroid.clone("asteroidClone" + i);
+                    asteroidClone.makeGeometryUnique();
+                    asteroidClone.setParent(null);
+                    asteroidClone.scaling.scaleInPlace(scalings[i]);
+                    asteroidClone.bakeCurrentTransformIntoVertices();
+                    asteroidClone.setEnabled(false);
 
-                const physicsShapeClone = new PhysicsShapeMesh(asteroidClone, scene);
-                physicsShapeClone.filterMembershipMask = CollisionMask.ENVIRONMENT;
-                physicsShapeClone.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
+                    Objects.ASTEROIDS.push(asteroidClone);
 
-                Objects.ASTEROID_PHYSICS_SHAPES.push(physicsShapeClone);
-            }
+                    const physicsShapeClone = new PhysicsShapeMesh(asteroidClone, scene);
+                    physicsShapeClone.filterMembershipMask = CollisionMask.ENVIRONMENT;
+                    physicsShapeClone.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
 
-            console.log("Asteroid loaded");
-        };
+                    Objects.ASTEROID_PHYSICS_SHAPES.push(physicsShapeClone);
+                }
+
+                console.log(`Asteroid${index} loaded`);
+            };
+        });
 
         const treeTask = manager.addMeshTask("treeTask", "", "", tree);
         treeTask.onSuccess = function (task: MeshAssetTask) {

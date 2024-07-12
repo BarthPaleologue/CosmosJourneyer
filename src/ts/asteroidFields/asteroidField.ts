@@ -45,7 +45,7 @@ export class AsteroidField implements IDisposable {
 
     readonly neighborCellsRenderRadius = 2;
 
-    private readonly patches = new Map<string, { patch: AsteroidPatch, cellX: number, cellZ: number }>();
+    private readonly patches = new Map<string, { patch: AsteroidPatch; cellX: number; cellZ: number }>();
 
     readonly scene: Scene;
 
@@ -114,14 +114,22 @@ export class AsteroidField implements IDisposable {
 
                 if (this.patches.has(`${cellX};${cellZ}`)) continue;
 
-                if ((cameraCellX - cellX) ** 2 + cameraCellY * cameraCellY + (cameraCellZ - cellZ) ** 2 >= this.neighborCellsRenderRadius * this.neighborCellsRenderRadius) continue;
+                if ((cameraCellX - cellX) ** 2 + cameraCellY * cameraCellY + (cameraCellZ - cellZ) ** 2 >= this.neighborCellsRenderRadius * this.neighborCellsRenderRadius)
+                    continue;
 
                 const cellCoords = new Vector3(cellX * this.patchSize, 0, cellZ * this.patchSize);
 
-                const [positions, rotations, typeIndices, rotationAxes, rotationSpeeds] = AsteroidField.CreateAsteroidBuffer(cellCoords, this.resolution, this.patchSize, this.patchThickness, this.minRadius, this.maxRadius, this.rng);
+                const [positions, rotations, typeIndices, rotationAxes, rotationSpeeds] = AsteroidField.CreateAsteroidBuffer(
+                    cellCoords,
+                    this.resolution,
+                    this.patchSize,
+                    this.patchThickness,
+                    this.minRadius,
+                    this.maxRadius,
+                    this.rng
+                );
                 const patch = new AsteroidPatch(positions, rotations, typeIndices, rotationAxes, rotationSpeeds, this.parent);
                 patch.createInstances();
-
 
                 this.patches.set(`${cellX};${cellZ}`, { patch: patch, cellX: cellX, cellZ: cellZ });
             }
@@ -145,7 +153,15 @@ export class AsteroidField implements IDisposable {
      * @param rng A random number generator
      * @returns A new matrix 4x4 buffer
      */
-    static CreateAsteroidBuffer(position: Vector3, resolution: number, patchSize: number, patchThickness: number, minRadius: number, maxRadius: number, rng: (index: number) => number): [Vector3[], Quaternion[], number[], Vector3[], number[]] {
+    static CreateAsteroidBuffer(
+        position: Vector3,
+        resolution: number,
+        patchSize: number,
+        patchThickness: number,
+        minRadius: number,
+        maxRadius: number,
+        rng: (index: number) => number
+    ): [Vector3[], Quaternion[], number[], Vector3[], number[]] {
         const positions = [];
         const rotations = [];
         const asteroidTypeIndices = [];
@@ -158,7 +174,7 @@ export class AsteroidField implements IDisposable {
         const cellSize = patchSize / resolution;
         for (let x = 0; x < resolution; x++) {
             for (let z = 0; z < resolution; z++) {
-                const asteroidIndex = (cellIndex / 1000e3) + (x * resolution + z) / 1000;
+                const asteroidIndex = cellIndex / 1000e3 + (x * resolution + z) / 1000;
                 const randomCellPositionX = rng(asteroidIndex) * cellSize;
                 const randomCellPositionZ = rng(asteroidIndex + 4621) * cellSize;
                 const positionX = position.x + x * cellSize - patchSize / 2 + randomCellPositionX;

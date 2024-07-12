@@ -19,6 +19,9 @@ import { AssetsManager } from "@babylonjs/core/Misc/assetsManager";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import { Scene } from "@babylonjs/core/scene";
+import "@babylonjs/core/Materials/Textures/Loaders/envTextureLoader";
+import "@babylonjs/core/Helpers/sceneHelpers";
+import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 
 import rockNormalMetallicMap from "../../asset/rockMaterial/layered-planetary_normal_metallic.png";
 import rockAlbedoRoughnessMap from "../../asset/rockMaterial/layered-planetary_albedo_roughness.png";
@@ -32,12 +35,13 @@ import sandNormalMetallicMap from "../../asset/sandMaterial/wavy-sand_normal_met
 import sandAlbedoRoughnessMap from "../../asset/sandMaterial/wavy-sand_albedo_roughness.png";
 import waterNormal1 from "../../asset/textures/waterNormalMap3.jpg";
 import waterNormal2 from "../../asset/textures/waterNormalMap4.jpg";
-import starfield from "../../asset/textures/milkyway.jpg";
 import plumeParticle from "../../asset/textures/plume.png";
 import flareParticle from "../../asset/flare.png";
 import seamlessPerlin from "../../asset/perlin.png";
 import atmosphereLUT from "../../shaders/textures/atmosphereLUT.glsl";
 import empty from "../../asset/oneBlackPixel.png";
+
+import skyBox from "../../asset/skybox/milkyway.env";
 
 import cursorImage from "../../asset/textures/hoveredCircle.png";
 
@@ -56,7 +60,7 @@ import metalPanelsAlbdeo from "../../asset/metalPanelMaterial/sci-fi-panel1-albe
 import metalPanelsNormal from "../../asset/metalPanelMaterial/sci-fi-panel1-normal-dx.png";
 import metalPanelsRoughness from "../../asset/metalPanelMaterial/sci-fi-panel1-roughness.png";
 import metalPanelsMetallic from "../../asset/metalPanelMaterial/sci-fi-panel1-metallic.png";
-import metalPanelsAmbientOcclusion from "../../asset/spaceStationMaterial/spaceship-panels1-ao.png";
+import metalPanelsAmbientOcclusion from "../../asset/metalPanelMaterial/sci-fi-panel1-ao.png";
 
 import crateAlbedo from "../../asset/crateMaterial/space-crate1-albedo.png";
 import crateNormal from "../../asset/crateMaterial/space-crate1-normal-dx.png";
@@ -82,7 +86,6 @@ export class Textures {
     static WATER_NORMAL_MAP_1: Texture;
     static WATER_NORMAL_MAP_2: Texture;
 
-    static STAR_FIELD: Texture;
     static PLUME_PARTICLE: Texture;
 
     static FLARE_TEXTURE: Texture;
@@ -117,6 +120,8 @@ export class Textures {
     static CRATE_METALLIC_ROUGHNESS: Texture;
     static CRATE_AMBIENT_OCCLUSION: Texture;
 
+    static MILKY_WAY: CubeTexture;
+
     static EnqueueTasks(manager: AssetsManager, scene: Scene) {
         manager.addTextureTask("RockNormalMetallicMap", rockNormalMetallicMap).onSuccess = (task) => (Textures.ROCK_NORMAL_METALLIC_MAP = task.texture);
         manager.addTextureTask("RockAlbedoRoughnessMap", rockAlbedoRoughnessMap).onSuccess = (task) => (Textures.ROCK_ALBEDO_ROUGHNESS_MAP = task.texture);
@@ -135,8 +140,6 @@ export class Textures {
 
         manager.addTextureTask("WaterNormalMap1", waterNormal1).onSuccess = (task) => (Textures.WATER_NORMAL_MAP_1 = task.texture);
         manager.addTextureTask("WaterNormalMap2", waterNormal2).onSuccess = (task) => (Textures.WATER_NORMAL_MAP_2 = task.texture);
-
-        manager.addTextureTask("Starfield", starfield).onSuccess = (task) => (Textures.STAR_FIELD = task.texture);
 
         manager.addTextureTask("PlumeParticle", plumeParticle).onSuccess = (task) => (Textures.PLUME_PARTICLE = task.texture);
         manager.addTextureTask("FlareTexture", flareParticle).onSuccess = (task) => (Textures.FLARE_TEXTURE = task.texture);
@@ -164,6 +167,8 @@ export class Textures {
         manager.addTextureTask("CrateNormal", crateNormal).onSuccess = (task) => (Textures.CRATE_NORMAL = task.texture);
         manager.addTextureTask("CrateMetallicRoughness", crateMetallicRoughness).onSuccess = (task) => (Textures.CRATE_METALLIC_ROUGHNESS = task.texture);
         manager.addTextureTask("CrateAmbientOcclusion", crateAmbientOcclusion).onSuccess = (task) => (Textures.CRATE_AMBIENT_OCCLUSION = task.texture);
+
+        manager.addCubeTextureTask("SkyBox", skyBox).onSuccess = (task) => (Textures.MILKY_WAY = task.texture);
 
         Textures.ATMOSPHERE_LUT = new ProceduralTexture("atmosphereLUT", 100, { fragmentSource: atmosphereLUT }, scene, undefined, false, false);
         Textures.ATMOSPHERE_LUT.refreshRate = 0;

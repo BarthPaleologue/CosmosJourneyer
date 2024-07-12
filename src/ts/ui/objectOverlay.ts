@@ -29,7 +29,6 @@ import { TypedObject } from "../architecture/typedObject";
 import { Textures } from "../assets/textures";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
-
 export class ObjectOverlay {
     readonly textRoot: StackPanel;
     readonly cursor: Image;

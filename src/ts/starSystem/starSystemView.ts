@@ -329,9 +329,11 @@ export class StarSystemView implements View {
             }
         });
 
-        this.scene = new UberScene(engine, ScenePerformancePriority.Intermediate);
+        this.scene = new UberScene(engine);
         // The right-handed system allows to use directly GLTF models without having to flip them with a transform
         this.scene.useRightHandedSystem = true;
+        this.scene.skipPointerMovePicking = true;
+        this.scene.autoClear = false;
 
         this.havokPlugin = new HavokPlugin(true, havokInstance);
         setMaxLinVel(this.havokPlugin, 10000, 10000);
@@ -350,7 +352,7 @@ export class StarSystemView implements View {
         });
 
         this.scene.onBeforeRenderObservable.add(() => {
-            const deltaSeconds = engine.getDeltaTime() * Settings.TIME_MULTIPLIER / 1000;
+            const deltaSeconds = (engine.getDeltaTime() * Settings.TIME_MULTIPLIER) / 1000;
             this.updateBeforeRender(deltaSeconds);
         });
 
@@ -729,7 +731,7 @@ export class StarSystemView implements View {
         const targetSystemUniversePosition = targetSystemStarSector.getPositionOfStar(targetSeed.index);
 
         const direction = targetSystemUniversePosition.subtract(currentSystemUniversePosition).normalize();
-        direction.applyRotationQuaternionInPlace(currentSystem.universeRotation);
+        Vector3.TransformCoordinatesToRef(direction, currentSystem.starFieldBox.getRotationMatrix(), direction);
 
         const distance = StarMap.StarMapDistanceToLy(Vector3.Distance(currentSystemUniversePosition, targetSystemUniversePosition));
 
