@@ -107,6 +107,7 @@ export class ShipControls implements Controls {
 
             Sounds.LANDING_REQUEST_GRANTED.play();
             Sounds.STRAUSS_BLUE_DANUBE.play();
+            Sounds.STRAUSS_BLUE_DANUBE.setVolume(1, 1);
             createNotification(`Landing request granted. Proceed to pad ${landingPad.padNumber}`, 30000);
             this.spaceship.engageLandingOnPad(landingPad);
         });
@@ -121,7 +122,8 @@ export class ShipControls implements Controls {
 
         this.spaceship.onLandingObservable.add(() => {
             Sounds.LANDING_COMPLETE.play();
-            Sounds.STRAUSS_BLUE_DANUBE.stop();
+            Sounds.STRAUSS_BLUE_DANUBE.setVolume(0, 2);
+            Sounds.STRAUSS_BLUE_DANUBE.stop(2);
 
             if(!this.spaceship.isLandedAtFacility()) {
                 const bindingsString = pressInteractionToStrings(StarSystemInputs.map.toggleSpaceShipCharacter).join(", ");
