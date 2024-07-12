@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { RingHabitatMaterial } from "./ringHabitatMaterial";
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Scene } from "@babylonjs/core/scene";
@@ -32,13 +31,14 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { createEnvironmentAggregate } from "../../../utils/physics";
 import { createRing } from "../../../utils/ringBuilder";
 import { SpaceStationModel } from "../../../spacestation/spacestationModel";
+import { LandingBayMaterial } from "./landingBayMaterial";
 
 export class LandingBay {
     private readonly root: TransformNode;
 
     private readonly radius: number;
 
-    private readonly ringMaterial: RingHabitatMaterial;
+    private readonly landingBayMaterial: LandingBayMaterial;
     private readonly metalSectionMaterial: MetalSectionMaterial;
 
     private readonly ring: Mesh;
@@ -69,8 +69,8 @@ export class LandingBay {
 
         this.ring = createRing(this.radius, deltaRadius, heightFactor * deltaRadius, nbSteps, scene);
 
-        this.ringMaterial = new RingHabitatMaterial(stationModel, this.radius, deltaRadius, heightFactor, scene);
-        this.ring.material = this.ringMaterial;
+        this.landingBayMaterial = new LandingBayMaterial(stationModel, this.radius, deltaRadius, heightFactor, scene);
+        this.ring.material = this.landingBayMaterial;
 
         this.ring.parent = this.getTransform();
 
@@ -146,7 +146,7 @@ export class LandingBay {
 
     update(stellarObjects: Transformable[], cameraWorldPosition: Vector3, deltaSeconds: number) {
         this.getTransform().rotate(Axis.Y, deltaSeconds / computeRingRotationPeriod(this.radius, Settings.G_EARTH * 0.1));
-        this.ringMaterial.update(stellarObjects);
+        this.landingBayMaterial.update(stellarObjects);
         this.metalSectionMaterial.update(stellarObjects);
         this.landingPads.forEach((landingPad) => landingPad.update(stellarObjects));
 
@@ -178,7 +178,7 @@ export class LandingBay {
         this.ringAggregate?.dispose();
         this.ringAggregate = null;
 
-        this.ringMaterial.dispose();
+        this.landingBayMaterial.dispose();
         this.metalSectionMaterial.dispose();
         this.arms.forEach((arm) => arm.dispose());
 

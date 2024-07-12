@@ -29,6 +29,8 @@ uniform sampler2D metallic;
 uniform sampler2D roughness;
 uniform sampler2D occlusion;
 
+uniform sampler2D namePlate;
+
 uniform float deltaRadius;
 uniform float meanRadius;
 
@@ -52,10 +54,20 @@ void main() {
 
     float gamma = 2.2;
 
-    vec3 albedoColor = pow(texture2D(albedo, vUV).rgb, vec3(gamma));
-    float roughnessColor = texture2D(roughness, vUV).r;
-    float metallicColor = texture2D(metallic, vUV).r;
-    float occlusionColor = texture2D(occlusion, vUV).r;
+    vec2 planarPosition = normalize(vPosition.xz);
+    float theta = atan2(planarPosition.y, planarPosition.x);
+    float distanceToCenter = length(vPosition.xz);
+    distanceToCenter = remap(distanceToCenter, meanRadius - deltaRadius / 2.0, meanRadius + deltaRadius / 2.0, 0.0, 1.0);
+
+    vec2 uv = vec2(theta * meanRadius / deltaRadius, vUV.y);
+    if(vNormal.y != 0.0) {
+        uv.y = distanceToCenter;
+    }
+
+    vec3 albedoColor = pow(texture2D(albedo, uv).rgb, vec3(gamma));
+    float roughnessColor = texture2D(roughness, uv).r;
+    float metallicColor = texture2D(metallic, uv).r;
+    float occlusionColor = texture2D(occlusion, uv).r;
 
     vec3 tangent1 = normalize(dFdx(vPositionW));
     vec3 tangent2 = normalize(dFdy(vPositionW));
@@ -63,17 +75,28 @@ void main() {
     vec3 bitangent = cross(normalW, tangent1);
     mat3 TBN = mat3(tangent1, tangent2, normalW);
 
-    vec3 normalMap = texture2D(normal, vUV).rgb;
+    vec3 normalMap = texture2D(normal, uv).rgb;
     normalMap = normalize(normalMap * 2.0 - 1.0);
     normalW = normalize(TBN * normalMap);
+
+    vec2 namePlateUV = vec2(theta / (PI), distanceToCenter);
+    if (vNormal.y < 1.0) {
+        namePlateUV *= 0.0;
+    }
+
+    vec4 namePlate = texture2D(namePlate, fract(namePlateUV));
+    float paintWeight = namePlate.a;
+
+    albedoColor = mix(albedoColor, namePlate.rgb, paintWeight);
+    metallicColor = mix(metallicColor, 0.0, paintWeight);
+    roughnessColor = mix(roughnessColor, 0.7, paintWeight);
+    normalW = mix(normalW, TBN[2], paintWeight * 0.7);
 
     vec3 Lo = vec3(0.0);
     for(int i = 0; i < nbStars; i++) {
         vec3 lightDirectionW = normalize(star_positions[i] - vPositionW);
         Lo += calculateLight(albedoColor, normalW, roughnessColor, metallicColor, lightDirectionW, viewDirectionW, star_colors[i]);
     }
-
-    Lo += smoothstep(0.48, 0.5, fract(vUV.x)) * smoothstep(0.52, 0.5, fract(vUV.x)) * smoothstep(0.4, 0.45, fract(vUV.y)) * smoothstep(0.6, 0.55, fract(vUV.y)) * vec3(1.0, 1.0, 0.4);
 
     // occlusion
     //Lo *= mix(1.0, occlusionColor, 0.5);
