@@ -106,6 +106,7 @@ export class ShipControls implements Controls {
             }
 
             Sounds.LANDING_REQUEST_GRANTED.play();
+            Sounds.STRAUSS_BLUE_DANUBE.play();
             createNotification(`Landing request granted. Proceed to pad ${landingPad.padNumber}`, 30000);
             this.spaceship.engageLandingOnPad(landingPad);
         });
@@ -129,7 +130,6 @@ export class ShipControls implements Controls {
         });
 
         this.spaceship.onLandingEngaged.add(() => {
-            Sounds.STRAUSS_BLUE_DANUBE.play();
             createNotification(i18n.t("notifications:landingSequenceEngaged"), 5000);
         });
     }
