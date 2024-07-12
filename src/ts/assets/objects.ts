@@ -42,6 +42,7 @@ import sphericalTank from "../../asset/SpaceStationParts/sphericalTank.glb";
 
 import { CollisionMask } from "../settings";
 import { PhysicsShape, PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 
 export class Objects {
     private static SPACESHIP: Mesh;
@@ -61,6 +62,8 @@ export class Objects {
     public static GRASS_BLADE: Mesh;
 
     public static SPHERICAL_TANK: Mesh;
+
+    public static CRATE: Mesh;
 
     public static EnqueueTasks(manager: AssetsManager, scene: Scene) {
         const spaceshipTask = manager.addMeshTask("spaceshipTask", "", "", spaceship);
@@ -220,6 +223,9 @@ export class Objects {
 
         Objects.GRASS_BLADE = createGrassBlade(scene, 3);
         Objects.GRASS_BLADE.isVisible = false;
+
+        Objects.CRATE = MeshBuilder.CreateBox("crate", { size: 1 }, scene);
+        Objects.CRATE.isVisible = false;
 
         manager.onProgress = (remainingCount, totalCount) => {
             const loadingScreen = scene.getEngine().loadingScreen;

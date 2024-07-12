@@ -1,18 +1,18 @@
 import { Transformable } from "../../../architecture/transformable";
 import { Mesh } from "@babylonjs/core/Meshes";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { PBRMetallicRoughnessMaterial } from "@babylonjs/core/Materials/PBR/pbrMetallicRoughnessMaterial";
 import { Scene } from "@babylonjs/core/scene";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { LandingPadMaterial } from "./landingPadMaterial";
-import { Textures } from "../../textures";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { CollisionMask } from "../../../settings";
 import { TypedObject } from "../../../architecture/typedObject";
 import i18n from "../../../i18n";
 import { BoundingSphere } from "../../../architecture/boundingSphere";
+import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
+import { Objects } from "../../objects";
 
 export const enum LandingPadSize {
     SMALL = 1,
@@ -26,8 +26,7 @@ export class LandingPad implements Transformable, TypedObject, BoundingSphere {
 
     private readonly deckMaterial: LandingPadMaterial;
 
-    private readonly crates: Mesh[] = [];
-    private readonly crateMaterial: PBRMetallicRoughnessMaterial;
+    private readonly crates: InstancedMesh[] = [];
 
     readonly padNumber: number;
     readonly padSize: LandingPadSize;
@@ -55,20 +54,14 @@ export class LandingPad implements Transformable, TypedObject, BoundingSphere {
         this.deckAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
         this.deckAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
 
-        this.crateMaterial = new PBRMetallicRoughnessMaterial("crateMaterial", scene);
-        this.crateMaterial.baseTexture = Textures.CRATE_ALBEDO;
-        this.crateMaterial.normalTexture = Textures.CRATE_NORMAL;
-        this.crateMaterial.metallicRoughnessTexture = Textures.CRATE_METALLIC_ROUGHNESS;
-        //this.crateMaterial.occlusionTexture = Textures.CRATE_AMBIENT_OCCLUSION;
-
         const nbBoxes = Math.floor(Math.random() * 30);
         for (let i = 0; i < nbBoxes; i++) {
             const corner1 = Math.random() < 0.5 ? -1 : 1;
             const corner2 = Math.random() < 0.5 ? -1 : 1;
 
             const crateSize = Math.random() < 0.2 ? 0.5 : 1;
-            const crate = MeshBuilder.CreateBox("crate", { size: crateSize }, scene);
-            crate.material = this.crateMaterial;
+            const crate = Objects.CRATE.createInstance(`crate${i}`);
+            crate.scaling.scaleInPlace(crateSize);
             crate.parent = this.deck;
             crate.position.y += 0.25 + crateSize / 2;
 
@@ -107,8 +100,7 @@ export class LandingPad implements Transformable, TypedObject, BoundingSphere {
         this.deck.dispose();
         this.deckAggregate.dispose();
         this.deckMaterial.dispose();
-        this.crates.forEach((box) => box.dispose());
-        this.crateMaterial.dispose();
+        this.crates.forEach((crate) => crate.dispose());
     }
 
     getTypeName(): string {

@@ -20,6 +20,8 @@ import { GrassMaterial } from "./procedural/grass/grassMaterial";
 import { Scene } from "@babylonjs/core/scene";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { PBRMetallicRoughnessMaterial } from "@babylonjs/core/Materials/PBR/pbrMetallicRoughnessMaterial";
+import { Textures } from "./textures";
 
 export class Materials {
     public static BUTTERFLY_MATERIAL: ButterflyMaterial;
@@ -27,6 +29,8 @@ export class Materials {
 
     public static GRASS_MATERIAL: GrassMaterial;
     public static GRASS_DEPTH_MATERIAL: GrassMaterial;
+    
+    public static CRATE_MATERIAL: PBRMetallicRoughnessMaterial;
 
     public static Init(scene: Scene) {
         Materials.BUTTERFLY_MATERIAL = new ButterflyMaterial(scene, false);
@@ -34,6 +38,11 @@ export class Materials {
 
         Materials.GRASS_MATERIAL = new GrassMaterial(scene, false);
         Materials.GRASS_DEPTH_MATERIAL = new GrassMaterial(scene, true);
+
+        Materials.CRATE_MATERIAL = new PBRMetallicRoughnessMaterial("crateMaterial", scene);
+        Materials.CRATE_MATERIAL.baseTexture = Textures.CRATE_ALBEDO;
+        Materials.CRATE_MATERIAL.normalTexture = Textures.CRATE_NORMAL;
+        Materials.CRATE_MATERIAL.metallicRoughnessTexture = Textures.CRATE_METALLIC_ROUGHNESS;
     }
 
     static DebugMaterial(name: string, diffuse: boolean, wireframe: boolean, scene: Scene) {

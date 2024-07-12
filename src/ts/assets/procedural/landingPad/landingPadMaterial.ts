@@ -43,7 +43,7 @@ export class LandingPadMaterial extends ShaderMaterial {
             samplers: [...Object.values(LandingPadSamplerNames)]
         });
 
-        const textureResolution = 2048;
+        const textureResolution = 1024;
         const numberTexture = new DynamicTexture(
             `PadNumberTexture${padNumber}`,
             {
@@ -54,7 +54,7 @@ export class LandingPadMaterial extends ShaderMaterial {
         );
 
         //Add text to dynamic texture
-        const font = `bold 512px ${Settings.MAIN_FONT}`;
+        const font = `bold 256px ${Settings.MAIN_FONT}`;
         numberTexture.drawText(`${padNumber}`, null, null, font, "white", null, true, true);
 
         this.onBindObservable.add(() => {
