@@ -328,9 +328,11 @@ export class StarSystemView implements View {
             }
         });
 
-        this.scene = new UberScene(engine, ScenePerformancePriority.Intermediate);
+        this.scene = new UberScene(engine);
         // The right-handed system allows to use directly GLTF models without having to flip them with a transform
         this.scene.useRightHandedSystem = true;
+        this.scene.skipPointerMovePicking = true;
+        this.scene.autoClear = false;
 
         this.havokPlugin = new HavokPlugin(true, havokInstance);
         setMaxLinVel(this.havokPlugin, 10000, 10000);
