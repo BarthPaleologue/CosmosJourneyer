@@ -311,7 +311,7 @@ export class StarSystemController {
                     case PostProcessType.VOLUMETRIC_LIGHT:
                         if (!(object instanceof Star) && !(object instanceof NeutronStar))
                             throw new Error("Volumetric light post process can only be added to stars and neutron stars. Source:" + object.name);
-                        postProcessManager.addVolumetricLight(object);
+                        postProcessManager.addVolumetricLight(object, [this.starFieldBox.mesh]);
                         break;
                     case PostProcessType.MANDELBULB:
                         if (!(object instanceof Mandelbulb)) throw new Error("Mandelbulb post process can only be added to mandelbulbs. Source:" + object.name);

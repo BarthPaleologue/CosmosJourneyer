@@ -52,6 +52,7 @@ import { JuliaSetPostProcess } from "../anomalies/julia/juliaSetPostProcess";
 import { JuliaSet } from "../anomalies/julia/juliaSet";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 
 /**
  * The order in which the post processes are rendered when away from a planet
@@ -308,9 +309,10 @@ export class PostProcessManager {
     /**
      * Creates a new VolumetricLight postprocess for the given star and adds it to the manager.
      * @param star A star
+     * @param excludedMeshes
      */
-    public addVolumetricLight(star: Star | NeutronStar) {
-        this.volumetricLights.push(new VolumetricLight(star, this.scene));
+    public addVolumetricLight(star: Star | NeutronStar, excludedMeshes: AbstractMesh[]) {
+        this.volumetricLights.push(new VolumetricLight(star, excludedMeshes, this.scene));
     }
 
     /**
