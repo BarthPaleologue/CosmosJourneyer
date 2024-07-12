@@ -101,7 +101,6 @@ export class WarpDrive implements ReadonlyWarpDrive {
      */
     private state = WarpDriveState.DISABLED;
 
-
     constructor(enabledByDefault = false) {
         this.state = enabledByDefault ? WarpDriveState.ENABLED : WarpDriveState.DISABLED;
     }

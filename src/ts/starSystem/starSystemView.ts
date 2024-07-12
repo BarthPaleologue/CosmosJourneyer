@@ -351,7 +351,7 @@ export class StarSystemView implements View {
         });
 
         this.scene.onBeforeRenderObservable.add(() => {
-            const deltaSeconds = engine.getDeltaTime() * Settings.TIME_MULTIPLIER / 1000;
+            const deltaSeconds = (engine.getDeltaTime() * Settings.TIME_MULTIPLIER) / 1000;
             this.updateBeforeRender(deltaSeconds);
         });
 
