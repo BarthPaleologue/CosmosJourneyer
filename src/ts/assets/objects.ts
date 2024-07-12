@@ -40,8 +40,8 @@ import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import "@babylonjs/loaders";
 import "@babylonjs/core/Loading/Plugins/babylonFileLoader";
 import "@babylonjs/core/Animations/animatable";
-import { PhysicsShape, PhysicsShapeMesh } from "@babylonjs/core";
 import { CollisionMask } from "../settings";
+import { PhysicsShape, PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
 
 export class Objects {
     private static SPACESHIP: Mesh;
