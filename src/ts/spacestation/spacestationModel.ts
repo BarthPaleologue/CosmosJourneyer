@@ -27,8 +27,10 @@ import { clamp } from "../utils/math";
 import { GenerationSteps } from "../utils/generationSteps";
 import { CropType, CropTypes } from "../utils/agriculture";
 import { randomPieChart } from "../utils/random";
+import { generateSpaceStationName } from "../utils/spaceStationNameGenerator";
 
 export class SpaceStationModel implements OrbitalObjectModel {
+    readonly name: string;
     readonly seed: number;
     readonly rng: (step: number) => number;
     readonly orbit: OrbitProperties;
@@ -51,6 +53,8 @@ export class SpaceStationModel implements OrbitalObjectModel {
     constructor(seed: number, parentBody?: CelestialBodyModel) {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed);
+        
+        this.name = generateSpaceStationName(this.rng, 2756);
 
         this.parentBody = parentBody ?? null;
         this.childrenBodies = [];

@@ -27,12 +27,15 @@ import {
     StellarObjectUniformNames
 } from "../../../postProcesses/uniforms/stellarObjectUniforms";
 import { Textures } from "../../textures";
+import { DynamicTexture } from "@babylonjs/core";
+import { Settings } from "../../../settings";
+import { SpaceStationModel } from "../../../spacestation/spacestationModel";
 
 const RingHabitatUniformNames = {
     WORLD: "world",
     WORLD_VIEW_PROJECTION: "worldViewProjection",
     CAMERA_POSITION: "cameraPosition",
-    CIRCUMFERENCE: "circumference",
+    MEAN_RADIUS: "meanRadius",
     DELTA_RADIUS: "deltaRadius",
     HEIGHT: "height"
 }
@@ -43,12 +46,13 @@ const RingHabitatSamplerNames = {
     METALLIC: "metallic",
     ROUGHNESS: "roughness",
     OCCLUSION: "occlusion",
+    NAME_PLATE: "namePlate"
 }
 
 export class RingHabitatMaterial extends ShaderMaterial {
     private stellarObjects: Transformable[] = [];
 
-    constructor(circumference: number, deltaRadius: number, height: number, scene: Scene) {
+    constructor(stationModel: SpaceStationModel, meanRadius: number, deltaRadius: number, height: number, scene: Scene) {
         const shaderName = "ringHabitatMaterial";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = ringHabitatMaterialFragment;
@@ -68,6 +72,25 @@ export class RingHabitatMaterial extends ShaderMaterial {
             ]
         });
 
+        const circumference = 2 * Math.PI * meanRadius;
+
+        const aspectRatio = 0.5 * circumference / deltaRadius;
+
+        const textureResolution = 256;
+        const namePlateTexture = new DynamicTexture(
+            `NamePlateTexture`,
+            {
+                width: textureResolution * aspectRatio,
+                height: textureResolution
+            },
+            scene
+        );
+
+        const font_size = 128;
+
+        //Add text to dynamic texture
+        namePlateTexture.drawText(stationModel.name, null, null, `${font_size}px ${Settings.MAIN_FONT}`, "white", null, true, true);
+
         this.onBindObservable.add(() => {
             const activeCamera = scene.activeCamera;
             if(activeCamera === null) {
@@ -75,7 +98,7 @@ export class RingHabitatMaterial extends ShaderMaterial {
             }
 
             this.getEffect().setVector3(RingHabitatUniformNames.CAMERA_POSITION, activeCamera.globalPosition);
-            this.getEffect().setFloat(RingHabitatUniformNames.CIRCUMFERENCE, circumference);
+            this.getEffect().setFloat(RingHabitatUniformNames.MEAN_RADIUS, meanRadius);
             this.getEffect().setFloat(RingHabitatUniformNames.DELTA_RADIUS, deltaRadius);
             this.getEffect().setFloat(RingHabitatUniformNames.HEIGHT, height);
 
@@ -86,6 +109,12 @@ export class RingHabitatMaterial extends ShaderMaterial {
             this.getEffect().setTexture(RingHabitatSamplerNames.METALLIC, Textures.SPACE_STATION_METALLIC);
             this.getEffect().setTexture(RingHabitatSamplerNames.ROUGHNESS, Textures.SPACE_STATION_ROUGHNESS);
             this.getEffect().setTexture(RingHabitatSamplerNames.OCCLUSION, Textures.SPACE_STATION_AMBIENT_OCCLUSION);
+
+            this.getEffect().setTexture(RingHabitatSamplerNames.NAME_PLATE, namePlateTexture);
+        });
+
+        this.onDisposeObservable.add(() => {
+            namePlateTexture.dispose();
         });
     }
 

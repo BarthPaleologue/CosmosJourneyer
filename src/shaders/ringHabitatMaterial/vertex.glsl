@@ -24,14 +24,17 @@ attribute vec2 uv;
 uniform mat4 world;
 uniform mat4 view;
 uniform mat4 worldViewProjection;
-uniform float circumference;
+uniform float meanRadius;
 uniform float deltaRadius;
 uniform float height;
 
 varying vec3 vPositionW;
 varying vec3 vNormalW;
 varying vec3 vPosition;
+varying vec3 vNormal;
 varying vec2 vUV;
+
+#include "../utils/pi.glsl";
 
 void main() {
     vec4 outPosition = worldViewProjection * vec4(position, 1.0);
@@ -40,14 +43,15 @@ void main() {
     vPositionW = vec3(world * vec4(position, 1.0));
     vNormalW = vec3(world * vec4(normal, 0.0));
     vPosition = position;
+    vNormal = normal;
 
     vUV = uv;
 
     // we then repeat the texture around the circle
-    vUV.x *= circumference / deltaRadius;
+    vUV.x *= 2.0 * PI * meanRadius / deltaRadius;
 
     // if we are on the interior or exterior of the ring, we account for the vertical stretch
-    if(abs(normal.y) < 0.02) {
+    if (abs(normal.y) < 0.02) {
         vUV.y *= height;
     }
 }

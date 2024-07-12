@@ -20,6 +20,7 @@ precision highp float;
 varying vec3 vPositionW;
 varying vec3 vNormalW;
 varying vec3 vPosition;
+varying vec3 vNormal;
 varying vec2 vUV;
 
 uniform sampler2D albedo;
@@ -28,11 +29,25 @@ uniform sampler2D metallic;
 uniform sampler2D roughness;
 uniform sampler2D occlusion;
 
+uniform sampler2D namePlate;
+
+uniform float deltaRadius;
+uniform float meanRadius;
+
 uniform vec3 cameraPosition;
 
 #include "../utils/stars.glsl";
 
 #include "../utils/pbr.glsl";
+
+#include "../utils/pi.glsl";
+
+#include "../utils/remap.glsl";
+
+float atan2(in float y, in float x) {
+    bool s = (abs(x) > abs(y));
+    return mix(PI/2.0 - atan(x,y), atan(y,x), s);
+}
 
 void main() {
     vec3 viewDirectionW = normalize(cameraPosition - vPositionW);
@@ -53,6 +68,25 @@ void main() {
     vec3 normalMap = texture2D(normal, vUV).rgb;
     normalMap = normalize(normalMap * 2.0 - 1.0);
     normalW = normalize(TBN * normalMap);
+
+
+    vec2 planarPosition = normalize(vPosition.xz);
+    float theta = atan2(planarPosition.y, planarPosition.x);
+    float distanceToCenter = length(vPosition.xz);
+    distanceToCenter = remap(distanceToCenter, meanRadius - deltaRadius / 2.0, meanRadius + deltaRadius / 2.0, 0.0, 1.0);
+
+    vec2 namePlateUV = vec2(theta / (PI), distanceToCenter);
+    if (vNormal.y < 1.0) {
+        namePlateUV *= 0.0;
+    }
+
+    vec4 namePlate = texture2D(namePlate, fract(namePlateUV));
+    float paintWeight = namePlate.a;
+
+    albedoColor = mix(albedoColor, namePlate.rgb, paintWeight);
+    metallicColor = mix(metallicColor, 0.0, paintWeight);
+    roughnessColor = mix(roughnessColor, 0.7, paintWeight);
+    normalW = mix(normalW, TBN[2], paintWeight * 0.7);
 
     vec3 Lo = vec3(0.0);
     for(int i = 0; i < nbStars; i++) {

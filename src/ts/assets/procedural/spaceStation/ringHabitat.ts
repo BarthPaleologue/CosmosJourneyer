@@ -30,6 +30,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { createEnvironmentAggregate } from "../../../utils/physics";
 import { createRing } from "../../../utils/ringBuilder";
 import { seededSquirrelNoise } from "squirrel-noise";
+import { SpaceStationModel } from "../../../spacestation/spacestationModel";
 
 export class RingHabitat implements Transformable {
     private readonly root: TransformNode;
@@ -52,7 +53,7 @@ export class RingHabitat implements Transformable {
 
     readonly habitableSurface: number;
 
-    constructor(requiredHabitableSurface: number, seed: number, scene: Scene) {
+    constructor(stationModel: SpaceStationModel, requiredHabitableSurface: number, seed: number, scene: Scene) {
         this.root = new TransformNode("RingHabitatRoot", scene);
 
         this.rng = seededSquirrelNoise(seed);
@@ -94,7 +95,7 @@ export class RingHabitat implements Transformable {
         const nbSteps = Math.ceil(circumference / deltaRadius);
         this.ring = createRing(this.radius, deltaRadius, height, nbSteps, scene);
 
-        this.ringMaterial = new RingHabitatMaterial(circumference, deltaRadius, yScaling, scene);
+        this.ringMaterial = new RingHabitatMaterial(stationModel, this.radius, deltaRadius, yScaling, scene);
 
         this.ring.material = this.ringMaterial;
 

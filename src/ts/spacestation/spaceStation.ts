@@ -74,7 +74,7 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
     constructor(scene: Scene, model: SpaceStationModel | number, parentBody: CelestialBody | null = null) {
         this.model = model instanceof SpaceStationModel ? model : new SpaceStationModel(model, parentBody?.model);
 
-        this.name = generateSpaceStationName(this.model.rng, 2756);
+        this.name = this.model.name;
 
         this.parent = parentBody;
 
@@ -212,7 +212,7 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
             this.helixHabitats.push(helixHabitat);
             newNode = helixHabitat.getTransform();
         } else if (habitatType === SpaceStationNodeType.RING_HABITAT) {
-            const ringHabitat = new RingHabitat(habitatSurface, this.model.rng(27), this.scene);
+            const ringHabitat = new RingHabitat(this.model, habitatSurface, this.model.rng(27), this.scene);
             this.ringHabitats.push(ringHabitat);
             newNode = ringHabitat.getTransform();
         } else if (habitatType === SpaceStationNodeType.CYLINDER_HABITAT) {
@@ -246,7 +246,7 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
             lastNode = utilitySection.getTransform();
         }
 
-        const landingBay = new LandingBay(this.scene);
+        const landingBay = new LandingBay(this.model, this.scene);
 
         this.landingBays.push(landingBay);
         this.placeNode(landingBay.getTransform(), lastNode);

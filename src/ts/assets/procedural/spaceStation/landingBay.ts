@@ -31,6 +31,7 @@ import { LandingPad, LandingPadSize } from "../landingPad/landingPad";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { createEnvironmentAggregate } from "../../../utils/physics";
 import { createRing } from "../../../utils/ringBuilder";
+import { SpaceStationModel } from "../../../spacestation/spacestationModel";
 
 export class LandingBay {
     private readonly root: TransformNode;
@@ -48,7 +49,7 @@ export class LandingBay {
 
     readonly landingPads: LandingPad[] = [];
 
-    constructor(scene: Scene) {
+    constructor(stationModel: SpaceStationModel, scene: Scene) {
         this.root = new TransformNode("LandingBayRoot", scene);
 
         this.radius = 500;
@@ -68,7 +69,7 @@ export class LandingBay {
 
         this.ring = createRing(this.radius, deltaRadius, heightFactor * deltaRadius, nbSteps, scene);
 
-        this.ringMaterial = new RingHabitatMaterial(circumference, deltaRadius, heightFactor, scene);
+        this.ringMaterial = new RingHabitatMaterial(stationModel, this.radius, deltaRadius, heightFactor, scene);
         this.ring.material = this.ringMaterial;
 
         this.ring.parent = this.getTransform();

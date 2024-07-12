@@ -45,7 +45,7 @@ export class LandingPadMaterial extends ShaderMaterial {
 
         const textureResolution = 2048;
         const numberTexture = new DynamicTexture(
-            "dynamic texture",
+            `PadNumberTexture${padNumber}`,
             {
                 width: textureResolution * aspectRatio,
                 height: textureResolution
