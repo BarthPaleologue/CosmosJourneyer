@@ -105,7 +105,7 @@ export class BlackHolePostProcess extends PostProcess implements ObjectPostProce
             effect.setVector3(BlackHoleUniformNames.FORWARD_AXIS, getForwardDirection(blackHole.getTransform()));
 
             setSamplerUniforms(effect, this.activeCamera, scene);
-            effect.setTexture(BlackHoleSamplerNames.STARFIELD_TEXTURE, Textures.STAR_FIELD);
+            effect.setTexture(BlackHoleSamplerNames.STARFIELD_TEXTURE, Textures.MILKY_WAY);
         });
     }
 

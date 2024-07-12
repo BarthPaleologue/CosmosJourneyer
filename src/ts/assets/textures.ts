@@ -32,7 +32,6 @@ import sandNormalMetallicMap from "../../asset/sandMaterial/wavy-sand_normal_met
 import sandAlbedoRoughnessMap from "../../asset/sandMaterial/wavy-sand_albedo_roughness.png";
 import waterNormal1 from "../../asset/textures/waterNormalMap3.jpg";
 import waterNormal2 from "../../asset/textures/waterNormalMap4.jpg";
-import starfield from "../../asset/textures/milkyway.jpg";
 import plumeParticle from "../../asset/textures/plume.png";
 import flareParticle from "../../asset/flare.png";
 import seamlessPerlin from "../../asset/perlin.png";
@@ -63,7 +62,6 @@ export class Textures {
     static WATER_NORMAL_MAP_1: Texture;
     static WATER_NORMAL_MAP_2: Texture;
 
-    static STAR_FIELD: Texture;
     static PLUME_PARTICLE: Texture;
 
     static FLARE_TEXTURE: Texture;
@@ -96,8 +94,6 @@ export class Textures {
 
         manager.addTextureTask("WaterNormalMap1", waterNormal1).onSuccess = (task) => (Textures.WATER_NORMAL_MAP_1 = task.texture);
         manager.addTextureTask("WaterNormalMap2", waterNormal2).onSuccess = (task) => (Textures.WATER_NORMAL_MAP_2 = task.texture);
-
-        manager.addTextureTask("Starfield", starfield).onSuccess = (task) => (Textures.STAR_FIELD = task.texture);
 
         manager.addTextureTask("PlumeParticle", plumeParticle).onSuccess = (task) => (Textures.PLUME_PARTICLE = task.texture);
         manager.addTextureTask("FlareTexture", flareParticle).onSuccess = (task) => (Textures.FLARE_TEXTURE = task.texture);

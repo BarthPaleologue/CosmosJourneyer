@@ -26,7 +26,7 @@ const bool hasAccretionDisk = true;
 uniform sampler2D textureSampler;
 uniform sampler2D depthSampler;
 
-uniform sampler2D starfieldTexture;
+uniform samplerCube starfieldTexture;
 
 uniform mat4 starfieldRotation;
 
@@ -273,12 +273,7 @@ void main() {
         bg = texture2D(textureSampler, uv);
     } else {
         rayDir = vec3(starfieldRotation * vec4(rayDir, 1.0));
-        vec2 starfieldUV = vec2(
-        sign(rayDir.z) * acos(rayDir.x / length(vec2(rayDir.x, rayDir.z))) / 6.28318530718,
-        acos(rayDir.y) / 3.14159265359
-        );
-        bg = texture2D(starfieldTexture, starfieldUV);
-        bg.rgb = pow(bg.rgb, vec3(2.2));
+        bg = texture(starfieldTexture, rayDir);
     }
 
     vec4 finalColor = vec4(1.0, 0.0, 0.0, 1.0);
