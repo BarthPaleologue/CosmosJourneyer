@@ -62,7 +62,7 @@ directionalLight.intensity = 0.7;
 const hemi = new HemisphericLight("hemi", Vector3.Up(), scene);
 hemi.intensity = 0.4;
 
-const scaler = 500;
+const scaler = 5000;
 
 defaultControls.getTransform().position.z = -200 * scaler;
 defaultControls.getTransform().position.y = 20 * scaler;
@@ -70,8 +70,6 @@ defaultControls.speed *= scaler;
 camera.maxZ *= scaler;
 
 const sphere = MeshBuilder.CreateSphere("box", { diameter: 20 * scaler }, scene);
-
-const sphereAggregate = new PhysicsAggregate(sphere, PhysicsShapeType.SPHERE, {mass:0}, scene);
 
 const beltRadius = 100 * scaler;
 const beltSpread = 20 * scaler;
