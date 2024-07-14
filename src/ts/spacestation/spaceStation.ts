@@ -28,7 +28,6 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { OrbitalObjectPhysicalProperties } from "../architecture/physicalProperties";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { CelestialBody } from "../architecture/celestialBody";
-import { generateSpaceStationName } from "../utils/spaceStationNameGenerator";
 import i18n from "../i18n";
 import { SpaceStationNodeType } from "../assets/procedural/spaceStation/spaceStationNode";
 import { UtilitySection } from "../assets/procedural/spaceStation/utilitySection";
@@ -179,7 +178,7 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
 
         let lastNode: TransformNode | null = null;
 
-        const solarSection = new SolarSection(solarPanelSurface, this.model.rng(31), this.scene);
+        const solarSection = new SolarSection(solarPanelSurface, Settings.SEED_HALF_RANGE * this.model.rng(31), this.scene);
         solarSection.getTransform().parent = this.getTransform();
         lastNode = solarSection.getTransform();
         this.solarSections.push(solarSection);
@@ -208,15 +207,15 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
 
         let newNode: TransformNode | null = null;
         if (habitatType === SpaceStationNodeType.HELIX_HABITAT) {
-            const helixHabitat = new HelixHabitat(habitatSurface, this.model.rng(19), this.scene);
+            const helixHabitat = new HelixHabitat(habitatSurface, Settings.SEED_HALF_RANGE * this.model.rng(19), this.scene);
             this.helixHabitats.push(helixHabitat);
             newNode = helixHabitat.getTransform();
         } else if (habitatType === SpaceStationNodeType.RING_HABITAT) {
-            const ringHabitat = new RingHabitat(this.model, habitatSurface, this.model.rng(27), this.scene);
+            const ringHabitat = new RingHabitat(this.model, habitatSurface, Settings.SEED_HALF_RANGE * this.model.rng(27), this.scene);
             this.ringHabitats.push(ringHabitat);
             newNode = ringHabitat.getTransform();
         } else if (habitatType === SpaceStationNodeType.CYLINDER_HABITAT) {
-            const cylinderHabitat = new CylinderHabitat(habitatSurface, this.model.rng(13), this.scene);
+            const cylinderHabitat = new CylinderHabitat(habitatSurface, Settings.SEED_HALF_RANGE * this.model.rng(13), this.scene);
             this.cylinderHabitats.push(cylinderHabitat);
             newNode = cylinderHabitat.getTransform();
         }
