@@ -45,7 +45,6 @@ import { LandingPad } from "../assets/procedural/landingPad/landingPad";
 import { LandingRequest, ManagesLandingPads } from "../utils/managesLandingPads";
 import { getEdibleEnergyPerHaPerDay } from "../utils/agriculture";
 import { Settings } from "../settings";
-import { Objects } from "../assets/objects";
 import { EngineBay } from "../assets/procedural/spaceStation/engineBay";
 
 export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads {
@@ -179,11 +178,9 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
         });
         const habitatSurface = habitatSurfaceHa * 1000;
 
-        let lastNode: TransformNode | null = null;
-
         const engineBay = new EngineBay(this.scene);
         engineBay.getTransform().parent = this.getTransform();
-        lastNode = engineBay.getTransform();
+        let lastNode = engineBay.getTransform();
         this.engineBays.push(engineBay);
 
         lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(this.model.rng(564) * 5));
@@ -224,12 +221,8 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
             throw new Error("Node creation failed");
         }
 
-        if (lastNode !== null) {
-            this.placeNode(newNode, lastNode);
-        }
-
+        this.placeNode(newNode, lastNode);
         newNode.parent = this.root;
-
         lastNode = newNode;
 
         lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(this.model.rng(23) * 5));
@@ -238,7 +231,7 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
 
         this.landingBays.push(landingBay);
         this.placeNode(landingBay.getTransform(), lastNode);
-        landingBay.getTransform().parent = this.root;
+        landingBay.getTransform().parent = this.getTransform();
     }
 
     private addUtilitySections(lastNode: TransformNode, nbSections: number): TransformNode {
@@ -249,7 +242,7 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
 
             this.placeNode(utilitySection.getTransform(), newLastNode);
 
-            utilitySection.getTransform().parent = this.root;
+            utilitySection.getTransform().parent = this.getTransform();
 
             newLastNode = utilitySection.getTransform();
         }
