@@ -22,7 +22,6 @@ attribute vec3 normal;
 attribute vec2 uv;
 
 uniform mat4 world;
-uniform mat4 view;
 uniform mat4 worldViewProjection;
 uniform float meanRadius;
 uniform float deltaRadius;
