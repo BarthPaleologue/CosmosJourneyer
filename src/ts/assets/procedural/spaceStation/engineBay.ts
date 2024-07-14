@@ -1,26 +1,36 @@
 import { Transformable } from "../../../architecture/transformable";
 import { Mesh, MeshBuilder } from "@babylonjs/core/Meshes";
 import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
-import { PhysicsShape, PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
+import { PhysicsShape, PhysicsShapeConvexHull } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Objects } from "../../objects";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 import { Scene } from "@babylonjs/core/scene";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { createEnvironmentAggregate } from "../../../utils/physics";
+import { CollisionMask } from "../../../settings";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 
 export class EngineBay implements Transformable {
     private readonly root: TransformNode;
 
     private readonly skirt: Mesh;
+    private skirtAggregate: PhysicsAggregate | null = null;
     private readonly skirtMaterial: MetalSectionMaterial;
 
     private readonly engines: AbstractMesh[] = [];
     private readonly engineBodies: PhysicsBody[] = [];
     private readonly engineShape: PhysicsShape;
 
+    private readonly scene: Scene;
+
     constructor(scene: Scene) {
         this.root = new TransformNode("EngineBayRoot", scene);
+
+        this.scene = scene;
 
         const nbEngines = 6;
         this.skirt = MeshBuilder.CreateCylinder("EngineBaySkirt", {
@@ -46,7 +56,7 @@ export class EngineBay implements Transformable {
             this.engines.push(engine);
         }
 
-        this.engines.forEach(engine => {
+        this.engines.forEach((engine) => {
             engine.parent = this.root;
             engine.translate(Axis.Y, -300, Space.LOCAL);
             engine.scaling.scaleInPlace(100);
@@ -59,11 +69,30 @@ export class EngineBay implements Transformable {
             node.position.subtractInPlace(center);
         });
 
-        this.engineShape = new PhysicsShapeMesh(this.engines[0] as Mesh, scene);
+        this.engineShape = new PhysicsShapeConvexHull(this.engines[0] as Mesh, scene);
+        this.engineShape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+        this.engineShape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
     }
 
-    update(stellarObjects: Transformable[]) {
+    update(stellarObjects: Transformable[], cameraWorldPosition: Vector3) {
         this.skirtMaterial.update(stellarObjects);
+
+        const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
+        if (distanceToCamera < 350e3 && this.skirtAggregate === null) {
+            this.skirtAggregate = createEnvironmentAggregate(this.skirt, PhysicsShapeType.MESH);
+            this.engines.forEach((engine) => {
+                const engineBody = new PhysicsBody(engine, PhysicsMotionType.STATIC, false, this.scene);
+                engineBody.setMassProperties({ mass: 0 });
+                engineBody.shape = this.engineShape;
+                this.engineBodies.push(engineBody);
+            });
+        } else if (distanceToCamera > 360e3 && this.skirtAggregate !== null) {
+            this.skirtAggregate.dispose();
+            this.skirtAggregate = null;
+
+            this.engineBodies.forEach((body) => body.dispose());
+            this.engineBodies.length = 0;
+        }
     }
 
     getTransform(): TransformNode {
@@ -73,7 +102,9 @@ export class EngineBay implements Transformable {
     dispose() {
         this.skirt.dispose();
         this.skirtMaterial.dispose();
+        this.skirtAggregate?.dispose();
         this.engines.forEach((engine) => engine.dispose());
+        this.engineBodies.forEach((body) => body.dispose());
         this.engineShape.dispose();
     }
 }

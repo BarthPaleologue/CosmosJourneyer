@@ -281,7 +281,7 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
         this.ringHabitats.forEach((ringHabitat) => ringHabitat.update(stellarObjects, cameraWorldPosition, deltaSeconds));
         this.cylinderHabitats.forEach((cylinderHabitat) => cylinderHabitat.update(stellarObjects, cameraWorldPosition, deltaSeconds));
         this.landingBays.forEach((landingBay) => landingBay.update(stellarObjects, cameraWorldPosition, deltaSeconds));
-        this.engineBays.forEach((engineBay) => engineBay.update(stellarObjects));
+        this.engineBays.forEach((engineBay) => engineBay.update(stellarObjects, cameraWorldPosition));
     }
 
     getTransform(): TransformNode {
