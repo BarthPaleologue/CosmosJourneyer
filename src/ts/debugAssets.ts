@@ -27,13 +27,23 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { BaseTexture } from "@babylonjs/core/Materials/Textures/baseTexture";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import "@babylonjs/core/Loading/loadingScreen";
+import HavokPhysics from "@babylonjs/havok";
+import { HavokPlugin } from "@babylonjs/core";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 const engine = new Engine(canvas, true);
+
+const havokInstance = await HavokPhysics();
+
 const scene = new Scene(engine);
+scene.useRightHandedSystem = true;
+
+const havokPlugin = new HavokPlugin(true, havokInstance);
+scene.enablePhysics(new Vector3(0, 0, 0), havokPlugin);
 
 const camera = new FreeCamera("camera", new Vector3(0, 1, -1).scale(15), scene);
 camera.setTarget(Vector3.Zero());
