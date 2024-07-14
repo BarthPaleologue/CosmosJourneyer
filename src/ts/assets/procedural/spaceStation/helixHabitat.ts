@@ -92,14 +92,7 @@ export class HelixHabitat implements Transformable {
         this.attachment.rotate(Axis.Y, Math.PI / attachmentNbSides, Space.WORLD);
         this.attachment.parent = this.getTransform();
 
-        const path = [];
         const tessellation = 360;
-        const turns = nbSpires * tessellation;
-        for (let i = 0; i < turns; i++) {
-            const angle = Math.PI / 2 + (i * Math.PI * 2.0) / tessellation;
-            const y = (i * pitch) / tessellation;
-            path.push(new Vector3(this.radius * Math.sin(angle), y - (nbSpires * pitch) / 2, this.radius * Math.cos(angle)));
-        }
 
         this.helix1 = createHelix(this.radius, deltaRadius, deltaRadius * thicknessMultipler, tessellation, nbSpires, pitch, scene);
 
@@ -131,7 +124,7 @@ export class HelixHabitat implements Transformable {
 
             const y = (i / nbArms) * totalLength - totalLength / 2;
 
-            const theta = (y / pitch) * Math.PI * 2;
+            const theta = -(2.0 * Math.PI * nbSpires * i) / nbArms;
 
             arm.position.y = y;
             arm.rotate(Axis.Y, theta, Space.WORLD);
@@ -154,7 +147,7 @@ export class HelixHabitat implements Transformable {
             this.helix1Aggregate = createEnvironmentAggregate(this.helix1, PhysicsShapeType.MESH, this.getTransform().getScene());
             this.helix2Aggregate = createEnvironmentAggregate(this.helix2, PhysicsShapeType.MESH, this.getTransform().getScene());
 
-            this.arms.forEach(arm => {
+            this.arms.forEach((arm) => {
                 const armAggregate = createEnvironmentAggregate(arm, PhysicsShapeType.MESH, this.getTransform().getScene());
                 this.armAggregates.push(armAggregate);
             });
@@ -168,7 +161,7 @@ export class HelixHabitat implements Transformable {
             this.helix2Aggregate?.dispose();
             this.helix2Aggregate = null;
 
-            this.armAggregates.forEach(armAggregate => armAggregate.dispose());
+            this.armAggregates.forEach((armAggregate) => armAggregate.dispose());
             this.armAggregates.length = 0;
         }
     }
@@ -187,10 +180,10 @@ export class HelixHabitat implements Transformable {
 
         this.helixMaterial.dispose();
         this.metalSectionMaterial.dispose();
-        
+
         this.helix1.dispose();
         this.helix2.dispose();
-        
+
         this.helix1Aggregate?.dispose();
         this.helix1Aggregate = null;
 
@@ -200,7 +193,7 @@ export class HelixHabitat implements Transformable {
         this.arms.forEach((arm) => arm.dispose());
         this.arms.length = 0;
 
-        this.armAggregates.forEach(armAggregate => armAggregate.dispose());
+        this.armAggregates.forEach((armAggregate) => armAggregate.dispose());
         this.armAggregates.length = 0;
     }
 }
