@@ -23,11 +23,11 @@ varying vec3 vPosition;
 varying vec3 vNormal;
 varying vec2 vUV;
 
-uniform sampler2D albedo;
-uniform sampler2D normal;
-uniform sampler2D metallic;
-uniform sampler2D roughness;
-uniform sampler2D occlusion;
+uniform sampler2D albedoMap;
+uniform sampler2D normalMap;
+uniform sampler2D metallicMap;
+uniform sampler2D roughnessMap;
+uniform sampler2D occlusionMap;
 
 uniform sampler2D namePlate;
 
@@ -64,10 +64,10 @@ void main() {
         uv.y = distanceToCenter;
     }
 
-    vec3 albedoColor = pow(texture2D(albedo, uv).rgb, vec3(gamma));
-    float roughnessColor = texture2D(roughness, uv).r;
-    float metallicColor = texture2D(metallic, uv).r;
-    float occlusionColor = texture2D(occlusion, uv).r;
+    vec3 albedoColor = pow(texture2D(albedoMap, uv).rgb, vec3(gamma));
+    float roughnessColor = texture2D(roughnessMap, uv).r;
+    float metallicColor = texture2D(metallicMap, uv).r;
+    float occlusionColor = texture2D(occlusionMap, uv).r;
 
     vec3 tangent1 = normalize(dFdx(vPositionW));
     vec3 tangent2 = normalize(dFdy(vPositionW));
@@ -75,19 +75,19 @@ void main() {
     vec3 bitangent = cross(normalW, tangent1);
     mat3 TBN = mat3(tangent1, tangent2, normalW);
 
-    vec3 normalMap = texture2D(normal, uv).rgb;
-    normalMap = normalize(normalMap * 2.0 - 1.0);
-    normalW = normalize(TBN * normalMap);
+    vec3 normalColor = texture2D(normalMap, uv).rgb;
+    normalColor = normalize(normalColor * 2.0 - 1.0);
+    normalW = normalize(TBN * normalColor);
 
-    vec2 namePlateUV = vec2(theta / (PI), distanceToCenter);
+    vec2 namePlateUV = vec2(theta / PI, distanceToCenter);
     if (vNormal.y < 1.0) {
         namePlateUV *= 0.0;
     }
 
-    vec4 namePlate = texture2D(namePlate, fract(namePlateUV));
-    float paintWeight = namePlate.a;
+    vec4 namePlateColor = texture2D(namePlate, fract(namePlateUV));
+    float paintWeight = namePlateColor.a;
 
-    albedoColor = mix(albedoColor, namePlate.rgb, paintWeight);
+    albedoColor = mix(albedoColor, namePlateColor.rgb, paintWeight);
     metallicColor = mix(metallicColor, 0.0, paintWeight);
     roughnessColor = mix(roughnessColor, 0.7, paintWeight);
     normalW = mix(normalW, TBN[2], paintWeight * 0.7);

@@ -41,11 +41,11 @@ const LandingBayUniformNames = {
 }
 
 const LandingBaySamplerNames = {
-    ALBEDO: "albedo",
-    NORMAL: "normal",
-    METALLIC: "metallic",
-    ROUGHNESS: "roughness",
-    OCCLUSION: "occlusion",
+    ALBEDO: "albedoMap",
+    NORMAL: "normalMap",
+    METALLIC: "metallicMap",
+    ROUGHNESS: "roughnessMap",
+    OCCLUSION: "occlusionMap",
     NAME_PLATE: "namePlate"
 }
 
