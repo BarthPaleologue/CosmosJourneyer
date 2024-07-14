@@ -45,6 +45,7 @@ import { LandingPad } from "../assets/procedural/landingPad/landingPad";
 import { LandingRequest, ManagesLandingPads } from "../utils/managesLandingPads";
 import { getEdibleEnergyPerHaPerDay } from "../utils/agriculture";
 import { Settings } from "../settings";
+import { Objects } from "../assets/objects";
 
 export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads {
     readonly name: string;
@@ -178,8 +179,14 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
 
         let lastNode: TransformNode | null = null;
 
+        const engine = Objects.STATION_ENGINE.createInstance("StationEngine");
+        engine.scaling.scaleInPlace(100);
+        engine.parent = this.getTransform();
+        lastNode = engine;
+
         const solarSection = new SolarSection(solarPanelSurface, Settings.SEED_HALF_RANGE * this.model.rng(31), this.scene);
         solarSection.getTransform().parent = this.getTransform();
+        this.placeNode(solarSection.getTransform(), lastNode);
         lastNode = solarSection.getTransform();
         this.solarSections.push(solarSection);
 

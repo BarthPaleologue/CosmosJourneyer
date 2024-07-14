@@ -38,7 +38,9 @@ import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import "@babylonjs/loaders";
 import "@babylonjs/core/Loading/Plugins/babylonFileLoader";
 import "@babylonjs/core/Animations/animatable";
+
 import sphericalTank from "../../asset/SpaceStationParts/sphericalTank.glb";
+import stationEngine from "../../asset/SpaceStationParts/engine.glb";
 
 import { CollisionMask } from "../settings";
 import { PhysicsShape, PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
@@ -50,7 +52,7 @@ export class Objects {
     private static WANDERER: Mesh;
     private static BANANA: Mesh;
     private static CHARACTER: Mesh;
-    
+
     public static ROCK: Mesh;
 
     public static ASTEROIDS: Mesh[] = [];
@@ -62,6 +64,7 @@ export class Objects {
     public static GRASS_BLADE: Mesh;
 
     public static SPHERICAL_TANK: Mesh;
+    public static STATION_ENGINE: Mesh;
 
     public static CRATE: Mesh;
 
@@ -205,7 +208,7 @@ export class Objects {
 
         const sphericalTankTask = manager.addMeshTask("SphericalTankTask", "", "", sphericalTank);
         sphericalTankTask.onSuccess = (task: MeshAssetTask) => {
-            Objects.SPHERICAL_TANK = (task.loadedMeshes[0]).getChildMeshes()[0] as Mesh;
+            Objects.SPHERICAL_TANK = task.loadedMeshes[0].getChildMeshes()[0] as Mesh;
             Objects.SPHERICAL_TANK.parent = null;
             Objects.SPHERICAL_TANK.isVisible = false;
 
@@ -216,6 +219,21 @@ export class Objects {
             Objects.SPHERICAL_TANK.bakeCurrentTransformIntoVertices();
 
             console.log("SphericalTank loaded");
+        };
+
+        const stationEngineTask = manager.addMeshTask("StationEngineTask", "", "", stationEngine);
+        stationEngineTask.onSuccess = (task: MeshAssetTask) => {
+            Objects.STATION_ENGINE = task.loadedMeshes[0].getChildMeshes()[0] as Mesh;
+            Objects.STATION_ENGINE.parent = null;
+            Objects.STATION_ENGINE.isVisible = false;
+
+            const boundingBox = Objects.STATION_ENGINE.getBoundingInfo().boundingBox;
+            const maxDimension = Math.max(boundingBox.extendSize.x, boundingBox.extendSize.y, boundingBox.extendSize.z);
+
+            Objects.STATION_ENGINE.scalingDeterminant = 1.0 / maxDimension;
+            Objects.STATION_ENGINE.bakeCurrentTransformIntoVertices();
+
+            console.log("StationEngine loaded");
         };
 
         Objects.BUTTERFLY = createButterfly(scene);
