@@ -38,11 +38,11 @@ const HelixHabitatUniformNames = {
 }
 
 const HelixHabitatSamplerNames = {
-    ALBEDO: "albedo",
-    NORMAL: "normal",
-    METALLIC: "metallic",
-    ROUGHNESS: "roughness",
-    OCCLUSION: "occlusion",
+    ALBEDO: "albedoMap",
+    NORMAL: "normalMap",
+    METALLIC: "metallicMap",
+    ROUGHNESS: "roughnessMap",
+    OCCLUSION: "occlusionMap",
 }
 
 export class HelixHabitatMaterial extends ShaderMaterial {

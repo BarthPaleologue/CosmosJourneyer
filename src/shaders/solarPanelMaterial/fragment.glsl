@@ -51,9 +51,9 @@ void main() {
     vec3 bitangent = cross(normalW, tangent1);
     mat3 TBN = mat3(tangent1, tangent2, normalW);
 
-    vec3 normalMap = texture2D(normalMap, vUV).rgb;
-    normalMap = normalize(normalMap * 2.0 - 1.0);
-    normalW = normalize(TBN * normalMap);
+    vec3 normal = texture2D(normalMap, vUV).rgb;
+    normal = normalize(normal * 2.0 - 1.0);
+    normalW = normalize(TBN * normal);
 
     vec3 Lo = vec3(0.0);
     for(int i = 0; i < nbStars; i++) {
