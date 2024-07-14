@@ -26,9 +26,12 @@ import { MetalSectionMaterial } from "./metalSectionMaterial";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { AbstractMesh, PhysicsAggregate, PhysicsShapeType } from "@babylonjs/core";
 import { CollisionMask } from "../../../settings";
+import { seededSquirrelNoise } from "squirrel-noise";
 
 export class UtilitySection implements Transformable {
     private readonly attachment: Mesh;
+
+    readonly rng: (step: number) => number;
 
     private attachmentAggregate: PhysicsAggregate | null = null;
 
@@ -37,8 +40,10 @@ export class UtilitySection implements Transformable {
     private readonly tanks: AbstractMesh[] = [];
     private readonly tankAggregates: PhysicsAggregate[] = [];
 
-    constructor(scene: Scene) {
+    constructor(seed: number, scene: Scene) {
         this.metalSectionMaterial = new MetalSectionMaterial(scene);
+
+        this.rng = seededSquirrelNoise(seed);
 
         this.attachment = MeshBuilder.CreateCylinder("UtilitySectionRoot", {
             height: 700,
@@ -51,7 +56,7 @@ export class UtilitySection implements Transformable {
         const boundingVectors = this.attachment.getHierarchyBoundingVectors();
         const boundingExtendSize = boundingVectors.max.subtract(boundingVectors.min).scale(0.5);
 
-        if(Math.random() < 0.3) {
+        if(this.rng(0) < 0.3) {
             for (let ring = -3; ring <= 3; ring++) {
                 for (let sideIndex = 0; sideIndex < 6; sideIndex++) {
                     const tank = Objects.SPHERICAL_TANK.createInstance("SphericalTank");

@@ -32,9 +32,12 @@ import { createEnvironmentAggregate } from "../../../utils/physics";
 import { createRing } from "../../../utils/ringBuilder";
 import { SpaceStationModel } from "../../../spacestation/spacestationModel";
 import { LandingBayMaterial } from "./landingBayMaterial";
+import { seededSquirrelNoise } from "squirrel-noise";
 
 export class LandingBay {
     private readonly root: TransformNode;
+
+    readonly rng: (step: number) => number;
 
     private readonly radius: number;
 
@@ -49,8 +52,10 @@ export class LandingBay {
 
     readonly landingPads: LandingPad[] = [];
 
-    constructor(stationModel: SpaceStationModel, scene: Scene) {
+    constructor(stationModel: SpaceStationModel, seed: number, scene: Scene) {
         this.root = new TransformNode("LandingBayRoot", scene);
+
+        this.rng = seededSquirrelNoise(seed);
 
         this.radius = 500;
 
@@ -58,7 +63,7 @@ export class LandingBay {
 
         this.metalSectionMaterial = new MetalSectionMaterial(scene);
 
-        const heightFactor = 2 + Math.floor(Math.random() * 3);
+        const heightFactor = 2 + Math.floor(this.rng(0) * 3);
 
         const circumference = 2 * Math.PI * this.radius;
 
