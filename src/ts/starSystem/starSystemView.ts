@@ -69,6 +69,7 @@ import { Anomaly } from "../anomalies/anomaly";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Sounds } from "../assets/sounds";
 import { Materials } from "../assets/materials";
+import { SpaceStation } from "../spacestation/spaceStation";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -328,9 +329,11 @@ export class StarSystemView implements View {
             }
         });
 
-        this.scene = new UberScene(engine, ScenePerformancePriority.Intermediate);
+        this.scene = new UberScene(engine);
         // The right-handed system allows to use directly GLTF models without having to flip them with a transform
         this.scene.useRightHandedSystem = true;
+        this.scene.skipPointerMovePicking = true;
+        this.scene.autoClear = false;
 
         this.havokPlugin = new HavokPlugin(true, havokInstance);
         setMaxLinVel(this.havokPlugin, 10000, 10000);
@@ -349,7 +352,7 @@ export class StarSystemView implements View {
         });
 
         this.scene.onBeforeRenderObservable.add(() => {
-            const deltaSeconds = engine.getDeltaTime() * Settings.TIME_MULTIPLIER / 1000;
+            const deltaSeconds = (engine.getDeltaTime() * Settings.TIME_MULTIPLIER) / 1000;
             this.updateBeforeRender(deltaSeconds);
         });
 
@@ -549,8 +552,15 @@ export class StarSystemView implements View {
             this.helmetOverlay.displaySpeed(this.spaceshipControls.spaceship.getThrottle(), this.spaceshipControls.spaceship.getSpeed());
         }
 
+
         this.characterControls.setClosestWalkableObject(nearestOrbitalObject);
         this.spaceshipControls.spaceship.setClosestWalkableObject(nearestOrbitalObject);
+
+        if(nearestOrbitalObject instanceof SpaceStation) {
+            this.spaceshipControls.setClosestLandableFacility(nearestOrbitalObject);
+        } else {
+            this.spaceshipControls.setClosestLandableFacility(null);
+        }
 
         this.bodyEditor.update(nearestCelestialBody, this.postProcessManager, this.scene);
 
@@ -721,7 +731,7 @@ export class StarSystemView implements View {
         const targetSystemUniversePosition = targetSystemStarSector.getPositionOfStar(targetSeed.index);
 
         const direction = targetSystemUniversePosition.subtract(currentSystemUniversePosition).normalize();
-        direction.applyRotationQuaternionInPlace(currentSystem.universeRotation);
+        Vector3.TransformCoordinatesToRef(direction, currentSystem.starFieldBox.getRotationMatrix(), direction);
 
         const distance = StarMap.StarMapDistanceToLy(Vector3.Distance(currentSystemUniversePosition, targetSystemUniversePosition));
 

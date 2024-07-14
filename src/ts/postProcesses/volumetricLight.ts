@@ -21,12 +21,12 @@ import { ObjectPostProcess } from "./objectPostProcess";
 import { Star } from "../stellarObjects/star/star";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { Scene } from "@babylonjs/core/scene";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 
 export class VolumetricLight extends VolumetricLightScatteringPostProcess implements ObjectPostProcess {
     readonly object: Star | NeutronStar;
-    private readonly scene: Scene;
 
-    constructor(star: Star | NeutronStar, scene: Scene) {
+    constructor(star: Star | NeutronStar, excludedMeshes: AbstractMesh[], scene: Scene) {
         if (scene.activeCameras === null || scene.activeCameras.length === 0) throw new Error("no camera");
         super(`${star.name}VolumetricLight`, 1, null, star.mesh, 100, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, scene);
 
@@ -38,6 +38,6 @@ export class VolumetricLight extends VolumetricLightScatteringPostProcess implem
         this.exposure = 0.26;
         this.decay = 0.95;
 
-        this.scene = scene;
+        this.excludedMeshes = excludedMeshes;
     }
 }

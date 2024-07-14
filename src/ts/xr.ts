@@ -57,7 +57,7 @@ function createMandelbulb(): TransformNode {
     mandelbulb.getTransform().scalingDeterminant = 1 / 400e3;
 
     const mandelbulbPP = new MandelbulbPostProcess(mandelbulb, scene, []);
-    scene.cameras.forEach(camera => camera.attachPostProcess(mandelbulbPP));
+    scene.cameras.forEach((camera) => camera.attachPostProcess(mandelbulbPP));
     scene.onNewCameraAddedObservable.add((camera) => {
         camera.attachPostProcess(mandelbulbPP);
     });
@@ -75,7 +75,7 @@ function createJulia(): TransformNode {
     julia.getTransform().scalingDeterminant = 1 / 400e3;
 
     const juliaPP = new JuliaSetPostProcess(julia, scene, []);
-    scene.cameras.forEach(camera => camera.attachPostProcess(juliaPP));
+    scene.cameras.forEach((camera) => camera.attachPostProcess(juliaPP));
     scene.onNewCameraAddedObservable.add((camera) => {
         camera.attachPostProcess(juliaPP);
     });
@@ -101,7 +101,7 @@ if (sceneType === "mandelbulb") {
 }
 
 const xr = await scene.createDefaultXRExperienceAsync();
-if(xr.baseExperience) {
+if (xr.baseExperience) {
     // web xr code goes here
     const xrCamera = xr.baseExperience.camera;
     xrCamera.setTransformationFromNonVRCamera(camera, true);

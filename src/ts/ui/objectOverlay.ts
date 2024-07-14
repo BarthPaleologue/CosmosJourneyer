@@ -29,7 +29,6 @@ import { TypedObject } from "../architecture/typedObject";
 import { Textures } from "../assets/textures";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
-
 export class ObjectOverlay {
     readonly textRoot: StackPanel;
     readonly cursor: Image;
@@ -120,18 +119,11 @@ export class ObjectOverlay {
         this.transformPlaceHolder.setAbsolutePosition(camera.globalPosition.add(cameraToObject.scale(10)));
         this.transformPlaceHolder.computeWorldMatrix(true);
 
-        const viewRay = camera.getDirection(LocalDirection.BACKWARD);
         const objectRay = this.object.getTransform().getAbsolutePosition().subtract(camera.globalPosition);
         const distance = objectRay.length();
         const deltaDistance = this.lastDistance - distance;
         const speed = deltaDistance !== 0 ? deltaDistance / (camera.getScene().getEngine().getDeltaTime() / 1000) : 0;
         objectRay.scaleInPlace(1 / distance);
-
-        /*if (Vector3.Dot(viewRay, objectRay) < 0) {
-            this.cursor.isVisible = false;
-            this.textRoot.isVisible = false;
-            return;
-        }*/
 
         this.cursor.isVisible = true;
         this.textRoot.isVisible = this.object === target;

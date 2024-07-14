@@ -17,18 +17,34 @@
 
 import "../styles/index.scss";
 
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import "@babylonjs/core/Materials/standardMaterial";
 import "@babylonjs/core/Loading/loadingScreen";
 import "@babylonjs/core/Misc/screenshotTools";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import "@babylonjs/core/Meshes/thinInstanceMesh";
-import { Axis, DirectionalLight, HavokPlugin, HemisphericLight, MeshBuilder, PhysicsAggregate, PhysicsShapeType, PhysicsViewer, Scene } from "@babylonjs/core";
+import {
+    Axis,
+    Color3,
+    DirectionalLight,
+    HavokPlugin,
+    HemisphericLight,
+    MeshBuilder,
+    PBRMaterial,
+    PhysicsAggregate,
+    PhysicsShapeType,
+    PhysicsViewer,
+    Texture
+} from "@babylonjs/core";
 import { Assets } from "./assets/assets";
+import { Scene, StandardMaterial } from "@babylonjs/core";
+import { translate } from "./uberCore/transforms/basicTransform";
 import { DefaultControls } from "./defaultControls/defaultControls";
 import { AsteroidField } from "./asteroidFields/asteroidField";
 import HavokPhysics from "@babylonjs/havok";
+import { Textures } from "./assets/textures";
+import { StarFieldBox } from "./starSystem/starFieldBox";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -47,7 +63,6 @@ const havokPlugin = new HavokPlugin(true, havokInstance);
 scene.enablePhysics(new Vector3(0, 0, 0), havokPlugin);
 
 const defaultControls = new DefaultControls(scene);
-
 
 const camera = defaultControls.getActiveCameras()[0];
 camera.attachControl();
@@ -69,9 +84,18 @@ defaultControls.getTransform().position.y = 20 * scaler;
 defaultControls.speed *= scaler;
 camera.maxZ *= scaler;
 
+const skybox = new StarFieldBox(scene);
+
 const sphere = MeshBuilder.CreateSphere("box", { diameter: 20 * scaler }, scene);
 
-const sphereAggregate = new PhysicsAggregate(sphere, PhysicsShapeType.SPHERE, {mass:0}, scene);
+const pbr = new PBRMaterial("pbr", scene);
+sphere.material = pbr;
+
+pbr.albedoColor = new Color3(1.0, 0.766, 0.336);
+pbr.metallic = 1.0; // set to 1 to only use it from the metallicRoughnessTexture
+pbr.roughness = 0; // set to 1 to only use it from the metallicRoughnessTexture
+
+const sphereAggregate = new PhysicsAggregate(sphere, PhysicsShapeType.SPHERE, { mass: 0 }, scene);
 
 const beltRadius = 100 * scaler;
 const beltSpread = 20 * scaler;
@@ -85,15 +109,21 @@ torus.scaling.y = 0.1 / scaler;
 
 const physicsViewer = new PhysicsViewer(scene);
 
+const rotation = Matrix.Identity();
+
 scene.onBeforeRenderObservable.add(() => {
     defaultControls.update(engine.getDeltaTime() / 1000);
 
     belt.update(defaultControls.getTransform().getAbsolutePosition(), engine.getDeltaTime() / 1000);
 
+    rotation.copyFrom(rotation.multiply(Matrix.RotationAxis(Vector3.Up(), 0.001)));
+
+    skybox.setRotationMatrix(rotation);
+
     //sphere.rotate(Axis.Y, 0.002);
-    scene.meshes.forEach((mesh) => {
+    /*scene.meshes.forEach((mesh) => {
         if (mesh.physicsBody) physicsViewer.showBody(mesh.physicsBody);
-    });
+    });*/
 });
 
 scene.executeWhenReady(() => {

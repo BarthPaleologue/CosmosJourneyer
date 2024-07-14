@@ -101,7 +101,6 @@ export class WarpDrive implements ReadonlyWarpDrive {
      */
     private state = WarpDriveState.DISABLED;
 
-
     constructor(enabledByDefault = false) {
         this.state = enabledByDefault ? WarpDriveState.ENABLED : WarpDriveState.DISABLED;
     }
@@ -154,6 +153,7 @@ export class WarpDrive implements ReadonlyWarpDrive {
      */
     public updateMaxTargetSpeed(closestObjectDistance: number, closestObjectRadius: number): number {
         const speedThreshold = 10e3;
+
         const closeSpeed = (speedThreshold * 0.1 * Math.max(0, closestObjectDistance - closestObjectRadius)) / speedThreshold;
         const deepSpaceSpeed = speedThreshold * ((0.1 * Math.max(0, closestObjectDistance - closestObjectRadius)) / speedThreshold) ** 1.2;
         this.maxTargetSpeed = clamp(Math.max(closeSpeed, deepSpaceSpeed), WarpDrive.MIN_WARP_SPEED, WarpDrive.MAX_WARP_SPEED);

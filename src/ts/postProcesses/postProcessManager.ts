@@ -22,7 +22,6 @@ import { FlatCloudsPostProcess } from "../clouds/flatCloudsPostProcess";
 import { Settings } from "../settings";
 import { AtmosphericScatteringPostProcess } from "./atmosphericScatteringPostProcess";
 import { RingsPostProcess } from "../rings/ringsPostProcess";
-import { StarfieldPostProcess } from "./starfieldPostProcess";
 import { VolumetricLight } from "./volumetricLight";
 import { BlackHolePostProcess } from "../stellarObjects/blackHole/blackHolePostProcess";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
@@ -53,6 +52,7 @@ import { JuliaSetPostProcess } from "../anomalies/julia/juliaSetPostProcess";
 import { JuliaSet } from "../anomalies/julia/juliaSet";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 
 /**
  * The order in which the post processes are rendered when away from a planet
@@ -125,7 +125,6 @@ export class PostProcessManager {
      */
     private currentBody: CelestialBody | null = null;
 
-    private readonly starFields: StarfieldPostProcess[] = [];
     private readonly volumetricLights: VolumetricLight[] = [];
     private readonly oceans: OceanPostProcess[] = [];
     private readonly clouds: FlatCloudsPostProcess[] = [];
@@ -168,12 +167,6 @@ export class PostProcessManager {
     readonly fxaa: FxaaPostProcess;
 
     /**
-     * The effect storing the star field post process.
-     * @private
-     */
-    private readonly starFieldRenderEffect: PostProcessRenderEffect;
-
-    /**
      * The effect storing the color correction post process.
      */
     readonly colorCorrectionRenderEffect: PostProcessRenderEffect;
@@ -207,10 +200,6 @@ export class PostProcessManager {
 
         this.renderingPipeline = new PostProcessRenderPipeline(scene.getEngine(), "renderingPipeline");
         this.renderingPipelineManager.addPipeline(this.renderingPipeline);
-
-        this.starFieldRenderEffect = new PostProcessRenderEffect(this.engine, "starFieldRenderEffect", () => {
-            return this.starFields;
-        });
 
         //this.bloomRenderEffect = new BloomEffect(scene, 1.0, 2.0, 32);
         //this.bloomRenderEffect.threshold = 0.7;
@@ -318,21 +307,12 @@ export class PostProcessManager {
     }
 
     /**
-     * Creates a new Starfield postprocess and adds it to the manager.
-     * @param stellarObjects An array of stars or black holes
-     * @param planets An array of planets
-     * @param starfieldRotation
-     */
-    public addStarField(stellarObjects: StellarObject[], planets: CelestialBody[], starfieldRotation: Quaternion) {
-        this.starFields.push(new StarfieldPostProcess(this.scene, stellarObjects, planets, starfieldRotation));
-    }
-
-    /**
      * Creates a new VolumetricLight postprocess for the given star and adds it to the manager.
      * @param star A star
+     * @param excludedMeshes
      */
-    public addVolumetricLight(star: Star | NeutronStar) {
-        this.volumetricLights.push(new VolumetricLight(star, this.scene));
+    public addVolumetricLight(star: Star | NeutronStar, excludedMeshes: AbstractMesh[]) {
+        this.volumetricLights.push(new VolumetricLight(star, excludedMeshes, this.scene));
     }
 
     /**
@@ -346,10 +326,9 @@ export class PostProcessManager {
     /**
      * Creates a new BlackHole postprocess for the given black hole and adds it to the manager.
      * @param blackHole A black hole
-     * @param starfieldRotation
      */
-    public addBlackHole(blackHole: BlackHole, starfieldRotation: Quaternion) {
-        const blackhole = new BlackHolePostProcess(blackHole, this.scene, starfieldRotation);
+    public addBlackHole(blackHole: BlackHole) {
+        const blackhole = new BlackHolePostProcess(blackHole, this.scene);
         this.blackHoles.push(blackhole);
     }
 
@@ -463,8 +442,6 @@ export class PostProcessManager {
         const [otherMatterJetsRenderEffect, bodyMatterJetsRenderEffect] = makeSplitRenderEffects("MatterJets", this.getCurrentBody(), this.matterJets, this.engine);
         const shadowRenderEffect = new PostProcessRenderEffect(this.engine, "ShadowRenderEffect", () => this.shadows);
         const lensFlareRenderEffect = new PostProcessRenderEffect(this.engine, "LensFlareRenderEffect", () => this.lensFlares);
-
-        this.renderingPipeline.addEffect(this.starFieldRenderEffect);
 
         this.renderingPipeline.addEffect(shadowRenderEffect);
 

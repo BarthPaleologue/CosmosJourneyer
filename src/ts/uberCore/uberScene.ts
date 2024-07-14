@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Scene, ScenePerformancePriority } from "@babylonjs/core/scene";
+import { Scene } from "@babylonjs/core/scene";
 import { Controls } from "./controls";
 import "@babylonjs/core/Rendering/depthRendererSceneComponent";
 import { Camera } from "@babylonjs/core/Cameras/camera";
@@ -39,11 +39,9 @@ export class UberScene extends Scene {
     /**
      * Creates a new UberScene.
      * @param engine The BabylonJS engine.
-     * @param performancePriority The performance priority of the scene (default: ScenePerformancePriority.BackwardCompatible).
      */
-    constructor(engine: AbstractEngine, performancePriority = ScenePerformancePriority.BackwardCompatible) {
+    constructor(engine: AbstractEngine) {
         super(engine);
-        this.performancePriority = performancePriority;
         this.clearColor = new Color4(0, 0, 0, 0);
 
         this.onNewCameraAddedObservable.add((camera) => {
@@ -53,9 +51,9 @@ export class UberScene extends Scene {
                 this.depthRenderer.clearColor = new Color4(0, 0, 0, 1);
             }
         });
-        
+
         this.onBeforeCameraRenderObservable.add((camera) => {
-            if(this.depthRenderer === null) {
+            if (this.depthRenderer === null) {
                 throw new Error("Depth renderer is null!");
             }
             this.depthRenderer.getDepthMap().activeCamera = camera;

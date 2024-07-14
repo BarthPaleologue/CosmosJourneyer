@@ -138,5 +138,5 @@ export const SpaceStationAdjectives: string[] = [
 export function generateSpaceStationName(rng: (index: number) => number, sampleIndex: number) {
     const adjective = SpaceStationAdjectives[Math.floor(rng(sampleIndex) * SpaceStationAdjectives.length)];
     const name = SpaceStationNames[Math.floor(rng(sampleIndex + 1) * SpaceStationNames.length)];
-    return `${name} ${uniformRandBool(0.5, rng, sampleIndex + 2) ? "'s" : ""}${adjective}`;
+    return `${name}${uniformRandBool(0.5, rng, sampleIndex + 2) ? "'s" : ""} ${adjective}`;
 }

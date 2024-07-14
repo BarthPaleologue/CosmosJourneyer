@@ -99,8 +99,8 @@ export class GasPlanet implements Planet, Cullable {
             this.postProcesses.push(PostProcessType.RING);
             this.ringsUniforms = new RingsUniforms(this.model.rings, scene);
 
-            const averageRadius = this.model.radius * (this.model.rings.ringStart + this.model.rings.ringEnd) / 2;
-            const spread = this.model.radius * (this.model.rings.ringEnd - this.model.rings.ringStart) / 2;
+            const averageRadius = (this.model.radius * (this.model.rings.ringStart + this.model.rings.ringEnd)) / 2;
+            const spread = (this.model.radius * (this.model.rings.ringEnd - this.model.rings.ringStart)) / 2;
             this.asteroidField = new AsteroidField(this.model.rng(84133), this.getTransform(), averageRadius, spread, scene);
         } else {
             this.ringsUniforms = null;
