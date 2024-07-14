@@ -21,37 +21,37 @@ import { Scene } from "@babylonjs/core/scene";
 import spaceship from "../../asset/spaceship/spaceship2.glb";
 import endeavorSpaceship from "../../asset/spaceship/endeavour.glb";
 import wanderer from "../../asset/spaceship/wanderer.glb";
-import shipCarrier from "../../asset/spacestation/shipcarrier.glb";
 import banana from "../../asset/banana/banana.glb";
 import character from "../../asset/character/character.glb";
 import rock from "../../asset/rock.glb";
 import asteroid from "../../asset/asteroid/asteroid.glb";
 import asteroid2 from "../../asset/asteroid/asteroid2.glb";
-import landingPad from "../../asset/landingpad.glb";
 import tree from "../../asset/tree/tree.babylon";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import treeTexturePath from "../../asset/tree/Tree.png";
-import { createButterfly } from "../proceduralAssets/butterfly/butterfly";
-import { createGrassBlade } from "../proceduralAssets/grass/grassBlade";
+import { createButterfly } from "./procedural/butterfly/butterfly";
+import { createGrassBlade } from "./procedural/grass/grassBlade";
 import { LoadingScreen } from "../uberCore/loadingScreen";
 import i18next from "../i18n";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import "@babylonjs/loaders";
 import "@babylonjs/core/Loading/Plugins/babylonFileLoader";
 import "@babylonjs/core/Animations/animatable";
+
+import sphericalTank from "../../asset/SpaceStationParts/sphericalTank.glb";
+import stationEngine from "../../asset/SpaceStationParts/engine.glb";
+
 import { CollisionMask } from "../settings";
 import { PhysicsShape, PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 
 export class Objects {
     private static SPACESHIP: Mesh;
     private static ENDEAVOR_SPACESHIP: Mesh;
     private static WANDERER: Mesh;
-    private static SPACE_STATION: Mesh;
     private static BANANA: Mesh;
     private static CHARACTER: Mesh;
-
-    private static LANDING_PAD: Mesh;
 
     public static ROCK: Mesh;
 
@@ -62,6 +62,11 @@ export class Objects {
 
     public static BUTTERFLY: Mesh;
     public static GRASS_BLADE: Mesh;
+
+    public static SPHERICAL_TANK: Mesh;
+    public static STATION_ENGINE: Mesh;
+
+    public static CRATE: Mesh;
 
     public static EnqueueTasks(manager: AssetsManager, scene: Scene) {
         const spaceshipTask = manager.addMeshTask("spaceshipTask", "", "", spaceship);
@@ -95,19 +100,6 @@ export class Objects {
             }
 
             console.log("Wanderer loaded");
-        };
-
-        const spacestationTask = manager.addMeshTask("spacestationTask", "", "", shipCarrier);
-        spacestationTask.onSuccess = function (task: MeshAssetTask) {
-            Objects.SPACE_STATION = task.loadedMeshes[0] as Mesh;
-
-            for (const mesh of Objects.SPACE_STATION.getChildMeshes()) {
-                mesh.isVisible = false;
-                //pbr._reflectionTexture = new Texture(starfield, scene);
-                //pbr._reflectionTexture.coordinatesMode = Texture.SPHERICAL_MODE;
-            }
-
-            console.log("Spacestation loaded");
         };
 
         const bananaTask = manager.addMeshTask("bananaTask", "", "", banana);
@@ -188,18 +180,6 @@ export class Objects {
             };
         });
 
-        const landingPadTask = manager.addMeshTask("landingPadTask", "", "", landingPad);
-        landingPadTask.onSuccess = function (task: MeshAssetTask) {
-            Objects.LANDING_PAD = task.loadedMeshes[0] as Mesh;
-            Objects.LANDING_PAD.isVisible = false;
-
-            for (const mesh of Objects.LANDING_PAD.getChildMeshes()) {
-                mesh.isVisible = false;
-            }
-
-            console.log("LandingPad loaded");
-        };
-
         const treeTask = manager.addMeshTask("treeTask", "", "", tree);
         treeTask.onSuccess = function (task: MeshAssetTask) {
             Objects.TREE = task.loadedMeshes[0] as Mesh;
@@ -226,11 +206,44 @@ export class Objects {
             console.log("Tree loaded");
         };
 
+        const sphericalTankTask = manager.addMeshTask("SphericalTankTask", "", "", sphericalTank);
+        sphericalTankTask.onSuccess = (task: MeshAssetTask) => {
+            Objects.SPHERICAL_TANK = task.loadedMeshes[0].getChildMeshes()[0] as Mesh;
+            Objects.SPHERICAL_TANK.parent = null;
+            Objects.SPHERICAL_TANK.isVisible = false;
+
+            const boundingBox = Objects.SPHERICAL_TANK.getBoundingInfo().boundingBox;
+            const maxDimension = Math.max(boundingBox.extendSize.x, boundingBox.extendSize.y, boundingBox.extendSize.z);
+
+            Objects.SPHERICAL_TANK.scalingDeterminant = 20 / maxDimension;
+            Objects.SPHERICAL_TANK.bakeCurrentTransformIntoVertices();
+
+            console.log("SphericalTank loaded");
+        };
+
+        const stationEngineTask = manager.addMeshTask("StationEngineTask", "", "", stationEngine);
+        stationEngineTask.onSuccess = (task: MeshAssetTask) => {
+            Objects.STATION_ENGINE = task.loadedMeshes[0].getChildMeshes()[0] as Mesh;
+            Objects.STATION_ENGINE.parent = null;
+            Objects.STATION_ENGINE.isVisible = false;
+
+            const boundingBox = Objects.STATION_ENGINE.getBoundingInfo().boundingBox;
+            const maxDimension = Math.max(boundingBox.extendSize.x, boundingBox.extendSize.y, boundingBox.extendSize.z);
+
+            Objects.STATION_ENGINE.scalingDeterminant = 1.0 / maxDimension;
+            Objects.STATION_ENGINE.bakeCurrentTransformIntoVertices();
+
+            console.log("StationEngine loaded");
+        };
+
         Objects.BUTTERFLY = createButterfly(scene);
         Objects.BUTTERFLY.isVisible = false;
 
         Objects.GRASS_BLADE = createGrassBlade(scene, 3);
         Objects.GRASS_BLADE.isVisible = false;
+
+        Objects.CRATE = MeshBuilder.CreateBox("crate", { size: 1 }, scene);
+        Objects.CRATE.isVisible = false;
 
         manager.onProgress = (remainingCount, totalCount) => {
             const loadingScreen = scene.getEngine().loadingScreen;
@@ -257,10 +270,6 @@ export class Objects {
         return Objects.WANDERER.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
     }
 
-    static CreateSpaceStationInstance(): InstancedMesh {
-        return Objects.SPACE_STATION.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
-    }
-
     static CreateBananaInstance(): InstancedMesh {
         return Objects.BANANA.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
     }
@@ -276,13 +285,5 @@ export class Objects {
 
     static CreateCharacterInstance(): InstancedMesh {
         return Objects.CHARACTER.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
-    }
-
-    static CreateRockInstance(): InstancedMesh {
-        return Objects.ROCK.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
-    }
-
-    static CreateLandingPadInstance(): InstancedMesh {
-        return Objects.LANDING_PAD.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
     }
 }

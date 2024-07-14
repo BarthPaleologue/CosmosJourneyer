@@ -45,6 +45,28 @@ import skyBox from "../../asset/skybox/milkyway.env";
 
 import cursorImage from "../../asset/textures/hoveredCircle.png";
 
+import solarPanelAlbedo from "../../asset/SolarPanelMaterial/SolarPanel002_2K-PNG_Color.png";
+import solarPanelNormal from "../../asset/SolarPanelMaterial/SolarPanel002_2K-PNG_NormalDX.png";
+import solarPanelMetallic from "../../asset/SolarPanelMaterial/SolarPanel002_2K-PNG_Metalness.png";
+import solarPanelRoughness from "../../asset/SolarPanelMaterial/SolarPanel002_2K-PNG_Roughness.png";
+
+import spaceStationAlbedo from "../../asset/spaceStationMaterial/spaceship-panels1-albedo.png";
+import spaceStationNormal from "../../asset/spaceStationMaterial/spaceship-panels1-normal-dx.png";
+import spaceStationMetallic from "../../asset/spaceStationMaterial/spaceship-panels1-metallic.png";
+import spaceStationRoughness from "../../asset/spaceStationMaterial/spaceship-panels1-roughness.png";
+import spaceStationAmbientOcclusion from "../../asset/spaceStationMaterial/spaceship-panels1-ao.png";
+
+import metalPanelsAlbdeo from "../../asset/metalPanelMaterial/sci-fi-panel1-albedo.png";
+import metalPanelsNormal from "../../asset/metalPanelMaterial/sci-fi-panel1-normal-dx.png";
+import metalPanelsRoughness from "../../asset/metalPanelMaterial/sci-fi-panel1-roughness.png";
+import metalPanelsMetallic from "../../asset/metalPanelMaterial/sci-fi-panel1-metallic.png";
+import metalPanelsAmbientOcclusion from "../../asset/metalPanelMaterial/sci-fi-panel1-ao.png";
+
+import crateAlbedo from "../../asset/crateMaterial/space-crate1-albedo.png";
+import crateNormal from "../../asset/crateMaterial/space-crate1-normal-dx.png";
+import crateMetallicRoughness from "../../asset/crateMaterial/space-crate1-metallic-roughness.png";
+import crateAmbientOcclusion from "../../asset/crateMaterial/space-crate1-ao.png";
+
 export class Textures {
     static ROCK_NORMAL_METALLIC_MAP: Texture;
     static ROCK_ALBEDO_ROUGHNESS_MAP: Texture;
@@ -76,6 +98,28 @@ export class Textures {
 
     static SEAMLESS_PERLIN: Texture;
 
+    static SOLAR_PANEL_ALBEDO: Texture;
+    static SOLAR_PANEL_NORMAL: Texture;
+    static SOLAR_PANEL_METALLIC: Texture;
+    static SOLAR_PANEL_ROUGHNESS: Texture;
+
+    static SPACE_STATION_ALBEDO: Texture;
+    static SPACE_STATION_NORMAL: Texture;
+    static SPACE_STATION_METALLIC: Texture;
+    static SPACE_STATION_ROUGHNESS: Texture;
+    static SPACE_STATION_AMBIENT_OCCLUSION: Texture;
+
+    static METAL_PANELS_ALBEDO: Texture;
+    static METAL_PANELS_NORMAL: Texture;
+    static METAL_PANELS_METALLIC: Texture;
+    static METAL_PANELS_ROUGHNESS: Texture;
+    static METAL_PANELS_AMBIENT_OCCLUSION: Texture;
+
+    static CRATE_ALBEDO: Texture;
+    static CRATE_NORMAL: Texture;
+    static CRATE_METALLIC_ROUGHNESS: Texture;
+    static CRATE_AMBIENT_OCCLUSION: Texture;
+
     static MILKY_WAY: CubeTexture;
 
     static EnqueueTasks(manager: AssetsManager, scene: Scene) {
@@ -101,6 +145,28 @@ export class Textures {
         manager.addTextureTask("FlareTexture", flareParticle).onSuccess = (task) => (Textures.FLARE_TEXTURE = task.texture);
 
         manager.addTextureTask("SeamlessPerlin", seamlessPerlin).onSuccess = (task) => (Textures.SEAMLESS_PERLIN = task.texture);
+
+        manager.addTextureTask("SolarPanelAlbedo", solarPanelAlbedo).onSuccess = (task) => (Textures.SOLAR_PANEL_ALBEDO = task.texture);
+        manager.addTextureTask("SolarPanelNormal", solarPanelNormal).onSuccess = (task) => (Textures.SOLAR_PANEL_NORMAL = task.texture);
+        manager.addTextureTask("SolarPanelMetallic", solarPanelMetallic).onSuccess = (task) => (Textures.SOLAR_PANEL_METALLIC = task.texture);
+        manager.addTextureTask("SolarPanelRoughness", solarPanelRoughness).onSuccess = (task) => (Textures.SOLAR_PANEL_ROUGHNESS = task.texture);
+
+        manager.addTextureTask("SpaceStationAlbedo", spaceStationAlbedo).onSuccess = (task) => (Textures.SPACE_STATION_ALBEDO = task.texture);
+        manager.addTextureTask("SpaceStationNormal", spaceStationNormal).onSuccess = (task) => (Textures.SPACE_STATION_NORMAL = task.texture);
+        manager.addTextureTask("SpaceStationMetallic", spaceStationMetallic).onSuccess = (task) => (Textures.SPACE_STATION_METALLIC = task.texture);
+        manager.addTextureTask("SpaceStationRoughness", spaceStationRoughness).onSuccess = (task) => (Textures.SPACE_STATION_ROUGHNESS = task.texture);
+        manager.addTextureTask("SpaceStationAmbientOcclusion", spaceStationAmbientOcclusion).onSuccess = (task) => (Textures.SPACE_STATION_AMBIENT_OCCLUSION = task.texture);
+        
+        manager.addTextureTask("MetalPanelsAlbedo", metalPanelsAlbdeo).onSuccess = (task) => (Textures.METAL_PANELS_ALBEDO = task.texture);
+        manager.addTextureTask("MetalPanelsNormal", metalPanelsNormal).onSuccess = (task) => (Textures.METAL_PANELS_NORMAL = task.texture);
+        manager.addTextureTask("MetalPanelsMetallic", metalPanelsMetallic).onSuccess = (task) => (Textures.METAL_PANELS_METALLIC = task.texture);
+        manager.addTextureTask("MetalPanelsRoughness", metalPanelsRoughness).onSuccess = (task) => (Textures.METAL_PANELS_ROUGHNESS = task.texture);
+        manager.addTextureTask("MetalPanelsAmbientOcclusion", metalPanelsAmbientOcclusion).onSuccess = (task) => (Textures.METAL_PANELS_AMBIENT_OCCLUSION = task.texture);
+
+        manager.addTextureTask("CrateAlbedo", crateAlbedo).onSuccess = (task) => (Textures.CRATE_ALBEDO = task.texture);
+        manager.addTextureTask("CrateNormal", crateNormal).onSuccess = (task) => (Textures.CRATE_NORMAL = task.texture);
+        manager.addTextureTask("CrateMetallicRoughness", crateMetallicRoughness).onSuccess = (task) => (Textures.CRATE_METALLIC_ROUGHNESS = task.texture);
+        manager.addTextureTask("CrateAmbientOcclusion", crateAmbientOcclusion).onSuccess = (task) => (Textures.CRATE_AMBIENT_OCCLUSION = task.texture);
 
         manager.addCubeTextureTask("SkyBox", skyBox).onSuccess = (task) => (Textures.MILKY_WAY = task.texture);
 

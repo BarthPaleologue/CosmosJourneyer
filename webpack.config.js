@@ -13,9 +13,9 @@ const config = {
         main: "./src/ts/index.ts",
         alphaTestis: "./src/ts/alphaTestis.ts",
         blackHole: "./src/ts/blackHoleDemo.ts",
-        landingSimulator: "./src/ts/landingSimulator.ts",
         playground: "./src/ts/playground.ts",
         xr: "./src/ts/xr.ts",
+        spaceStationGenerator: "./src/ts/spaceStationGenerator.ts",
         debugAssets: "./src/ts/debugAssets.ts"
     },
     output: {
@@ -73,12 +73,6 @@ const config = {
             chunks: ["blackHole"]
         }),
         new HtmlWebpackPlugin({
-            title: "Landing Simulator",
-            filename: "landingSimulator.html",
-            template: path.join(htmlPath, "index.html"),
-            chunks: ["landingSimulator"]
-        }),
-        new HtmlWebpackPlugin({
             title: "Playground",
             filename: "playground.html",
             template: path.join(htmlPath, "index.html"),
@@ -91,8 +85,14 @@ const config = {
             chunks: ["xr"]
         }),
         new HtmlWebpackPlugin({
+            title: "Space station generator",
+            filename: "spaceStationGenerator.html",
+            template: path.join(htmlPath, "index.html"),
+            chunks: ["spaceStationGenerator"]
+        }),
+        new HtmlWebpackPlugin({
             title: "Debug Texture",
-            filename: "debugassets.html",
+            filename: "debugAssets.html",
             template: path.join(htmlPath, "index.html"),
             chunks: ["debugAssets"]
         }),

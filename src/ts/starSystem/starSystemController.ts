@@ -236,8 +236,8 @@ export class StarSystemController {
         }
 
         for (const spacestation of this.spaceStations) {
-            const distance = spacestation.getTransform().getAbsolutePosition().subtract(position).length() - spacestation.getBoundingRadius() * 100;
-            if (distance < smallerDistance && distance < spacestation.getBoundingRadius() * 500) {
+            const distance = spacestation.getTransform().getAbsolutePosition().subtract(position).length();
+            if (distance < smallerDistance && distance < spacestation.getBoundingRadius() * 20) {
                 nearest = spacestation;
                 smallerDistance = distance;
             }
@@ -346,11 +346,11 @@ export class StarSystemController {
     /**
      * Updates the system and all its orbital objects forward in time by the given delta time.
      * The nearest object is kept in place and the other objects are updated accordingly.
-     * @param deltaTime The time elapsed since the last update
+     * @param deltaSeconds The time elapsed since the last update
      * @param chunkForge The chunk forge used to update the LOD of the telluric planets
      * @param postProcessManager
      */
-    public update(deltaTime: number, chunkForge: ChunkForge, postProcessManager: PostProcessManager): void {
+    public update(deltaSeconds: number, chunkForge: ChunkForge, postProcessManager: PostProcessManager): void {
         const controller = this.scene.getActiveControls();
         this.computeClosestToScreenCenterOrbitalObject();
 
@@ -386,7 +386,7 @@ export class StarSystemController {
         // By doing so, their rotation axis on themselves except the fixed one must as well be rotated in the same way.
         // Last but not least, the background starfield must be rotated in the opposite direction to give the impression the moon is rotating.
         if (shouldCompensateRotation) {
-            const dthetaNearest = OrbitalObjectUtils.GetRotationAngle(nearestOrbitalObject, deltaTime);
+            const dthetaNearest = OrbitalObjectUtils.GetRotationAngle(nearestOrbitalObject, deltaSeconds);
 
             for (const object of this.orbitalObjects) {
                 const orbit = object.getOrbitProperties();
@@ -410,7 +410,7 @@ export class StarSystemController {
             this.starFieldBox.setRotationMatrix(this.starFieldBox.getRotationMatrix().multiply(starfieldAdditionalRotation));
         } else {
             // if we don't compensate the rotation of the nearest body, we must simply update its rotation
-            OrbitalObjectUtils.UpdateRotation(nearestOrbitalObject, deltaTime);
+            OrbitalObjectUtils.UpdateRotation(nearestOrbitalObject, deltaSeconds);
         }
 
         // TRANSLATION COMPENSATION
@@ -418,7 +418,8 @@ export class StarSystemController {
         // compute what would be its next position if it were to move normally.
         // This gives us a translation vector that we can negate and apply to all other bodies.
         const initialPosition = nearestOrbitalObject.getTransform().getAbsolutePosition().clone();
-        const newPosition = OrbitalObjectUtils.GetNextOrbitalPosition(nearestOrbitalObject, deltaTime);
+        const newPosition = OrbitalObjectUtils.GetNextOrbitalPosition(nearestOrbitalObject, deltaSeconds);
+
         const nearestBodyDisplacement = newPosition.subtract(initialPosition);
         if (shouldCompensateTranslation) {
             const negatedDisplacement = nearestBodyDisplacement.negate();
@@ -441,14 +442,14 @@ export class StarSystemController {
         for (const object of this.orbitalObjects) {
             if (object === nearestOrbitalObject) continue;
 
-            OrbitalObjectUtils.UpdateOrbitalPosition(object, deltaTime);
-            OrbitalObjectUtils.UpdateRotation(object, deltaTime);
+            OrbitalObjectUtils.UpdateOrbitalPosition(object, deltaSeconds);
+            OrbitalObjectUtils.UpdateRotation(object, deltaSeconds);
         }
 
-        controller.update(deltaTime);
+        controller.update(deltaSeconds);
 
         for (const object of this.celestialBodies) {
-            object.getAsteroidField()?.update(controller.getActiveCameras()[0].globalPosition, deltaTime);
+            object.getAsteroidField()?.update(controller.getActiveCameras()[0].globalPosition, deltaSeconds);
         }
 
         for (const body of this.telluricPlanets) {
@@ -461,15 +462,16 @@ export class StarSystemController {
             object.computeCulling(controller.getActiveCameras());
         }
 
-        for (const object of this.spaceStations) {
-            object.updateRings(deltaTime);
-            object.computeCulling(controller.getActiveCameras());
+        const cameraWorldPosition = controller.getTransform().getAbsolutePosition();
+        for (const spaceStation of this.spaceStations) {
+            spaceStation.update(this.stellarObjects, cameraWorldPosition, deltaSeconds);
+            spaceStation.computeCulling(controller.getActiveCameras());
         }
 
         // floating origin
         this.applyFloatingOrigin();
 
-        this.updateShaders(deltaTime, postProcessManager);
+        this.updateShaders(deltaSeconds, postProcessManager);
     }
 
     public applyFloatingOrigin() {
@@ -477,7 +479,9 @@ export class StarSystemController {
         if (controller.getTransform().getAbsolutePosition().length() > 500) {
             const displacementTranslation = controller.getTransform().getAbsolutePosition().negate();
             this.translateEverythingNow(displacementTranslation);
-            translate(controller.getTransform(), displacementTranslation);
+            if(controller.getTransform().parent === null) {
+                translate(controller.getTransform(), displacementTranslation);
+            }
         }
     }
 

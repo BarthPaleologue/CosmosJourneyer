@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<materialx version="1.38" fileprefix="./">
+  <standard_surface ypos="-1.879310" xpos="6.159420" name="SolarPanel002_2K_PNG_StandardSurface" type="surfaceshader">
+    <input value="0" name="specular" type="float" />
+    <input value="1" name="coat" type="float" />
+    <input value="1, 1, 1" name="coat_color" type="color3" />
+    <input value="1" name="base" type="float" />
+    <input nodename="SolarPanel002_2K_PNG_Color" name="base_color" type="color3" />
+    <input nodename="SolarPanel002_2K_PNG_Metalness" value="1" name="metalness" type="float" />
+    <input nodename="normalmap" name="normal" type="vector3" />
+    <input nodename="normalmap" name="coat_normal" type="vector3" />
+    <input nodename="SolarPanel002_2K_PNG_Roughness" name="specular_roughness" type="float" />
+    <input nodename="SolarPanel002_2K_PNG_Roughness" name="coat_roughness" type="float" />
+  </standard_surface>
+  <surfacematerial ypos="0.000000" xpos="8.695652" name="SolarPanel002_2K_PNG" type="material">
+    <input nodename="SolarPanel002_2K_PNG_StandardSurface" name="surfaceshader" type="surfaceshader" />
+    <input nodename="displacement" name="displacementshader" type="displacementshader" />
+  </surfacematerial>
+  <tiledimage ypos="-3.103448" xpos="3.623188" name="SolarPanel002_2K_PNG_Color" type="color3">
+    <input colorspace="srgb_texture" value="SolarPanel002_2K-PNG_Color.png" name="file" type="filename" />
+    <input value="1.0, 1.0" name="uvtiling" type="vector2" />
+  </tiledimage>
+  <tiledimage ypos="5.163793" xpos="3.623188" name="SolarPanel002_2K_PNG_Displacement" type="float">
+    <input value="SolarPanel002_2K-PNG_Displacement.png" name="file" type="filename" />
+    <input value="1.0, 1.0" name="uvtiling" type="vector2" />
+  </tiledimage>
+  <displacement ypos="1.879310" xpos="6.159420" name="displacement" type="displacementshader">
+    <input nodename="SolarPanel002_2K_PNG_Displacement" name="displacement" type="float" />
+    <input value="1.0" name="scale" type="float" />
+  </displacement>
+  <tiledimage ypos="-1.758621" xpos="3.623188" name="SolarPanel002_2K_PNG_Metalness" type="float">
+    <input value="SolarPanel002_2K-PNG_Metalness.png" name="file" type="filename" />
+    <input value="1.0, 1.0" name="uvtiling" type="vector2" />
+  </tiledimage>
+  <tiledimage ypos="0.879310" xpos="1.086957" name="SolarPanel002_2K_PNG_NormalGL" type="vector3">
+    <input value="SolarPanel002_2K-PNG_NormalGL.png" name="file" type="filename" />
+    <input value="1.0, 1.0" name="uvtiling" type="vector2" />
+  </tiledimage>
+  <normalmap ypos="3.586207" xpos="3.623188" name="normalmap" type="vector3">
+    <input nodename="SolarPanel002_2K_PNG_NormalGL" name="in" type="vector3" />
+    <input value="1.0" name="scale" type="float" />
+  </normalmap>
+  <tiledimage ypos="-0.413793" xpos="3.623188" name="SolarPanel002_2K_PNG_Roughness" type="float">
+    <input value="SolarPanel002_2K-PNG_Roughness.png" name="file" type="filename" />
+    <input value="1.0, 1.0" name="uvtiling" type="vector2" />
+  </tiledimage>
+</materialx>
