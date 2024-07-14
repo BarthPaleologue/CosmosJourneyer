@@ -46,6 +46,7 @@ import { LandingRequest, ManagesLandingPads } from "../utils/managesLandingPads"
 import { getEdibleEnergyPerHaPerDay } from "../utils/agriculture";
 import { Settings } from "../settings";
 import { Objects } from "../assets/objects";
+import { EngineBay } from "../assets/procedural/spaceStation/engineBay";
 
 export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads {
     readonly name: string;
@@ -64,6 +65,7 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
     readonly ringHabitats: RingHabitat[] = [];
     readonly cylinderHabitats: CylinderHabitat[] = [];
     readonly landingBays: LandingBay[] = [];
+    readonly engineBays: EngineBay[] = [];
 
     private readonly root: TransformNode;
 
@@ -179,10 +181,10 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
 
         let lastNode: TransformNode | null = null;
 
-        const engine = Objects.STATION_ENGINE.createInstance("StationEngine");
-        engine.scaling.scaleInPlace(100);
-        engine.parent = this.getTransform();
-        lastNode = engine;
+        const engineBay = new EngineBay(this.scene);
+        engineBay.getTransform().parent = this.getTransform();
+        lastNode = engineBay.getTransform();
+        this.engineBays.push(engineBay);
 
         const solarSection = new SolarSection(solarPanelSurface, Settings.SEED_HALF_RANGE * this.model.rng(31), this.scene);
         solarSection.getTransform().parent = this.getTransform();
@@ -279,6 +281,7 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
         this.ringHabitats.forEach((ringHabitat) => ringHabitat.update(stellarObjects, cameraWorldPosition, deltaSeconds));
         this.cylinderHabitats.forEach((cylinderHabitat) => cylinderHabitat.update(stellarObjects, cameraWorldPosition, deltaSeconds));
         this.landingBays.forEach((landingBay) => landingBay.update(stellarObjects, cameraWorldPosition, deltaSeconds));
+        this.engineBays.forEach((engineBay) => engineBay.update(stellarObjects));
     }
 
     getTransform(): TransformNode {
@@ -292,6 +295,7 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
         this.ringHabitats.forEach((ringHabitat) => ringHabitat.dispose());
         this.cylinderHabitats.forEach((cylinderHabitat) => cylinderHabitat.dispose());
         this.landingBays.forEach((landingBay) => landingBay.dispose());
+        this.engineBays.forEach((engineBay) => engineBay.dispose());
 
         this.childAggregates.forEach((childAggregate) => childAggregate.dispose());
     }
