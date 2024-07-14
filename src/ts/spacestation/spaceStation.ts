@@ -227,11 +227,11 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
 
         lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(this.model.rng(23) * 5));
 
-        const landingBay = new LandingBay(this.model, this.model.rng(37) * Settings.SEED_HALF_RANGE, this.scene);
+        /*const landingBay = new LandingBay(this.model, this.model.rng(37) * Settings.SEED_HALF_RANGE, this.scene);
 
         this.landingBays.push(landingBay);
         this.placeNode(landingBay.getTransform(), lastNode);
-        landingBay.getTransform().parent = this.getTransform();
+        landingBay.getTransform().parent = this.getTransform();*/
     }
 
     private addUtilitySections(lastNode: TransformNode, nbSections: number): TransformNode {
