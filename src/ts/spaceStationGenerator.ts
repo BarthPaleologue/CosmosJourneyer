@@ -74,7 +74,7 @@ sun.getTransform().position = new Vector3(7, 2, 5).normalize().scaleInPlace(dist
 
 const starfieldBox = new StarFieldBox(scene);
 
-const spaceStationModel = new SpaceStationModel(Math.random() * 69420, sun.model);
+const spaceStationModel = new SpaceStationModel(Math.random() * Settings.SEED_HALF_RANGE, sun.model);
 spaceStationModel.orbit.radius = distanceToStar;
 
 const spaceStation = new SpaceStation(scene, spaceStationModel, sun);
