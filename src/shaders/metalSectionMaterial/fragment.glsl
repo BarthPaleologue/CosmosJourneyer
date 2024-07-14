@@ -38,12 +38,14 @@ void main() {
 
     vec2 uv = vec2(fract(6.0 * vUV.x), fract(vPosition.y / 50.0));
 
+    float gamma = 2.2;
+
     vec3 normalFromMap = texture(normalMap, uv).rgb;
     normalFromMap.y = 1.0 - normalFromMap.y;
     normalFromMap = normalFromMap * 2.0 - 1.0;
     vec3 normalW = normalize(vTBN * normalFromMap);
 
-    vec3 albedo = pow(texture(albedoMap, uv).rgb, vec3(2.2));
+    vec3 albedo = pow(texture(albedoMap, uv).rgb, vec3(gamma));
     float roughness = texture(roughnessMap, uv).r;
     float metallic = texture(metallicMap, uv).r;
 
@@ -53,7 +55,7 @@ void main() {
         Lo += calculateLight(albedo, normalW, roughness, metallic, lightDirectionW, viewDirectionW, star_colors[i]);
     }
 
-    Lo = pow(Lo, vec3(1.0 / 2.2));
+    Lo = pow(Lo, vec3(1.0 / gamma));
 
     gl_FragColor = vec4(Lo, 1.0);
 }

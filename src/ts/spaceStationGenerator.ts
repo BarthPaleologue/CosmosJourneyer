@@ -36,12 +36,14 @@ import { Settings } from "./settings";
 import { SpaceStationModel } from "./spacestation/spacestationModel";
 import { SpaceStationUI } from "./ui/spaceStationUI";
 import { StarFieldBox } from "./starSystem/starFieldBox";
+import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-const engine = new Engine(canvas, true);
+const engine = new WebGPUEngine(canvas);
+await engine.initAsync();
 engine.useReverseDepthBuffer = true;
 engine.displayLoadingUI();
 
