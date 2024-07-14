@@ -186,24 +186,15 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
         lastNode = engineBay.getTransform();
         this.engineBays.push(engineBay);
 
+        lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(this.model.rng(564) * 5));
+
         const solarSection = new SolarSection(solarPanelSurface, Settings.SEED_HALF_RANGE * this.model.rng(31), this.scene);
         solarSection.getTransform().parent = this.getTransform();
         this.placeNode(solarSection.getTransform(), lastNode);
         lastNode = solarSection.getTransform();
         this.solarSections.push(solarSection);
 
-        for (let i = 0; i < 10 + Math.floor(this.model.rng(66) * 10); i++) {
-            const utilitySection = new UtilitySection(this.model.rng(632 + 10 * i) * Settings.SEED_HALF_RANGE, this.scene);
-            this.utilitySections.push(utilitySection);
-
-            if (lastNode !== null) {
-                this.placeNode(utilitySection.getTransform(), lastNode);
-            }
-
-            utilitySection.getTransform().parent = this.root;
-
-            lastNode = utilitySection.getTransform();
-        }
+        lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(this.model.rng(23) * 5));
 
         const habitatType = wheelOfFortune(
             [
@@ -241,24 +232,29 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
 
         lastNode = newNode;
 
-        for (let i = 0; i < 5 + Math.floor(this.model.rng(23) * 5); i++) {
-            const utilitySection = new UtilitySection(this.model.rng(132 + 10 * i) * Settings.SEED_HALF_RANGE, this.scene);
-            this.utilitySections.push(utilitySection);
-
-            if (lastNode !== null) {
-                this.placeNode(utilitySection.getTransform(), lastNode);
-            }
-
-            utilitySection.getTransform().parent = this.root;
-
-            lastNode = utilitySection.getTransform();
-        }
+        lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(this.model.rng(23) * 5));
 
         const landingBay = new LandingBay(this.model, this.model.rng(37) * Settings.SEED_HALF_RANGE, this.scene);
 
         this.landingBays.push(landingBay);
         this.placeNode(landingBay.getTransform(), lastNode);
         landingBay.getTransform().parent = this.root;
+    }
+
+    private addUtilitySections(lastNode: TransformNode, nbSections: number): TransformNode {
+        let newLastNode = lastNode;
+        for (let i = 0; i < nbSections; i++) {
+            const utilitySection = new UtilitySection(this.model.rng(132 + 10 * this.utilitySections.length) * Settings.SEED_HALF_RANGE, this.scene);
+            this.utilitySections.push(utilitySection);
+
+            this.placeNode(utilitySection.getTransform(), newLastNode);
+
+            utilitySection.getTransform().parent = this.root;
+
+            newLastNode = utilitySection.getTransform();
+        }
+
+        return newLastNode;
     }
 
     private placeNode(node: TransformNode, parent: TransformNode) {

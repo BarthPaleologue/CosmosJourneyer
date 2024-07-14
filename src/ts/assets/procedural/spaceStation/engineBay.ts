@@ -38,7 +38,7 @@ export class EngineBay implements Transformable {
             height: 400,
             diameterBottom: 250,
             tessellation: nbEngines
-        });
+        }, scene);
         this.skirt.convertToFlatShadedMesh();
 
         this.skirtMaterial = new MetalSectionMaterial(scene);
@@ -79,11 +79,12 @@ export class EngineBay implements Transformable {
 
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
         if (distanceToCamera < 350e3 && this.skirtAggregate === null) {
-            this.skirtAggregate = createEnvironmentAggregate(this.skirt, PhysicsShapeType.MESH);
+            this.skirtAggregate = createEnvironmentAggregate(this.skirt, PhysicsShapeType.MESH, this.scene);
             this.engines.forEach((engine) => {
                 const engineBody = new PhysicsBody(engine, PhysicsMotionType.STATIC, false, this.scene);
                 engineBody.setMassProperties({ mass: 0 });
                 engineBody.shape = this.engineShape;
+                engineBody.disablePreStep = false;
                 this.engineBodies.push(engineBody);
             });
         } else if (distanceToCamera > 360e3 && this.skirtAggregate !== null) {

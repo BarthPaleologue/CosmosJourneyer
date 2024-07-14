@@ -133,12 +133,12 @@ export class RingHabitat implements Transformable {
 
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
         if(distanceToCamera < 350e3 && this.attachmentAggregate === null) {
-            this.attachmentAggregate = createEnvironmentAggregate(this.attachment, PhysicsShapeType.MESH);
+            this.attachmentAggregate = createEnvironmentAggregate(this.attachment, PhysicsShapeType.MESH, this.getTransform().getScene());
             this.arms.forEach(arm => {
-                const armAggregate = createEnvironmentAggregate(arm, PhysicsShapeType.MESH);
+                const armAggregate = createEnvironmentAggregate(arm, PhysicsShapeType.MESH, this.getTransform().getScene());
                 this.armAggregates.push(armAggregate);
             });
-            this.ringAggregate = createEnvironmentAggregate(this.ring, PhysicsShapeType.MESH);
+            this.ringAggregate = createEnvironmentAggregate(this.ring, PhysicsShapeType.MESH, this.getTransform().getScene());
         } else if(distanceToCamera > 360e3 && this.attachmentAggregate !== null) {
             this.attachmentAggregate?.dispose();
             this.attachmentAggregate = null;

@@ -79,7 +79,7 @@ export class LandingBay {
 
         this.ring.parent = this.getTransform();
 
-        this.ringAggregate = createEnvironmentAggregate(this.ring, PhysicsShapeType.MESH);
+        this.ringAggregate = createEnvironmentAggregate(this.ring, PhysicsShapeType.MESH, scene);
 
         const yExtent = this.ring.getBoundingInfo().boundingBox.extendSize.y;
 
@@ -113,7 +113,7 @@ export class LandingBay {
 
             this.arms.push(arm);
 
-            const armAggregate = createEnvironmentAggregate(arm, PhysicsShapeType.BOX);
+            const armAggregate = createEnvironmentAggregate(arm, PhysicsShapeType.BOX, scene);
             this.armAggregates.push(armAggregate);
         }
 
@@ -158,9 +158,9 @@ export class LandingBay {
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
 
         if (distanceToCamera < 350e3 && this.ringAggregate === null) {
-            this.ringAggregate = createEnvironmentAggregate(this.ring, PhysicsShapeType.MESH);
+            this.ringAggregate = createEnvironmentAggregate(this.ring, PhysicsShapeType.MESH, this.getTransform().getScene());
             this.arms.forEach((arm) => {
-                const armAggregate = createEnvironmentAggregate(arm, PhysicsShapeType.BOX);
+                const armAggregate = createEnvironmentAggregate(arm, PhysicsShapeType.BOX, this.getTransform().getScene());
                 this.armAggregates.push(armAggregate);
             });
         } else if (distanceToCamera > 360e3 && this.ringAggregate !== null) {

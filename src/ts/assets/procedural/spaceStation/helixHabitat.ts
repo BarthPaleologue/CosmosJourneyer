@@ -150,12 +150,12 @@ export class HelixHabitat implements Transformable {
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
 
         if (distanceToCamera < 350e3 && this.attachmentAggregate === null) {
-            this.attachmentAggregate = createEnvironmentAggregate(this.attachment, PhysicsShapeType.MESH);
-            this.helix1Aggregate = createEnvironmentAggregate(this.helix1, PhysicsShapeType.MESH);
-            this.helix2Aggregate = createEnvironmentAggregate(this.helix2, PhysicsShapeType.MESH);
+            this.attachmentAggregate = createEnvironmentAggregate(this.attachment, PhysicsShapeType.MESH, this.getTransform().getScene());
+            this.helix1Aggregate = createEnvironmentAggregate(this.helix1, PhysicsShapeType.MESH, this.getTransform().getScene());
+            this.helix2Aggregate = createEnvironmentAggregate(this.helix2, PhysicsShapeType.MESH, this.getTransform().getScene());
 
             this.arms.forEach(arm => {
-                const armAggregate = createEnvironmentAggregate(arm, PhysicsShapeType.MESH);
+                const armAggregate = createEnvironmentAggregate(arm, PhysicsShapeType.MESH, this.getTransform().getScene());
                 this.armAggregates.push(armAggregate);
             });
         } else if (distanceToCamera > 360e3 && this.attachmentAggregate !== null) {

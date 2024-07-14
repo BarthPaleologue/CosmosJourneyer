@@ -78,7 +78,7 @@ export class CylinderHabitat implements Transformable {
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
 
         if (distanceToCamera < 350e3 && this.cylinderAggregate === null) {
-            this.cylinderAggregate = createEnvironmentAggregate(this.cylinder, PhysicsShapeType.MESH);
+            this.cylinderAggregate = createEnvironmentAggregate(this.cylinder, PhysicsShapeType.MESH, this.getTransform().getScene());
         } else if (distanceToCamera > 360e3 && this.cylinderAggregate !== null) {
             this.cylinderAggregate.dispose();
             this.cylinderAggregate = null;
