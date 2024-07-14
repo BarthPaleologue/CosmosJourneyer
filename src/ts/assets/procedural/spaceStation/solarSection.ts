@@ -48,9 +48,9 @@ export class SolarSection implements Transformable {
 
         const nbArms = wheelOfFortune(
             [
-                [1, 0.2],
+                [1, 0.1],
                 [2, 0.3],
-                [3, 0.2],
+                [3, 0.3],
                 [4, 0.2],
                 [5, 0.1]
             ],
