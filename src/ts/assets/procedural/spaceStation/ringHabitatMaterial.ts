@@ -39,11 +39,11 @@ const RingHabitatUniformNames = {
 }
 
 const RingHabitatSamplerNames = {
-    ALBEDO: "albedo",
-    NORMAL: "normal",
-    METALLIC: "metallic",
-    ROUGHNESS: "roughness",
-    OCCLUSION: "occlusion",
+    ALBEDO: "albedoMap",
+    NORMAL: "normalMap",
+    METALLIC: "metallicMap",
+    ROUGHNESS: "roughnessMap",
+    OCCLUSION: "occlusionMap",
 }
 
 export class RingHabitatMaterial extends ShaderMaterial {
