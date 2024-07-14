@@ -185,15 +185,15 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
 
         lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(this.model.rng(564) * 5));
 
-        /*const solarSection = new SolarSection(solarPanelSurface, Settings.SEED_HALF_RANGE * this.model.rng(31), this.scene);
+        const solarSection = new SolarSection(solarPanelSurface, Settings.SEED_HALF_RANGE * this.model.rng(31), this.scene);
         solarSection.getTransform().parent = this.getTransform();
         this.placeNode(solarSection.getTransform(), lastNode);
         lastNode = solarSection.getTransform();
-        this.solarSections.push(solarSection);*/
+        this.solarSections.push(solarSection);
 
         lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(this.model.rng(23) * 5));
 
-        /*const habitatType = wheelOfFortune(
+        const habitatType = wheelOfFortune(
             [
                 [SpaceStationNodeType.RING_HABITAT, 0.5],
                 [SpaceStationNodeType.HELIX_HABITAT, 0.3],
@@ -223,15 +223,15 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
 
         this.placeNode(newNode, lastNode);
         newNode.parent = this.root;
-        lastNode = newNode;*/
+        lastNode = newNode;
 
         lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(this.model.rng(23) * 5));
 
-        /*const landingBay = new LandingBay(this.model, this.model.rng(37) * Settings.SEED_HALF_RANGE, this.scene);
+        const landingBay = new LandingBay(this.model, this.model.rng(37) * Settings.SEED_HALF_RANGE, this.scene);
 
         this.landingBays.push(landingBay);
         this.placeNode(landingBay.getTransform(), lastNode);
-        landingBay.getTransform().parent = this.getTransform();*/
+        landingBay.getTransform().parent = this.getTransform();
     }
 
     private addUtilitySections(lastNode: TransformNode, nbSections: number): TransformNode {
