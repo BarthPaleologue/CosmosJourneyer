@@ -18,8 +18,6 @@
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { AssetsManager, MeshAssetTask } from "@babylonjs/core/Misc/assetsManager";
 import { Scene } from "@babylonjs/core/scene";
-import spaceship from "../../asset/spaceship/spaceship2.glb";
-import endeavorSpaceship from "../../asset/spaceship/endeavour.glb";
 import wanderer from "../../asset/spaceship/wanderer.glb";
 import banana from "../../asset/banana/banana.glb";
 import character from "../../asset/character/character.glb";
@@ -47,8 +45,6 @@ import { PhysicsShape, PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physi
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 
 export class Objects {
-    private static SPACESHIP: Mesh;
-    private static ENDEAVOR_SPACESHIP: Mesh;
     private static WANDERER: Mesh;
     private static BANANA: Mesh;
     private static CHARACTER: Mesh;
@@ -69,28 +65,6 @@ export class Objects {
     public static CRATE: Mesh;
 
     public static EnqueueTasks(manager: AssetsManager, scene: Scene) {
-        const spaceshipTask = manager.addMeshTask("spaceshipTask", "", "", spaceship);
-        spaceshipTask.onSuccess = function (task: MeshAssetTask) {
-            Objects.SPACESHIP = task.loadedMeshes[0] as Mesh;
-
-            for (const mesh of Objects.SPACESHIP.getChildMeshes()) {
-                mesh.isVisible = false;
-            }
-
-            console.log("Spaceship loaded");
-        };
-
-        const endeavorSpaceshipTask = manager.addMeshTask("endeavorSpaceshipTask", "", "", endeavorSpaceship);
-        endeavorSpaceshipTask.onSuccess = function (task: MeshAssetTask) {
-            Objects.ENDEAVOR_SPACESHIP = task.loadedMeshes[0] as Mesh;
-
-            for (const mesh of Objects.ENDEAVOR_SPACESHIP.getChildMeshes()) {
-                mesh.isVisible = false;
-            }
-
-            console.log("Endeavor Spaceship loaded");
-        };
-
         const wandererTask = manager.addMeshTask("wandererTask", "", "", wanderer);
         wandererTask.onSuccess = function (task: MeshAssetTask) {
             Objects.WANDERER = task.loadedMeshes[0] as Mesh;
@@ -253,17 +227,6 @@ export class Objects {
                 loadingScreen.loadingUIText = i18next.t("common:loading") + " " + ((100 * (totalCount - remainingCount)) / totalCount).toFixed(0) + "%";
             }
         };
-    }
-
-    static CreateSpaceShipInstance(): InstancedMesh {
-        return Objects.SPACESHIP.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
-    }
-
-    static CreateEndeavorSpaceShipInstance(): InstancedMesh {
-        const instance = Objects.ENDEAVOR_SPACESHIP.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
-        for (const child of instance.getChildMeshes()) child.isVisible = true;
-
-        return instance;
     }
 
     static CreateWandererInstance(): InstancedMesh {
