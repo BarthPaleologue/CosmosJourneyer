@@ -21,11 +21,10 @@ import { Scene } from "@babylonjs/core/scene";
 
 import grassFragment from "../../../../shaders/grassMaterial/grassFragment.glsl";
 import grassVertex from "../../../../shaders/grassMaterial/grassVertex.glsl";
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import perlinNoise from "../../../../asset/perlin.png";
 import { Transformable } from "../../../architecture/transformable";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { setStellarObjectUniforms, StellarObjectUniformNames } from "../../../postProcesses/uniforms/stellarObjectUniforms";
+import { Textures } from "../../textures";
 
 const GrassMaterialUniformNames = {
     WORLD: "world",
@@ -68,10 +67,8 @@ export class GrassMaterial extends ShaderMaterial {
             samplers: [...Object.values(GrassMaterialSamplerNames)]
         });
 
-        const perlinTexture = new Texture(perlinNoise, scene);
-
         this.backFaceCulling = false;
-        this.setTexture("perlinNoise", perlinTexture);
+        this.setTexture("perlinNoise", Textures.SEAMLESS_PERLIN);
 
         this.onBindObservable.add(() => {
             setStellarObjectUniforms(this.getEffect(), this.stars);
