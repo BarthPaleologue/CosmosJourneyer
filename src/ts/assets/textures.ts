@@ -39,13 +39,15 @@ import waterNormal1 from "../../asset/textures/waterNormalMap3.jpg";
 import waterNormal2 from "../../asset/textures/waterNormalMap4.jpg";
 import plumeParticle from "../../asset/textures/plume.png";
 import flareParticle from "../../asset/flare.png";
-import seamlessPerlin from "../../asset/perlin.png";
+import seamlessPerlin from "../../asset/perlin.webp";
 import atmosphereLUT from "../../shaders/textures/atmosphereLUT.glsl";
-import empty from "../../asset/oneBlackPixel.png";
+import empty from "../../asset/oneBlackPixel.webp";
 
 import skyBox from "../../asset/skybox/milkyway.env";
 
 import cursorImage from "../../asset/textures/hoveredCircle.png";
+
+import butterflyTexture from "../../asset/butterfly.webp";
 
 import solarPanelAlbedo from "../../asset/SolarPanelMaterial/SolarPanel002_2K-PNG_Color.webp";
 import solarPanelNormal from "../../asset/SolarPanelMaterial/SolarPanel002_2K-PNG_NormalDX.webp";
@@ -88,6 +90,8 @@ export class Textures {
     static PLUME_PARTICLE: Texture;
 
     static FLARE_TEXTURE: Texture;
+
+    static BUTTERFLY: Texture;
 
     static EMPTY_TEXTURE: Texture;
 
@@ -139,6 +143,8 @@ export class Textures {
 
         manager.addTextureTask("PlumeParticle", plumeParticle).onSuccess = (task) => (Textures.PLUME_PARTICLE = task.texture);
         manager.addTextureTask("FlareTexture", flareParticle).onSuccess = (task) => (Textures.FLARE_TEXTURE = task.texture);
+
+        manager.addTextureTask("Butterfly", butterflyTexture).onSuccess = (task) => (Textures.BUTTERFLY = task.texture);
 
         manager.addTextureTask("SeamlessPerlin", seamlessPerlin).onSuccess = (task) => (Textures.SEAMLESS_PERLIN = task.texture);
 

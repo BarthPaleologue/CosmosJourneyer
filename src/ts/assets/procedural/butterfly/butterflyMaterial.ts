@@ -21,10 +21,9 @@ import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import butterflyFragment from "../../../../shaders/butterflyMaterial/butterflyFragment.glsl";
 import butterflyVertex from "../../../../shaders/butterflyMaterial/butterflyVertex.glsl";
 
-import butterflyTexture from "../../../../asset/butterfly.png";
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Transformable } from "../../../architecture/transformable";
+import { Textures } from "../../textures";
 
 export class ButterflyMaterial extends ShaderMaterial {
     private elapsedSeconds = 0;
@@ -52,7 +51,7 @@ export class ButterflyMaterial extends ShaderMaterial {
         this.setVector3("lightDirection", new Vector3(0, 0, 0));
         this.setVector3("playerPosition", new Vector3(0, 0, 0));
         this.setFloat("time", 0);
-        this.setTexture("butterflyTexture", new Texture(butterflyTexture, scene));
+        this.setTexture("butterflyTexture", Textures.BUTTERFLY);
         this.backFaceCulling = false;
 
         this.onBindObservable.add(() => {
