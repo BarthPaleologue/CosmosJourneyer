@@ -25,8 +25,6 @@ import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 
 import rockNormalMetallicMap from "../../asset/rockMaterial/layered-planetary_normal_metallic.png";
 import rockAlbedoRoughnessMap from "../../asset/rockMaterial/layered-planetary_albedo_roughness.png";
-import dirtNormalMap from "../../asset/textures/dirt/Ground_Dirt_008_normal.jpg";
-import bottomNormalMap from "../../asset/textures/crackednormal.jpg";
 import grassNormalMetallicMap from "../../asset/grassMaterial/wispy-grass-meadow_normal_metallic.png";
 import grassAlbedoRoughnessMap from "../../asset/grassMaterial/wispy-grass-meadow_albedo_roughness.png";
 import snowNormalMetallicMap from "../../asset/iceMaterial/ice_field_normal_metallic.png";
@@ -70,9 +68,6 @@ import crateAmbientOcclusion from "../../asset/crateMaterial/space-crate1-ao.png
 export class Textures {
     static ROCK_NORMAL_METALLIC_MAP: Texture;
     static ROCK_ALBEDO_ROUGHNESS_MAP: Texture;
-
-    static DIRT_NORMAL_MAP: Texture;
-    static BOTTOM_NORMAL_MAP: Texture;
 
     static GRASS_NORMAL_METALLIC_MAP: Texture;
     static GRASS_ALBEDO_ROUGHNESS_MAP: Texture;
@@ -125,9 +120,6 @@ export class Textures {
     static EnqueueTasks(manager: AssetsManager, scene: Scene) {
         manager.addTextureTask("RockNormalMetallicMap", rockNormalMetallicMap).onSuccess = (task) => (Textures.ROCK_NORMAL_METALLIC_MAP = task.texture);
         manager.addTextureTask("RockAlbedoRoughnessMap", rockAlbedoRoughnessMap).onSuccess = (task) => (Textures.ROCK_ALBEDO_ROUGHNESS_MAP = task.texture);
-
-        manager.addTextureTask("DirtNormalMap", dirtNormalMap).onSuccess = (task) => (Textures.DIRT_NORMAL_MAP = task.texture);
-        manager.addTextureTask("BottomNormalMap", bottomNormalMap).onSuccess = (task) => (Textures.BOTTOM_NORMAL_MAP = task.texture);
 
         manager.addTextureTask("GrassNormalMetallicMap", grassNormalMetallicMap).onSuccess = (task) => (Textures.GRASS_NORMAL_METALLIC_MAP = task.texture);
         manager.addTextureTask("GrassAlbedoRoughnessMap", grassAlbedoRoughnessMap).onSuccess = (task) => (Textures.GRASS_ALBEDO_ROUGHNESS_MAP = task.texture);
