@@ -16,8 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { LinesMesh, MeshBuilder } from "@babylonjs/core/Meshes";
-import { Color3, Vector3 } from "@babylonjs/core/Maths/math";
-import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import { Vector3 } from "@babylonjs/core/Maths/math";
 import { setUpVector } from "../uberCore/transforms/basicTransform";
 import { getPointOnOrbitLocal } from "./orbit";
 import { OrbitalObject } from "../architecture/orbitalObject";
@@ -28,28 +27,20 @@ export class OrbitRenderer {
 
     private orbitalObjects: OrbitalObject[] = [];
 
-    private orbitMaterial: StandardMaterial | null = null;
-
     private _isVisible = false;
 
     setOrbitalObjects(orbitalObjects: OrbitalObject[], scene: Scene) {
-        if (this.orbitMaterial === null) {
-            this.orbitMaterial = new StandardMaterial("orbitMaterial", scene);
-            this.orbitMaterial.emissiveColor = Color3.White();
-            this.orbitMaterial.disableLighting = true;
-        }
-
         this.reset();
         this.orbitalObjects = orbitalObjects;
 
         for (const orbitalObject of orbitalObjects) {
-            this.createOrbitMesh(orbitalObject);
+            this.createOrbitMesh(orbitalObject, scene);
         }
 
         this.setVisibility(this.isVisible());
     }
 
-    private createOrbitMesh(orbitalObject: OrbitalObject) {
+    private createOrbitMesh(orbitalObject: OrbitalObject, scene: Scene) {
         const orbit = orbitalObject.getOrbitProperties();
         const nbSteps = 1000;
         const timestep = orbit.period / nbSteps;
@@ -61,9 +52,7 @@ export class OrbitRenderer {
         }
         points.push(points[0]);
 
-        const orbitMesh = MeshBuilder.CreateLines("orbit", { points: points }, orbitalObject.getTransform().getScene());
-        if (this.orbitMaterial === null) throw new Error("Orbit material is null");
-        orbitMesh.material = this.orbitMaterial;
+        const orbitMesh = MeshBuilder.CreateLines("orbit", { points: points }, scene);
         this.orbitMeshes.push(orbitMesh);
     }
 
