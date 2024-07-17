@@ -1,20 +1,25 @@
 .targetCursor {
-    --dim: 50px;
-    --s: max(20px, calc(var(--dim) * 0.4));
-    
-    border: 5px solid white;
-    width: var(--dim);
-    height: var(--dim);
-    mask:
-      conic-gradient(at var(--s) var(--s),#0000 75%,#000 0)
-      0 0/calc(100% - var(--s)) calc(100% - var(--s)),
-      linear-gradient(#000 0 0) content-box;
-  
-    &.round {
-        border-radius: 50%;
-    }
+  --dim: 50px;
+  --s: max(20px, calc(var(--dim) * 0.4));
 
-    &.rotated {
-        rotate: 45deg;
-    }
+  position: absolute;
+
+  border: 5px solid white;
+  width: var(--dim);
+  height: var(--dim);
+  mask: conic-gradient(at var(--s) var(--s), #0000 75%, #000 0) 0 0/calc(100% - var(--s)) calc(100% - var(--s)), linear-gradient(#000 0 0) content-box;
+
+  translate: -50% -50%;
+
+  &.round {
+    border-radius: 50%;
+  }
+
+  &.rotated {
+    rotate: 45deg;
+  }
+
+  .hidden {
+    display: none;
+  }
 }

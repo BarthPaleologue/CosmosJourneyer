@@ -68,7 +68,6 @@ export class SystemUI {
     public addObjectOverlay(object: Transformable & BoundingSphere & TypedObject) {
         const overlay = new ObjectOverlay(object);
         this.gui.addControl(overlay.textRoot);
-        this.gui.addControl(overlay.cursor);
         this.objectOverlays.push(overlay);
         overlay.init();
     }

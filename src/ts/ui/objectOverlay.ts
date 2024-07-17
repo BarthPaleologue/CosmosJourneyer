@@ -17,21 +17,21 @@
 
 import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
-import { Image } from "@babylonjs/gui/2D/controls/image";
 import { parseDistance, parseSeconds } from "../utils/parseToStrings";
 import { getAngularSize } from "../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { LocalDirection } from "../uberCore/localDirections";
 import { Settings } from "../settings";
 import { Transformable } from "../architecture/transformable";
 import { BoundingSphere } from "../architecture/boundingSphere";
 import { TypedObject } from "../architecture/typedObject";
-import { Textures } from "../assets/textures";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Matrix } from "@babylonjs/core/Maths/math";
 
 export class ObjectOverlay {
+    readonly cursor: HTMLDivElement;
+
     readonly textRoot: StackPanel;
-    readonly cursor: Image;
     readonly namePlate: TextBlock;
     readonly typeText: TextBlock;
     readonly distanceText: TextBlock;
@@ -49,6 +49,10 @@ export class ObjectOverlay {
     private readonly transformPlaceHolder: TransformNode;
 
     constructor(object: Transformable & BoundingSphere & TypedObject) {
+        this.cursor = document.createElement("div");
+        this.cursor.classList.add("targetCursor");
+        document.body.appendChild(this.cursor);
+
         this.object = object;
 
         this.textRoot = new StackPanel(object.getTransform().name + "OverlayTextRoot");
@@ -100,22 +104,27 @@ export class ObjectOverlay {
         this.etaText.textVerticalAlignment = TextBlock.VERTICAL_ALIGNMENT_CENTER;
         this.textRoot.addControl(this.etaText);
 
-        this.cursor = new Image("cursorImage", Textures.CURSOR_IMAGE_URL);
-        this.cursor.fixedRatio = 1;
-        this.cursor.width = 1;
-        this.cursor.alpha = 0.8;
-        this.cursor.zIndex = 4;
-
         this.transformPlaceHolder = new TransformNode(object.getTransform().name + "OverlayTransform", object.getTransform().getScene());
     }
 
     init() {
         this.textRoot.linkWithMesh(this.transformPlaceHolder);
-        this.cursor.linkWithMesh(this.transformPlaceHolder);
     }
 
     update(camera: Camera, target: (Transformable & BoundingSphere & TypedObject) | null) {
         const cameraToObject = this.object.getTransform().getAbsolutePosition().subtract(camera.globalPosition).normalize();
+        const cameraForward = camera.getDirection(Vector3.Forward(camera.getScene().useRightHandedSystem));
+
+        if (Vector3.Dot(cameraToObject, cameraForward) > 0) {
+            const screenCoordinates = Vector3.Project(this.object.getTransform().getAbsolutePosition(), Matrix.IdentityReadOnly, camera.getTransformationMatrix(), camera.viewport);
+
+            this.cursor.classList.remove("hidden");
+            this.cursor.style.left = `${screenCoordinates.x * 100}vw`;
+            this.cursor.style.top = `${screenCoordinates.y * 100}vh`;
+        } else {
+            this.cursor.classList.add("hidden");
+        }
+
         this.transformPlaceHolder.setAbsolutePosition(camera.globalPosition.add(cameraToObject.scale(10)));
         this.transformPlaceHolder.computeWorldMatrix(true);
 
@@ -125,23 +134,21 @@ export class ObjectOverlay {
         const speed = deltaDistance !== 0 ? deltaDistance / (camera.getScene().getEngine().getDeltaTime() / 1000) : 0;
         objectRay.scaleInPlace(1 / distance);
 
-        this.cursor.isVisible = true;
         this.textRoot.isVisible = this.object === target;
 
         const angularSize = getAngularSize(this.object.getTransform().getAbsolutePosition(), this.object.getBoundingRadius(), camera.globalPosition);
         const screenRatio = angularSize / camera.fov;
 
-        const scale = Math.max(0.02, 0.03 * Math.pow(this.object.getBoundingRadius() / 1e6, 0.2));
-        this.cursor.scaleX = Math.max(scale, screenRatio);
-        this.cursor.scaleY = Math.max(scale, screenRatio);
+        this.cursor.style.height = Math.max(100 * (screenRatio * 1.1), 5) + "vh";
+        this.cursor.style.width = this.cursor.style.height;
 
-        const alphaCursor = 100 * Math.max(scale - screenRatio, 0.0);
-        this.cursor.alpha = Math.min(alphaCursor, 0.5);
+        const alphaCursor = 1;
+        this.cursor.style.opacity = `${Math.min(alphaCursor, 0.5)}`;
 
         const alphaText = Math.max(0, distance / (3 * this.object.getBoundingRadius()) - 1.0);
         this.textRoot.alpha = alphaText;
 
-        this.textRoot.linkOffsetXInPixels = 0.5 * Math.max(scale, screenRatio) * window.innerWidth + ObjectOverlay.WIDTH / 2 + 20;
+        this.textRoot.linkOffsetXInPixels = 0.5 * screenRatio * window.innerWidth + ObjectOverlay.WIDTH / 2 + 20;
 
         this.distanceText.text = parseDistance(distance);
 
@@ -153,7 +160,7 @@ export class ObjectOverlay {
 
     dispose() {
         this.textRoot.dispose();
-        this.cursor.dispose();
+        this.cursor.remove();
         this.transformPlaceHolder.dispose();
     }
 }
