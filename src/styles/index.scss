@@ -111,6 +111,8 @@ body {
 
   @import "loadingScreen.scss";
 
+  @import "targetCursors.scss";
+
   #renderer {
     z-index: 1;
     float: left;
