@@ -27,6 +27,7 @@ import { TypedObject } from "../architecture/typedObject";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Matrix } from "@babylonjs/core/Maths/math";
+import { Scalar } from "@babylonjs/core/Maths/math.scalar";
 
 export class ObjectOverlay {
     readonly cursor: HTMLDivElement;
@@ -51,6 +52,7 @@ export class ObjectOverlay {
     constructor(object: Transformable & BoundingSphere & TypedObject) {
         this.cursor = document.createElement("div");
         this.cursor.classList.add("targetCursor");
+        this.cursor.classList.add("rounded");
         document.body.appendChild(this.cursor);
 
         this.object = object;
@@ -139,14 +141,12 @@ export class ObjectOverlay {
         const angularSize = getAngularSize(this.object.getTransform().getAbsolutePosition(), this.object.getBoundingRadius(), camera.globalPosition);
         const screenRatio = angularSize / camera.fov;
 
-        this.cursor.style.height = Math.max(100 * (screenRatio * 1.1), 5) + "vh";
-        this.cursor.style.width = this.cursor.style.height;
+        // change the --dim css variable for the cursor size
+        this.cursor.style.setProperty("--dim", Math.max(100 * (screenRatio * 1.3), 5) + "vh");
 
-        const alphaCursor = 1;
-        this.cursor.style.opacity = `${Math.min(alphaCursor, 0.5)}`;
-
-        const alphaText = Math.max(0, distance / (3 * this.object.getBoundingRadius()) - 1.0);
-        this.textRoot.alpha = alphaText;
+        const alpha = Scalar.SmoothStep(1.0, 0.0, screenRatio);
+        this.cursor.style.opacity = `${Math.min(alpha, 0.5)}`;
+        this.textRoot.alpha = alpha;
 
         this.textRoot.linkOffsetXInPixels = 0.5 * screenRatio * window.innerWidth + ObjectOverlay.WIDTH / 2 + 20;
 

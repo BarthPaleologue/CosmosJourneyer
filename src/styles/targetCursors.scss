@@ -1,6 +1,6 @@
 .targetCursor {
   --dim: 50px;
-  --s: max(20px, calc(var(--dim) * 0.4));
+  --s: max(20px, calc(var(--dim) * 0.25));
 
   position: absolute;
 
@@ -11,7 +11,7 @@
 
   translate: -50% -50%;
 
-  &.round {
+  &.rounded {
     border-radius: 50%;
   }
 
