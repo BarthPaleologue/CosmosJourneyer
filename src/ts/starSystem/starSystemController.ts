@@ -49,7 +49,7 @@ export class StarSystemController {
 
     private readonly orbitalObjects: OrbitalObject[] = [];
 
-    private readonly spaceStations: SpaceStation[] = [];
+    readonly spaceStations: SpaceStation[] = [];
 
     readonly celestialBodies: CelestialBody[] = [];
 

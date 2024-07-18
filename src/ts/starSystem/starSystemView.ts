@@ -377,7 +377,7 @@ export class StarSystemView implements View {
             this.chunkForge.reset();
             this.postProcessManager.reset();
             this.starSystem.dispose();
-            this.ui.disposeObjectOverlays();
+            this.ui.reset();
         }
         this.starSystem = starSystem;
 
@@ -468,7 +468,16 @@ export class StarSystemView implements View {
     public initStarSystem(): Promise<void> {
         const starSystem = this.getStarSystem();
         starSystem.initPositions(2, this.chunkForge, this.postProcessManager);
-        this.ui.createObjectOverlays(starSystem.getOrbitalObjects());
+        this.ui.reset();
+
+
+        starSystem.celestialBodies.forEach((body) => {
+            this.ui.addObjectOverlay(body, body.getBoundingRadius() * 10.0, 0.0);
+        });
+
+        starSystem.spaceStations.forEach((body) => {
+            this.ui.addObjectOverlay(body, body.getBoundingRadius() * 6.0, 0.0);
+        });
 
         this.orbitRenderer.setOrbitalObjects(starSystem.getOrbitalObjects(), this.scene);
         this.axisRenderer.setOrbitalObjects(starSystem.getOrbitalObjects(), this.scene);
@@ -736,7 +745,7 @@ export class StarSystemView implements View {
         const distance = StarMap.StarMapDistanceToLy(Vector3.Distance(currentSystemUniversePosition, targetSystemUniversePosition));
 
         const target = currentSystem.addSystemTarget(targetSeed, direction, distance);
-        this.ui.addObjectOverlay(target);
+        this.ui.addObjectOverlay(target, 0, 0);
         this.ui.setTarget(target);
         this.helmetOverlay.setTarget(target.getTransform());
     }

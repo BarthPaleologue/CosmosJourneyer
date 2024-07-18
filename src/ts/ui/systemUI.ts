@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Scene } from "@babylonjs/core/scene";
+import { IDisposable, Scene } from "@babylonjs/core/scene";
 import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
 import { ObjectOverlay } from "./objectOverlay";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
@@ -25,7 +25,7 @@ import { BoundingSphere } from "../architecture/boundingSphere";
 import { TypedObject } from "../architecture/typedObject";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 
-export class SystemUI {
+export class SystemUI implements IDisposable {
     readonly scene: Scene;
     readonly camera: FreeCamera;
     readonly gui: AdvancedDynamicTexture;
@@ -57,22 +57,14 @@ export class SystemUI {
         return this.gui.rootContainer.alpha === 1;
     }
 
-    public createObjectOverlays(objects: (Transformable & BoundingSphere & TypedObject)[]) {
-        this.disposeObjectOverlays();
-
-        for (const object of objects) {
-            this.addObjectOverlay(object);
-        }
-    }
-
-    public addObjectOverlay(object: Transformable & BoundingSphere & TypedObject) {
-        const overlay = new ObjectOverlay(object);
+    public addObjectOverlay(object: Transformable & BoundingSphere & TypedObject, minDistance: number, maxDistance: number) {
+        const overlay = new ObjectOverlay(object, minDistance, maxDistance);
         this.gui.addControl(overlay.textRoot);
         this.objectOverlays.push(overlay);
         overlay.init();
     }
 
-    public disposeObjectOverlays() {
+    public reset() {
         for (const overlay of this.objectOverlays) {
             overlay.dispose();
         }
@@ -89,5 +81,11 @@ export class SystemUI {
 
     getTarget() {
         return this.target;
+    }
+
+    dispose() {
+        this.reset();
+        this.gui.dispose();
+        this.scene.dispose();
     }
 }

@@ -28,6 +28,7 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Matrix } from "@babylonjs/core/Maths/math";
 import { Scalar } from "@babylonjs/core/Maths/math.scalar";
+import { smoothstep } from "../utils/smoothstep";
 
 export class ObjectOverlay {
     readonly cursor: HTMLDivElement;
@@ -43,19 +44,25 @@ export class ObjectOverlay {
 
     static readonly WIDTH = 300;
 
+    readonly minDistance: number;
+    readonly maxDistance: number;
+
     /**
      * @see https://forum.babylonjs.com/t/how-to-render-gui-attached-to-objects-far-away/51271/2
      * @private
      */
     private readonly transformPlaceHolder: TransformNode;
 
-    constructor(object: Transformable & BoundingSphere & TypedObject) {
+    constructor(object: Transformable & BoundingSphere & TypedObject, minDistance: number, maxDistance: number) {
         this.cursor = document.createElement("div");
         this.cursor.classList.add("targetCursor");
         this.cursor.classList.add("rounded");
         document.body.appendChild(this.cursor);
 
         this.object = object;
+
+        this.minDistance = minDistance;
+        this.maxDistance = maxDistance;
 
         this.textRoot = new StackPanel(object.getTransform().name + "OverlayTextRoot");
         this.textRoot.width = `${ObjectOverlay.WIDTH}px`;
@@ -114,7 +121,9 @@ export class ObjectOverlay {
     }
 
     update(camera: Camera, target: (Transformable & BoundingSphere & TypedObject) | null) {
-        const cameraToObject = this.object.getTransform().getAbsolutePosition().subtract(camera.globalPosition).normalize();
+        const objectRay = this.object.getTransform().getAbsolutePosition().subtract(camera.globalPosition);
+        const distance = objectRay.length();
+        const cameraToObject = objectRay.scale(1 / distance);
         const cameraForward = camera.getDirection(Vector3.Forward(camera.getScene().useRightHandedSystem));
 
         if (Vector3.Dot(cameraToObject, cameraForward) > 0) {
@@ -130,8 +139,6 @@ export class ObjectOverlay {
         this.transformPlaceHolder.setAbsolutePosition(camera.globalPosition.add(cameraToObject.scale(10)));
         this.transformPlaceHolder.computeWorldMatrix(true);
 
-        const objectRay = this.object.getTransform().getAbsolutePosition().subtract(camera.globalPosition);
-        const distance = objectRay.length();
         const deltaDistance = this.lastDistance - distance;
         const speed = deltaDistance !== 0 ? deltaDistance / (camera.getScene().getEngine().getDeltaTime() / 1000) : 0;
         objectRay.scaleInPlace(1 / distance);
@@ -144,7 +151,10 @@ export class ObjectOverlay {
         // change the --dim css variable for the cursor size
         this.cursor.style.setProperty("--dim", Math.max(100 * (screenRatio * 1.3), 5) + "vh");
 
-        const alpha = Scalar.SmoothStep(1.0, 0.0, screenRatio);
+        let alpha = 1.0;
+        if(this.minDistance > 0) alpha *= smoothstep(this.minDistance * 0.5, this.minDistance, distance);
+        if(this.maxDistance > 0) alpha *= smoothstep(this.maxDistance * 1.5, this.maxDistance, distance);
+
         this.cursor.style.opacity = `${Math.min(alpha, 0.5)}`;
         this.textRoot.alpha = alpha;
 
