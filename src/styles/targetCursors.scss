@@ -5,7 +5,7 @@
   align-items: center;
   column-gap: max(3vh, 20px);
   
-  translate: calc(var(--dim) * -0.5) calc(var(--dim) * -0.5);
+  translate: calc(var(--dim) * -0.5) -50%;
   pointer-events: none;
 
   .targetCursor {

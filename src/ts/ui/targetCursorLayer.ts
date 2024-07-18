@@ -16,47 +16,39 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { IDisposable, Scene } from "@babylonjs/core/scene";
-import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
 import { ObjectTargetCursor, ObjectTargetCursorType } from "./objectTargetCursor";
-import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Transformable } from "../architecture/transformable";
 import { BoundingSphere } from "../architecture/boundingSphere";
 import { TypedObject } from "../architecture/typedObject";
-import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 
 export class TargetCursorLayer implements IDisposable {
-    readonly scene: Scene;
-    readonly camera: FreeCamera;
-    readonly gui: AdvancedDynamicTexture;
     private targetCursors: ObjectTargetCursor[] = [];
+
+    private layerRoot: HTMLDivElement;
 
     private target: (Transformable & BoundingSphere & TypedObject) | null = null;
 
-    constructor(engine: AbstractEngine) {
-        this.scene = new Scene(engine);
-        this.scene.useRightHandedSystem = true;
-        this.scene.autoClear = false;
+    constructor() {
+        this.layerRoot = document.createElement("div");
+        this.layerRoot.classList.add("targetCursorLayer");
 
-        this.camera = new FreeCamera("UiCamera", Vector3.Zero(), this.scene);
-
-        this.gui = AdvancedDynamicTexture.CreateFullscreenUI("SystemUI", true, this.scene);
+        document.body.appendChild(this.layerRoot);
     }
 
     public setEnabled(enabled: boolean) {
-        this.gui.rootContainer.alpha = enabled ? 1 : 0;
+        this.layerRoot.style.display = enabled ? "block" : "none";
     }
 
     public isEnabled() {
-        return this.gui.rootContainer.alpha === 1;
+        return this.layerRoot.style.display === "block";
     }
 
     public addObjectOverlay(object: Transformable & BoundingSphere & TypedObject, iconType: ObjectTargetCursorType, minDistance: number, maxDistance: number) {
         const overlay = new ObjectTargetCursor(object, iconType, minDistance, maxDistance);
-        this.gui.addControl(overlay.textRoot);
         this.targetCursors.push(overlay);
-        overlay.init();
+        this.layerRoot.appendChild(overlay.htmlRoot);
     }
 
     public getClosestToScreenCenterOrbitalObject(): (Transformable & BoundingSphere & TypedObject) | null {
@@ -78,8 +70,8 @@ export class TargetCursorLayer implements IDisposable {
     }
 
     public reset() {
-        for (const overlay of this.targetCursors) {
-            overlay.dispose();
+        for (const targetCursor of this.targetCursors) {
+            targetCursor.dispose();
         }
         this.targetCursors = [];
     }
@@ -97,8 +89,8 @@ export class TargetCursorLayer implements IDisposable {
     }
 
     update(camera: Camera) {
-        for (const overlay of this.targetCursors) {
-            overlay.update(camera);
+        for (const targetCursor of this.targetCursors) {
+            targetCursor.update(camera);
         }
     }
 
@@ -108,7 +100,5 @@ export class TargetCursorLayer implements IDisposable {
 
     dispose() {
         this.reset();
-        this.gui.dispose();
-        this.scene.dispose();
     }
 }

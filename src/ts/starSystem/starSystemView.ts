@@ -363,7 +363,7 @@ export class StarSystemView implements View {
         this.bodyEditor.resize();
         this.helmetOverlay.setVisibility(false);
 
-        this.targetCursorLayer = new TargetCursorLayer(engine);
+        this.targetCursorLayer = new TargetCursorLayer();
     }
 
     /**
@@ -759,19 +759,14 @@ export class StarSystemView implements View {
 
     public render() {
         this.scene.render();
-
-        syncCamera(this.scene.getActiveCameras()[0], this.targetCursorLayer.camera);
-        this.targetCursorLayer.scene.render();
     }
 
     public attachControl() {
         this.scene.attachControl();
-        this.targetCursorLayer.scene.attachControl();
     }
 
     public detachControl() {
         this.scene.detachControl();
-        this.targetCursorLayer.scene.detachControl();
     }
 
     public getMainScene() {
