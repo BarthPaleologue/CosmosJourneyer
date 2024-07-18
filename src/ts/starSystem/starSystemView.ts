@@ -19,11 +19,10 @@ import { HelmetOverlay } from "../ui/helmetOverlay";
 import { BodyEditor, EditorVisibility } from "../ui/bodyEditor/bodyEditor";
 import { UberScene } from "../uberCore/uberScene";
 import { AxisRenderer } from "../orbit/axisRenderer";
-import { SystemUI } from "../ui/systemUI";
+import { TargetCursorLayer } from "../ui/targetCursorLayer";
 import { Animation } from "@babylonjs/core/Animations/animation";
 import { StarSystemController } from "./starSystemController";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
-import { ScenePerformancePriority } from "@babylonjs/core/scene";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { Settings } from "../settings";
@@ -129,9 +128,9 @@ export class StarSystemView implements View {
     private readonly axisRenderer: AxisRenderer = new AxisRenderer();
 
     /**
-     * The GPU accelerated GUI used to display orbital objects overlays and information when targeted.
+     * The HTML GUI used to display orbital objects cursors and information when targeted.
      */
-    readonly ui: SystemUI;
+    readonly targetCursorLayer: TargetCursorLayer;
 
     /**
      * An animation to unzoom the camera when opening the star map
@@ -191,10 +190,10 @@ export class StarSystemView implements View {
         ]);
 
         StarSystemInputs.map.toggleOverlay.on("complete", () => {
-            const enabled = !this.ui.isEnabled();
+            const enabled = !this.targetCursorLayer.isEnabled();
             if (enabled) Sounds.MENU_HOVER_SOUND.play();
             else Sounds.MENU_HOVER_SOUND.play();
-            this.ui.setEnabled(enabled);
+            this.targetCursorLayer.setEnabled(enabled);
             this.helmetOverlay.setVisibility(enabled);
         });
 
@@ -221,11 +220,11 @@ export class StarSystemView implements View {
         });
 
         StarSystemInputs.map.setTarget.on("complete", () => {
-            const closestObjectToCenter = this.ui.getClosestToScreenCenterOrbitalObject();
+            const closestObjectToCenter = this.targetCursorLayer.getClosestToScreenCenterOrbitalObject();
 
-            if (this.ui.getTarget() === closestObjectToCenter) {
+            if (this.targetCursorLayer.getTarget() === closestObjectToCenter) {
                 this.helmetOverlay.setTarget(null);
-                this.ui.setTarget(null);
+                this.targetCursorLayer.setTarget(null);
                 Sounds.TARGET_UNLOCK_SOUND.play();
                 return;
             }
@@ -233,13 +232,13 @@ export class StarSystemView implements View {
             if (closestObjectToCenter === null) return;
 
             this.helmetOverlay.setTarget(closestObjectToCenter.getTransform());
-            this.ui.setTarget(closestObjectToCenter);
+            this.targetCursorLayer.setTarget(closestObjectToCenter);
             Sounds.TARGET_LOCK_SOUND.play();
         });
 
         StarSystemInputs.map.jumpToSystem.on("complete", async () => {
             if (this.isLoadingSystem) return;
-            const target = this.ui.getTarget();
+            const target = this.targetCursorLayer.getTarget();
             if (!(target instanceof SystemTarget)) return;
 
             const shipControls = this.getSpaceshipControls();
@@ -285,7 +284,7 @@ export class StarSystemView implements View {
             this.isLoadingSystem = false;
             AudioManager.SetMask(AudioMasks.STAR_SYSTEM_VIEW);
             observer.remove();
-            this.ui.setTarget(null);
+            this.targetCursorLayer.setTarget(null);
         });
 
         StarSystemInputs.map.toggleSpaceShipCharacter.on("complete", () => {
@@ -364,7 +363,7 @@ export class StarSystemView implements View {
         this.bodyEditor.resize();
         this.helmetOverlay.setVisibility(false);
 
-        this.ui = new SystemUI(engine);
+        this.targetCursorLayer = new TargetCursorLayer(engine);
     }
 
     /**
@@ -378,7 +377,7 @@ export class StarSystemView implements View {
             this.chunkForge.reset();
             this.postProcessManager.reset();
             this.starSystem.dispose();
-            this.ui.reset();
+            this.targetCursorLayer.reset();
         }
         this.starSystem = starSystem;
 
@@ -469,7 +468,7 @@ export class StarSystemView implements View {
     public initStarSystem(): Promise<void> {
         const starSystem = this.getStarSystem();
         starSystem.initPositions(2, this.chunkForge, this.postProcessManager);
-        this.ui.reset();
+        this.targetCursorLayer.reset();
 
 
         starSystem.celestialBodies.forEach((body) => {
@@ -478,11 +477,11 @@ export class StarSystemView implements View {
                 // this is a satellite of a planet orbiting a star
                 maxDistance = body.getOrbitProperties().radius * 8.0;
             }
-            this.ui.addObjectOverlay(body, ObjectTargetCursorType.CELESTIAL_BODY, body.getBoundingRadius() * 10.0, maxDistance);
+            this.targetCursorLayer.addObjectOverlay(body, ObjectTargetCursorType.CELESTIAL_BODY, body.getBoundingRadius() * 10.0, maxDistance);
         });
 
         starSystem.spaceStations.forEach((body) => {
-            this.ui.addObjectOverlay(body, ObjectTargetCursorType.FACILITY, body.getBoundingRadius() * 6.0, 0.0);
+            this.targetCursorLayer.addObjectOverlay(body, ObjectTargetCursorType.FACILITY, body.getBoundingRadius() * 6.0, 0.0);
         });
 
         this.orbitRenderer.setOrbitalObjects(starSystem.getOrbitalObjects(), this.scene);
@@ -751,26 +750,26 @@ export class StarSystemView implements View {
         const distance = StarMap.StarMapDistanceToLy(Vector3.Distance(currentSystemUniversePosition, targetSystemUniversePosition));
 
         const target = currentSystem.addSystemTarget(targetSeed, direction, distance);
-        this.ui.addObjectOverlay(target, ObjectTargetCursorType.CELESTIAL_BODY, 0, 0);
-        this.ui.setTarget(target);
+        this.targetCursorLayer.addObjectOverlay(target, ObjectTargetCursorType.CELESTIAL_BODY, 0, 0);
+        this.targetCursorLayer.setTarget(target);
         this.helmetOverlay.setTarget(target.getTransform());
     }
 
     public render() {
         this.scene.render();
 
-        syncCamera(this.scene.getActiveCameras()[0], this.ui.camera);
-        this.ui.scene.render();
+        syncCamera(this.scene.getActiveCameras()[0], this.targetCursorLayer.camera);
+        this.targetCursorLayer.scene.render();
     }
 
     public attachControl() {
         this.scene.attachControl();
-        this.ui.scene.attachControl();
+        this.targetCursorLayer.scene.attachControl();
     }
 
     public detachControl() {
         this.scene.detachControl();
-        this.ui.scene.detachControl();
+        this.targetCursorLayer.scene.detachControl();
     }
 
     public getMainScene() {

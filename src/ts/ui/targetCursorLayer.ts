@@ -25,11 +25,11 @@ import { BoundingSphere } from "../architecture/boundingSphere";
 import { TypedObject } from "../architecture/typedObject";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 
-export class SystemUI implements IDisposable {
+export class TargetCursorLayer implements IDisposable {
     readonly scene: Scene;
     readonly camera: FreeCamera;
     readonly gui: AdvancedDynamicTexture;
-    private objectOverlays: ObjectTargetCursor[] = [];
+    private targetCursors: ObjectTargetCursor[] = [];
 
     private target: (Transformable & BoundingSphere & TypedObject) | null = null;
 
@@ -43,7 +43,7 @@ export class SystemUI implements IDisposable {
         this.gui = AdvancedDynamicTexture.CreateFullscreenUI("SystemUI", true, this.scene);
 
         this.scene.onBeforeRenderObservable.add(() => {
-            for (const overlay of this.objectOverlays) {
+            for (const overlay of this.targetCursors) {
                 overlay.update(this.camera);
             }
         });
@@ -60,14 +60,14 @@ export class SystemUI implements IDisposable {
     public addObjectOverlay(object: Transformable & BoundingSphere & TypedObject, iconType: ObjectTargetCursorType, minDistance: number, maxDistance: number) {
         const overlay = new ObjectTargetCursor(object, iconType, minDistance, maxDistance);
         this.gui.addControl(overlay.textRoot);
-        this.objectOverlays.push(overlay);
+        this.targetCursors.push(overlay);
         overlay.init();
     }
 
     public getClosestToScreenCenterOrbitalObject(): (Transformable & BoundingSphere & TypedObject) | null {
         let nearest = null;
         let closestDistance = Number.POSITIVE_INFINITY;
-        this.objectOverlays.forEach((overlay) => {
+        this.targetCursors.forEach((overlay) => {
             if(!overlay.isVisible()) return;
 
             const screenCoordinates = overlay.screenCoordinates;
@@ -83,14 +83,14 @@ export class SystemUI implements IDisposable {
     }
 
     public reset() {
-        for (const overlay of this.objectOverlays) {
+        for (const overlay of this.targetCursors) {
             overlay.dispose();
         }
-        this.objectOverlays = [];
+        this.targetCursors = [];
     }
 
     public setTarget(object: (Transformable & BoundingSphere & TypedObject) | null) {
-        this.objectOverlays.forEach((overlay) => {
+        this.targetCursors.forEach((overlay) => {
             overlay.setTarget(overlay.object === object);
         });
 
