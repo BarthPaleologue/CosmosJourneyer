@@ -44,7 +44,7 @@ export class SystemUI implements IDisposable {
 
         this.scene.onBeforeRenderObservable.add(() => {
             for (const overlay of this.objectOverlays) {
-                overlay.update(this.camera, this.target);
+                overlay.update(this.camera);
             }
         });
     }
@@ -90,6 +90,10 @@ export class SystemUI implements IDisposable {
     }
 
     public setTarget(object: (Transformable & BoundingSphere & TypedObject) | null) {
+        this.objectOverlays.forEach((overlay) => {
+            overlay.setTarget(overlay.object === object);
+        });
+
         if (this.target === object) {
             this.target = null;
             return;

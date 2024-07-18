@@ -56,6 +56,8 @@ export class ObjectOverlay {
 
     readonly screenCoordinates: Vector3 = Vector3.Zero();
 
+    private isTarget = false;
+
     /**
      * @see https://forum.babylonjs.com/t/how-to-render-gui-attached-to-objects-far-away/51271/2
      * @private
@@ -139,7 +141,11 @@ export class ObjectOverlay {
         this.textRoot.linkWithMesh(this.transformPlaceHolder);
     }
 
-    update(camera: Camera, target: (Transformable & BoundingSphere & TypedObject) | null) {
+    setTarget(isTarget: boolean) {
+        this.isTarget = isTarget;
+    }
+
+    update(camera: Camera) {
         const objectRay = this.object.getTransform().getAbsolutePosition().subtract(camera.globalPosition);
         const distance = objectRay.length();
         const cameraToObject = objectRay.scale(1 / distance);
@@ -162,7 +168,7 @@ export class ObjectOverlay {
         const speed = deltaDistance !== 0 ? deltaDistance / (camera.getScene().getEngine().getDeltaTime() / 1000) : 0;
         objectRay.scaleInPlace(1 / distance);
 
-        this.textRoot.isVisible = this.object === target;
+        this.textRoot.isVisible = this.isTarget;
 
         const angularSize = getAngularSize(this.object.getTransform().getAbsolutePosition(), this.object.getBoundingRadius(), camera.globalPosition);
         const screenRatio = angularSize / camera.fov;
@@ -172,7 +178,7 @@ export class ObjectOverlay {
 
         this.alpha = 1.0;
         if(this.minDistance > 0) this.alpha *= smoothstep(this.minDistance * 0.5, this.minDistance, distance);
-        if(this.maxDistance > 0) this.alpha *= smoothstep(this.maxDistance * 1.5, this.maxDistance, distance);
+        if(this.maxDistance > 0 && !this.isTarget) this.alpha *= smoothstep(this.maxDistance * 1.5, this.maxDistance, distance);
 
         this.cursor.style.opacity = `${Math.min(this.alpha, 0.5)}`;
         this.textRoot.alpha = this.alpha;
