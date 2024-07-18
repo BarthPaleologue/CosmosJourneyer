@@ -27,8 +27,13 @@ import { TypedObject } from "../architecture/typedObject";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Matrix } from "@babylonjs/core/Maths/math";
-import { Scalar } from "@babylonjs/core/Maths/math.scalar";
 import { smoothstep } from "../utils/smoothstep";
+
+export const enum ObjectOverlayIconType {
+    CELESTIAL_BODY,
+    FACILITY,
+    ANOMALY
+}
 
 export class ObjectOverlay {
     readonly cursor: HTMLDivElement;
@@ -53,10 +58,20 @@ export class ObjectOverlay {
      */
     private readonly transformPlaceHolder: TransformNode;
 
-    constructor(object: Transformable & BoundingSphere & TypedObject, minDistance: number, maxDistance: number) {
+    constructor(object: Transformable & BoundingSphere & TypedObject, iconType: ObjectOverlayIconType, minDistance: number, maxDistance: number) {
         this.cursor = document.createElement("div");
         this.cursor.classList.add("targetCursor");
-        this.cursor.classList.add("rounded");
+        switch (iconType) {
+            case ObjectOverlayIconType.CELESTIAL_BODY:
+                this.cursor.classList.add("rounded");
+                break;
+            case ObjectOverlayIconType.FACILITY:
+                this.cursor.classList.add("rotated");
+                break;
+            case ObjectOverlayIconType.ANOMALY:
+                break;
+        }
+        
         document.body.appendChild(this.cursor);
 
         this.object = object;
