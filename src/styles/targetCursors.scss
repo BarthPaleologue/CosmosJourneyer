@@ -37,8 +37,15 @@
     flex-shrink: 0;
 
     display: flex;
-    flex-direction: column;
+    flex-direction: column;    
+    justify-content: center;
 
     transition: opacity 0.2s;
+
+    row-gap: 5px;
+    
+    p {
+      margin-block: 0;
+    }
   }
 }
