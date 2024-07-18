@@ -29,13 +29,13 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Matrix } from "@babylonjs/core/Maths/math";
 import { smoothstep } from "../utils/smoothstep";
 
-export const enum ObjectOverlayIconType {
+export const enum ObjectTargetCursorType {
     CELESTIAL_BODY,
     FACILITY,
     ANOMALY
 }
 
-export class ObjectOverlay {
+export class ObjectTargetCursor {
     readonly cursor: HTMLDivElement;
 
     readonly textRoot: StackPanel;
@@ -66,19 +66,19 @@ export class ObjectOverlay {
      */
     private readonly transformPlaceHolder: TransformNode;
 
-    constructor(object: Transformable & BoundingSphere & TypedObject, iconType: ObjectOverlayIconType, minDistance: number, maxDistance: number) {
+    constructor(object: Transformable & BoundingSphere & TypedObject, iconType: ObjectTargetCursorType, minDistance: number, maxDistance: number) {
         this.cursor = document.createElement("div");
         this.cursor.classList.add("targetCursor");
         switch (iconType) {
-            case ObjectOverlayIconType.CELESTIAL_BODY:
+            case ObjectTargetCursorType.CELESTIAL_BODY:
                 this.cursor.classList.add("rounded");
                 this.minSize = 5;
                 break;
-            case ObjectOverlayIconType.FACILITY:
+            case ObjectTargetCursorType.FACILITY:
                 this.cursor.classList.add("rotated");
                 this.minSize = 2;
                 break;
-            case ObjectOverlayIconType.ANOMALY:
+            case ObjectTargetCursorType.ANOMALY:
                 this.cursor.classList.add("rounded");
                 this.minSize = 2;
                 break;
@@ -92,7 +92,7 @@ export class ObjectOverlay {
         this.maxDistance = maxDistance;
 
         this.textRoot = new StackPanel(object.getTransform().name + "OverlayTextRoot");
-        this.textRoot.width = `${ObjectOverlay.WIDTH}px`;
+        this.textRoot.width = `${ObjectTargetCursor.WIDTH}px`;
         this.textRoot.height = "130px";
         this.textRoot.background = "transparent";
         this.textRoot.zIndex = 6;
@@ -189,7 +189,7 @@ export class ObjectOverlay {
         this.cursor.style.opacity = `${Math.min(this.alpha, 0.5)}`;
         this.textRoot.alpha = this.alpha;
 
-        this.textRoot.linkOffsetXInPixels = 0.5 * screenRatio * window.innerWidth + ObjectOverlay.WIDTH / 2 + 20;
+        this.textRoot.linkOffsetXInPixels = 0.5 * screenRatio * window.innerWidth + ObjectTargetCursor.WIDTH / 2 + 20;
 
         this.distanceText.text = parseDistance(distance);
 

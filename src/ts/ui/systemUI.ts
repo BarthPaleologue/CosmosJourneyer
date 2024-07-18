@@ -17,7 +17,7 @@
 
 import { IDisposable, Scene } from "@babylonjs/core/scene";
 import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
-import { ObjectOverlay, ObjectOverlayIconType } from "./objectOverlay";
+import { ObjectTargetCursor, ObjectTargetCursorType } from "./objectTargetCursor";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Transformable } from "../architecture/transformable";
@@ -29,7 +29,7 @@ export class SystemUI implements IDisposable {
     readonly scene: Scene;
     readonly camera: FreeCamera;
     readonly gui: AdvancedDynamicTexture;
-    private objectOverlays: ObjectOverlay[] = [];
+    private objectOverlays: ObjectTargetCursor[] = [];
 
     private target: (Transformable & BoundingSphere & TypedObject) | null = null;
 
@@ -57,8 +57,8 @@ export class SystemUI implements IDisposable {
         return this.gui.rootContainer.alpha === 1;
     }
 
-    public addObjectOverlay(object: Transformable & BoundingSphere & TypedObject, iconType: ObjectOverlayIconType, minDistance: number, maxDistance: number) {
-        const overlay = new ObjectOverlay(object, iconType, minDistance, maxDistance);
+    public addObjectOverlay(object: Transformable & BoundingSphere & TypedObject, iconType: ObjectTargetCursorType, minDistance: number, maxDistance: number) {
+        const overlay = new ObjectTargetCursor(object, iconType, minDistance, maxDistance);
         this.gui.addControl(overlay.textRoot);
         this.objectOverlays.push(overlay);
         overlay.init();

@@ -70,7 +70,7 @@ import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Sounds } from "../assets/sounds";
 import { Materials } from "../assets/materials";
 import { SpaceStation } from "../spacestation/spaceStation";
-import { ObjectOverlayIconType } from "../ui/objectOverlay";
+import { ObjectTargetCursorType } from "../ui/objectTargetCursor";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -478,11 +478,11 @@ export class StarSystemView implements View {
                 // this is a satellite of a planet orbiting a star
                 maxDistance = body.getOrbitProperties().radius * 8.0;
             }
-            this.ui.addObjectOverlay(body, ObjectOverlayIconType.CELESTIAL_BODY, body.getBoundingRadius() * 10.0, maxDistance);
+            this.ui.addObjectOverlay(body, ObjectTargetCursorType.CELESTIAL_BODY, body.getBoundingRadius() * 10.0, maxDistance);
         });
 
         starSystem.spaceStations.forEach((body) => {
-            this.ui.addObjectOverlay(body, ObjectOverlayIconType.FACILITY, body.getBoundingRadius() * 6.0, 0.0);
+            this.ui.addObjectOverlay(body, ObjectTargetCursorType.FACILITY, body.getBoundingRadius() * 6.0, 0.0);
         });
 
         this.orbitRenderer.setOrbitalObjects(starSystem.getOrbitalObjects(), this.scene);
@@ -751,7 +751,7 @@ export class StarSystemView implements View {
         const distance = StarMap.StarMapDistanceToLy(Vector3.Distance(currentSystemUniversePosition, targetSystemUniversePosition));
 
         const target = currentSystem.addSystemTarget(targetSeed, direction, distance);
-        this.ui.addObjectOverlay(target, ObjectOverlayIconType.CELESTIAL_BODY, 0, 0);
+        this.ui.addObjectOverlay(target, ObjectTargetCursorType.CELESTIAL_BODY, 0, 0);
         this.ui.setTarget(target);
         this.helmetOverlay.setTarget(target.getTransform());
     }
