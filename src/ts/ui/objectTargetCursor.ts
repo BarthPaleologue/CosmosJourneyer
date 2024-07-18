@@ -110,6 +110,7 @@ export class ObjectTargetCursor {
         this.textBlock.appendChild(this.nameText);
         this.textBlock.appendChild(this.typeText);
         this.textBlock.appendChild(this.distanceText);
+        this.textBlock.appendChild(this.etaText);
 
         this.object = object;
 
