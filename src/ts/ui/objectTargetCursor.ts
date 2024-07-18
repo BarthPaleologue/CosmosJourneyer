@@ -201,6 +201,7 @@ export class ObjectTargetCursor {
         if(this.maxDistance > 0 && !this.isTarget) this.alpha *= smoothstep(this.maxDistance * 1.5, this.maxDistance, distance);
 
         this.cursor.style.opacity = `${Math.min(this.alpha, 0.5)}`;
+        this.textBlock.style.opacity = `${this.alpha}`;
         this.textRoot.alpha = this.alpha;
 
         this.textRoot.linkOffsetXInPixels = 0.5 * screenRatio * window.innerWidth + ObjectTargetCursor.WIDTH / 2 + 20;

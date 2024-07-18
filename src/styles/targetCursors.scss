@@ -6,6 +6,7 @@
   column-gap: max(3vh, 20px);
   
   translate: calc(var(--dim) * -0.5) calc(var(--dim) * -0.5);
+  pointer-events: none;
 
   .targetCursor {
     --s: max(20px, calc(var(--dim) * 0.25));
@@ -16,8 +17,6 @@
     mask: conic-gradient(at var(--s) var(--s), #0000 75%, #000 0) 0 0/calc(100% - var(--s)) calc(100% - var(--s)), linear-gradient(#000 0 0) content-box;
 
     flex-shrink: 0;
-
-    pointer-events: none;
 
     &.rounded {
       border-radius: 50%;
@@ -36,5 +35,8 @@
     color: white;
     font-family: Nasalization;
     flex-shrink: 0;
+
+    display: flex;
+    flex-direction: column;
   }
 }
