@@ -43,9 +43,14 @@
     transition: opacity 0.2s;
 
     row-gap: 5px;
-    
+
     p {
       margin-block: 0;
+
+      &.targetCursorName {
+        font-weight: bold;
+        font-size: 1.5em;
+      }
     }
   }
 }
