@@ -52,6 +52,8 @@ export class ObjectOverlay {
     readonly minDistance: number;
     readonly maxDistance: number;
 
+    readonly minSize: number;
+
     private alpha = 1.0;
 
     readonly screenCoordinates: Vector3 = Vector3.Zero();
@@ -70,11 +72,15 @@ export class ObjectOverlay {
         switch (iconType) {
             case ObjectOverlayIconType.CELESTIAL_BODY:
                 this.cursor.classList.add("rounded");
+                this.minSize = 5;
                 break;
             case ObjectOverlayIconType.FACILITY:
                 this.cursor.classList.add("rotated");
+                this.minSize = 2;
                 break;
             case ObjectOverlayIconType.ANOMALY:
+                this.cursor.classList.add("rounded");
+                this.minSize = 2;
                 break;
         }
 
@@ -174,7 +180,7 @@ export class ObjectOverlay {
         const screenRatio = angularSize / camera.fov;
 
         // change the --dim css variable for the cursor size
-        this.cursor.style.setProperty("--dim", Math.max(100 * (screenRatio * 1.3), 5) + "vh");
+        this.cursor.style.setProperty("--dim", Math.max(100 * (screenRatio * 1.3), this.minSize) + "vh");
 
         this.alpha = 1.0;
         if(this.minDistance > 0) this.alpha *= smoothstep(this.minDistance * 0.5, this.minDistance, distance);
