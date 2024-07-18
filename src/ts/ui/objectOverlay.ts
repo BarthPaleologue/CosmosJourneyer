@@ -52,6 +52,10 @@ export class ObjectOverlay {
     readonly minDistance: number;
     readonly maxDistance: number;
 
+    private alpha = 1.0;
+
+    readonly screenCoordinates: Vector3 = Vector3.Zero();
+
     /**
      * @see https://forum.babylonjs.com/t/how-to-render-gui-attached-to-objects-far-away/51271/2
      * @private
@@ -71,7 +75,7 @@ export class ObjectOverlay {
             case ObjectOverlayIconType.ANOMALY:
                 break;
         }
-        
+
         document.body.appendChild(this.cursor);
 
         this.object = object;
@@ -142,11 +146,11 @@ export class ObjectOverlay {
         const cameraForward = camera.getDirection(Vector3.Forward(camera.getScene().useRightHandedSystem));
 
         if (Vector3.Dot(cameraToObject, cameraForward) > 0) {
-            const screenCoordinates = Vector3.Project(this.object.getTransform().getAbsolutePosition(), Matrix.IdentityReadOnly, camera.getTransformationMatrix(), camera.viewport);
+            Vector3.ProjectToRef(this.object.getTransform().getAbsolutePosition(), Matrix.IdentityReadOnly, camera.getTransformationMatrix(), camera.viewport, this.screenCoordinates);
 
             this.cursor.classList.remove("hidden");
-            this.cursor.style.left = `${screenCoordinates.x * 100}vw`;
-            this.cursor.style.top = `${screenCoordinates.y * 100}vh`;
+            this.cursor.style.left = `${this.screenCoordinates.x * 100}vw`;
+            this.cursor.style.top = `${this.screenCoordinates.y * 100}vh`;
         } else {
             this.cursor.classList.add("hidden");
         }
@@ -166,12 +170,12 @@ export class ObjectOverlay {
         // change the --dim css variable for the cursor size
         this.cursor.style.setProperty("--dim", Math.max(100 * (screenRatio * 1.3), 5) + "vh");
 
-        let alpha = 1.0;
-        if(this.minDistance > 0) alpha *= smoothstep(this.minDistance * 0.5, this.minDistance, distance);
-        if(this.maxDistance > 0) alpha *= smoothstep(this.maxDistance * 1.5, this.maxDistance, distance);
+        this.alpha = 1.0;
+        if(this.minDistance > 0) this.alpha *= smoothstep(this.minDistance * 0.5, this.minDistance, distance);
+        if(this.maxDistance > 0) this.alpha *= smoothstep(this.maxDistance * 1.5, this.maxDistance, distance);
 
-        this.cursor.style.opacity = `${Math.min(alpha, 0.5)}`;
-        this.textRoot.alpha = alpha;
+        this.cursor.style.opacity = `${Math.min(this.alpha, 0.5)}`;
+        this.textRoot.alpha = this.alpha;
 
         this.textRoot.linkOffsetXInPixels = 0.5 * screenRatio * window.innerWidth + ObjectOverlay.WIDTH / 2 + 20;
 
@@ -181,6 +185,10 @@ export class ObjectOverlay {
         this.etaText.text = speed > 0 ? parseSeconds(nbSeconds) : "∞";
 
         this.lastDistance = distance;
+    }
+
+    isVisible() {
+        return this.alpha > 0 && this.screenCoordinates.z > 0;
     }
 
     dispose() {

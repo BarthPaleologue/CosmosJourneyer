@@ -221,7 +221,7 @@ export class StarSystemView implements View {
         });
 
         StarSystemInputs.map.setTarget.on("complete", () => {
-            const closestObjectToCenter = this.getStarSystem().getClosestToScreenCenterOrbitalObject();
+            const closestObjectToCenter = this.ui.getClosestToScreenCenterOrbitalObject();
 
             if (this.ui.getTarget() === closestObjectToCenter) {
                 this.helmetOverlay.setTarget(null);

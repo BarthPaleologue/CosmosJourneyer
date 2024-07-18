@@ -64,6 +64,24 @@ export class SystemUI implements IDisposable {
         overlay.init();
     }
 
+    public getClosestToScreenCenterOrbitalObject(): (Transformable & BoundingSphere & TypedObject) | null {
+        let nearest = null;
+        let closestDistance = Number.POSITIVE_INFINITY;
+        this.objectOverlays.forEach((overlay) => {
+            if(!overlay.isVisible()) return;
+
+            const screenCoordinates = overlay.screenCoordinates;
+            const distance = screenCoordinates.subtract(new Vector3(0.5, 0.5, 0)).length();
+
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                nearest = overlay.object;
+            }
+        });
+
+        return nearest;
+    }
+
     public reset() {
         for (const overlay of this.objectOverlays) {
             overlay.dispose();

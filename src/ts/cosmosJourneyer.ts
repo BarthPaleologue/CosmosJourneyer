@@ -112,7 +112,7 @@ export class CosmosJourneyer {
             this.starSystemView.getSpaceshipControls().spaceship.enableWarpDrive();
             this.starSystemView.showHtmlUI();
             this.starSystemView.ui.setEnabled(true);
-            const target = this.starSystemView.getStarSystem().getClosestToScreenCenterOrbitalObject();
+            const target = this.starSystemView.ui.getClosestToScreenCenterOrbitalObject();
             if (target !== null) {
                 this.starSystemView.ui.setTarget(target);
                 this.starSystemView.helmetOverlay.setTarget(target.getTransform());
