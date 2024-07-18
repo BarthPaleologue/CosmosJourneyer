@@ -142,8 +142,6 @@ export class ObjectTargetCursor {
         const speed = deltaDistance !== 0 ? deltaDistance / (camera.getScene().getEngine().getDeltaTime() / 1000) : 0;
         objectRay.scaleInPlace(1 / distance);
 
-        this.textBlock.style.display = this.isTarget ? "block" : "none";
-
         const angularSize = getAngularSize(this.object.getTransform().getAbsolutePosition(), this.object.getBoundingRadius(), camera.globalPosition);
         const screenRatio = angularSize / camera.fov;
 
@@ -154,12 +152,12 @@ export class ObjectTargetCursor {
         if(this.maxDistance > 0 && !this.isTarget) this.alpha *= smoothstep(this.maxDistance * 1.5, this.maxDistance, distance);
 
         this.cursor.style.opacity = `${Math.min(this.alpha, 0.5)}`;
-        this.textBlock.style.opacity = `${this.alpha}`;
+        this.textBlock.style.opacity = this.isTarget ? `${this.alpha}` : "0.0";
 
         this.distanceText.innerText = parseDistance(distance);
 
         const nbSeconds = distance / speed;
-        this.etaText.innerText = speed > 0 ? parseSeconds(nbSeconds) : "∞";
+        this.etaText.innerText = "ETA: " + (speed > 0 ? parseSeconds(nbSeconds) : "∞");
 
         this.lastDistance = distance;
     }
