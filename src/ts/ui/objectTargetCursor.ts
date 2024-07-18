@@ -36,7 +36,9 @@ export const enum ObjectTargetCursorType {
 }
 
 export class ObjectTargetCursor {
+    readonly htmlRoot: HTMLDivElement;
     readonly cursor: HTMLDivElement;
+    readonly textBlock: HTMLDivElement;
 
     readonly textRoot: StackPanel;
     readonly namePlate: TextBlock;
@@ -67,8 +69,13 @@ export class ObjectTargetCursor {
     private readonly transformPlaceHolder: TransformNode;
 
     constructor(object: Transformable & BoundingSphere & TypedObject, iconType: ObjectTargetCursorType, minDistance: number, maxDistance: number) {
+        this.htmlRoot = document.createElement("div");
+        this.htmlRoot.classList.add("targetCursorRoot");
+        this.htmlRoot.dataset.name = object.getTransform().name + " Target Cursor Root";
+
         this.cursor = document.createElement("div");
         this.cursor.classList.add("targetCursor");
+
         switch (iconType) {
             case ObjectTargetCursorType.CELESTIAL_BODY:
                 this.cursor.classList.add("rounded");
@@ -84,7 +91,15 @@ export class ObjectTargetCursor {
                 break;
         }
 
-        document.body.appendChild(this.cursor);
+        this.textBlock = document.createElement("div");
+        this.textBlock.innerText = object.getTransform().name;
+        this.textBlock.classList.add("targetCursorText");
+
+        document.body.appendChild(this.htmlRoot);
+
+        this.htmlRoot.appendChild(this.cursor);
+
+        this.htmlRoot.appendChild(this.textBlock);
 
         this.object = object;
 
@@ -160,11 +175,11 @@ export class ObjectTargetCursor {
         if (Vector3.Dot(cameraToObject, cameraForward) > 0) {
             Vector3.ProjectToRef(this.object.getTransform().getAbsolutePosition(), Matrix.IdentityReadOnly, camera.getTransformationMatrix(), camera.viewport, this.screenCoordinates);
 
-            this.cursor.classList.remove("hidden");
-            this.cursor.style.left = `${this.screenCoordinates.x * 100}vw`;
-            this.cursor.style.top = `${this.screenCoordinates.y * 100}vh`;
+            this.htmlRoot.classList.remove("hidden");
+            this.htmlRoot.style.left = `${this.screenCoordinates.x * 100}vw`;
+            this.htmlRoot.style.top = `${this.screenCoordinates.y * 100}vh`;
         } else {
-            this.cursor.classList.add("hidden");
+            this.htmlRoot.classList.add("hidden");
         }
 
         this.transformPlaceHolder.setAbsolutePosition(camera.globalPosition.add(cameraToObject.scale(10)));
@@ -179,8 +194,7 @@ export class ObjectTargetCursor {
         const angularSize = getAngularSize(this.object.getTransform().getAbsolutePosition(), this.object.getBoundingRadius(), camera.globalPosition);
         const screenRatio = angularSize / camera.fov;
 
-        // change the --dim css variable for the cursor size
-        this.cursor.style.setProperty("--dim", Math.max(100 * (screenRatio * 1.3), this.minSize) + "vh");
+        this.htmlRoot.style.setProperty("--dim", Math.max(100 * (screenRatio * 1.3), this.minSize) + "vh");
 
         this.alpha = 1.0;
         if(this.minDistance > 0) this.alpha *= smoothstep(this.minDistance * 0.5, this.minDistance, distance);
@@ -205,7 +219,7 @@ export class ObjectTargetCursor {
 
     dispose() {
         this.textRoot.dispose();
-        this.cursor.remove();
+        this.htmlRoot.remove();
         this.transformPlaceHolder.dispose();
     }
 }
