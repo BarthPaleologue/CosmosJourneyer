@@ -24,6 +24,7 @@ import { Transformable } from "../architecture/transformable";
 import { BoundingSphere } from "../architecture/boundingSphere";
 import { TypedObject } from "../architecture/typedObject";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { Camera } from "@babylonjs/core/Cameras/camera";
 
 export class TargetCursorLayer implements IDisposable {
     readonly scene: Scene;
@@ -41,12 +42,6 @@ export class TargetCursorLayer implements IDisposable {
         this.camera = new FreeCamera("UiCamera", Vector3.Zero(), this.scene);
 
         this.gui = AdvancedDynamicTexture.CreateFullscreenUI("SystemUI", true, this.scene);
-
-        this.scene.onBeforeRenderObservable.add(() => {
-            for (const overlay of this.targetCursors) {
-                overlay.update(this.camera);
-            }
-        });
     }
 
     public setEnabled(enabled: boolean) {
@@ -99,6 +94,12 @@ export class TargetCursorLayer implements IDisposable {
             return;
         }
         this.target = object;
+    }
+
+    update(camera: Camera) {
+        for (const overlay of this.targetCursors) {
+            overlay.update(camera);
+        }
     }
 
     getTarget() {

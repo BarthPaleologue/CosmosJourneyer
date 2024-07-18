@@ -582,6 +582,8 @@ export class StarSystemView implements View {
 
         this.orbitRenderer.update();
 
+        this.targetCursorLayer.update(this.scene.getActiveControls().getActiveCameras()[0]);
+
         Materials.BUTTERFLY_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
         Materials.BUTTERFLY_DEPTH_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
         Materials.GRASS_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
