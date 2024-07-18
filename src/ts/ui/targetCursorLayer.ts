@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { IDisposable, Scene } from "@babylonjs/core/scene";
+import { IDisposable } from "@babylonjs/core/scene";
 import { ObjectTargetCursor, ObjectTargetCursorType } from "./objectTargetCursor";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Transformable } from "../architecture/transformable";
@@ -29,6 +29,8 @@ export class TargetCursorLayer implements IDisposable {
     private layerRoot: HTMLDivElement;
 
     private target: (Transformable & BoundingSphere & TypedObject) | null = null;
+
+    private closestToScreenCenterOrbitalObject: (Transformable & BoundingSphere & TypedObject) | null = null;
 
     constructor() {
         this.layerRoot = document.createElement("div");
@@ -51,7 +53,7 @@ export class TargetCursorLayer implements IDisposable {
         this.layerRoot.appendChild(overlay.htmlRoot);
     }
 
-    public getClosestToScreenCenterOrbitalObject(): (Transformable & BoundingSphere & TypedObject) | null {
+    private computeClosestToScreenCenterOrbitalObject() {
         let nearest = null;
         let closestDistance = Number.POSITIVE_INFINITY;
         this.targetCursors.forEach((overlay) => {
@@ -66,7 +68,11 @@ export class TargetCursorLayer implements IDisposable {
             }
         });
 
-        return nearest;
+        this.closestToScreenCenterOrbitalObject = nearest;
+    }
+
+    public getClosestToScreenCenterOrbitalObject() {
+        return this.closestToScreenCenterOrbitalObject;
     }
 
     public reset() {
@@ -88,17 +94,19 @@ export class TargetCursorLayer implements IDisposable {
         this.target = object;
     }
 
-    update(camera: Camera) {
+    public update(camera: Camera) {
         for (const targetCursor of this.targetCursors) {
             targetCursor.update(camera);
+            targetCursor.setTarget(targetCursor.object === this.target || targetCursor.object === this.closestToScreenCenterOrbitalObject);
         }
+        this.computeClosestToScreenCenterOrbitalObject();
     }
 
-    getTarget() {
+    public getTarget() {
         return this.target;
     }
 
-    dispose() {
+    public dispose() {
         this.reset();
     }
 }
