@@ -8,15 +8,24 @@
   translate: calc(var(--dim) * -0.5) -50%;
   pointer-events: none;
 
+
   .targetCursor {
-    --s: max(20px, calc(var(--dim) * 0.25));
+    --s: max(15px, calc(var(--dim) * 0.4)); /* the size on the corner */
+    --t: 3px;  /* the thickness of the border */
+    --g: 10px; /* the gap between the border and image */
 
-    border: 5px solid white;
-    width: var(--dim);
-    height: var(--dim);
-    mask: conic-gradient(at var(--s) var(--s), #0000 75%, #000 0) 0 0/calc(100% - var(--s)) calc(100% - var(--s)), linear-gradient(#000 0 0) content-box;
+    padding: calc(var(--g) + var(--t));
 
+    outline: var(--t) solid white; /* the color here */
+    outline-offset: calc(-1*var(--t));
+    mask:
+            conic-gradient(at var(--s) var(--s),#0000 75%,#000 0)
+            0 0/calc(100% - var(--s)) calc(100% - var(--s)),
+            linear-gradient(#000 0 0) content-box;
     flex-shrink: 0;
+
+    width: calc(var(--dim) - var(--g) * 2 - var(--t) * 2);
+    height: calc(var(--dim) - var(--g) * 2 - var(--t) * 2);
 
     transition: transform 0.2s, border-color 0.2s, scale 0.2s cubic-bezier(0.34,-1.87, 0.74, 2.99), rotate 0.2s;
 
@@ -29,7 +38,7 @@
     }
 
     &.target {
-      border-color: goldenrod;
+      outline-color: goldenrod;
       scale: 1.2;
     }
   }
