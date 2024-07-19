@@ -360,6 +360,10 @@ export class StarSystemView implements View {
             this.updateBeforeRender(deltaSeconds);
         });
 
+        this.scene.onAfterRenderObservable.add(() => {
+            this.updateAfterRender();
+        });
+
         window.addEventListener("resize", () => {
             this.bodyEditor.resize();
         });
@@ -584,22 +588,33 @@ export class StarSystemView implements View {
             this.spaceshipControls.setClosestLandableFacility(null);
         }
 
+        this.orbitRenderer.update();
+
+        Materials.BUTTERFLY_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
+        Materials.BUTTERFLY_DEPTH_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
+        Materials.GRASS_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
+        Materials.GRASS_DEPTH_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
+    }
+
+    public updateAfterRender() {
+        if (this.isLoadingSystem) return;
+
+        const starSystem = this.getStarSystem();
+        if (this.spaceshipControls === null) throw new Error("Spaceship controls is null");
+        if (this.characterControls === null) throw new Error("Character controls is null");
+
+        const nearestCelestialBody = starSystem.getNearestCelestialBody(this.scene.getActiveControls().getTransform().getAbsolutePosition());
+        const nearestOrbitalObject = starSystem.getNearestOrbitalObject(this.scene.getActiveControls().getTransform().getAbsolutePosition());
+
         this.bodyEditor.update(nearestCelestialBody, this.postProcessManager, this.scene);
 
         this.helmetOverlay.update(nearestOrbitalObject, this.scene.getActiveControls().getTransform());
-
-        this.orbitRenderer.update();
 
         this.targetCursorLayer.update(this.scene.getActiveControls().getActiveCameras()[0]);
         const targetLandingPad = this.spaceshipControls.spaceship.getTargetLandingPad();
         if (targetLandingPad !== null && !this.spaceshipControls.spaceship.isLanded() && this.targetCursorLayer.getTarget() !== targetLandingPad) {
             this.targetCursorLayer.setTarget(targetLandingPad);
         }
-
-        Materials.BUTTERFLY_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
-        Materials.BUTTERFLY_DEPTH_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
-        Materials.GRASS_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
-        Materials.GRASS_DEPTH_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
     }
 
     /**
