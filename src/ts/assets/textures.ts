@@ -23,56 +23,57 @@ import "@babylonjs/core/Materials/Textures/Loaders/envTextureLoader";
 import "@babylonjs/core/Helpers/sceneHelpers";
 import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 
-import rockNormalMetallicMap from "../../asset/rockMaterial/layered-planetary_normal_metallic.png";
-import rockAlbedoRoughnessMap from "../../asset/rockMaterial/layered-planetary_albedo_roughness.png";
-import dirtNormalMap from "../../asset/textures/dirt/Ground_Dirt_008_normal.jpg";
-import bottomNormalMap from "../../asset/textures/crackednormal.jpg";
-import grassNormalMetallicMap from "../../asset/grassMaterial/wispy-grass-meadow_normal_metallic.png";
-import grassAlbedoRoughnessMap from "../../asset/grassMaterial/wispy-grass-meadow_albedo_roughness.png";
-import snowNormalMetallicMap from "../../asset/iceMaterial/ice_field_normal_metallic.png";
-import snowAlbedoRoughnessMap from "../../asset/iceMaterial/ice_field_albedo_roughness.png";
-import sandNormalMetallicMap from "../../asset/sandMaterial/wavy-sand_normal_metallic.png";
-import sandAlbedoRoughnessMap from "../../asset/sandMaterial/wavy-sand_albedo_roughness.png";
+import rockNormalMetallicMap from "../../asset/rockMaterial/layered-planetary_normal_metallic.webp";
+import rockAlbedoRoughnessMap from "../../asset/rockMaterial/layered-planetary_albedo_roughness.webp";
+
+import grassNormalMetallicMap from "../../asset/grassMaterial/wispy-grass-meadow_normal_metallic.webp";
+import grassAlbedoRoughnessMap from "../../asset/grassMaterial/wispy-grass-meadow_albedo_roughness.webp";
+
+import snowNormalMetallicMap from "../../asset/iceMaterial/ice_field_normal_metallic.webp";
+import snowAlbedoRoughnessMap from "../../asset/iceMaterial/ice_field_albedo_roughness.webp";
+
+import sandNormalMetallicMap from "../../asset/sandMaterial/wavy-sand_normal_metallic.webp";
+import sandAlbedoRoughnessMap from "../../asset/sandMaterial/wavy-sand_albedo_roughness.webp";
+
 import waterNormal1 from "../../asset/textures/waterNormalMap3.jpg";
 import waterNormal2 from "../../asset/textures/waterNormalMap4.jpg";
 import plumeParticle from "../../asset/textures/plume.png";
 import flareParticle from "../../asset/flare.png";
-import seamlessPerlin from "../../asset/perlin.png";
+import seamlessPerlin from "../../asset/perlin.webp";
 import atmosphereLUT from "../../shaders/textures/atmosphereLUT.glsl";
-import empty from "../../asset/oneBlackPixel.png";
+import empty from "../../asset/oneBlackPixel.webp";
 
 import skyBox from "../../asset/skybox/milkyway.env";
 
 import cursorImage from "../../asset/textures/hoveredCircle.png";
 
-import solarPanelAlbedo from "../../asset/SolarPanelMaterial/SolarPanel002_2K-PNG_Color.png";
-import solarPanelNormal from "../../asset/SolarPanelMaterial/SolarPanel002_2K-PNG_NormalDX.png";
-import solarPanelMetallic from "../../asset/SolarPanelMaterial/SolarPanel002_2K-PNG_Metalness.png";
-import solarPanelRoughness from "../../asset/SolarPanelMaterial/SolarPanel002_2K-PNG_Roughness.png";
+import butterflyTexture from "../../asset/butterfly.webp";
 
-import spaceStationAlbedo from "../../asset/spaceStationMaterial/spaceship-panels1-albedo.png";
-import spaceStationNormal from "../../asset/spaceStationMaterial/spaceship-panels1-normal-dx.png";
-import spaceStationMetallic from "../../asset/spaceStationMaterial/spaceship-panels1-metallic.png";
-import spaceStationRoughness from "../../asset/spaceStationMaterial/spaceship-panels1-roughness.png";
-import spaceStationAmbientOcclusion from "../../asset/spaceStationMaterial/spaceship-panels1-ao.png";
+import solarPanelAlbedo from "../../asset/SolarPanelMaterial/SolarPanel002_2K-PNG_Color.webp";
+import solarPanelNormal from "../../asset/SolarPanelMaterial/SolarPanel002_2K-PNG_NormalDX.webp";
+import solarPanelMetallic from "../../asset/SolarPanelMaterial/SolarPanel002_2K-PNG_Metalness.webp";
+import solarPanelRoughness from "../../asset/SolarPanelMaterial/SolarPanel002_2K-PNG_Roughness.webp";
 
-import metalPanelsAlbdeo from "../../asset/metalPanelMaterial/sci-fi-panel1-albedo.png";
-import metalPanelsNormal from "../../asset/metalPanelMaterial/sci-fi-panel1-normal-dx.png";
-import metalPanelsRoughness from "../../asset/metalPanelMaterial/sci-fi-panel1-roughness.png";
-import metalPanelsMetallic from "../../asset/metalPanelMaterial/sci-fi-panel1-metallic.png";
-import metalPanelsAmbientOcclusion from "../../asset/metalPanelMaterial/sci-fi-panel1-ao.png";
+import spaceStationAlbedo from "../../asset/spaceStationMaterial/spaceship-panels1-albedo.webp";
+import spaceStationNormal from "../../asset/spaceStationMaterial/spaceship-panels1-normal-dx.webp";
+import spaceStationMetallic from "../../asset/spaceStationMaterial/spaceship-panels1-metallic.webp";
+import spaceStationRoughness from "../../asset/spaceStationMaterial/spaceship-panels1-roughness.webp";
+import spaceStationAmbientOcclusion from "../../asset/spaceStationMaterial/spaceship-panels1-ao.webp";
 
-import crateAlbedo from "../../asset/crateMaterial/space-crate1-albedo.png";
-import crateNormal from "../../asset/crateMaterial/space-crate1-normal-dx.png";
-import crateMetallicRoughness from "../../asset/crateMaterial/space-crate1-metallic-roughness.png";
-import crateAmbientOcclusion from "../../asset/crateMaterial/space-crate1-ao.png";
+import metalPanelsAlbdeo from "../../asset/metalPanelMaterial/sci-fi-panel1-albedo.webp";
+import metalPanelsNormal from "../../asset/metalPanelMaterial/sci-fi-panel1-normal-dx.webp";
+import metalPanelsRoughness from "../../asset/metalPanelMaterial/sci-fi-panel1-roughness.webp";
+import metalPanelsMetallic from "../../asset/metalPanelMaterial/sci-fi-panel1-metallic.webp";
+import metalPanelsAmbientOcclusion from "../../asset/metalPanelMaterial/sci-fi-panel1-ao.webp";
+
+import crateAlbedo from "../../asset/crateMaterial/space-crate1-albedo.webp";
+import crateNormal from "../../asset/crateMaterial/space-crate1-normal-dx.webp";
+import crateMetallicRoughness from "../../asset/crateMaterial/space-crate1-metallic-roughness.webp";
+import crateAmbientOcclusion from "../../asset/crateMaterial/space-crate1-ao.webp";
 
 export class Textures {
     static ROCK_NORMAL_METALLIC_MAP: Texture;
     static ROCK_ALBEDO_ROUGHNESS_MAP: Texture;
-
-    static DIRT_NORMAL_MAP: Texture;
-    static BOTTOM_NORMAL_MAP: Texture;
 
     static GRASS_NORMAL_METALLIC_MAP: Texture;
     static GRASS_ALBEDO_ROUGHNESS_MAP: Texture;
@@ -89,6 +90,8 @@ export class Textures {
     static PLUME_PARTICLE: Texture;
 
     static FLARE_TEXTURE: Texture;
+
+    static BUTTERFLY: Texture;
 
     static EMPTY_TEXTURE: Texture;
 
@@ -126,9 +129,6 @@ export class Textures {
         manager.addTextureTask("RockNormalMetallicMap", rockNormalMetallicMap).onSuccess = (task) => (Textures.ROCK_NORMAL_METALLIC_MAP = task.texture);
         manager.addTextureTask("RockAlbedoRoughnessMap", rockAlbedoRoughnessMap).onSuccess = (task) => (Textures.ROCK_ALBEDO_ROUGHNESS_MAP = task.texture);
 
-        manager.addTextureTask("DirtNormalMap", dirtNormalMap).onSuccess = (task) => (Textures.DIRT_NORMAL_MAP = task.texture);
-        manager.addTextureTask("BottomNormalMap", bottomNormalMap).onSuccess = (task) => (Textures.BOTTOM_NORMAL_MAP = task.texture);
-
         manager.addTextureTask("GrassNormalMetallicMap", grassNormalMetallicMap).onSuccess = (task) => (Textures.GRASS_NORMAL_METALLIC_MAP = task.texture);
         manager.addTextureTask("GrassAlbedoRoughnessMap", grassAlbedoRoughnessMap).onSuccess = (task) => (Textures.GRASS_ALBEDO_ROUGHNESS_MAP = task.texture);
 
@@ -143,6 +143,8 @@ export class Textures {
 
         manager.addTextureTask("PlumeParticle", plumeParticle).onSuccess = (task) => (Textures.PLUME_PARTICLE = task.texture);
         manager.addTextureTask("FlareTexture", flareParticle).onSuccess = (task) => (Textures.FLARE_TEXTURE = task.texture);
+
+        manager.addTextureTask("Butterfly", butterflyTexture).onSuccess = (task) => (Textures.BUTTERFLY = task.texture);
 
         manager.addTextureTask("SeamlessPerlin", seamlessPerlin).onSuccess = (task) => (Textures.SEAMLESS_PERLIN = task.texture);
 
