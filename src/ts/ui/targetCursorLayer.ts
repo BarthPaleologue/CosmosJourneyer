@@ -47,7 +47,7 @@ export class TargetCursorLayer implements IDisposable {
         return this.layerRoot.style.display === "block";
     }
 
-    public addObjectOverlay(object: Transformable & BoundingSphere & TypedObject, iconType: ObjectTargetCursorType, minDistance: number, maxDistance: number) {
+    public addObject(object: Transformable & BoundingSphere & TypedObject, iconType: ObjectTargetCursorType, minDistance: number, maxDistance: number) {
         const overlay = new ObjectTargetCursor(object, iconType, minDistance, maxDistance);
         this.targetCursors.push(overlay);
         this.layerRoot.appendChild(overlay.htmlRoot);
@@ -57,7 +57,7 @@ export class TargetCursorLayer implements IDisposable {
         let nearest = null;
         let closestDistance = Number.POSITIVE_INFINITY;
         this.targetCursors.forEach((overlay) => {
-            if(!overlay.isVisible()) return;
+            if (!overlay.isVisible()) return;
 
             const screenCoordinates = overlay.screenCoordinates;
             const distance = screenCoordinates.subtract(new Vector3(0.5, 0.5, 0)).length();
@@ -97,7 +97,10 @@ export class TargetCursorLayer implements IDisposable {
     public update(camera: Camera) {
         for (const targetCursor of this.targetCursors) {
             targetCursor.update(camera);
-            targetCursor.setTarget(targetCursor.object === this.target || targetCursor.object === this.closestToScreenCenterOrbitalObject);
+            const distanceToCenter = (targetCursor.screenCoordinates.x - 0.5) ** 2 + (targetCursor.screenCoordinates.y - 0.5) ** 2;
+            const isHovered = distanceToCenter < 0.05 && targetCursor.object === this.closestToScreenCenterOrbitalObject;
+            const isTarget = targetCursor.object === this.target;
+            targetCursor.setTarget(isTarget || isHovered);
         }
         this.computeClosestToScreenCenterOrbitalObject();
     }

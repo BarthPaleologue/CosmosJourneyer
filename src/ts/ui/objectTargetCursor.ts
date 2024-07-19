@@ -28,12 +28,13 @@ import { smoothstep } from "../utils/smoothstep";
 export const enum ObjectTargetCursorType {
     CELESTIAL_BODY,
     FACILITY,
-    ANOMALY
+    ANOMALY,
+    LANDING_PAD
 }
 
 export class ObjectTargetCursor {
     readonly htmlRoot: HTMLDivElement;
-    
+
     readonly cursor: HTMLDivElement;
 
     readonly textBlock: HTMLDivElement;
@@ -52,6 +53,7 @@ export class ObjectTargetCursor {
     readonly maxDistance: number;
 
     readonly minSize: number;
+    readonly maxSize: number;
 
     private alpha = 1.0;
 
@@ -71,14 +73,22 @@ export class ObjectTargetCursor {
             case ObjectTargetCursorType.CELESTIAL_BODY:
                 this.cursor.classList.add("rounded");
                 this.minSize = 5;
+                this.maxSize = 0;
                 break;
             case ObjectTargetCursorType.FACILITY:
                 this.cursor.classList.add("rotated");
                 this.minSize = 2;
+                this.maxSize = 0;
                 break;
             case ObjectTargetCursorType.ANOMALY:
                 this.cursor.classList.add("rounded");
                 this.minSize = 2;
+                this.maxSize = 0;
+                break;
+            case ObjectTargetCursorType.LANDING_PAD:
+                this.cursor.classList.add("rotated");
+                this.minSize = 1.5;
+                this.maxSize = 1.5;
                 break;
         }
 
@@ -145,11 +155,14 @@ export class ObjectTargetCursor {
         const angularSize = getAngularSize(this.object.getTransform().getAbsolutePosition(), this.object.getBoundingRadius(), camera.globalPosition);
         const screenRatio = angularSize / camera.fov;
 
-        this.htmlRoot.style.setProperty("--dim", Math.max(100 * (screenRatio * 1.3), this.minSize) + "vh");
+        let size = 100 * (screenRatio * 1.3);
+        if (this.minSize > 0) size = Math.max(size, this.minSize);
+        if (this.maxSize > 0) size = Math.min(size, this.maxSize);
+        this.htmlRoot.style.setProperty("--dim", size + "vh");
 
         this.alpha = 1.0;
-        if(this.minDistance > 0) this.alpha *= smoothstep(this.minDistance * 0.5, this.minDistance, distance);
-        if(this.maxDistance > 0 && !this.isTarget) this.alpha *= smoothstep(this.maxDistance * 1.5, this.maxDistance, distance);
+        if (this.minDistance > 0) this.alpha *= smoothstep(this.minDistance * 0.5, this.minDistance, distance);
+        if (this.maxDistance > 0 && !this.isTarget) this.alpha *= smoothstep(this.maxDistance * 1.5, this.maxDistance, distance);
 
         this.cursor.style.opacity = `${Math.min(this.alpha, 0.5)}`;
         this.textBlock.style.opacity = this.isTarget ? `${this.alpha}` : "0.0";

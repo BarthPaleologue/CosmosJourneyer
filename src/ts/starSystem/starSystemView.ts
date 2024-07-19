@@ -39,11 +39,15 @@ import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge"
 import { DefaultControls } from "../defaultControls/defaultControls";
 import { CharacterControls } from "../characterControls/characterControls";
 import { Assets } from "../assets/assets";
-import { getForwardDirection, getRotationQuaternion, setRotationQuaternion, translate } from "../uberCore/transforms/basicTransform";
+import {
+    getForwardDirection,
+    getRotationQuaternion,
+    setRotationQuaternion,
+    translate
+} from "../uberCore/transforms/basicTransform";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { View } from "../utils/view";
-import { syncCamera } from "../utils/cameraSyncing";
 import { SystemSeed } from "../utils/systemSeed";
 import { StarSector } from "../starmap/starSector";
 import { StarMap } from "../starmap/starMap";
@@ -477,11 +481,15 @@ export class StarSystemView implements View {
                 // this is a satellite of a planet orbiting a star
                 maxDistance = body.getOrbitProperties().radius * 8.0;
             }
-            this.targetCursorLayer.addObjectOverlay(body, ObjectTargetCursorType.CELESTIAL_BODY, body.getBoundingRadius() * 10.0, maxDistance);
+            this.targetCursorLayer.addObject(body, ObjectTargetCursorType.CELESTIAL_BODY, body.getBoundingRadius() * 10.0, maxDistance);
         });
 
-        starSystem.spaceStations.forEach((body) => {
-            this.targetCursorLayer.addObjectOverlay(body, ObjectTargetCursorType.FACILITY, body.getBoundingRadius() * 6.0, 0.0);
+        starSystem.spaceStations.forEach((spaceStation) => {
+            this.targetCursorLayer.addObject(spaceStation, ObjectTargetCursorType.FACILITY, spaceStation.getBoundingRadius() * 6.0, 0.0);
+
+            spaceStation.getLandingPads().forEach(landingPad => {
+               this.targetCursorLayer.addObject(landingPad, ObjectTargetCursorType.LANDING_PAD, landingPad.getBoundingRadius() * 4.0, 2e3);
+            });
         });
 
         this.orbitRenderer.setOrbitalObjects(starSystem.getOrbitalObjects(), this.scene);
@@ -752,7 +760,7 @@ export class StarSystemView implements View {
         const distance = StarMap.StarMapDistanceToLy(Vector3.Distance(currentSystemUniversePosition, targetSystemUniversePosition));
 
         const target = currentSystem.addSystemTarget(targetSeed, direction, distance);
-        this.targetCursorLayer.addObjectOverlay(target, ObjectTargetCursorType.CELESTIAL_BODY, 0, 0);
+        this.targetCursorLayer.addObject(target, ObjectTargetCursorType.CELESTIAL_BODY, 0, 0);
         this.targetCursorLayer.setTarget(target);
         this.helmetOverlay.setTarget(target.getTransform());
     }

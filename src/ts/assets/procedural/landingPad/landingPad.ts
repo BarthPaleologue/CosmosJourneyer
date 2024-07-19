@@ -46,7 +46,7 @@ export class LandingPad implements Transformable, TypedObject, BoundingSphere {
 
         this.deckMaterial = new LandingPadMaterial(padNumber, aspectRatio, scene);
 
-        this.deck = MeshBuilder.CreateBox("LandingPad", { width: width, depth: depth, height: 0.5 }, scene);
+        this.deck = MeshBuilder.CreateBox(`Landing Pad ${padNumber}`, { width: width, depth: depth, height: 0.5 }, scene);
         this.deck.material = this.deckMaterial;
 
         this.deckAggregate = new PhysicsAggregate(this.deck, PhysicsShapeType.BOX, { mass: 0, friction: 10 }, scene);
