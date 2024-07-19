@@ -54,7 +54,7 @@ export class LandingPad implements Transformable, TypedObject, BoundingSphere {
         this.deckAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
         this.deckAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
 
-        const nbBoxes = Math.floor(Math.random() * 10);
+        const nbBoxes = Math.floor(Math.random() * 5);
         for (let i = 0; i < nbBoxes; i++) {
             const corner1 = Math.random() < 0.5 ? -1 : 1;
             const corner2 = Math.random() < 0.5 ? -1 : 1;
