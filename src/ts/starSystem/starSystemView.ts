@@ -591,8 +591,8 @@ export class StarSystemView implements View {
         this.orbitRenderer.update();
 
         this.targetCursorLayer.update(this.scene.getActiveControls().getActiveCameras()[0]);
-        const targetLandingPad = this.getSpaceshipControls().spaceship.getTargetLandingPad();
-        if (targetLandingPad !== null) {
+        const targetLandingPad = this.spaceshipControls.spaceship.getTargetLandingPad();
+        if (targetLandingPad !== null && !this.spaceshipControls.spaceship.isLanded() && this.targetCursorLayer.getTarget() !== targetLandingPad) {
             this.targetCursorLayer.setTarget(targetLandingPad);
         }
 

@@ -83,15 +83,16 @@ export class TargetCursorLayer implements IDisposable {
     }
 
     public setTarget(object: (Transformable & BoundingSphere & TypedObject) | null) {
-        this.targetCursors.forEach((overlay) => {
-            overlay.setTarget(overlay.object === object);
-        });
-
         if (this.target === object) {
             this.target = null;
             return;
         }
+
         this.target = object;
+    }
+
+    public getTarget() {
+        return this.target;
     }
 
     public update(camera: Camera) {
@@ -100,13 +101,10 @@ export class TargetCursorLayer implements IDisposable {
             const distanceToCenterSquared = (targetCursor.screenCoordinates.x - 0.5) ** 2 + (targetCursor.screenCoordinates.y - 0.5) ** 2;
             const isHovered = distanceToCenterSquared < 0.1 * 0.1 && targetCursor.object === this.closestToScreenCenterOrbitalObject;
             const isTarget = targetCursor.object === this.target;
-            targetCursor.setTarget(isTarget || isHovered);
+            targetCursor.setTarget(isTarget);
+            targetCursor.setInformationEnabled(isTarget || isHovered);
         }
         this.computeClosestToScreenCenterOrbitalObject();
-    }
-
-    public getTarget() {
-        return this.target;
     }
 
     public dispose() {

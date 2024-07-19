@@ -61,6 +61,8 @@ export class ObjectTargetCursor {
 
     private isTarget = false;
 
+    private isInformationEnabled = false;
+
     constructor(object: Transformable & BoundingSphere & TypedObject, iconType: ObjectTargetCursorType, minDistance: number, maxDistance: number) {
         this.htmlRoot = document.createElement("div");
         this.htmlRoot.classList.add("targetCursorRoot");
@@ -130,6 +132,11 @@ export class ObjectTargetCursor {
 
     setTarget(isTarget: boolean) {
         this.isTarget = isTarget;
+        this.cursor.classList.toggle("target", isTarget);
+    }
+
+    setInformationEnabled(enabled: boolean) {
+        this.isInformationEnabled = enabled;
     }
 
     update(camera: Camera) {
@@ -164,8 +171,8 @@ export class ObjectTargetCursor {
         if (this.minDistance > 0) this.alpha *= smoothstep(this.minDistance * 0.5, this.minDistance, distance);
         if (this.maxDistance > 0 && !this.isTarget) this.alpha *= smoothstep(this.maxDistance * 1.5, this.maxDistance, distance);
 
-        this.cursor.style.opacity = `${Math.min(this.alpha, 0.5)}`;
-        this.textBlock.style.opacity = this.isTarget ? `${this.alpha}` : "0.0";
+        this.cursor.style.opacity = `${Math.min(this.alpha, this.isTarget ? 1 : 0.5)}`;
+        this.textBlock.style.opacity = this.isInformationEnabled ? `${this.alpha}` : "0.0";
 
         this.distanceText.innerText = parseDistance(distance);
 

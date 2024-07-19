@@ -4,7 +4,7 @@
   display: flex;
   align-items: center;
   column-gap: max(3vh, 20px);
-  
+
   translate: calc(var(--dim) * -0.5) -50%;
   pointer-events: none;
 
@@ -18,6 +18,8 @@
 
     flex-shrink: 0;
 
+    transition: transform 0.2s, border-color 0.2s, scale 0.2s cubic-bezier(0.34,-1.87, 0.74, 2.99), rotate 0.2s;
+
     &.rounded {
       border-radius: 50%;
     }
@@ -25,19 +27,24 @@
     &.rotated {
       rotate: 45deg;
     }
+
+    &.target {
+      border-color: goldenrod;
+      scale: 1.2;
+    }
   }
-  
+
   &.hidden {
     display: none;
   }
 
   .targetCursorText {
     color: white;
-    font-family: Nasalization;
+    font-family: Nasalization, sans-serif;
     flex-shrink: 0;
 
     display: flex;
-    flex-direction: column;    
+    flex-direction: column;
     justify-content: center;
 
     transition: opacity 0.2s;
