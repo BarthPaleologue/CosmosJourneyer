@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { HelmetOverlay } from "../ui/helmetOverlay";
+import { SpaceShipLayer } from "../ui/spaceShipLayer";
 import { BodyEditor, EditorVisibility } from "../ui/bodyEditor/bodyEditor";
 import { UberScene } from "../uberCore/uberScene";
 import { AxisRenderer } from "../orbit/axisRenderer";
@@ -82,9 +82,14 @@ import { ObjectTargetCursorType } from "../ui/objectTargetCursor";
  */
 export class StarSystemView implements View {
     /**
+     * The HTML GUI used to display orbital objects cursors and information when targeted.
+     */
+    readonly targetCursorLayer: TargetCursorLayer;
+
+    /**
      * The HTML UI responsible for the name of the closest orbital object, the velocity of the spaceship and the target helper radar.
      */
-    readonly helmetOverlay: HelmetOverlay;
+    readonly spaceShipLayer: SpaceShipLayer;
 
     /**
      * A debug HTML UI to change the properties of the closest celestial body
@@ -132,11 +137,6 @@ export class StarSystemView implements View {
     private readonly axisRenderer: AxisRenderer = new AxisRenderer();
 
     /**
-     * The HTML GUI used to display orbital objects cursors and information when targeted.
-     */
-    readonly targetCursorLayer: TargetCursorLayer;
-
-    /**
      * An animation to unzoom the camera when opening the star map
      * @private
      */
@@ -175,7 +175,7 @@ export class StarSystemView implements View {
      * @param havokInstance The Havok physics instance
      */
     constructor(engine: AbstractEngine, havokInstance: HavokPhysicsWithBindings) {
-        this.helmetOverlay = new HelmetOverlay();
+        this.spaceShipLayer = new SpaceShipLayer();
         this.bodyEditor = new BodyEditor(EditorVisibility.HIDDEN);
 
         const canvas = engine.getRenderingCanvas();
@@ -198,7 +198,7 @@ export class StarSystemView implements View {
             if (enabled) Sounds.MENU_HOVER_SOUND.play();
             else Sounds.MENU_HOVER_SOUND.play();
             this.targetCursorLayer.setEnabled(enabled);
-            this.helmetOverlay.setVisibility(enabled);
+            this.spaceShipLayer.setVisibility(enabled);
         });
 
         StarSystemInputs.map.toggleOrbitsAndAxis.on("complete", () => {
@@ -227,7 +227,7 @@ export class StarSystemView implements View {
             const closestObjectToCenter = this.targetCursorLayer.getClosestToScreenCenterOrbitalObject();
 
             if (this.targetCursorLayer.getTarget() === closestObjectToCenter) {
-                this.helmetOverlay.setTarget(null);
+                this.spaceShipLayer.setTarget(null);
                 this.targetCursorLayer.setTarget(null);
                 Sounds.TARGET_UNLOCK_SOUND.play();
                 return;
@@ -235,7 +235,7 @@ export class StarSystemView implements View {
 
             if (closestObjectToCenter === null) return;
 
-            this.helmetOverlay.setTarget(closestObjectToCenter.getTransform());
+            this.spaceShipLayer.setTarget(closestObjectToCenter.getTransform());
             this.targetCursorLayer.setTarget(closestObjectToCenter);
             Sounds.TARGET_LOCK_SOUND.play();
         });
@@ -369,7 +369,7 @@ export class StarSystemView implements View {
         });
 
         this.bodyEditor.resize();
-        this.helmetOverlay.setVisibility(false);
+        this.spaceShipLayer.setVisibility(false);
 
         this.targetCursorLayer = new TargetCursorLayer();
     }
@@ -499,7 +499,7 @@ export class StarSystemView implements View {
         this.orbitRenderer.setOrbitalObjects(starSystem.getOrbitalObjects(), this.scene);
         this.axisRenderer.setOrbitalObjects(starSystem.getOrbitalObjects(), this.scene);
 
-        this.helmetOverlay.setTarget(null);
+        this.spaceShipLayer.setTarget(null);
 
         const firstBody = starSystem.getBodies()[0];
         if (firstBody === undefined) throw new Error("No bodies in star system");
@@ -573,9 +573,9 @@ export class StarSystemView implements View {
 
         const warpDrive = this.spaceshipControls.spaceship.getWarpDrive();
         if (warpDrive.isEnabled()) {
-            this.helmetOverlay.displaySpeed(warpDrive.getThrottle(), this.spaceshipControls.spaceship.getSpeed());
+            this.spaceShipLayer.displaySpeed(warpDrive.getThrottle(), this.spaceshipControls.spaceship.getSpeed());
         } else {
-            this.helmetOverlay.displaySpeed(this.spaceshipControls.spaceship.getThrottle(), this.spaceshipControls.spaceship.getSpeed());
+            this.spaceShipLayer.displaySpeed(this.spaceshipControls.spaceship.getThrottle(), this.spaceshipControls.spaceship.getSpeed());
         }
 
 
@@ -608,7 +608,7 @@ export class StarSystemView implements View {
 
         this.bodyEditor.update(nearestCelestialBody, this.postProcessManager, this.scene);
 
-        this.helmetOverlay.update(nearestOrbitalObject, this.scene.getActiveControls().getTransform());
+        this.spaceShipLayer.update(nearestOrbitalObject, this.scene.getActiveControls().getTransform());
 
         this.targetCursorLayer.update(this.scene.getActiveControls().getActiveCameras()[0]);
         const targetLandingPad = this.spaceshipControls.spaceship.getTargetLandingPad();
@@ -729,11 +729,11 @@ export class StarSystemView implements View {
 
     public hideHtmlUI() {
         this.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
-        this.helmetOverlay.setVisibility(false);
+        this.spaceShipLayer.setVisibility(false);
     }
 
     public showHtmlUI() {
-        this.helmetOverlay.setVisibility(true);
+        this.spaceShipLayer.setVisibility(true);
         this.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
     }
 
@@ -781,7 +781,7 @@ export class StarSystemView implements View {
         const target = currentSystem.addSystemTarget(targetSeed, direction, distance);
         this.targetCursorLayer.addObject(target, ObjectTargetCursorType.CELESTIAL_BODY, 0, 0);
         this.targetCursorLayer.setTarget(target);
-        this.helmetOverlay.setTarget(target.getTransform());
+        this.spaceShipLayer.setTarget(target.getTransform());
     }
 
     public render() {

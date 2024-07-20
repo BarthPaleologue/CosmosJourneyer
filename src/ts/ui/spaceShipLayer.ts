@@ -22,7 +22,7 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Matrix } from "@babylonjs/core/Maths/math";
 
-export class HelmetOverlay {
+export class SpaceShipLayer {
     private parentNode: HTMLElement;
     private bodyNamePlate: HTMLElement;
 

@@ -115,7 +115,7 @@ export class CosmosJourneyer {
             const target = this.starSystemView.targetCursorLayer.getClosestToScreenCenterOrbitalObject();
             if (target !== null) {
                 this.starSystemView.targetCursorLayer.setTarget(target);
-                this.starSystemView.helmetOverlay.setTarget(target.getTransform());
+                this.starSystemView.spaceShipLayer.setTarget(target.getTransform());
             }
         });
 
@@ -426,7 +426,7 @@ export class CosmosJourneyer {
 
             // set the ui target to the nearest orbital object
             this.starSystemView.targetCursorLayer.setTarget(nearestOrbitalObject);
-            this.starSystemView.helmetOverlay.setTarget(nearestOrbitalObject.getTransform());
+            this.starSystemView.spaceShipLayer.setTarget(nearestOrbitalObject.getTransform());
         });
 
         await this.starSystemView.loadStarSystem(new StarSystemController(seed, this.starSystemView.scene), true);
