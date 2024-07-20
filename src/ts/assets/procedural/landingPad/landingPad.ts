@@ -46,7 +46,7 @@ export class LandingPad implements Transformable, TypedObject, BoundingSphere {
 
         this.deckMaterial = new LandingPadMaterial(padNumber, aspectRatio, scene);
 
-        this.deck = MeshBuilder.CreateBox("LandingPad", { width: width, depth: depth, height: 0.5 }, scene);
+        this.deck = MeshBuilder.CreateBox(`Landing Pad ${padNumber}`, { width: width, depth: depth, height: 0.5 }, scene);
         this.deck.material = this.deckMaterial;
 
         this.deckAggregate = new PhysicsAggregate(this.deck, PhysicsShapeType.BOX, { mass: 0, friction: 10 }, scene);
@@ -54,7 +54,7 @@ export class LandingPad implements Transformable, TypedObject, BoundingSphere {
         this.deckAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
         this.deckAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
 
-        const nbBoxes = Math.floor(Math.random() * 10);
+        const nbBoxes = Math.floor(Math.random() * 5);
         for (let i = 0; i < nbBoxes; i++) {
             const corner1 = Math.random() < 0.5 ? -1 : 1;
             const corner2 = Math.random() < 0.5 ? -1 : 1;

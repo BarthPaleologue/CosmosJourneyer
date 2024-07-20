@@ -265,6 +265,10 @@ export class Spaceship implements Transformable {
         this.targetLandingPad = landingPad;
     }
 
+    public getTargetLandingPad(): LandingPad | null {
+        return this.targetLandingPad;
+    }
+
     private completeLanding() {
         console.log("Landing sequence complete");
         this.state = ShipState.LANDED;
