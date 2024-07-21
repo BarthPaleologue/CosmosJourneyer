@@ -305,6 +305,7 @@ export class StarSystemView implements View {
 
                 setRotationQuaternion(characterControls.getTransform(), getRotationQuaternion(shipControls.getTransform()).clone());
                 SpaceShipControlsInputs.setEnabled(false);
+                this.spaceShipLayer.setVisibility(false);
 
                 this.scene.setActiveControls(characterControls);
                 this.postProcessManager.rebuild();
@@ -655,6 +656,8 @@ export class StarSystemView implements View {
         const characterControls = this.getCharacterControls();
         const defaultControls = this.getDefaultControls();
 
+        this.spaceShipLayer.setVisibility(true);
+
         characterControls.getTransform().setEnabled(false);
         CharacterInputs.setEnabled(false);
         this.scene.setActiveControls(shipControls);
@@ -672,6 +675,8 @@ export class StarSystemView implements View {
         const shipControls = this.getSpaceshipControls();
         const characterControls = this.getCharacterControls();
         const defaultControls = this.getDefaultControls();
+
+        this.spaceShipLayer.setVisibility(false);
 
         characterControls.getTransform().setEnabled(true);
         CharacterInputs.setEnabled(true);
@@ -693,6 +698,8 @@ export class StarSystemView implements View {
         const shipControls = this.getSpaceshipControls();
         const characterControls = this.getCharacterControls();
         const defaultControls = this.getDefaultControls();
+
+        this.spaceShipLayer.setVisibility(false);
 
         characterControls.getTransform().setEnabled(false);
         CharacterInputs.setEnabled(false);
