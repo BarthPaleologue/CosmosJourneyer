@@ -25,10 +25,21 @@
   right: 0;
   z-index: 2;
   pointer-events: none;
+  cursor: none;
 
   font-family: Nasalization, sans-serif;
 
   @import "targetHelper.scss";
+
+  .cursor {
+    position: absolute;
+    width: 30px;
+    height: 40px;
+    transform-origin: center;
+    background: url('../asset/shipCursor.webp') no-repeat center;
+    background-size: cover;
+    pointer-events: none;
+  }
 
   #bodyData {
     position: absolute;
