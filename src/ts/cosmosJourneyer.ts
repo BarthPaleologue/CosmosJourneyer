@@ -110,11 +110,11 @@ export class CosmosJourneyer {
             this.starSystemView.switchToSpaceshipControls();
             this.starSystemView.getSpaceshipControls().spaceship.enableWarpDrive();
             this.starSystemView.showHtmlUI();
-            this.starSystemView.ui.setEnabled(true);
-            const target = this.starSystemView.getStarSystem().getClosestToScreenCenterOrbitalObject();
+            this.starSystemView.targetCursorLayer.setEnabled(true);
+            const target = this.starSystemView.targetCursorLayer.getClosestToScreenCenterOrbitalObject();
             if (target !== null) {
-                this.starSystemView.ui.setTarget(target);
-                this.starSystemView.helmetOverlay.setTarget(target.getTransform());
+                this.starSystemView.targetCursorLayer.setTarget(target);
+                this.starSystemView.spaceShipLayer.setTarget(target.getTransform());
             }
         });
 
@@ -268,7 +268,7 @@ export class CosmosJourneyer {
             this.starSystemView.unZoom(() => {
                 AudioManager.SetMask(AudioMasks.STAR_MAP_VIEW);
 
-                this.starSystemView.ui.setEnabled(false);
+                this.starSystemView.targetCursorLayer.setEnabled(false);
 
                 this.starSystemView.detachControl();
                 this.starMap.attachControl();
@@ -281,7 +281,7 @@ export class CosmosJourneyer {
             this.starMap.detachControl();
             this.starSystemView.attachControl();
 
-            this.starSystemView.ui.setEnabled(true);
+            this.starSystemView.targetCursorLayer.setEnabled(true);
 
             AudioManager.SetMask(AudioMasks.STAR_SYSTEM_VIEW);
             this.activeView = this.starSystemView;
@@ -395,7 +395,7 @@ export class CosmosJourneyer {
         this.starSystemView.onInitStarSystem.addOnce(() => {
             this.starSystemView.switchToSpaceshipControls();
 
-            this.starSystemView.ui.setEnabled(true);
+            this.starSystemView.targetCursorLayer.setEnabled(true);
             this.starSystemView.showHtmlUI();
 
             const playerTransform = this.starSystemView.scene.getActiveControls().getTransform();
@@ -426,8 +426,8 @@ export class CosmosJourneyer {
             this.starSystemView.getStarSystem().applyFloatingOrigin();
 
             // set the ui target to the nearest orbital object
-            this.starSystemView.ui.setTarget(nearestOrbitalObject);
-            this.starSystemView.helmetOverlay.setTarget(nearestOrbitalObject.getTransform());
+            this.starSystemView.targetCursorLayer.setTarget(nearestOrbitalObject);
+            this.starSystemView.spaceShipLayer.setTarget(nearestOrbitalObject.getTransform());
         });
 
         await this.starSystemView.loadStarSystem(new StarSystemController(seed, this.starSystemView.scene), true);

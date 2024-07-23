@@ -200,7 +200,7 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
             Sounds.MAIN_MENU_BACKGROUND_MUSIC.play();
         });
 
-        this.starSystemView.ui.setEnabled(false);
+        this.starSystemView.targetCursorLayer.setEnabled(false);
 
         this.starSystemView.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
 

@@ -49,7 +49,7 @@ export class StarSystemController {
 
     private readonly orbitalObjects: OrbitalObject[] = [];
 
-    private readonly spaceStations: SpaceStation[] = [];
+    readonly spaceStations: SpaceStation[] = [];
 
     readonly celestialBodies: CelestialBody[] = [];
 
@@ -87,8 +87,6 @@ export class StarSystemController {
      * The model of the star system that describes it and generates the randomness
      */
     readonly model: StarSystemModel;
-
-    private closestToScreenCenterOrbitalObject: OrbitalObject | null = null;
 
     constructor(model: StarSystemModel | SystemSeed, scene: UberScene) {
         this.scene = scene;
@@ -190,34 +188,6 @@ export class StarSystemController {
         for (const body of this.celestialBodies) objects.push(body);
         for (const spacestation of this.spaceStations) objects.push(spacestation);
         return objects;
-    }
-
-    public computeClosestToScreenCenterOrbitalObject() {
-        let nearest = null;
-        let closestDistance = Number.POSITIVE_INFINITY;
-        for (const object of this.orbitalObjects) {
-            const screenCoordinates = Vector3.Project(
-                object.getTransform().getAbsolutePosition(),
-                Matrix.IdentityReadOnly,
-                this.scene.getTransformMatrix(),
-                this.scene.getActiveCameras()[0].viewport
-            );
-
-            if (screenCoordinates.z < 0) continue;
-
-            const distance = screenCoordinates.subtract(new Vector3(0.5, 0.5, 0)).length();
-
-            if (distance < closestDistance) {
-                closestDistance = distance;
-                nearest = object;
-            }
-        }
-
-        this.closestToScreenCenterOrbitalObject = nearest;
-    }
-
-    public getClosestToScreenCenterOrbitalObject(): OrbitalObject | null {
-        return this.closestToScreenCenterOrbitalObject;
     }
 
     /**
@@ -352,7 +322,6 @@ export class StarSystemController {
      */
     public update(deltaSeconds: number, chunkForge: ChunkForge, postProcessManager: PostProcessManager): void {
         const controller = this.scene.getActiveControls();
-        this.computeClosestToScreenCenterOrbitalObject();
 
         // The nearest body might have to be treated separately
         // The first step is to find the nearest body

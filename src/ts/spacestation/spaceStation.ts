@@ -100,11 +100,15 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
         this.boundingRadius = Math.max(extendSize.x, extendSize.y, extendSize.z);
     }
 
-    handleLandingRequest(request: LandingRequest): LandingPad | null {
-        const availableLandingPads = this.landingBays
+    getLandingPads(): LandingPad[] {
+        return this.landingBays
             .flatMap((landingBay) => {
                 return landingBay.landingPads;
-            })
+            });
+    }
+
+    handleLandingRequest(request: LandingRequest): LandingPad | null {
+        const availableLandingPads = this.getLandingPads()
             .filter((landingPad) => {
                 return landingPad.padSize >= request.minimumPadSize;
             })

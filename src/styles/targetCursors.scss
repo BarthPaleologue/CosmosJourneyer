@@ -1,0 +1,72 @@
+.targetCursorRoot {
+  --dim: 50px;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  column-gap: max(3vh, 20px);
+
+  translate: calc(var(--dim) * -0.5) -50%;
+  pointer-events: none;
+
+
+  .targetCursor {
+    --s: max(15px, calc(var(--dim) * 0.4)); /* the size on the corner */
+    --t: 3px;  /* the thickness of the border */
+    --g: 10px; /* the gap between the border and image */
+
+    padding: calc(var(--g) + var(--t));
+
+    outline: var(--t) solid white; /* the color here */
+    outline-offset: calc(-1*var(--t));
+    mask:
+            conic-gradient(at var(--s) var(--s),#0000 75%,#000 0)
+            0 0/calc(100% - var(--s)) calc(100% - var(--s)),
+            linear-gradient(#000 0 0) content-box;
+    flex-shrink: 0;
+
+    width: calc(var(--dim) - var(--g) * 2 - var(--t) * 2);
+    height: calc(var(--dim) - var(--g) * 2 - var(--t) * 2);
+
+    transition: transform 0.2s, border-color 0.2s, scale 0.2s cubic-bezier(0.34,-1.87, 0.74, 2.99), rotate 0.2s;
+
+    &.rounded {
+      border-radius: 50%;
+    }
+
+    &.rotated {
+      rotate: 45deg;
+    }
+
+    &.target {
+      outline-color: goldenrod;
+      scale: 1.05;
+    }
+  }
+
+  &.hidden {
+    display: none;
+  }
+
+  .targetCursorText {
+    color: white;
+    font-family: Nasalization, sans-serif;
+    flex-shrink: 0;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    transition: opacity 0.2s;
+
+    row-gap: 5px;
+
+    p {
+      margin-block: 0;
+
+      &.targetCursorName {
+        font-weight: bold;
+        font-size: 1.5em;
+      }
+    }
+  }
+}
