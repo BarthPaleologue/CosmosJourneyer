@@ -1,3 +1,4 @@
+import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
 import { TutorialControlsInputs } from "../ui/tutorial/tutorialLayerInputs";
 import { pressInteractionToStrings } from "../utils/inputControlsString";
 
@@ -39,7 +40,7 @@ export function getDivs() {
     thrustPanelTitle.innerText = `Spaceship Thrust`;
 
     const thrustPanelText = document.createElement("p");
-    thrustPanelText.innerText = `Rotating is well and good, but we won't get far without using our main engines. You can throttle the main engines with the W and S keys: W to increase thrust and S to decrease it. Pressing X will set the throttle to zero.
+    thrustPanelText.innerText = `Rotating is well and good, but we won't get far without using our main engines. You can throttle the main engines with the W and S keys: W to increase thrust and S to decrease it. Pressing ${pressInteractionToStrings(SpaceShipControlsInputs.map.throttleToZero).join(" or ")} will set the throttle to zero.
 
     Your current throttle is displayed as a vertical progress bar on the bottom right of the screen alongside your current speed.
 
@@ -59,7 +60,7 @@ export function getDivs() {
     const warpPanelText = document.createElement("p");
     warpPanelText.innerText = `Space is absurdly big as you will soon experience. Moving between planets and stars will often require faster than light (FTL) travel in order to reach your destination before the heat death of the universe. 
     
-    Thankfully your spaceship comes equipped with a warp drive to do just that. Pressing the H key will toggle the warp drive on and off. Its throttle can be adjusted just like the main engines with the W and S keys.
+    Thankfully your spaceship comes equipped with a warp drive to do just that. Pressing the ${pressInteractionToStrings(SpaceShipControlsInputs.map.toggleWarpDrive).join(" or ")} key will toggle the warp drive on and off. Its throttle can be adjusted just like the main engines with the W and S keys.
     
     Fly up or down to leave the asteroid field and then engage your warp drive to fly away to the stars!
     
