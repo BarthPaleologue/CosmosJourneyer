@@ -123,8 +123,6 @@ export class StarMap implements View {
     constructor(engine: AbstractEngine) {
         this.scene = new Scene(engine);
         this.scene.clearColor = new Color4(0, 0, 0, 1);
-        this.scene.performancePriority = ScenePerformancePriority.Intermediate;
-        this.scene.skipPointerMovePicking = false;
         this.scene.useRightHandedSystem = true;
 
         this.controls = new DefaultControls(this.scene);
@@ -584,11 +582,13 @@ export class StarMap implements View {
     public attachControl() {
         this.scene.attachControl();
         this.starMapUI.scene.attachControl();
+        this.starMapUI.htmlRoot.classList.remove("hidden");
     }
 
     public detachControl() {
         this.scene.detachControl();
         this.starMapUI.scene.detachControl();
+        this.starMapUI.htmlRoot.classList.add("hidden");
     }
 
     public getMainScene(): Scene {
