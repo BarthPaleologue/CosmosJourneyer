@@ -145,8 +145,7 @@ export class StarMapUI {
         document.body.appendChild(this.htmlRoot);
 
         document.addEventListener("mousemove", (event) => {
-            this.cursor.style.left = `${event.clientX}px`;
-            this.cursor.style.top = `${event.clientY}px`;
+            this.cursor.style.transform = `translate(calc(${event.clientX}px - 50%), calc(${event.clientY}px - 50%))`;
         });
     }
 
