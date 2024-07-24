@@ -115,6 +115,8 @@ body {
 
   @import "starMapUI.scss";
 
+  @import "tutorialLayer.scss";
+
   #renderer {
     z-index: 1;
     float: left;
