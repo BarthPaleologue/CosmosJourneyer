@@ -7,6 +7,7 @@ import welcomeImageSrc from "../../asset/tutorials/flightTutorial/welcome.webp";
 import rotationImageSrc from "../../asset/tutorials/flightTutorial/rotation.webp";
 import thrustImageSrc from "../../asset/tutorials/flightTutorial/thrust.webp";
 import warpImageSrc from "../../asset/tutorials/flightTutorial/warp.webp";
+import congratsImageSrc from "../../asset/tutorials/flightTutorial/congrats.webp";
 
 export function getDivs() {
     const welcomePanel = document.createElement("div");
@@ -83,7 +84,7 @@ export function getDivs() {
     const warpPanelTitle = document.createElement("h2");
     warpPanelTitle.innerText = `Warp Drive`;
     warpPanel.appendChild(warpPanelTitle);
-    
+
     const warpPanelText = document.createElement("p");
     warpPanelText.innerText = `Moving between planets and stars will often require faster than light (FTL) travel in order to reach your destination before the heat death of the universe. 
     
@@ -101,13 +102,17 @@ export function getDivs() {
     const congratsPanel = document.createElement("div");
     congratsPanel.classList.add("tutorialContent");
 
+    const congratsImage = document.createElement("img");
+    congratsImage.src = congratsImageSrc;
+    congratsImage.alt = "Congratulations!";
+    congratsPanel.appendChild(congratsImage);
+
     const congratsPanelText = document.createElement("p");
     congratsPanelText.innerText = `Congratulations, Commander! You have completed the flight tutorial. You are now ready to explore the cosmos. Good luck, and have fun!
     
-    This tutorial and others are available at any time from the main menu.
+    This tutorial and others are available at any time from the main menu and the pause menu.
     
     Press ${pressInteractionToStrings(TutorialControlsInputs.map.quitTutorial).join(" or ")} to leave the tutorial.`;
-
     congratsPanel.appendChild(congratsPanelText);
 
     return [welcomePanel, rotationPanel, thrustPanel, warpPanel, congratsPanel];
