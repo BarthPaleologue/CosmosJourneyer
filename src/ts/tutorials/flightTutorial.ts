@@ -15,7 +15,7 @@ export function getDivs() {
     welcomePanel.appendChild(welcomeImage);
 
     const welcomePanelText = document.createElement("p");
-    welcomePanelText.innerText = `Welcome to Cosmos Journeyer, Commander! If this is your first flight, this tutorial will cover the basics of space flight.
+    welcomePanelText.innerText = `Welcome to Cosmos Journeyer, Commander! If this is your first time, this tutorial will cover the basics of space flight.
     
     To move forward in the tutorial, simply press ${pressInteractionToStrings(TutorialControlsInputs.map.nextPanel).join(" or ")}. You can go back to the previous panel by pressing ${pressInteractionToStrings(TutorialControlsInputs.map.prevPanel).join(" or ")}. 
     
