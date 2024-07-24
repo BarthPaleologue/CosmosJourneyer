@@ -5,8 +5,9 @@
     .tutorialPanel {
         position: absolute;
         height: 80vh;
-        background: rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(10px);
+        box-shadow: 0 0 20px black;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(3px);
         width: 25vw;
         min-width: 500px;
         top: 10vh;
@@ -16,9 +17,10 @@
         flex-direction: column;
         align-items: center;
         justify-content: space-between;
+        
+        font-family: Nasalilzation, sans-serif;
 
         h1 {
-            font-family: Nasalilzation, sans-serif;
             text-align: center;
             color: white;
             flex-grow: 0;
@@ -29,9 +31,9 @@
             flex-grow: 1;
 
             .tutorialContent {
-                font-family: Nasalization, sans-serif;
                 color: white;
                 padding: 10px;
+                line-height: 1.5em;
             }
         }
 
@@ -44,7 +46,6 @@
             p {
                 background: white;
                 color: black;
-                font-family: Nasalization, sans-serif;
                 padding: 5px;
 
                 display: flex;
