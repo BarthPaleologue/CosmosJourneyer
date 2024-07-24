@@ -6,15 +6,15 @@ import PressInteraction from "@brianchirls/game-input/interactions/PressInteract
 const keyboard = InputDevices.KEYBOARD;
 
 const nextPanel = new PressInteraction(new Action({
-    bindings: [keyboard.getControl("keyReturn")]
+    bindings: [keyboard.getControl("Space")]
 }));
 
 const prevPanel = new PressInteraction(new Action({
-    bindings: [keyboard.getControl("keyBackspace")]
+    bindings: [keyboard.getControl("Backspace")]
 }));
 
 const quitTutorial = new PressInteraction(new Action({
-    bindings: [keyboard.getControl("keyEscape")]
+    bindings: [keyboard.getControl("Delete")]
 }));
 
 export const TutorialControlsInputs = new InputMap<{
@@ -26,3 +26,5 @@ export const TutorialControlsInputs = new InputMap<{
     prevPanel,
     quitTutorial
 });
+
+TutorialControlsInputs.setEnabled(false);

@@ -13,11 +13,17 @@ export class TutorialLayer implements IDisposable {
 
     private readonly controls: HTMLDivElement;
 
-    private readonly tutorialPanels: HTMLDivElement[];
+    private readonly quitButton: HTMLElement;
+
+    private readonly prevButton: HTMLElement;
+
+    private readonly nextButton: HTMLElement;
+
+    private tutorialPanels: HTMLDivElement[] = [];
 
     private currentPanelIndex = 0;
 
-    constructor(tutorialName: string, tutorialPanels: HTMLDivElement[]) {
+    constructor() {
         this.layerRoot = document.createElement("div");
         this.layerRoot.classList.add("tutorialLayer");
 
@@ -25,7 +31,7 @@ export class TutorialLayer implements IDisposable {
         this.panel.classList.add("tutorialPanel");
 
         this.title = document.createElement("h1");
-        this.title.innerText = tutorialName;
+        this.title.innerText = "Tutorial";
         this.panel.appendChild(this.title);
 
         this.contentContainer = document.createElement("div");
@@ -35,57 +41,99 @@ export class TutorialLayer implements IDisposable {
         this.controls = document.createElement("div");
         this.controls.classList.add("tutorialControls");
 
-        const stopButton = document.createElement("p");
+        this.quitButton = document.createElement("p");
         const stopButtonTextSpan = document.createElement("span");
         stopButtonTextSpan.innerText = "Quit";
-        stopButton.appendChild(stopButtonTextSpan);
+        this.quitButton.appendChild(stopButtonTextSpan);
 
         pressInteractionToStrings(TutorialControlsInputs.map.quitTutorial).forEach((key) => {
             const stopKeySpan = document.createElement("span");
             stopKeySpan.classList.add("keySpan");
             stopKeySpan.innerText = key;
-            stopButton.appendChild(stopKeySpan);
+            this.quitButton.appendChild(stopKeySpan);
         });
 
-        const prevButton = document.createElement("p");
+        this.prevButton = document.createElement("p");
         const prevButtonTextSpan = document.createElement("span");
         prevButtonTextSpan.innerText = "Previous";
-        prevButton.appendChild(prevButtonTextSpan);
+        this.prevButton.appendChild(prevButtonTextSpan);
 
         pressInteractionToStrings(TutorialControlsInputs.map.prevPanel).forEach((key) => {
             const prevKeySpan = document.createElement("span");
             prevKeySpan.classList.add("keySpan");
             prevKeySpan.innerText = key;
-            prevButton.appendChild(prevKeySpan);
+            this.prevButton.appendChild(prevKeySpan);
         });
 
-        const nextButton = document.createElement("p");
+        this.nextButton = document.createElement("p");
         const nextButtonTextSpan = document.createElement("span");
         nextButtonTextSpan.innerText = "Next";
-        nextButton.appendChild(nextButtonTextSpan);
+        this.nextButton.appendChild(nextButtonTextSpan);
 
         pressInteractionToStrings(TutorialControlsInputs.map.nextPanel).forEach((key) => {
             const nextKeySpan = document.createElement("span");
             nextKeySpan.classList.add("keySpan");
             nextKeySpan.innerText = key;
-            nextButton.appendChild(nextKeySpan);
+            this.nextButton.appendChild(nextKeySpan);
         });
 
-        this.controls.appendChild(stopButton);
-        this.controls.appendChild(prevButton);
-        this.controls.appendChild(nextButton);
+        this.controls.appendChild(this.quitButton);
+        this.controls.appendChild(this.prevButton);
+        this.controls.appendChild(this.nextButton);
 
         this.panel.appendChild(this.controls);
 
         this.layerRoot.appendChild(this.panel);
 
-        this.tutorialPanels = tutorialPanels;
-
         document.body.appendChild(this.layerRoot);
+
+        TutorialControlsInputs.map.quitTutorial.on("complete", () => {
+            this.setEnabled(false);
+            this.quitButton.animate([
+                { transform: "scale(1)" },
+                { transform: "scale(1.1)" },
+                { transform: "scale(1)" }
+            ], {
+                duration: 200,
+                easing: "ease"
+            });
+        });
+
+        TutorialControlsInputs.map.prevPanel.on("complete", () => {
+            this.currentPanelIndex = Math.max(0, this.currentPanelIndex - 1);
+            this.prevButton.animate([
+                { transform: "scale(1)" },
+                { transform: "scale(1.1)" },
+                { transform: "scale(1)" }
+            ], {
+                duration: 200,
+                easing: "ease"
+            });
+        });
+
+        TutorialControlsInputs.map.nextPanel.on("complete", () => {
+            this.currentPanelIndex = Math.min(this.tutorialPanels.length - 1, this.currentPanelIndex + 1);
+            this.nextButton.animate([
+                { transform: "scale(1)" },
+                { transform: "scale(1.1)" },
+                { transform: "scale(1)" }
+            ], {
+                duration: 200,
+                easing: "ease"
+            });
+        });
+    }
+
+    public setTutorial(name: string, panels: HTMLDivElement[]) {
+        this.title.innerText = name;
+        this.tutorialPanels = panels;
+        this.currentPanelIndex = 0;
+        this.setEnabled(true);
     }
 
     public setEnabled(enabled: boolean) {
         this.layerRoot.style.display = enabled ? "block" : "none";
+        TutorialControlsInputs.setEnabled(enabled);
     }
 
     public isEnabled() {

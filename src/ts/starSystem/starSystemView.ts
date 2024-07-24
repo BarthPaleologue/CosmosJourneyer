@@ -181,7 +181,9 @@ export class StarSystemView implements View {
     constructor(engine: AbstractEngine, havokInstance: HavokPhysicsWithBindings) {
         this.spaceShipLayer = new SpaceShipLayer();
         this.bodyEditor = new BodyEditor(EditorVisibility.HIDDEN);
-        this.tutorialLayer = new TutorialLayer("Flight tutorial", getDivs());
+
+        this.tutorialLayer = new TutorialLayer();
+        this.tutorialLayer.setTutorial("Flight tutorial", getDivs());
 
         const canvas = engine.getRenderingCanvas();
         if (canvas === null) throw new Error("Canvas is null");
