@@ -6,6 +6,7 @@ import { AxisComposite } from "@brianchirls/game-input/browser";
 import welcomeImageSrc from "../../asset/tutorials/flightTutorial/welcome.webp";
 import rotationImageSrc from "../../asset/tutorials/flightTutorial/rotation.webp";
 import thrustImageSrc from "../../asset/tutorials/flightTutorial/thrust.webp";
+import warpImageSrc from "../../asset/tutorials/flightTutorial/warp.webp";
 
 export function getDivs() {
     const welcomePanel = document.createElement("div");
@@ -62,9 +63,7 @@ export function getDivs() {
     }
     const throttleStrings = axisCompositeToString(control);
     console.log(axisCompositeToString(control));
-    thrustPanelText.innerText = `We won't get far without using our main engines. You can throttle the main engines with the ${throttleStrings[1][1]} and ${throttleStrings[0][1]} keys: ${throttleStrings[1][1]} to increase thrust and ${throttleStrings[0][1]} to decrease it. Pressing ${pressInteractionToStrings(SpaceShipControlsInputs.map.throttleToZero).join(" or ")} will set the throttle to zero.
-
-    Your throttle is displayed as a vertical progress bar on the bottom right of the screen alongside your current speed.`
+    thrustPanelText.innerText = `You can throttle the main engines with the ${throttleStrings[1][1]} and ${throttleStrings[0][1]} keys: ${throttleStrings[1][1]} to increase thrust and ${throttleStrings[0][1]} to decrease it. Pressing ${pressInteractionToStrings(SpaceShipControlsInputs.map.throttleToZero).join(" or ")} will set the throttle to zero.`
     thrustPanel.appendChild(thrustPanelText);
 
     const thrustImage = document.createElement("img");
@@ -74,7 +73,8 @@ export function getDivs() {
 
 
     const thrustPanelText2 = document.createElement("p");
-    thrustPanelText2.innerText = `You can fly around the asteroid field to get familiar with the controls.`;
+    thrustPanelText2.innerText = `Your throttle is displayed as a vertical progress bar on the bottom right of the screen alongside your speed. 
+    Try flying around the asteroid field to get familiar with the controls.`;
     thrustPanel.appendChild(thrustPanelText2);
 
     const warpPanel = document.createElement("div");
@@ -82,16 +82,21 @@ export function getDivs() {
 
     const warpPanelTitle = document.createElement("h2");
     warpPanelTitle.innerText = `Warp Drive`;
-
+    warpPanel.appendChild(warpPanelTitle);
+    
     const warpPanelText = document.createElement("p");
     warpPanelText.innerText = `Moving between planets and stars will often require faster than light (FTL) travel in order to reach your destination before the heat death of the universe. 
     
     Your spaceship comes equipped with a warp drive to do just that. Pressing the ${pressInteractionToStrings(SpaceShipControlsInputs.map.toggleWarpDrive).join(" or ")} key will toggle the warp drive on and off. The warp throttle can be adjusted like for the main engines.
     
     Fly up or down to leave the asteroid field and then engage your warp drive to fly away to the stars!`;
-
-    warpPanel.appendChild(warpPanelTitle);
     warpPanel.appendChild(warpPanelText);
+
+    const warpImage = document.createElement("img");
+    warpImage.src = warpImageSrc;
+    warpImage.alt = "Warp Drive";
+    warpPanel.appendChild(warpImage);
+
 
     const congratsPanel = document.createElement("div");
     congratsPanel.classList.add("tutorialContent");
