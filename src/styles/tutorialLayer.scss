@@ -8,6 +8,7 @@
         background: rgba(0, 0, 0, 0.5);
         backdrop-filter: blur(10px);
         width: 25vw;
+        min-width: 500px;
         top: 10vh;
         left: 0;
 
@@ -40,11 +41,22 @@
             display: flex;
             justify-content: space-evenly;
 
-            div {
+            p {
                 background: white;
                 color: black;
                 font-family: Nasalization, sans-serif;
-                padding: 5px 10px;
+                padding: 5px;
+
+                display: flex;
+                column-gap: 5px;
+                align-items: center;
+
+                .keySpan {
+                    font-weight: bold;
+                    background: rgba(0, 0, 0, 0.3);
+                    padding: 5px;
+                    font-size: 75%;
+                }
             }
         }
     }

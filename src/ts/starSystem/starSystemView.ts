@@ -74,7 +74,7 @@ import { Sounds } from "../assets/sounds";
 import { Materials } from "../assets/materials";
 import { SpaceStation } from "../spacestation/spaceStation";
 import { ObjectTargetCursorType } from "../ui/objectTargetCursor";
-import { TutorialLayer } from "../ui/tutorialLayer";
+import { TutorialLayer } from "../ui/tutorial/tutorialLayer";
 import { getDivs } from "../tutorials/flightTutorial";
 
 /**
