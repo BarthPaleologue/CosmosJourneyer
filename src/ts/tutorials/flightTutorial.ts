@@ -6,9 +6,9 @@ export function getDivs() {
     welcomePanel.classList.add("tutorialContent");
 
     const welcomePanelText = document.createElement("p");
-    welcomePanelText.innerText = `Welcome to Cosmos Journeyer, Commander! If this is your first flight, this tutorial will guide you through the basics of piloting your ship. 
+    welcomePanelText.innerText = `Welcome to Cosmos Journeyer, Commander! If this is your first flight, this tutorial will cover the basics of space flight.
     
-    Press ${pressInteractionToStrings(TutorialControlsInputs.map.nextPanel).join(" or ")} to start. 
+    To start the tutorial, simply press ${pressInteractionToStrings(TutorialControlsInputs.map.nextPanel).join(" or ")}. You can go back to the previous panel by pressing ${pressInteractionToStrings(TutorialControlsInputs.map.prevPanel).join(" or ")}. 
     
     You can leave the tutorial at any time by pressing ${pressInteractionToStrings(TutorialControlsInputs.map.quitTutorial).join(" or ")}.`;
 
@@ -39,9 +39,13 @@ export function getDivs() {
     thrustPanelTitle.innerText = `Spaceship Thrust`;
 
     const thrustPanelText = document.createElement("p");
-    thrustPanelText.innerText = `Rotating is well and good, but we won't get far without using our main engines. The thrust can be adjusted with the W and S keys. Pressing W will increase the thrust, while pressing S will decrease it.
+    thrustPanelText.innerText = `Rotating is well and good, but we won't get far without using our main engines. You can throttle the main engines with the W and S keys: W to increase thrust and S to decrease it. Pressing X will set the throttle to zero.
 
-    You can also press X to stop the spaceship completely.`
+    Your current throttle is displayed as a vertical progress bar on the bottom right of the screen alongside your current speed.
+
+    You can fly around the asteroid field to get familiar with the controls. Be careful with the asteroids!
+    
+    When you are ready, press ${pressInteractionToStrings(TutorialControlsInputs.map.nextPanel).join(" or ")} to continue.`;
 
     thrustPanel.appendChild(thrustPanelTitle);
     thrustPanel.appendChild(thrustPanelText);
@@ -53,7 +57,7 @@ export function getDivs() {
     warpPanelTitle.innerText = `Warp Drive`;
 
     const warpPanelText = document.createElement("p");
-    warpPanelText.innerText = `You will soon experience the absurd gigantism of space. Moving between planets and stars will often require faster than light (FTL) travel. 
+    warpPanelText.innerText = `Space is absurdly big as you will soon experience. Moving between planets and stars will often require faster than light (FTL) travel in order to reach your destination before the heat death of the universe. 
     
     Thankfully your spaceship comes equipped with a warp drive to do just that. Pressing the H key will toggle the warp drive on and off. Its throttle can be adjusted just like the main engines with the W and S keys.
     
