@@ -4,6 +4,8 @@ import { axisCompositeToString, pressInteractionToStrings } from "../utils/input
 import { AxisComposite } from "@brianchirls/game-input/browser";
 
 import welcomeImageSrc from "../../asset/tutorials/flightTutorial/welcome.webp";
+import rotationImageSrc from "../../asset/tutorials/flightTutorial/rotation.webp";
+import thrustImageSrc from "../../asset/tutorials/flightTutorial/thrust.webp";
 
 export function getDivs() {
     const welcomePanel = document.createElement("div");
@@ -28,22 +30,29 @@ export function getDivs() {
 
     const rotationPanelTitle = document.createElement("h2");
     rotationPanelTitle.innerText = `Spaceship Rotation`;
+    rotationPanel.appendChild(rotationPanelTitle);
 
     const rotationPanelText = document.createElement("p");
-    rotationPanelText.innerText = `The spaceship rotation is controlled by the mouse. Moving the mouse left or right will make the spaceship roll. Moving the mouse up or down will make the spaceship pitch. 
-    
-    The yellow arrow on the screen is there to help you understand the orientation of the spaceship. Its opacity also indicates the rate of rotation.
+    rotationPanelText.innerText = `The spaceship rotation is controlled by the mouse. Moving the mouse left or right will make the spaceship roll. Moving the mouse up or down will make the spaceship pitch.`
+    rotationPanel.appendChild(rotationPanelText);
+
+    const rotationImage = document.createElement("img");
+    rotationImage.src = rotationImageSrc;
+    rotationImage.alt = "Spaceship Rotation";
+    rotationPanel.appendChild(rotationImage);
+
+    const rotationPanelText2 = document.createElement("p");
+    rotationPanelText2.innerText = `The yellow arrow on the screen is there to help you understand the orientation of the spaceship. Its opacity also indicates the rate of rotation.
     
     Try to get a feel for the controls by rotating the spaceship. You will get better at it with practice.`;
-
-    rotationPanel.appendChild(rotationPanelTitle);
-    rotationPanel.appendChild(rotationPanelText);
+    rotationPanel.appendChild(rotationPanelText2);
 
     const thrustPanel = document.createElement("div");
     thrustPanel.classList.add("tutorialContent");
 
     const thrustPanelTitle = document.createElement("h2");
     thrustPanelTitle.innerText = `Spaceship Thrust`;
+    thrustPanel.appendChild(thrustPanelTitle);
 
     const thrustPanelText = document.createElement("p");
 
@@ -53,14 +62,20 @@ export function getDivs() {
     }
     const throttleStrings = axisCompositeToString(control);
     console.log(axisCompositeToString(control));
-    thrustPanelText.innerText = `Rotating is well and good, but we won't get far without using our main engines. You can throttle the main engines with the ${throttleStrings[1][1]} and ${throttleStrings[0][1]} keys: ${throttleStrings[1][1]} to increase thrust and ${throttleStrings[0][1]} to decrease it. Pressing ${pressInteractionToStrings(SpaceShipControlsInputs.map.throttleToZero).join(" or ")} will set the throttle to zero.
+    thrustPanelText.innerText = `We won't get far without using our main engines. You can throttle the main engines with the ${throttleStrings[1][1]} and ${throttleStrings[0][1]} keys: ${throttleStrings[1][1]} to increase thrust and ${throttleStrings[0][1]} to decrease it. Pressing ${pressInteractionToStrings(SpaceShipControlsInputs.map.throttleToZero).join(" or ")} will set the throttle to zero.
 
-    Your current throttle is displayed as a vertical progress bar on the bottom right of the screen alongside your current speed.
-
-    You can fly around the asteroid field to get familiar with the controls. Be careful with the asteroids!`;
-
-    thrustPanel.appendChild(thrustPanelTitle);
+    Your throttle is displayed as a vertical progress bar on the bottom right of the screen alongside your current speed.`
     thrustPanel.appendChild(thrustPanelText);
+
+    const thrustImage = document.createElement("img");
+    thrustImage.src = thrustImageSrc;
+    thrustImage.alt = "Spaceship Thrust";
+    thrustPanel.appendChild(thrustImage);
+
+
+    const thrustPanelText2 = document.createElement("p");
+    thrustPanelText2.innerText = `You can fly around the asteroid field to get familiar with the controls.`;
+    thrustPanel.appendChild(thrustPanelText2);
 
     const warpPanel = document.createElement("div");
     warpPanel.classList.add("tutorialContent");
