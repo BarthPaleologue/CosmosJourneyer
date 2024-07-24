@@ -39,6 +39,7 @@
     background: url('../asset/shipCursor.webp') no-repeat center;
     background-size: cover;
     pointer-events: none;
+    filter: drop-shadow(0 0 5px white) hue-rotate(-30deg);
   }
 
   #bodyData {
