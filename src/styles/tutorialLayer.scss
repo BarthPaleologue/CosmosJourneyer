@@ -23,6 +23,13 @@
 
     font-family: 'Nasalization', sans-serif;
 
+    transform: translate(0);
+    transition: transform 0.5s ease-in-out;
+
+    &.hidden {
+        transform: translate(-100%);
+    }
+
     h1 {
       text-align: center;
       color: white;

@@ -74,8 +74,6 @@ import { Sounds } from "../assets/sounds";
 import { Materials } from "../assets/materials";
 import { SpaceStation } from "../spacestation/spaceStation";
 import { ObjectTargetCursorType } from "../ui/objectTargetCursor";
-import { TutorialLayer } from "../ui/tutorial/tutorialLayer";
-import { getDivs } from "../tutorials/flightTutorial";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -92,8 +90,6 @@ export class StarSystemView implements View {
      * The HTML UI responsible for the name of the closest orbital object, the velocity of the spaceship and the target helper radar.
      */
     readonly spaceShipLayer: SpaceShipLayer;
-
-    readonly tutorialLayer: TutorialLayer;
 
     /**
      * A debug HTML UI to change the properties of the closest celestial body
@@ -181,9 +177,6 @@ export class StarSystemView implements View {
     constructor(engine: AbstractEngine, havokInstance: HavokPhysicsWithBindings) {
         this.spaceShipLayer = new SpaceShipLayer();
         this.bodyEditor = new BodyEditor(EditorVisibility.HIDDEN);
-
-        this.tutorialLayer = new TutorialLayer();
-        this.tutorialLayer.setTutorial("Flight tutorial", getDivs());
 
         const canvas = engine.getRenderingCanvas();
         if (canvas === null) throw new Error("Canvas is null");

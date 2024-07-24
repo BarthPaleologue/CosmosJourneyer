@@ -29,6 +29,7 @@ export class TutorialLayer implements IDisposable {
 
         this.panel = document.createElement("div");
         this.panel.classList.add("tutorialPanel");
+        this.panel.classList.add("hidden");
 
         this.title = document.createElement("h1");
         this.title.innerText = "Tutorial";
@@ -135,7 +136,7 @@ export class TutorialLayer implements IDisposable {
     }
 
     public setEnabled(enabled: boolean) {
-        this.layerRoot.style.display = enabled ? "block" : "none";
+        this.panel.classList.toggle("hidden", !enabled);
         TutorialControlsInputs.setEnabled(enabled);
     }
 

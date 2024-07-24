@@ -52,6 +52,8 @@ import { LoadingScreen } from "./uberCore/loadingScreen";
 import i18n from "./i18n";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Sounds } from "./assets/sounds";
+import { TutorialLayer } from "./ui/tutorial/tutorialLayer";
+import { getDivs } from "./tutorials/flightTutorial";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -72,6 +74,8 @@ export class CosmosJourneyer {
 
     readonly mainMenu: MainMenu;
     readonly pauseMenu: PauseMenu;
+
+    readonly tutorialLayer: TutorialLayer;
 
     private activeView: View;
 
@@ -104,9 +108,12 @@ export class CosmosJourneyer {
         this.activeView = this.starSystemView;
         AudioManager.SetMask(AudioMasks.STAR_SYSTEM_VIEW);
 
+        this.tutorialLayer = new TutorialLayer();
+
         this.mainMenu = new MainMenu(starSystemView);
         this.mainMenu.onStartObservable.add(() => {
-            createNotification(i18n.t("notifications:howToFly"), 20000);
+            this.tutorialLayer.setTutorial("Flight tutorial", getDivs());
+
             this.starMap.setCurrentStarSystem(this.starSystemView.getStarSystem().model.seed);
             this.starSystemView.switchToSpaceshipControls();
             this.starSystemView.getSpaceshipControls().spaceship.enableWarpDrive();
