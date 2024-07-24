@@ -1,15 +1,23 @@
 import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
 import { TutorialControlsInputs } from "../ui/tutorial/tutorialLayerInputs";
-import { pressInteractionToStrings } from "../utils/inputControlsString";
+import { axisCompositeToString, pressInteractionToStrings } from "../utils/inputControlsString";
+import { AxisComposite } from "@brianchirls/game-input/browser";
+
+import welcomeImageSrc from "../../asset/tutorials/flightTutorial/welcome.webp";
 
 export function getDivs() {
     const welcomePanel = document.createElement("div");
     welcomePanel.classList.add("tutorialContent");
 
+    const welcomeImage = document.createElement("img");
+    welcomeImage.src = welcomeImageSrc;
+    welcomeImage.alt = "Welcome to Cosmos Journeyer";
+    welcomePanel.appendChild(welcomeImage);
+
     const welcomePanelText = document.createElement("p");
     welcomePanelText.innerText = `Welcome to Cosmos Journeyer, Commander! If this is your first flight, this tutorial will cover the basics of space flight.
     
-    To start the tutorial, simply press ${pressInteractionToStrings(TutorialControlsInputs.map.nextPanel).join(" or ")}. You can go back to the previous panel by pressing ${pressInteractionToStrings(TutorialControlsInputs.map.prevPanel).join(" or ")}. 
+    To move forward in the tutorial, simply press ${pressInteractionToStrings(TutorialControlsInputs.map.nextPanel).join(" or ")}. You can go back to the previous panel by pressing ${pressInteractionToStrings(TutorialControlsInputs.map.prevPanel).join(" or ")}. 
     
     You can leave the tutorial at any time by pressing ${pressInteractionToStrings(TutorialControlsInputs.map.quitTutorial).join(" or ")}.`;
 
@@ -26,9 +34,7 @@ export function getDivs() {
     
     The yellow arrow on the screen is there to help you understand the orientation of the spaceship. Its opacity also indicates the rate of rotation.
     
-    Try to get a feel for the controls by rotating the spaceship. You will get better at it with practice.
-    
-    Once you feel comfortable enough, press ${pressInteractionToStrings(TutorialControlsInputs.map.nextPanel).join(" or ")} to continue.`;
+    Try to get a feel for the controls by rotating the spaceship. You will get better at it with practice.`;
 
     rotationPanel.appendChild(rotationPanelTitle);
     rotationPanel.appendChild(rotationPanelText);
@@ -40,13 +46,18 @@ export function getDivs() {
     thrustPanelTitle.innerText = `Spaceship Thrust`;
 
     const thrustPanelText = document.createElement("p");
-    thrustPanelText.innerText = `Rotating is well and good, but we won't get far without using our main engines. You can throttle the main engines with the W and S keys: W to increase thrust and S to decrease it. Pressing ${pressInteractionToStrings(SpaceShipControlsInputs.map.throttleToZero).join(" or ")} will set the throttle to zero.
+
+    const control = SpaceShipControlsInputs.map.throttle.bindings[0].control;
+    if(!(control instanceof AxisComposite)) {
+        throw new Error("Expected control to be an AxisComposite");
+    }
+    const throttleStrings = axisCompositeToString(control);
+    console.log(axisCompositeToString(control));
+    thrustPanelText.innerText = `Rotating is well and good, but we won't get far without using our main engines. You can throttle the main engines with the ${throttleStrings[1][1]} and ${throttleStrings[0][1]} keys: ${throttleStrings[1][1]} to increase thrust and ${throttleStrings[0][1]} to decrease it. Pressing ${pressInteractionToStrings(SpaceShipControlsInputs.map.throttleToZero).join(" or ")} will set the throttle to zero.
 
     Your current throttle is displayed as a vertical progress bar on the bottom right of the screen alongside your current speed.
 
-    You can fly around the asteroid field to get familiar with the controls. Be careful with the asteroids!
-    
-    When you are ready, press ${pressInteractionToStrings(TutorialControlsInputs.map.nextPanel).join(" or ")} to continue.`;
+    You can fly around the asteroid field to get familiar with the controls. Be careful with the asteroids!`;
 
     thrustPanel.appendChild(thrustPanelTitle);
     thrustPanel.appendChild(thrustPanelText);
@@ -58,20 +69,26 @@ export function getDivs() {
     warpPanelTitle.innerText = `Warp Drive`;
 
     const warpPanelText = document.createElement("p");
-    warpPanelText.innerText = `Space is absurdly big as you will soon experience. Moving between planets and stars will often require faster than light (FTL) travel in order to reach your destination before the heat death of the universe. 
+    warpPanelText.innerText = `Moving between planets and stars will often require faster than light (FTL) travel in order to reach your destination before the heat death of the universe. 
     
-    Thankfully your spaceship comes equipped with a warp drive to do just that. Pressing the ${pressInteractionToStrings(SpaceShipControlsInputs.map.toggleWarpDrive).join(" or ")} key will toggle the warp drive on and off. Its throttle can be adjusted just like the main engines with the W and S keys.
+    Your spaceship comes equipped with a warp drive to do just that. Pressing the ${pressInteractionToStrings(SpaceShipControlsInputs.map.toggleWarpDrive).join(" or ")} key will toggle the warp drive on and off. The warp throttle can be adjusted like for the main engines.
     
-    Fly up or down to leave the asteroid field and then engage your warp drive to fly away to the stars!
-    
-    You are now ready to explore the cosmos. Good luck, and have fun!
-
-    This tutorial and others are available at any time from the main menu.
-    
-    Press ${pressInteractionToStrings(TutorialControlsInputs.map.quitTutorial).join(" or ")} to leave the tutorial.`;
+    Fly up or down to leave the asteroid field and then engage your warp drive to fly away to the stars!`;
 
     warpPanel.appendChild(warpPanelTitle);
     warpPanel.appendChild(warpPanelText);
 
-    return [welcomePanel, rotationPanel, thrustPanel, warpPanel];
+    const congratsPanel = document.createElement("div");
+    congratsPanel.classList.add("tutorialContent");
+
+    const congratsPanelText = document.createElement("p");
+    congratsPanelText.innerText = `Congratulations, Commander! You have completed the flight tutorial. You are now ready to explore the cosmos. Good luck, and have fun!
+    
+    This tutorial and others are available at any time from the main menu.
+    
+    Press ${pressInteractionToStrings(TutorialControlsInputs.map.quitTutorial).join(" or ")} to leave the tutorial.`;
+
+    congratsPanel.appendChild(congratsPanelText);
+
+    return [welcomePanel, rotationPanel, thrustPanel, warpPanel, congratsPanel];
 }

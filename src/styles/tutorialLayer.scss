@@ -31,9 +31,22 @@
             flex-grow: 1;
 
             .tutorialContent {
-                color: white;
-                padding: 10px;
-                line-height: 1.5em;
+                p {
+                    color: white;
+                    padding: 0 10px;
+                    line-height: 1.5em;
+                }
+
+                h2 {
+                    color: white;
+                    padding: 0 10px;
+                }
+
+                img {
+                    width: 100%;
+                    height: auto;
+                    flex-grow: 0;
+                }
             }
         }
 
