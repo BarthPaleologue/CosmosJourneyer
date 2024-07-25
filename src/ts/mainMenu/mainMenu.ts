@@ -39,6 +39,7 @@ export class MainMenu {
     private activeRightPanel: HTMLElement | null = null;
     private readonly loadSavePanel: HTMLElement;
     private readonly settingsPanel: HTMLElement;
+    private readonly tutorialsPanel: HTMLElement;
     private readonly contributePanel: HTMLElement;
     private readonly creditsPanel: HTMLElement;
     private readonly aboutPanel: HTMLElement;
@@ -127,6 +128,10 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
 
         this.settingsPanel = initSettingsPanel();
 
+        const tutorialsPanel = document.getElementById("tutorials");
+        if (tutorialsPanel === null) throw new Error("#tutorials does not exist!");
+        this.tutorialsPanel = tutorialsPanel;
+
         const contributePanel = document.getElementById("contribute");
         if (contributePanel === null) throw new Error("#contribute does not exist!");
         this.contributePanel = contributePanel;
@@ -159,6 +164,13 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
 
         settingsButton.addEventListener("click", () => {
             this.toggleActivePanel(this.settingsPanel);
+        });
+
+        const tutorialsButton = document.getElementById("tutorialsButton");
+        if (tutorialsButton === null) throw new Error("#tutorialsButton does not exist!");
+
+        tutorialsButton.addEventListener("click", () => {
+            this.toggleActivePanel(this.tutorialsPanel);
         });
 
         const contributeButton = document.getElementById("contributeButton");

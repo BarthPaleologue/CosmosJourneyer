@@ -27,10 +27,12 @@ export class PauseMenu {
     private readonly screenshotButton: HTMLElement;
     private readonly shareButton: HTMLElement;
     private readonly contributeButton: HTMLElement;
+    private readonly tutorialsButton: HTMLElement;
     private readonly settingsButton: HTMLElement;
     private readonly saveButton: HTMLElement;
     private readonly resumeButton: HTMLElement;
 
+    private readonly tutorialsPanel: HTMLElement;
     private readonly settingsPanel: HTMLElement;
     private readonly contibutePanel: HTMLElement;
     private activePanel: HTMLElement | null = null;
@@ -61,6 +63,14 @@ export class PauseMenu {
         });
         this.contributeButton.innerText = i18n.t("pauseMenu:contribute");
 
+        this.tutorialsButton = document.getElementById("pauseTutorialsButton") as HTMLElement;
+        this.tutorialsButton.addEventListener("click", () => {
+            Sounds.MENU_SELECT_SOUND.play();
+
+            this.setActivePanel(this.activePanel === this.tutorialsPanel ? null : this.tutorialsPanel);
+        });
+        this.tutorialsButton.innerText = i18n.t("pauseMenu:tutorials");
+
         this.settingsButton = document.getElementById("pauseSettingsButton") as HTMLElement;
         this.settingsButton.addEventListener("click", () => {
             Sounds.MENU_SELECT_SOUND.play();
@@ -88,6 +98,10 @@ export class PauseMenu {
                 Sounds.MENU_SELECT_SOUND.play();
             });
         });
+
+        const tutorialsPanel = document.getElementById("tutorials");
+        if (tutorialsPanel === null) throw new Error("#tutorials not found");
+        this.tutorialsPanel = tutorialsPanel;
 
         const settingsPanel = document.getElementById("settingsPanel");
         if (settingsPanel === null) throw new Error("#settingsPanel not found");
