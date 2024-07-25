@@ -15,12 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export interface TutorialHeader {
-    title: string;
-    coverImageSrc: string;
-    description: string;
-}
+import { TutorialHeader } from "./tutorial";
+import { FlightTutorial } from "./flightTutorial";
 
-export interface Tutorial<ContextType> extends TutorialHeader {
-    getContentPanelsHtml(context: ContextType): string[];
-}
+export const AvailableTutorials: TutorialHeader[] = [FlightTutorial];
