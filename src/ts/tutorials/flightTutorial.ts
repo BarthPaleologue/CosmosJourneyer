@@ -2,17 +2,17 @@ import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
 import { TutorialControlsInputs } from "../ui/tutorial/tutorialLayerInputs";
 import { axisCompositeToString, pressInteractionToStrings } from "../utils/inputControlsString";
 import { AxisComposite } from "@brianchirls/game-input/browser";
+import { Tutorial } from "./tutorial";
 
 import welcomeImageSrc from "../../asset/tutorials/flightTutorial/welcome.webp";
 import rotationImageSrc from "../../asset/tutorials/flightTutorial/rotation.webp";
 import thrustImageSrc from "../../asset/tutorials/flightTutorial/thrust.webp";
 import warpImageSrc from "../../asset/tutorials/flightTutorial/warp.webp";
 import congratsImageSrc from "../../asset/tutorials/flightTutorial/congrats.webp";
-import { Tutorial } from "./tutorial";
 
-export class FlightTutorial implements Tutorial {
-    title = "Flight Tutorial";
-    public getContentPanelsHtml(): string[] {
+export const FlightTutorial: Tutorial = {
+    title: "Flight Tutorial",
+    getContentPanelsHtml(): string[] {
         const welcomePanelHtml = `
         <div class="tutorialContent">
             <img src="${welcomeImageSrc}" alt="Welcome to Cosmos Journeyer">

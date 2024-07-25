@@ -112,7 +112,7 @@ export class CosmosJourneyer {
 
         this.mainMenu = new MainMenu(starSystemView);
         this.mainMenu.onStartObservable.add(() => {
-            this.tutorialLayer.setTutorial(new FlightTutorial());
+            this.tutorialLayer.setTutorial(FlightTutorial.title, FlightTutorial.getContentPanelsHtml());
 
             this.starMap.setCurrentStarSystem(this.starSystemView.getStarSystem().model.seed);
             this.starSystemView.switchToSpaceshipControls();
