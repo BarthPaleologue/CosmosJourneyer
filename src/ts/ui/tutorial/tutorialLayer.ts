@@ -1,6 +1,7 @@
 import { IDisposable } from "@babylonjs/core";
 import { pressInteractionToStrings } from "../../utils/inputControlsString";
 import { TutorialControlsInputs } from "./tutorialLayerInputs";
+import { Tutorial } from "../../tutorials/tutorial";
 
 export class TutorialLayer implements IDisposable {
     private readonly layerRoot: HTMLDivElement;
@@ -127,9 +128,9 @@ export class TutorialLayer implements IDisposable {
         });
     }
 
-    public setTutorial(name: string, panels: string[]) {
-        this.title.innerText = name;
-        this.tutorialPanelsHtml = panels;
+    public setTutorial(tutorial: Tutorial) {
+        this.title.innerText = tutorial.title;
+        this.tutorialPanelsHtml = tutorial.getContentPanelsHtml();
         this.currentPanelIndex = 0;
         this.updatePanelState();
         this.setEnabled(true);

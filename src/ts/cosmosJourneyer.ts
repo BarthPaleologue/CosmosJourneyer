@@ -53,7 +53,7 @@ import i18n from "./i18n";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Sounds } from "./assets/sounds";
 import { TutorialLayer } from "./ui/tutorial/tutorialLayer";
-import { getDivs } from "./tutorials/flightTutorial";
+import { FlightTutorial } from "./tutorials/flightTutorial";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -112,7 +112,7 @@ export class CosmosJourneyer {
 
         this.mainMenu = new MainMenu(starSystemView);
         this.mainMenu.onStartObservable.add(() => {
-            this.tutorialLayer.setTutorial("Flight tutorial", getDivs());
+            this.tutorialLayer.setTutorial(new FlightTutorial());
 
             this.starMap.setCurrentStarSystem(this.starSystemView.getStarSystem().model.seed);
             this.starSystemView.switchToSpaceshipControls();
