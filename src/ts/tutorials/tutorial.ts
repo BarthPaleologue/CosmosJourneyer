@@ -1,4 +1,6 @@
-export interface Tutorial {
+export interface Tutorial<ContextType> {
     title: string;
-    getContentPanelsHtml(): string[];
+    coverImageSrc: string;
+    description: string;
+    getContentPanelsHtml(context: ContextType): string[];
 }

@@ -10,8 +10,10 @@ import thrustImageSrc from "../../asset/tutorials/flightTutorial/thrust.webp";
 import warpImageSrc from "../../asset/tutorials/flightTutorial/warp.webp";
 import congratsImageSrc from "../../asset/tutorials/flightTutorial/congrats.webp";
 
-export const FlightTutorial: Tutorial = {
+export const FlightTutorial: Tutorial<{}> = {
     title: "Flight Tutorial",
+    coverImageSrc: welcomeImageSrc,
+    description: "Learn the basics of space flight in less than 5 minutes.",
     getContentPanelsHtml(): string[] {
         const welcomePanelHtml = `
         <div class="tutorialContent">
