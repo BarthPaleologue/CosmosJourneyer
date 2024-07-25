@@ -18,6 +18,7 @@ import { initSettingsPanel } from "./settingsPanel";
 import i18n from "../i18n";
 import { BodyType } from "../architecture/bodyType";
 import { Sounds } from "../assets/sounds";
+import { initTutorialsPanel } from "./tutorialsPanel";
 
 export class MainMenu {
     readonly scene: UberScene;
@@ -131,6 +132,7 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
         const tutorialsPanel = document.getElementById("tutorials");
         if (tutorialsPanel === null) throw new Error("#tutorials does not exist!");
         this.tutorialsPanel = tutorialsPanel;
+        this.tutorialsPanel.appendChild(initTutorialsPanel());
 
         const contributePanel = document.getElementById("contribute");
         if (contributePanel === null) throw new Error("#contribute does not exist!");
