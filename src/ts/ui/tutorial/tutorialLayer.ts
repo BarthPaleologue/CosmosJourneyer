@@ -19,7 +19,7 @@ export class TutorialLayer implements IDisposable {
 
     private readonly nextButton: HTMLElement;
 
-    private tutorialPanels: HTMLDivElement[] = [];
+    private tutorialPanelsHtml: string[] = [];
 
     private currentPanelIndex = 0;
 
@@ -114,7 +114,7 @@ export class TutorialLayer implements IDisposable {
         });
 
         TutorialControlsInputs.map.nextPanel.on("complete", () => {
-            this.currentPanelIndex = Math.min(this.tutorialPanels.length - 1, this.currentPanelIndex + 1);
+            this.currentPanelIndex = Math.min(this.tutorialPanelsHtml.length - 1, this.currentPanelIndex + 1);
             this.updatePanelState();
             this.nextButton.animate([
                 { transform: "scale(1)" },
@@ -127,9 +127,9 @@ export class TutorialLayer implements IDisposable {
         });
     }
 
-    public setTutorial(name: string, panels: HTMLDivElement[]) {
+    public setTutorial(name: string, panels: string[]) {
         this.title.innerText = name;
-        this.tutorialPanels = panels;
+        this.tutorialPanelsHtml = panels;
         this.currentPanelIndex = 0;
         this.updatePanelState();
         this.setEnabled(true);
@@ -145,8 +145,7 @@ export class TutorialLayer implements IDisposable {
     }
 
     private updatePanelState() {
-        this.contentContainer.innerHTML = "";
-        this.contentContainer.appendChild(this.tutorialPanels[this.currentPanelIndex]);
+        this.contentContainer.innerHTML = this.tutorialPanelsHtml[this.currentPanelIndex];
     }
 
     dispose(): void {
