@@ -20,18 +20,19 @@ import { TutorialControlsInputs } from "../ui/tutorial/tutorialLayerInputs";
 import { axisCompositeToString, pressInteractionToStrings } from "../utils/inputControlsString";
 import { AxisComposite } from "@brianchirls/game-input/browser";
 import { Tutorial } from "./tutorial";
+import { EmptyObject } from "../utils/emptyObjects";
+import i18n from "../i18n";
 
 import welcomeImageSrc from "../../asset/tutorials/flightTutorial/welcome.webp";
 import rotationImageSrc from "../../asset/tutorials/flightTutorial/rotation.webp";
 import thrustImageSrc from "../../asset/tutorials/flightTutorial/thrust.webp";
 import warpImageSrc from "../../asset/tutorials/flightTutorial/warp.webp";
 import congratsImageSrc from "../../asset/tutorials/flightTutorial/congrats.webp";
-import { EmptyObject } from "../utils/emptyObjects";
 
 export const FlightTutorial: Tutorial<EmptyObject> = {
-    title: "Flight Tutorial",
+    title: i18n.t("flightTutorial:title"),
     coverImageSrc: welcomeImageSrc,
-    description: "Learn the basics of space flight in less than 5 minutes.",
+    description: i18n.t("flightTutorial:description"),
     getContentPanelsHtml(): string[] {
         const welcomePanelHtml = `
         <div class="tutorialContent">

@@ -9,8 +9,9 @@ function loadResources() {
     const resources: Resource = {}; // { "en-US": { "notifications": { ... } }, "es-ES": { "notifications": { ... } } }
 
     requireContext.keys().forEach((key: string) => {
-        const languageFolder = key.split("/")[1]; // (./en-US/notifications.json) => en-US
-        const nameSpace = key.split("/")[2].split(".")[0]; // (./en-US/notifications.json) => notifications
+        const parts = key.split("/");
+        const languageFolder = parts[1]; // (./en-US/notifications.json) => en-US
+        const nameSpace = parts[parts.length - 1].split(".")[0]; // (./en-US/notifications.json) => notifications
         const fileContent = requireContext(key);
 
         resources[languageFolder] = resources[languageFolder] || {};
