@@ -9,8 +9,9 @@ import rotationImageSrc from "../../asset/tutorials/flightTutorial/rotation.webp
 import thrustImageSrc from "../../asset/tutorials/flightTutorial/thrust.webp";
 import warpImageSrc from "../../asset/tutorials/flightTutorial/warp.webp";
 import congratsImageSrc from "../../asset/tutorials/flightTutorial/congrats.webp";
+import { EmptyObject } from "../utils/emptyObjects";
 
-export const FlightTutorial: Tutorial<{}> = {
+export const FlightTutorial: Tutorial<EmptyObject> = {
     title: "Flight Tutorial",
     coverImageSrc: welcomeImageSrc,
     description: "Learn the basics of space flight in less than 5 minutes.",
@@ -66,4 +67,4 @@ export const FlightTutorial: Tutorial<{}> = {
 
         return [welcomePanelHtml, rotationPanelHtml, thrustPanelHtml, warpPanelHtml, congratsPanelHtml];
     }
-}
+};
