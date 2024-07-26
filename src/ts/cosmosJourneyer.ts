@@ -118,7 +118,6 @@ export class CosmosJourneyer {
         this.mainMenu.onStartObservable.add(() => {
             this.tutorialLayer.setTutorial(FlightTutorial.title, FlightTutorial.getContentPanelsHtml());
 
-            this.starMap.setCurrentStarSystem(this.starSystemView.getStarSystem().model.seed);
             this.starSystemView.switchToSpaceshipControls();
             this.starSystemView.getSpaceshipControls().spaceship.enableWarpDrive();
             this.starSystemView.showHtmlUI();
@@ -138,6 +137,10 @@ export class CosmosJourneyer {
             this.mainMenu.hide();
             this.resume();
             this.tutorialLayer.setTutorial(tutorial.title, tutorial.getContentPanelsHtml());
+        });
+
+        this.starSystemView.onInitStarSystem.add(() => {
+            this.starMap.setCurrentStarSystem(this.starSystemView.getStarSystem().model.seed);
         });
 
         this.pauseMenu = new PauseMenu(this.sidePanels);
@@ -406,8 +409,6 @@ export class CosmosJourneyer {
         this.engine.loadingScreen.displayLoadingUI();
 
         const seed = SystemSeed.Deserialize(universeCoordinates.starSystem);
-
-        this.starMap.setCurrentStarSystem(seed);
 
         this.starSystemView.onInitStarSystem.addOnce(() => {
             this.starSystemView.switchToSpaceshipControls();

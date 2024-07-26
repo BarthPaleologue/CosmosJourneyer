@@ -310,6 +310,8 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
             }
         );
 
+        Sounds.MAIN_MENU_BACKGROUND_MUSIC.setVolume(0, duration);
+
         const animationCallback = () => {
             const deltaTime = this.scene.getEngine().getDeltaTime() / 1000;
 
@@ -324,9 +326,6 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
 
                 return;
             }
-
-            const currentProgress = translationAnimation.getProgress();
-            Sounds.MAIN_MENU_BACKGROUND_MUSIC.setVolume(1 - currentProgress);
 
             this.controls.getActiveCameras().forEach((camera) => camera.getViewMatrix());
 
@@ -356,6 +355,7 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
         this.hideMenu();
         this.sidePanels.hideActivePanel();
         this.htmlRoot.style.display = "none";
+        Sounds.MAIN_MENU_BACKGROUND_MUSIC.setVolume(0, 2);
     }
 
     public isVisible() {
