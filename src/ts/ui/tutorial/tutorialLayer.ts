@@ -2,6 +2,7 @@ import { IDisposable } from "@babylonjs/core";
 import { pressInteractionToStrings } from "../../utils/inputControlsString";
 import { TutorialControlsInputs } from "./tutorialLayerInputs";
 import i18n from "../../i18n";
+import { Sounds } from "../../assets/sounds";
 
 export class TutorialLayer implements IDisposable {
     private readonly layerRoot: HTMLDivElement;
@@ -99,6 +100,7 @@ export class TutorialLayer implements IDisposable {
                 duration: 200,
                 easing: "ease"
             });
+            Sounds.MENU_SELECT_SOUND.play();
         });
 
         TutorialControlsInputs.map.prevPanel.on("complete", () => {
@@ -112,6 +114,7 @@ export class TutorialLayer implements IDisposable {
                 duration: 200,
                 easing: "ease"
             });
+            Sounds.MENU_SELECT_SOUND.play();
         });
 
         TutorialControlsInputs.map.nextPanel.on("complete", () => {
@@ -125,6 +128,7 @@ export class TutorialLayer implements IDisposable {
                 duration: 200,
                 easing: "ease"
             });
+            Sounds.MENU_SELECT_SOUND.play();
         });
     }
 
