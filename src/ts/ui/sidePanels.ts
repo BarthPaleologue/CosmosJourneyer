@@ -1,4 +1,4 @@
-import { initSettingsPanel } from "../mainMenu/settingsPanel";
+import { initSettingsPanel } from "./settingsPanel";
 import { TutorialsPanelContent } from "./tutorial/tutorialsPanel";
 import { StarSystemView } from "../starSystem/starSystemView";
 
