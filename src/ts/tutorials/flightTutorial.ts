@@ -85,9 +85,11 @@ export const FlightTutorial: Tutorial<EmptyObject> = {
         const congratsPanelHtml = `
         <div class="tutorialContent">
             <img src="${congratsImageSrc}" alt="Congratulations!">
-            <p>Congratulations, Commander! You have completed the flight tutorial. You are now ready to explore the cosmos. Good luck, and have fun!</p>
-            <p>This tutorial and others are available at any time from the main menu and the pause menu.</p>
-            <p>Press ${pressInteractionToStrings(TutorialControlsInputs.map.quitTutorial).join(" or ")} to leave the tutorial.</p>
+            <p>${i18n.t("tutorials:flightTutorial:congratulationsText1")}</p>
+            
+            ${i18n.t("tutorials:common:tutorialEnding", {
+                keyQuit: pressInteractionToStrings(TutorialControlsInputs.map.quitTutorial).join(` ${i18n.t("common:or")} `)
+            })}
         </div>`;
 
         return [welcomePanelHtml, rotationPanelHtml, thrustPanelHtml, warpPanelHtml, congratsPanelHtml];

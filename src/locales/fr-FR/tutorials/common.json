@@ -3,5 +3,6 @@
   "navigationInfo": "<p>Pour avancer dans le tutoriel, appuyez sur {{nextKeys}}. Vous pouvez revenir aux étapes précédentes avec {{previousKeys}}.</p><p>Vous pouvez sortir du tutoriel à tout moment avec {{quitKeys}}.</p>",
   "quit": "Quitter",
   "next": "Suivant",
-  "previous": "Précédent"
+  "previous": "Précédent",
+  "tutorialEnding": "<p>Ce tutoriel et d'autres sont disponibles à tout moment depuis le menu principal et le menu de pause.</p><p>Appuyez sur {{keyQuit}} pour quitter le tutoriel.</p>"
 }

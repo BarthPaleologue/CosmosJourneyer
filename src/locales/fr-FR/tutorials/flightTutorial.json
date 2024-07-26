@@ -13,5 +13,6 @@
   "spaceShipWarpDriveTitle": "Moteur à distorsion",
   "spaceShipWarpDriveText1": "Se déplacer entre les planètes et les étoiles nécessitera souvent de voyager plus rapidement que la lumière (PRL) afin d'arriver avant la mort de l'univers.",
   "spaceShipWarpDriveText2": "Votre vaisseau est équipé d'un moteur à distorsion pour cela. Appuyer sur {{keyToggle}} activera ou désactivera le moteur à distorsion. L'intensité de la distorsion peut être ajustée comme pour la poussée des moteurs principaux.",
-  "spaceShipWarpDriveText3": "Sortez du champ d'astéroïdes par le haut ou le bas, puis activez votre moteur à distorsion pour vous envoler vers les étoiles !"
+  "spaceShipWarpDriveText3": "Sortez du champ d'astéroïdes par le haut ou le bas, puis activez votre moteur à distorsion pour vous envoler vers les étoiles !",
+  "congratulationsText1": "Félicitations, Commandant ! Vous avez terminé le tutoriel de vol. Vous êtes maintenant prêt à explorer le cosmos. Bonne chance et amusez-vous bien !"
 }
