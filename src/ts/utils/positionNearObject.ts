@@ -106,7 +106,7 @@ export function positionNearObjectWithStarVisible(transformable: Controls, objec
     });
 }
 
-export function positionNearObjectAsteroidField(body: Transformable & CanHaveRings & BoundingSphere, transformable: Controls, starSystem: StarSystemController): void {
+export function positionNearObjectAsteroidField(body: Transformable & CanHaveRings & BoundingSphere, starSystem: StarSystemController): Vector3 {
     const asteroidField = body.getAsteroidField();
     if (asteroidField === null) {
         throw new Error("The body does not have an asteroid field");
@@ -121,8 +121,9 @@ export function positionNearObjectAsteroidField(body: Transformable & CanHaveRin
     const upDirection = getUpwardDirection(body.getTransform());
     const lateralDirection = Vector3.Cross(dirToStar, upDirection).normalize();
 
-    const targetPosition = bodyPosition.add(lateralDirection.scale(asteroidFieldAverageRadius)).add(upDirection.scale(asteroidField.patchThickness));
+    return bodyPosition.add(lateralDirection.scale(asteroidFieldAverageRadius)).add(upDirection.scale(asteroidField.patchThickness));
 
+    /*
     transformable.getTransform().setAbsolutePosition(targetPosition);
     transformable.getTransform().lookAt(bodyPosition);
 
@@ -135,4 +136,5 @@ export function positionNearObjectAsteroidField(body: Transformable & CanHaveRin
         camera.getViewMatrix(true);
         camera.getProjectionMatrix(true);
     });
+    */
 }

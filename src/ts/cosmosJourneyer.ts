@@ -119,14 +119,8 @@ export class CosmosJourneyer {
             this.tutorialLayer.setTutorial(FlightTutorial.title, FlightTutorial.getContentPanelsHtml());
 
             this.starSystemView.switchToSpaceshipControls();
-            this.starSystemView.getSpaceshipControls().spaceship.enableWarpDrive();
             this.starSystemView.showHtmlUI();
             this.starSystemView.targetCursorLayer.setEnabled(true);
-            const target = this.starSystemView.targetCursorLayer.getClosestToScreenCenterOrbitalObject();
-            if (target !== null) {
-                this.starSystemView.targetCursorLayer.setTarget(target);
-                this.starSystemView.spaceShipLayer.setTarget(target.getTransform());
-            }
         });
 
         this.mainMenu.onLoadSaveObservable.add(async (saveData: SaveFileData) => {

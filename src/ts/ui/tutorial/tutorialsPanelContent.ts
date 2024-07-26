@@ -6,6 +6,7 @@ import { SystemSeed } from "../../utils/systemSeed";
 import { positionNearObjectAsteroidField } from "../../utils/positionNearObject";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { Tutorial } from "../../tutorials/tutorial";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export class TutorialsPanelContent {
     readonly htmlRoot: HTMLElement;
@@ -56,7 +57,12 @@ export class TutorialsPanelContent {
                     }
 
                     starSystemView.switchToSpaceshipControls();
-                    positionNearObjectAsteroidField(correspondingCelestialBody, starSystemView.getSpaceshipControls(), starSystemView.getStarSystem());
+                    const position = positionNearObjectAsteroidField(correspondingCelestialBody, starSystemView.getStarSystem());
+                    const ship = starSystemView.getSpaceshipControls();
+                    ship.getTransform().setAbsolutePosition(position);
+                    ship.getTransform().lookAt(correspondingCelestialBody.getTransform().getAbsolutePosition());
+                    starSystemView.getStarSystem().translateEverythingNow(ship.getTransform().getAbsolutePosition().negate());
+                    ship.getTransform().setAbsolutePosition(Vector3.Zero());
                 }
             });
         });

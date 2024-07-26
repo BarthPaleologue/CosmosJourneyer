@@ -2,7 +2,7 @@ import { UberScene } from "../uberCore/uberScene";
 import { DefaultControls } from "../defaultControls/defaultControls";
 import { StarSystemView } from "../starSystem/starSystemView";
 import { StarSystemController } from "../starSystem/starSystemController";
-import { positionNearObjectWithStarVisible } from "../utils/positionNearObject";
+import { positionNearObjectAsteroidField, positionNearObjectWithStarVisible } from "../utils/positionNearObject";
 import { EditorVisibility } from "./bodyEditor/bodyEditor";
 import mainMenuHTML from "../../html/mainMenu.html";
 import { getForwardDirection } from "../uberCore/transforms/basicTransform";
@@ -18,6 +18,7 @@ import i18n from "../i18n";
 import { BodyType } from "../architecture/bodyType";
 import { Sounds } from "../assets/sounds";
 import { PanelType, SidePanels } from "./sidePanels";
+import { UniverseObjectIdentifier } from "../saveFile/universeCoordinates";
 
 export class MainMenu {
     readonly scene: UberScene;
@@ -38,6 +39,10 @@ export class MainMenu {
 
     private readonly sidePanels: SidePanels;
 
+    private readonly orbitalObjectIndex: number;
+
+    private readonly startAnimationDurationSeconds = 5;
+
     constructor(sidePanels: SidePanels, starSystemView: StarSystemView) {
         this.sidePanels = sidePanels;
         this.starSystemView = starSystemView;
@@ -45,38 +50,21 @@ export class MainMenu {
         this.scene = this.starSystemView.scene;
         this.controls = this.starSystemView.getDefaultControls();
 
-        const allowedSeeds = [
-            new SystemSeed(-600, 955, -68, 0),
-            new SystemSeed(576, -192, 480, 0),
-            new SystemSeed(-760, -856, 60, 0),
-            new SystemSeed(-238, 254, -675, 0),
-            new SystemSeed(-312, 314, 736, 0),
-            new SystemSeed(-866, 71, -294, 0),
-            new SystemSeed(-249, 706, 631, 0),
-            new SystemSeed(-433, 945, -693, 0),
-            new SystemSeed(-430, -767, -670, 0),
-            new SystemSeed(61, 376, -389, 0),
-            new SystemSeed(-499, -114, 377, 0),
-            new SystemSeed(-596, 339, -571, 0),
-            new SystemSeed(-319, 253, 30, 0),
-            new SystemSeed(709, 570, 285, 0),
-            new SystemSeed(-516, -140, -2, 0),
-            new SystemSeed(728, 691, -883, 0),
-            new SystemSeed(-673, -545, 753, 0),
-            new SystemSeed(-218, 213, 765, 0),
-            new SystemSeed(-47, 97, -20, 0),
-            new SystemSeed(817, 750, -983, 0)
+        const allowedIdentifiers: UniverseObjectIdentifier[] = [
+            {
+                starSystem: {
+                    starSectorX: 1,
+                    starSectorY: 1,
+                    starSectorZ: 0,
+                    index: 7
+                },
+                orbitalObjectIndex: 1
+            }
         ];
 
-        /*const randomSeed = new SystemSeed(
-Math.trunc((Math.random() * 2 - 1) * 1000),
-Math.trunc((Math.random() * 2 - 1) * 1000),
-Math.trunc((Math.random() * 2 - 1) * 1000),
-0
-);*/
-
-        const seed = allowedSeeds[Math.floor(Math.random() * allowedSeeds.length)];
-        console.log(seed.starSectorX + ", " + seed.starSectorY + ", " + seed.starSectorZ + ", " + seed.index);
+        const randomIndex = Math.floor(Math.random() * allowedIdentifiers.length);
+        this.orbitalObjectIndex = allowedIdentifiers[randomIndex].orbitalObjectIndex;
+        const seed = SystemSeed.Deserialize(allowedIdentifiers[randomIndex].starSystem);
         this.starSystemController = new StarSystemController(seed, this.scene);
 
         document.body.insertAdjacentHTML("beforeend", mainMenuHTML);
@@ -274,20 +262,22 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
 
         const currentForward = getForwardDirection(this.controls.getTransform());
 
-        const planet = this.starSystemController.planets[0];
-        const newForward = planet.getTransform().getAbsolutePosition().subtract(this.controls.getTransform().getAbsolutePosition()).normalize();
+        const orbitalObject = this.starSystemController.getOrbitalObjects()[this.orbitalObjectIndex];
+        const celestialBody = this.starSystemController.getBodies().find((body) => body.name === orbitalObject.name);
+        if(celestialBody === undefined) {
+            throw new Error("No corresponding celestial body found");
+        }
+        const newForward = celestialBody.getTransform().getAbsolutePosition().subtract(this.controls.getTransform().getAbsolutePosition()).normalize();
         const axis = Vector3.Cross(currentForward, newForward);
         const angle = Vector3.GetAngleBetweenVectors(currentForward, newForward, axis);
-        const duration = 2;
 
-        const rotationAnimation = new TransformRotationAnimation(this.controls.getTransform(), axis, angle, duration);
+        const targetPosition = positionNearObjectAsteroidField(celestialBody, this.starSystemController);
+
+        const rotationAnimation = new TransformRotationAnimation(this.controls.getTransform(), axis, angle, this.startAnimationDurationSeconds);
         const translationAnimation = new TransformTranslationAnimation(
             this.controls.getTransform(),
-            this.controls
-                .getTransform()
-                .getAbsolutePosition()
-                .add(newForward.scale(-planet.model.radius * 2)),
-            duration
+            targetPosition,
+            this.startAnimationDurationSeconds
         );
 
         if (this.title === null) throw new Error("Title is null");
@@ -304,13 +294,13 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
                 }
             ],
             {
-                duration: duration * 1000,
+                duration: this.startAnimationDurationSeconds * 1000,
                 easing: "ease-in-out",
                 fill: "forwards"
             }
         );
 
-        Sounds.MAIN_MENU_BACKGROUND_MUSIC.setVolume(0, duration);
+        Sounds.MAIN_MENU_BACKGROUND_MUSIC.setVolume(0, this.startAnimationDurationSeconds);
 
         const animationCallback = () => {
             const deltaTime = this.scene.getEngine().getDeltaTime() / 1000;
