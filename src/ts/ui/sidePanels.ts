@@ -1,5 +1,5 @@
 import { initSettingsPanel } from "./settingsPanel";
-import { TutorialsPanelContent } from "./tutorial/tutorialsPanel";
+import { TutorialsPanelContent } from "./tutorial/tutorialsPanelContent";
 import { StarSystemView } from "../starSystem/starSystemView";
 
 export const enum PanelType {
