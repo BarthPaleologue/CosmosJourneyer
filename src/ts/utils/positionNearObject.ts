@@ -22,6 +22,7 @@ import { Transformable } from "../architecture/transformable";
 import { BoundingSphere } from "../architecture/boundingSphere";
 import { Controls } from "../uberCore/controls";
 import { getUpwardDirection, roll, rotateAround } from "../uberCore/transforms/basicTransform";
+import { CanHaveRings } from "../architecture/canHaveRings";
 
 export function positionNearObjectBrightSide(transformable: Transformable, object: Transformable & BoundingSphere, starSystem: StarSystemController, nRadius = 3): void {
     // go from the nearest star to be on the sunny side of the object
@@ -98,6 +99,37 @@ export function positionNearObjectWithStarVisible(transformable: Controls, objec
     transformable.getTransform().computeWorldMatrix(true);
 
     roll(transformable.getTransform(), -Math.PI / 8);
+
+    transformable.getActiveCameras().forEach((camera) => {
+        camera.getViewMatrix(true);
+        camera.getProjectionMatrix(true);
+    });
+}
+
+export function positionNearObjectAsteroidField(body: Transformable & CanHaveRings & BoundingSphere, transformable: Controls, starSystem: StarSystemController): void {
+    const asteroidField = body.getAsteroidField();
+    if (asteroidField === null) {
+        throw new Error("The body does not have an asteroid field");
+    }
+
+    const bodyPosition = body.getTransform().getAbsolutePosition();
+
+    const asteroidFieldAverageRadius = asteroidField.averageRadius;
+
+    const nearestStar = nearestBody(bodyPosition, starSystem.stellarObjects);
+    const dirToStar = bodyPosition.subtract(nearestStar.getTransform().getAbsolutePosition()).normalize();
+    const upDirection = getUpwardDirection(body.getTransform());
+    const lateralDirection = Vector3.Cross(dirToStar, upDirection).normalize();
+
+    const targetPosition = bodyPosition.add(lateralDirection.scale(asteroidFieldAverageRadius)).add(upDirection.scale(asteroidField.patchThickness));
+
+    transformable.getTransform().setAbsolutePosition(targetPosition);
+    transformable.getTransform().lookAt(bodyPosition);
+
+    starSystem.translateEverythingNow(transformable.getTransform().getAbsolutePosition().negate());
+    transformable.getTransform().setAbsolutePosition(Vector3.Zero());
+
+    transformable.getTransform().computeWorldMatrix(true);
 
     transformable.getActiveCameras().forEach((camera) => {
         camera.getViewMatrix(true);
