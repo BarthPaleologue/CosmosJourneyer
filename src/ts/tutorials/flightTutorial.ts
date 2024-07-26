@@ -37,7 +37,7 @@ export const FlightTutorial: Tutorial<EmptyObject> = {
         const welcomePanelHtml = `
         <div class="tutorialContent">
             <img src="${welcomeImageSrc}" alt="Welcome to Cosmos Journeyer">
-            <p>Welcome to Cosmos Journeyer, Commander! If this is your first time, this tutorial will cover the basics of space flight.</p>
+            <p>${i18n.t("tutorials:flightTutorial:welcome")}</p>
             ${i18n.t("tutorials:common:navigationInfo", {
             nextKeys: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel).join(` ${i18n.t("common:or")} `),
             previousKeys: pressInteractionToStrings(TutorialControlsInputs.map.prevPanel).join(` ${i18n.t("common:or")} `),
@@ -47,11 +47,11 @@ export const FlightTutorial: Tutorial<EmptyObject> = {
 
         const rotationPanelHtml = `
         <div class="tutorialContent">
-            <h2>Spaceship Rotation</h2>
-            <p>The spaceship rotation is controlled by the mouse. Moving the mouse left or right will make the spaceship roll. Moving the mouse up or down will make the spaceship pitch.</p>
+            <h2>${i18n.t("tutorials:flightTutorial:spaceShipRotationTitle")}</h2>
+            <p>${i18n.t("tutorials:flightTutorial:spaceShipRotationText1")}</p>
             <img src="${rotationImageSrc}" alt="Spaceship Rotation">
-            <p>The yellow arrow on the screen is there to help you understand the orientation of the spaceship. Its opacity also indicates the rate of rotation.</p>
-            <p>Try to get a feel for the controls by rotating the spaceship. You will get better at it with practice.</p>
+            <p>${i18n.t("tutorials:flightTutorial:spaceShipRotationText2")}</p>
+            <p>${i18n.t("tutorials:flightTutorial:spaceShipRotationText3")}</p>
         </div>`;
 
         const control = SpaceShipControlsInputs.map.throttle.bindings[0].control;

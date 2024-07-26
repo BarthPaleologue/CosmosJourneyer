@@ -1,4 +1,9 @@
 {
   "title": "Les bases du vol",
-  "description": "Apprenez les bases du vol spatial en moins de 5 minutes."
+  "description": "Apprenez les bases du vol spatial en moins de 5 minutes.",
+  "welcome": "Bienvenue dans Cosmos Journeyer, Commandant ! Si c'est votre première fois, ce tutoriel couvre les bases du vol spatial.",
+  "spaceShipRotationTitle": "Rotation du vaisseau",
+  "spaceShipRotationText1": "La rotation du vaisseau est contrôlée par la souris. Déplacer la souris à gauche ou à droite contrôle le roulis du vaisseau. Déplacer la souris en haut ou en bas fera cabrer ou piquer le vaisseau.",
+  "spaceShipRotationText2": "La flèche jaune à l'écran est là pour vous aider à comprendre l'orientation du vaisseau. Son opacité indique également la vitesse de rotation.",
+  "spaceShipRotationText3": "Essayez de vous familiariser avec les commandes en faisant tourner le vaisseau. Vous vous améliorerez avec la pratique."
 }

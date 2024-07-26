@@ -1,4 +1,7 @@
 {
   "moreWillComeSoon": "Plus de tutoriels dans le futur !",
-  "navigationInfo": "<p>Pour avancer dans le tutoriel, appuyez sur {{nextKeys}}. Vous pouvez revenir aux étapes précédentes avec {{previousKeys}}.</p><p>Vous pouvez sortir du tutoriel à tout moment avec {{quitKeys}}.</p>"
+  "navigationInfo": "<p>Pour avancer dans le tutoriel, appuyez sur {{nextKeys}}. Vous pouvez revenir aux étapes précédentes avec {{previousKeys}}.</p><p>Vous pouvez sortir du tutoriel à tout moment avec {{quitKeys}}.</p>",
+  "quit": "Quitter",
+  "next": "Suivant",
+  "previous": "Précédent"
 }

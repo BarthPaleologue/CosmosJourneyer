@@ -1,6 +1,7 @@
 import { IDisposable } from "@babylonjs/core";
 import { pressInteractionToStrings } from "../../utils/inputControlsString";
 import { TutorialControlsInputs } from "./tutorialLayerInputs";
+import i18n from "../../i18n";
 
 export class TutorialLayer implements IDisposable {
     private readonly layerRoot: HTMLDivElement;
@@ -44,7 +45,7 @@ export class TutorialLayer implements IDisposable {
 
         this.quitButton = document.createElement("p");
         const stopButtonTextSpan = document.createElement("span");
-        stopButtonTextSpan.innerText = "Quit";
+        stopButtonTextSpan.innerText = i18n.t("tutorials:common:quit");
         this.quitButton.appendChild(stopButtonTextSpan);
 
         pressInteractionToStrings(TutorialControlsInputs.map.quitTutorial).forEach((key) => {
@@ -56,7 +57,7 @@ export class TutorialLayer implements IDisposable {
 
         this.prevButton = document.createElement("p");
         const prevButtonTextSpan = document.createElement("span");
-        prevButtonTextSpan.innerText = "Previous";
+        prevButtonTextSpan.innerText = i18n.t("tutorials:common:previous");
         this.prevButton.appendChild(prevButtonTextSpan);
 
         pressInteractionToStrings(TutorialControlsInputs.map.prevPanel).forEach((key) => {
@@ -68,7 +69,7 @@ export class TutorialLayer implements IDisposable {
 
         this.nextButton = document.createElement("p");
         const nextButtonTextSpan = document.createElement("span");
-        nextButtonTextSpan.innerText = "Next";
+        nextButtonTextSpan.innerText = i18n.t("tutorials:common:next");
         this.nextButton.appendChild(nextButtonTextSpan);
 
         pressInteractionToStrings(TutorialControlsInputs.map.nextPanel).forEach((key) => {

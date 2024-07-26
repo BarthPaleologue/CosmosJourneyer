@@ -1,4 +1,9 @@
 {
   "title": "Flight Tutorial",
-  "description": "Learn the basics of space flight in less than 5 minutes."
+  "description": "Learn the basics of space flight in less than 5 minutes.",
+  "welcome": "Welcome to Cosmos Journeyer, Commander! If this is your first time, this tutorial will cover the basics of space flight.",
+  "spaceShipRotationTitle": "Spaceship Rotation",
+  "spaceShipRotationText1": "The spaceship rotation is controlled by the mouse. Moving the mouse left or right will make the spaceship roll. Moving the mouse up or down will make the spaceship pitch.",
+  "spaceShipRotationText2": "The yellow arrow on the screen is there to help you understand the orientation of the spaceship. Its opacity also indicates the rate of rotation.",
+  "spaceShipRotationText3": "Try to get a feel for the controls by rotating the spaceship. You will get better at it with practice."
 }
