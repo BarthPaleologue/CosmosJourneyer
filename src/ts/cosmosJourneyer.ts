@@ -254,7 +254,7 @@ export class CosmosJourneyer {
      */
     public async init(skipMainMenu = false): Promise<void> {
         if (!skipMainMenu) await this.mainMenu.init();
-        await this.starSystemView.initStarSystem();
+        this.starSystemView.initStarSystem();
 
         this.engine.runRenderLoop(() => {
             updateInputDevices();
@@ -352,7 +352,7 @@ export class CosmosJourneyer {
             version: projectInfo.version,
             universeCoordinates: {
                 starSystem: seed.serialize(),
-                nearestOrbitalObjectIndex: nearestOrbitalObjectIndex,
+                orbitalObjectIndex: nearestOrbitalObjectIndex,
                 positionX: currentLocalPosition.x,
                 positionY: currentLocalPosition.y,
                 positionZ: currentLocalPosition.z,
@@ -406,7 +406,7 @@ export class CosmosJourneyer {
 
             const playerTransform = this.starSystemView.scene.getActiveControls().getTransform();
 
-            const nearestOrbitalObject = this.starSystemView.getStarSystem().getOrbitalObjects()[universeCoordinates.nearestOrbitalObjectIndex];
+            const nearestOrbitalObject = this.starSystemView.getStarSystem().getOrbitalObjects()[universeCoordinates.orbitalObjectIndex];
             const nearestOrbitalObjectWorld = nearestOrbitalObject.getTransform().getWorldMatrix();
             const currentLocalPosition = new Vector3(universeCoordinates.positionX, universeCoordinates.positionY, universeCoordinates.positionZ);
             const currentWorldPosition = Vector3.TransformCoordinates(currentLocalPosition, nearestOrbitalObjectWorld);
@@ -439,7 +439,7 @@ export class CosmosJourneyer {
         await this.starSystemView.loadStarSystem(new StarSystemController(seed, this.starSystemView.scene), true);
 
         if (this.state === EngineState.UNINITIALIZED) await this.init(true);
-        else await this.starSystemView.initStarSystem();
+        else this.starSystemView.initStarSystem();
 
         this.engine.loadingScreen.hideLoadingUI();
     }
