@@ -39,10 +39,10 @@ export const FlightTutorial: Tutorial<EmptyObject> = {
             <img src="${welcomeImageSrc}" alt="Welcome to Cosmos Journeyer">
             <p>${i18n.t("tutorials:flightTutorial:welcome")}</p>
             ${i18n.t("tutorials:common:navigationInfo", {
-            nextKeys: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel).join(` ${i18n.t("common:or")} `),
-            previousKeys: pressInteractionToStrings(TutorialControlsInputs.map.prevPanel).join(` ${i18n.t("common:or")} `),
-            quitKeys: pressInteractionToStrings(TutorialControlsInputs.map.quitTutorial).join(` ${i18n.t("common:or")} `)
-        })}
+                nextKeys: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel).join(` ${i18n.t("common:or")} `),
+                previousKeys: pressInteractionToStrings(TutorialControlsInputs.map.prevPanel).join(` ${i18n.t("common:or")} `),
+                quitKeys: pressInteractionToStrings(TutorialControlsInputs.map.quitTutorial).join(` ${i18n.t("common:or")} `)
+            })}
         </div>`;
 
         const rotationPanelHtml = `
@@ -64,10 +64,10 @@ export const FlightTutorial: Tutorial<EmptyObject> = {
         <div class="tutorialContent">
             <h2>${i18n.t("tutorials:flightTutorial:spaceShipThrustTitle")}</h2>
             <p>${i18n.t("tutorials:flightTutorial:spaceShipThrustText1", {
-            keyIncrease: throttleStrings[1][1],
-            keyDecrease: throttleStrings[0][1],
-            keyKill: pressInteractionToStrings(SpaceShipControlsInputs.map.throttleToZero).join(` ${i18n.t("common:or")} `)
-        })}</p>
+                keyIncrease: throttleStrings[1][1],
+                keyDecrease: throttleStrings[0][1],
+                keyKill: pressInteractionToStrings(SpaceShipControlsInputs.map.throttleToZero).join(` ${i18n.t("common:or")} `)
+            })}</p>
             <img src="${thrustImageSrc}" alt="Spaceship Thrust">
             <p>${i18n.t("tutorials:flightTutorial:spaceShipThrustText2")}</p>
             <p>${i18n.t("tutorials:flightTutorial:spaceShipThrustText3")}</p>
@@ -75,10 +75,10 @@ export const FlightTutorial: Tutorial<EmptyObject> = {
 
         const warpPanelHtml = `
         <div class="tutorialContent">
-            <h2>Warp Drive</h2>
-            <p>Moving between planets and stars will often require faster than light (FTL) travel in order to reach your destination before the heat death of the universe.</p>
-            <p>Your spaceship comes equipped with a warp drive to do just that. Pressing F will toggle the warp drive on and off. The warp throttle can be adjusted like for the main engines.</p>
-            <p>Fly up or down to leave the asteroid field and then engage your warp drive to fly away to the stars!</p>
+            <h2>${i18n.t("tutorials:flightTutorial:spaceShipWarpDriveTitle")}</h2>
+            <p>${i18n.t("tutorials:flightTutorial:spaceShipWarpDriveText1")}</p>
+            <p>${i18n.t("tutorials:flightTutorial:spaceShipWarpDriveText2", { keyToggle: pressInteractionToStrings(SpaceShipControlsInputs.map.toggleWarpDrive).join(` ${i18n.t("common:or")} `) })}</p>
+            <p>${i18n.t("tutorials:flightTutorial:spaceShipWarpDriveText3")}</p>
             <img src="${warpImageSrc}" alt="Warp Drive">
         </div>`;
 

@@ -9,5 +9,9 @@
   "spaceShipThrustTitle": "Propulsion du vaisseau",
   "spaceShipThrustText1": "Sur un clavier QWERTY, vous pouvez ajuster la propulsion avec {{keyIncrease}} and {{keyDecrease}}. Presser {{keyKill}} mettra la propulsion à zéro.",
   "spaceShipThrustText2": "Votre propulsion est affichée sous forme de barre de progression verticale en bas à droite de l'écran, à côté de votre vitesse.",
-  "spaceShipThrustText3": "Essayez de voler dans le champ d'astéroïdes pour vous familiariser avec les commandes."
+  "spaceShipThrustText3": "Essayez de voler dans le champ d'astéroïdes pour vous familiariser avec les commandes.",
+  "spaceShipWarpDriveTitle": "Moteur à distorsion",
+  "spaceShipWarpDriveText1": "Se déplacer entre les planètes et les étoiles nécessitera souvent de voyager plus rapidement que la lumière (PRL) afin d'arriver avant la mort de l'univers.",
+  "spaceShipWarpDriveText2": "Votre vaisseau est équipé d'un moteur à distorsion pour cela. Appuyer sur {{keyToggle}} activera ou désactivera le moteur à distorsion. L'intensité de la distorsion peut être ajustée comme pour la poussée des moteurs principaux.",
+  "spaceShipWarpDriveText3": "Sortez du champ d'astéroïdes par le haut ou le bas, puis activez votre moteur à distorsion pour vous envoler vers les étoiles !"
 }
