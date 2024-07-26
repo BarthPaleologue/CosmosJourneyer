@@ -137,6 +137,7 @@ export class CosmosJourneyer {
             this.mainMenu.hide();
             this.resume();
             this.tutorialLayer.setTutorial(tutorial.title, tutorial.getContentPanelsHtml());
+            this.starSystemView.targetCursorLayer.setEnabled(true);
         });
 
         this.starSystemView.onInitStarSystem.add(() => {
