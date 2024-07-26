@@ -3,7 +3,7 @@ import { DefaultControls } from "../defaultControls/defaultControls";
 import { StarSystemView } from "../starSystem/starSystemView";
 import { StarSystemController } from "../starSystem/starSystemController";
 import { positionNearObjectWithStarVisible } from "../utils/positionNearObject";
-import { EditorVisibility } from "../ui/bodyEditor/bodyEditor";
+import { EditorVisibility } from "./bodyEditor/bodyEditor";
 import mainMenuHTML from "../../html/mainMenu.html";
 import { getForwardDirection } from "../uberCore/transforms/basicTransform";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -17,7 +17,7 @@ import { Settings } from "../settings";
 import i18n from "../i18n";
 import { BodyType } from "../architecture/bodyType";
 import { Sounds } from "../assets/sounds";
-import { PanelType, SidePanels } from "../ui/sidePanels";
+import { PanelType, SidePanels } from "./sidePanels";
 
 export class MainMenu {
     readonly scene: UberScene;
