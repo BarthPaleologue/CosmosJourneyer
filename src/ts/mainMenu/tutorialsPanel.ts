@@ -1,34 +1,68 @@
 import { AvailableTutorials } from "../tutorials/availableTutorials";
 import i18n from "../i18n";
+import { StarSystemView } from "../starSystem/starSystemView";
+import { StarSystemController } from "../starSystem/starSystemController";
+import { SystemSeed } from "../utils/systemSeed";
+import { positionNearObjectAsteroidField } from "../utils/positionNearObject";
+import { Observable } from "@babylonjs/core/Misc/observable";
 
-export function initTutorialsPanel(): HTMLElement {
-    const container = document.createElement("div");
-    container.classList.add("tutorialsMenuContainer");
+export class TutorialsPanelContent {
+    readonly htmlRoot: HTMLElement;
 
-    AvailableTutorials.forEach((tutorial) => {
-        const tutorialDiv = document.createElement("div");
-        tutorialDiv.classList.add("tutorial");
+    readonly onTutorialSelected: Observable<void> = new Observable<void>();
 
-        const title = document.createElement("h2");
-        title.textContent = tutorial.title;
-        tutorialDiv.appendChild(title);
+    constructor(starSystemView: StarSystemView) {
+        this.htmlRoot = document.createElement("div");
+        this.htmlRoot.classList.add("tutorialsMenuContainer");
 
-        const coverImage = document.createElement("img");
-        coverImage.src = tutorial.coverImageSrc;
-        coverImage.alt = tutorial.title;
-        tutorialDiv.appendChild(coverImage);
+        AvailableTutorials.forEach((tutorial) => {
+            const tutorialDiv = document.createElement("div");
+            tutorialDiv.classList.add("tutorial");
 
-        const description = document.createElement("p");
-        description.textContent = tutorial.description;
-        tutorialDiv.appendChild(description);
+            const title = document.createElement("h2");
+            title.textContent = tutorial.title;
+            tutorialDiv.appendChild(title);
 
-        container.appendChild(tutorialDiv);
-    });
+            const coverImage = document.createElement("img");
+            coverImage.src = tutorial.coverImageSrc;
+            coverImage.alt = tutorial.title;
+            tutorialDiv.appendChild(coverImage);
 
-    const moreWillCome = document.createElement("p");
-    moreWillCome.classList.add("moreWillCome");
-    moreWillCome.textContent = i18n.t("tutorials:common:moreWillComeSoon");
-    container.appendChild(moreWillCome);
+            const description = document.createElement("p");
+            description.textContent = tutorial.description;
+            tutorialDiv.appendChild(description);
 
-    return container;
+            this.htmlRoot.appendChild(tutorialDiv);
+
+            tutorialDiv.addEventListener("click", async () => {
+                this.onTutorialSelected.notifyObservers();
+
+                if (tutorial.universeObjectIdentifier !== undefined) {
+                    const engine = starSystemView.scene.getEngine();
+                    engine.displayLoadingUI();
+                    const systemSeed = SystemSeed.Deserialize(tutorial.universeObjectIdentifier.starSystem);
+                    await starSystemView.loadStarSystem(new StarSystemController(systemSeed, starSystemView.scene), true);
+                    starSystemView.initStarSystem();
+                    engine.hideLoadingUI();
+
+                    const orbitalObject = starSystemView.getStarSystem().getOrbitalObjects()[tutorial.universeObjectIdentifier.orbitalObjectIndex];
+                    const correspondingCelestialBody = starSystemView
+                        .getStarSystem()
+                        .getBodies()
+                        .find((body) => body.name === orbitalObject.name);
+                    if (correspondingCelestialBody === undefined) {
+                        throw new Error("No corresponding celestial body found");
+                    }
+
+                    starSystemView.switchToSpaceshipControls();
+                    positionNearObjectAsteroidField(correspondingCelestialBody, starSystemView.getSpaceshipControls(), starSystemView.getStarSystem());
+                }
+            });
+        });
+
+        const moreWillCome = document.createElement("p");
+        moreWillCome.classList.add("moreWillCome");
+        moreWillCome.textContent = i18n.t("tutorials:common:moreWillComeSoon");
+        this.htmlRoot.appendChild(moreWillCome);
+    }
 }

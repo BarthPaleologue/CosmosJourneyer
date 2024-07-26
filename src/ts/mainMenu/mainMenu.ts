@@ -14,11 +14,10 @@ import { SystemSeed } from "../utils/systemSeed";
 import { parseSaveFileData, SaveFileData } from "../saveFile/saveFileData";
 import packageInfo from "../../../package.json";
 import { Settings } from "../settings";
-import { initSettingsPanel } from "./settingsPanel";
 import i18n from "../i18n";
 import { BodyType } from "../architecture/bodyType";
 import { Sounds } from "../assets/sounds";
-import { initTutorialsPanel } from "./tutorialsPanel";
+import { PanelType, SidePanels } from "../ui/sidePanels";
 
 export class MainMenu {
     readonly scene: UberScene;
@@ -37,15 +36,10 @@ export class MainMenu {
     private readonly title: HTMLElement;
     private readonly version: HTMLElement;
 
-    private activeRightPanel: HTMLElement | null = null;
-    private readonly loadSavePanel: HTMLElement;
-    private readonly settingsPanel: HTMLElement;
-    private readonly tutorialsPanel: HTMLElement;
-    private readonly contributePanel: HTMLElement;
-    private readonly creditsPanel: HTMLElement;
-    private readonly aboutPanel: HTMLElement;
+    private readonly sidePanels: SidePanels;
 
-    constructor(starSystemView: StarSystemView) {
+    constructor(sidePanels: SidePanels, starSystemView: StarSystemView) {
+        this.sidePanels = sidePanels;
         this.starSystemView = starSystemView;
 
         this.scene = this.starSystemView.scene;
@@ -123,29 +117,6 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
             element.textContent = i18n.t(key);
         });
 
-        const loadSavePanel = document.getElementById("loadSavePanel");
-        if (loadSavePanel === null) throw new Error("#loadSavePanel does not exist!");
-        this.loadSavePanel = loadSavePanel;
-
-        this.settingsPanel = initSettingsPanel();
-
-        const tutorialsPanel = document.getElementById("tutorials");
-        if (tutorialsPanel === null) throw new Error("#tutorials does not exist!");
-        this.tutorialsPanel = tutorialsPanel;
-        this.tutorialsPanel.appendChild(initTutorialsPanel());
-
-        const contributePanel = document.getElementById("contribute");
-        if (contributePanel === null) throw new Error("#contribute does not exist!");
-        this.contributePanel = contributePanel;
-
-        const creditsPanel = document.getElementById("credits");
-        if (creditsPanel === null) throw new Error("#credits does not exist!");
-        this.creditsPanel = creditsPanel;
-
-        const aboutPanel = document.getElementById("about");
-        if (aboutPanel === null) throw new Error("#about does not exist!");
-        this.aboutPanel = aboutPanel;
-
         const startButton = document.getElementById("startButton");
         if (startButton === null) throw new Error("#startButton does not exist!");
         startButton.addEventListener("click", () => {
@@ -158,28 +129,28 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
         this.initLoadSavePanel();
 
         loadSaveButton.addEventListener("click", () => {
-            this.toggleActivePanel(this.loadSavePanel);
+            this.sidePanels.toggleActivePanel(PanelType.LOAD_SAVE);
         });
 
         const settingsButton = document.getElementById("settingsButton");
         if (settingsButton === null) throw new Error("#settingsButton does not exist!");
 
         settingsButton.addEventListener("click", () => {
-            this.toggleActivePanel(this.settingsPanel);
+            this.sidePanels.toggleActivePanel(PanelType.SETTINGS);
         });
 
         const tutorialsButton = document.getElementById("tutorialsButton");
         if (tutorialsButton === null) throw new Error("#tutorialsButton does not exist!");
 
         tutorialsButton.addEventListener("click", () => {
-            this.toggleActivePanel(this.tutorialsPanel);
+            this.sidePanels.toggleActivePanel(PanelType.TUTORIALS);
         });
 
         const contributeButton = document.getElementById("contributeButton");
         if (contributeButton === null) throw new Error("#contributeButton does not exist!");
 
         contributeButton.addEventListener("click", () => {
-            this.toggleActivePanel(this.contributePanel);
+            this.sidePanels.toggleActivePanel(PanelType.CONTRIBUTE);
             this.onContributeObservable.notifyObservers();
         });
 
@@ -187,7 +158,7 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
         if (creditsButton === null) throw new Error("#creditsButton does not exist!");
 
         creditsButton.addEventListener("click", () => {
-            this.toggleActivePanel(this.creditsPanel);
+            this.sidePanels.toggleActivePanel(PanelType.CREDITS);
             this.onCreditsObservable.notifyObservers();
         });
 
@@ -195,7 +166,7 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
         if (aboutButton === null) throw new Error("#aboutButton does not exist!");
 
         aboutButton.addEventListener("click", () => {
-            this.toggleActivePanel(this.aboutPanel);
+            this.sidePanels.toggleActivePanel(PanelType.ABOUT);
             this.onAboutObservable.notifyObservers();
         });
     }
@@ -298,7 +269,7 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
     }
 
     private startAnimation(onAnimationFinished: () => void) {
-        this.hideActivePanel();
+        this.sidePanels.hideActivePanel();
         Settings.TIME_MULTIPLIER = 1;
 
         const currentForward = getForwardDirection(this.controls.getTransform());
@@ -369,27 +340,6 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
         this.hideVersion();
     }
 
-    private toggleActivePanel(newPanel: HTMLElement) {
-        if (this.activeRightPanel === newPanel) {
-            this.hideActivePanel();
-            return;
-        }
-
-        if (this.activeRightPanel !== null) {
-            this.hideActivePanel();
-        }
-
-        this.activeRightPanel = newPanel;
-        newPanel.classList.add("visible");
-    }
-
-    private hideActivePanel() {
-        if (this.activeRightPanel !== null) {
-            this.activeRightPanel.classList.remove("visible");
-            this.activeRightPanel = null;
-        }
-    }
-
     private hideVersion() {
         if (this.version === null) throw new Error("Version is null");
         this.version.style.transform = "translateY(100%)";
@@ -399,6 +349,13 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
         const menuItems = document.getElementById("menuItems");
         if (menuItems === null) throw new Error("#menuItems does not exist!");
         menuItems.style.left = "-20%";
+    }
+
+    public hide() {
+        this.hideVersion();
+        this.hideMenu();
+        this.sidePanels.hideActivePanel();
+        this.htmlRoot.style.display = "none";
     }
 
     public isVisible() {

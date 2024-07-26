@@ -54,6 +54,7 @@ import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Sounds } from "./assets/sounds";
 import { TutorialLayer } from "./ui/tutorial/tutorialLayer";
 import { FlightTutorial } from "./tutorials/flightTutorial";
+import { SidePanels } from "./ui/sidePanels";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -74,6 +75,7 @@ export class CosmosJourneyer {
 
     readonly mainMenu: MainMenu;
     readonly pauseMenu: PauseMenu;
+    readonly sidePanels: SidePanels;
 
     readonly tutorialLayer: TutorialLayer;
 
@@ -110,7 +112,9 @@ export class CosmosJourneyer {
 
         this.tutorialLayer = new TutorialLayer();
 
-        this.mainMenu = new MainMenu(starSystemView);
+        this.sidePanels = new SidePanels(this.starSystemView);
+
+        this.mainMenu = new MainMenu(this.sidePanels, starSystemView);
         this.mainMenu.onStartObservable.add(() => {
             this.tutorialLayer.setTutorial(FlightTutorial.title, FlightTutorial.getContentPanelsHtml({}));
 
@@ -130,7 +134,12 @@ export class CosmosJourneyer {
             await this.loadSaveData(saveData);
         });
 
-        this.pauseMenu = new PauseMenu();
+        this.sidePanels.tutorialsPanelContent.onTutorialSelected.add(() => {
+            this.mainMenu.hide();
+            this.resume();
+        });
+
+        this.pauseMenu = new PauseMenu(this.sidePanels);
         this.pauseMenu.onResume.add(() => this.resume());
         this.pauseMenu.onScreenshot.add(() => this.takeScreenshot());
         this.pauseMenu.onShare.add(() => {
@@ -240,6 +249,7 @@ export class CosmosJourneyer {
     }
 
     public resume(): void {
+        if (!this.isPaused()) return;
         this.state = EngineState.RUNNING;
         Sounds.MENU_SELECT_SOUND.play();
         this.pauseMenu.setVisibility(false);
