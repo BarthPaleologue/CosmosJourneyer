@@ -133,6 +133,8 @@ export class CosmosJourneyer {
             this.resume();
             this.tutorialLayer.setTutorial(tutorial.title, tutorial.getContentPanelsHtml());
             this.starSystemView.targetCursorLayer.setEnabled(true);
+            this.starSystemView.getSpaceshipControls().spaceship.disableWarpDrive();
+            this.starSystemView.getSpaceshipControls().spaceship.setMainEngineThrottle(0);
             Settings.TIME_MULTIPLIER = 1;
         });
 
