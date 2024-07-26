@@ -20,7 +20,6 @@ import { TutorialControlsInputs } from "../ui/tutorial/tutorialLayerInputs";
 import { axisCompositeToString, pressInteractionToStrings } from "../utils/inputControlsString";
 import { AxisComposite } from "@brianchirls/game-input/browser";
 import { Tutorial } from "./tutorial";
-import { EmptyObject } from "../utils/emptyObjects";
 import i18n from "../i18n";
 
 import welcomeImageSrc from "../../asset/tutorials/flightTutorial/welcome.webp";
@@ -29,7 +28,7 @@ import thrustImageSrc from "../../asset/tutorials/flightTutorial/thrust.webp";
 import warpImageSrc from "../../asset/tutorials/flightTutorial/warp.webp";
 import congratsImageSrc from "../../asset/tutorials/flightTutorial/congrats.webp";
 
-export const FlightTutorial: Tutorial<EmptyObject> = {
+export const FlightTutorial: Tutorial = {
     title: i18n.t("tutorials:flightTutorial:title"),
     coverImageSrc: welcomeImageSrc,
     description: i18n.t("tutorials:flightTutorial:description"),

@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { TutorialHeader } from "./tutorial";
+import { Tutorial } from "./tutorial";
 import { FlightTutorial } from "./flightTutorial";
 
-export const AvailableTutorials: TutorialHeader[] = [FlightTutorial];
+export const AvailableTutorials: Tutorial[] = [FlightTutorial];

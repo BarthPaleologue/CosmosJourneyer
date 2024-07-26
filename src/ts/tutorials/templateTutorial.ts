@@ -5,15 +5,15 @@ import { Tutorial } from "./tutorial";
 import welcomeImageSrc from "../../asset/tutorials/flightTutorial/welcome.webp";
 import i18n from "../i18n";
 
-export const TemplateTutorial: Tutorial<{ cmdrName: string }> = {
+export const TemplateTutorial: Tutorial = {
     title: "Template Tutorial",
     coverImageSrc: welcomeImageSrc,
     description: "This is a template tutorial to help building more tutorials!",
-    getContentPanelsHtml({ cmdrName }): string[] {
+    getContentPanelsHtml(): string[] {
         const welcomePanelHtml = `
         <div class="tutorialContent">
             <img src="${welcomeImageSrc}" alt="Welcome to Cosmos Journeyer">
-            <p>Welcome, Commander ${cmdrName}! This is a tutorial about tutorials! Now this is meta.</p>
+            <p>Welcome, Commander! This is a tutorial about tutorials! Now this is meta.</p>
             
             ${i18n.t("tutorials:common:navigationInfo", {
                 // This displays a small internationalized text to explain the keys to navigate the tutorial

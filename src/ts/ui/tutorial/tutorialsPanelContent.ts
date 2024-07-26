@@ -5,11 +5,12 @@ import { StarSystemController } from "../../starSystem/starSystemController";
 import { SystemSeed } from "../../utils/systemSeed";
 import { positionNearObjectAsteroidField } from "../../utils/positionNearObject";
 import { Observable } from "@babylonjs/core/Misc/observable";
+import { Tutorial } from "../../tutorials/tutorial";
 
 export class TutorialsPanelContent {
     readonly htmlRoot: HTMLElement;
 
-    readonly onTutorialSelected: Observable<void> = new Observable<void>();
+    readonly onTutorialSelected: Observable<Tutorial> = new Observable<Tutorial>();
 
     constructor(starSystemView: StarSystemView) {
         this.htmlRoot = document.createElement("div");
@@ -35,7 +36,7 @@ export class TutorialsPanelContent {
             this.htmlRoot.appendChild(tutorialDiv);
 
             tutorialDiv.addEventListener("click", async () => {
-                this.onTutorialSelected.notifyObservers();
+                this.onTutorialSelected.notifyObservers(tutorial);
 
                 if (tutorial.universeObjectIdentifier !== undefined) {
                     const engine = starSystemView.scene.getEngine();

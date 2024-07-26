@@ -17,14 +17,12 @@
 
 import { UniverseObjectIdentifier } from "../saveFile/universeCoordinates";
 
-export interface TutorialHeader {
+export interface Tutorial {
     title: string;
     coverImageSrc: string;
     description: string;
 
     universeObjectIdentifier?: UniverseObjectIdentifier;
-}
 
-export interface Tutorial<ContextType> extends TutorialHeader {
-    getContentPanelsHtml(context: ContextType): string[];
+    getContentPanelsHtml(): string[];
 }
