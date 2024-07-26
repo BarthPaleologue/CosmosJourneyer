@@ -37,10 +37,10 @@ export const FlightTutorial: Tutorial = {
         starSystem: {
             starSectorX: 0,
             starSectorY: 0,
-            starSectorZ: 0,
-            index: 0
+            starSectorZ: 1,
+            index: 1
         },
-        orbitalObjectIndex: 3
+        orbitalObjectIndex: 2
     },
 
     getContentPanelsHtml(): string[] {
