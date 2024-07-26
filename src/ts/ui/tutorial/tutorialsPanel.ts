@@ -1,9 +1,9 @@
-import { AvailableTutorials } from "../tutorials/availableTutorials";
-import i18n from "../i18n";
-import { StarSystemView } from "../starSystem/starSystemView";
-import { StarSystemController } from "../starSystem/starSystemController";
-import { SystemSeed } from "../utils/systemSeed";
-import { positionNearObjectAsteroidField } from "../utils/positionNearObject";
+import { AvailableTutorials } from "../../tutorials/availableTutorials";
+import i18n from "../../i18n";
+import { StarSystemView } from "../../starSystem/starSystemView";
+import { StarSystemController } from "../../starSystem/starSystemController";
+import { SystemSeed } from "../../utils/systemSeed";
+import { positionNearObjectAsteroidField } from "../../utils/positionNearObject";
 import { Observable } from "@babylonjs/core/Misc/observable";
 
 export class TutorialsPanelContent {
