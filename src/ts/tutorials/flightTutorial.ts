@@ -30,9 +30,9 @@ import warpImageSrc from "../../asset/tutorials/flightTutorial/warp.webp";
 import congratsImageSrc from "../../asset/tutorials/flightTutorial/congrats.webp";
 
 export const FlightTutorial: Tutorial<EmptyObject> = {
-    title: i18n.t("flightTutorial:title"),
+    title: i18n.t("tutorials:flightTutorial:title"),
     coverImageSrc: welcomeImageSrc,
-    description: i18n.t("flightTutorial:description"),
+    description: i18n.t("tutorials:flightTutorial:description"),
     getContentPanelsHtml(): string[] {
         const welcomePanelHtml = `
         <div class="tutorialContent">

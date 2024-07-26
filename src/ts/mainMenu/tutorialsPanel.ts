@@ -1,4 +1,5 @@
 import { AvailableTutorials } from "../tutorials/availableTutorials";
+import i18n from "../i18n";
 
 export function initTutorialsPanel(): HTMLElement {
     const container = document.createElement("div");
@@ -26,7 +27,7 @@ export function initTutorialsPanel(): HTMLElement {
 
     const moreWillCome = document.createElement("p");
     moreWillCome.classList.add("moreWillCome");
-    moreWillCome.textContent = "More tutorials will come in the future!";
+    moreWillCome.textContent = i18n.t("tutorials:common:moreWillComeSoon");
     container.appendChild(moreWillCome);
 
     return container;

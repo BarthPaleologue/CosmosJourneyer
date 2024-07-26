@@ -1,4 +1,4 @@
-import i18next, { Resource, init, t } from "i18next";
+import i18next, { Resource, init, t, ResourceKey, ResourceLanguage } from "i18next";
 
 /**
  * Load all the resources from the locales folder and return them in the i18next format.
@@ -11,11 +11,20 @@ function loadResources() {
     requireContext.keys().forEach((key: string) => {
         const parts = key.split("/");
         const languageFolder = parts[1]; // (./en-US/notifications.json) => en-US
+        const subFolders: string[] = parts.slice(2, parts.length - 1); // (./en-US/subFolder/subSubFolder/notifications.json) => ["subFolder", "subSubFolder"]
         const nameSpace = parts[parts.length - 1].split(".")[0]; // (./en-US/notifications.json) => notifications
         const fileContent = requireContext(key);
 
         resources[languageFolder] = resources[languageFolder] || {};
-        resources[languageFolder][nameSpace] = fileContent;
+        let currentResource: ResourceLanguage | ResourceKey = resources[languageFolder];
+        subFolders.forEach((subFolder) => {
+            if (typeof currentResource === "string") {
+                throw new Error("Encountered recursion error when iterating locale subfolders!");
+            }
+            currentResource[subFolder] = currentResource[subFolder] || {};
+            currentResource = currentResource[subFolder];
+        });
+        currentResource[nameSpace] = fileContent;
     });
 
     return resources;
