@@ -59,6 +59,69 @@ export class MainMenu {
                     index: 7
                 },
                 orbitalObjectIndex: 1
+            },
+            {
+                starSystem: {
+                    starSectorX: 0,
+                    starSectorY: 0,
+                    starSectorZ: 0,
+                    index: 0
+                },
+                orbitalObjectIndex: 3
+            },
+            {
+                starSystem: {
+                    starSectorX: 0,
+                    starSectorY: 0,
+                    starSectorZ: 1,
+                    index: 4
+                },
+                orbitalObjectIndex: 1
+            },
+            {
+                starSystem: {
+                    starSectorX: 0,
+                    starSectorY: 0,
+                    starSectorZ: 1,
+                    index: 9
+                },
+                orbitalObjectIndex: 1
+            },
+            {
+                starSystem: {
+                    starSectorX: 0,
+                    starSectorY: 0,
+                    starSectorZ: 1,
+                    index: 1
+                },
+                orbitalObjectIndex: 2
+            },
+            {
+                starSystem: {
+                    starSectorX: 1,
+                    starSectorY: 1,
+                    starSectorZ: 0,
+                    index: 12
+                },
+                orbitalObjectIndex: 2
+            },
+            {
+                starSystem: {
+                    starSectorX: 1,
+                    starSectorY: 1,
+                    starSectorZ: 0,
+                    index: 5
+                },
+                orbitalObjectIndex: 1
+            },
+            {
+                starSystem: {
+                    starSectorX: 0,
+                    starSectorY: 0,
+                    starSectorZ: 0,
+                    index: 17
+                },
+                orbitalObjectIndex: 3
             }
         ];
 
@@ -165,7 +228,7 @@ export class MainMenu {
         this.starSystemView.onInitStarSystem.addOnce(() => {
             this.starSystemView.switchToDefaultControls();
             const nbRadius = this.starSystemController.model.getBodyTypeOfStellarObject(0) === BodyType.BLACK_HOLE ? 8 : 2;
-            const targetObject = this.starSystemController.planets.length > 0 ? this.starSystemController.planets[0] : this.starSystemController.stellarObjects[0];
+            const targetObject = this.starSystemController.getOrbitalObjects()[this.orbitalObjectIndex];
             positionNearObjectWithStarVisible(this.controls, targetObject, this.starSystemController, nbRadius);
 
             Settings.TIME_MULTIPLIER = 3;
@@ -264,7 +327,7 @@ export class MainMenu {
 
         const orbitalObject = this.starSystemController.getOrbitalObjects()[this.orbitalObjectIndex];
         const celestialBody = this.starSystemController.getBodies().find((body) => body.name === orbitalObject.name);
-        if(celestialBody === undefined) {
+        if (celestialBody === undefined) {
             throw new Error("No corresponding celestial body found");
         }
         const newForward = celestialBody.getTransform().getAbsolutePosition().subtract(this.controls.getTransform().getAbsolutePosition()).normalize();
@@ -274,11 +337,7 @@ export class MainMenu {
         const targetPosition = positionNearObjectAsteroidField(celestialBody, this.starSystemController);
 
         const rotationAnimation = new TransformRotationAnimation(this.controls.getTransform(), axis, angle, this.startAnimationDurationSeconds);
-        const translationAnimation = new TransformTranslationAnimation(
-            this.controls.getTransform(),
-            targetPosition,
-            this.startAnimationDurationSeconds
-        );
+        const translationAnimation = new TransformTranslationAnimation(this.controls.getTransform(), targetPosition, this.startAnimationDurationSeconds);
 
         if (this.title === null) throw new Error("Title is null");
 
