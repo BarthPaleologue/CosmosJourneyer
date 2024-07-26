@@ -196,7 +196,7 @@ export class AsteroidField implements IDisposable {
                 asteroidTypeIndices.push(asteroidTypeIndex);
 
                 rotationAxes.push(new Vector3(rng(asteroidIndex + 9630) - 0.5, rng(asteroidIndex + 3256) - 0.5, rng(asteroidIndex + 8520) - 0.5).normalize());
-                rotationSpeeds.push(rng(asteroidIndex + 1569) * 0.5);
+                rotationSpeeds.push(rng(asteroidIndex + 1569) * 0.2);
             }
         }
 
