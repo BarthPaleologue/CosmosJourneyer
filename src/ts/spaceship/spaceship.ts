@@ -91,7 +91,7 @@ export class Spaceship implements Transformable {
     readonly thrusterSound: AudioInstance;
 
     readonly onWarpDriveEnabled = new Observable<void>();
-    readonly onWarpDriveDisabled = new Observable<void>();
+    readonly onWarpDriveDisabled = new Observable<boolean>();
 
     readonly onLandingEngaged = new Observable<void>();
     readonly onLandingObservable = new Observable<void>();
@@ -198,7 +198,7 @@ export class Spaceship implements Transformable {
         this.aggregate.body.setMotionType(PhysicsMotionType.DYNAMIC);
 
         this.disableWarpDriveSound.sound.play();
-        this.onWarpDriveDisabled.notifyObservers();
+        this.onWarpDriveDisabled.notifyObservers(false);
     }
 
     public emergencyStopWarpDrive() {
@@ -206,7 +206,7 @@ export class Spaceship implements Transformable {
         this.aggregate.body.setMotionType(PhysicsMotionType.DYNAMIC);
 
         this.disableWarpDriveSound.sound.play();
-        this.onWarpDriveDisabled.notifyObservers();
+        this.onWarpDriveDisabled.notifyObservers(true);
     }
 
     public toggleWarpDrive() {
@@ -434,11 +434,10 @@ export class Spaceship implements Transformable {
 
                     if (distanceAboveRings < asteroidField.patchThickness * 1000 && planarDistance > ringsMinDistance - 100e3 && planarDistance < ringsMaxDistance + 100e3) {
                         closestDistance = distanceAboveRings;
-                        objectHalfThickness = asteroidField.patchThickness / 2;
+                        objectHalfThickness = asteroidField.patchThickness / 4;
                     }
 
-                    if (distanceAboveRings < asteroidField.patchThickness * 1.5 && planarDistance > ringsMinDistance && planarDistance < ringsMaxDistance) {
-                        console.log(distanceAboveRings);
+                    if (distanceAboveRings < asteroidField.patchThickness / 2 && planarDistance > ringsMinDistance && planarDistance < ringsMaxDistance) {
                         this.emergencyStopWarpDrive();
                     }
                 }
