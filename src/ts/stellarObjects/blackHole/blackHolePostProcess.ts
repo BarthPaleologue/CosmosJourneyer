@@ -3,23 +3,22 @@
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import blackHoleFragment from "../../../shaders/blackhole.glsl";
 import { ObjectPostProcess } from "../../postProcesses/objectPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { getForwardDirection } from "../../uberCore/transforms/basicTransform";
-import { Matrix, Quaternion } from "@babylonjs/core/Maths/math";
 import { BlackHole } from "./blackHole";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { ObjectUniformNames, setObjectUniforms } from "../../postProcesses/uniforms/objectUniforms";
@@ -44,7 +43,7 @@ export class BlackHolePostProcess extends PostProcess implements ObjectPostProce
 
     private activeCamera: Camera | null = null;
 
-    constructor(blackHole: BlackHole, scene: Scene, starfieldRotation: Quaternion) {
+    constructor(blackHole: BlackHole, scene: Scene) {
         const shaderName = "blackhole";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = blackHoleFragment;
@@ -94,9 +93,7 @@ export class BlackHolePostProcess extends PostProcess implements ObjectPostProce
             setCameraUniforms(effect, this.activeCamera);
             setObjectUniforms(effect, blackHole);
 
-            const rotationMatrix = new Matrix();
-            starfieldRotation.toRotationMatrix(rotationMatrix);
-            effect.setMatrix(BlackHoleUniformNames.STARFIELD_ROTATION, rotationMatrix);
+            effect.setMatrix(BlackHoleUniformNames.STARFIELD_ROTATION, Textures.MILKY_WAY.getReflectionTextureMatrix());
 
             effect.setFloat(BlackHoleUniformNames.TIME, blackHoleUniforms.time % (blackHoleUniforms.rotationPeriod * 10000));
             effect.setFloat(BlackHoleUniformNames.SCHWARZSCHILD_RADIUS, blackHole.model.getSchwarzschildRadius());
@@ -108,7 +105,7 @@ export class BlackHolePostProcess extends PostProcess implements ObjectPostProce
             effect.setVector3(BlackHoleUniformNames.FORWARD_AXIS, getForwardDirection(blackHole.getTransform()));
 
             setSamplerUniforms(effect, this.activeCamera, scene);
-            effect.setTexture(BlackHoleSamplerNames.STARFIELD_TEXTURE, Textures.STAR_FIELD);
+            effect.setTexture(BlackHoleSamplerNames.STARFIELD_TEXTURE, Textures.MILKY_WAY);
         });
     }
 

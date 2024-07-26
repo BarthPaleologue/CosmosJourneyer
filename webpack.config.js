@@ -13,10 +13,9 @@ const config = {
         main: "./src/ts/index.ts",
         alphaTestis: "./src/ts/alphaTestis.ts",
         blackHole: "./src/ts/blackHoleDemo.ts",
-        landingSimulator: "./src/ts/landingSimulator.ts",
         playground: "./src/ts/playground.ts",
         xr: "./src/ts/xr.ts",
-        stereo: "./src/ts/stereo.ts",
+        spaceStationGenerator: "./src/ts/spaceStationGenerator.ts",
         debugAssets: "./src/ts/debugAssets.ts"
     },
     output: {
@@ -41,16 +40,16 @@ const config = {
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
         `,
             stage: webpack.Compilation.PROCESS_ASSETS_STAGE_REPORT
@@ -74,12 +73,6 @@ const config = {
             chunks: ["blackHole"]
         }),
         new HtmlWebpackPlugin({
-            title: "Landing Simulator",
-            filename: "landingSimulator.html",
-            template: path.join(htmlPath, "index.html"),
-            chunks: ["landingSimulator"]
-        }),
-        new HtmlWebpackPlugin({
             title: "Playground",
             filename: "playground.html",
             template: path.join(htmlPath, "index.html"),
@@ -92,14 +85,14 @@ const config = {
             chunks: ["xr"]
         }),
         new HtmlWebpackPlugin({
-            title: "3D Stereo",
-            filename: "stereo.html",
+            title: "Space station generator",
+            filename: "spaceStationGenerator.html",
             template: path.join(htmlPath, "index.html"),
-            chunks: ["stereo"]
+            chunks: ["spaceStationGenerator"]
         }),
         new HtmlWebpackPlugin({
             title: "Debug Texture",
-            filename: "debugassets.html",
+            filename: "debugAssets.html",
             template: path.join(htmlPath, "index.html"),
             chunks: ["debugAssets"]
         }),
@@ -123,7 +116,7 @@ const config = {
                 use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"]
             },
             {
-                test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif|glb|obj|mp3|babylon)$/i,
+                test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif|webp|glb|obj|mp3|babylon|env|dds)$/i,
                 type: "asset"
             },
 

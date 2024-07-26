@@ -3,16 +3,16 @@
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
@@ -43,6 +43,10 @@ export class StarMapUI {
     readonly hoveredSystemRing: Image;
     readonly selectedSystemRing: Image;
     readonly currentSystemRing: Image;
+
+    readonly htmlRoot: HTMLDivElement;
+
+    readonly cursor: HTMLDivElement;
 
     readonly scene: Scene;
     readonly uiCamera: FreeCamera;
@@ -129,6 +133,20 @@ export class StarMapUI {
         ]);
 
         this.hoveredSystemRing.animations = [StarMapUI.ALPHA_ANIMATION];
+
+        this.htmlRoot = document.createElement("div");
+        this.htmlRoot.classList.add("starMapUI");
+
+        this.cursor = document.createElement("div");
+        this.cursor.classList.add("cursor");
+
+        this.htmlRoot.appendChild(this.cursor);
+
+        document.body.appendChild(this.htmlRoot);
+
+        document.addEventListener("pointermove", (event) => {
+            this.cursor.style.transform = `translate(calc(${event.clientX}px - 50%), calc(${event.clientY}px - 50%))`;
+        });
     }
 
     isHovered() {
@@ -204,5 +222,11 @@ export class StarMapUI {
     setSelectedSystem({ name, text }: { name: string; text: string }) {
         this.namePlate.text = name;
         this.descriptionPanel.text = text;
+    }
+
+    dispose() {
+        this.scene.dispose();
+        this.gui.dispose();
+        this.htmlRoot.remove();
     }
 }

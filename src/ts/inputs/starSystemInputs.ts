@@ -25,19 +25,19 @@ const jumpToSystemAction = new Action({
 const jumpToSystemInteraction = new PressInteraction(jumpToSystemAction);
 
 const toggleOverlayAction = new Action({
-    bindings: [keyboard.getControl("KeyO")]
+    bindings: [keyboard.getControl("KeyU")]
 });
 
 const toggleOverlayInteraction = new PressInteraction(toggleOverlayAction);
 
 const toggleOrbitsAndAxisAction = new Action({
-    bindings: [keyboard.getControl("KeyN")]
+    bindings: [keyboard.getControl("KeyO")]
 });
 
 const toggleOrbitsAndAxisInteraction = new PressInteraction(toggleOrbitsAndAxisAction);
 
 const toggleDebugUiAction = new Action({
-    bindings: [keyboard.getControl("KeyU")]
+    bindings: [keyboard.getControl("KeyN")]
 });
 
 const toggleDebugUiInteraction = new PressInteraction(toggleDebugUiAction);

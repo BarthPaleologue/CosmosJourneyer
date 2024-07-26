@@ -3,16 +3,16 @@
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Sound } from "@babylonjs/core/Audio/sound";
@@ -32,6 +32,16 @@ import deceleratingWarpDriveSound from "../../asset/sound/539503__timbre_endless
 import hyperSpaceSound from "../../asset/sound/539503__timbre_endless-deceleration-hyperspace.mp3";
 import thrusterSound from "../../asset/sound/318688__limitsnap_creations__rocket-thrust-effect.mp3";
 import starMapBackgroundMusic from "../../asset/sound/455855__andrewkn__wandering.mp3";
+
+import landingRequestSound from "../../asset/sound/voice/LandingRequestGrantedCharlotte.mp3";
+import landingCompleteSound from "../../asset/sound/voice/LandingCompleteCharlotte.mp3";
+
+import cannotEngageWarpDriveSound from "../../asset/sound/voice/CannotEngageWarpDriveCharlotte.mp3";
+import warpDriveEmergencyShutDownSound from "../../asset/sound/voice/WarpDriveEmergencyShutdownCharlotte.mp3";
+import warpDriveDisengagedSound from "../../asset/sound/voice/WarpDriveDisengagedCharlotte.mp3";
+import engagingWarpDriveSound from "../../asset/sound/voice/EngagingWarpDriveCharlotte.mp3";
+
+import straussBlueDanube from "../../asset/sound/Strauss_The_Blue_Danube_Waltz.mp3";
 
 export class Sounds {
     public static OUCH_SOUND: Sound;
@@ -58,6 +68,16 @@ export class Sounds {
 
     public static STAR_MAP_BACKGROUND_MUSIC: Sound;
     public static MAIN_MENU_BACKGROUND_MUSIC: Sound;
+
+    public static LANDING_REQUEST_GRANTED: Sound;
+    public static LANDING_COMPLETE: Sound;
+
+    public static CANNOT_ENGAGE_WARP_DRIVE: Sound;
+    public static WARP_DRIVE_EMERGENCY_SHUT_DOWN: Sound;
+    public static WARP_DRIVE_DISENGAGED: Sound;
+    public static ENGAGING_WARP_DRIVE: Sound;
+
+    public static STRAUSS_BLUE_DANUBE: Sound;
 
     public static EnqueueTasks(manager: AssetsManager, scene: Scene) {
         const ouchSoundTask = manager.addBinaryFileTask("ouchSoundTask", ouchSound);
@@ -199,6 +219,48 @@ export class Sounds {
             });
 
             console.log("Main menu background music loaded");
+        };
+
+        const landingRequestSoundTask = manager.addBinaryFileTask("landingRequestSoundTask", landingRequestSound);
+        landingRequestSoundTask.onSuccess = (task) => {
+            Sounds.LANDING_REQUEST_GRANTED = new Sound("LandingRequestGranted", task.data, scene);
+            console.log("Landing request sound loaded");
+        };
+
+        const landingCompleteSoundTask = manager.addBinaryFileTask("landingCompleteSoundTask", landingCompleteSound);
+        landingCompleteSoundTask.onSuccess = (task) => {
+            Sounds.LANDING_COMPLETE = new Sound("LandingComplete", task.data, scene);
+            console.log("Landing complete sound loaded");
+        };
+
+        const straussBlueDanubeTask = manager.addBinaryFileTask("straussBlueDanubeTask", straussBlueDanube);
+        straussBlueDanubeTask.onSuccess = (task) => {
+            Sounds.STRAUSS_BLUE_DANUBE = new Sound("StraussBlueDanube", task.data, scene);
+            console.log("Strauss Blue Danube sound loaded");
+        };
+
+        const cannotEngageWarpDriveSoundTask = manager.addBinaryFileTask("cannotEngageWarpDriveSoundTask", cannotEngageWarpDriveSound);
+        cannotEngageWarpDriveSoundTask.onSuccess = (task) => {
+            Sounds.CANNOT_ENGAGE_WARP_DRIVE = new Sound("CannotEngageWarpDrive", task.data, scene);
+            console.log("Cannot engage warp drive sound loaded");
+        };
+
+        const warpDriveEmergencyShutDownSoundTask = manager.addBinaryFileTask("warpDriveEmergencyShutDownSoundTask", warpDriveEmergencyShutDownSound);
+        warpDriveEmergencyShutDownSoundTask.onSuccess = (task) => {
+            Sounds.WARP_DRIVE_EMERGENCY_SHUT_DOWN = new Sound("WarpDriveEmergencyShutDown", task.data, scene);
+            console.log("Warp drive emergency shut down sound loaded");
+        };
+
+        const warpDriveDisengagedSoundTask = manager.addBinaryFileTask("warpDriveDisengagedSoundTask", warpDriveDisengagedSound);
+        warpDriveDisengagedSoundTask.onSuccess = (task) => {
+            Sounds.WARP_DRIVE_DISENGAGED = new Sound("WarpDriveDisengaged", task.data, scene);
+            console.log("Warp drive disengaged sound loaded");
+        };
+
+        const engagingWarpDriveSoundTask = manager.addBinaryFileTask("engagingWarpDriveSoundTask", engagingWarpDriveSound);
+        engagingWarpDriveSoundTask.onSuccess = (task) => {
+            Sounds.ENGAGING_WARP_DRIVE = new Sound("EngagingWarpDrive", task.data, scene);
+            console.log("Engaging warp drive sound loaded");
         };
     }
 }

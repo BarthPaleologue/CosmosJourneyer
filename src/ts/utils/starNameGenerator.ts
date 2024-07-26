@@ -3,20 +3,21 @@
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
  * @see https://en.wikipedia.org/wiki/List_of_proper_names_of_stars
+ * @see https://www.aavso.org/constellation-names-and-abbreviations
  */
 const constellationNames: string[] = [
     "Andromedae",
@@ -26,6 +27,7 @@ const constellationNames: string[] = [
     "Aquilae",
     "Arae",
     "Archimediae",
+    "Arietis",
     "Arii",
     "Aurigae",
     "Azophi",
@@ -35,6 +37,7 @@ const constellationNames: string[] = [
     "Botes",
     "Caeli",
     "Cameliae",
+    "Camelopardalis",
     "Cancri",
     "Canesis",
     "Cannonis",
@@ -47,6 +50,7 @@ const constellationNames: string[] = [
     "Centauri",
     "Cephei",
     "Ceti",
+    "Chamaeleontis",
     "Circini",
     "Columbae",
     "Comae",
@@ -54,14 +58,17 @@ const constellationNames: string[] = [
     "Copernici",
     "Coronae",
     "Corvi",
+    "Crateris",
     "Crucis",
     "Curi",
     "Cygni",
     "Darwini",
+    "Delphini",
     "Da Vinci",
     "Delphini",
     "Descartes",
     "Dijkstrae",
+    "Doradus",
     "Draconis",
     "Drakes",
     "Eich",
@@ -76,15 +83,17 @@ const constellationNames: string[] = [
     "Gaussi",
     "Galilei",
     "Geminorum",
+    "Gruis",
     "Hamiltoni",
     "Hawking",
-    "Hercules",
+    "Herculis",
     "Herschel",
     "Hopperae",
-    "Horologium",
+    "Horologii",
     "Hubblis",
     "Huygentis",
     "Hyades",
+    "Hydrae",
     "Hydri",
     "Hypatiae",
     "Indi",
@@ -93,7 +102,7 @@ const constellationNames: string[] = [
     "Lacertae",
     "Leavitis",
     "Leonis",
-    "Lepi",
+    "Leporis",
     "Librae",
     "Lovelace",
     "Lupi",
@@ -101,12 +110,13 @@ const constellationNames: string[] = [
     "Lyrae",
     "Mensae",
     "Messier",
+    "Microscopii",
     "Mobii",
+    "Monocerotis",
     "Muscae",
     "Neumanni",
     "Newtonis",
     "Normae",
-    "Norma",
     "Octantis",
     "Ophiuchi",
     "Orionis",
@@ -116,9 +126,11 @@ const constellationNames: string[] = [
     "Phoenicis",
     "Pictoris",
     "Piscium",
+    "Piscis",
     "Ptolemæi",
     "Puppis",
     "Pythagorae",
+    "Pyxidis",
     "Reticuli",
     "Saganis",
     "Sagittae",
@@ -126,7 +138,7 @@ const constellationNames: string[] = [
     "Scorpii",
     "Sculptoris",
     "Scuti",
-    "Serpentinis",
+    "Serpentis",
     "Sextantis",
     "Tauri",
     "Telescopii",
@@ -135,10 +147,10 @@ const constellationNames: string[] = [
     "Tucanae",
     "Turingi",
     "Ursae",
-    "Velae",
+    "Velorum",
     "Virginis",
     "Volantis",
-    "Vulpecula",
+    "Vulpeculae",
     "Weierstrass",
     "Zeno",
     "Zimmerman"

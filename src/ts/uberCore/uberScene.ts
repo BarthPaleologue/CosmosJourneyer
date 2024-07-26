@@ -3,19 +3,19 @@
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Scene, ScenePerformancePriority } from "@babylonjs/core/scene";
+import { Scene } from "@babylonjs/core/scene";
 import { Controls } from "./controls";
 import "@babylonjs/core/Rendering/depthRendererSceneComponent";
 import { Camera } from "@babylonjs/core/Cameras/camera";
@@ -34,22 +34,27 @@ export class UberScene extends Scene {
      */
     private activeControls: Controls | null = null;
 
-    private readonly depthRenderers: DepthRenderer[] = [];
+    private depthRenderer: DepthRenderer | null = null;
 
     /**
      * Creates a new UberScene.
      * @param engine The BabylonJS engine.
-     * @param performancePriority The performance priority of the scene (default: ScenePerformancePriority.BackwardCompatible).
      */
-    constructor(engine: AbstractEngine, performancePriority = ScenePerformancePriority.BackwardCompatible) {
+    constructor(engine: AbstractEngine) {
         super(engine);
-        this.performancePriority = performancePriority;
         this.clearColor = new Color4(0, 0, 0, 0);
 
         this.onNewCameraAddedObservable.add((camera) => {
-            const depthRenderer = this.enableDepthRenderer(camera, false, true);
-            depthRenderer.getDepthMap().activeCamera = camera;
-            this.depthRenderers.push(depthRenderer);
+            if (this.depthRenderer === null) {
+                this.depthRenderer = this.enableDepthRenderer(camera, false, true);
+            }
+        });
+
+        this.onBeforeCameraRenderObservable.add((camera) => {
+            if (this.depthRenderer === null) {
+                throw new Error("Depth renderer is null!");
+            }
+            this.depthRenderer.getDepthMap().activeCamera = camera;
         });
     }
 
@@ -69,16 +74,7 @@ export class UberScene extends Scene {
     public setActiveCameras(cameras: Camera[]) {
         if (this.activeCameras !== null) this.activeCameras.forEach((camera) => camera.detachControl());
         this.activeCameras = cameras;
-
-        if (cameras.length === 1) cameras[0].attachControl(true);
-
-        for (const depthRenderer of this.depthRenderers) {
-            const depthRendererCamera = depthRenderer.getDepthMap().activeCamera;
-            if (depthRendererCamera === null) {
-                throw new Error("Depth renderer camera is null: " + depthRenderer);
-            }
-            depthRenderer.enabled = cameras.includes(depthRendererCamera);
-        }
+        this.activeCameras.forEach((camera) => camera.attachControl(true));
     }
 
     /**

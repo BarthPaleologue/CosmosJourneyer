@@ -1,5 +1,7 @@
 declare module "*.png";
 declare module "*.jpg";
+declare module "*.webp";
+declare module "*.env";
 
 declare module "*.html";
 

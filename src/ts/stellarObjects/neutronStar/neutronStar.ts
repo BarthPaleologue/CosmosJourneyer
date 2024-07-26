@@ -3,16 +3,16 @@
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { NeutronStarModel } from "./neutronStarModel";
@@ -41,6 +41,7 @@ import { Camera } from "@babylonjs/core/Cameras/camera";
 import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
 import i18n from "../../i18n";
 import { Scene } from "@babylonjs/core/scene";
+import { AsteroidField } from "../../asteroidFields/asteroidField";
 
 export class NeutronStar implements StellarObject, Cullable {
     readonly model: NeutronStarModel;
@@ -57,6 +58,8 @@ export class NeutronStar implements StellarObject, Cullable {
     readonly postProcesses: PostProcessType[] = [];
 
     readonly ringsUniforms: RingsUniforms | null;
+
+    private readonly asteroidField: AsteroidField | null;
 
     readonly parent: OrbitalObject | null;
 
@@ -111,8 +114,13 @@ export class NeutronStar implements StellarObject, Cullable {
             this.postProcesses.push(PostProcessType.RING);
 
             this.ringsUniforms = new RingsUniforms(this.model.rings, scene);
+
+            const averageRadius = (this.model.radius * (this.model.rings.ringStart + this.model.rings.ringEnd)) / 2;
+            const spread = (this.model.radius * (this.model.rings.ringEnd - this.model.rings.ringStart)) / 2;
+            this.asteroidField = new AsteroidField(this.model.rng(84133), this.getTransform(), averageRadius, spread, scene);
         } else {
             this.ringsUniforms = null;
+            this.asteroidField = null;
         }
     }
 
@@ -144,6 +152,10 @@ export class NeutronStar implements StellarObject, Cullable {
         return this.ringsUniforms;
     }
 
+    getAsteroidField(): AsteroidField | null {
+        return this.asteroidField;
+    }
+
     public updateMaterial(deltaTime: number): void {
         this.material.update(deltaTime);
     }
@@ -168,5 +180,6 @@ export class NeutronStar implements StellarObject, Cullable {
         this.mesh.dispose();
         this.light.dispose();
         this.material.dispose();
+        this.asteroidField?.dispose();
     }
 }

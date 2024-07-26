@@ -3,16 +3,16 @@
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Direction } from "../../utils/direction";
@@ -43,6 +43,7 @@ import i18n from "../../i18n";
 import { CloudsUniforms } from "../../clouds/cloudsUniforms";
 import { Scene } from "@babylonjs/core/scene";
 import { BodyType } from "../../architecture/bodyType";
+import { AsteroidField } from "../../asteroidFields/asteroidField";
 
 export class TelluricPlanet implements Planet, Cullable {
     readonly name: string;
@@ -59,6 +60,8 @@ export class TelluricPlanet implements Planet, Cullable {
     readonly postProcesses: PostProcessType[] = [];
 
     readonly ringsUniforms: RingsUniforms | null;
+    private readonly asteroidField: AsteroidField | null;
+
     readonly cloudsUniforms: CloudsUniforms | null;
 
     readonly parent: CelestialBody | null;
@@ -115,8 +118,13 @@ export class TelluricPlanet implements Planet, Cullable {
         if (this.model.rings !== null) {
             this.postProcesses.push(PostProcessType.RING);
             this.ringsUniforms = new RingsUniforms(this.model.rings, scene);
+
+            const averageRadius = (this.model.radius * (this.model.rings.ringStart + this.model.rings.ringEnd)) / 2;
+            const spread = (this.model.radius * (this.model.rings.ringEnd - this.model.rings.ringStart)) / 2;
+            this.asteroidField = new AsteroidField(this.model.rng(84133), this.getTransform(), averageRadius, spread, scene);
         } else {
             this.ringsUniforms = null;
+            this.asteroidField = null;
         }
 
         if (this.model.clouds !== null) {
@@ -156,6 +164,10 @@ export class TelluricPlanet implements Planet, Cullable {
 
     getRingsUniforms(): RingsUniforms | null {
         return this.ringsUniforms;
+    }
+
+    getAsteroidField(): AsteroidField | null {
+        return this.asteroidField;
     }
 
     getCloudsUniforms(): CloudsUniforms | null {
@@ -199,5 +211,6 @@ export class TelluricPlanet implements Planet, Cullable {
         this.material.dispose();
         this.aggregate.dispose();
         this.transform.dispose();
+        this.asteroidField?.dispose();
     }
 }

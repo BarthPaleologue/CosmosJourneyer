@@ -1,0 +1,38 @@
+$gaps: 20px;
+
+#spaceStationUI {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 2;
+    pointer-events: none;
+  
+    font-family: Nasalization, sans-serif;
+
+    padding: $gaps;
+
+    display: grid;
+    grid-template-columns: 70% auto;
+    grid-template-rows: 15vh auto;
+
+    row-gap: $gaps;
+    column-gap: $gaps;
+
+    &>* {
+        background: rgba(100, 100, 200, 0.3);
+        backdrop-filter: blur(10px);
+        color: white;
+    }
+
+    #spaceStationHeader {
+        background: rgba(100, 100, 200, 0.3);
+        backdrop-filter: blur(10px);
+        font-size: 200%;
+    }
+
+    #spaceStationActions {
+        grid-column-start: 2;
+    }
+}

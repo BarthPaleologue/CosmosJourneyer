@@ -7,4 +7,6 @@ target
 .idea
 coverage
 docs
-.ts~
+*.ts~
+*.blend1
+*.blend11

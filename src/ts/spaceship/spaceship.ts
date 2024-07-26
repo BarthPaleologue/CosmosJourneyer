@@ -3,16 +3,16 @@
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Scene } from "@babylonjs/core/scene";
@@ -27,14 +27,13 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { setEnabledBody } from "../utils/havok";
-import { getForwardDirection, getRotationQuaternion, getUpwardDirection, rotate, setRotationQuaternion, translate } from "../uberCore/transforms/basicTransform";
+import { getForwardDirection, getUpwardDirection, rotate, setRotationQuaternion, translate } from "../uberCore/transforms/basicTransform";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { CollisionMask } from "../settings";
 import { Transformable } from "../architecture/transformable";
 import { WarpTunnel } from "../utils/warpTunnel";
 import { Quaternion } from "@babylonjs/core/Maths/math";
-import { LandingPad } from "../landingPad/landingPad";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { HyperSpaceTunnel } from "../utils/hyperSpaceTunnel";
 import { AudioInstance } from "../utils/audioInstance";
@@ -43,6 +42,10 @@ import { MainThruster } from "./mainThruster";
 import { AudioMasks } from "../audio/audioMasks";
 import { Objects } from "../assets/objects";
 import { Sounds } from "../assets/sounds";
+import { LandingPad } from "../assets/procedural/landingPad/landingPad";
+import { createNotification } from "../utils/notification";
+import { OrbitalObject } from "../architecture/orbitalObject";
+import { CelestialBody } from "../architecture/celestialBody";
 
 const enum ShipState {
     FLYING,
@@ -68,10 +71,8 @@ export class Spaceship implements Transformable {
 
     private state = ShipState.FLYING;
 
-    private closestObject = {
-        distance: Infinity,
-        radius: 1
-    };
+    private nearestOrbitalObject: OrbitalObject | null = null;
+    private nearestCelestialBody: CelestialBody | null = null;
 
     readonly warpTunnel: WarpTunnel;
     readonly hyperSpaceTunnel: HyperSpaceTunnel;
@@ -90,7 +91,7 @@ export class Spaceship implements Transformable {
     readonly thrusterSound: AudioInstance;
 
     readonly onWarpDriveEnabled = new Observable<void>();
-    readonly onWarpDriveDisabled = new Observable<void>();
+    readonly onWarpDriveDisabled = new Observable<boolean>();
 
     readonly onLandingEngaged = new Observable<void>();
     readonly onLandingObservable = new Observable<void>();
@@ -171,8 +172,12 @@ export class Spaceship implements Transformable {
         setEnabledBody(this.aggregate.body, enabled, havokPlugin);
     }
 
-    public registerClosestObject(distance: number, radius: number) {
-        this.closestObject = { distance, radius };
+    public setNearestOrbitalObject(orbitalObject: OrbitalObject) {
+        this.nearestOrbitalObject = orbitalObject;
+    }
+
+    public setNearestCelestialBody(celestialBody: CelestialBody) {
+        this.nearestCelestialBody = celestialBody;
     }
 
     public enableWarpDrive() {
@@ -189,11 +194,19 @@ export class Spaceship implements Transformable {
     }
 
     public disableWarpDrive() {
-        this.warpDrive.desengage();
+        this.warpDrive.disengage();
         this.aggregate.body.setMotionType(PhysicsMotionType.DYNAMIC);
 
         this.disableWarpDriveSound.sound.play();
-        this.onWarpDriveDisabled.notifyObservers();
+        this.onWarpDriveDisabled.notifyObservers(false);
+    }
+
+    public emergencyStopWarpDrive() {
+        this.warpDrive.emergencyStop();
+        this.aggregate.body.setMotionType(PhysicsMotionType.DYNAMIC);
+
+        this.disableWarpDriveSound.sound.play();
+        this.onWarpDriveDisabled.notifyObservers(true);
     }
 
     public toggleWarpDrive() {
@@ -249,15 +262,33 @@ export class Spaceship implements Transformable {
 
     public engageLandingOnPad(landingPad: LandingPad) {
         console.log("Landing on pad", landingPad.getTransform().name);
-        this.aggregate.body.setMotionType(PhysicsMotionType.ANIMATED);
-        this.state = ShipState.LANDING;
         this.targetLandingPad = landingPad;
+    }
+
+    public getTargetLandingPad(): LandingPad | null {
+        return this.targetLandingPad;
     }
 
     private completeLanding() {
         console.log("Landing sequence complete");
         this.state = ShipState.LANDED;
+
         this.aggregate.body.setMotionType(PhysicsMotionType.STATIC);
+        this.aggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
+        this.aggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+
+        if (this.targetLandingPad !== null) {
+            const currentPosition = this.getTransform().getAbsolutePosition().clone();
+            const currentRotation = this.getTransform().absoluteRotationQuaternion.clone();
+            const padRotation = this.targetLandingPad.getTransform().absoluteRotationQuaternion.clone();
+            if (padRotation === null) {
+                throw new Error("Landing pad's rotation quaternion is null!");
+            }
+            this.getTransform().parent = this.targetLandingPad.getTransform();
+            this.getTransform().setAbsolutePosition(currentPosition);
+            this.getTransform().rotationQuaternion = padRotation.invert().multiply(currentRotation);
+        }
+
         this.landingTarget = null;
 
         this.onLandingObservable.notifyObservers();
@@ -267,16 +298,30 @@ export class Spaceship implements Transformable {
         return this.state === ShipState.LANDED;
     }
 
+    public isLanding(): boolean {
+        return this.state === ShipState.LANDING;
+    }
+
+    public isLandedAtFacility(): boolean {
+        return this.isLanded() && this.targetLandingPad !== null;
+    }
+
     public takeOff() {
+        this.targetLandingPad = null;
+
         this.state = ShipState.FLYING;
         this.aggregate.body.setMotionType(PhysicsMotionType.DYNAMIC);
+        this.aggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS | CollisionMask.ENVIRONMENT;
+        this.aggregate.shape.filterMembershipMask = CollisionMask.DYNAMIC_OBJECTS;
+
+        const currentPosition = this.getTransform().getAbsolutePosition().clone();
+        const currentRotation = this.getTransform().absoluteRotationQuaternion.clone();
+        this.getTransform().parent = null;
+        this.getTransform().setAbsolutePosition(currentPosition);
+        this.getTransform().rotationQuaternion = currentRotation;
     }
 
     private land(deltaTime: number) {
-        if (this.targetLandingPad !== null) {
-            this.landOnPad(this.targetLandingPad, deltaTime);
-        }
-
         if (this.landingTarget !== null) {
             const gravityDir = this.landingTarget.getTransform().getAbsolutePosition().subtract(this.getTransform().getAbsolutePosition()).normalize();
             const start = this.getTransform().getAbsolutePosition().add(gravityDir.scale(-50e3));
@@ -307,47 +352,127 @@ export class Spaceship implements Transformable {
         }
     }
 
-    private landOnPad(landingPad: LandingPad, deltaTime: number) {
+    private landOnPad(landingPad: LandingPad) {
+        this.setMainEngineThrottle(0);
+
+        const shipUp = this.getTransform().up;
         const padUp = landingPad.getTransform().up;
 
         const targetPosition = landingPad.getTransform().getAbsolutePosition();
-        targetPosition.addInPlace(padUp.scale(2));
+        targetPosition.addInPlace(padUp.scale(1));
+
         const currentPosition = this.getTransform().getAbsolutePosition();
 
         const distance = Vector3.Distance(targetPosition, currentPosition);
 
-        if (distance < 0.01) {
+        const directionToTarget = targetPosition.subtract(currentPosition).normalize();
+
+        //const currentVelocity = this.aggregate.body.getLinearVelocity();
+        //const unwantedVelocity = currentVelocity.subtract(directionToTarget.scale(Vector3.Dot(directionToTarget, currentVelocity)));
+        //this.aggregate.body.applyForce(unwantedVelocity.scale(-1), currentPosition);
+        //const forceMag = 2000;
+        //this.aggregate.body.applyForce(directionToTarget.scale(forceMag), currentPosition);
+
+        this.aggregate.body.setLinearVelocity(directionToTarget.scale(Math.min(Math.max(1, distance), 20)));
+
+        if (distance < 3.0) {
             this.completeLanding();
             return;
         }
 
-        const targetOrientation = landingPad.getTransform().absoluteRotationQuaternion;
-        const currentOrientation = getRotationQuaternion(this.getTransform());
+        const upRotationAxis = Vector3.Cross(shipUp, padUp);
+        const upRotationAngle = Math.acos(Vector3.Dot(shipUp, padUp));
 
-        translate(
-            this.getTransform(),
-            targetPosition
-                .subtract(currentPosition)
-                .normalize()
-                .scaleInPlace(Math.min(distance, 20 * deltaTime))
-        );
+        this.aggregate.body.applyAngularImpulse(upRotationAxis.scale(upRotationAngle * 0.5));
 
-        this.getTransform().rotationQuaternion = Quaternion.Slerp(currentOrientation, targetOrientation, deltaTime);
+        const shipForward = getForwardDirection(this.getTransform());
+        const padBackward = getForwardDirection(landingPad.getTransform()).negateInPlace();
+
+        const forwardRotationAxis = Vector3.Cross(shipForward, padBackward);
+        const forwardRotationAngle = Math.acos(Vector3.Dot(shipForward, padBackward));
+
+        this.aggregate.body.applyAngularImpulse(forwardRotationAxis.scale(forwardRotationAngle * 0.5));
+
+        // dampen rotation that is not along any of the rotation axis
+        const angularVelocity = this.aggregate.body.getAngularVelocity();
+        const noiseAngularVelocity = angularVelocity.subtract(upRotationAxis.scale(Vector3.Dot(angularVelocity, upRotationAxis)));
+        noiseAngularVelocity.subtractInPlace(forwardRotationAxis.scale(Vector3.Dot(noiseAngularVelocity, forwardRotationAxis)));
+        this.aggregate.body.applyAngularImpulse(noiseAngularVelocity.scale(-0.1));
     }
 
-    public update(deltaTime: number) {
+    public canEngageWarpDrive() {
+        let canEngage = true;
+        if (this.nearestCelestialBody !== null) {
+            // if the spaceship goes too close to planetary rings, stop the warp drive to avoid collision with asteroids
+            const asteroidField = this.nearestCelestialBody.getAsteroidField();
+
+            if (asteroidField !== null) {
+                const relativePosition = this.getTransform().getAbsolutePosition().subtract(this.nearestCelestialBody.getTransform().getAbsolutePosition());
+                const distanceAboveRings = Math.abs(Vector3.Dot(relativePosition, this.nearestCelestialBody.getRotationAxis()));
+                const planarDistance = relativePosition.subtract(this.nearestCelestialBody.getRotationAxis().scale(distanceAboveRings)).length();
+
+                const ringsMinDistance = asteroidField.minRadius;
+                const ringsMaxDistance = asteroidField.maxRadius;
+
+                if (distanceAboveRings < asteroidField.patchThickness / 2 && planarDistance > ringsMinDistance && planarDistance < ringsMaxDistance) {
+                    canEngage = false;
+                }
+            }
+        }
+
+        return canEngage;
+    }
+
+    public update(deltaSeconds: number) {
         this.mainEngineTargetSpeed = Math.sign(this.mainEngineThrottle) * this.mainEngineThrottle ** 2 * 500;
 
         const warpSpeed = getForwardDirection(this.aggregate.transformNode).scale(this.warpDrive.getWarpSpeed());
 
         const currentForwardSpeed = Vector3.Dot(warpSpeed, this.aggregate.transformNode.getDirection(Axis.Z));
-        this.warpDrive.update(currentForwardSpeed, this.closestObject.distance, this.closestObject.radius, deltaTime);
+
+        let closestDistance = Number.POSITIVE_INFINITY;
+        let objectHalfThickness = 0;
+
+        if (this.warpDrive.isEnabled()) {
+            if(!this.canEngageWarpDrive()) {
+                this.emergencyStopWarpDrive();
+            }
+
+            if (this.nearestOrbitalObject !== null) {
+                const distanceToClosestOrbitalObject = Vector3.Distance(this.getTransform().getAbsolutePosition(), this.nearestOrbitalObject.getTransform().getAbsolutePosition());
+                const orbitalObjectRadius = this.nearestOrbitalObject.getBoundingRadius();
+
+                closestDistance = Math.min(closestDistance, distanceToClosestOrbitalObject);
+                objectHalfThickness = Math.max(orbitalObjectRadius, objectHalfThickness);
+            }
+
+            if (this.nearestCelestialBody !== null) {
+                // if the spaceship goes too close to planetary rings, stop the warp drive to avoid collision with asteroids
+                const asteroidField = this.nearestCelestialBody.getAsteroidField();
+
+                if (asteroidField !== null) {
+                    const relativePosition = this.getTransform().getAbsolutePosition().subtract(this.nearestCelestialBody.getTransform().getAbsolutePosition());
+                    const distanceAboveRings = Math.abs(Vector3.Dot(relativePosition, this.nearestCelestialBody.getRotationAxis()));
+                    const planarDistance = relativePosition.subtract(this.nearestCelestialBody.getRotationAxis().scale(distanceAboveRings)).length();
+
+                    const ringsMinDistance = asteroidField.minRadius;
+                    const ringsMaxDistance = asteroidField.maxRadius;
+
+                    if (distanceAboveRings < asteroidField.patchThickness * 1000 && planarDistance > ringsMinDistance - 100e3 && planarDistance < ringsMaxDistance + 100e3) {
+                        closestDistance = distanceAboveRings;
+                        objectHalfThickness = asteroidField.patchThickness / 4;
+                    }
+                }
+            }
+        }
+
+        this.warpDrive.update(currentForwardSpeed, closestDistance, objectHalfThickness, deltaSeconds);
 
         // the warp throttle goes from 0.1 to 1 smoothly using an inverse function
         if (this.warpDrive.isEnabled()) this.warpTunnel.setThrottle(1 - 1 / (1.1 * (1 + 1e-7 * this.warpDrive.getWarpSpeed())));
         else this.warpTunnel.setThrottle(0);
 
-        if (this.warpDrive.isDisabled()) {
+        if (this.warpDrive.isDisabled() && this.state !== ShipState.LANDED) {
             const linearVelocity = this.aggregate.body.getLinearVelocity();
             const forwardDirection = getForwardDirection(this.getTransform());
             const forwardSpeed = Vector3.Dot(linearVelocity, forwardDirection);
@@ -359,12 +484,13 @@ export class Spaceship implements Transformable {
 
             if (forwardSpeed < this.mainEngineTargetSpeed) {
                 this.aggregate.body.applyForce(forwardDirection.scale(3000), this.aggregate.body.getObjectCenterWorld());
-                this.mainThrusters.forEach((thruster) => {
-                    thruster.setThrottle(this.mainEngineThrottle);
-                });
             } else {
                 this.aggregate.body.applyForce(forwardDirection.scale(-3000), this.aggregate.body.getObjectCenterWorld());
             }
+
+            this.mainThrusters.forEach((thruster) => {
+                thruster.setThrottle(this.mainEngineThrottle);
+            });
 
             // damp other speed
             this.aggregate.body.applyForce(otherSpeed.scale(-10), this.aggregate.body.getObjectCenterWorld());
@@ -376,12 +502,27 @@ export class Spaceship implements Transformable {
 
             this.acceleratingWarpDriveSound.setTargetVolume(0);
             this.deceleratingWarpDriveSound.setTargetVolume(0);
-        } else {
+
+            if (this.targetLandingPad !== null) {
+                const shipRelativePosition = this.getTransform().getAbsolutePosition().subtract(this.targetLandingPad.getTransform().getAbsolutePosition());
+                const distanceToPad = shipRelativePosition.length();
+                const verticalDistance = Vector3.Dot(shipRelativePosition, this.targetLandingPad.getTransform().up);
+                if (distanceToPad < 600 && verticalDistance > 0) {
+                    if (this.state !== ShipState.LANDING) {
+                        createNotification("Automatic landing procedure engaged", 10000);
+                    }
+                    this.state = ShipState.LANDING;
+                    this.landOnPad(this.targetLandingPad);
+                }
+            }
+        }
+
+        if(this.warpDrive.isEnabled()) {
             this.mainThrusters.forEach((thruster) => {
                 thruster.setThrottle(0);
             });
 
-            translate(this.getTransform(), warpSpeed.scale(deltaTime));
+            translate(this.getTransform(), warpSpeed.scale(deltaSeconds));
 
             this.thrusterSound.setTargetVolume(0);
 
@@ -395,11 +536,11 @@ export class Spaceship implements Transformable {
         }
 
         this.mainThrusters.forEach((thruster) => {
-            thruster.update(deltaTime);
+            thruster.update(deltaSeconds);
         });
 
         if (this.state === ShipState.LANDING) {
-            this.land(deltaTime);
+            this.land(deltaSeconds);
         }
     }
 
@@ -414,5 +555,11 @@ export class Spaceship implements Transformable {
         this.hyperSpaceTunnel.dispose();
         this.aggregate.dispose();
         this.instanceRoot.dispose();
+
+        this.onWarpDriveEnabled.clear();
+        this.onWarpDriveDisabled.clear();
+    
+        this.onLandingEngaged.clear();
+        this.onLandingObservable.clear();
     }
 }

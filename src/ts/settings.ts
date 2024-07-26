@@ -3,16 +3,16 @@
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { seededSquirrelNoise } from "squirrel-noise";
@@ -41,6 +41,17 @@ export const Settings = {
     SEED_HALF_RANGE: 1e4,
 
     /**
+     * The average daily intake for a human being in kcal/day
+     * It is 2500 for males and 2000 for females, hence 2250.
+     */
+    INDIVIDUAL_AVERAGE_DAILY_INTAKE: 2250,
+
+    /**
+     * Hydroponic agriculture can be 250% more productive than conventional agriculture.
+     */
+    HYDROPONIC_TO_CONVENTIONAL_RATIO: 3.5,
+
+    /**
      * The speed of light in meters per second.
      */
     C: 299792458,
@@ -64,6 +75,11 @@ export const Settings = {
      * The radius of the sun in meters.
      */
     SOLAR_RADIUS: 696340e3,
+
+    /**
+     * The gravitational acceleration in m/s^2.
+     */
+    G_EARTH: 9.81,
 
     FOV: Tools.ToRadians(60),
 

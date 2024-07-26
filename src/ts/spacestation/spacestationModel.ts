@@ -3,16 +3,16 @@
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { seededSquirrelNoise } from "squirrel-noise";
@@ -25,8 +25,12 @@ import { CelestialBodyModel } from "../architecture/celestialBody";
 import { normalRandom } from "extended-random";
 import { clamp } from "../utils/math";
 import { GenerationSteps } from "../utils/generationSteps";
+import { CropType, CropTypes } from "../utils/agriculture";
+import { randomPieChart } from "../utils/random";
+import { generateSpaceStationName } from "../utils/spaceStationNameGenerator";
 
 export class SpaceStationModel implements OrbitalObjectModel {
+    readonly name: string;
     readonly seed: number;
     readonly rng: (step: number) => number;
     readonly orbit: OrbitProperties;
@@ -34,9 +38,23 @@ export class SpaceStationModel implements OrbitalObjectModel {
     readonly parentBody: OrbitalObjectModel | null;
     readonly childrenBodies: OrbitalObjectModel[] = [];
 
+    readonly population: number;
+    readonly energyConsumptionPerCapita: number;
+
+    /**
+     * The number of inhabitants per square kilometer in the habitat
+     */
+    readonly populationDensity: number;
+
+    readonly agricultureMix: [number, CropType][];
+
+    readonly nbHydroponicLayers: number;
+
     constructor(seed: number, parentBody?: CelestialBodyModel) {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed);
+        
+        this.name = generateSpaceStationName(this.rng, 2756);
 
         this.parentBody = parentBody ?? null;
         this.childrenBodies = [];
@@ -56,5 +74,16 @@ export class SpaceStationModel implements OrbitalObjectModel {
             rotationPeriod: 0,
             axialTilt: 2 * this.rng(GenerationSteps.AXIAL_TILT) * Math.PI
         };
+
+        //TODO: make this dependent on economic model
+        this.population = 2_000_000;
+        this.energyConsumptionPerCapita = 40_000;
+
+        this.populationDensity = 4_000;
+
+        const mix = randomPieChart(CropTypes.length, this.rng, 498);
+        this.agricultureMix = mix.map((proportion, index) => [proportion, CropTypes[index]]);
+
+        this.nbHydroponicLayers = 10;
     }
 }

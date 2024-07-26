@@ -3,16 +3,16 @@
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import "../styles/index.scss";
@@ -27,13 +27,23 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { BaseTexture } from "@babylonjs/core/Materials/Textures/baseTexture";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import "@babylonjs/core/Loading/loadingScreen";
+import HavokPhysics from "@babylonjs/havok";
+import { HavokPlugin } from "@babylonjs/core";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 const engine = new Engine(canvas, true);
+
+const havokInstance = await HavokPhysics();
+
 const scene = new Scene(engine);
+scene.useRightHandedSystem = true;
+
+const havokPlugin = new HavokPlugin(true, havokInstance);
+scene.enablePhysics(new Vector3(0, 0, 0), havokPlugin);
 
 const camera = new FreeCamera("camera", new Vector3(0, 1, -1).scale(15), scene);
 camera.setTarget(Vector3.Zero());
@@ -76,6 +86,10 @@ for (const transform of transformNodes) {
 for (let i = 0; i < scene.textures.length; i++) {
     showTexture(scene.textures[i], new Vector3((i % sideLength) - sideLength / 2, 0, Math.floor(i / sideLength) - sideLength / 2));
 }
+
+scene.executeWhenReady(() => {
+    engine.loadingScreen.hideLoadingUI();
+});
 
 engine.runRenderLoop(() => {
     scene.render();

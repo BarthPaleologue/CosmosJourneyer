@@ -3,16 +3,16 @@
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import projectInfo from "../../package.json";
@@ -31,7 +31,7 @@ import "@babylonjs/core/Engines/WebGPU/Extensions/";
 import { PauseMenu } from "./ui/pauseMenu";
 import { StarSystemView } from "./starSystem/starSystemView";
 import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
-import { MainMenu } from "./mainMenu/mainMenu";
+import { MainMenu } from "./ui/mainMenu";
 import { SystemSeed } from "./utils/systemSeed";
 import { SaveFileData } from "./saveFile/saveFileData";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -52,6 +52,10 @@ import { LoadingScreen } from "./uberCore/loadingScreen";
 import i18n from "./i18n";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Sounds } from "./assets/sounds";
+import { TutorialLayer } from "./ui/tutorial/tutorialLayer";
+import { FlightTutorial } from "./tutorials/flightTutorial";
+import { SidePanels } from "./ui/sidePanels";
+import { Settings } from "./settings";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -72,6 +76,9 @@ export class CosmosJourneyer {
 
     readonly mainMenu: MainMenu;
     readonly pauseMenu: PauseMenu;
+    readonly sidePanels: SidePanels;
+
+    readonly tutorialLayer: TutorialLayer;
 
     private activeView: View;
 
@@ -104,26 +111,38 @@ export class CosmosJourneyer {
         this.activeView = this.starSystemView;
         AudioManager.SetMask(AudioMasks.STAR_SYSTEM_VIEW);
 
-        this.mainMenu = new MainMenu(starSystemView);
+        this.tutorialLayer = new TutorialLayer();
+
+        this.sidePanels = new SidePanels(this.starSystemView);
+
+        this.mainMenu = new MainMenu(this.sidePanels, starSystemView);
         this.mainMenu.onStartObservable.add(() => {
-            createNotification(i18n.t("notifications:howToFly"), 20000);
-            this.starMap.setCurrentStarSystem(this.starSystemView.getStarSystem().model.seed);
+            this.tutorialLayer.setTutorial(FlightTutorial.title, FlightTutorial.getContentPanelsHtml());
+
             this.starSystemView.switchToSpaceshipControls();
-            this.starSystemView.getSpaceshipControls().spaceship.enableWarpDrive();
             this.starSystemView.showHtmlUI();
-            this.starSystemView.ui.setEnabled(true);
-            const target = this.starSystemView.getStarSystem().getClosestToScreenCenterOrbitalObject();
-            if (target !== null) {
-                this.starSystemView.ui.setTarget(target);
-                this.starSystemView.helmetOverlay.setTarget(target.getTransform());
-            }
+            this.starSystemView.targetCursorLayer.setEnabled(true);
         });
 
         this.mainMenu.onLoadSaveObservable.add(async (saveData: SaveFileData) => {
             await this.loadSaveData(saveData);
         });
 
-        this.pauseMenu = new PauseMenu();
+        this.sidePanels.tutorialsPanelContent.onTutorialSelected.add((tutorial) => {
+            this.mainMenu.hide();
+            this.resume();
+            this.tutorialLayer.setTutorial(tutorial.title, tutorial.getContentPanelsHtml());
+            this.starSystemView.targetCursorLayer.setEnabled(true);
+            this.starSystemView.getSpaceshipControls().spaceship.disableWarpDrive();
+            this.starSystemView.getSpaceshipControls().spaceship.setMainEngineThrottle(0);
+            Settings.TIME_MULTIPLIER = 1;
+        });
+
+        this.starSystemView.onInitStarSystem.add(() => {
+            this.starMap.setCurrentStarSystem(this.starSystemView.getStarSystem().model.seed);
+        });
+
+        this.pauseMenu = new PauseMenu(this.sidePanels);
         this.pauseMenu.onResume.add(() => this.resume());
         this.pauseMenu.onScreenshot.add(() => this.takeScreenshot());
         this.pauseMenu.onShare.add(() => {
@@ -192,7 +211,8 @@ export class CosmosJourneyer {
               })
             : new Engine(canvas, true, {
                   // the preserveDrawingBuffer option is required for the screenshot feature to work
-                  preserveDrawingBuffer: true
+                  preserveDrawingBuffer: true,
+                  useHighPrecisionMatrix: true
               });
 
         engine.useReverseDepthBuffer = true;
@@ -232,6 +252,7 @@ export class CosmosJourneyer {
     }
 
     public resume(): void {
+        if (!this.isPaused()) return;
         this.state = EngineState.RUNNING;
         Sounds.MENU_SELECT_SOUND.play();
         this.pauseMenu.setVisibility(false);
@@ -246,7 +267,7 @@ export class CosmosJourneyer {
      */
     public async init(skipMainMenu = false): Promise<void> {
         if (!skipMainMenu) await this.mainMenu.init();
-        await this.starSystemView.initStarSystem();
+        this.starSystemView.initStarSystem();
 
         this.engine.runRenderLoop(() => {
             updateInputDevices();
@@ -266,7 +287,7 @@ export class CosmosJourneyer {
             this.starSystemView.unZoom(() => {
                 AudioManager.SetMask(AudioMasks.STAR_MAP_VIEW);
 
-                this.starSystemView.ui.setEnabled(false);
+                this.starSystemView.targetCursorLayer.setEnabled(false);
 
                 this.starSystemView.detachControl();
                 this.starMap.attachControl();
@@ -279,7 +300,7 @@ export class CosmosJourneyer {
             this.starMap.detachControl();
             this.starSystemView.attachControl();
 
-            this.starSystemView.ui.setEnabled(true);
+            this.starSystemView.targetCursorLayer.setEnabled(true);
 
             AudioManager.SetMask(AudioMasks.STAR_SYSTEM_VIEW);
             this.activeView = this.starSystemView;
@@ -326,7 +347,7 @@ export class CosmosJourneyer {
         const seed = currentStarSystem.model.seed;
 
         // Finding the index of the nearest orbital object
-        const nearestOrbitalObject = currentStarSystem.getNearestOrbitalObject();
+        const nearestOrbitalObject = currentStarSystem.getNearestOrbitalObject(this.starSystemView.scene.getActiveControls().getTransform().getAbsolutePosition());
         const nearestOrbitalObjectIndex = currentStarSystem.getOrbitalObjects().indexOf(nearestOrbitalObject);
         if (nearestOrbitalObjectIndex === -1) throw new Error("Nearest orbital object not found");
 
@@ -344,7 +365,7 @@ export class CosmosJourneyer {
             version: projectInfo.version,
             universeCoordinates: {
                 starSystem: seed.serialize(),
-                nearestOrbitalObjectIndex: nearestOrbitalObjectIndex,
+                orbitalObjectIndex: nearestOrbitalObjectIndex,
                 positionX: currentLocalPosition.x,
                 positionY: currentLocalPosition.y,
                 positionZ: currentLocalPosition.z,
@@ -388,17 +409,15 @@ export class CosmosJourneyer {
 
         const seed = SystemSeed.Deserialize(universeCoordinates.starSystem);
 
-        this.starMap.setCurrentStarSystem(seed);
-
         this.starSystemView.onInitStarSystem.addOnce(() => {
             this.starSystemView.switchToSpaceshipControls();
 
-            this.starSystemView.ui.setEnabled(true);
+            this.starSystemView.targetCursorLayer.setEnabled(true);
             this.starSystemView.showHtmlUI();
 
             const playerTransform = this.starSystemView.scene.getActiveControls().getTransform();
 
-            const nearestOrbitalObject = this.starSystemView.getStarSystem().getOrbitalObjects()[universeCoordinates.nearestOrbitalObjectIndex];
+            const nearestOrbitalObject = this.starSystemView.getStarSystem().getOrbitalObjects()[universeCoordinates.orbitalObjectIndex];
             const nearestOrbitalObjectWorld = nearestOrbitalObject.getTransform().getWorldMatrix();
             const currentLocalPosition = new Vector3(universeCoordinates.positionX, universeCoordinates.positionY, universeCoordinates.positionZ);
             const currentWorldPosition = Vector3.TransformCoordinates(currentLocalPosition, nearestOrbitalObjectWorld);
@@ -424,14 +443,14 @@ export class CosmosJourneyer {
             this.starSystemView.getStarSystem().applyFloatingOrigin();
 
             // set the ui target to the nearest orbital object
-            this.starSystemView.ui.setTarget(nearestOrbitalObject);
-            this.starSystemView.helmetOverlay.setTarget(nearestOrbitalObject.getTransform());
+            this.starSystemView.targetCursorLayer.setTarget(nearestOrbitalObject);
+            this.starSystemView.spaceShipLayer.setTarget(nearestOrbitalObject.getTransform());
         });
 
         await this.starSystemView.loadStarSystem(new StarSystemController(seed, this.starSystemView.scene), true);
 
         if (this.state === EngineState.UNINITIALIZED) await this.init(true);
-        else await this.starSystemView.initStarSystem();
+        else this.starSystemView.initStarSystem();
 
         this.engine.loadingScreen.hideLoadingUI();
     }

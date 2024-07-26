@@ -3,16 +3,16 @@
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import "../styles/index.scss";
@@ -30,6 +30,7 @@ import { StarSystemHelper } from "./starSystem/starSystemHelper";
 import { StarModel } from "./stellarObjects/star/starModel";
 import { getMoonSeed } from "./planets/common";
 import { SystemSeed } from "./utils/systemSeed";
+import { SpaceShipControlsInputs } from "./spaceship/spaceShipControlsInputs";
 
 const engine = await CosmosJourneyer.CreateAsync();
 
@@ -69,7 +70,7 @@ planetModel.physicalProperties.minTemperature = -40;
 planetModel.physicalProperties.maxTemperature = 30;
 
 planetModel.orbit.period = 60 * 60 * 24 * 365.25;
-planetModel.orbit.radius = 4000 * planetModel.radius;
+planetModel.orbit.radius = 25000 * planetModel.radius;
 planetModel.orbit.normalToPlane = Vector3.Up();
 
 const planet = StarSystemHelper.MakeTelluricPlanet(starSystem, planetModel);
@@ -104,7 +105,7 @@ aresModel.physicalProperties.waterAmount = 0.2;
 aresModel.physicalProperties.oceanLevel = 0;
 
 aresModel.orbit.period = 60 * 60 * 24 * 365.24;
-aresModel.orbit.radius = 4020 * planet.getRadius();
+aresModel.orbit.radius = 25020 * planet.getRadius();
 aresModel.orbit.normalToPlane = Vector3.Up();
 
 //aresModel.terrainSettings.continents_fragmentation = 0.0;
@@ -119,7 +120,7 @@ ares.material.updateConstants();
 
 const andromaqueModel = new GasPlanetModel(0.28711440474126226, sunModel);
 andromaqueModel.orbit.period = 60 * 60 * 24 * 365.25;
-andromaqueModel.orbit.radius = 4300 * ares.getRadius();
+andromaqueModel.orbit.radius = 25300 * ares.getRadius();
 andromaqueModel.orbit.normalToPlane = Vector3.Up();
 
 const andromaque = StarSystemHelper.MakeGasPlanet(starSystem, andromaqueModel);
@@ -145,13 +146,6 @@ if (aresAtmosphere) {
 document.addEventListener("keydown", (e) => {
     if (engine.isPaused()) return;
 
-    if (e.key === "o") {
-        const landingPad = spaceStation.handleDockingRequest();
-        if (landingPad !== null && starSystemView.scene.getActiveControls() === spaceshipController) {
-            spaceshipController.spaceship.engageLandingOnPad(landingPad);
-        }
-    }
-
     if (e.key === "x") {
         let nbVertices = 0;
         let nbInstances = 0;
@@ -167,6 +161,7 @@ document.addEventListener("keydown", (e) => {
     }
 });
 
-starSystemView.ui.setEnabled(true);
+starSystemView.targetCursorLayer.setEnabled(true);
 starSystemView.showHtmlUI();
 starSystemView.getSpaceshipControls().spaceship.enableWarpDrive();
+SpaceShipControlsInputs.setEnabled(true);
