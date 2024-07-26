@@ -38,8 +38,11 @@ export const FlightTutorial: Tutorial<EmptyObject> = {
         <div class="tutorialContent">
             <img src="${welcomeImageSrc}" alt="Welcome to Cosmos Journeyer">
             <p>Welcome to Cosmos Journeyer, Commander! If this is your first time, this tutorial will cover the basics of space flight.</p>
-            <p>To move forward in the tutorial, simply press ${pressInteractionToStrings(TutorialControlsInputs.map.nextPanel).join(" or ")}. You can go back to the previous panel by pressing ${pressInteractionToStrings(TutorialControlsInputs.map.prevPanel).join(" or ")}.</p> 
-            <p>You can leave the tutorial at any time by pressing ${pressInteractionToStrings(TutorialControlsInputs.map.quitTutorial).join(" or ")}.</p>
+            ${i18n.t("tutorials:common:navigationInfo", {
+            nextKeys: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel).join(` ${i18n.t("common:or")} `),
+            previousKeys: pressInteractionToStrings(TutorialControlsInputs.map.prevPanel).join(` ${i18n.t("common:or")} `),
+            quitKeys: pressInteractionToStrings(TutorialControlsInputs.map.quitTutorial).join(` ${i18n.t("common:or")} `)
+        })}
         </div>`;
 
         const rotationPanelHtml = `
