@@ -400,6 +400,29 @@ export class Spaceship implements Transformable {
         this.aggregate.body.applyAngularImpulse(noiseAngularVelocity.scale(-0.1));
     }
 
+    public canEngageWarpDrive() {
+        let canEngage = true;
+        if (this.nearestCelestialBody !== null) {
+            // if the spaceship goes too close to planetary rings, stop the warp drive to avoid collision with asteroids
+            const asteroidField = this.nearestCelestialBody.getAsteroidField();
+
+            if (asteroidField !== null) {
+                const relativePosition = this.getTransform().getAbsolutePosition().subtract(this.nearestCelestialBody.getTransform().getAbsolutePosition());
+                const distanceAboveRings = Math.abs(Vector3.Dot(relativePosition, this.nearestCelestialBody.getRotationAxis()));
+                const planarDistance = relativePosition.subtract(this.nearestCelestialBody.getRotationAxis().scale(distanceAboveRings)).length();
+
+                const ringsMinDistance = asteroidField.minRadius;
+                const ringsMaxDistance = asteroidField.maxRadius;
+
+                if (distanceAboveRings < asteroidField.patchThickness / 2 && planarDistance > ringsMinDistance && planarDistance < ringsMaxDistance) {
+                    canEngage = false;
+                }
+            }
+        }
+
+        return canEngage;
+    }
+
     public update(deltaSeconds: number) {
         this.mainEngineTargetSpeed = Math.sign(this.mainEngineThrottle) * this.mainEngineThrottle ** 2 * 500;
 
@@ -411,6 +434,10 @@ export class Spaceship implements Transformable {
         let objectHalfThickness = 0;
 
         if (this.warpDrive.isEnabled()) {
+            if(!this.canEngageWarpDrive()) {
+                this.emergencyStopWarpDrive();
+            }
+
             if (this.nearestOrbitalObject !== null) {
                 const distanceToClosestOrbitalObject = Vector3.Distance(this.getTransform().getAbsolutePosition(), this.nearestOrbitalObject.getTransform().getAbsolutePosition());
                 const orbitalObjectRadius = this.nearestOrbitalObject.getBoundingRadius();
@@ -421,24 +448,19 @@ export class Spaceship implements Transformable {
 
             if (this.nearestCelestialBody !== null) {
                 // if the spaceship goes too close to planetary rings, stop the warp drive to avoid collision with asteroids
-                const ringsUniforms = this.nearestCelestialBody.getRingsUniforms();
                 const asteroidField = this.nearestCelestialBody.getAsteroidField();
 
-                if (ringsUniforms !== null && asteroidField !== null) {
+                if (asteroidField !== null) {
                     const relativePosition = this.getTransform().getAbsolutePosition().subtract(this.nearestCelestialBody.getTransform().getAbsolutePosition());
                     const distanceAboveRings = Math.abs(Vector3.Dot(relativePosition, this.nearestCelestialBody.getRotationAxis()));
                     const planarDistance = relativePosition.subtract(this.nearestCelestialBody.getRotationAxis().scale(distanceAboveRings)).length();
 
-                    const ringsMinDistance = ringsUniforms.model.ringStart * this.nearestCelestialBody.getBoundingRadius();
-                    const ringsMaxDistance = ringsUniforms.model.ringEnd * this.nearestCelestialBody.getBoundingRadius();
+                    const ringsMinDistance = asteroidField.minRadius;
+                    const ringsMaxDistance = asteroidField.maxRadius;
 
                     if (distanceAboveRings < asteroidField.patchThickness * 1000 && planarDistance > ringsMinDistance - 100e3 && planarDistance < ringsMaxDistance + 100e3) {
                         closestDistance = distanceAboveRings;
                         objectHalfThickness = asteroidField.patchThickness / 4;
-                    }
-
-                    if (distanceAboveRings < asteroidField.patchThickness / 2 && planarDistance > ringsMinDistance && planarDistance < ringsMaxDistance) {
-                        this.emergencyStopWarpDrive();
                     }
                 }
             }

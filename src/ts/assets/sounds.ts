@@ -36,6 +36,7 @@ import starMapBackgroundMusic from "../../asset/sound/455855__andrewkn__wanderin
 import landingRequestSound from "../../asset/sound/voice/LandingRequestGrantedCharlotte.mp3";
 import landingCompleteSound from "../../asset/sound/voice/LandingCompleteCharlotte.mp3";
 
+import cannotEngageWarpDriveSound from "../../asset/sound/voice/CannotEngageWarpDriveCharlotte.mp3";
 import warpDriveEmergencyShutDownSound from "../../asset/sound/voice/WarpDriveEmergencyShutdownCharlotte.mp3";
 import warpDriveDisengagedSound from "../../asset/sound/voice/WarpDriveDisengagedCharlotte.mp3";
 import engagingWarpDriveSound from "../../asset/sound/voice/EngagingWarpDriveCharlotte.mp3";
@@ -71,6 +72,7 @@ export class Sounds {
     public static LANDING_REQUEST_GRANTED: Sound;
     public static LANDING_COMPLETE: Sound;
 
+    public static CANNOT_ENGAGE_WARP_DRIVE: Sound;
     public static WARP_DRIVE_EMERGENCY_SHUT_DOWN: Sound;
     public static WARP_DRIVE_DISENGAGED: Sound;
     public static ENGAGING_WARP_DRIVE: Sound;
@@ -235,6 +237,12 @@ export class Sounds {
         straussBlueDanubeTask.onSuccess = (task) => {
             Sounds.STRAUSS_BLUE_DANUBE = new Sound("StraussBlueDanube", task.data, scene);
             console.log("Strauss Blue Danube sound loaded");
+        };
+
+        const cannotEngageWarpDriveSoundTask = manager.addBinaryFileTask("cannotEngageWarpDriveSoundTask", cannotEngageWarpDriveSound);
+        cannotEngageWarpDriveSoundTask.onSuccess = (task) => {
+            Sounds.CANNOT_ENGAGE_WARP_DRIVE = new Sound("CannotEngageWarpDrive", task.data, scene);
+            console.log("Cannot engage warp drive sound loaded");
         };
 
         const warpDriveEmergencyShutDownSoundTask = manager.addBinaryFileTask("warpDriveEmergencyShutDownSoundTask", warpDriveEmergencyShutDownSound);
