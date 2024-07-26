@@ -41,7 +41,7 @@ export class AsteroidField implements IDisposable {
     readonly resolution = 15;
     readonly patchSize = 30000;
 
-    readonly patchThickness = 1000;
+    readonly patchThickness = 2000;
 
     readonly neighborCellsRenderRadius = 2;
 
@@ -183,7 +183,7 @@ export class AsteroidField implements IDisposable {
                 if (positionX * positionX + positionZ * positionZ < minRadius * minRadius) continue;
                 if (positionX * positionX + positionZ * positionZ > maxRadius * maxRadius) continue;
 
-                const positionY = position.y + (rng(asteroidIndex + 8781) - 0.5) * 2 * patchThickness;
+                const positionY = position.y + (rng(asteroidIndex + 8781) - 0.5) * patchThickness;
 
                 const asteroidTypeIndex = Math.floor(rng(asteroidIndex + 6549) * Objects.ASTEROIDS.length);
 
