@@ -72,7 +72,7 @@ const toggleWarpDrive = new Action({
 const toggleWarpDriveInteraction = new PressInteraction(toggleWarpDrive);
 
 const ignorePointer = new Action({
-    bindings: [keyboard.getControl("AltLeft")]
+    bindings: [keyboard.getControl("ShiftLeft")]
 });
 
 const throttleToZero = new Action({

@@ -1,16 +1,18 @@
 import { SystemSeedSerialized } from "../utils/systemSeed";
 
-export type UniverseCoordinates = {
+export type UniverseObjectIdentifier = {
     /**
-     * The seed of the current star system.
+     * The seed of the star system.
      */
     starSystem: SystemSeedSerialized;
 
     /**
-     * The index of the nearest orbital object.
+     * The index of the orbital object.
      */
-    nearestOrbitalObjectIndex: number;
+    orbitalObjectIndex: number;
+};
 
+export type UniverseCoordinates = UniverseObjectIdentifier & {
     /**
      * The x coordinate of the player's position in the nearest orbital object's frame of reference.
      */
@@ -62,7 +64,7 @@ export function isJsonStringValidUniverseCoordinates(jsonString: string): boolea
         if (typeof data.starSystem.starSectorZ !== "number") return false;
         if (typeof data.starSystem.index !== "number") return false;
 
-        if (typeof data.nearestOrbitalObjectIndex !== "number") return false;
+        if (typeof data.orbitalObjectIndex !== "number") return false;
 
         if (typeof data.positionX !== "number") return false;
         if (typeof data.positionY !== "number") return false;

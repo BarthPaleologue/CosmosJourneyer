@@ -1,0 +1,70 @@
+.sidePanel#tutorials {
+  overflow-x: hidden;
+
+  .tutorialsMenuContainer {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    padding: 0 20px 20px 20px;
+    align-items: stretch;
+    column-gap: 20px;
+
+    $tileWidth: 300px;
+
+    &>* {
+      width: $tileWidth;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(3px);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.1) inset, 0 0 10px rgba(255, 255, 255, 0.1);
+
+      transition: 0.2s;
+
+      border-radius: 20px;
+
+      &:hover {
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.5) inset, 0 0 10px rgba(255, 255, 255, 0.5);
+        cursor: pointer;
+      }
+    }
+
+    .moreWillCome {
+      color: white;
+      font-family: Nasalization, sans-serif;
+      font-size: 2em;
+      text-align: center;
+      margin-block: 0;
+      display: flex;
+      align-items: center;
+
+      &:hover {
+        cursor: default;
+      }
+    }
+
+    .tutorial {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+
+      h2 {
+        color: white;
+        font-family: Nasalization, sans-serif;
+        font-size: 3em;
+        margin-block: 0.6em;
+      }
+
+      img {
+        width: 90%;
+      }
+
+      p {
+        color: white;
+        font-family: Nasalization, sans-serif;
+        line-height: 1.5em;
+        font-size: 1.25em;
+        padding: 0 20px;
+      }
+    }
+  }
+}

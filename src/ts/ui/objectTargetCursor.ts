@@ -145,7 +145,7 @@ export class ObjectTargetCursor {
         const cameraToObject = objectRay.scale(1 / distance);
         const cameraForward = camera.getDirection(Vector3.Forward(camera.getScene().useRightHandedSystem));
 
-        if (Vector3.Dot(cameraToObject, cameraForward) > 0) {
+        if (Vector3.Dot(cameraToObject, cameraForward) > 0 && this.alpha > 0) {
             Vector3.ProjectToRef(this.object.getTransform().getAbsolutePosition(), Matrix.IdentityReadOnly, camera.getTransformationMatrix(), camera.viewport, this.screenCoordinates);
 
             this.htmlRoot.classList.remove("hidden");

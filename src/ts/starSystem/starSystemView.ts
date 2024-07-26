@@ -280,7 +280,7 @@ export class StarSystemView implements View {
             const systemSeed = target.seed;
             this.isLoadingSystem = true;
             await this.loadStarSystem(new StarSystemController(systemSeed, this.scene), true);
-            await this.initStarSystem();
+            this.initStarSystem();
 
             this.spaceshipControls?.spaceship.hyperSpaceTunnel.setEnabled(false);
             this.spaceshipControls?.spaceship.warpTunnel.getTransform().setEnabled(true);
@@ -305,6 +305,7 @@ export class StarSystemView implements View {
 
                 setRotationQuaternion(characterControls.getTransform(), getRotationQuaternion(shipControls.getTransform()).clone());
                 SpaceShipControlsInputs.setEnabled(false);
+                this.spaceShipLayer.setVisibility(false);
 
                 this.scene.setActiveControls(characterControls);
                 this.postProcessManager.rebuild();
@@ -473,7 +474,7 @@ export class StarSystemView implements View {
      * Initializes the star system. It initializes the positions of the orbital objects, the UI, the chunk forge and the post processes
      * As it initializes the post processes using `initPostProcesses`, it returns a promise that resolves when the post processes are initialized.
      */
-    public initStarSystem(): Promise<void> {
+    public initStarSystem(): void {
         const starSystem = this.getStarSystem();
         starSystem.initPositions(2, this.chunkForge, this.postProcessManager);
         this.targetCursorLayer.reset();
@@ -510,14 +511,10 @@ export class StarSystemView implements View {
         else if (firstBody instanceof NeutronStar) controllerDistanceFactor = 100_000;
         positionNearObjectBrightSide(activeController, firstBody, starSystem, controllerDistanceFactor);
 
-        const initPostProcessesPromise = starSystem.initPostProcesses(this.postProcessManager);
+        starSystem.initPostProcesses(this.postProcessManager);
 
-        initPostProcessesPromise.then(() => {
-            this.onInitStarSystem.notifyObservers();
-            this.scene.getEngine().loadingScreen.hideLoadingUI();
-        });
-
-        return initPostProcessesPromise;
+        this.onInitStarSystem.notifyObservers();
+        this.scene.getEngine().loadingScreen.hideLoadingUI();
     }
 
     /**
@@ -655,6 +652,8 @@ export class StarSystemView implements View {
         const characterControls = this.getCharacterControls();
         const defaultControls = this.getDefaultControls();
 
+        this.spaceShipLayer.setVisibility(true);
+
         characterControls.getTransform().setEnabled(false);
         CharacterInputs.setEnabled(false);
         this.scene.setActiveControls(shipControls);
@@ -672,6 +671,8 @@ export class StarSystemView implements View {
         const shipControls = this.getSpaceshipControls();
         const characterControls = this.getCharacterControls();
         const defaultControls = this.getDefaultControls();
+
+        this.spaceShipLayer.setVisibility(false);
 
         characterControls.getTransform().setEnabled(true);
         CharacterInputs.setEnabled(true);
@@ -693,6 +694,8 @@ export class StarSystemView implements View {
         const shipControls = this.getSpaceshipControls();
         const characterControls = this.getCharacterControls();
         const defaultControls = this.getDefaultControls();
+
+        this.spaceShipLayer.setVisibility(false);
 
         characterControls.getTransform().setEnabled(false);
         CharacterInputs.setEnabled(false);

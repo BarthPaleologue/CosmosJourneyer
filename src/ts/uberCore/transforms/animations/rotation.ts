@@ -36,10 +36,10 @@ export class TransformRotationAnimation {
         this.duration = duration;
     }
 
-    update(deltaTime: number) {
+    update(deltaSeconds: number) {
         if (this.isFinished()) return;
 
-        this.clock += deltaTime;
+        this.clock += deltaSeconds;
 
         const t = clamp(this.clock / this.duration, 0, 1);
 

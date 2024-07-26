@@ -21,10 +21,13 @@ import { parseSpeed } from "../utils/parseToStrings";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Matrix } from "@babylonjs/core/Maths/math";
+import { smoothstep } from "../utils/smoothstep";
 
 export class SpaceShipLayer {
     private parentNode: HTMLElement;
     private bodyNamePlate: HTMLElement;
+
+    private readonly cursor: HTMLElement;
 
     private targetHelper: HTMLElement;
     private targetDot: HTMLElement;
@@ -37,8 +40,25 @@ export class SpaceShipLayer {
         this.parentNode = document.getElementById("helmetOverlay") as HTMLElement;
         this.bodyNamePlate = document.getElementById("bodyName") as HTMLElement;
 
+        this.cursor = document.createElement("div");
+        this.cursor.classList.add("cursor");
+        this.parentNode.appendChild(this.cursor);
+
         this.targetHelper = document.getElementById("targetHelper") as HTMLElement;
         this.targetDot = document.getElementById("targetDot") as HTMLElement;
+
+        document.addEventListener("mousemove", (event) => {
+            this.cursor.style.left = `${event.clientX}px`;
+            this.cursor.style.top = `${event.clientY}px`;
+
+            const theta = Math.atan2(event.clientY - window.innerHeight / 2, event.clientX - window.innerWidth / 2);
+            this.cursor.style.transform = `translate(-50%, -50%) rotate(${Math.PI / 2 + theta}rad)`;
+
+            const distanceToCenter = Math.sqrt((event.clientX - window.innerWidth / 2) ** 2 + (event.clientY - window.innerHeight / 2) ** 2);
+            const normalizedDistance = Math.min(distanceToCenter / Math.min(window.innerWidth, window.innerHeight), 1);
+
+            this.cursor.style.opacity = `${smoothstep(0.1, 0.3, normalizedDistance)}`;
+        });
     }
 
     public setVisibility(visible: boolean) {
@@ -93,5 +113,9 @@ export class SpaceShipLayer {
         const speedIndicator = document.getElementById("speed");
         if (speedIndicator === null) throw new Error("Speed indicator not found");
         speedIndicator.innerText = parseSpeed(speed);
+    }
+
+    dispose() {
+        this.parentNode.remove();
     }
 }

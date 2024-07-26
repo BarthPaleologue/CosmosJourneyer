@@ -1,0 +1,91 @@
+.tutorialLayer {
+  z-index: 20;
+  pointer-events: none;
+  position: relative;
+
+  .tutorialPanel {
+    position: absolute;
+    height: 85vh;
+    box-shadow: 0 0 20px black;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(3px);
+    width: 25vw;
+    min-width: 500px;
+    top: 7.5vh;
+    left: 0;
+
+    padding-bottom: 10px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+
+    font-family: 'Nasalization', sans-serif;
+
+    transform: translate(0);
+    transition: transform 0.5s ease-in-out;
+
+    &.hidden {
+        transform: translate(-100%);
+    }
+
+    h1 {
+      text-align: center;
+      color: white;
+      flex-grow: 0;
+    }
+
+    .tutorialContentContainer {
+      overflow-y: auto;
+      flex-grow: 1;
+
+      .tutorialContent {
+        p {
+          color: white;
+          padding: 0 10px;
+          line-height: 1.5em;
+        }
+
+        h2 {
+          color: white;
+          padding: 0 10px;
+        }
+
+        img {
+          width: 100%;
+          height: auto;
+          flex-grow: 0;
+        }
+      }
+    }
+
+    .tutorialControls {
+      flex-grow: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-evenly;
+
+      p {
+        background: white;
+        color: black;
+        padding: 3px 5px;
+
+        display: flex;
+        align-items: center;
+        margin-block: 0;
+
+        span {
+          padding: 5px;
+
+          &.keySpan {
+            font-weight: bold;
+            background: rgba(0, 0, 0, 0.3);
+            font-size: 75%;
+          }
+        }
+
+      }
+    }
+  }
+}
