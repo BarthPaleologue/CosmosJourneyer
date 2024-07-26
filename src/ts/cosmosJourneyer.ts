@@ -55,6 +55,7 @@ import { Sounds } from "./assets/sounds";
 import { TutorialLayer } from "./ui/tutorial/tutorialLayer";
 import { FlightTutorial } from "./tutorials/flightTutorial";
 import { SidePanels } from "./ui/sidePanels";
+import { Settings } from "./settings";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -132,6 +133,7 @@ export class CosmosJourneyer {
             this.resume();
             this.tutorialLayer.setTutorial(tutorial.title, tutorial.getContentPanelsHtml());
             this.starSystemView.targetCursorLayer.setEnabled(true);
+            Settings.TIME_MULTIPLIER = 1;
         });
 
         this.starSystemView.onInitStarSystem.add(() => {
