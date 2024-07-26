@@ -62,11 +62,15 @@ export const FlightTutorial: Tutorial<EmptyObject> = {
 
         const thrustPanelHtml = `
         <div class="tutorialContent">
-            <h2>Spaceship Thrust</h2>
-            <p>Assuming a QWERTY layout, you can throttle the main engines with ${throttleStrings[1][1]} and ${throttleStrings[0][1]}. Pressing ${pressInteractionToStrings(SpaceShipControlsInputs.map.throttleToZero).join(" or ")} will set the throttle to zero.</p>
+            <h2>${i18n.t("tutorials:flightTutorial:spaceShipThrustTitle")}</h2>
+            <p>${i18n.t("tutorials:flightTutorial:spaceShipThrustText1", {
+            keyIncrease: throttleStrings[1][1],
+            keyDecrease: throttleStrings[0][1],
+            keyKill: pressInteractionToStrings(SpaceShipControlsInputs.map.throttleToZero).join(` ${i18n.t("common:or")} `)
+        })}</p>
             <img src="${thrustImageSrc}" alt="Spaceship Thrust">
-            <p>Your throttle is displayed as a vertical progress bar on the bottom right of the screen alongside your speed.</p>
-            <p>Try flying around the asteroid field to get familiar with the controls.</p>
+            <p>${i18n.t("tutorials:flightTutorial:spaceShipThrustText2")}</p>
+            <p>${i18n.t("tutorials:flightTutorial:spaceShipThrustText3")}</p>
         </div>`;
 
         const warpPanelHtml = `
