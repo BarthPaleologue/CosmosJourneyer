@@ -1,0 +1,8 @@
+{
+  "moreWillComeSoon": "More tutorials will come in the future!",
+  "navigationInfo": "<p>To move forward in the tutorial, simply press {{nextKeys}}. You can go back to the previous panel by pressing {{previousKeys}}.</p><p>You can leave the tutorial at any time by pressing {{quitKeys}}.</p>",
+  "quit": "Quit",
+  "next": "Next",
+  "previous": "Previous",
+  "tutorialEnding": "<p>This tutorial and others are available at any time from the main menu and the pause menu.</p><p>Press {{keyQuit}} to leave the tutorial.</p>"
+}

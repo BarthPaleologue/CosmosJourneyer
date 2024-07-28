@@ -67,6 +67,11 @@ export class ShipControls implements Controls {
         this.scene = scene;
 
         SpaceShipControlsInputs.map.toggleWarpDrive.on("complete", () => {
+            if(!this.spaceship.canEngageWarpDrive() && this.spaceship.getWarpDrive().isDisabled()) {
+                Sounds.CANNOT_ENGAGE_WARP_DRIVE.play();
+                return;
+            }
+
             this.spaceship.toggleWarpDrive();
             if (this.spaceship.getWarpDrive().isEnabled()) {
                 Sounds.ENGAGING_WARP_DRIVE.play();
@@ -125,7 +130,7 @@ export class ShipControls implements Controls {
             Sounds.STRAUSS_BLUE_DANUBE.setVolume(0, 2);
             Sounds.STRAUSS_BLUE_DANUBE.stop(2);
 
-            if(!this.spaceship.isLandedAtFacility()) {
+            if (!this.spaceship.isLandedAtFacility()) {
                 const bindingsString = pressInteractionToStrings(StarSystemInputs.map.toggleSpaceShipCharacter).join(", ");
                 createNotification(i18n.t("notifications:landingComplete", { bindingsString: bindingsString }), 5000);
             }
@@ -133,6 +138,10 @@ export class ShipControls implements Controls {
 
         this.spaceship.onLandingEngaged.add(() => {
             createNotification(i18n.t("notifications:landingSequenceEngaged"), 5000);
+        });
+
+        this.spaceship.onWarpDriveDisabled.add((isEmergency) => {
+            if (isEmergency) Sounds.WARP_DRIVE_EMERGENCY_SHUT_DOWN.play();
         });
     }
 

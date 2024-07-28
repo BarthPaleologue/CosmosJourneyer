@@ -113,9 +113,16 @@ body {
 
   @import "targetCursors.scss";
 
+  @import "starMapUI.scss";
+
+  @import "tutorialLayer.scss";
+
+  @import "tutorialsMenuPanel.scss";
+
   #renderer {
     z-index: 1;
     float: left;
+    cursor: none;
   }
 
   #planetName {

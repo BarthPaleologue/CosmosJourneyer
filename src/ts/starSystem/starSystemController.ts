@@ -258,7 +258,7 @@ export class StarSystemController {
      * Inits the post processes of all the bodies in the system
      * This method cannot be awaited as its completion depends on the execution of BabylonJS that happens afterward.
      */
-    public async initPostProcesses(postProcessManager: PostProcessManager): Promise<void> {
+    public initPostProcesses(postProcessManager: PostProcessManager): void {
         for (const object of this.celestialBodies) {
             for (const postProcess of object.postProcesses) {
                 switch (postProcess) {

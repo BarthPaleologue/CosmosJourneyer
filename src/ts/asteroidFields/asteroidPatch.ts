@@ -41,7 +41,7 @@ export class AsteroidPatch {
 
     private readonly physicsRadius = 15e3;
 
-    private readonly batchSize = 3;
+    private readonly batchSize = 10;
 
     constructor(positions: Vector3[], rotations: Quaternion[], typeIndices: number[], rotationAxes: Vector3[], rotationSpeeds: number[], parent: TransformNode) {
         this.parent = parent;

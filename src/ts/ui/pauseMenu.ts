@@ -19,6 +19,7 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import pauseMenuHTML from "../../html/pauseMenu.html";
 import i18n from "../i18n";
 import { Sounds } from "../assets/sounds";
+import { PanelType, SidePanels } from "./sidePanels";
 
 export class PauseMenu {
     private readonly rootNode: HTMLElement;
@@ -27,20 +28,21 @@ export class PauseMenu {
     private readonly screenshotButton: HTMLElement;
     private readonly shareButton: HTMLElement;
     private readonly contributeButton: HTMLElement;
+    private readonly tutorialsButton: HTMLElement;
     private readonly settingsButton: HTMLElement;
     private readonly saveButton: HTMLElement;
     private readonly resumeButton: HTMLElement;
 
-    private readonly settingsPanel: HTMLElement;
-    private readonly contibutePanel: HTMLElement;
-    private activePanel: HTMLElement | null = null;
+    private readonly sidePanels: SidePanels;
 
     readonly onScreenshot = new Observable<void>();
     readonly onShare = new Observable<void>();
     readonly onSave = new Observable<void>();
     readonly onResume = new Observable<void>();
 
-    constructor() {
+    constructor(sidePanels: SidePanels) {
+        this.sidePanels = sidePanels;
+
         document.body.insertAdjacentHTML("beforeend", pauseMenuHTML);
         this.rootNode = document.getElementById("pauseMenu") as HTMLElement;
         this.mask = document.getElementById("pauseMask") as HTMLElement;
@@ -57,15 +59,23 @@ export class PauseMenu {
         this.contributeButton.addEventListener("click", () => {
             Sounds.MENU_SELECT_SOUND.play();
 
-            this.setActivePanel(this.activePanel === this.contibutePanel ? null : this.contibutePanel);
+            this.sidePanels.toggleActivePanel(PanelType.CONTRIBUTE);
         });
         this.contributeButton.innerText = i18n.t("pauseMenu:contribute");
+
+        this.tutorialsButton = document.getElementById("pauseTutorialsButton") as HTMLElement;
+        this.tutorialsButton.addEventListener("click", () => {
+            Sounds.MENU_SELECT_SOUND.play();
+
+            this.sidePanels.toggleActivePanel(PanelType.TUTORIALS);
+        });
+        this.tutorialsButton.innerText = i18n.t("pauseMenu:tutorials");
 
         this.settingsButton = document.getElementById("pauseSettingsButton") as HTMLElement;
         this.settingsButton.addEventListener("click", () => {
             Sounds.MENU_SELECT_SOUND.play();
 
-            this.setActivePanel(this.activePanel === this.settingsPanel ? null : this.settingsPanel);
+            this.sidePanels.toggleActivePanel(PanelType.SETTINGS);
         });
         this.settingsButton.innerText = i18n.t("pauseMenu:settings");
 
@@ -89,34 +99,14 @@ export class PauseMenu {
             });
         });
 
-        const settingsPanel = document.getElementById("settingsPanel");
-        if (settingsPanel === null) throw new Error("#settingsPanel not found");
-        this.settingsPanel = settingsPanel;
-
-        const contributePanel = document.getElementById("contribute");
-        if (contributePanel === null) throw new Error("#contribute not found");
-        this.contibutePanel = contributePanel;
-
         this.setVisibility(false);
-    }
-
-    private setActivePanel(panel: HTMLElement | null) {
-        if (this.activePanel !== null) {
-            this.activePanel.classList.remove("visible");
-        }
-
-        this.activePanel = panel;
-
-        if (this.activePanel !== null) {
-            this.activePanel.classList.add("visible");
-        }
     }
 
     public setVisibility(visible: boolean) {
         this.rootNode.style.display = visible ? "grid" : "none";
         this.mask.style.display = visible ? "block" : "none";
 
-        this.activePanel?.classList.remove("visible");
+        if (!visible) this.sidePanels.hideActivePanel();
     }
 
     public isVisible(): boolean {

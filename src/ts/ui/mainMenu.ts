@@ -2,8 +2,8 @@ import { UberScene } from "../uberCore/uberScene";
 import { DefaultControls } from "../defaultControls/defaultControls";
 import { StarSystemView } from "../starSystem/starSystemView";
 import { StarSystemController } from "../starSystem/starSystemController";
-import { positionNearObjectWithStarVisible } from "../utils/positionNearObject";
-import { EditorVisibility } from "../ui/bodyEditor/bodyEditor";
+import { positionNearObjectAsteroidField, positionNearObjectWithStarVisible } from "../utils/positionNearObject";
+import { EditorVisibility } from "./bodyEditor/bodyEditor";
 import mainMenuHTML from "../../html/mainMenu.html";
 import { getForwardDirection } from "../uberCore/transforms/basicTransform";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -14,10 +14,11 @@ import { SystemSeed } from "../utils/systemSeed";
 import { parseSaveFileData, SaveFileData } from "../saveFile/saveFileData";
 import packageInfo from "../../../package.json";
 import { Settings } from "../settings";
-import { initSettingsPanel } from "./settingsPanel";
 import i18n from "../i18n";
 import { BodyType } from "../architecture/bodyType";
 import { Sounds } from "../assets/sounds";
+import { PanelType, SidePanels } from "./sidePanels";
+import { UniverseObjectIdentifier } from "../saveFile/universeCoordinates";
 
 export class MainMenu {
     readonly scene: UberScene;
@@ -36,51 +37,97 @@ export class MainMenu {
     private readonly title: HTMLElement;
     private readonly version: HTMLElement;
 
-    private activeRightPanel: HTMLElement | null = null;
-    private readonly loadSavePanel: HTMLElement;
-    private readonly settingsPanel: HTMLElement;
-    private readonly contributePanel: HTMLElement;
-    private readonly creditsPanel: HTMLElement;
-    private readonly aboutPanel: HTMLElement;
+    private readonly sidePanels: SidePanels;
 
-    constructor(starSystemView: StarSystemView) {
+    private readonly orbitalObjectIndex: number;
+
+    private readonly startAnimationDurationSeconds = 5;
+
+    constructor(sidePanels: SidePanels, starSystemView: StarSystemView) {
+        this.sidePanels = sidePanels;
         this.starSystemView = starSystemView;
 
         this.scene = this.starSystemView.scene;
         this.controls = this.starSystemView.getDefaultControls();
 
-        const allowedSeeds = [
-            new SystemSeed(-600, 955, -68, 0),
-            new SystemSeed(576, -192, 480, 0),
-            new SystemSeed(-760, -856, 60, 0),
-            new SystemSeed(-238, 254, -675, 0),
-            new SystemSeed(-312, 314, 736, 0),
-            new SystemSeed(-866, 71, -294, 0),
-            new SystemSeed(-249, 706, 631, 0),
-            new SystemSeed(-433, 945, -693, 0),
-            new SystemSeed(-430, -767, -670, 0),
-            new SystemSeed(61, 376, -389, 0),
-            new SystemSeed(-499, -114, 377, 0),
-            new SystemSeed(-596, 339, -571, 0),
-            new SystemSeed(-319, 253, 30, 0),
-            new SystemSeed(709, 570, 285, 0),
-            new SystemSeed(-516, -140, -2, 0),
-            new SystemSeed(728, 691, -883, 0),
-            new SystemSeed(-673, -545, 753, 0),
-            new SystemSeed(-218, 213, 765, 0),
-            new SystemSeed(-47, 97, -20, 0),
-            new SystemSeed(817, 750, -983, 0)
+        const allowedIdentifiers: UniverseObjectIdentifier[] = [
+            {
+                starSystem: {
+                    starSectorX: 1,
+                    starSectorY: 1,
+                    starSectorZ: 0,
+                    index: 7
+                },
+                orbitalObjectIndex: 1
+            },
+            {
+                starSystem: {
+                    starSectorX: 0,
+                    starSectorY: 0,
+                    starSectorZ: 0,
+                    index: 0
+                },
+                orbitalObjectIndex: 3
+            },
+            {
+                starSystem: {
+                    starSectorX: 0,
+                    starSectorY: 0,
+                    starSectorZ: 1,
+                    index: 4
+                },
+                orbitalObjectIndex: 1
+            },
+            {
+                starSystem: {
+                    starSectorX: 0,
+                    starSectorY: 0,
+                    starSectorZ: 1,
+                    index: 9
+                },
+                orbitalObjectIndex: 1
+            },
+            {
+                starSystem: {
+                    starSectorX: 0,
+                    starSectorY: 0,
+                    starSectorZ: 1,
+                    index: 1
+                },
+                orbitalObjectIndex: 2
+            },
+            {
+                starSystem: {
+                    starSectorX: 1,
+                    starSectorY: 1,
+                    starSectorZ: 0,
+                    index: 12
+                },
+                orbitalObjectIndex: 2
+            },
+            {
+                starSystem: {
+                    starSectorX: 1,
+                    starSectorY: 1,
+                    starSectorZ: 0,
+                    index: 5
+                },
+                orbitalObjectIndex: 1
+            },
+            {
+                starSystem: {
+                    starSectorX: 0,
+                    starSectorY: 0,
+                    starSectorZ: 0,
+                    index: 17
+                },
+                orbitalObjectIndex: 3
+            }
         ];
 
-        /*const randomSeed = new SystemSeed(
-Math.trunc((Math.random() * 2 - 1) * 1000),
-Math.trunc((Math.random() * 2 - 1) * 1000),
-Math.trunc((Math.random() * 2 - 1) * 1000),
-0
-);*/
-
-        const seed = allowedSeeds[Math.floor(Math.random() * allowedSeeds.length)];
-        console.log(seed.starSectorX + ", " + seed.starSectorY + ", " + seed.starSectorZ + ", " + seed.index);
+        const randomIndex = Math.floor(Math.random() * allowedIdentifiers.length);
+        this.orbitalObjectIndex = allowedIdentifiers[randomIndex].orbitalObjectIndex;
+        const seed = SystemSeed.Deserialize(allowedIdentifiers[randomIndex].starSystem);
         this.starSystemController = new StarSystemController(seed, this.scene);
 
         document.body.insertAdjacentHTML("beforeend", mainMenuHTML);
@@ -121,24 +168,6 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
             element.textContent = i18n.t(key);
         });
 
-        const loadSavePanel = document.getElementById("loadSavePanel");
-        if (loadSavePanel === null) throw new Error("#loadSavePanel does not exist!");
-        this.loadSavePanel = loadSavePanel;
-
-        this.settingsPanel = initSettingsPanel();
-
-        const contributePanel = document.getElementById("contribute");
-        if (contributePanel === null) throw new Error("#contribute does not exist!");
-        this.contributePanel = contributePanel;
-
-        const creditsPanel = document.getElementById("credits");
-        if (creditsPanel === null) throw new Error("#credits does not exist!");
-        this.creditsPanel = creditsPanel;
-
-        const aboutPanel = document.getElementById("about");
-        if (aboutPanel === null) throw new Error("#about does not exist!");
-        this.aboutPanel = aboutPanel;
-
         const startButton = document.getElementById("startButton");
         if (startButton === null) throw new Error("#startButton does not exist!");
         startButton.addEventListener("click", () => {
@@ -151,21 +180,28 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
         this.initLoadSavePanel();
 
         loadSaveButton.addEventListener("click", () => {
-            this.toggleActivePanel(this.loadSavePanel);
+            this.sidePanels.toggleActivePanel(PanelType.LOAD_SAVE);
         });
 
         const settingsButton = document.getElementById("settingsButton");
         if (settingsButton === null) throw new Error("#settingsButton does not exist!");
 
         settingsButton.addEventListener("click", () => {
-            this.toggleActivePanel(this.settingsPanel);
+            this.sidePanels.toggleActivePanel(PanelType.SETTINGS);
+        });
+
+        const tutorialsButton = document.getElementById("tutorialsButton");
+        if (tutorialsButton === null) throw new Error("#tutorialsButton does not exist!");
+
+        tutorialsButton.addEventListener("click", () => {
+            this.sidePanels.toggleActivePanel(PanelType.TUTORIALS);
         });
 
         const contributeButton = document.getElementById("contributeButton");
         if (contributeButton === null) throw new Error("#contributeButton does not exist!");
 
         contributeButton.addEventListener("click", () => {
-            this.toggleActivePanel(this.contributePanel);
+            this.sidePanels.toggleActivePanel(PanelType.CONTRIBUTE);
             this.onContributeObservable.notifyObservers();
         });
 
@@ -173,7 +209,7 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
         if (creditsButton === null) throw new Error("#creditsButton does not exist!");
 
         creditsButton.addEventListener("click", () => {
-            this.toggleActivePanel(this.creditsPanel);
+            this.sidePanels.toggleActivePanel(PanelType.CREDITS);
             this.onCreditsObservable.notifyObservers();
         });
 
@@ -181,7 +217,7 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
         if (aboutButton === null) throw new Error("#aboutButton does not exist!");
 
         aboutButton.addEventListener("click", () => {
-            this.toggleActivePanel(this.aboutPanel);
+            this.sidePanels.toggleActivePanel(PanelType.ABOUT);
             this.onAboutObservable.notifyObservers();
         });
     }
@@ -192,7 +228,7 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
         this.starSystemView.onInitStarSystem.addOnce(() => {
             this.starSystemView.switchToDefaultControls();
             const nbRadius = this.starSystemController.model.getBodyTypeOfStellarObject(0) === BodyType.BLACK_HOLE ? 8 : 2;
-            const targetObject = this.starSystemController.planets.length > 0 ? this.starSystemController.planets[0] : this.starSystemController.stellarObjects[0];
+            const targetObject = this.starSystemController.getOrbitalObjects()[this.orbitalObjectIndex];
             positionNearObjectWithStarVisible(this.controls, targetObject, this.starSystemController, nbRadius);
 
             Settings.TIME_MULTIPLIER = 3;
@@ -284,26 +320,24 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
     }
 
     private startAnimation(onAnimationFinished: () => void) {
-        this.hideActivePanel();
+        this.sidePanels.hideActivePanel();
         Settings.TIME_MULTIPLIER = 1;
 
         const currentForward = getForwardDirection(this.controls.getTransform());
 
-        const planet = this.starSystemController.planets[0];
-        const newForward = planet.getTransform().getAbsolutePosition().subtract(this.controls.getTransform().getAbsolutePosition()).normalize();
+        const orbitalObject = this.starSystemController.getOrbitalObjects()[this.orbitalObjectIndex];
+        const celestialBody = this.starSystemController.getBodies().find((body) => body.name === orbitalObject.name);
+        if (celestialBody === undefined) {
+            throw new Error("No corresponding celestial body found");
+        }
+        const newForward = celestialBody.getTransform().getAbsolutePosition().subtract(this.controls.getTransform().getAbsolutePosition()).normalize();
         const axis = Vector3.Cross(currentForward, newForward);
         const angle = Vector3.GetAngleBetweenVectors(currentForward, newForward, axis);
-        const duration = 2;
 
-        const rotationAnimation = new TransformRotationAnimation(this.controls.getTransform(), axis, angle, duration);
-        const translationAnimation = new TransformTranslationAnimation(
-            this.controls.getTransform(),
-            this.controls
-                .getTransform()
-                .getAbsolutePosition()
-                .add(newForward.scale(-planet.model.radius * 2)),
-            duration
-        );
+        const targetPosition = positionNearObjectAsteroidField(celestialBody, this.starSystemController);
+
+        const rotationAnimation = new TransformRotationAnimation(this.controls.getTransform(), axis, angle, this.startAnimationDurationSeconds);
+        const translationAnimation = new TransformTranslationAnimation(this.controls.getTransform(), targetPosition, this.startAnimationDurationSeconds);
 
         if (this.title === null) throw new Error("Title is null");
 
@@ -319,11 +353,13 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
                 }
             ],
             {
-                duration: duration * 1000,
+                duration: this.startAnimationDurationSeconds * 1000,
                 easing: "ease-in-out",
                 fill: "forwards"
             }
         );
+
+        Sounds.MAIN_MENU_BACKGROUND_MUSIC.setVolume(0, this.startAnimationDurationSeconds);
 
         const animationCallback = () => {
             const deltaTime = this.scene.getEngine().getDeltaTime() / 1000;
@@ -340,9 +376,6 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
                 return;
             }
 
-            const currentProgress = translationAnimation.getProgress();
-            Sounds.MAIN_MENU_BACKGROUND_MUSIC.setVolume(1 - currentProgress);
-
             this.controls.getActiveCameras().forEach((camera) => camera.getViewMatrix());
 
             this.starSystemController.applyFloatingOrigin();
@@ -355,27 +388,6 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
         this.hideVersion();
     }
 
-    private toggleActivePanel(newPanel: HTMLElement) {
-        if (this.activeRightPanel === newPanel) {
-            this.hideActivePanel();
-            return;
-        }
-
-        if (this.activeRightPanel !== null) {
-            this.hideActivePanel();
-        }
-
-        this.activeRightPanel = newPanel;
-        newPanel.classList.add("visible");
-    }
-
-    private hideActivePanel() {
-        if (this.activeRightPanel !== null) {
-            this.activeRightPanel.classList.remove("visible");
-            this.activeRightPanel = null;
-        }
-    }
-
     private hideVersion() {
         if (this.version === null) throw new Error("Version is null");
         this.version.style.transform = "translateY(100%)";
@@ -385,6 +397,14 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
         const menuItems = document.getElementById("menuItems");
         if (menuItems === null) throw new Error("#menuItems does not exist!");
         menuItems.style.left = "-20%";
+    }
+
+    public hide() {
+        this.hideVersion();
+        this.hideMenu();
+        this.sidePanels.hideActivePanel();
+        this.htmlRoot.style.display = "none";
+        Sounds.MAIN_MENU_BACKGROUND_MUSIC.setVolume(0, 2);
     }
 
     public isVisible() {

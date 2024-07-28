@@ -44,6 +44,10 @@ export class StarMapUI {
     readonly selectedSystemRing: Image;
     readonly currentSystemRing: Image;
 
+    readonly htmlRoot: HTMLDivElement;
+
+    readonly cursor: HTMLDivElement;
+
     readonly scene: Scene;
     readonly uiCamera: FreeCamera;
 
@@ -129,6 +133,20 @@ export class StarMapUI {
         ]);
 
         this.hoveredSystemRing.animations = [StarMapUI.ALPHA_ANIMATION];
+
+        this.htmlRoot = document.createElement("div");
+        this.htmlRoot.classList.add("starMapUI");
+
+        this.cursor = document.createElement("div");
+        this.cursor.classList.add("cursor");
+
+        this.htmlRoot.appendChild(this.cursor);
+
+        document.body.appendChild(this.htmlRoot);
+
+        document.addEventListener("pointermove", (event) => {
+            this.cursor.style.transform = `translate(calc(${event.clientX}px - 50%), calc(${event.clientY}px - 50%))`;
+        });
     }
 
     isHovered() {
@@ -204,5 +222,11 @@ export class StarMapUI {
     setSelectedSystem({ name, text }: { name: string; text: string }) {
         this.namePlate.text = name;
         this.descriptionPanel.text = text;
+    }
+
+    dispose() {
+        this.scene.dispose();
+        this.gui.dispose();
+        this.htmlRoot.remove();
     }
 }

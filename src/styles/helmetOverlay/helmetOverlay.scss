@@ -23,12 +23,24 @@
   left: 0;
   bottom: 0;
   right: 0;
-  z-index: 2;
+  z-index: 30;
   pointer-events: none;
+  cursor: none;
 
   font-family: Nasalization, sans-serif;
 
   @import "targetHelper.scss";
+
+  .cursor {
+    position: absolute;
+    width: 30px;
+    height: 40px;
+    transform-origin: center;
+    background: url('../asset/shipCursor.webp') no-repeat center;
+    background-size: cover;
+    pointer-events: none;
+    filter: drop-shadow(0 0 5px white) hue-rotate(-30deg);
+  }
 
   #bodyData {
     position: absolute;

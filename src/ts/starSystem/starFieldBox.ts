@@ -44,7 +44,6 @@ export class StarFieldBox implements Transformable {
         this.material.reflectionTexture.gammaSpace = true;
         this.material.reflectionTexture.coordinatesMode = Texture.SKYBOX_MODE;
         this.material.disableLighting = true;
-        this.material.freeze();
 
         this.mesh.material = this.material;
         this.mesh.infiniteDistance = true;
@@ -54,7 +53,6 @@ export class StarFieldBox implements Transformable {
 
     setRotationMatrix(rotationMatrix: Matrix): void {
         this.texture.setReflectionTextureMatrix(rotationMatrix);
-        this.material.markDirty(true);
     }
 
     getRotationMatrix(): Matrix {
