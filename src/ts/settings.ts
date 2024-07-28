@@ -22,7 +22,7 @@ export const Settings = {
 
     POWER_PLAY_SEED: 77,
 
-    EARTH_RADIUS: 1000e3, // target is 6000e3
+    EARTH_RADIUS: 6000e3, // target is 6000e3
 
     EARTH_MASS: 5.972e24,
 
