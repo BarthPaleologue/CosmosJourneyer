@@ -22,7 +22,7 @@ export const Settings = {
 
     POWER_PLAY_SEED: 77,
 
-    EARTH_RADIUS: 1000e3, // target is 6000e3
+    EARTH_RADIUS: 6000e3, // target is 6000e3
 
     VERTEX_RESOLUTION: 64,
     MIN_DISTANCE_BETWEEN_VERTICES: 1.5,
