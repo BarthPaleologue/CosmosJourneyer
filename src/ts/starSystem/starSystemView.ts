@@ -658,6 +658,7 @@ export class StarSystemView implements View {
             this.defaultControls = new DefaultControls(this.scene);
             this.defaultControls.speed = 0.2 * Settings.EARTH_RADIUS;
             this.defaultControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
+            this.defaultControls.getCameras().forEach((camera) => (camera.minZ = 0.1));
         }
 
         const spaceshipSerialized = this.player.serializedSpaceships.shift();
@@ -669,6 +670,7 @@ export class StarSystemView implements View {
         if (this.spaceshipControls === null) {
             this.spaceshipControls = new ShipControls(spaceship, this.scene);
             this.spaceshipControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
+            this.spaceshipControls.getCameras().forEach((camera) => (camera.minZ = 0.1));
         } else {
             const oldSpaceship = this.spaceshipControls.getSpaceship();
             this.spaceshipControls.reset();
@@ -680,6 +682,7 @@ export class StarSystemView implements View {
             this.characterControls = new CharacterControls(this.scene);
             this.characterControls.getTransform().setEnabled(false);
             this.characterControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
+            this.characterControls.getCameras().forEach((camera) => (camera.minZ = 0.1));
         }
 
         await this.scene.setActiveControls(this.spaceshipControls);
