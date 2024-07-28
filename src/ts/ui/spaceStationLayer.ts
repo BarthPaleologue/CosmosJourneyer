@@ -30,7 +30,6 @@ export class SpaceStationLayer {
         }
         this.parentNode = document.getElementById("spaceStationUI") as HTMLElement;
         this.spaceStationHeader = document.getElementById("spaceStationHeader") as HTMLElement;
-        this.spaceStationHeader.innerText += "from TS!";
     }
 
     public setVisibility(visible: boolean) {
@@ -44,6 +43,8 @@ export class SpaceStationLayer {
 
     public setStation(station: SpaceStationModel) {
         this.currentStation = station;
-        this.spaceStationHeader.innerText = station.name;
+        this.spaceStationHeader.innerHTML = `
+            <p class="welcomeTo">Welcome to</p>
+            <p class="spaceStationName">${station.name}</p>`;
     }
 }

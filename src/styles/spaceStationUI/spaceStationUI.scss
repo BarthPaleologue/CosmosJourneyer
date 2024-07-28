@@ -21,15 +21,32 @@ $gaps: 20px;
     column-gap: $gaps;
 
     &>* {
-        background: rgba(100, 100, 200, 0.3);
-        backdrop-filter: blur(10px);
+        box-shadow: 0 0 20px black;
+        background: rgba(20, 20, 50, 0.8);
+        backdrop-filter: blur(3px);
+
         color: white;
     }
 
     #spaceStationHeader {
-        background: rgba(100, 100, 200, 0.3);
-        backdrop-filter: blur(10px);
-        font-size: 200%;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+
+        padding: 0 20px;
+
+        p {
+            margin-block: 0;
+        }
+
+        .welcomeTo {
+            font-size: 150%;
+        }
+
+        .spaceStationName {
+            font-size: 300%;
+        }
     }
 
     #spaceStationActions {
