@@ -122,7 +122,7 @@ float contrast(float val, float contrast_offset, float contrast_mid_level)
 void main() {
     vec4 screenColor = texture2D(textureSampler, vUV);// the current screen color
 
-    vec3 pixelWorldPosition = worldFromUV(vUV, camera_inverseProjection, camera_inverseView);// the pixel position in world space (near plane)
+    vec3 pixelWorldPosition = worldFromUV(vUV, camera_inverseProjectionView);// the pixel position in world space (near plane)
     vec3 rayDir = normalize(pixelWorldPosition - camera_position);// normalized direction of the ray
 
     float depth = texture2D(depthSampler, vUV).r;// the depth corresponding to the pixel in the depth map
