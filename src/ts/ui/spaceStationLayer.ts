@@ -17,7 +17,7 @@
 
 import spaceStationHTML from "../../html/spaceStationUI.html";
 
-export class SpaceStationUI {
+export class SpaceStationLayer {
     private parentNode: HTMLElement;
     private spaceStationHeader: HTMLElement;
 

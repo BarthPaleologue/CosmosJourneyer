@@ -34,7 +34,7 @@ import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { Star } from "./stellarObjects/star/star";
 import { Settings } from "./settings";
 import { SpaceStationModel } from "./spacestation/spacestationModel";
-import { SpaceStationUI } from "./ui/spaceStationUI";
+import { SpaceStationLayer } from "./ui/spaceStationLayer";
 import { StarFieldBox } from "./starSystem/starFieldBox";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
@@ -105,7 +105,7 @@ scene.onBeforePhysicsObservable.add(() => {
 });
 
 
-//const spaceStationUI = new SpaceStationUI();
+//const spaceStationUI = new SpaceStationLayer();
 
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
