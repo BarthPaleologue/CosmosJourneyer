@@ -21,7 +21,7 @@ import { Tools } from "@babylonjs/core/Misc/tools";
 
 export const Settings = {
     UNIVERSE_SEED: Math.PI,
-    EARTH_RADIUS: 1000e3, // target is 6000e3
+    EARTH_RADIUS: 6000e3, // target is 6000e3
 
     /**
      * The distance light travels in one year.

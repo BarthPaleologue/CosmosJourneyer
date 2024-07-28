@@ -60,7 +60,7 @@ export class GasPlanetModel implements PlanetModel {
         this.radius = randRangeInt(Settings.EARTH_RADIUS * 4, Settings.EARTH_RADIUS * 20, this.rng, GenerationSteps.RADIUS);
 
         // Todo: do not hardcode
-        let orbitRadius = this.rng(GenerationSteps.ORBIT) * 15e9;
+        let orbitRadius = 2e9 + this.rng(GenerationSteps.ORBIT) * 300e9;
 
         const orbitalP = clamp(0.7, 3.0, normalRandom(2.0, 0.3, this.rng, GenerationSteps.ORBIT + 80));
         orbitRadius += orbitRadius - getPeriapsis(orbitRadius, orbitalP);

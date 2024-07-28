@@ -93,7 +93,7 @@ export class TelluricPlanetModel implements PlanetModel {
             : Vector3.Up().applyRotationQuaternionInPlace(Quaternion.RotationAxis(Axis.X, (this.rng(GenerationSteps.ORBIT + 20) - 0.5) * 0.2));
 
         // Todo: do not hardcode
-        let orbitRadius = 2e9 + this.rng(GenerationSteps.ORBIT) * 15e9;
+        let orbitRadius = 12e9 + this.rng(GenerationSteps.ORBIT) * 150e9;
 
         const orbitalP = 2; //clamp(normalRandom(2.0, 0.3, this.rng, GenerationSteps.Orbit + 80), 0.7, 3.0);
 
