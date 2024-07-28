@@ -50,5 +50,29 @@ $gaps: 20px;
 
     #spaceStationActions {
         grid-column-start: 2;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        row-gap: 5px;
+
+        .flexGrow {
+            flex-grow: 1;
+        }
+
+        .spaceStationAction {
+            padding: 0 20px;
+            align-self: stretch;
+
+            background: rgba(253, 140, 26, 0.5);
+
+            transition: .2s;
+
+            &:hover {
+                cursor: pointer;
+                background: rgba(253, 140, 26, 0.8);
+            }
+        }
     }
 }
