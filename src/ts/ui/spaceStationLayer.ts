@@ -17,6 +17,7 @@
 
 import spaceStationHTML from "../../html/spaceStationUI.html";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
+import { Observable } from "@babylonjs/core/Misc/observable";
 
 export class SpaceStationLayer {
     private parentNode: HTMLElement;
@@ -24,12 +25,25 @@ export class SpaceStationLayer {
 
     private currentStation: SpaceStationModel | null = null;
 
+    private takeOffButton: HTMLElement;
+
+    readonly onTakeOffObservable = new Observable<void>();
+
     constructor() {
         if (document.querySelector("#spaceStationUI") === null) {
             document.body.insertAdjacentHTML("beforeend", spaceStationHTML);
         }
         this.parentNode = document.getElementById("spaceStationUI") as HTMLElement;
         this.spaceStationHeader = document.getElementById("spaceStationHeader") as HTMLElement;
+
+        const takeOffButton = document.querySelector<HTMLElement>(".spaceStationAction.takeOffButton");
+        if (takeOffButton === null) {
+            throw new Error("Take off button not found");
+        }
+        this.takeOffButton = takeOffButton;
+        this.takeOffButton.addEventListener("click", () => {
+            this.onTakeOffObservable.notifyObservers();
+        });
     }
 
     public setVisibility(visible: boolean) {

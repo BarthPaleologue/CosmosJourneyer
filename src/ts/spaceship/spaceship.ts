@@ -319,6 +319,8 @@ export class Spaceship implements Transformable {
         this.getTransform().parent = null;
         this.getTransform().setAbsolutePosition(currentPosition);
         this.getTransform().rotationQuaternion = currentRotation;
+
+        this.aggregate.body.applyImpulse(this.getTransform().up.scale(200), this.getTransform().getAbsolutePosition());
     }
 
     private land(deltaTime: number) {

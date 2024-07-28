@@ -374,6 +374,9 @@ export class StarSystemView implements View {
 
         this.spaceStationLayer = new SpaceStationLayer();
         this.spaceStationLayer.setVisibility(false);
+        this.spaceStationLayer.onTakeOffObservable.add(() => {
+            this.spaceshipControls?.spaceship.takeOff();
+        });
 
         this.targetCursorLayer = new TargetCursorLayer();
     }
