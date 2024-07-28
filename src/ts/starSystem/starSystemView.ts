@@ -39,12 +39,7 @@ import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge"
 import { DefaultControls } from "../defaultControls/defaultControls";
 import { CharacterControls } from "../characterControls/characterControls";
 import { Assets } from "../assets/assets";
-import {
-    getForwardDirection,
-    getRotationQuaternion,
-    setRotationQuaternion,
-    translate
-} from "../uberCore/transforms/basicTransform";
+import { getForwardDirection, getRotationQuaternion, setRotationQuaternion, translate } from "../uberCore/transforms/basicTransform";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { View } from "../utils/view";
@@ -74,6 +69,7 @@ import { Sounds } from "../assets/sounds";
 import { Materials } from "../assets/materials";
 import { SpaceStation } from "../spacestation/spaceStation";
 import { ObjectTargetCursorType } from "../ui/objectTargetCursor";
+import { SpaceStationLayer } from "../ui/spaceStationLayer";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -90,6 +86,13 @@ export class StarSystemView implements View {
      * The HTML UI responsible for the name of the closest orbital object, the velocity of the spaceship and the target helper radar.
      */
     readonly spaceShipLayer: SpaceShipLayer;
+
+    /**
+     * The HTML UI responsible for the interaction with space stations
+     */
+    readonly spaceStationLayer: SpaceStationLayer;
+
+    private isUiEnabled = true;
 
     /**
      * A debug HTML UI to change the properties of the closest celestial body
@@ -193,12 +196,9 @@ export class StarSystemView implements View {
             }
         ]);
 
-        StarSystemInputs.map.toggleOverlay.on("complete", () => {
-            const enabled = !this.targetCursorLayer.isEnabled();
-            if (enabled) Sounds.MENU_HOVER_SOUND.play();
-            else Sounds.MENU_HOVER_SOUND.play();
-            this.targetCursorLayer.setEnabled(enabled);
-            this.spaceShipLayer.setVisibility(enabled);
+        StarSystemInputs.map.toggleUi.on("complete", () => {
+            this.isUiEnabled = !this.isUiEnabled;
+            Sounds.MENU_HOVER_SOUND.play();
         });
 
         StarSystemInputs.map.toggleOrbitsAndAxis.on("complete", () => {
@@ -372,6 +372,9 @@ export class StarSystemView implements View {
         this.bodyEditor.resize();
         this.spaceShipLayer.setVisibility(false);
 
+        this.spaceStationLayer = new SpaceStationLayer();
+        this.spaceStationLayer.setVisibility(false);
+
         this.targetCursorLayer = new TargetCursorLayer();
     }
 
@@ -479,10 +482,9 @@ export class StarSystemView implements View {
         starSystem.initPositions(2, this.chunkForge, this.postProcessManager);
         this.targetCursorLayer.reset();
 
-
         starSystem.celestialBodies.forEach((body) => {
             let maxDistance = 0.0;
-            if(body.parent !== null && body.parent.parent !== null) {
+            if (body.parent !== null && body.parent.parent !== null) {
                 // this is a satellite of a planet orbiting a star
                 maxDistance = body.getOrbitProperties().radius * 8.0;
             }
@@ -492,8 +494,8 @@ export class StarSystemView implements View {
         starSystem.spaceStations.forEach((spaceStation) => {
             this.targetCursorLayer.addObject(spaceStation, ObjectTargetCursorType.FACILITY, spaceStation.getBoundingRadius() * 6.0, 0.0);
 
-            spaceStation.getLandingPads().forEach(landingPad => {
-               this.targetCursorLayer.addObject(landingPad, ObjectTargetCursorType.LANDING_PAD, landingPad.getBoundingRadius() * 4.0, 2e3);
+            spaceStation.getLandingPads().forEach((landingPad) => {
+                this.targetCursorLayer.addObject(landingPad, ObjectTargetCursorType.LANDING_PAD, landingPad.getBoundingRadius() * 4.0, 2e3);
             });
         });
 
@@ -575,11 +577,10 @@ export class StarSystemView implements View {
             this.spaceShipLayer.displaySpeed(this.spaceshipControls.spaceship.getThrottle(), this.spaceshipControls.spaceship.getSpeed());
         }
 
-
         this.characterControls.setClosestWalkableObject(nearestOrbitalObject);
         this.spaceshipControls.spaceship.setClosestWalkableObject(nearestOrbitalObject);
 
-        if(nearestOrbitalObject instanceof SpaceStation) {
+        if (nearestOrbitalObject instanceof SpaceStation) {
             this.spaceshipControls.setClosestLandableFacility(nearestOrbitalObject);
         } else {
             this.spaceshipControls.setClosestLandableFacility(null);
@@ -612,6 +613,25 @@ export class StarSystemView implements View {
         if (targetLandingPad !== null && !this.spaceshipControls.spaceship.isLanded() && this.targetCursorLayer.getTarget() !== targetLandingPad) {
             this.targetCursorLayer.setTarget(targetLandingPad);
         }
+
+        if (this.spaceshipControls.spaceship.isLandedAtFacility() && this.isUiEnabled) {
+            this.spaceStationLayer.setVisibility(true);
+            const facility = this.spaceshipControls.getClosestLandableFacility();
+            this.getStarSystem()
+                .getSpaceStations()
+                .find((spaceStation) => {
+                    if (spaceStation === facility) {
+                        this.spaceStationLayer.setStation(spaceStation.model);
+                        return true;
+                    }
+                    return false;
+                });
+        } else {
+            this.spaceStationLayer.setVisibility(false);
+        }
+
+        this.targetCursorLayer.setEnabled(this.isUiEnabled && !this.spaceshipControls.spaceship.isLandedAtFacility());
+        this.spaceShipLayer.setVisibility(this.isUiEnabled && this.scene.getActiveControls() === this.spaceshipControls && !this.spaceshipControls.spaceship.isLandedAtFacility());
     }
 
     /**
@@ -652,7 +672,7 @@ export class StarSystemView implements View {
         const characterControls = this.getCharacterControls();
         const defaultControls = this.getDefaultControls();
 
-        this.spaceShipLayer.setVisibility(true);
+        this.spaceShipLayer.setVisibility(this.isUiEnabled);
 
         characterControls.getTransform().setEnabled(false);
         CharacterInputs.setEnabled(false);
@@ -736,7 +756,7 @@ export class StarSystemView implements View {
     }
 
     public showHtmlUI() {
-        this.spaceShipLayer.setVisibility(true);
+        this.spaceShipLayer.setVisibility(this.isUiEnabled);
         this.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
     }
 

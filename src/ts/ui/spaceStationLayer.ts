@@ -16,11 +16,13 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import spaceStationHTML from "../../html/spaceStationUI.html";
+import { SpaceStationModel } from "../spacestation/spacestationModel";
 
 export class SpaceStationLayer {
     private parentNode: HTMLElement;
     private spaceStationHeader: HTMLElement;
 
+    private currentStation: SpaceStationModel | null = null;
 
     constructor() {
         if (document.querySelector("#spaceStationUI") === null) {
@@ -32,10 +34,16 @@ export class SpaceStationLayer {
     }
 
     public setVisibility(visible: boolean) {
+        if (this.isVisible() === visible) return;
         this.parentNode.style.visibility = visible ? "visible" : "hidden";
     }
 
     public isVisible(): boolean {
-        return this.parentNode.style.visibility === "visible";
+        return this.parentNode.style.visibility !== "hidden";
+    }
+
+    public setStation(station: SpaceStationModel) {
+        this.currentStation = station;
+        this.spaceStationHeader.innerText = station.name;
     }
 }

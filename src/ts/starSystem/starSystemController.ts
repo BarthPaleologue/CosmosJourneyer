@@ -183,6 +183,10 @@ export class StarSystemController {
         return this.celestialBodies;
     }
 
+    public getSpaceStations(): SpaceStation[] {
+        return this.spaceStations;
+    }
+
     public getOrbitalObjects(): OrbitalObject[] {
         const objects = [];
         for (const body of this.celestialBodies) objects.push(body);

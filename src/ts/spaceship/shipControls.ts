@@ -165,6 +165,10 @@ export class ShipControls implements Controls {
         this.closestLandableFacility = facility;
     }
 
+    public getClosestLandableFacility(): (Transformable & ManagesLandingPads) | null {
+        return this.closestLandableFacility;
+    }
+
     public update(deltaTime: number): Vector3 {
         this.spaceship.update(deltaTime);
 
