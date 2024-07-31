@@ -404,45 +404,43 @@ export class CosmosJourneyer {
 
         const seed = SystemSeed.Deserialize(universeCoordinates.starSystem);
 
-        this.starSystemView.onInitStarSystem.addOnce(() => {
-            this.starSystemView.switchToSpaceshipControls();
-
-            const playerTransform = this.starSystemView.scene.getActiveControls().getTransform();
-
-            const nearestOrbitalObject = this.starSystemView.getStarSystem().getOrbitalObjects()[universeCoordinates.orbitalObjectIndex];
-            const nearestOrbitalObjectWorld = nearestOrbitalObject.getTransform().getWorldMatrix();
-            const currentLocalPosition = new Vector3(universeCoordinates.positionX, universeCoordinates.positionY, universeCoordinates.positionZ);
-            const currentWorldPosition = Vector3.TransformCoordinates(currentLocalPosition, nearestOrbitalObjectWorld);
-            playerTransform.setAbsolutePosition(currentWorldPosition);
-
-            const nearestOrbitalObjectWorldRotation = nearestOrbitalObject.getTransform().absoluteRotationQuaternion;
-            const currentLocalRotationQuaternion = new Quaternion(
-                universeCoordinates.rotationQuaternionX,
-                universeCoordinates.rotationQuaternionY,
-                universeCoordinates.rotationQuaternionZ,
-                universeCoordinates.rotationQuaternionW
-            );
-            const currentWorldRotationQuaternion = currentLocalRotationQuaternion.multiply(nearestOrbitalObjectWorldRotation);
-            setRotationQuaternion(playerTransform, currentWorldRotationQuaternion);
-
-            // updates camera position
-            this.starSystemView
-                .getSpaceshipControls()
-                .getActiveCameras()
-                .forEach((camera) => camera.getViewMatrix(true));
-
-            // re-centers the star system
-            this.starSystemView.getStarSystem().applyFloatingOrigin();
-
-            // set the ui target to the nearest orbital object
-            this.starSystemView.targetCursorLayer.setTarget(nearestOrbitalObject);
-            this.starSystemView.spaceShipLayer.setTarget(nearestOrbitalObject.getTransform());
-        });
-
         await this.starSystemView.loadStarSystem(new StarSystemController(seed, this.starSystemView.scene), true);
 
         if (this.state === EngineState.UNINITIALIZED) await this.init(true);
         else this.starSystemView.initStarSystem();
+
+        this.starSystemView.switchToSpaceshipControls();
+
+        const playerTransform = this.starSystemView.scene.getActiveControls().getTransform();
+
+        const nearestOrbitalObject = this.starSystemView.getStarSystem().getOrbitalObjects()[universeCoordinates.orbitalObjectIndex];
+        const nearestOrbitalObjectWorld = nearestOrbitalObject.getTransform().getWorldMatrix();
+        const currentLocalPosition = new Vector3(universeCoordinates.positionX, universeCoordinates.positionY, universeCoordinates.positionZ);
+        const currentWorldPosition = Vector3.TransformCoordinates(currentLocalPosition, nearestOrbitalObjectWorld);
+        playerTransform.setAbsolutePosition(currentWorldPosition);
+
+        const nearestOrbitalObjectWorldRotation = nearestOrbitalObject.getTransform().absoluteRotationQuaternion;
+        const currentLocalRotationQuaternion = new Quaternion(
+            universeCoordinates.rotationQuaternionX,
+            universeCoordinates.rotationQuaternionY,
+            universeCoordinates.rotationQuaternionZ,
+            universeCoordinates.rotationQuaternionW
+        );
+        const currentWorldRotationQuaternion = currentLocalRotationQuaternion.multiply(nearestOrbitalObjectWorldRotation);
+        setRotationQuaternion(playerTransform, currentWorldRotationQuaternion);
+
+        // updates camera position
+        this.starSystemView
+            .getSpaceshipControls()
+            .getActiveCameras()
+            .forEach((camera) => camera.getViewMatrix(true));
+
+        // re-centers the star system
+        this.starSystemView.getStarSystem().applyFloatingOrigin();
+
+        // set the ui target to the nearest orbital object
+        this.starSystemView.targetCursorLayer.setTarget(nearestOrbitalObject);
+        this.starSystemView.spaceShipLayer.setTarget(nearestOrbitalObject.getTransform());
 
         this.engine.loadingScreen.hideLoadingUI();
     }
