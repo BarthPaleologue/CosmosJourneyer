@@ -17,7 +17,6 @@
 
 import projectInfo from "../../package.json";
 
-import { StarSystemController } from "./starSystem/starSystemController";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { VideoRecorder } from "@babylonjs/core/Misc/videoRecorder";
@@ -407,7 +406,7 @@ export class CosmosJourneyer {
 
         const seed = SystemSeed.Deserialize(universeCoordinates.starSystem);
 
-        await this.starSystemView.loadStarSystem(new StarSystemController(seed, this.starSystemView.scene), true);
+        await this.starSystemView.loadStarSystemFromSeed(seed);
 
         if (this.state === EngineState.UNINITIALIZED) await this.init(true);
         else this.starSystemView.initStarSystem();

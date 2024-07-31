@@ -279,7 +279,7 @@ export class StarSystemView implements View {
 
             const systemSeed = target.seed;
             this.isLoadingSystem = true;
-            await this.loadStarSystem(new StarSystemController(systemSeed, this.scene), true);
+            await this.loadStarSystemFromSeed(systemSeed);
             this.initStarSystem();
 
             this.spaceshipControls?.spaceship.hyperSpaceTunnel.setEnabled(false);
@@ -379,6 +379,10 @@ export class StarSystemView implements View {
         });
 
         this.targetCursorLayer = new TargetCursorLayer();
+    }
+
+    public async loadStarSystemFromSeed(seed: SystemSeed) {
+        await this.loadStarSystem(new StarSystemController(seed, this.scene), true);
     }
 
     /**
