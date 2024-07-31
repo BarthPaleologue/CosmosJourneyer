@@ -341,18 +341,20 @@ export class CosmosJourneyer {
         const currentStarSystem = this.starSystemView.getStarSystem();
         const seed = currentStarSystem.model.seed;
 
+        const spaceShipControls = this.starSystemView.getSpaceshipControls();
+
         // Finding the index of the nearest orbital object
-        const nearestOrbitalObject = currentStarSystem.getNearestOrbitalObject(this.starSystemView.scene.getActiveControls().getTransform().getAbsolutePosition());
+        const nearestOrbitalObject = currentStarSystem.getNearestOrbitalObject(spaceShipControls.getTransform().getAbsolutePosition());
         const nearestOrbitalObjectIndex = currentStarSystem.getOrbitalObjects().indexOf(nearestOrbitalObject);
         if (nearestOrbitalObjectIndex === -1) throw new Error("Nearest orbital object not found");
 
         // Finding the position of the player in the nearest orbital object's frame of reference
-        const currentWorldPosition = this.starSystemView.scene.getActiveControls().getTransform().getAbsolutePosition();
+        const currentWorldPosition = spaceShipControls.getTransform().getAbsolutePosition();
         const nearestOrbitalObjectInverseWorld = nearestOrbitalObject.getTransform().getWorldMatrix().clone().invert();
         const currentLocalPosition = Vector3.TransformCoordinates(currentWorldPosition, nearestOrbitalObjectInverseWorld);
 
         // Finding the rotation of the player in the nearest orbital object's frame of reference
-        const currentWorldRotation = this.starSystemView.scene.getActiveControls().getTransform().absoluteRotationQuaternion;
+        const currentWorldRotation = spaceShipControls.getTransform().absoluteRotationQuaternion;
         const nearestOrbitalObjectInverseRotation = nearestOrbitalObject.getTransform().absoluteRotationQuaternion.clone().invert();
         const currentLocalRotation = currentWorldRotation.multiply(nearestOrbitalObjectInverseRotation);
 
@@ -368,7 +370,8 @@ export class CosmosJourneyer {
                 rotationQuaternionY: currentLocalRotation.y,
                 rotationQuaternionZ: currentLocalRotation.z,
                 rotationQuaternionW: currentLocalRotation.w
-            }
+            },
+            padNumber: spaceShipControls.spaceship.isLandedAtFacility() ? spaceShipControls.spaceship.getTargetLandingPad()?.padNumber : undefined
         };
     }
 

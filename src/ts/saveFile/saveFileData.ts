@@ -13,6 +13,11 @@ export type SaveFileData = {
      * The coordinates of the current star system and the coordinates inside the star system.
      */
     universeCoordinates: UniverseCoordinates;
+
+    /**
+     * If the player is landed at a facility, store the pad number to allow graceful respawn at the station
+     */
+    padNumber?: number;
 };
 
 /**
