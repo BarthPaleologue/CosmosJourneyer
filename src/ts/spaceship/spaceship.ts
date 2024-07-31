@@ -124,13 +124,7 @@ export class Spaceship implements Transformable {
         this.aggregate.body.setAngularDamping(0.9);
 
         this.aggregate.body.setCollisionCallbackEnabled(true);
-
         this.collisionObservable = this.aggregate.body.getCollisionObservable();
-        this.collisionObservable.add((collisionEvent: IPhysicsCollisionEvent) => {
-            console.log("Collision");
-            if (collisionEvent.impulse < 0.8) return;
-            console.log(collisionEvent);
-        });
 
         this.warpTunnel = new WarpTunnel(this.getTransform(), scene);
         this.hyperSpaceTunnel = new HyperSpaceTunnel(this.getTransform().getDirection(Axis.Z), scene);
@@ -284,6 +278,15 @@ export class Spaceship implements Transformable {
         this.landingTarget = null;
 
         this.onLandingObservable.notifyObservers();
+    }
+
+    public spawnOnPad(landingPad: LandingPad) {
+        this.getTransform().setParent(null);
+        this.engageLanding(landingPad);
+        this.getTransform().rotationQuaternion = Quaternion.Identity();
+        this.getTransform().position.copyFromFloats(0, 1.5, 0);
+        this.getTransform().parent = landingPad.getTransform();
+        this.completeLanding();
     }
 
     public isLanded(): boolean {

@@ -394,6 +394,25 @@ export class CosmosJourneyer {
      */
     public async loadSaveData(saveData: SaveFileData): Promise<void> {
         await this.loadUniverseCoordinates(saveData.universeCoordinates);
+
+        if(saveData.padNumber !== undefined) {
+            const padNumber = saveData.padNumber;
+
+            const shipPosition = this.starSystemView.getSpaceshipControls().getTransform().getAbsolutePosition();
+
+            const nearestOrbitalObject = this.starSystemView.getStarSystem().getNearestOrbitalObject(shipPosition);
+            const correspondingSpaceStation = this.starSystemView.getStarSystem().getSpaceStations().find((station) => station === nearestOrbitalObject);
+            if(correspondingSpaceStation === undefined) {
+                throw new Error("Tried loading a save with a pad number, but the closest orbital objects does not have landing pads!");
+            }
+
+            const landingPad = correspondingSpaceStation.getLandingPads().at(padNumber);
+            if(landingPad === undefined) {
+                throw new Error(`Could not find the pad with number ${padNumber} at this station: ${correspondingSpaceStation.model.name}`);
+            }
+
+            this.starSystemView.getSpaceshipControls().spaceship.spawnOnPad(landingPad);
+        }
     }
 
     /**
@@ -415,7 +434,11 @@ export class CosmosJourneyer {
 
         const playerTransform = this.starSystemView.scene.getActiveControls().getTransform();
 
-        const nearestOrbitalObject = this.starSystemView.getStarSystem().getOrbitalObjects()[universeCoordinates.orbitalObjectIndex];
+        const nearestOrbitalObject = this.starSystemView.getStarSystem().getOrbitalObjects().at(universeCoordinates.orbitalObjectIndex);
+        if(nearestOrbitalObject === undefined) {
+            throw new Error(`Could not find the nearest orbital object with index ${universeCoordinates.orbitalObjectIndex} among the ${this.starSystemView.getStarSystem().getOrbitalObjects().length} different objects`);
+        }
+
         const nearestOrbitalObjectWorld = nearestOrbitalObject.getTransform().getWorldMatrix();
         const currentLocalPosition = new Vector3(universeCoordinates.positionX, universeCoordinates.positionY, universeCoordinates.positionZ);
         const currentWorldPosition = Vector3.TransformCoordinates(currentLocalPosition, nearestOrbitalObjectWorld);
