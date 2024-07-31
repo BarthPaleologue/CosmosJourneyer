@@ -161,7 +161,5 @@ document.addEventListener("keydown", (e) => {
     }
 });
 
-starSystemView.targetCursorLayer.setEnabled(true);
-starSystemView.showHtmlUI();
 starSystemView.getSpaceshipControls().spaceship.enableWarpDrive();
 SpaceShipControlsInputs.setEnabled(true);

@@ -756,11 +756,7 @@ export class StarSystemView implements View {
     public hideHtmlUI() {
         this.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
         this.spaceShipLayer.setVisibility(false);
-    }
-
-    public showHtmlUI() {
-        this.spaceShipLayer.setVisibility(this.isUiEnabled);
-        this.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
+        this.targetCursorLayer.setEnabled(false);
     }
 
     public unZoom(callback: () => void) {
@@ -775,10 +771,10 @@ export class StarSystemView implements View {
                 .getActiveControls()
                 .getActiveCameras()
                 .forEach((camera) => (camera.animations = []));
-            this.hideHtmlUI();
             callback();
             this.scene.onAfterRenderObservable.addOnce(() => {
                 (activeControls as ShipControls).thirdPersonCamera.radius = 30;
+                this.hideHtmlUI();
             });
         });
     }

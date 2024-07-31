@@ -120,8 +120,6 @@ export class CosmosJourneyer {
             this.tutorialLayer.setTutorial(FlightTutorial.title, FlightTutorial.getContentPanelsHtml());
 
             this.starSystemView.switchToSpaceshipControls();
-            this.starSystemView.showHtmlUI();
-            this.starSystemView.targetCursorLayer.setEnabled(true);
         });
 
         this.mainMenu.onLoadSaveObservable.add(async (saveData: SaveFileData) => {
@@ -300,11 +298,8 @@ export class CosmosJourneyer {
             this.starMap.detachControl();
             this.starSystemView.attachControl();
 
-            this.starSystemView.targetCursorLayer.setEnabled(true);
-
             AudioManager.SetMask(AudioMasks.STAR_SYSTEM_VIEW);
             this.activeView = this.starSystemView;
-            this.starSystemView.showHtmlUI();
         }
     }
 
@@ -411,9 +406,6 @@ export class CosmosJourneyer {
 
         this.starSystemView.onInitStarSystem.addOnce(() => {
             this.starSystemView.switchToSpaceshipControls();
-
-            this.starSystemView.targetCursorLayer.setEnabled(true);
-            this.starSystemView.showHtmlUI();
 
             const playerTransform = this.starSystemView.scene.getActiveControls().getTransform();
 
