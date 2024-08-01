@@ -417,7 +417,7 @@ export class Spaceship implements Transformable {
     }
 
     public update(deltaSeconds: number) {
-        this.mainEngineTargetSpeed = Math.sign(this.mainEngineThrottle) * this.mainEngineThrottle ** 2 * 500;
+        this.mainEngineTargetSpeed = Math.sign(this.mainEngineThrottle) * this.mainEngineThrottle * 500;
 
         const warpSpeed = getForwardDirection(this.aggregate.transformNode).scale(this.warpDrive.getWarpSpeed());
 
