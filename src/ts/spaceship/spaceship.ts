@@ -282,7 +282,7 @@ export class Spaceship implements Transformable {
 
     public spawnOnPad(landingPad: LandingPad) {
         this.getTransform().setParent(null);
-        this.engageLanding(landingPad);
+        this.engageLandingOnPad(landingPad);
         this.getTransform().rotationQuaternion = Quaternion.Identity();
         this.getTransform().position.copyFromFloats(0, 1.5, 0);
         this.getTransform().parent = landingPad.getTransform();
