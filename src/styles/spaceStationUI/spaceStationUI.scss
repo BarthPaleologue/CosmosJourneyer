@@ -48,6 +48,17 @@ $gaps: 20px;
         }
     }
 
+    .mainContainer {
+        scale: 1;
+        transition: .2s ease-in-out;
+
+        padding: 0 20px;
+
+        &.hidden {
+            scale: 0;
+        }
+    }
+
     #spaceStationActions {
         grid-column-start: 2;
 

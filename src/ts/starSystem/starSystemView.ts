@@ -69,7 +69,7 @@ import { Sounds } from "../assets/sounds";
 import { Materials } from "../assets/materials";
 import { SpaceStation } from "../spacestation/spaceStation";
 import { ObjectTargetCursorType } from "../ui/objectTargetCursor";
-import { SpaceStationLayer } from "../ui/spaceStationLayer";
+import { SpaceStationLayer } from "../ui/spaceStation/spaceStationLayer";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the

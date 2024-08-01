@@ -34,7 +34,7 @@ import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { Star } from "./stellarObjects/star/star";
 import { Settings } from "./settings";
 import { SpaceStationModel } from "./spacestation/spacestationModel";
-import { SpaceStationLayer } from "./ui/spaceStationLayer";
+import { SpaceStationLayer } from "./ui/spaceStation/spaceStationLayer";
 import { StarFieldBox } from "./starSystem/starFieldBox";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;

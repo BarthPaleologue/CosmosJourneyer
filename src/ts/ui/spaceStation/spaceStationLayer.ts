@@ -15,9 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import spaceStationHTML from "../../html/spaceStationUI.html";
-import { SpaceStationModel } from "../spacestation/spacestationModel";
+import spaceStationHTML from "../../../html/spaceStationUI.html";
+import { SpaceStationModel } from "../../spacestation/spacestationModel";
 import { Observable } from "@babylonjs/core/Misc/observable";
+import { generateInfoHTML } from "./spaceStationInfos";
+
+enum MainPanelState {
+    NONE,
+    INFO
+}
 
 export class SpaceStationLayer {
     private parentNode: HTMLElement;
@@ -25,7 +31,13 @@ export class SpaceStationLayer {
 
     private currentStation: SpaceStationModel | null = null;
 
-    private takeOffButton: HTMLElement;
+    private readonly mainPanel: HTMLElement;
+
+    private readonly infoButton: HTMLElement;
+
+    private readonly takeOffButton: HTMLElement;
+
+    private mainPanelState: MainPanelState = MainPanelState.NONE;
 
     readonly onTakeOffObservable = new Observable<void>();
 
@@ -36,6 +48,17 @@ export class SpaceStationLayer {
         this.parentNode = document.getElementById("spaceStationUI") as HTMLElement;
         this.spaceStationHeader = document.getElementById("spaceStationHeader") as HTMLElement;
 
+        this.mainPanel = document.querySelector<HTMLElement>("#spaceStationUI .mainContainer") as HTMLElement;
+
+        const infoButton = document.querySelector<HTMLElement>(".spaceStationAction.infoButton");
+        if (infoButton === null) {
+            throw new Error("Info button not found");
+        }
+        this.infoButton = infoButton;
+        this.infoButton.addEventListener("click", () => {
+            this.setMainPanelState(MainPanelState.INFO);
+        });
+
         const takeOffButton = document.querySelector<HTMLElement>(".spaceStationAction.takeOffButton");
         if (takeOffButton === null) {
             throw new Error("Take off button not found");
@@ -44,6 +67,28 @@ export class SpaceStationLayer {
         this.takeOffButton.addEventListener("click", () => {
             this.onTakeOffObservable.notifyObservers();
         });
+    }
+
+    private setMainPanelState(state: MainPanelState) {
+        if(this.mainPanelState === state) {
+            this.mainPanelState = MainPanelState.NONE;
+        } else {
+            this.mainPanelState = state;
+        }
+
+        switch(this.mainPanelState) {
+            case MainPanelState.INFO:
+                if(this.currentStation === null) {
+                    throw new Error("No current station");
+                }
+                this.mainPanel.classList.remove("hidden");
+                this.mainPanel.innerHTML = generateInfoHTML(this.currentStation)
+                break;
+            case MainPanelState.NONE:
+                this.mainPanel.classList.add("hidden");
+                this.mainPanel.innerHTML = "";
+                break;
+        }
     }
 
     public setVisibility(visible: boolean) {
