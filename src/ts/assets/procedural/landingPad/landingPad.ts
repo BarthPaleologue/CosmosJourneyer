@@ -7,7 +7,7 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { LandingPadMaterial } from "./landingPadMaterial";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { CollisionMask } from "../../../settings";
+import { CollisionMask, Settings } from "../../../settings";
 import { TypedObject } from "../../../architecture/typedObject";
 import i18n from "../../../i18n";
 import { BoundingSphere } from "../../../architecture/boundingSphere";
@@ -37,14 +37,13 @@ export class LandingPad implements Transformable, TypedObject, BoundingSphere {
         this.padSize = padSize;
 
         const width = 40 * padSize;
-        const depth = width * 1.618;
-        const aspectRatio = width / depth;
+        const depth = width * Settings.LANDING_PAD_ASPECT_RATIO;
 
         this.boundingRadius = depth / 2;
 
         this.padNumber = padNumber;
 
-        this.deckMaterial = new LandingPadMaterial(padNumber, aspectRatio, scene);
+        this.deckMaterial = new LandingPadMaterial(padNumber, scene);
 
         this.deck = MeshBuilder.CreateBox(`Landing Pad ${padNumber}`, { width: width, depth: depth, height: 0.5 }, scene);
         this.deck.material = this.deckMaterial;

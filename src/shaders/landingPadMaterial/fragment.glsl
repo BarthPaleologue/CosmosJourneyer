@@ -52,12 +52,12 @@ void main() {
     float paintWeight = texture(numberTexture, vec2(vUV.y, vUV.x + 0.03)).a;
     vec3 paintColor = vec3(1.0);
     float borderThickness = 0.03;
-    if(vUV.x < borderThickness * aspectRatio || vUV.x > (1.0 - borderThickness * aspectRatio) || vUV.y < borderThickness || vUV.y > (1.0 - borderThickness)) {
+    if(vUV.x < borderThickness || vUV.x > (1.0 - borderThickness) || vUV.y < borderThickness * aspectRatio || vUV.y > (1.0 - borderThickness * aspectRatio)) {
         paintWeight = 1.0;
     }
 
     vec2 centeredUV = vUV - vec2(0.5);
-    centeredUV.y *= aspectRatio;
+    centeredUV.x *= aspectRatio;
 
     float radius = 0.25;
     float circleThickness = 0.01;
