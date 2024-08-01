@@ -36,12 +36,13 @@ export function generateInfoHTML(model: SpaceStationModel): string {
 
         <svg viewBox="-250 -250 700 500">
             ${arcs.map(({ path, data, color }, i) => `
-            <g>
+            <g class="pie-slice-group">
                 <path d="${path}" fill="${color}" class="pie-slice" title="${cropTypeToString(data[1])}"></path>
+
+                <rect x="250" y="${(i - arcs.length / 2) * 40}" width="30" height="30" fill="${color}"></rect>
+                <text x="290" y="${(i - arcs.length / 2) * 40 + 24}" font-size="24">${cropTypeToString(data[1])}</text>
             </g>
 
-            <rect x="250" y="${(i - arcs.length / 2) * 40}" width="30" height="30" fill="${color}"></rect>
-            <text x="290" y="${(i - arcs.length / 2) * 40 + 24}" font-size="24">${cropTypeToString(data[1])}</text>
 
             `).join("")}
         </svg>

@@ -63,14 +63,23 @@ $gaps: 20px;
             text {
                 fill: white;
                 font-family: Nasalization, sans-serif;
+                transition: .2s;
             }
 
-            .pie-slice {
-                scale: 1;
-                transition: .2s;
-
+            .pie-slice-group {
                 &:hover {
-                    scale: 1.05;
+                    .pie-slice {
+                        scale: 1.05;
+                    }
+
+                    text {
+                        text-decoration: underline solid white;
+                    }
+                }
+
+                .pie-slice {
+                    scale: 1;
+                    transition: .2s;
                 }
             }
         }
