@@ -61,7 +61,17 @@ $gaps: 20px;
 
         svg {
             text {
+                fill: white;
                 font-family: Nasalization, sans-serif;
+            }
+
+            .pie-slice {
+                scale: 1;
+                transition: .2s;
+
+                &:hover {
+                    scale: 1.05;
+                }
             }
         }
     }
