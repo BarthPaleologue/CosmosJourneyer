@@ -67,6 +67,8 @@ $gaps: 20px;
             }
 
             .pie-slice-group {
+                cursor: pointer;
+
                 &:hover {
                     .pie-slice {
                         scale: 1.05;
