@@ -2,6 +2,7 @@ import { SpaceStationModel } from "../../spacestation/spacestationModel";
 import { CropType, cropTypeToString } from "../../utils/agriculture";
 
 import * as d3 from "d3";
+import { makeD3PieChart } from "../../utils/d3PieChart";
 
 export function generateInfoHTML(model: SpaceStationModel): string {
     const agricultureMix = model.agricultureMix;
@@ -34,17 +35,6 @@ export function generateInfoHTML(model: SpaceStationModel): string {
 
         <h2>Agriculture mix</h2>
 
-        <svg viewBox="-250 -250 700 500">
-            ${arcs.map(({ path, data, color }, i) => `
-            <g class="pie-slice-group">
-                <path d="${path}" fill="${color}" class="pie-slice" title="${cropTypeToString(data[1])}"></path>
-
-                <rect x="250" y="${(i - arcs.length / 2) * 40}" width="30" height="30" fill="${color}"></rect>
-                <text x="290" y="${(i - arcs.length / 2) * 40 + 24}" font-size="24">${cropTypeToString(data[1])}</text>
-            </g>
-
-
-            `).join("")}
-        </svg>
+        ${makeD3PieChart<[number, CropType]>(agricultureMix, ([proportion, _]) => proportion, ([_, cropType]) => cropTypeToString(cropType))}
     `;
 }
