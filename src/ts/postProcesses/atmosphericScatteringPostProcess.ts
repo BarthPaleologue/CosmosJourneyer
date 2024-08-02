@@ -63,7 +63,7 @@ export class AtmosphericScatteringPostProcess extends PostProcess implements Obj
             atmosphereRadius: planet.getBoundingRadius() + atmosphereHeight,
             falloffFactor: 10,
             intensity: 11 * planet.model.physicalProperties.pressure,
-            rayleighStrength: 1,
+            rayleighStrength: 3,
             mieStrength: 1,
             densityModifier: 1,
             redWaveLength: 700 * (1 + centeredRand(planet.model.rng, 1300) / 6),
