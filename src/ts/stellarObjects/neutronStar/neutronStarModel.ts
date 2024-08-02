@@ -97,9 +97,4 @@ export class NeutronStarModel implements StellarObjectModel {
             this.rings = null;
         }
     }
-
-    public getNbSpaceStations(): number {
-        if (uniformRandBool(0.00001, this.rng, GenerationSteps.SPACE_STATIONS)) return 1;
-        return 0;
-    }
 }

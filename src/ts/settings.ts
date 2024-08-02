@@ -40,6 +40,8 @@ export const Settings = {
     ENABLE_VOLUMETRIC_CLOUDS: false,
     SEED_HALF_RANGE: 1e4,
 
+    HUMAN_BUBBLE_RADIUS_LY: 200,
+
     /**
      * The average daily intake for a human being in kcal/day
      * It is 2500 for males and 2000 for females, hence 2250.

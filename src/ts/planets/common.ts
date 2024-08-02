@@ -34,7 +34,6 @@ export function getMoonSeeds(model: PlanetModel) {
 }
 
 export function getSpaceStationSeed(model: CelestialBodyModel, index: number) {
-    if (index > model.getNbSpaceStations()) throw new Error("Space station out of bound! " + index);
     return centeredRand(model.rng, GenerationSteps.SPACE_STATIONS + index) * Settings.SEED_HALF_RANGE;
 }
 
