@@ -188,8 +188,8 @@ export class Textures {
             const numberTexture = new DynamicTexture(
                 `PadNumberTexture${i}`,
                 {
-                    width: padNumberTextureResolution * Settings.LANDING_PAD_ASPECT_RATIO,
-                    height: padNumberTextureResolution
+                    width: padNumberTextureResolution,
+                    height: padNumberTextureResolution * Settings.LANDING_PAD_ASPECT_RATIO
                 },
                 scene
             );
