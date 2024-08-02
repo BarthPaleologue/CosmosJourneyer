@@ -117,13 +117,15 @@ float contrast(float val, float contrast_offset, float contrast_mid_level)
 
 void main() {
     vec4 screenColor = texture2D(textureSampler, vUV);// the current screen color
+
     float depth = texture2D(depthSampler, vUV).r;// the depth corresponding to the pixel in the depth map
 
     vec3 pixelWorldPosition = worldFromUV(vUV, depth, camera_inverseProjectionView);// the pixel position in world space (near plane)
-    vec3 rayDir = normalize(worldFromUV(vUV, 1.0, camera_inverseProjectionView) - camera_position);// normalized direction of the ray
 
     // actual depth of the scene
     float maximumDistance = length(pixelWorldPosition - camera_position);
+
+    vec3 rayDir = normalize(worldFromUV(vUV, 1.0, camera_inverseProjectionView) - camera_position);
 
     float impactPoint, escapePoint;
     if (!(rayIntersectSphere(camera_position, rayDir, object_position, object_radius * object_scaling_determinant, impactPoint, escapePoint))) {

@@ -71,7 +71,7 @@ void main() {
     // actual depth of the scene
     float maximumDistance = length(pixelWorldPosition - camera_position);
 
-    vec3 rayDir = normalize(worldFromUV(vUV, 1.0, camera_inverseProjectionView) - camera_position);// normalized direction of the ray
+    vec3 rayDir = normalize(worldFromUV(vUV, 1.0, camera_inverseProjectionView) - camera_position);
 
     vec4 finalColor = screenColor;
 
@@ -107,7 +107,7 @@ void main() {
         vec3 ambiant = mix(oceanColor, screenColor.rgb, alpha);
 
         // if the camera is not inside the ocean
-        if(impactPoint > 0.0) {
+        if (impactPoint > 0.0) {
             // color of the sky
             vec3 reflectedSkyColor = vec3(0.6, 0.8, 0.95);
 
