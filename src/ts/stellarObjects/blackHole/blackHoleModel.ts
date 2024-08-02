@@ -117,7 +117,7 @@ export class BlackHoleModel implements StellarObjectModel {
      * The angular momentum is important in the Kerr metric to compute frame dragging.
      */
     public estimateAngularMomentum(): number {
-        if (this.physicalProperties.rotationPeriod === 0) 0;
+        if (this.physicalProperties.rotationPeriod === 0) return 0;
 
         const estimatedOriginalStarRadius = estimateStarRadiusFromMass(this.physicalProperties.mass);
 
