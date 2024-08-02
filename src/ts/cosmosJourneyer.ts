@@ -17,7 +17,6 @@
 
 import projectInfo from "../../package.json";
 
-import { StarSystemController } from "./starSystem/starSystemController";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { VideoRecorder } from "@babylonjs/core/Misc/videoRecorder";
@@ -56,6 +55,8 @@ import { TutorialLayer } from "./ui/tutorial/tutorialLayer";
 import { FlightTutorial } from "./tutorials/flightTutorial";
 import { SidePanels } from "./ui/sidePanels";
 import { Settings } from "./settings";
+import { SeededStarSystemModel } from "./starSystem/seededStarSystemModel";
+import { CustomStarSystemModel } from "./starSystem/customStarSystemModel";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -120,8 +121,6 @@ export class CosmosJourneyer {
             this.tutorialLayer.setTutorial(FlightTutorial.title, FlightTutorial.getContentPanelsHtml());
 
             this.starSystemView.switchToSpaceshipControls();
-            this.starSystemView.showHtmlUI();
-            this.starSystemView.targetCursorLayer.setEnabled(true);
         });
 
         this.mainMenu.onLoadSaveObservable.add(async (saveData: SaveFileData) => {
@@ -139,7 +138,10 @@ export class CosmosJourneyer {
         });
 
         this.starSystemView.onInitStarSystem.add(() => {
-            this.starMap.setCurrentStarSystem(this.starSystemView.getStarSystem().model.seed);
+            const starSystemModel = this.starSystemView.getStarSystem().model;
+            if (starSystemModel instanceof SeededStarSystemModel) {
+                this.starMap.setCurrentStarSystem(starSystemModel.seed);
+            }
         });
 
         this.pauseMenu = new PauseMenu(this.sidePanels);
@@ -300,11 +302,8 @@ export class CosmosJourneyer {
             this.starMap.detachControl();
             this.starSystemView.attachControl();
 
-            this.starSystemView.targetCursorLayer.setEnabled(true);
-
             AudioManager.SetMask(AudioMasks.STAR_SYSTEM_VIEW);
             this.activeView = this.starSystemView;
-            this.starSystemView.showHtmlUI();
         }
     }
 
@@ -344,20 +343,26 @@ export class CosmosJourneyer {
      */
     public generateSaveData(): SaveFileData {
         const currentStarSystem = this.starSystemView.getStarSystem();
+
+        if (!(currentStarSystem.model instanceof SeededStarSystemModel)) {
+            throw new Error("Cannot save inside a star system that has no generation seed");
+        }
         const seed = currentStarSystem.model.seed;
 
+        const spaceShipControls = this.starSystemView.getSpaceshipControls();
+
         // Finding the index of the nearest orbital object
-        const nearestOrbitalObject = currentStarSystem.getNearestOrbitalObject(this.starSystemView.scene.getActiveControls().getTransform().getAbsolutePosition());
+        const nearestOrbitalObject = currentStarSystem.getNearestOrbitalObject(spaceShipControls.getTransform().getAbsolutePosition());
         const nearestOrbitalObjectIndex = currentStarSystem.getOrbitalObjects().indexOf(nearestOrbitalObject);
         if (nearestOrbitalObjectIndex === -1) throw new Error("Nearest orbital object not found");
 
         // Finding the position of the player in the nearest orbital object's frame of reference
-        const currentWorldPosition = this.starSystemView.scene.getActiveControls().getTransform().getAbsolutePosition();
+        const currentWorldPosition = spaceShipControls.getTransform().getAbsolutePosition();
         const nearestOrbitalObjectInverseWorld = nearestOrbitalObject.getTransform().getWorldMatrix().clone().invert();
         const currentLocalPosition = Vector3.TransformCoordinates(currentWorldPosition, nearestOrbitalObjectInverseWorld);
 
         // Finding the rotation of the player in the nearest orbital object's frame of reference
-        const currentWorldRotation = this.starSystemView.scene.getActiveControls().getTransform().absoluteRotationQuaternion;
+        const currentWorldRotation = spaceShipControls.getTransform().absoluteRotationQuaternion;
         const nearestOrbitalObjectInverseRotation = nearestOrbitalObject.getTransform().absoluteRotationQuaternion.clone().invert();
         const currentLocalRotation = currentWorldRotation.multiply(nearestOrbitalObjectInverseRotation);
 
@@ -373,7 +378,8 @@ export class CosmosJourneyer {
                 rotationQuaternionY: currentLocalRotation.y,
                 rotationQuaternionZ: currentLocalRotation.z,
                 rotationQuaternionW: currentLocalRotation.w
-            }
+            },
+            padNumber: spaceShipControls.spaceship.isLandedAtFacility() ? spaceShipControls.spaceship.getTargetLandingPad()?.padNumber : undefined
         };
     }
 
@@ -397,6 +403,28 @@ export class CosmosJourneyer {
      */
     public async loadSaveData(saveData: SaveFileData): Promise<void> {
         await this.loadUniverseCoordinates(saveData.universeCoordinates);
+
+        if (saveData.padNumber !== undefined) {
+            const padNumber = saveData.padNumber;
+
+            const shipPosition = this.starSystemView.getSpaceshipControls().getTransform().getAbsolutePosition();
+
+            const nearestOrbitalObject = this.starSystemView.getStarSystem().getNearestOrbitalObject(shipPosition);
+            const correspondingSpaceStation = this.starSystemView
+                .getStarSystem()
+                .getSpaceStations()
+                .find((station) => station === nearestOrbitalObject);
+            if (correspondingSpaceStation === undefined) {
+                throw new Error("Tried loading a save with a pad number, but the closest orbital objects does not have landing pads!");
+            }
+
+            const landingPad = correspondingSpaceStation.getLandingPads().at(padNumber);
+            if (landingPad === undefined) {
+                throw new Error(`Could not find the pad with number ${padNumber} at this station: ${correspondingSpaceStation.model.name}`);
+            }
+
+            this.starSystemView.getSpaceshipControls().spaceship.spawnOnPad(landingPad);
+        }
     }
 
     /**
@@ -409,48 +437,49 @@ export class CosmosJourneyer {
 
         const seed = SystemSeed.Deserialize(universeCoordinates.starSystem);
 
-        this.starSystemView.onInitStarSystem.addOnce(() => {
-            this.starSystemView.switchToSpaceshipControls();
-
-            this.starSystemView.targetCursorLayer.setEnabled(true);
-            this.starSystemView.showHtmlUI();
-
-            const playerTransform = this.starSystemView.scene.getActiveControls().getTransform();
-
-            const nearestOrbitalObject = this.starSystemView.getStarSystem().getOrbitalObjects()[universeCoordinates.orbitalObjectIndex];
-            const nearestOrbitalObjectWorld = nearestOrbitalObject.getTransform().getWorldMatrix();
-            const currentLocalPosition = new Vector3(universeCoordinates.positionX, universeCoordinates.positionY, universeCoordinates.positionZ);
-            const currentWorldPosition = Vector3.TransformCoordinates(currentLocalPosition, nearestOrbitalObjectWorld);
-            playerTransform.setAbsolutePosition(currentWorldPosition);
-
-            const nearestOrbitalObjectWorldRotation = nearestOrbitalObject.getTransform().absoluteRotationQuaternion;
-            const currentLocalRotationQuaternion = new Quaternion(
-                universeCoordinates.rotationQuaternionX,
-                universeCoordinates.rotationQuaternionY,
-                universeCoordinates.rotationQuaternionZ,
-                universeCoordinates.rotationQuaternionW
-            );
-            const currentWorldRotationQuaternion = currentLocalRotationQuaternion.multiply(nearestOrbitalObjectWorldRotation);
-            setRotationQuaternion(playerTransform, currentWorldRotationQuaternion);
-
-            // updates camera position
-            this.starSystemView
-                .getSpaceshipControls()
-                .getActiveCameras()
-                .forEach((camera) => camera.getViewMatrix(true));
-
-            // re-centers the star system
-            this.starSystemView.getStarSystem().applyFloatingOrigin();
-
-            // set the ui target to the nearest orbital object
-            this.starSystemView.targetCursorLayer.setTarget(nearestOrbitalObject);
-            this.starSystemView.spaceShipLayer.setTarget(nearestOrbitalObject.getTransform());
-        });
-
-        await this.starSystemView.loadStarSystem(new StarSystemController(seed, this.starSystemView.scene), true);
+        await this.starSystemView.loadStarSystemFromSeed(seed);
 
         if (this.state === EngineState.UNINITIALIZED) await this.init(true);
         else this.starSystemView.initStarSystem();
+
+        this.starSystemView.switchToSpaceshipControls();
+
+        const playerTransform = this.starSystemView.scene.getActiveControls().getTransform();
+
+        const nearestOrbitalObject = this.starSystemView.getStarSystem().getOrbitalObjects().at(universeCoordinates.orbitalObjectIndex);
+        if (nearestOrbitalObject === undefined) {
+            throw new Error(
+                `Could not find the nearest orbital object with index ${universeCoordinates.orbitalObjectIndex} among the ${this.starSystemView.getStarSystem().getOrbitalObjects().length} different objects`
+            );
+        }
+
+        const nearestOrbitalObjectWorld = nearestOrbitalObject.getTransform().getWorldMatrix();
+        const currentLocalPosition = new Vector3(universeCoordinates.positionX, universeCoordinates.positionY, universeCoordinates.positionZ);
+        const currentWorldPosition = Vector3.TransformCoordinates(currentLocalPosition, nearestOrbitalObjectWorld);
+        playerTransform.setAbsolutePosition(currentWorldPosition);
+
+        const nearestOrbitalObjectWorldRotation = nearestOrbitalObject.getTransform().absoluteRotationQuaternion;
+        const currentLocalRotationQuaternion = new Quaternion(
+            universeCoordinates.rotationQuaternionX,
+            universeCoordinates.rotationQuaternionY,
+            universeCoordinates.rotationQuaternionZ,
+            universeCoordinates.rotationQuaternionW
+        );
+        const currentWorldRotationQuaternion = currentLocalRotationQuaternion.multiply(nearestOrbitalObjectWorldRotation);
+        setRotationQuaternion(playerTransform, currentWorldRotationQuaternion);
+
+        // updates camera position
+        this.starSystemView
+            .getSpaceshipControls()
+            .getActiveCameras()
+            .forEach((camera) => camera.getViewMatrix(true));
+
+        // re-centers the star system
+        this.starSystemView.getStarSystem().applyFloatingOrigin();
+
+        // set the ui target to the nearest orbital object
+        this.starSystemView.targetCursorLayer.setTarget(nearestOrbitalObject);
+        this.starSystemView.spaceShipLayer.setTarget(nearestOrbitalObject.getTransform());
 
         this.engine.loadingScreen.hideLoadingUI();
     }

@@ -20,7 +20,7 @@ import { DefaultControls } from "../defaultControls/defaultControls";
 import starTexture from "../../asset/textures/starParticle.png";
 import blackHoleTexture from "../../asset/textures/blackholeParticleSmall.png";
 
-import { StarSystemModel } from "../starSystem/starSystemModel";
+import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
 import { BuildData, StarSector, vector3ToString } from "./starSector";
 import { StarMapUI } from "./starMapUI";
 import { getStellarTypeString } from "../stellarObjects/common";
@@ -388,7 +388,7 @@ export class StarMap implements View {
 
     private createInstance(data: BuildData) {
         const starSystemSeed = data.seed;
-        const starSystemModel = new StarSystemModel(starSystemSeed);
+        const starSystemModel = new SeededStarSystemModel(starSystemSeed);
 
         const starSeed = starSystemModel.getStellarObjectSeed(0);
         const stellarObjectType = starSystemModel.getBodyTypeOfStellarObject(0);
@@ -396,13 +396,13 @@ export class StarMap implements View {
         let starModel: StarModel | BlackHoleModel | NeutronStarModel | null = null;
         switch (stellarObjectType) {
             case BodyType.STAR:
-                starModel = new StarModel(starSeed);
+                starModel = new StarModel(starSeed, starSystemModel);
                 break;
             case BodyType.BLACK_HOLE:
-                starModel = new BlackHoleModel(starSeed);
+                starModel = new BlackHoleModel(starSeed, starSystemModel);
                 break;
             case BodyType.NEUTRON_STAR:
-                starModel = new NeutronStarModel(starSeed);
+                starModel = new NeutronStarModel(starSeed, starSystemModel);
                 break;
             default:
                 throw new Error("Unknown stellar object type!");
@@ -487,7 +487,7 @@ export class StarMap implements View {
                 text += `${i18n.t("starMap:planets")}: ${starSystemModel.getNbPlanets()}\n`;
 
                 this.starMapUI.attachUIToMesh(initializedInstance);
-                this.starMapUI.setSelectedSystem({ name: starSystemModel.getName(), text });
+                this.starMapUI.setSelectedSystem({ name: starSystemModel.name, text });
 
                 this.selectedSystemSeed = starSystemSeed;
 

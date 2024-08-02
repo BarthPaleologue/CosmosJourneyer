@@ -32,11 +32,17 @@ import { RingsModel } from "../../rings/ringsModel";
 import { CloudsModel } from "../../clouds/cloudsModel";
 import { BodyType } from "../../architecture/bodyType";
 import { GenerationSteps } from "../../utils/generationSteps";
+import { getPlanetName } from "../common";
+import { StarSystemModel } from "../../starSystem/starSystemModel";
 
 export class TelluricPlanetModel implements PlanetModel {
+    readonly name: string;
     readonly bodyType = BodyType.TELLURIC_PLANET;
+
     readonly seed: number;
     readonly rng: (step: number) => number;
+
+    readonly starSystem: StarSystemModel;
 
     readonly radius: number;
 
@@ -51,20 +57,25 @@ export class TelluricPlanetModel implements PlanetModel {
 
     readonly nbMoons: number;
 
-    private isSatelliteOfTelluric = false;
-    private isSatelliteOfGas = false;
+    private readonly isSatelliteOfTelluric;
+    private readonly isSatelliteOfGas;
 
     readonly parentBody: CelestialBodyModel | null;
     readonly childrenBodies: CelestialBodyModel[] = [];
 
-    constructor(seed: number, parentBody?: CelestialBodyModel) {
+    constructor(seed: number, starSystemModel: StarSystemModel, parentBody?: CelestialBodyModel) {
+        this.starSystem = starSystemModel;
+
         this.seed = seed;
-        this.rng = seededSquirrelNoise(this.seed);
 
         this.parentBody = parentBody ?? null;
 
-        if (this.parentBody?.bodyType === BodyType.TELLURIC_PLANET) this.isSatelliteOfTelluric = true;
-        if (this.parentBody?.bodyType === BodyType.GAS_PLANET) this.isSatelliteOfGas = true;
+        this.name = getPlanetName(this.seed, this.starSystem, this.parentBody);
+
+        this.rng = seededSquirrelNoise(this.seed);
+
+        this.isSatelliteOfTelluric = this.parentBody?.bodyType === BodyType.TELLURIC_PLANET ?? false;
+        this.isSatelliteOfGas = this.parentBody?.bodyType === BodyType.GAS_PLANET ?? false;
 
         if (this.isSatelliteOfTelluric) {
             this.radius = Math.max(0.03, normalRandom(0.06, 0.03, this.rng, GenerationSteps.RADIUS)) * Settings.EARTH_RADIUS;

@@ -46,6 +46,7 @@ import { LandingRequest, ManagesLandingPads } from "../utils/managesLandingPads"
 import { getEdibleEnergyPerHaPerDay } from "../utils/agriculture";
 import { Settings } from "../settings";
 import { EngineBay } from "../assets/procedural/spaceStation/engineBay";
+import { StarSystemModel } from "../starSystem/starSystemModel";
 
 export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads {
     readonly name: string;
@@ -72,8 +73,8 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
 
     private readonly boundingRadius: number;
 
-    constructor(scene: Scene, model: SpaceStationModel | number, parentBody: CelestialBody | null = null) {
-        this.model = model instanceof SpaceStationModel ? model : new SpaceStationModel(model, parentBody?.model);
+    constructor(model: SpaceStationModel | number, starSystemModel: StarSystemModel, scene: Scene, parentBody: CelestialBody | null = null) {
+        this.model = model instanceof SpaceStationModel ? model : new SpaceStationModel(model, starSystemModel, parentBody?.model);
 
         this.name = this.model.name;
 
@@ -101,10 +102,9 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
     }
 
     getLandingPads(): LandingPad[] {
-        return this.landingBays
-            .flatMap((landingBay) => {
-                return landingBay.landingPads;
-            });
+        return this.landingBays.flatMap((landingBay) => {
+            return landingBay.landingPads;
+        });
     }
 
     handleLandingRequest(request: LandingRequest): LandingPad | null {

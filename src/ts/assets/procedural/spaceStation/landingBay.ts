@@ -144,9 +144,11 @@ export class LandingBay {
         const extend = bb.max.subtract(bb.min);
         const center = bb.min.add(extend.scale(0.5));
 
-        this.getTransform().getChildMeshes(true).forEach((mesh) => {
-            mesh.position.subtractInPlace(center);
-        });
+        this.getTransform()
+            .getChildMeshes(true)
+            .forEach((mesh) => {
+                mesh.position.subtractInPlace(center);
+            });
     }
 
     update(stellarObjects: Transformable[], cameraWorldPosition: Vector3, deltaSeconds: number) {

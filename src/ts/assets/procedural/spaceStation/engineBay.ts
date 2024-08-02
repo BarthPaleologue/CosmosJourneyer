@@ -33,12 +33,16 @@ export class EngineBay implements Transformable {
         this.scene = scene;
 
         const nbEngines = 6;
-        this.skirt = MeshBuilder.CreateCylinder("EngineBaySkirt", {
-            diameterTop: 100,
-            height: 400,
-            diameterBottom: 250,
-            tessellation: nbEngines
-        }, scene);
+        this.skirt = MeshBuilder.CreateCylinder(
+            "EngineBaySkirt",
+            {
+                diameterTop: 100,
+                height: 400,
+                diameterBottom: 250,
+                tessellation: nbEngines
+            },
+            scene
+        );
         this.skirt.convertToFlatShadedMesh();
 
         this.skirtMaterial = new MetalSectionMaterial(scene);

@@ -29,7 +29,7 @@ export class Materials {
 
     public static GRASS_MATERIAL: GrassMaterial;
     public static GRASS_DEPTH_MATERIAL: GrassMaterial;
-    
+
     public static CRATE_MATERIAL: PBRMetallicRoughnessMaterial;
 
     public static Init(scene: Scene) {

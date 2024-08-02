@@ -27,10 +27,10 @@ import { PostProcessType } from "./postProcesses/postProcessTypes";
 import { TelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModel";
 import { GasPlanetModel } from "./planets/gasPlanet/gasPlanetModel";
 import { StarSystemHelper } from "./starSystem/starSystemHelper";
-import { StarModel } from "./stellarObjects/star/starModel";
 import { getMoonSeed } from "./planets/common";
-import { SystemSeed } from "./utils/systemSeed";
 import { SpaceShipControlsInputs } from "./spaceship/spaceShipControlsInputs";
+import { CustomStarSystemModel } from "./starSystem/customStarSystemModel";
+import { BodyType } from "./architecture/bodyType";
 
 const engine = await CosmosJourneyer.CreateAsync();
 
@@ -45,14 +45,22 @@ const characterController = starSystemView.getCharacterControls();
 
 console.log(`Time is going ${Settings.TIME_MULTIPLIER} time${Settings.TIME_MULTIPLIER > 1 ? "s" : ""} faster than in reality`);
 
-const starSystemSeed = new SystemSeed(0, 0, 0, 0);
-const starSystem = new StarSystemController(starSystemSeed, starSystemView.scene);
-starSystem.model.setName("Alpha Testis");
+const starSystemModel = new CustomStarSystemModel(
+    "Alpha Testis",
+    [[BodyType.STAR, 4413.641464990006]],
+    [
+        [BodyType.TELLURIC_PLANET, 0.4233609183800225],
+        [BodyType.TELLURIC_PLANET, 0.3725],
+        [BodyType.GAS_PLANET, 0.28711440474126226]
+    ],
+    []
+);
+
+const starSystem = new StarSystemController(starSystemModel, starSystemView.scene);
 
 await starSystemView.loadStarSystem(starSystem, false);
 
-const sunModel = new StarModel(4413.641464990006);
-const sun = StarSystemHelper.MakeStar(starSystem, sunModel);
+const sun = StarSystemHelper.MakeStar(starSystem);
 sun.model.orbit.period = 60 * 60 * 24;
 
 /*const secundaModel = new StarModel(-672446, sunModel);
@@ -65,7 +73,7 @@ terminaModel.orbit.radius = 50 * sunModel.radius;
 terminaModel.orbit.period = 60 * 60;
 const termina = StarSystemHelper.makeStar(starSystem, terminaModel);*/
 
-const planetModel = new TelluricPlanetModel(0.4233609183800225, sunModel);
+const planetModel = new TelluricPlanetModel(starSystemModel.getPlanetSeed(0), starSystemModel, sun.model);
 planetModel.physicalProperties.minTemperature = -40;
 planetModel.physicalProperties.maxTemperature = 30;
 
@@ -82,7 +90,7 @@ const [spaceStation] = StarSystemHelper.MakeSpaceStations(starSystem, planet, 1)
     physicsViewer.showBody(landingpad.aggregate.body);
 }*/
 
-const moonModel = new TelluricPlanetModel(getMoonSeed(planetModel, 0), planetModel);
+const moonModel = new TelluricPlanetModel(getMoonSeed(planetModel, 0), starSystemModel, planetModel);
 moonModel.physicalProperties.mass = 2;
 moonModel.physicalProperties.rotationPeriod = 7 * 60 * 60;
 moonModel.physicalProperties.minTemperature = -180;
@@ -95,7 +103,7 @@ moonModel.orbit.normalToPlane = Vector3.Up();
 
 const moon = StarSystemHelper.MakeSatellite(starSystem, planet, moonModel);
 
-const aresModel = new TelluricPlanetModel(0.3725, sunModel);
+const aresModel = new TelluricPlanetModel(0.3725, starSystemModel, sun.model);
 aresModel.physicalProperties.mass = 7;
 aresModel.physicalProperties.rotationPeriod = (24 * 60 * 60) / 30;
 aresModel.physicalProperties.minTemperature = -30;
@@ -118,7 +126,7 @@ ares.postProcesses.splice(ares.postProcesses.indexOf(PostProcessType.CLOUDS), 1)
 
 ares.material.updateConstants();
 
-const andromaqueModel = new GasPlanetModel(0.28711440474126226, sunModel);
+const andromaqueModel = new GasPlanetModel(0.28711440474126226, starSystemModel, sun.model);
 andromaqueModel.orbit.period = 60 * 60 * 24 * 365.25;
 andromaqueModel.orbit.radius = 25300 * ares.getRadius();
 andromaqueModel.orbit.normalToPlane = Vector3.Up();
@@ -161,7 +169,5 @@ document.addEventListener("keydown", (e) => {
     }
 });
 
-starSystemView.targetCursorLayer.setEnabled(true);
-starSystemView.showHtmlUI();
 starSystemView.getSpaceshipControls().spaceship.enableWarpDrive();
 SpaceShipControlsInputs.setEnabled(true);

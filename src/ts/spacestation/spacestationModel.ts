@@ -28,11 +28,16 @@ import { GenerationSteps } from "../utils/generationSteps";
 import { CropType, CropTypes } from "../utils/agriculture";
 import { randomPieChart } from "../utils/random";
 import { generateSpaceStationName } from "../utils/spaceStationNameGenerator";
+import { StarSystemModel } from "../starSystem/starSystemModel";
 
 export class SpaceStationModel implements OrbitalObjectModel {
     readonly name: string;
+
     readonly seed: number;
     readonly rng: (step: number) => number;
+
+    readonly starSystem: StarSystemModel;
+
     readonly orbit: OrbitProperties;
     readonly physicalProperties: OrbitalObjectPhysicalProperties;
     readonly parentBody: OrbitalObjectModel | null;
@@ -50,10 +55,12 @@ export class SpaceStationModel implements OrbitalObjectModel {
 
     readonly nbHydroponicLayers: number;
 
-    constructor(seed: number, parentBody?: CelestialBodyModel) {
+    constructor(seed: number, starSystemModel: StarSystemModel, parentBody?: CelestialBodyModel) {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed);
-        
+
+        this.starSystem = starSystemModel;
+
         this.name = generateSpaceStationName(this.rng, 2756);
 
         this.parentBody = parentBody ?? null;

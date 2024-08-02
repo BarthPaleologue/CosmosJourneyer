@@ -31,6 +31,7 @@ import i18n from "../../i18n";
 import { Anomaly } from "../anomaly";
 import { AnomalyType } from "../anomalyType";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
+import { StarSystemModel } from "../../starSystem/starSystemModel";
 
 export class Mandelbulb implements Anomaly, Cullable {
     readonly name: string;
@@ -47,19 +48,19 @@ export class Mandelbulb implements Anomaly, Cullable {
 
     /**
      * New Gas Planet
-     * @param name The name of the planet
+     * @param model The model to create the planet from or a seed for the planet in [-1, 1]
+     * @param starSystemModel
      * @param scene
      * @param parentBody The bodies the planet is orbiting
-     * @param model The model to create the planet from or a seed for the planet in [-1, 1]
      */
-    constructor(name: string, scene: Scene, model: MandelbulbModel | number, parentBody: CelestialBody | null = null) {
-        this.name = name;
+    constructor(model: MandelbulbModel | number, starSystemModel: StarSystemModel, scene: Scene, parentBody: CelestialBody | null = null) {
+        this.model = model instanceof MandelbulbModel ? model : new MandelbulbModel(model, starSystemModel, parentBody?.model);
 
-        this.model = model instanceof MandelbulbModel ? model : new MandelbulbModel(model, parentBody?.model);
+        this.name = this.model.name;
 
         this.parent = parentBody;
 
-        this.transform = new TransformNode(name, scene);
+        this.transform = new TransformNode(this.model.name, scene);
 
         this.postProcesses.push(PostProcessType.MANDELBULB);
 

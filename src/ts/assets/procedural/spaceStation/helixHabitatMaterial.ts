@@ -22,10 +22,7 @@ import { Transformable } from "../../../architecture/transformable";
 
 import helixHabitatMaterialFragment from "../../../../shaders/helixHabitatMaterial/fragment.glsl";
 import helixHabitatMaterialVertex from "../../../../shaders/helixHabitatMaterial/vertex.glsl";
-import {
-    setStellarObjectUniforms,
-    StellarObjectUniformNames
-} from "../../../postProcesses/uniforms/stellarObjectUniforms";
+import { setStellarObjectUniforms, StellarObjectUniformNames } from "../../../postProcesses/uniforms/stellarObjectUniforms";
 import { Textures } from "../../textures";
 
 const HelixHabitatUniformNames = {
@@ -34,16 +31,16 @@ const HelixHabitatUniformNames = {
     CAMERA_POSITION: "cameraPosition",
     MEAN_RADIUS: "meanRadius",
     DELTA_RADIUS: "deltaRadius",
-    THICKNESS_MULTIPLIER: "thicknessMultiplier",
-}
+    THICKNESS_MULTIPLIER: "thicknessMultiplier"
+};
 
 const HelixHabitatSamplerNames = {
     ALBEDO: "albedoMap",
     NORMAL: "normalMap",
     METALLIC: "metallicMap",
     ROUGHNESS: "roughnessMap",
-    OCCLUSION: "occlusionMap",
-}
+    OCCLUSION: "occlusionMap"
+};
 
 export class HelixHabitatMaterial extends ShaderMaterial {
     private stellarObjects: Transformable[] = [];
@@ -59,18 +56,13 @@ export class HelixHabitatMaterial extends ShaderMaterial {
 
         super(`RingHabitatMaterial`, scene, shaderName, {
             attributes: ["position", "normal", "uv"],
-            uniforms: [
-                ...Object.values(HelixHabitatUniformNames),
-                ...Object.values(StellarObjectUniformNames)
-            ],
-            samplers: [
-                ...Object.values(HelixHabitatSamplerNames),
-            ]
+            uniforms: [...Object.values(HelixHabitatUniformNames), ...Object.values(StellarObjectUniformNames)],
+            samplers: [...Object.values(HelixHabitatSamplerNames)]
         });
 
         this.onBindObservable.add(() => {
             const activeCamera = scene.activeCamera;
-            if(activeCamera === null) {
+            if (activeCamera === null) {
                 throw new Error("No active camera");
             }
 

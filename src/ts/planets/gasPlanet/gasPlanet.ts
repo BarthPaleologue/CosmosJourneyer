@@ -39,6 +39,7 @@ import { Transformable } from "../../architecture/transformable";
 import i18n from "../../i18n";
 import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
+import { StarSystemModel } from "../../starSystem/starSystemModel";
 
 export class GasPlanet implements Planet, Cullable {
     private readonly mesh: Mesh;
@@ -56,20 +57,20 @@ export class GasPlanet implements Planet, Cullable {
 
     /**
      * New Gas Planet
-     * @param name The name of the planet
+     * @param model The model to create the planet from or a seed for the planet in [-1, 1]
+     * @param starSystemModel
      * @param scene
      * @param parentBody The bodies the planet is orbiting
-     * @param model The model to create the planet from or a seed for the planet in [-1, 1]
      */
-    constructor(name: string, scene: Scene, model: GasPlanetModel | number, parentBody: CelestialBody | null = null) {
-        this.name = name;
-
+    constructor(model: GasPlanetModel | number, starSystemModel: StarSystemModel, scene: Scene, parentBody: CelestialBody | null = null) {
         this.parent = parentBody;
 
-        this.model = model instanceof GasPlanetModel ? model : new GasPlanetModel(model, parentBody?.model);
+        this.model = model instanceof GasPlanetModel ? model : new GasPlanetModel(model, starSystemModel, parentBody?.model);
+
+        this.name = this.model.name;
 
         this.mesh = MeshBuilder.CreateSphere(
-            name,
+            this.name,
             {
                 diameter: this.model.radius * 2,
                 segments: 64

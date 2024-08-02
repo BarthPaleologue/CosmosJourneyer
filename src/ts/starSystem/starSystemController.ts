@@ -26,7 +26,7 @@ import { SpaceStation } from "../spacestation/spaceStation";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { Mandelbulb } from "../anomalies/mandelbulb/mandelbulb";
-import { StarSystemModel } from "./starSystemModel";
+import { SeededStarSystemModel } from "./seededStarSystemModel";
 import { rotateAround, translate } from "../uberCore/transforms/basicTransform";
 import { Star } from "../stellarObjects/star/star";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
@@ -41,6 +41,7 @@ import { SystemTarget } from "../utils/systemTarget";
 import { JuliaSet } from "../anomalies/julia/juliaSet";
 import { Anomaly } from "../anomalies/anomaly";
 import { StarFieldBox } from "./starFieldBox";
+import { StarSystemModel } from "./starSystemModel";
 
 export class StarSystemController {
     readonly scene: UberScene;
@@ -93,7 +94,7 @@ export class StarSystemController {
 
         this.starFieldBox = new StarFieldBox(scene);
 
-        this.model = model instanceof StarSystemModel ? model : new StarSystemModel(model);
+        this.model = model instanceof SystemSeed ? new SeededStarSystemModel(model) : model;
     }
 
     /**
@@ -181,6 +182,10 @@ export class StarSystemController {
      */
     public getBodies(): CelestialBody[] {
         return this.celestialBodies;
+    }
+
+    public getSpaceStations(): SpaceStation[] {
+        return this.spaceStations;
     }
 
     public getOrbitalObjects(): OrbitalObject[] {
@@ -448,7 +453,7 @@ export class StarSystemController {
         if (controller.getTransform().getAbsolutePosition().length() > 500) {
             const displacementTranslation = controller.getTransform().getAbsolutePosition().negate();
             this.translateEverythingNow(displacementTranslation);
-            if(controller.getTransform().parent === null) {
+            if (controller.getTransform().parent === null) {
                 translate(controller.getTransform(), displacementTranslation);
             }
         }

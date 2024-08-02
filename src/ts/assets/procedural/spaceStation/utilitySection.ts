@@ -45,18 +45,22 @@ export class UtilitySection implements Transformable {
 
         this.rng = seededSquirrelNoise(seed);
 
-        this.attachment = MeshBuilder.CreateCylinder("UtilitySectionRoot", {
-            height: 700,
-            diameter: 100,
-            tessellation: 6
-        }, scene);
+        this.attachment = MeshBuilder.CreateCylinder(
+            "UtilitySectionRoot",
+            {
+                height: 700,
+                diameter: 100,
+                tessellation: 6
+            },
+            scene
+        );
         this.attachment.convertToFlatShadedMesh();
         this.attachment.material = this.metalSectionMaterial;
 
         const boundingVectors = this.attachment.getHierarchyBoundingVectors();
         const boundingExtendSize = boundingVectors.max.subtract(boundingVectors.min).scale(0.5);
 
-        if(this.rng(0) < 0.3) {
+        if (this.rng(0) < 0.3) {
             for (let ring = -3; ring <= 3; ring++) {
                 for (let sideIndex = 0; sideIndex < 6; sideIndex++) {
                     const tank = Objects.SPHERICAL_TANK.createInstance("SphericalTank");
@@ -82,13 +86,13 @@ export class UtilitySection implements Transformable {
 
         const distanceToCamera = cameraWorldPosition.subtract(this.getTransform().getAbsolutePosition()).length();
 
-        if(distanceToCamera < 350e3 && this.attachmentAggregate === null) {
+        if (distanceToCamera < 350e3 && this.attachmentAggregate === null) {
             this.attachmentAggregate = new PhysicsAggregate(this.attachment, PhysicsShapeType.MESH, { mass: 0 });
             this.attachmentAggregate.body.disablePreStep = false;
             this.attachmentAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
             this.attachmentAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
 
-            this.tanks.forEach(tank => {
+            this.tanks.forEach((tank) => {
                 const tankAggregate = new PhysicsAggregate(tank, PhysicsShapeType.SPHERE, { mass: 0 });
                 tankAggregate.body.disablePreStep = false;
                 tankAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
@@ -96,11 +100,11 @@ export class UtilitySection implements Transformable {
 
                 this.tankAggregates.push(tankAggregate);
             });
-        } else if(distanceToCamera > 360e3 && this.attachmentAggregate !== null) {
+        } else if (distanceToCamera > 360e3 && this.attachmentAggregate !== null) {
             this.attachmentAggregate?.dispose();
             this.attachmentAggregate = null;
 
-            this.tankAggregates.forEach(tankAggregate => tankAggregate.dispose());
+            this.tankAggregates.forEach((tankAggregate) => tankAggregate.dispose());
             this.tankAggregates.length = 0;
         }
     }
@@ -113,7 +117,7 @@ export class UtilitySection implements Transformable {
         this.attachment.dispose();
         this.attachmentAggregate?.dispose();
         this.metalSectionMaterial.dispose();
-        this.tanks.forEach(tank => tank.dispose());
-        this.tankAggregates.forEach(tankAggregate => tankAggregate.dispose());
+        this.tanks.forEach((tank) => tank.dispose());
+        this.tankAggregates.forEach((tankAggregate) => tankAggregate.dispose());
     }
 }

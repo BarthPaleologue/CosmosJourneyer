@@ -42,6 +42,7 @@ import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
 import i18n from "../../i18n";
 import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
+import { StarSystemModel } from "../../starSystem/starSystemModel";
 
 export class NeutronStar implements StellarObject, Cullable {
     readonly model: NeutronStarModel;
@@ -65,19 +66,19 @@ export class NeutronStar implements StellarObject, Cullable {
 
     /**
      * New Star
-     * @param name The name of the star
-     * @param scene
      * @param model The seed of the star in [-1, 1]
+     * @param starSystemModel
+     * @param scene
      * @param parentBody
      */
-    constructor(name: string, scene: Scene, model: number | NeutronStarModel, parentBody: CelestialBody | null = null) {
-        this.model = model instanceof NeutronStarModel ? model : new NeutronStarModel(model, parentBody?.model);
-        this.name = name;
+    constructor(model: number | NeutronStarModel, starSystemModel: StarSystemModel, scene: Scene, parentBody: CelestialBody | null = null) {
+        this.model = model instanceof NeutronStarModel ? model : new NeutronStarModel(model, starSystemModel, parentBody?.model);
+        this.name = this.model.name;
 
         this.parent = parentBody;
 
         this.mesh = MeshBuilder.CreateSphere(
-            name,
+            this.name,
             {
                 diameter: this.model.radius * 2,
                 segments: 32

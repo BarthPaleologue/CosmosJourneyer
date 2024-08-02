@@ -7,7 +7,6 @@ $gaps: 20px;
     bottom: 0;
     right: 0;
     z-index: 2;
-    pointer-events: none;
   
     font-family: Nasalization, sans-serif;
 
@@ -21,18 +20,98 @@ $gaps: 20px;
     column-gap: $gaps;
 
     &>* {
-        background: rgba(100, 100, 200, 0.3);
-        backdrop-filter: blur(10px);
+        box-shadow: 0 0 20px black;
+        background: rgba(20, 20, 50, 0.8);
+        backdrop-filter: blur(3px);
+
         color: white;
     }
 
     #spaceStationHeader {
-        background: rgba(100, 100, 200, 0.3);
-        backdrop-filter: blur(10px);
-        font-size: 200%;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+
+        padding: 0 20px;
+
+        p {
+            margin-block: 0;
+        }
+
+        .welcomeTo {
+            font-size: 150%;
+        }
+
+        .spaceStationName {
+            font-size: 300%;
+        }
+    }
+
+    .mainContainer {
+        scale: 1;
+        transition: .2s ease-in-out;
+
+        padding: 0 20px;
+        overflow-y: auto;
+
+        &.hidden {
+            scale: 0;
+        }
+
+        svg {
+            text {
+                fill: white;
+                font-family: Nasalization, sans-serif;
+                transition: .2s;
+            }
+
+            .pie-slice-group {
+                cursor: pointer;
+
+                &:hover {
+                    .pie-slice {
+                        scale: 1.05;
+                    }
+
+                    text {
+                        text-decoration: underline solid white;
+                    }
+                }
+
+                .pie-slice {
+                    scale: 1;
+                    transition: .2s;
+                }
+            }
+        }
     }
 
     #spaceStationActions {
         grid-column-start: 2;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        row-gap: 5px;
+
+        .flexGrow {
+            flex-grow: 1;
+        }
+
+        .spaceStationAction {
+            padding: 0 20px;
+            align-self: stretch;
+
+            background: rgba(253, 140, 26, 0.5);
+
+            transition: .2s;
+
+            &:hover {
+                cursor: pointer;
+                background: rgba(253, 140, 26, 0.8);
+            }
+        }
     }
 }
