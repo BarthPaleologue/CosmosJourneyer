@@ -70,6 +70,7 @@ import { Materials } from "../assets/materials";
 import { SpaceStation } from "../spacestation/spaceStation";
 import { ObjectTargetCursorType } from "../ui/objectTargetCursor";
 import { SpaceStationLayer } from "../ui/spaceStation/spaceStationLayer";
+import { SeededStarSystemModel } from "./seededStarSystemModel";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -790,7 +791,7 @@ export class StarSystemView implements View {
      */
     public setSystemAsTarget(targetSeed: SystemSeed) {
         const currentSystem = this.getStarSystem();
-        const currentSeed = currentSystem.model.seed;
+        const currentSeed = currentSystem.model instanceof SeededStarSystemModel ? currentSystem.model.seed : new SystemSeed(0, 0, 0, 0);
 
         const currentSystemStarSector = new StarSector(new Vector3(currentSeed.starSectorX, currentSeed.starSectorY, currentSeed.starSectorZ));
 

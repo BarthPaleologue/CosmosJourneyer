@@ -43,7 +43,7 @@ export class LandingPadMaterial extends ShaderMaterial {
         });
 
         const numberTexture = Textures.LANDING_PAD_NUMBER_TEXTURES.at(padNumber);
-        if(numberTexture === undefined) {
+        if (numberTexture === undefined) {
             throw new Error(`No texture for pad number ${padNumber}`);
         }
 

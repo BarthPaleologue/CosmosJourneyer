@@ -67,7 +67,7 @@ export class ShipControls implements Controls {
         this.scene = scene;
 
         SpaceShipControlsInputs.map.toggleWarpDrive.on("complete", () => {
-            if(!this.spaceship.canEngageWarpDrive() && this.spaceship.getWarpDrive().isDisabled()) {
+            if (!this.spaceship.canEngageWarpDrive() && this.spaceship.getWarpDrive().isDisabled()) {
                 Sounds.CANNOT_ENGAGE_WARP_DRIVE.play();
                 return;
             }

@@ -21,14 +21,12 @@ import { StarMaterial } from "./starMaterial";
 import { StarModel } from "./starModel";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { getRgbFromTemperature } from "../../utils/specrend";
 import { Light } from "@babylonjs/core/Lights/light";
 import { setRotationQuaternion } from "../../uberCore/transforms/basicTransform";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { getStellarTypeString } from "../common";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
 import { CelestialBody } from "../../architecture/celestialBody";
 import { OrbitalObject } from "../../architecture/orbitalObject";
@@ -42,8 +40,8 @@ import { RingsUniforms } from "../../rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import i18n from "../../i18n";
 import { Scene } from "@babylonjs/core/scene";
-import { Objects } from "../../assets/objects";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
+import { StarSystemModel } from "../../starSystem/starSystemModel";
 
 export class Star implements StellarObject, Cullable {
     readonly name: string;
@@ -66,35 +64,30 @@ export class Star implements StellarObject, Cullable {
 
     /**
      * New Star
-     * @param name The name of the star
+     * @param model The seed of the star in [-1, 1]
+     * @param starSystemModel
      * @param scene
      * @param parentBody The bodies the star is orbiting
-     * @param model The seed of the star in [-1, 1]
      */
-    constructor(name: string, scene: Scene, model: StarModel | number, parentBody: CelestialBody | null = null) {
-        this.name = name;
-
+    constructor(model: StarModel | number, starSystemModel: StarSystemModel, scene: Scene, parentBody: CelestialBody | null = null) {
         this.parent = parentBody;
 
-        this.model = model instanceof StarModel ? model : new StarModel(model, parentBody?.model);
+        this.model = model instanceof StarModel ? model : new StarModel(model, starSystemModel, parentBody?.model);
 
-        const isSphere = this.model.rng(42) > 0.1;
+        this.name = this.model.name;
 
-        this.mesh = isSphere
-            ? MeshBuilder.CreateSphere(
-                  name,
-                  {
-                      diameter: this.model.radius * 2,
-                      segments: 32
-                  },
-                  scene
-              )
-            : Objects.CreateBananaClone(2 * this.model.radius);
-        this.mesh.name = name; // enforce name in the case of cloning the banana
+        this.mesh = MeshBuilder.CreateSphere(
+            this.name,
+            {
+                diameter: this.model.radius * 2,
+                segments: 32
+            },
+            scene
+        );
 
         this.aggregate = new PhysicsAggregate(
             this.getTransform(),
-            PhysicsShapeType.CONTAINER,
+            PhysicsShapeType.SPHERE,
             {
                 mass: 0,
                 restitution: 0.2
@@ -103,9 +96,6 @@ export class Star implements StellarObject, Cullable {
         );
         this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
         this.aggregate.body.disablePreStep = false;
-        //FIXME: the radius here is a dirty fix because bakeTransformIntoVertexData does not work for reasons unknown
-        const physicsShape = new PhysicsShapeSphere(Vector3.Zero(), isSphere ? this.model.radius : 0.1, scene);
-        this.aggregate.shape.addChildFromParent(this.getTransform(), physicsShape, this.mesh);
 
         this.light = new PointLight(`${name}Light`, Vector3.Zero(), scene);
         this.light.diffuse.copyFrom(this.model.color);

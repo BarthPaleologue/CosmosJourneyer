@@ -427,7 +427,7 @@ export class Spaceship implements Transformable {
         let objectHalfThickness = 0;
 
         if (this.warpDrive.isEnabled()) {
-            if(!this.canEngageWarpDrive()) {
+            if (!this.canEngageWarpDrive()) {
                 this.emergencyStopWarpDrive();
             }
 
@@ -510,7 +510,7 @@ export class Spaceship implements Transformable {
             }
         }
 
-        if(this.warpDrive.isEnabled()) {
+        if (this.warpDrive.isEnabled()) {
             this.mainThrusters.forEach((thruster) => {
                 thruster.setThrottle(0);
             });
@@ -551,7 +551,7 @@ export class Spaceship implements Transformable {
 
         this.onWarpDriveEnabled.clear();
         this.onWarpDriveDisabled.clear();
-    
+
         this.onLandingEngaged.clear();
         this.onLandingObservable.clear();
     }

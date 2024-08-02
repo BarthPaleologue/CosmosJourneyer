@@ -162,7 +162,7 @@ export class Textures {
         manager.addTextureTask("SpaceStationMetallic", spaceStationMetallic).onSuccess = (task) => (Textures.SPACE_STATION_METALLIC = task.texture);
         manager.addTextureTask("SpaceStationRoughness", spaceStationRoughness).onSuccess = (task) => (Textures.SPACE_STATION_ROUGHNESS = task.texture);
         manager.addTextureTask("SpaceStationAmbientOcclusion", spaceStationAmbientOcclusion).onSuccess = (task) => (Textures.SPACE_STATION_AMBIENT_OCCLUSION = task.texture);
-        
+
         manager.addTextureTask("MetalPanelsAlbedo", metalPanelsAlbdeo).onSuccess = (task) => (Textures.METAL_PANELS_ALBEDO = task.texture);
         manager.addTextureTask("MetalPanelsNormal", metalPanelsNormal).onSuccess = (task) => (Textures.METAL_PANELS_NORMAL = task.texture);
         manager.addTextureTask("MetalPanelsMetallic", metalPanelsMetallic).onSuccess = (task) => (Textures.METAL_PANELS_METALLIC = task.texture);
@@ -184,7 +184,7 @@ export class Textures {
         manager.addTextureTask("EmptyTexture", empty).onSuccess = (task) => (Textures.EMPTY_TEXTURE = task.texture);
 
         const padNumberTextureResolution = 1024;
-        for(let i = 0; i < 100; i++) {
+        for (let i = 0; i < 100; i++) {
             const numberTexture = new DynamicTexture(
                 `PadNumberTexture${i}`,
                 {
@@ -193,7 +193,7 @@ export class Textures {
                 },
                 scene
             );
-            
+
             //Add text to dynamic texture
             const font = `bold 256px ${Settings.MAIN_FONT}`;
             numberTexture.drawText(`${i}`, null, null, font, "white", null, true, true);

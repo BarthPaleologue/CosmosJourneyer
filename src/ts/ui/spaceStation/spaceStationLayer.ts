@@ -20,7 +20,7 @@ import { SpaceStationModel } from "../../spacestation/spacestationModel";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { generateInfoHTML } from "./spaceStationInfos";
 
-enum MainPanelState {
+const enum MainPanelState {
     NONE,
     INFO
 }
@@ -70,19 +70,19 @@ export class SpaceStationLayer {
     }
 
     private setMainPanelState(state: MainPanelState) {
-        if(this.mainPanelState === state) {
+        if (this.mainPanelState === state) {
             this.mainPanelState = MainPanelState.NONE;
         } else {
             this.mainPanelState = state;
         }
 
-        switch(this.mainPanelState) {
+        switch (this.mainPanelState) {
             case MainPanelState.INFO:
-                if(this.currentStation === null) {
+                if (this.currentStation === null) {
                     throw new Error("No current station");
                 }
                 this.mainPanel.classList.remove("hidden");
-                this.mainPanel.innerHTML = generateInfoHTML(this.currentStation)
+                this.mainPanel.innerHTML = generateInfoHTML(this.currentStation);
                 break;
             case MainPanelState.NONE:
                 this.mainPanel.classList.add("hidden");

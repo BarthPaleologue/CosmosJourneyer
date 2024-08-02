@@ -55,6 +55,8 @@ import { TutorialLayer } from "./ui/tutorial/tutorialLayer";
 import { FlightTutorial } from "./tutorials/flightTutorial";
 import { SidePanels } from "./ui/sidePanels";
 import { Settings } from "./settings";
+import { SeededStarSystemModel } from "./starSystem/seededStarSystemModel";
+import { CustomStarSystemModel } from "./starSystem/customStarSystemModel";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -136,7 +138,10 @@ export class CosmosJourneyer {
         });
 
         this.starSystemView.onInitStarSystem.add(() => {
-            this.starMap.setCurrentStarSystem(this.starSystemView.getStarSystem().model.seed);
+            const starSystemModel = this.starSystemView.getStarSystem().model;
+            if (starSystemModel instanceof SeededStarSystemModel) {
+                this.starMap.setCurrentStarSystem(starSystemModel.seed);
+            }
         });
 
         this.pauseMenu = new PauseMenu(this.sidePanels);
@@ -338,6 +343,10 @@ export class CosmosJourneyer {
      */
     public generateSaveData(): SaveFileData {
         const currentStarSystem = this.starSystemView.getStarSystem();
+
+        if (!(currentStarSystem.model instanceof SeededStarSystemModel)) {
+            throw new Error("Cannot save inside a star system that has no generation seed");
+        }
         const seed = currentStarSystem.model.seed;
 
         const spaceShipControls = this.starSystemView.getSpaceshipControls();
@@ -395,19 +404,22 @@ export class CosmosJourneyer {
     public async loadSaveData(saveData: SaveFileData): Promise<void> {
         await this.loadUniverseCoordinates(saveData.universeCoordinates);
 
-        if(saveData.padNumber !== undefined) {
+        if (saveData.padNumber !== undefined) {
             const padNumber = saveData.padNumber;
 
             const shipPosition = this.starSystemView.getSpaceshipControls().getTransform().getAbsolutePosition();
 
             const nearestOrbitalObject = this.starSystemView.getStarSystem().getNearestOrbitalObject(shipPosition);
-            const correspondingSpaceStation = this.starSystemView.getStarSystem().getSpaceStations().find((station) => station === nearestOrbitalObject);
-            if(correspondingSpaceStation === undefined) {
+            const correspondingSpaceStation = this.starSystemView
+                .getStarSystem()
+                .getSpaceStations()
+                .find((station) => station === nearestOrbitalObject);
+            if (correspondingSpaceStation === undefined) {
                 throw new Error("Tried loading a save with a pad number, but the closest orbital objects does not have landing pads!");
             }
 
             const landingPad = correspondingSpaceStation.getLandingPads().at(padNumber);
-            if(landingPad === undefined) {
+            if (landingPad === undefined) {
                 throw new Error(`Could not find the pad with number ${padNumber} at this station: ${correspondingSpaceStation.model.name}`);
             }
 
@@ -435,8 +447,10 @@ export class CosmosJourneyer {
         const playerTransform = this.starSystemView.scene.getActiveControls().getTransform();
 
         const nearestOrbitalObject = this.starSystemView.getStarSystem().getOrbitalObjects().at(universeCoordinates.orbitalObjectIndex);
-        if(nearestOrbitalObject === undefined) {
-            throw new Error(`Could not find the nearest orbital object with index ${universeCoordinates.orbitalObjectIndex} among the ${this.starSystemView.getStarSystem().getOrbitalObjects().length} different objects`);
+        if (nearestOrbitalObject === undefined) {
+            throw new Error(
+                `Could not find the nearest orbital object with index ${universeCoordinates.orbitalObjectIndex} among the ${this.starSystemView.getStarSystem().getOrbitalObjects().length} different objects`
+            );
         }
 
         const nearestOrbitalObjectWorld = nearestOrbitalObject.getTransform().getWorldMatrix();

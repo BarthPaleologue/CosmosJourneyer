@@ -132,18 +132,18 @@ export class RingHabitat implements Transformable {
         this.metalSectionMaterial.update(stellarObjects);
 
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
-        if(distanceToCamera < 350e3 && this.attachmentAggregate === null) {
+        if (distanceToCamera < 350e3 && this.attachmentAggregate === null) {
             this.attachmentAggregate = createEnvironmentAggregate(this.attachment, PhysicsShapeType.MESH, this.getTransform().getScene());
-            this.arms.forEach(arm => {
+            this.arms.forEach((arm) => {
                 const armAggregate = createEnvironmentAggregate(arm, PhysicsShapeType.MESH, this.getTransform().getScene());
                 this.armAggregates.push(armAggregate);
             });
             this.ringAggregate = createEnvironmentAggregate(this.ring, PhysicsShapeType.MESH, this.getTransform().getScene());
-        } else if(distanceToCamera > 360e3 && this.attachmentAggregate !== null) {
+        } else if (distanceToCamera > 360e3 && this.attachmentAggregate !== null) {
             this.attachmentAggregate?.dispose();
             this.attachmentAggregate = null;
 
-            this.armAggregates.forEach(armAggregate => armAggregate.dispose());
+            this.armAggregates.forEach((armAggregate) => armAggregate.dispose());
             this.armAggregates.length = 0;
 
             this.ringAggregate?.dispose();
