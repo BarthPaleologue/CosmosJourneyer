@@ -79,6 +79,7 @@ export class ThickLines {
                 },
                 this.scene
             );
+            cylinder.alwaysSelectAsActiveMesh = true;
             cylinder.material = this.material;
             this.cylinders.push(cylinder);
         }

@@ -24,7 +24,7 @@ import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
 import { BuildData, StarSector, vector3ToString } from "./starSector";
 import { StarMapUI } from "./starMapUI";
 import { getStellarTypeString } from "../stellarObjects/common";
-import { Scene, ScenePerformancePriority } from "@babylonjs/core/scene";
+import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
@@ -154,7 +154,7 @@ export class StarMap implements View {
         pipeline.bloomThreshold = 0.0;
         pipeline.bloomWeight = 1.5;
         pipeline.bloomKernel = 128;
-        pipeline.imageProcessing.exposure = 1.5;
+        pipeline.imageProcessing.exposure = 1.0;
         pipeline.imageProcessing.contrast = 1.0;
 
         this.starMapCenterPosition = Vector3.Zero();
@@ -230,7 +230,7 @@ export class StarMap implements View {
             "travelLine",
             {
                 points: [],
-                thickness: 0.01,
+                thickness: 0.05,
                 color: Color3.Red()
             },
             this.scene
@@ -472,7 +472,7 @@ export class StarMap implements View {
                 let text = "";
                 if (this.currentSystemSeed !== null) {
                     const currentInstance = this.seedToInstanceMap.get(this.currentSystemSeed.toString()) as InstancedMesh;
-                    const distance = StarMap.StarMapDistanceToLy(Vector3.Distance(currentInstance.getAbsolutePosition(), initializedInstance.getAbsolutePosition()));
+                    const distance = Vector3.Distance(currentInstance.getAbsolutePosition(), initializedInstance.getAbsolutePosition()) * Settings.LIGHT_YEAR;
                     text += `${i18n.t("starMap:distance")}: ${parseDistance(distance)}\n`;
                 }
 
@@ -505,10 +505,6 @@ export class StarMap implements View {
         else this.loadedStarSectors.get(data.sectorString)?.starInstances.push(initializedInstance);
     }
 
-    public static StarMapDistanceToLy(distance: number): number {
-        return distance * 2 * Settings.LIGHT_YEAR;
-    }
-
     private focusCameraOnStar(starInstance: InstancedMesh, skipAnimation = false) {
         const cameraDir = getForwardDirection(this.controls.getTransform());
         const starDir = starInstance.position.subtract(this.controls.getTransform().getAbsolutePosition()).normalize();
@@ -528,7 +524,7 @@ export class StarMap implements View {
         const targetPosition = this.controls
             .getTransform()
             .getAbsolutePosition()
-            .add(starDir.scaleInPlace(distance - 1.5));
+            .add(starDir.scaleInPlace(distance - 6));
 
         // if the transform is already in the right position, do not animate
         if (skipAnimation) this.controls.getTransform().position = targetPosition;

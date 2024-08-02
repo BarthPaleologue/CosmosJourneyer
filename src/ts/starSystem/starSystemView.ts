@@ -803,7 +803,7 @@ export class StarSystemView implements View {
         const direction = targetSystemUniversePosition.subtract(currentSystemUniversePosition).normalize();
         Vector3.TransformCoordinatesToRef(direction, currentSystem.starFieldBox.getRotationMatrix(), direction);
 
-        const distance = StarMap.StarMapDistanceToLy(Vector3.Distance(currentSystemUniversePosition, targetSystemUniversePosition));
+        const distance = Vector3.Distance(currentSystemUniversePosition, targetSystemUniversePosition) * Settings.LIGHT_YEAR;
 
         const target = currentSystem.addSystemTarget(targetSeed, direction, distance);
         this.targetCursorLayer.addObject(target, ObjectTargetCursorType.CELESTIAL_BODY, 0, 0);
