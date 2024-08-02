@@ -28,8 +28,12 @@ import { Settings } from "../../settings";
 import { estimateStarRadiusFromMass } from "../../utils/estimateStarRadiusFromMass";
 import { BodyType } from "../../architecture/bodyType";
 import { GenerationSteps } from "../../utils/generationSteps";
+import { starName } from "../../utils/parseToStrings";
+import { StarSystemModel } from "../../starSystem/starSystemModel";
 
 export class BlackHoleModel implements StellarObjectModel {
+    readonly name: string;
+
     readonly bodyType = BodyType.BLACK_HOLE;
     readonly seed: number;
     readonly rng: (step: number) => number;
@@ -51,9 +55,16 @@ export class BlackHoleModel implements StellarObjectModel {
 
     readonly childrenBodies: CelestialBodyModel[] = [];
 
-    constructor(seed: number, parentBody?: CelestialBodyModel) {
+    readonly starSystemModel: StarSystemModel;
+
+    constructor(seed: number, starSystemModel: StarSystemModel, parentBody?: CelestialBodyModel) {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed);
+
+        this.starSystemModel = starSystemModel;
+
+        const stellarObjectIndex = this.starSystemModel.getStellarObjects().findIndex(([_, stellarObjectSeed]) => stellarObjectSeed === this.seed);
+        this.name = starName(this.starSystemModel.name, stellarObjectIndex);
 
         this.radius = 1000e3;
 
@@ -106,7 +117,7 @@ export class BlackHoleModel implements StellarObjectModel {
      * The angular momentum is important in the Kerr metric to compute frame dragging.
      */
     public estimateAngularMomentum(): number {
-        if (this.physicalProperties.rotationPeriod === 0) 0;
+        if (this.physicalProperties.rotationPeriod === 0) return 0;
 
         const estimatedOriginalStarRadius = estimateStarRadiusFromMass(this.physicalProperties.mass);
 

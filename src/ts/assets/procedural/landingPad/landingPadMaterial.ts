@@ -7,7 +7,6 @@ import { Transformable } from "../../../architecture/transformable";
 import landingPadMaterialFragment from "../../../../shaders/landingPadMaterial/fragment.glsl";
 import landingPadMaterialVertex from "../../../../shaders/landingPadMaterial/vertex.glsl";
 import { Textures } from "../../textures";
-import { DynamicTexture } from "@babylonjs/core";
 import { Settings } from "../../../settings";
 
 const LandingPadUniformNames = {
@@ -28,7 +27,7 @@ const LandingPadSamplerNames = {
 export class LandingPadMaterial extends ShaderMaterial {
     private stellarObjects: Transformable[] = [];
 
-    constructor(padNumber: number, aspectRatio: number, scene: Scene) {
+    constructor(padNumber: number, scene: Scene) {
         const shaderName = "landingPadMaterial";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = landingPadMaterialFragment;
@@ -43,19 +42,10 @@ export class LandingPadMaterial extends ShaderMaterial {
             samplers: [...Object.values(LandingPadSamplerNames)]
         });
 
-        const textureResolution = 1024;
-        const numberTexture = new DynamicTexture(
-            `PadNumberTexture${padNumber}`,
-            {
-                width: textureResolution * aspectRatio,
-                height: textureResolution
-            },
-            scene
-        );
-
-        //Add text to dynamic texture
-        const font = `bold 256px ${Settings.MAIN_FONT}`;
-        numberTexture.drawText(`${padNumber}`, null, null, font, "white", null, true, true);
+        const numberTexture = Textures.LANDING_PAD_NUMBER_TEXTURES.at(padNumber);
+        if (numberTexture === undefined) {
+            throw new Error(`No texture for pad number ${padNumber}`);
+        }
 
         this.onBindObservable.add(() => {
             const activeCamera = scene.activeCamera;
@@ -64,7 +54,7 @@ export class LandingPadMaterial extends ShaderMaterial {
             }
 
             this.getEffect().setVector3(LandingPadUniformNames.CAMERA_POSITION, activeCamera.globalPosition);
-            this.getEffect().setFloat(LandingPadUniformNames.ASPECT_RATIO, aspectRatio);
+            this.getEffect().setFloat(LandingPadUniformNames.ASPECT_RATIO, Settings.LANDING_PAD_ASPECT_RATIO);
 
             this.getEffect().setTexture(LandingPadSamplerNames.ALBEDO_MAP, Textures.METAL_PANELS_ALBEDO);
             this.getEffect().setTexture(LandingPadSamplerNames.NORMAL_MAP, Textures.METAL_PANELS_NORMAL);
@@ -73,10 +63,6 @@ export class LandingPadMaterial extends ShaderMaterial {
             this.getEffect().setTexture(LandingPadSamplerNames.NUMBER_TEXTURE, numberTexture);
 
             setStellarObjectUniforms(this.getEffect(), this.stellarObjects);
-        });
-
-        this.onDisposeObservable.add(() => {
-            numberTexture.dispose();
         });
     }
 

@@ -35,7 +35,7 @@ const MetalSectionSamplerNames = {
     ALBEDO_MAP: "albedoMap",
     NORMAL_MAP: "normalMap",
     METALLIC_MAP: "metallicMap",
-    ROUGHNESS_MAP: "roughnessMap",
+    ROUGHNESS_MAP: "roughnessMap"
 };
 
 export class MetalSectionMaterial extends ShaderMaterial {

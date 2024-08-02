@@ -68,25 +68,25 @@ export function createRingVertexData(radius: number, thickness: number, height: 
 
         const stride = 8;
 
-        const previousBottomIndex = stride * (i-1) + 0;
+        const previousBottomIndex = stride * (i - 1) + 0;
         const currentBottomIndex = stride * i + 0;
 
         indices.push(currentBottomIndex + 1, previousBottomIndex + 1, previousBottomIndex);
         indices.push(currentBottomIndex, currentBottomIndex + 1, previousBottomIndex);
 
-        const previousTopIndex = stride * (i-1) + 2;
+        const previousTopIndex = stride * (i - 1) + 2;
         const currentTopIndex = stride * i + 2;
 
         indices.push(previousTopIndex, previousTopIndex + 1, currentTopIndex + 1);
         indices.push(previousTopIndex, currentTopIndex + 1, currentTopIndex);
 
-        const previousOuterIndex = stride * (i-1) + 4;
+        const previousOuterIndex = stride * (i - 1) + 4;
         const currentOuterIndex = stride * i + 4;
 
         indices.push(currentOuterIndex + 1, previousOuterIndex + 1, previousOuterIndex);
         indices.push(currentOuterIndex, currentOuterIndex + 1, previousOuterIndex);
 
-        const previousInnerIndex = stride * (i-1) + 6;
+        const previousInnerIndex = stride * (i - 1) + 6;
         const currentInnerIndex = stride * i + 6;
 
         indices.push(previousInnerIndex, previousInnerIndex + 1, currentInnerIndex + 1);

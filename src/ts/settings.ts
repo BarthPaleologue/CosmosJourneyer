@@ -83,6 +83,8 @@ export const Settings = {
 
     FOV: Tools.ToRadians(60),
 
+    LANDING_PAD_ASPECT_RATIO: 1.618,
+
     MAIN_FONT: "Nasalization"
 };
 

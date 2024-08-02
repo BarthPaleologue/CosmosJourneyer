@@ -14,9 +14,11 @@ const landingAction = new Action({
 
 const landingInteraction = new PressInteraction(landingAction);
 
-const emitLandingRequest = new PressInteraction(new Action({
-    bindings: [keyboard.getControl("keyY")]
-}));
+const emitLandingRequest = new PressInteraction(
+    new Action({
+        bindings: [keyboard.getControl("keyY")]
+    })
+);
 
 const upDown = new AxisComposite({
     positive: keyboard.getControl("KeyR"),

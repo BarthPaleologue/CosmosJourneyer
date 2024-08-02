@@ -4,7 +4,7 @@ import { Transformable } from "../architecture/transformable";
 import { BoundingSphere } from "../architecture/boundingSphere";
 import { TypedObject } from "../architecture/typedObject";
 import { SystemSeed } from "./systemSeed";
-import { StarSystemModel } from "../starSystem/starSystemModel";
+import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
 import i18n from "../i18n";
 
 export class SystemTarget implements Transformable, BoundingSphere, TypedObject {
@@ -15,8 +15,8 @@ export class SystemTarget implements Transformable, BoundingSphere, TypedObject 
     readonly seed: SystemSeed;
 
     constructor(seed: SystemSeed, scene: Scene) {
-        const systemModel = new StarSystemModel(seed);
-        this.name = systemModel.getName();
+        const systemModel = new SeededStarSystemModel(seed);
+        this.name = systemModel.name;
         this.transform = new TransformNode(this.name, scene);
         this.scene = scene;
 

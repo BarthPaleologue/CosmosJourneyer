@@ -70,6 +70,8 @@ import crateAlbedo from "../../asset/crateMaterial/space-crate1-albedo.webp";
 import crateNormal from "../../asset/crateMaterial/space-crate1-normal-dx.webp";
 import crateMetallicRoughness from "../../asset/crateMaterial/space-crate1-metallic-roughness.webp";
 import crateAmbientOcclusion from "../../asset/crateMaterial/space-crate1-ao.webp";
+import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
+import { Settings } from "../settings";
 
 export class Textures {
     static ROCK_NORMAL_METALLIC_MAP: Texture;
@@ -125,6 +127,8 @@ export class Textures {
 
     static MILKY_WAY: CubeTexture;
 
+    static LANDING_PAD_NUMBER_TEXTURES: DynamicTexture[] = [];
+
     static EnqueueTasks(manager: AssetsManager, scene: Scene) {
         manager.addTextureTask("RockNormalMetallicMap", rockNormalMetallicMap).onSuccess = (task) => (Textures.ROCK_NORMAL_METALLIC_MAP = task.texture);
         manager.addTextureTask("RockAlbedoRoughnessMap", rockAlbedoRoughnessMap).onSuccess = (task) => (Textures.ROCK_ALBEDO_ROUGHNESS_MAP = task.texture);
@@ -158,7 +162,7 @@ export class Textures {
         manager.addTextureTask("SpaceStationMetallic", spaceStationMetallic).onSuccess = (task) => (Textures.SPACE_STATION_METALLIC = task.texture);
         manager.addTextureTask("SpaceStationRoughness", spaceStationRoughness).onSuccess = (task) => (Textures.SPACE_STATION_ROUGHNESS = task.texture);
         manager.addTextureTask("SpaceStationAmbientOcclusion", spaceStationAmbientOcclusion).onSuccess = (task) => (Textures.SPACE_STATION_AMBIENT_OCCLUSION = task.texture);
-        
+
         manager.addTextureTask("MetalPanelsAlbedo", metalPanelsAlbdeo).onSuccess = (task) => (Textures.METAL_PANELS_ALBEDO = task.texture);
         manager.addTextureTask("MetalPanelsNormal", metalPanelsNormal).onSuccess = (task) => (Textures.METAL_PANELS_NORMAL = task.texture);
         manager.addTextureTask("MetalPanelsMetallic", metalPanelsMetallic).onSuccess = (task) => (Textures.METAL_PANELS_METALLIC = task.texture);
@@ -178,5 +182,23 @@ export class Textures {
         this.CURSOR_IMAGE_URL = cursorImage;
 
         manager.addTextureTask("EmptyTexture", empty).onSuccess = (task) => (Textures.EMPTY_TEXTURE = task.texture);
+
+        const padNumberTextureResolution = 1024;
+        for (let i = 0; i < 100; i++) {
+            const numberTexture = new DynamicTexture(
+                `PadNumberTexture${i}`,
+                {
+                    width: padNumberTextureResolution,
+                    height: padNumberTextureResolution * Settings.LANDING_PAD_ASPECT_RATIO
+                },
+                scene
+            );
+
+            //Add text to dynamic texture
+            const font = `bold 256px ${Settings.MAIN_FONT}`;
+            numberTexture.drawText(`${i}`, null, null, font, "white", null, true, true);
+
+            Textures.LANDING_PAD_NUMBER_TEXTURES.push(numberTexture);
+        }
     }
 }

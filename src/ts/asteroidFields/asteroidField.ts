@@ -84,7 +84,7 @@ export class AsteroidField implements IDisposable {
         const cameraLocalPosition = Vector3.TransformCoordinates(cameraWorldPosition, planetInverseWorld);
 
         const cameraCellX = Math.round(cameraLocalPosition.x / this.patchSize);
-        const cameraCellY = Math.round(cameraLocalPosition.y / this.patchSize);
+        const cameraCellY = Math.round(cameraLocalPosition.y / this.patchSize) / 5.0;
         const cameraCellZ = Math.round(cameraLocalPosition.z / this.patchSize);
 
         // remove patches too far away

@@ -124,13 +124,7 @@ export class Spaceship implements Transformable {
         this.aggregate.body.setAngularDamping(0.9);
 
         this.aggregate.body.setCollisionCallbackEnabled(true);
-
         this.collisionObservable = this.aggregate.body.getCollisionObservable();
-        this.collisionObservable.add((collisionEvent: IPhysicsCollisionEvent) => {
-            console.log("Collision");
-            if (collisionEvent.impulse < 0.8) return;
-            console.log(collisionEvent);
-        });
 
         this.warpTunnel = new WarpTunnel(this.getTransform(), scene);
         this.hyperSpaceTunnel = new HyperSpaceTunnel(this.getTransform().getDirection(Axis.Z), scene);
@@ -278,20 +272,21 @@ export class Spaceship implements Transformable {
         this.aggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
 
         if (this.targetLandingPad !== null) {
-            const currentPosition = this.getTransform().getAbsolutePosition().clone();
-            const currentRotation = this.getTransform().absoluteRotationQuaternion.clone();
-            const padRotation = this.targetLandingPad.getTransform().absoluteRotationQuaternion.clone();
-            if (padRotation === null) {
-                throw new Error("Landing pad's rotation quaternion is null!");
-            }
-            this.getTransform().parent = this.targetLandingPad.getTransform();
-            this.getTransform().setAbsolutePosition(currentPosition);
-            this.getTransform().rotationQuaternion = padRotation.invert().multiply(currentRotation);
+            this.getTransform().setParent(this.targetLandingPad.getTransform());
         }
 
         this.landingTarget = null;
 
         this.onLandingObservable.notifyObservers();
+    }
+
+    public spawnOnPad(landingPad: LandingPad) {
+        this.getTransform().setParent(null);
+        this.engageLandingOnPad(landingPad);
+        this.getTransform().rotationQuaternion = Quaternion.Identity();
+        this.getTransform().position.copyFromFloats(0, 1.5, 0);
+        this.getTransform().parent = landingPad.getTransform();
+        this.completeLanding();
     }
 
     public isLanded(): boolean {
@@ -314,11 +309,9 @@ export class Spaceship implements Transformable {
         this.aggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS | CollisionMask.ENVIRONMENT;
         this.aggregate.shape.filterMembershipMask = CollisionMask.DYNAMIC_OBJECTS;
 
-        const currentPosition = this.getTransform().getAbsolutePosition().clone();
-        const currentRotation = this.getTransform().absoluteRotationQuaternion.clone();
-        this.getTransform().parent = null;
-        this.getTransform().setAbsolutePosition(currentPosition);
-        this.getTransform().rotationQuaternion = currentRotation;
+        this.getTransform().setParent(null);
+
+        this.aggregate.body.applyImpulse(this.getTransform().up.scale(200), this.getTransform().getAbsolutePosition());
     }
 
     private land(deltaTime: number) {
@@ -424,7 +417,7 @@ export class Spaceship implements Transformable {
     }
 
     public update(deltaSeconds: number) {
-        this.mainEngineTargetSpeed = Math.sign(this.mainEngineThrottle) * this.mainEngineThrottle ** 2 * 500;
+        this.mainEngineTargetSpeed = this.mainEngineThrottle * 500;
 
         const warpSpeed = getForwardDirection(this.aggregate.transformNode).scale(this.warpDrive.getWarpSpeed());
 
@@ -434,7 +427,7 @@ export class Spaceship implements Transformable {
         let objectHalfThickness = 0;
 
         if (this.warpDrive.isEnabled()) {
-            if(!this.canEngageWarpDrive()) {
+            if (!this.canEngageWarpDrive()) {
                 this.emergencyStopWarpDrive();
             }
 
@@ -517,7 +510,7 @@ export class Spaceship implements Transformable {
             }
         }
 
-        if(this.warpDrive.isEnabled()) {
+        if (this.warpDrive.isEnabled()) {
             this.mainThrusters.forEach((thruster) => {
                 thruster.setThrottle(0);
             });
@@ -558,7 +551,7 @@ export class Spaceship implements Transformable {
 
         this.onWarpDriveEnabled.clear();
         this.onWarpDriveDisabled.clear();
-    
+
         this.onLandingEngaged.clear();
         this.onLandingObservable.clear();
     }

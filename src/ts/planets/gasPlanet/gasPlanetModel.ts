@@ -30,8 +30,11 @@ import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { RingsModel } from "../../rings/ringsModel";
 import { BodyType } from "../../architecture/bodyType";
 import { GenerationSteps } from "../../utils/generationSteps";
+import { getPlanetName } from "../common";
+import { StarSystemModel } from "../../starSystem/starSystemModel";
 
 export class GasPlanetModel implements PlanetModel {
+    readonly name: string;
     readonly bodyType = BodyType.GAS_PLANET;
     readonly seed: number;
     readonly rng: (step: number) => number;
@@ -50,12 +53,18 @@ export class GasPlanetModel implements PlanetModel {
 
     readonly childrenBodies: CelestialBodyModel[] = [];
 
-    constructor(seed: number, parentBody?: CelestialBodyModel) {
+    readonly starSystem: StarSystemModel;
+
+    constructor(seed: number, starSystem: StarSystemModel, parentBody?: CelestialBodyModel) {
         this.seed = seed;
 
         this.rng = seededSquirrelNoise(this.seed);
 
         this.parentBody = parentBody ?? null;
+
+        this.starSystem = starSystem;
+
+        this.name = getPlanetName(this.seed, this.starSystem, this.parentBody);
 
         this.radius = randRangeInt(Settings.EARTH_RADIUS * 4, Settings.EARTH_RADIUS * 20, this.rng, GenerationSteps.RADIUS);
 

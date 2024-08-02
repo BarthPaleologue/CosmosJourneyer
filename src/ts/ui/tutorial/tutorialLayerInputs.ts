@@ -5,17 +5,23 @@ import PressInteraction from "@brianchirls/game-input/interactions/PressInteract
 
 const keyboard = InputDevices.KEYBOARD;
 
-const nextPanel = new PressInteraction(new Action({
-    bindings: [keyboard.getControl("Space")]
-}));
+const nextPanel = new PressInteraction(
+    new Action({
+        bindings: [keyboard.getControl("Space")]
+    })
+);
 
-const prevPanel = new PressInteraction(new Action({
-    bindings: [keyboard.getControl("Backspace")]
-}));
+const prevPanel = new PressInteraction(
+    new Action({
+        bindings: [keyboard.getControl("Backspace")]
+    })
+);
 
-const quitTutorial = new PressInteraction(new Action({
-    bindings: [keyboard.getControl("Delete")]
-}));
+const quitTutorial = new PressInteraction(
+    new Action({
+        bindings: [keyboard.getControl("Delete")]
+    })
+);
 
 export const TutorialControlsInputs = new InputMap<{
     nextPanel: PressInteraction;

@@ -31,8 +31,12 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { RingsModel } from "../../rings/ringsModel";
 import { BodyType } from "../../architecture/bodyType";
 import { GenerationSteps } from "../../utils/generationSteps";
+import { starName } from "../../utils/parseToStrings";
+import { StarSystemModel } from "../../starSystem/starSystemModel";
 
 export class StarModel implements StellarObjectModel {
+    readonly name: string;
+
     readonly bodyType = BodyType.STAR;
     readonly rng: (step: number) => number;
     readonly seed: number;
@@ -54,9 +58,16 @@ export class StarModel implements StellarObjectModel {
 
     readonly childrenBodies: CelestialBodyModel[] = [];
 
-    constructor(seed: number, parentBody: CelestialBodyModel | null = null) {
+    readonly starSystemModel: StarSystemModel;
+
+    constructor(seed: number, starSystemModel: StarSystemModel, parentBody: CelestialBodyModel | null = null) {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed);
+
+        this.starSystemModel = starSystemModel;
+
+        const stellarObjectIndex = this.starSystemModel.getStellarObjects().findIndex(([_, stellarObjectSeed]) => stellarObjectSeed === this.seed);
+        this.name = starName(this.starSystemModel.name, stellarObjectIndex);
 
         this.stellarType = StarModel.GetRandomStellarType(this.rng);
 

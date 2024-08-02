@@ -18,7 +18,6 @@
 import { StarSystemController } from "./starSystemController";
 import { StarModel } from "../stellarObjects/star/starModel";
 import { Star } from "../stellarObjects/star/star";
-import { GreekAlphabet, starName } from "../utils/parseToStrings";
 import { MandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModel";
 import { Mandelbulb } from "../anomalies/mandelbulb/mandelbulb";
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
@@ -34,7 +33,6 @@ import { Planet } from "../architecture/planet";
 import { StellarObject } from "../architecture/stellarObject";
 import { SpaceStation } from "../spacestation/spaceStation";
 import { CelestialBody } from "../architecture/celestialBody";
-import { romanNumeral } from "../utils/romanNumerals";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
 import { BodyType } from "../architecture/bodyType";
 import { JuliaSet } from "../anomalies/julia/juliaSet";
@@ -42,11 +40,7 @@ import { JuliaSetModel } from "../anomalies/julia/juliaSetModel";
 
 export class StarSystemHelper {
     public static MakeStar(starsystem: StarSystemController, model?: number | StarModel): Star {
-        if (model === undefined) {
-            model = starsystem.model.getStellarObjectSeed(starsystem.stellarObjects.length);
-        }
-        const name = starName(starsystem.model.getName(), starsystem.stellarObjects.length);
-        const star = new Star(name, starsystem.scene, model, starsystem.stellarObjects[0]);
+        const star = new Star(model ?? starsystem.model.getStellarObjectSeed(starsystem.stellarObjects.length), starsystem.model, starsystem.scene, starsystem.stellarObjects[0]);
         starsystem.addStellarObject(star);
         return star;
     }
@@ -56,7 +50,7 @@ export class StarSystemHelper {
             console.warn(`You are adding a mandelbulb to the system.
             The system generator had planned for ${starsystem.model.getNbAnomalies()} anomalies, but you are adding the ${starsystem.anomalies.length + 1}th anomaly.
             This might cause issues, or not who knows.`);
-        const mandelbulb = new Mandelbulb(`${starsystem.model.getName()} ${GreekAlphabet[starsystem.anomalies.length]}`, starsystem.scene, model, starsystem.stellarObjects[0]);
+        const mandelbulb = new Mandelbulb(model, starsystem.model, starsystem.scene, starsystem.stellarObjects[0]);
         starsystem.addMandelbulb(mandelbulb);
         return mandelbulb;
     }
@@ -66,7 +60,7 @@ export class StarSystemHelper {
             console.warn(`You are adding a julia set to the system.
             The system generator had planned for ${starsystem.model.getNbAnomalies()} anomalies, but you are adding the ${starsystem.anomalies.length + 1}th anomaly.
             This might cause issues, or not who knows.`);
-        const juliaSet = new JuliaSet(`${starsystem.model.getName()} ${GreekAlphabet[starsystem.anomalies.length]}`, starsystem.scene, model, starsystem.stellarObjects[0]);
+        const juliaSet = new JuliaSet(model, starsystem.model, starsystem.scene, starsystem.stellarObjects[0]);
         starsystem.addJuliaSet(juliaSet);
         return juliaSet;
     }
@@ -87,8 +81,7 @@ export class StarSystemHelper {
         starsystem: StarSystemController,
         model: number | BlackHoleModel = starsystem.model.getStellarObjectSeed(starsystem.stellarObjects.length)
     ): BlackHole {
-        const name = starName(starsystem.model.getName(), starsystem.stellarObjects.length);
-        const blackHole = new BlackHole(name, starsystem.scene, model, starsystem.stellarObjects.length > 0 ? starsystem.stellarObjects[0] : null);
+        const blackHole = new BlackHole(model, starsystem.model, starsystem.scene, starsystem.stellarObjects.length > 0 ? starsystem.stellarObjects[0] : null);
         starsystem.addStellarObject(blackHole);
         return blackHole;
     }
@@ -101,8 +94,7 @@ export class StarSystemHelper {
             console.warn(`You are adding a neutron star
         to a system that already has ${starsystem.stellarObjects.length} stars.
         The capacity of the generator was supposed to be ${starsystem.model.getNbStellarObjects()} starsystem is not a problem, but it may be.`);
-        const name = starName(starsystem.model.getName(), starsystem.stellarObjects.length);
-        const neutronStar = new NeutronStar(name, starsystem.scene, model, starsystem.stellarObjects.length > 0 ? starsystem.stellarObjects[0] : null);
+        const neutronStar = new NeutronStar(model, starsystem.model, starsystem.scene, starsystem.stellarObjects.length > 0 ? starsystem.stellarObjects[0] : null);
 
         starsystem.addStellarObject(neutronStar);
         return neutronStar;
@@ -151,7 +143,7 @@ export class StarSystemHelper {
         starsystem: StarSystemController,
         model: number | TelluricPlanetModel = starsystem.model.getPlanetSeed(starsystem.planets.length)
     ): TelluricPlanet {
-        const planet = new TelluricPlanet(`${starsystem.model.getName()} ${romanNumeral(starsystem.planets.length + 1)}`, starsystem.scene, model, starsystem.stellarObjects[0]);
+        const planet = new TelluricPlanet(model, starsystem.model, starsystem.scene, starsystem.stellarObjects[0]);
         starsystem.addTelluricPlanet(planet);
 
         return planet;
@@ -163,7 +155,7 @@ export class StarSystemHelper {
      * @param model The model or seed to use for the planet generation (by default, the next available seed planned by the system model)
      */
     public static MakeGasPlanet(starsystem: StarSystemController, model: number | GasPlanetModel = starsystem.model.getPlanetSeed(starsystem.planets.length)): GasPlanet {
-        const planet = new GasPlanet(`${starsystem.model.getName()} ${romanNumeral(starsystem.planets.length + 1)}`, starsystem.scene, model, starsystem.stellarObjects[0]);
+        const planet = new GasPlanet(model, starsystem.model, starsystem.scene, starsystem.stellarObjects[0]);
         starsystem.addGasPlanet(planet);
         return planet;
     }
@@ -192,7 +184,7 @@ export class StarSystemHelper {
     }
 
     public static MakeSpaceStation(starsystem: StarSystemController, model: SpaceStationModel | number, body: CelestialBody): SpaceStation {
-        const spacestation = new SpaceStation(starsystem.scene, model, body);
+        const spacestation = new SpaceStation(model, starsystem.model, starsystem.scene, body);
         starsystem.addSpaceStation(spacestation);
         return spacestation;
     }
@@ -214,7 +206,7 @@ export class StarSystemHelper {
         planet: Planet,
         model: TelluricPlanetModel | number = getMoonSeed(planet.model, planet.model.childrenBodies.length)
     ): TelluricPlanet {
-        const satellite = new TelluricPlanet(`${planet.name} ${romanNumeral(planet.model.childrenBodies.length + 1)}`, starsystem.scene, model, planet);
+        const satellite = new TelluricPlanet(model, starsystem.model, starsystem.scene, planet);
 
         planet.model.childrenBodies.push(satellite.model);
 

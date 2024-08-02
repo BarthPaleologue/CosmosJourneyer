@@ -2,7 +2,7 @@ import { LandingPad, LandingPadSize } from "../assets/procedural/landingPad/land
 
 export type LandingRequest = {
     minimumPadSize: LandingPadSize;
-}
+};
 
 export interface ManagesLandingPads {
     handleLandingRequest(request: LandingRequest): LandingPad | null;

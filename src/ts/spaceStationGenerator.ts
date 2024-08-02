@@ -25,7 +25,7 @@ import { Tools } from "@babylonjs/core/Misc/tools";
 import "@babylonjs/core/Meshes/thinInstanceMesh";
 import { PhysicsViewer, Scene } from "@babylonjs/core";
 import { DefaultControls } from "./defaultControls/defaultControls";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Assets } from "./assets/assets";
 import { SpaceStation } from "./spacestation/spaceStation";
@@ -34,9 +34,10 @@ import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { Star } from "./stellarObjects/star/star";
 import { Settings } from "./settings";
 import { SpaceStationModel } from "./spacestation/spacestationModel";
-import { SpaceStationUI } from "./ui/spaceStationUI";
 import { StarFieldBox } from "./starSystem/starFieldBox";
 import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
+import { CustomStarSystemModel } from "./starSystem/customStarSystemModel";
+import { BodyType } from "./architecture/bodyType";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -71,15 +72,17 @@ const distanceToStar = 25000 * Settings.EARTH_RADIUS;
 defaultControls.getTransform().setAbsolutePosition(new Vector3(0, 2, -3).normalize().scaleInPlace(40e3));
 defaultControls.getTransform().lookAt(Vector3.Zero());
 
-const sun = new Star("Sun", scene, 4413.641464990006);
+const starSystemModel = new CustomStarSystemModel("Space Station Generator", [[BodyType.STAR, 4413.641464990006]], [], []);
+
+const sun = new Star(starSystemModel.getStellarObjectSeed(0), starSystemModel, scene);
 sun.getTransform().position = new Vector3(7, 2, 5).normalize().scaleInPlace(distanceToStar);
 
 const starfieldBox = new StarFieldBox(scene);
 
-const spaceStationModel = new SpaceStationModel(Math.random() * Settings.SEED_HALF_RANGE, sun.model);
+const spaceStationModel = new SpaceStationModel(Math.random() * Settings.SEED_HALF_RANGE, starSystemModel, sun.model);
 spaceStationModel.orbit.radius = distanceToStar;
 
-const spaceStation = new SpaceStation(scene, spaceStationModel, sun);
+const spaceStation = new SpaceStation(spaceStationModel, starSystemModel, scene, sun);
 
 const ambient = new HemisphericLight("Sun", Vector3.Up(), scene);
 ambient.intensity = 0.1;
@@ -106,8 +109,7 @@ scene.onBeforePhysicsObservable.add(() => {
     //spaceStation.getTransform().position.y = Math.sin(elapsedSeconds / 5) * 10000;
 });
 
-
-//const spaceStationUI = new SpaceStationUI();
+//const spaceStationUI = new SpaceStationLayer();
 
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
