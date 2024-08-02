@@ -21,7 +21,7 @@ export function makeD3PieChart<T>(data: T[], extractProportion: (d: T) => number
     }));
 
     return `
-    <svg viewBox="-250 -250 700 500">
+    <svg viewBox="-250 -250 800 500">
         ${arcs.map(({ path, data, color }, i) => `
         <g class="pie-slice-group">
             <path d="${path}" fill="${color}" class="pie-slice"></path>
