@@ -16,6 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 .colorPickerContainer {
+  display: block;
+
   p {
     display: inline-block;
     padding: 0 !important;
@@ -35,6 +37,4 @@
       border: none;
     }
   }
-
-  display: block;
 }

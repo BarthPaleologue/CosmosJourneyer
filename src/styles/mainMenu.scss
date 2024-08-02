@@ -69,13 +69,13 @@
   transform: scale(0);
   opacity: 0;
 
+  box-shadow: 0 0 20px black;
+  background: rgba(0, 0, 0, 0.8);
+
   &.visible {
     transform: scale(1);
     opacity: 1;
   }
-
-  box-shadow: 0 0 20px black;
-  background: rgba(0, 0, 0, 0.8);
 
   h2 {
     color: white;
