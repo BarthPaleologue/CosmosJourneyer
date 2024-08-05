@@ -73,6 +73,7 @@ void main() {
     float leanAmount = 0.3;
     float curveAmount = leanAmount * position.y;
     float objectDistance = length(objectWorld - playerPosition);
+    float objectCameraDistance = length(objectWorld - cameraPosition);
 
     // account for player presence
     vec3 playerDirection = (objectWorld - playerPosition) / objectDistance;
@@ -86,7 +87,7 @@ void main() {
     leanAxis = normalize(mix(cross(vec3(0.0, 1.0, 0.0), playerDirection), leanAxis, smoothstep(0.0, 1.0, 1.0 - distance01)));
 
     float scaling = 1.0 + 0.3 * (texture2D(perlinNoise, objectWorld.xz * 0.1).r * 2.0 - 1.0);
-    scaling *= smoothstep(90.0, 70.0, objectDistance); // fade grass in the distance using scaling
+    scaling *= smoothstep(90.0, 70.0, objectCameraDistance); // fade grass in the distance using scaling
 
     vec3 leaningPosition = scaling * rotateAround(position, leanAxis, curveAmount);
 
