@@ -167,9 +167,28 @@ export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
             butterflyPatch.createInstances(Objects.BUTTERFLY);
             this.instancePatches.push(butterflyPatch);
 
-            const grassPatch = new ThinInstancePatch(this.parent, instancesMatrixBuffer);
+            const grassPatch = new ThinInstancePatch(this.parent, alignedInstancesMatrixBuffer);
             grassPatch.createInstances(Objects.GRASS_BLADE);
             this.instancePatches.push(grassPatch);
+
+            const observable1 = Materials.GRASS_MATERIAL.onBindObservable.add((mesh) => {
+                if (mesh === grassPatch.getBaseMesh()) {
+                    Materials.GRASS_MATERIAL.getEffect().setMatrix("planetWorld", this.parent.getWorldMatrix());
+                    Materials.GRASS_MATERIAL.getEffect().setVector3("planetPosition", this.parent.getAbsolutePosition());
+                }
+            });
+
+            const observable2 = Materials.GRASS_DEPTH_MATERIAL.onBindObservable.add((mesh) => {
+                if (mesh === grassPatch.getBaseMesh()) {
+                    Materials.GRASS_DEPTH_MATERIAL.getEffect().setMatrix("planetWorld", this.parent.getWorldMatrix());
+                    Materials.GRASS_DEPTH_MATERIAL.getEffect().setVector3("planetPosition", this.parent.getAbsolutePosition());
+                }
+            });
+
+            this.mesh.onDisposeObservable.add(() => {
+                Materials.GRASS_MATERIAL.onBindObservable.remove(observable1);
+                Materials.GRASS_DEPTH_MATERIAL.onBindObservable.remove(observable2);
+            });
 
             for (const depthRenderer of Object.values(this.scene._depthRenderer)) {
                 depthRenderer.setMaterialForRendering([butterflyPatch.getBaseMesh()], Materials.BUTTERFLY_DEPTH_MATERIAL);

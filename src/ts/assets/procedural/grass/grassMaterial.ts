@@ -25,6 +25,7 @@ import { Transformable } from "../../../architecture/transformable";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { setStellarObjectUniforms, StellarObjectUniformNames } from "../../../postProcesses/uniforms/stellarObjectUniforms";
 import { Textures } from "../../textures";
+import { TransformNode } from "@babylonjs/core";
 
 const GrassMaterialUniformNames = {
     WORLD: "world",
@@ -35,7 +36,9 @@ const GrassMaterialUniformNames = {
     VIEW_PROJECTION: "viewProjection",
     TIME: "time",
     CAMERA_POSITION: "cameraPosition",
-    PLAYER_POSITION: "playerPosition"
+    PLAYER_POSITION: "playerPosition",
+    PLANET_POSITION: "planetPosition",
+    PLANET_WORLD: "planetWorld"
 };
 
 const GrassMaterialSamplerNames = {

@@ -26,6 +26,9 @@ uniform mat4 projection;
 uniform vec3 cameraPosition;
 uniform vec3 playerPosition;
 
+uniform mat4 planetWorld;
+uniform vec3 planetPosition;
+
 uniform float time;
 
 uniform sampler2D perlinNoise;
@@ -34,7 +37,6 @@ varying vec3 vPosition;
 varying vec3 vPositionW;
 
 varying mat4 normalMatrix;
-varying vec3 vNormal;
 varying vec3 vNormalW;
 
 // This is used to render the grass blade to the depth buffer properly
@@ -61,8 +63,10 @@ float easeIn(float t, float alpha) {
 void main() {
     #include<instancesVertex>
 
+    mat4 worldMatrix = planetWorld * finalWorld;
+
     // wind
-    vec3 objectWorld = world3.xyz;
+    vec3 objectWorld = worldMatrix[3].xyz;
     float windStrength = texture2D(perlinNoise, objectWorld.xz * 0.007 + 0.1 * time).r;
     float windDir = texture2D(perlinNoise, objectWorld.xz * 0.005 + 0.05 * time).r * 2.0 * 3.14;
 
@@ -89,11 +93,20 @@ void main() {
     float scaling = 1.0 + 0.3 * (texture2D(perlinNoise, objectWorld.xz * 0.1).r * 2.0 - 1.0);
     scaling *= smoothstep(90.0, 70.0, objectCameraDistance); // fade grass in the distance using scaling
 
+    vec3 terrainNormal = normalize(vec3(worldMatrix * vec4(0.0, 1.0, 0.0, 0.0)));
+    vec3 sphereNormal = normalize(objectWorld - planetPosition);
+    float flatness = max(dot(terrainNormal, sphereNormal), 0.0);
+
+    scaling *= smoothstep(0.78, 0.8, flatness);
+
+    // taller grass bends more than short grass
+    curveAmount *= max(scaling, 0.3);
+
     vec3 leaningPosition = scaling * rotateAround(position, leanAxis, curveAmount);
 
     vec3 leaningNormal = rotateAround(normal, leanAxis, curveAmount);
 
-    vec4 worldPosition = finalWorld * vec4(leaningPosition, 1.0);
+    vec4 worldPosition = worldMatrix * vec4(leaningPosition, 1.0);
 
     //vec3 viewDir = normalize(cameraPosition - worldPosition);
     //float viewDotNormal = abs(dot(viewDir, leaningNormal));
@@ -110,8 +123,7 @@ void main() {
     vPosition = position;
     vPositionW = worldPosition.xyz;
 
-    vNormal = leaningNormal;
-    vNormalW = vec3(finalWorld * vec4(leaningNormal, 0.0));
+    vNormalW = vec3(worldMatrix * vec4(leaningNormal, 0.0));
 
     #ifdef FORDEPTH
     vDepthMetric = (-gl_Position.z + depthValues.x) / (depthValues.y);
