@@ -52,6 +52,8 @@ export class GrassMaterial extends ShaderMaterial {
 
     private scene: Scene;
 
+    private planet: TransformNode | null = null;
+
     constructor(scene: Scene, isDepthMaterial: boolean) {
         const shaderName = "grassMaterial";
         Effect.ShadersStore[`${shaderName}FragmentShader`] = grassFragment;
@@ -85,6 +87,15 @@ export class GrassMaterial extends ShaderMaterial {
         });
 
         this.scene = scene;
+    }
+
+    setPlanet(planet: TransformNode) {
+        if(planet === this.planet) return;
+        this.planet = planet;
+        this.onBindObservable.addOnce(() => {
+            this.getEffect().setVector3(GrassMaterialUniformNames.PLANET_POSITION, planet.getAbsolutePosition());
+            this.getEffect().setMatrix(GrassMaterialUniformNames.PLANET_WORLD, planet.getWorldMatrix());
+        });
     }
 
     update(stars: Transformable[], playerPosition: Vector3, deltaSeconds: number) {
