@@ -35,6 +35,7 @@ varying vec3 vPositionW;
 
 varying mat4 normalMatrix;
 varying vec3 vNormal;
+varying vec3 vNormalW;
 
 // This is used to render the grass blade to the depth buffer properly
 // (see https://forum.babylonjs.com/t/how-to-write-shadermaterial-to-depthrenderer/47227/3 and https://playground.babylonjs.com/#6GFJNR#161)
@@ -77,20 +78,21 @@ void main() {
     vec3 playerDirection = (objectWorld - playerPosition) / objectDistance;
     float maxDistance = 3.0;
     float distance01 = objectDistance / maxDistance;
-    float influence = 1.0 + 8.0 * smoothstep(0.0, 1.0, 1.0 - distance01);
-    curveAmount *= influence;
+    float influence = smoothstep(1.0, 0.0, distance01);
+    curveAmount += influence;
     curveAmount += windLeanAngle * smoothstep(0.2, 1.0, distance01);
 
     vec3 leanAxis = rotateAround(vec3(1.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0), windDir * smoothstep(0.2, 1.0, distance01));
     leanAxis = normalize(mix(cross(vec3(0.0, 1.0, 0.0), playerDirection), leanAxis, smoothstep(0.0, 1.0, 1.0 - distance01)));
 
+    float scaling = 1.0 + 0.3 * (texture2D(perlinNoise, objectWorld.xz * 0.1).r * 2.0 - 1.0);
+    scaling *= smoothstep(90.0, 70.0, objectDistance); // fade grass in the distance using scaling
 
-    vec3 leaningPosition = rotateAround(position, leanAxis, curveAmount);
+    vec3 leaningPosition = scaling * rotateAround(position, leanAxis, curveAmount);
 
     vec3 leaningNormal = rotateAround(normal, leanAxis, curveAmount);
 
     vec4 worldPosition = finalWorld * vec4(leaningPosition, 1.0);
-
 
     //vec3 viewDir = normalize(cameraPosition - worldPosition);
     //float viewDotNormal = abs(dot(viewDir, leaningNormal));
@@ -107,9 +109,8 @@ void main() {
     vPosition = position;
     vPositionW = worldPosition.xyz;
 
-    normalMatrix = finalWorld;
-
     vNormal = leaningNormal;
+    vNormalW = vec3(finalWorld * vec4(leaningNormal, 0.0));
 
     #ifdef FORDEPTH
     vDepthMetric = (-gl_Position.z + depthValues.x) / (depthValues.y);
