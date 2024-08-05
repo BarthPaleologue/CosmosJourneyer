@@ -60,7 +60,7 @@ void main() {
         if (ndl < 0.0) {
             normalW = -normalW;
         }
-        Lo += calculateLight(albedo, normalW, 0.3, 0.0, lightDirectionW, viewDirectionW, star_colors[i]);
+        Lo += calculateLight(albedo, normalW, 0.2, 0.0, lightDirectionW, viewDirectionW, star_colors[i]);
     }
 
     Lo += albedo * 0.2;
