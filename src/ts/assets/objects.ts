@@ -57,7 +57,7 @@ export class Objects {
     public static TREE: Mesh;
 
     public static BUTTERFLY: Mesh;
-    public static GRASS_BLADE: Mesh;
+    public static GRASS_BLADES: Mesh[] = [];
 
     public static SPHERICAL_TANK: Mesh;
     public static STATION_ENGINE: Mesh;
@@ -213,8 +213,11 @@ export class Objects {
         Objects.BUTTERFLY = createButterfly(scene);
         Objects.BUTTERFLY.isVisible = false;
 
-        Objects.GRASS_BLADE = createGrassBlade(scene, 3);
-        Objects.GRASS_BLADE.isVisible = false;
+        Objects.GRASS_BLADES.push(createGrassBlade(scene, 3));
+        Objects.GRASS_BLADES[0].isVisible = false;
+
+        Objects.GRASS_BLADES.push(createGrassBlade(scene, 1));
+        Objects.GRASS_BLADES[1].isVisible = false;
 
         Objects.CRATE = MeshBuilder.CreateBox("crate", { size: 1 }, scene);
         Objects.CRATE.isVisible = false;

@@ -17,56 +17,93 @@
 
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import "@babylonjs/core/Meshes/thinInstanceMesh";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { IPatch } from "./iPatch";
 
 export class ThinInstancePatch implements IPatch {
-    private baseMesh: Mesh | null = null;
+
     readonly matrixBuffer: Float32Array;
 
-    readonly parent: TransformNode;
+    private currentLod: { mesh: Mesh, lodIndex: number } | null = null;
+    private readonly lods: { mesh: Mesh, distance: number }[] = [];
 
-    constructor(parent: TransformNode, matrixBuffer: Float32Array) {
-        this.parent = parent;
+    constructor(matrixBuffer: Float32Array) {
         this.matrixBuffer = matrixBuffer;
     }
 
     public clearInstances(): void {
-        if (this.baseMesh === null) return;
-        this.baseMesh.thinInstanceCount = 0;
-        this.baseMesh.dispose();
-        this.baseMesh = null;
+        if (this.currentLod === null) return;
+        const currentMesh = this.currentLod.mesh;
+        currentMesh.thinInstanceCount = 0;
+        this.currentLod = null;
     }
 
-    public createInstances(baseMesh: TransformNode): void {
+    public createInstances(baseMeshes: { mesh: Mesh, distance: number }[]): void {
         this.clearInstances();
-        if (!(baseMesh instanceof Mesh)) {
-            throw new Error("Tried to create instances from a non-mesh object. Try using HierarchyInstancePatch instead if you want to use a TransformNode.");
+        this.lods.length = 0;
+        for (const baseMesh of baseMeshes) {
+            const lodMesh = baseMesh.mesh.clone();
+            lodMesh.makeGeometryUnique();
+            lodMesh.isVisible = true;
+            lodMesh.alwaysSelectAsActiveMesh = true;
+            this.lods.push({ mesh: lodMesh, distance: baseMesh.distance });
         }
-        this.baseMesh = baseMesh.clone();
-        this.baseMesh.makeGeometryUnique();
-        this.baseMesh.isVisible = true;
-        this.baseMesh.alwaysSelectAsActiveMesh = true;
-        this.baseMesh.thinInstanceSetBuffer("matrix", this.matrixBuffer, 16, false);
+
+        const currentLod = this.lods.at(0);
+        if (currentLod === undefined) throw new Error("No lod mesh was set.");
+        this.currentLod = { mesh: currentLod.mesh, lodIndex: 0 };
+        this.sendToGPU();
+    }
+
+    private sendToGPU() {
+        if (this.currentLod === null) throw new Error("Tried to send matrix buffer to GPU but no base mesh was set.");
+        this.currentLod.mesh.thinInstanceSetBuffer("matrix", this.matrixBuffer, 16, false);
     }
 
     public getNbInstances(): number {
-        if (this.baseMesh === null) return 0;
-        return this.baseMesh.thinInstanceCount;
+        if (this.currentLod === null) return 0;
+        return this.currentLod.mesh.thinInstanceCount;
     }
 
     public setEnabled(enabled: boolean) {
-        if (this.baseMesh === null) return;
-        this.baseMesh.setEnabled(enabled);
+        if (this.currentLod === null) return;
+        this.currentLod.mesh.setEnabled(enabled);
     }
 
-    public getBaseMesh(): Mesh {
-        if (this.baseMesh === null) throw new Error("Tried to get base mesh but no base mesh was set.");
-        return this.baseMesh;
+    public isEnabled(): boolean {
+        if (this.currentLod === null) return false;
+        return this.currentLod.mesh.isEnabled();
+    }
+
+    public handleLod(distance: number): void {
+        if (this.lods.length === 0) throw new Error("No lod meshes were set.");
+        if (this.currentLod === null) throw new Error("No lod mesh was set.");
+        let currentLodIndex = this.currentLod.lodIndex;
+
+        // check for furthest away lod
+        for(let i = this.lods.length - 1; i >= 0; i--) {
+            if(distance > this.lods[i].distance) {
+                if(i === currentLodIndex) break;
+                
+                this.clearInstances();
+                this.currentLod = { mesh: this.lods[i].mesh, lodIndex: i };
+                this.sendToGPU();
+                break;
+            }
+        }
+    }
+
+    public getCurrentMesh(): Mesh {
+        if (this.currentLod === null) throw new Error("Tried to get base mesh but no base mesh was set.");
+        return this.currentLod.mesh;
+    }
+
+    public getLodMeshes(): Mesh[] {
+        return this.lods.map(lod => lod.mesh);
     }
 
     public dispose() {
         this.clearInstances();
-        if (this.baseMesh !== null) this.baseMesh.dispose();
+        this.lods.forEach(lod => lod.mesh.dispose());
+        this.lods.length = 0;
     }
 }

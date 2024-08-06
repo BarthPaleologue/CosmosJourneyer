@@ -35,10 +35,10 @@ import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/
 import { Transformable } from "../../../../architecture/transformable";
 import { CollisionMask } from "../../../../settings";
 import { InstancePatch } from "../instancePatch/instancePatch";
-import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Cullable } from "../../../../utils/cullable";
 import { Materials } from "../../../../assets/materials";
 import { Objects } from "../../../../assets/objects";
+import { min } from "d3";
 
 export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
     public readonly mesh: Mesh;
@@ -151,7 +151,7 @@ export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
         if (instancesMatrixBuffer.length === 0) return;
 
         const rockPatch = new InstancePatch(this.parent, randomDownSample(alignedInstancesMatrixBuffer, 3200));
-        rockPatch.createInstances(Objects.ROCK);
+        rockPatch.createInstances([{ mesh: Objects.ROCK, distance: 0 }]);
         this.instancePatches.push(rockPatch);
 
         if (
@@ -160,15 +160,15 @@ export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
             this.getAverageHeight() > this.planetModel.physicalProperties.oceanLevel + 50
         ) {
             const treePatch = new InstancePatch(this.parent, randomDownSample(instancesMatrixBuffer, 4800));
-            treePatch.createInstances(Objects.TREE);
+            treePatch.createInstances([{ mesh: Objects.TREE, distance: 0 }]);
             this.instancePatches.push(treePatch);
 
-            const butterflyPatch = new ThinInstancePatch(this.parent, randomDownSample(instancesMatrixBuffer, 800));
-            butterflyPatch.createInstances(Objects.BUTTERFLY);
+            const butterflyPatch = new ThinInstancePatch(randomDownSample(instancesMatrixBuffer, 800));
+            butterflyPatch.createInstances([{ mesh: Objects.BUTTERFLY, distance: 0 }]);
             this.instancePatches.push(butterflyPatch);
 
-            const grassPatch = new ThinInstancePatch(this.parent, alignedInstancesMatrixBuffer);
-            grassPatch.createInstances(Objects.GRASS_BLADE);
+            const grassPatch = new ThinInstancePatch(alignedInstancesMatrixBuffer);
+            grassPatch.createInstances([{ mesh: Objects.GRASS_BLADES[0], distance: 0 }, { mesh: Objects.GRASS_BLADES[1], distance: 50 }]);
             this.instancePatches.push(grassPatch);
 
             Materials.GRASS_MATERIAL.setPlanet(this.parent);
@@ -178,8 +178,8 @@ export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
             Materials.BUTTERFLY_DEPTH_MATERIAL.setPlanet(this.parent);
 
             for (const depthRenderer of Object.values(this.scene._depthRenderer)) {
-                depthRenderer.setMaterialForRendering([butterflyPatch.getBaseMesh()], Materials.BUTTERFLY_DEPTH_MATERIAL);
-                depthRenderer.setMaterialForRendering([grassPatch.getBaseMesh()], Materials.GRASS_DEPTH_MATERIAL);
+                depthRenderer.setMaterialForRendering(butterflyPatch.getLodMeshes(), Materials.BUTTERFLY_DEPTH_MATERIAL);
+                depthRenderer.setMaterialForRendering(grassPatch.getLodMeshes(), Materials.GRASS_DEPTH_MATERIAL);
             }
         }
     }
@@ -248,6 +248,7 @@ export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
 
         this.instancePatches.forEach((patch) => {
             let isVisible = false;
+            let minDistance = Number.MAX_VALUE;
             for (const camera of cameras) {
                 const distanceVector = camera.globalPosition.subtract(this.getTransform().getAbsolutePosition());
 
@@ -258,8 +259,10 @@ export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
                 const tangentialDistance = distanceVector.subtract(normalComponent).length();
 
                 isVisible = isVisible || tangentialDistance < 200;
+                minDistance = Math.min(minDistance, tangentialDistance);
             }
             patch.setEnabled(isVisible);
+            patch.handleLod(minDistance);
         });
     }
 }

@@ -22,13 +22,14 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 
 export class HierarchyInstancePatch implements IPatch {
-    private baseRoot: TransformNode | null = null;
-
     readonly instances: TransformNode[] = [];
     private positions: Vector3[] = [];
     private rotations: Quaternion[] = [];
     private scalings: Vector3[] = [];
     readonly parent: TransformNode;
+
+    private currentLod: { mesh: TransformNode, lodIndex: number } | null = null;
+    private readonly lods: { mesh: TransformNode, distance: number }[] = [];
 
     constructor(parent: TransformNode, matrixBuffer: Float32Array) {
         this.parent = parent;
@@ -48,35 +49,42 @@ export class HierarchyInstancePatch implements IPatch {
     }
 
     public clearInstances(): void {
-        if (this.baseRoot === null) return;
+        if (this.currentLod === null) return;
         for (const instance of this.instances) {
             instance.dispose();
         }
-        this.instances.length = 0;
-        this.baseRoot.dispose();
-        this.baseRoot = null;
+        this.currentLod = null;
     }
 
-    public static CreateSquare(parent: TransformNode, position: Vector3, size: number, resolution: number) {
-        const buffer = createSquareMatrixBuffer(position, size, resolution);
-        return new HierarchyInstancePatch(parent, buffer);
-    }
-
-    public createInstances(baseRoot: TransformNode): void {
+    public createInstances(baseMeshes: { mesh: TransformNode, distance: number }[]): void {
         this.clearInstances();
-        this.baseRoot = baseRoot.clone(baseRoot.name + "Clone", null);
-        if (this.baseRoot === null) throw new Error("baseRoot is null");
-        this.baseRoot.getChildMeshes().forEach((mesh) => {
-            if (mesh instanceof Mesh) {
-                mesh.makeGeometryUnique();
-                mesh.isVisible = false;
-            }
-        });
+        this.lods.length = 0;
 
+        for (const baseMesh of baseMeshes) {
+            const clonedMesh = baseMesh.mesh.clone(baseMesh.mesh.name + "Clone", null);
+            if(clonedMesh === null) throw new Error("clonedMesh is null");
+            clonedMesh.getChildMeshes().forEach((mesh) => {
+                if (mesh instanceof Mesh) {
+                    mesh.makeGeometryUnique();
+                    mesh.isVisible = false;
+                }
+            });
+            this.lods.push({ mesh: clonedMesh, distance: baseMesh.distance });
+        }
+        
+        const currentLod = this.lods.at(0);
+        if (currentLod === undefined) throw new Error("No lod mesh was set.");
+        this.currentLod = { mesh: currentLod.mesh, lodIndex: 0 };
+
+        this.sendToGPU();
+    }
+
+    private sendToGPU() {
+        if (this.currentLod === null) throw new Error("Tried to send matrix buffer to GPU but no base mesh was set.");
         for (let i = 0; i < this.positions.length; i++) {
-            const instanceRoot = this.baseRoot.instantiateHierarchy(null);
+            const instanceRoot = this.currentLod.mesh.instantiateHierarchy(null);
             if (instanceRoot === null) throw new Error("instanceRoot is null");
-            instanceRoot.position.copyFrom(this.positions[i].add(this.baseRoot.position));
+            instanceRoot.position.copyFrom(this.positions[i].add(this.currentLod.mesh.position));
             instanceRoot.rotationQuaternion = this.rotations[i];
             instanceRoot.scaling.copyFrom(this.scalings[i]);
 
@@ -84,23 +92,53 @@ export class HierarchyInstancePatch implements IPatch {
         }
     }
 
+    
     public setEnabled(enabled: boolean) {
-        if (this.baseRoot === null) return;
-        this.baseRoot.setEnabled(enabled);
+        for (const instance of this.instances) {
+            instance.setEnabled(enabled);
+        }
     }
 
-    public getBaseMesh(): Mesh {
-        if (this.baseRoot === null) throw new Error("Tried to get base mesh but no base mesh was set.");
-        return this.baseRoot as Mesh;
+    public isEnabled(): boolean {
+        if (this.instances.length === 0) return false;
+        return this.instances[0].isEnabled();
+    }
+    
+    public handleLod(distance: number): void {
+        if (this.lods.length === 0) throw new Error("No lod meshes were set.");
+        if (this.currentLod === null) throw new Error("No lod mesh was set.");
+        let currentLodIndex = this.currentLod.lodIndex;
+
+        // check for furthest away lod
+        for(let i = this.lods.length - 1; i >= 0; i--) {
+            if(distance > this.lods[i].distance) {
+                if(i === currentLodIndex) break;
+                
+                this.clearInstances();
+                this.currentLod = { mesh: this.lods[i].mesh, lodIndex: i };
+                this.sendToGPU();
+                break;
+            }
+        }
+    }
+    
+    public getCurrentMesh(): TransformNode {
+        if (this.currentLod === null) throw new Error("Tried to get base mesh but no base mesh was set.");
+        return this.currentLod.mesh;
     }
 
+    public getLodMeshes(): TransformNode[] {
+        return this.lods.map(lod => lod.mesh);
+    }
+
+    
     public getNbInstances(): number {
-        if (this.baseRoot === null) return 0;
         return this.instances.length;
     }
 
     public dispose() {
         this.clearInstances();
-        if (this.baseRoot !== null) this.baseRoot.dispose();
+        this.lods.forEach(lod => lod.mesh.dispose());
+        this.lods.length = 0;
     }
 }
