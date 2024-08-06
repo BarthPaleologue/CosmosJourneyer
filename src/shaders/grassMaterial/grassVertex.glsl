@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 precision highp float;
+precision lowp int;
 
 attribute vec3 position;
 attribute vec3 normal;
@@ -39,6 +40,8 @@ varying vec3 vPositionW;
 varying mat4 normalMatrix;
 varying vec3 vNormalW;
 
+varying float vPlanetNdl;
+
 // This is used to render the grass blade to the depth buffer properly
 // (see https://forum.babylonjs.com/t/how-to-write-shadermaterial-to-depthrenderer/47227/3 and https://playground.babylonjs.com/#6GFJNR#161)
 #ifdef FORDEPTH
@@ -59,6 +62,8 @@ float easeIn(float t, float alpha) {
 #include "../utils/remap.glsl";
 
 #include<instancesDeclaration>
+
+#include "../utils/stars.glsl";
 
 void main() {
     #include<instancesVertex>
@@ -124,6 +129,15 @@ void main() {
     vPositionW = worldPosition.xyz;
 
     vNormalW = vec3(worldMatrix * vec4(leaningNormal, 0.0));
+
+    vPlanetNdl = 0.0;
+    for(int i = 0; i < nbStars; i++) {
+        vec3 starPosition = star_positions[i];
+        vec3 lightDirectionW = normalize(starPosition - vPositionW);
+        float ndl = dot(sphereNormal, lightDirectionW);
+
+        vPlanetNdl = max(vPlanetNdl, ndl);
+    }
 
     #ifdef FORDEPTH
     vDepthMetric = (-gl_Position.z + depthValues.x) / (depthValues.y);

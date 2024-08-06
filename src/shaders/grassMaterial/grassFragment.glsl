@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 precision highp float;
+precision lowp int;
 
 uniform float time;
 
@@ -25,6 +26,8 @@ varying vec3 vPosition;
 varying vec3 vPositionW;
 
 varying vec3 vNormalW;
+
+varying float vPlanetNdl;
 
 // This is used to render the grass blade to the depth buffer properly
 // (see https://forum.babylonjs.com/t/how-to-write-shadermaterial-to-depthrenderer/47227/3 and https://playground.babylonjs.com/#6GFJNR#161)
@@ -63,7 +66,9 @@ void main() {
         Lo += calculateLight(albedo, normalW, 0.2, 0.0, lightDirectionW, viewDirectionW, star_colors[i]);
     }
 
-    Lo += albedo * 0.2;
+    Lo *= vPlanetNdl;
+
+    Lo += albedo * 0.05;
 
     gl_FragColor = vec4(Lo * ao, 1.0);// apply color and lighting
     #endif
