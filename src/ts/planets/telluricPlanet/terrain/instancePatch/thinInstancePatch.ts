@@ -77,12 +77,11 @@ export class ThinInstancePatch implements IPatch {
     public handleLod(distance: number): void {
         if (this.lods.length === 0) throw new Error("No lod meshes were set.");
         if (this.currentLod === null) throw new Error("No lod mesh was set.");
-        let currentLodIndex = this.currentLod.lodIndex;
 
         // check for furthest away lod
         for(let i = this.lods.length - 1; i >= 0; i--) {
             if(distance > this.lods[i].distance) {
-                if(i === currentLodIndex) break;
+                if(i === this.currentLod.lodIndex) break;
                 
                 this.clearInstances();
                 this.currentLod = { mesh: this.lods[i].mesh, lodIndex: i };
