@@ -17,7 +17,7 @@
 
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { IPatch } from "./iPatch";
-import { createSquareMatrixBuffer, decomposeModelMatrix } from "./matrixBuffer";
+import { decomposeModelMatrix } from "./matrixBuffer";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 
@@ -91,7 +91,6 @@ export class HierarchyInstancePatch implements IPatch {
             this.instances.push(instanceRoot);
         }
     }
-
     
     public setEnabled(enabled: boolean) {
         for (const instance of this.instances) {
