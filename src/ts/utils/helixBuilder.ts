@@ -1,7 +1,7 @@
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Scene } from "@babylonjs/core";
 import { Mesh } from "@babylonjs/core/Meshes";
+import { Scene } from "@babylonjs/core/scene";
 
 /**
  * Create two walled spiral.

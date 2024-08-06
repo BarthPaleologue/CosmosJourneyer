@@ -19,14 +19,16 @@ import { wheelOfFortune } from "../../../utils/random";
 import { Transformable } from "../../../architecture/transformable";
 import { AbstractMesh, Mesh } from "@babylonjs/core/Meshes";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { Axis, PhysicsAggregate, PhysicsShapeType, Scene } from "@babylonjs/core";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { Space } from "@babylonjs/core/Maths/math.axis";
+import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { SolarPanelMaterial } from "../solarPanel/solarPanelMaterial";
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 import { createEnvironmentAggregate } from "../../../utils/physics";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { seededSquirrelNoise } from "squirrel-noise";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { Scene } from "@babylonjs/core/scene";
+import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 
 export class SolarSection implements Transformable {
     private readonly attachment: Mesh;

@@ -24,9 +24,9 @@ import landingBayMaterialFragment from "../../../../shaders/landingBayMaterial/f
 import landingBayMaterialVertex from "../../../../shaders/landingBayMaterial/vertex.glsl";
 import { setStellarObjectUniforms, StellarObjectUniformNames } from "../../../postProcesses/uniforms/stellarObjectUniforms";
 import { Textures } from "../../textures";
-import { DynamicTexture } from "@babylonjs/core";
 import { Settings } from "../../../settings";
 import { SpaceStationModel } from "../../../spacestation/spacestationModel";
+import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
 
 const LandingBayUniformNames = {
     WORLD: "world",

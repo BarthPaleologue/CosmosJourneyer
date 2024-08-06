@@ -25,7 +25,7 @@ import { Transformable } from "../../../architecture/transformable";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { setStellarObjectUniforms, StellarObjectUniformNames } from "../../../postProcesses/uniforms/stellarObjectUniforms";
 import { Textures } from "../../textures";
-import { TransformNode } from "@babylonjs/core";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
 const GrassMaterialUniformNames = {
     WORLD: "world",

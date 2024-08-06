@@ -17,8 +17,7 @@
 
 import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { Axis, PhysicsAggregate, PhysicsShapeType } from "@babylonjs/core";
-import { Space } from "@babylonjs/core/Maths/math.axis";
+import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { RingHabitatMaterial } from "./ringHabitatMaterial";
 import { Transformable } from "../../../architecture/transformable";
@@ -31,6 +30,8 @@ import { createEnvironmentAggregate } from "../../../utils/physics";
 import { createRing } from "../../../utils/ringBuilder";
 import { seededSquirrelNoise } from "squirrel-noise";
 import { SpaceStationModel } from "../../../spacestation/spacestationModel";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 
 export class RingHabitat implements Transformable {
     private readonly root: TransformNode;
