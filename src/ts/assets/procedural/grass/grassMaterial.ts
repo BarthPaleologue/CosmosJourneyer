@@ -84,18 +84,18 @@ export class GrassMaterial extends ShaderMaterial {
             const activeCamera = this.scene.activeCamera;
             if (activeCamera === null) throw new Error("No active camera in the scene");
             this.getEffect().setVector3(GrassMaterialUniformNames.CAMERA_POSITION, activeCamera.globalPosition);
+
+            if(this.planet !== null) {
+                this.getEffect().setVector3(GrassMaterialUniformNames.PLANET_POSITION, this.planet.getAbsolutePosition());
+                this.getEffect().setMatrix(GrassMaterialUniformNames.PLANET_WORLD, this.planet.getWorldMatrix());
+            }
         });
 
         this.scene = scene;
     }
 
     setPlanet(planet: TransformNode) {
-        if(planet === this.planet) return;
         this.planet = planet;
-        this.onBindObservable.addOnce(() => {
-            this.getEffect().setVector3(GrassMaterialUniformNames.PLANET_POSITION, planet.getAbsolutePosition());
-            this.getEffect().setMatrix(GrassMaterialUniformNames.PLANET_WORLD, planet.getWorldMatrix());
-        });
     }
 
     update(stars: Transformable[], playerPosition: Vector3, deltaSeconds: number) {
