@@ -67,10 +67,10 @@ vec3 hueShift( vec3 color, float hueAdjust ){
 #include "../utils/stars.glsl";
 
 void main() {
-    vec4 finalColor = texture(butterflyTexture, vUV);
-    if(finalColor.a < 0.1) discard;
+    vec4 butterflyColor = texture(butterflyTexture, vUV);
+    if(butterflyColor.a < 0.1) discard;
 
-    finalColor.rgb = hueShift(finalColor.rgb, vOriginalWorldPosition.x * 10.0 + vOriginalWorldPosition.z * 10.0);
+    butterflyColor.rgb = hueShift(butterflyColor.rgb, vOriginalWorldPosition.x * 10.0 + vOriginalWorldPosition.z * 10.0);
 
     vec3 normalW = vNormalW;
 
@@ -85,10 +85,10 @@ void main() {
         if (ndl < 0.0) {
             normalW = -normalW;
         }
-        Lo += calculateLight(finalColor.rgb, normalW, 1.0, 0.0, lightDirectionW, viewDirectionW, star_colors[i]);
+        Lo += calculateLight(butterflyColor.rgb, normalW, 1.0, 0.0, lightDirectionW, viewDirectionW, star_colors[i]);
     }
 
-    Lo += albedo * 0.2;
+    Lo += butterflyColor.rgb * 0.2;
 
     #ifdef FORDEPTH
     gl_FragColor = vec4(vDepthMetric, 0.0, 0.0, 1.0);
