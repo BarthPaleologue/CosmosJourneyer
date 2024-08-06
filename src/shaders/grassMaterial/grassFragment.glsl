@@ -68,7 +68,7 @@ void main() {
 
     Lo *= vPlanetNdl;
 
-    Lo += albedo * 0.05;
+    Lo += albedo * 0.2;
 
     gl_FragColor = vec4(Lo * ao, 1.0);// apply color and lighting
     #endif
