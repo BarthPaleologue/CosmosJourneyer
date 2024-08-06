@@ -177,6 +177,7 @@ export class CharacterControls implements Controls {
         this.thirdPersonCamera.upperRadiusLimit = 500;
         this.thirdPersonCamera.minZ = 1;
         this.thirdPersonCamera.maxZ = Settings.EARTH_RADIUS * 5;
+        this.thirdPersonCamera.wheelPrecision *= 3;
         this.thirdPersonCamera.parent = this.getTransform();
     }
 

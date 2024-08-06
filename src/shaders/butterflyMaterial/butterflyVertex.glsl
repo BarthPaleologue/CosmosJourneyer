@@ -29,11 +29,13 @@ uniform vec3 playerPosition;
 
 uniform float time;
 
-varying vec3 vPosition;
+uniform vec3 planetPosition;
+uniform mat4 planetWorld;
+
+varying vec3 vPositionW;
 varying vec2 vUV;
 
-varying mat4 normalMatrix;
-varying vec3 vNormal;
+varying vec3 vNormalW;
 
 varying vec3 vOriginalWorldPosition;
 
@@ -61,7 +63,9 @@ float easeIn(float t, float alpha) {
 void main() {
     #include<instancesVertex>
 
-    vec3 objectWorld = vec3(finalWorld[3].x, finalWorld[3].y, finalWorld[3].z);
+    mat4 worldMatrix = planetWorld * finalWorld;
+    
+    vec3 objectWorld = worldMatrix[3].xyz;
     vOriginalWorldPosition = objectWorld;
 
     // high frequency movement for wing flap
@@ -88,17 +92,15 @@ void main() {
         objectWorld += normalize(playerToButterfly) * (2.0 - distanceToPlayer);
     }
 
-    finalWorld[3].xyz = objectWorld;
+    worldMatrix[3].xyz = objectWorld;
 
-    vec4 outPosition = viewProjection * finalWorld * vec4(flyPosition, 1.0);
+    vec4 outPosition = viewProjection * worldMatrix * vec4(flyPosition, 1.0);
     gl_Position = outPosition;
 
-    vPosition = flyPosition;
+    vPositionW = vec3(worldMatrix * vec4(flyPosition, 1.0));
     vUV = uv;
 
-    normalMatrix = transpose(inverse(finalWorld));
-
-    vNormal = normal;
+    vNormalW = vec3(worldMatrix * vec4(normal, 0.0));
 
     #ifdef FORDEPTH
     vDepthMetric = (-gl_Position.z + depthValues.x) / (depthValues.y);

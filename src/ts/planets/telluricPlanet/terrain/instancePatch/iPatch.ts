@@ -33,14 +33,20 @@ export interface IPatch extends IDisposable {
      * @param baseMesh The mesh to create instances from.
      * @throws Error if baseMesh is not a Mesh in the case of InstancePatch and ThinInstancePatch.
      */
-    createInstances(baseMesh: TransformNode): void;
+    createInstances(baseMesh: { mesh: TransformNode, distance: number }[]): void;
 
     /**
      * Returns the number of instances currently rendered.
      */
     getNbInstances(): number;
 
-    getBaseMesh(): Mesh;
+    getCurrentMesh(): TransformNode;
+    
+    getLodMeshes(): TransformNode[];
 
     setEnabled(enabled: boolean): void;
+
+    isEnabled(): boolean;
+
+    handleLod(distance: number): void;
 }
