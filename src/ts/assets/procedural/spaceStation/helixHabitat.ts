@@ -17,8 +17,7 @@
 
 import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { Axis, PhysicsAggregate, PhysicsShapeType } from "@babylonjs/core";
-import { Space } from "@babylonjs/core/Maths/math.axis";
+import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Transformable } from "../../../architecture/transformable";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
@@ -30,6 +29,8 @@ import { HelixHabitatMaterial } from "./helixHabitatMaterial";
 import { createEnvironmentAggregate } from "../../../utils/physics";
 import { createHelix } from "../../../utils/helixBuilder";
 import { seededSquirrelNoise } from "squirrel-noise";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 
 export class HelixHabitat implements Transformable {
     private readonly root: TransformNode;
