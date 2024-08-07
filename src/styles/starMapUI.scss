@@ -9,6 +9,48 @@
     pointer-events: none;
   }
 
+  .starMapInfoPanel {
+    position: absolute;
+    height: 90vh;
+    top: 5vh;
+    width: 25vw;
+
+    backdrop-filter: blur(3px);
+    overflow-y: auto;
+
+    box-shadow: 0 0 20px black;
+    background: rgba(0, 0, 0, 0.8);
+
+    display: flex;
+    flex-direction: column;
+    
+    padding: 30px 0;
+
+    .starMapInfoPanelStarPreview {
+      width: 150px;
+      height: 150px;
+      background: white;
+      align-self: center;
+      border-radius: 50%;
+      box-shadow: 0 0 30px white;
+    }
+
+    .starMapInfoPanelTitle {
+      color: white;
+      text-align: center;
+      font-family: Nasalization, sans-serif;
+      font-size: 3em;
+      margin-block: 0.6em;
+    }
+
+    hr {
+      width: 90%;
+      margin: 20px auto;
+      border: 0;
+      border-top: 1px solid white;
+    }
+  }
+
   &.hidden {
     display: none;
   }

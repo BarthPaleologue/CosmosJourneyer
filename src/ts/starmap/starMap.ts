@@ -469,25 +469,8 @@ export class StarMap implements View {
 
                 Sounds.STAR_MAP_CLICK_SOUND.play();
 
-                let text = "";
-                if (this.currentSystemSeed !== null) {
-                    const currentInstance = this.seedToInstanceMap.get(this.currentSystemSeed.toString()) as InstancedMesh;
-                    const distance = Vector3.Distance(currentInstance.getAbsolutePosition(), initializedInstance.getAbsolutePosition()) * Settings.LIGHT_YEAR;
-                    text += `${i18n.t("starMap:distance")}: ${parseDistance(distance)}\n`;
-                }
-
-                if (starModel === null) throw new Error("Star model is null!");
-
-                let typeString = "";
-                if (starModel.bodyType === BodyType.BLACK_HOLE) typeString = i18n.t("objectTypes:blackHole");
-                else if (starModel.bodyType === BodyType.NEUTRON_STAR) typeString = i18n.t("objectTypes:neutronStar");
-                else typeString = i18n.t("objectTypes:star", { stellarType: getStellarTypeString(starModel.stellarType) });
-                text += `${typeString}\n`;
-
-                text += `${i18n.t("starMap:planets")}: ${starSystemModel.getNbPlanets()}\n`;
-
                 this.starMapUI.attachUIToMesh(initializedInstance);
-                this.starMapUI.setSelectedSystem({ name: starSystemModel.name, text });
+                this.starMapUI.setSelectedSystem(starSystemModel, this.currentSystemSeed !== null ? new SeededStarSystemModel(this.currentSystemSeed) : null);
 
                 this.selectedSystemSeed = starSystemSeed;
 

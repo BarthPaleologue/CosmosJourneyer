@@ -32,6 +32,15 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import i18n from "../i18n";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { StarSystemModel } from "../starSystem/starSystemModel";
+import { getStellarTypeString } from "../stellarObjects/common";
+import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
+import { StarModel } from "../stellarObjects/star/starModel";
+import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
+import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
+import { BodyType } from "../architecture/bodyType";
+import { getStarGalacticCoordinates } from "../utils/getStarGalacticCoordinates";
+import { parseDistance } from "../utils/parseToStrings";
 
 export class StarMapUI {
     readonly gui: AdvancedDynamicTexture;
@@ -45,6 +54,10 @@ export class StarMapUI {
     readonly currentSystemRing: Image;
 
     readonly htmlRoot: HTMLDivElement;
+
+    readonly infoPanel: HTMLDivElement;
+    readonly infoPanelStarPreview: HTMLDivElement;
+    readonly infoPanelTitle: HTMLHeadingElement;
 
     readonly cursor: HTMLDivElement;
 
@@ -136,13 +149,26 @@ export class StarMapUI {
 
         this.htmlRoot = document.createElement("div");
         this.htmlRoot.classList.add("starMapUI");
+        document.body.appendChild(this.htmlRoot);
+
+        this.infoPanel = document.createElement("div");
+        this.infoPanel.classList.add("starMapInfoPanel");
+        this.htmlRoot.appendChild(this.infoPanel);
+
+        this.infoPanelStarPreview = document.createElement("div");
+        this.infoPanelStarPreview.classList.add("starMapInfoPanelStarPreview");
+        this.infoPanel.appendChild(this.infoPanelStarPreview);
+        
+        this.infoPanelTitle = document.createElement("h2");
+        this.infoPanelTitle.classList.add("starMapInfoPanelTitle");
+        this.infoPanel.appendChild(this.infoPanelTitle);
+
+        const hr = document.createElement("hr");
+        this.infoPanel.appendChild(hr);
 
         this.cursor = document.createElement("div");
         this.cursor.classList.add("cursor");
-
         this.htmlRoot.appendChild(this.cursor);
-
-        document.body.appendChild(this.htmlRoot);
 
         document.addEventListener("pointermove", (event) => {
             this.cursor.style.transform = `translate(calc(${event.clientX}px - 50%), calc(${event.clientY}px - 50%))`;
@@ -219,9 +245,51 @@ export class StarMapUI {
         return this.hoveredSystemRing.linkedMesh;
     }
 
-    setSelectedSystem({ name, text }: { name: string; text: string }) {
-        this.namePlate.text = name;
+    setSelectedSystem(targetSystemModel: SeededStarSystemModel, currentSystemModel: SeededStarSystemModel | null) {
+        let text = "";
+        if (currentSystemModel !== null) {
+            const currentCoordinates = getStarGalacticCoordinates(currentSystemModel.seed);
+            const targetCoordinates = getStarGalacticCoordinates(targetSystemModel.seed);
+
+            const distance = Vector3.Distance(currentCoordinates, targetCoordinates) * Settings.LIGHT_YEAR;
+            text += `${i18n.t("starMap:distance")}: ${parseDistance(distance)}\n`;
+        }
+
+        const starSeed = targetSystemModel.getStellarObjectSeed(0);
+        const stellarObjectType = targetSystemModel.getBodyTypeOfStellarObject(0);
+
+        let starModel: StarModel | BlackHoleModel | NeutronStarModel;
+        switch (stellarObjectType) {
+            case BodyType.STAR:
+                starModel = new StarModel(starSeed, targetSystemModel);
+                break;
+            case BodyType.BLACK_HOLE:
+                starModel = new BlackHoleModel(starSeed, targetSystemModel);
+                break;
+            case BodyType.NEUTRON_STAR:
+                starModel = new NeutronStarModel(starSeed, targetSystemModel);
+                break;
+            default:
+                throw new Error("Unknown stellar object type!");
+        }
+
+        let typeString = "";
+        if (starModel.bodyType === BodyType.BLACK_HOLE) typeString = i18n.t("objectTypes:blackHole");
+        else if (starModel.bodyType === BodyType.NEUTRON_STAR) typeString = i18n.t("objectTypes:neutronStar");
+        else typeString = i18n.t("objectTypes:star", { stellarType: getStellarTypeString(starModel.stellarType) });
+        text += `${typeString}\n`;
+
+        text += `${i18n.t("starMap:planets")}: ${targetSystemModel.getNbPlanets()}\n`;
+
+        this.namePlate.text = targetSystemModel.name;
         this.descriptionPanel.text = text;
+
+        if(starModel instanceof StarModel) {
+            this.infoPanelStarPreview.style.background = starModel.color.toHexString();
+            this.infoPanelStarPreview.style.boxShadow = `0 0 20px ${starModel.color.toHexString()}`;
+        }
+
+        this.infoPanelTitle.textContent = targetSystemModel.name;
     }
 
     dispose() {
