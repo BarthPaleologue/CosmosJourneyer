@@ -58,6 +58,7 @@ export class StarMapUI {
     readonly infoPanel: HTMLDivElement;
     readonly infoPanelStarPreview: HTMLDivElement;
     readonly infoPanelTitle: HTMLHeadingElement;
+    readonly starSector: HTMLParagraphElement;
 
     readonly cursor: HTMLDivElement;
 
@@ -165,6 +166,13 @@ export class StarMapUI {
 
         const hr = document.createElement("hr");
         this.infoPanel.appendChild(hr);
+
+        this.starSector = document.createElement("p");
+        this.starSector.classList.add("starMapInfoPanelStarSector");
+        this.infoPanel.appendChild(this.starSector);
+
+        const hr2 = document.createElement("hr");
+        this.infoPanel.appendChild(hr2);
 
         this.cursor = document.createElement("div");
         this.cursor.classList.add("cursor");
@@ -290,6 +298,8 @@ export class StarMapUI {
         }
 
         this.infoPanelTitle.textContent = targetSystemModel.name;
+
+        this.starSector.textContent = `X${targetSystemModel.seed.starSectorX} - Y${targetSystemModel.seed.starSectorY} - Z${targetSystemModel.seed.starSectorZ} - I${targetSystemModel.seed.index}`;
     }
 
     dispose() {
