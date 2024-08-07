@@ -535,18 +535,21 @@ export class StarSystemView implements View {
     public async initAssets() {
         await Assets.Init(this.scene);
 
-        const maxZ = Settings.EARTH_RADIUS * 1e5;
+        const maxZ = 0; // infinite far plane mode (see https://forum.babylonjs.com/t/how-to-show-objects-20km-away/25462/6)
 
         this.defaultControls = new DefaultControls(this.scene);
         this.defaultControls.speed = 0.2 * Settings.EARTH_RADIUS;
         this.defaultControls.getActiveCameras().forEach((camera) => (camera.maxZ = maxZ));
+        this.defaultControls.getActiveCameras().forEach((camera) => (camera.minZ = 0.1));
 
         this.spaceshipControls = new ShipControls(this.scene);
         this.spaceshipControls.getActiveCameras().forEach((camera) => (camera.maxZ = maxZ));
+        this.spaceshipControls.getActiveCameras().forEach((camera) => (camera.minZ = 0.1));
 
         this.characterControls = new CharacterControls(this.scene);
         this.characterControls.getTransform().setEnabled(false);
         this.characterControls.getActiveCameras().forEach((camera) => (camera.maxZ = maxZ));
+        this.characterControls.getActiveCameras().forEach((camera) => (camera.minZ = 0.1));
 
         this.scene.setActiveControls(this.spaceshipControls);
     }
