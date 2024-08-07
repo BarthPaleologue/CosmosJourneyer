@@ -22,13 +22,16 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { OrbitalObjectModel } from "../architecture/orbitalObject";
 import { OrbitalObjectPhysicalProperties } from "../architecture/physicalProperties";
 import { CelestialBodyModel } from "../architecture/celestialBody";
-import { normalRandom } from "extended-random";
+import { normalRandom, uniformRandBool } from "extended-random";
 import { clamp } from "../utils/math";
 import { GenerationSteps } from "../utils/generationSteps";
 import { CropType, CropTypes } from "../utils/agriculture";
 import { randomPieChart } from "../utils/random";
 import { generateSpaceStationName } from "../utils/spaceStationNameGenerator";
 import { StarSystemModel } from "../starSystem/starSystemModel";
+import { Faction } from "../powerplay/factions";
+import { getPowerPlayData } from "../powerplay/powerplay";
+import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
 
 export class SpaceStationModel implements OrbitalObjectModel {
     readonly name: string;
@@ -54,6 +57,8 @@ export class SpaceStationModel implements OrbitalObjectModel {
     readonly agricultureMix: [number, CropType][];
 
     readonly nbHydroponicLayers: number;
+
+    readonly faction: Faction;
 
     constructor(seed: number, starSystemModel: StarSystemModel, parentBody?: CelestialBodyModel) {
         this.seed = seed;
@@ -81,6 +86,21 @@ export class SpaceStationModel implements OrbitalObjectModel {
             rotationPeriod: 0,
             axialTilt: 2 * this.rng(GenerationSteps.AXIAL_TILT) * Math.PI
         };
+
+        const powerplayData = this.starSystem instanceof SeededStarSystemModel ? getPowerPlayData(this.starSystem.seed) : { materialistSpiritualist: 0.5, capitalistCommunist: 0.5 };
+
+        const isMaterialist = uniformRandBool(powerplayData.materialistSpiritualist, this.rng, 249);
+        const isCapitalist = uniformRandBool(powerplayData.capitalistCommunist, this.rng, 498);
+
+        if (isMaterialist && isCapitalist) {
+            this.faction = Faction.FEYNMAN_INTERSTELLAR;
+        } else if (isMaterialist && !isCapitalist) {
+            this.faction = Faction.HUMAN_COMMONWEALTH;
+        } else if (!isMaterialist && isCapitalist) {
+            this.faction = Faction.CHURCH_OF_AWAKENING;
+        } else {
+            this.faction = Faction.SATORI_CONCORD;
+        }
 
         //TODO: make this dependent on economic model
         this.population = 2_000_000;

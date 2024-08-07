@@ -89,11 +89,6 @@ export class BlackHoleModel implements StellarObjectModel {
         };
     }
 
-    public getNbSpaceStations(): number {
-        if (uniformRandBool(0.1, this.rng, GenerationSteps.SPACE_STATIONS)) return 1;
-        return 0;
-    }
-
     /**
      * Returns the Schwarzschild radius of the black hole
      * @returns the Schwarzschild radius of the black hole

@@ -71,6 +71,8 @@ import { SpaceStation } from "../spacestation/spaceStation";
 import { ObjectTargetCursorType } from "../ui/objectTargetCursor";
 import { SpaceStationLayer } from "../ui/spaceStation/spaceStationLayer";
 import { SeededStarSystemModel } from "./seededStarSystemModel";
+import { placeSpaceStations } from "../society/spaceStationPlacement";
+import { isSystemInHumanBubble } from "../society/starSystemSociety";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -448,11 +450,13 @@ export class StarSystemView implements View {
         }
 
         // Space stations
-        for (let i = 0; i < planets.length; i++) {
-            const planet = planets[i];
-            for (let j = 0; j < planet.model.getNbSpaceStations(); j++) {
-                console.log("Space station:", j + 1, "of", planet.model.getNbSpaceStations());
-                const seed = getSpaceStationSeed(planet.model, j);
+        if (systemModel instanceof SeededStarSystemModel && isSystemInHumanBubble(systemModel.seed)) {
+            const spaceStationPlaces = placeSpaceStations(systemModel);
+            for (const planetModel of spaceStationPlaces) {
+                const planet = planets.find((planet) => planet.model.name === planetModel.name);
+                if (planet === undefined) throw new Error("Planet not found to place space station around");
+
+                const seed = getSpaceStationSeed(planet.model, 0);
                 const spaceStation = StarSystemHelper.MakeSpaceStation(starSystem, seed, planet);
                 spaceStation.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
 
@@ -803,7 +807,7 @@ export class StarSystemView implements View {
         const direction = targetSystemUniversePosition.subtract(currentSystemUniversePosition).normalize();
         Vector3.TransformCoordinatesToRef(direction, currentSystem.starFieldBox.getRotationMatrix(), direction);
 
-        const distance = StarMap.StarMapDistanceToLy(Vector3.Distance(currentSystemUniversePosition, targetSystemUniversePosition));
+        const distance = Vector3.Distance(currentSystemUniversePosition, targetSystemUniversePosition) * Settings.LIGHT_YEAR;
 
         const target = currentSystem.addSystemTarget(targetSeed, direction, distance);
         this.targetCursorLayer.addObject(target, ObjectTargetCursorType.CELESTIAL_BODY, 0, 0);

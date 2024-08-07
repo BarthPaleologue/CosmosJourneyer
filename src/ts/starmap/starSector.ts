@@ -54,7 +54,7 @@ export class StarSector {
     /**
      * The size of all sectors
      */
-    static readonly SIZE = 3;
+    static readonly SIZE = 20;
 
     readonly density;
 
@@ -84,7 +84,7 @@ export class StarSector {
                 name: `starInstance|${this.coordinates.x}|${this.coordinates.y}|${this.coordinates.z}|${i}`,
                 seed: systemSeed,
                 sectorString: sectorString,
-                scale: 0.5 + this.rng(100 * i) / 2,
+                scale: 4.0,
                 position: this.getPositionOfStar(i)
             });
         }
