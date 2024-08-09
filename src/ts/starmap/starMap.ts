@@ -52,17 +52,16 @@ import { syncCamera } from "../utils/cameraSyncing";
 import { AudioInstance } from "../utils/audioInstance";
 import { AudioManager } from "../audio/audioManager";
 import { AudioMasks } from "../audio/audioMasks";
-import { Settings } from "../settings";
-import { parseDistance } from "../utils/parseToStrings";
 import { StarMapInputs } from "../inputs/starMapInputs";
-import i18n from "../i18n";
 import { BodyType } from "../architecture/bodyType";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Sounds } from "../assets/sounds";
+import { Controls } from "../uberCore/controls";
+import { StarMapControls } from "../starMapControls/starMapControls";
 
 export class StarMap implements View {
     readonly scene: Scene;
-    private readonly controls: DefaultControls;
+    private readonly controls: Controls;
 
     private readonly backgroundMusic: AudioInstance;
 
@@ -125,8 +124,7 @@ export class StarMap implements View {
         this.scene.clearColor = new Color4(0, 0, 0, 1);
         this.scene.useRightHandedSystem = true;
 
-        this.controls = new DefaultControls(this.scene);
-        this.controls.speed /= 5;
+        this.controls = new StarMapControls(this.scene);
         this.controls.getActiveCameras().forEach((camera) => (camera.minZ = 0.01));
 
         this.controls.getActiveCameras()[0].attachControl();
@@ -366,7 +364,7 @@ export class StarMap implements View {
             this.registerStarSector(coordinates);
         }
 
-        this.buildNextStars(Math.min(2000, StarMap.GENERATION_RATE * this.controls.speed));
+        this.buildNextStars(Math.min(2000, StarMap.GENERATION_RATE * 1));
 
         this.starMapUI.update(this.controls.getTransform().getAbsolutePosition());
     }
@@ -507,7 +505,7 @@ export class StarMap implements View {
         const targetPosition = this.controls
             .getTransform()
             .getAbsolutePosition()
-            .add(starDir.scaleInPlace(distance - 6));
+            .add(starDir.scaleInPlace(distance));
 
         // if the transform is already in the right position, do not animate
         if (skipAnimation) this.controls.getTransform().position = targetPosition;
