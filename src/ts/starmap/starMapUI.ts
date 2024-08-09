@@ -41,6 +41,11 @@ import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel
 import { BodyType } from "../architecture/bodyType";
 import { getStarGalacticCoordinates } from "../utils/getStarGalacticCoordinates";
 import { parseDistance } from "../utils/parseToStrings";
+import { placeSpaceStations } from "../society/spaceStationPlacement";
+import { SpaceStationModel } from "../spacestation/spacestationModel";
+import { getSpaceStationSeed } from "../planets/common";
+import { factionToString } from "../powerplay/factions";
+import { isSystemInHumanBubble } from "../society/starSystemSociety";
 
 export class StarMapUI {
     readonly gui: AdvancedDynamicTexture;
@@ -59,6 +64,12 @@ export class StarMapUI {
     readonly infoPanelStarPreview: HTMLDivElement;
     readonly infoPanelTitle: HTMLHeadingElement;
     readonly starSector: HTMLParagraphElement;
+    readonly nbPlanets: HTMLParagraphElement;
+    readonly distanceToSol: HTMLParagraphElement;
+
+    readonly humanPresence: HTMLDivElement;
+    readonly nbSpaceStations: HTMLParagraphElement;
+    readonly factions: HTMLDivElement;
 
     readonly cursor: HTMLDivElement;
 
@@ -159,7 +170,7 @@ export class StarMapUI {
         this.infoPanelStarPreview = document.createElement("div");
         this.infoPanelStarPreview.classList.add("starMapInfoPanelStarPreview");
         this.infoPanel.appendChild(this.infoPanelStarPreview);
-        
+
         this.infoPanelTitle = document.createElement("h2");
         this.infoPanelTitle.classList.add("starMapInfoPanelTitle");
         this.infoPanel.appendChild(this.infoPanelTitle);
@@ -173,6 +184,34 @@ export class StarMapUI {
 
         const hr2 = document.createElement("hr");
         this.infoPanel.appendChild(hr2);
+
+        const generalInfoTitle = document.createElement("h3");
+        generalInfoTitle.textContent = i18n.t("starMap:generalInfo");
+        this.infoPanel.appendChild(generalInfoTitle);
+
+        this.nbPlanets = document.createElement("p");
+        this.nbPlanets.classList.add("starMapInfoPanelNbPlanets");
+        this.infoPanel.appendChild(this.nbPlanets);
+
+        this.distanceToSol = document.createElement("p");
+        this.distanceToSol.classList.add("starMapInfoPanelDistanceToSol");
+        this.infoPanel.appendChild(this.distanceToSol);
+
+        this.humanPresence = document.createElement("div");
+        this.humanPresence.classList.add("starMapInfoPanelHumanPresence");
+        this.infoPanel.appendChild(this.humanPresence);
+
+        const humanPresenceTitle = document.createElement("h3");
+        humanPresenceTitle.textContent = i18n.t("starMap:humanPresence");
+        this.humanPresence.appendChild(humanPresenceTitle);
+
+        this.nbSpaceStations = document.createElement("p");
+        this.nbSpaceStations.classList.add("starMapInfoPanelNbSpaceStations");
+        this.humanPresence.appendChild(this.nbSpaceStations);
+
+        this.factions = document.createElement("div");
+        this.factions.classList.add("starMapInfoPanelFactions");
+        this.infoPanel.appendChild(this.factions);
 
         this.cursor = document.createElement("div");
         this.cursor.classList.add("cursor");
@@ -254,10 +293,11 @@ export class StarMapUI {
     }
 
     setSelectedSystem(targetSystemModel: SeededStarSystemModel, currentSystemModel: SeededStarSystemModel | null) {
+        const targetCoordinates = getStarGalacticCoordinates(targetSystemModel.seed);
+
         let text = "";
         if (currentSystemModel !== null) {
             const currentCoordinates = getStarGalacticCoordinates(currentSystemModel.seed);
-            const targetCoordinates = getStarGalacticCoordinates(targetSystemModel.seed);
 
             const distance = Vector3.Distance(currentCoordinates, targetCoordinates) * Settings.LIGHT_YEAR;
             text += `${i18n.t("starMap:distance")}: ${parseDistance(distance)}\n`;
@@ -292,14 +332,35 @@ export class StarMapUI {
         this.namePlate.text = targetSystemModel.name;
         this.descriptionPanel.text = text;
 
-        if(starModel instanceof StarModel) {
+        if (starModel instanceof StarModel) {
             this.infoPanelStarPreview.style.background = starModel.color.toHexString();
             this.infoPanelStarPreview.style.boxShadow = `0 0 20px ${starModel.color.toHexString()}`;
         }
 
         this.infoPanelTitle.textContent = targetSystemModel.name;
 
-        this.starSector.textContent = `X${targetSystemModel.seed.starSectorX} - Y${targetSystemModel.seed.starSectorY} - Z${targetSystemModel.seed.starSectorZ} - I${targetSystemModel.seed.index}`;
+        this.starSector.textContent = `X:${targetSystemModel.seed.starSectorX} Y:${targetSystemModel.seed.starSectorY} Z:${targetSystemModel.seed.starSectorZ} I:${targetSystemModel.seed.index}`;
+
+        this.nbPlanets.textContent = `${i18n.t("starMap:planets")}: ${targetSystemModel.getNbPlanets()}`;
+
+        this.distanceToSol.textContent = `${i18n.t("starMap:distanceToSol")}: ${Vector3.Distance(targetCoordinates, Vector3.Zero()).toFixed(1)} ${i18n.t("units:ly")}`;
+
+        if (isSystemInHumanBubble(targetSystemModel.seed)) {
+            const spaceStationParents = placeSpaceStations(targetSystemModel);
+            const spaceStations = spaceStationParents.map((planet) => {
+                return new SpaceStationModel(getSpaceStationSeed(planet, 0), targetSystemModel, planet);
+            });
+
+            this.nbSpaceStations.textContent = `${i18n.t("starMap:spaceStations")}: ${spaceStations.length}`;
+
+            const factionNames = spaceStations.map((station) => factionToString(station.faction));
+            const uniqueFactions = Array.from(new Set(factionNames));
+
+            this.factions.textContent = `${i18n.t("starMap:factions")}: ${uniqueFactions.join(", ")}`;
+        } else {
+            this.nbSpaceStations.textContent = `${i18n.t("starMap:spaceStations")}: 0`;
+            this.factions.textContent = `${i18n.t("starMap:factions")}: ${i18n.t("starMap:none")}`;
+        }
     }
 
     dispose() {

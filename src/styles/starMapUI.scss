@@ -14,20 +14,24 @@
     height: 90vh;
     top: 5vh;
     width: 25vw;
+    min-width: 500px;
 
     backdrop-filter: blur(3px);
     overflow-y: auto;
 
-    box-shadow: 0 0 20px black;
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
     background: rgba(0, 0, 0, 0.8);
 
     display: flex;
     flex-direction: column;
     
-    padding: 30px 0;
+    padding: 0 15px;
+
+    color: white;
+    font-family: Nasalization, sans-serif;
 
     h2, p {
-      margin-block: 0;
+      margin-block: 5px;
     }
 
     .starMapInfoPanelStarPreview {
@@ -41,22 +45,18 @@
     }
 
     .starMapInfoPanelTitle {
-      color: white;
       text-align: center;
-      font-family: Nasalization, sans-serif;
       font-size: 3em;
     }
 
     .starMapInfoPanelStarSector {
-      color: white;
       padding: 0 20px;
-      font-family: Nasalization, sans-serif;
       font-size: 2em;
       text-align: center;
     }
 
     hr {
-      width: 90%;
+      width: 100%;
       margin: 10px auto;
       border: 0;
       border-top: 1px solid white;

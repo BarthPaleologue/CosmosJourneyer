@@ -48,8 +48,6 @@ export function getPlanetName(seed: number, starSystemModel: StarSystemModel, pa
         ? starSystemModel.getPlanets().findIndex(([_, planetSeed]) => planetSeed === seed)
         : getMoonSeeds(parentBody as PlanetModel).findIndex((moonSeed) => moonSeed === seed);
 
-    console.log(isSatellite, seed, starSystemModel.getPlanets(), planetIndex);
-
     if (planetIndex === -1) throw new Error("Planet not found in star system");
 
     if (isSatellite) {

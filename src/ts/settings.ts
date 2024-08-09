@@ -44,7 +44,8 @@ export const Settings = {
     SEED_HALF_RANGE: 1e4,
 
     FLOATING_ORIGIN_THRESHOLD: 500,
-    HUMAN_BUBBLE_RADIUS_LY: 200,
+
+    HUMAN_BUBBLE_RADIUS_LY: 100,
 
     /**
      * The average daily intake for a human being in kcal/day

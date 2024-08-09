@@ -1,5 +1,11 @@
 {
     "distance": "Distance",
     "planets": "Planètes",
-    "setAsDestination": "Définir comme destination"
+    "setAsDestination": "Définir comme destination",
+    "distanceToSol": "Distance à Sol",
+    "humanPresence": "Présence humaine",
+    "spaceStations": "Stations spatiales",
+    "factions": "Factions",
+    "none": "Aucune",
+    "generalInfo": "Général"
 }
