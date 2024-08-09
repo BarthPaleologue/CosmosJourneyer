@@ -448,22 +448,7 @@ export class StarSystemView implements View {
                 await wait(timeOut);
             }
         }
-
-        // Space stations
-        if (systemModel instanceof SeededStarSystemModel && isSystemInHumanBubble(systemModel.seed)) {
-            const spaceStationPlaces = placeSpaceStations(systemModel);
-            for (const planetModel of spaceStationPlaces) {
-                const planet = planets.find((planet) => planet.model.name === planetModel.name);
-                if (planet === undefined) throw new Error("Planet not found to place space station around");
-
-                const seed = getSpaceStationSeed(planet.model, 0);
-                const spaceStation = StarSystemHelper.MakeSpaceStation(starSystem, seed, planet);
-                spaceStation.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
-
-                await wait(timeOut);
-            }
-        }
-
+        
         // Anomalies
         for (let i = 0; i < systemModel.getNbAnomalies(); i++) {
             console.log("Anomaly:", i + 1, "of", systemModel.getNbAnomalies());
@@ -482,6 +467,21 @@ export class StarSystemView implements View {
             anomaly.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
 
             await wait(timeOut);
+        }
+
+        // Space stations
+        if (systemModel instanceof SeededStarSystemModel && isSystemInHumanBubble(systemModel.seed)) {
+            const spaceStationPlaces = placeSpaceStations(systemModel);
+            for (const planetModel of spaceStationPlaces) {
+                const planet = planets.find((planet) => planet.model.name === planetModel.name);
+                if (planet === undefined) throw new Error("Planet not found to place space station around");
+
+                const seed = getSpaceStationSeed(planet.model, 0);
+                const spaceStation = StarSystemHelper.MakeSpaceStation(starSystem, seed, planet);
+                spaceStation.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
+
+                await wait(timeOut);
+            }
         }
     }
 
