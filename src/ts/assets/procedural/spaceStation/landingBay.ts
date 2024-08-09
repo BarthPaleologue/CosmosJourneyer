@@ -19,13 +19,12 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Scene } from "@babylonjs/core/scene";
-import { Axis, PhysicsShapeType } from "@babylonjs/core";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Transformable } from "../../../architecture/transformable";
 import { computeRingRotationPeriod } from "../../../utils/ringRotation";
 import { Settings } from "../../../settings";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { Space } from "@babylonjs/core/Maths/math.axis";
+import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { LandingPad, LandingPadSize } from "../landingPad/landingPad";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { createEnvironmentAggregate } from "../../../utils/physics";
@@ -33,6 +32,7 @@ import { createRing } from "../../../utils/ringBuilder";
 import { SpaceStationModel } from "../../../spacestation/spacestationModel";
 import { LandingBayMaterial } from "./landingBayMaterial";
 import { seededSquirrelNoise } from "squirrel-noise";
+import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 
 export class LandingBay {
     private readonly root: TransformNode;
@@ -144,9 +144,11 @@ export class LandingBay {
         const extend = bb.max.subtract(bb.min);
         const center = bb.min.add(extend.scale(0.5));
 
-        this.getTransform().getChildMeshes(true).forEach((mesh) => {
-            mesh.position.subtractInPlace(center);
-        });
+        this.getTransform()
+            .getChildMeshes(true)
+            .forEach((mesh) => {
+                mesh.position.subtractInPlace(center);
+            });
     }
 
     update(stellarObjects: Transformable[], cameraWorldPosition: Vector3, deltaSeconds: number) {

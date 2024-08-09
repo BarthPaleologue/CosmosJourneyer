@@ -49,10 +49,10 @@ export const FlightTutorial: Tutorial = {
             <img src="${welcomeImageSrc}" alt="Welcome to Cosmos Journeyer">
             <p>${i18n.t("tutorials:flightTutorial:welcome")}</p>
             ${i18n.t("tutorials:common:navigationInfo", {
-            nextKeys: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel).join(` ${i18n.t("common:or")} `),
-            previousKeys: pressInteractionToStrings(TutorialControlsInputs.map.prevPanel).join(` ${i18n.t("common:or")} `),
-            quitKeys: pressInteractionToStrings(TutorialControlsInputs.map.quitTutorial).join(` ${i18n.t("common:or")} `)
-        })}
+                nextKeys: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel).join(` ${i18n.t("common:or")} `),
+                previousKeys: pressInteractionToStrings(TutorialControlsInputs.map.prevPanel).join(` ${i18n.t("common:or")} `),
+                quitKeys: pressInteractionToStrings(TutorialControlsInputs.map.quitTutorial).join(` ${i18n.t("common:or")} `)
+            })}
         </div>`;
 
         const rotationPanelHtml = `
@@ -74,10 +74,10 @@ export const FlightTutorial: Tutorial = {
         <div class="tutorialContent">
             <h2>${i18n.t("tutorials:flightTutorial:spaceShipThrustTitle")}</h2>
             <p>${i18n.t("tutorials:flightTutorial:spaceShipThrustText1", {
-            keyIncrease: throttleStrings[1][1],
-            keyDecrease: throttleStrings[0][1],
-            keyKill: pressInteractionToStrings(SpaceShipControlsInputs.map.throttleToZero).join(` ${i18n.t("common:or")} `)
-        })}</p>
+                keyIncrease: throttleStrings[1][1],
+                keyDecrease: throttleStrings[0][1],
+                keyKill: pressInteractionToStrings(SpaceShipControlsInputs.map.throttleToZero).join(` ${i18n.t("common:or")} `)
+            })}</p>
             <img src="${thrustImageSrc}" alt="Spaceship Thrust">
             <p>${i18n.t("tutorials:flightTutorial:spaceShipThrustText2")}</p>
             <p>${i18n.t("tutorials:flightTutorial:spaceShipThrustText3")}</p>
@@ -98,8 +98,8 @@ export const FlightTutorial: Tutorial = {
             <p>${i18n.t("tutorials:flightTutorial:congratulationsText1")}</p>
             
             ${i18n.t("tutorials:common:tutorialEnding", {
-            keyQuit: pressInteractionToStrings(TutorialControlsInputs.map.quitTutorial).join(` ${i18n.t("common:or")} `)
-        })}
+                keyQuit: pressInteractionToStrings(TutorialControlsInputs.map.quitTutorial).join(` ${i18n.t("common:or")} `)
+            })}
         </div>`;
 
         return [welcomePanelHtml, rotationPanelHtml, thrustPanelHtml, warpPanelHtml, congratsPanelHtml];

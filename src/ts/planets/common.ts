@@ -20,13 +20,42 @@ import { Settings } from "../settings";
 import { PlanetModel } from "../architecture/planet";
 import { CelestialBodyModel } from "../architecture/celestialBody";
 import { GenerationSteps } from "../utils/generationSteps";
+import { BodyType } from "../architecture/bodyType";
+import { romanNumeral } from "../utils/romanNumerals";
+import { StarSystemModel } from "../starSystem/starSystemModel";
 
 export function getMoonSeed(model: PlanetModel, index: number) {
     if (index > model.nbMoons) throw new Error("Moon out of bound! " + index);
     return centeredRand(model.rng, GenerationSteps.MOONS + index) * Settings.SEED_HALF_RANGE;
 }
 
+export function getMoonSeeds(model: PlanetModel) {
+    return Array.from({ length: model.nbMoons }, (_, index) => getMoonSeed(model, index));
+}
+
 export function getSpaceStationSeed(model: CelestialBodyModel, index: number) {
     if (index > model.getNbSpaceStations()) throw new Error("Space station out of bound! " + index);
     return centeredRand(model.rng, GenerationSteps.SPACE_STATIONS + index) * Settings.SEED_HALF_RANGE;
+}
+
+export function getPlanetName(seed: number, starSystemModel: StarSystemModel, parentBody: CelestialBodyModel | null): string {
+    if (parentBody === null) {
+        return `${starSystemModel.name} Rogue`;
+    }
+
+    const isSatellite = parentBody.bodyType === BodyType.TELLURIC_PLANET || parentBody.bodyType === BodyType.GAS_PLANET;
+
+    const planetIndex = !isSatellite
+        ? starSystemModel.getPlanets().findIndex(([_, planetSeed]) => planetSeed === seed)
+        : getMoonSeeds(parentBody as PlanetModel).findIndex((moonSeed) => moonSeed === seed);
+
+    console.log(isSatellite, seed, starSystemModel.getPlanets(), planetIndex);
+
+    if (planetIndex === -1) throw new Error("Planet not found in star system");
+
+    if (isSatellite) {
+        return `${parentBody.name} ${romanNumeral(planetIndex + 1)}`;
+    }
+
+    return `${starSystemModel.name} ${romanNumeral(planetIndex + 1)}`;
 }

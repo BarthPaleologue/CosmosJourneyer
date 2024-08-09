@@ -17,8 +17,7 @@
 
 import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { Axis, PhysicsAggregate, PhysicsShapeType } from "@babylonjs/core";
-import { Space } from "@babylonjs/core/Maths/math.axis";
+import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { RingHabitatMaterial } from "./ringHabitatMaterial";
 import { Transformable } from "../../../architecture/transformable";
@@ -31,6 +30,8 @@ import { createEnvironmentAggregate } from "../../../utils/physics";
 import { createRing } from "../../../utils/ringBuilder";
 import { seededSquirrelNoise } from "squirrel-noise";
 import { SpaceStationModel } from "../../../spacestation/spacestationModel";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 
 export class RingHabitat implements Transformable {
     private readonly root: TransformNode;
@@ -132,18 +133,18 @@ export class RingHabitat implements Transformable {
         this.metalSectionMaterial.update(stellarObjects);
 
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
-        if(distanceToCamera < 350e3 && this.attachmentAggregate === null) {
+        if (distanceToCamera < 350e3 && this.attachmentAggregate === null) {
             this.attachmentAggregate = createEnvironmentAggregate(this.attachment, PhysicsShapeType.MESH, this.getTransform().getScene());
-            this.arms.forEach(arm => {
+            this.arms.forEach((arm) => {
                 const armAggregate = createEnvironmentAggregate(arm, PhysicsShapeType.MESH, this.getTransform().getScene());
                 this.armAggregates.push(armAggregate);
             });
             this.ringAggregate = createEnvironmentAggregate(this.ring, PhysicsShapeType.MESH, this.getTransform().getScene());
-        } else if(distanceToCamera > 360e3 && this.attachmentAggregate !== null) {
+        } else if (distanceToCamera > 360e3 && this.attachmentAggregate !== null) {
             this.attachmentAggregate?.dispose();
             this.attachmentAggregate = null;
 
-            this.armAggregates.forEach(armAggregate => armAggregate.dispose());
+            this.armAggregates.forEach((armAggregate) => armAggregate.dispose());
             this.armAggregates.length = 0;
 
             this.ringAggregate?.dispose();

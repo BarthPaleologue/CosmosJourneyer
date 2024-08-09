@@ -1,7 +1,7 @@
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Scene } from "@babylonjs/core";
 import { Mesh } from "@babylonjs/core/Meshes";
+import { Scene } from "@babylonjs/core/scene";
 
 /**
  * Create two walled spiral.
@@ -27,7 +27,7 @@ export function createHelixVertexData(radius: number, thickness: number, height:
             const dx = Math.cos(angle);
             const dz = Math.sin(angle);
 
-            const yOffset = (spire + i / tesselation) * pitch - nbSpires * pitch / 2;
+            const yOffset = (spire + i / tesselation) * pitch - (nbSpires * pitch) / 2;
 
             const bottomY = yOffset - height / 2;
             const topY = yOffset + height / 2;
@@ -107,7 +107,7 @@ export function createHelixVertexData(radius: number, thickness: number, height:
     indices.push(0, 1, 2);
     indices.push(2, 1, 3);
 
-    const spiralIndexOffset = (positions.length) / 3 - 4 * 3;
+    const spiralIndexOffset = positions.length / 3 - 4 * 3;
 
     indices.push(spiralIndexOffset, spiralIndexOffset + 2, spiralIndexOffset + 1);
     indices.push(spiralIndexOffset + 2, spiralIndexOffset + 3, spiralIndexOffset + 1);

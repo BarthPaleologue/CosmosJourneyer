@@ -22,10 +22,7 @@ import { Transformable } from "../../../architecture/transformable";
 
 import cylinderHabitatMaterialFragment from "../../../../shaders/cylinderHabitatMaterial/fragment.glsl";
 import cylinderHabitatMaterialVertex from "../../../../shaders/cylinderHabitatMaterial/vertex.glsl";
-import {
-    setStellarObjectUniforms,
-    StellarObjectUniformNames
-} from "../../../postProcesses/uniforms/stellarObjectUniforms";
+import { setStellarObjectUniforms, StellarObjectUniformNames } from "../../../postProcesses/uniforms/stellarObjectUniforms";
 import { Textures } from "../../textures";
 
 const CylinderHabitatUniformNames = {
@@ -34,15 +31,15 @@ const CylinderHabitatUniformNames = {
     CAMERA_POSITION: "cameraPosition",
     RADIUS: "radius",
     HEIGHT: "height"
-}
+};
 
 const CylinderHabitatSamplerNames = {
     ALBEDO: "albedoMap",
     NORMAL: "normalMap",
     METALLIC: "metallicMap",
     ROUGHNESS: "roughnessMap",
-    OCCLUSION: "occlusionMap",
-}
+    OCCLUSION: "occlusionMap"
+};
 
 export class CylinderHabitatMaterial extends ShaderMaterial {
     private stellarObjects: Transformable[] = [];
@@ -58,18 +55,13 @@ export class CylinderHabitatMaterial extends ShaderMaterial {
 
         super(`RingHabitatMaterial`, scene, shaderName, {
             attributes: ["position", "normal", "uv"],
-            uniforms: [
-                ...Object.values(CylinderHabitatUniformNames),
-                ...Object.values(StellarObjectUniformNames)
-            ],
-            samplers: [
-                ...Object.values(CylinderHabitatSamplerNames),
-            ]
+            uniforms: [...Object.values(CylinderHabitatUniformNames), ...Object.values(StellarObjectUniformNames)],
+            samplers: [...Object.values(CylinderHabitatSamplerNames)]
         });
 
         this.onBindObservable.add(() => {
             const activeCamera = scene.activeCamera;
-            if(activeCamera === null) {
+            if (activeCamera === null) {
                 throw new Error("No active camera");
             }
 

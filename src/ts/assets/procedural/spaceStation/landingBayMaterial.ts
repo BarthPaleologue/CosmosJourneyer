@@ -22,14 +22,11 @@ import { Transformable } from "../../../architecture/transformable";
 
 import landingBayMaterialFragment from "../../../../shaders/landingBayMaterial/fragment.glsl";
 import landingBayMaterialVertex from "../../../../shaders/landingBayMaterial/vertex.glsl";
-import {
-    setStellarObjectUniforms,
-    StellarObjectUniformNames
-} from "../../../postProcesses/uniforms/stellarObjectUniforms";
+import { setStellarObjectUniforms, StellarObjectUniformNames } from "../../../postProcesses/uniforms/stellarObjectUniforms";
 import { Textures } from "../../textures";
-import { DynamicTexture } from "@babylonjs/core";
 import { Settings } from "../../../settings";
 import { SpaceStationModel } from "../../../spacestation/spacestationModel";
+import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
 
 const LandingBayUniformNames = {
     WORLD: "world",
@@ -38,7 +35,7 @@ const LandingBayUniformNames = {
     MEAN_RADIUS: "meanRadius",
     DELTA_RADIUS: "deltaRadius",
     HEIGHT: "height"
-}
+};
 
 const LandingBaySamplerNames = {
     ALBEDO: "albedoMap",
@@ -47,7 +44,7 @@ const LandingBaySamplerNames = {
     ROUGHNESS: "roughnessMap",
     OCCLUSION: "occlusionMap",
     NAME_PLATE: "namePlate"
-}
+};
 
 export class LandingBayMaterial extends ShaderMaterial {
     private stellarObjects: Transformable[] = [];
@@ -63,18 +60,13 @@ export class LandingBayMaterial extends ShaderMaterial {
 
         super(`LandingBayMaterial`, scene, shaderName, {
             attributes: ["position", "normal", "uv"],
-            uniforms: [
-                ...Object.values(LandingBayUniformNames),
-                ...Object.values(StellarObjectUniformNames)
-            ],
-            samplers: [
-                ...Object.values(LandingBaySamplerNames),
-            ]
+            uniforms: [...Object.values(LandingBayUniformNames), ...Object.values(StellarObjectUniformNames)],
+            samplers: [...Object.values(LandingBaySamplerNames)]
         });
 
         const circumference = 2 * Math.PI * meanRadius;
 
-        const aspectRatio = 0.5 * circumference / deltaRadius;
+        const aspectRatio = (0.5 * circumference) / deltaRadius;
 
         const textureResolution = 256;
         const namePlateTexture = new DynamicTexture(
@@ -93,7 +85,7 @@ export class LandingBayMaterial extends ShaderMaterial {
 
         this.onBindObservable.add(() => {
             const activeCamera = scene.activeCamera;
-            if(activeCamera === null) {
+            if (activeCamera === null) {
                 throw new Error("No active camera");
             }
 

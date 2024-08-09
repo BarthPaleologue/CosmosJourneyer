@@ -24,11 +24,11 @@ const jumpToSystemAction = new Action({
 
 const jumpToSystemInteraction = new PressInteraction(jumpToSystemAction);
 
-const toggleOverlayAction = new Action({
+const toggleUiAction = new Action({
     bindings: [keyboard.getControl("KeyU")]
 });
 
-const toggleOverlayInteraction = new PressInteraction(toggleOverlayAction);
+const toggleUiInteraction = new PressInteraction(toggleUiAction);
 
 const toggleOrbitsAndAxisAction = new Action({
     bindings: [keyboard.getControl("KeyO")]
@@ -52,7 +52,7 @@ export const StarSystemInputs = new InputMap<{
     setTarget: PressInteraction;
     toggleSpaceShipCharacter: PressInteraction;
     jumpToSystem: PressInteraction;
-    toggleOverlay: PressInteraction;
+    toggleUi: PressInteraction;
     toggleOrbitsAndAxis: PressInteraction;
     cycleViews: PressInteraction;
     toggleDebugUi: PressInteraction;
@@ -60,7 +60,7 @@ export const StarSystemInputs = new InputMap<{
     setTarget: setTargetInteraction,
     toggleSpaceShipCharacter: toggleSpaceShipCharacterInteraction,
     jumpToSystem: jumpToSystemInteraction,
-    toggleOverlay: toggleOverlayInteraction,
+    toggleUi: toggleUiInteraction,
     toggleOrbitsAndAxis: toggleOrbitsAndAxisInteraction,
     cycleViews: cycleViewsInteraction,
     toggleDebugUi: toggleDebugUiInteraction

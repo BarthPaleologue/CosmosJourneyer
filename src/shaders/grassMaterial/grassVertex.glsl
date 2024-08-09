@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 precision highp float;
+precision lowp int;
 
 attribute vec3 position;
 attribute vec3 normal;
@@ -26,6 +27,9 @@ uniform mat4 projection;
 uniform vec3 cameraPosition;
 uniform vec3 playerPosition;
 
+uniform mat4 planetWorld;
+uniform vec3 planetPosition;
+
 uniform float time;
 
 uniform sampler2D perlinNoise;
@@ -34,7 +38,9 @@ varying vec3 vPosition;
 varying vec3 vPositionW;
 
 varying mat4 normalMatrix;
-varying vec3 vNormal;
+varying vec3 vNormalW;
+
+varying float vPlanetNdl;
 
 // This is used to render the grass blade to the depth buffer properly
 // (see https://forum.babylonjs.com/t/how-to-write-shadermaterial-to-depthrenderer/47227/3 and https://playground.babylonjs.com/#6GFJNR#161)
@@ -57,11 +63,15 @@ float easeIn(float t, float alpha) {
 
 #include<instancesDeclaration>
 
+#include "../utils/stars.glsl";
+
 void main() {
     #include<instancesVertex>
 
+    mat4 worldMatrix = planetWorld * finalWorld;
+
     // wind
-    vec3 objectWorld = world3.xyz;
+    vec3 objectWorld = worldMatrix[3].xyz;
     float windStrength = texture2D(perlinNoise, objectWorld.xz * 0.007 + 0.1 * time).r;
     float windDir = texture2D(perlinNoise, objectWorld.xz * 0.005 + 0.05 * time).r * 2.0 * 3.14;
 
@@ -72,25 +82,36 @@ void main() {
     float leanAmount = 0.3;
     float curveAmount = leanAmount * position.y;
     float objectDistance = length(objectWorld - playerPosition);
+    float objectCameraDistance = length(objectWorld - cameraPosition);
 
     // account for player presence
     vec3 playerDirection = (objectWorld - playerPosition) / objectDistance;
     float maxDistance = 3.0;
     float distance01 = objectDistance / maxDistance;
-    float influence = 1.0 + 8.0 * smoothstep(0.0, 1.0, 1.0 - distance01);
-    curveAmount *= influence;
+    float influence = smoothstep(1.0, 0.0, distance01);
+    curveAmount += influence;
     curveAmount += windLeanAngle * smoothstep(0.2, 1.0, distance01);
 
     vec3 leanAxis = rotateAround(vec3(1.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0), windDir * smoothstep(0.2, 1.0, distance01));
     leanAxis = normalize(mix(cross(vec3(0.0, 1.0, 0.0), playerDirection), leanAxis, smoothstep(0.0, 1.0, 1.0 - distance01)));
 
+    float scaling = 1.0 + 0.3 * (texture2D(perlinNoise, objectWorld.xz * 0.1).r * 2.0 - 1.0);
+    scaling *= smoothstep(90.0, 70.0, objectCameraDistance); // fade grass in the distance using scaling
 
-    vec3 leaningPosition = rotateAround(position, leanAxis, curveAmount);
+    vec3 terrainNormal = normalize(vec3(worldMatrix * vec4(0.0, 1.0, 0.0, 0.0)));
+    vec3 sphereNormal = normalize(objectWorld - planetPosition);
+    float flatness = max(dot(terrainNormal, sphereNormal), 0.0);
+
+    scaling *= smoothstep(0.78, 0.8, flatness);
+
+    // taller grass bends more than short grass
+    curveAmount *= max(scaling, 0.3);
+
+    vec3 leaningPosition = scaling * rotateAround(position, leanAxis, curveAmount);
 
     vec3 leaningNormal = rotateAround(normal, leanAxis, curveAmount);
 
-    vec4 worldPosition = finalWorld * vec4(leaningPosition, 1.0);
-
+    vec4 worldPosition = worldMatrix * vec4(leaningPosition, 1.0);
 
     //vec3 viewDir = normalize(cameraPosition - worldPosition);
     //float viewDotNormal = abs(dot(viewDir, leaningNormal));
@@ -107,9 +128,16 @@ void main() {
     vPosition = position;
     vPositionW = worldPosition.xyz;
 
-    normalMatrix = finalWorld;
+    vNormalW = vec3(worldMatrix * vec4(leaningNormal, 0.0));
 
-    vNormal = leaningNormal;
+    vPlanetNdl = 0.0;
+    for(int i = 0; i < nbStars; i++) {
+        vec3 starPosition = star_positions[i];
+        vec3 lightDirectionW = normalize(starPosition - vPositionW);
+        float ndl = dot(sphereNormal, lightDirectionW);
+
+        vPlanetNdl = max(vPlanetNdl, ndl);
+    }
 
     #ifdef FORDEPTH
     vDepthMetric = (-gl_Position.z + depthValues.x) / (depthValues.y);

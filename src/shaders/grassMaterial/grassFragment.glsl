@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 precision highp float;
+precision lowp int;
 
 uniform float time;
 
@@ -24,8 +25,9 @@ uniform vec3 cameraPosition;
 varying vec3 vPosition;
 varying vec3 vPositionW;
 
-varying mat4 normalMatrix;
-varying vec3 vNormal;
+varying vec3 vNormalW;
+
+varying float vPlanetNdl;
 
 // This is used to render the grass blade to the depth buffer properly
 // (see https://forum.babylonjs.com/t/how-to-write-shadermaterial-to-depthrenderer/47227/3 and https://playground.babylonjs.com/#6GFJNR#161)
@@ -41,16 +43,14 @@ void main() {
     #ifdef FORDEPTH
     gl_FragColor = vec4(vDepthMetric, 0.0, 0.0, 1.0);
     #else
-    vec3 baseColor = 3.0 * vec3(0.05, 0.2, 0.01);
+    vec3 baseColor = vec3(0.4, 0.8, 0.08);
     vec3 tipColor = vec3(0.5, 0.5, 0.1);
 
     vec3 albedo = mix(baseColor, tipColor, pow(vPosition.y, 4.0));
 
-    vec3 normalW = normalize(vec3(normalMatrix * vec4(vNormal, 0.0)));
+    vec3 normalW = vNormalW;
 
-    float density = 0.2;
-    float aoForDensity = mix(1.0, 0.25, density);
-    float ao = mix(aoForDensity, 1.0, pow(vPosition.y, 2.0));
+    float ao = 0.5 + 0.5 * (vPosition.y * vPosition.y);
 
     vec3 Lo = vec3(0.0);
 
@@ -63,8 +63,10 @@ void main() {
         if (ndl < 0.0) {
             normalW = -normalW;
         }
-        Lo += calculateLight(albedo, normalW, 0.3, 0.0, lightDirectionW, viewDirectionW, star_colors[i]);
+        Lo += calculateLight(albedo, normalW, 0.2, 0.0, lightDirectionW, viewDirectionW, star_colors[i]);
     }
+
+    Lo *= vPlanetNdl;
 
     Lo += albedo * 0.2;
 

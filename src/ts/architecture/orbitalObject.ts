@@ -132,6 +132,11 @@ export class OrbitalObjectUtils {
  */
 export interface OrbitalObjectModel {
     /**
+     * The name of the object
+     */
+    readonly name: string;
+
+    /**
      * The random number generator used by the model to generate internal values
      * @param step The sample step of the random number generator (use squirrel noise for example)
      */

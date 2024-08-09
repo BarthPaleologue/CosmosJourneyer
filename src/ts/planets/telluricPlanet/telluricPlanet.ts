@@ -44,6 +44,7 @@ import { CloudsUniforms } from "../../clouds/cloudsUniforms";
 import { Scene } from "@babylonjs/core/scene";
 import { BodyType } from "../../architecture/bodyType";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
+import { StarSystemModel } from "../../starSystem/starSystemModel";
 
 export class TelluricPlanet implements Planet, Cullable {
     readonly name: string;
@@ -68,19 +69,19 @@ export class TelluricPlanet implements Planet, Cullable {
 
     /**
      * New Telluric Planet
-     * @param name The name of the planet
-     * @param scene
      * @param model The model to build the planet or a seed for the planet in [-1, 1]
+     * @param starSystemModel The model of the star system the planet is in
+     * @param scene
      * @param parentBody
      */
-    constructor(name: string, scene: Scene, model: TelluricPlanetModel | number, parentBody: CelestialBody | null = null) {
-        this.name = name;
-
+    constructor(model: TelluricPlanetModel | number, starSystemModel: StarSystemModel, scene: Scene, parentBody: CelestialBody | null = null) {
         this.parent = parentBody;
 
-        this.model = model instanceof TelluricPlanetModel ? model : new TelluricPlanetModel(model, parentBody?.model);
+        this.model = model instanceof TelluricPlanetModel ? model : new TelluricPlanetModel(model, starSystemModel, parentBody?.model);
 
-        this.transform = new TransformNode(name, scene);
+        this.name = this.model.name;
+
+        this.transform = new TransformNode(this.name, scene);
 
         rotate(this.transform, Axis.X, this.model.physicalProperties.axialTilt);
         this.transform.computeWorldMatrix(true);

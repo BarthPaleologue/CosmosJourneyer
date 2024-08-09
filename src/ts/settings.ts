@@ -40,6 +40,8 @@ export const Settings = {
     ENABLE_VOLUMETRIC_CLOUDS: false,
     SEED_HALF_RANGE: 1e4,
 
+    FLOATING_ORIGIN_THRESHOLD: 500,
+
     /**
      * The average daily intake for a human being in kcal/day
      * It is 2500 for males and 2000 for females, hence 2250.
@@ -82,6 +84,8 @@ export const Settings = {
     G_EARTH: 9.81,
 
     FOV: Tools.ToRadians(60),
+
+    LANDING_PAD_ASPECT_RATIO: 1.618,
 
     MAIN_FONT: "Nasalization"
 };

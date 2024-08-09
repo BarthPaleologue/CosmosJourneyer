@@ -32,6 +32,7 @@ import { RingsUniforms } from "../../rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import i18n from "../../i18n";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
+import { StarSystemModel } from "../../starSystem/starSystemModel";
 
 export class BlackHole implements StellarObject, Cullable {
     readonly name: string;
@@ -46,17 +47,17 @@ export class BlackHole implements StellarObject, Cullable {
 
     readonly parent: CelestialBody | null;
 
-    constructor(name: string, scene: Scene, model: BlackHoleModel | number, parentBody: CelestialBody | null = null) {
-        this.name = name;
+    constructor(model: BlackHoleModel | number, starSystemModel: StarSystemModel, scene: Scene, parentBody: CelestialBody | null = null) {
+        this.model = model instanceof BlackHoleModel ? model : new BlackHoleModel(model, starSystemModel);
 
-        this.model = model instanceof BlackHoleModel ? model : new BlackHoleModel(model);
+        this.name = this.model.name;
 
         this.parent = parentBody;
 
-        this.transform = new TransformNode(name, scene);
+        this.transform = new TransformNode(this.model.name, scene);
         this.transform.rotate(Axis.X, this.model.physicalProperties.axialTilt);
 
-        this.light = new PointLight(`${name}Light`, Vector3.Zero(), scene);
+        this.light = new PointLight(`${this.model.name}Light`, Vector3.Zero(), scene);
         //this.light.diffuse.fromArray(getRgbFromTemperature(this.model.physicalProperties.temperature).asArray());
         this.light.falloffType = Light.FALLOFF_STANDARD;
         this.light.parent = this.getTransform();

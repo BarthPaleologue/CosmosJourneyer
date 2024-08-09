@@ -26,6 +26,13 @@ import { getSphereRadiatedEnergyFlux } from "./thermodynamic";
  * @param energyRequirement The energy requirement in watts.
  * @param sunLightExposure The fraction of the time spent in sunlight between 0 and 1.
  */
-export function getSolarPanelSurfaceFromEnergyRequirement(efficiency: number, distanceToStar: number, starTemperature: number, starRadius: number, energyRequirement: number, sunLightExposure: number) {
+export function getSolarPanelSurfaceFromEnergyRequirement(
+    efficiency: number,
+    distanceToStar: number,
+    starTemperature: number,
+    starRadius: number,
+    energyRequirement: number,
+    sunLightExposure: number
+) {
     return energyRequirement / (efficiency * getSphereRadiatedEnergyFlux(starTemperature, starRadius, distanceToStar)) / sunLightExposure;
 }

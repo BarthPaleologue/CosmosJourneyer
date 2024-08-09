@@ -67,7 +67,7 @@ export class ShipControls implements Controls {
         this.scene = scene;
 
         SpaceShipControlsInputs.map.toggleWarpDrive.on("complete", () => {
-            if(!this.spaceship.canEngageWarpDrive() && this.spaceship.getWarpDrive().isDisabled()) {
+            if (!this.spaceship.canEngageWarpDrive() && this.spaceship.getWarpDrive().isDisabled()) {
                 Sounds.CANNOT_ENGAGE_WARP_DRIVE.play();
                 return;
             }
@@ -163,6 +163,10 @@ export class ShipControls implements Controls {
 
     public setClosestLandableFacility(facility: (Transformable & ManagesLandingPads) | null) {
         this.closestLandableFacility = facility;
+    }
+
+    public getClosestLandableFacility(): (Transformable & ManagesLandingPads) | null {
+        return this.closestLandableFacility;
     }
 
     public update(deltaTime: number): Vector3 {

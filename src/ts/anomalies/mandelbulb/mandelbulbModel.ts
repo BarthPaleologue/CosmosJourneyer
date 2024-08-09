@@ -19,7 +19,7 @@ import { seededSquirrelNoise } from "squirrel-noise";
 
 import { OrbitProperties } from "../../orbit/orbitProperties";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { normalRandom, randRange, randRangeInt } from "extended-random";
+import { normalRandom, randRange } from "extended-random";
 import { clamp } from "../../utils/math";
 import { getOrbitalPeriod, getPeriapsis } from "../../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -29,8 +29,12 @@ import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { BodyType } from "../../architecture/bodyType";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { wheelOfFortune } from "../../utils/random";
+import { GreekAlphabet } from "../../utils/parseToStrings";
+import { StarSystemModel } from "../../starSystem/starSystemModel";
 
 export class MandelbulbModel implements PlanetModel {
+    readonly name;
+
     readonly bodyType = BodyType.MANDELBULB;
     readonly seed: number;
     readonly rng: (step: number) => number;
@@ -50,9 +54,16 @@ export class MandelbulbModel implements PlanetModel {
     readonly power: number;
     readonly accentColor: Color3;
 
-    constructor(seed: number, parentBody?: CelestialBodyModel) {
+    readonly starSystemModel: StarSystemModel;
+
+    constructor(seed: number, starSystemModel: StarSystemModel, parentBody?: CelestialBodyModel) {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed);
+
+        this.starSystemModel = starSystemModel;
+
+        const anomalyIndex = this.starSystemModel.getAnomalies().findIndex(([_, anomalySeed]) => anomalySeed === this.seed);
+        this.name = `${this.starSystemModel.name} ${GreekAlphabet[anomalyIndex]}`;
 
         this.radius = 1000e3;
 
