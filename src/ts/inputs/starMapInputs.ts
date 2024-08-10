@@ -3,6 +3,7 @@ import PressInteraction from "@brianchirls/game-input/interactions/PressInteract
 import { InputMap } from "./inputMap";
 import { InputDevices } from "./devices";
 import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
+import { AxisComposite } from "@brianchirls/game-input/browser";
 
 const gamepad = InputDevices.GAMEPAD;
 const keyboard = InputDevices.KEYBOARD;
@@ -32,10 +33,22 @@ const moveAction = new Action({
     bindings: [kbdWASD, leftStick]
 });
 
+
+const keyboardSpeed = new AxisComposite({
+    positive: keyboard.getControl("NumpadAdd"), // '+'
+    negative: keyboard.getControl("NumpadSubtract") // '-'
+});
+
+const changeSpeedAction = new Action({
+    bindings: [keyboardSpeed]
+});
+
 export const StarMapInputs = new InputMap<{
     focusOnCurrentSystem: PressInteraction;
     move: Action<[number, number]>;
+    changeSpeed: Action<number>;
 }>("StarMapInputs", {
     focusOnCurrentSystem: focusOnCurrentSystemInteraction,
-    move: moveAction
+    move: moveAction,
+    changeSpeed: changeSpeedAction
 });

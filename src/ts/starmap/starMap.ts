@@ -364,7 +364,7 @@ export class StarMap implements View {
             this.registerStarSector(coordinates);
         }
 
-        this.buildNextStars(Math.min(2000, StarMap.GENERATION_RATE * 1));
+        this.buildNextStars(Math.min(2000, StarMap.GENERATION_RATE * this.controls.getSpeed()));
 
         this.starMapUI.update(this.controls.getTransform().getAbsolutePosition());
     }
