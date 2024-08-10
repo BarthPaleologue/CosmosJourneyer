@@ -40,8 +40,8 @@ export class StarMapControls implements Controls {
         this.transform = new TransformNode("starMapControls", scene);
         this.transform.rotationQuaternion = Quaternion.Identity();
         this.thirdPersonCamera = new ArcRotateCamera("camera", 0, Math.PI / 2, 10, Vector3.Zero(), scene);
-        this.thirdPersonCamera.lowerRadiusLimit = 2;
-        this.thirdPersonCamera.upperRadiusLimit = 500;
+        this.thirdPersonCamera.lowerRadiusLimit = 5;
+        this.thirdPersonCamera.upperRadiusLimit = 100_000;
         this.thirdPersonCamera.minZ = 1;
         this.thirdPersonCamera.maxZ = Settings.EARTH_RADIUS * 5;
         this.thirdPersonCamera.wheelPrecision *= 3;

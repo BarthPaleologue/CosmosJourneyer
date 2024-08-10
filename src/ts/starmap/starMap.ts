@@ -55,6 +55,7 @@ import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Sounds } from "../assets/sounds";
 import { StarMapControls } from "../starMapControls/starMapControls";
 import { CameraRadiusAnimation } from "../uberCore/transforms/animations/radius";
+import { Camera } from "@babylonjs/core/Cameras/camera";
 
 export class StarMap implements View {
     readonly scene: Scene;
@@ -261,12 +262,14 @@ export class StarMap implements View {
     }
 
     private acknowledgeCameraMovement() {
+        const activeCamera = this.scene.activeCamera;
+        if (activeCamera === null) throw new Error("No active camera!");
         // floating origin
-        if (this.controls.getTransform().getAbsolutePosition().length() > StarMap.FLOATING_ORIGIN_DISTANCE) {
-            this.translateCameraBackToOrigin();
+        if (activeCamera.globalPosition.length() > StarMap.FLOATING_ORIGIN_DISTANCE) {
+            this.translateCameraBackToOrigin(activeCamera);
         }
 
-        this.cameraPositionToCenter = this.controls.getTransform().getAbsolutePosition().subtract(this.starMapCenterPosition);
+        this.cameraPositionToCenter = activeCamera.globalPosition.subtract(this.starMapCenterPosition);
         this.currentStarSectorCoordinates = new Vector3(
             Math.round(this.cameraPositionToCenter.x / StarSector.SIZE),
             Math.round(this.cameraPositionToCenter.y / StarSector.SIZE),
@@ -274,9 +277,9 @@ export class StarMap implements View {
         );
     }
 
-    public translateCameraBackToOrigin() {
-        const translationToOrigin = this.controls.getTransform().getAbsolutePosition().negate();
-        this.controls.getTransform().position = Vector3.Zero();
+    public translateCameraBackToOrigin(camera: Camera) {
+        const translationToOrigin = camera.globalPosition.negate();
+        this.controls.getTransform().position.addInPlace(translationToOrigin);
         this.controls.getActiveCameras().forEach((camera) => camera.getViewMatrix(true));
         this.starMapCenterPosition.addInPlace(translationToOrigin);
         for (const mesh of this.scene.meshes) mesh.position.addInPlace(translationToOrigin);
@@ -365,7 +368,10 @@ export class StarMap implements View {
 
         this.buildNextStars(Math.min(2000, StarMap.GENERATION_RATE * this.controls.getSpeed()));
 
-        this.starMapUI.update(this.controls.getTransform().getAbsolutePosition());
+        const activeCamera = this.scene.activeCamera;
+        if (activeCamera === null) throw new Error("No active camera!");
+
+        this.starMapUI.update(activeCamera.globalPosition);
     }
 
     private buildNextStars(n: number): void {
@@ -488,9 +494,9 @@ export class StarMap implements View {
     private focusCameraOnStar(starInstance: InstancedMesh, skipAnimation = false) {
         const cameraDir = this.controls.thirdPersonCamera.getDirection(Vector3.Forward(this.scene.useRightHandedSystem));
 
-        const starDir = starInstance.position.subtract(this.controls.getTransform().getAbsolutePosition()).normalize();
+        const cameraToStarDir = starInstance.position.subtract(this.controls.thirdPersonCamera.globalPosition).normalize();
 
-        const rotationAngle = Math.acos(Vector3.Dot(cameraDir, starDir));
+        const rotationAngle = Math.acos(Vector3.Dot(cameraDir, cameraToStarDir));
 
         const animationDurationSeconds = 1;
 
@@ -499,12 +505,13 @@ export class StarMap implements View {
             this.controls.getTransform().lookAt(starInstance.position);
             this.controls.getTransform().computeWorldMatrix(true);
         } else if (rotationAngle > 0.02) {
-            const rotationAxis = Vector3.Cross(cameraDir, starDir).normalize();
+            const rotationAxis = Vector3.Cross(cameraDir, cameraToStarDir).normalize();
             this.rotationAnimation = new TransformRotationAnimation(this.controls.getTransform(), rotationAxis, rotationAngle, animationDurationSeconds);
         }
 
+        const transformToStarDir = starInstance.position.subtract(this.controls.getTransform().getAbsolutePosition()).normalize();
         const distance = starInstance.position.subtract(this.controls.getTransform().getAbsolutePosition()).length();
-        const targetPosition = this.controls.getTransform().getAbsolutePosition().add(starDir.scaleInPlace(distance));
+        const targetPosition = this.controls.getTransform().getAbsolutePosition().add(transformToStarDir.scaleInPlace(distance));
 
         // if the transform is already in the right position, do not animate
         if (skipAnimation) this.controls.getTransform().position = targetPosition;
@@ -512,7 +519,7 @@ export class StarMap implements View {
             this.translationAnimation = new TransformTranslationAnimation(this.controls.getTransform(), targetPosition, animationDurationSeconds);
         }
 
-        const targetRadius = 5;
+        const targetRadius = 10;
         if (skipAnimation) this.controls.thirdPersonCamera.radius = targetRadius;
         else {
             this.radiusAnimation = new CameraRadiusAnimation(this.controls.thirdPersonCamera, targetRadius, animationDurationSeconds);
