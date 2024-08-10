@@ -7,6 +7,7 @@ import { CelestialBodyModel } from "../architecture/celestialBody";
 import { getMoonSeeds } from "../planets/common";
 import { PlanetModel } from "../architecture/planet";
 import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
+import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 
 /**
  * Analyzes the given star system to return the indices of the orbital objects that are space stations.
@@ -19,6 +20,8 @@ export function placeSpaceStations(systemModel: SeededStarSystemModel): PlanetMo
                 return new StarModel(seed, systemModel);
             case BodyType.BLACK_HOLE:
                 return new BlackHoleModel(seed, systemModel);
+            case BodyType.NEUTRON_STAR:
+                return new NeutronStarModel(seed, systemModel);
             default:
                 throw new Error(`Incorrect body type in the stellar object list: ${bodyType}`);
         }
