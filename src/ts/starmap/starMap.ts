@@ -535,6 +535,11 @@ export class StarMap implements View {
         const instance = this.seedToInstanceMap.get(this.currentSystemSeed.toString());
         if (instance === undefined) throw new Error("The current system has no instance!");
 
+        const currentSystemModel = new SeededStarSystemModel(this.currentSystemSeed);
+
+        this.starMapUI.attachUIToMesh(instance);
+        this.starMapUI.setSelectedSystem(currentSystemModel, this.currentSystemSeed !== null ? new SeededStarSystemModel(this.currentSystemSeed) : null);
+
         this.focusCameraOnStar(instance, skipAnimation);
     }
 
