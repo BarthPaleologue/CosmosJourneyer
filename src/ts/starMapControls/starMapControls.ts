@@ -59,12 +59,18 @@ export class StarMapControls implements Controls {
     public update(deltaSeconds: number): Vector3 {
         const [xMove, yMove] = StarMapInputs.map.move.value;
 
+        const upDown = StarMapInputs.map.upDown.value;
+
         this.speed *= 1 + StarMapInputs.map.changeSpeed.value / 20;
 
         const cameraForward = this.thirdPersonCamera.getDirection(Vector3.Forward(this.scene.useRightHandedSystem));
         const cameraRight = this.thirdPersonCamera.getDirection(Vector3.Right());
+        const cameraUp = this.thirdPersonCamera.getDirection(Vector3.Up());
 
-        const displacement = cameraForward.scaleInPlace(yMove * deltaSeconds * this.speed).addInPlace(cameraRight.scaleInPlace(xMove * deltaSeconds * this.speed));
+        const displacement = cameraForward
+            .scaleInPlace(yMove * deltaSeconds * this.speed)
+            .addInPlace(cameraRight.scaleInPlace(xMove * deltaSeconds * this.speed))
+            .addInPlace(cameraUp.scaleInPlace(upDown * deltaSeconds * this.speed));
 
         this.transform.position.addInPlace(displacement);
 

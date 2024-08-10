@@ -43,12 +43,23 @@ const changeSpeedAction = new Action({
     bindings: [keyboardSpeed]
 });
 
+const upDown = new AxisComposite({
+    positive: keyboard.getControl("Space"),
+    negative: keyboard.getControl("ShiftLeft")
+});
+
+const upDownAction = new Action({
+    bindings: [upDown]
+});
+
 export const StarMapInputs = new InputMap<{
     focusOnCurrentSystem: PressInteraction;
     move: Action<[number, number]>;
     changeSpeed: Action<number>;
+    upDown: Action<number>;
 }>("StarMapInputs", {
     focusOnCurrentSystem: focusOnCurrentSystemInteraction,
     move: moveAction,
-    changeSpeed: changeSpeedAction
+    changeSpeed: changeSpeedAction,
+    upDown: upDownAction
 });
