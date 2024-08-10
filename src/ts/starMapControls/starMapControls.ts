@@ -19,7 +19,6 @@ import { Controls } from "../uberCore/controls";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { setRotationQuaternion } from "../uberCore/transforms/basicTransform";
 import { Settings } from "../settings";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import "@babylonjs/core/Collisions/collisionCoordinator";
@@ -29,7 +28,7 @@ import { StarMapInputs } from "../inputs/starMapInputs";
 
 export class StarMapControls implements Controls {
     private readonly transform: TransformNode;
-    private readonly thirdPersonCamera: ArcRotateCamera;
+    readonly thirdPersonCamera: ArcRotateCamera;
 
     private speed = 10;
 
@@ -39,14 +38,14 @@ export class StarMapControls implements Controls {
         this.scene = scene;
 
         this.transform = new TransformNode("starMapControls", scene);
-        setRotationQuaternion(this.transform, Quaternion.Identity());
-        this.thirdPersonCamera = new ArcRotateCamera("camera", Math.PI / 2, Math.PI / 4, 40, new Vector3(0, 1.5, 0), scene);
+        this.transform.rotationQuaternion = Quaternion.Identity();
+        this.thirdPersonCamera = new ArcRotateCamera("camera", 0, Math.PI / 2, 10, Vector3.Zero(), scene);
         this.thirdPersonCamera.lowerRadiusLimit = 2;
         this.thirdPersonCamera.upperRadiusLimit = 500;
         this.thirdPersonCamera.minZ = 1;
         this.thirdPersonCamera.maxZ = Settings.EARTH_RADIUS * 5;
         this.thirdPersonCamera.wheelPrecision *= 3;
-        this.thirdPersonCamera.lockedTarget = this.transform;
+        this.thirdPersonCamera.parent = this.transform;
     }
 
     public getActiveCameras(): Camera[] {

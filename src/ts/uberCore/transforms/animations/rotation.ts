@@ -20,8 +20,9 @@ import { easeInOutInterpolation } from "./interpolations";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { rotate } from "../basicTransform";
 import { clamp } from "../../../utils/math";
+import { CustomAnimation } from "./animation";
 
-export class TransformRotationAnimation {
+export class TransformRotationAnimation implements CustomAnimation {
     private clock = 0;
     private readonly duration: number;
     private thetaAcc = 0;

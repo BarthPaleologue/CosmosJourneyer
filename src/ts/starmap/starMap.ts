@@ -15,15 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { DefaultControls } from "../defaultControls/defaultControls";
-
 import starTexture from "../../asset/textures/starParticle.png";
 import blackHoleTexture from "../../asset/textures/blackholeParticleSmall.png";
 
 import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
 import { BuildData, StarSector, vector3ToString } from "./starSector";
 import { StarMapUI } from "./starMapUI";
-import { getStellarTypeString } from "../stellarObjects/common";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
@@ -56,17 +53,18 @@ import { StarMapInputs } from "../inputs/starMapInputs";
 import { BodyType } from "../architecture/bodyType";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Sounds } from "../assets/sounds";
-import { Controls } from "../uberCore/controls";
 import { StarMapControls } from "../starMapControls/starMapControls";
+import { CameraRadiusAnimation } from "../uberCore/transforms/animations/radius";
 
 export class StarMap implements View {
     readonly scene: Scene;
-    private readonly controls: Controls;
+    private readonly controls: StarMapControls;
 
     private readonly backgroundMusic: AudioInstance;
 
     private rotationAnimation: TransformRotationAnimation | null = null;
     private translationAnimation: TransformTranslationAnimation | null = null;
+    private radiusAnimation: CameraRadiusAnimation | null = null;
 
     /**
      * The position of the center of the starmap in world space.
@@ -246,12 +244,13 @@ export class StarMap implements View {
         }
 
         this.scene.onBeforeRenderObservable.add(() => {
-            const deltaTime = this.scene.getEngine().getDeltaTime() / 1000;
+            const deltaSeconds = this.scene.getEngine().getDeltaTime() / 1000;
 
-            if (this.rotationAnimation !== null) this.rotationAnimation.update(deltaTime);
-            if (this.translationAnimation !== null) this.translationAnimation.update(deltaTime);
+            if (this.rotationAnimation !== null) this.rotationAnimation.update(deltaSeconds);
+            if (this.translationAnimation !== null) this.translationAnimation.update(deltaSeconds);
+            if (this.radiusAnimation !== null) this.radiusAnimation.update(deltaSeconds);
 
-            this.controls.update(deltaTime);
+            this.controls.update(deltaSeconds);
 
             this.acknowledgeCameraMovement();
 
@@ -487,10 +486,13 @@ export class StarMap implements View {
     }
 
     private focusCameraOnStar(starInstance: InstancedMesh, skipAnimation = false) {
-        const cameraDir = getForwardDirection(this.controls.getTransform());
+        const cameraDir = this.controls.thirdPersonCamera.getDirection(Vector3.Forward(this.scene.useRightHandedSystem));
+
         const starDir = starInstance.position.subtract(this.controls.getTransform().getAbsolutePosition()).normalize();
 
         const rotationAngle = Math.acos(Vector3.Dot(cameraDir, starDir));
+
+        const animationDurationSeconds = 1;
 
         // if the rotation axis has a length different from 1, it means the cross product was made between very close vectors : no rotation is needed
         if (skipAnimation) {
@@ -498,19 +500,22 @@ export class StarMap implements View {
             this.controls.getTransform().computeWorldMatrix(true);
         } else if (rotationAngle > 0.02) {
             const rotationAxis = Vector3.Cross(cameraDir, starDir).normalize();
-            this.rotationAnimation = new TransformRotationAnimation(this.controls.getTransform(), rotationAxis, rotationAngle, 1);
+            this.rotationAnimation = new TransformRotationAnimation(this.controls.getTransform(), rotationAxis, rotationAngle, animationDurationSeconds);
         }
 
         const distance = starInstance.position.subtract(this.controls.getTransform().getAbsolutePosition()).length();
-        const targetPosition = this.controls
-            .getTransform()
-            .getAbsolutePosition()
-            .add(starDir.scaleInPlace(distance));
+        const targetPosition = this.controls.getTransform().getAbsolutePosition().add(starDir.scaleInPlace(distance));
 
         // if the transform is already in the right position, do not animate
         if (skipAnimation) this.controls.getTransform().position = targetPosition;
         else if (targetPosition.subtract(this.controls.getTransform().getAbsolutePosition()).lengthSquared() > 0.1) {
-            this.translationAnimation = new TransformTranslationAnimation(this.controls.getTransform(), targetPosition, 1);
+            this.translationAnimation = new TransformTranslationAnimation(this.controls.getTransform(), targetPosition, animationDurationSeconds);
+        }
+
+        const targetRadius = 5;
+        if (skipAnimation) this.controls.thirdPersonCamera.radius = targetRadius;
+        else {
+            this.radiusAnimation = new CameraRadiusAnimation(this.controls.thirdPersonCamera, targetRadius, animationDurationSeconds);
         }
 
         this.starMapUI.setHoveredStarSystemMesh(null);
