@@ -28,7 +28,7 @@ type Node = {
 };
 
 /**
- * A* pathfinder to find the shortest path between two star systems
+ * Incremental A* pathfinder to find the shortest path between two star systems
  */
 export class StellarPathfinder {
     private startSystem: {
@@ -51,6 +51,8 @@ export class StellarPathfinder {
     private hasPath = false;
     private nbIterations = 0;
 
+    private lastExploredNode: Node | null = null;
+
     /**
      * Initialize the pathfinder
      * @param startSystemSeed The seed of the starting system
@@ -63,6 +65,7 @@ export class StellarPathfinder {
         this.closedList = [];
         this.hasPath = false;
         this.nbIterations = 0;
+        this.lastExploredNode = null;
 
         this.startSystem = {
             seed: startSystemSeed,
@@ -122,6 +125,8 @@ export class StellarPathfinder {
 
         const currentNode = this.openList.shift()!;
         this.closedList.push(currentNode);
+
+        this.lastExploredNode = currentNode;
 
         console.log("Exploring", currentNode.seed.toString());
 
@@ -210,5 +215,27 @@ export class StellarPathfinder {
      */
     hasFoundPath(): boolean {
         return this.hasPath;
+    }
+
+    /**
+     * Get the progress of the pathfinder as a number between 0 and 1
+     */
+    getProgress(): number {
+        if (this.startSystem === null || this.targetSystem === null) {
+            throw new Error("Cannot get progress without initializing the pathfinder first");
+        }
+
+        if (this.lastExploredNode === null) {
+            return 0;
+        }
+
+        const start = this.startSystem.position;
+        const target = this.targetSystem.position;
+        const current = this.lastExploredNode.position;
+
+        const totalDistance = Vector3.Distance(start, target);
+        const currentDistance = Vector3.Distance(start, current);
+
+        return Math.max(0, Math.min(1, currentDistance / totalDistance));
     }
 }

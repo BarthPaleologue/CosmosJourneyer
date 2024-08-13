@@ -143,8 +143,9 @@ export class StarMap implements View {
             if (this.currentSystemSeed === null) throw new Error("current system seed is null!");
             if (this.selectedSystemSeed === null) throw new Error("selected system seed is null!");
             this.stellarPathfinder.init(this.currentSystemSeed, this.selectedSystemSeed, 10);
-            while (!this.stellarPathfinder.hasFoundPath() && this.stellarPathfinder.getNbIterations() < 100) {
+            while (!this.stellarPathfinder.hasFoundPath() && this.stellarPathfinder.getNbIterations() < 1000) {
                 this.stellarPathfinder.update();
+                console.log(this.stellarPathfinder.getProgress(), "%");
             }
             if (this.stellarPathfinder.hasFoundPath()) {
                 const path = this.stellarPathfinder.getPath();
