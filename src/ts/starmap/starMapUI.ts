@@ -32,7 +32,6 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import i18n from "../i18n";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
-import { StarSystemModel } from "../starSystem/starSystemModel";
 import { getStellarTypeString } from "../stellarObjects/common";
 import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
 import { StarModel } from "../stellarObjects/star/starModel";
@@ -52,7 +51,7 @@ export class StarMapUI {
     readonly systemUI: StackPanel;
     readonly namePlate: TextBlock;
     readonly descriptionPanel: TextBlock;
-    readonly warpButton: Button;
+    readonly plotItineraryButton: Button;
 
     readonly hoveredSystemRing: Image;
     readonly selectedSystemRing: Image;
@@ -121,18 +120,18 @@ export class StarMapUI {
         this.descriptionPanel.textHorizontalAlignment = TextBlock.HORIZONTAL_ALIGNMENT_LEFT;
         this.descriptionPanel.setPadding(0, 15, 10, 15);
 
-        this.warpButton = Button.CreateSimpleButton("warpButton", i18n.t("starMap:setAsDestination"));
+        this.plotItineraryButton = Button.CreateSimpleButton("warpButton", i18n.t("starMap:setAsDestination"));
         //this.warpButton.width = "100px";
-        this.warpButton.height = "40px";
-        this.warpButton.background = "midnightblue";
-        this.warpButton.fontWeight = "bold";
-        this.warpButton.fontFamily = Settings.MAIN_FONT;
-        this.warpButton.isPointerBlocker = false;
+        this.plotItineraryButton.height = "40px";
+        this.plotItineraryButton.background = "midnightblue";
+        this.plotItineraryButton.fontWeight = "bold";
+        this.plotItineraryButton.fontFamily = Settings.MAIN_FONT;
+        this.plotItineraryButton.isPointerBlocker = false;
         //this.warpButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
 
         this.systemUI.addControl(this.namePlate);
         this.systemUI.addControl(this.descriptionPanel);
-        this.systemUI.addControl(this.warpButton);
+        this.systemUI.addControl(this.plotItineraryButton);
 
         this.hoveredSystemRing = new Image("hoverSystemRing", hoveredCircle);
         this.hoveredSystemRing.fixedRatio = 1;

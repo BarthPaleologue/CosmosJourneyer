@@ -37,7 +37,7 @@ import "@babylonjs/core/Animations/animatable";
 import "@babylonjs/core/Culling/ray";
 import { TransformRotationAnimation } from "../uberCore/transforms/animations/rotation";
 import { TransformTranslationAnimation } from "../uberCore/transforms/animations/translation";
-import { getForwardDirection, translate } from "../uberCore/transforms/basicTransform";
+import { translate } from "../uberCore/transforms/basicTransform";
 import { ThickLines } from "../utils/thickLines";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { StarModel } from "../stellarObjects/star/starModel";
@@ -56,6 +56,7 @@ import { Sounds } from "../assets/sounds";
 import { StarMapControls } from "../starMapControls/starMapControls";
 import { CameraRadiusAnimation } from "../uberCore/transforms/animations/radius";
 import { Camera } from "@babylonjs/core/Cameras/camera";
+import { StellarPathfinder } from "./stellarPathfinder";
 
 export class StarMap implements View {
     readonly scene: Scene;
@@ -98,6 +99,8 @@ export class StarMap implements View {
     private readonly travelLine: ThickLines;
     private readonly thickLines: ThickLines[];
 
+    private readonly stellarPathfinder: StellarPathfinder = new StellarPathfinder();
+
     public readonly onTargetSetObservable: Observable<SystemSeed> = new Observable();
 
     /**
@@ -134,11 +137,25 @@ export class StarMap implements View {
 
         this.starMapUI = new StarMapUI(engine);
 
-        this.starMapUI.warpButton.onPointerClickObservable.add(() => {
+        this.starMapUI.plotItineraryButton.onPointerClickObservable.add(() => {
             Sounds.MENU_SELECT_SOUND.play();
-            this.currentSystemSeed = this.selectedSystemSeed;
-            if (this.currentSystemSeed !== null) this.starMapUI.setCurrentStarSystemMesh(this.seedToInstanceMap.get(this.currentSystemSeed.toString()) as InstancedMesh);
-            this.dispatchWarpCallbacks();
+            if (this.currentSystemSeed === null) throw new Error("current system seed is null!");
+            if (this.selectedSystemSeed === null) throw new Error("selected system seed is null!");
+            this.stellarPathfinder.init(this.currentSystemSeed, this.selectedSystemSeed);
+            let iteration = 0;
+            while (!this.stellarPathfinder.hasFoundPath() && iteration < 100) {
+                this.stellarPathfinder.update();
+                iteration++;
+            }
+            const path = this.stellarPathfinder.getPath();
+            console.log(path);
+
+            const points = path.map((seed) => {
+                return this.seedToInstanceMap.get(seed.toString()) as InstancedMesh;
+            });
+
+            this.travelLine.setPoints(points);
+            this.onTargetSetObservable.notifyObservers(path[1]);
         });
 
         StarMapInputs.map.focusOnCurrentSystem.on("complete", () => {
@@ -283,11 +300,6 @@ export class StarMap implements View {
         this.controls.getActiveCameras().forEach((camera) => camera.getViewMatrix(true));
         this.starMapCenterPosition.addInPlace(translationToOrigin);
         for (const mesh of this.scene.meshes) mesh.position.addInPlace(translationToOrigin);
-    }
-
-    private dispatchWarpCallbacks() {
-        if (this.selectedSystemSeed === null) throw new Error("No system selected!");
-        this.onTargetSetObservable.notifyObservers(this.selectedSystemSeed);
     }
 
     /**

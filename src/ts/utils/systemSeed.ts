@@ -49,6 +49,10 @@ export class SystemSeed {
         this.hash = centeredRand(cellRNG, 1 + index) * Settings.SEED_HALF_RANGE;
     }
 
+    equals(other: SystemSeed): boolean {
+        return this.starSectorX === other.starSectorX && this.starSectorY === other.starSectorY && this.starSectorZ === other.starSectorZ && this.index === other.index;
+    }
+
     toString(): string {
         return `${this.starSectorX},${this.starSectorY},${this.starSectorZ},${this.index}`;
     }
