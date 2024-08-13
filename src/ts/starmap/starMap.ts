@@ -57,6 +57,7 @@ import { StarMapControls } from "../starMapControls/starMapControls";
 import { CameraRadiusAnimation } from "../uberCore/transforms/animations/radius";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { StellarPathfinder } from "./stellarPathfinder";
+import { createNotification } from "../utils/notification";
 
 export class StarMap implements View {
     readonly scene: Scene;
@@ -142,20 +143,22 @@ export class StarMap implements View {
             if (this.currentSystemSeed === null) throw new Error("current system seed is null!");
             if (this.selectedSystemSeed === null) throw new Error("selected system seed is null!");
             this.stellarPathfinder.init(this.currentSystemSeed, this.selectedSystemSeed, 10);
-            let iteration = 0;
-            while (!this.stellarPathfinder.hasFoundPath() && iteration < 100) {
+            while (!this.stellarPathfinder.hasFoundPath() && this.stellarPathfinder.getNbIterations() < 100) {
                 this.stellarPathfinder.update();
-                iteration++;
             }
-            const path = this.stellarPathfinder.getPath();
-            console.log(path);
+            if (this.stellarPathfinder.hasFoundPath()) {
+                const path = this.stellarPathfinder.getPath();
+                console.log(path);
 
-            const points = path.map((seed) => {
-                return this.seedToInstanceMap.get(seed.toString()) as InstancedMesh;
-            });
+                const points = path.map((seed) => {
+                    return this.seedToInstanceMap.get(seed.toString()) as InstancedMesh;
+                });
 
-            this.travelLine.setPoints(points);
-            this.onTargetSetObservable.notifyObservers(path[1]);
+                this.travelLine.setPoints(points);
+                this.onTargetSetObservable.notifyObservers(path[1]);
+            } else {
+                createNotification("Could not find a path to the target system", 5000);
+            }
         });
 
         StarMapInputs.map.focusOnCurrentSystem.on("complete", () => {

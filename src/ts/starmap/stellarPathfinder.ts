@@ -49,6 +49,7 @@ export class StellarPathfinder {
     private jumpRange = 10;
 
     private hasPath = false;
+    private nbIterations = 0;
 
     /**
      * Initialize the pathfinder
@@ -61,6 +62,7 @@ export class StellarPathfinder {
         this.openList = [];
         this.closedList = [];
         this.hasPath = false;
+        this.nbIterations = 0;
 
         this.startSystem = {
             seed: startSystemSeed,
@@ -161,6 +163,7 @@ export class StellarPathfinder {
         this.openList.sort((a, b) => a.G + a.H - b.G - b.H);
 
         this.hasPath = false;
+        this.nbIterations++;
     }
 
     /**
@@ -191,6 +194,14 @@ export class StellarPathfinder {
         path.push(this.startSystem.seed);
 
         return path.reverse();
+    }
+
+    /**
+     * Get the number of iterations executed by the pathfinder
+     * @returns The number of iterations executed by the pathfinder. Will return 0 if the pathfinder has not been initialized.
+     */
+    getNbIterations(): number {
+        return this.nbIterations;
     }
 
     /**
