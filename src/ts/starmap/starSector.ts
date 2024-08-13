@@ -98,6 +98,14 @@ export class StarSector {
             .addInPlace(this.position);
     }
 
+    getPositionOfStars(): Vector3[] {
+        const positions: Vector3[] = [];
+        for (let i = 0; i < this.nbStars; i++) {
+            positions.push(this.getPositionOfStar(i));
+        }
+        return positions;
+    }
+
     /**
      * Returns a string that uniquely identifies this sector (its position relative to the global node)
      * @returns a string that uniquely identifies this sector
