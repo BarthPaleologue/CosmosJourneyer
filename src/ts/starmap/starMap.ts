@@ -58,6 +58,7 @@ import { CameraRadiusAnimation } from "../uberCore/transforms/animations/radius"
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { StellarPathfinder } from "./stellarPathfinder";
 import { createNotification } from "../utils/notification";
+import { getStarGalacticCoordinates } from "../utils/getStarGalacticCoordinates";
 
 export class StarMap implements View {
     readonly scene: Scene;
@@ -98,7 +99,6 @@ export class StarMap implements View {
     private readonly instanceToSeedMap: Map<InstancedMesh, string> = new Map();
 
     private readonly travelLine: ThickLines;
-    private readonly thickLines: ThickLines[];
 
     private readonly stellarPathfinder: StellarPathfinder = new StellarPathfinder();
 
@@ -152,7 +152,7 @@ export class StarMap implements View {
                 console.log(path);
 
                 const points = path.map((seed) => {
-                    return this.seedToInstanceMap.get(seed.toString()) as InstancedMesh;
+                    return getStarGalacticCoordinates(seed);
                 });
 
                 this.travelLine.setPoints(points);
@@ -253,7 +253,6 @@ export class StarMap implements View {
             },
             this.scene
         );
-        this.thickLines = [this.travelLine];
 
         // then generate missing star sectors
         for (let x = -StarMap.RENDER_RADIUS; x <= StarMap.RENDER_RADIUS; x++) {
@@ -277,8 +276,6 @@ export class StarMap implements View {
             this.acknowledgeCameraMovement();
 
             this.updateStarSectors();
-
-            this.thickLines.forEach((bondingLine) => bondingLine.update());
         });
     }
 
@@ -494,10 +491,6 @@ export class StarMap implements View {
                 this.selectedSystemSeed = starSystemSeed;
 
                 this.focusCameraOnStar(initializedInstance);
-
-                if (this.currentSystemSeed !== null) {
-                    this.travelLine.setPoints([this.seedToInstanceMap.get(this.currentSystemSeed.toString()) as InstancedMesh, initializedInstance]);
-                }
             })
         );
 
