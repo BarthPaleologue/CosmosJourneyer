@@ -141,7 +141,7 @@ export class StarMap implements View {
             Sounds.MENU_SELECT_SOUND.play();
             if (this.currentSystemSeed === null) throw new Error("current system seed is null!");
             if (this.selectedSystemSeed === null) throw new Error("selected system seed is null!");
-            this.stellarPathfinder.init(this.currentSystemSeed, this.selectedSystemSeed);
+            this.stellarPathfinder.init(this.currentSystemSeed, this.selectedSystemSeed, 10);
             let iteration = 0;
             while (!this.stellarPathfinder.hasFoundPath() && iteration < 100) {
                 this.stellarPathfinder.update();
