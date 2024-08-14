@@ -19,6 +19,7 @@ import { getStarGalacticCoordinates } from "../utils/getStarGalacticCoordinates"
 import { SystemSeed } from "../utils/systemSeed";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getNeighborStarSystems } from "../utils/getNeighborStarSystems";
+import { PriorityQueue } from "../utils/priorityQueue";
 
 type Node = {
     seed: SystemSeed;
@@ -43,7 +44,7 @@ export class StellarPathfinder {
 
     private seedToPrevious: Map<number, SystemSeed> = new Map();
 
-    private openList: Node[] = [];
+    private openList: PriorityQueue<Node> = new PriorityQueue((a, b) => a.G + a.H < b.G - b.H);
     private closedList: Node[] = [];
 
     private jumpRange = 10;
@@ -61,7 +62,7 @@ export class StellarPathfinder {
      */
     public init(startSystemSeed: SystemSeed, targetSystemSeed: SystemSeed, jumpRange: number) {
         this.seedToPrevious.clear();
-        this.openList = [];
+        this.openList.clear();
         this.closedList = [];
         this.hasPath = false;
         this.nbIterations = 0;
@@ -113,7 +114,7 @@ export class StellarPathfinder {
             throw new Error("Cannot update pathfinder without initializing it first");
         }
 
-        if (this.openList.length === 0) {
+        if (this.openList.size() === 0) {
             console.log("Initializing pathfinder");
             this.openList.push({
                 seed: this.startSystem.seed,
@@ -123,7 +124,7 @@ export class StellarPathfinder {
             });
         }
 
-        const currentNode = this.openList.shift()!;
+        const currentNode = this.openList.pop()!;
         this.closedList.push(currentNode);
 
         this.lastExploredNode = currentNode;
@@ -164,8 +165,6 @@ export class StellarPathfinder {
                 this.seedToPrevious.set(neighbor.seed.hash, currentNode.seed);
             }
         }
-
-        this.openList.sort((a, b) => a.G + a.H - b.G - b.H);
 
         this.hasPath = false;
         this.nbIterations++;
