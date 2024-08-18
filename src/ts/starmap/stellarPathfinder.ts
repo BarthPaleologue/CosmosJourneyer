@@ -235,8 +235,8 @@ export class StellarPathfinder {
         const current = this.lastExploredNode.position;
 
         const totalDistance = Vector3.Distance(start, target);
-        const currentDistance = Vector3.Distance(start, current);
+        const currentDistance = Vector3.Distance(target, current);
 
-        return Math.max(0, Math.min(1, currentDistance / totalDistance));
+        return 1.0 - Math.max(0, Math.min(1, currentDistance / totalDistance));
     }
 }
