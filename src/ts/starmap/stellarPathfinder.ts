@@ -115,7 +115,6 @@ export class StellarPathfinder {
         }
 
         if (this.openList.size() === 0) {
-            console.log("Initializing pathfinder");
             this.openList.push({
                 seed: this.startSystem.seed,
                 position: this.startSystem.position,
@@ -129,16 +128,12 @@ export class StellarPathfinder {
 
         this.lastExploredNode = currentNode;
 
-        console.log("Exploring", currentNode.seed.toString());
-
         if (currentNode.seed.equals(this.targetSystem.seed)) {
-            console.log("Found path");
             this.hasPath = true;
             return;
         }
 
         const neighborsWithDistances = this.getNeighbors(currentNode);
-        console.log("Found", neighborsWithDistances.length, "neighbors");
         for (let i = 0; i < neighborsWithDistances.length; i++) {
             const [neighbor, distance] = neighborsWithDistances[i];
             if (this.closedList.find((node) => node.seed.equals(neighbor.seed))) {
@@ -190,9 +185,10 @@ export class StellarPathfinder {
         const path: SystemSeed[] = [];
         let currentSeed = this.targetSystem.seed;
         while (currentSeed !== this.startSystem.seed) {
-            if (path.find((seed) => seed.equals(currentSeed))) {
-                console.log(path);
-                throw new Error("Path contains a loop with " + currentSeed.toString());
+            if (path.length >= 2 ** 32) {
+                throw new Error(
+                    `Path between ${this.startSystem.seed.toString()} and ${this.targetSystem.seed.toString()} is too long, exceeding 2^32 elements! There might be a loop somewhere...`
+                );
             }
             path.push(currentSeed);
             const previous = this.seedToPrevious.get(currentSeed.toString());
