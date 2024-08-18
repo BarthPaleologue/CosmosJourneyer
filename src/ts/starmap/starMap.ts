@@ -143,23 +143,6 @@ export class StarMap implements View {
             if (this.currentSystemSeed === null) throw new Error("current system seed is null!");
             if (this.selectedSystemSeed === null) throw new Error("selected system seed is null!");
             this.stellarPathfinder.init(this.currentSystemSeed, this.selectedSystemSeed, 15);
-            while (!this.stellarPathfinder.hasFoundPath() && this.stellarPathfinder.getNbIterations() < 1000) {
-                this.stellarPathfinder.update();
-                console.log(this.stellarPathfinder.getProgress(), "%");
-            }
-            if (this.stellarPathfinder.hasFoundPath()) {
-                const path = this.stellarPathfinder.getPath();
-                console.log(path);
-
-                const points = path.map((seed) => {
-                    return getStarGalacticCoordinates(seed);
-                });
-
-                this.travelLine.setPoints(points);
-                this.onTargetSetObservable.notifyObservers(path[1]);
-            } else {
-                createNotification("Could not find a path to the target system", 5000);
-            }
         });
 
         StarMapInputs.map.focusOnCurrentSystem.on("complete", () => {
@@ -276,6 +259,34 @@ export class StarMap implements View {
             this.acknowledgeCameraMovement();
 
             this.updateStarSectors();
+
+            // update pathfinder
+            const pathfinderMaxIterations = 1_000_000;
+            const pathfinderStepsPerFrame = 10;
+            for (let i = 0; i < pathfinderStepsPerFrame; i++) {
+                if (!this.stellarPathfinder.hasBeenInit()) break;
+                if (this.stellarPathfinder.hasFoundPath()) break;
+                if (this.stellarPathfinder.getNbIterations() >= pathfinderMaxIterations) break;
+
+                this.stellarPathfinder.update();
+                console.log(this.stellarPathfinder.getProgress(), "%");
+
+                if (this.stellarPathfinder.hasFoundPath()) {
+                    const path = this.stellarPathfinder.getPath();
+                    console.log(path);
+
+                    const points = path.map((seed) => {
+                        return getStarGalacticCoordinates(seed);
+                    });
+
+                    this.travelLine.setPoints(points);
+                    this.onTargetSetObservable.notifyObservers(path[1]);
+                    break;
+                } else if (this.stellarPathfinder.getNbIterations() >= pathfinderMaxIterations) {
+                    createNotification(`Could not find a path to the target system after ${pathfinderMaxIterations} iterations`, 5000);
+                    break;
+                }
+            }
         });
     }
 

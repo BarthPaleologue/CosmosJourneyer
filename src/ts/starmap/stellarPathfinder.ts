@@ -81,6 +81,10 @@ export class StellarPathfinder {
         this.jumpRange = jumpRange;
     }
 
+    public hasBeenInit(): boolean {
+        return this.startSystem !== null && this.targetSystem !== null;
+    }
+
     private getHeuristic(node: Node): number {
         const position = node.position;
 
