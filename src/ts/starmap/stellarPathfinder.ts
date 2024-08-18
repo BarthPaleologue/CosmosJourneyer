@@ -42,7 +42,7 @@ export class StellarPathfinder {
         position: Vector3;
     } | null = null;
 
-    private seedToPrevious: Map<number, SystemSeed> = new Map();
+    private seedToPrevious: Map<string, SystemSeed> = new Map();
 
     private openList: PriorityQueue<Node> = new PriorityQueue((a, b) => a.G + a.H < b.G - b.H);
     private closedList: Node[] = [];
@@ -142,6 +142,7 @@ export class StellarPathfinder {
         for (let i = 0; i < neighborsWithDistances.length; i++) {
             const [neighbor, distance] = neighborsWithDistances[i];
             if (this.closedList.find((node) => node.seed.equals(neighbor.seed))) {
+                // if the neighbor is already in the closed list, skip it
                 continue;
             }
 
@@ -149,11 +150,12 @@ export class StellarPathfinder {
             const H = this.getHeuristic(neighbor);
 
             const openNode = this.openList.find((node) => node.seed.equals(neighbor.seed));
-            if (openNode) {
+            if (openNode !== undefined) {
+                // if the neighbor is already in the open list, update its G value if the new path is shorter
                 if (G < openNode.G) {
                     openNode.G = G;
                     openNode.H = H;
-                    this.seedToPrevious.set(neighbor.seed.hash, currentNode.seed);
+                    this.seedToPrevious.set(neighbor.seed.toString(), currentNode.seed);
                 }
             } else {
                 this.openList.push({
@@ -162,7 +164,7 @@ export class StellarPathfinder {
                     G,
                     H
                 });
-                this.seedToPrevious.set(neighbor.seed.hash, currentNode.seed);
+                this.seedToPrevious.set(neighbor.seed.toString(), currentNode.seed);
             }
         }
 
@@ -188,8 +190,12 @@ export class StellarPathfinder {
         const path: SystemSeed[] = [];
         let currentSeed = this.targetSystem.seed;
         while (currentSeed !== this.startSystem.seed) {
+            if (path.find((seed) => seed.equals(currentSeed))) {
+                console.log(path);
+                throw new Error("Path contains a loop with " + currentSeed.toString());
+            }
             path.push(currentSeed);
-            const previous = this.seedToPrevious.get(currentSeed.hash);
+            const previous = this.seedToPrevious.get(currentSeed.toString());
             if (previous === undefined) {
                 throw new Error("Could not find a path to the target system");
             }
