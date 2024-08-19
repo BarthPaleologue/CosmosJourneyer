@@ -269,20 +269,20 @@ export class StarMap implements View {
                 if (this.stellarPathfinder.getNbIterations() >= pathfinderMaxIterations) break;
 
                 this.stellarPathfinder.update();
-            }
+        
+                if (this.stellarPathfinder.hasFoundPath()) {
+                    const path = this.stellarPathfinder.getPath();
+                    console.log(path);
 
-            if (this.stellarPathfinder.hasFoundPath()) {
-                const path = this.stellarPathfinder.getPath();
-                console.log(path);
+                    const points = path.map((seed) => {
+                        return getStarGalacticCoordinates(seed);
+                    });
 
-                const points = path.map((seed) => {
-                    return getStarGalacticCoordinates(seed);
-                });
-
-                this.travelLine.setPoints(points);
-                this.onTargetSetObservable.notifyObservers(path[1]);
-            } else if (this.stellarPathfinder.getNbIterations() >= pathfinderMaxIterations) {
-                createNotification(`Could not find a path to the target system after ${pathfinderMaxIterations} iterations`, 5000);
+                    this.travelLine.setPoints(points);
+                    this.onTargetSetObservable.notifyObservers(path[1]);
+                } else if (this.stellarPathfinder.getNbIterations() >= pathfinderMaxIterations) {
+                    createNotification(`Could not find a path to the target system after ${pathfinderMaxIterations} iterations`, 5000);
+                }
             }
 
             //console.log(this.stellarPathfinder.getProgress(), "%");
