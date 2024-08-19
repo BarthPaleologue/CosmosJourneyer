@@ -60,6 +60,7 @@ export class StarMapUI {
 
     readonly shortHandUI: HTMLDivElement;
     readonly shortHandUITitle: HTMLHeadingElement;
+    readonly shortHandUISystemType: HTMLParagraphElement;
     readonly shortHandUIDistanceFromCurrent: HTMLParagraphElement;
     readonly shortHandUIFactions: HTMLDivElement;
     readonly shortHandUIButtonContainer: HTMLDivElement;
@@ -170,6 +171,9 @@ export class StarMapUI {
         this.shortHandUITitle = document.createElement("h2");
         this.shortHandUI.appendChild(this.shortHandUITitle);
 
+        this.shortHandUISystemType = document.createElement("p");
+        this.shortHandUI.appendChild(this.shortHandUISystemType);
+
         this.shortHandUIDistanceFromCurrent = document.createElement("p");
         this.shortHandUI.appendChild(this.shortHandUIDistanceFromCurrent);
 
@@ -208,9 +212,6 @@ export class StarMapUI {
         const minScale = 5.0;
         if (this.selectedMesh !== null) {
             const selectedMeshScreenCoordinates = Vector3.Project(this.selectedMesh.position, Matrix.IdentityReadOnly, camera.getTransformationMatrix(), camera.viewport);
-            this.shortHandUI.style.visibility = selectedMeshScreenCoordinates.z >= 0 ? "visible" : "hidden";
-            this.shortHandUI.style.transform = `translate(calc(${(selectedMeshScreenCoordinates.x * width).toFixed(0)}px + 50px), calc(${(selectedMeshScreenCoordinates.y * height).toFixed(0)}px - 50%))`;
-
             this.selectedSystemCursor.classList.toggle("transparent", selectedMeshScreenCoordinates.z < 0);
             this.selectedSystemCursorContainer.style.left = `${selectedMeshScreenCoordinates.x * 100}vw`;
             this.selectedSystemCursorContainer.style.top = `${selectedMeshScreenCoordinates.y * 100}vh`;
@@ -218,6 +219,12 @@ export class StarMapUI {
             const distance = Vector3.Distance(this.selectedMesh.getAbsolutePosition(), playerPosition);
             const scale = Math.max(minScale, scalingBase / distance);
             this.selectedSystemCursorContainer.style.setProperty("--dim", `${scale}vh`);
+
+            const xOffsetBase = 500;
+            const minXOffset = 25;
+            const xOffset = Math.max(minXOffset, xOffsetBase / distance);
+            this.shortHandUI.style.visibility = selectedMeshScreenCoordinates.z >= 0 ? "visible" : "hidden";
+            this.shortHandUI.style.transform = `translate(calc(${(selectedMeshScreenCoordinates.x * width).toFixed(0)}px + ${xOffset}px), calc(${(selectedMeshScreenCoordinates.y * height).toFixed(0)}px - 50%))`;
         } else {
             this.shortHandUI.style.visibility = "hidden";
             this.selectedSystemCursor.classList.add("transparent");
@@ -312,9 +319,8 @@ export class StarMapUI {
         if (starModel.bodyType === BodyType.BLACK_HOLE) typeString = i18n.t("objectTypes:blackHole");
         else if (starModel.bodyType === BodyType.NEUTRON_STAR) typeString = i18n.t("objectTypes:neutronStar");
         else typeString = i18n.t("objectTypes:star", { stellarType: getStellarTypeString(starModel.stellarType) });
-        text += `${typeString}\n`;
 
-        text += `${i18n.t("starMap:planets")}: ${targetSystemModel.getNbPlanets()}\n`;
+        this.shortHandUISystemType.textContent = typeString;
 
         if (starModel instanceof StarModel) {
             this.infoPanelStarPreview.style.background = starModel.color.toHexString();
