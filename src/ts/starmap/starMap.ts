@@ -262,31 +262,30 @@ export class StarMap implements View {
 
             // update pathfinder
             const pathfinderMaxIterations = 1_000_000;
-            const pathfinderStepsPerFrame = 10;
+            const pathfinderStepsPerFrame = 20;
             for (let i = 0; i < pathfinderStepsPerFrame; i++) {
                 if (!this.stellarPathfinder.hasBeenInit()) break;
                 if (this.stellarPathfinder.hasFoundPath()) break;
                 if (this.stellarPathfinder.getNbIterations() >= pathfinderMaxIterations) break;
 
                 this.stellarPathfinder.update();
-                console.log(this.stellarPathfinder.getProgress(), "%");
-
-                if (this.stellarPathfinder.hasFoundPath()) {
-                    const path = this.stellarPathfinder.getPath();
-                    console.log(path);
-
-                    const points = path.map((seed) => {
-                        return getStarGalacticCoordinates(seed);
-                    });
-
-                    this.travelLine.setPoints(points);
-                    this.onTargetSetObservable.notifyObservers(path[1]);
-                    break;
-                } else if (this.stellarPathfinder.getNbIterations() >= pathfinderMaxIterations) {
-                    createNotification(`Could not find a path to the target system after ${pathfinderMaxIterations} iterations`, 5000);
-                    break;
-                }
             }
+
+            if (this.stellarPathfinder.hasFoundPath()) {
+                const path = this.stellarPathfinder.getPath();
+                console.log(path);
+
+                const points = path.map((seed) => {
+                    return getStarGalacticCoordinates(seed);
+                });
+
+                this.travelLine.setPoints(points);
+                this.onTargetSetObservable.notifyObservers(path[1]);
+            } else if (this.stellarPathfinder.getNbIterations() >= pathfinderMaxIterations) {
+                createNotification(`Could not find a path to the target system after ${pathfinderMaxIterations} iterations`, 5000);
+            }
+
+            //console.log(this.stellarPathfinder.getProgress(), "%");
         });
     }
 
