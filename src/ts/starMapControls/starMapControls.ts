@@ -45,6 +45,7 @@ export class StarMapControls implements Controls {
         this.thirdPersonCamera.minZ = 1;
         this.thirdPersonCamera.maxZ = Settings.EARTH_RADIUS * 5;
         this.thirdPersonCamera.wheelPrecision *= 3;
+        this.thirdPersonCamera.panningSensibility = 0;
         this.thirdPersonCamera.parent = this.transform;
     }
 
