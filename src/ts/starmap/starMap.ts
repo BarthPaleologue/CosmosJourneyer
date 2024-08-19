@@ -161,7 +161,7 @@ export class StarMap implements View {
 
         this.starMapCenterPosition = Vector3.Zero();
 
-        this.starTemplate = MeshBuilder.CreatePlane("star", { size: 0.15 }, this.scene);
+        this.starTemplate = MeshBuilder.CreatePlane("star", { size: 0.6 }, this.scene);
         this.starTemplate.billboardMode = Mesh.BILLBOARDMODE_ALL;
         this.starTemplate.isPickable = true;
         this.starTemplate.isVisible = false;
@@ -177,7 +177,7 @@ export class StarMap implements View {
         this.starTemplate.registerInstancedBuffer("color", 4); // 4 is the stride size eg. 4 floats here
         this.starTemplate.material = starMaterial;
 
-        this.blackHoleTemplate = MeshBuilder.CreatePlane("blackHole", { size: 0.2 }, this.scene);
+        this.blackHoleTemplate = MeshBuilder.CreatePlane("blackHole", { size: 0.8 }, this.scene);
         this.blackHoleTemplate.billboardMode = Mesh.BILLBOARDMODE_ALL;
         this.blackHoleTemplate.isPickable = true;
         this.blackHoleTemplate.isVisible = false;
@@ -459,7 +459,6 @@ export class StarMap implements View {
         this.seedToInstanceMap.set(starSystemSeed.toString(), initializedInstance);
         this.instanceToSeedMap.set(initializedInstance, starSystemSeed.toString());
 
-        initializedInstance.scaling = Vector3.One().scaleInPlace(data.scale);
         initializedInstance.position = data.position.add(this.starMapCenterPosition);
 
         if (starModel.bodyType === BodyType.STAR || starModel.bodyType === BodyType.NEUTRON_STAR) {
