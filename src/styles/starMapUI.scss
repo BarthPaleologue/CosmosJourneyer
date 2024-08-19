@@ -9,6 +9,41 @@
     pointer-events: none;
   }
 
+  .shortHandUI {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.8);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5), 0 0 10px rgba(255, 255, 255, 0.5) inset;
+
+    display: flex;
+    row-gap: 10px;
+    flex-direction: column;
+
+    color: white;
+    font-family: Nasalization, sans-serif;
+    padding: 20px;
+
+    h2, p {
+      margin-block: 0;
+    }
+
+    .buttonContainer {
+      display: flex;
+      justify-content: space-between;
+      column-gap: 5px;
+      flex:2;
+    }
+
+    button {
+      background: #002b6a;
+      outline: none;
+      border: none;
+      cursor: pointer;
+      color: white;
+      font-family: Nasalization, sans-serif;
+      padding: 5px;
+    }
+  }
+
   .starMapInfoPanel {
     position: absolute;
     height: 90vh;
@@ -19,7 +54,7 @@
     backdrop-filter: blur(3px);
     overflow-y: auto;
 
-    box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5) inset, 0 0 5px rgba(0, 0, 0, 0.5);
     background: rgba(0, 0, 0, 0.8);
 
     display: flex;

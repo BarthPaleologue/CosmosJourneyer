@@ -138,7 +138,7 @@ export class StarMap implements View {
 
         this.starMapUI = new StarMapUI(engine);
 
-        this.starMapUI.plotItineraryButton.onPointerClickObservable.add(() => {
+        this.starMapUI.shortHandUIPlotItineraryButton.addEventListener("click", () => {
             Sounds.MENU_SELECT_SOUND.play();
             if (this.currentSystemSeed === null) throw new Error("current system seed is null!");
             if (this.selectedSystemSeed === null) throw new Error("selected system seed is null!");
@@ -269,7 +269,7 @@ export class StarMap implements View {
                 if (this.stellarPathfinder.getNbIterations() >= pathfinderMaxIterations) break;
 
                 this.stellarPathfinder.update();
-        
+
                 if (this.stellarPathfinder.hasFoundPath()) {
                     const path = this.stellarPathfinder.getPath();
                     console.log(path);
@@ -473,7 +473,6 @@ export class StarMap implements View {
 
             initializedInstance.actionManager.registerAction(
                 new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, () => {
-                    if (this.starMapUI.isHovered()) return;
                     this.starMapUI.setHoveredStarSystemMesh(initializedInstance);
                     Sounds.MENU_HOVER_SOUND.play();
                 })
@@ -491,8 +490,6 @@ export class StarMap implements View {
 
         initializedInstance.actionManager?.registerAction(
             new ExecuteCodeAction(ActionManager.OnPickTrigger, () => {
-                if (this.starMapUI.isHovered()) return;
-
                 Sounds.STAR_MAP_CLICK_SOUND.play();
 
                 this.starMapUI.attachUIToMesh(initializedInstance);

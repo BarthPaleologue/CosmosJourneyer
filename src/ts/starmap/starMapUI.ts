@@ -28,7 +28,7 @@ import selectedCircle from "../../asset/textures/selectedCircle.png";
 import { Animation } from "@babylonjs/core/Animations/animation";
 import { Scene } from "@babylonjs/core/scene";
 import { Settings } from "../settings";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import i18n from "../i18n";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
@@ -48,10 +48,6 @@ import { isSystemInHumanBubble } from "../society/starSystemSociety";
 
 export class StarMapUI {
     readonly gui: AdvancedDynamicTexture;
-    readonly systemUI: StackPanel;
-    readonly namePlate: TextBlock;
-    readonly descriptionPanel: TextBlock;
-    readonly plotItineraryButton: Button;
 
     readonly hoveredSystemRing: Image;
     readonly selectedSystemRing: Image;
@@ -72,12 +68,20 @@ export class StarMapUI {
 
     readonly cursor: HTMLDivElement;
 
+    readonly shortHandUI: HTMLDivElement;
+    readonly shortHandUITitle: HTMLHeadingElement;
+    readonly shortHandUIDistanceFromCurrent: HTMLParagraphElement;
+    readonly shortHandUIFactions: HTMLDivElement;
+    readonly shortHandUIButtonContainer: HTMLDivElement;
+    readonly shortHandUIPlotItineraryButton: HTMLButtonElement;
+    readonly shortHandUIBookmarkButton: HTMLButtonElement;
+
+    private selectedMesh: AbstractMesh | null = null;
+
     readonly scene: Scene;
     readonly uiCamera: FreeCamera;
 
     static ALPHA_ANIMATION = new Animation("alphaAnimation", "alpha", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
-
-    private _isHovered = false;
 
     constructor(engine: AbstractEngine) {
         this.scene = new Scene(engine);
@@ -87,51 +91,6 @@ export class StarMapUI {
         this.uiCamera = new FreeCamera("UiCamera", Vector3.Zero(), this.scene);
 
         this.gui = AdvancedDynamicTexture.CreateFullscreenUI("StarMapUI", true, this.scene);
-
-        this.systemUI = new StackPanel();
-        this.systemUI.width = "300px";
-        this.systemUI.height = "220px";
-        this.systemUI.color = "white";
-        this.systemUI.background = "black";
-        this.systemUI.linkOffsetY = -200;
-        this.systemUI.zIndex = 6;
-        this.systemUI.alpha = 0.95;
-
-        this.systemUI.onPointerEnterObservable.add(() => {
-            this._isHovered = true;
-        });
-
-        this.systemUI.onPointerOutObservable.add(() => {
-            this._isHovered = false;
-        });
-
-        this.namePlate = new TextBlock();
-        this.namePlate.text = "";
-        this.namePlate.fontSize = 24;
-        this.namePlate.height = "50px";
-        this.namePlate.fontFamily = Settings.MAIN_FONT;
-        this.namePlate.textHorizontalAlignment = TextBlock.HORIZONTAL_ALIGNMENT_LEFT;
-        this.namePlate.setPadding(15, 15, 10, 15);
-
-        this.descriptionPanel = new TextBlock();
-        this.descriptionPanel.height = "130px";
-        this.descriptionPanel.lineSpacing = 4.0;
-        this.descriptionPanel.fontFamily = Settings.MAIN_FONT;
-        this.descriptionPanel.textHorizontalAlignment = TextBlock.HORIZONTAL_ALIGNMENT_LEFT;
-        this.descriptionPanel.setPadding(0, 15, 10, 15);
-
-        this.plotItineraryButton = Button.CreateSimpleButton("warpButton", i18n.t("starMap:setAsDestination"));
-        //this.warpButton.width = "100px";
-        this.plotItineraryButton.height = "40px";
-        this.plotItineraryButton.background = "midnightblue";
-        this.plotItineraryButton.fontWeight = "bold";
-        this.plotItineraryButton.fontFamily = Settings.MAIN_FONT;
-        this.plotItineraryButton.isPointerBlocker = false;
-        //this.warpButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-
-        this.systemUI.addControl(this.namePlate);
-        this.systemUI.addControl(this.descriptionPanel);
-        this.systemUI.addControl(this.plotItineraryButton);
 
         this.hoveredSystemRing = new Image("hoverSystemRing", hoveredCircle);
         this.hoveredSystemRing.fixedRatio = 1;
@@ -216,20 +175,39 @@ export class StarMapUI {
         this.cursor.classList.add("cursor");
         this.htmlRoot.appendChild(this.cursor);
 
+        this.shortHandUI = document.createElement("div");
+        this.shortHandUI.classList.add("shortHandUI");
+        this.htmlRoot.appendChild(this.shortHandUI);
+
+        this.shortHandUITitle = document.createElement("h2");
+        this.shortHandUI.appendChild(this.shortHandUITitle);
+
+        this.shortHandUIDistanceFromCurrent = document.createElement("p");
+        this.shortHandUI.appendChild(this.shortHandUIDistanceFromCurrent);
+
+        this.shortHandUIFactions = document.createElement("p");
+        this.shortHandUI.appendChild(this.shortHandUIFactions);
+
+        this.shortHandUIButtonContainer = document.createElement("div");
+        this.shortHandUIButtonContainer.classList.add("buttonContainer");
+        this.shortHandUI.appendChild(this.shortHandUIButtonContainer);
+
+        this.shortHandUIPlotItineraryButton = document.createElement("button");
+        this.shortHandUIPlotItineraryButton.classList.add("plotItineraryButton");
+        this.shortHandUIPlotItineraryButton.textContent = i18n.t("starMap:setAsDestination");
+        this.shortHandUIButtonContainer.appendChild(this.shortHandUIPlotItineraryButton);
+
+        this.shortHandUIBookmarkButton = document.createElement("button");
+        this.shortHandUIBookmarkButton.classList.add("bookmarkButton");
+        this.shortHandUIBookmarkButton.textContent = i18n.t("starMap:bookmark");
+        this.shortHandUIButtonContainer.appendChild(this.shortHandUIBookmarkButton);
+
         document.addEventListener("pointermove", (event) => {
             this.cursor.style.transform = `translate(calc(${event.clientX}px - 50%), calc(${event.clientY}px - 50%))`;
         });
     }
 
-    isHovered() {
-        return this._isHovered;
-    }
-
     update(playerPosition: Vector3) {
-        if (this.systemUI.linkedMesh === null || this.systemUI.linkedMesh === undefined) this.gui.removeControl(this.systemUI);
-        else {
-            this.systemUI.linkOffsetY = -150 - 50 / this.systemUI.linkedMesh.getAbsolutePosition().length();
-        }
         if (this.hoveredSystemRing.linkedMesh !== null && this.hoveredSystemRing.linkedMesh !== undefined) {
             const distance = this.hoveredSystemRing.linkedMesh.getAbsolutePosition().subtract(playerPosition).length();
             const scale = this.hoveredSystemRing.linkedMesh.scaling.x / distance;
@@ -247,20 +225,39 @@ export class StarMapUI {
             const scale = Math.max(0.3, this.currentSystemRing.linkedMesh.scaling.x / distance);
             this.currentSystemRing.scaleX = scale;
             this.currentSystemRing.scaleY = scale;
+        }        
+
+        if(this.selectedMesh !== null) {
+            const camera = this.scene.activeCamera;
+            if (camera === null) {
+                throw new Error("No active camera found");
+            }
+
+            this.shortHandUI.style.visibility = "visible";
+            const meshScreenCoordinates = Vector3.Project(this.selectedMesh.position, Matrix.IdentityReadOnly, camera.getTransformationMatrix(), camera.viewport);
+            const width = this.scene.getEngine().getRenderWidth();
+            const height = this.scene.getEngine().getRenderHeight();
+            this.shortHandUI.style.visibility = "visible";
+            this.shortHandUI.style.transform = `translate(calc(${(meshScreenCoordinates.x * width).toFixed(0)}px + 50px), calc(${(meshScreenCoordinates.y * height).toFixed(0)}px - 50%))`;
+        } else {
+            this.shortHandUI.style.visibility = "hidden";
         }
     }
 
     attachUIToMesh(mesh: AbstractMesh) {
         this.gui._linkedControls = [];
-        if (this.gui._linkedControls.length === 0) this.gui.addControl(this.systemUI);
-
-        this.systemUI.linkWithMesh(mesh);
-
         this.gui.addControl(this.selectedSystemRing);
         this.selectedSystemRing.linkWithMesh(mesh);
 
         //FIXME: this should not be here, probably a BabylonJS bug
         this.currentSystemRing.linkWithMesh(this.currentSystemRing.linkedMesh);
+
+        const camera = this.scene.activeCamera;
+        if (camera === null) {
+            throw new Error("No active camera found");
+        }
+
+        this.selectedMesh = mesh;
     }
 
     setHoveredStarSystemMesh(mesh: AbstractMesh | null) {
@@ -278,13 +275,8 @@ export class StarMapUI {
         this.currentSystemRing.linkWithMesh(mesh);
     }
 
-    detachUIFromMesh() {
-        this.systemUI.linkWithMesh(null);
-        this.gui.removeControl(this.systemUI);
-    }
-
     getCurrentPickedMesh() {
-        return this.systemUI.linkedMesh;
+        return this.selectedMesh;
     }
 
     getCurrentHoveredMesh() {
@@ -300,6 +292,8 @@ export class StarMapUI {
 
             const distance = Vector3.Distance(currentCoordinates, targetCoordinates) * Settings.LIGHT_YEAR;
             text += `${i18n.t("starMap:distance")}: ${parseDistance(distance)}\n`;
+
+            this.shortHandUIDistanceFromCurrent.textContent = `${i18n.t("starMap:distanceFromCurrent")}: ${Vector3.Distance(currentCoordinates, targetCoordinates).toFixed(1)} ${i18n.t("units:ly")}`;
         }
 
         const starSeed = targetSystemModel.getStellarObjectSeed(0);
@@ -328,15 +322,13 @@ export class StarMapUI {
 
         text += `${i18n.t("starMap:planets")}: ${targetSystemModel.getNbPlanets()}\n`;
 
-        this.namePlate.text = targetSystemModel.name;
-        this.descriptionPanel.text = text;
-
         if (starModel instanceof StarModel) {
             this.infoPanelStarPreview.style.background = starModel.color.toHexString();
             this.infoPanelStarPreview.style.boxShadow = `0 0 20px ${starModel.color.toHexString()}`;
         }
 
         this.infoPanelTitle.textContent = targetSystemModel.name;
+        this.shortHandUITitle.textContent = targetSystemModel.name;
 
         this.starSector.textContent = `X:${targetSystemModel.seed.starSectorX} Y:${targetSystemModel.seed.starSectorY} Z:${targetSystemModel.seed.starSectorZ} I:${targetSystemModel.seed.index}`;
 
@@ -356,10 +348,17 @@ export class StarMapUI {
             const uniqueFactions = Array.from(new Set(factionNames));
 
             this.factions.textContent = `${i18n.t("starMap:factions")}: ${uniqueFactions.join(", ")}`;
+            this.shortHandUIFactions.textContent = `${i18n.t("starMap:factions")}: ${uniqueFactions.join(", ")}`;
         } else {
             this.nbSpaceStations.textContent = `${i18n.t("starMap:spaceStations")}: 0`;
             this.factions.textContent = `${i18n.t("starMap:factions")}: ${i18n.t("starMap:none")}`;
+            this.shortHandUIFactions.textContent = `${i18n.t("starMap:factions")}: ${i18n.t("starMap:none")}`;
         }
+    }
+
+    detachUIFromMesh() {
+        this.gui.removeControl(this.selectedSystemRing);
+        this.selectedMesh = null;
     }
 
     dispose() {
