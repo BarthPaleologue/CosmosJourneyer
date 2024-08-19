@@ -27,7 +27,7 @@
     width: calc(var(--dim) - var(--g) * 2 - var(--t) * 2);
     height: calc(var(--dim) - var(--g) * 2 - var(--t) * 2);
 
-    transition: transform 0.2s, border-color 0.2s, scale 0.2s cubic-bezier(0.34,-1.87, 0.74, 2.99), rotate 0.2s;
+    transition: outline-color 0.2s, scale 0.2s cubic-bezier(0.34,-1.87, 0.74, 2.99), rotate 0.2s, opacity 0.2s;
 
     &.rounded {
       border-radius: 50%;
@@ -40,6 +40,10 @@
     &.target {
       outline-color: goldenrod;
       scale: 1.05;
+    }
+
+    &.transparent {
+      opacity: 0;
     }
   }
 

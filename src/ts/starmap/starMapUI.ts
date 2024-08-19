@@ -16,22 +16,11 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
-import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
-import { Button } from "@babylonjs/gui/2D/controls/button";
-import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
-import { Image } from "@babylonjs/gui/2D/controls/image";
-
-import hoveredCircle from "../../asset/textures/hoveredCircle.png";
-import selectedCircle from "../../asset/textures/selectedCircle.png";
-
 import { Animation } from "@babylonjs/core/Animations/animation";
 import { Scene } from "@babylonjs/core/scene";
 import { Settings } from "../settings";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import i18n from "../i18n";
-import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { getStellarTypeString } from "../stellarObjects/common";
 import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
 import { StarModel } from "../stellarObjects/star/starModel";
@@ -47,13 +36,14 @@ import { factionToString } from "../powerplay/factions";
 import { isSystemInHumanBubble } from "../society/starSystemSociety";
 
 export class StarMapUI {
-    readonly gui: AdvancedDynamicTexture;
-
-    readonly hoveredSystemRing: Image;
-    readonly selectedSystemRing: Image;
-    readonly currentSystemRing: Image;
-
     readonly htmlRoot: HTMLDivElement;
+
+    readonly hoveredSystemCursorContainer: HTMLDivElement;
+    readonly hoveredSystemCursor: HTMLDivElement;
+    readonly selectedSystemCursorContainer: HTMLDivElement;
+    readonly selectedSystemCursor: HTMLDivElement;
+    readonly currentSystemCursorContainer: HTMLDivElement;
+    readonly currentSystemCursor: HTMLDivElement;
 
     readonly infoPanel: HTMLDivElement;
     readonly infoPanelStarPreview: HTMLDivElement;
@@ -77,49 +67,46 @@ export class StarMapUI {
     readonly shortHandUIBookmarkButton: HTMLButtonElement;
 
     private selectedMesh: AbstractMesh | null = null;
-
-    readonly scene: Scene;
-    readonly uiCamera: FreeCamera;
+    private hoveredMesh: AbstractMesh | null = null;
+    private currentMesh: AbstractMesh | null = null;
 
     static ALPHA_ANIMATION = new Animation("alphaAnimation", "alpha", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
 
-    constructor(engine: AbstractEngine) {
-        this.scene = new Scene(engine);
-        this.scene.useRightHandedSystem = true;
-        this.scene.autoClear = false;
+    readonly scene: Scene;
 
-        this.uiCamera = new FreeCamera("UiCamera", Vector3.Zero(), this.scene);
-
-        this.gui = AdvancedDynamicTexture.CreateFullscreenUI("StarMapUI", true, this.scene);
-
-        this.hoveredSystemRing = new Image("hoverSystemRing", hoveredCircle);
-        this.hoveredSystemRing.fixedRatio = 1;
-        this.hoveredSystemRing.width = 0.2;
-        this.hoveredSystemRing.alpha = 0.8;
-        this.hoveredSystemRing.zIndex = 4;
-
-        this.selectedSystemRing = new Image("selectedSystemRing", hoveredCircle);
-        this.selectedSystemRing.fixedRatio = 1;
-        this.selectedSystemRing.width = 0.2;
-        this.selectedSystemRing.alpha = 0.8;
-        this.selectedSystemRing.zIndex = 4;
-
-        this.currentSystemRing = new Image("currentSystemRing", selectedCircle);
-        this.currentSystemRing.fixedRatio = 1;
-        this.currentSystemRing.width = 0.2;
-        this.currentSystemRing.alpha = 1;
-        this.currentSystemRing.zIndex = 5;
-
-        StarMapUI.ALPHA_ANIMATION.setKeys([
-            { frame: 0, value: 0.0 },
-            { frame: 60, value: 0.8 }
-        ]);
-
-        this.hoveredSystemRing.animations = [StarMapUI.ALPHA_ANIMATION];
+    constructor(scene: Scene) {
+        this.scene = scene;
 
         this.htmlRoot = document.createElement("div");
         this.htmlRoot.classList.add("starMapUI");
         document.body.appendChild(this.htmlRoot);
+
+        this.selectedSystemCursorContainer = document.createElement("div");
+        this.selectedSystemCursorContainer.classList.add("targetCursorRoot");
+        this.htmlRoot.appendChild(this.selectedSystemCursorContainer);
+
+        this.selectedSystemCursor = document.createElement("div");
+        this.selectedSystemCursor.classList.add("targetCursor", "rounded");
+        this.selectedSystemCursorContainer.appendChild(this.selectedSystemCursor);
+
+        this.hoveredSystemCursorContainer = document.createElement("div");
+        this.hoveredSystemCursorContainer.classList.add("targetCursorRoot");
+        this.htmlRoot.appendChild(this.hoveredSystemCursorContainer);
+
+        this.hoveredSystemCursor = document.createElement("div");
+        this.hoveredSystemCursor.classList.add("targetCursor", "rounded");
+        this.hoveredSystemCursorContainer.appendChild(this.hoveredSystemCursor);
+
+        this.currentSystemCursorContainer = document.createElement("div");
+        this.currentSystemCursorContainer.classList.add("targetCursorRoot");
+        this.htmlRoot.appendChild(this.currentSystemCursorContainer);
+
+        this.currentSystemCursor = document.createElement("div");
+        this.currentSystemCursor.classList.add("targetCursor", "rounded", "target");
+        this.currentSystemCursorContainer.appendChild(this.currentSystemCursor);
+
+        this.cursor = document.createElement("div");
+        this.cursor.classList.add("targetCursor");
 
         this.infoPanel = document.createElement("div");
         this.infoPanel.classList.add("starMapInfoPanel");
@@ -208,7 +195,7 @@ export class StarMapUI {
     }
 
     update(playerPosition: Vector3) {
-        if (this.hoveredSystemRing.linkedMesh !== null && this.hoveredSystemRing.linkedMesh !== undefined) {
+        /*if (this.hoveredSystemRing.linkedMesh !== null && this.hoveredSystemRing.linkedMesh !== undefined) {
             const distance = this.hoveredSystemRing.linkedMesh.getAbsolutePosition().subtract(playerPosition).length();
             const scale = this.hoveredSystemRing.linkedMesh.scaling.x / distance;
             this.hoveredSystemRing.scaleX = scale;
@@ -225,33 +212,50 @@ export class StarMapUI {
             const scale = Math.max(0.3, this.currentSystemRing.linkedMesh.scaling.x / distance);
             this.currentSystemRing.scaleX = scale;
             this.currentSystemRing.scaleY = scale;
-        }        
+        }*/
+        // this.htmlRoot.style.setProperty("--dim", size + "vh");
 
-        if(this.selectedMesh !== null) {
-            const camera = this.scene.activeCamera;
-            if (camera === null) {
-                throw new Error("No active camera found");
-            }
+        const width = this.scene.getEngine().getRenderWidth();
+        const height = this.scene.getEngine().getRenderHeight();
 
+        const camera = this.scene.activeCamera;
+        if (camera === null) {
+            throw new Error("No active camera found");
+        }
+
+        if (this.selectedMesh !== null) {
             this.shortHandUI.style.visibility = "visible";
-            const meshScreenCoordinates = Vector3.Project(this.selectedMesh.position, Matrix.IdentityReadOnly, camera.getTransformationMatrix(), camera.viewport);
-            const width = this.scene.getEngine().getRenderWidth();
-            const height = this.scene.getEngine().getRenderHeight();
-            this.shortHandUI.style.visibility = "visible";
-            this.shortHandUI.style.transform = `translate(calc(${(meshScreenCoordinates.x * width).toFixed(0)}px + 50px), calc(${(meshScreenCoordinates.y * height).toFixed(0)}px - 50%))`;
+            const selectedMeshScreenCoordinates = Vector3.Project(this.selectedMesh.position, Matrix.IdentityReadOnly, camera.getTransformationMatrix(), camera.viewport);
+            this.shortHandUI.style.transform = `translate(calc(${(selectedMeshScreenCoordinates.x * width).toFixed(0)}px + 50px), calc(${(selectedMeshScreenCoordinates.y * height).toFixed(0)}px - 50%))`;
+
+            this.selectedSystemCursor.classList.toggle("transparent", selectedMeshScreenCoordinates.z < 0);
+            this.selectedSystemCursorContainer.style.left = `${selectedMeshScreenCoordinates.x * 100}vw`;
+            this.selectedSystemCursorContainer.style.top = `${selectedMeshScreenCoordinates.y * 100}vh`;
         } else {
             this.shortHandUI.style.visibility = "hidden";
+            this.selectedSystemCursor.classList.add("transparent");
+        }
+
+        if (this.hoveredMesh !== null) {
+            const meshScreenCoordinates = Vector3.Project(this.hoveredMesh.position, Matrix.IdentityReadOnly, camera.getTransformationMatrix(), camera.viewport);
+            this.hoveredSystemCursor.classList.toggle("transparent", meshScreenCoordinates.z < 0);
+            this.hoveredSystemCursorContainer.style.left = `${meshScreenCoordinates.x * 100}vw`;
+            this.hoveredSystemCursorContainer.style.top = `${meshScreenCoordinates.y * 100}vh`;
+        } else {
+            this.hoveredSystemCursor.classList.add("transparent");
+        }
+
+        if (this.currentMesh !== null) {
+            const meshScreenCoordinates = Vector3.Project(this.currentMesh.position, Matrix.IdentityReadOnly, camera.getTransformationMatrix(), camera.viewport);
+            this.currentSystemCursor.classList.toggle("transparent", meshScreenCoordinates.z < 0);
+            this.currentSystemCursorContainer.style.left = `${meshScreenCoordinates.x * 100}vw`;
+            this.currentSystemCursorContainer.style.top = `${meshScreenCoordinates.y * 100}vh`;
+        } else {
+            this.currentSystemCursor.classList.add("transparent");
         }
     }
 
-    attachUIToMesh(mesh: AbstractMesh) {
-        this.gui._linkedControls = [];
-        this.gui.addControl(this.selectedSystemRing);
-        this.selectedSystemRing.linkWithMesh(mesh);
-
-        //FIXME: this should not be here, probably a BabylonJS bug
-        this.currentSystemRing.linkWithMesh(this.currentSystemRing.linkedMesh);
-
+    setSelectedMesh(mesh: AbstractMesh) {
         const camera = this.scene.activeCamera;
         if (camera === null) {
             throw new Error("No active camera found");
@@ -260,19 +264,12 @@ export class StarMapUI {
         this.selectedMesh = mesh;
     }
 
-    setHoveredStarSystemMesh(mesh: AbstractMesh | null) {
-        if (mesh !== null) {
-            this.scene.beginAnimation(this.hoveredSystemRing, 0, 60, false, 2.0);
-            this.gui.addControl(this.hoveredSystemRing);
-        } else {
-            this.gui.removeControl(this.hoveredSystemRing);
-        }
-        this.hoveredSystemRing.linkWithMesh(mesh);
+    setHoveredMesh(mesh: AbstractMesh | null) {
+        this.hoveredMesh = mesh;
     }
 
-    setCurrentStarSystemMesh(mesh: AbstractMesh | null) {
-        if (mesh !== null) this.gui.addControl(this.currentSystemRing);
-        this.currentSystemRing.linkWithMesh(mesh);
+    setCurrentMesh(mesh: AbstractMesh | null) {
+        this.currentMesh = mesh;
     }
 
     getCurrentPickedMesh() {
@@ -280,7 +277,7 @@ export class StarMapUI {
     }
 
     getCurrentHoveredMesh() {
-        return this.hoveredSystemRing.linkedMesh;
+        return this.hoveredMesh;
     }
 
     setSelectedSystem(targetSystemModel: SeededStarSystemModel, currentSystemModel: SeededStarSystemModel | null) {
@@ -357,13 +354,11 @@ export class StarMapUI {
     }
 
     detachUIFromMesh() {
-        this.gui.removeControl(this.selectedSystemRing);
         this.selectedMesh = null;
     }
 
     dispose() {
         this.scene.dispose();
-        this.gui.dispose();
         this.htmlRoot.remove();
     }
 }
