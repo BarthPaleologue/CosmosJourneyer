@@ -1,10 +1,15 @@
 .starMapUI {
+  cursor: none;
+  z-index: 30;
+
   .cursor {
     position: absolute;
     width: 2vh;
     height: 2vh;
+    z-index: 31;
     transform: translate(-50%, -50%);
-    outline: white 0.2vh solid;
+    outline: white 0.3vh solid;
+    background: rgba(0, 0, 0, 0.8);
     border-radius: 50%;
     pointer-events: none;
     transform-origin: center;
@@ -14,24 +19,24 @@
 
   .shortHandUI {
     position: absolute;
-    background: rgba(0, 0, 0, 0.8);
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5), 0 0 10px rgba(255, 255, 255, 0.5) inset;
+    //background: rgba(0, 0, 0, 0.8);
+    //box-shadow: 0 0 10px rgba(0, 0, 0, 0.5), 0 0 10px rgba(255, 255, 255, 0.5) inset;
+    //backdrop-filter: $backdrop-blur;
 
     display: flex;
-    row-gap: 10px;
+    row-gap: 1.0vmin;
     flex-direction: column;
 
     color: white;
     font-family: $main-font;
-    padding: 20px;
-    backdrop-filter: $backdrop-blur;
+    padding: 2vmin;
 
     h2, p {
       margin-block: 0;
     }
 
     h2 {
-      font-size: 3.5vmin;
+      font-size: var(--h2-size);
     }
 
     p {
@@ -40,70 +45,86 @@
 
     .buttonContainer {
       display: flex;
-      column-gap: 5px;
+      column-gap: 0.5vmin;
     }
 
     button {
-      background: #002b6a;
+      background: var(--accent-color);
       outline: none;
       border: none;
-      cursor: pointer;
+      cursor: none;
       color: white;
-      font-family: Nasalization, sans-serif;
-      padding: 5px;
+      font-family: $main-font;
+      padding: 1.0vmin;
       font-size: var(--text-size);
+
+      transition: $transition-time;
+
+      &:hover {
+        background: var(--accent-color-light);
+      }
+
+      &:active {
+        background: var(--accent-color-dark);
+      }
     }
   }
 
   .starMapInfoPanel {
     position: absolute;
-    height: 90vh;
-    top: 5vh;
+    height: 100vh;
     width: 25vw;
-    min-width: 500px;
 
     backdrop-filter: blur(3px);
     overflow-y: auto;
 
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5) inset, 0 0 5px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 20px black;
     background: rgba(0, 0, 0, 0.8);
 
     display: flex;
     flex-direction: column;
-    
-    padding: 0 15px;
+
+    padding: 0 0.7vw;
 
     color: white;
     font-family: Nasalization, sans-serif;
 
-    h2, p {
-      margin-block: 5px;
+    h1, p {
+      margin-block: 0.5vh;
     }
 
     .starMapInfoPanelStarPreview {
-      width: 150px;
-      height: 150px;
+      width: 15vmin;
+      height: 15vmin;
       background: white;
       align-self: center;
       border-radius: 50%;
       box-shadow: 0 0 30px white;
-      margin: 30px 0;
+      margin: 3vh 0;
     }
 
     .starMapInfoPanelTitle {
       text-align: center;
-      font-size: 3em;
+      font-size: var(--h1-size);
     }
 
     .starMapInfoPanelStarSector {
-      padding: 0 20px;
-      font-size: 2em;
+      padding: 0 1vw;
+      font-size: var(--h2-size);
       text-align: center;
+    }
+
+    h2 {
+      font-size: var(--h2-size);
+    }
+
+    p {
+      font-size: var(--text-size);
     }
 
     hr {
       width: 100%;
-      margin: 10px auto;
+      margin: 1vh auto;
       border: 0;
       border-top: 1px solid white;
     }

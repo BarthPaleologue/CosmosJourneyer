@@ -76,6 +76,7 @@ export class StarMapUI {
 
     constructor(scene: Scene) {
         this.scene = scene;
+        this.scene.hoverCursor = "none";
 
         this.htmlRoot = document.createElement("div");
         this.htmlRoot.classList.add("starMapUI");
@@ -116,7 +117,7 @@ export class StarMapUI {
         this.infoPanelStarPreview.classList.add("starMapInfoPanelStarPreview");
         this.infoPanel.appendChild(this.infoPanelStarPreview);
 
-        this.infoPanelTitle = document.createElement("h2");
+        this.infoPanelTitle = document.createElement("h1");
         this.infoPanelTitle.classList.add("starMapInfoPanelTitle");
         this.infoPanel.appendChild(this.infoPanelTitle);
 
@@ -130,7 +131,7 @@ export class StarMapUI {
         const hr2 = document.createElement("hr");
         this.infoPanel.appendChild(hr2);
 
-        const generalInfoTitle = document.createElement("h3");
+        const generalInfoTitle = document.createElement("h2");
         generalInfoTitle.textContent = i18n.t("starMap:generalInfo");
         this.infoPanel.appendChild(generalInfoTitle);
 
@@ -146,7 +147,7 @@ export class StarMapUI {
         this.humanPresence.classList.add("starMapInfoPanelHumanPresence");
         this.infoPanel.appendChild(this.humanPresence);
 
-        const humanPresenceTitle = document.createElement("h3");
+        const humanPresenceTitle = document.createElement("h2");
         humanPresenceTitle.textContent = i18n.t("starMap:humanPresence");
         this.humanPresence.appendChild(humanPresenceTitle);
 
@@ -206,8 +207,8 @@ export class StarMapUI {
         const scalingBase = 100;
         const minScale = 5.0;
         if (this.selectedMesh !== null) {
-            this.shortHandUI.style.visibility = "visible";
             const selectedMeshScreenCoordinates = Vector3.Project(this.selectedMesh.position, Matrix.IdentityReadOnly, camera.getTransformationMatrix(), camera.viewport);
+            this.shortHandUI.style.visibility = selectedMeshScreenCoordinates.z >= 0 ? "visible" : "hidden";
             this.shortHandUI.style.transform = `translate(calc(${(selectedMeshScreenCoordinates.x * width).toFixed(0)}px + 50px), calc(${(selectedMeshScreenCoordinates.y * height).toFixed(0)}px - 50%))`;
 
             this.selectedSystemCursor.classList.toggle("transparent", selectedMeshScreenCoordinates.z < 0);
