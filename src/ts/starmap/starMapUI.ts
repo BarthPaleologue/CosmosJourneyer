@@ -195,26 +195,6 @@ export class StarMapUI {
     }
 
     update(playerPosition: Vector3) {
-        /*if (this.hoveredSystemRing.linkedMesh !== null && this.hoveredSystemRing.linkedMesh !== undefined) {
-            const distance = this.hoveredSystemRing.linkedMesh.getAbsolutePosition().subtract(playerPosition).length();
-            const scale = this.hoveredSystemRing.linkedMesh.scaling.x / distance;
-            this.hoveredSystemRing.scaleX = scale;
-            this.hoveredSystemRing.scaleY = scale;
-        }
-        if (this.selectedSystemRing.linkedMesh !== null && this.selectedSystemRing.linkedMesh !== undefined) {
-            const distance = this.selectedSystemRing.linkedMesh.getAbsolutePosition().subtract(playerPosition).length();
-            const scale = Math.max(0.3, this.selectedSystemRing.linkedMesh.scaling.x / distance);
-            this.selectedSystemRing.scaleX = scale;
-            this.selectedSystemRing.scaleY = scale;
-        }
-        if (this.currentSystemRing.linkedMesh !== null && this.currentSystemRing.linkedMesh !== undefined) {
-            const distance = this.currentSystemRing.linkedMesh.getAbsolutePosition().subtract(playerPosition).length();
-            const scale = Math.max(0.3, this.currentSystemRing.linkedMesh.scaling.x / distance);
-            this.currentSystemRing.scaleX = scale;
-            this.currentSystemRing.scaleY = scale;
-        }*/
-        // this.htmlRoot.style.setProperty("--dim", size + "vh");
-
         const width = this.scene.getEngine().getRenderWidth();
         const height = this.scene.getEngine().getRenderHeight();
 
@@ -223,6 +203,8 @@ export class StarMapUI {
             throw new Error("No active camera found");
         }
 
+        const scalingBase = 100;
+        const minScale = 5.0;
         if (this.selectedMesh !== null) {
             this.shortHandUI.style.visibility = "visible";
             const selectedMeshScreenCoordinates = Vector3.Project(this.selectedMesh.position, Matrix.IdentityReadOnly, camera.getTransformationMatrix(), camera.viewport);
@@ -231,6 +213,10 @@ export class StarMapUI {
             this.selectedSystemCursor.classList.toggle("transparent", selectedMeshScreenCoordinates.z < 0);
             this.selectedSystemCursorContainer.style.left = `${selectedMeshScreenCoordinates.x * 100}vw`;
             this.selectedSystemCursorContainer.style.top = `${selectedMeshScreenCoordinates.y * 100}vh`;
+
+            const distance = Vector3.Distance(this.selectedMesh.getAbsolutePosition(), playerPosition);
+            const scale = Math.max(minScale, scalingBase / distance);
+            this.selectedSystemCursorContainer.style.setProperty("--dim", `${scale}vh`);
         } else {
             this.shortHandUI.style.visibility = "hidden";
             this.selectedSystemCursor.classList.add("transparent");
@@ -241,6 +227,10 @@ export class StarMapUI {
             this.hoveredSystemCursor.classList.toggle("transparent", meshScreenCoordinates.z < 0);
             this.hoveredSystemCursorContainer.style.left = `${meshScreenCoordinates.x * 100}vw`;
             this.hoveredSystemCursorContainer.style.top = `${meshScreenCoordinates.y * 100}vh`;
+
+            const distance = Vector3.Distance(this.hoveredMesh.getAbsolutePosition(), playerPosition);
+            const scale = Math.max(minScale, scalingBase / distance);
+            this.hoveredSystemCursorContainer.style.setProperty("--dim", `${scale}vh`);
         } else {
             this.hoveredSystemCursor.classList.add("transparent");
         }
@@ -250,12 +240,17 @@ export class StarMapUI {
             this.currentSystemCursor.classList.toggle("transparent", meshScreenCoordinates.z < 0);
             this.currentSystemCursorContainer.style.left = `${meshScreenCoordinates.x * 100}vw`;
             this.currentSystemCursorContainer.style.top = `${meshScreenCoordinates.y * 100}vh`;
+
+            const distance = Vector3.Distance(this.currentMesh.getAbsolutePosition(), playerPosition);
+            const scale = Math.max(minScale, scalingBase / distance);
+            this.currentSystemCursorContainer.style.setProperty("--dim", `${scale}vh`);
         } else {
             this.currentSystemCursor.classList.add("transparent");
         }
     }
 
     setSelectedMesh(mesh: AbstractMesh) {
+        if (mesh === this.currentMesh) return;
         const camera = this.scene.activeCamera;
         if (camera === null) {
             throw new Error("No active camera found");
@@ -265,6 +260,7 @@ export class StarMapUI {
     }
 
     setHoveredMesh(mesh: AbstractMesh | null) {
+        if (mesh === this.currentMesh || mesh === this.selectedMesh) return;
         this.hoveredMesh = mesh;
     }
 

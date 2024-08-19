@@ -7,6 +7,9 @@
     outline: white 0.2vh solid;
     border-radius: 50%;
     pointer-events: none;
+    transform-origin: center;
+    scale: 1;
+    transition: scale 0.2s cubic-bezier(0.34, -1.87, 0.74, 2.99);
   }
 
   .shortHandUI {
