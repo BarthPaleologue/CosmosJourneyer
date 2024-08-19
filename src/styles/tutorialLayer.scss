@@ -1,20 +1,16 @@
 .tutorialLayer {
-  z-index: 20;
+  z-index: 40;
   pointer-events: none;
   position: relative;
 
   .tutorialPanel {
     position: absolute;
-    height: 85vh;
+    height: 100vh;
     box-shadow: 0 0 20px black;
     background: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(3px);
-    width: 25vw;
-    min-width: 500px;
-    top: 7.5vh;
+    width: 30vw;
     left: 0;
-
-    padding-bottom: 10px;
 
     display: flex;
     flex-direction: column;
@@ -34,6 +30,9 @@
       text-align: center;
       color: white;
       flex-grow: 0;
+      margin-block-end: 0;
+      margin-block-start: 0.5vh;
+      font-size: var(--h1-size);
     }
 
     .tutorialContentContainer {
@@ -43,13 +42,17 @@
       .tutorialContent {
         p {
           color: white;
-          padding: 0 10px;
+          padding: 0 0.7vw;
           line-height: 1.5em;
+          font-size: var(--text-size);
         }
 
         h2 {
           color: white;
-          padding: 0 10px;
+          padding: 0 0.7vw;
+          font-size: var(--h2-size);
+          margin-block-start: 1vh;
+          margin-block-end: 1vh;
         }
 
         img {
@@ -65,23 +68,25 @@
       width: 100%;
       display: flex;
       justify-content: space-evenly;
+      margin-bottom: 1vh;
 
       p {
         background: white;
         color: black;
-        padding: 3px 5px;
+        padding: 0.3vw;
+        font-size: calc(var(--text-size) * 0.75);
 
         display: flex;
         align-items: center;
         margin-block: 0;
 
         span {
-          padding: 5px;
+          padding: 0.3vw;
 
           &.keySpan {
             font-weight: bold;
             background: rgba(0, 0, 0, 0.3);
-            font-size: 75%;
+            font-size: calc(var(--text-size) * 0.75);
           }
         }
 

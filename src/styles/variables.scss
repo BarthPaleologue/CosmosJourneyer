@@ -5,6 +5,8 @@ $backdrop-blur: blur(3px);
 
 :root {
   --text-size: 2vmin;
+  --h2-size: calc(1.5 * var(--text-size));
+  --h1-size: calc(2.0 * var(--text-size));
   --menu-items-size: 3.2vmin;
   --accent-color: #002b6a;
   --accent-color-dark: #001a3f;
