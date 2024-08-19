@@ -286,10 +286,14 @@ export class StarMap implements View {
                 }
             }
 
-            //console.log(this.stellarPathfinder.getProgress(), "%");
+            if (this.stellarPathfinder.hasBeenInit() && !this.stellarPathfinder.hasFoundPath()) {
+                this.starMapUI.shortHandUIPlotItineraryButton.classList.add("loading");
+            } else {
+                this.starMapUI.shortHandUIPlotItineraryButton.classList.remove("loading");
+            }
         });
 
-        this.scene.onAfterRenderObservable.add(() => {      
+        this.scene.onAfterRenderObservable.add(() => {
             const activeCamera = this.scene.activeCamera;
             if (activeCamera === null) throw new Error("No active camera!");
             this.starMapUI.update(activeCamera.globalPosition);
