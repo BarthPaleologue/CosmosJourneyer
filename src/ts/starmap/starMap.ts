@@ -262,8 +262,8 @@ export class StarMap implements View {
             this.updateStarSectors();
 
             // update pathfinder
-            const pathfinderMaxIterations = 1_000_000;
-            const pathfinderStepsPerFrame = 20;
+            const pathfinderMaxIterations = 50_000;
+            const pathfinderStepsPerFrame = 10;
             for (let i = 0; i < pathfinderStepsPerFrame; i++) {
                 if (!this.stellarPathfinder.hasBeenInit()) break;
                 if (this.stellarPathfinder.hasFoundPath()) break;
@@ -273,8 +273,6 @@ export class StarMap implements View {
 
                 if (this.stellarPathfinder.hasFoundPath()) {
                     const path = this.stellarPathfinder.getPath();
-                    console.log(path);
-
                     const points = path.map((seed) => {
                         return getStarGalacticCoordinates(seed);
                     });
