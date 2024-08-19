@@ -194,7 +194,7 @@ export class StarMapUI {
 
         this.shortHandUIPlotItineraryButton = document.createElement("button");
         this.shortHandUIPlotItineraryButton.classList.add("plotItineraryButton");
-        this.shortHandUIPlotItineraryButton.textContent = i18n.t("starMap:setAsDestination");
+        this.shortHandUIPlotItineraryButton.textContent = i18n.t("starMap:plotItinerary");
         this.shortHandUIButtonContainer.appendChild(this.shortHandUIPlotItineraryButton);
 
         this.shortHandUIBookmarkButton = document.createElement("button");
