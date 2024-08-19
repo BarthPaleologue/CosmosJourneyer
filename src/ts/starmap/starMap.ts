@@ -515,7 +515,7 @@ export class StarMap implements View {
 
         const rotationAngle = Math.acos(Vector3.Dot(cameraDir, cameraToStarDir));
 
-        const animationDurationSeconds = 1;
+        const animationDurationSeconds = 2;
 
         // if the rotation axis has a length different from 1, it means the cross product was made between very close vectors : no rotation is needed
         if (skipAnimation) {
