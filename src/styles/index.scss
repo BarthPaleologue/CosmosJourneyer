@@ -20,6 +20,8 @@
   src: url('./nasalization/nasalization-rg.otf') format('opentype');
 }
 
+@import "variables";
+
 *,
 *::before,
 *::after {
@@ -62,21 +64,21 @@ body {
     top: 65vh;
     left: 2.5vw;
     transform: translateY(-50%);
-    transition: 0.2s ease-in-out;
+    transition: $transition-time ease-in-out;
 
     z-index: 10;
 
     li {
       color: white;
-      font-family: Nasalization, sans-serif;
-      font-size: 2em;
+      font-family: $main-font;
+      font-size: var(--menu-items-size);
       line-height: 1.5em;
       cursor: pointer;
       padding: 5px 20px;
-      transition: 0.1s;
+      transition: $transition-time;
 
       &:hover {
-        background: #002b6a;
+        background: var(--accent-color);
       }
 
       &.disabled {
@@ -89,8 +91,7 @@ body {
       }
 
       &:active {
-        background: darken(white, 40%);
-        color: black;
+        background: var(--accent-color-dark);
       }
     }
   }

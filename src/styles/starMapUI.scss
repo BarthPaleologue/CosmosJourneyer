@@ -9,7 +9,7 @@
     pointer-events: none;
     transform-origin: center;
     scale: 1;
-    transition: scale 0.2s cubic-bezier(0.34, -1.87, 0.74, 2.99);
+    transition: scale $transition-time $bezier-overshoot;
   }
 
   .shortHandUI {
@@ -22,12 +22,20 @@
     flex-direction: column;
 
     color: white;
-    font-family: Nasalization, sans-serif;
+    font-family: $main-font;
     padding: 20px;
-    backdrop-filter: blur(3px);
+    backdrop-filter: $backdrop-blur;
 
     h2, p {
       margin-block: 0;
+    }
+
+    h2 {
+      font-size: 3.5vmin;
+    }
+
+    p {
+      font-size: var(--text-size);
     }
 
     .buttonContainer {
@@ -43,6 +51,7 @@
       color: white;
       font-family: Nasalization, sans-serif;
       padding: 5px;
+      font-size: var(--text-size);
     }
   }
 
