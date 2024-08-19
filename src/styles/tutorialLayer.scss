@@ -30,8 +30,8 @@
       text-align: center;
       color: white;
       flex-grow: 0;
-      margin-block-end: 0;
-      margin-block-start: 0.5vh;
+      margin-block-end: 2vh;
+      margin-block-start: 2vh;
       font-size: var(--h1-size);
     }
 
@@ -51,7 +51,7 @@
           color: white;
           padding: 0 0.7vw;
           font-size: var(--h2-size);
-          margin-block-start: 1vh;
+          margin-block-start: 0;
           margin-block-end: 1vh;
         }
 
