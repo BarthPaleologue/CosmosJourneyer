@@ -34,7 +34,6 @@ export function getMoonSeeds(model: PlanetModel) {
 }
 
 export function getSpaceStationSeed(model: CelestialBodyModel, index: number) {
-    if (index > model.getNbSpaceStations()) throw new Error("Space station out of bound! " + index);
     return centeredRand(model.rng, GenerationSteps.SPACE_STATIONS + index) * Settings.SEED_HALF_RANGE;
 }
 
@@ -48,8 +47,6 @@ export function getPlanetName(seed: number, starSystemModel: StarSystemModel, pa
     const planetIndex = !isSatellite
         ? starSystemModel.getPlanets().findIndex(([_, planetSeed]) => planetSeed === seed)
         : getMoonSeeds(parentBody as PlanetModel).findIndex((moonSeed) => moonSeed === seed);
-
-    console.log(isSatellite, seed, starSystemModel.getPlanets(), planetIndex);
 
     if (planetIndex === -1) throw new Error("Planet not found in star system");
 

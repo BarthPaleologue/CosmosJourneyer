@@ -17,20 +17,21 @@
 
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { CreateCylinder, Mesh, TransformNode } from "@babylonjs/core/Meshes";
+import { CreateCylinder, Mesh } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export class ThickLines {
     private readonly name: string;
 
-    private points: TransformNode[] = [];
+    private points: Vector3[] = [];
 
     private readonly cylinders: Mesh[] = [];
 
     private readonly material: StandardMaterial;
 
-    private thickness: number;
+    private readonly thickness: number;
 
     private readonly scene: Scene;
 
@@ -41,7 +42,7 @@ export class ThickLines {
             thickness,
             color
         }: {
-            points: TransformNode[];
+            points: Vector3[];
             thickness?: number;
             color?: Color3;
         },
@@ -58,37 +59,45 @@ export class ThickLines {
         this.setPoints(points);
     }
 
-    public setPoints(points: TransformNode[]) {
+    public setPoints(points: Vector3[]) {
         this.points = points;
 
         const targetNumberOfCylinders = Math.max(0, this.points.length - 1);
         const currentNumberOfCylinders = this.cylinders.length;
 
         // delete useless cylinders
-        for (let i = targetNumberOfCylinders; i < currentNumberOfCylinders; i++) {
-            this.cylinders[i].dispose();
+        if (targetNumberOfCylinders < currentNumberOfCylinders) {
+            for (let i = targetNumberOfCylinders; i < currentNumberOfCylinders; i++) {
+                this.cylinders[i].dispose();
+            }
+            this.cylinders.length = targetNumberOfCylinders;
         }
 
         // create new cylinders
-        for (let i = currentNumberOfCylinders; i < targetNumberOfCylinders; i++) {
-            const cylinder = CreateCylinder(
-                `${this.name}Segment${i}`,
-                {
-                    height: 1,
-                    diameter: this.thickness
-                },
-                this.scene
-            );
-            cylinder.material = this.material;
-            this.cylinders.push(cylinder);
+        if (targetNumberOfCylinders > currentNumberOfCylinders) {
+            for (let i = currentNumberOfCylinders; i < targetNumberOfCylinders; i++) {
+                const cylinder = CreateCylinder(
+                    `${this.name}Segment${i}`,
+                    {
+                        height: 1,
+                        diameter: this.thickness
+                    },
+                    this.scene
+                );
+                cylinder.alwaysSelectAsActiveMesh = true;
+                cylinder.material = this.material;
+                this.cylinders.push(cylinder);
+            }
         }
+
+        this.init();
     }
 
-    public update() {
+    private init() {
         for (let i = 0; i < this.points.length - 1; i++) {
             const cylinder = this.cylinders[i];
-            const start = this.points[i].getAbsolutePosition();
-            const end = this.points[i + 1].getAbsolutePosition();
+            const start = this.points[i];
+            const end = this.points[i + 1];
 
             const middlePoint = start.add(end).scaleInPlace(0.5);
             const distance = end.subtract(start).length();

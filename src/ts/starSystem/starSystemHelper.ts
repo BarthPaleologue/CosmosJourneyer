@@ -28,7 +28,7 @@ import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetMod
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { GasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
-import { getMoonSeed, getSpaceStationSeed } from "../planets/common";
+import { getMoonSeed } from "../planets/common";
 import { Planet } from "../architecture/planet";
 import { StellarObject } from "../architecture/stellarObject";
 import { SpaceStation } from "../spacestation/spaceStation";
@@ -108,17 +108,11 @@ export class StarSystemHelper {
     public static MakeStellarObject(starsystem: StarSystemController, seed: number = starsystem.model.getStellarObjectSeed(starsystem.stellarObjects.length)): StellarObject {
         const stellarObjectType = starsystem.model.getBodyTypeOfStellarObject(starsystem.stellarObjects.length);
         if (stellarObjectType === BodyType.BLACK_HOLE) {
-            const blackHole = StarSystemHelper.MakeBlackHole(starsystem, seed);
-            StarSystemHelper.MakeSpaceStations(starsystem, blackHole);
-            return blackHole;
+            return StarSystemHelper.MakeBlackHole(starsystem, seed);
         } else if (stellarObjectType === BodyType.NEUTRON_STAR) {
-            const neutronStar = StarSystemHelper.MakeNeutronStar(starsystem, seed);
-            StarSystemHelper.MakeSpaceStations(starsystem, neutronStar);
-            return neutronStar;
+            return StarSystemHelper.MakeNeutronStar(starsystem, seed);
         } else if (stellarObjectType === BodyType.STAR) {
-            const star = StarSystemHelper.MakeStar(starsystem, seed);
-            StarSystemHelper.MakeSpaceStations(starsystem, star);
-            return star;
+            return StarSystemHelper.MakeStar(starsystem, seed);
         } else {
             throw new Error(`Unknown stellar object type ${stellarObjectType}`);
         }
@@ -173,11 +167,9 @@ export class StarSystemHelper {
         if (bodyType === BodyType.TELLURIC_PLANET) {
             const planet = StarSystemHelper.MakeTelluricPlanet(starsystem);
             StarSystemHelper.MakeSatellites(starsystem, planet);
-            StarSystemHelper.MakeSpaceStations(starsystem, planet);
         } else if (bodyType === BodyType.GAS_PLANET) {
             const planet = StarSystemHelper.MakeGasPlanet(starsystem);
             StarSystemHelper.MakeSatellites(starsystem, planet);
-            StarSystemHelper.MakeSpaceStations(starsystem, planet);
         } else {
             throw new Error(`Unknown body type ${bodyType}`);
         }
@@ -187,18 +179,6 @@ export class StarSystemHelper {
         const spacestation = new SpaceStation(model, starsystem.model, starsystem.scene, body);
         starsystem.addSpaceStation(spacestation);
         return spacestation;
-    }
-
-    public static MakeSpaceStations(starsystem: StarSystemController, body: CelestialBody, n = body.model.getNbSpaceStations()): SpaceStation[] {
-        console.assert(n >= 0, `Cannot make a negative amount of space stations : ${n}`);
-        const spaceStations = [];
-        for (let i = 0; i < n; i++) {
-            const seed = getSpaceStationSeed(body.model, i);
-            const spacestation = StarSystemHelper.MakeSpaceStation(starsystem, seed, body);
-            spaceStations.push(spacestation);
-        }
-
-        return spaceStations;
     }
 
     public static MakeSatellite(
