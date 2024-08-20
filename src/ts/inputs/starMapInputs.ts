@@ -14,7 +14,6 @@ const focusOnCurrentSystemAction = new Action({
 
 const focusOnCurrentSystemInteraction = new PressInteraction(focusOnCurrentSystemAction);
 
-
 const leftStick = gamepad.getControl("leftStick");
 
 // It takes four keys to go in four directions
@@ -32,7 +31,6 @@ const kbdWASD = new DPadComposite({
 const moveAction = new Action({
     bindings: [kbdWASD, leftStick]
 });
-
 
 const keyboardSpeed = new AxisComposite({
     positive: keyboard.getControl("NumpadAdd"), // '+'

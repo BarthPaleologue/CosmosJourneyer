@@ -81,17 +81,16 @@ export class ButterflyMaterial extends ShaderMaterial {
             this.getEffect().setVector3(ButterflyMaterialUniformNames.PLAYER_POSITION, this.playerPosition);
             this.getEffect().setFloat(ButterflyMaterialUniformNames.TIME, this.elapsedSeconds);
 
-            
             const activeCamera = this.scene.activeCamera;
             if (activeCamera === null) throw new Error("No active camera in the scene");
             this.getEffect().setVector3(ButterflyMaterialUniformNames.CAMERA_POSITION, activeCamera.globalPosition);
 
-            if(this.planet !== null) {
+            if (this.planet !== null) {
                 this.getEffect().setVector3(ButterflyMaterialUniformNames.PLANET_POSITION, this.planet.getAbsolutePosition());
                 this.getEffect().setMatrix(ButterflyMaterialUniformNames.PLANET_WORLD, this.planet.getWorldMatrix());
             }
         });
-        
+
         this.scene = scene;
     }
 

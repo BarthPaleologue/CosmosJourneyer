@@ -41,7 +41,7 @@ export function getAxisComponentFromQuaternion(quaternion: Quaternion, axisToGet
 }
 
 export function getTransformationQuaternion(from: Vector3, to: Vector3): Quaternion {
-    if(from.equalsWithEpsilon(to)) {
+    if (from.equalsWithEpsilon(to)) {
         return Quaternion.Identity();
     }
     const rotationAxis = Vector3.Cross(from, to);

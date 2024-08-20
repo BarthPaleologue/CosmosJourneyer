@@ -347,7 +347,7 @@ export class StarMapUI {
             const factionNames = spaceStations.map((station) => factionToString(station.faction));
             const uniqueFactions = Array.from(new Set(factionNames));
 
-            if(uniqueFactions.length > 0) {
+            if (uniqueFactions.length > 0) {
                 this.factions.textContent = `${i18n.t("starMap:factions")}: ${uniqueFactions.join(", ")}`;
                 this.shortHandUIFactions.textContent = `${i18n.t("starMap:factions")}: ${uniqueFactions.join(", ")}`;
             } else {

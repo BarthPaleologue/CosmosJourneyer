@@ -168,7 +168,10 @@ export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
             this.instancePatches.push(butterflyPatch);
 
             const grassPatch = new ThinInstancePatch(alignedInstancesMatrixBuffer);
-            grassPatch.createInstances([{ mesh: Objects.GRASS_BLADES[0], distance: 0 }, { mesh: Objects.GRASS_BLADES[1], distance: 50 }]);
+            grassPatch.createInstances([
+                { mesh: Objects.GRASS_BLADES[0], distance: 0 },
+                { mesh: Objects.GRASS_BLADES[1], distance: 50 }
+            ]);
             this.instancePatches.push(grassPatch);
 
             Materials.GRASS_MATERIAL.setPlanet(this.parent);

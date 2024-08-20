@@ -365,14 +365,14 @@ export class StarMap implements View {
 
     private updateStarSectors() {
         const activeCamera = this.scene.activeCamera;
-        if(activeCamera === null) throw new Error("No active camera!");
+        if (activeCamera === null) throw new Error("No active camera!");
         const activeCameraPosition = activeCamera.globalPosition;
 
         // first remove all star sectors that are too far
         const currentSystemInstance = this.currentSystemSeed === null ? null : (this.seedToInstanceMap.get(this.currentSystemSeed.toString()) as InstancedMesh);
         const selectedSystemInstance = this.selectedSystemSeed === null ? null : (this.seedToInstanceMap.get(this.selectedSystemSeed.toString()) as InstancedMesh);
         for (const starSector of this.loadedStarSectors.values()) {
-            // only set as pickable if the distance is less than 40 light years 
+            // only set as pickable if the distance is less than 40 light years
             const pickableThresholdLy = 45;
             starSector.starInstances.forEach((starInstance) => {
                 starInstance.isPickable = Vector3.DistanceSquared(starInstance.position, activeCameraPosition) < pickableThresholdLy * pickableThresholdLy;
