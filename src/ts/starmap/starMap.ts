@@ -364,10 +364,23 @@ export class StarMap implements View {
     }
 
     private updateStarSectors() {
+        const activeCamera = this.scene.activeCamera;
+        if(activeCamera === null) throw new Error("No active camera!");
+        const activeCameraPosition = activeCamera.globalPosition;
+
         // first remove all star sectors that are too far
         const currentSystemInstance = this.currentSystemSeed === null ? null : (this.seedToInstanceMap.get(this.currentSystemSeed.toString()) as InstancedMesh);
         const selectedSystemInstance = this.selectedSystemSeed === null ? null : (this.seedToInstanceMap.get(this.selectedSystemSeed.toString()) as InstancedMesh);
         for (const starSector of this.loadedStarSectors.values()) {
+            // only set as pickable if the distance is less than 40 light years 
+            const pickableThresholdLy = 45;
+            starSector.starInstances.forEach((starInstance) => {
+                starInstance.isPickable = Vector3.DistanceSquared(starInstance.position, activeCameraPosition) < pickableThresholdLy * pickableThresholdLy;
+            });
+            starSector.blackHoleInstances.forEach((blackHoleInstance) => {
+                blackHoleInstance.isPickable = Vector3.DistanceSquared(blackHoleInstance.position, activeCameraPosition) < pickableThresholdLy * pickableThresholdLy;
+            });
+
             if (currentSystemInstance !== null && starSector.starInstances.concat(starSector.blackHoleInstances).includes(currentSystemInstance)) continue; // don't remove star sector that contains the current system
             if (selectedSystemInstance !== null && starSector.starInstances.concat(starSector.blackHoleInstances).includes(selectedSystemInstance)) continue; // don't remove star sector that contains the selected system
 
@@ -389,11 +402,7 @@ export class StarMap implements View {
 
             // don't generate star sectors that are not in the frustum
             const bb = StarSector.GetBoundingBox(coordinates.scale(StarSector.SIZE), this.starMapCenterPosition);
-            let isInFrustrum = false;
-            this.controls.getActiveCameras().forEach((camera) => {
-                isInFrustrum = isInFrustrum || camera.isInFrustum(bb);
-            });
-            if (!isInFrustrum) continue;
+            if (!activeCamera.isInFrustum(bb)) continue;
 
             this.registerStarSector(coordinates);
         }
