@@ -65,7 +65,7 @@ export class AtmosphericScatteringPostProcess extends PostProcess implements Obj
             intensity: 11 * planet.model.physicalProperties.pressure,
             rayleighStrength: 3,
             mieStrength: 1,
-            densityModifier: 1,
+            densityModifier: 3,
             redWaveLength: 700 * (1 + centeredRand(planet.model.rng, 1300) / 6),
             greenWaveLength: 530 * (1 + centeredRand(planet.model.rng, 1310) / 6),
             blueWaveLength: 440 * (1 + centeredRand(planet.model.rng, 1320) / 6),
