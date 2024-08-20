@@ -41,6 +41,9 @@ export function getAxisComponentFromQuaternion(quaternion: Quaternion, axisToGet
 }
 
 export function getTransformationQuaternion(from: Vector3, to: Vector3): Quaternion {
+    if(from.equalsWithEpsilon(to)) {
+        return Quaternion.Identity();
+    }
     const rotationAxis = Vector3.Cross(from, to);
     const angle = Math.acos(Vector3.Dot(from, to));
     return Quaternion.RotationAxis(rotationAxis, angle);
