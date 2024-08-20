@@ -107,8 +107,4 @@ export class MandelbulbModel implements PlanetModel {
     getApparentRadius(): number {
         return this.radius;
     }
-
-    getNbSpaceStations(): number {
-        return 0;
-    }
 }

@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { factionToString } from "../../powerplay/factions";
 import { SpaceStationModel } from "../../spacestation/spacestationModel";
 import { CropType, cropTypeToString } from "../../utils/agriculture";
 
@@ -27,6 +28,8 @@ export function generateInfoHTML(model: SpaceStationModel): string {
         <h2>General information</h2>
         
         <p>${model.name} is orbiting ${model.parentBody?.name} at a distance of ${(model.orbit.radius * 0.001).toLocaleString(undefined, { maximumSignificantDigits: 3 })}km</p>
+
+        <p>${model.name} is affiliated to ${factionToString(model.faction)}</p>
 
         <p>It is the home to ${model.population.toLocaleString(undefined, { maximumSignificantDigits: 3 })} inhabitants, with a population density of ${model.populationDensity.toLocaleString(undefined, { maximumSignificantDigits: 3 })} per km²</p>
 

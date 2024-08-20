@@ -29,9 +29,9 @@ export class InstancePatch implements IPatch {
     private positions: Vector3[] = [];
     private rotations: Quaternion[] = [];
     private scalings: Vector3[] = [];
-    
-    private currentLod: { mesh: Mesh, lodIndex: number } | null = null;
-    private readonly lods: { mesh: Mesh, distance: number }[] = [];
+
+    private currentLod: { mesh: Mesh; lodIndex: number } | null = null;
+    private readonly lods: { mesh: Mesh; distance: number }[] = [];
 
     constructor(parent: TransformNode, matrixBuffer: Float32Array) {
         this.parent = parent;
@@ -58,7 +58,7 @@ export class InstancePatch implements IPatch {
         this.currentLod = null;
     }
 
-    public createInstances(baseMeshes: { mesh: Mesh, distance: number }[]): void {
+    public createInstances(baseMeshes: { mesh: Mesh; distance: number }[]): void {
         this.clearInstances();
         this.lods.length = 0;
 
@@ -103,10 +103,10 @@ export class InstancePatch implements IPatch {
         if (this.currentLod === null) throw new Error("No lod mesh was set.");
 
         // check for furthest away lod
-        for(let i = this.lods.length - 1; i >= 0; i--) {
-            if(distance > this.lods[i].distance) {
-                if(i === this.currentLod.lodIndex) break;
-                
+        for (let i = this.lods.length - 1; i >= 0; i--) {
+            if (distance > this.lods[i].distance) {
+                if (i === this.currentLod.lodIndex) break;
+
                 this.clearInstances();
                 this.currentLod = { mesh: this.lods[i].mesh, lodIndex: i };
                 this.sendToGPU();
@@ -121,7 +121,7 @@ export class InstancePatch implements IPatch {
     }
 
     public getLodMeshes(): Mesh[] {
-        return this.lods.map(lod => lod.mesh);
+        return this.lods.map((lod) => lod.mesh);
     }
 
     public getNbInstances(): number {

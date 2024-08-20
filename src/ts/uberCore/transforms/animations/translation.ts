@@ -20,8 +20,9 @@ import { easeInOutInterpolation } from "./interpolations";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { translate } from "../basicTransform";
 import { clamp } from "../../../utils/math";
+import { CustomAnimation } from "./animation";
 
-export class TransformTranslationAnimation {
+export class TransformTranslationAnimation implements CustomAnimation {
     private clock = 0;
     private readonly duration: number;
     private distanceAcc = 0;

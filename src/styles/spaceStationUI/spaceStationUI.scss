@@ -1,4 +1,4 @@
-$gaps: 20px;
+$gaps: 10px;
 
 #spaceStationUI {
     position: absolute;
@@ -7,7 +7,7 @@ $gaps: 20px;
     bottom: 0;
     right: 0;
     z-index: 2;
-  
+
     font-family: Nasalization, sans-serif;
 
     padding: $gaps;
@@ -21,7 +21,7 @@ $gaps: 20px;
 
     &>* {
         box-shadow: 0 0 20px black;
-        background: rgba(20, 20, 50, 0.8);
+        background: rgba(20, 20, 20, 0.8);
         backdrop-filter: blur(3px);
 
         color: white;
@@ -101,16 +101,43 @@ $gaps: 20px;
         }
 
         .spaceStationAction {
-            padding: 0 20px;
+
             align-self: stretch;
 
             background: rgba(253, 140, 26, 0.5);
 
             transition: .2s;
 
+            $icon-size: 75px;
+
+            display: grid;
+            grid-template-columns: $icon-size auto;
+            align-items: center;
+
+            column-gap: 10px;
+            padding: 10px 10px;
+            
+            box-shadow: 0 0 0px white inset;
+
+            img {
+                grid-row: span 2;
+                width: $icon-size;
+                height: $icon-size;
+            }
+
+            h2 {
+                margin-block: 0;
+            }
+
+            p {
+                margin-block: 0;
+            }
+
             &:hover {
                 cursor: pointer;
                 background: rgba(253, 140, 26, 0.8);
+
+                box-shadow: 0 0 10px white inset;
             }
         }
     }

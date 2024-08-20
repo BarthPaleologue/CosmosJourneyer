@@ -21,7 +21,10 @@ import { Tools } from "@babylonjs/core/Misc/tools";
 
 export const Settings = {
     UNIVERSE_SEED: Math.PI,
+
     EARTH_RADIUS: 6000e3, // target is 6000e3
+
+    POWER_PLAY_SEED: 77,
 
     /**
      * The distance light travels in one year.
@@ -41,6 +44,8 @@ export const Settings = {
     SEED_HALF_RANGE: 1e4,
 
     FLOATING_ORIGIN_THRESHOLD: 500,
+
+    HUMAN_BUBBLE_RADIUS_LY: 100,
 
     /**
      * The average daily intake for a human being in kcal/day
@@ -95,9 +100,9 @@ export const CollisionMask = {
     DYNAMIC_OBJECTS: 0b00000010
 };
 
-const seedableRng = seededSquirrelNoise(Settings.UNIVERSE_SEED);
-let step = 0;
-const perlinRng = makeNoise3D(() => {
-    return seedableRng(step++);
+const densityRng = seededSquirrelNoise(Settings.UNIVERSE_SEED);
+let densitySampleStep = 0;
+const densityPerlin = makeNoise3D(() => {
+    return densityRng(densitySampleStep++);
 });
-export const UniverseDensity = (x: number, y: number, z: number) => (1.0 - Math.abs(perlinRng(x * 0.2, y * 0.2, z * 0.2))) ** 8;
+export const UniverseDensity = (x: number, y: number, z: number) => (1.0 - Math.abs(densityPerlin(x * 0.2, y * 0.2, z * 0.2))) ** 8;
