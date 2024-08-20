@@ -440,7 +440,6 @@ export class StarSystemController {
         this.updateShaders(deltaSeconds, postProcessManager);
     }
 
-    
     /**
      * Translates all celestial bodies and spacestations in the system by the given displacement
      * @param displacement The displacement applied to all bodies

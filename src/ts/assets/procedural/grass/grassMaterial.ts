@@ -85,7 +85,7 @@ export class GrassMaterial extends ShaderMaterial {
             if (activeCamera === null) throw new Error("No active camera in the scene");
             this.getEffect().setVector3(GrassMaterialUniformNames.CAMERA_POSITION, activeCamera.globalPosition);
 
-            if(this.planet !== null) {
+            if (this.planet !== null) {
                 this.getEffect().setVector3(GrassMaterialUniformNames.PLANET_POSITION, this.planet.getAbsolutePosition());
                 this.getEffect().setMatrix(GrassMaterialUniformNames.PLANET_WORLD, this.planet.getWorldMatrix());
             }

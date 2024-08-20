@@ -20,11 +20,10 @@ import "@babylonjs/core/Meshes/thinInstanceMesh";
 import { IPatch } from "./iPatch";
 
 export class ThinInstancePatch implements IPatch {
-
     readonly matrixBuffer: Float32Array;
 
-    private currentLod: { mesh: Mesh, lodIndex: number } | null = null;
-    private readonly lods: { mesh: Mesh, distance: number }[] = [];
+    private currentLod: { mesh: Mesh; lodIndex: number } | null = null;
+    private readonly lods: { mesh: Mesh; distance: number }[] = [];
 
     constructor(matrixBuffer: Float32Array) {
         this.matrixBuffer = matrixBuffer;
@@ -37,7 +36,7 @@ export class ThinInstancePatch implements IPatch {
         this.currentLod = null;
     }
 
-    public createInstances(baseMeshes: { mesh: Mesh, distance: number }[]): void {
+    public createInstances(baseMeshes: { mesh: Mesh; distance: number }[]): void {
         this.clearInstances();
         this.lods.length = 0;
         for (const baseMesh of baseMeshes) {
@@ -79,10 +78,10 @@ export class ThinInstancePatch implements IPatch {
         if (this.currentLod === null) throw new Error("No lod mesh was set.");
 
         // check for furthest away lod
-        for(let i = this.lods.length - 1; i >= 0; i--) {
-            if(distance > this.lods[i].distance) {
-                if(i === this.currentLod.lodIndex) break;
-                
+        for (let i = this.lods.length - 1; i >= 0; i--) {
+            if (distance > this.lods[i].distance) {
+                if (i === this.currentLod.lodIndex) break;
+
                 this.clearInstances();
                 this.currentLod = { mesh: this.lods[i].mesh, lodIndex: i };
                 this.sendToGPU();
@@ -97,12 +96,12 @@ export class ThinInstancePatch implements IPatch {
     }
 
     public getLodMeshes(): Mesh[] {
-        return this.lods.map(lod => lod.mesh);
+        return this.lods.map((lod) => lod.mesh);
     }
 
     public dispose() {
         this.clearInstances();
-        this.lods.forEach(lod => lod.mesh.dispose());
+        this.lods.forEach((lod) => lod.mesh.dispose());
         this.lods.length = 0;
     }
 }

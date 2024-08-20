@@ -28,8 +28,8 @@ export class HierarchyInstancePatch implements IPatch {
     private scalings: Vector3[] = [];
     readonly parent: TransformNode;
 
-    private currentLod: { mesh: TransformNode, lodIndex: number } | null = null;
-    private readonly lods: { mesh: TransformNode, distance: number }[] = [];
+    private currentLod: { mesh: TransformNode; lodIndex: number } | null = null;
+    private readonly lods: { mesh: TransformNode; distance: number }[] = [];
 
     constructor(parent: TransformNode, matrixBuffer: Float32Array) {
         this.parent = parent;
@@ -56,13 +56,13 @@ export class HierarchyInstancePatch implements IPatch {
         this.currentLod = null;
     }
 
-    public createInstances(baseMeshes: { mesh: TransformNode, distance: number }[]): void {
+    public createInstances(baseMeshes: { mesh: TransformNode; distance: number }[]): void {
         this.clearInstances();
         this.lods.length = 0;
 
         for (const baseMesh of baseMeshes) {
             const clonedMesh = baseMesh.mesh.clone(baseMesh.mesh.name + "Clone", null);
-            if(clonedMesh === null) throw new Error("clonedMesh is null");
+            if (clonedMesh === null) throw new Error("clonedMesh is null");
             clonedMesh.getChildMeshes().forEach((mesh) => {
                 if (mesh instanceof Mesh) {
                     mesh.makeGeometryUnique();
@@ -71,7 +71,7 @@ export class HierarchyInstancePatch implements IPatch {
             });
             this.lods.push({ mesh: clonedMesh, distance: baseMesh.distance });
         }
-        
+
         const currentLod = this.lods.at(0);
         if (currentLod === undefined) throw new Error("No lod mesh was set.");
         this.currentLod = { mesh: currentLod.mesh, lodIndex: 0 };
@@ -91,7 +91,7 @@ export class HierarchyInstancePatch implements IPatch {
             this.instances.push(instanceRoot);
         }
     }
-    
+
     public setEnabled(enabled: boolean) {
         for (const instance of this.instances) {
             instance.setEnabled(enabled);
@@ -102,16 +102,16 @@ export class HierarchyInstancePatch implements IPatch {
         if (this.instances.length === 0) return false;
         return this.instances[0].isEnabled();
     }
-    
+
     public handleLod(distance: number): void {
         if (this.lods.length === 0) throw new Error("No lod meshes were set.");
         if (this.currentLod === null) throw new Error("No lod mesh was set.");
 
         // check for furthest away lod
-        for(let i = this.lods.length - 1; i >= 0; i--) {
-            if(distance > this.lods[i].distance) {
-                if(i === this.currentLod.lodIndex) break;
-                
+        for (let i = this.lods.length - 1; i >= 0; i--) {
+            if (distance > this.lods[i].distance) {
+                if (i === this.currentLod.lodIndex) break;
+
                 this.clearInstances();
                 this.currentLod = { mesh: this.lods[i].mesh, lodIndex: i };
                 this.sendToGPU();
@@ -119,24 +119,23 @@ export class HierarchyInstancePatch implements IPatch {
             }
         }
     }
-    
+
     public getCurrentMesh(): TransformNode {
         if (this.currentLod === null) throw new Error("Tried to get base mesh but no base mesh was set.");
         return this.currentLod.mesh;
     }
 
     public getLodMeshes(): TransformNode[] {
-        return this.lods.map(lod => lod.mesh);
+        return this.lods.map((lod) => lod.mesh);
     }
 
-    
     public getNbInstances(): number {
         return this.instances.length;
     }
 
     public dispose() {
         this.clearInstances();
-        this.lods.forEach(lod => lod.mesh.dispose());
+        this.lods.forEach((lod) => lod.mesh.dispose());
         this.lods.length = 0;
     }
 }
