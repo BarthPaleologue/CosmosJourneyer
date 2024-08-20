@@ -1,0 +1,14 @@
+$main-font: "Nasalization", sans-serif;
+$transition-time: 0.2s;
+$bezier-overshoot: cubic-bezier(0.34, -1.87, 0.74, 2.99);
+$backdrop-blur: blur(3px);
+
+:root {
+  --text-size: 2vmin;
+  --h2-size: calc(1.5 * var(--text-size));
+  --h1-size: calc(2.0 * var(--text-size));
+  --menu-items-size: 3.2vmin;
+  --accent-color: #002b6a;
+  --accent-color-dark: #001a3f;
+  --accent-color-light: #003f9f;
+}

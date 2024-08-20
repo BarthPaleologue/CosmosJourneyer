@@ -16,217 +16,357 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
-import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
-import { Button } from "@babylonjs/gui/2D/controls/button";
-import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
-import { Image } from "@babylonjs/gui/2D/controls/image";
-
-import hoveredCircle from "../../asset/textures/hoveredCircle.png";
-import selectedCircle from "../../asset/textures/selectedCircle.png";
-
 import { Animation } from "@babylonjs/core/Animations/animation";
 import { Scene } from "@babylonjs/core/scene";
 import { Settings } from "../settings";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
+import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import i18n from "../i18n";
-import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { getStellarTypeString } from "../stellarObjects/common";
+import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
+import { StarModel } from "../stellarObjects/star/starModel";
+import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
+import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
+import { BodyType } from "../architecture/bodyType";
+import { getStarGalacticCoordinates } from "../utils/getStarGalacticCoordinates";
+import { parseDistance } from "../utils/parseToStrings";
+import { placeSpaceStations } from "../society/spaceStationPlacement";
+import { SpaceStationModel } from "../spacestation/spacestationModel";
+import { getSpaceStationSeed } from "../planets/common";
+import { factionToString } from "../powerplay/factions";
+import { isSystemInHumanBubble } from "../society/starSystemSociety";
 
 export class StarMapUI {
-    readonly gui: AdvancedDynamicTexture;
-    readonly systemUI: StackPanel;
-    readonly namePlate: TextBlock;
-    readonly descriptionPanel: TextBlock;
-    readonly warpButton: Button;
-
-    readonly hoveredSystemRing: Image;
-    readonly selectedSystemRing: Image;
-    readonly currentSystemRing: Image;
-
     readonly htmlRoot: HTMLDivElement;
+
+    readonly hoveredSystemCursorContainer: HTMLDivElement;
+    readonly hoveredSystemCursor: HTMLDivElement;
+    readonly selectedSystemCursorContainer: HTMLDivElement;
+    readonly selectedSystemCursor: HTMLDivElement;
+    readonly currentSystemCursorContainer: HTMLDivElement;
+    readonly currentSystemCursor: HTMLDivElement;
+
+    readonly infoPanel: HTMLDivElement;
+    readonly infoPanelStarPreview: HTMLDivElement;
+    readonly infoPanelTitle: HTMLHeadingElement;
+    readonly starSector: HTMLParagraphElement;
+    readonly nbPlanets: HTMLParagraphElement;
+    readonly distanceToSol: HTMLParagraphElement;
+
+    readonly humanPresence: HTMLDivElement;
+    readonly nbSpaceStations: HTMLParagraphElement;
+    readonly factions: HTMLDivElement;
 
     readonly cursor: HTMLDivElement;
 
-    readonly scene: Scene;
-    readonly uiCamera: FreeCamera;
+    readonly shortHandUI: HTMLDivElement;
+    readonly shortHandUITitle: HTMLHeadingElement;
+    readonly shortHandUISystemType: HTMLParagraphElement;
+    readonly shortHandUIDistanceFromCurrent: HTMLParagraphElement;
+    readonly shortHandUIFactions: HTMLDivElement;
+    readonly shortHandUIButtonContainer: HTMLDivElement;
+    readonly shortHandUIPlotItineraryButton: HTMLButtonElement;
+    readonly shortHandUIBookmarkButton: HTMLButtonElement;
+
+    private selectedMesh: AbstractMesh | null = null;
+    private hoveredMesh: AbstractMesh | null = null;
+    private currentMesh: AbstractMesh | null = null;
 
     static ALPHA_ANIMATION = new Animation("alphaAnimation", "alpha", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
 
-    private _isHovered = false;
+    private readonly scene: Scene;
 
-    constructor(engine: AbstractEngine) {
-        this.scene = new Scene(engine);
-        this.scene.useRightHandedSystem = true;
-        this.scene.autoClear = false;
-
-        this.uiCamera = new FreeCamera("UiCamera", Vector3.Zero(), this.scene);
-
-        this.gui = AdvancedDynamicTexture.CreateFullscreenUI("StarMapUI", true, this.scene);
-
-        this.systemUI = new StackPanel();
-        this.systemUI.width = "300px";
-        this.systemUI.height = "220px";
-        this.systemUI.color = "white";
-        this.systemUI.background = "black";
-        this.systemUI.linkOffsetY = -200;
-        this.systemUI.zIndex = 6;
-        this.systemUI.alpha = 0.95;
-
-        this.systemUI.onPointerEnterObservable.add(() => {
-            this._isHovered = true;
-        });
-
-        this.systemUI.onPointerOutObservable.add(() => {
-            this._isHovered = false;
-        });
-
-        this.namePlate = new TextBlock();
-        this.namePlate.text = "";
-        this.namePlate.fontSize = 24;
-        this.namePlate.height = "50px";
-        this.namePlate.fontFamily = Settings.MAIN_FONT;
-        this.namePlate.textHorizontalAlignment = TextBlock.HORIZONTAL_ALIGNMENT_LEFT;
-        this.namePlate.setPadding(15, 15, 10, 15);
-
-        this.descriptionPanel = new TextBlock();
-        this.descriptionPanel.height = "130px";
-        this.descriptionPanel.lineSpacing = 4.0;
-        this.descriptionPanel.fontFamily = Settings.MAIN_FONT;
-        this.descriptionPanel.textHorizontalAlignment = TextBlock.HORIZONTAL_ALIGNMENT_LEFT;
-        this.descriptionPanel.setPadding(0, 15, 10, 15);
-
-        this.warpButton = Button.CreateSimpleButton("warpButton", i18n.t("starMap:setAsDestination"));
-        //this.warpButton.width = "100px";
-        this.warpButton.height = "40px";
-        this.warpButton.background = "midnightblue";
-        this.warpButton.fontWeight = "bold";
-        this.warpButton.fontFamily = Settings.MAIN_FONT;
-        this.warpButton.isPointerBlocker = false;
-        //this.warpButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-
-        this.systemUI.addControl(this.namePlate);
-        this.systemUI.addControl(this.descriptionPanel);
-        this.systemUI.addControl(this.warpButton);
-
-        this.hoveredSystemRing = new Image("hoverSystemRing", hoveredCircle);
-        this.hoveredSystemRing.fixedRatio = 1;
-        this.hoveredSystemRing.width = 0.2;
-        this.hoveredSystemRing.alpha = 0.8;
-        this.hoveredSystemRing.zIndex = 4;
-
-        this.selectedSystemRing = new Image("selectedSystemRing", hoveredCircle);
-        this.selectedSystemRing.fixedRatio = 1;
-        this.selectedSystemRing.width = 0.2;
-        this.selectedSystemRing.alpha = 0.8;
-        this.selectedSystemRing.zIndex = 4;
-
-        this.currentSystemRing = new Image("currentSystemRing", selectedCircle);
-        this.currentSystemRing.fixedRatio = 1;
-        this.currentSystemRing.width = 0.2;
-        this.currentSystemRing.alpha = 1;
-        this.currentSystemRing.zIndex = 5;
-
-        StarMapUI.ALPHA_ANIMATION.setKeys([
-            { frame: 0, value: 0.0 },
-            { frame: 60, value: 0.8 }
-        ]);
-
-        this.hoveredSystemRing.animations = [StarMapUI.ALPHA_ANIMATION];
+    constructor(scene: Scene) {
+        this.scene = scene;
+        this.scene.hoverCursor = "none";
 
         this.htmlRoot = document.createElement("div");
         this.htmlRoot.classList.add("starMapUI");
+        document.body.appendChild(this.htmlRoot);
+
+        this.selectedSystemCursorContainer = document.createElement("div");
+        this.selectedSystemCursorContainer.classList.add("targetCursorRoot");
+        this.htmlRoot.appendChild(this.selectedSystemCursorContainer);
+
+        this.selectedSystemCursor = document.createElement("div");
+        this.selectedSystemCursor.classList.add("targetCursor", "rounded");
+        this.selectedSystemCursorContainer.appendChild(this.selectedSystemCursor);
+
+        this.hoveredSystemCursorContainer = document.createElement("div");
+        this.hoveredSystemCursorContainer.classList.add("targetCursorRoot");
+        this.htmlRoot.appendChild(this.hoveredSystemCursorContainer);
+
+        this.hoveredSystemCursor = document.createElement("div");
+        this.hoveredSystemCursor.classList.add("targetCursor", "rounded");
+        this.hoveredSystemCursorContainer.appendChild(this.hoveredSystemCursor);
+
+        this.currentSystemCursorContainer = document.createElement("div");
+        this.currentSystemCursorContainer.classList.add("targetCursorRoot");
+        this.htmlRoot.appendChild(this.currentSystemCursorContainer);
+
+        this.currentSystemCursor = document.createElement("div");
+        this.currentSystemCursor.classList.add("targetCursor", "rounded", "target");
+        this.currentSystemCursorContainer.appendChild(this.currentSystemCursor);
+
+        this.cursor = document.createElement("div");
+        this.cursor.classList.add("targetCursor");
+
+        this.infoPanel = document.createElement("div");
+        this.infoPanel.classList.add("starMapInfoPanel");
+        this.htmlRoot.appendChild(this.infoPanel);
+
+        this.infoPanelStarPreview = document.createElement("div");
+        this.infoPanelStarPreview.classList.add("starMapInfoPanelStarPreview");
+        this.infoPanel.appendChild(this.infoPanelStarPreview);
+
+        this.infoPanelTitle = document.createElement("h1");
+        this.infoPanelTitle.classList.add("starMapInfoPanelTitle");
+        this.infoPanel.appendChild(this.infoPanelTitle);
+
+        const hr = document.createElement("hr");
+        this.infoPanel.appendChild(hr);
+
+        this.starSector = document.createElement("p");
+        this.starSector.classList.add("starMapInfoPanelStarSector");
+        this.infoPanel.appendChild(this.starSector);
+
+        const hr2 = document.createElement("hr");
+        this.infoPanel.appendChild(hr2);
+
+        const generalInfoTitle = document.createElement("h2");
+        generalInfoTitle.textContent = i18n.t("starMap:generalInfo");
+        this.infoPanel.appendChild(generalInfoTitle);
+
+        this.nbPlanets = document.createElement("p");
+        this.nbPlanets.classList.add("starMapInfoPanelNbPlanets");
+        this.infoPanel.appendChild(this.nbPlanets);
+
+        this.distanceToSol = document.createElement("p");
+        this.distanceToSol.classList.add("starMapInfoPanelDistanceToSol");
+        this.infoPanel.appendChild(this.distanceToSol);
+
+        this.humanPresence = document.createElement("div");
+        this.humanPresence.classList.add("starMapInfoPanelHumanPresence");
+        this.infoPanel.appendChild(this.humanPresence);
+
+        const humanPresenceTitle = document.createElement("h2");
+        humanPresenceTitle.textContent = i18n.t("starMap:humanPresence");
+        this.humanPresence.appendChild(humanPresenceTitle);
+
+        this.nbSpaceStations = document.createElement("p");
+        this.nbSpaceStations.classList.add("starMapInfoPanelNbSpaceStations");
+        this.humanPresence.appendChild(this.nbSpaceStations);
+
+        this.factions = document.createElement("div");
+        this.factions.classList.add("starMapInfoPanelFactions");
+        this.infoPanel.appendChild(this.factions);
 
         this.cursor = document.createElement("div");
         this.cursor.classList.add("cursor");
-
         this.htmlRoot.appendChild(this.cursor);
 
-        document.body.appendChild(this.htmlRoot);
+        this.shortHandUI = document.createElement("div");
+        this.shortHandUI.classList.add("shortHandUI");
+        this.htmlRoot.appendChild(this.shortHandUI);
+
+        this.shortHandUITitle = document.createElement("h2");
+        this.shortHandUI.appendChild(this.shortHandUITitle);
+
+        this.shortHandUISystemType = document.createElement("p");
+        this.shortHandUI.appendChild(this.shortHandUISystemType);
+
+        this.shortHandUIDistanceFromCurrent = document.createElement("p");
+        this.shortHandUI.appendChild(this.shortHandUIDistanceFromCurrent);
+
+        this.shortHandUIFactions = document.createElement("p");
+        this.shortHandUI.appendChild(this.shortHandUIFactions);
+
+        this.shortHandUIButtonContainer = document.createElement("div");
+        this.shortHandUIButtonContainer.classList.add("buttonContainer");
+        this.shortHandUI.appendChild(this.shortHandUIButtonContainer);
+
+        this.shortHandUIPlotItineraryButton = document.createElement("button");
+        this.shortHandUIPlotItineraryButton.classList.add("plotItineraryButton");
+        this.shortHandUIPlotItineraryButton.textContent = i18n.t("starMap:plotItinerary");
+        this.shortHandUIButtonContainer.appendChild(this.shortHandUIPlotItineraryButton);
+
+        this.shortHandUIBookmarkButton = document.createElement("button");
+        this.shortHandUIBookmarkButton.classList.add("bookmarkButton");
+        this.shortHandUIBookmarkButton.textContent = i18n.t("starMap:bookmark");
+        this.shortHandUIButtonContainer.appendChild(this.shortHandUIBookmarkButton);
 
         document.addEventListener("pointermove", (event) => {
             this.cursor.style.transform = `translate(calc(${event.clientX}px - 50%), calc(${event.clientY}px - 50%))`;
         });
     }
 
-    isHovered() {
-        return this._isHovered;
-    }
-
     update(playerPosition: Vector3) {
-        if (this.systemUI.linkedMesh === null || this.systemUI.linkedMesh === undefined) this.gui.removeControl(this.systemUI);
-        else {
-            this.systemUI.linkOffsetY = -150 - 50 / this.systemUI.linkedMesh.getAbsolutePosition().length();
+        const width = this.scene.getEngine().getRenderWidth();
+        const height = this.scene.getEngine().getRenderHeight();
+
+        const camera = this.scene.activeCamera;
+        if (camera === null) {
+            throw new Error("No active camera found");
         }
-        if (this.hoveredSystemRing.linkedMesh !== null && this.hoveredSystemRing.linkedMesh !== undefined) {
-            const distance = this.hoveredSystemRing.linkedMesh.getAbsolutePosition().subtract(playerPosition).length();
-            const scale = this.hoveredSystemRing.linkedMesh.scaling.x / distance;
-            this.hoveredSystemRing.scaleX = scale;
-            this.hoveredSystemRing.scaleY = scale;
-        }
-        if (this.selectedSystemRing.linkedMesh !== null && this.selectedSystemRing.linkedMesh !== undefined) {
-            const distance = this.selectedSystemRing.linkedMesh.getAbsolutePosition().subtract(playerPosition).length();
-            const scale = Math.max(0.3, this.selectedSystemRing.linkedMesh.scaling.x / distance);
-            this.selectedSystemRing.scaleX = scale;
-            this.selectedSystemRing.scaleY = scale;
-        }
-        if (this.currentSystemRing.linkedMesh !== null && this.currentSystemRing.linkedMesh !== undefined) {
-            const distance = this.currentSystemRing.linkedMesh.getAbsolutePosition().subtract(playerPosition).length();
-            const scale = Math.max(0.3, this.currentSystemRing.linkedMesh.scaling.x / distance);
-            this.currentSystemRing.scaleX = scale;
-            this.currentSystemRing.scaleY = scale;
-        }
-    }
 
-    attachUIToMesh(mesh: AbstractMesh) {
-        this.gui._linkedControls = [];
-        if (this.gui._linkedControls.length === 0) this.gui.addControl(this.systemUI);
+        const scalingBase = 100;
+        const minScale = 5.0;
+        if (this.selectedMesh !== null) {
+            const selectedMeshScreenCoordinates = Vector3.Project(this.selectedMesh.position, Matrix.IdentityReadOnly, camera.getTransformationMatrix(), camera.viewport);
+            this.selectedSystemCursor.classList.toggle("transparent", selectedMeshScreenCoordinates.z < 0);
+            this.selectedSystemCursorContainer.style.left = `${selectedMeshScreenCoordinates.x * 100}vw`;
+            this.selectedSystemCursorContainer.style.top = `${selectedMeshScreenCoordinates.y * 100}vh`;
 
-        this.systemUI.linkWithMesh(mesh);
+            const distance = Vector3.Distance(this.selectedMesh.getAbsolutePosition(), playerPosition);
+            const scale = Math.max(minScale, scalingBase / distance);
+            this.selectedSystemCursorContainer.style.setProperty("--dim", `${scale}vh`);
 
-        this.gui.addControl(this.selectedSystemRing);
-        this.selectedSystemRing.linkWithMesh(mesh);
-
-        //FIXME: this should not be here, probably a BabylonJS bug
-        this.currentSystemRing.linkWithMesh(this.currentSystemRing.linkedMesh);
-    }
-
-    setHoveredStarSystemMesh(mesh: AbstractMesh | null) {
-        if (mesh !== null) {
-            this.scene.beginAnimation(this.hoveredSystemRing, 0, 60, false, 2.0);
-            this.gui.addControl(this.hoveredSystemRing);
+            const xOffsetBase = 500;
+            const minXOffset = 25;
+            const xOffset = Math.max(minXOffset, xOffsetBase / distance);
+            this.shortHandUI.style.visibility = selectedMeshScreenCoordinates.z >= 0 ? "visible" : "hidden";
+            this.shortHandUI.style.transform = `translate(calc(${(selectedMeshScreenCoordinates.x * width).toFixed(0)}px + ${xOffset}px), calc(${(selectedMeshScreenCoordinates.y * height).toFixed(0)}px - 50%))`;
         } else {
-            this.gui.removeControl(this.hoveredSystemRing);
+            this.shortHandUI.style.visibility = "hidden";
+            this.selectedSystemCursor.classList.add("transparent");
         }
-        this.hoveredSystemRing.linkWithMesh(mesh);
+
+        if (this.hoveredMesh !== null) {
+            const meshScreenCoordinates = Vector3.Project(this.hoveredMesh.position, Matrix.IdentityReadOnly, camera.getTransformationMatrix(), camera.viewport);
+            this.hoveredSystemCursor.classList.toggle("transparent", meshScreenCoordinates.z < 0);
+            this.hoveredSystemCursorContainer.style.left = `${meshScreenCoordinates.x * 100}vw`;
+            this.hoveredSystemCursorContainer.style.top = `${meshScreenCoordinates.y * 100}vh`;
+
+            const distance = Vector3.Distance(this.hoveredMesh.getAbsolutePosition(), playerPosition);
+            const scale = Math.max(minScale, scalingBase / distance);
+            this.hoveredSystemCursorContainer.style.setProperty("--dim", `${scale}vh`);
+        } else {
+            this.hoveredSystemCursor.classList.add("transparent");
+        }
+
+        if (this.currentMesh !== null) {
+            const meshScreenCoordinates = Vector3.Project(this.currentMesh.position, Matrix.IdentityReadOnly, camera.getTransformationMatrix(), camera.viewport);
+            this.currentSystemCursor.classList.toggle("transparent", meshScreenCoordinates.z < 0);
+            this.currentSystemCursorContainer.style.left = `${meshScreenCoordinates.x * 100}vw`;
+            this.currentSystemCursorContainer.style.top = `${meshScreenCoordinates.y * 100}vh`;
+
+            const distance = Vector3.Distance(this.currentMesh.getAbsolutePosition(), playerPosition);
+            const scale = Math.max(minScale, scalingBase / distance);
+            this.currentSystemCursorContainer.style.setProperty("--dim", `${scale}vh`);
+        } else {
+            this.currentSystemCursor.classList.add("transparent");
+        }
     }
 
-    setCurrentStarSystemMesh(mesh: AbstractMesh | null) {
-        if (mesh !== null) this.gui.addControl(this.currentSystemRing);
-        this.currentSystemRing.linkWithMesh(mesh);
+    setSelectedMesh(mesh: AbstractMesh) {
+        if (mesh === this.currentMesh) return;
+        const camera = this.scene.activeCamera;
+        if (camera === null) {
+            throw new Error("No active camera found");
+        }
+
+        this.selectedMesh = mesh;
     }
 
-    detachUIFromMesh() {
-        this.systemUI.linkWithMesh(null);
-        this.gui.removeControl(this.systemUI);
+    setHoveredMesh(mesh: AbstractMesh | null) {
+        if (mesh === this.currentMesh || mesh === this.selectedMesh) return;
+        this.hoveredMesh = mesh;
+    }
+
+    setCurrentMesh(mesh: AbstractMesh | null) {
+        this.currentMesh = mesh;
     }
 
     getCurrentPickedMesh() {
-        return this.systemUI.linkedMesh;
+        return this.selectedMesh;
     }
 
     getCurrentHoveredMesh() {
-        return this.hoveredSystemRing.linkedMesh;
+        return this.hoveredMesh;
     }
 
-    setSelectedSystem({ name, text }: { name: string; text: string }) {
-        this.namePlate.text = name;
-        this.descriptionPanel.text = text;
+    setSelectedSystem(targetSystemModel: SeededStarSystemModel, currentSystemModel: SeededStarSystemModel | null) {
+        const targetCoordinates = getStarGalacticCoordinates(targetSystemModel.seed);
+
+        let text = "";
+        if (currentSystemModel !== null) {
+            const currentCoordinates = getStarGalacticCoordinates(currentSystemModel.seed);
+
+            const distance = Vector3.Distance(currentCoordinates, targetCoordinates) * Settings.LIGHT_YEAR;
+            text += `${i18n.t("starMap:distance")}: ${parseDistance(distance)}\n`;
+
+            this.shortHandUIDistanceFromCurrent.textContent = `${i18n.t("starMap:distanceFromCurrent")}: ${Vector3.Distance(currentCoordinates, targetCoordinates).toFixed(1)} ${i18n.t("units:ly")}`;
+        }
+
+        const starSeed = targetSystemModel.getStellarObjectSeed(0);
+        const stellarObjectType = targetSystemModel.getBodyTypeOfStellarObject(0);
+
+        let starModel: StarModel | BlackHoleModel | NeutronStarModel;
+        switch (stellarObjectType) {
+            case BodyType.STAR:
+                starModel = new StarModel(starSeed, targetSystemModel);
+                break;
+            case BodyType.BLACK_HOLE:
+                starModel = new BlackHoleModel(starSeed, targetSystemModel);
+                break;
+            case BodyType.NEUTRON_STAR:
+                starModel = new NeutronStarModel(starSeed, targetSystemModel);
+                break;
+            default:
+                throw new Error("Unknown stellar object type!");
+        }
+
+        let typeString = "";
+        if (starModel.bodyType === BodyType.BLACK_HOLE) typeString = i18n.t("objectTypes:blackHole");
+        else if (starModel.bodyType === BodyType.NEUTRON_STAR) typeString = i18n.t("objectTypes:neutronStar");
+        else typeString = i18n.t("objectTypes:star", { stellarType: getStellarTypeString(starModel.stellarType) });
+
+        this.shortHandUISystemType.textContent = typeString;
+
+        if (starModel instanceof StarModel) {
+            this.infoPanelStarPreview.style.background = starModel.color.toHexString();
+            this.infoPanelStarPreview.style.boxShadow = `0 0 20px ${starModel.color.toHexString()}`;
+        }
+
+        this.infoPanelTitle.textContent = targetSystemModel.name;
+        this.shortHandUITitle.textContent = targetSystemModel.name;
+
+        this.starSector.textContent = `X:${targetSystemModel.seed.starSectorX} Y:${targetSystemModel.seed.starSectorY} Z:${targetSystemModel.seed.starSectorZ} I:${targetSystemModel.seed.index}`;
+
+        this.nbPlanets.textContent = `${i18n.t("starMap:planets")}: ${targetSystemModel.getNbPlanets()}`;
+
+        this.distanceToSol.textContent = `${i18n.t("starMap:distanceToSol")}: ${Vector3.Distance(targetCoordinates, Vector3.Zero()).toFixed(1)} ${i18n.t("units:ly")}`;
+
+        if (isSystemInHumanBubble(targetSystemModel.seed)) {
+            const spaceStationParents = placeSpaceStations(targetSystemModel);
+            const spaceStations = spaceStationParents.map((planet) => {
+                return new SpaceStationModel(getSpaceStationSeed(planet, 0), targetSystemModel, planet);
+            });
+
+            this.nbSpaceStations.textContent = `${i18n.t("starMap:spaceStations")}: ${spaceStations.length}`;
+
+            const factionNames = spaceStations.map((station) => factionToString(station.faction));
+            const uniqueFactions = Array.from(new Set(factionNames));
+
+            if(uniqueFactions.length > 0) {
+                this.factions.textContent = `${i18n.t("starMap:factions")}: ${uniqueFactions.join(", ")}`;
+                this.shortHandUIFactions.textContent = `${i18n.t("starMap:factions")}: ${uniqueFactions.join(", ")}`;
+            } else {
+                this.factions.textContent = `${i18n.t("starMap:factions")}: ${i18n.t("starMap:none")}`;
+                this.shortHandUIFactions.textContent = `${i18n.t("starMap:factions")}: ${i18n.t("starMap:none")}`;
+            }
+        } else {
+            this.nbSpaceStations.textContent = `${i18n.t("starMap:spaceStations")}: 0`;
+            this.factions.textContent = `${i18n.t("starMap:factions")}: ${i18n.t("starMap:none")}`;
+            this.shortHandUIFactions.textContent = `${i18n.t("starMap:factions")}: ${i18n.t("starMap:none")}`;
+        }
+    }
+
+    detachUIFromMesh() {
+        this.selectedMesh = null;
     }
 
     dispose() {
         this.scene.dispose();
-        this.gui.dispose();
         this.htmlRoot.remove();
     }
 }

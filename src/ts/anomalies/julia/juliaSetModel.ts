@@ -105,8 +105,4 @@ export class JuliaSetModel implements PlanetModel {
     getApparentRadius(): number {
         return this.radius;
     }
-
-    getNbSpaceStations(): number {
-        return 0;
-    }
 }

@@ -49,6 +49,4 @@ export interface CelestialBodyModel extends OrbitalObjectModel {
      * The radius of the celestial body
      */
     readonly radius: number;
-
-    getNbSpaceStations(): number;
 }
