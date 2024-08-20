@@ -161,7 +161,7 @@ export class StarMap implements View {
 
         this.starMapCenterPosition = Vector3.Zero();
 
-        this.starTemplate = MeshBuilder.CreatePlane("star", { size: 0.15 }, this.scene);
+        this.starTemplate = MeshBuilder.CreatePlane("star", { size: 0.6 }, this.scene);
         this.starTemplate.billboardMode = Mesh.BILLBOARDMODE_ALL;
         this.starTemplate.isPickable = true;
         this.starTemplate.isVisible = false;
@@ -177,7 +177,7 @@ export class StarMap implements View {
         this.starTemplate.registerInstancedBuffer("color", 4); // 4 is the stride size eg. 4 floats here
         this.starTemplate.material = starMaterial;
 
-        this.blackHoleTemplate = MeshBuilder.CreatePlane("blackHole", { size: 0.2 }, this.scene);
+        this.blackHoleTemplate = MeshBuilder.CreatePlane("blackHole", { size: 0.8 }, this.scene);
         this.blackHoleTemplate.billboardMode = Mesh.BILLBOARDMODE_ALL;
         this.blackHoleTemplate.isPickable = true;
         this.blackHoleTemplate.isVisible = false;
@@ -262,8 +262,8 @@ export class StarMap implements View {
             this.updateStarSectors();
 
             // update pathfinder
-            const pathfinderMaxIterations = 1_000_000;
-            const pathfinderStepsPerFrame = 20;
+            const pathfinderMaxIterations = 50_000;
+            const pathfinderStepsPerFrame = 10;
             for (let i = 0; i < pathfinderStepsPerFrame; i++) {
                 if (!this.stellarPathfinder.hasBeenInit()) break;
                 if (this.stellarPathfinder.hasFoundPath()) break;
@@ -273,8 +273,6 @@ export class StarMap implements View {
 
                 if (this.stellarPathfinder.hasFoundPath()) {
                     const path = this.stellarPathfinder.getPath();
-                    console.log(path);
-
                     const points = path.map((seed) => {
                         return getStarGalacticCoordinates(seed);
                     });
@@ -286,10 +284,14 @@ export class StarMap implements View {
                 }
             }
 
-            //console.log(this.stellarPathfinder.getProgress(), "%");
+            if (this.stellarPathfinder.hasBeenInit() && !this.stellarPathfinder.hasFoundPath()) {
+                this.starMapUI.shortHandUIPlotItineraryButton.classList.add("loading");
+            } else {
+                this.starMapUI.shortHandUIPlotItineraryButton.classList.remove("loading");
+            }
         });
 
-        this.scene.onAfterRenderObservable.add(() => {      
+        this.scene.onAfterRenderObservable.add(() => {
             const activeCamera = this.scene.activeCamera;
             if (activeCamera === null) throw new Error("No active camera!");
             this.starMapUI.update(activeCamera.globalPosition);
@@ -459,7 +461,6 @@ export class StarMap implements View {
         this.seedToInstanceMap.set(starSystemSeed.toString(), initializedInstance);
         this.instanceToSeedMap.set(initializedInstance, starSystemSeed.toString());
 
-        initializedInstance.scaling = Vector3.One().scaleInPlace(data.scale);
         initializedInstance.position = data.position.add(this.starMapCenterPosition);
 
         if (starModel.bodyType === BodyType.STAR || starModel.bodyType === BodyType.NEUTRON_STAR) {
@@ -516,7 +517,7 @@ export class StarMap implements View {
 
         const rotationAngle = Math.acos(Vector3.Dot(cameraDir, cameraToStarDir));
 
-        const animationDurationSeconds = 1;
+        const animationDurationSeconds = 2;
 
         // if the rotation axis has a length different from 1, it means the cross product was made between very close vectors : no rotation is needed
         if (skipAnimation) {

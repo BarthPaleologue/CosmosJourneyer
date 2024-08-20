@@ -32,7 +32,6 @@ export type BuildData = {
     name: string;
     seed: SystemSeed;
     sectorString: string;
-    scale: number;
     position: Vector3;
 };
 
@@ -84,7 +83,6 @@ export class StarSector {
                 name: `starInstance|${this.coordinates.x}|${this.coordinates.y}|${this.coordinates.z}|${i}`,
                 seed: systemSeed,
                 sectorString: sectorString,
-                scale: 4.0,
                 position: this.getPositionOfStar(i)
             });
         }

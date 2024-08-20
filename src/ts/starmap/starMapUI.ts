@@ -60,6 +60,7 @@ export class StarMapUI {
 
     readonly shortHandUI: HTMLDivElement;
     readonly shortHandUITitle: HTMLHeadingElement;
+    readonly shortHandUISystemType: HTMLParagraphElement;
     readonly shortHandUIDistanceFromCurrent: HTMLParagraphElement;
     readonly shortHandUIFactions: HTMLDivElement;
     readonly shortHandUIButtonContainer: HTMLDivElement;
@@ -76,6 +77,7 @@ export class StarMapUI {
 
     constructor(scene: Scene) {
         this.scene = scene;
+        this.scene.hoverCursor = "none";
 
         this.htmlRoot = document.createElement("div");
         this.htmlRoot.classList.add("starMapUI");
@@ -116,7 +118,7 @@ export class StarMapUI {
         this.infoPanelStarPreview.classList.add("starMapInfoPanelStarPreview");
         this.infoPanel.appendChild(this.infoPanelStarPreview);
 
-        this.infoPanelTitle = document.createElement("h2");
+        this.infoPanelTitle = document.createElement("h1");
         this.infoPanelTitle.classList.add("starMapInfoPanelTitle");
         this.infoPanel.appendChild(this.infoPanelTitle);
 
@@ -130,7 +132,7 @@ export class StarMapUI {
         const hr2 = document.createElement("hr");
         this.infoPanel.appendChild(hr2);
 
-        const generalInfoTitle = document.createElement("h3");
+        const generalInfoTitle = document.createElement("h2");
         generalInfoTitle.textContent = i18n.t("starMap:generalInfo");
         this.infoPanel.appendChild(generalInfoTitle);
 
@@ -146,7 +148,7 @@ export class StarMapUI {
         this.humanPresence.classList.add("starMapInfoPanelHumanPresence");
         this.infoPanel.appendChild(this.humanPresence);
 
-        const humanPresenceTitle = document.createElement("h3");
+        const humanPresenceTitle = document.createElement("h2");
         humanPresenceTitle.textContent = i18n.t("starMap:humanPresence");
         this.humanPresence.appendChild(humanPresenceTitle);
 
@@ -168,6 +170,9 @@ export class StarMapUI {
 
         this.shortHandUITitle = document.createElement("h2");
         this.shortHandUI.appendChild(this.shortHandUITitle);
+
+        this.shortHandUISystemType = document.createElement("p");
+        this.shortHandUI.appendChild(this.shortHandUISystemType);
 
         this.shortHandUIDistanceFromCurrent = document.createElement("p");
         this.shortHandUI.appendChild(this.shortHandUIDistanceFromCurrent);
@@ -206,10 +211,7 @@ export class StarMapUI {
         const scalingBase = 100;
         const minScale = 5.0;
         if (this.selectedMesh !== null) {
-            this.shortHandUI.style.visibility = "visible";
             const selectedMeshScreenCoordinates = Vector3.Project(this.selectedMesh.position, Matrix.IdentityReadOnly, camera.getTransformationMatrix(), camera.viewport);
-            this.shortHandUI.style.transform = `translate(calc(${(selectedMeshScreenCoordinates.x * width).toFixed(0)}px + 50px), calc(${(selectedMeshScreenCoordinates.y * height).toFixed(0)}px - 50%))`;
-
             this.selectedSystemCursor.classList.toggle("transparent", selectedMeshScreenCoordinates.z < 0);
             this.selectedSystemCursorContainer.style.left = `${selectedMeshScreenCoordinates.x * 100}vw`;
             this.selectedSystemCursorContainer.style.top = `${selectedMeshScreenCoordinates.y * 100}vh`;
@@ -217,6 +219,12 @@ export class StarMapUI {
             const distance = Vector3.Distance(this.selectedMesh.getAbsolutePosition(), playerPosition);
             const scale = Math.max(minScale, scalingBase / distance);
             this.selectedSystemCursorContainer.style.setProperty("--dim", `${scale}vh`);
+
+            const xOffsetBase = 500;
+            const minXOffset = 25;
+            const xOffset = Math.max(minXOffset, xOffsetBase / distance);
+            this.shortHandUI.style.visibility = selectedMeshScreenCoordinates.z >= 0 ? "visible" : "hidden";
+            this.shortHandUI.style.transform = `translate(calc(${(selectedMeshScreenCoordinates.x * width).toFixed(0)}px + ${xOffset}px), calc(${(selectedMeshScreenCoordinates.y * height).toFixed(0)}px - 50%))`;
         } else {
             this.shortHandUI.style.visibility = "hidden";
             this.selectedSystemCursor.classList.add("transparent");
@@ -311,9 +319,8 @@ export class StarMapUI {
         if (starModel.bodyType === BodyType.BLACK_HOLE) typeString = i18n.t("objectTypes:blackHole");
         else if (starModel.bodyType === BodyType.NEUTRON_STAR) typeString = i18n.t("objectTypes:neutronStar");
         else typeString = i18n.t("objectTypes:star", { stellarType: getStellarTypeString(starModel.stellarType) });
-        text += `${typeString}\n`;
 
-        text += `${i18n.t("starMap:planets")}: ${targetSystemModel.getNbPlanets()}\n`;
+        this.shortHandUISystemType.textContent = typeString;
 
         if (starModel instanceof StarModel) {
             this.infoPanelStarPreview.style.background = starModel.color.toHexString();
@@ -340,8 +347,13 @@ export class StarMapUI {
             const factionNames = spaceStations.map((station) => factionToString(station.faction));
             const uniqueFactions = Array.from(new Set(factionNames));
 
-            this.factions.textContent = `${i18n.t("starMap:factions")}: ${uniqueFactions.join(", ")}`;
-            this.shortHandUIFactions.textContent = `${i18n.t("starMap:factions")}: ${uniqueFactions.join(", ")}`;
+            if(uniqueFactions.length > 0) {
+                this.factions.textContent = `${i18n.t("starMap:factions")}: ${uniqueFactions.join(", ")}`;
+                this.shortHandUIFactions.textContent = `${i18n.t("starMap:factions")}: ${uniqueFactions.join(", ")}`;
+            } else {
+                this.factions.textContent = `${i18n.t("starMap:factions")}: ${i18n.t("starMap:none")}`;
+                this.shortHandUIFactions.textContent = `${i18n.t("starMap:factions")}: ${i18n.t("starMap:none")}`;
+            }
         } else {
             this.nbSpaceStations.textContent = `${i18n.t("starMap:spaceStations")}: 0`;
             this.factions.textContent = `${i18n.t("starMap:factions")}: ${i18n.t("starMap:none")}`;

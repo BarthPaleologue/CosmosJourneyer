@@ -8,11 +8,10 @@
   translate: -50% -50%;
   pointer-events: none;
 
-
   .targetCursor {
-    --s: max(15px, calc(var(--dim) * 0.4)); /* the size on the corner */
-    --t: 3px;  /* the thickness of the border */
-    --g: 10px; /* the gap between the border and image */
+    --s: max(2.0vmin, calc(var(--dim) * 0.4)); /* the size on the corner */
+    --t: 0.4vmin;  /* the thickness of the border */
+    --g: 1.3vmin; /* the gap between the border and image */
 
     padding: calc(var(--g) + var(--t));
 
@@ -66,10 +65,11 @@
 
     p {
       margin-block: 0;
+      font-size: var(--text-size);
 
       &.targetCursorName {
         font-weight: bold;
-        font-size: 1.5em;
+        font-size: calc(1.5 * var(--text-size));
       }
     }
   }
