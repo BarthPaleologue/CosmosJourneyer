@@ -202,7 +202,7 @@ export class PostProcessManager {
         this.renderingPipeline = new PostProcessRenderPipeline(scene.getEngine(), "renderingPipeline");
         this.renderingPipelineManager.addPipeline(this.renderingPipeline);
 
-        this.bloomRenderEffect = new BloomEffect(scene, 1.0, 1.0, 64);
+        this.bloomRenderEffect = new BloomEffect(scene, 1.0, 0.3, 64);
         this.bloomRenderEffect.threshold = 0.5;
     }
 
