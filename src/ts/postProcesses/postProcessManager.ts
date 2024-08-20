@@ -53,6 +53,7 @@ import { JuliaSet } from "../anomalies/julia/juliaSet";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import { BloomEffect } from "@babylonjs/core/PostProcesses/bloomEffect";
 
 /**
  * The order in which the post processes are rendered when away from a planet
@@ -176,7 +177,7 @@ export class PostProcessManager {
      */
     readonly fxaaRenderEffect: PostProcessRenderEffect;
 
-    //readonly bloomRenderEffect: BloomEffect;
+    readonly bloomRenderEffect: BloomEffect;
 
     constructor(scene: UberScene) {
         this.scene = scene;
@@ -201,8 +202,8 @@ export class PostProcessManager {
         this.renderingPipeline = new PostProcessRenderPipeline(scene.getEngine(), "renderingPipeline");
         this.renderingPipelineManager.addPipeline(this.renderingPipeline);
 
-        //this.bloomRenderEffect = new BloomEffect(scene, 1.0, 2.0, 32);
-        //this.bloomRenderEffect.threshold = 0.7;
+        this.bloomRenderEffect = new BloomEffect(scene, 1.0, 1.0, 64);
+        this.bloomRenderEffect.threshold = 0.5;
     }
 
     /**
@@ -444,6 +445,7 @@ export class PostProcessManager {
         const lensFlareRenderEffect = new PostProcessRenderEffect(this.engine, "LensFlareRenderEffect", () => this.lensFlares);
 
         this.renderingPipeline.addEffect(shadowRenderEffect);
+        this.renderingPipeline.addEffect(this.bloomRenderEffect);
 
         for (const postProcessType of this.currentRenderingOrder) {
             switch (postProcessType) {
@@ -523,7 +525,6 @@ export class PostProcessManager {
 
         this.renderingPipeline.addEffect(lensFlareRenderEffect);
         this.renderingPipeline.addEffect(this.fxaaRenderEffect);
-        //this.renderingPipeline.addEffect(this.bloomRenderEffect);
         this.renderingPipeline.addEffect(this.colorCorrectionRenderEffect);
 
         this.renderingPipelineManager.addPipeline(this.renderingPipeline);
