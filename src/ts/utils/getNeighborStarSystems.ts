@@ -7,7 +7,7 @@ import { StarSector } from "../starmap/starSector";
  * Finds all systems within a given radius of the given system.
  * @param seed The seed of the system.
  * @param radius The radius of the search in light years.
- * @returns An array of tuples containing the seed of the system, the galactic coordinates of the system, and the distance to the system.
+ * @returns An array of tuples containing the seed of the system, the galactic coordinates of the system, and the distance to the system in light years.
  */
 export function getNeighborStarSystems(seed: SystemSeed, radius: number): [SystemSeed, Vector3, number][] {
     const currentSystemCoordinates = getStarGalacticCoordinates(seed);

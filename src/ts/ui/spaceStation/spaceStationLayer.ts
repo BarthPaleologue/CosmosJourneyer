@@ -20,10 +20,12 @@ import { SpaceStationModel } from "../../spacestation/spacestationModel";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { generateInfoHTML } from "./spaceStationInfos";
 import { Player } from "../../player/player";
+import { generateMissionsHTML } from "./spaceStationMissions";
 
 const enum MainPanelState {
     NONE,
-    INFO
+    INFO,
+    MISSIONS,
 }
 
 export class SpaceStationLayer {
@@ -36,6 +38,8 @@ export class SpaceStationLayer {
     private readonly playerBalance: HTMLElement;
 
     private readonly mainPanel: HTMLElement;
+
+    private readonly missionsButton: HTMLElement;
 
     private readonly infoButton: HTMLElement;
 
@@ -56,6 +60,15 @@ export class SpaceStationLayer {
         this.playerBalance = document.querySelector<HTMLElement>("#spaceStationUI .playerBalance") as HTMLElement;
 
         this.mainPanel = document.querySelector<HTMLElement>("#spaceStationUI .mainContainer") as HTMLElement;
+
+        const missionsButton = document.querySelector<HTMLElement>(".spaceStationAction.missionsButton");
+        if (missionsButton === null) {
+            throw new Error("Missions button not found");
+        }
+        this.missionsButton = missionsButton;
+        this.missionsButton.addEventListener("click", () => {
+            this.setMainPanelState(MainPanelState.MISSIONS);
+        });
 
         const infoButton = document.querySelector<HTMLElement>(".spaceStationAction.infoButton");
         if (infoButton === null) {
@@ -90,6 +103,13 @@ export class SpaceStationLayer {
                 }
                 this.mainPanel.classList.remove("hidden");
                 this.mainPanel.innerHTML = generateInfoHTML(this.currentStation);
+                break;
+            case MainPanelState.MISSIONS:
+                if(this.currentStation === null) {
+                    throw new Error("No current station");
+                }
+                this.mainPanel.classList.remove("hidden");
+                this.mainPanel.innerHTML = generateMissionsHTML(this.currentStation);
                 break;
             case MainPanelState.NONE:
                 this.mainPanel.classList.add("hidden");
