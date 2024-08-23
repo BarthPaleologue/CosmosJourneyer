@@ -1,12 +1,11 @@
 import { SpaceStationModel } from "../../spacestation/spacestationModel";
 import { getNeighborStarSystems } from "../../utils/getNeighborStarSystems";
 import { SeededStarSystemModel } from "../../starSystem/seededStarSystemModel";
-import { placeSpaceStations } from "../../society/spaceStationPlacement";
-import { getSpaceStationSeed } from "../../planets/common";
 import { parseDistance } from "../../utils/parseToStrings";
 import { Settings } from "../../settings";
 import { uniformRandBool } from "extended-random";
 import { BodyType } from "../../architecture/bodyType";
+import { getSpaceStationModels } from "../../utils/getSpaceStationModels";
 
 export function generateMissionsHTML(stationModel: SpaceStationModel) {
     const starSystem = stationModel.starSystem;
@@ -34,9 +33,8 @@ export function generateMissionsHTML(stationModel: SpaceStationModel) {
             systemsWithBlackHoles.push([systemModel, distance]);
         }
 
-        const spaceStationParents = placeSpaceStations(systemModel);
-        const spaceStations = spaceStationParents.map<[SpaceStationModel, number]>((planet) => {
-            return [new SpaceStationModel(getSpaceStationSeed(planet, 0), systemModel, planet), distance];
+        const spaceStations = getSpaceStationModels(systemModel).map<[SpaceStationModel, number]>((stationModel) => {
+            return [stationModel, distance];
         });
         neighborSpaceStations = neighborSpaceStations.concat(spaceStations);
     });

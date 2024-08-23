@@ -29,11 +29,9 @@ import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel
 import { BodyType } from "../architecture/bodyType";
 import { getStarGalacticCoordinates } from "../utils/getStarGalacticCoordinates";
 import { parseDistance } from "../utils/parseToStrings";
-import { placeSpaceStations } from "../society/spaceStationPlacement";
-import { SpaceStationModel } from "../spacestation/spacestationModel";
-import { getSpaceStationSeed } from "../planets/common";
 import { factionToString } from "../powerplay/factions";
 import { isSystemInHumanBubble } from "../society/starSystemSociety";
+import { getSpaceStationModels } from "../utils/getSpaceStationModels";
 
 export class StarMapUI {
     readonly htmlRoot: HTMLDivElement;
@@ -337,10 +335,7 @@ export class StarMapUI {
         this.distanceToSol.textContent = `${i18n.t("starMap:distanceToSol")}: ${Vector3.Distance(targetCoordinates, Vector3.Zero()).toFixed(1)} ${i18n.t("units:ly")}`;
 
         if (isSystemInHumanBubble(targetSystemModel.seed)) {
-            const spaceStationParents = placeSpaceStations(targetSystemModel);
-            const spaceStations = spaceStationParents.map((planet) => {
-                return new SpaceStationModel(getSpaceStationSeed(planet, 0), targetSystemModel, planet);
-            });
+            const spaceStations = getSpaceStationModels(targetSystemModel);
 
             this.nbSpaceStations.textContent = `${i18n.t("starMap:spaceStations")}: ${spaceStations.length}`;
 
