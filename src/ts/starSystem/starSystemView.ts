@@ -97,7 +97,7 @@ export class StarSystemView implements View {
 
     private isUiEnabled = true;
 
-    private player: Player = Player.Default();
+    private readonly player: Player;
 
     /**
      * A debug HTML UI to change the properties of the closest celestial body
@@ -179,10 +179,13 @@ export class StarSystemView implements View {
     /**
      * Creates an empty star system view with a scene, a gui and a havok plugin
      * To fill it with a star system, use `loadStarSystem` and then `initStarSystem`
+     * @param player The player object shared with the rest of the game
      * @param engine The BabylonJS engine
      * @param havokInstance The Havok physics instance
      */
-    constructor(engine: AbstractEngine, havokInstance: HavokPhysicsWithBindings) {
+    constructor(player: Player, engine: AbstractEngine, havokInstance: HavokPhysicsWithBindings) {
+        this.player = player;
+
         this.spaceShipLayer = new SpaceShipLayer();
         this.bodyEditor = new BodyEditor(EditorVisibility.HIDDEN);
 
@@ -450,7 +453,7 @@ export class StarSystemView implements View {
                 await wait(timeOut);
             }
         }
-        
+
         // Anomalies
         for (let i = 0; i < systemModel.getNbAnomalies(); i++) {
             console.log("Anomaly:", i + 1, "of", systemModel.getNbAnomalies());
@@ -555,10 +558,6 @@ export class StarSystemView implements View {
         this.characterControls.getActiveCameras().forEach((camera) => (camera.maxZ = maxZ));
 
         this.scene.setActiveControls(this.spaceshipControls);
-    }
-
-    public setPlayer(player: Player) {
-        this.player = player;
     }
 
     /**

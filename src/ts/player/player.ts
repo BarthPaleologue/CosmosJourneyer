@@ -47,4 +47,12 @@ export class Player {
             systemBookmarks: player.systemBookmarks.map((seed) => seed.serialize())
         };
     }
+
+    public copyFrom(player: Player) {
+        this.name = player.name;
+        this.balance = player.balance;
+        this.creationDate = player.creationDate;
+        this.currentItinerary = player.currentItinerary;
+        this.systemBookmarks = player.systemBookmarks;
+    }
 }

@@ -70,7 +70,7 @@ export class StarMap implements View {
     private translationAnimation: TransformTranslationAnimation | null = null;
     private radiusAnimation: CameraRadiusAnimation | null = null;
 
-    private player: Player = Player.Default();
+    private readonly player: Player;
 
     /**
      * The position of the center of the starmap in world space.
@@ -124,7 +124,7 @@ export class StarMap implements View {
     private static readonly SHIMMER_ANIMATION = new Animation("shimmer", "instancedBuffers.color.a", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
     private static readonly SHIMMER_DURATION = 1000;
 
-    constructor(engine: AbstractEngine) {
+    constructor(player: Player, engine: AbstractEngine) {
         this.scene = new Scene(engine);
         this.scene.clearColor = new Color4(0, 0, 0, 1);
         this.scene.useRightHandedSystem = true;
@@ -133,6 +133,8 @@ export class StarMap implements View {
         this.controls.getActiveCameras().forEach((camera) => (camera.minZ = 0.01));
 
         this.controls.getActiveCameras()[0].attachControl();
+
+        this.player = player;
 
         this.backgroundMusic = new AudioInstance(Sounds.STAR_MAP_BACKGROUND_MUSIC, AudioMasks.STAR_MAP_VIEW, 1, false, null);
         AudioManager.RegisterSound(this.backgroundMusic);
@@ -276,11 +278,10 @@ export class StarMap implements View {
                 if (this.stellarPathfinder.hasFoundPath()) {
                     Sounds.TARGET_LOCK_SOUND.play();
                     const path = this.stellarPathfinder.getPath();
-                    const points = path.map((seed) => {
-                        return getStarGalacticCoordinates(seed);
-                    });
+                    this.drawPath(path);
 
-                    this.travelLine.setPoints(points);
+                    this.player.currentItinerary = path;
+
                     this.onTargetSetObservable.notifyObservers(path[1]);
                 } else if (this.stellarPathfinder.getNbIterations() >= pathfinderMaxIterations) {
                     createNotification(`Could not find a path to the target system after ${pathfinderMaxIterations} iterations`, 5000);
@@ -299,6 +300,13 @@ export class StarMap implements View {
             if (activeCamera === null) throw new Error("No active camera!");
             this.starMapUI.update(activeCamera.globalPosition);
         });
+    }
+
+    private drawPath(path: SystemSeed[]) {
+        const points = path.map((seed) => {
+            return getStarGalacticCoordinates(seed);
+        });
+        this.travelLine.setPoints(points);
     }
 
     private acknowledgeCameraMovement() {
@@ -560,7 +568,6 @@ export class StarMap implements View {
     }
 
     public focusOnCurrentSystem(skipAnimation = false) {
-        console.log("focus on current system");
         if (this.currentSystemSeed === null) return console.warn("No current system seed!");
 
         const instance = this.seedToInstanceMap.get(this.currentSystemSeed.toString());
@@ -605,6 +612,7 @@ export class StarMap implements View {
     public attachControl() {
         this.scene.attachControl();
         this.starMapUI.htmlRoot.classList.remove("hidden");
+        this.drawPath(this.player.currentItinerary);
     }
 
     public detachControl() {
@@ -614,9 +622,5 @@ export class StarMap implements View {
 
     public getMainScene(): Scene {
         return this.scene;
-    }
-
-    public setPlayer(player: Player) {
-        this.player = player;
     }
 }

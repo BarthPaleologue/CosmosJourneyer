@@ -84,13 +84,16 @@ export class CosmosJourneyer {
 
     private videoRecorder: VideoRecorder | null = null;
 
-    private player: Player = Player.Default();
+    private readonly player: Player;
 
-    private constructor(engine: AbstractEngine, starSystemView: StarSystemView, starMap: StarMap) {
+    private constructor(player: Player, engine: AbstractEngine, starSystemView: StarSystemView) {
         this.engine = engine;
+        this.player = player;
 
         this.starSystemView = starSystemView;
-        this.starMap = starMap;
+
+        // Init starmap view
+        this.starMap = new StarMap(this.player, this.engine);
         this.starMap.onTargetSetObservable.add((seed: SystemSeed) => {
             this.starSystemView.setSystemAsTarget(seed);
         });
@@ -221,15 +224,14 @@ export class CosmosJourneyer {
         const havokInstance = await HavokPhysics();
         console.log(`Havok initialized`);
 
+        const player = Player.Default();
+
         // Init star system view
-        const starSystemView = new StarSystemView(engine, havokInstance);
+        const starSystemView = new StarSystemView(player, engine, havokInstance);
 
         await starSystemView.initAssets();
 
-        // Init starmap view
-        const starMap = new StarMap(engine);
-
-        return new CosmosJourneyer(engine, starSystemView, starMap);
+        return new CosmosJourneyer(player, engine, starSystemView);
     }
 
     public pause(): void {
@@ -391,14 +393,8 @@ export class CosmosJourneyer {
      * @param saveData The save file data to load
      */
     public async loadSaveData(saveData: SaveFileData): Promise<void> {
-        if (saveData.player !== undefined) {
-            this.player = Player.Deserialize(saveData.player);
-        } else {
-            this.player = Player.Default();
-        }
-
-        this.starSystemView.setPlayer(this.player);
-        this.starMap.setPlayer(this.player);
+        const newPlayer = saveData.player !== undefined ? Player.Deserialize(saveData.player) : Player.Default();
+        this.player.copyFrom(newPlayer);
 
         await this.loadUniverseCoordinates(saveData.universeCoordinates);
 
