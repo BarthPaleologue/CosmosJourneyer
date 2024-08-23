@@ -151,36 +151,8 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
     }
 
     private generate() {
-        // find distance to star
-        let distanceToStar = this.model.orbit.radius;
-        let parent = this.parent;
-        let stellarObject: StellarObject | null = null;
-        while (parent !== null) {
-            if (parent.parent === null) {
-                stellarObject = parent as StellarObject;
-                break;
-            }
-            distanceToStar += parent.getOrbitProperties().radius;
-            parent = parent.parent;
-        }
-
-        if (stellarObject === null) {
-            throw new Error("No stellar object found");
-        }
-
-        const starRadius = stellarObject.model.radius;
-        const starTemperature = stellarObject.model.temperature;
-        const energyRequirement = this.model.population * this.model.energyConsumptionPerCapita;
-
-        const solarPanelSurface = getSolarPanelSurfaceFromEnergyRequirement(0.4, distanceToStar, starTemperature, starRadius, energyRequirement, 0.5);
-
-        let habitatSurfaceHa = (100 * this.model.population) / this.model.populationDensity;
-        this.model.agricultureMix.forEach(([fraction, cropType]) => {
-            habitatSurfaceHa +=
-                (fraction * this.model.population * Settings.INDIVIDUAL_AVERAGE_DAILY_INTAKE) /
-                (Settings.HYDROPONIC_TO_CONVENTIONAL_RATIO * this.model.nbHydroponicLayers * getEdibleEnergyPerHaPerDay(cropType));
-        });
-        const habitatSurface = habitatSurfaceHa * 1000;
+        const solarPanelSurface = this.model.solarPanelSurfaceM2;
+        const habitatSurface = this.model.totalHabitatSurfaceM2;
 
         const engineBay = new EngineBay(this.scene);
         engineBay.getTransform().parent = this.getTransform();

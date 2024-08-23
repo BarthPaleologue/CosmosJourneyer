@@ -25,13 +25,19 @@ import { CelestialBodyModel } from "../architecture/celestialBody";
 import { normalRandom, uniformRandBool } from "extended-random";
 import { clamp } from "../utils/math";
 import { GenerationSteps } from "../utils/generationSteps";
-import { CropType, CropTypes } from "../utils/agriculture";
+import { CropType, CropTypes, getEdibleEnergyPerHaPerDay } from "../utils/agriculture";
 import { randomPieChart } from "../utils/random";
 import { generateSpaceStationName } from "../utils/spaceStationNameGenerator";
 import { StarSystemModel } from "../starSystem/starSystemModel";
 import { Faction } from "../powerplay/factions";
 import { getPowerPlayData } from "../powerplay/powerplay";
 import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
+import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
+import { BodyType } from "../architecture/bodyType";
+import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
+import { StarModel } from "../stellarObjects/star/starModel";
+import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
+import { Settings } from "../settings";
 
 export class SpaceStationModel implements OrbitalObjectModel {
     readonly name: string;
@@ -47,7 +53,11 @@ export class SpaceStationModel implements OrbitalObjectModel {
     readonly childrenBodies: OrbitalObjectModel[] = [];
 
     readonly population: number;
-    readonly energyConsumptionPerCapita: number;
+
+    /**
+     * The average energy consumption of a citizen of the habitat in KWh
+     */
+    readonly energyConsumptionPerCapitaKWh: number;
 
     /**
      * The number of inhabitants per square kilometer in the habitat
@@ -59,6 +69,21 @@ export class SpaceStationModel implements OrbitalObjectModel {
     readonly nbHydroponicLayers: number;
 
     readonly faction: Faction;
+
+    /**
+     * The total energy consumption of the habitat in KWh
+     */
+    readonly totalEnergyConsumptionKWh: number;
+    readonly solarPanelEfficiency = 0.4;
+
+    /**
+     * The surface of solar panels in m²
+     */
+    readonly solarPanelSurfaceM2: number;
+
+    readonly housingSurfaceHa: number;
+    readonly agricultureSurfaceHa: number;
+    readonly totalHabitatSurfaceM2: number;
 
     constructor(seed: number, starSystemModel: StarSystemModel, parentBody?: CelestialBodyModel) {
         this.seed = seed;
@@ -88,7 +113,12 @@ export class SpaceStationModel implements OrbitalObjectModel {
         };
 
         const powerplayData =
-            this.starSystem instanceof SeededStarSystemModel ? getPowerPlayData(this.starSystem.seed) : { materialistSpiritualist: 0.5, capitalistCommunist: 0.5 };
+            this.starSystem instanceof SeededStarSystemModel
+                ? getPowerPlayData(this.starSystem.seed)
+                : {
+                      materialistSpiritualist: 0.5,
+                      capitalistCommunist: 0.5
+                  };
 
         const isMaterialist = uniformRandBool(powerplayData.materialistSpiritualist, this.rng, 249);
         const isCapitalist = uniformRandBool(powerplayData.capitalistCommunist, this.rng, 498);
@@ -105,7 +135,7 @@ export class SpaceStationModel implements OrbitalObjectModel {
 
         //TODO: make this dependent on economic model
         this.population = 2_000_000;
-        this.energyConsumptionPerCapita = 40_000;
+        this.energyConsumptionPerCapitaKWh = 40_000;
 
         this.populationDensity = 4_000;
 
@@ -113,5 +143,47 @@ export class SpaceStationModel implements OrbitalObjectModel {
         this.agricultureMix = mix.map((proportion, index) => [proportion, CropTypes[index]]);
 
         this.nbHydroponicLayers = 10;
+
+        const starModelBuildInfo = starSystemModel.getStellarObjects()[0];
+        let starModel;
+        switch (starModelBuildInfo[0]) {
+            case BodyType.NEUTRON_STAR:
+                starModel = new NeutronStarModel(starModelBuildInfo[1], starSystemModel);
+                break;
+            case BodyType.BLACK_HOLE:
+                starModel = new BlackHoleModel(starModelBuildInfo[1], starSystemModel);
+                break;
+            case BodyType.STAR:
+                starModel = new StarModel(starModelBuildInfo[1], starSystemModel);
+                break;
+            default:
+                throw new Error("Unknown star type");
+        }
+
+        // find distance to star
+        const distanceToStar = this.parentBody ? this.parentBody?.orbit.radius : 0;
+
+        const starRadius = starModel.radius;
+        const starTemperature = starModel.temperature;
+        this.totalEnergyConsumptionKWh = this.population * this.energyConsumptionPerCapitaKWh;
+
+        this.solarPanelSurfaceM2 = getSolarPanelSurfaceFromEnergyRequirement(
+            this.solarPanelEfficiency,
+            distanceToStar,
+            starTemperature,
+            starRadius,
+            this.totalEnergyConsumptionKWh,
+            0.5
+        );
+
+        this.housingSurfaceHa = (100 * this.population) / this.populationDensity; // convert km² to ha
+        let agricultureSurfaceHa = 0;
+        this.agricultureMix.forEach(([fraction, cropType]) => {
+            agricultureSurfaceHa +=
+                (fraction * this.population * Settings.INDIVIDUAL_AVERAGE_DAILY_INTAKE) /
+                (Settings.HYDROPONIC_TO_CONVENTIONAL_RATIO * this.nbHydroponicLayers * getEdibleEnergyPerHaPerDay(cropType));
+        });
+        this.agricultureSurfaceHa = agricultureSurfaceHa;
+        this.totalHabitatSurfaceM2 = (this.housingSurfaceHa + this.agricultureSurfaceHa) * 1000; // convert ha to m²
     }
 }
