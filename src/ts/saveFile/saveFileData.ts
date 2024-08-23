@@ -1,4 +1,5 @@
 import { isJsonStringValidUniverseCoordinates, UniverseCoordinates } from "./universeCoordinates";
+import { SerializedPlayer } from "../player/player";
 
 /**
  * Data structure for the save file to allow restoring current star system and position.
@@ -8,6 +9,11 @@ export type SaveFileData = {
      * The version of CosmosJourneyer that created this save file.
      */
     version: string;
+
+    /**
+     * The player data.
+     */
+    player: SerializedPlayer;
 
     /**
      * The coordinates of the current star system and the coordinates inside the star system.

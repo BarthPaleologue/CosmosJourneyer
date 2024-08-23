@@ -36,7 +36,6 @@ import { SaveFileData } from "./saveFile/saveFileData";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { setRotationQuaternion } from "./uberCore/transforms/basicTransform";
-import { ShipControls } from "./spaceship/shipControls";
 import { encodeBase64 } from "./utils/base64";
 import { UniverseCoordinates } from "./saveFile/universeCoordinates";
 import { View } from "./utils/view";
@@ -45,8 +44,6 @@ import { AudioManager } from "./audio/audioManager";
 import { AudioMasks } from "./audio/audioMasks";
 import { GeneralInputs } from "./inputs/generalInputs";
 import { createNotification } from "./utils/notification";
-import { StarSystemInputs } from "./inputs/starSystemInputs";
-import { pressInteractionToStrings } from "./utils/inputControlsString";
 import { LoadingScreen } from "./uberCore/loadingScreen";
 import i18n from "./i18n";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
@@ -56,7 +53,7 @@ import { FlightTutorial } from "./tutorials/flightTutorial";
 import { SidePanels } from "./ui/sidePanels";
 import { Settings } from "./settings";
 import { SeededStarSystemModel } from "./starSystem/seededStarSystemModel";
-import { CustomStarSystemModel } from "./starSystem/customStarSystemModel";
+import { Player } from "./player/player";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -86,6 +83,8 @@ export class CosmosJourneyer {
     private state = EngineState.UNINITIALIZED;
 
     private videoRecorder: VideoRecorder | null = null;
+
+    private player: Player = Player.Default();
 
     private constructor(engine: AbstractEngine, starSystemView: StarSystemView, starMap: StarMap) {
         this.engine = engine;
@@ -357,6 +356,7 @@ export class CosmosJourneyer {
 
         return {
             version: projectInfo.version,
+            player: Player.Serialize(this.player),
             universeCoordinates: {
                 starSystem: seed.serialize(),
                 orbitalObjectIndex: nearestOrbitalObjectIndex,
@@ -391,6 +391,12 @@ export class CosmosJourneyer {
      * @param saveData The save file data to load
      */
     public async loadSaveData(saveData: SaveFileData): Promise<void> {
+        if (saveData.player !== undefined) {
+            this.player = Player.Deserialize(saveData.player);
+        } else {
+            this.player = Player.Default();
+        }
+
         await this.loadUniverseCoordinates(saveData.universeCoordinates);
 
         if (saveData.padNumber !== undefined) {
