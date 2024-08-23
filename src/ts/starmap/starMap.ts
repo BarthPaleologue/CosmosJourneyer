@@ -272,6 +272,7 @@ export class StarMap implements View {
                 this.stellarPathfinder.update();
 
                 if (this.stellarPathfinder.hasFoundPath()) {
+                    Sounds.TARGET_LOCK_SOUND.play();
                     const path = this.stellarPathfinder.getPath();
                     const points = path.map((seed) => {
                         return getStarGalacticCoordinates(seed);
