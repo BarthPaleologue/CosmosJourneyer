@@ -156,9 +156,9 @@ export class StarMapUI {
         this.nbSpaceStations.classList.add("starMapInfoPanelNbSpaceStations");
         this.humanPresence.appendChild(this.nbSpaceStations);
 
-        this.factions = document.createElement("div");
+        this.factions = document.createElement("p");
         this.factions.classList.add("starMapInfoPanelFactions");
-        this.infoPanel.appendChild(this.factions);
+        this.humanPresence.appendChild(this.factions);
 
         this.cursor = document.createElement("div");
         this.cursor.classList.add("cursor");
