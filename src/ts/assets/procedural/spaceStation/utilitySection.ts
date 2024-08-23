@@ -24,9 +24,11 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Objects } from "../../objects";
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { AbstractMesh, PhysicsAggregate, PhysicsShapeType } from "@babylonjs/core";
 import { CollisionMask } from "../../../settings";
 import { seededSquirrelNoise } from "squirrel-noise";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 
 export class UtilitySection implements Transformable {
     private readonly attachment: Mesh;

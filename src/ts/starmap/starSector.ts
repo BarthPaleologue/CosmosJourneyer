@@ -32,7 +32,6 @@ export type BuildData = {
     name: string;
     seed: SystemSeed;
     sectorString: string;
-    scale: number;
     position: Vector3;
 };
 
@@ -84,7 +83,6 @@ export class StarSector {
                 name: `starInstance|${this.coordinates.x}|${this.coordinates.y}|${this.coordinates.z}|${i}`,
                 seed: systemSeed,
                 sectorString: sectorString,
-                scale: 4.0,
                 position: this.getPositionOfStar(i)
             });
         }
@@ -96,6 +94,14 @@ export class StarSector {
         return new Vector3(centeredRand(this.rng, 10 * starIndex + 1) / 2, centeredRand(this.rng, 10 * starIndex + 2) / 2, centeredRand(this.rng, 10 * starIndex + 3) / 2)
             .scaleInPlace(StarSector.SIZE)
             .addInPlace(this.position);
+    }
+
+    getPositionOfStars(): Vector3[] {
+        const positions: Vector3[] = [];
+        for (let i = 0; i < this.nbStars; i++) {
+            positions.push(this.getPositionOfStar(i));
+        }
+        return positions;
     }
 
     /**

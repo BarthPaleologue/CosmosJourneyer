@@ -93,17 +93,7 @@ export class CosmosJourneyer {
         this.starSystemView = starSystemView;
         this.starMap = starMap;
         this.starMap.onTargetSetObservable.add((seed: SystemSeed) => {
-            this.toggleStarMap();
-
-            const activeControls = this.starSystemView.scene.getActiveControls();
-            if (activeControls instanceof ShipControls) {
-                activeControls.thirdPersonCamera.radius = ShipControls.BASE_CAMERA_RADIUS;
-            }
-
             this.starSystemView.setSystemAsTarget(seed);
-
-            const bindingsString = pressInteractionToStrings(StarSystemInputs.map.jumpToSystem).join(" or ");
-            createNotification(i18n.t("notifications:howToHyperSpace", { bindingsString: bindingsString }), 20000);
         });
 
         // Init the active scene
@@ -309,12 +299,11 @@ export class CosmosJourneyer {
 
     /**
      * Takes a screenshot of the current scene. By default, the screenshot is taken at a 4x the resolution of the canvas
-     * @param precision The resolution multiplier of the screenshot
      */
-    public takeScreenshot(precision = 4): void {
+    public takeScreenshot(): void {
         const camera = this.activeView.getMainScene().activeCamera;
         if (camera === null) throw new Error("Cannot take screenshot: camera is null");
-        Tools.CreateScreenshot(this.engine, camera, { precision: precision });
+        Tools.CreateScreenshot(this.engine, camera, { precision: 1 });
     }
 
     public takeVideoCapture(): void {

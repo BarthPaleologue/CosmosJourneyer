@@ -41,7 +41,7 @@ export class Assets {
             Materials.Init(scene);
 
             Objects.BUTTERFLY.material = Materials.BUTTERFLY_MATERIAL;
-            Objects.GRASS_BLADE.material = Materials.GRASS_MATERIAL;
+            Objects.GRASS_BLADES.forEach((grassBlade) => (grassBlade.material = Materials.GRASS_MATERIAL));
             Objects.CRATE.material = Materials.CRATE_MATERIAL;
 
             console.log("Assets loaded");

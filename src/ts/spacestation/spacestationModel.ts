@@ -87,7 +87,8 @@ export class SpaceStationModel implements OrbitalObjectModel {
             axialTilt: 2 * this.rng(GenerationSteps.AXIAL_TILT) * Math.PI
         };
 
-        const powerplayData = this.starSystem instanceof SeededStarSystemModel ? getPowerPlayData(this.starSystem.seed) : { materialistSpiritualist: 0.5, capitalistCommunist: 0.5 };
+        const powerplayData =
+            this.starSystem instanceof SeededStarSystemModel ? getPowerPlayData(this.starSystem.seed) : { materialistSpiritualist: 0.5, capitalistCommunist: 0.5 };
 
         const isMaterialist = uniformRandBool(powerplayData.materialistSpiritualist, this.rng, 249);
         const isCapitalist = uniformRandBool(powerplayData.capitalistCommunist, this.rng, 498);

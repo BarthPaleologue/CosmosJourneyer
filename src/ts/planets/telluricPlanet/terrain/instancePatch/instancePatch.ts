@@ -23,14 +23,15 @@ import { decomposeModelMatrix } from "./matrixBuffer";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
 export class InstancePatch implements IPatch {
-    private baseMesh: Mesh | null = null;
-
     readonly parent: TransformNode;
 
     readonly instances: InstancedMesh[] = [];
     private positions: Vector3[] = [];
     private rotations: Quaternion[] = [];
     private scalings: Vector3[] = [];
+
+    private currentLod: { mesh: Mesh; lodIndex: number } | null = null;
+    private readonly lods: { mesh: Mesh; distance: number }[] = [];
 
     constructor(parent: TransformNode, matrixBuffer: Float32Array) {
         this.parent = parent;
@@ -50,31 +51,39 @@ export class InstancePatch implements IPatch {
     }
 
     public clearInstances(): void {
-        if (this.baseMesh === null) return;
+        if (this.currentLod === null) return;
         for (const instance of this.instances) {
             instance.dispose();
         }
-        this.instances.length = 0;
-        this.baseMesh = null;
+        this.currentLod = null;
     }
 
-    public createInstances(baseMesh: TransformNode): void {
+    public createInstances(baseMeshes: { mesh: Mesh; distance: number }[]): void {
         this.clearInstances();
-        if (!(baseMesh instanceof Mesh)) {
-            throw new Error("Tried to create instances from a non-mesh object. Try using HierarchyInstancePatch instead if you want to use a TransformNode.");
-        }
-        this.baseMesh = baseMesh as Mesh;
+        this.lods.length = 0;
 
+        for (const baseMesh of baseMeshes) {
+            this.lods.push(baseMesh);
+        }
+
+        const currentLod = this.lods.at(0);
+        if (currentLod === undefined) throw new Error("No lod mesh was set.");
+        this.currentLod = { mesh: currentLod.mesh, lodIndex: 0 };
+        this.sendToGPU();
+    }
+
+    private sendToGPU() {
+        if (this.currentLod === null) throw new Error("Tried to send matrix buffer to GPU but no base mesh was set.");
         for (let i = 0; i < this.positions.length; i++) {
-            const instance = this.baseMesh.createInstance(`instance${i}`);
-            instance.position.copyFrom(this.positions[i].add(this.baseMesh.position));
+            const instance = this.currentLod.mesh.createInstance(`instance${i}`);
+            instance.position.copyFrom(this.positions[i].add(this.currentLod.mesh.position));
             instance.rotationQuaternion = this.rotations[i];
             instance.scaling.copyFrom(this.scalings[i]);
             this.instances.push(instance);
 
             instance.parent = this.parent;
 
-            instance.checkCollisions = baseMesh.checkCollisions;
+            instance.checkCollisions = this.currentLod.mesh.checkCollisions;
         }
     }
 
@@ -84,9 +93,35 @@ export class InstancePatch implements IPatch {
         }
     }
 
-    public getBaseMesh(): Mesh {
-        if (this.baseMesh === null) throw new Error("Tried to get base mesh but no base mesh was set.");
-        return this.baseMesh;
+    public isEnabled(): boolean {
+        if (this.instances.length === 0) return false;
+        return this.instances[0].isEnabled();
+    }
+
+    public handleLod(distance: number): void {
+        if (this.lods.length === 0) throw new Error("No lod meshes were set.");
+        if (this.currentLod === null) throw new Error("No lod mesh was set.");
+
+        // check for furthest away lod
+        for (let i = this.lods.length - 1; i >= 0; i--) {
+            if (distance > this.lods[i].distance) {
+                if (i === this.currentLod.lodIndex) break;
+
+                this.clearInstances();
+                this.currentLod = { mesh: this.lods[i].mesh, lodIndex: i };
+                this.sendToGPU();
+                break;
+            }
+        }
+    }
+
+    public getCurrentMesh(): Mesh {
+        if (this.currentLod === null) throw new Error("Tried to get base mesh but no base mesh was set.");
+        return this.currentLod.mesh;
+    }
+
+    public getLodMeshes(): Mesh[] {
+        return this.lods.map((lod) => lod.mesh);
     }
 
     public getNbInstances(): number {
@@ -95,5 +130,6 @@ export class InstancePatch implements IPatch {
 
     public dispose() {
         this.clearInstances();
+        this.lods.length = 0;
     }
 }

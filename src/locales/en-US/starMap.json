@@ -1,5 +1,13 @@
 {
     "distance": "Distance",
     "planets": "Planets",
-    "setAsDestination": "Set as Destination"
+    "plotItinerary": "Plot Itinerary",
+    "bookmark": "Bookmark",
+    "distanceToSol": "Distance to Sol",
+    "distanceFromCurrent": "Distance",
+    "humanPresence": "Human Presence",
+    "spaceStations": "Space Stations",
+    "factions": "Factions",
+    "none": "None",
+    "generalInfo": "General"
 }

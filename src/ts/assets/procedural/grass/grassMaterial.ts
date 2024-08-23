@@ -25,6 +25,7 @@ import { Transformable } from "../../../architecture/transformable";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { setStellarObjectUniforms, StellarObjectUniformNames } from "../../../postProcesses/uniforms/stellarObjectUniforms";
 import { Textures } from "../../textures";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
 const GrassMaterialUniformNames = {
     WORLD: "world",
@@ -35,7 +36,9 @@ const GrassMaterialUniformNames = {
     VIEW_PROJECTION: "viewProjection",
     TIME: "time",
     CAMERA_POSITION: "cameraPosition",
-    PLAYER_POSITION: "playerPosition"
+    PLAYER_POSITION: "playerPosition",
+    PLANET_POSITION: "planetPosition",
+    PLANET_WORLD: "planetWorld"
 };
 
 const GrassMaterialSamplerNames = {
@@ -48,6 +51,8 @@ export class GrassMaterial extends ShaderMaterial {
     private playerPosition: Vector3 = Vector3.Zero();
 
     private scene: Scene;
+
+    private planet: TransformNode | null = null;
 
     constructor(scene: Scene, isDepthMaterial: boolean) {
         const shaderName = "grassMaterial";
@@ -79,9 +84,18 @@ export class GrassMaterial extends ShaderMaterial {
             const activeCamera = this.scene.activeCamera;
             if (activeCamera === null) throw new Error("No active camera in the scene");
             this.getEffect().setVector3(GrassMaterialUniformNames.CAMERA_POSITION, activeCamera.globalPosition);
+
+            if (this.planet !== null) {
+                this.getEffect().setVector3(GrassMaterialUniformNames.PLANET_POSITION, this.planet.getAbsolutePosition());
+                this.getEffect().setMatrix(GrassMaterialUniformNames.PLANET_WORLD, this.planet.getWorldMatrix());
+            }
         });
 
         this.scene = scene;
+    }
+
+    setPlanet(planet: TransformNode) {
+        this.planet = planet;
     }
 
     update(stars: Transformable[], playerPosition: Vector3, deltaSeconds: number) {

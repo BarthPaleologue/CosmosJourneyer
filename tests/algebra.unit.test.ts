@@ -18,6 +18,8 @@
 import { Scene } from "@babylonjs/core/scene";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { TransformNode } from "@babylonjs/core/Meshes";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { getTransformationQuaternion } from "../src/ts/utils/algebra";
 
 const engine = new NullEngine();
 const scene = new Scene(engine);
@@ -25,4 +27,26 @@ const scene = new Scene(engine);
 describe("BasicTransform", () => {
   const transform = new TransformNode("transform", scene);
   it("exists", () => expect(transform).toBeDefined());
+});
+
+test("getTransformationQuaternion", () => {
+  const from = new Vector3(1, 0, 0);
+  const to = new Vector3(0, 1, 0);
+  const quaternion = getTransformationQuaternion(from, to);
+  expect(quaternion).toBeDefined();
+  expect(quaternion).toBeInstanceOf(Quaternion);
+  expect(quaternion).toHaveProperty("x");
+  expect(quaternion).toHaveProperty("y");
+  expect(quaternion).toHaveProperty("z");
+  expect(quaternion).toHaveProperty("w");
+
+  from.copyFromFloats(0, 1, 0);
+  to.copyFromFloats(0, 1, 0);
+  const quaternion2 = getTransformationQuaternion(from, to);
+  expect(quaternion2).toBeDefined();
+  expect(quaternion2).toBeInstanceOf(Quaternion);
+  expect(quaternion2.x).toEqual(0);
+  expect(quaternion2.y).toEqual(0);
+  expect(quaternion2.z).toEqual(0);
+  expect(quaternion2.w).toEqual(1);
 });

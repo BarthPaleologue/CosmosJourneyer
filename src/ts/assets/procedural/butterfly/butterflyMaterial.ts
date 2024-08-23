@@ -24,11 +24,35 @@ import butterflyVertex from "../../../../shaders/butterflyMaterial/butterflyVert
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Transformable } from "../../../architecture/transformable";
 import { Textures } from "../../textures";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { setStellarObjectUniforms, StellarObjectUniformNames } from "../../../postProcesses/uniforms/stellarObjectUniforms";
+
+const ButterflyMaterialUniformNames = {
+    WORLD: "world",
+    WORLD_VIEW: "worldView",
+    WORLD_VIEW_PROJECTION: "worldViewProjection",
+    VIEW: "view",
+    PROJECTION: "projection",
+    VIEW_PROJECTION: "viewProjection",
+    TIME: "time",
+    PLAYER_POSITION: "playerPosition",
+    CAMERA_POSITION: "cameraPosition",
+    PLANET_POSITION: "planetPosition",
+    PLANET_WORLD: "planetWorld"
+};
+
+const ButterflyMaterialSamplerNames = {
+    BUTTERFLY_TEXTURE: "butterflyTexture"
+};
 
 export class ButterflyMaterial extends ShaderMaterial {
     private elapsedSeconds = 0;
     private stars: Transformable[] = [];
     private playerPosition: Vector3 = Vector3.Zero();
+
+    private planet: TransformNode | null = null;
+
+    private scene: Scene;
 
     constructor(scene: Scene, isDepthMaterial: boolean) {
         const shaderName = "butterflyMaterial";
@@ -38,32 +62,40 @@ export class ButterflyMaterial extends ShaderMaterial {
         const defines = ["#define INSTANCES"];
         if (isDepthMaterial) defines.push("#define FORDEPTH");
 
-        const uniforms = ["world", "worldView", "worldViewProjection", "view", "projection", "viewProjection", "time", "lightDirection", "playerPosition"];
+        const uniforms = [...Object.values(ButterflyMaterialUniformNames), ...Object.values(StellarObjectUniformNames)];
         if (isDepthMaterial) uniforms.push("depthValues");
 
         super(shaderName, scene, shaderName, {
             attributes: ["position", "normal", "uv"],
             uniforms: uniforms,
             defines: defines,
-            samplers: ["butterflyTexture"]
+            samplers: [...Object.values(ButterflyMaterialSamplerNames)]
         });
 
-        this.setVector3("lightDirection", new Vector3(0, 0, 0));
-        this.setVector3("playerPosition", new Vector3(0, 0, 0));
-        this.setFloat("time", 0);
-        this.setTexture("butterflyTexture", Textures.BUTTERFLY);
         this.backFaceCulling = false;
+        this.setTexture(ButterflyMaterialSamplerNames.BUTTERFLY_TEXTURE, Textures.BUTTERFLY);
 
         this.onBindObservable.add(() => {
-            if (this.stars.length > 0) {
-                const star = this.stars[0];
-                const lightDirection = star.getTransform().getAbsolutePosition().subtract(this.playerPosition).normalize();
-                this.getEffect().setVector3("lightDirection", lightDirection);
-            }
+            setStellarObjectUniforms(this.getEffect(), this.stars);
 
-            this.getEffect().setVector3("playerPosition", this.playerPosition);
-            this.getEffect().setFloat("time", this.elapsedSeconds);
+            this.getEffect().setVector3(ButterflyMaterialUniformNames.PLAYER_POSITION, this.playerPosition);
+            this.getEffect().setFloat(ButterflyMaterialUniformNames.TIME, this.elapsedSeconds);
+
+            const activeCamera = this.scene.activeCamera;
+            if (activeCamera === null) throw new Error("No active camera in the scene");
+            this.getEffect().setVector3(ButterflyMaterialUniformNames.CAMERA_POSITION, activeCamera.globalPosition);
+
+            if (this.planet !== null) {
+                this.getEffect().setVector3(ButterflyMaterialUniformNames.PLANET_POSITION, this.planet.getAbsolutePosition());
+                this.getEffect().setMatrix(ButterflyMaterialUniformNames.PLANET_WORLD, this.planet.getWorldMatrix());
+            }
         });
+
+        this.scene = scene;
+    }
+
+    setPlanet(planet: TransformNode) {
+        this.planet = planet;
     }
 
     update(stars: Transformable[], playerPosition: Vector3, deltaSeconds: number) {

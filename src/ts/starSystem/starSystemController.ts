@@ -42,6 +42,7 @@ import { JuliaSet } from "../anomalies/julia/juliaSet";
 import { Anomaly } from "../anomalies/anomaly";
 import { StarFieldBox } from "./starFieldBox";
 import { StarSystemModel } from "./starSystemModel";
+import { Settings } from "../settings";
 
 export class StarSystemController {
     readonly scene: UberScene;
@@ -166,15 +167,6 @@ export class StarSystemController {
         this.orbitalObjects.push(spaceStation);
         this.spaceStations.push(spaceStation);
         return spaceStation;
-    }
-
-    /**
-     * Translates all celestial bodies and spacestations in the system by the given displacement
-     * @param displacement The displacement applied to all bodies
-     */
-    public translateEverythingNow(displacement: Vector3): void {
-        for (const object of this.orbitalObjects) translate(object.getTransform(), displacement);
-        this.systemTargets.forEach((target) => translate(target.getTransform(), displacement));
     }
 
     /**
@@ -448,9 +440,18 @@ export class StarSystemController {
         this.updateShaders(deltaSeconds, postProcessManager);
     }
 
+    /**
+     * Translates all celestial bodies and spacestations in the system by the given displacement
+     * @param displacement The displacement applied to all bodies
+     */
+    public translateEverythingNow(displacement: Vector3): void {
+        for (const object of this.orbitalObjects) translate(object.getTransform(), displacement);
+        this.systemTargets.forEach((target) => translate(target.getTransform(), displacement));
+    }
+
     public applyFloatingOrigin() {
         const controller = this.scene.getActiveControls();
-        if (controller.getTransform().getAbsolutePosition().length() > 500) {
+        if (controller.getTransform().getAbsolutePosition().length() > Settings.FLOATING_ORIGIN_THRESHOLD) {
             const displacementTranslation = controller.getTransform().getAbsolutePosition().negate();
             this.translateEverythingNow(displacementTranslation);
             if (controller.getTransform().parent === null) {

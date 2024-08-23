@@ -8,11 +8,10 @@
   translate: calc(var(--dim) * -0.5) -50%;
   pointer-events: none;
 
-
   .targetCursor {
-    --s: max(15px, calc(var(--dim) * 0.4)); /* the size on the corner */
-    --t: 3px;  /* the thickness of the border */
-    --g: 10px; /* the gap between the border and image */
+    --s: max(2.0vmin, calc(var(--dim) * 0.4)); /* the size on the corner */
+    --t: 0.4vmin;  /* the thickness of the border */
+    --g: 1.3vmin; /* the gap between the border and image */
 
     padding: calc(var(--g) + var(--t));
 
@@ -27,7 +26,7 @@
     width: calc(var(--dim) - var(--g) * 2 - var(--t) * 2);
     height: calc(var(--dim) - var(--g) * 2 - var(--t) * 2);
 
-    transition: transform 0.2s, border-color 0.2s, scale 0.2s cubic-bezier(0.34,-1.87, 0.74, 2.99), rotate 0.2s;
+    transition: outline-color 0.2s, scale 0.2s cubic-bezier(0.34,-1.87, 0.74, 2.99), rotate 0.2s, opacity 0.2s;
 
     &.rounded {
       border-radius: 50%;
@@ -40,6 +39,10 @@
     &.target {
       outline-color: goldenrod;
       scale: 1.05;
+    }
+
+    &.transparent {
+      opacity: 0;
     }
   }
 
@@ -62,10 +65,11 @@
 
     p {
       margin-block: 0;
+      font-size: var(--text-size);
 
       &.targetCursorName {
         font-weight: bold;
-        font-size: 1.5em;
+        font-size: calc(1.5 * var(--text-size));
       }
     }
   }

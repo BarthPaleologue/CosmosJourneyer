@@ -1,8 +1,8 @@
-import { IDisposable } from "@babylonjs/core";
 import { pressInteractionToStrings } from "../../utils/inputControlsString";
 import { TutorialControlsInputs } from "./tutorialLayerInputs";
 import i18n from "../../i18n";
 import { Sounds } from "../../assets/sounds";
+import { IDisposable } from "@babylonjs/core/scene";
 
 export class TutorialLayer implements IDisposable {
     private readonly layerRoot: HTMLDivElement;

@@ -15,46 +15,41 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { easeInOutInterpolation } from "./interpolations";
-import { TransformNode } from "@babylonjs/core/Meshes";
-import { translate } from "../basicTransform";
 import { clamp } from "../../../utils/math";
 import { CustomAnimation } from "./animation";
+import { ArcRotateCamera } from "@babylonjs/core";
+import { Scalar } from "@babylonjs/core/Maths/math.scalar";
 
-export class TransformTranslationAnimation implements CustomAnimation {
-    private clock = 0;
+export class CameraRadiusAnimation implements CustomAnimation {
+    private elapsedSeconds = 0;
     private readonly duration: number;
-    private distanceAcc = 0;
-    private readonly totalDistance;
-    private readonly direction: Vector3;
-    private readonly transform: TransformNode;
+    private readonly startRadius: number;
+    private readonly targetRadius: number;
+    private readonly camera: ArcRotateCamera;
 
-    constructor(transform: TransformNode, targetPosition: Vector3, duration: number) {
-        this.transform = transform;
+    constructor(camera: ArcRotateCamera, targetRadius: number, duration: number) {
+        this.camera = camera;
         this.duration = duration;
-        this.totalDistance = targetPosition.subtract(transform.getAbsolutePosition()).length();
-        this.direction = targetPosition.subtract(transform.getAbsolutePosition()).normalizeToNew();
+        this.startRadius = camera.radius;
+        this.targetRadius = targetRadius;
     }
 
     update(deltaTime: number) {
         if (this.isFinished()) return;
 
-        this.clock += deltaTime;
+        this.elapsedSeconds += deltaTime;
 
-        const t = clamp(this.clock / this.duration, 0, 1);
+        const t = clamp(this.elapsedSeconds / this.duration, 0, 1);
 
-        const dDistance = this.totalDistance * easeInOutInterpolation(t) - this.distanceAcc;
-        this.distanceAcc += dDistance;
-
-        translate(this.transform, this.direction.scale(dDistance));
+        this.camera.radius = Scalar.Lerp(this.startRadius, this.targetRadius, easeInOutInterpolation(t));
     }
 
     isFinished(): boolean {
-        return this.clock >= this.duration;
+        return this.elapsedSeconds >= this.duration;
     }
 
     getProgress(): number {
-        return this.clock / this.duration;
+        return this.elapsedSeconds / this.duration;
     }
 }
