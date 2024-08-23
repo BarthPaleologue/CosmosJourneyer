@@ -19,6 +19,7 @@ import spaceStationHTML from "../../../html/spaceStationUI.html";
 import { SpaceStationModel } from "../../spacestation/spacestationModel";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { generateInfoHTML } from "./spaceStationInfos";
+import { Player } from "../../player/player";
 
 const enum MainPanelState {
     NONE,
@@ -30,6 +31,9 @@ export class SpaceStationLayer {
     private spaceStationHeader: HTMLElement;
 
     private currentStation: SpaceStationModel | null = null;
+
+    private readonly playerName: HTMLElement;
+    private readonly playerBalance: HTMLElement;
 
     private readonly mainPanel: HTMLElement;
 
@@ -47,6 +51,9 @@ export class SpaceStationLayer {
         }
         this.parentNode = document.getElementById("spaceStationUI") as HTMLElement;
         this.spaceStationHeader = document.getElementById("spaceStationHeader") as HTMLElement;
+
+        this.playerName = document.querySelector<HTMLElement>("#spaceStationUI .playerName") as HTMLElement;
+        this.playerBalance = document.querySelector<HTMLElement>("#spaceStationUI .playerBalance") as HTMLElement;
 
         this.mainPanel = document.querySelector<HTMLElement>("#spaceStationUI .mainContainer") as HTMLElement;
 
@@ -100,10 +107,13 @@ export class SpaceStationLayer {
         return this.parentNode.style.visibility !== "hidden";
     }
 
-    public setStation(station: SpaceStationModel) {
+    public setStation(station: SpaceStationModel, player: Player) {
         this.currentStation = station;
         this.spaceStationHeader.innerHTML = `
             <p class="welcomeTo">Welcome to</p>
             <p class="spaceStationName">${station.name}</p>`;
+
+        this.playerName.textContent = `CMDR ${player.name}`;
+        this.playerBalance.textContent = `Balance: ₽${player.balance.toLocaleString()}`;
     }
 }

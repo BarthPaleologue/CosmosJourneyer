@@ -48,6 +48,21 @@ $gaps: 10px;
         }
     }
 
+    #playerInfo {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 20px;
+
+        .playerName {
+
+        }
+
+        .playerBalance {
+
+        }
+    }
+
     .mainContainer {
         scale: 1;
         transition: .2s ease-in-out;

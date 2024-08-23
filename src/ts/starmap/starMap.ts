@@ -45,7 +45,6 @@ import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { SystemSeed } from "../utils/systemSeed";
 import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 import { View } from "../utils/view";
-import { syncCamera } from "../utils/cameraSyncing";
 import { AudioInstance } from "../utils/audioInstance";
 import { AudioManager } from "../audio/audioManager";
 import { AudioMasks } from "../audio/audioMasks";
@@ -59,6 +58,7 @@ import { Camera } from "@babylonjs/core/Cameras/camera";
 import { StellarPathfinder } from "./stellarPathfinder";
 import { createNotification } from "../utils/notification";
 import { getStarGalacticCoordinates } from "../utils/getStarGalacticCoordinates";
+import { Player } from "../player/player";
 
 export class StarMap implements View {
     readonly scene: Scene;
@@ -69,6 +69,8 @@ export class StarMap implements View {
     private rotationAnimation: TransformRotationAnimation | null = null;
     private translationAnimation: TransformTranslationAnimation | null = null;
     private radiusAnimation: CameraRadiusAnimation | null = null;
+
+    private player: Player = Player.Default();
 
     /**
      * The position of the center of the starmap in world space.
@@ -612,5 +614,9 @@ export class StarMap implements View {
 
     public getMainScene(): Scene {
         return this.scene;
+    }
+
+    public setPlayer(player: Player) {
+        this.player = player;
     }
 }

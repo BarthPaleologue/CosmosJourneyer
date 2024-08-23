@@ -45,7 +45,6 @@ import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { View } from "../utils/view";
 import { SystemSeed } from "../utils/systemSeed";
 import { StarSector } from "../starmap/starSector";
-import { StarMap } from "../starmap/starMap";
 import { SystemTarget } from "../utils/systemTarget";
 import { StarSystemInputs } from "../inputs/starSystemInputs";
 import { createNotification } from "../utils/notification";
@@ -73,6 +72,7 @@ import { SpaceStationLayer } from "../ui/spaceStation/spaceStationLayer";
 import { SeededStarSystemModel } from "./seededStarSystemModel";
 import { placeSpaceStations } from "../society/spaceStationPlacement";
 import { isSystemInHumanBubble } from "../society/starSystemSociety";
+import { Player } from "../player/player";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -96,6 +96,8 @@ export class StarSystemView implements View {
     readonly spaceStationLayer: SpaceStationLayer;
 
     private isUiEnabled = true;
+
+    private player: Player = Player.Default();
 
     /**
      * A debug HTML UI to change the properties of the closest celestial body
@@ -555,6 +557,10 @@ export class StarSystemView implements View {
         this.scene.setActiveControls(this.spaceshipControls);
     }
 
+    public setPlayer(player: Player) {
+        this.player = player;
+    }
+
     /**
      * Updates the system view. It updates the underlying star system, the UI, the chunk forge and the controls
      * @param deltaSeconds the time elapsed since the last update in seconds
@@ -633,7 +639,7 @@ export class StarSystemView implements View {
                 .getSpaceStations()
                 .find((spaceStation) => {
                     if (spaceStation === facility) {
-                        this.spaceStationLayer.setStation(spaceStation.model);
+                        this.spaceStationLayer.setStation(spaceStation.model, this.player);
                         return true;
                     }
                     return false;

@@ -397,6 +397,9 @@ export class CosmosJourneyer {
             this.player = Player.Default();
         }
 
+        this.starSystemView.setPlayer(this.player);
+        this.starMap.setPlayer(this.player);
+
         await this.loadUniverseCoordinates(saveData.universeCoordinates);
 
         if (saveData.padNumber !== undefined) {
