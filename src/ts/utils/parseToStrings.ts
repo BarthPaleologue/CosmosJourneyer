@@ -53,8 +53,10 @@ export function parseSeconds(seconds: number): string {
         return `${(seconds / 3600).toFixed(0)} h`;
     } else if (seconds < 604800) {
         return `${(seconds / (60 * 60 * 24)).toFixed(0)} d`;
-    } else {
+    } else if (seconds < 31557600 * 10) {
         return `${(seconds / (60 * 60 * 24 * 365.25)).toFixed(0)} y`;
+    } else {
+        return `∞`;
     }
 }
 
