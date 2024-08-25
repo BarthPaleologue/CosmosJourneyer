@@ -277,18 +277,16 @@ export class CosmosJourneyer {
      */
     public toggleStarMap(): void {
         if (this.activeView === this.starSystemView) {
-            this.starSystemView.unZoom(() => {
-                AudioManager.SetMask(AudioMasks.STAR_MAP_VIEW);
+            AudioManager.SetMask(AudioMasks.STAR_MAP_VIEW);
 
-                this.starSystemView.targetCursorLayer.setEnabled(false);
+            this.starSystemView.targetCursorLayer.setEnabled(false);
 
-                this.starSystemView.detachControl();
-                this.starMap.attachControl();
+            this.starSystemView.detachControl();
+            this.starMap.attachControl();
 
-                const starMap = this.starMap;
-                this.activeView = starMap;
-                starMap.focusOnCurrentSystem();
-            });
+            const starMap = this.starMap;
+            this.activeView = starMap;
+            starMap.focusOnCurrentSystem();
         } else {
             this.starMap.detachControl();
             this.starSystemView.attachControl();

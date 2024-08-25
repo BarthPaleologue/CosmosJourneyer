@@ -146,12 +146,6 @@ export class StarSystemView implements View {
     private readonly axisRenderer: AxisRenderer = new AxisRenderer();
 
     /**
-     * An animation to unzoom the camera when opening the star map
-     * @private
-     */
-    private static readonly UN_ZOOM_ANIMATION = new Animation("unZoom", "radius", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
-
-    /**
      * The controller of the current star system. This controller is unique per star system and is destroyed when the star system is changed.
      * @private
      */
@@ -193,17 +187,6 @@ export class StarSystemView implements View {
         const canvas = engine.getRenderingCanvas();
         if (canvas === null) throw new Error("Canvas is null");
         this.bodyEditor.setCanvas(canvas);
-
-        StarSystemView.UN_ZOOM_ANIMATION.setKeys([
-            {
-                frame: 0,
-                value: ShipControls.BASE_CAMERA_RADIUS
-            },
-            {
-                frame: 30,
-                value: 600
-            }
-        ]);
 
         StarSystemInputs.map.toggleUi.on("complete", () => {
             this.isUiEnabled = !this.isUiEnabled;
@@ -250,7 +233,9 @@ export class StarSystemView implements View {
         });
 
         StarSystemInputs.map.jumpToSystem.on("complete", async () => {
-            if (this.isLoadingSystem) return;
+            if (!this.isLoadingSystem) this.isLoadingSystem = true;
+            else return;
+
             const target = this.targetCursorLayer.getTarget();
             if (!(target instanceof SystemTarget)) return;
 
@@ -287,7 +272,6 @@ export class StarSystemView implements View {
             });
 
             const systemSeed = target.seed;
-            this.isLoadingSystem = true;
             await this.loadStarSystemFromSeed(systemSeed);
             this.initStarSystem();
 
@@ -553,14 +537,12 @@ export class StarSystemView implements View {
         if (starSystem.model instanceof SeededStarSystemModel) {
             getNeighborStarSystems(starSystem.model.seed, Settings.PLAYER_JUMP_RANGE_LY).forEach(([neighborSeed, position, distance]) => {
                 const systemTarget = this.getStarSystem().addSystemTarget(neighborSeed);
-                this.targetCursorLayer.addObject(systemTarget, ObjectTargetCursorType.CELESTIAL_BODY, 0, 0);
+                this.targetCursorLayer.addObject(systemTarget, ObjectTargetCursorType.STAR_SYSTEM, 0, 0);
             });
-            console.log(this.getStarSystem().getSystemTargets());
         }
 
         this.onInitStarSystem.notifyObservers();
         this.scene.getEngine().loadingScreen.hideLoadingUI();
-        console.log(this.getStarSystem().getSystemTargets());
     }
 
     /**
@@ -800,37 +782,19 @@ export class StarSystemView implements View {
         this.targetCursorLayer.setEnabled(false);
     }
 
-    public unZoom(callback: () => void) {
-        const activeControls = this.scene.getActiveControls();
-        if (activeControls !== this.getSpaceshipControls()) {
-            callback();
-            return;
-        }
-        activeControls.getActiveCameras().forEach((camera) => (camera.animations = [StarSystemView.UN_ZOOM_ANIMATION]));
-        this.scene.beginAnimation(this.scene.getActiveControls().getActiveCameras(), 0, 60, false, 2.0, () => {
-            this.scene
-                .getActiveControls()
-                .getActiveCameras()
-                .forEach((camera) => (camera.animations = []));
-            callback();
-            this.scene.onAfterRenderObservable.addOnce(() => {
-                (activeControls as ShipControls).thirdPersonCamera.radius = 30;
-                this.hideHtmlUI();
-            });
-        });
-    }
-
     /**
      * Creates a visible target inside the current star system to aim for another star system.
      * This target will display the name of the target system and its distance.
      * @param targetSeed the seed of the target system
      */
     public setSystemAsTarget(targetSeed: SystemSeed) {
-        const target =
-            this.getStarSystem()
-                .getSystemTargets()
-                .find((systemTarget) => systemTarget.seed.equals(targetSeed)) ?? this.getStarSystem().addSystemTarget(targetSeed);
-        this.targetCursorLayer.addObject(target, ObjectTargetCursorType.CELESTIAL_BODY, 0, 0);
+        let target = this.getStarSystem()
+            .getSystemTargets()
+            .find((systemTarget) => systemTarget.seed.equals(targetSeed));
+        if (target === undefined) {
+            target = this.getStarSystem().addSystemTarget(targetSeed);
+            this.targetCursorLayer.addObject(target, ObjectTargetCursorType.STAR_SYSTEM, 0, 0);
+        }
         this.targetCursorLayer.setTarget(target);
         this.spaceShipLayer.setTarget(target.getTransform());
     }
@@ -845,6 +809,7 @@ export class StarSystemView implements View {
 
     public detachControl() {
         this.scene.detachControl();
+        this.hideHtmlUI();
     }
 
     public getMainScene() {

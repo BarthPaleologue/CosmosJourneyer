@@ -29,7 +29,8 @@ export const enum ObjectTargetCursorType {
     CELESTIAL_BODY,
     FACILITY,
     ANOMALY,
-    LANDING_PAD
+    LANDING_PAD,
+    STAR_SYSTEM,
 }
 
 export class ObjectTargetCursor {
@@ -46,8 +47,6 @@ export class ObjectTargetCursor {
     readonly object: Transformable & BoundingSphere & TypedObject;
 
     private lastDistance = 0;
-
-    static readonly WIDTH = 300;
 
     readonly minDistance: number;
     readonly maxDistance: number;
@@ -79,7 +78,7 @@ export class ObjectTargetCursor {
                 break;
             case ObjectTargetCursorType.FACILITY:
                 this.cursor.classList.add("rotated");
-                this.minSize = 2;
+                this.minSize = 3;
                 this.maxSize = 0;
                 break;
             case ObjectTargetCursorType.ANOMALY:
@@ -91,6 +90,11 @@ export class ObjectTargetCursor {
                 this.cursor.classList.add("rotated");
                 this.minSize = 1.5;
                 this.maxSize = 1.5;
+                break;
+            case ObjectTargetCursorType.STAR_SYSTEM:
+                this.cursor.classList.add("rounded");
+                this.minSize = 0.2;
+                this.maxSize = 0.2;
                 break;
         }
 
@@ -189,7 +193,7 @@ export class ObjectTargetCursor {
     }
 
     isVisible() {
-        return this.alpha > 0 && this.screenCoordinates.z > 0;
+        return this.alpha > 0; // && this.screenCoordinates.z > 0;
     }
 
     dispose() {
