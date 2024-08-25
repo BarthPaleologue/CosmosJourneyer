@@ -73,6 +73,7 @@ import { SeededStarSystemModel } from "./seededStarSystemModel";
 import { placeSpaceStations } from "../society/spaceStationPlacement";
 import { isSystemInHumanBubble } from "../society/starSystemSociety";
 import { Player } from "../player/player";
+import { getNeighborStarSystems } from "../utils/getNeighborStarSystems";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -532,14 +533,14 @@ export class StarSystemView implements View {
 
         starSystem.initPostProcesses(this.postProcessManager);
 
-        if(this.player.currentItinerary.length >= 2 && starSystem.model instanceof SeededStarSystemModel) {
+        if (this.player.currentItinerary.length >= 2 && starSystem.model instanceof SeededStarSystemModel) {
             const targetSeed = this.player.currentItinerary[1];
-            if(starSystem.model.seed.equals(targetSeed)) {
+            if (starSystem.model.seed.equals(targetSeed)) {
                 // the current system was the first destination of the itinerary, we can remove the system before from the itinerary
                 this.player.currentItinerary.shift();
 
                 // now there are either one or more systems in the itinerary (including the current one)
-                if(this.player.currentItinerary.length >= 2) {
+                if (this.player.currentItinerary.length >= 2) {
                     // if there are more than 1, the journey continues to the next system
                     this.setSystemAsTarget(this.player.currentItinerary[1]);
                 } else {
@@ -549,8 +550,17 @@ export class StarSystemView implements View {
             }
         }
 
+        if (starSystem.model instanceof SeededStarSystemModel) {
+            getNeighborStarSystems(starSystem.model.seed, Settings.PLAYER_JUMP_RANGE_LY).forEach(([neighborSeed, position, distance]) => {
+                const systemTarget = this.getStarSystem().addSystemTarget(neighborSeed);
+                this.targetCursorLayer.addObject(systemTarget, ObjectTargetCursorType.CELESTIAL_BODY, 0, 0);
+            });
+            console.log(this.getStarSystem().getSystemTargets());
+        }
+
         this.onInitStarSystem.notifyObservers();
         this.scene.getEngine().loadingScreen.hideLoadingUI();
+        console.log(this.getStarSystem().getSystemTargets());
     }
 
     /**
@@ -816,7 +826,10 @@ export class StarSystemView implements View {
      * @param targetSeed the seed of the target system
      */
     public setSystemAsTarget(targetSeed: SystemSeed) {
-        const target = this.getStarSystem().addSystemTarget(targetSeed);
+        const target =
+            this.getStarSystem()
+                .getSystemTargets()
+                .find((systemTarget) => systemTarget.seed.equals(targetSeed)) ?? this.getStarSystem().addSystemTarget(targetSeed);
         this.targetCursorLayer.addObject(target, ObjectTargetCursorType.CELESTIAL_BODY, 0, 0);
         this.targetCursorLayer.setTarget(target);
         this.spaceShipLayer.setTarget(target.getTransform());

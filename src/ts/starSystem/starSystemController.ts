@@ -501,6 +501,10 @@ export class StarSystemController {
         return placeholderTransform;
     }
 
+    getSystemTargets(): SystemTarget[] {
+        return this.systemTargets;
+    }
+
     /**
      * Disposes all the bodies in the system
      */
