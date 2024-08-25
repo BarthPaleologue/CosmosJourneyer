@@ -26,7 +26,7 @@ import { Camera } from "@babylonjs/core/Cameras/camera";
 export class TargetCursorLayer implements IDisposable {
     private targetCursors: ObjectTargetCursor[] = [];
 
-    private layerRoot: HTMLDivElement;
+    private readonly layerRoot: HTMLDivElement;
 
     private target: (Transformable & BoundingSphere & TypedObject) | null = null;
 

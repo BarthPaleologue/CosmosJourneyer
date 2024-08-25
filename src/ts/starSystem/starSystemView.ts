@@ -296,7 +296,6 @@ export class StarSystemView implements View {
             this.isLoadingSystem = false;
             AudioManager.SetMask(AudioMasks.STAR_SYSTEM_VIEW);
             observer.remove();
-            this.targetCursorLayer.setTarget(null);
         });
 
         StarSystemInputs.map.toggleSpaceShipCharacter.on("complete", () => {
@@ -520,6 +519,7 @@ export class StarSystemView implements View {
         this.axisRenderer.setOrbitalObjects(starSystem.getOrbitalObjects(), this.scene);
 
         this.spaceShipLayer.setTarget(null);
+        this.targetCursorLayer.setTarget(null);
 
         const firstBody = starSystem.getBodies()[0];
         if (firstBody === undefined) throw new Error("No bodies in star system");
@@ -531,6 +531,23 @@ export class StarSystemView implements View {
         positionNearObjectBrightSide(activeController, firstBody, starSystem, controllerDistanceFactor);
 
         starSystem.initPostProcesses(this.postProcessManager);
+
+        if(this.player.currentItinerary.length >= 2 && starSystem.model instanceof SeededStarSystemModel) {
+            const targetSeed = this.player.currentItinerary[1];
+            if(starSystem.model.seed.equals(targetSeed)) {
+                // the current system was the first destination of the itinerary, we can remove the system before from the itinerary
+                this.player.currentItinerary.shift();
+
+                // now there are either one or more systems in the itinerary (including the current one)
+                if(this.player.currentItinerary.length >= 2) {
+                    // if there are more than 1, the journey continues to the next system
+                    this.setSystemAsTarget(this.player.currentItinerary[1]);
+                } else {
+                    // if there is only one (the current system), the journey is over
+                    this.player.currentItinerary = [];
+                }
+            }
+        }
 
         this.onInitStarSystem.notifyObservers();
         this.scene.getEngine().loadingScreen.hideLoadingUI();
