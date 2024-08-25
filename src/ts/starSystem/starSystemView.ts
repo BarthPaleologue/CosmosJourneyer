@@ -239,11 +239,11 @@ export class StarSystemView implements View {
         });
 
         StarSystemInputs.map.jumpToSystem.on("complete", async () => {
-            if (!this.jumpLock) this.jumpLock = true;
-            else return;
-
             const target = this.targetCursorLayer.getTarget();
             if (!(target instanceof SystemTarget)) return;
+
+            if (!this.jumpLock) this.jumpLock = true;
+            else return;
 
             const shipControls = this.getSpaceshipControls();
 
