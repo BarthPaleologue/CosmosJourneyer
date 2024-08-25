@@ -164,6 +164,12 @@ export class StarSystemView implements View {
     readonly onInitStarSystem = new Observable<void>();
 
     /**
+     * A lock to prevent multiple executions of the jump to system action
+     * @private
+     */
+    private jumpLock = false;
+
+    /**
      * Whether the star system is currently loading or not
      * @private
      */
@@ -233,7 +239,7 @@ export class StarSystemView implements View {
         });
 
         StarSystemInputs.map.jumpToSystem.on("complete", async () => {
-            if (!this.isLoadingSystem) this.isLoadingSystem = true;
+            if (!this.jumpLock) this.jumpLock = true;
             else return;
 
             const target = this.targetCursorLayer.getTarget();
@@ -272,6 +278,7 @@ export class StarSystemView implements View {
             });
 
             const systemSeed = target.seed;
+            this.isLoadingSystem = true;
             await this.loadStarSystemFromSeed(systemSeed);
             this.initStarSystem();
 
@@ -281,6 +288,7 @@ export class StarSystemView implements View {
             this.isLoadingSystem = false;
             AudioManager.SetMask(AudioMasks.STAR_SYSTEM_VIEW);
             observer.remove();
+            this.jumpLock = false;
         });
 
         StarSystemInputs.map.toggleSpaceShipCharacter.on("complete", () => {
