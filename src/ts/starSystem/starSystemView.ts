@@ -525,6 +525,13 @@ export class StarSystemView implements View {
 
         starSystem.initPostProcesses(this.postProcessManager);
 
+        if (starSystem.model instanceof SeededStarSystemModel) {
+            getNeighborStarSystems(starSystem.model.seed, Settings.PLAYER_JUMP_RANGE_LY).forEach(([neighborSeed, position, distance]) => {
+                const systemTarget = this.getStarSystem().addSystemTarget(neighborSeed);
+                this.targetCursorLayer.addObject(systemTarget, ObjectTargetCursorType.STAR_SYSTEM, 0, 0);
+            });
+        }
+
         if (this.player.currentItinerary.length >= 2 && starSystem.model instanceof SeededStarSystemModel) {
             const targetSeed = this.player.currentItinerary[1];
             if (starSystem.model.seed.equals(targetSeed)) {
@@ -540,13 +547,6 @@ export class StarSystemView implements View {
                     this.player.currentItinerary = [];
                 }
             }
-        }
-
-        if (starSystem.model instanceof SeededStarSystemModel) {
-            getNeighborStarSystems(starSystem.model.seed, Settings.PLAYER_JUMP_RANGE_LY).forEach(([neighborSeed, position, distance]) => {
-                const systemTarget = this.getStarSystem().addSystemTarget(neighborSeed);
-                this.targetCursorLayer.addObject(systemTarget, ObjectTargetCursorType.STAR_SYSTEM, 0, 0);
-            });
         }
 
         this.onInitStarSystem.notifyObservers();
