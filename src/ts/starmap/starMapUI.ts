@@ -206,11 +206,14 @@ export class StarMapUI {
             throw new Error("No active camera found");
         }
 
+        // disable the plot itinerary button if the selected mesh is the current mesh
+        this.shortHandUIPlotItineraryButton.disabled = this.selectedMesh === this.currentMesh;
+
         const scalingBase = 100;
         const minScale = 5.0;
         if (this.selectedMesh !== null) {
             const selectedMeshScreenCoordinates = Vector3.Project(this.selectedMesh.position, Matrix.IdentityReadOnly, camera.getTransformationMatrix(), camera.viewport);
-            this.selectedSystemCursor.classList.toggle("transparent", selectedMeshScreenCoordinates.z < 0);
+            this.selectedSystemCursor.classList.toggle("transparent", selectedMeshScreenCoordinates.z < 0 || this.selectedMesh === this.currentMesh);
             this.selectedSystemCursorContainer.style.left = `${selectedMeshScreenCoordinates.x * 100}vw`;
             this.selectedSystemCursorContainer.style.top = `${selectedMeshScreenCoordinates.y * 100}vh`;
 
@@ -228,7 +231,7 @@ export class StarMapUI {
             this.selectedSystemCursor.classList.add("transparent");
         }
 
-        if (this.hoveredMesh !== null) {
+        if (this.hoveredMesh !== null && this.hoveredMesh !== this.currentMesh) {
             const meshScreenCoordinates = Vector3.Project(this.hoveredMesh.position, Matrix.IdentityReadOnly, camera.getTransformationMatrix(), camera.viewport);
             this.hoveredSystemCursor.classList.toggle("transparent", meshScreenCoordinates.z < 0);
             this.hoveredSystemCursorContainer.style.left = `${meshScreenCoordinates.x * 100}vw`;
@@ -256,7 +259,6 @@ export class StarMapUI {
     }
 
     setSelectedMesh(mesh: AbstractMesh) {
-        if (mesh === this.currentMesh) return;
         const camera = this.scene.activeCamera;
         if (camera === null) {
             throw new Error("No active camera found");
@@ -285,13 +287,8 @@ export class StarMapUI {
     setSelectedSystem(targetSystemModel: SeededStarSystemModel, currentSystemModel: SeededStarSystemModel | null) {
         const targetCoordinates = getStarGalacticCoordinates(targetSystemModel.seed);
 
-        let text = "";
         if (currentSystemModel !== null) {
             const currentCoordinates = getStarGalacticCoordinates(currentSystemModel.seed);
-
-            const distance = Vector3.Distance(currentCoordinates, targetCoordinates) * Settings.LIGHT_YEAR;
-            text += `${i18n.t("starMap:distance")}: ${parseDistance(distance)}\n`;
-
             this.shortHandUIDistanceFromCurrent.textContent = `${i18n.t("starMap:distanceFromCurrent")}: ${Vector3.Distance(currentCoordinates, targetCoordinates).toFixed(1)} ${i18n.t("units:ly")}`;
         }
 

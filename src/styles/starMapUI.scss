@@ -73,6 +73,19 @@
         background: var(--accent-color-light);
       }
 
+      &:disabled {
+        background: var(--disabled-color);
+        color: rgb(200, 200, 200);
+
+        &:hover {
+          background: var(--disabled-color);
+        }
+
+        &:active {
+          background: var(--disabled-color);
+        }
+      }
+
       &:active {
         background: var(--accent-color-dark);
       }
