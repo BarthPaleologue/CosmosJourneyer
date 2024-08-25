@@ -10,7 +10,6 @@ import i18n from "../i18n";
 export class SystemTarget implements Transformable, BoundingSphere, TypedObject {
     readonly name: string;
     private readonly transform: TransformNode;
-    private readonly scene: Scene;
 
     readonly seed: SystemSeed;
 
@@ -18,8 +17,6 @@ export class SystemTarget implements Transformable, BoundingSphere, TypedObject 
         const systemModel = new SeededStarSystemModel(seed);
         this.name = systemModel.name;
         this.transform = new TransformNode(this.name, scene);
-        this.scene = scene;
-
         this.seed = seed;
     }
 

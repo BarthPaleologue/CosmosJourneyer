@@ -816,22 +816,7 @@ export class StarSystemView implements View {
      * @param targetSeed the seed of the target system
      */
     public setSystemAsTarget(targetSeed: SystemSeed) {
-        const currentSystem = this.getStarSystem();
-        const currentSeed = currentSystem.model instanceof SeededStarSystemModel ? currentSystem.model.seed : new SystemSeed(0, 0, 0, 0);
-
-        const currentSystemStarSector = new StarSector(new Vector3(currentSeed.starSectorX, currentSeed.starSectorY, currentSeed.starSectorZ));
-
-        const targetSystemStarSector = new StarSector(new Vector3(targetSeed.starSectorX, targetSeed.starSectorY, targetSeed.starSectorZ));
-
-        const currentSystemUniversePosition = currentSystemStarSector.getPositionOfStar(currentSeed.index);
-        const targetSystemUniversePosition = targetSystemStarSector.getPositionOfStar(targetSeed.index);
-
-        const direction = targetSystemUniversePosition.subtract(currentSystemUniversePosition).normalize();
-        Vector3.TransformCoordinatesToRef(direction, currentSystem.starFieldBox.getRotationMatrix(), direction);
-
-        const distance = Vector3.Distance(currentSystemUniversePosition, targetSystemUniversePosition) * Settings.LIGHT_YEAR;
-
-        const target = currentSystem.addSystemTarget(targetSeed, direction, distance);
+        const target = this.getStarSystem().addSystemTarget(targetSeed);
         this.targetCursorLayer.addObject(target, ObjectTargetCursorType.CELESTIAL_BODY, 0, 0);
         this.targetCursorLayer.setTarget(target);
         this.spaceShipLayer.setTarget(target.getTransform());

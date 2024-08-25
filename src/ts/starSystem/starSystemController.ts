@@ -43,6 +43,8 @@ import { Anomaly } from "../anomalies/anomaly";
 import { StarFieldBox } from "./starFieldBox";
 import { StarSystemModel } from "./starSystemModel";
 import { Settings } from "../settings";
+import { StarSector } from "../starmap/starSector";
+import { getStarGalacticCoordinates } from "../utils/getStarGalacticCoordinates";
 
 export class StarSystemController {
     readonly scene: UberScene;
@@ -480,14 +482,21 @@ export class StarSystemController {
         postProcessManager.update(deltaSeconds);
     }
 
-    addSystemTarget(seed: SystemSeed, systemDirection: Vector3, distance: number): SystemTarget {
-        const placeholderTransform = new SystemTarget(seed, this.scene);
-        placeholderTransform.getTransform().position.copyFrom(systemDirection.scale(distance));
+    addSystemTarget(targetSeed: SystemSeed): SystemTarget {
+        const currentSeed = this.model instanceof SeededStarSystemModel ? this.model.seed : new SystemSeed(0, 0, 0, 0);
 
-        this.systemTargets.forEach((target) => {
-            target.dispose();
-        });
-        this.systemTargets = [placeholderTransform];
+        const currentSystemUniversePosition = getStarGalacticCoordinates(currentSeed);
+        const targetSystemUniversePosition = getStarGalacticCoordinates(targetSeed);
+
+        const distance = Vector3.Distance(currentSystemUniversePosition, targetSystemUniversePosition) * Settings.LIGHT_YEAR;
+
+        const direction = targetSystemUniversePosition.subtract(currentSystemUniversePosition).scaleInPlace(Settings.LIGHT_YEAR / distance);
+        Vector3.TransformCoordinatesToRef(direction, this.starFieldBox.getRotationMatrix(), direction);
+
+        const placeholderTransform = new SystemTarget(targetSeed, this.scene);
+        placeholderTransform.getTransform().position.copyFrom(direction.scale(distance));
+
+        this.systemTargets.push(placeholderTransform);
 
         return placeholderTransform;
     }
