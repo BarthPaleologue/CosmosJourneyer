@@ -59,6 +59,7 @@ import { StellarPathfinder } from "./stellarPathfinder";
 import { createNotification } from "../utils/notification";
 import { getStarGalacticCoordinates } from "../utils/getStarGalacticCoordinates";
 import { Player } from "../player/player";
+import { Settings } from "../settings";
 
 export class StarMap implements View {
     readonly scene: Scene;
@@ -147,7 +148,7 @@ export class StarMap implements View {
             if (this.selectedSystemSeed === null) throw new Error("selected system seed is null!");
             if (this.selectedSystemSeed.equals(this.currentSystemSeed)) return;
             Sounds.MENU_SELECT_SOUND.play();
-            this.stellarPathfinder.init(this.currentSystemSeed, this.selectedSystemSeed, 15);
+            this.stellarPathfinder.init(this.currentSystemSeed, this.selectedSystemSeed, Settings.PLAYER_JUMP_RANGE_LY);
         });
 
         StarMapInputs.map.focusOnCurrentSystem.on("complete", () => {

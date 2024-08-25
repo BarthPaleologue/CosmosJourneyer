@@ -47,6 +47,8 @@ export const Settings = {
 
     HUMAN_BUBBLE_RADIUS_LY: 100,
 
+    PLAYER_JUMP_RANGE_LY: 15,
+
     /**
      * The average daily intake for a human being in kcal/day
      * It is 2500 for males and 2000 for females, hence 2250.
