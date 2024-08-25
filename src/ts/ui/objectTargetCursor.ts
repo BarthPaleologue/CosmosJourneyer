@@ -93,8 +93,8 @@ export class ObjectTargetCursor {
                 break;
             case ObjectTargetCursorType.STAR_SYSTEM:
                 this.cursor.classList.add("rounded");
-                this.minSize = 0.2;
-                this.maxSize = 0.2;
+                this.minSize = 1.5;
+                this.maxSize = 1.5;
                 break;
         }
 
