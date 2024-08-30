@@ -6,16 +6,17 @@ import { getStarGalacticCoordinates } from "../utils/getStarGalacticCoordinates"
 import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MissionNode } from "./nodes/missionNode";
-import { MissionAndNode } from "./nodes/logic/missionAndNode";
 import { MissionContext } from "./missionContext";
 import { MissionSightSeeingFlyByNode } from "./nodes/actions/sightseeing/missionSightSeeingFlyByNode";
 import { MissionSightSeeingLandNode } from "./nodes/actions/sightseeing/missionSightSeeingLandNode";
 import { MissionSightSeeingAsteroidFieldNode } from "./nodes/actions/sightseeing/missionSightSeeingAsteroidFieldNode";
+import { Settings } from "../settings";
+import { parseDistance } from "../utils/parseToStrings";
 
 export const enum SightSeeingType {
     FLY_BY,
-    LAND,
-    ASTEROID_FIELD
+    TERMINATOR_LANDING,
+    ASTEROID_FIELD_TREK
 }
 
 export type SightSeeingTarget = {
@@ -25,11 +26,11 @@ export type SightSeeingTarget = {
 
 export class SightSeeingMission implements Mission {
     private readonly missionGiver: SpaceStationModel;
-    private readonly targets: SightSeeingTarget[];
+    private readonly target: SightSeeingTarget;
 
-    private readonly targetSystems: SystemSeed[];
+    private readonly targetSystem: SystemSeed;
 
-    private reward: number;
+    private readonly reward: number;
 
     private hasCompletedLock = false;
 
@@ -37,54 +38,37 @@ export class SightSeeingMission implements Mission {
 
     private state: MissionState = MissionState.UNKNOWN;
 
-    constructor(missionGiver: SpaceStationModel, targets: SightSeeingTarget[]) {
+    constructor(missionGiver: SpaceStationModel, target: SightSeeingTarget) {
         this.missionGiver = missionGiver;
-        this.targets = targets;
+        this.target = target;
 
-        this.targetSystems = targets.map(
-            (target) =>
-                new SystemSeed(
-                    target.objectId.starSystem.starSectorX,
-                    target.objectId.starSystem.starSectorY,
-                    target.objectId.starSystem.starSectorZ,
-                    target.objectId.starSystem.index
-                )
-        );
-        // filter out duplicates using custom equals method
-        this.targetSystems = this.targetSystems.filter((system, index, self) => self.findIndex((other) => system.equals(other)) === index);
+        this.targetSystem = SystemSeed.Deserialize(target.objectId.starSystem);
 
         const missionGiverGalacticCoordinates = getStarGalacticCoordinates((missionGiver.starSystem as SeededStarSystemModel).seed);
 
-        this.reward = 0;
-        this.targetSystems.forEach((target) => {
-            const targetGalacticCoordinates = getStarGalacticCoordinates(target);
-            const distanceLY = Vector3.Distance(missionGiverGalacticCoordinates, targetGalacticCoordinates);
+        const targetGalacticCoordinates = getStarGalacticCoordinates(this.targetSystem);
+        const distanceLY = Vector3.Distance(missionGiverGalacticCoordinates, targetGalacticCoordinates);
 
-            this.reward += 100 * distanceLY * distanceLY;
-        });
+        this.reward = 100 * distanceLY * distanceLY;
 
         this.tree = this.generateMissionTree();
     }
 
     private generateMissionTree(): MissionNode {
-        return new MissionAndNode(
-            this.targets.map((target) => {
-                switch (target.type) {
-                    case SightSeeingType.FLY_BY:
-                        return new MissionSightSeeingFlyByNode(target.objectId);
-                    case SightSeeingType.LAND:
-                        return new MissionSightSeeingLandNode(target.objectId);
-                    case SightSeeingType.ASTEROID_FIELD:
-                        return new MissionSightSeeingAsteroidFieldNode(target.objectId);
-                    default:
-                        throw new Error(`Unknown sight seeing type: ${target.type}`);
-                }
-            })
-        );
+        switch (this.target.type) {
+            case SightSeeingType.FLY_BY:
+                return new MissionSightSeeingFlyByNode(this.target.objectId);
+            case SightSeeingType.TERMINATOR_LANDING:
+                return new MissionSightSeeingLandNode(this.target.objectId);
+            case SightSeeingType.ASTEROID_FIELD_TREK:
+                return new MissionSightSeeingAsteroidFieldNode(this.target.objectId);
+            default:
+                throw new Error(`Unknown sight seeing type: ${this.target.type}`);
+        }
     }
 
     getTargetSystems(): SystemSeed[] {
-        return this.targetSystems;
+        return [this.targetSystem];
     }
 
     getReward(): number {
@@ -114,8 +98,33 @@ export class SightSeeingMission implements Mission {
         const systemModel = context.currentSystem.model;
         if (systemModel instanceof SeededStarSystemModel) {
             // if the current system is none of the target systems, early return
-            if (this.targetSystems.every((target) => !target.equals(systemModel.seed))) return;
+            if (!this.targetSystem.equals(systemModel.seed)) return;
         }
         this.tree.updateState(context);
+    }
+
+    describe(): string {
+        const missionGiverGalacticCoordinates = getStarGalacticCoordinates((this.missionGiver.starSystem as SeededStarSystemModel).seed);
+        const systemSeed = SystemSeed.Deserialize(this.target.objectId.starSystem);
+        const systemGalacticPosition = getStarGalacticCoordinates(systemSeed);
+        const distance = Vector3.Distance(missionGiverGalacticCoordinates, systemGalacticPosition);
+        const systemModel = new SeededStarSystemModel(systemSeed);
+
+        let actionString: string;
+        switch (this.target.type) {
+            case SightSeeingType.FLY_BY:
+                actionString = "Fly By of";
+                break;
+            case SightSeeingType.TERMINATOR_LANDING:
+                actionString = "Landing at the terminator of";
+                break;
+            case SightSeeingType.ASTEROID_FIELD_TREK:
+                actionString = "Trek in the asteroid field around";
+                break;
+            default:
+                throw new Error(`Unknown sight seeing type: ${this.target.type}`);
+        }
+
+        return `${actionString} in ${systemModel.name} (${parseDistance(distance * Settings.LIGHT_YEAR)}`;
     }
 }

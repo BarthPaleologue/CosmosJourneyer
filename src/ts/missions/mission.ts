@@ -24,4 +24,6 @@ export interface Mission {
     getState(): MissionState;
 
     update(context: MissionContext): void;
+
+    describe(): string;
 }
