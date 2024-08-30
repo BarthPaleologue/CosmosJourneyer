@@ -74,6 +74,7 @@ import { placeSpaceStations } from "../society/spaceStationPlacement";
 import { isSystemInHumanBubble } from "../society/starSystemSociety";
 import { Player } from "../player/player";
 import { getNeighborStarSystems } from "../utils/getNeighborStarSystems";
+import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -621,6 +622,14 @@ export class StarSystemView implements View {
         }
 
         this.orbitRenderer.update();
+
+        this.player.currentMissions.forEach((mission) => {
+            mission.update({
+                currentSystem: this.getStarSystem(),
+                playerPosition: this.scene.getActiveControls().getTransform().getAbsolutePosition(),
+                physicsEngine: this.scene.getPhysicsEngine() as PhysicsEngineV2
+            });
+        });
 
         Materials.BUTTERFLY_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
         Materials.BUTTERFLY_DEPTH_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);

@@ -1,4 +1,5 @@
 import { SystemSeed, SystemSeedSerialized } from "../utils/systemSeed";
+import { Mission } from "../missions/mission";
 
 export type SerializedPlayer = {
     name: string;
@@ -15,6 +16,8 @@ export class Player {
 
     currentItinerary: SystemSeed[];
     systemBookmarks: SystemSeed[];
+
+    currentMissions: Mission[] = [];
 
     private constructor(name: string, balance: number, creationDate: Date, currentItinerary: SystemSeed[], systemBookmarks: SystemSeed[]) {
         this.name = name;
