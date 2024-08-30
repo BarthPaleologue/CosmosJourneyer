@@ -95,7 +95,7 @@ export class BlackHole implements StellarObject, Cullable {
     }
 
     getTypeName(): string {
-        return i18n.t("objectTypes:blackHole");
+        return this.model.typeName;
     }
 
     public computeCulling(cameras: Camera[]): void {

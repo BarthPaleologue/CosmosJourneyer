@@ -100,7 +100,7 @@ export class JuliaSet implements Anomaly, Cullable {
     }
 
     getTypeName(): string {
-        return i18n.t("objectTypes:anomaly");
+        return this.model.typeName;
     }
 
     computeCulling(cameras: Camera[]): void {

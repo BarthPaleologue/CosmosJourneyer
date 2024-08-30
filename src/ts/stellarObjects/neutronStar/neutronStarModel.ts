@@ -31,6 +31,7 @@ import { BodyType } from "../../architecture/bodyType";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { starName } from "../../utils/parseToStrings";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
+import i18n from "../../i18n";
 
 export class NeutronStarModel implements StellarObjectModel {
     readonly name: string;
@@ -56,6 +57,8 @@ export class NeutronStarModel implements StellarObjectModel {
     readonly childrenBodies: CelestialBodyModel[] = [];
 
     readonly starSystemModel: StarSystemModel;
+
+    readonly typeName: string;
 
     constructor(seed: number, starSystemModel: StarSystemModel, parentBody: CelestialBodyModel | null = null) {
         this.seed = seed;
@@ -96,5 +99,7 @@ export class NeutronStarModel implements StellarObjectModel {
         } else {
             this.rings = null;
         }
+
+        this.typeName = i18n.t("objectTypes:neutronStar");
     }
 }

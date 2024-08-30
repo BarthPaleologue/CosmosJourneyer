@@ -32,6 +32,7 @@ import { BodyType } from "../../architecture/bodyType";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { getPlanetName } from "../common";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
+import i18n from "../../i18n";
 
 export class GasPlanetModel implements PlanetModel {
     readonly name: string;
@@ -54,6 +55,8 @@ export class GasPlanetModel implements PlanetModel {
     readonly childrenBodies: CelestialBodyModel[] = [];
 
     readonly starSystem: StarSystemModel;
+
+    readonly typeName = i18n.t("objectTypes:gasPlanet");
 
     constructor(seed: number, starSystem: StarSystemModel, parentBody?: CelestialBodyModel) {
         this.seed = seed;

@@ -176,10 +176,7 @@ export class TelluricPlanet implements Planet, Cullable {
     }
 
     getTypeName(): string {
-        if (this.parent?.model.bodyType === BodyType.TELLURIC_PLANET || this.parent?.model.bodyType === BodyType.GAS_PLANET) {
-            return i18n.t("objectTypes:telluricMoon");
-        }
-        return i18n.t("objectTypes:telluricPlanet");
+        return this.model.typeName;
     }
 
     /**

@@ -38,6 +38,7 @@ import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { StarModel } from "../stellarObjects/star/starModel";
 import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
 import { Settings } from "../settings";
+import i18n from "../i18n";
 
 export class SpaceStationModel implements OrbitalObjectModel {
     readonly name: string;
@@ -84,6 +85,8 @@ export class SpaceStationModel implements OrbitalObjectModel {
     readonly housingSurfaceHa: number;
     readonly agricultureSurfaceHa: number;
     readonly totalHabitatSurfaceM2: number;
+
+    readonly typeName = i18n.t("objectTypes:spaceStation");
 
     constructor(seed: number, starSystemModel: StarSystemModel, parentBody?: CelestialBodyModel) {
         this.seed = seed;

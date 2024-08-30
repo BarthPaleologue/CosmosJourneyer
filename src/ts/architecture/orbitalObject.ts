@@ -166,4 +166,9 @@ export interface OrbitalObjectModel {
      * The models of the children objects of the object
      */
     readonly childrenBodies: OrbitalObjectModel[];
+
+    /**
+     * The general name of the object type
+     */
+    readonly typeName: string;
 }

@@ -130,7 +130,7 @@ export class NeutronStar implements StellarObject, Cullable {
     }
 
     getTypeName(): string {
-        return i18n.t("objectTypes:neutronStar");
+        return this.model.typeName;
     }
 
     getRotationAxis(): Vector3 {

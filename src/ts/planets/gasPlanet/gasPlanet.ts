@@ -136,7 +136,7 @@ export class GasPlanet implements Planet, Cullable {
     }
 
     getTypeName(): string {
-        return i18n.t("objectTypes:gasPlanet");
+        return this.model.typeName;
     }
 
     public computeCulling(cameras: Camera[]): void {

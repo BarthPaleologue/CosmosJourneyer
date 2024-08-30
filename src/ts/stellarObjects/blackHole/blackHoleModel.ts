@@ -30,6 +30,7 @@ import { BodyType } from "../../architecture/bodyType";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { starName } from "../../utils/parseToStrings";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
+import i18n from "../../i18n";
 
 export class BlackHoleModel implements StellarObjectModel {
     readonly name: string;
@@ -87,6 +88,8 @@ export class BlackHoleModel implements StellarObjectModel {
             axialTilt: normalRandom(0, 0.4, this.rng, GenerationSteps.AXIAL_TILT),
             accretionDiskRadius: this.radius * normalRandom(12, 3, this.rng, 7777)
         };
+
+        this.typeName = i18n.t("objectTypes:blackHole");
     }
 
     /**

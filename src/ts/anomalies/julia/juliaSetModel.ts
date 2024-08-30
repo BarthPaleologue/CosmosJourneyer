@@ -29,8 +29,9 @@ import { BodyType } from "../../architecture/bodyType";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { wheelOfFortune } from "../../utils/random";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { GreekAlphabet } from "../../utils/parseToStrings";
+import { GreekAlphabet, ReversedGreekAlphabet } from "../../utils/parseToStrings";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
+import i18n from "../../i18n";
 
 export class JuliaSetModel implements PlanetModel {
     readonly name: string;
@@ -55,6 +56,8 @@ export class JuliaSetModel implements PlanetModel {
 
     readonly starSystem: StarSystemModel;
 
+    readonly typeName: string;
+
     constructor(seed: number, starSystemModel: StarSystemModel, parentBody?: CelestialBodyModel) {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed);
@@ -62,7 +65,7 @@ export class JuliaSetModel implements PlanetModel {
         this.starSystem = starSystemModel;
 
         const anomalyIndex = this.starSystem.getAnomalies().findIndex(([_, anomalySeed]) => anomalySeed === this.seed);
-        this.name = `${this.starSystem.name} ${GreekAlphabet[anomalyIndex]}`;
+        this.name = `${this.starSystem.name} ${ReversedGreekAlphabet[anomalyIndex].toUpperCase()}`;
 
         this.radius = 1000e3;
 
@@ -100,6 +103,8 @@ export class JuliaSetModel implements PlanetModel {
             ],
             this.rng(GenerationSteps.NB_MOONS)
         );
+
+        this.typeName = i18n.t("objectTypes:anomaly");
     }
 
     getApparentRadius(): number {

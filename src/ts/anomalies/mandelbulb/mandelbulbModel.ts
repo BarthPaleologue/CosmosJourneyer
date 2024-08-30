@@ -29,8 +29,9 @@ import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { BodyType } from "../../architecture/bodyType";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { wheelOfFortune } from "../../utils/random";
-import { GreekAlphabet } from "../../utils/parseToStrings";
+import { GreekAlphabet, ReversedGreekAlphabet } from "../../utils/parseToStrings";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
+import i18n from "../../i18n";
 
 export class MandelbulbModel implements PlanetModel {
     readonly name;
@@ -56,6 +57,8 @@ export class MandelbulbModel implements PlanetModel {
 
     readonly starSystemModel: StarSystemModel;
 
+    readonly typeName: string;
+
     constructor(seed: number, starSystemModel: StarSystemModel, parentBody?: CelestialBodyModel) {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed);
@@ -63,7 +66,7 @@ export class MandelbulbModel implements PlanetModel {
         this.starSystemModel = starSystemModel;
 
         const anomalyIndex = this.starSystemModel.getAnomalies().findIndex(([_, anomalySeed]) => anomalySeed === this.seed);
-        this.name = `${this.starSystemModel.name} ${GreekAlphabet[anomalyIndex]}`;
+        this.name = `${this.starSystemModel.name} ${ReversedGreekAlphabet[anomalyIndex].toUpperCase()}`;
 
         this.radius = 1000e3;
 
@@ -102,6 +105,8 @@ export class MandelbulbModel implements PlanetModel {
             ],
             this.rng(GenerationSteps.NB_MOONS)
         );
+
+        this.typeName = i18n.t("objectTypes:anomaly");
     }
 
     getApparentRadius(): number {

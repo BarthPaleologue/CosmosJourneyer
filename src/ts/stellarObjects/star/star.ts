@@ -25,7 +25,6 @@ import { Light } from "@babylonjs/core/Lights/light";
 import { setRotationQuaternion } from "../../uberCore/transforms/basicTransform";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
-import { getStellarTypeString } from "../common";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
 import { CelestialBody } from "../../architecture/celestialBody";
@@ -38,7 +37,6 @@ import { Cullable } from "../../utils/cullable";
 import { OrbitProperties } from "../../orbit/orbitProperties";
 import { RingsUniforms } from "../../rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
-import i18n from "../../i18n";
 import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
@@ -151,7 +149,7 @@ export class Star implements StellarObject, Cullable {
     }
 
     getTypeName(): string {
-        return i18n.t("objectTypes:star", { stellarType: getStellarTypeString(this.model.stellarType) });
+        return this.model.typeName;
     }
 
     public updateMaterial(deltaTime: number): void {

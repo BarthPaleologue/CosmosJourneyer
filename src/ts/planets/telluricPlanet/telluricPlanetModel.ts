@@ -34,6 +34,7 @@ import { BodyType } from "../../architecture/bodyType";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { getPlanetName } from "../common";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
+import i18n from "../../i18n";
 
 export class TelluricPlanetModel implements PlanetModel {
     readonly name: string;
@@ -62,6 +63,8 @@ export class TelluricPlanetModel implements PlanetModel {
 
     readonly parentBody: CelestialBodyModel | null;
     readonly childrenBodies: CelestialBodyModel[] = [];
+
+    readonly typeName;
 
     constructor(seed: number, starSystemModel: StarSystemModel, parentBody?: CelestialBodyModel) {
         this.starSystem = starSystemModel;
@@ -165,6 +168,8 @@ export class TelluricPlanetModel implements PlanetModel {
         }
 
         this.nbMoons = randRangeInt(0, 2, this.rng, GenerationSteps.NB_MOONS);
+
+        this.typeName = this.isMoon() ? i18n.t("objectTypes:telluricMoon") : i18n.t("objectTypes:telluricPlanet");
     }
 
     getApparentRadius(): number {

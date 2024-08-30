@@ -138,7 +138,7 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
     }
 
     getTypeName(): string {
-        return i18n.t("objectTypes:spaceStation");
+        return this.model.typeName;
     }
 
     public computeCulling(cameras: Camera[]): void {
