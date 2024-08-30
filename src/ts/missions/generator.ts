@@ -24,50 +24,44 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
         systemModel.getAnomalies().forEach((_, anomalyIndex) => {
             if (!uniformRandBool(1.0 / (1.0 + 0.4 * distance), systemModel.rng, 6254 + anomalyIndex + hours)) return;
             anomalyFlyByMissions.push(
-                new SightSeeingMission(spaceStationModel, [
-                    {
-                        type: SightSeeingType.FLY_BY,
-                        objectId: {
-                            starSystem: systemSeed.serialize(),
-                            objectType: SystemObjectType.ANOMALY,
-                            index: anomalyIndex
-                        }
+                new SightSeeingMission(spaceStationModel, {
+                    type: SightSeeingType.FLY_BY,
+                    objectId: {
+                        starSystem: systemSeed.serialize(),
+                        objectType: SystemObjectType.ANOMALY,
+                        index: anomalyIndex
                     }
-                ])
+                })
             );
         });
 
         systemModel.getStellarObjects().forEach(([bodyType, bodySeed], stellarObjectIndex) => {
             if (bodyType === BodyType.NEUTRON_STAR) {
                 neutronStarFlyByMissions.push(
-                    new SightSeeingMission(spaceStationModel, [
-                        {
-                            type: SightSeeingType.FLY_BY,
-                            objectId: {
-                                starSystem: systemSeed.serialize(),
-                                objectType: SystemObjectType.STELLAR_OBJECT,
-                                index: stellarObjectIndex
-                            }
+                    new SightSeeingMission(spaceStationModel, {
+                        type: SightSeeingType.FLY_BY,
+                        objectId: {
+                            starSystem: systemSeed.serialize(),
+                            objectType: SystemObjectType.STELLAR_OBJECT,
+                            index: stellarObjectIndex
                         }
-                    ])
+                    })
                 );
             }
             if (bodyType === BodyType.BLACK_HOLE) {
                 blackHoleFlyByMissions.push(
-                    new SightSeeingMission(spaceStationModel, [
-                        {
-                            type: SightSeeingType.FLY_BY,
-                            objectId: {
-                                starSystem: systemSeed.serialize(),
-                                objectType: SystemObjectType.STELLAR_OBJECT,
-                                index: stellarObjectIndex
-                            }
+                    new SightSeeingMission(spaceStationModel, {
+                        type: SightSeeingType.FLY_BY,
+                        objectId: {
+                            starSystem: systemSeed.serialize(),
+                            objectType: SystemObjectType.STELLAR_OBJECT,
+                            index: stellarObjectIndex
                         }
-                    ])
+                    })
                 );
             }
         });
     });
 
-    return anomalyFlyByMissions.concat(neutronStarFlyByMissions, blackHoleFlyByMissions);
+    return blackHoleFlyByMissions.concat(neutronStarFlyByMissions, anomalyFlyByMissions);
 }

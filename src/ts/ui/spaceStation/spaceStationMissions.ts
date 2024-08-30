@@ -4,10 +4,9 @@ import { SeededStarSystemModel } from "../../starSystem/seededStarSystemModel";
 import { parseDistance } from "../../utils/parseToStrings";
 import { Settings } from "../../settings";
 import { uniformRandBool } from "extended-random";
-import { getSpaceStationModels } from "../../utils/getSpaceStationModels";
+import { getSpaceStationModels } from "../../utils/getModelsFromSystemModel";
 import { generateSightseeingMissions } from "../../missions/generator";
 import { getStarGalacticCoordinates } from "../../utils/getStarGalacticCoordinates";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export function generateMissionsHTML(stationModel: SpaceStationModel) {
     const sightSeeingMissions = generateSightseeingMissions(stationModel, Date.now());
@@ -42,16 +41,8 @@ export function generateMissionsHTML(stationModel: SpaceStationModel) {
         
         ${sightSeeingMissions
             .map((mission) => {
-                const systemNamesAndDistances: [string, number][] = mission.getTargetSystems().map((systemSeed) => {
-                    const systemGalacticPosition = getStarGalacticCoordinates(systemSeed);
-                    const distance = Vector3.Distance(systemGalacticPosition, starSystemPosition);
-                    const systemModel = new SeededStarSystemModel(systemSeed);
-
-                    return [systemModel.name, distance];
-                });
-
                 return `<div class="missionItem">
-                    <p>Sightseeing in ${systemNamesAndDistances.map(([name, distance]) => `${name} (${parseDistance(distance * Settings.LIGHT_YEAR)}`).join(", ")})</p>
+                    <p>${mission.describe()}</p>
                     </div>`;
             })
             .join("")}

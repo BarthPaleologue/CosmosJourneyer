@@ -12,6 +12,9 @@ import { MissionSightSeeingLandNode } from "./nodes/actions/sightseeing/missionS
 import { MissionSightSeeingAsteroidFieldNode } from "./nodes/actions/sightseeing/missionSightSeeingAsteroidFieldNode";
 import { Settings } from "../settings";
 import { parseDistance } from "../utils/parseToStrings";
+import { getObjectModelByUniverseId } from "../utils/orbitalObjectId";
+import { bodyTypeToString } from "../architecture/bodyType";
+import i18n from "../i18n";
 
 export const enum SightSeeingType {
     FLY_BY,
@@ -110,21 +113,34 @@ export class SightSeeingMission implements Mission {
         const distance = Vector3.Distance(missionGiverGalacticCoordinates, systemGalacticPosition);
         const systemModel = new SeededStarSystemModel(systemSeed);
 
-        let actionString: string;
+        const targetModel = getObjectModelByUniverseId(this.target.objectId);
+        const targetModelTypeString = targetModel.typeName.toLowerCase();
+        const targetModelNameString = targetModel.name;
+
+        let describeString: string;
         switch (this.target.type) {
             case SightSeeingType.FLY_BY:
-                actionString = "Fly By of";
+                describeString = i18n.t("missions:sightseeing:describeFlyBy", {
+                    objectType: targetModelTypeString,
+                    systemName: systemModel.name
+                });
                 break;
             case SightSeeingType.TERMINATOR_LANDING:
-                actionString = "Landing at the terminator of";
+                describeString = i18n.t("missions:sightseeing:describeTerminatorLanding", {
+                    objectName: targetModelNameString,
+                    systemName: systemModel.name
+                });
                 break;
             case SightSeeingType.ASTEROID_FIELD_TREK:
-                actionString = "Trek in the asteroid field around";
+                describeString = i18n.t("missions:sightseeing:describeAsteroidFieldTrek", {
+                    objectName: targetModelNameString,
+                    systemName: systemModel.name
+                });
                 break;
             default:
                 throw new Error(`Unknown sight seeing type: ${this.target.type}`);
         }
 
-        return `${actionString} in ${systemModel.name} (${parseDistance(distance * Settings.LIGHT_YEAR)}`;
+        return `${describeString} (${parseDistance(distance * Settings.LIGHT_YEAR)})`;
     }
 }

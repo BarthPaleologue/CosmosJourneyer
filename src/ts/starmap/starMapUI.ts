@@ -31,7 +31,7 @@ import { getStarGalacticCoordinates } from "../utils/getStarGalacticCoordinates"
 import { parseDistance } from "../utils/parseToStrings";
 import { factionToString } from "../powerplay/factions";
 import { isSystemInHumanBubble } from "../society/starSystemSociety";
-import { getSpaceStationModels } from "../utils/getSpaceStationModels";
+import { getSpaceStationModels } from "../utils/getModelsFromSystemModel";
 
 export class StarMapUI {
     readonly htmlRoot: HTMLDivElement;

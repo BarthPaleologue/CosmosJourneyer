@@ -1,4 +1,4 @@
-import { OrbitalObject } from "../architecture/orbitalObject";
+import { OrbitalObject, OrbitalObjectModel } from "../architecture/orbitalObject";
 import { StarSystemController } from "../starSystem/starSystemController";
 import { StellarObject } from "../architecture/stellarObject";
 import { SystemObjectId, UniverseObjectId, SystemObjectType } from "../saveFile/universeCoordinates";
@@ -6,6 +6,9 @@ import { Planet } from "../architecture/planet";
 import { Anomaly } from "../anomalies/anomaly";
 import { SpaceStation } from "../spacestation/spaceStation";
 import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
+import { SystemSeed } from "./systemSeed";
+import { placeSpaceStations } from "../society/spaceStationPlacement";
+import { getAnomalyModels, getPlanetaryMassObjectModels, getSpaceStationModels, getStellarObjectModels } from "./getModelsFromSystemModel";
 
 /**
  * Get the object ID of the given orbital object within the star system.
@@ -70,4 +73,22 @@ export function getObjectBySystemId(systemObjectId: SystemObjectId, starSystem: 
     }
 
     return orbitalObject;
+}
+
+export function getObjectModelByUniverseId(universeObjectId: UniverseObjectId): OrbitalObjectModel {
+    const starSystemSeed = SystemSeed.Deserialize(universeObjectId.starSystem);
+    const seededStarSystemModel = new SeededStarSystemModel(starSystemSeed);
+
+    switch (universeObjectId.objectType) {
+        case SystemObjectType.STELLAR_OBJECT:
+            return getStellarObjectModels(seededStarSystemModel)[universeObjectId.index];
+        case SystemObjectType.PLANETARY_MASS_OBJECT:
+            return getPlanetaryMassObjectModels(seededStarSystemModel)[universeObjectId.index];
+        case SystemObjectType.ANOMALY:
+            return getAnomalyModels(seededStarSystemModel)[universeObjectId.index];
+        case SystemObjectType.SPACE_STATION:
+            return getSpaceStationModels(seededStarSystemModel)[universeObjectId.index];
+        default:
+            throw new Error(`Unknown universe object type: ${universeObjectId.objectType}`);
+    }
 }
