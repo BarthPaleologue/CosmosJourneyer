@@ -36,7 +36,7 @@ import i18n from "../../i18n";
 export class JuliaSetModel implements PlanetModel {
     readonly name: string;
 
-    readonly bodyType = BodyType.MANDELBULB;
+    readonly bodyType = BodyType.ANOMALY;
     readonly seed: number;
     readonly rng: (step: number) => number;
 

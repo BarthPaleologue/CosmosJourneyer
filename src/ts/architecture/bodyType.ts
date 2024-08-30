@@ -19,7 +19,7 @@ export const enum BodyType {
     STAR,
     TELLURIC_PLANET,
     GAS_PLANET,
-    MANDELBULB,
+    ANOMALY,
     BLACK_HOLE,
     NEUTRON_STAR
 }

@@ -36,7 +36,7 @@ import i18n from "../../i18n";
 export class MandelbulbModel implements PlanetModel {
     readonly name;
 
-    readonly bodyType = BodyType.MANDELBULB;
+    readonly bodyType = BodyType.ANOMALY;
     readonly seed: number;
     readonly rng: (step: number) => number;
 
