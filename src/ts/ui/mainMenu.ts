@@ -18,7 +18,8 @@ import i18n from "../i18n";
 import { BodyType } from "../architecture/bodyType";
 import { Sounds } from "../assets/sounds";
 import { PanelType, SidePanels } from "./sidePanels";
-import { UniverseObjectIdentifier } from "../saveFile/universeCoordinates";
+import { SystemObjectType, UniverseObjectId } from "../saveFile/universeCoordinates";
+import { getObjectBySystemId } from "../utils/orbitalObjectId";
 
 export class MainMenu {
     readonly scene: UberScene;
@@ -39,7 +40,7 @@ export class MainMenu {
 
     private readonly sidePanels: SidePanels;
 
-    private readonly orbitalObjectIndex: number;
+    private readonly universeObjectId: UniverseObjectId;
 
     private readonly startAnimationDurationSeconds = 5;
 
@@ -50,7 +51,7 @@ export class MainMenu {
         this.scene = this.starSystemView.scene;
         this.controls = this.starSystemView.getDefaultControls();
 
-        const allowedIdentifiers: UniverseObjectIdentifier[] = [
+        const allowedIdentifiers: UniverseObjectId[] = [
             {
                 starSystem: {
                     starSectorX: 1,
@@ -58,7 +59,8 @@ export class MainMenu {
                     starSectorZ: 0,
                     index: 7
                 },
-                orbitalObjectIndex: 1
+                objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
+                index: 1
             },
             {
                 starSystem: {
@@ -67,7 +69,8 @@ export class MainMenu {
                     starSectorZ: 0,
                     index: 0
                 },
-                orbitalObjectIndex: 3
+                objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
+                index: 1
             },
             {
                 starSystem: {
@@ -76,7 +79,8 @@ export class MainMenu {
                     starSectorZ: 1,
                     index: 4
                 },
-                orbitalObjectIndex: 1
+                objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
+                index: 3
             },
             {
                 starSystem: {
@@ -85,7 +89,8 @@ export class MainMenu {
                     starSectorZ: 1,
                     index: 9
                 },
-                orbitalObjectIndex: 1
+                objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
+                index: 0
             },
             {
                 starSystem: {
@@ -94,7 +99,8 @@ export class MainMenu {
                     starSectorZ: 1,
                     index: 1
                 },
-                orbitalObjectIndex: 2
+                objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
+                index: 1
             },
             {
                 starSystem: {
@@ -103,7 +109,8 @@ export class MainMenu {
                     starSectorZ: 0,
                     index: 12
                 },
-                orbitalObjectIndex: 2
+                objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
+                index: 0
             },
             {
                 starSystem: {
@@ -112,7 +119,8 @@ export class MainMenu {
                     starSectorZ: 0,
                     index: 5
                 },
-                orbitalObjectIndex: 1
+                objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
+                index: 0
             },
             {
                 starSystem: {
@@ -121,12 +129,13 @@ export class MainMenu {
                     starSectorZ: 0,
                     index: 17
                 },
-                orbitalObjectIndex: 3
+                objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
+                index: 2
             }
         ];
 
         const randomIndex = Math.floor(Math.random() * allowedIdentifiers.length);
-        this.orbitalObjectIndex = allowedIdentifiers[randomIndex].orbitalObjectIndex;
+        this.universeObjectId = allowedIdentifiers[randomIndex];
         const seed = SystemSeed.Deserialize(allowedIdentifiers[randomIndex].starSystem);
         this.starSystemController = new StarSystemController(seed, this.scene);
 
@@ -228,7 +237,10 @@ export class MainMenu {
         this.starSystemView.onInitStarSystem.addOnce(() => {
             this.starSystemView.switchToDefaultControls();
             const nbRadius = this.starSystemController.model.getBodyTypeOfStellarObject(0) === BodyType.BLACK_HOLE ? 8 : 2;
-            const targetObject = this.starSystemController.getOrbitalObjects()[this.orbitalObjectIndex];
+            const targetObject = getObjectBySystemId(this.universeObjectId, this.starSystemController);
+            if (targetObject === null) {
+                throw new Error(`Could not find object with ID ${JSON.stringify(this.universeObjectId)}`);
+            }
             positionNearObjectWithStarVisible(this.controls, targetObject, this.starSystemController, nbRadius);
 
             Settings.TIME_MULTIPLIER = 3;
@@ -325,7 +337,10 @@ export class MainMenu {
 
         const currentForward = getForwardDirection(this.controls.getTransform());
 
-        const orbitalObject = this.starSystemController.getOrbitalObjects()[this.orbitalObjectIndex];
+        const orbitalObject = getObjectBySystemId(this.universeObjectId, this.starSystemController);
+        if (orbitalObject === null) {
+            throw new Error("Could not find object with ID " + JSON.stringify(this.universeObjectId));
+        }
         const celestialBody = this.starSystemController.getBodies().find((body) => body.name === orbitalObject.name);
         if (celestialBody === undefined) {
             throw new Error("No corresponding celestial body found");

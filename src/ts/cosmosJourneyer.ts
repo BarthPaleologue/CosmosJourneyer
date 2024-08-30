@@ -37,7 +37,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { setRotationQuaternion } from "./uberCore/transforms/basicTransform";
 import { encodeBase64 } from "./utils/base64";
-import { UniverseCoordinates } from "./saveFile/universeCoordinates";
+import { UniverseCoordinates, SystemObjectType } from "./saveFile/universeCoordinates";
 import { View } from "./utils/view";
 import { updateInputDevices } from "./inputs/devices";
 import { AudioManager } from "./audio/audioManager";
@@ -54,6 +54,11 @@ import { SidePanels } from "./ui/sidePanels";
 import { Settings } from "./settings";
 import { SeededStarSystemModel } from "./starSystem/seededStarSystemModel";
 import { Player } from "./player/player";
+import { StellarObject } from "./architecture/stellarObject";
+import { Planet } from "./architecture/planet";
+import { Anomaly } from "./anomalies/anomaly";
+import { SpaceStation } from "./spacestation/spaceStation";
+import { getObjectBySystemId, getSystemObjectId, getUniverseObjectId } from "./utils/orbitalObjectId";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -335,7 +340,6 @@ export class CosmosJourneyer {
         if (!(currentStarSystem.model instanceof SeededStarSystemModel)) {
             throw new Error("Cannot save inside a star system that has no generation seed");
         }
-        const seed = currentStarSystem.model.seed;
 
         const spaceShipControls = this.starSystemView.getSpaceshipControls();
 
@@ -354,12 +358,13 @@ export class CosmosJourneyer {
         const nearestOrbitalObjectInverseRotation = nearestOrbitalObject.getTransform().absoluteRotationQuaternion.clone().invert();
         const currentLocalRotation = currentWorldRotation.multiply(nearestOrbitalObjectInverseRotation);
 
+        const universeObjectId = getUniverseObjectId(nearestOrbitalObject, currentStarSystem);
+
         return {
             version: projectInfo.version,
             player: Player.Serialize(this.player),
             universeCoordinates: {
-                starSystem: seed.serialize(),
-                orbitalObjectIndex: nearestOrbitalObjectIndex,
+                universeObjectId: universeObjectId,
                 positionX: currentLocalPosition.x,
                 positionY: currentLocalPosition.y,
                 positionZ: currentLocalPosition.z,
@@ -427,7 +432,9 @@ export class CosmosJourneyer {
     public async loadUniverseCoordinates(universeCoordinates: UniverseCoordinates): Promise<void> {
         this.engine.loadingScreen.displayLoadingUI();
 
-        const seed = SystemSeed.Deserialize(universeCoordinates.starSystem);
+        const universeObjectId = universeCoordinates.universeObjectId;
+
+        const seed = SystemSeed.Deserialize(universeObjectId.starSystem);
 
         await this.starSystemView.loadStarSystemFromSeed(seed);
 
@@ -438,11 +445,9 @@ export class CosmosJourneyer {
 
         const playerTransform = this.starSystemView.scene.getActiveControls().getTransform();
 
-        const nearestOrbitalObject = this.starSystemView.getStarSystem().getOrbitalObjects().at(universeCoordinates.orbitalObjectIndex);
-        if (nearestOrbitalObject === undefined) {
-            throw new Error(
-                `Could not find the nearest orbital object with index ${universeCoordinates.orbitalObjectIndex} among the ${this.starSystemView.getStarSystem().getOrbitalObjects().length} different objects`
-            );
+        const nearestOrbitalObject = getObjectBySystemId(universeObjectId, this.starSystemView.getStarSystem());
+        if (nearestOrbitalObject === null) {
+            throw new Error(`Could not find the nearest orbital object with index ${universeObjectId.index} and type ${universeObjectId.objectType}`);
         }
 
         const nearestOrbitalObjectWorld = nearestOrbitalObject.getTransform().getWorldMatrix();

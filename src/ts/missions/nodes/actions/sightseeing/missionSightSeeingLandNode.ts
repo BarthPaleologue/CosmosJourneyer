@@ -1,22 +1,23 @@
 import { MissionNode } from "../../missionNode";
 import { MissionContext } from "../../../missionContext";
-import { UniverseObjectIdentifier } from "../../../../saveFile/universeCoordinates";
+import { UniverseObjectId } from "../../../../saveFile/universeCoordinates";
 import { SeededStarSystemModel } from "../../../../starSystem/seededStarSystemModel";
 import { SystemSeed } from "../../../../utils/systemSeed";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { CollisionMask } from "../../../../settings";
+import { getObjectBySystemId } from "../../../../utils/orbitalObjectId";
 
 export class MissionSightSeeingLandNode implements MissionNode {
     private hasCompletedLock = false;
 
-    private readonly objectId: UniverseObjectIdentifier;
+    private readonly objectId: UniverseObjectId;
 
     private readonly targetSystemSeed: SystemSeed;
 
     private readonly raycastResult = new PhysicsRaycastResult();
 
-    constructor(objectId: UniverseObjectIdentifier) {
+    constructor(objectId: UniverseObjectId) {
         this.objectId = objectId;
         this.targetSystemSeed = new SystemSeed(objectId.starSystem.starSectorX, objectId.starSystem.starSectorY, objectId.starSystem.starSectorZ, objectId.starSystem.index);
     }
@@ -37,9 +38,9 @@ export class MissionSightSeeingLandNode implements MissionNode {
             }
         }
 
-        const targetObject = currentSystem.getOrbitalObjects().at(this.objectId.orbitalObjectIndex);
-        if (targetObject === undefined) {
-            throw new Error(`Could not find object with index ${this.objectId.orbitalObjectIndex}`);
+        const targetObject = getObjectBySystemId(this.objectId, currentSystem);
+        if (targetObject === null) {
+            throw new Error(`Could not find object with ID ${JSON.stringify(this.objectId)}`);
         }
 
         const playerPosition = context.playerPosition;

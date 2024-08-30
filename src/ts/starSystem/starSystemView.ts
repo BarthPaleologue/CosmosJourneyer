@@ -44,7 +44,6 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { View } from "../utils/view";
 import { SystemSeed } from "../utils/systemSeed";
-import { StarSector } from "../starmap/starSector";
 import { SystemTarget } from "../utils/systemTarget";
 import { StarSystemInputs } from "../inputs/starSystemInputs";
 import { createNotification } from "../utils/notification";
@@ -75,6 +74,7 @@ import { isSystemInHumanBubble } from "../society/starSystemSociety";
 import { Player } from "../player/player";
 import { getNeighborStarSystems } from "../utils/getNeighborStarSystems";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
+import { getSystemObjectId, getUniverseObjectId } from "../utils/orbitalObjectId";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -333,6 +333,11 @@ export class StarSystemView implements View {
                     createNotification(i18n.t("notifications:howToLiftOff", { bindingsString: axisCompositeToString(control)[1][1] }), 5000);
                 }
             }
+        });
+
+        StarSystemInputs.map.printDebugInfo.on("complete", () => {
+            const object = this.getStarSystem().getNearestOrbitalObject(Vector3.Zero());
+            console.log(getUniverseObjectId(object, this.getStarSystem()));
         });
 
         this.scene = new UberScene(engine);

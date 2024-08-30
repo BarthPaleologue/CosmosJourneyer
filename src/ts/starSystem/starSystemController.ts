@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-
 import { Matrix, Quaternion } from "@babylonjs/core/Maths/math";
 import { PostProcessType } from "../postProcesses/postProcessTypes";
 import { getTransformationQuaternion } from "../utils/algebra";
@@ -43,7 +42,6 @@ import { Anomaly } from "../anomalies/anomaly";
 import { StarFieldBox } from "./starFieldBox";
 import { StarSystemModel } from "./starSystemModel";
 import { Settings } from "../settings";
-import { StarSector } from "../starmap/starSector";
 import { getStarGalacticCoordinates } from "../utils/getStarGalacticCoordinates";
 
 export class StarSystemController {
@@ -61,6 +59,11 @@ export class StarSystemController {
      * The list of all stellar objects in the system (stars, black holes, pulsars)
      */
     readonly stellarObjects: StellarObject[] = [];
+
+    /**
+     * The list of all planetary mass objects in the system (planets and moons)
+     */
+    readonly planetaryMassObjects: Planet[] = [];
 
     /**
      * The list of all planets in the system (telluric and gas)
@@ -100,15 +103,26 @@ export class StarSystemController {
         this.model = model instanceof SystemSeed ? new SeededStarSystemModel(model) : model;
     }
 
+    public addSatellite(satellite: TelluricPlanet): void {
+        if(!satellite.model.isMoon()) throw new Error("Use addTelluricPlanet to add a telluric planet to a planet, not addSatellite");
+        this.orbitalObjects.push(satellite);
+        this.celestialBodies.push(satellite);
+        this.planetaryMassObjects.push(satellite);
+    }
+
     /**
      * Adds a telluric planet to the system and returns it
      * @param planet The planet to add to the system
      */
     public addTelluricPlanet(planet: TelluricPlanet): TelluricPlanet {
+        if (planet.model.isMoon()) {
+            throw new Error("Use addSatellite to add a moon to a planet, not addTelluricPlanet");
+        }
         this.orbitalObjects.push(planet);
         this.celestialBodies.push(planet);
         this.planets.push(planet);
         this.telluricPlanets.push(planet);
+        this.planetaryMassObjects.push(planet);
         return planet;
     }
 
@@ -121,6 +135,7 @@ export class StarSystemController {
         this.celestialBodies.push(planet);
         this.planets.push(planet);
         this.gasPlanets.push(planet);
+        this.planetaryMassObjects.push(planet);
         return planet;
     }
 

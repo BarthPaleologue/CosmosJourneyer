@@ -1,6 +1,6 @@
 import { Mission, MissionState } from "./mission";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
-import { UniverseObjectIdentifier } from "../saveFile/universeCoordinates";
+import { UniverseObjectId } from "../saveFile/universeCoordinates";
 import { SystemSeed } from "../utils/systemSeed";
 import { getStarGalacticCoordinates } from "../utils/getStarGalacticCoordinates";
 import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
@@ -20,7 +20,7 @@ export const enum SightSeeingType {
 
 export type SightSeeingTarget = {
     type: SightSeeingType;
-    objectId: UniverseObjectIdentifier;
+    objectId: UniverseObjectId;
 };
 
 export class SightSeeingMission implements Mission {
