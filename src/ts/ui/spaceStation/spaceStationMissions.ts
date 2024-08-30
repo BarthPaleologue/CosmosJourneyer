@@ -4,44 +4,29 @@ import { SeededStarSystemModel } from "../../starSystem/seededStarSystemModel";
 import { parseDistance } from "../../utils/parseToStrings";
 import { Settings } from "../../settings";
 import { uniformRandBool } from "extended-random";
-import { BodyType } from "../../architecture/bodyType";
 import { getSpaceStationModels } from "../../utils/getSpaceStationModels";
+import { generateSightseeingMissions } from "../../missions/generator";
+import { getStarGalacticCoordinates } from "../../utils/getStarGalacticCoordinates";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export function generateMissionsHTML(stationModel: SpaceStationModel) {
+    const sightSeeingMissions = generateSightseeingMissions(stationModel, Date.now());
+
     const starSystem = stationModel.starSystem;
     if (!(starSystem instanceof SeededStarSystemModel)) {
         throw new Error("Star system is not seeded, hence missions cannot be generated");
     }
+    const starSystemPosition = getStarGalacticCoordinates(starSystem.seed);
     const neighborSystems = getNeighborStarSystems(starSystem.seed, 75);
-
-    const systemsWithAnomalies: [SeededStarSystemModel, number][] = [];
-    const systemsWithNeutronStars: [SeededStarSystemModel, number][] = [];
-    const systemsWithBlackHoles: [SeededStarSystemModel, number][] = [];
 
     let neighborSpaceStations: [SpaceStationModel, number][] = [];
     neighborSystems.forEach(([seed, coordinates, distance], index) => {
         const systemModel = new SeededStarSystemModel(seed);
-        if(systemModel.getNbAnomalies() > 0 && uniformRandBool(1.0 / (1.0 + 0.4 * distance), systemModel.rng, 6254 + index)) {
-            systemsWithAnomalies.push([systemModel, distance]);
-        }
-
-        if(systemModel.getStellarObjects().find(([bodyType, seed]) => bodyType === BodyType.NEUTRON_STAR)) {
-            systemsWithNeutronStars.push([systemModel, distance]);
-        }
-
-        if(systemModel.getStellarObjects().find(([bodyType, seed]) => bodyType === BodyType.BLACK_HOLE)) {
-            systemsWithBlackHoles.push([systemModel, distance]);
-        }
-
         const spaceStations = getSpaceStationModels(systemModel).map<[SpaceStationModel, number]>((stationModel) => {
             return [stationModel, distance];
         });
         neighborSpaceStations = neighborSpaceStations.concat(spaceStations);
     });
-
-    systemsWithAnomalies.sort((a, b) => a[1] - b[1]);
-    systemsWithNeutronStars.sort((a, b) => a[1] - b[1]);
-    systemsWithBlackHoles.sort((a, b) => a[1] - b[1]);
 
     const contactStations = neighborSpaceStations
         // prune list randomly based on distance
@@ -55,26 +40,21 @@ export function generateMissionsHTML(stationModel: SpaceStationModel) {
         
         <h3>Exploration</h3>
         
-        ${systemsWithNeutronStars
-        .map(([system, distance]) => {
-            return `<div class="missionItem">
-                    <p>Visit the neutron star in ${system.name} (${parseDistance(distance * Settings.LIGHT_YEAR)})</p>
+        ${sightSeeingMissions
+            .map((mission) => {
+                const systemNamesAndDistances: [string, number][] = mission.getTargetSystems().map((systemSeed) => {
+                    const systemGalacticPosition = getStarGalacticCoordinates(systemSeed);
+                    const distance = Vector3.Distance(systemGalacticPosition, starSystemPosition);
+                    const systemModel = new SeededStarSystemModel(systemSeed);
+
+                    return [systemModel.name, distance];
+                });
+
+                return `<div class="missionItem">
+                    <p>Sightseeing in ${systemNamesAndDistances.map(([name, distance]) => `${name} (${parseDistance(distance * Settings.LIGHT_YEAR)}`).join(", ")})</p>
                     </div>`;
-        }).join("")}
-        
-        ${systemsWithBlackHoles
-        .map(([system, distance]) => {
-            return `<div class="missionItem">
-                    <p>Visit the black hole in ${system.name} (${parseDistance(distance * Settings.LIGHT_YEAR)})</p>
-                    </div>`;
-        }).join("")}
-        
-        ${systemsWithAnomalies
-        .map(([system, distance]) => {
-            return `<div class="missionItem">
-                    <p>Go investigate the anomaly in ${system.name} (${parseDistance(distance * Settings.LIGHT_YEAR)})</p>
-                    </div>`;
-        }).join("")}
+            })
+            .join("")}
         
         <h3>Terraformation</h3>
         
