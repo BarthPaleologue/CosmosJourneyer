@@ -58,7 +58,9 @@ export class BlackHoleModel implements StellarObjectModel {
 
     readonly starSystemModel: StarSystemModel;
 
-    constructor(seed: number, starSystemModel: StarSystemModel, parentBody?: CelestialBodyModel) {
+    readonly typeName: string;
+
+    constructor(seed: number, starSystemModel: StarSystemModel, parentBody: CelestialBodyModel | null = null) {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed);
 
@@ -69,7 +71,7 @@ export class BlackHoleModel implements StellarObjectModel {
 
         this.radius = 1000e3;
 
-        this.parentBody = parentBody ?? null;
+        this.parentBody = parentBody;
 
         // TODO: do not hardcode
         const orbitRadius = this.parentBody === null ? 0 : 2 * (this.parentBody.radius + this.radius);
