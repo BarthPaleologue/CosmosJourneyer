@@ -170,4 +170,11 @@ export class TelluricPlanetModel implements PlanetModel {
     getApparentRadius(): number {
         return this.radius + this.physicalProperties.oceanLevel;
     }
+
+    /**
+     * Checks if the planet is a moon (i.e. a satellite of a telluric or gas planet).
+     */
+    public isMoon(): boolean {
+        return this.parentBody?.bodyType === BodyType.TELLURIC_PLANET || this.parentBody?.bodyType === BodyType.GAS_PLANET;
+    }
 }
