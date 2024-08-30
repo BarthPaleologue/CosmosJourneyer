@@ -69,16 +69,21 @@ void main() {
 
                 vec3 ringShadeColor = rings_color;
 
-                // hypothèse des rayons parallèles
-                int nbLightSources = nbStars;
+                float softShadowFactor = 1.0;
                 for (int i = 0; i < nbStars; i++) {
+                    // hypothèse des rayons parallèles
                     vec3 rayToSun = normalize(star_positions[i] - object_position);
                     float t2, t3;
                     if (rayIntersectSphere(samplePoint, rayToSun, object_position, object_radius, t2, t3)) {
-                        nbLightSources -= 1;
+                        vec3 closestPointToPlanetCenter = samplePoint + rayToSun * (t2 + t3) * 0.5;
+                        float closestDistanceToPlanetCenter = length(closestPointToPlanetCenter - object_position);
+                        float r01 = remap(closestDistanceToPlanetCenter, 0.0, object_radius, 0.0, 1.0);
+                        softShadowFactor = min(softShadowFactor, 0.2 + 0.8 * smoothstep(0.85, 1.0, r01));
+                    } else {
+                        softShadowFactor = 1.0;
                     }
                 }
-                if (nbLightSources == 0) ringShadeColor *= 0.1;
+                ringShadeColor *= softShadowFactor;
 
                 finalColor = vec4(mix(finalColor.rgb * (1.0 - ringDensity), ringShadeColor, ringDensity), 1.0);
             }
