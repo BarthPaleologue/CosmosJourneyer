@@ -23,6 +23,9 @@ importers:
       '@brianchirls/game-input':
         specifier: ^0.1.1
         version: 0.1.1
+      '@mlc-ai/web-llm':
+        specifier: ^0.2.62
+        version: 0.2.62
       '@tauri-apps/cli':
         specifier: ^1.6.0
         version: 1.6.0
@@ -522,6 +525,9 @@ packages:
 
   '@material/material-color-utilities@0.2.7':
     resolution: {integrity: sha512-0FCeqG6WvK4/Cc06F/xXMd/pv4FeisI0c1tUpBbfhA2n9Y8eZEv4Karjbmf2ZqQCPUWMrGp8A571tCjizxoTiQ==}
+
+  '@mlc-ai/web-llm@0.2.62':
+    resolution: {integrity: sha512-biEYs13nfNjRa4GRVXRsnXLk/yCTslxSH3OjW/4PjoyvZcCtcIe4Aks20WnrMpJMz63ezE6noJF2fkFWStsI0A==}
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -3222,6 +3228,10 @@ packages:
     resolution: {integrity: sha512-8XPvpAA8uyhfteu8pIvQxpJZ7SYYdpUivZpGy6sFsBuKRY/7rQGavedeB8aK+Zkyq6upMFVL/9AW6vOYzfRyLg==}
     engines: {node: '>=10'}
 
+  loglevel@1.9.1:
+    resolution: {integrity: sha512-hP3I3kCrDIMuRwAwHltphhDM1r8i55H33GgqjXbrisuJhF4kRhW1dNuxsRklp4bXl8DSdLaNLuiL4A/LWRfxvg==}
+    engines: {node: '>= 0.6.0'}
+
   lower-case@2.0.2:
     resolution: {integrity: sha512-7fm3l3NAF9WfN6W3JOmf5drwpVqX78JtoGJ3A6W0a6ZnldM41w2fV5D490psKFTpMds8TJse/eHLFFsNHHjHgg==}
 
@@ -5489,6 +5499,10 @@ snapshots:
   '@leichtgewicht/ip-codec@2.0.5': {}
 
   '@material/material-color-utilities@0.2.7': {}
+
+  '@mlc-ai/web-llm@0.2.62':
+    dependencies:
+      loglevel: 1.9.1
 
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
@@ -8758,6 +8772,8 @@ snapshots:
     dependencies:
       chalk: 4.1.2
       is-unicode-supported: 0.1.0
+
+  loglevel@1.9.1: {}
 
   lower-case@2.0.2:
     dependencies:

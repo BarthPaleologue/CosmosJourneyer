@@ -57,6 +57,8 @@ import { Settings } from "./settings";
 import { SeededStarSystemModel } from "./starSystem/seededStarSystemModel";
 import { CustomStarSystemModel } from "./starSystem/customStarSystemModel";
 
+import * as webllm from "@mlc-ai/web-llm";
+
 const enum EngineState {
     UNINITIALIZED,
     RUNNING,
@@ -230,6 +232,33 @@ export class CosmosJourneyer {
 
         // Init starmap view
         const starMap = new StarMap(engine);
+
+        const selectedModel = "Phi-3.5-mini-instruct-q4f16_1-MLC-1k";
+        const initProgressCallback = (report: webllm.InitProgressReport) => {
+            console.log(report.text);
+          };
+        const inferenceEngine: webllm.MLCEngineInterface = await webllm.CreateMLCEngine(
+            selectedModel,
+            {
+            initProgressCallback: initProgressCallback,
+            logLevel: "INFO", // specify the log level
+            },
+            // customize kv cache, use either context_window_size or sliding_window_size (with attention sink)
+            undefined,
+          );
+
+        const reply0 = await inferenceEngine.chat.completions.create({
+        messages: [{ role: "user", content: "Le silence de ces espaces infinis m'effraie" }],
+        // below configurations are all optional
+        n: 1,
+        temperature: 1.5,
+        max_tokens: 256,
+        logit_bias: null,
+        logprobs: true,
+        top_logprobs: 2,
+        });
+        console.log(reply0);
+        console.log(reply0.usage);
 
         return new CosmosJourneyer(engine, starSystemView, starMap);
     }
