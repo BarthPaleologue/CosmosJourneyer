@@ -187,9 +187,9 @@ export class PostProcessManager {
         this.renderingPipelineManager = scene.postProcessRenderPipelineManager;
 
         this.colorCorrection = new ColorCorrection("colorCorrection", scene);
-        this.colorCorrection.exposure = 1.5;
+        this.colorCorrection.exposure = 1.3;
         this.colorCorrection.gamma = 1.0;
-        this.colorCorrection.saturation = 1.2;
+        this.colorCorrection.saturation = 1.5;
 
         this.fxaa = new FxaaPostProcess("fxaa", 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, Constants.TEXTURETYPE_HALF_FLOAT);
 
