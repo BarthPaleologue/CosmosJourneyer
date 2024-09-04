@@ -31,8 +31,6 @@ export abstract class EditorPanel {
         this.panel = document.getElementById(id + "UI") as HTMLElement;
     }
 
-    abstract init(body: CelestialBody, postProcess: PostProcess, scene: Scene): void;
-
     updateAllSliders() {
         for (const slider of this.sliders) slider.update(false);
     }
