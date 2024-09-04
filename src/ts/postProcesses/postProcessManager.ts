@@ -36,7 +36,6 @@ import { PostProcessType } from "./postProcessTypes";
 import { MandelbulbPostProcess } from "../anomalies/mandelbulb/mandelbulbPostProcess";
 import { ShadowPostProcess } from "./shadowPostProcess";
 import { LensFlarePostProcess } from "./lensFlarePostProcess";
-import { Quaternion } from "@babylonjs/core/Maths/math";
 import { isOrbiting } from "../utils/nearestBody";
 import { UpdatablePostProcess } from "./objectPostProcess";
 import { MatterJetPostProcess } from "./matterJetPostProcess";
@@ -54,6 +53,7 @@ import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { BloomEffect } from "@babylonjs/core/PostProcesses/bloomEffect";
+import { Constants } from "@babylonjs/core/Engines/constants";
 
 /**
  * The order in which the post processes are rendered when away from a planet
@@ -186,11 +186,11 @@ export class PostProcessManager {
         this.renderingPipelineManager = scene.postProcessRenderPipelineManager;
 
         this.colorCorrection = new ColorCorrection("colorCorrection", scene);
-        this.colorCorrection.exposure = 1.5;
+        this.colorCorrection.exposure = 1.3;
         this.colorCorrection.gamma = 1.0;
-        this.colorCorrection.saturation = 1.2;
+        this.colorCorrection.saturation = 1.5;
 
-        this.fxaa = new FxaaPostProcess("fxaa", 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine());
+        this.fxaa = new FxaaPostProcess("fxaa", 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, Constants.TEXTURETYPE_HALF_FLOAT);
 
         this.colorCorrectionRenderEffect = new PostProcessRenderEffect(scene.getEngine(), "colorCorrectionRenderEffect", () => {
             return [this.colorCorrection];
@@ -202,8 +202,8 @@ export class PostProcessManager {
         this.renderingPipeline = new PostProcessRenderPipeline(scene.getEngine(), "renderingPipeline");
         this.renderingPipelineManager.addPipeline(this.renderingPipeline);
 
-        this.bloomRenderEffect = new BloomEffect(scene, 1.0, 0.3, 64);
-        this.bloomRenderEffect.threshold = 0.5;
+        this.bloomRenderEffect = new BloomEffect(scene, 1.0, 0.3, 32, Constants.TEXTURETYPE_HALF_FLOAT);
+        this.bloomRenderEffect.threshold = 0.0;
     }
 
     /**
@@ -523,6 +523,7 @@ export class PostProcessManager {
             }
         }
 
+        this.renderingPipeline.addEffect(this.bloomRenderEffect);
         this.renderingPipeline.addEffect(lensFlareRenderEffect);
         this.renderingPipeline.addEffect(this.fxaaRenderEffect);
         this.renderingPipeline.addEffect(this.colorCorrectionRenderEffect);

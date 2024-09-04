@@ -27,17 +27,16 @@ uniform sampler2D textureSampler;
 
 varying vec2 vUV;
 
-#include "./utils/acesTonemap.glsl";
+#include "./utils/tonemapping/acesTonemap.glsl";
 
 void main() {
     vec3 color = texture2D(textureSampler, vUV).rgb;
 
     float alpha = texture2D(textureSampler, vUV).a;
 
-    color = acesTonemap(color);
-
     color *= exposure;
-    color = clamp(color, 0.0, 1.0);
+
+    color = acesTonemap(color);
 
     color = (color - 0.5) * contrast + 0.5 + brightness;
     color = clamp(color, 0.0, 1.0);
