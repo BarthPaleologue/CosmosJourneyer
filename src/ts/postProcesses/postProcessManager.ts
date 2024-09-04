@@ -55,7 +55,6 @@ import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { BloomEffect } from "@babylonjs/core/PostProcesses/bloomEffect";
 import { Constants } from "@babylonjs/core/Engines/constants";
 
-
 /**
  * The order in which the post processes are rendered when away from a planet
  */
@@ -446,6 +445,7 @@ export class PostProcessManager {
         const lensFlareRenderEffect = new PostProcessRenderEffect(this.engine, "LensFlareRenderEffect", () => this.lensFlares);
 
         this.renderingPipeline.addEffect(shadowRenderEffect);
+        this.renderingPipeline.addEffect(this.bloomRenderEffect);
 
         for (const postProcessType of this.currentRenderingOrder) {
             switch (postProcessType) {
@@ -526,7 +526,6 @@ export class PostProcessManager {
         this.renderingPipeline.addEffect(this.bloomRenderEffect);
         this.renderingPipeline.addEffect(lensFlareRenderEffect);
         this.renderingPipeline.addEffect(this.fxaaRenderEffect);
-        //this.renderingPipeline.addEffect(this.bloomRenderEffect);
         this.renderingPipeline.addEffect(this.colorCorrectionRenderEffect);
 
         this.renderingPipelineManager.addPipeline(this.renderingPipeline);

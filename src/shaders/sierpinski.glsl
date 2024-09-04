@@ -36,8 +36,6 @@ uniform sampler2D depthSampler;
 
 #include "./utils/camera.glsl";
 
-#include "./utils/remap.glsl";
-
 #include "./utils/worldFromUV.glsl";
 
 #include "./utils/rayIntersectSphere.glsl";
@@ -127,12 +125,13 @@ vec3 estimate_normal(const vec3 p, const float delta)
 void main() {
     vec4 screenColor = texture2D(textureSampler, vUV);// the current screen color
 
-    vec3 pixelWorldPosition = worldFromUV(vUV, camera_inverseProjection, camera_inverseView);// the pixel position in world space (near plane)
-    vec3 rayDir = normalize(pixelWorldPosition - camera_position);// normalized direction of the ray
-
     float depth = texture2D(depthSampler, vUV).r;// the depth corresponding to the pixel in the depth map
+
+    vec3 pixelWorldPosition = worldFromUV(vUV, depth, camera_inverseProjectionView);// the pixel position in world space (near plane)
+    vec3 rayDir = normalize(pixelWorldPosition - cameraPosition);// normalized direction of the ray
+
     // actual depth of the scene
-    float maximumDistance = length(pixelWorldPosition - camera_position) * remap(depth, 0.0, 1.0, camera_near, camera_far);
+    float maximumDistance = length(pixelWorldPosition - camera_position);
     
     float impactPoint, escapePoint;
     if (!(rayIntersectSphere(camera_position, rayDir, object_position, planetRadius, impactPoint, escapePoint))) {

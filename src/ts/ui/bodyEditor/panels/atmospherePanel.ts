@@ -39,7 +39,7 @@ export class AtmospherePanel extends EditorPanel {
             new Slider("intensity", document.getElementById("intensity") as HTMLElement, 0, 40, atmosphere.atmosphereUniforms.intensity, (val: number) => {
                 atmosphere.atmosphereUniforms.intensity = val;
             }),
-            new Slider("density", document.getElementById("density") as HTMLElement, 0, 40, atmosphere.atmosphereUniforms.densityModifier * 10, (val: number) => {
+            new Slider("density", document.getElementById("density") as HTMLElement, 0, 150, atmosphere.atmosphereUniforms.densityModifier * 10, (val: number) => {
                 atmosphere.atmosphereUniforms.densityModifier = val / 10;
             }),
             new Slider(

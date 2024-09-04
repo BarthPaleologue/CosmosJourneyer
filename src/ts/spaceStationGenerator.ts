@@ -35,16 +35,16 @@ import { Star } from "./stellarObjects/star/star";
 import { Settings } from "./settings";
 import { SpaceStationModel } from "./spacestation/spacestationModel";
 import { StarFieldBox } from "./starSystem/starFieldBox";
+import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 import { CustomStarSystemModel } from "./starSystem/customStarSystemModel";
 import { BodyType } from "./architecture/bodyType";
-import { StarSystemHelper } from "./starSystem/starSystemHelper";
-import { StarSystemController } from "./starSystem/starSystemController";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-const engine = new Engine(canvas, true);
+const engine = new WebGPUEngine(canvas);
+await engine.initAsync();
 engine.useReverseDepthBuffer = true;
 engine.displayLoadingUI();
 
