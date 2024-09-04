@@ -27,13 +27,14 @@ import { BoundingSphere } from "../../../architecture/boundingSphere";
 import { Transformable } from "../../../architecture/transformable";
 import { Scene } from "@babylonjs/core/scene";
 import { Tools } from "@babylonjs/core/Misc/tools";
+import { BloomEffect } from "@babylonjs/core/PostProcesses/bloomEffect";
 
 export class GeneralPanel extends EditorPanel {
     constructor() {
         super("general");
     }
 
-    init(body: Transformable & BoundingSphere, colorCorrection: ColorCorrection, scene: Scene) {
+    init(body: Transformable & BoundingSphere, colorCorrection: ColorCorrection, bloom: BloomEffect, scene: Scene) {
         this.enable();
 
         for (const slider of this.sliders) slider.remove();
@@ -76,13 +77,16 @@ export class GeneralPanel extends EditorPanel {
             }),
             new Slider("gamma", document.getElementById("gamma") as HTMLElement, 0, 300, colorCorrection.gamma * 100, (val: number) => {
                 colorCorrection.gamma = val / 100;
-            })
-            /*new Slider("bloomThreshold", document.getElementById("bloomThreshold") as HTMLElement, 0, 100, bloom.threshold * 100, (val: number) => {
+            }),
+            new Slider("bloomThreshold", document.getElementById("bloomThreshold") as HTMLElement, 0, 100, bloom.threshold * 100, (val: number) => {
                 bloom.threshold = val / 100;
             }),
             new Slider("bloomWeight", document.getElementById("bloomWeight") as HTMLElement, 0, 600, bloom.weight * 100, (val: number) => {
                 bloom.weight = val / 100;
-            })*/
+            }),
+            new Slider("bloomKernel", document.getElementById("bloomKernel") as HTMLElement, 0, 100, bloom.kernel, (val: number) => {
+                bloom.kernel = val;
+            })
         ];
     }
 }

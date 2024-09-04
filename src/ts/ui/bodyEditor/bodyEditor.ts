@@ -175,7 +175,7 @@ export class BodyEditor {
 
         this.generalPanel.enable();
         this.generalPanel.setVisibility(this.currentPanel === this.generalPanel);
-        this.generalPanel.init(body, postProcessManager.colorCorrection, scene);
+        this.generalPanel.init(body, postProcessManager.colorCorrection, postProcessManager.bloomRenderEffect, scene);
 
         const rings = postProcessManager.getRings(body);
         if (rings) {
