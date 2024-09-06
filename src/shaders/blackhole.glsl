@@ -274,10 +274,11 @@ void main() {
     behindBH = behindBH && dot(closestPointEndRay - camera_position, object_position - camera_position) >= 0.0;
 
     vec4 bg = vec4(0.0);
-    if(uv.x >= 0.0 && uv.x <= 1.0 && uv.y >= 0.0 && uv.y <= 1.0 && behindBH) {
+    if(uv.x > 0.0 && uv.x < 1.0 && uv.y > 0.0 && uv.y < 1.0 && behindBH) {
         bg = texture2D(textureSampler, uv);
     } else {
         rayDir = vec3(starfieldRotation * vec4(rayDir, 1.0));
+        rayDir.z *= -1.0;
         bg = texture(starfieldTexture, rayDir);
     }
 
