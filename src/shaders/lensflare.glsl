@@ -25,6 +25,8 @@ float getSun(vec2 uv){
     return length(uv) < 0.009 ? 1.0 : 0.0;
 }
 
+#define CHEAP_FLARE
+
 //from: https://www.shadertoy.com/view/XdfXRX
 vec3 lensflares(vec2 uv, vec2 pos)
 {
