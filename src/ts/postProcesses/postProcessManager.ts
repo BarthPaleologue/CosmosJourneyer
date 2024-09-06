@@ -187,7 +187,7 @@ export class PostProcessManager {
         this.renderingPipelineManager = scene.postProcessRenderPipelineManager;
 
         this.colorCorrection = new ColorCorrection("colorCorrection", scene);
-        this.colorCorrection.exposure = 1.3;
+        this.colorCorrection.exposure = 1.1;
         this.colorCorrection.gamma = 1.0;
         this.colorCorrection.saturation = 1.5;
 
