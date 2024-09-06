@@ -49,6 +49,8 @@ export const Settings = {
 
     PLAYER_JUMP_RANGE_LY: 15,
 
+    CREDIT_SYMBOL: "₽",
+
     /**
      * The average daily intake for a human being in kcal/day
      * It is 2500 for males and 2000 for females, hence 2250.

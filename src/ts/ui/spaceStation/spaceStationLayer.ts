@@ -20,12 +20,13 @@ import { SpaceStationModel } from "../../spacestation/spacestationModel";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { generateInfoHTML } from "./spaceStationInfos";
 import { Player } from "../../player/player";
-import { generateMissionsHTML } from "./spaceStationMissions";
+import { generateMissionsDom } from "./spaceStationMissions";
+import { Settings } from "../../settings";
 
 const enum MainPanelState {
     NONE,
     INFO,
-    MISSIONS,
+    MISSIONS
 }
 
 export class SpaceStationLayer {
@@ -49,7 +50,11 @@ export class SpaceStationLayer {
 
     readonly onTakeOffObservable = new Observable<void>();
 
-    constructor() {
+    readonly player: Player;
+
+    constructor(player: Player) {
+        this.player = player;
+
         if (document.querySelector("#spaceStationUI") === null) {
             document.body.insertAdjacentHTML("beforeend", spaceStationHTML);
         }
@@ -105,11 +110,12 @@ export class SpaceStationLayer {
                 this.mainPanel.innerHTML = generateInfoHTML(this.currentStation);
                 break;
             case MainPanelState.MISSIONS:
-                if(this.currentStation === null) {
+                if (this.currentStation === null) {
                     throw new Error("No current station");
                 }
                 this.mainPanel.classList.remove("hidden");
-                this.mainPanel.innerHTML = generateMissionsHTML(this.currentStation);
+                this.mainPanel.innerHTML = "";
+                this.mainPanel.appendChild(generateMissionsDom(this.currentStation, this.player));
                 break;
             case MainPanelState.NONE:
                 this.mainPanel.classList.add("hidden");
@@ -134,6 +140,6 @@ export class SpaceStationLayer {
             <p class="spaceStationName">${station.name}</p>`;
 
         this.playerName.textContent = `CMDR ${player.name}`;
-        this.playerBalance.textContent = `Balance: ₽${player.balance.toLocaleString()}`;
+        this.playerBalance.textContent = `Balance: ${Settings.CREDIT_SYMBOL}${player.balance.toLocaleString()}`;
     }
 }

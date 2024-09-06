@@ -13,7 +13,6 @@ import { MissionSightSeeingAsteroidFieldNode } from "./nodes/actions/sightseeing
 import { Settings } from "../settings";
 import { parseDistance } from "../utils/parseToStrings";
 import { getObjectModelByUniverseId } from "../utils/orbitalObjectId";
-import { bodyTypeToString } from "../architecture/bodyType";
 import i18n from "../i18n";
 
 export const enum SightSeeingType {
@@ -52,7 +51,7 @@ export class SightSeeingMission implements Mission {
         const targetGalacticCoordinates = getStarGalacticCoordinates(this.targetSystem);
         const distanceLY = Vector3.Distance(missionGiverGalacticCoordinates, targetGalacticCoordinates);
 
-        this.reward = 100 * distanceLY * distanceLY;
+        this.reward = Math.ceil(100 * distanceLY * distanceLY);
 
         this.tree = this.generateMissionTree();
     }
@@ -104,6 +103,19 @@ export class SightSeeingMission implements Mission {
             if (!this.targetSystem.equals(systemModel.seed)) return;
         }
         this.tree.updateState(context);
+    }
+
+    getTypeString(): string {
+        switch (this.target.type) {
+            case SightSeeingType.FLY_BY:
+                return "Fly-By";
+            case SightSeeingType.TERMINATOR_LANDING:
+                return "Terminator Landing";
+            case SightSeeingType.ASTEROID_FIELD_TREK:
+                return "Asteroid Field Trek";
+            default:
+                throw new Error(`Unknown sight seeing type: ${this.target.type}`);
+        }
     }
 
     describe(): string {

@@ -378,7 +378,7 @@ export class StarSystemView implements View {
         this.bodyEditor.resize();
         this.spaceShipLayer.setVisibility(false);
 
-        this.spaceStationLayer = new SpaceStationLayer();
+        this.spaceStationLayer = new SpaceStationLayer(this.player);
         this.spaceStationLayer.setVisibility(false);
         this.spaceStationLayer.onTakeOffObservable.add(() => {
             this.spaceshipControls?.spaceship.takeOff();
