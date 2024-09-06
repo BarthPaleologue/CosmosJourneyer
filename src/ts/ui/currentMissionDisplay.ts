@@ -32,7 +32,11 @@ export class CurrentMissionDisplay {
         this.rootNode = document.createElement("div");
         this.rootNode.classList.add("currentMissionDisplay");
 
-        this.setNoMissionActive();
+        if (this.player.currentMissions.length === 0) {
+            this.setNoMissionActive();
+        } else {
+            this.setMission(this.player.currentMissions[0]);
+        }
 
         SpaceShipControlsInputs.map.previousMission.on("complete", () => {
             this.setPreviousMission();
