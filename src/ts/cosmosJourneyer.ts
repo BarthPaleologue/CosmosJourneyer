@@ -352,6 +352,10 @@ export class CosmosJourneyer {
         const currentWorldPosition = spaceShipControls.getTransform().getAbsolutePosition();
         const nearestOrbitalObjectInverseWorld = nearestOrbitalObject.getTransform().getWorldMatrix().clone().invert();
         const currentLocalPosition = Vector3.TransformCoordinates(currentWorldPosition, nearestOrbitalObjectInverseWorld);
+        const distanceToNearestOrbitalObject = currentLocalPosition.length();
+        if(distanceToNearestOrbitalObject < nearestOrbitalObject.getBoundingRadius() + 200e3) {
+            currentLocalPosition.scaleInPlace((nearestOrbitalObject.getBoundingRadius() + 200e3) / distanceToNearestOrbitalObject);
+        }
 
         // Finding the rotation of the player in the nearest orbital object's frame of reference
         const currentWorldRotation = spaceShipControls.getTransform().absoluteRotationQuaternion;
