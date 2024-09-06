@@ -71,14 +71,14 @@ export class StarSystemController {
     readonly planets: Planet[] = [];
 
     /**
-     * The list of all telluric planets in the system
-     */
-    readonly telluricPlanets: TelluricPlanet[] = [];
-
-    /**
      * The list of all gas planets in the system
      */
     readonly gasPlanets: GasPlanet[] = [];
+
+    /**
+     * The list of all telluric planets and moons in the system
+     */
+    readonly telluricBodies: TelluricPlanet[] = [];
 
     /**
      * The list of all anomalies in the system
@@ -107,6 +107,7 @@ export class StarSystemController {
         if(!satellite.model.isMoon()) throw new Error("Use addTelluricPlanet to add a telluric planet to a planet, not addSatellite");
         this.orbitalObjects.push(satellite);
         this.celestialBodies.push(satellite);
+        this.telluricBodies.push(satellite);
         this.planetaryMassObjects.push(satellite);
     }
 
@@ -121,7 +122,7 @@ export class StarSystemController {
         this.orbitalObjects.push(planet);
         this.celestialBodies.push(planet);
         this.planets.push(planet);
-        this.telluricPlanets.push(planet);
+        this.telluricBodies.push(planet);
         this.planetaryMassObjects.push(planet);
         return planet;
     }
@@ -435,7 +436,7 @@ export class StarSystemController {
             object.getAsteroidField()?.update(controller.getActiveCameras()[0].globalPosition, deltaSeconds);
         }
 
-        for (const body of this.telluricPlanets) {
+        for (const body of this.telluricBodies) {
             // Meshes with LOD are updated (surface quadtrees)
             body.updateLOD(controller.getTransform().getAbsolutePosition(), chunkForge);
             body.computeCulling(controller.getActiveCameras());
@@ -536,7 +537,8 @@ export class StarSystemController {
         this.celestialBodies.length = 0;
         this.stellarObjects.length = 0;
         this.planets.length = 0;
-        this.telluricPlanets.length = 0;
+        this.telluricBodies.length = 0;
+        this.planetaryMassObjects.length = 0;
         this.gasPlanets.length = 0;
         this.anomalies.length = 0;
     }
