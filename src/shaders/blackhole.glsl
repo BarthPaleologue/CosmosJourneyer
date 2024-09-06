@@ -227,8 +227,13 @@ void main() {
                 rayDir = bendRay(rayDir, dirToBlackHole, distanceToCenter2, maxBendDistance, stepSize);
                 rayPositionBlackHoleSpace += stepSize * (rayDir - frameDragForce);
 
-                //TODO: improve glow
-                //glow += vec4(1.2,1.1,1, 1.0) * (0.2 * (object_radius / distanceToCenter2) * stepSize * clamp(distanceToCenter / object_radius - 1.2, 0.0, 1.0)); //adds fairly cheap glow
+                if(hasAccretionDisk) {
+                    // the distance in the unit of the schwarzschild radius
+                    float relativeDistance = distanceToCenter / object_radius;
+                    // the glow mask fades the glow when to close to the horizon (the photon sphere has a radius of 1.5 * schwarzschild, so 1.7 is slightly above for artistic reasons)
+                    float glowMask = smoothstep(1.7, 2.5, relativeDistance);
+                    col += 0.5 * vec4(1.0, 0.9, 0.6, 1.0) * (stepSize / object_radius) * glowMask / (relativeDistance * relativeDistance);
+                }
             }
 
             if (distanceToCenter < object_radius) {

@@ -21,8 +21,8 @@ import { StarSystemController } from "./starSystem/starSystemController";
 
 import { positionNearObjectBrightSide } from "./utils/positionNearObject";
 import { CosmosJourneyer } from "./cosmosJourneyer";
-import { StarSystemHelper } from "./starSystem/starSystemHelper";
-import { SystemSeed } from "./utils/systemSeed";
+import { CustomStarSystemModel } from "./starSystem/customStarSystemModel";
+import { BodyType } from "./architecture/bodyType";
 
 const engine = await CosmosJourneyer.CreateAsync();
 
@@ -30,21 +30,15 @@ const starSystemView = engine.starSystemView;
 
 const scene = starSystemView.scene;
 
-const starSystemSeed = new SystemSeed(0, 0, 0, 0);
-const starSystem = new StarSystemController(starSystemSeed, scene);
+const starSystemModel = new CustomStarSystemModel("Black Hole Demo", [[BodyType.BLACK_HOLE, 0]], [[BodyType.TELLURIC_PLANET, 42]], []);
+const starSystem = new StarSystemController(starSystemModel, scene);
 
-const BH = StarSystemHelper.MakeBlackHole(starSystem, 0);
-BH.model.orbit.radius = 0;
-BH.model.physicalProperties.accretionDiskRadius = BH.model.radius * 12;
-
-const planet = StarSystemHelper.MakeTelluricPlanet(starSystem);
-planet.model.orbit.radius = 45 * planet.getRadius();
-planet.model.orbit.period = 24 * 60 * 60;
-
-await starSystemView.loadStarSystem(starSystem, false);
+await starSystemView.loadStarSystem(starSystem, true);
 
 engine.init(true);
 
 starSystemView.switchToDefaultControls();
+
+const BH = starSystem.stellarObjects[0];
 
 positionNearObjectBrightSide(scene.getActiveControls(), BH, starSystem, 20);
