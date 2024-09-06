@@ -51,6 +51,8 @@ export class MainMenu {
         this.scene = this.starSystemView.scene;
         this.controls = this.starSystemView.getDefaultControls();
 
+        this.starSystemView.setUIEnabled(false);
+
         const allowedIdentifiers: UniverseObjectId[] = [
             {
                 starSystem: {
@@ -386,6 +388,8 @@ export class MainMenu {
                 if (this.htmlRoot === null) throw new Error("MainMenu is null");
                 this.htmlRoot.style.display = "none";
                 Sounds.MAIN_MENU_BACKGROUND_MUSIC.stop();
+
+                this.starSystemView.setUIEnabled(true);
                 onAnimationFinished();
 
                 return;

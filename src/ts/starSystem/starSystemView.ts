@@ -804,6 +804,10 @@ export class StarSystemView implements View {
         this.targetCursorLayer.setEnabled(false);
     }
 
+    public setUIEnabled(enabled: boolean) {
+        this.isUiEnabled = enabled;
+    }
+
     /**
      * Creates a visible target inside the current star system to aim for another star system.
      * This target will display the name of the target system and its distance.
