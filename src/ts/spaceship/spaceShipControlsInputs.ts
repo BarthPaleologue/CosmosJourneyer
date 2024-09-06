@@ -83,6 +83,14 @@ const throttleToZero = new Action({
 
 const throttleToZeroInteraction = new PressInteraction(throttleToZero);
 
+const previousMissionInteraction = new PressInteraction(new Action({
+    bindings: [keyboard.getControl("Numpad1")]
+}));
+
+const nextMissionInteraction = new PressInteraction(new Action({
+    bindings: [keyboard.getControl("Numpad2")]
+}));
+
 export const SpaceShipControlsInputs = new InputMap<{
     landing: PressInteraction;
     emitLandingRequest: PressInteraction;
@@ -92,6 +100,8 @@ export const SpaceShipControlsInputs = new InputMap<{
     toggleWarpDrive: PressInteraction;
     ignorePointer: Action<number>;
     throttleToZero: PressInteraction;
+    previousMission: PressInteraction;
+    nextMission: PressInteraction;
 }>("SpaceShipInputs", {
     landing: landingInteraction,
     emitLandingRequest: emitLandingRequest,
@@ -100,7 +110,9 @@ export const SpaceShipControlsInputs = new InputMap<{
     rollPitch: rollPitch,
     toggleWarpDrive: toggleWarpDriveInteraction,
     ignorePointer: ignorePointer,
-    throttleToZero: throttleToZeroInteraction
+    throttleToZero: throttleToZeroInteraction,
+    previousMission: previousMissionInteraction,
+    nextMission: nextMissionInteraction
 });
 
 SpaceShipControlsInputs.setEnabled(false);

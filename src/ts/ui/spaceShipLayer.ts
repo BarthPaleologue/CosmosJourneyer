@@ -105,6 +105,8 @@ export class SpaceShipLayer {
             this.targetDot.style.top = `${50 - 50 * directionLocal.y}%`;
             this.targetDot.style.left = `${50 - 50 * directionLocal.x}%`;
         }
+
+        this.currentMissionDisplay.update();
     }
 
     displaySpeed(shipThrottle: number, speed: number) {
