@@ -80,7 +80,7 @@ export class StarModel implements StellarObjectModel {
         this.parentBody = parentBody;
 
         this.physicalProperties = {
-            mass: 1000,
+            mass: 1.9885e30, //TODO: compute mass from physical properties
             rotationPeriod: 24 * 60 * 60,
             temperature: this.temperature,
             axialTilt: 0

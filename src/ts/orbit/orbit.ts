@@ -17,6 +17,7 @@
 
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { OrbitProperties } from "./orbitProperties";
+import { Settings } from "../settings";
 
 /**
  *
@@ -75,14 +76,14 @@ export function getPeriapsis(radius: number, p: number) {
 
 /**
  *
- * @see https://www.wikiwand.com/fr/Lois_de_Kepler#/Troisi%C3%A8me_loi_%E2%80%93_Loi_des_p%C3%A9riodes
- * @param radius
+ * @see https://fr.wikipedia.org/wiki/Lois_de_Kepler
+ * @param orbitRadius
  * @param parentMass
  */
-export function getOrbitalPeriod(radius: number, parentMass: number) {
+export function getOrbitalPeriod(orbitRadius: number, parentMass: number) {
     if (parentMass === 0) return 0;
-    const a = radius;
-    const G = 1e12;
+    const a = orbitRadius;
+    const G = Settings.G;
     const M = parentMass;
     return Math.sqrt((4 * Math.PI ** 2 * a ** 3) / (G * M));
 }

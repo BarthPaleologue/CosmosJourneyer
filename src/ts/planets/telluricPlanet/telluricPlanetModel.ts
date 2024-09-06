@@ -88,7 +88,8 @@ export class TelluricPlanetModel implements PlanetModel {
             this.radius = Math.max(0.3, normalRandom(1.0, 0.1, this.rng, GenerationSteps.RADIUS)) * Settings.EARTH_RADIUS;
         }
 
-        const mass = this.isSatelliteOfTelluric ? 1 : 10;
+        //TODO: make mass dependent on physical properties
+        const mass = this.isSatelliteOfTelluric ? 7.348e22 : 5.972e24;
 
         this.physicalProperties = {
             mass: mass,
