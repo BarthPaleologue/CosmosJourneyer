@@ -25,6 +25,8 @@ export interface Mission {
 
     update(context: MissionContext): void;
 
+    equals(other: Mission): boolean;
+
     getTypeString(): string;
 
     describe(): string;

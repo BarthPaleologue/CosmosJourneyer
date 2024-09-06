@@ -1,4 +1,4 @@
-import { SystemSeedSerialized } from "../utils/systemSeed";
+import { SystemSeedSerialized, systemSeedSerializedEquals } from "../utils/systemSeed";
 
 export const enum SystemObjectType {
     STELLAR_OBJECT,
@@ -22,6 +22,10 @@ export type SystemObjectId = {
     index: number;
 };
 
+export function systemObjectIdEquals(a: SystemObjectId, b: SystemObjectId): boolean {
+    return a.objectType === b.objectType && a.index === b.index;
+}
+
 /**
  * Data structure that can identify any object within the universe.
  */
@@ -31,6 +35,10 @@ export type UniverseObjectId = SystemObjectId & {
      */
     starSystem: SystemSeedSerialized;
 };
+
+export function universeObjectIdEquals(a: UniverseObjectId, b: UniverseObjectId): boolean {
+    return systemObjectIdEquals(a, b) && systemSeedSerializedEquals(a.starSystem, b.starSystem);
+}
 
 export type UniverseCoordinates = {
     /**

@@ -27,6 +27,10 @@ export type SystemSeedSerialized = {
     index: number;
 };
 
+export function systemSeedSerializedEquals(a: SystemSeedSerialized, b: SystemSeedSerialized): boolean {
+    return a.starSectorX === b.starSectorX && a.starSectorY === b.starSectorY && a.starSectorZ === b.starSectorZ && a.index === b.index;
+}
+
 export class SystemSeed {
     readonly starSectorX: number;
     readonly starSectorY: number;

@@ -80,11 +80,23 @@ export function generateMissionsDom(stationModel: SpaceStationModel, player: Pla
         acceptButton.innerText = "Accept";
         buttonContainer.appendChild(acceptButton);
 
-        acceptButton.addEventListener("click", () => {
+        if(player.currentMissions.find((m) => m.equals(mission))) {
             acceptButton.classList.add("accepted");
             acceptButton.innerText = "Accepted";
+        }
 
+        acceptButton.addEventListener("click", () => {
+            if(player.currentMissions.find((m) => m.equals(mission))) {
+                acceptButton.classList.remove("accepted");
+                acceptButton.innerText = "Accept";
+                player.currentMissions = player.currentMissions.filter((m) => !m.equals(mission));
+                return;
+            }
+
+            acceptButton.classList.add("accepted");
+            acceptButton.innerText = "Accepted";
             player.currentMissions.push(mission);
+
             console.log(player.currentMissions);
         });
     });

@@ -1,6 +1,6 @@
 import { Mission, MissionState } from "./mission";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
-import { UniverseObjectId } from "../saveFile/universeCoordinates";
+import { UniverseObjectId, universeObjectIdEquals } from "../saveFile/universeCoordinates";
 import { SystemSeed } from "../utils/systemSeed";
 import { getStarGalacticCoordinates } from "../utils/getStarGalacticCoordinates";
 import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
@@ -93,6 +93,13 @@ export class SightSeeingMission implements Mission {
 
     getState(): MissionState {
         return MissionState.UNKNOWN;
+    }
+
+    equals(other: Mission): boolean {
+        if (other instanceof SightSeeingMission) {
+            return universeObjectIdEquals(this.target.objectId, other.target.objectId) && this.target.type === other.target.type;
+        }
+        return false;
     }
 
     update(context: MissionContext): void {
