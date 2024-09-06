@@ -98,8 +98,12 @@ export class CurrentMissionDisplay {
         defaultPanel.classList.add("missionPanel");
 
         const defaultPanelH2 = document.createElement("h2");
-        defaultPanelH2.innerText = "You don't have any active missions";
+        defaultPanelH2.innerText = "You don't have any active mission yet";
         defaultPanel.appendChild(defaultPanelH2);
+
+        const defaultPanelP = document.createElement("p");
+        defaultPanelP.innerText = "You can get missions at space stations.";
+        defaultPanel.appendChild(defaultPanelP);
 
         this.rootNode.innerHTML = "";
         this.rootNode.appendChild(defaultPanel);
