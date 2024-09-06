@@ -8,6 +8,7 @@ import { getSpaceStationModels } from "../../utils/getModelsFromSystemModel";
 import { generateSightseeingMissions } from "../../missions/generator";
 import { getStarGalacticCoordinates } from "../../utils/getStarGalacticCoordinates";
 import { Player } from "../../player/player";
+import { MissionContainer } from "./missionContainer";
 
 export function generateMissionsDom(stationModel: SpaceStationModel, player: Player): HTMLDivElement {
     const sightSeeingMissions = generateSightseeingMissions(stationModel, Date.now());
@@ -51,54 +52,8 @@ export function generateMissionsDom(stationModel: SpaceStationModel, player: Pla
     mainContainer.appendChild(missionList);
 
     sightSeeingMissions.forEach((mission) => {
-        const missionContainer = document.createElement("div");
-        missionContainer.className = "missionItem";
-        missionList.appendChild(missionContainer);
-
-        const descriptionContainer = document.createElement("div");
-        descriptionContainer.className = "missionDescription";
-        missionContainer.appendChild(descriptionContainer);
-
-        const missionH4 = document.createElement("h4");
-        missionH4.innerText = mission.getTypeString();
-        descriptionContainer.appendChild(missionH4);
-
-        const missionP = document.createElement("p");
-        missionP.innerText = mission.describe();
-        descriptionContainer.appendChild(missionP);
-
-        const rewardP = document.createElement("p");
-        rewardP.innerText = `Reward: ${Settings.CREDIT_SYMBOL}${mission.getReward().toLocaleString()}`;
-        descriptionContainer.appendChild(rewardP);
-
-        const buttonContainer = document.createElement("div");
-        buttonContainer.className = "missionButtonContainer";
-        missionContainer.appendChild(buttonContainer);
-
-        const acceptButton = document.createElement("button");
-        acceptButton.className = "missionButton";
-        acceptButton.innerText = "Accept";
-        buttonContainer.appendChild(acceptButton);
-
-        if(player.currentMissions.find((m) => m.equals(mission))) {
-            acceptButton.classList.add("accepted");
-            acceptButton.innerText = "Accepted";
-        }
-
-        acceptButton.addEventListener("click", () => {
-            if(player.currentMissions.find((m) => m.equals(mission))) {
-                acceptButton.classList.remove("accepted");
-                acceptButton.innerText = "Accept";
-                player.currentMissions = player.currentMissions.filter((m) => !m.equals(mission));
-                return;
-            }
-
-            acceptButton.classList.add("accepted");
-            acceptButton.innerText = "Accepted";
-            player.currentMissions.push(mission);
-
-            console.log(player.currentMissions);
-        });
+        const missionContainer = new MissionContainer(mission, player);
+        missionList.appendChild(missionContainer.rootNode);
     });
 
     const terraformationMissionH3 = document.createElement("h3");
