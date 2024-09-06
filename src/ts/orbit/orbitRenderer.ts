@@ -15,15 +15,17 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { LinesMesh, MeshBuilder } from "@babylonjs/core/Meshes";
+import { CreateGreasedLine, GreasedLineBaseMesh, GreasedLineMesh, GreasedLineRibbonMesh } from "@babylonjs/core/Meshes";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { setUpVector } from "../uberCore/transforms/basicTransform";
 import { getPointOnOrbitLocal } from "./orbit";
 import { OrbitalObject } from "../architecture/orbitalObject";
 import { Scene } from "@babylonjs/core/scene";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { GreasedLineMeshColorMode } from "@babylonjs/core/Materials/GreasedLine/greasedLineMaterialInterfaces";
 
 export class OrbitRenderer {
-    private orbitMeshes: LinesMesh[] = [];
+    private orbitMeshes: (GreasedLineBaseMesh | GreasedLineMesh | GreasedLineRibbonMesh)[] = [];
 
     private orbitalObjects: OrbitalObject[] = [];
 
@@ -52,7 +54,20 @@ export class OrbitRenderer {
         }
         points.push(points[0]);
 
-        const orbitMesh = MeshBuilder.CreateLines("orbit", { points: points }, scene);
+        const orbitMesh = CreateGreasedLine(
+            "orbit2",
+            {
+                points: points,
+                updatable: false
+            },
+            {
+                color: Color3.White(),
+                width: 5,
+                colorMode: GreasedLineMeshColorMode.COLOR_MODE_SET,
+                sizeAttenuation: true
+            },
+            scene
+        );
         this.orbitMeshes.push(orbitMesh);
     }
 
