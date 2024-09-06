@@ -60,7 +60,7 @@ export class StarMapControls implements Controls {
     }
 
     public update(deltaSeconds: number): Vector3 {
-        const inertiaFactor = 0.1;
+        const inertiaFactor = Scalar.Clamp(0.1, 0, 1);
         const [xMove, zMove] = StarMapInputs.map.move.value;
         this.inertia.x = Scalar.Lerp(this.inertia.x, xMove, inertiaFactor);
         this.inertia.z = Scalar.Lerp(this.inertia.z, zMove, inertiaFactor);

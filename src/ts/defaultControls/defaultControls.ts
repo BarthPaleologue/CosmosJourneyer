@@ -58,7 +58,7 @@ export class DefaultControls implements Controls {
     }
 
     public update(deltaSeconds: number): Vector3 {
-        const inertiaFactor = deltaSeconds * 10;
+        const inertiaFactor = Scalar.Clamp(deltaSeconds * 10, 0, 1);
 
         this.rotationInertia.x = Scalar.Lerp(this.rotationInertia.x, DefaultControlsInputs.map.roll.value, inertiaFactor);
         this.rotationInertia.y = Scalar.Lerp(this.rotationInertia.y, DefaultControlsInputs.map.pitch.value, inertiaFactor);
