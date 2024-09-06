@@ -141,7 +141,7 @@ export class StarMap implements View {
         AudioManager.RegisterSound(this.backgroundMusic);
         this.backgroundMusic.sound.play();
 
-        this.starMapUI = new StarMapUI(this.scene);
+        this.starMapUI = new StarMapUI(this.scene, this.player);
 
         this.starMapUI.shortHandUIPlotItineraryButton.addEventListener("click", () => {
             if (this.currentSystemSeed === null) throw new Error("current system seed is null!");

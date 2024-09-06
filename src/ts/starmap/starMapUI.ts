@@ -18,7 +18,6 @@
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Animation } from "@babylonjs/core/Animations/animation";
 import { Scene } from "@babylonjs/core/scene";
-import { Settings } from "../settings";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import i18n from "../i18n";
 import { getStellarTypeString } from "../stellarObjects/common";
@@ -28,10 +27,11 @@ import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 import { BodyType } from "../architecture/bodyType";
 import { getStarGalacticCoordinates } from "../utils/getStarGalacticCoordinates";
-import { parseDistance } from "../utils/parseToStrings";
 import { factionToString } from "../powerplay/factions";
 import { isSystemInHumanBubble } from "../society/starSystemSociety";
 import { getSpaceStationModels } from "../utils/getModelsFromSystemModel";
+import { StarMapBookmarkButton } from "./starMapBookmarkButton";
+import { Player } from "../player/player";
 
 export class StarMapUI {
     readonly htmlRoot: HTMLDivElement;
@@ -63,7 +63,7 @@ export class StarMapUI {
     readonly shortHandUIFactions: HTMLDivElement;
     readonly shortHandUIButtonContainer: HTMLDivElement;
     readonly shortHandUIPlotItineraryButton: HTMLButtonElement;
-    readonly shortHandUIBookmarkButton: HTMLButtonElement;
+    readonly shortHandUIBookmarkButton: StarMapBookmarkButton;
 
     private selectedMesh: AbstractMesh | null = null;
     private hoveredMesh: AbstractMesh | null = null;
@@ -73,7 +73,7 @@ export class StarMapUI {
 
     private readonly scene: Scene;
 
-    constructor(scene: Scene) {
+    constructor(scene: Scene, player: Player) {
         this.scene = scene;
         this.scene.hoverCursor = "none";
 
@@ -187,10 +187,8 @@ export class StarMapUI {
         this.shortHandUIPlotItineraryButton.textContent = i18n.t("starMap:plotItinerary");
         this.shortHandUIButtonContainer.appendChild(this.shortHandUIPlotItineraryButton);
 
-        this.shortHandUIBookmarkButton = document.createElement("button");
-        this.shortHandUIBookmarkButton.classList.add("bookmarkButton");
-        this.shortHandUIBookmarkButton.textContent = i18n.t("starMap:bookmark");
-        this.shortHandUIButtonContainer.appendChild(this.shortHandUIBookmarkButton);
+        this.shortHandUIBookmarkButton = new StarMapBookmarkButton(player);
+        this.shortHandUIButtonContainer.appendChild(this.shortHandUIBookmarkButton.rootNode);
 
         document.addEventListener("pointermove", (event) => {
             this.cursor.style.transform = `translate(calc(${event.clientX}px - 50%), calc(${event.clientY}px - 50%))`;
@@ -316,6 +314,7 @@ export class StarMapUI {
         else typeString = i18n.t("objectTypes:star", { stellarType: getStellarTypeString(starModel.stellarType) });
 
         this.shortHandUISystemType.textContent = typeString;
+        this.shortHandUIBookmarkButton.setSelectedSystemSeed(targetSystemModel.seed);
 
         if (starModel instanceof StarModel) {
             this.infoPanelStarPreview.style.background = starModel.color.toHexString();
