@@ -188,7 +188,7 @@ export class StarSystemView implements View {
     constructor(player: Player, engine: AbstractEngine, havokInstance: HavokPhysicsWithBindings) {
         this.player = player;
 
-        this.spaceShipLayer = new SpaceShipLayer();
+        this.spaceShipLayer = new SpaceShipLayer(this.player);
         this.bodyEditor = new BodyEditor(EditorVisibility.HIDDEN);
 
         const canvas = engine.getRenderingCanvas();
