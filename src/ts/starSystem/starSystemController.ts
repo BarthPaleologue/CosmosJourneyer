@@ -488,7 +488,7 @@ export class StarSystemController {
     public updateShaders(deltaSeconds: number, postProcessManager: PostProcessManager) {
         const nearestBody = this.getNearestCelestialBody(this.scene.getActiveControls().getTransform().getAbsolutePosition());
 
-        for (const planet of this.planets) {
+        for (const planet of this.planetaryMassObjects) {
             planet.updateMaterial(this.stellarObjects, deltaSeconds);
         }
 
