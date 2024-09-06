@@ -359,6 +359,8 @@ export class StarSystemController {
         }
         // and never compensate the rotation of a space station
         shouldCompensateRotation = shouldCompensateRotation && !(nearestOrbitalObject instanceof SpaceStation);
+        // also never compensate the rotation of a black hole
+        shouldCompensateRotation = shouldCompensateRotation && !(nearestOrbitalObject instanceof BlackHole);
 
         // ROTATION COMPENSATION
         // If we have to compensate the rotation of the nearest body, there are multiple things to take into account
