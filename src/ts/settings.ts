@@ -48,6 +48,7 @@ export const Settings = {
     HUMAN_BUBBLE_RADIUS_LY: 100,
 
     PLAYER_JUMP_RANGE_LY: 15,
+    VISIBLE_NEIGHBORHOOD_MAX_RADIUS_LY: 20,
 
     CREDIT_SYMBOL: "₽",
 
