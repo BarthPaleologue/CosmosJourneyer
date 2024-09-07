@@ -38,30 +38,26 @@ uniform mat4 inverseWorld;
 
 #include "./utils/removeAxialTilt.glsl";
 
-// from https://www.shadertoy.com/view/MtcXWr
-bool rayIntersectCone(vec3 rayOrigin, vec3 rayDir, vec3 tipPosition, vec3 orientation, float coneAngle, out float t1, out float t2) {
-    vec3 co = rayOrigin - tipPosition;
+bool rayIntersectInfiniteCone(vec3 rayOrigin, vec3 rayDir, float theta, out float t1, out float t2) {
+    float cosTheta = cos(theta);
+    float cosTheta2 = cosTheta * cosTheta;
 
-    float a = dot(rayDir, orientation)*dot(rayDir, orientation) - coneAngle*coneAngle;
-    float b = 2. * (dot(rayDir, orientation)*dot(co, orientation) - dot(rayDir, co)*coneAngle*coneAngle);
-    float c = dot(co, orientation)*dot(co, orientation) - dot(co, co)*coneAngle*coneAngle;
+    vec3 co = rayOrigin;
 
-    float det = b*b - 4.*a*c;
-    if (det < 0.) return false;
+    float a = rayDir.y * rayDir.y - cosTheta2;
+    float b = 2.0 * (rayDir.y * co.y - dot(rayDir, co)*cosTheta2);
+    float c = co.y * co.y - dot(co, co)*cosTheta2;
 
-    det = sqrt(det);
-    t1 = (-b - det) / (2. * a);
-    t2 = (-b + det) / (2. * a);
+    float det = b*b - 4.0*a*c;
+    if (det < 0.0) return false;
 
-    // This is a bit messy; there ought to be a more elegant solution.
-    float t = t1;
-    if (t < 0. || t2 > 0. && t2 < t) t = t2;
-    if (t < 0.) return false;
+    float sqrtDet = sqrt(det);
 
-    vec3 cp = rayOrigin + t*rayDir - tipPosition;
-    float h = dot(cp, orientation);
+    float intersect1 = (-b - sqrtDet) / (2.0 * a);
+    float intersect2 = (-b + sqrtDet) / (2.0 * a);
 
-    vec3 n = normalize(cp * dot(orientation, cp) / dot(cp, cp) - orientation);
+    t1 = min(intersect1, intersect2);
+    t2 = max(intersect1, intersect2);
 
     return true;
 }
@@ -103,7 +99,7 @@ float spiralDensity(vec3 pointOnCone, float coneMaxHeight) {
     float d = spiralSDF(theta + time, 0.2 + sqrt(heightFraction) / 2.0) / (0.3 + heightFraction * 2.0);
     //d = pow(d, 4.0);
 
-    density *= smoothstep(0.6, 1.0, pow(1.0 - d, 8.0)) * 2.0; //smoothstep(0.85, 1.0, 1.0 - d) * 2.0;
+    density *= smoothstep(0.6, 1.0, pow(1.0 - d, 8.0)) * 2.0;//smoothstep(0.85, 1.0, 1.0 - d) * 2.0;
 
     //density *= d * 500.0;
 
@@ -131,8 +127,8 @@ void main() {
     const vec3 jetColor = vec3(0.5, 0.5, 1.0);
 
     float t1, t2;
-    if (rayIntersectCone(camera_position_local, rayDir_local, vec3(0.0), vec3(0.0, 1.0, 0.0), 0.95, t1, t2)) {
-        if(t2 > 0.0 && t1 < maximumDistance) {
+    if (rayIntersectInfiniteCone(camera_position_local, rayDir_local, 0.5, t1, t2)) {
+        if (t2 > 0.0 && t1 < maximumDistance) {
             float startT = max(t1, 0.0);
             float endT = min(t2, maximumDistance);
             vec3 startPoint = camera_position_local + startT * rayDir_local;
@@ -144,7 +140,7 @@ void main() {
             int nbSamples = 48;
             float step = distance / float(nbSamples);
             vec4 sum = vec4(0., 0., 0., 1.);
-            for(int i = 0; i < nbSamples; i++) {
+            for (int i = 0; i < nbSamples; i++) {
                 float t = startT + float(i) * step;
                 vec3 jetPointPosition = camera_position_local + t * rayDir_local;
                 float distanceToAxis = length(jetPointPosition.xz);
