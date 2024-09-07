@@ -56,6 +56,7 @@ export class MatterJetPostProcess extends PostProcess implements ObjectPostProce
 
         const MatterJetUniformNames = {
             TIME: "time",
+            INVERSE_WORLD: "inverseWorld",
             ROTATION_PERIOD: "rotationPeriod",
             ROTATION_AXIS: "rotationAxis"
         };
@@ -82,6 +83,7 @@ export class MatterJetPostProcess extends PostProcess implements ObjectPostProce
             setObjectUniforms(effect, stellarObject);
 
             effect.setFloat(MatterJetUniformNames.TIME, this.matterJetUniforms.time % (this.matterJetUniforms.rotationPeriod * 10000));
+            effect.setMatrix(MatterJetUniformNames.INVERSE_WORLD, stellarObject.getTransform().getWorldMatrix().clone().invert());
             effect.setFloat(MatterJetUniformNames.ROTATION_PERIOD, this.matterJetUniforms.rotationPeriod);
             effect.setVector3(MatterJetUniformNames.ROTATION_AXIS, stellarObject.getRotationAxis());
 

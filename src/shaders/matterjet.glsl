@@ -24,6 +24,8 @@ uniform sampler2D depthSampler;// the depth map of the camera
 
 uniform float time;
 
+uniform mat4 inverseWorld;
+
 #include "./utils/camera.glsl";
 
 #include "./utils/object.glsl";
@@ -88,18 +90,15 @@ float spiralSDF(float theta, float radius) {
     return min(abs(upper_r-r), abs(r-lower_r));
 }
 
-float spiralDensity(vec3 pointOnCone, vec3 coneAxis, float coneMaxHeight) {
-    // Then we rotate that point so that we eliminate the axial tilt of the star from the equation
-    vec3 pointOnYCone = removeAxialTilt(pointOnCone, coneAxis);
-
-    vec2 pointOnXZPlane = vec2(pointOnYCone.x, pointOnYCone.z);
-    float theta = atan(pointOnXZPlane.y, pointOnXZPlane.x) + 3.14 * min(0.0, sign(dot(pointOnCone, coneAxis)));
-    float heightFraction = abs(pointOnYCone.y) / coneMaxHeight;
+float spiralDensity(vec3 pointOnCone, float coneMaxHeight) {
+    vec2 pointOnXZPlane = vec2(pointOnCone.x, pointOnCone.z);
+    float theta = atan(pointOnXZPlane.y, pointOnXZPlane.x) + 3.14 * min(0.0, sign(pointOnCone.y));
+    float heightFraction = abs(pointOnCone.y) / coneMaxHeight;
 
     float density = 1.0;
 
     // smoothstep fadeout when the height is too much (outside of cone)
-    density *= smoothstep(1.0, 0.0, heightFraction);
+    density *= smoothstep(0.9, 0.0, heightFraction);
 
     float d = spiralSDF(theta + time, 0.2 + sqrt(heightFraction) / 2.0) / (0.3 + heightFraction * 2.0);
     //d = pow(d, 4.0);
@@ -125,25 +124,42 @@ void main() {
 
     vec4 finalColor = screenColor;
 
+    vec3 camera_position_local = vec3(inverseWorld * vec4(camera_position, 1.0));
+    vec3 rayDir_local = vec3(inverseWorld * vec4(rayDir, 0.0));
+
     const float jetHeight = 10000000e3;
     const vec3 jetColor = vec3(0.5, 0.5, 1.0);
 
-
     float t1, t2;
-    if (rayIntersectCone(camera_position, rayDir, object_position, object_rotationAxis, 0.95, t1, t2)) {
-        if (t2 > 0.0 && t2 < maximumDistance) {
-            vec3 jetPointPosition2 = camera_position + t2 * rayDir - object_position;
+    if (rayIntersectCone(camera_position_local, rayDir_local, vec3(0.0), vec3(0.0, 1.0, 0.0), 0.95, t1, t2)) {
+        if(t2 > 0.0 && t1 < maximumDistance) {
+            float startT = max(t1, 0.0);
+            float endT = min(t2, maximumDistance);
+            vec3 startPoint = camera_position_local + startT * rayDir_local;
+            vec3 endPoint = camera_position_local + t2 * rayDir_local;
+            float startDistanceToAxis = length(startPoint.xz);
+            float endDistanceToAxis = length(endPoint.xz);
+            float averageDistanceToAxis = (startDistanceToAxis + endDistanceToAxis) / 2.0;
+            float distance = endT - startT;
+            int nbSamples = 48;
+            float step = distance / float(nbSamples);
+            vec4 sum = vec4(0., 0., 0., 1.);
+            for(int i = 0; i < nbSamples; i++) {
+                float t = startT + float(i) * step;
+                vec3 jetPointPosition = camera_position_local + t * rayDir_local;
+                float distanceToAxis = length(jetPointPosition.xz);
+                float density = spiralDensity(jetPointPosition, jetHeight);
+                density *= smoothstep(0.1, 1.0, 1.0 - distanceToAxis / averageDistanceToAxis);
+                density *= smoothstep(0.2, 1.0, distanceToAxis / averageDistanceToAxis);
 
-            float density2 = spiralDensity(jetPointPosition2, object_rotationAxis, jetHeight);
+                density = clamp((density / float(nbSamples)) * 20.0, 0.0, 1.0);
 
-            finalColor.rgb = mix(finalColor.rgb, jetColor, density2);
-        }
-        if (t1 > 0.0 && t1 < maximumDistance) {
-            vec3 jetPointPosition1 = camera_position + t1 * rayDir - object_position;
+                sum.rgb += vec3(density) * vec3(1.1, 0.9, .5) * sum.a;
+                sum.a *= 1.-density;
 
-            float density1 = spiralDensity(jetPointPosition1, object_rotationAxis, jetHeight);
-
-            finalColor.rgb = mix(finalColor.rgb, jetColor, density1);
+                sum.rgb += exp(-density * .2) * density * vec3(0.15, 0.45, 1.1) * sum.a;
+            }
+            finalColor.rgb = mix(sum.rgb, screenColor.rgb, sum.a);
         }
     }
 
