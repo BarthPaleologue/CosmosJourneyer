@@ -30,7 +30,25 @@ const starSystemView = engine.starSystemView;
 
 const scene = starSystemView.scene;
 
-const starSystemModel = new CustomStarSystemModel("Black Hole Demo", [[BodyType.BLACK_HOLE, 0]], [[BodyType.TELLURIC_PLANET, 42]], []);
+const urlParams = new URLSearchParams(window.location.search);
+const stellarType = urlParams.get("stellarType");
+let stellarBodyType: BodyType;
+switch (stellarType) {
+    case "blackHole":
+        stellarBodyType = BodyType.BLACK_HOLE;
+        break;
+    case "neutronStar":
+        stellarBodyType = BodyType.NEUTRON_STAR;
+        break;
+    case "star":
+        stellarBodyType = BodyType.STAR;
+        break;
+    default:
+        stellarBodyType = BodyType.BLACK_HOLE;
+        break;
+}
+
+const starSystemModel = new CustomStarSystemModel("Black Hole Demo", [[stellarBodyType, 0]], [[BodyType.TELLURIC_PLANET, 42]], []);
 const starSystem = new StarSystemController(starSystemModel, scene);
 
 await starSystemView.loadStarSystem(starSystem, true);
@@ -41,4 +59,17 @@ starSystemView.switchToDefaultControls();
 
 const BH = starSystem.stellarObjects[0];
 
-positionNearObjectBrightSide(scene.getActiveControls(), BH, starSystem, 20);
+let radius;
+switch (stellarBodyType) {
+    case BodyType.BLACK_HOLE:
+        radius = 20;
+        break;
+    case BodyType.NEUTRON_STAR:
+        radius = 200000;
+        break;
+    case BodyType.STAR:
+        radius = 10;
+        break;
+}
+
+positionNearObjectBrightSide(scene.getActiveControls(), BH, starSystem, radius);
