@@ -38,15 +38,13 @@ uniform mat4 inverseWorld;
 
 #include "./utils/removeAxialTilt.glsl";
 
-bool rayIntersectInfiniteCone(vec3 rayOrigin, vec3 rayDir, float theta, out float t1, out float t2) {
+bool rayIntersectInfiniteCone2(vec3 rayOrigin, vec3 rayDir, float theta, out float t1, out float t2) {
     float cosTheta = cos(theta);
     float cosTheta2 = cosTheta * cosTheta;
 
-    vec3 co = rayOrigin;
-
     float a = rayDir.y * rayDir.y - cosTheta2;
-    float b = 2.0 * (rayDir.y * co.y - dot(rayDir, co)*cosTheta2);
-    float c = co.y * co.y - dot(co, co)*cosTheta2;
+    float b = 2.0 * (rayDir.y * rayOrigin.y - dot(rayDir, rayOrigin) * cosTheta2);
+    float c = rayOrigin.y * rayOrigin.y - dot(rayOrigin, rayOrigin) * cosTheta2;
 
     float det = b*b - 4.0*a*c;
     if (det < 0.0) return false;
@@ -61,6 +59,60 @@ bool rayIntersectInfiniteCone(vec3 rayOrigin, vec3 rayDir, float theta, out floa
 
     return true;
 }
+
+float dot2( in vec3 v ) { return dot(v,v); }
+
+bool iCappedCone( in vec3  ro, in vec3  rd, in float theta, out float t1, out float t2) {
+    vec3 pa = vec3(0.0);
+    vec3 pb = pa + vec3(0.0, 1000000e3, 0.0);
+
+    float ra = 1.0;
+    float rb = 0.3 * 100000e3;
+
+    vec3  ba = pb - pa;
+    vec3  oa = ro - pa;
+    vec3  ob = ro - pb;
+
+    float m0 = dot(ba,ba);
+    float m1 = dot(oa,ba);
+    float m2 = dot(ob,ba);
+    float m3 = dot(rd,ba);
+
+    //caps
+    if(m1 < 0.0 || m2 > 0.0) return false;
+    //if( m1<0.0 ) { if( dot2(oa*m3-rd*m1)<(ra*ra*m3*m3) ) return vec4(-m1/m3,-ba*inversesqrt(m0)); }
+    //else if( m2>0.0 ) { if( dot2(ob*m3-rd*m2)<(rb*rb*m3*m3) ) return vec4(-m2/m3, ba*inversesqrt(m0)); }
+
+    // body
+    float m4 = dot(rd,oa);
+    float m5 = dot(oa,oa);
+    float rr = ra - rb;
+    float hy = m0 + rr*rr;
+
+    float k2 = m0*m0    - m3*m3*hy;
+    float k1 = m0*m0*m4 - m1*m3*hy + m0*ra*(rr*m3*1.0        );
+    float k0 = m0*m0*m5 - m1*m1*hy + m0*ra*(rr*m1*2.0 - m0*ra);
+
+    float h = k1*k1 - k2*k0;
+    if( h<0.0 ) return false; //return vec4(-1.0);
+
+    //float t = (-k1+sqrt(h))/k2;
+    float intersect1 = (-k1+sqrt(h))/k2;
+    float intersect2 = (-k1-sqrt(h))/k2;
+
+    t1 = min(intersect1, intersect2);
+    t2 = max(intersect1, intersect2);
+
+    float y = m1 + t*m3;
+    if( y>0.0 && y<m0 )
+    {
+        return true; //return vec4(t, normalize(m0*(m0*(oa+t*rd)+rr*ba*ra)-ba*hy*y));
+    }
+
+    return false; //return vec4(-1.0);
+}
+
+
 
 // see https://www.shadertoy.com/view/tslcW4
 const float a=1.0;
@@ -127,7 +179,7 @@ void main() {
     const vec3 jetColor = vec3(0.5, 0.5, 1.0);
 
     float t1, t2;
-    if (rayIntersectInfiniteCone(camera_position_local, rayDir_local, 0.5, t1, t2)) {
+    if (iCappedCone(camera_position_local, rayDir_local, 0.5, t1, t2)) {
         if (t2 > 0.0 && t1 < maximumDistance) {
             float startT = max(t1, 0.0);
             float endT = min(t2, maximumDistance);
@@ -137,7 +189,7 @@ void main() {
             float endDistanceToAxis = length(endPoint.xz);
             float averageDistanceToAxis = (startDistanceToAxis + endDistanceToAxis) / 2.0;
             float distance = endT - startT;
-            int nbSamples = 48;
+            int nbSamples = 32;
             float step = distance / float(nbSamples);
             vec4 sum = vec4(0., 0., 0., 1.);
             for (int i = 0; i < nbSamples; i++) {
@@ -156,7 +208,12 @@ void main() {
                 sum.rgb += exp(-density * .2) * density * vec3(0.15, 0.45, 1.1) * sum.a;
             }
             finalColor.rgb = mix(sum.rgb, screenColor.rgb, sum.a);
+            if (startT == 0.0) finalColor.rgb = vec3(1.0, 0.0, 0.0);
+            //if (endT == 0.0) finalColor.rgb = vec3(0.0, 1.0, 0.0);
         }
+        finalColor.rgb = vec3(0.0, 1.0, 0.0);
+    } else {
+        finalColor.rgb = vec3(0.0, 0.0, 1.0);
     }
 
     gl_FragColor = finalColor;// displaying the final color
