@@ -18,7 +18,7 @@
 import { seededSquirrelNoise } from "squirrel-noise";
 import { getOrbitalPeriod } from "../../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { normalRandom, uniformRandBool } from "extended-random";
+import { normalRandom } from "extended-random";
 import { OrbitProperties } from "../../orbit/orbitProperties";
 import { BlackHolePhysicalProperties } from "../../architecture/physicalProperties";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
@@ -136,6 +136,10 @@ export class BlackHoleModel implements StellarObjectModel {
      */
     public getKerrMetricA(): number {
         return this.estimateAngularMomentum() / (this.physicalProperties.mass * Settings.C);
+    }
+
+    public hasNakedSingularity(): boolean {
+        return this.getKerrMetricA() > this.physicalProperties.mass;
     }
 
     /**

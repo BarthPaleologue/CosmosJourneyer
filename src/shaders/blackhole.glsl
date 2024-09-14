@@ -230,8 +230,8 @@ void main() {
                 if(hasAccretionDisk) {
                     // the distance in the unit of the schwarzschild radius
                     float relativeDistance = distanceToCenter / object_radius;
-                    // the glow mask fades the glow when to close to the horizon (the photon sphere has a radius of 1.5 * schwarzschild, so 1.7 is slightly above for artistic reasons)
-                    float glowMask = smoothstep(1.7, 2.5, relativeDistance);
+                    // the glow mask fades the glow when to close to the horizon (the photon sphere has a radius of 1.5 * schwarzschild, so 1.0 is slightly below for artistic reasons: bloom leaks at the camera level)
+                    float glowMask = smoothstep(1.0, 2.5, relativeDistance);
                     col += 0.5 * vec4(1.0, 0.9, 0.6, 1.0) * (stepSize / object_radius) * glowMask / (relativeDistance * relativeDistance);
                 }
             }
