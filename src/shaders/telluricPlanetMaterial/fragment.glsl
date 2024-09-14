@@ -53,6 +53,7 @@ uniform sampler2D snowAlbedoRoughnessMap;
 uniform sampler2D steepNormalMetallicMap;
 uniform sampler2D steepAlbedoRoughnessMap;
 
+uniform mat4 planetWorldMatrix;// planet world matrix
 uniform float planetRadius;// planet radius
 uniform float waterLevel;// controls sand layer
 uniform float beachSize;
@@ -245,6 +246,13 @@ void main() {
     float metallic = steepFactor * steepMetallic + plainFactor * plainMetallic + (desertFactor+beachFactor) * desertMetallic + snowFactor * snowMetallic;
 
     vec3 normalW = vec3(world * vec4(normal, 0.0));
+
+    // smooth normal when far away from the planet
+    float distanceToPlanet = length(cameraPosition - vPositionW);
+    vec3 planetPosition = vec3(planetWorldMatrix[3]);
+    vec3 planetNormalW = normalize(vPositionW- planetPosition);
+
+    normalW = mix(normalW, planetNormalW, 0.2 + 0.8 * smoothstep(40e3, 250e3, distanceToPlanet));
 
     // pbr accumulation
     vec3 Lo = vec3(0.0);
