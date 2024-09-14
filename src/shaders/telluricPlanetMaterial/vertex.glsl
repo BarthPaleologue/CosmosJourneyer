@@ -26,6 +26,7 @@ uniform mat4 worldViewProjection;
 uniform vec3 chunkPositionPlanetSpace;
 
 uniform mat4 planetWorldMatrix;
+uniform float planetRadius;
 
 uniform vec3 cameraPosition;
 
@@ -45,6 +46,13 @@ void main() {
     
     vPositionW = vec3(world * vec4(position, 1.0));
     vNormalW = vec3(world * vec4(normal, 0.0));
+
+    // smooth normal when far away from the planet
+    vec3 planetPosition = vec3(planetWorldMatrix[3]);
+    float distanceToPlanet = max(0.0, length(cameraPosition - planetPosition) - planetRadius);
+    vec3 planetNormalW = normalize(vPositionW - planetPosition);
+
+    vNormalW = mix(vNormalW, planetNormalW, 0.8 + 0.2 * smoothstep(20e3, 300e3, distanceToPlanet));
 
 	vPosition = chunkPositionPlanetSpace + position;
 
