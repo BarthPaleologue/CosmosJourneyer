@@ -41,4 +41,6 @@ starSystemView.switchToDefaultControls();
 
 const BH = starSystem.stellarObjects[0];
 
+starSystemView.getDefaultControls().speed = BH.getBoundingRadius();
+
 positionNearObjectBrightSide(scene.getActiveControls(), BH, starSystem, 20);
