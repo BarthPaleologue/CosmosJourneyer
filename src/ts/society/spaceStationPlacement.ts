@@ -64,7 +64,8 @@ export function placeSpaceStations(systemModel: SeededStarSystemModel): PlanetMo
     });
 
     // sort planets by potential score
-    const sortedPlanets = planetModels.toSorted((planetA, planetB) => {
+    const sortedPlanets = Array.from(planetModels);
+    sortedPlanets.sort((planetA, planetB) => {
         const scoreA = planetToPotentialScore.get(planetA) ?? 0;
         const scoreB = planetToPotentialScore.get(planetB) ?? 0;
         return scoreB - scoreA;
