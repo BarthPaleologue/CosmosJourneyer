@@ -216,7 +216,7 @@ export class StarSystemView implements View {
 
         StarSystemInputs.map.cycleViews.on("complete", () => {
             if (this.scene.getActiveControls() === this.getSpaceshipControls()) {
-                this.switchToDefaultControls();
+                this.switchToDefaultControls(true);
             } else if (this.scene.getActiveControls() === this.getDefaultControls()) {
                 this.switchToCharacterControls();
             } else if (this.scene.getActiveControls() === this.getCharacterControls()) {
@@ -762,7 +762,7 @@ export class StarSystemView implements View {
     /**
      * Switches the active controller to the default controls
      */
-    public switchToDefaultControls() {
+    public switchToDefaultControls(showHelpNotification: boolean) {
         const shipControls = this.getSpaceshipControls();
         const characterControls = this.getCharacterControls();
         const defaultControls = this.getDefaultControls();
@@ -782,8 +782,10 @@ export class StarSystemView implements View {
         setRotationQuaternion(defaultControls.getTransform(), getRotationQuaternion(shipControls.getTransform()).clone());
         this.postProcessManager.rebuild();
 
-        const keys = dPadCompositeToString(DefaultControlsInputs.map.move.bindings[0].control as DPadComposite);
-        createNotification(`Move using QWERTY ${keys.map((key) => key[1].replace("Key", "")).join(", ")}`, 20000);
+        if(showHelpNotification) {
+            const keys = dPadCompositeToString(DefaultControlsInputs.map.move.bindings[0].control as DPadComposite);
+            createNotification(`Move using QWERTY ${keys.map((key) => key[1].replace("Key", "")).join(", ")}`, 20000);
+        }
     }
 
     /**
