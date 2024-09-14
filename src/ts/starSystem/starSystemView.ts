@@ -47,7 +47,7 @@ import { SystemSeed } from "../utils/systemSeed";
 import { SystemTarget } from "../utils/systemTarget";
 import { StarSystemInputs } from "../inputs/starSystemInputs";
 import { createNotification } from "../utils/notification";
-import { axisCompositeToString } from "../utils/inputControlsString";
+import { axisCompositeToString, dPadCompositeToString } from "../utils/inputControlsString";
 import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
 import { AxisComposite } from "@brianchirls/game-input/browser";
 import { getMoonSeed, getSpaceStationSeed } from "../planets/common";
@@ -75,6 +75,8 @@ import { Player } from "../player/player";
 import { getNeighborStarSystems } from "../utils/getNeighborStarSystems";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { getSystemObjectId, getUniverseObjectId } from "../utils/orbitalObjectId";
+import { DefaultControlsInputs } from "../defaultControls/defaultControlsInputs";
+import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -779,6 +781,9 @@ export class StarSystemView implements View {
         this.scene.setActiveControls(defaultControls);
         setRotationQuaternion(defaultControls.getTransform(), getRotationQuaternion(shipControls.getTransform()).clone());
         this.postProcessManager.rebuild();
+
+        const keys = dPadCompositeToString(DefaultControlsInputs.map.move.bindings[0].control as DPadComposite);
+        createNotification(`Move using QWERTY ${keys.map((key) => key[1].replace("Key", "")).join(", ")}`, 20000);
     }
 
     /**
