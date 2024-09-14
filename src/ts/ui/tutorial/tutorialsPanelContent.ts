@@ -8,6 +8,7 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { Tutorial } from "../../tutorials/tutorial";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { SystemObjectType } from "../../saveFile/universeCoordinates";
+import { OrbitalObject } from "../../architecture/orbitalObject";
 
 export class TutorialsPanelContent {
     readonly htmlRoot: HTMLElement;
@@ -48,7 +49,7 @@ export class TutorialsPanelContent {
                     starSystemView.initStarSystem();
                     engine.hideLoadingUI();
 
-                    let orbitalObject;
+                    let orbitalObject: OrbitalObject;
                     switch (tutorial.universeObjectId.objectType) {
                         case SystemObjectType.STELLAR_OBJECT:
                             orbitalObject = starSystemView.getStarSystem().stellarObjects[tutorial.universeObjectId.index];
