@@ -26,6 +26,7 @@ import { BuildTask } from "./taskTypes";
 
 export class WorkerPool {
     availableWorkers: Worker[] = []; // liste des workers disponibles pour exécuter des tâches
+    busyWorkers: Worker[] = []; // liste des workers occupés à exécuter une tâche
     finishedWorkers: Worker[] = []; // liste des workers ayant terminé leur tâche (prêts à être réintégré dans la liste des workers disponibles)
     taskQueue: BuildTask[] = [];
 
@@ -57,8 +58,10 @@ export class WorkerPool {
     }
 
     public reset() {
-        this.availableWorkers = this.availableWorkers.concat(this.finishedWorkers);
+        this.busyWorkers.forEach(worker => worker.terminate());
+        this.availableWorkers = this.availableWorkers.concat(this.finishedWorkers).concat(this.busyWorkers);
         this.finishedWorkers = [];
+        this.busyWorkers = [];
         this.availableWorkers.forEach((worker) => (worker.onmessage = null));
 
         this.taskQueue.length = 0;
