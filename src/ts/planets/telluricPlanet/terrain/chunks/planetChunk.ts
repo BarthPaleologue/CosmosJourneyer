@@ -38,7 +38,6 @@ import { InstancePatch } from "../instancePatch/instancePatch";
 import { Cullable } from "../../../../utils/cullable";
 import { Materials } from "../../../../assets/materials";
 import { Objects } from "../../../../assets/objects";
-import { min } from "d3";
 
 export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
     public readonly mesh: Mesh;
