@@ -107,4 +107,9 @@ export class GasPlanetMaterial extends ShaderMaterial {
             this.getEffect().setFloat(GasPlanetMaterialUniformNames.TIME, this.elapsedSeconds % 100000);
         });
     }
+
+    public dispose(forceDisposeEffect?: boolean, forceDisposeTextures?: boolean, notBoundToMesh?: boolean) {
+        super.dispose(forceDisposeEffect, forceDisposeTextures, notBoundToMesh);
+        this.stellarObjects.length = 0;
+    }
 }

@@ -36,7 +36,6 @@ import { Cullable } from "../../utils/cullable";
 import { RingsUniforms } from "../../rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import { Transformable } from "../../architecture/transformable";
-import i18n from "../../i18n";
 import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
@@ -154,6 +153,7 @@ export class GasPlanet implements Planet, Cullable {
         this.aggregate.dispose();
         this.material.dispose();
         this.asteroidField?.dispose();
+        this.ringsUniforms?.dispose();
     }
 
     getOrbitProperties(): OrbitProperties {

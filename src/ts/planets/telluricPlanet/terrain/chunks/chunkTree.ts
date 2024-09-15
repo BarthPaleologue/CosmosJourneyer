@@ -267,10 +267,9 @@ export class ChunkTree implements Cullable {
         this.executeOnEveryChunk((chunk: PlanetChunk) => {
             chunk.dispose();
         });
-        for (const deleteSemaphore of this.deleteSemaphores) {
-            for (const chunk of deleteSemaphore.chunksToDelete) {
-                chunk.dispose();
-            }
-        }
+        this.deleteSemaphores.forEach((deleteSemaphore) => {
+            deleteSemaphore.dispose();
+        });
+        this.deleteSemaphores.length = 0;
     }
 }

@@ -39,10 +39,8 @@ import { CelestialBody } from "../../architecture/celestialBody";
 import { RingsUniforms } from "../../rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import { rotate } from "../../uberCore/transforms/basicTransform";
-import i18n from "../../i18n";
 import { CloudsUniforms } from "../../clouds/cloudsUniforms";
 import { Scene } from "@babylonjs/core/scene";
-import { BodyType } from "../../architecture/bodyType";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
 
@@ -205,7 +203,12 @@ export class TelluricPlanet implements Planet, Cullable {
     }
 
     public dispose(): void {
-        for (const side of this.sides) side.dispose();
+        this.sides.forEach(side => side.dispose());
+        this.sides.length = 0;
+
+        this.cloudsUniforms?.dispose();
+        this.ringsUniforms?.dispose();
+
         this.material.dispose();
         this.aggregate.dispose();
         this.transform.dispose();

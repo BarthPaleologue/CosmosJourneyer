@@ -249,4 +249,9 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
     public getSteepSharpness(): number {
         return this.steepSharpness;
     }
+
+    public dispose(forceDisposeEffect?: boolean, forceDisposeTextures?: boolean, notBoundToMesh?: boolean) {
+        super.dispose(forceDisposeEffect, forceDisposeTextures, notBoundToMesh);
+        this.stellarObjects.length = 0;
+    }
 }

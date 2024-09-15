@@ -39,7 +39,6 @@ import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProp
 import { RingsUniforms } from "../../rings/ringsUniform";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
-import i18n from "../../i18n";
 import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
@@ -178,9 +177,11 @@ export class NeutronStar implements StellarObject, Cullable {
     }
 
     public dispose(): void {
+        this.aggregate.dispose();
         this.mesh.dispose();
         this.light.dispose();
         this.material.dispose();
         this.asteroidField?.dispose();
+        this.ringsUniforms?.dispose();
     }
 }
