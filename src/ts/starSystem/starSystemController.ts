@@ -104,7 +104,7 @@ export class StarSystemController {
     }
 
     public addSatellite(satellite: TelluricPlanet): void {
-        if(!satellite.model.isMoon()) throw new Error("Use addTelluricPlanet to add a telluric planet to a planet, not addSatellite");
+        if (!satellite.model.isMoon()) throw new Error("Use addTelluricPlanet to add a telluric planet to a planet, not addSatellite");
         this.orbitalObjects.push(satellite);
         this.celestialBodies.push(satellite);
         this.telluricBodies.push(satellite);
@@ -527,7 +527,7 @@ export class StarSystemController {
      * Disposes all the bodies in the system
      */
     public dispose() {
-        for (const object of this.orbitalObjects) object.dispose();
+        this.orbitalObjects.forEach((object) => object.dispose());
         this.systemTargets.forEach((target) => target.dispose());
 
         this.starFieldBox.dispose();
