@@ -74,13 +74,13 @@ export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
 
         this.planetModel = planetModel;
 
-        this.mesh = new Mesh(`Chunk${id}`, scene);
+        this.mesh = new Mesh(`${planetModel.name}_Chunk${id}`, scene);
         this.mesh.setEnabled(false);
 
         this.scene = scene;
 
         this.mesh.material = material;
-        //this.mesh.material = Assets.DebugMaterial(id, false, false, scene);
+        //this.mesh.material = Materials.DebugMaterial(id, false, false, scene);
 
         this.mesh.parent = parentAggregate.transformNode;
 
