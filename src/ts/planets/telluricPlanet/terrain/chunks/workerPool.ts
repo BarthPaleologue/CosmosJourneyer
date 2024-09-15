@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { BuildTask } from "./taskTypes";
+import { PriorityQueue } from "../../../../utils/priorityQueue";
 
 /*export class BuildTaskQueue {
     array: ArrayBuffer
@@ -28,15 +29,16 @@ export class WorkerPool {
     availableWorkers: Worker[] = []; // liste des workers disponibles pour exécuter des tâches
     busyWorkers: Worker[] = []; // liste des workers occupés à exécuter une tâche
     finishedWorkers: Worker[] = []; // liste des workers ayant terminé leur tâche (prêts à être réintégré dans la liste des workers disponibles)
-    taskQueue: BuildTask[] = [];
+    taskQueue: PriorityQueue<BuildTask>;
 
     //TODO: continuer à expérimenter avec le SharedArrayBuffer
     //sharedMemoryBuffer: SharedArrayBuffer;
     //sharedTaskQueue: BuildTaskQueue;
 
-    constructor(nbWorkers: number) {
+    constructor(nbWorkers: number, comparator: (a: BuildTask, b: BuildTask) => boolean) {
         //this.sharedMemoryBuffer = new SharedArrayBuffer(0);
         //this.sharedTaskQueue = new BuildTaskQueue(this.sharedMemoryBuffer);
+        this.taskQueue = new PriorityQueue<BuildTask>(comparator);
         for (let i = 0; i < nbWorkers; i++) {
             const worker = new Worker(new URL("../workers/buildScript", import.meta.url), { type: "module" });
             this.availableWorkers.push(worker);
@@ -49,11 +51,11 @@ export class WorkerPool {
     }
 
     public hasTask(): boolean {
-        return this.taskQueue.length > 0;
+        return this.taskQueue.size() > 0;
     }
 
     public nextTask(): BuildTask {
-        if (this.hasTask()) return this.taskQueue.shift() as BuildTask;
+        if (this.hasTask()) return this.taskQueue.pop() as BuildTask;
         throw new Error("The workerpool has no task to dispatch");
     }
 
@@ -64,6 +66,6 @@ export class WorkerPool {
         this.busyWorkers = [];
         this.availableWorkers.forEach((worker) => (worker.onmessage = null));
 
-        this.taskQueue.length = 0;
+        this.taskQueue.clear();
     }
 }

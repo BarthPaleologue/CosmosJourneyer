@@ -41,7 +41,7 @@ export class ChunkForgeWorkers implements ChunkForge {
     constructor(nbVerticesPerRow: number) {
         this.nbVerticesPerRow = nbVerticesPerRow;
         const nbMaxWorkers = navigator.hardwareConcurrency - 1; // -1 because the main thread is also used
-        this.workerPool = new WorkerPool(nbMaxWorkers);
+        this.workerPool = new WorkerPool(nbMaxWorkers, (task1, task2) => task1.depth < task2.depth);
     }
 
     public addTask(task: BuildTask) {
