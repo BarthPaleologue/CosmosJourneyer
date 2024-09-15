@@ -11,7 +11,7 @@ import { Player } from "../../player/player";
 import { MissionContainer } from "./missionContainer";
 
 export function generateMissionsDom(stationModel: SpaceStationModel, player: Player): HTMLDivElement {
-    const sightSeeingMissions = generateSightseeingMissions(stationModel, Date.now());
+    const sightSeeingMissions = generateSightseeingMissions(stationModel, player, Date.now());
 
     const starSystem = stationModel.starSystem;
     if (!(starSystem instanceof SeededStarSystemModel)) {

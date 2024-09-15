@@ -5,8 +5,9 @@ import { SightSeeingMission, SightSeeingType } from "./sightSeeingMission";
 import { uniformRandBool } from "extended-random";
 import { BodyType } from "../architecture/bodyType";
 import { SystemObjectType } from "../saveFile/universeCoordinates";
+import { Player } from "../player/player";
 
-export function generateSightseeingMissions(spaceStationModel: SpaceStationModel, timestampMillis: number): SightSeeingMission[] {
+export function generateSightseeingMissions(spaceStationModel: SpaceStationModel, player: Player, timestampMillis: number): SightSeeingMission[] {
     const hours = Math.floor(timestampMillis / 1000 / 60 / 60);
 
     const starSystem = spaceStationModel.starSystem;
@@ -63,5 +64,8 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
         });
     });
 
-    return blackHoleFlyByMissions.concat(neutronStarFlyByMissions, anomalyFlyByMissions);
+    const allMissions = blackHoleFlyByMissions.concat(neutronStarFlyByMissions, anomalyFlyByMissions);
+
+    // filter missions to avoid duplicates with already accepted missions of the player
+    return allMissions.filter((mission) => player.currentMissions.every((currentMission) => !mission.equals(currentMission)));
 }
