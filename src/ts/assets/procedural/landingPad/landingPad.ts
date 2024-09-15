@@ -45,7 +45,15 @@ export class LandingPad implements Transformable, TypedObject, BoundingSphere {
 
         this.deckMaterial = new LandingPadMaterial(padNumber, scene);
 
-        this.deck = MeshBuilder.CreateBox(`Landing Pad ${padNumber}`, { width: width, depth: depth, height: 0.5 }, scene);
+        this.deck = MeshBuilder.CreateBox(
+            `Landing Pad ${padNumber}`,
+            {
+                width: width,
+                depth: depth,
+                height: 0.5
+            },
+            scene
+        );
         this.deck.material = this.deckMaterial;
 
         this.deckAggregate = new PhysicsAggregate(this.deck, PhysicsShapeType.BOX, { mass: 0, friction: 10 }, scene);
@@ -83,8 +91,13 @@ export class LandingPad implements Transformable, TypedObject, BoundingSphere {
         }
     }
 
-    update(stellarObjects: Transformable[]): void {
+    update(stellarObjects: Transformable[], cameraWorldPosition: Vector3): void {
         this.deckMaterial.update(stellarObjects);
+
+        const padCameraDistance2 = Vector3.DistanceSquared(cameraWorldPosition, this.deck.getAbsolutePosition());
+        const distanceThreshold = 12e3;
+        const isEnabled = padCameraDistance2 < distanceThreshold * distanceThreshold;
+        this.getTransform().setEnabled(isEnabled);
     }
 
     getTransform(): TransformNode {
