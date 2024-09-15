@@ -528,13 +528,13 @@ export class StarSystemController {
      */
     public dispose() {
         this.orbitalObjects.forEach((object) => object.dispose());
+        this.orbitalObjects.length = 0;
+
         this.systemTargets.forEach((target) => target.dispose());
+        this.systemTargets.length = 0;
 
         this.starFieldBox.dispose();
 
-        this.systemTargets = [];
-
-        this.orbitalObjects.length = 0;
         this.spaceStations.length = 0;
         this.celestialBodies.length = 0;
         this.stellarObjects.length = 0;

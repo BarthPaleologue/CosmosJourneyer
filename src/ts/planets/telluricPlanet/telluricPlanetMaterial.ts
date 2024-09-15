@@ -158,13 +158,17 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
         }
 
         this.setTexture("lut", Textures.EMPTY_TEXTURE);
-        const lut = new ProceduralTexture("lut", 4096, "telluricPlanetLut", scene, null, true, false);
+        const lut = new ProceduralTexture(`${planetName}MaterialLut`, 4096, "telluricPlanetLut", scene, null, true, false);
         lut.setFloat(TelluricPlanetMaterialUniformNames.MIN_TEMPERATURE, this.planetModel.physicalProperties.minTemperature);
         lut.setFloat(TelluricPlanetMaterialUniformNames.MAX_TEMPERATURE, this.planetModel.physicalProperties.maxTemperature);
         lut.setFloat(TelluricPlanetMaterialUniformNames.PRESSURE, this.planetModel.physicalProperties.pressure);
         lut.refreshRate = 0;
         lut.executeWhenReady(() => {
             this.setTexture(TelluricPlanetMaterialSamplerNames.LUT, lut);
+        });
+
+        this.onDisposeObservable.add(() => {
+            lut.dispose();
         });
 
         this.updateTextures();

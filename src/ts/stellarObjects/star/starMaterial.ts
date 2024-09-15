@@ -65,7 +65,7 @@ export class StarMaterial extends ShaderMaterial {
         }
 
         this.setTexture("lut", Textures.EMPTY_TEXTURE);
-        const lut = new ProceduralTexture("lut", 4096, "starLut", scene, null, true, false);
+        const lut = new ProceduralTexture(`${star.name}MaterialLut`, 4096, "starLut", scene, null, true, false);
         lut.refreshRate = 0;
         lut.executeWhenReady(() => {
             this.setTexture(StarMaterialSamplerNames.LUT, lut);
@@ -79,6 +79,10 @@ export class StarMaterial extends ShaderMaterial {
             this.getEffect().setFloat(StarMaterialUniformNames.TIME, this.elapsedSeconds % 100000);
             this.getEffect().setColor3(StarMaterialUniformNames.STAR_COLOR, this.starModel.color);
             this.getEffect().setFloat(StarMaterialUniformNames.SEED, this.starSeed);
+        });
+
+        this.onDisposeObservable.add(() => {
+            lut.dispose();
         });
     }
 
