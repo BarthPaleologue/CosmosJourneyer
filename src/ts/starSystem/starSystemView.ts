@@ -811,6 +811,7 @@ export class StarSystemView implements View {
         this.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
         this.spaceShipLayer.setVisibility(false);
         this.targetCursorLayer.setEnabled(false);
+        this.spaceStationLayer.setVisibility(false);
     }
 
     public setUIEnabled(enabled: boolean) {
