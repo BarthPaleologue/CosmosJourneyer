@@ -789,7 +789,7 @@ export class StarSystemView implements View {
 
         if(showHelpNotification) {
             const keys = dPadCompositeToString(DefaultControlsInputs.map.move.bindings[0].control as DPadComposite, keyboardLayoutMap);
-            createNotification(`Move using QWERTY ${keys.map((key) => key[1].replace("Key", "")).join(", ")}`, 20000);
+            createNotification(`Move using ${keys.map((key) => key[1].replace("Key", "")).join(", ")}`, 20000);
         }
     }
 
