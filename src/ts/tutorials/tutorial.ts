@@ -24,5 +24,5 @@ export interface Tutorial {
 
     universeObjectIdentifier?: UniverseObjectIdentifier;
 
-    getContentPanelsHtml(): string[];
+    getContentPanelsHtml(): Promise<string[]>;
 }

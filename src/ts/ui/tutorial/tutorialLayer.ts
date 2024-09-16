@@ -49,7 +49,7 @@ export class TutorialLayer implements IDisposable {
         stopButtonTextSpan.innerText = i18n.t("tutorials:common:quit");
         this.quitButton.appendChild(stopButtonTextSpan);
 
-        pressInteractionToStrings(TutorialControlsInputs.map.quitTutorial).forEach((key) => {
+        pressInteractionToStrings(TutorialControlsInputs.map.quitTutorial, null).forEach((key) => {
             const stopKeySpan = document.createElement("span");
             stopKeySpan.classList.add("keySpan");
             stopKeySpan.innerText = key;
@@ -61,7 +61,7 @@ export class TutorialLayer implements IDisposable {
         prevButtonTextSpan.innerText = i18n.t("tutorials:common:previous");
         this.prevButton.appendChild(prevButtonTextSpan);
 
-        pressInteractionToStrings(TutorialControlsInputs.map.prevPanel).forEach((key) => {
+        pressInteractionToStrings(TutorialControlsInputs.map.prevPanel, null).forEach((key) => {
             const prevKeySpan = document.createElement("span");
             prevKeySpan.classList.add("keySpan");
             prevKeySpan.innerText = key;
@@ -73,7 +73,7 @@ export class TutorialLayer implements IDisposable {
         nextButtonTextSpan.innerText = i18n.t("tutorials:common:next");
         this.nextButton.appendChild(nextButtonTextSpan);
 
-        pressInteractionToStrings(TutorialControlsInputs.map.nextPanel).forEach((key) => {
+        pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, null).forEach((key) => {
             const nextKeySpan = document.createElement("span");
             nextKeySpan.classList.add("keySpan");
             nextKeySpan.innerText = key;
