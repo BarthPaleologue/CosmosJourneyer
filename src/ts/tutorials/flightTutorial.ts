@@ -28,6 +28,7 @@ import thrustImageSrc from "../../asset/tutorials/flightTutorial/thrust.webp";
 import warpImageSrc from "../../asset/tutorials/flightTutorial/warp.webp";
 import congratsImageSrc from "../../asset/tutorials/flightTutorial/congrats.webp";
 import { SystemObjectType } from "../saveFile/universeCoordinates";
+import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 
 export const FlightTutorial: Tutorial = {
     title: i18n.t("tutorials:flightTutorial:title"),
@@ -45,15 +46,16 @@ export const FlightTutorial: Tutorial = {
         index: 1
     },
 
-    getContentPanelsHtml(): string[] {
+    async getContentPanelsHtml(): Promise<string[]> {
+        const keybordLayoutMap = await getGlobalKeyboardLayoutMap();
         const welcomePanelHtml = `
         <div class="tutorialContent">
             <img src="${welcomeImageSrc}" alt="Welcome to Cosmos Journeyer">
             <p>${i18n.t("tutorials:flightTutorial:welcome")}</p>
             ${i18n.t("tutorials:common:navigationInfo", {
-                nextKeys: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel).join(` ${i18n.t("common:or")} `),
-                previousKeys: pressInteractionToStrings(TutorialControlsInputs.map.prevPanel).join(` ${i18n.t("common:or")} `),
-                quitKeys: pressInteractionToStrings(TutorialControlsInputs.map.quitTutorial).join(` ${i18n.t("common:or")} `)
+                nextKeys: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keybordLayoutMap).join(` ${i18n.t("common:or")} `),
+                previousKeys: pressInteractionToStrings(TutorialControlsInputs.map.prevPanel, keybordLayoutMap).join(` ${i18n.t("common:or")} `),
+                quitKeys: pressInteractionToStrings(TutorialControlsInputs.map.quitTutorial, keybordLayoutMap).join(` ${i18n.t("common:or")} `)
             })}
         </div>`;
 
@@ -70,7 +72,7 @@ export const FlightTutorial: Tutorial = {
         if (!(control instanceof AxisComposite)) {
             throw new Error("Expected control to be an AxisComposite");
         }
-        const throttleStrings = axisCompositeToString(control);
+        const throttleStrings = axisCompositeToString(control, keybordLayoutMap);
 
         const thrustPanelHtml = `
         <div class="tutorialContent">
@@ -78,7 +80,7 @@ export const FlightTutorial: Tutorial = {
             <p>${i18n.t("tutorials:flightTutorial:spaceShipThrustText1", {
                 keyIncrease: throttleStrings[1][1],
                 keyDecrease: throttleStrings[0][1],
-                keyKill: pressInteractionToStrings(SpaceShipControlsInputs.map.throttleToZero).join(` ${i18n.t("common:or")} `)
+                keyKill: pressInteractionToStrings(SpaceShipControlsInputs.map.throttleToZero, keybordLayoutMap).join(` ${i18n.t("common:or")} `)
             })}</p>
             <img src="${thrustImageSrc}" alt="Spaceship Thrust">
             <p>${i18n.t("tutorials:flightTutorial:spaceShipThrustText2")}</p>
@@ -89,7 +91,7 @@ export const FlightTutorial: Tutorial = {
         <div class="tutorialContent">
             <h2>${i18n.t("tutorials:flightTutorial:spaceShipWarpDriveTitle")}</h2>
             <p>${i18n.t("tutorials:flightTutorial:spaceShipWarpDriveText1")}</p>
-            <p>${i18n.t("tutorials:flightTutorial:spaceShipWarpDriveText2", { keyToggle: pressInteractionToStrings(SpaceShipControlsInputs.map.toggleWarpDrive).join(` ${i18n.t("common:or")} `) })}</p>
+            <p>${i18n.t("tutorials:flightTutorial:spaceShipWarpDriveText2", { keyToggle: pressInteractionToStrings(SpaceShipControlsInputs.map.toggleWarpDrive, keybordLayoutMap).join(` ${i18n.t("common:or")} `) })}</p>
             <p>${i18n.t("tutorials:flightTutorial:spaceShipWarpDriveText3")}</p>
             <img src="${warpImageSrc}" alt="Warp Drive">
         </div>`;
@@ -100,7 +102,7 @@ export const FlightTutorial: Tutorial = {
             <p>${i18n.t("tutorials:flightTutorial:congratulationsText1")}</p>
             
             ${i18n.t("tutorials:common:tutorialEnding", {
-                keyQuit: pressInteractionToStrings(TutorialControlsInputs.map.quitTutorial).join(` ${i18n.t("common:or")} `)
+                keyQuit: pressInteractionToStrings(TutorialControlsInputs.map.quitTutorial, keybordLayoutMap).join(` ${i18n.t("common:or")} `)
             })}
         </div>`;
 

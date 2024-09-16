@@ -77,6 +77,7 @@ import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { getSystemObjectId, getUniverseObjectId } from "../utils/orbitalObjectId";
 import { DefaultControlsInputs } from "../defaultControls/defaultControlsInputs";
 import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
+import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -214,9 +215,9 @@ export class StarSystemView implements View {
             this.bodyEditor.setVisibility(this.bodyEditor.getVisibility() === EditorVisibility.HIDDEN ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
         });
 
-        StarSystemInputs.map.cycleViews.on("complete", () => {
+        StarSystemInputs.map.cycleViews.on("complete", async () => {
             if (this.scene.getActiveControls() === this.getSpaceshipControls()) {
-                this.switchToDefaultControls(true);
+                await this.switchToDefaultControls(true);
             } else if (this.scene.getActiveControls() === this.getDefaultControls()) {
                 this.switchToCharacterControls();
             } else if (this.scene.getActiveControls() === this.getCharacterControls()) {
@@ -294,9 +295,11 @@ export class StarSystemView implements View {
             this.jumpLock = false;
         });
 
-        StarSystemInputs.map.toggleSpaceShipCharacter.on("complete", () => {
+        StarSystemInputs.map.toggleSpaceShipCharacter.on("complete", async () => {
             const characterControls = this.getCharacterControls();
             const shipControls = this.getSpaceshipControls();
+
+            const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
 
             if (this.scene.getActiveControls() === shipControls) {
                 console.log("disembark");
@@ -332,7 +335,7 @@ export class StarSystemView implements View {
                     if (!(control instanceof AxisComposite)) {
                         throw new Error("Up down is not an axis composite");
                     }
-                    createNotification(i18n.t("notifications:howToLiftOff", { bindingsString: axisCompositeToString(control)[1][1] }), 5000);
+                    createNotification(i18n.t("notifications:howToLiftOff", { bindingsString: axisCompositeToString(control, keyboardLayoutMap)[1][1] }), 5000);
                 }
             }
         });
@@ -762,10 +765,12 @@ export class StarSystemView implements View {
     /**
      * Switches the active controller to the default controls
      */
-    public switchToDefaultControls(showHelpNotification: boolean) {
+    public async switchToDefaultControls(showHelpNotification: boolean) {
         const shipControls = this.getSpaceshipControls();
         const characterControls = this.getCharacterControls();
         const defaultControls = this.getDefaultControls();
+
+        const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
 
         this.spaceShipLayer.setVisibility(false);
 
@@ -783,7 +788,7 @@ export class StarSystemView implements View {
         this.postProcessManager.rebuild();
 
         if(showHelpNotification) {
-            const keys = dPadCompositeToString(DefaultControlsInputs.map.move.bindings[0].control as DPadComposite);
+            const keys = dPadCompositeToString(DefaultControlsInputs.map.move.bindings[0].control as DPadComposite, keyboardLayoutMap);
             createNotification(`Move using QWERTY ${keys.map((key) => key[1].replace("Key", "")).join(", ")}`, 20000);
         }
     }

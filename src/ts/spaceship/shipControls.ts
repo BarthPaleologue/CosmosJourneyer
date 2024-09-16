@@ -34,6 +34,7 @@ import { Transformable } from "../architecture/transformable";
 import { ManagesLandingPads } from "../utils/managesLandingPads";
 import { Sounds } from "../assets/sounds";
 import { LandingPadSize } from "../assets/procedural/landingPad/landingPad";
+import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 
 export class ShipControls implements Controls {
     readonly spaceship: Spaceship;
@@ -66,11 +67,13 @@ export class ShipControls implements Controls {
 
         this.scene = scene;
 
-        SpaceShipControlsInputs.map.toggleWarpDrive.on("complete", () => {
+        SpaceShipControlsInputs.map.toggleWarpDrive.on("complete", async () => {
             if (!this.spaceship.canEngageWarpDrive() && this.spaceship.getWarpDrive().isDisabled()) {
                 Sounds.CANNOT_ENGAGE_WARP_DRIVE.play();
                 return;
             }
+
+            const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
 
             this.spaceship.toggleWarpDrive();
             if (this.spaceship.getWarpDrive().isEnabled()) {
@@ -88,7 +91,7 @@ export class ShipControls implements Controls {
                         this.closestLandableFacility.getTransform().getAbsolutePosition()
                     );
                     if (distanceToLandingFacility < 500e3) {
-                        const bindingsString = pressInteractionToStrings(SpaceShipControlsInputs.map.emitLandingRequest).join(", ");
+                        const bindingsString = pressInteractionToStrings(SpaceShipControlsInputs.map.emitLandingRequest, keyboardLayoutMap).join(", ");
                         createNotification(`Don't forget to send a landing request with ${bindingsString} before approaching the facility`, 5000);
                     }
                 }
@@ -125,13 +128,14 @@ export class ShipControls implements Controls {
         this.baseFov = this.thirdPersonCamera.fov;
         this.targetFov = this.baseFov;
 
-        this.spaceship.onLandingObservable.add(() => {
+        this.spaceship.onLandingObservable.add(async () => {
+            const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
             Sounds.LANDING_COMPLETE.play();
             Sounds.STRAUSS_BLUE_DANUBE.setVolume(0, 2);
             Sounds.STRAUSS_BLUE_DANUBE.stop(2);
 
             if (!this.spaceship.isLandedAtFacility()) {
-                const bindingsString = pressInteractionToStrings(StarSystemInputs.map.toggleSpaceShipCharacter).join(", ");
+                const bindingsString = pressInteractionToStrings(StarSystemInputs.map.toggleSpaceShipCharacter, keyboardLayoutMap).join(", ");
                 createNotification(i18n.t("notifications:landingComplete", { bindingsString: bindingsString }), 5000);
             }
         });
