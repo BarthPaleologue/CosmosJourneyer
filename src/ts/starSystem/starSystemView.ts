@@ -73,6 +73,7 @@ import { SpaceStationLayer } from "../ui/spaceStation/spaceStationLayer";
 import { SeededStarSystemModel } from "./seededStarSystemModel";
 import { placeSpaceStations } from "../society/spaceStationPlacement";
 import { isSystemInHumanBubble } from "../society/starSystemSociety";
+import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -294,9 +295,11 @@ export class StarSystemView implements View {
             this.targetCursorLayer.setTarget(null);
         });
 
-        StarSystemInputs.map.toggleSpaceShipCharacter.on("complete", () => {
+        StarSystemInputs.map.toggleSpaceShipCharacter.on("complete", async () => {
             const characterControls = this.getCharacterControls();
             const shipControls = this.getSpaceshipControls();
+
+            const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
 
             if (this.scene.getActiveControls() === shipControls) {
                 console.log("disembark");
@@ -332,7 +335,7 @@ export class StarSystemView implements View {
                     if (!(control instanceof AxisComposite)) {
                         throw new Error("Up down is not an axis composite");
                     }
-                    createNotification(i18n.t("notifications:howToLiftOff", { bindingsString: axisCompositeToString(control)[1][1] }), 5000);
+                    createNotification(i18n.t("notifications:howToLiftOff", { bindingsString: axisCompositeToString(control, keyboardLayoutMap)[1][1] }), 5000);
                 }
             }
         });

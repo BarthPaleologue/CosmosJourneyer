@@ -6,18 +6,21 @@ export function stickInputToString(input: StickInputControl): [string, string][]
     const keys: [string, string][] = [];
     input.children.forEach((child, key) => {
         if (key === "x" || key === "y") return;
-        keys.push([key, input.name]);
+        else keys.push([key, input.name]);
     });
     return keys;
 }
 
-export function dPadCompositeToString(input: DPadComposite): [string, string][] {
+export function dPadCompositeToString(input: DPadComposite, keyboardMap: Map<string, string> | null): [string, string][] {
     const keys: [string, string][] = [];
     input.children.forEach((child, key) => {
         if (key === "x" || key === "y") return;
         let name = child.name;
         // remove the "key:" prefix
         name = name.replace("key:", "");
+        if(keyboardMap?.has(name)) {
+            name = keyboardMap.get(name)?.toUpperCase() ?? name;
+        }
         keys.push([key, name]);
     });
     return keys;
@@ -30,26 +33,31 @@ export function vector2ToString(input: Vector2InputControl): [string, string][] 
     ];
 }
 
-export function buttonInputToString(input: ButtonInputControl): string {
+export function buttonInputToString(input: ButtonInputControl, keyboardMap: Map<string, string> | null): string {
     let name = input.name;
     // remove the "key:" prefix
     name = name.replace("key:", "");
+    if(keyboardMap?.has(name)) {
+        name = keyboardMap.get(name)?.toUpperCase() ?? name;
+    }
     return name;
 }
 
-export function axisCompositeToString(input: AxisComposite): [string, string][] {
+export function axisCompositeToString(input: AxisComposite, keyboardMap: Map<string, string> | null): [string, string][] {
     const keys: [string, string][] = [];
     input.children.forEach((child, key) => {
         let name = child.name;
-
         // remove the "key:" prefix
         name = name.replace("key:", "");
+        if(keyboardMap?.has(name)) {
+            name = keyboardMap.get(name)?.toUpperCase() ?? name;
+        }
         keys.push([key, name]);
     });
     return keys;
 }
 
-export function pressInteractionToStrings(pressInteraction: PressInteraction): string[] {
+export function pressInteractionToStrings(pressInteraction: PressInteraction, keyboardMap: Map<string, string> | null): string[] {
     const bindings = pressInteraction.action.bindings;
-    return bindings.map((binding) => buttonInputToString(binding.control as ButtonInputControl));
+    return bindings.map((binding) => buttonInputToString(binding.control as ButtonInputControl, keyboardMap));
 }

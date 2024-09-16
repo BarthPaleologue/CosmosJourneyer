@@ -107,8 +107,8 @@ export class CosmosJourneyer {
         this.sidePanels = new SidePanels(this.starSystemView);
 
         this.mainMenu = new MainMenu(this.sidePanels, starSystemView);
-        this.mainMenu.onStartObservable.add(() => {
-            this.tutorialLayer.setTutorial(FlightTutorial.title, FlightTutorial.getContentPanelsHtml());
+        this.mainMenu.onStartObservable.add(async () => {
+            this.tutorialLayer.setTutorial(FlightTutorial.title, await FlightTutorial.getContentPanelsHtml());
 
             this.starSystemView.switchToSpaceshipControls();
         });
@@ -117,10 +117,10 @@ export class CosmosJourneyer {
             await this.loadSaveData(saveData);
         });
 
-        this.sidePanels.tutorialsPanelContent.onTutorialSelected.add((tutorial) => {
+        this.sidePanels.tutorialsPanelContent.onTutorialSelected.add(async (tutorial) => {
             this.mainMenu.hide();
             this.resume();
-            this.tutorialLayer.setTutorial(tutorial.title, tutorial.getContentPanelsHtml());
+            this.tutorialLayer.setTutorial(tutorial.title, await tutorial.getContentPanelsHtml());
             this.starSystemView.targetCursorLayer.setEnabled(true);
             this.starSystemView.getSpaceshipControls().spaceship.disableWarpDrive();
             this.starSystemView.getSpaceshipControls().spaceship.setMainEngineThrottle(0);
