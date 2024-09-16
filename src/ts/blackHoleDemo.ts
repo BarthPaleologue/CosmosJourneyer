@@ -37,7 +37,7 @@ await starSystemView.loadStarSystem(starSystem, true);
 
 engine.init(true);
 
-starSystemView.switchToDefaultControls(true);
+await starSystemView.switchToDefaultControls(true);
 
 const BH = starSystem.stellarObjects[0];
 

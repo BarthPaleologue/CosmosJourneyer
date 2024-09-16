@@ -236,8 +236,8 @@ export class MainMenu {
     async init() {
         await this.starSystemView.loadStarSystem(this.starSystemController, true, 0);
 
-        this.starSystemView.onInitStarSystem.addOnce(() => {
-            this.starSystemView.switchToDefaultControls(false);
+        this.starSystemView.onInitStarSystem.addOnce(async () => {
+            await this.starSystemView.switchToDefaultControls(false);
             const nbRadius = this.starSystemController.model.getBodyTypeOfStellarObject(0) === BodyType.BLACK_HOLE ? 8 : 2;
             const targetObject = getObjectBySystemId(this.universeObjectId, this.starSystemController);
             if (targetObject === null) {
