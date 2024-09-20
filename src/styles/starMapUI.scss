@@ -35,6 +35,10 @@
 
     transform: translateY(-50%) translateX(calc(-100% - 25px));
 
+    &.transparent {
+      opacity: 0;
+    }
+
     .bookmarkIcon {
       width: 100%;
       aspect-ratio: 1;

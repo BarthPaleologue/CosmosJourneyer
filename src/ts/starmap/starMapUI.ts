@@ -219,8 +219,13 @@ export class StarMapUI {
             const systemPosition = getStarGalacticCoordinates(systemIcons.systemSeed);
             const systemUniversePosition = systemPosition.add(centerOfUniversePosition);
             const screenCoordinates = Vector3.Project(systemUniversePosition, Matrix.IdentityReadOnly, camera.getTransformationMatrix(), camera.viewport);
+            systemIcons.htmlRoot.classList.toggle("transparent", screenCoordinates.z < 0);
             systemIcons.htmlRoot.style.left = `${screenCoordinates.x * 100}vw`;
             systemIcons.htmlRoot.style.top = `${screenCoordinates.y * 100}vh`;
+
+            const distance = Vector3.Distance(systemUniversePosition, playerPosition);
+            const offsetX = Math.max(40.0 / distance, 3);
+            systemIcons.htmlRoot.style.transform = `translate(calc(-50% - ${offsetX}vw), -50%)`;
         });
 
         // disable the plot itinerary button if the selected mesh is the current mesh
