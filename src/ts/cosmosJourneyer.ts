@@ -37,7 +37,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { setRotationQuaternion } from "./uberCore/transforms/basicTransform";
 import { encodeBase64 } from "./utils/base64";
-import { UniverseCoordinates, SystemObjectType } from "./saveFile/universeCoordinates";
+import { UniverseCoordinates } from "./saveFile/universeCoordinates";
 import { View } from "./utils/view";
 import { updateInputDevices } from "./inputs/devices";
 import { AudioManager } from "./audio/audioManager";
@@ -54,11 +54,7 @@ import { SidePanels } from "./ui/sidePanels";
 import { Settings } from "./settings";
 import { SeededStarSystemModel } from "./starSystem/seededStarSystemModel";
 import { Player } from "./player/player";
-import { StellarObject } from "./architecture/stellarObject";
-import { Planet } from "./architecture/planet";
-import { Anomaly } from "./anomalies/anomaly";
-import { SpaceStation } from "./spacestation/spaceStation";
-import { getObjectBySystemId, getSystemObjectId, getUniverseObjectId } from "./utils/orbitalObjectId";
+import { getObjectBySystemId, getUniverseObjectId } from "./utils/orbitalObjectId";
 
 const enum EngineState {
     UNINITIALIZED,
