@@ -122,6 +122,8 @@ body {
 
   @import "tutorialsMenuPanel.scss";
 
+  @import "inspectorLayer.scss";
+
   #renderer {
     z-index: 1;
     float: left;

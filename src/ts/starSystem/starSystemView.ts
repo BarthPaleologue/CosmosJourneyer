@@ -20,7 +20,6 @@ import { BodyEditor, EditorVisibility } from "../ui/bodyEditor/bodyEditor";
 import { UberScene } from "../uberCore/uberScene";
 import { AxisRenderer } from "../orbit/axisRenderer";
 import { TargetCursorLayer } from "../ui/targetCursorLayer";
-import { Animation } from "@babylonjs/core/Animations/animation";
 import { StarSystemController } from "./starSystemController";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
@@ -74,7 +73,7 @@ import { isSystemInHumanBubble } from "../society/starSystemSociety";
 import { Player } from "../player/player";
 import { getNeighborStarSystems } from "../utils/getNeighborStarSystems";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
-import { getSystemObjectId, getUniverseObjectId } from "../utils/orbitalObjectId";
+import { getUniverseObjectId } from "../utils/orbitalObjectId";
 import { DefaultControlsInputs } from "../defaultControls/defaultControlsInputs";
 import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
@@ -390,6 +389,14 @@ export class StarSystemView implements View {
         });
 
         this.targetCursorLayer = new TargetCursorLayer();
+
+        /*
+        const inspectorRoot = document.getElementById("inspectorLayer");
+        if(inspectorRoot === null) throw new Error("Inspector root not found");
+        Inspector.Show(this.scene, {
+            globalRoot: inspectorRoot,
+        });
+        */
     }
 
     public async loadStarSystemFromSeed(seed: SystemSeed) {
@@ -790,7 +797,7 @@ export class StarSystemView implements View {
         setRotationQuaternion(defaultControls.getTransform(), getRotationQuaternion(shipControls.getTransform()).clone());
         this.postProcessManager.rebuild();
 
-        if(showHelpNotification) {
+        if (showHelpNotification) {
             const keys = dPadCompositeToString(DefaultControlsInputs.map.move.bindings[0].control as DPadComposite, keyboardLayoutMap);
             createNotification(`Move using ${keys.map((key) => key[1].replace("Key", "")).join(", ")}`, 20000);
         }
