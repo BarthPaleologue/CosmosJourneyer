@@ -48,7 +48,7 @@ export class AxisRenderer {
 
     private createAxisMesh(orbitalObject: Transformable & BoundingSphere, scene: Scene) {
         const rotationAxisHelper = CreateGreasedLine(
-            "orbit2",
+            `${orbitalObject.getTransform().name}AxisHelper`,
             {
                 points: [new Vector3(0, -orbitalObject.getBoundingRadius() * 2, 0), new Vector3(0, orbitalObject.getBoundingRadius() * 2, 0)],
                 updatable: false
@@ -89,7 +89,7 @@ export class AxisRenderer {
      * @private
      */
     public reset() {
-        this.axisMeshes.forEach((orbitMesh) => orbitMesh.dispose());
+        this.axisMeshes.forEach((orbitMesh) => orbitMesh.dispose(false, true));
         this.axisMeshes = [];
     }
 }

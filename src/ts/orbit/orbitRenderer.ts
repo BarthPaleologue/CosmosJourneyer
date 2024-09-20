@@ -55,7 +55,7 @@ export class OrbitRenderer {
         points.push(points[0]);
 
         const orbitMesh = CreateGreasedLine(
-            "orbit2",
+            `${orbitalObject.getTransform().name}OrbitHelper`,
             {
                 points: points,
                 updatable: false
@@ -97,7 +97,7 @@ export class OrbitRenderer {
     }
 
     private reset() {
-        this.orbitMeshes.forEach((orbitMesh) => orbitMesh.dispose());
+        this.orbitMeshes.forEach((orbitMesh) => orbitMesh.dispose(false, true));
         this.orbitMeshes = [];
         this.orbitalObjects = [];
     }
