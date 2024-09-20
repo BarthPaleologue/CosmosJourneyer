@@ -410,6 +410,7 @@ export class StarSystemView implements View {
             this.postProcessManager.reset();
             this.starSystem.dispose();
             this.targetCursorLayer.reset();
+            this.spaceStationLayer.reset();
         }
         this.starSystem = starSystem;
 

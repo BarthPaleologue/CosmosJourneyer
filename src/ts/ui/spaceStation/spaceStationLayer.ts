@@ -142,4 +142,12 @@ export class SpaceStationLayer {
         this.playerName.textContent = `CMDR ${player.name}`;
         this.playerBalance.textContent = `Balance: ${Settings.CREDIT_SYMBOL}${player.balance.toLocaleString()}`;
     }
+
+    public reset() {
+        this.currentStation = null;
+        this.spaceStationHeader.innerHTML = "";
+        this.playerName.textContent = "";
+        this.playerBalance.textContent = "";
+        this.mainPanel.innerHTML = "";
+    }
 }
