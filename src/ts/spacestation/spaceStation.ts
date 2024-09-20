@@ -26,16 +26,12 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { OrbitProperties } from "../orbit/orbitProperties";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { OrbitalObjectPhysicalProperties } from "../architecture/physicalProperties";
-import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { CelestialBody } from "../architecture/celestialBody";
-import i18n from "../i18n";
 import { SpaceStationNodeType } from "../assets/procedural/spaceStation/spaceStationNode";
 import { UtilitySection } from "../assets/procedural/spaceStation/utilitySection";
 import { HelixHabitat } from "../assets/procedural/spaceStation/helixHabitat";
 import { RingHabitat } from "../assets/procedural/spaceStation/ringHabitat";
 import { Transformable } from "../architecture/transformable";
-import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
-import { StellarObject } from "../architecture/stellarObject";
 import { SolarSection } from "../assets/procedural/spaceStation/solarSection";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { wheelOfFortune } from "../utils/random";
@@ -43,7 +39,6 @@ import { CylinderHabitat } from "../assets/procedural/spaceStation/cylinderHabit
 import { LandingBay } from "../assets/procedural/spaceStation/landingBay";
 import { LandingPad } from "../assets/procedural/landingPad/landingPad";
 import { LandingRequest, ManagesLandingPads } from "../utils/managesLandingPads";
-import { getEdibleEnergyPerHaPerDay } from "../utils/agriculture";
 import { Settings } from "../settings";
 import { EngineBay } from "../assets/procedural/spaceStation/engineBay";
 import { StarSystemModel } from "../starSystem/starSystemModel";
@@ -54,8 +49,6 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
     readonly model: SpaceStationModel;
 
     readonly postProcesses: PostProcessType[] = [];
-
-    readonly childAggregates: PhysicsAggregate[] = [];
 
     readonly parent: OrbitalObject | null = null;
 
@@ -254,7 +247,7 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
     }
 
     dispose() {
-        this.root.dispose();
+        this.solarSections.forEach((solarSection) => solarSection.dispose());
         this.utilitySections.forEach((utilitySection) => utilitySection.dispose());
         this.helixHabitats.forEach((helixHabitat) => helixHabitat.dispose());
         this.ringHabitats.forEach((ringHabitat) => ringHabitat.dispose());
@@ -262,6 +255,6 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
         this.landingBays.forEach((landingBay) => landingBay.dispose());
         this.engineBays.forEach((engineBay) => engineBay.dispose());
 
-        this.childAggregates.forEach((childAggregate) => childAggregate.dispose());
+        this.root.dispose();
     }
 }
