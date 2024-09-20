@@ -181,7 +181,7 @@ export class CharacterControls implements Controls {
         this.thirdPersonCamera.parent = this.getTransform();
     }
 
-    public setClosestWalkableObject(object: Transformable) {
+    public setClosestWalkableObject(object: Transformable | null) {
         this.closestWalkableObject = object;
     }
 

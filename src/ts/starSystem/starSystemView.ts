@@ -404,6 +404,8 @@ export class StarSystemView implements View {
      */
     public async loadStarSystem(starSystem: StarSystemController, needsGenerating = true, timeOut = 700) {
         if (this.starSystem !== null) {
+            this.spaceshipControls?.setClosestLandableFacility(null);
+            this.characterControls?.setClosestWalkableObject(null);
             this.chunkForge.reset();
             this.postProcessManager.reset();
             this.starSystem.dispose();
