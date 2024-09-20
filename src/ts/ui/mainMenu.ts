@@ -3,7 +3,6 @@ import { DefaultControls } from "../defaultControls/defaultControls";
 import { StarSystemView } from "../starSystem/starSystemView";
 import { StarSystemController } from "../starSystem/starSystemController";
 import { positionNearObjectAsteroidField, positionNearObjectWithStarVisible } from "../utils/positionNearObject";
-import { EditorVisibility } from "./bodyEditor/bodyEditor";
 import mainMenuHTML from "../../html/mainMenu.html";
 import { getForwardDirection } from "../uberCore/transforms/basicTransform";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -251,8 +250,6 @@ export class MainMenu {
         });
 
         this.starSystemView.targetCursorLayer.setEnabled(false);
-
-        this.starSystemView.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
 
         this.htmlRoot.style.display = "block";
     }
