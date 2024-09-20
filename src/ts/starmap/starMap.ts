@@ -299,7 +299,7 @@ export class StarMap implements View {
         this.scene.onAfterRenderObservable.add(() => {
             const activeCamera = this.scene.activeCamera;
             if (activeCamera === null) throw new Error("No active camera!");
-            this.starMapUI.update(activeCamera.globalPosition);
+            this.starMapUI.update(activeCamera.globalPosition, this.starMapCenterPosition);
         });
     }
 

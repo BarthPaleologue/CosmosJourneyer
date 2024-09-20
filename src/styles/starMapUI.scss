@@ -26,6 +26,23 @@
     transition: scale $transition-time $bezier-overshoot;
   }
 
+  .systemIcons {
+    position: absolute;
+    border: 2px solid red;
+    width: 30px;
+    height: 30px;
+
+    transform: translateY(-50%) translateX(calc(-100% - 25px));
+
+    .bookmarkIcon {
+
+    }
+
+    .missionIcon {
+
+    }
+  }
+
   .shortHandUI {
     position: absolute;
     //background: rgba(0, 0, 0, 0.8);

@@ -32,6 +32,7 @@ import { isSystemInHumanBubble } from "../society/starSystemSociety";
 import { getSpaceStationModels } from "../utils/getModelsFromSystemModel";
 import { StarMapBookmarkButton } from "./starMapBookmarkButton";
 import { Player } from "../player/player";
+import { SystemIconMask, SystemIcons } from "./systemIcons";
 
 export class StarMapUI {
     readonly htmlRoot: HTMLDivElement;
@@ -69,13 +70,19 @@ export class StarMapUI {
     private hoveredMesh: AbstractMesh | null = null;
     private currentMesh: AbstractMesh | null = null;
 
+    private readonly systemIcons: SystemIcons[] = [];
+
     static ALPHA_ANIMATION = new Animation("alphaAnimation", "alpha", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
 
     private readonly scene: Scene;
 
+    private readonly player: Player;
+
     constructor(scene: Scene, player: Player) {
         this.scene = scene;
         this.scene.hoverCursor = "none";
+
+        this.player = player;
 
         this.htmlRoot = document.createElement("div");
         this.htmlRoot.classList.add("starMapUI");
@@ -195,7 +202,8 @@ export class StarMapUI {
         });
     }
 
-    update(playerPosition: Vector3) {
+    update(playerPosition: Vector3, centerOfUniversePosition: Vector3) {
+
         const width = this.scene.getEngine().getRenderWidth();
         const height = this.scene.getEngine().getRenderHeight();
 
@@ -203,6 +211,16 @@ export class StarMapUI {
         if (camera === null) {
             throw new Error("No active camera found");
         }
+
+        this.rebuildSystemIcons();
+
+        this.systemIcons.forEach(systemIcons => {
+            const systemPosition = getStarGalacticCoordinates(systemIcons.systemSeed);
+            const systemUniversePosition = systemPosition.add(centerOfUniversePosition);
+            const screenCoordinates = Vector3.Project(systemUniversePosition, Matrix.IdentityReadOnly, camera.getTransformationMatrix(), camera.viewport);
+            systemIcons.htmlRoot.style.left = `${screenCoordinates.x * 100}vw`;
+            systemIcons.htmlRoot.style.top = `${screenCoordinates.y * 100}vh`;
+        });
 
         // disable the plot itinerary button if the selected mesh is the current mesh
         this.shortHandUIPlotItineraryButton.disabled = this.selectedMesh === this.currentMesh;
@@ -354,6 +372,25 @@ export class StarMapUI {
 
     detachUIFromMesh() {
         this.selectedMesh = null;
+    }
+
+    rebuildSystemIcons() {
+        this.systemIcons.forEach((icon) => icon.dispose());
+        this.systemIcons.length = 0;
+
+        const bookmarkedSystems = this.player.systemBookmarks;
+        const targetSystems = this.player.currentMissions.flatMap((mission) => mission.getTargetSystems());
+
+        const systemsWithIcons = bookmarkedSystems.concat(targetSystems);
+
+        systemsWithIcons.forEach((system) => {
+            let iconMask = 0;
+            if (bookmarkedSystems.includes(system)) iconMask |= SystemIconMask.BOOKMARK;
+            if (targetSystems.includes(system)) iconMask |= SystemIconMask.MISSION;
+            const icon = new SystemIcons(system, iconMask);
+            this.htmlRoot.appendChild(icon.htmlRoot);
+            this.systemIcons.push(icon);
+        });
     }
 
     dispose() {
