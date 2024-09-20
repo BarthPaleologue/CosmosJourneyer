@@ -22,14 +22,39 @@ export class SystemIcons {
 
         this.bookmarkIcon = document.createElement("div");
         this.bookmarkIcon.classList.add("bookmarkIcon");
-        this.htmlRoot.appendChild(this.bookmarkIcon);
+        if(iconMask & SystemIconMask.BOOKMARK) {
+            this.htmlRoot.appendChild(this.bookmarkIcon);
+        }
 
         this.missionIcon = document.createElement("div");
         this.missionIcon.classList.add("missionIcon");
-        this.htmlRoot.appendChild(this.missionIcon);
+        if(iconMask & SystemIconMask.MISSION) {
+            this.htmlRoot.appendChild(this.missionIcon);
+        }
+    }
+
+    update(iconMask: number): void {
+        if(iconMask & SystemIconMask.BOOKMARK) {
+            this.htmlRoot.appendChild(this.bookmarkIcon);
+        } else {
+            this.bookmarkIcon.remove();
+        }
+
+        if(iconMask & SystemIconMask.MISSION) {
+            this.htmlRoot.appendChild(this.missionIcon);
+        } else {
+            this.missionIcon.remove();
+        }
     }
 
     dispose() {
         this.htmlRoot.remove();
+    }
+
+    static IconMaskForSystem(system: SystemSeed, bookmarkedSystems: SystemSeed[], targetSystems: SystemSeed[]): number {
+        let iconMask = 0;
+        if (bookmarkedSystems.includes(system)) iconMask |= SystemIconMask.BOOKMARK;
+        if (targetSystems.includes(system)) iconMask |= SystemIconMask.MISSION;
+        return iconMask;
     }
 }

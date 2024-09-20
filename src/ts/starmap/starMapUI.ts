@@ -33,6 +33,7 @@ import { getSpaceStationModels } from "../utils/getModelsFromSystemModel";
 import { StarMapBookmarkButton } from "./starMapBookmarkButton";
 import { Player } from "../player/player";
 import { SystemIconMask, SystemIcons } from "./systemIcons";
+import { SystemSeed } from "../utils/systemSeed";
 
 export class StarMapUI {
     readonly htmlRoot: HTMLDivElement;
@@ -70,7 +71,7 @@ export class StarMapUI {
     private hoveredMesh: AbstractMesh | null = null;
     private currentMesh: AbstractMesh | null = null;
 
-    private readonly systemIcons: SystemIcons[] = [];
+    private systemIcons: SystemIcons[] = [];
 
     static ALPHA_ANIMATION = new Animation("alphaAnimation", "alpha", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
 
@@ -375,19 +376,34 @@ export class StarMapUI {
     }
 
     rebuildSystemIcons() {
-        this.systemIcons.forEach((icon) => icon.dispose());
-        this.systemIcons.length = 0;
-
         const bookmarkedSystems = this.player.systemBookmarks;
         const targetSystems = this.player.currentMissions.flatMap((mission) => mission.getTargetSystems());
 
-        const systemsWithIcons = bookmarkedSystems.concat(targetSystems);
+        const systemsWithIcons = bookmarkedSystems
+            // add target systems to the list of systems with icons
+            .concat(targetSystems)
+            // remove duplicates
+            .filter((value, index, self) => self.indexOf(value) === index);
+
+        const systemIconsToKeep: SystemIcons[] = [];
+
+        this.systemIcons.forEach(systemIcons => {
+            const system = systemIcons.systemSeed;
+            if (!systemsWithIcons.includes(system)) {
+                systemIcons.dispose();
+                return;
+            }
+
+            systemIcons.update(SystemIcons.IconMaskForSystem(system, bookmarkedSystems, targetSystems));
+
+            systemIconsToKeep.push(systemIcons);
+            systemsWithIcons.splice(systemsWithIcons.indexOf(system), 1);
+        });
+
+        this.systemIcons = systemIconsToKeep;
 
         systemsWithIcons.forEach((system) => {
-            let iconMask = 0;
-            if (bookmarkedSystems.includes(system)) iconMask |= SystemIconMask.BOOKMARK;
-            if (targetSystems.includes(system)) iconMask |= SystemIconMask.MISSION;
-            const icon = new SystemIcons(system, iconMask);
+            const icon = new SystemIcons(system, SystemIcons.IconMaskForSystem(system, bookmarkedSystems, targetSystems));
             this.htmlRoot.appendChild(icon.htmlRoot);
             this.systemIcons.push(icon);
         });

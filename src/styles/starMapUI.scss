@@ -28,18 +28,27 @@
 
   .systemIcons {
     position: absolute;
-    border: 2px solid red;
     width: 30px;
-    height: 30px;
+
+    display: flex;
+    flex-direction: column;
 
     transform: translateY(-50%) translateX(calc(-100% - 25px));
 
     .bookmarkIcon {
+      width: 100%;
+      aspect-ratio: 1;
 
+      background-image: url('../asset/icons/bookmark.webp');
+      background-size: contain;
     }
 
     .missionIcon {
+      width: 100%;
+      aspect-ratio: 1;
 
+      background-image: url('../asset/icons/mission.webp');
+      background-size: contain;
     }
   }
 
@@ -109,9 +118,11 @@
 
       &.bookmarked {
         background: goldenrod;
+
         &:active {
           background: darkgoldenrod;
         }
+
         &:hover {
           background: gold;
         }
