@@ -157,7 +157,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
             this.setTexture(TelluricPlanetMaterialSamplerNames.LUT, lut);
         });
 
-        this.onDisposeObservable.add(() => {
+        this.onDisposeObservable.addOnce(() => {
             lut.dispose();
         });
 

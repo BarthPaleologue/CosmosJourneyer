@@ -78,7 +78,7 @@ export class StarMaterial extends ShaderMaterial {
             this.getEffect().setFloat(StarMaterialUniformNames.SEED, this.starSeed);
         });
 
-        this.onDisposeObservable.add(() => {
+        this.onDisposeObservable.addOnce(() => {
             lut.dispose();
         });
     }
