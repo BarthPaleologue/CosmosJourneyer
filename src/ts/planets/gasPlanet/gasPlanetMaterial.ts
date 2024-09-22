@@ -24,7 +24,6 @@ import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Scene } from "@babylonjs/core/scene";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { TransformNode } from "@babylonjs/core/Meshes";
 import { Transformable } from "../../architecture/transformable";
 import { setStellarObjectUniforms, StellarObjectUniformNames } from "../../postProcesses/uniforms/stellarObjectUniforms";
 
@@ -41,13 +40,10 @@ const GasPlanetMaterialUniformNames = {
 };
 
 export class GasPlanetMaterial extends ShaderMaterial {
-    readonly planet: TransformNode;
     readonly colorSettings: GazColorSettings;
     private elapsedSeconds = 0;
 
-    private stellarObjects: Transformable[] = [];
-
-    constructor(planetName: string, planet: TransformNode, model: GasPlanetModel, scene: Scene) {
+    constructor(planetName: string, model: GasPlanetModel, scene: Scene) {
         const shaderName = "gasPlanetMaterial";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
@@ -60,8 +56,6 @@ export class GasPlanetMaterial extends ShaderMaterial {
             attributes: ["position", "normal"],
             uniforms: [...Object.values(GasPlanetMaterialUniformNames), ...Object.values(StellarObjectUniformNames)]
         });
-
-        this.planet = planet;
 
         const hue1 = normalRandom(240, 30, model.rng, 70);
         const hue2 = normalRandom(0, 180, model.rng, 72);
@@ -100,16 +94,14 @@ export class GasPlanetMaterial extends ShaderMaterial {
 
     public update(stellarObjects: Transformable[], deltaSeconds: number) {
         this.elapsedSeconds += deltaSeconds;
-        this.stellarObjects = stellarObjects;
 
         this.onBindObservable.addOnce(() => {
-            setStellarObjectUniforms(this.getEffect(), this.stellarObjects);
+            setStellarObjectUniforms(this.getEffect(), stellarObjects);
             this.getEffect().setFloat(GasPlanetMaterialUniformNames.TIME, this.elapsedSeconds % 100000);
         });
     }
 
     public dispose(forceDisposeEffect?: boolean, forceDisposeTextures?: boolean, notBoundToMesh?: boolean) {
         super.dispose(forceDisposeEffect, forceDisposeTextures, notBoundToMesh);
-        this.stellarObjects.length = 0;
     }
 }

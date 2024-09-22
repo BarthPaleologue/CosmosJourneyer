@@ -91,7 +91,7 @@ export class GasPlanet implements Planet, Cullable {
         const physicsShape = new PhysicsShapeSphere(Vector3.Zero(), this.model.radius, scene);
         this.aggregate.shape.addChildFromParent(this.getTransform(), physicsShape, this.mesh);
 
-        this.material = new GasPlanetMaterial(this.name, this.getTransform(), this.model, scene);
+        this.material = new GasPlanetMaterial(this.name, this.model, scene);
         this.mesh.material = this.material;
 
         this.postProcesses.push(PostProcessType.ATMOSPHERE, PostProcessType.SHADOW);
