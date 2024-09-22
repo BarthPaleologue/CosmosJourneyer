@@ -30,7 +30,7 @@ export const enum ObjectTargetCursorType {
     FACILITY,
     ANOMALY,
     LANDING_PAD,
-    STAR_SYSTEM,
+    STAR_SYSTEM
 }
 
 export class ObjectTargetCursor {

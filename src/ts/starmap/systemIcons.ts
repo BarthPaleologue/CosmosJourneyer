@@ -22,25 +22,25 @@ export class SystemIcons {
 
         this.bookmarkIcon = document.createElement("div");
         this.bookmarkIcon.classList.add("bookmarkIcon");
-        if(iconMask & SystemIconMask.BOOKMARK) {
+        if (iconMask & SystemIconMask.BOOKMARK) {
             this.htmlRoot.appendChild(this.bookmarkIcon);
         }
 
         this.missionIcon = document.createElement("div");
         this.missionIcon.classList.add("missionIcon");
-        if(iconMask & SystemIconMask.MISSION) {
+        if (iconMask & SystemIconMask.MISSION) {
             this.htmlRoot.appendChild(this.missionIcon);
         }
     }
 
     update(iconMask: number): void {
-        if(iconMask & SystemIconMask.BOOKMARK) {
+        if (iconMask & SystemIconMask.BOOKMARK) {
             this.htmlRoot.appendChild(this.bookmarkIcon);
         } else {
             this.bookmarkIcon.remove();
         }
 
-        if(iconMask & SystemIconMask.MISSION) {
+        if (iconMask & SystemIconMask.MISSION) {
             this.htmlRoot.appendChild(this.missionIcon);
         } else {
             this.missionIcon.remove();

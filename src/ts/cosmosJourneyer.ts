@@ -349,7 +349,7 @@ export class CosmosJourneyer {
         const nearestOrbitalObjectInverseWorld = nearestOrbitalObject.getTransform().getWorldMatrix().clone().invert();
         const currentLocalPosition = Vector3.TransformCoordinates(currentWorldPosition, nearestOrbitalObjectInverseWorld);
         const distanceToNearestOrbitalObject = currentLocalPosition.length();
-        if(distanceToNearestOrbitalObject < nearestOrbitalObject.getBoundingRadius() + 200e3) {
+        if (distanceToNearestOrbitalObject < nearestOrbitalObject.getBoundingRadius() + 200e3) {
             currentLocalPosition.scaleInPlace((nearestOrbitalObject.getBoundingRadius() + 200e3) / distanceToNearestOrbitalObject);
         }
 

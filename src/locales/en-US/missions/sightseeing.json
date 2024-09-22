@@ -1,5 +1,5 @@
 {
-  "describeFlyBy": "Fly by the {{objectType}} in {{systemName}}",
-  "describeTerminatorLanding": "Land near the terminator of {{objectName}} in {{systemName}}",
-  "describeAsteroidFieldTrek": "Trek in the asteroid field of {{objectName}} in {{systemName}}"
+    "describeFlyBy": "Fly by the {{objectType}} in {{systemName}}",
+    "describeTerminatorLanding": "Land near the terminator of {{objectName}} in {{systemName}}",
+    "describeAsteroidFieldTrek": "Trek in the asteroid field of {{objectName}} in {{systemName}}"
 }

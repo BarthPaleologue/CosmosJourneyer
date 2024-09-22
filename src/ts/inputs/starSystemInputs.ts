@@ -48,9 +48,11 @@ const cycleViewsAction = new Action({
 
 const cycleViewsInteraction = new PressInteraction(cycleViewsAction);
 
-const printDebugInfoInteraction = new PressInteraction(new Action({
-    bindings: [keyboard.getControl("Numpad0")]
-}));
+const printDebugInfoInteraction = new PressInteraction(
+    new Action({
+        bindings: [keyboard.getControl("Numpad0")]
+    })
+);
 
 export const StarSystemInputs = new InputMap<{
     setTarget: PressInteraction;

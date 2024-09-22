@@ -10,14 +10,14 @@ export class AcceptMissionButton {
         this.rootNode.className = "missionButton";
         this.rootNode.innerText = "Accept";
 
-        if(player.currentMissions.find((m) => m.equals(mission))) {
+        if (player.currentMissions.find((m) => m.equals(mission))) {
             this.rootNode.classList.add("accepted");
             this.rootNode.innerText = "Accepted";
         }
 
         this.rootNode.addEventListener("click", () => {
             Sounds.MENU_SELECT_SOUND.play();
-            if(player.currentMissions.find((m) => m.equals(mission))) {
+            if (player.currentMissions.find((m) => m.equals(mission))) {
                 this.rootNode.classList.remove("accepted");
                 this.rootNode.innerText = "Accept";
                 player.currentMissions = player.currentMissions.filter((m) => !m.equals(mission));

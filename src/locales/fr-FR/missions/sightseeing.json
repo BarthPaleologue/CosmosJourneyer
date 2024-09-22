@@ -1,5 +1,5 @@
 {
-  "describeFlyBy": "Survoler {{objectType}} dans {{systemName}}",
-  "describeTerminatorLanding": "Attérir près du terminateur de {{objectName}} dans {{systemName}}",
-  "describeAsteroidFieldTrek": "Excursion au sein du champ d'astéroïdes de {{objectName}} dans {{systemName}}"
+    "describeFlyBy": "Survoler {{objectType}} dans {{systemName}}",
+    "describeTerminatorLanding": "Attérir près du terminateur de {{objectName}} dans {{systemName}}",
+    "describeAsteroidFieldTrek": "Excursion au sein du champ d'astéroïdes de {{objectName}} dans {{systemName}}"
 }

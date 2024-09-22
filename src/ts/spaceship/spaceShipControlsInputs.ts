@@ -83,13 +83,17 @@ const throttleToZero = new Action({
 
 const throttleToZeroInteraction = new PressInteraction(throttleToZero);
 
-const previousMissionInteraction = new PressInteraction(new Action({
-    bindings: [keyboard.getControl("Numpad1")]
-}));
+const previousMissionInteraction = new PressInteraction(
+    new Action({
+        bindings: [keyboard.getControl("Numpad1")]
+    })
+);
 
-const nextMissionInteraction = new PressInteraction(new Action({
-    bindings: [keyboard.getControl("Numpad2")]
-}));
+const nextMissionInteraction = new PressInteraction(
+    new Action({
+        bindings: [keyboard.getControl("Numpad2")]
+    })
+);
 
 export const SpaceShipControlsInputs = new InputMap<{
     landing: PressInteraction;

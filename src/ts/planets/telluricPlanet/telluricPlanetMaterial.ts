@@ -68,7 +68,6 @@ const TelluricPlanetMaterialSamplerNames = {
  * It is responsible for the shading of the surface of the planet (biome blending, normal mapping and color)
  */
 export class TelluricPlanetMaterial extends ShaderMaterial {
-
     /**
      * The model of the planet associated with this material
      */

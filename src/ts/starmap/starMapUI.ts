@@ -204,7 +204,6 @@ export class StarMapUI {
     }
 
     update(playerPosition: Vector3, centerOfUniversePosition: Vector3) {
-
         const width = this.scene.getEngine().getRenderWidth();
         const height = this.scene.getEngine().getRenderHeight();
 
@@ -215,7 +214,7 @@ export class StarMapUI {
 
         this.rebuildSystemIcons();
 
-        this.systemIcons.forEach(systemIcons => {
+        this.systemIcons.forEach((systemIcons) => {
             const systemPosition = getStarGalacticCoordinates(systemIcons.systemSeed);
             const systemUniversePosition = systemPosition.add(centerOfUniversePosition);
             const screenCoordinates = Vector3.Project(systemUniversePosition, Matrix.IdentityReadOnly, camera.getTransformationMatrix(), camera.viewport);
@@ -392,7 +391,7 @@ export class StarMapUI {
 
         const systemIconsToKeep: SystemIcons[] = [];
 
-        this.systemIcons.forEach(systemIcons => {
+        this.systemIcons.forEach((systemIcons) => {
             const system = systemIcons.systemSeed;
             if (!systemsWithIcons.includes(system)) {
                 systemIcons.dispose();
