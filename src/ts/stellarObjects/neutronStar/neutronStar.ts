@@ -104,7 +104,7 @@ export class NeutronStar implements StellarObject, Cullable {
         this.light.falloffType = Light.FALLOFF_STANDARD;
         this.light.parent = this.getTransform();
 
-        this.material = new StarMaterial(this.getTransform(), this.model, scene);
+        this.material = new StarMaterial(this.model, scene);
         this.mesh.material = this.material;
 
         setRotationQuaternion(this.getTransform(), Quaternion.Identity());
