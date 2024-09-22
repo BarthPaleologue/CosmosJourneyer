@@ -100,7 +100,6 @@ export class AsteroidPatch {
             const instance = Objects.ASTEROIDS[this.typeIndices[this.nbInstances]].createInstance(`${this.parent.name}_AsteroidInstance${this.nbInstances}`);
             instance.position.copyFrom(this.positions[this.nbInstances]);
             instance.rotationQuaternion = this.rotations[this.nbInstances];
-            instance.alwaysSelectAsActiveMesh = true;
             instance.isPickable = false;
             instance.parent = this.parent;
 
