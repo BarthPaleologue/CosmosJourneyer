@@ -133,7 +133,7 @@ export class TelluricPlanet implements Planet, Cullable {
             this.cloudsUniforms = null;
         }
 
-        this.material = new TelluricPlanetMaterial(this.name, this.getTransform(), this.model, scene);
+        this.material = new TelluricPlanetMaterial(this.name, this.model, scene);
 
         this.sides = [
             new ChunkTree(Direction.UP, this.name, this.model, this.aggregate, this.material, scene),
@@ -187,7 +187,7 @@ export class TelluricPlanet implements Planet, Cullable {
     }
 
     public updateMaterial(stellarObjects: Transformable[], deltaSeconds: number): void {
-        this.material.update(stellarObjects);
+        this.material.update(this.getTransform().getWorldMatrix(), stellarObjects);
     }
 
     public getRadius(): number {
@@ -203,7 +203,7 @@ export class TelluricPlanet implements Planet, Cullable {
     }
 
     public dispose(): void {
-        this.sides.forEach(side => side.dispose());
+        this.sides.forEach((side) => side.dispose());
         this.sides.length = 0;
 
         this.cloudsUniforms?.dispose();

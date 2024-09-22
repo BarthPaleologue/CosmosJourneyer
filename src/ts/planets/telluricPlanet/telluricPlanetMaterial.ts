@@ -24,7 +24,6 @@ import { centeredRand } from "extended-random";
 import { TelluricPlanetModel } from "./telluricPlanetModel";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
-import { TransformNode } from "@babylonjs/core/Meshes";
 import lutFragment from "../../../shaders/telluricPlanetMaterial/utils/lut.glsl";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import { Transformable } from "../../architecture/transformable";
@@ -32,6 +31,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { setStellarObjectUniforms, StellarObjectUniformNames } from "../../postProcesses/uniforms/stellarObjectUniforms";
 import { Textures } from "../../assets/textures";
+import { Matrix } from "@babylonjs/core/Maths/math";
 
 const TelluricPlanetMaterialUniformNames = {
     WORLD: "world",
@@ -68,17 +68,11 @@ const TelluricPlanetMaterialSamplerNames = {
  * It is responsible for the shading of the surface of the planet (biome blending, normal mapping and color)
  */
 export class TelluricPlanetMaterial extends ShaderMaterial {
-    /**
-     * The transform node of the planet associated with this material
-     */
-    private readonly planetTransform: TransformNode;
 
     /**
      * The model of the planet associated with this material
      */
     private readonly planetModel: TelluricPlanetModel;
-
-    private stellarObjects: Transformable[] = [];
 
     private readonly plainNormalMetallicMap: Texture;
     private readonly plainAlbedoRoughnessMap: Texture;
@@ -99,11 +93,10 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
     /**
      * Creates a new telluric planet material
      * @param planetName The name of the planet
-     * @param planet The transform node of the planet
      * @param model The model of the planet associated with this material
      * @param scene
      */
-    constructor(planetName: string, planet: TransformNode, model: TelluricPlanetModel, scene: Scene) {
+    constructor(planetName: string, model: TelluricPlanetModel, scene: Scene) {
         const shaderName = "surfaceMaterial";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
@@ -119,7 +112,6 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
         });
 
         this.planetModel = model;
-        this.planetTransform = planet;
 
         this.beachSize = 100 + 50 * centeredRand(model.rng, 85);
         this.colorMode = ColorMode.DEFAULT;
@@ -150,8 +142,6 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
                 this.plainAlbedoRoughnessMap = Textures.ROCK_ALBEDO_ROUGHNESS_MAP;
             }
         }
-
-        this.setVector3("planetPosition", this.planetTransform.getAbsolutePosition());
 
         if (Effect.ShadersStore["telluricPlanetLutFragmentShader"] === undefined) {
             Effect.ShadersStore["telluricPlanetLutFragmentShader"] = lutFragment;
@@ -217,13 +207,11 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
         );
     }
 
-    public update(stellarObjects: Transformable[]) {
-        this.stellarObjects = stellarObjects;
-
+    public update(planetWorldMatrix: Matrix, stellarObjects: Transformable[]) {
         // The add once is important because the material will be bound for every chunk of the planet
         this.onBindObservable.addOnce(() => {
-            this.getEffect().setMatrix(TelluricPlanetMaterialUniformNames.PLANET_WORLD_MATRIX, this.planetTransform.getWorldMatrix());
-            setStellarObjectUniforms(this.getEffect(), this.stellarObjects);
+            this.getEffect().setMatrix(TelluricPlanetMaterialUniformNames.PLANET_WORLD_MATRIX, planetWorldMatrix);
+            setStellarObjectUniforms(this.getEffect(), stellarObjects);
         });
     }
 
@@ -252,10 +240,5 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
 
     public getSteepSharpness(): number {
         return this.steepSharpness;
-    }
-
-    public dispose(forceDisposeEffect?: boolean, forceDisposeTextures?: boolean, notBoundToMesh?: boolean) {
-        super.dispose(forceDisposeEffect, forceDisposeTextures, notBoundToMesh);
-        this.stellarObjects.length = 0;
     }
 }
