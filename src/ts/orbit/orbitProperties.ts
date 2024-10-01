@@ -31,7 +31,7 @@ export class OrbitProperties {
     readonly p: number;
 
     /**
-     * The duration it takes for the body to make one orbit
+     * The duration it takes for the body to make one orbit in seconds
      */
     period: number;
 

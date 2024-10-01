@@ -27,7 +27,8 @@ export function generateInfoHTML(model: SpaceStationModel): string {
     return `
         <h2>General information</h2>
         
-        <p>${model.name} is orbiting ${model.parentBody?.name} at a distance of ${(model.orbit.radius * 0.001).toLocaleString(undefined, { maximumSignificantDigits: 3 })}km</p>
+        <p>${model.name} is orbiting ${model.parentBody?.name} at a distance of ${(model.orbit.radius * 0.001).toLocaleString(undefined, { maximumSignificantDigits: 3 })}km. 
+        One orbit around ${model.parentBody?.name} takes ${(model.orbit.period / (24 * 60 * 60)).toLocaleString(undefined, { maximumSignificantDigits: 3 })} days</p>
 
         <p>${model.name} is affiliated to ${factionToString(model.faction)}</p>
 
@@ -40,12 +41,12 @@ export function generateInfoHTML(model: SpaceStationModel): string {
         <p>The total energy consumption is then ${model.totalEnergyConsumptionKWh.toLocaleString()}KWh</p>
         
         <p>Most of the energy produced comes from solar panels, with an efficiency of ${model.solarPanelEfficiency}. The installed ${model.solarPanelSurfaceM2.toLocaleString(
-            undefined,
-            {
-                maximumFractionDigits: 0,
-                maximumSignificantDigits: 3
-            }
-        )}m² of solar panels cover the needs of the population.</p>
+        undefined,
+        {
+            maximumFractionDigits: 0,
+            maximumSignificantDigits: 3
+        }
+    )}m² of solar panels cover the needs of the population.</p>
 
         <h2>Agriculture mix</h2>
         
@@ -55,9 +56,9 @@ export function generateInfoHTML(model: SpaceStationModel): string {
         </p>
 
         ${makeD3PieChart<[number, CropType]>(
-            agricultureMix,
-            ([proportion, _]) => proportion,
-            ([_, cropType]) => cropTypeToString(cropType)
-        )}
+        agricultureMix,
+        ([proportion, _]) => proportion,
+        ([_, cropType]) => cropTypeToString(cropType)
+    )}
     `;
 }

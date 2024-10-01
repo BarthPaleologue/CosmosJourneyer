@@ -75,7 +75,7 @@ export function getPeriapsis(radius: number, p: number) {
 }
 
 /**
- *
+ * Returns the orbital period of a body in seconds
  * @see https://fr.wikipedia.org/wiki/Lois_de_Kepler
  * @param orbitRadius
  * @param parentMass
