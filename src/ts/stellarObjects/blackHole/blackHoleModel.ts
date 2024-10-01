@@ -16,10 +16,9 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { seededSquirrelNoise } from "squirrel-noise";
-import { getOrbitalPeriod } from "../../orbit/orbit";
+import { getOrbitalPeriod, Orbit } from "../../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { normalRandom } from "extended-random";
-import { OrbitProperties } from "../../orbit/orbitProperties";
 import { BlackHolePhysicalProperties } from "../../architecture/physicalProperties";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { StellarObjectModel } from "../../architecture/stellarObject";
@@ -44,7 +43,7 @@ export class BlackHoleModel implements StellarObjectModel {
      */
     readonly radius: number;
 
-    readonly orbit: OrbitProperties;
+    readonly orbit: Orbit;
 
     readonly physicalProperties: BlackHolePhysicalProperties;
 
@@ -81,7 +80,6 @@ export class BlackHoleModel implements StellarObjectModel {
             p: 2,
             period: getOrbitalPeriod(orbitRadius, this.parentBody?.physicalProperties.mass ?? 0),
             normalToPlane: Vector3.Up(),
-            isPlaneAlignedWithParent: true
         };
 
         this.physicalProperties = {

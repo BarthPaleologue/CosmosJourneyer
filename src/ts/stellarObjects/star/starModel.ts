@@ -20,8 +20,7 @@ import { randRange, randRangeInt, uniformRandBool } from "extended-random";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getRgbFromTemperature } from "../../utils/specrend";
 import { Settings } from "../../settings";
-import { getOrbitalPeriod } from "../../orbit/orbit";
-import { OrbitProperties } from "../../orbit/orbitProperties";
+import { getOrbitalPeriod, Orbit } from "../../orbit/orbit";
 import { getStellarTypeString, StellarType } from "../common";
 import { StarPhysicalProperties } from "../../architecture/physicalProperties";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
@@ -47,7 +46,7 @@ export class StarModel implements StellarObjectModel {
     stellarType: StellarType;
     readonly radius: number;
 
-    readonly orbit: OrbitProperties;
+    readonly orbit: Orbit;
 
     readonly physicalProperties: StarPhysicalProperties;
 
@@ -96,7 +95,6 @@ export class StarModel implements StellarObjectModel {
             p: 2,
             period: getOrbitalPeriod(orbitRadius, this.parentBody?.physicalProperties.mass ?? 0),
             normalToPlane: Vector3.Up(),
-            isPlaneAlignedWithParent: true
         };
 
         if (uniformRandBool(StarModel.RING_PROPORTION, this.rng, GenerationSteps.RINGS)) {

@@ -26,7 +26,6 @@ import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Planet } from "../../architecture/planet";
-import { OrbitProperties } from "../../orbit/orbitProperties";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { CelestialBody } from "../../architecture/celestialBody";
 import { OrbitalObject } from "../../architecture/orbitalObject";
@@ -39,6 +38,7 @@ import { Transformable } from "../../architecture/transformable";
 import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
+import { Orbit } from "../../orbit/orbit";
 
 export class GasPlanet implements Planet, Cullable {
     private readonly mesh: Mesh;
@@ -156,7 +156,7 @@ export class GasPlanet implements Planet, Cullable {
         this.ringsUniforms?.dispose();
     }
 
-    getOrbitProperties(): OrbitProperties {
+    getOrbitProperties(): Orbit {
         return this.model.orbit;
     }
 

@@ -20,9 +20,8 @@ import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../../settings";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
-import { OrbitProperties } from "../../orbit/orbitProperties";
 import { clamp } from "../../utils/math";
-import { getOrbitalPeriod, getPeriapsis } from "../../orbit/orbit";
+import { getOrbitalPeriod, getPeriapsis, Orbit } from "../../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PlanetModel } from "../../architecture/planet";
 import { PlanetPhysicalProperties } from "../../architecture/physicalProperties";
@@ -42,7 +41,7 @@ export class GasPlanetModel implements PlanetModel {
 
     readonly radius: number;
 
-    readonly orbit: OrbitProperties;
+    readonly orbit: Orbit;
 
     readonly physicalProperties: PlanetPhysicalProperties;
 
@@ -85,7 +84,6 @@ export class GasPlanetModel implements PlanetModel {
             p: 2, //orbitalP,
             period: getOrbitalPeriod(orbitRadius, this.parentBody?.physicalProperties.mass ?? 0),
             normalToPlane: orbitalPlaneNormal,
-            isPlaneAlignedWithParent: true
         };
 
         this.physicalProperties = {

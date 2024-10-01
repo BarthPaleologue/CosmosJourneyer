@@ -16,8 +16,14 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { OrbitProperties } from "./orbitProperties";
 import { Settings } from "../settings";
+
+export type Orbit = {
+    radius: number;
+    p: number;
+    period: number;
+    normalToPlane: Vector3;
+};
 
 /**
  *
@@ -26,7 +32,7 @@ import { Settings } from "../settings";
  * @returns
  * @see https://medium.com/@barth_29567/crazy-orbits-lets-make-squares-c91a427c6b26
  */
-export function getPointOnOrbitLocal(settings: OrbitProperties, t: number): Vector3 {
+export function getPointOnOrbitLocal(settings: Orbit, t: number): Vector3 {
     const theta = -(2 * Math.PI * t) / settings.period;
     const cosTheta = Math.cos(theta);
     const sinTheta = Math.sin(theta);
@@ -43,7 +49,7 @@ export function getPointOnOrbitLocal(settings: OrbitProperties, t: number): Vect
  * @param t
  * @returns
  */
-export function getPointOnOrbit(centerOfMass: Vector3, settings: OrbitProperties, t: number): Vector3 {
+export function getPointOnOrbit(centerOfMass: Vector3, settings: Orbit, t: number): Vector3 {
     const localPosition = getPointOnOrbitLocal(settings, t);
 
     // rotate orbital plane

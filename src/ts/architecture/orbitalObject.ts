@@ -17,11 +17,11 @@
 
 import { Transformable } from "./transformable";
 import { BoundingSphere } from "./boundingSphere";
-import { OrbitProperties } from "../orbit/orbitProperties";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math";
 import { getRotationQuaternion, setRotationQuaternion, translate } from "../uberCore/transforms/basicTransform";
 import { OrbitalObjectPhysicalProperties } from "./physicalProperties";
 import { TypedObject } from "./typedObject";
+import { Orbit } from "../orbit/orbit";
 
 /**
  * Describes all objects that can have an orbital trajectory and rotate on themselves
@@ -40,7 +40,7 @@ export interface OrbitalObject extends Transformable, BoundingSphere, TypedObjec
     /**
      * Returns the orbital properties of the object
      */
-    getOrbitProperties(): OrbitProperties;
+    getOrbitProperties(): Orbit;
 
     /**
      * Returns the physical properties of the object
@@ -150,7 +150,7 @@ export interface OrbitalObjectModel {
     /**
      * Orbit properties of the object
      */
-    readonly orbit: OrbitProperties;
+    readonly orbit: Orbit;
 
     /**
      * Physical properties of the object

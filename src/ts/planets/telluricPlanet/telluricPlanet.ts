@@ -32,7 +32,6 @@ import { ChunkForge } from "./terrain/chunks/chunkForge";
 import { Planet } from "../../architecture/planet";
 import { Cullable } from "../../utils/cullable";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { OrbitProperties } from "../../orbit/orbitProperties";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { CelestialBody } from "../../architecture/celestialBody";
@@ -43,6 +42,7 @@ import { CloudsUniforms } from "../../clouds/cloudsUniforms";
 import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
+import { Orbit } from "../../orbit/orbit";
 
 export class TelluricPlanet implements Planet, Cullable {
     readonly name: string;
@@ -153,7 +153,7 @@ export class TelluricPlanet implements Planet, Cullable {
         return this.getTransform().up;
     }
 
-    getOrbitProperties(): OrbitProperties {
+    getOrbitProperties(): Orbit {
         return this.model.orbit;
     }
 

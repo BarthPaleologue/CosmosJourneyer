@@ -23,8 +23,7 @@ import { clamp } from "terrain-generation";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { getOrbitalPeriod, getPeriapsis } from "../../orbit/orbit";
-import { OrbitProperties } from "../../orbit/orbitProperties";
+import { getOrbitalPeriod, getPeriapsis, Orbit } from "../../orbit/orbit";
 import { PlanetModel } from "../../architecture/planet";
 import { TelluricPlanetPhysicalProperties } from "../../architecture/physicalProperties";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
@@ -47,7 +46,7 @@ export class TelluricPlanetModel implements PlanetModel {
 
     readonly radius: number;
 
-    readonly orbit: OrbitProperties;
+    readonly orbit: Orbit;
 
     readonly physicalProperties: TelluricPlanetPhysicalProperties;
 
@@ -130,8 +129,7 @@ export class TelluricPlanetModel implements PlanetModel {
             radius: orbitRadius,
             p: orbitalP,
             period: getOrbitalPeriod(orbitRadius, this.parentBody?.physicalProperties.mass ?? 0),
-            normalToPlane: orbitalPlaneNormal,
-            isPlaneAlignedWithParent: isOrbitalPlaneAlignedWithParent
+            normalToPlane: orbitalPlaneNormal
         };
 
         if (this.isSatelliteOfTelluric || this.isSatelliteOfGas) {

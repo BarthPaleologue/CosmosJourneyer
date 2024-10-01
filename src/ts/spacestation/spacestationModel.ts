@@ -16,8 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { seededSquirrelNoise } from "squirrel-noise";
-import { OrbitProperties } from "../orbit/orbitProperties";
-import { getOrbitalPeriod } from "../orbit/orbit";
+import { getOrbitalPeriod, Orbit } from "../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { OrbitalObjectModel } from "../architecture/orbitalObject";
 import { OrbitalObjectPhysicalProperties } from "../architecture/physicalProperties";
@@ -48,7 +47,7 @@ export class SpaceStationModel implements OrbitalObjectModel {
 
     readonly starSystem: StarSystemModel;
 
-    readonly orbit: OrbitProperties;
+    readonly orbit: Orbit;
     readonly physicalProperties: OrbitalObjectPhysicalProperties;
     readonly parentBody: OrbitalObjectModel | null;
     readonly childrenBodies: OrbitalObjectModel[] = [];
@@ -105,8 +104,7 @@ export class SpaceStationModel implements OrbitalObjectModel {
             radius: orbitRadius,
             p: 2,
             period: getOrbitalPeriod(orbitRadius, this.parentBody?.physicalProperties.mass ?? 0),
-            normalToPlane: Vector3.Up(),
-            isPlaneAlignedWithParent: false
+            normalToPlane: Vector3.Up()
         };
 
         this.physicalProperties = {

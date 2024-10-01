@@ -23,7 +23,6 @@ import { PostProcessType } from "../postProcesses/postProcessTypes";
 import { OrbitalObject } from "../architecture/orbitalObject";
 import { Cullable } from "../utils/cullable";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { OrbitProperties } from "../orbit/orbitProperties";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { OrbitalObjectPhysicalProperties } from "../architecture/physicalProperties";
 import { CelestialBody } from "../architecture/celestialBody";
@@ -42,6 +41,7 @@ import { LandingRequest, ManagesLandingPads } from "../utils/managesLandingPads"
 import { Settings } from "../settings";
 import { EngineBay } from "../assets/procedural/spaceStation/engineBay";
 import { StarSystemModel } from "../starSystem/starSystemModel";
+import { Orbit } from "../orbit/orbit";
 
 export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads {
     readonly name: string;
@@ -118,7 +118,7 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
         return this.getTransform().up;
     }
 
-    getOrbitProperties(): OrbitProperties {
+    getOrbitProperties(): Orbit {
         return this.model.orbit;
     }
 

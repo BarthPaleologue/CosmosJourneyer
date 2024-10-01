@@ -17,11 +17,10 @@
 
 import { seededSquirrelNoise } from "squirrel-noise";
 
-import { OrbitProperties } from "../../orbit/orbitProperties";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { normalRandom, randRange } from "extended-random";
 import { clamp } from "../../utils/math";
-import { getOrbitalPeriod, getPeriapsis } from "../../orbit/orbit";
+import { getOrbitalPeriod, getPeriapsis, Orbit } from "../../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PlanetModel } from "../../architecture/planet";
 import { PlanetPhysicalProperties } from "../../architecture/physicalProperties";
@@ -42,7 +41,7 @@ export class MandelbulbModel implements PlanetModel {
 
     readonly radius: number;
 
-    readonly orbit: OrbitProperties;
+    readonly orbit: Orbit;
 
     readonly physicalProperties: PlanetPhysicalProperties;
 
@@ -86,7 +85,6 @@ export class MandelbulbModel implements PlanetModel {
             p: orbitalP,
             period: getOrbitalPeriod(orbitRadius, this.parentBody?.physicalProperties.mass ?? 0),
             normalToPlane: Vector3.Up(),
-            isPlaneAlignedWithParent: true
         };
 
         this.physicalProperties = {

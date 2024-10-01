@@ -34,12 +34,12 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { StellarObject } from "../../architecture/stellarObject";
 import { Cullable } from "../../utils/cullable";
-import { OrbitProperties } from "../../orbit/orbitProperties";
 import { RingsUniforms } from "../../rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
+import { Orbit } from "../../orbit/orbit";
 
 export class Star implements StellarObject, Cullable {
     readonly name: string;
@@ -132,7 +132,7 @@ export class Star implements StellarObject, Cullable {
         return this.light;
     }
 
-    getOrbitProperties(): OrbitProperties {
+    getOrbitProperties(): Orbit {
         return this.model.orbit;
     }
 

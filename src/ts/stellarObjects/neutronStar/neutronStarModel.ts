@@ -17,12 +17,11 @@
 
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { OrbitProperties } from "../../orbit/orbitProperties";
 import { StarPhysicalProperties } from "../../architecture/physicalProperties";
 import { StellarObjectModel } from "../../architecture/stellarObject";
 import { seededSquirrelNoise } from "squirrel-noise";
 import { getRgbFromTemperature } from "../../utils/specrend";
-import { getOrbitalPeriod } from "../../orbit/orbit";
+import { getOrbitalPeriod, Orbit } from "../../orbit/orbit";
 import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { clamp } from "../../utils/math";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
@@ -44,7 +43,7 @@ export class NeutronStarModel implements StellarObjectModel {
     readonly color: Color3;
     readonly radius: number;
 
-    readonly orbit: OrbitProperties;
+    readonly orbit: Orbit;
 
     readonly physicalProperties: StarPhysicalProperties;
 
@@ -91,7 +90,6 @@ export class NeutronStarModel implements StellarObjectModel {
             p: 2,
             period: getOrbitalPeriod(orbitRadius, this.parentBody?.physicalProperties.mass ?? 0),
             normalToPlane: Vector3.Up(),
-            isPlaneAlignedWithParent: true
         };
 
         if (uniformRandBool(NeutronStarModel.RING_PROPORTION, this.rng, GenerationSteps.RINGS)) {

@@ -22,7 +22,6 @@ import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { CelestialBody } from "../../architecture/celestialBody";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
-import { OrbitProperties } from "../../orbit/orbitProperties";
 import { RingsUniforms } from "../../rings/ringsUniform";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Cullable } from "../../utils/cullable";
@@ -32,6 +31,7 @@ import { Anomaly } from "../anomaly";
 import { AnomalyType } from "../anomalyType";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
+import { Orbit } from "../../orbit/orbit";
 
 export class Mandelbulb implements Anomaly, Cullable {
     readonly name: string;
@@ -75,7 +75,7 @@ export class Mandelbulb implements Anomaly, Cullable {
         return this.getTransform().up;
     }
 
-    getOrbitProperties(): OrbitProperties {
+    getOrbitProperties(): Orbit {
         return this.model.orbit;
     }
 

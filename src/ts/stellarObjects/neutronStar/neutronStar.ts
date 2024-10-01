@@ -34,7 +34,6 @@ import { Light } from "@babylonjs/core/Lights/light";
 import { setRotationQuaternion } from "../../uberCore/transforms/basicTransform";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { OrbitProperties } from "../../orbit/orbitProperties";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import { RingsUniforms } from "../../rings/ringsUniform";
 import { Camera } from "@babylonjs/core/Cameras/camera";
@@ -42,6 +41,7 @@ import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
 import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
+import { Orbit } from "../../orbit/orbit";
 
 export class NeutronStar implements StellarObject, Cullable {
     readonly model: NeutronStarModel;
@@ -140,7 +140,7 @@ export class NeutronStar implements StellarObject, Cullable {
         return this.light;
     }
 
-    getOrbitProperties(): OrbitProperties {
+    getOrbitProperties(): Orbit {
         return this.model.orbit;
     }
 
