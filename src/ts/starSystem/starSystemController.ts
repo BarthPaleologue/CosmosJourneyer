@@ -95,6 +95,8 @@ export class StarSystemController {
      */
     readonly model: StarSystemModel;
 
+    private elapsedSeconds = 0;
+
     constructor(model: StarSystemModel | SystemSeed, scene: UberScene) {
         this.scene = scene;
 
@@ -336,6 +338,8 @@ export class StarSystemController {
      * @param postProcessManager
      */
     public update(deltaSeconds: number, chunkForge: ChunkForge, postProcessManager: PostProcessManager): void {
+        this.elapsedSeconds += deltaSeconds;
+
         const controller = this.scene.getActiveControls();
 
         // The nearest body might have to be treated separately
@@ -404,7 +408,7 @@ export class StarSystemController {
         // compute what would be its next position if it were to move normally.
         // This gives us a translation vector that we can negate and apply to all other bodies.
         const initialPosition = nearestOrbitalObject.getTransform().getAbsolutePosition().clone();
-        const newPosition = OrbitalObjectUtils.GetNextOrbitalPosition(nearestOrbitalObject, deltaSeconds);
+        const newPosition = OrbitalObjectUtils.GetOrbitalPosition(nearestOrbitalObject, this.elapsedSeconds);
 
         const nearestBodyDisplacement = newPosition.subtract(initialPosition);
         if (shouldCompensateTranslation) {
@@ -428,7 +432,7 @@ export class StarSystemController {
         for (const object of this.orbitalObjects) {
             if (object === nearestOrbitalObject) continue;
 
-            OrbitalObjectUtils.UpdateOrbitalPosition(object, deltaSeconds);
+            OrbitalObjectUtils.SetOrbitalPosition(object, this.elapsedSeconds);
             OrbitalObjectUtils.UpdateRotation(object, deltaSeconds);
         }
 

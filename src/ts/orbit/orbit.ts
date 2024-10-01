@@ -53,7 +53,7 @@ export function getPointOnOrbit(centerOfMass: Vector3, settings: Orbit, t: numbe
     const localPosition = getPointOnOrbitLocal(settings, t);
 
     // rotate orbital plane
-    const rotationAxis = Vector3.Cross(Vector3.Up(), settings.normalToPlane).normalize();
+    const rotationAxis = Vector3.Up().equalsWithEpsilon(settings.normalToPlane) ? Vector3.Up() : Vector3.Cross(Vector3.Up(), settings.normalToPlane).normalize();
     const angle = Vector3.GetAngleBetweenVectors(Vector3.Up(), settings.normalToPlane, rotationAxis);
     const rotationMatrix = Matrix.RotationAxis(rotationAxis, angle);
 
