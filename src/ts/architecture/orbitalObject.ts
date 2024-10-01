@@ -57,10 +57,10 @@ export class OrbitalObjectUtils {
     /**
      * Returns the next position of the object on its orbit. This does not update the position of the object (see UpdateOrbitalPosition)
      * @param object The object we want to compute the next position of
-     * @param deltaTime The time elapsed since the last update
+     * @param deltaSeconds The time elapsed since the last update
      * @constructor
      */
-    static GetNextOrbitalPosition(object: OrbitalObject, deltaTime: number): Vector3 {
+    static GetNextOrbitalPosition(object: OrbitalObject, deltaSeconds: number): Vector3 {
         const orbit = object.getOrbitProperties();
         if (orbit.period === 0 || object.parent === null) return object.getTransform().getAbsolutePosition();
 
@@ -71,7 +71,7 @@ export class OrbitalObjectUtils {
         const newPosition = oldPosition.clone();
 
         // rotate the object around the barycenter of the orbit, around the normal to the orbital plane
-        const dtheta = (2 * Math.PI * deltaTime) / orbit.period;
+        const dtheta = (2 * Math.PI * deltaSeconds) / orbit.period;
         const rotationQuaternion = Quaternion.RotationAxis(orbit.normalToPlane, dtheta);
         newPosition.applyRotationQuaternionInPlace(rotationQuaternion);
         newPosition.normalize().scaleInPlace(orbit.radius);
