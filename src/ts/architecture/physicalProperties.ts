@@ -17,6 +17,9 @@
 
 export type OrbitalObjectPhysicalProperties = {
     mass: number;
+    /**
+     * Time needed for the object to rotate on its axis in seconds
+     */
     rotationPeriod: number;
     axialTilt: number;
 };
