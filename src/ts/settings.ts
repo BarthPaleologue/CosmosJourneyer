@@ -26,6 +26,12 @@ export const Settings = {
 
     EARTH_RADIUS: 1000e3, // target is 6000e3
 
+    EARTH_MASS: 5.972e24,
+
+    MOON_MASS: 7.348e22,
+
+    JUPITER_MASS: 1.898e27,
+
     /**
      * The distance light travels in one year.
      */

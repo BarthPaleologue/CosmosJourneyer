@@ -89,8 +89,8 @@ export class GasPlanetModel implements PlanetModel {
         };
 
         this.physicalProperties = {
-            // Fixme: choose physically accurate values
-            mass: 10,
+            //FIXME: when Settings.Earth radius gets to 1:1 scale, change this value by a variable in settings
+            mass: Settings.JUPITER_MASS * (this.radius / 69_911e3) ** 3,
             axialTilt: normalRandom(0, 0.4, this.rng, GenerationSteps.AXIAL_TILT),
             rotationPeriod: (24 * 60 * 60) / 10,
             minTemperature: -180,

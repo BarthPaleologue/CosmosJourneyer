@@ -88,8 +88,15 @@ export class TelluricPlanetModel implements PlanetModel {
             this.radius = Math.max(0.3, normalRandom(1.0, 0.1, this.rng, GenerationSteps.RADIUS)) * Settings.EARTH_RADIUS;
         }
 
-        //TODO: make mass dependent on physical properties
-        const mass = this.isSatelliteOfTelluric ? 7.348e22 : 5.972e24;
+        //TODO: make mass dependent on more physical properties like density
+        let mass;
+        if(this.isSatelliteOfTelluric) {
+            //FIXME: when Settings.Earth radius gets to 1:1 scale, change this value by a variable in settings
+            mass = Settings.MOON_MASS * (this.radius / 1_735e3) ** 3;
+        } else {
+            //FIXME: when Settings.Earth radius gets to 1:1 scale, change this value by a variable in settings
+            mass = Settings.EARTH_MASS * (this.radius / 6_371e3) ** 3;
+        }
 
         this.physicalProperties = {
             mass: mass,
