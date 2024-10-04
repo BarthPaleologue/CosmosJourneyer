@@ -182,6 +182,16 @@ $gaps: 10px;
             
             box-shadow: 0 0 0px white inset;
 
+            &.disabled {
+                background: var(--disabled-color);
+
+                &:hover {
+                    cursor: not-allowed;
+                    background: var(--disabled-color);
+                    box-shadow: 0 0 0px white inset;
+                }
+            }
+
             img {
                 grid-row: span 2;
                 width: $icon-size;
