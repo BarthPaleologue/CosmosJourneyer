@@ -106,7 +106,7 @@ export class BlackHole implements StellarObject, Cullable {
     }
 
     public getBoundingRadius(): number {
-        return this.getRadius();
+        return Math.max(this.getRadius(), this.model.physicalProperties.accretionDiskRadius);
     }
 
     public dispose(): void {

@@ -72,8 +72,8 @@ vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
 
     vec3 samplePoint = initialPosition;
     float distanceToCenter = length(samplePoint);// distance to the center of the disk
-    float relativeDistance = distanceToCenter / object_radius;
-    float relativeDiskRadius = accretionDiskRadius / object_radius;
+    float relativeDistance = distanceToCenter / schwarzschildRadius;
+    float relativeDiskRadius = accretionDiskRadius / schwarzschildRadius;
 
     vec3 diskNormal = object_rotationAxis;
 
@@ -110,7 +110,7 @@ vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
 
         float intensity = 1.0 - (i / DISK_STEPS);
         distanceToCenter = length(samplePoint);
-        relativeDistance = distanceToCenter / object_radius;
+        relativeDistance = distanceToCenter / schwarzschildRadius;
 
         float diskMask = 1.0;
         diskMask *= smoothstep(1.5, 2.5, relativeDistance); // Fade the disk when too close to the event horizon. 1.5 is the IBCO (innermost bound circular orbit) for a Schwarzschild black hole. It is also called the photon sphere.
@@ -165,7 +165,7 @@ void main() {
     // actual depth of the scene
     float maximumDistance = length(pixelWorldPosition - camera_position) * remap(depth, 0.0, 1.0, camera_near, camera_far);
 
-    float maxBendDistance = max(accretionDiskRadius * 3.0, object_radius * 15.0);
+    float maxBendDistance = max(accretionDiskRadius * 3.0, schwarzschildRadius * 15.0);
 
     float t0, t1;
     if(!rayIntersectSphere(camera_position, rayDir, object_position, maxBendDistance, t0, t1)) {
@@ -211,7 +211,7 @@ void main() {
 
                 float stepSize = 0.92 * projectedDistance / rayDirProjectedDistance;//conservative distance to disk (y==0)
                 float farLimit = distanceToCenter * 0.5;//limit step size far from to BH
-                float closeLimit = distanceToCenter * 0.1 + 0.05 * distanceToCenter2 / object_radius;//limit step size close to BH
+                float closeLimit = distanceToCenter * 0.1 + 0.05 * distanceToCenter2 / schwarzschildRadius;//limit step size close to BH
                 stepSize = min(stepSize, min(farLimit, closeLimit));
 
                 // Frame dragging computation below: (see https://www.shadertoy.com/view/sdjcWm)
@@ -229,17 +229,17 @@ void main() {
 
                 if(hasAccretionDisk) {
                     // the distance in the unit of the schwarzschild radius
-                    float relativeDistance = distanceToCenter / object_radius;
+                    float relativeDistance = distanceToCenter / schwarzschildRadius;
                     // the glow mask fades the glow when to close to the horizon (the photon sphere has a radius of 1.5 * schwarzschild, so 1.0 is slightly below for artistic reasons: bloom leaks at the camera level)
                     float glowMask = smoothstep(1.0, 2.5, relativeDistance);
-                    col += 0.5 * vec4(1.0, 0.9, 0.6, 1.0) * (stepSize / object_radius) * glowMask / (relativeDistance * relativeDistance);
+                    col += 0.5 * vec4(1.0, 0.9, 0.6, 1.0) * (stepSize / schwarzschildRadius) * glowMask / (relativeDistance * relativeDistance);
                 }
             }
 
-            if (distanceToCenter < object_radius) {
+            if (distanceToCenter < schwarzschildRadius) {
                 suckedInBH = true;
                 break;
-            } else if (distanceToCenter > object_radius * 5000.0) {
+            } else if (distanceToCenter > schwarzschildRadius * 5000.0) {
                 escapedBH = true;
                 break;
             } else if (projectedDistance <= accretionDiskHeight) {

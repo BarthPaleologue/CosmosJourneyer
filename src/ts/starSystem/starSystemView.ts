@@ -540,8 +540,8 @@ export class StarSystemView implements View {
         if (firstBody === undefined) throw new Error("No bodies in star system");
 
         const activeController = this.scene.getActiveControls();
-        let controllerDistanceFactor = 5;
-        if (firstBody instanceof BlackHole) controllerDistanceFactor = 7;
+        let controllerDistanceFactor = 7;
+        if (firstBody instanceof BlackHole) controllerDistanceFactor = 5;
         else if (firstBody instanceof NeutronStar) controllerDistanceFactor = 100_000;
         positionNearObjectBrightSide(activeController, firstBody, starSystem, controllerDistanceFactor);
 
