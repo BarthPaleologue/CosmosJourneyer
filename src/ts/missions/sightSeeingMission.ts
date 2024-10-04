@@ -113,11 +113,11 @@ export class SightSeeingMission implements Mission {
     getTypeString(): string {
         switch (this.target.type) {
             case SightSeeingType.FLY_BY:
-                return "Fly-By";
+                return i18n.t("missions:sightseeing:flyBy");
             case SightSeeingType.TERMINATOR_LANDING:
-                return "Terminator Landing";
+                return i18n.t("missions:sightseeing:terminatorLanding");
             case SightSeeingType.ASTEROID_FIELD_TREK:
-                return "Asteroid Field Trek";
+                return i18n.t("missions:sightseeing:asteroidFieldTrek");
             default:
                 throw new Error(`Unknown sight seeing type: ${this.target.type}`);
         }
