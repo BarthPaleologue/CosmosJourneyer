@@ -654,6 +654,7 @@ export class StarSystemView implements View {
                 physicsEngine: this.scene.getPhysicsEngine() as PhysicsEngineV2
             });
             if (mission.isCompleted()) {
+                this.player.balance += mission.getReward();
                 Sounds.MISSION_COMPLETE.play();
             }
         });
