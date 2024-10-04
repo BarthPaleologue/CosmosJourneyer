@@ -8,6 +8,7 @@ import { getObjectBySystemId, getObjectModelByUniverseId } from "../../../../uti
 import { getStarGalacticCoordinates } from "../../../../utils/getStarGalacticCoordinates";
 import { parseDistance } from "../../../../utils/parseToStrings";
 import { Settings } from "../../../../settings";
+import i18n from "../../../../i18n";
 
 const enum FlyByState {
     NOT_IN_SYSTEM,
@@ -65,7 +66,7 @@ export class MissionSightSeeingFlyByNode implements MissionNode {
     describeNextTask(context: MissionContext): string {
         const targetSystemModel = new SeededStarSystemModel(this.targetSystemSeed);
         const currentSystemModel = context.currentSystem.model;
-        if(!(currentSystemModel instanceof SeededStarSystemModel)) {
+        if (!(currentSystemModel instanceof SeededStarSystemModel)) {
             throw new Error("Cannot handle non-seeded star system models yet");
         }
 
@@ -77,11 +78,16 @@ export class MissionSightSeeingFlyByNode implements MissionNode {
 
         switch (this.state) {
             case FlyByState.NOT_IN_SYSTEM:
-                return `Travel to ${targetSystemModel.name} (${parseDistance(distance * Settings.LIGHT_YEAR)})`;
+                return i18n.t("missions:flyBy:travelToTargetSystem", {
+                    systemName: targetSystemModel.name,
+                    distance: parseDistance(distance * Settings.LIGHT_YEAR)
+                });
             case FlyByState.TOO_FAR_IN_SYSTEM:
-                return `Get closer to ${targetObject.name}`;
+                return i18n.t("missions:flyBy:getCloserToTarget", {
+                    objectName: targetObject.name
+                });
             case FlyByState.CLOSE_ENOUGH:
-                return `Mission completed. Enjoy the view CMDR!`;
+                return i18n.t("missions:flyBy:missionCompleted");
         }
     }
 }
