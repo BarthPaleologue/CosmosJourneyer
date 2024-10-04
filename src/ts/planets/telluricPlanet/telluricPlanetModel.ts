@@ -97,13 +97,20 @@ export class TelluricPlanetModel implements PlanetModel {
             mass = Settings.EARTH_MASS * (this.radius / 6_371e3) ** 3;
         }
 
+        const pressure = Math.max(normalRandom(0.9, 0.2, this.rng, GenerationSteps.PRESSURE), 0);
+
+        //TODO: use distance to star to determine min temperature when using 1:1 scale
+        const minTemperature = Math.max(-273, normalRandom(-20, 30, this.rng, 80));
+        // when pressure is close to 1, the max temperature is close to the min temperature (the atmosphere does thermal regulation)
+        const maxTemperature = minTemperature + Math.exp(-pressure) * randRangeInt(30, 200, this.rng, 81);
+
         this.physicalProperties = {
             mass: mass,
             axialTilt: normalRandom(0, 0.2, this.rng, GenerationSteps.AXIAL_TILT),
             rotationPeriod: (60 * 60 * 24) / 10,
-            minTemperature: randRangeInt(-60, 5, this.rng, 80),
-            maxTemperature: randRangeInt(10, 50, this.rng, 81),
-            pressure: Math.max(normalRandom(0.9, 0.2, this.rng, GenerationSteps.PRESSURE), 0),
+            minTemperature: minTemperature,
+            maxTemperature: maxTemperature,
+            pressure: pressure,
             waterAmount: Math.max(normalRandom(1.0, 0.3, this.rng, GenerationSteps.WATER_AMOUNT), 0),
             oceanLevel: 0
         };
@@ -187,5 +194,9 @@ export class TelluricPlanetModel implements PlanetModel {
      */
     public isMoon(): boolean {
         return this.parentBody?.bodyType === BodyType.TELLURIC_PLANET || this.parentBody?.bodyType === BodyType.GAS_PLANET;
+    }
+
+    public hasLiquidWater(): boolean {
+        return this.physicalProperties.oceanLevel > 0;
     }
 }
