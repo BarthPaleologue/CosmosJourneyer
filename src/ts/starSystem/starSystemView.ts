@@ -647,11 +647,15 @@ export class StarSystemView implements View {
         this.orbitRenderer.update();
 
         this.player.currentMissions.forEach((mission) => {
+            if (mission.isCompleted()) return;
             mission.update({
                 currentSystem: this.getStarSystem(),
                 playerPosition: this.scene.getActiveControls().getTransform().getAbsolutePosition(),
                 physicsEngine: this.scene.getPhysicsEngine() as PhysicsEngineV2
             });
+            if (mission.isCompleted()) {
+                Sounds.MISSION_COMPLETE.play();
+            }
         });
 
         Materials.BUTTERFLY_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
@@ -678,7 +682,7 @@ export class StarSystemView implements View {
             currentSystem: starSystem,
             playerPosition: activeControls.getTransform().getAbsolutePosition(),
             physicsEngine: this.scene.getPhysicsEngine() as PhysicsEngineV2
-        }
+        };
 
         this.spaceShipLayer.update(nearestOrbitalObject, activeControls.getTransform(), missionContext);
 

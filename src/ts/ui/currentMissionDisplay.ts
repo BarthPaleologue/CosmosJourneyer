@@ -19,7 +19,6 @@ import { Player } from "../player/player";
 import { Mission } from "../missions/mission";
 import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
 import { MissionContext } from "../missions/missionContext";
-import { Sounds } from "../assets/sounds";
 
 export class CurrentMissionDisplay {
     readonly rootNode: HTMLElement;
@@ -66,11 +65,6 @@ export class CurrentMissionDisplay {
         const newDescriptionText = currentMission.describeNextTask(context);
         if(newDescriptionText === descriptionBlock.innerText) return;
         descriptionBlock.innerText = newDescriptionText;
-
-        if(currentMission.isCompleted()) {
-            Sounds.MISSION_COMPLETE.play();
-        }
-
     }
 
     public setNextMission() {
