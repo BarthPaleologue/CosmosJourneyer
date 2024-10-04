@@ -6,6 +6,9 @@ import { uniformRandBool } from "extended-random";
 import { BodyType } from "../architecture/bodyType";
 import { SystemObjectType } from "../saveFile/universeCoordinates";
 import { Player } from "../player/player";
+import { GasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
+import { getPlanetaryMassObjectModels } from "../utils/getModelsFromSystemModel";
+import { getUniverseObjectId } from "../utils/orbitalObjectId";
 
 export function generateSightseeingMissions(spaceStationModel: SpaceStationModel, player: Player, timestampMillis: number): SightSeeingMission[] {
     const hours = Math.floor(timestampMillis / 1000 / 60 / 60);
@@ -64,7 +67,25 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
         });
     });
 
-    const allMissions = blackHoleFlyByMissions.concat(neutronStarFlyByMissions, anomalyFlyByMissions);
+    // for asteroid field missions, find all asteroid fields in the current system
+    const asteroidFieldMissions: SightSeeingMission[] = [];
+    const currentSystemModel = starSystem;
+    getPlanetaryMassObjectModels(currentSystemModel).forEach((celestialBodyModel, index) => {
+        if (celestialBodyModel.rings === null) return;
+
+        asteroidFieldMissions.push(
+            new SightSeeingMission(spaceStationModel, {
+                type: SightSeeingType.ASTEROID_FIELD_TREK,
+                objectId: {
+                    starSystem: currentSystemModel.seed.serialize(),
+                    objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
+                    index
+                }
+            })
+        );
+    });
+
+    const allMissions = blackHoleFlyByMissions.concat(neutronStarFlyByMissions, anomalyFlyByMissions, asteroidFieldMissions);
 
     // filter missions to avoid duplicates with already accepted missions of the player
     return allMissions.filter((mission) => player.currentMissions.every((currentMission) => !mission.equals(currentMission)));

@@ -7,7 +7,6 @@ import { Anomaly } from "../anomalies/anomaly";
 import { SpaceStation } from "../spacestation/spaceStation";
 import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
 import { SystemSeed } from "./systemSeed";
-import { placeSpaceStations } from "../society/spaceStationPlacement";
 import { getAnomalyModels, getPlanetaryMassObjectModels, getSpaceStationModels, getStellarObjectModels } from "./getModelsFromSystemModel";
 
 /**
