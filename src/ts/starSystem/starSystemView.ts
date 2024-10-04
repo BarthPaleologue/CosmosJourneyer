@@ -77,6 +77,7 @@ import { getUniverseObjectId } from "../utils/orbitalObjectId";
 import { DefaultControlsInputs } from "../defaultControls/defaultControlsInputs";
 import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
+import { MissionContext } from "../missions/missionContext";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -666,14 +667,22 @@ export class StarSystemView implements View {
         if (this.spaceshipControls === null) throw new Error("Spaceship controls is null");
         if (this.characterControls === null) throw new Error("Character controls is null");
 
-        const nearestCelestialBody = starSystem.getNearestCelestialBody(this.scene.getActiveControls().getTransform().getAbsolutePosition());
-        const nearestOrbitalObject = starSystem.getNearestOrbitalObject(this.scene.getActiveControls().getTransform().getAbsolutePosition());
+        const activeControls = this.scene.getActiveControls();
+
+        const nearestCelestialBody = starSystem.getNearestCelestialBody(activeControls.getTransform().getAbsolutePosition());
+        const nearestOrbitalObject = starSystem.getNearestOrbitalObject(activeControls.getTransform().getAbsolutePosition());
 
         this.bodyEditor.update(nearestCelestialBody, this.postProcessManager, this.scene);
 
-        this.spaceShipLayer.update(nearestOrbitalObject, this.scene.getActiveControls().getTransform());
+        const missionContext: MissionContext = {
+            currentSystem: starSystem,
+            playerPosition: activeControls.getTransform().getAbsolutePosition(),
+            physicsEngine: this.scene.getPhysicsEngine() as PhysicsEngineV2
+        }
 
-        this.targetCursorLayer.update(this.scene.getActiveControls().getActiveCameras()[0]);
+        this.spaceShipLayer.update(nearestOrbitalObject, activeControls.getTransform(), missionContext);
+
+        this.targetCursorLayer.update(activeControls.getActiveCameras()[0]);
         const targetLandingPad = this.spaceshipControls.spaceship.getTargetLandingPad();
         if (targetLandingPad !== null && !this.spaceshipControls.spaceship.isLanded() && this.targetCursorLayer.getTarget() !== targetLandingPad) {
             this.targetCursorLayer.setTarget(targetLandingPad);
@@ -696,7 +705,7 @@ export class StarSystemView implements View {
         }
 
         this.targetCursorLayer.setEnabled(this.isUiEnabled && !this.spaceshipControls.spaceship.isLandedAtFacility());
-        this.spaceShipLayer.setVisibility(this.isUiEnabled && this.scene.getActiveControls() === this.spaceshipControls && !this.spaceshipControls.spaceship.isLandedAtFacility());
+        this.spaceShipLayer.setVisibility(this.isUiEnabled && activeControls === this.spaceshipControls && !this.spaceshipControls.spaceship.isLandedAtFacility());
     }
 
     /**

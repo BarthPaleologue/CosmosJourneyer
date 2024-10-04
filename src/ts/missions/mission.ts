@@ -30,4 +30,6 @@ export interface Mission {
     getTypeString(): string;
 
     describe(): string;
+
+    describeNextTask(context: MissionContext): string;
 }

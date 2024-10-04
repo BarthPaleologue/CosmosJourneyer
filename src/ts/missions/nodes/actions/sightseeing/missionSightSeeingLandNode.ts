@@ -57,4 +57,8 @@ export class MissionSightSeeingLandNode implements MissionNode {
             }
         }
     }
+
+    describeNextTask(context: MissionContext): string {
+        throw new Error("Method not implemented.");
+    }
 }

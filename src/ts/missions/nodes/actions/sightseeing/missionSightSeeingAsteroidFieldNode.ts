@@ -70,4 +70,8 @@ export class MissionSightSeeingAsteroidFieldNode implements MissionNode {
             this.hasCompletedLock = true;
         }
     }
+
+    describeNextTask(context: MissionContext): string {
+        throw new Error("Method not implemented.");
+    }
 }

@@ -18,6 +18,7 @@
 import { Player } from "../player/player";
 import { Mission } from "../missions/mission";
 import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
+import { MissionContext } from "../missions/missionContext";
 
 export class CurrentMissionDisplay {
     readonly rootNode: HTMLElement;
@@ -47,10 +48,19 @@ export class CurrentMissionDisplay {
         });
     }
 
-    public update() {
+    public update(context: MissionContext) {
         if (this.activeMissionIndex === null && this.player.currentMissions.length !== 0) {
+            this.activeMissionIndex = 0;
             this.setMission(this.player.currentMissions[0]);
         }
+
+        if(this.activeMissionIndex === null) return;
+
+        const descriptionBlock = this.rootNode.querySelector<HTMLParagraphElement>(".missionPanel p");
+        if(descriptionBlock === null) {
+            throw new Error("Could not find description block in mission panel");
+        }
+        descriptionBlock.innerText = this.player.currentMissions[this.activeMissionIndex].describeNextTask(context);
     }
 
     public setNextMission() {

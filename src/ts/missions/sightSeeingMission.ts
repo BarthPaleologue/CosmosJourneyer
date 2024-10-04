@@ -103,12 +103,7 @@ export class SightSeeingMission implements Mission {
     }
 
     update(context: MissionContext): void {
-        if (this.hasCompletedLock) return;
-        const systemModel = context.currentSystem.model;
-        if (systemModel instanceof SeededStarSystemModel) {
-            // if the current system is none of the target systems, early return
-            if (!this.targetSystem.equals(systemModel.seed)) return;
-        }
+        if (this.isCompleted()) return;
         this.tree.updateState(context);
     }
 
@@ -161,5 +156,9 @@ export class SightSeeingMission implements Mission {
         }
 
         return `${describeString} (${parseDistance(distance * Settings.LIGHT_YEAR)})`;
+    }
+
+    describeNextTask(context: MissionContext): string {
+        return this.tree.describeNextTask(context);
     }
 }

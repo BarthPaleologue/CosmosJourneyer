@@ -27,4 +27,10 @@ export class MissionSequenceNode implements MissionNode {
             this.activeChildIndex++;
         }
     }
+
+    describeNextTask(context: MissionContext): string {
+        if (this.hasCompletedLock) return "Mission completed";
+        if (this.activeChildIndex >= this.children.length) return "Mission completed";
+        return this.children[this.activeChildIndex].describeNextTask(context);
+    }
 }

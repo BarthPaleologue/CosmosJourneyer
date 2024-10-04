@@ -24,6 +24,7 @@ import { Matrix } from "@babylonjs/core/Maths/math";
 import { smoothstep } from "../utils/smoothstep";
 import { Player } from "../player/player";
 import { CurrentMissionDisplay } from "./currentMissionDisplay";
+import { MissionContext } from "../missions/missionContext";
 
 export class SpaceShipLayer {
     private readonly rootNode: HTMLElement;
@@ -81,19 +82,15 @@ export class SpaceShipLayer {
     public setTarget(target: TransformNode | null) {
         if (target === null || this.currentTarget === target) {
             this.targetHelper.style.display = "none";
-        } else {
-            this.targetHelper.style.display = "block";
-        }
-
-        if (this.currentTarget === target) {
             this.currentTarget = null;
             return;
         }
 
+        this.targetHelper.style.display = "block";
         this.currentTarget = target;
     }
 
-    public update(currentBody: OrbitalObject, currentControls: TransformNode) {
+    public update(currentBody: OrbitalObject, currentControls: TransformNode, missionContext: MissionContext) {
         if (this.currentTarget !== null) {
             const directionWorld = this.currentTarget.getAbsolutePosition().subtract(currentControls.getAbsolutePosition()).normalize();
             const directionLocal = Vector3.TransformNormal(directionWorld, Matrix.Invert(currentControls.getWorldMatrix()));
@@ -106,7 +103,7 @@ export class SpaceShipLayer {
             this.targetDot.style.left = `${50 - 50 * directionLocal.x}%`;
         }
 
-        this.currentMissionDisplay.update();
+        this.currentMissionDisplay.update(missionContext);
     }
 
     displaySpeed(shipThrottle: number, speed: number) {
