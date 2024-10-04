@@ -155,7 +155,14 @@ export class SightSeeingMission implements Mission {
                 throw new Error(`Unknown sight seeing type: ${this.target.type}`);
         }
 
-        return `${describeString} (${parseDistance(distance * Settings.LIGHT_YEAR)})`;
+        let resultString = `${describeString}`;
+        if (distance > 0) {
+            resultString += ` (${parseDistance(distance * Settings.LIGHT_YEAR)})`;
+        } else {
+            resultString += ` (${i18n.t("missions:common:here")})`;
+        }
+
+        return resultString;
     }
 
     describeNextTask(context: MissionContext): string {

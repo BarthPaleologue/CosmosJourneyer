@@ -6,9 +6,7 @@ import { uniformRandBool } from "extended-random";
 import { BodyType } from "../architecture/bodyType";
 import { SystemObjectType } from "../saveFile/universeCoordinates";
 import { Player } from "../player/player";
-import { GasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 import { getPlanetaryMassObjectModels } from "../utils/getModelsFromSystemModel";
-import { getUniverseObjectId } from "../utils/orbitalObjectId";
 
 export function generateSightseeingMissions(spaceStationModel: SpaceStationModel, player: Player, timestampMillis: number): SightSeeingMission[] {
     const hours = Math.floor(timestampMillis / 1000 / 60 / 60);

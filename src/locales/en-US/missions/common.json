@@ -1,4 +1,5 @@
 {
   "travelToTargetSystem": "Travel to {{systemName}} ({{distance}})",
-  "getCloserToTarget": "Fly closer to {{objectName}}"
+  "getCloserToTarget": "Fly closer to {{objectName}}",
+  "here": "here"
 }
