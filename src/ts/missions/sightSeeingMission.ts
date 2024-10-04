@@ -1,6 +1,6 @@
 import { Mission, MissionState } from "./mission";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
-import { UniverseObjectId, universeObjectIdEquals } from "../saveFile/universeCoordinates";
+import { SystemObjectType, UniverseObjectId, universeObjectIdEquals } from "../saveFile/universeCoordinates";
 import { SystemSeed } from "../utils/systemSeed";
 import { getStarGalacticCoordinates } from "../utils/getStarGalacticCoordinates";
 import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
@@ -51,7 +51,10 @@ export class SightSeeingMission implements Mission {
         const targetGalacticCoordinates = getStarGalacticCoordinates(this.targetSystem);
         const distanceLY = Vector3.Distance(missionGiverGalacticCoordinates, targetGalacticCoordinates);
 
-        this.reward = Math.ceil(100 * distanceLY * distanceLY);
+        this.reward = Math.max(5_000, 1000 * Math.ceil(distanceLY));
+        if (target.objectId.objectType === SystemObjectType.STELLAR_OBJECT) {
+            this.reward *= 1.5;
+        }
 
         this.tree = this.generateMissionTree();
     }
