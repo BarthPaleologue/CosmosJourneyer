@@ -53,8 +53,8 @@ export class SystemIcons {
 
     static IconMaskForSystem(system: SystemSeed, bookmarkedSystems: SystemSeed[], targetSystems: SystemSeed[]): number {
         let iconMask = 0;
-        if (bookmarkedSystems.includes(system)) iconMask |= SystemIconMask.BOOKMARK;
-        if (targetSystems.includes(system)) iconMask |= SystemIconMask.MISSION;
+        if (bookmarkedSystems.find((bookmarkedSystem) => bookmarkedSystem.equals(system))) iconMask |= SystemIconMask.BOOKMARK;
+        if (targetSystems.find((targetSystem) => targetSystem.equals(system))) iconMask |= SystemIconMask.MISSION;
         return iconMask;
     }
 }

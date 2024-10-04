@@ -387,7 +387,7 @@ export class StarMapUI {
             // add target systems to the list of systems with icons
             .concat(targetSystems)
             // remove duplicates
-            .filter((value, index, self) => self.indexOf(value) === index);
+            .filter((value, index, self) => self.findIndex((v) => v.equals(value)) === index);
 
         const systemIconsToKeep: SystemIcons[] = [];
 

@@ -33,6 +33,8 @@
     display: flex;
     flex-direction: column;
 
+    row-gap: 10px;
+
     transform: translateY(-50%) translateX(calc(-100% - 25px));
 
     &.transparent {
