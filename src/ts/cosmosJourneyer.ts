@@ -423,6 +423,10 @@ export class CosmosJourneyer {
 
             this.starSystemView.getSpaceshipControls().spaceship.spawnOnPad(landingPad);
         }
+
+        if(this.player.currentItinerary.length > 1) {
+            this.starSystemView.setSystemAsTarget(this.player.currentItinerary[1]);
+        }
     }
 
     /**
