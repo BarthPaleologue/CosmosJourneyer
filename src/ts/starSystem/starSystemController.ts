@@ -149,7 +149,6 @@ export class StarSystemController {
      */
     public addMandelbulb(mandelbulb: Mandelbulb): Mandelbulb {
         this.orbitalObjects.push(mandelbulb);
-        this.celestialBodies.push(mandelbulb);
         this.anomalies.push(mandelbulb);
         return mandelbulb;
     }
@@ -161,7 +160,6 @@ export class StarSystemController {
      */
     public addJuliaSet(juliaSet: JuliaSet): JuliaSet {
         this.orbitalObjects.push(juliaSet);
-        this.celestialBodies.push(juliaSet);
         this.anomalies.push(juliaSet);
         return juliaSet;
     }

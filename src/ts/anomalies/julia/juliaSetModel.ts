@@ -21,18 +21,18 @@ import { normalRandom } from "extended-random";
 import { clamp } from "../../utils/math";
 import { getOrbitalPeriod, getPeriapsis, Orbit } from "../../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { PlanetModel } from "../../architecture/planet";
 import { PlanetPhysicalProperties } from "../../architecture/physicalProperties";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { BodyType } from "../../architecture/bodyType";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { wheelOfFortune } from "../../utils/random";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { GreekAlphabet, ReversedGreekAlphabet } from "../../utils/parseToStrings";
+import { ReversedGreekAlphabet } from "../../utils/parseToStrings";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
 import i18n from "../../i18n";
+import { OrbitalObjectModel } from "../../architecture/orbitalObject";
 
-export class JuliaSetModel implements PlanetModel {
+export class JuliaSetModel implements OrbitalObjectModel {
     readonly name: string;
 
     readonly bodyType = BodyType.ANOMALY;
