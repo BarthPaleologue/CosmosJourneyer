@@ -19,6 +19,7 @@ import { Player } from "../player/player";
 import { Mission } from "../missions/mission";
 import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
 import { MissionContext } from "../missions/missionContext";
+import { Sounds } from "../assets/sounds";
 
 export class CurrentMissionDisplay {
     readonly rootNode: HTMLElement;
@@ -56,11 +57,20 @@ export class CurrentMissionDisplay {
 
         if(this.activeMissionIndex === null) return;
 
+        const currentMission = this.player.currentMissions[this.activeMissionIndex];
+
         const descriptionBlock = this.rootNode.querySelector<HTMLParagraphElement>(".missionPanel p");
         if(descriptionBlock === null) {
             throw new Error("Could not find description block in mission panel");
         }
-        descriptionBlock.innerText = this.player.currentMissions[this.activeMissionIndex].describeNextTask(context);
+        const newDescriptionText = currentMission.describeNextTask(context);
+        if(newDescriptionText === descriptionBlock.innerText) return;
+        descriptionBlock.innerText = newDescriptionText;
+
+        if(currentMission.isCompleted()) {
+            Sounds.MISSION_COMPLETE.play();
+        }
+
     }
 
     public setNextMission() {
