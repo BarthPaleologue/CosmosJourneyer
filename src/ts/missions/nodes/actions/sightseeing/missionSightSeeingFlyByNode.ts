@@ -78,12 +78,12 @@ export class MissionSightSeeingFlyByNode implements MissionNode {
 
         switch (this.state) {
             case FlyByState.NOT_IN_SYSTEM:
-                return i18n.t("missions:flyBy:travelToTargetSystem", {
+                return i18n.t("missions:common:travelToTargetSystem", {
                     systemName: targetSystemModel.name,
                     distance: parseDistance(distance * Settings.LIGHT_YEAR)
                 });
             case FlyByState.TOO_FAR_IN_SYSTEM:
-                return i18n.t("missions:flyBy:getCloserToTarget", {
+                return i18n.t("missions:common:getCloserToTarget", {
                     objectName: targetObject.name
                 });
             case FlyByState.CLOSE_ENOUGH:

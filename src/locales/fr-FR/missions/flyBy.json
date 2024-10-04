@@ -1,5 +1,3 @@
 {
-  "travelToTargetSystem": "Voyagez jusqu'à {{systemName}} ({{distance}})",
-  "getCloserToTarget": "Approchez vous de {{objectName}}",
   "missionCompleted": "Mission réussie. Profitez de la vue CMDR !"
 }

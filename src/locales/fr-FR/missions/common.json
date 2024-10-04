@@ -1,0 +1,4 @@
+{
+  "travelToTargetSystem": "Voyagez jusqu'à {{systemName}} ({{distance}})",
+  "getCloserToTarget": "Approchez vous de {{objectName}}"
+}
