@@ -100,19 +100,9 @@ export class TelluricPlanet implements Planet, Cullable {
 
         this.postProcesses.push(PostProcessType.SHADOW);
 
-        const waterBoilingPoint = waterBoilingPointCelsius(this.model.physicalProperties.pressure);
-        const waterFreezingPoint = 0.0;
         const epsilon = 0.05;
-        if (this.model.physicalProperties.pressure > epsilon) {
-            if (waterFreezingPoint > this.model.physicalProperties.minTemperature && waterFreezingPoint < this.model.physicalProperties.maxTemperature) {
-                this.postProcesses.push(PostProcessType.OCEAN);
-            } else {
-                this.model.physicalProperties.oceanLevel = 0;
-            }
-            this.postProcesses.push(PostProcessType.ATMOSPHERE);
-        } else {
-            this.model.physicalProperties.oceanLevel = 0;
-        }
+        if (this.model.hasLiquidWater()) this.postProcesses.push(PostProcessType.OCEAN);
+        if (this.model.physicalProperties.pressure > epsilon) this.postProcesses.push(PostProcessType.ATMOSPHERE);
 
         if (this.model.rings !== null) {
             this.postProcesses.push(PostProcessType.RING);

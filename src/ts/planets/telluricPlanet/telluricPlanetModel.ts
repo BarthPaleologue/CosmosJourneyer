@@ -34,6 +34,8 @@ import { GenerationSteps } from "../../utils/generationSteps";
 import { getPlanetName } from "../common";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
 import i18n from "../../i18n";
+import { waterBoilingPointCelsius } from "../../utils/waterMechanics";
+import { PostProcessType } from "../../postProcesses/postProcessTypes";
 
 export class TelluricPlanetModel implements PlanetModel {
     readonly name: string;
@@ -151,6 +153,19 @@ export class TelluricPlanetModel implements PlanetModel {
 
         this.physicalProperties.oceanLevel = Settings.OCEAN_DEPTH * this.physicalProperties.waterAmount * this.physicalProperties.pressure;
 
+        const waterBoilingPoint = waterBoilingPointCelsius(this.physicalProperties.pressure);
+        const waterFreezingPoint = 0.0;
+        const epsilon = 0.05;
+        if (this.physicalProperties.pressure > epsilon) {
+            // if temperature is too high, there is no ocean (desert world)
+            if(this.physicalProperties.maxTemperature > waterBoilingPoint) this.physicalProperties.oceanLevel = 0;
+            // if temperature is too low, there is no ocean (frozen world)
+            if(this.physicalProperties.maxTemperature < waterFreezingPoint) this.physicalProperties.oceanLevel = 0;
+        } else {
+            // if pressure is too low, there is no ocean (sterile world)
+            this.physicalProperties.oceanLevel = 0;
+        }
+
         this.terrainSettings = {
             continents_frequency: this.radius / Settings.EARTH_RADIUS,
             continents_fragmentation: clamp(normalRandom(0.65, 0.03, this.rng, GenerationSteps.TERRAIN), 0, 0.95),
@@ -175,7 +190,6 @@ export class TelluricPlanetModel implements PlanetModel {
             this.rings = new RingsModel(this.rng);
         }
 
-        const waterFreezingPoint = 0.0;
         if (waterFreezingPoint > this.physicalProperties.minTemperature && waterFreezingPoint < this.physicalProperties.maxTemperature && this.physicalProperties.pressure > 0) {
             this.clouds = new CloudsModel(this.getApparentRadius(), Settings.CLOUD_LAYER_HEIGHT, this.physicalProperties.waterAmount, this.physicalProperties.pressure);
         }
