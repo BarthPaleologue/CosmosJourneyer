@@ -5,11 +5,20 @@ import { SeededStarSystemModel } from "../../../../starSystem/seededStarSystemMo
 import { SystemSeed } from "../../../../utils/systemSeed";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
-import { CollisionMask } from "../../../../settings";
-import { getObjectBySystemId } from "../../../../utils/orbitalObjectId";
+import { CollisionMask, Settings } from "../../../../settings";
+import { getObjectBySystemId, getObjectModelByUniverseId } from "../../../../utils/orbitalObjectId";
+import { getStarGalacticCoordinates } from "../../../../utils/getStarGalacticCoordinates";
+import i18n from "../../../../i18n";
+import { parseDistance } from "../../../../utils/parseToStrings";
+
+const enum LandMissionState {
+    NOT_IN_SYSTEM,
+    TOO_FAR_IN_SYSTEM,
+    LANDED
+}
 
 export class MissionSightSeeingLandNode implements MissionNode {
-    private hasCompletedLock = false;
+    private state: LandMissionState = LandMissionState.NOT_IN_SYSTEM;
 
     private readonly objectId: UniverseObjectId;
 
@@ -23,17 +32,18 @@ export class MissionSightSeeingLandNode implements MissionNode {
     }
 
     isCompleted(): boolean {
-        return this.hasCompletedLock;
+        return this.state === LandMissionState.LANDED;
     }
 
     updateState(context: MissionContext) {
-        if (this.hasCompletedLock) return;
+        if (this.isCompleted()) return;
 
         const currentSystem = context.currentSystem;
         const currentSystemModel = currentSystem.model;
         if (currentSystemModel instanceof SeededStarSystemModel) {
             // Skip if the current system is not the one we are looking for
             if (!currentSystemModel.seed.equals(this.targetSystemSeed)) {
+                this.state = LandMissionState.NOT_IN_SYSTEM;
                 return;
             }
         }
@@ -53,12 +63,39 @@ export class MissionSightSeeingLandNode implements MissionNode {
             const distanceThreshold = 10;
 
             if (distance < distanceThreshold) {
-                this.hasCompletedLock = true;
+                this.state = LandMissionState.LANDED;
+                return;
             }
         }
+
+        this.state = LandMissionState.TOO_FAR_IN_SYSTEM;
     }
 
     describeNextTask(context: MissionContext): string {
-        throw new Error("Method not implemented.");
+        const targetSystemModel = new SeededStarSystemModel(this.targetSystemSeed);
+        const currentSystemModel = context.currentSystem.model;
+        if (!(currentSystemModel instanceof SeededStarSystemModel)) {
+            throw new Error("Cannot handle non-seeded star system models yet");
+        }
+
+        const targetSystemPosition = getStarGalacticCoordinates(this.targetSystemSeed);
+        const currentSystemPosition = getStarGalacticCoordinates(currentSystemModel.seed);
+        const distance = Vector3.Distance(targetSystemPosition, currentSystemPosition);
+
+        const targetObject = getObjectModelByUniverseId(this.objectId);
+
+        switch (this.state) {
+            case LandMissionState.NOT_IN_SYSTEM:
+                return i18n.t("missions:common:travelToTargetSystem", {
+                    systemName: targetSystemModel.name,
+                    distance: parseDistance(distance * Settings.LIGHT_YEAR)
+                });
+            case LandMissionState.TOO_FAR_IN_SYSTEM:
+                return i18n.t("missions:common:getCloserToTarget", {
+                    objectName: targetObject.name
+                });
+            case LandMissionState.LANDED:
+                return i18n.t("missions:terminatorLanding:missionCompleted");
+        }
     }
 }

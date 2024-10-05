@@ -86,11 +86,8 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
         }
 
         if (celestialBodyModel.bodyType === BodyType.TELLURIC_PLANET) {
-            console.log("terminator candidate")
             const telluricPlanetModel = celestialBodyModel as TelluricPlanetModel;
-            console.log(telluricPlanetModel.hasLiquidWater(), telluricPlanetModel.isMoon());
             if (!telluricPlanetModel.hasLiquidWater() && !telluricPlanetModel.isMoon()) {
-                console.log("terminator landing mission")
                 terminatorLandingMissions.push(
                     new SightSeeingMission(spaceStationModel, {
                         type: SightSeeingType.TERMINATOR_LANDING,
