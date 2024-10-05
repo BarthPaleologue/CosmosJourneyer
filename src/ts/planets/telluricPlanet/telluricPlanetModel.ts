@@ -166,6 +166,10 @@ export class TelluricPlanetModel implements PlanetModel {
             this.physicalProperties.oceanLevel = 0;
         }
 
+        if (this.hasLiquidWater()) {
+            this.clouds = new CloudsModel(this.getApparentRadius(), Settings.CLOUD_LAYER_HEIGHT, this.physicalProperties.waterAmount, this.physicalProperties.pressure);
+        }
+
         this.terrainSettings = {
             continents_frequency: this.radius / Settings.EARTH_RADIUS,
             continents_fragmentation: clamp(normalRandom(0.65, 0.03, this.rng, GenerationSteps.TERRAIN), 0, 0.95),
@@ -188,10 +192,6 @@ export class TelluricPlanetModel implements PlanetModel {
 
         if (uniformRandBool(0.6, this.rng, GenerationSteps.RINGS) && !this.isSatelliteOfTelluric && !this.isSatelliteOfGas) {
             this.rings = new RingsModel(this.rng);
-        }
-
-        if (waterFreezingPoint > this.physicalProperties.minTemperature && waterFreezingPoint < this.physicalProperties.maxTemperature && this.physicalProperties.pressure > 0) {
-            this.clouds = new CloudsModel(this.getApparentRadius(), Settings.CLOUD_LAYER_HEIGHT, this.physicalProperties.waterAmount, this.physicalProperties.pressure);
         }
 
         this.nbMoons = randRangeInt(0, 2, this.rng, GenerationSteps.NB_MOONS);
