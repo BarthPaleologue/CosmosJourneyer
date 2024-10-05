@@ -7,6 +7,7 @@ import { BodyType } from "../architecture/bodyType";
 import { SystemObjectType } from "../saveFile/universeCoordinates";
 import { Player } from "../player/player";
 import { getPlanetaryMassObjectModels } from "../utils/getModelsFromSystemModel";
+import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 
 export function generateSightseeingMissions(spaceStationModel: SpaceStationModel, player: Player, timestampMillis: number): SightSeeingMission[] {
     const hours = Math.floor(timestampMillis / 1000 / 60 / 60);
@@ -67,23 +68,44 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
 
     // for asteroid field missions, find all asteroid fields in the current system
     const asteroidFieldMissions: SightSeeingMission[] = [];
+    // for terminator landing missions, find all telluric planets with no liquid water
+    const terminatorLandingMissions: SightSeeingMission[] = [];
     const currentSystemModel = starSystem;
     getPlanetaryMassObjectModels(currentSystemModel).forEach((celestialBodyModel, index) => {
-        if (celestialBodyModel.rings === null) return;
+        if (celestialBodyModel.rings !== null) {
+            asteroidFieldMissions.push(
+                new SightSeeingMission(spaceStationModel, {
+                    type: SightSeeingType.ASTEROID_FIELD_TREK,
+                    objectId: {
+                        starSystem: currentSystemModel.seed.serialize(),
+                        objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
+                        index
+                    }
+                })
+            );
+        }
 
-        asteroidFieldMissions.push(
-            new SightSeeingMission(spaceStationModel, {
-                type: SightSeeingType.ASTEROID_FIELD_TREK,
-                objectId: {
-                    starSystem: currentSystemModel.seed.serialize(),
-                    objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
-                    index
-                }
-            })
-        );
+        if (celestialBodyModel.bodyType === BodyType.TELLURIC_PLANET) {
+            console.log("terminator candidate")
+            const telluricPlanetModel = celestialBodyModel as TelluricPlanetModel;
+            console.log(telluricPlanetModel.hasLiquidWater(), telluricPlanetModel.isMoon());
+            if (!telluricPlanetModel.hasLiquidWater() && !telluricPlanetModel.isMoon()) {
+                console.log("terminator landing mission")
+                terminatorLandingMissions.push(
+                    new SightSeeingMission(spaceStationModel, {
+                        type: SightSeeingType.TERMINATOR_LANDING,
+                        objectId: {
+                            starSystem: currentSystemModel.seed.serialize(),
+                            objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
+                            index
+                        }
+                    })
+                );
+            }
+        }
     });
 
-    const allMissions = blackHoleFlyByMissions.concat(neutronStarFlyByMissions, anomalyFlyByMissions, asteroidFieldMissions);
+    const allMissions = blackHoleFlyByMissions.concat(neutronStarFlyByMissions, anomalyFlyByMissions, asteroidFieldMissions, terminatorLandingMissions);
 
     // filter missions to avoid duplicates with already accepted missions of the player
     return allMissions.filter((mission) => player.currentMissions.every((currentMission) => !mission.equals(currentMission)));
