@@ -10,7 +10,7 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { CollisionMask, Settings } from "../../../settings";
 import { TypedObject } from "../../../architecture/typedObject";
 import i18n from "../../../i18n";
-import { BoundingSphere } from "../../../architecture/boundingSphere";
+import { HasBoundingSphere } from "../../../architecture/hasBoundingSphere";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { Objects } from "../../objects";
 
@@ -20,7 +20,7 @@ export const enum LandingPadSize {
     LARGE = 3
 }
 
-export class LandingPad implements Transformable, TypedObject, BoundingSphere {
+export class LandingPad implements Transformable, TypedObject, HasBoundingSphere {
     private readonly deck: Mesh;
     private readonly deckAggregate: PhysicsAggregate;
 

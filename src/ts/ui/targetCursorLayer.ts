@@ -19,7 +19,7 @@ import { IDisposable } from "@babylonjs/core/scene";
 import { ObjectTargetCursor, ObjectTargetCursorType } from "./objectTargetCursor";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Transformable } from "../architecture/transformable";
-import { BoundingSphere } from "../architecture/boundingSphere";
+import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { TypedObject } from "../architecture/typedObject";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 
@@ -28,9 +28,9 @@ export class TargetCursorLayer implements IDisposable {
 
     private readonly layerRoot: HTMLDivElement;
 
-    private target: (Transformable & BoundingSphere & TypedObject) | null = null;
+    private target: (Transformable & HasBoundingSphere & TypedObject) | null = null;
 
-    private closestToScreenCenterOrbitalObject: (Transformable & BoundingSphere & TypedObject) | null = null;
+    private closestToScreenCenterOrbitalObject: (Transformable & HasBoundingSphere & TypedObject) | null = null;
 
     constructor() {
         this.layerRoot = document.createElement("div");
@@ -47,7 +47,7 @@ export class TargetCursorLayer implements IDisposable {
         return this.layerRoot.style.display === "block";
     }
 
-    public addObject(object: Transformable & BoundingSphere & TypedObject, iconType: ObjectTargetCursorType, minDistance: number, maxDistance: number) {
+    public addObject(object: Transformable & HasBoundingSphere & TypedObject, iconType: ObjectTargetCursorType, minDistance: number, maxDistance: number) {
         const overlay = new ObjectTargetCursor(object, iconType, minDistance, maxDistance);
         this.targetCursors.push(overlay);
         this.layerRoot.appendChild(overlay.htmlRoot);
@@ -82,7 +82,7 @@ export class TargetCursorLayer implements IDisposable {
         this.targetCursors = [];
     }
 
-    public setTarget(object: (Transformable & BoundingSphere & TypedObject) | null) {
+    public setTarget(object: (Transformable & HasBoundingSphere & TypedObject) | null) {
         if (this.target === object) {
             this.target = null;
             return;

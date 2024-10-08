@@ -46,7 +46,7 @@ import { LandingPad } from "../assets/procedural/landingPad/landingPad";
 import { createNotification } from "../utils/notification";
 import { OrbitalObject } from "../architecture/orbitalObject";
 import { CelestialBody } from "../architecture/celestialBody";
-import { BoundingSphere } from "../architecture/boundingSphere";
+import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 
 const enum ShipState {
     FLYING,
@@ -65,7 +65,7 @@ export class Spaceship implements Transformable {
     private mainEngineThrottle = 0;
     private mainEngineTargetSpeed = 0;
 
-    private closestWalkableObject: (Transformable & BoundingSphere) | null = null;
+    private closestWalkableObject: (Transformable & HasBoundingSphere) | null = null;
 
     private landingTarget: Transformable | null = null;
     private readonly raycastResult = new PhysicsRaycastResult();
@@ -157,7 +157,7 @@ export class Spaceship implements Transformable {
         this.scene = scene;
     }
 
-    public setClosestWalkableObject(object: Transformable & BoundingSphere) {
+    public setClosestWalkableObject(object: Transformable & HasBoundingSphere) {
         this.closestWalkableObject = object;
     }
 
@@ -246,7 +246,7 @@ export class Spaceship implements Transformable {
         this.mainEngineThrottle = Math.max(-1, Math.min(1, this.mainEngineThrottle + delta));
     }
 
-    public getClosestWalkableObject(): (Transformable & BoundingSphere) | null {
+    public getClosestWalkableObject(): (Transformable & HasBoundingSphere) | null {
         return this.closestWalkableObject;
     }
 

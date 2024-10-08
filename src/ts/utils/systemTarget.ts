@@ -1,13 +1,13 @@
 import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Transformable } from "../architecture/transformable";
-import { BoundingSphere } from "../architecture/boundingSphere";
+import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { TypedObject } from "../architecture/typedObject";
 import { SystemSeed } from "./systemSeed";
 import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
 import i18n from "../i18n";
 
-export class SystemTarget implements Transformable, BoundingSphere, TypedObject {
+export class SystemTarget implements Transformable, HasBoundingSphere, TypedObject {
     readonly name: string;
     private readonly transform: TransformNode;
 

@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Transformable } from "./transformable";
-import { BoundingSphere } from "./boundingSphere";
+import { HasBoundingSphere } from "./hasBoundingSphere";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math";
 import { getRotationQuaternion, setRotationQuaternion, translate } from "../uberCore/transforms/basicTransform";
 import { OrbitalObjectPhysicalProperties } from "./physicalProperties";
@@ -26,7 +26,7 @@ import { getPointOnOrbit, Orbit } from "../orbit/orbit";
 /**
  * Describes all objects that can have an orbital trajectory and rotate on themselves
  */
-export interface OrbitalObject extends Transformable, BoundingSphere, TypedObject {
+export interface OrbitalObject extends Transformable, HasBoundingSphere, TypedObject {
     /**
      * The name of the object
      */

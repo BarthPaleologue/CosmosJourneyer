@@ -19,7 +19,7 @@ import { parseDistance, parseSeconds } from "../utils/parseToStrings";
 import { getAngularSize } from "../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Transformable } from "../architecture/transformable";
-import { BoundingSphere } from "../architecture/boundingSphere";
+import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { TypedObject } from "../architecture/typedObject";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Matrix } from "@babylonjs/core/Maths/math";
@@ -44,7 +44,7 @@ export class ObjectTargetCursor {
     readonly distanceText: HTMLParagraphElement;
     readonly etaText: HTMLParagraphElement;
 
-    readonly object: Transformable & BoundingSphere & TypedObject;
+    readonly object: Transformable & HasBoundingSphere & TypedObject;
 
     private lastDistance = 0;
 
@@ -62,7 +62,7 @@ export class ObjectTargetCursor {
 
     private isInformationEnabled = false;
 
-    constructor(object: Transformable & BoundingSphere & TypedObject, iconType: ObjectTargetCursorType, minDistance: number, maxDistance: number) {
+    constructor(object: Transformable & HasBoundingSphere & TypedObject, iconType: ObjectTargetCursorType, minDistance: number, maxDistance: number) {
         this.htmlRoot = document.createElement("div");
         this.htmlRoot.classList.add("targetCursorRoot");
         this.htmlRoot.dataset.name = object.getTransform().name + " Target Cursor Root";

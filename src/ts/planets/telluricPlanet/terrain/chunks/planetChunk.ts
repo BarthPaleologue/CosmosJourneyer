@@ -30,7 +30,7 @@ import { isSizeOnScreenEnough } from "../../../../utils/isObjectVisibleOnScreen"
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { IPatch } from "../instancePatch/iPatch";
 import { TelluricPlanetModel } from "../../telluricPlanetModel";
-import { BoundingSphere } from "../../../../architecture/boundingSphere";
+import { HasBoundingSphere } from "../../../../architecture/hasBoundingSphere";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { Transformable } from "../../../../architecture/transformable";
 import { CollisionMask } from "../../../../settings";
@@ -39,7 +39,7 @@ import { Cullable } from "../../../../utils/cullable";
 import { Materials } from "../../../../assets/materials";
 import { Objects } from "../../../../assets/objects";
 
-export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
+export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
     public readonly mesh: Mesh;
     private readonly depth: number;
     public readonly cubePosition: Vector3;

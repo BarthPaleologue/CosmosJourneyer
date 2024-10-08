@@ -29,16 +29,16 @@ import { CameraUniformNames, setCameraUniforms } from "../postProcesses/uniforms
 import { SamplerUniformNames, setSamplerUniforms } from "../postProcesses/uniforms/samplerUniforms";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
-import { BoundingSphere } from "../architecture/boundingSphere";
+import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { Scene } from "@babylonjs/core/scene";
 
 export class FlatCloudsPostProcess extends PostProcess implements ObjectPostProcess, UpdatablePostProcess {
     readonly cloudUniforms: CloudsUniforms;
-    readonly object: Transformable & BoundingSphere;
+    readonly object: Transformable & HasBoundingSphere;
 
     private activeCamera: Camera | null = null;
 
-    constructor(name: string, planet: Transformable & BoundingSphere, cloudUniforms: CloudsUniforms, scene: Scene, stellarObjects: Transformable[]) {
+    constructor(name: string, planet: Transformable & HasBoundingSphere, cloudUniforms: CloudsUniforms, scene: Scene, stellarObjects: Transformable[]) {
         const shaderName = "flatClouds";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = flatCloudsFragment;
