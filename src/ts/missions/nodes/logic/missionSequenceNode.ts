@@ -3,7 +3,7 @@ import { MissionContext } from "../../missionContext";
 
 export type MissionSequenceNodeSerialized = MissionNodeSerialized & {
     activeChildIndex: number;
-}
+};
 
 export class MissionSequenceNode implements MissionNode {
     public children: MissionNode[];
@@ -46,7 +46,7 @@ export class MissionSequenceNode implements MissionNode {
         return {
             type: MissionNodeType.SEQUENCE,
             children: this.children.map((child) => child.serialize()),
-            activeChildIndex: this.activeChildIndex,
+            activeChildIndex: this.activeChildIndex
         };
     }
 }

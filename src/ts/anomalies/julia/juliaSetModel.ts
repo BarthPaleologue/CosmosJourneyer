@@ -82,7 +82,7 @@ export class JuliaSetModel implements OrbitalObjectModel {
             radius: orbitRadius,
             p: orbitalP,
             period: getOrbitalPeriod(orbitRadius, this.parentBody?.physicalProperties.mass ?? 0),
-            normalToPlane: Vector3.Up(),
+            normalToPlane: Vector3.Up()
         };
 
         this.physicalProperties = {

@@ -83,7 +83,7 @@ export class GasPlanetModel implements PlanetModel {
             radius: orbitRadius,
             p: 2, //orbitalP,
             period: getOrbitalPeriod(orbitRadius, this.parentBody?.physicalProperties.mass ?? 0),
-            normalToPlane: orbitalPlaneNormal,
+            normalToPlane: orbitalPlaneNormal
         };
 
         this.physicalProperties = {

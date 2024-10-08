@@ -96,13 +96,13 @@ export function getObjectModelByUniverseId(universeObjectId: UniverseObjectId): 
 
 export function getUniverseIdForSpaceStationModel(spaceStationModel: SpaceStationModel): UniverseObjectId {
     const systemModel = spaceStationModel.starSystem;
-    if(!(systemModel instanceof SeededStarSystemModel)) {
+    if (!(systemModel instanceof SeededStarSystemModel)) {
         throw new Error("Cannot handle non-seeded star system models yet");
     }
 
     const spaceStationModels = getSpaceStationModels(systemModel);
     const index = spaceStationModels.findIndex((model) => model.seed === spaceStationModel.seed);
-    if(index === -1) {
+    if (index === -1) {
         throw new Error("Space station model not found in star system");
     }
 

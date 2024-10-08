@@ -32,7 +32,7 @@ export class MissionOrNode implements MissionNode {
     serialize(): MissionNodeSerialized {
         return {
             type: MissionNodeType.OR,
-            children: this.children.map((child) => child.serialize()),
+            children: this.children.map((child) => child.serialize())
         };
     }
 }

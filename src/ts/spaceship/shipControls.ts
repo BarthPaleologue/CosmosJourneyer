@@ -100,7 +100,7 @@ export class ShipControls implements Controls {
 
         SpaceShipControlsInputs.map.landing.on("complete", async () => {
             const keyboardLayout = await getGlobalKeyboardLayoutMap();
-            if(this.spaceship.isWarpDriveEnabled()) {
+            if (this.spaceship.isWarpDriveEnabled()) {
                 const relevantKeys = pressInteractionToStrings(SpaceShipControlsInputs.map.toggleWarpDrive, keyboardLayout);
                 createNotification(`Cannot land while warp drive is enabled. You can use ${relevantKeys} to toggle your warp drive.`, 5000);
                 return;

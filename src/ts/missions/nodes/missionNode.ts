@@ -17,7 +17,7 @@ export const enum MissionNodeType {
     AND,
     OR,
     XOR,
-    SEQUENCE,
+    SEQUENCE
 }
 
 export type MissionNodeSerialized = {

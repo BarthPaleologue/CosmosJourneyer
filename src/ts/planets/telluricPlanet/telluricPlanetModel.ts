@@ -91,7 +91,7 @@ export class TelluricPlanetModel implements PlanetModel {
 
         //TODO: make mass dependent on more physical properties like density
         let mass;
-        if(this.isSatelliteOfTelluric) {
+        if (this.isSatelliteOfTelluric) {
             //FIXME: when Settings.Earth radius gets to 1:1 scale, change this value by a variable in settings
             mass = Settings.MOON_MASS * (this.radius / 1_735e3) ** 3;
         } else {
@@ -158,9 +158,9 @@ export class TelluricPlanetModel implements PlanetModel {
         const epsilon = 0.05;
         if (this.physicalProperties.pressure > epsilon) {
             // if temperature is too high, there is no ocean (desert world)
-            if(this.physicalProperties.maxTemperature > waterBoilingPoint) this.physicalProperties.oceanLevel = 0;
+            if (this.physicalProperties.maxTemperature > waterBoilingPoint) this.physicalProperties.oceanLevel = 0;
             // if temperature is too low, there is no ocean (frozen world)
-            if(this.physicalProperties.maxTemperature < waterFreezingPoint) this.physicalProperties.oceanLevel = 0;
+            if (this.physicalProperties.maxTemperature < waterFreezingPoint) this.physicalProperties.oceanLevel = 0;
         } else {
             // if pressure is too low, there is no ocean (sterile world)
             this.physicalProperties.oceanLevel = 0;

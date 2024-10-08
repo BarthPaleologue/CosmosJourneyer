@@ -94,7 +94,7 @@ export class StarModel implements StellarObjectModel {
             radius: orbitRadius,
             p: 2,
             period: getOrbitalPeriod(orbitRadius, this.parentBody?.physicalProperties.mass ?? 0),
-            normalToPlane: Vector3.Up(),
+            normalToPlane: Vector3.Up()
         };
 
         if (uniformRandBool(StarModel.RING_PROPORTION, this.rng, GenerationSteps.RINGS)) {

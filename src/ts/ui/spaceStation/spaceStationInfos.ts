@@ -41,12 +41,12 @@ export function generateInfoHTML(model: SpaceStationModel): string {
         <p>The total energy consumption is then ${model.totalEnergyConsumptionKWh.toLocaleString()}KWh</p>
         
         <p>Most of the energy produced comes from solar panels, with an efficiency of ${model.solarPanelEfficiency}. The installed ${model.solarPanelSurfaceM2.toLocaleString(
-        undefined,
-        {
-            maximumFractionDigits: 0,
-            maximumSignificantDigits: 3
-        }
-    )}m² of solar panels cover the needs of the population.</p>
+            undefined,
+            {
+                maximumFractionDigits: 0,
+                maximumSignificantDigits: 3
+            }
+        )}m² of solar panels cover the needs of the population.</p>
 
         <h2>Agriculture mix</h2>
         
@@ -56,9 +56,9 @@ export function generateInfoHTML(model: SpaceStationModel): string {
         </p>
 
         ${makeD3PieChart<[number, CropType]>(
-        agricultureMix,
-        ([proportion, _]) => proportion,
-        ([_, cropType]) => cropTypeToString(cropType)
-    )}
+            agricultureMix,
+            ([proportion, _]) => proportion,
+            ([_, cropType]) => cropTypeToString(cropType)
+        )}
     `;
 }

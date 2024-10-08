@@ -39,11 +39,11 @@ export interface Mission {
 }
 
 export const enum MissionType {
-    SIGHT_SEEING,
+    SIGHT_SEEING
 }
 
 export type MissionSerialized = {
     missionGiver: UniverseObjectId;
     type: MissionType;
     tree: MissionNodeSerialized;
-}
+};

@@ -31,7 +31,7 @@ export class MissionAndNode implements MissionNode {
     serialize(): MissionAndNodeSerialized {
         return {
             type: MissionNodeType.AND,
-            children: this.children.map((child) => child.serialize()),
+            children: this.children.map((child) => child.serialize())
         };
     }
 }

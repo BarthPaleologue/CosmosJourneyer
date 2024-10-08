@@ -54,16 +54,16 @@ export class CurrentMissionDisplay {
             this.setMission(this.player.currentMissions[0]);
         }
 
-        if(this.activeMissionIndex === null) return;
+        if (this.activeMissionIndex === null) return;
 
         const currentMission = this.player.currentMissions[this.activeMissionIndex];
 
         const descriptionBlock = this.rootNode.querySelector<HTMLParagraphElement>(".missionPanel p");
-        if(descriptionBlock === null) {
+        if (descriptionBlock === null) {
             throw new Error("Could not find description block in mission panel");
         }
         const newDescriptionText = await currentMission.describeNextTask(context);
-        if(newDescriptionText === descriptionBlock.innerText) return;
+        if (newDescriptionText === descriptionBlock.innerText) return;
         descriptionBlock.innerText = newDescriptionText;
     }
 

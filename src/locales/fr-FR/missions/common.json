@@ -1,5 +1,5 @@
 {
-  "travelToTargetSystem": "Voyagez jusqu'à {{systemName}} ({{distance}}). Appuyez sur {{starMapKey}} pour ouvrir la carte stellaire.",
-  "getCloserToTarget": "Approchez vous de {{objectName}}",
-  "here": "ici"
+    "travelToTargetSystem": "Voyagez jusqu'à {{systemName}} ({{distance}}). Appuyez sur {{starMapKey}} pour ouvrir la carte stellaire.",
+    "getCloserToTarget": "Approchez vous de {{objectName}}",
+    "here": "ici"
 }

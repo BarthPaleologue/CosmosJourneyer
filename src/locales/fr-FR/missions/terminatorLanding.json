@@ -1,4 +1,4 @@
 {
-  "getCloserToTerminator": "Approchez vous du terminateur de {{objectName}}",
-  "missionCompleted": "Mission réussie. Profitez de la vue CMDR !"
+    "getCloserToTerminator": "Approchez vous du terminateur de {{objectName}}",
+    "missionCompleted": "Mission réussie. Profitez de la vue CMDR !"
 }

@@ -1,4 +1,4 @@
 {
-  "getCloserToTerminator": "Get closer to {{objectName}}'s terminator",
-  "missionCompleted": "Mission completed. Enjoy the view CMDR!"
+    "getCloserToTerminator": "Get closer to {{objectName}}'s terminator",
+    "missionCompleted": "Mission completed. Enjoy the view CMDR!"
 }
