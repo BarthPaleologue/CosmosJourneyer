@@ -90,7 +90,7 @@ export class SpaceShipLayer {
         this.currentTarget = target;
     }
 
-    public update(currentBody: OrbitalObject, currentControls: TransformNode, missionContext: MissionContext) {
+    public async update(currentBody: OrbitalObject, currentControls: TransformNode, missionContext: MissionContext) {
         if (this.currentTarget !== null) {
             const directionWorld = this.currentTarget.getAbsolutePosition().subtract(currentControls.getAbsolutePosition()).normalize();
             const directionLocal = Vector3.TransformNormal(directionWorld, Matrix.Invert(currentControls.getWorldMatrix()));
@@ -103,7 +103,7 @@ export class SpaceShipLayer {
             this.targetDot.style.left = `${50 - 50 * directionLocal.x}%`;
         }
 
-        this.currentMissionDisplay.update(missionContext);
+        await this.currentMissionDisplay.update(missionContext);
     }
 
     displaySpeed(shipThrottle: number, speed: number) {

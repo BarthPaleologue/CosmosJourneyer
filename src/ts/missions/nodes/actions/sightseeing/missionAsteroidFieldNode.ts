@@ -10,6 +10,9 @@ import { getStarGalacticCoordinates } from "../../../../utils/getStarGalacticCoo
 import i18n from "../../../../i18n";
 import { parseDistance } from "../../../../utils/parseToStrings";
 import { Settings } from "../../../../settings";
+import { pressInteractionToStrings } from "../../../../utils/inputControlsString";
+import { GeneralInputs } from "../../../../inputs/generalInputs";
+import { getGlobalKeyboardLayoutMap } from "../../../../utils/keyboardAPI";
 
 const enum AsteroidFieldMissionState {
     NOT_IN_SYSTEM,
@@ -84,7 +87,7 @@ export class MissionAsteroidFieldNode implements MissionNode {
         }
     }
 
-    describeNextTask(context: MissionContext): string {
+    async describeNextTask(context: MissionContext): Promise<string> {
         const targetSystemModel = new SeededStarSystemModel(this.targetSystemSeed);
         const currentSystemModel = context.currentSystem.model;
         if (!(currentSystemModel instanceof SeededStarSystemModel)) {
@@ -97,11 +100,14 @@ export class MissionAsteroidFieldNode implements MissionNode {
 
         const targetObject = getObjectModelByUniverseId(this.objectId);
 
+        const keyboardLayout = await getGlobalKeyboardLayoutMap();
+
         switch (this.state) {
             case AsteroidFieldMissionState.NOT_IN_SYSTEM:
                 return i18n.t("missions:common:travelToTargetSystem", {
                     systemName: targetSystemModel.name,
-                    distance: parseDistance(distance * Settings.LIGHT_YEAR)
+                    distance: parseDistance(distance * Settings.LIGHT_YEAR),
+                    starMapKey: pressInteractionToStrings(GeneralInputs.map.toggleStarMap, keyboardLayout).join(` ${i18n.t("common:or")} `)
                 });
             case AsteroidFieldMissionState.TOO_FAR_IN_SYSTEM:
                 return i18n.t("missions:common:getCloserToTarget", {

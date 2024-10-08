@@ -21,8 +21,8 @@ export class MissionAndNode implements MissionNode {
         this.children.forEach((child) => child.updateState(context));
     }
 
-    describeNextTask(context: MissionContext): string {
-        if (this.hasCompletedLock) return "Mission completed";
-        return this.children.map((child) => child.describeNextTask(context)).join(" and ");
+    describeNextTask(context: MissionContext): Promise<string> {
+        if (this.hasCompletedLock) return Promise.resolve("Mission completed");
+        return Promise.resolve(this.children.map((child) => child.describeNextTask(context)).join(" and "));
     }
 }

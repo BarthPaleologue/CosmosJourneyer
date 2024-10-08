@@ -1,5 +1,6 @@
 import { MissionNode } from "../missionNode";
 import { MissionContext } from "../../missionContext";
+import i18n from "../../../i18n";
 
 export class MissionOrNode implements MissionNode {
     public children: MissionNode[];
@@ -21,8 +22,8 @@ export class MissionOrNode implements MissionNode {
         this.children.forEach((child) => child.updateState(context));
     }
 
-    describeNextTask(context: MissionContext): string {
-        if (this.hasCompletedLock) return "Mission completed";
-        return this.children.map((child) => child.describeNextTask(context)).join(" or ");
+    describeNextTask(context: MissionContext): Promise<string> {
+        if (this.hasCompletedLock) return Promise.resolve("Mission completed");
+        return Promise.resolve(this.children.map((child) => child.describeNextTask(context)).join(` ${i18n.t("common:or")} `));
     }
 }

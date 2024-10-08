@@ -372,8 +372,8 @@ export class StarSystemView implements View {
             this.updateBeforeRender(deltaSeconds);
         });
 
-        this.scene.onAfterRenderObservable.add(() => {
-            this.updateAfterRender();
+        this.scene.onAfterRenderObservable.add(async () => {
+            await this.updateAfterRender();
         });
 
         window.addEventListener("resize", () => {
@@ -665,7 +665,7 @@ export class StarSystemView implements View {
         Materials.GRASS_DEPTH_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
     }
 
-    public updateAfterRender() {
+    public async updateAfterRender() {
         if (this.isLoadingSystem) return;
 
         const starSystem = this.getStarSystem();
@@ -685,7 +685,7 @@ export class StarSystemView implements View {
             physicsEngine: this.scene.getPhysicsEngine() as PhysicsEngineV2
         };
 
-        this.spaceShipLayer.update(nearestOrbitalObject, activeControls.getTransform(), missionContext);
+        await this.spaceShipLayer.update(nearestOrbitalObject, activeControls.getTransform(), missionContext);
 
         this.targetCursorLayer.update(activeControls.getActiveCameras()[0]);
         const targetLandingPad = this.spaceshipControls.spaceship.getTargetLandingPad();

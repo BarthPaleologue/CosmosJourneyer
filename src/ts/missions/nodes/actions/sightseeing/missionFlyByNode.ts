@@ -9,6 +9,9 @@ import { getStarGalacticCoordinates } from "../../../../utils/getStarGalacticCoo
 import { parseDistance } from "../../../../utils/parseToStrings";
 import { Settings } from "../../../../settings";
 import i18n from "../../../../i18n";
+import { getGlobalKeyboardLayoutMap } from "../../../../utils/keyboardAPI";
+import { pressInteractionToStrings } from "../../../../utils/inputControlsString";
+import { GeneralInputs } from "../../../../inputs/generalInputs";
 
 const enum FlyByState {
     NOT_IN_SYSTEM,
@@ -63,7 +66,7 @@ export class MissionFlyByNode implements MissionNode {
         }
     }
 
-    describeNextTask(context: MissionContext): string {
+    async describeNextTask(context: MissionContext): Promise<string> {
         const targetSystemModel = new SeededStarSystemModel(this.targetSystemSeed);
         const currentSystemModel = context.currentSystem.model;
         if (!(currentSystemModel instanceof SeededStarSystemModel)) {
@@ -76,11 +79,14 @@ export class MissionFlyByNode implements MissionNode {
 
         const targetObject = getObjectModelByUniverseId(this.objectId);
 
+        const keyboardLayout = await getGlobalKeyboardLayoutMap();
+
         switch (this.state) {
             case FlyByState.NOT_IN_SYSTEM:
                 return i18n.t("missions:common:travelToTargetSystem", {
                     systemName: targetSystemModel.name,
-                    distance: parseDistance(distance * Settings.LIGHT_YEAR)
+                    distance: parseDistance(distance * Settings.LIGHT_YEAR),
+                    starMapKey: pressInteractionToStrings(GeneralInputs.map.toggleStarMap, keyboardLayout).join(` ${i18n.t("common:or")} `)
                 });
             case FlyByState.TOO_FAR_IN_SYSTEM:
                 return i18n.t("missions:common:getCloserToTarget", {

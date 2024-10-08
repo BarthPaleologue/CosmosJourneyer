@@ -31,5 +31,5 @@ export interface Mission {
 
     describe(): string;
 
-    describeNextTask(context: MissionContext): string;
+    describeNextTask(context: MissionContext): Promise<string>;
 }

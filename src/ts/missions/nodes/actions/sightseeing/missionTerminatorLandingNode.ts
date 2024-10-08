@@ -10,6 +10,9 @@ import { getObjectBySystemId, getObjectModelByUniverseId } from "../../../../uti
 import { getStarGalacticCoordinates } from "../../../../utils/getStarGalacticCoordinates";
 import i18n from "../../../../i18n";
 import { parseDistance } from "../../../../utils/parseToStrings";
+import { getGlobalKeyboardLayoutMap } from "../../../../utils/keyboardAPI";
+import { pressInteractionToStrings } from "../../../../utils/inputControlsString";
+import { GeneralInputs } from "../../../../inputs/generalInputs";
 
 const enum LandMissionState {
     NOT_IN_SYSTEM,
@@ -92,7 +95,7 @@ export class MissionTerminatorLandingNode implements MissionNode {
         this.state = LandMissionState.TOO_FAR_IN_SYSTEM;
     }
 
-    describeNextTask(context: MissionContext): string {
+    async describeNextTask(context: MissionContext): Promise<string> {
         const targetSystemModel = new SeededStarSystemModel(this.targetSystemSeed);
         const currentSystemModel = context.currentSystem.model;
         if (!(currentSystemModel instanceof SeededStarSystemModel)) {
@@ -105,11 +108,14 @@ export class MissionTerminatorLandingNode implements MissionNode {
 
         const targetObject = getObjectModelByUniverseId(this.objectId);
 
+        const keyboardLayout = await getGlobalKeyboardLayoutMap();
+
         switch (this.state) {
             case LandMissionState.NOT_IN_SYSTEM:
                 return i18n.t("missions:common:travelToTargetSystem", {
                     systemName: targetSystemModel.name,
-                    distance: parseDistance(distance * Settings.LIGHT_YEAR)
+                    distance: parseDistance(distance * Settings.LIGHT_YEAR),
+                    starMapKey: pressInteractionToStrings(GeneralInputs.map.toggleStarMap, keyboardLayout).join(` ${i18n.t("common:or")} `)
                 });
             case LandMissionState.TOO_FAR_IN_SYSTEM:
                 return i18n.t("missions:terminatorLanding:getCloserToTerminator", {

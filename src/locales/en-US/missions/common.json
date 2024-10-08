@@ -1,5 +1,5 @@
 {
-  "travelToTargetSystem": "Travel to {{systemName}} ({{distance}})",
+  "travelToTargetSystem": "Travel to {{systemName}} ({{distance}}). Press {{starMapKey}} to open the Star Map.",
   "getCloserToTarget": "Fly closer to {{objectName}}",
   "here": "here"
 }

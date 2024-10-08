@@ -48,7 +48,7 @@ export class CurrentMissionDisplay {
         });
     }
 
-    public update(context: MissionContext) {
+    public async update(context: MissionContext) {
         if (this.activeMissionIndex === null && this.player.currentMissions.length !== 0) {
             this.activeMissionIndex = 0;
             this.setMission(this.player.currentMissions[0]);
@@ -62,7 +62,7 @@ export class CurrentMissionDisplay {
         if(descriptionBlock === null) {
             throw new Error("Could not find description block in mission panel");
         }
-        const newDescriptionText = currentMission.describeNextTask(context);
+        const newDescriptionText = await currentMission.describeNextTask(context);
         if(newDescriptionText === descriptionBlock.innerText) return;
         descriptionBlock.innerText = newDescriptionText;
     }

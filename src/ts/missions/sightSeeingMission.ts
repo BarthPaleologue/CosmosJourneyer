@@ -168,7 +168,7 @@ export class SightSeeingMission implements Mission {
         return resultString;
     }
 
-    describeNextTask(context: MissionContext): string {
-        return this.tree.describeNextTask(context);
+    async describeNextTask(context: MissionContext): Promise<string> {
+        return await this.tree.describeNextTask(context);
     }
 }
