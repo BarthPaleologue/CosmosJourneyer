@@ -95,6 +95,9 @@ export class Spaceship implements Transformable {
 
     readonly onLandingEngaged = new Observable<void>();
     readonly onLandingObservable = new Observable<void>();
+    readonly onLandingCancelled = new Observable<void>();
+
+    readonly onTakeOff = new Observable<void>();
 
     constructor(scene: Scene) {
         this.instanceRoot = Objects.CreateWandererInstance();
@@ -280,6 +283,19 @@ export class Spaceship implements Transformable {
         this.onLandingObservable.notifyObservers();
     }
 
+    public cancelLanding() {
+        this.state = ShipState.FLYING;
+        this.aggregate.body.setMotionType(PhysicsMotionType.DYNAMIC);
+        this.aggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS | CollisionMask.ENVIRONMENT;
+        this.aggregate.shape.filterMembershipMask = CollisionMask.DYNAMIC_OBJECTS;
+
+        this.getTransform().setParent(null);
+        this.landingTarget = null;
+        this.targetLandingPad = null;
+
+        this.onLandingCancelled.notifyObservers();
+    }
+
     public spawnOnPad(landingPad: LandingPad) {
         this.getTransform().setParent(null);
         this.engageLandingOnPad(landingPad);
@@ -312,6 +328,8 @@ export class Spaceship implements Transformable {
         this.getTransform().setParent(null);
 
         this.aggregate.body.applyImpulse(this.getTransform().up.scale(200), this.getTransform().getAbsolutePosition());
+
+        this.onTakeOff.notifyObservers();
     }
 
     private land(deltaTime: number) {

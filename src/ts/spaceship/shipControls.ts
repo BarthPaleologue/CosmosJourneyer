@@ -144,6 +144,17 @@ export class ShipControls implements Controls {
             createNotification(i18n.t("notifications:landingSequenceEngaged"), 5000);
         });
 
+        this.spaceship.onLandingCancelled.add(() => {
+            createNotification(i18n.t("notifications:landingCancelled"), 5000);
+            Sounds.STRAUSS_BLUE_DANUBE.setVolume(0, 2);
+            Sounds.STRAUSS_BLUE_DANUBE.stop(2);
+        });
+
+        this.spaceship.onTakeOff.add(() => {
+            //FIXME: localize
+            createNotification("Takeoff successful", 2000);
+        });
+
         this.spaceship.onWarpDriveDisabled.add((isEmergency) => {
             if (isEmergency) Sounds.WARP_DRIVE_EMERGENCY_SHUT_DOWN.play();
         });
@@ -188,7 +199,8 @@ export class ShipControls implements Controls {
             if (SpaceShipControlsInputs.map.upDown.value !== 0) {
                 if (this.spaceship.isLanded()) {
                     this.spaceship.takeOff();
-                    createNotification("Takeoff successful", 2000);
+                } else if (this.spaceship.isLanding()) {
+                    this.spaceship.cancelLanding();
                 }
                 this.spaceship.aggregate.body.applyForce(
                     getUpwardDirection(this.getTransform()).scale(9.8 * 10 * SpaceShipControlsInputs.map.upDown.value),
