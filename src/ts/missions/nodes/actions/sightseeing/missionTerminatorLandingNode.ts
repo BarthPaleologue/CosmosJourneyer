@@ -54,17 +54,28 @@ export class MissionTerminatorLandingNode implements MissionNode {
         }
 
         const playerPosition = context.playerPosition;
+        const targetObjectPosition = targetObject.getTransform().getAbsolutePosition();
 
-        if (Vector3.Distance(playerPosition, targetObject.getTransform().getAbsolutePosition()) > targetObject.getBoundingRadius() + 100e3) {
+        if (Vector3.Distance(playerPosition, targetObjectPosition) > targetObject.getBoundingRadius() + 100e3) {
             this.state = LandMissionState.TOO_FAR_IN_SYSTEM;
             return;
         }
 
-        const downDirection = targetObject.getTransform().getAbsolutePosition().subtract(playerPosition).normalize();
+        const downDirection = targetObjectPosition.subtract(playerPosition).normalize();
 
         context.physicsEngine.raycastToRef(playerPosition, playerPosition.add(downDirection.scale(5)), this.raycastResult, { collideWith: CollisionMask.ENVIRONMENT });
         if (this.raycastResult.hasHit) {
             if (this.raycastResult.body?.transformNode.parent !== targetObject.getTransform()) {
+                this.state = LandMissionState.TOO_FAR_IN_SYSTEM;
+                return;
+            }
+
+            const starTransform = currentSystem.stellarObjects[0].getTransform();
+
+            const objectToPlayer = downDirection.negate();
+            const targetToStar = starTransform.getAbsolutePosition().subtract(targetObjectPosition).normalize();
+
+            if (Math.abs(Vector3.Dot(objectToPlayer, targetToStar)) > Math.cos(Math.PI / 6)) {
                 this.state = LandMissionState.TOO_FAR_IN_SYSTEM;
                 return;
             }
@@ -101,7 +112,7 @@ export class MissionTerminatorLandingNode implements MissionNode {
                     distance: parseDistance(distance * Settings.LIGHT_YEAR)
                 });
             case LandMissionState.TOO_FAR_IN_SYSTEM:
-                return i18n.t("missions:common:getCloserToTarget", {
+                return i18n.t("missions:terminatorLanding:getCloserToTerminator", {
                     objectName: targetObject.name
                 });
             case LandMissionState.LANDED:
