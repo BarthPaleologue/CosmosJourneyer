@@ -1,5 +1,7 @@
-import { MissionNode } from "../missionNode";
+import { MissionNode, MissionNodeSerialized, MissionNodeType } from "../missionNode";
 import { MissionContext } from "../../missionContext";
+
+export type MissionXorNodeSerialized = MissionNodeSerialized;
 
 export class MissionXorNode implements MissionNode {
     public children: MissionNode[];
@@ -24,5 +26,12 @@ export class MissionXorNode implements MissionNode {
     describeNextTask(context: MissionContext): Promise<string> {
         if (this.hasCompletedLock) return Promise.resolve("Mission completed");
         return Promise.resolve(this.children.map((child) => child.describeNextTask(context)).join(" xor "));
+    }
+
+    serialize(): MissionNodeSerialized {
+        return {
+            type: MissionNodeType.XOR,
+            children: this.children.map((child) => child.serialize()),
+        };
     }
 }

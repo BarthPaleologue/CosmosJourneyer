@@ -1,5 +1,6 @@
 import { SystemSeed, SystemSeedSerialized } from "../utils/systemSeed";
-import { Mission } from "../missions/mission";
+import { Mission, MissionSerialized } from "../missions/mission";
+import { deserializeMission } from "../missions/deserializeMission";
 
 export type SerializedPlayer = {
     name: string;
@@ -7,6 +8,8 @@ export type SerializedPlayer = {
     creationDate: string;
     currentItinerary: SystemSeedSerialized[];
     systemBookmarks: SystemSeedSerialized[];
+
+    currentMissions: MissionSerialized[];
 };
 
 export class Player {
@@ -19,12 +22,13 @@ export class Player {
 
     currentMissions: Mission[] = [];
 
-    private constructor(name: string, balance: number, creationDate: Date, currentItinerary: SystemSeed[], systemBookmarks: SystemSeed[]) {
+    private constructor(name: string, balance: number, creationDate: Date, currentItinerary: SystemSeed[], systemBookmarks: SystemSeed[], currentMissions: Mission[] = []) {
         this.name = name;
         this.balance = balance;
         this.creationDate = creationDate;
         this.currentItinerary = currentItinerary;
         this.systemBookmarks = systemBookmarks;
+        this.currentMissions = currentMissions;
     }
 
     public static Default(): Player {
@@ -37,7 +41,8 @@ export class Player {
             serializedPlayer.balance,
             new Date(serializedPlayer.creationDate),
             serializedPlayer.currentItinerary.map((seed) => SystemSeed.Deserialize(seed)),
-            serializedPlayer.systemBookmarks.map((seed) => SystemSeed.Deserialize(seed))
+            serializedPlayer.systemBookmarks.map((seed) => SystemSeed.Deserialize(seed)),
+            serializedPlayer.currentMissions.map((mission) => deserializeMission(mission))
         );
     }
 
@@ -47,7 +52,8 @@ export class Player {
             balance: player.balance,
             creationDate: player.creationDate.toISOString(),
             currentItinerary: player.currentItinerary.map((seed) => seed.serialize()),
-            systemBookmarks: player.systemBookmarks.map((seed) => seed.serialize())
+            systemBookmarks: player.systemBookmarks.map((seed) => seed.serialize()),
+            currentMissions: player.currentMissions.map((mission) => mission.serialize())
         };
     }
 
@@ -57,5 +63,6 @@ export class Player {
         this.creationDate = player.creationDate;
         this.currentItinerary = player.currentItinerary;
         this.systemBookmarks = player.systemBookmarks;
+        this.currentMissions = player.currentMissions;
     }
 }

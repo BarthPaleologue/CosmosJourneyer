@@ -1,5 +1,9 @@
-import { MissionNode } from "../missionNode";
+import { MissionNode, MissionNodeSerialized, MissionNodeType } from "../missionNode";
 import { MissionContext } from "../../missionContext";
+
+export type MissionSequenceNodeSerialized = MissionNodeSerialized & {
+    activeChildIndex: number;
+}
 
 export class MissionSequenceNode implements MissionNode {
     public children: MissionNode[];
@@ -28,9 +32,21 @@ export class MissionSequenceNode implements MissionNode {
         }
     }
 
+    setActiveChildIndex(index: number) {
+        this.activeChildIndex = index;
+    }
+
     describeNextTask(context: MissionContext): Promise<string> {
         if (this.hasCompletedLock) return Promise.resolve("Mission completed");
         if (this.activeChildIndex >= this.children.length) return Promise.resolve("Mission completed");
         return this.children[this.activeChildIndex].describeNextTask(context);
+    }
+
+    serialize(): MissionSequenceNodeSerialized {
+        return {
+            type: MissionNodeType.SEQUENCE,
+            children: this.children.map((child) => child.serialize()),
+            activeChildIndex: this.activeChildIndex,
+        };
     }
 }

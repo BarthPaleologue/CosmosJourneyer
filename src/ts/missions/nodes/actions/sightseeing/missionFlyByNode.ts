@@ -1,4 +1,4 @@
-import { MissionNode } from "../../missionNode";
+import { MissionNode, MissionNodeSerialized, MissionNodeType } from "../../missionNode";
 import { MissionContext } from "../../../missionContext";
 import { UniverseObjectId } from "../../../../saveFile/universeCoordinates";
 import { SeededStarSystemModel } from "../../../../starSystem/seededStarSystemModel";
@@ -18,6 +18,10 @@ const enum FlyByState {
     TOO_FAR_IN_SYSTEM,
     CLOSE_ENOUGH
 }
+
+export type MissionFlyByNodeSerialized = MissionNodeSerialized & {
+    objectId: UniverseObjectId;
+};
 
 export class MissionFlyByNode implements MissionNode {
     private state: FlyByState = FlyByState.NOT_IN_SYSTEM;
@@ -95,5 +99,13 @@ export class MissionFlyByNode implements MissionNode {
             case FlyByState.CLOSE_ENOUGH:
                 return i18n.t("missions:flyBy:missionCompleted");
         }
+    }
+
+    serialize(): MissionFlyByNodeSerialized {
+        return {
+            type: MissionNodeType.FLY_BY,
+            children: [],
+            objectId: this.objectId
+        };
     }
 }

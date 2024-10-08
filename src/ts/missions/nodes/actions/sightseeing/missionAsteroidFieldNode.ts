@@ -1,4 +1,4 @@
-import { MissionNode } from "../../missionNode";
+import { MissionNode, MissionNodeSerialized, MissionNodeType } from "../../missionNode";
 import { MissionContext } from "../../../missionContext";
 import { UniverseObjectId } from "../../../../saveFile/universeCoordinates";
 import { SeededStarSystemModel } from "../../../../starSystem/seededStarSystemModel";
@@ -19,6 +19,10 @@ const enum AsteroidFieldMissionState {
     TOO_FAR_IN_SYSTEM,
     CLOSE_ENOUGH
 }
+
+export type MissionAsteroidFieldNodeSerialized = MissionNodeSerialized & {
+    objectId: UniverseObjectId;
+};
 
 export class MissionAsteroidFieldNode implements MissionNode {
     private state = AsteroidFieldMissionState.NOT_IN_SYSTEM;
@@ -116,5 +120,13 @@ export class MissionAsteroidFieldNode implements MissionNode {
             case AsteroidFieldMissionState.CLOSE_ENOUGH:
                 return i18n.t("missions:asteroidField:missionCompleted");
         }
+    }
+
+    serialize(): MissionAsteroidFieldNodeSerialized {
+        return {
+            type: MissionNodeType.ASTEROID_FIELD,
+            children: [],
+            objectId: this.objectId
+        };
     }
 }

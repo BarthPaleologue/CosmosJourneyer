@@ -1,4 +1,4 @@
-import { Mission, MissionState } from "./mission";
+import { Mission, MissionSerialized, MissionState, MissionType } from "./mission";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
 import { SystemObjectType, UniverseObjectId, universeObjectIdEquals } from "../saveFile/universeCoordinates";
 import { SystemSeed } from "../utils/systemSeed";
@@ -12,7 +12,7 @@ import { MissionTerminatorLandingNode } from "./nodes/actions/sightseeing/missio
 import { MissionAsteroidFieldNode } from "./nodes/actions/sightseeing/missionAsteroidFieldNode";
 import { Settings } from "../settings";
 import { parseDistance } from "../utils/parseToStrings";
-import { getObjectModelByUniverseId } from "../utils/orbitalObjectId";
+import { getObjectModelByUniverseId, getUniverseIdForSpaceStationModel } from "../utils/orbitalObjectId";
 import i18n from "../i18n";
 
 export const enum SightSeeingType {
@@ -24,6 +24,10 @@ export const enum SightSeeingType {
 export type SightSeeingTarget = {
     type: SightSeeingType;
     objectId: UniverseObjectId;
+};
+
+export type SightSeeingMissionSerialized = MissionSerialized & {
+    target: SightSeeingTarget;
 };
 
 export class SightSeeingMission implements Mission {
@@ -170,5 +174,14 @@ export class SightSeeingMission implements Mission {
 
     async describeNextTask(context: MissionContext): Promise<string> {
         return await this.tree.describeNextTask(context);
+    }
+
+    serialize(): SightSeeingMissionSerialized {
+        return {
+            missionGiver: getUniverseIdForSpaceStationModel(this.missionGiver),
+            type: MissionType.SIGHT_SEEING,
+            target: this.target,
+            tree: this.tree.serialize()
+        };
     }
 }

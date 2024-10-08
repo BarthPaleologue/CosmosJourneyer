@@ -8,6 +8,8 @@ import { SpaceStation } from "../spacestation/spaceStation";
 import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
 import { SystemSeed } from "./systemSeed";
 import { getAnomalyModels, getPlanetaryMassObjectModels, getSpaceStationModels, getStellarObjectModels } from "./getModelsFromSystemModel";
+import { StarSystemModel } from "../starSystem/starSystemModel";
+import { SpaceStationModel } from "../spacestation/spacestationModel";
 
 /**
  * Get the object ID of the given orbital object within the star system.
@@ -90,4 +92,23 @@ export function getObjectModelByUniverseId(universeObjectId: UniverseObjectId): 
         default:
             throw new Error(`Unknown universe object type: ${universeObjectId.objectType}`);
     }
+}
+
+export function getUniverseIdForSpaceStationModel(spaceStationModel: SpaceStationModel): UniverseObjectId {
+    const systemModel = spaceStationModel.starSystem;
+    if(!(systemModel instanceof SeededStarSystemModel)) {
+        throw new Error("Cannot handle non-seeded star system models yet");
+    }
+
+    const spaceStationModels = getSpaceStationModels(systemModel);
+    const index = spaceStationModels.findIndex((model) => model.seed === spaceStationModel.seed);
+    if(index === -1) {
+        throw new Error("Space station model not found in star system");
+    }
+
+    return {
+        objectType: SystemObjectType.SPACE_STATION,
+        index,
+        starSystem: systemModel.seed.serialize()
+    };
 }

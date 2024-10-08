@@ -1,4 +1,4 @@
-import { MissionNode } from "../../missionNode";
+import { MissionNode, MissionNodeSerialized, MissionNodeType } from "../../missionNode";
 import { MissionContext } from "../../../missionContext";
 import { UniverseObjectId } from "../../../../saveFile/universeCoordinates";
 import { SeededStarSystemModel } from "../../../../starSystem/seededStarSystemModel";
@@ -19,6 +19,10 @@ const enum LandMissionState {
     TOO_FAR_IN_SYSTEM,
     LANDED
 }
+
+export type MissionTerminatorLandingNodeSerialized = MissionNodeSerialized & {
+    objectId: UniverseObjectId;
+};
 
 export class MissionTerminatorLandingNode implements MissionNode {
     private state: LandMissionState = LandMissionState.NOT_IN_SYSTEM;
@@ -124,5 +128,13 @@ export class MissionTerminatorLandingNode implements MissionNode {
             case LandMissionState.LANDED:
                 return i18n.t("missions:terminatorLanding:missionCompleted");
         }
+    }
+
+    serialize(): MissionTerminatorLandingNodeSerialized {
+        return {
+            type: MissionNodeType.TERMINATOR_LANDING,
+            children: [],
+            objectId: this.objectId
+        };
     }
 }

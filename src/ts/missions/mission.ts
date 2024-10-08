@@ -1,6 +1,8 @@
 import { SpaceStationModel } from "../spacestation/spacestationModel";
 import { SystemSeed } from "../utils/systemSeed";
 import { MissionContext } from "./missionContext";
+import { UniverseObjectId } from "../saveFile/universeCoordinates";
+import { MissionNodeSerialized } from "./nodes/missionNode";
 
 export const enum MissionState {
     UNKNOWN,
@@ -32,4 +34,16 @@ export interface Mission {
     describe(): string;
 
     describeNextTask(context: MissionContext): Promise<string>;
+
+    serialize(): MissionSerialized;
+}
+
+export const enum MissionType {
+    SIGHT_SEEING,
+}
+
+export type MissionSerialized = {
+    missionGiver: UniverseObjectId;
+    type: MissionType;
+    tree: MissionNodeSerialized;
 }
