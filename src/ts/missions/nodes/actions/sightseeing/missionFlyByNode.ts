@@ -16,7 +16,7 @@ const enum FlyByState {
     CLOSE_ENOUGH
 }
 
-export class MissionSightSeeingFlyByNode implements MissionNode {
+export class MissionFlyByNode implements MissionNode {
     private state: FlyByState = FlyByState.NOT_IN_SYSTEM;
 
     private readonly objectId: UniverseObjectId;

@@ -4,27 +4,25 @@ import { UniverseObjectId } from "../../../../saveFile/universeCoordinates";
 import { SeededStarSystemModel } from "../../../../starSystem/seededStarSystemModel";
 import { SystemSeed } from "../../../../utils/systemSeed";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
-import { CollisionMask, Settings } from "../../../../settings";
+import { clamp } from "../../../../utils/math";
 import { getObjectBySystemId, getObjectModelByUniverseId } from "../../../../utils/orbitalObjectId";
 import { getStarGalacticCoordinates } from "../../../../utils/getStarGalacticCoordinates";
 import i18n from "../../../../i18n";
 import { parseDistance } from "../../../../utils/parseToStrings";
+import { Settings } from "../../../../settings";
 
-const enum LandMissionState {
+const enum AsteroidFieldMissionState {
     NOT_IN_SYSTEM,
     TOO_FAR_IN_SYSTEM,
-    LANDED
+    CLOSE_ENOUGH
 }
 
-export class MissionSightSeeingLandNode implements MissionNode {
-    private state: LandMissionState = LandMissionState.NOT_IN_SYSTEM;
+export class MissionAsteroidFieldNode implements MissionNode {
+    private state = AsteroidFieldMissionState.NOT_IN_SYSTEM;
 
     private readonly objectId: UniverseObjectId;
 
     private readonly targetSystemSeed: SystemSeed;
-
-    private readonly raycastResult = new PhysicsRaycastResult();
 
     constructor(objectId: UniverseObjectId) {
         this.objectId = objectId;
@@ -32,7 +30,7 @@ export class MissionSightSeeingLandNode implements MissionNode {
     }
 
     isCompleted(): boolean {
-        return this.state === LandMissionState.LANDED;
+        return this.state === AsteroidFieldMissionState.CLOSE_ENOUGH;
     }
 
     updateState(context: MissionContext) {
@@ -43,7 +41,7 @@ export class MissionSightSeeingLandNode implements MissionNode {
         if (currentSystemModel instanceof SeededStarSystemModel) {
             // Skip if the current system is not the one we are looking for
             if (!currentSystemModel.seed.equals(this.targetSystemSeed)) {
-                this.state = LandMissionState.NOT_IN_SYSTEM;
+                this.state = AsteroidFieldMissionState.NOT_IN_SYSTEM;
                 return;
             }
         }
@@ -53,32 +51,37 @@ export class MissionSightSeeingLandNode implements MissionNode {
             throw new Error(`Could not find object with ID ${JSON.stringify(this.objectId)}`);
         }
 
-        const playerPosition = context.playerPosition;
-
-        if (Vector3.Distance(playerPosition, targetObject.getTransform().getAbsolutePosition()) > targetObject.getBoundingRadius() + 100e3) {
-            this.state = LandMissionState.TOO_FAR_IN_SYSTEM;
-            return;
+        const celestialBody = currentSystem.celestialBodies.find((body) => body === targetObject);
+        if (celestialBody === undefined) {
+            throw new Error(`Object with ID ${JSON.stringify(this.objectId)} is not a celestial body`);
         }
 
-        const downDirection = targetObject.getTransform().getAbsolutePosition().subtract(playerPosition).normalize();
-
-        context.physicsEngine.raycastToRef(playerPosition, playerPosition.add(downDirection.scale(5)), this.raycastResult, { collideWith: CollisionMask.ENVIRONMENT });
-        if (this.raycastResult.hasHit) {
-            if (this.raycastResult.body?.transformNode.parent !== targetObject.getTransform()) {
-                this.state = LandMissionState.TOO_FAR_IN_SYSTEM;
-                return;
-            }
-
-            const distance = Vector3.Distance(playerPosition, this.raycastResult.hitPointWorld);
-            const distanceThreshold = 10;
-
-            if (distance < distanceThreshold) {
-                this.state = LandMissionState.LANDED;
-                return;
-            }
+        const asteroidField = celestialBody.getAsteroidField();
+        if (asteroidField === null) {
+            throw new Error(`Object with ID ${JSON.stringify(this.objectId)} does not have an asteroid field`);
         }
 
-        this.state = LandMissionState.TOO_FAR_IN_SYSTEM;
+        const playerPositionWorld = context.playerPosition;
+
+        // everything will be computed in local space from here
+        const playerPosition = Vector3.TransformCoordinates(playerPositionWorld, celestialBody.getTransform().getWorldMatrix().clone().invert());
+
+        const projectionOnPlane = new Vector3(playerPosition.x, 0, playerPosition.z);
+        const distanceToCenterOfBodyInPlane = projectionOnPlane.length();
+
+        const clampedLocalPosition = projectionOnPlane.scaleInPlace(
+            clamp(distanceToCenterOfBodyInPlane, asteroidField.minRadius, asteroidField.maxRadius) / distanceToCenterOfBodyInPlane
+        );
+
+        const distance = Vector3.Distance(playerPosition, clampedLocalPosition);
+
+        const distanceThreshold = 1000;
+
+        if (distance < distanceThreshold) {
+            this.state = AsteroidFieldMissionState.CLOSE_ENOUGH;
+        } else {
+            this.state = AsteroidFieldMissionState.TOO_FAR_IN_SYSTEM;
+        }
     }
 
     describeNextTask(context: MissionContext): string {
@@ -95,17 +98,17 @@ export class MissionSightSeeingLandNode implements MissionNode {
         const targetObject = getObjectModelByUniverseId(this.objectId);
 
         switch (this.state) {
-            case LandMissionState.NOT_IN_SYSTEM:
+            case AsteroidFieldMissionState.NOT_IN_SYSTEM:
                 return i18n.t("missions:common:travelToTargetSystem", {
                     systemName: targetSystemModel.name,
                     distance: parseDistance(distance * Settings.LIGHT_YEAR)
                 });
-            case LandMissionState.TOO_FAR_IN_SYSTEM:
+            case AsteroidFieldMissionState.TOO_FAR_IN_SYSTEM:
                 return i18n.t("missions:common:getCloserToTarget", {
                     objectName: targetObject.name
                 });
-            case LandMissionState.LANDED:
-                return i18n.t("missions:terminatorLanding:missionCompleted");
+            case AsteroidFieldMissionState.CLOSE_ENOUGH:
+                return i18n.t("missions:asteroidField:missionCompleted");
         }
     }
 }

@@ -7,9 +7,9 @@ import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MissionNode } from "./nodes/missionNode";
 import { MissionContext } from "./missionContext";
-import { MissionSightSeeingFlyByNode } from "./nodes/actions/sightseeing/missionSightSeeingFlyByNode";
-import { MissionSightSeeingLandNode } from "./nodes/actions/sightseeing/missionSightSeeingLandNode";
-import { MissionSightSeeingAsteroidFieldNode } from "./nodes/actions/sightseeing/missionSightSeeingAsteroidFieldNode";
+import { MissionFlyByNode } from "./nodes/actions/sightseeing/missionFlyByNode";
+import { MissionTerminatorLandingNode } from "./nodes/actions/sightseeing/missionTerminatorLandingNode";
+import { MissionAsteroidFieldNode } from "./nodes/actions/sightseeing/missionAsteroidFieldNode";
 import { Settings } from "../settings";
 import { parseDistance } from "../utils/parseToStrings";
 import { getObjectModelByUniverseId } from "../utils/orbitalObjectId";
@@ -62,11 +62,11 @@ export class SightSeeingMission implements Mission {
     private generateMissionTree(): MissionNode {
         switch (this.target.type) {
             case SightSeeingType.FLY_BY:
-                return new MissionSightSeeingFlyByNode(this.target.objectId);
+                return new MissionFlyByNode(this.target.objectId);
             case SightSeeingType.TERMINATOR_LANDING:
-                return new MissionSightSeeingLandNode(this.target.objectId);
+                return new MissionTerminatorLandingNode(this.target.objectId);
             case SightSeeingType.ASTEROID_FIELD_TREK:
-                return new MissionSightSeeingAsteroidFieldNode(this.target.objectId);
+                return new MissionAsteroidFieldNode(this.target.objectId);
             default:
                 throw new Error(`Unknown sight seeing type: ${this.target.type}`);
         }
