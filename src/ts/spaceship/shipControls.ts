@@ -98,10 +98,26 @@ export class ShipControls implements Controls {
             }
         });
 
-        SpaceShipControlsInputs.map.landing.on("complete", () => {
-            if (this.spaceship.getClosestWalkableObject() !== null) {
-                this.spaceship.engageLanding(null);
+        SpaceShipControlsInputs.map.landing.on("complete", async () => {
+            const keyboardLayout = await getGlobalKeyboardLayoutMap();
+            if(this.spaceship.isWarpDriveEnabled()) {
+                const relevantKeys = pressInteractionToStrings(SpaceShipControlsInputs.map.toggleWarpDrive, keyboardLayout);
+                createNotification(`Cannot land while warp drive is enabled. You can use ${relevantKeys} to toggle your warp drive.`, 5000);
+                return;
             }
+
+            const closestWalkableObject = this.spaceship.getClosestWalkableObject();
+            if (closestWalkableObject === null) return;
+
+            const distance = Vector3.Distance(this.getTransform().getAbsolutePosition(), closestWalkableObject.getTransform().getAbsolutePosition());
+
+            // If the object is too far, don't engage landing
+            if (distance > closestWalkableObject.getBoundingRadius() + 100e3) {
+                createNotification("Too high to land", 2000);
+                return;
+            }
+
+            this.spaceship.engagePlanetaryLanding(null);
         });
 
         SpaceShipControlsInputs.map.emitLandingRequest.on("complete", () => {
@@ -140,8 +156,9 @@ export class ShipControls implements Controls {
             }
         });
 
-        this.spaceship.onLandingEngaged.add(() => {
+        this.spaceship.onPlanetaryLandingEngaged.add(() => {
             createNotification(i18n.t("notifications:landingSequenceEngaged"), 5000);
+            Sounds.EnqueuePlay(Sounds.INITIATING_PLANETARY_LANDING);
         });
 
         this.spaceship.onLandingCancelled.add(() => {

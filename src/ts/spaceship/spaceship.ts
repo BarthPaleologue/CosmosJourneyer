@@ -46,6 +46,7 @@ import { LandingPad } from "../assets/procedural/landingPad/landingPad";
 import { createNotification } from "../utils/notification";
 import { OrbitalObject } from "../architecture/orbitalObject";
 import { CelestialBody } from "../architecture/celestialBody";
+import { BoundingSphere } from "../architecture/boundingSphere";
 
 const enum ShipState {
     FLYING,
@@ -64,7 +65,7 @@ export class Spaceship implements Transformable {
     private mainEngineThrottle = 0;
     private mainEngineTargetSpeed = 0;
 
-    private closestWalkableObject: Transformable | null = null;
+    private closestWalkableObject: (Transformable & BoundingSphere) | null = null;
 
     private landingTarget: Transformable | null = null;
     private readonly raycastResult = new PhysicsRaycastResult();
@@ -93,7 +94,7 @@ export class Spaceship implements Transformable {
     readonly onWarpDriveEnabled = new Observable<void>();
     readonly onWarpDriveDisabled = new Observable<boolean>();
 
-    readonly onLandingEngaged = new Observable<void>();
+    readonly onPlanetaryLandingEngaged = new Observable<void>();
     readonly onLandingObservable = new Observable<void>();
     readonly onLandingCancelled = new Observable<void>();
 
@@ -156,7 +157,7 @@ export class Spaceship implements Transformable {
         this.scene = scene;
     }
 
-    public setClosestWalkableObject(object: Transformable) {
+    public setClosestWalkableObject(object: Transformable & BoundingSphere) {
         this.closestWalkableObject = object;
     }
 
@@ -175,6 +176,10 @@ export class Spaceship implements Transformable {
 
     public setNearestCelestialBody(celestialBody: CelestialBody) {
         this.nearestCelestialBody = celestialBody;
+    }
+
+    public isWarpDriveEnabled() {
+        return this.warpDrive.isEnabled();
     }
 
     public enableWarpDrive() {
@@ -241,11 +246,11 @@ export class Spaceship implements Transformable {
         this.mainEngineThrottle = Math.max(-1, Math.min(1, this.mainEngineThrottle + delta));
     }
 
-    public getClosestWalkableObject(): Transformable | null {
+    public getClosestWalkableObject(): (Transformable & BoundingSphere) | null {
         return this.closestWalkableObject;
     }
 
-    public engageLanding(landingTarget: Transformable | null) {
+    public engagePlanetaryLanding(landingTarget: Transformable | null) {
         console.log("Landing sequence engaged");
         this.aggregate.body.setMotionType(PhysicsMotionType.ANIMATED);
         this.state = ShipState.LANDING;
@@ -254,7 +259,7 @@ export class Spaceship implements Transformable {
             throw new Error("Landing target is null");
         }
 
-        this.onLandingEngaged.notifyObservers();
+        this.onPlanetaryLandingEngaged.notifyObservers();
     }
 
     public engageLandingOnPad(landingPad: LandingPad) {
@@ -570,7 +575,7 @@ export class Spaceship implements Transformable {
         this.onWarpDriveEnabled.clear();
         this.onWarpDriveDisabled.clear();
 
-        this.onLandingEngaged.clear();
+        this.onPlanetaryLandingEngaged.clear();
         this.onLandingObservable.clear();
     }
 }
