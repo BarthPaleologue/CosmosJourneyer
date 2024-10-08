@@ -655,7 +655,7 @@ export class StarSystemView implements View {
             });
             if (mission.isCompleted()) {
                 this.player.balance += mission.getReward();
-                Sounds.MISSION_COMPLETE.play();
+                Sounds.EnqueuePlay(Sounds.MISSION_COMPLETE);
             }
         });
 

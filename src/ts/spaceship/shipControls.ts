@@ -113,7 +113,7 @@ export class ShipControls implements Controls {
                 return;
             }
 
-            Sounds.LANDING_REQUEST_GRANTED.play();
+            Sounds.EnqueuePlay(Sounds.LANDING_REQUEST_GRANTED);
             Sounds.STRAUSS_BLUE_DANUBE.play();
             Sounds.STRAUSS_BLUE_DANUBE.setVolume(1, 1);
             createNotification(`Landing request granted. Proceed to pad ${landingPad.padNumber}`, 30000);
@@ -130,7 +130,7 @@ export class ShipControls implements Controls {
 
         this.spaceship.onLandingObservable.add(async () => {
             const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
-            Sounds.LANDING_COMPLETE.play();
+            Sounds.EnqueuePlay(Sounds.LANDING_COMPLETE);
             Sounds.STRAUSS_BLUE_DANUBE.setVolume(0, 2);
             Sounds.STRAUSS_BLUE_DANUBE.stop(2);
 

@@ -267,6 +267,7 @@ export class CosmosJourneyer {
         this.engine.runRenderLoop(() => {
             updateInputDevices();
             AudioManager.Update(this.engine.getDeltaTime() / 1000);
+            Sounds.Update();
 
             if (this.isPaused()) return;
             this.activeView.render();

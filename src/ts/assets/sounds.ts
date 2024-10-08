@@ -83,6 +83,29 @@ export class Sounds {
 
     public static STRAUSS_BLUE_DANUBE: Sound;
 
+    private static IS_PLAYING = false;
+    private static QUEUE: Sound[] = [];
+
+    public static EnqueuePlay(sound: Sound) {
+        Sounds.QUEUE.push(sound);
+    }
+
+    public static Update() {
+        if (Sounds.IS_PLAYING) return;
+
+        if (Sounds.QUEUE.length === 0) return;
+
+        const sound = Sounds.QUEUE.shift();
+        if (sound === undefined) return;
+
+        Sounds.IS_PLAYING = true;
+        sound.play();
+
+        sound.onEndedObservable.addOnce(() => {
+            Sounds.IS_PLAYING = false;
+        });
+    }
+
     public static EnqueueTasks(manager: AssetsManager, scene: Scene) {
         const ouchSoundTask = manager.addBinaryFileTask("ouchSoundTask", ouchSound);
         ouchSoundTask.onSuccess = (task) => {
