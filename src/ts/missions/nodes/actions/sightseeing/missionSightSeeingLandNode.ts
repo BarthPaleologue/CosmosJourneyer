@@ -55,10 +55,20 @@ export class MissionSightSeeingLandNode implements MissionNode {
 
         const playerPosition = context.playerPosition;
 
+        if (Vector3.Distance(playerPosition, targetObject.getTransform().getAbsolutePosition()) > targetObject.getBoundingRadius() + 100e3) {
+            this.state = LandMissionState.TOO_FAR_IN_SYSTEM;
+            return;
+        }
+
         const downDirection = targetObject.getTransform().getAbsolutePosition().subtract(playerPosition).normalize();
 
         context.physicsEngine.raycastToRef(playerPosition, playerPosition.add(downDirection.scale(5)), this.raycastResult, { collideWith: CollisionMask.ENVIRONMENT });
         if (this.raycastResult.hasHit) {
+            if (this.raycastResult.body?.transformNode.parent !== targetObject.getTransform()) {
+                this.state = LandMissionState.TOO_FAR_IN_SYSTEM;
+                return;
+            }
+
             const distance = Vector3.Distance(playerPosition, this.raycastResult.hitPointWorld);
             const distanceThreshold = 10;
 
