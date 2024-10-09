@@ -23,6 +23,10 @@ export class MissionXorNode implements MissionNode {
         this.hasCompletedLock = this.children.filter((child) => child.isCompleted()).length === 1;
     }
 
+    describe(originSeed: SystemSeed): string {
+        return this.children.map((child) => child.describe(originSeed)).join(" xor ");
+    }
+
     describeNextTask(context: MissionContext): Promise<string> {
         if (this.hasCompletedLock) return Promise.resolve("Mission completed");
         return Promise.resolve(this.children.map((child) => child.describeNextTask(context)).join(" xor "));

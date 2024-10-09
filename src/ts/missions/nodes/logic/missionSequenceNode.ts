@@ -37,6 +37,10 @@ export class MissionSequenceNode implements MissionNode {
         this.activeChildIndex = index;
     }
 
+    describe(originSeed: SystemSeed): string {
+        return this.children.map((child) => child.describe(originSeed)).join(" then ");
+    }
+
     describeNextTask(context: MissionContext): Promise<string> {
         if (this.hasCompletedLock) return Promise.resolve("Mission completed");
         if (this.activeChildIndex >= this.children.length) return Promise.resolve("Mission completed");

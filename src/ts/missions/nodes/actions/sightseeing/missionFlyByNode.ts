@@ -75,6 +75,17 @@ export class MissionFlyByNode implements MissionNode {
         }
     }
 
+    describe(originSeed: SystemSeed): string {
+        const distance = Vector3.Distance(getStarGalacticCoordinates(originSeed), getStarGalacticCoordinates(this.targetSystemSeed));
+        const objectModel = getObjectModelByUniverseId(this.objectId);
+        const systemModel = new SeededStarSystemModel(this.targetSystemSeed);
+        return i18n.t("missions:sightseeing:describeFlyBy", {
+            objectType: objectModel.typeName.toLowerCase(),
+            systemName: systemModel.name,
+            distance: distance > 0 ? parseDistance(distance * Settings.LIGHT_YEAR): i18n.t("missions:common:here")
+        });
+    }
+
     async describeNextTask(context: MissionContext): Promise<string> {
         if (this.isCompleted()) {
             return i18n.t("missions:flyBy:missionCompleted");

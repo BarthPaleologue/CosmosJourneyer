@@ -1,14 +1,14 @@
 import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
 import { getNeighborStarSystems } from "../utils/getNeighborStarSystems";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
-import { newSightSeeingMission, SightSeeingType } from "./sightSeeingMission";
+import { newSightSeeingMission } from "./sightSeeingMission";
 import { uniformRandBool } from "extended-random";
 import { BodyType } from "../architecture/bodyType";
 import { SystemObjectType } from "../saveFile/universeCoordinates";
 import { Player } from "../player/player";
 import { getPlanetaryMassObjectModels } from "../utils/getModelsFromSystemModel";
 import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
-import { Mission } from "./mission";
+import { Mission, MissionType } from "./mission";
 
 export function generateSightseeingMissions(spaceStationModel: SpaceStationModel, player: Player, timestampMillis: number): Mission[] {
     const hours = Math.floor(timestampMillis / 1000 / 60 / 60);
@@ -29,7 +29,7 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
             if (!uniformRandBool(1.0 / (1.0 + 0.4 * distance), systemModel.rng, 6254 + anomalyIndex + hours)) return;
             anomalyFlyByMissions.push(
                 newSightSeeingMission(spaceStationModel, {
-                    type: SightSeeingType.FLY_BY,
+                    type: MissionType.SIGHT_SEEING_FLY_BY,
                     objectId: {
                         starSystem: systemSeed.serialize(),
                         objectType: SystemObjectType.ANOMALY,
@@ -43,7 +43,7 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
             if (bodyType === BodyType.NEUTRON_STAR) {
                 neutronStarFlyByMissions.push(
                     newSightSeeingMission(spaceStationModel, {
-                        type: SightSeeingType.FLY_BY,
+                        type: MissionType.SIGHT_SEEING_FLY_BY,
                         objectId: {
                             starSystem: systemSeed.serialize(),
                             objectType: SystemObjectType.STELLAR_OBJECT,
@@ -55,7 +55,7 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
             if (bodyType === BodyType.BLACK_HOLE) {
                 blackHoleFlyByMissions.push(
                     newSightSeeingMission(spaceStationModel, {
-                        type: SightSeeingType.FLY_BY,
+                        type: MissionType.SIGHT_SEEING_FLY_BY,
                         objectId: {
                             starSystem: systemSeed.serialize(),
                             objectType: SystemObjectType.STELLAR_OBJECT,
@@ -76,7 +76,7 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
         if (celestialBodyModel.rings !== null) {
             asteroidFieldMissions.push(
                 newSightSeeingMission(spaceStationModel, {
-                    type: SightSeeingType.ASTEROID_FIELD_TREK,
+                    type: MissionType.SIGHT_SEEING_ASTEROID_FIELD,
                     objectId: {
                         starSystem: currentSystemModel.seed.serialize(),
                         objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
@@ -91,7 +91,7 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
             if (!telluricPlanetModel.hasLiquidWater() && !telluricPlanetModel.isMoon()) {
                 terminatorLandingMissions.push(
                     newSightSeeingMission(spaceStationModel, {
-                        type: SightSeeingType.TERMINATOR_LANDING,
+                        type: MissionType.SIGHT_SEEING_TERMINATOR_LANDING,
                         objectId: {
                             starSystem: currentSystemModel.seed.serialize(),
                             objectType: SystemObjectType.PLANETARY_MASS_OBJECT,

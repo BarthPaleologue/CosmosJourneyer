@@ -104,6 +104,17 @@ export class MissionTerminatorLandingNode implements MissionNode {
         this.state = LandMissionState.TOO_FAR_IN_SYSTEM;
     }
 
+    describe(originSeed: SystemSeed): string {
+        const distance = Vector3.Distance(getStarGalacticCoordinates(originSeed), getStarGalacticCoordinates(this.targetSystemSeed));
+        const objectModel = getObjectModelByUniverseId(this.objectId);
+        const systemModel = new SeededStarSystemModel(this.targetSystemSeed);
+        return i18n.t("missions:sightseeing:describeTerminatorLanding", {
+            objectName: objectModel.name,
+            systemName: systemModel.name,
+            distance: distance > 0 ? parseDistance(distance * Settings.LIGHT_YEAR): i18n.t("missions:common:here")
+        });
+    }
+
     async describeNextTask(context: MissionContext): Promise<string> {
         if (this.isCompleted()) {
             return i18n.t("missions:terminatorLanding:missionCompleted");

@@ -5,6 +5,7 @@ import { SystemSeed } from "../utils/systemSeed";
 import { getUniverseIdForSpaceStationModel } from "../utils/orbitalObjectId";
 import i18n from "../i18n";
 import { UniverseObjectId } from "../saveFile/universeCoordinates";
+import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
 
 export const enum MissionType {
     SIGHT_SEEING_FLY_BY,
@@ -69,7 +70,13 @@ export class Mission implements Mission {
     }
 
     describe(): string {
-        return "";
+        const originSystem = this.missionGiver.starSystem;
+        if(!(originSystem instanceof SeededStarSystemModel)) {
+            throw new Error("Mission giver is not in a seeded star system");
+        }
+        const originSeed = originSystem.seed;
+
+        return this.tree.describe(originSeed);
     }
 
     isCompleted(): boolean {
