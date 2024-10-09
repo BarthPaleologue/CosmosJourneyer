@@ -32,7 +32,7 @@ import { StarSystemModel } from "../../starSystem/starSystemModel";
 import i18n from "../../i18n";
 import { OrbitalObjectModel } from "../../architecture/orbitalObject";
 
-export class JuliaSetModel implements OrbitalObjectModel {
+export class JuliaSetModel implements CelestialBodyModel {
     readonly name: string;
 
     readonly bodyType = BodyType.ANOMALY;
@@ -54,6 +54,8 @@ export class JuliaSetModel implements OrbitalObjectModel {
     readonly accentColor: Color3;
 
     readonly starSystem: StarSystemModel;
+
+    readonly rings = null;
 
     readonly typeName: string;
 

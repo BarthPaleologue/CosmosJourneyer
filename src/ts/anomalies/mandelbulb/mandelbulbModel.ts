@@ -32,7 +32,7 @@ import { StarSystemModel } from "../../starSystem/starSystemModel";
 import i18n from "../../i18n";
 import { OrbitalObjectModel } from "../../architecture/orbitalObject";
 
-export class MandelbulbModel implements OrbitalObjectModel {
+export class MandelbulbModel implements CelestialBodyModel {
     readonly name;
 
     readonly bodyType = BodyType.ANOMALY;
@@ -55,6 +55,8 @@ export class MandelbulbModel implements OrbitalObjectModel {
     readonly accentColor: Color3;
 
     readonly starSystemModel: StarSystemModel;
+
+    readonly rings = null;
 
     readonly typeName: string;
 

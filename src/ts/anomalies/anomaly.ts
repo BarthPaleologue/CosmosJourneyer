@@ -1,6 +1,6 @@
 import { AnomalyType } from "./anomalyType";
-import { OrbitalObject } from "../architecture/orbitalObject";
+import { CelestialBody } from "../architecture/celestialBody";
 
-export interface Anomaly extends OrbitalObject {
+export interface Anomaly extends CelestialBody {
     readonly anomalyType: AnomalyType;
 }
