@@ -283,14 +283,13 @@ export class StarSystemView implements View {
             });
 
             const systemSeed = target.seed;
-            this.isLoadingSystem = true;
             await this.loadStarSystemFromSeed(systemSeed);
             this.initStarSystem();
 
             this.spaceshipControls?.spaceship.hyperSpaceTunnel.setEnabled(false);
             this.spaceshipControls?.spaceship.warpTunnel.getTransform().setEnabled(true);
             this.spaceshipControls?.spaceship.hyperSpaceSound.setTargetVolume(0);
-            this.isLoadingSystem = false;
+
             AudioManager.SetMask(AudioMasks.STAR_SYSTEM_VIEW);
             observer.remove();
             this.jumpLock = false;
@@ -412,6 +411,11 @@ export class StarSystemView implements View {
      * @param timeOut
      */
     public async loadStarSystem(starSystem: StarSystemController, needsGenerating = true, timeOut = 700) {
+        if(this.isLoadingSystem) {
+            throw new Error("Cannot load a new star system while the current one is loading");
+        }
+        this.isLoadingSystem = true;
+
         if (this.starSystem !== null) {
             this.spaceshipControls?.setClosestLandableFacility(null);
             this.characterControls?.setClosestWalkableObject(null);
@@ -576,6 +580,8 @@ export class StarSystemView implements View {
 
         this.onInitStarSystem.notifyObservers();
         this.scene.getEngine().loadingScreen.hideLoadingUI();
+
+        this.isLoadingSystem = false;
     }
 
     /**
