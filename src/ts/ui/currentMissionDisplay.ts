@@ -56,13 +56,20 @@ export class CurrentMissionDisplay {
 
         if (this.activeMission === null) return;
 
-        const descriptionBlock = this.rootNode.querySelector<HTMLParagraphElement>(".missionPanel p");
-        if (descriptionBlock === null) {
-            throw new Error("Could not find description block in mission panel");
+        const missionPanel = this.rootNode.querySelector<HTMLDivElement>(".missionPanel");
+        if (missionPanel === null) {
+            throw new Error("Could not find mission panel");
         }
-        const newDescriptionText = await this.activeMission.describeNextTask(context);
-        if (newDescriptionText === descriptionBlock.innerText) return;
-        descriptionBlock.innerText = newDescriptionText;
+        missionPanel.classList.toggle("completed", this.activeMission.tree.isCompleted());
+
+        const descriptionBlocks = this.rootNode.querySelectorAll<HTMLParagraphElement>(".missionPanel p");
+        const descriptionBlock = descriptionBlocks[0];
+        const newDescriptionText = this.activeMission.describe();
+        if (newDescriptionText !== descriptionBlock.innerText) descriptionBlock.innerText = newDescriptionText;
+
+        const nextTaskBlock = descriptionBlocks[1];
+        const nextTaskText = await this.activeMission.describeNextTask(context);
+        if (nextTaskText !== nextTaskBlock.innerText) nextTaskBlock.innerText = nextTaskText;
     }
 
     public setNextMission() {
@@ -72,7 +79,7 @@ export class CurrentMissionDisplay {
 
         const allMissions = this.player.completedMissions.concat(this.player.currentMissions);
         const currentMissionIndex = allMissions.indexOf(this.activeMission);
-        if(currentMissionIndex === -1) {
+        if (currentMissionIndex === -1) {
             throw new Error("Could not find current mission in all missions");
         }
 
@@ -91,7 +98,7 @@ export class CurrentMissionDisplay {
 
         const allMissions = this.player.completedMissions.concat(this.player.currentMissions);
         const currentMissionIndex = allMissions.indexOf(this.activeMission);
-        if(currentMissionIndex === -1) {
+        if (currentMissionIndex === -1) {
             throw new Error("Could not find current mission in all missions");
         }
 
@@ -116,6 +123,9 @@ export class CurrentMissionDisplay {
         const missionDescription = document.createElement("p");
         missionDescription.innerText = mission.describe();
         missionPanel.appendChild(missionDescription);
+
+        const missionNextTask = document.createElement("p");
+        missionPanel.appendChild(missionNextTask);
 
         this.rootNode.innerHTML = "";
         this.rootNode.appendChild(missionPanel);

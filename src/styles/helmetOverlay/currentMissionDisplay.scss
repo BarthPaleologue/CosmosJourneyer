@@ -26,6 +26,13 @@
     display: flex;
     flex-direction: column;
     padding: 20px;
+
+    transition: $transition-time;
+
+    &.completed {
+        background: rgba(0, 64, 0, 0.5);
+    }
+
     h2 {
       color: white;
     }
