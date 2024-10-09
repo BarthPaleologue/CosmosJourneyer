@@ -20,8 +20,6 @@ import { Mission } from "../missions/mission";
 import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
 import { MissionContext } from "../missions/missionContext";
 import { pressInteractionToStrings } from "../utils/inputControlsString";
-import { TutorialControlsInputs } from "./tutorial/tutorialLayerInputs";
-import { GeneralInputs } from "../inputs/generalInputs";
 import { Sounds } from "../assets/sounds";
 
 export class CurrentMissionDisplay {
