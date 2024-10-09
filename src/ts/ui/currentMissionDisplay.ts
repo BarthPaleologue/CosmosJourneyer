@@ -107,7 +107,9 @@ export class CurrentMissionDisplay {
 
     public async update(context: MissionContext) {
         const allMissions = this.player.completedMissions.concat(this.player.currentMissions);
-        if (this.activeMission === null && allMissions.length !== 0) {
+        if (this.activeMission === null && this.player.currentMissions.length !== 0) {
+            this.setMission(this.player.currentMissions[0]);
+        } else if (this.activeMission === null && allMissions.length !== 0) {
             this.setMission(allMissions[0]);
         }
 
