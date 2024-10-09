@@ -19,9 +19,19 @@ import { Player } from "../player/player";
 import { Mission } from "../missions/mission";
 import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
 import { MissionContext } from "../missions/missionContext";
+import { pressInteractionToStrings } from "../utils/inputControlsString";
+import { TutorialControlsInputs } from "./tutorial/tutorialLayerInputs";
+import { GeneralInputs } from "../inputs/generalInputs";
 
 export class CurrentMissionDisplay {
     readonly rootNode: HTMLElement;
+
+    private readonly missionPanel: HTMLElement;
+
+    private readonly buttonContainer: HTMLElement;
+
+    private readonly previousMissionButton: HTMLElement;
+    private readonly nextMissionButton: HTMLElement;
 
     private activeMission: Mission | null = null;
 
@@ -32,6 +42,42 @@ export class CurrentMissionDisplay {
 
         this.rootNode = document.createElement("div");
         this.rootNode.classList.add("currentMissionDisplay");
+
+        this.missionPanel = document.createElement("div");
+        this.missionPanel.classList.add("missionPanel");
+        this.rootNode.appendChild(this.missionPanel);
+
+        this.buttonContainer = document.createElement("div");
+        this.buttonContainer.classList.add("buttonContainer");
+        this.rootNode.appendChild(this.buttonContainer);
+
+        this.previousMissionButton = document.createElement("p");
+        this.buttonContainer.appendChild(this.previousMissionButton);
+
+        const previousSpan = document.createElement("span");
+        previousSpan.innerText = "Previous";
+        this.previousMissionButton.appendChild(previousSpan);
+
+        pressInteractionToStrings(SpaceShipControlsInputs.map.previousMission, null).forEach((key) => {
+            const previousKeySpan = document.createElement("span");
+            previousKeySpan.classList.add("keySpan");
+            previousKeySpan.innerText = key;
+            this.previousMissionButton.appendChild(previousKeySpan);
+        });
+
+        this.nextMissionButton = document.createElement("p");
+        this.buttonContainer.appendChild(this.nextMissionButton);
+
+        const nextSpan = document.createElement("span");
+        nextSpan.innerText = "Next";
+        this.nextMissionButton.appendChild(nextSpan);
+
+        pressInteractionToStrings(SpaceShipControlsInputs.map.nextMission, null).forEach((key) => {
+            const nextKeySpan = document.createElement("span");
+            nextKeySpan.classList.add("keySpan");
+            nextKeySpan.innerText = key;
+            this.nextMissionButton.appendChild(nextKeySpan);
+        });
 
         if (this.player.currentMissions.length === 0) {
             this.setNoMissionActive();
@@ -56,11 +102,7 @@ export class CurrentMissionDisplay {
 
         if (this.activeMission === null) return;
 
-        const missionPanel = this.rootNode.querySelector<HTMLDivElement>(".missionPanel");
-        if (missionPanel === null) {
-            throw new Error("Could not find mission panel");
-        }
-        missionPanel.classList.toggle("completed", this.activeMission.tree.isCompleted());
+        this.rootNode.classList.toggle("completed", this.activeMission.tree.isCompleted());
 
         const descriptionBlocks = this.rootNode.querySelectorAll<HTMLParagraphElement>(".missionPanel p");
         const descriptionBlock = descriptionBlocks[0];
@@ -102,6 +144,8 @@ export class CurrentMissionDisplay {
             throw new Error("Could not find current mission in all missions");
         }
 
+        if (currentMissionIndex === 0) return;
+
         const previousMission = allMissions.at(currentMissionIndex - 1);
         if (previousMission === undefined) {
             return;
@@ -113,37 +157,29 @@ export class CurrentMissionDisplay {
     private setMission(mission: Mission) {
         this.activeMission = mission;
 
-        const missionPanel = document.createElement("div");
-        missionPanel.classList.add("missionPanel");
+        this.missionPanel.innerHTML = "";
 
         const missionTitle = document.createElement("h2");
         missionTitle.innerText = mission.getTypeString();
-        missionPanel.appendChild(missionTitle);
+        this.missionPanel.appendChild(missionTitle);
 
         const missionDescription = document.createElement("p");
         missionDescription.innerText = mission.describe();
-        missionPanel.appendChild(missionDescription);
+        this.missionPanel.appendChild(missionDescription);
 
         const missionNextTask = document.createElement("p");
-        missionPanel.appendChild(missionNextTask);
-
-        this.rootNode.innerHTML = "";
-        this.rootNode.appendChild(missionPanel);
+        this.missionPanel.appendChild(missionNextTask);
     }
 
     private setNoMissionActive() {
-        const defaultPanel = document.createElement("div");
-        defaultPanel.classList.add("missionPanel");
+        this.missionPanel.innerHTML = "";
 
         const defaultPanelH2 = document.createElement("h2");
         defaultPanelH2.innerText = "You don't have any active mission yet";
-        defaultPanel.appendChild(defaultPanelH2);
+        this.missionPanel.appendChild(defaultPanelH2);
 
         const defaultPanelP = document.createElement("p");
         defaultPanelP.innerText = "You can get missions at space stations.";
-        defaultPanel.appendChild(defaultPanelP);
-
-        this.rootNode.innerHTML = "";
-        this.rootNode.appendChild(defaultPanel);
+        this.missionPanel.appendChild(defaultPanelP);
     }
 }
