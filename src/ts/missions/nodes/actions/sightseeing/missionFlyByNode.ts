@@ -1,6 +1,6 @@
 import { MissionNode, MissionNodeSerialized, MissionNodeType } from "../../missionNode";
 import { MissionContext } from "../../../missionContext";
-import { UniverseObjectId } from "../../../../saveFile/universeCoordinates";
+import { UniverseObjectId, universeObjectIdEquals } from "../../../../saveFile/universeCoordinates";
 import { SeededStarSystemModel } from "../../../../starSystem/seededStarSystemModel";
 import { SystemSeed } from "../../../../utils/systemSeed";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -44,6 +44,11 @@ export class MissionFlyByNode implements MissionNode {
         return this.state === FlyByState.CLOSE_ENOUGH;
     }
 
+    equals(other: MissionNode): boolean {
+        if (!(other instanceof MissionFlyByNode)) return false;
+        return universeObjectIdEquals(this.objectId, other.objectId);
+    }
+
     updateState(context: MissionContext) {
         if (this.isCompleted()) return;
 
@@ -82,7 +87,7 @@ export class MissionFlyByNode implements MissionNode {
         return i18n.t("missions:sightseeing:describeFlyBy", {
             objectType: objectModel.typeName.toLowerCase(),
             systemName: systemModel.name,
-            distance: distance > 0 ? parseDistance(distance * Settings.LIGHT_YEAR): i18n.t("missions:common:here")
+            distance: distance > 0 ? parseDistance(distance * Settings.LIGHT_YEAR) : i18n.t("missions:common:here")
         });
     }
 

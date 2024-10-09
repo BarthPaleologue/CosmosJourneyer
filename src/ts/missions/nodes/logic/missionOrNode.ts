@@ -6,7 +6,7 @@ import { SystemSeed } from "../../../utils/systemSeed";
 export type MissionOrNodeSerialized = MissionNodeSerialized;
 
 export class MissionOrNode implements MissionNode {
-    public children: MissionNode[];
+    readonly children: MissionNode[];
 
     private hasCompletedLock = false;
 
@@ -16,6 +16,15 @@ export class MissionOrNode implements MissionNode {
 
     isCompleted(): boolean {
         return this.hasCompletedLock;
+    }
+
+    equals(other: MissionNode): boolean {
+        if (!(other instanceof MissionOrNode)) return false;
+        if (this.children.length !== other.children.length) return false;
+        for (let i = 0; i < this.children.length; i++) {
+            if (!this.children[i].equals(other.children[i])) return false;
+        }
+        return true;
     }
 
     updateState(context: MissionContext) {

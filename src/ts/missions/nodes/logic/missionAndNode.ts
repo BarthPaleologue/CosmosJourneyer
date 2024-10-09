@@ -6,7 +6,7 @@ import i18n from "../../../i18n";
 export type MissionAndNodeSerialized = MissionNodeSerialized;
 
 export class MissionAndNode implements MissionNode {
-    public children: MissionNode[];
+    readonly children: MissionNode[];
 
     private hasCompletedLock = false;
 
@@ -16,6 +16,15 @@ export class MissionAndNode implements MissionNode {
 
     isCompleted(): boolean {
         return this.hasCompletedLock;
+    }
+
+    equals(other: MissionNode): boolean {
+        if (!(other instanceof MissionAndNode)) return false;
+        if (this.children.length !== other.children.length) return false;
+        for (let i = 0; i < this.children.length; i++) {
+            if (!this.children[i].equals(other.children[i])) return false;
+        }
+        return true;
     }
 
     updateState(context: MissionContext) {

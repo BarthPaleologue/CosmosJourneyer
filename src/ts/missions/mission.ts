@@ -20,14 +20,14 @@ export type MissionSerialized = {
     reward: number;
 };
 
-export class Mission implements Mission {
-    private readonly tree: MissionNode;
+export class Mission {
+    readonly tree: MissionNode;
 
-    private readonly reward: number;
+    readonly reward: number;
 
-    private readonly missionGiver: SpaceStationModel;
+    readonly missionGiver: SpaceStationModel;
 
-    private readonly missionType: MissionType;
+    readonly missionType: MissionType;
 
     constructor(tree: MissionNode, reward: number, missionGiver: SpaceStationModel, missionType: MissionType) {
         this.tree = tree;
@@ -41,11 +41,7 @@ export class Mission implements Mission {
     }
 
     equals(other: Mission): boolean {
-        return false;
-    }
-
-    getMissionGiver(): SpaceStationModel {
-        return this.missionGiver;
+        return this.tree.equals(other.tree);
     }
 
     getReward(): number {

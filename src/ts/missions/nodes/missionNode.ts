@@ -6,6 +6,8 @@ export interface MissionNode {
 
     updateState(context: MissionContext): void;
 
+    equals(other: MissionNode): boolean;
+
     describe(originSeed: SystemSeed): string;
 
     describeNextTask(context: MissionContext): Promise<string>;
