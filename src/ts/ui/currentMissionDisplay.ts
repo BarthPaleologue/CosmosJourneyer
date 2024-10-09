@@ -22,6 +22,7 @@ import { MissionContext } from "../missions/missionContext";
 import { pressInteractionToStrings } from "../utils/inputControlsString";
 import { TutorialControlsInputs } from "./tutorial/tutorialLayerInputs";
 import { GeneralInputs } from "../inputs/generalInputs";
+import { Sounds } from "../assets/sounds";
 
 export class CurrentMissionDisplay {
     readonly rootNode: HTMLElement;
@@ -91,6 +92,7 @@ export class CurrentMissionDisplay {
                 duration: 200,
                 easing: "ease"
             });
+            Sounds.MENU_SELECT_SOUND.play();
         });
 
         SpaceShipControlsInputs.map.nextMission.on("complete", () => {
@@ -99,6 +101,7 @@ export class CurrentMissionDisplay {
                 duration: 200,
                 easing: "ease"
             });
+            Sounds.MENU_SELECT_SOUND.play();
         });
     }
 
