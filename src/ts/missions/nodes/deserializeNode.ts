@@ -47,13 +47,19 @@ export function deserializeMissionSequenceNode(serialized: MissionSequenceNodeSe
 }
 
 export function deserializeMissionAsteroidFieldNode(serialized: MissionAsteroidFieldNodeSerialized): MissionAsteroidFieldNode {
-    return new MissionAsteroidFieldNode(serialized.objectId);
+    const missionNode = new MissionAsteroidFieldNode(serialized.objectId);
+    missionNode.setState(serialized.state);
+    return missionNode;
 }
 
 export function deserializeMissionFlyByNode(serialized: MissionFlyByNodeSerialized): MissionFlyByNode {
-    return new MissionFlyByNode(serialized.objectId);
+    const missionNode = new MissionFlyByNode(serialized.objectId);
+    missionNode.setState(serialized.state);
+    return missionNode;
 }
 
 export function deserializeMissionTerminatorLandingNode(serialized: MissionTerminatorLandingNodeSerialized): MissionTerminatorLandingNode {
-    return new MissionTerminatorLandingNode(serialized.objectId);
+    const missionNode = new MissionTerminatorLandingNode(serialized.objectId);
+    missionNode.setState(serialized.state);
+    return missionNode;
 }

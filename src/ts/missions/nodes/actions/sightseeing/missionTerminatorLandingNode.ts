@@ -22,6 +22,7 @@ const enum LandMissionState {
 
 export type MissionTerminatorLandingNodeSerialized = MissionNodeSerialized & {
     objectId: UniverseObjectId;
+    state: LandMissionState;
 };
 
 export class MissionTerminatorLandingNode implements MissionNode {
@@ -36,6 +37,10 @@ export class MissionTerminatorLandingNode implements MissionNode {
     constructor(objectId: UniverseObjectId) {
         this.objectId = objectId;
         this.targetSystemSeed = new SystemSeed(objectId.starSystem.starSectorX, objectId.starSystem.starSectorY, objectId.starSystem.starSectorZ, objectId.starSystem.index);
+    }
+
+    setState(state: LandMissionState) {
+        this.state = state;
     }
 
     isCompleted(): boolean {
@@ -100,6 +105,10 @@ export class MissionTerminatorLandingNode implements MissionNode {
     }
 
     async describeNextTask(context: MissionContext): Promise<string> {
+        if (this.isCompleted()) {
+            return i18n.t("missions:terminatorLanding:missionCompleted");
+        }
+
         const targetSystemModel = new SeededStarSystemModel(this.targetSystemSeed);
         const currentSystemModel = context.currentSystem.model;
         if (!(currentSystemModel instanceof SeededStarSystemModel)) {
@@ -130,11 +139,16 @@ export class MissionTerminatorLandingNode implements MissionNode {
         }
     }
 
+    getTargetSystems(): SystemSeed[] {
+        return [this.targetSystemSeed];
+    }
+
     serialize(): MissionTerminatorLandingNodeSerialized {
         return {
             type: MissionNodeType.TERMINATOR_LANDING,
             children: [],
-            objectId: this.objectId
+            objectId: this.objectId,
+            state: this.state
         };
     }
 }

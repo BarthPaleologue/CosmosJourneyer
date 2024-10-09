@@ -1,18 +1,17 @@
-import { Mission, MissionSerialized, MissionState, MissionType } from "./mission";
+import { Mission, MissionType } from "./mission";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
-import { SystemObjectType, UniverseObjectId, universeObjectIdEquals } from "../saveFile/universeCoordinates";
+import { SystemObjectType, UniverseObjectId } from "../saveFile/universeCoordinates";
 import { SystemSeed } from "../utils/systemSeed";
 import { getStarGalacticCoordinates } from "../utils/getStarGalacticCoordinates";
 import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MissionNode } from "./nodes/missionNode";
-import { MissionContext } from "./missionContext";
 import { MissionFlyByNode } from "./nodes/actions/sightseeing/missionFlyByNode";
 import { MissionTerminatorLandingNode } from "./nodes/actions/sightseeing/missionTerminatorLandingNode";
 import { MissionAsteroidFieldNode } from "./nodes/actions/sightseeing/missionAsteroidFieldNode";
 import { Settings } from "../settings";
 import { parseDistance } from "../utils/parseToStrings";
-import { getObjectModelByUniverseId, getUniverseIdForSpaceStationModel } from "../utils/orbitalObjectId";
+import { getObjectModelByUniverseId } from "../utils/orbitalObjectId";
 import i18n from "../i18n";
 
 export const enum SightSeeingType {
@@ -21,167 +20,94 @@ export const enum SightSeeingType {
     ASTEROID_FIELD_TREK
 }
 
+function sightSeeingTypeToMissionType(type: SightSeeingType) {
+    switch (type) {
+        case SightSeeingType.FLY_BY:
+            return MissionType.SIGHT_SEEING_FLY_BY;
+        case SightSeeingType.TERMINATOR_LANDING:
+            return MissionType.SIGHT_SEEING_TERMINATOR_LANDING;
+        case SightSeeingType.ASTEROID_FIELD_TREK:
+            return MissionType.SIGHT_SEEING_ASTEROID_FIELD;
+    }
+}
+
 export type SightSeeingTarget = {
     type: SightSeeingType;
     objectId: UniverseObjectId;
 };
 
-export type SightSeeingMissionSerialized = MissionSerialized & {
-    target: SightSeeingTarget;
-};
+function generateMissionTree(target: SightSeeingTarget): MissionNode {
+    switch (target.type) {
+        case SightSeeingType.FLY_BY:
+            return new MissionFlyByNode(target.objectId);
+        case SightSeeingType.TERMINATOR_LANDING:
+            return new MissionTerminatorLandingNode(target.objectId);
+        case SightSeeingType.ASTEROID_FIELD_TREK:
+            return new MissionAsteroidFieldNode(target.objectId);
+        default:
+            throw new Error(`Unknown sight seeing type: ${target.type}`);
+    }
+}
 
-export class SightSeeingMission implements Mission {
-    private readonly missionGiver: SpaceStationModel;
-    private readonly target: SightSeeingTarget;
+function getDescribeString(originSeed: SystemSeed, target: SightSeeingTarget): string {
+    const missionGiverGalacticCoordinates = getStarGalacticCoordinates(originSeed);
+    const systemSeed = SystemSeed.Deserialize(target.objectId.starSystem);
+    const systemGalacticPosition = getStarGalacticCoordinates(systemSeed);
+    const distance = Vector3.Distance(missionGiverGalacticCoordinates, systemGalacticPosition);
+    const systemModel = new SeededStarSystemModel(systemSeed);
 
-    private readonly targetSystem: SystemSeed;
+    const targetModel = getObjectModelByUniverseId(target.objectId);
+    const targetModelTypeString = targetModel.typeName.toLowerCase();
+    const targetModelNameString = targetModel.name;
 
-    private readonly reward: number;
-
-    private hasCompletedLock = false;
-
-    private tree: MissionNode;
-
-    private state: MissionState = MissionState.UNKNOWN;
-
-    constructor(missionGiver: SpaceStationModel, target: SightSeeingTarget) {
-        this.missionGiver = missionGiver;
-        this.target = target;
-
-        this.targetSystem = SystemSeed.Deserialize(target.objectId.starSystem);
-
-        const missionGiverGalacticCoordinates = getStarGalacticCoordinates((missionGiver.starSystem as SeededStarSystemModel).seed);
-
-        const targetGalacticCoordinates = getStarGalacticCoordinates(this.targetSystem);
-        const distanceLY = Vector3.Distance(missionGiverGalacticCoordinates, targetGalacticCoordinates);
-
-        this.reward = Math.max(5_000, 1000 * Math.ceil(distanceLY));
-        if (target.objectId.objectType === SystemObjectType.STELLAR_OBJECT) {
-            this.reward *= 1.5;
-        }
-
-        this.tree = this.generateMissionTree();
+    let describeString: string;
+    switch (target.type) {
+        case SightSeeingType.FLY_BY:
+            describeString = i18n.t("missions:sightseeing:describeFlyBy", {
+                objectType: targetModelTypeString,
+                systemName: systemModel.name
+            });
+            break;
+        case SightSeeingType.TERMINATOR_LANDING:
+            describeString = i18n.t("missions:sightseeing:describeTerminatorLanding", {
+                objectName: targetModelNameString,
+                systemName: systemModel.name
+            });
+            break;
+        case SightSeeingType.ASTEROID_FIELD_TREK:
+            describeString = i18n.t("missions:sightseeing:describeAsteroidFieldTrek", {
+                objectName: targetModelNameString,
+                systemName: systemModel.name
+            });
+            break;
+        default:
+            throw new Error(`Unknown sight seeing type: ${target.type}`);
     }
 
-    private generateMissionTree(): MissionNode {
-        switch (this.target.type) {
-            case SightSeeingType.FLY_BY:
-                return new MissionFlyByNode(this.target.objectId);
-            case SightSeeingType.TERMINATOR_LANDING:
-                return new MissionTerminatorLandingNode(this.target.objectId);
-            case SightSeeingType.ASTEROID_FIELD_TREK:
-                return new MissionAsteroidFieldNode(this.target.objectId);
-            default:
-                throw new Error(`Unknown sight seeing type: ${this.target.type}`);
-        }
+    let resultString = `${describeString}`;
+    if (distance > 0) {
+        resultString += ` (${parseDistance(distance * Settings.LIGHT_YEAR)})`;
+    } else {
+        resultString += ` (${i18n.t("missions:common:here")})`;
     }
 
-    getTargetSystems(): SystemSeed[] {
-        return [this.targetSystem];
+    return resultString;
+}
+
+export function newSightSeeingMission(missionGiver: SpaceStationModel, target: SightSeeingTarget): Mission {
+    const missionTree = generateMissionTree(target);
+
+    const targetSystem = SystemSeed.Deserialize(target.objectId.starSystem);
+
+    const missionGiverGalacticCoordinates = getStarGalacticCoordinates((missionGiver.starSystem as SeededStarSystemModel).seed);
+
+    const targetGalacticCoordinates = getStarGalacticCoordinates(targetSystem);
+    const distanceLY = Vector3.Distance(missionGiverGalacticCoordinates, targetGalacticCoordinates);
+
+    let reward = Math.max(5_000, 1000 * Math.ceil(distanceLY));
+    if (target.objectId.objectType === SystemObjectType.STELLAR_OBJECT) {
+        reward *= 1.5;
     }
 
-    getReward(): number {
-        return this.reward;
-    }
-
-    getMissionGiver(): SpaceStationModel {
-        return this.missionGiver;
-    }
-
-    isCompleted(): boolean {
-        if (this.hasCompletedLock) return true;
-        this.hasCompletedLock = this.tree.isCompleted();
-        return this.hasCompletedLock;
-    }
-
-    setState(state: MissionState) {
-        this.state = state;
-    }
-
-    getState(): MissionState {
-        return MissionState.UNKNOWN;
-    }
-
-    equals(other: Mission): boolean {
-        if (other instanceof SightSeeingMission) {
-            return universeObjectIdEquals(this.target.objectId, other.target.objectId) && this.target.type === other.target.type;
-        }
-        return false;
-    }
-
-    update(context: MissionContext): void {
-        if (this.isCompleted()) return;
-        this.tree.updateState(context);
-    }
-
-    getTypeString(): string {
-        switch (this.target.type) {
-            case SightSeeingType.FLY_BY:
-                return i18n.t("missions:sightseeing:flyBy");
-            case SightSeeingType.TERMINATOR_LANDING:
-                return i18n.t("missions:sightseeing:terminatorLanding");
-            case SightSeeingType.ASTEROID_FIELD_TREK:
-                return i18n.t("missions:sightseeing:asteroidFieldTrek");
-            default:
-                throw new Error(`Unknown sight seeing type: ${this.target.type}`);
-        }
-    }
-
-    describe(): string {
-        const missionGiverGalacticCoordinates = getStarGalacticCoordinates((this.missionGiver.starSystem as SeededStarSystemModel).seed);
-        const systemSeed = SystemSeed.Deserialize(this.target.objectId.starSystem);
-        const systemGalacticPosition = getStarGalacticCoordinates(systemSeed);
-        const distance = Vector3.Distance(missionGiverGalacticCoordinates, systemGalacticPosition);
-        const systemModel = new SeededStarSystemModel(systemSeed);
-
-        const targetModel = getObjectModelByUniverseId(this.target.objectId);
-        const targetModelTypeString = targetModel.typeName.toLowerCase();
-        const targetModelNameString = targetModel.name;
-
-        let describeString: string;
-        switch (this.target.type) {
-            case SightSeeingType.FLY_BY:
-                describeString = i18n.t("missions:sightseeing:describeFlyBy", {
-                    objectType: targetModelTypeString,
-                    systemName: systemModel.name
-                });
-                break;
-            case SightSeeingType.TERMINATOR_LANDING:
-                describeString = i18n.t("missions:sightseeing:describeTerminatorLanding", {
-                    objectName: targetModelNameString,
-                    systemName: systemModel.name
-                });
-                break;
-            case SightSeeingType.ASTEROID_FIELD_TREK:
-                describeString = i18n.t("missions:sightseeing:describeAsteroidFieldTrek", {
-                    objectName: targetModelNameString,
-                    systemName: systemModel.name
-                });
-                break;
-            default:
-                throw new Error(`Unknown sight seeing type: ${this.target.type}`);
-        }
-
-        let resultString = `${describeString}`;
-        if (distance > 0) {
-            resultString += ` (${parseDistance(distance * Settings.LIGHT_YEAR)})`;
-        } else {
-            resultString += ` (${i18n.t("missions:common:here")})`;
-        }
-
-        return resultString;
-    }
-
-    async describeNextTask(context: MissionContext): Promise<string> {
-        return await this.tree.describeNextTask(context);
-    }
-
-    serialize(): SightSeeingMissionSerialized {
-        return {
-            missionGiver: getUniverseIdForSpaceStationModel(this.missionGiver),
-            type: MissionType.SIGHT_SEEING,
-            target: this.target,
-            tree: this.tree.serialize()
-        };
-    }
+    return new Mission(missionTree, reward, missionGiver, sightSeeingTypeToMissionType(target.type));
 }

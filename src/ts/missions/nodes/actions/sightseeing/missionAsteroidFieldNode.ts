@@ -22,6 +22,7 @@ const enum AsteroidFieldMissionState {
 
 export type MissionAsteroidFieldNodeSerialized = MissionNodeSerialized & {
     objectId: UniverseObjectId;
+    state: AsteroidFieldMissionState;
 };
 
 export class MissionAsteroidFieldNode implements MissionNode {
@@ -34,6 +35,10 @@ export class MissionAsteroidFieldNode implements MissionNode {
     constructor(objectId: UniverseObjectId) {
         this.objectId = objectId;
         this.targetSystemSeed = new SystemSeed(objectId.starSystem.starSectorX, objectId.starSystem.starSectorY, objectId.starSystem.starSectorZ, objectId.starSystem.index);
+    }
+
+    public setState(state: AsteroidFieldMissionState) {
+        this.state = state;
     }
 
     isCompleted(): boolean {
@@ -92,6 +97,10 @@ export class MissionAsteroidFieldNode implements MissionNode {
     }
 
     async describeNextTask(context: MissionContext): Promise<string> {
+        if (this.isCompleted()) {
+            return i18n.t("missions:asteroidField:missionCompleted");
+        }
+
         const targetSystemModel = new SeededStarSystemModel(this.targetSystemSeed);
         const currentSystemModel = context.currentSystem.model;
         if (!(currentSystemModel instanceof SeededStarSystemModel)) {
@@ -122,11 +131,16 @@ export class MissionAsteroidFieldNode implements MissionNode {
         }
     }
 
+    getTargetSystems(): SystemSeed[] {
+        return [this.targetSystemSeed];
+    }
+
     serialize(): MissionAsteroidFieldNodeSerialized {
         return {
             type: MissionNodeType.ASTEROID_FIELD,
             children: [],
-            objectId: this.objectId
+            objectId: this.objectId,
+            state: this.state
         };
     }
 }

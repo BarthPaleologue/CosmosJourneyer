@@ -1,5 +1,6 @@
 import { MissionNode, MissionNodeSerialized, MissionNodeType } from "../missionNode";
 import { MissionContext } from "../../missionContext";
+import { SystemSeed } from "../../../utils/systemSeed";
 
 export type MissionSequenceNodeSerialized = MissionNodeSerialized & {
     activeChildIndex: number;
@@ -17,8 +18,6 @@ export class MissionSequenceNode implements MissionNode {
     }
 
     isCompleted(): boolean {
-        if (this.hasCompletedLock) return true;
-        this.hasCompletedLock = this.children.every((child) => child.isCompleted());
         return this.hasCompletedLock;
     }
 
@@ -30,6 +29,8 @@ export class MissionSequenceNode implements MissionNode {
         if (child.isCompleted()) {
             this.activeChildIndex++;
         }
+
+        this.hasCompletedLock = this.children.every((child) => child.isCompleted());
     }
 
     setActiveChildIndex(index: number) {
@@ -40,6 +41,10 @@ export class MissionSequenceNode implements MissionNode {
         if (this.hasCompletedLock) return Promise.resolve("Mission completed");
         if (this.activeChildIndex >= this.children.length) return Promise.resolve("Mission completed");
         return this.children[this.activeChildIndex].describeNextTask(context);
+    }
+
+    getTargetSystems(): SystemSeed[] {
+        return this.children[this.activeChildIndex].getTargetSystems();
     }
 
     serialize(): MissionSequenceNodeSerialized {

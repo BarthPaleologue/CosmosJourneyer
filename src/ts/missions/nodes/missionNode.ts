@@ -1,4 +1,5 @@
 import { MissionContext } from "../missionContext";
+import { SystemSeed } from "../../utils/systemSeed";
 
 export interface MissionNode {
     isCompleted(): boolean;
@@ -6,6 +7,8 @@ export interface MissionNode {
     updateState(context: MissionContext): void;
 
     describeNextTask(context: MissionContext): Promise<string>;
+
+    getTargetSystems(): SystemSeed[];
 
     serialize(): MissionNodeSerialized;
 }
