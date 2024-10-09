@@ -87,10 +87,18 @@ export class CurrentMissionDisplay {
 
         SpaceShipControlsInputs.map.previousMission.on("complete", () => {
             this.setPreviousMission();
+            this.previousMissionButton.animate([{ transform: "scale(1)" }, { transform: "scale(1.1)" }, { transform: "scale(1)" }], {
+                duration: 200,
+                easing: "ease"
+            });
         });
 
         SpaceShipControlsInputs.map.nextMission.on("complete", () => {
             this.setNextMission();
+            this.nextMissionButton.animate([{ transform: "scale(1)" }, { transform: "scale(1.1)" }, { transform: "scale(1)" }], {
+                duration: 200,
+                easing: "ease"
+            });
         });
     }
 
