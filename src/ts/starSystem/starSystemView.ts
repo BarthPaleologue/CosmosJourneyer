@@ -78,6 +78,7 @@ import { DefaultControlsInputs } from "../defaultControls/defaultControlsInputs"
 import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import { MissionContext } from "../missions/missionContext";
+import { Mission } from "../missions/mission";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -646,19 +647,28 @@ export class StarSystemView implements View {
 
         this.orbitRenderer.update();
 
+        // update missions
+        const missionContext: MissionContext = {
+            currentSystem: starSystem,
+            playerPosition: this.scene.getActiveControls().getTransform().getAbsolutePosition(),
+            physicsEngine: this.scene.getPhysicsEngine() as PhysicsEngineV2
+        };
+
+        const newlyCompletedMissions: Mission[] = [];
         this.player.currentMissions.forEach((mission) => {
             if (mission.isCompleted()) return;
-            mission.update({
-                currentSystem: this.getStarSystem(),
-                playerPosition: this.scene.getActiveControls().getTransform().getAbsolutePosition(),
-                physicsEngine: this.scene.getPhysicsEngine() as PhysicsEngineV2
-            });
+            mission.update(missionContext);
             if (mission.isCompleted()) {
                 this.player.balance += mission.getReward();
                 Sounds.EnqueuePlay(Sounds.MISSION_COMPLETE);
+                newlyCompletedMissions.push(mission);
             }
         });
 
+        this.player.completedMissions.push(...newlyCompletedMissions);
+        this.player.currentMissions = this.player.currentMissions.filter((mission) => !mission.isCompleted());
+
+        // update dynamic materials
         Materials.BUTTERFLY_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
         Materials.BUTTERFLY_DEPTH_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
         Materials.GRASS_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);

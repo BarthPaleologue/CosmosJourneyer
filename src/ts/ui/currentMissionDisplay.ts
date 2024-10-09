@@ -49,6 +49,11 @@ export class CurrentMissionDisplay {
     }
 
     public async update(context: MissionContext) {
+        if (this.activeMissionIndex !== null && this.player.currentMissions.length === 0) {
+            this.activeMissionIndex = null;
+            return;
+        }
+
         if (this.activeMissionIndex === null && this.player.currentMissions.length !== 0) {
             this.activeMissionIndex = 0;
             this.setMission(this.player.currentMissions[0]);
