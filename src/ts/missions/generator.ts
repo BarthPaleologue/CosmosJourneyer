@@ -106,5 +106,5 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
     const allMissions = blackHoleFlyByMissions.concat(neutronStarFlyByMissions, anomalyFlyByMissions, asteroidFieldMissions, terminatorLandingMissions);
 
     // filter missions to avoid duplicates with already accepted missions of the player
-    return allMissions.filter((mission) => player.currentMissions.every((currentMission) => !mission.equals(currentMission)));
+    return allMissions.filter((mission) => player.currentMissions.concat(player.completedMissions).every((currentMission) => !mission.equals(currentMission)));
 }
