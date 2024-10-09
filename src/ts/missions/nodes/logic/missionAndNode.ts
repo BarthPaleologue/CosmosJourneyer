@@ -5,6 +5,9 @@ import i18n from "../../../i18n";
 
 export type MissionAndNodeSerialized = MissionNodeSerialized;
 
+/**
+ * Node used to describe a set of tasks that must all be completed in any order.
+ */
 export class MissionAndNode implements MissionNode {
     readonly children: MissionNode[];
 

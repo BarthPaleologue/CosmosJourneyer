@@ -25,6 +25,9 @@ export type MissionAsteroidFieldNodeSerialized = MissionNodeSerialized & {
     state: AsteroidFieldMissionState;
 };
 
+/**
+ * Node used to describe a trek to an asteroid field
+ */
 export class MissionAsteroidFieldNode implements MissionNode {
     private state = AsteroidFieldMissionState.NOT_IN_SYSTEM;
 
@@ -37,6 +40,10 @@ export class MissionAsteroidFieldNode implements MissionNode {
         this.targetSystemSeed = new SystemSeed(objectId.starSystem.starSectorX, objectId.starSystem.starSectorY, objectId.starSystem.starSectorZ, objectId.starSystem.index);
     }
 
+    /**
+     * Set the state of the asteroid field mission. Useful when deserializing an ongoing mission.
+     * @param state The state of the mission
+     */
     public setState(state: AsteroidFieldMissionState) {
         this.state = state;
     }

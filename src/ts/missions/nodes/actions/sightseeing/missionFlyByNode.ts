@@ -24,6 +24,9 @@ export type MissionFlyByNodeSerialized = MissionNodeSerialized & {
     state: FlyByState;
 };
 
+/**
+ * Node used to describe a fly-by mission around a target object
+ */
 export class MissionFlyByNode implements MissionNode {
     private state: FlyByState = FlyByState.NOT_IN_SYSTEM;
 
@@ -36,6 +39,10 @@ export class MissionFlyByNode implements MissionNode {
         this.targetSystemSeed = new SystemSeed(objectId.starSystem.starSectorX, objectId.starSystem.starSectorY, objectId.starSystem.starSectorZ, objectId.starSystem.index);
     }
 
+    /**
+     * Set the state of the fly-by mission. Useful when deserializing an ongoing mission.
+     * @param state The state of the mission
+     */
     public setState(state: FlyByState) {
         this.state = state;
     }

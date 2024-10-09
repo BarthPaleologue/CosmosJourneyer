@@ -25,6 +25,9 @@ export type MissionTerminatorLandingNodeSerialized = MissionNodeSerialized & {
     state: LandMissionState;
 };
 
+/**
+ * Node used to describe a landing mission on a target object near the terminator line
+ */
 export class MissionTerminatorLandingNode implements MissionNode {
     private state: LandMissionState = LandMissionState.NOT_IN_SYSTEM;
 
@@ -39,6 +42,10 @@ export class MissionTerminatorLandingNode implements MissionNode {
         this.targetSystemSeed = new SystemSeed(objectId.starSystem.starSectorX, objectId.starSystem.starSectorY, objectId.starSystem.starSectorZ, objectId.starSystem.index);
     }
 
+    /**
+     * Set the state of the landing mission. Useful when deserializing an ongoing mission.
+     * @param state The state of the mission
+     */
     setState(state: LandMissionState) {
         this.state = state;
     }

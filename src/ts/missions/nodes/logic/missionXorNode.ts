@@ -4,6 +4,9 @@ import { SystemSeed } from "../../../utils/systemSeed";
 
 export type MissionXorNodeSerialized = MissionNodeSerialized;
 
+/**
+ * Node used to describe a set of tasks where only one must be completed.
+ */
 export class MissionXorNode implements MissionNode {
     readonly children: MissionNode[];
 

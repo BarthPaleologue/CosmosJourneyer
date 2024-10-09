@@ -5,6 +5,9 @@ import { SystemSeed } from "../../../utils/systemSeed";
 
 export type MissionOrNodeSerialized = MissionNodeSerialized;
 
+/**
+ * Node used to describe a set of tasks where only a subset must be completed in any order.
+ */
 export class MissionOrNode implements MissionNode {
     readonly children: MissionNode[];
 

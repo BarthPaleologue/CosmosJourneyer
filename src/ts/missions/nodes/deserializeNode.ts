@@ -7,6 +7,10 @@ import { MissionTerminatorLandingNode, MissionTerminatorLandingNodeSerialized } 
 import { MissionXorNode, MissionXorNodeSerialized } from "./logic/missionXorNode";
 import { MissionSequenceNode, MissionSequenceNodeSerialized } from "./logic/missionSequenceNode";
 
+/**
+ * Deserialize recursively a mission node.
+ * @param missionNodeSerialized The serialized mission node.
+ */
 export function deserializeMissionNode(missionNodeSerialized: MissionNodeSerialized): MissionNode {
     switch (missionNodeSerialized.type) {
         case MissionNodeType.AND:
@@ -28,37 +32,37 @@ export function deserializeMissionNode(missionNodeSerialized: MissionNodeSeriali
     }
 }
 
-export function deserializeMissionAndNode(serialized: MissionAndNodeSerialized): MissionAndNode {
+function deserializeMissionAndNode(serialized: MissionAndNodeSerialized): MissionAndNode {
     return new MissionAndNode(serialized.children.map((child) => deserializeMissionNode(child)));
 }
 
-export function deserializeMissionOrNode(serialized: MissionOrNodeSerialized): MissionOrNode {
+function deserializeMissionOrNode(serialized: MissionOrNodeSerialized): MissionOrNode {
     return new MissionOrNode(serialized.children.map((child) => deserializeMissionNode(child)));
 }
 
-export function deserializeMissionXorNode(serialized: MissionXorNodeSerialized): MissionXorNode {
+function deserializeMissionXorNode(serialized: MissionXorNodeSerialized): MissionXorNode {
     return new MissionXorNode(serialized.children.map((child) => deserializeMissionNode(child)));
 }
 
-export function deserializeMissionSequenceNode(serialized: MissionSequenceNodeSerialized): MissionSequenceNode {
+function deserializeMissionSequenceNode(serialized: MissionSequenceNodeSerialized): MissionSequenceNode {
     const missionNode = new MissionSequenceNode(serialized.children.map((child) => deserializeMissionNode(child)));
     missionNode.setActiveChildIndex(serialized.activeChildIndex);
     return missionNode;
 }
 
-export function deserializeMissionAsteroidFieldNode(serialized: MissionAsteroidFieldNodeSerialized): MissionAsteroidFieldNode {
+function deserializeMissionAsteroidFieldNode(serialized: MissionAsteroidFieldNodeSerialized): MissionAsteroidFieldNode {
     const missionNode = new MissionAsteroidFieldNode(serialized.objectId);
     missionNode.setState(serialized.state);
     return missionNode;
 }
 
-export function deserializeMissionFlyByNode(serialized: MissionFlyByNodeSerialized): MissionFlyByNode {
+function deserializeMissionFlyByNode(serialized: MissionFlyByNodeSerialized): MissionFlyByNode {
     const missionNode = new MissionFlyByNode(serialized.objectId);
     missionNode.setState(serialized.state);
     return missionNode;
 }
 
-export function deserializeMissionTerminatorLandingNode(serialized: MissionTerminatorLandingNodeSerialized): MissionTerminatorLandingNode {
+function deserializeMissionTerminatorLandingNode(serialized: MissionTerminatorLandingNodeSerialized): MissionTerminatorLandingNode {
     const missionNode = new MissionTerminatorLandingNode(serialized.objectId);
     missionNode.setState(serialized.state);
     return missionNode;
