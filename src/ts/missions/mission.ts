@@ -2,10 +2,11 @@ import { MissionNode, MissionNodeSerialized } from "./nodes/missionNode";
 import { MissionContext } from "./missionContext";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
 import { SystemSeed } from "../utils/systemSeed";
-import { getUniverseIdForSpaceStationModel } from "../utils/orbitalObjectId";
+import { getObjectModelByUniverseId, getUniverseIdForSpaceStationModel } from "../utils/orbitalObjectId";
 import i18n from "../i18n";
 import { UniverseObjectId } from "../saveFile/universeCoordinates";
 import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
+import { deserializeMissionNode } from "./nodes/deserializeNode";
 
 /**
  * Registered mission types. Those are used to display localized strings in the UI
@@ -116,7 +117,7 @@ export class Mission {
      */
     describe(): string {
         const originSystem = this.missionGiver.starSystem;
-        if(!(originSystem instanceof SeededStarSystemModel)) {
+        if (!(originSystem instanceof SeededStarSystemModel)) {
             throw new Error("Mission giver is not in a seeded star system");
         }
         const originSeed = originSystem.seed;
@@ -150,5 +151,14 @@ export class Mission {
     update(context: MissionContext): void {
         if (this.isCompleted()) return;
         this.tree.updateState(context);
+    }
+
+    static Deserialize(missionSerialized: MissionSerialized) {
+        return new Mission(
+            deserializeMissionNode(missionSerialized.tree),
+            missionSerialized.reward,
+            getObjectModelByUniverseId(missionSerialized.missionGiver) as SpaceStationModel,
+            missionSerialized.type
+        );
     }
 }

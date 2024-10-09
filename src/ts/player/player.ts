@@ -1,6 +1,5 @@
 import { SystemSeed, SystemSeedSerialized } from "../utils/systemSeed";
 import { Mission, MissionSerialized } from "../missions/mission";
-import { deserializeMission } from "../missions/deserializeMission";
 
 export type SerializedPlayer = {
     name: string;
@@ -45,8 +44,8 @@ export class Player {
             new Date(serializedPlayer.creationDate),
             serializedPlayer.currentItinerary.map((seed) => SystemSeed.Deserialize(seed)),
             serializedPlayer.systemBookmarks.map((seed) => SystemSeed.Deserialize(seed)),
-            serializedPlayer.currentMissions.map((mission) => deserializeMission(mission)),
-            serializedPlayer.completedMissions.map((mission) => deserializeMission(mission))
+            serializedPlayer.currentMissions.map((mission) => Mission.Deserialize(mission)),
+            serializedPlayer.completedMissions.map((mission) => Mission.Deserialize(mission))
         );
     }
 
