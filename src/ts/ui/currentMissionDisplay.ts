@@ -23,7 +23,7 @@ import { MissionContext } from "../missions/missionContext";
 export class CurrentMissionDisplay {
     readonly rootNode: HTMLElement;
 
-    private activeMissionIndex: number | null = null;
+    private activeMission: Mission | null = null;
 
     private readonly player: Player;
 
@@ -49,34 +49,34 @@ export class CurrentMissionDisplay {
     }
 
     public async update(context: MissionContext) {
-        if (this.activeMissionIndex !== null && this.player.currentMissions.length === 0) {
-            this.activeMissionIndex = null;
-            return;
+        const allMissions = this.player.completedMissions.concat(this.player.currentMissions);
+        if (this.activeMission === null && allMissions.length !== 0) {
+            this.setMission(allMissions[0]);
         }
 
-        if (this.activeMissionIndex === null && this.player.currentMissions.length !== 0) {
-            this.activeMissionIndex = 0;
-            this.setMission(this.player.currentMissions[0]);
-        }
-
-        if (this.activeMissionIndex === null) return;
-
-        const currentMission = this.player.currentMissions[this.activeMissionIndex];
+        if (this.activeMission === null) return;
 
         const descriptionBlock = this.rootNode.querySelector<HTMLParagraphElement>(".missionPanel p");
         if (descriptionBlock === null) {
             throw new Error("Could not find description block in mission panel");
         }
-        const newDescriptionText = await currentMission.describeNextTask(context);
+        const newDescriptionText = await this.activeMission.describeNextTask(context);
         if (newDescriptionText === descriptionBlock.innerText) return;
         descriptionBlock.innerText = newDescriptionText;
     }
 
     public setNextMission() {
-        if (this.activeMissionIndex === null) {
+        if (this.activeMission === null) {
             return;
         }
-        const nextMission = this.player.currentMissions.at(this.activeMissionIndex + 1);
+
+        const allMissions = this.player.completedMissions.concat(this.player.currentMissions);
+        const currentMissionIndex = allMissions.indexOf(this.activeMission);
+        if(currentMissionIndex === -1) {
+            throw new Error("Could not find current mission in all missions");
+        }
+
+        const nextMission = allMissions.at(currentMissionIndex + 1);
         if (nextMission === undefined) {
             return;
         }
@@ -85,10 +85,17 @@ export class CurrentMissionDisplay {
     }
 
     public setPreviousMission() {
-        if (this.activeMissionIndex === null) {
+        if (this.activeMission === null) {
             return;
         }
-        const previousMission = this.player.currentMissions.at(this.activeMissionIndex - 1);
+
+        const allMissions = this.player.completedMissions.concat(this.player.currentMissions);
+        const currentMissionIndex = allMissions.indexOf(this.activeMission);
+        if(currentMissionIndex === -1) {
+            throw new Error("Could not find current mission in all missions");
+        }
+
+        const previousMission = allMissions.at(currentMissionIndex - 1);
         if (previousMission === undefined) {
             return;
         }
@@ -97,6 +104,8 @@ export class CurrentMissionDisplay {
     }
 
     private setMission(mission: Mission) {
+        this.activeMission = mission;
+
         const missionPanel = document.createElement("div");
         missionPanel.classList.add("missionPanel");
 
