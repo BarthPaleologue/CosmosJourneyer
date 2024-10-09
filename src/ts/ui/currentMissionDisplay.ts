@@ -172,8 +172,11 @@ export class CurrentMissionDisplay {
 
         this.missionPanel.innerHTML = "";
 
+        const allMissions = this.player.completedMissions.concat(this.player.currentMissions);
+        const missionIndex = allMissions.indexOf(mission);
+
         const missionTitle = document.createElement("h2");
-        missionTitle.innerText = mission.getTypeString();
+        missionTitle.innerText = `${missionIndex + 1}/${allMissions.length} ${mission.getTypeString()}`;
         this.missionPanel.appendChild(missionTitle);
 
         const missionDescription = document.createElement("p");
