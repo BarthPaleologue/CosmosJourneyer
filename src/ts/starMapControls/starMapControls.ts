@@ -25,12 +25,14 @@ import "@babylonjs/core/Collisions/collisionCoordinator";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { StarMapInputs } from "../inputs/starMapInputs";
+import { Scalar } from "@babylonjs/core/Maths/math.scalar";
 
 export class StarMapControls implements Controls {
     private readonly transform: TransformNode;
     readonly thirdPersonCamera: ArcRotateCamera;
 
     private speed = 10;
+    private inertia = Vector3.Zero();
 
     private readonly scene: Scene;
 
@@ -58,9 +60,13 @@ export class StarMapControls implements Controls {
     }
 
     public update(deltaSeconds: number): Vector3 {
-        const [xMove, yMove] = StarMapInputs.map.move.value;
+        const inertiaFactor = Scalar.Clamp(0.1, 0, 1);
+        const [xMove, zMove] = StarMapInputs.map.move.value;
+        this.inertia.x = Scalar.Lerp(this.inertia.x, xMove, inertiaFactor);
+        this.inertia.z = Scalar.Lerp(this.inertia.z, zMove, inertiaFactor);
 
         const upDown = StarMapInputs.map.upDown.value;
+        this.inertia.y = Scalar.Lerp(this.inertia.y, upDown, inertiaFactor);
 
         this.speed *= 1 + StarMapInputs.map.changeSpeed.value / 20;
 
@@ -69,9 +75,9 @@ export class StarMapControls implements Controls {
         const cameraUp = this.thirdPersonCamera.getDirection(Vector3.Up());
 
         const displacement = cameraForward
-            .scaleInPlace(yMove * deltaSeconds * this.speed)
-            .addInPlace(cameraRight.scaleInPlace(xMove * deltaSeconds * this.speed))
-            .addInPlace(cameraUp.scaleInPlace(upDown * deltaSeconds * this.speed));
+            .scaleInPlace(this.inertia.z * deltaSeconds * this.speed)
+            .addInPlace(cameraRight.scaleInPlace(this.inertia.x * deltaSeconds * this.speed))
+            .addInPlace(cameraUp.scaleInPlace(this.inertia.y * deltaSeconds * this.speed));
 
         this.transform.position.addInPlace(displacement);
 

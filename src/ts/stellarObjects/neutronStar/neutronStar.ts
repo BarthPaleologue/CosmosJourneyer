@@ -34,15 +34,14 @@ import { Light } from "@babylonjs/core/Lights/light";
 import { setRotationQuaternion } from "../../uberCore/transforms/basicTransform";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { OrbitProperties } from "../../orbit/orbitProperties";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import { RingsUniforms } from "../../rings/ringsUniform";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
-import i18n from "../../i18n";
 import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
+import { Orbit } from "../../orbit/orbit";
 
 export class NeutronStar implements StellarObject, Cullable {
     readonly model: NeutronStarModel;
@@ -105,7 +104,7 @@ export class NeutronStar implements StellarObject, Cullable {
         this.light.falloffType = Light.FALLOFF_STANDARD;
         this.light.parent = this.getTransform();
 
-        this.material = new StarMaterial(this.getTransform(), this.model, scene);
+        this.material = new StarMaterial(this.model, scene);
         this.mesh.material = this.material;
 
         setRotationQuaternion(this.getTransform(), Quaternion.Identity());
@@ -130,7 +129,7 @@ export class NeutronStar implements StellarObject, Cullable {
     }
 
     getTypeName(): string {
-        return i18n.t("objectTypes:neutronStar");
+        return this.model.typeName;
     }
 
     getRotationAxis(): Vector3 {
@@ -141,7 +140,7 @@ export class NeutronStar implements StellarObject, Cullable {
         return this.light;
     }
 
-    getOrbitProperties(): OrbitProperties {
+    getOrbitProperties(): Orbit {
         return this.model.orbit;
     }
 
@@ -178,9 +177,11 @@ export class NeutronStar implements StellarObject, Cullable {
     }
 
     public dispose(): void {
+        this.aggregate.dispose();
         this.mesh.dispose();
         this.light.dispose();
         this.material.dispose();
         this.asteroidField?.dispose();
+        this.ringsUniforms?.dispose();
     }
 }

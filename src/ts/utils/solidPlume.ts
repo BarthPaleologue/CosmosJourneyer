@@ -129,6 +129,10 @@ export class SolidPlume {
     }
 
     update(deltaSeconds: number) {
+        if (this.targetNbParticles === 0 && this.nbParticles === 0) {
+            return;
+        }
+
         this.subTimeStep = deltaSeconds / this.nbSubTimeSteps;
         for (let i = 0; i < this.nbSubTimeSteps; i++) {
             // if there aren't enough particles, instantiate more

@@ -31,12 +31,10 @@ import { PauseMenu } from "./ui/pauseMenu";
 import { StarSystemView } from "./starSystem/starSystemView";
 import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
 import { MainMenu } from "./ui/mainMenu";
-import { SystemSeed } from "./utils/systemSeed";
 import { SaveFileData } from "./saveFile/saveFileData";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { setRotationQuaternion } from "./uberCore/transforms/basicTransform";
-import { ShipControls } from "./spaceship/shipControls";
 import { encodeBase64 } from "./utils/base64";
 import { UniverseCoordinates } from "./saveFile/universeCoordinates";
 import { View } from "./utils/view";
@@ -45,8 +43,6 @@ import { AudioManager } from "./audio/audioManager";
 import { AudioMasks } from "./audio/audioMasks";
 import { GeneralInputs } from "./inputs/generalInputs";
 import { createNotification } from "./utils/notification";
-import { StarSystemInputs } from "./inputs/starSystemInputs";
-import { pressInteractionToStrings } from "./utils/inputControlsString";
 import { LoadingScreen } from "./uberCore/loadingScreen";
 import i18n from "./i18n";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
@@ -55,8 +51,11 @@ import { TutorialLayer } from "./ui/tutorial/tutorialLayer";
 import { FlightTutorial } from "./tutorials/flightTutorial";
 import { SidePanels } from "./ui/sidePanels";
 import { Settings } from "./settings";
-import { SeededStarSystemModel } from "./starSystem/seededStarSystemModel";
-import { CustomStarSystemModel } from "./starSystem/customStarSystemModel";
+import { Player } from "./player/player";
+import { getObjectBySystemId, getUniverseObjectId } from "./utils/orbitalObjectId";
+import { StarSystemCoordinates } from "./starSystem/starSystemModel";
+import { getSystemModelFromCoordinates } from "./utils/starSystemCoordinatesUtils";
+import { StarSystemController } from "./starSystem/starSystemController";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -87,13 +86,18 @@ export class CosmosJourneyer {
 
     private videoRecorder: VideoRecorder | null = null;
 
-    private constructor(engine: AbstractEngine, starSystemView: StarSystemView, starMap: StarMap) {
+    private readonly player: Player;
+
+    private constructor(player: Player, engine: AbstractEngine, starSystemView: StarSystemView) {
         this.engine = engine;
+        this.player = player;
 
         this.starSystemView = starSystemView;
-        this.starMap = starMap;
-        this.starMap.onTargetSetObservable.add((seed: SystemSeed) => {
-            this.starSystemView.setSystemAsTarget(seed);
+
+        // Init starmap view
+        this.starMap = new StarMap(this.player, this.engine);
+        this.starMap.onTargetSetObservable.add((systemCoordinates: StarSystemCoordinates) => {
+            this.starSystemView.setSystemAsTarget(systemCoordinates);
         });
 
         // Init the active scene
@@ -129,9 +133,7 @@ export class CosmosJourneyer {
 
         this.starSystemView.onInitStarSystem.add(() => {
             const starSystemModel = this.starSystemView.getStarSystem().model;
-            if (starSystemModel instanceof SeededStarSystemModel) {
-                this.starMap.setCurrentStarSystem(starSystemModel.seed);
-            }
+            this.starMap.setCurrentStarSystem(starSystemModel.getCoordinates());
         });
 
         this.pauseMenu = new PauseMenu(this.sidePanels);
@@ -223,15 +225,14 @@ export class CosmosJourneyer {
         const havokInstance = await HavokPhysics();
         console.log(`Havok initialized`);
 
+        const player = Player.Default();
+
         // Init star system view
-        const starSystemView = new StarSystemView(engine, havokInstance);
+        const starSystemView = new StarSystemView(player, engine, havokInstance);
 
         await starSystemView.initAssets();
 
-        // Init starmap view
-        const starMap = new StarMap(engine);
-
-        return new CosmosJourneyer(engine, starSystemView, starMap);
+        return new CosmosJourneyer(player, engine, starSystemView);
     }
 
     public pause(): void {
@@ -265,6 +266,7 @@ export class CosmosJourneyer {
         this.engine.runRenderLoop(() => {
             updateInputDevices();
             AudioManager.Update(this.engine.getDeltaTime() / 1000);
+            Sounds.Update();
 
             if (this.isPaused()) return;
             this.activeView.render();
@@ -277,18 +279,16 @@ export class CosmosJourneyer {
      */
     public toggleStarMap(): void {
         if (this.activeView === this.starSystemView) {
-            this.starSystemView.unZoom(() => {
-                AudioManager.SetMask(AudioMasks.STAR_MAP_VIEW);
+            AudioManager.SetMask(AudioMasks.STAR_MAP_VIEW);
 
-                this.starSystemView.targetCursorLayer.setEnabled(false);
+            this.starSystemView.targetCursorLayer.setEnabled(false);
 
-                this.starSystemView.detachControl();
-                this.starMap.attachControl();
+            this.starSystemView.detachControl();
+            this.starMap.attachControl();
 
-                const starMap = this.starMap;
-                this.activeView = starMap;
-                starMap.focusOnCurrentSystem();
-            });
+            const starMap = this.starMap;
+            this.activeView = starMap;
+            starMap.focusOnCurrentSystem();
         } else {
             this.starMap.detachControl();
             this.starSystemView.attachControl();
@@ -334,11 +334,6 @@ export class CosmosJourneyer {
     public generateSaveData(): SaveFileData {
         const currentStarSystem = this.starSystemView.getStarSystem();
 
-        if (!(currentStarSystem.model instanceof SeededStarSystemModel)) {
-            throw new Error("Cannot save inside a star system that has no generation seed");
-        }
-        const seed = currentStarSystem.model.seed;
-
         const spaceShipControls = this.starSystemView.getSpaceshipControls();
 
         // Finding the index of the nearest orbital object
@@ -350,17 +345,23 @@ export class CosmosJourneyer {
         const currentWorldPosition = spaceShipControls.getTransform().getAbsolutePosition();
         const nearestOrbitalObjectInverseWorld = nearestOrbitalObject.getTransform().getWorldMatrix().clone().invert();
         const currentLocalPosition = Vector3.TransformCoordinates(currentWorldPosition, nearestOrbitalObjectInverseWorld);
+        const distanceToNearestOrbitalObject = currentLocalPosition.length();
+        if (distanceToNearestOrbitalObject < nearestOrbitalObject.getBoundingRadius() + 200e3) {
+            currentLocalPosition.scaleInPlace((nearestOrbitalObject.getBoundingRadius() + 200e3) / distanceToNearestOrbitalObject);
+        }
 
         // Finding the rotation of the player in the nearest orbital object's frame of reference
         const currentWorldRotation = spaceShipControls.getTransform().absoluteRotationQuaternion;
         const nearestOrbitalObjectInverseRotation = nearestOrbitalObject.getTransform().absoluteRotationQuaternion.clone().invert();
         const currentLocalRotation = currentWorldRotation.multiply(nearestOrbitalObjectInverseRotation);
 
+        const universeObjectId = getUniverseObjectId(nearestOrbitalObject, currentStarSystem);
+
         return {
             version: projectInfo.version,
+            player: Player.Serialize(this.player),
             universeCoordinates: {
-                starSystem: seed.serialize(),
-                orbitalObjectIndex: nearestOrbitalObjectIndex,
+                universeObjectId: universeObjectId,
                 positionX: currentLocalPosition.x,
                 positionY: currentLocalPosition.y,
                 positionZ: currentLocalPosition.z,
@@ -392,6 +393,9 @@ export class CosmosJourneyer {
      * @param saveData The save file data to load
      */
     public async loadSaveData(saveData: SaveFileData): Promise<void> {
+        const newPlayer = saveData.player !== undefined ? Player.Deserialize(saveData.player) : Player.Default();
+        this.player.copyFrom(newPlayer);
+
         await this.loadUniverseCoordinates(saveData.universeCoordinates);
 
         if (saveData.padNumber !== undefined) {
@@ -415,6 +419,10 @@ export class CosmosJourneyer {
 
             this.starSystemView.getSpaceshipControls().spaceship.spawnOnPad(landingPad);
         }
+
+        if (this.player.currentItinerary.length > 1) {
+            this.starSystemView.setSystemAsTarget(this.player.currentItinerary[1]);
+        }
     }
 
     /**
@@ -425,9 +433,11 @@ export class CosmosJourneyer {
     public async loadUniverseCoordinates(universeCoordinates: UniverseCoordinates): Promise<void> {
         this.engine.loadingScreen.displayLoadingUI();
 
-        const seed = SystemSeed.Deserialize(universeCoordinates.starSystem);
+        const universeObjectId = universeCoordinates.universeObjectId;
 
-        await this.starSystemView.loadStarSystemFromSeed(seed);
+        const systemModel = getSystemModelFromCoordinates(universeObjectId.starSystemCoordinates);
+        const systemController = new StarSystemController(systemModel, this.starSystemView.scene);
+        await this.starSystemView.loadStarSystem(systemController, true);
 
         if (this.state === EngineState.UNINITIALIZED) await this.init(true);
         else this.starSystemView.initStarSystem();
@@ -436,11 +446,9 @@ export class CosmosJourneyer {
 
         const playerTransform = this.starSystemView.scene.getActiveControls().getTransform();
 
-        const nearestOrbitalObject = this.starSystemView.getStarSystem().getOrbitalObjects().at(universeCoordinates.orbitalObjectIndex);
-        if (nearestOrbitalObject === undefined) {
-            throw new Error(
-                `Could not find the nearest orbital object with index ${universeCoordinates.orbitalObjectIndex} among the ${this.starSystemView.getStarSystem().getOrbitalObjects().length} different objects`
-            );
+        const nearestOrbitalObject = getObjectBySystemId(universeObjectId, this.starSystemView.getStarSystem());
+        if (nearestOrbitalObject === null) {
+            throw new Error(`Could not find the nearest orbital object with index ${universeObjectId.objectIndex} and type ${universeObjectId.objectType}`);
         }
 
         const nearestOrbitalObjectWorld = nearestOrbitalObject.getTransform().getWorldMatrix();

@@ -17,31 +17,30 @@
 
 import { seededSquirrelNoise } from "squirrel-noise";
 
-import { OrbitProperties } from "../../orbit/orbitProperties";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { normalRandom, randRange } from "extended-random";
 import { clamp } from "../../utils/math";
-import { getOrbitalPeriod, getPeriapsis } from "../../orbit/orbit";
+import { getOrbitalPeriod, getPeriapsis, Orbit } from "../../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { PlanetModel } from "../../architecture/planet";
 import { PlanetPhysicalProperties } from "../../architecture/physicalProperties";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { BodyType } from "../../architecture/bodyType";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { wheelOfFortune } from "../../utils/random";
-import { GreekAlphabet } from "../../utils/parseToStrings";
+import { ReversedGreekAlphabet } from "../../utils/parseToStrings";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
+import i18n from "../../i18n";
 
-export class MandelbulbModel implements PlanetModel {
+export class MandelbulbModel implements CelestialBodyModel {
     readonly name;
 
-    readonly bodyType = BodyType.MANDELBULB;
+    readonly bodyType = BodyType.ANOMALY;
     readonly seed: number;
     readonly rng: (step: number) => number;
 
     readonly radius: number;
 
-    readonly orbit: OrbitProperties;
+    readonly orbit: Orbit;
 
     readonly physicalProperties: PlanetPhysicalProperties;
 
@@ -56,6 +55,10 @@ export class MandelbulbModel implements PlanetModel {
 
     readonly starSystemModel: StarSystemModel;
 
+    readonly rings = null;
+
+    readonly typeName: string;
+
     constructor(seed: number, starSystemModel: StarSystemModel, parentBody?: CelestialBodyModel) {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed);
@@ -63,7 +66,7 @@ export class MandelbulbModel implements PlanetModel {
         this.starSystemModel = starSystemModel;
 
         const anomalyIndex = this.starSystemModel.getAnomalies().findIndex(([_, anomalySeed]) => anomalySeed === this.seed);
-        this.name = `${this.starSystemModel.name} ${GreekAlphabet[anomalyIndex]}`;
+        this.name = `${this.starSystemModel.name} ${ReversedGreekAlphabet[anomalyIndex].toUpperCase()}`;
 
         this.radius = 1000e3;
 
@@ -82,8 +85,7 @@ export class MandelbulbModel implements PlanetModel {
             radius: orbitRadius,
             p: orbitalP,
             period: getOrbitalPeriod(orbitRadius, this.parentBody?.physicalProperties.mass ?? 0),
-            normalToPlane: Vector3.Up(),
-            isPlaneAlignedWithParent: true
+            normalToPlane: Vector3.Up()
         };
 
         this.physicalProperties = {
@@ -102,6 +104,8 @@ export class MandelbulbModel implements PlanetModel {
             ],
             this.rng(GenerationSteps.NB_MOONS)
         );
+
+        this.typeName = i18n.t("objectTypes:anomaly");
     }
 
     getApparentRadius(): number {

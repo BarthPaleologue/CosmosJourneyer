@@ -41,7 +41,7 @@ export class ChunkForgeWorkers implements ChunkForge {
     constructor(nbVerticesPerRow: number) {
         this.nbVerticesPerRow = nbVerticesPerRow;
         const nbMaxWorkers = navigator.hardwareConcurrency - 1; // -1 because the main thread is also used
-        this.workerPool = new WorkerPool(nbMaxWorkers);
+        this.workerPool = new WorkerPool(nbMaxWorkers, (task1, task2) => task1.depth < task2.depth);
     }
 
     public addTask(task: BuildTask) {
@@ -58,6 +58,8 @@ export class ChunkForgeWorkers implements ChunkForge {
     }
 
     private dispatchBuildTask(task: BuildTask, worker: Worker): void {
+        this.workerPool.busyWorkers.push(worker);
+
         const buildData: TransferBuildData = {
             taskType: TaskType.BUILD,
             planetName: task.planetName,
@@ -99,7 +101,10 @@ export class ChunkForgeWorkers implements ChunkForge {
             this.applyTaskQueue.push(applyTask);
 
             if (this.workerPool.hasTask()) this.dispatchBuildTask(this.workerPool.nextTask(), worker);
-            else this.workerPool.finishedWorkers.push(worker);
+            else {
+                this.workerPool.busyWorkers = this.workerPool.busyWorkers.filter((w) => w !== worker);
+                this.workerPool.finishedWorkers.push(worker);
+            }
         };
     }
 

@@ -16,9 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Slider } from "handle-sliderjs";
-import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
-import { CelestialBody } from "../../architecture/celestialBody";
-import { Scene } from "@babylonjs/core/scene";
 
 export abstract class EditorPanel {
     sliders: Slider[] = [];

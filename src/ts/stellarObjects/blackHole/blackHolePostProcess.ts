@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import blackHoleFragment from "../../../shaders/blackhole.glsl";
-import { ObjectPostProcess } from "../../postProcesses/objectPostProcess";
+import { ObjectPostProcess, UpdatablePostProcess } from "../../postProcesses/objectPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { getForwardDirection } from "../../uberCore/transforms/basicTransform";
 import { BlackHole } from "./blackHole";
@@ -37,7 +37,7 @@ export type BlackHoleUniforms = {
     time: number;
 };
 
-export class BlackHolePostProcess extends PostProcess implements ObjectPostProcess {
+export class BlackHolePostProcess extends PostProcess implements ObjectPostProcess, UpdatablePostProcess {
     readonly blackHoleUniforms: BlackHoleUniforms;
     readonly object: BlackHole;
 

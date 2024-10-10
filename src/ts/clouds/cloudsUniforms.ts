@@ -95,4 +95,8 @@ export class CloudsUniforms {
             effect.setTexture(CloudsSamplerNames.LUT, Textures.EMPTY_TEXTURE);
         }
     }
+
+    public dispose() {
+        this.lut.dispose();
+    }
 }

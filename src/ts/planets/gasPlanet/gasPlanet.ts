@@ -26,7 +26,6 @@ import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Planet } from "../../architecture/planet";
-import { OrbitProperties } from "../../orbit/orbitProperties";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { CelestialBody } from "../../architecture/celestialBody";
 import { OrbitalObject } from "../../architecture/orbitalObject";
@@ -36,10 +35,10 @@ import { Cullable } from "../../utils/cullable";
 import { RingsUniforms } from "../../rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import { Transformable } from "../../architecture/transformable";
-import i18n from "../../i18n";
 import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
+import { Orbit } from "../../orbit/orbit";
 
 export class GasPlanet implements Planet, Cullable {
     private readonly mesh: Mesh;
@@ -92,7 +91,7 @@ export class GasPlanet implements Planet, Cullable {
         const physicsShape = new PhysicsShapeSphere(Vector3.Zero(), this.model.radius, scene);
         this.aggregate.shape.addChildFromParent(this.getTransform(), physicsShape, this.mesh);
 
-        this.material = new GasPlanetMaterial(this.name, this.getTransform(), this.model, scene);
+        this.material = new GasPlanetMaterial(this.name, this.model, scene);
         this.mesh.material = this.material;
 
         this.postProcesses.push(PostProcessType.ATMOSPHERE, PostProcessType.SHADOW);
@@ -136,7 +135,7 @@ export class GasPlanet implements Planet, Cullable {
     }
 
     getTypeName(): string {
-        return i18n.t("objectTypes:gasPlanet");
+        return this.model.typeName;
     }
 
     public computeCulling(cameras: Camera[]): void {
@@ -154,9 +153,10 @@ export class GasPlanet implements Planet, Cullable {
         this.aggregate.dispose();
         this.material.dispose();
         this.asteroidField?.dispose();
+        this.ringsUniforms?.dispose();
     }
 
-    getOrbitProperties(): OrbitProperties {
+    getOrbitProperties(): Orbit {
         return this.model.orbit;
     }
 

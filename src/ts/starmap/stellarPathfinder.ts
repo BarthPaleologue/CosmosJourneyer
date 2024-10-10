@@ -15,14 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getStarGalacticCoordinates } from "../utils/getStarGalacticCoordinates";
-import { SystemSeed } from "../utils/systemSeed";
+import { getStarGalacticPosition } from "../utils/starSystemCoordinatesUtils";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { getNeighborStarSystems } from "../utils/getNeighborStarSystems";
+import { getNeighborStarSystemCoordinates } from "../utils/getNeighborStarSystems";
 import { PriorityQueue } from "../utils/priorityQueue";
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../starSystem/starSystemModel";
 
 type Node = {
-    seed: SystemSeed;
+    coordinates: StarSystemCoordinates;
     position: Vector3;
     G: number;
     H: number;
@@ -33,16 +33,16 @@ type Node = {
  */
 export class StellarPathfinder {
     private startSystem: {
-        seed: SystemSeed;
+        coordinates: StarSystemCoordinates;
         position: Vector3;
     } | null = null;
 
     private targetSystem: {
-        seed: SystemSeed;
+        coordinates: StarSystemCoordinates;
         position: Vector3;
     } | null = null;
 
-    private seedToPrevious: Map<string, SystemSeed> = new Map();
+    private coordinatesToPrevious: Map<string, StarSystemCoordinates> = new Map();
 
     private openList: PriorityQueue<Node> = new PriorityQueue((a, b) => a.G + a.H < b.G + b.H);
     private closedList: Node[] = [];
@@ -56,12 +56,12 @@ export class StellarPathfinder {
 
     /**
      * Initialize the pathfinder
-     * @param startSystemSeed The seed of the starting system
-     * @param targetSystemSeed The seed of the target system
+     * @param startSystemCoordinates The seed of the starting system
+     * @param targetSystemCoordinates The seed of the target system
      * @param jumpRange The jump range of the ship in light years
      */
-    public init(startSystemSeed: SystemSeed, targetSystemSeed: SystemSeed, jumpRange: number) {
-        this.seedToPrevious.clear();
+    public init(startSystemCoordinates: StarSystemCoordinates, targetSystemCoordinates: StarSystemCoordinates, jumpRange: number) {
+        this.coordinatesToPrevious.clear();
         this.openList.clear();
         this.closedList = [];
         this.hasPath = false;
@@ -69,13 +69,13 @@ export class StellarPathfinder {
         this.lastExploredNode = null;
 
         this.startSystem = {
-            seed: startSystemSeed,
-            position: getStarGalacticCoordinates(startSystemSeed)
+            coordinates: startSystemCoordinates,
+            position: getStarGalacticPosition(startSystemCoordinates)
         };
 
         this.targetSystem = {
-            seed: targetSystemSeed,
-            position: getStarGalacticCoordinates(targetSystemSeed)
+            coordinates: targetSystemCoordinates,
+            position: getStarGalacticPosition(targetSystemCoordinates)
         };
 
         this.jumpRange = jumpRange;
@@ -97,10 +97,10 @@ export class StellarPathfinder {
     }
 
     private getNeighbors(node: Node): [Node, number][] {
-        const stellarNeighbors = getNeighborStarSystems(node.seed, this.jumpRange);
-        return stellarNeighbors.map<[Node, number]>(([seed, position, distance]) => [
+        const stellarNeighbors = getNeighborStarSystemCoordinates(node.coordinates, this.jumpRange);
+        return stellarNeighbors.map<[Node, number]>(([coordinates, position, distance]) => [
             {
-                seed,
+                coordinates: coordinates,
                 position,
                 G: 0,
                 H: 0
@@ -120,7 +120,7 @@ export class StellarPathfinder {
 
         if (this.openList.size() === 0) {
             this.openList.push({
-                seed: this.startSystem.seed,
+                coordinates: this.startSystem.coordinates,
                 position: this.startSystem.position,
                 G: 0,
                 H: 0
@@ -132,7 +132,7 @@ export class StellarPathfinder {
 
         this.lastExploredNode = currentNode;
 
-        if (currentNode.seed.equals(this.targetSystem.seed)) {
+        if (starSystemCoordinatesEquals(currentNode.coordinates, this.targetSystem.coordinates)) {
             this.hasPath = true;
             return;
         }
@@ -140,7 +140,7 @@ export class StellarPathfinder {
         const neighborsWithDistances = this.getNeighbors(currentNode);
         for (let i = 0; i < neighborsWithDistances.length; i++) {
             const [neighbor, distance] = neighborsWithDistances[i];
-            if (this.closedList.find((node) => node.seed.equals(neighbor.seed))) {
+            if (this.closedList.find((node) => starSystemCoordinatesEquals(node.coordinates, neighbor.coordinates))) {
                 // if the neighbor is already in the closed list, skip it
                 continue;
             }
@@ -148,22 +148,22 @@ export class StellarPathfinder {
             const G = currentNode.G + distance;
             const H = this.getHeuristic(neighbor);
 
-            const openNode = this.openList.find((node) => node.seed.equals(neighbor.seed));
+            const openNode = this.openList.find((node) => starSystemCoordinatesEquals(node.coordinates, neighbor.coordinates));
             if (openNode !== undefined) {
                 // if the neighbor is already in the open list, update its G value if the new path is shorter
                 if (G < openNode.G) {
                     openNode.G = G;
                     openNode.H = H;
-                    this.seedToPrevious.set(neighbor.seed.toString(), currentNode.seed);
+                    this.coordinatesToPrevious.set(JSON.stringify(neighbor.coordinates), currentNode.coordinates);
                 }
             } else {
                 this.openList.push({
-                    seed: neighbor.seed,
+                    coordinates: neighbor.coordinates,
                     position: neighbor.position,
                     G,
                     H
                 });
-                this.seedToPrevious.set(neighbor.seed.toString(), currentNode.seed);
+                this.coordinatesToPrevious.set(JSON.stringify(neighbor.coordinates), currentNode.coordinates);
             }
         }
 
@@ -177,7 +177,7 @@ export class StellarPathfinder {
      * @throws An error if the pathfinder has not been initialized
      * @throws An error if no path has been found
      */
-    getPath(): SystemSeed[] {
+    getPath(): StarSystemCoordinates[] {
         if (this.startSystem === null || this.targetSystem === null) {
             throw new Error("Cannot get path without initializing the pathfinder first");
         }
@@ -186,22 +186,22 @@ export class StellarPathfinder {
             throw new Error("No path found");
         }
 
-        const path: SystemSeed[] = [];
-        let currentSeed = this.targetSystem.seed;
-        while (currentSeed !== this.startSystem.seed) {
+        const path: StarSystemCoordinates[] = [];
+        let currentCoordinates = this.targetSystem.coordinates;
+        while (currentCoordinates !== this.startSystem.coordinates) {
             if (path.length >= 2 ** 32) {
                 throw new Error(
-                    `Path between ${this.startSystem.seed.toString()} and ${this.targetSystem.seed.toString()} is too long, exceeding 2^32 elements! There might be a loop somewhere...`
+                    `Path between ${this.startSystem.coordinates.toString()} and ${this.targetSystem.coordinates.toString()} is too long, exceeding 2^32 elements! There might be a loop somewhere...`
                 );
             }
-            path.push(currentSeed);
-            const previous = this.seedToPrevious.get(currentSeed.toString());
+            path.push(currentCoordinates);
+            const previous = this.coordinatesToPrevious.get(JSON.stringify(currentCoordinates));
             if (previous === undefined) {
                 throw new Error("Could not find a path to the target system");
             }
-            currentSeed = previous;
+            currentCoordinates = previous;
         }
-        path.push(this.startSystem.seed);
+        path.push(this.startSystem.coordinates);
 
         return path.reverse();
     }

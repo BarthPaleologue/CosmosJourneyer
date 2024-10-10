@@ -20,7 +20,6 @@ import { BodyEditor, EditorVisibility } from "../ui/bodyEditor/bodyEditor";
 import { UberScene } from "../uberCore/uberScene";
 import { AxisRenderer } from "../orbit/axisRenderer";
 import { TargetCursorLayer } from "../ui/targetCursorLayer";
-import { Animation } from "@babylonjs/core/Animations/animation";
 import { StarSystemController } from "./starSystemController";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
@@ -43,13 +42,10 @@ import { getForwardDirection, getRotationQuaternion, setRotationQuaternion, tran
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { View } from "../utils/view";
-import { SystemSeed } from "../utils/systemSeed";
-import { StarSector } from "../starmap/starSector";
-import { StarMap } from "../starmap/starMap";
 import { SystemTarget } from "../utils/systemTarget";
 import { StarSystemInputs } from "../inputs/starSystemInputs";
 import { createNotification } from "../utils/notification";
-import { axisCompositeToString } from "../utils/inputControlsString";
+import { axisCompositeToString, dPadCompositeToString } from "../utils/inputControlsString";
 import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
 import { AxisComposite } from "@brianchirls/game-input/browser";
 import { getMoonSeed, getSpaceStationSeed } from "../planets/common";
@@ -70,10 +66,19 @@ import { Materials } from "../assets/materials";
 import { SpaceStation } from "../spacestation/spaceStation";
 import { ObjectTargetCursorType } from "../ui/objectTargetCursor";
 import { SpaceStationLayer } from "../ui/spaceStation/spaceStationLayer";
-import { SeededStarSystemModel } from "./seededStarSystemModel";
 import { placeSpaceStations } from "../society/spaceStationPlacement";
 import { isSystemInHumanBubble } from "../society/starSystemSociety";
+import { Player } from "../player/player";
+import { getNeighborStarSystemCoordinates } from "../utils/getNeighborStarSystems";
+import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
+import { getUniverseObjectId } from "../utils/orbitalObjectId";
+import { DefaultControlsInputs } from "../defaultControls/defaultControlsInputs";
+import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
+import { MissionContext } from "../missions/missionContext";
+import { Mission } from "../missions/mission";
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "./starSystemModel";
+import { getSystemModelFromCoordinates } from "../utils/starSystemCoordinatesUtils";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -97,6 +102,8 @@ export class StarSystemView implements View {
     readonly spaceStationLayer: SpaceStationLayer;
 
     private isUiEnabled = true;
+
+    private readonly player: Player;
 
     /**
      * A debug HTML UI to change the properties of the closest celestial body
@@ -144,12 +151,6 @@ export class StarSystemView implements View {
     private readonly axisRenderer: AxisRenderer = new AxisRenderer();
 
     /**
-     * An animation to unzoom the camera when opening the star map
-     * @private
-     */
-    private static readonly UN_ZOOM_ANIMATION = new Animation("unZoom", "radius", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
-
-    /**
      * The controller of the current star system. This controller is unique per star system and is destroyed when the star system is changed.
      * @private
      */
@@ -168,6 +169,12 @@ export class StarSystemView implements View {
     readonly onInitStarSystem = new Observable<void>();
 
     /**
+     * A lock to prevent multiple executions of the jump to system action
+     * @private
+     */
+    private jumpLock = false;
+
+    /**
      * Whether the star system is currently loading or not
      * @private
      */
@@ -178,27 +185,19 @@ export class StarSystemView implements View {
     /**
      * Creates an empty star system view with a scene, a gui and a havok plugin
      * To fill it with a star system, use `loadStarSystem` and then `initStarSystem`
+     * @param player The player object shared with the rest of the game
      * @param engine The BabylonJS engine
      * @param havokInstance The Havok physics instance
      */
-    constructor(engine: AbstractEngine, havokInstance: HavokPhysicsWithBindings) {
-        this.spaceShipLayer = new SpaceShipLayer();
+    constructor(player: Player, engine: AbstractEngine, havokInstance: HavokPhysicsWithBindings) {
+        this.player = player;
+
+        this.spaceShipLayer = new SpaceShipLayer(this.player);
         this.bodyEditor = new BodyEditor(EditorVisibility.HIDDEN);
 
         const canvas = engine.getRenderingCanvas();
         if (canvas === null) throw new Error("Canvas is null");
         this.bodyEditor.setCanvas(canvas);
-
-        StarSystemView.UN_ZOOM_ANIMATION.setKeys([
-            {
-                frame: 0,
-                value: ShipControls.BASE_CAMERA_RADIUS
-            },
-            {
-                frame: 30,
-                value: 600
-            }
-        ]);
 
         StarSystemInputs.map.toggleUi.on("complete", () => {
             this.isUiEnabled = !this.isUiEnabled;
@@ -217,9 +216,9 @@ export class StarSystemView implements View {
             this.bodyEditor.setVisibility(this.bodyEditor.getVisibility() === EditorVisibility.HIDDEN ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
         });
 
-        StarSystemInputs.map.cycleViews.on("complete", () => {
+        StarSystemInputs.map.cycleViews.on("complete", async () => {
             if (this.scene.getActiveControls() === this.getSpaceshipControls()) {
-                this.switchToDefaultControls();
+                await this.switchToDefaultControls(true);
             } else if (this.scene.getActiveControls() === this.getDefaultControls()) {
                 this.switchToCharacterControls();
             } else if (this.scene.getActiveControls() === this.getCharacterControls()) {
@@ -245,9 +244,11 @@ export class StarSystemView implements View {
         });
 
         StarSystemInputs.map.jumpToSystem.on("complete", async () => {
-            if (this.isLoadingSystem) return;
             const target = this.targetCursorLayer.getTarget();
             if (!(target instanceof SystemTarget)) return;
+
+            if (!this.jumpLock) this.jumpLock = true;
+            else return;
 
             const shipControls = this.getSpaceshipControls();
 
@@ -281,18 +282,19 @@ export class StarSystemView implements View {
                 this.spaceshipControls?.spaceship.hyperSpaceTunnel.update(deltaSeconds);
             });
 
-            const systemSeed = target.seed;
-            this.isLoadingSystem = true;
-            await this.loadStarSystemFromSeed(systemSeed);
+            const starSystemCoordinates = target.systemCoordinates;
+            const systemModel = getSystemModelFromCoordinates(starSystemCoordinates);
+            const systemController = new StarSystemController(systemModel, this.scene);
+            await this.loadStarSystem(systemController, true);
             this.initStarSystem();
 
             this.spaceshipControls?.spaceship.hyperSpaceTunnel.setEnabled(false);
             this.spaceshipControls?.spaceship.warpTunnel.getTransform().setEnabled(true);
             this.spaceshipControls?.spaceship.hyperSpaceSound.setTargetVolume(0);
-            this.isLoadingSystem = false;
+
             AudioManager.SetMask(AudioMasks.STAR_SYSTEM_VIEW);
             observer.remove();
-            this.targetCursorLayer.setTarget(null);
+            this.jumpLock = false;
         });
 
         StarSystemInputs.map.toggleSpaceShipCharacter.on("complete", async () => {
@@ -340,6 +342,11 @@ export class StarSystemView implements View {
             }
         });
 
+        StarSystemInputs.map.printDebugInfo.on("complete", () => {
+            const object = this.getStarSystem().getNearestOrbitalObject(Vector3.Zero());
+            console.log(getUniverseObjectId(object, this.getStarSystem()));
+        });
+
         this.scene = new UberScene(engine);
         // The right-handed system allows to use directly GLTF models without having to flip them with a transform
         this.scene.useRightHandedSystem = true;
@@ -367,8 +374,8 @@ export class StarSystemView implements View {
             this.updateBeforeRender(deltaSeconds);
         });
 
-        this.scene.onAfterRenderObservable.add(() => {
-            this.updateAfterRender();
+        this.scene.onAfterRenderObservable.add(async () => {
+            await this.updateAfterRender();
         });
 
         window.addEventListener("resize", () => {
@@ -378,17 +385,21 @@ export class StarSystemView implements View {
         this.bodyEditor.resize();
         this.spaceShipLayer.setVisibility(false);
 
-        this.spaceStationLayer = new SpaceStationLayer();
+        this.spaceStationLayer = new SpaceStationLayer(this.player);
         this.spaceStationLayer.setVisibility(false);
         this.spaceStationLayer.onTakeOffObservable.add(() => {
             this.spaceshipControls?.spaceship.takeOff();
         });
 
         this.targetCursorLayer = new TargetCursorLayer();
-    }
 
-    public async loadStarSystemFromSeed(seed: SystemSeed) {
-        await this.loadStarSystem(new StarSystemController(seed, this.scene), true);
+        /*
+        const inspectorRoot = document.getElementById("inspectorLayer");
+        if(inspectorRoot === null) throw new Error("Inspector root not found");
+        Inspector.Show(this.scene, {
+            globalRoot: inspectorRoot,
+        });
+        */
     }
 
     /**
@@ -398,11 +409,19 @@ export class StarSystemView implements View {
      * @param timeOut
      */
     public async loadStarSystem(starSystem: StarSystemController, needsGenerating = true, timeOut = 700) {
+        if (this.isLoadingSystem) {
+            throw new Error("Cannot load a new star system while the current one is loading");
+        }
+        this.isLoadingSystem = true;
+
         if (this.starSystem !== null) {
+            this.spaceshipControls?.setClosestLandableFacility(null);
+            this.characterControls?.setClosestWalkableObject(null);
             this.chunkForge.reset();
             this.postProcessManager.reset();
             this.starSystem.dispose();
             this.targetCursorLayer.reset();
+            this.spaceStationLayer.reset();
         }
         this.starSystem = starSystem;
 
@@ -452,21 +471,6 @@ export class StarSystemView implements View {
             }
         }
 
-        // Space stations
-        if (systemModel instanceof SeededStarSystemModel && isSystemInHumanBubble(systemModel.seed)) {
-            const spaceStationPlaces = placeSpaceStations(systemModel);
-            for (const planetModel of spaceStationPlaces) {
-                const planet = planets.find((planet) => planet.model.name === planetModel.name);
-                if (planet === undefined) throw new Error("Planet not found to place space station around");
-
-                const seed = getSpaceStationSeed(planet.model, 0);
-                const spaceStation = StarSystemHelper.MakeSpaceStation(starSystem, seed, planet);
-                spaceStation.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
-
-                await wait(timeOut);
-            }
-        }
-
         // Anomalies
         for (let i = 0; i < systemModel.getNbAnomalies(); i++) {
             console.log("Anomaly:", i + 1, "of", systemModel.getNbAnomalies());
@@ -485,6 +489,21 @@ export class StarSystemView implements View {
             anomaly.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
 
             await wait(timeOut);
+        }
+
+        // Space stations
+        if (isSystemInHumanBubble(systemModel.getCoordinates())) {
+            const spaceStationPlaces = placeSpaceStations(systemModel);
+            for (const planetModel of spaceStationPlaces) {
+                const planet = planets.find((planet) => planet.model.name === planetModel.name);
+                if (planet === undefined) throw new Error("Planet not found to place space station around");
+
+                const seed = getSpaceStationSeed(planet.model, 0);
+                const spaceStation = StarSystemHelper.MakeSpaceStation(starSystem, seed, planet);
+                spaceStation.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
+
+                await wait(timeOut);
+            }
         }
     }
 
@@ -518,20 +537,47 @@ export class StarSystemView implements View {
         this.axisRenderer.setOrbitalObjects(starSystem.getOrbitalObjects(), this.scene);
 
         this.spaceShipLayer.setTarget(null);
+        this.targetCursorLayer.setTarget(null);
 
         const firstBody = starSystem.getBodies()[0];
         if (firstBody === undefined) throw new Error("No bodies in star system");
 
         const activeController = this.scene.getActiveControls();
-        let controllerDistanceFactor = 5;
-        if (firstBody instanceof BlackHole) controllerDistanceFactor = 7;
+        let controllerDistanceFactor = 7;
+        if (firstBody instanceof BlackHole) controllerDistanceFactor = 5;
         else if (firstBody instanceof NeutronStar) controllerDistanceFactor = 100_000;
         positionNearObjectBrightSide(activeController, firstBody, starSystem, controllerDistanceFactor);
 
         starSystem.initPostProcesses(this.postProcessManager);
 
+        getNeighborStarSystemCoordinates(starSystem.model.getCoordinates(), Math.min(Settings.PLAYER_JUMP_RANGE_LY, Settings.VISIBLE_NEIGHBORHOOD_MAX_RADIUS_LY)).forEach(
+            ([neighborCoordinates, position, distance]) => {
+                const systemTarget = this.getStarSystem().addSystemTarget(neighborCoordinates);
+                this.targetCursorLayer.addObject(systemTarget, ObjectTargetCursorType.STAR_SYSTEM, 0, 0);
+            }
+        );
+
+        if (this.player.currentItinerary.length >= 2) {
+            const targetCoordinates = this.player.currentItinerary[1];
+            if (starSystemCoordinatesEquals(starSystem.model.getCoordinates(), targetCoordinates)) {
+                // the current system was the first destination of the itinerary, we can remove the system before from the itinerary
+                this.player.currentItinerary.shift();
+
+                // now there are either one or more systems in the itinerary (including the current one)
+                if (this.player.currentItinerary.length >= 2) {
+                    // if there are more than 1, the journey continues to the next system
+                    this.setSystemAsTarget(this.player.currentItinerary[1]);
+                } else {
+                    // if there is only one (the current system), the journey is over
+                    this.player.currentItinerary = [];
+                }
+            }
+        }
+
         this.onInitStarSystem.notifyObservers();
         this.scene.getEngine().loadingScreen.hideLoadingUI();
+
+        this.isLoadingSystem = false;
     }
 
     /**
@@ -603,27 +649,57 @@ export class StarSystemView implements View {
 
         this.orbitRenderer.update();
 
+        // update missions
+        const missionContext: MissionContext = {
+            currentSystem: starSystem,
+            playerPosition: this.scene.getActiveControls().getTransform().getAbsolutePosition(),
+            physicsEngine: this.scene.getPhysicsEngine() as PhysicsEngineV2
+        };
+
+        const newlyCompletedMissions: Mission[] = [];
+        this.player.currentMissions.forEach((mission) => {
+            if (mission.isCompleted()) return;
+            mission.update(missionContext);
+            if (mission.isCompleted()) {
+                this.player.balance += mission.getReward();
+                Sounds.EnqueuePlay(Sounds.MISSION_COMPLETE);
+                newlyCompletedMissions.push(mission);
+            }
+        });
+
+        this.player.completedMissions.push(...newlyCompletedMissions);
+        this.player.currentMissions = this.player.currentMissions.filter((mission) => !mission.isCompleted());
+
+        // update dynamic materials
         Materials.BUTTERFLY_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
         Materials.BUTTERFLY_DEPTH_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
         Materials.GRASS_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
         Materials.GRASS_DEPTH_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
     }
 
-    public updateAfterRender() {
+    public async updateAfterRender() {
         if (this.isLoadingSystem) return;
 
         const starSystem = this.getStarSystem();
         if (this.spaceshipControls === null) throw new Error("Spaceship controls is null");
         if (this.characterControls === null) throw new Error("Character controls is null");
 
-        const nearestCelestialBody = starSystem.getNearestCelestialBody(this.scene.getActiveControls().getTransform().getAbsolutePosition());
-        const nearestOrbitalObject = starSystem.getNearestOrbitalObject(this.scene.getActiveControls().getTransform().getAbsolutePosition());
+        const activeControls = this.scene.getActiveControls();
+
+        const nearestCelestialBody = starSystem.getNearestCelestialBody(activeControls.getTransform().getAbsolutePosition());
+        const nearestOrbitalObject = starSystem.getNearestOrbitalObject(activeControls.getTransform().getAbsolutePosition());
 
         this.bodyEditor.update(nearestCelestialBody, this.postProcessManager, this.scene);
 
-        this.spaceShipLayer.update(nearestOrbitalObject, this.scene.getActiveControls().getTransform());
+        const missionContext: MissionContext = {
+            currentSystem: starSystem,
+            playerPosition: activeControls.getTransform().getAbsolutePosition(),
+            physicsEngine: this.scene.getPhysicsEngine() as PhysicsEngineV2
+        };
 
-        this.targetCursorLayer.update(this.scene.getActiveControls().getActiveCameras()[0]);
+        await this.spaceShipLayer.update(nearestOrbitalObject, activeControls.getTransform(), missionContext);
+
+        this.targetCursorLayer.update(activeControls.getActiveCameras()[0]);
         const targetLandingPad = this.spaceshipControls.spaceship.getTargetLandingPad();
         if (targetLandingPad !== null && !this.spaceshipControls.spaceship.isLanded() && this.targetCursorLayer.getTarget() !== targetLandingPad) {
             this.targetCursorLayer.setTarget(targetLandingPad);
@@ -636,7 +712,7 @@ export class StarSystemView implements View {
                 .getSpaceStations()
                 .find((spaceStation) => {
                     if (spaceStation === facility) {
-                        this.spaceStationLayer.setStation(spaceStation.model);
+                        this.spaceStationLayer.setStation(spaceStation.model, this.player);
                         return true;
                     }
                     return false;
@@ -646,7 +722,7 @@ export class StarSystemView implements View {
         }
 
         this.targetCursorLayer.setEnabled(this.isUiEnabled && !this.spaceshipControls.spaceship.isLandedAtFacility());
-        this.spaceShipLayer.setVisibility(this.isUiEnabled && this.scene.getActiveControls() === this.spaceshipControls && !this.spaceshipControls.spaceship.isLandedAtFacility());
+        this.spaceShipLayer.setVisibility(this.isUiEnabled && activeControls === this.spaceshipControls && !this.spaceshipControls.spaceship.isLandedAtFacility());
     }
 
     /**
@@ -725,10 +801,12 @@ export class StarSystemView implements View {
     /**
      * Switches the active controller to the default controls
      */
-    public switchToDefaultControls() {
+    public async switchToDefaultControls(showHelpNotification: boolean) {
         const shipControls = this.getSpaceshipControls();
         const characterControls = this.getCharacterControls();
         const defaultControls = this.getDefaultControls();
+
+        const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
 
         this.spaceShipLayer.setVisibility(false);
 
@@ -744,6 +822,11 @@ export class StarSystemView implements View {
         this.scene.setActiveControls(defaultControls);
         setRotationQuaternion(defaultControls.getTransform(), getRotationQuaternion(shipControls.getTransform()).clone());
         this.postProcessManager.rebuild();
+
+        if (showHelpNotification) {
+            const keys = dPadCompositeToString(DefaultControlsInputs.map.move.bindings[0].control as DPadComposite, keyboardLayoutMap);
+            createNotification(`Move using ${keys.map((key) => key[1].replace("Key", "")).join(", ")}`, 20000);
+        }
     }
 
     /**
@@ -769,26 +852,11 @@ export class StarSystemView implements View {
         this.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
         this.spaceShipLayer.setVisibility(false);
         this.targetCursorLayer.setEnabled(false);
+        this.spaceStationLayer.setVisibility(false);
     }
 
-    public unZoom(callback: () => void) {
-        const activeControls = this.scene.getActiveControls();
-        if (activeControls !== this.getSpaceshipControls()) {
-            callback();
-            return;
-        }
-        activeControls.getActiveCameras().forEach((camera) => (camera.animations = [StarSystemView.UN_ZOOM_ANIMATION]));
-        this.scene.beginAnimation(this.scene.getActiveControls().getActiveCameras(), 0, 60, false, 2.0, () => {
-            this.scene
-                .getActiveControls()
-                .getActiveCameras()
-                .forEach((camera) => (camera.animations = []));
-            callback();
-            this.scene.onAfterRenderObservable.addOnce(() => {
-                (activeControls as ShipControls).thirdPersonCamera.radius = 30;
-                this.hideHtmlUI();
-            });
-        });
+    public setUIEnabled(enabled: boolean) {
+        this.isUiEnabled = enabled;
     }
 
     /**
@@ -796,24 +864,14 @@ export class StarSystemView implements View {
      * This target will display the name of the target system and its distance.
      * @param targetSeed the seed of the target system
      */
-    public setSystemAsTarget(targetSeed: SystemSeed) {
-        const currentSystem = this.getStarSystem();
-        const currentSeed = currentSystem.model instanceof SeededStarSystemModel ? currentSystem.model.seed : new SystemSeed(0, 0, 0, 0);
-
-        const currentSystemStarSector = new StarSector(new Vector3(currentSeed.starSectorX, currentSeed.starSectorY, currentSeed.starSectorZ));
-
-        const targetSystemStarSector = new StarSector(new Vector3(targetSeed.starSectorX, targetSeed.starSectorY, targetSeed.starSectorZ));
-
-        const currentSystemUniversePosition = currentSystemStarSector.getPositionOfStar(currentSeed.index);
-        const targetSystemUniversePosition = targetSystemStarSector.getPositionOfStar(targetSeed.index);
-
-        const direction = targetSystemUniversePosition.subtract(currentSystemUniversePosition).normalize();
-        Vector3.TransformCoordinatesToRef(direction, currentSystem.starFieldBox.getRotationMatrix(), direction);
-
-        const distance = Vector3.Distance(currentSystemUniversePosition, targetSystemUniversePosition) * Settings.LIGHT_YEAR;
-
-        const target = currentSystem.addSystemTarget(targetSeed, direction, distance);
-        this.targetCursorLayer.addObject(target, ObjectTargetCursorType.CELESTIAL_BODY, 0, 0);
+    public setSystemAsTarget(targetSeed: StarSystemCoordinates) {
+        let target = this.getStarSystem()
+            .getSystemTargets()
+            .find((systemTarget) => starSystemCoordinatesEquals(systemTarget.systemCoordinates, targetSeed));
+        if (target === undefined) {
+            target = this.getStarSystem().addSystemTarget(targetSeed);
+            this.targetCursorLayer.addObject(target, ObjectTargetCursorType.STAR_SYSTEM, 0, 0);
+        }
         this.targetCursorLayer.setTarget(target);
         this.spaceShipLayer.setTarget(target.getTransform());
     }
@@ -828,6 +886,7 @@ export class StarSystemView implements View {
 
     public detachControl() {
         this.scene.detachControl();
+        this.hideHtmlUI();
     }
 
     public getMainScene() {

@@ -26,6 +26,12 @@ export const Settings = {
 
     EARTH_RADIUS: 1000e3, // target is 6000e3
 
+    EARTH_MASS: 5.972e24,
+
+    MOON_MASS: 7.348e22,
+
+    JUPITER_MASS: 1.898e27,
+
     /**
      * The distance light travels in one year.
      */
@@ -46,6 +52,11 @@ export const Settings = {
     FLOATING_ORIGIN_THRESHOLD: 500,
 
     HUMAN_BUBBLE_RADIUS_LY: 100,
+
+    PLAYER_JUMP_RANGE_LY: 15,
+    VISIBLE_NEIGHBORHOOD_MAX_RADIUS_LY: 20,
+
+    CREDIT_SYMBOL: "₽",
 
     /**
      * The average daily intake for a human being in kcal/day

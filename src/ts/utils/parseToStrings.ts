@@ -17,6 +17,7 @@
 
 import { Settings } from "../settings";
 import i18n from "../i18n";
+import { SystemObjectType } from "../saveFile/universeCoordinates";
 
 export function parseSpeed(speed: number): string {
     if (speed < 1000) {
@@ -53,8 +54,10 @@ export function parseSeconds(seconds: number): string {
         return `${(seconds / 3600).toFixed(0)} h`;
     } else if (seconds < 604800) {
         return `${(seconds / (60 * 60 * 24)).toFixed(0)} d`;
-    } else {
+    } else if (seconds < 31557600 * 10) {
         return `${(seconds / (60 * 60 * 24 * 365.25)).toFixed(0)} y`;
+    } else {
+        return `∞`;
     }
 }
 
@@ -71,7 +74,21 @@ export function parsePercentageFrom01(percentage01: number): string {
 export const Alphabet = "abcdefghijklmnopqrstuvwxyz";
 
 export const GreekAlphabet = "αβγδεζηθικλμνξοπρστυφχψω";
+export const ReversedGreekAlphabet = GreekAlphabet.split("").reverse().join("");
 
 export function starName(baseName: string, index: number): string {
     return `${baseName} ${Alphabet[index].toUpperCase()}`;
+}
+
+export function systemObjectTypeToString(systemObjectType: SystemObjectType): string {
+    switch (systemObjectType) {
+        case SystemObjectType.ANOMALY:
+            return i18n.t("anomaly");
+        case SystemObjectType.PLANETARY_MASS_OBJECT:
+            return i18n.t("planet");
+        case SystemObjectType.SPACE_STATION:
+            return i18n.t("spaceStation");
+        case SystemObjectType.STELLAR_OBJECT:
+            return i18n.t("stellarObject");
+    }
 }

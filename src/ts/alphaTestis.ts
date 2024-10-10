@@ -47,6 +47,14 @@ console.log(`Time is going ${Settings.TIME_MULTIPLIER} time${Settings.TIME_MULTI
 
 const starSystemModel = new CustomStarSystemModel(
     "Alpha Testis",
+    {
+        starSectorX: 0,
+        starSectorY: 0,
+        starSectorZ: 0,
+        localX: 0,
+        localY: 0,
+        localZ: 0
+    },
     [[BodyType.STAR, 4413.641464990006]],
     [
         [BodyType.TELLURIC_PLANET, 0.4233609183800225],

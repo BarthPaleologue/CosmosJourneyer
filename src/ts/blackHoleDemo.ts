@@ -30,15 +30,30 @@ const starSystemView = engine.starSystemView;
 
 const scene = starSystemView.scene;
 
-const starSystemModel = new CustomStarSystemModel("Black Hole Demo", [[BodyType.BLACK_HOLE, 0]], [[BodyType.TELLURIC_PLANET, 42]], []);
+const starSystemModel = new CustomStarSystemModel(
+    "Black Hole Demo",
+    {
+        starSectorX: 0,
+        starSectorY: 0,
+        starSectorZ: 0,
+        localX: 0,
+        localY: 0,
+        localZ: 0
+    },
+    [[BodyType.BLACK_HOLE, 0]],
+    [[BodyType.TELLURIC_PLANET, 42]],
+    []
+);
 const starSystem = new StarSystemController(starSystemModel, scene);
 
 await starSystemView.loadStarSystem(starSystem, true);
 
 engine.init(true);
 
-starSystemView.switchToDefaultControls();
+await starSystemView.switchToDefaultControls(true);
 
 const BH = starSystem.stellarObjects[0];
+
+starSystemView.getDefaultControls().speed = BH.getBoundingRadius();
 
 positionNearObjectBrightSide(scene.getActiveControls(), BH, starSystem, 20);

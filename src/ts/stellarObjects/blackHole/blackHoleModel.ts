@@ -16,10 +16,9 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { seededSquirrelNoise } from "squirrel-noise";
-import { getOrbitalPeriod } from "../../orbit/orbit";
+import { getOrbitalPeriod, Orbit } from "../../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { normalRandom, uniformRandBool } from "extended-random";
-import { OrbitProperties } from "../../orbit/orbitProperties";
+import { normalRandom } from "extended-random";
 import { BlackHolePhysicalProperties } from "../../architecture/physicalProperties";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { StellarObjectModel } from "../../architecture/stellarObject";
@@ -30,6 +29,7 @@ import { BodyType } from "../../architecture/bodyType";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { starName } from "../../utils/parseToStrings";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
+import i18n from "../../i18n";
 
 export class BlackHoleModel implements StellarObjectModel {
     readonly name: string;
@@ -43,9 +43,11 @@ export class BlackHoleModel implements StellarObjectModel {
      */
     readonly radius: number;
 
-    readonly orbit: OrbitProperties;
+    readonly orbit: Orbit;
 
     readonly physicalProperties: BlackHolePhysicalProperties;
+
+    readonly rings = null;
 
     //TODO: compute temperature of accretion disk (function of rotation speed)
     readonly temperature = 0;
@@ -57,7 +59,9 @@ export class BlackHoleModel implements StellarObjectModel {
 
     readonly starSystemModel: StarSystemModel;
 
-    constructor(seed: number, starSystemModel: StarSystemModel, parentBody?: CelestialBodyModel) {
+    readonly typeName: string;
+
+    constructor(seed: number, starSystemModel: StarSystemModel, parentBody: CelestialBodyModel | null = null) {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed);
 
@@ -68,7 +72,7 @@ export class BlackHoleModel implements StellarObjectModel {
 
         this.radius = 1000e3;
 
-        this.parentBody = parentBody ?? null;
+        this.parentBody = parentBody;
 
         // TODO: do not hardcode
         const orbitRadius = this.parentBody === null ? 0 : 2 * (this.parentBody.radius + this.radius);
@@ -77,8 +81,7 @@ export class BlackHoleModel implements StellarObjectModel {
             radius: orbitRadius,
             p: 2,
             period: getOrbitalPeriod(orbitRadius, this.parentBody?.physicalProperties.mass ?? 0),
-            normalToPlane: Vector3.Up(),
-            isPlaneAlignedWithParent: true
+            normalToPlane: Vector3.Up()
         };
 
         this.physicalProperties = {
@@ -87,6 +90,8 @@ export class BlackHoleModel implements StellarObjectModel {
             axialTilt: normalRandom(0, 0.4, this.rng, GenerationSteps.AXIAL_TILT),
             accretionDiskRadius: this.radius * normalRandom(12, 3, this.rng, 7777)
         };
+
+        this.typeName = i18n.t("objectTypes:blackHole");
     }
 
     /**
@@ -131,6 +136,10 @@ export class BlackHoleModel implements StellarObjectModel {
      */
     public getKerrMetricA(): number {
         return this.estimateAngularMomentum() / (this.physicalProperties.mass * Settings.C);
+    }
+
+    public hasNakedSingularity(): boolean {
+        return this.getKerrMetricA() > this.physicalProperties.mass;
     }
 
     /**

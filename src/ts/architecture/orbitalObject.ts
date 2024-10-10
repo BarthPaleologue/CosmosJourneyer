@@ -16,17 +16,17 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Transformable } from "./transformable";
-import { BoundingSphere } from "./boundingSphere";
-import { OrbitProperties } from "../orbit/orbitProperties";
+import { HasBoundingSphere } from "./hasBoundingSphere";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math";
 import { getRotationQuaternion, setRotationQuaternion, translate } from "../uberCore/transforms/basicTransform";
 import { OrbitalObjectPhysicalProperties } from "./physicalProperties";
 import { TypedObject } from "./typedObject";
+import { getPointOnOrbit, Orbit } from "../orbit/orbit";
 
 /**
  * Describes all objects that can have an orbital trajectory and rotate on themselves
  */
-export interface OrbitalObject extends Transformable, BoundingSphere, TypedObject {
+export interface OrbitalObject extends Transformable, HasBoundingSphere, TypedObject {
     /**
      * The name of the object
      */
@@ -40,7 +40,7 @@ export interface OrbitalObject extends Transformable, BoundingSphere, TypedObjec
     /**
      * Returns the orbital properties of the object
      */
-    getOrbitProperties(): OrbitProperties;
+    getOrbitProperties(): Orbit;
 
     /**
      * Returns the physical properties of the object
@@ -55,47 +55,32 @@ export interface OrbitalObject extends Transformable, BoundingSphere, TypedObjec
 
 export class OrbitalObjectUtils {
     /**
-     * Returns the next position of the object on its orbit. This does not update the position of the object (see UpdateOrbitalPosition)
-     * @param object The object we want to compute the next position of
-     * @param deltaTime The time elapsed since the last update
+     * Returns the position of the object on its orbit at a given time. This does not update the position of the object (see SetOrbitalPosition)
+     * @param object The object we want to compute the position of
+     * @param elapsedSeconds The time elapsed since the beginning of time in seconds
      * @constructor
      */
-    static GetNextOrbitalPosition(object: OrbitalObject, deltaTime: number): Vector3 {
+    static GetOrbitalPosition(object: OrbitalObject, elapsedSeconds: number): Vector3 {
         const orbit = object.getOrbitProperties();
         if (orbit.period === 0 || object.parent === null) return object.getTransform().getAbsolutePosition();
 
         const barycenter = object.parent.getTransform().getAbsolutePosition();
 
-        // enforce distance to orbit center
-        const oldPosition = object.getTransform().getAbsolutePosition().subtract(barycenter);
-        const newPosition = oldPosition.clone();
-
-        // rotate the object around the barycenter of the orbit, around the normal to the orbital plane
-        const dtheta = (2 * Math.PI * deltaTime) / orbit.period;
-        const rotationQuaternion = Quaternion.RotationAxis(orbit.normalToPlane, dtheta);
-        newPosition.applyRotationQuaternionInPlace(rotationQuaternion);
-        newPosition.normalize().scaleInPlace(orbit.radius);
-
-        // enforce orbital plane
-        const correctionAxis = Vector3.Cross(orbit.normalToPlane, newPosition.normalizeToNew());
-        const correctionAngle = 0.5 * Math.PI - Vector3.GetAngleBetweenVectors(orbit.normalToPlane, newPosition.normalizeToNew(), correctionAxis);
-        newPosition.applyRotationQuaternionInPlace(Quaternion.RotationAxis(correctionAxis, correctionAngle));
-
-        return newPosition.addInPlace(barycenter);
+        return getPointOnOrbit(barycenter, orbit, elapsedSeconds);
     }
 
     /**
-     * Updates the position of the object on its orbit (under the hood calls GetNextOrbitalPosition)
+     * Sets the position of the object on its orbit given the elapsed seconds.
      * @param object The object we want to update the position of
-     * @param deltaTime The time elapsed since the last update
+     * @param elapsedSeconds The time elapsed since the beginning of time in seconds
      * @constructor
      */
-    static UpdateOrbitalPosition(object: OrbitalObject, deltaTime: number): void {
+    static SetOrbitalPosition(object: OrbitalObject, elapsedSeconds: number): void {
         const orbit = object.getOrbitProperties();
         if (orbit.period === 0 || object.parent === null) return;
 
         const oldPosition = object.getTransform().getAbsolutePosition();
-        const newPosition = OrbitalObjectUtils.GetNextOrbitalPosition(object, deltaTime);
+        const newPosition = OrbitalObjectUtils.GetOrbitalPosition(object, elapsedSeconds);
         translate(object.getTransform(), newPosition.subtractInPlace(oldPosition));
     }
 
@@ -150,7 +135,7 @@ export interface OrbitalObjectModel {
     /**
      * Orbit properties of the object
      */
-    readonly orbit: OrbitProperties;
+    readonly orbit: Orbit;
 
     /**
      * Physical properties of the object
@@ -166,4 +151,9 @@ export interface OrbitalObjectModel {
      * The models of the children objects of the object
      */
     readonly childrenBodies: OrbitalObjectModel[];
+
+    /**
+     * The general name of the object type
+     */
+    readonly typeName: string;
 }

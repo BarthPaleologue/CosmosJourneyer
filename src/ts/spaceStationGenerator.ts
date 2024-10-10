@@ -37,8 +37,6 @@ import { SpaceStationModel } from "./spacestation/spacestationModel";
 import { StarFieldBox } from "./starSystem/starFieldBox";
 import { CustomStarSystemModel } from "./starSystem/customStarSystemModel";
 import { BodyType } from "./architecture/bodyType";
-import { StarSystemHelper } from "./starSystem/starSystemHelper";
-import { StarSystemController } from "./starSystem/starSystemController";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -72,7 +70,20 @@ const distanceToStar = 25000 * Settings.EARTH_RADIUS;
 defaultControls.getTransform().setAbsolutePosition(new Vector3(0, 2, -3).normalize().scaleInPlace(40e3));
 defaultControls.getTransform().lookAt(Vector3.Zero());
 
-const starSystemModel = new CustomStarSystemModel("Space Station Generator", [[BodyType.STAR, 4413.641464990006]], [], []);
+const starSystemModel = new CustomStarSystemModel(
+    "Space Station Generator",
+    {
+        starSectorX: 0,
+        starSectorY: 0,
+        starSectorZ: 0,
+        localX: 0,
+        localY: 0,
+        localZ: 0
+    },
+    [[BodyType.STAR, 4413.641464990006]],
+    [],
+    []
+);
 
 const sun = new Star(starSystemModel.getStellarObjectSeed(0), starSystemModel, scene);
 sun.getTransform().position = new Vector3(7, 2, 5).normalize().scaleInPlace(distanceToStar);

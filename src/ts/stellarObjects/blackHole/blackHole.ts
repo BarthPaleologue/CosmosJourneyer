@@ -27,12 +27,11 @@ import { StellarObject } from "../../architecture/stellarObject";
 import { Cullable } from "../../utils/cullable";
 import { CelestialBody } from "../../architecture/celestialBody";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { OrbitProperties } from "../../orbit/orbitProperties";
 import { RingsUniforms } from "../../rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
-import i18n from "../../i18n";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
+import { Orbit } from "../../orbit/orbit";
 
 export class BlackHole implements StellarObject, Cullable {
     readonly name: string;
@@ -78,7 +77,7 @@ export class BlackHole implements StellarObject, Cullable {
         return this.light;
     }
 
-    getOrbitProperties(): OrbitProperties {
+    getOrbitProperties(): Orbit {
         return this.model.orbit;
     }
 
@@ -95,7 +94,7 @@ export class BlackHole implements StellarObject, Cullable {
     }
 
     getTypeName(): string {
-        return i18n.t("objectTypes:blackHole");
+        return this.model.typeName;
     }
 
     public computeCulling(cameras: Camera[]): void {
@@ -107,7 +106,7 @@ export class BlackHole implements StellarObject, Cullable {
     }
 
     public getBoundingRadius(): number {
-        return this.getRadius();
+        return Math.max(this.getRadius(), this.model.physicalProperties.accretionDiskRadius);
     }
 
     public dispose(): void {

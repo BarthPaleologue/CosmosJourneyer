@@ -15,9 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// https://www.omnicalculator.com/chemistry/boiling-point
-// https://www.wikiwand.com/en/Boiling_point#/Saturation_temperature_and_pressure
-// https://www.desmos.com/calculator/ctxerbh48s
+/**
+ *
+ * @param pressure
+ * @see https://www.omnicalculator.com/chemistry/boiling-point
+ * @see https://www.wikiwand.com/en/Boiling_point#/Saturation_temperature_and_pressure
+ * @see https://www.desmos.com/calculator/ctxerbh48s
+ */
 export function waterBoilingPointCelsius(pressure: number): number {
     const P1 = 1.0;
     const P2 = pressure;

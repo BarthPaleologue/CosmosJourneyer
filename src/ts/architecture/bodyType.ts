@@ -19,7 +19,24 @@ export const enum BodyType {
     STAR,
     TELLURIC_PLANET,
     GAS_PLANET,
-    MANDELBULB,
+    ANOMALY,
     BLACK_HOLE,
     NEUTRON_STAR
+}
+
+export function bodyTypeToString(bodyType: BodyType): string {
+    switch (bodyType) {
+        case BodyType.STAR:
+            return "Star";
+        case BodyType.TELLURIC_PLANET:
+            return "Telluric planet";
+        case BodyType.GAS_PLANET:
+            return "Gas planet";
+        case BodyType.ANOMALY:
+            return "Anomaly";
+        case BodyType.BLACK_HOLE:
+            return "Black hole";
+        case BodyType.NEUTRON_STAR:
+            return "Neutron star";
+    }
 }

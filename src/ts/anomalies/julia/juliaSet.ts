@@ -22,16 +22,15 @@ import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { CelestialBody } from "../../architecture/celestialBody";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
-import { OrbitProperties } from "../../orbit/orbitProperties";
 import { RingsUniforms } from "../../rings/ringsUniform";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Cullable } from "../../utils/cullable";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
-import i18n from "../../i18n";
 import { Anomaly } from "../anomaly";
 import { AnomalyType } from "../anomalyType";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
+import { Orbit } from "../../orbit/orbit";
 
 export class JuliaSet implements Anomaly, Cullable {
     readonly name: string;
@@ -75,7 +74,7 @@ export class JuliaSet implements Anomaly, Cullable {
         return this.getTransform().up;
     }
 
-    getOrbitProperties(): OrbitProperties {
+    getOrbitProperties(): Orbit {
         return this.model.orbit;
     }
 
@@ -100,7 +99,7 @@ export class JuliaSet implements Anomaly, Cullable {
     }
 
     getTypeName(): string {
-        return i18n.t("objectTypes:anomaly");
+        return this.model.typeName;
     }
 
     computeCulling(cameras: Camera[]): void {

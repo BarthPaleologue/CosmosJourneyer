@@ -55,7 +55,6 @@ import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { BloomEffect } from "@babylonjs/core/PostProcesses/bloomEffect";
 import { Constants } from "@babylonjs/core/Engines/constants";
 
-
 /**
  * The order in which the post processes are rendered when away from a planet
  */
@@ -187,7 +186,7 @@ export class PostProcessManager {
         this.renderingPipelineManager = scene.postProcessRenderPipelineManager;
 
         this.colorCorrection = new ColorCorrection("colorCorrection", scene);
-        this.colorCorrection.exposure = 1.3;
+        this.colorCorrection.exposure = 1.1;
         this.colorCorrection.gamma = 1.0;
         this.colorCorrection.saturation = 1.5;
 

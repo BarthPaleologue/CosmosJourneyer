@@ -18,7 +18,7 @@ export function dPadCompositeToString(input: DPadComposite, keyboardMap: Map<str
         let name = child.name;
         // remove the "key:" prefix
         name = name.replace("key:", "");
-        if(keyboardMap?.has(name)) {
+        if (keyboardMap?.has(name)) {
             name = keyboardMap.get(name)?.toUpperCase() ?? name;
         }
         keys.push([key, name]);
@@ -37,7 +37,7 @@ export function buttonInputToString(input: ButtonInputControl, keyboardMap: Map<
     let name = input.name;
     // remove the "key:" prefix
     name = name.replace("key:", "");
-    if(keyboardMap?.has(name)) {
+    if (keyboardMap?.has(name)) {
         name = keyboardMap.get(name)?.toUpperCase() ?? name;
     }
     return name;
@@ -49,7 +49,7 @@ export function axisCompositeToString(input: AxisComposite, keyboardMap: Map<str
         let name = child.name;
         // remove the "key:" prefix
         name = name.replace("key:", "");
-        if(keyboardMap?.has(name)) {
+        if (keyboardMap?.has(name)) {
             name = keyboardMap.get(name)?.toUpperCase() ?? name;
         }
         keys.push([key, name]);

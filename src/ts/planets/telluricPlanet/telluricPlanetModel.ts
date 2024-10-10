@@ -23,8 +23,7 @@ import { clamp } from "terrain-generation";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { getOrbitalPeriod, getPeriapsis } from "../../orbit/orbit";
-import { OrbitProperties } from "../../orbit/orbitProperties";
+import { getOrbitalPeriod, getPeriapsis, Orbit } from "../../orbit/orbit";
 import { PlanetModel } from "../../architecture/planet";
 import { TelluricPlanetPhysicalProperties } from "../../architecture/physicalProperties";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
@@ -34,6 +33,8 @@ import { BodyType } from "../../architecture/bodyType";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { getPlanetName } from "../common";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
+import i18n from "../../i18n";
+import { waterBoilingPointCelsius } from "../../utils/waterMechanics";
 
 export class TelluricPlanetModel implements PlanetModel {
     readonly name: string;
@@ -46,7 +47,7 @@ export class TelluricPlanetModel implements PlanetModel {
 
     readonly radius: number;
 
-    readonly orbit: OrbitProperties;
+    readonly orbit: Orbit;
 
     readonly physicalProperties: TelluricPlanetPhysicalProperties;
 
@@ -62,6 +63,8 @@ export class TelluricPlanetModel implements PlanetModel {
 
     readonly parentBody: CelestialBodyModel | null;
     readonly childrenBodies: CelestialBodyModel[] = [];
+
+    readonly typeName;
 
     constructor(seed: number, starSystemModel: StarSystemModel, parentBody?: CelestialBodyModel) {
         this.starSystem = starSystemModel;
@@ -85,15 +88,30 @@ export class TelluricPlanetModel implements PlanetModel {
             this.radius = Math.max(0.3, normalRandom(1.0, 0.1, this.rng, GenerationSteps.RADIUS)) * Settings.EARTH_RADIUS;
         }
 
-        const mass = this.isSatelliteOfTelluric ? 1 : 10;
+        //TODO: make mass dependent on more physical properties like density
+        let mass;
+        if (this.isSatelliteOfTelluric) {
+            //FIXME: when Settings.Earth radius gets to 1:1 scale, change this value by a variable in settings
+            mass = Settings.MOON_MASS * (this.radius / 1_735e3) ** 3;
+        } else {
+            //FIXME: when Settings.Earth radius gets to 1:1 scale, change this value by a variable in settings
+            mass = Settings.EARTH_MASS * (this.radius / 6_371e3) ** 3;
+        }
+
+        const pressure = Math.max(normalRandom(0.9, 0.2, this.rng, GenerationSteps.PRESSURE), 0);
+
+        //TODO: use distance to star to determine min temperature when using 1:1 scale
+        const minTemperature = Math.max(-273, normalRandom(-20, 30, this.rng, 80));
+        // when pressure is close to 1, the max temperature is close to the min temperature (the atmosphere does thermal regulation)
+        const maxTemperature = minTemperature + Math.exp(-pressure) * randRangeInt(30, 200, this.rng, 81);
 
         this.physicalProperties = {
             mass: mass,
             axialTilt: normalRandom(0, 0.2, this.rng, GenerationSteps.AXIAL_TILT),
             rotationPeriod: (60 * 60 * 24) / 10,
-            minTemperature: randRangeInt(-60, 5, this.rng, 80),
-            maxTemperature: randRangeInt(10, 50, this.rng, 81),
-            pressure: Math.max(normalRandom(0.9, 0.2, this.rng, GenerationSteps.PRESSURE), 0),
+            minTemperature: minTemperature,
+            maxTemperature: maxTemperature,
+            pressure: pressure,
             waterAmount: Math.max(normalRandom(1.0, 0.3, this.rng, GenerationSteps.WATER_AMOUNT), 0),
             oceanLevel: 0
         };
@@ -119,8 +137,7 @@ export class TelluricPlanetModel implements PlanetModel {
             radius: orbitRadius,
             p: orbitalP,
             period: getOrbitalPeriod(orbitRadius, this.parentBody?.physicalProperties.mass ?? 0),
-            normalToPlane: orbitalPlaneNormal,
-            isPlaneAlignedWithParent: isOrbitalPlaneAlignedWithParent
+            normalToPlane: orbitalPlaneNormal
         };
 
         if (this.isSatelliteOfTelluric || this.isSatelliteOfGas) {
@@ -134,6 +151,23 @@ export class TelluricPlanetModel implements PlanetModel {
         if (this.radius <= 0.3 * Settings.EARTH_RADIUS) this.physicalProperties.pressure = 0;
 
         this.physicalProperties.oceanLevel = Settings.OCEAN_DEPTH * this.physicalProperties.waterAmount * this.physicalProperties.pressure;
+
+        const waterBoilingPoint = waterBoilingPointCelsius(this.physicalProperties.pressure);
+        const waterFreezingPoint = 0.0;
+        const epsilon = 0.05;
+        if (this.physicalProperties.pressure > epsilon) {
+            // if temperature is too high, there is no ocean (desert world)
+            if (this.physicalProperties.maxTemperature > waterBoilingPoint) this.physicalProperties.oceanLevel = 0;
+            // if temperature is too low, there is no ocean (frozen world)
+            if (this.physicalProperties.maxTemperature < waterFreezingPoint) this.physicalProperties.oceanLevel = 0;
+        } else {
+            // if pressure is too low, there is no ocean (sterile world)
+            this.physicalProperties.oceanLevel = 0;
+        }
+
+        if (this.hasLiquidWater()) {
+            this.clouds = new CloudsModel(this.getApparentRadius(), Settings.CLOUD_LAYER_HEIGHT, this.physicalProperties.waterAmount, this.physicalProperties.pressure);
+        }
 
         this.terrainSettings = {
             continents_frequency: this.radius / Settings.EARTH_RADIUS,
@@ -159,15 +193,23 @@ export class TelluricPlanetModel implements PlanetModel {
             this.rings = new RingsModel(this.rng);
         }
 
-        const waterFreezingPoint = 0.0;
-        if (waterFreezingPoint > this.physicalProperties.minTemperature && waterFreezingPoint < this.physicalProperties.maxTemperature && this.physicalProperties.pressure > 0) {
-            this.clouds = new CloudsModel(this.getApparentRadius(), Settings.CLOUD_LAYER_HEIGHT, this.physicalProperties.waterAmount, this.physicalProperties.pressure);
-        }
-
         this.nbMoons = randRangeInt(0, 2, this.rng, GenerationSteps.NB_MOONS);
+
+        this.typeName = this.isMoon() ? i18n.t("objectTypes:telluricMoon") : i18n.t("objectTypes:telluricPlanet");
     }
 
     getApparentRadius(): number {
         return this.radius + this.physicalProperties.oceanLevel;
+    }
+
+    /**
+     * Checks if the planet is a moon (i.e. a satellite of a telluric or gas planet).
+     */
+    public isMoon(): boolean {
+        return this.parentBody?.bodyType === BodyType.TELLURIC_PLANET || this.parentBody?.bodyType === BodyType.GAS_PLANET;
+    }
+
+    public hasLiquidWater(): boolean {
+        return this.physicalProperties.oceanLevel > 0;
     }
 }

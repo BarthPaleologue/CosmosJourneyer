@@ -27,21 +27,24 @@ import rotationImageSrc from "../../asset/tutorials/flightTutorial/rotation.webp
 import thrustImageSrc from "../../asset/tutorials/flightTutorial/thrust.webp";
 import warpImageSrc from "../../asset/tutorials/flightTutorial/warp.webp";
 import congratsImageSrc from "../../asset/tutorials/flightTutorial/congrats.webp";
+import { SystemObjectType } from "../saveFile/universeCoordinates";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
+import { getStarSystemCoordinatesFromSeed } from "../utils/starSystemCoordinatesUtils";
 
 export const FlightTutorial: Tutorial = {
     title: i18n.t("tutorials:flightTutorial:title"),
     coverImageSrc: welcomeImageSrc,
     description: i18n.t("tutorials:flightTutorial:description"),
 
-    universeObjectIdentifier: {
-        starSystem: {
+    universeObjectId: {
+        starSystemCoordinates: getStarSystemCoordinatesFromSeed({
             starSectorX: 0,
             starSectorY: 0,
             starSectorZ: 1,
             index: 1
-        },
-        orbitalObjectIndex: 2
+        }),
+        objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
+        objectIndex: 1
     },
 
     async getContentPanelsHtml(): Promise<string[]> {
