@@ -23,7 +23,9 @@ import { SystemSeed } from "../utils/systemSeed";
 import { BodyType } from "../architecture/bodyType";
 import { wheelOfFortune } from "../utils/random";
 import { AnomalyType } from "../anomalies/anomalyType";
-import { StarSystemModel } from "./starSystemModel";
+import { StarSystemCoordinates, StarSystemModel } from "./starSystemModel";
+import { StarSector } from "../starmap/starSector";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 const enum GenerationSteps {
     NAME,
@@ -46,6 +48,20 @@ export class SeededStarSystemModel implements StarSystemModel {
         this.rng = seededSquirrelNoise(this.seed.hash);
 
         this.name = generateStarName(this.rng, GenerationSteps.NAME);
+    }
+
+    getCoordinates(): StarSystemCoordinates {
+        const starSector = new StarSector(new Vector3(this.seed.starSectorX, this.seed.starSectorY, this.seed.starSectorZ));
+        const localPosition = starSector.getLocalPositionOfStar(this.seed.index);
+
+        return {
+            starSectorX: this.seed.starSectorX,
+            starSectorY: this.seed.starSectorY,
+            starSectorZ: this.seed.starSectorZ,
+            localX: localPosition.x,
+            localY: localPosition.y,
+            localZ: localPosition.z
+        };
     }
 
     getNbStellarObjects(): number {

@@ -1,5 +1,5 @@
 import { MissionContext } from "../missionContext";
-import { SystemSeed } from "../../utils/systemSeed";
+import { StarSystemCoordinates } from "../../starSystem/starSystemModel";
 
 /**
  * Describes any node in the mission tree.
@@ -24,9 +24,9 @@ export interface MissionNode {
 
     /**
      * Describes the node recursively.
-     * @param originSeed The seed of the system where the mission has been given.
+     * @param originSystemCoordinates The seed of the system where the mission has been given.
      */
-    describe(originSeed: SystemSeed): string;
+    describe(originSystemCoordinates: StarSystemCoordinates): string;
 
     /**
      * Describes the next task to be done in the mission subtree.
@@ -37,7 +37,7 @@ export interface MissionNode {
     /**
      * Returns the target systems of the subtree.
      */
-    getTargetSystems(): SystemSeed[];
+    getTargetSystems(): StarSystemCoordinates[];
 
     /**
      * Serializes the node recursively.

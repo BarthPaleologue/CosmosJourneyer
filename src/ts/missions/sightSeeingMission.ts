@@ -1,9 +1,7 @@
 import { Mission, MissionType } from "./mission";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
 import { SystemObjectType, UniverseObjectId } from "../saveFile/universeCoordinates";
-import { SystemSeed } from "../utils/systemSeed";
-import { getStarGalacticCoordinates } from "../utils/getStarGalacticCoordinates";
-import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
+import { getStarGalacticPosition } from "../utils/getStarGalacticPositionFromSeed";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MissionNode } from "./nodes/missionNode";
 import { MissionFlyByNode } from "./nodes/actions/sightseeing/missionFlyByNode";
@@ -45,11 +43,11 @@ function generateMissionTree(target: SightSeeingTarget): MissionNode {
 export function newSightSeeingMission(missionGiver: SpaceStationModel, target: SightSeeingTarget): Mission {
     const missionTree = generateMissionTree(target);
 
-    const targetSystem = SystemSeed.Deserialize(target.objectId.starSystem);
+    const targetSystemCoordinates = target.objectId.starSystemCoordinates;
 
-    const missionGiverGalacticCoordinates = getStarGalacticCoordinates((missionGiver.starSystem as SeededStarSystemModel).seed);
+    const missionGiverGalacticCoordinates = getStarGalacticPosition(missionGiver.starSystem.getCoordinates());
 
-    const targetGalacticCoordinates = getStarGalacticCoordinates(targetSystem);
+    const targetGalacticCoordinates = getStarGalacticPosition(targetSystemCoordinates);
     const distanceLY = Vector3.Distance(missionGiverGalacticCoordinates, targetGalacticCoordinates);
 
     // reward far away targets more

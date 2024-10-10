@@ -40,9 +40,9 @@ import { SystemTarget } from "../utils/systemTarget";
 import { JuliaSet } from "../anomalies/julia/juliaSet";
 import { Anomaly } from "../anomalies/anomaly";
 import { StarFieldBox } from "./starFieldBox";
-import { StarSystemModel } from "./starSystemModel";
+import { StarSystemCoordinates, StarSystemModel } from "./starSystemModel";
 import { Settings } from "../settings";
-import { getStarGalacticCoordinates } from "../utils/getStarGalacticCoordinates";
+import { getStarGalacticPosition } from "../utils/getStarGalacticPositionFromSeed";
 
 export class StarSystemController {
     readonly scene: UberScene;
@@ -504,18 +504,16 @@ export class StarSystemController {
         postProcessManager.update(deltaSeconds);
     }
 
-    addSystemTarget(targetSeed: SystemSeed): SystemTarget {
-        const currentSeed = this.model instanceof SeededStarSystemModel ? this.model.seed : new SystemSeed(0, 0, 0, 0);
-
-        const currentSystemUniversePosition = getStarGalacticCoordinates(currentSeed);
-        const targetSystemUniversePosition = getStarGalacticCoordinates(targetSeed);
+    addSystemTarget(targetCoordinates: StarSystemCoordinates): SystemTarget {
+        const currentSystemUniversePosition = getStarGalacticPosition(this.model.getCoordinates());
+        const targetSystemUniversePosition = getStarGalacticPosition(targetCoordinates);
 
         const distance = Vector3.Distance(currentSystemUniversePosition, targetSystemUniversePosition) * Settings.LIGHT_YEAR;
 
         const direction = targetSystemUniversePosition.subtract(currentSystemUniversePosition).scaleInPlace(Settings.LIGHT_YEAR / distance);
         Vector3.TransformCoordinatesToRef(direction, this.starFieldBox.getRotationMatrix(), direction);
 
-        const placeholderTransform = new SystemTarget(targetSeed, this.scene);
+        const placeholderTransform = new SystemTarget(targetCoordinates, this.scene);
         placeholderTransform.getTransform().position.copyFrom(direction.scale(distance));
 
         this.systemTargets.push(placeholderTransform);

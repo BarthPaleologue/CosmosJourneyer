@@ -1,12 +1,11 @@
 import { MissionNode, MissionNodeSerialized } from "./nodes/missionNode";
 import { MissionContext } from "./missionContext";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
-import { SystemSeed } from "../utils/systemSeed";
 import { getObjectModelByUniverseId, getUniverseIdForSpaceStationModel } from "../utils/orbitalObjectId";
 import i18n from "../i18n";
 import { UniverseObjectId } from "../saveFile/universeCoordinates";
-import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
 import { deserializeMissionNode } from "./nodes/deserializeNode";
+import { StarSystemCoordinates } from "../starSystem/starSystemModel";
 
 /**
  * Registered mission types. Those are used to display localized strings in the UI
@@ -92,7 +91,7 @@ export class Mission {
     /**
      * Returns all the current target systems that the player has to visit to complete the mission
      */
-    getTargetSystems(): SystemSeed[] {
+    getTargetSystems(): StarSystemCoordinates[] {
         return this.tree.getTargetSystems();
     }
 
@@ -117,12 +116,7 @@ export class Mission {
      */
     describe(): string {
         const originSystem = this.missionGiver.starSystem;
-        if (!(originSystem instanceof SeededStarSystemModel)) {
-            throw new Error("Mission giver is not in a seeded star system");
-        }
-        const originSeed = originSystem.seed;
-
-        return this.tree.describe(originSeed);
+        return this.tree.describe(originSystem.getCoordinates());
     }
 
     /**

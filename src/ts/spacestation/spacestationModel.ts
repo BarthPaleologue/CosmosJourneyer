@@ -28,8 +28,8 @@ import { CropType, CropTypes, getEdibleEnergyPerHaPerDay } from "../utils/agricu
 import { randomPieChart } from "../utils/random";
 import { generateSpaceStationName } from "../utils/spaceStationNameGenerator";
 import { StarSystemModel } from "../starSystem/starSystemModel";
-import { Faction } from "../powerplay/factions";
-import { getPowerPlayData } from "../powerplay/powerplay";
+import { Faction } from "../society/factions";
+import { getPowerPlayData } from "../society/powerplay";
 import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
 import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 import { BodyType } from "../architecture/bodyType";
@@ -115,7 +115,7 @@ export class SpaceStationModel implements OrbitalObjectModel {
 
         const powerplayData =
             this.starSystem instanceof SeededStarSystemModel
-                ? getPowerPlayData(this.starSystem.seed)
+                ? getPowerPlayData(this.starSystem.getCoordinates())
                 : {
                       materialistSpiritualist: 0.5,
                       capitalistCommunist: 0.5

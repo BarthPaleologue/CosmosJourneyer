@@ -1,12 +1,12 @@
-import { SystemSeed, SystemSeedSerialized } from "../utils/systemSeed";
 import { Mission, MissionSerialized } from "../missions/mission";
+import { StarSystemCoordinates } from "../starSystem/starSystemModel";
 
 export type SerializedPlayer = {
     name: string;
     balance: number;
     creationDate: string;
-    currentItinerary: SystemSeedSerialized[];
-    systemBookmarks: SystemSeedSerialized[];
+    currentItinerary: StarSystemCoordinates[];
+    systemBookmarks: StarSystemCoordinates[];
 
     currentMissions: MissionSerialized[];
     completedMissions: MissionSerialized[];
@@ -17,13 +17,21 @@ export class Player {
     balance: number;
     creationDate: Date;
 
-    currentItinerary: SystemSeed[];
-    systemBookmarks: SystemSeed[];
+    currentItinerary: StarSystemCoordinates[];
+    systemBookmarks: StarSystemCoordinates[];
 
     currentMissions: Mission[] = [];
     completedMissions: Mission[] = [];
 
-    private constructor(name: string, balance: number, creationDate: Date, currentItinerary: SystemSeed[], systemBookmarks: SystemSeed[], currentMissions: Mission[], completedMissions: Mission[]) {
+    private constructor(
+        name: string,
+        balance: number,
+        creationDate: Date,
+        currentItinerary: StarSystemCoordinates[],
+        systemBookmarks: StarSystemCoordinates[],
+        currentMissions: Mission[],
+        completedMissions: Mission[]
+    ) {
         this.name = name;
         this.balance = balance;
         this.creationDate = creationDate;
@@ -42,8 +50,8 @@ export class Player {
             serializedPlayer.name,
             serializedPlayer.balance,
             new Date(serializedPlayer.creationDate),
-            serializedPlayer.currentItinerary.map((seed) => SystemSeed.Deserialize(seed)),
-            serializedPlayer.systemBookmarks.map((seed) => SystemSeed.Deserialize(seed)),
+            serializedPlayer.currentItinerary,
+            serializedPlayer.systemBookmarks,
             serializedPlayer.currentMissions.map((mission) => Mission.Deserialize(mission)),
             serializedPlayer.completedMissions.map((mission) => Mission.Deserialize(mission))
         );
@@ -54,8 +62,8 @@ export class Player {
             name: player.name,
             balance: player.balance,
             creationDate: player.creationDate.toISOString(),
-            currentItinerary: player.currentItinerary.map((seed) => seed.serialize()),
-            systemBookmarks: player.systemBookmarks.map((seed) => seed.serialize()),
+            currentItinerary: player.currentItinerary,
+            systemBookmarks: player.systemBookmarks,
             currentMissions: player.currentMissions.map((mission) => mission.serialize()),
             completedMissions: player.completedMissions.map((mission) => mission.serialize())
         };

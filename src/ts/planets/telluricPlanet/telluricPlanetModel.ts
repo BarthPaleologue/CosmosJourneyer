@@ -35,7 +35,6 @@ import { getPlanetName } from "../common";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
 import i18n from "../../i18n";
 import { waterBoilingPointCelsius } from "../../utils/waterMechanics";
-import { PostProcessType } from "../../postProcesses/postProcessTypes";
 
 export class TelluricPlanetModel implements PlanetModel {
     readonly name: string;

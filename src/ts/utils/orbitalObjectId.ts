@@ -6,10 +6,9 @@ import { Planet } from "../architecture/planet";
 import { Anomaly } from "../anomalies/anomaly";
 import { SpaceStation } from "../spacestation/spaceStation";
 import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
-import { SystemSeed } from "./systemSeed";
 import { getAnomalyModels, getPlanetaryMassObjectModels, getSpaceStationModels, getStellarObjectModels } from "./getModelsFromSystemModel";
-import { StarSystemModel } from "../starSystem/starSystemModel";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
+import { getSeedFromCoordinates, getStarSystemCoordinatesFromSeed } from "./getStarGalacticPositionFromSeed";
 
 /**
  * Get the object ID of the given orbital object within the star system.
@@ -31,7 +30,7 @@ export function getSystemObjectId(orbitalObject: OrbitalObject, starSystem: Star
 
     return {
         objectType,
-        index: objectIndex
+        objectIndex: objectIndex
     };
 }
 
@@ -47,7 +46,7 @@ export function getUniverseObjectId(orbitalObject: OrbitalObject, starSystem: St
 
     return {
         ...getSystemObjectId(orbitalObject, starSystem),
-        starSystem: starSystem.model.seed.serialize()
+        starSystemCoordinates: getStarSystemCoordinatesFromSeed(starSystem.model.seed)
     };
 }
 
@@ -55,16 +54,16 @@ export function getObjectBySystemId(systemObjectId: SystemObjectId, starSystem: 
     let orbitalObject;
     switch (systemObjectId.objectType) {
         case SystemObjectType.STELLAR_OBJECT:
-            orbitalObject = starSystem.stellarObjects.at(systemObjectId.index);
+            orbitalObject = starSystem.stellarObjects.at(systemObjectId.objectIndex);
             break;
         case SystemObjectType.PLANETARY_MASS_OBJECT:
-            orbitalObject = starSystem.planetaryMassObjects.at(systemObjectId.index);
+            orbitalObject = starSystem.planetaryMassObjects.at(systemObjectId.objectIndex);
             break;
         case SystemObjectType.ANOMALY:
-            orbitalObject = starSystem.anomalies.at(systemObjectId.index);
+            orbitalObject = starSystem.anomalies.at(systemObjectId.objectIndex);
             break;
         case SystemObjectType.SPACE_STATION:
-            orbitalObject = starSystem.spaceStations.at(systemObjectId.index);
+            orbitalObject = starSystem.spaceStations.at(systemObjectId.objectIndex);
             break;
         default:
             throw new Error(`Unknown universe object type: ${systemObjectId.objectType}`);
@@ -77,18 +76,22 @@ export function getObjectBySystemId(systemObjectId: SystemObjectId, starSystem: 
 }
 
 export function getObjectModelByUniverseId(universeObjectId: UniverseObjectId): OrbitalObjectModel {
-    const starSystemSeed = SystemSeed.Deserialize(universeObjectId.starSystem);
+    const starSystemCoordinates = universeObjectId.starSystemCoordinates;
+    const starSystemSeed = getSeedFromCoordinates(starSystemCoordinates);
+    if (starSystemSeed === null) {
+        throw new Error("Could not find star system seed from coordinates. Custom star systems are not supported yet.");
+    }
     const seededStarSystemModel = new SeededStarSystemModel(starSystemSeed);
 
     switch (universeObjectId.objectType) {
         case SystemObjectType.STELLAR_OBJECT:
-            return getStellarObjectModels(seededStarSystemModel)[universeObjectId.index];
+            return getStellarObjectModels(seededStarSystemModel)[universeObjectId.objectIndex];
         case SystemObjectType.PLANETARY_MASS_OBJECT:
-            return getPlanetaryMassObjectModels(seededStarSystemModel)[universeObjectId.index];
+            return getPlanetaryMassObjectModels(seededStarSystemModel)[universeObjectId.objectIndex];
         case SystemObjectType.ANOMALY:
-            return getAnomalyModels(seededStarSystemModel)[universeObjectId.index];
+            return getAnomalyModels(seededStarSystemModel)[universeObjectId.objectIndex];
         case SystemObjectType.SPACE_STATION:
-            return getSpaceStationModels(seededStarSystemModel)[universeObjectId.index];
+            return getSpaceStationModels(seededStarSystemModel)[universeObjectId.objectIndex];
         default:
             throw new Error(`Unknown universe object type: ${universeObjectId.objectType}`);
     }
@@ -108,7 +111,7 @@ export function getUniverseIdForSpaceStationModel(spaceStationModel: SpaceStatio
 
     return {
         objectType: SystemObjectType.SPACE_STATION,
-        index,
-        starSystem: systemModel.seed.serialize()
+        objectIndex: index,
+        starSystemCoordinates: getStarSystemCoordinatesFromSeed(systemModel.seed)
     };
 }

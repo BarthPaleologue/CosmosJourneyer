@@ -1,4 +1,4 @@
-import { SystemSeedSerialized, systemSeedSerializedEquals } from "../utils/systemSeed";
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../starSystem/starSystemModel";
 
 export const enum SystemObjectType {
     STELLAR_OBJECT,
@@ -19,11 +19,11 @@ export type SystemObjectId = {
     /**
      * The index of the object inside the array containing all objects of the given type within the star system.
      */
-    index: number;
+    objectIndex: number;
 };
 
 export function systemObjectIdEquals(a: SystemObjectId, b: SystemObjectId): boolean {
-    return a.objectType === b.objectType && a.index === b.index;
+    return a.objectType === b.objectType && a.objectIndex === b.objectIndex;
 }
 
 /**
@@ -31,13 +31,13 @@ export function systemObjectIdEquals(a: SystemObjectId, b: SystemObjectId): bool
  */
 export type UniverseObjectId = SystemObjectId & {
     /**
-     * The seed of the star system.
+     * The coordinates of the star system.
      */
-    starSystem: SystemSeedSerialized;
+    starSystemCoordinates: StarSystemCoordinates;
 };
 
 export function universeObjectIdEquals(a: UniverseObjectId, b: UniverseObjectId): boolean {
-    return systemObjectIdEquals(a, b) && systemSeedSerializedEquals(a.starSystem, b.starSystem);
+    return systemObjectIdEquals(a, b) && starSystemCoordinatesEquals(a.starSystemCoordinates, b.starSystemCoordinates);
 }
 
 export type UniverseCoordinates = {

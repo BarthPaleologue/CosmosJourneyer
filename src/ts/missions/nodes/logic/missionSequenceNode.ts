@@ -1,6 +1,6 @@
 import { MissionNode, MissionNodeSerialized, MissionNodeType } from "../missionNode";
 import { MissionContext } from "../../missionContext";
-import { SystemSeed } from "../../../utils/systemSeed";
+import { StarSystemCoordinates } from "../../../starSystem/starSystemModel";
 
 export type MissionSequenceNodeSerialized = MissionNodeSerialized & {
     activeChildIndex: number;
@@ -56,8 +56,8 @@ export class MissionSequenceNode implements MissionNode {
         this.activeChildIndex = index;
     }
 
-    describe(originSeed: SystemSeed): string {
-        return this.children.map((child) => child.describe(originSeed)).join(" then ");
+    describe(originSystemCoordinates: StarSystemCoordinates): string {
+        return this.children.map((child) => child.describe(originSystemCoordinates)).join(" then ");
     }
 
     describeNextTask(context: MissionContext): Promise<string> {
@@ -66,7 +66,7 @@ export class MissionSequenceNode implements MissionNode {
         return this.children[this.activeChildIndex].describeNextTask(context);
     }
 
-    getTargetSystems(): SystemSeed[] {
+    getTargetSystems(): StarSystemCoordinates[] {
         return this.children[this.activeChildIndex].getTargetSystems();
     }
 

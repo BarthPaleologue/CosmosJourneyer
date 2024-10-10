@@ -18,7 +18,6 @@
 import { Settings } from "../settings";
 import i18n from "../i18n";
 import { SystemObjectType } from "../saveFile/universeCoordinates";
-import { BodyType } from "../architecture/bodyType";
 
 export function parseSpeed(speed: number): string {
     if (speed < 1000) {

@@ -1,5 +1,5 @@
 import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
-import { getNeighborStarSystems } from "../utils/getNeighborStarSystems";
+import { getNeighborStarSystemCoordinates } from "../utils/getNeighborStarSystems";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
 import { newSightSeeingMission } from "./sightSeeingMission";
 import { uniformRandBool } from "extended-random";
@@ -9,6 +9,7 @@ import { Player } from "../player/player";
 import { getPlanetaryMassObjectModels } from "../utils/getModelsFromSystemModel";
 import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 import { Mission, MissionType } from "./mission";
+import { getSeedFromCoordinates } from "../utils/getStarGalacticPositionFromSeed";
 
 /**
  * Generates sightseeing missions available at the given space station for the player. Missions are generated based on the current timestamp (hourly basis).
@@ -28,8 +29,12 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
     const neutronStarFlyByMissions: Mission[] = [];
     const blackHoleFlyByMissions: Mission[] = [];
 
-    const neighborSystems = getNeighborStarSystems(starSystem.seed, 75);
-    neighborSystems.forEach(([systemSeed, coordinates, distance]) => {
+    const neighborSystems = getNeighborStarSystemCoordinates(starSystem.getCoordinates(), 75);
+    neighborSystems.forEach(([systemCoordinates, coordinates, distance]) => {
+        const systemSeed = getSeedFromCoordinates(systemCoordinates);
+        if (systemSeed === null) {
+            throw new Error("Could not find star system seed from coordinates. Custom star systems are not supported yet.");
+        }
         const systemModel = new SeededStarSystemModel(systemSeed);
         systemModel.getAnomalies().forEach((_, anomalyIndex) => {
             if (!uniformRandBool(1.0 / (1.0 + 0.4 * distance), systemModel.rng, 6254 + anomalyIndex + currentHour)) return;
@@ -37,9 +42,9 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
                 newSightSeeingMission(spaceStationModel, {
                     type: MissionType.SIGHT_SEEING_FLY_BY,
                     objectId: {
-                        starSystem: systemSeed.serialize(),
+                        starSystemCoordinates: systemCoordinates,
                         objectType: SystemObjectType.ANOMALY,
-                        index: anomalyIndex
+                        objectIndex: anomalyIndex
                     }
                 })
             );
@@ -51,9 +56,9 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
                     newSightSeeingMission(spaceStationModel, {
                         type: MissionType.SIGHT_SEEING_FLY_BY,
                         objectId: {
-                            starSystem: systemSeed.serialize(),
+                            starSystemCoordinates: systemCoordinates,
                             objectType: SystemObjectType.STELLAR_OBJECT,
-                            index: stellarObjectIndex
+                            objectIndex: stellarObjectIndex
                         }
                     })
                 );
@@ -63,9 +68,9 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
                     newSightSeeingMission(spaceStationModel, {
                         type: MissionType.SIGHT_SEEING_FLY_BY,
                         objectId: {
-                            starSystem: systemSeed.serialize(),
+                            starSystemCoordinates: systemCoordinates,
                             objectType: SystemObjectType.STELLAR_OBJECT,
-                            index: stellarObjectIndex
+                            objectIndex: stellarObjectIndex
                         }
                     })
                 );
@@ -84,9 +89,9 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
                 newSightSeeingMission(spaceStationModel, {
                     type: MissionType.SIGHT_SEEING_ASTEROID_FIELD,
                     objectId: {
-                        starSystem: currentSystemModel.seed.serialize(),
+                        starSystemCoordinates: currentSystemModel.getCoordinates(),
                         objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
-                        index
+                        objectIndex: index
                     }
                 })
             );
@@ -99,9 +104,9 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
                     newSightSeeingMission(spaceStationModel, {
                         type: MissionType.SIGHT_SEEING_TERMINATOR_LANDING,
                         objectId: {
-                            starSystem: currentSystemModel.seed.serialize(),
+                            starSystemCoordinates: currentSystemModel.getCoordinates(),
                             objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
-                            index
+                            objectIndex: index
                         }
                     })
                 );

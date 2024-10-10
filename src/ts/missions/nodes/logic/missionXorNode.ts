@@ -1,6 +1,6 @@
 import { MissionNode, MissionNodeSerialized, MissionNodeType } from "../missionNode";
 import { MissionContext } from "../../missionContext";
-import { SystemSeed } from "../../../utils/systemSeed";
+import { StarSystemCoordinates } from "../../../starSystem/starSystemModel";
 
 export type MissionXorNodeSerialized = MissionNodeSerialized;
 
@@ -35,8 +35,8 @@ export class MissionXorNode implements MissionNode {
         this.hasCompletedLock = this.children.filter((child) => child.isCompleted()).length === 1;
     }
 
-    describe(originSeed: SystemSeed): string {
-        return this.children.map((child) => child.describe(originSeed)).join(" xor ");
+    describe(originSystemCoordinates: StarSystemCoordinates): string {
+        return this.children.map((child) => child.describe(originSystemCoordinates)).join(" xor ");
     }
 
     describeNextTask(context: MissionContext): Promise<string> {
@@ -44,7 +44,7 @@ export class MissionXorNode implements MissionNode {
         return Promise.resolve(this.children.map((child) => child.describeNextTask(context)).join(" xor "));
     }
 
-    getTargetSystems(): SystemSeed[] {
+    getTargetSystems(): StarSystemCoordinates[] {
         return this.children.flatMap((child) => child.getTargetSystems());
     }
 

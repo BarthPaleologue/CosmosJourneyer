@@ -1,5 +1,5 @@
 import { SpaceStationModel } from "../../spacestation/spacestationModel";
-import { getNeighborStarSystems } from "../../utils/getNeighborStarSystems";
+import { getNeighborStarSystemCoordinates } from "../../utils/getNeighborStarSystems";
 import { SeededStarSystemModel } from "../../starSystem/seededStarSystemModel";
 import { parseDistance } from "../../utils/parseToStrings";
 import { Settings } from "../../settings";
@@ -8,6 +8,7 @@ import { getSpaceStationModels } from "../../utils/getModelsFromSystemModel";
 import { generateSightseeingMissions } from "../../missions/generateSightSeeingMissions";
 import { Player } from "../../player/player";
 import { MissionContainer } from "./missionContainer";
+import { getSeedFromCoordinates } from "../../utils/getStarGalacticPositionFromSeed";
 
 /**
  * Generates all missions available at the given space station for the player. Missions are generated based on the current timestamp (hourly basis).
@@ -22,10 +23,14 @@ export function generateMissionsDom(stationModel: SpaceStationModel, player: Pla
     if (!(starSystem instanceof SeededStarSystemModel)) {
         throw new Error("Star system is not seeded, hence missions cannot be generated");
     }
-    const neighborSystems = getNeighborStarSystems(starSystem.seed, 75);
+    const neighborSystems = getNeighborStarSystemCoordinates(starSystem.getCoordinates(), 75);
 
     let neighborSpaceStations: [SpaceStationModel, number][] = [];
-    neighborSystems.forEach(([seed, coordinates, distance], index) => {
+    neighborSystems.forEach(([coordinates, position, distance], index) => {
+        const seed = getSeedFromCoordinates(coordinates);
+        if (seed === null) {
+            throw new Error("Seed is null. Custom star systems are not supported yet.");
+        }
         const systemModel = new SeededStarSystemModel(seed);
         const spaceStations = getSpaceStationModels(systemModel).map<[SpaceStationModel, number]>((stationModel) => {
             return [stationModel, distance];

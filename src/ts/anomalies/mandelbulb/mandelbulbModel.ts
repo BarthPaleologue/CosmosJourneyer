@@ -30,7 +30,6 @@ import { wheelOfFortune } from "../../utils/random";
 import { ReversedGreekAlphabet } from "../../utils/parseToStrings";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
 import i18n from "../../i18n";
-import { OrbitalObjectModel } from "../../architecture/orbitalObject";
 
 export class MandelbulbModel implements CelestialBodyModel {
     readonly name;

@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { factionToString } from "../../powerplay/factions";
+import { factionToString } from "../../society/factions";
 import { SpaceStationModel } from "../../spacestation/spacestationModel";
 import { CropType, cropTypeToString } from "../../utils/agriculture";
 

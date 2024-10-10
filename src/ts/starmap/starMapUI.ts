@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { Animation } from "@babylonjs/core/Animations/animation";
 import { Scene } from "@babylonjs/core/scene";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import i18n from "../i18n";
@@ -26,14 +25,14 @@ import { StarModel } from "../stellarObjects/star/starModel";
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 import { BodyType } from "../architecture/bodyType";
-import { getStarGalacticCoordinates } from "../utils/getStarGalacticCoordinates";
-import { factionToString } from "../powerplay/factions";
+import { getSeedFromCoordinates, getStarGalacticPosition } from "../utils/getStarGalacticPositionFromSeed";
+import { factionToString } from "../society/factions";
 import { isSystemInHumanBubble } from "../society/starSystemSociety";
 import { getSpaceStationModels } from "../utils/getModelsFromSystemModel";
 import { StarMapBookmarkButton } from "./starMapBookmarkButton";
 import { Player } from "../player/player";
-import { SystemIconMask, SystemIcons } from "./systemIcons";
-import { SystemSeed } from "../utils/systemSeed";
+import { SystemIcons } from "./systemIcons";
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../starSystem/starSystemModel";
 
 export class StarMapUI {
     readonly htmlRoot: HTMLDivElement;
@@ -72,8 +71,6 @@ export class StarMapUI {
     private currentMesh: AbstractMesh | null = null;
 
     private systemIcons: SystemIcons[] = [];
-
-    static ALPHA_ANIMATION = new Animation("alphaAnimation", "alpha", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
 
     private readonly scene: Scene;
 
@@ -215,7 +212,7 @@ export class StarMapUI {
         this.rebuildSystemIcons();
 
         this.systemIcons.forEach((systemIcons) => {
-            const systemPosition = getStarGalacticCoordinates(systemIcons.systemSeed);
+            const systemPosition = getStarGalacticPosition(systemIcons.systemCoordinates);
             const systemUniversePosition = systemPosition.add(centerOfUniversePosition);
             const screenCoordinates = Vector3.Project(systemUniversePosition, Matrix.IdentityReadOnly, camera.getTransformationMatrix(), camera.viewport);
             systemIcons.htmlRoot.classList.toggle("transparent", screenCoordinates.z < 0);
@@ -305,12 +302,18 @@ export class StarMapUI {
         return this.hoveredMesh;
     }
 
-    setSelectedSystem(targetSystemModel: SeededStarSystemModel, currentSystemModel: SeededStarSystemModel | null) {
-        const targetCoordinates = getStarGalacticCoordinates(targetSystemModel.seed);
+    setSelectedSystem(targetSystemCoordinates: StarSystemCoordinates, currentSystemCoordinates: StarSystemCoordinates | null) {
+        const targetPosition = getStarGalacticPosition(targetSystemCoordinates);
 
-        if (currentSystemModel !== null) {
-            const currentCoordinates = getStarGalacticCoordinates(currentSystemModel.seed);
-            this.shortHandUIDistanceFromCurrent.textContent = `${i18n.t("starMap:distanceFromCurrent")}: ${Vector3.Distance(currentCoordinates, targetCoordinates).toFixed(1)} ${i18n.t("units:ly")}`;
+        const targetSystemSeed = getSeedFromCoordinates(targetSystemCoordinates);
+        if (targetSystemSeed === null) {
+            throw new Error("Could not find star system seed from coordinates. Custom star systems are not supported yet.");
+        }
+        const targetSystemModel = new SeededStarSystemModel(targetSystemSeed);
+
+        if (currentSystemCoordinates !== null) {
+            const currentCoordinates = getStarGalacticPosition(currentSystemCoordinates);
+            this.shortHandUIDistanceFromCurrent.textContent = `${i18n.t("starMap:distanceFromCurrent")}: ${Vector3.Distance(currentCoordinates, targetPosition).toFixed(1)} ${i18n.t("units:ly")}`;
         }
 
         const starSeed = targetSystemModel.getStellarObjectSeed(0);
@@ -331,13 +334,13 @@ export class StarMapUI {
                 throw new Error("Unknown stellar object type!");
         }
 
-        let typeString = "";
+        let typeString: string;
         if (starModel.bodyType === BodyType.BLACK_HOLE) typeString = i18n.t("objectTypes:blackHole");
         else if (starModel.bodyType === BodyType.NEUTRON_STAR) typeString = i18n.t("objectTypes:neutronStar");
         else typeString = i18n.t("objectTypes:star", { stellarType: getStellarTypeString(starModel.stellarType) });
 
         this.shortHandUISystemType.textContent = typeString;
-        this.shortHandUIBookmarkButton.setSelectedSystemSeed(targetSystemModel.seed);
+        this.shortHandUIBookmarkButton.setSelectedSystemSeed(targetSystemModel.getCoordinates());
 
         if (starModel instanceof StarModel) {
             this.infoPanelStarPreview.style.background = starModel.color.toHexString();
@@ -351,9 +354,9 @@ export class StarMapUI {
 
         this.nbPlanets.textContent = `${i18n.t("starMap:planets")}: ${targetSystemModel.getNbPlanets()}`;
 
-        this.distanceToSol.textContent = `${i18n.t("starMap:distanceToSol")}: ${Vector3.Distance(targetCoordinates, Vector3.Zero()).toFixed(1)} ${i18n.t("units:ly")}`;
+        this.distanceToSol.textContent = `${i18n.t("starMap:distanceToSol")}: ${Vector3.Distance(targetPosition, Vector3.Zero()).toFixed(1)} ${i18n.t("units:ly")}`;
 
-        if (isSystemInHumanBubble(targetSystemModel.seed)) {
+        if (isSystemInHumanBubble(targetSystemModel.getCoordinates())) {
             const spaceStations = getSpaceStationModels(targetSystemModel);
 
             this.nbSpaceStations.textContent = `${i18n.t("starMap:spaceStations")}: ${spaceStations.length}`;
@@ -387,12 +390,12 @@ export class StarMapUI {
             // add target systems to the list of systems with icons
             .concat(targetSystems)
             // remove duplicates
-            .filter((value, index, self) => self.findIndex((v) => v.equals(value)) === index);
+            .filter((value, index, self) => self.findIndex((v) => starSystemCoordinatesEquals(v, value)) === index);
 
         const systemIconsToKeep: SystemIcons[] = [];
 
         this.systemIcons.forEach((systemIcons) => {
-            const system = systemIcons.systemSeed;
+            const system = systemIcons.systemCoordinates;
             if (!systemsWithIcons.includes(system)) {
                 systemIcons.dispose();
                 return;

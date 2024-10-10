@@ -1,7 +1,7 @@
 import { MissionNode, MissionNodeSerialized, MissionNodeType } from "../missionNode";
 import { MissionContext } from "../../missionContext";
 import i18n from "../../../i18n";
-import { SystemSeed } from "../../../utils/systemSeed";
+import { StarSystemCoordinates } from "../../../starSystem/starSystemModel";
 
 export type MissionOrNodeSerialized = MissionNodeSerialized;
 
@@ -36,8 +36,8 @@ export class MissionOrNode implements MissionNode {
         this.hasCompletedLock = this.children.some((child) => child.isCompleted());
     }
 
-    describe(originSeed: SystemSeed): string {
-        return this.children.map((child) => child.describe(originSeed)).join(` ${i18n.t("common:or")} `);
+    describe(originSystemCoordinates: StarSystemCoordinates): string {
+        return this.children.map((child) => child.describe(originSystemCoordinates)).join(` ${i18n.t("common:or")} `);
     }
 
     describeNextTask(context: MissionContext): Promise<string> {
@@ -45,7 +45,7 @@ export class MissionOrNode implements MissionNode {
         return Promise.resolve(this.children.map((child) => child.describeNextTask(context)).join(` ${i18n.t("common:or")} `));
     }
 
-    getTargetSystems(): SystemSeed[] {
+    getTargetSystems(): StarSystemCoordinates[] {
         return this.children.flatMap((child) => child.getTargetSystems());
     }
 

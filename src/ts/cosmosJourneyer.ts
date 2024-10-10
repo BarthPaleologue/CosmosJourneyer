@@ -31,7 +31,6 @@ import { PauseMenu } from "./ui/pauseMenu";
 import { StarSystemView } from "./starSystem/starSystemView";
 import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
 import { MainMenu } from "./ui/mainMenu";
-import { SystemSeed } from "./utils/systemSeed";
 import { SaveFileData } from "./saveFile/saveFileData";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Quaternion } from "@babylonjs/core/Maths/math";
@@ -55,6 +54,8 @@ import { Settings } from "./settings";
 import { SeededStarSystemModel } from "./starSystem/seededStarSystemModel";
 import { Player } from "./player/player";
 import { getObjectBySystemId, getUniverseObjectId } from "./utils/orbitalObjectId";
+import { StarSystemCoordinates } from "./starSystem/starSystemModel";
+import { getSeedFromCoordinates } from "./utils/getStarGalacticPositionFromSeed";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -95,8 +96,8 @@ export class CosmosJourneyer {
 
         // Init starmap view
         this.starMap = new StarMap(this.player, this.engine);
-        this.starMap.onTargetSetObservable.add((seed: SystemSeed) => {
-            this.starSystemView.setSystemAsTarget(seed);
+        this.starMap.onTargetSetObservable.add((systemCoordinates: StarSystemCoordinates) => {
+            this.starSystemView.setSystemAsTarget(systemCoordinates);
         });
 
         // Init the active scene
@@ -133,7 +134,7 @@ export class CosmosJourneyer {
         this.starSystemView.onInitStarSystem.add(() => {
             const starSystemModel = this.starSystemView.getStarSystem().model;
             if (starSystemModel instanceof SeededStarSystemModel) {
-                this.starMap.setCurrentStarSystem(starSystemModel.seed);
+                this.starMap.setCurrentStarSystem(starSystemModel.getCoordinates());
             }
         });
 
@@ -335,10 +336,6 @@ export class CosmosJourneyer {
     public generateSaveData(): SaveFileData {
         const currentStarSystem = this.starSystemView.getStarSystem();
 
-        if (!(currentStarSystem.model instanceof SeededStarSystemModel)) {
-            throw new Error("Cannot save inside a star system that has no generation seed");
-        }
-
         const spaceShipControls = this.starSystemView.getSpaceshipControls();
 
         // Finding the index of the nearest orbital object
@@ -440,8 +437,10 @@ export class CosmosJourneyer {
 
         const universeObjectId = universeCoordinates.universeObjectId;
 
-        const seed = SystemSeed.Deserialize(universeObjectId.starSystem);
-
+        const seed = getSeedFromCoordinates(universeObjectId.starSystemCoordinates);
+        if (seed === null) {
+            throw new Error("Could not find star system seed from coordinates. Custom star systems are not supported yet.");
+        }
         await this.starSystemView.loadStarSystemFromSeed(seed);
 
         if (this.state === EngineState.UNINITIALIZED) await this.init(true);
@@ -453,7 +452,7 @@ export class CosmosJourneyer {
 
         const nearestOrbitalObject = getObjectBySystemId(universeObjectId, this.starSystemView.getStarSystem());
         if (nearestOrbitalObject === null) {
-            throw new Error(`Could not find the nearest orbital object with index ${universeObjectId.index} and type ${universeObjectId.objectType}`);
+            throw new Error(`Could not find the nearest orbital object with index ${universeObjectId.objectIndex} and type ${universeObjectId.objectType}`);
         }
 
         const nearestOrbitalObjectWorld = nearestOrbitalObject.getTransform().getWorldMatrix();

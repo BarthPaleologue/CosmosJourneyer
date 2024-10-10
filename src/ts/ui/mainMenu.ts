@@ -19,6 +19,7 @@ import { Sounds } from "../assets/sounds";
 import { PanelType, SidePanels } from "./sidePanels";
 import { SystemObjectType, UniverseObjectId } from "../saveFile/universeCoordinates";
 import { getObjectBySystemId } from "../utils/orbitalObjectId";
+import { getSeedFromCoordinates, getStarSystemCoordinatesFromSeed } from "../utils/getStarGalacticPositionFromSeed";
 
 export class MainMenu {
     readonly scene: UberScene;
@@ -54,90 +55,54 @@ export class MainMenu {
 
         const allowedIdentifiers: UniverseObjectId[] = [
             {
-                starSystem: {
-                    starSectorX: 1,
-                    starSectorY: 1,
-                    starSectorZ: 0,
-                    index: 7
-                },
+                starSystemCoordinates: getStarSystemCoordinatesFromSeed(new SystemSeed(1, 1, 0, 7)),
                 objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
-                index: 1
+                objectIndex: 1
             },
             {
-                starSystem: {
-                    starSectorX: 0,
-                    starSectorY: 0,
-                    starSectorZ: 0,
-                    index: 0
-                },
+                starSystemCoordinates: getStarSystemCoordinatesFromSeed(new SystemSeed(0, 0, 0, 0)),
                 objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
-                index: 1
+                objectIndex: 1
             },
             {
-                starSystem: {
-                    starSectorX: 0,
-                    starSectorY: 0,
-                    starSectorZ: 1,
-                    index: 4
-                },
+                starSystemCoordinates: getStarSystemCoordinatesFromSeed(new SystemSeed(0, 0, 1, 4)),
                 objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
-                index: 3
+                objectIndex: 3
             },
             {
-                starSystem: {
-                    starSectorX: 0,
-                    starSectorY: 0,
-                    starSectorZ: 1,
-                    index: 9
-                },
+                starSystemCoordinates: getStarSystemCoordinatesFromSeed(new SystemSeed(0, 0, 1, 9)),
                 objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
-                index: 0
+                objectIndex: 0
             },
             {
-                starSystem: {
-                    starSectorX: 0,
-                    starSectorY: 0,
-                    starSectorZ: 1,
-                    index: 1
-                },
+                starSystemCoordinates: getStarSystemCoordinatesFromSeed(new SystemSeed(0, 0, 1, 1)),
                 objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
-                index: 1
+                objectIndex: 1
             },
             {
-                starSystem: {
-                    starSectorX: 1,
-                    starSectorY: 1,
-                    starSectorZ: 0,
-                    index: 12
-                },
+                starSystemCoordinates: getStarSystemCoordinatesFromSeed(new SystemSeed(1, 1, 0, 12)),
                 objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
-                index: 0
+                objectIndex: 0
             },
             {
-                starSystem: {
-                    starSectorX: 1,
-                    starSectorY: 1,
-                    starSectorZ: 0,
-                    index: 5
-                },
+                starSystemCoordinates: getStarSystemCoordinatesFromSeed(new SystemSeed(1, 1, 0, 5)),
                 objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
-                index: 0
+                objectIndex: 0
             },
             {
-                starSystem: {
-                    starSectorX: 0,
-                    starSectorY: 0,
-                    starSectorZ: 0,
-                    index: 17
-                },
+                starSystemCoordinates: getStarSystemCoordinatesFromSeed(new SystemSeed(0, 0, 0, 17)),
                 objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
-                index: 2
+                objectIndex: 2
             }
         ];
 
         const randomIndex = Math.floor(Math.random() * allowedIdentifiers.length);
         this.universeObjectId = allowedIdentifiers[randomIndex];
-        const seed = SystemSeed.Deserialize(allowedIdentifiers[randomIndex].starSystem);
+        const coordinates = this.universeObjectId.starSystemCoordinates;
+        const seed = getSeedFromCoordinates(coordinates);
+        if (seed === null) {
+            throw new Error("No seed found for coordinates. Custom star systems are not supported in the main menu yet.");
+        }
         this.starSystemController = new StarSystemController(seed, this.scene);
 
         document.body.insertAdjacentHTML("beforeend", mainMenuHTML);
@@ -300,6 +265,7 @@ export class MainMenu {
                     const saveFileData = parseSaveFileData(data);
                     this.startAnimation(() => this.onLoadSaveObservable.notifyObservers(saveFileData));
                 } catch (e) {
+                    console.error(e);
                     dropFileZone.classList.add("invalid");
                     alert(
                         "Invalid save file. Please check your save file against the current format at https://barthpaleologue.github.io/CosmosJourneyer/docs/types/saveFile_saveFileData.SaveFileData.html\nYou can open an issue here if the issue persists: https://github.com/BarthPaleologue/CosmosJourneyer"

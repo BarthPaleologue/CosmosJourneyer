@@ -71,7 +71,7 @@ import { SeededStarSystemModel } from "./seededStarSystemModel";
 import { placeSpaceStations } from "../society/spaceStationPlacement";
 import { isSystemInHumanBubble } from "../society/starSystemSociety";
 import { Player } from "../player/player";
-import { getNeighborStarSystems } from "../utils/getNeighborStarSystems";
+import { getNeighborStarSystemCoordinates } from "../utils/getNeighborStarSystems";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { getUniverseObjectId } from "../utils/orbitalObjectId";
 import { DefaultControlsInputs } from "../defaultControls/defaultControlsInputs";
@@ -79,6 +79,8 @@ import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import { MissionContext } from "../missions/missionContext";
 import { Mission } from "../missions/mission";
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "./starSystemModel";
+import { getSeedFromCoordinates } from "../utils/getStarGalacticPositionFromSeed";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -282,8 +284,10 @@ export class StarSystemView implements View {
                 this.spaceshipControls?.spaceship.hyperSpaceTunnel.update(deltaSeconds);
             });
 
-            const systemSeed = target.seed;
-            await this.loadStarSystemFromSeed(systemSeed);
+            const starSystemCoordinates = target.systemCoordinates;
+            const seed = getSeedFromCoordinates(starSystemCoordinates);
+            if (seed === null) throw new Error("No seed found for coordinates. Custom star systems are not supported for direct jumps yet.");
+            await this.loadStarSystemFromSeed(seed);
             this.initStarSystem();
 
             this.spaceshipControls?.spaceship.hyperSpaceTunnel.setEnabled(false);
@@ -411,7 +415,7 @@ export class StarSystemView implements View {
      * @param timeOut
      */
     public async loadStarSystem(starSystem: StarSystemController, needsGenerating = true, timeOut = 700) {
-        if(this.isLoadingSystem) {
+        if (this.isLoadingSystem) {
             throw new Error("Cannot load a new star system while the current one is loading");
         }
         this.isLoadingSystem = true;
@@ -494,7 +498,7 @@ export class StarSystemView implements View {
         }
 
         // Space stations
-        if (systemModel instanceof SeededStarSystemModel && isSystemInHumanBubble(systemModel.seed)) {
+        if (systemModel instanceof SeededStarSystemModel && isSystemInHumanBubble(systemModel.getCoordinates())) {
             const spaceStationPlaces = placeSpaceStations(systemModel);
             for (const planetModel of spaceStationPlaces) {
                 const planet = planets.find((planet) => planet.model.name === planetModel.name);
@@ -553,17 +557,17 @@ export class StarSystemView implements View {
         starSystem.initPostProcesses(this.postProcessManager);
 
         if (starSystem.model instanceof SeededStarSystemModel) {
-            getNeighborStarSystems(starSystem.model.seed, Math.min(Settings.PLAYER_JUMP_RANGE_LY, Settings.VISIBLE_NEIGHBORHOOD_MAX_RADIUS_LY)).forEach(
-                ([neighborSeed, position, distance]) => {
-                    const systemTarget = this.getStarSystem().addSystemTarget(neighborSeed);
+            getNeighborStarSystemCoordinates(starSystem.model.getCoordinates(), Math.min(Settings.PLAYER_JUMP_RANGE_LY, Settings.VISIBLE_NEIGHBORHOOD_MAX_RADIUS_LY)).forEach(
+                ([neighborCoordinates, position, distance]) => {
+                    const systemTarget = this.getStarSystem().addSystemTarget(neighborCoordinates);
                     this.targetCursorLayer.addObject(systemTarget, ObjectTargetCursorType.STAR_SYSTEM, 0, 0);
                 }
             );
         }
 
         if (this.player.currentItinerary.length >= 2 && starSystem.model instanceof SeededStarSystemModel) {
-            const targetSeed = this.player.currentItinerary[1];
-            if (starSystem.model.seed.equals(targetSeed)) {
+            const targetCoordinates = this.player.currentItinerary[1];
+            if (starSystemCoordinatesEquals(starSystem.model.getCoordinates(), targetCoordinates)) {
                 // the current system was the first destination of the itinerary, we can remove the system before from the itinerary
                 this.player.currentItinerary.shift();
 
@@ -868,10 +872,10 @@ export class StarSystemView implements View {
      * This target will display the name of the target system and its distance.
      * @param targetSeed the seed of the target system
      */
-    public setSystemAsTarget(targetSeed: SystemSeed) {
+    public setSystemAsTarget(targetSeed: StarSystemCoordinates) {
         let target = this.getStarSystem()
             .getSystemTargets()
-            .find((systemTarget) => systemTarget.seed.equals(targetSeed));
+            .find((systemTarget) => starSystemCoordinatesEquals(systemTarget.systemCoordinates, targetSeed));
         if (target === undefined) {
             target = this.getStarSystem().addSystemTarget(targetSeed);
             this.targetCursorLayer.addObject(target, ObjectTargetCursorType.STAR_SYSTEM, 0, 0);

@@ -1,4 +1,4 @@
-import { SystemSeed } from "../utils/systemSeed";
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../starSystem/starSystemModel";
 
 export const enum SystemIconMask {
     BOOKMARK = 0b01,
@@ -8,14 +8,14 @@ export const enum SystemIconMask {
 export class SystemIcons {
     readonly htmlRoot: HTMLElement;
 
-    readonly systemSeed: SystemSeed;
+    readonly systemCoordinates: StarSystemCoordinates;
 
     private readonly bookmarkIcon: HTMLElement;
 
     private readonly missionIcon: HTMLElement;
 
-    constructor(systemSeed: SystemSeed, iconMask: number) {
-        this.systemSeed = systemSeed;
+    constructor(starSystemCoordinates: StarSystemCoordinates, iconMask: number) {
+        this.systemCoordinates = starSystemCoordinates;
 
         this.htmlRoot = document.createElement("div");
         this.htmlRoot.classList.add("systemIcons");
@@ -51,10 +51,10 @@ export class SystemIcons {
         this.htmlRoot.remove();
     }
 
-    static IconMaskForSystem(system: SystemSeed, bookmarkedSystems: SystemSeed[], targetSystems: SystemSeed[]): number {
+    static IconMaskForSystem(system: StarSystemCoordinates, bookmarkedSystems: StarSystemCoordinates[], targetSystems: StarSystemCoordinates[]): number {
         let iconMask = 0;
-        if (bookmarkedSystems.find((bookmarkedSystem) => bookmarkedSystem.equals(system))) iconMask |= SystemIconMask.BOOKMARK;
-        if (targetSystems.find((targetSystem) => targetSystem.equals(system))) iconMask |= SystemIconMask.MISSION;
+        if (bookmarkedSystems.find((bookmarkedSystem) => starSystemCoordinatesEquals(bookmarkedSystem, system))) iconMask |= SystemIconMask.BOOKMARK;
+        if (targetSystems.find((targetSystem) => starSystemCoordinatesEquals(targetSystem, system))) iconMask |= SystemIconMask.MISSION;
         return iconMask;
     }
 }
