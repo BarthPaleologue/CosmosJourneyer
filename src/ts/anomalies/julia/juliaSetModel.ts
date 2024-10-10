@@ -30,7 +30,6 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { ReversedGreekAlphabet } from "../../utils/parseToStrings";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
 import i18n from "../../i18n";
-import { OrbitalObjectModel } from "../../architecture/orbitalObject";
 
 export class JuliaSetModel implements CelestialBodyModel {
     readonly name: string;
@@ -105,9 +104,5 @@ export class JuliaSetModel implements CelestialBodyModel {
         );
 
         this.typeName = i18n.t("objectTypes:anomaly");
-    }
-
-    getApparentRadius(): number {
-        return this.radius;
     }
 }

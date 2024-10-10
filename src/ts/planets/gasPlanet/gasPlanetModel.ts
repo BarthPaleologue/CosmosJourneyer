@@ -104,8 +104,4 @@ export class GasPlanetModel implements PlanetModel {
 
         this.nbMoons = randRangeInt(0, 3, this.rng, GenerationSteps.NB_MOONS);
     }
-
-    getApparentRadius(): number {
-        return this.radius;
-    }
 }

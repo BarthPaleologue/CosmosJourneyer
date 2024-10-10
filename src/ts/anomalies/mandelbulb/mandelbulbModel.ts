@@ -107,8 +107,4 @@ export class MandelbulbModel implements CelestialBodyModel {
 
         this.typeName = i18n.t("objectTypes:anomaly");
     }
-
-    getApparentRadius(): number {
-        return this.radius;
-    }
 }

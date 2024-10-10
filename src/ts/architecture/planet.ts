@@ -29,6 +29,4 @@ export interface PlanetModel extends CelestialBodyModel {
     physicalProperties: PlanetPhysicalProperties;
 
     nbMoons: number;
-
-    getApparentRadius(): number;
 }

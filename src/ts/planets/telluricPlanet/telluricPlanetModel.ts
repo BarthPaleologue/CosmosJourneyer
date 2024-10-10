@@ -166,7 +166,7 @@ export class TelluricPlanetModel implements PlanetModel {
         }
 
         if (this.hasLiquidWater()) {
-            this.clouds = new CloudsModel(this.getApparentRadius(), Settings.CLOUD_LAYER_HEIGHT, this.physicalProperties.waterAmount, this.physicalProperties.pressure);
+            this.clouds = new CloudsModel(this.radius + this.physicalProperties.oceanLevel, Settings.CLOUD_LAYER_HEIGHT, this.physicalProperties.waterAmount, this.physicalProperties.pressure);
         }
 
         this.terrainSettings = {
@@ -196,10 +196,6 @@ export class TelluricPlanetModel implements PlanetModel {
         this.nbMoons = randRangeInt(0, 2, this.rng, GenerationSteps.NB_MOONS);
 
         this.typeName = this.isMoon() ? i18n.t("objectTypes:telluricMoon") : i18n.t("objectTypes:telluricPlanet");
-    }
-
-    getApparentRadius(): number {
-        return this.radius + this.physicalProperties.oceanLevel;
     }
 
     /**
