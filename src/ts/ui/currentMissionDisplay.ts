@@ -31,6 +31,7 @@ export class CurrentMissionDisplay {
     private readonly buttonContainer: HTMLElement;
 
     private readonly previousMissionButton: HTMLElement;
+    private readonly missionCounter: HTMLElement;
     private readonly nextMissionButton: HTMLElement;
 
     private activeMission: Mission | null = null;
@@ -57,6 +58,9 @@ export class CurrentMissionDisplay {
         const previousSpan = document.createElement("span");
         previousSpan.innerText = "Previous";
         this.previousMissionButton.appendChild(previousSpan);
+
+        this.missionCounter = document.createElement("p");
+        this.buttonContainer.appendChild(this.missionCounter);
 
         this.nextMissionButton = document.createElement("p");
         this.buttonContainer.appendChild(this.nextMissionButton);
@@ -126,6 +130,18 @@ export class CurrentMissionDisplay {
         const nextTaskBlock = descriptionBlocks[1];
         const nextTaskText = await this.activeMission.describeNextTask(context);
         if (nextTaskText !== nextTaskBlock.innerText) nextTaskBlock.innerText = nextTaskText;
+
+        this.buttonContainer.remove();
+        if (allMissions.length > 1) {
+            this.rootNode.appendChild(this.buttonContainer);
+        }
+
+        if (this.activeMission !== null) {
+            const allMissions = this.player.completedMissions.concat(this.player.currentMissions);
+            const missionIndex = allMissions.indexOf(this.activeMission);
+
+            this.missionCounter.innerText = `${missionIndex + 1}/${allMissions.length}`;
+        }
     }
 
     public setNextMission() {
@@ -173,11 +189,8 @@ export class CurrentMissionDisplay {
 
         this.missionPanel.innerHTML = "";
 
-        const allMissions = this.player.completedMissions.concat(this.player.currentMissions);
-        const missionIndex = allMissions.indexOf(mission);
-
         const missionTitle = document.createElement("h2");
-        missionTitle.innerText = `${missionIndex + 1}/${allMissions.length} ${mission.getTypeString()}`;
+        missionTitle.innerText = mission.getTypeString();
         this.missionPanel.appendChild(missionTitle);
 
         const missionDescription = document.createElement("p");
@@ -198,5 +211,7 @@ export class CurrentMissionDisplay {
         const defaultPanelP = document.createElement("p");
         defaultPanelP.innerText = "You can get missions at space stations.";
         this.missionPanel.appendChild(defaultPanelP);
+
+        this.buttonContainer.remove();
     }
 }
