@@ -6,10 +6,15 @@ import { Settings } from "../../settings";
 import { uniformRandBool } from "extended-random";
 import { getSpaceStationModels } from "../../utils/getModelsFromSystemModel";
 import { generateSightseeingMissions } from "../../missions/generateSightSeeingMissions";
-import { getStarGalacticCoordinates } from "../../utils/getStarGalacticCoordinates";
 import { Player } from "../../player/player";
 import { MissionContainer } from "./missionContainer";
 
+/**
+ * Generates all missions available at the given space station for the player. Missions are generated based on the current timestamp (hourly basis).
+ * @param stationModel The space station model where the missions are generated
+ * @param player The player for which the missions are generated
+ * @returns The DOM element containing the generated missions as HTML
+ */
 export function generateMissionsDom(stationModel: SpaceStationModel, player: Player): HTMLDivElement {
     const sightSeeingMissions = generateSightseeingMissions(stationModel, player, Date.now());
 
@@ -17,7 +22,6 @@ export function generateMissionsDom(stationModel: SpaceStationModel, player: Pla
     if (!(starSystem instanceof SeededStarSystemModel)) {
         throw new Error("Star system is not seeded, hence missions cannot be generated");
     }
-    const starSystemPosition = getStarGalacticCoordinates(starSystem.seed);
     const neighborSystems = getNeighborStarSystems(starSystem.seed, 75);
 
     let neighborSpaceStations: [SpaceStationModel, number][] = [];
