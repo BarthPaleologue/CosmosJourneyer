@@ -51,11 +51,11 @@ import { TutorialLayer } from "./ui/tutorial/tutorialLayer";
 import { FlightTutorial } from "./tutorials/flightTutorial";
 import { SidePanels } from "./ui/sidePanels";
 import { Settings } from "./settings";
-import { SeededStarSystemModel } from "./starSystem/seededStarSystemModel";
 import { Player } from "./player/player";
 import { getObjectBySystemId, getUniverseObjectId } from "./utils/orbitalObjectId";
 import { StarSystemCoordinates } from "./starSystem/starSystemModel";
-import { getSeedFromCoordinates } from "./utils/getStarGalacticPositionFromSeed";
+import { getSystemModelFromCoordinates } from "./utils/starSystemCoordinatesUtils";
+import { StarSystemController } from "./starSystem/starSystemController";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -133,9 +133,7 @@ export class CosmosJourneyer {
 
         this.starSystemView.onInitStarSystem.add(() => {
             const starSystemModel = this.starSystemView.getStarSystem().model;
-            if (starSystemModel instanceof SeededStarSystemModel) {
-                this.starMap.setCurrentStarSystem(starSystemModel.getCoordinates());
-            }
+            this.starMap.setCurrentStarSystem(starSystemModel.getCoordinates());
         });
 
         this.pauseMenu = new PauseMenu(this.sidePanels);
@@ -437,11 +435,9 @@ export class CosmosJourneyer {
 
         const universeObjectId = universeCoordinates.universeObjectId;
 
-        const seed = getSeedFromCoordinates(universeObjectId.starSystemCoordinates);
-        if (seed === null) {
-            throw new Error("Could not find star system seed from coordinates. Custom star systems are not supported yet.");
-        }
-        await this.starSystemView.loadStarSystemFromSeed(seed);
+        const systemModel = getSystemModelFromCoordinates(universeObjectId.starSystemCoordinates);
+        const systemController = new StarSystemController(systemModel, this.starSystemView.scene);
+        await this.starSystemView.loadStarSystem(systemController, true);
 
         if (this.state === EngineState.UNINITIALIZED) await this.init(true);
         else this.starSystemView.initStarSystem();

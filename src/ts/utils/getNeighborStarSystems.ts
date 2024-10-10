@@ -1,4 +1,4 @@
-import { getStarGalacticPosition } from "./getStarGalacticPositionFromSeed";
+import { getStarGalacticPosition } from "./starSystemCoordinatesUtils";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { StarSector } from "../starmap/starSector";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../starSystem/starSystemModel";

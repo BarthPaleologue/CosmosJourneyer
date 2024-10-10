@@ -1,7 +1,6 @@
 import { placeSpaceStations } from "../society/spaceStationPlacement";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
 import { getMoonSeeds, getSpaceStationSeed } from "../planets/common";
-import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
 import { StarModel } from "../stellarObjects/star/starModel";
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { BodyType } from "../architecture/bodyType";
@@ -13,15 +12,16 @@ import { JuliaSetModel } from "../anomalies/julia/juliaSetModel";
 import { PlanetModel } from "../architecture/planet";
 import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 import { GasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
+import { StarSystemModel } from "../starSystem/starSystemModel";
 
-export function getSpaceStationModels(system: SeededStarSystemModel): SpaceStationModel[] {
+export function getSpaceStationModels(system: StarSystemModel): SpaceStationModel[] {
     const spaceStationParents = placeSpaceStations(system);
     return spaceStationParents.map((planet) => {
         return new SpaceStationModel(getSpaceStationSeed(planet, 0), system, planet);
     });
 }
 
-export function getStellarObjectModels(system: SeededStarSystemModel): StellarObjectModel[] {
+export function getStellarObjectModels(system: StarSystemModel): StellarObjectModel[] {
     const stellarObjectSeedAndTypes = system.getStellarObjects();
     const stellarObjectModels: StellarObjectModel[] = [];
     for (let i = 0; i < stellarObjectSeedAndTypes.length; i++) {
@@ -45,7 +45,7 @@ export function getStellarObjectModels(system: SeededStarSystemModel): StellarOb
     return stellarObjectModels;
 }
 
-export function getAnomalyModels(system: SeededStarSystemModel): (MandelbulbModel | JuliaSetModel)[] {
+export function getAnomalyModels(system: StarSystemModel): (MandelbulbModel | JuliaSetModel)[] {
     const anomalySeedAndTypes = system.getAnomalies();
     const anomalyModels: (MandelbulbModel | JuliaSetModel)[] = [];
     const parentBodyModel = getStellarObjectModels(system)[0];
@@ -66,7 +66,7 @@ export function getAnomalyModels(system: SeededStarSystemModel): (MandelbulbMode
     return anomalyModels;
 }
 
-export function getPlanetaryMassObjectModels(system: SeededStarSystemModel): PlanetModel[] {
+export function getPlanetaryMassObjectModels(system: StarSystemModel): PlanetModel[] {
     const planetSeedAndTypes = system.getPlanets();
     const planetModels: PlanetModel[] = [];
     const parentBodyModel = getStellarObjectModels(system)[0];

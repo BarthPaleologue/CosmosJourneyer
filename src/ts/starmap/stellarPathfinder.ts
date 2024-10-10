@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getStarGalacticPosition } from "../utils/getStarGalacticPositionFromSeed";
+import { getStarGalacticPosition } from "../utils/starSystemCoordinatesUtils";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getNeighborStarSystemCoordinates } from "../utils/getNeighborStarSystems";
 import { PriorityQueue } from "../utils/priorityQueue";

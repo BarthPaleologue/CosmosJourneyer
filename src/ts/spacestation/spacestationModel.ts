@@ -30,7 +30,6 @@ import { generateSpaceStationName } from "../utils/spaceStationNameGenerator";
 import { StarSystemModel } from "../starSystem/starSystemModel";
 import { Faction } from "../society/factions";
 import { getPowerPlayData } from "../society/powerplay";
-import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
 import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 import { BodyType } from "../architecture/bodyType";
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
@@ -113,13 +112,7 @@ export class SpaceStationModel implements OrbitalObjectModel {
             axialTilt: 2 * this.rng(GenerationSteps.AXIAL_TILT) * Math.PI
         };
 
-        const powerplayData =
-            this.starSystem instanceof SeededStarSystemModel
-                ? getPowerPlayData(this.starSystem.getCoordinates())
-                : {
-                      materialistSpiritualist: 0.5,
-                      capitalistCommunist: 0.5
-                  };
+        const powerplayData = getPowerPlayData(this.starSystem.getCoordinates());
 
         const isMaterialist = uniformRandBool(powerplayData.materialistSpiritualist, this.rng, 249);
         const isCapitalist = uniformRandBool(powerplayData.capitalistCommunist, this.rng, 498);

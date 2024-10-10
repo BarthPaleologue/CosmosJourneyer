@@ -1,7 +1,7 @@
-import { SystemSeed } from "./systemSeed";
 import { StarSector } from "../starmap/starSector";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { StarSystemCoordinates } from "../starSystem/starSystemModel";
+import { SeededStarSystemModel, SystemSeed } from "../starSystem/seededStarSystemModel";
 
 export function getStarSystemCoordinatesFromSeed(systemSeed: SystemSeed): StarSystemCoordinates {
     const starSector = new StarSector(new Vector3(systemSeed.starSectorX, systemSeed.starSectorY, systemSeed.starSectorZ));
@@ -34,14 +34,28 @@ export function getStarGalacticPosition(coordinates: StarSystemCoordinates) {
  * @param coordinates The coordinates of the system.
  * @returns The seed of the system, or null if not found.
  */
-export function getSeedFromCoordinates(coordinates: StarSystemCoordinates) {
+export function getSeedFromCoordinates(coordinates: StarSystemCoordinates): SystemSeed | null {
     const starSector = new StarSector(new Vector3(coordinates.starSectorX, coordinates.starSectorY, coordinates.starSectorZ));
     const localPositions = starSector.getLocalPositionsOfStars();
-    for (const localPosition of localPositions) {
+    for (let i = 0; i < localPositions.length; i++) {
+        const localPosition = localPositions[i];
         if (localPosition.equals(new Vector3(coordinates.localX, coordinates.localY, coordinates.localZ))) {
-            return new SystemSeed(coordinates.starSectorX, coordinates.starSectorY, coordinates.starSectorZ, localPositions.indexOf(localPosition));
+            return {
+                starSectorX: coordinates.starSectorX,
+                starSectorY: coordinates.starSectorY,
+                starSectorZ: coordinates.starSectorZ,
+                index: i
+            };
         }
     }
 
     return null;
+}
+
+export function getSystemModelFromCoordinates(coordinates: StarSystemCoordinates) {
+    const seed = getSeedFromCoordinates(coordinates);
+    if (seed === null) {
+        throw new Error("No seed found for coordinates. Custom star systems are not supported in system targets yet.");
+    }
+    return new SeededStarSystemModel(seed);
 }

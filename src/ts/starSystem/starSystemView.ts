@@ -42,7 +42,6 @@ import { getForwardDirection, getRotationQuaternion, setRotationQuaternion, tran
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { View } from "../utils/view";
-import { SystemSeed } from "../utils/systemSeed";
 import { SystemTarget } from "../utils/systemTarget";
 import { StarSystemInputs } from "../inputs/starSystemInputs";
 import { createNotification } from "../utils/notification";
@@ -67,7 +66,6 @@ import { Materials } from "../assets/materials";
 import { SpaceStation } from "../spacestation/spaceStation";
 import { ObjectTargetCursorType } from "../ui/objectTargetCursor";
 import { SpaceStationLayer } from "../ui/spaceStation/spaceStationLayer";
-import { SeededStarSystemModel } from "./seededStarSystemModel";
 import { placeSpaceStations } from "../society/spaceStationPlacement";
 import { isSystemInHumanBubble } from "../society/starSystemSociety";
 import { Player } from "../player/player";
@@ -80,7 +78,7 @@ import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import { MissionContext } from "../missions/missionContext";
 import { Mission } from "../missions/mission";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "./starSystemModel";
-import { getSeedFromCoordinates } from "../utils/getStarGalacticPositionFromSeed";
+import { getSystemModelFromCoordinates } from "../utils/starSystemCoordinatesUtils";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -285,9 +283,9 @@ export class StarSystemView implements View {
             });
 
             const starSystemCoordinates = target.systemCoordinates;
-            const seed = getSeedFromCoordinates(starSystemCoordinates);
-            if (seed === null) throw new Error("No seed found for coordinates. Custom star systems are not supported for direct jumps yet.");
-            await this.loadStarSystemFromSeed(seed);
+            const systemModel = getSystemModelFromCoordinates(starSystemCoordinates);
+            const systemController = new StarSystemController(systemModel, this.scene);
+            await this.loadStarSystem(systemController, true);
             this.initStarSystem();
 
             this.spaceshipControls?.spaceship.hyperSpaceTunnel.setEnabled(false);
@@ -404,10 +402,6 @@ export class StarSystemView implements View {
         */
     }
 
-    public async loadStarSystemFromSeed(seed: SystemSeed) {
-        await this.loadStarSystem(new StarSystemController(seed, this.scene), true);
-    }
-
     /**
      * Dispose the previous star system and incrementally loads the new star system. All the assets are instantiated but the system still need to be initialized
      * @param starSystem the star system to be set
@@ -498,7 +492,7 @@ export class StarSystemView implements View {
         }
 
         // Space stations
-        if (systemModel instanceof SeededStarSystemModel && isSystemInHumanBubble(systemModel.getCoordinates())) {
+        if (isSystemInHumanBubble(systemModel.getCoordinates())) {
             const spaceStationPlaces = placeSpaceStations(systemModel);
             for (const planetModel of spaceStationPlaces) {
                 const planet = planets.find((planet) => planet.model.name === planetModel.name);
@@ -556,16 +550,14 @@ export class StarSystemView implements View {
 
         starSystem.initPostProcesses(this.postProcessManager);
 
-        if (starSystem.model instanceof SeededStarSystemModel) {
-            getNeighborStarSystemCoordinates(starSystem.model.getCoordinates(), Math.min(Settings.PLAYER_JUMP_RANGE_LY, Settings.VISIBLE_NEIGHBORHOOD_MAX_RADIUS_LY)).forEach(
-                ([neighborCoordinates, position, distance]) => {
-                    const systemTarget = this.getStarSystem().addSystemTarget(neighborCoordinates);
-                    this.targetCursorLayer.addObject(systemTarget, ObjectTargetCursorType.STAR_SYSTEM, 0, 0);
-                }
-            );
-        }
+        getNeighborStarSystemCoordinates(starSystem.model.getCoordinates(), Math.min(Settings.PLAYER_JUMP_RANGE_LY, Settings.VISIBLE_NEIGHBORHOOD_MAX_RADIUS_LY)).forEach(
+            ([neighborCoordinates, position, distance]) => {
+                const systemTarget = this.getStarSystem().addSystemTarget(neighborCoordinates);
+                this.targetCursorLayer.addObject(systemTarget, ObjectTargetCursorType.STAR_SYSTEM, 0, 0);
+            }
+        );
 
-        if (this.player.currentItinerary.length >= 2 && starSystem.model instanceof SeededStarSystemModel) {
+        if (this.player.currentItinerary.length >= 2) {
             const targetCoordinates = this.player.currentItinerary[1];
             if (starSystemCoordinatesEquals(starSystem.model.getCoordinates(), targetCoordinates)) {
                 // the current system was the first destination of the itinerary, we can remove the system before from the itinerary

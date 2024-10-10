@@ -1,4 +1,3 @@
-import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
 import { getNeighborStarSystemCoordinates } from "../utils/getNeighborStarSystems";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
 import { newSightSeeingMission } from "./sightSeeingMission";
@@ -9,7 +8,7 @@ import { Player } from "../player/player";
 import { getPlanetaryMassObjectModels } from "../utils/getModelsFromSystemModel";
 import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 import { Mission, MissionType } from "./mission";
-import { getSeedFromCoordinates } from "../utils/getStarGalacticPositionFromSeed";
+import { getSystemModelFromCoordinates } from "../utils/starSystemCoordinatesUtils";
 
 /**
  * Generates sightseeing missions available at the given space station for the player. Missions are generated based on the current timestamp (hourly basis).
@@ -21,9 +20,6 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
     const currentHour = Math.floor(timestampMillis / 1000 / 60 / 60);
 
     const starSystem = spaceStationModel.starSystem;
-    if (!(starSystem instanceof SeededStarSystemModel)) {
-        throw new Error("Star system is not seeded, hence missions cannot be generated");
-    }
 
     const anomalyFlyByMissions: Mission[] = [];
     const neutronStarFlyByMissions: Mission[] = [];
@@ -31,11 +27,7 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
 
     const neighborSystems = getNeighborStarSystemCoordinates(starSystem.getCoordinates(), 75);
     neighborSystems.forEach(([systemCoordinates, coordinates, distance]) => {
-        const systemSeed = getSeedFromCoordinates(systemCoordinates);
-        if (systemSeed === null) {
-            throw new Error("Could not find star system seed from coordinates. Custom star systems are not supported yet.");
-        }
-        const systemModel = new SeededStarSystemModel(systemSeed);
+        const systemModel = getSystemModelFromCoordinates(systemCoordinates);
         systemModel.getAnomalies().forEach((_, anomalyIndex) => {
             if (!uniformRandBool(1.0 / (1.0 + 0.4 * distance), systemModel.rng, 6254 + anomalyIndex + currentHour)) return;
             anomalyFlyByMissions.push(

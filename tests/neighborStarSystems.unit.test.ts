@@ -15,14 +15,18 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { SystemSeed } from "../src/ts/utils/systemSeed";
 import { getNeighborStarSystemCoordinates } from "../src/ts/utils/getNeighborStarSystems";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { getStarSystemCoordinatesFromSeed } from "../src/ts/utils/getStarGalacticPositionFromSeed";
+import { getStarSystemCoordinatesFromSeed } from "../src/ts/utils/starSystemCoordinatesUtils";
 import { starSystemCoordinatesEquals } from "../src/ts/starSystem/starSystemModel";
 
 test("getNeighborStarSystemCoordinates", () => {
-    const systemCoordinates = getStarSystemCoordinatesFromSeed(new SystemSeed(0, 0, 0, 0));
+    const systemCoordinates = getStarSystemCoordinatesFromSeed({
+        starSectorX: 0,
+        starSectorY: 0,
+        starSectorZ: 0,
+        index: 0
+    });
 
     for (let i = 0; i < 10; i++) {
         const searchRadius = 5 * i;

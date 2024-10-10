@@ -18,7 +18,6 @@
 import starTexture from "../../asset/textures/starParticle.png";
 import blackHoleTexture from "../../asset/textures/blackholeParticleSmall.png";
 
-import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
 import { BuildData, StarSector, vector3ToString } from "./starSector";
 import { StarMapUI } from "./starMapUI";
 import { Scene } from "@babylonjs/core/scene";
@@ -56,7 +55,7 @@ import { CameraRadiusAnimation } from "../uberCore/transforms/animations/radius"
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { StellarPathfinder } from "./stellarPathfinder";
 import { createNotification } from "../utils/notification";
-import { getStarGalacticPosition } from "../utils/getStarGalacticPositionFromSeed";
+import { getStarGalacticPosition, getSystemModelFromCoordinates } from "../utils/starSystemCoordinatesUtils";
 import { Player } from "../player/player";
 import { Settings } from "../settings";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../starSystem/starSystemModel";
@@ -443,8 +442,7 @@ export class StarMap implements View {
     }
 
     private createInstance(data: BuildData) {
-        const starSystemSeed = data.seed;
-        const starSystemModel = new SeededStarSystemModel(starSystemSeed);
+        const starSystemModel = getSystemModelFromCoordinates(data.coordinates);
         const starSystemCoordinates = starSystemModel.getCoordinates();
 
         const starSeed = starSystemModel.getStellarObjectSeed(0);

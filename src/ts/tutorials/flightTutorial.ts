@@ -29,8 +29,7 @@ import warpImageSrc from "../../asset/tutorials/flightTutorial/warp.webp";
 import congratsImageSrc from "../../asset/tutorials/flightTutorial/congrats.webp";
 import { SystemObjectType } from "../saveFile/universeCoordinates";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
-import { getStarSystemCoordinatesFromSeed } from "../utils/getStarGalacticPositionFromSeed";
-import { SystemSeed } from "../utils/systemSeed";
+import { getStarSystemCoordinatesFromSeed } from "../utils/starSystemCoordinatesUtils";
 
 export const FlightTutorial: Tutorial = {
     title: i18n.t("tutorials:flightTutorial:title"),
@@ -38,7 +37,12 @@ export const FlightTutorial: Tutorial = {
     description: i18n.t("tutorials:flightTutorial:description"),
 
     universeObjectId: {
-        starSystemCoordinates: getStarSystemCoordinatesFromSeed(new SystemSeed(0, 0, 1, 1)),
+        starSystemCoordinates: getStarSystemCoordinatesFromSeed({
+            starSectorX: 0,
+            starSectorY: 0,
+            starSectorZ: 1,
+            index: 1
+        }),
         objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
         objectIndex: 1
     },

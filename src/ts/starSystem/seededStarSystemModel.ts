@@ -19,13 +19,13 @@ import { seededSquirrelNoise } from "squirrel-noise";
 import { centeredRand, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../settings";
 import { generateStarName } from "../utils/starNameGenerator";
-import { SystemSeed } from "../utils/systemSeed";
 import { BodyType } from "../architecture/bodyType";
 import { wheelOfFortune } from "../utils/random";
 import { AnomalyType } from "../anomalies/anomalyType";
 import { StarSystemCoordinates, StarSystemModel } from "./starSystemModel";
 import { StarSector } from "../starmap/starSector";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { hashVec3 } from "../utils/hashVec3";
 
 const enum GenerationSteps {
     NAME,
@@ -37,6 +37,13 @@ const enum GenerationSteps {
     GENERATE_ANOMALIES = 666
 }
 
+export type SystemSeed = {
+    starSectorX: number;
+    starSectorY: number;
+    starSectorZ: number;
+    index: number;
+};
+
 export class SeededStarSystemModel implements StarSystemModel {
     readonly seed: SystemSeed;
     readonly rng: (step: number) => number;
@@ -45,7 +52,11 @@ export class SeededStarSystemModel implements StarSystemModel {
 
     constructor(seed: SystemSeed) {
         this.seed = seed;
-        this.rng = seededSquirrelNoise(this.seed.hash);
+
+        const cellRNG = seededSquirrelNoise(hashVec3(seed.starSectorX, seed.starSectorY, seed.starSectorZ));
+        const hash = centeredRand(cellRNG, 1 + seed.index) * Settings.SEED_HALF_RANGE;
+
+        this.rng = seededSquirrelNoise(hash);
 
         this.name = generateStarName(this.rng, GenerationSteps.NAME);
     }

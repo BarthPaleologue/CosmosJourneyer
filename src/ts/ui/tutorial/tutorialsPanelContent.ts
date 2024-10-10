@@ -8,7 +8,7 @@ import { Tutorial } from "../../tutorials/tutorial";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { SystemObjectType } from "../../saveFile/universeCoordinates";
 import { OrbitalObject } from "../../architecture/orbitalObject";
-import { getSeedFromCoordinates } from "../../utils/getStarGalacticPositionFromSeed";
+import { getSystemModelFromCoordinates } from "../../utils/starSystemCoordinatesUtils";
 
 export class TutorialsPanelContent {
     readonly htmlRoot: HTMLElement;
@@ -44,11 +44,8 @@ export class TutorialsPanelContent {
                 if (tutorial.universeObjectId !== undefined) {
                     const engine = starSystemView.scene.getEngine();
                     engine.displayLoadingUI();
-                    const systemSeed = getSeedFromCoordinates(tutorial.universeObjectId.starSystemCoordinates);
-                    if (systemSeed === null) {
-                        throw new Error("No seed found for coordinates. Custom star systems are not supported in tutorials yet.");
-                    }
-                    await starSystemView.loadStarSystem(new StarSystemController(systemSeed, starSystemView.scene), true);
+                    const systemModel = getSystemModelFromCoordinates(tutorial.universeObjectId.starSystemCoordinates);
+                    await starSystemView.loadStarSystem(new StarSystemController(systemModel, starSystemView.scene), true);
                     starSystemView.initStarSystem();
                     engine.hideLoadingUI();
 

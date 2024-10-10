@@ -22,7 +22,7 @@ import { UniverseDensity } from "../settings";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { BoundingBox } from "@babylonjs/core/Culling/boundingBox";
-import { SystemSeed } from "../utils/systemSeed";
+import { StarSystemCoordinates } from "../starSystem/starSystemModel";
 
 export function vector3ToString(v: Vector3): string {
     return `${v.x},${v.y},${v.z}`;
@@ -30,7 +30,7 @@ export function vector3ToString(v: Vector3): string {
 
 export type BuildData = {
     name: string;
-    seed: SystemSeed;
+    coordinates: StarSystemCoordinates;
     sectorString: string;
     position: Vector3;
 };
@@ -78,10 +78,18 @@ export class StarSector {
         const sectorString = this.getKey();
         const data: BuildData[] = [];
         for (let i = 0; i < this.nbStars; i++) {
-            const systemSeed = new SystemSeed(this.coordinates.x, this.coordinates.y, this.coordinates.z, i);
+            const localPosition = this.getLocalPositionOfStar(i);
+            const coordinates: StarSystemCoordinates = {
+                starSectorX: this.coordinates.x,
+                starSectorY: this.coordinates.y,
+                starSectorZ: this.coordinates.z,
+                localX: localPosition.x,
+                localY: localPosition.y,
+                localZ: localPosition.z
+            };
             data.push({
                 name: `starInstance|${this.coordinates.x}|${this.coordinates.y}|${this.coordinates.z}|${i}`,
-                seed: systemSeed,
+                coordinates: coordinates,
                 sectorString: sectorString,
                 position: this.getPositionOfStar(i)
             });

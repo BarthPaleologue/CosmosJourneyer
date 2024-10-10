@@ -25,12 +25,10 @@ import { SpaceStation } from "../spacestation/spaceStation";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { Mandelbulb } from "../anomalies/mandelbulb/mandelbulb";
-import { SeededStarSystemModel } from "./seededStarSystemModel";
 import { rotateAround, translate } from "../uberCore/transforms/basicTransform";
 import { Star } from "../stellarObjects/star/star";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
-import { SystemSeed } from "../utils/systemSeed";
 import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge";
 import { OrbitalObject, OrbitalObjectUtils } from "../architecture/orbitalObject";
 import { CelestialBody } from "../architecture/celestialBody";
@@ -42,7 +40,7 @@ import { Anomaly } from "../anomalies/anomaly";
 import { StarFieldBox } from "./starFieldBox";
 import { StarSystemCoordinates, StarSystemModel } from "./starSystemModel";
 import { Settings } from "../settings";
-import { getStarGalacticPosition } from "../utils/getStarGalacticPositionFromSeed";
+import { getStarGalacticPosition } from "../utils/starSystemCoordinatesUtils";
 
 export class StarSystemController {
     readonly scene: UberScene;
@@ -97,12 +95,12 @@ export class StarSystemController {
 
     private elapsedSeconds = 0;
 
-    constructor(model: StarSystemModel | SystemSeed, scene: UberScene) {
+    constructor(model: StarSystemModel, scene: UberScene) {
         this.scene = scene;
 
         this.starFieldBox = new StarFieldBox(scene);
 
-        this.model = model instanceof SystemSeed ? new SeededStarSystemModel(model) : model;
+        this.model = model;
     }
 
     public addSatellite(satellite: TelluricPlanet): void {

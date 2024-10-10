@@ -1,4 +1,4 @@
-import { getStarGalacticPosition } from "../utils/getStarGalacticPositionFromSeed";
+import { getStarGalacticPosition } from "../utils/starSystemCoordinatesUtils";
 import { Settings } from "../settings";
 import { StarSystemCoordinates } from "../starSystem/starSystemModel";
 

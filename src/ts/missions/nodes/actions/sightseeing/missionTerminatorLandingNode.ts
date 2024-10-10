@@ -1,12 +1,11 @@
 import { MissionNode, MissionNodeSerialized, MissionNodeType } from "../../missionNode";
 import { MissionContext } from "../../../missionContext";
 import { UniverseObjectId, universeObjectIdEquals } from "../../../../saveFile/universeCoordinates";
-import { SeededStarSystemModel } from "../../../../starSystem/seededStarSystemModel";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { CollisionMask, Settings } from "../../../../settings";
 import { getObjectBySystemId, getObjectModelByUniverseId } from "../../../../utils/orbitalObjectId";
-import { getSeedFromCoordinates, getStarGalacticPosition } from "../../../../utils/getStarGalacticPositionFromSeed";
+import { getStarGalacticPosition, getSystemModelFromCoordinates } from "../../../../utils/starSystemCoordinatesUtils";
 import i18n from "../../../../i18n";
 import { parseDistance } from "../../../../utils/parseToStrings";
 import { getGlobalKeyboardLayoutMap } from "../../../../utils/keyboardAPI";
@@ -64,12 +63,11 @@ export class MissionTerminatorLandingNode implements MissionNode {
 
         const currentSystem = context.currentSystem;
         const currentSystemModel = currentSystem.model;
-        if (currentSystemModel instanceof SeededStarSystemModel) {
-            // Skip if the current system is not the one we are looking for
-            if (!starSystemCoordinatesEquals(currentSystemModel.getCoordinates(), this.targetSystemCoordinates)) {
-                this.state = LandMissionState.NOT_IN_SYSTEM;
-                return;
-            }
+
+        // Skip if the current system is not the one we are looking for
+        if (!starSystemCoordinatesEquals(currentSystemModel.getCoordinates(), this.targetSystemCoordinates)) {
+            this.state = LandMissionState.NOT_IN_SYSTEM;
+            return;
         }
 
         const targetObject = getObjectBySystemId(this.objectId, currentSystem);
@@ -119,11 +117,7 @@ export class MissionTerminatorLandingNode implements MissionNode {
     describe(originSystemCoordinates: StarSystemCoordinates): string {
         const distance = Vector3.Distance(getStarGalacticPosition(originSystemCoordinates), getStarGalacticPosition(this.targetSystemCoordinates));
         const objectModel = getObjectModelByUniverseId(this.objectId);
-        const systemSeed = getSeedFromCoordinates(this.targetSystemCoordinates);
-        if (systemSeed === null) {
-            throw new Error("Could not find star system seed from coordinates. Custom star systems are not supported yet.");
-        }
-        const systemModel = new SeededStarSystemModel(systemSeed);
+        const systemModel = getSystemModelFromCoordinates(this.targetSystemCoordinates);
         return i18n.t("missions:sightseeing:describeTerminatorLanding", {
             objectName: objectModel.name,
             systemName: systemModel.name,
@@ -136,12 +130,7 @@ export class MissionTerminatorLandingNode implements MissionNode {
             return i18n.t("missions:terminatorLanding:missionCompleted");
         }
 
-        const systemSeed = getSeedFromCoordinates(this.targetSystemCoordinates);
-        if (systemSeed === null) {
-            throw new Error("Could not find star system seed from coordinates. Custom star systems are not supported yet.");
-        }
-
-        const targetSystemModel = new SeededStarSystemModel(systemSeed);
+        const targetSystemModel = getSystemModelFromCoordinates(this.targetSystemCoordinates);
         const currentSystemModel = context.currentSystem.model;
 
         const targetSystemPosition = getStarGalacticPosition(this.targetSystemCoordinates);

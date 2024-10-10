@@ -1,10 +1,9 @@
 import { MissionNode, MissionNodeSerialized, MissionNodeType } from "../../missionNode";
 import { MissionContext } from "../../../missionContext";
 import { UniverseObjectId, universeObjectIdEquals } from "../../../../saveFile/universeCoordinates";
-import { SeededStarSystemModel } from "../../../../starSystem/seededStarSystemModel";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getObjectBySystemId, getObjectModelByUniverseId } from "../../../../utils/orbitalObjectId";
-import { getStarGalacticPosition, getSeedFromCoordinates } from "../../../../utils/getStarGalacticPositionFromSeed";
+import { getStarGalacticPosition, getSystemModelFromCoordinates } from "../../../../utils/starSystemCoordinatesUtils";
 import { parseDistance } from "../../../../utils/parseToStrings";
 import { Settings } from "../../../../settings";
 import i18n from "../../../../i18n";
@@ -61,12 +60,11 @@ export class MissionFlyByNode implements MissionNode {
 
         const currentSystem = context.currentSystem;
         const currentSystemModel = currentSystem.model;
-        if (currentSystemModel instanceof SeededStarSystemModel) {
-            // Skip if the current system is not the one we are looking for
-            if (!starSystemCoordinatesEquals(currentSystemModel.getCoordinates(), this.targetSystemCoordinates)) {
-                this.state = FlyByState.NOT_IN_SYSTEM;
-                return;
-            }
+
+        // Skip if the current system is not the one we are looking for
+        if (!starSystemCoordinatesEquals(currentSystemModel.getCoordinates(), this.targetSystemCoordinates)) {
+            this.state = FlyByState.NOT_IN_SYSTEM;
+            return;
         }
 
         const targetObject = getObjectBySystemId(this.objectId, currentSystem);
@@ -90,11 +88,7 @@ export class MissionFlyByNode implements MissionNode {
     describe(originSystemCoordinates: StarSystemCoordinates): string {
         const distance = Vector3.Distance(getStarGalacticPosition(originSystemCoordinates), getStarGalacticPosition(this.targetSystemCoordinates));
         const objectModel = getObjectModelByUniverseId(this.objectId);
-        const systemSeed = getSeedFromCoordinates(this.targetSystemCoordinates);
-        if (systemSeed === null) {
-            throw new Error("Could not find star system seed from coordinates. Custom star systems are not supported yet.");
-        }
-        const systemModel = new SeededStarSystemModel(systemSeed);
+        const systemModel = getSystemModelFromCoordinates(this.targetSystemCoordinates);
         return i18n.t("missions:sightseeing:describeFlyBy", {
             objectType: objectModel.typeName.toLowerCase(),
             systemName: systemModel.name,
@@ -107,11 +101,7 @@ export class MissionFlyByNode implements MissionNode {
             return i18n.t("missions:flyBy:missionCompleted");
         }
 
-        const systemSeed = getSeedFromCoordinates(this.targetSystemCoordinates);
-        if (systemSeed === null) {
-            throw new Error("Could not find star system seed from coordinates. Custom star systems are not supported yet.");
-        }
-        const targetSystemModel = new SeededStarSystemModel(systemSeed);
+        const targetSystemModel = getSystemModelFromCoordinates(this.targetSystemCoordinates);
         const currentSystemModel = context.currentSystem.model;
 
         const targetSystemPosition = getStarGalacticPosition(this.targetSystemCoordinates);

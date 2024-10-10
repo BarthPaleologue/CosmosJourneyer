@@ -20,12 +20,11 @@ import { Scene } from "@babylonjs/core/scene";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import i18n from "../i18n";
 import { getStellarTypeString } from "../stellarObjects/common";
-import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
 import { StarModel } from "../stellarObjects/star/starModel";
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 import { BodyType } from "../architecture/bodyType";
-import { getSeedFromCoordinates, getStarGalacticPosition } from "../utils/getStarGalacticPositionFromSeed";
+import { getStarGalacticPosition, getSystemModelFromCoordinates } from "../utils/starSystemCoordinatesUtils";
 import { factionToString } from "../society/factions";
 import { isSystemInHumanBubble } from "../society/starSystemSociety";
 import { getSpaceStationModels } from "../utils/getModelsFromSystemModel";
@@ -305,11 +304,7 @@ export class StarMapUI {
     setSelectedSystem(targetSystemCoordinates: StarSystemCoordinates, currentSystemCoordinates: StarSystemCoordinates | null) {
         const targetPosition = getStarGalacticPosition(targetSystemCoordinates);
 
-        const targetSystemSeed = getSeedFromCoordinates(targetSystemCoordinates);
-        if (targetSystemSeed === null) {
-            throw new Error("Could not find star system seed from coordinates. Custom star systems are not supported yet.");
-        }
-        const targetSystemModel = new SeededStarSystemModel(targetSystemSeed);
+        const targetSystemModel = getSystemModelFromCoordinates(targetSystemCoordinates);
 
         if (currentSystemCoordinates !== null) {
             const currentCoordinates = getStarGalacticPosition(currentSystemCoordinates);

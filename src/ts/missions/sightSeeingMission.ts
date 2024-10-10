@@ -1,7 +1,7 @@
 import { Mission, MissionType } from "./mission";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
 import { SystemObjectType, UniverseObjectId } from "../saveFile/universeCoordinates";
-import { getStarGalacticPosition } from "../utils/getStarGalacticPositionFromSeed";
+import { getStarGalacticPosition } from "../utils/starSystemCoordinatesUtils";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MissionNode } from "./nodes/missionNode";
 import { MissionFlyByNode } from "./nodes/actions/sightseeing/missionFlyByNode";
