@@ -5,7 +5,7 @@ import { parseDistance } from "../../utils/parseToStrings";
 import { Settings } from "../../settings";
 import { uniformRandBool } from "extended-random";
 import { getSpaceStationModels } from "../../utils/getModelsFromSystemModel";
-import { generateSightseeingMissions } from "../../missions/generator";
+import { generateSightseeingMissions } from "../../missions/generateSightSeeingMissions";
 import { getStarGalacticCoordinates } from "../../utils/getStarGalacticCoordinates";
 import { Player } from "../../player/player";
 import { MissionContainer } from "./missionContainer";

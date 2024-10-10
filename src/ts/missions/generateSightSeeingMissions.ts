@@ -10,8 +10,14 @@ import { getPlanetaryMassObjectModels } from "../utils/getModelsFromSystemModel"
 import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 import { Mission, MissionType } from "./mission";
 
+/**
+ * Generates sightseeing missions available at the given space station for the player. Missions are generated based on the current timestamp (hourly basis).
+ * @param spaceStationModel The space station model where the missions are generated
+ * @param player The player for which the missions are generated
+ * @param timestampMillis The current timestamp in milliseconds
+ */
 export function generateSightseeingMissions(spaceStationModel: SpaceStationModel, player: Player, timestampMillis: number): Mission[] {
-    const hours = Math.floor(timestampMillis / 1000 / 60 / 60);
+    const currentHour = Math.floor(timestampMillis / 1000 / 60 / 60);
 
     const starSystem = spaceStationModel.starSystem;
     if (!(starSystem instanceof SeededStarSystemModel)) {
@@ -26,7 +32,7 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
     neighborSystems.forEach(([systemSeed, coordinates, distance]) => {
         const systemModel = new SeededStarSystemModel(systemSeed);
         systemModel.getAnomalies().forEach((_, anomalyIndex) => {
-            if (!uniformRandBool(1.0 / (1.0 + 0.4 * distance), systemModel.rng, 6254 + anomalyIndex + hours)) return;
+            if (!uniformRandBool(1.0 / (1.0 + 0.4 * distance), systemModel.rng, 6254 + anomalyIndex + currentHour)) return;
             anomalyFlyByMissions.push(
                 newSightSeeingMission(spaceStationModel, {
                     type: MissionType.SIGHT_SEEING_FLY_BY,

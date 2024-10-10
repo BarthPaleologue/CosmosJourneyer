@@ -49,13 +49,13 @@ export interface MissionNode {
  * Describes the type of mission node. Useful for serialization/deserialization.
  */
 export const enum MissionNodeType {
-    FLY_BY,
-    TERMINATOR_LANDING,
-    ASTEROID_FIELD,
-    AND,
-    OR,
-    XOR,
-    SEQUENCE
+    FLY_BY = 0,
+    TERMINATOR_LANDING = 1,
+    ASTEROID_FIELD = 2,
+    AND = 1000,
+    OR = 1001,
+    XOR = 1002,
+    SEQUENCE = 1003
 }
 
 /**

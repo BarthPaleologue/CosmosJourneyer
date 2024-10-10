@@ -10,8 +10,14 @@ import { MissionFlyByNode } from "./nodes/actions/sightseeing/missionFlyByNode";
 import { MissionTerminatorLandingNode } from "./nodes/actions/sightseeing/missionTerminatorLandingNode";
 import { MissionAsteroidFieldNode } from "./nodes/actions/sightseeing/missionAsteroidFieldNode";
 
+/**
+ * Sightseeing mission types are a subset of mission types.
+ */
 export type SightSeeingType = MissionType.SIGHT_SEEING_FLY_BY | MissionType.SIGHT_SEEING_TERMINATOR_LANDING | MissionType.SIGHT_SEEING_ASTEROID_FIELD;
 
+/**
+ * Defines a target for a sightseeing mission and the type of sightseeing mission.
+ */
 export type SightSeeingTarget = {
     type: SightSeeingType;
     objectId: UniverseObjectId;
@@ -30,6 +36,12 @@ function generateMissionTree(target: SightSeeingTarget): MissionNode {
     }
 }
 
+/**
+ * Creates a new sightseeing mission from a mission giver to a target.
+ * @param missionGiver The space station that gives the mission.
+ * @param target The target of the sightseeing mission.
+ * @returns The new sightseeing mission.
+ */
 export function newSightSeeingMission(missionGiver: SpaceStationModel, target: SightSeeingTarget): Mission {
     const missionTree = generateMissionTree(target);
 
@@ -40,8 +52,10 @@ export function newSightSeeingMission(missionGiver: SpaceStationModel, target: S
     const targetGalacticCoordinates = getStarGalacticCoordinates(targetSystem);
     const distanceLY = Vector3.Distance(missionGiverGalacticCoordinates, targetGalacticCoordinates);
 
+    // reward far away targets more
     let reward = Math.max(5_000, 1000 * Math.ceil(distanceLY));
     if (target.objectId.objectType === SystemObjectType.STELLAR_OBJECT) {
+        // reward for stellar objects is higher to nudge the player towards them
         reward *= 1.5;
     }
 
