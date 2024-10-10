@@ -24,7 +24,7 @@ import { positionNearObjectBrightSide } from "./utils/positionNearObject";
 import { CosmosJourneyer } from "./cosmosJourneyer";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PostProcessType } from "./postProcesses/postProcessTypes";
-import { TelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModel";
+import { createSeededTelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModel";
 import { GasPlanetModel } from "./planets/gasPlanet/gasPlanetModel";
 import { StarSystemHelper } from "./starSystem/starSystemHelper";
 import { getMoonSeed } from "./planets/common";
@@ -82,7 +82,7 @@ terminaModel.orbit.radius = 50 * sunModel.radius;
 terminaModel.orbit.period = 60 * 60;
 const termina = StarSystemHelper.makeStar(starSystem, terminaModel);*/
 
-const planetModel = new TelluricPlanetModel(starSystemModel.getPlanetSeed(0), starSystemModel, sun.model);
+const planetModel = createSeededTelluricPlanetModel(starSystemModel.getPlanetSeed(0), starSystemModel, sun.model);
 planetModel.physicalProperties.minTemperature = -40;
 planetModel.physicalProperties.maxTemperature = 30;
 
@@ -99,7 +99,7 @@ const spaceStation = StarSystemHelper.MakeSpaceStation(starSystem, 0, planet);
     physicsViewer.showBody(landingpad.aggregate.body);
 }*/
 
-const moonModel = new TelluricPlanetModel(getMoonSeed(planetModel, 0), starSystemModel, planetModel);
+const moonModel = createSeededTelluricPlanetModel(getMoonSeed(planetModel, 0), starSystemModel, planetModel);
 moonModel.physicalProperties.mass = 2;
 moonModel.physicalProperties.rotationPeriod = 7 * 60 * 60;
 moonModel.physicalProperties.minTemperature = -180;
@@ -112,7 +112,7 @@ moonModel.orbit.normalToPlane = Vector3.Up();
 
 const moon = StarSystemHelper.MakeSatellite(starSystem, planet, moonModel);
 
-const aresModel = new TelluricPlanetModel(0.3725, starSystemModel, sun.model);
+const aresModel = createSeededTelluricPlanetModel(0.3725, starSystemModel, sun.model);
 aresModel.physicalProperties.mass = 7;
 aresModel.physicalProperties.rotationPeriod = (24 * 60 * 60) / 30;
 aresModel.physicalProperties.minTemperature = -30;

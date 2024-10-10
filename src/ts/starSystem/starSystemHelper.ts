@@ -24,7 +24,7 @@ import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
-import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
+import { createSeededTelluricPlanetModel, TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { GasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
@@ -62,13 +62,6 @@ export class StarSystemHelper {
         const juliaSet = new JuliaSet(model, starsystem.model, starsystem.scene, starsystem.stellarObjects[0]);
         starsystem.addJuliaSet(juliaSet);
         return juliaSet;
-    }
-
-    public static MakeAnomalies(starsystem: StarSystemController, n = starsystem.model.getNbAnomalies()): void {
-        if (n < 0) throw new Error(`Cannot make a negative amount of anomalies : ${n}`);
-        for (let i = 0; i < n; i++) {
-            StarSystemHelper.MakeMandelbulb(starsystem);
-        }
     }
 
     /**
@@ -118,25 +111,12 @@ export class StarSystemHelper {
     }
 
     /**
-     * Makes n stars and adds them to the system. By default, it will use the next available seeds planned by the system model
-     * @param starsystem
-     * @param n The number of stars to make (by default, the number of stars planned by the system model)
-     */
-    public static MakeStellarObjects(starsystem: StarSystemController, n = starsystem.model.getNbStellarObjects()): void {
-        if (n < 1) throw new Error("Cannot make less than 1 star");
-        for (let i = 0; i < n; i++) StarSystemHelper.MakeStellarObject(starsystem);
-    }
-
-    /**
      * Makes a telluric planet and adds it to the system. By default, it will use the next available model planned by the system model
      * @param starsystem
      * @param model The model or seed to use for the planet generation (by default, the next available seed planned by the system model)
      */
-    public static MakeTelluricPlanet(
-        starsystem: StarSystemController,
-        model: number | TelluricPlanetModel = starsystem.model.getPlanetSeed(starsystem.planets.length)
-    ): TelluricPlanet {
-        const planet = new TelluricPlanet(model, starsystem.model, starsystem.scene, starsystem.stellarObjects[0]);
+    public static MakeTelluricPlanet(starsystem: StarSystemController, model: TelluricPlanetModel): TelluricPlanet {
+        const planet = new TelluricPlanet(model, starsystem.scene, starsystem.stellarObjects[0]);
         starsystem.addTelluricPlanet(planet);
 
         return planet;
@@ -147,8 +127,8 @@ export class StarSystemHelper {
      * @param starsystem
      * @param model The model or seed to use for the planet generation (by default, the next available seed planned by the system model)
      */
-    public static MakeGasPlanet(starsystem: StarSystemController, model: number | GasPlanetModel = starsystem.model.getPlanetSeed(starsystem.planets.length)): GasPlanet {
-        const planet = new GasPlanet(model, starsystem.model, starsystem.scene, starsystem.stellarObjects[0]);
+    public static MakeGasPlanet(starsystem: StarSystemController, model: GasPlanetModel): GasPlanet {
+        const planet = new GasPlanet(model, starsystem.scene, starsystem.stellarObjects[0]);
         starsystem.addGasPlanet(planet);
         return planet;
     }
@@ -164,10 +144,12 @@ export class StarSystemHelper {
     public static MakePlanet(starsystem: StarSystemController) {
         const bodyType = starsystem.model.getBodyTypeOfPlanet(starsystem.planets.length);
         if (bodyType === CelestialBodyType.TELLURIC_PLANET) {
-            const planet = StarSystemHelper.MakeTelluricPlanet(starsystem);
+            const planetModel = createSeededTelluricPlanetModel(starsystem.model.getPlanetSeed(starsystem.planets.length), starsystem.model, starsystem.stellarObjects[0].model);
+            const planet = StarSystemHelper.MakeTelluricPlanet(starsystem, planetModel);
             StarSystemHelper.MakeSatellites(starsystem, planet);
         } else if (bodyType === CelestialBodyType.GAS_PLANET) {
-            const planet = StarSystemHelper.MakeGasPlanet(starsystem);
+            const planetModel = new GasPlanetModel(starsystem.model.getPlanetSeed(starsystem.planets.length), starsystem.model, starsystem.stellarObjects[0].model);
+            const planet = StarSystemHelper.MakeGasPlanet(starsystem, planetModel);
             StarSystemHelper.MakeSatellites(starsystem, planet);
         } else {
             throw new Error(`Unknown body type ${bodyType}`);
@@ -180,12 +162,8 @@ export class StarSystemHelper {
         return spacestation;
     }
 
-    public static MakeSatellite(
-        starsystem: StarSystemController,
-        parent: Planet,
-        model: TelluricPlanetModel | number = getMoonSeed(parent.model, parent.model.childrenBodies.length)
-    ): TelluricPlanet {
-        const satellite = new TelluricPlanet(model, starsystem.model, starsystem.scene, parent);
+    public static MakeSatellite(starsystem: StarSystemController, parent: Planet, model: TelluricPlanetModel): TelluricPlanet {
+        const satellite = new TelluricPlanet(model, starsystem.scene, parent);
 
         parent.model.childrenBodies.push(satellite.model);
 
@@ -213,18 +191,10 @@ export class StarSystemHelper {
 
         const satellites = [];
         for (let i = 0; i < n; i++) {
-            satellites.push(StarSystemHelper.MakeSatellite(starsystem, planet, getMoonSeed(planet.model, planet.model.childrenBodies.length)));
+            const satelliteModel = createSeededTelluricPlanetModel(getMoonSeed(planet.model, planet.model.childrenBodies.length), starsystem.model, planet.model);
+            satellites.push(StarSystemHelper.MakeSatellite(starsystem, planet, satelliteModel));
         }
 
         return satellites;
-    }
-
-    /**
-     * Generates the system using the seed provided in the constructor
-     */
-    public static Generate(starSystem: StarSystemController) {
-        StarSystemHelper.MakeStellarObjects(starSystem, starSystem.model.getNbStellarObjects());
-        StarSystemHelper.MakePlanets(starSystem, starSystem.model.getNbPlanets());
-        StarSystemHelper.MakeAnomalies(starSystem, starSystem.model.getNbAnomalies());
     }
 }

@@ -1,5 +1,5 @@
 
-import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
+import { createSeededTelluricPlanetModel, TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 import { GasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 import { StarModel } from "../stellarObjects/star/starModel";
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
@@ -40,7 +40,7 @@ export function placeSpaceStations(systemModel: StarSystemModel): PlanetModel[] 
     const planetModels = systemModel.getPlanets().map(([bodyType, seed]) => {
         switch (bodyType) {
             case CelestialBodyType.TELLURIC_PLANET:
-                return new TelluricPlanetModel(seed, systemModel, mainStellarObjectModel);
+                return createSeededTelluricPlanetModel(seed, systemModel, mainStellarObjectModel);
             case CelestialBodyType.GAS_PLANET:
                 return new GasPlanetModel(seed, systemModel, mainStellarObjectModel);
             default:
@@ -51,7 +51,7 @@ export function placeSpaceStations(systemModel: StarSystemModel): PlanetModel[] 
     const planetToSatellites = new Map<CelestialBodyModel, TelluricPlanetModel[]>();
 
     planetModels.forEach((planetModel) => {
-        const moonModels = getMoonSeeds(planetModel).map((moonSeed) => new TelluricPlanetModel(moonSeed, systemModel, planetModel));
+        const moonModels = getMoonSeeds(planetModel).map((moonSeed) => createSeededTelluricPlanetModel(moonSeed, systemModel, planetModel));
         planetToSatellites.set(planetModel, moonModels);
     });
 

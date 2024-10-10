@@ -79,6 +79,8 @@ import { Mission } from "../missions/mission";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "./starSystemModel";
 import { getSystemModelFromCoordinates } from "../utils/starSystemCoordinatesUtils";
 import { CelestialBodyType } from "../architecture/celestialBody";
+import { createSeededTelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
+import { GasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -451,7 +453,18 @@ export class StarSystemView implements View {
             console.log("Planet:", i + 1, "of", systemModel.getNbPlanets());
             const bodyType = starSystem.model.getBodyTypeOfPlanet(starSystem.planets.length);
 
-            const planet = bodyType === CelestialBodyType.TELLURIC_PLANET ? StarSystemHelper.MakeTelluricPlanet(starSystem) : StarSystemHelper.MakeGasPlanet(starSystem);
+            let planet: Planet;
+
+            if (bodyType === CelestialBodyType.TELLURIC_PLANET) {
+                const telluricPlanetModel = createSeededTelluricPlanetModel(systemModel.getPlanetSeed(i), systemModel, starSystem.stellarObjects[0].model);
+                planet = StarSystemHelper.MakeTelluricPlanet(starSystem, telluricPlanetModel);
+            } else if (bodyType === CelestialBodyType.GAS_PLANET) {
+                const gasPlanetModel = new GasPlanetModel(systemModel.getPlanetSeed(i), systemModel, starSystem.stellarObjects[0].model);
+                planet = StarSystemHelper.MakeGasPlanet(starSystem, gasPlanetModel);
+            } else {
+                throw new Error(`Incorrect body type in the planet list: ${bodyType}`);
+            }
+
             planet.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
 
             planets.push(planet);
@@ -464,7 +477,8 @@ export class StarSystemView implements View {
             const planet = planets[i];
             for (let j = 0; j < planet.model.nbMoons; j++) {
                 console.log("Satellite:", j + 1, "of", planet.model.nbMoons);
-                const satellite = StarSystemHelper.MakeSatellite(starSystem, planet, getMoonSeed(planet.model, j));
+                const satelliteModel = createSeededTelluricPlanetModel(getMoonSeed(planet.model, j), systemModel, planet.model);
+                const satellite = StarSystemHelper.MakeSatellite(starSystem, planet, satelliteModel);
                 satellite.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
 
                 await wait(timeOut);

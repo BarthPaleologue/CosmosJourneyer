@@ -57,14 +57,13 @@ export class GasPlanet implements Planet, Cullable {
     /**
      * New Gas Planet
      * @param model The model to create the planet from or a seed for the planet in [-1, 1]
-     * @param starSystemModel
      * @param scene
      * @param parentBody The bodies the planet is orbiting
      */
-    constructor(model: GasPlanetModel | number, starSystemModel: StarSystemModel, scene: Scene, parentBody: CelestialBody | null = null) {
+    constructor(model: GasPlanetModel, scene: Scene, parentBody: CelestialBody | null = null) {
         this.parent = parentBody;
 
-        this.model = model instanceof GasPlanetModel ? model : new GasPlanetModel(model, starSystemModel, parentBody?.model);
+        this.model = model;
 
         this.name = this.model.name;
 
