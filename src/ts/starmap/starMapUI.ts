@@ -23,7 +23,6 @@ import { getStellarTypeString } from "../stellarObjects/common";
 import { StarModel } from "../stellarObjects/star/starModel";
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
-import { BodyType } from "../architecture/bodyType";
 import { getStarGalacticPosition, getSystemModelFromCoordinates } from "../utils/starSystemCoordinatesUtils";
 import { factionToString } from "../society/factions";
 import { isSystemInHumanBubble } from "../society/starSystemSociety";
@@ -32,6 +31,7 @@ import { StarMapBookmarkButton } from "./starMapBookmarkButton";
 import { Player } from "../player/player";
 import { SystemIcons } from "./systemIcons";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../starSystem/starSystemModel";
+import { CelestialBodyType } from "../architecture/celestialBody";
 
 export class StarMapUI {
     readonly htmlRoot: HTMLDivElement;
@@ -316,13 +316,13 @@ export class StarMapUI {
 
         let starModel: StarModel | BlackHoleModel | NeutronStarModel;
         switch (stellarObjectType) {
-            case BodyType.STAR:
+            case CelestialBodyType.STAR:
                 starModel = new StarModel(starSeed, targetSystemModel);
                 break;
-            case BodyType.BLACK_HOLE:
+            case CelestialBodyType.BLACK_HOLE:
                 starModel = new BlackHoleModel(starSeed, targetSystemModel);
                 break;
-            case BodyType.NEUTRON_STAR:
+            case CelestialBodyType.NEUTRON_STAR:
                 starModel = new NeutronStarModel(starSeed, targetSystemModel);
                 break;
             default:
@@ -330,8 +330,8 @@ export class StarMapUI {
         }
 
         let typeString: string;
-        if (starModel.bodyType === BodyType.BLACK_HOLE) typeString = i18n.t("objectTypes:blackHole");
-        else if (starModel.bodyType === BodyType.NEUTRON_STAR) typeString = i18n.t("objectTypes:neutronStar");
+        if (starModel.bodyType === CelestialBodyType.BLACK_HOLE) typeString = i18n.t("objectTypes:blackHole");
+        else if (starModel.bodyType === CelestialBodyType.NEUTRON_STAR) typeString = i18n.t("objectTypes:neutronStar");
         else typeString = i18n.t("objectTypes:star", { stellarType: getStellarTypeString(starModel.stellarType) });
 
         this.shortHandUISystemType.textContent = typeString;

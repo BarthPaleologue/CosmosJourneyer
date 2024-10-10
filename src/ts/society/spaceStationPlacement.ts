@@ -1,9 +1,9 @@
-import { BodyType } from "../architecture/bodyType";
+
 import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 import { GasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 import { StarModel } from "../stellarObjects/star/starModel";
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
-import { CelestialBodyModel } from "../architecture/celestialBody";
+import { CelestialBodyModel, CelestialBodyType } from "../architecture/celestialBody";
 import { getMoonSeeds } from "../planets/common";
 import { PlanetModel } from "../architecture/planet";
 import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
@@ -21,11 +21,11 @@ export function placeSpaceStations(systemModel: StarSystemModel): PlanetModel[] 
 
     const stellarObjectModels = systemModel.getStellarObjects().map(([bodyType, seed]) => {
         switch (bodyType) {
-            case BodyType.STAR:
+            case CelestialBodyType.STAR:
                 return new StarModel(seed, systemModel);
-            case BodyType.BLACK_HOLE:
+            case CelestialBodyType.BLACK_HOLE:
                 return new BlackHoleModel(seed, systemModel);
-            case BodyType.NEUTRON_STAR:
+            case CelestialBodyType.NEUTRON_STAR:
                 return new NeutronStarModel(seed, systemModel);
             default:
                 throw new Error(`Incorrect body type in the stellar object list: ${bodyType}`);
@@ -39,9 +39,9 @@ export function placeSpaceStations(systemModel: StarSystemModel): PlanetModel[] 
 
     const planetModels = systemModel.getPlanets().map(([bodyType, seed]) => {
         switch (bodyType) {
-            case BodyType.TELLURIC_PLANET:
+            case CelestialBodyType.TELLURIC_PLANET:
                 return new TelluricPlanetModel(seed, systemModel, mainStellarObjectModel);
-            case BodyType.GAS_PLANET:
+            case CelestialBodyType.GAS_PLANET:
                 return new GasPlanetModel(seed, systemModel, mainStellarObjectModel);
             default:
                 throw new Error(`Incorrect body type in the planet list: ${bodyType}`);

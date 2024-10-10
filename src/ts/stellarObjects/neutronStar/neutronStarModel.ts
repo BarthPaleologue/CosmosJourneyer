@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { CelestialBodyModel } from "../../architecture/celestialBody";
+import { CelestialBodyModel, CelestialBodyType } from "../../architecture/celestialBody";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { StarPhysicalProperties } from "../../architecture/physicalProperties";
 import { StellarObjectModel } from "../../architecture/stellarObject";
@@ -26,7 +26,6 @@ import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { clamp } from "../../utils/math";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { RingsModel } from "../../rings/ringsModel";
-import { BodyType } from "../../architecture/bodyType";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { starName } from "../../utils/parseToStrings";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
@@ -35,7 +34,7 @@ import i18n from "../../i18n";
 export class NeutronStarModel implements StellarObjectModel {
     readonly name: string;
 
-    readonly bodyType = BodyType.NEUTRON_STAR;
+    readonly bodyType = CelestialBodyType.NEUTRON_STAR;
     readonly rng: (step: number) => number;
     readonly seed: number;
 

@@ -2,13 +2,14 @@ import { getNeighborStarSystemCoordinates } from "../utils/getNeighborStarSystem
 import { SpaceStationModel } from "../spacestation/spacestationModel";
 import { newSightSeeingMission } from "./sightSeeingMission";
 import { uniformRandBool } from "extended-random";
-import { BodyType } from "../architecture/bodyType";
 import { SystemObjectType } from "../saveFile/universeCoordinates";
 import { Player } from "../player/player";
 import { getPlanetaryMassObjectModels } from "../utils/getModelsFromSystemModel";
-import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
+import { hasLiquidWater, TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 import { Mission, MissionType } from "./mission";
 import { getSystemModelFromCoordinates } from "../utils/starSystemCoordinatesUtils";
+import { isMoon } from "../architecture/planet";
+import { CelestialBodyType } from "../architecture/celestialBody";
 
 /**
  * Generates sightseeing missions available at the given space station for the player. Missions are generated based on the current timestamp (hourly basis).
@@ -43,7 +44,7 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
         });
 
         systemModel.getStellarObjects().forEach(([bodyType, bodySeed], stellarObjectIndex) => {
-            if (bodyType === BodyType.NEUTRON_STAR) {
+            if (bodyType === CelestialBodyType.NEUTRON_STAR) {
                 neutronStarFlyByMissions.push(
                     newSightSeeingMission(spaceStationModel, {
                         type: MissionType.SIGHT_SEEING_FLY_BY,
@@ -55,7 +56,7 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
                     })
                 );
             }
-            if (bodyType === BodyType.BLACK_HOLE) {
+            if (bodyType === CelestialBodyType.BLACK_HOLE) {
                 blackHoleFlyByMissions.push(
                     newSightSeeingMission(spaceStationModel, {
                         type: MissionType.SIGHT_SEEING_FLY_BY,
@@ -89,9 +90,9 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
             );
         }
 
-        if (celestialBodyModel.bodyType === BodyType.TELLURIC_PLANET) {
+        if (celestialBodyModel.bodyType === CelestialBodyType.TELLURIC_PLANET) {
             const telluricPlanetModel = celestialBodyModel as TelluricPlanetModel;
-            if (!telluricPlanetModel.hasLiquidWater() && !telluricPlanetModel.isMoon()) {
+            if (!hasLiquidWater(telluricPlanetModel) && !isMoon(telluricPlanetModel)) {
                 terminatorLandingMissions.push(
                     newSightSeeingMission(spaceStationModel, {
                         type: MissionType.SIGHT_SEEING_TERMINATOR_LANDING,

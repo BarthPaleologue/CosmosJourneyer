@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { BodyType } from "../architecture/bodyType";
 import { AnomalyType } from "../anomalies/anomalyType";
+import { CelestialBodyType } from "../architecture/celestialBody";
 
 /**
  * Describes the coordinates of a star system in the universe
@@ -72,15 +72,15 @@ export interface StarSystemModel {
 
     getStellarObjectSeed(index: number): number;
 
-    getStellarObjects(): [BodyType, number][];
+    getStellarObjects(): [CelestialBodyType, number][];
 
-    getBodyTypeOfStellarObject(index: number): BodyType;
+    getBodyTypeOfStellarObject(index: number): CelestialBodyType;
 
     getPlanetSeed(index: number): number;
 
-    getPlanets(): [BodyType, number][];
+    getPlanets(): [CelestialBodyType, number][];
 
-    getBodyTypeOfPlanet(index: number): BodyType;
+    getBodyTypeOfPlanet(index: number): CelestialBodyType;
 
     getAnomalySeed(index: number): number;
 

@@ -47,7 +47,6 @@ import { AudioInstance } from "../utils/audioInstance";
 import { AudioManager } from "../audio/audioManager";
 import { AudioMasks } from "../audio/audioMasks";
 import { StarMapInputs } from "../inputs/starMapInputs";
-import { BodyType } from "../architecture/bodyType";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Sounds } from "../assets/sounds";
 import { StarMapControls } from "../starMapControls/starMapControls";
@@ -59,6 +58,7 @@ import { getStarGalacticPosition, getSystemModelFromCoordinates } from "../utils
 import { Player } from "../player/player";
 import { Settings } from "../settings";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../starSystem/starSystemModel";
+import { CelestialBodyType } from "../architecture/celestialBody";
 
 export class StarMap implements View {
     readonly scene: Scene;
@@ -450,13 +450,13 @@ export class StarMap implements View {
 
         let starModel: StarModel | BlackHoleModel | NeutronStarModel | null = null;
         switch (stellarObjectType) {
-            case BodyType.STAR:
+            case CelestialBodyType.STAR:
                 starModel = new StarModel(starSeed, starSystemModel);
                 break;
-            case BodyType.BLACK_HOLE:
+            case CelestialBodyType.BLACK_HOLE:
                 starModel = new BlackHoleModel(starSeed, starSystemModel);
                 break;
-            case BodyType.NEUTRON_STAR:
+            case CelestialBodyType.NEUTRON_STAR:
                 starModel = new NeutronStarModel(starSeed, starSystemModel);
                 break;
             default:
@@ -467,7 +467,7 @@ export class StarMap implements View {
         let instance: InstancedMesh | null = null;
         let recycled = false;
 
-        if (stellarObjectType === BodyType.STAR || stellarObjectType === BodyType.NEUTRON_STAR) {
+        if (stellarObjectType === CelestialBodyType.STAR || stellarObjectType === CelestialBodyType.NEUTRON_STAR) {
             if (this.recycledStars.length > 0) {
                 instance = this.recycledStars[0];
                 this.recycledStars.shift();
@@ -488,7 +488,7 @@ export class StarMap implements View {
 
         initializedInstance.position = data.position.add(this.starMapCenterPosition);
 
-        if (starModel.bodyType === BodyType.STAR || starModel.bodyType === BodyType.NEUTRON_STAR) {
+        if (starModel.bodyType === CelestialBodyType.STAR || starModel.bodyType === CelestialBodyType.NEUTRON_STAR) {
             const starColor = starModel.color;
             initializedInstance.instancedBuffers.color = new Color4(starColor.r, starColor.g, starColor.b, 0.0);
         } else {
@@ -531,7 +531,7 @@ export class StarMap implements View {
 
         this.fadeIn(initializedInstance);
 
-        if (starModel.bodyType === BodyType.BLACK_HOLE) this.loadedStarSectors.get(data.sectorString)?.blackHoleInstances.push(initializedInstance);
+        if (starModel.bodyType === CelestialBodyType.BLACK_HOLE) this.loadedStarSectors.get(data.sectorString)?.blackHoleInstances.push(initializedInstance);
         else this.loadedStarSectors.get(data.sectorString)?.starInstances.push(initializedInstance);
     }
 

@@ -19,13 +19,13 @@ import { seededSquirrelNoise } from "squirrel-noise";
 import { centeredRand, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../settings";
 import { generateStarName } from "../utils/starNameGenerator";
-import { BodyType } from "../architecture/bodyType";
 import { wheelOfFortune } from "../utils/random";
 import { AnomalyType } from "../anomalies/anomalyType";
 import { StarSystemCoordinates, StarSystemModel } from "./starSystemModel";
 import { StarSector } from "../starmap/starSector";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { hashVec3 } from "../utils/hashVec3";
+import { CelestialBodyType } from "../architecture/celestialBody";
 
 const enum GenerationSteps {
     NAME,
@@ -81,7 +81,7 @@ export class SeededStarSystemModel implements StarSystemModel {
     }
 
     getNbPlanets(): number {
-        if (this.getBodyTypeOfStellarObject(0) === BodyType.BLACK_HOLE) return 0; //Fixme: will not apply when more than one star
+        if (this.getBodyTypeOfStellarObject(0) === CelestialBodyType.BLACK_HOLE) return 0; //Fixme: will not apply when more than one star
         return randRangeInt(0, 7, this.rng, GenerationSteps.NB_PLANETS);
     }
 
@@ -90,9 +90,9 @@ export class SeededStarSystemModel implements StarSystemModel {
         return centeredRand(this.rng, GenerationSteps.GENERATE_STARS + index) * Settings.SEED_HALF_RANGE;
     }
 
-    public getStellarObjects(): [BodyType, number][] {
+    public getStellarObjects(): [CelestialBodyType, number][] {
         const nbStars = this.getNbStellarObjects();
-        const stars: [BodyType, number][] = [];
+        const stars: [CelestialBodyType, number][] = [];
 
         for (let i = 0; i < nbStars; i++) {
             stars.push([this.getBodyTypeOfStellarObject(i), this.getStellarObjectSeed(i)]);
@@ -110,20 +110,20 @@ export class SeededStarSystemModel implements StarSystemModel {
         if (index > this.getNbStellarObjects()) throw new Error("Star out of bound! " + index);
 
         // percentages are taken from https://physics.stackexchange.com/questions/442154/how-common-are-neutron-stars
-        if (uniformRandBool(0.0006, this.rng, GenerationSteps.GENERATE_STARS + index)) return BodyType.BLACK_HOLE;
-        if (uniformRandBool(0.0026, this.rng, GenerationSteps.GENERATE_STARS + index)) return BodyType.NEUTRON_STAR;
+        if (uniformRandBool(0.0006, this.rng, GenerationSteps.GENERATE_STARS + index)) return CelestialBodyType.BLACK_HOLE;
+        if (uniformRandBool(0.0026, this.rng, GenerationSteps.GENERATE_STARS + index)) return CelestialBodyType.NEUTRON_STAR;
 
-        return BodyType.STAR;
+        return CelestialBodyType.STAR;
     }
 
     public getBodyTypeOfPlanet(index: number) {
-        if (uniformRandBool(0.5, this.rng, GenerationSteps.CHOOSE_PLANET_TYPE + index)) return BodyType.TELLURIC_PLANET;
-        return BodyType.GAS_PLANET;
+        if (uniformRandBool(0.5, this.rng, GenerationSteps.CHOOSE_PLANET_TYPE + index)) return CelestialBodyType.TELLURIC_PLANET;
+        return CelestialBodyType.GAS_PLANET;
     }
 
-    public getPlanets(): [BodyType, number][] {
+    public getPlanets(): [CelestialBodyType, number][] {
         const nbPlanets = this.getNbPlanets();
-        const planets: [BodyType, number][] = [];
+        const planets: [CelestialBodyType, number][] = [];
 
         for (let i = 0; i < nbPlanets; i++) {
             planets.push([this.getBodyTypeOfPlanet(i), this.getPlanetSeed(i)]);

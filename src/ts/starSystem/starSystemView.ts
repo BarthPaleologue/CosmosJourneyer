@@ -57,7 +57,6 @@ import { PostProcessManager } from "../postProcesses/postProcessManager";
 import { wait } from "../utils/wait";
 import { CharacterInputs } from "../characterControls/characterControlsInputs";
 import i18n from "../i18n";
-import { BodyType } from "../architecture/bodyType";
 import { AnomalyType } from "../anomalies/anomalyType";
 import { Anomaly } from "../anomalies/anomaly";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
@@ -79,6 +78,7 @@ import { MissionContext } from "../missions/missionContext";
 import { Mission } from "../missions/mission";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "./starSystemModel";
 import { getSystemModelFromCoordinates } from "../utils/starSystemCoordinatesUtils";
+import { CelestialBodyType } from "../architecture/celestialBody";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -451,7 +451,7 @@ export class StarSystemView implements View {
             console.log("Planet:", i + 1, "of", systemModel.getNbPlanets());
             const bodyType = starSystem.model.getBodyTypeOfPlanet(starSystem.planets.length);
 
-            const planet = bodyType === BodyType.TELLURIC_PLANET ? StarSystemHelper.MakeTelluricPlanet(starSystem) : StarSystemHelper.MakeGasPlanet(starSystem);
+            const planet = bodyType === CelestialBodyType.TELLURIC_PLANET ? StarSystemHelper.MakeTelluricPlanet(starSystem) : StarSystemHelper.MakeGasPlanet(starSystem);
             planet.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
 
             planets.push(planet);

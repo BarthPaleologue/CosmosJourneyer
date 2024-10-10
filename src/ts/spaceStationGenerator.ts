@@ -36,7 +36,8 @@ import { Settings } from "./settings";
 import { SpaceStationModel } from "./spacestation/spacestationModel";
 import { StarFieldBox } from "./starSystem/starFieldBox";
 import { CustomStarSystemModel } from "./starSystem/customStarSystemModel";
-import { BodyType } from "./architecture/bodyType";
+
+import { CelestialBodyType } from "./architecture/celestialBody";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -80,7 +81,7 @@ const starSystemModel = new CustomStarSystemModel(
         localY: 0,
         localZ: 0
     },
-    [[BodyType.STAR, 4413.641464990006]],
+    [[CelestialBodyType.STAR, 4413.641464990006]],
     [],
     []
 );

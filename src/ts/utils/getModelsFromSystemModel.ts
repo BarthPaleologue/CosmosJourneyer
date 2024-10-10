@@ -3,7 +3,6 @@ import { SpaceStationModel } from "../spacestation/spacestationModel";
 import { getMoonSeeds, getSpaceStationSeed } from "../planets/common";
 import { StarModel } from "../stellarObjects/star/starModel";
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
-import { BodyType } from "../architecture/bodyType";
 import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 import { StellarObjectModel } from "../architecture/stellarObject";
 import { AnomalyType } from "../anomalies/anomalyType";
@@ -13,6 +12,7 @@ import { PlanetModel } from "../architecture/planet";
 import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 import { GasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 import { StarSystemModel } from "../starSystem/starSystemModel";
+import { CelestialBodyType } from "../architecture/celestialBody";
 
 export function getSpaceStationModels(system: StarSystemModel): SpaceStationModel[] {
     const spaceStationParents = placeSpaceStations(system);
@@ -28,13 +28,13 @@ export function getStellarObjectModels(system: StarSystemModel): StellarObjectMo
         const [bodyType, seed] = stellarObjectSeedAndTypes[i];
         const parentBodyModel = i === 0 ? null : stellarObjectModels[0];
         switch (bodyType) {
-            case BodyType.STAR:
+            case CelestialBodyType.STAR:
                 stellarObjectModels.push(new StarModel(seed, system, parentBodyModel));
                 break;
-            case BodyType.BLACK_HOLE:
+            case CelestialBodyType.BLACK_HOLE:
                 stellarObjectModels.push(new BlackHoleModel(seed, system, parentBodyModel));
                 break;
-            case BodyType.NEUTRON_STAR:
+            case CelestialBodyType.NEUTRON_STAR:
                 stellarObjectModels.push(new NeutronStarModel(seed, system, parentBodyModel));
                 break;
             default:
@@ -72,14 +72,14 @@ export function getPlanetaryMassObjectModels(system: StarSystemModel): PlanetMod
     const parentBodyModel = getStellarObjectModels(system)[0];
     for (let i = 0; i < planetSeedAndTypes.length; i++) {
         const [bodyType, seed] = planetSeedAndTypes[i];
-        if (bodyType === BodyType.TELLURIC_PLANET) {
+        if (bodyType === CelestialBodyType.TELLURIC_PLANET) {
             const telluricPlanetModel = new TelluricPlanetModel(seed, system, parentBodyModel);
             planetModels.push(telluricPlanetModel);
 
             getMoonSeeds(telluricPlanetModel).forEach((moonSeed) => {
                 planetModels.push(new TelluricPlanetModel(moonSeed, system, telluricPlanetModel));
             });
-        } else if (bodyType === BodyType.GAS_PLANET) {
+        } else if (bodyType === CelestialBodyType.GAS_PLANET) {
             const gasPlanetModel = new GasPlanetModel(seed, system, parentBodyModel);
             planetModels.push(gasPlanetModel);
 

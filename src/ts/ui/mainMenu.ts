@@ -13,12 +13,12 @@ import { parseSaveFileData, SaveFileData } from "../saveFile/saveFileData";
 import packageInfo from "../../../package.json";
 import { Settings } from "../settings";
 import i18n from "../i18n";
-import { BodyType } from "../architecture/bodyType";
 import { Sounds } from "../assets/sounds";
 import { PanelType, SidePanels } from "./sidePanels";
 import { SystemObjectType, UniverseObjectId } from "../saveFile/universeCoordinates";
 import { getObjectBySystemId } from "../utils/orbitalObjectId";
 import { getStarSystemCoordinatesFromSeed, getSystemModelFromCoordinates } from "../utils/starSystemCoordinatesUtils";
+import { CelestialBodyType } from "../architecture/celestialBody";
 
 export class MainMenu {
     readonly scene: UberScene;
@@ -238,7 +238,7 @@ export class MainMenu {
 
         this.starSystemView.onInitStarSystem.addOnce(async () => {
             await this.starSystemView.switchToDefaultControls(false);
-            const nbRadius = this.starSystemController.model.getBodyTypeOfStellarObject(0) === BodyType.BLACK_HOLE ? 8 : 2;
+            const nbRadius = this.starSystemController.model.getBodyTypeOfStellarObject(0) === CelestialBodyType.BLACK_HOLE ? 8 : 2;
             const targetObject = getObjectBySystemId(this.universeObjectId, this.starSystemController);
             if (targetObject === null) {
                 throw new Error(`Could not find object with ID ${JSON.stringify(this.universeObjectId)}`);

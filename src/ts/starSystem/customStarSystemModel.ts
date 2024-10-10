@@ -16,19 +16,19 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { StarSystemCoordinates, StarSystemModel } from "./starSystemModel";
-import { BodyType } from "../architecture/bodyType";
 import { AnomalyType } from "../anomalies/anomalyType";
+import { CelestialBodyType } from "../architecture/celestialBody";
 
 export class CustomStarSystemModel implements StarSystemModel {
     readonly name: string;
 
     private readonly coordinates: StarSystemCoordinates;
 
-    readonly stellarObjects: [BodyType, number][];
-    readonly planets: [BodyType, number][];
+    readonly stellarObjects: [CelestialBodyType, number][];
+    readonly planets: [CelestialBodyType, number][];
     readonly anomalies: [AnomalyType, number][];
 
-    constructor(name: string, coordinates: StarSystemCoordinates, stellarObjects: [BodyType, number][], planets: [BodyType, number][], anomalies: [AnomalyType, number][]) {
+    constructor(name: string, coordinates: StarSystemCoordinates, stellarObjects: [CelestialBodyType, number][], planets: [CelestialBodyType, number][], anomalies: [AnomalyType, number][]) {
         this.name = name;
 
         this.coordinates = coordinates;
@@ -51,11 +51,11 @@ export class CustomStarSystemModel implements StarSystemModel {
         return this.stellarObjects[index][1];
     }
 
-    getStellarObjects(): [BodyType, number][] {
+    getStellarObjects(): [CelestialBodyType, number][] {
         return this.stellarObjects;
     }
 
-    getBodyTypeOfStellarObject(index: number): BodyType {
+    getBodyTypeOfStellarObject(index: number): CelestialBodyType {
         if (index > this.getNbStellarObjects()) throw new Error("Star out of bound! " + index);
         return this.stellarObjects[index][0];
     }
@@ -64,7 +64,7 @@ export class CustomStarSystemModel implements StarSystemModel {
         return this.planets.length;
     }
 
-    getPlanets(): [BodyType, number][] {
+    getPlanets(): [CelestialBodyType, number][] {
         return this.planets;
     }
 
@@ -73,7 +73,7 @@ export class CustomStarSystemModel implements StarSystemModel {
         return this.planets[index][1];
     }
 
-    getBodyTypeOfPlanet(index: number): BodyType {
+    getBodyTypeOfPlanet(index: number): CelestialBodyType {
         if (index > this.getNbPlanets()) throw new Error("Planet out of bound! " + index);
         return this.planets[index][0];
     }

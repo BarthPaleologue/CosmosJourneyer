@@ -22,7 +22,8 @@ import { StarSystemController } from "./starSystem/starSystemController";
 import { positionNearObjectBrightSide } from "./utils/positionNearObject";
 import { CosmosJourneyer } from "./cosmosJourneyer";
 import { CustomStarSystemModel } from "./starSystem/customStarSystemModel";
-import { BodyType } from "./architecture/bodyType";
+
+import { CelestialBodyType } from "./architecture/celestialBody";
 
 const engine = await CosmosJourneyer.CreateAsync();
 
@@ -40,8 +41,8 @@ const starSystemModel = new CustomStarSystemModel(
         localY: 0,
         localZ: 0
     },
-    [[BodyType.BLACK_HOLE, 0]],
-    [[BodyType.TELLURIC_PLANET, 42]],
+    [[CelestialBodyType.BLACK_HOLE, 0]],
+    [[CelestialBodyType.TELLURIC_PLANET, 42]],
     []
 );
 const starSystem = new StarSystemController(starSystemModel, scene);

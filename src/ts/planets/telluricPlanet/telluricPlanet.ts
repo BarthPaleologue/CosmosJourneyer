@@ -21,15 +21,14 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 
 import { TelluricPlanetMaterial } from "./telluricPlanetMaterial";
-import { waterBoilingPointCelsius } from "../../utils/waterMechanics";
-import { TelluricPlanetModel } from "./telluricPlanetModel";
+import { hasLiquidWater, TelluricPlanetModel } from "./telluricPlanetModel";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { ChunkTree } from "./terrain/chunks/chunkTree";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Transformable } from "../../architecture/transformable";
 import { ChunkForge } from "./terrain/chunks/chunkForge";
-import { Planet } from "../../architecture/planet";
+import { hasAtmosphere, Planet } from "../../architecture/planet";
 import { Cullable } from "../../utils/cullable";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
@@ -100,9 +99,8 @@ export class TelluricPlanet implements Planet, Cullable {
 
         this.postProcesses.push(PostProcessType.SHADOW);
 
-        const epsilon = 0.05;
-        if (this.model.hasLiquidWater()) this.postProcesses.push(PostProcessType.OCEAN);
-        if (this.model.physicalProperties.pressure > epsilon) this.postProcesses.push(PostProcessType.ATMOSPHERE);
+        if (hasLiquidWater(this.model)) this.postProcesses.push(PostProcessType.OCEAN);
+        if (hasAtmosphere(this.model)) this.postProcesses.push(PostProcessType.ATMOSPHERE);
 
         if (this.model.rings !== null) {
             this.postProcesses.push(PostProcessType.RING);

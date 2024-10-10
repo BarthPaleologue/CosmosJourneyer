@@ -23,12 +23,11 @@ import { Settings } from "../../settings";
 import { getOrbitalPeriod, Orbit } from "../../orbit/orbit";
 import { getStellarTypeString, StellarType } from "../common";
 import { StarPhysicalProperties } from "../../architecture/physicalProperties";
-import { CelestialBodyModel } from "../../architecture/celestialBody";
+import { CelestialBodyModel, CelestialBodyType } from "../../architecture/celestialBody";
 import { wheelOfFortune } from "../../utils/random";
 import { StellarObjectModel } from "../../architecture/stellarObject";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { RingsModel } from "../../rings/ringsModel";
-import { BodyType } from "../../architecture/bodyType";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { starName } from "../../utils/parseToStrings";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
@@ -37,7 +36,7 @@ import i18n from "../../i18n";
 export class StarModel implements StellarObjectModel {
     readonly name: string;
 
-    readonly bodyType = BodyType.STAR;
+    readonly bodyType = CelestialBodyType.STAR;
     readonly rng: (step: number) => number;
     readonly seed: number;
 

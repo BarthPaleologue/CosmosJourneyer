@@ -25,9 +25,8 @@ import { getOrbitalPeriod, getPeriapsis, Orbit } from "../../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PlanetModel } from "../../architecture/planet";
 import { PlanetPhysicalProperties } from "../../architecture/physicalProperties";
-import { CelestialBodyModel } from "../../architecture/celestialBody";
+import { CelestialBodyModel, CelestialBodyType } from "../../architecture/celestialBody";
 import { RingsModel } from "../../rings/ringsModel";
-import { BodyType } from "../../architecture/bodyType";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { getPlanetName } from "../common";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
@@ -35,7 +34,7 @@ import i18n from "../../i18n";
 
 export class GasPlanetModel implements PlanetModel {
     readonly name: string;
-    readonly bodyType = BodyType.GAS_PLANET;
+    readonly bodyType = CelestialBodyType.GAS_PLANET;
     readonly seed: number;
     readonly rng: (step: number) => number;
 

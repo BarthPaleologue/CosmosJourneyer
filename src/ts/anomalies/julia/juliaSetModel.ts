@@ -22,8 +22,7 @@ import { clamp } from "../../utils/math";
 import { getOrbitalPeriod, getPeriapsis, Orbit } from "../../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PlanetPhysicalProperties } from "../../architecture/physicalProperties";
-import { CelestialBodyModel } from "../../architecture/celestialBody";
-import { BodyType } from "../../architecture/bodyType";
+import { CelestialBodyModel, CelestialBodyType } from "../../architecture/celestialBody";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { wheelOfFortune } from "../../utils/random";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
@@ -34,7 +33,7 @@ import i18n from "../../i18n";
 export class JuliaSetModel implements CelestialBodyModel {
     readonly name: string;
 
-    readonly bodyType = BodyType.ANOMALY;
+    readonly bodyType = CelestialBodyType.ANOMALY;
     readonly seed: number;
     readonly rng: (step: number) => number;
 

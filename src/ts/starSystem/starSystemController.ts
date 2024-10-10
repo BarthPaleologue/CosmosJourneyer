@@ -33,7 +33,7 @@ import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge"
 import { OrbitalObject, OrbitalObjectUtils } from "../architecture/orbitalObject";
 import { CelestialBody } from "../architecture/celestialBody";
 import { StellarObject } from "../architecture/stellarObject";
-import { Planet } from "../architecture/planet";
+import { isMoon, Planet } from "../architecture/planet";
 import { SystemTarget } from "../utils/systemTarget";
 import { JuliaSet } from "../anomalies/julia/juliaSet";
 import { Anomaly } from "../anomalies/anomaly";
@@ -104,7 +104,7 @@ export class StarSystemController {
     }
 
     public addSatellite(satellite: TelluricPlanet): void {
-        if (!satellite.model.isMoon()) throw new Error("Use addTelluricPlanet to add a telluric planet to a planet, not addSatellite");
+        if (!isMoon(satellite.model)) throw new Error("Use addTelluricPlanet to add a telluric planet to a planet, not addSatellite");
         this.orbitalObjects.push(satellite);
         this.celestialBodies.push(satellite);
         this.telluricBodies.push(satellite);
@@ -116,7 +116,7 @@ export class StarSystemController {
      * @param planet The planet to add to the system
      */
     public addTelluricPlanet(planet: TelluricPlanet): TelluricPlanet {
-        if (planet.model.isMoon()) {
+        if (isMoon(planet.model)) {
             throw new Error("Use addSatellite to add a moon to a planet, not addTelluricPlanet");
         }
         this.orbitalObjects.push(planet);

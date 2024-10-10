@@ -32,9 +32,8 @@ import { getMoonSeed } from "../planets/common";
 import { Planet } from "../architecture/planet";
 import { StellarObject } from "../architecture/stellarObject";
 import { SpaceStation } from "../spacestation/spaceStation";
-import { CelestialBody } from "../architecture/celestialBody";
+import { CelestialBody, CelestialBodyType } from "../architecture/celestialBody";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
-import { BodyType } from "../architecture/bodyType";
 import { JuliaSet } from "../anomalies/julia/juliaSet";
 import { JuliaSetModel } from "../anomalies/julia/juliaSetModel";
 
@@ -107,11 +106,11 @@ export class StarSystemHelper {
      */
     public static MakeStellarObject(starsystem: StarSystemController, seed: number = starsystem.model.getStellarObjectSeed(starsystem.stellarObjects.length)): StellarObject {
         const stellarObjectType = starsystem.model.getBodyTypeOfStellarObject(starsystem.stellarObjects.length);
-        if (stellarObjectType === BodyType.BLACK_HOLE) {
+        if (stellarObjectType === CelestialBodyType.BLACK_HOLE) {
             return StarSystemHelper.MakeBlackHole(starsystem, seed);
-        } else if (stellarObjectType === BodyType.NEUTRON_STAR) {
+        } else if (stellarObjectType === CelestialBodyType.NEUTRON_STAR) {
             return StarSystemHelper.MakeNeutronStar(starsystem, seed);
-        } else if (stellarObjectType === BodyType.STAR) {
+        } else if (stellarObjectType === CelestialBodyType.STAR) {
             return StarSystemHelper.MakeStar(starsystem, seed);
         } else {
             throw new Error(`Unknown stellar object type ${stellarObjectType}`);
@@ -164,10 +163,10 @@ export class StarSystemHelper {
 
     public static MakePlanet(starsystem: StarSystemController) {
         const bodyType = starsystem.model.getBodyTypeOfPlanet(starsystem.planets.length);
-        if (bodyType === BodyType.TELLURIC_PLANET) {
+        if (bodyType === CelestialBodyType.TELLURIC_PLANET) {
             const planet = StarSystemHelper.MakeTelluricPlanet(starsystem);
             StarSystemHelper.MakeSatellites(starsystem, planet);
-        } else if (bodyType === BodyType.GAS_PLANET) {
+        } else if (bodyType === CelestialBodyType.GAS_PLANET) {
             const planet = StarSystemHelper.MakeGasPlanet(starsystem);
             StarSystemHelper.MakeSatellites(starsystem, planet);
         } else {

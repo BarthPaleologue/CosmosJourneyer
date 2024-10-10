@@ -18,9 +18,8 @@
 import { centeredRand } from "extended-random";
 import { Settings } from "../settings";
 import { PlanetModel } from "../architecture/planet";
-import { CelestialBodyModel } from "../architecture/celestialBody";
+import { CelestialBodyModel, CelestialBodyType } from "../architecture/celestialBody";
 import { GenerationSteps } from "../utils/generationSteps";
-import { BodyType } from "../architecture/bodyType";
 import { romanNumeral } from "../utils/romanNumerals";
 import { StarSystemModel } from "../starSystem/starSystemModel";
 import { Alphabet } from "../utils/parseToStrings";
@@ -43,7 +42,7 @@ export function getPlanetName(seed: number, starSystemModel: StarSystemModel, pa
         return `${starSystemModel.name} Rogue`;
     }
 
-    const isSatellite = parentBody.bodyType === BodyType.TELLURIC_PLANET || parentBody.bodyType === BodyType.GAS_PLANET;
+    const isSatellite = parentBody.bodyType === CelestialBodyType.TELLURIC_PLANET || parentBody.bodyType === CelestialBodyType.GAS_PLANET;
 
     const planetIndex = !isSatellite
         ? starSystemModel.getPlanets().findIndex(([_, planetSeed]) => planetSeed === seed)

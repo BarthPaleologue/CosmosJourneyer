@@ -20,7 +20,7 @@ import { getOrbitalPeriod, Orbit } from "../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { OrbitalObjectModel } from "../architecture/orbitalObject";
 import { OrbitalObjectPhysicalProperties } from "../architecture/physicalProperties";
-import { CelestialBodyModel } from "../architecture/celestialBody";
+import { CelestialBodyModel, CelestialBodyType } from "../architecture/celestialBody";
 import { normalRandom, uniformRandBool } from "extended-random";
 import { clamp } from "../utils/math";
 import { GenerationSteps } from "../utils/generationSteps";
@@ -31,7 +31,6 @@ import { StarSystemModel } from "../starSystem/starSystemModel";
 import { Faction } from "../society/factions";
 import { getPowerPlayData } from "../society/powerplay";
 import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
-import { BodyType } from "../architecture/bodyType";
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { StarModel } from "../stellarObjects/star/starModel";
 import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
@@ -141,13 +140,13 @@ export class SpaceStationModel implements OrbitalObjectModel {
         const starModelBuildInfo = starSystemModel.getStellarObjects()[0];
         let starModel;
         switch (starModelBuildInfo[0]) {
-            case BodyType.NEUTRON_STAR:
+            case CelestialBodyType.NEUTRON_STAR:
                 starModel = new NeutronStarModel(starModelBuildInfo[1], starSystemModel);
                 break;
-            case BodyType.BLACK_HOLE:
+            case CelestialBodyType.BLACK_HOLE:
                 starModel = new BlackHoleModel(starModelBuildInfo[1], starSystemModel);
                 break;
-            case BodyType.STAR:
+            case CelestialBodyType.STAR:
                 starModel = new StarModel(starModelBuildInfo[1], starSystemModel);
                 break;
             default:

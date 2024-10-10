@@ -30,7 +30,8 @@ import { StarSystemHelper } from "./starSystem/starSystemHelper";
 import { getMoonSeed } from "./planets/common";
 import { SpaceShipControlsInputs } from "./spaceship/spaceShipControlsInputs";
 import { CustomStarSystemModel } from "./starSystem/customStarSystemModel";
-import { BodyType } from "./architecture/bodyType";
+
+import { CelestialBodyType } from "./architecture/celestialBody";
 
 const engine = await CosmosJourneyer.CreateAsync();
 
@@ -55,11 +56,11 @@ const starSystemModel = new CustomStarSystemModel(
         localY: 0,
         localZ: 0
     },
-    [[BodyType.STAR, 4413.641464990006]],
+    [[CelestialBodyType.STAR, 4413.641464990006]],
     [
-        [BodyType.TELLURIC_PLANET, 0.4233609183800225],
-        [BodyType.TELLURIC_PLANET, 0.3725],
-        [BodyType.GAS_PLANET, 0.28711440474126226]
+        [CelestialBodyType.TELLURIC_PLANET, 0.4233609183800225],
+        [CelestialBodyType.TELLURIC_PLANET, 0.3725],
+        [CelestialBodyType.GAS_PLANET, 0.28711440474126226]
     ],
     []
 );
