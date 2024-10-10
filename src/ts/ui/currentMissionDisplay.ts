@@ -21,6 +21,7 @@ import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
 import { MissionContext } from "../missions/missionContext";
 import { pressInteractionToStrings } from "../utils/inputControlsString";
 import { Sounds } from "../assets/sounds";
+import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 
 export class CurrentMissionDisplay {
     readonly rootNode: HTMLElement;
@@ -57,13 +58,6 @@ export class CurrentMissionDisplay {
         previousSpan.innerText = "Previous";
         this.previousMissionButton.appendChild(previousSpan);
 
-        pressInteractionToStrings(SpaceShipControlsInputs.map.previousMission, null).forEach((key) => {
-            const previousKeySpan = document.createElement("span");
-            previousKeySpan.classList.add("keySpan");
-            previousKeySpan.innerText = key;
-            this.previousMissionButton.appendChild(previousKeySpan);
-        });
-
         this.nextMissionButton = document.createElement("p");
         this.buttonContainer.appendChild(this.nextMissionButton);
 
@@ -71,11 +65,20 @@ export class CurrentMissionDisplay {
         nextSpan.innerText = "Next";
         this.nextMissionButton.appendChild(nextSpan);
 
-        pressInteractionToStrings(SpaceShipControlsInputs.map.nextMission, null).forEach((key) => {
-            const nextKeySpan = document.createElement("span");
-            nextKeySpan.classList.add("keySpan");
-            nextKeySpan.innerText = key;
-            this.nextMissionButton.appendChild(nextKeySpan);
+        getGlobalKeyboardLayoutMap().then((keyboardLayoutMap) => {
+            pressInteractionToStrings(SpaceShipControlsInputs.map.previousMission, keyboardLayoutMap).forEach((key) => {
+                const previousKeySpan = document.createElement("span");
+                previousKeySpan.classList.add("keySpan");
+                previousKeySpan.innerText = key;
+                this.previousMissionButton.appendChild(previousKeySpan);
+            });
+
+            pressInteractionToStrings(SpaceShipControlsInputs.map.nextMission, keyboardLayoutMap).forEach((key) => {
+                const nextKeySpan = document.createElement("span");
+                nextKeySpan.classList.add("keySpan");
+                nextKeySpan.innerText = key;
+                this.nextMissionButton.appendChild(nextKeySpan);
+            });
         });
 
         if (this.player.currentMissions.length === 0) {
