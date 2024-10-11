@@ -50,8 +50,6 @@ export class GasPlanetModel implements PlanetModel {
 
     readonly parentBody: CelestialBodyModel | null;
 
-    readonly childrenBodies: CelestialBodyModel[] = [];
-
     readonly starSystem: StarSystemModel;
 
     readonly typeName = i18n.t("objectTypes:gasPlanet");

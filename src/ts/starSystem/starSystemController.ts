@@ -41,6 +41,14 @@ import { StarFieldBox } from "./starFieldBox";
 import { StarSystemCoordinates, StarSystemModel } from "./starSystemModel";
 import { Settings } from "../settings";
 import { getStarGalacticPosition } from "../utils/starSystemCoordinatesUtils";
+import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
+import { GasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
+import { MandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModel";
+import { JuliaSetModel } from "../anomalies/julia/juliaSetModel";
+import { SpaceStationModel } from "../spacestation/spacestationModel";
+import { StarModel } from "../stellarObjects/star/starModel";
+import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
+import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 
 export class StarSystemController {
     readonly scene: UberScene;
@@ -97,55 +105,67 @@ export class StarSystemController {
 
     constructor(model: StarSystemModel, scene: UberScene) {
         this.scene = scene;
-
         this.starFieldBox = new StarFieldBox(scene);
-
         this.model = model;
     }
 
-    public addSatellite(satellite: TelluricPlanet): void {
-        if (!isMoon(satellite.model)) throw new Error("Use addTelluricPlanet to add a telluric planet to a planet, not addSatellite");
+    private addPlanet(planet: Planet) {
+        this.orbitalObjects.push(planet);
+        this.celestialBodies.push(planet);
+        this.planetaryMassObjects.push(planet);
+        this.planets.push(planet);
+    }
+
+    /**
+     * Adds a satellite to the given planet and returns it
+     * @param satelliteModel The model of the satellite to add to the planet
+     * @param parentBody The planet to which the satellite will be added
+     * @returns The satellite added to the planet
+     */
+    public addSatellite(satelliteModel: TelluricPlanetModel, parentBody: CelestialBody): TelluricPlanet {
+        if (!isMoon(satelliteModel)) throw new Error("Use addTelluricPlanet to add a telluric planet to a planet, not addSatellite");
+        const satellite = new TelluricPlanet(satelliteModel, this.scene, parentBody);
         this.orbitalObjects.push(satellite);
         this.celestialBodies.push(satellite);
-        this.telluricBodies.push(satellite);
         this.planetaryMassObjects.push(satellite);
+        this.telluricBodies.push(satellite);
+
+        return satellite;
     }
 
     /**
      * Adds a telluric planet to the system and returns it
-     * @param planet The planet to add to the system
+     * @param planetModel The model of the planet to add to the system
+     * @returns The telluric planet added to the system
      */
-    public addTelluricPlanet(planet: TelluricPlanet): TelluricPlanet {
-        if (isMoon(planet.model)) {
+    public addTelluricPlanet(planetModel: TelluricPlanetModel): TelluricPlanet {
+        if (isMoon(planetModel)) {
             throw new Error("Use addSatellite to add a moon to a planet, not addTelluricPlanet");
         }
-        this.orbitalObjects.push(planet);
-        this.celestialBodies.push(planet);
-        this.planets.push(planet);
+        const planet = new TelluricPlanet(planetModel, this.scene, this.stellarObjects[0]);
+        this.addPlanet(planet);
         this.telluricBodies.push(planet);
-        this.planetaryMassObjects.push(planet);
         return planet;
     }
 
     /**
      * Adds a gas planet to the system and returns it
-     * @param planet The planet to add to the system
+     * @param planetModel The model of the planet to add to the system
      */
-    public addGasPlanet(planet: GasPlanet): GasPlanet {
-        this.orbitalObjects.push(planet);
-        this.celestialBodies.push(planet);
-        this.planets.push(planet);
+    public addGasPlanet(planetModel: GasPlanetModel): GasPlanet {
+        const planet = new GasPlanet(planetModel, this.scene, this.stellarObjects[0]);
+        this.addPlanet(planet);
         this.gasPlanets.push(planet);
-        this.planetaryMassObjects.push(planet);
         return planet;
     }
 
     /**
      * Adds a Mandelbulb to the system and returns it
-     * @param mandelbulb The mandelbulb to add to the system
+     * @param mandelbulbModel The model of the mandelbulb to add to the system
      * @returns The mandelbulb added to the system
      */
-    public addMandelbulb(mandelbulb: Mandelbulb): Mandelbulb {
+    public addMandelbulb(mandelbulbModel: MandelbulbModel): Mandelbulb {
+        const mandelbulb = new Mandelbulb(mandelbulbModel, this.scene, this.stellarObjects[0]);
         this.orbitalObjects.push(mandelbulb);
         this.anomalies.push(mandelbulb);
         this.celestialBodies.push(mandelbulb);
@@ -154,10 +174,11 @@ export class StarSystemController {
 
     /**
      * Adds a Julia set to the system and returns it
-     * @param juliaSet The julia set to add to the system
+     * @param juliaSetModel The model of the julia set to add to the system
      * @returns The julia set added to the system
      */
-    public addJuliaSet(juliaSet: JuliaSet): JuliaSet {
+    public addJuliaSet(juliaSetModel: JuliaSetModel): JuliaSet {
+        const juliaSet = new JuliaSet(juliaSetModel, this.scene, this.stellarObjects[0]);
         this.orbitalObjects.push(juliaSet);
         this.anomalies.push(juliaSet);
         this.celestialBodies.push(juliaSet);
@@ -165,11 +186,47 @@ export class StarSystemController {
     }
 
     /**
+     * Adds a star to the system and returns it
+     * @param starModel The model of the star added to the system
+     * @param parentBody The parent body of the star
+     * @returns The star added to the system
+     */
+    public addStar(starModel: StarModel, parentBody: CelestialBody | null) {
+        const star = new Star(starModel, this.scene, parentBody);
+        this.addStellarObject(star);
+        return star;
+    }
+
+    /**
+     * Adds a neutron star to the system and returns it
+     * @param neutronStarModel The model of the neutron star added to the system
+     * @param parentBody The parent body of the neutron star
+     * @returns The neutron star added to the system
+     */
+    public addNeutronStar(neutronStarModel: NeutronStarModel, parentBody: CelestialBody | null): NeutronStar {
+        const neutronStar = new NeutronStar(neutronStarModel, this.scene, parentBody);
+        this.addStellarObject(neutronStar);
+        return neutronStar;
+    }
+
+    /**
+     * Adds a black hole to the system and returns it
+     * @param blackHoleModel The model of the black hole added to the system
+     * @param parentBody The parent body of the black hole
+     * @returns The black hole added to the system
+     */
+    public addBlackHole(blackHoleModel: BlackHoleModel, parentBody: CelestialBody | null): BlackHole {
+        const blackHole = new BlackHole(blackHoleModel, this.scene, parentBody);
+        this.addStellarObject(blackHole);
+        return blackHole;
+    }
+
+    /**
      * Adds a star or a blackhole to the system and returns it
      * @param stellarObject The star added to the system
      * @returns The star added to the system
      */
-    public addStellarObject(stellarObject: StellarObject): StellarObject {
+    private addStellarObject(stellarObject: StellarObject): StellarObject {
         this.orbitalObjects.push(stellarObject);
         this.celestialBodies.push(stellarObject);
         this.stellarObjects.push(stellarObject);
@@ -178,10 +235,12 @@ export class StarSystemController {
 
     /**
      * Adds a spacestation to the system and returns it
-     * @param spaceStation The spacestation added to the system
+     * @param spaceStationModel The model of the spacestation added to the system
+     * @param parentBody
      * @returns The spacestation added to the system
      */
-    public addSpaceStation(spaceStation: SpaceStation): SpaceStation {
+    public addSpaceStation(spaceStationModel: SpaceStationModel, parentBody: CelestialBody | null): SpaceStation {
+        const spaceStation = new SpaceStation(spaceStationModel, this.scene, parentBody);
         this.orbitalObjects.push(spaceStation);
         this.spaceStations.push(spaceStation);
         return spaceStation;
@@ -199,10 +258,7 @@ export class StarSystemController {
     }
 
     public getOrbitalObjects(): OrbitalObject[] {
-        const objects = [];
-        for (const body of this.celestialBodies) objects.push(body);
-        for (const spacestation of this.spaceStations) objects.push(spacestation);
-        return objects;
+        return this.orbitalObjects;
     }
 
     /**

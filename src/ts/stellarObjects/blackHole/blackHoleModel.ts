@@ -54,8 +54,6 @@ export class BlackHoleModel implements StellarObjectModel {
 
     readonly parentBody: CelestialBodyModel | null;
 
-    readonly childrenBodies: CelestialBodyModel[] = [];
-
     readonly starSystemModel: StarSystemModel;
 
     readonly typeName: string;

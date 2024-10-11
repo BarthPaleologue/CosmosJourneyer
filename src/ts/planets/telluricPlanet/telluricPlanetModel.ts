@@ -189,7 +189,6 @@ export function createSeededTelluricPlanetModel(seed: number, starSystemModel: S
         rings: rings,
         clouds: clouds,
         nbMoons: nbMoons,
-        childrenBodies: [],
         typeName: isSatellite ? i18n.t("objectTypes:telluricMoon") : i18n.t("objectTypes:telluricPlanet")
     };
 }

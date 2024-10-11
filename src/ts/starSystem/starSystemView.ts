@@ -25,7 +25,6 @@ import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { Settings } from "../settings";
-import { StarSystemHelper } from "./starSystemHelper";
 import { positionNearObjectBrightSide } from "../utils/positionNearObject";
 import { ShipControls } from "../spaceship/shipControls";
 import { OrbitRenderer } from "../orbit/orbitRenderer";
@@ -84,6 +83,10 @@ import { GasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 import { MandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModel";
 import { JuliaSetModel } from "../anomalies/julia/juliaSetModel";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
+import { StellarObject } from "../architecture/stellarObject";
+import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
+import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
+import { StarModel } from "../stellarObjects/star/starModel";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -443,7 +446,21 @@ export class StarSystemView implements View {
         let objectIndex = 0;
         for (let i = 0; i < targetNbStellarObjects; i++) {
             console.log("Stellar:", i + 1, "of", targetNbStellarObjects);
-            const stellarObject = StarSystemHelper.MakeStellarObject(starSystem);
+            let stellarObject: StellarObject;
+            const seed = systemModel.getStellarObjectSeed(i);
+            switch (starSystem.model.getBodyTypeOfStellarObject(starSystem.stellarObjects.length)) {
+                case CelestialBodyType.STAR:
+                    stellarObject = starSystem.addStar(new StarModel(seed, systemModel), null);
+                    break;
+                case CelestialBodyType.BLACK_HOLE:
+                    stellarObject = starSystem.addBlackHole(new BlackHoleModel(seed, systemModel), null);
+                    break;
+                case CelestialBodyType.NEUTRON_STAR:
+                    stellarObject = starSystem.addNeutronStar(new NeutronStarModel(seed, systemModel), null);
+                    break;
+                default:
+                    throw new Error("Unknown stellar object type");
+            }
             stellarObject.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
 
             await wait(timeOut);
@@ -460,10 +477,10 @@ export class StarSystemView implements View {
 
             if (bodyType === CelestialBodyType.TELLURIC_PLANET) {
                 const telluricPlanetModel = createSeededTelluricPlanetModel(systemModel.getPlanetSeed(i), systemModel, starSystem.stellarObjects[0].model);
-                planet = StarSystemHelper.MakeTelluricPlanet(starSystem, telluricPlanetModel);
+                planet = this.starSystem.addTelluricPlanet(telluricPlanetModel);
             } else if (bodyType === CelestialBodyType.GAS_PLANET) {
                 const gasPlanetModel = new GasPlanetModel(systemModel.getPlanetSeed(i), systemModel, starSystem.stellarObjects[0].model);
-                planet = StarSystemHelper.MakeGasPlanet(starSystem, gasPlanetModel);
+                planet = this.starSystem.addGasPlanet(gasPlanetModel);
             } else {
                 throw new Error(`Incorrect body type in the planet list: ${bodyType}`);
             }
@@ -481,7 +498,7 @@ export class StarSystemView implements View {
             for (let j = 0; j < planet.model.nbMoons; j++) {
                 console.log("Satellite:", j + 1, "of", planet.model.nbMoons);
                 const satelliteModel = createSeededTelluricPlanetModel(getMoonSeed(planet.model, j), systemModel, planet.model);
-                const satellite = StarSystemHelper.MakeSatellite(starSystem, planet, satelliteModel);
+                const satellite = starSystem.addSatellite(satelliteModel, planet);
                 satellite.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
 
                 await wait(timeOut);
@@ -496,10 +513,10 @@ export class StarSystemView implements View {
             let anomaly: Anomaly;
             switch (anomalyType) {
                 case AnomalyType.MANDELBULB:
-                    anomaly = StarSystemHelper.MakeMandelbulb(starSystem, new MandelbulbModel(systemModel.getAnomalySeed(i), systemModel, starSystem.stellarObjects[0].model));
+                    anomaly = this.starSystem.addMandelbulb(new MandelbulbModel(systemModel.getAnomalySeed(i), systemModel, starSystem.stellarObjects[0].model));
                     break;
                 case AnomalyType.JULIA_SET:
-                    anomaly = StarSystemHelper.MakeJuliaSet(starSystem, new JuliaSetModel(systemModel.getAnomalySeed(i), systemModel, starSystem.stellarObjects[0].model));
+                    anomaly = this.starSystem.addJuliaSet(new JuliaSetModel(systemModel.getAnomalySeed(i), systemModel, starSystem.stellarObjects[0].model));
                     break;
             }
 
@@ -517,7 +534,7 @@ export class StarSystemView implements View {
 
                 const seed = getSpaceStationSeed(planet.model, 0);
                 const spaceStationModel = new SpaceStationModel(seed, systemModel, planet.model);
-                const spaceStation = StarSystemHelper.MakeSpaceStation(starSystem, spaceStationModel, planet);
+                const spaceStation = starSystem.addSpaceStation(spaceStationModel, planet);
                 spaceStation.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
 
                 await wait(timeOut);

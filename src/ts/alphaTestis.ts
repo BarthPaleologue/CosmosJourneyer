@@ -26,7 +26,6 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PostProcessType } from "./postProcesses/postProcessTypes";
 import { createSeededTelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModel";
 import { GasPlanetModel } from "./planets/gasPlanet/gasPlanetModel";
-import { StarSystemHelper } from "./starSystem/starSystemHelper";
 import { getMoonSeed } from "./planets/common";
 import { SpaceShipControlsInputs } from "./spaceship/spaceShipControlsInputs";
 import { CustomStarSystemModel } from "./starSystem/customStarSystemModel";
@@ -72,7 +71,7 @@ const starSystem = new StarSystemController(starSystemModel, starSystemView.scen
 await starSystemView.loadStarSystem(starSystem, false);
 
 const sunModel = new StarModel(starSystemModel.getStellarObjectSeed(0), starSystemModel);
-const sun = StarSystemHelper.MakeStar(starSystem, sunModel);
+const sun = starSystem.addStar(sunModel, null);
 sun.model.orbit.period = 60 * 60 * 24;
 
 /*const secundaModel = new StarModel(-672446, sunModel);
@@ -93,10 +92,10 @@ planetModel.orbit.period = 60 * 60 * 24 * 365.25;
 planetModel.orbit.radius = 25000 * planetModel.radius;
 planetModel.orbit.normalToPlane = Vector3.Up();
 
-const planet = StarSystemHelper.MakeTelluricPlanet(starSystem, planetModel);
+const planet = starSystem.addTelluricPlanet(planetModel);
 
 const spaceStationModel = new SpaceStationModel(0, starSystem.model, planetModel);
-const spaceStation = StarSystemHelper.MakeSpaceStation(starSystem, spaceStationModel, planet);
+const spaceStation = starSystem.addSpaceStation(spaceStationModel, planet);
 
 //physicsViewer.showBody(spaceStation.aggregate.body);
 /*for(const landingpad of spaceStation.landingPads) {
@@ -114,7 +113,7 @@ moonModel.orbit.period = moonModel.physicalProperties.rotationPeriod;
 moonModel.orbit.radius = 8 * planet.getRadius();
 moonModel.orbit.normalToPlane = Vector3.Up();
 
-const moon = StarSystemHelper.MakeSatellite(starSystem, planet, moonModel);
+const moon = starSystem.addSatellite(moonModel, planet);
 
 const aresModel = createSeededTelluricPlanetModel(0.3725, starSystemModel, sun.model);
 aresModel.physicalProperties.mass = 7;
@@ -133,7 +132,7 @@ aresModel.orbit.normalToPlane = Vector3.Up();
 //aresModel.terrainSettings.continent_base_height = 10e3;
 //aresModel.terrainSettings.max_mountain_height = 20e3;
 
-const ares = StarSystemHelper.MakeTelluricPlanet(starSystem, aresModel);
+const ares = starSystem.addTelluricPlanet(aresModel);
 ares.postProcesses.splice(ares.postProcesses.indexOf(PostProcessType.OCEAN), 1);
 ares.postProcesses.splice(ares.postProcesses.indexOf(PostProcessType.CLOUDS), 1);
 
@@ -144,7 +143,7 @@ andromaqueModel.orbit.period = 60 * 60 * 24 * 365.25;
 andromaqueModel.orbit.radius = 25300 * ares.getRadius();
 andromaqueModel.orbit.normalToPlane = Vector3.Up();
 
-const andromaque = StarSystemHelper.MakeGasPlanet(starSystem, andromaqueModel);
+const andromaque = starSystem.addGasPlanet(andromaqueModel);
 
 /*const blackHoleModel = new BlackHoleModel(0.5, sunModel);
 blackHoleModel.orbit.period = 60 * 60 * 24 * 365.25;

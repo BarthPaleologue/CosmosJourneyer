@@ -45,8 +45,6 @@ export class MandelbulbModel implements CelestialBodyModel {
 
     readonly parentBody: CelestialBodyModel | null;
 
-    readonly childrenBodies: CelestialBodyModel[] = [];
-
     readonly nbMoons: number;
 
     readonly power: number;

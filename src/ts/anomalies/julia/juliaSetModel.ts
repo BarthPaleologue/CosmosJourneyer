@@ -45,8 +45,6 @@ export class JuliaSetModel implements CelestialBodyModel {
 
     readonly parentBody: CelestialBodyModel | null;
 
-    readonly childrenBodies: CelestialBodyModel[] = [];
-
     readonly nbMoons: number;
 
     readonly accentColor: Color3;

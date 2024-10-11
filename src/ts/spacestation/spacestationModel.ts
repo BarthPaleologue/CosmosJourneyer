@@ -48,7 +48,6 @@ export class SpaceStationModel implements OrbitalObjectModel {
     readonly orbit: Orbit;
     readonly physicalProperties: OrbitalObjectPhysicalProperties;
     readonly parentBody: OrbitalObjectModel | null;
-    readonly childrenBodies: OrbitalObjectModel[] = [];
 
     readonly population: number;
 
@@ -94,7 +93,6 @@ export class SpaceStationModel implements OrbitalObjectModel {
         this.name = generateSpaceStationName(this.rng, 2756);
 
         this.parentBody = parentBody ?? null;
-        this.childrenBodies = [];
 
         const orbitRadius = (2 + clamp(normalRandom(2, 1, this.rng, GenerationSteps.ORBIT), 0, 10)) * (parentBody?.radius ?? 0);
 
