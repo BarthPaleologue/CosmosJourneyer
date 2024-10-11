@@ -38,7 +38,6 @@ import { RingsUniforms } from "../../rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
-import { StarSystemModel } from "../../starSystem/starSystemModel";
 import { Orbit } from "../../orbit/orbit";
 
 export class Star implements StellarObject, Cullable {
@@ -63,14 +62,13 @@ export class Star implements StellarObject, Cullable {
     /**
      * New Star
      * @param model The seed of the star in [-1, 1]
-     * @param starSystemModel
      * @param scene
      * @param parentBody The bodies the star is orbiting
      */
-    constructor(model: StarModel | number, starSystemModel: StarSystemModel, scene: Scene, parentBody: CelestialBody | null = null) {
+    constructor(model: StarModel, scene: Scene, parentBody: CelestialBody | null = null) {
         this.parent = parentBody;
 
-        this.model = model instanceof StarModel ? model : new StarModel(model, starSystemModel, parentBody?.model);
+        this.model = model;
 
         this.name = this.model.name;
 

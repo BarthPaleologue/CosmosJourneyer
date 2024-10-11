@@ -40,7 +40,6 @@ import { LandingPad } from "../assets/procedural/landingPad/landingPad";
 import { LandingRequest, ManagesLandingPads } from "../utils/managesLandingPads";
 import { Settings } from "../settings";
 import { EngineBay } from "../assets/procedural/spaceStation/engineBay";
-import { StarSystemModel } from "../starSystem/starSystemModel";
 import { Orbit } from "../orbit/orbit";
 
 export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads {
@@ -66,8 +65,8 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
 
     private readonly boundingRadius: number;
 
-    constructor(model: SpaceStationModel | number, starSystemModel: StarSystemModel, scene: Scene, parentBody: CelestialBody | null = null) {
-        this.model = model instanceof SpaceStationModel ? model : new SpaceStationModel(model, starSystemModel, parentBody?.model);
+    constructor(model: SpaceStationModel, scene: Scene, parentBody: CelestialBody | null = null) {
+        this.model = model;
 
         this.name = this.model.name;
 

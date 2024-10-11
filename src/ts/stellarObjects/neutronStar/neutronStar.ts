@@ -40,7 +40,6 @@ import { Camera } from "@babylonjs/core/Cameras/camera";
 import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
 import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
-import { StarSystemModel } from "../../starSystem/starSystemModel";
 import { Orbit } from "../../orbit/orbit";
 
 export class NeutronStar implements StellarObject, Cullable {
@@ -66,12 +65,11 @@ export class NeutronStar implements StellarObject, Cullable {
     /**
      * New Star
      * @param model The seed of the star in [-1, 1]
-     * @param starSystemModel
      * @param scene
      * @param parentBody
      */
-    constructor(model: number | NeutronStarModel, starSystemModel: StarSystemModel, scene: Scene, parentBody: CelestialBody | null = null) {
-        this.model = model instanceof NeutronStarModel ? model : new NeutronStarModel(model, starSystemModel, parentBody?.model);
+    constructor(model: NeutronStarModel, scene: Scene, parentBody: CelestialBody | null = null) {
+        this.model = model;
         this.name = this.model.name;
 
         this.parent = parentBody;

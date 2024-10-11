@@ -38,6 +38,7 @@ import { StarFieldBox } from "./starSystem/starFieldBox";
 import { CustomStarSystemModel } from "./starSystem/customStarSystemModel";
 
 import { CelestialBodyType } from "./architecture/celestialBody";
+import { StarModel } from "./stellarObjects/star/starModel";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -86,7 +87,8 @@ const starSystemModel = new CustomStarSystemModel(
     []
 );
 
-const sun = new Star(starSystemModel.getStellarObjectSeed(0), starSystemModel, scene);
+const sunModel = new StarModel(starSystemModel.getStellarObjectSeed(0), starSystemModel);
+const sun = new Star(sunModel, scene);
 sun.getTransform().position = new Vector3(7, 2, 5).normalize().scaleInPlace(distanceToStar);
 
 const starfieldBox = new StarFieldBox(scene);
@@ -94,7 +96,7 @@ const starfieldBox = new StarFieldBox(scene);
 const spaceStationModel = new SpaceStationModel(Math.random() * Settings.SEED_HALF_RANGE, starSystemModel, sun.model);
 spaceStationModel.orbit.radius = distanceToStar;
 
-const spaceStation = new SpaceStation(spaceStationModel, starSystemModel, scene, sun);
+const spaceStation = new SpaceStation(spaceStationModel, scene, sun);
 
 const ambient = new HemisphericLight("Sun", Vector3.Up(), scene);
 ambient.intensity = 0.1;

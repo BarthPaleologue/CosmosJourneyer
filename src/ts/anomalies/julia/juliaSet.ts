@@ -29,7 +29,6 @@ import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProp
 import { Anomaly } from "../anomaly";
 import { AnomalyType } from "../anomalyType";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
-import { StarSystemModel } from "../../starSystem/starSystemModel";
 import { Orbit } from "../../orbit/orbit";
 
 export class JuliaSet implements Anomaly, Cullable {
@@ -48,12 +47,11 @@ export class JuliaSet implements Anomaly, Cullable {
     /**
      * New Gas Planet
      * @param model The model to create the planet from or a seed for the planet in [-1, 1]
-     * @param starSystemModel
      * @param scene
      * @param parentBody The bodies the planet is orbiting
      */
-    constructor(model: JuliaSetModel | number, starSystemModel: StarSystemModel, scene: Scene, parentBody: CelestialBody | null = null) {
-        this.model = model instanceof JuliaSetModel ? model : new JuliaSetModel(model, starSystemModel, parentBody?.model);
+    constructor(model: JuliaSetModel, scene: Scene, parentBody: CelestialBody | null = null) {
+        this.model = model;
 
         this.name = this.model.name;
 

@@ -38,28 +38,28 @@ import { JuliaSet } from "../anomalies/julia/juliaSet";
 import { JuliaSetModel } from "../anomalies/julia/juliaSetModel";
 
 export class StarSystemHelper {
-    public static MakeStar(starsystem: StarSystemController, model?: number | StarModel): Star {
-        const star = new Star(model ?? starsystem.model.getStellarObjectSeed(starsystem.stellarObjects.length), starsystem.model, starsystem.scene, starsystem.stellarObjects[0]);
+    public static MakeStar(starsystem: StarSystemController, model: StarModel): Star {
+        const star = new Star(model, starsystem.scene, starsystem.stellarObjects[0]);
         starsystem.addStellarObject(star);
         return star;
     }
 
-    public static MakeMandelbulb(starsystem: StarSystemController, model: number | MandelbulbModel = starsystem.model.getAnomalySeed(starsystem.anomalies.length)): Mandelbulb {
+    public static MakeMandelbulb(starsystem: StarSystemController, model: MandelbulbModel): Mandelbulb {
         if (starsystem.anomalies.length >= starsystem.model.getNbAnomalies())
             console.warn(`You are adding a mandelbulb to the system.
             The system generator had planned for ${starsystem.model.getNbAnomalies()} anomalies, but you are adding the ${starsystem.anomalies.length + 1}th anomaly.
             This might cause issues, or not who knows.`);
-        const mandelbulb = new Mandelbulb(model, starsystem.model, starsystem.scene, starsystem.stellarObjects[0]);
+        const mandelbulb = new Mandelbulb(model, starsystem.scene, starsystem.stellarObjects[0]);
         starsystem.addMandelbulb(mandelbulb);
         return mandelbulb;
     }
 
-    public static MakeJuliaSet(starsystem: StarSystemController, model: number | JuliaSetModel = starsystem.model.getAnomalySeed(starsystem.anomalies.length)): JuliaSet {
+    public static MakeJuliaSet(starsystem: StarSystemController, model: JuliaSetModel): JuliaSet {
         if (starsystem.anomalies.length >= starsystem.model.getNbAnomalies())
             console.warn(`You are adding a julia set to the system.
             The system generator had planned for ${starsystem.model.getNbAnomalies()} anomalies, but you are adding the ${starsystem.anomalies.length + 1}th anomaly.
             This might cause issues, or not who knows.`);
-        const juliaSet = new JuliaSet(model, starsystem.model, starsystem.scene, starsystem.stellarObjects[0]);
+        const juliaSet = new JuliaSet(model, starsystem.scene, starsystem.stellarObjects[0]);
         starsystem.addJuliaSet(juliaSet);
         return juliaSet;
     }
@@ -71,22 +71,19 @@ export class StarSystemHelper {
      */
     public static MakeBlackHole(
         starsystem: StarSystemController,
-        model: number | BlackHoleModel = starsystem.model.getStellarObjectSeed(starsystem.stellarObjects.length)
+        model: BlackHoleModel
     ): BlackHole {
-        const blackHole = new BlackHole(model, starsystem.model, starsystem.scene, starsystem.stellarObjects.length > 0 ? starsystem.stellarObjects[0] : null);
+        const blackHole = new BlackHole(model, starsystem.scene, starsystem.stellarObjects.length > 0 ? starsystem.stellarObjects[0] : null);
         starsystem.addStellarObject(blackHole);
         return blackHole;
     }
 
-    public static MakeNeutronStar(
-        starsystem: StarSystemController,
-        model: number | NeutronStarModel = starsystem.model.getStellarObjectSeed(starsystem.stellarObjects.length)
-    ): NeutronStar {
+    public static MakeNeutronStar(starsystem: StarSystemController, model: NeutronStarModel): NeutronStar {
         if (starsystem.stellarObjects.length >= starsystem.model.getNbStellarObjects())
             console.warn(`You are adding a neutron star
         to a system that already has ${starsystem.stellarObjects.length} stars.
         The capacity of the generator was supposed to be ${starsystem.model.getNbStellarObjects()} starsystem is not a problem, but it may be.`);
-        const neutronStar = new NeutronStar(model, starsystem.model, starsystem.scene, starsystem.stellarObjects.length > 0 ? starsystem.stellarObjects[0] : null);
+        const neutronStar = new NeutronStar(model, starsystem.scene, starsystem.stellarObjects.length > 0 ? starsystem.stellarObjects[0] : null);
 
         starsystem.addStellarObject(neutronStar);
         return neutronStar;
@@ -100,11 +97,11 @@ export class StarSystemHelper {
     public static MakeStellarObject(starsystem: StarSystemController, seed: number = starsystem.model.getStellarObjectSeed(starsystem.stellarObjects.length)): StellarObject {
         const stellarObjectType = starsystem.model.getBodyTypeOfStellarObject(starsystem.stellarObjects.length);
         if (stellarObjectType === CelestialBodyType.BLACK_HOLE) {
-            return StarSystemHelper.MakeBlackHole(starsystem, seed);
+            return StarSystemHelper.MakeBlackHole(starsystem, new BlackHoleModel(seed, starsystem.model));
         } else if (stellarObjectType === CelestialBodyType.NEUTRON_STAR) {
-            return StarSystemHelper.MakeNeutronStar(starsystem, seed);
+            return StarSystemHelper.MakeNeutronStar(starsystem, new NeutronStarModel(seed, starsystem.model));
         } else if (stellarObjectType === CelestialBodyType.STAR) {
-            return StarSystemHelper.MakeStar(starsystem, seed);
+            return StarSystemHelper.MakeStar(starsystem, new StarModel(seed, starsystem.model));
         } else {
             throw new Error(`Unknown stellar object type ${stellarObjectType}`);
         }
@@ -156,8 +153,8 @@ export class StarSystemHelper {
         }
     }
 
-    public static MakeSpaceStation(starsystem: StarSystemController, model: SpaceStationModel | number, body: CelestialBody): SpaceStation {
-        const spacestation = new SpaceStation(model, starsystem.model, starsystem.scene, body);
+    public static MakeSpaceStation(starsystem: StarSystemController, model: SpaceStationModel, body: CelestialBody): SpaceStation {
+        const spacestation = new SpaceStation(model, starsystem.scene, body);
         starsystem.addSpaceStation(spacestation);
         return spacestation;
     }

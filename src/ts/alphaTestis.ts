@@ -32,6 +32,8 @@ import { SpaceShipControlsInputs } from "./spaceship/spaceShipControlsInputs";
 import { CustomStarSystemModel } from "./starSystem/customStarSystemModel";
 
 import { CelestialBodyType } from "./architecture/celestialBody";
+import { StarModel } from "./stellarObjects/star/starModel";
+import { SpaceStationModel } from "./spacestation/spacestationModel";
 
 const engine = await CosmosJourneyer.CreateAsync();
 
@@ -69,7 +71,8 @@ const starSystem = new StarSystemController(starSystemModel, starSystemView.scen
 
 await starSystemView.loadStarSystem(starSystem, false);
 
-const sun = StarSystemHelper.MakeStar(starSystem);
+const sunModel = new StarModel(starSystemModel.getStellarObjectSeed(0), starSystemModel);
+const sun = StarSystemHelper.MakeStar(starSystem, sunModel);
 sun.model.orbit.period = 60 * 60 * 24;
 
 /*const secundaModel = new StarModel(-672446, sunModel);
@@ -92,7 +95,8 @@ planetModel.orbit.normalToPlane = Vector3.Up();
 
 const planet = StarSystemHelper.MakeTelluricPlanet(starSystem, planetModel);
 
-const spaceStation = StarSystemHelper.MakeSpaceStation(starSystem, 0, planet);
+const spaceStationModel = new SpaceStationModel(0, starSystem.model, planetModel);
+const spaceStation = StarSystemHelper.MakeSpaceStation(starSystem, spaceStationModel, planet);
 
 //physicsViewer.showBody(spaceStation.aggregate.body);
 /*for(const landingpad of spaceStation.landingPads) {

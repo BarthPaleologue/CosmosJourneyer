@@ -30,7 +30,6 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { RingsUniforms } from "../../rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
-import { StarSystemModel } from "../../starSystem/starSystemModel";
 import { Orbit } from "../../orbit/orbit";
 
 export class BlackHole implements StellarObject, Cullable {
@@ -46,8 +45,8 @@ export class BlackHole implements StellarObject, Cullable {
 
     readonly parent: CelestialBody | null;
 
-    constructor(model: BlackHoleModel | number, starSystemModel: StarSystemModel, scene: Scene, parentBody: CelestialBody | null = null) {
-        this.model = model instanceof BlackHoleModel ? model : new BlackHoleModel(model, starSystemModel);
+    constructor(model: BlackHoleModel, scene: Scene, parentBody: CelestialBody | null = null) {
+        this.model = model;
 
         this.name = this.model.name;
 

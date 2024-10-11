@@ -495,6 +495,7 @@ export class StarSystemController {
         }
 
         for (const stellarObject of this.stellarObjects) {
+            //FIXME: this needs to be refactored to be future proof when adding new stellar objects
             if (stellarObject instanceof Star) stellarObject.updateMaterial(deltaSeconds);
         }
 

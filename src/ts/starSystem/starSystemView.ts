@@ -81,6 +81,9 @@ import { getSystemModelFromCoordinates } from "../utils/starSystemCoordinatesUti
 import { CelestialBodyType } from "../architecture/celestialBody";
 import { createSeededTelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 import { GasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
+import { MandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModel";
+import { JuliaSetModel } from "../anomalies/julia/juliaSetModel";
+import { SpaceStationModel } from "../spacestation/spacestationModel";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -493,10 +496,10 @@ export class StarSystemView implements View {
             let anomaly: Anomaly;
             switch (anomalyType) {
                 case AnomalyType.MANDELBULB:
-                    anomaly = StarSystemHelper.MakeMandelbulb(starSystem);
+                    anomaly = StarSystemHelper.MakeMandelbulb(starSystem, new MandelbulbModel(systemModel.getAnomalySeed(i), systemModel, starSystem.stellarObjects[0].model));
                     break;
                 case AnomalyType.JULIA_SET:
-                    anomaly = StarSystemHelper.MakeJuliaSet(starSystem);
+                    anomaly = StarSystemHelper.MakeJuliaSet(starSystem, new JuliaSetModel(systemModel.getAnomalySeed(i), systemModel, starSystem.stellarObjects[0].model));
                     break;
             }
 
@@ -513,7 +516,8 @@ export class StarSystemView implements View {
                 if (planet === undefined) throw new Error("Planet not found to place space station around");
 
                 const seed = getSpaceStationSeed(planet.model, 0);
-                const spaceStation = StarSystemHelper.MakeSpaceStation(starSystem, seed, planet);
+                const spaceStationModel = new SpaceStationModel(seed, systemModel, planet.model);
+                const spaceStation = StarSystemHelper.MakeSpaceStation(starSystem, spaceStationModel, planet);
                 spaceStation.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
 
                 await wait(timeOut);
