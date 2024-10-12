@@ -1,6 +1,10 @@
 import { MissionNode, MissionNodeSerialized, MissionNodeType } from "../../missionNode";
 import { MissionContext } from "../../../missionContext";
-import { UniverseObjectId, universeObjectIdEquals } from "../../../../saveFile/universeCoordinates";
+import {
+    StarSystemCoordinates, starSystemCoordinatesEquals,
+    UniverseObjectId,
+    universeObjectIdEquals
+} from "../../../../saveFile/universeCoordinates";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { clamp } from "../../../../utils/math";
 import { getObjectBySystemId, getObjectModelByUniverseId } from "../../../../utils/orbitalObjectId";
@@ -11,7 +15,6 @@ import { Settings } from "../../../../settings";
 import { pressInteractionToStrings } from "../../../../utils/inputControlsString";
 import { GeneralInputs } from "../../../../inputs/generalInputs";
 import { getGlobalKeyboardLayoutMap } from "../../../../utils/keyboardAPI";
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../../../../starSystem/starSystemModel";
 
 const enum AsteroidFieldMissionState {
     NOT_IN_SYSTEM,

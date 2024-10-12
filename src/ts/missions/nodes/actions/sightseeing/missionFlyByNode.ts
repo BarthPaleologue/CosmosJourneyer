@@ -1,6 +1,10 @@
 import { MissionNode, MissionNodeSerialized, MissionNodeType } from "../../missionNode";
 import { MissionContext } from "../../../missionContext";
-import { UniverseObjectId, universeObjectIdEquals } from "../../../../saveFile/universeCoordinates";
+import {
+    StarSystemCoordinates, starSystemCoordinatesEquals,
+    UniverseObjectId,
+    universeObjectIdEquals
+} from "../../../../saveFile/universeCoordinates";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getObjectBySystemId, getObjectModelByUniverseId } from "../../../../utils/orbitalObjectId";
 import { getStarGalacticPosition, getSystemModelFromCoordinates } from "../../../../utils/starSystemCoordinatesUtils";
@@ -10,7 +14,6 @@ import i18n from "../../../../i18n";
 import { getGlobalKeyboardLayoutMap } from "../../../../utils/keyboardAPI";
 import { pressInteractionToStrings } from "../../../../utils/inputControlsString";
 import { GeneralInputs } from "../../../../inputs/generalInputs";
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../../../../starSystem/starSystemModel";
 
 const enum FlyByState {
     NOT_IN_SYSTEM,

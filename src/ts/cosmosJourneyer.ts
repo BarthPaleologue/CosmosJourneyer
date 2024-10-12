@@ -36,7 +36,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { setRotationQuaternion } from "./uberCore/transforms/basicTransform";
 import { encodeBase64 } from "./utils/base64";
-import { UniverseCoordinates } from "./saveFile/universeCoordinates";
+import { StarSystemCoordinates, UniverseCoordinates } from "./saveFile/universeCoordinates";
 import { View } from "./utils/view";
 import { updateInputDevices } from "./inputs/devices";
 import { AudioManager } from "./audio/audioManager";
@@ -53,7 +53,6 @@ import { SidePanels } from "./ui/sidePanels";
 import { Settings } from "./settings";
 import { Player } from "./player/player";
 import { getObjectBySystemId, getUniverseObjectId } from "./utils/orbitalObjectId";
-import { StarSystemCoordinates } from "./starSystem/starSystemModel";
 import { getSystemModelFromCoordinates } from "./utils/starSystemCoordinatesUtils";
 import { StarSystemController } from "./starSystem/starSystemController";
 

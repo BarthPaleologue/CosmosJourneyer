@@ -22,7 +22,8 @@ import { UniverseDensity } from "../settings";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { BoundingBox } from "@babylonjs/core/Culling/boundingBox";
-import { StarSystemCoordinates } from "../starSystem/starSystemModel";
+
+import { StarSystemCoordinates } from "../saveFile/universeCoordinates";
 
 export function vector3ToString(v: Vector3): string {
     return `${v.x},${v.y},${v.z}`;

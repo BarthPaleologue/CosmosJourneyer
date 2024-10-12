@@ -21,11 +21,12 @@ import { Settings } from "../settings";
 import { generateStarName } from "../utils/starNameGenerator";
 import { wheelOfFortune } from "../utils/random";
 import { AnomalyType } from "../anomalies/anomalyType";
-import { StarSystemCoordinates, StarSystemModel } from "./starSystemModel";
+import { StarSystemModel } from "./starSystemModel";
 import { StarSector } from "../starmap/starSector";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { hashVec3 } from "../utils/hashVec3";
 import { CelestialBodyType } from "../architecture/celestialBody";
+import { StarSystemCoordinates } from "../saveFile/universeCoordinates";
 
 const enum GenerationSteps {
     NAME,

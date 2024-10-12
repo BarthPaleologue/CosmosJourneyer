@@ -3,9 +3,8 @@ import { MissionContext } from "./missionContext";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
 import { getObjectModelByUniverseId, getUniverseIdForSpaceStationModel } from "../utils/orbitalObjectId";
 import i18n from "../i18n";
-import { UniverseObjectId } from "../saveFile/universeCoordinates";
+import { StarSystemCoordinates, UniverseObjectId } from "../saveFile/universeCoordinates";
 import { deserializeMissionNode } from "./nodes/deserializeNode";
-import { StarSystemCoordinates } from "../starSystem/starSystemModel";
 
 /**
  * Registered mission types. Those are used to display localized strings in the UI

@@ -1,5 +1,6 @@
 import { MissionContext } from "../missionContext";
-import { StarSystemCoordinates } from "../../starSystem/starSystemModel";
+
+import { StarSystemCoordinates } from "../../saveFile/universeCoordinates";
 
 /**
  * Describes any node in the mission tree.

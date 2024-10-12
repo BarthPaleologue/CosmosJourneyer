@@ -57,11 +57,11 @@ import { createNotification } from "../utils/notification";
 import { getStarGalacticPosition, getSystemModelFromCoordinates } from "../utils/starSystemCoordinatesUtils";
 import { Player } from "../player/player";
 import { Settings } from "../settings";
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../starSystem/starSystemModel";
 import { CelestialBodyType } from "../architecture/celestialBody";
 import { getRgbFromTemperature } from "../utils/specrend";
 import { StellarObjectModel } from "../architecture/stellarObject";
 import { getStellarObjectName } from "../utils/parseToStrings";
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../saveFile/universeCoordinates";
 
 export class StarMap implements View {
     readonly scene: Scene;

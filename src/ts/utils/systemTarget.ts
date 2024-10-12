@@ -4,8 +4,8 @@ import { Transformable } from "../architecture/transformable";
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { TypedObject } from "../architecture/typedObject";
 import i18n from "../i18n";
-import { StarSystemCoordinates } from "../starSystem/starSystemModel";
 import { getSystemModelFromCoordinates } from "./starSystemCoordinatesUtils";
+import { StarSystemCoordinates } from "../saveFile/universeCoordinates";
 
 export class SystemTarget implements Transformable, HasBoundingSphere, TypedObject {
     readonly name: string;

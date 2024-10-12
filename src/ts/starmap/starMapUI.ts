@@ -29,10 +29,10 @@ import { getSpaceStationModels } from "../utils/getModelsFromSystemModel";
 import { StarMapBookmarkButton } from "./starMapBookmarkButton";
 import { Player } from "../player/player";
 import { SystemIcons } from "./systemIcons";
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../starSystem/starSystemModel";
 import { CelestialBodyType } from "../architecture/celestialBody";
 import { getRgbFromTemperature } from "../utils/specrend";
 import { getStellarObjectName } from "../utils/parseToStrings";
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../saveFile/universeCoordinates";
 
 export class StarMapUI {
     readonly htmlRoot: HTMLDivElement;

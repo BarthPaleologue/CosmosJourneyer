@@ -1,6 +1,10 @@
 import { MissionNode, MissionNodeSerialized, MissionNodeType } from "../../missionNode";
 import { MissionContext } from "../../../missionContext";
-import { UniverseObjectId, universeObjectIdEquals } from "../../../../saveFile/universeCoordinates";
+import {
+    StarSystemCoordinates, starSystemCoordinatesEquals,
+    UniverseObjectId,
+    universeObjectIdEquals
+} from "../../../../saveFile/universeCoordinates";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { CollisionMask, Settings } from "../../../../settings";
@@ -11,7 +15,6 @@ import { parseDistance } from "../../../../utils/parseToStrings";
 import { getGlobalKeyboardLayoutMap } from "../../../../utils/keyboardAPI";
 import { pressInteractionToStrings } from "../../../../utils/inputControlsString";
 import { GeneralInputs } from "../../../../inputs/generalInputs";
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../../../../starSystem/starSystemModel";
 
 const enum LandMissionState {
     NOT_IN_SYSTEM,

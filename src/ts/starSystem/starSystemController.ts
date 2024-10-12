@@ -38,7 +38,7 @@ import { SystemTarget } from "../utils/systemTarget";
 import { JuliaSet } from "../anomalies/julia/juliaSet";
 import { Anomaly } from "../anomalies/anomaly";
 import { StarFieldBox } from "./starFieldBox";
-import { StarSystemCoordinates, StarSystemModel } from "./starSystemModel";
+import { StarSystemModel } from "./starSystemModel";
 import { Settings } from "../settings";
 import { getStarGalacticPosition } from "../utils/starSystemCoordinatesUtils";
 import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
@@ -49,6 +49,7 @@ import { SpaceStationModel } from "../spacestation/spacestationModel";
 import { StarModel } from "../stellarObjects/star/starModel";
 import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
+import { StarSystemCoordinates } from "../saveFile/universeCoordinates";
 
 export class StarSystemController {
     readonly scene: UberScene;

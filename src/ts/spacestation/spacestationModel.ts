@@ -27,13 +27,13 @@ import { GenerationSteps } from "../utils/generationSteps";
 import { CropType, CropTypes, getEdibleEnergyPerHaPerDay } from "../utils/agriculture";
 import { randomPieChart } from "../utils/random";
 import { generateSpaceStationName } from "../utils/spaceStationNameGenerator";
-import { StarSystemCoordinates } from "../starSystem/starSystemModel";
 import { Faction } from "../society/factions";
 import { getPowerPlayData } from "../society/powerplay";
 import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
 import { Settings } from "../settings";
 import i18n from "../i18n";
 import { StellarObjectModel } from "../architecture/stellarObject";
+import { StarSystemCoordinates } from "../saveFile/universeCoordinates";
 
 export type SpaceStationModel = OrbitalObjectModel & {
     readonly starSystemCoordinates: StarSystemCoordinates;

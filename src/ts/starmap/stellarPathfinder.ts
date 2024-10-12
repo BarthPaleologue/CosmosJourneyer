@@ -19,7 +19,7 @@ import { getStarGalacticPosition } from "../utils/starSystemCoordinatesUtils";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getNeighborStarSystemCoordinates } from "../utils/getNeighborStarSystems";
 import { PriorityQueue } from "../utils/priorityQueue";
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../starSystem/starSystemModel";
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../saveFile/universeCoordinates";
 
 type Node = {
     coordinates: StarSystemCoordinates;

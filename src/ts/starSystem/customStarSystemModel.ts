@@ -15,9 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { StarSystemCoordinates, StarSystemModel } from "./starSystemModel";
+import { StarSystemModel } from "./starSystemModel";
 import { AnomalyType } from "../anomalies/anomalyType";
 import { CelestialBodyType } from "../architecture/celestialBody";
+import { StarSystemCoordinates } from "../saveFile/universeCoordinates";
 
 export class CustomStarSystemModel implements StarSystemModel {
     readonly name: string;

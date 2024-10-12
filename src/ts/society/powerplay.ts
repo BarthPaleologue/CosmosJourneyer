@@ -2,7 +2,8 @@ import { seededSquirrelNoise } from "squirrel-noise";
 import { Settings } from "../settings";
 import { makeNoise3D } from "fast-simplex-noise";
 import { getStarGalacticPosition } from "../utils/starSystemCoordinatesUtils";
-import { StarSystemCoordinates } from "../starSystem/starSystemModel";
+
+import { StarSystemCoordinates } from "../saveFile/universeCoordinates";
 
 const materialistSpiritualistRng = seededSquirrelNoise(Settings.POWER_PLAY_SEED);
 let materialistSpiritualistSampleStep = 0;

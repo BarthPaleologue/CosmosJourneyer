@@ -1,7 +1,7 @@
 import { StarSector } from "../starmap/starSector";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { StarSystemCoordinates } from "../starSystem/starSystemModel";
 import { SeededStarSystemModel, SystemSeed } from "../starSystem/seededStarSystemModel";
+import { StarSystemCoordinates } from "../saveFile/universeCoordinates";
 
 export function getStarSystemCoordinatesFromSeed(systemSeed: SystemSeed): StarSystemCoordinates {
     const starSector = new StarSector(new Vector3(systemSeed.starSectorX, systemSeed.starSectorY, systemSeed.starSectorZ));

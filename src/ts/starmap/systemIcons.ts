@@ -1,4 +1,5 @@
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../starSystem/starSystemModel";
+
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../saveFile/universeCoordinates";
 
 export const enum SystemIconMask {
     BOOKMARK = 0b01,

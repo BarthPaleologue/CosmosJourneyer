@@ -1,5 +1,6 @@
 import { Mission, MissionSerialized } from "../missions/mission";
-import { StarSystemCoordinates } from "../starSystem/starSystemModel";
+
+import { StarSystemCoordinates } from "../saveFile/universeCoordinates";
 
 export type SerializedPlayer = {
     name: string;
