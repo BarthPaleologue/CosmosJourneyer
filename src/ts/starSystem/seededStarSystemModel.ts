@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { seededSquirrelNoise } from "squirrel-noise";
 import { centeredRand, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../settings";
 import { generateStarName } from "../utils/starNameGenerator";
@@ -39,6 +38,7 @@ import { newSeededTelluricPlanetModel, TelluricPlanetModel } from "../planets/te
 import { newSeededGasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 import { newSeededMandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModel";
 import { newSeededJuliaSetModel } from "../anomalies/julia/juliaSetModel";
+import { getRngFromSeed } from "../utils/getRngFromSeed";
 
 const enum GenerationSteps {
     NAME,
@@ -73,10 +73,10 @@ export class SeededStarSystemModel implements StarSystemModel {
     constructor(seed: SystemSeed) {
         this.seed = seed;
 
-        const cellRNG = seededSquirrelNoise(hashVec3(seed.starSectorX, seed.starSectorY, seed.starSectorZ));
+        const cellRNG = getRngFromSeed(hashVec3(seed.starSectorX, seed.starSectorY, seed.starSectorZ));
         const hash = centeredRand(cellRNG, 1 + seed.index) * Settings.SEED_HALF_RANGE;
 
-        this.rng = seededSquirrelNoise(hash);
+        this.rng = getRngFromSeed(hash);
 
         this.name = generateStarName(this.rng, GenerationSteps.NAME);
 

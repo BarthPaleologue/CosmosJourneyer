@@ -22,18 +22,17 @@ import { CelestialBodyModel, CelestialBodyType } from "../architecture/celestial
 import { GenerationSteps } from "../utils/generationSteps";
 import { romanNumeral } from "../utils/romanNumerals";
 import { Alphabet } from "../utils/parseToStrings";
+import { getRngFromSeed } from "../utils/getRngFromSeed";
 
 export function getMoonSeed(model: PlanetModel, index: number) {
     if (index > model.nbMoons) throw new Error("Moon out of bound! " + index);
-    return centeredRand(model.rng, GenerationSteps.MOONS + index) * Settings.SEED_HALF_RANGE;
-}
-
-export function getMoonSeeds(model: PlanetModel) {
-    return Array.from({ length: model.nbMoons }, (_, index) => getMoonSeed(model, index));
+    const rng = getRngFromSeed(model.seed);
+    return centeredRand(rng, GenerationSteps.MOONS + index) * Settings.SEED_HALF_RANGE;
 }
 
 export function getSpaceStationSeed(model: CelestialBodyModel, index: number) {
-    return centeredRand(model.rng, GenerationSteps.SPACE_STATIONS + index) * Settings.SEED_HALF_RANGE;
+    const rng = getRngFromSeed(model.seed);
+    return centeredRand(rng, GenerationSteps.SPACE_STATIONS + index) * Settings.SEED_HALF_RANGE;
 }
 
 export function getPlanetName(planetIndex: number, starSystemName: string, parentBody: CelestialBodyModel | null): string {

@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { seededSquirrelNoise } from "squirrel-noise";
 import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../../settings";
 import { TerrainSettings } from "./terrain/terrainSettings";
@@ -27,11 +26,13 @@ import { getOrbitalPeriod, getPeriapsis, Orbit } from "../../orbit/orbit";
 import { PlanetModel } from "../../architecture/planet";
 import { TelluricPlanetPhysicalProperties } from "../../architecture/physicalProperties";
 import { CelestialBodyModel, CelestialBodyType } from "../../architecture/celestialBody";
-import { RingsModel } from "../../rings/ringsModel";
+import { newSeededRingsModel, RingsModel } from "../../rings/ringsModel";
 import { CloudsModel } from "../../clouds/cloudsModel";
 import { GenerationSteps } from "../../utils/generationSteps";
 import i18n from "../../i18n";
 import { waterBoilingPointCelsius } from "../../utils/waterMechanics";
+
+import { getRngFromSeed } from "../../utils/getRngFromSeed";
 
 export type TelluricPlanetModel = PlanetModel & {
     readonly bodyType: CelestialBodyType.TELLURIC_PLANET;
@@ -48,7 +49,7 @@ export function hasLiquidWater(telluricPlanetModel: TelluricPlanetModel): boolea
 }
 
 export function newSeededTelluricPlanetModel(seed: number, name: string, parentBody?: CelestialBodyModel): TelluricPlanetModel {
-    const rng = seededSquirrelNoise(seed);
+    const rng = getRngFromSeed(seed);
 
     const isSatelliteOfTelluric = parentBody?.bodyType === CelestialBodyType.TELLURIC_PLANET ?? false;
     const isSatelliteOfGas = parentBody?.bodyType === CelestialBodyType.GAS_PLANET ?? false;
@@ -167,7 +168,7 @@ export function newSeededTelluricPlanetModel(seed: number, name: string, parentB
 
     let rings: RingsModel | null = null;
     if (uniformRandBool(0.6, rng, GenerationSteps.RINGS) && !isSatelliteOfTelluric && !isSatelliteOfGas) {
-        rings = new RingsModel(rng);
+        rings = newSeededRingsModel(rng);
     }
 
     const nbMoons = randRangeInt(0, 2, rng, GenerationSteps.NB_MOONS);
@@ -180,7 +181,6 @@ export function newSeededTelluricPlanetModel(seed: number, name: string, parentB
         radius: radius,
         physicalProperties: physicalProperties,
         orbit: orbit,
-        rng: rng,
         terrainSettings: terrainSettings,
         rings: rings,
         clouds: clouds,

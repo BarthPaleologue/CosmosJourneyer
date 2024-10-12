@@ -37,7 +37,6 @@ import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProp
 import { Transformable } from "../../architecture/transformable";
 import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
-import { StarSystemModel } from "../../starSystem/starSystemModel";
 import { Orbit } from "../../orbit/orbit";
 
 export class GasPlanet implements Planet, Cullable {
@@ -100,7 +99,7 @@ export class GasPlanet implements Planet, Cullable {
 
             const averageRadius = (this.model.radius * (this.model.rings.ringStart + this.model.rings.ringEnd)) / 2;
             const spread = (this.model.radius * (this.model.rings.ringEnd - this.model.rings.ringStart)) / 2;
-            this.asteroidField = new AsteroidField(this.model.rng(84133), this.getTransform(), averageRadius, spread, scene);
+            this.asteroidField = new AsteroidField(this.model.rings.seed, this.getTransform(), averageRadius, spread, scene);
         } else {
             this.ringsUniforms = null;
             this.asteroidField = null;

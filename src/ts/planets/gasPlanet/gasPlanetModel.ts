@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { seededSquirrelNoise } from "squirrel-noise";
 import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../../settings";
 import { Quaternion } from "@babylonjs/core/Maths/math";
@@ -26,16 +25,18 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PlanetModel } from "../../architecture/planet";
 import { PlanetPhysicalProperties } from "../../architecture/physicalProperties";
 import { CelestialBodyModel, CelestialBodyType } from "../../architecture/celestialBody";
-import { RingsModel } from "../../rings/ringsModel";
+import { newSeededRingsModel } from "../../rings/ringsModel";
 import { GenerationSteps } from "../../utils/generationSteps";
 import i18n from "../../i18n";
+
+import { getRngFromSeed } from "../../utils/getRngFromSeed";
 
 export type GasPlanetModel = PlanetModel & {
     readonly bodyType: CelestialBodyType.GAS_PLANET;
 };
 
 export function newSeededGasPlanetModel(seed: number, name: string, parentBody: CelestialBodyModel | null): GasPlanetModel {
-    const rng = seededSquirrelNoise(seed);
+    const rng = getRngFromSeed(seed);
 
     const radius = randRangeInt(Settings.EARTH_RADIUS * 4, Settings.EARTH_RADIUS * 20, rng, GenerationSteps.RADIUS);
 
@@ -65,7 +66,7 @@ export function newSeededGasPlanetModel(seed: number, name: string, parentBody: 
         pressure: 1
     };
 
-    const rings = uniformRandBool(0.8, rng, GenerationSteps.RINGS) ? new RingsModel(rng) : null;
+    const rings = uniformRandBool(0.8, rng, GenerationSteps.RINGS) ? newSeededRingsModel(rng) : null;
 
     const nbMoons = randRangeInt(0, 3, rng, GenerationSteps.NB_MOONS);
 
@@ -73,7 +74,6 @@ export function newSeededGasPlanetModel(seed: number, name: string, parentBody: 
         name: name,
         seed: seed,
         parentBody: parentBody,
-        rng: rng,
         bodyType: CelestialBodyType.GAS_PLANET,
         radius: radius,
         orbit: orbit,

@@ -28,10 +28,10 @@ import { MetalSectionMaterial } from "./metalSectionMaterial";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { createEnvironmentAggregate } from "../../../utils/physics";
 import { createRing } from "../../../utils/ringBuilder";
-import { seededSquirrelNoise } from "squirrel-noise";
 import { SpaceStationModel } from "../../../spacestation/spacestationModel";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { getRngFromSeed } from "../../../utils/getRngFromSeed";
 
 export class RingHabitat implements Transformable {
     private readonly root: TransformNode;
@@ -57,7 +57,7 @@ export class RingHabitat implements Transformable {
     constructor(stationModel: SpaceStationModel, requiredHabitableSurface: number, seed: number, scene: Scene) {
         this.root = new TransformNode("RingHabitatRoot", scene);
 
-        this.rng = seededSquirrelNoise(seed);
+        this.rng = getRngFromSeed(seed);
 
         this.radius = 5e3 + this.rng(0) * 10e3;
 

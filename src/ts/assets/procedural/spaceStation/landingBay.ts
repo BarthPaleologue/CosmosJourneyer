@@ -31,8 +31,9 @@ import { createEnvironmentAggregate } from "../../../utils/physics";
 import { createRing } from "../../../utils/ringBuilder";
 import { SpaceStationModel } from "../../../spacestation/spacestationModel";
 import { LandingBayMaterial } from "./landingBayMaterial";
-import { seededSquirrelNoise } from "squirrel-noise";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+
+import { getRngFromSeed } from "../../../utils/getRngFromSeed";
 
 export class LandingBay {
     private readonly root: TransformNode;
@@ -55,7 +56,7 @@ export class LandingBay {
     constructor(stationModel: SpaceStationModel, seed: number, scene: Scene) {
         this.root = new TransformNode("LandingBayRoot", scene);
 
-        this.rng = seededSquirrelNoise(seed);
+        this.rng = getRngFromSeed(seed);
 
         this.radius = 500;
 

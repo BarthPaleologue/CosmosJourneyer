@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { seededSquirrelNoise } from "squirrel-noise";
 import { randRange, randRangeInt, uniformRandBool } from "extended-random";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Settings } from "../../settings";
@@ -24,9 +23,11 @@ import { StarPhysicalProperties } from "../../architecture/physicalProperties";
 import { CelestialBodyModel, CelestialBodyType } from "../../architecture/celestialBody";
 import { wheelOfFortune } from "../../utils/random";
 import { StellarObjectModel } from "../../architecture/stellarObject";
-import { RingsModel } from "../../rings/ringsModel";
+import { newSeededRingsModel } from "../../rings/ringsModel";
 import { GenerationSteps } from "../../utils/generationSteps";
 import i18n from "../../i18n";
+
+import { getRngFromSeed } from "../../utils/getRngFromSeed";
 
 export type StarModel = StellarObjectModel & {
     readonly bodyType: CelestialBodyType.STAR;
@@ -35,7 +36,7 @@ export type StarModel = StellarObjectModel & {
 };
 
 export function newSeededStarModel(seed: number, name: string, parentBody: CelestialBodyModel | null): StarModel {
-    const rng = seededSquirrelNoise(seed);
+    const rng = getRngFromSeed(seed);
 
     const RING_PROPORTION = 0.2;
 
@@ -62,7 +63,7 @@ export function newSeededStarModel(seed: number, name: string, parentBody: Celes
         normalToPlane: Vector3.Up()
     };
 
-    const rings = uniformRandBool(RING_PROPORTION, rng, GenerationSteps.RINGS) ? new RingsModel(rng) : null;
+    const rings = uniformRandBool(RING_PROPORTION, rng, GenerationSteps.RINGS) ? newSeededRingsModel(rng) : null;
 
     const typeName = i18n.t("objectTypes:star", { stellarType: stellarType });
 
@@ -70,7 +71,6 @@ export function newSeededStarModel(seed: number, name: string, parentBody: Celes
         name: name,
         seed: seed,
         parentBody: parentBody,
-        rng: rng,
         bodyType: CelestialBodyType.STAR,
         temperature: temperature,
         radius: radius,

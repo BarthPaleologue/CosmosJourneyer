@@ -15,8 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { seededSquirrelNoise } from "squirrel-noise";
-
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { normalRandom, randRange } from "extended-random";
 import { clamp } from "../../utils/math";
@@ -29,6 +27,8 @@ import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProp
 import { AnomalyType } from "../anomalyType";
 import { AnomalyModel } from "../anomaly";
 
+import { getRngFromSeed } from "../../utils/getRngFromSeed";
+
 export type MandelbulbModel = AnomalyModel & {
     readonly bodyType: CelestialBodyType.ANOMALY;
     readonly anomalyType: AnomalyType.MANDELBULB;
@@ -38,7 +38,7 @@ export type MandelbulbModel = AnomalyModel & {
 };
 
 export function newSeededMandelbulbModel(seed: number, name: string, parentBody: CelestialBodyModel | null): MandelbulbModel {
-    const rng = seededSquirrelNoise(seed);
+    const rng = getRngFromSeed(seed);
 
     const radius = 1000e3;
 
@@ -68,7 +68,6 @@ export function newSeededMandelbulbModel(seed: number, name: string, parentBody:
 
     return {
         seed,
-        rng,
         radius,
         rings: null,
         name,

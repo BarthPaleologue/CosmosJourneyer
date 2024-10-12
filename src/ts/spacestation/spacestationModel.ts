@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { seededSquirrelNoise } from "squirrel-noise";
 import { getOrbitalPeriod, Orbit } from "../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { OrbitalObjectModel } from "../architecture/orbitalObject";
@@ -34,6 +33,8 @@ import { Settings } from "../settings";
 import i18n from "../i18n";
 import { StellarObjectModel } from "../architecture/stellarObject";
 import { StarSystemCoordinates } from "../saveFile/universeCoordinates";
+
+import { getRngFromSeed } from "../utils/getRngFromSeed";
 
 export type SpaceStationModel = OrbitalObjectModel & {
     readonly starSystemCoordinates: StarSystemCoordinates;
@@ -78,7 +79,7 @@ export function newSeededSpaceStationModel(
     starSystemCoordinates: StarSystemCoordinates,
     parentBody: CelestialBodyModel | null
 ): SpaceStationModel {
-    const rng = seededSquirrelNoise(seed);
+    const rng = getRngFromSeed(seed);
 
     const name = generateSpaceStationName(rng, 2756);
 
@@ -152,7 +153,6 @@ export function newSeededSpaceStationModel(
         seed,
         starSystemCoordinates: starSystemCoordinates,
         name,
-        rng,
         parentBody,
         orbit,
         physicalProperties,

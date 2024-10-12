@@ -28,9 +28,9 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { HelixHabitatMaterial } from "./helixHabitatMaterial";
 import { createEnvironmentAggregate } from "../../../utils/physics";
 import { createHelix } from "../../../utils/helixBuilder";
-import { seededSquirrelNoise } from "squirrel-noise";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { getRngFromSeed } from "../../../utils/getRngFromSeed";
 
 export class HelixHabitat implements Transformable {
     private readonly root: TransformNode;
@@ -57,7 +57,7 @@ export class HelixHabitat implements Transformable {
     constructor(requiredHabitableSurface: number, seed: number, scene: Scene) {
         this.root = new TransformNode("HelixHabitatRoot", scene);
 
-        this.rng = seededSquirrelNoise(seed);
+        this.rng = getRngFromSeed(seed);
 
         this.radius = 5e3 + this.rng(0) * 10e3;
         const deltaRadius = 400 + this.rng(1) * 100;

@@ -122,12 +122,6 @@ export interface OrbitalObjectModel {
     readonly name: string;
 
     /**
-     * The random number generator used by the model to generate internal values
-     * @param step The sample step of the random number generator (use squirrel noise for example)
-     */
-    readonly rng: (step: number) => number;
-
-    /**
      * The seed used by the random number generator
      */
     readonly seed: number;

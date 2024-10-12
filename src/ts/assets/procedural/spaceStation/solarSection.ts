@@ -25,10 +25,10 @@ import { SolarPanelMaterial } from "../solarPanel/solarPanelMaterial";
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 import { createEnvironmentAggregate } from "../../../utils/physics";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { seededSquirrelNoise } from "squirrel-noise";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { Scene } from "@babylonjs/core/scene";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { getRngFromSeed } from "../../../utils/getRngFromSeed";
 
 export class SolarSection implements Transformable {
     private readonly attachment: Mesh;
@@ -46,7 +46,7 @@ export class SolarSection implements Transformable {
     private readonly solarPanelMaterial: SolarPanelMaterial;
 
     constructor(requiredSurface: number, seed: number, scene: Scene) {
-        this.rng = seededSquirrelNoise(seed);
+        this.rng = getRngFromSeed(seed);
 
         const nbArms = wheelOfFortune(
             [

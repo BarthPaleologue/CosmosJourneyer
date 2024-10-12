@@ -19,24 +19,24 @@ import { CelestialBodyModel, CelestialBodyType } from "../../architecture/celest
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { StarPhysicalProperties } from "../../architecture/physicalProperties";
 import { StellarObjectModel } from "../../architecture/stellarObject";
-import { seededSquirrelNoise } from "squirrel-noise";
 import { getOrbitalPeriod, Orbit } from "../../orbit/orbit";
 import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { clamp } from "../../utils/math";
-import { RingsModel } from "../../rings/ringsModel";
+import { newSeededRingsModel } from "../../rings/ringsModel";
 import { GenerationSteps } from "../../utils/generationSteps";
 import i18n from "../../i18n";
 
-export type NeutronStarModel = StellarObjectModel & {
+import { getRngFromSeed } from "../../utils/getRngFromSeed";
 
+export type NeutronStarModel = StellarObjectModel & {
     readonly bodyType: CelestialBodyType.NEUTRON_STAR;
     readonly temperature: number;
 
     readonly physicalProperties: StarPhysicalProperties;
-}
+};
 
 export function newSeededNeutronStarModel(seed: number, name: string, parentBody: CelestialBodyModel | null): NeutronStarModel {
-    const rng = seededSquirrelNoise(seed);
+    const rng = getRngFromSeed(seed);
 
     const temperature = randRangeInt(200_000, 5_000_000_000, rng, GenerationSteps.TEMPERATURE);
 
@@ -59,17 +59,15 @@ export function newSeededNeutronStarModel(seed: number, name: string, parentBody
         normalToPlane: Vector3.Up()
     };
 
-
     const ringProportion = 0.02;
 
-    const rings = uniformRandBool(ringProportion, rng, GenerationSteps.RINGS) ? new RingsModel(rng) : null;
+    const rings = uniformRandBool(ringProportion, rng, GenerationSteps.RINGS) ? newSeededRingsModel(rng) : null;
 
     const typeName = i18n.t("objectTypes:neutronStar");
 
     return {
         name: name,
         seed: seed,
-        rng: rng,
         bodyType: CelestialBodyType.NEUTRON_STAR,
         physicalProperties: physicalProperties,
         temperature: temperature,

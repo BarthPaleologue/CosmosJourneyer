@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { seededSquirrelNoise } from "squirrel-noise";
 import { getOrbitalPeriod, Orbit } from "../../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { normalRandom } from "extended-random";
@@ -26,6 +25,8 @@ import { Settings } from "../../settings";
 import { estimateStarRadiusFromMass } from "../../utils/estimateStarRadiusFromMass";
 import { GenerationSteps } from "../../utils/generationSteps";
 import i18n from "../../i18n";
+
+import { getRngFromSeed } from "../../utils/getRngFromSeed";
 
 export type BlackHoleModel = StellarObjectModel & {
     readonly bodyType: CelestialBodyType.BLACK_HOLE;
@@ -38,7 +39,7 @@ export type BlackHoleModel = StellarObjectModel & {
 };
 
 export function newSeededBlackHoleModel(seed: number, name: string, parentBody: CelestialBodyModel | null): BlackHoleModel {
-    const rng = seededSquirrelNoise(seed);
+    const rng = getRngFromSeed(seed);
 
     //FIXME: do not hardcode
     const radius = 1000e3;
@@ -68,7 +69,6 @@ export function newSeededBlackHoleModel(seed: number, name: string, parentBody: 
         name,
         //TODO: compute temperature of accretion disk (function of rotation speed)
         temperature: 7_000,
-        rng,
         rings: null,
         bodyType: CelestialBodyType.BLACK_HOLE,
         radius,

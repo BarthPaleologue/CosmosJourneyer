@@ -9,6 +9,8 @@ import { Player } from "../../player/player";
 import { MissionContainer } from "./missionContainer";
 import { getSystemModelFromCoordinates } from "../../utils/starSystemCoordinatesUtils";
 
+import { getRngFromSeed } from "../../utils/getRngFromSeed";
+
 /**
  * Generates all missions available at the given space station for the player. Missions are generated based on the current timestamp (hourly basis).
  * @param stationModel The space station model where the missions are generated
@@ -22,6 +24,8 @@ export function generateMissionsDom(stationModel: SpaceStationModel, player: Pla
     const starSystem = starSystemModel;
     const neighborSystems = getNeighborStarSystemCoordinates(starSystem.getCoordinates(), 75);
 
+    const rng = getRngFromSeed(stationModel.seed);
+
     let neighborSpaceStations: [SpaceStationModel, number][] = [];
     neighborSystems.forEach(([coordinates, position, distance], index) => {
         const systemModel = getSystemModelFromCoordinates(coordinates);
@@ -33,7 +37,7 @@ export function generateMissionsDom(stationModel: SpaceStationModel, player: Pla
 
     const contactStations = neighborSpaceStations
         // prune list randomly based on distance
-        .filter(([station, distance], index) => uniformRandBool(1.0 / (1.0 + 0.02 * (distance * distance)), stationModel.rng, 325 + index))
+        .filter(([station, distance], index) => uniformRandBool(1.0 / (1.0 + 0.02 * (distance * distance)), rng, 325 + index))
         // filter out stations of the same faction
         .filter(([station, distance]) => station.faction === stationModel.faction);
 

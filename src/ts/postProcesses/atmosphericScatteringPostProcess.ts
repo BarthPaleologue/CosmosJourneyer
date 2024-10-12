@@ -34,6 +34,8 @@ import { Constants } from "@babylonjs/core/Engines/constants";
 import { Scene } from "@babylonjs/core/scene";
 import { Textures } from "../assets/textures";
 
+import { getRngFromSeed } from "../utils/getRngFromSeed";
+
 export interface AtmosphereUniforms {
     atmosphereRadius: number;
     falloffFactor: number;
@@ -59,6 +61,8 @@ export class AtmosphericScatteringPostProcess extends PostProcess implements Obj
             Effect.ShadersStore[`${shaderName}FragmentShader`] = atmosphericScatteringFragment;
         }
 
+        const rng = getRngFromSeed(planet.model.seed);
+
         const atmosphereUniforms: AtmosphereUniforms = {
             atmosphereRadius: planet.getBoundingRadius() + atmosphereHeight,
             falloffFactor: 10,
@@ -66,9 +70,9 @@ export class AtmosphericScatteringPostProcess extends PostProcess implements Obj
             rayleighStrength: 1,
             mieStrength: 1,
             densityModifier: 1,
-            redWaveLength: 700 * (1 + centeredRand(planet.model.rng, 1300) / 6),
-            greenWaveLength: 530 * (1 + centeredRand(planet.model.rng, 1310) / 6),
-            blueWaveLength: 440 * (1 + centeredRand(planet.model.rng, 1320) / 6),
+            redWaveLength: 700 * (1 + centeredRand(rng, 1300) / 6),
+            greenWaveLength: 530 * (1 + centeredRand(rng, 1310) / 6),
+            blueWaveLength: 440 * (1 + centeredRand(rng, 1320) / 6),
             mieHaloRadius: 0.65
         };
 

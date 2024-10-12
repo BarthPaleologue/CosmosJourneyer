@@ -15,8 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { seededSquirrelNoise } from "squirrel-noise";
-
 import { normalRandom } from "extended-random";
 import { clamp } from "../../utils/math";
 import { getOrbitalPeriod, getPeriapsis, Orbit } from "../../orbit/orbit";
@@ -29,6 +27,8 @@ import i18n from "../../i18n";
 import { AnomalyType } from "../anomalyType";
 import { AnomalyModel } from "../anomaly";
 
+import { getRngFromSeed } from "../../utils/getRngFromSeed";
+
 export type JuliaSetModel = AnomalyModel & {
     readonly bodyType: CelestialBodyType.ANOMALY;
 
@@ -38,7 +38,7 @@ export type JuliaSetModel = AnomalyModel & {
 };
 
 export function newSeededJuliaSetModel(seed: number, name: string, parentBody: CelestialBodyModel | null): JuliaSetModel {
-    const rng = seededSquirrelNoise(seed);
+    const rng = getRngFromSeed(seed);
 
     const radius = 1000e3;
 
@@ -68,7 +68,6 @@ export function newSeededJuliaSetModel(seed: number, name: string, parentBody: C
     return {
         seed,
         name,
-        rng,
         radius,
         parentBody,
         orbit,

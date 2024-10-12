@@ -33,6 +33,8 @@ import { setStellarObjectUniforms, StellarObjectUniformNames } from "../../postP
 import { Textures } from "../../assets/textures";
 import { Matrix } from "@babylonjs/core/Maths/math";
 
+import { getRngFromSeed } from "../../utils/getRngFromSeed";
+
 const TelluricPlanetMaterialUniformNames = {
     WORLD: "world",
     WORLD_VIEW_PROJECTION: "worldViewProjection",
@@ -110,9 +112,11 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
             samplers: [...Object.values(TelluricPlanetMaterialSamplerNames)]
         });
 
+        const rng = getRngFromSeed(model.seed);
+
         this.planetModel = model;
 
-        this.beachSize = 100 + 50 * centeredRand(model.rng, 85);
+        this.beachSize = 100 + 50 * centeredRand(rng, 85);
         this.colorMode = ColorMode.DEFAULT;
         this.steepSharpness = 2;
 

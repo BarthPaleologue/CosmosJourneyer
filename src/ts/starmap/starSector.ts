@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { hashVec3 } from "../utils/hashVec3";
-import { seededSquirrelNoise } from "squirrel-noise";
 import { centeredRand } from "extended-random";
 import { UniverseDensity } from "../settings";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -24,6 +23,7 @@ import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { BoundingBox } from "@babylonjs/core/Culling/boundingBox";
 
 import { StarSystemCoordinates } from "../saveFile/universeCoordinates";
+import { getRngFromSeed } from "../utils/getRngFromSeed";
 
 export function vector3ToString(v: Vector3): string {
     return `${v.x},${v.y},${v.z}`;
@@ -68,7 +68,7 @@ export class StarSector {
     constructor(coordinates: Vector3) {
         this.coordinates = coordinates;
         this.position = coordinates.scale(StarSector.SIZE);
-        this.rng = seededSquirrelNoise(hashVec3(coordinates.x, coordinates.y, coordinates.z));
+        this.rng = getRngFromSeed(hashVec3(coordinates.x, coordinates.y, coordinates.z));
 
         this.density = UniverseDensity(coordinates.x, coordinates.y, coordinates.z);
 
