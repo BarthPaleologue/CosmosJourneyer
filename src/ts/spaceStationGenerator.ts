@@ -93,7 +93,7 @@ const starSystemModel = new CustomStarSystemModel(
     []
 );
 
-const spaceStationModel = newSeededSpaceStationModel(Math.random() * Settings.SEED_HALF_RANGE, sunModel, starSystemModel.getCoordinates(), sun.model);
+const spaceStationModel = newSeededSpaceStationModel(Math.random() * Settings.SEED_HALF_RANGE, sunModel, starSystemModel.coordinates, sun.model);
 spaceStationModel.orbit.radius = distanceToStar;
 
 const spaceStation = new SpaceStation(spaceStationModel, scene, sun);

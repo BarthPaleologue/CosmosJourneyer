@@ -441,9 +441,9 @@ export class StarMap implements View {
 
     private createInstance(data: BuildData) {
         const starSystemModel = getSystemModelFromCoordinates(data.coordinates);
-        const starSystemCoordinates = starSystemModel.getCoordinates();
+        const starSystemCoordinates = starSystemModel.coordinates;
 
-        const stellarObjectModel = starSystemModel.getStellarObjects()[0];
+        const stellarObjectModel = starSystemModel.stellarObjects[0];
 
         let instance: InstancedMesh | null = null;
         let recycled = false;

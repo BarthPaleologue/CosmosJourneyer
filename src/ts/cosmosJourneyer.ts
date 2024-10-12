@@ -132,7 +132,7 @@ export class CosmosJourneyer {
 
         this.starSystemView.onInitStarSystem.add(() => {
             const starSystemModel = this.starSystemView.getStarSystem().model;
-            this.starMap.setCurrentStarSystem(starSystemModel.getCoordinates());
+            this.starMap.setCurrentStarSystem(starSystemModel.coordinates);
         });
 
         this.pauseMenu = new PauseMenu(this.sidePanels);

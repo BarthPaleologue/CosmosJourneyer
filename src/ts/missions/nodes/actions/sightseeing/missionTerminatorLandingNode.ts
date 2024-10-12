@@ -68,7 +68,7 @@ export class MissionTerminatorLandingNode implements MissionNode {
         const currentSystemModel = currentSystem.model;
 
         // Skip if the current system is not the one we are looking for
-        if (!starSystemCoordinatesEquals(currentSystemModel.getCoordinates(), this.targetSystemCoordinates)) {
+        if (!starSystemCoordinatesEquals(currentSystemModel.coordinates, this.targetSystemCoordinates)) {
             this.state = LandMissionState.NOT_IN_SYSTEM;
             return;
         }
@@ -137,7 +137,7 @@ export class MissionTerminatorLandingNode implements MissionNode {
         const currentSystemModel = context.currentSystem.model;
 
         const targetSystemPosition = getStarGalacticPosition(this.targetSystemCoordinates);
-        const currentSystemPosition = getStarGalacticPosition(currentSystemModel.getCoordinates());
+        const currentSystemPosition = getStarGalacticPosition(currentSystemModel.coordinates);
         const distance = Vector3.Distance(targetSystemPosition, currentSystemPosition);
 
         const targetObject = getObjectModelByUniverseId(this.objectId);

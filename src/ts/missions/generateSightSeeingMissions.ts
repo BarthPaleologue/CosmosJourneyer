@@ -9,7 +9,7 @@ import { Mission, MissionType } from "./mission";
 import { getSystemModelFromCoordinates } from "../utils/starSystemCoordinatesUtils";
 import { isMoon } from "../architecture/planet";
 import { CelestialBodyType } from "../architecture/celestialBody";
-import { StarSystemModel } from "../starSystem/starSystemModel";
+import { getPlanetaryMassObjects, StarSystemModel } from "../starSystem/starSystemModel";
 
 /**
  * Generates sightseeing missions available at the given space station for the player. Missions are generated based on the current timestamp (hourly basis).
@@ -27,10 +27,10 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
     const neutronStarFlyByMissions: Mission[] = [];
     const blackHoleFlyByMissions: Mission[] = [];
 
-    const neighborSystems = getNeighborStarSystemCoordinates(starSystem.getCoordinates(), 75);
+    const neighborSystems = getNeighborStarSystemCoordinates(starSystem.coordinates, 75);
     neighborSystems.forEach(([systemCoordinates, coordinates, distance]) => {
         const systemModel = getSystemModelFromCoordinates(systemCoordinates);
-        for (let anomalyIndex = 0; anomalyIndex < systemModel.getNbAnomalies(); anomalyIndex++) {
+        for (let anomalyIndex = 0; anomalyIndex < systemModel.anomalies.length; anomalyIndex++) {
             if (!uniformRandBool(1.0 / (1.0 + 0.4 * distance), systemModel.rng, 6254 + anomalyIndex + currentHour)) return;
             anomalyFlyByMissions.push(
                 newSightSeeingMission(spaceStationModel, {
@@ -43,7 +43,7 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
                 })
             );
         }
-        systemModel.getStellarObjects().forEach((model, stellarObjectIndex) => {
+        systemModel.stellarObjects.forEach((model, stellarObjectIndex) => {
             if (model.bodyType === CelestialBodyType.NEUTRON_STAR) {
                 neutronStarFlyByMissions.push(
                     newSightSeeingMission(spaceStationModel, {
@@ -76,13 +76,13 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
     // for terminator landing missions, find all telluric planets with no liquid water
     const terminatorLandingMissions: Mission[] = [];
     const currentSystemModel = starSystem;
-    currentSystemModel.getPlanetaryMassObjects().forEach((celestialBodyModel, index) => {
+    getPlanetaryMassObjects(currentSystemModel).forEach((celestialBodyModel, index) => {
         if (celestialBodyModel.rings !== null) {
             asteroidFieldMissions.push(
                 newSightSeeingMission(spaceStationModel, {
                     type: MissionType.SIGHT_SEEING_ASTEROID_FIELD,
                     objectId: {
-                        starSystemCoordinates: currentSystemModel.getCoordinates(),
+                        starSystemCoordinates: currentSystemModel.coordinates,
                         objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
                         objectIndex: index
                     }
@@ -97,7 +97,7 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
                     newSightSeeingMission(spaceStationModel, {
                         type: MissionType.SIGHT_SEEING_TERMINATOR_LANDING,
                         objectId: {
-                            starSystemCoordinates: currentSystemModel.getCoordinates(),
+                            starSystemCoordinates: currentSystemModel.coordinates,
                             objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
                             objectIndex: index
                         }

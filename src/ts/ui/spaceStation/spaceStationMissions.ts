@@ -22,7 +22,7 @@ export function generateMissionsDom(stationModel: SpaceStationModel, player: Pla
     const sightSeeingMissions = generateSightseeingMissions(stationModel, starSystemModel, player, Date.now());
 
     const starSystem = starSystemModel;
-    const neighborSystems = getNeighborStarSystemCoordinates(starSystem.getCoordinates(), 75);
+    const neighborSystems = getNeighborStarSystemCoordinates(starSystem.coordinates, 75);
 
     const rng = getRngFromSeed(stationModel.seed);
 

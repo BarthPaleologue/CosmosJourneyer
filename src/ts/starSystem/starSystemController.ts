@@ -561,7 +561,7 @@ export class StarSystemController {
     }
 
     addSystemTarget(targetCoordinates: StarSystemCoordinates): SystemTarget {
-        const currentSystemUniversePosition = getStarGalacticPosition(this.model.getCoordinates());
+        const currentSystemUniversePosition = getStarGalacticPosition(this.model.coordinates);
         const targetSystemUniversePosition = getStarGalacticPosition(targetCoordinates);
 
         const distance = Vector3.Distance(currentSystemUniversePosition, targetSystemUniversePosition) * Settings.LIGHT_YEAR;

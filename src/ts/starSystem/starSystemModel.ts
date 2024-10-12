@@ -29,21 +29,23 @@ export type PlanetarySystem = {
 export interface StarSystemModel {
     readonly name: string;
 
-    getCoordinates(): StarSystemCoordinates;
+    readonly coordinates: StarSystemCoordinates;
 
-    getNbStellarObjects(): number;
+    readonly stellarObjects: StellarObjectModel[];
 
-    getStellarObjects(): StellarObjectModel[];
+    readonly planetarySystems: PlanetarySystem[];
 
-    getNbPlanets(): number;
+    readonly anomalies: AnomalyModel[];
+}
 
-    getPlanet(): PlanetModel[];
+export function getPlanets(starSystem: StarSystemModel): PlanetModel[] {
+    return starSystem.planetarySystems.map(({ planet, satellites }) => planet);
+}
 
-    getSatellitesOfPlanet(index: number): TelluricPlanetModel[];
+export function getSatellitesOfPlanet(starSystem: StarSystemModel, index: number): TelluricPlanetModel[] {
+    return starSystem.planetarySystems.at(index)?.satellites ?? [];
+}
 
-    getPlanetaryMassObjects(): PlanetModel[];
-
-    getNbAnomalies(): number;
-
-    getAnomalies(): AnomalyModel[];
+export function getPlanetaryMassObjects(starSystem: StarSystemModel): PlanetModel[] {
+    return starSystem.planetarySystems.flatMap(({ planet, satellites }) => [planet, ...satellites]);
 }

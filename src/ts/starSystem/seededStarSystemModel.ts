@@ -32,9 +32,8 @@ import { getAnomalyName, getStellarObjectName } from "../utils/parseToStrings";
 import { newSeededStarModel } from "../stellarObjects/star/starModel";
 import { newSeededBlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
-import { PlanetModel } from "../architecture/planet";
 import { getMoonSeed, getPlanetName } from "../planets/common";
-import { newSeededTelluricPlanetModel, TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
+import { newSeededTelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 import { newSeededGasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 import { newSeededMandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModel";
 import { newSeededJuliaSetModel } from "../anomalies/julia/juliaSetModel";
@@ -61,16 +60,30 @@ export class SeededStarSystemModel implements StarSystemModel {
     readonly seed: SystemSeed;
     readonly rng: (step: number) => number;
 
+    readonly coordinates: StarSystemCoordinates;
+
     readonly name: string;
 
-    readonly stellarObjectModels: StellarObjectModel[] = [];
+    readonly stellarObjects: StellarObjectModel[] = [];
 
     readonly planetarySystems: PlanetarySystem[] = [];
 
-    readonly anomalyModels: AnomalyModel[] = [];
+    readonly anomalies: AnomalyModel[] = [];
 
     constructor(seed: SystemSeed) {
         this.seed = seed;
+
+        const starSector = new StarSector(new Vector3(this.seed.starSectorX, this.seed.starSectorY, this.seed.starSectorZ));
+        const localPosition = starSector.getLocalPositionOfStar(this.seed.index);
+
+        this.coordinates = {
+            starSectorX: this.seed.starSectorX,
+            starSectorY: this.seed.starSectorY,
+            starSectorZ: this.seed.starSectorZ,
+            localX: localPosition.x,
+            localY: localPosition.y,
+            localZ: localPosition.z
+        };
 
         const cellRNG = getRngFromSeed(hashVec3(seed.starSectorX, seed.starSectorY, seed.starSectorZ));
         const hash = centeredRand(cellRNG, 1 + seed.index) * Settings.SEED_HALF_RANGE;
@@ -79,19 +92,20 @@ export class SeededStarSystemModel implements StarSystemModel {
 
         this.name = generateStarName(this.rng, GenerationSteps.NAME);
 
-        for (let i = 0; i < this.getNbStellarObjects(); i++) {
+        const nbStellarObjects = 1;
+        for (let i = 0; i < nbStellarObjects; i++) {
             const stellarObjectType = this.getBodyTypeOfStellarObject(i);
             const seed = this.getStellarObjectSeed(i);
             const stellarObjectName = getStellarObjectName(this.name, i);
             switch (stellarObjectType) {
                 case CelestialBodyType.STAR:
-                    this.stellarObjectModels.push(newSeededStarModel(seed, stellarObjectName, null));
+                    this.stellarObjects.push(newSeededStarModel(seed, stellarObjectName, null));
                     break;
                 case CelestialBodyType.BLACK_HOLE:
-                    this.stellarObjectModels.push(newSeededBlackHoleModel(seed, stellarObjectName, null));
+                    this.stellarObjects.push(newSeededBlackHoleModel(seed, stellarObjectName, null));
                     break;
                 case CelestialBodyType.NEUTRON_STAR:
-                    this.stellarObjectModels.push(newSeededNeutronStarModel(seed, stellarObjectName, null));
+                    this.stellarObjects.push(newSeededNeutronStarModel(seed, stellarObjectName, null));
                     break;
                 default:
                     throw new Error("Unknown stellar object type");
@@ -99,20 +113,22 @@ export class SeededStarSystemModel implements StarSystemModel {
         }
 
         // Planets
-        for (let i = 0; i < this.getNbPlanets(); i++) {
+        //Fixme: will not apply when more than one star
+        const nbPlanets = this.getBodyTypeOfStellarObject(0) === CelestialBodyType.BLACK_HOLE ? 0 : randRangeInt(0, 7, this.rng, GenerationSteps.NB_PLANETS);
+        for (let i = 0; i < nbPlanets; i++) {
             const bodyType = this.getBodyTypeOfPlanet(i);
-            const planetName = getPlanetName(i, this.name, this.stellarObjectModels[0]);
+            const planetName = getPlanetName(i, this.name, this.stellarObjects[0]);
 
             switch (bodyType) {
                 case CelestialBodyType.TELLURIC_PLANET:
                     this.planetarySystems.push({
-                        planet: newSeededTelluricPlanetModel(this.getPlanetSeed(i), planetName, this.stellarObjectModels[0]),
+                        planet: newSeededTelluricPlanetModel(this.getPlanetSeed(i), planetName, this.stellarObjects[0]),
                         satellites: []
                     });
                     break;
                 case CelestialBodyType.GAS_PLANET:
                     this.planetarySystems.push({
-                        planet: newSeededGasPlanetModel(this.getPlanetSeed(i), planetName, this.stellarObjectModels[0]),
+                        planet: newSeededGasPlanetModel(this.getPlanetSeed(i), planetName, this.stellarObjects[0]),
                         satellites: []
                     });
                     break;
@@ -130,51 +146,36 @@ export class SeededStarSystemModel implements StarSystemModel {
             }
         });
 
+        const nbAnomalies = wheelOfFortune(
+            [
+                [0, 0.95],
+                [1, 0.04],
+                [2, 0.01]
+            ],
+            this.rng(GenerationSteps.GENERATE_ANOMALIES * 16)
+        );
+
         // Anomalies
-        for (let i = 0; i < this.getNbAnomalies(); i++) {
+        for (let i = 0; i < nbAnomalies; i++) {
             const anomalySeed = this.getAnomalySeed(i);
             const anomalyType = this.getAnomalyType(i);
             const anomalyName = getAnomalyName(this.name, i);
 
-            const stellarObjectModel = this.stellarObjectModels[0];
+            const stellarObjectModel = this.stellarObjects[0];
 
             switch (anomalyType) {
                 case AnomalyType.MANDELBULB:
-                    this.anomalyModels.push(newSeededMandelbulbModel(anomalySeed, anomalyName, stellarObjectModel));
+                    this.anomalies.push(newSeededMandelbulbModel(anomalySeed, anomalyName, stellarObjectModel));
                     break;
                 case AnomalyType.JULIA_SET:
-                    this.anomalyModels.push(newSeededJuliaSetModel(anomalySeed, anomalyName, stellarObjectModel));
+                    this.anomalies.push(newSeededJuliaSetModel(anomalySeed, anomalyName, stellarObjectModel));
                     break;
             }
         }
     }
 
-    getCoordinates(): StarSystemCoordinates {
-        const starSector = new StarSector(new Vector3(this.seed.starSectorX, this.seed.starSectorY, this.seed.starSectorZ));
-        const localPosition = starSector.getLocalPositionOfStar(this.seed.index);
-
-        return {
-            starSectorX: this.seed.starSectorX,
-            starSectorY: this.seed.starSectorY,
-            starSectorZ: this.seed.starSectorZ,
-            localX: localPosition.x,
-            localY: localPosition.y,
-            localZ: localPosition.z
-        };
-    }
-
-    getNbStellarObjects(): number {
-        //return 1 + Math.floor(2 * this.rng(GenerationSteps.NbStars));
-        return 1;
-    }
-
-    getNbPlanets(): number {
-        if (this.getBodyTypeOfStellarObject(0) === CelestialBodyType.BLACK_HOLE) return 0; //Fixme: will not apply when more than one star
-        return randRangeInt(0, 7, this.rng, GenerationSteps.NB_PLANETS);
-    }
-
     private getStellarObjectSeed(index: number) {
-        if (index > this.getNbStellarObjects()) throw new Error("Star out of bound! " + index);
+        if (index > this.stellarObjects.length) throw new Error("Star out of bound! " + index);
         return centeredRand(this.rng, GenerationSteps.GENERATE_STARS + index) * Settings.SEED_HALF_RANGE;
     }
 
@@ -184,7 +185,7 @@ export class SeededStarSystemModel implements StarSystemModel {
      * @see https://physics.stackexchange.com/questions/442154/how-common-are-neutron-stars
      */
     private getBodyTypeOfStellarObject(index: number) {
-        if (index > this.getNbStellarObjects()) throw new Error("Star out of bound! " + index);
+        if (index > this.stellarObjects.length) throw new Error("Star out of bound! " + index);
 
         // percentages are taken from https://physics.stackexchange.com/questions/442154/how-common-are-neutron-stars
         if (uniformRandBool(0.0006, this.rng, GenerationSteps.GENERATE_STARS + index)) return CelestialBodyType.BLACK_HOLE;
@@ -209,36 +210,5 @@ export class SeededStarSystemModel implements StarSystemModel {
     private getAnomalyType(index: number): AnomalyType {
         if (uniformRandBool(0.5, this.rng, GenerationSteps.GENERATE_ANOMALIES + index * 300)) return AnomalyType.MANDELBULB;
         return AnomalyType.JULIA_SET;
-    }
-
-    getNbAnomalies(): number {
-        return wheelOfFortune(
-            [
-                [0, 0.95],
-                [1, 0.04],
-                [2, 0.01]
-            ],
-            this.rng(GenerationSteps.GENERATE_ANOMALIES * 16)
-        );
-    }
-
-    getAnomalies(): AnomalyModel[] {
-        return this.anomalyModels;
-    }
-
-    getPlanet(): PlanetModel[] {
-        return this.planetarySystems.map(({ planet, satellites }) => planet);
-    }
-
-    getSatellitesOfPlanet(index: number): TelluricPlanetModel[] {
-        return this.planetarySystems[index].satellites;
-    }
-
-    getPlanetaryMassObjects(): PlanetModel[] {
-        return this.planetarySystems.flatMap(({ planet, satellites }) => [planet, ...satellites]);
-    }
-
-    getStellarObjects(): StellarObjectModel[] {
-        return this.stellarObjectModels;
     }
 }

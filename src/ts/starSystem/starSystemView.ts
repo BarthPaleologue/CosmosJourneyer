@@ -87,6 +87,7 @@ import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { StarModel } from "../stellarObjects/star/starModel";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../saveFile/universeCoordinates";
+import { getPlanets, getSatellitesOfPlanet } from "./starSystemModel";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -440,13 +441,13 @@ export class StarSystemView implements View {
         const offset = 1e10;
 
         const systemModel = starSystem.model;
-        const targetNbStellarObjects = systemModel.getNbStellarObjects();
+        const targetNbStellarObjects = systemModel.stellarObjects.length;
 
         // Stellar objects
         let objectIndex = 0;
-        for (let i = 0; i < systemModel.getNbStellarObjects(); i++) {
+        for (let i = 0; i < systemModel.stellarObjects.length; i++) {
             console.log("Stellar:", i + 1, "of", targetNbStellarObjects);
-            const stellarObjectModel = systemModel.getStellarObjects()[i];
+            const stellarObjectModel = systemModel.stellarObjects[i];
             let stellarObject: StellarObject;
             switch (stellarObjectModel.bodyType) {
                 case CelestialBodyType.STAR:
@@ -469,7 +470,7 @@ export class StarSystemView implements View {
         const planets: Planet[] = [];
 
         // Planets
-        for (const planetModel of systemModel.getPlanet()) {
+        for (const planetModel of getPlanets(systemModel)) {
             console.log("Loading planet", planetModel.name);
 
             let planet: Planet;
@@ -494,7 +495,7 @@ export class StarSystemView implements View {
         // Satellites
         for (let i = 0; i < planets.length; i++) {
             const planet = planets[i];
-            for (const satelliteModel of systemModel.getSatellitesOfPlanet(i)) {
+            for (const satelliteModel of getSatellitesOfPlanet(systemModel, i)) {
                 console.log("Loading satellite:", satelliteModel.name);
                 const satellite = starSystem.addSatellite(satelliteModel, planet);
                 satellite.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
@@ -504,7 +505,7 @@ export class StarSystemView implements View {
         }
 
         // Anomalies
-        for (const anomalyModel of systemModel.getAnomalies()) {
+        for (const anomalyModel of systemModel.anomalies) {
             console.log("Loading Anomaly:", anomalyModel.name);
             let anomaly: Anomaly;
             switch (anomalyModel.anomalyType) {
@@ -522,14 +523,14 @@ export class StarSystemView implements View {
         }
 
         // Space stations
-        if (isSystemInHumanBubble(systemModel.getCoordinates())) {
+        if (isSystemInHumanBubble(systemModel.coordinates)) {
             const spaceStationPlaces = placeSpaceStations(systemModel);
             for (const planetModel of spaceStationPlaces) {
                 const planet = planets.find((planet) => planet.model.name === planetModel.name);
                 if (planet === undefined) throw new Error("Planet not found to place space station around");
 
                 const seed = getSpaceStationSeed(planet.model, 0);
-                const spaceStationModel = newSeededSpaceStationModel(seed, starSystem.stellarObjects[0].model, systemModel.getCoordinates(), planet.model);
+                const spaceStationModel = newSeededSpaceStationModel(seed, starSystem.stellarObjects[0].model, systemModel.coordinates, planet.model);
                 const spaceStation = starSystem.addSpaceStation(spaceStationModel, planet);
                 spaceStation.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
 
@@ -581,7 +582,7 @@ export class StarSystemView implements View {
 
         starSystem.initPostProcesses(this.postProcessManager);
 
-        getNeighborStarSystemCoordinates(starSystem.model.getCoordinates(), Math.min(Settings.PLAYER_JUMP_RANGE_LY, Settings.VISIBLE_NEIGHBORHOOD_MAX_RADIUS_LY)).forEach(
+        getNeighborStarSystemCoordinates(starSystem.model.coordinates, Math.min(Settings.PLAYER_JUMP_RANGE_LY, Settings.VISIBLE_NEIGHBORHOOD_MAX_RADIUS_LY)).forEach(
             ([neighborCoordinates, position, distance]) => {
                 const systemTarget = this.getStarSystem().addSystemTarget(neighborCoordinates);
                 this.targetCursorLayer.addObject(systemTarget, ObjectTargetCursorType.STAR_SYSTEM, 0, 0);
@@ -590,7 +591,7 @@ export class StarSystemView implements View {
 
         if (this.player.currentItinerary.length >= 2) {
             const targetCoordinates = this.player.currentItinerary[1];
-            if (starSystemCoordinatesEquals(starSystem.model.getCoordinates(), targetCoordinates)) {
+            if (starSystemCoordinatesEquals(starSystem.model.coordinates, targetCoordinates)) {
                 // the current system was the first destination of the itinerary, we can remove the system before from the itinerary
                 this.player.currentItinerary.shift();
 

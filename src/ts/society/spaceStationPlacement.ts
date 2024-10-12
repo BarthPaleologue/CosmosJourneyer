@@ -1,7 +1,7 @@
 import { CelestialBodyModel } from "../architecture/celestialBody";
 import { PlanetModel } from "../architecture/planet";
 import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
-import { StarSystemModel } from "../starSystem/starSystemModel";
+import { getPlanets, StarSystemModel } from "../starSystem/starSystemModel";
 
 /**
  * Analyzes the given star system to return the indices of the orbital objects that are space stations.
@@ -12,14 +12,14 @@ export function placeSpaceStations(systemModel: StarSystemModel): PlanetModel[] 
         throw new Error("Only seeded star systems are supported for space station placement.");
     }
 
-    const stellarObjectModels = systemModel.getStellarObjects();
+    const stellarObjectModels = systemModel.stellarObjects;
 
     const mainStellarObjectModel = stellarObjectModels.at(0);
     if (mainStellarObjectModel === undefined) {
         throw new Error("The star system must have at least one stellar object.");
     }
 
-    const planetModels = systemModel.getPlanet();
+    const planetModels = getPlanets(systemModel);
 
     const planetToPotentialScore = new Map<CelestialBodyModel, number>();
 

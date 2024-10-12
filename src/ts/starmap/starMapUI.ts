@@ -309,7 +309,7 @@ export class StarMapUI {
             this.shortHandUIDistanceFromCurrent.textContent = `${i18n.t("starMap:distanceFromCurrent")}: ${Vector3.Distance(currentCoordinates, targetPosition).toFixed(1)} ${i18n.t("units:ly")}`;
         }
 
-        const starModel = targetSystemModel.getStellarObjects()[0];
+        const starModel = targetSystemModel.stellarObjects[0];
 
         let typeString: string;
         if (starModel.bodyType === CelestialBodyType.BLACK_HOLE) typeString = i18n.t("objectTypes:blackHole");
@@ -317,7 +317,7 @@ export class StarMapUI {
         else typeString = i18n.t("objectTypes:star", { stellarType: getStellarTypeFromTemperature(starModel.temperature) });
 
         this.shortHandUISystemType.textContent = typeString;
-        this.shortHandUIBookmarkButton.setSelectedSystemSeed(targetSystemModel.getCoordinates());
+        this.shortHandUIBookmarkButton.setSelectedSystemSeed(targetSystemModel.coordinates);
 
         const objectColor = getRgbFromTemperature(starModel.temperature);
         this.infoPanelStarPreview.style.background = objectColor.toHexString();
@@ -328,11 +328,11 @@ export class StarMapUI {
 
         this.starSector.textContent = `X:${targetSystemModel.seed.starSectorX} Y:${targetSystemModel.seed.starSectorY} Z:${targetSystemModel.seed.starSectorZ} I:${targetSystemModel.seed.index}`;
 
-        this.nbPlanets.textContent = `${i18n.t("starMap:planets")}: ${targetSystemModel.getNbPlanets()}`;
+        this.nbPlanets.textContent = `${i18n.t("starMap:planets")}: ${targetSystemModel.planetarySystems.length}`;
 
         this.distanceToSol.textContent = `${i18n.t("starMap:distanceToSol")}: ${Vector3.Distance(targetPosition, Vector3.Zero()).toFixed(1)} ${i18n.t("units:ly")}`;
 
-        if (isSystemInHumanBubble(targetSystemModel.getCoordinates())) {
+        if (isSystemInHumanBubble(targetSystemModel.coordinates)) {
             const spaceStations = getSpaceStationModels(targetSystemModel);
 
             this.nbSpaceStations.textContent = `${i18n.t("starMap:spaceStations")}: ${spaceStations.length}`;

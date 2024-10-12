@@ -8,6 +8,7 @@ import { SpaceStation } from "../spacestation/spaceStation";
 import { getSpaceStationModels } from "./getModelsFromSystemModel";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
 import { getSystemModelFromCoordinates } from "./starSystemCoordinatesUtils";
+import { getPlanetaryMassObjects } from "../starSystem/starSystemModel";
 
 /**
  * Get the object ID of the given orbital object within the star system.
@@ -41,7 +42,7 @@ export function getSystemObjectId(orbitalObject: OrbitalObject, starSystem: Star
 export function getUniverseObjectId(orbitalObject: OrbitalObject, starSystem: StarSystemController): UniverseObjectId {
     return {
         ...getSystemObjectId(orbitalObject, starSystem),
-        starSystemCoordinates: starSystem.model.getCoordinates()
+        starSystemCoordinates: starSystem.model.coordinates
     };
 }
 
@@ -76,11 +77,11 @@ export function getObjectModelByUniverseId(universeObjectId: UniverseObjectId): 
 
     switch (universeObjectId.objectType) {
         case SystemObjectType.STELLAR_OBJECT:
-            return starSystemModel.getStellarObjects()[universeObjectId.objectIndex];
+            return starSystemModel.stellarObjects[universeObjectId.objectIndex];
         case SystemObjectType.PLANETARY_MASS_OBJECT:
-            return starSystemModel.getPlanetaryMassObjects()[universeObjectId.objectIndex];
+            return getPlanetaryMassObjects(starSystemModel)[universeObjectId.objectIndex];
         case SystemObjectType.ANOMALY:
-            return starSystemModel.getAnomalies()[universeObjectId.objectIndex];
+            return starSystemModel.anomalies[universeObjectId.objectIndex];
         case SystemObjectType.SPACE_STATION:
             return getSpaceStationModels(starSystemModel)[universeObjectId.objectIndex];
         default:
@@ -100,6 +101,6 @@ export function getUniverseIdForSpaceStationModel(spaceStationModel: SpaceStatio
     return {
         objectType: SystemObjectType.SPACE_STATION,
         objectIndex: index,
-        starSystemCoordinates: systemModel.getCoordinates()
+        starSystemCoordinates: systemModel.coordinates
     };
 }
