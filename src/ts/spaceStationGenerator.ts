@@ -87,7 +87,7 @@ const starSystemModel = new CustomStarSystemModel(
     []
 );
 
-const sunModel = newSeededStarModel(starSystemModel.getStellarObjectSeed(0), starSystemModel, null);
+const sunModel = newSeededStarModel(starSystemModel.getStellarObjectSeed(0), "Untitled Star", null);
 const sun = new Star(sunModel, scene);
 sun.getTransform().position = new Vector3(7, 2, 5).normalize().scaleInPlace(distanceToStar);
 

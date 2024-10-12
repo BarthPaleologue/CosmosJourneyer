@@ -25,7 +25,7 @@ import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { clamp } from "../../utils/math";
 import { RingsModel } from "../../rings/ringsModel";
 import { GenerationSteps } from "../../utils/generationSteps";
-import { starName } from "../../utils/parseToStrings";
+import { getStellarObjectName } from "../../utils/parseToStrings";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
 import i18n from "../../i18n";
 
@@ -41,7 +41,7 @@ export function newSeededNeutronStarModel(seed: number, starSystemModel: StarSys
     const rng = seededSquirrelNoise(seed);
 
     const stellarObjectIndex = starSystemModel.getStellarObjects().findIndex(([_, stellarObjectSeed]) => stellarObjectSeed === seed);
-    const name = starName(starSystemModel.name, stellarObjectIndex);
+    const name = getStellarObjectName(starSystemModel.name, stellarObjectIndex);
 
     const temperature = randRangeInt(200_000, 5_000_000_000, rng, GenerationSteps.TEMPERATURE);
 

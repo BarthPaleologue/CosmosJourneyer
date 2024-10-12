@@ -76,7 +76,7 @@ export const Alphabet = "abcdefghijklmnopqrstuvwxyz";
 export const GreekAlphabet = "αβγδεζηθικλμνξοπρστυφχψω";
 export const ReversedGreekAlphabet = GreekAlphabet.split("").reverse().join("");
 
-export function starName(baseName: string, index: number): string {
+export function getStellarObjectName(baseName: string, index: number): string {
     return `${baseName} ${Alphabet[index].toUpperCase()}`;
 }
 

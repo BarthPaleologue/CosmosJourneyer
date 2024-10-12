@@ -36,6 +36,7 @@ import { newSeededStarModel } from "../stellarObjects/star/starModel";
 import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
 import { Settings } from "../settings";
 import i18n from "../i18n";
+import { getStellarObjectName } from "../utils/parseToStrings";
 
 export type SpaceStationModel = OrbitalObjectModel & {
     readonly starSystemCoordinates: StarSystemCoordinates;
@@ -123,6 +124,7 @@ export function newSeededSpaceStationModel(seed: number, starSystemModel: StarSy
 
     const starModelBuildInfo = starSystemModel.getStellarObjects()[0];
     let starModel;
+    const stellarObjectName = getStellarObjectName(starSystemModel.name, 0);
     switch (starModelBuildInfo[0]) {
         case CelestialBodyType.NEUTRON_STAR:
             starModel = newSeededNeutronStarModel(starModelBuildInfo[1], starSystemModel, null);
@@ -131,7 +133,7 @@ export function newSeededSpaceStationModel(seed: number, starSystemModel: StarSy
             starModel = newSeededBlackHoleModel(starModelBuildInfo[1], starSystemModel, null);
             break;
         case CelestialBodyType.STAR:
-            starModel = newSeededStarModel(starModelBuildInfo[1], starSystemModel, null);
+            starModel = newSeededStarModel(starModelBuildInfo[1], stellarObjectName, null);
             break;
         default:
             throw new Error("Unknown star type");

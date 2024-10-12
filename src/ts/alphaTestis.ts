@@ -66,7 +66,7 @@ const starSystem = new StarSystemController(starSystemModel, starSystemView.scen
 
 await starSystemView.loadStarSystem(starSystem, false);
 
-const sunModel = newSeededStarModel(starSystemModel.getStellarObjectSeed(0), starSystemModel, null);
+const sunModel = newSeededStarModel(starSystemModel.getStellarObjectSeed(0), "Weierstrass", null);
 const sun = starSystem.addStar(sunModel, null);
 sun.model.orbit.period = 60 * 60 * 24;
 

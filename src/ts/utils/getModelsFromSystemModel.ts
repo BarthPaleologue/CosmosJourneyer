@@ -13,6 +13,7 @@ import { GasPlanetModel, newSeededGasPlanetModel } from "../planets/gasPlanet/ga
 import { StarSystemModel } from "../starSystem/starSystemModel";
 import { CelestialBodyType } from "../architecture/celestialBody";
 import { newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
+import { getStellarObjectName } from "./parseToStrings";
 
 export function getSpaceStationModels(system: StarSystemModel): SpaceStationModel[] {
     const spaceStationParents = placeSpaceStations(system);
@@ -27,9 +28,10 @@ export function getStellarObjectModels(system: StarSystemModel): StellarObjectMo
     for (let i = 0; i < stellarObjectSeedAndTypes.length; i++) {
         const [bodyType, seed] = stellarObjectSeedAndTypes[i];
         const parentBodyModel = i === 0 ? null : stellarObjectModels[0];
+        const stellarObjectName = getStellarObjectName(system.name, i);
         switch (bodyType) {
             case CelestialBodyType.STAR:
-                stellarObjectModels.push(newSeededStarModel(seed, system, parentBodyModel));
+                stellarObjectModels.push(newSeededStarModel(seed, stellarObjectName, parentBodyModel));
                 break;
             case CelestialBodyType.BLACK_HOLE:
                 stellarObjectModels.push(newSeededBlackHoleModel(seed, system, parentBodyModel));

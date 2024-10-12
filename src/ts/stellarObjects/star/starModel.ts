@@ -26,8 +26,6 @@ import { wheelOfFortune } from "../../utils/random";
 import { StellarObjectModel } from "../../architecture/stellarObject";
 import { RingsModel } from "../../rings/ringsModel";
 import { GenerationSteps } from "../../utils/generationSteps";
-import { starName } from "../../utils/parseToStrings";
-import { StarSystemModel } from "../../starSystem/starSystemModel";
 import i18n from "../../i18n";
 
 export type StarModel = StellarObjectModel & {
@@ -36,13 +34,10 @@ export type StarModel = StellarObjectModel & {
     readonly physicalProperties: StarPhysicalProperties;
 };
 
-export function newSeededStarModel(seed: number, starSystemModel: StarSystemModel, parentBody: CelestialBodyModel | null): StarModel {
+export function newSeededStarModel(seed: number, name: string, parentBody: CelestialBodyModel | null): StarModel {
     const rng = seededSquirrelNoise(seed);
 
     const RING_PROPORTION = 0.2;
-
-    const stellarObjectIndex = starSystemModel.getStellarObjects().findIndex(([_, stellarObjectSeed]) => stellarObjectSeed === seed);
-    const name = starName(starSystemModel.name, stellarObjectIndex);
 
     const stellarType = getRandomStellarType(rng);
 

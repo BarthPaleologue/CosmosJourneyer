@@ -32,6 +32,7 @@ import { SystemIcons } from "./systemIcons";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../starSystem/starSystemModel";
 import { CelestialBodyType } from "../architecture/celestialBody";
 import { getRgbFromTemperature } from "../utils/specrend";
+import { getStellarObjectName } from "../utils/parseToStrings";
 
 export class StarMapUI {
     readonly htmlRoot: HTMLDivElement;
@@ -313,11 +314,11 @@ export class StarMapUI {
 
         const starSeed = targetSystemModel.getStellarObjectSeed(0);
         const stellarObjectType = targetSystemModel.getBodyTypeOfStellarObject(0);
-
+        const stellarObjectName = getStellarObjectName(targetSystemModel.name, 0);
         let starModel: StarModel | BlackHoleModel | NeutronStarModel;
         switch (stellarObjectType) {
             case CelestialBodyType.STAR:
-                starModel = newSeededStarModel(starSeed, targetSystemModel, null);
+                starModel = newSeededStarModel(starSeed, stellarObjectName, null);
                 break;
             case CelestialBodyType.BLACK_HOLE:
                 starModel = newSeededBlackHoleModel(starSeed, targetSystemModel, null);

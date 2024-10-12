@@ -61,6 +61,7 @@ import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../starSyste
 import { CelestialBodyType } from "../architecture/celestialBody";
 import { getRgbFromTemperature } from "../utils/specrend";
 import { StellarObjectModel } from "../architecture/stellarObject";
+import { getStellarObjectName } from "../utils/parseToStrings";
 
 export class StarMap implements View {
     readonly scene: Scene;
@@ -451,9 +452,10 @@ export class StarMap implements View {
         const stellarObjectType = starSystemModel.getBodyTypeOfStellarObject(0);
 
         let starModel: StellarObjectModel | null = null;
+        const stellarObjectName = getStellarObjectName(starSystemModel.name, 0);
         switch (stellarObjectType) {
             case CelestialBodyType.STAR:
-                starModel = newSeededStarModel(starSeed, starSystemModel, null);
+                starModel = newSeededStarModel(starSeed, stellarObjectName, null);
                 break;
             case CelestialBodyType.BLACK_HOLE:
                 starModel = newSeededBlackHoleModel(starSeed, starSystemModel, null);

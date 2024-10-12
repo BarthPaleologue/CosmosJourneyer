@@ -8,6 +8,7 @@ import { PlanetModel } from "../architecture/planet";
 import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
 import { newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 import { StarSystemModel } from "../starSystem/starSystemModel";
+import { getStellarObjectName } from "../utils/parseToStrings";
 
 /**
  * Analyzes the given star system to return the indices of the orbital objects that are space stations.
@@ -18,10 +19,11 @@ export function placeSpaceStations(systemModel: StarSystemModel): PlanetModel[] 
         throw new Error("Only seeded star systems are supported for space station placement.");
     }
 
-    const stellarObjectModels = systemModel.getStellarObjects().map(([bodyType, seed]) => {
+    const stellarObjectModels = systemModel.getStellarObjects().map(([bodyType, seed], index) => {
+        const stellarObjectName = getStellarObjectName(systemModel.name, index);
         switch (bodyType) {
             case CelestialBodyType.STAR:
-                return newSeededStarModel(seed, systemModel, null);
+                return newSeededStarModel(seed, stellarObjectName, null);
             case CelestialBodyType.BLACK_HOLE:
                 return newSeededBlackHoleModel(seed, systemModel, null);
             case CelestialBodyType.NEUTRON_STAR:
