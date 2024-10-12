@@ -133,14 +133,7 @@ const starSystemModel = new CustomStarSystemModel(
 
 const starSystem = new StarSystemController(starSystemModel, starSystemView.scene);
 
-const sun = starSystem.addStar(sunModel, null);
-
 await starSystemView.loadStarSystem(starSystem, true);
-
-/*const blackHoleModel = new BlackHoleModel(0.5, sunModel);
-blackHoleModel.orbit.period = 60 * 60 * 24 * 365.25;
-blackHoleModel.orbit.radius = 100 * ares.getRadius();
-const blackHole = starSystem.makeBlackHole(blackHoleModel);*/
 
 engine.init(true);
 
