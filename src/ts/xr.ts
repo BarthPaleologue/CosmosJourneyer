@@ -33,8 +33,8 @@ import { Color4 } from "@babylonjs/core/Maths/math.color";
 import { ArcRotateCamera, Engine } from "@babylonjs/core";
 import { CustomStarSystemModel } from "./starSystem/customStarSystemModel";
 import { AnomalyType } from "./anomalies/anomalyType";
-import { MandelbulbModel } from "./anomalies/mandelbulb/mandelbulbModel";
-import { JuliaSetModel } from "./anomalies/julia/juliaSetModel";
+import { newSeededMandelbulbModel } from "./anomalies/mandelbulb/mandelbulbModel";
+import { newSeededJuliaSetModel } from "./anomalies/julia/juliaSetModel";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -71,7 +71,7 @@ const starSystemModel = new CustomStarSystemModel(
 );
 
 function createMandelbulb(): TransformNode {
-    const mandelBulbModel = new MandelbulbModel(starSystemModel.getAnomalySeed(0), starSystemModel);
+    const mandelBulbModel = newSeededMandelbulbModel(starSystemModel.getAnomalySeed(0), starSystemModel, null);
     const mandelbulb = new Mandelbulb(mandelBulbModel, scene, null);
     mandelbulb.getTransform().scalingDeterminant = 1 / 400e3;
 
@@ -90,7 +90,7 @@ function createMandelbulb(): TransformNode {
 }
 
 function createJulia(): TransformNode {
-    const juliaModel = new JuliaSetModel(starSystemModel.getAnomalySeed(0), starSystemModel);
+    const juliaModel = newSeededJuliaSetModel(starSystemModel.getAnomalySeed(0), starSystemModel, null);
     const julia = new JuliaSet(juliaModel, scene, null);
     julia.getTransform().scalingDeterminant = 1 / 400e3;
 

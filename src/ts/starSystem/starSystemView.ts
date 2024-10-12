@@ -80,8 +80,8 @@ import { getSystemModelFromCoordinates } from "../utils/starSystemCoordinatesUti
 import { CelestialBodyType } from "../architecture/celestialBody";
 import { newSeededTelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 import { newSeededGasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
-import { MandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModel";
-import { JuliaSetModel } from "../anomalies/julia/juliaSetModel";
+import { newSeededMandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModel";
+import { newSeededJuliaSetModel } from "../anomalies/julia/juliaSetModel";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
 import { StellarObject } from "../architecture/stellarObject";
 import { newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
@@ -513,10 +513,10 @@ export class StarSystemView implements View {
             let anomaly: Anomaly;
             switch (anomalyType) {
                 case AnomalyType.MANDELBULB:
-                    anomaly = this.starSystem.addMandelbulb(new MandelbulbModel(systemModel.getAnomalySeed(i), systemModel, starSystem.stellarObjects[0].model));
+                    anomaly = this.starSystem.addMandelbulb(newSeededMandelbulbModel(systemModel.getAnomalySeed(i), systemModel, starSystem.stellarObjects[0].model));
                     break;
                 case AnomalyType.JULIA_SET:
-                    anomaly = this.starSystem.addJuliaSet(new JuliaSetModel(systemModel.getAnomalySeed(i), systemModel, starSystem.stellarObjects[0].model));
+                    anomaly = this.starSystem.addJuliaSet(newSeededJuliaSetModel(systemModel.getAnomalySeed(i), systemModel, starSystem.stellarObjects[0].model));
                     break;
             }
 

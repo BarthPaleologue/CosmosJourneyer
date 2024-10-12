@@ -5,8 +5,8 @@ import { newSeededStarModel } from "../stellarObjects/star/starModel";
 import { newSeededBlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { StellarObjectModel } from "../architecture/stellarObject";
 import { AnomalyType } from "../anomalies/anomalyType";
-import { MandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModel";
-import { JuliaSetModel } from "../anomalies/julia/juliaSetModel";
+import { MandelbulbModel, newSeededMandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModel";
+import { JuliaSetModel, newSeededJuliaSetModel } from "../anomalies/julia/juliaSetModel";
 import { PlanetModel } from "../architecture/planet";
 import { newSeededTelluricPlanetModel, TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 import { GasPlanetModel, newSeededGasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
@@ -53,10 +53,10 @@ export function getAnomalyModels(system: StarSystemModel): (MandelbulbModel | Ju
         const [anomalyType, seed] = anomalySeedAndTypes[i];
         switch (anomalyType) {
             case AnomalyType.MANDELBULB:
-                anomalyModels.push(new MandelbulbModel(seed, system, parentBodyModel));
+                anomalyModels.push(newSeededMandelbulbModel(seed, system, parentBodyModel));
                 break;
             case AnomalyType.JULIA_SET:
-                anomalyModels.push(new JuliaSetModel(seed, system, parentBodyModel));
+                anomalyModels.push(newSeededJuliaSetModel(seed, system, parentBodyModel));
                 break;
             default:
                 throw new Error(`Incorrect body type in the anomaly list: ${anomalyType}`);

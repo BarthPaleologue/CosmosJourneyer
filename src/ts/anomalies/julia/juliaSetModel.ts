@@ -21,85 +21,62 @@ import { normalRandom } from "extended-random";
 import { clamp } from "../../utils/math";
 import { getOrbitalPeriod, getPeriapsis, Orbit } from "../../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { PlanetPhysicalProperties } from "../../architecture/physicalProperties";
+import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import { CelestialBodyModel, CelestialBodyType } from "../../architecture/celestialBody";
 import { GenerationSteps } from "../../utils/generationSteps";
-import { wheelOfFortune } from "../../utils/random";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { ReversedGreekAlphabet } from "../../utils/parseToStrings";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
 import i18n from "../../i18n";
 
-export class JuliaSetModel implements CelestialBodyModel {
-    readonly name: string;
-
-    readonly bodyType = CelestialBodyType.ANOMALY;
-    readonly seed: number;
-    readonly rng: (step: number) => number;
-
-    readonly radius: number;
-
-    readonly orbit: Orbit;
-
-    readonly physicalProperties: PlanetPhysicalProperties;
-
-    readonly parentBody: CelestialBodyModel | null;
-
-    readonly nbMoons: number;
+export type JuliaSetModel = CelestialBodyModel & {
+    readonly bodyType: CelestialBodyType.ANOMALY;
 
     readonly accentColor: Color3;
+};
 
-    readonly starSystem: StarSystemModel;
+export function newSeededJuliaSetModel(seed: number, starSystem: StarSystemModel, parentBody: CelestialBodyModel | null): JuliaSetModel {
+    const rng = seededSquirrelNoise(seed);
 
-    readonly rings = null;
+    const anomalyIndex = starSystem.getAnomalies().findIndex(([_, anomalySeed]) => anomalySeed === seed);
+    const name = `${starSystem.name} ${ReversedGreekAlphabet[anomalyIndex].toUpperCase()}`;
 
-    readonly typeName: string;
+    const radius = 1000e3;
 
-    constructor(seed: number, starSystemModel: StarSystemModel, parentBody?: CelestialBodyModel) {
-        this.seed = seed;
-        this.rng = seededSquirrelNoise(this.seed);
+    const accentColor = Color3.FromHSV(360 * rng(GenerationSteps.ACCENT_COLOR), rng(GenerationSteps.ACCENT_COLOR + 123) * 0.5, 0.8);
 
-        this.starSystem = starSystemModel;
+    // Todo: do not hardcode
+    let orbitRadius = rng(GenerationSteps.ORBIT) * 15e9;
 
-        const anomalyIndex = this.starSystem.getAnomalies().findIndex(([_, anomalySeed]) => anomalySeed === this.seed);
-        this.name = `${this.starSystem.name} ${ReversedGreekAlphabet[anomalyIndex].toUpperCase()}`;
+    const orbitalP = clamp(0.5, 3.0, normalRandom(1.0, 0.3, rng, GenerationSteps.ORBIT + 80));
+    orbitRadius += orbitRadius - getPeriapsis(orbitRadius, orbitalP);
 
-        this.radius = 1000e3;
+    const orbit: Orbit = {
+        radius: orbitRadius,
+        p: orbitalP,
+        period: getOrbitalPeriod(orbitRadius, parentBody?.physicalProperties.mass ?? 0),
+        normalToPlane: Vector3.Up()
+    };
 
-        this.parentBody = parentBody ?? null;
+    const physicalProperties: OrbitalObjectPhysicalProperties = {
+        mass: 10,
+        rotationPeriod: 0,
+        axialTilt: normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT)
+    };
 
-        this.accentColor = Color3.FromHSV(360 * this.rng(GenerationSteps.ACCENT_COLOR), this.rng(GenerationSteps.ACCENT_COLOR + 123) * 0.5, 0.8);
+    const typeName = i18n.t("objectTypes:anomaly");
 
-        // Todo: do not hardcode
-        let orbitRadius = this.rng(GenerationSteps.ORBIT) * 15e9;
-
-        const orbitalP = clamp(0.5, 3.0, normalRandom(1.0, 0.3, this.rng, GenerationSteps.ORBIT + 80));
-        orbitRadius += orbitRadius - getPeriapsis(orbitRadius, orbitalP);
-
-        this.orbit = {
-            radius: orbitRadius,
-            p: orbitalP,
-            period: getOrbitalPeriod(orbitRadius, this.parentBody?.physicalProperties.mass ?? 0),
-            normalToPlane: Vector3.Up()
-        };
-
-        this.physicalProperties = {
-            mass: 10,
-            rotationPeriod: 0,
-            axialTilt: normalRandom(0, 0.4, this.rng, GenerationSteps.AXIAL_TILT),
-            minTemperature: -180,
-            maxTemperature: 100,
-            pressure: 0
-        };
-
-        this.nbMoons = wheelOfFortune(
-            [
-                [0, 0.95],
-                [1, 0.5]
-            ],
-            this.rng(GenerationSteps.NB_MOONS)
-        );
-
-        this.typeName = i18n.t("objectTypes:anomaly");
-    }
+    return {
+        seed,
+        name,
+        rng,
+        radius,
+        parentBody,
+        orbit,
+        physicalProperties,
+        accentColor,
+        rings: null,
+        bodyType: CelestialBodyType.ANOMALY,
+        typeName
+    };
 }
