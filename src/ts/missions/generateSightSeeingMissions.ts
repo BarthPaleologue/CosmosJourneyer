@@ -10,6 +10,7 @@ import { getSystemModelFromCoordinates } from "../utils/starSystemCoordinatesUti
 import { isMoon } from "../architecture/planet";
 import { CelestialBodyType } from "../architecture/celestialBody";
 import { getPlanetaryMassObjects, StarSystemModel } from "../starSystem/starSystemModel";
+import { getRngFromSeed } from "../utils/getRngFromSeed";
 
 /**
  * Generates sightseeing missions available at the given space station for the player. Missions are generated based on the current timestamp (hourly basis).
@@ -27,11 +28,13 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
     const neutronStarFlyByMissions: Mission[] = [];
     const blackHoleFlyByMissions: Mission[] = [];
 
+    const rng = getRngFromSeed(spaceStationModel.seed);
+
     const neighborSystems = getNeighborStarSystemCoordinates(starSystem.coordinates, 75);
     neighborSystems.forEach(([systemCoordinates, coordinates, distance]) => {
         const systemModel = getSystemModelFromCoordinates(systemCoordinates);
         for (let anomalyIndex = 0; anomalyIndex < systemModel.anomalies.length; anomalyIndex++) {
-            if (!uniformRandBool(1.0 / (1.0 + 0.4 * distance), systemModel.rng, 6254 + anomalyIndex + currentHour)) return;
+            if (!uniformRandBool(1.0 / (1.0 + 0.4 * distance), rng, 6254 + anomalyIndex + currentHour)) return;
             anomalyFlyByMissions.push(
                 newSightSeeingMission(spaceStationModel, {
                     type: MissionType.SIGHT_SEEING_FLY_BY,
@@ -76,7 +79,7 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
     // for terminator landing missions, find all telluric planets with no liquid water
     const terminatorLandingMissions: Mission[] = [];
     const currentSystemModel = starSystem;
-    getPlanetaryMassObjects(currentSystemModel).forEach((celestialBodyModel, index) => {
+    getPlanetaryMassObjects(currentSystemModel.planetarySystems).forEach((celestialBodyModel, index) => {
         if (celestialBodyModel.rings !== null) {
             asteroidFieldMissions.push(
                 newSightSeeingMission(spaceStationModel, {

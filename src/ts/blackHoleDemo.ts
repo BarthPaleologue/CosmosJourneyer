@@ -48,7 +48,8 @@ const starSystemModel: StarSystemModel = {
     },
     stellarObjects: [blackHoleModel],
     planetarySystems: [{ planet: millerPlanetModel, satellites: [] }],
-    anomalies: []
+    anomalies: [],
+    spaceStations: []
 };
 const starSystem = new StarSystemController(starSystemModel, scene);
 

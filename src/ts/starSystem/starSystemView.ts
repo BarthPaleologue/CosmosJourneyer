@@ -470,7 +470,7 @@ export class StarSystemView implements View {
         const planets: Planet[] = [];
 
         // Planets
-        for (const planetModel of getPlanets(systemModel)) {
+        for (const planetModel of getPlanets(systemModel.planetarySystems)) {
             console.log("Loading planet", planetModel.name);
 
             let planet: Planet;
@@ -524,14 +524,10 @@ export class StarSystemView implements View {
 
         // Space stations
         if (isSystemInHumanBubble(systemModel.coordinates)) {
-            const spaceStationPlaces = placeSpaceStations(systemModel);
-            for (const planetModel of spaceStationPlaces) {
-                const planet = planets.find((planet) => planet.model.name === planetModel.name);
-                if (planet === undefined) throw new Error("Planet not found to place space station around");
-
-                const seed = getSpaceStationSeed(planet.model, 0);
-                const spaceStationModel = newSeededSpaceStationModel(seed, starSystem.stellarObjects[0].model, systemModel.coordinates, planet.model);
-                const spaceStation = starSystem.addSpaceStation(spaceStationModel, planet);
+            const spaceStationPlaces = placeSpaceStations(starSystem);
+            const spaceStationModels = systemModel.spaceStations.map((station) => station.model);
+            for (let i = 0; i < spaceStationPlaces.length; i++) {
+                const spaceStation = starSystem.addSpaceStation(spaceStationModels[i], spaceStationPlaces[i]);
                 spaceStation.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
 
                 await wait(timeOut);

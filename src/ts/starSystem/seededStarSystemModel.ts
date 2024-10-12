@@ -20,11 +20,11 @@ import { Settings } from "../settings";
 import { generateStarName } from "../utils/starNameGenerator";
 import { wheelOfFortune } from "../utils/random";
 import { AnomalyType } from "../anomalies/anomalyType";
-import { PlanetarySystem, StarSystemModel } from "./starSystemModel";
+import { getPlanetaryMassObjects, PlanetarySystem, StarSystemModel } from "./starSystemModel";
 import { StarSector } from "../starmap/starSector";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { hashVec3 } from "../utils/hashVec3";
-import { CelestialBodyType } from "../architecture/celestialBody";
+import { CelestialBodyModel, CelestialBodyType } from "../architecture/celestialBody";
 import { StellarObjectModel } from "../architecture/stellarObject";
 import { AnomalyModel } from "../anomalies/anomaly";
 import { Alphabet, ReversedGreekAlphabet } from "../utils/parseToStrings";
@@ -37,6 +37,8 @@ import { newSeededMandelbulbModel } from "../anomalies/mandelbulb/mandelbulbMode
 import { newSeededJuliaSetModel } from "../anomalies/julia/juliaSetModel";
 import { getRngFromSeed } from "../utils/getRngFromSeed";
 import { romanNumeral } from "../utils/romanNumerals";
+import { SystemObjectId, SystemObjectType } from "../saveFile/universeCoordinates";
+import { newSeededSpaceStationModel } from "../spacestation/spacestationModel";
 
 const enum GenerationSteps {
     NAME,
@@ -46,7 +48,8 @@ const enum GenerationSteps {
     PLANETS = 200,
     PLANET_TYPE = 400,
     MOONS = 11,
-    ANOMALIES = 666
+    ANOMALIES = 666,
+    SPACE_STATIONS = 2000
 }
 
 /**
@@ -184,12 +187,66 @@ export function newSeededStarSystemModel(seed: SystemSeed): StarSystemModel {
         }
     }
 
+    // finally, space station are placed
+    const planetToPotentialScore = new Map<CelestialBodyModel, number>();
+
+    const planetModels = planetarySystems.map((system) => system.planet);
+
+    planetModels.forEach((planetModel) => {
+        let score = 0;
+        const nbMoons = planetModel.nbMoons;
+        score += nbMoons;
+
+        const hasRings = planetModel.rings !== null;
+        score += hasRings ? 2 : 0;
+
+        planetToPotentialScore.set(planetModel, score);
+    });
+
+    // sort planets by potential score
+    const sortedPlanets = Array.from(planetModels);
+    sortedPlanets.sort((planetA, planetB) => {
+        const scoreA = planetToPotentialScore.get(planetA) ?? 0;
+        const scoreB = planetToPotentialScore.get(planetB) ?? 0;
+        return scoreB - scoreA;
+    });
+
+    const nbStations = Math.min(planetModels.length, Math.max(1, rng(77) * Math.floor(planetModels.length / 2)));
+
+    const planetsWithStations = sortedPlanets.slice(0, nbStations);
+
+    const planetaryMassObjects = getPlanetaryMassObjects(planetarySystems);
+    const spaceStationParentObjectIds = planetsWithStations.map<SystemObjectId>((planet) => {
+        const index = planetaryMassObjects.findIndex((obj) => obj === planet);
+        if (index === -1) {
+            throw new Error("Space station parent object not found");
+        }
+
+        return {
+            objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
+            objectIndex: index
+        };
+    });
+
+    const spaceStations = spaceStationParentObjectIds.map((parentId, index) => {
+        const parent = planetsWithStations[index];
+        const parentRng = getRngFromSeed(parent.seed);
+        const stationSeed = centeredRand(parentRng, GenerationSteps.SPACE_STATIONS + index) * Settings.SEED_HALF_RANGE;
+        const spaceStationModel = newSeededSpaceStationModel(stationSeed, stellarObjects[0], coordinates, parent);
+
+        return {
+            model: spaceStationModel,
+            parent: parentId
+        };
+    });
+
     return {
         name: systemName,
         coordinates,
         stellarObjects,
         planetarySystems,
-        anomalies
+        anomalies,
+        spaceStations
     };
 }
 

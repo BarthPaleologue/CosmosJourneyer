@@ -25,12 +25,12 @@ import { CosmosJourneyer } from "./cosmosJourneyer";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { newSeededTelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModel";
 import { newSeededGasPlanetModel } from "./planets/gasPlanet/gasPlanetModel";
-import { getMoonSeed } from "./planets/common";
 import { SpaceShipControlsInputs } from "./spaceship/spaceShipControlsInputs";
 
 import { newSeededStarModel } from "./stellarObjects/star/starModel";
 import { newSeededSpaceStationModel } from "./spacestation/spacestationModel";
 import { StarSystemModel } from "./starSystem/starSystemModel";
+import { SystemObjectType } from "./saveFile/universeCoordinates";
 
 const engine = await CosmosJourneyer.CreateAsync();
 
@@ -79,7 +79,7 @@ const spaceStationModel = newSeededSpaceStationModel(0, sunModel, systemCoordina
     physicsViewer.showBody(landingpad.aggregate.body);
 }*/
 
-const moonModel = newSeededTelluricPlanetModel(getMoonSeed(hecateModel, 0), "Manaleth", hecateModel);
+const moonModel = newSeededTelluricPlanetModel(23, "Manaleth", hecateModel);
 moonModel.physicalProperties.mass = 2;
 moonModel.physicalProperties.rotationPeriod = 7 * 60 * 60;
 moonModel.physicalProperties.minTemperature = -180;
@@ -128,7 +128,16 @@ const starSystemModel: StarSystemModel = {
         { planet: aresModel, satellites: [] },
         { planet: andromaqueModel, satellites: [] }
     ],
-    anomalies: []
+    anomalies: [],
+    spaceStations: [
+        {
+            model: spaceStationModel,
+            parent: {
+                objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
+                objectIndex: 0
+            }
+        }
+    ]
 };
 
 const starSystem = new StarSystemController(starSystemModel, starSystemView.scene);

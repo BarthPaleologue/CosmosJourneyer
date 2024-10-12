@@ -79,7 +79,7 @@ export function getObjectModelByUniverseId(universeObjectId: UniverseObjectId): 
         case SystemObjectType.STELLAR_OBJECT:
             return starSystemModel.stellarObjects[universeObjectId.objectIndex];
         case SystemObjectType.PLANETARY_MASS_OBJECT:
-            return getPlanetaryMassObjects(starSystemModel)[universeObjectId.objectIndex];
+            return getPlanetaryMassObjects(starSystemModel.planetarySystems)[universeObjectId.objectIndex];
         case SystemObjectType.ANOMALY:
             return starSystemModel.anomalies[universeObjectId.objectIndex];
         case SystemObjectType.SPACE_STATION:

@@ -15,11 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { StarSystemCoordinates } from "../saveFile/universeCoordinates";
+import { StarSystemCoordinates, SystemObjectId } from "../saveFile/universeCoordinates";
 import { StellarObjectModel } from "../architecture/stellarObject";
 import { PlanetModel } from "../architecture/planet";
 import { AnomalyModel } from "../anomalies/anomaly";
 import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
+import { SpaceStationModel } from "../spacestation/spacestationModel";
 
 /**
  * Data model for a planetary system. It holds all the information necessary to generate and render a planetary system.
@@ -63,20 +64,25 @@ export type StarSystemModel = {
      * The anomalies in the star system.
      */
     readonly anomalies: AnomalyModel[];
+
+    readonly spaceStations: {
+        model: SpaceStationModel;
+        parent: SystemObjectId;
+    }[];
 };
 
 /**
- * Returns all the planets in the given star system (telluric planets and gas giants). Satellites are not included.
- * @param starSystem The star system to get the planets from.
+ * Returns all the planets in the planetary systems (telluric planets and gas giants). Satellites are not included.
+ * @param planetarySystems The planetary systems to get the planets from.
  */
-export function getPlanets(starSystem: StarSystemModel): PlanetModel[] {
-    return starSystem.planetarySystems.map(({ planet }) => planet);
+export function getPlanets(planetarySystems: PlanetarySystem[]): PlanetModel[] {
+    return planetarySystems.map(({ planet }) => planet);
 }
 
 /**
- * Returns all the planetary mass objects in the given star system (telluric planets, gas planets and satellites).
- * @param starSystem The star system to get the planetary mass objects from.
+ * Returns all the planetary mass objects in the given planetary systems (telluric planets, gas planets and satellites).
+ * @param planetarySystems The planetary systems to get the planetary mass objects from.
  */
-export function getPlanetaryMassObjects(starSystem: StarSystemModel): PlanetModel[] {
-    return starSystem.planetarySystems.flatMap(({ planet, satellites }) => [planet, ...satellites]);
+export function getPlanetaryMassObjects(planetarySystems: PlanetarySystem[]): PlanetModel[] {
+    return planetarySystems.flatMap(({ planet, satellites }) => [planet, ...satellites]);
 }

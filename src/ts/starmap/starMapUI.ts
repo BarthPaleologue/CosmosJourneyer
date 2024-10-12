@@ -326,7 +326,8 @@ export class StarMapUI {
         this.infoPanelTitle.textContent = targetSystemModel.name;
         this.shortHandUITitle.textContent = targetSystemModel.name;
 
-        this.starSector.textContent = `X:${targetSystemModel.seed.starSectorX} Y:${targetSystemModel.seed.starSectorY} Z:${targetSystemModel.seed.starSectorZ} I:${targetSystemModel.seed.index}`;
+        this.starSector.innerText = `X:${targetSystemModel.coordinates.starSectorX} Y:${targetSystemModel.coordinates.starSectorY} Z:${targetSystemModel.coordinates.starSectorZ}
+            x:${targetSystemModel.coordinates.localX.toFixed(2)} y:${targetSystemModel.coordinates.localY.toFixed(2)} z:${targetSystemModel.coordinates.localZ.toFixed(2)}`;
 
         this.nbPlanets.textContent = `${i18n.t("starMap:planets")}: ${targetSystemModel.planetarySystems.length}`;
 
