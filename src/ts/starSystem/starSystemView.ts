@@ -47,7 +47,6 @@ import { createNotification } from "../utils/notification";
 import { axisCompositeToString, dPadCompositeToString } from "../utils/inputControlsString";
 import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
 import { AxisComposite } from "@brianchirls/game-input/browser";
-import { getSpaceStationSeed } from "../planets/common";
 import { Planet } from "../architecture/planet";
 import { AudioManager } from "../audio/audioManager";
 import { AudioMasks } from "../audio/audioMasks";
@@ -64,19 +63,18 @@ import { Materials } from "../assets/materials";
 import { SpaceStation } from "../spacestation/spaceStation";
 import { ObjectTargetCursorType } from "../ui/objectTargetCursor";
 import { SpaceStationLayer } from "../ui/spaceStation/spaceStationLayer";
-import { placeSpaceStations } from "../society/spaceStationPlacement";
 import { isSystemInHumanBubble } from "../society/starSystemSociety";
 import { Player } from "../player/player";
 import { getNeighborStarSystemCoordinates } from "../utils/getNeighborStarSystems";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
-import { getUniverseObjectId } from "../utils/orbitalObjectId";
+import { getObjectBySystemId, getUniverseObjectId } from "../utils/orbitalObjectId";
 import { DefaultControlsInputs } from "../defaultControls/defaultControlsInputs";
 import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import { MissionContext } from "../missions/missionContext";
 import { Mission } from "../missions/mission";
 import { getSystemModelFromCoordinates } from "../utils/starSystemCoordinatesUtils";
-import { CelestialBodyType } from "../architecture/celestialBody";
+import { CelestialBody, CelestialBodyType } from "../architecture/celestialBody";
 import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 import { GasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 import { MandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModel";
@@ -524,7 +522,7 @@ export class StarSystemView implements View {
 
         // Space stations
         if (isSystemInHumanBubble(systemModel.coordinates)) {
-            const spaceStationPlaces = placeSpaceStations(starSystem);
+            const spaceStationPlaces = starSystem.model.spaceStations.map((station) => getObjectBySystemId(station.parent, starSystem));
             const spaceStationModels = systemModel.spaceStations.map((station) => station.model);
             for (let i = 0; i < spaceStationPlaces.length; i++) {
                 const spaceStation = starSystem.addSpaceStation(spaceStationModels[i], spaceStationPlaces[i]);

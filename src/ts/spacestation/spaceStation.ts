@@ -25,7 +25,6 @@ import { Cullable } from "../utils/cullable";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { OrbitalObjectPhysicalProperties } from "../architecture/physicalProperties";
-import { CelestialBody } from "../architecture/celestialBody";
 import { SpaceStationNodeType } from "../assets/procedural/spaceStation/spaceStationNode";
 import { UtilitySection } from "../assets/procedural/spaceStation/utilitySection";
 import { HelixHabitat } from "../assets/procedural/spaceStation/helixHabitat";
@@ -67,7 +66,7 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
 
     private readonly boundingRadius: number;
 
-    constructor(model: SpaceStationModel, scene: Scene, parentBody: CelestialBody | null = null) {
+    constructor(model: SpaceStationModel, scene: Scene, parentBody: OrbitalObject | null = null) {
         this.model = model;
 
         this.name = this.model.name;

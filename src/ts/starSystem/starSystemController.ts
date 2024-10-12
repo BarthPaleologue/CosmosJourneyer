@@ -240,7 +240,7 @@ export class StarSystemController {
      * @param parentBody
      * @returns The spacestation added to the system
      */
-    public addSpaceStation(spaceStationModel: SpaceStationModel, parentBody: CelestialBody | null): SpaceStation {
+    public addSpaceStation(spaceStationModel: SpaceStationModel, parentBody: OrbitalObject | null): SpaceStation {
         const spaceStation = new SpaceStation(spaceStationModel, this.scene, parentBody);
         this.orbitalObjects.push(spaceStation);
         this.spaceStations.push(spaceStation);
