@@ -1,9 +1,8 @@
 import { placeSpaceStations } from "../society/spaceStationPlacement";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
 import { getMoonSeeds, getSpaceStationSeed } from "../planets/common";
-import { newSeededStarModel, StarModel } from "../stellarObjects/star/starModel";
+import { newSeededStarModel } from "../stellarObjects/star/starModel";
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
-import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 import { StellarObjectModel } from "../architecture/stellarObject";
 import { AnomalyType } from "../anomalies/anomalyType";
 import { MandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModel";
@@ -13,6 +12,7 @@ import { newSeededTelluricPlanetModel, TelluricPlanetModel } from "../planets/te
 import { GasPlanetModel, newSeededGasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 import { StarSystemModel } from "../starSystem/starSystemModel";
 import { CelestialBodyType } from "../architecture/celestialBody";
+import { newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 
 export function getSpaceStationModels(system: StarSystemModel): SpaceStationModel[] {
     const spaceStationParents = placeSpaceStations(system);
@@ -35,7 +35,7 @@ export function getStellarObjectModels(system: StarSystemModel): StellarObjectMo
                 stellarObjectModels.push(new BlackHoleModel(seed, system, parentBodyModel));
                 break;
             case CelestialBodyType.NEUTRON_STAR:
-                stellarObjectModels.push(new NeutronStarModel(seed, system, parentBodyModel));
+                stellarObjectModels.push(newSeededNeutronStarModel(seed, system, parentBodyModel));
                 break;
             default:
                 throw new Error(`Incorrect body type in the stellar object list: ${bodyType}`);

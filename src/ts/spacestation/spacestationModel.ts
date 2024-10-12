@@ -30,7 +30,7 @@ import { generateSpaceStationName } from "../utils/spaceStationNameGenerator";
 import { StarSystemModel } from "../starSystem/starSystemModel";
 import { Faction } from "../society/factions";
 import { getPowerPlayData } from "../society/powerplay";
-import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
+import { NeutronStarModel, newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { newSeededStarModel } from "../stellarObjects/star/starModel";
 import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
@@ -139,7 +139,7 @@ export class SpaceStationModel implements OrbitalObjectModel {
         let starModel;
         switch (starModelBuildInfo[0]) {
             case CelestialBodyType.NEUTRON_STAR:
-                starModel = new NeutronStarModel(starModelBuildInfo[1], starSystemModel);
+                starModel = newSeededNeutronStarModel(starModelBuildInfo[1], starSystemModel, null);
                 break;
             case CelestialBodyType.BLACK_HOLE:
                 starModel = new BlackHoleModel(starModelBuildInfo[1], starSystemModel);

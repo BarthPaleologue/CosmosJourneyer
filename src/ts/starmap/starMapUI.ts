@@ -21,7 +21,7 @@ import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import i18n from "../i18n";
 import { getStellarTypeFromTemperature, newSeededStarModel, StarModel } from "../stellarObjects/star/starModel";
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
-import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
+import { NeutronStarModel, newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 import { getStarGalacticPosition, getSystemModelFromCoordinates } from "../utils/starSystemCoordinatesUtils";
 import { factionToString } from "../society/factions";
 import { isSystemInHumanBubble } from "../society/starSystemSociety";
@@ -323,7 +323,7 @@ export class StarMapUI {
                 starModel = new BlackHoleModel(starSeed, targetSystemModel);
                 break;
             case CelestialBodyType.NEUTRON_STAR:
-                starModel = new NeutronStarModel(starSeed, targetSystemModel);
+                starModel = newSeededNeutronStarModel(starSeed, targetSystemModel, null);
                 break;
             default:
                 throw new Error("Unknown stellar object type!");

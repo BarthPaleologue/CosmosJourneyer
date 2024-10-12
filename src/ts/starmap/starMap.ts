@@ -39,9 +39,9 @@ import { TransformTranslationAnimation } from "../uberCore/transforms/animations
 import { translate } from "../uberCore/transforms/basicTransform";
 import { ThickLines } from "../utils/thickLines";
 import { Observable } from "@babylonjs/core/Misc/observable";
-import { newSeededStarModel, StarModel } from "../stellarObjects/star/starModel";
+import { newSeededStarModel } from "../stellarObjects/star/starModel";
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
-import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
+import { newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 import { View } from "../utils/view";
 import { AudioInstance } from "../utils/audioInstance";
 import { AudioManager } from "../audio/audioManager";
@@ -459,7 +459,7 @@ export class StarMap implements View {
                 starModel = new BlackHoleModel(starSeed, starSystemModel);
                 break;
             case CelestialBodyType.NEUTRON_STAR:
-                starModel = new NeutronStarModel(starSeed, starSystemModel);
+                starModel = newSeededNeutronStarModel(starSeed, starSystemModel, null);
                 break;
             default:
                 throw new Error("Unknown stellar object type!");

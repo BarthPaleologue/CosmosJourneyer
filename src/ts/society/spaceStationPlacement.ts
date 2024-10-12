@@ -6,7 +6,7 @@ import { CelestialBodyModel, CelestialBodyType } from "../architecture/celestial
 import { getMoonSeeds } from "../planets/common";
 import { PlanetModel } from "../architecture/planet";
 import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
-import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
+import { newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 import { StarSystemModel } from "../starSystem/starSystemModel";
 
 /**
@@ -25,7 +25,7 @@ export function placeSpaceStations(systemModel: StarSystemModel): PlanetModel[] 
             case CelestialBodyType.BLACK_HOLE:
                 return new BlackHoleModel(seed, systemModel);
             case CelestialBodyType.NEUTRON_STAR:
-                return new NeutronStarModel(seed, systemModel);
+                return newSeededNeutronStarModel(seed, systemModel, null);
             default:
                 throw new Error(`Incorrect body type in the stellar object list: ${bodyType}`);
         }

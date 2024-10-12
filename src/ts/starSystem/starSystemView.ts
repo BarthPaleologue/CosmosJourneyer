@@ -84,7 +84,7 @@ import { MandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModel";
 import { JuliaSetModel } from "../anomalies/julia/juliaSetModel";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
 import { StellarObject } from "../architecture/stellarObject";
-import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
+import { NeutronStarModel, newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { newSeededStarModel, StarModel } from "../stellarObjects/star/starModel";
 
@@ -456,7 +456,7 @@ export class StarSystemView implements View {
                     stellarObject = starSystem.addBlackHole(new BlackHoleModel(seed, systemModel), null);
                     break;
                 case CelestialBodyType.NEUTRON_STAR:
-                    stellarObject = starSystem.addNeutronStar(new NeutronStarModel(seed, systemModel), null);
+                    stellarObject = starSystem.addNeutronStar(newSeededNeutronStarModel(seed, systemModel, null), null);
                     break;
                 default:
                     throw new Error("Unknown stellar object type");
