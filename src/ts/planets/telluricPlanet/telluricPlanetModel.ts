@@ -51,7 +51,7 @@ export function hasLiquidWater(telluricPlanetModel: TelluricPlanetModel): boolea
     return telluricPlanetModel.physicalProperties.oceanLevel > 0;
 }
 
-export function createSeededTelluricPlanetModel(seed: number, starSystemModel: StarSystemModel, parentBody?: CelestialBodyModel): TelluricPlanetModel {
+export function newSeededTelluricPlanetModel(seed: number, starSystemModel: StarSystemModel, parentBody?: CelestialBodyModel): TelluricPlanetModel {
     const rng = seededSquirrelNoise(seed);
 
     const isSatelliteOfTelluric = parentBody?.bodyType === CelestialBodyType.TELLURIC_PLANET ?? false;

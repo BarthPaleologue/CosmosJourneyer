@@ -32,11 +32,10 @@ import { getPlanetName } from "../common";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
 import i18n from "../../i18n";
 
-export class GasPlanetModel implements PlanetModel {
+export type GasPlanetModel = PlanetModel & {
     readonly name: string;
-    readonly bodyType = CelestialBodyType.GAS_PLANET;
+    readonly bodyType: CelestialBodyType.GAS_PLANET;
     readonly seed: number;
-    readonly rng: (step: number) => number;
 
     readonly radius: number;
 
@@ -50,55 +49,57 @@ export class GasPlanetModel implements PlanetModel {
 
     readonly parentBody: CelestialBodyModel | null;
 
-    readonly starSystem: StarSystemModel;
+    readonly typeName: string;
+};
 
-    readonly typeName = i18n.t("objectTypes:gasPlanet");
+export function newSeededGasPlanetModel(seed: number, starSystem: StarSystemModel, parentBody: CelestialBodyModel | null): GasPlanetModel {
+    const rng = seededSquirrelNoise(seed);
 
-    constructor(seed: number, starSystem: StarSystemModel, parentBody?: CelestialBodyModel) {
-        this.seed = seed;
+    const name = getPlanetName(seed, starSystem, parentBody);
 
-        this.rng = seededSquirrelNoise(this.seed);
+    const radius = randRangeInt(Settings.EARTH_RADIUS * 4, Settings.EARTH_RADIUS * 20, rng, GenerationSteps.RADIUS);
 
-        this.parentBody = parentBody ?? null;
+    // Todo: do not hardcode
+    let orbitRadius = rng(GenerationSteps.ORBIT) * 15e9;
 
-        this.starSystem = starSystem;
+    const orbitalP = clamp(0.7, 3.0, normalRandom(2.0, 0.3, rng, GenerationSteps.ORBIT + 80));
+    orbitRadius += orbitRadius - getPeriapsis(orbitRadius, orbitalP);
+    if (parentBody) orbitRadius += parentBody.radius * 1.5;
 
-        this.name = getPlanetName(this.seed, this.starSystem, this.parentBody);
+    const orbitalPlaneNormal = Vector3.Up().applyRotationQuaternionInPlace(Quaternion.RotationAxis(Axis.X, (rng(GenerationSteps.ORBIT + 20) - 0.5) * 0.2));
 
-        this.radius = randRangeInt(Settings.EARTH_RADIUS * 4, Settings.EARTH_RADIUS * 20, this.rng, GenerationSteps.RADIUS);
+    const orbit: Orbit = {
+        radius: orbitRadius,
+        p: 2, //orbitalP,
+        period: getOrbitalPeriod(orbitRadius, parentBody?.physicalProperties.mass ?? 0),
+        normalToPlane: orbitalPlaneNormal
+    };
 
-        // Todo: do not hardcode
-        let orbitRadius = this.rng(GenerationSteps.ORBIT) * 15e9;
+    const physicalProperties: PlanetPhysicalProperties = {
+        //FIXME: when Settings.Earth radius gets to 1:1 scale, change this value by a variable in settings
+        mass: Settings.JUPITER_MASS * (radius / 69_911e3) ** 3,
+        axialTilt: normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT),
+        rotationPeriod: (24 * 60 * 60) / 10,
+        minTemperature: -180,
+        maxTemperature: 200,
+        pressure: 1
+    };
 
-        const orbitalP = clamp(0.7, 3.0, normalRandom(2.0, 0.3, this.rng, GenerationSteps.ORBIT + 80));
-        orbitRadius += orbitRadius - getPeriapsis(orbitRadius, orbitalP);
-        if (parentBody) orbitRadius += parentBody.radius * 1.5;
+    const rings = uniformRandBool(0.8, rng, GenerationSteps.RINGS) ? new RingsModel(rng) : null;
 
-        const orbitalPlaneNormal = Vector3.Up().applyRotationQuaternionInPlace(Quaternion.RotationAxis(Axis.X, (this.rng(GenerationSteps.ORBIT + 20) - 0.5) * 0.2));
+    const nbMoons = randRangeInt(0, 3, rng, GenerationSteps.NB_MOONS);
 
-        this.orbit = {
-            radius: orbitRadius,
-            p: 2, //orbitalP,
-            period: getOrbitalPeriod(orbitRadius, this.parentBody?.physicalProperties.mass ?? 0),
-            normalToPlane: orbitalPlaneNormal
-        };
-
-        this.physicalProperties = {
-            //FIXME: when Settings.Earth radius gets to 1:1 scale, change this value by a variable in settings
-            mass: Settings.JUPITER_MASS * (this.radius / 69_911e3) ** 3,
-            axialTilt: normalRandom(0, 0.4, this.rng, GenerationSteps.AXIAL_TILT),
-            rotationPeriod: (24 * 60 * 60) / 10,
-            minTemperature: -180,
-            maxTemperature: 200,
-            pressure: 1
-        };
-
-        if (uniformRandBool(0.8, this.rng, GenerationSteps.RINGS)) {
-            this.rings = new RingsModel(this.rng);
-        } else {
-            this.rings = null;
-        }
-
-        this.nbMoons = randRangeInt(0, 3, this.rng, GenerationSteps.NB_MOONS);
-    }
+    return {
+        name: name,
+        seed: seed,
+        parentBody: parentBody,
+        rng: rng,
+        bodyType: CelestialBodyType.GAS_PLANET,
+        radius: radius,
+        orbit: orbit,
+        physicalProperties: physicalProperties,
+        rings: rings,
+        nbMoons: nbMoons,
+        typeName: i18n.t("objectTypes:gasPlanet")
+    };
 }

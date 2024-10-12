@@ -1,6 +1,6 @@
 
-import { createSeededTelluricPlanetModel, TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
-import { GasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
+import { newSeededTelluricPlanetModel, TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
+import { GasPlanetModel, newSeededGasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 import { StarModel } from "../stellarObjects/star/starModel";
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { CelestialBodyModel, CelestialBodyType } from "../architecture/celestialBody";
@@ -40,9 +40,9 @@ export function placeSpaceStations(systemModel: StarSystemModel): PlanetModel[] 
     const planetModels = systemModel.getPlanets().map(([bodyType, seed]) => {
         switch (bodyType) {
             case CelestialBodyType.TELLURIC_PLANET:
-                return createSeededTelluricPlanetModel(seed, systemModel, mainStellarObjectModel);
+                return newSeededTelluricPlanetModel(seed, systemModel, mainStellarObjectModel);
             case CelestialBodyType.GAS_PLANET:
-                return new GasPlanetModel(seed, systemModel, mainStellarObjectModel);
+                return newSeededGasPlanetModel(seed, systemModel, mainStellarObjectModel);
             default:
                 throw new Error(`Incorrect body type in the planet list: ${bodyType}`);
         }
@@ -51,7 +51,7 @@ export function placeSpaceStations(systemModel: StarSystemModel): PlanetModel[] 
     const planetToSatellites = new Map<CelestialBodyModel, TelluricPlanetModel[]>();
 
     planetModels.forEach((planetModel) => {
-        const moonModels = getMoonSeeds(planetModel).map((moonSeed) => createSeededTelluricPlanetModel(moonSeed, systemModel, planetModel));
+        const moonModels = getMoonSeeds(planetModel).map((moonSeed) => newSeededTelluricPlanetModel(moonSeed, systemModel, planetModel));
         planetToSatellites.set(planetModel, moonModels);
     });
 

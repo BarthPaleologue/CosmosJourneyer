@@ -78,8 +78,8 @@ import { Mission } from "../missions/mission";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "./starSystemModel";
 import { getSystemModelFromCoordinates } from "../utils/starSystemCoordinatesUtils";
 import { CelestialBodyType } from "../architecture/celestialBody";
-import { createSeededTelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
-import { GasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
+import { newSeededTelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
+import { GasPlanetModel, newSeededGasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 import { MandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModel";
 import { JuliaSetModel } from "../anomalies/julia/juliaSetModel";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
@@ -476,10 +476,10 @@ export class StarSystemView implements View {
             let planet: Planet;
 
             if (bodyType === CelestialBodyType.TELLURIC_PLANET) {
-                const telluricPlanetModel = createSeededTelluricPlanetModel(systemModel.getPlanetSeed(i), systemModel, starSystem.stellarObjects[0].model);
+                const telluricPlanetModel = newSeededTelluricPlanetModel(systemModel.getPlanetSeed(i), systemModel, starSystem.stellarObjects[0].model);
                 planet = this.starSystem.addTelluricPlanet(telluricPlanetModel);
             } else if (bodyType === CelestialBodyType.GAS_PLANET) {
-                const gasPlanetModel = new GasPlanetModel(systemModel.getPlanetSeed(i), systemModel, starSystem.stellarObjects[0].model);
+                const gasPlanetModel = newSeededGasPlanetModel(systemModel.getPlanetSeed(i), systemModel, starSystem.stellarObjects[0].model);
                 planet = this.starSystem.addGasPlanet(gasPlanetModel);
             } else {
                 throw new Error(`Incorrect body type in the planet list: ${bodyType}`);
@@ -497,7 +497,7 @@ export class StarSystemView implements View {
             const planet = planets[i];
             for (let j = 0; j < planet.model.nbMoons; j++) {
                 console.log("Satellite:", j + 1, "of", planet.model.nbMoons);
-                const satelliteModel = createSeededTelluricPlanetModel(getMoonSeed(planet.model, j), systemModel, planet.model);
+                const satelliteModel = newSeededTelluricPlanetModel(getMoonSeed(planet.model, j), systemModel, planet.model);
                 const satellite = starSystem.addSatellite(satelliteModel, planet);
                 satellite.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
 

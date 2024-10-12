@@ -9,8 +9,8 @@ import { AnomalyType } from "../anomalies/anomalyType";
 import { MandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModel";
 import { JuliaSetModel } from "../anomalies/julia/juliaSetModel";
 import { PlanetModel } from "../architecture/planet";
-import { createSeededTelluricPlanetModel, TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
-import { GasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
+import { newSeededTelluricPlanetModel, TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
+import { GasPlanetModel, newSeededGasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 import { StarSystemModel } from "../starSystem/starSystemModel";
 import { CelestialBodyType } from "../architecture/celestialBody";
 
@@ -73,18 +73,18 @@ export function getPlanetaryMassObjectModels(system: StarSystemModel): PlanetMod
     for (let i = 0; i < planetSeedAndTypes.length; i++) {
         const [bodyType, seed] = planetSeedAndTypes[i];
         if (bodyType === CelestialBodyType.TELLURIC_PLANET) {
-            const telluricPlanetModel = createSeededTelluricPlanetModel(seed, system, parentBodyModel);
+            const telluricPlanetModel: TelluricPlanetModel = newSeededTelluricPlanetModel(seed, system, parentBodyModel);
             planetModels.push(telluricPlanetModel);
 
             getMoonSeeds(telluricPlanetModel).forEach((moonSeed) => {
-                planetModels.push(createSeededTelluricPlanetModel(moonSeed, system, telluricPlanetModel));
+                planetModels.push(newSeededTelluricPlanetModel(moonSeed, system, telluricPlanetModel));
             });
         } else if (bodyType === CelestialBodyType.GAS_PLANET) {
-            const gasPlanetModel = new GasPlanetModel(seed, system, parentBodyModel);
+            const gasPlanetModel: GasPlanetModel = newSeededGasPlanetModel(seed, system, parentBodyModel);
             planetModels.push(gasPlanetModel);
 
             getMoonSeeds(gasPlanetModel).forEach((moonSeed) => {
-                planetModels.push(createSeededTelluricPlanetModel(moonSeed, system, gasPlanetModel));
+                planetModels.push(newSeededTelluricPlanetModel(moonSeed, system, gasPlanetModel));
             });
         }
     }

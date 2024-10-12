@@ -24,8 +24,8 @@ import { positionNearObjectBrightSide } from "./utils/positionNearObject";
 import { CosmosJourneyer } from "./cosmosJourneyer";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PostProcessType } from "./postProcesses/postProcessTypes";
-import { createSeededTelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModel";
-import { GasPlanetModel } from "./planets/gasPlanet/gasPlanetModel";
+import { newSeededTelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModel";
+import { GasPlanetModel, newSeededGasPlanetModel } from "./planets/gasPlanet/gasPlanetModel";
 import { getMoonSeed } from "./planets/common";
 import { SpaceShipControlsInputs } from "./spaceship/spaceShipControlsInputs";
 import { CustomStarSystemModel } from "./starSystem/customStarSystemModel";
@@ -84,7 +84,7 @@ terminaModel.orbit.radius = 50 * sunModel.radius;
 terminaModel.orbit.period = 60 * 60;
 const termina = StarSystemHelper.makeStar(starSystem, terminaModel);*/
 
-const planetModel = createSeededTelluricPlanetModel(starSystemModel.getPlanetSeed(0), starSystemModel, sun.model);
+const planetModel = newSeededTelluricPlanetModel(starSystemModel.getPlanetSeed(0), starSystemModel, sun.model);
 planetModel.physicalProperties.minTemperature = -40;
 planetModel.physicalProperties.maxTemperature = 30;
 
@@ -102,7 +102,7 @@ const spaceStation = starSystem.addSpaceStation(spaceStationModel, planet);
     physicsViewer.showBody(landingpad.aggregate.body);
 }*/
 
-const moonModel = createSeededTelluricPlanetModel(getMoonSeed(planetModel, 0), starSystemModel, planetModel);
+const moonModel = newSeededTelluricPlanetModel(getMoonSeed(planetModel, 0), starSystemModel, planetModel);
 moonModel.physicalProperties.mass = 2;
 moonModel.physicalProperties.rotationPeriod = 7 * 60 * 60;
 moonModel.physicalProperties.minTemperature = -180;
@@ -115,7 +115,7 @@ moonModel.orbit.normalToPlane = Vector3.Up();
 
 const moon = starSystem.addSatellite(moonModel, planet);
 
-const aresModel = createSeededTelluricPlanetModel(0.3725, starSystemModel, sun.model);
+const aresModel = newSeededTelluricPlanetModel(0.3725, starSystemModel, sun.model);
 aresModel.physicalProperties.mass = 7;
 aresModel.physicalProperties.rotationPeriod = (24 * 60 * 60) / 30;
 aresModel.physicalProperties.minTemperature = -30;
@@ -138,7 +138,7 @@ ares.postProcesses.splice(ares.postProcesses.indexOf(PostProcessType.CLOUDS), 1)
 
 ares.material.updateConstants();
 
-const andromaqueModel = new GasPlanetModel(0.28711440474126226, starSystemModel, sun.model);
+const andromaqueModel = newSeededGasPlanetModel(0.28711440474126226, starSystemModel, sun.model);
 andromaqueModel.orbit.period = 60 * 60 * 24 * 365.25;
 andromaqueModel.orbit.radius = 25300 * ares.getRadius();
 andromaqueModel.orbit.normalToPlane = Vector3.Up();
