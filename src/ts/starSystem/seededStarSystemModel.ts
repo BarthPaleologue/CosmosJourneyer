@@ -20,7 +20,7 @@ import { Settings } from "../settings";
 import { generateStarName } from "../utils/starNameGenerator";
 import { wheelOfFortune } from "../utils/random";
 import { AnomalyType } from "../anomalies/anomalyType";
-import { StarSystemModel } from "./starSystemModel";
+import { PlanetarySystem, StarSystemModel } from "./starSystemModel";
 import { StarSector } from "../starmap/starSector";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { hashVec3 } from "../utils/hashVec3";
@@ -65,8 +65,7 @@ export class SeededStarSystemModel implements StarSystemModel {
 
     readonly stellarObjectModels: StellarObjectModel[] = [];
 
-    readonly planetModels: PlanetModel[] = [];
-    readonly planetModelToSatellites: Map<PlanetModel, TelluricPlanetModel[]> = new Map();
+    readonly planetarySystems: PlanetarySystem[] = [];
 
     readonly anomalyModels: AnomalyModel[] = [];
 
@@ -106,10 +105,16 @@ export class SeededStarSystemModel implements StarSystemModel {
 
             switch (bodyType) {
                 case CelestialBodyType.TELLURIC_PLANET:
-                    this.planetModels.push(newSeededTelluricPlanetModel(this.getPlanetSeed(i), planetName, this.stellarObjectModels[0]));
+                    this.planetarySystems.push({
+                        planet: newSeededTelluricPlanetModel(this.getPlanetSeed(i), planetName, this.stellarObjectModels[0]),
+                        satellites: []
+                    });
                     break;
                 case CelestialBodyType.GAS_PLANET:
-                    this.planetModels.push(newSeededGasPlanetModel(this.getPlanetSeed(i), planetName, this.stellarObjectModels[0]));
+                    this.planetarySystems.push({
+                        planet: newSeededGasPlanetModel(this.getPlanetSeed(i), planetName, this.stellarObjectModels[0]),
+                        satellites: []
+                    });
                     break;
                 default:
                     throw new Error("Unknown planet type");
@@ -117,14 +122,12 @@ export class SeededStarSystemModel implements StarSystemModel {
         }
 
         // Satellites
-        this.planetModels.forEach((planetModel) => {
-            const satellites: TelluricPlanetModel[] = [];
-            for (let j = 0; j < planetModel.nbMoons; j++) {
-                const satelliteName = getPlanetName(j, this.name, planetModel);
-                const satelliteModel = newSeededTelluricPlanetModel(getMoonSeed(planetModel, j), satelliteName, planetModel);
+        this.planetarySystems.forEach(({ planet, satellites }) => {
+            for (let j = 0; j < planet.nbMoons; j++) {
+                const satelliteName = getPlanetName(j, this.name, planet);
+                const satelliteModel = newSeededTelluricPlanetModel(getMoonSeed(planet, j), satelliteName, planet);
                 satellites.push(satelliteModel);
             }
-            this.planetModelToSatellites.set(planetModel, satellites);
         });
 
         // Anomalies
@@ -224,22 +227,15 @@ export class SeededStarSystemModel implements StarSystemModel {
     }
 
     getPlanet(): PlanetModel[] {
-        return this.planetModels;
+        return this.planetarySystems.map(({ planet, satellites }) => planet);
     }
 
     getSatellitesOfPlanet(index: number): TelluricPlanetModel[] {
-        const satellites = this.planetModelToSatellites.get(this.planetModels[index]);
-        if (satellites === undefined) throw new Error("Planet out of bound! " + index);
-        return satellites;
+        return this.planetarySystems[index].satellites;
     }
 
     getPlanetaryMassObjects(): PlanetModel[] {
-        const planetaryMassObjects: PlanetModel[] = [];
-        for (const [planet, satellite] of this.planetModelToSatellites.entries()) {
-            planetaryMassObjects.push(planet);
-            planetaryMassObjects.push(...satellite);
-        }
-        return planetaryMassObjects;
+        return this.planetarySystems.flatMap(({ planet, satellites }) => [planet, ...satellites]);
     }
 
     getStellarObjects(): StellarObjectModel[] {

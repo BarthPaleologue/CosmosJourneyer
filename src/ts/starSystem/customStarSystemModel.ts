@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { StarSystemModel } from "./starSystemModel";
+import { PlanetarySystem, StarSystemModel } from "./starSystemModel";
 import { StarSystemCoordinates } from "../saveFile/universeCoordinates";
 import { StellarObjectModel } from "../architecture/stellarObject";
 import { PlanetModel } from "../architecture/planet";
@@ -29,22 +29,16 @@ export class CustomStarSystemModel implements StarSystemModel {
 
     private readonly stellarObjectModels: StellarObjectModel[];
 
-    private readonly planets: [PlanetModel, TelluricPlanetModel[]][];
+    private readonly planetarySystems: PlanetarySystem[];
     private readonly anomalies: AnomalyModel[];
 
-    constructor(
-        name: string,
-        coordinates: StarSystemCoordinates,
-        stellarObjects: StellarObjectModel[],
-        planets: [PlanetModel, TelluricPlanetModel[]][],
-        anomalies: AnomalyModel[]
-    ) {
+    constructor(name: string, coordinates: StarSystemCoordinates, stellarObjects: StellarObjectModel[], planetarySystems: PlanetarySystem[], anomalies: AnomalyModel[]) {
         this.name = name;
 
         this.coordinates = coordinates;
 
         this.stellarObjectModels = stellarObjects;
-        this.planets = planets;
+        this.planetarySystems = planetarySystems;
         this.anomalies = anomalies;
     }
 
@@ -61,7 +55,7 @@ export class CustomStarSystemModel implements StarSystemModel {
     }
 
     getNbPlanets(): number {
-        return this.planets.length;
+        return this.planetarySystems.length;
     }
 
     getNbAnomalies(): number {
@@ -73,16 +67,16 @@ export class CustomStarSystemModel implements StarSystemModel {
     }
 
     getPlanet(): PlanetModel[] {
-        return this.planets.map(([planet, moons]) => planet);
+        return this.planetarySystems.map(({ planet, satellites }) => planet);
     }
 
     getSatellitesOfPlanet(index: number): TelluricPlanetModel[] {
-        const planetAndSatellites = this.planets.at(index);
+        const planetAndSatellites = this.planetarySystems.at(index);
         if (planetAndSatellites === undefined) throw new Error("Planet out of bound! " + index);
-        return planetAndSatellites[1];
+        return planetAndSatellites.satellites;
     }
 
     getPlanetaryMassObjects(): PlanetModel[] {
-        return this.planets.flatMap(([planet, moons]) => [planet, ...moons]);
+        return this.planetarySystems.flatMap(({ planet, satellites }) => [planet, ...satellites]);
     }
 }

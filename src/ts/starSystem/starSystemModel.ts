@@ -21,6 +21,11 @@ import { PlanetModel } from "../architecture/planet";
 import { AnomalyModel } from "../anomalies/anomaly";
 import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 
+export type PlanetarySystem = {
+    planet: PlanetModel;
+    satellites: TelluricPlanetModel[];
+};
+
 export interface StarSystemModel {
     readonly name: string;
 

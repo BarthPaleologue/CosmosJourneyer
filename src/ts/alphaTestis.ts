@@ -124,9 +124,9 @@ const starSystemModel = new CustomStarSystemModel(
     },
     [sunModel],
     [
-        [hecateModel, [moonModel]],
-        [aresModel, []],
-        [andromaqueModel, []]
+        { planet: hecateModel, satellites: [moonModel] },
+        { planet: aresModel, satellites: [] },
+        { planet: andromaqueModel, satellites: [] }
     ],
     []
 );
