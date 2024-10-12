@@ -10,17 +10,19 @@ import { Mission, MissionType } from "./mission";
 import { getSystemModelFromCoordinates } from "../utils/starSystemCoordinatesUtils";
 import { isMoon } from "../architecture/planet";
 import { CelestialBodyType } from "../architecture/celestialBody";
+import { StarSystemModel } from "../starSystem/starSystemModel";
 
 /**
  * Generates sightseeing missions available at the given space station for the player. Missions are generated based on the current timestamp (hourly basis).
  * @param spaceStationModel The space station model where the missions are generated
+ * @param starSystemModel
  * @param player The player for which the missions are generated
  * @param timestampMillis The current timestamp in milliseconds
  */
-export function generateSightseeingMissions(spaceStationModel: SpaceStationModel, player: Player, timestampMillis: number): Mission[] {
+export function generateSightseeingMissions(spaceStationModel: SpaceStationModel, starSystemModel: StarSystemModel, player: Player, timestampMillis: number): Mission[] {
     const currentHour = Math.floor(timestampMillis / 1000 / 60 / 60);
 
-    const starSystem = spaceStationModel.starSystem;
+    const starSystem = starSystemModel;
 
     const anomalyFlyByMissions: Mission[] = [];
     const neutronStarFlyByMissions: Mission[] = [];

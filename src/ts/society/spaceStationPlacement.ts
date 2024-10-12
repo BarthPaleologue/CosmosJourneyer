@@ -1,7 +1,7 @@
 import { newSeededTelluricPlanetModel, TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 import { newSeededGasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 import { newSeededStarModel } from "../stellarObjects/star/starModel";
-import { BlackHoleModel, newSeededBlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
+import { newSeededBlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { CelestialBodyModel, CelestialBodyType } from "../architecture/celestialBody";
 import { getMoonSeeds } from "../planets/common";
 import { PlanetModel } from "../architecture/planet";

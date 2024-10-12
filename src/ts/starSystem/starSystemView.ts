@@ -82,7 +82,7 @@ import { newSeededTelluricPlanetModel } from "../planets/telluricPlanet/telluric
 import { newSeededGasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 import { newSeededMandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModel";
 import { newSeededJuliaSetModel } from "../anomalies/julia/juliaSetModel";
-import { SpaceStationModel } from "../spacestation/spacestationModel";
+import { newSeededSpaceStationModel } from "../spacestation/spacestationModel";
 import { StellarObject } from "../architecture/stellarObject";
 import { newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 import { newSeededBlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
@@ -533,7 +533,7 @@ export class StarSystemView implements View {
                 if (planet === undefined) throw new Error("Planet not found to place space station around");
 
                 const seed = getSpaceStationSeed(planet.model, 0);
-                const spaceStationModel = new SpaceStationModel(seed, systemModel, planet.model);
+                const spaceStationModel = newSeededSpaceStationModel(seed, systemModel, planet.model);
                 const spaceStation = starSystem.addSpaceStation(spaceStationModel, planet);
                 spaceStation.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
 

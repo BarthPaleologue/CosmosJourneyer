@@ -16,9 +16,10 @@ import { getSystemModelFromCoordinates } from "../../utils/starSystemCoordinates
  * @returns The DOM element containing the generated missions as HTML
  */
 export function generateMissionsDom(stationModel: SpaceStationModel, player: Player): HTMLDivElement {
-    const sightSeeingMissions = generateSightseeingMissions(stationModel, player, Date.now());
+    const starSystemModel = getSystemModelFromCoordinates(stationModel.starSystemCoordinates);
+    const sightSeeingMissions = generateSightseeingMissions(stationModel, starSystemModel, player, Date.now());
 
-    const starSystem = stationModel.starSystem;
+    const starSystem = starSystemModel;
     const neighborSystems = getNeighborStarSystemCoordinates(starSystem.getCoordinates(), 75);
 
     let neighborSpaceStations: [SpaceStationModel, number][] = [];
@@ -67,7 +68,7 @@ export function generateMissionsDom(stationModel: SpaceStationModel, player: Pla
 
     contactStations.forEach(([station, distance]) => {
         const stationP = document.createElement("p");
-        stationP.innerText = `${station.name} in ${station.starSystem.name} (${parseDistance(distance * Settings.LIGHT_YEAR)})`;
+        stationP.innerText = `${station.name} in ${starSystem.name} (${parseDistance(distance * Settings.LIGHT_YEAR)})`;
         mainContainer.appendChild(stationP);
     });
 

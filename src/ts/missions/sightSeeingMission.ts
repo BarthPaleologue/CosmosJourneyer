@@ -45,7 +45,7 @@ export function newSightSeeingMission(missionGiver: SpaceStationModel, target: S
 
     const targetSystemCoordinates = target.objectId.starSystemCoordinates;
 
-    const missionGiverGalacticCoordinates = getStarGalacticPosition(missionGiver.starSystem.getCoordinates());
+    const missionGiverGalacticCoordinates = getStarGalacticPosition(missionGiver.starSystemCoordinates);
 
     const targetGalacticCoordinates = getStarGalacticPosition(targetSystemCoordinates);
     const distanceLY = Vector3.Distance(missionGiverGalacticCoordinates, targetGalacticCoordinates);

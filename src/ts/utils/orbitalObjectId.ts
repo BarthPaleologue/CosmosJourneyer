@@ -89,7 +89,7 @@ export function getObjectModelByUniverseId(universeObjectId: UniverseObjectId): 
 }
 
 export function getUniverseIdForSpaceStationModel(spaceStationModel: SpaceStationModel): UniverseObjectId {
-    const systemModel = spaceStationModel.starSystem;
+    const systemModel = getSystemModelFromCoordinates(spaceStationModel.starSystemCoordinates);
 
     const spaceStationModels = getSpaceStationModels(systemModel);
     const index = spaceStationModels.findIndex((model) => model.seed === spaceStationModel.seed);

@@ -1,5 +1,5 @@
 import { placeSpaceStations } from "../society/spaceStationPlacement";
-import { SpaceStationModel } from "../spacestation/spacestationModel";
+import { newSeededSpaceStationModel, SpaceStationModel } from "../spacestation/spacestationModel";
 import { getMoonSeeds, getSpaceStationSeed } from "../planets/common";
 import { newSeededStarModel } from "../stellarObjects/star/starModel";
 import { newSeededBlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
@@ -17,7 +17,7 @@ import { newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutron
 export function getSpaceStationModels(system: StarSystemModel): SpaceStationModel[] {
     const spaceStationParents = placeSpaceStations(system);
     return spaceStationParents.map((planet) => {
-        return new SpaceStationModel(getSpaceStationSeed(planet, 0), system, planet);
+        return newSeededSpaceStationModel(getSpaceStationSeed(planet, 0), system, planet);
     });
 }
 

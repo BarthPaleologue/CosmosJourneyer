@@ -33,12 +33,12 @@ import HavokPhysics from "@babylonjs/havok";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { Star } from "./stellarObjects/star/star";
 import { Settings } from "./settings";
-import { SpaceStationModel } from "./spacestation/spacestationModel";
 import { StarFieldBox } from "./starSystem/starFieldBox";
 import { CustomStarSystemModel } from "./starSystem/customStarSystemModel";
 
 import { CelestialBodyType } from "./architecture/celestialBody";
-import { newSeededStarModel, StarModel } from "./stellarObjects/star/starModel";
+import { newSeededStarModel } from "./stellarObjects/star/starModel";
+import { newSeededSpaceStationModel } from "./spacestation/spacestationModel";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -93,7 +93,7 @@ sun.getTransform().position = new Vector3(7, 2, 5).normalize().scaleInPlace(dist
 
 const starfieldBox = new StarFieldBox(scene);
 
-const spaceStationModel = new SpaceStationModel(Math.random() * Settings.SEED_HALF_RANGE, starSystemModel, sun.model);
+const spaceStationModel = newSeededSpaceStationModel(Math.random() * Settings.SEED_HALF_RANGE, starSystemModel, sun.model);
 spaceStationModel.orbit.radius = distanceToStar;
 
 const spaceStation = new SpaceStation(spaceStationModel, scene, sun);

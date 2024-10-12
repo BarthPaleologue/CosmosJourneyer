@@ -32,7 +32,7 @@ import { CustomStarSystemModel } from "./starSystem/customStarSystemModel";
 
 import { CelestialBodyType } from "./architecture/celestialBody";
 import { newSeededStarModel } from "./stellarObjects/star/starModel";
-import { SpaceStationModel } from "./spacestation/spacestationModel";
+import { newSeededSpaceStationModel } from "./spacestation/spacestationModel";
 
 const engine = await CosmosJourneyer.CreateAsync();
 
@@ -90,7 +90,7 @@ planetModel.orbit.normalToPlane = Vector3.Up();
 
 const planet = starSystem.addTelluricPlanet(planetModel);
 
-const spaceStationModel = new SpaceStationModel(0, starSystem.model, planetModel);
+const spaceStationModel = newSeededSpaceStationModel(0, starSystem.model, planetModel);
 const spaceStation = starSystem.addSpaceStation(spaceStationModel, planet);
 
 //physicsViewer.showBody(spaceStation.aggregate.body);
