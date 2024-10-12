@@ -39,6 +39,7 @@ import { getRngFromSeed } from "../utils/getRngFromSeed";
 import { romanNumeral } from "../utils/romanNumerals";
 import { SystemObjectId, SystemObjectType } from "../saveFile/universeCoordinates";
 import { newSeededSpaceStationModel } from "../spacestation/spacestationModel";
+import { SystemSeed } from "./systemSeed";
 
 const enum GenerationSteps {
     NAME,
@@ -51,28 +52,6 @@ const enum GenerationSteps {
     ANOMALIES = 666,
     SPACE_STATIONS = 2000
 }
-
-/**
- * Seed used to generate star systems in a pseudo-random fashion.
- */
-export type SystemSeed = {
-    /**
-     * The X coordinate of the star sector (integer).
-     */
-    starSectorX: number;
-    /**
-     * The Y coordinate of the star sector (integer).
-     */
-    starSectorY: number;
-    /**
-     * The Z coordinate of the star sector (integer).
-     */
-    starSectorZ: number;
-    /**
-     * The index of the system inside its star sector (integer).
-     */
-    index: number;
-};
 
 /**
  * Generates a new star system data model given a seed using a pseudo-random number generator.

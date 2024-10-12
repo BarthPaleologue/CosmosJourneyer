@@ -6,11 +6,11 @@ import { SystemObjectType } from "../saveFile/universeCoordinates";
 import { Player } from "../player/player";
 import { hasLiquidWater, TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 import { Mission, MissionType } from "./mission";
-import { getSystemModelFromCoordinates } from "../utils/starSystemCoordinatesUtils";
 import { isMoon } from "../architecture/planet";
 import { CelestialBodyType } from "../architecture/celestialBody";
 import { getPlanetaryMassObjects, StarSystemModel } from "../starSystem/starSystemModel";
 import { getRngFromSeed } from "../utils/getRngFromSeed";
+import { getSystemModelFromCoordinates } from "../starSystem/modelFromCoordinates";
 
 /**
  * Generates sightseeing missions available at the given space station for the player. Missions are generated based on the current timestamp (hourly basis).

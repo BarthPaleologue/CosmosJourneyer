@@ -7,13 +7,14 @@ import {
 } from "../../../../saveFile/universeCoordinates";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getObjectBySystemId, getObjectModelByUniverseId } from "../../../../utils/orbitalObjectId";
-import { getStarGalacticPosition, getSystemModelFromCoordinates } from "../../../../utils/starSystemCoordinatesUtils";
+import { getStarGalacticPosition } from "../../../../utils/starSystemCoordinatesUtils";
 import { parseDistance } from "../../../../utils/parseToStrings";
 import { Settings } from "../../../../settings";
 import i18n from "../../../../i18n";
 import { getGlobalKeyboardLayoutMap } from "../../../../utils/keyboardAPI";
 import { pressInteractionToStrings } from "../../../../utils/inputControlsString";
 import { GeneralInputs } from "../../../../inputs/generalInputs";
+import { getSystemModelFromCoordinates } from "../../../../starSystem/modelFromCoordinates";
 
 const enum FlyByState {
     NOT_IN_SYSTEM,

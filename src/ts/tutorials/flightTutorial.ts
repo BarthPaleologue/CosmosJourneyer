@@ -29,7 +29,7 @@ import warpImageSrc from "../../asset/tutorials/flightTutorial/warp.webp";
 import congratsImageSrc from "../../asset/tutorials/flightTutorial/congrats.webp";
 import { SystemObjectType } from "../saveFile/universeCoordinates";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
-import { getStarSystemCoordinatesFromSeed } from "../utils/starSystemCoordinatesUtils";
+import { getStarSystemCoordinatesFromSeed } from "../starSystem/systemSeed";
 
 export const FlightTutorial: Tutorial = {
     title: i18n.t("tutorials:flightTutorial:title"),

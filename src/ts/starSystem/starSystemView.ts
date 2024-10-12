@@ -73,7 +73,6 @@ import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import { MissionContext } from "../missions/missionContext";
 import { Mission } from "../missions/mission";
-import { getSystemModelFromCoordinates } from "../utils/starSystemCoordinatesUtils";
 import { CelestialBody, CelestialBodyType } from "../architecture/celestialBody";
 import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 import { GasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
@@ -86,6 +85,7 @@ import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { StarModel } from "../stellarObjects/star/starModel";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../saveFile/universeCoordinates";
 import { getPlanets } from "./starSystemModel";
+import { getSystemModelFromCoordinates } from "./modelFromCoordinates";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the

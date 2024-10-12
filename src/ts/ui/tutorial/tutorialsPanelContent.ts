@@ -8,7 +8,8 @@ import { Tutorial } from "../../tutorials/tutorial";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { SystemObjectType } from "../../saveFile/universeCoordinates";
 import { OrbitalObject } from "../../architecture/orbitalObject";
-import { getSystemModelFromCoordinates } from "../../utils/starSystemCoordinatesUtils";
+
+import { getSystemModelFromCoordinates } from "../../starSystem/modelFromCoordinates";
 
 export class TutorialsPanelContent {
     readonly htmlRoot: HTMLElement;

@@ -53,8 +53,8 @@ import { SidePanels } from "./ui/sidePanels";
 import { Settings } from "./settings";
 import { Player } from "./player/player";
 import { getObjectBySystemId, getUniverseObjectId } from "./utils/orbitalObjectId";
-import { getSystemModelFromCoordinates } from "./utils/starSystemCoordinatesUtils";
 import { StarSystemController } from "./starSystem/starSystemController";
+import { getSystemModelFromCoordinates } from "./starSystem/modelFromCoordinates";
 
 const enum EngineState {
     UNINITIALIZED,

@@ -17,8 +17,9 @@ import { Sounds } from "../assets/sounds";
 import { PanelType, SidePanels } from "./sidePanels";
 import { SystemObjectType, UniverseObjectId } from "../saveFile/universeCoordinates";
 import { getObjectBySystemId } from "../utils/orbitalObjectId";
-import { getStarSystemCoordinatesFromSeed, getSystemModelFromCoordinates } from "../utils/starSystemCoordinatesUtils";
 import { CelestialBodyType } from "../architecture/celestialBody";
+import { getSystemModelFromCoordinates } from "../starSystem/modelFromCoordinates";
+import { getStarSystemCoordinatesFromSeed } from "../starSystem/systemSeed";
 
 export class MainMenu {
     readonly scene: UberScene;

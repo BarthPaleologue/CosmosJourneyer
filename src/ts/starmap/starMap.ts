@@ -51,12 +51,13 @@ import { CameraRadiusAnimation } from "../uberCore/transforms/animations/radius"
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { StellarPathfinder } from "./stellarPathfinder";
 import { createNotification } from "../utils/notification";
-import { getStarGalacticPosition, getSystemModelFromCoordinates } from "../utils/starSystemCoordinatesUtils";
+import { getStarGalacticPosition } from "../utils/starSystemCoordinatesUtils";
 import { Player } from "../player/player";
 import { Settings } from "../settings";
 import { CelestialBodyType } from "../architecture/celestialBody";
 import { getRgbFromTemperature } from "../utils/specrend";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../saveFile/universeCoordinates";
+import { getSystemModelFromCoordinates } from "../starSystem/modelFromCoordinates";
 
 export class StarMap implements View {
     readonly scene: Scene;

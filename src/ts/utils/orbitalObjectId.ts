@@ -7,8 +7,8 @@ import { Anomaly } from "../anomalies/anomaly";
 import { SpaceStation } from "../spacestation/spaceStation";
 import { getSpaceStationModels } from "./getModelsFromSystemModel";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
-import { getSystemModelFromCoordinates } from "./starSystemCoordinatesUtils";
 import { getPlanetaryMassObjects } from "../starSystem/starSystemModel";
+import { getSystemModelFromCoordinates } from "../starSystem/modelFromCoordinates";
 
 /**
  * Get the object ID of the given orbital object within the star system.

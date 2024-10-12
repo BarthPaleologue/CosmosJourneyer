@@ -20,7 +20,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import i18n from "../i18n";
 import { getStellarTypeFromTemperature } from "../stellarObjects/star/starModel";
-import { getStarGalacticPosition, getSystemModelFromCoordinates } from "../utils/starSystemCoordinatesUtils";
+import { getStarGalacticPosition } from "../utils/starSystemCoordinatesUtils";
 import { factionToString } from "../society/factions";
 import { isSystemInHumanBubble } from "../society/starSystemSociety";
 import { getSpaceStationModels } from "../utils/getModelsFromSystemModel";
@@ -30,6 +30,7 @@ import { SystemIcons } from "./systemIcons";
 import { CelestialBodyType } from "../architecture/celestialBody";
 import { getRgbFromTemperature } from "../utils/specrend";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../saveFile/universeCoordinates";
+import { getSystemModelFromCoordinates } from "../starSystem/modelFromCoordinates";
 
 export class StarMapUI {
     readonly htmlRoot: HTMLDivElement;

@@ -7,9 +7,9 @@ import { getSpaceStationModels } from "../../utils/getModelsFromSystemModel";
 import { generateSightseeingMissions } from "../../missions/generateSightSeeingMissions";
 import { Player } from "../../player/player";
 import { MissionContainer } from "./missionContainer";
-import { getSystemModelFromCoordinates } from "../../utils/starSystemCoordinatesUtils";
 
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
+import { getSystemModelFromCoordinates } from "../../starSystem/modelFromCoordinates";
 
 /**
  * Generates all missions available at the given space station for the player. Missions are generated based on the current timestamp (hourly basis).

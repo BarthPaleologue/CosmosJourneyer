@@ -9,12 +9,13 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { CollisionMask, Settings } from "../../../../settings";
 import { getObjectBySystemId, getObjectModelByUniverseId } from "../../../../utils/orbitalObjectId";
-import { getStarGalacticPosition, getSystemModelFromCoordinates } from "../../../../utils/starSystemCoordinatesUtils";
+import { getStarGalacticPosition } from "../../../../utils/starSystemCoordinatesUtils";
 import i18n from "../../../../i18n";
 import { parseDistance } from "../../../../utils/parseToStrings";
 import { getGlobalKeyboardLayoutMap } from "../../../../utils/keyboardAPI";
 import { pressInteractionToStrings } from "../../../../utils/inputControlsString";
 import { GeneralInputs } from "../../../../inputs/generalInputs";
+import { getSystemModelFromCoordinates } from "../../../../starSystem/modelFromCoordinates";
 
 const enum LandMissionState {
     NOT_IN_SYSTEM,
