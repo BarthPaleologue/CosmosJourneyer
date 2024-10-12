@@ -20,23 +20,20 @@ import { getOrbitalPeriod, Orbit } from "../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { OrbitalObjectModel } from "../architecture/orbitalObject";
 import { OrbitalObjectPhysicalProperties } from "../architecture/physicalProperties";
-import { CelestialBodyModel, CelestialBodyType } from "../architecture/celestialBody";
+import { CelestialBodyModel } from "../architecture/celestialBody";
 import { normalRandom, uniformRandBool } from "extended-random";
 import { clamp } from "../utils/math";
 import { GenerationSteps } from "../utils/generationSteps";
 import { CropType, CropTypes, getEdibleEnergyPerHaPerDay } from "../utils/agriculture";
 import { randomPieChart } from "../utils/random";
 import { generateSpaceStationName } from "../utils/spaceStationNameGenerator";
-import { StarSystemCoordinates, StarSystemModel } from "../starSystem/starSystemModel";
+import { StarSystemCoordinates } from "../starSystem/starSystemModel";
 import { Faction } from "../society/factions";
 import { getPowerPlayData } from "../society/powerplay";
-import { newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
-import { newSeededBlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
-import { newSeededStarModel } from "../stellarObjects/star/starModel";
 import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
 import { Settings } from "../settings";
 import i18n from "../i18n";
-import { getStellarObjectName } from "../utils/parseToStrings";
+import { StellarObjectModel } from "../architecture/stellarObject";
 
 export type SpaceStationModel = OrbitalObjectModel & {
     readonly starSystemCoordinates: StarSystemCoordinates;
@@ -75,7 +72,12 @@ export type SpaceStationModel = OrbitalObjectModel & {
     readonly totalHabitatSurfaceM2: number;
 };
 
-export function newSeededSpaceStationModel(seed: number, starSystemModel: StarSystemModel, parentBody: CelestialBodyModel | null): SpaceStationModel {
+export function newSeededSpaceStationModel(
+    seed: number,
+    stellarObjectModel: StellarObjectModel,
+    starSystemCoordinates: StarSystemCoordinates,
+    parentBody: CelestialBodyModel | null
+): SpaceStationModel {
     const rng = seededSquirrelNoise(seed);
 
     const name = generateSpaceStationName(rng, 2756);
@@ -95,7 +97,7 @@ export function newSeededSpaceStationModel(seed: number, starSystemModel: StarSy
         axialTilt: 2 * rng(GenerationSteps.AXIAL_TILT) * Math.PI
     };
 
-    const powerplayData = getPowerPlayData(starSystemModel.getCoordinates());
+    const powerplayData = getPowerPlayData(starSystemCoordinates);
 
     const isMaterialist = uniformRandBool(powerplayData.materialistSpiritualist, rng, 249);
     const isCapitalist = uniformRandBool(powerplayData.capitalistCommunist, rng, 498);
@@ -122,22 +124,7 @@ export function newSeededSpaceStationModel(seed: number, starSystemModel: StarSy
 
     const nbHydroponicLayers = 10;
 
-    const starModelBuildInfo = starSystemModel.getStellarObjects()[0];
-    let starModel;
-    const stellarObjectName = getStellarObjectName(starSystemModel.name, 0);
-    switch (starModelBuildInfo[0]) {
-        case CelestialBodyType.NEUTRON_STAR:
-            starModel = newSeededNeutronStarModel(starModelBuildInfo[1], stellarObjectName, null);
-            break;
-        case CelestialBodyType.BLACK_HOLE:
-            starModel = newSeededBlackHoleModel(starModelBuildInfo[1], stellarObjectName, null);
-            break;
-        case CelestialBodyType.STAR:
-            starModel = newSeededStarModel(starModelBuildInfo[1], stellarObjectName, null);
-            break;
-        default:
-            throw new Error("Unknown star type");
-    }
+    const starModel = stellarObjectModel;
 
     // find distance to star
     const distanceToStar = parentBody ? parentBody?.orbit.radius : 0;
@@ -163,7 +150,7 @@ export function newSeededSpaceStationModel(seed: number, starSystemModel: StarSy
 
     return {
         seed,
-        starSystemCoordinates: starSystemModel.getCoordinates(),
+        starSystemCoordinates: starSystemCoordinates,
         name,
         rng,
         parentBody,

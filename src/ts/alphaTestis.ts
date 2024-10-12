@@ -90,7 +90,7 @@ planetModel.orbit.normalToPlane = Vector3.Up();
 
 const planet = starSystem.addTelluricPlanet(planetModel);
 
-const spaceStationModel = newSeededSpaceStationModel(0, starSystem.model, planetModel);
+const spaceStationModel = newSeededSpaceStationModel(0, sunModel, starSystemModel.getCoordinates(), planetModel);
 const spaceStation = starSystem.addSpaceStation(spaceStationModel, planet);
 
 //physicsViewer.showBody(spaceStation.aggregate.body);

@@ -17,8 +17,9 @@ import { getStellarObjectName } from "./parseToStrings";
 
 export function getSpaceStationModels(system: StarSystemModel): SpaceStationModel[] {
     const spaceStationParents = placeSpaceStations(system);
+    const stellarObjectModels = getStellarObjectModels(system);
     return spaceStationParents.map((planet) => {
-        return newSeededSpaceStationModel(getSpaceStationSeed(planet, 0), system, planet);
+        return newSeededSpaceStationModel(getSpaceStationSeed(planet, 0), stellarObjectModels[0], system.getCoordinates(), planet);
     });
 }
 

@@ -538,7 +538,7 @@ export class StarSystemView implements View {
                 if (planet === undefined) throw new Error("Planet not found to place space station around");
 
                 const seed = getSpaceStationSeed(planet.model, 0);
-                const spaceStationModel = newSeededSpaceStationModel(seed, systemModel, planet.model);
+                const spaceStationModel = newSeededSpaceStationModel(seed, starSystem.stellarObjects[0].model, systemModel.getCoordinates(), planet.model);
                 const spaceStation = starSystem.addSpaceStation(spaceStationModel, planet);
                 spaceStation.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
 
