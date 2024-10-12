@@ -28,18 +28,14 @@ import { PlanetPhysicalProperties } from "../../architecture/physicalProperties"
 import { CelestialBodyModel, CelestialBodyType } from "../../architecture/celestialBody";
 import { RingsModel } from "../../rings/ringsModel";
 import { GenerationSteps } from "../../utils/generationSteps";
-import { getPlanetName } from "../common";
-import { StarSystemModel } from "../../starSystem/starSystemModel";
 import i18n from "../../i18n";
 
 export type GasPlanetModel = PlanetModel & {
     readonly bodyType: CelestialBodyType.GAS_PLANET;
 };
 
-export function newSeededGasPlanetModel(seed: number, starSystem: StarSystemModel, parentBody: CelestialBodyModel | null): GasPlanetModel {
+export function newSeededGasPlanetModel(seed: number, name: string, parentBody: CelestialBodyModel | null): GasPlanetModel {
     const rng = seededSquirrelNoise(seed);
-
-    const name = getPlanetName(seed, starSystem, parentBody);
 
     const radius = randRangeInt(Settings.EARTH_RADIUS * 4, Settings.EARTH_RADIUS * 20, rng, GenerationSteps.RADIUS);
 

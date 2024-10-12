@@ -3,7 +3,7 @@ import { newSeededGasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 import { newSeededStarModel } from "../stellarObjects/star/starModel";
 import { newSeededBlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { CelestialBodyModel, CelestialBodyType } from "../architecture/celestialBody";
-import { getMoonSeeds } from "../planets/common";
+import { getMoonSeeds, getPlanetName } from "../planets/common";
 import { PlanetModel } from "../architecture/planet";
 import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
 import { newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
@@ -36,12 +36,13 @@ export function placeSpaceStations(systemModel: StarSystemModel): PlanetModel[] 
         throw new Error("The star system must have at least one stellar object.");
     }
 
-    const planetModels = systemModel.getPlanets().map(([bodyType, seed]) => {
+    const planetModels = systemModel.getPlanets().map(([bodyType, seed], index) => {
+        const planetName = getPlanetName(index, systemModel.name, mainStellarObjectModel);
         switch (bodyType) {
             case CelestialBodyType.TELLURIC_PLANET:
-                return newSeededTelluricPlanetModel(seed, systemModel, mainStellarObjectModel);
+                return newSeededTelluricPlanetModel(seed, planetName, mainStellarObjectModel);
             case CelestialBodyType.GAS_PLANET:
-                return newSeededGasPlanetModel(seed, systemModel, mainStellarObjectModel);
+                return newSeededGasPlanetModel(seed, planetName, mainStellarObjectModel);
             default:
                 throw new Error(`Incorrect body type in the planet list: ${bodyType}`);
         }
@@ -50,7 +51,9 @@ export function placeSpaceStations(systemModel: StarSystemModel): PlanetModel[] 
     const planetToSatellites = new Map<CelestialBodyModel, TelluricPlanetModel[]>();
 
     planetModels.forEach((planetModel) => {
-        const moonModels = getMoonSeeds(planetModel).map((moonSeed) => newSeededTelluricPlanetModel(moonSeed, systemModel, planetModel));
+        const moonModels = getMoonSeeds(planetModel).map((moonSeed, index) =>
+            newSeededTelluricPlanetModel(moonSeed, getPlanetName(index, systemModel.name, planetModel), planetModel)
+        );
         planetToSatellites.set(planetModel, moonModels);
     });
 

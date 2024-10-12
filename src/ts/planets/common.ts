@@ -21,7 +21,6 @@ import { PlanetModel } from "../architecture/planet";
 import { CelestialBodyModel, CelestialBodyType } from "../architecture/celestialBody";
 import { GenerationSteps } from "../utils/generationSteps";
 import { romanNumeral } from "../utils/romanNumerals";
-import { StarSystemModel } from "../starSystem/starSystemModel";
 import { Alphabet } from "../utils/parseToStrings";
 
 export function getMoonSeed(model: PlanetModel, index: number) {
@@ -37,16 +36,12 @@ export function getSpaceStationSeed(model: CelestialBodyModel, index: number) {
     return centeredRand(model.rng, GenerationSteps.SPACE_STATIONS + index) * Settings.SEED_HALF_RANGE;
 }
 
-export function getPlanetName(seed: number, starSystemModel: StarSystemModel, parentBody: CelestialBodyModel | null): string {
+export function getPlanetName(planetIndex: number, starSystemName: string, parentBody: CelestialBodyModel | null): string {
     if (parentBody === null) {
-        return `${starSystemModel.name} Rogue`;
+        return `${starSystemName} Rogue`;
     }
 
     const isSatellite = parentBody.bodyType === CelestialBodyType.TELLURIC_PLANET || parentBody.bodyType === CelestialBodyType.GAS_PLANET;
-
-    const planetIndex = !isSatellite
-        ? starSystemModel.getPlanets().findIndex(([_, planetSeed]) => planetSeed === seed)
-        : getMoonSeeds(parentBody as PlanetModel).findIndex((moonSeed) => moonSeed === seed);
 
     if (planetIndex === -1) throw new Error("Planet not found in star system");
 
@@ -54,5 +49,5 @@ export function getPlanetName(seed: number, starSystemModel: StarSystemModel, pa
         return `${parentBody.name}${Alphabet[planetIndex]}`;
     }
 
-    return `${starSystemModel.name} ${romanNumeral(planetIndex + 1)}`;
+    return `${starSystemName} ${romanNumeral(planetIndex + 1)}`;
 }

@@ -30,8 +30,6 @@ import { CelestialBodyModel, CelestialBodyType } from "../../architecture/celest
 import { RingsModel } from "../../rings/ringsModel";
 import { CloudsModel } from "../../clouds/cloudsModel";
 import { GenerationSteps } from "../../utils/generationSteps";
-import { getPlanetName } from "../common";
-import { StarSystemModel } from "../../starSystem/starSystemModel";
 import i18n from "../../i18n";
 import { waterBoilingPointCelsius } from "../../utils/waterMechanics";
 
@@ -49,7 +47,7 @@ export function hasLiquidWater(telluricPlanetModel: TelluricPlanetModel): boolea
     return telluricPlanetModel.physicalProperties.oceanLevel > 0;
 }
 
-export function newSeededTelluricPlanetModel(seed: number, starSystemModel: StarSystemModel, parentBody?: CelestialBodyModel): TelluricPlanetModel {
+export function newSeededTelluricPlanetModel(seed: number, name: string, parentBody?: CelestialBodyModel): TelluricPlanetModel {
     const rng = seededSquirrelNoise(seed);
 
     const isSatelliteOfTelluric = parentBody?.bodyType === CelestialBodyType.TELLURIC_PLANET ?? false;
@@ -178,7 +176,7 @@ export function newSeededTelluricPlanetModel(seed: number, starSystemModel: Star
         bodyType: CelestialBodyType.TELLURIC_PLANET,
         seed: seed,
         parentBody: parentBody ?? null,
-        name: getPlanetName(seed, starSystemModel, parentBody ?? null),
+        name,
         radius: radius,
         physicalProperties: physicalProperties,
         orbit: orbit,
