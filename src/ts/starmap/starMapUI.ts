@@ -321,10 +321,10 @@ export class StarMapUI {
                 starModel = newSeededStarModel(starSeed, stellarObjectName, null);
                 break;
             case CelestialBodyType.BLACK_HOLE:
-                starModel = newSeededBlackHoleModel(starSeed, targetSystemModel, null);
+                starModel = newSeededBlackHoleModel(starSeed, stellarObjectName, null);
                 break;
             case CelestialBodyType.NEUTRON_STAR:
-                starModel = newSeededNeutronStarModel(starSeed, targetSystemModel, null);
+                starModel = newSeededNeutronStarModel(starSeed, stellarObjectName, null);
                 break;
             default:
                 throw new Error("Unknown stellar object type!");

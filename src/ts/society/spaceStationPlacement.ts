@@ -25,9 +25,9 @@ export function placeSpaceStations(systemModel: StarSystemModel): PlanetModel[] 
             case CelestialBodyType.STAR:
                 return newSeededStarModel(seed, stellarObjectName, null);
             case CelestialBodyType.BLACK_HOLE:
-                return newSeededBlackHoleModel(seed, systemModel, null);
+                return newSeededBlackHoleModel(seed, stellarObjectName, null);
             case CelestialBodyType.NEUTRON_STAR:
-                return newSeededNeutronStarModel(seed, systemModel, null);
+                return newSeededNeutronStarModel(seed, stellarObjectName, null);
             default:
                 throw new Error(`Incorrect body type in the stellar object list: ${bodyType}`);
         }

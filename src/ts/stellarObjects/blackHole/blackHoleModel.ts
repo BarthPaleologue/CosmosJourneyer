@@ -25,8 +25,6 @@ import { StellarObjectModel } from "../../architecture/stellarObject";
 import { Settings } from "../../settings";
 import { estimateStarRadiusFromMass } from "../../utils/estimateStarRadiusFromMass";
 import { GenerationSteps } from "../../utils/generationSteps";
-import { getStellarObjectName } from "../../utils/parseToStrings";
-import { StarSystemModel } from "../../starSystem/starSystemModel";
 import i18n from "../../i18n";
 
 export type BlackHoleModel = StellarObjectModel & {
@@ -39,11 +37,8 @@ export type BlackHoleModel = StellarObjectModel & {
     readonly physicalProperties: BlackHolePhysicalProperties;
 };
 
-export function newSeededBlackHoleModel(seed: number, starSystemModel: StarSystemModel, parentBody: CelestialBodyModel | null): BlackHoleModel {
+export function newSeededBlackHoleModel(seed: number, name: string, parentBody: CelestialBodyModel | null): BlackHoleModel {
     const rng = seededSquirrelNoise(seed);
-
-    const stellarObjectIndex = starSystemModel.getStellarObjects().findIndex(([_, stellarObjectSeed]) => stellarObjectSeed === seed);
-    const name = getStellarObjectName(starSystemModel.name, stellarObjectIndex);
 
     //FIXME: do not hardcode
     const radius = 1000e3;

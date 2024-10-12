@@ -458,10 +458,10 @@ export class StarMap implements View {
                 starModel = newSeededStarModel(starSeed, stellarObjectName, null);
                 break;
             case CelestialBodyType.BLACK_HOLE:
-                starModel = newSeededBlackHoleModel(starSeed, starSystemModel, null);
+                starModel = newSeededBlackHoleModel(starSeed, stellarObjectName, null);
                 break;
             case CelestialBodyType.NEUTRON_STAR:
-                starModel = newSeededNeutronStarModel(starSeed, starSystemModel, null);
+                starModel = newSeededNeutronStarModel(starSeed, stellarObjectName, null);
                 break;
             default:
                 throw new Error("Unknown stellar object type!");

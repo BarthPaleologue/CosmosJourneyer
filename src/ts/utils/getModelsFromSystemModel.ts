@@ -34,10 +34,10 @@ export function getStellarObjectModels(system: StarSystemModel): StellarObjectMo
                 stellarObjectModels.push(newSeededStarModel(seed, stellarObjectName, parentBodyModel));
                 break;
             case CelestialBodyType.BLACK_HOLE:
-                stellarObjectModels.push(newSeededBlackHoleModel(seed, system, parentBodyModel));
+                stellarObjectModels.push(newSeededBlackHoleModel(seed, stellarObjectName, parentBodyModel));
                 break;
             case CelestialBodyType.NEUTRON_STAR:
-                stellarObjectModels.push(newSeededNeutronStarModel(seed, system, parentBodyModel));
+                stellarObjectModels.push(newSeededNeutronStarModel(seed, stellarObjectName, parentBodyModel));
                 break;
             default:
                 throw new Error(`Incorrect body type in the stellar object list: ${bodyType}`);

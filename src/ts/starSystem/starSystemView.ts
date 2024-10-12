@@ -455,10 +455,10 @@ export class StarSystemView implements View {
                     stellarObject = starSystem.addStar(newSeededStarModel(seed, stellarObjectName, null), null);
                     break;
                 case CelestialBodyType.BLACK_HOLE:
-                    stellarObject = starSystem.addBlackHole(newSeededBlackHoleModel(seed, systemModel, null), null);
+                    stellarObject = starSystem.addBlackHole(newSeededBlackHoleModel(seed, stellarObjectName, null), null);
                     break;
                 case CelestialBodyType.NEUTRON_STAR:
-                    stellarObject = starSystem.addNeutronStar(newSeededNeutronStarModel(seed, systemModel, null), null);
+                    stellarObject = starSystem.addNeutronStar(newSeededNeutronStarModel(seed, stellarObjectName, null), null);
                     break;
                 default:
                     throw new Error("Unknown stellar object type");

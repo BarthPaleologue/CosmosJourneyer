@@ -127,10 +127,10 @@ export function newSeededSpaceStationModel(seed: number, starSystemModel: StarSy
     const stellarObjectName = getStellarObjectName(starSystemModel.name, 0);
     switch (starModelBuildInfo[0]) {
         case CelestialBodyType.NEUTRON_STAR:
-            starModel = newSeededNeutronStarModel(starModelBuildInfo[1], starSystemModel, null);
+            starModel = newSeededNeutronStarModel(starModelBuildInfo[1], stellarObjectName, null);
             break;
         case CelestialBodyType.BLACK_HOLE:
-            starModel = newSeededBlackHoleModel(starModelBuildInfo[1], starSystemModel, null);
+            starModel = newSeededBlackHoleModel(starModelBuildInfo[1], stellarObjectName, null);
             break;
         case CelestialBodyType.STAR:
             starModel = newSeededStarModel(starModelBuildInfo[1], stellarObjectName, null);
