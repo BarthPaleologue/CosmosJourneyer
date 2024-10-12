@@ -80,6 +80,10 @@ export function getStellarObjectName(baseName: string, index: number): string {
     return `${baseName} ${Alphabet[index].toUpperCase()}`;
 }
 
+export function getAnomalyName(baseName: string, index: number): string {
+    return `${baseName} ${ReversedGreekAlphabet[index].toUpperCase()}`;
+}
+
 export function systemObjectTypeToString(systemObjectType: SystemObjectType): string {
     switch (systemObjectType) {
         case SystemObjectType.ANOMALY:

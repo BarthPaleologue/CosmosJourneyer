@@ -35,6 +35,7 @@ import { CustomStarSystemModel } from "./starSystem/customStarSystemModel";
 import { AnomalyType } from "./anomalies/anomalyType";
 import { newSeededMandelbulbModel } from "./anomalies/mandelbulb/mandelbulbModel";
 import { newSeededJuliaSetModel } from "./anomalies/julia/juliaSetModel";
+import { getAnomalyName } from "./utils/parseToStrings";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -71,7 +72,7 @@ const starSystemModel = new CustomStarSystemModel(
 );
 
 function createMandelbulb(): TransformNode {
-    const mandelBulbModel = newSeededMandelbulbModel(starSystemModel.getAnomalySeed(0), starSystemModel, null);
+    const mandelBulbModel = newSeededMandelbulbModel(starSystemModel.getAnomalySeed(0), getAnomalyName(starSystemModel.name, 0), null);
     const mandelbulb = new Mandelbulb(mandelBulbModel, scene, null);
     mandelbulb.getTransform().scalingDeterminant = 1 / 400e3;
 
@@ -90,7 +91,7 @@ function createMandelbulb(): TransformNode {
 }
 
 function createJulia(): TransformNode {
-    const juliaModel = newSeededJuliaSetModel(starSystemModel.getAnomalySeed(0), starSystemModel, null);
+    const juliaModel = newSeededJuliaSetModel(starSystemModel.getAnomalySeed(0), getAnomalyName(starSystemModel.name, 0), null);
     const julia = new JuliaSet(juliaModel, scene, null);
     julia.getTransform().scalingDeterminant = 1 / 400e3;
 

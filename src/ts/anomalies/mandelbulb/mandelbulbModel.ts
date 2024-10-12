@@ -24,8 +24,6 @@ import { getOrbitalPeriod, getPeriapsis, Orbit } from "../../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { CelestialBodyModel, CelestialBodyType } from "../../architecture/celestialBody";
 import { GenerationSteps } from "../../utils/generationSteps";
-import { ReversedGreekAlphabet } from "../../utils/parseToStrings";
-import { StarSystemModel } from "../../starSystem/starSystemModel";
 import i18n from "../../i18n";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 
@@ -36,11 +34,8 @@ export type MandelbulbModel = CelestialBodyModel & {
     readonly accentColor: Color3;
 };
 
-export function newSeededMandelbulbModel(seed: number, starSystemModel: StarSystemModel, parentBody: CelestialBodyModel | null): MandelbulbModel {
+export function newSeededMandelbulbModel(seed: number, name: string, parentBody: CelestialBodyModel | null): MandelbulbModel {
     const rng = seededSquirrelNoise(seed);
-
-    const anomalyIndex = starSystemModel.getAnomalies().findIndex(([_, anomalySeed]) => anomalySeed === seed);
-    const name = `${starSystemModel.name} ${ReversedGreekAlphabet[anomalyIndex].toUpperCase()}`;
 
     const radius = 1000e3;
 

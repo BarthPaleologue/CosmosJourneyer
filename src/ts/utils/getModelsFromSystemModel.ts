@@ -13,7 +13,7 @@ import { GasPlanetModel, newSeededGasPlanetModel } from "../planets/gasPlanet/ga
 import { StarSystemModel } from "../starSystem/starSystemModel";
 import { CelestialBodyType } from "../architecture/celestialBody";
 import { newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
-import { getStellarObjectName } from "./parseToStrings";
+import { getAnomalyName, getStellarObjectName } from "./parseToStrings";
 
 export function getSpaceStationModels(system: StarSystemModel): SpaceStationModel[] {
     const spaceStationParents = placeSpaceStations(system);
@@ -54,12 +54,13 @@ export function getAnomalyModels(system: StarSystemModel): (MandelbulbModel | Ju
     const parentBodyModel = getStellarObjectModels(system)[0];
     for (let i = 0; i < anomalySeedAndTypes.length; i++) {
         const [anomalyType, seed] = anomalySeedAndTypes[i];
+        const anomalyName = getAnomalyName(system.name, i);
         switch (anomalyType) {
             case AnomalyType.MANDELBULB:
-                anomalyModels.push(newSeededMandelbulbModel(seed, system, parentBodyModel));
+                anomalyModels.push(newSeededMandelbulbModel(seed, anomalyName, parentBodyModel));
                 break;
             case AnomalyType.JULIA_SET:
-                anomalyModels.push(newSeededJuliaSetModel(seed, system, parentBodyModel));
+                anomalyModels.push(newSeededJuliaSetModel(seed, anomalyName, parentBodyModel));
                 break;
             default:
                 throw new Error(`Incorrect body type in the anomaly list: ${anomalyType}`);

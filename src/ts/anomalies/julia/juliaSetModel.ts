@@ -25,8 +25,6 @@ import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProp
 import { CelestialBodyModel, CelestialBodyType } from "../../architecture/celestialBody";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { ReversedGreekAlphabet } from "../../utils/parseToStrings";
-import { StarSystemModel } from "../../starSystem/starSystemModel";
 import i18n from "../../i18n";
 
 export type JuliaSetModel = CelestialBodyModel & {
@@ -35,11 +33,8 @@ export type JuliaSetModel = CelestialBodyModel & {
     readonly accentColor: Color3;
 };
 
-export function newSeededJuliaSetModel(seed: number, starSystem: StarSystemModel, parentBody: CelestialBodyModel | null): JuliaSetModel {
+export function newSeededJuliaSetModel(seed: number, name: string, parentBody: CelestialBodyModel | null): JuliaSetModel {
     const rng = seededSquirrelNoise(seed);
-
-    const anomalyIndex = starSystem.getAnomalies().findIndex(([_, anomalySeed]) => anomalySeed === seed);
-    const name = `${starSystem.name} ${ReversedGreekAlphabet[anomalyIndex].toUpperCase()}`;
 
     const radius = 1000e3;
 

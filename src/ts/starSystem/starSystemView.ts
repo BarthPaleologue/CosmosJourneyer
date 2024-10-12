@@ -87,7 +87,7 @@ import { StellarObject } from "../architecture/stellarObject";
 import { newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 import { newSeededBlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { newSeededStarModel } from "../stellarObjects/star/starModel";
-import { getStellarObjectName } from "../utils/parseToStrings";
+import { getAnomalyName, getStellarObjectName } from "../utils/parseToStrings";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -514,14 +514,15 @@ export class StarSystemView implements View {
         for (let i = 0; i < systemModel.getNbAnomalies(); i++) {
             console.log("Anomaly:", i + 1, "of", systemModel.getNbAnomalies());
             const anomalyType = systemModel.getAnomalyType(i);
+            const anomalyName = getAnomalyName(systemModel.name, i);
 
             let anomaly: Anomaly;
             switch (anomalyType) {
                 case AnomalyType.MANDELBULB:
-                    anomaly = this.starSystem.addMandelbulb(newSeededMandelbulbModel(systemModel.getAnomalySeed(i), systemModel, starSystem.stellarObjects[0].model));
+                    anomaly = this.starSystem.addMandelbulb(newSeededMandelbulbModel(systemModel.getAnomalySeed(i), anomalyName, starSystem.stellarObjects[0].model));
                     break;
                 case AnomalyType.JULIA_SET:
-                    anomaly = this.starSystem.addJuliaSet(newSeededJuliaSetModel(systemModel.getAnomalySeed(i), systemModel, starSystem.stellarObjects[0].model));
+                    anomaly = this.starSystem.addJuliaSet(newSeededJuliaSetModel(systemModel.getAnomalySeed(i), anomalyName, starSystem.stellarObjects[0].model));
                     break;
             }
 
