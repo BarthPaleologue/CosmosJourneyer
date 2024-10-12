@@ -86,7 +86,7 @@ import { SpaceStationModel } from "../spacestation/spacestationModel";
 import { StellarObject } from "../architecture/stellarObject";
 import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
-import { StarModel } from "../stellarObjects/star/starModel";
+import { newSeededStarModel, StarModel } from "../stellarObjects/star/starModel";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -450,7 +450,7 @@ export class StarSystemView implements View {
             const seed = systemModel.getStellarObjectSeed(i);
             switch (starSystem.model.getBodyTypeOfStellarObject(starSystem.stellarObjects.length)) {
                 case CelestialBodyType.STAR:
-                    stellarObject = starSystem.addStar(new StarModel(seed, systemModel), null);
+                    stellarObject = starSystem.addStar(newSeededStarModel(seed, systemModel, null), null);
                     break;
                 case CelestialBodyType.BLACK_HOLE:
                     stellarObject = starSystem.addBlackHole(new BlackHoleModel(seed, systemModel), null);

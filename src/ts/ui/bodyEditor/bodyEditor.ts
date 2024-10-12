@@ -226,7 +226,7 @@ export class BodyEditor {
             if (volumetricLight) {
                 this.starPanel.enable();
                 this.starPanel.setVisibility(this.currentPanel === this.starPanel);
-                this.starPanel.init(body, volumetricLight);
+                this.starPanel.init(volumetricLight);
             }
         } else if (body instanceof BlackHole) {
             const blackHole = postProcessManager.getBlackHole(body as BlackHole);

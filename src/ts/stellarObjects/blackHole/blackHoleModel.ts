@@ -49,7 +49,7 @@ export class BlackHoleModel implements StellarObjectModel {
     readonly rings = null;
 
     //TODO: compute temperature of accretion disk (function of rotation speed)
-    readonly temperature = 0;
+    readonly temperature = 7_000;
     readonly color = Color3.Black();
 
     readonly parentBody: CelestialBodyModel | null;

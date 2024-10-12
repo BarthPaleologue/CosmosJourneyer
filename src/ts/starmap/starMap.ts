@@ -39,7 +39,7 @@ import { TransformTranslationAnimation } from "../uberCore/transforms/animations
 import { translate } from "../uberCore/transforms/basicTransform";
 import { ThickLines } from "../utils/thickLines";
 import { Observable } from "@babylonjs/core/Misc/observable";
-import { StarModel } from "../stellarObjects/star/starModel";
+import { newSeededStarModel, StarModel } from "../stellarObjects/star/starModel";
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 import { View } from "../utils/view";
@@ -59,6 +59,8 @@ import { Player } from "../player/player";
 import { Settings } from "../settings";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../starSystem/starSystemModel";
 import { CelestialBodyType } from "../architecture/celestialBody";
+import { getRgbFromTemperature } from "../utils/specrend";
+import { StellarObjectModel } from "../architecture/stellarObject";
 
 export class StarMap implements View {
     readonly scene: Scene;
@@ -448,10 +450,10 @@ export class StarMap implements View {
         const starSeed = starSystemModel.getStellarObjectSeed(0);
         const stellarObjectType = starSystemModel.getBodyTypeOfStellarObject(0);
 
-        let starModel: StarModel | BlackHoleModel | NeutronStarModel | null = null;
+        let starModel: StellarObjectModel | null = null;
         switch (stellarObjectType) {
             case CelestialBodyType.STAR:
-                starModel = new StarModel(starSeed, starSystemModel);
+                starModel = newSeededStarModel(starSeed, starSystemModel, null);
                 break;
             case CelestialBodyType.BLACK_HOLE:
                 starModel = new BlackHoleModel(starSeed, starSystemModel);
@@ -488,12 +490,8 @@ export class StarMap implements View {
 
         initializedInstance.position = data.position.add(this.starMapCenterPosition);
 
-        if (starModel.bodyType === CelestialBodyType.STAR || starModel.bodyType === CelestialBodyType.NEUTRON_STAR) {
-            const starColor = starModel.color;
-            initializedInstance.instancedBuffers.color = new Color4(starColor.r, starColor.g, starColor.b, 0.0);
-        } else {
-            initializedInstance.instancedBuffers.color = new Color4(1.0, 0.6, 0.3, 0.0);
-        }
+        const objectColor = getRgbFromTemperature(starModel.temperature);
+        initializedInstance.instancedBuffers.color = new Color4(objectColor.r, objectColor.g, objectColor.b, 0.0);
 
         if (!recycled) {
             initializedInstance.isPickable = true;

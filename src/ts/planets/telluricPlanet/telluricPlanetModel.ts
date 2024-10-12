@@ -43,8 +43,6 @@ export type TelluricPlanetModel = PlanetModel & {
     readonly terrainSettings: TerrainSettings;
 
     readonly clouds: CloudsModel | null;
-
-    readonly nbMoons: number;
 };
 
 export function hasLiquidWater(telluricPlanetModel: TelluricPlanetModel): boolean {

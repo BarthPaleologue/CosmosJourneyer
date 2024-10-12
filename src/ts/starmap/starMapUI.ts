@@ -19,8 +19,7 @@ import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Scene } from "@babylonjs/core/scene";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import i18n from "../i18n";
-import { getStellarTypeString } from "../stellarObjects/common";
-import { StarModel } from "../stellarObjects/star/starModel";
+import { getStellarTypeFromTemperature, newSeededStarModel, StarModel } from "../stellarObjects/star/starModel";
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 import { getStarGalacticPosition, getSystemModelFromCoordinates } from "../utils/starSystemCoordinatesUtils";
@@ -32,6 +31,7 @@ import { Player } from "../player/player";
 import { SystemIcons } from "./systemIcons";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../starSystem/starSystemModel";
 import { CelestialBodyType } from "../architecture/celestialBody";
+import { getRgbFromTemperature } from "../utils/specrend";
 
 export class StarMapUI {
     readonly htmlRoot: HTMLDivElement;
@@ -317,7 +317,7 @@ export class StarMapUI {
         let starModel: StarModel | BlackHoleModel | NeutronStarModel;
         switch (stellarObjectType) {
             case CelestialBodyType.STAR:
-                starModel = new StarModel(starSeed, targetSystemModel);
+                starModel = newSeededStarModel(starSeed, targetSystemModel, null);
                 break;
             case CelestialBodyType.BLACK_HOLE:
                 starModel = new BlackHoleModel(starSeed, targetSystemModel);
@@ -332,15 +332,14 @@ export class StarMapUI {
         let typeString: string;
         if (starModel.bodyType === CelestialBodyType.BLACK_HOLE) typeString = i18n.t("objectTypes:blackHole");
         else if (starModel.bodyType === CelestialBodyType.NEUTRON_STAR) typeString = i18n.t("objectTypes:neutronStar");
-        else typeString = i18n.t("objectTypes:star", { stellarType: getStellarTypeString(starModel.stellarType) });
+        else typeString = i18n.t("objectTypes:star", { stellarType: getStellarTypeFromTemperature(starModel.temperature) });
 
         this.shortHandUISystemType.textContent = typeString;
         this.shortHandUIBookmarkButton.setSelectedSystemSeed(targetSystemModel.getCoordinates());
 
-        if (starModel instanceof StarModel) {
-            this.infoPanelStarPreview.style.background = starModel.color.toHexString();
-            this.infoPanelStarPreview.style.boxShadow = `0 0 20px ${starModel.color.toHexString()}`;
-        }
+        const objectColor = getRgbFromTemperature(starModel.temperature);
+        this.infoPanelStarPreview.style.background = objectColor.toHexString();
+        this.infoPanelStarPreview.style.boxShadow = `0 0 20px ${objectColor.toHexString()}`;
 
         this.infoPanelTitle.textContent = targetSystemModel.name;
         this.shortHandUITitle.textContent = targetSystemModel.name;

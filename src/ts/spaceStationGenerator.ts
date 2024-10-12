@@ -38,7 +38,7 @@ import { StarFieldBox } from "./starSystem/starFieldBox";
 import { CustomStarSystemModel } from "./starSystem/customStarSystemModel";
 
 import { CelestialBodyType } from "./architecture/celestialBody";
-import { StarModel } from "./stellarObjects/star/starModel";
+import { newSeededStarModel, StarModel } from "./stellarObjects/star/starModel";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -87,7 +87,7 @@ const starSystemModel = new CustomStarSystemModel(
     []
 );
 
-const sunModel = new StarModel(starSystemModel.getStellarObjectSeed(0), starSystemModel);
+const sunModel = newSeededStarModel(starSystemModel.getStellarObjectSeed(0), starSystemModel, null);
 const sun = new Star(sunModel, scene);
 sun.getTransform().position = new Vector3(7, 2, 5).normalize().scaleInPlace(distanceToStar);
 

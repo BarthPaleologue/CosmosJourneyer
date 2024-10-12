@@ -20,12 +20,10 @@ import { ObjectPostProcess } from "./objectPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { moveTowards } from "../utils/moveTowards";
-import { Star } from "../stellarObjects/star/star";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { Matrix } from "@babylonjs/core/Maths/math";
 import { StellarObject } from "../architecture/stellarObject";
-import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { ObjectUniformNames, setObjectUniforms } from "./uniforms/objectUniforms";
 import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms";
@@ -34,6 +32,7 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Scene } from "@babylonjs/core/scene";
+import { getRgbFromTemperature } from "../utils/specrend";
 
 export type LensFlareSettings = {
     visibility: number;
@@ -75,6 +74,8 @@ export class LensFlarePostProcess extends PostProcess implements ObjectPostProce
         this.object = object;
         this.settings = settings;
 
+        const flareColor = getRgbFromTemperature(object.model.temperature);
+
         this.onActivateObservable.add((camera) => {
             this.activeCamera = camera;
         });
@@ -87,7 +88,7 @@ export class LensFlarePostProcess extends PostProcess implements ObjectPostProce
             setCameraUniforms(effect, this.activeCamera);
             setObjectUniforms(effect, object);
 
-            effect.setColor3(LensFlareUniformNames.FLARE_COLOR, object instanceof Star ? object.model.color : new Color3(1, 1, 1));
+            effect.setColor3(LensFlareUniformNames.FLARE_COLOR, flareColor);
 
             const clipPosition = Vector3.Project(object.getTransform().getAbsolutePosition(), Matrix.IdentityReadOnly, scene.getTransformMatrix(), this.activeCamera.viewport);
             settings.behindCamera = clipPosition.z < 0;

@@ -17,7 +17,6 @@
 
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { CelestialBody, CelestialBodyModel } from "./celestialBody";
-import { Color3 } from "@babylonjs/core/Maths/math.color";
 
 export interface StellarObject extends CelestialBody {
     model: StellarObjectModel;
@@ -26,6 +25,8 @@ export interface StellarObject extends CelestialBody {
 }
 
 export interface StellarObjectModel extends CelestialBodyModel {
+    /**
+     * Black body temperature of the object in Kelvin
+     */
     readonly temperature: number;
-    readonly color: Color3;
 }

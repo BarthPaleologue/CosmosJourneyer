@@ -39,6 +39,7 @@ import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProp
 import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { Orbit } from "../../orbit/orbit";
+import { getRgbFromTemperature } from "../../utils/specrend";
 
 export class Star implements StellarObject, Cullable {
     readonly name: string;
@@ -93,8 +94,8 @@ export class Star implements StellarObject, Cullable {
         this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
         this.aggregate.body.disablePreStep = false;
 
-        this.light = new PointLight(`${name}Light`, Vector3.Zero(), scene);
-        this.light.diffuse.copyFrom(this.model.color);
+        this.light = new PointLight(`${this.name}Light`, Vector3.Zero(), scene);
+        this.light.diffuse = getRgbFromTemperature(this.model.temperature);
         this.light.falloffType = Light.FALLOFF_STANDARD;
         this.light.parent = this.getTransform();
 

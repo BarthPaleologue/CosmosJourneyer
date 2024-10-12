@@ -33,23 +33,7 @@ import { StarSystemModel } from "../../starSystem/starSystemModel";
 import i18n from "../../i18n";
 
 export type GasPlanetModel = PlanetModel & {
-    readonly name: string;
     readonly bodyType: CelestialBodyType.GAS_PLANET;
-    readonly seed: number;
-
-    readonly radius: number;
-
-    readonly orbit: Orbit;
-
-    readonly physicalProperties: PlanetPhysicalProperties;
-
-    readonly rings: RingsModel | null;
-
-    readonly nbMoons: number;
-
-    readonly parentBody: CelestialBodyModel | null;
-
-    readonly typeName: string;
 };
 
 export function newSeededGasPlanetModel(seed: number, starSystem: StarSystemModel, parentBody: CelestialBodyModel | null): GasPlanetModel {

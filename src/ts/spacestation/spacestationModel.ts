@@ -32,7 +32,7 @@ import { Faction } from "../society/factions";
 import { getPowerPlayData } from "../society/powerplay";
 import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
-import { StarModel } from "../stellarObjects/star/starModel";
+import { newSeededStarModel } from "../stellarObjects/star/starModel";
 import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
 import { Settings } from "../settings";
 import i18n from "../i18n";
@@ -145,7 +145,7 @@ export class SpaceStationModel implements OrbitalObjectModel {
                 starModel = new BlackHoleModel(starModelBuildInfo[1], starSystemModel);
                 break;
             case CelestialBodyType.STAR:
-                starModel = new StarModel(starModelBuildInfo[1], starSystemModel);
+                starModel = newSeededStarModel(starModelBuildInfo[1], starSystemModel, null);
                 break;
             default:
                 throw new Error("Unknown star type");

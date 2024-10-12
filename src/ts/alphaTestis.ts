@@ -25,22 +25,18 @@ import { CosmosJourneyer } from "./cosmosJourneyer";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PostProcessType } from "./postProcesses/postProcessTypes";
 import { newSeededTelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModel";
-import { GasPlanetModel, newSeededGasPlanetModel } from "./planets/gasPlanet/gasPlanetModel";
+import { newSeededGasPlanetModel } from "./planets/gasPlanet/gasPlanetModel";
 import { getMoonSeed } from "./planets/common";
 import { SpaceShipControlsInputs } from "./spaceship/spaceShipControlsInputs";
 import { CustomStarSystemModel } from "./starSystem/customStarSystemModel";
 
 import { CelestialBodyType } from "./architecture/celestialBody";
-import { StarModel } from "./stellarObjects/star/starModel";
+import { newSeededStarModel } from "./stellarObjects/star/starModel";
 import { SpaceStationModel } from "./spacestation/spacestationModel";
 
 const engine = await CosmosJourneyer.CreateAsync();
 
 const starSystemView = engine.starSystemView;
-
-const spaceshipController = starSystemView.getSpaceshipControls();
-
-const characterController = starSystemView.getCharacterControls();
 
 // const physicsViewer = new PhysicsViewer();
 // physicsViewer.showBody(spaceshipController.aggregate.body);
@@ -70,7 +66,7 @@ const starSystem = new StarSystemController(starSystemModel, starSystemView.scen
 
 await starSystemView.loadStarSystem(starSystem, false);
 
-const sunModel = new StarModel(starSystemModel.getStellarObjectSeed(0), starSystemModel);
+const sunModel = newSeededStarModel(starSystemModel.getStellarObjectSeed(0), starSystemModel, null);
 const sun = starSystem.addStar(sunModel, null);
 sun.model.orbit.period = 60 * 60 * 24;
 
