@@ -27,16 +27,16 @@ import { hashVec3 } from "../utils/hashVec3";
 import { CelestialBodyType } from "../architecture/celestialBody";
 import { StellarObjectModel } from "../architecture/stellarObject";
 import { AnomalyModel } from "../anomalies/anomaly";
-import { getAnomalyName, getStellarObjectName } from "../utils/parseToStrings";
+import { Alphabet, ReversedGreekAlphabet } from "../utils/parseToStrings";
 import { newSeededStarModel } from "../stellarObjects/star/starModel";
 import { newSeededBlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
-import { getMoonSeed, getPlanetName } from "../planets/common";
 import { newSeededTelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 import { newSeededGasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 import { newSeededMandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModel";
 import { newSeededJuliaSetModel } from "../anomalies/julia/juliaSetModel";
 import { getRngFromSeed } from "../utils/getRngFromSeed";
+import { romanNumeral } from "../utils/romanNumerals";
 
 const enum GenerationSteps {
     NAME,
@@ -45,20 +45,41 @@ const enum GenerationSteps {
     NB_PLANETS = 30,
     PLANETS = 200,
     PLANET_TYPE = 400,
+    MOONS = 11,
     ANOMALIES = 666
 }
 
+/**
+ * Seed used to generate star systems in a pseudo-random fashion.
+ */
 export type SystemSeed = {
+    /**
+     * The X coordinate of the star sector (integer).
+     */
     starSectorX: number;
+    /**
+     * The Y coordinate of the star sector (integer).
+     */
     starSectorY: number;
+    /**
+     * The Z coordinate of the star sector (integer).
+     */
     starSectorZ: number;
+    /**
+     * The index of the system inside its star sector (integer).
+     */
     index: number;
 };
 
+/**
+ * Generates a new star system data model given a seed using a pseudo-random number generator.
+ * @param seed The seed of the star system.
+ * @returns The data model of the generated star system.
+ */
 export function newSeededStarSystemModel(seed: SystemSeed): StarSystemModel {
+    // extract coordinates from seed
     const starSector = new StarSector(new Vector3(seed.starSectorX, seed.starSectorY, seed.starSectorZ));
     const localPosition = starSector.getLocalPositionOfStar(seed.index);
-
     const coordinates = {
         starSectorX: seed.starSectorX,
         starSectorY: seed.starSectorY,
@@ -68,19 +89,20 @@ export function newSeededStarSystemModel(seed: SystemSeed): StarSystemModel {
         localZ: localPosition.z
     };
 
+    // init pseudo-random number generator
     const cellRNG = getRngFromSeed(hashVec3(seed.starSectorX, seed.starSectorY, seed.starSectorZ));
     const hash = centeredRand(cellRNG, 1 + seed.index) * Settings.SEED_HALF_RANGE;
-
     const rng = getRngFromSeed(hash);
 
-    const name = generateStarName(rng, GenerationSteps.NAME);
+    const systemName = generateStarName(rng, GenerationSteps.NAME);
 
+    // generate stellar objects of the system first (we can assume the other objects don't have a significant influence on the stellar objects)
     const stellarObjects: StellarObjectModel[] = [];
     const nbStellarObjects = 1;
     for (let i = 0; i < nbStellarObjects; i++) {
         const stellarObjectType = getBodyTypeOfStellarObject(rng, i);
         const seed = centeredRand(rng, GenerationSteps.STARS + i) * Settings.SEED_HALF_RANGE;
-        const stellarObjectName = getStellarObjectName(name, i);
+        const stellarObjectName = `${systemName} ${Alphabet[i].toUpperCase()}`;
         switch (stellarObjectType) {
             case CelestialBodyType.STAR:
                 stellarObjects.push(newSeededStarModel(seed, stellarObjectName, null));
@@ -96,13 +118,13 @@ export function newSeededStarSystemModel(seed: SystemSeed): StarSystemModel {
         }
     }
 
-    // Planets
+    // Afterward planets are generated. We can assume they only depend on the stellar objects.
     const planetarySystems: PlanetarySystem[] = [];
-    //Fixme: will not apply when more than one star
+    //Fixme: planets need to work with black holes as well at some point
     const nbPlanets = stellarObjects[0].bodyType === CelestialBodyType.BLACK_HOLE ? 0 : randRangeInt(0, 7, rng, GenerationSteps.NB_PLANETS);
     for (let i = 0; i < nbPlanets; i++) {
         const bodyType = uniformRandBool(0.5, rng, GenerationSteps.PLANET_TYPE + i) ? CelestialBodyType.TELLURIC_PLANET : CelestialBodyType.GAS_PLANET;
-        const planetName = getPlanetName(i, name, stellarObjects[0]);
+        const planetName = `${systemName} ${romanNumeral(i + 1)}`;
 
         const seed = centeredRand(rng, GenerationSteps.PLANETS + i) * Settings.SEED_HALF_RANGE;
 
@@ -124,15 +146,18 @@ export function newSeededStarSystemModel(seed: SystemSeed): StarSystemModel {
         }
     }
 
-    // Satellites
+    // For each planet, generate satellites
     planetarySystems.forEach(({ planet, satellites }) => {
+        const planetRng = getRngFromSeed(planet.seed);
         for (let j = 0; j < planet.nbMoons; j++) {
-            const satelliteName = getPlanetName(j, name, planet);
-            const satelliteModel = newSeededTelluricPlanetModel(getMoonSeed(planet, j), satelliteName, planet);
+            const satelliteName = `${planet.name}${Alphabet[j]}`;
+            const satelliteSeed = centeredRand(planetRng, GenerationSteps.MOONS + j) * Settings.SEED_HALF_RANGE;
+            const satelliteModel = newSeededTelluricPlanetModel(satelliteSeed, satelliteName, planet);
             satellites.push(satelliteModel);
         }
     });
 
+    // Finally, generate anomalies
     const anomalies: AnomalyModel[] = [];
     const nbAnomalies = wheelOfFortune(
         [
@@ -142,12 +167,10 @@ export function newSeededStarSystemModel(seed: SystemSeed): StarSystemModel {
         ],
         rng(GenerationSteps.ANOMALIES * 16)
     );
-
-    // Anomalies
     for (let i = 0; i < nbAnomalies; i++) {
         const anomalySeed = centeredRand(rng, GenerationSteps.ANOMALIES + i * 100) * Settings.SEED_HALF_RANGE;
         const anomalyType = uniformRandBool(0.5, rng, GenerationSteps.ANOMALIES + i * 300) ? AnomalyType.MANDELBULB : AnomalyType.JULIA_SET;
-        const anomalyName = getAnomalyName(name, i);
+        const anomalyName = `${systemName} ${ReversedGreekAlphabet[i].toUpperCase()}`;
 
         const stellarObjectModel = stellarObjects[0];
 
@@ -162,7 +185,7 @@ export function newSeededStarSystemModel(seed: SystemSeed): StarSystemModel {
     }
 
     return {
-        name,
+        name: systemName,
         coordinates,
         stellarObjects,
         planetarySystems,
@@ -171,8 +194,9 @@ export function newSeededStarSystemModel(seed: SystemSeed): StarSystemModel {
 }
 
 /**
- * Get the body type of the star
- * @param index
+ * Get the body type of the stellar object at the given index using real-world statistics.
+ * @param rng Random number generator
+ * @param index Index of the stellar object
  * @see https://physics.stackexchange.com/questions/442154/how-common-are-neutron-stars
  */
 function getBodyTypeOfStellarObject(rng: (index: number) => number, index: number) {

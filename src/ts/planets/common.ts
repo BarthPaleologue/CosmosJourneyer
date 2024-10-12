@@ -17,36 +17,11 @@
 
 import { centeredRand } from "extended-random";
 import { Settings } from "../settings";
-import { PlanetModel } from "../architecture/planet";
-import { CelestialBodyModel, CelestialBodyType } from "../architecture/celestialBody";
+import { CelestialBodyModel } from "../architecture/celestialBody";
 import { GenerationSteps } from "../utils/generationSteps";
-import { romanNumeral } from "../utils/romanNumerals";
-import { Alphabet } from "../utils/parseToStrings";
 import { getRngFromSeed } from "../utils/getRngFromSeed";
-
-export function getMoonSeed(model: PlanetModel, index: number) {
-    if (index > model.nbMoons) throw new Error("Moon out of bound! " + index);
-    const rng = getRngFromSeed(model.seed);
-    return centeredRand(rng, GenerationSteps.MOONS + index) * Settings.SEED_HALF_RANGE;
-}
 
 export function getSpaceStationSeed(model: CelestialBodyModel, index: number) {
     const rng = getRngFromSeed(model.seed);
     return centeredRand(rng, GenerationSteps.SPACE_STATIONS + index) * Settings.SEED_HALF_RANGE;
-}
-
-export function getPlanetName(planetIndex: number, starSystemName: string, parentBody: CelestialBodyModel | null): string {
-    if (parentBody === null) {
-        return `${starSystemName} Rogue`;
-    }
-
-    const isSatellite = parentBody.bodyType === CelestialBodyType.TELLURIC_PLANET || parentBody.bodyType === CelestialBodyType.GAS_PLANET;
-
-    if (planetIndex === -1) throw new Error("Planet not found in star system");
-
-    if (isSatellite) {
-        return `${parentBody.name}${Alphabet[planetIndex]}`;
-    }
-
-    return `${starSystemName} ${romanNumeral(planetIndex + 1)}`;
 }

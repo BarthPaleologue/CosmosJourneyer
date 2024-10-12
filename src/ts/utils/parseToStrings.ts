@@ -17,7 +17,6 @@
 
 import { Settings } from "../settings";
 import i18n from "../i18n";
-import { SystemObjectType } from "../saveFile/universeCoordinates";
 
 export function parseSpeed(speed: number): string {
     if (speed < 1000) {
@@ -75,24 +74,3 @@ export const Alphabet = "abcdefghijklmnopqrstuvwxyz";
 
 export const GreekAlphabet = "αβγδεζηθικλμνξοπρστυφχψω";
 export const ReversedGreekAlphabet = GreekAlphabet.split("").reverse().join("");
-
-export function getStellarObjectName(baseName: string, index: number): string {
-    return `${baseName} ${Alphabet[index].toUpperCase()}`;
-}
-
-export function getAnomalyName(baseName: string, index: number): string {
-    return `${baseName} ${ReversedGreekAlphabet[index].toUpperCase()}`;
-}
-
-export function systemObjectTypeToString(systemObjectType: SystemObjectType): string {
-    switch (systemObjectType) {
-        case SystemObjectType.ANOMALY:
-            return i18n.t("anomaly");
-        case SystemObjectType.PLANETARY_MASS_OBJECT:
-            return i18n.t("planet");
-        case SystemObjectType.SPACE_STATION:
-            return i18n.t("spaceStation");
-        case SystemObjectType.STELLAR_OBJECT:
-            return i18n.t("stellarObject");
-    }
-}

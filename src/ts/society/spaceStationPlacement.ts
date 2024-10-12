@@ -1,6 +1,5 @@
 import { CelestialBodyModel } from "../architecture/celestialBody";
 import { PlanetModel } from "../architecture/planet";
-import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
 import { getPlanets, StarSystemModel } from "../starSystem/starSystemModel";
 
 /**
