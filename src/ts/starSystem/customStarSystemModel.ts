@@ -16,25 +16,34 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { StarSystemModel } from "./starSystemModel";
-import { AnomalyType } from "../anomalies/anomalyType";
-import { CelestialBodyType } from "../architecture/celestialBody";
 import { StarSystemCoordinates } from "../saveFile/universeCoordinates";
+import { StellarObjectModel } from "../architecture/stellarObject";
+import { PlanetModel } from "../architecture/planet";
+import { AnomalyModel } from "../anomalies/anomaly";
+import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 
 export class CustomStarSystemModel implements StarSystemModel {
     readonly name: string;
 
     private readonly coordinates: StarSystemCoordinates;
 
-    readonly stellarObjects: [CelestialBodyType, number][];
-    readonly planets: [CelestialBodyType, number][];
-    readonly anomalies: [AnomalyType, number][];
+    private readonly stellarObjectModels: StellarObjectModel[];
 
-    constructor(name: string, coordinates: StarSystemCoordinates, stellarObjects: [CelestialBodyType, number][], planets: [CelestialBodyType, number][], anomalies: [AnomalyType, number][]) {
+    private readonly planets: [PlanetModel, TelluricPlanetModel[]][];
+    private readonly anomalies: AnomalyModel[];
+
+    constructor(
+        name: string,
+        coordinates: StarSystemCoordinates,
+        stellarObjects: StellarObjectModel[],
+        planets: [PlanetModel, TelluricPlanetModel[]][],
+        anomalies: AnomalyModel[]
+    ) {
         this.name = name;
 
         this.coordinates = coordinates;
 
-        this.stellarObjects = stellarObjects;
+        this.stellarObjectModels = stellarObjects;
         this.planets = planets;
         this.anomalies = anomalies;
     }
@@ -44,56 +53,36 @@ export class CustomStarSystemModel implements StarSystemModel {
     }
 
     getNbStellarObjects(): number {
-        return this.stellarObjects.length;
+        return this.stellarObjectModels.length;
     }
 
-    getStellarObjectSeed(index: number): number {
-        if (index > this.getNbStellarObjects()) throw new Error("Star out of bound! " + index);
-        return this.stellarObjects[index][1];
-    }
-
-    getStellarObjects(): [CelestialBodyType, number][] {
-        return this.stellarObjects;
-    }
-
-    getBodyTypeOfStellarObject(index: number): CelestialBodyType {
-        if (index > this.getNbStellarObjects()) throw new Error("Star out of bound! " + index);
-        return this.stellarObjects[index][0];
+    getStellarObjects(): StellarObjectModel[] {
+        return this.stellarObjectModels;
     }
 
     getNbPlanets(): number {
         return this.planets.length;
     }
 
-    getPlanets(): [CelestialBodyType, number][] {
-        return this.planets;
-    }
-
-    getPlanetSeed(index: number): number {
-        if (index > this.getNbPlanets()) throw new Error("Planet out of bound! " + index);
-        return this.planets[index][1];
-    }
-
-    getBodyTypeOfPlanet(index: number): CelestialBodyType {
-        if (index > this.getNbPlanets()) throw new Error("Planet out of bound! " + index);
-        return this.planets[index][0];
-    }
-
     getNbAnomalies(): number {
         return this.anomalies.length;
     }
 
-    getAnomalies(): [AnomalyType, number][] {
+    getAnomalies(): AnomalyModel[] {
         return this.anomalies;
     }
 
-    getAnomalySeed(index: number): number {
-        if (index > this.getNbAnomalies()) throw new Error("Anomaly out of bound! " + index);
-        return this.anomalies[index][1];
+    getPlanet(): PlanetModel[] {
+        return this.planets.map(([planet, moons]) => planet);
     }
 
-    getAnomalyType(index: number): AnomalyType {
-        if (index > this.getNbAnomalies()) throw new Error("Anomaly out of bound! " + index);
-        return this.anomalies[index][0];
+    getSatellitesOfPlanet(index: number): TelluricPlanetModel[] {
+        const planetAndSatellites = this.planets.at(index);
+        if (planetAndSatellites === undefined) throw new Error("Planet out of bound! " + index);
+        return planetAndSatellites[1];
+    }
+
+    getPlanetaryMassObjects(): PlanetModel[] {
+        return this.planets.flatMap(([planet, moons]) => [planet, ...moons]);
     }
 }

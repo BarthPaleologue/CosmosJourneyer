@@ -4,7 +4,6 @@ import { newSightSeeingMission } from "./sightSeeingMission";
 import { uniformRandBool } from "extended-random";
 import { SystemObjectType } from "../saveFile/universeCoordinates";
 import { Player } from "../player/player";
-import { getPlanetaryMassObjectModels } from "../utils/getModelsFromSystemModel";
 import { hasLiquidWater, TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 import { Mission, MissionType } from "./mission";
 import { getSystemModelFromCoordinates } from "../utils/starSystemCoordinatesUtils";
@@ -31,7 +30,7 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
     const neighborSystems = getNeighborStarSystemCoordinates(starSystem.getCoordinates(), 75);
     neighborSystems.forEach(([systemCoordinates, coordinates, distance]) => {
         const systemModel = getSystemModelFromCoordinates(systemCoordinates);
-        systemModel.getAnomalies().forEach((_, anomalyIndex) => {
+        for (let anomalyIndex = 0; anomalyIndex < systemModel.getNbAnomalies(); anomalyIndex++) {
             if (!uniformRandBool(1.0 / (1.0 + 0.4 * distance), systemModel.rng, 6254 + anomalyIndex + currentHour)) return;
             anomalyFlyByMissions.push(
                 newSightSeeingMission(spaceStationModel, {
@@ -43,10 +42,9 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
                     }
                 })
             );
-        });
-
-        systemModel.getStellarObjects().forEach(([bodyType, bodySeed], stellarObjectIndex) => {
-            if (bodyType === CelestialBodyType.NEUTRON_STAR) {
+        }
+        systemModel.getStellarObjects().forEach((model, stellarObjectIndex) => {
+            if (model.bodyType === CelestialBodyType.NEUTRON_STAR) {
                 neutronStarFlyByMissions.push(
                     newSightSeeingMission(spaceStationModel, {
                         type: MissionType.SIGHT_SEEING_FLY_BY,
@@ -58,7 +56,7 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
                     })
                 );
             }
-            if (bodyType === CelestialBodyType.BLACK_HOLE) {
+            if (model.bodyType === CelestialBodyType.BLACK_HOLE) {
                 blackHoleFlyByMissions.push(
                     newSightSeeingMission(spaceStationModel, {
                         type: MissionType.SIGHT_SEEING_FLY_BY,
@@ -78,7 +76,7 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
     // for terminator landing missions, find all telluric planets with no liquid water
     const terminatorLandingMissions: Mission[] = [];
     const currentSystemModel = starSystem;
-    getPlanetaryMassObjectModels(currentSystemModel).forEach((celestialBodyModel, index) => {
+    currentSystemModel.getPlanetaryMassObjects().forEach((celestialBodyModel, index) => {
         if (celestialBodyModel.rings !== null) {
             asteroidFieldMissions.push(
                 newSightSeeingMission(spaceStationModel, {

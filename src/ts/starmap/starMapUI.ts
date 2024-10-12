@@ -19,9 +19,7 @@ import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Scene } from "@babylonjs/core/scene";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import i18n from "../i18n";
-import { getStellarTypeFromTemperature, newSeededStarModel, StarModel } from "../stellarObjects/star/starModel";
-import { BlackHoleModel, newSeededBlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
-import { NeutronStarModel, newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
+import { getStellarTypeFromTemperature } from "../stellarObjects/star/starModel";
 import { getStarGalacticPosition, getSystemModelFromCoordinates } from "../utils/starSystemCoordinatesUtils";
 import { factionToString } from "../society/factions";
 import { isSystemInHumanBubble } from "../society/starSystemSociety";
@@ -31,7 +29,6 @@ import { Player } from "../player/player";
 import { SystemIcons } from "./systemIcons";
 import { CelestialBodyType } from "../architecture/celestialBody";
 import { getRgbFromTemperature } from "../utils/specrend";
-import { getStellarObjectName } from "../utils/parseToStrings";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../saveFile/universeCoordinates";
 
 export class StarMapUI {
@@ -312,23 +309,7 @@ export class StarMapUI {
             this.shortHandUIDistanceFromCurrent.textContent = `${i18n.t("starMap:distanceFromCurrent")}: ${Vector3.Distance(currentCoordinates, targetPosition).toFixed(1)} ${i18n.t("units:ly")}`;
         }
 
-        const starSeed = targetSystemModel.getStellarObjectSeed(0);
-        const stellarObjectType = targetSystemModel.getBodyTypeOfStellarObject(0);
-        const stellarObjectName = getStellarObjectName(targetSystemModel.name, 0);
-        let starModel: StarModel | BlackHoleModel | NeutronStarModel;
-        switch (stellarObjectType) {
-            case CelestialBodyType.STAR:
-                starModel = newSeededStarModel(starSeed, stellarObjectName, null);
-                break;
-            case CelestialBodyType.BLACK_HOLE:
-                starModel = newSeededBlackHoleModel(starSeed, stellarObjectName, null);
-                break;
-            case CelestialBodyType.NEUTRON_STAR:
-                starModel = newSeededNeutronStarModel(starSeed, stellarObjectName, null);
-                break;
-            default:
-                throw new Error("Unknown stellar object type!");
-        }
+        const starModel = targetSystemModel.getStellarObjects()[0];
 
         let typeString: string;
         if (starModel.bodyType === CelestialBodyType.BLACK_HOLE) typeString = i18n.t("objectTypes:blackHole");

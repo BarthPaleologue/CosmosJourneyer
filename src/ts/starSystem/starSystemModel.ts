@@ -15,9 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AnomalyType } from "../anomalies/anomalyType";
-import { CelestialBodyType } from "../architecture/celestialBody";
 import { StarSystemCoordinates } from "../saveFile/universeCoordinates";
+import { StellarObjectModel } from "../architecture/stellarObject";
+import { PlanetModel } from "../architecture/planet";
+import { AnomalyModel } from "../anomalies/anomaly";
+import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 
 export interface StarSystemModel {
     readonly name: string;
@@ -26,25 +28,17 @@ export interface StarSystemModel {
 
     getNbStellarObjects(): number;
 
+    getStellarObjects(): StellarObjectModel[];
+
     getNbPlanets(): number;
+
+    getPlanet(): PlanetModel[];
+
+    getSatellitesOfPlanet(index: number): TelluricPlanetModel[];
+
+    getPlanetaryMassObjects(): PlanetModel[];
 
     getNbAnomalies(): number;
 
-    getStellarObjectSeed(index: number): number;
-
-    getStellarObjects(): [CelestialBodyType, number][];
-
-    getBodyTypeOfStellarObject(index: number): CelestialBodyType;
-
-    getPlanetSeed(index: number): number;
-
-    getPlanets(): [CelestialBodyType, number][];
-
-    getBodyTypeOfPlanet(index: number): CelestialBodyType;
-
-    getAnomalySeed(index: number): number;
-
-    getAnomalies(): [AnomalyType, number][];
-
-    getAnomalyType(index: number): AnomalyType;
+    getAnomalies(): AnomalyModel[];
 }

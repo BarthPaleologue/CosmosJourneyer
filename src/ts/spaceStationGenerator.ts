@@ -72,6 +72,12 @@ const distanceToStar = 25000 * Settings.EARTH_RADIUS;
 defaultControls.getTransform().setAbsolutePosition(new Vector3(0, 2, -3).normalize().scaleInPlace(40e3));
 defaultControls.getTransform().lookAt(Vector3.Zero());
 
+const sunModel = newSeededStarModel(456, "Untitled Star", null);
+const sun = new Star(sunModel, scene);
+sun.getTransform().position = new Vector3(7, 2, 5).normalize().scaleInPlace(distanceToStar);
+
+const starfieldBox = new StarFieldBox(scene);
+
 const starSystemModel = new CustomStarSystemModel(
     "Space Station Generator",
     {
@@ -82,16 +88,10 @@ const starSystemModel = new CustomStarSystemModel(
         localY: 0,
         localZ: 0
     },
-    [[CelestialBodyType.STAR, 4413.641464990006]],
+    [sunModel],
     [],
     []
 );
-
-const sunModel = newSeededStarModel(starSystemModel.getStellarObjectSeed(0), "Untitled Star", null);
-const sun = new Star(sunModel, scene);
-sun.getTransform().position = new Vector3(7, 2, 5).normalize().scaleInPlace(distanceToStar);
-
-const starfieldBox = new StarFieldBox(scene);
 
 const spaceStationModel = newSeededSpaceStationModel(Math.random() * Settings.SEED_HALF_RANGE, sunModel, starSystemModel.getCoordinates(), sun.model);
 spaceStationModel.orbit.radius = distanceToStar;

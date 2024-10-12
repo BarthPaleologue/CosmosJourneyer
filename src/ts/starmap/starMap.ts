@@ -39,9 +39,6 @@ import { TransformTranslationAnimation } from "../uberCore/transforms/animations
 import { translate } from "../uberCore/transforms/basicTransform";
 import { ThickLines } from "../utils/thickLines";
 import { Observable } from "@babylonjs/core/Misc/observable";
-import { newSeededStarModel } from "../stellarObjects/star/starModel";
-import { newSeededBlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
-import { newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 import { View } from "../utils/view";
 import { AudioInstance } from "../utils/audioInstance";
 import { AudioManager } from "../audio/audioManager";
@@ -59,8 +56,6 @@ import { Player } from "../player/player";
 import { Settings } from "../settings";
 import { CelestialBodyType } from "../architecture/celestialBody";
 import { getRgbFromTemperature } from "../utils/specrend";
-import { StellarObjectModel } from "../architecture/stellarObject";
-import { getStellarObjectName } from "../utils/parseToStrings";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../saveFile/universeCoordinates";
 
 export class StarMap implements View {
@@ -448,30 +443,12 @@ export class StarMap implements View {
         const starSystemModel = getSystemModelFromCoordinates(data.coordinates);
         const starSystemCoordinates = starSystemModel.getCoordinates();
 
-        const starSeed = starSystemModel.getStellarObjectSeed(0);
-        const stellarObjectType = starSystemModel.getBodyTypeOfStellarObject(0);
-
-        let starModel: StellarObjectModel | null = null;
-        const stellarObjectName = getStellarObjectName(starSystemModel.name, 0);
-        switch (stellarObjectType) {
-            case CelestialBodyType.STAR:
-                starModel = newSeededStarModel(starSeed, stellarObjectName, null);
-                break;
-            case CelestialBodyType.BLACK_HOLE:
-                starModel = newSeededBlackHoleModel(starSeed, stellarObjectName, null);
-                break;
-            case CelestialBodyType.NEUTRON_STAR:
-                starModel = newSeededNeutronStarModel(starSeed, stellarObjectName, null);
-                break;
-            default:
-                throw new Error("Unknown stellar object type!");
-        }
-        if (starModel === null) throw new Error("Star model is null!");
+        const stellarObjectModel = starSystemModel.getStellarObjects()[0];
 
         let instance: InstancedMesh | null = null;
         let recycled = false;
 
-        if (stellarObjectType === CelestialBodyType.STAR || stellarObjectType === CelestialBodyType.NEUTRON_STAR) {
+        if (stellarObjectModel.bodyType === CelestialBodyType.STAR || stellarObjectModel.bodyType === CelestialBodyType.NEUTRON_STAR) {
             if (this.recycledStars.length > 0) {
                 instance = this.recycledStars[0];
                 this.recycledStars.shift();
@@ -492,7 +469,7 @@ export class StarMap implements View {
 
         initializedInstance.position = data.position.add(this.starMapCenterPosition);
 
-        const objectColor = getRgbFromTemperature(starModel.temperature);
+        const objectColor = getRgbFromTemperature(stellarObjectModel.temperature);
         initializedInstance.instancedBuffers.color = new Color4(objectColor.r, objectColor.g, objectColor.b, 0.0);
 
         if (!recycled) {
@@ -531,7 +508,7 @@ export class StarMap implements View {
 
         this.fadeIn(initializedInstance);
 
-        if (starModel.bodyType === CelestialBodyType.BLACK_HOLE) this.loadedStarSectors.get(data.sectorString)?.blackHoleInstances.push(initializedInstance);
+        if (stellarObjectModel.bodyType === CelestialBodyType.BLACK_HOLE) this.loadedStarSectors.get(data.sectorString)?.blackHoleInstances.push(initializedInstance);
         else this.loadedStarSectors.get(data.sectorString)?.starInstances.push(initializedInstance);
     }
 

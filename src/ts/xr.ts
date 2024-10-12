@@ -31,11 +31,8 @@ import { JuliaSet } from "./anomalies/julia/juliaSet";
 import { JuliaSetPostProcess } from "./anomalies/julia/juliaSetPostProcess";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
 import { ArcRotateCamera, Engine } from "@babylonjs/core";
-import { CustomStarSystemModel } from "./starSystem/customStarSystemModel";
-import { AnomalyType } from "./anomalies/anomalyType";
 import { newSeededMandelbulbModel } from "./anomalies/mandelbulb/mandelbulbModel";
 import { newSeededJuliaSetModel } from "./anomalies/julia/juliaSetModel";
-import { getAnomalyName } from "./utils/parseToStrings";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -56,23 +53,8 @@ camera.wheelPrecision *= 100;
 
 const depthRenderer = scene.enableDepthRenderer(null, false, true);
 
-const starSystemModel = new CustomStarSystemModel(
-    "XR System",
-    {
-        starSectorX: 0,
-        starSectorY: 0,
-        starSectorZ: 0,
-        localX: 0,
-        localY: 0,
-        localZ: 0
-    },
-    [],
-    [],
-    [[AnomalyType.JULIA_SET, Math.random() * 10000]]
-);
-
 function createMandelbulb(): TransformNode {
-    const mandelBulbModel = newSeededMandelbulbModel(starSystemModel.getAnomalySeed(0), getAnomalyName(starSystemModel.name, 0), null);
+    const mandelBulbModel = newSeededMandelbulbModel(Math.random() * 100_000, "XR Anomaly", null);
     const mandelbulb = new Mandelbulb(mandelBulbModel, scene, null);
     mandelbulb.getTransform().scalingDeterminant = 1 / 400e3;
 
@@ -91,7 +73,7 @@ function createMandelbulb(): TransformNode {
 }
 
 function createJulia(): TransformNode {
-    const juliaModel = newSeededJuliaSetModel(starSystemModel.getAnomalySeed(0), getAnomalyName(starSystemModel.name, 0), null);
+    const juliaModel = newSeededJuliaSetModel(Math.random() * 100_000, "XR Anomaly", null);
     const julia = new JuliaSet(juliaModel, scene, null);
     julia.getTransform().scalingDeterminant = 1 / 400e3;
 
@@ -109,16 +91,14 @@ function createJulia(): TransformNode {
     return julia.getTransform();
 }
 
-let targetObject: TransformNode;
-
 const sceneType = urlParams.get("scene");
 
 if (sceneType === "mandelbulb") {
-    targetObject = createMandelbulb();
+    createMandelbulb();
 } else if (sceneType === "julia") {
-    targetObject = createJulia();
+    createJulia();
 } else {
-    targetObject = createMandelbulb();
+    createMandelbulb();
 }
 
 const xr = await scene.createDefaultXRExperienceAsync();

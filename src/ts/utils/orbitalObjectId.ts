@@ -5,7 +5,7 @@ import { SystemObjectId, UniverseObjectId, SystemObjectType } from "../saveFile/
 import { Planet } from "../architecture/planet";
 import { Anomaly } from "../anomalies/anomaly";
 import { SpaceStation } from "../spacestation/spaceStation";
-import { getAnomalyModels, getPlanetaryMassObjectModels, getSpaceStationModels, getStellarObjectModels } from "./getModelsFromSystemModel";
+import { getSpaceStationModels } from "./getModelsFromSystemModel";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
 import { getSystemModelFromCoordinates } from "./starSystemCoordinatesUtils";
 
@@ -76,11 +76,11 @@ export function getObjectModelByUniverseId(universeObjectId: UniverseObjectId): 
 
     switch (universeObjectId.objectType) {
         case SystemObjectType.STELLAR_OBJECT:
-            return getStellarObjectModels(starSystemModel)[universeObjectId.objectIndex];
+            return starSystemModel.getStellarObjects()[universeObjectId.objectIndex];
         case SystemObjectType.PLANETARY_MASS_OBJECT:
-            return getPlanetaryMassObjectModels(starSystemModel)[universeObjectId.objectIndex];
+            return starSystemModel.getPlanetaryMassObjects()[universeObjectId.objectIndex];
         case SystemObjectType.ANOMALY:
-            return getAnomalyModels(starSystemModel)[universeObjectId.objectIndex];
+            return starSystemModel.getAnomalies()[universeObjectId.objectIndex];
         case SystemObjectType.SPACE_STATION:
             return getSpaceStationModels(starSystemModel)[universeObjectId.objectIndex];
         default:

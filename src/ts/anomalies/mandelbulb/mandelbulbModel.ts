@@ -26,9 +26,12 @@ import { CelestialBodyModel, CelestialBodyType } from "../../architecture/celest
 import { GenerationSteps } from "../../utils/generationSteps";
 import i18n from "../../i18n";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
+import { AnomalyType } from "../anomalyType";
+import { AnomalyModel } from "../anomaly";
 
-export type MandelbulbModel = CelestialBodyModel & {
+export type MandelbulbModel = AnomalyModel & {
     readonly bodyType: CelestialBodyType.ANOMALY;
+    readonly anomalyType: AnomalyType.MANDELBULB;
 
     readonly power: number;
     readonly accentColor: Color3;
@@ -70,6 +73,7 @@ export function newSeededMandelbulbModel(seed: number, name: string, parentBody:
         rings: null,
         name,
         bodyType: CelestialBodyType.ANOMALY,
+        anomalyType: AnomalyType.MANDELBULB,
         accentColor,
         power,
         orbit,

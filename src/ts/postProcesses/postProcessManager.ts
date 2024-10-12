@@ -54,6 +54,7 @@ import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { BloomEffect } from "@babylonjs/core/PostProcesses/bloomEffect";
 import { Constants } from "@babylonjs/core/Engines/constants";
+import { Planet } from "../architecture/planet";
 
 /**
  * The order in which the post processes are rendered when away from a planet
@@ -266,7 +267,7 @@ export class PostProcessManager {
      * Returns the atmosphere post process for the given planet. Throws an error if no atmosphere is found.
      * @param planet A gas or telluric planet
      */
-    public getAtmosphere(planet: GasPlanet | TelluricPlanet): AtmosphericScatteringPostProcess | null {
+    public getAtmosphere(planet: Planet): AtmosphericScatteringPostProcess | null {
         return this.atmospheres.find((atmosphere) => atmosphere.object === planet) ?? null;
     }
 

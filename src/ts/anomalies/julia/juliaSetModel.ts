@@ -26,9 +26,13 @@ import { CelestialBodyModel, CelestialBodyType } from "../../architecture/celest
 import { GenerationSteps } from "../../utils/generationSteps";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import i18n from "../../i18n";
+import { AnomalyType } from "../anomalyType";
+import { AnomalyModel } from "../anomaly";
 
-export type JuliaSetModel = CelestialBodyModel & {
+export type JuliaSetModel = AnomalyModel & {
     readonly bodyType: CelestialBodyType.ANOMALY;
+
+    readonly anomalyType: AnomalyType.JULIA_SET;
 
     readonly accentColor: Color3;
 };
@@ -72,6 +76,7 @@ export function newSeededJuliaSetModel(seed: number, name: string, parentBody: C
         accentColor,
         rings: null,
         bodyType: CelestialBodyType.ANOMALY,
+        anomalyType: AnomalyType.JULIA_SET,
         typeName
     };
 }

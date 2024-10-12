@@ -23,13 +23,18 @@ import { positionNearObjectBrightSide } from "./utils/positionNearObject";
 import { CosmosJourneyer } from "./cosmosJourneyer";
 import { CustomStarSystemModel } from "./starSystem/customStarSystemModel";
 
-import { CelestialBodyType } from "./architecture/celestialBody";
+import { newSeededBlackHoleModel } from "./stellarObjects/blackHole/blackHoleModel";
+import { newSeededTelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModel";
 
 const engine = await CosmosJourneyer.CreateAsync();
 
 const starSystemView = engine.starSystemView;
 
 const scene = starSystemView.scene;
+
+const blackHoleModel = newSeededBlackHoleModel(42, "Gargantua", null);
+
+const millerPlanetModel = newSeededTelluricPlanetModel(42, "Miller", blackHoleModel);
 
 const starSystemModel = new CustomStarSystemModel(
     "Black Hole Demo",
@@ -41,8 +46,8 @@ const starSystemModel = new CustomStarSystemModel(
         localY: 0,
         localZ: 0
     },
-    [[CelestialBodyType.BLACK_HOLE, 0]],
-    [[CelestialBodyType.TELLURIC_PLANET, 42]],
+    [blackHoleModel],
+    [[millerPlanetModel, []]],
     []
 );
 const starSystem = new StarSystemController(starSystemModel, scene);

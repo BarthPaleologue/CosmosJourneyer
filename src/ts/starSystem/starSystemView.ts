@@ -47,7 +47,7 @@ import { createNotification } from "../utils/notification";
 import { axisCompositeToString, dPadCompositeToString } from "../utils/inputControlsString";
 import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
 import { AxisComposite } from "@brianchirls/game-input/browser";
-import { getMoonSeed, getPlanetName, getSpaceStationSeed } from "../planets/common";
+import { getSpaceStationSeed } from "../planets/common";
 import { Planet } from "../architecture/planet";
 import { AudioManager } from "../audio/audioManager";
 import { AudioMasks } from "../audio/audioMasks";
@@ -77,16 +77,15 @@ import { MissionContext } from "../missions/missionContext";
 import { Mission } from "../missions/mission";
 import { getSystemModelFromCoordinates } from "../utils/starSystemCoordinatesUtils";
 import { CelestialBodyType } from "../architecture/celestialBody";
-import { newSeededTelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
-import { newSeededGasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
-import { newSeededMandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModel";
-import { newSeededJuliaSetModel } from "../anomalies/julia/juliaSetModel";
+import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
+import { GasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
+import { MandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModel";
+import { JuliaSetModel } from "../anomalies/julia/juliaSetModel";
 import { newSeededSpaceStationModel } from "../spacestation/spacestationModel";
 import { StellarObject } from "../architecture/stellarObject";
-import { newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
-import { newSeededBlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
-import { newSeededStarModel } from "../stellarObjects/star/starModel";
-import { getAnomalyName, getStellarObjectName } from "../utils/parseToStrings";
+import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
+import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
+import { StarModel } from "../stellarObjects/star/starModel";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../saveFile/universeCoordinates";
 
 /**
@@ -445,20 +444,19 @@ export class StarSystemView implements View {
 
         // Stellar objects
         let objectIndex = 0;
-        for (let i = 0; i < targetNbStellarObjects; i++) {
+        for (let i = 0; i < systemModel.getNbStellarObjects(); i++) {
             console.log("Stellar:", i + 1, "of", targetNbStellarObjects);
+            const stellarObjectModel = systemModel.getStellarObjects()[i];
             let stellarObject: StellarObject;
-            const seed = systemModel.getStellarObjectSeed(i);
-            const stellarObjectName = getStellarObjectName(systemModel.name, i);
-            switch (starSystem.model.getBodyTypeOfStellarObject(starSystem.stellarObjects.length)) {
+            switch (stellarObjectModel.bodyType) {
                 case CelestialBodyType.STAR:
-                    stellarObject = starSystem.addStar(newSeededStarModel(seed, stellarObjectName, null), null);
+                    stellarObject = starSystem.addStar(stellarObjectModel as StarModel, null);
                     break;
                 case CelestialBodyType.BLACK_HOLE:
-                    stellarObject = starSystem.addBlackHole(newSeededBlackHoleModel(seed, stellarObjectName, null), null);
+                    stellarObject = starSystem.addBlackHole(stellarObjectModel as BlackHoleModel, null);
                     break;
                 case CelestialBodyType.NEUTRON_STAR:
-                    stellarObject = starSystem.addNeutronStar(newSeededNeutronStarModel(seed, stellarObjectName, null), null);
+                    stellarObject = starSystem.addNeutronStar(stellarObjectModel as NeutronStarModel, null);
                     break;
                 default:
                     throw new Error("Unknown stellar object type");
@@ -471,22 +469,19 @@ export class StarSystemView implements View {
         const planets: Planet[] = [];
 
         // Planets
-        for (let i = 0; i < systemModel.getNbPlanets(); i++) {
-            console.log("Planet:", i + 1, "of", systemModel.getNbPlanets());
-            const bodyType = starSystem.model.getBodyTypeOfPlanet(starSystem.planets.length);
+        for (const planetModel of systemModel.getPlanet()) {
+            console.log("Loading planet", planetModel.name);
 
             let planet: Planet;
 
-            const planetName = getPlanetName(i, systemModel.name, starSystem.stellarObjects[0].model);
-
-            if (bodyType === CelestialBodyType.TELLURIC_PLANET) {
-                const telluricPlanetModel = newSeededTelluricPlanetModel(systemModel.getPlanetSeed(i), planetName, starSystem.stellarObjects[0].model);
+            if (planetModel.bodyType === CelestialBodyType.TELLURIC_PLANET) {
+                const telluricPlanetModel = planetModel as TelluricPlanetModel;
                 planet = this.starSystem.addTelluricPlanet(telluricPlanetModel);
-            } else if (bodyType === CelestialBodyType.GAS_PLANET) {
-                const gasPlanetModel = newSeededGasPlanetModel(systemModel.getPlanetSeed(i), planetName, starSystem.stellarObjects[0].model);
+            } else if (planetModel.bodyType === CelestialBodyType.GAS_PLANET) {
+                const gasPlanetModel = planetModel as GasPlanetModel;
                 planet = this.starSystem.addGasPlanet(gasPlanetModel);
             } else {
-                throw new Error(`Incorrect body type in the planet list: ${bodyType}`);
+                throw new Error(`Incorrect body type in the planet list: ${planetModel.bodyType}`);
             }
 
             planet.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
@@ -499,10 +494,8 @@ export class StarSystemView implements View {
         // Satellites
         for (let i = 0; i < planets.length; i++) {
             const planet = planets[i];
-            for (let j = 0; j < planet.model.nbMoons; j++) {
-                console.log("Satellite:", j + 1, "of", planet.model.nbMoons);
-                const satelliteName = getPlanetName(j, systemModel.name, planet.model);
-                const satelliteModel = newSeededTelluricPlanetModel(getMoonSeed(planet.model, j), satelliteName, planet.model);
+            for (const satelliteModel of systemModel.getSatellitesOfPlanet(i)) {
+                console.log("Loading satellite:", satelliteModel.name);
                 const satellite = starSystem.addSatellite(satelliteModel, planet);
                 satellite.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
 
@@ -511,18 +504,15 @@ export class StarSystemView implements View {
         }
 
         // Anomalies
-        for (let i = 0; i < systemModel.getNbAnomalies(); i++) {
-            console.log("Anomaly:", i + 1, "of", systemModel.getNbAnomalies());
-            const anomalyType = systemModel.getAnomalyType(i);
-            const anomalyName = getAnomalyName(systemModel.name, i);
-
+        for (const anomalyModel of systemModel.getAnomalies()) {
+            console.log("Loading Anomaly:", anomalyModel.name);
             let anomaly: Anomaly;
-            switch (anomalyType) {
+            switch (anomalyModel.anomalyType) {
                 case AnomalyType.MANDELBULB:
-                    anomaly = this.starSystem.addMandelbulb(newSeededMandelbulbModel(systemModel.getAnomalySeed(i), anomalyName, starSystem.stellarObjects[0].model));
+                    anomaly = this.starSystem.addMandelbulb(anomalyModel as MandelbulbModel);
                     break;
                 case AnomalyType.JULIA_SET:
-                    anomaly = this.starSystem.addJuliaSet(newSeededJuliaSetModel(systemModel.getAnomalySeed(i), anomalyName, starSystem.stellarObjects[0].model));
+                    anomaly = this.starSystem.addJuliaSet(anomalyModel as JuliaSetModel);
                     break;
             }
 

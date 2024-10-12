@@ -238,7 +238,7 @@ export class MainMenu {
 
         this.starSystemView.onInitStarSystem.addOnce(async () => {
             await this.starSystemView.switchToDefaultControls(false);
-            const nbRadius = this.starSystemController.model.getBodyTypeOfStellarObject(0) === CelestialBodyType.BLACK_HOLE ? 8 : 2;
+            const nbRadius = this.starSystemController.model.getStellarObjects()[0].bodyType === CelestialBodyType.BLACK_HOLE ? 8 : 2;
             const targetObject = getObjectBySystemId(this.universeObjectId, this.starSystemController);
             if (targetObject === null) {
                 throw new Error(`Could not find object with ID ${JSON.stringify(this.universeObjectId)}`);
