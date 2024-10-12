@@ -26,7 +26,7 @@ export type PlanetarySystem = {
     satellites: TelluricPlanetModel[];
 };
 
-export interface StarSystemModel {
+export type StarSystemModel = {
     readonly name: string;
 
     readonly coordinates: StarSystemCoordinates;
@@ -36,14 +36,10 @@ export interface StarSystemModel {
     readonly planetarySystems: PlanetarySystem[];
 
     readonly anomalies: AnomalyModel[];
-}
+};
 
 export function getPlanets(starSystem: StarSystemModel): PlanetModel[] {
     return starSystem.planetarySystems.map(({ planet, satellites }) => planet);
-}
-
-export function getSatellitesOfPlanet(starSystem: StarSystemModel, index: number): TelluricPlanetModel[] {
-    return starSystem.planetarySystems.at(index)?.satellites ?? [];
 }
 
 export function getPlanetaryMassObjects(starSystem: StarSystemModel): PlanetModel[] {

@@ -27,10 +27,10 @@ import { newSeededTelluricPlanetModel } from "./planets/telluricPlanet/telluricP
 import { newSeededGasPlanetModel } from "./planets/gasPlanet/gasPlanetModel";
 import { getMoonSeed } from "./planets/common";
 import { SpaceShipControlsInputs } from "./spaceship/spaceShipControlsInputs";
-import { CustomStarSystemModel } from "./starSystem/customStarSystemModel";
 
 import { newSeededStarModel } from "./stellarObjects/star/starModel";
 import { newSeededSpaceStationModel } from "./spacestation/spacestationModel";
+import { StarSystemModel } from "./starSystem/starSystemModel";
 
 const engine = await CosmosJourneyer.CreateAsync();
 
@@ -112,9 +112,9 @@ andromaqueModel.orbit.period = 60 * 60 * 24 * 365.25;
 andromaqueModel.orbit.radius = 25300 * aresModel.radius;
 andromaqueModel.orbit.normalToPlane = Vector3.Up();
 
-const starSystemModel = new CustomStarSystemModel(
-    systemName,
-    {
+const starSystemModel: StarSystemModel = {
+    name: systemName,
+    coordinates: {
         starSectorX: 0,
         starSectorY: 0,
         starSectorZ: 0,
@@ -122,14 +122,14 @@ const starSystemModel = new CustomStarSystemModel(
         localY: 0,
         localZ: 0
     },
-    [sunModel],
-    [
+    stellarObjects: [sunModel],
+    planetarySystems: [
         { planet: hecateModel, satellites: [moonModel] },
         { planet: aresModel, satellites: [] },
         { planet: andromaqueModel, satellites: [] }
     ],
-    []
-);
+    anomalies: []
+};
 
 const starSystem = new StarSystemController(starSystemModel, starSystemView.scene);
 

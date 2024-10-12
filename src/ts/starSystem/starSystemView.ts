@@ -87,7 +87,7 @@ import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { StarModel } from "../stellarObjects/star/starModel";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../saveFile/universeCoordinates";
-import { getPlanets, getSatellitesOfPlanet } from "./starSystemModel";
+import { getPlanets } from "./starSystemModel";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -495,7 +495,7 @@ export class StarSystemView implements View {
         // Satellites
         for (let i = 0; i < planets.length; i++) {
             const planet = planets[i];
-            for (const satelliteModel of getSatellitesOfPlanet(systemModel, i)) {
+            for (const satelliteModel of systemModel.planetarySystems[i].satellites) {
                 console.log("Loading satellite:", satelliteModel.name);
                 const satellite = starSystem.addSatellite(satelliteModel, planet);
                 satellite.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));

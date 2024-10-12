@@ -1,6 +1,6 @@
 import { StarSector } from "../starmap/starSector";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { SeededStarSystemModel, SystemSeed } from "../starSystem/seededStarSystemModel";
+import { newSeededStarSystemModel, SystemSeed } from "../starSystem/seededStarSystemModel";
 import { StarSystemCoordinates } from "../saveFile/universeCoordinates";
 
 export function getStarSystemCoordinatesFromSeed(systemSeed: SystemSeed): StarSystemCoordinates {
@@ -57,5 +57,5 @@ export function getSystemModelFromCoordinates(coordinates: StarSystemCoordinates
     if (seed === null) {
         throw new Error("No seed found for coordinates. Custom star systems are not supported in system targets yet.");
     }
-    return new SeededStarSystemModel(seed);
+    return newSeededStarSystemModel(seed);
 }
