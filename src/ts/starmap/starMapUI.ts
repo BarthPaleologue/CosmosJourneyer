@@ -20,7 +20,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import i18n from "../i18n";
 import { getStellarTypeFromTemperature, newSeededStarModel, StarModel } from "../stellarObjects/star/starModel";
-import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
+import { BlackHoleModel, newSeededBlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { NeutronStarModel, newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 import { getStarGalacticPosition, getSystemModelFromCoordinates } from "../utils/starSystemCoordinatesUtils";
 import { factionToString } from "../society/factions";
@@ -320,7 +320,7 @@ export class StarMapUI {
                 starModel = newSeededStarModel(starSeed, targetSystemModel, null);
                 break;
             case CelestialBodyType.BLACK_HOLE:
-                starModel = new BlackHoleModel(starSeed, targetSystemModel);
+                starModel = newSeededBlackHoleModel(starSeed, targetSystemModel, null);
                 break;
             case CelestialBodyType.NEUTRON_STAR:
                 starModel = newSeededNeutronStarModel(starSeed, targetSystemModel, null);

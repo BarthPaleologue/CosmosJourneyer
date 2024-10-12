@@ -29,6 +29,7 @@ import { Constants } from "@babylonjs/core/Engines/constants";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Scene } from "@babylonjs/core/scene";
 import { Textures } from "../../assets/textures";
+import { getKerrMetricA } from "./blackHoleModel";
 
 export type BlackHoleUniforms = {
     accretionDiskRadius: number;
@@ -85,6 +86,9 @@ export class BlackHolePostProcess extends PostProcess implements ObjectPostProce
             this.activeCamera = camera;
         });
 
+        const schwarzschildRadius = blackHole.model.radius;
+        const kerrMetricA = getKerrMetricA(blackHole.model.physicalProperties.mass, blackHole.model.physicalProperties.rotationPeriod);
+
         this.onApplyObservable.add((effect) => {
             if (this.activeCamera === null) {
                 throw new Error("Camera is null");
@@ -96,8 +100,8 @@ export class BlackHolePostProcess extends PostProcess implements ObjectPostProce
             effect.setMatrix(BlackHoleUniformNames.STARFIELD_ROTATION, Textures.MILKY_WAY.getReflectionTextureMatrix());
 
             effect.setFloat(BlackHoleUniformNames.TIME, blackHoleUniforms.time % (blackHoleUniforms.rotationPeriod * 10000));
-            effect.setFloat(BlackHoleUniformNames.SCHWARZSCHILD_RADIUS, blackHole.model.getSchwarzschildRadius());
-            effect.setFloat(BlackHoleUniformNames.FRAME_DRAGGING_FACTOR, blackHole.model.getKerrMetricA() / blackHole.model.physicalProperties.mass);
+            effect.setFloat(BlackHoleUniformNames.SCHWARZSCHILD_RADIUS, schwarzschildRadius);
+            effect.setFloat(BlackHoleUniformNames.FRAME_DRAGGING_FACTOR, kerrMetricA / blackHole.model.physicalProperties.mass);
             effect.setFloat(BlackHoleUniformNames.ACCRETION_DISK_RADIUS, blackHoleUniforms.accretionDiskRadius);
             effect.setFloat(BlackHoleUniformNames.WARPING_MINKOWSKI_FACTOR, blackHoleUniforms.warpingMinkowskiFactor);
             effect.setFloat(BlackHoleUniformNames.ROTATION_PERIOD, blackHoleUniforms.rotationPeriod);

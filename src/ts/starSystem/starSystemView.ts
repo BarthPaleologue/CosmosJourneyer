@@ -79,14 +79,14 @@ import { StarSystemCoordinates, starSystemCoordinatesEquals } from "./starSystem
 import { getSystemModelFromCoordinates } from "../utils/starSystemCoordinatesUtils";
 import { CelestialBodyType } from "../architecture/celestialBody";
 import { newSeededTelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
-import { GasPlanetModel, newSeededGasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
+import { newSeededGasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 import { MandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModel";
 import { JuliaSetModel } from "../anomalies/julia/juliaSetModel";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
 import { StellarObject } from "../architecture/stellarObject";
-import { NeutronStarModel, newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
-import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
-import { newSeededStarModel, StarModel } from "../stellarObjects/star/starModel";
+import { newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
+import { newSeededBlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
+import { newSeededStarModel } from "../stellarObjects/star/starModel";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -453,7 +453,7 @@ export class StarSystemView implements View {
                     stellarObject = starSystem.addStar(newSeededStarModel(seed, systemModel, null), null);
                     break;
                 case CelestialBodyType.BLACK_HOLE:
-                    stellarObject = starSystem.addBlackHole(new BlackHoleModel(seed, systemModel), null);
+                    stellarObject = starSystem.addBlackHole(newSeededBlackHoleModel(seed, systemModel, null), null);
                     break;
                 case CelestialBodyType.NEUTRON_STAR:
                     stellarObject = starSystem.addNeutronStar(newSeededNeutronStarModel(seed, systemModel, null), null);

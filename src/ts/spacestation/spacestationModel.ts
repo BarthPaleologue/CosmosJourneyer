@@ -31,7 +31,7 @@ import { StarSystemModel } from "../starSystem/starSystemModel";
 import { Faction } from "../society/factions";
 import { getPowerPlayData } from "../society/powerplay";
 import { NeutronStarModel, newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
-import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
+import { BlackHoleModel, newSeededBlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { newSeededStarModel } from "../stellarObjects/star/starModel";
 import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
 import { Settings } from "../settings";
@@ -142,7 +142,7 @@ export class SpaceStationModel implements OrbitalObjectModel {
                 starModel = newSeededNeutronStarModel(starModelBuildInfo[1], starSystemModel, null);
                 break;
             case CelestialBodyType.BLACK_HOLE:
-                starModel = new BlackHoleModel(starModelBuildInfo[1], starSystemModel);
+                starModel = newSeededBlackHoleModel(starModelBuildInfo[1], starSystemModel, null);
                 break;
             case CelestialBodyType.STAR:
                 starModel = newSeededStarModel(starModelBuildInfo[1], starSystemModel, null);

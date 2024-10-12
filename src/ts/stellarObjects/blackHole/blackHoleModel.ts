@@ -22,7 +22,6 @@ import { normalRandom } from "extended-random";
 import { BlackHolePhysicalProperties } from "../../architecture/physicalProperties";
 import { CelestialBodyModel, CelestialBodyType } from "../../architecture/celestialBody";
 import { StellarObjectModel } from "../../architecture/stellarObject";
-import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Settings } from "../../settings";
 import { estimateStarRadiusFromMass } from "../../utils/estimateStarRadiusFromMass";
 import { GenerationSteps } from "../../utils/generationSteps";
@@ -30,128 +29,124 @@ import { starName } from "../../utils/parseToStrings";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
 import i18n from "../../i18n";
 
-export class BlackHoleModel implements StellarObjectModel {
-    readonly name: string;
-
-    readonly bodyType = CelestialBodyType.BLACK_HOLE;
-    readonly seed: number;
-    readonly rng: (step: number) => number;
-
+export type BlackHoleModel = StellarObjectModel & {
+    readonly bodyType: CelestialBodyType.BLACK_HOLE;
     /**
      * The Schwarzschild radius of the black hole in meters
      */
     readonly radius: number;
 
-    readonly orbit: Orbit;
-
     readonly physicalProperties: BlackHolePhysicalProperties;
+};
 
-    readonly rings = null;
+export function newSeededBlackHoleModel(seed: number, starSystemModel: StarSystemModel, parentBody: CelestialBodyModel | null): BlackHoleModel {
+    const rng = seededSquirrelNoise(seed);
 
-    //TODO: compute temperature of accretion disk (function of rotation speed)
-    readonly temperature = 7_000;
-    readonly color = Color3.Black();
+    const stellarObjectIndex = starSystemModel.getStellarObjects().findIndex(([_, stellarObjectSeed]) => stellarObjectSeed === seed);
+    const name = starName(starSystemModel.name, stellarObjectIndex);
 
-    readonly parentBody: CelestialBodyModel | null;
+    //FIXME: do not hardcode
+    const radius = 1000e3;
 
-    readonly starSystemModel: StarSystemModel;
+    // TODO: do not hardcode
+    const orbitRadius = parentBody === null ? 0 : 2 * (parentBody.radius + radius);
 
-    readonly typeName: string;
+    const orbit: Orbit = {
+        radius: orbitRadius,
+        p: 2,
+        period: getOrbitalPeriod(orbitRadius, parentBody?.physicalProperties.mass ?? 0),
+        normalToPlane: Vector3.Up()
+    };
 
-    constructor(seed: number, starSystemModel: StarSystemModel, parentBody: CelestialBodyModel | null = null) {
-        this.seed = seed;
-        this.rng = seededSquirrelNoise(this.seed);
+    const physicalProperties: BlackHolePhysicalProperties = {
+        mass: getMassFromSchwarzschildRadius(radius),
+        //FIXME: do not hardcode
+        rotationPeriod: 1.5e-19,
+        axialTilt: normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT),
+        accretionDiskRadius: radius * normalRandom(12, 3, rng, 7777)
+    };
 
-        this.starSystemModel = starSystemModel;
+    const typeName = i18n.t("objectTypes:blackHole");
 
-        const stellarObjectIndex = this.starSystemModel.getStellarObjects().findIndex(([_, stellarObjectSeed]) => stellarObjectSeed === this.seed);
-        this.name = starName(this.starSystemModel.name, stellarObjectIndex);
+    return {
+        seed,
+        name,
+        //TODO: compute temperature of accretion disk (function of rotation speed)
+        temperature: 7_000,
+        rng,
+        rings: null,
+        bodyType: CelestialBodyType.BLACK_HOLE,
+        radius,
+        physicalProperties,
+        orbit,
+        parentBody,
+        typeName
+    };
+}
 
-        this.radius = 1000e3;
+/**
+ * Returns the Schwarzschild radius of an object given its mass
+ * @param mass The mass of the object in kilograms
+ * @returns the Schwarzschild radius of the object in meters
+ */
+export function getSchwarzschildRadius(mass: number): number {
+    return (2 * Settings.G * mass) / (Settings.C * Settings.C);
+}
 
-        this.parentBody = parentBody;
+/**
+ * Returns the mass a black hole needs to posess a given Schwarzschild radius
+ * @param radius The target radius (in meters)
+ * @returns The mass needed to achieve the given radius
+ */
+export function getMassFromSchwarzschildRadius(radius: number): number {
+    return (radius * Settings.C * Settings.C) / (2 * Settings.G);
+}
 
-        // TODO: do not hardcode
-        const orbitRadius = this.parentBody === null ? 0 : 2 * (this.parentBody.radius + this.radius);
+/**
+ * As the angular momentum is conserved, the black hole retains the original star's angular momentum.
+ * As the original star's radius is only known approximately, the black hole's angular momentum can only be estimated.
+ * The angular momentum is important in the Kerr metric to compute frame dragging.
+ */
+export function estimateAngularMomentum(mass: number, rotationPeriod: number): number {
+    if (rotationPeriod === 0) return 0;
 
-        this.orbit = {
-            radius: orbitRadius,
-            p: 2,
-            period: getOrbitalPeriod(orbitRadius, this.parentBody?.physicalProperties.mass ?? 0),
-            normalToPlane: Vector3.Up()
-        };
+    const estimatedOriginalStarRadius = estimateStarRadiusFromMass(mass);
 
-        this.physicalProperties = {
-            mass: BlackHoleModel.GetMassFromSchwarzschildRadius(this.radius),
-            rotationPeriod: 1.5e-19,
-            axialTilt: normalRandom(0, 0.4, this.rng, GenerationSteps.AXIAL_TILT),
-            accretionDiskRadius: this.radius * normalRandom(12, 3, this.rng, 7777)
-        };
+    // The inertia tensor for a sphere is a diagonal scaling matrix, we can express it as a simple number
+    const inertiaTensor = (2 / 5) * mass * estimatedOriginalStarRadius * estimatedOriginalStarRadius;
 
-        this.typeName = i18n.t("objectTypes:blackHole");
-    }
+    const omega = (2 * Math.PI) / rotationPeriod;
 
-    /**
-     * Returns the Schwarzschild radius of the black hole
-     * @returns the Schwarzschild radius of the black hole
-     */
-    public getSchwarzschildRadius(): number {
-        return (2 * Settings.G * this.physicalProperties.mass) / (Settings.C * Settings.C);
-    }
+    return inertiaTensor * omega;
+}
 
-    /**
-     * Returns the mass a black hole needs to posess a given Schwarzschild radius
-     * @param radius The target radius (in meters)
-     * @returns The mass needed to achieve the given radius
-     */
-    public static GetMassFromSchwarzschildRadius(radius: number): number {
-        return (radius * Settings.C * Settings.C) / (2 * Settings.G);
-    }
+/**
+ * This corresponds to a=J/Mc in the Kerr metric. Physical values are between 0 and the mass of the black hole. Exceeding that range will create naked singularities. (J > M²)
+ * @returns J/Mc for this black hole
+ * @see https://en.wikipedia.org/wiki/Kerr_metric#Overextreme_Kerr_solutions
+ */
+export function getKerrMetricA(mass: number, rotationPeriod: number): number {
+    return estimateAngularMomentum(mass, rotationPeriod) / (mass * Settings.C);
+}
 
-    /**
-     * As the angular momentum is conserved, the black hole retains the original star's angular momentum.
-     * As the original star's radius is only known approximately, the black hole's angular momentum can only be estimated.
-     * The angular momentum is important in the Kerr metric to compute frame dragging.
-     */
-    public estimateAngularMomentum(): number {
-        if (this.physicalProperties.rotationPeriod === 0) return 0;
+export function hasNakedSingularity(mass: number, rotationPeriod: number): boolean {
+    return getKerrMetricA(mass, rotationPeriod) > mass;
+}
 
-        const estimatedOriginalStarRadius = estimateStarRadiusFromMass(this.physicalProperties.mass);
+/**
+ * Returns the radius of the ergosphere at a given angle theta.
+ * @param mass The mass of the black hole in kilograms
+ * @param rotationPeriod The rotation period of the black hole in seconds
+ * @param theta The angle in radians to the black hole's rotation axis. (equator => theta = pi / 2)
+ * @throws This function throws an error when the black hole is a naked singularity
+ */
+export function getErgosphereRadius(mass: number, rotationPeriod: number, theta: number): number {
+    const m = (Settings.G * mass) / (Settings.C * Settings.C);
 
-        // The inertia tensor for a sphere is a diagonal scaling matrix, we can express it as a simple number
-        const inertiaTensor = (2 / 5) * this.physicalProperties.mass * estimatedOriginalStarRadius * estimatedOriginalStarRadius;
+    const a = getKerrMetricA(mass, rotationPeriod);
+    const cosTheta = Math.cos(theta);
 
-        const omega = (2 * Math.PI) / this.physicalProperties.rotationPeriod;
+    if (a > m) throw new Error("Black hole angular momentum exceeds maximum value for a Kerr black hole. a > m: " + a);
 
-        return inertiaTensor * omega;
-    }
-
-    /**
-     * This corresponds to a=J/Mc in the Kerr metric. Physical values are between 0 and the mass of the black hole. Exceeding that range will create naked singularities. (J > M²)
-     * @returns J/Mc for this black hole
-     * @see https://en.wikipedia.org/wiki/Kerr_metric#Overextreme_Kerr_solutions
-     */
-    public getKerrMetricA(): number {
-        return this.estimateAngularMomentum() / (this.physicalProperties.mass * Settings.C);
-    }
-
-    public hasNakedSingularity(): boolean {
-        return this.getKerrMetricA() > this.physicalProperties.mass;
-    }
-
-    /**
-     * Returns the radius of the ergosphere at a given angle theta.
-     * @param theta The angle in radians to the black hole's rotation axis. (equator => theta = pi / 2)
-     * @throws This function throws an error when the black hole is a naked singularity
-     */
-    public getErgosphereRadius(theta: number): number {
-        const m = (Settings.G * this.physicalProperties.mass) / (Settings.C * Settings.C);
-
-        const a = this.getKerrMetricA();
-        const cosTheta = Math.cos(theta);
-
-        if (a > m) throw new Error("Black hole angular momentum exceeds maximum value for a Kerr black hole. a > m: " + a);
-
-        return m + Math.sqrt(m * m - a * a * cosTheta * cosTheta);
-    }
+    return m + Math.sqrt(m * m - a * a * cosTheta * cosTheta);
 }

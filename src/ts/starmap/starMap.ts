@@ -40,7 +40,7 @@ import { translate } from "../uberCore/transforms/basicTransform";
 import { ThickLines } from "../utils/thickLines";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { newSeededStarModel } from "../stellarObjects/star/starModel";
-import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
+import { newSeededBlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 import { View } from "../utils/view";
 import { AudioInstance } from "../utils/audioInstance";
@@ -456,7 +456,7 @@ export class StarMap implements View {
                 starModel = newSeededStarModel(starSeed, starSystemModel, null);
                 break;
             case CelestialBodyType.BLACK_HOLE:
-                starModel = new BlackHoleModel(starSeed, starSystemModel);
+                starModel = newSeededBlackHoleModel(starSeed, starSystemModel, null);
                 break;
             case CelestialBodyType.NEUTRON_STAR:
                 starModel = newSeededNeutronStarModel(starSeed, starSystemModel, null);

@@ -2,7 +2,7 @@ import { placeSpaceStations } from "../society/spaceStationPlacement";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
 import { getMoonSeeds, getSpaceStationSeed } from "../planets/common";
 import { newSeededStarModel } from "../stellarObjects/star/starModel";
-import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
+import { newSeededBlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { StellarObjectModel } from "../architecture/stellarObject";
 import { AnomalyType } from "../anomalies/anomalyType";
 import { MandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModel";
@@ -32,7 +32,7 @@ export function getStellarObjectModels(system: StarSystemModel): StellarObjectMo
                 stellarObjectModels.push(newSeededStarModel(seed, system, parentBodyModel));
                 break;
             case CelestialBodyType.BLACK_HOLE:
-                stellarObjectModels.push(new BlackHoleModel(seed, system, parentBodyModel));
+                stellarObjectModels.push(newSeededBlackHoleModel(seed, system, parentBodyModel));
                 break;
             case CelestialBodyType.NEUTRON_STAR:
                 stellarObjectModels.push(newSeededNeutronStarModel(seed, system, parentBodyModel));

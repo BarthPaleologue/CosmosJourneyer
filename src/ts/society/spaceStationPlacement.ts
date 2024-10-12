@@ -1,7 +1,7 @@
 import { newSeededTelluricPlanetModel, TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 import { newSeededGasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 import { newSeededStarModel } from "../stellarObjects/star/starModel";
-import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
+import { BlackHoleModel, newSeededBlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { CelestialBodyModel, CelestialBodyType } from "../architecture/celestialBody";
 import { getMoonSeeds } from "../planets/common";
 import { PlanetModel } from "../architecture/planet";
@@ -23,7 +23,7 @@ export function placeSpaceStations(systemModel: StarSystemModel): PlanetModel[] 
             case CelestialBodyType.STAR:
                 return newSeededStarModel(seed, systemModel, null);
             case CelestialBodyType.BLACK_HOLE:
-                return new BlackHoleModel(seed, systemModel);
+                return newSeededBlackHoleModel(seed, systemModel, null);
             case CelestialBodyType.NEUTRON_STAR:
                 return newSeededNeutronStarModel(seed, systemModel, null);
             default:
