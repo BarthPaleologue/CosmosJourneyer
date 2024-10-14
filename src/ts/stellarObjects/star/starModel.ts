@@ -74,7 +74,7 @@ export function newSeededStarModel(seed: number, name: string, parentBodies: Cel
         radius: radius,
         orbit: orbit,
         physicalProperties: physicalProperties,
-        rings: rings,
+        rings: rings
     };
 }
 

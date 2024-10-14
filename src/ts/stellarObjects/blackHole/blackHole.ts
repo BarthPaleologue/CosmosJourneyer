@@ -30,8 +30,6 @@ import { RingsUniforms } from "../../rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { Orbit } from "../../orbit/orbit";
-import i18n from "../../i18n";
-
 import { orbitalObjectTypeToDisplay } from "../../utils/orbitalObjectTypeToDisplay";
 
 export class BlackHole implements StellarObject, Cullable {

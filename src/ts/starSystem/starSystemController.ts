@@ -62,6 +62,10 @@ export type SubStarSystem = {
     readonly spaceStations: SpaceStation[];
 };
 
+/**
+ * The controller of the star system manages all resources specific to a single star system.
+ * Changing star system means destroying and creating a new controller.
+ */
 export class StarSystemController {
     readonly scene: UberScene;
 
@@ -73,14 +77,18 @@ export class StarSystemController {
     readonly model: StarSystemModel;
 
     /**
-     * Translation of the model in terms of actual 3D objects
+     * Translation of the system data model in terms of actual 3D objects
+     * @type {StarSystemModel}
      */
     readonly subSystems: SubStarSystem[] = [];
 
+    /**
+     * Relation between orbital objects and their parents
+     */
     readonly objectToParents: Map<OrbitalObject, OrbitalObject[]> = new Map();
 
-    readonly telluricBodies: TelluricPlanet[] = [];
-    readonly gasPlanets: GasPlanet[] = [];
+    private readonly telluricBodies: TelluricPlanet[] = [];
+    private readonly gasPlanets: GasPlanet[] = [];
 
     /**
      * The list of all system targets in the system
@@ -89,18 +97,27 @@ export class StarSystemController {
 
     private elapsedSeconds = 0;
 
+    // variables used when loading the star system
     private timeOut = 500;
-
     private loadingIndex = 0;
-
     private offset = 1e8;
 
+    /**
+     * Creates a new star system controller from a given model and scene
+     * Note that the star system is not loaded until the load method is called
+     * @param model The data model of the star system
+     * @param scene The scene in which the star system will be rendered
+     */
     constructor(model: StarSystemModel, scene: UberScene) {
         this.scene = scene;
         this.starFieldBox = new StarFieldBox(scene);
         this.model = model;
     }
 
+    /**
+     * Loads the star system from the underlying data model.
+     * This instantiates all stars, planets, satellites, anomalies and space stations in the star system.
+     */
     public async load() {
         for (const subSystem of this.model.subSystems) {
             this.subSystems.push(await this.loadSubSystem(subSystem));
@@ -237,7 +254,8 @@ export class StarSystemController {
     }
 
     /**
-     * Returns the nearest orbital object to the origin
+     * Returns the nearest orbital object to the given position
+     * @param position The position from which we want to find the nearest orbital object
      */
     public getNearestOrbitalObject(position: Vector3): OrbitalObject {
         const celestialBodies = this.getCelestialBodies();
@@ -264,12 +282,18 @@ export class StarSystemController {
         return nearest;
     }
 
+    /**
+     * Returns all the space stations in the star system
+     */
     public getSpaceStations(): SpaceStation[] {
         const solarSpaceStations: SpaceStation[] = this.subSystems.flatMap((subSystem) => subSystem.spaceStations);
         const planetSpaceStations: SpaceStation[] = this.subSystems.flatMap((subSystem) => subSystem.planetarySystems.flatMap((planetarySystem) => planetarySystem.spaceStations));
         return solarSpaceStations.concat(planetSpaceStations);
     }
 
+    /**
+     * Returns all the celestial bodies in the star system
+     */
     public getCelestialBodies(): CelestialBody[] {
         const celestialBodies: CelestialBody[] = this.subSystems.flatMap((subSystem) => subSystem.stellarObjects);
         celestialBodies.push(
@@ -280,14 +304,23 @@ export class StarSystemController {
         return celestialBodies;
     }
 
+    /**
+     * Returns all the stellar objects in the star system
+     */
     public getStellarObjects(): StellarObject[] {
         return this.subSystems.flatMap((subSystem) => subSystem.stellarObjects);
     }
 
+    /**
+     * Returns all the orbital objects in the star system
+     */
     public getOrbitalObjects(): OrbitalObject[] {
         return [...this.getCelestialBodies(), ...this.getSpaceStations()];
     }
 
+    /**
+     * Returns all the planets in the star system
+     */
     public getPlanets(): Planet[] {
         return this.subSystems.flatMap((subSystem) => subSystem.planetarySystems.flatMap((planetarySystem) => planetarySystem.planets));
     }
@@ -308,10 +341,17 @@ export class StarSystemController {
         return planets.concat(satellites);
     }
 
+    /**
+     * Returns all the anomalies in the star system
+     */
     public getAnomalies(): CelestialBody[] {
         return this.subSystems.flatMap((subSystem) => subSystem.anomalies);
     }
 
+    /**
+     * Returns the parent objects of the given object
+     * @param object The object for which we want to find the parents
+     */
     public getParentsOf(object: OrbitalObject): OrbitalObject[] {
         return this.objectToParents.get(object) ?? [];
     }

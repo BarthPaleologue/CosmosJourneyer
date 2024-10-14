@@ -175,6 +175,6 @@ export function newSeededSpaceStationModel(
         solarPanelSurfaceM2,
         housingSurfaceHa,
         agricultureSurfaceHa,
-        totalHabitatSurfaceM2,
+        totalHabitatSurfaceM2
     };
 }

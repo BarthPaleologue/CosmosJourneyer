@@ -165,4 +165,3 @@ export const SatelliteTypes = [OrbitalObjectType.TELLURIC_SATELLITE, OrbitalObje
 export function isSatellite(orbitalObjectType: OrbitalObjectType): boolean {
     return SatelliteTypes.includes(orbitalObjectType);
 }
-

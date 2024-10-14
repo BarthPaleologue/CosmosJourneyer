@@ -68,6 +68,6 @@ export function newSeededJuliaSetModel(seed: number, name: string, parentBodies:
         physicalProperties,
         accentColor,
         rings: null,
-        type: OrbitalObjectType.JULIA_SET,
+        type: OrbitalObjectType.JULIA_SET
     };
 }

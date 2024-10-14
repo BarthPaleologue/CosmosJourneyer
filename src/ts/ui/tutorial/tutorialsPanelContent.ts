@@ -49,7 +49,7 @@ export class TutorialsPanelContent {
                     engine.hideLoadingUI();
 
                     const orbitalObject = getObjectBySystemId(tutorial.universeObjectId, starSystemView.getStarSystem());
-                    if(orbitalObject === null) {
+                    if (orbitalObject === null) {
                         throw new Error(`Orbital object not found for tutorial ${tutorial.title}. ID: ${JSON.stringify(tutorial.universeObjectId)}`);
                     }
 

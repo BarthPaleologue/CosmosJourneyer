@@ -95,19 +95,42 @@ export type StarSystemModel = {
     readonly subSystems: SubStarSystemModel[];
 };
 
+/**
+ * Utility class to manipulate star system models.
+ */
 export class StarSystemModelUtils {
+    /**
+     * Returns all the stellar objects in the star system.
+     * @param starSystem The star system to get the stellar objects from.
+     * @constructor
+     */
     static GetStellarObjects(starSystem: StarSystemModel): StellarObjectModel[] {
         return starSystem.subSystems.flatMap((subSystem) => subSystem.stellarObjects);
     }
 
+    /**
+     * Returns all the planetary systems in the star system.
+     * @param starSystem The star system to get the planetary systems from.
+     * @constructor
+     */
     static GetPlanetarySystems(starSystem: StarSystemModel): PlanetarySystemModel[] {
         return starSystem.subSystems.flatMap((subSystem) => subSystem.planetarySystems);
     }
 
+    /**
+     * Returns all the planets in the star system. (excluding satellites)
+     * @param starSystem The star system to get the planets from.
+     * @constructor
+     */
     static GetPlanets(starSystem: StarSystemModel): PlanetModel[] {
         return starSystem.subSystems.flatMap((subSystem) => subSystem.planetarySystems.flatMap((planetarySystem) => planetarySystem.planets));
     }
 
+    /**
+     * Returns all space stations in the star system.
+     * @param starSystem The star system to get the space stations from.
+     * @constructor
+     */
     static GetSpaceStations(starSystem: StarSystemModel): SpaceStationModel[] {
         const stellarSpaceStations = starSystem.subSystems.flatMap((subSystem) => subSystem.spaceStations);
         const planetarySpaceStations = starSystem.subSystems.flatMap((subSystem) => subSystem.planetarySystems.flatMap((planetarySystem) => planetarySystem.spaceStations));
@@ -133,6 +156,11 @@ export class StarSystemModelUtils {
         return planets.concat(satellites);
     }
 
+    /**
+     * Returns all the anomalies in the star system.
+     * @param starSystem The star system to get the anomalies from.
+     * @constructor
+     */
     static GetAnomalies(starSystem: StarSystemModel): AnomalyModel[] {
         return starSystem.subSystems.flatMap((subSystem) => subSystem.anomalies);
     }

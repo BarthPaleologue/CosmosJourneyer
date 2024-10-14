@@ -1,4 +1,3 @@
-
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../saveFile/universeCoordinates";
 
 export const enum SystemIconMask {

@@ -37,9 +37,10 @@ export interface CelestialBody extends OrbitalObject, CanHaveRings, HasPostProce
 /**
  * Describes the model of a celestial body
  */
-export interface CelestialBodyModel extends OrbitalObjectModel, CanHaveRingsModel {
-    /**
-     * The radius of the celestial body
-     */
-    readonly radius: number;
-}
+export type CelestialBodyModel = OrbitalObjectModel &
+    CanHaveRingsModel & {
+        /**
+         * The radius of the celestial body
+         */
+        readonly radius: number;
+    };

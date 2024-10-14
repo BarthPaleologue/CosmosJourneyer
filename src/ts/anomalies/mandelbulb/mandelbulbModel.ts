@@ -29,7 +29,7 @@ import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { OrbitalObjectType } from "../../architecture/orbitalObject";
 
 export type MandelbulbModel = AnomalyModel & {
-    readonly type: OrbitalObjectType.MANDELBULB
+    readonly type: OrbitalObjectType.MANDELBULB;
     readonly power: number;
     readonly accentColor: Color3;
 };
