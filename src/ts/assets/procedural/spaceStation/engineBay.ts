@@ -9,10 +9,10 @@ import { MetalSectionMaterial } from "./metalSectionMaterial";
 import { Scene } from "@babylonjs/core/scene";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { createEnvironmentAggregate } from "../../../utils/physics";
 import { CollisionMask } from "../../../settings";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { createEnvironmentAggregate } from "../../../utils/havok";
 
 export class EngineBay implements Transformable {
     private readonly root: TransformNode;

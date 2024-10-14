@@ -17,12 +17,26 @@
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { StarSystemController } from "../starSystem/starSystemController";
-import { nearestBody } from "./nearestBody";
 import { Transformable } from "../architecture/transformable";
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { Controls } from "../uberCore/controls";
 import { getUpwardDirection, roll, rotateAround } from "../uberCore/transforms/basicTransform";
 import { CanHaveRings } from "../architecture/canHaveRings";
+import { CelestialBody } from "../architecture/celestialBody";
+
+export function nearestBody(objectPosition: Vector3, bodies: CelestialBody[]): CelestialBody {
+    let distance = -1;
+    if (bodies.length === 0) throw new Error("no bodieees !");
+    let nearest = bodies[0];
+    for (const body of bodies) {
+        const newDistance = objectPosition.subtract(body.getTransform().getAbsolutePosition()).length();
+        if (distance === -1 || newDistance < distance) {
+            nearest = body;
+            distance = newDistance;
+        }
+    }
+    return nearest;
+}
 
 export function positionNearObjectBrightSide(transformable: Transformable, object: Transformable & HasBoundingSphere, starSystem: StarSystemController, nRadius = 3): void {
     // go from the nearest star to be on the sunny side of the object

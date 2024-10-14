@@ -28,7 +28,7 @@ import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProp
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { Orbit } from "../../orbit/orbit";
 import { CelestialBody } from "../../architecture/celestialBody";
-import { orbitalObjectTypeToDisplay } from "../../utils/orbitalObjectTypeToDisplay";
+import { orbitalObjectTypeToDisplay } from "../../utils/strings/orbitalObjectTypeToDisplay";
 
 export class JuliaSet implements CelestialBody, Cullable {
     readonly name: string;

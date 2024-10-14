@@ -38,7 +38,7 @@ import { JuliaSet } from "../anomalies/julia/juliaSet";
 import { StarFieldBox } from "./starFieldBox";
 import { PlanetarySystemModel, StarSystemModel, SubStarSystemModel } from "./starSystemModel";
 import { Settings } from "../settings";
-import { getStarGalacticPosition } from "../utils/starSystemCoordinatesUtils";
+import { getStarGalacticPosition } from "../utils/coordinates/starSystemCoordinatesUtils";
 import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 import { GasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 import { MandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModel";
@@ -46,7 +46,7 @@ import { JuliaSetModel } from "../anomalies/julia/juliaSetModel";
 import { StarModel } from "../stellarObjects/star/starModel";
 import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
-import { StarSystemCoordinates } from "../saveFile/universeCoordinates";
+import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates";
 import { wait } from "../utils/wait";
 
 export type PlanetarySystem = {

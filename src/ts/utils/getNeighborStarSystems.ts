@@ -1,7 +1,7 @@
-import { getStarGalacticPosition } from "./starSystemCoordinatesUtils";
+import { getStarGalacticPosition } from "./coordinates/starSystemCoordinatesUtils";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { StarSector } from "../starmap/starSector";
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../saveFile/universeCoordinates";
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "./coordinates/universeCoordinates";
 
 export function getNeighborStarSystemCoordinates(starSystemCoordinates: StarSystemCoordinates, radius: number): [StarSystemCoordinates, Vector3, number][] {
     const currentSystemPosition = getStarGalacticPosition(starSystemCoordinates);

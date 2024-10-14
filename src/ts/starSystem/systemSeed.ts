@@ -1,4 +1,4 @@
-import { StarSystemCoordinates } from "../saveFile/universeCoordinates";
+import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates";
 import { StarSector } from "../starmap/starSector";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 

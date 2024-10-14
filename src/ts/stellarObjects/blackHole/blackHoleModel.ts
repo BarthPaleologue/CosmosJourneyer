@@ -22,11 +22,11 @@ import { BlackHolePhysicalProperties } from "../../architecture/physicalProperti
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { StellarObjectModel } from "../../architecture/stellarObject";
 import { Settings } from "../../settings";
-import { estimateStarRadiusFromMass } from "../../utils/estimateStarRadiusFromMass";
 import { GenerationSteps } from "../../utils/generationSteps";
 
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { OrbitalObjectType } from "../../architecture/orbitalObject";
+import { estimateStarRadiusFromMass } from "../../utils/physics";
 
 export type BlackHoleModel = StellarObjectModel & {
     readonly type: OrbitalObjectType.BLACK_HOLE;

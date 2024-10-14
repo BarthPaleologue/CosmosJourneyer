@@ -40,7 +40,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { Orbit } from "../../orbit/orbit";
 
-import { orbitalObjectTypeToDisplay } from "../../utils/orbitalObjectTypeToDisplay";
+import { orbitalObjectTypeToDisplay } from "../../utils/strings/orbitalObjectTypeToDisplay";
 
 export class NeutronStar implements StellarObject, Cullable {
     readonly model: NeutronStarModel;

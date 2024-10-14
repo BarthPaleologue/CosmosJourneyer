@@ -19,7 +19,6 @@ import lensFlareFragment from "../../shaders/lensflare.glsl";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { moveTowards } from "../utils/moveTowards";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { Matrix } from "@babylonjs/core/Maths/math";
@@ -33,6 +32,7 @@ import { Constants } from "@babylonjs/core/Engines/constants";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Scene } from "@babylonjs/core/scene";
 import { getRgbFromTemperature } from "../utils/specrend";
+import { moveTowards } from "../utils/math";
 
 export type LensFlareSettings = {
     visibility: number;

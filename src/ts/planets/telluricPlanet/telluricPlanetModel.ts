@@ -29,10 +29,10 @@ import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { newSeededRingsModel, RingsModel } from "../../rings/ringsModel";
 import { CloudsModel } from "../../clouds/cloudsModel";
 import { GenerationSteps } from "../../utils/generationSteps";
-import { waterBoilingPointCelsius } from "../../utils/waterMechanics";
 
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { OrbitalObjectType } from "../../architecture/orbitalObject";
+import { waterBoilingPointCelsius } from "../../utils/physics";
 
 export type TelluricPlanetModel = PlanetModel & {
     readonly type: OrbitalObjectType.TELLURIC_PLANET | OrbitalObjectType.TELLURIC_SATELLITE;

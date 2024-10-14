@@ -1,13 +1,13 @@
-import { OrbitalObject, OrbitalObjectModel } from "../architecture/orbitalObject";
-import { StarSystemController } from "../starSystem/starSystemController";
-import { StellarObject } from "../architecture/stellarObject";
-import { SystemObjectId, UniverseObjectId, SystemObjectType } from "../saveFile/universeCoordinates";
-import { Planet } from "../architecture/planet";
-import { SpaceStation } from "../spacestation/spaceStation";
-import { SpaceStationModel } from "../spacestation/spacestationModel";
-import { getSystemModelFromCoordinates } from "../starSystem/modelFromCoordinates";
-import { StarSystemModelUtils } from "../starSystem/starSystemModel";
-import { CelestialBody } from "../architecture/celestialBody";
+import { OrbitalObject, OrbitalObjectModel } from "../../architecture/orbitalObject";
+import { StarSystemController } from "../../starSystem/starSystemController";
+import { StellarObject } from "../../architecture/stellarObject";
+import { SystemObjectId, UniverseObjectId, SystemObjectType } from "./universeCoordinates";
+import { Planet } from "../../architecture/planet";
+import { SpaceStation } from "../../spacestation/spaceStation";
+import { SpaceStationModel } from "../../spacestation/spacestationModel";
+import { getSystemModelFromCoordinates } from "../../starSystem/modelFromCoordinates";
+import { StarSystemModelUtils } from "../../starSystem/starSystemModel";
+import { CelestialBody } from "../../architecture/celestialBody";
 
 /**
  * Get the object ID of the given orbital object within the star system.

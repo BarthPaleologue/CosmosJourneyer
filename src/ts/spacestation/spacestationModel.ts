@@ -25,16 +25,16 @@ import { clamp } from "../utils/math";
 import { GenerationSteps } from "../utils/generationSteps";
 import { CropType, CropTypes, getEdibleEnergyPerHaPerDay } from "../utils/agriculture";
 import { randomPieChart } from "../utils/random";
-import { generateSpaceStationName } from "../utils/spaceStationNameGenerator";
+import { generateSpaceStationName } from "../utils/strings/spaceStationNameGenerator";
 import { Faction } from "../society/factions";
 import { getPowerPlayData } from "../society/powerplay";
 import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
 import { Settings } from "../settings";
 import { StellarObjectModel } from "../architecture/stellarObject";
-import { StarSystemCoordinates } from "../saveFile/universeCoordinates";
+import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates";
 
 import { getRngFromSeed } from "../utils/getRngFromSeed";
-import { getSphereRadiatedEnergyFlux } from "../utils/thermodynamic";
+import { getSphereRadiatedEnergyFlux } from "../utils/physics";
 
 export type SpaceStationModel = OrbitalObjectModel & {
     readonly starSystemCoordinates: StarSystemCoordinates;

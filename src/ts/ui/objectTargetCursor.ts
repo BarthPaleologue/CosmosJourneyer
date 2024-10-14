@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { parseDistance, parseSeconds } from "../utils/parseToStrings";
+import { parseDistance, parseSeconds } from "../utils/strings/parseToStrings";
 import { getAngularSize } from "../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Transformable } from "../architecture/transformable";
@@ -23,7 +23,7 @@ import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { TypedObject } from "../architecture/typedObject";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Matrix } from "@babylonjs/core/Maths/math";
-import { smoothstep } from "../utils/smoothstep";
+import { smoothstep } from "../utils/math";
 
 export const enum ObjectTargetCursorType {
     CELESTIAL_BODY,

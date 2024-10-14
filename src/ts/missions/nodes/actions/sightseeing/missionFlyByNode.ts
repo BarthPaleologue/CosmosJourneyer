@@ -17,19 +17,19 @@
 
 import { MissionNode, MissionNodeSerialized, MissionNodeType } from "../../missionNode";
 import { MissionContext } from "../../../missionContext";
-import { StarSystemCoordinates, starSystemCoordinatesEquals, UniverseObjectId, universeObjectIdEquals } from "../../../../saveFile/universeCoordinates";
+import { StarSystemCoordinates, starSystemCoordinatesEquals, UniverseObjectId, universeObjectIdEquals } from "../../../../utils/coordinates/universeCoordinates";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { getObjectBySystemId, getObjectModelByUniverseId } from "../../../../utils/orbitalObjectId";
-import { getStarGalacticPosition } from "../../../../utils/starSystemCoordinatesUtils";
-import { parseDistance } from "../../../../utils/parseToStrings";
+import { getObjectBySystemId, getObjectModelByUniverseId } from "../../../../utils/coordinates/orbitalObjectId";
+import { getStarGalacticPosition } from "../../../../utils/coordinates/starSystemCoordinatesUtils";
+import { parseDistance } from "../../../../utils/strings/parseToStrings";
 import { Settings } from "../../../../settings";
 import i18n from "../../../../i18n";
 import { getGlobalKeyboardLayoutMap } from "../../../../utils/keyboardAPI";
-import { pressInteractionToStrings } from "../../../../utils/inputControlsString";
+import { pressInteractionToStrings } from "../../../../utils/strings/inputControlsString";
 import { GeneralInputs } from "../../../../inputs/generalInputs";
 import { getSystemModelFromCoordinates } from "../../../../starSystem/modelFromCoordinates";
 
-import { orbitalObjectTypeToDisplay } from "../../../../utils/orbitalObjectTypeToDisplay";
+import { orbitalObjectTypeToDisplay } from "../../../../utils/strings/orbitalObjectTypeToDisplay";
 
 const enum FlyByState {
     NOT_IN_SYSTEM,

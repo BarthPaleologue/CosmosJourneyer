@@ -15,11 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getStarGalacticPosition } from "../utils/starSystemCoordinatesUtils";
+import { getStarGalacticPosition } from "../utils/coordinates/starSystemCoordinatesUtils";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getNeighborStarSystemCoordinates } from "../utils/getNeighborStarSystems";
 import { PriorityQueue } from "../utils/priorityQueue";
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../saveFile/universeCoordinates";
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/universeCoordinates";
 
 type Node = {
     coordinates: StarSystemCoordinates;

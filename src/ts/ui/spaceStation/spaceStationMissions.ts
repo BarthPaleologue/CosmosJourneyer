@@ -1,6 +1,6 @@
 import { SpaceStationModel } from "../../spacestation/spacestationModel";
 import { getNeighborStarSystemCoordinates } from "../../utils/getNeighborStarSystems";
-import { parseDistance } from "../../utils/parseToStrings";
+import { parseDistance } from "../../utils/strings/parseToStrings";
 import { Settings } from "../../settings";
 import { uniformRandBool } from "extended-random";
 import { generateSightseeingMissions } from "../../missions/generateSightSeeingMissions";

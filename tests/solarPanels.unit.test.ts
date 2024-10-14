@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { getSolarPanelSurfaceFromEnergyRequirement } from "../src/ts/utils/solarPanels";
-import { getSphereRadiatedEnergyFlux } from "../src/ts/utils/thermodynamic";
+import { getSphereRadiatedEnergyFlux } from "../src/ts/utils/physics";
 
 test("solarPanelSurfaceCalculation", () => {
     // test with ISS data

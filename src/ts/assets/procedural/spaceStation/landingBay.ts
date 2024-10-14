@@ -21,19 +21,19 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Transformable } from "../../../architecture/transformable";
-import { computeRingRotationPeriod } from "../../../utils/ringRotation";
 import { Settings } from "../../../settings";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { LandingPad, LandingPadSize } from "../landingPad/landingPad";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { createEnvironmentAggregate } from "../../../utils/physics";
-import { createRing } from "../../../utils/ringBuilder";
+import { createRing } from "../../../utils/geometry/ringBuilder";
 import { SpaceStationModel } from "../../../spacestation/spacestationModel";
 import { LandingBayMaterial } from "./landingBayMaterial";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 
 import { getRngFromSeed } from "../../../utils/getRngFromSeed";
+import { createEnvironmentAggregate } from "../../../utils/havok";
+import { computeRingRotationPeriod } from "../../../utils/physics";
 
 export class LandingBay {
     private readonly root: TransformNode;

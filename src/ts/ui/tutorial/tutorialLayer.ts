@@ -1,4 +1,4 @@
-import { pressInteractionToStrings } from "../../utils/inputControlsString";
+import { pressInteractionToStrings } from "../../utils/strings/inputControlsString";
 import { TutorialControlsInputs } from "./tutorialLayerInputs";
 import i18n from "../../i18n";
 import { Sounds } from "../../assets/sounds";

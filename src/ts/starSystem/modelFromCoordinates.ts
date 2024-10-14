@@ -1,4 +1,4 @@
-import { StarSystemCoordinates } from "../saveFile/universeCoordinates";
+import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates";
 import { newSeededStarSystemModel } from "./seededStarSystemModel";
 import { getSeedFromCoordinates } from "./systemSeed";
 

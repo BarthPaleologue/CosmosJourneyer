@@ -7,7 +7,7 @@ import { Tutorial } from "../../tutorials/tutorial";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { getSystemModelFromCoordinates } from "../../starSystem/modelFromCoordinates";
-import { getObjectBySystemId } from "../../utils/orbitalObjectId";
+import { getObjectBySystemId } from "../../utils/coordinates/orbitalObjectId";
 
 export class TutorialsPanelContent {
     readonly htmlRoot: HTMLElement;

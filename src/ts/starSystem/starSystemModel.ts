@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { StarSystemCoordinates } from "../saveFile/universeCoordinates";
+import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates";
 import { StellarObjectModel } from "../architecture/stellarObject";
 import { PlanetModel } from "../architecture/planet";
 import { AnomalyModel } from "../anomalies/anomaly";

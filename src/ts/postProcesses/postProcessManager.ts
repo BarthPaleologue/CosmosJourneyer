@@ -36,7 +36,6 @@ import { PostProcessType } from "./postProcessTypes";
 import { MandelbulbPostProcess } from "../anomalies/mandelbulb/mandelbulbPostProcess";
 import { ShadowPostProcess } from "./shadowPostProcess";
 import { LensFlarePostProcess } from "./lensFlarePostProcess";
-import { isOrbiting } from "../utils/nearestBody";
 import { UpdatablePostProcess } from "./objectPostProcess";
 import { MatterJetPostProcess } from "./matterJetPostProcess";
 import { Mandelbulb } from "../anomalies/mandelbulb/mandelbulb";
@@ -55,6 +54,7 @@ import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { BloomEffect } from "@babylonjs/core/PostProcesses/bloomEffect";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { Planet } from "../architecture/planet";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 /**
  * The order in which the post processes are rendered when away from a planet
@@ -387,7 +387,8 @@ export class PostProcessManager {
 
         const rings = this.getRings(body);
         const switchLimit = rings !== null ? rings.ringsUniforms.model.ringStart : 2;
-        if (isOrbiting(this.scene.getActiveControls(), body, switchLimit)) this.setSurfaceOrder();
+        const distance2 = Vector3.DistanceSquared(body.getTransform().getAbsolutePosition(), this.scene.getActiveControls().getTransform().getAbsolutePosition());
+        if (distance2 < (switchLimit * body.getBoundingRadius()) ** 2) this.setSurfaceOrder();
         else this.setSpaceOrder();
     }
 

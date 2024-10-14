@@ -25,16 +25,16 @@ import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { Spaceship } from "./spaceship";
 import { SpaceShipControlsInputs } from "./spaceShipControlsInputs";
-import { moveTowards } from "../utils/moveTowards";
 import { createNotification } from "../utils/notification";
 import { StarSystemInputs } from "../inputs/starSystemInputs";
-import { pressInteractionToStrings } from "../utils/inputControlsString";
+import { pressInteractionToStrings } from "../utils/strings/inputControlsString";
 import i18n from "../i18n";
 import { Transformable } from "../architecture/transformable";
 import { ManagesLandingPads } from "../utils/managesLandingPads";
 import { Sounds } from "../assets/sounds";
 import { LandingPadSize } from "../assets/procedural/landingPad/landingPad";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
+import { moveTowards } from "../utils/math";
 
 export class ShipControls implements Controls {
     readonly spaceship: Spaceship;

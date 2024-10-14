@@ -19,7 +19,7 @@ import {
     getRadiatedEnergyFlux,
     getSphereRadiatedEnergyFlux,
     getSphereTotalRadiatedEnergy
-} from "../src/ts/utils/thermodynamic";
+} from "../src/ts/utils/physics";
 
 describe('Stefan-Boltzmann Law Functions', () => {
 

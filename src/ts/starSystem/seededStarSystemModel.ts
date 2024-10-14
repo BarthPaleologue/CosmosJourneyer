@@ -17,7 +17,7 @@
 
 import { centeredRand, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../settings";
-import { generateStarName } from "../utils/starNameGenerator";
+import { generateStarName } from "../utils/strings/starNameGenerator";
 import { wheelOfFortune } from "../utils/random";
 import { PlanetarySystemModel, StarSystemModel } from "./starSystemModel";
 import { StarSector } from "../starmap/starSector";
@@ -25,7 +25,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { hashVec3 } from "../utils/hashVec3";
 import { StellarObjectModel } from "../architecture/stellarObject";
 import { AnomalyModel } from "../anomalies/anomaly";
-import { Alphabet, ReversedGreekAlphabet } from "../utils/parseToStrings";
+import { Alphabet, ReversedGreekAlphabet } from "../utils/strings/parseToStrings";
 import { newSeededStarModel } from "../stellarObjects/star/starModel";
 import { newSeededBlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
@@ -34,7 +34,7 @@ import { newSeededGasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 import { newSeededMandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModel";
 import { newSeededJuliaSetModel } from "../anomalies/julia/juliaSetModel";
 import { getRngFromSeed } from "../utils/getRngFromSeed";
-import { romanNumeral } from "../utils/romanNumerals";
+import { romanNumeral } from "../utils/strings/romanNumerals";
 import { newSeededSpaceStationModel } from "../spacestation/spacestationModel";
 import { SystemSeed } from "./systemSeed";
 import { isSystemInHumanBubble } from "../society/starSystemSociety";

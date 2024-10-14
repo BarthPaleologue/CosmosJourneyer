@@ -1,7 +1,7 @@
-import { getStarGalacticPosition } from "../utils/starSystemCoordinatesUtils";
+import { getStarGalacticPosition } from "../utils/coordinates/starSystemCoordinatesUtils";
 import { Settings } from "../settings";
 
-import { StarSystemCoordinates } from "../saveFile/universeCoordinates";
+import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates";
 
 export function isSystemInHumanBubble(systemCoordinates: StarSystemCoordinates) {
     const systemPosition = getStarGalacticPosition(systemCoordinates);

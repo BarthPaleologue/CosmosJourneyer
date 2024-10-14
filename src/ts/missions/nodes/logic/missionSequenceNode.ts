@@ -18,7 +18,7 @@
 import { MissionNode, MissionNodeSerialized, MissionNodeType } from "../missionNode";
 import { MissionContext } from "../../missionContext";
 
-import { StarSystemCoordinates } from "../../../saveFile/universeCoordinates";
+import { StarSystemCoordinates } from "../../../utils/coordinates/universeCoordinates";
 
 export type MissionSequenceNodeSerialized = MissionNodeSerialized & {
     activeChildIndex: number;

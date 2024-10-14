@@ -43,7 +43,7 @@ import { Orbit } from "../orbit/orbit";
 
 import { getRngFromSeed } from "../utils/getRngFromSeed";
 import i18n from "../i18n";
-import { orbitalObjectTypeToDisplay } from "../utils/orbitalObjectTypeToDisplay";
+import { orbitalObjectTypeToDisplay } from "../utils/strings/orbitalObjectTypeToDisplay";
 
 export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads {
     readonly name: string;

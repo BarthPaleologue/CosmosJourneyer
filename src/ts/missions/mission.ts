@@ -18,9 +18,9 @@
 import { MissionNode, MissionNodeSerialized } from "./nodes/missionNode";
 import { MissionContext } from "./missionContext";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
-import { getObjectModelByUniverseId, getUniverseIdForSpaceStationModel } from "../utils/orbitalObjectId";
+import { getObjectModelByUniverseId, getUniverseIdForSpaceStationModel } from "../utils/coordinates/orbitalObjectId";
 import i18n from "../i18n";
-import { StarSystemCoordinates, UniverseObjectId } from "../saveFile/universeCoordinates";
+import { StarSystemCoordinates, UniverseObjectId } from "../utils/coordinates/universeCoordinates";
 import { deserializeMissionNode } from "./nodes/deserializeNode";
 
 /**

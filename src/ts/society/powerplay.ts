@@ -1,8 +1,8 @@
 import { Settings } from "../settings";
 import { makeNoise3D } from "fast-simplex-noise";
-import { getStarGalacticPosition } from "../utils/starSystemCoordinatesUtils";
+import { getStarGalacticPosition } from "../utils/coordinates/starSystemCoordinatesUtils";
 
-import { StarSystemCoordinates } from "../saveFile/universeCoordinates";
+import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates";
 import { getRngFromSeed } from "../utils/getRngFromSeed";
 
 const materialistSpiritualistRng = getRngFromSeed(Settings.POWER_PLAY_SEED);

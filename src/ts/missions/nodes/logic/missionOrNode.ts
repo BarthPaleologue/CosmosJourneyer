@@ -19,7 +19,7 @@ import { MissionNode, MissionNodeSerialized, MissionNodeType } from "../missionN
 import { MissionContext } from "../../missionContext";
 import i18n from "../../../i18n";
 
-import { StarSystemCoordinates } from "../../../saveFile/universeCoordinates";
+import { StarSystemCoordinates } from "../../../utils/coordinates/universeCoordinates";
 
 export type MissionOrNodeSerialized = MissionNodeSerialized;
 

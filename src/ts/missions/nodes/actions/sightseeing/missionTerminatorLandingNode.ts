@@ -17,16 +17,16 @@
 
 import { MissionNode, MissionNodeSerialized, MissionNodeType } from "../../missionNode";
 import { MissionContext } from "../../../missionContext";
-import { StarSystemCoordinates, starSystemCoordinatesEquals, UniverseObjectId, universeObjectIdEquals } from "../../../../saveFile/universeCoordinates";
+import { StarSystemCoordinates, starSystemCoordinatesEquals, UniverseObjectId, universeObjectIdEquals } from "../../../../utils/coordinates/universeCoordinates";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { CollisionMask, Settings } from "../../../../settings";
-import { getObjectBySystemId, getObjectModelByUniverseId } from "../../../../utils/orbitalObjectId";
-import { getStarGalacticPosition } from "../../../../utils/starSystemCoordinatesUtils";
+import { getObjectBySystemId, getObjectModelByUniverseId } from "../../../../utils/coordinates/orbitalObjectId";
+import { getStarGalacticPosition } from "../../../../utils/coordinates/starSystemCoordinatesUtils";
 import i18n from "../../../../i18n";
-import { parseDistance } from "../../../../utils/parseToStrings";
+import { parseDistance } from "../../../../utils/strings/parseToStrings";
 import { getGlobalKeyboardLayoutMap } from "../../../../utils/keyboardAPI";
-import { pressInteractionToStrings } from "../../../../utils/inputControlsString";
+import { pressInteractionToStrings } from "../../../../utils/strings/inputControlsString";
 import { GeneralInputs } from "../../../../inputs/generalInputs";
 import { getSystemModelFromCoordinates } from "../../../../starSystem/modelFromCoordinates";
 

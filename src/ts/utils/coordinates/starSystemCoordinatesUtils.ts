@@ -1,6 +1,6 @@
-import { StarSector } from "../starmap/starSector";
+import { StarSector } from "../../starmap/starSector";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { StarSystemCoordinates } from "../saveFile/universeCoordinates";
+import { StarSystemCoordinates } from "./universeCoordinates";
 
 /**
  * Get the galactic position of a star system in the universe in light years.

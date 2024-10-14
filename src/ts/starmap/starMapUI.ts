@@ -19,18 +19,18 @@ import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Scene } from "@babylonjs/core/scene";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import i18n from "../i18n";
-import { getStarGalacticPosition } from "../utils/starSystemCoordinatesUtils";
+import { getStarGalacticPosition } from "../utils/coordinates/starSystemCoordinatesUtils";
 import { factionToString } from "../society/factions";
 import { isSystemInHumanBubble } from "../society/starSystemSociety";
 import { StarMapBookmarkButton } from "./starMapBookmarkButton";
 import { Player } from "../player/player";
 import { SystemIcons } from "./systemIcons";
 import { getRgbFromTemperature } from "../utils/specrend";
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../saveFile/universeCoordinates";
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/universeCoordinates";
 import { getSystemModelFromCoordinates } from "../starSystem/modelFromCoordinates";
 import { StarSystemModelUtils } from "../starSystem/starSystemModel";
 
-import { orbitalObjectTypeToDisplay } from "../utils/orbitalObjectTypeToDisplay";
+import { orbitalObjectTypeToDisplay } from "../utils/strings/orbitalObjectTypeToDisplay";
 
 export class StarMapUI {
     readonly htmlRoot: HTMLDivElement;

@@ -21,16 +21,16 @@ import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Transformable } from "../../../architecture/transformable";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { computeRingRotationPeriod } from "../../../utils/ringRotation";
 import { Settings } from "../../../settings";
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { HelixHabitatMaterial } from "./helixHabitatMaterial";
-import { createEnvironmentAggregate } from "../../../utils/physics";
-import { createHelix } from "../../../utils/helixBuilder";
+import { createHelix } from "../../../utils/geometry/helixBuilder";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { getRngFromSeed } from "../../../utils/getRngFromSeed";
+import { createEnvironmentAggregate } from "../../../utils/havok";
+import { computeRingRotationPeriod } from "../../../utils/physics";
 
 export class HelixHabitat implements Transformable {
     private readonly root: TransformNode;

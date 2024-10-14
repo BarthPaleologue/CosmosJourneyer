@@ -19,7 +19,7 @@ import { getNeighborStarSystemCoordinates } from "../utils/getNeighborStarSystem
 import { SpaceStationModel } from "../spacestation/spacestationModel";
 import { newSightSeeingMission } from "./sightSeeingMission";
 import { uniformRandBool } from "extended-random";
-import { SystemObjectType } from "../saveFile/universeCoordinates";
+import { SystemObjectType } from "../utils/coordinates/universeCoordinates";
 import { Player } from "../player/player";
 import { hasLiquidWater, TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 import { Mission, MissionType } from "./mission";

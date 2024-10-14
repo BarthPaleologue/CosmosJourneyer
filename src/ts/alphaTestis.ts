@@ -28,7 +28,7 @@ import { SpaceShipControlsInputs } from "./spaceship/spaceShipControlsInputs";
 import { newSeededStarModel } from "./stellarObjects/star/starModel";
 import { newSeededSpaceStationModel } from "./spacestation/spacestationModel";
 import { StarSystemModel } from "./starSystem/starSystemModel";
-import { StarSystemCoordinates } from "./saveFile/universeCoordinates";
+import { StarSystemCoordinates } from "./utils/coordinates/universeCoordinates";
 
 const engine = await CosmosJourneyer.CreateAsync();
 

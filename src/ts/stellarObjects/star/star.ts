@@ -38,7 +38,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { Orbit } from "../../orbit/orbit";
 import { getRgbFromTemperature } from "../../utils/specrend";
-import { orbitalObjectTypeToDisplay } from "../../utils/orbitalObjectTypeToDisplay";
+import { orbitalObjectTypeToDisplay } from "../../utils/strings/orbitalObjectTypeToDisplay";
 
 export class Star implements StellarObject, Cullable {
     readonly name: string;

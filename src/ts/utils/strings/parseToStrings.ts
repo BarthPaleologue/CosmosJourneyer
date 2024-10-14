@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Settings } from "../settings";
-import i18n from "../i18n";
+import { Settings } from "../../settings";
+import i18n from "../../i18n";
 
 export function parseSpeed(speed: number): string {
     if (speed < 1000) {
