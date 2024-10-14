@@ -37,7 +37,7 @@ export class RingsPostProcess extends PostProcess implements ObjectPostProcess {
 
     private activeCamera: Camera | null = null;
 
-    constructor(name: string, scene: Scene, body: CelestialBody, stellarObjects: Transformable[]) {
+    constructor(body: CelestialBody, stellarObjects: Transformable[], scene: Scene) {
         const shaderName = "rings";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = ringsFragment;
@@ -46,7 +46,7 @@ export class RingsPostProcess extends PostProcess implements ObjectPostProcess {
         const ringsUniforms = body.getRingsUniforms();
         if (ringsUniforms === null) {
             throw new Error(
-                `RingsPostProcess: ringsUniforms are null. This should not be possible as the postprocess should not be created if the body has no rings. Body: ${body.name}`
+                `RingsPostProcess: ringsUniforms are null. This should not be possible as the postprocess should not be created if the body has no rings. Body: ${body.model.name}`
             );
         }
 
@@ -59,7 +59,19 @@ export class RingsPostProcess extends PostProcess implements ObjectPostProcess {
 
         const samplers: string[] = [...Object.values(SamplerUniformNames), ...Object.values(RingsSamplerNames)];
 
-        super(name, shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
+        super(
+            `${body.model.name}RingPostProcess`,
+            shaderName,
+            uniforms,
+            samplers,
+            1,
+            null,
+            Texture.BILINEAR_SAMPLINGMODE,
+            scene.getEngine(),
+            false,
+            null,
+            Constants.TEXTURETYPE_HALF_FLOAT
+        );
 
         this.object = body;
         this.ringsUniforms = ringsUniforms;

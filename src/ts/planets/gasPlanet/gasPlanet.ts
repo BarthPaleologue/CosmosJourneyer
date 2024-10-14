@@ -43,7 +43,6 @@ export class GasPlanet implements Planet, Cullable {
     readonly aggregate: PhysicsAggregate;
     readonly model: GasPlanetModel;
 
-    name: string;
     postProcesses: PostProcessType[] = [];
 
     readonly ringsUniforms: RingsUniforms | null;
@@ -57,10 +56,8 @@ export class GasPlanet implements Planet, Cullable {
     constructor(model: GasPlanetModel, scene: Scene) {
         this.model = model;
 
-        this.name = this.model.name;
-
         this.mesh = MeshBuilder.CreateSphere(
-            this.name,
+            this.model.name,
             {
                 diameter: this.model.radius * 2,
                 segments: 64
@@ -82,7 +79,7 @@ export class GasPlanet implements Planet, Cullable {
         const physicsShape = new PhysicsShapeSphere(Vector3.Zero(), this.model.radius, scene);
         this.aggregate.shape.addChildFromParent(this.getTransform(), physicsShape, this.mesh);
 
-        this.material = new GasPlanetMaterial(this.name, this.model, scene);
+        this.material = new GasPlanetMaterial(this.model.name, this.model, scene);
         this.mesh.material = this.material;
 
         this.postProcesses.push(PostProcessType.ATMOSPHERE, PostProcessType.SHADOW);

@@ -70,15 +70,14 @@ export class ChunkTree implements Cullable {
     /**
      *
      * @param direction
-     * @param planetName
      * @param planetModel
      * @param parentAggregate
      * @param material
      * @param scene
      */
-    constructor(direction: Direction, planetName: string, planetModel: TelluricPlanetModel, parentAggregate: PhysicsAggregate, material: Material, scene: Scene) {
+    constructor(direction: Direction, planetModel: TelluricPlanetModel, parentAggregate: PhysicsAggregate, material: Material, scene: Scene) {
         this.rootChunkLength = planetModel.radius * 2;
-        this.planetName = planetName;
+        this.planetName = planetModel.name;
         this.planetSeed = planetModel.seed;
         this.terrainSettings = planetModel.terrainSettings;
 

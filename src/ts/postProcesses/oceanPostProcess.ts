@@ -47,7 +47,7 @@ export class OceanPostProcess extends PostProcess implements ObjectPostProcess, 
 
     private activeCamera: Camera | null = null;
 
-    constructor(name: string, planet: TelluricPlanet, scene: Scene, stars: Transformable[]) {
+    constructor(planet: TelluricPlanet, stellarObjects: Transformable[], scene: Scene) {
         const shaderName = "ocean";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = oceanFragment;
@@ -87,7 +87,19 @@ export class OceanPostProcess extends PostProcess implements ObjectPostProcess, 
 
         const samplers: string[] = [...Object.values(SamplerUniformNames), ...Object.values(OceanSamplerNames)];
 
-        super(name, shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
+        super(
+            `${planet.model.name}OceanPostProcess`,
+            shaderName,
+            uniforms,
+            samplers,
+            1,
+            null,
+            Texture.BILINEAR_SAMPLINGMODE,
+            scene.getEngine(),
+            false,
+            null,
+            Constants.TEXTURETYPE_HALF_FLOAT
+        );
 
         this.object = planet;
         this.oceanUniforms = oceanUniforms;
@@ -100,7 +112,7 @@ export class OceanPostProcess extends PostProcess implements ObjectPostProcess, 
             }
 
             setCameraUniforms(effect, this.activeCamera);
-            setStellarObjectUniforms(effect, stars);
+            setStellarObjectUniforms(effect, stellarObjects);
             setObjectUniforms(effect, planet);
 
             effect.setFloat(OceanUniformNames.OCEAN_RADIUS, planet.getRadius() + planet.model.physics.oceanLevel);

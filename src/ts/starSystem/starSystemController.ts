@@ -399,36 +399,36 @@ export class StarSystemController {
                         break;
                     case PostProcessType.ATMOSPHERE:
                         if (!(object instanceof GasPlanet) && !(object instanceof TelluricPlanet))
-                            throw new Error("Atmosphere post process can only be added to gas or telluric planets. Source:" + object.name);
+                            throw new Error("Atmosphere post process can only be added to gas or telluric planets. Source:" + object.model.name);
                         postProcessManager.addAtmosphere(object as GasPlanet | TelluricPlanet, stellarObjects);
                         break;
                     case PostProcessType.CLOUDS:
-                        if (!(object instanceof TelluricPlanet)) throw new Error("Clouds post process can only be added to telluric planets. Source:" + object.name);
+                        if (!(object instanceof TelluricPlanet)) throw new Error("Clouds post process can only be added to telluric planets. Source:" + object.model.name);
                         postProcessManager.addClouds(object as TelluricPlanet, stellarObjects);
                         break;
                     case PostProcessType.OCEAN:
-                        if (!(object instanceof TelluricPlanet)) throw new Error("Ocean post process can only be added to telluric planets. Source:" + object.name);
+                        if (!(object instanceof TelluricPlanet)) throw new Error("Ocean post process can only be added to telluric planets. Source:" + object.model.name);
                         postProcessManager.addOcean(object as TelluricPlanet, stellarObjects);
                         break;
                     case PostProcessType.VOLUMETRIC_LIGHT:
                         if (!(object instanceof Star) && !(object instanceof NeutronStar))
-                            throw new Error("Volumetric light post process can only be added to stars and neutron stars. Source:" + object.name);
+                            throw new Error("Volumetric light post process can only be added to stars and neutron stars. Source:" + object.model.name);
                         postProcessManager.addVolumetricLight(object, [this.starFieldBox.mesh]);
                         break;
                     case PostProcessType.MANDELBULB:
-                        if (!(object instanceof Mandelbulb)) throw new Error("Mandelbulb post process can only be added to mandelbulbs. Source:" + object.name);
+                        if (!(object instanceof Mandelbulb)) throw new Error("Mandelbulb post process can only be added to mandelbulbs. Source:" + object.model.name);
                         postProcessManager.addMandelbulb(object as Mandelbulb, stellarObjects);
                         break;
                     case PostProcessType.JULIA_SET:
-                        if (!(object instanceof JuliaSet)) throw new Error("Julia set post process can only be added to julia sets. Source:" + object.name);
+                        if (!(object instanceof JuliaSet)) throw new Error("Julia set post process can only be added to julia sets. Source:" + object.model.name);
                         postProcessManager.addJuliaSet(object as JuliaSet, stellarObjects);
                         break;
                     case PostProcessType.BLACK_HOLE:
-                        if (!(object instanceof BlackHole)) throw new Error("Black hole post process can only be added to black holes. Source:" + object.name);
+                        if (!(object instanceof BlackHole)) throw new Error("Black hole post process can only be added to black holes. Source:" + object.model.name);
                         postProcessManager.addBlackHole(object as BlackHole);
                         break;
                     case PostProcessType.MATTER_JETS:
-                        if (!(object instanceof NeutronStar)) throw new Error("Matter jets post process can only be added to neutron stars. Source:" + object.name);
+                        if (!(object instanceof NeutronStar)) throw new Error("Matter jets post process can only be added to neutron stars. Source:" + object.model.name);
                         postProcessManager.addMatterJet(object as NeutronStar);
                         break;
                     case PostProcessType.SHADOW:
@@ -558,7 +558,7 @@ export class StarSystemController {
 
             const parents = this.objectToParents.get(object);
             if (parents === undefined) {
-                throw new Error(`Parents of ${object.name} are not defined`);
+                throw new Error(`Parents of ${object.model.name} are not defined`);
             }
 
             OrbitalObjectUtils.SetOrbitalPosition(object, parents, this.elapsedSeconds);

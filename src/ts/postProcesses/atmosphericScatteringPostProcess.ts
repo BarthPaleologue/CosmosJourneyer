@@ -55,7 +55,7 @@ export class AtmosphericScatteringPostProcess extends PostProcess implements Obj
 
     private activeCamera: Camera | null = null;
 
-    constructor(name: string, planet: GasPlanet | TelluricPlanet, atmosphereHeight: number, scene: Scene, stellarObjects: Transformable[]) {
+    constructor(planet: GasPlanet | TelluricPlanet, atmosphereHeight: number, stellarObjects: Transformable[], scene: Scene) {
         const shaderName = "atmosphericScattering";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = atmosphericScatteringFragment;
@@ -102,7 +102,19 @@ export class AtmosphericScatteringPostProcess extends PostProcess implements Obj
 
         const samplers: string[] = [...Object.values(SamplerUniformNames), ...Object.values(AtmosphereSamplerNames)];
 
-        super(name, shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
+        super(
+            `${planet.model.name}AtmospherePostProcess`,
+            shaderName,
+            uniforms,
+            samplers,
+            1,
+            null,
+            Texture.BILINEAR_SAMPLINGMODE,
+            scene.getEngine(),
+            false,
+            null,
+            Constants.TEXTURETYPE_HALF_FLOAT
+        );
 
         this.object = planet;
         this.atmosphereUniforms = atmosphereUniforms;

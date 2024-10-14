@@ -27,11 +27,6 @@ import { getPointOnOrbit, Orbit } from "../orbit/orbit";
  * Describes all objects that can have an orbital trajectory and rotate on themselves
  */
 export interface OrbitalObject extends Transformable, HasBoundingSphere, TypedObject {
-    /**
-     * The name of the object
-     */
-    readonly name: string;
-
     readonly model: OrbitalObjectModel;
 
     /**

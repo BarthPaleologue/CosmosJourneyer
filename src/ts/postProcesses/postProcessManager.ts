@@ -213,7 +213,7 @@ export class PostProcessManager {
      * @param stellarObjects An array of stars or black holes
      */
     public addOcean(planet: TelluricPlanet, stellarObjects: StellarObject[]) {
-        const ocean = new OceanPostProcess(`${planet.name}Ocean`, planet, this.scene, stellarObjects);
+        const ocean = new OceanPostProcess(planet, stellarObjects, this.scene);
         this.oceans.push(ocean);
     }
 
@@ -234,9 +234,9 @@ export class PostProcessManager {
         const uniforms = planet.getCloudsUniforms();
         if (uniforms === null)
             throw new Error(
-                `PostProcessManager: addClouds: uniforms are null. This should not be possible as the postprocess should not be created if the body has no clouds. Body: ${planet.name}`
+                `PostProcessManager: addClouds: uniforms are null. This should not be possible as the postprocess should not be created if the body has no clouds. Body: ${planet.model.name}`
             );
-        this.clouds.push(new FlatCloudsPostProcess(`${planet.name}Clouds`, planet, uniforms, this.scene, stellarObjects));
+        this.clouds.push(new FlatCloudsPostProcess(planet, uniforms, stellarObjects, this.scene));
     }
 
     /**
@@ -254,11 +254,10 @@ export class PostProcessManager {
      */
     public addAtmosphere(planet: GasPlanet | TelluricPlanet, stellarObjects: StellarObject[]) {
         const atmosphere = new AtmosphericScatteringPostProcess(
-            `${planet.name}Atmosphere`,
             planet,
             Settings.ATMOSPHERE_HEIGHT * Math.max(1, planet.model.radius / Settings.EARTH_RADIUS),
-            this.scene,
-            stellarObjects
+            stellarObjects,
+            this.scene
         );
         this.atmospheres.push(atmosphere);
     }
@@ -277,7 +276,7 @@ export class PostProcessManager {
      * @param stellarObjects An array of stars or black holes
      */
     public addRings(body: CelestialBody, stellarObjects: StellarObject[]) {
-        this.rings.push(new RingsPostProcess(body.name + "Rings", this.scene, body, stellarObjects));
+        this.rings.push(new RingsPostProcess(body, stellarObjects, this.scene));
     }
 
     /**
@@ -365,7 +364,7 @@ export class PostProcessManager {
      * @param stellarObjects An array of stellar objects
      */
     public addShadowCaster(body: CelestialBody, stellarObjects: StellarObject[]) {
-        this.shadows.push(new ShadowPostProcess(body.name + "Shadow", body, stellarObjects, this.scene));
+        this.shadows.push(new ShadowPostProcess(body, stellarObjects, this.scene));
     }
 
     /**

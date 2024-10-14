@@ -56,7 +56,7 @@ export class TutorialsPanelContent {
                     const correspondingCelestialBody = starSystemView
                         .getStarSystem()
                         .getCelestialBodies()
-                        .find((body) => body.name === orbitalObject.name);
+                        .find((body) => body === orbitalObject);
                     if (correspondingCelestialBody === undefined) {
                         throw new Error("No corresponding celestial body found");
                     }

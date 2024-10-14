@@ -39,8 +39,6 @@ import { getRgbFromTemperature } from "../../utils/specrend";
 import { orbitalObjectTypeToDisplay } from "../../utils/strings/orbitalObjectTypeToDisplay";
 
 export class Star implements StellarObject, Cullable {
-    readonly name: string;
-
     readonly mesh: Mesh;
     readonly light: PointLight;
     private readonly material: StarMaterial;
@@ -63,10 +61,8 @@ export class Star implements StellarObject, Cullable {
     constructor(model: StarModel, scene: Scene) {
         this.model = model;
 
-        this.name = this.model.name;
-
         this.mesh = MeshBuilder.CreateSphere(
-            this.name,
+            this.model.name,
             {
                 diameter: this.model.radius * 2,
                 segments: 32
@@ -86,7 +82,7 @@ export class Star implements StellarObject, Cullable {
         this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
         this.aggregate.body.disablePreStep = false;
 
-        this.light = new PointLight(`${this.name}Light`, Vector3.Zero(), scene);
+        this.light = new PointLight(`${this.model.name}Light`, Vector3.Zero(), scene);
         this.light.diffuse = getRgbFromTemperature(this.model.physics.temperature);
         this.light.falloffType = Light.FALLOFF_STANDARD;
         this.light.parent = this.getTransform();

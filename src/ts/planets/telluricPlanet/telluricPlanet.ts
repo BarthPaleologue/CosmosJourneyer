@@ -39,8 +39,6 @@ import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { orbitalObjectTypeToDisplay } from "../../utils/strings/orbitalObjectTypeToDisplay";
 
 export class TelluricPlanet implements Planet, Cullable {
-    readonly name: string;
-
     readonly sides: ChunkTree[]; // stores the 6 sides of the sphere
 
     readonly material: TelluricPlanetMaterial;
@@ -65,9 +63,7 @@ export class TelluricPlanet implements Planet, Cullable {
     constructor(model: TelluricPlanetModel, scene: Scene) {
         this.model = model;
 
-        this.name = this.model.name;
-
-        this.transform = new TransformNode(this.name, scene);
+        this.transform = new TransformNode(this.model.name, scene);
 
         rotate(this.transform, Axis.X, this.model.physics.axialTilt);
         this.transform.computeWorldMatrix(true);
@@ -110,15 +106,15 @@ export class TelluricPlanet implements Planet, Cullable {
             this.cloudsUniforms = null;
         }
 
-        this.material = new TelluricPlanetMaterial(this.name, this.model, scene);
+        this.material = new TelluricPlanetMaterial(this.model, scene);
 
         this.sides = [
-            new ChunkTree(Direction.UP, this.name, this.model, this.aggregate, this.material, scene),
-            new ChunkTree(Direction.DOWN, this.name, this.model, this.aggregate, this.material, scene),
-            new ChunkTree(Direction.FORWARD, this.name, this.model, this.aggregate, this.material, scene),
-            new ChunkTree(Direction.BACKWARD, this.name, this.model, this.aggregate, this.material, scene),
-            new ChunkTree(Direction.RIGHT, this.name, this.model, this.aggregate, this.material, scene),
-            new ChunkTree(Direction.LEFT, this.name, this.model, this.aggregate, this.material, scene)
+            new ChunkTree(Direction.UP, this.model, this.aggregate, this.material, scene),
+            new ChunkTree(Direction.DOWN, this.model, this.aggregate, this.material, scene),
+            new ChunkTree(Direction.FORWARD, this.model, this.aggregate, this.material, scene),
+            new ChunkTree(Direction.BACKWARD, this.model, this.aggregate, this.material, scene),
+            new ChunkTree(Direction.RIGHT, this.model, this.aggregate, this.material, scene),
+            new ChunkTree(Direction.LEFT, this.model, this.aggregate, this.material, scene)
         ];
     }
 

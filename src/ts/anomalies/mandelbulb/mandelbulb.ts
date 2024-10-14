@@ -29,8 +29,6 @@ import { CelestialBody } from "../../architecture/celestialBody";
 import { orbitalObjectTypeToDisplay } from "../../utils/strings/orbitalObjectTypeToDisplay";
 
 export class Mandelbulb implements CelestialBody, Cullable {
-    readonly name: string;
-
     readonly model: MandelbulbModel;
 
     private readonly transform: TransformNode;
@@ -44,8 +42,6 @@ export class Mandelbulb implements CelestialBody, Cullable {
      */
     constructor(model: MandelbulbModel, scene: Scene) {
         this.model = model;
-
-        this.name = this.model.name;
 
         this.transform = new TransformNode(this.model.name, scene);
 

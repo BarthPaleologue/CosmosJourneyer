@@ -93,11 +93,10 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
 
     /**
      * Creates a new telluric planet material
-     * @param planetName The name of the planet
      * @param model The model of the planet associated with this material
      * @param scene
      */
-    constructor(planetName: string, model: TelluricPlanetModel, scene: Scene) {
+    constructor(model: TelluricPlanetModel, scene: Scene) {
         const shaderName = "surfaceMaterial";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
@@ -106,7 +105,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
             Effect.ShadersStore[`${shaderName}VertexShader`] = surfaceMaterialVertex;
         }
 
-        super(`${planetName}SurfaceColor`, scene, shaderName, {
+        super(`${model.name}SurfaceColor`, scene, shaderName, {
             attributes: ["position", "normal"],
             uniforms: [...Object.values(TelluricPlanetMaterialUniformNames), ...Object.values(StellarObjectUniformNames)],
             samplers: [...Object.values(TelluricPlanetMaterialSamplerNames)]
@@ -151,7 +150,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
         }
 
         this.setTexture("lut", Textures.EMPTY_TEXTURE);
-        const lut = new ProceduralTexture(`${planetName}MaterialLut`, 4096, "telluricPlanetLut", scene, null, true, false);
+        const lut = new ProceduralTexture(`${model.name}MaterialLut`, 4096, "telluricPlanetLut", scene, null, true, false);
         lut.setFloat(TelluricPlanetMaterialUniformNames.MIN_TEMPERATURE, this.planetModel.physics.minTemperature);
         lut.setFloat(TelluricPlanetMaterialUniformNames.MAX_TEMPERATURE, this.planetModel.physics.maxTemperature);
         lut.setFloat(TelluricPlanetMaterialUniformNames.PRESSURE, this.planetModel.physics.pressure);

@@ -344,7 +344,7 @@ export class MainMenu {
         if (orbitalObject === null) {
             throw new Error("Could not find object with ID " + JSON.stringify(this.universeObjectId));
         }
-        const celestialBody = starSystemController.getCelestialBodies().find((body) => body.name === orbitalObject.name);
+        const celestialBody = starSystemController.getCelestialBodies().find((body) => body === orbitalObject);
         if (celestialBody === undefined) {
             throw new Error("No corresponding celestial body found");
         }

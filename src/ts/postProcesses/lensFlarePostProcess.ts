@@ -69,7 +69,7 @@ export class LensFlarePostProcess extends PostProcess implements ObjectPostProce
 
         const samplers: string[] = Object.values(SamplerUniformNames);
 
-        super(object.name + "LensFlare", shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
+        super(object.model.name + "LensFlare", shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
 
         this.object = object;
         this.settings = settings;

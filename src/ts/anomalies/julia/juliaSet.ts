@@ -29,8 +29,6 @@ import { CelestialBody } from "../../architecture/celestialBody";
 import { orbitalObjectTypeToDisplay } from "../../utils/strings/orbitalObjectTypeToDisplay";
 
 export class JuliaSet implements CelestialBody, Cullable {
-    readonly name: string;
-
     readonly model: JuliaSetModel;
 
     private readonly transform: TransformNode;
@@ -45,9 +43,7 @@ export class JuliaSet implements CelestialBody, Cullable {
     constructor(model: JuliaSetModel, scene: Scene) {
         this.model = model;
 
-        this.name = this.model.name;
-
-        this.transform = new TransformNode(this.name, scene);
+        this.transform = new TransformNode(this.model.name, scene);
 
         this.postProcesses.push(PostProcessType.JULIA_SET);
 
