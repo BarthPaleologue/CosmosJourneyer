@@ -29,6 +29,7 @@ import { newSeededStarModel } from "./stellarObjects/star/starModel";
 import { newSeededSpaceStationModel } from "./spacestation/spacestationModel";
 import { StarSystemModel } from "./starSystem/starSystemModel";
 import { StarSystemCoordinates } from "./utils/coordinates/universeCoordinates";
+import { CustomSystemRegistry } from "./starSystem/customSystemRegistry";
 
 const engine = await CosmosJourneyer.CreateAsync();
 
@@ -49,7 +50,8 @@ const systemCoordinates: StarSystemCoordinates = {
     localZ: 0
 };
 
-const sunModel = newSeededStarModel(42, "Weierstrass", []);
+const sunModel = newSeededStarModel(420, "Weierstrass", []);
+sunModel.physicalProperties.temperature = 5778;
 sunModel.orbit.period = 60 * 60 * 24;
 
 /*const secundaModel = new StarModel(-672446, sunModel);
@@ -89,6 +91,7 @@ moonModel.orbit.radius = 8 * hecateModel.radius;
 moonModel.orbit.normalToPlane = Vector3.Up();
 
 const aresModel = newSeededTelluricPlanetModel(0.3725, "Ares", [sunModel]);
+if (aresModel.clouds !== null) aresModel.clouds.coverage = 1;
 aresModel.physicalProperties.mass = 7;
 aresModel.physicalProperties.rotationPeriod = (24 * 60 * 60) / 30;
 aresModel.physicalProperties.minTemperature = -30;
@@ -107,7 +110,7 @@ aresModel.orbit.normalToPlane = Vector3.Up();
 
 const andromaqueModel = newSeededGasPlanetModel(0.28711440474126226, "Andromaque", [sunModel]);
 andromaqueModel.orbit.period = 60 * 60 * 24 * 365.25;
-andromaqueModel.orbit.radius = 25300 * aresModel.radius;
+andromaqueModel.orbit.radius = 25300 * hecateModel.radius;
 andromaqueModel.orbit.normalToPlane = Vector3.Up();
 
 const starSystemModel: StarSystemModel = {
@@ -126,6 +129,8 @@ const starSystemModel: StarSystemModel = {
         }
     ]
 };
+
+CustomSystemRegistry.RegisterSystem(starSystemModel);
 
 const starSystem = await starSystemView.loadStarSystem(starSystemModel);
 

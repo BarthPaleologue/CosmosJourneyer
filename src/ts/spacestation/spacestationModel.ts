@@ -138,7 +138,7 @@ export function newSeededSpaceStationModel(
     stellarObjectModels.forEach((stellarObject) => {
         const exposureTimeFraction = 0.5;
         const starRadius = stellarObject.radius;
-        const starTemperature = stellarObject.temperature;
+        const starTemperature = stellarObject.physicalProperties.temperature;
         totalStellarFlux += getSphereRadiatedEnergyFlux(starTemperature, starRadius, distanceToStar) * exposureTimeFraction;
     });
 

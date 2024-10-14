@@ -17,7 +17,7 @@
 
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { StarPhysicalProperties } from "../../architecture/physicalProperties";
+import { StellarObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import { StellarObjectModel } from "../../architecture/stellarObject";
 import { getOrbitalPeriod, Orbit } from "../../orbit/orbit";
 import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
@@ -30,9 +30,6 @@ import { OrbitalObjectType } from "../../architecture/orbitalObject";
 
 export type NeutronStarModel = StellarObjectModel & {
     readonly type: OrbitalObjectType.NEUTRON_STAR;
-    readonly temperature: number;
-
-    readonly physicalProperties: StarPhysicalProperties;
 };
 
 export function newSeededNeutronStarModel(seed: number, name: string, parentBodies: CelestialBodyModel[]): NeutronStarModel {
@@ -40,7 +37,7 @@ export function newSeededNeutronStarModel(seed: number, name: string, parentBodi
 
     const temperature = randRangeInt(200_000, 5_000_000_000, rng, GenerationSteps.TEMPERATURE);
 
-    const physicalProperties: StarPhysicalProperties = {
+    const physicalProperties: StellarObjectPhysicalProperties = {
         mass: 1000,
         rotationPeriod: 24 * 60 * 60,
         temperature: temperature,
@@ -69,7 +66,6 @@ export function newSeededNeutronStarModel(seed: number, name: string, parentBodi
         seed: seed,
         type: OrbitalObjectType.NEUTRON_STAR,
         physicalProperties: physicalProperties,
-        temperature: temperature,
         radius: radius,
         orbit: orbit,
         rings: rings

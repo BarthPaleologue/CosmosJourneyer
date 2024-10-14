@@ -27,7 +27,7 @@ import { PlanetModel } from "../../architecture/planet";
 import { TelluricPlanetPhysicalProperties } from "../../architecture/physicalProperties";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { newSeededRingsModel, RingsModel } from "../../rings/ringsModel";
-import { CloudsModel } from "../../clouds/cloudsModel";
+import { CloudsModel, newCloudsModel } from "../../clouds/cloudsModel";
 import { GenerationSteps } from "../../utils/generationSteps";
 
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
@@ -146,7 +146,7 @@ export function newSeededTelluricPlanetModel(seed: number, name: string, parentB
 
     let clouds: CloudsModel | null = null;
     if (physicalProperties.oceanLevel > 0) {
-        clouds = new CloudsModel(radius + physicalProperties.oceanLevel, Settings.CLOUD_LAYER_HEIGHT, physicalProperties.waterAmount, physicalProperties.pressure);
+        clouds = newCloudsModel(radius + physicalProperties.oceanLevel, Settings.CLOUD_LAYER_HEIGHT, physicalProperties.waterAmount, physicalProperties.pressure);
     }
 
     const terrainSettings = {

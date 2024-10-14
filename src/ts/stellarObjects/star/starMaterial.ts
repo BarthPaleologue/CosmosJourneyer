@@ -76,7 +76,7 @@ export class StarMaterial extends ShaderMaterial {
         this.starModel = model;
         this.starSeed = model.seed;
 
-        this.starColor = getRgbFromTemperature(model.temperature);
+        this.starColor = getRgbFromTemperature(model.physicalProperties.temperature);
 
         this.onBindObservable.add(() => {
             this.getEffect().setFloat(StarMaterialUniformNames.TIME, this.elapsedSeconds % 100000);

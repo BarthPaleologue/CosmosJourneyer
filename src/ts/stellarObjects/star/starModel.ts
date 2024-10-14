@@ -19,7 +19,7 @@ import { randRange, randRangeInt, uniformRandBool } from "extended-random";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Settings } from "../../settings";
 import { getOrbitalPeriod, Orbit } from "../../orbit/orbit";
-import { StarPhysicalProperties } from "../../architecture/physicalProperties";
+import { StellarObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { wheelOfFortune } from "../../utils/random";
 import { StellarObjectModel } from "../../architecture/stellarObject";
@@ -31,8 +31,6 @@ import { OrbitalObjectType } from "../../architecture/orbitalObject";
 
 export type StarModel = StellarObjectModel & {
     readonly type: OrbitalObjectType.STAR;
-
-    readonly physicalProperties: StarPhysicalProperties;
 };
 
 export function newSeededStarModel(seed: number, name: string, parentBodies: CelestialBodyModel[]): StarModel {
@@ -44,7 +42,7 @@ export function newSeededStarModel(seed: number, name: string, parentBodies: Cel
 
     const temperature = getRandomTemperatureFromStellarType(stellarType, rng);
 
-    const physicalProperties: StarPhysicalProperties = {
+    const physicalProperties: StellarObjectPhysicalProperties = {
         mass: 1.9885e30, //TODO: compute mass from physical properties
         rotationPeriod: 24 * 60 * 60,
         temperature: temperature,
@@ -70,7 +68,6 @@ export function newSeededStarModel(seed: number, name: string, parentBodies: Cel
         name: name,
         seed: seed,
         type: OrbitalObjectType.STAR,
-        temperature: temperature,
         radius: radius,
         orbit: orbit,
         physicalProperties: physicalProperties,

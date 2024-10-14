@@ -24,11 +24,14 @@ export type OrbitalObjectPhysicalProperties = {
     axialTilt: number;
 };
 
-export type StarPhysicalProperties = OrbitalObjectPhysicalProperties & {
+export type StellarObjectPhysicalProperties = OrbitalObjectPhysicalProperties & {
+    /**
+     * Black body temperature of the object in Kelvin
+     */
     temperature: number;
 };
 
-export type BlackHolePhysicalProperties = OrbitalObjectPhysicalProperties & {
+export type BlackHolePhysicalProperties = StellarObjectPhysicalProperties & {
     accretionDiskRadius: number;
 };
 

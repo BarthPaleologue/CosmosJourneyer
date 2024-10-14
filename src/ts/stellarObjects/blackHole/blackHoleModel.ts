@@ -62,14 +62,14 @@ export function newSeededBlackHoleModel(seed: number, name: string, parentBodies
         //FIXME: do not hardcode
         rotationPeriod: 1.5e-19,
         axialTilt: normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT),
-        accretionDiskRadius: radius * normalRandom(12, 3, rng, 7777)
+        accretionDiskRadius: radius * normalRandom(12, 3, rng, 7777),
+        //TODO: compute temperature of accretion disk (function of rotation speed)
+        temperature: 7_000
     };
 
     return {
         seed,
         name,
-        //TODO: compute temperature of accretion disk (function of rotation speed)
-        temperature: 7_000,
         rings: null,
         type: OrbitalObjectType.BLACK_HOLE,
         radius,

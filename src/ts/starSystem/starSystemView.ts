@@ -746,7 +746,9 @@ export class StarSystemView implements View {
         this.postProcessManager.rebuild();
 
         if (showHelpNotification) {
-            const keys = dPadCompositeToString(DefaultControlsInputs.map.move.bindings[0].control as DPadComposite, keyboardLayoutMap);
+            const horizontalKeys = dPadCompositeToString(DefaultControlsInputs.map.move.bindings[0].control as DPadComposite, keyboardLayoutMap);
+            const verticalKeys = axisCompositeToString(DefaultControlsInputs.map.upDown.bindings[0].control as AxisComposite, keyboardLayoutMap);
+            const keys = horizontalKeys.concat(verticalKeys);
             createNotification(`Move using ${keys.map((key) => key[1].replace("Key", "")).join(", ")}`, 20000);
         }
     }

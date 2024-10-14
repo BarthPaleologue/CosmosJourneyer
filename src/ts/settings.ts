@@ -59,6 +59,11 @@ export const Settings = {
     CREDIT_SYMBOL: "₽",
 
     /**
+     * Size of each star
+     */
+    STAR_SECTOR_SIZE: 20,
+
+    /**
      * The average daily intake for a human being in kcal/day
      * It is 2500 for males and 2000 for females, hence 2250.
      */

@@ -23,6 +23,7 @@ import { CosmosJourneyer } from "./cosmosJourneyer";
 import { newSeededBlackHoleModel } from "./stellarObjects/blackHole/blackHoleModel";
 import { newSeededTelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModel";
 import { StarSystemModel } from "./starSystem/starSystemModel";
+import { CustomSystemRegistry } from "./starSystem/customSystemRegistry";
 
 const engine = await CosmosJourneyer.CreateAsync();
 
@@ -32,7 +33,9 @@ const scene = starSystemView.scene;
 
 const blackHoleModel = newSeededBlackHoleModel(42, "Gargantua", []);
 
-const millerPlanetModel = newSeededTelluricPlanetModel(42, "Miller", [blackHoleModel]);
+const millerPlanetModel = newSeededTelluricPlanetModel(47, "Miller", [blackHoleModel]);
+millerPlanetModel.orbit.radius = blackHoleModel.physicalProperties.accretionDiskRadius * 4;
+millerPlanetModel.orbit.normalToPlane.x += 0.2;
 
 const starSystemModel: StarSystemModel = {
     name: "Black Hole Demo",
@@ -54,6 +57,8 @@ const starSystemModel: StarSystemModel = {
     ]
 };
 
+CustomSystemRegistry.RegisterSystem(starSystemModel);
+
 const starSystem = await starSystemView.loadStarSystem(starSystemModel);
 
 engine.init(true);
@@ -64,4 +69,4 @@ const BH = starSystem.getStellarObjects()[0];
 
 starSystemView.getDefaultControls().speed = BH.getBoundingRadius();
 
-positionNearObjectBrightSide(scene.getActiveControls(), BH, starSystem, 20);
+positionNearObjectBrightSide(scene.getActiveControls(), BH, starSystem, 5);
