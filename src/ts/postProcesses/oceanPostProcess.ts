@@ -103,7 +103,7 @@ export class OceanPostProcess extends PostProcess implements ObjectPostProcess, 
             setStellarObjectUniforms(effect, stars);
             setObjectUniforms(effect, planet);
 
-            effect.setFloat(OceanUniformNames.OCEAN_RADIUS, planet.getRadius() + planet.model.physicalProperties.oceanLevel);
+            effect.setFloat(OceanUniformNames.OCEAN_RADIUS, planet.getRadius() + planet.model.physics.oceanLevel);
             effect.setFloat(OceanUniformNames.OCEAN_SMOOTHNESS, oceanUniforms.smoothness);
             effect.setFloat(OceanUniformNames.OCEAN_SPECULAR_POWER, oceanUniforms.specularPower);
             effect.setFloat(OceanUniformNames.OCEAN_ALPHA_MODIFIER, oceanUniforms.alphaModifier);

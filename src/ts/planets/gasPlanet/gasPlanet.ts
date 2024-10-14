@@ -101,7 +101,7 @@ export class GasPlanet implements Planet, Cullable {
             this.asteroidField = null;
         }
 
-        this.getTransform().rotate(Axis.X, this.model.physicalProperties.axialTilt);
+        this.getTransform().rotate(Axis.X, this.model.physics.axialTilt);
     }
 
     updateMaterial(stellarObjects: Transformable[], deltaSeconds: number): void {
@@ -155,7 +155,7 @@ export class GasPlanet implements Planet, Cullable {
     }
 
     getPhysicalProperties(): OrbitalObjectPhysicalProperties {
-        return this.model.physicalProperties;
+        return this.model.physics;
     }
 
     getTransform(): TransformNode {

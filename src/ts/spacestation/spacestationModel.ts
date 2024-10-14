@@ -86,7 +86,7 @@ export function newSeededSpaceStationModel(
     const parentMaxRadius = parentBodies.reduce((max, body) => Math.max(max, body.radius), 0);
     const orbitRadius = (2 + clamp(normalRandom(2, 1, rng, GenerationSteps.ORBIT), 0, 10)) * parentMaxRadius;
 
-    const parentMassSum = parentBodies.reduce((sum, body) => sum + body.physicalProperties.mass, 0);
+    const parentMassSum = parentBodies.reduce((sum, body) => sum + body.physics.mass, 0);
     const orbit: Orbit = {
         radius: orbitRadius,
         p: 2,
@@ -138,7 +138,7 @@ export function newSeededSpaceStationModel(
     stellarObjectModels.forEach((stellarObject) => {
         const exposureTimeFraction = 0.5;
         const starRadius = stellarObject.radius;
-        const starTemperature = stellarObject.physicalProperties.temperature;
+        const starTemperature = stellarObject.physics.temperature;
         totalStellarFlux += getSphereRadiatedEnergyFlux(starTemperature, starRadius, distanceToStar) * exposureTimeFraction;
     });
 
@@ -163,7 +163,7 @@ export function newSeededSpaceStationModel(
         starSystemCoordinates: starSystemCoordinates,
         name,
         orbit,
-        physicalProperties,
+        physics: physicalProperties,
         population,
         energyConsumptionPerCapitaKWh,
         populationDensity,

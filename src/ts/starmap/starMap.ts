@@ -477,7 +477,7 @@ export class StarMap implements View {
 
         initializedInstance.position = data.position.add(this.starMapCenterPosition);
 
-        const objectColor = getRgbFromTemperature(stellarObjectModel.physicalProperties.temperature);
+        const objectColor = getRgbFromTemperature(stellarObjectModel.physics.temperature);
         initializedInstance.instancedBuffers.color = new Color4(objectColor.r, objectColor.g, objectColor.b, 0.0);
 
         if (!recycled) {

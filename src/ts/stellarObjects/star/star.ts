@@ -89,7 +89,7 @@ export class Star implements StellarObject, Cullable {
         this.aggregate.body.disablePreStep = false;
 
         this.light = new PointLight(`${this.name}Light`, Vector3.Zero(), scene);
-        this.light.diffuse = getRgbFromTemperature(this.model.physicalProperties.temperature);
+        this.light.diffuse = getRgbFromTemperature(this.model.physics.temperature);
         this.light.falloffType = Light.FALLOFF_STANDARD;
         this.light.parent = this.getTransform();
 
@@ -130,7 +130,7 @@ export class Star implements StellarObject, Cullable {
     }
 
     getPhysicalProperties(): OrbitalObjectPhysicalProperties {
-        return this.model.physicalProperties;
+        return this.model.physics;
     }
 
     getRingsUniforms(): RingsUniforms | null {

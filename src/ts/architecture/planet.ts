@@ -29,9 +29,9 @@ export interface Planet extends CelestialBody {
 export type PlanetModel = CelestialBodyModel & {
     readonly type: OrbitalObjectType.TELLURIC_PLANET | OrbitalObjectType.GAS_PLANET | OrbitalObjectType.TELLURIC_SATELLITE;
 
-    physicalProperties: PlanetPhysicalProperties;
+    physics: PlanetPhysicalProperties;
 };
 
 export function hasAtmosphere(planetModel: PlanetModel): boolean {
-    return planetModel.physicalProperties.pressure > 0.05;
+    return planetModel.physics.pressure > 0.05;
 }

@@ -52,7 +52,7 @@ export function newSeededGasPlanetModel(seed: number, name: string, parentBodies
 
     const orbitalPlaneNormal = Vector3.Up().applyRotationQuaternionInPlace(Quaternion.RotationAxis(Axis.X, (rng(GenerationSteps.ORBIT + 20) - 0.5) * 0.2));
 
-    const parentMassSum = parentBodies.reduce((sum, body) => sum + body.physicalProperties.mass, 0);
+    const parentMassSum = parentBodies.reduce((sum, body) => sum + body.physics.mass, 0);
     const orbit: Orbit = {
         radius: orbitRadius,
         p: 2, //orbitalP,
@@ -78,7 +78,7 @@ export function newSeededGasPlanetModel(seed: number, name: string, parentBodies
         type: OrbitalObjectType.GAS_PLANET,
         radius: radius,
         orbit: orbit,
-        physicalProperties: physicalProperties,
+        physics: physicalProperties,
         rings: rings
     };
 }

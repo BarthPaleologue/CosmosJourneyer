@@ -145,7 +145,7 @@ export type OrbitalObjectModel = {
     /**
      * Physical properties of the object
      */
-    readonly physicalProperties: OrbitalObjectPhysicalProperties;
+    readonly physics: OrbitalObjectPhysicalProperties;
 };
 
 export const enum OrbitalObjectType {

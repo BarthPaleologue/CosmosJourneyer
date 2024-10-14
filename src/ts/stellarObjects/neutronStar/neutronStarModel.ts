@@ -49,7 +49,7 @@ export function newSeededNeutronStarModel(seed: number, name: string, parentBodi
     // Todo: do not hardcode
     const orbitRadius = rng(GenerationSteps.ORBIT) * 5000000e3;
 
-    const parentMassSum = parentBodies?.reduce((sum, body) => sum + body.physicalProperties.mass, 0) ?? 0;
+    const parentMassSum = parentBodies?.reduce((sum, body) => sum + body.physics.mass, 0) ?? 0;
     const orbit: Orbit = {
         radius: orbitRadius,
         p: 2,
@@ -65,7 +65,7 @@ export function newSeededNeutronStarModel(seed: number, name: string, parentBodi
         name: name,
         seed: seed,
         type: OrbitalObjectType.NEUTRON_STAR,
-        physicalProperties: physicalProperties,
+        physics: physicalProperties,
         radius: radius,
         orbit: orbit,
         rings: rings

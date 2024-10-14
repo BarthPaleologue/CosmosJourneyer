@@ -35,7 +35,7 @@ export type BlackHoleModel = StellarObjectModel & {
      */
     readonly radius: number;
 
-    readonly physicalProperties: BlackHolePhysicalProperties;
+    readonly physics: BlackHolePhysicalProperties;
 };
 
 export function newSeededBlackHoleModel(seed: number, name: string, parentBodies: CelestialBodyModel[]): BlackHoleModel {
@@ -49,7 +49,7 @@ export function newSeededBlackHoleModel(seed: number, name: string, parentBodies
     // TODO: do not hardcode
     const orbitRadius = parentBodies.length === 0 ? 0 : 2 * (parentMaxRadius + radius);
 
-    const parentMassSum = parentBodies?.reduce((sum, body) => sum + body.physicalProperties.mass, 0) ?? 0;
+    const parentMassSum = parentBodies?.reduce((sum, body) => sum + body.physics.mass, 0) ?? 0;
     const orbit: Orbit = {
         radius: orbitRadius,
         p: 2,
@@ -73,7 +73,7 @@ export function newSeededBlackHoleModel(seed: number, name: string, parentBodies
         rings: null,
         type: OrbitalObjectType.BLACK_HOLE,
         radius,
-        physicalProperties,
+        physics: physicalProperties,
         orbit
     };
 }

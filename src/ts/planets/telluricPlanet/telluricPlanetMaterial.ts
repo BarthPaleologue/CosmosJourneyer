@@ -134,8 +134,8 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
         this.steepNormalMetallic = Textures.ROCK_NORMAL_METALLIC_MAP;
         this.steepAlbedoRoughnessMap = Textures.ROCK_ALBEDO_ROUGHNESS_MAP;
 
-        if (model.physicalProperties.oceanLevel === 0) {
-            if (model.physicalProperties.pressure > 0) {
+        if (model.physics.oceanLevel === 0) {
+            if (model.physics.pressure > 0) {
                 // desert world
                 this.plainNormalMetallicMap = Textures.SAND_NORMAL_METALLIC_MAP;
                 this.plainAlbedoRoughnessMap = Textures.SAND_ALBEDO_ROUGHNESS_MAP;
@@ -152,9 +152,9 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
 
         this.setTexture("lut", Textures.EMPTY_TEXTURE);
         const lut = new ProceduralTexture(`${planetName}MaterialLut`, 4096, "telluricPlanetLut", scene, null, true, false);
-        lut.setFloat(TelluricPlanetMaterialUniformNames.MIN_TEMPERATURE, this.planetModel.physicalProperties.minTemperature);
-        lut.setFloat(TelluricPlanetMaterialUniformNames.MAX_TEMPERATURE, this.planetModel.physicalProperties.maxTemperature);
-        lut.setFloat(TelluricPlanetMaterialUniformNames.PRESSURE, this.planetModel.physicalProperties.pressure);
+        lut.setFloat(TelluricPlanetMaterialUniformNames.MIN_TEMPERATURE, this.planetModel.physics.minTemperature);
+        lut.setFloat(TelluricPlanetMaterialUniformNames.MAX_TEMPERATURE, this.planetModel.physics.maxTemperature);
+        lut.setFloat(TelluricPlanetMaterialUniformNames.PRESSURE, this.planetModel.physics.pressure);
         lut.refreshRate = 0;
         lut.executeWhenReady(() => {
             this.setTexture(TelluricPlanetMaterialSamplerNames.LUT, lut);
@@ -195,14 +195,14 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
 
         this.setInt(TelluricPlanetMaterialUniformNames.COLOR_MODE, this.colorMode);
 
-        this.setFloat(TelluricPlanetMaterialUniformNames.WATER_LEVEL, this.planetModel.physicalProperties.oceanLevel);
+        this.setFloat(TelluricPlanetMaterialUniformNames.WATER_LEVEL, this.planetModel.physics.oceanLevel);
         this.setFloat(TelluricPlanetMaterialUniformNames.BEACH_SIZE, this.beachSize);
         this.setFloat(TelluricPlanetMaterialUniformNames.STEEP_SHARPNESS, this.steepSharpness);
 
-        this.setFloat(TelluricPlanetMaterialUniformNames.MIN_TEMPERATURE, this.planetModel.physicalProperties.minTemperature);
-        this.setFloat(TelluricPlanetMaterialUniformNames.MAX_TEMPERATURE, this.planetModel.physicalProperties.maxTemperature);
-        this.setFloat(TelluricPlanetMaterialUniformNames.PRESSURE, this.planetModel.physicalProperties.pressure);
-        this.setFloat(TelluricPlanetMaterialUniformNames.WATER_AMOUNT, this.planetModel.physicalProperties.waterAmount);
+        this.setFloat(TelluricPlanetMaterialUniformNames.MIN_TEMPERATURE, this.planetModel.physics.minTemperature);
+        this.setFloat(TelluricPlanetMaterialUniformNames.MAX_TEMPERATURE, this.planetModel.physics.maxTemperature);
+        this.setFloat(TelluricPlanetMaterialUniformNames.PRESSURE, this.planetModel.physics.pressure);
+        this.setFloat(TelluricPlanetMaterialUniformNames.WATER_AMOUNT, this.planetModel.physics.waterAmount);
 
         this.setFloat(
             TelluricPlanetMaterialUniformNames.MAX_ELEVATION,

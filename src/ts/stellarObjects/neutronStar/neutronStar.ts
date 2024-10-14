@@ -93,7 +93,7 @@ export class NeutronStar implements StellarObject, Cullable {
         this.aggregate.shape.addChildFromParent(this.getTransform(), physicsShape, this.mesh);
 
         this.light = new PointLight(`${name}Light`, Vector3.Zero(), scene);
-        this.light.diffuse.fromArray(getRgbFromTemperature(this.model.physicalProperties.temperature).asArray());
+        this.light.diffuse.fromArray(getRgbFromTemperature(this.model.physics.temperature).asArray());
         this.light.falloffType = Light.FALLOFF_STANDARD;
         this.light.parent = this.getTransform();
 
@@ -138,7 +138,7 @@ export class NeutronStar implements StellarObject, Cullable {
     }
 
     getPhysicalProperties(): OrbitalObjectPhysicalProperties {
-        return this.model.physicalProperties;
+        return this.model.physics;
     }
 
     getRingsUniforms(): RingsUniforms | null {

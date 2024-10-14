@@ -74,7 +74,7 @@ export class TelluricPlanet implements Planet, Cullable {
 
         this.transform = new TransformNode(this.name, scene);
 
-        rotate(this.transform, Axis.X, this.model.physicalProperties.axialTilt);
+        rotate(this.transform, Axis.X, this.model.physics.axialTilt);
         this.transform.computeWorldMatrix(true);
 
         this.aggregate = new PhysicsAggregate(
@@ -140,7 +140,7 @@ export class TelluricPlanet implements Planet, Cullable {
     }
 
     getPhysicalProperties(): OrbitalObjectPhysicalProperties {
-        return this.model.physicalProperties;
+        return this.model.physics;
     }
 
     getRingsUniforms(): RingsUniforms | null {
@@ -177,7 +177,7 @@ export class TelluricPlanet implements Planet, Cullable {
     }
 
     public getBoundingRadius(): number {
-        return this.getRadius() + this.model.physicalProperties.oceanLevel;
+        return this.getRadius() + this.model.physics.oceanLevel;
     }
 
     public computeCulling(cameras: Camera[]): void {

@@ -49,13 +49,13 @@ export class BlackHole implements StellarObject, Cullable {
         this.name = this.model.name;
 
         this.transform = new TransformNode(this.model.name, scene);
-        this.transform.rotate(Axis.X, this.model.physicalProperties.axialTilt);
+        this.transform.rotate(Axis.X, this.model.physics.axialTilt);
 
         this.light = new PointLight(`${this.model.name}Light`, Vector3.Zero(), scene);
         //this.light.diffuse.fromArray(getRgbFromTemperature(this.model.physicalProperties.temperature).asArray());
         this.light.falloffType = Light.FALLOFF_STANDARD;
         this.light.parent = this.getTransform();
-        if (this.model.physicalProperties.accretionDiskRadius === 0) this.light.intensity = 0;
+        if (this.model.physics.accretionDiskRadius === 0) this.light.intensity = 0;
 
         this.postProcesses.push(PostProcessType.BLACK_HOLE);
     }
@@ -77,7 +77,7 @@ export class BlackHole implements StellarObject, Cullable {
     }
 
     getPhysicalProperties(): OrbitalObjectPhysicalProperties {
-        return this.model.physicalProperties;
+        return this.model.physics;
     }
 
     getRingsUniforms(): RingsUniforms | null {
@@ -101,7 +101,7 @@ export class BlackHole implements StellarObject, Cullable {
     }
 
     public getBoundingRadius(): number {
-        return Math.max(this.getRadius(), this.model.physicalProperties.accretionDiskRadius);
+        return Math.max(this.getRadius(), this.model.physics.accretionDiskRadius);
     }
 
     public dispose(): void {

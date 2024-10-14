@@ -54,7 +54,7 @@ export function newSeededStarModel(seed: number, name: string, parentBodies: Cel
     // TODO: do not hardcode
     const orbitRadius = rng(GenerationSteps.ORBIT) * 5000000e3;
 
-    const parentMassSum = parentBodies?.reduce((sum, body) => sum + body.physicalProperties.mass, 0) ?? 0;
+    const parentMassSum = parentBodies?.reduce((sum, body) => sum + body.physics.mass, 0) ?? 0;
     const orbit: Orbit = {
         radius: orbitRadius,
         p: 2,
@@ -70,7 +70,7 @@ export function newSeededStarModel(seed: number, name: string, parentBodies: Cel
         type: OrbitalObjectType.STAR,
         radius: radius,
         orbit: orbit,
-        physicalProperties: physicalProperties,
+        physics: physicalProperties,
         rings: rings
     };
 }

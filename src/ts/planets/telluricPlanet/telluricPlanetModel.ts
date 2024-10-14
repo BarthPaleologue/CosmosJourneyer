@@ -37,7 +37,7 @@ import { waterBoilingPointCelsius } from "../../utils/physics";
 export type TelluricPlanetModel = PlanetModel & {
     readonly type: OrbitalObjectType.TELLURIC_PLANET | OrbitalObjectType.TELLURIC_SATELLITE;
 
-    readonly physicalProperties: TelluricPlanetPhysicalProperties;
+    readonly physics: TelluricPlanetPhysicalProperties;
 
     readonly terrainSettings: TerrainSettings;
 
@@ -45,7 +45,7 @@ export type TelluricPlanetModel = PlanetModel & {
 };
 
 export function hasLiquidWater(telluricPlanetModel: TelluricPlanetModel): boolean {
-    return telluricPlanetModel.physicalProperties.oceanLevel > 0;
+    return telluricPlanetModel.physics.oceanLevel > 0;
 }
 
 export function newSeededTelluricPlanetModel(seed: number, name: string, parentBodies: CelestialBodyModel[]): TelluricPlanetModel {
@@ -111,7 +111,7 @@ export function newSeededTelluricPlanetModel(seed: number, name: string, parentB
         orbitRadius += 2.0 * Math.max(0, minRadius - getPeriapsis(orbitRadius, orbitalP));
     } else if (parentBodies) orbitRadius += parentMaxRadius * 1.5;
 
-    const parentMassSum = parentBodies.reduce((sum, body) => sum + body.physicalProperties.mass, 0);
+    const parentMassSum = parentBodies.reduce((sum, body) => sum + body.physics.mass, 0);
     const orbit: Orbit = {
         radius: orbitRadius,
         p: orbitalP,
@@ -179,7 +179,7 @@ export function newSeededTelluricPlanetModel(seed: number, name: string, parentB
         seed: seed,
         name,
         radius: radius,
-        physicalProperties: physicalProperties,
+        physics: physicalProperties,
         orbit: orbit,
         terrainSettings: terrainSettings,
         rings: rings,

@@ -66,7 +66,7 @@ export class AtmosphericScatteringPostProcess extends PostProcess implements Obj
         const atmosphereUniforms: AtmosphereUniforms = {
             atmosphereRadius: planet.getBoundingRadius() + atmosphereHeight,
             falloffFactor: 10,
-            intensity: 11 * planet.model.physicalProperties.pressure,
+            intensity: 11 * planet.model.physics.pressure,
             rayleighStrength: 1,
             mieStrength: 1,
             densityModifier: 1,

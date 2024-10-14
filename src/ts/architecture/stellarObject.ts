@@ -26,5 +26,5 @@ export interface StellarObject extends CelestialBody {
 }
 
 export type StellarObjectModel = CelestialBodyModel & {
-    physicalProperties: StellarObjectPhysicalProperties;
+    physics: StellarObjectPhysicalProperties;
 };

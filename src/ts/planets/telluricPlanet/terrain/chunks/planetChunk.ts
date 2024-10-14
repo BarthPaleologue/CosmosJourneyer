@@ -150,9 +150,9 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
         this.instancePatches.push(rockPatch);
 
         if (
-            this.planetModel.physicalProperties.pressure > 0 &&
-            this.planetModel.physicalProperties.oceanLevel > 0 &&
-            this.getAverageHeight() > this.planetModel.physicalProperties.oceanLevel + 50
+            this.planetModel.physics.pressure > 0 &&
+            this.planetModel.physics.oceanLevel > 0 &&
+            this.getAverageHeight() > this.planetModel.physics.oceanLevel + 50
         ) {
             const treePatch = new InstancePatch(this.parent, randomDownSample(instancesMatrixBuffer, 4800));
             treePatch.createInstances([{ mesh: Objects.TREE, distance: 0 }]);

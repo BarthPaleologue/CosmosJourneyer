@@ -110,9 +110,9 @@ export class MissionTerminatorLandingNode implements MissionNode {
             }
 
             const stellarObjects = currentSystem.getStellarObjects();
-            const stellarMassSum = stellarObjects.reduce((sum, stellarObject) => sum + stellarObject.model.physicalProperties.mass, 0);
+            const stellarMassSum = stellarObjects.reduce((sum, stellarObject) => sum + stellarObject.model.physics.mass, 0);
             const stellarBarycenter = stellarObjects
-                .reduce((sum, stellarObject) => sum.add(stellarObject.getTransform().getAbsolutePosition().scale(stellarObject.model.physicalProperties.mass)), Vector3.Zero())
+                .reduce((sum, stellarObject) => sum.add(stellarObject.getTransform().getAbsolutePosition().scale(stellarObject.model.physics.mass)), Vector3.Zero())
                 .scaleInPlace(1 / stellarMassSum);
 
             const objectToPlayer = downDirection.negate();

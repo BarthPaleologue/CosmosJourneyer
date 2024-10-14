@@ -53,7 +53,7 @@ export class Mandelbulb implements CelestialBody, Cullable {
 
         this.postProcesses.push(PostProcessType.MANDELBULB);
 
-        this.getTransform().rotate(Axis.X, this.model.physicalProperties.axialTilt);
+        this.getTransform().rotate(Axis.X, this.model.physics.axialTilt);
     }
 
     getTransform(): TransformNode {
@@ -69,7 +69,7 @@ export class Mandelbulb implements CelestialBody, Cullable {
     }
 
     getPhysicalProperties(): OrbitalObjectPhysicalProperties {
-        return this.model.physicalProperties;
+        return this.model.physics;
     }
 
     getRingsUniforms(): RingsUniforms | null {

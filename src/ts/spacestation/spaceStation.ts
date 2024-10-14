@@ -85,8 +85,8 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
             .getChildTransformNodes(true)
             .forEach((transform) => transform.position.addInPlace(deltaPosition));
 
-        this.root.rotate(Axis.X, this.model.physicalProperties.axialTilt);
-        this.root.rotate(Axis.Z, this.model.physicalProperties.axialTilt);
+        this.root.rotate(Axis.X, this.model.physics.axialTilt);
+        this.root.rotate(Axis.Z, this.model.physics.axialTilt);
 
         const extendSize = boundingVectors.max.subtract(boundingVectors.min).scale(0.5);
         this.boundingRadius = Math.max(extendSize.x, extendSize.y, extendSize.z);
@@ -121,7 +121,7 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
     }
 
     getPhysicalProperties(): OrbitalObjectPhysicalProperties {
-        return this.model.physicalProperties;
+        return this.model.physics;
     }
 
     public getBoundingRadius(): number {

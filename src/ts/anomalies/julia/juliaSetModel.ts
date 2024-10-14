@@ -46,7 +46,7 @@ export function newSeededJuliaSetModel(seed: number, name: string, parentBodies:
     const orbitalP = clamp(0.5, 3.0, normalRandom(1.0, 0.3, rng, GenerationSteps.ORBIT + 80));
     orbitRadius += orbitRadius - getPeriapsis(orbitRadius, orbitalP);
 
-    const parentMassSum = parentBodies?.reduce((sum, body) => sum + body.physicalProperties.mass, 0) ?? 0;
+    const parentMassSum = parentBodies?.reduce((sum, body) => sum + body.physics.mass, 0) ?? 0;
     const orbit: Orbit = {
         radius: orbitRadius,
         p: orbitalP,
@@ -65,7 +65,7 @@ export function newSeededJuliaSetModel(seed: number, name: string, parentBodies:
         name,
         radius,
         orbit,
-        physicalProperties,
+        physics: physicalProperties,
         accentColor,
         rings: null,
         type: OrbitalObjectType.JULIA_SET

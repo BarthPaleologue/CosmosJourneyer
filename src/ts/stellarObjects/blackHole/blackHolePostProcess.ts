@@ -51,7 +51,7 @@ export class BlackHolePostProcess extends PostProcess implements ObjectPostProce
         }
 
         const blackHoleUniforms: BlackHoleUniforms = {
-            accretionDiskRadius: blackHole.model.physicalProperties.accretionDiskRadius,
+            accretionDiskRadius: blackHole.model.physics.accretionDiskRadius,
             rotationPeriod: 1.5,
             warpingMinkowskiFactor: 2.0,
             time: 0
@@ -87,7 +87,7 @@ export class BlackHolePostProcess extends PostProcess implements ObjectPostProce
         });
 
         const schwarzschildRadius = blackHole.model.radius;
-        const kerrMetricA = getKerrMetricA(blackHole.model.physicalProperties.mass, blackHole.model.physicalProperties.rotationPeriod);
+        const kerrMetricA = getKerrMetricA(blackHole.model.physics.mass, blackHole.model.physics.rotationPeriod);
 
         this.onApplyObservable.add((effect) => {
             if (this.activeCamera === null) {
@@ -101,7 +101,7 @@ export class BlackHolePostProcess extends PostProcess implements ObjectPostProce
 
             effect.setFloat(BlackHoleUniformNames.TIME, blackHoleUniforms.time % (blackHoleUniforms.rotationPeriod * 10000));
             effect.setFloat(BlackHoleUniformNames.SCHWARZSCHILD_RADIUS, schwarzschildRadius);
-            effect.setFloat(BlackHoleUniformNames.FRAME_DRAGGING_FACTOR, kerrMetricA / blackHole.model.physicalProperties.mass);
+            effect.setFloat(BlackHoleUniformNames.FRAME_DRAGGING_FACTOR, kerrMetricA / blackHole.model.physics.mass);
             effect.setFloat(BlackHoleUniformNames.ACCRETION_DISK_RADIUS, blackHoleUniforms.accretionDiskRadius);
             effect.setFloat(BlackHoleUniformNames.WARPING_MINKOWSKI_FACTOR, blackHoleUniforms.warpingMinkowskiFactor);
             effect.setFloat(BlackHoleUniformNames.ROTATION_PERIOD, blackHoleUniforms.rotationPeriod);

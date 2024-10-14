@@ -53,7 +53,7 @@ export class JuliaSet implements CelestialBody, Cullable {
 
         this.postProcesses.push(PostProcessType.JULIA_SET);
 
-        this.getTransform().rotate(Axis.X, this.model.physicalProperties.axialTilt);
+        this.getTransform().rotate(Axis.X, this.model.physics.axialTilt);
     }
 
     getTransform(): TransformNode {
@@ -69,7 +69,7 @@ export class JuliaSet implements CelestialBody, Cullable {
     }
 
     getPhysicalProperties(): OrbitalObjectPhysicalProperties {
-        return this.model.physicalProperties;
+        return this.model.physics;
     }
 
     getRingsUniforms(): RingsUniforms | null {
