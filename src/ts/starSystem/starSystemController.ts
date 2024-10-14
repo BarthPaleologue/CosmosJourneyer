@@ -499,7 +499,7 @@ export class StarSystemController {
             const dThetaNearest = OrbitalObjectUtils.GetRotationAngle(nearestOrbitalObject, deltaSeconds);
 
             for (const object of orbitalObjects) {
-                const orbit = object.getOrbitProperties();
+                const orbit = object.model.orbit;
 
                 // the normal to the orbit planes must be rotated as well (even the one of the nearest body)
                 const rotation = Quaternion.RotationAxis(nearestOrbitalObject.getRotationAxis(), -dThetaNearest);

@@ -33,10 +33,8 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import { StellarObject } from "../../architecture/stellarObject";
 import { Cullable } from "../../utils/cullable";
 import { RingsUniforms } from "../../rings/ringsUniform";
-import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
-import { Orbit } from "../../orbit/orbit";
 import { getRgbFromTemperature } from "../../utils/specrend";
 import { orbitalObjectTypeToDisplay } from "../../utils/strings/orbitalObjectTypeToDisplay";
 
@@ -123,14 +121,6 @@ export class Star implements StellarObject, Cullable {
 
     getLight(): PointLight {
         return this.light;
-    }
-
-    getOrbitProperties(): Orbit {
-        return this.model.orbit;
-    }
-
-    getPhysicalProperties(): OrbitalObjectPhysicalProperties {
-        return this.model.physics;
     }
 
     getRingsUniforms(): RingsUniforms | null {

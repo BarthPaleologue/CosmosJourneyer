@@ -436,7 +436,7 @@ export class StarSystemView implements View {
             let maxDistance = 0.0;
             if (isSatellite(body.model.type)) {
                 // moon target cursors fades away when the player is too far
-                maxDistance = body.getOrbitProperties().radius * 8.0;
+                maxDistance = body.model.orbit.radius * 8.0;
             }
             this.targetCursorLayer.addObject(body, ObjectTargetCursorType.CELESTIAL_BODY, body.getBoundingRadius() * 10.0, maxDistance);
         });

@@ -27,9 +27,7 @@ import { StellarObject } from "../../architecture/stellarObject";
 import { Cullable } from "../../utils/cullable";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { RingsUniforms } from "../../rings/ringsUniform";
-import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
-import { Orbit } from "../../orbit/orbit";
 import { orbitalObjectTypeToDisplay } from "../../utils/strings/orbitalObjectTypeToDisplay";
 
 export class BlackHole implements StellarObject, Cullable {
@@ -70,14 +68,6 @@ export class BlackHole implements StellarObject, Cullable {
 
     getLight(): PointLight {
         return this.light;
-    }
-
-    getOrbitProperties(): Orbit {
-        return this.model.orbit;
-    }
-
-    getPhysicalProperties(): OrbitalObjectPhysicalProperties {
-        return this.model.physics;
     }
 
     getRingsUniforms(): RingsUniforms | null {

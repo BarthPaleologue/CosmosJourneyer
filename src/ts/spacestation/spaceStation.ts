@@ -24,7 +24,6 @@ import { OrbitalObject } from "../architecture/orbitalObject";
 import { Cullable } from "../utils/cullable";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { OrbitalObjectPhysicalProperties } from "../architecture/physicalProperties";
 import { SpaceStationNodeType } from "../assets/procedural/spaceStation/spaceStationNode";
 import { UtilitySection } from "../assets/procedural/spaceStation/utilitySection";
 import { HelixHabitat } from "../assets/procedural/spaceStation/helixHabitat";
@@ -39,10 +38,7 @@ import { LandingPad } from "../assets/procedural/landingPad/landingPad";
 import { LandingRequest, ManagesLandingPads } from "../utils/managesLandingPads";
 import { Settings } from "../settings";
 import { EngineBay } from "../assets/procedural/spaceStation/engineBay";
-import { Orbit } from "../orbit/orbit";
-
 import { getRngFromSeed } from "../utils/getRngFromSeed";
-import i18n from "../i18n";
 import { orbitalObjectTypeToDisplay } from "../utils/strings/orbitalObjectTypeToDisplay";
 
 export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads {
@@ -114,14 +110,6 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
 
     getRotationAxis(): Vector3 {
         return this.getTransform().up;
-    }
-
-    getOrbitProperties(): Orbit {
-        return this.model.orbit;
-    }
-
-    getPhysicalProperties(): OrbitalObjectPhysicalProperties {
-        return this.model.physics;
     }
 
     public getBoundingRadius(): number {

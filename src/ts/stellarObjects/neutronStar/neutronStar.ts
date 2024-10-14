@@ -133,14 +133,6 @@ export class NeutronStar implements StellarObject, Cullable {
         return this.light;
     }
 
-    getOrbitProperties(): Orbit {
-        return this.model.orbit;
-    }
-
-    getPhysicalProperties(): OrbitalObjectPhysicalProperties {
-        return this.model.physics;
-    }
-
     getRingsUniforms(): RingsUniforms | null {
         return this.ringsUniforms;
     }

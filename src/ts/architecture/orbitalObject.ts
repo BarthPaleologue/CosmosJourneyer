@@ -38,16 +38,6 @@ export interface OrbitalObject extends Transformable, HasBoundingSphere, TypedOb
      * The rotation axis around which the object rotates on itself
      */
     getRotationAxis(): Vector3;
-
-    /**
-     * Returns the orbital properties of the object
-     */
-    getOrbitProperties(): Orbit;
-
-    /**
-     * Returns the physical properties of the object
-     */
-    getPhysicalProperties(): OrbitalObjectPhysicalProperties;
 }
 
 export class OrbitalObjectUtils {
@@ -59,13 +49,13 @@ export class OrbitalObjectUtils {
      * @constructor
      */
     static GetOrbitalPosition(object: OrbitalObject, parents: OrbitalObject[], elapsedSeconds: number): Vector3 {
-        const orbit = object.getOrbitProperties();
+        const orbit = object.model.orbit;
         if (orbit.period === 0 || parents.length === 0) return object.getTransform().getAbsolutePosition();
 
         const barycenter = Vector3.Zero(); //object.parent.getTransform().getAbsolutePosition();
         let sumOfMasses = 0;
         for (const parent of parents) {
-            const mass = parent.getPhysicalProperties().mass;
+            const mass = parent.model.physics.mass;
             barycenter.addInPlace(parent.getTransform().getAbsolutePosition().scale(mass));
             sumOfMasses += mass;
         }
@@ -82,7 +72,7 @@ export class OrbitalObjectUtils {
      * @constructor
      */
     static SetOrbitalPosition(object: OrbitalObject, parents: OrbitalObject[], elapsedSeconds: number): void {
-        const orbit = object.getOrbitProperties();
+        const orbit = object.model.orbit;
         if (orbit.period === 0 || parents.length === 0) return;
 
         const oldPosition = object.getTransform().getAbsolutePosition();
@@ -97,8 +87,8 @@ export class OrbitalObjectUtils {
      * @constructor
      */
     static GetRotationAngle(object: OrbitalObject, deltaTime: number): number {
-        if (object.getPhysicalProperties().rotationPeriod === 0) return 0;
-        return (2 * Math.PI * deltaTime) / object.getPhysicalProperties().rotationPeriod;
+        if (object.model.physics.rotationPeriod === 0) return 0;
+        return (2 * Math.PI * deltaTime) / object.model.physics.rotationPeriod;
     }
 
     /**

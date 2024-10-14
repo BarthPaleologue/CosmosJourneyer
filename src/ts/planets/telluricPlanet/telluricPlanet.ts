@@ -16,10 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Direction } from "../../utils/direction";
-
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
-
 import { TelluricPlanetMaterial } from "./telluricPlanetMaterial";
 import { hasLiquidWater, TelluricPlanetModel } from "./telluricPlanetModel";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
@@ -34,13 +32,10 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { RingsUniforms } from "../../rings/ringsUniform";
-import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import { rotate } from "../../uberCore/transforms/basicTransform";
 import { CloudsUniforms } from "../../clouds/cloudsUniforms";
 import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
-import { Orbit } from "../../orbit/orbit";
-
 import { orbitalObjectTypeToDisplay } from "../../utils/strings/orbitalObjectTypeToDisplay";
 
 export class TelluricPlanet implements Planet, Cullable {
@@ -133,14 +128,6 @@ export class TelluricPlanet implements Planet, Cullable {
 
     getRotationAxis(): Vector3 {
         return this.getTransform().up;
-    }
-
-    getOrbitProperties(): Orbit {
-        return this.model.orbit;
-    }
-
-    getPhysicalProperties(): OrbitalObjectPhysicalProperties {
-        return this.model.physics;
     }
 
     getRingsUniforms(): RingsUniforms | null {

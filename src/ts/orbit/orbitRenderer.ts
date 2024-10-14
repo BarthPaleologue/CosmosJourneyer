@@ -43,7 +43,7 @@ export class OrbitRenderer {
     }
 
     private createOrbitMesh(orbitalObject: OrbitalObject, scene: Scene) {
-        const orbit = orbitalObject.getOrbitProperties();
+        const orbit = orbitalObject.model.orbit;
         const nbSteps = 1000;
         const timestep = orbit.period / nbSteps;
         const points: Vector3[] = [];
@@ -91,16 +91,16 @@ export class OrbitRenderer {
             }
 
             const parentBarycenter = Vector3.Zero();
-            const massSum = parents.reduce((sum, parent) => sum + parent.getPhysicalProperties().mass, 0);
+            const massSum = parents.reduce((sum, parent) => sum + parent.model.physics.mass, 0);
             for (const parent of parents) {
-                parentBarycenter.addInPlace(parent.getTransform().position.scale(parent.getPhysicalProperties().mass));
+                parentBarycenter.addInPlace(parent.getTransform().position.scale(parent.model.physics.mass));
             }
             parentBarycenter.scaleInPlace(1 / massSum);
 
             orbitMesh.position = parentBarycenter;
             orbitMesh.computeWorldMatrix(true);
 
-            const normalToPlane = orbitalObject.getOrbitProperties().normalToPlane;
+            const normalToPlane = orbitalObject.model.orbit.normalToPlane;
             setUpVector(orbitMesh, normalToPlane);
         }
     }
