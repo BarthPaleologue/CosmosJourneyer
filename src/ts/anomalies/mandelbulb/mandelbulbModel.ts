@@ -20,24 +20,21 @@ import { normalRandom, randRange } from "extended-random";
 import { clamp } from "../../utils/math";
 import { getOrbitalPeriod, getPeriapsis, Orbit } from "../../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { CelestialBodyModel, CelestialBodyType } from "../../architecture/celestialBody";
+import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { GenerationSteps } from "../../utils/generationSteps";
-import i18n from "../../i18n";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
-import { AnomalyType } from "../anomalyType";
 import { AnomalyModel } from "../anomaly";
 
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
+import { OrbitalObjectType } from "../../architecture/orbitalObject";
 
 export type MandelbulbModel = AnomalyModel & {
-    readonly bodyType: CelestialBodyType.ANOMALY;
-    readonly anomalyType: AnomalyType.MANDELBULB;
-
+    readonly type: OrbitalObjectType.MANDELBULB
     readonly power: number;
     readonly accentColor: Color3;
 };
 
-export function newSeededMandelbulbModel(seed: number, name: string, parentBody: CelestialBodyModel | null): MandelbulbModel {
+export function newSeededMandelbulbModel(seed: number, name: string, parentBodies: CelestialBodyModel[]): MandelbulbModel {
     const rng = getRngFromSeed(seed);
 
     const radius = 1000e3;
@@ -51,10 +48,11 @@ export function newSeededMandelbulbModel(seed: number, name: string, parentBody:
     const orbitalP = clamp(0.5, 3.0, normalRandom(1.0, 0.3, rng, GenerationSteps.ORBIT + 80));
     orbitRadius += orbitRadius - getPeriapsis(orbitRadius, orbitalP);
 
+    const parentMassSum = parentBodies?.reduce((sum, body) => sum + body.physicalProperties.mass, 0) ?? 0;
     const orbit: Orbit = {
         radius: orbitRadius,
         p: orbitalP,
-        period: getOrbitalPeriod(orbitRadius, parentBody?.physicalProperties.mass ?? 0),
+        period: getOrbitalPeriod(orbitRadius, parentMassSum),
         normalToPlane: Vector3.Up()
     };
 
@@ -64,20 +62,15 @@ export function newSeededMandelbulbModel(seed: number, name: string, parentBody:
         axialTilt: normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT)
     };
 
-    const typeName = i18n.t("objectTypes:anomaly");
-
     return {
         seed,
         radius,
         rings: null,
         name,
-        bodyType: CelestialBodyType.ANOMALY,
-        anomalyType: AnomalyType.MANDELBULB,
+        type: OrbitalObjectType.MANDELBULB,
         accentColor,
         power,
         orbit,
-        physicalProperties,
-        parentBody,
-        typeName
+        physicalProperties
     };
 }

@@ -3,12 +3,11 @@ import { StarSystemController } from "../starSystem/starSystemController";
 import { StellarObject } from "../architecture/stellarObject";
 import { SystemObjectId, UniverseObjectId, SystemObjectType } from "../saveFile/universeCoordinates";
 import { Planet } from "../architecture/planet";
-import { Anomaly } from "../anomalies/anomaly";
 import { SpaceStation } from "../spacestation/spaceStation";
-import { getSpaceStationModels } from "./getModelsFromSystemModel";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
-import { getPlanetaryMassObjects } from "../starSystem/starSystemModel";
 import { getSystemModelFromCoordinates } from "../starSystem/modelFromCoordinates";
+import { StarSystemModelUtils } from "../starSystem/starSystemModel";
+import { CelestialBody } from "../architecture/celestialBody";
 
 /**
  * Get the object ID of the given orbital object within the star system.
@@ -18,13 +17,13 @@ import { getSystemModelFromCoordinates } from "../starSystem/modelFromCoordinate
 export function getSystemObjectId(orbitalObject: OrbitalObject, starSystem: StarSystemController): SystemObjectId {
     let objectType: SystemObjectType;
     let objectIndex: number;
-    if ((objectIndex = starSystem.stellarObjects.indexOf(orbitalObject as StellarObject)) !== -1) {
+    if ((objectIndex = starSystem.getStellarObjects().indexOf(orbitalObject as StellarObject)) !== -1) {
         objectType = SystemObjectType.STELLAR_OBJECT;
-    } else if ((objectIndex = starSystem.planetaryMassObjects.indexOf(orbitalObject as Planet)) !== -1) {
+    } else if ((objectIndex = starSystem.getPlanetaryMassObjects().indexOf(orbitalObject as Planet)) !== -1) {
         objectType = SystemObjectType.PLANETARY_MASS_OBJECT;
-    } else if ((objectIndex = starSystem.anomalies.indexOf(orbitalObject as Anomaly)) !== -1) {
+    } else if ((objectIndex = starSystem.getAnomalies().indexOf(orbitalObject as CelestialBody)) !== -1) {
         objectType = SystemObjectType.ANOMALY;
-    } else if ((objectIndex = starSystem.spaceStations.indexOf(orbitalObject as SpaceStation)) !== -1) {
+    } else if ((objectIndex = starSystem.getSpaceStations().indexOf(orbitalObject as SpaceStation)) !== -1) {
         objectType = SystemObjectType.SPACE_STATION;
     } else throw new Error("Nearest orbital object not found among any of the universal orbital object types");
 
@@ -50,16 +49,16 @@ export function getObjectBySystemId(systemObjectId: SystemObjectId, starSystem: 
     let orbitalObject;
     switch (systemObjectId.objectType) {
         case SystemObjectType.STELLAR_OBJECT:
-            orbitalObject = starSystem.stellarObjects.at(systemObjectId.objectIndex);
+            orbitalObject = starSystem.getStellarObjects().at(systemObjectId.objectIndex);
             break;
         case SystemObjectType.PLANETARY_MASS_OBJECT:
-            orbitalObject = starSystem.planetaryMassObjects.at(systemObjectId.objectIndex);
+            orbitalObject = starSystem.getPlanetaryMassObjects().at(systemObjectId.objectIndex);
             break;
         case SystemObjectType.ANOMALY:
-            orbitalObject = starSystem.anomalies.at(systemObjectId.objectIndex);
+            orbitalObject = starSystem.getAnomalies().at(systemObjectId.objectIndex);
             break;
         case SystemObjectType.SPACE_STATION:
-            orbitalObject = starSystem.spaceStations.at(systemObjectId.objectIndex);
+            orbitalObject = starSystem.getSpaceStations().at(systemObjectId.objectIndex);
             break;
         default:
             throw new Error(`Unknown universe object type: ${systemObjectId.objectType}`);
@@ -77,13 +76,13 @@ export function getObjectModelByUniverseId(universeObjectId: UniverseObjectId): 
 
     switch (universeObjectId.objectType) {
         case SystemObjectType.STELLAR_OBJECT:
-            return starSystemModel.stellarObjects[universeObjectId.objectIndex];
+            return StarSystemModelUtils.GetStellarObjects(starSystemModel)[universeObjectId.objectIndex];
         case SystemObjectType.PLANETARY_MASS_OBJECT:
-            return getPlanetaryMassObjects(starSystemModel.planetarySystems)[universeObjectId.objectIndex];
+            return StarSystemModelUtils.GetPlanetaryMassObjects(starSystemModel)[universeObjectId.objectIndex];
         case SystemObjectType.ANOMALY:
-            return starSystemModel.anomalies[universeObjectId.objectIndex];
+            return StarSystemModelUtils.GetAnomalies(starSystemModel)[universeObjectId.objectIndex];
         case SystemObjectType.SPACE_STATION:
-            return getSpaceStationModels(starSystemModel)[universeObjectId.objectIndex];
+            return StarSystemModelUtils.GetSpaceStations(starSystemModel)[universeObjectId.objectIndex];
         default:
             throw new Error(`Unknown universe object type: ${universeObjectId.objectType}`);
     }
@@ -92,7 +91,7 @@ export function getObjectModelByUniverseId(universeObjectId: UniverseObjectId): 
 export function getUniverseIdForSpaceStationModel(spaceStationModel: SpaceStationModel): UniverseObjectId {
     const systemModel = getSystemModelFromCoordinates(spaceStationModel.starSystemCoordinates);
 
-    const spaceStationModels = getSpaceStationModels(systemModel);
+    const spaceStationModels = StarSystemModelUtils.GetSpaceStations(systemModel);
     const index = spaceStationModels.findIndex((model) => model.seed === spaceStationModel.seed);
     if (index === -1) {
         throw new Error("Space station model not found in star system");

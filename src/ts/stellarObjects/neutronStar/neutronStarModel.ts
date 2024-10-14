@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { CelestialBodyModel, CelestialBodyType } from "../../architecture/celestialBody";
+import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { StarPhysicalProperties } from "../../architecture/physicalProperties";
 import { StellarObjectModel } from "../../architecture/stellarObject";
@@ -24,18 +24,18 @@ import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { clamp } from "../../utils/math";
 import { newSeededRingsModel } from "../../rings/ringsModel";
 import { GenerationSteps } from "../../utils/generationSteps";
-import i18n from "../../i18n";
 
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
+import { OrbitalObjectType } from "../../architecture/orbitalObject";
 
 export type NeutronStarModel = StellarObjectModel & {
-    readonly bodyType: CelestialBodyType.NEUTRON_STAR;
+    readonly type: OrbitalObjectType.NEUTRON_STAR;
     readonly temperature: number;
 
     readonly physicalProperties: StarPhysicalProperties;
 };
 
-export function newSeededNeutronStarModel(seed: number, name: string, parentBody: CelestialBodyModel | null): NeutronStarModel {
+export function newSeededNeutronStarModel(seed: number, name: string, parentBodies: CelestialBodyModel[]): NeutronStarModel {
     const rng = getRngFromSeed(seed);
 
     const temperature = randRangeInt(200_000, 5_000_000_000, rng, GenerationSteps.TEMPERATURE);
@@ -52,10 +52,11 @@ export function newSeededNeutronStarModel(seed: number, name: string, parentBody
     // Todo: do not hardcode
     const orbitRadius = rng(GenerationSteps.ORBIT) * 5000000e3;
 
+    const parentMassSum = parentBodies?.reduce((sum, body) => sum + body.physicalProperties.mass, 0) ?? 0;
     const orbit: Orbit = {
         radius: orbitRadius,
         p: 2,
-        period: getOrbitalPeriod(orbitRadius, parentBody?.physicalProperties.mass ?? 0),
+        period: getOrbitalPeriod(orbitRadius, parentMassSum),
         normalToPlane: Vector3.Up()
     };
 
@@ -63,18 +64,14 @@ export function newSeededNeutronStarModel(seed: number, name: string, parentBody
 
     const rings = uniformRandBool(ringProportion, rng, GenerationSteps.RINGS) ? newSeededRingsModel(rng) : null;
 
-    const typeName = i18n.t("objectTypes:neutronStar");
-
     return {
         name: name,
         seed: seed,
-        bodyType: CelestialBodyType.NEUTRON_STAR,
+        type: OrbitalObjectType.NEUTRON_STAR,
         physicalProperties: physicalProperties,
         temperature: temperature,
-        parentBody: parentBody,
         radius: radius,
         orbit: orbit,
-        rings: rings,
-        typeName: typeName
+        rings: rings
     };
 }

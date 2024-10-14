@@ -18,7 +18,7 @@
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { StarMaterial } from "./starMaterial";
-import { StarModel } from "./starModel";
+import { getStellarTypeFromTemperature, StarModel } from "./starModel";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Light } from "@babylonjs/core/Lights/light";
@@ -27,8 +27,6 @@ import { Quaternion } from "@babylonjs/core/Maths/math";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
-import { CelestialBody } from "../../architecture/celestialBody";
-import { OrbitalObject } from "../../architecture/orbitalObject";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
@@ -40,6 +38,9 @@ import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { Orbit } from "../../orbit/orbit";
 import { getRgbFromTemperature } from "../../utils/specrend";
+import i18n from "../../i18n";
+
+import { orbitalObjectTypeToDisplay } from "../../utils/orbitalObjectTypeToDisplay";
 
 export class Star implements StellarObject, Cullable {
     readonly name: string;
@@ -58,17 +59,12 @@ export class Star implements StellarObject, Cullable {
 
     readonly model: StarModel;
 
-    readonly parent: OrbitalObject | null;
-
     /**
      * New Star
      * @param model The seed of the star in [-1, 1]
      * @param scene
-     * @param parentBody The bodies the star is orbiting
      */
-    constructor(model: StarModel, scene: Scene, parentBody: CelestialBody | null = null) {
-        this.parent = parentBody;
-
+    constructor(model: StarModel, scene: Scene) {
         this.model = model;
 
         this.name = this.model.name;
@@ -148,7 +144,7 @@ export class Star implements StellarObject, Cullable {
     }
 
     getTypeName(): string {
-        return this.model.typeName;
+        return orbitalObjectTypeToDisplay(this.model);
     }
 
     public updateMaterial(deltaTime: number): void {

@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { getSolarPanelSurfaceFromEnergyRequirement } from "../src/ts/utils/solarPanels";
+import { getSphereRadiatedEnergyFlux } from "../src/ts/utils/thermodynamic";
 
 test("solarPanelSurfaceCalculation", () => {
     // test with ISS data
@@ -26,7 +27,9 @@ test("solarPanelSurfaceCalculation", () => {
     const sunRadius = 6.9634e8;
     const energyRequirement = 120000;
 
-    const solarPanelSurface = getSolarPanelSurfaceFromEnergyRequirement(efficiency, distanceToSun, sunTemperature, sunRadius, energyRequirement, sunExposure);
+    const solarFlux = getSphereRadiatedEnergyFlux(sunTemperature, sunRadius, distanceToSun) * sunExposure;
+
+    const solarPanelSurface = getSolarPanelSurfaceFromEnergyRequirement(efficiency, energyRequirement, solarFlux);
     expect(solarPanelSurface).toBeGreaterThanOrEqual(2400);
     expect(solarPanelSurface).toBeLessThanOrEqual(2600);
 });

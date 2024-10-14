@@ -17,7 +17,7 @@
 
 import { getOrbitalPeriod, Orbit } from "../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { OrbitalObjectModel } from "../architecture/orbitalObject";
+import { OrbitalObjectModel, OrbitalObjectType } from "../architecture/orbitalObject";
 import { OrbitalObjectPhysicalProperties } from "../architecture/physicalProperties";
 import { CelestialBodyModel } from "../architecture/celestialBody";
 import { normalRandom, uniformRandBool } from "extended-random";
@@ -30,11 +30,11 @@ import { Faction } from "../society/factions";
 import { getPowerPlayData } from "../society/powerplay";
 import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
 import { Settings } from "../settings";
-import i18n from "../i18n";
 import { StellarObjectModel } from "../architecture/stellarObject";
 import { StarSystemCoordinates } from "../saveFile/universeCoordinates";
 
 import { getRngFromSeed } from "../utils/getRngFromSeed";
+import { getSphereRadiatedEnergyFlux } from "../utils/thermodynamic";
 
 export type SpaceStationModel = OrbitalObjectModel & {
     readonly starSystemCoordinates: StarSystemCoordinates;
@@ -75,20 +75,22 @@ export type SpaceStationModel = OrbitalObjectModel & {
 
 export function newSeededSpaceStationModel(
     seed: number,
-    stellarObjectModel: StellarObjectModel,
+    stellarObjectModels: StellarObjectModel[],
     starSystemCoordinates: StarSystemCoordinates,
-    parentBody: CelestialBodyModel | null
+    parentBodies: CelestialBodyModel[]
 ): SpaceStationModel {
     const rng = getRngFromSeed(seed);
 
     const name = generateSpaceStationName(rng, 2756);
 
-    const orbitRadius = (2 + clamp(normalRandom(2, 1, rng, GenerationSteps.ORBIT), 0, 10)) * (parentBody?.radius ?? 0);
+    const parentMaxRadius = parentBodies.reduce((max, body) => Math.max(max, body.radius), 0);
+    const orbitRadius = (2 + clamp(normalRandom(2, 1, rng, GenerationSteps.ORBIT), 0, 10)) * parentMaxRadius;
 
+    const parentMassSum = parentBodies.reduce((sum, body) => sum + body.physicalProperties.mass, 0);
     const orbit: Orbit = {
         radius: orbitRadius,
         p: 2,
-        period: getOrbitalPeriod(orbitRadius, parentBody?.physicalProperties.mass ?? 0),
+        period: getOrbitalPeriod(orbitRadius, parentMassSum),
         normalToPlane: Vector3.Up()
     };
 
@@ -125,18 +127,26 @@ export function newSeededSpaceStationModel(
 
     const nbHydroponicLayers = 10;
 
-    const starModel = stellarObjectModel;
+    // find average distance to stellar objects
+    let distanceToStar = 0;
+    parentBodies.forEach((celestialBody) => {
+        distanceToStar += celestialBody.orbit.radius;
+    });
+    distanceToStar /= parentBodies.length;
 
-    // find distance to star
-    const distanceToStar = parentBody ? parentBody?.orbit.radius : 0;
+    let totalStellarFlux = 0;
+    stellarObjectModels.forEach((stellarObject) => {
+        const exposureTimeFraction = 0.5;
+        const starRadius = stellarObject.radius;
+        const starTemperature = stellarObject.temperature;
+        totalStellarFlux += getSphereRadiatedEnergyFlux(starTemperature, starRadius, distanceToStar) * exposureTimeFraction;
+    });
 
-    const starRadius = starModel.radius;
-    const starTemperature = starModel.temperature;
     const totalEnergyConsumptionKWh = population * energyConsumptionPerCapitaKWh;
 
     const solarPanelEfficiency = 0.4;
 
-    const solarPanelSurfaceM2 = getSolarPanelSurfaceFromEnergyRequirement(solarPanelEfficiency, distanceToStar, starTemperature, starRadius, totalEnergyConsumptionKWh, 0.5);
+    const solarPanelSurfaceM2 = getSolarPanelSurfaceFromEnergyRequirement(solarPanelEfficiency, totalEnergyConsumptionKWh, totalStellarFlux);
 
     const housingSurfaceHa = (100 * population) / populationDensity; // convert km² to ha
     let agricultureSurfaceHa = 0;
@@ -147,13 +157,11 @@ export function newSeededSpaceStationModel(
     });
     const totalHabitatSurfaceM2 = (housingSurfaceHa + agricultureSurfaceHa) * 1000; // convert ha to m²
 
-    const typeName = i18n.t("objectTypes:spaceStation");
-
     return {
         seed,
+        type: OrbitalObjectType.SPACE_STATION,
         starSystemCoordinates: starSystemCoordinates,
         name,
-        parentBody,
         orbit,
         physicalProperties,
         population,
@@ -168,6 +176,5 @@ export function newSeededSpaceStationModel(
         housingSurfaceHa,
         agricultureSurfaceHa,
         totalHabitatSurfaceM2,
-        typeName
     };
 }

@@ -17,8 +17,6 @@
 
 import "../styles/index.scss";
 
-import { StarSystemController } from "./starSystem/starSystemController";
-
 import { Settings } from "./settings";
 import { positionNearObjectBrightSide } from "./utils/positionNearObject";
 import { CosmosJourneyer } from "./cosmosJourneyer";
@@ -30,7 +28,7 @@ import { SpaceShipControlsInputs } from "./spaceship/spaceShipControlsInputs";
 import { newSeededStarModel } from "./stellarObjects/star/starModel";
 import { newSeededSpaceStationModel } from "./spacestation/spacestationModel";
 import { StarSystemModel } from "./starSystem/starSystemModel";
-import { SystemObjectType } from "./saveFile/universeCoordinates";
+import { StarSystemCoordinates } from "./saveFile/universeCoordinates";
 
 const engine = await CosmosJourneyer.CreateAsync();
 
@@ -42,7 +40,7 @@ const starSystemView = engine.starSystemView;
 console.log(`Time is going ${Settings.TIME_MULTIPLIER} time${Settings.TIME_MULTIPLIER > 1 ? "s" : ""} faster than in reality`);
 
 const systemName = "Alpha Testis";
-const systemCoordinates = {
+const systemCoordinates: StarSystemCoordinates = {
     starSectorX: 0,
     starSectorY: 0,
     starSectorZ: 0,
@@ -51,7 +49,7 @@ const systemCoordinates = {
     localZ: 0
 };
 
-const sunModel = newSeededStarModel(42, "Weierstrass", null);
+const sunModel = newSeededStarModel(42, "Weierstrass", []);
 sunModel.orbit.period = 60 * 60 * 24;
 
 /*const secundaModel = new StarModel(-672446, sunModel);
@@ -64,7 +62,7 @@ terminaModel.orbit.radius = 50 * sunModel.radius;
 terminaModel.orbit.period = 60 * 60;
 const termina = StarSystemHelper.makeStar(starSystem, terminaModel);*/
 
-const hecateModel = newSeededTelluricPlanetModel(253, "Hécate", sunModel);
+const hecateModel = newSeededTelluricPlanetModel(253, "Hécate", [sunModel]);
 hecateModel.physicalProperties.minTemperature = -40;
 hecateModel.physicalProperties.maxTemperature = 30;
 
@@ -72,14 +70,14 @@ hecateModel.orbit.period = 60 * 60 * 24 * 365.25;
 hecateModel.orbit.radius = 25000 * hecateModel.radius;
 hecateModel.orbit.normalToPlane = Vector3.Up();
 
-const spaceStationModel = newSeededSpaceStationModel(0, sunModel, systemCoordinates, hecateModel);
+const spaceStationModel = newSeededSpaceStationModel(0, [sunModel], systemCoordinates, [hecateModel]);
 
 //physicsViewer.showBody(spaceStation.aggregate.body);
 /*for(const landingpad of spaceStation.landingPads) {
     physicsViewer.showBody(landingpad.aggregate.body);
 }*/
 
-const moonModel = newSeededTelluricPlanetModel(23, "Manaleth", hecateModel);
+const moonModel = newSeededTelluricPlanetModel(23, "Manaleth", [hecateModel]);
 moonModel.physicalProperties.mass = 2;
 moonModel.physicalProperties.rotationPeriod = 7 * 60 * 60;
 moonModel.physicalProperties.minTemperature = -180;
@@ -90,7 +88,7 @@ moonModel.orbit.period = moonModel.physicalProperties.rotationPeriod;
 moonModel.orbit.radius = 8 * hecateModel.radius;
 moonModel.orbit.normalToPlane = Vector3.Up();
 
-const aresModel = newSeededTelluricPlanetModel(0.3725, "Ares", sunModel);
+const aresModel = newSeededTelluricPlanetModel(0.3725, "Ares", [sunModel]);
 aresModel.physicalProperties.mass = 7;
 aresModel.physicalProperties.rotationPeriod = (24 * 60 * 60) / 30;
 aresModel.physicalProperties.minTemperature = -30;
@@ -107,53 +105,42 @@ aresModel.orbit.normalToPlane = Vector3.Up();
 //aresModel.terrainSettings.continent_base_height = 10e3;
 //aresModel.terrainSettings.max_mountain_height = 20e3;
 
-const andromaqueModel = newSeededGasPlanetModel(0.28711440474126226, "Andromaque", sunModel);
+const andromaqueModel = newSeededGasPlanetModel(0.28711440474126226, "Andromaque", [sunModel]);
 andromaqueModel.orbit.period = 60 * 60 * 24 * 365.25;
 andromaqueModel.orbit.radius = 25300 * aresModel.radius;
 andromaqueModel.orbit.normalToPlane = Vector3.Up();
 
 const starSystemModel: StarSystemModel = {
     name: systemName,
-    coordinates: {
-        starSectorX: 0,
-        starSectorY: 0,
-        starSectorZ: 0,
-        localX: 0,
-        localY: 0,
-        localZ: 0
-    },
-    stellarObjects: [sunModel],
-    planetarySystems: [
-        { planet: hecateModel, satellites: [moonModel] },
-        { planet: aresModel, satellites: [] },
-        { planet: andromaqueModel, satellites: [] }
-    ],
-    anomalies: [],
-    spaceStations: [
+    coordinates: systemCoordinates,
+    subSystems: [
         {
-            model: spaceStationModel,
-            parent: {
-                objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
-                objectIndex: 0
-            }
+            stellarObjects: [sunModel],
+            planetarySystems: [
+                { planets: [hecateModel], satellites: [moonModel], spaceStations: [spaceStationModel] },
+                { planets: [aresModel], satellites: [], spaceStations: [] },
+                { planets: [andromaqueModel], satellites: [], spaceStations: [] }
+            ],
+            anomalies: [],
+            spaceStations: []
         }
     ]
 };
 
-const starSystem = new StarSystemController(starSystemModel, starSystemView.scene);
-
-await starSystemView.loadStarSystem(starSystem, true);
+const starSystem = await starSystemView.loadStarSystem(starSystemModel);
 
 engine.init(true);
 
-const hecate = starSystem.planets.find((planet) => planet.model === hecateModel);
+const planets = starSystem.getPlanets();
+
+const hecate = planets.find((planet) => planet.model === hecateModel);
 if (hecate === undefined) {
     throw new Error("Hécate not found");
 }
 
 positionNearObjectBrightSide(starSystemView.scene.getActiveControls(), hecate, starSystem, 2);
 
-const ares = starSystem.planets.find((planet) => planet.model === aresModel);
+const ares = planets.find((planet) => planet.model === aresModel);
 if (ares === undefined) {
     throw new Error("Ares not found");
 }

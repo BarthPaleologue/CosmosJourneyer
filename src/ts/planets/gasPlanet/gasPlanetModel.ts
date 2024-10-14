@@ -24,18 +24,18 @@ import { getOrbitalPeriod, getPeriapsis, Orbit } from "../../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PlanetModel } from "../../architecture/planet";
 import { PlanetPhysicalProperties } from "../../architecture/physicalProperties";
-import { CelestialBodyModel, CelestialBodyType } from "../../architecture/celestialBody";
+import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { newSeededRingsModel } from "../../rings/ringsModel";
 import { GenerationSteps } from "../../utils/generationSteps";
-import i18n from "../../i18n";
 
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
+import { OrbitalObjectType } from "../../architecture/orbitalObject";
 
 export type GasPlanetModel = PlanetModel & {
-    readonly bodyType: CelestialBodyType.GAS_PLANET;
+    readonly type: OrbitalObjectType.GAS_PLANET;
 };
 
-export function newSeededGasPlanetModel(seed: number, name: string, parentBody: CelestialBodyModel | null): GasPlanetModel {
+export function newSeededGasPlanetModel(seed: number, name: string, parentBodies: CelestialBodyModel[]): GasPlanetModel {
     const rng = getRngFromSeed(seed);
 
     const radius = randRangeInt(Settings.EARTH_RADIUS * 4, Settings.EARTH_RADIUS * 20, rng, GenerationSteps.RADIUS);
@@ -45,14 +45,18 @@ export function newSeededGasPlanetModel(seed: number, name: string, parentBody: 
 
     const orbitalP = clamp(0.7, 3.0, normalRandom(2.0, 0.3, rng, GenerationSteps.ORBIT + 80));
     orbitRadius += orbitRadius - getPeriapsis(orbitRadius, orbitalP);
-    if (parentBody) orbitRadius += parentBody.radius * 1.5;
+    if (parentBodies.length > 0) {
+        const maxRadius = parentBodies.reduce((max, body) => Math.max(max, body.radius), 0);
+        orbitRadius += maxRadius * 1.5;
+    }
 
     const orbitalPlaneNormal = Vector3.Up().applyRotationQuaternionInPlace(Quaternion.RotationAxis(Axis.X, (rng(GenerationSteps.ORBIT + 20) - 0.5) * 0.2));
 
+    const parentMassSum = parentBodies.reduce((sum, body) => sum + body.physicalProperties.mass, 0);
     const orbit: Orbit = {
         radius: orbitRadius,
         p: 2, //orbitalP,
-        period: getOrbitalPeriod(orbitRadius, parentBody?.physicalProperties.mass ?? 0),
+        period: getOrbitalPeriod(orbitRadius, parentMassSum),
         normalToPlane: orbitalPlaneNormal
     };
 
@@ -68,18 +72,13 @@ export function newSeededGasPlanetModel(seed: number, name: string, parentBody: 
 
     const rings = uniformRandBool(0.8, rng, GenerationSteps.RINGS) ? newSeededRingsModel(rng) : null;
 
-    const nbMoons = randRangeInt(0, 3, rng, GenerationSteps.NB_MOONS);
-
     return {
         name: name,
         seed: seed,
-        parentBody: parentBody,
-        bodyType: CelestialBodyType.GAS_PLANET,
+        type: OrbitalObjectType.GAS_PLANET,
         radius: radius,
         orbit: orbit,
         physicalProperties: physicalProperties,
-        rings: rings,
-        nbMoons: nbMoons,
-        typeName: i18n.t("objectTypes:gasPlanet")
+        rings: rings
     };
 }

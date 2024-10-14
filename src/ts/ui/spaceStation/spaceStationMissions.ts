@@ -3,13 +3,13 @@ import { getNeighborStarSystemCoordinates } from "../../utils/getNeighborStarSys
 import { parseDistance } from "../../utils/parseToStrings";
 import { Settings } from "../../settings";
 import { uniformRandBool } from "extended-random";
-import { getSpaceStationModels } from "../../utils/getModelsFromSystemModel";
 import { generateSightseeingMissions } from "../../missions/generateSightSeeingMissions";
 import { Player } from "../../player/player";
 import { MissionContainer } from "./missionContainer";
 
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { getSystemModelFromCoordinates } from "../../starSystem/modelFromCoordinates";
+import { StarSystemModelUtils } from "../../starSystem/starSystemModel";
 
 /**
  * Generates all missions available at the given space station for the player. Missions are generated based on the current timestamp (hourly basis).
@@ -29,7 +29,7 @@ export function generateMissionsDom(stationModel: SpaceStationModel, player: Pla
     let neighborSpaceStations: [SpaceStationModel, number][] = [];
     neighborSystems.forEach(([coordinates, position, distance], index) => {
         const systemModel = getSystemModelFromCoordinates(coordinates);
-        const spaceStations = getSpaceStationModels(systemModel).map<[SpaceStationModel, number]>((stationModel) => {
+        const spaceStations = StarSystemModelUtils.GetSpaceStations(systemModel).map<[SpaceStationModel, number]>((stationModel) => {
             return [stationModel, distance];
         });
         neighborSpaceStations = neighborSpaceStations.concat(spaceStations);

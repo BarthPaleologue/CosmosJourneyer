@@ -17,8 +17,6 @@
 
 import "../styles/index.scss";
 
-import { StarSystemController } from "./starSystem/starSystemController";
-
 import { positionNearObjectBrightSide } from "./utils/positionNearObject";
 import { CosmosJourneyer } from "./cosmosJourneyer";
 
@@ -32,9 +30,9 @@ const starSystemView = engine.starSystemView;
 
 const scene = starSystemView.scene;
 
-const blackHoleModel = newSeededBlackHoleModel(42, "Gargantua", null);
+const blackHoleModel = newSeededBlackHoleModel(42, "Gargantua", []);
 
-const millerPlanetModel = newSeededTelluricPlanetModel(42, "Miller", blackHoleModel);
+const millerPlanetModel = newSeededTelluricPlanetModel(42, "Miller", [blackHoleModel]);
 
 const starSystemModel: StarSystemModel = {
     name: "Black Hole Demo",
@@ -46,20 +44,23 @@ const starSystemModel: StarSystemModel = {
         localY: 0,
         localZ: 0
     },
-    stellarObjects: [blackHoleModel],
-    planetarySystems: [{ planet: millerPlanetModel, satellites: [] }],
-    anomalies: [],
-    spaceStations: []
+    subSystems: [
+        {
+            stellarObjects: [blackHoleModel],
+            planetarySystems: [{ planets: [millerPlanetModel], satellites: [], spaceStations: [] }],
+            anomalies: [],
+            spaceStations: []
+        }
+    ]
 };
-const starSystem = new StarSystemController(starSystemModel, scene);
 
-await starSystemView.loadStarSystem(starSystem, true);
+const starSystem = await starSystemView.loadStarSystem(starSystemModel);
 
 engine.init(true);
 
 await starSystemView.switchToDefaultControls(true);
 
-const BH = starSystem.stellarObjects[0];
+const BH = starSystem.getStellarObjects()[0];
 
 starSystemView.getDefaultControls().speed = BH.getBoundingRadius();
 

@@ -19,43 +19,35 @@ import { Camera } from "@babylonjs/core/Cameras/camera";
 import { JuliaSetModel } from "./juliaSetModel";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
-import { CelestialBody } from "../../architecture/celestialBody";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
 import { RingsUniforms } from "../../rings/ringsUniform";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Cullable } from "../../utils/cullable";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
-import { Anomaly } from "../anomaly";
-import { AnomalyType } from "../anomalyType";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { Orbit } from "../../orbit/orbit";
+import { CelestialBody } from "../../architecture/celestialBody";
+import { orbitalObjectTypeToDisplay } from "../../utils/orbitalObjectTypeToDisplay";
 
-export class JuliaSet implements Anomaly, Cullable {
+export class JuliaSet implements CelestialBody, Cullable {
     readonly name: string;
 
     readonly model: JuliaSetModel;
-
-    readonly anomalyType = AnomalyType.JULIA_SET;
 
     private readonly transform: TransformNode;
 
     readonly postProcesses: PostProcessType[] = [];
 
-    readonly parent: CelestialBody | null = null;
-
     /**
      * New Gas Planet
      * @param model The model to create the planet from or a seed for the planet in [-1, 1]
      * @param scene
-     * @param parentBody The bodies the planet is orbiting
      */
-    constructor(model: JuliaSetModel, scene: Scene, parentBody: CelestialBody | null = null) {
+    constructor(model: JuliaSetModel, scene: Scene) {
         this.model = model;
 
         this.name = this.model.name;
-
-        this.parent = parentBody;
 
         this.transform = new TransformNode(this.name, scene);
 
@@ -97,7 +89,7 @@ export class JuliaSet implements Anomaly, Cullable {
     }
 
     getTypeName(): string {
-        return this.model.typeName;
+        return orbitalObjectTypeToDisplay(this.model);
     }
 
     computeCulling(cameras: Camera[]): void {

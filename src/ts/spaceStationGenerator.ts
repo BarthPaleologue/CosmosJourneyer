@@ -78,16 +78,16 @@ const coordinates = {
     localZ: 0
 };
 
-const sunModel = newSeededStarModel(456, "Untitled Star", null);
+const sunModel = newSeededStarModel(456, "Untitled Star", []);
 const sun = new Star(sunModel, scene);
 sun.getTransform().position = new Vector3(7, 2, 5).normalize().scaleInPlace(distanceToStar);
 
 const starfieldBox = new StarFieldBox(scene);
 
-const spaceStationModel = newSeededSpaceStationModel(Math.random() * Settings.SEED_HALF_RANGE, sunModel, coordinates, sun.model);
+const spaceStationModel = newSeededSpaceStationModel(Math.random() * Settings.SEED_HALF_RANGE, [sunModel], coordinates, [sunModel]);
 spaceStationModel.orbit.radius = distanceToStar;
 
-const spaceStation = new SpaceStation(spaceStationModel, scene, sun);
+const spaceStation = new SpaceStation(spaceStationModel, scene);
 
 const ambient = new HemisphericLight("Sun", Vector3.Up(), scene);
 ambient.intensity = 0.1;

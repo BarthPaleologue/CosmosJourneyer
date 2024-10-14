@@ -435,8 +435,7 @@ export class CosmosJourneyer {
         const universeObjectId = universeCoordinates.universeObjectId;
 
         const systemModel = getSystemModelFromCoordinates(universeObjectId.starSystemCoordinates);
-        const systemController = new StarSystemController(systemModel, this.starSystemView.scene);
-        await this.starSystemView.loadStarSystem(systemController, true);
+        await this.starSystemView.loadStarSystem(systemModel);
 
         if (this.state === EngineState.UNINITIALIZED) await this.init(true);
         else this.starSystemView.initStarSystem();

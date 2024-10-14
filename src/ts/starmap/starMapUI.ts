@@ -19,18 +19,18 @@ import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Scene } from "@babylonjs/core/scene";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import i18n from "../i18n";
-import { getStellarTypeFromTemperature } from "../stellarObjects/star/starModel";
 import { getStarGalacticPosition } from "../utils/starSystemCoordinatesUtils";
 import { factionToString } from "../society/factions";
 import { isSystemInHumanBubble } from "../society/starSystemSociety";
-import { getSpaceStationModels } from "../utils/getModelsFromSystemModel";
 import { StarMapBookmarkButton } from "./starMapBookmarkButton";
 import { Player } from "../player/player";
 import { SystemIcons } from "./systemIcons";
-import { CelestialBodyType } from "../architecture/celestialBody";
 import { getRgbFromTemperature } from "../utils/specrend";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../saveFile/universeCoordinates";
 import { getSystemModelFromCoordinates } from "../starSystem/modelFromCoordinates";
+import { StarSystemModelUtils } from "../starSystem/starSystemModel";
+
+import { orbitalObjectTypeToDisplay } from "../utils/orbitalObjectTypeToDisplay";
 
 export class StarMapUI {
     readonly htmlRoot: HTMLDivElement;
@@ -310,14 +310,10 @@ export class StarMapUI {
             this.shortHandUIDistanceFromCurrent.textContent = `${i18n.t("starMap:distanceFromCurrent")}: ${Vector3.Distance(currentCoordinates, targetPosition).toFixed(1)} ${i18n.t("units:ly")}`;
         }
 
-        const starModel = targetSystemModel.stellarObjects[0];
+        //TODO: when implementing binary star systems, this will need to be updated to display all stellar objects and not just the first one
+        const starModel = StarSystemModelUtils.GetStellarObjects(targetSystemModel)[0];
 
-        let typeString: string;
-        if (starModel.bodyType === CelestialBodyType.BLACK_HOLE) typeString = i18n.t("objectTypes:blackHole");
-        else if (starModel.bodyType === CelestialBodyType.NEUTRON_STAR) typeString = i18n.t("objectTypes:neutronStar");
-        else typeString = i18n.t("objectTypes:star", { stellarType: getStellarTypeFromTemperature(starModel.temperature) });
-
-        this.shortHandUISystemType.textContent = typeString;
+        this.shortHandUISystemType.textContent = orbitalObjectTypeToDisplay(starModel);
         this.shortHandUIBookmarkButton.setSelectedSystemSeed(targetSystemModel.coordinates);
 
         const objectColor = getRgbFromTemperature(starModel.temperature);
@@ -330,12 +326,12 @@ export class StarMapUI {
         this.starSector.innerText = `X:${targetSystemModel.coordinates.starSectorX} Y:${targetSystemModel.coordinates.starSectorY} Z:${targetSystemModel.coordinates.starSectorZ}
             x:${targetSystemModel.coordinates.localX.toFixed(2)} y:${targetSystemModel.coordinates.localY.toFixed(2)} z:${targetSystemModel.coordinates.localZ.toFixed(2)}`;
 
-        this.nbPlanets.textContent = `${i18n.t("starMap:planets")}: ${targetSystemModel.planetarySystems.length}`;
+        this.nbPlanets.textContent = `${i18n.t("starMap:planets")}: ${StarSystemModelUtils.GetPlanets(targetSystemModel).length}`;
 
         this.distanceToSol.textContent = `${i18n.t("starMap:distanceToSol")}: ${Vector3.Distance(targetPosition, Vector3.Zero()).toFixed(1)} ${i18n.t("units:ly")}`;
 
         if (isSystemInHumanBubble(targetSystemModel.coordinates)) {
-            const spaceStations = getSpaceStationModels(targetSystemModel);
+            const spaceStations = StarSystemModelUtils.GetSpaceStations(targetSystemModel);
 
             this.nbSpaceStations.textContent = `${i18n.t("starMap:spaceStations")}: ${spaceStations.length}`;
 

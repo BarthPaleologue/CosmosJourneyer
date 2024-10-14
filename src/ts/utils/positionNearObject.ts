@@ -26,7 +26,7 @@ import { CanHaveRings } from "../architecture/canHaveRings";
 
 export function positionNearObjectBrightSide(transformable: Transformable, object: Transformable & HasBoundingSphere, starSystem: StarSystemController, nRadius = 3): void {
     // go from the nearest star to be on the sunny side of the object
-    const nearestStar = nearestBody(object.getTransform().getAbsolutePosition(), starSystem.stellarObjects);
+    const nearestStar = nearestBody(object.getTransform().getAbsolutePosition(), starSystem.getStellarObjects());
 
     if (nearestStar === object) {
         // the object is the nearest star
@@ -56,7 +56,7 @@ export function positionNearObjectBrightSide(transformable: Transformable, objec
 
 export function positionNearObjectWithStarVisible(transformable: Controls, object: Transformable & HasBoundingSphere, starSystem: StarSystemController, nRadius = 3): void {
     // go from the nearest star to be on the sunny side of the object
-    const nearestStar = nearestBody(object.getTransform().getAbsolutePosition(), starSystem.stellarObjects);
+    const nearestStar = nearestBody(object.getTransform().getAbsolutePosition(), starSystem.getStellarObjects());
 
     if (nearestStar === object) {
         // the object is the nearest star
@@ -116,7 +116,7 @@ export function positionNearObjectAsteroidField(body: Transformable & CanHaveRin
 
     const asteroidFieldAverageRadius = asteroidField.averageRadius;
 
-    const nearestStar = nearestBody(bodyPosition, starSystem.stellarObjects);
+    const nearestStar = nearestBody(bodyPosition, starSystem.getStellarObjects());
     const dirToStar = bodyPosition.subtract(nearestStar.getTransform().getAbsolutePosition()).normalize();
     const upDirection = getUpwardDirection(body.getTransform());
     const lateralDirection = Vector3.Cross(dirToStar, upDirection).normalize();

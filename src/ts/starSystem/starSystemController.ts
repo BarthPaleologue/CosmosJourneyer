@@ -18,7 +18,6 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Matrix, Quaternion } from "@babylonjs/core/Maths/math";
 import { PostProcessType } from "../postProcesses/postProcessTypes";
-import { getTransformationQuaternion } from "../utils/algebra";
 import { PostProcessManager } from "../postProcesses/postProcessManager";
 import { UberScene } from "../uberCore/uberScene";
 import { SpaceStation } from "../spacestation/spaceStation";
@@ -30,79 +29,71 @@ import { Star } from "../stellarObjects/star/star";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge";
-import { OrbitalObject, OrbitalObjectUtils } from "../architecture/orbitalObject";
+import { OrbitalObject, OrbitalObjectType, OrbitalObjectUtils } from "../architecture/orbitalObject";
 import { CelestialBody } from "../architecture/celestialBody";
 import { StellarObject } from "../architecture/stellarObject";
-import { isMoon, Planet } from "../architecture/planet";
+import { Planet } from "../architecture/planet";
 import { SystemTarget } from "../utils/systemTarget";
 import { JuliaSet } from "../anomalies/julia/juliaSet";
-import { Anomaly } from "../anomalies/anomaly";
 import { StarFieldBox } from "./starFieldBox";
-import { StarSystemModel } from "./starSystemModel";
+import { PlanetarySystemModel, StarSystemModel, SubStarSystemModel } from "./starSystemModel";
 import { Settings } from "../settings";
 import { getStarGalacticPosition } from "../utils/starSystemCoordinatesUtils";
 import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 import { GasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 import { MandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModel";
 import { JuliaSetModel } from "../anomalies/julia/juliaSetModel";
-import { SpaceStationModel } from "../spacestation/spacestationModel";
 import { StarModel } from "../stellarObjects/star/starModel";
 import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { StarSystemCoordinates } from "../saveFile/universeCoordinates";
+import { wait } from "../utils/wait";
+
+export type PlanetarySystem = {
+    readonly planets: Planet[];
+    readonly satellites: TelluricPlanet[];
+    readonly spaceStations: SpaceStation[];
+};
+
+export type SubStarSystem = {
+    readonly stellarObjects: StellarObject[];
+    readonly planetarySystems: PlanetarySystem[];
+    readonly anomalies: CelestialBody[];
+    readonly spaceStations: SpaceStation[];
+};
 
 export class StarSystemController {
     readonly scene: UberScene;
 
     readonly starFieldBox: StarFieldBox;
 
-    private readonly orbitalObjects: OrbitalObject[] = [];
-
-    readonly spaceStations: SpaceStation[] = [];
-
-    readonly celestialBodies: CelestialBody[] = [];
+    /**
+     * The model of the star system that describes it and generates the randomness
+     */
+    readonly model: StarSystemModel;
 
     /**
-     * The list of all stellar objects in the system (stars, black holes, pulsars)
+     * Translation of the model in terms of actual 3D objects
      */
-    readonly stellarObjects: StellarObject[] = [];
+    readonly subSystems: SubStarSystem[] = [];
 
-    /**
-     * The list of all planetary mass objects in the system (planets and moons)
-     */
-    readonly planetaryMassObjects: Planet[] = [];
+    readonly objectToParents: Map<OrbitalObject, OrbitalObject[]> = new Map();
 
-    /**
-     * The list of all planets in the system (telluric and gas)
-     */
-    readonly planets: Planet[] = [];
-
-    /**
-     * The list of all gas planets in the system
-     */
-    readonly gasPlanets: GasPlanet[] = [];
-
-    /**
-     * The list of all telluric planets and moons in the system
-     */
     readonly telluricBodies: TelluricPlanet[] = [];
-
-    /**
-     * The list of all anomalies in the system
-     */
-    readonly anomalies: Anomaly[] = [];
+    readonly gasPlanets: GasPlanet[] = [];
 
     /**
      * The list of all system targets in the system
      */
     private systemTargets: SystemTarget[] = [];
 
-    /**
-     * The model of the star system that describes it and generates the randomness
-     */
-    readonly model: StarSystemModel;
-
     private elapsedSeconds = 0;
+
+    private timeOut = 500;
+
+    private loadingIndex = 0;
+
+    private offset = 1e8;
 
     constructor(model: StarSystemModel, scene: UberScene) {
         this.scene = scene;
@@ -110,166 +101,151 @@ export class StarSystemController {
         this.model = model;
     }
 
-    private addPlanet(planet: Planet) {
-        this.orbitalObjects.push(planet);
-        this.celestialBodies.push(planet);
-        this.planetaryMassObjects.push(planet);
-        this.planets.push(planet);
-    }
-
-    /**
-     * Adds a satellite to the given planet and returns it
-     * @param satelliteModel The model of the satellite to add to the planet
-     * @param parentBody The planet to which the satellite will be added
-     * @returns The satellite added to the planet
-     */
-    public addSatellite(satelliteModel: TelluricPlanetModel, parentBody: CelestialBody): TelluricPlanet {
-        if (!isMoon(satelliteModel)) throw new Error("Use addTelluricPlanet to add a telluric planet to a planet, not addSatellite");
-        const satellite = new TelluricPlanet(satelliteModel, this.scene, parentBody);
-        this.orbitalObjects.push(satellite);
-        this.celestialBodies.push(satellite);
-        this.planetaryMassObjects.push(satellite);
-        this.telluricBodies.push(satellite);
-
-        return satellite;
-    }
-
-    /**
-     * Adds a telluric planet to the system and returns it
-     * @param planetModel The model of the planet to add to the system
-     * @returns The telluric planet added to the system
-     */
-    public addTelluricPlanet(planetModel: TelluricPlanetModel): TelluricPlanet {
-        if (isMoon(planetModel)) {
-            throw new Error("Use addSatellite to add a moon to a planet, not addTelluricPlanet");
+    public async load() {
+        for (const subSystem of this.model.subSystems) {
+            this.subSystems.push(await this.loadSubSystem(subSystem));
         }
-        const planet = new TelluricPlanet(planetModel, this.scene, this.stellarObjects[0]);
-        this.addPlanet(planet);
-        this.telluricBodies.push(planet);
-        return planet;
     }
 
-    /**
-     * Adds a gas planet to the system and returns it
-     * @param planetModel The model of the planet to add to the system
-     */
-    public addGasPlanet(planetModel: GasPlanetModel): GasPlanet {
-        const planet = new GasPlanet(planetModel, this.scene, this.stellarObjects[0]);
-        this.addPlanet(planet);
-        this.gasPlanets.push(planet);
-        return planet;
+    private async loadSubSystem(subSystemModel: SubStarSystemModel): Promise<SubStarSystem> {
+        const stellarObjects: StellarObject[] = [];
+        for (const stellarObjectModel of subSystemModel.stellarObjects) {
+            console.log("Loading stellar object:", stellarObjectModel.name);
+            let stellarObject: StellarObject;
+            switch (stellarObjectModel.type) {
+                case OrbitalObjectType.STAR:
+                    stellarObject = new Star(stellarObjectModel as StarModel, this.scene);
+                    break;
+                case OrbitalObjectType.BLACK_HOLE:
+                    stellarObject = new BlackHole(stellarObjectModel as BlackHoleModel, this.scene);
+                    break;
+                case OrbitalObjectType.NEUTRON_STAR:
+                    stellarObject = new NeutronStar(stellarObjectModel as NeutronStarModel, this.scene);
+                    break;
+                default:
+                    throw new Error("Unknown stellar object type");
+            }
+            stellarObjects.push(stellarObject);
+            this.objectToParents.set(stellarObject, []);
+            stellarObject.getTransform().setAbsolutePosition(new Vector3(this.offset * ++this.loadingIndex, 0, 0));
+
+            await wait(this.timeOut);
+        }
+
+        const planetarySystems: PlanetarySystem[] = [];
+        for (const planetarySystem of subSystemModel.planetarySystems) {
+            planetarySystems.push(await this.loadPlanetarySystem(planetarySystem, stellarObjects));
+        }
+
+        const anomalies: CelestialBody[] = [];
+        for (const anomalyModel of subSystemModel.anomalies) {
+            console.log("Loading Anomaly:", anomalyModel.name);
+            let anomaly: CelestialBody;
+            switch (anomalyModel.type) {
+                case OrbitalObjectType.MANDELBULB:
+                    anomaly = new Mandelbulb(anomalyModel as MandelbulbModel, this.scene);
+                    break;
+                case OrbitalObjectType.JULIA_SET:
+                    anomaly = new JuliaSet(anomalyModel as JuliaSetModel, this.scene);
+                    break;
+            }
+            anomalies.push(anomaly);
+
+            this.objectToParents.set(anomaly, stellarObjects);
+
+            anomaly.getTransform().setAbsolutePosition(new Vector3(this.offset * ++this.loadingIndex, 0, 0));
+
+            await wait(this.timeOut);
+        }
+
+        const spaceStations: SpaceStation[] = [];
+        for (const spaceStationModel of subSystemModel.spaceStations) {
+            const spaceStation = new SpaceStation(spaceStationModel, this.scene);
+            spaceStations.push(spaceStation);
+            spaceStation.getTransform().setAbsolutePosition(new Vector3(this.offset * ++this.loadingIndex, 0, 0));
+
+            this.objectToParents.set(spaceStation, stellarObjects);
+
+            await wait(this.timeOut);
+        }
+
+        return {
+            stellarObjects,
+            planetarySystems,
+            anomalies,
+            spaceStations
+        };
     }
 
-    /**
-     * Adds a Mandelbulb to the system and returns it
-     * @param mandelbulbModel The model of the mandelbulb to add to the system
-     * @returns The mandelbulb added to the system
-     */
-    public addMandelbulb(mandelbulbModel: MandelbulbModel): Mandelbulb {
-        const mandelbulb = new Mandelbulb(mandelbulbModel, this.scene, this.stellarObjects[0]);
-        this.orbitalObjects.push(mandelbulb);
-        this.anomalies.push(mandelbulb);
-        this.celestialBodies.push(mandelbulb);
-        return mandelbulb;
-    }
+    private async loadPlanetarySystem(planetarySystemModel: PlanetarySystemModel, stellarObjects: StellarObject[]): Promise<PlanetarySystem> {
+        const planets: Planet[] = [];
+        for (const planetModel of planetarySystemModel.planets) {
+            console.log("Loading planet", planetModel.name);
 
-    /**
-     * Adds a Julia set to the system and returns it
-     * @param juliaSetModel The model of the julia set to add to the system
-     * @returns The julia set added to the system
-     */
-    public addJuliaSet(juliaSetModel: JuliaSetModel): JuliaSet {
-        const juliaSet = new JuliaSet(juliaSetModel, this.scene, this.stellarObjects[0]);
-        this.orbitalObjects.push(juliaSet);
-        this.anomalies.push(juliaSet);
-        this.celestialBodies.push(juliaSet);
-        return juliaSet;
-    }
+            let planet: Planet;
 
-    /**
-     * Adds a star to the system and returns it
-     * @param starModel The model of the star added to the system
-     * @param parentBody The parent body of the star
-     * @returns The star added to the system
-     */
-    public addStar(starModel: StarModel, parentBody: CelestialBody | null) {
-        const star = new Star(starModel, this.scene, parentBody);
-        this.addStellarObject(star);
-        return star;
-    }
+            switch (planetModel.type) {
+                case OrbitalObjectType.TELLURIC_PLANET:
+                    planet = new TelluricPlanet(planetModel as TelluricPlanetModel, this.scene);
+                    this.telluricBodies.push(planet as TelluricPlanet);
+                    break;
+                case OrbitalObjectType.GAS_PLANET:
+                    planet = new GasPlanet(planetModel as GasPlanetModel, this.scene);
+                    this.gasPlanets.push(planet as GasPlanet);
+                    break;
+                case OrbitalObjectType.TELLURIC_SATELLITE:
+                    throw new Error("Telluric satellites must be stored in the satellites array, not in the planets array");
+            }
 
-    /**
-     * Adds a neutron star to the system and returns it
-     * @param neutronStarModel The model of the neutron star added to the system
-     * @param parentBody The parent body of the neutron star
-     * @returns The neutron star added to the system
-     */
-    public addNeutronStar(neutronStarModel: NeutronStarModel, parentBody: CelestialBody | null): NeutronStar {
-        const neutronStar = new NeutronStar(neutronStarModel, this.scene, parentBody);
-        this.addStellarObject(neutronStar);
-        return neutronStar;
-    }
+            planet.getTransform().setAbsolutePosition(new Vector3(this.offset * ++this.loadingIndex, 0, 0));
 
-    /**
-     * Adds a black hole to the system and returns it
-     * @param blackHoleModel The model of the black hole added to the system
-     * @param parentBody The parent body of the black hole
-     * @returns The black hole added to the system
-     */
-    public addBlackHole(blackHoleModel: BlackHoleModel, parentBody: CelestialBody | null): BlackHole {
-        const blackHole = new BlackHole(blackHoleModel, this.scene, parentBody);
-        this.addStellarObject(blackHole);
-        return blackHole;
-    }
+            planets.push(planet);
 
-    /**
-     * Adds a star or a blackhole to the system and returns it
-     * @param stellarObject The star added to the system
-     * @returns The star added to the system
-     */
-    private addStellarObject(stellarObject: StellarObject): StellarObject {
-        this.orbitalObjects.push(stellarObject);
-        this.celestialBodies.push(stellarObject);
-        this.stellarObjects.push(stellarObject);
-        return stellarObject;
-    }
+            this.objectToParents.set(planet, stellarObjects);
 
-    /**
-     * Adds a spacestation to the system and returns it
-     * @param spaceStationModel The model of the spacestation added to the system
-     * @param parentBody
-     * @returns The spacestation added to the system
-     */
-    public addSpaceStation(spaceStationModel: SpaceStationModel, parentBody: OrbitalObject | null): SpaceStation {
-        const spaceStation = new SpaceStation(spaceStationModel, this.scene, parentBody);
-        this.orbitalObjects.push(spaceStation);
-        this.spaceStations.push(spaceStation);
-        return spaceStation;
-    }
+            await wait(this.timeOut);
+        }
 
-    /**
-     * Returns the list of all celestial bodies managed by the star system
-     */
-    public getBodies(): CelestialBody[] {
-        return this.celestialBodies;
-    }
+        const satellites: TelluricPlanet[] = [];
+        for (const satelliteModel of planetarySystemModel.satellites) {
+            console.log("Loading satellite:", satelliteModel.name);
+            const satellite = new TelluricPlanet(satelliteModel, this.scene);
+            satellite.getTransform().setAbsolutePosition(new Vector3(this.offset * ++this.loadingIndex, 0, 0));
+            satellites.push(satellite);
+            this.telluricBodies.push(satellite);
+            this.objectToParents.set(satellite, planets);
+            await wait(this.timeOut);
+        }
 
-    public getSpaceStations(): SpaceStation[] {
-        return this.spaceStations;
-    }
+        const spaceStations: SpaceStation[] = [];
+        for (const spaceStationModel of planetarySystemModel.spaceStations) {
+            console.log("Loading space station:", spaceStationModel.name);
+            const spaceStation = new SpaceStation(spaceStationModel, this.scene);
+            spaceStations.push(spaceStation);
+            spaceStation.getTransform().setAbsolutePosition(new Vector3(this.offset * ++this.loadingIndex, 0, 0));
 
-    public getOrbitalObjects(): OrbitalObject[] {
-        return this.orbitalObjects;
+            this.objectToParents.set(spaceStation, planets);
+
+            await wait(this.timeOut);
+        }
+
+        return {
+            planets,
+            satellites,
+            spaceStations
+        };
     }
 
     /**
      * Returns the nearest orbital object to the origin
      */
     public getNearestOrbitalObject(position: Vector3): OrbitalObject {
-        if (this.orbitalObjects.length === 0) throw new Error("There are no orbital objects in the solar system");
-        let nearest: OrbitalObject = this.orbitalObjects[0];
+        const celestialBodies = this.getCelestialBodies();
+        const spaceStations = this.getSpaceStations();
+        if (celestialBodies.length + spaceStations.length === 0) throw new Error("There are no orbital objects in the solar system");
+        let nearest: OrbitalObject = celestialBodies[0];
         let smallerDistance = Number.POSITIVE_INFINITY;
-        for (const body of this.celestialBodies) {
+        for (const body of celestialBodies) {
             const distance = body.getTransform().getAbsolutePosition().subtract(position).length() - body.getRadius();
             if (distance < smallerDistance) {
                 nearest = body;
@@ -277,7 +253,7 @@ export class StarSystemController {
             }
         }
 
-        for (const spacestation of this.spaceStations) {
+        for (const spacestation of spaceStations) {
             const distance = spacestation.getTransform().getAbsolutePosition().subtract(position).length();
             if (distance < smallerDistance && distance < spacestation.getBoundingRadius() * 20) {
                 nearest = spacestation;
@@ -288,14 +264,67 @@ export class StarSystemController {
         return nearest;
     }
 
+    public getSpaceStations(): SpaceStation[] {
+        const solarSpaceStations: SpaceStation[] = this.subSystems.flatMap((subSystem) => subSystem.spaceStations);
+        const planetSpaceStations: SpaceStation[] = this.subSystems.flatMap((subSystem) => subSystem.planetarySystems.flatMap((planetarySystem) => planetarySystem.spaceStations));
+        return solarSpaceStations.concat(planetSpaceStations);
+    }
+
+    public getCelestialBodies(): CelestialBody[] {
+        const celestialBodies: CelestialBody[] = this.subSystems.flatMap((subSystem) => subSystem.stellarObjects);
+        celestialBodies.push(
+            ...this.subSystems.flatMap((subSystem) => subSystem.planetarySystems.flatMap((planetarySystem) => [...planetarySystem.planets, ...planetarySystem.satellites]))
+        );
+        celestialBodies.push(...this.subSystems.flatMap((subSystem) => subSystem.anomalies));
+
+        return celestialBodies;
+    }
+
+    public getStellarObjects(): StellarObject[] {
+        return this.subSystems.flatMap((subSystem) => subSystem.stellarObjects);
+    }
+
+    public getOrbitalObjects(): OrbitalObject[] {
+        return [...this.getCelestialBodies(), ...this.getSpaceStations()];
+    }
+
+    public getPlanets(): Planet[] {
+        return this.subSystems.flatMap((subSystem) => subSystem.planetarySystems.flatMap((planetarySystem) => planetarySystem.planets));
+    }
+
+    /**
+     * Returns all the planetary mass objects in the star system. (Planets first, then satellites)
+     */
+    public getPlanetaryMassObjects(): Planet[] {
+        const planets: Planet[] = [];
+        const satellites: Planet[] = [];
+        this.subSystems.forEach((subSystem) =>
+            subSystem.planetarySystems.forEach((planetarySystem) => {
+                planets.push(...planetarySystem.planets);
+                satellites.push(...planetarySystem.satellites);
+            })
+        );
+
+        return planets.concat(satellites);
+    }
+
+    public getAnomalies(): CelestialBody[] {
+        return this.subSystems.flatMap((subSystem) => subSystem.anomalies);
+    }
+
+    public getParentsOf(object: OrbitalObject): OrbitalObject[] {
+        return this.objectToParents.get(object) ?? [];
+    }
+
     /**
      * Returns the nearest body to the given position
      */
     public getNearestCelestialBody(position: Vector3): CelestialBody {
-        if (this.celestialBodies.length === 0) throw new Error("There are no bodies or spacestation in the solar system");
+        const celestialBodies = this.getCelestialBodies();
+        if (celestialBodies.length === 0) throw new Error("There are no bodies or spacestation in the solar system");
         let nearest = null;
         let smallerDistance = -1;
-        for (const body of this.celestialBodies) {
+        for (const body of celestialBodies) {
             const distance = body.getTransform().getAbsolutePosition().subtract(position).length() - body.getRadius();
             if (nearest === null || distance < smallerDistance) {
                 nearest = body;
@@ -311,19 +340,8 @@ export class StarSystemController {
      * Inits the post processes and moves the system forward in time to the current time (it is additive)
      */
     public initPositions(nbWarmUpUpdates: number, chunkForge: ChunkForge, postProcessManager: PostProcessManager): void {
-        for (const object of this.orbitalObjects) {
-            const orbit = object.getOrbitProperties();
-            const displacement = new Vector3(orbit.radius, 0, 0);
-            const quaternion = getTransformationQuaternion(Vector3.Up(), orbit.normalToPlane);
-            displacement.applyRotationQuaternionInPlace(quaternion);
-            if (object.parent !== null) {
-                translate(object.getTransform(), object.parent.getTransform().getAbsolutePosition());
-            }
-            translate(object.getTransform(), displacement);
-        }
-
         this.update(Date.now() / 1000, chunkForge, postProcessManager);
-        for (let i = 0; i < nbWarmUpUpdates; i++) this.update(1, chunkForge, postProcessManager);
+        for (let i = 0; i < nbWarmUpUpdates; i++) this.update(1 / 60, chunkForge, postProcessManager);
     }
 
     /**
@@ -331,24 +349,26 @@ export class StarSystemController {
      * This method cannot be awaited as its completion depends on the execution of BabylonJS that happens afterward.
      */
     public initPostProcesses(postProcessManager: PostProcessManager): void {
-        for (const object of this.celestialBodies) {
+        const celestialBodies = this.getCelestialBodies();
+        const stellarObjects = this.getStellarObjects();
+        for (const object of celestialBodies) {
             for (const postProcess of object.postProcesses) {
                 switch (postProcess) {
                     case PostProcessType.RING:
-                        postProcessManager.addRings(object, this.stellarObjects);
+                        postProcessManager.addRings(object, stellarObjects);
                         break;
                     case PostProcessType.ATMOSPHERE:
                         if (!(object instanceof GasPlanet) && !(object instanceof TelluricPlanet))
                             throw new Error("Atmosphere post process can only be added to gas or telluric planets. Source:" + object.name);
-                        postProcessManager.addAtmosphere(object as GasPlanet | TelluricPlanet, this.stellarObjects);
+                        postProcessManager.addAtmosphere(object as GasPlanet | TelluricPlanet, stellarObjects);
                         break;
                     case PostProcessType.CLOUDS:
                         if (!(object instanceof TelluricPlanet)) throw new Error("Clouds post process can only be added to telluric planets. Source:" + object.name);
-                        postProcessManager.addClouds(object as TelluricPlanet, this.stellarObjects);
+                        postProcessManager.addClouds(object as TelluricPlanet, stellarObjects);
                         break;
                     case PostProcessType.OCEAN:
                         if (!(object instanceof TelluricPlanet)) throw new Error("Ocean post process can only be added to telluric planets. Source:" + object.name);
-                        postProcessManager.addOcean(object as TelluricPlanet, this.stellarObjects);
+                        postProcessManager.addOcean(object as TelluricPlanet, stellarObjects);
                         break;
                     case PostProcessType.VOLUMETRIC_LIGHT:
                         if (!(object instanceof Star) && !(object instanceof NeutronStar))
@@ -357,11 +377,11 @@ export class StarSystemController {
                         break;
                     case PostProcessType.MANDELBULB:
                         if (!(object instanceof Mandelbulb)) throw new Error("Mandelbulb post process can only be added to mandelbulbs. Source:" + object.name);
-                        postProcessManager.addMandelbulb(object as Mandelbulb, this.stellarObjects);
+                        postProcessManager.addMandelbulb(object as Mandelbulb, stellarObjects);
                         break;
                     case PostProcessType.JULIA_SET:
                         if (!(object instanceof JuliaSet)) throw new Error("Julia set post process can only be added to julia sets. Source:" + object.name);
-                        postProcessManager.addJuliaSet(object as JuliaSet, this.stellarObjects);
+                        postProcessManager.addJuliaSet(object as JuliaSet, stellarObjects);
                         break;
                     case PostProcessType.BLACK_HOLE:
                         if (!(object instanceof BlackHole)) throw new Error("Black hole post process can only be added to black holes. Source:" + object.name);
@@ -372,7 +392,7 @@ export class StarSystemController {
                         postProcessManager.addMatterJet(object as NeutronStar);
                         break;
                     case PostProcessType.SHADOW:
-                        postProcessManager.addShadowCaster(object, this.stellarObjects);
+                        postProcessManager.addShadowCaster(object, stellarObjects);
                         break;
                     case PostProcessType.LENS_FLARE:
                         postProcessManager.addLensFlare(object as StellarObject);
@@ -396,6 +416,11 @@ export class StarSystemController {
         this.elapsedSeconds += deltaSeconds;
 
         const controller = this.scene.getActiveControls();
+
+        const celestialBodies = this.getCelestialBodies();
+        const stellarObjects = this.getStellarObjects();
+        const spaceStations = this.getSpaceStations();
+        const orbitalObjects = this.getOrbitalObjects();
 
         // The nearest body might have to be treated separately
         // The first step is to find the nearest body
@@ -433,7 +458,7 @@ export class StarSystemController {
         if (shouldCompensateRotation) {
             const dThetaNearest = OrbitalObjectUtils.GetRotationAngle(nearestOrbitalObject, deltaSeconds);
 
-            for (const object of this.orbitalObjects) {
+            for (const object of orbitalObjects) {
                 const orbit = object.getOrbitProperties();
 
                 // the normal to the orbit planes must be rotated as well (even the one of the nearest body)
@@ -463,12 +488,16 @@ export class StarSystemController {
         // compute what would be its next position if it were to move normally.
         // This gives us a translation vector that we can negate and apply to all other bodies.
         const initialPosition = nearestOrbitalObject.getTransform().getAbsolutePosition().clone();
-        const newPosition = OrbitalObjectUtils.GetOrbitalPosition(nearestOrbitalObject, this.elapsedSeconds);
+        const nearestObjectParents = this.objectToParents.get(nearestOrbitalObject);
+        if (nearestObjectParents === undefined) {
+            throw new Error("Nearest object parents are not defined");
+        }
+        const newPosition = OrbitalObjectUtils.GetOrbitalPosition(nearestOrbitalObject, nearestObjectParents, this.elapsedSeconds);
 
         const nearestBodyDisplacement = newPosition.subtract(initialPosition);
         if (shouldCompensateTranslation) {
             const negatedDisplacement = nearestBodyDisplacement.negate();
-            for (const object of this.orbitalObjects) {
+            for (const object of orbitalObjects) {
                 if (object === nearestOrbitalObject) continue;
 
                 // the body is translated so that the nearest body can stay in place
@@ -484,16 +513,21 @@ export class StarSystemController {
         }
 
         // finally, all other objects are updated normally
-        for (const object of this.orbitalObjects) {
+        for (const object of orbitalObjects) {
             if (object === nearestOrbitalObject) continue;
 
-            OrbitalObjectUtils.SetOrbitalPosition(object, this.elapsedSeconds);
+            const parents = this.objectToParents.get(object);
+            if (parents === undefined) {
+                throw new Error(`Parents of ${object.name} are not defined`);
+            }
+
+            OrbitalObjectUtils.SetOrbitalPosition(object, parents, this.elapsedSeconds);
             OrbitalObjectUtils.UpdateRotation(object, deltaSeconds);
         }
 
         controller.update(deltaSeconds);
 
-        for (const object of this.celestialBodies) {
+        for (const object of celestialBodies) {
             object.getAsteroidField()?.update(controller.getActiveCameras()[0].globalPosition, deltaSeconds);
         }
 
@@ -508,8 +542,8 @@ export class StarSystemController {
         }
 
         const cameraWorldPosition = controller.getTransform().getAbsolutePosition();
-        for (const spaceStation of this.spaceStations) {
-            spaceStation.update(this.stellarObjects, cameraWorldPosition, deltaSeconds);
+        for (const spaceStation of spaceStations) {
+            spaceStation.update(stellarObjects, cameraWorldPosition, deltaSeconds);
             spaceStation.computeCulling(controller.getActiveCameras());
         }
 
@@ -524,7 +558,8 @@ export class StarSystemController {
      * @param displacement The displacement applied to all bodies
      */
     public translateEverythingNow(displacement: Vector3): void {
-        for (const object of this.orbitalObjects) translate(object.getTransform(), displacement);
+        const orbitalObjects = this.getOrbitalObjects();
+        for (const object of orbitalObjects) translate(object.getTransform(), displacement);
         this.systemTargets.forEach((target) => translate(target.getTransform(), displacement));
     }
 
@@ -547,11 +582,14 @@ export class StarSystemController {
     public updateShaders(deltaSeconds: number, postProcessManager: PostProcessManager) {
         const nearestBody = this.getNearestCelestialBody(this.scene.getActiveControls().getTransform().getAbsolutePosition());
 
-        for (const planet of this.planetaryMassObjects) {
-            planet.updateMaterial(this.stellarObjects, deltaSeconds);
+        const stellarObjects = this.getStellarObjects();
+        const planetaryMassObjects = this.getPlanetaryMassObjects();
+
+        for (const planet of planetaryMassObjects) {
+            planet.updateMaterial(stellarObjects, deltaSeconds);
         }
 
-        for (const stellarObject of this.stellarObjects) {
+        for (const stellarObject of stellarObjects) {
             //FIXME: this needs to be refactored to be future proof when adding new stellar objects
             if (stellarObject instanceof Star) stellarObject.updateMaterial(deltaSeconds);
         }
@@ -585,21 +623,33 @@ export class StarSystemController {
      * Disposes all the bodies in the system
      */
     public dispose() {
-        this.orbitalObjects.forEach((object) => object.dispose());
-        this.orbitalObjects.length = 0;
+        this.objectToParents.clear();
+        this.telluricBodies.length = 0;
+        this.gasPlanets.length = 0;
+
+        this.subSystems.forEach((subSystem) => {
+            subSystem.stellarObjects.forEach((stellarObject) => stellarObject.dispose());
+            subSystem.stellarObjects.length = 0;
+
+            subSystem.planetarySystems.forEach((planetarySystem) => {
+                planetarySystem.planets.forEach((planet) => planet.dispose());
+                planetarySystem.planets.length = 0;
+                planetarySystem.satellites.forEach((satellite) => satellite.dispose());
+                planetarySystem.satellites.length = 0;
+                planetarySystem.spaceStations.forEach((spaceStation) => spaceStation.dispose());
+                planetarySystem.spaceStations.length = 0;
+            });
+
+            subSystem.anomalies.forEach((anomaly) => anomaly.dispose());
+            subSystem.anomalies.length = 0;
+
+            subSystem.spaceStations.forEach((spaceStation) => spaceStation.dispose());
+            subSystem.spaceStations.length = 0;
+        });
 
         this.systemTargets.forEach((target) => target.dispose());
         this.systemTargets.length = 0;
 
         this.starFieldBox.dispose();
-
-        this.spaceStations.length = 0;
-        this.celestialBodies.length = 0;
-        this.stellarObjects.length = 0;
-        this.planets.length = 0;
-        this.telluricBodies.length = 0;
-        this.planetaryMassObjects.length = 0;
-        this.gasPlanets.length = 0;
-        this.anomalies.length = 0;
     }
 }

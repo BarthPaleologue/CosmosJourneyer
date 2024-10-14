@@ -77,7 +77,7 @@ export class MissionAsteroidFieldNode implements MissionNode {
             throw new Error(`Could not find object with ID ${JSON.stringify(this.objectId)}`);
         }
 
-        const celestialBody = currentSystem.celestialBodies.find((body) => body === targetObject);
+        const celestialBody = currentSystem.getCelestialBodies().find((body) => body === targetObject);
         if (celestialBody === undefined) {
             throw new Error(`Object with ID ${JSON.stringify(this.objectId)} is not a celestial body`);
         }

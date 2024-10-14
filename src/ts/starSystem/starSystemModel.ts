@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { StarSystemCoordinates, SystemObjectId } from "../saveFile/universeCoordinates";
+import { StarSystemCoordinates } from "../saveFile/universeCoordinates";
 import { StellarObjectModel } from "../architecture/stellarObject";
 import { PlanetModel } from "../architecture/planet";
 import { AnomalyModel } from "../anomalies/anomaly";
@@ -24,16 +24,53 @@ import { SpaceStationModel } from "../spacestation/spacestationModel";
 
 /**
  * Data model for a planetary system. It holds all the information necessary to generate and render a planetary system.
+ * For example the Earth-Moon system is a planetary system, with the ISS orbiting the Earth.
+ * Saturn and its satellites are another planetary system, with many satellites and no space stations (yet!).
  */
-export type PlanetarySystem = {
+export type PlanetarySystemModel = {
     /**
-     * The planet of the planetary system.
+     * The planets of the planetary system.
+     * Usually, there is only one planet in the planetary system.
+     * However, binary planets are possible, like Pluto and Charon
      */
-    planet: PlanetModel;
+    planets: PlanetModel[];
     /**
      * The satellites of the planet.
      */
     satellites: TelluricPlanetModel[];
+
+    /**
+     * The space stations orbiting the planet.
+     */
+    spaceStations: SpaceStationModel[];
+};
+
+/**
+ * Data model for a sub star system. It holds all the information necessary to generate and render a sub star system.
+ * A typical star system like Sol, which has a single star and planets orbiting it, a single sub star system can describe the whole star system.
+ */
+export type SubStarSystemModel = {
+    /**
+     * The stellar objects in the sub star system.
+     * Usually, there is only one star in the sub star system.
+     * However, we can imagine more complex scenarios like 2 neutron stars orbiting each other while having planets orbiting them from far away.
+     */
+    stellarObjects: StellarObjectModel[];
+
+    /**
+     * The planetary systems in the sub star system.
+     */
+    planetarySystems: PlanetarySystemModel[];
+
+    /**
+     * The anomalies in the sub star system.
+     */
+    anomalies: AnomalyModel[];
+
+    /**
+     * The space stations orbiting the stellar objects in the sub star system.
+     */
+    spaceStations: SpaceStationModel[];
 };
 
 /**
@@ -47,42 +84,56 @@ export type StarSystemModel = {
 
     /**
      * The coordinates of the star system in the universe.
+     * They are used for identification purposes and to generate the star system.
      */
     readonly coordinates: StarSystemCoordinates;
 
     /**
-     * The stellar objects in the star system.
+     * Data models for system hierarchies inside the star system. (There can be multiple sub star systems in a star system, for example a binary star system).
+     * Usually, there is only one sub star system with a single star.
      */
-    readonly stellarObjects: StellarObjectModel[];
-
-    /**
-     * The planetary systems in the star system.
-     */
-    readonly planetarySystems: PlanetarySystem[];
-
-    /**
-     * The anomalies in the star system.
-     */
-    readonly anomalies: AnomalyModel[];
-
-    readonly spaceStations: {
-        model: SpaceStationModel;
-        parent: SystemObjectId;
-    }[];
+    readonly subSystems: SubStarSystemModel[];
 };
 
-/**
- * Returns all the planets in the planetary systems (telluric planets and gas giants). Satellites are not included.
- * @param planetarySystems The planetary systems to get the planets from.
- */
-export function getPlanets(planetarySystems: PlanetarySystem[]): PlanetModel[] {
-    return planetarySystems.map(({ planet }) => planet);
-}
+export class StarSystemModelUtils {
+    static GetStellarObjects(starSystem: StarSystemModel): StellarObjectModel[] {
+        return starSystem.subSystems.flatMap((subSystem) => subSystem.stellarObjects);
+    }
 
-/**
- * Returns all the planetary mass objects in the given planetary systems (telluric planets, gas planets and satellites).
- * @param planetarySystems The planetary systems to get the planetary mass objects from.
- */
-export function getPlanetaryMassObjects(planetarySystems: PlanetarySystem[]): PlanetModel[] {
-    return planetarySystems.flatMap(({ planet, satellites }) => [planet, ...satellites]);
+    static GetPlanetarySystems(starSystem: StarSystemModel): PlanetarySystemModel[] {
+        return starSystem.subSystems.flatMap((subSystem) => subSystem.planetarySystems);
+    }
+
+    static GetPlanets(starSystem: StarSystemModel): PlanetModel[] {
+        return starSystem.subSystems.flatMap((subSystem) => subSystem.planetarySystems.flatMap((planetarySystem) => planetarySystem.planets));
+    }
+
+    static GetSpaceStations(starSystem: StarSystemModel): SpaceStationModel[] {
+        const stellarSpaceStations = starSystem.subSystems.flatMap((subSystem) => subSystem.spaceStations);
+        const planetarySpaceStations = starSystem.subSystems.flatMap((subSystem) => subSystem.planetarySystems.flatMap((planetarySystem) => planetarySystem.spaceStations));
+
+        return stellarSpaceStations.concat(planetarySpaceStations);
+    }
+
+    /**
+     * Returns all the planetary mass objects in the star system. (Planets first, then satellites)
+     * @param starSystem The star system to get the planetary mass objects from.
+     * @constructor
+     */
+    static GetPlanetaryMassObjects(starSystem: StarSystemModel): PlanetModel[] {
+        const planets: PlanetModel[] = [];
+        const satellites: PlanetModel[] = [];
+        starSystem.subSystems.forEach((subSystem) =>
+            subSystem.planetarySystems.forEach((planetarySystem) => {
+                planets.push(...planetarySystem.planets);
+                satellites.push(...planetarySystem.satellites);
+            })
+        );
+
+        return planets.concat(satellites);
+    }
+
+    static GetAnomalies(starSystem: StarSystemModel): AnomalyModel[] {
+        return starSystem.subSystems.flatMap((subSystem) => subSystem.anomalies);
+    }
 }

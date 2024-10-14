@@ -25,12 +25,14 @@ import { Camera } from "@babylonjs/core/Cameras/camera";
 import { BlackHoleModel } from "./blackHoleModel";
 import { StellarObject } from "../../architecture/stellarObject";
 import { Cullable } from "../../utils/cullable";
-import { CelestialBody } from "../../architecture/celestialBody";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { RingsUniforms } from "../../rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { Orbit } from "../../orbit/orbit";
+import i18n from "../../i18n";
+
+import { orbitalObjectTypeToDisplay } from "../../utils/orbitalObjectTypeToDisplay";
 
 export class BlackHole implements StellarObject, Cullable {
     readonly name: string;
@@ -43,14 +45,10 @@ export class BlackHole implements StellarObject, Cullable {
 
     readonly postProcesses: PostProcessType[] = [];
 
-    readonly parent: CelestialBody | null;
-
-    constructor(model: BlackHoleModel, scene: Scene, parentBody: CelestialBody | null = null) {
+    constructor(model: BlackHoleModel, scene: Scene) {
         this.model = model;
 
         this.name = this.model.name;
-
-        this.parent = parentBody;
 
         this.transform = new TransformNode(this.model.name, scene);
         this.transform.rotate(Axis.X, this.model.physicalProperties.axialTilt);
@@ -93,7 +91,7 @@ export class BlackHole implements StellarObject, Cullable {
     }
 
     getTypeName(): string {
-        return this.model.typeName;
+        return orbitalObjectTypeToDisplay(this.model);
     }
 
     public computeCulling(cameras: Camera[]): void {

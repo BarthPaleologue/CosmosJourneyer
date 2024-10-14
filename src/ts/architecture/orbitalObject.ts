@@ -32,6 +32,8 @@ export interface OrbitalObject extends Transformable, HasBoundingSphere, TypedOb
      */
     readonly name: string;
 
+    readonly model: OrbitalObjectModel;
+
     /**
      * The rotation axis around which the object rotates on itself
      */
@@ -46,25 +48,28 @@ export interface OrbitalObject extends Transformable, HasBoundingSphere, TypedOb
      * Returns the physical properties of the object
      */
     getPhysicalProperties(): OrbitalObjectPhysicalProperties;
-
-    /**
-     * Returns the parent of the object
-     */
-    parent: OrbitalObject | null;
 }
 
 export class OrbitalObjectUtils {
     /**
      * Returns the position of the object on its orbit at a given time. This does not update the position of the object (see SetOrbitalPosition)
      * @param object The object we want to compute the position of
+     * @param parents
      * @param elapsedSeconds The time elapsed since the beginning of time in seconds
      * @constructor
      */
-    static GetOrbitalPosition(object: OrbitalObject, elapsedSeconds: number): Vector3 {
+    static GetOrbitalPosition(object: OrbitalObject, parents: OrbitalObject[], elapsedSeconds: number): Vector3 {
         const orbit = object.getOrbitProperties();
-        if (orbit.period === 0 || object.parent === null) return object.getTransform().getAbsolutePosition();
+        if (orbit.period === 0 || parents.length === 0) return object.getTransform().getAbsolutePosition();
 
-        const barycenter = object.parent.getTransform().getAbsolutePosition();
+        const barycenter = Vector3.Zero(); //object.parent.getTransform().getAbsolutePosition();
+        let sumOfMasses = 0;
+        for (const parent of parents) {
+            const mass = parent.getPhysicalProperties().mass;
+            barycenter.addInPlace(parent.getTransform().getAbsolutePosition().scale(mass));
+            sumOfMasses += mass;
+        }
+        barycenter.scaleInPlace(1 / sumOfMasses);
 
         return getPointOnOrbit(barycenter, orbit, elapsedSeconds);
     }
@@ -72,15 +77,16 @@ export class OrbitalObjectUtils {
     /**
      * Sets the position of the object on its orbit given the elapsed seconds.
      * @param object The object we want to update the position of
+     * @param parents
      * @param elapsedSeconds The time elapsed since the beginning of time in seconds
      * @constructor
      */
-    static SetOrbitalPosition(object: OrbitalObject, elapsedSeconds: number): void {
+    static SetOrbitalPosition(object: OrbitalObject, parents: OrbitalObject[], elapsedSeconds: number): void {
         const orbit = object.getOrbitProperties();
-        if (orbit.period === 0 || object.parent === null) return;
+        if (orbit.period === 0 || parents.length === 0) return;
 
         const oldPosition = object.getTransform().getAbsolutePosition();
-        const newPosition = OrbitalObjectUtils.GetOrbitalPosition(object, elapsedSeconds);
+        const newPosition = OrbitalObjectUtils.GetOrbitalPosition(object, parents, elapsedSeconds);
         translate(object.getTransform(), newPosition.subtractInPlace(oldPosition));
     }
 
@@ -115,7 +121,7 @@ export class OrbitalObjectUtils {
 /**
  * Describes the model of an orbital object
  */
-export interface OrbitalObjectModel {
+export type OrbitalObjectModel = {
     /**
      * The name of the object
      */
@@ -127,6 +133,11 @@ export interface OrbitalObjectModel {
     readonly seed: number;
 
     /**
+     * The type of the celestial body
+     */
+    readonly type: OrbitalObjectType;
+
+    /**
      * Orbit properties of the object
      */
     readonly orbit: Orbit;
@@ -135,14 +146,23 @@ export interface OrbitalObjectModel {
      * Physical properties of the object
      */
     readonly physicalProperties: OrbitalObjectPhysicalProperties;
+};
 
-    /**
-     * The model of the parent object if the object is to have a parent, null otherwise
-     */
-    readonly parentBody: OrbitalObjectModel | null;
-
-    /**
-     * The general name of the object type
-     */
-    readonly typeName: string;
+export const enum OrbitalObjectType {
+    STAR = 0,
+    NEUTRON_STAR = 1,
+    BLACK_HOLE = 2,
+    TELLURIC_PLANET = 1000,
+    TELLURIC_SATELLITE = 1001,
+    GAS_PLANET = 1002,
+    MANDELBULB = 2000,
+    JULIA_SET = 2001,
+    SPACE_STATION = 3000
 }
+
+export const SatelliteTypes = [OrbitalObjectType.TELLURIC_SATELLITE, OrbitalObjectType.SPACE_STATION];
+
+export function isSatellite(orbitalObjectType: OrbitalObjectType): boolean {
+    return SatelliteTypes.includes(orbitalObjectType);
+}
+

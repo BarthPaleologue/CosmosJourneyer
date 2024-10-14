@@ -34,24 +34,10 @@ export interface CelestialBody extends OrbitalObject, CanHaveRings, HasPostProce
     getRadius(): number;
 }
 
-export const enum CelestialBodyType {
-    STAR,
-    TELLURIC_PLANET,
-    GAS_PLANET,
-    ANOMALY,
-    BLACK_HOLE,
-    NEUTRON_STAR
-}
-
 /**
  * Describes the model of a celestial body
  */
 export interface CelestialBodyModel extends OrbitalObjectModel, CanHaveRingsModel {
-    /**
-     * The type of the celestial body
-     */
-    readonly bodyType: CelestialBodyType;
-
     /**
      * The radius of the celestial body
      */

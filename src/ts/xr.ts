@@ -54,8 +54,8 @@ camera.wheelPrecision *= 100;
 const depthRenderer = scene.enableDepthRenderer(null, false, true);
 
 function createMandelbulb(): TransformNode {
-    const mandelBulbModel = newSeededMandelbulbModel(Math.random() * 100_000, "XR Anomaly", null);
-    const mandelbulb = new Mandelbulb(mandelBulbModel, scene, null);
+    const mandelBulbModel = newSeededMandelbulbModel(Math.random() * 100_000, "XR Anomaly", []);
+    const mandelbulb = new Mandelbulb(mandelBulbModel, scene);
     mandelbulb.getTransform().scalingDeterminant = 1 / 400e3;
 
     const mandelbulbPP = new MandelbulbPostProcess(mandelbulb, scene, []);
@@ -73,8 +73,8 @@ function createMandelbulb(): TransformNode {
 }
 
 function createJulia(): TransformNode {
-    const juliaModel = newSeededJuliaSetModel(Math.random() * 100_000, "XR Anomaly", null);
-    const julia = new JuliaSet(juliaModel, scene, null);
+    const juliaModel = newSeededJuliaSetModel(Math.random() * 100_000, "XR Anomaly", []);
+    const julia = new JuliaSet(juliaModel, scene);
     julia.getTransform().scalingDeterminant = 1 / 400e3;
 
     const juliaPP = new JuliaSetPostProcess(julia, scene, []);

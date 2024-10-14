@@ -17,14 +17,12 @@
 
 import { NeutronStarModel } from "./neutronStarModel";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
-import { CelestialBody } from "../../architecture/celestialBody";
 import { StellarObject } from "../../architecture/stellarObject";
 import { Cullable } from "../../utils/cullable";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { StarMaterial } from "../star/starMaterial";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { OrbitalObject } from "../../architecture/orbitalObject";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -42,7 +40,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { Orbit } from "../../orbit/orbit";
 
-import { getRngFromSeed } from "../../utils/getRngFromSeed";
+import { orbitalObjectTypeToDisplay } from "../../utils/orbitalObjectTypeToDisplay";
 
 export class NeutronStar implements StellarObject, Cullable {
     readonly model: NeutronStarModel;
@@ -62,19 +60,14 @@ export class NeutronStar implements StellarObject, Cullable {
 
     private readonly asteroidField: AsteroidField | null;
 
-    readonly parent: OrbitalObject | null;
-
     /**
      * New Star
      * @param model The seed of the star in [-1, 1]
      * @param scene
-     * @param parentBody
      */
-    constructor(model: NeutronStarModel, scene: Scene, parentBody: CelestialBody | null = null) {
+    constructor(model: NeutronStarModel, scene: Scene) {
         this.model = model;
         this.name = this.model.name;
-
-        this.parent = parentBody;
 
         this.mesh = MeshBuilder.CreateSphere(
             this.name,
@@ -129,7 +122,7 @@ export class NeutronStar implements StellarObject, Cullable {
     }
 
     getTypeName(): string {
-        return this.model.typeName;
+        return orbitalObjectTypeToDisplay(this.model);
     }
 
     getRotationAxis(): Vector3 {

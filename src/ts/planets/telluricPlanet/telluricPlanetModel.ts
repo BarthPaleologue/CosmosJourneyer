@@ -25,17 +25,17 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getOrbitalPeriod, getPeriapsis, Orbit } from "../../orbit/orbit";
 import { PlanetModel } from "../../architecture/planet";
 import { TelluricPlanetPhysicalProperties } from "../../architecture/physicalProperties";
-import { CelestialBodyModel, CelestialBodyType } from "../../architecture/celestialBody";
+import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { newSeededRingsModel, RingsModel } from "../../rings/ringsModel";
 import { CloudsModel } from "../../clouds/cloudsModel";
 import { GenerationSteps } from "../../utils/generationSteps";
-import i18n from "../../i18n";
 import { waterBoilingPointCelsius } from "../../utils/waterMechanics";
 
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
+import { OrbitalObjectType } from "../../architecture/orbitalObject";
 
 export type TelluricPlanetModel = PlanetModel & {
-    readonly bodyType: CelestialBodyType.TELLURIC_PLANET;
+    readonly type: OrbitalObjectType.TELLURIC_PLANET | OrbitalObjectType.TELLURIC_SATELLITE;
 
     readonly physicalProperties: TelluricPlanetPhysicalProperties;
 
@@ -48,11 +48,11 @@ export function hasLiquidWater(telluricPlanetModel: TelluricPlanetModel): boolea
     return telluricPlanetModel.physicalProperties.oceanLevel > 0;
 }
 
-export function newSeededTelluricPlanetModel(seed: number, name: string, parentBody?: CelestialBodyModel): TelluricPlanetModel {
+export function newSeededTelluricPlanetModel(seed: number, name: string, parentBodies: CelestialBodyModel[]): TelluricPlanetModel {
     const rng = getRngFromSeed(seed);
 
-    const isSatelliteOfTelluric = parentBody?.bodyType === CelestialBodyType.TELLURIC_PLANET ?? false;
-    const isSatelliteOfGas = parentBody?.bodyType === CelestialBodyType.GAS_PLANET ?? false;
+    const isSatelliteOfTelluric = parentBodies.some((parent) => parent.type === OrbitalObjectType.TELLURIC_PLANET);
+    const isSatelliteOfGas = parentBodies.some((parent) => parent.type === OrbitalObjectType.GAS_PLANET);
     const isSatellite = isSatelliteOfTelluric || isSatelliteOfGas;
 
     let radius: number;
@@ -102,17 +102,20 @@ export function newSeededTelluricPlanetModel(seed: number, name: string, parentB
 
     const orbitalP = 2; //clamp(normalRandom(2.0, 0.3, this.rng, GenerationSteps.Orbit + 80), 0.7, 3.0);
 
+    const parentMaxRadius = parentBodies.reduce((max, body) => Math.max(max, body.radius), 0);
+
     if (isSatelliteOfGas || isSatelliteOfTelluric) {
-        const minRadius = parentBody?.radius ?? 0;
+        const minRadius = parentMaxRadius;
         orbitRadius = minRadius * clamp(normalRandom(2.0, 0.3, rng, GenerationSteps.ORBIT), 1.2, 3.0);
         orbitRadius += minRadius * clamp(normalRandom(10, 4, rng, GenerationSteps.ORBIT), 1, 50);
         orbitRadius += 2.0 * Math.max(0, minRadius - getPeriapsis(orbitRadius, orbitalP));
-    } else if (parentBody) orbitRadius += parentBody.radius * 1.5;
+    } else if (parentBodies) orbitRadius += parentMaxRadius * 1.5;
 
+    const parentMassSum = parentBodies.reduce((sum, body) => sum + body.physicalProperties.mass, 0);
     const orbit: Orbit = {
         radius: orbitRadius,
         p: orbitalP,
-        period: getOrbitalPeriod(orbitRadius, parentBody?.physicalProperties.mass ?? 0),
+        period: getOrbitalPeriod(orbitRadius, parentMassSum),
         normalToPlane: orbitalPlaneNormal
     };
 
@@ -171,20 +174,15 @@ export function newSeededTelluricPlanetModel(seed: number, name: string, parentB
         rings = newSeededRingsModel(rng);
     }
 
-    const nbMoons = randRangeInt(0, 2, rng, GenerationSteps.NB_MOONS);
-
     return {
-        bodyType: CelestialBodyType.TELLURIC_PLANET,
+        type: isSatellite ? OrbitalObjectType.TELLURIC_SATELLITE : OrbitalObjectType.TELLURIC_PLANET,
         seed: seed,
-        parentBody: parentBody ?? null,
         name,
         radius: radius,
         physicalProperties: physicalProperties,
         orbit: orbit,
         terrainSettings: terrainSettings,
         rings: rings,
-        clouds: clouds,
-        nbMoons: nbMoons,
-        typeName: isSatellite ? i18n.t("objectTypes:telluricMoon") : i18n.t("objectTypes:telluricPlanet")
+        clouds: clouds
     };
 }

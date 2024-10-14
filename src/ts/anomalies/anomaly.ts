@@ -1,10 +1,6 @@
-import { AnomalyType } from "./anomalyType";
-import { CelestialBody, CelestialBodyModel } from "../architecture/celestialBody";
-
-export interface Anomaly extends CelestialBody {
-    readonly anomalyType: AnomalyType;
-}
+import { CelestialBodyModel } from "../architecture/celestialBody";
+import { OrbitalObjectType } from "../architecture/orbitalObject";
 
 export interface AnomalyModel extends CelestialBodyModel {
-    readonly anomalyType: AnomalyType;
+    readonly type: OrbitalObjectType.MANDELBULB | OrbitalObjectType.JULIA_SET;
 }

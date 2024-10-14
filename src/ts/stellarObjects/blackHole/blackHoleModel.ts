@@ -19,17 +19,17 @@ import { getOrbitalPeriod, Orbit } from "../../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { normalRandom } from "extended-random";
 import { BlackHolePhysicalProperties } from "../../architecture/physicalProperties";
-import { CelestialBodyModel, CelestialBodyType } from "../../architecture/celestialBody";
+import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { StellarObjectModel } from "../../architecture/stellarObject";
 import { Settings } from "../../settings";
 import { estimateStarRadiusFromMass } from "../../utils/estimateStarRadiusFromMass";
 import { GenerationSteps } from "../../utils/generationSteps";
-import i18n from "../../i18n";
 
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
+import { OrbitalObjectType } from "../../architecture/orbitalObject";
 
 export type BlackHoleModel = StellarObjectModel & {
-    readonly bodyType: CelestialBodyType.BLACK_HOLE;
+    readonly type: OrbitalObjectType.BLACK_HOLE;
     /**
      * The Schwarzschild radius of the black hole in meters
      */
@@ -38,19 +38,22 @@ export type BlackHoleModel = StellarObjectModel & {
     readonly physicalProperties: BlackHolePhysicalProperties;
 };
 
-export function newSeededBlackHoleModel(seed: number, name: string, parentBody: CelestialBodyModel | null): BlackHoleModel {
+export function newSeededBlackHoleModel(seed: number, name: string, parentBodies: CelestialBodyModel[]): BlackHoleModel {
     const rng = getRngFromSeed(seed);
 
     //FIXME: do not hardcode
     const radius = 1000e3;
 
-    // TODO: do not hardcode
-    const orbitRadius = parentBody === null ? 0 : 2 * (parentBody.radius + radius);
+    const parentMaxRadius = parentBodies?.reduce((max, body) => Math.max(max, body.radius), 0) ?? 0;
 
+    // TODO: do not hardcode
+    const orbitRadius = parentBodies.length === 0 ? 0 : 2 * (parentMaxRadius + radius);
+
+    const parentMassSum = parentBodies?.reduce((sum, body) => sum + body.physicalProperties.mass, 0) ?? 0;
     const orbit: Orbit = {
         radius: orbitRadius,
         p: 2,
-        period: getOrbitalPeriod(orbitRadius, parentBody?.physicalProperties.mass ?? 0),
+        period: getOrbitalPeriod(orbitRadius, parentMassSum),
         normalToPlane: Vector3.Up()
     };
 
@@ -62,20 +65,16 @@ export function newSeededBlackHoleModel(seed: number, name: string, parentBody: 
         accretionDiskRadius: radius * normalRandom(12, 3, rng, 7777)
     };
 
-    const typeName = i18n.t("objectTypes:blackHole");
-
     return {
         seed,
         name,
         //TODO: compute temperature of accretion disk (function of rotation speed)
         temperature: 7_000,
         rings: null,
-        bodyType: CelestialBodyType.BLACK_HOLE,
+        type: OrbitalObjectType.BLACK_HOLE,
         radius,
         physicalProperties,
-        orbit,
-        parentBody,
-        typeName
+        orbit
     };
 }
 

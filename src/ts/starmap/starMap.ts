@@ -54,10 +54,11 @@ import { createNotification } from "../utils/notification";
 import { getStarGalacticPosition } from "../utils/starSystemCoordinatesUtils";
 import { Player } from "../player/player";
 import { Settings } from "../settings";
-import { CelestialBodyType } from "../architecture/celestialBody";
 import { getRgbFromTemperature } from "../utils/specrend";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../saveFile/universeCoordinates";
 import { getSystemModelFromCoordinates } from "../starSystem/modelFromCoordinates";
+import { StarSystemModelUtils } from "../starSystem/starSystemModel";
+import { OrbitalObjectType } from "../architecture/orbitalObject";
 
 export class StarMap implements View {
     readonly scene: Scene;
@@ -444,12 +445,13 @@ export class StarMap implements View {
         const starSystemModel = getSystemModelFromCoordinates(data.coordinates);
         const starSystemCoordinates = starSystemModel.coordinates;
 
-        const stellarObjectModel = starSystemModel.stellarObjects[0];
+        //TODO: when implementing binary star systems, this will need to be updated to display all stellar objects and not just the first one
+        const stellarObjectModel = StarSystemModelUtils.GetStellarObjects(starSystemModel)[0];
 
         let instance: InstancedMesh | null = null;
         let recycled = false;
 
-        if (stellarObjectModel.bodyType === CelestialBodyType.STAR || stellarObjectModel.bodyType === CelestialBodyType.NEUTRON_STAR) {
+        if (stellarObjectModel.type === OrbitalObjectType.STAR || stellarObjectModel.type === OrbitalObjectType.NEUTRON_STAR) {
             if (this.recycledStars.length > 0) {
                 instance = this.recycledStars[0];
                 this.recycledStars.shift();
@@ -509,7 +511,7 @@ export class StarMap implements View {
 
         this.fadeIn(initializedInstance);
 
-        if (stellarObjectModel.bodyType === CelestialBodyType.BLACK_HOLE) this.loadedStarSectors.get(data.sectorString)?.blackHoleInstances.push(initializedInstance);
+        if (stellarObjectModel.type === OrbitalObjectType.BLACK_HOLE) this.loadedStarSectors.get(data.sectorString)?.blackHoleInstances.push(initializedInstance);
         else this.loadedStarSectors.get(data.sectorString)?.starInstances.push(initializedInstance);
     }
 

@@ -20,22 +20,22 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Settings } from "../../settings";
 import { getOrbitalPeriod, Orbit } from "../../orbit/orbit";
 import { StarPhysicalProperties } from "../../architecture/physicalProperties";
-import { CelestialBodyModel, CelestialBodyType } from "../../architecture/celestialBody";
+import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { wheelOfFortune } from "../../utils/random";
 import { StellarObjectModel } from "../../architecture/stellarObject";
 import { newSeededRingsModel } from "../../rings/ringsModel";
 import { GenerationSteps } from "../../utils/generationSteps";
-import i18n from "../../i18n";
 
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
+import { OrbitalObjectType } from "../../architecture/orbitalObject";
 
 export type StarModel = StellarObjectModel & {
-    readonly bodyType: CelestialBodyType.STAR;
+    readonly type: OrbitalObjectType.STAR;
 
     readonly physicalProperties: StarPhysicalProperties;
 };
 
-export function newSeededStarModel(seed: number, name: string, parentBody: CelestialBodyModel | null): StarModel {
+export function newSeededStarModel(seed: number, name: string, parentBodies: CelestialBodyModel[]): StarModel {
     const rng = getRngFromSeed(seed);
 
     const RING_PROPORTION = 0.2;
@@ -56,28 +56,25 @@ export function newSeededStarModel(seed: number, name: string, parentBody: Celes
     // TODO: do not hardcode
     const orbitRadius = rng(GenerationSteps.ORBIT) * 5000000e3;
 
+    const parentMassSum = parentBodies?.reduce((sum, body) => sum + body.physicalProperties.mass, 0) ?? 0;
     const orbit: Orbit = {
         radius: orbitRadius,
         p: 2,
-        period: getOrbitalPeriod(orbitRadius, parentBody?.physicalProperties.mass ?? 0),
+        period: getOrbitalPeriod(orbitRadius, parentMassSum),
         normalToPlane: Vector3.Up()
     };
 
     const rings = uniformRandBool(RING_PROPORTION, rng, GenerationSteps.RINGS) ? newSeededRingsModel(rng) : null;
 
-    const typeName = i18n.t("objectTypes:star", { stellarType: stellarType });
-
     return {
         name: name,
         seed: seed,
-        parentBody: parentBody,
-        bodyType: CelestialBodyType.STAR,
+        type: OrbitalObjectType.STAR,
         temperature: temperature,
         radius: radius,
         orbit: orbit,
         physicalProperties: physicalProperties,
         rings: rings,
-        typeName: typeName
     };
 }
 

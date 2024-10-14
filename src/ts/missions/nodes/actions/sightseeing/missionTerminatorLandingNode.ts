@@ -1,10 +1,6 @@
 import { MissionNode, MissionNodeSerialized, MissionNodeType } from "../../missionNode";
 import { MissionContext } from "../../../missionContext";
-import {
-    StarSystemCoordinates, starSystemCoordinatesEquals,
-    UniverseObjectId,
-    universeObjectIdEquals
-} from "../../../../saveFile/universeCoordinates";
+import { StarSystemCoordinates, starSystemCoordinatesEquals, UniverseObjectId, universeObjectIdEquals } from "../../../../saveFile/universeCoordinates";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { CollisionMask, Settings } from "../../../../settings";
@@ -96,10 +92,14 @@ export class MissionTerminatorLandingNode implements MissionNode {
                 return;
             }
 
-            const starTransform = currentSystem.stellarObjects[0].getTransform();
+            const stellarObjects = currentSystem.getStellarObjects();
+            const stellarMassSum = stellarObjects.reduce((sum, stellarObject) => sum + stellarObject.model.physicalProperties.mass, 0);
+            const stellarBarycenter = stellarObjects
+                .reduce((sum, stellarObject) => sum.add(stellarObject.getTransform().getAbsolutePosition().scale(stellarObject.model.physicalProperties.mass)), Vector3.Zero())
+                .scaleInPlace(1 / stellarMassSum);
 
             const objectToPlayer = downDirection.negate();
-            const targetToStar = starTransform.getAbsolutePosition().subtract(targetObjectPosition).normalize();
+            const targetToStar = stellarBarycenter.subtract(targetObjectPosition).normalize();
 
             if (Math.abs(Vector3.Dot(objectToPlayer, targetToStar)) > Math.cos(Math.PI / 6)) {
                 this.state = LandMissionState.TOO_FAR_IN_SYSTEM;

@@ -42,6 +42,8 @@ import { EngineBay } from "../assets/procedural/spaceStation/engineBay";
 import { Orbit } from "../orbit/orbit";
 
 import { getRngFromSeed } from "../utils/getRngFromSeed";
+import i18n from "../i18n";
+import { orbitalObjectTypeToDisplay } from "../utils/orbitalObjectTypeToDisplay";
 
 export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads {
     readonly name: string;
@@ -49,8 +51,6 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
     readonly model: SpaceStationModel;
 
     readonly postProcesses: PostProcessType[] = [];
-
-    readonly parent: OrbitalObject | null = null;
 
     readonly solarSections: SolarSection[] = [];
     readonly utilitySections: UtilitySection[] = [];
@@ -66,12 +66,10 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
 
     private readonly boundingRadius: number;
 
-    constructor(model: SpaceStationModel, scene: Scene, parentBody: OrbitalObject | null = null) {
+    constructor(model: SpaceStationModel, scene: Scene) {
         this.model = model;
 
         this.name = this.model.name;
-
-        this.parent = parentBody;
 
         this.root = new TransformNode(this.name, scene);
         this.scene = scene;
@@ -131,7 +129,7 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
     }
 
     getTypeName(): string {
-        return this.model.typeName;
+        return orbitalObjectTypeToDisplay(this.model);
     }
 
     public computeCulling(cameras: Camera[]): void {

@@ -1,10 +1,6 @@
 import { MissionNode, MissionNodeSerialized, MissionNodeType } from "../../missionNode";
 import { MissionContext } from "../../../missionContext";
-import {
-    StarSystemCoordinates, starSystemCoordinatesEquals,
-    UniverseObjectId,
-    universeObjectIdEquals
-} from "../../../../saveFile/universeCoordinates";
+import { StarSystemCoordinates, starSystemCoordinatesEquals, UniverseObjectId, universeObjectIdEquals } from "../../../../saveFile/universeCoordinates";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getObjectBySystemId, getObjectModelByUniverseId } from "../../../../utils/orbitalObjectId";
 import { getStarGalacticPosition } from "../../../../utils/starSystemCoordinatesUtils";
@@ -15,6 +11,8 @@ import { getGlobalKeyboardLayoutMap } from "../../../../utils/keyboardAPI";
 import { pressInteractionToStrings } from "../../../../utils/inputControlsString";
 import { GeneralInputs } from "../../../../inputs/generalInputs";
 import { getSystemModelFromCoordinates } from "../../../../starSystem/modelFromCoordinates";
+
+import { orbitalObjectTypeToDisplay } from "../../../../utils/orbitalObjectTypeToDisplay";
 
 const enum FlyByState {
     NOT_IN_SYSTEM,
@@ -94,7 +92,7 @@ export class MissionFlyByNode implements MissionNode {
         const objectModel = getObjectModelByUniverseId(this.objectId);
         const systemModel = getSystemModelFromCoordinates(this.targetSystemCoordinates);
         return i18n.t("missions:sightseeing:describeFlyBy", {
-            objectType: objectModel.typeName.toLowerCase(),
+            objectType: orbitalObjectTypeToDisplay(objectModel),
             systemName: systemModel.name,
             distance: distance > 0 ? parseDistance(distance * Settings.LIGHT_YEAR) : i18n.t("missions:common:here")
         });

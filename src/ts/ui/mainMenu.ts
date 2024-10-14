@@ -1,7 +1,6 @@
 import { UberScene } from "../uberCore/uberScene";
 import { DefaultControls } from "../defaultControls/defaultControls";
 import { StarSystemView } from "../starSystem/starSystemView";
-import { StarSystemController } from "../starSystem/starSystemController";
 import { positionNearObjectAsteroidField, positionNearObjectWithStarVisible } from "../utils/positionNearObject";
 import mainMenuHTML from "../../html/mainMenu.html";
 import { getForwardDirection } from "../uberCore/transforms/basicTransform";
@@ -17,16 +16,17 @@ import { Sounds } from "../assets/sounds";
 import { PanelType, SidePanels } from "./sidePanels";
 import { SystemObjectType, UniverseObjectId } from "../saveFile/universeCoordinates";
 import { getObjectBySystemId } from "../utils/orbitalObjectId";
-import { CelestialBodyType } from "../architecture/celestialBody";
 import { getSystemModelFromCoordinates } from "../starSystem/modelFromCoordinates";
 import { getStarSystemCoordinatesFromSeed } from "../starSystem/systemSeed";
+import { StarSystemModel, StarSystemModelUtils } from "../starSystem/starSystemModel";
+import { OrbitalObjectType } from "../architecture/orbitalObject";
 
 export class MainMenu {
     readonly scene: UberScene;
     readonly controls: DefaultControls;
 
     readonly starSystemView: StarSystemView;
-    readonly starSystemController: StarSystemController;
+    readonly starSystemModel: StarSystemModel;
 
     readonly onStartObservable = new Observable<void>();
     readonly onLoadSaveObservable = new Observable<SaveFileData>();
@@ -139,8 +139,7 @@ export class MainMenu {
         const randomIndex = Math.floor(Math.random() * allowedIdentifiers.length);
         this.universeObjectId = allowedIdentifiers[randomIndex];
         const coordinates = this.universeObjectId.starSystemCoordinates;
-        const systemModel = getSystemModelFromCoordinates(coordinates);
-        this.starSystemController = new StarSystemController(systemModel, this.scene);
+        this.starSystemModel = getSystemModelFromCoordinates(coordinates);
 
         document.body.insertAdjacentHTML("beforeend", mainMenuHTML);
 
@@ -235,16 +234,16 @@ export class MainMenu {
     }
 
     async init() {
-        await this.starSystemView.loadStarSystem(this.starSystemController, true, 0);
+        await this.starSystemView.loadStarSystem(this.starSystemModel);
 
         this.starSystemView.onInitStarSystem.addOnce(async () => {
             await this.starSystemView.switchToDefaultControls(false);
-            const nbRadius = this.starSystemController.model.stellarObjects[0].bodyType === CelestialBodyType.BLACK_HOLE ? 8 : 2;
-            const targetObject = getObjectBySystemId(this.universeObjectId, this.starSystemController);
+            const nbRadius = StarSystemModelUtils.GetStellarObjects(this.starSystemModel)[0].type === OrbitalObjectType.BLACK_HOLE ? 8 : 2;
+            const targetObject = getObjectBySystemId(this.universeObjectId, this.starSystemView.getStarSystem());
             if (targetObject === null) {
                 throw new Error(`Could not find object with ID ${JSON.stringify(this.universeObjectId)}`);
             }
-            positionNearObjectWithStarVisible(this.controls, targetObject, this.starSystemController, nbRadius);
+            positionNearObjectWithStarVisible(this.controls, targetObject, this.starSystemView.getStarSystem(), nbRadius);
 
             Settings.TIME_MULTIPLIER = 3;
 
@@ -337,13 +336,15 @@ export class MainMenu {
         this.sidePanels.hideActivePanel();
         Settings.TIME_MULTIPLIER = 1;
 
+        const starSystemController = this.starSystemView.getStarSystem();
+
         const currentForward = getForwardDirection(this.controls.getTransform());
 
-        const orbitalObject = getObjectBySystemId(this.universeObjectId, this.starSystemController);
+        const orbitalObject = getObjectBySystemId(this.universeObjectId, starSystemController);
         if (orbitalObject === null) {
             throw new Error("Could not find object with ID " + JSON.stringify(this.universeObjectId));
         }
-        const celestialBody = this.starSystemController.getBodies().find((body) => body.name === orbitalObject.name);
+        const celestialBody = starSystemController.getCelestialBodies().find((body) => body.name === orbitalObject.name);
         if (celestialBody === undefined) {
             throw new Error("No corresponding celestial body found");
         }
@@ -351,7 +352,7 @@ export class MainMenu {
         const axis = Vector3.Cross(currentForward, newForward);
         const angle = Vector3.GetAngleBetweenVectors(currentForward, newForward, axis);
 
-        const targetPosition = positionNearObjectAsteroidField(celestialBody, this.starSystemController);
+        const targetPosition = positionNearObjectAsteroidField(celestialBody, starSystemController);
 
         const rotationAnimation = new TransformRotationAnimation(this.controls.getTransform(), axis, angle, this.startAnimationDurationSeconds);
         const translationAnimation = new TransformTranslationAnimation(this.controls.getTransform(), targetPosition, this.startAnimationDurationSeconds);
@@ -397,8 +398,8 @@ export class MainMenu {
 
             this.controls.getActiveCameras().forEach((camera) => camera.getViewMatrix());
 
-            this.starSystemController.applyFloatingOrigin();
-            this.starSystemController.updateShaders(0.0, this.starSystemView.postProcessManager);
+            starSystemController.applyFloatingOrigin();
+            starSystemController.updateShaders(0.0, this.starSystemView.postProcessManager);
         };
 
         this.scene.onBeforePhysicsObservable.add(animationCallback);

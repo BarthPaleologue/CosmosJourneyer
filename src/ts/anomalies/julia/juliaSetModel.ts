@@ -20,24 +20,20 @@ import { clamp } from "../../utils/math";
 import { getOrbitalPeriod, getPeriapsis, Orbit } from "../../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
-import { CelestialBodyModel, CelestialBodyType } from "../../architecture/celestialBody";
+import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import i18n from "../../i18n";
-import { AnomalyType } from "../anomalyType";
 import { AnomalyModel } from "../anomaly";
 
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
+import { OrbitalObjectType } from "../../architecture/orbitalObject";
 
 export type JuliaSetModel = AnomalyModel & {
-    readonly bodyType: CelestialBodyType.ANOMALY;
-
-    readonly anomalyType: AnomalyType.JULIA_SET;
-
+    readonly type: OrbitalObjectType.JULIA_SET;
     readonly accentColor: Color3;
 };
 
-export function newSeededJuliaSetModel(seed: number, name: string, parentBody: CelestialBodyModel | null): JuliaSetModel {
+export function newSeededJuliaSetModel(seed: number, name: string, parentBodies: CelestialBodyModel[]): JuliaSetModel {
     const rng = getRngFromSeed(seed);
 
     const radius = 1000e3;
@@ -50,10 +46,11 @@ export function newSeededJuliaSetModel(seed: number, name: string, parentBody: C
     const orbitalP = clamp(0.5, 3.0, normalRandom(1.0, 0.3, rng, GenerationSteps.ORBIT + 80));
     orbitRadius += orbitRadius - getPeriapsis(orbitRadius, orbitalP);
 
+    const parentMassSum = parentBodies?.reduce((sum, body) => sum + body.physicalProperties.mass, 0) ?? 0;
     const orbit: Orbit = {
         radius: orbitRadius,
         p: orbitalP,
-        period: getOrbitalPeriod(orbitRadius, parentBody?.physicalProperties.mass ?? 0),
+        period: getOrbitalPeriod(orbitRadius, parentMassSum),
         normalToPlane: Vector3.Up()
     };
 
@@ -63,19 +60,14 @@ export function newSeededJuliaSetModel(seed: number, name: string, parentBody: C
         axialTilt: normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT)
     };
 
-    const typeName = i18n.t("objectTypes:anomaly");
-
     return {
         seed,
         name,
         radius,
-        parentBody,
         orbit,
         physicalProperties,
         accentColor,
         rings: null,
-        bodyType: CelestialBodyType.ANOMALY,
-        anomalyType: AnomalyType.JULIA_SET,
-        typeName
+        type: OrbitalObjectType.JULIA_SET,
     };
 }

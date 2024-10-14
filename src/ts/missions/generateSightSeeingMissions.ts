@@ -6,11 +6,10 @@ import { SystemObjectType } from "../saveFile/universeCoordinates";
 import { Player } from "../player/player";
 import { hasLiquidWater, TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 import { Mission, MissionType } from "./mission";
-import { isMoon } from "../architecture/planet";
-import { CelestialBodyType } from "../architecture/celestialBody";
-import { getPlanetaryMassObjects, StarSystemModel } from "../starSystem/starSystemModel";
+import { StarSystemModel, StarSystemModelUtils } from "../starSystem/starSystemModel";
 import { getRngFromSeed } from "../utils/getRngFromSeed";
 import { getSystemModelFromCoordinates } from "../starSystem/modelFromCoordinates";
+import { OrbitalObjectType } from "../architecture/orbitalObject";
 
 /**
  * Generates sightseeing missions available at the given space station for the player. Missions are generated based on the current timestamp (hourly basis).
@@ -33,7 +32,7 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
     const neighborSystems = getNeighborStarSystemCoordinates(starSystem.coordinates, 75);
     neighborSystems.forEach(([systemCoordinates, coordinates, distance]) => {
         const systemModel = getSystemModelFromCoordinates(systemCoordinates);
-        for (let anomalyIndex = 0; anomalyIndex < systemModel.anomalies.length; anomalyIndex++) {
+        for (let anomalyIndex = 0; anomalyIndex < StarSystemModelUtils.GetAnomalies(systemModel).length; anomalyIndex++) {
             if (!uniformRandBool(1.0 / (1.0 + 0.4 * distance), rng, 6254 + anomalyIndex + currentHour)) return;
             anomalyFlyByMissions.push(
                 newSightSeeingMission(spaceStationModel, {
@@ -46,8 +45,8 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
                 })
             );
         }
-        systemModel.stellarObjects.forEach((model, stellarObjectIndex) => {
-            if (model.bodyType === CelestialBodyType.NEUTRON_STAR) {
+        StarSystemModelUtils.GetStellarObjects(systemModel).forEach((model, stellarObjectIndex) => {
+            if (model.type === OrbitalObjectType.NEUTRON_STAR) {
                 neutronStarFlyByMissions.push(
                     newSightSeeingMission(spaceStationModel, {
                         type: MissionType.SIGHT_SEEING_FLY_BY,
@@ -59,7 +58,7 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
                     })
                 );
             }
-            if (model.bodyType === CelestialBodyType.BLACK_HOLE) {
+            if (model.type === OrbitalObjectType.BLACK_HOLE) {
                 blackHoleFlyByMissions.push(
                     newSightSeeingMission(spaceStationModel, {
                         type: MissionType.SIGHT_SEEING_FLY_BY,
@@ -79,7 +78,7 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
     // for terminator landing missions, find all telluric planets with no liquid water
     const terminatorLandingMissions: Mission[] = [];
     const currentSystemModel = starSystem;
-    getPlanetaryMassObjects(currentSystemModel.planetarySystems).forEach((celestialBodyModel, index) => {
+    StarSystemModelUtils.GetPlanetaryMassObjects(currentSystemModel).forEach((celestialBodyModel, index) => {
         if (celestialBodyModel.rings !== null) {
             asteroidFieldMissions.push(
                 newSightSeeingMission(spaceStationModel, {
@@ -93,9 +92,9 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
             );
         }
 
-        if (celestialBodyModel.bodyType === CelestialBodyType.TELLURIC_PLANET) {
+        if (celestialBodyModel.type === OrbitalObjectType.TELLURIC_PLANET) {
             const telluricPlanetModel = celestialBodyModel as TelluricPlanetModel;
-            if (!hasLiquidWater(telluricPlanetModel) && !isMoon(telluricPlanetModel)) {
+            if (!hasLiquidWater(telluricPlanetModel)) {
                 terminatorLandingMissions.push(
                     newSightSeeingMission(spaceStationModel, {
                         type: MissionType.SIGHT_SEEING_TERMINATOR_LANDING,

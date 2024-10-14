@@ -19,12 +19,10 @@ import { centeredRand, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../settings";
 import { generateStarName } from "../utils/starNameGenerator";
 import { wheelOfFortune } from "../utils/random";
-import { AnomalyType } from "../anomalies/anomalyType";
-import { getPlanetaryMassObjects, PlanetarySystem, StarSystemModel } from "./starSystemModel";
+import { PlanetarySystemModel, StarSystemModel } from "./starSystemModel";
 import { StarSector } from "../starmap/starSector";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { hashVec3 } from "../utils/hashVec3";
-import { CelestialBodyModel, CelestialBodyType } from "../architecture/celestialBody";
 import { StellarObjectModel } from "../architecture/stellarObject";
 import { AnomalyModel } from "../anomalies/anomaly";
 import { Alphabet, ReversedGreekAlphabet } from "../utils/parseToStrings";
@@ -37,9 +35,10 @@ import { newSeededMandelbulbModel } from "../anomalies/mandelbulb/mandelbulbMode
 import { newSeededJuliaSetModel } from "../anomalies/julia/juliaSetModel";
 import { getRngFromSeed } from "../utils/getRngFromSeed";
 import { romanNumeral } from "../utils/romanNumerals";
-import { SystemObjectId, SystemObjectType } from "../saveFile/universeCoordinates";
 import { newSeededSpaceStationModel } from "../spacestation/spacestationModel";
 import { SystemSeed } from "./systemSeed";
+import { isSystemInHumanBubble } from "../society/starSystemSociety";
+import { OrbitalObjectType } from "../architecture/orbitalObject";
 
 const enum GenerationSteps {
     NAME,
@@ -48,6 +47,7 @@ const enum GenerationSteps {
     NB_PLANETS = 30,
     PLANETS = 200,
     PLANET_TYPE = 400,
+    NB_MOONS = 10,
     MOONS = 11,
     ANOMALIES = 666,
     SPACE_STATIONS = 2000
@@ -74,26 +74,26 @@ export function newSeededStarSystemModel(seed: SystemSeed): StarSystemModel {
     // init pseudo-random number generator
     const cellRNG = getRngFromSeed(hashVec3(seed.starSectorX, seed.starSectorY, seed.starSectorZ));
     const hash = centeredRand(cellRNG, 1 + seed.index) * Settings.SEED_HALF_RANGE;
-    const rng = getRngFromSeed(hash);
+    const systemRng = getRngFromSeed(hash);
 
-    const systemName = generateStarName(rng, GenerationSteps.NAME);
+    const systemName = generateStarName(systemRng, GenerationSteps.NAME);
 
     // generate stellar objects of the system first (we can assume the other objects don't have a significant influence on the stellar objects)
     const stellarObjects: StellarObjectModel[] = [];
     const nbStellarObjects = 1;
     for (let i = 0; i < nbStellarObjects; i++) {
-        const stellarObjectType = getBodyTypeOfStellarObject(rng, i);
-        const seed = centeredRand(rng, GenerationSteps.STARS + i) * Settings.SEED_HALF_RANGE;
+        const stellarObjectType = getBodyTypeOfStellarObject(systemRng, i);
+        const seed = centeredRand(systemRng, GenerationSteps.STARS + i) * Settings.SEED_HALF_RANGE;
         const stellarObjectName = `${systemName} ${Alphabet[i].toUpperCase()}`;
         switch (stellarObjectType) {
-            case CelestialBodyType.STAR:
-                stellarObjects.push(newSeededStarModel(seed, stellarObjectName, null));
+            case OrbitalObjectType.STAR:
+                stellarObjects.push(newSeededStarModel(seed, stellarObjectName, []));
                 break;
-            case CelestialBodyType.BLACK_HOLE:
-                stellarObjects.push(newSeededBlackHoleModel(seed, stellarObjectName, null));
+            case OrbitalObjectType.BLACK_HOLE:
+                stellarObjects.push(newSeededBlackHoleModel(seed, stellarObjectName, []));
                 break;
-            case CelestialBodyType.NEUTRON_STAR:
-                stellarObjects.push(newSeededNeutronStarModel(seed, stellarObjectName, null));
+            case OrbitalObjectType.NEUTRON_STAR:
+                stellarObjects.push(newSeededNeutronStarModel(seed, stellarObjectName, []));
                 break;
             default:
                 throw new Error("Unknown stellar object type");
@@ -101,26 +101,28 @@ export function newSeededStarSystemModel(seed: SystemSeed): StarSystemModel {
     }
 
     // Afterward planets are generated. We can assume they only depend on the stellar objects.
-    const planetarySystems: PlanetarySystem[] = [];
+    const planetarySystems: PlanetarySystemModel[] = [];
     //Fixme: planets need to work with black holes as well at some point
-    const nbPlanets = stellarObjects[0].bodyType === CelestialBodyType.BLACK_HOLE ? 0 : randRangeInt(0, 7, rng, GenerationSteps.NB_PLANETS);
+    const nbPlanets = stellarObjects[0].type === OrbitalObjectType.BLACK_HOLE ? 0 : randRangeInt(0, 7, systemRng, GenerationSteps.NB_PLANETS);
     for (let i = 0; i < nbPlanets; i++) {
-        const bodyType = uniformRandBool(0.5, rng, GenerationSteps.PLANET_TYPE + i) ? CelestialBodyType.TELLURIC_PLANET : CelestialBodyType.GAS_PLANET;
+        const bodyType = uniformRandBool(0.5, systemRng, GenerationSteps.PLANET_TYPE + i) ? OrbitalObjectType.TELLURIC_PLANET : OrbitalObjectType.GAS_PLANET;
         const planetName = `${systemName} ${romanNumeral(i + 1)}`;
 
-        const seed = centeredRand(rng, GenerationSteps.PLANETS + i) * Settings.SEED_HALF_RANGE;
+        const seed = centeredRand(systemRng, GenerationSteps.PLANETS + i) * Settings.SEED_HALF_RANGE;
 
         switch (bodyType) {
-            case CelestialBodyType.TELLURIC_PLANET:
+            case OrbitalObjectType.TELLURIC_PLANET:
                 planetarySystems.push({
-                    planet: newSeededTelluricPlanetModel(seed, planetName, stellarObjects[0]),
-                    satellites: []
+                    planets: [newSeededTelluricPlanetModel(seed, planetName, stellarObjects)],
+                    satellites: [],
+                    spaceStations: []
                 });
                 break;
-            case CelestialBodyType.GAS_PLANET:
+            case OrbitalObjectType.GAS_PLANET:
                 planetarySystems.push({
-                    planet: newSeededGasPlanetModel(seed, planetName, stellarObjects[0]),
-                    satellites: []
+                    planets: [newSeededGasPlanetModel(seed, planetName, stellarObjects)],
+                    satellites: [],
+                    spaceStations: []
                 });
                 break;
             default:
@@ -129,12 +131,20 @@ export function newSeededStarSystemModel(seed: SystemSeed): StarSystemModel {
     }
 
     // For each planet, generate satellites
-    planetarySystems.forEach(({ planet, satellites }) => {
-        const planetRng = getRngFromSeed(planet.seed);
-        for (let j = 0; j < planet.nbMoons; j++) {
-            const satelliteName = `${planet.name}${Alphabet[j]}`;
-            const satelliteSeed = centeredRand(planetRng, GenerationSteps.MOONS + j) * Settings.SEED_HALF_RANGE;
-            const satelliteModel = newSeededTelluricPlanetModel(satelliteSeed, satelliteName, planet);
+    planetarySystems.forEach(({ planets, satellites }) => {
+        let nbMoons = 0;
+        planets.forEach((planet) => {
+            const planetRng = getRngFromSeed(planet.seed);
+            nbMoons +=
+                planet.type === OrbitalObjectType.GAS_PLANET ? randRangeInt(0, 3, planetRng, GenerationSteps.NB_MOONS) : randRangeInt(0, 2, planetRng, GenerationSteps.NB_MOONS);
+        });
+        const seedSum = planets.reduce((acc, planet) => acc + planet.seed, 0);
+        const planetarySystemName = planets.map((planet) => planet.name).join("-");
+        const planetarySystemRng = getRngFromSeed(seedSum);
+        for (let j = 0; j < nbMoons; j++) {
+            const satelliteName = `${planetarySystemName}${Alphabet[j]}`;
+            const satelliteSeed = centeredRand(planetarySystemRng, GenerationSteps.MOONS + j) * Settings.SEED_HALF_RANGE;
+            const satelliteModel = newSeededTelluricPlanetModel(satelliteSeed, satelliteName, planets);
             satellites.push(satelliteModel);
         }
     });
@@ -147,85 +157,68 @@ export function newSeededStarSystemModel(seed: SystemSeed): StarSystemModel {
             [1, 0.04],
             [2, 0.01]
         ],
-        rng(GenerationSteps.ANOMALIES * 16)
+        systemRng(GenerationSteps.ANOMALIES * 16)
     );
     for (let i = 0; i < nbAnomalies; i++) {
-        const anomalySeed = centeredRand(rng, GenerationSteps.ANOMALIES + i * 100) * Settings.SEED_HALF_RANGE;
-        const anomalyType = uniformRandBool(0.5, rng, GenerationSteps.ANOMALIES + i * 300) ? AnomalyType.MANDELBULB : AnomalyType.JULIA_SET;
+        const anomalySeed = centeredRand(systemRng, GenerationSteps.ANOMALIES + i * 100) * Settings.SEED_HALF_RANGE;
+        const anomalyType = uniformRandBool(0.5, systemRng, GenerationSteps.ANOMALIES + i * 300) ? OrbitalObjectType.MANDELBULB : OrbitalObjectType.JULIA_SET;
         const anomalyName = `${systemName} ${ReversedGreekAlphabet[i].toUpperCase()}`;
 
-        const stellarObjectModel = stellarObjects[0];
-
         switch (anomalyType) {
-            case AnomalyType.MANDELBULB:
-                anomalies.push(newSeededMandelbulbModel(anomalySeed, anomalyName, stellarObjectModel));
+            case OrbitalObjectType.MANDELBULB:
+                anomalies.push(newSeededMandelbulbModel(anomalySeed, anomalyName, stellarObjects));
                 break;
-            case AnomalyType.JULIA_SET:
-                anomalies.push(newSeededJuliaSetModel(anomalySeed, anomalyName, stellarObjectModel));
+            case OrbitalObjectType.JULIA_SET:
+                anomalies.push(newSeededJuliaSetModel(anomalySeed, anomalyName, stellarObjects));
                 break;
         }
     }
 
-    // finally, space station are placed
-    const planetToPotentialScore = new Map<CelestialBodyModel, number>();
+    if (isSystemInHumanBubble(coordinates)) {
+        // finally, space station are placed
+        const planetarySystemToScore = new Map<PlanetarySystemModel, number>();
 
-    const planetModels = planetarySystems.map((system) => system.planet);
+        planetarySystems.forEach((planetarySystem) => {
+            let score = 0;
+            const nbMoons = planetarySystem.satellites.length;
+            score += nbMoons;
 
-    planetModels.forEach((planetModel) => {
-        let score = 0;
-        const nbMoons = planetModel.nbMoons;
-        score += nbMoons;
+            const hasRings = planetarySystem.planets.some((planetModel) => planetModel.rings !== null);
+            score += hasRings ? 2 : 0;
 
-        const hasRings = planetModel.rings !== null;
-        score += hasRings ? 2 : 0;
+            planetarySystemToScore.set(planetarySystem, score);
+        });
 
-        planetToPotentialScore.set(planetModel, score);
-    });
+        // sort planets by potential score
+        const sortedPlanetarySystems = Array.from(planetarySystems);
+        sortedPlanetarySystems.sort((planetA, planetB) => {
+            const scoreA = planetarySystemToScore.get(planetA) ?? 0;
+            const scoreB = planetarySystemToScore.get(planetB) ?? 0;
+            return scoreB - scoreA;
+        });
 
-    // sort planets by potential score
-    const sortedPlanets = Array.from(planetModels);
-    sortedPlanets.sort((planetA, planetB) => {
-        const scoreA = planetToPotentialScore.get(planetA) ?? 0;
-        const scoreB = planetToPotentialScore.get(planetB) ?? 0;
-        return scoreB - scoreA;
-    });
+        const nbStations = Math.min(planetarySystems.length, Math.max(1, systemRng(77) * Math.floor(planetarySystems.length / 2)));
 
-    const nbStations = Math.min(planetModels.length, Math.max(1, rng(77) * Math.floor(planetModels.length / 2)));
+        const planetarySystemsWithStations = sortedPlanetarySystems.slice(0, nbStations);
 
-    const planetsWithStations = sortedPlanets.slice(0, nbStations);
-
-    const planetaryMassObjects = getPlanetaryMassObjects(planetarySystems);
-    const spaceStationParentObjectIds = planetsWithStations.map<SystemObjectId>((planet) => {
-        const index = planetaryMassObjects.findIndex((obj) => obj === planet);
-        if (index === -1) {
-            throw new Error("Space station parent object not found");
-        }
-
-        return {
-            objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
-            objectIndex: index
-        };
-    });
-
-    const spaceStations = spaceStationParentObjectIds.map((parentId, index) => {
-        const parent = planetsWithStations[index];
-        const parentRng = getRngFromSeed(parent.seed);
-        const stationSeed = centeredRand(parentRng, GenerationSteps.SPACE_STATIONS + index) * Settings.SEED_HALF_RANGE;
-        const spaceStationModel = newSeededSpaceStationModel(stationSeed, stellarObjects[0], coordinates, parent);
-
-        return {
-            model: spaceStationModel,
-            parent: parentId
-        };
-    });
+        planetarySystemsWithStations.forEach((planetarySystem) => {
+            const spaceStationSeed = centeredRand(systemRng, GenerationSteps.SPACE_STATIONS + planetarySystem.planets.length) * Settings.SEED_HALF_RANGE;
+            const spaceStationModel = newSeededSpaceStationModel(spaceStationSeed, stellarObjects, coordinates, planetarySystem.planets);
+            planetarySystem.spaceStations.push(spaceStationModel);
+        });
+    }
 
     return {
         name: systemName,
         coordinates,
-        stellarObjects,
-        planetarySystems,
-        anomalies,
-        spaceStations
+        subSystems: [
+            {
+                stellarObjects,
+                planetarySystems,
+                anomalies,
+                spaceStations: []
+            }
+        ]
     };
 }
 
@@ -237,8 +230,8 @@ export function newSeededStarSystemModel(seed: SystemSeed): StarSystemModel {
  */
 function getBodyTypeOfStellarObject(rng: (index: number) => number, index: number) {
     // percentages are taken from https://physics.stackexchange.com/questions/442154/how-common-are-neutron-stars
-    if (uniformRandBool(0.0006, rng, GenerationSteps.STARS + index)) return CelestialBodyType.BLACK_HOLE;
-    if (uniformRandBool(0.0026, rng, GenerationSteps.STARS + index)) return CelestialBodyType.NEUTRON_STAR;
+    if (uniformRandBool(0.0006, rng, GenerationSteps.STARS + index)) return OrbitalObjectType.BLACK_HOLE;
+    if (uniformRandBool(0.0026, rng, GenerationSteps.STARS + index)) return OrbitalObjectType.NEUTRON_STAR;
 
-    return CelestialBodyType.STAR;
+    return OrbitalObjectType.STAR;
 }

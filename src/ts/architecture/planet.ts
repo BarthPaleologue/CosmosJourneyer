@@ -15,9 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { CelestialBody, CelestialBodyModel, CelestialBodyType } from "./celestialBody";
+import { CelestialBody, CelestialBodyModel } from "./celestialBody";
 import { PlanetPhysicalProperties } from "./physicalProperties";
 import { Transformable } from "./transformable";
+import { OrbitalObjectType } from "./orbitalObject";
 
 export interface Planet extends CelestialBody {
     model: PlanetModel;
@@ -25,20 +26,11 @@ export interface Planet extends CelestialBody {
     updateMaterial(stellarObjects: Transformable[], deltaSeconds: number): void;
 }
 
-export interface PlanetModel extends CelestialBodyModel {
-    parentBody: CelestialBodyModel | null;
+export type PlanetModel = CelestialBodyModel & {
+    readonly type: OrbitalObjectType.TELLURIC_PLANET | OrbitalObjectType.GAS_PLANET | OrbitalObjectType.TELLURIC_SATELLITE;
 
     physicalProperties: PlanetPhysicalProperties;
-
-    nbMoons: number;
-}
-
-/**
- * Checks if the planet is a moon (i.e. a satellite of a telluric or gas planet).
- */
-export function isMoon(model: PlanetModel): boolean {
-    return model.parentBody?.bodyType === CelestialBodyType.TELLURIC_PLANET || model.parentBody?.bodyType === CelestialBodyType.GAS_PLANET;
-}
+};
 
 export function hasAtmosphere(planetModel: PlanetModel): boolean {
     return planetModel.physicalProperties.pressure > 0.05;
