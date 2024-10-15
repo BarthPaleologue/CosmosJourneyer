@@ -442,6 +442,7 @@ export class PostProcessManager {
         const lensFlareRenderEffect = new PostProcessRenderEffect(this.engine, "LensFlareRenderEffect", () => this.lensFlares);
 
         this.renderingPipeline.addEffect(shadowRenderEffect);
+        this.renderingPipeline.addEffect(this.bloomRenderEffect);
 
         // other objects are viewed in their space configuration
         for (const postProcessType of spaceRenderingOrder) {
@@ -524,7 +525,6 @@ export class PostProcessManager {
         this.renderingPipeline.addEffect(this.bloomRenderEffect);
         this.renderingPipeline.addEffect(lensFlareRenderEffect);
         this.renderingPipeline.addEffect(this.fxaaRenderEffect);
-        //this.renderingPipeline.addEffect(this.bloomRenderEffect);
         this.renderingPipeline.addEffect(this.colorCorrectionRenderEffect);
 
         this.renderingPipelineManager.addPipeline(this.renderingPipeline);

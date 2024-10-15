@@ -22,9 +22,9 @@ import { getRngFromSeed } from "./utils/getRngFromSeed";
 export const Settings = {
     UNIVERSE_SEED: Math.PI,
 
-    POWER_PLAY_SEED: 77,
+    EARTH_RADIUS: 6000e3, // target is 6000e3
 
-    EARTH_RADIUS: 1000e3, // target is 6000e3
+    POWER_PLAY_SEED: 77,
 
     EARTH_MASS: 5.972e24,
 

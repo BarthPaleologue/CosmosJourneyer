@@ -17,7 +17,6 @@
 
 import "../styles/index.scss";
 
-import { Engine } from "@babylonjs/core/Engines/engine";
 import "@babylonjs/core/Materials/standardMaterial";
 import "@babylonjs/core/Loading/loadingScreen";
 import "@babylonjs/core/Misc/screenshotTools";
@@ -34,6 +33,7 @@ import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { Star } from "./stellarObjects/star/star";
 import { Settings } from "./settings";
 import { StarFieldBox } from "./starSystem/starFieldBox";
+import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 import { newSeededStarModel } from "./stellarObjects/star/starModel";
 import { newSeededSpaceStationModel } from "./spacestation/spacestationModel";
 
@@ -41,7 +41,8 @@ const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-const engine = new Engine(canvas, true);
+const engine = new WebGPUEngine(canvas);
+await engine.initAsync();
 engine.useReverseDepthBuffer = true;
 engine.displayLoadingUI();
 
