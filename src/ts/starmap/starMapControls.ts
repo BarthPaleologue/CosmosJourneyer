@@ -24,8 +24,8 @@ import { Quaternion } from "@babylonjs/core/Maths/math";
 import "@babylonjs/core/Collisions/collisionCoordinator";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
-import { StarMapInputs } from "../inputs/starMapInputs";
-import { Scalar } from "@babylonjs/core/Maths/math.scalar";
+import { StarMapInputs } from "./starMapInputs";
+import { Clamp, Lerp } from "@babylonjs/core/Maths/math.scalar.functions";
 
 export class StarMapControls implements Controls {
     private readonly transform: TransformNode;
@@ -60,13 +60,13 @@ export class StarMapControls implements Controls {
     }
 
     public update(deltaSeconds: number): Vector3 {
-        const inertiaFactor = Scalar.Clamp(0.1, 0, 1);
+        const inertiaFactor = Clamp(0.1, 0, 1);
         const [xMove, zMove] = StarMapInputs.map.move.value;
-        this.inertia.x = Scalar.Lerp(this.inertia.x, xMove, inertiaFactor);
-        this.inertia.z = Scalar.Lerp(this.inertia.z, zMove, inertiaFactor);
+        this.inertia.x = Lerp(this.inertia.x, xMove, inertiaFactor);
+        this.inertia.z = Lerp(this.inertia.z, zMove, inertiaFactor);
 
         const upDown = StarMapInputs.map.upDown.value;
-        this.inertia.y = Scalar.Lerp(this.inertia.y, upDown, inertiaFactor);
+        this.inertia.y = Lerp(this.inertia.y, upDown, inertiaFactor);
 
         this.speed *= 1 + StarMapInputs.map.changeSpeed.value / 20;
 

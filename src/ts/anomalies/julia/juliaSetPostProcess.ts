@@ -57,7 +57,7 @@ export class JuliaSetPostProcess extends PostProcess implements ObjectPostProces
 
         const samplers: string[] = Object.values(SamplerUniformNames);
 
-        super(julia.name, shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
+        super(julia.model.name, shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
 
         this.object = julia;
 

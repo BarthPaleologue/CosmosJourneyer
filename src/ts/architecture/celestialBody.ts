@@ -19,8 +19,6 @@ import { OrbitalObject, OrbitalObjectModel } from "./orbitalObject";
 import { HasPostProcesses } from "./hasPostProcesses";
 import { CanHaveRings, CanHaveRingsModel } from "./canHaveRings";
 
-import { BodyType } from "./bodyType";
-
 /**
  * Describes all celestial bodies (a combination of OrbitalObject, CanHaveRings and HasPostProcesses)
  */
@@ -39,14 +37,10 @@ export interface CelestialBody extends OrbitalObject, CanHaveRings, HasPostProce
 /**
  * Describes the model of a celestial body
  */
-export interface CelestialBodyModel extends OrbitalObjectModel, CanHaveRingsModel {
-    /**
-     * The type of the celestial body
-     */
-    readonly bodyType: BodyType;
-
-    /**
-     * The radius of the celestial body
-     */
-    readonly radius: number;
-}
+export type CelestialBodyModel = OrbitalObjectModel &
+    CanHaveRingsModel & {
+        /**
+         * The radius of the celestial body
+         */
+        readonly radius: number;
+    };

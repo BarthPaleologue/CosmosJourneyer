@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getGravitationalLensFocalDistance } from "../src/ts/utils/gravitationalLensing";
 import { Settings } from "../src/ts/settings";
+import { getGravitationalLensFocalDistance } from "../src/ts/utils/physics";
 
 test("gravitationalLensing", () => {
     const solarMass = 1.989e30; // in kg

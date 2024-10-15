@@ -15,41 +15,29 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { seededSquirrelNoise } from "squirrel-noise";
 import { getOrbitalPeriod, Orbit } from "../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { OrbitalObjectModel } from "../architecture/orbitalObject";
-import { OrbitalObjectPhysicalProperties } from "../architecture/physicalProperties";
+import { OrbitalObjectModel, OrbitalObjectType } from "../architecture/orbitalObject";
+import { OrbitalObjectPhysicsInfo } from "../architecture/physicsInfo";
 import { CelestialBodyModel } from "../architecture/celestialBody";
 import { normalRandom, uniformRandBool } from "extended-random";
 import { clamp } from "../utils/math";
 import { GenerationSteps } from "../utils/generationSteps";
 import { CropType, CropTypes, getEdibleEnergyPerHaPerDay } from "../utils/agriculture";
 import { randomPieChart } from "../utils/random";
-import { generateSpaceStationName } from "../utils/spaceStationNameGenerator";
-import { StarSystemModel } from "../starSystem/starSystemModel";
+import { generateSpaceStationName } from "../utils/strings/spaceStationNameGenerator";
 import { Faction } from "../society/factions";
 import { getPowerPlayData } from "../society/powerplay";
-import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
-import { BodyType } from "../architecture/bodyType";
-import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
-import { StarModel } from "../stellarObjects/star/starModel";
 import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
 import { Settings } from "../settings";
-import i18n from "../i18n";
+import { StellarObjectModel } from "../architecture/stellarObject";
+import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates";
 
-export class SpaceStationModel implements OrbitalObjectModel {
-    readonly name: string;
+import { getRngFromSeed } from "../utils/getRngFromSeed";
+import { getSphereRadiatedEnergyFlux } from "../utils/physics";
 
-    readonly seed: number;
-    readonly rng: (step: number) => number;
-
-    readonly starSystem: StarSystemModel;
-
-    readonly orbit: Orbit;
-    readonly physicalProperties: OrbitalObjectPhysicalProperties;
-    readonly parentBody: OrbitalObjectModel | null;
-    readonly childrenBodies: OrbitalObjectModel[] = [];
+export type SpaceStationModel = OrbitalObjectModel & {
+    readonly starSystemCoordinates: StarSystemCoordinates;
 
     readonly population: number;
 
@@ -73,7 +61,7 @@ export class SpaceStationModel implements OrbitalObjectModel {
      * The total energy consumption of the habitat in KWh
      */
     readonly totalEnergyConsumptionKWh: number;
-    readonly solarPanelEfficiency = 0.4;
+    readonly solarPanelEfficiency: number;
 
     /**
      * The surface of solar panels in m²
@@ -83,101 +71,110 @@ export class SpaceStationModel implements OrbitalObjectModel {
     readonly housingSurfaceHa: number;
     readonly agricultureSurfaceHa: number;
     readonly totalHabitatSurfaceM2: number;
+};
 
-    readonly typeName = i18n.t("objectTypes:spaceStation");
+export function newSeededSpaceStationModel(
+    seed: number,
+    stellarObjectModels: StellarObjectModel[],
+    starSystemCoordinates: StarSystemCoordinates,
+    parentBodies: CelestialBodyModel[]
+): SpaceStationModel {
+    const rng = getRngFromSeed(seed);
 
-    constructor(seed: number, starSystemModel: StarSystemModel, parentBody?: CelestialBodyModel) {
-        this.seed = seed;
-        this.rng = seededSquirrelNoise(this.seed);
+    const name = generateSpaceStationName(rng, 2756);
 
-        this.starSystem = starSystemModel;
+    const parentMaxRadius = parentBodies.reduce((max, body) => Math.max(max, body.radius), 0);
+    const orbitRadius = (2 + clamp(normalRandom(2, 1, rng, GenerationSteps.ORBIT), 0, 10)) * parentMaxRadius;
 
-        this.name = generateSpaceStationName(this.rng, 2756);
+    const parentMassSum = parentBodies.reduce((sum, body) => sum + body.physics.mass, 0);
+    const orbit: Orbit = {
+        radius: orbitRadius,
+        p: 2,
+        period: getOrbitalPeriod(orbitRadius, parentMassSum),
+        normalToPlane: Vector3.Up()
+    };
 
-        this.parentBody = parentBody ?? null;
-        this.childrenBodies = [];
+    const physicalProperties: OrbitalObjectPhysicsInfo = {
+        mass: 1,
+        rotationPeriod: 0,
+        axialTilt: 2 * rng(GenerationSteps.AXIAL_TILT) * Math.PI
+    };
 
-        const orbitRadius = (2 + clamp(normalRandom(2, 1, this.rng, GenerationSteps.ORBIT), 0, 10)) * (parentBody?.radius ?? 0);
+    const powerplayData = getPowerPlayData(starSystemCoordinates);
 
-        this.orbit = {
-            radius: orbitRadius,
-            p: 2,
-            period: getOrbitalPeriod(orbitRadius, this.parentBody?.physicalProperties.mass ?? 0),
-            normalToPlane: Vector3.Up()
-        };
+    const isMaterialist = uniformRandBool(powerplayData.materialistSpiritualist, rng, 249);
+    const isCapitalist = uniformRandBool(powerplayData.capitalistCommunist, rng, 498);
 
-        this.physicalProperties = {
-            mass: 1,
-            rotationPeriod: 0,
-            axialTilt: 2 * this.rng(GenerationSteps.AXIAL_TILT) * Math.PI
-        };
-
-        const powerplayData = getPowerPlayData(this.starSystem.getCoordinates());
-
-        const isMaterialist = uniformRandBool(powerplayData.materialistSpiritualist, this.rng, 249);
-        const isCapitalist = uniformRandBool(powerplayData.capitalistCommunist, this.rng, 498);
-
-        if (isMaterialist && isCapitalist) {
-            this.faction = Faction.FEYNMAN_INTERSTELLAR;
-        } else if (isMaterialist && !isCapitalist) {
-            this.faction = Faction.HUMAN_COMMONWEALTH;
-        } else if (!isMaterialist && isCapitalist) {
-            this.faction = Faction.CHURCH_OF_AWAKENING;
-        } else {
-            this.faction = Faction.SATORI_CONCORD;
-        }
-
-        //TODO: make this dependent on economic model
-        this.population = 2_000_000;
-        this.energyConsumptionPerCapitaKWh = 40_000;
-
-        this.populationDensity = 4_000;
-
-        const mix = randomPieChart(CropTypes.length, this.rng, 498);
-        this.agricultureMix = mix.map((proportion, index) => [proportion, CropTypes[index]]);
-
-        this.nbHydroponicLayers = 10;
-
-        const starModelBuildInfo = starSystemModel.getStellarObjects()[0];
-        let starModel;
-        switch (starModelBuildInfo[0]) {
-            case BodyType.NEUTRON_STAR:
-                starModel = new NeutronStarModel(starModelBuildInfo[1], starSystemModel);
-                break;
-            case BodyType.BLACK_HOLE:
-                starModel = new BlackHoleModel(starModelBuildInfo[1], starSystemModel);
-                break;
-            case BodyType.STAR:
-                starModel = new StarModel(starModelBuildInfo[1], starSystemModel);
-                break;
-            default:
-                throw new Error("Unknown star type");
-        }
-
-        // find distance to star
-        const distanceToStar = this.parentBody ? this.parentBody?.orbit.radius : 0;
-
-        const starRadius = starModel.radius;
-        const starTemperature = starModel.temperature;
-        this.totalEnergyConsumptionKWh = this.population * this.energyConsumptionPerCapitaKWh;
-
-        this.solarPanelSurfaceM2 = getSolarPanelSurfaceFromEnergyRequirement(
-            this.solarPanelEfficiency,
-            distanceToStar,
-            starTemperature,
-            starRadius,
-            this.totalEnergyConsumptionKWh,
-            0.5
-        );
-
-        this.housingSurfaceHa = (100 * this.population) / this.populationDensity; // convert km² to ha
-        let agricultureSurfaceHa = 0;
-        this.agricultureMix.forEach(([fraction, cropType]) => {
-            agricultureSurfaceHa +=
-                (fraction * this.population * Settings.INDIVIDUAL_AVERAGE_DAILY_INTAKE) /
-                (Settings.HYDROPONIC_TO_CONVENTIONAL_RATIO * this.nbHydroponicLayers * getEdibleEnergyPerHaPerDay(cropType));
-        });
-        this.agricultureSurfaceHa = agricultureSurfaceHa;
-        this.totalHabitatSurfaceM2 = (this.housingSurfaceHa + this.agricultureSurfaceHa) * 1000; // convert ha to m²
+    let faction: Faction;
+    if (isMaterialist && isCapitalist) {
+        faction = Faction.FEYNMAN_INTERSTELLAR;
+    } else if (isMaterialist && !isCapitalist) {
+        faction = Faction.HUMAN_COMMONWEALTH;
+    } else if (!isMaterialist && isCapitalist) {
+        faction = Faction.CHURCH_OF_AWAKENING;
+    } else {
+        faction = Faction.SATORI_CONCORD;
     }
+
+    //TODO: make this dependent on economic model
+    const population = 2_000_000;
+    const energyConsumptionPerCapitaKWh = 40_000;
+
+    const populationDensity = 4_000;
+
+    const mix = randomPieChart(CropTypes.length, rng, 498);
+    const agricultureMix: [number, CropType][] = mix.map((proportion, index) => [proportion, CropTypes[index]]);
+
+    const nbHydroponicLayers = 10;
+
+    // find average distance to stellar objects
+    let distanceToStar = 0;
+    parentBodies.forEach((celestialBody) => {
+        distanceToStar += celestialBody.orbit.radius;
+    });
+    distanceToStar /= parentBodies.length;
+
+    let totalStellarFlux = 0;
+    stellarObjectModels.forEach((stellarObject) => {
+        const exposureTimeFraction = 0.5;
+        const starRadius = stellarObject.radius;
+        const starTemperature = stellarObject.physics.blackBodyTemperature;
+        totalStellarFlux += getSphereRadiatedEnergyFlux(starTemperature, starRadius, distanceToStar) * exposureTimeFraction;
+    });
+
+    const totalEnergyConsumptionKWh = population * energyConsumptionPerCapitaKWh;
+
+    const solarPanelEfficiency = 0.4;
+
+    const solarPanelSurfaceM2 = getSolarPanelSurfaceFromEnergyRequirement(solarPanelEfficiency, totalEnergyConsumptionKWh, totalStellarFlux);
+
+    const housingSurfaceHa = (100 * population) / populationDensity; // convert km² to ha
+    let agricultureSurfaceHa = 0;
+    agricultureMix.forEach(([fraction, cropType]) => {
+        agricultureSurfaceHa +=
+            (fraction * population * Settings.INDIVIDUAL_AVERAGE_DAILY_INTAKE) /
+            (Settings.HYDROPONIC_TO_CONVENTIONAL_RATIO * nbHydroponicLayers * getEdibleEnergyPerHaPerDay(cropType));
+    });
+    const totalHabitatSurfaceM2 = (housingSurfaceHa + agricultureSurfaceHa) * 1000; // convert ha to m²
+
+    return {
+        seed,
+        type: OrbitalObjectType.SPACE_STATION,
+        starSystemCoordinates: starSystemCoordinates,
+        name,
+        orbit,
+        physics: physicalProperties,
+        population,
+        energyConsumptionPerCapitaKWh,
+        populationDensity,
+        agricultureMix,
+        nbHydroponicLayers,
+        faction,
+        totalEnergyConsumptionKWh,
+        solarPanelEfficiency,
+        solarPanelSurfaceM2,
+        housingSurfaceHa,
+        agricultureSurfaceHa,
+        totalHabitatSurfaceM2
+    };
 }

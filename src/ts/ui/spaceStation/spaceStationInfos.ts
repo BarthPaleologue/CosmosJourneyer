@@ -20,15 +20,18 @@ import { SpaceStationModel } from "../../spacestation/spacestationModel";
 import { CropType, cropTypeToString } from "../../utils/agriculture";
 
 import { makeD3PieChart } from "../../utils/d3PieChart";
+import { OrbitalObjectModel } from "../../architecture/orbitalObject";
 
-export function generateInfoHTML(model: SpaceStationModel): string {
+export function generateInfoHTML(model: SpaceStationModel, parentModels: OrbitalObjectModel[]): string {
     const agricultureMix = model.agricultureMix;
+
+    const parentName = parentModels.map((parentModel) => parentModel.name).join("-");
 
     return `
         <h2>General information</h2>
         
-        <p>${model.name} is orbiting ${model.parentBody?.name} at a distance of ${(model.orbit.radius * 0.001).toLocaleString(undefined, { maximumSignificantDigits: 3 })}km. 
-        One orbit around ${model.parentBody?.name} takes ${(model.orbit.period / (24 * 60 * 60)).toLocaleString(undefined, { maximumSignificantDigits: 3 })} days</p>
+        <p>${model.name} is orbiting ${parentName} at a distance of ${(model.orbit.radius * 0.001).toLocaleString(undefined, { maximumSignificantDigits: 3 })}km. 
+        One orbit around ${parentName} takes ${(model.orbit.period / (24 * 60 * 60)).toLocaleString(undefined, { maximumSignificantDigits: 3 })} days</p>
 
         <p>${model.name} is affiliated to ${factionToString(model.faction)}</p>
 

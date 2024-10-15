@@ -15,24 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getSphereRadiatedEnergyFlux } from "./thermodynamic";
-
 /**
  * Calculates the surface area of a solar panel required to meet a given energy requirement, efficiency, and star
  * @param efficiency The efficiency of the solar panel between 0 and 1.
- * @param distanceToStar The distance from the star in meters.
- * @param starTemperature The temperature of the star in Kelvin.
- * @param starRadius The radius of the star in meters.
  * @param energyRequirement The energy requirement in watts.
- * @param sunLightExposure The fraction of the time spent in sunlight between 0 and 1.
+ * @param stellarEnergyFlux The incoming average energy flux from the stars in watts per square meter.
  */
-export function getSolarPanelSurfaceFromEnergyRequirement(
-    efficiency: number,
-    distanceToStar: number,
-    starTemperature: number,
-    starRadius: number,
-    energyRequirement: number,
-    sunLightExposure: number
-) {
-    return energyRequirement / (efficiency * getSphereRadiatedEnergyFlux(starTemperature, starRadius, distanceToStar)) / sunLightExposure;
+export function getSolarPanelSurfaceFromEnergyRequirement(efficiency: number, energyRequirement: number, stellarEnergyFlux: number) {
+    return energyRequirement / (efficiency * stellarEnergyFlux);
 }

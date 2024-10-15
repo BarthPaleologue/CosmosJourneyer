@@ -20,7 +20,7 @@ import { IDisposable, Scene } from "@babylonjs/core/scene";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Objects } from "../assets/objects";
 import { AsteroidPatch } from "./asteroidPatch";
-import { seededSquirrelNoise } from "squirrel-noise";
+import { getRngFromSeed } from "../utils/getRngFromSeed";
 
 /**
  * An asteroid field is basically a collection of instance chunks that can be created and destroyed depending on where the player is.
@@ -59,7 +59,7 @@ export class AsteroidField implements IDisposable {
      */
     constructor(seed: number, parent: TransformNode, averageRadius: number, spread: number, scene: Scene) {
         this.seed = seed;
-        this.rng = seededSquirrelNoise(this.seed);
+        this.rng = getRngFromSeed(this.seed);
 
         this.parent = parent;
 

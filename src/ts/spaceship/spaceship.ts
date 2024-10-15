@@ -420,7 +420,7 @@ export class Spaceship implements Transformable {
         let canEngage = true;
         if (this.nearestCelestialBody !== null) {
             // if the spaceship goes too close to planetary rings, stop the warp drive to avoid collision with asteroids
-            const asteroidField = this.nearestCelestialBody.getAsteroidField();
+            const asteroidField = this.nearestCelestialBody.asteroidField;
 
             if (asteroidField !== null) {
                 const relativePosition = this.getTransform().getAbsolutePosition().subtract(this.nearestCelestialBody.getTransform().getAbsolutePosition());
@@ -464,7 +464,7 @@ export class Spaceship implements Transformable {
 
             if (this.nearestCelestialBody !== null) {
                 // if the spaceship goes too close to planetary rings, stop the warp drive to avoid collision with asteroids
-                const asteroidField = this.nearestCelestialBody.getAsteroidField();
+                const asteroidField = this.nearestCelestialBody.asteroidField;
 
                 if (asteroidField !== null) {
                     const relativePosition = this.getTransform().getAbsolutePosition().subtract(this.nearestCelestialBody.getTransform().getAbsolutePosition());

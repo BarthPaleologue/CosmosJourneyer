@@ -36,7 +36,6 @@ import { PostProcessType } from "./postProcessTypes";
 import { MandelbulbPostProcess } from "../anomalies/mandelbulb/mandelbulbPostProcess";
 import { ShadowPostProcess } from "./shadowPostProcess";
 import { LensFlarePostProcess } from "./lensFlarePostProcess";
-import { isOrbiting } from "../utils/nearestBody";
 import { UpdatablePostProcess } from "./objectPostProcess";
 import { MatterJetPostProcess } from "./matterJetPostProcess";
 import { Mandelbulb } from "../anomalies/mandelbulb/mandelbulb";
@@ -54,6 +53,8 @@ import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { BloomEffect } from "@babylonjs/core/PostProcesses/bloomEffect";
 import { Constants } from "@babylonjs/core/Engines/constants";
+import { PlanetaryMassObject } from "../architecture/planetaryMassObject";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 /**
  * The order in which the post processes are rendered when away from a planet
@@ -212,7 +213,7 @@ export class PostProcessManager {
      * @param stellarObjects An array of stars or black holes
      */
     public addOcean(planet: TelluricPlanet, stellarObjects: StellarObject[]) {
-        const ocean = new OceanPostProcess(`${planet.name}Ocean`, planet, this.scene, stellarObjects);
+        const ocean = new OceanPostProcess(planet, stellarObjects, this.scene);
         this.oceans.push(ocean);
     }
 
@@ -233,9 +234,9 @@ export class PostProcessManager {
         const uniforms = planet.getCloudsUniforms();
         if (uniforms === null)
             throw new Error(
-                `PostProcessManager: addClouds: uniforms are null. This should not be possible as the postprocess should not be created if the body has no clouds. Body: ${planet.name}`
+                `PostProcessManager: addClouds: uniforms are null. This should not be possible as the postprocess should not be created if the body has no clouds. Body: ${planet.model.name}`
             );
-        this.clouds.push(new FlatCloudsPostProcess(`${planet.name}Clouds`, planet, uniforms, this.scene, stellarObjects));
+        this.clouds.push(new FlatCloudsPostProcess(planet, uniforms, stellarObjects, this.scene));
     }
 
     /**
@@ -253,11 +254,10 @@ export class PostProcessManager {
      */
     public addAtmosphere(planet: GasPlanet | TelluricPlanet, stellarObjects: StellarObject[]) {
         const atmosphere = new AtmosphericScatteringPostProcess(
-            `${planet.name}Atmosphere`,
             planet,
             Settings.ATMOSPHERE_HEIGHT * Math.max(1, planet.model.radius / Settings.EARTH_RADIUS),
-            this.scene,
-            stellarObjects
+            stellarObjects,
+            this.scene
         );
         this.atmospheres.push(atmosphere);
     }
@@ -266,7 +266,7 @@ export class PostProcessManager {
      * Returns the atmosphere post process for the given planet. Throws an error if no atmosphere is found.
      * @param planet A gas or telluric planet
      */
-    public getAtmosphere(planet: GasPlanet | TelluricPlanet): AtmosphericScatteringPostProcess | null {
+    public getAtmosphere(planet: PlanetaryMassObject): AtmosphericScatteringPostProcess | null {
         return this.atmospheres.find((atmosphere) => atmosphere.object === planet) ?? null;
     }
 
@@ -276,7 +276,7 @@ export class PostProcessManager {
      * @param stellarObjects An array of stars or black holes
      */
     public addRings(body: CelestialBody, stellarObjects: StellarObject[]) {
-        this.rings.push(new RingsPostProcess(body.name + "Rings", this.scene, body, stellarObjects));
+        this.rings.push(new RingsPostProcess(body, stellarObjects, this.scene));
     }
 
     /**
@@ -293,8 +293,7 @@ export class PostProcessManager {
      * @param stellarObjects An array of stars or black holes
      */
     public addMandelbulb(body: Mandelbulb, stellarObjects: StellarObject[]) {
-        const mandelbulb = new MandelbulbPostProcess(body, this.scene, stellarObjects);
-        this.mandelbulbs.push(mandelbulb);
+        this.mandelbulbs.push(new MandelbulbPostProcess(body, this.scene, stellarObjects));
     }
 
     /**
@@ -303,8 +302,7 @@ export class PostProcessManager {
      * @param stellarObjects An array of stars or black holes
      */
     public addJuliaSet(juliaSet: JuliaSet, stellarObjects: StellarObject[]) {
-        const juliaSetPostProcess = new JuliaSetPostProcess(juliaSet, this.scene, stellarObjects);
-        this.juliaSets.push(juliaSetPostProcess);
+        this.juliaSets.push(new JuliaSetPostProcess(juliaSet, this.scene, stellarObjects));
     }
 
     /**
@@ -329,8 +327,7 @@ export class PostProcessManager {
      * @param blackHole A black hole
      */
     public addBlackHole(blackHole: BlackHole) {
-        const blackhole = new BlackHolePostProcess(blackHole, this.scene);
-        this.blackHoles.push(blackhole);
+        this.blackHoles.push(new BlackHolePostProcess(blackHole, this.scene));
     }
 
     /**
@@ -346,8 +343,7 @@ export class PostProcessManager {
      * @param neutronStar A neutron star
      */
     public addMatterJet(neutronStar: NeutronStar) {
-        console.log("add matter jet");
-        this.matterJets.push(new MatterJetPostProcess(neutronStar.name, neutronStar, this.scene));
+        this.matterJets.push(new MatterJetPostProcess(neutronStar, this.scene));
     }
 
     /**
@@ -364,7 +360,7 @@ export class PostProcessManager {
      * @param stellarObjects An array of stellar objects
      */
     public addShadowCaster(body: CelestialBody, stellarObjects: StellarObject[]) {
-        this.shadows.push(new ShadowPostProcess(body.name + "Shadow", body, stellarObjects, this.scene));
+        this.shadows.push(new ShadowPostProcess(body, stellarObjects, this.scene));
     }
 
     /**
@@ -381,12 +377,13 @@ export class PostProcessManager {
      * This method will also choose the appropriate rendering order and rebuild the pipeline.
      * @param body The closest celestial body to the active camera
      */
-    public setBody(body: CelestialBody) {
+    public setCelestialBody(body: CelestialBody) {
         this.currentBody = body;
 
         const rings = this.getRings(body);
         const switchLimit = rings !== null ? rings.ringsUniforms.model.ringStart : 2;
-        if (isOrbiting(this.scene.getActiveControls(), body, switchLimit)) this.setSurfaceOrder();
+        const distance2 = Vector3.DistanceSquared(body.getTransform().getAbsolutePosition(), this.scene.getActiveControls().getTransform().getAbsolutePosition());
+        if (distance2 < (switchLimit * body.getBoundingRadius()) ** 2) this.setSurfaceOrder();
         else this.setSpaceOrder();
     }
 

@@ -19,16 +19,16 @@ import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Transformable } from "../../../architecture/transformable";
-import { computeRingRotationPeriod } from "../../../utils/ringRotation";
 import { Settings } from "../../../settings";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { CylinderHabitatMaterial } from "./cylinderHabitatMaterial";
-import { createEnvironmentAggregate } from "../../../utils/physics";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { seededSquirrelNoise } from "squirrel-noise";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
+import { getRngFromSeed } from "../../../utils/getRngFromSeed";
+import { createEnvironmentAggregate } from "../../../utils/havok";
+import { computeRingRotationPeriod } from "../../../utils/physics";
 
 export class CylinderHabitat implements Transformable {
     private readonly root: TransformNode;
@@ -47,7 +47,7 @@ export class CylinderHabitat implements Transformable {
     constructor(requiredHabitableSurface: number, seed: number, scene: Scene) {
         this.root = new TransformNode("CylinderHabitatRoot", scene);
 
-        this.rng = seededSquirrelNoise(seed);
+        this.rng = getRngFromSeed(seed);
 
         this.radius = 2e3 + this.rng(0) * 2e3;
 

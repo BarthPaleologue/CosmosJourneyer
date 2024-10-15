@@ -1,4 +1,4 @@
-import { UniverseCoordinates } from "./universeCoordinates";
+import { UniverseCoordinates } from "../utils/coordinates/universeCoordinates";
 import { SerializedPlayer } from "../player/player";
 
 /**

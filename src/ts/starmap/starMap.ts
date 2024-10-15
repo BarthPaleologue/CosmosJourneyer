@@ -39,26 +39,26 @@ import { TransformTranslationAnimation } from "../uberCore/transforms/animations
 import { translate } from "../uberCore/transforms/basicTransform";
 import { ThickLines } from "../utils/thickLines";
 import { Observable } from "@babylonjs/core/Misc/observable";
-import { StarModel } from "../stellarObjects/star/starModel";
-import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
-import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 import { View } from "../utils/view";
 import { AudioInstance } from "../utils/audioInstance";
 import { AudioManager } from "../audio/audioManager";
 import { AudioMasks } from "../audio/audioMasks";
-import { StarMapInputs } from "../inputs/starMapInputs";
-import { BodyType } from "../architecture/bodyType";
+import { StarMapInputs } from "./starMapInputs";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Sounds } from "../assets/sounds";
-import { StarMapControls } from "../starMapControls/starMapControls";
+import { StarMapControls } from "./starMapControls";
 import { CameraRadiusAnimation } from "../uberCore/transforms/animations/radius";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { StellarPathfinder } from "./stellarPathfinder";
 import { createNotification } from "../utils/notification";
-import { getStarGalacticPosition, getSystemModelFromCoordinates } from "../utils/starSystemCoordinatesUtils";
+import { getStarGalacticPosition } from "../utils/coordinates/starSystemCoordinatesUtils";
 import { Player } from "../player/player";
 import { Settings } from "../settings";
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../starSystem/starSystemModel";
+import { getRgbFromTemperature } from "../utils/specrend";
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/universeCoordinates";
+import { getSystemModelFromCoordinates } from "../starSystem/modelFromCoordinates";
+import { StarSystemModelUtils } from "../starSystem/starSystemModel";
+import { OrbitalObjectType } from "../architecture/orbitalObject";
 
 export class StarMap implements View {
     readonly scene: Scene;
@@ -322,9 +322,9 @@ export class StarMap implements View {
 
         this.cameraPositionToCenter = activeCamera.globalPosition.subtract(this.starMapCenterPosition);
         this.currentStarSectorCoordinates = new Vector3(
-            Math.round(this.cameraPositionToCenter.x / StarSector.SIZE),
-            Math.round(this.cameraPositionToCenter.y / StarSector.SIZE),
-            Math.round(this.cameraPositionToCenter.z / StarSector.SIZE)
+            Math.round(this.cameraPositionToCenter.x / Settings.STAR_SECTOR_SIZE),
+            Math.round(this.cameraPositionToCenter.y / Settings.STAR_SECTOR_SIZE),
+            Math.round(this.cameraPositionToCenter.z / Settings.STAR_SECTOR_SIZE)
         );
     }
 
@@ -369,7 +369,7 @@ export class StarMap implements View {
         this.registerStarSector(sectorCoordinates, true);
         this.starMapUI.setCurrentMesh(this.coordinatesToInstanceMap.get(JSON.stringify(this.currentSystemCoordinates)) as InstancedMesh);
 
-        const translation = sectorCoordinates.subtract(this.currentStarSectorCoordinates).scaleInPlace(StarSector.SIZE);
+        const translation = sectorCoordinates.subtract(this.currentStarSectorCoordinates).scaleInPlace(Settings.STAR_SECTOR_SIZE);
         translate(this.controls.getTransform(), translation);
         this.controls.getActiveCameras().forEach((camera) => camera.getViewMatrix(true));
         this.acknowledgeCameraMovement();
@@ -401,7 +401,7 @@ export class StarMap implements View {
             if (selectedSystemInstance !== null && starSector.starInstances.concat(starSector.blackHoleInstances).includes(selectedSystemInstance)) continue; // don't remove star sector that contains the selected system
 
             const position = starSector.position;
-            if (position.subtract(this.cameraPositionToCenter).length() / StarSector.SIZE > StarMap.RENDER_RADIUS + 1) {
+            if (position.subtract(this.cameraPositionToCenter).length() / Settings.STAR_SECTOR_SIZE > StarMap.RENDER_RADIUS + 1) {
                 for (const starInstance of starSector.starInstances) this.fadeOutThenRecycle(starInstance, this.recycledStars);
                 for (const blackHoleInstance of starSector.blackHoleInstances) this.fadeOutThenRecycle(blackHoleInstance, this.recycledBlackHoles);
 
@@ -417,7 +417,7 @@ export class StarMap implements View {
             if (this.loadedStarSectors.has(sectorKey)) continue; // already generated
 
             // don't generate star sectors that are not in the frustum
-            const bb = StarSector.GetBoundingBox(coordinates.scale(StarSector.SIZE), this.starMapCenterPosition);
+            const bb = StarSector.GetBoundingBox(coordinates.scale(Settings.STAR_SECTOR_SIZE), this.starMapCenterPosition);
             if (!activeCamera.isInFrustum(bb)) continue;
 
             this.registerStarSector(coordinates);
@@ -442,43 +442,32 @@ export class StarMap implements View {
     }
 
     private createInstance(data: BuildData) {
-        const starSystemModel = getSystemModelFromCoordinates(data.coordinates);
-        const starSystemCoordinates = starSystemModel.getCoordinates();
+        const starSystemCoordinates = data.coordinates;
+        const starSystemModel = getSystemModelFromCoordinates(starSystemCoordinates);
 
-        const starSeed = starSystemModel.getStellarObjectSeed(0);
-        const stellarObjectType = starSystemModel.getBodyTypeOfStellarObject(0);
 
-        let starModel: StarModel | BlackHoleModel | NeutronStarModel | null = null;
-        switch (stellarObjectType) {
-            case BodyType.STAR:
-                starModel = new StarModel(starSeed, starSystemModel);
-                break;
-            case BodyType.BLACK_HOLE:
-                starModel = new BlackHoleModel(starSeed, starSystemModel);
-                break;
-            case BodyType.NEUTRON_STAR:
-                starModel = new NeutronStarModel(starSeed, starSystemModel);
-                break;
-            default:
-                throw new Error("Unknown stellar object type!");
-        }
-        if (starModel === null) throw new Error("Star model is null!");
+        //TODO: when implementing binary star systems, this will need to be updated to display all stellar objects and not just the first one
+        const stellarObjectModel = StarSystemModelUtils.GetStellarObjects(starSystemModel)[0];
+
+        const instanceName = JSON.stringify(starSystemCoordinates);
 
         let instance: InstancedMesh | null = null;
         let recycled = false;
 
-        if (stellarObjectType === BodyType.STAR || stellarObjectType === BodyType.NEUTRON_STAR) {
+        if (stellarObjectModel.type === OrbitalObjectType.STAR || stellarObjectModel.type === OrbitalObjectType.NEUTRON_STAR) {
             if (this.recycledStars.length > 0) {
                 instance = this.recycledStars[0];
+                instance.name = instanceName;
                 this.recycledStars.shift();
                 recycled = true;
-            } else instance = this.starTemplate.createInstance(data.name);
+            } else instance = this.starTemplate.createInstance(instanceName);
         } else {
             if (this.recycledBlackHoles.length > 0) {
                 instance = this.recycledBlackHoles[0];
+                instance.name = instanceName;
                 this.recycledBlackHoles.shift();
                 recycled = true;
-            } else instance = this.blackHoleTemplate.createInstance(data.name);
+            } else instance = this.blackHoleTemplate.createInstance(instanceName);
         }
 
         const initializedInstance = instance;
@@ -488,12 +477,8 @@ export class StarMap implements View {
 
         initializedInstance.position = data.position.add(this.starMapCenterPosition);
 
-        if (starModel.bodyType === BodyType.STAR || starModel.bodyType === BodyType.NEUTRON_STAR) {
-            const starColor = starModel.color;
-            initializedInstance.instancedBuffers.color = new Color4(starColor.r, starColor.g, starColor.b, 0.0);
-        } else {
-            initializedInstance.instancedBuffers.color = new Color4(1.0, 0.6, 0.3, 0.0);
-        }
+        const objectColor = getRgbFromTemperature(stellarObjectModel.physics.blackBodyTemperature);
+        initializedInstance.instancedBuffers.color = new Color4(objectColor.r, objectColor.g, objectColor.b, 0.0);
 
         if (!recycled) {
             initializedInstance.isPickable = true;
@@ -531,7 +516,7 @@ export class StarMap implements View {
 
         this.fadeIn(initializedInstance);
 
-        if (starModel.bodyType === BodyType.BLACK_HOLE) this.loadedStarSectors.get(data.sectorString)?.blackHoleInstances.push(initializedInstance);
+        if (stellarObjectModel.type === OrbitalObjectType.BLACK_HOLE) this.loadedStarSectors.get(data.sectorString)?.blackHoleInstances.push(initializedInstance);
         else this.loadedStarSectors.get(data.sectorString)?.starInstances.push(initializedInstance);
     }
 

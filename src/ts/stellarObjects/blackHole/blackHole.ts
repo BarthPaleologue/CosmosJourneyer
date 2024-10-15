@@ -25,13 +25,8 @@ import { Camera } from "@babylonjs/core/Cameras/camera";
 import { BlackHoleModel } from "./blackHoleModel";
 import { StellarObject } from "../../architecture/stellarObject";
 import { Cullable } from "../../utils/cullable";
-import { CelestialBody } from "../../architecture/celestialBody";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { RingsUniforms } from "../../rings/ringsUniform";
-import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
-import { AsteroidField } from "../../asteroidFields/asteroidField";
-import { StarSystemModel } from "../../starSystem/starSystemModel";
-import { Orbit } from "../../orbit/orbit";
+import { orbitalObjectTypeToDisplay } from "../../utils/strings/orbitalObjectTypeToDisplay";
 
 export class BlackHole implements StellarObject, Cullable {
     readonly name: string;
@@ -44,23 +39,23 @@ export class BlackHole implements StellarObject, Cullable {
 
     readonly postProcesses: PostProcessType[] = [];
 
-    readonly parent: CelestialBody | null;
+    readonly ringsUniforms = null;
 
-    constructor(model: BlackHoleModel | number, starSystemModel: StarSystemModel, scene: Scene, parentBody: CelestialBody | null = null) {
-        this.model = model instanceof BlackHoleModel ? model : new BlackHoleModel(model, starSystemModel);
+    readonly asteroidField = null;
+
+    constructor(model: BlackHoleModel, scene: Scene) {
+        this.model = model;
 
         this.name = this.model.name;
 
-        this.parent = parentBody;
-
         this.transform = new TransformNode(this.model.name, scene);
-        this.transform.rotate(Axis.X, this.model.physicalProperties.axialTilt);
+        this.transform.rotate(Axis.X, this.model.physics.axialTilt);
 
         this.light = new PointLight(`${this.model.name}Light`, Vector3.Zero(), scene);
         //this.light.diffuse.fromArray(getRgbFromTemperature(this.model.physicalProperties.temperature).asArray());
         this.light.falloffType = Light.FALLOFF_STANDARD;
         this.light.parent = this.getTransform();
-        if (this.model.physicalProperties.accretionDiskRadius === 0) this.light.intensity = 0;
+        if (this.model.physics.accretionDiskRadius === 0) this.light.intensity = 0;
 
         this.postProcesses.push(PostProcessType.BLACK_HOLE);
     }
@@ -77,24 +72,8 @@ export class BlackHole implements StellarObject, Cullable {
         return this.light;
     }
 
-    getOrbitProperties(): Orbit {
-        return this.model.orbit;
-    }
-
-    getPhysicalProperties(): OrbitalObjectPhysicalProperties {
-        return this.model.physicalProperties;
-    }
-
-    getRingsUniforms(): RingsUniforms | null {
-        return null;
-    }
-
-    getAsteroidField(): AsteroidField | null {
-        return null;
-    }
-
     getTypeName(): string {
-        return this.model.typeName;
+        return orbitalObjectTypeToDisplay(this.model);
     }
 
     public computeCulling(cameras: Camera[]): void {
@@ -106,7 +85,7 @@ export class BlackHole implements StellarObject, Cullable {
     }
 
     public getBoundingRadius(): number {
-        return Math.max(this.getRadius(), this.model.physicalProperties.accretionDiskRadius);
+        return Math.max(this.getRadius(), this.model.physics.accretionDiskRadius);
     }
 
     public dispose(): void {

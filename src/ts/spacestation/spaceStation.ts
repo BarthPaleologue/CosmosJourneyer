@@ -24,8 +24,6 @@ import { OrbitalObject } from "../architecture/orbitalObject";
 import { Cullable } from "../utils/cullable";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { OrbitalObjectPhysicalProperties } from "../architecture/physicalProperties";
-import { CelestialBody } from "../architecture/celestialBody";
 import { SpaceStationNodeType } from "../assets/procedural/spaceStation/spaceStationNode";
 import { UtilitySection } from "../assets/procedural/spaceStation/utilitySection";
 import { HelixHabitat } from "../assets/procedural/spaceStation/helixHabitat";
@@ -40,8 +38,8 @@ import { LandingPad } from "../assets/procedural/landingPad/landingPad";
 import { LandingRequest, ManagesLandingPads } from "../utils/managesLandingPads";
 import { Settings } from "../settings";
 import { EngineBay } from "../assets/procedural/spaceStation/engineBay";
-import { StarSystemModel } from "../starSystem/starSystemModel";
-import { Orbit } from "../orbit/orbit";
+import { getRngFromSeed } from "../utils/getRngFromSeed";
+import { orbitalObjectTypeToDisplay } from "../utils/strings/orbitalObjectTypeToDisplay";
 
 export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads {
     readonly name: string;
@@ -49,8 +47,6 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
     readonly model: SpaceStationModel;
 
     readonly postProcesses: PostProcessType[] = [];
-
-    readonly parent: OrbitalObject | null = null;
 
     readonly solarSections: SolarSection[] = [];
     readonly utilitySections: UtilitySection[] = [];
@@ -66,12 +62,10 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
 
     private readonly boundingRadius: number;
 
-    constructor(model: SpaceStationModel | number, starSystemModel: StarSystemModel, scene: Scene, parentBody: CelestialBody | null = null) {
-        this.model = model instanceof SpaceStationModel ? model : new SpaceStationModel(model, starSystemModel, parentBody?.model);
+    constructor(model: SpaceStationModel, scene: Scene) {
+        this.model = model;
 
         this.name = this.model.name;
-
-        this.parent = parentBody;
 
         this.root = new TransformNode(this.name, scene);
         this.scene = scene;
@@ -87,8 +81,8 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
             .getChildTransformNodes(true)
             .forEach((transform) => transform.position.addInPlace(deltaPosition));
 
-        this.root.rotate(Axis.X, this.model.physicalProperties.axialTilt);
-        this.root.rotate(Axis.Z, this.model.physicalProperties.axialTilt);
+        this.root.rotate(Axis.X, this.model.physics.axialTilt);
+        this.root.rotate(Axis.Z, this.model.physics.axialTilt);
 
         const extendSize = boundingVectors.max.subtract(boundingVectors.min).scale(0.5);
         this.boundingRadius = Math.max(extendSize.x, extendSize.y, extendSize.z);
@@ -118,20 +112,12 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
         return this.getTransform().up;
     }
 
-    getOrbitProperties(): Orbit {
-        return this.model.orbit;
-    }
-
-    getPhysicalProperties(): OrbitalObjectPhysicalProperties {
-        return this.model.physicalProperties;
-    }
-
     public getBoundingRadius(): number {
         return this.boundingRadius;
     }
 
     getTypeName(): string {
-        return this.model.typeName;
+        return orbitalObjectTypeToDisplay(this.model);
     }
 
     public computeCulling(cameras: Camera[]): void {
@@ -152,15 +138,17 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
         let lastNode = engineBay.getTransform();
         this.engineBays.push(engineBay);
 
-        lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(this.model.rng(564) * 5));
+        const rng = getRngFromSeed(this.model.seed);
 
-        const solarSection = new SolarSection(solarPanelSurface, Settings.SEED_HALF_RANGE * this.model.rng(31), this.scene);
+        lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(rng(564) * 5), rng);
+
+        const solarSection = new SolarSection(solarPanelSurface, Settings.SEED_HALF_RANGE * rng(31), this.scene);
         solarSection.getTransform().parent = this.getTransform();
         this.placeNode(solarSection.getTransform(), lastNode);
         lastNode = solarSection.getTransform();
         this.solarSections.push(solarSection);
 
-        lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(this.model.rng(23) * 5));
+        lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(rng(23) * 5), rng);
 
         const habitatType = wheelOfFortune(
             [
@@ -168,20 +156,20 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
                 [SpaceStationNodeType.HELIX_HABITAT, 0.3],
                 [SpaceStationNodeType.CYLINDER_HABITAT, 0.2]
             ],
-            this.model.rng(17)
+            rng(17)
         );
 
         let newNode: TransformNode | null = null;
         if (habitatType === SpaceStationNodeType.HELIX_HABITAT) {
-            const helixHabitat = new HelixHabitat(habitatSurface, Settings.SEED_HALF_RANGE * this.model.rng(19), this.scene);
+            const helixHabitat = new HelixHabitat(habitatSurface, Settings.SEED_HALF_RANGE * rng(19), this.scene);
             this.helixHabitats.push(helixHabitat);
             newNode = helixHabitat.getTransform();
         } else if (habitatType === SpaceStationNodeType.RING_HABITAT) {
-            const ringHabitat = new RingHabitat(this.model, habitatSurface, Settings.SEED_HALF_RANGE * this.model.rng(27), this.scene);
+            const ringHabitat = new RingHabitat(this.model, habitatSurface, Settings.SEED_HALF_RANGE * rng(27), this.scene);
             this.ringHabitats.push(ringHabitat);
             newNode = ringHabitat.getTransform();
         } else if (habitatType === SpaceStationNodeType.CYLINDER_HABITAT) {
-            const cylinderHabitat = new CylinderHabitat(habitatSurface, Settings.SEED_HALF_RANGE * this.model.rng(13), this.scene);
+            const cylinderHabitat = new CylinderHabitat(habitatSurface, Settings.SEED_HALF_RANGE * rng(13), this.scene);
             this.cylinderHabitats.push(cylinderHabitat);
             newNode = cylinderHabitat.getTransform();
         }
@@ -194,19 +182,19 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
         newNode.parent = this.root;
         lastNode = newNode;
 
-        lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(this.model.rng(23) * 5));
+        lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(rng(23) * 5), rng);
 
-        const landingBay = new LandingBay(this.model, this.model.rng(37) * Settings.SEED_HALF_RANGE, this.scene);
+        const landingBay = new LandingBay(this.model, rng(37) * Settings.SEED_HALF_RANGE, this.scene);
 
         this.landingBays.push(landingBay);
         this.placeNode(landingBay.getTransform(), lastNode);
         landingBay.getTransform().parent = this.getTransform();
     }
 
-    private addUtilitySections(lastNode: TransformNode, nbSections: number): TransformNode {
+    private addUtilitySections(lastNode: TransformNode, nbSections: number, rng: (index: number) => number): TransformNode {
         let newLastNode = lastNode;
         for (let i = 0; i < nbSections; i++) {
-            const utilitySection = new UtilitySection(this.model.rng(132 + 10 * this.utilitySections.length) * Settings.SEED_HALF_RANGE, this.scene);
+            const utilitySection = new UtilitySection(rng(132 + 10 * this.utilitySections.length) * Settings.SEED_HALF_RANGE, this.scene);
             this.utilitySections.push(utilitySection);
 
             this.placeNode(utilitySection.getTransform(), newLastNode);

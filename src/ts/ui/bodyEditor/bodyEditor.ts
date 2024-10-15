@@ -169,7 +169,7 @@ export class BodyEditor {
     }
 
     public setBody(body: CelestialBody, postProcessManager: PostProcessManager, scene: Scene) {
-        this.currentBodyId = body.name;
+        this.currentBodyId = body.model.name;
 
         for (const panel of this.panels) panel.disable();
 
@@ -226,7 +226,7 @@ export class BodyEditor {
             if (volumetricLight) {
                 this.starPanel.enable();
                 this.starPanel.setVisibility(this.currentPanel === this.starPanel);
-                this.starPanel.init(body, volumetricLight);
+                this.starPanel.init(volumetricLight);
             }
         } else if (body instanceof BlackHole) {
             const blackHole = postProcessManager.getBlackHole(body as BlackHole);
@@ -268,6 +268,6 @@ export class BodyEditor {
     }
 
     public update(nearestBody: CelestialBody, postProcessManager: PostProcessManager, scene: Scene) {
-        if (nearestBody.name !== this.currentBodyId) this.setBody(nearestBody, postProcessManager, scene);
+        if (nearestBody.model.name !== this.currentBodyId) this.setBody(nearestBody, postProcessManager, scene);
     }
 }

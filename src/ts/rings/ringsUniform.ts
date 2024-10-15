@@ -60,7 +60,7 @@ export class RingsUniforms {
             true,
             false
         );
-        this.lut.setFloat("seed", model.offset);
+        this.lut.setFloat("seed", model.seed);
         this.lut.setFloat("frequency", model.ringFrequency);
         this.lut.setFloat("ringStart", model.ringStart);
         this.lut.setFloat("ringEnd", model.ringEnd);

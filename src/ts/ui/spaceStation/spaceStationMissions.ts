@@ -1,13 +1,15 @@
 import { SpaceStationModel } from "../../spacestation/spacestationModel";
 import { getNeighborStarSystemCoordinates } from "../../utils/getNeighborStarSystems";
-import { parseDistance } from "../../utils/parseToStrings";
+import { parseDistance } from "../../utils/strings/parseToStrings";
 import { Settings } from "../../settings";
 import { uniformRandBool } from "extended-random";
-import { getSpaceStationModels } from "../../utils/getModelsFromSystemModel";
 import { generateSightseeingMissions } from "../../missions/generateSightSeeingMissions";
 import { Player } from "../../player/player";
 import { MissionContainer } from "./missionContainer";
-import { getSystemModelFromCoordinates } from "../../utils/starSystemCoordinatesUtils";
+
+import { getRngFromSeed } from "../../utils/getRngFromSeed";
+import { getSystemModelFromCoordinates } from "../../starSystem/modelFromCoordinates";
+import { StarSystemModelUtils } from "../../starSystem/starSystemModel";
 
 /**
  * Generates all missions available at the given space station for the player. Missions are generated based on the current timestamp (hourly basis).
@@ -16,15 +18,18 @@ import { getSystemModelFromCoordinates } from "../../utils/starSystemCoordinates
  * @returns The DOM element containing the generated missions as HTML
  */
 export function generateMissionsDom(stationModel: SpaceStationModel, player: Player): HTMLDivElement {
-    const sightSeeingMissions = generateSightseeingMissions(stationModel, player, Date.now());
+    const starSystemModel = getSystemModelFromCoordinates(stationModel.starSystemCoordinates);
+    const sightSeeingMissions = generateSightseeingMissions(stationModel, starSystemModel, player, Date.now());
 
-    const starSystem = stationModel.starSystem;
-    const neighborSystems = getNeighborStarSystemCoordinates(starSystem.getCoordinates(), 75);
+    const starSystem = starSystemModel;
+    const neighborSystems = getNeighborStarSystemCoordinates(starSystem.coordinates, 75);
+
+    const rng = getRngFromSeed(stationModel.seed);
 
     let neighborSpaceStations: [SpaceStationModel, number][] = [];
     neighborSystems.forEach(([coordinates, position, distance], index) => {
         const systemModel = getSystemModelFromCoordinates(coordinates);
-        const spaceStations = getSpaceStationModels(systemModel).map<[SpaceStationModel, number]>((stationModel) => {
+        const spaceStations = StarSystemModelUtils.GetSpaceStations(systemModel).map<[SpaceStationModel, number]>((stationModel) => {
             return [stationModel, distance];
         });
         neighborSpaceStations = neighborSpaceStations.concat(spaceStations);
@@ -32,7 +37,7 @@ export function generateMissionsDom(stationModel: SpaceStationModel, player: Pla
 
     const contactStations = neighborSpaceStations
         // prune list randomly based on distance
-        .filter(([station, distance], index) => uniformRandBool(1.0 / (1.0 + 0.02 * (distance * distance)), stationModel.rng, 325 + index))
+        .filter(([station, distance], index) => uniformRandBool(1.0 / (1.0 + 0.02 * (distance * distance)), rng, 325 + index))
         // filter out stations of the same faction
         .filter(([station, distance]) => station.faction === stationModel.faction);
 
@@ -67,7 +72,7 @@ export function generateMissionsDom(stationModel: SpaceStationModel, player: Pla
 
     contactStations.forEach(([station, distance]) => {
         const stationP = document.createElement("p");
-        stationP.innerText = `${station.name} in ${station.starSystem.name} (${parseDistance(distance * Settings.LIGHT_YEAR)})`;
+        stationP.innerText = `${station.name} in ${starSystem.name} (${parseDistance(distance * Settings.LIGHT_YEAR)})`;
         mainContainer.appendChild(stationP);
     });
 

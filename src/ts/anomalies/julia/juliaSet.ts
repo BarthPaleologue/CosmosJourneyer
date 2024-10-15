@@ -19,51 +19,36 @@ import { Camera } from "@babylonjs/core/Cameras/camera";
 import { JuliaSetModel } from "./juliaSetModel";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
-import { CelestialBody } from "../../architecture/celestialBody";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
-import { RingsUniforms } from "../../rings/ringsUniform";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Cullable } from "../../utils/cullable";
-import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
-import { Anomaly } from "../anomaly";
-import { AnomalyType } from "../anomalyType";
-import { AsteroidField } from "../../asteroidFields/asteroidField";
-import { StarSystemModel } from "../../starSystem/starSystemModel";
-import { Orbit } from "../../orbit/orbit";
+import { CelestialBody } from "../../architecture/celestialBody";
+import { orbitalObjectTypeToDisplay } from "../../utils/strings/orbitalObjectTypeToDisplay";
 
-export class JuliaSet implements Anomaly, Cullable {
-    readonly name: string;
-
+export class JuliaSet implements CelestialBody, Cullable {
     readonly model: JuliaSetModel;
-
-    readonly anomalyType = AnomalyType.JULIA_SET;
 
     private readonly transform: TransformNode;
 
     readonly postProcesses: PostProcessType[] = [];
 
-    readonly parent: CelestialBody | null = null;
+    readonly ringsUniforms = null;
+    readonly asteroidField = null;
 
     /**
      * New Gas Planet
      * @param model The model to create the planet from or a seed for the planet in [-1, 1]
-     * @param starSystemModel
      * @param scene
-     * @param parentBody The bodies the planet is orbiting
      */
-    constructor(model: JuliaSetModel | number, starSystemModel: StarSystemModel, scene: Scene, parentBody: CelestialBody | null = null) {
-        this.model = model instanceof JuliaSetModel ? model : new JuliaSetModel(model, starSystemModel, parentBody?.model);
+    constructor(model: JuliaSetModel, scene: Scene) {
+        this.model = model;
 
-        this.name = this.model.name;
-
-        this.parent = parentBody;
-
-        this.transform = new TransformNode(this.name, scene);
+        this.transform = new TransformNode(this.model.name, scene);
 
         this.postProcesses.push(PostProcessType.JULIA_SET);
 
-        this.getTransform().rotate(Axis.X, this.model.physicalProperties.axialTilt);
+        this.getTransform().rotate(Axis.X, this.model.physics.axialTilt);
     }
 
     getTransform(): TransformNode {
@@ -72,22 +57,6 @@ export class JuliaSet implements Anomaly, Cullable {
 
     getRotationAxis(): Vector3 {
         return this.getTransform().up;
-    }
-
-    getOrbitProperties(): Orbit {
-        return this.model.orbit;
-    }
-
-    getPhysicalProperties(): OrbitalObjectPhysicalProperties {
-        return this.model.physicalProperties;
-    }
-
-    getRingsUniforms(): RingsUniforms | null {
-        return null;
-    }
-
-    getAsteroidField(): AsteroidField | null {
-        return null;
     }
 
     getRadius(): number {
@@ -99,7 +68,7 @@ export class JuliaSet implements Anomaly, Cullable {
     }
 
     getTypeName(): string {
-        return this.model.typeName;
+        return orbitalObjectTypeToDisplay(this.model);
     }
 
     computeCulling(cameras: Camera[]): void {

@@ -1,17 +1,34 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Affero General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Affero General Public License for more details.
+//
+//  You should have received a copy of the GNU Affero General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { MissionNode, MissionNodeSerialized, MissionNodeType } from "../../missionNode";
 import { MissionContext } from "../../../missionContext";
-import { UniverseObjectId, universeObjectIdEquals } from "../../../../saveFile/universeCoordinates";
+import { StarSystemCoordinates, starSystemCoordinatesEquals, UniverseObjectId, universeObjectIdEquals } from "../../../../utils/coordinates/universeCoordinates";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { CollisionMask, Settings } from "../../../../settings";
-import { getObjectBySystemId, getObjectModelByUniverseId } from "../../../../utils/orbitalObjectId";
-import { getStarGalacticPosition, getSystemModelFromCoordinates } from "../../../../utils/starSystemCoordinatesUtils";
+import { getObjectBySystemId, getObjectModelByUniverseId } from "../../../../utils/coordinates/orbitalObjectId";
+import { getStarGalacticPosition } from "../../../../utils/coordinates/starSystemCoordinatesUtils";
 import i18n from "../../../../i18n";
-import { parseDistance } from "../../../../utils/parseToStrings";
+import { parseDistance } from "../../../../utils/strings/parseToStrings";
 import { getGlobalKeyboardLayoutMap } from "../../../../utils/keyboardAPI";
-import { pressInteractionToStrings } from "../../../../utils/inputControlsString";
+import { pressInteractionToStrings } from "../../../../utils/strings/inputControlsString";
 import { GeneralInputs } from "../../../../inputs/generalInputs";
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../../../../starSystem/starSystemModel";
+import { getSystemModelFromCoordinates } from "../../../../starSystem/modelFromCoordinates";
 
 const enum LandMissionState {
     NOT_IN_SYSTEM,
@@ -65,7 +82,7 @@ export class MissionTerminatorLandingNode implements MissionNode {
         const currentSystemModel = currentSystem.model;
 
         // Skip if the current system is not the one we are looking for
-        if (!starSystemCoordinatesEquals(currentSystemModel.getCoordinates(), this.targetSystemCoordinates)) {
+        if (!starSystemCoordinatesEquals(currentSystemModel.coordinates, this.targetSystemCoordinates)) {
             this.state = LandMissionState.NOT_IN_SYSTEM;
             return;
         }
@@ -92,10 +109,14 @@ export class MissionTerminatorLandingNode implements MissionNode {
                 return;
             }
 
-            const starTransform = currentSystem.stellarObjects[0].getTransform();
+            const stellarObjects = currentSystem.getStellarObjects();
+            const stellarMassSum = stellarObjects.reduce((sum, stellarObject) => sum + stellarObject.model.physics.mass, 0);
+            const stellarBarycenter = stellarObjects
+                .reduce((sum, stellarObject) => sum.add(stellarObject.getTransform().getAbsolutePosition().scale(stellarObject.model.physics.mass)), Vector3.Zero())
+                .scaleInPlace(1 / stellarMassSum);
 
             const objectToPlayer = downDirection.negate();
-            const targetToStar = starTransform.getAbsolutePosition().subtract(targetObjectPosition).normalize();
+            const targetToStar = stellarBarycenter.subtract(targetObjectPosition).normalize();
 
             if (Math.abs(Vector3.Dot(objectToPlayer, targetToStar)) > Math.cos(Math.PI / 6)) {
                 this.state = LandMissionState.TOO_FAR_IN_SYSTEM;
@@ -134,7 +155,7 @@ export class MissionTerminatorLandingNode implements MissionNode {
         const currentSystemModel = context.currentSystem.model;
 
         const targetSystemPosition = getStarGalacticPosition(this.targetSystemCoordinates);
-        const currentSystemPosition = getStarGalacticPosition(currentSystemModel.getCoordinates());
+        const currentSystemPosition = getStarGalacticPosition(currentSystemModel.coordinates);
         const distance = Vector3.Distance(targetSystemPosition, currentSystemPosition);
 
         const targetObject = getObjectModelByUniverseId(this.objectId);

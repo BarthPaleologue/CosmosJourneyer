@@ -22,6 +22,7 @@ import { generateInfoHTML } from "./spaceStationInfos";
 import { Player } from "../../player/player";
 import { generateMissionsDom } from "./spaceStationMissions";
 import { Settings } from "../../settings";
+import { OrbitalObjectModel } from "../../architecture/orbitalObject";
 
 const enum MainPanelState {
     NONE,
@@ -34,6 +35,7 @@ export class SpaceStationLayer {
     private spaceStationHeader: HTMLElement;
 
     private currentStation: SpaceStationModel | null = null;
+    private currentStationParents: OrbitalObjectModel[] = [];
 
     private readonly playerName: HTMLElement;
     private readonly playerBalance: HTMLElement;
@@ -107,7 +109,7 @@ export class SpaceStationLayer {
                     throw new Error("No current station");
                 }
                 this.mainPanel.classList.remove("hidden");
-                this.mainPanel.innerHTML = generateInfoHTML(this.currentStation);
+                this.mainPanel.innerHTML = generateInfoHTML(this.currentStation, this.currentStationParents);
                 break;
             case MainPanelState.MISSIONS:
                 if (this.currentStation === null) {
@@ -133,8 +135,9 @@ export class SpaceStationLayer {
         return this.parentNode.style.visibility !== "hidden";
     }
 
-    public setStation(station: SpaceStationModel, player: Player) {
+    public setStation(station: SpaceStationModel, stationParents: OrbitalObjectModel[], player: Player) {
         this.currentStation = station;
+        this.currentStationParents = stationParents;
         this.spaceStationHeader.innerHTML = `
             <p class="welcomeTo">Welcome to</p>
             <p class="spaceStationName">${station.name}</p>`;

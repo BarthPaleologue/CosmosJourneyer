@@ -17,12 +17,13 @@
 
 import "../styles/index.scss";
 
-import { StarSystemController } from "./starSystem/starSystemController";
-
 import { positionNearObjectBrightSide } from "./utils/positionNearObject";
 import { CosmosJourneyer } from "./cosmosJourneyer";
-import { CustomStarSystemModel } from "./starSystem/customStarSystemModel";
-import { BodyType } from "./architecture/bodyType";
+
+import { newSeededBlackHoleModel } from "./stellarObjects/blackHole/blackHoleModel";
+import { StarSystemModel } from "./starSystem/starSystemModel";
+import { CustomSystemRegistry } from "./starSystem/customSystemRegistry";
+import { newSeededTelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModel";
 
 const engine = await CosmosJourneyer.CreateAsync();
 
@@ -30,9 +31,15 @@ const starSystemView = engine.starSystemView;
 
 const scene = starSystemView.scene;
 
-const starSystemModel = new CustomStarSystemModel(
-    "Black Hole Demo",
-    {
+const blackHoleModel = newSeededBlackHoleModel(42, "Gargantua", []);
+
+const millerPlanetModel = newSeededTelluricPlanetModel(47, "Miller", [blackHoleModel]);
+millerPlanetModel.orbit.radius = blackHoleModel.physics.accretionDiskRadius * 4;
+millerPlanetModel.orbit.normalToPlane.x += 0.2;
+
+const starSystemModel: StarSystemModel = {
+    name: "Black Hole Demo",
+    coordinates: {
         starSectorX: 0,
         starSectorY: 0,
         starSectorZ: 0,
@@ -40,20 +47,26 @@ const starSystemModel = new CustomStarSystemModel(
         localY: 0,
         localZ: 0
     },
-    [[BodyType.BLACK_HOLE, 0]],
-    [[BodyType.TELLURIC_PLANET, 42]],
-    []
-);
-const starSystem = new StarSystemController(starSystemModel, scene);
+    subSystems: [
+        {
+            stellarObjects: [blackHoleModel],
+            planetarySystems: [{ planets: [millerPlanetModel], satellites: [], spaceStations: [] }],
+            anomalies: [],
+            spaceStations: []
+        }
+    ]
+};
 
-await starSystemView.loadStarSystem(starSystem, true);
+CustomSystemRegistry.RegisterSystem(starSystemModel);
+
+const starSystem = await starSystemView.loadStarSystem(starSystemModel);
 
 engine.init(true);
 
 await starSystemView.switchToDefaultControls(true);
 
-const BH = starSystem.stellarObjects[0];
+const BH = starSystem.getStellarObjects()[0];
 
 starSystemView.getDefaultControls().speed = BH.getBoundingRadius();
 
-positionNearObjectBrightSide(scene.getActiveControls(), BH, starSystem, 20);
+positionNearObjectBrightSide(scene.getActiveControls(), BH, starSystem, 5);

@@ -1,11 +1,12 @@
-import { getStarGalacticPosition } from "./starSystemCoordinatesUtils";
+import { getStarGalacticPosition } from "./coordinates/starSystemCoordinatesUtils";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { StarSector } from "../starmap/starSector";
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../starSystem/starSystemModel";
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "./coordinates/universeCoordinates";
+import { Settings } from "../settings";
 
 export function getNeighborStarSystemCoordinates(starSystemCoordinates: StarSystemCoordinates, radius: number): [StarSystemCoordinates, Vector3, number][] {
     const currentSystemPosition = getStarGalacticPosition(starSystemCoordinates);
-    const starSectorSize = StarSector.SIZE;
+    const starSectorSize = Settings.STAR_SECTOR_SIZE;
     const starSectorRadius = Math.ceil(radius / starSectorSize);
 
     const starSectors: StarSector[] = [];

@@ -17,6 +17,11 @@
 
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { Scene } from "@babylonjs/core/scene";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { CollisionMask } from "../settings";
 
 /**
  *
@@ -58,4 +63,13 @@ export function setMaxLinVel(havokPlugin: HavokPlugin, maxLinVel: number, maxAng
     tsbuf[201] = maxAngVel;
     tsbuf[228] = maxLinVel;
     tsbuf[229] = maxAngVel;
+}
+
+export function createEnvironmentAggregate(mesh: AbstractMesh, physicsShapeType: PhysicsShapeType, scene: Scene): PhysicsAggregate {
+    const aggregate = new PhysicsAggregate(mesh, physicsShapeType, { mass: 0 }, scene);
+    aggregate.body.disablePreStep = false;
+    aggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+    aggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
+
+    return aggregate;
 }

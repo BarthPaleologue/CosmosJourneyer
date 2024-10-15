@@ -15,100 +15,62 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { seededSquirrelNoise } from "squirrel-noise";
-
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { normalRandom, randRange } from "extended-random";
 import { clamp } from "../../utils/math";
 import { getOrbitalPeriod, getPeriapsis, Orbit } from "../../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { PlanetPhysicalProperties } from "../../architecture/physicalProperties";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
-import { BodyType } from "../../architecture/bodyType";
 import { GenerationSteps } from "../../utils/generationSteps";
-import { wheelOfFortune } from "../../utils/random";
-import { ReversedGreekAlphabet } from "../../utils/parseToStrings";
-import { StarSystemModel } from "../../starSystem/starSystemModel";
-import i18n from "../../i18n";
+import { OrbitalObjectPhysicsInfo } from "../../architecture/physicsInfo";
+import { AnomalyModel } from "../anomaly";
 
-export class MandelbulbModel implements CelestialBodyModel {
-    readonly name;
+import { getRngFromSeed } from "../../utils/getRngFromSeed";
+import { OrbitalObjectType } from "../../architecture/orbitalObject";
 
-    readonly bodyType = BodyType.ANOMALY;
-    readonly seed: number;
-    readonly rng: (step: number) => number;
-
-    readonly radius: number;
-
-    readonly orbit: Orbit;
-
-    readonly physicalProperties: PlanetPhysicalProperties;
-
-    readonly parentBody: CelestialBodyModel | null;
-
-    readonly childrenBodies: CelestialBodyModel[] = [];
-
-    readonly nbMoons: number;
-
+export type MandelbulbModel = AnomalyModel & {
+    readonly type: OrbitalObjectType.MANDELBULB;
     readonly power: number;
     readonly accentColor: Color3;
+};
 
-    readonly starSystemModel: StarSystemModel;
+export function newSeededMandelbulbModel(seed: number, name: string, parentBodies: CelestialBodyModel[]): MandelbulbModel {
+    const rng = getRngFromSeed(seed);
 
-    readonly rings = null;
+    const radius = 1000e3;
 
-    readonly typeName: string;
+    const power = randRange(4.0, 8.0, rng, GenerationSteps.POWER);
+    const accentColor = Color3.FromHSV(360 * rng(GenerationSteps.ACCENT_COLOR), rng(GenerationSteps.ACCENT_COLOR + 123) * 0.5, 0.8);
 
-    constructor(seed: number, starSystemModel: StarSystemModel, parentBody?: CelestialBodyModel) {
-        this.seed = seed;
-        this.rng = seededSquirrelNoise(this.seed);
+    // Todo: do not hardcode
+    let orbitRadius = rng(GenerationSteps.ORBIT) * 15e9;
 
-        this.starSystemModel = starSystemModel;
+    const orbitalP = clamp(0.5, 3.0, normalRandom(1.0, 0.3, rng, GenerationSteps.ORBIT + 80));
+    orbitRadius += orbitRadius - getPeriapsis(orbitRadius, orbitalP);
 
-        const anomalyIndex = this.starSystemModel.getAnomalies().findIndex(([_, anomalySeed]) => anomalySeed === this.seed);
-        this.name = `${this.starSystemModel.name} ${ReversedGreekAlphabet[anomalyIndex].toUpperCase()}`;
+    const parentMassSum = parentBodies?.reduce((sum, body) => sum + body.physics.mass, 0) ?? 0;
+    const orbit: Orbit = {
+        radius: orbitRadius,
+        p: orbitalP,
+        period: getOrbitalPeriod(orbitRadius, parentMassSum),
+        normalToPlane: Vector3.Up()
+    };
 
-        this.radius = 1000e3;
+    const physicalProperties: OrbitalObjectPhysicsInfo = {
+        mass: 10,
+        rotationPeriod: 0,
+        axialTilt: normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT)
+    };
 
-        this.parentBody = parentBody ?? null;
-
-        this.power = randRange(4.0, 8.0, this.rng, GenerationSteps.POWER);
-        this.accentColor = Color3.FromHSV(360 * this.rng(GenerationSteps.ACCENT_COLOR), this.rng(GenerationSteps.ACCENT_COLOR + 123) * 0.5, 0.8);
-
-        // Todo: do not hardcode
-        let orbitRadius = this.rng(GenerationSteps.ORBIT) * 15e9;
-
-        const orbitalP = clamp(0.5, 3.0, normalRandom(1.0, 0.3, this.rng, GenerationSteps.ORBIT + 80));
-        orbitRadius += orbitRadius - getPeriapsis(orbitRadius, orbitalP);
-
-        this.orbit = {
-            radius: orbitRadius,
-            p: orbitalP,
-            period: getOrbitalPeriod(orbitRadius, this.parentBody?.physicalProperties.mass ?? 0),
-            normalToPlane: Vector3.Up()
-        };
-
-        this.physicalProperties = {
-            mass: 10,
-            rotationPeriod: 0,
-            axialTilt: normalRandom(0, 0.4, this.rng, GenerationSteps.AXIAL_TILT),
-            minTemperature: -180,
-            maxTemperature: 100,
-            pressure: 0
-        };
-
-        this.nbMoons = wheelOfFortune(
-            [
-                [0, 0.95],
-                [1, 0.5]
-            ],
-            this.rng(GenerationSteps.NB_MOONS)
-        );
-
-        this.typeName = i18n.t("objectTypes:anomaly");
-    }
-
-    getApparentRadius(): number {
-        return this.radius;
-    }
+    return {
+        seed,
+        radius,
+        rings: null,
+        name,
+        type: OrbitalObjectType.MANDELBULB,
+        accentColor,
+        power,
+        orbit,
+        physics: physicalProperties
+    };
 }

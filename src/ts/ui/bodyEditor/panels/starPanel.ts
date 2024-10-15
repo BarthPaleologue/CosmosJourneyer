@@ -18,19 +18,16 @@
 import { EditorPanel } from "../editorPanel";
 import { Slider } from "handle-sliderjs";
 import { VolumetricLight } from "../../../postProcesses/volumetricLight";
-import { Star } from "../../../stellarObjects/star/star";
 
 export class StarPanel extends EditorPanel {
     constructor() {
         super("starPhysic");
     }
-    init(star: Star, volumetricLight: VolumetricLight) {
+
+    init(volumetricLight: VolumetricLight) {
         for (const slider of this.sliders) slider.remove();
 
         this.sliders = [
-            new Slider("temperature", document.getElementById("temperature") as HTMLElement, 3000, 15000, star.model.physicalProperties.temperature, (val: number) => {
-                star.model.setSurfaceTemperature(val);
-            }),
             new Slider("starExposure", document.getElementById("starExposure") as HTMLElement, 0, 200, volumetricLight.exposure * 100, (val: number) => {
                 volumetricLight.exposure = val / 100;
             }),

@@ -16,8 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Settings } from "../settings";
-import { clamp } from "../utils/math";
-import { moveTowards } from "../utils/moveTowards";
+import { clamp, moveTowards } from "../utils/math";
 
 const enum WarpDriveState {
     /**

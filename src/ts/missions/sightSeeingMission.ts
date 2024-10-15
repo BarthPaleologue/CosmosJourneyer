@@ -1,7 +1,24 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Affero General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Affero General Public License for more details.
+//
+//  You should have received a copy of the GNU Affero General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { Mission, MissionType } from "./mission";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
-import { SystemObjectType, UniverseObjectId } from "../saveFile/universeCoordinates";
-import { getStarGalacticPosition } from "../utils/starSystemCoordinatesUtils";
+import { SystemObjectType, UniverseObjectId } from "../utils/coordinates/universeCoordinates";
+import { getStarGalacticPosition } from "../utils/coordinates/starSystemCoordinatesUtils";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MissionNode } from "./nodes/missionNode";
 import { MissionFlyByNode } from "./nodes/actions/sightseeing/missionFlyByNode";
@@ -45,7 +62,7 @@ export function newSightSeeingMission(missionGiver: SpaceStationModel, target: S
 
     const targetSystemCoordinates = target.objectId.starSystemCoordinates;
 
-    const missionGiverGalacticCoordinates = getStarGalacticPosition(missionGiver.starSystem.getCoordinates());
+    const missionGiverGalacticCoordinates = getStarGalacticPosition(missionGiver.starSystemCoordinates);
 
     const targetGalacticCoordinates = getStarGalacticPosition(targetSystemCoordinates);
     const distanceLY = Vector3.Distance(missionGiverGalacticCoordinates, targetGalacticCoordinates);

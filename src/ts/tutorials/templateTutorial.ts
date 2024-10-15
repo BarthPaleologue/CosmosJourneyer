@@ -1,5 +1,5 @@
 import { TutorialControlsInputs } from "../ui/tutorial/tutorialLayerInputs";
-import { pressInteractionToStrings } from "../utils/inputControlsString";
+import { pressInteractionToStrings } from "../utils/strings/inputControlsString";
 import { Tutorial } from "./tutorial";
 
 import welcomeImageSrc from "../../asset/tutorials/flightTutorial/welcome.webp";

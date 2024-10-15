@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { EditorPanel } from "../editorPanel";
-import { stripAxisFromQuaternion } from "../../../utils/algebra";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Slider } from "handle-sliderjs";
 import { Settings } from "../../../settings";
@@ -39,21 +38,20 @@ export class GeneralPanel extends EditorPanel {
 
         for (const slider of this.sliders) slider.remove();
 
-        let axialTiltX = stripAxisFromQuaternion(getRotationQuaternion(body.getTransform()), Axis.Y).toEulerAngles().x;
-        let axialTiltZ = stripAxisFromQuaternion(getRotationQuaternion(body.getTransform()), Axis.Y).toEulerAngles().z;
+        const axialTilt = getRotationQuaternion(body.getTransform()).toEulerAngles();
 
         const power = 2.0;
 
         this.sliders = [
-            new Slider("axialTiltX", document.getElementById("axialTiltX") as HTMLElement, -180, 180, Math.round(Tools.ToDegrees(axialTiltX)), (val: number) => {
+            new Slider("axialTiltX", document.getElementById("axialTiltX") as HTMLElement, -180, 180, Math.round(Tools.ToDegrees(axialTilt.x)), (val: number) => {
                 const newAxialTilt = Tools.ToRadians(val);
-                rotate(body.getTransform(), Axis.X, newAxialTilt - axialTiltX);
-                axialTiltX = newAxialTilt;
+                rotate(body.getTransform(), Axis.X, newAxialTilt - axialTilt.x);
+                axialTilt.x = newAxialTilt;
             }),
-            new Slider("axialTiltZ", document.getElementById("axialTiltZ") as HTMLElement, -180, 180, Math.round(Tools.ToDegrees(axialTiltZ)), (val: number) => {
+            new Slider("axialTiltZ", document.getElementById("axialTiltZ") as HTMLElement, -180, 180, Math.round(Tools.ToDegrees(axialTilt.z)), (val: number) => {
                 const newAxialTilt = Tools.ToRadians(val);
-                rotate(body.getTransform(), Axis.Z, newAxialTilt - axialTiltZ);
-                axialTiltZ = newAxialTilt;
+                rotate(body.getTransform(), Axis.Z, newAxialTilt - axialTilt.z);
+                axialTilt.z = newAxialTilt;
             }),
             new Slider("cameraFOV", document.getElementById("cameraFOV") as HTMLElement, 0, 360, Tools.ToDegrees(Settings.FOV), (val: number) => {
                 scene.cameras.forEach((camera) => (camera.fov = Tools.ToRadians(val)));
