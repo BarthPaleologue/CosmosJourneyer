@@ -35,7 +35,7 @@ void main() {
     float ringDensity = completeNoise(fract(seed) + normalizedDistance * frequency, 5, 2.0, 2.0);
     ringDensity = mix(ringDensity, macroRingDensity, 0.5);
     ringDensity *= smoothstep(ringStart, ringStart + 0.03, normalizedDistance);
-    ringDensity *= smoothstep(ringEnd, ringEnd - 0.03, normalizedDistance);
+    ringDensity *= 1.0 - smoothstep(ringEnd - 0.03, ringEnd, normalizedDistance);
 
     ringDensity *= ringDensity;
 

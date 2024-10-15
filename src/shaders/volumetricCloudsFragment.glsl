@@ -63,7 +63,7 @@ float densityAtPoint(vec3 densitySamplePoint) {
     float density = cloudNoise * detailNoise;
 
     density *= smoothstep(0.1, 0.3, height01);
-    //density *= smoothstep(0.9, 0.7, height01);
+    //density *= 1.0 - smoothstep(0.7, 0.9, height01);
 
     //density = saturate(density);
 

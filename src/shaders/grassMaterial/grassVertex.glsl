@@ -88,7 +88,7 @@ void main() {
     vec3 playerDirection = (objectWorld - playerPosition) / objectDistance;
     float maxDistance = 3.0;
     float distance01 = objectDistance / maxDistance;
-    float influence = smoothstep(1.0, 0.0, distance01);
+    float influence = 1.0 - smoothstep(0.0, 1.0, distance01);
     curveAmount += influence;
     curveAmount += windLeanAngle * smoothstep(0.2, 1.0, distance01);
 
@@ -96,7 +96,7 @@ void main() {
     leanAxis = normalize(mix(cross(vec3(0.0, 1.0, 0.0), playerDirection), leanAxis, smoothstep(0.0, 1.0, 1.0 - distance01)));
 
     float scaling = 1.0 + 0.3 * (texture2D(perlinNoise, objectWorld.xz * 0.1).r * 2.0 - 1.0);
-    scaling *= smoothstep(90.0, 70.0, objectCameraDistance); // fade grass in the distance using scaling
+    scaling *= 1.0 - smoothstep(70.0, 90.0, objectCameraDistance); // fade grass in the distance using scaling
 
     vec3 terrainNormal = normalize(vec3(worldMatrix * vec4(0.0, 1.0, 0.0, 0.0)));
     vec3 sphereNormal = normalize(objectWorld - planetPosition);
