@@ -17,10 +17,11 @@
 
 import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates";
 import { StellarObjectModel } from "../architecture/stellarObject";
-import { PlanetModel } from "../architecture/planet";
+import { PlanetaryMassObjectModel } from "../architecture/planetaryMassObject";
 import { AnomalyModel } from "../anomalies/anomaly";
-import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
+import { PlanetModel } from "../architecture/planet";
+import { TelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModel";
 
 /**
  * Data model for a planetary system. It holds all the information necessary to generate and render a planetary system.
@@ -37,7 +38,7 @@ export type PlanetarySystemModel = {
     /**
      * The satellites of the planet.
      */
-    satellites: TelluricPlanetModel[];
+    satellites: TelluricSatelliteModel[];
 
     /**
      * The space stations orbiting the planet.
@@ -122,7 +123,7 @@ export class StarSystemModelUtils {
      * @param starSystem The star system to get the planets from.
      * @constructor
      */
-    static GetPlanets(starSystem: StarSystemModel): PlanetModel[] {
+    static GetPlanets(starSystem: StarSystemModel): PlanetaryMassObjectModel[] {
         return starSystem.subSystems.flatMap((subSystem) => subSystem.planetarySystems.flatMap((planetarySystem) => planetarySystem.planets));
     }
 
@@ -143,9 +144,9 @@ export class StarSystemModelUtils {
      * @param starSystem The star system to get the planetary mass objects from.
      * @constructor
      */
-    static GetPlanetaryMassObjects(starSystem: StarSystemModel): PlanetModel[] {
-        const planets: PlanetModel[] = [];
-        const satellites: PlanetModel[] = [];
+    static GetPlanetaryMassObjects(starSystem: StarSystemModel): PlanetaryMassObjectModel[] {
+        const planets: PlanetaryMassObjectModel[] = [];
+        const satellites: PlanetaryMassObjectModel[] = [];
         starSystem.subSystems.forEach((subSystem) =>
             subSystem.planetarySystems.forEach((planetarySystem) => {
                 planets.push(...planetarySystem.planets);

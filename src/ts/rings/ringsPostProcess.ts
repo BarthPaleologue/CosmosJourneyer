@@ -43,7 +43,7 @@ export class RingsPostProcess extends PostProcess implements ObjectPostProcess {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = ringsFragment;
         }
 
-        const ringsUniforms = body.getRingsUniforms();
+        const ringsUniforms = body.ringsUniforms;
         if (ringsUniforms === null) {
             throw new Error(
                 `RingsPostProcess: ringsUniforms are null. This should not be possible as the postprocess should not be created if the body has no rings. Body: ${body.model.name}`

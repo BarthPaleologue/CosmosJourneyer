@@ -15,9 +15,33 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export interface TypedObject {
+export type OrbitalObjectPhysicsInfo = {
+    mass: number;
     /**
-     * Returns the type name of the object. This is used as a short identifier in the UI Overlay of the object
+     * Time needed for the object to rotate on its axis in seconds
      */
-    getTypeName(): string;
-}
+    rotationPeriod: number;
+    axialTilt: number;
+};
+
+export type StellarObjectPhysicsInfo = OrbitalObjectPhysicsInfo & {
+    /**
+     * Black body temperature of the object in Kelvin
+     */
+    blackBodyTemperature: number;
+};
+
+export type BlackHolePhysicsInfo = StellarObjectPhysicsInfo & {
+    accretionDiskRadius: number;
+};
+
+export type PlanetaryMassObjectPhysicsInfo = OrbitalObjectPhysicsInfo & {
+    minTemperature: number;
+    maxTemperature: number;
+    pressure: number;
+};
+
+export type TelluricPlanetaryMassObjectPhysicsInfo = PlanetaryMassObjectPhysicsInfo & {
+    waterAmount: number;
+    oceanLevel: number;
+};

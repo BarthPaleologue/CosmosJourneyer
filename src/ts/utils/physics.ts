@@ -108,3 +108,29 @@ export function computeRingRotationPeriod(radius: number, gravity: number): numb
     // g = v * v / r and T = 2 * pi * r / v => v = sqrt(g * r) and T = 2 * pi * r / sqrt(g * r) = 2 * pi * sqrt(r / g)
     return 2 * Math.PI * Math.sqrt(radius / gravity);
 }
+
+export function hasLiquidWater(pressure: number, minTemperature: number, maxTemperature: number): boolean {
+    const waterBoilingPoint = waterBoilingPointCelsius(pressure);
+    const waterFreezingPoint = 0.0;
+    const epsilon = 0.05;
+    if (pressure > epsilon) {
+        // if temperature is too high, there is no ocean (desert world)
+        if (maxTemperature > waterBoilingPoint) return false;
+        // if temperature is too low, there is no ocean (frozen world)
+        if (maxTemperature < waterFreezingPoint) return false;
+    } else {
+        // if pressure is too low, there is no ocean (sterile world)
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ * Returns the Schwarzschild radius of an object given its mass
+ * @param mass The mass of the object in kilograms
+ * @returns the Schwarzschild radius of the object in meters
+ */
+export function getSchwarzschildRadius(mass: number): number {
+    return (2 * Settings.G * mass) / (Settings.C * Settings.C);
+}

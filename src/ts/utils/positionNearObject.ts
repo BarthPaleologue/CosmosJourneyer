@@ -121,7 +121,7 @@ export function positionNearObjectWithStarVisible(transformable: Controls, objec
 }
 
 export function positionNearObjectAsteroidField(body: Transformable & CanHaveRings & HasBoundingSphere, starSystem: StarSystemController): Vector3 {
-    const asteroidField = body.getAsteroidField();
+    const asteroidField = body.asteroidField;
     if (asteroidField === null) {
         throw new Error("The body does not have an asteroid field");
     }

@@ -21,7 +21,6 @@ import { Settings } from "./settings";
 import { positionNearObjectBrightSide } from "./utils/positionNearObject";
 import { CosmosJourneyer } from "./cosmosJourneyer";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { newSeededTelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModel";
 import { newSeededGasPlanetModel } from "./planets/gasPlanet/gasPlanetModel";
 import { SpaceShipControlsInputs } from "./spaceship/spaceShipControlsInputs";
 
@@ -30,6 +29,8 @@ import { newSeededSpaceStationModel } from "./spacestation/spacestationModel";
 import { StarSystemModel } from "./starSystem/starSystemModel";
 import { StarSystemCoordinates } from "./utils/coordinates/universeCoordinates";
 import { CustomSystemRegistry } from "./starSystem/customSystemRegistry";
+import { newSeededTelluricSatelliteModel } from "./planets/telluricPlanet/telluricSatelliteModel";
+import { newSeededTelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModel";
 
 const engine = await CosmosJourneyer.CreateAsync();
 
@@ -51,7 +52,7 @@ const systemCoordinates: StarSystemCoordinates = {
 };
 
 const sunModel = newSeededStarModel(420, "Weierstrass", []);
-sunModel.physics.temperature = 5778;
+sunModel.physics.blackBodyTemperature = 5778;
 sunModel.orbit.period = 60 * 60 * 24;
 
 /*const secundaModel = new StarModel(-672446, sunModel);
@@ -79,7 +80,7 @@ const spaceStationModel = newSeededSpaceStationModel(0, [sunModel], systemCoordi
     physicsViewer.showBody(landingpad.aggregate.body);
 }*/
 
-const moonModel = newSeededTelluricPlanetModel(23, "Manaleth", [hecateModel]);
+const moonModel = newSeededTelluricSatelliteModel(23, "Manaleth", [hecateModel]);
 moonModel.physics.mass = 2;
 moonModel.physics.rotationPeriod = 7 * 60 * 60;
 moonModel.physics.minTemperature = -180;

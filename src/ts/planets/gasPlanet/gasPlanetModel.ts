@@ -22,14 +22,14 @@ import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { clamp } from "../../utils/math";
 import { getOrbitalPeriod, getPeriapsis, Orbit } from "../../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { PlanetModel } from "../../architecture/planet";
-import { PlanetPhysicalProperties } from "../../architecture/physicalProperties";
+import { PlanetaryMassObjectPhysicsInfo } from "../../architecture/physicsInfo";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { newSeededRingsModel } from "../../rings/ringsModel";
 import { GenerationSteps } from "../../utils/generationSteps";
 
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { OrbitalObjectType } from "../../architecture/orbitalObject";
+import { PlanetModel } from "../../architecture/planet";
 
 export type GasPlanetModel = PlanetModel & {
     readonly type: OrbitalObjectType.GAS_PLANET;
@@ -60,7 +60,7 @@ export function newSeededGasPlanetModel(seed: number, name: string, parentBodies
         normalToPlane: orbitalPlaneNormal
     };
 
-    const physicalProperties: PlanetPhysicalProperties = {
+    const physicalProperties: PlanetaryMassObjectPhysicsInfo = {
         //FIXME: when Settings.Earth radius gets to 1:1 scale, change this value by a variable in settings
         mass: Settings.JUPITER_MASS * (radius / 69_911e3) ** 3,
         axialTilt: normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT),

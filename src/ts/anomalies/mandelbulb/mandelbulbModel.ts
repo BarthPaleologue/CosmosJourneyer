@@ -22,7 +22,7 @@ import { getOrbitalPeriod, getPeriapsis, Orbit } from "../../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { GenerationSteps } from "../../utils/generationSteps";
-import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
+import { OrbitalObjectPhysicsInfo } from "../../architecture/physicsInfo";
 import { AnomalyModel } from "../anomaly";
 
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
@@ -56,7 +56,7 @@ export function newSeededMandelbulbModel(seed: number, name: string, parentBodie
         normalToPlane: Vector3.Up()
     };
 
-    const physicalProperties: OrbitalObjectPhysicalProperties = {
+    const physicalProperties: OrbitalObjectPhysicsInfo = {
         mass: 10,
         rotationPeriod: 0,
         axialTilt: normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT)

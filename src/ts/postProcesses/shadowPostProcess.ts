@@ -52,7 +52,7 @@ export class ShadowPostProcess extends PostProcess implements ObjectPostProcess 
         }
 
         const shadowUniforms: ShadowUniforms = {
-            hasRings: body.getRingsUniforms() !== null,
+            hasRings: body.ringsUniforms !== null,
             hasClouds: body.postProcesses.includes(PostProcessType.CLOUDS),
             hasOcean: body.postProcesses.includes(PostProcessType.OCEAN)
         };
@@ -90,7 +90,7 @@ export class ShadowPostProcess extends PostProcess implements ObjectPostProcess 
 
         this.object = body;
         this.shadowUniforms = shadowUniforms;
-        this.ringsUniforms = body.getRingsUniforms();
+        this.ringsUniforms = body.ringsUniforms;
 
         this.onActivateObservable.add((camera) => {
             this.activeCamera = camera;

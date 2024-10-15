@@ -29,7 +29,6 @@ import { Alphabet, ReversedGreekAlphabet } from "../utils/strings/parseToStrings
 import { newSeededStarModel } from "../stellarObjects/star/starModel";
 import { newSeededBlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
-import { newSeededTelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 import { newSeededGasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 import { newSeededMandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModel";
 import { newSeededJuliaSetModel } from "../anomalies/julia/juliaSetModel";
@@ -39,6 +38,8 @@ import { newSeededSpaceStationModel } from "../spacestation/spacestationModel";
 import { SystemSeed } from "./systemSeed";
 import { isSystemInHumanBubble } from "../society/starSystemSociety";
 import { OrbitalObjectType } from "../architecture/orbitalObject";
+import { newSeededTelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModel";
+import { newSeededTelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 
 const enum GenerationSteps {
     NAME,
@@ -144,7 +145,7 @@ export function newSeededStarSystemModel(seed: SystemSeed): StarSystemModel {
         for (let j = 0; j < nbMoons; j++) {
             const satelliteName = `${planetarySystemName}${Alphabet[j]}`;
             const satelliteSeed = centeredRand(planetarySystemRng, GenerationSteps.MOONS + j) * Settings.SEED_HALF_RANGE;
-            const satelliteModel = newSeededTelluricPlanetModel(satelliteSeed, satelliteName, planets);
+            const satelliteModel = newSeededTelluricSatelliteModel(satelliteSeed, satelliteName, planets);
             satellites.push(satelliteModel);
         }
     });

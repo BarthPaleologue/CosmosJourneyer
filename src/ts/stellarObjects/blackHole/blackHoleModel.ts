@@ -18,7 +18,7 @@
 import { getOrbitalPeriod, Orbit } from "../../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { normalRandom } from "extended-random";
-import { BlackHolePhysicalProperties } from "../../architecture/physicalProperties";
+import { BlackHolePhysicsInfo } from "../../architecture/physicsInfo";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { StellarObjectModel } from "../../architecture/stellarObject";
 import { Settings } from "../../settings";
@@ -35,7 +35,7 @@ export type BlackHoleModel = StellarObjectModel & {
      */
     readonly radius: number;
 
-    readonly physics: BlackHolePhysicalProperties;
+    readonly physics: BlackHolePhysicsInfo;
 };
 
 export function newSeededBlackHoleModel(seed: number, name: string, parentBodies: CelestialBodyModel[]): BlackHoleModel {
@@ -57,14 +57,14 @@ export function newSeededBlackHoleModel(seed: number, name: string, parentBodies
         normalToPlane: Vector3.Up()
     };
 
-    const physicalProperties: BlackHolePhysicalProperties = {
+    const physicalProperties: BlackHolePhysicsInfo = {
         mass: getMassFromSchwarzschildRadius(radius),
         //FIXME: do not hardcode
         rotationPeriod: 1.5e-19,
         axialTilt: normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT),
         accretionDiskRadius: radius * normalRandom(12, 3, rng, 7777),
         //TODO: compute temperature of accretion disk (function of rotation speed)
-        temperature: 7_000
+        blackBodyTemperature: 7_000
     };
 
     return {
@@ -76,15 +76,6 @@ export function newSeededBlackHoleModel(seed: number, name: string, parentBodies
         physics: physicalProperties,
         orbit
     };
-}
-
-/**
- * Returns the Schwarzschild radius of an object given its mass
- * @param mass The mass of the object in kilograms
- * @returns the Schwarzschild radius of the object in meters
- */
-export function getSchwarzschildRadius(mass: number): number {
-    return (2 * Settings.G * mass) / (Settings.C * Settings.C);
 }
 
 /**

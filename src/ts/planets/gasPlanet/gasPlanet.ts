@@ -25,7 +25,6 @@ import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
-import { Planet } from "../../architecture/planet";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
@@ -35,6 +34,7 @@ import { Transformable } from "../../architecture/transformable";
 import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { orbitalObjectTypeToDisplay } from "../../utils/strings/orbitalObjectTypeToDisplay";
+import { Planet } from "../../architecture/planet";
 
 export class GasPlanet implements Planet, Cullable {
     private readonly mesh: Mesh;
@@ -46,7 +46,7 @@ export class GasPlanet implements Planet, Cullable {
     postProcesses: PostProcessType[] = [];
 
     readonly ringsUniforms: RingsUniforms | null;
-    private readonly asteroidField: AsteroidField | null;
+    readonly asteroidField: AsteroidField | null;
 
     /**
      * New Gas Planet
@@ -112,14 +112,6 @@ export class GasPlanet implements Planet, Cullable {
 
     getRotationAxis(): Vector3 {
         return this.getTransform().up;
-    }
-
-    getRingsUniforms(): RingsUniforms | null {
-        return this.ringsUniforms;
-    }
-
-    getAsteroidField(): AsteroidField | null {
-        return this.asteroidField;
     }
 
     getTypeName(): string {

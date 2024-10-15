@@ -19,7 +19,7 @@ import { normalRandom } from "extended-random";
 import { clamp } from "../../utils/math";
 import { getOrbitalPeriod, getPeriapsis, Orbit } from "../../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
+import { OrbitalObjectPhysicsInfo } from "../../architecture/physicsInfo";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
@@ -54,7 +54,7 @@ export function newSeededJuliaSetModel(seed: number, name: string, parentBodies:
         normalToPlane: Vector3.Up()
     };
 
-    const physicalProperties: OrbitalObjectPhysicalProperties = {
+    const physicalProperties: OrbitalObjectPhysicsInfo = {
         mass: 10,
         rotationPeriod: 0,
         axialTilt: normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT)

@@ -32,20 +32,15 @@ import { Light } from "@babylonjs/core/Lights/light";
 import { setRotationQuaternion } from "../../uberCore/transforms/basicTransform";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import { RingsUniforms } from "../../rings/ringsUniform";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
 import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
-import { Orbit } from "../../orbit/orbit";
-
 import { orbitalObjectTypeToDisplay } from "../../utils/strings/orbitalObjectTypeToDisplay";
 
 export class NeutronStar implements StellarObject, Cullable {
     readonly model: NeutronStarModel;
-
-    readonly name: string;
 
     readonly mesh: Mesh;
     readonly light: PointLight;
@@ -58,7 +53,7 @@ export class NeutronStar implements StellarObject, Cullable {
 
     readonly ringsUniforms: RingsUniforms | null;
 
-    private readonly asteroidField: AsteroidField | null;
+    readonly asteroidField: AsteroidField | null;
 
     /**
      * New Star
@@ -67,10 +62,9 @@ export class NeutronStar implements StellarObject, Cullable {
      */
     constructor(model: NeutronStarModel, scene: Scene) {
         this.model = model;
-        this.name = this.model.name;
 
         this.mesh = MeshBuilder.CreateSphere(
-            this.name,
+            this.model.name,
             {
                 diameter: this.model.radius * 2,
                 segments: 32
@@ -93,7 +87,7 @@ export class NeutronStar implements StellarObject, Cullable {
         this.aggregate.shape.addChildFromParent(this.getTransform(), physicsShape, this.mesh);
 
         this.light = new PointLight(`${name}Light`, Vector3.Zero(), scene);
-        this.light.diffuse.fromArray(getRgbFromTemperature(this.model.physics.temperature).asArray());
+        this.light.diffuse.fromArray(getRgbFromTemperature(this.model.physics.blackBodyTemperature).asArray());
         this.light.falloffType = Light.FALLOFF_STANDARD;
         this.light.parent = this.getTransform();
 
@@ -131,14 +125,6 @@ export class NeutronStar implements StellarObject, Cullable {
 
     getLight(): PointLight {
         return this.light;
-    }
-
-    getRingsUniforms(): RingsUniforms | null {
-        return this.ringsUniforms;
-    }
-
-    getAsteroidField(): AsteroidField | null {
-        return this.asteroidField;
     }
 
     public updateMaterial(deltaTime: number): void {

@@ -21,7 +21,7 @@ import { newSightSeeingMission } from "./sightSeeingMission";
 import { uniformRandBool } from "extended-random";
 import { SystemObjectType } from "../utils/coordinates/universeCoordinates";
 import { Player } from "../player/player";
-import { hasLiquidWater, TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
+import { TelluricPlanetaryMassObjectModel } from "../planets/telluricPlanet/telluricPlanetaryMassObjectModel";
 import { Mission, MissionType } from "./mission";
 import { StarSystemModel, StarSystemModelUtils } from "../starSystem/starSystemModel";
 import { getRngFromSeed } from "../utils/getRngFromSeed";
@@ -110,8 +110,8 @@ export function generateSightseeingMissions(spaceStationModel: SpaceStationModel
         }
 
         if (celestialBodyModel.type === OrbitalObjectType.TELLURIC_PLANET) {
-            const telluricPlanetModel = celestialBodyModel as TelluricPlanetModel;
-            if (!hasLiquidWater(telluricPlanetModel)) {
+            const telluricPlanetModel = celestialBodyModel as TelluricPlanetaryMassObjectModel;
+            if (telluricPlanetModel.physics.oceanLevel === 0) {
                 terminatorLandingMissions.push(
                     newSightSeeingMission(spaceStationModel, {
                         type: MissionType.SIGHT_SEEING_TERMINATOR_LANDING,

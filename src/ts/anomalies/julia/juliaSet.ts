@@ -21,10 +21,8 @@ import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
-import { RingsUniforms } from "../../rings/ringsUniform";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Cullable } from "../../utils/cullable";
-import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { CelestialBody } from "../../architecture/celestialBody";
 import { orbitalObjectTypeToDisplay } from "../../utils/strings/orbitalObjectTypeToDisplay";
 
@@ -34,6 +32,9 @@ export class JuliaSet implements CelestialBody, Cullable {
     private readonly transform: TransformNode;
 
     readonly postProcesses: PostProcessType[] = [];
+
+    readonly ringsUniforms = null;
+    readonly asteroidField = null;
 
     /**
      * New Gas Planet
@@ -56,14 +57,6 @@ export class JuliaSet implements CelestialBody, Cullable {
 
     getRotationAxis(): Vector3 {
         return this.getTransform().up;
-    }
-
-    getRingsUniforms(): RingsUniforms | null {
-        return null;
-    }
-
-    getAsteroidField(): AsteroidField | null {
-        return null;
     }
 
     getRadius(): number {

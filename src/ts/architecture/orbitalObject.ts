@@ -19,7 +19,7 @@ import { Transformable } from "./transformable";
 import { HasBoundingSphere } from "./hasBoundingSphere";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math";
 import { getRotationQuaternion, setRotationQuaternion, translate } from "../uberCore/transforms/basicTransform";
-import { OrbitalObjectPhysicalProperties } from "./physicalProperties";
+import { OrbitalObjectPhysicsInfo } from "./physicsInfo";
 import { TypedObject } from "./typedObject";
 import { getPointOnOrbit, Orbit } from "../orbit/orbit";
 
@@ -130,7 +130,7 @@ export type OrbitalObjectModel = {
     /**
      * Physical properties of the object
      */
-    readonly physics: OrbitalObjectPhysicalProperties;
+    readonly physics: OrbitalObjectPhysicsInfo;
 };
 
 export const enum OrbitalObjectType {

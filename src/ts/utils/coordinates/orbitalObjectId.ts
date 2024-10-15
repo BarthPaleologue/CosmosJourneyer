@@ -2,7 +2,7 @@ import { OrbitalObject, OrbitalObjectModel } from "../../architecture/orbitalObj
 import { StarSystemController } from "../../starSystem/starSystemController";
 import { StellarObject } from "../../architecture/stellarObject";
 import { SystemObjectId, UniverseObjectId, SystemObjectType } from "./universeCoordinates";
-import { Planet } from "../../architecture/planet";
+import { PlanetaryMassObject } from "../../architecture/planetaryMassObject";
 import { SpaceStation } from "../../spacestation/spaceStation";
 import { SpaceStationModel } from "../../spacestation/spacestationModel";
 import { getSystemModelFromCoordinates } from "../../starSystem/modelFromCoordinates";
@@ -19,7 +19,7 @@ export function getSystemObjectId(orbitalObject: OrbitalObject, starSystem: Star
     let objectIndex: number;
     if ((objectIndex = starSystem.getStellarObjects().indexOf(orbitalObject as StellarObject)) !== -1) {
         objectType = SystemObjectType.STELLAR_OBJECT;
-    } else if ((objectIndex = starSystem.getPlanetaryMassObjects().indexOf(orbitalObject as Planet)) !== -1) {
+    } else if ((objectIndex = starSystem.getPlanetaryMassObjects().indexOf(orbitalObject as PlanetaryMassObject)) !== -1) {
         objectType = SystemObjectType.PLANETARY_MASS_OBJECT;
     } else if ((objectIndex = starSystem.getAnomalies().indexOf(orbitalObject as CelestialBody)) !== -1) {
         objectType = SystemObjectType.ANOMALY;

@@ -26,8 +26,6 @@ import { BlackHoleModel } from "./blackHoleModel";
 import { StellarObject } from "../../architecture/stellarObject";
 import { Cullable } from "../../utils/cullable";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { RingsUniforms } from "../../rings/ringsUniform";
-import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { orbitalObjectTypeToDisplay } from "../../utils/strings/orbitalObjectTypeToDisplay";
 
 export class BlackHole implements StellarObject, Cullable {
@@ -40,6 +38,10 @@ export class BlackHole implements StellarObject, Cullable {
     readonly model: BlackHoleModel;
 
     readonly postProcesses: PostProcessType[] = [];
+
+    readonly ringsUniforms = null;
+
+    readonly asteroidField = null;
 
     constructor(model: BlackHoleModel, scene: Scene) {
         this.model = model;
@@ -68,14 +70,6 @@ export class BlackHole implements StellarObject, Cullable {
 
     getLight(): PointLight {
         return this.light;
-    }
-
-    getRingsUniforms(): RingsUniforms | null {
-        return null;
-    }
-
-    getAsteroidField(): AsteroidField | null {
-        return null;
     }
 
     getTypeName(): string {

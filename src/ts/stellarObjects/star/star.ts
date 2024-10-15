@@ -49,7 +49,7 @@ export class Star implements StellarObject, Cullable {
 
     readonly ringsUniforms: RingsUniforms | null;
 
-    private readonly asteroidField: AsteroidField | null;
+    readonly asteroidField: AsteroidField | null;
 
     readonly model: StarModel;
 
@@ -83,7 +83,7 @@ export class Star implements StellarObject, Cullable {
         this.aggregate.body.disablePreStep = false;
 
         this.light = new PointLight(`${this.model.name}Light`, Vector3.Zero(), scene);
-        this.light.diffuse = getRgbFromTemperature(this.model.physics.temperature);
+        this.light.diffuse = getRgbFromTemperature(this.model.physics.blackBodyTemperature);
         this.light.falloffType = Light.FALLOFF_STANDARD;
         this.light.parent = this.getTransform();
 
@@ -117,14 +117,6 @@ export class Star implements StellarObject, Cullable {
 
     getLight(): PointLight {
         return this.light;
-    }
-
-    getRingsUniforms(): RingsUniforms | null {
-        return this.ringsUniforms;
-    }
-
-    getAsteroidField(): AsteroidField | null {
-        return this.asteroidField;
     }
 
     getTypeName(): string {

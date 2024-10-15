@@ -18,7 +18,7 @@
 import { getOrbitalPeriod, Orbit } from "../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { OrbitalObjectModel, OrbitalObjectType } from "../architecture/orbitalObject";
-import { OrbitalObjectPhysicalProperties } from "../architecture/physicalProperties";
+import { OrbitalObjectPhysicsInfo } from "../architecture/physicsInfo";
 import { CelestialBodyModel } from "../architecture/celestialBody";
 import { normalRandom, uniformRandBool } from "extended-random";
 import { clamp } from "../utils/math";
@@ -94,7 +94,7 @@ export function newSeededSpaceStationModel(
         normalToPlane: Vector3.Up()
     };
 
-    const physicalProperties: OrbitalObjectPhysicalProperties = {
+    const physicalProperties: OrbitalObjectPhysicsInfo = {
         mass: 1,
         rotationPeriod: 0,
         axialTilt: 2 * rng(GenerationSteps.AXIAL_TILT) * Math.PI
@@ -138,7 +138,7 @@ export function newSeededSpaceStationModel(
     stellarObjectModels.forEach((stellarObject) => {
         const exposureTimeFraction = 0.5;
         const starRadius = stellarObject.radius;
-        const starTemperature = stellarObject.physics.temperature;
+        const starTemperature = stellarObject.physics.blackBodyTemperature;
         totalStellarFlux += getSphereRadiatedEnergyFlux(starTemperature, starRadius, distanceToStar) * exposureTimeFraction;
     });
 

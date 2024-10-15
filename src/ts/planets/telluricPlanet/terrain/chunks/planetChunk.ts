@@ -29,7 +29,7 @@ import { randomDownSample } from "../instancePatch/matrixBuffer";
 import { isSizeOnScreenEnough } from "../../../../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { IPatch } from "../instancePatch/iPatch";
-import { TelluricPlanetModel } from "../../telluricPlanetModel";
+import { TelluricPlanetaryMassObjectModel } from "../../telluricPlanetaryMassObjectModel";
 import { HasBoundingSphere } from "../../../../architecture/hasBoundingSphere";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { Transformable } from "../../../../architecture/transformable";
@@ -45,7 +45,7 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
     public readonly cubePosition: Vector3;
     private readonly planetLocalPosition: Vector3;
 
-    private readonly planetModel: TelluricPlanetModel;
+    private readonly planetModel: TelluricPlanetaryMassObjectModel;
 
     private readonly chunkSideLength: number;
 
@@ -63,7 +63,7 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
 
     private disposed = false;
 
-    constructor(path: number[], direction: Direction, parentAggregate: PhysicsAggregate, material: Material, planetModel: TelluricPlanetModel, rootLength: number, scene: Scene) {
+    constructor(path: number[], direction: Direction, parentAggregate: PhysicsAggregate, material: Material, planetModel: TelluricPlanetaryMassObjectModel, rootLength: number, scene: Scene) {
         const id = `D${direction}P${path.join("")}`;
 
         this.depth = path.length;

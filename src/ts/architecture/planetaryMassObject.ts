@@ -15,9 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export interface TypedObject {
-    /**
-     * Returns the type name of the object. This is used as a short identifier in the UI Overlay of the object
-     */
-    getTypeName(): string;
+import { CelestialBody, CelestialBodyModel } from "./celestialBody";
+import { PlanetaryMassObjectPhysicsInfo } from "./physicsInfo";
+import { Transformable } from "./transformable";
+
+export interface PlanetaryMassObject extends CelestialBody {
+    readonly model: PlanetaryMassObjectModel;
+
+    updateMaterial(stellarObjects: Transformable[], deltaSeconds: number): void;
 }
+
+export type PlanetaryMassObjectModel = CelestialBodyModel & {
+    readonly physics: PlanetaryMassObjectPhysicsInfo;
+};

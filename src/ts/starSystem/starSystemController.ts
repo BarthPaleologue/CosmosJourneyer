@@ -32,14 +32,13 @@ import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge"
 import { OrbitalObject, OrbitalObjectType, OrbitalObjectUtils } from "../architecture/orbitalObject";
 import { CelestialBody } from "../architecture/celestialBody";
 import { StellarObject } from "../architecture/stellarObject";
-import { Planet } from "../architecture/planet";
+import { PlanetaryMassObject } from "../architecture/planetaryMassObject";
 import { SystemTarget } from "../utils/systemTarget";
 import { JuliaSet } from "../anomalies/julia/juliaSet";
 import { StarFieldBox } from "./starFieldBox";
 import { PlanetarySystemModel, StarSystemModel, SubStarSystemModel } from "./starSystemModel";
 import { Settings } from "../settings";
 import { getStarGalacticPosition } from "../utils/coordinates/starSystemCoordinatesUtils";
-import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 import { GasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 import { MandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModel";
 import { JuliaSetModel } from "../anomalies/julia/juliaSetModel";
@@ -48,6 +47,8 @@ import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates";
 import { wait } from "../utils/wait";
+import { Planet } from "../architecture/planet";
+import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 
 export type PlanetarySystem = {
     readonly planets: Planet[];
@@ -203,15 +204,14 @@ export class StarSystemController {
 
             switch (planetModel.type) {
                 case OrbitalObjectType.TELLURIC_PLANET:
-                    planet = new TelluricPlanet(planetModel as TelluricPlanetModel, this.scene);
+                    //FIXME: TelluricPlanet and TelluricSatellite should be 2 different types to avoid casting
+                    planet = new TelluricPlanet(planetModel as TelluricPlanetModel, this.scene) as Planet;
                     this.telluricBodies.push(planet as TelluricPlanet);
                     break;
                 case OrbitalObjectType.GAS_PLANET:
                     planet = new GasPlanet(planetModel as GasPlanetModel, this.scene);
                     this.gasPlanets.push(planet as GasPlanet);
                     break;
-                case OrbitalObjectType.TELLURIC_SATELLITE:
-                    throw new Error("Telluric satellites must be stored in the satellites array, not in the planets array");
             }
 
             planet.getTransform().setAbsolutePosition(new Vector3(this.offset * ++this.loadingIndex, 0, 0));
@@ -321,16 +321,16 @@ export class StarSystemController {
     /**
      * Returns all the planets in the star system
      */
-    public getPlanets(): Planet[] {
+    public getPlanets(): PlanetaryMassObject[] {
         return this.subSystems.flatMap((subSystem) => subSystem.planetarySystems.flatMap((planetarySystem) => planetarySystem.planets));
     }
 
     /**
      * Returns all the planetary mass objects in the star system. (Planets first, then satellites)
      */
-    public getPlanetaryMassObjects(): Planet[] {
-        const planets: Planet[] = [];
-        const satellites: Planet[] = [];
+    public getPlanetaryMassObjects(): PlanetaryMassObject[] {
+        const planets: PlanetaryMassObject[] = [];
+        const satellites: PlanetaryMassObject[] = [];
         this.subSystems.forEach((subSystem) =>
             subSystem.planetarySystems.forEach((planetarySystem) => {
                 planets.push(...planetarySystem.planets);
@@ -441,7 +441,7 @@ export class StarSystemController {
             }
         }
 
-        postProcessManager.setBody(this.getNearestCelestialBody(this.scene.getActiveControls().getTransform().getAbsolutePosition()));
+        postProcessManager.setCelestialBody(this.getNearestCelestialBody(this.scene.getActiveControls().getTransform().getAbsolutePosition()));
         postProcessManager.rebuild();
     }
 
@@ -466,7 +466,7 @@ export class StarSystemController {
         // The first step is to find the nearest body
         const nearestOrbitalObject = this.getNearestOrbitalObject(controller.getTransform().getAbsolutePosition());
         const nearestCelestialBody = this.getNearestCelestialBody(controller.getTransform().getAbsolutePosition());
-        const ringUniforms = nearestCelestialBody.getRingsUniforms();
+        const ringUniforms = nearestCelestialBody.ringsUniforms;
 
         // Depending on the distance to the nearest body, we might have to compensate its translation and/or rotation
         // If we are very close, we want both translation and rotation to be compensated, so that the body appears to be fixed
@@ -568,7 +568,7 @@ export class StarSystemController {
         controller.update(deltaSeconds);
 
         for (const object of celestialBodies) {
-            object.getAsteroidField()?.update(controller.getActiveCameras()[0].globalPosition, deltaSeconds);
+            object.asteroidField?.update(controller.getActiveCameras()[0].globalPosition, deltaSeconds);
         }
 
         for (const body of this.telluricBodies) {
@@ -634,7 +634,7 @@ export class StarSystemController {
             if (stellarObject instanceof Star) stellarObject.updateMaterial(deltaSeconds);
         }
 
-        postProcessManager.setBody(nearestBody);
+        postProcessManager.setCelestialBody(nearestBody);
         postProcessManager.update(deltaSeconds);
     }
 

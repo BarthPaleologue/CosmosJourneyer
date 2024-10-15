@@ -15,33 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export type OrbitalObjectPhysicalProperties = {
-    mass: number;
-    /**
-     * Time needed for the object to rotate on its axis in seconds
-     */
-    rotationPeriod: number;
-    axialTilt: number;
-};
+import { TerrainSettings } from "./terrain/terrainSettings";
+import { PlanetaryMassObjectModel } from "../../architecture/planetaryMassObject";
+import { TelluricPlanetaryMassObjectPhysicsInfo } from "../../architecture/physicsInfo";
+import { CloudsModel } from "../../clouds/cloudsModel";
 
-export type StellarObjectPhysicalProperties = OrbitalObjectPhysicalProperties & {
-    /**
-     * Black body temperature of the object in Kelvin
-     */
-    temperature: number;
-};
+export type TelluricPlanetaryMassObjectModel = PlanetaryMassObjectModel & {
+    readonly physics: TelluricPlanetaryMassObjectPhysicsInfo;
 
-export type BlackHolePhysicalProperties = StellarObjectPhysicalProperties & {
-    accretionDiskRadius: number;
-};
+    readonly terrainSettings: TerrainSettings;
 
-export type PlanetPhysicalProperties = OrbitalObjectPhysicalProperties & {
-    minTemperature: number;
-    maxTemperature: number;
-    pressure: number;
-};
-
-export type TelluricPlanetPhysicalProperties = PlanetPhysicalProperties & {
-    waterAmount: number;
-    oceanLevel: number;
+    readonly clouds: CloudsModel | null;
 };

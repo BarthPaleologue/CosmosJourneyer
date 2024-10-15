@@ -53,7 +53,7 @@ import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { BloomEffect } from "@babylonjs/core/PostProcesses/bloomEffect";
 import { Constants } from "@babylonjs/core/Engines/constants";
-import { Planet } from "../architecture/planet";
+import { PlanetaryMassObject } from "../architecture/planetaryMassObject";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 /**
@@ -266,7 +266,7 @@ export class PostProcessManager {
      * Returns the atmosphere post process for the given planet. Throws an error if no atmosphere is found.
      * @param planet A gas or telluric planet
      */
-    public getAtmosphere(planet: Planet): AtmosphericScatteringPostProcess | null {
+    public getAtmosphere(planet: PlanetaryMassObject): AtmosphericScatteringPostProcess | null {
         return this.atmospheres.find((atmosphere) => atmosphere.object === planet) ?? null;
     }
 
@@ -293,8 +293,7 @@ export class PostProcessManager {
      * @param stellarObjects An array of stars or black holes
      */
     public addMandelbulb(body: Mandelbulb, stellarObjects: StellarObject[]) {
-        const mandelbulb = new MandelbulbPostProcess(body, this.scene, stellarObjects);
-        this.mandelbulbs.push(mandelbulb);
+        this.mandelbulbs.push(new MandelbulbPostProcess(body, this.scene, stellarObjects));
     }
 
     /**
@@ -303,8 +302,7 @@ export class PostProcessManager {
      * @param stellarObjects An array of stars or black holes
      */
     public addJuliaSet(juliaSet: JuliaSet, stellarObjects: StellarObject[]) {
-        const juliaSetPostProcess = new JuliaSetPostProcess(juliaSet, this.scene, stellarObjects);
-        this.juliaSets.push(juliaSetPostProcess);
+        this.juliaSets.push(new JuliaSetPostProcess(juliaSet, this.scene, stellarObjects));
     }
 
     /**
@@ -329,8 +327,7 @@ export class PostProcessManager {
      * @param blackHole A black hole
      */
     public addBlackHole(blackHole: BlackHole) {
-        const blackhole = new BlackHolePostProcess(blackHole, this.scene);
-        this.blackHoles.push(blackhole);
+        this.blackHoles.push(new BlackHolePostProcess(blackHole, this.scene));
     }
 
     /**
@@ -346,8 +343,7 @@ export class PostProcessManager {
      * @param neutronStar A neutron star
      */
     public addMatterJet(neutronStar: NeutronStar) {
-        console.log("add matter jet");
-        this.matterJets.push(new MatterJetPostProcess(neutronStar.name, neutronStar, this.scene));
+        this.matterJets.push(new MatterJetPostProcess(neutronStar, this.scene));
     }
 
     /**
@@ -381,7 +377,7 @@ export class PostProcessManager {
      * This method will also choose the appropriate rendering order and rebuild the pipeline.
      * @param body The closest celestial body to the active camera
      */
-    public setBody(body: CelestialBody) {
+    public setCelestialBody(body: CelestialBody) {
         this.currentBody = body;
 
         const rings = this.getRings(body);

@@ -74,7 +74,7 @@ export class LensFlarePostProcess extends PostProcess implements ObjectPostProce
         this.object = object;
         this.settings = settings;
 
-        const flareColor = getRgbFromTemperature(object.model.physics.temperature);
+        const flareColor = getRgbFromTemperature(object.model.physics.blackBodyTemperature);
 
         this.onActivateObservable.add((camera) => {
             this.activeCamera = camera;

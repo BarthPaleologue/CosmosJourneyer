@@ -21,7 +21,7 @@ import surfaceMaterialFragment from "../../../shaders/telluricPlanetMaterial/fra
 import surfaceMaterialVertex from "../../../shaders/telluricPlanetMaterial/vertex.glsl";
 import { Assets } from "../../assets/assets";
 import { centeredRand } from "extended-random";
-import { TelluricPlanetModel } from "./telluricPlanetModel";
+import { TelluricPlanetaryMassObjectModel } from "./telluricPlanetaryMassObjectModel";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import lutFragment from "../../../shaders/telluricPlanetMaterial/utils/lut.glsl";
@@ -73,7 +73,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
     /**
      * The model of the planet associated with this material
      */
-    private readonly planetModel: TelluricPlanetModel;
+    private readonly planetModel: TelluricPlanetaryMassObjectModel;
 
     private readonly plainNormalMetallicMap: Texture;
     private readonly plainAlbedoRoughnessMap: Texture;
@@ -96,7 +96,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
      * @param model The model of the planet associated with this material
      * @param scene
      */
-    constructor(model: TelluricPlanetModel, scene: Scene) {
+    constructor(model: TelluricPlanetaryMassObjectModel, scene: Scene) {
         const shaderName = "surfaceMaterial";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;

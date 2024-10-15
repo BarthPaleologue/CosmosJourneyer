@@ -95,7 +95,7 @@ export class MissionAsteroidFieldNode implements MissionNode {
             throw new Error(`Object with ID ${JSON.stringify(this.objectId)} is not a celestial body`);
         }
 
-        const asteroidField = celestialBody.getAsteroidField();
+        const asteroidField = celestialBody.asteroidField;
         if (asteroidField === null) {
             throw new Error(`Object with ID ${JSON.stringify(this.objectId)} does not have an asteroid field`);
         }

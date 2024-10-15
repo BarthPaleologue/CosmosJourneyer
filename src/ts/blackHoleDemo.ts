@@ -21,9 +21,9 @@ import { positionNearObjectBrightSide } from "./utils/positionNearObject";
 import { CosmosJourneyer } from "./cosmosJourneyer";
 
 import { newSeededBlackHoleModel } from "./stellarObjects/blackHole/blackHoleModel";
-import { newSeededTelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModel";
 import { StarSystemModel } from "./starSystem/starSystemModel";
 import { CustomSystemRegistry } from "./starSystem/customSystemRegistry";
+import { newSeededTelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModel";
 
 const engine = await CosmosJourneyer.CreateAsync();
 

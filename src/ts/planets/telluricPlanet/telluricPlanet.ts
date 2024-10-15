@@ -19,14 +19,14 @@ import { Direction } from "../../utils/direction";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { TelluricPlanetMaterial } from "./telluricPlanetMaterial";
-import { hasLiquidWater, TelluricPlanetModel } from "./telluricPlanetModel";
+import { TelluricPlanetaryMassObjectModel } from "./telluricPlanetaryMassObjectModel";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { ChunkTree } from "./terrain/chunks/chunkTree";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Transformable } from "../../architecture/transformable";
 import { ChunkForge } from "./terrain/chunks/chunkForge";
-import { hasAtmosphere, Planet } from "../../architecture/planet";
+import { PlanetaryMassObject } from "../../architecture/planetaryMassObject";
 import { Cullable } from "../../utils/cullable";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
@@ -38,12 +38,12 @@ import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { orbitalObjectTypeToDisplay } from "../../utils/strings/orbitalObjectTypeToDisplay";
 
-export class TelluricPlanet implements Planet, Cullable {
+export class TelluricPlanet implements PlanetaryMassObject, Cullable {
     readonly sides: ChunkTree[]; // stores the 6 sides of the sphere
 
     readonly material: TelluricPlanetMaterial;
 
-    readonly model: TelluricPlanetModel;
+    readonly model: TelluricPlanetaryMassObjectModel;
 
     private readonly transform: TransformNode;
     readonly aggregate: PhysicsAggregate;
@@ -51,7 +51,7 @@ export class TelluricPlanet implements Planet, Cullable {
     readonly postProcesses: PostProcessType[] = [];
 
     readonly ringsUniforms: RingsUniforms | null;
-    private readonly asteroidField: AsteroidField | null;
+    readonly asteroidField: AsteroidField | null;
 
     readonly cloudsUniforms: CloudsUniforms | null;
 
@@ -60,7 +60,7 @@ export class TelluricPlanet implements Planet, Cullable {
      * @param model The model to build the planet or a seed for the planet in [-1, 1]
      * @param scene
      */
-    constructor(model: TelluricPlanetModel, scene: Scene) {
+    constructor(model: TelluricPlanetaryMassObjectModel, scene: Scene) {
         this.model = model;
 
         this.transform = new TransformNode(this.model.name, scene);
@@ -84,8 +84,8 @@ export class TelluricPlanet implements Planet, Cullable {
 
         this.postProcesses.push(PostProcessType.SHADOW);
 
-        if (hasLiquidWater(this.model)) this.postProcesses.push(PostProcessType.OCEAN);
-        if (hasAtmosphere(this.model)) this.postProcesses.push(PostProcessType.ATMOSPHERE);
+        if (this.model.physics.oceanLevel > 0) this.postProcesses.push(PostProcessType.OCEAN);
+        if (this.model.physics.pressure > 0.05) this.postProcesses.push(PostProcessType.ATMOSPHERE);
 
         if (this.model.rings !== null) {
             this.postProcesses.push(PostProcessType.RING);
@@ -124,14 +124,6 @@ export class TelluricPlanet implements Planet, Cullable {
 
     getRotationAxis(): Vector3 {
         return this.getTransform().up;
-    }
-
-    getRingsUniforms(): RingsUniforms | null {
-        return this.ringsUniforms;
-    }
-
-    getAsteroidField(): AsteroidField | null {
-        return this.asteroidField;
     }
 
     getCloudsUniforms(): CloudsUniforms | null {
