@@ -30,7 +30,7 @@ import { isSizeOnScreenEnough } from "../../../../utils/isObjectVisibleOnScreen"
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { IPatch } from "../instancePatch/iPatch";
 import { TelluricPlanetModel } from "../../telluricPlanetModel";
-import { BoundingSphere } from "../../../../architecture/boundingSphere";
+import { HasBoundingSphere } from "../../../../architecture/hasBoundingSphere";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { Transformable } from "../../../../architecture/transformable";
 import { CollisionMask } from "../../../../settings";
@@ -38,9 +38,8 @@ import { InstancePatch } from "../instancePatch/instancePatch";
 import { Cullable } from "../../../../utils/cullable";
 import { Materials } from "../../../../assets/materials";
 import { Objects } from "../../../../assets/objects";
-import { min } from "d3";
 
-export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
+export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
     public readonly mesh: Mesh;
     private readonly depth: number;
     public readonly cubePosition: Vector3;
@@ -64,8 +63,6 @@ export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
 
     private disposed = false;
 
-    private readonly scene: Scene;
-
     constructor(path: number[], direction: Direction, parentAggregate: PhysicsAggregate, material: Material, planetModel: TelluricPlanetModel, rootLength: number, scene: Scene) {
         const id = `D${direction}P${path.join("")}`;
 
@@ -75,13 +72,11 @@ export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
 
         this.planetModel = planetModel;
 
-        this.mesh = new Mesh(`Chunk${id}`, scene);
+        this.mesh = new Mesh(`${planetModel.name}_Chunk${id}`, scene);
         this.mesh.setEnabled(false);
 
-        this.scene = scene;
-
         this.mesh.material = material;
-        //this.mesh.material = Assets.DebugMaterial(id, false, false, scene);
+        //this.mesh.material = Materials.DebugMaterial(id, false, false, scene);
 
         this.mesh.parent = parentAggregate.transformNode;
 
@@ -180,7 +175,7 @@ export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
             Materials.BUTTERFLY_MATERIAL.setPlanet(this.parent);
             Materials.BUTTERFLY_DEPTH_MATERIAL.setPlanet(this.parent);
 
-            for (const depthRenderer of Object.values(this.scene._depthRenderer)) {
+            for (const depthRenderer of Object.values(this.getTransform().getScene()._depthRenderer)) {
                 depthRenderer.setMaterialForRendering(butterflyPatch.getLodMeshes(), Materials.BUTTERFLY_DEPTH_MATERIAL);
                 depthRenderer.setMaterialForRendering(grassPatch.getLodMeshes(), Materials.GRASS_DEPTH_MATERIAL);
             }
@@ -218,8 +213,13 @@ export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
 
     public dispose() {
         this.aggregate?.dispose();
+
         this.helpers.forEach((helper) => helper.dispose());
+        this.helpers.length = 0;
+
         this.instancePatches.forEach((patch) => patch.dispose());
+        this.instancePatches.length = 0;
+
         this.mesh.dispose();
 
         this.disposed = true;

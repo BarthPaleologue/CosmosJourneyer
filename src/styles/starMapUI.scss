@@ -26,6 +26,38 @@
     transition: scale $transition-time $bezier-overshoot;
   }
 
+  .systemIcons {
+    position: absolute;
+    width: 30px;
+
+    display: flex;
+    flex-direction: column;
+
+    row-gap: 10px;
+
+    transform: translateY(-50%) translateX(calc(-100% - 25px));
+
+    &.transparent {
+      opacity: 0;
+    }
+
+    .bookmarkIcon {
+      width: 100%;
+      aspect-ratio: 1;
+
+      background-image: url('../asset/icons/bookmark.webp');
+      background-size: contain;
+    }
+
+    .missionIcon {
+      width: 100%;
+      aspect-ratio: 1;
+
+      background-image: url('../asset/icons/mission.webp');
+      background-size: contain;
+    }
+  }
+
   .shortHandUI {
     position: absolute;
     //background: rgba(0, 0, 0, 0.8);
@@ -35,6 +67,8 @@
     display: flex;
     row-gap: 1.0vmin;
     flex-direction: column;
+
+    z-index: 5;
 
     color: white;
     font-family: $main-font;
@@ -73,8 +107,33 @@
         background: var(--accent-color-light);
       }
 
+      &:disabled {
+        background: var(--disabled-color);
+        color: rgb(200, 200, 200);
+
+        &:hover {
+          background: var(--disabled-color);
+        }
+
+        &:active {
+          background: var(--disabled-color);
+        }
+      }
+
       &:active {
         background: var(--accent-color-dark);
+      }
+
+      &.bookmarked {
+        background: goldenrod;
+
+        &:active {
+          background: darkgoldenrod;
+        }
+
+        &:hover {
+          background: gold;
+        }
       }
 
       &.loading {

@@ -1,18 +1,51 @@
-import { SystemSeedSerialized } from "../utils/systemSeed";
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../starSystem/starSystemModel";
 
-export type UniverseObjectIdentifier = {
+export const enum SystemObjectType {
+    STELLAR_OBJECT,
+    PLANETARY_MASS_OBJECT,
+    ANOMALY,
+    SPACE_STATION
+}
+
+/**
+ * Data structure that can identify any object within a star system.
+ */
+export type SystemObjectId = {
     /**
-     * The seed of the star system.
+     * The type of the object.
      */
-    starSystem: SystemSeedSerialized;
+    objectType: SystemObjectType;
 
     /**
-     * The index of the orbital object.
+     * The index of the object inside the array containing all objects of the given type within the star system.
      */
-    orbitalObjectIndex: number;
+    objectIndex: number;
 };
 
-export type UniverseCoordinates = UniverseObjectIdentifier & {
+export function systemObjectIdEquals(a: SystemObjectId, b: SystemObjectId): boolean {
+    return a.objectType === b.objectType && a.objectIndex === b.objectIndex;
+}
+
+/**
+ * Data structure that can identify any object within the universe.
+ */
+export type UniverseObjectId = SystemObjectId & {
+    /**
+     * The coordinates of the star system.
+     */
+    starSystemCoordinates: StarSystemCoordinates;
+};
+
+export function universeObjectIdEquals(a: UniverseObjectId, b: UniverseObjectId): boolean {
+    return systemObjectIdEquals(a, b) && starSystemCoordinatesEquals(a.starSystemCoordinates, b.starSystemCoordinates);
+}
+
+export type UniverseCoordinates = {
+    /**
+     * The coordinates of the body in the universe.
+     */
+    universeObjectId: UniverseObjectId;
+
     /**
      * The x coordinate of the player's position in the nearest orbital object's frame of reference.
      */
@@ -48,35 +81,3 @@ export type UniverseCoordinates = UniverseObjectIdentifier & {
      */
     rotationQuaternionW: number;
 };
-
-/**
- * Checks if a string is a valid universe coordinates json data.
- * @param jsonString The string to check.
- */
-export function isJsonStringValidUniverseCoordinates(jsonString: string): boolean {
-    try {
-        const data = JSON.parse(jsonString);
-        if (typeof data !== "object") return false;
-
-        if (typeof data.starSystem !== "object") return false;
-        if (typeof data.starSystem.starSectorX !== "number") return false;
-        if (typeof data.starSystem.starSectorY !== "number") return false;
-        if (typeof data.starSystem.starSectorZ !== "number") return false;
-        if (typeof data.starSystem.index !== "number") return false;
-
-        if (typeof data.orbitalObjectIndex !== "number") return false;
-
-        if (typeof data.positionX !== "number") return false;
-        if (typeof data.positionY !== "number") return false;
-        if (typeof data.positionZ !== "number") return false;
-
-        if (typeof data.rotationQuaternionX !== "number") return false;
-        if (typeof data.rotationQuaternionY !== "number") return false;
-        if (typeof data.rotationQuaternionZ !== "number") return false;
-        if (typeof data.rotationQuaternionW !== "number") return false;
-
-        return true;
-    } catch (e) {
-        return false;
-    }
-}

@@ -82,4 +82,12 @@ export class DeleteSemaphore {
     public isResolved() {
         return this.resolved;
     }
+
+    public dispose() {
+        this.chunksToDelete.forEach((chunk) => chunk.dispose());
+        this.newChunks.forEach((chunk) => chunk.dispose());
+
+        this.chunksToDelete.length = 0;
+        this.newChunks.length = 0;
+    }
 }

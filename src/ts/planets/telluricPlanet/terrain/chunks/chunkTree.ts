@@ -142,28 +142,8 @@ export class ChunkTree implements Cullable {
         });
     }
 
-    private getAverageHeight(tree: QuadTree): number {
-        if (tree instanceof PlanetChunk) return tree.getAverageHeight();
-        else if (tree.length > 0) return 0.25 * (this.getAverageHeight(tree[0]) + this.getAverageHeight(tree[1]) + this.getAverageHeight(tree[2]) + this.getAverageHeight(tree[3]));
-        else return 0;
-    }
-
-    private getMinAverageHeight(tree: QuadTree): number {
-        if (tree instanceof PlanetChunk) return tree.getAverageHeight();
-        else if (tree.length > 0)
-            return Math.min(this.getMinAverageHeight(tree[0]), this.getMinAverageHeight(tree[1]), this.getMinAverageHeight(tree[2]), this.getMinAverageHeight(tree[3]));
-        else return 0;
-    }
-
-    private getMaxAverageHeight(tree: QuadTree): number {
-        if (tree instanceof PlanetChunk) return tree.getAverageHeight();
-        else if (tree.length > 0)
-            return Math.max(this.getMaxAverageHeight(tree[0]), this.getMaxAverageHeight(tree[1]), this.getMaxAverageHeight(tree[2]), this.getMaxAverageHeight(tree[3]));
-        else return 0;
-    }
-
     /**
-     * Recursive function used internaly to update LOD
+     * Recursive function used internally to update LOD
      * @param observerPositionW The observer position in world space
      * @param chunkForge
      * @param tree The tree to update recursively
@@ -214,7 +194,7 @@ export class ChunkTree implements Cullable {
         }
 
         if (tree instanceof Array) {
-            if (targetLOD < walked.length - 1) {
+            if (targetLOD <= walked.length) {
                 const newChunk = this.createChunk(walked, chunkForge);
                 this.requestDeletion(tree, [newChunk]);
                 return newChunk;
@@ -267,10 +247,11 @@ export class ChunkTree implements Cullable {
         this.executeOnEveryChunk((chunk: PlanetChunk) => {
             chunk.dispose();
         });
-        for (const deleteSemaphore of this.deleteSemaphores) {
-            for (const chunk of deleteSemaphore.chunksToDelete) {
-                chunk.dispose();
-            }
-        }
+        this.tree = [];
+
+        this.deleteSemaphores.forEach((deleteSemaphore) => {
+            deleteSemaphore.dispose();
+        });
+        this.deleteSemaphores.length = 0;
     }
 }

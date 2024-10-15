@@ -244,7 +244,7 @@ void main() {
 
     float metallic = steepFactor * steepMetallic + plainFactor * plainMetallic + (desertFactor+beachFactor) * desertMetallic + snowFactor * snowMetallic;
 
-    vec3 normalW = vec3(world * vec4(normal, 0.0));
+    vec3 normalW = vNormalW;
 
     // pbr accumulation
     vec3 Lo = vec3(0.0);

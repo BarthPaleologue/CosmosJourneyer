@@ -32,7 +32,7 @@ export class RingsModel {
         this.ringEnd = randRange(2.1, 4.0, rng, 1410);
         this.ringFrequency = 30.0;
         this.ringOpacity = clamp(normalRandom(0.7, 0.1, rng, 1420), 0, 1);
-        this.ringColor = new Color3(255, 225, 171).scaleInPlace(randRange(1.0, 1.5, rng, 1430) / 255);
+        this.ringColor = new Color3(255, 225, 171).scaleInPlace(randRange(0.7, 1.2, rng, 1430) / 255);
 
         this.offset = randRange(-100, 100, rng, 1440);
     }

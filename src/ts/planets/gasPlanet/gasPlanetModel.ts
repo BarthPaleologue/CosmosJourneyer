@@ -20,9 +20,8 @@ import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../../settings";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
-import { OrbitProperties } from "../../orbit/orbitProperties";
 import { clamp } from "../../utils/math";
-import { getOrbitalPeriod, getPeriapsis } from "../../orbit/orbit";
+import { getOrbitalPeriod, getPeriapsis, Orbit } from "../../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PlanetModel } from "../../architecture/planet";
 import { PlanetPhysicalProperties } from "../../architecture/physicalProperties";
@@ -32,6 +31,7 @@ import { BodyType } from "../../architecture/bodyType";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { getPlanetName } from "../common";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
+import i18n from "../../i18n";
 
 export class GasPlanetModel implements PlanetModel {
     readonly name: string;
@@ -41,7 +41,7 @@ export class GasPlanetModel implements PlanetModel {
 
     readonly radius: number;
 
-    readonly orbit: OrbitProperties;
+    readonly orbit: Orbit;
 
     readonly physicalProperties: PlanetPhysicalProperties;
 
@@ -54,6 +54,8 @@ export class GasPlanetModel implements PlanetModel {
     readonly childrenBodies: CelestialBodyModel[] = [];
 
     readonly starSystem: StarSystemModel;
+
+    readonly typeName = i18n.t("objectTypes:gasPlanet");
 
     constructor(seed: number, starSystem: StarSystemModel, parentBody?: CelestialBodyModel) {
         this.seed = seed;
@@ -81,13 +83,12 @@ export class GasPlanetModel implements PlanetModel {
             radius: orbitRadius,
             p: 2, //orbitalP,
             period: getOrbitalPeriod(orbitRadius, this.parentBody?.physicalProperties.mass ?? 0),
-            normalToPlane: orbitalPlaneNormal,
-            isPlaneAlignedWithParent: true
+            normalToPlane: orbitalPlaneNormal
         };
 
         this.physicalProperties = {
-            // Fixme: choose physically accurate values
-            mass: 10,
+            //FIXME: when Settings.Earth radius gets to 1:1 scale, change this value by a variable in settings
+            mass: Settings.JUPITER_MASS * (this.radius / 69_911e3) ** 3,
             axialTilt: normalRandom(0, 0.4, this.rng, GenerationSteps.AXIAL_TILT),
             rotationPeriod: (24 * 60 * 60) / 10,
             minTemperature: -180,

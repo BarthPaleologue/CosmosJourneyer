@@ -23,19 +23,14 @@ import { PostProcessType } from "../postProcesses/postProcessTypes";
 import { OrbitalObject } from "../architecture/orbitalObject";
 import { Cullable } from "../utils/cullable";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { OrbitProperties } from "../orbit/orbitProperties";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { OrbitalObjectPhysicalProperties } from "../architecture/physicalProperties";
-import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { CelestialBody } from "../architecture/celestialBody";
-import i18n from "../i18n";
 import { SpaceStationNodeType } from "../assets/procedural/spaceStation/spaceStationNode";
 import { UtilitySection } from "../assets/procedural/spaceStation/utilitySection";
 import { HelixHabitat } from "../assets/procedural/spaceStation/helixHabitat";
 import { RingHabitat } from "../assets/procedural/spaceStation/ringHabitat";
 import { Transformable } from "../architecture/transformable";
-import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
-import { StellarObject } from "../architecture/stellarObject";
 import { SolarSection } from "../assets/procedural/spaceStation/solarSection";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { wheelOfFortune } from "../utils/random";
@@ -43,10 +38,10 @@ import { CylinderHabitat } from "../assets/procedural/spaceStation/cylinderHabit
 import { LandingBay } from "../assets/procedural/spaceStation/landingBay";
 import { LandingPad } from "../assets/procedural/landingPad/landingPad";
 import { LandingRequest, ManagesLandingPads } from "../utils/managesLandingPads";
-import { getEdibleEnergyPerHaPerDay } from "../utils/agriculture";
 import { Settings } from "../settings";
 import { EngineBay } from "../assets/procedural/spaceStation/engineBay";
 import { StarSystemModel } from "../starSystem/starSystemModel";
+import { Orbit } from "../orbit/orbit";
 
 export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads {
     readonly name: string;
@@ -54,8 +49,6 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
     readonly model: SpaceStationModel;
 
     readonly postProcesses: PostProcessType[] = [];
-
-    readonly childAggregates: PhysicsAggregate[] = [];
 
     readonly parent: OrbitalObject | null = null;
 
@@ -125,7 +118,7 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
         return this.getTransform().up;
     }
 
-    getOrbitProperties(): OrbitProperties {
+    getOrbitProperties(): Orbit {
         return this.model.orbit;
     }
 
@@ -138,7 +131,7 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
     }
 
     getTypeName(): string {
-        return i18n.t("objectTypes:spaceStation");
+        return this.model.typeName;
     }
 
     public computeCulling(cameras: Camera[]): void {
@@ -151,36 +144,8 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
     }
 
     private generate() {
-        // find distance to star
-        let distanceToStar = this.model.orbit.radius;
-        let parent = this.parent;
-        let stellarObject: StellarObject | null = null;
-        while (parent !== null) {
-            if (parent.parent === null) {
-                stellarObject = parent as StellarObject;
-                break;
-            }
-            distanceToStar += parent.getOrbitProperties().radius;
-            parent = parent.parent;
-        }
-
-        if (stellarObject === null) {
-            throw new Error("No stellar object found");
-        }
-
-        const starRadius = stellarObject.model.radius;
-        const starTemperature = stellarObject.model.temperature;
-        const energyRequirement = this.model.population * this.model.energyConsumptionPerCapita;
-
-        const solarPanelSurface = getSolarPanelSurfaceFromEnergyRequirement(0.4, distanceToStar, starTemperature, starRadius, energyRequirement, 0.5);
-
-        let habitatSurfaceHa = (100 * this.model.population) / this.model.populationDensity;
-        this.model.agricultureMix.forEach(([fraction, cropType]) => {
-            habitatSurfaceHa +=
-                (fraction * this.model.population * Settings.INDIVIDUAL_AVERAGE_DAILY_INTAKE) /
-                (Settings.HYDROPONIC_TO_CONVENTIONAL_RATIO * this.model.nbHydroponicLayers * getEdibleEnergyPerHaPerDay(cropType));
-        });
-        const habitatSurface = habitatSurfaceHa * 1000;
+        const solarPanelSurface = this.model.solarPanelSurfaceM2;
+        const habitatSurface = this.model.totalHabitatSurfaceM2;
 
         const engineBay = new EngineBay(this.scene);
         engineBay.getTransform().parent = this.getTransform();
@@ -282,7 +247,7 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
     }
 
     dispose() {
-        this.root.dispose();
+        this.solarSections.forEach((solarSection) => solarSection.dispose());
         this.utilitySections.forEach((utilitySection) => utilitySection.dispose());
         this.helixHabitats.forEach((helixHabitat) => helixHabitat.dispose());
         this.ringHabitats.forEach((ringHabitat) => ringHabitat.dispose());
@@ -290,6 +255,6 @@ export class SpaceStation implements OrbitalObject, Cullable, ManagesLandingPads
         this.landingBays.forEach((landingBay) => landingBay.dispose());
         this.engineBays.forEach((engineBay) => engineBay.dispose());
 
-        this.childAggregates.forEach((childAggregate) => childAggregate.dispose());
+        this.root.dispose();
     }
 }

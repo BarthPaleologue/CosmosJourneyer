@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { BoundingSphere } from "../architecture/boundingSphere";
+import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { CelestialBody } from "../architecture/celestialBody";
 import { Transformable } from "../architecture/transformable";
@@ -40,6 +40,6 @@ export function nearestBody(objectPosition: Vector3, bodies: CelestialBody[]): C
  * @param body the body to check whereas the player is orbiting
  * @param orbitLimitFactor the boundary of the orbit detection (multiplied by planet radius)
  */
-export function isOrbiting(controller: Transformable, body: Transformable & BoundingSphere, orbitLimitFactor = 2.5): boolean {
+export function isOrbiting(controller: Transformable, body: Transformable & HasBoundingSphere, orbitLimitFactor = 2.5): boolean {
     return Vector3.DistanceSquared(body.getTransform().getAbsolutePosition(), controller.getTransform().getAbsolutePosition()) < (orbitLimitFactor * body.getBoundingRadius()) ** 2;
 }

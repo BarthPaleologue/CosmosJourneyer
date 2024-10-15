@@ -183,14 +183,14 @@ export class StarSystemHelper {
 
     public static MakeSatellite(
         starsystem: StarSystemController,
-        planet: Planet,
-        model: TelluricPlanetModel | number = getMoonSeed(planet.model, planet.model.childrenBodies.length)
+        parent: Planet,
+        model: TelluricPlanetModel | number = getMoonSeed(parent.model, parent.model.childrenBodies.length)
     ): TelluricPlanet {
-        const satellite = new TelluricPlanet(model, starsystem.model, starsystem.scene, planet);
+        const satellite = new TelluricPlanet(model, starsystem.model, starsystem.scene, parent);
 
-        planet.model.childrenBodies.push(satellite.model);
+        parent.model.childrenBodies.push(satellite.model);
 
-        starsystem.addTelluricPlanet(satellite);
+        starsystem.addSatellite(satellite);
         return satellite;
     }
 

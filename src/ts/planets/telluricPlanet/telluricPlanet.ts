@@ -32,19 +32,17 @@ import { ChunkForge } from "./terrain/chunks/chunkForge";
 import { Planet } from "../../architecture/planet";
 import { Cullable } from "../../utils/cullable";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { OrbitProperties } from "../../orbit/orbitProperties";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { CelestialBody } from "../../architecture/celestialBody";
 import { RingsUniforms } from "../../rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import { rotate } from "../../uberCore/transforms/basicTransform";
-import i18n from "../../i18n";
 import { CloudsUniforms } from "../../clouds/cloudsUniforms";
 import { Scene } from "@babylonjs/core/scene";
-import { BodyType } from "../../architecture/bodyType";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
+import { Orbit } from "../../orbit/orbit";
 
 export class TelluricPlanet implements Planet, Cullable {
     readonly name: string;
@@ -102,19 +100,9 @@ export class TelluricPlanet implements Planet, Cullable {
 
         this.postProcesses.push(PostProcessType.SHADOW);
 
-        const waterBoilingPoint = waterBoilingPointCelsius(this.model.physicalProperties.pressure);
-        const waterFreezingPoint = 0.0;
         const epsilon = 0.05;
-        if (this.model.physicalProperties.pressure > epsilon) {
-            if (waterFreezingPoint > this.model.physicalProperties.minTemperature && waterFreezingPoint < this.model.physicalProperties.maxTemperature) {
-                this.postProcesses.push(PostProcessType.OCEAN);
-            } else {
-                this.model.physicalProperties.oceanLevel = 0;
-            }
-            this.postProcesses.push(PostProcessType.ATMOSPHERE);
-        } else {
-            this.model.physicalProperties.oceanLevel = 0;
-        }
+        if (this.model.hasLiquidWater()) this.postProcesses.push(PostProcessType.OCEAN);
+        if (this.model.physicalProperties.pressure > epsilon) this.postProcesses.push(PostProcessType.ATMOSPHERE);
 
         if (this.model.rings !== null) {
             this.postProcesses.push(PostProcessType.RING);
@@ -135,7 +123,7 @@ export class TelluricPlanet implements Planet, Cullable {
             this.cloudsUniforms = null;
         }
 
-        this.material = new TelluricPlanetMaterial(this.name, this.getTransform(), this.model, scene);
+        this.material = new TelluricPlanetMaterial(this.name, this.model, scene);
 
         this.sides = [
             new ChunkTree(Direction.UP, this.name, this.model, this.aggregate, this.material, scene),
@@ -155,7 +143,7 @@ export class TelluricPlanet implements Planet, Cullable {
         return this.getTransform().up;
     }
 
-    getOrbitProperties(): OrbitProperties {
+    getOrbitProperties(): Orbit {
         return this.model.orbit;
     }
 
@@ -176,10 +164,7 @@ export class TelluricPlanet implements Planet, Cullable {
     }
 
     getTypeName(): string {
-        if (this.parent?.model.bodyType === BodyType.TELLURIC_PLANET || this.parent?.model.bodyType === BodyType.GAS_PLANET) {
-            return i18n.t("objectTypes:telluricMoon");
-        }
-        return i18n.t("objectTypes:telluricPlanet");
+        return this.model.typeName;
     }
 
     /**
@@ -192,7 +177,7 @@ export class TelluricPlanet implements Planet, Cullable {
     }
 
     public updateMaterial(stellarObjects: Transformable[], deltaSeconds: number): void {
-        this.material.update(stellarObjects);
+        this.material.update(this.getTransform().getWorldMatrix(), stellarObjects);
     }
 
     public getRadius(): number {
@@ -208,7 +193,12 @@ export class TelluricPlanet implements Planet, Cullable {
     }
 
     public dispose(): void {
-        for (const side of this.sides) side.dispose();
+        this.sides.forEach((side) => side.dispose());
+        this.sides.length = 0;
+
+        this.cloudsUniforms?.dispose();
+        this.ringsUniforms?.dispose();
+
         this.material.dispose();
         this.aggregate.dispose();
         this.transform.dispose();

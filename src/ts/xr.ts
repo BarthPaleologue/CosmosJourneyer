@@ -30,7 +30,6 @@ import { Scene } from "@babylonjs/core/scene";
 import { JuliaSet } from "./anomalies/julia/juliaSet";
 import { JuliaSetPostProcess } from "./anomalies/julia/juliaSetPostProcess";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
-import "@babylonjs/core";
 import { ArcRotateCamera, Engine } from "@babylonjs/core";
 import { CustomStarSystemModel } from "./starSystem/customStarSystemModel";
 import { AnomalyType } from "./anomalies/anomalyType";
@@ -54,7 +53,20 @@ camera.wheelPrecision *= 100;
 
 const depthRenderer = scene.enableDepthRenderer(null, false, true);
 
-const starSystemModel = new CustomStarSystemModel("XR System", [], [], [[AnomalyType.JULIA_SET, Math.random() * 10000]]);
+const starSystemModel = new CustomStarSystemModel(
+    "XR System",
+    {
+        starSectorX: 0,
+        starSectorY: 0,
+        starSectorZ: 0,
+        localX: 0,
+        localY: 0,
+        localZ: 0
+    },
+    [],
+    [],
+    [[AnomalyType.JULIA_SET, Math.random() * 10000]]
+);
 
 function createMandelbulb(): TransformNode {
     const mandelbulb = new Mandelbulb(starSystemModel.getAnomalySeed(0), starSystemModel, scene, null);

@@ -84,4 +84,9 @@ export class HelixHabitatMaterial extends ShaderMaterial {
     update(stellarObjects: Transformable[]) {
         this.stellarObjects = stellarObjects;
     }
+
+    dispose(forceDisposeEffect?: boolean, forceDisposeTextures?: boolean, notBoundToMesh?: boolean) {
+        super.dispose(forceDisposeEffect, forceDisposeTextures, notBoundToMesh);
+        this.stellarObjects.length = 0;
+    }
 }

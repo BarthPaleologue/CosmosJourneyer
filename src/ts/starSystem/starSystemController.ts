@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-
 import { Matrix, Quaternion } from "@babylonjs/core/Maths/math";
 import { PostProcessType } from "../postProcesses/postProcessTypes";
 import { getTransformationQuaternion } from "../utils/algebra";
@@ -26,12 +25,10 @@ import { SpaceStation } from "../spacestation/spaceStation";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { Mandelbulb } from "../anomalies/mandelbulb/mandelbulb";
-import { SeededStarSystemModel } from "./seededStarSystemModel";
 import { rotateAround, translate } from "../uberCore/transforms/basicTransform";
 import { Star } from "../stellarObjects/star/star";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
-import { SystemSeed } from "../utils/systemSeed";
 import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge";
 import { OrbitalObject, OrbitalObjectUtils } from "../architecture/orbitalObject";
 import { CelestialBody } from "../architecture/celestialBody";
@@ -41,8 +38,9 @@ import { SystemTarget } from "../utils/systemTarget";
 import { JuliaSet } from "../anomalies/julia/juliaSet";
 import { Anomaly } from "../anomalies/anomaly";
 import { StarFieldBox } from "./starFieldBox";
-import { StarSystemModel } from "./starSystemModel";
+import { StarSystemCoordinates, StarSystemModel } from "./starSystemModel";
 import { Settings } from "../settings";
+import { getStarGalacticPosition } from "../utils/starSystemCoordinatesUtils";
 
 export class StarSystemController {
     readonly scene: UberScene;
@@ -61,19 +59,24 @@ export class StarSystemController {
     readonly stellarObjects: StellarObject[] = [];
 
     /**
+     * The list of all planetary mass objects in the system (planets and moons)
+     */
+    readonly planetaryMassObjects: Planet[] = [];
+
+    /**
      * The list of all planets in the system (telluric and gas)
      */
     readonly planets: Planet[] = [];
 
     /**
-     * The list of all telluric planets in the system
-     */
-    readonly telluricPlanets: TelluricPlanet[] = [];
-
-    /**
      * The list of all gas planets in the system
      */
     readonly gasPlanets: GasPlanet[] = [];
+
+    /**
+     * The list of all telluric planets and moons in the system
+     */
+    readonly telluricBodies: TelluricPlanet[] = [];
 
     /**
      * The list of all anomalies in the system
@@ -90,12 +93,22 @@ export class StarSystemController {
      */
     readonly model: StarSystemModel;
 
-    constructor(model: StarSystemModel | SystemSeed, scene: UberScene) {
+    private elapsedSeconds = 0;
+
+    constructor(model: StarSystemModel, scene: UberScene) {
         this.scene = scene;
 
         this.starFieldBox = new StarFieldBox(scene);
 
-        this.model = model instanceof SystemSeed ? new SeededStarSystemModel(model) : model;
+        this.model = model;
+    }
+
+    public addSatellite(satellite: TelluricPlanet): void {
+        if (!satellite.model.isMoon()) throw new Error("Use addTelluricPlanet to add a telluric planet to a planet, not addSatellite");
+        this.orbitalObjects.push(satellite);
+        this.celestialBodies.push(satellite);
+        this.telluricBodies.push(satellite);
+        this.planetaryMassObjects.push(satellite);
     }
 
     /**
@@ -103,10 +116,14 @@ export class StarSystemController {
      * @param planet The planet to add to the system
      */
     public addTelluricPlanet(planet: TelluricPlanet): TelluricPlanet {
+        if (planet.model.isMoon()) {
+            throw new Error("Use addSatellite to add a moon to a planet, not addTelluricPlanet");
+        }
         this.orbitalObjects.push(planet);
         this.celestialBodies.push(planet);
         this.planets.push(planet);
-        this.telluricPlanets.push(planet);
+        this.telluricBodies.push(planet);
+        this.planetaryMassObjects.push(planet);
         return planet;
     }
 
@@ -119,6 +136,7 @@ export class StarSystemController {
         this.celestialBodies.push(planet);
         this.planets.push(planet);
         this.gasPlanets.push(planet);
+        this.planetaryMassObjects.push(planet);
         return planet;
     }
 
@@ -129,8 +147,8 @@ export class StarSystemController {
      */
     public addMandelbulb(mandelbulb: Mandelbulb): Mandelbulb {
         this.orbitalObjects.push(mandelbulb);
-        this.celestialBodies.push(mandelbulb);
         this.anomalies.push(mandelbulb);
+        this.celestialBodies.push(mandelbulb);
         return mandelbulb;
     }
 
@@ -141,8 +159,8 @@ export class StarSystemController {
      */
     public addJuliaSet(juliaSet: JuliaSet): JuliaSet {
         this.orbitalObjects.push(juliaSet);
-        this.celestialBodies.push(juliaSet);
         this.anomalies.push(juliaSet);
+        this.celestialBodies.push(juliaSet);
         return juliaSet;
     }
 
@@ -318,6 +336,8 @@ export class StarSystemController {
      * @param postProcessManager
      */
     public update(deltaSeconds: number, chunkForge: ChunkForge, postProcessManager: PostProcessManager): void {
+        this.elapsedSeconds += deltaSeconds;
+
         const controller = this.scene.getActiveControls();
 
         // The nearest body might have to be treated separately
@@ -331,7 +351,7 @@ export class StarSystemController {
         // When we are a bit further, we only need to compensate the translation as it would be unnatural not to see the body rotating
         const distanceOfNearestToControls = Vector3.Distance(nearestOrbitalObject.getTransform().getAbsolutePosition(), controller.getTransform().getAbsolutePosition());
 
-        const shouldCompensateTranslation = distanceOfNearestToControls < nearestOrbitalObject.getBoundingRadius() * (nearestOrbitalObject instanceof SpaceStation ? 80 : 10);
+        const shouldCompensateTranslation = distanceOfNearestToControls < nearestOrbitalObject.getBoundingRadius() * (nearestOrbitalObject instanceof SpaceStation ? 200 : 10);
 
         // compensate rotation when close to the body
         let shouldCompensateRotation = distanceOfNearestToControls < nearestOrbitalObject.getBoundingRadius() * 3;
@@ -341,6 +361,8 @@ export class StarSystemController {
         }
         // and never compensate the rotation of a space station
         shouldCompensateRotation = shouldCompensateRotation && !(nearestOrbitalObject instanceof SpaceStation);
+        // also never compensate the rotation of a black hole
+        shouldCompensateRotation = shouldCompensateRotation && !(nearestOrbitalObject instanceof BlackHole);
 
         // ROTATION COMPENSATION
         // If we have to compensate the rotation of the nearest body, there are multiple things to take into account
@@ -352,27 +374,27 @@ export class StarSystemController {
         // By doing so, their rotation axis on themselves except the fixed one must as well be rotated in the same way.
         // Last but not least, the background starfield must be rotated in the opposite direction to give the impression the moon is rotating.
         if (shouldCompensateRotation) {
-            const dthetaNearest = OrbitalObjectUtils.GetRotationAngle(nearestOrbitalObject, deltaSeconds);
+            const dThetaNearest = OrbitalObjectUtils.GetRotationAngle(nearestOrbitalObject, deltaSeconds);
 
             for (const object of this.orbitalObjects) {
                 const orbit = object.getOrbitProperties();
 
                 // the normal to the orbit planes must be rotated as well (even the one of the nearest body)
-                const rotation = Quaternion.RotationAxis(nearestOrbitalObject.getRotationAxis(), -dthetaNearest);
+                const rotation = Quaternion.RotationAxis(nearestOrbitalObject.getRotationAxis(), -dThetaNearest);
                 orbit.normalToPlane.applyRotationQuaternionInPlace(rotation);
 
                 if (object === nearestOrbitalObject) continue;
 
                 // All other bodies must revolve around it for consistency (finally we can say the sun revolves around the earth!)
-                rotateAround(object.getTransform(), nearestOrbitalObject.getTransform().getAbsolutePosition(), nearestOrbitalObject.getRotationAxis(), -dthetaNearest);
+                rotateAround(object.getTransform(), nearestOrbitalObject.getTransform().getAbsolutePosition(), nearestOrbitalObject.getRotationAxis(), -dThetaNearest);
             }
 
             this.systemTargets.forEach((target) => {
-                rotateAround(target.getTransform(), nearestOrbitalObject.getTransform().getAbsolutePosition(), nearestOrbitalObject.getRotationAxis(), -dthetaNearest);
+                rotateAround(target.getTransform(), nearestOrbitalObject.getTransform().getAbsolutePosition(), nearestOrbitalObject.getRotationAxis(), -dThetaNearest);
             });
 
             // the starfield is rotated to give the impression the nearest body is rotating, which is only an illusion
-            const starfieldAdditionalRotation = Matrix.RotationAxis(nearestOrbitalObject.getRotationAxis(), dthetaNearest);
+            const starfieldAdditionalRotation = Matrix.RotationAxis(nearestOrbitalObject.getRotationAxis(), dThetaNearest);
             this.starFieldBox.setRotationMatrix(this.starFieldBox.getRotationMatrix().multiply(starfieldAdditionalRotation));
         } else {
             // if we don't compensate the rotation of the nearest body, we must simply update its rotation
@@ -384,7 +406,7 @@ export class StarSystemController {
         // compute what would be its next position if it were to move normally.
         // This gives us a translation vector that we can negate and apply to all other bodies.
         const initialPosition = nearestOrbitalObject.getTransform().getAbsolutePosition().clone();
-        const newPosition = OrbitalObjectUtils.GetNextOrbitalPosition(nearestOrbitalObject, deltaSeconds);
+        const newPosition = OrbitalObjectUtils.GetOrbitalPosition(nearestOrbitalObject, this.elapsedSeconds);
 
         const nearestBodyDisplacement = newPosition.subtract(initialPosition);
         if (shouldCompensateTranslation) {
@@ -408,7 +430,7 @@ export class StarSystemController {
         for (const object of this.orbitalObjects) {
             if (object === nearestOrbitalObject) continue;
 
-            OrbitalObjectUtils.UpdateOrbitalPosition(object, deltaSeconds);
+            OrbitalObjectUtils.SetOrbitalPosition(object, this.elapsedSeconds);
             OrbitalObjectUtils.UpdateRotation(object, deltaSeconds);
         }
 
@@ -418,7 +440,7 @@ export class StarSystemController {
             object.getAsteroidField()?.update(controller.getActiveCameras()[0].globalPosition, deltaSeconds);
         }
 
-        for (const body of this.telluricPlanets) {
+        for (const body of this.telluricBodies) {
             // Meshes with LOD are updated (surface quadtrees)
             body.updateLOD(controller.getTransform().getAbsolutePosition(), chunkForge);
             body.computeCulling(controller.getActiveCameras());
@@ -468,7 +490,7 @@ export class StarSystemController {
     public updateShaders(deltaSeconds: number, postProcessManager: PostProcessManager) {
         const nearestBody = this.getNearestCelestialBody(this.scene.getActiveControls().getTransform().getAbsolutePosition());
 
-        for (const planet of this.planets) {
+        for (const planet of this.planetaryMassObjects) {
             planet.updateMaterial(this.stellarObjects, deltaSeconds);
         }
 
@@ -480,35 +502,45 @@ export class StarSystemController {
         postProcessManager.update(deltaSeconds);
     }
 
-    addSystemTarget(seed: SystemSeed, systemDirection: Vector3, distance: number): SystemTarget {
-        const placeholderTransform = new SystemTarget(seed, this.scene);
-        placeholderTransform.getTransform().position.copyFrom(systemDirection.scale(distance));
+    addSystemTarget(targetCoordinates: StarSystemCoordinates): SystemTarget {
+        const currentSystemUniversePosition = getStarGalacticPosition(this.model.getCoordinates());
+        const targetSystemUniversePosition = getStarGalacticPosition(targetCoordinates);
 
-        this.systemTargets.forEach((target) => {
-            target.dispose();
-        });
-        this.systemTargets = [placeholderTransform];
+        const distance = Vector3.Distance(currentSystemUniversePosition, targetSystemUniversePosition) * Settings.LIGHT_YEAR;
+
+        const direction = targetSystemUniversePosition.subtract(currentSystemUniversePosition).scaleInPlace(Settings.LIGHT_YEAR / distance);
+        Vector3.TransformCoordinatesToRef(direction, this.starFieldBox.getRotationMatrix(), direction);
+
+        const placeholderTransform = new SystemTarget(targetCoordinates, this.scene);
+        placeholderTransform.getTransform().position.copyFrom(direction.scale(distance));
+
+        this.systemTargets.push(placeholderTransform);
 
         return placeholderTransform;
+    }
+
+    getSystemTargets(): SystemTarget[] {
+        return this.systemTargets;
     }
 
     /**
      * Disposes all the bodies in the system
      */
     public dispose() {
-        for (const object of this.orbitalObjects) object.dispose();
+        this.orbitalObjects.forEach((object) => object.dispose());
+        this.orbitalObjects.length = 0;
+
         this.systemTargets.forEach((target) => target.dispose());
+        this.systemTargets.length = 0;
 
         this.starFieldBox.dispose();
 
-        this.systemTargets = [];
-
-        this.orbitalObjects.length = 0;
         this.spaceStations.length = 0;
         this.celestialBodies.length = 0;
         this.stellarObjects.length = 0;
         this.planets.length = 0;
-        this.telluricPlanets.length = 0;
+        this.telluricBodies.length = 0;
+        this.planetaryMassObjects.length = 0;
         this.gasPlanets.length = 0;
         this.anomalies.length = 0;
     }

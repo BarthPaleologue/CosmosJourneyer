@@ -19,12 +19,12 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { StarSystemController } from "../starSystem/starSystemController";
 import { nearestBody } from "./nearestBody";
 import { Transformable } from "../architecture/transformable";
-import { BoundingSphere } from "../architecture/boundingSphere";
+import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { Controls } from "../uberCore/controls";
 import { getUpwardDirection, roll, rotateAround } from "../uberCore/transforms/basicTransform";
 import { CanHaveRings } from "../architecture/canHaveRings";
 
-export function positionNearObjectBrightSide(transformable: Transformable, object: Transformable & BoundingSphere, starSystem: StarSystemController, nRadius = 3): void {
+export function positionNearObjectBrightSide(transformable: Transformable, object: Transformable & HasBoundingSphere, starSystem: StarSystemController, nRadius = 3): void {
     // go from the nearest star to be on the sunny side of the object
     const nearestStar = nearestBody(object.getTransform().getAbsolutePosition(), starSystem.stellarObjects);
 
@@ -54,7 +54,7 @@ export function positionNearObjectBrightSide(transformable: Transformable, objec
     transformable.getTransform().lookAt(object.getTransform().getAbsolutePosition());
 }
 
-export function positionNearObjectWithStarVisible(transformable: Controls, object: Transformable & BoundingSphere, starSystem: StarSystemController, nRadius = 3): void {
+export function positionNearObjectWithStarVisible(transformable: Controls, object: Transformable & HasBoundingSphere, starSystem: StarSystemController, nRadius = 3): void {
     // go from the nearest star to be on the sunny side of the object
     const nearestStar = nearestBody(object.getTransform().getAbsolutePosition(), starSystem.stellarObjects);
 
@@ -106,7 +106,7 @@ export function positionNearObjectWithStarVisible(transformable: Controls, objec
     });
 }
 
-export function positionNearObjectAsteroidField(body: Transformable & CanHaveRings & BoundingSphere, starSystem: StarSystemController): Vector3 {
+export function positionNearObjectAsteroidField(body: Transformable & CanHaveRings & HasBoundingSphere, starSystem: StarSystemController): Vector3 {
     const asteroidField = body.getAsteroidField();
     if (asteroidField === null) {
         throw new Error("The body does not have an asteroid field");

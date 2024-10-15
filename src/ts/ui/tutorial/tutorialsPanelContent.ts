@@ -2,11 +2,13 @@ import { AvailableTutorials } from "../../tutorials/availableTutorials";
 import i18n from "../../i18n";
 import { StarSystemView } from "../../starSystem/starSystemView";
 import { StarSystemController } from "../../starSystem/starSystemController";
-import { SystemSeed } from "../../utils/systemSeed";
 import { positionNearObjectAsteroidField } from "../../utils/positionNearObject";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { Tutorial } from "../../tutorials/tutorial";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { SystemObjectType } from "../../saveFile/universeCoordinates";
+import { OrbitalObject } from "../../architecture/orbitalObject";
+import { getSystemModelFromCoordinates } from "../../utils/starSystemCoordinatesUtils";
 
 export class TutorialsPanelContent {
     readonly htmlRoot: HTMLElement;
@@ -39,15 +41,30 @@ export class TutorialsPanelContent {
             tutorialDiv.addEventListener("click", async () => {
                 this.onTutorialSelected.notifyObservers(tutorial);
 
-                if (tutorial.universeObjectIdentifier !== undefined) {
+                if (tutorial.universeObjectId !== undefined) {
                     const engine = starSystemView.scene.getEngine();
                     engine.displayLoadingUI();
-                    const systemSeed = SystemSeed.Deserialize(tutorial.universeObjectIdentifier.starSystem);
-                    await starSystemView.loadStarSystem(new StarSystemController(systemSeed, starSystemView.scene), true);
+                    const systemModel = getSystemModelFromCoordinates(tutorial.universeObjectId.starSystemCoordinates);
+                    await starSystemView.loadStarSystem(new StarSystemController(systemModel, starSystemView.scene), true);
                     starSystemView.initStarSystem();
                     engine.hideLoadingUI();
 
-                    const orbitalObject = starSystemView.getStarSystem().getOrbitalObjects()[tutorial.universeObjectIdentifier.orbitalObjectIndex];
+                    let orbitalObject: OrbitalObject;
+                    switch (tutorial.universeObjectId.objectType) {
+                        case SystemObjectType.STELLAR_OBJECT:
+                            orbitalObject = starSystemView.getStarSystem().stellarObjects[tutorial.universeObjectId.objectIndex];
+                            break;
+                        case SystemObjectType.ANOMALY:
+                            orbitalObject = starSystemView.getStarSystem().anomalies[tutorial.universeObjectId.objectIndex];
+                            break;
+                        case SystemObjectType.PLANETARY_MASS_OBJECT:
+                            orbitalObject = starSystemView.getStarSystem().planets[tutorial.universeObjectId.objectIndex];
+                            break;
+                        case SystemObjectType.SPACE_STATION:
+                            orbitalObject = starSystemView.getStarSystem().spaceStations[tutorial.universeObjectId.objectIndex];
+                            break;
+                    }
+
                     const correspondingCelestialBody = starSystemView
                         .getStarSystem()
                         .getBodies()

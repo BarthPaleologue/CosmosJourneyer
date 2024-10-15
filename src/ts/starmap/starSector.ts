@@ -22,7 +22,7 @@ import { UniverseDensity } from "../settings";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { BoundingBox } from "@babylonjs/core/Culling/boundingBox";
-import { SystemSeed } from "../utils/systemSeed";
+import { StarSystemCoordinates } from "../starSystem/starSystemModel";
 
 export function vector3ToString(v: Vector3): string {
     return `${v.x},${v.y},${v.z}`;
@@ -30,7 +30,7 @@ export function vector3ToString(v: Vector3): string {
 
 export type BuildData = {
     name: string;
-    seed: SystemSeed;
+    coordinates: StarSystemCoordinates;
     sectorString: string;
     position: Vector3;
 };
@@ -78,10 +78,18 @@ export class StarSector {
         const sectorString = this.getKey();
         const data: BuildData[] = [];
         for (let i = 0; i < this.nbStars; i++) {
-            const systemSeed = new SystemSeed(this.coordinates.x, this.coordinates.y, this.coordinates.z, i);
+            const localPosition = this.getLocalPositionOfStar(i);
+            const coordinates: StarSystemCoordinates = {
+                starSectorX: this.coordinates.x,
+                starSectorY: this.coordinates.y,
+                starSectorZ: this.coordinates.z,
+                localX: localPosition.x,
+                localY: localPosition.y,
+                localZ: localPosition.z
+            };
             data.push({
                 name: `starInstance|${this.coordinates.x}|${this.coordinates.y}|${this.coordinates.z}|${i}`,
-                seed: systemSeed,
+                coordinates: coordinates,
                 sectorString: sectorString,
                 position: this.getPositionOfStar(i)
             });
@@ -89,13 +97,37 @@ export class StarSector {
         return data;
     }
 
-    getPositionOfStar(starIndex: number): Vector3 {
+    /**
+     * Returns the local position of a star in the sector (between -0.5 and 0.5)
+     * @param starIndex The index of the star in the sector
+     */
+    getLocalPositionOfStar(starIndex: number): Vector3 {
         if (starIndex >= this.nbStars) throw new Error(`Star index ${starIndex} is out of bounds for sector ${this.coordinates}`);
-        return new Vector3(centeredRand(this.rng, 10 * starIndex + 1) / 2, centeredRand(this.rng, 10 * starIndex + 2) / 2, centeredRand(this.rng, 10 * starIndex + 3) / 2)
-            .scaleInPlace(StarSector.SIZE)
-            .addInPlace(this.position);
+        return new Vector3(centeredRand(this.rng, 10 * starIndex + 1) / 2, centeredRand(this.rng, 10 * starIndex + 2) / 2, centeredRand(this.rng, 10 * starIndex + 3) / 2);
     }
 
+    /**
+     * Returns the local positions of all stars in the sector (between -0.5 and 0.5)
+     */
+    getLocalPositionsOfStars(): Vector3[] {
+        const positions: Vector3[] = [];
+        for (let i = 0; i < this.nbStars; i++) {
+            positions.push(this.getLocalPositionOfStar(i));
+        }
+        return positions;
+    }
+
+    /**
+     * Returns the position of a star in the universe
+     * @param starIndex The index of the star in the sector
+     */
+    getPositionOfStar(starIndex: number): Vector3 {
+        return this.getLocalPositionOfStar(starIndex).scaleInPlace(StarSector.SIZE).addInPlace(this.position);
+    }
+
+    /**
+     * Returns the positions of all stars of the sector in the universe
+     */
     getPositionOfStars(): Vector3[] {
         const positions: Vector3[] = [];
         for (let i = 0; i < this.nbStars; i++) {

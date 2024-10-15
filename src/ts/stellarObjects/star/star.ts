@@ -25,7 +25,6 @@ import { Light } from "@babylonjs/core/Lights/light";
 import { setRotationQuaternion } from "../../uberCore/transforms/basicTransform";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
-import { getStellarTypeString } from "../common";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
 import { CelestialBody } from "../../architecture/celestialBody";
@@ -35,13 +34,12 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { StellarObject } from "../../architecture/stellarObject";
 import { Cullable } from "../../utils/cullable";
-import { OrbitProperties } from "../../orbit/orbitProperties";
 import { RingsUniforms } from "../../rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
-import i18n from "../../i18n";
 import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
+import { Orbit } from "../../orbit/orbit";
 
 export class Star implements StellarObject, Cullable {
     readonly name: string;
@@ -102,7 +100,7 @@ export class Star implements StellarObject, Cullable {
         this.light.falloffType = Light.FALLOFF_STANDARD;
         this.light.parent = this.getTransform();
 
-        this.material = new StarMaterial(this.getTransform(), this.model, scene);
+        this.material = new StarMaterial(this.model, scene);
         this.mesh.material = this.material;
 
         setRotationQuaternion(this.getTransform(), Quaternion.Identity());
@@ -134,7 +132,7 @@ export class Star implements StellarObject, Cullable {
         return this.light;
     }
 
-    getOrbitProperties(): OrbitProperties {
+    getOrbitProperties(): Orbit {
         return this.model.orbit;
     }
 
@@ -151,7 +149,7 @@ export class Star implements StellarObject, Cullable {
     }
 
     getTypeName(): string {
-        return i18n.t("objectTypes:star", { stellarType: getStellarTypeString(this.model.stellarType) });
+        return this.model.typeName;
     }
 
     public updateMaterial(deltaTime: number): void {
@@ -175,9 +173,11 @@ export class Star implements StellarObject, Cullable {
     }
 
     public dispose(): void {
-        this.mesh.dispose();
+        this.aggregate.dispose();
         this.material.dispose();
         this.light.dispose();
         this.asteroidField?.dispose();
+        this.ringsUniforms?.dispose();
+        this.mesh.dispose();
     }
 }

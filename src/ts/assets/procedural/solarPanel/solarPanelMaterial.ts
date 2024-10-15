@@ -59,4 +59,9 @@ export class SolarPanelMaterial extends ShaderMaterial {
     update(stellarObjects: Transformable[]): void {
         this.stellarObjects = stellarObjects;
     }
+
+    dispose(forceDisposeEffect?: boolean, forceDisposeTextures?: boolean, notBoundToMesh?: boolean) {
+        super.dispose(forceDisposeEffect, forceDisposeTextures, notBoundToMesh);
+        this.stellarObjects.length = 0;
+    }
 }

@@ -15,23 +15,31 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { StarSystemModel } from "./starSystemModel";
+import { StarSystemCoordinates, StarSystemModel } from "./starSystemModel";
 import { BodyType } from "../architecture/bodyType";
 import { AnomalyType } from "../anomalies/anomalyType";
 
 export class CustomStarSystemModel implements StarSystemModel {
     readonly name: string;
 
+    private readonly coordinates: StarSystemCoordinates;
+
     readonly stellarObjects: [BodyType, number][];
     readonly planets: [BodyType, number][];
     readonly anomalies: [AnomalyType, number][];
 
-    constructor(name: string, stellarObjects: [BodyType, number][], planets: [BodyType, number][], anomalies: [AnomalyType, number][]) {
+    constructor(name: string, coordinates: StarSystemCoordinates, stellarObjects: [BodyType, number][], planets: [BodyType, number][], anomalies: [AnomalyType, number][]) {
         this.name = name;
+
+        this.coordinates = coordinates;
 
         this.stellarObjects = stellarObjects;
         this.planets = planets;
         this.anomalies = anomalies;
+    }
+
+    getCoordinates(): StarSystemCoordinates {
+        return this.coordinates;
     }
 
     getNbStellarObjects(): number {

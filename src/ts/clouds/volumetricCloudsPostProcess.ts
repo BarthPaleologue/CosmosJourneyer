@@ -21,7 +21,7 @@ import { FlatCloudsPostProcess } from "./flatCloudsPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { CloudsUniforms } from "./cloudsUniforms";
 
-import { BoundingSphere } from "../architecture/boundingSphere";
+import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { Transformable } from "../architecture/transformable";
 import { StellarObject } from "../architecture/stellarObject";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
@@ -42,7 +42,7 @@ export class VolumetricCloudsPostProcess extends PostProcess implements ObjectPo
 
     private activeCamera: Camera | null = null;
 
-    constructor(name: string, planet: Transformable & BoundingSphere, cloudsUniforms: CloudsUniforms, scene: Scene, stars: StellarObject[]) {
+    constructor(name: string, planet: Transformable & HasBoundingSphere, cloudsUniforms: CloudsUniforms, scene: Scene, stars: StellarObject[]) {
         const shaderName = "volumetricClouds";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = volumetricCloudsFragment;

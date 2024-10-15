@@ -140,6 +140,8 @@ export class AsteroidField implements IDisposable {
         for (const value of this.patches.values()) {
             value.patch.dispose();
         }
+
+        this.patches.clear();
     }
 
     /**

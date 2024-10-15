@@ -8,12 +8,17 @@ import { getMoonSeeds } from "../planets/common";
 import { PlanetModel } from "../architecture/planet";
 import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
 import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
+import { StarSystemModel } from "../starSystem/starSystemModel";
 
 /**
  * Analyzes the given star system to return the indices of the orbital objects that are space stations.
  * @param systemModel
  */
-export function placeSpaceStations(systemModel: SeededStarSystemModel): PlanetModel[] {
+export function placeSpaceStations(systemModel: StarSystemModel): PlanetModel[] {
+    if (!(systemModel instanceof SeededStarSystemModel)) {
+        throw new Error("Only seeded star systems are supported for space station placement.");
+    }
+
     const stellarObjectModels = systemModel.getStellarObjects().map(([bodyType, seed]) => {
         switch (bodyType) {
             case BodyType.STAR:
@@ -64,7 +69,8 @@ export function placeSpaceStations(systemModel: SeededStarSystemModel): PlanetMo
     });
 
     // sort planets by potential score
-    const sortedPlanets = planetModels.toSorted((planetA, planetB) => {
+    const sortedPlanets = Array.from(planetModels);
+    sortedPlanets.sort((planetA, planetB) => {
         const scoreA = planetToPotentialScore.get(planetA) ?? 0;
         const scoreB = planetToPotentialScore.get(planetB) ?? 0;
         return scoreB - scoreA;

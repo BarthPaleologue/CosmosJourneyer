@@ -19,7 +19,7 @@ import { parseDistance, parseSeconds } from "../utils/parseToStrings";
 import { getAngularSize } from "../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Transformable } from "../architecture/transformable";
-import { BoundingSphere } from "../architecture/boundingSphere";
+import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { TypedObject } from "../architecture/typedObject";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Matrix } from "@babylonjs/core/Maths/math";
@@ -29,7 +29,8 @@ export const enum ObjectTargetCursorType {
     CELESTIAL_BODY,
     FACILITY,
     ANOMALY,
-    LANDING_PAD
+    LANDING_PAD,
+    STAR_SYSTEM
 }
 
 export class ObjectTargetCursor {
@@ -43,11 +44,9 @@ export class ObjectTargetCursor {
     readonly distanceText: HTMLParagraphElement;
     readonly etaText: HTMLParagraphElement;
 
-    readonly object: Transformable & BoundingSphere & TypedObject;
+    readonly object: Transformable & HasBoundingSphere & TypedObject;
 
     private lastDistance = 0;
-
-    static readonly WIDTH = 300;
 
     readonly minDistance: number;
     readonly maxDistance: number;
@@ -63,7 +62,7 @@ export class ObjectTargetCursor {
 
     private isInformationEnabled = false;
 
-    constructor(object: Transformable & BoundingSphere & TypedObject, iconType: ObjectTargetCursorType, minDistance: number, maxDistance: number) {
+    constructor(object: Transformable & HasBoundingSphere & TypedObject, iconType: ObjectTargetCursorType, minDistance: number, maxDistance: number) {
         this.htmlRoot = document.createElement("div");
         this.htmlRoot.classList.add("targetCursorRoot");
         this.htmlRoot.dataset.name = object.getTransform().name + " Target Cursor Root";
@@ -79,7 +78,7 @@ export class ObjectTargetCursor {
                 break;
             case ObjectTargetCursorType.FACILITY:
                 this.cursor.classList.add("rotated");
-                this.minSize = 2;
+                this.minSize = 3;
                 this.maxSize = 0;
                 break;
             case ObjectTargetCursorType.ANOMALY:
@@ -89,6 +88,11 @@ export class ObjectTargetCursor {
                 break;
             case ObjectTargetCursorType.LANDING_PAD:
                 this.cursor.classList.add("rotated");
+                this.minSize = 1.5;
+                this.maxSize = 1.5;
+                break;
+            case ObjectTargetCursorType.STAR_SYSTEM:
+                this.cursor.classList.add("rounded");
                 this.minSize = 1.5;
                 this.maxSize = 1.5;
                 break;
@@ -189,7 +193,7 @@ export class ObjectTargetCursor {
     }
 
     isVisible() {
-        return this.alpha > 0 && this.screenCoordinates.z > 0;
+        return this.alpha > 0; // && this.screenCoordinates.z > 0;
     }
 
     dispose() {

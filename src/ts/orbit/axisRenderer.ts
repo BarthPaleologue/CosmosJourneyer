@@ -15,17 +15,19 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { LinesMesh, MeshBuilder } from "@babylonjs/core/Meshes";
+import { CreateGreasedLine, GreasedLineBaseMesh, GreasedLineMesh, GreasedLineRibbonMesh } from "@babylonjs/core/Meshes";
 import { Vector3 } from "@babylonjs/core/Maths/math";
-import { BoundingSphere } from "../architecture/boundingSphere";
+import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { Transformable } from "../architecture/transformable";
 import { Scene } from "@babylonjs/core/scene";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { GreasedLineMeshColorMode } from "@babylonjs/core/Materials/GreasedLine/greasedLineMaterialInterfaces";
 
 /**
  * Visual helper designed to display the rotation axis of given objects
  */
 export class AxisRenderer {
-    private axisMeshes: LinesMesh[] = [];
+    private axisMeshes: (GreasedLineBaseMesh | GreasedLineMesh | GreasedLineRibbonMesh)[] = [];
 
     private _isVisible = false;
 
@@ -34,7 +36,7 @@ export class AxisRenderer {
      * @param objects
      * @param scene
      */
-    setOrbitalObjects(objects: (Transformable & BoundingSphere)[], scene: Scene) {
+    setOrbitalObjects(objects: (Transformable & HasBoundingSphere)[], scene: Scene) {
         this.reset();
 
         for (const object of objects) {
@@ -44,14 +46,22 @@ export class AxisRenderer {
         this.setVisibility(this._isVisible);
     }
 
-    private createAxisMesh(orbitalObject: Transformable & BoundingSphere, scene: Scene) {
-        const rotationAxisHelper = MeshBuilder.CreateLines(
-            `RotationAxisHelper`,
+    private createAxisMesh(orbitalObject: Transformable & HasBoundingSphere, scene: Scene) {
+        const rotationAxisHelper = CreateGreasedLine(
+            `${orbitalObject.getTransform().name}AxisHelper`,
             {
-                points: [new Vector3(0, -orbitalObject.getBoundingRadius() * 2, 0), new Vector3(0, orbitalObject.getBoundingRadius() * 2, 0)]
+                points: [new Vector3(0, -orbitalObject.getBoundingRadius() * 2, 0), new Vector3(0, orbitalObject.getBoundingRadius() * 2, 0)],
+                updatable: false
+            },
+            {
+                color: Color3.White(),
+                width: 5,
+                colorMode: GreasedLineMeshColorMode.COLOR_MODE_SET,
+                sizeAttenuation: true
             },
             scene
         );
+
         rotationAxisHelper.parent = orbitalObject.getTransform();
         this.axisMeshes.push(rotationAxisHelper);
     }
@@ -79,7 +89,7 @@ export class AxisRenderer {
      * @private
      */
     public reset() {
-        this.axisMeshes.forEach((orbitMesh) => orbitMesh.dispose());
+        this.axisMeshes.forEach((orbitMesh) => orbitMesh.dispose(false, true));
         this.axisMeshes = [];
     }
 }

@@ -7,7 +7,7 @@
     "spaceShipRotationText2": "The yellow arrow on the screen is there to help you understand the orientation of the spaceship. Its opacity also indicates the rate of rotation.",
     "spaceShipRotationText3": "Try to get a feel for the controls by rotating the spaceship. You will get better at it with practice.",
     "spaceShipThrustTitle": "Spaceship Thrust",
-    "spaceShipThrustText1": "Assuming a QWERTY layout, you can throttle the main engines with {{keyIncrease}} and {{keyDecrease}}. Pressing {{keyKill}} will set the throttle to zero.",
+    "spaceShipThrustText1": "You can throttle the main engines with {{keyIncrease}} and {{keyDecrease}}. Pressing {{keyKill}} will set the throttle to zero.",
     "spaceShipThrustText2": "Your throttle is displayed as a vertical progress bar on the bottom right of the screen alongside your speed.",
     "spaceShipThrustText3": "Try flying around in the asteroid field to get familiar with the controls.",
     "spaceShipWarpDriveTitle": "Warp Drive",

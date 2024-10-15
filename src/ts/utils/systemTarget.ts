@@ -1,26 +1,23 @@
 import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Transformable } from "../architecture/transformable";
-import { BoundingSphere } from "../architecture/boundingSphere";
+import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { TypedObject } from "../architecture/typedObject";
-import { SystemSeed } from "./systemSeed";
-import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
 import i18n from "../i18n";
+import { StarSystemCoordinates } from "../starSystem/starSystemModel";
+import { getSystemModelFromCoordinates } from "./starSystemCoordinatesUtils";
 
-export class SystemTarget implements Transformable, BoundingSphere, TypedObject {
+export class SystemTarget implements Transformable, HasBoundingSphere, TypedObject {
     readonly name: string;
     private readonly transform: TransformNode;
-    private readonly scene: Scene;
 
-    readonly seed: SystemSeed;
+    readonly systemCoordinates: StarSystemCoordinates;
 
-    constructor(seed: SystemSeed, scene: Scene) {
-        const systemModel = new SeededStarSystemModel(seed);
+    constructor(systemCoordinates: StarSystemCoordinates, scene: Scene) {
+        const systemModel = getSystemModelFromCoordinates(systemCoordinates);
         this.name = systemModel.name;
         this.transform = new TransformNode(this.name, scene);
-        this.scene = scene;
-
-        this.seed = seed;
+        this.systemCoordinates = systemCoordinates;
     }
 
     getTransform(): TransformNode {

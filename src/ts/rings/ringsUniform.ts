@@ -36,7 +36,7 @@ export const RingsSamplerNames = {
 };
 
 export class RingsUniforms {
-    private lut: ProceduralTexture | null = null;
+    private readonly lut: ProceduralTexture;
     private lutReady = false;
 
     readonly model: RingsModel;
@@ -97,5 +97,9 @@ export class RingsUniforms {
 
     public static SetEmptySamplers(effect: Effect) {
         effect.setTexture(RingsSamplerNames.RING_LUT, Textures.EMPTY_TEXTURE);
+    }
+
+    public dispose() {
+        this.lut.dispose();
     }
 }

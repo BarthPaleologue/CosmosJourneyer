@@ -33,8 +33,11 @@ import hyperSpaceSound from "../../asset/sound/539503__timbre_endless-decelerati
 import thrusterSound from "../../asset/sound/318688__limitsnap_creations__rocket-thrust-effect.mp3";
 import starMapBackgroundMusic from "../../asset/sound/455855__andrewkn__wandering.mp3";
 
+import initiatingPlanetaryLandingSound from "../../asset/sound/voice/InitiatingPlanetaryLandingCharlotte.mp3";
 import landingRequestSound from "../../asset/sound/voice/LandingRequestGrantedCharlotte.mp3";
 import landingCompleteSound from "../../asset/sound/voice/LandingCompleteCharlotte.mp3";
+
+import missionCompleteSound from "../../asset/sound/voice/MissionCompleteCharlotte.mp3";
 
 import cannotEngageWarpDriveSound from "../../asset/sound/voice/CannotEngageWarpDriveCharlotte.mp3";
 import warpDriveEmergencyShutDownSound from "../../asset/sound/voice/WarpDriveEmergencyShutdownCharlotte.mp3";
@@ -69,8 +72,11 @@ export class Sounds {
     public static STAR_MAP_BACKGROUND_MUSIC: Sound;
     public static MAIN_MENU_BACKGROUND_MUSIC: Sound;
 
+    public static INITIATING_PLANETARY_LANDING: Sound;
     public static LANDING_REQUEST_GRANTED: Sound;
     public static LANDING_COMPLETE: Sound;
+
+    public static MISSION_COMPLETE: Sound;
 
     public static CANNOT_ENGAGE_WARP_DRIVE: Sound;
     public static WARP_DRIVE_EMERGENCY_SHUT_DOWN: Sound;
@@ -78,6 +84,29 @@ export class Sounds {
     public static ENGAGING_WARP_DRIVE: Sound;
 
     public static STRAUSS_BLUE_DANUBE: Sound;
+
+    private static IS_PLAYING = false;
+    private static QUEUE: Sound[] = [];
+
+    public static EnqueuePlay(sound: Sound) {
+        Sounds.QUEUE.push(sound);
+    }
+
+    public static Update() {
+        if (Sounds.IS_PLAYING) return;
+
+        if (Sounds.QUEUE.length === 0) return;
+
+        const sound = Sounds.QUEUE.shift();
+        if (sound === undefined) return;
+
+        Sounds.IS_PLAYING = true;
+        sound.play();
+
+        sound.onEndedObservable.addOnce(() => {
+            Sounds.IS_PLAYING = false;
+        });
+    }
 
     public static EnqueueTasks(manager: AssetsManager, scene: Scene) {
         const ouchSoundTask = manager.addBinaryFileTask("ouchSoundTask", ouchSound);
@@ -221,6 +250,12 @@ export class Sounds {
             console.log("Main menu background music loaded");
         };
 
+        const initiatingPlanetaryLandingSoundTask = manager.addBinaryFileTask("initiatingPlanetaryLandingSoundTask", initiatingPlanetaryLandingSound);
+        initiatingPlanetaryLandingSoundTask.onSuccess = (task) => {
+            Sounds.INITIATING_PLANETARY_LANDING = new Sound("InitiatingPlanetaryLanding", task.data, scene);
+            console.log("Initiating planetary landing sound loaded");
+        };
+
         const landingRequestSoundTask = manager.addBinaryFileTask("landingRequestSoundTask", landingRequestSound);
         landingRequestSoundTask.onSuccess = (task) => {
             Sounds.LANDING_REQUEST_GRANTED = new Sound("LandingRequestGranted", task.data, scene);
@@ -231,6 +266,12 @@ export class Sounds {
         landingCompleteSoundTask.onSuccess = (task) => {
             Sounds.LANDING_COMPLETE = new Sound("LandingComplete", task.data, scene);
             console.log("Landing complete sound loaded");
+        };
+
+        const missionCompleteSoundTask = manager.addBinaryFileTask("missionCompleteSoundTask", missionCompleteSound);
+        missionCompleteSoundTask.onSuccess = (task) => {
+            Sounds.MISSION_COMPLETE = new Sound("MissionComplete", task.data, scene);
+            console.log("Mission complete sound loaded");
         };
 
         const straussBlueDanubeTask = manager.addBinaryFileTask("straussBlueDanubeTask", straussBlueDanube);

@@ -23,6 +23,7 @@ import { GenerationSteps } from "../utils/generationSteps";
 import { BodyType } from "../architecture/bodyType";
 import { romanNumeral } from "../utils/romanNumerals";
 import { StarSystemModel } from "../starSystem/starSystemModel";
+import { Alphabet } from "../utils/parseToStrings";
 
 export function getMoonSeed(model: PlanetModel, index: number) {
     if (index > model.nbMoons) throw new Error("Moon out of bound! " + index);
@@ -51,7 +52,7 @@ export function getPlanetName(seed: number, starSystemModel: StarSystemModel, pa
     if (planetIndex === -1) throw new Error("Planet not found in star system");
 
     if (isSatellite) {
-        return `${parentBody.name} ${romanNumeral(planetIndex + 1)}`;
+        return `${parentBody.name}${Alphabet[planetIndex]}`;
     }
 
     return `${starSystemModel.name} ${romanNumeral(planetIndex + 1)}`;

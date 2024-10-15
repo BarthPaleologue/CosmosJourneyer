@@ -22,30 +22,40 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Matrix } from "@babylonjs/core/Maths/math";
 import { smoothstep } from "../utils/smoothstep";
+import { Player } from "../player/player";
+import { CurrentMissionDisplay } from "./currentMissionDisplay";
+import { MissionContext } from "../missions/missionContext";
 
 export class SpaceShipLayer {
-    private parentNode: HTMLElement;
-    private bodyNamePlate: HTMLElement;
+    private readonly rootNode: HTMLElement;
 
     private readonly cursor: HTMLElement;
 
-    private targetHelper: HTMLElement;
-    private targetDot: HTMLElement;
+    private readonly targetHelper: HTMLElement;
+    private readonly targetDot: HTMLElement;
     private currentTarget: TransformNode | null = null;
 
-    constructor() {
+    private readonly currentMissionDisplay: CurrentMissionDisplay;
+
+    private readonly player: Player;
+
+    constructor(player: Player) {
+        this.player = player;
+
         if (document.querySelector("#helmetOverlay") === null) {
             document.body.insertAdjacentHTML("beforeend", overlayHTML);
         }
-        this.parentNode = document.getElementById("helmetOverlay") as HTMLElement;
-        this.bodyNamePlate = document.getElementById("bodyName") as HTMLElement;
+        this.rootNode = document.getElementById("helmetOverlay") as HTMLElement;
 
         this.cursor = document.createElement("div");
         this.cursor.classList.add("cursor");
-        this.parentNode.appendChild(this.cursor);
+        this.rootNode.appendChild(this.cursor);
 
         this.targetHelper = document.getElementById("targetHelper") as HTMLElement;
         this.targetDot = document.getElementById("targetDot") as HTMLElement;
+
+        this.currentMissionDisplay = new CurrentMissionDisplay(player);
+        this.rootNode.appendChild(this.currentMissionDisplay.rootNode);
 
         document.addEventListener("mousemove", (event) => {
             this.cursor.style.left = `${event.clientX}px`;
@@ -62,31 +72,25 @@ export class SpaceShipLayer {
     }
 
     public setVisibility(visible: boolean) {
-        this.parentNode.style.visibility = visible ? "visible" : "hidden";
+        this.rootNode.style.visibility = visible ? "visible" : "hidden";
     }
 
     public isVisible(): boolean {
-        return this.parentNode.style.visibility === "visible";
+        return this.rootNode.style.visibility === "visible";
     }
 
     public setTarget(target: TransformNode | null) {
         if (target === null || this.currentTarget === target) {
             this.targetHelper.style.display = "none";
-        } else {
-            this.targetHelper.style.display = "block";
-        }
-
-        if (this.currentTarget === target) {
             this.currentTarget = null;
             return;
         }
 
+        this.targetHelper.style.display = "block";
         this.currentTarget = target;
     }
 
-    public update(currentBody: OrbitalObject, currentControls: TransformNode) {
-        this.bodyNamePlate.innerText = currentBody.name;
-
+    public async update(currentBody: OrbitalObject, currentControls: TransformNode, missionContext: MissionContext) {
         if (this.currentTarget !== null) {
             const directionWorld = this.currentTarget.getAbsolutePosition().subtract(currentControls.getAbsolutePosition()).normalize();
             const directionLocal = Vector3.TransformNormal(directionWorld, Matrix.Invert(currentControls.getWorldMatrix()));
@@ -98,6 +102,8 @@ export class SpaceShipLayer {
             this.targetDot.style.top = `${50 - 50 * directionLocal.y}%`;
             this.targetDot.style.left = `${50 - 50 * directionLocal.x}%`;
         }
+
+        await this.currentMissionDisplay.update(missionContext);
     }
 
     displaySpeed(shipThrottle: number, speed: number) {
@@ -116,6 +122,6 @@ export class SpaceShipLayer {
     }
 
     dispose() {
-        this.parentNode.remove();
+        this.rootNode.remove();
     }
 }

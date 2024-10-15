@@ -23,7 +23,7 @@ import { Settings } from "../../../settings";
 import { ColorCorrection } from "../../../postProcesses/colorCorrection";
 import { getRotationQuaternion, rotate } from "../../../uberCore/transforms/basicTransform";
 
-import { BoundingSphere } from "../../../architecture/boundingSphere";
+import { HasBoundingSphere } from "../../../architecture/hasBoundingSphere";
 import { Transformable } from "../../../architecture/transformable";
 import { Scene } from "@babylonjs/core/scene";
 import { Tools } from "@babylonjs/core/Misc/tools";
@@ -34,7 +34,7 @@ export class GeneralPanel extends EditorPanel {
         super("general");
     }
 
-    init(body: Transformable & BoundingSphere, colorCorrection: ColorCorrection, bloom: BloomEffect, scene: Scene) {
+    init(body: Transformable & HasBoundingSphere, colorCorrection: ColorCorrection, bloom: BloomEffect, scene: Scene) {
         this.enable();
 
         for (const slider of this.sliders) slider.remove();

@@ -20,9 +20,8 @@ import { randRange, randRangeInt, uniformRandBool } from "extended-random";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getRgbFromTemperature } from "../../utils/specrend";
 import { Settings } from "../../settings";
-import { getOrbitalPeriod } from "../../orbit/orbit";
-import { OrbitProperties } from "../../orbit/orbitProperties";
-import { StellarType } from "../common";
+import { getOrbitalPeriod, Orbit } from "../../orbit/orbit";
+import { getStellarTypeString, StellarType } from "../common";
 import { StarPhysicalProperties } from "../../architecture/physicalProperties";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { wheelOfFortune } from "../../utils/random";
@@ -33,6 +32,7 @@ import { BodyType } from "../../architecture/bodyType";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { starName } from "../../utils/parseToStrings";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
+import i18n from "../../i18n";
 
 export class StarModel implements StellarObjectModel {
     readonly name: string;
@@ -46,7 +46,7 @@ export class StarModel implements StellarObjectModel {
     stellarType: StellarType;
     readonly radius: number;
 
-    readonly orbit: OrbitProperties;
+    readonly orbit: Orbit;
 
     readonly physicalProperties: StarPhysicalProperties;
 
@@ -59,6 +59,8 @@ export class StarModel implements StellarObjectModel {
     readonly childrenBodies: CelestialBodyModel[] = [];
 
     readonly starSystemModel: StarSystemModel;
+
+    readonly typeName: string;
 
     constructor(seed: number, starSystemModel: StarSystemModel, parentBody: CelestialBodyModel | null = null) {
         this.seed = seed;
@@ -77,7 +79,7 @@ export class StarModel implements StellarObjectModel {
         this.parentBody = parentBody;
 
         this.physicalProperties = {
-            mass: 1000,
+            mass: 1.9885e30, //TODO: compute mass from physical properties
             rotationPeriod: 24 * 60 * 60,
             temperature: this.temperature,
             axialTilt: 0
@@ -92,8 +94,7 @@ export class StarModel implements StellarObjectModel {
             radius: orbitRadius,
             p: 2,
             period: getOrbitalPeriod(orbitRadius, this.parentBody?.physicalProperties.mass ?? 0),
-            normalToPlane: Vector3.Up(),
-            isPlaneAlignedWithParent: true
+            normalToPlane: Vector3.Up()
         };
 
         if (uniformRandBool(StarModel.RING_PROPORTION, this.rng, GenerationSteps.RINGS)) {
@@ -101,6 +102,8 @@ export class StarModel implements StellarObjectModel {
         } else {
             this.rings = null;
         }
+
+        this.typeName = i18n.t("objectTypes:star", { stellarType: getStellarTypeString(this.stellarType) });
     }
 
     public setSurfaceTemperature(temperature: number) {

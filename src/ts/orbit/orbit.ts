@@ -16,7 +16,14 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { OrbitProperties } from "./orbitProperties";
+import { Settings } from "../settings";
+
+export type Orbit = {
+    radius: number;
+    p: number;
+    period: number;
+    normalToPlane: Vector3;
+};
 
 /**
  *
@@ -25,7 +32,7 @@ import { OrbitProperties } from "./orbitProperties";
  * @returns
  * @see https://medium.com/@barth_29567/crazy-orbits-lets-make-squares-c91a427c6b26
  */
-export function getPointOnOrbitLocal(settings: OrbitProperties, t: number): Vector3 {
+export function getPointOnOrbitLocal(settings: Orbit, t: number): Vector3 {
     const theta = -(2 * Math.PI * t) / settings.period;
     const cosTheta = Math.cos(theta);
     const sinTheta = Math.sin(theta);
@@ -42,11 +49,11 @@ export function getPointOnOrbitLocal(settings: OrbitProperties, t: number): Vect
  * @param t
  * @returns
  */
-export function getPointOnOrbit(centerOfMass: Vector3, settings: OrbitProperties, t: number): Vector3 {
+export function getPointOnOrbit(centerOfMass: Vector3, settings: Orbit, t: number): Vector3 {
     const localPosition = getPointOnOrbitLocal(settings, t);
 
     // rotate orbital plane
-    const rotationAxis = Vector3.Cross(Vector3.Up(), settings.normalToPlane).normalize();
+    const rotationAxis = Vector3.Up().equalsWithEpsilon(settings.normalToPlane) ? Vector3.Up() : Vector3.Cross(Vector3.Up(), settings.normalToPlane).normalize();
     const angle = Vector3.GetAngleBetweenVectors(Vector3.Up(), settings.normalToPlane, rotationAxis);
     const rotationMatrix = Matrix.RotationAxis(rotationAxis, angle);
 
@@ -74,15 +81,15 @@ export function getPeriapsis(radius: number, p: number) {
 }
 
 /**
- *
- * @see https://www.wikiwand.com/fr/Lois_de_Kepler#/Troisi%C3%A8me_loi_%E2%80%93_Loi_des_p%C3%A9riodes
- * @param radius
+ * Returns the orbital period of a body in seconds
+ * @see https://fr.wikipedia.org/wiki/Lois_de_Kepler
+ * @param orbitRadius
  * @param parentMass
  */
-export function getOrbitalPeriod(radius: number, parentMass: number) {
+export function getOrbitalPeriod(orbitRadius: number, parentMass: number) {
     if (parentMass === 0) return 0;
-    const a = radius;
-    const G = 1e12;
+    const a = orbitRadius;
+    const G = Settings.G;
     const M = parentMass;
     return Math.sqrt((4 * Math.PI ** 2 * a ** 3) / (G * M));
 }

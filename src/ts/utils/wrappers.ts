@@ -20,9 +20,9 @@ import { Quaternion } from "@babylonjs/core/Maths/math";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Transformable } from "../architecture/transformable";
-import { BoundingSphere } from "../architecture/boundingSphere";
+import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 
-export class TransformNodeWrapper implements Transformable, BoundingSphere {
+export class TransformNodeWrapper implements Transformable, HasBoundingSphere {
     readonly transform: TransformNode;
     readonly radius: number;
     constructor(mesh: TransformNode, radius: number) {

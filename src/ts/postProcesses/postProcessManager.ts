@@ -186,7 +186,7 @@ export class PostProcessManager {
         this.renderingPipelineManager = scene.postProcessRenderPipelineManager;
 
         this.colorCorrection = new ColorCorrection("colorCorrection", scene);
-        this.colorCorrection.exposure = 1.3;
+        this.colorCorrection.exposure = 1.1;
         this.colorCorrection.gamma = 1.0;
         this.colorCorrection.saturation = 1.5;
 
@@ -447,7 +447,8 @@ export class PostProcessManager {
         this.renderingPipeline.addEffect(shadowRenderEffect);
         this.renderingPipeline.addEffect(this.bloomRenderEffect);
 
-        for (const postProcessType of this.currentRenderingOrder) {
+        // other objects are viewed in their space configuration
+        for (const postProcessType of spaceRenderingOrder) {
             switch (postProcessType) {
                 case PostProcessType.VOLUMETRIC_LIGHT:
                     this.renderingPipeline.addEffect(otherVolumetricLightsRenderEffect);
@@ -485,6 +486,7 @@ export class PostProcessManager {
             }
         }
 
+        // closest object is either in surface or space configuration depending on distance to camera
         for (const postProcessType of this.currentRenderingOrder) {
             switch (postProcessType) {
                 case PostProcessType.VOLUMETRIC_LIGHT:
