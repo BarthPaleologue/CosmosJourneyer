@@ -101,7 +101,7 @@ vec3 anflares(vec2 uv, float intensity, float stretch, float brightness)
 {
     uv.x *= 1.0/(intensity*stretch);
     uv.y *= 0.5;
-    return vec3(smoothstep(0.009, 0.0, length(uv)))*brightness;
+    return vec3(1.0 - smoothstep(0.0, 0.009, length(uv)))*brightness;
 }
 
 void main() {
@@ -141,7 +141,7 @@ void main() {
 
     // if angular radius is to great, fade the anflare out
     float angularRadius = object_radius / length(object_position - camera_position);
-    anflare *= smoothstep(0.1, 0.0, angularRadius);
+    anflare *= 1.0 - smoothstep(0.0, 0.1, angularRadius);
 
     vec3 sun = getSun(uv-mouse) + (flare + anflare)*flareColor*2.0;
 
@@ -149,7 +149,7 @@ void main() {
     sun *= smoothstep(0.0, 0.1, dot(objectDirection, rayDir));
 
     // no lensflare when too close to the sun
-    sun *= smoothstep(0.08, 0.0, angularRadius);
+    sun *= 1.0 - smoothstep(0.0, 0.08, angularRadius);
 
     col += sun * visibility;
 
