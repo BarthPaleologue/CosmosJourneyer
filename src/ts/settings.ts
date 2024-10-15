@@ -15,9 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { seededSquirrelNoise } from "squirrel-noise";
 import { makeNoise3D } from "fast-simplex-noise";
 import { Tools } from "@babylonjs/core/Misc/tools";
+import { getRngFromSeed } from "./utils/getRngFromSeed";
 
 export const Settings = {
     UNIVERSE_SEED: Math.PI,
@@ -57,6 +57,11 @@ export const Settings = {
     VISIBLE_NEIGHBORHOOD_MAX_RADIUS_LY: 20,
 
     CREDIT_SYMBOL: "₽",
+
+    /**
+     * Size of each star
+     */
+    STAR_SECTOR_SIZE: 20,
 
     /**
      * The average daily intake for a human being in kcal/day
@@ -111,7 +116,7 @@ export const CollisionMask = {
     DYNAMIC_OBJECTS: 0b00000010
 };
 
-const densityRng = seededSquirrelNoise(Settings.UNIVERSE_SEED);
+const densityRng = getRngFromSeed(Settings.UNIVERSE_SEED);
 let densitySampleStep = 0;
 const densityPerlin = makeNoise3D(() => {
     return densityRng(densitySampleStep++);

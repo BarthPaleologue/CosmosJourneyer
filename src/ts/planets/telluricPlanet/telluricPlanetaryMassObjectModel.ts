@@ -15,19 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Settings } from "../settings";
+import { TerrainSettings } from "./terrain/terrainSettings";
+import { PlanetaryMassObjectModel } from "../../architecture/planetaryMassObject";
+import { TelluricPlanetaryMassObjectPhysicsInfo } from "../../architecture/physicsInfo";
+import { CloudsModel } from "../../clouds/cloudsModel";
 
-/**
- * Returns an estimate of the radius of a star given its mass. This is only an approximation!
- * This can be used to estimate the angular momentum of a black hole.
- * @param mass The mass of the object
- * @constructor
- * @see https://en.wikipedia.org/wiki/Main_sequence#Sample_parameters
- */
-export function estimateStarRadiusFromMass(mass: number) {
-    const massInSolarUnits = mass / Settings.SOLAR_MASS;
+export type TelluricPlanetaryMassObjectModel = PlanetaryMassObjectModel & {
+    readonly physics: TelluricPlanetaryMassObjectPhysicsInfo;
 
-    const estimatedRadiusInSolarUnits = Math.pow(massInSolarUnits, 0.78);
+    readonly terrainSettings: TerrainSettings;
 
-    return estimatedRadiusInSolarUnits * Settings.SOLAR_RADIUS;
-}
+    readonly clouds: CloudsModel | null;
+};

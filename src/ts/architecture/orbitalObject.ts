@@ -19,7 +19,7 @@ import { Transformable } from "./transformable";
 import { HasBoundingSphere } from "./hasBoundingSphere";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math";
 import { getRotationQuaternion, setRotationQuaternion, translate } from "../uberCore/transforms/basicTransform";
-import { OrbitalObjectPhysicalProperties } from "./physicalProperties";
+import { OrbitalObjectPhysicsInfo } from "./physicsInfo";
 import { TypedObject } from "./typedObject";
 import { getPointOnOrbit, Orbit } from "../orbit/orbit";
 
@@ -27,44 +27,34 @@ import { getPointOnOrbit, Orbit } from "../orbit/orbit";
  * Describes all objects that can have an orbital trajectory and rotate on themselves
  */
 export interface OrbitalObject extends Transformable, HasBoundingSphere, TypedObject {
-    /**
-     * The name of the object
-     */
-    readonly name: string;
+    readonly model: OrbitalObjectModel;
 
     /**
      * The rotation axis around which the object rotates on itself
      */
     getRotationAxis(): Vector3;
-
-    /**
-     * Returns the orbital properties of the object
-     */
-    getOrbitProperties(): Orbit;
-
-    /**
-     * Returns the physical properties of the object
-     */
-    getPhysicalProperties(): OrbitalObjectPhysicalProperties;
-
-    /**
-     * Returns the parent of the object
-     */
-    parent: OrbitalObject | null;
 }
 
 export class OrbitalObjectUtils {
     /**
      * Returns the position of the object on its orbit at a given time. This does not update the position of the object (see SetOrbitalPosition)
      * @param object The object we want to compute the position of
+     * @param parents
      * @param elapsedSeconds The time elapsed since the beginning of time in seconds
      * @constructor
      */
-    static GetOrbitalPosition(object: OrbitalObject, elapsedSeconds: number): Vector3 {
-        const orbit = object.getOrbitProperties();
-        if (orbit.period === 0 || object.parent === null) return object.getTransform().getAbsolutePosition();
+    static GetOrbitalPosition(object: OrbitalObject, parents: OrbitalObject[], elapsedSeconds: number): Vector3 {
+        const orbit = object.model.orbit;
+        if (orbit.period === 0 || parents.length === 0) return object.getTransform().getAbsolutePosition();
 
-        const barycenter = object.parent.getTransform().getAbsolutePosition();
+        const barycenter = Vector3.Zero(); //object.parent.getTransform().getAbsolutePosition();
+        let sumOfMasses = 0;
+        for (const parent of parents) {
+            const mass = parent.model.physics.mass;
+            barycenter.addInPlace(parent.getTransform().getAbsolutePosition().scale(mass));
+            sumOfMasses += mass;
+        }
+        barycenter.scaleInPlace(1 / sumOfMasses);
 
         return getPointOnOrbit(barycenter, orbit, elapsedSeconds);
     }
@@ -72,15 +62,16 @@ export class OrbitalObjectUtils {
     /**
      * Sets the position of the object on its orbit given the elapsed seconds.
      * @param object The object we want to update the position of
+     * @param parents
      * @param elapsedSeconds The time elapsed since the beginning of time in seconds
      * @constructor
      */
-    static SetOrbitalPosition(object: OrbitalObject, elapsedSeconds: number): void {
-        const orbit = object.getOrbitProperties();
-        if (orbit.period === 0 || object.parent === null) return;
+    static SetOrbitalPosition(object: OrbitalObject, parents: OrbitalObject[], elapsedSeconds: number): void {
+        const orbit = object.model.orbit;
+        if (orbit.period === 0 || parents.length === 0) return;
 
         const oldPosition = object.getTransform().getAbsolutePosition();
-        const newPosition = OrbitalObjectUtils.GetOrbitalPosition(object, elapsedSeconds);
+        const newPosition = OrbitalObjectUtils.GetOrbitalPosition(object, parents, elapsedSeconds);
         translate(object.getTransform(), newPosition.subtractInPlace(oldPosition));
     }
 
@@ -91,8 +82,8 @@ export class OrbitalObjectUtils {
      * @constructor
      */
     static GetRotationAngle(object: OrbitalObject, deltaTime: number): number {
-        if (object.getPhysicalProperties().rotationPeriod === 0) return 0;
-        return (2 * Math.PI * deltaTime) / object.getPhysicalProperties().rotationPeriod;
+        if (object.model.physics.rotationPeriod === 0) return 0;
+        return (2 * Math.PI * deltaTime) / object.model.physics.rotationPeriod;
     }
 
     /**
@@ -115,22 +106,21 @@ export class OrbitalObjectUtils {
 /**
  * Describes the model of an orbital object
  */
-export interface OrbitalObjectModel {
+export type OrbitalObjectModel = {
     /**
      * The name of the object
      */
     readonly name: string;
 
     /**
-     * The random number generator used by the model to generate internal values
-     * @param step The sample step of the random number generator (use squirrel noise for example)
-     */
-    readonly rng: (step: number) => number;
-
-    /**
      * The seed used by the random number generator
      */
     readonly seed: number;
+
+    /**
+     * The type of the celestial body
+     */
+    readonly type: OrbitalObjectType;
 
     /**
      * Orbit properties of the object
@@ -140,20 +130,23 @@ export interface OrbitalObjectModel {
     /**
      * Physical properties of the object
      */
-    readonly physicalProperties: OrbitalObjectPhysicalProperties;
+    readonly physics: OrbitalObjectPhysicsInfo;
+};
 
-    /**
-     * The model of the parent object if the object is to have a parent, null otherwise
-     */
-    readonly parentBody: OrbitalObjectModel | null;
+export const enum OrbitalObjectType {
+    STAR = 0,
+    NEUTRON_STAR = 1,
+    BLACK_HOLE = 2,
+    TELLURIC_PLANET = 1000,
+    TELLURIC_SATELLITE = 1001,
+    GAS_PLANET = 1002,
+    MANDELBULB = 2000,
+    JULIA_SET = 2001,
+    SPACE_STATION = 3000
+}
 
-    /**
-     * The models of the children objects of the object
-     */
-    readonly childrenBodies: OrbitalObjectModel[];
+export const SatelliteTypes = [OrbitalObjectType.TELLURIC_SATELLITE, OrbitalObjectType.SPACE_STATION];
 
-    /**
-     * The general name of the object type
-     */
-    readonly typeName: string;
+export function isSatellite(orbitalObjectType: OrbitalObjectType): boolean {
+    return SatelliteTypes.includes(orbitalObjectType);
 }

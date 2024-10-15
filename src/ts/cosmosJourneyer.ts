@@ -36,7 +36,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { setRotationQuaternion } from "./uberCore/transforms/basicTransform";
 import { encodeBase64 } from "./utils/base64";
-import { UniverseCoordinates } from "./saveFile/universeCoordinates";
+import { StarSystemCoordinates, UniverseCoordinates } from "./utils/coordinates/universeCoordinates";
 import { View } from "./utils/view";
 import { updateInputDevices } from "./inputs/devices";
 import { AudioManager } from "./audio/audioManager";
@@ -52,10 +52,8 @@ import { FlightTutorial } from "./tutorials/flightTutorial";
 import { SidePanels } from "./ui/sidePanels";
 import { Settings } from "./settings";
 import { Player } from "./player/player";
-import { getObjectBySystemId, getUniverseObjectId } from "./utils/orbitalObjectId";
-import { StarSystemCoordinates } from "./starSystem/starSystemModel";
-import { getSystemModelFromCoordinates } from "./utils/starSystemCoordinatesUtils";
-import { StarSystemController } from "./starSystem/starSystemController";
+import { getObjectBySystemId, getUniverseObjectId } from "./utils/coordinates/orbitalObjectId";
+import { getSystemModelFromCoordinates } from "./starSystem/modelFromCoordinates";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -133,7 +131,7 @@ export class CosmosJourneyer {
 
         this.starSystemView.onInitStarSystem.add(() => {
             const starSystemModel = this.starSystemView.getStarSystem().model;
-            this.starMap.setCurrentStarSystem(starSystemModel.getCoordinates());
+            this.starMap.setCurrentStarSystem(starSystemModel.coordinates);
         });
 
         this.pauseMenu = new PauseMenu(this.sidePanels);
@@ -436,8 +434,7 @@ export class CosmosJourneyer {
         const universeObjectId = universeCoordinates.universeObjectId;
 
         const systemModel = getSystemModelFromCoordinates(universeObjectId.starSystemCoordinates);
-        const systemController = new StarSystemController(systemModel, this.starSystemView.scene);
-        await this.starSystemView.loadStarSystem(systemController, true);
+        await this.starSystemView.loadStarSystem(systemModel);
 
         if (this.state === EngineState.UNINITIALIZED) await this.init(true);
         else this.starSystemView.initStarSystem();

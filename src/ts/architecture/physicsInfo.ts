@@ -15,14 +15,33 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-/**
- * Computes the mean temperature of a planet given the properties of its star and itself
- * @param starTemperature The temperature of the star
- * @param starRadius The radius of the star
- * @param starDistance The distance between the planet and the star
- * @param planetAlbedo The albedo of the planet
- * @param planetGreenHouseEffect The greenhouse effect of the planet
- */
-export function computeMeanTemperature(starTemperature: number, starRadius: number, starDistance: number, planetAlbedo: number, planetGreenHouseEffect: number) {
-    return starTemperature * Math.pow(((1 - planetAlbedo) * starRadius ** 2) / (4 * (1 - planetGreenHouseEffect) * starDistance ** 2), 0.25);
-}
+export type OrbitalObjectPhysicsInfo = {
+    mass: number;
+    /**
+     * Time needed for the object to rotate on its axis in seconds
+     */
+    rotationPeriod: number;
+    axialTilt: number;
+};
+
+export type StellarObjectPhysicsInfo = OrbitalObjectPhysicsInfo & {
+    /**
+     * Black body temperature of the object in Kelvin
+     */
+    blackBodyTemperature: number;
+};
+
+export type BlackHolePhysicsInfo = StellarObjectPhysicsInfo & {
+    accretionDiskRadius: number;
+};
+
+export type PlanetaryMassObjectPhysicsInfo = OrbitalObjectPhysicsInfo & {
+    minTemperature: number;
+    maxTemperature: number;
+    pressure: number;
+};
+
+export type TelluricPlanetaryMassObjectPhysicsInfo = PlanetaryMassObjectPhysicsInfo & {
+    waterAmount: number;
+    oceanLevel: number;
+};

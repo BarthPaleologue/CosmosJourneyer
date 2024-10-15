@@ -20,6 +20,7 @@ import { Transformable } from "../../architecture/transformable";
 import { Star } from "../../stellarObjects/star/star";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { flattenColor3Array, flattenVector3Array } from "../../utils/algebra";
+import { getRgbFromTemperature } from "../../utils/specrend";
 
 export const StellarObjectUniformNames = {
     STAR_POSITIONS: "star_positions",
@@ -27,6 +28,7 @@ export const StellarObjectUniformNames = {
     NB_STARS: "nbStars"
 };
 
+//FIXME: take point lights as input instead of transformables
 export function setStellarObjectUniforms(effect: Effect, stellarObjects: Transformable[]): void {
     effect.setInt(StellarObjectUniformNames.NB_STARS, stellarObjects.length);
 
@@ -39,6 +41,6 @@ export function setStellarObjectUniforms(effect: Effect, stellarObjects: Transfo
     effect.setArray3(StellarObjectUniformNames.STAR_POSITIONS, flattenVector3Array(stellarObjects.map((stellarObject) => stellarObject.getTransform().getAbsolutePosition())));
     effect.setArray3(
         StellarObjectUniformNames.STAR_COLORS,
-        flattenColor3Array(stellarObjects.map((stellarObject) => (stellarObject instanceof Star ? stellarObject.model.color : Color3.White())))
+        flattenColor3Array(stellarObjects.map((stellarObject) => (stellarObject instanceof Star ? getRgbFromTemperature(stellarObject.model.physics.blackBodyTemperature) : Color3.White())))
     );
 }

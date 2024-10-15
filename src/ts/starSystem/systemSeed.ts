@@ -1,7 +1,28 @@
+import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates";
 import { StarSector } from "../starmap/starSector";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { StarSystemCoordinates } from "../starSystem/starSystemModel";
-import { SeededStarSystemModel, SystemSeed } from "../starSystem/seededStarSystemModel";
+
+/**
+ * Seed used to generate star systems in a pseudo-random fashion.
+ */
+export type SystemSeed = {
+    /**
+     * The X coordinate of the star sector (integer).
+     */
+    starSectorX: number;
+    /**
+     * The Y coordinate of the star sector (integer).
+     */
+    starSectorY: number;
+    /**
+     * The Z coordinate of the star sector (integer).
+     */
+    starSectorZ: number;
+    /**
+     * The index of the system inside its star sector (integer).
+     */
+    index: number;
+};
 
 export function getStarSystemCoordinatesFromSeed(systemSeed: SystemSeed): StarSystemCoordinates {
     const starSector = new StarSector(new Vector3(systemSeed.starSectorX, systemSeed.starSectorY, systemSeed.starSectorZ));
@@ -15,18 +36,6 @@ export function getStarSystemCoordinatesFromSeed(systemSeed: SystemSeed): StarSy
         localY: localPosition.y,
         localZ: localPosition.z
     };
-}
-
-/**
- * Get the galactic position of a star system in the universe in light years.
- * @param coordinates The coordinates of the star system.
- */
-export function getStarGalacticPosition(coordinates: StarSystemCoordinates) {
-    return new Vector3(
-        (coordinates.starSectorX + coordinates.localX) * StarSector.SIZE,
-        (coordinates.starSectorY + coordinates.localY) * StarSector.SIZE,
-        (coordinates.starSectorZ + coordinates.localZ) * StarSector.SIZE
-    );
 }
 
 /**
@@ -50,12 +59,4 @@ export function getSeedFromCoordinates(coordinates: StarSystemCoordinates): Syst
     }
 
     return null;
-}
-
-export function getSystemModelFromCoordinates(coordinates: StarSystemCoordinates) {
-    const seed = getSeedFromCoordinates(coordinates);
-    if (seed === null) {
-        throw new Error("No seed found for coordinates. Custom star systems are not supported in system targets yet.");
-    }
-    return new SeededStarSystemModel(seed);
 }

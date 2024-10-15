@@ -19,7 +19,7 @@ import { Player } from "../player/player";
 import { Mission } from "../missions/mission";
 import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
 import { MissionContext } from "../missions/missionContext";
-import { pressInteractionToStrings } from "../utils/inputControlsString";
+import { pressInteractionToStrings } from "../utils/strings/inputControlsString";
 import { Sounds } from "../assets/sounds";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 

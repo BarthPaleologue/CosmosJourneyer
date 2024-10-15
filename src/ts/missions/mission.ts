@@ -1,11 +1,27 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Affero General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Affero General Public License for more details.
+//
+//  You should have received a copy of the GNU Affero General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { MissionNode, MissionNodeSerialized } from "./nodes/missionNode";
 import { MissionContext } from "./missionContext";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
-import { getObjectModelByUniverseId, getUniverseIdForSpaceStationModel } from "../utils/orbitalObjectId";
+import { getObjectModelByUniverseId, getUniverseIdForSpaceStationModel } from "../utils/coordinates/orbitalObjectId";
 import i18n from "../i18n";
-import { UniverseObjectId } from "../saveFile/universeCoordinates";
+import { StarSystemCoordinates, UniverseObjectId } from "../utils/coordinates/universeCoordinates";
 import { deserializeMissionNode } from "./nodes/deserializeNode";
-import { StarSystemCoordinates } from "../starSystem/starSystemModel";
 
 /**
  * Registered mission types. Those are used to display localized strings in the UI
@@ -115,8 +131,7 @@ export class Mission {
      * Returns a string describing the mission using the mission tree and the origin seed
      */
     describe(): string {
-        const originSystem = this.missionGiver.starSystem;
-        return this.tree.describe(originSystem.getCoordinates());
+        return this.tree.describe(this.missionGiver.starSystemCoordinates);
     }
 
     /**

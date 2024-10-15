@@ -43,7 +43,7 @@ export class MatterJetPostProcess extends PostProcess implements ObjectPostProce
 
     private activeCamera: Camera | null = null;
 
-    constructor(name: string, stellarObject: StellarObject, scene: Scene) {
+    constructor(stellarObject: StellarObject, scene: Scene) {
         const shaderName = "matterjet";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = matterJetFragment;
@@ -64,7 +64,7 @@ export class MatterJetPostProcess extends PostProcess implements ObjectPostProce
 
         const samplers: string[] = Object.values(SamplerUniformNames);
 
-        super(name, shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
+        super(`${stellarObject.model.name}MatterJetPostProcess`, shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
 
         this.object = stellarObject;
         this.matterJetUniforms = settings;

@@ -45,14 +45,14 @@ export class ShadowPostProcess extends PostProcess implements ObjectPostProcess 
 
     private activeCamera: Camera | null = null;
 
-    constructor(name: string, body: CelestialBody, stellarObjects: StellarObject[], scene: Scene) {
+    constructor(body: CelestialBody, stellarObjects: StellarObject[], scene: Scene) {
         const shaderName = "shadow";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = shadowFragment;
         }
 
         const shadowUniforms: ShadowUniforms = {
-            hasRings: body.getRingsUniforms() !== null,
+            hasRings: body.ringsUniforms !== null,
             hasClouds: body.postProcesses.includes(PostProcessType.CLOUDS),
             hasOcean: body.postProcesses.includes(PostProcessType.OCEAN)
         };
@@ -74,11 +74,23 @@ export class ShadowPostProcess extends PostProcess implements ObjectPostProcess 
 
         const samplers: string[] = [...Object.values(SamplerUniformNames), ...Object.values(RingsSamplerNames)];
 
-        super(name, shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
+        super(
+            `${body.model.name}ShadowPostProcess`,
+            shaderName,
+            uniforms,
+            samplers,
+            1,
+            null,
+            Texture.BILINEAR_SAMPLINGMODE,
+            scene.getEngine(),
+            false,
+            null,
+            Constants.TEXTURETYPE_HALF_FLOAT
+        );
 
         this.object = body;
         this.shadowUniforms = shadowUniforms;
-        this.ringsUniforms = body.getRingsUniforms();
+        this.ringsUniforms = body.ringsUniforms;
 
         this.onActivateObservable.add((camera) => {
             this.activeCamera = camera;

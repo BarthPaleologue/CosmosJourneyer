@@ -1,16 +1,35 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Affero General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Affero General Public License for more details.
+//
+//  You should have received a copy of the GNU Affero General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { MissionNode, MissionNodeSerialized, MissionNodeType } from "../../missionNode";
 import { MissionContext } from "../../../missionContext";
-import { UniverseObjectId, universeObjectIdEquals } from "../../../../saveFile/universeCoordinates";
+import { StarSystemCoordinates, starSystemCoordinatesEquals, UniverseObjectId, universeObjectIdEquals } from "../../../../utils/coordinates/universeCoordinates";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { getObjectBySystemId, getObjectModelByUniverseId } from "../../../../utils/orbitalObjectId";
-import { getStarGalacticPosition, getSystemModelFromCoordinates } from "../../../../utils/starSystemCoordinatesUtils";
-import { parseDistance } from "../../../../utils/parseToStrings";
+import { getObjectBySystemId, getObjectModelByUniverseId } from "../../../../utils/coordinates/orbitalObjectId";
+import { getStarGalacticPosition } from "../../../../utils/coordinates/starSystemCoordinatesUtils";
+import { parseDistance } from "../../../../utils/strings/parseToStrings";
 import { Settings } from "../../../../settings";
 import i18n from "../../../../i18n";
 import { getGlobalKeyboardLayoutMap } from "../../../../utils/keyboardAPI";
-import { pressInteractionToStrings } from "../../../../utils/inputControlsString";
+import { pressInteractionToStrings } from "../../../../utils/strings/inputControlsString";
 import { GeneralInputs } from "../../../../inputs/generalInputs";
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../../../../starSystem/starSystemModel";
+import { getSystemModelFromCoordinates } from "../../../../starSystem/modelFromCoordinates";
+
+import { orbitalObjectTypeToDisplay } from "../../../../utils/strings/orbitalObjectTypeToDisplay";
 
 const enum FlyByState {
     NOT_IN_SYSTEM,
@@ -62,7 +81,7 @@ export class MissionFlyByNode implements MissionNode {
         const currentSystemModel = currentSystem.model;
 
         // Skip if the current system is not the one we are looking for
-        if (!starSystemCoordinatesEquals(currentSystemModel.getCoordinates(), this.targetSystemCoordinates)) {
+        if (!starSystemCoordinatesEquals(currentSystemModel.coordinates, this.targetSystemCoordinates)) {
             this.state = FlyByState.NOT_IN_SYSTEM;
             return;
         }
@@ -90,7 +109,7 @@ export class MissionFlyByNode implements MissionNode {
         const objectModel = getObjectModelByUniverseId(this.objectId);
         const systemModel = getSystemModelFromCoordinates(this.targetSystemCoordinates);
         return i18n.t("missions:sightseeing:describeFlyBy", {
-            objectType: objectModel.typeName.toLowerCase(),
+            objectType: orbitalObjectTypeToDisplay(objectModel),
             systemName: systemModel.name,
             distance: distance > 0 ? parseDistance(distance * Settings.LIGHT_YEAR) : i18n.t("missions:common:here")
         });
@@ -105,7 +124,7 @@ export class MissionFlyByNode implements MissionNode {
         const currentSystemModel = context.currentSystem.model;
 
         const targetSystemPosition = getStarGalacticPosition(this.targetSystemCoordinates);
-        const currentSystemPosition = getStarGalacticPosition(currentSystemModel.getCoordinates());
+        const currentSystemPosition = getStarGalacticPosition(currentSystemModel.coordinates);
         const distance = Vector3.Distance(targetSystemPosition, currentSystemPosition);
 
         const targetObject = getObjectModelByUniverseId(this.objectId);

@@ -216,7 +216,7 @@ export class CharacterControls implements Controls {
 
             // if closestWalkableObject is a telluric planet, the distance is the min between the distance to the ground and the distance to the water level
             if (this.closestWalkableObject !== null && this.closestWalkableObject instanceof TelluricPlanet) {
-                const waterLevel = this.closestWalkableObject.model.physicalProperties.oceanLevel + this.closestWalkableObject.getRadius();
+                const waterLevel = this.closestWalkableObject.model.physics.oceanLevel + this.closestWalkableObject.getRadius();
                 const distanceToWater = Vector3.Distance(this.getTransform().getAbsolutePosition(), this.closestWalkableObject.getTransform().getAbsolutePosition()) - waterLevel;
                 distance = Math.min(distance, distanceToWater + 1.3);
             }
@@ -226,7 +226,7 @@ export class CharacterControls implements Controls {
                 translate(character, up.scale(-distance));
 
                 if (this.closestWalkableObject !== null && this.closestWalkableObject instanceof TelluricPlanet) {
-                    const waterLevel = this.closestWalkableObject.model.physicalProperties.oceanLevel + this.closestWalkableObject.getRadius();
+                    const waterLevel = this.closestWalkableObject.model.physics.oceanLevel + this.closestWalkableObject.getRadius();
                     const distanceToWater =
                         Vector3.Distance(this.getTransform().getAbsolutePosition(), this.closestWalkableObject.getTransform().getAbsolutePosition()) - waterLevel;
                     if (distanceToWater < 0) {

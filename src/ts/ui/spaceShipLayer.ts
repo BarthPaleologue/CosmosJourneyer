@@ -17,14 +17,14 @@
 
 import overlayHTML from "../../html/helmetOverlay.html";
 import { OrbitalObject } from "../architecture/orbitalObject";
-import { parseSpeed } from "../utils/parseToStrings";
+import { parseSpeed } from "../utils/strings/parseToStrings";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Matrix } from "@babylonjs/core/Maths/math";
-import { smoothstep } from "../utils/smoothstep";
 import { Player } from "../player/player";
 import { CurrentMissionDisplay } from "./currentMissionDisplay";
 import { MissionContext } from "../missions/missionContext";
+import { smoothstep } from "../utils/math";
 
 export class SpaceShipLayer {
     private readonly rootNode: HTMLElement;

@@ -1,7 +1,7 @@
 import { Sound } from "@babylonjs/core/Audio/sound";
-import { moveTowards } from "./moveTowards";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
+import { moveTowards } from "./math";
 
 export class AudioInstance {
     readonly sound: Sound;

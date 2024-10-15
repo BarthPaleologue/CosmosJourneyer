@@ -34,6 +34,8 @@ import { Constants } from "@babylonjs/core/Engines/constants";
 import { Scene } from "@babylonjs/core/scene";
 import { Textures } from "../assets/textures";
 
+import { getRngFromSeed } from "../utils/getRngFromSeed";
+
 export interface AtmosphereUniforms {
     atmosphereRadius: number;
     falloffFactor: number;
@@ -53,22 +55,24 @@ export class AtmosphericScatteringPostProcess extends PostProcess implements Obj
 
     private activeCamera: Camera | null = null;
 
-    constructor(name: string, planet: GasPlanet | TelluricPlanet, atmosphereHeight: number, scene: Scene, stellarObjects: Transformable[]) {
+    constructor(planet: GasPlanet | TelluricPlanet, atmosphereHeight: number, stellarObjects: Transformable[], scene: Scene) {
         const shaderName = "atmosphericScattering";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = atmosphericScatteringFragment;
         }
 
+        const rng = getRngFromSeed(planet.model.seed);
+
         const atmosphereUniforms: AtmosphereUniforms = {
             atmosphereRadius: planet.getBoundingRadius() + atmosphereHeight,
             falloffFactor: 10,
-            intensity: 11 * planet.model.physicalProperties.pressure,
+            intensity: 11 * planet.model.physics.pressure,
             rayleighStrength: 1,
             mieStrength: 1,
             densityModifier: 1,
-            redWaveLength: 700 * (1 + centeredRand(planet.model.rng, 1300) / 6),
-            greenWaveLength: 530 * (1 + centeredRand(planet.model.rng, 1310) / 6),
-            blueWaveLength: 440 * (1 + centeredRand(planet.model.rng, 1320) / 6),
+            redWaveLength: 700 * (1 + centeredRand(rng, 1300) / 6),
+            greenWaveLength: 530 * (1 + centeredRand(rng, 1310) / 6),
+            blueWaveLength: 440 * (1 + centeredRand(rng, 1320) / 6),
             mieHaloRadius: 0.65
         };
 
@@ -98,7 +102,19 @@ export class AtmosphericScatteringPostProcess extends PostProcess implements Obj
 
         const samplers: string[] = [...Object.values(SamplerUniformNames), ...Object.values(AtmosphereSamplerNames)];
 
-        super(name, shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
+        super(
+            `${planet.model.name}AtmospherePostProcess`,
+            shaderName,
+            uniforms,
+            samplers,
+            1,
+            null,
+            Texture.BILINEAR_SAMPLINGMODE,
+            scene.getEngine(),
+            false,
+            null,
+            Constants.TEXTURETYPE_HALF_FLOAT
+        );
 
         this.object = planet;
         this.atmosphereUniforms = atmosphereUniforms;

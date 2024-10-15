@@ -16,20 +16,21 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { hashVec3 } from "../utils/hashVec3";
-import { seededSquirrelNoise } from "squirrel-noise";
 import { centeredRand } from "extended-random";
-import { UniverseDensity } from "../settings";
+import { Settings, UniverseDensity } from "../settings";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { BoundingBox } from "@babylonjs/core/Culling/boundingBox";
-import { StarSystemCoordinates } from "../starSystem/starSystemModel";
+
+import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates";
+import { getRngFromSeed } from "../utils/getRngFromSeed";
+import { CustomSystemRegistry } from "../starSystem/customSystemRegistry";
 
 export function vector3ToString(v: Vector3): string {
     return `${v.x},${v.y},${v.z}`;
 }
 
 export type BuildData = {
-    name: string;
     coordinates: StarSystemCoordinates;
     sectorString: string;
     position: Vector3;
@@ -50,11 +51,6 @@ export class StarSector {
      */
     readonly position: Vector3;
 
-    /**
-     * The size of all sectors
-     */
-    static readonly SIZE = 20;
-
     readonly density;
 
     readonly nbStars: number;
@@ -66,8 +62,8 @@ export class StarSector {
 
     constructor(coordinates: Vector3) {
         this.coordinates = coordinates;
-        this.position = coordinates.scale(StarSector.SIZE);
-        this.rng = seededSquirrelNoise(hashVec3(coordinates.x, coordinates.y, coordinates.z));
+        this.position = coordinates.scale(Settings.STAR_SECTOR_SIZE);
+        this.rng = getRngFromSeed(hashVec3(coordinates.x, coordinates.y, coordinates.z));
 
         this.density = UniverseDensity(coordinates.x, coordinates.y, coordinates.z);
 
@@ -88,12 +84,21 @@ export class StarSector {
                 localZ: localPosition.z
             };
             data.push({
-                name: `starInstance|${this.coordinates.x}|${this.coordinates.y}|${this.coordinates.z}|${i}`,
                 coordinates: coordinates,
                 sectorString: sectorString,
                 position: this.getPositionOfStar(i)
             });
         }
+
+        const customSystems = CustomSystemRegistry.GetSystemsFromSector(this.coordinates.x, this.coordinates.y, this.coordinates.z);
+        customSystems.forEach((system) => {
+            data.push({
+                coordinates: system.coordinates,
+                sectorString: sectorString,
+                position: this.getPositionOfStarFromLocal(new Vector3(system.coordinates.localX, system.coordinates.localY, system.coordinates.localZ))
+            });
+        });
+
         return data;
     }
 
@@ -122,7 +127,11 @@ export class StarSector {
      * @param starIndex The index of the star in the sector
      */
     getPositionOfStar(starIndex: number): Vector3 {
-        return this.getLocalPositionOfStar(starIndex).scaleInPlace(StarSector.SIZE).addInPlace(this.position);
+        return this.getPositionOfStarFromLocal(this.getLocalPositionOfStar(starIndex));
+    }
+
+    getPositionOfStarFromLocal(localPosition: Vector3): Vector3 {
+        return localPosition.scaleInPlace(Settings.STAR_SECTOR_SIZE).addInPlace(this.position);
     }
 
     /**
@@ -146,8 +155,8 @@ export class StarSector {
 
     static GetBoundingBox(position: Vector3, globalNodePosition: Vector3): BoundingBox {
         return new BoundingBox(
-            new Vector3(-1, -1, -1).scaleInPlace(StarSector.SIZE / 2),
-            new Vector3(1, 1, 1).scaleInPlace(StarSector.SIZE / 2),
+            new Vector3(-1, -1, -1).scaleInPlace(Settings.STAR_SECTOR_SIZE / 2),
+            new Vector3(1, 1, 1).scaleInPlace(Settings.STAR_SECTOR_SIZE / 2),
             Matrix.Translation(position.x + globalNodePosition.x, position.y + globalNodePosition.y, position.z + globalNodePosition.z)
         );
     }

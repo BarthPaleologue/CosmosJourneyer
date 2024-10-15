@@ -17,7 +17,7 @@
 
 import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
 import { TutorialControlsInputs } from "../ui/tutorial/tutorialLayerInputs";
-import { axisCompositeToString, pressInteractionToStrings } from "../utils/inputControlsString";
+import { axisCompositeToString, pressInteractionToStrings } from "../utils/strings/inputControlsString";
 import { AxisComposite } from "@brianchirls/game-input/browser";
 import { Tutorial } from "./tutorial";
 import i18n from "../i18n";
@@ -27,9 +27,9 @@ import rotationImageSrc from "../../asset/tutorials/flightTutorial/rotation.webp
 import thrustImageSrc from "../../asset/tutorials/flightTutorial/thrust.webp";
 import warpImageSrc from "../../asset/tutorials/flightTutorial/warp.webp";
 import congratsImageSrc from "../../asset/tutorials/flightTutorial/congrats.webp";
-import { SystemObjectType } from "../saveFile/universeCoordinates";
+import { SystemObjectType } from "../utils/coordinates/universeCoordinates";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
-import { getStarSystemCoordinatesFromSeed } from "../utils/starSystemCoordinatesUtils";
+import { getStarSystemCoordinatesFromSeed } from "../starSystem/systemSeed";
 
 export const FlightTutorial: Tutorial = {
     title: i18n.t("tutorials:flightTutorial:title"),

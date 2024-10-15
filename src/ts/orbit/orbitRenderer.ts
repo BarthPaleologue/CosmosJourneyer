@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { CreateGreasedLine, GreasedLineBaseMesh, GreasedLineMesh, GreasedLineRibbonMesh } from "@babylonjs/core/Meshes";
+import { CreateGreasedLine, GreasedLineBaseMesh } from "@babylonjs/core/Meshes";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { setUpVector } from "../uberCore/transforms/basicTransform";
 import { getPointOnOrbitLocal } from "./orbit";
@@ -25,17 +25,17 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { GreasedLineMeshColorMode } from "@babylonjs/core/Materials/GreasedLine/greasedLineMaterialInterfaces";
 
 export class OrbitRenderer {
-    private orbitMeshes: (GreasedLineBaseMesh | GreasedLineMesh | GreasedLineRibbonMesh)[] = [];
+    private orbitMeshes: Map<OrbitalObject, GreasedLineBaseMesh> = new Map();
 
-    private orbitalObjects: OrbitalObject[] = [];
+    private orbitalObjects: Map<OrbitalObject, OrbitalObject[]> = new Map();
 
     private _isVisible = false;
 
-    setOrbitalObjects(orbitalObjects: OrbitalObject[], scene: Scene) {
+    setOrbitalObjects(orbitalObjects: Map<OrbitalObject, OrbitalObject[]>, scene: Scene) {
         this.reset();
         this.orbitalObjects = orbitalObjects;
 
-        for (const orbitalObject of orbitalObjects) {
+        for (const [orbitalObject, parents] of orbitalObjects) {
             this.createOrbitMesh(orbitalObject, scene);
         }
 
@@ -43,7 +43,7 @@ export class OrbitRenderer {
     }
 
     private createOrbitMesh(orbitalObject: OrbitalObject, scene: Scene) {
-        const orbit = orbitalObject.getOrbitProperties();
+        const orbit = orbitalObject.model.orbit;
         const nbSteps = 1000;
         const timestep = orbit.period / nbSteps;
         const points: Vector3[] = [];
@@ -68,12 +68,12 @@ export class OrbitRenderer {
             },
             scene
         );
-        this.orbitMeshes.push(orbitMesh);
+        this.orbitMeshes.set(orbitalObject, orbitMesh);
     }
 
     setVisibility(visible: boolean) {
         this._isVisible = visible;
-        for (const orbitMesh of this.orbitMeshes) {
+        for (const [orbitalObject, orbitMesh] of this.orbitMeshes) {
             orbitMesh.setEnabled(visible);
         }
     }
@@ -84,21 +84,30 @@ export class OrbitRenderer {
 
     update() {
         if (!this._isVisible) return;
-        for (let i = 0; i < this.orbitalObjects.length; i++) {
-            const orbitalObject = this.orbitalObjects[i];
-            const orbitMesh = this.orbitMeshes[i];
+        for (const [orbitalObject, parents] of this.orbitalObjects) {
+            const orbitMesh = this.orbitMeshes.get(orbitalObject);
+            if (orbitMesh === undefined) {
+                throw new Error("Orbit mesh not found");
+            }
 
-            orbitMesh.position = orbitalObject.parent?.getTransform().position ?? Vector3.Zero();
+            const parentBarycenter = Vector3.Zero();
+            const massSum = parents.reduce((sum, parent) => sum + parent.model.physics.mass, 0);
+            for (const parent of parents) {
+                parentBarycenter.addInPlace(parent.getTransform().position.scale(parent.model.physics.mass));
+            }
+            parentBarycenter.scaleInPlace(1 / massSum);
+
+            orbitMesh.position = parentBarycenter;
             orbitMesh.computeWorldMatrix(true);
 
-            const normalToPlane = orbitalObject.getOrbitProperties().normalToPlane;
+            const normalToPlane = orbitalObject.model.orbit.normalToPlane;
             setUpVector(orbitMesh, normalToPlane);
         }
     }
 
     private reset() {
         this.orbitMeshes.forEach((orbitMesh) => orbitMesh.dispose(false, true));
-        this.orbitMeshes = [];
-        this.orbitalObjects = [];
+        this.orbitMeshes.clear();
+        this.orbitalObjects.clear();
     }
 }
