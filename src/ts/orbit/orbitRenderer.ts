@@ -68,6 +68,7 @@ export class OrbitRenderer {
             },
             scene
         );
+        orbitMesh.parent = orbitalObject.getTransform().parent;
         this.orbitMeshes.set(orbitalObject, orbitMesh);
     }
 
