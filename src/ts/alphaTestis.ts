@@ -70,6 +70,8 @@ const hecateModel = newSeededTelluricPlanetModel(253, "Hécate", [sunModel]);
 hecateModel.physics.minTemperature = -40;
 hecateModel.physics.maxTemperature = 30;
 
+hecateModel.physics.axialTilt = 0;
+
 hecateModel.orbit.period = 60 * 60 * 24 * 365.25;
 hecateModel.orbit.radius = 25000 * hecateModel.radius;
 hecateModel.orbit.normalToPlane = Vector3.Up();
