@@ -63,7 +63,15 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
 
     private disposed = false;
 
-    constructor(path: number[], direction: Direction, parentAggregate: PhysicsAggregate, material: Material, planetModel: TelluricPlanetaryMassObjectModel, rootLength: number, scene: Scene) {
+    constructor(
+        path: number[],
+        direction: Direction,
+        parentAggregate: PhysicsAggregate,
+        material: Material,
+        planetModel: TelluricPlanetaryMassObjectModel,
+        rootLength: number,
+        scene: Scene
+    ) {
         const id = `D${direction}P${path.join("")}`;
 
         this.depth = path.length;
@@ -149,11 +157,7 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
         rockPatch.createInstances([{ mesh: Objects.ROCK, distance: 0 }]);
         this.instancePatches.push(rockPatch);
 
-        if (
-            this.planetModel.physics.pressure > 0 &&
-            this.planetModel.physics.oceanLevel > 0 &&
-            this.getAverageHeight() > this.planetModel.physics.oceanLevel + 50
-        ) {
+        if (this.planetModel.physics.pressure > 0 && this.planetModel.physics.oceanLevel > 0 && this.getAverageHeight() > this.planetModel.physics.oceanLevel + 50) {
             const treePatch = new InstancePatch(this.parent, randomDownSample(instancesMatrixBuffer, 4800));
             treePatch.createInstances([{ mesh: Objects.TREE, distance: 0 }]);
             this.instancePatches.push(treePatch);

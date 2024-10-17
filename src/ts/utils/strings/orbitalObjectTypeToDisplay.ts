@@ -33,6 +33,8 @@ export function orbitalObjectTypeToDisplay(model: OrbitalObjectModel): string {
             return i18n.t("objectTypes:telluricMoon");
         case OrbitalObjectType.SPACE_STATION:
             return i18n.t("objectTypes:spaceStation");
+        case OrbitalObjectType.SPACE_ELEVATOR:
+            return i18n.t("objectTypes:spaceElevator");
         case OrbitalObjectType.STAR:
             return i18n.t("objectTypes:star", { stellarType: getStellarTypeFromTemperature((model as StellarObjectModel).physics.blackBodyTemperature) });
         case OrbitalObjectType.NEUTRON_STAR:

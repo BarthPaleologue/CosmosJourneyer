@@ -430,7 +430,7 @@ export class StarSystemView implements View {
         this.targetCursorLayer.reset();
 
         const celestialBodies = starSystem.getCelestialBodies();
-        const spaceStations = starSystem.getSpaceStations();
+        const spaceStations = starSystem.getOrbitalFacilities();
 
         celestialBodies.forEach((body) => {
             let maxDistance = 0.0;
@@ -627,7 +627,7 @@ export class StarSystemView implements View {
             this.spaceStationLayer.setVisibility(true);
             const facility = this.spaceshipControls.getClosestLandableFacility();
             this.getStarSystem()
-                .getSpaceStations()
+                .getOrbitalFacilities()
                 .find((spaceStation) => {
                     if (spaceStation === facility) {
                         this.spaceStationLayer.setStation(

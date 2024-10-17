@@ -1,62 +1,44 @@
-//  This file is part of Cosmos Journeyer
-//
-//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU Affero General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU Affero General Public License for more details.
-//
-//  You should have received a copy of the GNU Affero General Public License
-//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-import { getOrbitalPeriod, Orbit } from "../orbit/orbit";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { OrbitalObjectType } from "../architecture/orbitalObject";
-import { OrbitalObjectPhysicsInfo } from "../architecture/physicsInfo";
-import { CelestialBodyModel } from "../architecture/celestialBody";
-import { normalRandom } from "extended-random";
-import { clamp } from "../utils/math";
-import { GenerationSteps } from "../utils/generationSteps";
-import { CropType, CropTypes, getEdibleEnergyPerHaPerDay } from "../utils/agriculture";
-import { randomPieChart } from "../utils/random";
-import { generateSpaceStationName } from "../utils/strings/spaceStationNameGenerator";
-import { getFactionFromCoordinates } from "../society/factions";
-import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
-import { Settings } from "../settings";
 import { StellarObjectModel } from "../architecture/stellarObject";
 import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates";
+import { CelestialBodyModel } from "../architecture/celestialBody";
 import { getRngFromSeed } from "../utils/getRngFromSeed";
-import { getSphereRadiatedEnergyFlux } from "../utils/physics";
+import { generateSpaceElevatorName } from "../utils/strings/spaceStationNameGenerator";
+import { GenerationSteps } from "../utils/generationSteps";
+import { Orbit } from "../orbit/orbit";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { OrbitalObjectPhysicsInfo } from "../architecture/physicsInfo";
+import { getFactionFromCoordinates } from "../society/factions";
+import { randomPieChart } from "../utils/random";
+import { CropType, CropTypes, getEdibleEnergyPerHaPerDay } from "../utils/agriculture";
+import { getOrbitRadiusFromPeriod, getSphereRadiatedEnergyFlux } from "../utils/physics";
+import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
+import { Settings } from "../settings";
+import { OrbitalObjectType } from "../architecture/orbitalObject";
+
 import { OrbitalFacilityModel } from "./orbitalFacility";
 
-export type SpaceStationModel = OrbitalFacilityModel & {
-    readonly type: OrbitalObjectType.SPACE_STATION;
+export type SpaceElevatorModel = OrbitalFacilityModel & {
+    readonly type: OrbitalObjectType.SPACE_ELEVATOR;
 };
 
-export function newSeededSpaceStationModel(
+export function newSeededSpaceElevatorModel(
     seed: number,
     stellarObjectModels: StellarObjectModel[],
     starSystemCoordinates: StarSystemCoordinates,
-    parentBodies: CelestialBodyModel[]
-): SpaceStationModel {
+    parentBody: CelestialBodyModel
+): SpaceElevatorModel {
     const rng = getRngFromSeed(seed);
 
-    const name = generateSpaceStationName(rng, 2756);
+    const name = generateSpaceElevatorName(rng, 2756);
 
-    const parentMaxRadius = parentBodies.reduce((max, body) => Math.max(max, body.radius), 0);
-    const orbitRadius = (2 + clamp(normalRandom(2, 1, rng, GenerationSteps.ORBIT), 0, 10)) * parentMaxRadius;
+    const parentRotationPeriod = parentBody.physics.rotationPeriod;
 
-    const parentMassSum = parentBodies.reduce((sum, body) => sum + body.physics.mass, 0);
+    const orbitRadius = getOrbitRadiusFromPeriod(parentRotationPeriod, parentBody.physics.mass);
+
     const orbit: Orbit = {
         radius: orbitRadius,
         p: 2,
-        period: getOrbitalPeriod(orbitRadius, parentMassSum),
+        period: parentRotationPeriod,
         normalToPlane: Vector3.Up()
     };
 
@@ -80,11 +62,7 @@ export function newSeededSpaceStationModel(
     const nbHydroponicLayers = 10;
 
     // find average distance to stellar objects
-    let distanceToStar = 0;
-    parentBodies.forEach((celestialBody) => {
-        distanceToStar += celestialBody.orbit.radius;
-    });
-    distanceToStar /= parentBodies.length;
+    const distanceToStar = parentBody.orbit.radius;
 
     let totalStellarFlux = 0;
     stellarObjectModels.forEach((stellarObject) => {
@@ -111,7 +89,7 @@ export function newSeededSpaceStationModel(
 
     return {
         seed,
-        type: OrbitalObjectType.SPACE_STATION,
+        type: OrbitalObjectType.SPACE_ELEVATOR,
         starSystemCoordinates: starSystemCoordinates,
         name,
         orbit,

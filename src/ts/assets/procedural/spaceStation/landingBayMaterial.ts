@@ -25,8 +25,8 @@ import landingBayMaterialVertex from "../../../../shaders/landingBayMaterial/ver
 import { setStellarObjectUniforms, StellarObjectUniformNames } from "../../../postProcesses/uniforms/stellarObjectUniforms";
 import { Textures } from "../../textures";
 import { Settings } from "../../../settings";
-import { SpaceStationModel } from "../../../spacestation/spacestationModel";
 import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
+import { OrbitalFacilityModel } from "../../../spacestation/orbitalFacility";
 
 const LandingBayUniformNames = {
     WORLD: "world",
@@ -49,7 +49,7 @@ const LandingBaySamplerNames = {
 export class LandingBayMaterial extends ShaderMaterial {
     private stellarObjects: Transformable[] = [];
 
-    constructor(stationModel: SpaceStationModel, meanRadius: number, deltaRadius: number, height: number, scene: Scene) {
+    constructor(stationModel: OrbitalFacilityModel, meanRadius: number, deltaRadius: number, height: number, scene: Scene) {
         const shaderName = "landingBayMaterial";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = landingBayMaterialFragment;

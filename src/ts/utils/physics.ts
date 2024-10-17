@@ -134,3 +134,37 @@ export function hasLiquidWater(pressure: number, minTemperature: number, maxTemp
 export function getSchwarzschildRadius(mass: number): number {
     return (2 * Settings.G * mass) / (Settings.C * Settings.C);
 }
+
+/**
+ * Returns the orbital period of an object in seconds given its radius and the mass of the parent object
+ * @param period The period of the orbit in seconds
+ * @param mass The mass of the parent object in kilograms
+ */
+export function getOrbitRadiusFromPeriod(period: number, mass: number) {
+    const omega = (2 * Math.PI) / period;
+    return Math.cbrt((Settings.G * mass) / (omega * omega));
+}
+
+/**
+ * Returns the apparent gravity on a space tether given its period, mass and distance
+ * @param period The rotation period of the tether in seconds (typically the same as the parent object for a classic space elevator)
+ * @param mass The mass of the parent object in kilograms
+ * @param distance The distance to the center of the parent object in meters
+ * @see https://en.wikipedia.org/wiki/Space_elevator#Apparent_gravitational_field
+ */
+export function getApparentGravityOnSpaceTether(period: number, mass: number, distance: number) {
+    const omega = (2 * Math.PI) / period;
+    return (-Settings.G * mass) / (distance * distance) + distance * omega * omega;
+}
+
+/**
+ * Returns the necessary length of a tether to simulate a given gravity at the end of the tether of a space elevator
+ * This is an approximation that only works when GM/r² << w²r (which tends to be the case for space elevators)
+ * @param period The rotation period of the tether in seconds (typically the same as the parent object for a classic space elevator)
+ * @param mass The mass of the parent object in kilograms
+ * @param gravity The gravity to simulate at the end of the tether in m/s²
+ */
+export function getTetherLengthForGravity(period: number, mass: number, gravity: number) {
+    const omega = (2 * Math.PI) / period;
+    return gravity / (omega * omega);
+}

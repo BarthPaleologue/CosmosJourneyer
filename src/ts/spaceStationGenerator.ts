@@ -108,7 +108,7 @@ scene.onBeforePhysicsObservable.add(() => {
 
     const cameraWorldPosition = camera.globalPosition;
 
-    spaceStation.update([sun], cameraWorldPosition, deltaSeconds);
+    spaceStation.update([sun], [], cameraWorldPosition, deltaSeconds);
 
     //scene.meshes.forEach(mesh => {if(mesh.physicsBody) viewer.showBody(mesh.physicsBody)});
     //spaceStation.getTransform().position.y = Math.sin(elapsedSeconds / 5) * 10000;

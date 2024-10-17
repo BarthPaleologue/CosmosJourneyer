@@ -41,6 +41,8 @@ export function setStellarObjectUniforms(effect: Effect, stellarObjects: Transfo
     effect.setArray3(StellarObjectUniformNames.STAR_POSITIONS, flattenVector3Array(stellarObjects.map((stellarObject) => stellarObject.getTransform().getAbsolutePosition())));
     effect.setArray3(
         StellarObjectUniformNames.STAR_COLORS,
-        flattenColor3Array(stellarObjects.map((stellarObject) => (stellarObject instanceof Star ? getRgbFromTemperature(stellarObject.model.physics.blackBodyTemperature) : Color3.White())))
+        flattenColor3Array(
+            stellarObjects.map((stellarObject) => (stellarObject instanceof Star ? getRgbFromTemperature(stellarObject.model.physics.blackBodyTemperature) : Color3.White()))
+        )
     );
 }

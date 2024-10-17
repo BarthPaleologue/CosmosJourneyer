@@ -142,7 +142,8 @@ export const enum OrbitalObjectType {
     GAS_PLANET = 1002,
     MANDELBULB = 2000,
     JULIA_SET = 2001,
-    SPACE_STATION = 3000
+    SPACE_STATION = 3000,
+    SPACE_ELEVATOR = 3001
 }
 
 export const SatelliteTypes = [OrbitalObjectType.TELLURIC_SATELLITE, OrbitalObjectType.SPACE_STATION];

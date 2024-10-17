@@ -50,9 +50,9 @@ const starSystemModel: StarSystemModel = {
     subSystems: [
         {
             stellarObjects: [blackHoleModel],
-            planetarySystems: [{ planets: [millerPlanetModel], satellites: [], spaceStations: [] }],
+            planetarySystems: [{ planets: [millerPlanetModel], satellites: [], orbitalFacilities: [] }],
             anomalies: [],
-            spaceStations: []
+            orbitalFacilities: []
         }
     ]
 };

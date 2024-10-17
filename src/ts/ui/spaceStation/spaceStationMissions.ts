@@ -1,4 +1,3 @@
-import { SpaceStationModel } from "../../spacestation/spacestationModel";
 import { getNeighborStarSystemCoordinates } from "../../utils/getNeighborStarSystems";
 import { parseDistance } from "../../utils/strings/parseToStrings";
 import { Settings } from "../../settings";
@@ -10,6 +9,7 @@ import { MissionContainer } from "./missionContainer";
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { getSystemModelFromCoordinates } from "../../starSystem/modelFromCoordinates";
 import { StarSystemModelUtils } from "../../starSystem/starSystemModel";
+import { OrbitalFacilityModel } from "../../spacestation/orbitalFacility";
 
 /**
  * Generates all missions available at the given space station for the player. Missions are generated based on the current timestamp (hourly basis).
@@ -17,7 +17,7 @@ import { StarSystemModelUtils } from "../../starSystem/starSystemModel";
  * @param player The player for which the missions are generated
  * @returns The DOM element containing the generated missions as HTML
  */
-export function generateMissionsDom(stationModel: SpaceStationModel, player: Player): HTMLDivElement {
+export function generateMissionsDom(stationModel: OrbitalFacilityModel, player: Player): HTMLDivElement {
     const starSystemModel = getSystemModelFromCoordinates(stationModel.starSystemCoordinates);
     const sightSeeingMissions = generateSightseeingMissions(stationModel, starSystemModel, player, Date.now());
 
@@ -26,10 +26,10 @@ export function generateMissionsDom(stationModel: SpaceStationModel, player: Pla
 
     const rng = getRngFromSeed(stationModel.seed);
 
-    let neighborSpaceStations: [SpaceStationModel, number][] = [];
+    let neighborSpaceStations: [OrbitalFacilityModel, number][] = [];
     neighborSystems.forEach(([coordinates, position, distance], index) => {
         const systemModel = getSystemModelFromCoordinates(coordinates);
-        const spaceStations = StarSystemModelUtils.GetSpaceStations(systemModel).map<[SpaceStationModel, number]>((stationModel) => {
+        const spaceStations = StarSystemModelUtils.GetSpaceStations(systemModel).map<[OrbitalFacilityModel, number]>((stationModel) => {
             return [stationModel, distance];
         });
         neighborSpaceStations = neighborSpaceStations.concat(spaceStations);

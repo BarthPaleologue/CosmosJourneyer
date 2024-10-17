@@ -49,18 +49,22 @@ import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates"
 import { wait } from "../utils/wait";
 import { Planet } from "../architecture/planet";
 import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
+import { OrbitalFacility } from "../spacestation/orbitalFacility";
+import { SpaceStationModel } from "../spacestation/spacestationModel";
+import { SpaceElevator } from "../spacestation/spaceElevator";
+import { SpaceElevatorModel } from "../spacestation/spaceElevatorModel";
 
 export type PlanetarySystem = {
     readonly planets: Planet[];
     readonly satellites: TelluricPlanet[];
-    readonly spaceStations: SpaceStation[];
+    readonly spaceStations: OrbitalFacility[];
 };
 
 export type SubStarSystem = {
     readonly stellarObjects: StellarObject[];
     readonly planetarySystems: PlanetarySystem[];
     readonly anomalies: CelestialBody[];
-    readonly spaceStations: SpaceStation[];
+    readonly spaceStations: OrbitalFacility[];
 };
 
 /**
@@ -176,13 +180,20 @@ export class StarSystemController {
             await wait(this.timeOut);
         }
 
-        const spaceStations: SpaceStation[] = [];
-        for (const spaceStationModel of subSystemModel.spaceStations) {
-            const spaceStation = new SpaceStation(spaceStationModel, this.scene);
-            spaceStations.push(spaceStation);
-            spaceStation.getTransform().setAbsolutePosition(new Vector3(this.offset * ++this.loadingIndex, 0, 0));
+        const spaceStations: OrbitalFacility[] = [];
+        for (const orbitalFacilityModel of subSystemModel.orbitalFacilities) {
+            let orbitalFacility: OrbitalFacility;
+            switch (orbitalFacilityModel.type) {
+                case OrbitalObjectType.SPACE_STATION:
+                    orbitalFacility = new SpaceStation(orbitalFacilityModel as SpaceStationModel, this.scene);
+                    break;
+                case OrbitalObjectType.SPACE_ELEVATOR:
+                    throw new Error("A space elevator orbiting a star??? Sounds like a bad idea");
+            }
+            spaceStations.push(orbitalFacility);
+            orbitalFacility.getTransform().setAbsolutePosition(new Vector3(this.offset * ++this.loadingIndex, 0, 0));
 
-            this.objectToParents.set(spaceStation, stellarObjects);
+            this.objectToParents.set(orbitalFacility, stellarObjects);
 
             await wait(this.timeOut);
         }
@@ -234,14 +245,26 @@ export class StarSystemController {
             await wait(this.timeOut);
         }
 
-        const spaceStations: SpaceStation[] = [];
-        for (const spaceStationModel of planetarySystemModel.spaceStations) {
-            console.log("Loading space station:", spaceStationModel.name);
-            const spaceStation = new SpaceStation(spaceStationModel, this.scene);
-            spaceStations.push(spaceStation);
-            spaceStation.getTransform().setAbsolutePosition(new Vector3(this.offset * ++this.loadingIndex, 0, 0));
+        const spaceStations: OrbitalFacility[] = [];
+        for (const orbitalFacilityModel of planetarySystemModel.orbitalFacilities) {
+            console.log("Loading space station:", orbitalFacilityModel.name);
 
-            this.objectToParents.set(spaceStation, planets);
+            let orbitalFacility: OrbitalFacility;
+
+            switch (orbitalFacilityModel.type) {
+                case OrbitalObjectType.SPACE_STATION:
+                    orbitalFacility = new SpaceStation(orbitalFacilityModel as SpaceStationModel, this.scene);
+                    break;
+
+                case OrbitalObjectType.SPACE_ELEVATOR:
+                    orbitalFacility = new SpaceElevator(orbitalFacilityModel as SpaceElevatorModel, this.scene);
+                    break;
+            }
+
+            spaceStations.push(orbitalFacility);
+            orbitalFacility.getTransform().setAbsolutePosition(new Vector3(this.offset * ++this.loadingIndex, 0, 0));
+
+            this.objectToParents.set(orbitalFacility, planets);
 
             await wait(this.timeOut);
         }
@@ -259,7 +282,7 @@ export class StarSystemController {
      */
     public getNearestOrbitalObject(position: Vector3): OrbitalObject {
         const celestialBodies = this.getCelestialBodies();
-        const spaceStations = this.getSpaceStations();
+        const spaceStations = this.getOrbitalFacilities();
         if (celestialBodies.length + spaceStations.length === 0) throw new Error("There are no orbital objects in the solar system");
         let nearest: OrbitalObject = celestialBodies[0];
         let smallerDistance = Number.POSITIVE_INFINITY;
@@ -285,10 +308,10 @@ export class StarSystemController {
     /**
      * Returns all the space stations in the star system
      */
-    public getSpaceStations(): SpaceStation[] {
-        const solarSpaceStations: SpaceStation[] = this.subSystems.flatMap((subSystem) => subSystem.spaceStations);
-        const planetSpaceStations: SpaceStation[] = this.subSystems.flatMap((subSystem) => subSystem.planetarySystems.flatMap((planetarySystem) => planetarySystem.spaceStations));
-        return solarSpaceStations.concat(planetSpaceStations);
+    public getOrbitalFacilities(): OrbitalFacility[] {
+        const solarFacilities: OrbitalFacility[] = this.subSystems.flatMap((subSystem) => subSystem.spaceStations);
+        const planetFacilities: OrbitalFacility[] = this.subSystems.flatMap((subSystem) => subSystem.planetarySystems.flatMap((planetarySystem) => planetarySystem.spaceStations));
+        return solarFacilities.concat(planetFacilities);
     }
 
     /**
@@ -315,7 +338,7 @@ export class StarSystemController {
      * Returns all the orbital objects in the star system
      */
     public getOrbitalObjects(): OrbitalObject[] {
-        return [...this.getCelestialBodies(), ...this.getSpaceStations()];
+        return [...this.getCelestialBodies(), ...this.getOrbitalFacilities()];
     }
 
     /**
@@ -459,7 +482,7 @@ export class StarSystemController {
 
         const celestialBodies = this.getCelestialBodies();
         const stellarObjects = this.getStellarObjects();
-        const spaceStations = this.getSpaceStations();
+        const orbitalFacilities = this.getOrbitalFacilities();
         const orbitalObjects = this.getOrbitalObjects();
 
         // The nearest body might have to be treated separately
@@ -582,9 +605,9 @@ export class StarSystemController {
         }
 
         const cameraWorldPosition = controller.getTransform().getAbsolutePosition();
-        for (const spaceStation of spaceStations) {
-            spaceStation.update(stellarObjects, cameraWorldPosition, deltaSeconds);
-            spaceStation.computeCulling(controller.getActiveCameras());
+        for (const orbitalFacility of orbitalFacilities) {
+            orbitalFacility.update(stellarObjects, this.objectToParents.get(orbitalFacility) ?? [], cameraWorldPosition, deltaSeconds);
+            orbitalFacility.computeCulling(controller.getActiveCameras());
         }
 
         // floating origin

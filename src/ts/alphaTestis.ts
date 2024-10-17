@@ -31,6 +31,7 @@ import { StarSystemCoordinates } from "./utils/coordinates/universeCoordinates";
 import { CustomSystemRegistry } from "./starSystem/customSystemRegistry";
 import { newSeededTelluricSatelliteModel } from "./planets/telluricPlanet/telluricSatelliteModel";
 import { newSeededTelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModel";
+import { newSeededSpaceElevatorModel } from "./spacestation/spaceElevatorModel";
 
 const engine = await CosmosJourneyer.CreateAsync();
 
@@ -73,7 +74,7 @@ hecateModel.orbit.period = 60 * 60 * 24 * 365.25;
 hecateModel.orbit.radius = 25000 * hecateModel.radius;
 hecateModel.orbit.normalToPlane = Vector3.Up();
 
-const spaceStationModel = newSeededSpaceStationModel(0, [sunModel], systemCoordinates, [hecateModel]);
+const spaceStationModel = newSeededSpaceElevatorModel(0, [sunModel], systemCoordinates, hecateModel);
 
 //physicsViewer.showBody(spaceStation.aggregate.body);
 /*for(const landingpad of spaceStation.landingPads) {
@@ -121,12 +122,12 @@ const starSystemModel: StarSystemModel = {
         {
             stellarObjects: [sunModel],
             planetarySystems: [
-                { planets: [hecateModel], satellites: [moonModel], spaceStations: [spaceStationModel] },
-                { planets: [aresModel], satellites: [], spaceStations: [] },
-                { planets: [andromaqueModel], satellites: [], spaceStations: [] }
+                { planets: [hecateModel], satellites: [moonModel], orbitalFacilities: [spaceStationModel] },
+                { planets: [aresModel], satellites: [], orbitalFacilities: [] },
+                { planets: [andromaqueModel], satellites: [], orbitalFacilities: [] }
             ],
             anomalies: [],
-            spaceStations: []
+            orbitalFacilities: []
         }
     ]
 };

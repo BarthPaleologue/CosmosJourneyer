@@ -16,13 +16,13 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { factionToString } from "../../society/factions";
-import { SpaceStationModel } from "../../spacestation/spacestationModel";
 import { CropType, cropTypeToString } from "../../utils/agriculture";
 
 import { makeD3PieChart } from "../../utils/d3PieChart";
 import { OrbitalObjectModel } from "../../architecture/orbitalObject";
+import { OrbitalFacilityModel } from "../../spacestation/orbitalFacility";
 
-export function generateInfoHTML(model: SpaceStationModel, parentModels: OrbitalObjectModel[]): string {
+export function generateInfoHTML(model: OrbitalFacilityModel, parentModels: OrbitalObjectModel[]): string {
     const agricultureMix = model.agricultureMix;
 
     const parentName = parentModels.map((parentModel) => parentModel.name).join("-");

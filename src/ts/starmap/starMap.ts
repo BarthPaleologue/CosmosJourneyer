@@ -445,7 +445,6 @@ export class StarMap implements View {
         const starSystemCoordinates = data.coordinates;
         const starSystemModel = getSystemModelFromCoordinates(starSystemCoordinates);
 
-
         //TODO: when implementing binary star systems, this will need to be updated to display all stellar objects and not just the first one
         const stellarObjectModel = StarSystemModelUtils.GetStellarObjects(starSystemModel)[0];
 
