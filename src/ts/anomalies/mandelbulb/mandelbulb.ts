@@ -26,6 +26,8 @@ import { Cullable } from "../../utils/cullable";
 import { CelestialBody } from "../../architecture/celestialBody";
 import { orbitalObjectTypeToDisplay } from "../../utils/strings/orbitalObjectTypeToDisplay";
 
+import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
+
 export class Mandelbulb implements CelestialBody, Cullable {
     readonly model: MandelbulbModel;
 
@@ -35,6 +37,8 @@ export class Mandelbulb implements CelestialBody, Cullable {
 
     readonly asteroidField = null;
     readonly ringsUniforms = null;
+
+    readonly targetInfo: TargetInfo;
 
     /**
      * New Gas Planet
@@ -49,6 +53,8 @@ export class Mandelbulb implements CelestialBody, Cullable {
         this.postProcesses.push(PostProcessType.MANDELBULB);
 
         this.getTransform().rotate(Axis.X, this.model.physics.axialTilt);
+
+        this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());
     }
 
     getTransform(): TransformNode {

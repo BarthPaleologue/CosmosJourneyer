@@ -38,6 +38,8 @@ import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { getRgbFromTemperature } from "../../utils/specrend";
 import { orbitalObjectTypeToDisplay } from "../../utils/strings/orbitalObjectTypeToDisplay";
 
+import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
+
 export class Star implements StellarObject, Cullable {
     readonly mesh: Mesh;
     readonly light: PointLight;
@@ -52,6 +54,8 @@ export class Star implements StellarObject, Cullable {
     readonly asteroidField: AsteroidField | null;
 
     readonly model: StarModel;
+
+    readonly targetInfo: TargetInfo;
 
     /**
      * New Star
@@ -105,6 +109,8 @@ export class Star implements StellarObject, Cullable {
             this.ringsUniforms = null;
             this.asteroidField = null;
         }
+
+        this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());
     }
 
     getTransform(): TransformNode {

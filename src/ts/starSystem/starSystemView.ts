@@ -57,7 +57,6 @@ import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Sounds } from "../assets/sounds";
 import { Materials } from "../assets/materials";
 import { SpaceStation } from "../spacestation/spaceStation";
-import { ObjectTargetCursorType } from "../ui/objectTargetCursor";
 import { SpaceStationLayer } from "../ui/spaceStation/spaceStationLayer";
 import { Player } from "../player/player";
 import { getNeighborStarSystemCoordinates } from "../utils/getNeighborStarSystems";
@@ -71,7 +70,6 @@ import { Mission } from "../missions/mission";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/universeCoordinates";
 import { getSystemModelFromCoordinates } from "./modelFromCoordinates";
 import { StarSystemModel } from "./starSystemModel";
-import { isSatellite } from "../architecture/orbitalObject";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -433,19 +431,14 @@ export class StarSystemView implements View {
         const spaceStations = starSystem.getOrbitalFacilities();
 
         celestialBodies.forEach((body) => {
-            let maxDistance = 0.0;
-            if (isSatellite(body.model.type)) {
-                // moon target cursors fades away when the player is too far
-                maxDistance = body.model.orbit.radius * 8.0;
-            }
-            this.targetCursorLayer.addObject(body, ObjectTargetCursorType.CELESTIAL_BODY, body.getBoundingRadius() * 10.0, maxDistance);
+            this.targetCursorLayer.addObject(body);
         });
 
         spaceStations.forEach((spaceStation) => {
-            this.targetCursorLayer.addObject(spaceStation, ObjectTargetCursorType.FACILITY, spaceStation.getBoundingRadius() * 6.0, 0.0);
+            this.targetCursorLayer.addObject(spaceStation);
 
-            spaceStation.getLandingPads().forEach((landingPad) => {
-                this.targetCursorLayer.addObject(landingPad, ObjectTargetCursorType.LANDING_PAD, landingPad.getBoundingRadius() * 4.0, 2e3);
+            spaceStation.getSubTargets().forEach((landingPad) => {
+                this.targetCursorLayer.addObject(landingPad);
             });
         });
 
@@ -469,7 +462,7 @@ export class StarSystemView implements View {
         getNeighborStarSystemCoordinates(starSystem.model.coordinates, Math.min(Settings.PLAYER_JUMP_RANGE_LY, Settings.VISIBLE_NEIGHBORHOOD_MAX_RADIUS_LY)).forEach(
             ([neighborCoordinates, position, distance]) => {
                 const systemTarget = this.getStarSystem().addSystemTarget(neighborCoordinates);
-                this.targetCursorLayer.addObject(systemTarget, ObjectTargetCursorType.STAR_SYSTEM, 0, 0);
+                this.targetCursorLayer.addObject(systemTarget);
             }
         );
 
@@ -794,7 +787,7 @@ export class StarSystemView implements View {
             .find((systemTarget) => starSystemCoordinatesEquals(systemTarget.systemCoordinates, targetSeed));
         if (target === undefined) {
             target = this.getStarSystem().addSystemTarget(targetSeed);
-            this.targetCursorLayer.addObject(target, ObjectTargetCursorType.STAR_SYSTEM, 0, 0);
+            this.targetCursorLayer.addObject(target);
         }
         this.targetCursorLayer.setTarget(target);
         this.spaceShipLayer.setTarget(target.getTransform());

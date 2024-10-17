@@ -28,6 +28,8 @@ import { Cullable } from "../../utils/cullable";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { orbitalObjectTypeToDisplay } from "../../utils/strings/orbitalObjectTypeToDisplay";
 
+import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
+
 export class BlackHole implements StellarObject, Cullable {
     readonly name: string;
 
@@ -42,6 +44,8 @@ export class BlackHole implements StellarObject, Cullable {
     readonly ringsUniforms = null;
 
     readonly asteroidField = null;
+
+    readonly targetInfo: TargetInfo;
 
     constructor(model: BlackHoleModel, scene: Scene) {
         this.model = model;
@@ -58,6 +62,8 @@ export class BlackHole implements StellarObject, Cullable {
         if (this.model.physics.accretionDiskRadius === 0) this.light.intensity = 0;
 
         this.postProcesses.push(PostProcessType.BLACK_HOLE);
+
+        this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());
     }
 
     getTransform(): TransformNode {

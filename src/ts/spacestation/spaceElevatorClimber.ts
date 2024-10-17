@@ -7,12 +7,18 @@ import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { SolarPanelMaterial } from "../assets/procedural/solarPanel/solarPanelMaterial";
 import { MetalSectionMaterial } from "../assets/procedural/spaceStation/metalSectionMaterial";
 import { ClimberRingMaterial } from "../materials/climberRingMaterial";
+import i18n from "../i18n";
+import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
 
-export class SpaceElevatorClimber implements Transformable {
+export class SpaceElevatorClimber implements Targetable {
     private readonly transform: TransformNode;
 
     private readonly solarPanelMaterial: SolarPanelMaterial;
     private readonly metalSectionMaterial: MetalSectionMaterial;
+
+    private readonly boundingRadius: number;
+
+    readonly targetInfo: TargetInfo;
 
     constructor(scene: Scene) {
         this.transform = new TransformNode("SpaceElevatorClimber", scene);
@@ -101,6 +107,22 @@ export class SpaceElevatorClimber implements Transformable {
             solarPanel2.parent = this.transform;
             solarPanel2.rotateAround(Vector3.Zero(), Axis.Y, angle);
         });
+
+        this.boundingRadius = globalRadius + solarPanelWidth;
+
+        this.targetInfo = {
+            type: ObjectTargetCursorType.FACILITY,
+            minDistance: this.boundingRadius * 4.0,
+            maxDistance: 0
+        };
+    }
+
+    getBoundingRadius(): number {
+        return this.boundingRadius;
+    }
+
+    getTypeName(): string {
+        return i18n.t("objectTypes:spaceElevatorClimber");
     }
 
     update(stellarObjects: Transformable[]) {

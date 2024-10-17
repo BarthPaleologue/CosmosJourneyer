@@ -36,6 +36,8 @@ import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { orbitalObjectTypeToDisplay } from "../../utils/strings/orbitalObjectTypeToDisplay";
 import { Planet } from "../../architecture/planet";
 
+import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
+
 export class GasPlanet implements Planet, Cullable {
     private readonly mesh: Mesh;
     readonly material: GasPlanetMaterial;
@@ -47,6 +49,8 @@ export class GasPlanet implements Planet, Cullable {
 
     readonly ringsUniforms: RingsUniforms | null;
     readonly asteroidField: AsteroidField | null;
+
+    readonly targetInfo: TargetInfo;
 
     /**
      * New Gas Planet
@@ -96,6 +100,8 @@ export class GasPlanet implements Planet, Cullable {
         }
 
         this.getTransform().rotate(Axis.X, this.model.physics.axialTilt);
+
+        this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());
     }
 
     updateMaterial(stellarObjects: Transformable[], deltaSeconds: number): void {

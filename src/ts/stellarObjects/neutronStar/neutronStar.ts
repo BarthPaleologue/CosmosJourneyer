@@ -39,6 +39,8 @@ import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { orbitalObjectTypeToDisplay } from "../../utils/strings/orbitalObjectTypeToDisplay";
 
+import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
+
 export class NeutronStar implements StellarObject, Cullable {
     readonly model: NeutronStarModel;
 
@@ -54,6 +56,8 @@ export class NeutronStar implements StellarObject, Cullable {
     readonly ringsUniforms: RingsUniforms | null;
 
     readonly asteroidField: AsteroidField | null;
+
+    readonly targetInfo: TargetInfo;
 
     /**
      * New Star
@@ -86,7 +90,7 @@ export class NeutronStar implements StellarObject, Cullable {
         const physicsShape = new PhysicsShapeSphere(Vector3.Zero(), this.model.radius, scene);
         this.aggregate.shape.addChildFromParent(this.getTransform(), physicsShape, this.mesh);
 
-        this.light = new PointLight(`${name}Light`, Vector3.Zero(), scene);
+        this.light = new PointLight(`${this.model.name}Light`, Vector3.Zero(), scene);
         this.light.diffuse.fromArray(getRgbFromTemperature(this.model.physics.blackBodyTemperature).asArray());
         this.light.falloffType = Light.FALLOFF_STANDARD;
         this.light.parent = this.getTransform();
@@ -109,6 +113,8 @@ export class NeutronStar implements StellarObject, Cullable {
             this.ringsUniforms = null;
             this.asteroidField = null;
         }
+
+        this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());
     }
 
     getTransform(): TransformNode {

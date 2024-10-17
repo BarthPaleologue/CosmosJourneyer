@@ -6,6 +6,7 @@ import { CropType } from "../utils/agriculture";
 import { Faction } from "../society/factions";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Transformable } from "../architecture/transformable";
+import { Targetable } from "../architecture/targetable";
 
 export type OrbitalFacilityModel = OrbitalObjectModel & {
     readonly starSystemCoordinates: StarSystemCoordinates;
@@ -46,8 +47,10 @@ export type OrbitalFacilityModel = OrbitalObjectModel & {
     readonly totalHabitatSurfaceM2: number;
 };
 
-export interface OrbitalFacility extends OrbitalObject, ManagesLandingPads, Cullable {
+export interface OrbitalFacility extends OrbitalObject, ManagesLandingPads, Cullable, Targetable {
     readonly model: OrbitalFacilityModel;
+
+    getSubTargets(): Targetable[];
 
     update(stellarObjects: Transformable[], parents: OrbitalObject[], cameraWorldPosition: Vector3, deltaSeconds: number): void;
 }

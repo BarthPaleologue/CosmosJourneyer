@@ -16,12 +16,13 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { IDisposable } from "@babylonjs/core/scene";
-import { ObjectTargetCursor, ObjectTargetCursorType } from "./objectTargetCursor";
+import { ObjectTargetCursor } from "./objectTargetCursor";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Transformable } from "../architecture/transformable";
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { TypedObject } from "../architecture/typedObject";
 import { Camera } from "@babylonjs/core/Cameras/camera";
+import { Targetable } from "../architecture/targetable";
 
 export class TargetCursorLayer implements IDisposable {
     private targetCursors: ObjectTargetCursor[] = [];
@@ -47,8 +48,8 @@ export class TargetCursorLayer implements IDisposable {
         return this.layerRoot.style.display === "block";
     }
 
-    public addObject(object: Transformable & HasBoundingSphere & TypedObject, iconType: ObjectTargetCursorType, minDistance: number, maxDistance: number) {
-        const overlay = new ObjectTargetCursor(object, iconType, minDistance, maxDistance);
+    public addObject(object: Targetable) {
+        const overlay = new ObjectTargetCursor(object);
         this.targetCursors.push(overlay);
         this.layerRoot.appendChild(overlay.htmlRoot);
     }

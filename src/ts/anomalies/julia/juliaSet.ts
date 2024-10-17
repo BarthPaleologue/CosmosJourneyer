@@ -25,6 +25,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Cullable } from "../../utils/cullable";
 import { CelestialBody } from "../../architecture/celestialBody";
 import { orbitalObjectTypeToDisplay } from "../../utils/strings/orbitalObjectTypeToDisplay";
+import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
 
 export class JuliaSet implements CelestialBody, Cullable {
     readonly model: JuliaSetModel;
@@ -35,6 +36,8 @@ export class JuliaSet implements CelestialBody, Cullable {
 
     readonly ringsUniforms = null;
     readonly asteroidField = null;
+
+    readonly targetInfo: TargetInfo;
 
     /**
      * New Gas Planet
@@ -49,6 +52,8 @@ export class JuliaSet implements CelestialBody, Cullable {
         this.postProcesses.push(PostProcessType.JULIA_SET);
 
         this.getTransform().rotate(Axis.X, this.model.physics.axialTilt);
+
+        this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());
     }
 
     getTransform(): TransformNode {

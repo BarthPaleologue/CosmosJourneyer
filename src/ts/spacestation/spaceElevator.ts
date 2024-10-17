@@ -44,6 +44,7 @@ import { MetalSectionMaterial } from "../assets/procedural/spaceStation/metalSec
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { SpaceElevatorClimber } from "./spaceElevatorClimber";
 import { remap, triangleWave } from "../utils/math";
+import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
 
 export class SpaceElevator implements OrbitalFacility {
     readonly name: string;
@@ -70,6 +71,8 @@ export class SpaceElevator implements OrbitalFacility {
     private readonly boundingRadius: number;
 
     private elapsedSeconds = 0;
+
+    readonly targetInfo: TargetInfo;
 
     constructor(model: SpaceElevatorModel, scene: Scene) {
         this.model = model;
@@ -119,12 +122,22 @@ export class SpaceElevator implements OrbitalFacility {
 
         const extendSize = boundingVectors.max.subtract(boundingVectors.min).scale(0.5);
         this.boundingRadius = Math.max(extendSize.x, extendSize.y, extendSize.z);
+
+        this.targetInfo = {
+            type: ObjectTargetCursorType.FACILITY,
+            minDistance: this.getBoundingRadius() * 6.0,
+            maxDistance: 0.0
+        };
     }
 
     getLandingPads(): LandingPad[] {
         return this.landingBays.flatMap((landingBay) => {
             return landingBay.landingPads;
         });
+    }
+
+    getSubTargets(): Targetable[] {
+        return [this.climber, ...this.getLandingPads()];
     }
 
     handleLandingRequest(request: LandingRequest): LandingPad | null {

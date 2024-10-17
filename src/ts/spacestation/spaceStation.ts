@@ -18,7 +18,6 @@
 import { Scene } from "@babylonjs/core/scene";
 import { isSizeOnScreenEnough } from "../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { PostProcessType } from "../postProcesses/postProcessTypes";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { SpaceStationNodeType } from "../assets/procedural/spaceStation/spaceStationNode";
@@ -40,6 +39,7 @@ import { orbitalObjectTypeToDisplay } from "../utils/strings/orbitalObjectTypeTo
 import { OrbitalFacility } from "./orbitalFacility";
 import { SpaceStationModel } from "./spacestationModel";
 import { OrbitalObject } from "../architecture/orbitalObject";
+import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
 
 export class SpaceStation implements OrbitalFacility {
     readonly name: string;
@@ -59,6 +59,8 @@ export class SpaceStation implements OrbitalFacility {
     private readonly scene: Scene;
 
     private readonly boundingRadius: number;
+
+    readonly targetInfo: TargetInfo;
 
     constructor(model: SpaceStationModel, scene: Scene) {
         this.model = model;
@@ -84,12 +86,22 @@ export class SpaceStation implements OrbitalFacility {
 
         const extendSize = boundingVectors.max.subtract(boundingVectors.min).scale(0.5);
         this.boundingRadius = Math.max(extendSize.x, extendSize.y, extendSize.z);
+
+        this.targetInfo = {
+            type: ObjectTargetCursorType.FACILITY,
+            minDistance: this.getBoundingRadius() * 6.0,
+            maxDistance: 0.0
+        };
     }
 
     getLandingPads(): LandingPad[] {
         return this.landingBays.flatMap((landingBay) => {
             return landingBay.landingPads;
         });
+    }
+
+    getSubTargets(): Targetable[] {
+        return this.getLandingPads();
     }
 
     handleLandingRequest(request: LandingRequest): LandingPad | null {

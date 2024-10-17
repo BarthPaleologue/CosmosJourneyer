@@ -37,6 +37,8 @@ import { CloudsUniforms } from "../../clouds/cloudsUniforms";
 import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { orbitalObjectTypeToDisplay } from "../../utils/strings/orbitalObjectTypeToDisplay";
+import { OrbitalObjectType } from "../../architecture/orbitalObject";
+import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
 
 export class TelluricPlanet implements PlanetaryMassObject, Cullable {
     readonly sides: ChunkTree[]; // stores the 6 sides of the sphere
@@ -54,6 +56,8 @@ export class TelluricPlanet implements PlanetaryMassObject, Cullable {
     readonly asteroidField: AsteroidField | null;
 
     readonly cloudsUniforms: CloudsUniforms | null;
+
+    readonly targetInfo: TargetInfo;
 
     /**
      * New Telluric Planet
@@ -116,6 +120,9 @@ export class TelluricPlanet implements PlanetaryMassObject, Cullable {
             new ChunkTree(Direction.RIGHT, this.model, this.aggregate, this.material, scene),
             new ChunkTree(Direction.LEFT, this.model, this.aggregate, this.material, scene)
         ];
+
+        this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());
+        this.targetInfo.maxDistance = this.model.type === OrbitalObjectType.TELLURIC_SATELLITE ? this.model.orbit.radius * 8.0 : 0;
     }
 
     getTransform(): TransformNode {
