@@ -37,7 +37,12 @@ import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge"
 import { DefaultControls } from "../defaultControls/defaultControls";
 import { CharacterControls } from "../characterControls/characterControls";
 import { Assets } from "../assets/assets";
-import { getForwardDirection, getRotationQuaternion, setRotationQuaternion, translate } from "../uberCore/transforms/basicTransform";
+import {
+    getForwardDirection,
+    getRotationQuaternion,
+    setRotationQuaternion,
+    translate
+} from "../uberCore/transforms/basicTransform";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { View } from "../utils/view";
@@ -56,7 +61,6 @@ import i18n from "../i18n";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Sounds } from "../assets/sounds";
 import { Materials } from "../assets/materials";
-import { SpaceStation } from "../spacestation/spaceStation";
 import { SpaceStationLayer } from "../ui/spaceStation/spaceStationLayer";
 import { Player } from "../player/player";
 import { getNeighborStarSystemCoordinates } from "../utils/getNeighborStarSystems";
@@ -70,6 +74,8 @@ import { Mission } from "../missions/mission";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/universeCoordinates";
 import { getSystemModelFromCoordinates } from "./modelFromCoordinates";
 import { StarSystemModel } from "./starSystemModel";
+import { OrbitalObjectType } from "../architecture/orbitalObject";
+import { OrbitalFacility } from "../spacestation/orbitalFacility";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -550,8 +556,8 @@ export class StarSystemView implements View {
         this.characterControls.setClosestWalkableObject(nearestOrbitalObject);
         this.spaceshipControls.spaceship.setClosestWalkableObject(nearestOrbitalObject);
 
-        if (nearestOrbitalObject instanceof SpaceStation) {
-            this.spaceshipControls.setClosestLandableFacility(nearestOrbitalObject);
+        if (nearestOrbitalObject.model.type === OrbitalObjectType.SPACE_STATION || nearestOrbitalObject.model.type === OrbitalObjectType.SPACE_ELEVATOR) {
+            this.spaceshipControls.setClosestLandableFacility(nearestOrbitalObject as OrbitalFacility);
         } else {
             this.spaceshipControls.setClosestLandableFacility(null);
         }
