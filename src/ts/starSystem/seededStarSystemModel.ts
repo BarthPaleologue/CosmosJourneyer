@@ -206,7 +206,7 @@ export function newSeededStarSystemModel(seed: SystemSeed): StarSystemModel {
         planetarySystemsWithStations.forEach((planetarySystem) => {
             const spaceStationSeed = centeredRand(systemRng, GenerationSteps.SPACE_STATIONS + planetarySystem.planets.length) * Settings.SEED_HALF_RANGE;
 
-            if (planetarySystem.planets.length === 1 && planetarySystem.planets[0].type === OrbitalObjectType.TELLURIC_PLANET) {
+            if (uniformRandBool(0.5, systemRng, 657) && planetarySystem.planets.length === 1 && planetarySystem.planets[0].type === OrbitalObjectType.TELLURIC_PLANET) {
                 const spaceElevatorModel = newSeededSpaceElevatorModel(spaceStationSeed, stellarObjects, coordinates, planetarySystem.planets[0]);
                 planetarySystem.orbitalFacilities.push(spaceElevatorModel);
             } else {
