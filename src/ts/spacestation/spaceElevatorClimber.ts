@@ -112,8 +112,8 @@ export class SpaceElevatorClimber implements Targetable {
 
         this.targetInfo = {
             type: ObjectTargetCursorType.FACILITY,
-            minDistance: this.boundingRadius * 4.0,
-            maxDistance: 0
+            minDistance: this.getBoundingRadius() * 7.0,
+            maxDistance: this.getBoundingRadius() * 3000,
         };
     }
 
