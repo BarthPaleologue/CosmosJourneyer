@@ -280,7 +280,7 @@ export class SpaceElevator implements OrbitalFacility {
 
         this.tetherMaterial.update(stellarObjects);
 
-        const climberSpeed = 200 / 3.6; // 200 km/h in m/s
+        const climberSpeed = 300 / 3.6; // 300 km/h in m/s
         const roundTripDuration = (2 * this.tetherLength) / climberSpeed;
 
         this.climber.getTransform().position.y = remap(triangleWave(this.elapsedSeconds / roundTripDuration), 0, 1, -this.tetherLength / 2, this.tetherLength / 2);
