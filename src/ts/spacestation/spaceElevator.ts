@@ -42,6 +42,8 @@ import { OrbitalObject } from "../architecture/orbitalObject";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { MetalSectionMaterial } from "../assets/procedural/spaceStation/metalSectionMaterial";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { SpaceElevatorClimber } from "./spaceElevatorClimber";
+import { remap, triangleWave } from "../utils/math";
 
 export class SpaceElevator implements OrbitalFacility {
     readonly name: string;
@@ -56,13 +58,18 @@ export class SpaceElevator implements OrbitalFacility {
     private readonly landingBays: LandingBay[] = [];
 
     private readonly tether: Mesh;
+    private readonly tetherLength: number;
     private readonly tetherMaterial: MetalSectionMaterial;
+
+    private readonly climber: SpaceElevatorClimber;
 
     private readonly root: TransformNode;
 
     private readonly scene: Scene;
 
     private readonly boundingRadius: number;
+
+    private elapsedSeconds = 0;
 
     constructor(model: SpaceElevatorModel, scene: Scene) {
         this.model = model;
@@ -73,12 +80,12 @@ export class SpaceElevator implements OrbitalFacility {
         this.scene = scene;
 
         const tetherThickness = 10;
-        const tetherHeight = this.model.orbit.radius;
+        this.tetherLength = this.model.tetherLength;
 
         this.tether = MeshBuilder.CreateCylinder(
-            "Tether",
+            `${this.name} Tether`,
             {
-                height: tetherHeight,
+                height: this.tetherLength,
                 diameter: tetherThickness,
                 tessellation: 6
             },
@@ -88,6 +95,11 @@ export class SpaceElevator implements OrbitalFacility {
 
         this.tetherMaterial = new MetalSectionMaterial(scene);
         this.tether.material = this.tetherMaterial;
+
+        this.climber = new SpaceElevatorClimber(scene);
+        this.climber.getTransform().parent = this.tether;
+
+        this.climber.getTransform().position.y = this.tetherLength / 2;
 
         this.generate();
 
@@ -239,6 +251,8 @@ export class SpaceElevator implements OrbitalFacility {
     }
 
     update(stellarObjects: Transformable[], parents: OrbitalObject[], cameraWorldPosition: Vector3, deltaSeconds: number) {
+        this.elapsedSeconds += deltaSeconds;
+
         const parentPosition = parents[0].getTransform().getAbsolutePosition();
         const currentPositon = this.getTransform().getAbsolutePosition();
 
@@ -252,6 +266,11 @@ export class SpaceElevator implements OrbitalFacility {
         this.landingBays.forEach((landingBay) => landingBay.update(stellarObjects, cameraWorldPosition, deltaSeconds));
 
         this.tetherMaterial.update(stellarObjects);
+
+        const climberSpeed = 200 / 3.6; // 200 km/h in m/s
+        const roundTripDuration = (2 * this.tetherLength) / climberSpeed;
+
+        this.climber.getTransform().position.y = remap(triangleWave(this.elapsedSeconds / roundTripDuration), 0, 1, -this.tetherLength / 2, this.tetherLength / 2);
     }
 
     getTransform(): TransformNode {
@@ -267,6 +286,8 @@ export class SpaceElevator implements OrbitalFacility {
         this.landingBays.forEach((landingBay) => landingBay.dispose());
         this.tether.dispose();
         this.tetherMaterial.dispose();
+
+        this.climber.dispose();
 
         this.root.dispose();
     }

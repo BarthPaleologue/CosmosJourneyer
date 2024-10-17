@@ -34,3 +34,11 @@ export function smoothstep(edge0: number, edge1: number, x: number): number {
     const t = Math.min(1, Math.max(0, (x - edge0) / (edge1 - edge0)));
     return t * t * (3 - 2 * t);
 }
+
+export function triangleWave(x: number) {
+    return 2 * Math.abs(x - Math.floor(x + 0.5));
+}
+
+export function remap(value: number, from1: number, to1: number, from2: number, to2: number) {
+    return from2 + (value - from1) * (to2 - from2) / (to1 - from1);
+}

@@ -19,6 +19,8 @@ import { OrbitalFacilityModel } from "./orbitalFacility";
 
 export type SpaceElevatorModel = OrbitalFacilityModel & {
     readonly type: OrbitalObjectType.SPACE_ELEVATOR;
+
+    readonly tetherLength: number;
 };
 
 export function newSeededSpaceElevatorModel(
@@ -41,6 +43,8 @@ export function newSeededSpaceElevatorModel(
         period: parentRotationPeriod,
         normalToPlane: Vector3.Up()
     };
+
+    const tetherLength = orbitRadius - parentBody.radius;
 
     const physicalProperties: OrbitalObjectPhysicsInfo = {
         mass: 1,
@@ -94,6 +98,7 @@ export function newSeededSpaceElevatorModel(
         name,
         orbit,
         physics: physicalProperties,
+        tetherLength,
         population,
         energyConsumptionPerCapitaKWh,
         populationDensity,
