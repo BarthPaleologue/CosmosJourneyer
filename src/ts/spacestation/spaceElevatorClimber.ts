@@ -3,13 +3,22 @@ import { CreateBox, CreateTube, TransformNode } from "@babylonjs/core/Meshes";
 import { Transformable } from "../architecture/transformable";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { Axis } from "@babylonjs/core/Maths/math.axis";
+import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
+import { SolarPanelMaterial } from "../assets/procedural/solarPanel/solarPanelMaterial";
+import { MetalSectionMaterial } from "../assets/procedural/spaceStation/metalSectionMaterial";
+import { ClimberRingMaterial } from "../materials/climberRingMaterial";
 
 export class SpaceElevatorClimber implements Transformable {
     private readonly transform: TransformNode;
 
+    private readonly solarPanelMaterial: SolarPanelMaterial;
+    private readonly metalSectionMaterial: MetalSectionMaterial;
+
     constructor(scene: Scene) {
         this.transform = new TransformNode("SpaceElevatorClimber", scene);
+
+        this.solarPanelMaterial = new SolarPanelMaterial(scene);
+        this.metalSectionMaterial = new MetalSectionMaterial(scene);
 
         const angleSubtracted = Math.PI / 6;
         const minAngle = -Math.PI / 2 + angleSubtracted / 2;
@@ -40,27 +49,31 @@ export class SpaceElevatorClimber implements Transformable {
         rightRing.scaling.y = yThickness;
         rightRing.parent = this.transform;
 
+        rightRing.material = new ClimberRingMaterial("ClimberRingMaterial", scene);
+
         const leftRing = rightRing.clone("ClimberLeftRing");
         leftRing.rotate(Axis.Y, Math.PI);
 
         const arm1 = CreateBox(
             "ClimberArm1",
             {
-                width: globalRadius * 2,
-                height: innerRadius * yThickness / 4,
-                depth: innerRadius * yThickness / 4
+                height: globalRadius * 2,
+                width: (innerRadius * yThickness) / 4,
+                depth: (innerRadius * yThickness) / 4
             },
             scene
         );
+        arm1.material = this.metalSectionMaterial;
+        arm1.rotate(Axis.Z, Math.PI / 2, Space.WORLD);
         arm1.parent = this.transform;
 
-        const arm2 = arm1.clone("ClimberArm2");
-        arm2.rotate(Axis.Y, Math.PI / 4);
-        arm2.parent = this.transform;
+        const armAngles = [Math.PI / 4, -Math.PI / 4];
 
-        const arm3 = arm1.clone("ClimberArm3");
-        arm3.rotate(Axis.Y, -Math.PI / 4);
-        arm3.parent = this.transform;
+        armAngles.forEach((angle, index) => {
+            const arm = arm1.clone(`ClimberArm${index + 2}`);
+            arm.rotate(Axis.Y, angle, Space.WORLD);
+            arm.parent = this.transform;
+        });
 
         const solarPanelWidth = 100;
         const solarPanelDepth = 20;
@@ -77,6 +90,7 @@ export class SpaceElevatorClimber implements Transformable {
             },
             scene
         );
+        solarPanel1.material = this.solarPanelMaterial;
         solarPanel1.position.x = globalRadius + solarPanelWidth / 2;
         solarPanel1.parent = this.transform;
 
@@ -89,11 +103,18 @@ export class SpaceElevatorClimber implements Transformable {
         });
     }
 
+    update(stellarObjects: Transformable[]) {
+        this.solarPanelMaterial.update(stellarObjects);
+        this.metalSectionMaterial.update(stellarObjects);
+    }
+
     getTransform() {
         return this.transform;
     }
 
     dispose() {
+        this.solarPanelMaterial.dispose();
+        this.metalSectionMaterial.dispose();
         this.transform.dispose();
     }
 }
