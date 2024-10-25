@@ -19,16 +19,16 @@ importers:
         version: 1.3.10
       '@babylonjs/inspector':
         specifier: ^7.29.0
-        version: 7.29.0(@babylonjs/core@7.29.0)(@babylonjs/gui-editor@7.26.0(@babylonjs/core@7.29.0)(@babylonjs/gui@7.29.0(@babylonjs/core@7.29.0))(@types/react-dom@18.3.0)(@types/react@18.3.8))(@babylonjs/gui@7.29.0(@babylonjs/core@7.29.0))(@babylonjs/loaders@7.29.0(@babylonjs/core@7.29.0)(babylonjs-gltf2interface@7.25.1))(@babylonjs/materials@7.26.0(@babylonjs/core@7.29.0))(@babylonjs/serializers@7.26.0(@babylonjs/core@7.29.0)(babylonjs-gltf2interface@7.25.1))(@types/react-dom@18.3.0)(@types/react@18.3.8)
+        version: 7.29.0(@babylonjs/core@7.29.0)(@babylonjs/gui-editor@7.31.0(@babylonjs/core@7.29.0)(@babylonjs/gui@7.29.0(@babylonjs/core@7.29.0))(@types/react-dom@18.3.1)(@types/react@18.3.12))(@babylonjs/gui@7.29.0(@babylonjs/core@7.29.0))(@babylonjs/loaders@7.29.0(@babylonjs/core@7.29.0)(babylonjs-gltf2interface@7.31.0))(@babylonjs/materials@7.31.0(@babylonjs/core@7.29.0))(@babylonjs/serializers@7.31.0(@babylonjs/core@7.29.0)(babylonjs-gltf2interface@7.31.0))(@types/react-dom@18.3.1)(@types/react@18.3.12)
       '@babylonjs/loaders':
         specifier: ^7.29.0
-        version: 7.29.0(@babylonjs/core@7.29.0)(babylonjs-gltf2interface@7.25.1)
+        version: 7.29.0(@babylonjs/core@7.29.0)(babylonjs-gltf2interface@7.31.0)
       '@brianchirls/game-input':
         specifier: ^0.1.1
         version: 0.1.1
       '@tauri-apps/cli':
-        specifier: ^1.6.3
-        version: 1.6.3
+        specifier: 2.0.4
+        version: 2.0.4
       '@types/d3':
         specifier: ^7.4.3
         version: 7.4.3
@@ -335,8 +335,8 @@ packages:
   '@babylonjs/core@7.29.0':
     resolution: {integrity: sha512-uegeRE4kEjoiW8nXOszMTkz1jlx5ITTTZvDo5xjhPSa0GK9KhZ2IQF0JONEuJgBdJPtplrUXzH8VzqIE8GpY1g==}
 
-  '@babylonjs/gui-editor@7.26.0':
-    resolution: {integrity: sha512-VBqrHZfdVXhwLJdz6FDdM1ZnFull+hHoTQj1Na3ps4U3ubJ3t26/PA86DOjBrK/BBMVYPFoa/I3TDK/BaWgG+Q==}
+  '@babylonjs/gui-editor@7.31.0':
+    resolution: {integrity: sha512-5Atsj+GQvggpE+ZhGP04v7S6tMGf3rTAhoNol3Io152qeNo9zHPKtcXbNOfUG69B3cKn6rVhWJcArazL84NAlg==}
     peerDependencies:
       '@babylonjs/core': ^7.0.0
       '@babylonjs/gui': ^7.0.0
@@ -369,13 +369,13 @@ packages:
       '@babylonjs/core': ^7.0.0
       babylonjs-gltf2interface: ^7.0.0
 
-  '@babylonjs/materials@7.26.0':
-    resolution: {integrity: sha512-GJxcbT0UFV7FjaoOFJvYNhULqBBiLhKPi4lX0XDJJ81pjHKFcdU8fNxIFJMZQfp4f62zv8eFHMWs+MqUThIXQQ==}
+  '@babylonjs/materials@7.31.0':
+    resolution: {integrity: sha512-iXzm/jKSGgZycM3j9gJdy8SfQbNftNEkYANA//KOna/TGf30vZSWkRkXTLWjhdXQTuJp+1jJ1xVWej4FR3rUXQ==}
     peerDependencies:
       '@babylonjs/core': ^7.0.0
 
-  '@babylonjs/serializers@7.26.0':
-    resolution: {integrity: sha512-V+SzNLGMvK8HjXDo6TpbHKxG7TTKW9+Aia/FKI111uYBIMRxKKlXUpbhsC8KBsx4nu6tIknwdou6nnN4CAAEJw==}
+  '@babylonjs/serializers@7.31.0':
+    resolution: {integrity: sha512-xUJA9t8yRvTscPfXsV3DTKCaWCYXGODmPB9hfs2ywSQ2PSvHOLeDEXbWOovEJnIcqS4jmCJHe20PiOY7xAYAwA==}
     peerDependencies:
       '@babylonjs/core': ^7.0.0
       babylonjs-gltf2interface: ^7.0.0
@@ -828,68 +828,68 @@ packages:
   '@sinonjs/fake-timers@10.3.0':
     resolution: {integrity: sha512-V4BG07kuYSUkTCSBHG8G8TNhM+F19jXFWnQtzj+we8DrkpSBCee9Z3Ms8yiGer/dlmhe35/Xdgyo3/0rQKg7YA==}
 
-  '@tauri-apps/cli-darwin-arm64@1.6.3':
-    resolution: {integrity: sha512-fQN6IYSL8bG4NvkdKE4sAGF4dF/QqqQq4hOAU+t8ksOzHJr0hUlJYfncFeJYutr/MMkdF7hYKadSb0j5EE9r0A==}
+  '@tauri-apps/cli-darwin-arm64@2.0.4':
+    resolution: {integrity: sha512-siH7rOHobb16rPbc11k64p1mxIpiRCkWmzs2qmL5IX21Gx9K5onI3Tk67Oqpf2uNupbYzItrOttaDT4NHFC7tw==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [darwin]
 
-  '@tauri-apps/cli-darwin-x64@1.6.3':
-    resolution: {integrity: sha512-1yTXZzLajKAYINJOJhZfmMhCzweHSgKQ3bEgJSn6t+1vFkOgY8Yx4oFgWcybrrWI5J1ZLZAl47+LPOY81dLcyA==}
+  '@tauri-apps/cli-darwin-x64@2.0.4':
+    resolution: {integrity: sha512-zIccfbCoZMfmUpnk6PFCV0keFyfVj1A9XV3Oiiitj/dkTZ9CQvzjhX3XC0XcK4rsTWegfr2PjSrK06aiPAROAw==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [darwin]
 
-  '@tauri-apps/cli-linux-arm-gnueabihf@1.6.3':
-    resolution: {integrity: sha512-CjTEr9r9xgjcvos09AQw8QMRPuH152B1jvlZt4PfAsyJNPFigzuwed5/SF7XAd8bFikA7zArP4UT12RdBxrx7w==}
+  '@tauri-apps/cli-linux-arm-gnueabihf@2.0.4':
+    resolution: {integrity: sha512-fgQqJzefOGWCBNg4yrVA82Rg4s1XQr5K0dc2rCxBhJfa696e8dQ1LDrnWq/AiO5r+uHfVaoQTIUvxxpFicYRSA==}
     engines: {node: '>= 10'}
     cpu: [arm]
     os: [linux]
 
-  '@tauri-apps/cli-linux-arm64-gnu@1.6.3':
-    resolution: {integrity: sha512-G9EUUS4M8M/Jz1UKZqvJmQQCKOzgTb8/0jZKvfBuGfh5AjFBu8LHvlFpwkKVm1l4951Xg4ulUp6P9Q7WRJ9XSA==}
+  '@tauri-apps/cli-linux-arm64-gnu@2.0.4':
+    resolution: {integrity: sha512-u8wbt5tPA9pI6j+d7jGrfOz9UVCiTp+IYzKNiIqlrDsAjqAUFaNXYHKqOUboeFWEmI4zoCWj6LgpS2OJTQ5FKg==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
 
-  '@tauri-apps/cli-linux-arm64-musl@1.6.3':
-    resolution: {integrity: sha512-MuBTHJyNpZRbPVG8IZBN8+Zs7aKqwD22tkWVBcL1yOGL4zNNTJlkfL+zs5qxRnHlUsn6YAlbW/5HKocfpxVwBw==}
+  '@tauri-apps/cli-linux-arm64-musl@2.0.4':
+    resolution: {integrity: sha512-hntF1V8e3V1hlrESm93PsghDhf3lA5pbvFrRfYxU1c+fVD/jRXGVw8BH3O1lW8MWwhEg1YdhKk01oAgsuHLuig==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
 
-  '@tauri-apps/cli-linux-x64-gnu@1.6.3':
-    resolution: {integrity: sha512-Uvi7M+NK3tAjCZEY1WGel+dFlzJmqcvu3KND+nqa22762NFmOuBIZ4KJR/IQHfpEYqKFNUhJfCGnpUDfiC3Oxg==}
+  '@tauri-apps/cli-linux-x64-gnu@2.0.4':
+    resolution: {integrity: sha512-Iq1GGJb+oT1T0ZV8izrgf0cBtlzPCJaWcNueRbf1ZXquMf+FSTyQv+/Lo8rq5T6buOIJOH7cAOTuEWWqiCZteg==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
 
-  '@tauri-apps/cli-linux-x64-musl@1.6.3':
-    resolution: {integrity: sha512-rc6B342C0ra8VezB/OJom9j/N+9oW4VRA4qMxS2f4bHY2B/z3J9NPOe6GOILeg4v/CV62ojkLsC3/K/CeF3fqQ==}
+  '@tauri-apps/cli-linux-x64-musl@2.0.4':
+    resolution: {integrity: sha512-9NTk6Pf0bSwXqCBdAA+PDYts9HeHebZzIo8mbRzRyUbER6QngG5HZb9Ka36Z1QWtJjdRy6uxSb4zb/9NuTeHfA==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
 
-  '@tauri-apps/cli-win32-arm64-msvc@1.6.3':
-    resolution: {integrity: sha512-cSH2qOBYuYC4UVIFtrc1YsGfc5tfYrotoHrpTvRjUGu0VywvmyNk82+ZsHEnWZ2UHmu3l3lXIGRqSWveLln0xg==}
+  '@tauri-apps/cli-win32-arm64-msvc@2.0.4':
+    resolution: {integrity: sha512-OF2e9oxiBFR8A8wVMOhUx9QGN/I1ZkquWC7gVQBnA56nx9PabJlDT08QBy5UD8USqZFVznnfNr2ehlheQahb3g==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [win32]
 
-  '@tauri-apps/cli-win32-ia32-msvc@1.6.3':
-    resolution: {integrity: sha512-T8V6SJQqE4PSWmYBl0ChQVmS6AR2hXFHURH2DwAhgSGSQ6uBXgwlYFcfIeQpBQA727K2Eq8X2hGfvmoySyHMRw==}
+  '@tauri-apps/cli-win32-ia32-msvc@2.0.4':
+    resolution: {integrity: sha512-T+hCKB3rFP6q0saHHtR02hm6wr1ZPJ0Mkii3oRTxjPG6BBXoVzHNCYzvdgEGJPTA2sFuAQtJH764NRtNlDMifw==}
     engines: {node: '>= 10'}
     cpu: [ia32]
     os: [win32]
 
-  '@tauri-apps/cli-win32-x64-msvc@1.6.3':
-    resolution: {integrity: sha512-HUkWZ+lYHI/Gjkh2QjHD/OBDpqLVmvjZGpLK9losur1Eg974Jip6k+vsoTUxQBCBDfj30eDBct9E1FvXOspWeg==}
+  '@tauri-apps/cli-win32-x64-msvc@2.0.4':
+    resolution: {integrity: sha512-GVaiI3KWRFLomjJmApHqihhYlkJ+7FqhumhVfBO6Z2tWzZjQyVQgTdNp0kYEuW2WoAYEj0dKY6qd4YM33xYcUA==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [win32]
 
-  '@tauri-apps/cli@1.6.3':
-    resolution: {integrity: sha512-q46umd6QLRKDd4Gg6WyZBGa2fWvk0pbeUA5vFomm4uOs1/17LIciHv2iQ4UD+2Yv5H7AO8YiE1t50V0POiEGEw==}
+  '@tauri-apps/cli@2.0.4':
+    resolution: {integrity: sha512-Hl9eFXz+O366+6su9PfaSzu2EJdFe1p8K8ghkWmi40dz8VmSE7vsMTaOStD0I71ckSOkh2ICDX7FQTBgjlpjWw==}
     engines: {node: '>= 10'}
     hasBin: true
 
@@ -1128,11 +1128,11 @@ packages:
   '@types/range-parser@1.2.7':
     resolution: {integrity: sha512-hKormJbkJqzQGhziax5PItDUTMAM9uE2XXQmM37dyd4hVM+5aVl7oVxMVUiVQn2oCQFN/LKCZdvSM0pFRqbSmQ==}
 
-  '@types/react-dom@18.3.0':
-    resolution: {integrity: sha512-EhwApuTmMBmXuFOikhQLIBUn6uFg81SwLMOAUgodJF14SOBOCMdU04gDoYi0WOJJHD144TL32z4yDqCW3dnkQg==}
+  '@types/react-dom@18.3.1':
+    resolution: {integrity: sha512-qW1Mfv8taImTthu4KoXgDfLuk4bydU6Q/TkADnDWWHwi4NX4BR+LWfTp2sVmTqRrsHvyDDTelgelxJ+SsejKKQ==}
 
-  '@types/react@18.3.8':
-    resolution: {integrity: sha512-syBUrW3/XpnW4WJ41Pft+I+aPoDVbrBVQGEnbD7NijDGlVC+8gV/XKRY+7vMDlfPpbwYt0l1vd/Sj8bJGMbs9Q==}
+  '@types/react@18.3.12':
+    resolution: {integrity: sha512-D2wOSq/d6Agt28q7rSI3jhU7G6aiuzljDGZ2hTZHIkrTLUI+AF3WMeKkEZ9nN2fkBAlcktT6vcZjDFiIhMYEQw==}
 
   '@types/retry@0.12.2':
     resolution: {integrity: sha512-XISRgDJ2Tc5q4TRqvgJtzsRkFYNJzZrhTdtMoGVBttwzzQJkPnS3WWTFc7kuDRoPtPakl+T+OfdEUjYJj7Jbow==}
@@ -1525,8 +1525,8 @@ packages:
     peerDependencies:
       '@babel/core': ^7.0.0
 
-  babylonjs-gltf2interface@7.25.1:
-    resolution: {integrity: sha512-MT7P7SmSmCy6WvUGemR4m6nijGilt7gstXEDwhkHmaOBuhQeFoRt9BqSQ42UcyuEW32S1w8TkkO/OxsnBSb62A==}
+  babylonjs-gltf2interface@7.31.0:
+    resolution: {integrity: sha512-ZGtSmhOpDGPtXQNJ1KkgwTplsDczf3pTUKLs/T8ZxBD9598izuUPQK8+Ua1zAioC+NQdQuEyQ0f2aytn/HtZ5A==}
 
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
@@ -5445,12 +5445,12 @@ snapshots:
 
   '@babylonjs/core@7.29.0': {}
 
-  '@babylonjs/gui-editor@7.26.0(@babylonjs/core@7.29.0)(@babylonjs/gui@7.29.0(@babylonjs/core@7.29.0))(@types/react-dom@18.3.0)(@types/react@18.3.8)':
+  '@babylonjs/gui-editor@7.31.0(@babylonjs/core@7.29.0)(@babylonjs/gui@7.29.0(@babylonjs/core@7.29.0))(@types/react-dom@18.3.1)(@types/react@18.3.12)':
     dependencies:
       '@babylonjs/core': 7.29.0
       '@babylonjs/gui': 7.29.0(@babylonjs/core@7.29.0)
-      '@types/react': 18.3.8
-      '@types/react-dom': 18.3.0
+      '@types/react': 18.3.12
+      '@types/react-dom': 18.3.1
 
   '@babylonjs/gui@7.29.0(@babylonjs/core@7.29.0)':
     dependencies:
@@ -5460,33 +5460,33 @@ snapshots:
     dependencies:
       '@types/emscripten': 1.39.13
 
-  '@babylonjs/inspector@7.29.0(@babylonjs/core@7.29.0)(@babylonjs/gui-editor@7.26.0(@babylonjs/core@7.29.0)(@babylonjs/gui@7.29.0(@babylonjs/core@7.29.0))(@types/react-dom@18.3.0)(@types/react@18.3.8))(@babylonjs/gui@7.29.0(@babylonjs/core@7.29.0))(@babylonjs/loaders@7.29.0(@babylonjs/core@7.29.0)(babylonjs-gltf2interface@7.25.1))(@babylonjs/materials@7.26.0(@babylonjs/core@7.29.0))(@babylonjs/serializers@7.26.0(@babylonjs/core@7.29.0)(babylonjs-gltf2interface@7.25.1))(@types/react-dom@18.3.0)(@types/react@18.3.8)':
+  '@babylonjs/inspector@7.29.0(@babylonjs/core@7.29.0)(@babylonjs/gui-editor@7.31.0(@babylonjs/core@7.29.0)(@babylonjs/gui@7.29.0(@babylonjs/core@7.29.0))(@types/react-dom@18.3.1)(@types/react@18.3.12))(@babylonjs/gui@7.29.0(@babylonjs/core@7.29.0))(@babylonjs/loaders@7.29.0(@babylonjs/core@7.29.0)(babylonjs-gltf2interface@7.31.0))(@babylonjs/materials@7.31.0(@babylonjs/core@7.29.0))(@babylonjs/serializers@7.31.0(@babylonjs/core@7.29.0)(babylonjs-gltf2interface@7.31.0))(@types/react-dom@18.3.1)(@types/react@18.3.12)':
     dependencies:
       '@babylonjs/core': 7.29.0
       '@babylonjs/gui': 7.29.0(@babylonjs/core@7.29.0)
-      '@babylonjs/gui-editor': 7.26.0(@babylonjs/core@7.29.0)(@babylonjs/gui@7.29.0(@babylonjs/core@7.29.0))(@types/react-dom@18.3.0)(@types/react@18.3.8)
-      '@babylonjs/loaders': 7.29.0(@babylonjs/core@7.29.0)(babylonjs-gltf2interface@7.25.1)
-      '@babylonjs/materials': 7.26.0(@babylonjs/core@7.29.0)
-      '@babylonjs/serializers': 7.26.0(@babylonjs/core@7.29.0)(babylonjs-gltf2interface@7.25.1)
+      '@babylonjs/gui-editor': 7.31.0(@babylonjs/core@7.29.0)(@babylonjs/gui@7.29.0(@babylonjs/core@7.29.0))(@types/react-dom@18.3.1)(@types/react@18.3.12)
+      '@babylonjs/loaders': 7.29.0(@babylonjs/core@7.29.0)(babylonjs-gltf2interface@7.31.0)
+      '@babylonjs/materials': 7.31.0(@babylonjs/core@7.29.0)
+      '@babylonjs/serializers': 7.31.0(@babylonjs/core@7.29.0)(babylonjs-gltf2interface@7.31.0)
       '@fortawesome/fontawesome-svg-core': 6.6.0
       '@fortawesome/free-regular-svg-icons': 6.6.0
       '@fortawesome/free-solid-svg-icons': 6.6.0
-      '@types/react': 18.3.8
-      '@types/react-dom': 18.3.0
+      '@types/react': 18.3.12
+      '@types/react-dom': 18.3.1
 
-  '@babylonjs/loaders@7.29.0(@babylonjs/core@7.29.0)(babylonjs-gltf2interface@7.25.1)':
+  '@babylonjs/loaders@7.29.0(@babylonjs/core@7.29.0)(babylonjs-gltf2interface@7.31.0)':
     dependencies:
       '@babylonjs/core': 7.29.0
-      babylonjs-gltf2interface: 7.25.1
+      babylonjs-gltf2interface: 7.31.0
 
-  '@babylonjs/materials@7.26.0(@babylonjs/core@7.29.0)':
+  '@babylonjs/materials@7.31.0(@babylonjs/core@7.29.0)':
     dependencies:
       '@babylonjs/core': 7.29.0
 
-  '@babylonjs/serializers@7.26.0(@babylonjs/core@7.29.0)(babylonjs-gltf2interface@7.25.1)':
+  '@babylonjs/serializers@7.31.0(@babylonjs/core@7.29.0)(babylonjs-gltf2interface@7.31.0)':
     dependencies:
       '@babylonjs/core': 7.29.0
-      babylonjs-gltf2interface: 7.25.1
+      babylonjs-gltf2interface: 7.31.0
 
   '@bcoe/v8-coverage@0.2.3': {}
 
@@ -6143,50 +6143,48 @@ snapshots:
     dependencies:
       '@sinonjs/commons': 3.0.1
 
-  '@tauri-apps/cli-darwin-arm64@1.6.3':
+  '@tauri-apps/cli-darwin-arm64@2.0.4':
     optional: true
 
-  '@tauri-apps/cli-darwin-x64@1.6.3':
+  '@tauri-apps/cli-darwin-x64@2.0.4':
     optional: true
 
-  '@tauri-apps/cli-linux-arm-gnueabihf@1.6.3':
+  '@tauri-apps/cli-linux-arm-gnueabihf@2.0.4':
     optional: true
 
-  '@tauri-apps/cli-linux-arm64-gnu@1.6.3':
+  '@tauri-apps/cli-linux-arm64-gnu@2.0.4':
     optional: true
 
-  '@tauri-apps/cli-linux-arm64-musl@1.6.3':
+  '@tauri-apps/cli-linux-arm64-musl@2.0.4':
     optional: true
 
-  '@tauri-apps/cli-linux-x64-gnu@1.6.3':
+  '@tauri-apps/cli-linux-x64-gnu@2.0.4':
     optional: true
 
-  '@tauri-apps/cli-linux-x64-musl@1.6.3':
+  '@tauri-apps/cli-linux-x64-musl@2.0.4':
     optional: true
 
-  '@tauri-apps/cli-win32-arm64-msvc@1.6.3':
+  '@tauri-apps/cli-win32-arm64-msvc@2.0.4':
     optional: true
 
-  '@tauri-apps/cli-win32-ia32-msvc@1.6.3':
+  '@tauri-apps/cli-win32-ia32-msvc@2.0.4':
     optional: true
 
-  '@tauri-apps/cli-win32-x64-msvc@1.6.3':
+  '@tauri-apps/cli-win32-x64-msvc@2.0.4':
     optional: true
 
-  '@tauri-apps/cli@1.6.3':
-    dependencies:
-      semver: 7.6.3
+  '@tauri-apps/cli@2.0.4':
     optionalDependencies:
-      '@tauri-apps/cli-darwin-arm64': 1.6.3
-      '@tauri-apps/cli-darwin-x64': 1.6.3
-      '@tauri-apps/cli-linux-arm-gnueabihf': 1.6.3
-      '@tauri-apps/cli-linux-arm64-gnu': 1.6.3
-      '@tauri-apps/cli-linux-arm64-musl': 1.6.3
-      '@tauri-apps/cli-linux-x64-gnu': 1.6.3
-      '@tauri-apps/cli-linux-x64-musl': 1.6.3
-      '@tauri-apps/cli-win32-arm64-msvc': 1.6.3
-      '@tauri-apps/cli-win32-ia32-msvc': 1.6.3
-      '@tauri-apps/cli-win32-x64-msvc': 1.6.3
+      '@tauri-apps/cli-darwin-arm64': 2.0.4
+      '@tauri-apps/cli-darwin-x64': 2.0.4
+      '@tauri-apps/cli-linux-arm-gnueabihf': 2.0.4
+      '@tauri-apps/cli-linux-arm64-gnu': 2.0.4
+      '@tauri-apps/cli-linux-arm64-musl': 2.0.4
+      '@tauri-apps/cli-linux-x64-gnu': 2.0.4
+      '@tauri-apps/cli-linux-x64-musl': 2.0.4
+      '@tauri-apps/cli-win32-arm64-msvc': 2.0.4
+      '@tauri-apps/cli-win32-ia32-msvc': 2.0.4
+      '@tauri-apps/cli-win32-x64-msvc': 2.0.4
 
   '@tootallnate/once@1.1.2': {}
 
@@ -6461,11 +6459,11 @@ snapshots:
 
   '@types/range-parser@1.2.7': {}
 
-  '@types/react-dom@18.3.0':
+  '@types/react-dom@18.3.1':
     dependencies:
-      '@types/react': 18.3.8
+      '@types/react': 18.3.12
 
-  '@types/react@18.3.8':
+  '@types/react@18.3.12':
     dependencies:
       '@types/prop-types': 15.7.13
       csstype: 3.1.3
@@ -6956,7 +6954,7 @@ snapshots:
       babel-plugin-jest-hoist: 29.6.3
       babel-preset-current-node-syntax: 1.1.0(@babel/core@7.25.8)
 
-  babylonjs-gltf2interface@7.25.1: {}
+  babylonjs-gltf2interface@7.31.0: {}
 
   balanced-match@1.0.2: {}
 
