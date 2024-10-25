@@ -15,9 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { seededSquirrelNoise } from "squirrel-noise";
 import { makeNoise3D } from "fast-simplex-noise";
 import { Tools } from "@babylonjs/core/Misc/tools";
+import { getRngFromSeed } from "./utils/getRngFromSeed";
 
 export const Settings = {
     UNIVERSE_SEED: Math.PI,
@@ -25,6 +25,12 @@ export const Settings = {
     POWER_PLAY_SEED: 77,
 
     EARTH_RADIUS: 1000e3, // target is 6000e3
+
+    EARTH_MASS: 5.972e24,
+
+    MOON_MASS: 7.348e22,
+
+    JUPITER_MASS: 1.898e27,
 
     /**
      * The distance light travels in one year.
@@ -35,7 +41,7 @@ export const Settings = {
     MIN_DISTANCE_BETWEEN_VERTICES: 1.5,
 
     CLOUD_LAYER_HEIGHT: 7e3,
-    ATMOSPHERE_HEIGHT: 100e3,
+    EARTH_ATMOSPHERE_THICKNESS: 100e3,
     OCEAN_DEPTH: 7e3,
 
     TIME_MULTIPLIER: 1,
@@ -46,6 +52,16 @@ export const Settings = {
     FLOATING_ORIGIN_THRESHOLD: 500,
 
     HUMAN_BUBBLE_RADIUS_LY: 100,
+
+    PLAYER_JUMP_RANGE_LY: 15,
+    VISIBLE_NEIGHBORHOOD_MAX_RADIUS_LY: 20,
+
+    CREDIT_SYMBOL: "₽",
+
+    /**
+     * Size of each star
+     */
+    STAR_SECTOR_SIZE: 20,
 
     /**
      * The average daily intake for a human being in kcal/day
@@ -100,7 +116,7 @@ export const CollisionMask = {
     DYNAMIC_OBJECTS: 0b00000010
 };
 
-const densityRng = seededSquirrelNoise(Settings.UNIVERSE_SEED);
+const densityRng = getRngFromSeed(Settings.UNIVERSE_SEED);
 let densitySampleStep = 0;
 const densityPerlin = makeNoise3D(() => {
     return densityRng(densitySampleStep++);

@@ -29,16 +29,16 @@ import { CameraUniformNames, setCameraUniforms } from "../postProcesses/uniforms
 import { SamplerUniformNames, setSamplerUniforms } from "../postProcesses/uniforms/samplerUniforms";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
-import { BoundingSphere } from "../architecture/boundingSphere";
+import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { Scene } from "@babylonjs/core/scene";
 
 export class FlatCloudsPostProcess extends PostProcess implements ObjectPostProcess, UpdatablePostProcess {
     readonly cloudUniforms: CloudsUniforms;
-    readonly object: Transformable & BoundingSphere;
+    readonly object: Transformable & HasBoundingSphere;
 
     private activeCamera: Camera | null = null;
 
-    constructor(name: string, planet: Transformable & BoundingSphere, cloudUniforms: CloudsUniforms, scene: Scene, stellarObjects: Transformable[]) {
+    constructor(planet: Transformable & HasBoundingSphere, cloudUniforms: CloudsUniforms, stellarObjects: Transformable[], scene: Scene) {
         const shaderName = "flatClouds";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = flatCloudsFragment;
@@ -53,7 +53,19 @@ export class FlatCloudsPostProcess extends PostProcess implements ObjectPostProc
 
         const samplers: string[] = [...Object.values(SamplerUniformNames), ...Object.values(CloudsSamplerNames)];
 
-        super(name, shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
+        super(
+            `${planet.getTransform().name}CloudsPostProcess`,
+            shaderName,
+            uniforms,
+            samplers,
+            1,
+            null,
+            Texture.BILINEAR_SAMPLINGMODE,
+            scene.getEngine(),
+            false,
+            null,
+            Constants.TEXTURETYPE_HALF_FLOAT
+        );
 
         this.object = planet;
         this.cloudUniforms = cloudUniforms;

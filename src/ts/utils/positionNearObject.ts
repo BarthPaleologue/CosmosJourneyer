@@ -17,16 +17,30 @@
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { StarSystemController } from "../starSystem/starSystemController";
-import { nearestBody } from "./nearestBody";
 import { Transformable } from "../architecture/transformable";
-import { BoundingSphere } from "../architecture/boundingSphere";
+import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { Controls } from "../uberCore/controls";
 import { getUpwardDirection, roll, rotateAround } from "../uberCore/transforms/basicTransform";
 import { CanHaveRings } from "../architecture/canHaveRings";
+import { CelestialBody } from "../architecture/celestialBody";
 
-export function positionNearObjectBrightSide(transformable: Transformable, object: Transformable & BoundingSphere, starSystem: StarSystemController, nRadius = 3): void {
+export function nearestBody(objectPosition: Vector3, bodies: CelestialBody[]): CelestialBody {
+    let distance = -1;
+    if (bodies.length === 0) throw new Error("no bodieees !");
+    let nearest = bodies[0];
+    for (const body of bodies) {
+        const newDistance = objectPosition.subtract(body.getTransform().getAbsolutePosition()).length();
+        if (distance === -1 || newDistance < distance) {
+            nearest = body;
+            distance = newDistance;
+        }
+    }
+    return nearest;
+}
+
+export function positionNearObjectBrightSide(transformable: Transformable, object: Transformable & HasBoundingSphere, starSystem: StarSystemController, nRadius = 3): void {
     // go from the nearest star to be on the sunny side of the object
-    const nearestStar = nearestBody(object.getTransform().getAbsolutePosition(), starSystem.stellarObjects);
+    const nearestStar = nearestBody(object.getTransform().getAbsolutePosition(), starSystem.getStellarObjects());
 
     if (nearestStar === object) {
         // the object is the nearest star
@@ -54,9 +68,9 @@ export function positionNearObjectBrightSide(transformable: Transformable, objec
     transformable.getTransform().lookAt(object.getTransform().getAbsolutePosition());
 }
 
-export function positionNearObjectWithStarVisible(transformable: Controls, object: Transformable & BoundingSphere, starSystem: StarSystemController, nRadius = 3): void {
+export function positionNearObjectWithStarVisible(transformable: Controls, object: Transformable & HasBoundingSphere, starSystem: StarSystemController, nRadius = 3): void {
     // go from the nearest star to be on the sunny side of the object
-    const nearestStar = nearestBody(object.getTransform().getAbsolutePosition(), starSystem.stellarObjects);
+    const nearestStar = nearestBody(object.getTransform().getAbsolutePosition(), starSystem.getStellarObjects());
 
     if (nearestStar === object) {
         // the object is the nearest star
@@ -106,8 +120,8 @@ export function positionNearObjectWithStarVisible(transformable: Controls, objec
     });
 }
 
-export function positionNearObjectAsteroidField(body: Transformable & CanHaveRings & BoundingSphere, starSystem: StarSystemController): Vector3 {
-    const asteroidField = body.getAsteroidField();
+export function positionNearObjectAsteroidField(body: Transformable & CanHaveRings & HasBoundingSphere, starSystem: StarSystemController): Vector3 {
+    const asteroidField = body.asteroidField;
     if (asteroidField === null) {
         throw new Error("The body does not have an asteroid field");
     }
@@ -116,7 +130,7 @@ export function positionNearObjectAsteroidField(body: Transformable & CanHaveRin
 
     const asteroidFieldAverageRadius = asteroidField.averageRadius;
 
-    const nearestStar = nearestBody(bodyPosition, starSystem.stellarObjects);
+    const nearestStar = nearestBody(bodyPosition, starSystem.getStellarObjects());
     const dirToStar = bodyPosition.subtract(nearestStar.getTransform().getAbsolutePosition()).normalize();
     const upDirection = getUpwardDirection(body.getTransform());
     const lateralDirection = Vector3.Cross(dirToStar, upDirection).normalize();

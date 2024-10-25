@@ -17,6 +17,7 @@
 
 import { AsteroidField } from "../asteroidFields/asteroidField";
 import { RingsUniforms } from "../rings/ringsUniform";
+import { RingsModel } from "../rings/ringsModel";
 
 /**
  * Describes objects that can have a ring system
@@ -25,10 +26,14 @@ export interface CanHaveRings {
     /**
      * Returns the uniforms used to render the rings, or null if the object has no rings
      */
-    getRingsUniforms(): RingsUniforms | null;
+    readonly ringsUniforms: RingsUniforms | null;
 
     /**
      * Returns the asteroid belt of the object's ring, or null if the object has no rings
      */
-    getAsteroidField(): AsteroidField | null;
+    readonly asteroidField: AsteroidField | null;
+}
+
+export interface CanHaveRingsModel {
+    readonly rings: RingsModel | null;
 }

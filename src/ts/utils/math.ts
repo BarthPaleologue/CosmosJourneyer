@@ -22,3 +22,15 @@ export function clamp(value: number, min: number, max: number) {
 export function sigmoid(x: number): number {
     return 1 / (1 + Math.exp(-x));
 }
+
+export function moveTowards(x: number, target: number, rate: number): number {
+    if (x > target) {
+        return Math.max(target, x - rate);
+    }
+    return Math.min(target, x + rate);
+}
+
+export function smoothstep(edge0: number, edge1: number, x: number): number {
+    const t = Math.min(1, Math.max(0, (x - edge0) / (edge1 - edge0)));
+    return t * t * (3 - 2 * t);
+}

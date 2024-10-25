@@ -19,10 +19,15 @@ import spaceStationHTML from "../../../html/spaceStationUI.html";
 import { SpaceStationModel } from "../../spacestation/spacestationModel";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { generateInfoHTML } from "./spaceStationInfos";
+import { Player } from "../../player/player";
+import { generateMissionsDom } from "./spaceStationMissions";
+import { Settings } from "../../settings";
+import { OrbitalObjectModel } from "../../architecture/orbitalObject";
 
 const enum MainPanelState {
     NONE,
-    INFO
+    INFO,
+    MISSIONS
 }
 
 export class SpaceStationLayer {
@@ -30,8 +35,14 @@ export class SpaceStationLayer {
     private spaceStationHeader: HTMLElement;
 
     private currentStation: SpaceStationModel | null = null;
+    private currentStationParents: OrbitalObjectModel[] = [];
+
+    private readonly playerName: HTMLElement;
+    private readonly playerBalance: HTMLElement;
 
     private readonly mainPanel: HTMLElement;
+
+    private readonly missionsButton: HTMLElement;
 
     private readonly infoButton: HTMLElement;
 
@@ -41,14 +52,30 @@ export class SpaceStationLayer {
 
     readonly onTakeOffObservable = new Observable<void>();
 
-    constructor() {
+    readonly player: Player;
+
+    constructor(player: Player) {
+        this.player = player;
+
         if (document.querySelector("#spaceStationUI") === null) {
             document.body.insertAdjacentHTML("beforeend", spaceStationHTML);
         }
         this.parentNode = document.getElementById("spaceStationUI") as HTMLElement;
         this.spaceStationHeader = document.getElementById("spaceStationHeader") as HTMLElement;
 
+        this.playerName = document.querySelector<HTMLElement>("#spaceStationUI .playerName") as HTMLElement;
+        this.playerBalance = document.querySelector<HTMLElement>("#spaceStationUI .playerBalance") as HTMLElement;
+
         this.mainPanel = document.querySelector<HTMLElement>("#spaceStationUI .mainContainer") as HTMLElement;
+
+        const missionsButton = document.querySelector<HTMLElement>(".spaceStationAction.missionsButton");
+        if (missionsButton === null) {
+            throw new Error("Missions button not found");
+        }
+        this.missionsButton = missionsButton;
+        this.missionsButton.addEventListener("click", () => {
+            this.setMainPanelState(MainPanelState.MISSIONS);
+        });
 
         const infoButton = document.querySelector<HTMLElement>(".spaceStationAction.infoButton");
         if (infoButton === null) {
@@ -82,7 +109,15 @@ export class SpaceStationLayer {
                     throw new Error("No current station");
                 }
                 this.mainPanel.classList.remove("hidden");
-                this.mainPanel.innerHTML = generateInfoHTML(this.currentStation);
+                this.mainPanel.innerHTML = generateInfoHTML(this.currentStation, this.currentStationParents);
+                break;
+            case MainPanelState.MISSIONS:
+                if (this.currentStation === null) {
+                    throw new Error("No current station");
+                }
+                this.mainPanel.classList.remove("hidden");
+                this.mainPanel.innerHTML = "";
+                this.mainPanel.appendChild(generateMissionsDom(this.currentStation, this.player));
                 break;
             case MainPanelState.NONE:
                 this.mainPanel.classList.add("hidden");
@@ -100,10 +135,22 @@ export class SpaceStationLayer {
         return this.parentNode.style.visibility !== "hidden";
     }
 
-    public setStation(station: SpaceStationModel) {
+    public setStation(station: SpaceStationModel, stationParents: OrbitalObjectModel[], player: Player) {
         this.currentStation = station;
+        this.currentStationParents = stationParents;
         this.spaceStationHeader.innerHTML = `
             <p class="welcomeTo">Welcome to</p>
             <p class="spaceStationName">${station.name}</p>`;
+
+        this.playerName.textContent = `CMDR ${player.name}`;
+        this.playerBalance.textContent = `Balance: ${Settings.CREDIT_SYMBOL}${player.balance.toLocaleString()}`;
+    }
+
+    public reset() {
+        this.currentStation = null;
+        this.spaceStationHeader.innerHTML = "";
+        this.playerName.textContent = "";
+        this.playerBalance.textContent = "";
+        this.mainPanel.innerHTML = "";
     }
 }

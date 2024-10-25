@@ -18,7 +18,6 @@
 import starTexture from "../../asset/textures/starParticle.png";
 import blackHoleTexture from "../../asset/textures/blackholeParticleSmall.png";
 
-import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
 import { BuildData, StarSector, vector3ToString } from "./starSector";
 import { StarMapUI } from "./starMapUI";
 import { Scene } from "@babylonjs/core/scene";
@@ -40,25 +39,26 @@ import { TransformTranslationAnimation } from "../uberCore/transforms/animations
 import { translate } from "../uberCore/transforms/basicTransform";
 import { ThickLines } from "../utils/thickLines";
 import { Observable } from "@babylonjs/core/Misc/observable";
-import { StarModel } from "../stellarObjects/star/starModel";
-import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
-import { SystemSeed } from "../utils/systemSeed";
-import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 import { View } from "../utils/view";
-import { syncCamera } from "../utils/cameraSyncing";
 import { AudioInstance } from "../utils/audioInstance";
 import { AudioManager } from "../audio/audioManager";
 import { AudioMasks } from "../audio/audioMasks";
-import { StarMapInputs } from "../inputs/starMapInputs";
-import { BodyType } from "../architecture/bodyType";
+import { StarMapInputs } from "./starMapInputs";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Sounds } from "../assets/sounds";
-import { StarMapControls } from "../starMapControls/starMapControls";
+import { StarMapControls } from "./starMapControls";
 import { CameraRadiusAnimation } from "../uberCore/transforms/animations/radius";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { StellarPathfinder } from "./stellarPathfinder";
 import { createNotification } from "../utils/notification";
-import { getStarGalacticCoordinates } from "../utils/getStarGalacticCoordinates";
+import { getStarGalacticPosition } from "../utils/coordinates/starSystemCoordinatesUtils";
+import { Player } from "../player/player";
+import { Settings } from "../settings";
+import { getRgbFromTemperature } from "../utils/specrend";
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/universeCoordinates";
+import { getSystemModelFromCoordinates } from "../starSystem/modelFromCoordinates";
+import { StarSystemModelUtils } from "../starSystem/starSystemModel";
+import { OrbitalObjectType } from "../architecture/orbitalObject";
 
 export class StarMap implements View {
     readonly scene: Scene;
@@ -69,6 +69,8 @@ export class StarMap implements View {
     private rotationAnimation: TransformRotationAnimation | null = null;
     private translationAnimation: TransformTranslationAnimation | null = null;
     private radiusAnimation: CameraRadiusAnimation | null = null;
+
+    private readonly player: Player;
 
     /**
      * The position of the center of the starmap in world space.
@@ -90,19 +92,19 @@ export class StarMap implements View {
 
     private readonly starMapUI: StarMapUI;
 
-    private selectedSystemSeed: SystemSeed | null = null;
-    private currentSystemSeed: SystemSeed | null = null;
+    private selectedSystemCoordinates: StarSystemCoordinates | null = null;
+    private currentSystemCoordinates: StarSystemCoordinates | null = null;
 
     private readonly loadedStarSectors: Map<string, StarSector> = new Map<string, StarSector>();
 
-    private readonly seedToInstanceMap: Map<string, InstancedMesh> = new Map();
-    private readonly instanceToSeedMap: Map<InstancedMesh, string> = new Map();
+    private readonly coordinatesToInstanceMap: Map<string, InstancedMesh> = new Map();
+    private readonly instanceToCoordinatesMap: Map<InstancedMesh, string> = new Map();
 
     private readonly travelLine: ThickLines;
 
     private readonly stellarPathfinder: StellarPathfinder = new StellarPathfinder();
 
-    public readonly onTargetSetObservable: Observable<SystemSeed> = new Observable();
+    public readonly onTargetSetObservable: Observable<StarSystemCoordinates> = new Observable();
 
     /**
      * The position of the star sector the player is currently in (relative to the global node).
@@ -122,28 +124,33 @@ export class StarMap implements View {
     private static readonly SHIMMER_ANIMATION = new Animation("shimmer", "instancedBuffers.color.a", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
     private static readonly SHIMMER_DURATION = 1000;
 
-    constructor(engine: AbstractEngine) {
+    constructor(player: Player, engine: AbstractEngine) {
         this.scene = new Scene(engine);
         this.scene.clearColor = new Color4(0, 0, 0, 1);
         this.scene.useRightHandedSystem = true;
+        this.scene.onDisposeObservable.addOnce(() => {
+            this.starMapUI.dispose();
+        });
 
         this.controls = new StarMapControls(this.scene);
         this.controls.getActiveCameras().forEach((camera) => (camera.minZ = 0.01));
 
         this.controls.getActiveCameras()[0].attachControl();
 
+        this.player = player;
+
         this.backgroundMusic = new AudioInstance(Sounds.STAR_MAP_BACKGROUND_MUSIC, AudioMasks.STAR_MAP_VIEW, 1, false, null);
         AudioManager.RegisterSound(this.backgroundMusic);
         this.backgroundMusic.sound.play();
 
-        this.starMapUI = new StarMapUI(this.scene);
+        this.starMapUI = new StarMapUI(this.scene, this.player);
 
         this.starMapUI.shortHandUIPlotItineraryButton.addEventListener("click", () => {
-            if (this.currentSystemSeed === null) throw new Error("current system seed is null!");
-            if (this.selectedSystemSeed === null) throw new Error("selected system seed is null!");
-            if (this.selectedSystemSeed.equals(this.currentSystemSeed)) return;
+            if (this.currentSystemCoordinates === null) throw new Error("current system seed is null!");
+            if (this.selectedSystemCoordinates === null) throw new Error("selected system seed is null!");
+            if (starSystemCoordinatesEquals(this.selectedSystemCoordinates, this.currentSystemCoordinates)) return;
             Sounds.MENU_SELECT_SOUND.play();
-            this.stellarPathfinder.init(this.currentSystemSeed, this.selectedSystemSeed, 15);
+            this.stellarPathfinder.init(this.currentSystemCoordinates, this.selectedSystemCoordinates, Settings.PLAYER_JUMP_RANGE_LY);
         });
 
         StarMapInputs.map.focusOnCurrentSystem.on("complete", () => {
@@ -272,12 +279,12 @@ export class StarMap implements View {
                 this.stellarPathfinder.update();
 
                 if (this.stellarPathfinder.hasFoundPath()) {
+                    Sounds.TARGET_LOCK_SOUND.play();
                     const path = this.stellarPathfinder.getPath();
-                    const points = path.map((seed) => {
-                        return getStarGalacticCoordinates(seed);
-                    });
+                    this.drawPath(path);
 
-                    this.travelLine.setPoints(points);
+                    this.player.currentItinerary = path;
+
                     this.onTargetSetObservable.notifyObservers(path[1]);
                 } else if (this.stellarPathfinder.getNbIterations() >= pathfinderMaxIterations) {
                     createNotification(`Could not find a path to the target system after ${pathfinderMaxIterations} iterations`, 5000);
@@ -294,8 +301,15 @@ export class StarMap implements View {
         this.scene.onAfterRenderObservable.add(() => {
             const activeCamera = this.scene.activeCamera;
             if (activeCamera === null) throw new Error("No active camera!");
-            this.starMapUI.update(activeCamera.globalPosition);
+            this.starMapUI.update(activeCamera.globalPosition, this.starMapCenterPosition);
         });
+    }
+
+    private drawPath(path: StarSystemCoordinates[]) {
+        const points = path.map((coordinates) => {
+            return getStarGalacticPosition(coordinates);
+        });
+        this.travelLine.setPoints(points);
     }
 
     private acknowledgeCameraMovement() {
@@ -308,9 +322,9 @@ export class StarMap implements View {
 
         this.cameraPositionToCenter = activeCamera.globalPosition.subtract(this.starMapCenterPosition);
         this.currentStarSectorCoordinates = new Vector3(
-            Math.round(this.cameraPositionToCenter.x / StarSector.SIZE),
-            Math.round(this.cameraPositionToCenter.y / StarSector.SIZE),
-            Math.round(this.cameraPositionToCenter.z / StarSector.SIZE)
+            Math.round(this.cameraPositionToCenter.x / Settings.STAR_SECTOR_SIZE),
+            Math.round(this.cameraPositionToCenter.y / Settings.STAR_SECTOR_SIZE),
+            Math.round(this.cameraPositionToCenter.z / Settings.STAR_SECTOR_SIZE)
         );
     }
 
@@ -340,22 +354,22 @@ export class StarMap implements View {
         return starSector;
     }
 
-    public setCurrentStarSystem(starSystemSeed: SystemSeed) {
-        this.currentSystemSeed = starSystemSeed;
-        this.selectedSystemSeed = starSystemSeed;
+    public setCurrentStarSystem(starSystemCoordinates: StarSystemCoordinates) {
+        this.currentSystemCoordinates = starSystemCoordinates;
+        this.selectedSystemCoordinates = starSystemCoordinates;
 
-        const sectorCoordinates = new Vector3(starSystemSeed.starSectorX, starSystemSeed.starSectorY, starSystemSeed.starSectorZ);
+        const sectorCoordinates = new Vector3(starSystemCoordinates.starSectorX, starSystemCoordinates.starSectorY, starSystemCoordinates.starSectorZ);
 
         if (this.loadedStarSectors.has(vector3ToString(sectorCoordinates))) {
-            this.starMapUI.setCurrentMesh(this.seedToInstanceMap.get(this.currentSystemSeed.toString()) as InstancedMesh);
+            this.starMapUI.setCurrentMesh(this.coordinatesToInstanceMap.get(JSON.stringify(this.currentSystemCoordinates)) as InstancedMesh);
             this.focusOnCurrentSystem();
             return;
         }
 
         this.registerStarSector(sectorCoordinates, true);
-        this.starMapUI.setCurrentMesh(this.seedToInstanceMap.get(this.currentSystemSeed.toString()) as InstancedMesh);
+        this.starMapUI.setCurrentMesh(this.coordinatesToInstanceMap.get(JSON.stringify(this.currentSystemCoordinates)) as InstancedMesh);
 
-        const translation = sectorCoordinates.subtract(this.currentStarSectorCoordinates).scaleInPlace(StarSector.SIZE);
+        const translation = sectorCoordinates.subtract(this.currentStarSectorCoordinates).scaleInPlace(Settings.STAR_SECTOR_SIZE);
         translate(this.controls.getTransform(), translation);
         this.controls.getActiveCameras().forEach((camera) => camera.getViewMatrix(true));
         this.acknowledgeCameraMovement();
@@ -369,8 +383,10 @@ export class StarMap implements View {
         const activeCameraPosition = activeCamera.globalPosition;
 
         // first remove all star sectors that are too far
-        const currentSystemInstance = this.currentSystemSeed === null ? null : (this.seedToInstanceMap.get(this.currentSystemSeed.toString()) as InstancedMesh);
-        const selectedSystemInstance = this.selectedSystemSeed === null ? null : (this.seedToInstanceMap.get(this.selectedSystemSeed.toString()) as InstancedMesh);
+        const currentSystemInstance =
+            this.currentSystemCoordinates === null ? null : (this.coordinatesToInstanceMap.get(JSON.stringify(this.currentSystemCoordinates)) as InstancedMesh);
+        const selectedSystemInstance =
+            this.selectedSystemCoordinates === null ? null : (this.coordinatesToInstanceMap.get(JSON.stringify(this.selectedSystemCoordinates)) as InstancedMesh);
         for (const starSector of this.loadedStarSectors.values()) {
             // only set as pickable if the distance is less than 40 light years
             const pickableThresholdLy = 45;
@@ -385,7 +401,7 @@ export class StarMap implements View {
             if (selectedSystemInstance !== null && starSector.starInstances.concat(starSector.blackHoleInstances).includes(selectedSystemInstance)) continue; // don't remove star sector that contains the selected system
 
             const position = starSector.position;
-            if (position.subtract(this.cameraPositionToCenter).length() / StarSector.SIZE > StarMap.RENDER_RADIUS + 1) {
+            if (position.subtract(this.cameraPositionToCenter).length() / Settings.STAR_SECTOR_SIZE > StarMap.RENDER_RADIUS + 1) {
                 for (const starInstance of starSector.starInstances) this.fadeOutThenRecycle(starInstance, this.recycledStars);
                 for (const blackHoleInstance of starSector.blackHoleInstances) this.fadeOutThenRecycle(blackHoleInstance, this.recycledBlackHoles);
 
@@ -401,7 +417,7 @@ export class StarMap implements View {
             if (this.loadedStarSectors.has(sectorKey)) continue; // already generated
 
             // don't generate star sectors that are not in the frustum
-            const bb = StarSector.GetBoundingBox(coordinates.scale(StarSector.SIZE), this.starMapCenterPosition);
+            const bb = StarSector.GetBoundingBox(coordinates.scale(Settings.STAR_SECTOR_SIZE), this.starMapCenterPosition);
             if (!activeCamera.isInFrustum(bb)) continue;
 
             this.registerStarSector(coordinates);
@@ -426,58 +442,43 @@ export class StarMap implements View {
     }
 
     private createInstance(data: BuildData) {
-        const starSystemSeed = data.seed;
-        const starSystemModel = new SeededStarSystemModel(starSystemSeed);
+        const starSystemCoordinates = data.coordinates;
+        const starSystemModel = getSystemModelFromCoordinates(starSystemCoordinates);
 
-        const starSeed = starSystemModel.getStellarObjectSeed(0);
-        const stellarObjectType = starSystemModel.getBodyTypeOfStellarObject(0);
 
-        let starModel: StarModel | BlackHoleModel | NeutronStarModel | null = null;
-        switch (stellarObjectType) {
-            case BodyType.STAR:
-                starModel = new StarModel(starSeed, starSystemModel);
-                break;
-            case BodyType.BLACK_HOLE:
-                starModel = new BlackHoleModel(starSeed, starSystemModel);
-                break;
-            case BodyType.NEUTRON_STAR:
-                starModel = new NeutronStarModel(starSeed, starSystemModel);
-                break;
-            default:
-                throw new Error("Unknown stellar object type!");
-        }
-        if (starModel === null) throw new Error("Star model is null!");
+        //TODO: when implementing binary star systems, this will need to be updated to display all stellar objects and not just the first one
+        const stellarObjectModel = StarSystemModelUtils.GetStellarObjects(starSystemModel)[0];
+
+        const instanceName = JSON.stringify(starSystemCoordinates);
 
         let instance: InstancedMesh | null = null;
         let recycled = false;
 
-        if (stellarObjectType === BodyType.STAR || stellarObjectType === BodyType.NEUTRON_STAR) {
+        if (stellarObjectModel.type === OrbitalObjectType.STAR || stellarObjectModel.type === OrbitalObjectType.NEUTRON_STAR) {
             if (this.recycledStars.length > 0) {
                 instance = this.recycledStars[0];
+                instance.name = instanceName;
                 this.recycledStars.shift();
                 recycled = true;
-            } else instance = this.starTemplate.createInstance(data.name);
+            } else instance = this.starTemplate.createInstance(instanceName);
         } else {
             if (this.recycledBlackHoles.length > 0) {
                 instance = this.recycledBlackHoles[0];
+                instance.name = instanceName;
                 this.recycledBlackHoles.shift();
                 recycled = true;
-            } else instance = this.blackHoleTemplate.createInstance(data.name);
+            } else instance = this.blackHoleTemplate.createInstance(instanceName);
         }
 
         const initializedInstance = instance;
 
-        this.seedToInstanceMap.set(starSystemSeed.toString(), initializedInstance);
-        this.instanceToSeedMap.set(initializedInstance, starSystemSeed.toString());
+        this.coordinatesToInstanceMap.set(JSON.stringify(starSystemCoordinates), initializedInstance);
+        this.instanceToCoordinatesMap.set(initializedInstance, JSON.stringify(starSystemCoordinates));
 
         initializedInstance.position = data.position.add(this.starMapCenterPosition);
 
-        if (starModel.bodyType === BodyType.STAR || starModel.bodyType === BodyType.NEUTRON_STAR) {
-            const starColor = starModel.color;
-            initializedInstance.instancedBuffers.color = new Color4(starColor.r, starColor.g, starColor.b, 0.0);
-        } else {
-            initializedInstance.instancedBuffers.color = new Color4(1.0, 0.6, 0.3, 0.0);
-        }
+        const objectColor = getRgbFromTemperature(stellarObjectModel.physics.blackBodyTemperature);
+        initializedInstance.instancedBuffers.color = new Color4(objectColor.r, objectColor.g, objectColor.b, 0.0);
 
         if (!recycled) {
             initializedInstance.isPickable = true;
@@ -505,9 +506,9 @@ export class StarMap implements View {
                 Sounds.STAR_MAP_CLICK_SOUND.play();
 
                 this.starMapUI.setSelectedMesh(initializedInstance);
-                this.starMapUI.setSelectedSystem(starSystemModel, this.currentSystemSeed !== null ? new SeededStarSystemModel(this.currentSystemSeed) : null);
+                this.starMapUI.setSelectedSystem(starSystemCoordinates, this.currentSystemCoordinates);
 
-                this.selectedSystemSeed = starSystemSeed;
+                this.selectedSystemCoordinates = starSystemCoordinates;
 
                 this.focusCameraOnStar(initializedInstance);
             })
@@ -515,7 +516,7 @@ export class StarMap implements View {
 
         this.fadeIn(initializedInstance);
 
-        if (starModel.bodyType === BodyType.BLACK_HOLE) this.loadedStarSectors.get(data.sectorString)?.blackHoleInstances.push(initializedInstance);
+        if (stellarObjectModel.type === OrbitalObjectType.BLACK_HOLE) this.loadedStarSectors.get(data.sectorString)?.blackHoleInstances.push(initializedInstance);
         else this.loadedStarSectors.get(data.sectorString)?.starInstances.push(initializedInstance);
     }
 
@@ -557,16 +558,13 @@ export class StarMap implements View {
     }
 
     public focusOnCurrentSystem(skipAnimation = false) {
-        console.log("focus on current system");
-        if (this.currentSystemSeed === null) return console.warn("No current system seed!");
+        if (this.currentSystemCoordinates === null) return console.warn("No current system seed!");
 
-        const instance = this.seedToInstanceMap.get(this.currentSystemSeed.toString());
+        const instance = this.coordinatesToInstanceMap.get(JSON.stringify(this.currentSystemCoordinates));
         if (instance === undefined) throw new Error("The current system has no instance!");
 
-        const currentSystemModel = new SeededStarSystemModel(this.currentSystemSeed);
-
         this.starMapUI.setSelectedMesh(instance);
-        this.starMapUI.setSelectedSystem(currentSystemModel, this.currentSystemSeed !== null ? new SeededStarSystemModel(this.currentSystemSeed) : null);
+        this.starMapUI.setSelectedSystem(this.currentSystemCoordinates, this.currentSystemCoordinates);
 
         this.focusCameraOnStar(instance, skipAnimation);
     }
@@ -586,10 +584,10 @@ export class StarMap implements View {
             if (this.starMapUI.getCurrentHoveredMesh() === instance) this.starMapUI.setHoveredMesh(null);
             instance.setEnabled(false);
 
-            const seed = this.instanceToSeedMap.get(instance);
+            const seed = this.instanceToCoordinatesMap.get(instance);
             if (seed === undefined) throw new Error("No seed for instance!");
-            this.seedToInstanceMap.delete(seed);
-            this.instanceToSeedMap.delete(instance);
+            this.coordinatesToInstanceMap.delete(seed);
+            this.instanceToCoordinatesMap.delete(instance);
 
             recyclingList.push(instance);
         });
@@ -602,6 +600,7 @@ export class StarMap implements View {
     public attachControl() {
         this.scene.attachControl();
         this.starMapUI.htmlRoot.classList.remove("hidden");
+        this.drawPath(this.player.currentItinerary);
     }
 
     public detachControl() {

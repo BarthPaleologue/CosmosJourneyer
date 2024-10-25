@@ -15,163 +15,145 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { seededSquirrelNoise } from "squirrel-noise";
 import { randRange, randRangeInt, uniformRandBool } from "extended-random";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { getRgbFromTemperature } from "../../utils/specrend";
 import { Settings } from "../../settings";
-import { getOrbitalPeriod } from "../../orbit/orbit";
-import { OrbitProperties } from "../../orbit/orbitProperties";
-import { StellarType } from "../common";
-import { StarPhysicalProperties } from "../../architecture/physicalProperties";
+import { getOrbitalPeriod, Orbit } from "../../orbit/orbit";
+import { StellarObjectPhysicsInfo } from "../../architecture/physicsInfo";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { wheelOfFortune } from "../../utils/random";
 import { StellarObjectModel } from "../../architecture/stellarObject";
-import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { RingsModel } from "../../rings/ringsModel";
-import { BodyType } from "../../architecture/bodyType";
+import { newSeededRingsModel } from "../../rings/ringsModel";
 import { GenerationSteps } from "../../utils/generationSteps";
-import { starName } from "../../utils/parseToStrings";
-import { StarSystemModel } from "../../starSystem/starSystemModel";
 
-export class StarModel implements StellarObjectModel {
-    readonly name: string;
+import { getRngFromSeed } from "../../utils/getRngFromSeed";
+import { OrbitalObjectType } from "../../architecture/orbitalObject";
 
-    readonly bodyType = BodyType.STAR;
-    readonly rng: (step: number) => number;
-    readonly seed: number;
+export type StarModel = StellarObjectModel & {
+    readonly type: OrbitalObjectType.STAR;
+};
 
-    readonly temperature: number;
-    readonly color: Color3;
-    stellarType: StellarType;
-    readonly radius: number;
+export function newSeededStarModel(seed: number, name: string, parentBodies: CelestialBodyModel[]): StarModel {
+    const rng = getRngFromSeed(seed);
 
-    readonly orbit: OrbitProperties;
+    const RING_PROPORTION = 0.2;
 
-    readonly physicalProperties: StarPhysicalProperties;
+    const stellarType = getRandomStellarType(rng);
 
-    static RING_PROPORTION = 0.2;
+    const temperature = getRandomTemperatureFromStellarType(stellarType, rng);
 
-    readonly rings: RingsModel | null;
+    const physicalProperties: StellarObjectPhysicsInfo = {
+        mass: 1.9885e30, //TODO: compute mass from physical properties
+        rotationPeriod: 24 * 60 * 60,
+        blackBodyTemperature: temperature,
+        axialTilt: 0
+    };
 
-    readonly parentBody: CelestialBodyModel | null;
+    const radius = getRandomRadiusFromStellarType(stellarType, rng);
 
-    readonly childrenBodies: CelestialBodyModel[] = [];
+    // TODO: do not hardcode
+    const orbitRadius = rng(GenerationSteps.ORBIT) * 5000000e3;
 
-    readonly starSystemModel: StarSystemModel;
+    const parentMassSum = parentBodies?.reduce((sum, body) => sum + body.physics.mass, 0) ?? 0;
+    const orbit: Orbit = {
+        radius: orbitRadius,
+        p: 2,
+        period: getOrbitalPeriod(orbitRadius, parentMassSum),
+        normalToPlane: Vector3.Up()
+    };
 
-    constructor(seed: number, starSystemModel: StarSystemModel, parentBody: CelestialBodyModel | null = null) {
-        this.seed = seed;
-        this.rng = seededSquirrelNoise(this.seed);
+    const rings = uniformRandBool(RING_PROPORTION, rng, GenerationSteps.RINGS) ? newSeededRingsModel(rng) : null;
 
-        this.starSystemModel = starSystemModel;
+    return {
+        name: name,
+        seed: seed,
+        type: OrbitalObjectType.STAR,
+        radius: radius,
+        orbit: orbit,
+        physics: physicalProperties,
+        rings: rings
+    };
+}
 
-        const stellarObjectIndex = this.starSystemModel.getStellarObjects().findIndex(([_, stellarObjectSeed]) => stellarObjectSeed === this.seed);
-        this.name = starName(this.starSystemModel.name, stellarObjectIndex);
+export const enum StellarType {
+    /** 30,000 - 50,000 K */
+    O = "O",
+    /** 10,000 - 30,000 K */
+    B = "B",
+    /** 7,500 - 10,000 K */
+    A = "A",
+    /** 6,000 - 7,500 K */
+    F = "F",
+    /** 5,000 - 6,000 K */
+    G = "G",
+    /** 3,500 - 5,000 K */
+    K = "K",
+    /** 2,700 - 3,500 K */
+    M = "M"
+}
 
-        this.stellarType = StarModel.GetRandomStellarType(this.rng);
+export function getStellarTypeFromTemperature(temperature: number) {
+    if (temperature < 3500) return StellarType.M;
+    else if (temperature < 5000) return StellarType.K;
+    else if (temperature < 6000) return StellarType.G;
+    else if (temperature < 7500) return StellarType.F;
+    else if (temperature < 10000) return StellarType.A;
+    else if (temperature < 30000) return StellarType.B;
+    else return StellarType.O;
+}
 
-        this.temperature = StarModel.GetRandomTemperatureFromStellarType(this.stellarType, this.rng);
-        this.color = getRgbFromTemperature(this.temperature);
+export function getRandomStellarType(rng: (step: number) => number) {
+    // use wheel of fortune
+    const wheel: [StellarType, number][] = [
+        [StellarType.M, 0.765],
+        [StellarType.K, 0.121],
+        [StellarType.G, 0.076],
+        [StellarType.F, 0.03],
+        [StellarType.A, 0.006],
+        [StellarType.B, 0.0013],
+        [StellarType.O, 0.0000003]
+    ];
 
-        this.parentBody = parentBody;
+    const r = rng(GenerationSteps.STELLAR_TYPE);
 
-        this.physicalProperties = {
-            mass: 1000,
-            rotationPeriod: 24 * 60 * 60,
-            temperature: this.temperature,
-            axialTilt: 0
-        };
+    return wheelOfFortune<StellarType>(wheel, r);
+}
 
-        this.radius = StarModel.GetRandomRadiusFromStellarType(this.stellarType, this.rng);
-
-        // TODO: do not hardcode
-        const orbitRadius = this.rng(GenerationSteps.ORBIT) * 5000000e3;
-
-        this.orbit = {
-            radius: orbitRadius,
-            p: 2,
-            period: getOrbitalPeriod(orbitRadius, this.parentBody?.physicalProperties.mass ?? 0),
-            normalToPlane: Vector3.Up(),
-            isPlaneAlignedWithParent: true
-        };
-
-        if (uniformRandBool(StarModel.RING_PROPORTION, this.rng, GenerationSteps.RINGS)) {
-            this.rings = new RingsModel(this.rng);
-        } else {
-            this.rings = null;
-        }
+export function getRandomTemperatureFromStellarType(stellarType: StellarType, rng: (step: number) => number) {
+    switch (stellarType) {
+        case StellarType.M:
+            return randRangeInt(2100, 3400, rng, GenerationSteps.TEMPERATURE);
+        case StellarType.K:
+            return randRangeInt(3400, 4900, rng, GenerationSteps.TEMPERATURE);
+        case StellarType.G:
+            return randRangeInt(4900, 5700, rng, GenerationSteps.TEMPERATURE);
+        case StellarType.F:
+            return randRangeInt(5700, 7200, rng, GenerationSteps.TEMPERATURE);
+        case StellarType.A:
+            return randRangeInt(7200, 9700, rng, GenerationSteps.TEMPERATURE);
+        case StellarType.B:
+            return randRangeInt(9700, 30000, rng, GenerationSteps.TEMPERATURE);
+        case StellarType.O:
+            return randRangeInt(30000, 52000, rng, GenerationSteps.TEMPERATURE);
     }
+}
 
-    public setSurfaceTemperature(temperature: number) {
-        this.physicalProperties.temperature = temperature;
-        this.stellarType = StarModel.GetStellarTypeFromTemperature(temperature);
-        this.color.copyFrom(getRgbFromTemperature(temperature));
-    }
-
-    static GetStellarTypeFromTemperature(temperature: number) {
-        if (temperature < 3500) return StellarType.M;
-        else if (temperature < 5000) return StellarType.K;
-        else if (temperature < 6000) return StellarType.G;
-        else if (temperature < 7500) return StellarType.F;
-        else if (temperature < 10000) return StellarType.A;
-        else if (temperature < 30000) return StellarType.B;
-        else return StellarType.O;
-    }
-
-    static GetRandomStellarType(rng: (step: number) => number) {
-        // use wheel of fortune
-        const wheel: [StellarType, number][] = [
-            [StellarType.M, 0.765],
-            [StellarType.K, 0.121],
-            [StellarType.G, 0.076],
-            [StellarType.F, 0.03],
-            [StellarType.A, 0.006],
-            [StellarType.B, 0.0013],
-            [StellarType.O, 0.0000003]
-        ];
-
-        const r = rng(GenerationSteps.STELLAR_TYPE);
-
-        return wheelOfFortune<StellarType>(wheel, r);
-    }
-
-    static GetRandomTemperatureFromStellarType(stellarType: StellarType, rng: (step: number) => number) {
-        switch (stellarType) {
-            case StellarType.M:
-                return randRangeInt(2100, 3400, rng, GenerationSteps.TEMPERATURE);
-            case StellarType.K:
-                return randRangeInt(3400, 4900, rng, GenerationSteps.TEMPERATURE);
-            case StellarType.G:
-                return randRangeInt(4900, 5700, rng, GenerationSteps.TEMPERATURE);
-            case StellarType.F:
-                return randRangeInt(5700, 7200, rng, GenerationSteps.TEMPERATURE);
-            case StellarType.A:
-                return randRangeInt(7200, 9700, rng, GenerationSteps.TEMPERATURE);
-            case StellarType.B:
-                return randRangeInt(9700, 30000, rng, GenerationSteps.TEMPERATURE);
-            case StellarType.O:
-                return randRangeInt(30000, 52000, rng, GenerationSteps.TEMPERATURE);
-        }
-    }
-
-    static GetRandomRadiusFromStellarType(stellarType: StellarType, rng: (step: number) => number) {
-        const solarSize = 109 * Settings.EARTH_RADIUS;
-        switch (stellarType) {
-            case StellarType.M:
-                return randRange(0.5, 0.7, rng, GenerationSteps.RADIUS) * solarSize;
-            case StellarType.K:
-                return randRange(0.7, 0.9, rng, GenerationSteps.RADIUS) * solarSize;
-            case StellarType.G:
-                return randRange(0.9, 1.1, rng, GenerationSteps.RADIUS) * solarSize;
-            case StellarType.F:
-                return randRange(1.1, 1.4, rng, GenerationSteps.RADIUS) * solarSize;
-            case StellarType.A:
-                return randRange(1.4, 1.8, rng, GenerationSteps.RADIUS) * solarSize;
-            case StellarType.B:
-                return randRange(1.8, 6.6, rng, GenerationSteps.RADIUS) * solarSize;
-            case StellarType.O:
-                return randRange(6.6, 15.0, rng, GenerationSteps.RADIUS) * solarSize;
-        }
+export function getRandomRadiusFromStellarType(stellarType: StellarType, rng: (step: number) => number) {
+    const solarSize = 109 * Settings.EARTH_RADIUS;
+    switch (stellarType) {
+        case StellarType.M:
+            return randRange(0.5, 0.7, rng, GenerationSteps.RADIUS) * solarSize;
+        case StellarType.K:
+            return randRange(0.7, 0.9, rng, GenerationSteps.RADIUS) * solarSize;
+        case StellarType.G:
+            return randRange(0.9, 1.1, rng, GenerationSteps.RADIUS) * solarSize;
+        case StellarType.F:
+            return randRange(1.1, 1.4, rng, GenerationSteps.RADIUS) * solarSize;
+        case StellarType.A:
+            return randRange(1.4, 1.8, rng, GenerationSteps.RADIUS) * solarSize;
+        case StellarType.B:
+            return randRange(1.8, 6.6, rng, GenerationSteps.RADIUS) * solarSize;
+        case StellarType.O:
+            return randRange(6.6, 15.0, rng, GenerationSteps.RADIUS) * solarSize;
     }
 }

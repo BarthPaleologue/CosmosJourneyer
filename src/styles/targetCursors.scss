@@ -11,7 +11,7 @@
   .targetCursor {
     --s: max(2.0vmin, calc(var(--dim) * 0.4)); /* the size on the corner */
     --t: 0.4vmin;  /* the thickness of the border */
-    --g: 1.3vmin; /* the gap between the border and image */
+    --g: 0.8vmin; /* the gap between the border and image */
 
     padding: calc(var(--g) + var(--t));
 

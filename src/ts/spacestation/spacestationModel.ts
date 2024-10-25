@@ -15,39 +15,36 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { seededSquirrelNoise } from "squirrel-noise";
-import { OrbitProperties } from "../orbit/orbitProperties";
-import { getOrbitalPeriod } from "../orbit/orbit";
+import { getOrbitalPeriod, Orbit } from "../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { OrbitalObjectModel } from "../architecture/orbitalObject";
-import { OrbitalObjectPhysicalProperties } from "../architecture/physicalProperties";
+import { OrbitalObjectModel, OrbitalObjectType } from "../architecture/orbitalObject";
+import { OrbitalObjectPhysicsInfo } from "../architecture/physicsInfo";
 import { CelestialBodyModel } from "../architecture/celestialBody";
 import { normalRandom, uniformRandBool } from "extended-random";
 import { clamp } from "../utils/math";
 import { GenerationSteps } from "../utils/generationSteps";
-import { CropType, CropTypes } from "../utils/agriculture";
+import { CropType, CropTypes, getEdibleEnergyPerHaPerDay } from "../utils/agriculture";
 import { randomPieChart } from "../utils/random";
-import { generateSpaceStationName } from "../utils/spaceStationNameGenerator";
-import { StarSystemModel } from "../starSystem/starSystemModel";
-import { Faction } from "../powerplay/factions";
-import { getPowerPlayData } from "../powerplay/powerplay";
-import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
+import { generateSpaceStationName } from "../utils/strings/spaceStationNameGenerator";
+import { Faction } from "../society/factions";
+import { getPowerPlayData } from "../society/powerplay";
+import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
+import { Settings } from "../settings";
+import { StellarObjectModel } from "../architecture/stellarObject";
+import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates";
 
-export class SpaceStationModel implements OrbitalObjectModel {
-    readonly name: string;
+import { getRngFromSeed } from "../utils/getRngFromSeed";
+import { getSphereRadiatedEnergyFlux } from "../utils/physics";
 
-    readonly seed: number;
-    readonly rng: (step: number) => number;
-
-    readonly starSystem: StarSystemModel;
-
-    readonly orbit: OrbitProperties;
-    readonly physicalProperties: OrbitalObjectPhysicalProperties;
-    readonly parentBody: OrbitalObjectModel | null;
-    readonly childrenBodies: OrbitalObjectModel[] = [];
+export type SpaceStationModel = OrbitalObjectModel & {
+    readonly starSystemCoordinates: StarSystemCoordinates;
 
     readonly population: number;
-    readonly energyConsumptionPerCapita: number;
+
+    /**
+     * The average energy consumption of a citizen of the habitat in KWh
+     */
+    readonly energyConsumptionPerCapitaKWh: number;
 
     /**
      * The number of inhabitants per square kilometer in the habitat
@@ -60,58 +57,124 @@ export class SpaceStationModel implements OrbitalObjectModel {
 
     readonly faction: Faction;
 
-    constructor(seed: number, starSystemModel: StarSystemModel, parentBody?: CelestialBodyModel) {
-        this.seed = seed;
-        this.rng = seededSquirrelNoise(this.seed);
+    /**
+     * The total energy consumption of the habitat in KWh
+     */
+    readonly totalEnergyConsumptionKWh: number;
+    readonly solarPanelEfficiency: number;
 
-        this.starSystem = starSystemModel;
+    /**
+     * The surface of solar panels in m²
+     */
+    readonly solarPanelSurfaceM2: number;
 
-        this.name = generateSpaceStationName(this.rng, 2756);
+    readonly housingSurfaceHa: number;
+    readonly agricultureSurfaceHa: number;
+    readonly totalHabitatSurfaceM2: number;
+};
 
-        this.parentBody = parentBody ?? null;
-        this.childrenBodies = [];
+export function newSeededSpaceStationModel(
+    seed: number,
+    stellarObjectModels: StellarObjectModel[],
+    starSystemCoordinates: StarSystemCoordinates,
+    parentBodies: CelestialBodyModel[]
+): SpaceStationModel {
+    const rng = getRngFromSeed(seed);
 
-        const orbitRadius = (2 + clamp(normalRandom(2, 1, this.rng, GenerationSteps.ORBIT), 0, 10)) * (parentBody?.radius ?? 0);
+    const name = generateSpaceStationName(rng, 2756);
 
-        this.orbit = {
-            radius: orbitRadius,
-            p: 2,
-            period: getOrbitalPeriod(orbitRadius, this.parentBody?.physicalProperties.mass ?? 0),
-            normalToPlane: Vector3.Up(),
-            isPlaneAlignedWithParent: false
-        };
+    const parentMaxRadius = parentBodies.reduce((max, body) => Math.max(max, body.radius), 0);
+    const orbitRadius = (2 + clamp(normalRandom(2, 1, rng, GenerationSteps.ORBIT), 0, 10)) * parentMaxRadius;
 
-        this.physicalProperties = {
-            mass: 1,
-            rotationPeriod: 0,
-            axialTilt: 2 * this.rng(GenerationSteps.AXIAL_TILT) * Math.PI
-        };
+    const parentMassSum = parentBodies.reduce((sum, body) => sum + body.physics.mass, 0);
+    const orbit: Orbit = {
+        radius: orbitRadius,
+        p: 2,
+        period: getOrbitalPeriod(orbitRadius, parentMassSum),
+        normalToPlane: Vector3.Up()
+    };
 
-        const powerplayData =
-            this.starSystem instanceof SeededStarSystemModel ? getPowerPlayData(this.starSystem.seed) : { materialistSpiritualist: 0.5, capitalistCommunist: 0.5 };
+    const physicalProperties: OrbitalObjectPhysicsInfo = {
+        mass: 1,
+        rotationPeriod: 0,
+        axialTilt: 2 * rng(GenerationSteps.AXIAL_TILT) * Math.PI
+    };
 
-        const isMaterialist = uniformRandBool(powerplayData.materialistSpiritualist, this.rng, 249);
-        const isCapitalist = uniformRandBool(powerplayData.capitalistCommunist, this.rng, 498);
+    const powerplayData = getPowerPlayData(starSystemCoordinates);
 
-        if (isMaterialist && isCapitalist) {
-            this.faction = Faction.FEYNMAN_INTERSTELLAR;
-        } else if (isMaterialist && !isCapitalist) {
-            this.faction = Faction.HUMAN_COMMONWEALTH;
-        } else if (!isMaterialist && isCapitalist) {
-            this.faction = Faction.CHURCH_OF_AWAKENING;
-        } else {
-            this.faction = Faction.SATORI_CONCORD;
-        }
+    const isMaterialist = uniformRandBool(powerplayData.materialistSpiritualist, rng, 249);
+    const isCapitalist = uniformRandBool(powerplayData.capitalistCommunist, rng, 498);
 
-        //TODO: make this dependent on economic model
-        this.population = 2_000_000;
-        this.energyConsumptionPerCapita = 40_000;
-
-        this.populationDensity = 4_000;
-
-        const mix = randomPieChart(CropTypes.length, this.rng, 498);
-        this.agricultureMix = mix.map((proportion, index) => [proportion, CropTypes[index]]);
-
-        this.nbHydroponicLayers = 10;
+    let faction: Faction;
+    if (isMaterialist && isCapitalist) {
+        faction = Faction.FEYNMAN_INTERSTELLAR;
+    } else if (isMaterialist && !isCapitalist) {
+        faction = Faction.HUMAN_COMMONWEALTH;
+    } else if (!isMaterialist && isCapitalist) {
+        faction = Faction.CHURCH_OF_AWAKENING;
+    } else {
+        faction = Faction.SATORI_CONCORD;
     }
+
+    //TODO: make this dependent on economic model
+    const population = 2_000_000;
+    const energyConsumptionPerCapitaKWh = 40_000;
+
+    const populationDensity = 4_000;
+
+    const mix = randomPieChart(CropTypes.length, rng, 498);
+    const agricultureMix: [number, CropType][] = mix.map((proportion, index) => [proportion, CropTypes[index]]);
+
+    const nbHydroponicLayers = 10;
+
+    // find average distance to stellar objects
+    let distanceToStar = 0;
+    parentBodies.forEach((celestialBody) => {
+        distanceToStar += celestialBody.orbit.radius;
+    });
+    distanceToStar /= parentBodies.length;
+
+    let totalStellarFlux = 0;
+    stellarObjectModels.forEach((stellarObject) => {
+        const exposureTimeFraction = 0.5;
+        const starRadius = stellarObject.radius;
+        const starTemperature = stellarObject.physics.blackBodyTemperature;
+        totalStellarFlux += getSphereRadiatedEnergyFlux(starTemperature, starRadius, distanceToStar) * exposureTimeFraction;
+    });
+
+    const totalEnergyConsumptionKWh = population * energyConsumptionPerCapitaKWh;
+
+    const solarPanelEfficiency = 0.4;
+
+    const solarPanelSurfaceM2 = getSolarPanelSurfaceFromEnergyRequirement(solarPanelEfficiency, totalEnergyConsumptionKWh, totalStellarFlux);
+
+    const housingSurfaceHa = (100 * population) / populationDensity; // convert km² to ha
+    let agricultureSurfaceHa = 0;
+    agricultureMix.forEach(([fraction, cropType]) => {
+        agricultureSurfaceHa +=
+            (fraction * population * Settings.INDIVIDUAL_AVERAGE_DAILY_INTAKE) /
+            (Settings.HYDROPONIC_TO_CONVENTIONAL_RATIO * nbHydroponicLayers * getEdibleEnergyPerHaPerDay(cropType));
+    });
+    const totalHabitatSurfaceM2 = (housingSurfaceHa + agricultureSurfaceHa) * 1000; // convert ha to m²
+
+    return {
+        seed,
+        type: OrbitalObjectType.SPACE_STATION,
+        starSystemCoordinates: starSystemCoordinates,
+        name,
+        orbit,
+        physics: physicalProperties,
+        population,
+        energyConsumptionPerCapitaKWh,
+        populationDensity,
+        agricultureMix,
+        nbHydroponicLayers,
+        faction,
+        totalEnergyConsumptionKWh,
+        solarPanelEfficiency,
+        solarPanelSurfaceM2,
+        housingSurfaceHa,
+        agricultureSurfaceHa,
+        totalHabitatSurfaceM2
+    };
 }

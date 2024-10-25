@@ -27,6 +27,7 @@ import { Quaternion } from "@babylonjs/core/Maths/math";
 import { LocalDirection } from "../uberCore/localDirections";
 import { DefaultControlsInputs } from "./defaultControlsInputs";
 import { Settings } from "../settings";
+import { Scalar } from "@babylonjs/core/Maths/math.scalar";
 
 export class DefaultControls implements Controls {
     private readonly transform: TransformNode;
@@ -34,6 +35,9 @@ export class DefaultControls implements Controls {
 
     speed = 1;
     rotationSpeed = Math.PI / 4;
+
+    private inertia = Vector3.Zero();
+    private rotationInertia = Vector3.Zero();
 
     constructor(scene: Scene) {
         this.transform = new TransformNode("playerController", scene);
@@ -53,10 +57,16 @@ export class DefaultControls implements Controls {
         return this.transform;
     }
 
-    public update(deltaTime: number): Vector3 {
-        roll(this.transform, DefaultControlsInputs.map.roll.value * this.rotationSpeed * deltaTime);
-        pitch(this.transform, DefaultControlsInputs.map.pitch.value * this.rotationSpeed * deltaTime);
-        yaw(this.transform, DefaultControlsInputs.map.yaw.value * this.rotationSpeed * deltaTime);
+    public update(deltaSeconds: number): Vector3 {
+        const inertiaFactor = Scalar.Clamp(deltaSeconds * 10, 0, 1);
+
+        this.rotationInertia.x = Scalar.Lerp(this.rotationInertia.x, DefaultControlsInputs.map.roll.value, inertiaFactor);
+        this.rotationInertia.y = Scalar.Lerp(this.rotationInertia.y, DefaultControlsInputs.map.pitch.value, inertiaFactor);
+        this.rotationInertia.z = Scalar.Lerp(this.rotationInertia.z, DefaultControlsInputs.map.yaw.value, inertiaFactor);
+
+        roll(this.transform, this.rotationInertia.x * this.rotationSpeed * deltaSeconds);
+        pitch(this.transform, this.rotationInertia.y * this.rotationSpeed * deltaSeconds);
+        yaw(this.transform, this.rotationInertia.z * this.rotationSpeed * deltaSeconds);
 
         const cameraForward = this.camera.getDirection(LocalDirection.BACKWARD);
         const transformForward = getForwardDirection(this.transform);
@@ -69,17 +79,21 @@ export class DefaultControls implements Controls {
 
         this.speed *= 1 + DefaultControlsInputs.map.changeSpeed.value / 20;
 
+        this.inertia.x = Scalar.Lerp(this.inertia.x, DefaultControlsInputs.map.move.value[0], inertiaFactor);
+        this.inertia.z = Scalar.Lerp(this.inertia.z, DefaultControlsInputs.map.move.value[1], inertiaFactor);
+        this.inertia.y = Scalar.Lerp(this.inertia.y, DefaultControlsInputs.map.upDown.value, inertiaFactor);
+
         const displacement = Vector3.Zero();
 
         const forwardDisplacement = getForwardDirection(this.transform)
-            .scale(this.speed * deltaTime)
-            .scaleInPlace(DefaultControlsInputs.map.move.value[1]);
+            .scale(this.speed * deltaSeconds)
+            .scaleInPlace(this.inertia.z);
         const upwardDisplacement = getUpwardDirection(this.transform)
-            .scale(this.speed * deltaTime)
-            .scaleInPlace(DefaultControlsInputs.map.upDown.value);
+            .scale(this.speed * deltaSeconds)
+            .scaleInPlace(this.inertia.y);
         const rightDisplacement = getRightDirection(this.transform)
-            .scale(this.speed * deltaTime)
-            .scaleInPlace(DefaultControlsInputs.map.move.value[0]);
+            .scale(this.speed * deltaSeconds)
+            .scaleInPlace(this.inertia.x);
 
         displacement.addInPlace(forwardDisplacement);
         displacement.addInPlace(upwardDisplacement);

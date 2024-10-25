@@ -21,11 +21,14 @@ import { Settings } from "../../../settings";
 import { Slider } from "handle-sliderjs";
 import { AtmosphericScatteringPostProcess } from "../../../postProcesses/atmosphericScatteringPostProcess";
 import { CelestialBody } from "../../../architecture/celestialBody";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export class AtmospherePanel extends EditorPanel {
     constructor() {
         super("atmosphere");
     }
+
     init(planet: CelestialBody, atmosphere: AtmosphericScatteringPostProcess) {
         for (const slider of this.sliders) slider.remove();
 
@@ -33,14 +36,51 @@ export class AtmospherePanel extends EditorPanel {
         atmosphereToggler.addEventListener("click", () => {
             const checkbox = document.querySelectorAll("input[type='checkbox']")[2] as HTMLInputElement;
             checkbox.checked = !checkbox.checked;
-            atmosphere.atmosphereUniforms.atmosphereRadius = checkbox.checked ? planet.getBoundingRadius() + Settings.ATMOSPHERE_HEIGHT : 0;
+            atmosphere.atmosphereUniforms.atmosphereRadius = checkbox.checked ? planet.getBoundingRadius() + Settings.EARTH_ATMOSPHERE_THICKNESS : 0;
         });
+
+        const rayleighScatteringColorPicker = document.getElementById("rayleighScattering") as HTMLInputElement;
+        const rayleighConversionFactor = 128e-6;
+        rayleighScatteringColorPicker.value = new Color3(
+            atmosphere.atmosphereUniforms.rayleighScatteringCoefficients.x / rayleighConversionFactor,
+            atmosphere.atmosphereUniforms.rayleighScatteringCoefficients.y / rayleighConversionFactor,
+            atmosphere.atmosphereUniforms.rayleighScatteringCoefficients.z / rayleighConversionFactor
+        ).toHexString();
+        rayleighScatteringColorPicker.addEventListener("input", () => {
+            const color = rayleighScatteringColorPicker.value;
+            const color01 = Color3.FromHexString(color);
+            atmosphere.atmosphereUniforms.rayleighScatteringCoefficients = new Vector3(color01.r, color01.g, color01.b).scaleInPlace(rayleighConversionFactor);
+        });
+
+        const mieScatteringColorPicker = document.getElementById("mieScattering") as HTMLInputElement;
+        const mieConversionFactor = 16e-6;
+        mieScatteringColorPicker.value = new Color3(
+            atmosphere.atmosphereUniforms.mieScatteringCoefficients.x / mieConversionFactor,
+            atmosphere.atmosphereUniforms.mieScatteringCoefficients.y / mieConversionFactor,
+            atmosphere.atmosphereUniforms.mieScatteringCoefficients.z / mieConversionFactor
+        ).toHexString();
+        mieScatteringColorPicker.addEventListener("input", () => {
+            const color = mieScatteringColorPicker.value;
+            const color01 = Color3.FromHexString(color);
+            atmosphere.atmosphereUniforms.mieScatteringCoefficients = new Vector3(color01.r, color01.g, color01.b).scaleInPlace(mieConversionFactor);
+        });
+
+        const ozoneAbsorptionColorPicker = document.getElementById("ozoneAbsorption") as HTMLInputElement;
+        const ozoneConversionFactor = 8e-6;
+        ozoneAbsorptionColorPicker.value = new Color3(
+            atmosphere.atmosphereUniforms.ozoneAbsorptionCoefficients.x / ozoneConversionFactor,
+            atmosphere.atmosphereUniforms.ozoneAbsorptionCoefficients.y / ozoneConversionFactor,
+            atmosphere.atmosphereUniforms.ozoneAbsorptionCoefficients.z / ozoneConversionFactor
+        ).toHexString();
+        ozoneAbsorptionColorPicker.addEventListener("input", () => {
+            const color = ozoneAbsorptionColorPicker.value;
+            const color01 = Color3.FromHexString(color);
+            atmosphere.atmosphereUniforms.ozoneAbsorptionCoefficients = new Vector3(color01.r, color01.g, color01.b).scaleInPlace(ozoneConversionFactor);
+        });
+
         this.sliders = [
-            new Slider("intensity", document.getElementById("intensity") as HTMLElement, 0, 40, atmosphere.atmosphereUniforms.intensity, (val: number) => {
-                atmosphere.atmosphereUniforms.intensity = val;
-            }),
-            new Slider("density", document.getElementById("density") as HTMLElement, 0, 40, atmosphere.atmosphereUniforms.densityModifier * 10, (val: number) => {
-                atmosphere.atmosphereUniforms.densityModifier = val / 10;
+            new Slider("intensity", document.getElementById("intensity") as HTMLElement, 0, 60, atmosphere.atmosphereUniforms.lightIntensity, (val: number) => {
+                atmosphere.atmosphereUniforms.lightIntensity = val;
             }),
             new Slider(
                 "atmosphereRadius",
@@ -52,33 +92,20 @@ export class AtmospherePanel extends EditorPanel {
                     atmosphere.atmosphereUniforms.atmosphereRadius = planet.getRadius() + val * 10000;
                 }
             ),
-            new Slider(
-                "rayleighStrength",
-                document.getElementById("rayleighStrength") as HTMLElement,
-                0,
-                40,
-                atmosphere.atmosphereUniforms.rayleighStrength * 10,
-                (val: number) => {
-                    atmosphere.atmosphereUniforms.rayleighStrength = val / 10;
-                }
-            ),
-            new Slider("mieStrength", document.getElementById("mieStrength") as HTMLElement, 0, 40, atmosphere.atmosphereUniforms.mieStrength * 10, (val: number) => {
-                atmosphere.atmosphereUniforms.mieStrength = val / 10;
+            new Slider("rayleighHeight", document.getElementById("rayleighHeight") as HTMLElement, 0, 50, atmosphere.atmosphereUniforms.rayleighHeight / 1e3, (val: number) => {
+                atmosphere.atmosphereUniforms.rayleighHeight = val * 1e3;
             }),
-            new Slider("falloff", document.getElementById("falloff") as HTMLElement, -10, 200, atmosphere.atmosphereUniforms.falloffFactor, (val: number) => {
-                atmosphere.atmosphereUniforms.falloffFactor = val;
+            new Slider("mieHeight", document.getElementById("mieHeight") as HTMLElement, 0, 50, atmosphere.atmosphereUniforms.mieHeight / 1e2, (val: number) => {
+                atmosphere.atmosphereUniforms.mieHeight = val * 1e2;
             }),
-            new Slider("redWaveLength", document.getElementById("redWaveLength") as HTMLElement, 0, 1000, atmosphere.atmosphereUniforms.redWaveLength, (val: number) => {
-                atmosphere.atmosphereUniforms.redWaveLength = val;
+            new Slider("mieAsymmetry", document.getElementById("mieAsymmetry")!, -100, 100, atmosphere.atmosphereUniforms.mieAsymmetry * 100, (val: number) => {
+                atmosphere.atmosphereUniforms.mieAsymmetry = val / 100;
             }),
-            new Slider("greenWaveLength", document.getElementById("greenWaveLength") as HTMLElement, 0, 1000, atmosphere.atmosphereUniforms.greenWaveLength, (val: number) => {
-                atmosphere.atmosphereUniforms.greenWaveLength = val;
+            new Slider("ozoneLayerHeight", document.getElementById("ozoneLayerHeight") as HTMLElement, 0, 50, atmosphere.atmosphereUniforms.ozoneHeight / 1e3, (val: number) => {
+                atmosphere.atmosphereUniforms.ozoneHeight = val * 1e3;
             }),
-            new Slider("blueWaveLength", document.getElementById("blueWaveLength") as HTMLElement, 0, 1000, atmosphere.atmosphereUniforms.blueWaveLength, (val: number) => {
-                atmosphere.atmosphereUniforms.blueWaveLength = val;
-            }),
-            new Slider("mieHaloRadius", document.getElementById("mieHaloRadius") as HTMLElement, 0, 200, atmosphere.atmosphereUniforms.mieHaloRadius * 100, (val: number) => {
-                atmosphere.atmosphereUniforms.mieHaloRadius = val / 100;
+            new Slider("ozoneHeight", document.getElementById("ozoneHeight") as HTMLElement, 0, 50, atmosphere.atmosphereUniforms.ozoneFalloff / 1e3, (val: number) => {
+                atmosphere.atmosphereUniforms.ozoneFalloff = val * 1e3;
             })
         ];
     }

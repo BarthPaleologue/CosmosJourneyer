@@ -18,7 +18,6 @@
 import atmosphericScatteringFragment from "../../shaders/atmosphericScatteringFragment.glsl";
 
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { centeredRand } from "extended-random";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { ObjectPostProcess } from "./objectPostProcess";
@@ -34,18 +33,62 @@ import { Constants } from "@babylonjs/core/Engines/constants";
 import { Scene } from "@babylonjs/core/scene";
 import { Textures } from "../assets/textures";
 
-export interface AtmosphereUniforms {
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Settings } from "../settings";
+
+export type AtmosphereUniforms = {
+    /**
+     * Radius of the atmosphere in meters (planetRadius + 100km in the case of Earth)
+     */
     atmosphereRadius: number;
-    falloffFactor: number;
-    intensity: number;
-    rayleighStrength: number;
-    mieStrength: number;
-    densityModifier: number;
-    redWaveLength: number;
-    greenWaveLength: number;
-    blueWaveLength: number;
-    mieHaloRadius: number;
-}
+
+    /**
+     * Height falloff of rayleigh scattering (bigger = slower decrease)
+     */
+    rayleighHeight: number;
+
+    /**
+     * Rayleigh scattering coefficients (red, green, blue)
+     * @see https://sebh.github.io/publications/egsr2020.pdf (Hillaire 2020)
+     */
+    rayleighScatteringCoefficients: Vector3;
+
+    /**
+     * Height falloff of mie scattering (bigger = slower decrease)
+     */
+    mieHeight: number;
+
+    /**
+     * Mie scattering coefficients (red, green, blue)
+     */
+    mieScatteringCoefficients: Vector3;
+
+    /**
+     * Mie scattering asymmetry factor (between -1 and 1)
+     */
+    mieAsymmetry: number;
+
+    /**
+     * Height of the ozone layer in meters above the planet surface
+     */
+    ozoneHeight: number;
+
+    /**
+     * Ozone absorption coefficients (red, green, blue)
+     * @see https://sebh.github.io/publications/egsr2020.pdf (Hillaire 2020)
+     */
+    ozoneAbsorptionCoefficients: Vector3;
+
+    /**
+     * Ozone absorption falloff around the ozone layer height (in meters)
+     */
+    ozoneFalloff: number;
+
+    /**
+     * Intensity of the sun
+     */
+    lightIntensity: number;
+};
 
 export class AtmosphericScatteringPostProcess extends PostProcess implements ObjectPostProcess {
     readonly atmosphereUniforms: AtmosphereUniforms;
@@ -53,36 +96,36 @@ export class AtmosphericScatteringPostProcess extends PostProcess implements Obj
 
     private activeCamera: Camera | null = null;
 
-    constructor(name: string, planet: GasPlanet | TelluricPlanet, atmosphereHeight: number, scene: Scene, stellarObjects: Transformable[]) {
+    constructor(planet: GasPlanet | TelluricPlanet, atmosphereThickness: number, stellarObjects: Transformable[], scene: Scene) {
         const shaderName = "atmosphericScattering";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = atmosphericScatteringFragment;
         }
 
         const atmosphereUniforms: AtmosphereUniforms = {
-            atmosphereRadius: planet.getBoundingRadius() + atmosphereHeight,
-            falloffFactor: 10,
-            intensity: 11 * planet.model.physicalProperties.pressure,
-            rayleighStrength: 1,
-            mieStrength: 1,
-            densityModifier: 1,
-            redWaveLength: 700 * (1 + centeredRand(planet.model.rng, 1300) / 6),
-            greenWaveLength: 530 * (1 + centeredRand(planet.model.rng, 1310) / 6),
-            blueWaveLength: 440 * (1 + centeredRand(planet.model.rng, 1320) / 6),
-            mieHaloRadius: 0.65
+            atmosphereRadius: planet.getBoundingRadius() + atmosphereThickness,
+            rayleighHeight: (8e3 * atmosphereThickness) / Settings.EARTH_ATMOSPHERE_THICKNESS,
+            rayleighScatteringCoefficients: new Vector3(5.8e-6, 13.5e-6, 33.1e-6).scaleInPlace(Settings.EARTH_ATMOSPHERE_THICKNESS / atmosphereThickness),
+            mieHeight: (1.2e3 * atmosphereThickness) / Settings.EARTH_ATMOSPHERE_THICKNESS,
+            mieScatteringCoefficients: new Vector3(3.9e-6, 3.9e-6, 3.9e-6).scaleInPlace(Settings.EARTH_ATMOSPHERE_THICKNESS / atmosphereThickness),
+            mieAsymmetry: 0.8,
+            ozoneHeight: (25e3 * atmosphereThickness) / Settings.EARTH_ATMOSPHERE_THICKNESS,
+            ozoneAbsorptionCoefficients: new Vector3(0.6e-6, 1.8e-6, 0.085e-6).scaleInPlace(Settings.EARTH_ATMOSPHERE_THICKNESS / atmosphereThickness),
+            ozoneFalloff: (5e3 * atmosphereThickness) / Settings.EARTH_ATMOSPHERE_THICKNESS,
+            lightIntensity: 15
         };
 
         const AtmosphereUniformNames = {
             ATMOSPHERE_RADIUS: "atmosphere_radius",
-            ATMOSPHERE_FALLOFF: "atmosphere_falloff",
-            ATMOSPHERE_SUN_INTENSITY: "atmosphere_sunIntensity",
-            ATMOSPHERE_RAYLEIGH_STRENGTH: "atmosphere_rayleighStrength",
-            ATMOSPHERE_MIE_STRENGTH: "atmosphere_mieStrength",
-            ATMOSPHERE_DENSITY_MODIFIER: "atmosphere_densityModifier",
-            ATMOSPHERE_RED_WAVE_LENGTH: "atmosphere_redWaveLength",
-            ATMOSPHERE_GREEN_WAVE_LENGTH: "atmosphere_greenWaveLength",
-            ATMOSPHERE_BLUE_WAVE_LENGTH: "atmosphere_blueWaveLength",
-            ATMOSPHERE_MIE_HALO_RADIUS: "atmosphere_mieHaloRadius"
+            ATMOSPHERE_RAYLEIGH_HEIGHT: "atmosphere_rayleighHeight",
+            ATMOSPHERE_RAYLEIGH_COEFFS: "atmosphere_rayleighCoeffs",
+            ATMOSPHERE_MIE_HEIGHT: "atmosphere_mieHeight",
+            ATMOSPHERE_MIE_COEFFS: "atmosphere_mieCoeffs",
+            ATMOSPHERE_MIE_ASYMMETRY: "atmosphere_mieAsymmetry",
+            ATMOSPHERE_OZONE_HEIGHT: "atmosphere_ozoneHeight",
+            ATMOSPHERE_OZONE_COEFFS: "atmosphere_ozoneCoeffs",
+            ATMOSPHERE_OZONE_FALLOFF: "atmosphere_ozoneFalloff",
+            ATMOSPHERE_SUN_INTENSITY: "atmosphere_sunIntensity"
         };
 
         const uniforms: string[] = [
@@ -98,7 +141,19 @@ export class AtmosphericScatteringPostProcess extends PostProcess implements Obj
 
         const samplers: string[] = [...Object.values(SamplerUniformNames), ...Object.values(AtmosphereSamplerNames)];
 
-        super(name, shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
+        super(
+            `${planet.model.name}AtmospherePostProcess`,
+            shaderName,
+            uniforms,
+            samplers,
+            1,
+            null,
+            Texture.BILINEAR_SAMPLINGMODE,
+            scene.getEngine(),
+            false,
+            null,
+            Constants.TEXTURETYPE_HALF_FLOAT
+        );
 
         this.object = planet;
         this.atmosphereUniforms = atmosphereUniforms;
@@ -117,15 +172,15 @@ export class AtmosphericScatteringPostProcess extends PostProcess implements Obj
             setObjectUniforms(effect, planet);
 
             effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_RADIUS, atmosphereUniforms.atmosphereRadius);
-            effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_FALLOFF, atmosphereUniforms.falloffFactor);
-            effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_SUN_INTENSITY, atmosphereUniforms.intensity);
-            effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_RAYLEIGH_STRENGTH, atmosphereUniforms.rayleighStrength);
-            effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_MIE_STRENGTH, atmosphereUniforms.mieStrength);
-            effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_DENSITY_MODIFIER, atmosphereUniforms.densityModifier);
-            effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_RED_WAVE_LENGTH, atmosphereUniforms.redWaveLength);
-            effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_GREEN_WAVE_LENGTH, atmosphereUniforms.greenWaveLength);
-            effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_BLUE_WAVE_LENGTH, atmosphereUniforms.blueWaveLength);
-            effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_MIE_HALO_RADIUS, atmosphereUniforms.mieHaloRadius);
+            effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_RAYLEIGH_HEIGHT, atmosphereUniforms.rayleighHeight);
+            effect.setVector3(AtmosphereUniformNames.ATMOSPHERE_RAYLEIGH_COEFFS, atmosphereUniforms.rayleighScatteringCoefficients);
+            effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_MIE_HEIGHT, atmosphereUniforms.mieHeight);
+            effect.setVector3(AtmosphereUniformNames.ATMOSPHERE_MIE_COEFFS, atmosphereUniforms.mieScatteringCoefficients);
+            effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_MIE_ASYMMETRY, atmosphereUniforms.mieAsymmetry);
+            effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_OZONE_HEIGHT, atmosphereUniforms.ozoneHeight);
+            effect.setVector3(AtmosphereUniformNames.ATMOSPHERE_OZONE_COEFFS, atmosphereUniforms.ozoneAbsorptionCoefficients);
+            effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_OZONE_FALLOFF, atmosphereUniforms.ozoneFalloff);
+            effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_SUN_INTENSITY, atmosphereUniforms.lightIntensity);
 
             effect.setTexture(AtmosphereSamplerNames.ATMOSPHERE_LUT, Textures.ATMOSPHERE_LUT);
 

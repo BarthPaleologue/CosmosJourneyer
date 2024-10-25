@@ -55,12 +55,12 @@ void main() {
     normalW = normalize(TBN * normalColor);
 
     vec3 Lo = vec3(0.0);
-    for(int i = 0; i < nbStars; i++) {
+    for (int i = 0; i < nbStars; i++) {
         vec3 lightDirectionW = normalize(star_positions[i] - vPositionW);
         Lo += calculateLight(albedoColor, normalW, roughnessColor, metallicColor, lightDirectionW, viewDirectionW, star_colors[i]);
     }
 
-    Lo += smoothstep(0.48, 0.5, fract(vUV.x)) * smoothstep(0.52, 0.5, fract(vUV.x)) * smoothstep(0.4, 0.45, fract(vUV.y)) * smoothstep(0.6, 0.55, fract(vUV.y)) * vec3(1.0, 1.0, 0.4);
+    Lo += smoothstep(0.48, 0.5, fract(vUV.x)) * (1.0 - smoothstep(0.5, 0.52, fract(vUV.x))) * smoothstep(0.4, 0.45, fract(vUV.y)) * (1.0 - smoothstep(0.55, 0.6, fract(vUV.y))) * vec3(1.0, 1.0, 0.4);
 
     // occlusion
     //Lo *= mix(1.0, occlusionColor, 0.5);

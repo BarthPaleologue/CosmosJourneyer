@@ -17,7 +17,7 @@
 
 import { CreateGreasedLine, GreasedLineBaseMesh, GreasedLineMesh, GreasedLineRibbonMesh } from "@babylonjs/core/Meshes";
 import { Vector3 } from "@babylonjs/core/Maths/math";
-import { BoundingSphere } from "../architecture/boundingSphere";
+import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { Transformable } from "../architecture/transformable";
 import { Scene } from "@babylonjs/core/scene";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
@@ -36,7 +36,7 @@ export class AxisRenderer {
      * @param objects
      * @param scene
      */
-    setOrbitalObjects(objects: (Transformable & BoundingSphere)[], scene: Scene) {
+    setOrbitalObjects(objects: (Transformable & HasBoundingSphere)[], scene: Scene) {
         this.reset();
 
         for (const object of objects) {
@@ -46,9 +46,9 @@ export class AxisRenderer {
         this.setVisibility(this._isVisible);
     }
 
-    private createAxisMesh(orbitalObject: Transformable & BoundingSphere, scene: Scene) {
+    private createAxisMesh(orbitalObject: Transformable & HasBoundingSphere, scene: Scene) {
         const rotationAxisHelper = CreateGreasedLine(
-            "orbit2",
+            `${orbitalObject.getTransform().name}AxisHelper`,
             {
                 points: [new Vector3(0, -orbitalObject.getBoundingRadius() * 2, 0), new Vector3(0, orbitalObject.getBoundingRadius() * 2, 0)],
                 updatable: false
@@ -89,7 +89,7 @@ export class AxisRenderer {
      * @private
      */
     public reset() {
-        this.axisMeshes.forEach((orbitMesh) => orbitMesh.dispose());
+        this.axisMeshes.forEach((orbitMesh) => orbitMesh.dispose(false, true));
         this.axisMeshes = [];
     }
 }

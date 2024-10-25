@@ -25,21 +25,16 @@ import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
-import { Planet } from "../../architecture/planet";
-import { OrbitProperties } from "../../orbit/orbitProperties";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { CelestialBody } from "../../architecture/celestialBody";
-import { OrbitalObject } from "../../architecture/orbitalObject";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { Cullable } from "../../utils/cullable";
 import { RingsUniforms } from "../../rings/ringsUniform";
-import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import { Transformable } from "../../architecture/transformable";
-import i18n from "../../i18n";
 import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
-import { StarSystemModel } from "../../starSystem/starSystemModel";
+import { orbitalObjectTypeToDisplay } from "../../utils/strings/orbitalObjectTypeToDisplay";
+import { Planet } from "../../architecture/planet";
 
 export class GasPlanet implements Planet, Cullable {
     private readonly mesh: Mesh;
@@ -48,29 +43,21 @@ export class GasPlanet implements Planet, Cullable {
     readonly aggregate: PhysicsAggregate;
     readonly model: GasPlanetModel;
 
-    name: string;
-    parent: OrbitalObject | null;
     postProcesses: PostProcessType[] = [];
 
     readonly ringsUniforms: RingsUniforms | null;
-    private readonly asteroidField: AsteroidField | null;
+    readonly asteroidField: AsteroidField | null;
 
     /**
      * New Gas Planet
      * @param model The model to create the planet from or a seed for the planet in [-1, 1]
-     * @param starSystemModel
      * @param scene
-     * @param parentBody The bodies the planet is orbiting
      */
-    constructor(model: GasPlanetModel | number, starSystemModel: StarSystemModel, scene: Scene, parentBody: CelestialBody | null = null) {
-        this.parent = parentBody;
-
-        this.model = model instanceof GasPlanetModel ? model : new GasPlanetModel(model, starSystemModel, parentBody?.model);
-
-        this.name = this.model.name;
+    constructor(model: GasPlanetModel, scene: Scene) {
+        this.model = model;
 
         this.mesh = MeshBuilder.CreateSphere(
-            this.name,
+            this.model.name,
             {
                 diameter: this.model.radius * 2,
                 segments: 64
@@ -92,7 +79,7 @@ export class GasPlanet implements Planet, Cullable {
         const physicsShape = new PhysicsShapeSphere(Vector3.Zero(), this.model.radius, scene);
         this.aggregate.shape.addChildFromParent(this.getTransform(), physicsShape, this.mesh);
 
-        this.material = new GasPlanetMaterial(this.name, this.getTransform(), this.model, scene);
+        this.material = new GasPlanetMaterial(this.model.name, this.model, scene);
         this.mesh.material = this.material;
 
         this.postProcesses.push(PostProcessType.ATMOSPHERE, PostProcessType.SHADOW);
@@ -102,13 +89,13 @@ export class GasPlanet implements Planet, Cullable {
 
             const averageRadius = (this.model.radius * (this.model.rings.ringStart + this.model.rings.ringEnd)) / 2;
             const spread = (this.model.radius * (this.model.rings.ringEnd - this.model.rings.ringStart)) / 2;
-            this.asteroidField = new AsteroidField(this.model.rng(84133), this.getTransform(), averageRadius, spread, scene);
+            this.asteroidField = new AsteroidField(this.model.rings.seed, this.getTransform(), averageRadius, spread, scene);
         } else {
             this.ringsUniforms = null;
             this.asteroidField = null;
         }
 
-        this.getTransform().rotate(Axis.X, this.model.physicalProperties.axialTilt);
+        this.getTransform().rotate(Axis.X, this.model.physics.axialTilt);
     }
 
     updateMaterial(stellarObjects: Transformable[], deltaSeconds: number): void {
@@ -127,16 +114,8 @@ export class GasPlanet implements Planet, Cullable {
         return this.getTransform().up;
     }
 
-    getRingsUniforms(): RingsUniforms | null {
-        return this.ringsUniforms;
-    }
-
-    getAsteroidField(): AsteroidField | null {
-        return this.asteroidField;
-    }
-
     getTypeName(): string {
-        return i18n.t("objectTypes:gasPlanet");
+        return orbitalObjectTypeToDisplay(this.model);
     }
 
     public computeCulling(cameras: Camera[]): void {
@@ -154,14 +133,7 @@ export class GasPlanet implements Planet, Cullable {
         this.aggregate.dispose();
         this.material.dispose();
         this.asteroidField?.dispose();
-    }
-
-    getOrbitProperties(): OrbitProperties {
-        return this.model.orbit;
-    }
-
-    getPhysicalProperties(): OrbitalObjectPhysicalProperties {
-        return this.model.physicalProperties;
+        this.ringsUniforms?.dispose();
     }
 
     getTransform(): TransformNode {

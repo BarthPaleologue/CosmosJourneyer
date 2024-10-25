@@ -21,18 +21,19 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Transformable } from "../../../architecture/transformable";
-import { computeRingRotationPeriod } from "../../../utils/ringRotation";
 import { Settings } from "../../../settings";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { LandingPad, LandingPadSize } from "../landingPad/landingPad";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { createEnvironmentAggregate } from "../../../utils/physics";
-import { createRing } from "../../../utils/ringBuilder";
+import { createRing } from "../../../utils/geometry/ringBuilder";
 import { SpaceStationModel } from "../../../spacestation/spacestationModel";
 import { LandingBayMaterial } from "./landingBayMaterial";
-import { seededSquirrelNoise } from "squirrel-noise";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+
+import { getRngFromSeed } from "../../../utils/getRngFromSeed";
+import { createEnvironmentAggregate } from "../../../utils/havok";
+import { computeRingRotationPeriod } from "../../../utils/physics";
 
 export class LandingBay {
     private readonly root: TransformNode;
@@ -55,7 +56,7 @@ export class LandingBay {
     constructor(stationModel: SpaceStationModel, seed: number, scene: Scene) {
         this.root = new TransformNode("LandingBayRoot", scene);
 
-        this.rng = seededSquirrelNoise(seed);
+        this.rng = getRngFromSeed(seed);
 
         this.radius = 500;
 
@@ -155,7 +156,7 @@ export class LandingBay {
         this.getTransform().rotate(Axis.Y, deltaSeconds / computeRingRotationPeriod(this.radius, Settings.G_EARTH * 0.1));
         this.landingBayMaterial.update(stellarObjects);
         this.metalSectionMaterial.update(stellarObjects);
-        this.landingPads.forEach((landingPad) => landingPad.update(stellarObjects));
+        this.landingPads.forEach((landingPad) => landingPad.update(stellarObjects, cameraWorldPosition));
 
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
 

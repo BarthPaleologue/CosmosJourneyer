@@ -25,27 +25,20 @@ import { Light } from "@babylonjs/core/Lights/light";
 import { setRotationQuaternion } from "../../uberCore/transforms/basicTransform";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
-import { getStellarTypeString } from "../common";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
-import { CelestialBody } from "../../architecture/celestialBody";
-import { OrbitalObject } from "../../architecture/orbitalObject";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { StellarObject } from "../../architecture/stellarObject";
 import { Cullable } from "../../utils/cullable";
-import { OrbitProperties } from "../../orbit/orbitProperties";
 import { RingsUniforms } from "../../rings/ringsUniform";
-import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
-import i18n from "../../i18n";
 import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
-import { StarSystemModel } from "../../starSystem/starSystemModel";
+import { getRgbFromTemperature } from "../../utils/specrend";
+import { orbitalObjectTypeToDisplay } from "../../utils/strings/orbitalObjectTypeToDisplay";
 
 export class Star implements StellarObject, Cullable {
-    readonly name: string;
-
     readonly mesh: Mesh;
     readonly light: PointLight;
     private readonly material: StarMaterial;
@@ -56,28 +49,20 @@ export class Star implements StellarObject, Cullable {
 
     readonly ringsUniforms: RingsUniforms | null;
 
-    private readonly asteroidField: AsteroidField | null;
+    readonly asteroidField: AsteroidField | null;
 
     readonly model: StarModel;
-
-    readonly parent: OrbitalObject | null;
 
     /**
      * New Star
      * @param model The seed of the star in [-1, 1]
-     * @param starSystemModel
      * @param scene
-     * @param parentBody The bodies the star is orbiting
      */
-    constructor(model: StarModel | number, starSystemModel: StarSystemModel, scene: Scene, parentBody: CelestialBody | null = null) {
-        this.parent = parentBody;
-
-        this.model = model instanceof StarModel ? model : new StarModel(model, starSystemModel, parentBody?.model);
-
-        this.name = this.model.name;
+    constructor(model: StarModel, scene: Scene) {
+        this.model = model;
 
         this.mesh = MeshBuilder.CreateSphere(
-            this.name,
+            this.model.name,
             {
                 diameter: this.model.radius * 2,
                 segments: 32
@@ -97,12 +82,12 @@ export class Star implements StellarObject, Cullable {
         this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
         this.aggregate.body.disablePreStep = false;
 
-        this.light = new PointLight(`${name}Light`, Vector3.Zero(), scene);
-        this.light.diffuse.copyFrom(this.model.color);
+        this.light = new PointLight(`${this.model.name}Light`, Vector3.Zero(), scene);
+        this.light.diffuse = getRgbFromTemperature(this.model.physics.blackBodyTemperature);
         this.light.falloffType = Light.FALLOFF_STANDARD;
         this.light.parent = this.getTransform();
 
-        this.material = new StarMaterial(this.getTransform(), this.model, scene);
+        this.material = new StarMaterial(this.model, scene);
         this.mesh.material = this.material;
 
         setRotationQuaternion(this.getTransform(), Quaternion.Identity());
@@ -115,7 +100,7 @@ export class Star implements StellarObject, Cullable {
 
             const averageRadius = (this.model.radius * (this.model.rings.ringStart + this.model.rings.ringEnd)) / 2;
             const spread = (this.model.radius * (this.model.rings.ringEnd - this.model.rings.ringStart)) / 2;
-            this.asteroidField = new AsteroidField(this.model.rng(84133), this.getTransform(), averageRadius, spread, scene);
+            this.asteroidField = new AsteroidField(this.model.rings.seed, this.getTransform(), averageRadius, spread, scene);
         } else {
             this.ringsUniforms = null;
             this.asteroidField = null;
@@ -134,24 +119,8 @@ export class Star implements StellarObject, Cullable {
         return this.light;
     }
 
-    getOrbitProperties(): OrbitProperties {
-        return this.model.orbit;
-    }
-
-    getPhysicalProperties(): OrbitalObjectPhysicalProperties {
-        return this.model.physicalProperties;
-    }
-
-    getRingsUniforms(): RingsUniforms | null {
-        return this.ringsUniforms;
-    }
-
-    getAsteroidField(): AsteroidField | null {
-        return this.asteroidField;
-    }
-
     getTypeName(): string {
-        return i18n.t("objectTypes:star", { stellarType: getStellarTypeString(this.model.stellarType) });
+        return orbitalObjectTypeToDisplay(this.model);
     }
 
     public updateMaterial(deltaTime: number): void {
@@ -175,9 +144,11 @@ export class Star implements StellarObject, Cullable {
     }
 
     public dispose(): void {
-        this.mesh.dispose();
+        this.aggregate.dispose();
         this.material.dispose();
         this.light.dispose();
         this.asteroidField?.dispose();
+        this.ringsUniforms?.dispose();
+        this.mesh.dispose();
     }
 }

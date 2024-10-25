@@ -1,3 +1,5 @@
+@use "sass:color";
+
 //  This file is part of Cosmos Journeyer
 //
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
@@ -34,7 +36,7 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: darken(#888, 50%);
+  background: color.adjust(#888, $lightness: -50%, $space: hsl);
 }
 
 ::-webkit-scrollbar-thumb {
@@ -119,6 +121,8 @@ body {
   @import "tutorialLayer.scss";
 
   @import "tutorialsMenuPanel.scss";
+
+  @import "inspectorLayer.scss";
 
   #renderer {
     z-index: 1;

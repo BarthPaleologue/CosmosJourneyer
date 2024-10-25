@@ -21,7 +21,7 @@ import { BuildTask, TaskType } from "./taskTypes";
 import { Settings } from "../../../../settings";
 import { getChunkSphereSpacePositionFromPath } from "../../../../utils/chunkUtils";
 import { TerrainSettings } from "../terrainSettings";
-import { TelluricPlanetModel } from "../../telluricPlanetModel";
+import { TelluricPlanetaryMassObjectModel } from "../../telluricPlanetaryMassObjectModel";
 import { Material } from "@babylonjs/core/Materials/material";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
@@ -56,7 +56,7 @@ export class ChunkTree implements Cullable {
 
     private deleteSemaphores: DeleteSemaphore[] = [];
 
-    readonly planetModel: TelluricPlanetModel;
+    readonly planetModel: TelluricPlanetaryMassObjectModel;
 
     readonly planetName: string;
     readonly planetSeed: number;
@@ -70,15 +70,14 @@ export class ChunkTree implements Cullable {
     /**
      *
      * @param direction
-     * @param planetName
      * @param planetModel
      * @param parentAggregate
      * @param material
      * @param scene
      */
-    constructor(direction: Direction, planetName: string, planetModel: TelluricPlanetModel, parentAggregate: PhysicsAggregate, material: Material, scene: Scene) {
+    constructor(direction: Direction, planetModel: TelluricPlanetaryMassObjectModel, parentAggregate: PhysicsAggregate, material: Material, scene: Scene) {
         this.rootChunkLength = planetModel.radius * 2;
-        this.planetName = planetName;
+        this.planetName = planetModel.name;
         this.planetSeed = planetModel.seed;
         this.terrainSettings = planetModel.terrainSettings;
 
@@ -142,28 +141,8 @@ export class ChunkTree implements Cullable {
         });
     }
 
-    private getAverageHeight(tree: QuadTree): number {
-        if (tree instanceof PlanetChunk) return tree.getAverageHeight();
-        else if (tree.length > 0) return 0.25 * (this.getAverageHeight(tree[0]) + this.getAverageHeight(tree[1]) + this.getAverageHeight(tree[2]) + this.getAverageHeight(tree[3]));
-        else return 0;
-    }
-
-    private getMinAverageHeight(tree: QuadTree): number {
-        if (tree instanceof PlanetChunk) return tree.getAverageHeight();
-        else if (tree.length > 0)
-            return Math.min(this.getMinAverageHeight(tree[0]), this.getMinAverageHeight(tree[1]), this.getMinAverageHeight(tree[2]), this.getMinAverageHeight(tree[3]));
-        else return 0;
-    }
-
-    private getMaxAverageHeight(tree: QuadTree): number {
-        if (tree instanceof PlanetChunk) return tree.getAverageHeight();
-        else if (tree.length > 0)
-            return Math.max(this.getMaxAverageHeight(tree[0]), this.getMaxAverageHeight(tree[1]), this.getMaxAverageHeight(tree[2]), this.getMaxAverageHeight(tree[3]));
-        else return 0;
-    }
-
     /**
-     * Recursive function used internaly to update LOD
+     * Recursive function used internally to update LOD
      * @param observerPositionW The observer position in world space
      * @param chunkForge
      * @param tree The tree to update recursively
@@ -214,7 +193,7 @@ export class ChunkTree implements Cullable {
         }
 
         if (tree instanceof Array) {
-            if (targetLOD < walked.length - 1) {
+            if (targetLOD <= walked.length) {
                 const newChunk = this.createChunk(walked, chunkForge);
                 this.requestDeletion(tree, [newChunk]);
                 return newChunk;
@@ -267,10 +246,11 @@ export class ChunkTree implements Cullable {
         this.executeOnEveryChunk((chunk: PlanetChunk) => {
             chunk.dispose();
         });
-        for (const deleteSemaphore of this.deleteSemaphores) {
-            for (const chunk of deleteSemaphore.chunksToDelete) {
-                chunk.dispose();
-            }
-        }
+        this.tree = [];
+
+        this.deleteSemaphores.forEach((deleteSemaphore) => {
+            deleteSemaphore.dispose();
+        });
+        this.deleteSemaphores.length = 0;
     }
 }

@@ -24,9 +24,10 @@ import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Scene } from "@babylonjs/core/scene";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { TransformNode } from "@babylonjs/core/Meshes";
 import { Transformable } from "../../architecture/transformable";
 import { setStellarObjectUniforms, StellarObjectUniformNames } from "../../postProcesses/uniforms/stellarObjectUniforms";
+
+import { getRngFromSeed } from "../../utils/getRngFromSeed";
 
 const GasPlanetMaterialUniformNames = {
     WORLD: "world",
@@ -41,13 +42,10 @@ const GasPlanetMaterialUniformNames = {
 };
 
 export class GasPlanetMaterial extends ShaderMaterial {
-    readonly planet: TransformNode;
     readonly colorSettings: GazColorSettings;
     private elapsedSeconds = 0;
 
-    private stellarObjects: Transformable[] = [];
-
-    constructor(planetName: string, planet: TransformNode, model: GasPlanetModel, scene: Scene) {
+    constructor(planetName: string, model: GasPlanetModel, scene: Scene) {
         const shaderName = "gasPlanetMaterial";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
@@ -61,22 +59,22 @@ export class GasPlanetMaterial extends ShaderMaterial {
             uniforms: [...Object.values(GasPlanetMaterialUniformNames), ...Object.values(StellarObjectUniformNames)]
         });
 
-        this.planet = planet;
+        const rng = getRngFromSeed(model.seed);
 
-        const hue1 = normalRandom(240, 30, model.rng, 70);
-        const hue2 = normalRandom(0, 180, model.rng, 72);
+        const hue1 = normalRandom(240, 30, rng, 70);
+        const hue2 = normalRandom(0, 180, rng, 72);
 
         const divergence = -180;
 
-        const color1 = Color3.FromHSV(hue1 % 360, randRange(0.4, 0.9, model.rng, 72), randRange(0.7, 0.9, model.rng, 73));
-        const color2 = Color3.FromHSV(hue2 % 360, randRange(0.6, 0.9, model.rng, 74), randRange(0.0, 0.3, model.rng, 75));
-        const color3 = Color3.FromHSV((hue1 + divergence) % 360, randRange(0.4, 0.9, model.rng, 76), randRange(0.7, 0.9, model.rng, 77));
+        const color1 = Color3.FromHSV(hue1 % 360, randRange(0.4, 0.9, rng, 72), randRange(0.7, 0.9, rng, 73));
+        const color2 = Color3.FromHSV(hue2 % 360, randRange(0.6, 0.9, rng, 74), randRange(0.0, 0.3, rng, 75));
+        const color3 = Color3.FromHSV((hue1 + divergence) % 360, randRange(0.4, 0.9, rng, 76), randRange(0.7, 0.9, rng, 77));
 
         this.colorSettings = {
             color1: color1,
             color2: color2,
             color3: color3,
-            colorSharpness: randRangeInt(40, 80, model.rng, 80) / 10
+            colorSharpness: randRangeInt(40, 80, rng, 80) / 10
         };
 
         this.setFloat(GasPlanetMaterialUniformNames.SEED, model.seed);
@@ -100,11 +98,14 @@ export class GasPlanetMaterial extends ShaderMaterial {
 
     public update(stellarObjects: Transformable[], deltaSeconds: number) {
         this.elapsedSeconds += deltaSeconds;
-        this.stellarObjects = stellarObjects;
 
         this.onBindObservable.addOnce(() => {
-            setStellarObjectUniforms(this.getEffect(), this.stellarObjects);
+            setStellarObjectUniforms(this.getEffect(), stellarObjects);
             this.getEffect().setFloat(GasPlanetMaterialUniformNames.TIME, this.elapsedSeconds % 100000);
         });
+    }
+
+    public dispose(forceDisposeEffect?: boolean, forceDisposeTextures?: boolean, notBoundToMesh?: boolean) {
+        super.dispose(forceDisposeEffect, forceDisposeTextures, notBoundToMesh);
     }
 }

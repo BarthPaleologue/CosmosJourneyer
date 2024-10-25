@@ -67,7 +67,7 @@ export class MandelbulbPostProcess extends PostProcess implements ObjectPostProc
 
         const samplers: string[] = Object.values(SamplerUniformNames);
 
-        super(mandelbulb.name, shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
+        super(mandelbulb.model.name, shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
 
         this.object = mandelbulb;
         this.settings = settings;

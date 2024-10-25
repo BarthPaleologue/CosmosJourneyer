@@ -17,7 +17,7 @@
 
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Transformable } from "../../architecture/transformable";
-import { BoundingSphere } from "../../architecture/boundingSphere";
+import { HasBoundingSphere } from "../../architecture/hasBoundingSphere";
 
 export const ObjectUniformNames = {
     OBJECT_POSITION: "object_position",
@@ -26,7 +26,7 @@ export const ObjectUniformNames = {
     OBJECT_SCALING_DETERMINANT: "object_scaling_determinant"
 };
 
-export function setObjectUniforms(effect: Effect, object: Transformable & BoundingSphere): void {
+export function setObjectUniforms(effect: Effect, object: Transformable & HasBoundingSphere): void {
     effect.setVector3(ObjectUniformNames.OBJECT_POSITION, object.getTransform().getAbsolutePosition());
     effect.setFloat(ObjectUniformNames.OBJECT_RADIUS, object.getBoundingRadius());
     effect.setVector3(ObjectUniformNames.OBJECT_ROTATION_AXIS, object.getTransform().up);

@@ -16,44 +16,34 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Direction } from "../../utils/direction";
-
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
-
 import { TelluricPlanetMaterial } from "./telluricPlanetMaterial";
-import { waterBoilingPointCelsius } from "../../utils/waterMechanics";
-import { TelluricPlanetModel } from "./telluricPlanetModel";
+import { TelluricPlanetaryMassObjectModel } from "./telluricPlanetaryMassObjectModel";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { ChunkTree } from "./terrain/chunks/chunkTree";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Transformable } from "../../architecture/transformable";
 import { ChunkForge } from "./terrain/chunks/chunkForge";
-import { Planet } from "../../architecture/planet";
+import { PlanetaryMassObject } from "../../architecture/planetaryMassObject";
 import { Cullable } from "../../utils/cullable";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { OrbitProperties } from "../../orbit/orbitProperties";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
-import { CelestialBody } from "../../architecture/celestialBody";
 import { RingsUniforms } from "../../rings/ringsUniform";
-import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import { rotate } from "../../uberCore/transforms/basicTransform";
-import i18n from "../../i18n";
 import { CloudsUniforms } from "../../clouds/cloudsUniforms";
 import { Scene } from "@babylonjs/core/scene";
-import { BodyType } from "../../architecture/bodyType";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
-import { StarSystemModel } from "../../starSystem/starSystemModel";
+import { orbitalObjectTypeToDisplay } from "../../utils/strings/orbitalObjectTypeToDisplay";
 
-export class TelluricPlanet implements Planet, Cullable {
-    readonly name: string;
-
+export class TelluricPlanet implements PlanetaryMassObject, Cullable {
     readonly sides: ChunkTree[]; // stores the 6 sides of the sphere
 
     readonly material: TelluricPlanetMaterial;
 
-    readonly model: TelluricPlanetModel;
+    readonly model: TelluricPlanetaryMassObjectModel;
 
     private readonly transform: TransformNode;
     readonly aggregate: PhysicsAggregate;
@@ -61,29 +51,21 @@ export class TelluricPlanet implements Planet, Cullable {
     readonly postProcesses: PostProcessType[] = [];
 
     readonly ringsUniforms: RingsUniforms | null;
-    private readonly asteroidField: AsteroidField | null;
+    readonly asteroidField: AsteroidField | null;
 
     readonly cloudsUniforms: CloudsUniforms | null;
-
-    readonly parent: CelestialBody | null;
 
     /**
      * New Telluric Planet
      * @param model The model to build the planet or a seed for the planet in [-1, 1]
-     * @param starSystemModel The model of the star system the planet is in
      * @param scene
-     * @param parentBody
      */
-    constructor(model: TelluricPlanetModel | number, starSystemModel: StarSystemModel, scene: Scene, parentBody: CelestialBody | null = null) {
-        this.parent = parentBody;
+    constructor(model: TelluricPlanetaryMassObjectModel, scene: Scene) {
+        this.model = model;
 
-        this.model = model instanceof TelluricPlanetModel ? model : new TelluricPlanetModel(model, starSystemModel, parentBody?.model);
+        this.transform = new TransformNode(this.model.name, scene);
 
-        this.name = this.model.name;
-
-        this.transform = new TransformNode(this.name, scene);
-
-        rotate(this.transform, Axis.X, this.model.physicalProperties.axialTilt);
+        rotate(this.transform, Axis.X, this.model.physics.axialTilt);
         this.transform.computeWorldMatrix(true);
 
         this.aggregate = new PhysicsAggregate(
@@ -102,19 +84,8 @@ export class TelluricPlanet implements Planet, Cullable {
 
         this.postProcesses.push(PostProcessType.SHADOW);
 
-        const waterBoilingPoint = waterBoilingPointCelsius(this.model.physicalProperties.pressure);
-        const waterFreezingPoint = 0.0;
-        const epsilon = 0.05;
-        if (this.model.physicalProperties.pressure > epsilon) {
-            if (waterFreezingPoint > this.model.physicalProperties.minTemperature && waterFreezingPoint < this.model.physicalProperties.maxTemperature) {
-                this.postProcesses.push(PostProcessType.OCEAN);
-            } else {
-                this.model.physicalProperties.oceanLevel = 0;
-            }
-            this.postProcesses.push(PostProcessType.ATMOSPHERE);
-        } else {
-            this.model.physicalProperties.oceanLevel = 0;
-        }
+        if (this.model.physics.oceanLevel > 0) this.postProcesses.push(PostProcessType.OCEAN);
+        if (this.model.physics.pressure > 0.05) this.postProcesses.push(PostProcessType.ATMOSPHERE);
 
         if (this.model.rings !== null) {
             this.postProcesses.push(PostProcessType.RING);
@@ -122,7 +93,7 @@ export class TelluricPlanet implements Planet, Cullable {
 
             const averageRadius = (this.model.radius * (this.model.rings.ringStart + this.model.rings.ringEnd)) / 2;
             const spread = (this.model.radius * (this.model.rings.ringEnd - this.model.rings.ringStart)) / 2;
-            this.asteroidField = new AsteroidField(this.model.rng(84133), this.getTransform(), averageRadius, spread, scene);
+            this.asteroidField = new AsteroidField(this.model.rings.seed, this.getTransform(), averageRadius, spread, scene);
         } else {
             this.ringsUniforms = null;
             this.asteroidField = null;
@@ -135,15 +106,15 @@ export class TelluricPlanet implements Planet, Cullable {
             this.cloudsUniforms = null;
         }
 
-        this.material = new TelluricPlanetMaterial(this.name, this.getTransform(), this.model, scene);
+        this.material = new TelluricPlanetMaterial(this.model, scene);
 
         this.sides = [
-            new ChunkTree(Direction.UP, this.name, this.model, this.aggregate, this.material, scene),
-            new ChunkTree(Direction.DOWN, this.name, this.model, this.aggregate, this.material, scene),
-            new ChunkTree(Direction.FORWARD, this.name, this.model, this.aggregate, this.material, scene),
-            new ChunkTree(Direction.BACKWARD, this.name, this.model, this.aggregate, this.material, scene),
-            new ChunkTree(Direction.RIGHT, this.name, this.model, this.aggregate, this.material, scene),
-            new ChunkTree(Direction.LEFT, this.name, this.model, this.aggregate, this.material, scene)
+            new ChunkTree(Direction.UP, this.model, this.aggregate, this.material, scene),
+            new ChunkTree(Direction.DOWN, this.model, this.aggregate, this.material, scene),
+            new ChunkTree(Direction.FORWARD, this.model, this.aggregate, this.material, scene),
+            new ChunkTree(Direction.BACKWARD, this.model, this.aggregate, this.material, scene),
+            new ChunkTree(Direction.RIGHT, this.model, this.aggregate, this.material, scene),
+            new ChunkTree(Direction.LEFT, this.model, this.aggregate, this.material, scene)
         ];
     }
 
@@ -155,31 +126,12 @@ export class TelluricPlanet implements Planet, Cullable {
         return this.getTransform().up;
     }
 
-    getOrbitProperties(): OrbitProperties {
-        return this.model.orbit;
-    }
-
-    getPhysicalProperties(): OrbitalObjectPhysicalProperties {
-        return this.model.physicalProperties;
-    }
-
-    getRingsUniforms(): RingsUniforms | null {
-        return this.ringsUniforms;
-    }
-
-    getAsteroidField(): AsteroidField | null {
-        return this.asteroidField;
-    }
-
     getCloudsUniforms(): CloudsUniforms | null {
         return this.cloudsUniforms;
     }
 
     getTypeName(): string {
-        if (this.parent?.model.bodyType === BodyType.TELLURIC_PLANET || this.parent?.model.bodyType === BodyType.GAS_PLANET) {
-            return i18n.t("objectTypes:telluricMoon");
-        }
-        return i18n.t("objectTypes:telluricPlanet");
+        return orbitalObjectTypeToDisplay(this.model);
     }
 
     /**
@@ -192,7 +144,7 @@ export class TelluricPlanet implements Planet, Cullable {
     }
 
     public updateMaterial(stellarObjects: Transformable[], deltaSeconds: number): void {
-        this.material.update(stellarObjects);
+        this.material.update(this.getTransform().getWorldMatrix(), stellarObjects);
     }
 
     public getRadius(): number {
@@ -200,7 +152,7 @@ export class TelluricPlanet implements Planet, Cullable {
     }
 
     public getBoundingRadius(): number {
-        return this.getRadius() + this.model.physicalProperties.oceanLevel;
+        return this.getRadius() + this.model.physics.oceanLevel;
     }
 
     public computeCulling(cameras: Camera[]): void {
@@ -208,7 +160,12 @@ export class TelluricPlanet implements Planet, Cullable {
     }
 
     public dispose(): void {
-        for (const side of this.sides) side.dispose();
+        this.sides.forEach((side) => side.dispose());
+        this.sides.length = 0;
+
+        this.cloudsUniforms?.dispose();
+        this.ringsUniforms?.dispose();
+
         this.material.dispose();
         this.aggregate.dispose();
         this.transform.dispose();

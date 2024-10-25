@@ -1,8 +1,9 @@
-import { pressInteractionToStrings } from "../../utils/inputControlsString";
+import { pressInteractionToStrings } from "../../utils/strings/inputControlsString";
 import { TutorialControlsInputs } from "./tutorialLayerInputs";
 import i18n from "../../i18n";
 import { Sounds } from "../../assets/sounds";
 import { IDisposable } from "@babylonjs/core/scene";
+import { getGlobalKeyboardLayoutMap } from "../../utils/keyboardAPI";
 
 export class TutorialLayer implements IDisposable {
     private readonly layerRoot: HTMLDivElement;
@@ -49,35 +50,37 @@ export class TutorialLayer implements IDisposable {
         stopButtonTextSpan.innerText = i18n.t("tutorials:common:quit");
         this.quitButton.appendChild(stopButtonTextSpan);
 
-        pressInteractionToStrings(TutorialControlsInputs.map.quitTutorial, null).forEach((key) => {
-            const stopKeySpan = document.createElement("span");
-            stopKeySpan.classList.add("keySpan");
-            stopKeySpan.innerText = key;
-            this.quitButton.appendChild(stopKeySpan);
-        });
-
         this.prevButton = document.createElement("p");
         const prevButtonTextSpan = document.createElement("span");
         prevButtonTextSpan.innerText = i18n.t("tutorials:common:previous");
         this.prevButton.appendChild(prevButtonTextSpan);
-
-        pressInteractionToStrings(TutorialControlsInputs.map.prevPanel, null).forEach((key) => {
-            const prevKeySpan = document.createElement("span");
-            prevKeySpan.classList.add("keySpan");
-            prevKeySpan.innerText = key;
-            this.prevButton.appendChild(prevKeySpan);
-        });
 
         this.nextButton = document.createElement("p");
         const nextButtonTextSpan = document.createElement("span");
         nextButtonTextSpan.innerText = i18n.t("tutorials:common:next");
         this.nextButton.appendChild(nextButtonTextSpan);
 
-        pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, null).forEach((key) => {
-            const nextKeySpan = document.createElement("span");
-            nextKeySpan.classList.add("keySpan");
-            nextKeySpan.innerText = key;
-            this.nextButton.appendChild(nextKeySpan);
+        getGlobalKeyboardLayoutMap().then((keyboardLayoutMap) => {
+            pressInteractionToStrings(TutorialControlsInputs.map.quitTutorial, keyboardLayoutMap).forEach((key) => {
+                const stopKeySpan = document.createElement("span");
+                stopKeySpan.classList.add("keySpan");
+                stopKeySpan.innerText = key;
+                this.quitButton.appendChild(stopKeySpan);
+            });
+
+            pressInteractionToStrings(TutorialControlsInputs.map.prevPanel, keyboardLayoutMap).forEach((key) => {
+                const prevKeySpan = document.createElement("span");
+                prevKeySpan.classList.add("keySpan");
+                prevKeySpan.innerText = key;
+                this.prevButton.appendChild(prevKeySpan);
+            });
+
+            pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keyboardLayoutMap).forEach((key) => {
+                const nextKeySpan = document.createElement("span");
+                nextKeySpan.classList.add("keySpan");
+                nextKeySpan.innerText = key;
+                this.nextButton.appendChild(nextKeySpan);
+            });
         });
 
         this.controls.appendChild(this.quitButton);

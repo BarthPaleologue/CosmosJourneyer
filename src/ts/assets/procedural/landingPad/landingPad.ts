@@ -10,7 +10,7 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { CollisionMask, Settings } from "../../../settings";
 import { TypedObject } from "../../../architecture/typedObject";
 import i18n from "../../../i18n";
-import { BoundingSphere } from "../../../architecture/boundingSphere";
+import { HasBoundingSphere } from "../../../architecture/hasBoundingSphere";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { Objects } from "../../objects";
 
@@ -20,7 +20,7 @@ export const enum LandingPadSize {
     LARGE = 3
 }
 
-export class LandingPad implements Transformable, TypedObject, BoundingSphere {
+export class LandingPad implements Transformable, TypedObject, HasBoundingSphere {
     private readonly deck: Mesh;
     private readonly deckAggregate: PhysicsAggregate;
 
@@ -45,7 +45,15 @@ export class LandingPad implements Transformable, TypedObject, BoundingSphere {
 
         this.deckMaterial = new LandingPadMaterial(padNumber, scene);
 
-        this.deck = MeshBuilder.CreateBox(`Landing Pad ${padNumber}`, { width: width, depth: depth, height: 0.5 }, scene);
+        this.deck = MeshBuilder.CreateBox(
+            `Landing Pad ${padNumber}`,
+            {
+                width: width,
+                depth: depth,
+                height: 0.5
+            },
+            scene
+        );
         this.deck.material = this.deckMaterial;
 
         this.deckAggregate = new PhysicsAggregate(this.deck, PhysicsShapeType.BOX, { mass: 0, friction: 10 }, scene);
@@ -83,8 +91,13 @@ export class LandingPad implements Transformable, TypedObject, BoundingSphere {
         }
     }
 
-    update(stellarObjects: Transformable[]): void {
+    update(stellarObjects: Transformable[], cameraWorldPosition: Vector3): void {
         this.deckMaterial.update(stellarObjects);
+
+        const padCameraDistance2 = Vector3.DistanceSquared(cameraWorldPosition, this.deck.getAbsolutePosition());
+        const distanceThreshold = 12e3;
+        const isEnabled = padCameraDistance2 < distanceThreshold * distanceThreshold;
+        this.getTransform().setEnabled(isEnabled);
     }
 
     getTransform(): TransformNode {

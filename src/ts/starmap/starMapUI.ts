@@ -16,24 +16,21 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { Animation } from "@babylonjs/core/Animations/animation";
 import { Scene } from "@babylonjs/core/scene";
-import { Settings } from "../settings";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import i18n from "../i18n";
-import { getStellarTypeString } from "../stellarObjects/common";
-import { SeededStarSystemModel } from "../starSystem/seededStarSystemModel";
-import { StarModel } from "../stellarObjects/star/starModel";
-import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
-import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
-import { BodyType } from "../architecture/bodyType";
-import { getStarGalacticCoordinates } from "../utils/getStarGalacticCoordinates";
-import { parseDistance } from "../utils/parseToStrings";
-import { placeSpaceStations } from "../society/spaceStationPlacement";
-import { SpaceStationModel } from "../spacestation/spacestationModel";
-import { getSpaceStationSeed } from "../planets/common";
-import { factionToString } from "../powerplay/factions";
+import { getStarGalacticPosition } from "../utils/coordinates/starSystemCoordinatesUtils";
+import { factionToString } from "../society/factions";
 import { isSystemInHumanBubble } from "../society/starSystemSociety";
+import { StarMapBookmarkButton } from "./starMapBookmarkButton";
+import { Player } from "../player/player";
+import { SystemIcons } from "./systemIcons";
+import { getRgbFromTemperature } from "../utils/specrend";
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/universeCoordinates";
+import { getSystemModelFromCoordinates } from "../starSystem/modelFromCoordinates";
+import { StarSystemModelUtils } from "../starSystem/starSystemModel";
+
+import { orbitalObjectTypeToDisplay } from "../utils/strings/orbitalObjectTypeToDisplay";
 
 export class StarMapUI {
     readonly htmlRoot: HTMLDivElement;
@@ -65,19 +62,23 @@ export class StarMapUI {
     readonly shortHandUIFactions: HTMLDivElement;
     readonly shortHandUIButtonContainer: HTMLDivElement;
     readonly shortHandUIPlotItineraryButton: HTMLButtonElement;
-    readonly shortHandUIBookmarkButton: HTMLButtonElement;
+    readonly shortHandUIBookmarkButton: StarMapBookmarkButton;
 
     private selectedMesh: AbstractMesh | null = null;
     private hoveredMesh: AbstractMesh | null = null;
     private currentMesh: AbstractMesh | null = null;
 
-    static ALPHA_ANIMATION = new Animation("alphaAnimation", "alpha", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
+    private systemIcons: SystemIcons[] = [];
 
     private readonly scene: Scene;
 
-    constructor(scene: Scene) {
+    private readonly player: Player;
+
+    constructor(scene: Scene, player: Player) {
         this.scene = scene;
         this.scene.hoverCursor = "none";
+
+        this.player = player;
 
         this.htmlRoot = document.createElement("div");
         this.htmlRoot.classList.add("starMapUI");
@@ -156,9 +157,9 @@ export class StarMapUI {
         this.nbSpaceStations.classList.add("starMapInfoPanelNbSpaceStations");
         this.humanPresence.appendChild(this.nbSpaceStations);
 
-        this.factions = document.createElement("div");
+        this.factions = document.createElement("p");
         this.factions.classList.add("starMapInfoPanelFactions");
-        this.infoPanel.appendChild(this.factions);
+        this.humanPresence.appendChild(this.factions);
 
         this.cursor = document.createElement("div");
         this.cursor.classList.add("cursor");
@@ -189,17 +190,15 @@ export class StarMapUI {
         this.shortHandUIPlotItineraryButton.textContent = i18n.t("starMap:plotItinerary");
         this.shortHandUIButtonContainer.appendChild(this.shortHandUIPlotItineraryButton);
 
-        this.shortHandUIBookmarkButton = document.createElement("button");
-        this.shortHandUIBookmarkButton.classList.add("bookmarkButton");
-        this.shortHandUIBookmarkButton.textContent = i18n.t("starMap:bookmark");
-        this.shortHandUIButtonContainer.appendChild(this.shortHandUIBookmarkButton);
+        this.shortHandUIBookmarkButton = new StarMapBookmarkButton(player);
+        this.shortHandUIButtonContainer.appendChild(this.shortHandUIBookmarkButton.rootNode);
 
         document.addEventListener("pointermove", (event) => {
             this.cursor.style.transform = `translate(calc(${event.clientX}px - 50%), calc(${event.clientY}px - 50%))`;
         });
     }
 
-    update(playerPosition: Vector3) {
+    update(playerPosition: Vector3, centerOfUniversePosition: Vector3) {
         const width = this.scene.getEngine().getRenderWidth();
         const height = this.scene.getEngine().getRenderHeight();
 
@@ -208,11 +207,29 @@ export class StarMapUI {
             throw new Error("No active camera found");
         }
 
+        this.rebuildSystemIcons();
+
+        this.systemIcons.forEach((systemIcons) => {
+            const systemPosition = getStarGalacticPosition(systemIcons.systemCoordinates);
+            const systemUniversePosition = systemPosition.add(centerOfUniversePosition);
+            const screenCoordinates = Vector3.Project(systemUniversePosition, Matrix.IdentityReadOnly, camera.getTransformationMatrix(), camera.viewport);
+            systemIcons.htmlRoot.classList.toggle("transparent", screenCoordinates.z < 0);
+            systemIcons.htmlRoot.style.left = `${screenCoordinates.x * 100}vw`;
+            systemIcons.htmlRoot.style.top = `${screenCoordinates.y * 100}vh`;
+
+            const distance = Vector3.Distance(systemUniversePosition, playerPosition);
+            const offsetX = Math.max(40.0 / distance, 3);
+            systemIcons.htmlRoot.style.transform = `translate(calc(-50% - ${offsetX}vw), -50%)`;
+        });
+
+        // disable the plot itinerary button if the selected mesh is the current mesh
+        this.shortHandUIPlotItineraryButton.disabled = this.selectedMesh === this.currentMesh;
+
         const scalingBase = 100;
         const minScale = 5.0;
         if (this.selectedMesh !== null) {
             const selectedMeshScreenCoordinates = Vector3.Project(this.selectedMesh.position, Matrix.IdentityReadOnly, camera.getTransformationMatrix(), camera.viewport);
-            this.selectedSystemCursor.classList.toggle("transparent", selectedMeshScreenCoordinates.z < 0);
+            this.selectedSystemCursor.classList.toggle("transparent", selectedMeshScreenCoordinates.z < 0 || this.selectedMesh === this.currentMesh);
             this.selectedSystemCursorContainer.style.left = `${selectedMeshScreenCoordinates.x * 100}vw`;
             this.selectedSystemCursorContainer.style.top = `${selectedMeshScreenCoordinates.y * 100}vh`;
 
@@ -230,7 +247,7 @@ export class StarMapUI {
             this.selectedSystemCursor.classList.add("transparent");
         }
 
-        if (this.hoveredMesh !== null) {
+        if (this.hoveredMesh !== null && this.hoveredMesh !== this.currentMesh) {
             const meshScreenCoordinates = Vector3.Project(this.hoveredMesh.position, Matrix.IdentityReadOnly, camera.getTransformationMatrix(), camera.viewport);
             this.hoveredSystemCursor.classList.toggle("transparent", meshScreenCoordinates.z < 0);
             this.hoveredSystemCursorContainer.style.left = `${meshScreenCoordinates.x * 100}vw`;
@@ -258,7 +275,6 @@ export class StarMapUI {
     }
 
     setSelectedMesh(mesh: AbstractMesh) {
-        if (mesh === this.currentMesh) return;
         const camera = this.scene.activeCamera;
         if (camera === null) {
             throw new Error("No active camera found");
@@ -284,63 +300,38 @@ export class StarMapUI {
         return this.hoveredMesh;
     }
 
-    setSelectedSystem(targetSystemModel: SeededStarSystemModel, currentSystemModel: SeededStarSystemModel | null) {
-        const targetCoordinates = getStarGalacticCoordinates(targetSystemModel.seed);
+    setSelectedSystem(targetSystemCoordinates: StarSystemCoordinates, currentSystemCoordinates: StarSystemCoordinates | null) {
+        const targetPosition = getStarGalacticPosition(targetSystemCoordinates);
 
-        let text = "";
-        if (currentSystemModel !== null) {
-            const currentCoordinates = getStarGalacticCoordinates(currentSystemModel.seed);
+        const targetSystemModel = getSystemModelFromCoordinates(targetSystemCoordinates);
 
-            const distance = Vector3.Distance(currentCoordinates, targetCoordinates) * Settings.LIGHT_YEAR;
-            text += `${i18n.t("starMap:distance")}: ${parseDistance(distance)}\n`;
-
-            this.shortHandUIDistanceFromCurrent.textContent = `${i18n.t("starMap:distanceFromCurrent")}: ${Vector3.Distance(currentCoordinates, targetCoordinates).toFixed(1)} ${i18n.t("units:ly")}`;
+        if (currentSystemCoordinates !== null) {
+            const currentCoordinates = getStarGalacticPosition(currentSystemCoordinates);
+            this.shortHandUIDistanceFromCurrent.textContent = `${i18n.t("starMap:distanceFromCurrent")}: ${Vector3.Distance(currentCoordinates, targetPosition).toFixed(1)} ${i18n.t("units:ly")}`;
         }
 
-        const starSeed = targetSystemModel.getStellarObjectSeed(0);
-        const stellarObjectType = targetSystemModel.getBodyTypeOfStellarObject(0);
+        //TODO: when implementing binary star systems, this will need to be updated to display all stellar objects and not just the first one
+        const starModel = StarSystemModelUtils.GetStellarObjects(targetSystemModel)[0];
 
-        let starModel: StarModel | BlackHoleModel | NeutronStarModel;
-        switch (stellarObjectType) {
-            case BodyType.STAR:
-                starModel = new StarModel(starSeed, targetSystemModel);
-                break;
-            case BodyType.BLACK_HOLE:
-                starModel = new BlackHoleModel(starSeed, targetSystemModel);
-                break;
-            case BodyType.NEUTRON_STAR:
-                starModel = new NeutronStarModel(starSeed, targetSystemModel);
-                break;
-            default:
-                throw new Error("Unknown stellar object type!");
-        }
+        this.shortHandUISystemType.textContent = orbitalObjectTypeToDisplay(starModel);
+        this.shortHandUIBookmarkButton.setSelectedSystemSeed(targetSystemModel.coordinates);
 
-        let typeString = "";
-        if (starModel.bodyType === BodyType.BLACK_HOLE) typeString = i18n.t("objectTypes:blackHole");
-        else if (starModel.bodyType === BodyType.NEUTRON_STAR) typeString = i18n.t("objectTypes:neutronStar");
-        else typeString = i18n.t("objectTypes:star", { stellarType: getStellarTypeString(starModel.stellarType) });
-
-        this.shortHandUISystemType.textContent = typeString;
-
-        if (starModel instanceof StarModel) {
-            this.infoPanelStarPreview.style.background = starModel.color.toHexString();
-            this.infoPanelStarPreview.style.boxShadow = `0 0 20px ${starModel.color.toHexString()}`;
-        }
+        const objectColor = getRgbFromTemperature(starModel.physics.blackBodyTemperature);
+        this.infoPanelStarPreview.style.background = objectColor.toHexString();
+        this.infoPanelStarPreview.style.boxShadow = `0 0 20px ${objectColor.toHexString()}`;
 
         this.infoPanelTitle.textContent = targetSystemModel.name;
         this.shortHandUITitle.textContent = targetSystemModel.name;
 
-        this.starSector.textContent = `X:${targetSystemModel.seed.starSectorX} Y:${targetSystemModel.seed.starSectorY} Z:${targetSystemModel.seed.starSectorZ} I:${targetSystemModel.seed.index}`;
+        this.starSector.innerText = `X:${targetSystemModel.coordinates.starSectorX} Y:${targetSystemModel.coordinates.starSectorY} Z:${targetSystemModel.coordinates.starSectorZ}
+            x:${targetSystemModel.coordinates.localX.toFixed(2)} y:${targetSystemModel.coordinates.localY.toFixed(2)} z:${targetSystemModel.coordinates.localZ.toFixed(2)}`;
 
-        this.nbPlanets.textContent = `${i18n.t("starMap:planets")}: ${targetSystemModel.getNbPlanets()}`;
+        this.nbPlanets.textContent = `${i18n.t("starMap:planets")}: ${StarSystemModelUtils.GetPlanets(targetSystemModel).length}`;
 
-        this.distanceToSol.textContent = `${i18n.t("starMap:distanceToSol")}: ${Vector3.Distance(targetCoordinates, Vector3.Zero()).toFixed(1)} ${i18n.t("units:ly")}`;
+        this.distanceToSol.textContent = `${i18n.t("starMap:distanceToSol")}: ${Vector3.Distance(targetPosition, Vector3.Zero()).toFixed(1)} ${i18n.t("units:ly")}`;
 
-        if (isSystemInHumanBubble(targetSystemModel.seed)) {
-            const spaceStationParents = placeSpaceStations(targetSystemModel);
-            const spaceStations = spaceStationParents.map((planet) => {
-                return new SpaceStationModel(getSpaceStationSeed(planet, 0), targetSystemModel, planet);
-            });
+        if (isSystemInHumanBubble(targetSystemModel.coordinates)) {
+            const spaceStations = StarSystemModelUtils.GetSpaceStations(targetSystemModel);
 
             this.nbSpaceStations.textContent = `${i18n.t("starMap:spaceStations")}: ${spaceStations.length}`;
 
@@ -363,6 +354,40 @@ export class StarMapUI {
 
     detachUIFromMesh() {
         this.selectedMesh = null;
+    }
+
+    rebuildSystemIcons() {
+        const bookmarkedSystems = this.player.systemBookmarks;
+        const targetSystems = this.player.currentMissions.flatMap((mission) => mission.getTargetSystems());
+
+        const systemsWithIcons = bookmarkedSystems
+            // add target systems to the list of systems with icons
+            .concat(targetSystems)
+            // remove duplicates
+            .filter((value, index, self) => self.findIndex((v) => starSystemCoordinatesEquals(v, value)) === index);
+
+        const systemIconsToKeep: SystemIcons[] = [];
+
+        this.systemIcons.forEach((systemIcons) => {
+            const system = systemIcons.systemCoordinates;
+            if (!systemsWithIcons.includes(system)) {
+                systemIcons.dispose();
+                return;
+            }
+
+            systemIcons.update(SystemIcons.IconMaskForSystem(system, bookmarkedSystems, targetSystems));
+
+            systemIconsToKeep.push(systemIcons);
+            systemsWithIcons.splice(systemsWithIcons.indexOf(system), 1);
+        });
+
+        this.systemIcons = systemIconsToKeep;
+
+        systemsWithIcons.forEach((system) => {
+            const icon = new SystemIcons(system, SystemIcons.IconMaskForSystem(system, bookmarkedSystems, targetSystems));
+            this.htmlRoot.appendChild(icon.htmlRoot);
+            this.systemIcons.push(icon);
+        });
     }
 
     dispose() {

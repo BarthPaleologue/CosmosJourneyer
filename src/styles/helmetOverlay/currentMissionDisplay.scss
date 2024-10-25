@@ -1,0 +1,70 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Affero General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Affero General Public License for more details.
+//
+//  You should have received a copy of the GNU Affero General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+.currentMissionDisplay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 30vw;
+
+  display: flex;
+  flex-direction: column;
+
+  background: rgba(0, 0, 0, 0.5);
+  transition: $transition-time;
+
+  &.completed {
+    background: rgba(0, 64, 0, 0.5);
+  }
+
+  .missionPanel {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+
+    h2 {
+      color: white;
+    }
+    p {
+      color: white;
+    }
+  }
+
+  .buttonContainer {
+    display: flex;
+    justify-content: center;
+    column-gap: 10px;
+
+    p {
+      background: white;
+      color: black;
+      border: none;
+      padding: 0.5vw 0.3vw;
+      cursor: pointer;
+
+      span {
+        padding: 0.3vw;
+
+        &.keySpan {
+          font-weight: bold;
+          background: rgba(0, 0, 0, 0.3);
+          font-size: calc(var(--text-size) * 0.75);
+        }
+      }
+    }
+  }
+}

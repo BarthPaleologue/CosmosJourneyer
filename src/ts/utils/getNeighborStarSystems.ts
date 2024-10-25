@@ -1,23 +1,18 @@
-import { getStarGalacticCoordinates } from "./getStarGalacticCoordinates";
-import { SystemSeed } from "./systemSeed";
+import { getStarGalacticPosition } from "./coordinates/starSystemCoordinatesUtils";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { StarSector } from "../starmap/starSector";
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "./coordinates/universeCoordinates";
+import { Settings } from "../settings";
 
-/**
- * Finds all systems within a given radius of the given system.
- * @param seed The seed of the system.
- * @param radius The radius of the search in light years.
- * @returns An array of tuples containing the seed of the system, the galactic coordinates of the system, and the distance to the system.
- */
-export function getNeighborStarSystems(seed: SystemSeed, radius: number): [SystemSeed, Vector3, number][] {
-    const currentSystemCoordinates = getStarGalacticCoordinates(seed);
-    const starSectorSize = StarSector.SIZE;
+export function getNeighborStarSystemCoordinates(starSystemCoordinates: StarSystemCoordinates, radius: number): [StarSystemCoordinates, Vector3, number][] {
+    const currentSystemPosition = getStarGalacticPosition(starSystemCoordinates);
+    const starSectorSize = Settings.STAR_SECTOR_SIZE;
     const starSectorRadius = Math.ceil(radius / starSectorSize);
 
     const starSectors: StarSector[] = [];
-    for (let x = seed.starSectorX - starSectorRadius; x <= seed.starSectorX + starSectorRadius; x++) {
-        for (let y = seed.starSectorY - starSectorRadius; y <= seed.starSectorY + starSectorRadius; y++) {
-            for (let z = seed.starSectorZ - starSectorRadius; z <= seed.starSectorZ + starSectorRadius; z++) {
+    for (let x = starSystemCoordinates.starSectorX - starSectorRadius; x <= starSystemCoordinates.starSectorX + starSectorRadius; x++) {
+        for (let y = starSystemCoordinates.starSectorY - starSectorRadius; y <= starSystemCoordinates.starSectorY + starSectorRadius; y++) {
+            for (let z = starSystemCoordinates.starSectorZ - starSectorRadius; z <= starSystemCoordinates.starSectorZ + starSectorRadius; z++) {
                 starSectors.push(new StarSector(new Vector3(x, y, z)));
             }
         }
@@ -25,13 +20,25 @@ export function getNeighborStarSystems(seed: SystemSeed, radius: number): [Syste
 
     return starSectors.flatMap((starSector) => {
         const starPositions = starSector.getPositionOfStars();
+        const starLocalPositions = starSector.getLocalPositionsOfStars();
         return starPositions
-            .map<[SystemSeed, Vector3, number]>((position, index) => {
-                const distance = Vector3.Distance(position, currentSystemCoordinates);
-                return [new SystemSeed(starSector.coordinates.x, starSector.coordinates.y, starSector.coordinates.z, index), position, distance];
+            .map<[StarSystemCoordinates, Vector3, number]>((position, index) => {
+                const distance = Vector3.Distance(position, currentSystemPosition);
+                return [
+                    {
+                        starSectorX: starSector.coordinates.x,
+                        starSectorY: starSector.coordinates.y,
+                        starSectorZ: starSector.coordinates.z,
+                        localX: starLocalPositions[index].x,
+                        localY: starLocalPositions[index].y,
+                        localZ: starLocalPositions[index].z
+                    },
+                    position,
+                    distance
+                ];
             })
-            .filter(([neighborSeed, position, distance]) => {
-                return distance <= radius && neighborSeed.hash !== seed.hash;
+            .filter(([neighborCoordinates, position, distance]) => {
+                return distance <= radius && !starSystemCoordinatesEquals(neighborCoordinates, starSystemCoordinates);
             });
     });
 }

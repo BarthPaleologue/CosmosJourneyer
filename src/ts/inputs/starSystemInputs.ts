@@ -48,6 +48,12 @@ const cycleViewsAction = new Action({
 
 const cycleViewsInteraction = new PressInteraction(cycleViewsAction);
 
+const printDebugInfoInteraction = new PressInteraction(
+    new Action({
+        bindings: [keyboard.getControl("Numpad0")]
+    })
+);
+
 export const StarSystemInputs = new InputMap<{
     setTarget: PressInteraction;
     toggleSpaceShipCharacter: PressInteraction;
@@ -56,6 +62,7 @@ export const StarSystemInputs = new InputMap<{
     toggleOrbitsAndAxis: PressInteraction;
     cycleViews: PressInteraction;
     toggleDebugUi: PressInteraction;
+    printDebugInfo: PressInteraction;
 }>("StarSystemInputs", {
     setTarget: setTargetInteraction,
     toggleSpaceShipCharacter: toggleSpaceShipCharacterInteraction,
@@ -63,5 +70,6 @@ export const StarSystemInputs = new InputMap<{
     toggleUi: toggleUiInteraction,
     toggleOrbitsAndAxis: toggleOrbitsAndAxisInteraction,
     cycleViews: cycleViewsInteraction,
-    toggleDebugUi: toggleDebugUiInteraction
+    toggleDebugUi: toggleDebugUiInteraction,
+    printDebugInfo: printDebugInfoInteraction
 });

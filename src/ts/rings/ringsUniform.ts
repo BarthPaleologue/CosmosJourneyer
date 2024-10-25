@@ -36,7 +36,7 @@ export const RingsSamplerNames = {
 };
 
 export class RingsUniforms {
-    private lut: ProceduralTexture | null = null;
+    private readonly lut: ProceduralTexture;
     private lutReady = false;
 
     readonly model: RingsModel;
@@ -60,7 +60,7 @@ export class RingsUniforms {
             true,
             false
         );
-        this.lut.setFloat("seed", model.offset);
+        this.lut.setFloat("seed", model.seed);
         this.lut.setFloat("frequency", model.ringFrequency);
         this.lut.setFloat("ringStart", model.ringStart);
         this.lut.setFloat("ringEnd", model.ringEnd);
@@ -97,5 +97,9 @@ export class RingsUniforms {
 
     public static SetEmptySamplers(effect: Effect) {
         effect.setTexture(RingsSamplerNames.RING_LUT, Textures.EMPTY_TEXTURE);
+    }
+
+    public dispose() {
+        this.lut.dispose();
     }
 }

@@ -25,10 +25,10 @@ import { Objects } from "../../objects";
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { CollisionMask } from "../../../settings";
-import { seededSquirrelNoise } from "squirrel-noise";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { getRngFromSeed } from "../../../utils/getRngFromSeed";
 
 export class UtilitySection implements Transformable {
     private readonly attachment: Mesh;
@@ -45,7 +45,7 @@ export class UtilitySection implements Transformable {
     constructor(seed: number, scene: Scene) {
         this.metalSectionMaterial = new MetalSectionMaterial(scene);
 
-        this.rng = seededSquirrelNoise(seed);
+        this.rng = getRngFromSeed(seed);
 
         this.attachment = MeshBuilder.CreateCylinder(
             "UtilitySectionRoot",

@@ -19,7 +19,6 @@ import "../styles/index.scss";
 
 import { CosmosJourneyer } from "./cosmosJourneyer";
 import { decodeBase64 } from "./utils/base64";
-import { isJsonStringValidUniverseCoordinates } from "./saveFile/universeCoordinates";
 
 const engine = await CosmosJourneyer.CreateAsync();
 
@@ -28,9 +27,6 @@ const universeCoordinatesString = urlParams.get("universeCoordinates");
 
 if (universeCoordinatesString !== null) {
     const jsonString = decodeBase64(universeCoordinatesString);
-    if (!isJsonStringValidUniverseCoordinates(jsonString)) {
-        alert("Invalid universe coordinates");
-    }
     engine.loadUniverseCoordinates(JSON.parse(jsonString));
 } else {
     engine.init(false);

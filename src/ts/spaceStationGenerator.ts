@@ -33,12 +33,9 @@ import HavokPhysics from "@babylonjs/havok";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { Star } from "./stellarObjects/star/star";
 import { Settings } from "./settings";
-import { SpaceStationModel } from "./spacestation/spacestationModel";
 import { StarFieldBox } from "./starSystem/starFieldBox";
-import { CustomStarSystemModel } from "./starSystem/customStarSystemModel";
-import { BodyType } from "./architecture/bodyType";
-import { StarSystemHelper } from "./starSystem/starSystemHelper";
-import { StarSystemController } from "./starSystem/starSystemController";
+import { newSeededStarModel } from "./stellarObjects/star/starModel";
+import { newSeededSpaceStationModel } from "./spacestation/spacestationModel";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -72,17 +69,25 @@ const distanceToStar = 25000 * Settings.EARTH_RADIUS;
 defaultControls.getTransform().setAbsolutePosition(new Vector3(0, 2, -3).normalize().scaleInPlace(40e3));
 defaultControls.getTransform().lookAt(Vector3.Zero());
 
-const starSystemModel = new CustomStarSystemModel("Space Station Generator", [[BodyType.STAR, 4413.641464990006]], [], []);
+const coordinates = {
+    starSectorX: 0,
+    starSectorY: 0,
+    starSectorZ: 0,
+    localX: 0,
+    localY: 0,
+    localZ: 0
+};
 
-const sun = new Star(starSystemModel.getStellarObjectSeed(0), starSystemModel, scene);
+const sunModel = newSeededStarModel(456, "Untitled Star", []);
+const sun = new Star(sunModel, scene);
 sun.getTransform().position = new Vector3(7, 2, 5).normalize().scaleInPlace(distanceToStar);
 
 const starfieldBox = new StarFieldBox(scene);
 
-const spaceStationModel = new SpaceStationModel(Math.random() * Settings.SEED_HALF_RANGE, starSystemModel, sun.model);
+const spaceStationModel = newSeededSpaceStationModel(Math.random() * Settings.SEED_HALF_RANGE, [sunModel], coordinates, [sunModel]);
 spaceStationModel.orbit.radius = distanceToStar;
 
-const spaceStation = new SpaceStation(spaceStationModel, starSystemModel, scene, sun);
+const spaceStation = new SpaceStation(spaceStationModel, scene);
 
 const ambient = new HemisphericLight("Sun", Vector3.Up(), scene);
 ambient.intensity = 0.1;

@@ -15,26 +15,32 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { SystemSeed } from "../src/ts/utils/systemSeed";
-import { getNeighborStarSystems } from "../src/ts/utils/getNeighborStarSystems";
+import { getNeighborStarSystemCoordinates } from "../src/ts/utils/getNeighborStarSystems";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-test("getNeighborStarSystems", () => {
-    const systemSeed = new SystemSeed(0, 0, 0, 0);
+import { starSystemCoordinatesEquals } from "../src/ts/utils/coordinates/universeCoordinates";
+import { getStarSystemCoordinatesFromSeed } from "../src/ts/starSystem/systemSeed";
+
+test("getNeighborStarSystemCoordinates", () => {
+    const systemCoordinates = getStarSystemCoordinatesFromSeed({
+        starSectorX: 0,
+        starSectorY: 0,
+        starSectorZ: 0,
+        index: 0
+    });
 
     for (let i = 0; i < 10; i++) {
         const searchRadius = 5 * i;
 
-        const neighbors = getNeighborStarSystems(systemSeed, searchRadius);
+        const neighbors = getNeighborStarSystemCoordinates(systemCoordinates, searchRadius);
         neighbors.forEach((neighbor) => {
-            const [seed, position, distance] = neighbor;
-            expect(seed).toBeInstanceOf(SystemSeed);
+            const [starSystemCoordinates, position, distance] = neighbor;
             expect(position).toBeInstanceOf(Vector3);
             expect(distance).toBeGreaterThan(0);
             expect(distance).toBeLessThanOrEqual(searchRadius);
 
             // Check that the neighbor is not the system itself
-            expect(seed.hash).not.toEqual(systemSeed.hash);
+            expect(starSystemCoordinatesEquals(starSystemCoordinates, systemCoordinates)).toBe(false);
         });
     }
 });

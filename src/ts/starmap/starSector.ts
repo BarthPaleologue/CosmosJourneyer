@@ -16,21 +16,22 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { hashVec3 } from "../utils/hashVec3";
-import { seededSquirrelNoise } from "squirrel-noise";
 import { centeredRand } from "extended-random";
-import { UniverseDensity } from "../settings";
+import { Settings, UniverseDensity } from "../settings";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { BoundingBox } from "@babylonjs/core/Culling/boundingBox";
-import { SystemSeed } from "../utils/systemSeed";
+
+import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates";
+import { getRngFromSeed } from "../utils/getRngFromSeed";
+import { CustomSystemRegistry } from "../starSystem/customSystemRegistry";
 
 export function vector3ToString(v: Vector3): string {
     return `${v.x},${v.y},${v.z}`;
 }
 
 export type BuildData = {
-    name: string;
-    seed: SystemSeed;
+    coordinates: StarSystemCoordinates;
     sectorString: string;
     position: Vector3;
 };
@@ -50,11 +51,6 @@ export class StarSector {
      */
     readonly position: Vector3;
 
-    /**
-     * The size of all sectors
-     */
-    static readonly SIZE = 20;
-
     readonly density;
 
     readonly nbStars: number;
@@ -66,8 +62,8 @@ export class StarSector {
 
     constructor(coordinates: Vector3) {
         this.coordinates = coordinates;
-        this.position = coordinates.scale(StarSector.SIZE);
-        this.rng = seededSquirrelNoise(hashVec3(coordinates.x, coordinates.y, coordinates.z));
+        this.position = coordinates.scale(Settings.STAR_SECTOR_SIZE);
+        this.rng = getRngFromSeed(hashVec3(coordinates.x, coordinates.y, coordinates.z));
 
         this.density = UniverseDensity(coordinates.x, coordinates.y, coordinates.z);
 
@@ -78,24 +74,69 @@ export class StarSector {
         const sectorString = this.getKey();
         const data: BuildData[] = [];
         for (let i = 0; i < this.nbStars; i++) {
-            const systemSeed = new SystemSeed(this.coordinates.x, this.coordinates.y, this.coordinates.z, i);
+            const localPosition = this.getLocalPositionOfStar(i);
+            const coordinates: StarSystemCoordinates = {
+                starSectorX: this.coordinates.x,
+                starSectorY: this.coordinates.y,
+                starSectorZ: this.coordinates.z,
+                localX: localPosition.x,
+                localY: localPosition.y,
+                localZ: localPosition.z
+            };
             data.push({
-                name: `starInstance|${this.coordinates.x}|${this.coordinates.y}|${this.coordinates.z}|${i}`,
-                seed: systemSeed,
+                coordinates: coordinates,
                 sectorString: sectorString,
                 position: this.getPositionOfStar(i)
             });
         }
+
+        const customSystems = CustomSystemRegistry.GetSystemsFromSector(this.coordinates.x, this.coordinates.y, this.coordinates.z);
+        customSystems.forEach((system) => {
+            data.push({
+                coordinates: system.coordinates,
+                sectorString: sectorString,
+                position: this.getPositionOfStarFromLocal(new Vector3(system.coordinates.localX, system.coordinates.localY, system.coordinates.localZ))
+            });
+        });
+
         return data;
     }
 
-    getPositionOfStar(starIndex: number): Vector3 {
+    /**
+     * Returns the local position of a star in the sector (between -0.5 and 0.5)
+     * @param starIndex The index of the star in the sector
+     */
+    getLocalPositionOfStar(starIndex: number): Vector3 {
         if (starIndex >= this.nbStars) throw new Error(`Star index ${starIndex} is out of bounds for sector ${this.coordinates}`);
-        return new Vector3(centeredRand(this.rng, 10 * starIndex + 1) / 2, centeredRand(this.rng, 10 * starIndex + 2) / 2, centeredRand(this.rng, 10 * starIndex + 3) / 2)
-            .scaleInPlace(StarSector.SIZE)
-            .addInPlace(this.position);
+        return new Vector3(centeredRand(this.rng, 10 * starIndex + 1) / 2, centeredRand(this.rng, 10 * starIndex + 2) / 2, centeredRand(this.rng, 10 * starIndex + 3) / 2);
     }
 
+    /**
+     * Returns the local positions of all stars in the sector (between -0.5 and 0.5)
+     */
+    getLocalPositionsOfStars(): Vector3[] {
+        const positions: Vector3[] = [];
+        for (let i = 0; i < this.nbStars; i++) {
+            positions.push(this.getLocalPositionOfStar(i));
+        }
+        return positions;
+    }
+
+    /**
+     * Returns the position of a star in the universe
+     * @param starIndex The index of the star in the sector
+     */
+    getPositionOfStar(starIndex: number): Vector3 {
+        return this.getPositionOfStarFromLocal(this.getLocalPositionOfStar(starIndex));
+    }
+
+    getPositionOfStarFromLocal(localPosition: Vector3): Vector3 {
+        return localPosition.scaleInPlace(Settings.STAR_SECTOR_SIZE).addInPlace(this.position);
+    }
+
+    /**
+     * Returns the positions of all stars of the sector in the universe
+     */
     getPositionOfStars(): Vector3[] {
         const positions: Vector3[] = [];
         for (let i = 0; i < this.nbStars; i++) {
@@ -114,8 +155,8 @@ export class StarSector {
 
     static GetBoundingBox(position: Vector3, globalNodePosition: Vector3): BoundingBox {
         return new BoundingBox(
-            new Vector3(-1, -1, -1).scaleInPlace(StarSector.SIZE / 2),
-            new Vector3(1, 1, 1).scaleInPlace(StarSector.SIZE / 2),
+            new Vector3(-1, -1, -1).scaleInPlace(Settings.STAR_SECTOR_SIZE / 2),
+            new Vector3(1, 1, 1).scaleInPlace(Settings.STAR_SECTOR_SIZE / 2),
             Matrix.Translation(position.x + globalNodePosition.x, position.y + globalNodePosition.y, position.z + globalNodePosition.z)
         );
     }

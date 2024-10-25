@@ -25,16 +25,16 @@ import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { Spaceship } from "./spaceship";
 import { SpaceShipControlsInputs } from "./spaceShipControlsInputs";
-import { moveTowards } from "../utils/moveTowards";
 import { createNotification } from "../utils/notification";
 import { StarSystemInputs } from "../inputs/starSystemInputs";
-import { pressInteractionToStrings } from "../utils/inputControlsString";
+import { pressInteractionToStrings } from "../utils/strings/inputControlsString";
 import i18n from "../i18n";
 import { Transformable } from "../architecture/transformable";
 import { ManagesLandingPads } from "../utils/managesLandingPads";
 import { Sounds } from "../assets/sounds";
 import { LandingPadSize } from "../assets/procedural/landingPad/landingPad";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
+import { moveTowards } from "../utils/math";
 
 export class ShipControls implements Controls {
     readonly spaceship: Spaceship;
@@ -98,10 +98,26 @@ export class ShipControls implements Controls {
             }
         });
 
-        SpaceShipControlsInputs.map.landing.on("complete", () => {
-            if (this.spaceship.getClosestWalkableObject() !== null) {
-                this.spaceship.engageLanding(null);
+        SpaceShipControlsInputs.map.landing.on("complete", async () => {
+            const keyboardLayout = await getGlobalKeyboardLayoutMap();
+            if (this.spaceship.isWarpDriveEnabled()) {
+                const relevantKeys = pressInteractionToStrings(SpaceShipControlsInputs.map.toggleWarpDrive, keyboardLayout);
+                createNotification(`Cannot land while warp drive is enabled. You can use ${relevantKeys} to toggle your warp drive.`, 5000);
+                return;
             }
+
+            const closestWalkableObject = this.spaceship.getClosestWalkableObject();
+            if (closestWalkableObject === null) return;
+
+            const distance = Vector3.Distance(this.getTransform().getAbsolutePosition(), closestWalkableObject.getTransform().getAbsolutePosition());
+
+            // If the object is too far, don't engage landing
+            if (distance > closestWalkableObject.getBoundingRadius() + 100e3) {
+                createNotification("Too high to land", 2000);
+                return;
+            }
+
+            this.spaceship.engagePlanetaryLanding(null);
         });
 
         SpaceShipControlsInputs.map.emitLandingRequest.on("complete", () => {
@@ -113,7 +129,7 @@ export class ShipControls implements Controls {
                 return;
             }
 
-            Sounds.LANDING_REQUEST_GRANTED.play();
+            Sounds.EnqueuePlay(Sounds.LANDING_REQUEST_GRANTED);
             Sounds.STRAUSS_BLUE_DANUBE.play();
             Sounds.STRAUSS_BLUE_DANUBE.setVolume(1, 1);
             createNotification(`Landing request granted. Proceed to pad ${landingPad.padNumber}`, 30000);
@@ -130,7 +146,7 @@ export class ShipControls implements Controls {
 
         this.spaceship.onLandingObservable.add(async () => {
             const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
-            Sounds.LANDING_COMPLETE.play();
+            Sounds.EnqueuePlay(Sounds.LANDING_COMPLETE);
             Sounds.STRAUSS_BLUE_DANUBE.setVolume(0, 2);
             Sounds.STRAUSS_BLUE_DANUBE.stop(2);
 
@@ -140,8 +156,20 @@ export class ShipControls implements Controls {
             }
         });
 
-        this.spaceship.onLandingEngaged.add(() => {
+        this.spaceship.onPlanetaryLandingEngaged.add(() => {
             createNotification(i18n.t("notifications:landingSequenceEngaged"), 5000);
+            Sounds.EnqueuePlay(Sounds.INITIATING_PLANETARY_LANDING);
+        });
+
+        this.spaceship.onLandingCancelled.add(() => {
+            createNotification(i18n.t("notifications:landingCancelled"), 5000);
+            Sounds.STRAUSS_BLUE_DANUBE.setVolume(0, 2);
+            Sounds.STRAUSS_BLUE_DANUBE.stop(2);
+        });
+
+        this.spaceship.onTakeOff.add(() => {
+            //FIXME: localize
+            createNotification("Takeoff successful", 2000);
         });
 
         this.spaceship.onWarpDriveDisabled.add((isEmergency) => {
@@ -188,7 +216,8 @@ export class ShipControls implements Controls {
             if (SpaceShipControlsInputs.map.upDown.value !== 0) {
                 if (this.spaceship.isLanded()) {
                     this.spaceship.takeOff();
-                    createNotification("Takeoff successful", 2000);
+                } else if (this.spaceship.isLanding()) {
+                    this.spaceship.cancelLanding();
                 }
                 this.spaceship.aggregate.body.applyForce(
                     getUpwardDirection(this.getTransform()).scale(9.8 * 10 * SpaceShipControlsInputs.map.upDown.value),

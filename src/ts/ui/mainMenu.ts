@@ -1,31 +1,32 @@
 import { UberScene } from "../uberCore/uberScene";
 import { DefaultControls } from "../defaultControls/defaultControls";
 import { StarSystemView } from "../starSystem/starSystemView";
-import { StarSystemController } from "../starSystem/starSystemController";
 import { positionNearObjectAsteroidField, positionNearObjectWithStarVisible } from "../utils/positionNearObject";
-import { EditorVisibility } from "./bodyEditor/bodyEditor";
 import mainMenuHTML from "../../html/mainMenu.html";
 import { getForwardDirection } from "../uberCore/transforms/basicTransform";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformRotationAnimation } from "../uberCore/transforms/animations/rotation";
 import { TransformTranslationAnimation } from "../uberCore/transforms/animations/translation";
 import { Observable } from "@babylonjs/core/Misc/observable";
-import { SystemSeed } from "../utils/systemSeed";
 import { parseSaveFileData, SaveFileData } from "../saveFile/saveFileData";
 import packageInfo from "../../../package.json";
 import { Settings } from "../settings";
 import i18n from "../i18n";
-import { BodyType } from "../architecture/bodyType";
 import { Sounds } from "../assets/sounds";
 import { PanelType, SidePanels } from "./sidePanels";
-import { UniverseObjectIdentifier } from "../saveFile/universeCoordinates";
+import { SystemObjectType, UniverseObjectId } from "../utils/coordinates/universeCoordinates";
+import { getObjectBySystemId } from "../utils/coordinates/orbitalObjectId";
+import { getSystemModelFromCoordinates } from "../starSystem/modelFromCoordinates";
+import { getStarSystemCoordinatesFromSeed } from "../starSystem/systemSeed";
+import { StarSystemModel, StarSystemModelUtils } from "../starSystem/starSystemModel";
+import { OrbitalObjectType } from "../architecture/orbitalObject";
 
 export class MainMenu {
     readonly scene: UberScene;
     readonly controls: DefaultControls;
 
     readonly starSystemView: StarSystemView;
-    readonly starSystemController: StarSystemController;
+    readonly starSystemModel: StarSystemModel;
 
     readonly onStartObservable = new Observable<void>();
     readonly onLoadSaveObservable = new Observable<SaveFileData>();
@@ -39,7 +40,7 @@ export class MainMenu {
 
     private readonly sidePanels: SidePanels;
 
-    private readonly orbitalObjectIndex: number;
+    private readonly universeObjectId: UniverseObjectId;
 
     private readonly startAnimationDurationSeconds = 5;
 
@@ -50,85 +51,95 @@ export class MainMenu {
         this.scene = this.starSystemView.scene;
         this.controls = this.starSystemView.getDefaultControls();
 
-        const allowedIdentifiers: UniverseObjectIdentifier[] = [
+        this.starSystemView.setUIEnabled(false);
+
+        const allowedIdentifiers: UniverseObjectId[] = [
             {
-                starSystem: {
+                starSystemCoordinates: getStarSystemCoordinatesFromSeed({
                     starSectorX: 1,
                     starSectorY: 1,
                     starSectorZ: 0,
                     index: 7
-                },
-                orbitalObjectIndex: 1
+                }),
+                objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
+                objectIndex: 1
             },
             {
-                starSystem: {
+                starSystemCoordinates: getStarSystemCoordinatesFromSeed({
                     starSectorX: 0,
                     starSectorY: 0,
                     starSectorZ: 0,
                     index: 0
-                },
-                orbitalObjectIndex: 3
+                }),
+                objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
+                objectIndex: 1
             },
             {
-                starSystem: {
+                starSystemCoordinates: getStarSystemCoordinatesFromSeed({
                     starSectorX: 0,
                     starSectorY: 0,
                     starSectorZ: 1,
                     index: 4
-                },
-                orbitalObjectIndex: 1
+                }),
+                objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
+                objectIndex: 3
             },
             {
-                starSystem: {
+                starSystemCoordinates: getStarSystemCoordinatesFromSeed({
                     starSectorX: 0,
                     starSectorY: 0,
                     starSectorZ: 1,
                     index: 9
-                },
-                orbitalObjectIndex: 1
+                }),
+                objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
+                objectIndex: 0
             },
             {
-                starSystem: {
+                starSystemCoordinates: getStarSystemCoordinatesFromSeed({
                     starSectorX: 0,
                     starSectorY: 0,
                     starSectorZ: 1,
                     index: 1
-                },
-                orbitalObjectIndex: 2
+                }),
+                objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
+                objectIndex: 1
             },
             {
-                starSystem: {
+                starSystemCoordinates: getStarSystemCoordinatesFromSeed({
                     starSectorX: 1,
                     starSectorY: 1,
                     starSectorZ: 0,
                     index: 12
-                },
-                orbitalObjectIndex: 2
+                }),
+                objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
+                objectIndex: 0
             },
             {
-                starSystem: {
+                starSystemCoordinates: getStarSystemCoordinatesFromSeed({
                     starSectorX: 1,
                     starSectorY: 1,
                     starSectorZ: 0,
                     index: 5
-                },
-                orbitalObjectIndex: 1
+                }),
+                objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
+                objectIndex: 0
             },
             {
-                starSystem: {
+                starSystemCoordinates: getStarSystemCoordinatesFromSeed({
                     starSectorX: 0,
                     starSectorY: 0,
                     starSectorZ: 0,
                     index: 17
-                },
-                orbitalObjectIndex: 3
+                }),
+                objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
+                objectIndex: 2
             }
         ];
 
         const randomIndex = Math.floor(Math.random() * allowedIdentifiers.length);
-        this.orbitalObjectIndex = allowedIdentifiers[randomIndex].orbitalObjectIndex;
-        const seed = SystemSeed.Deserialize(allowedIdentifiers[randomIndex].starSystem);
-        this.starSystemController = new StarSystemController(seed, this.scene);
+        this.universeObjectId = allowedIdentifiers[randomIndex];
+        const coordinates = this.universeObjectId.starSystemCoordinates;
+        this.starSystemModel = getSystemModelFromCoordinates(coordinates);
 
         document.body.insertAdjacentHTML("beforeend", mainMenuHTML);
 
@@ -223,13 +234,16 @@ export class MainMenu {
     }
 
     async init() {
-        await this.starSystemView.loadStarSystem(this.starSystemController, true, 0);
+        await this.starSystemView.loadStarSystem(this.starSystemModel);
 
-        this.starSystemView.onInitStarSystem.addOnce(() => {
-            this.starSystemView.switchToDefaultControls();
-            const nbRadius = this.starSystemController.model.getBodyTypeOfStellarObject(0) === BodyType.BLACK_HOLE ? 8 : 2;
-            const targetObject = this.starSystemController.getOrbitalObjects()[this.orbitalObjectIndex];
-            positionNearObjectWithStarVisible(this.controls, targetObject, this.starSystemController, nbRadius);
+        this.starSystemView.onInitStarSystem.addOnce(async () => {
+            await this.starSystemView.switchToDefaultControls(false);
+            const nbRadius = StarSystemModelUtils.GetStellarObjects(this.starSystemModel)[0].type === OrbitalObjectType.BLACK_HOLE ? 8 : 2;
+            const targetObject = getObjectBySystemId(this.universeObjectId, this.starSystemView.getStarSystem());
+            if (targetObject === null) {
+                throw new Error(`Could not find object with ID ${JSON.stringify(this.universeObjectId)}`);
+            }
+            positionNearObjectWithStarVisible(this.controls, targetObject, this.starSystemView.getStarSystem(), nbRadius);
 
             Settings.TIME_MULTIPLIER = 3;
 
@@ -237,8 +251,6 @@ export class MainMenu {
         });
 
         this.starSystemView.targetCursorLayer.setEnabled(false);
-
-        this.starSystemView.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
 
         this.htmlRoot.style.display = "block";
     }
@@ -289,6 +301,7 @@ export class MainMenu {
                     const saveFileData = parseSaveFileData(data);
                     this.startAnimation(() => this.onLoadSaveObservable.notifyObservers(saveFileData));
                 } catch (e) {
+                    console.error(e);
                     dropFileZone.classList.add("invalid");
                     alert(
                         "Invalid save file. Please check your save file against the current format at https://barthpaleologue.github.io/CosmosJourneyer/docs/types/saveFile_saveFileData.SaveFileData.html\nYou can open an issue here if the issue persists: https://github.com/BarthPaleologue/CosmosJourneyer"
@@ -323,10 +336,15 @@ export class MainMenu {
         this.sidePanels.hideActivePanel();
         Settings.TIME_MULTIPLIER = 1;
 
+        const starSystemController = this.starSystemView.getStarSystem();
+
         const currentForward = getForwardDirection(this.controls.getTransform());
 
-        const orbitalObject = this.starSystemController.getOrbitalObjects()[this.orbitalObjectIndex];
-        const celestialBody = this.starSystemController.getBodies().find((body) => body.name === orbitalObject.name);
+        const orbitalObject = getObjectBySystemId(this.universeObjectId, starSystemController);
+        if (orbitalObject === null) {
+            throw new Error("Could not find object with ID " + JSON.stringify(this.universeObjectId));
+        }
+        const celestialBody = starSystemController.getCelestialBodies().find((body) => body === orbitalObject);
         if (celestialBody === undefined) {
             throw new Error("No corresponding celestial body found");
         }
@@ -334,7 +352,7 @@ export class MainMenu {
         const axis = Vector3.Cross(currentForward, newForward);
         const angle = Vector3.GetAngleBetweenVectors(currentForward, newForward, axis);
 
-        const targetPosition = positionNearObjectAsteroidField(celestialBody, this.starSystemController);
+        const targetPosition = positionNearObjectAsteroidField(celestialBody, starSystemController);
 
         const rotationAnimation = new TransformRotationAnimation(this.controls.getTransform(), axis, angle, this.startAnimationDurationSeconds);
         const translationAnimation = new TransformTranslationAnimation(this.controls.getTransform(), targetPosition, this.startAnimationDurationSeconds);
@@ -371,6 +389,8 @@ export class MainMenu {
                 if (this.htmlRoot === null) throw new Error("MainMenu is null");
                 this.htmlRoot.style.display = "none";
                 Sounds.MAIN_MENU_BACKGROUND_MUSIC.stop();
+
+                this.starSystemView.setUIEnabled(true);
                 onAnimationFinished();
 
                 return;
@@ -378,8 +398,8 @@ export class MainMenu {
 
             this.controls.getActiveCameras().forEach((camera) => camera.getViewMatrix());
 
-            this.starSystemController.applyFloatingOrigin();
-            this.starSystemController.updateShaders(0.0, this.starSystemView.postProcessManager);
+            starSystemController.applyFloatingOrigin();
+            starSystemController.updateShaders(0.0, this.starSystemView.postProcessManager);
         };
 
         this.scene.onBeforePhysicsObservable.add(animationCallback);

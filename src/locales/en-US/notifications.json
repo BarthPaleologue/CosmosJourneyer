@@ -2,6 +2,7 @@
     "howToFly": "Your pointer controls the pitch and roll of your spaceship. The neutral position is at the center of the screen.",
     "landingSequenceEngaged": "Landing sequence engaged",
     "landingComplete": "Landing complete! Use {{bindingsString}} to disembark.",
+    "landingCancelled": "Landing cancelled",
     "copiedToClipboard": "Copied to clipboard",
     "howToLiftOff": "Hold {{bindingsString}} to lift off.",
     "howToHyperSpace": "Align your ship with the system target using the target helper on the bottom right of your screen then press {{bindingsString}} to make a hyperspace jump."
