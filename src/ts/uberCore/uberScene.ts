@@ -45,8 +45,10 @@ export class UberScene extends Scene {
         this.clearColor = new Color4(0, 0, 0, 0);
 
         this.onNewCameraAddedObservable.add((camera) => {
-            if (this.depthRenderer === null) {
-                this.depthRenderer = this.enableDepthRenderer(camera, false, true);
+            if(this.depthRenderer === null) {
+                this.depthRenderer = this.enableDepthRenderer(camera, true, true);
+                this.depthRenderer.getDepthMap().activeCamera = camera;
+                this.depthRenderer.clearColor = new Color4(0, 0, 0, 1);
             }
         });
 

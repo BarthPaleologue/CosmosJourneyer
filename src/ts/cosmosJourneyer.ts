@@ -17,7 +17,6 @@
 
 import projectInfo from "../../package.json";
 
-import { Engine } from "@babylonjs/core/Engines/engine";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { VideoRecorder } from "@babylonjs/core/Misc/videoRecorder";
 import "@babylonjs/core/Misc/screenshotTools";
@@ -29,7 +28,6 @@ import HavokPhysics from "@babylonjs/havok";
 import "@babylonjs/core/Engines/WebGPU/Extensions/";
 import { PauseMenu } from "./ui/pauseMenu";
 import { StarSystemView } from "./starSystem/starSystemView";
-import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
 import { MainMenu } from "./ui/mainMenu";
 import { SaveFileData } from "./saveFile/saveFileData";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -45,6 +43,7 @@ import { GeneralInputs } from "./inputs/generalInputs";
 import { createNotification } from "./utils/notification";
 import { LoadingScreen } from "./uberCore/loadingScreen";
 import i18n from "./i18n";
+import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Sounds } from "./assets/sounds";
 import { TutorialLayer } from "./ui/tutorial/tutorialLayer";
@@ -193,20 +192,22 @@ export class CosmosJourneyer {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        // Init BabylonJS engine (use webgpu if ?webgpu is in the url)
-        const engine = window.location.search.includes("webgpu")
-            ? await EngineFactory.CreateAsync(canvas, {
-                  twgslOptions: {
-                      wasmPath: new URL("./utils/TWGSL/twgsl.wasm", import.meta.url).href,
-                      jsPath: new URL("./utils/TWGSL/twgsl.js", import.meta.url).href
-                  }
-              })
-            : new Engine(canvas, true, {
-                  // the preserveDrawingBuffer option is required for the screenshot feature to work
-                  preserveDrawingBuffer: true,
-                  useHighPrecisionMatrix: true,
-                  doNotHandleContextLost: true
-              });
+        if (!(await WebGPUEngine.IsSupportedAsync)) {
+            alert(
+                "WebGPU is not supported in your browser. Please check the compatibility here: https://github.com/gpuweb/gpuweb/wiki/Implementation-Status#implementation-status");
+        }
+
+        // Init BabylonJS engine
+        const engine = new WebGPUEngine(canvas, {
+            antialias: true,
+            audioEngine: true,
+            useHighPrecisionMatrix: true,
+            doNotHandleContextLost: true,
+        });
+        await engine.initAsync(undefined, {
+            wasmPath: new URL("./utils/TWGSL/twgsl.wasm", import.meta.url).href,
+            jsPath: new URL("./utils/TWGSL/twgsl.js", import.meta.url).href
+        });
 
         engine.useReverseDepthBuffer = true;
         engine.loadingScreen = new LoadingScreen(canvas);

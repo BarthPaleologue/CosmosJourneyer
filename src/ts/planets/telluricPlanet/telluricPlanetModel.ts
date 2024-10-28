@@ -79,7 +79,7 @@ export function newSeededTelluricPlanetModel(seed: number, name: string, parentB
 
     const parentMaxRadius = parentBodies.reduce((max, body) => Math.max(max, body.radius), 0);
     // Todo: do not hardcode
-    const orbitRadius = 2e9 + rng(GenerationSteps.ORBIT) * 15e9 + parentMaxRadius * 1.5;
+    const orbitRadius = 12e9 + rng(GenerationSteps.ORBIT) * 150e9 + parentMaxRadius * 1.5;
 
     const orbitalP = 2; //clamp(normalRandom(2.0, 0.3, this.rng, GenerationSteps.Orbit + 80), 0.7, 3.0);
 
