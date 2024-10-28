@@ -153,9 +153,8 @@ if (ares === undefined) {
 
 const aresAtmosphere = starSystemView.postProcessManager.getAtmosphere(ares);
 if (aresAtmosphere) {
-    aresAtmosphere.atmosphereUniforms.redWaveLength = 500;
-    aresAtmosphere.atmosphereUniforms.greenWaveLength = 680;
-    aresAtmosphere.atmosphereUniforms.blueWaveLength = 670;
+    aresAtmosphere.atmosphereUniforms.rayleighScatteringCoefficients.x *= 4;
+    aresAtmosphere.atmosphereUniforms.rayleighScatteringCoefficients.z /= 3;
 } else {
     console.warn("No atmosphere found for Ares");
 }

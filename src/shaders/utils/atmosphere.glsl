@@ -16,12 +16,16 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 uniform float atmosphere_radius;
-uniform float atmosphere_falloff;
-uniform float atmosphere_sunIntensity;
-uniform float atmosphere_rayleighStrength;
-uniform float atmosphere_mieStrength;
-uniform float atmosphere_densityModifier;
-uniform float atmosphere_redWaveLength;
-uniform float atmosphere_greenWaveLength;
-uniform float atmosphere_blueWaveLength;
-uniform float atmosphere_mieHaloRadius;
+
+uniform float atmosphere_rayleighHeight; // height falloff of rayleigh scattering (in meters)
+uniform vec3 atmosphere_rayleighCoeffs; // rayleigh scattering coefficients
+
+uniform float atmosphere_mieHeight; // height falloff of mie scattering (in meters)
+uniform vec3 atmosphere_mieCoeffs; // mie scattering coefficients
+uniform float atmosphere_mieAsymmetry; // mie scattering asymmetry (between -1 and 1)
+
+uniform float atmosphere_ozoneHeight; // height of ozone layer in meters above the surface
+uniform vec3 atmosphere_ozoneCoeffs; // ozone absorption coefficients
+uniform float atmosphere_ozoneFalloff; // ozone falloff around the ozone layer in meters
+
+uniform float atmosphere_sunIntensity; // controls atmosphere overall brightness

@@ -255,7 +255,7 @@ export class PostProcessManager {
     public addAtmosphere(planet: GasPlanet | TelluricPlanet, stellarObjects: StellarObject[]) {
         const atmosphere = new AtmosphericScatteringPostProcess(
             planet,
-            Settings.ATMOSPHERE_HEIGHT * Math.max(1, planet.model.radius / Settings.EARTH_RADIUS),
+            Settings.EARTH_ATMOSPHERE_THICKNESS * Math.max(1, planet.model.radius / Settings.EARTH_RADIUS),
             stellarObjects,
             this.scene
         );
