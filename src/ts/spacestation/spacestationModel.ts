@@ -49,7 +49,7 @@ export function newSeededSpaceStationModel(
 
     const name = generateSpaceStationName(rng, 2756);
 
-    const parentMaxRadius = parentBodies.reduce((max, body) => Math.max(max, body.radius), 0);
+    const parentMaxRadius = parentBodies.reduce((max, body) => Math.max(max, body.radius, (body.rings?.ringEnd || 0) * body.radius), 0);
     const orbitRadius = (2 + clamp(normalRandom(2, 1, rng, GenerationSteps.ORBIT), 0, 10)) * parentMaxRadius;
 
     const parentMassSum = parentBodies.reduce((sum, body) => sum + body.physics.mass, 0);
