@@ -504,9 +504,7 @@ export class StarSystemController {
             // or in the vicinity of the rings
             shouldCompensateRotation = shouldCompensateRotation || distanceOfNearestToControls < ringUniforms.model.ringEnd * nearestOrbitalObject.getBoundingRadius();
         }
-        // and never compensate the rotation of a space station
-        shouldCompensateRotation = shouldCompensateRotation && !(nearestOrbitalObject instanceof SpaceStation);
-        // also never compensate the rotation of a black hole
+        // never compensate the rotation of a black hole
         shouldCompensateRotation = shouldCompensateRotation && !(nearestOrbitalObject instanceof BlackHole);
 
         // ROTATION COMPENSATION
