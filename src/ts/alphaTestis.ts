@@ -32,6 +32,7 @@ import { CustomSystemRegistry } from "./starSystem/customSystemRegistry";
 import { newSeededTelluricSatelliteModel } from "./planets/telluricPlanet/telluricSatelliteModel";
 import { newSeededTelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModel";
 import { newSeededSpaceElevatorModel } from "./spacestation/spaceElevatorModel";
+import { getOrbitRadiusFromPeriod } from "./utils/physics";
 
 const engine = await CosmosJourneyer.CreateAsync();
 
@@ -91,7 +92,7 @@ moonModel.physics.maxTemperature = 200;
 moonModel.physics.waterAmount = 0.9;
 
 moonModel.orbit.period = moonModel.physics.siderealDayDuration;
-moonModel.orbit.radius = 8 * hecateModel.radius;
+moonModel.orbit.radius = getOrbitRadiusFromPeriod(moonModel.orbit.period, hecateModel.physics.mass);
 moonModel.orbit.normalToPlane = Vector3.Up();
 
 const aresModel = newSeededTelluricPlanetModel(0.3725, "Ares", [sunModel]);
