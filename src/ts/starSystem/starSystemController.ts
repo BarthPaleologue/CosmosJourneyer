@@ -281,23 +281,15 @@ export class StarSystemController {
      * @param position The position from which we want to find the nearest orbital object
      */
     public getNearestOrbitalObject(position: Vector3): OrbitalObject {
-        const celestialBodies = this.getCelestialBodies();
-        const spaceStations = this.getOrbitalFacilities();
-        if (celestialBodies.length + spaceStations.length === 0) throw new Error("There are no orbital objects in the solar system");
-        let nearest: OrbitalObject = celestialBodies[0];
+        const orbitalObjects = this.getOrbitalObjects();
+
+        if (orbitalObjects.length === 0) throw new Error("There are no orbital objects in the solar system");
+        let nearest: OrbitalObject = orbitalObjects[0];
         let smallerDistance = Number.POSITIVE_INFINITY;
-        for (const body of celestialBodies) {
-            const distance = body.getTransform().getAbsolutePosition().subtract(position).length() - body.getRadius();
+        for (const body of orbitalObjects) {
+            const distance = body.getTransform().getAbsolutePosition().subtract(position).length() - body.getBoundingRadius();
             if (distance < smallerDistance) {
                 nearest = body;
-                smallerDistance = distance;
-            }
-        }
-
-        for (const spacestation of spaceStations) {
-            const distance = spacestation.getTransform().getAbsolutePosition().subtract(position).length();
-            if (distance < smallerDistance && distance < spacestation.getBoundingRadius() * 20) {
-                nearest = spacestation;
                 smallerDistance = distance;
             }
         }
