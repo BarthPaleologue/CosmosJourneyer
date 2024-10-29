@@ -58,7 +58,7 @@ export function newSeededMandelbulbModel(seed: number, name: string, parentBodie
 
     const physicalProperties: OrbitalObjectPhysicsInfo = {
         mass: 10,
-        rotationPeriod: 0,
+        siderealDayDuration: 0,
         axialTilt: normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT)
     };
 

@@ -62,7 +62,7 @@ export function newSeededSpaceStationModel(
 
     const physicalProperties: OrbitalObjectPhysicsInfo = {
         mass: 1,
-        rotationPeriod: 0,
+        siderealDayDuration: 0,
         axialTilt: 2 * rng(GenerationSteps.AXIAL_TILT) * Math.PI
     };
 

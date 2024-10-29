@@ -73,7 +73,7 @@ export function newSeededTelluricSatelliteModel(seed: number, name: string, pare
     const physicalProperties: TelluricPlanetaryMassObjectPhysicsInfo = {
         mass: mass,
         axialTilt: 0,
-        rotationPeriod: (60 * 60 * 24) / 10,
+        siderealDayDuration: (60 * 60 * 24) / 10,
         minTemperature: minTemperature,
         maxTemperature: maxTemperature,
         pressure: pressure,
@@ -105,7 +105,7 @@ export function newSeededTelluricSatelliteModel(seed: number, name: string, pare
     };
 
     // tidal lock
-    physicalProperties.rotationPeriod = orbit.period;
+    physicalProperties.siderealDayDuration = orbit.period;
 
     const canHaveLiquidWater = hasLiquidWater(physicalProperties.pressure, physicalProperties.minTemperature, physicalProperties.maxTemperature);
     if (!canHaveLiquidWater) physicalProperties.oceanLevel = 0;

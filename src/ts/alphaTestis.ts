@@ -85,19 +85,19 @@ const spaceStationModel = newSeededSpaceElevatorModel(0, [sunModel], systemCoord
 
 const moonModel = newSeededTelluricSatelliteModel(23, "Manaleth", [hecateModel]);
 moonModel.physics.mass = 2;
-moonModel.physics.rotationPeriod = 7 * 60 * 60;
+moonModel.physics.siderealDayDuration = 7 * 60 * 60;
 moonModel.physics.minTemperature = -180;
 moonModel.physics.maxTemperature = 200;
 moonModel.physics.waterAmount = 0.9;
 
-moonModel.orbit.period = moonModel.physics.rotationPeriod;
+moonModel.orbit.period = moonModel.physics.siderealDayDuration;
 moonModel.orbit.radius = 8 * hecateModel.radius;
 moonModel.orbit.normalToPlane = Vector3.Up();
 
 const aresModel = newSeededTelluricPlanetModel(0.3725, "Ares", [sunModel]);
 if (aresModel.clouds !== null) aresModel.clouds.coverage = 1;
 aresModel.physics.mass = 7;
-aresModel.physics.rotationPeriod = (24 * 60 * 60) / 30;
+aresModel.physics.siderealDayDuration = (24 * 60 * 60) / 30;
 aresModel.physics.minTemperature = -30;
 aresModel.physics.maxTemperature = 20;
 aresModel.physics.pressure = 0.5;

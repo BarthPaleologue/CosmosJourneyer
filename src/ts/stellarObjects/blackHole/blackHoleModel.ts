@@ -60,7 +60,7 @@ export function newSeededBlackHoleModel(seed: number, name: string, parentBodies
     const physicalProperties: BlackHolePhysicsInfo = {
         mass: getMassFromSchwarzschildRadius(radius),
         //FIXME: do not hardcode
-        rotationPeriod: 1.5e-19,
+        siderealDayDuration: 1.5e-19,
         axialTilt: normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT),
         accretionDiskRadius: radius * normalRandom(12, 3, rng, 7777),
         //TODO: compute temperature of accretion disk (function of rotation speed)

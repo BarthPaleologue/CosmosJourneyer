@@ -18,9 +18,11 @@
 export type OrbitalObjectPhysicsInfo = {
     mass: number;
     /**
-     * Time needed for the object to rotate on its axis in seconds
+     * Time needed for the object to rotate 360° on its axis in seconds.
+     * It is slightly different from the duration of solar day which is the time it takes for the sun to be at the same position in the sky.
+     * @see https://en.wikipedia.org/wiki/Sidereal_time
      */
-    rotationPeriod: number;
+    siderealDayDuration: number;
     axialTilt: number;
 };
 

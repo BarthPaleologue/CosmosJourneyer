@@ -39,7 +39,7 @@ export function newSeededNeutronStarModel(seed: number, name: string, parentBodi
 
     const physicalProperties: StellarObjectPhysicsInfo = {
         mass: 1000,
-        rotationPeriod: 24 * 60 * 60,
+        siderealDayDuration: 24 * 60 * 60,
         blackBodyTemperature: temperature,
         axialTilt: 0
     };

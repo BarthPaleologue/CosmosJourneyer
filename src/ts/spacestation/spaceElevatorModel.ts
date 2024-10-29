@@ -33,14 +33,14 @@ export function newSeededSpaceElevatorModel(
 
     const name = generateSpaceElevatorName(rng, 2756);
 
-    const parentRotationPeriod = parentBody.physics.rotationPeriod;
+    const parentSiderealDayDuration = parentBody.physics.siderealDayDuration;
 
-    const orbitRadius = getOrbitRadiusFromPeriod(parentRotationPeriod, parentBody.physics.mass);
+    const orbitRadius = getOrbitRadiusFromPeriod(parentSiderealDayDuration, parentBody.physics.mass);
 
     const orbit: Orbit = {
         radius: orbitRadius,
         p: 2,
-        period: parentRotationPeriod,
+        period: parentSiderealDayDuration,
         normalToPlane: Vector3.Up()
     };
 
@@ -48,7 +48,7 @@ export function newSeededSpaceElevatorModel(
 
     const physicalProperties: OrbitalObjectPhysicsInfo = {
         mass: 1,
-        rotationPeriod: 0,
+        siderealDayDuration: parentSiderealDayDuration,
         axialTilt: 2 * rng(GenerationSteps.AXIAL_TILT) * Math.PI
     };
 

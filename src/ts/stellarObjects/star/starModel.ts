@@ -44,7 +44,7 @@ export function newSeededStarModel(seed: number, name: string, parentBodies: Cel
 
     const physicalProperties: StellarObjectPhysicsInfo = {
         mass: 1.9885e30, //TODO: compute mass from physical properties
-        rotationPeriod: 24 * 60 * 60,
+        siderealDayDuration: 24 * 60 * 60,
         blackBodyTemperature: temperature,
         axialTilt: 0
     };

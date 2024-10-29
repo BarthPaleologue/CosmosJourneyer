@@ -82,8 +82,8 @@ export class OrbitalObjectUtils {
      * @constructor
      */
     static GetRotationAngle(object: OrbitalObject, deltaTime: number): number {
-        if (object.model.physics.rotationPeriod === 0) return 0;
-        return (2 * Math.PI * deltaTime) / object.model.physics.rotationPeriod;
+        if (object.model.physics.siderealDayDuration === 0) return 0;
+        return (2 * Math.PI * deltaTime) / object.model.physics.siderealDayDuration;
     }
 
     /**

@@ -64,7 +64,7 @@ export function newSeededGasPlanetModel(seed: number, name: string, parentBodies
         //FIXME: when Settings.Earth radius gets to 1:1 scale, change this value by a variable in settings
         mass: Settings.JUPITER_MASS * (radius / 69_911e3) ** 3,
         axialTilt: normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT),
-        rotationPeriod: (24 * 60 * 60) / 10,
+        siderealDayDuration: (24 * 60 * 60) / 10,
         minTemperature: -180,
         maxTemperature: 200,
         pressure: 1
