@@ -500,6 +500,19 @@ export class StarSystemController {
         // never compensate the rotation of a black hole
         shouldCompensateRotation = shouldCompensateRotation && !(nearestOrbitalObject instanceof BlackHole);
 
+        // first, all other objects are updated normally
+        for (const object of orbitalObjects) {
+            if (object === nearestOrbitalObject) continue;
+
+            const parents = this.objectToParents.get(object);
+            if (parents === undefined) {
+                throw new Error(`Parents of ${object.model.name} are not defined`);
+            }
+
+            OrbitalObjectUtils.SetOrbitalPosition(object, parents, this.elapsedSeconds);
+            OrbitalObjectUtils.UpdateRotation(object, deltaSeconds);
+        }
+
         // ROTATION COMPENSATION
         // If we have to compensate the rotation of the nearest body, there are multiple things to take into account
         // The orbital plane of the body can be described using its normal vector. When the body is not rotating, the normal vector will rotate in its stead.
@@ -564,19 +577,6 @@ export class StarSystemController {
         } else {
             // if we don't compensate the translation of the nearest body, we must simply update its position
             translate(nearestOrbitalObject.getTransform(), nearestBodyDisplacement);
-        }
-
-        // finally, all other objects are updated normally
-        for (const object of orbitalObjects) {
-            if (object === nearestOrbitalObject) continue;
-
-            const parents = this.objectToParents.get(object);
-            if (parents === undefined) {
-                throw new Error(`Parents of ${object.model.name} are not defined`);
-            }
-
-            OrbitalObjectUtils.SetOrbitalPosition(object, parents, this.elapsedSeconds);
-            OrbitalObjectUtils.UpdateRotation(object, deltaSeconds);
         }
 
         controller.update(deltaSeconds);
