@@ -17,7 +17,6 @@
 
 import { CreateGreasedLine, GreasedLineBaseMesh } from "@babylonjs/core/Meshes";
 import { Vector3 } from "@babylonjs/core/Maths/math";
-import { setUpVector } from "../uberCore/transforms/basicTransform";
 import { getPointOnOrbitLocal } from "./orbit";
 import { OrbitalObject } from "../architecture/orbitalObject";
 import { Scene } from "@babylonjs/core/scene";
@@ -98,10 +97,8 @@ export class OrbitRenderer {
             parentBarycenter.scaleInPlace(1 / massSum);
 
             orbitMesh.position = parentBarycenter;
+            orbitMesh.rotationQuaternion = orbitalObject.model.orbit.orientation;
             orbitMesh.computeWorldMatrix(true);
-
-            const normalToPlane = orbitalObject.model.orbit.normalToPlane;
-            setUpVector(orbitMesh, normalToPlane);
         }
     }
 

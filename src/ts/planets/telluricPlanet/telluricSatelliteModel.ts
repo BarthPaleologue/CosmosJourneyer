@@ -83,8 +83,6 @@ export function newSeededTelluricSatelliteModel(seed: number, name: string, pare
 
     physicalProperties.oceanLevel = Settings.OCEAN_DEPTH * physicalProperties.waterAmount * physicalProperties.pressure;
 
-    const orbitalPlaneNormal = Vector3.Up().applyRotationQuaternionInPlace(Quaternion.RotationAxis(Axis.X, (rng(GenerationSteps.ORBIT + 20) - 0.5) * 0.2));
-
     // Todo: do not hardcode
     let orbitRadius = 2e9 + rng(GenerationSteps.ORBIT) * 15e9;
 
@@ -101,7 +99,7 @@ export function newSeededTelluricSatelliteModel(seed: number, name: string, pare
         radius: orbitRadius,
         p: orbitalP,
         period: getOrbitalPeriod(orbitRadius, parentMassSum),
-        normalToPlane: orbitalPlaneNormal
+        orientation: Quaternion.RotationAxis(Axis.X, (rng(GenerationSteps.ORBIT + 20) - 0.5) * 0.2)
     };
 
     // tidal lock

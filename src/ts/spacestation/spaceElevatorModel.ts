@@ -5,7 +5,6 @@ import { getRngFromSeed } from "../utils/getRngFromSeed";
 import { generateSpaceElevatorName } from "../utils/strings/spaceStationNameGenerator";
 import { GenerationSteps } from "../utils/generationSteps";
 import { Orbit } from "../orbit/orbit";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { OrbitalObjectPhysicsInfo } from "../architecture/physicsInfo";
 import { getFactionFromCoordinates } from "../society/factions";
 import { randomPieChart } from "../utils/random";
@@ -16,6 +15,7 @@ import { Settings } from "../settings";
 import { OrbitalObjectType } from "../architecture/orbitalObject";
 
 import { OrbitalFacilityModel } from "./orbitalFacility";
+import { Quaternion } from "@babylonjs/core/Maths/math";
 
 export type SpaceElevatorModel = OrbitalFacilityModel & {
     readonly type: OrbitalObjectType.SPACE_ELEVATOR;
@@ -41,7 +41,7 @@ export function newSeededSpaceElevatorModel(
         radius: orbitRadius,
         p: 2,
         period: parentSiderealDayDuration,
-        normalToPlane: Vector3.Up()
+        orientation: Quaternion.Identity(),
     };
 
     const tetherLength = orbitRadius - parentBody.radius;

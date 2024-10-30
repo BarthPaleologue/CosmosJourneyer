@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { randRange, randRangeInt, uniformRandBool } from "extended-random";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Settings } from "../../settings";
 import { getOrbitalPeriod, Orbit } from "../../orbit/orbit";
 import { StellarObjectPhysicsInfo } from "../../architecture/physicsInfo";
@@ -28,6 +27,7 @@ import { GenerationSteps } from "../../utils/generationSteps";
 
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { OrbitalObjectType } from "../../architecture/orbitalObject";
+import { Quaternion } from "@babylonjs/core/Maths/math";
 
 export type StarModel = StellarObjectModel & {
     readonly type: OrbitalObjectType.STAR;
@@ -59,7 +59,7 @@ export function newSeededStarModel(seed: number, name: string, parentBodies: Cel
         radius: orbitRadius,
         p: 2,
         period: getOrbitalPeriod(orbitRadius, parentMassSum),
-        normalToPlane: Vector3.Up()
+        orientation: Quaternion.Identity()
     };
 
     const rings = uniformRandBool(RING_PROPORTION, rng, GenerationSteps.RINGS) ? newSeededRingsModel(rng) : null;

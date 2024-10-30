@@ -75,8 +75,6 @@ export function newSeededTelluricPlanetModel(seed: number, name: string, parentB
         clouds = newCloudsModel(radius + physicalProperties.oceanLevel, Settings.CLOUD_LAYER_HEIGHT, physicalProperties.waterAmount, physicalProperties.pressure);
     }
 
-    const orbitalPlaneNormal = Vector3.Up().applyRotationQuaternionInPlace(Quaternion.RotationAxis(Axis.X, (rng(GenerationSteps.ORBIT + 20) - 0.5) * 0.2));
-
     const parentMaxRadius = parentBodies.reduce((max, body) => Math.max(max, body.radius), 0);
     // Todo: do not hardcode
     const orbitRadius = 2e9 + rng(GenerationSteps.ORBIT) * 15e9 + parentMaxRadius * 1.5;
@@ -88,7 +86,7 @@ export function newSeededTelluricPlanetModel(seed: number, name: string, parentB
         radius: orbitRadius,
         p: orbitalP,
         period: getOrbitalPeriod(orbitRadius, parentMassSum),
-        normalToPlane: orbitalPlaneNormal
+        orientation: Quaternion.RotationAxis(Axis.X, (rng(GenerationSteps.ORBIT + 20) - 0.5) * 0.2)
     };
 
     const terrainSettings = {

@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { CelestialBodyModel } from "../../architecture/celestialBody";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { StellarObjectPhysicsInfo } from "../../architecture/physicsInfo";
 import { StellarObjectModel } from "../../architecture/stellarObject";
 import { getOrbitalPeriod, Orbit } from "../../orbit/orbit";
@@ -27,6 +26,7 @@ import { GenerationSteps } from "../../utils/generationSteps";
 
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { OrbitalObjectType } from "../../architecture/orbitalObject";
+import { Quaternion } from "@babylonjs/core/Maths/math";
 
 export type NeutronStarModel = StellarObjectModel & {
     readonly type: OrbitalObjectType.NEUTRON_STAR;
@@ -54,7 +54,7 @@ export function newSeededNeutronStarModel(seed: number, name: string, parentBodi
         radius: orbitRadius,
         p: 2,
         period: getOrbitalPeriod(orbitRadius, parentMassSum),
-        normalToPlane: Vector3.Up()
+        orientation: Quaternion.Identity()
     };
 
     const ringProportion = 0.02;

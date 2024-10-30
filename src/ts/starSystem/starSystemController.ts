@@ -530,7 +530,7 @@ export class StarSystemController {
 
                 // the normal to the orbit planes must be rotated as well (even the one of the nearest body)
                 const rotation = Quaternion.RotationAxis(nearestOrbitalObject.getRotationAxis(), -dThetaNearest);
-                orbit.normalToPlane.applyRotationQuaternionInPlace(rotation);
+                orbit.orientation.multiplyInPlace(rotation); //.applyRotationQuaternionInPlace(rotation);
 
                 if (object === nearestOrbitalObject) continue;
 

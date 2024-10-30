@@ -34,6 +34,7 @@ import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates"
 import { getRngFromSeed } from "../utils/getRngFromSeed";
 import { getSphereRadiatedEnergyFlux } from "../utils/physics";
 import { OrbitalFacilityModel } from "./orbitalFacility";
+import { Quaternion } from "@babylonjs/core/Maths/math";
 
 export type SpaceStationModel = OrbitalFacilityModel & {
     readonly type: OrbitalObjectType.SPACE_STATION;
@@ -57,7 +58,7 @@ export function newSeededSpaceStationModel(
         radius: orbitRadius,
         p: 2,
         period: getOrbitalPeriod(orbitRadius, parentMassSum),
-        normalToPlane: Vector3.Up()
+        orientation: Quaternion.Identity()
     };
 
     const physicalProperties: OrbitalObjectPhysicsInfo = {

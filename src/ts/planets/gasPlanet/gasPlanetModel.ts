@@ -21,7 +21,6 @@ import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { clamp } from "../../utils/math";
 import { getOrbitalPeriod, getPeriapsis, Orbit } from "../../orbit/orbit";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PlanetaryMassObjectPhysicsInfo } from "../../architecture/physicsInfo";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { newSeededRingsModel } from "../../rings/ringsModel";
@@ -50,14 +49,12 @@ export function newSeededGasPlanetModel(seed: number, name: string, parentBodies
         orbitRadius += maxRadius * 1.5;
     }
 
-    const orbitalPlaneNormal = Vector3.Up().applyRotationQuaternionInPlace(Quaternion.RotationAxis(Axis.X, (rng(GenerationSteps.ORBIT + 20) - 0.5) * 0.2));
-
     const parentMassSum = parentBodies.reduce((sum, body) => sum + body.physics.mass, 0);
     const orbit: Orbit = {
         radius: orbitRadius,
         p: 2, //orbitalP,
         period: getOrbitalPeriod(orbitRadius, parentMassSum),
-        normalToPlane: orbitalPlaneNormal
+        orientation: Quaternion.RotationAxis(Axis.X, (rng(GenerationSteps.ORBIT + 20 - 0.5) * 0.2))
     };
 
     const physicalProperties: PlanetaryMassObjectPhysicsInfo = {

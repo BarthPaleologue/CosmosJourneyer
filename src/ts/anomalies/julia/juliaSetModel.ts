@@ -18,15 +18,14 @@
 import { normalRandom } from "extended-random";
 import { clamp } from "../../utils/math";
 import { getOrbitalPeriod, getPeriapsis, Orbit } from "../../orbit/orbit";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { OrbitalObjectPhysicsInfo } from "../../architecture/physicsInfo";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { AnomalyModel } from "../anomaly";
-
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { OrbitalObjectType } from "../../architecture/orbitalObject";
+import { Quaternion } from "@babylonjs/core/Maths/math";
 
 export type JuliaSetModel = AnomalyModel & {
     readonly type: OrbitalObjectType.JULIA_SET;
@@ -51,7 +50,7 @@ export function newSeededJuliaSetModel(seed: number, name: string, parentBodies:
         radius: orbitRadius,
         p: orbitalP,
         period: getOrbitalPeriod(orbitRadius, parentMassSum),
-        normalToPlane: Vector3.Up()
+        orientation: Quaternion.Identity()
     };
 
     const physicalProperties: OrbitalObjectPhysicsInfo = {
