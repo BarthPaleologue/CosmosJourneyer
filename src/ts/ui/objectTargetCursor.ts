@@ -152,8 +152,8 @@ export class ObjectTargetCursor {
             );
 
             this.htmlRoot.classList.remove("hidden");
-            this.htmlRoot.style.left = `${this.screenCoordinates.x * 100}vw`;
-            this.htmlRoot.style.top = `${this.screenCoordinates.y * 100}vh`;
+            this.htmlRoot.style.left = `${this.screenCoordinates.x * camera.getEngine().getRenderWidth()}px`;
+            this.htmlRoot.style.top = `${this.screenCoordinates.y * camera.getEngine().getRenderHeight()}px`;
         } else {
             this.htmlRoot.classList.add("hidden");
         }
