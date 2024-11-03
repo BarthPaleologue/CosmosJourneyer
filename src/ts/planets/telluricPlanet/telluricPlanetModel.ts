@@ -17,34 +17,58 @@
 
 import { PlanetModel } from "../../architecture/planet";
 import { OrbitalObjectType } from "../../architecture/orbitalObject";
-import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { Settings } from "../../settings";
 import { TelluricPlanetaryMassObjectPhysicsInfo } from "../../architecture/physicsInfo";
-import { hasLiquidWater } from "../../utils/physics";
+import { getCurrentUniverseYear, getTidalLockingTimescale, hasLiquidWater } from "../../utils/physics";
 import { CloudsModel, newCloudsModel } from "../../clouds/cloudsModel";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { getOrbitalPeriod, Orbit } from "../../orbit/orbit";
 import { clamp } from "terrain-generation";
 import { newSeededRingsModel, RingsModel } from "../../rings/ringsModel";
 import { TelluricPlanetaryMassObjectModel } from "./telluricPlanetaryMassObjectModel";
+import { StellarObjectModel } from "../../architecture/stellarObject";
+import { Lerp } from "@babylonjs/core/Maths/math.scalar.functions";
 
 export type TelluricPlanetModel = PlanetModel &
     TelluricPlanetaryMassObjectModel & {
         readonly type: OrbitalObjectType.TELLURIC_PLANET;
     };
 
-export function newSeededTelluricPlanetModel(seed: number, name: string, parentBodies: CelestialBodyModel[]): TelluricPlanetModel {
+export function newSeededTelluricPlanetModel(seed: number, name: string, parentBodies: StellarObjectModel[]): TelluricPlanetModel {
     const rng = getRngFromSeed(seed);
 
     const radius = Math.max(0.3, normalRandom(1.0, 0.1, rng, GenerationSteps.RADIUS)) * Settings.EARTH_RADIUS;
 
+    const parentMaxBirthYear = parentBodies.reduce((max, body) => Math.max(max, body.birthYear), 0);
+
+    const parentMaxRadius = parentBodies.reduce((max, body) => Math.max(max, body.radius), 0);
+    // Todo: do not hardcode
+    const orbitRadius = 2e9 + rng(GenerationSteps.ORBIT) * 15e9 + parentMaxRadius * 1.5;
+
+    const orbitalP = 2; //clamp(normalRandom(2.0, 0.3, this.rng, GenerationSteps.Orbit + 80), 0.7, 3.0);
+
+    const parentMassSum = parentBodies.reduce((sum, body) => sum + body.physics.mass, 0);
+    const orbit: Orbit = {
+        radius: orbitRadius,
+        p: orbitalP,
+        period: getOrbitalPeriod(orbitRadius, parentMassSum),
+        orientation: Quaternion.RotationAxis(Axis.X, (rng(GenerationSteps.ORBIT + 20) - 0.5) * 0.2)
+    };
+
     //TODO: make mass dependent on more physical properties like density
     const mass = Settings.EARTH_MASS * (radius / 6_371e3) ** 3;
+
+    const tidalLockingTimescale = getTidalLockingTimescale(parentMassSum, mass, orbitRadius, radius, 0);
+
+    const currentAge = getCurrentUniverseYear() - parentMaxBirthYear;
+
+    const tidalLockingFactor = Math.min(1, currentAge / tidalLockingTimescale);
+
+    const siderealDayDuration = Lerp(60 * 60 * 24, orbit.period, tidalLockingFactor);
 
     let pressure = Math.max(normalRandom(0.9, 0.2, rng, GenerationSteps.PRESSURE), 0);
     if (radius <= 0.3 * Settings.EARTH_RADIUS) pressure = 0;
@@ -57,7 +81,7 @@ export function newSeededTelluricPlanetModel(seed: number, name: string, parentB
     const physicalProperties: TelluricPlanetaryMassObjectPhysicsInfo = {
         mass: mass,
         axialTilt: Quaternion.RotationAxis(Axis.X, normalRandom(0, 0.2, rng, GenerationSteps.AXIAL_TILT)),
-        siderealDayDuration: (60 * 60 * 24) / 10,
+        siderealDayDuration: siderealDayDuration,
         minTemperature: minTemperature,
         maxTemperature: maxTemperature,
         pressure: pressure,
@@ -74,20 +98,6 @@ export function newSeededTelluricPlanetModel(seed: number, name: string, parentB
     if (physicalProperties.oceanLevel > 0) {
         clouds = newCloudsModel(radius + physicalProperties.oceanLevel, Settings.CLOUD_LAYER_HEIGHT, physicalProperties.waterAmount, physicalProperties.pressure);
     }
-
-    const parentMaxRadius = parentBodies.reduce((max, body) => Math.max(max, body.radius), 0);
-    // Todo: do not hardcode
-    const orbitRadius = 2e9 + rng(GenerationSteps.ORBIT) * 15e9 + parentMaxRadius * 1.5;
-
-    const orbitalP = 2; //clamp(normalRandom(2.0, 0.3, this.rng, GenerationSteps.Orbit + 80), 0.7, 3.0);
-
-    const parentMassSum = parentBodies.reduce((sum, body) => sum + body.physics.mass, 0);
-    const orbit: Orbit = {
-        radius: orbitRadius,
-        p: orbitalP,
-        period: getOrbitalPeriod(orbitRadius, parentMassSum),
-        orientation: Quaternion.RotationAxis(Axis.X, (rng(GenerationSteps.ORBIT + 20) - 0.5) * 0.2)
-    };
 
     const terrainSettings = {
         continents_frequency: radius / Settings.EARTH_RADIUS,

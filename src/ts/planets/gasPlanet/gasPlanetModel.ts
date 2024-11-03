@@ -22,19 +22,21 @@ import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { clamp } from "../../utils/math";
 import { getOrbitalPeriod, getPeriapsis, Orbit } from "../../orbit/orbit";
 import { PlanetaryMassObjectPhysicsInfo } from "../../architecture/physicsInfo";
-import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { newSeededRingsModel } from "../../rings/ringsModel";
 import { GenerationSteps } from "../../utils/generationSteps";
 
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { OrbitalObjectType } from "../../architecture/orbitalObject";
 import { PlanetModel } from "../../architecture/planet";
+import { StellarObjectModel } from "../../architecture/stellarObject";
+import { getCurrentUniverseYear, getTidalLockingTimescale } from "../../utils/physics";
+import { Lerp } from "@babylonjs/core/Maths/math.scalar.functions";
 
 export type GasPlanetModel = PlanetModel & {
     readonly type: OrbitalObjectType.GAS_PLANET;
 };
 
-export function newSeededGasPlanetModel(seed: number, name: string, parentBodies: CelestialBodyModel[]): GasPlanetModel {
+export function newSeededGasPlanetModel(seed: number, name: string, parentBodies: StellarObjectModel[]): GasPlanetModel {
     const rng = getRngFromSeed(seed);
 
     const radius = randRangeInt(Settings.EARTH_RADIUS * 4, Settings.EARTH_RADIUS * 20, rng, GenerationSteps.RADIUS);
@@ -57,11 +59,22 @@ export function newSeededGasPlanetModel(seed: number, name: string, parentBodies
         orientation: Quaternion.RotationAxis(Axis.X, (rng(GenerationSteps.ORBIT + 20 - 0.5) * 0.2))
     };
 
+    //FIXME: when Settings.Earth radius gets to 1:1 scale, change this value by a variable in settings
+    const mass =Settings.JUPITER_MASS * (radius / 69_911e3) ** 3;
+
+    const tidalLockingTimescale = getTidalLockingTimescale(parentMassSum, mass, orbitRadius, radius, 0);
+
+    const parentMaxBirthYear = parentBodies.reduce((max, body) => Math.max(max, body.birthYear), 0);
+    const currentAge = getCurrentUniverseYear() - parentMaxBirthYear;
+
+    const tidalLockingFactor = Math.min(1, currentAge / tidalLockingTimescale);
+
+    const siderealDayDuration = Lerp(60 * 60 * 24, orbit.period, tidalLockingFactor);
+
     const physicalProperties: PlanetaryMassObjectPhysicsInfo = {
-        //FIXME: when Settings.Earth radius gets to 1:1 scale, change this value by a variable in settings
-        mass: Settings.JUPITER_MASS * (radius / 69_911e3) ** 3,
+        mass: mass,
         axialTilt: Quaternion.RotationAxis(Axis.X, normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT)),
-        siderealDayDuration: (24 * 60 * 60) / 10,
+        siderealDayDuration: siderealDayDuration,
         minTemperature: -180,
         maxTemperature: 200,
         pressure: 1
