@@ -23,18 +23,24 @@ import { GenerationSteps } from "../../utils/generationSteps";
 import { Settings } from "../../settings";
 import { TelluricPlanetaryMassObjectPhysicsInfo } from "../../architecture/physicsInfo";
 import { Quaternion } from "@babylonjs/core/Maths/math";
-import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { clamp } from "terrain-generation";
 import { getOrbitalPeriod, getPeriapsis, Orbit } from "../../orbit/orbit";
-import { hasLiquidWater } from "../../utils/physics";
+import { getCurrentUniverseYear, getTidalLockingTimescale, hasLiquidWater } from "../../utils/physics";
 import { CloudsModel, newCloudsModel } from "../../clouds/cloudsModel";
 import { TelluricPlanetaryMassObjectModel } from "./telluricPlanetaryMassObjectModel";
+import { StellarObjectModel } from "../../architecture/stellarObject";
+import { Lerp } from "@babylonjs/core/Maths/math.scalar.functions";
 
 export type TelluricSatelliteModel = TelluricPlanetaryMassObjectModel & {
     readonly type: OrbitalObjectType.TELLURIC_SATELLITE;
 };
 
-export function newSeededTelluricSatelliteModel(seed: number, name: string, parentBodies: CelestialBodyModel[]): TelluricSatelliteModel {
+export function newSeededTelluricSatelliteModel(
+    seed: number,
+    name: string,
+    parentBodies: CelestialBodyModel[],
+    parentStellarObjects: StellarObjectModel[]
+): TelluricSatelliteModel {
     const rng = getRngFromSeed(seed);
 
     const isSatelliteOfTelluric = parentBodies.some((parent) => parent.type === OrbitalObjectType.TELLURIC_PLANET);
@@ -59,35 +65,6 @@ export function newSeededTelluricSatelliteModel(seed: number, name: string, pare
         mass = Settings.EARTH_MASS * (radius / 6_371e3) ** 3;
     }
 
-    let pressure = Math.max(normalRandom(0.9, 0.2, rng, GenerationSteps.PRESSURE), 0);
-    if (isSatelliteOfTelluric || radius <= 0.3 * Settings.EARTH_RADIUS) {
-        pressure = 0;
-    }
-
-    //TODO: use distance to star to determine min temperature when using 1:1 scale
-    const minTemperature = Math.max(-273, normalRandom(-20, 30, rng, 80));
-    // when pressure is close to 1, the max temperature is close to the min temperature (the atmosphere does thermal regulation)
-    const maxTemperature = minTemperature + Math.exp(-pressure) * randRangeInt(30, 200, rng, 81);
-
-    // this average is an approximation of a quaternion average
-    // see https://math.stackexchange.com/questions/61146/averaging-quaternions
-    const parentAverageAxialTilt: Quaternion = parentBodies.reduce((sum, body) => sum.add(body.physics.axialTilt), Quaternion.Zero());
-    parentAverageAxialTilt.scaleInPlace(1 / parentBodies.length);
-    parentAverageAxialTilt.normalize();
-
-    const physicalProperties: TelluricPlanetaryMassObjectPhysicsInfo = {
-        mass: mass,
-        axialTilt: parentAverageAxialTilt,
-        siderealDayDuration: (60 * 60 * 24) / 10,
-        minTemperature: minTemperature,
-        maxTemperature: maxTemperature,
-        pressure: pressure,
-        waterAmount: Math.max(normalRandom(1.0, 0.3, rng, GenerationSteps.WATER_AMOUNT), 0),
-        oceanLevel: 0
-    };
-
-    physicalProperties.oceanLevel = Settings.OCEAN_DEPTH * physicalProperties.waterAmount * physicalProperties.pressure;
-
     // Todo: do not hardcode
     let orbitRadius = 2e9 + rng(GenerationSteps.ORBIT) * 15e9;
 
@@ -99,6 +76,12 @@ export function newSeededTelluricSatelliteModel(seed: number, name: string, pare
     orbitRadius += parentMaxRadius * clamp(normalRandom(10, 4, rng, GenerationSteps.ORBIT), 1, 50);
     orbitRadius += 2.0 * Math.max(0, parentMaxRadius - getPeriapsis(orbitRadius, orbitalP));
 
+    // this average is an approximation of a quaternion average
+    // see https://math.stackexchange.com/questions/61146/averaging-quaternions
+    const parentAverageAxialTilt: Quaternion = parentBodies.reduce((sum, body) => sum.add(body.physics.axialTilt), Quaternion.Zero());
+    parentAverageAxialTilt.scaleInPlace(1 / parentBodies.length);
+    parentAverageAxialTilt.normalize();
+
     const parentMassSum = parentBodies.reduce((sum, body) => sum + body.physics.mass, 0);
     const orbit: Orbit = {
         radius: orbitRadius,
@@ -106,6 +89,38 @@ export function newSeededTelluricSatelliteModel(seed: number, name: string, pare
         period: getOrbitalPeriod(orbitRadius, parentMassSum),
         orientation: parentAverageAxialTilt
     };
+
+    const tidalLockingTimescale = getTidalLockingTimescale(parentMassSum, mass, orbitRadius, radius, 0);
+
+    const parentMaxBirthYear = parentStellarObjects.reduce((max, body) => Math.max(max, body.birthYear), 0);
+    const currentAge = getCurrentUniverseYear() - parentMaxBirthYear;
+
+    const tidalLockingFactor = Math.min(1, currentAge / tidalLockingTimescale);
+
+    const siderealDayDuration = Lerp(60 * 60 * 24, orbit.period, tidalLockingFactor);
+
+    let pressure = Math.max(normalRandom(0.9, 0.2, rng, GenerationSteps.PRESSURE), 0);
+    if (isSatelliteOfTelluric || radius <= 0.3 * Settings.EARTH_RADIUS) {
+        pressure = 0;
+    }
+
+    //TODO: use distance to star to determine min temperature when using 1:1 scale
+    const minTemperature = Math.max(-273, normalRandom(-20, 30, rng, 80));
+    // when pressure is close to 1, the max temperature is close to the min temperature (the atmosphere does thermal regulation)
+    const maxTemperature = minTemperature + Math.exp(-pressure) * randRangeInt(30, 200, rng, 81);
+
+    const physicalProperties: TelluricPlanetaryMassObjectPhysicsInfo = {
+        mass: mass,
+        axialTilt: parentAverageAxialTilt,
+        siderealDayDuration: siderealDayDuration,
+        minTemperature: minTemperature,
+        maxTemperature: maxTemperature,
+        pressure: pressure,
+        waterAmount: Math.max(normalRandom(1.0, 0.3, rng, GenerationSteps.WATER_AMOUNT), 0),
+        oceanLevel: 0
+    };
+
+    physicalProperties.oceanLevel = Settings.OCEAN_DEPTH * physicalProperties.waterAmount * physicalProperties.pressure;
 
     // tidal lock
     physicalProperties.siderealDayDuration = orbit.period;
