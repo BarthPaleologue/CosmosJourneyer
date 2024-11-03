@@ -41,7 +41,7 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { MetalSectionMaterial } from "../assets/procedural/spaceStation/metalSectionMaterial";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { SpaceElevatorClimber } from "./spaceElevatorClimber";
-import { remap, triangleWave } from "../utils/math";
+import { clamp, remap, triangleWave } from "../utils/math";
 import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
 import { setRotationQuaternion } from "../uberCore/transforms/basicTransform";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
@@ -117,7 +117,9 @@ export class SpaceElevator implements OrbitalFacility {
             .getChildTransformNodes(true)
             .forEach((transform) => transform.position.addInPlace(deltaPosition));
 
-        this.getTransform().getChildTransformNodes(true).forEach((transform) => transform.rotateAround(Vector3.Zero(), Axis.Z, -Math.PI / 2));
+        this.getTransform()
+            .getChildTransformNodes(true)
+            .forEach((transform) => transform.rotateAround(Vector3.Zero(), Axis.Z, -Math.PI / 2));
 
         setRotationQuaternion(this.getTransform(), this.model.physics.axialTilt);
 
@@ -279,7 +281,13 @@ export class SpaceElevator implements OrbitalFacility {
         const climberSpeed = 300 / 3.6; // 300 km/h in m/s
         const roundTripDuration = (2 * this.tetherLength) / climberSpeed;
 
-        this.climber.getTransform().position.y = remap(triangleWave(this.elapsedSeconds / roundTripDuration), 0, 1, -this.tetherLength / 2, this.tetherLength / 2);
+        this.climber.getTransform().position.y = remap(
+            clamp(1.05 * triangleWave(this.elapsedSeconds / roundTripDuration), 0, 1),
+            0,
+            1,
+            -this.tetherLength / 2,
+            this.tetherLength / 2
+        );
     }
 
     getTransform(): TransformNode {
