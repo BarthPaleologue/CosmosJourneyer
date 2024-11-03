@@ -5,5 +5,6 @@
     "landingCancelled": "Atterrissage annulé.",
     "copiedToClipboard": "Copié dans le presse-papiers.",
     "howToLiftOff": "Maintenez {{bindingsString}} pour décoller.",
-    "howToHyperSpace": "Alignez votre vaisseau avec la cible du système de destination à l'aide du radar de cible en bas à droite de l'écran. Appuyez ensuite sur {{bindingsString}} pour enclencher le saut hyperspatial."
+    "howToHyperSpace": "Alignez votre vaisseau avec la cible du système de destination à l'aide du radar de cible en bas à droite de l'écran. Appuyez ensuite sur {{bindingsString}} pour enclencher le saut hyperspatial.",
+    "saveVersionMismatch": "[VERSION_WARNING] La version du fichier de sauvegarde ({{saveVersion}}) ne correspond pas à la version actuelle ({{currentVersion}}). Le chargement peut entraîner un comportement inattendu."
 }

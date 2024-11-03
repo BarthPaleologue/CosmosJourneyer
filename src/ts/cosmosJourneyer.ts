@@ -391,6 +391,16 @@ export class CosmosJourneyer {
      * @param saveData The save file data to load
      */
     public async loadSaveData(saveData: SaveFileData): Promise<void> {
+        if (saveData.version !== projectInfo.version) {
+            createNotification(
+                i18n.t("notifications:saveVersionMismatch", {
+                    currentVersion: projectInfo.version,
+                    saveVersion: saveData.version
+                }),
+                60_000
+            );
+        }
+
         const newPlayer = saveData.player !== undefined ? Player.Deserialize(saveData.player) : Player.Default();
         this.player.copyFrom(newPlayer);
 

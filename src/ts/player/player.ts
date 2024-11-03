@@ -1,6 +1,6 @@
 import { Mission, MissionSerialized } from "../missions/mission";
-
 import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates";
+import { warnIfUndefined } from "../utils/notification";
 
 export type SerializedPlayer = {
     name: string;
@@ -29,6 +29,9 @@ export class Player {
     currentMissions: Mission[] = [];
     completedMissions: Mission[] = [];
 
+    static DEFAULT_NAME = "Python";
+    static DEFAULT_BALANCE = 10_000;
+
     private constructor(
         name: string,
         balance: number,
@@ -50,19 +53,23 @@ export class Player {
     }
 
     public static Default(): Player {
-        return new Player("Python", 10_000, new Date(), [], [], [], [], []);
+        return new Player(Player.DEFAULT_NAME, Player.DEFAULT_BALANCE, new Date(), [], [], [], [], []);
     }
 
     public static Deserialize(serializedPlayer: SerializedPlayer): Player {
         return new Player(
-            serializedPlayer.name,
-            serializedPlayer.balance,
-            new Date(serializedPlayer.creationDate),
-            serializedPlayer.visitedSystemHistory,
-            serializedPlayer.currentItinerary,
-            serializedPlayer.systemBookmarks,
-            serializedPlayer.currentMissions.map((mission) => Mission.Deserialize(mission)),
-            serializedPlayer.completedMissions.map((mission) => Mission.Deserialize(mission))
+            warnIfUndefined(serializedPlayer.name, Player.DEFAULT_NAME, `[PLAYER_DATA_WARNING] Name was undefined. Defaulting to ${Player.DEFAULT_NAME}`),
+            warnIfUndefined(serializedPlayer.balance, Player.DEFAULT_BALANCE, `[PLAYER_DATA_WARNING] Balance was undefined. Defaulting to ${Player.DEFAULT_BALANCE}`),
+            new Date(warnIfUndefined(serializedPlayer.creationDate, new Date().toISOString(), `[PLAYER_DATA_WARNING] Creation date was undefined. Defaulting to current date`)),
+            warnIfUndefined(serializedPlayer.visitedSystemHistory, [], `[PLAYER_DATA_WARNING] Visited system history was undefined. Defaulting to empty array`),
+            warnIfUndefined(serializedPlayer.currentItinerary, [], `[PLAYER_DATA_WARNING] Current itinerary was undefined. Defaulting to empty array`),
+            warnIfUndefined(serializedPlayer.systemBookmarks, [], `[PLAYER_DATA_WARNING] System bookmarks were undefined. Defaulting to empty array`),
+            warnIfUndefined(serializedPlayer.currentMissions, [], `[PLAYER_DATA_WARNING] Current missions were undefined. Defaulting to empty array`).map((mission) =>
+                Mission.Deserialize(mission)
+            ),
+            warnIfUndefined(serializedPlayer.completedMissions, [], `[PLAYER_DATA_WARNING] Completed missions were undefined. Defaulting to empty array`).map((mission) =>
+                Mission.Deserialize(mission)
+            )
         );
     }
 

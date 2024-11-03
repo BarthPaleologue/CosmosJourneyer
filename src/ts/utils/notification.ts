@@ -1,5 +1,10 @@
 import { Sounds } from "../assets/sounds";
 
+/**
+ * Create a notification with a text and a duration (in ms)
+ * @param text The text to display
+ * @param duration The duration of the notification in ms
+ */
 export function createNotification(text: string, duration: number) {
     const container = document.getElementById("notificationContainer");
     if (container === null) throw new Error("No notification container found");
@@ -28,10 +33,33 @@ export function createNotification(text: string, duration: number) {
     // animate progress bar
     progressBar.style.animation = `progress ${duration}ms linear`;
 
-    setTimeout(() => {
+    const removeNotification = () => {
         newNotification.style.animation = "popOut 0.5s ease-in-out";
         setTimeout(() => {
             newNotification.remove();
-        }, 500);
-    }, duration);
+        }, 450);
+    };
+
+    const timeOut = setTimeout(removeNotification, duration);
+
+    newNotification.addEventListener("click", () => {
+        clearTimeout(timeOut);
+        removeNotification();
+    });
+}
+
+/**
+ * Helper function to log a warning if a value is undefined and return a defined value
+ * @param value The value to check
+ * @param defaultValue The default value to return if the value is undefined
+ * @param message The message to log if the value is undefined
+ * @returns The value if it is defined, otherwise the default value
+ */
+export function warnIfUndefined<T>(value: T | undefined, defaultValue: T, message: string): T {
+    if (value === undefined) {
+        console.warn(message);
+        createNotification(message, 60_000);
+        return defaultValue;
+    }
+    return value;
 }
