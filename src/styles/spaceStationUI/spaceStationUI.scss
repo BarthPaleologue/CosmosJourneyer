@@ -1,3 +1,5 @@
+@use "../variables";
+
 $gaps: 10px;
 
 #spaceStationUI {
@@ -8,7 +10,7 @@ $gaps: 10px;
     right: 0;
     z-index: 2;
 
-    font-family: Nasalization, sans-serif;
+    font-family: variables.$main-font;
 
     padding: $gaps;
 
@@ -130,11 +132,11 @@ $gaps: 10px;
                         outline: none;
                         border: none;
                         color: white;
-                        font-family: $main-font;
+                        font-family: variables.$main-font;
                         padding: 1.0vmin;
                         font-size: var(--text-size);
 
-                        transition: $transition-time;
+                        transition: variables.$transition-time;
 
                         &:hover {
                             background: var(--accent-color-light);

@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+@use "../variables";
+
 .currentMissionDisplay {
   position: absolute;
   top: 0;
@@ -25,7 +27,7 @@
   flex-direction: column;
 
   background: rgba(0, 0, 0, 0.5);
-  transition: $transition-time;
+  transition: variables.$transition-time;
 
   &.completed {
     background: rgba(0, 64, 0, 0.5);

@@ -1,3 +1,5 @@
+@use "variables";
+
 @keyframes loadingAnimation {
   0% {
     background-position: 100% 0;
@@ -23,7 +25,7 @@
     pointer-events: none;
     transform-origin: center;
     scale: 1;
-    transition: scale $transition-time $bezier-overshoot;
+    transition: scale variables.$transition-time variables.$bezier-overshoot;
   }
 
   .systemIcons {
@@ -71,7 +73,7 @@
     z-index: 5;
 
     color: white;
-    font-family: $main-font;
+    font-family: variables.$main-font;
     padding: 2vmin;
 
     h2, p {
@@ -97,11 +99,11 @@
       border: none;
       cursor: none;
       color: white;
-      font-family: $main-font;
+      font-family: variables.$main-font;
       padding: 1.0vmin;
       font-size: var(--text-size);
 
-      transition: $transition-time;
+      transition: variables.$transition-time;
 
       &:hover {
         background: var(--accent-color-light);

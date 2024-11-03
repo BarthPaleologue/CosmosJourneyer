@@ -1,3 +1,4 @@
+@use "sass:meta";
 @use "sass:color";
 
 //  This file is part of Cosmos Journeyer
@@ -17,12 +18,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+@use "variables";
+
 @font-face {
   font-family: 'Nasalization';
   src: url('./nasalization/nasalization-rg.otf') format('opentype');
 }
-
-@import "variables";
 
 *,
 *::before,
@@ -49,6 +50,17 @@
   background: #555;
 }
 
+:root {
+  --text-size: 2vmin;
+  --h2-size: calc(1.5 * var(--text-size));
+  --h1-size: calc(2.0 * var(--text-size));
+  --menu-items-size: 3.2vmin;
+  --accent-color: #002b6a;
+  --accent-color-dark: #001a3f;
+  --accent-color-light: #003f9f;
+  --disabled-color: rgb(100, 100, 100);
+}
+
 body {
   margin: 0;
   overflow: hidden;
@@ -66,18 +78,18 @@ body {
     top: 65vh;
     left: 2.5vw;
     transform: translateY(-50%);
-    transition: $transition-time ease-in-out;
+    transition: variables.$transition-time ease-in-out;
 
     z-index: 10;
 
     li {
       color: white;
-      font-family: $main-font;
+      font-family: variables.$main-font;
       font-size: var(--menu-items-size);
       line-height: 1.5em;
       cursor: pointer;
       padding: 5px 20px;
-      transition: $transition-time;
+      transition: variables.$transition-time;
 
       &:hover {
         background: var(--accent-color);
@@ -98,31 +110,31 @@ body {
     }
   }
 
-  @import "bodyEditor/nav";
+  @include meta.load-css("bodyEditor/nav");
 
-  @import "bodyEditor/panels";
+  @include meta.load-css("bodyEditor/panels");
 
-  @import "helmetOverlay/helmetOverlay";
+  @include meta.load-css("helmetOverlay/helmetOverlay");
 
-  @import "spaceStationUI/spaceStationUI";
+  @include meta.load-css("spaceStationUI/spaceStationUI");
 
-  @import "pauseMenu/index.scss";
+  @include meta.load-css("pauseMenu/index.scss");
 
-  @import "mainMenu.scss";
+  @include meta.load-css("mainMenu.scss");
 
-  @import "inputs.scss";
+  @include meta.load-css("inputs.scss");
 
-  @import "loadingScreen.scss";
+  @include meta.load-css("loadingScreen.scss");
 
-  @import "targetCursors.scss";
+  @include meta.load-css("targetCursors.scss");
 
-  @import "starMapUI.scss";
+  @include meta.load-css("starMapUI.scss");
 
-  @import "tutorialLayer.scss";
+  @include meta.load-css("tutorialLayer.scss");
 
-  @import "tutorialsMenuPanel.scss";
+  @include meta.load-css("tutorialsMenuPanel.scss");
 
-  @import "inspectorLayer.scss";
+  @include meta.load-css("inspectorLayer.scss");
 
   #renderer {
     z-index: 1;
@@ -141,5 +153,5 @@ body {
     background: rgba(0, 0, 0, .7);
   }
 
-  @import "bodyEditor/toolbar";
+  @include meta.load-css("bodyEditor/toolbar");
 }
