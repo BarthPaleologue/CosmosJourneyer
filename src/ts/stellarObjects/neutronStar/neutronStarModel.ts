@@ -27,6 +27,7 @@ import { GenerationSteps } from "../../utils/generationSteps";
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { OrbitalObjectType } from "../../architecture/orbitalObject";
 import { Quaternion } from "@babylonjs/core/Maths/math";
+import { Settings } from "../../settings";
 
 export type NeutronStarModel = StellarObjectModel & {
     readonly type: OrbitalObjectType.NEUTRON_STAR;
@@ -61,9 +62,13 @@ export function newSeededNeutronStarModel(seed: number, name: string, parentBodi
 
     const rings = uniformRandBool(ringProportion, rng, GenerationSteps.RINGS) ? newSeededRingsModel(rng) : null;
 
+    // neutron stars can pretty much have any birth year as they have a very, very long lifespan
+    const birthYear = randRangeInt(0, Settings.GREGORIAN_YEAR_0, rng, GenerationSteps.BIRTH_YEAR);
+
     return {
         name: name,
         seed: seed,
+        birthYear: birthYear,
         type: OrbitalObjectType.NEUTRON_STAR,
         physics: physicalProperties,
         radius: radius,
