@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { getOrbitalPeriod, Orbit } from "../../orbit/orbit";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { normalRandom } from "extended-random";
 import { BlackHolePhysicsInfo } from "../../architecture/physicsInfo";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
@@ -27,6 +26,8 @@ import { GenerationSteps } from "../../utils/generationSteps";
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { OrbitalObjectType } from "../../architecture/orbitalObject";
 import { estimateStarRadiusFromMass } from "../../utils/physics";
+import { Quaternion } from "@babylonjs/core/Maths/math";
+import { Axis } from "@babylonjs/core/Maths/math.axis";
 
 export type BlackHoleModel = StellarObjectModel & {
     readonly type: OrbitalObjectType.BLACK_HOLE;
@@ -54,14 +55,14 @@ export function newSeededBlackHoleModel(seed: number, name: string, parentBodies
         radius: orbitRadius,
         p: 2,
         period: getOrbitalPeriod(orbitRadius, parentMassSum),
-        normalToPlane: Vector3.Up()
+        orientation: Quaternion.Identity()
     };
 
     const physicalProperties: BlackHolePhysicsInfo = {
         mass: getMassFromSchwarzschildRadius(radius),
         //FIXME: do not hardcode
-        rotationPeriod: 1.5e-19,
-        axialTilt: normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT),
+        siderealDayDuration: 1.5e-19,
+        axialTilt: Quaternion.RotationAxis(Axis.X, normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT)),
         accretionDiskRadius: radius * normalRandom(12, 3, rng, 7777),
         //TODO: compute temperature of accretion disk (function of rotation speed)
         blackBodyTemperature: 7_000

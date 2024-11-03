@@ -64,7 +64,19 @@ export class MatterJetPostProcess extends PostProcess implements ObjectPostProce
 
         const samplers: string[] = Object.values(SamplerUniformNames);
 
-        super(`${stellarObject.model.name}MatterJetPostProcess`, shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
+        super(
+            `${stellarObject.model.name}MatterJetPostProcess`,
+            shaderName,
+            uniforms,
+            samplers,
+            1,
+            null,
+            Texture.BILINEAR_SAMPLINGMODE,
+            scene.getEngine(),
+            false,
+            null,
+            Constants.TEXTURETYPE_HALF_FLOAT
+        );
 
         this.object = stellarObject;
         this.matterJetUniforms = settings;

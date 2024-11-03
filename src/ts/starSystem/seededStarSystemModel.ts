@@ -40,6 +40,7 @@ import { isSystemInHumanBubble } from "../society/starSystemSociety";
 import { OrbitalObjectType } from "../architecture/orbitalObject";
 import { newSeededTelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModel";
 import { newSeededTelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
+import { newSeededSpaceElevatorModel } from "../spacestation/spaceElevatorModel";
 
 const enum GenerationSteps {
     NAME,
@@ -116,14 +117,14 @@ export function newSeededStarSystemModel(seed: SystemSeed): StarSystemModel {
                 planetarySystems.push({
                     planets: [newSeededTelluricPlanetModel(seed, planetName, stellarObjects)],
                     satellites: [],
-                    spaceStations: []
+                    orbitalFacilities: []
                 });
                 break;
             case OrbitalObjectType.GAS_PLANET:
                 planetarySystems.push({
                     planets: [newSeededGasPlanetModel(seed, planetName, stellarObjects)],
                     satellites: [],
-                    spaceStations: []
+                    orbitalFacilities: []
                 });
                 break;
             default:
@@ -204,8 +205,19 @@ export function newSeededStarSystemModel(seed: SystemSeed): StarSystemModel {
 
         planetarySystemsWithStations.forEach((planetarySystem) => {
             const spaceStationSeed = centeredRand(systemRng, GenerationSteps.SPACE_STATIONS + planetarySystem.planets.length) * Settings.SEED_HALF_RANGE;
-            const spaceStationModel = newSeededSpaceStationModel(spaceStationSeed, stellarObjects, coordinates, planetarySystem.planets);
-            planetarySystem.spaceStations.push(spaceStationModel);
+
+            if (
+                uniformRandBool(0.5, systemRng, 657) && // 50% chance of having a space elevator
+                planetarySystem.planets.length === 1 && // I don't want to imagine the complexity of a space elevator in a close binary system
+                planetarySystem.planets[0].type === OrbitalObjectType.TELLURIC_PLANET && // space elevators can't be built on gas giants yet
+                planetarySystem.planets[0].rings === null // can't have rings because the tether would be at risk
+            ) {
+                const spaceElevatorModel = newSeededSpaceElevatorModel(spaceStationSeed, stellarObjects, coordinates, planetarySystem.planets[0]);
+                planetarySystem.orbitalFacilities.push(spaceElevatorModel);
+            } else {
+                const spaceStationModel = newSeededSpaceStationModel(spaceStationSeed, stellarObjects, coordinates, planetarySystem.planets);
+                planetarySystem.orbitalFacilities.push(spaceStationModel);
+            }
         });
     }
 
@@ -217,7 +229,7 @@ export function newSeededStarSystemModel(seed: SystemSeed): StarSystemModel {
                 stellarObjects,
                 planetarySystems,
                 anomalies,
-                spaceStations: []
+                orbitalFacilities: []
             }
         ]
     };

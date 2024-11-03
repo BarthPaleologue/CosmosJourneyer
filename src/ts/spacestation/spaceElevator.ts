@@ -32,27 +32,37 @@ import { LandingBay } from "../assets/procedural/spaceStation/landingBay";
 import { LandingPad } from "../assets/procedural/landingPad/landingPad";
 import { LandingRequest } from "../utils/managesLandingPads";
 import { Settings } from "../settings";
-import { EngineBay } from "../assets/procedural/spaceStation/engineBay";
 import { getRngFromSeed } from "../utils/getRngFromSeed";
 import { orbitalObjectTypeToDisplay } from "../utils/strings/orbitalObjectTypeToDisplay";
 import { OrbitalFacility } from "./orbitalFacility";
-import { SpaceStationModel } from "./spacestationModel";
+import { SpaceElevatorModel } from "./spaceElevatorModel";
 import { OrbitalObject } from "../architecture/orbitalObject";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { MetalSectionMaterial } from "../assets/procedural/spaceStation/metalSectionMaterial";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { SpaceElevatorClimber } from "./spaceElevatorClimber";
+import { clamp, remap, triangleWave } from "../utils/math";
 import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
 import { setRotationQuaternion } from "../uberCore/transforms/basicTransform";
+import { Axis } from "@babylonjs/core/Maths/math.axis";
 
-export class SpaceStation implements OrbitalFacility {
+export class SpaceElevator implements OrbitalFacility {
     readonly name: string;
 
-    readonly model: SpaceStationModel;
+    readonly model: SpaceElevatorModel;
 
-    readonly solarSections: SolarSection[] = [];
-    readonly utilitySections: UtilitySection[] = [];
-    readonly helixHabitats: HelixHabitat[] = [];
-    readonly ringHabitats: RingHabitat[] = [];
-    readonly cylinderHabitats: CylinderHabitat[] = [];
-    readonly landingBays: LandingBay[] = [];
-    readonly engineBays: EngineBay[] = [];
+    private readonly solarSections: SolarSection[] = [];
+    private readonly utilitySections: UtilitySection[] = [];
+    private readonly helixHabitats: HelixHabitat[] = [];
+    private readonly ringHabitats: RingHabitat[] = [];
+    private readonly cylinderHabitats: CylinderHabitat[] = [];
+    private readonly landingBays: LandingBay[] = [];
+
+    private readonly tether: Mesh;
+    private readonly tetherLength: number;
+    private readonly tetherMaterial: MetalSectionMaterial;
+
+    private readonly climber: SpaceElevatorClimber;
 
     private readonly root: TransformNode;
 
@@ -60,15 +70,39 @@ export class SpaceStation implements OrbitalFacility {
 
     private readonly boundingRadius: number;
 
+    private elapsedSeconds = 0;
+
     readonly targetInfo: TargetInfo;
 
-    constructor(model: SpaceStationModel, scene: Scene) {
+    constructor(model: SpaceElevatorModel, scene: Scene) {
         this.model = model;
 
         this.name = this.model.name;
 
         this.root = new TransformNode(this.name, scene);
         this.scene = scene;
+
+        const tetherThickness = 10;
+        this.tetherLength = this.model.tetherLength;
+
+        this.tether = MeshBuilder.CreateCylinder(
+            `${this.name} Tether`,
+            {
+                height: this.tetherLength,
+                diameter: tetherThickness,
+                tessellation: 6
+            },
+            this.scene
+        );
+        this.tether.convertToFlatShadedMesh();
+
+        this.tetherMaterial = new MetalSectionMaterial(scene);
+        this.tether.material = this.tetherMaterial;
+
+        this.climber = new SpaceElevatorClimber(scene);
+        this.climber.getTransform().parent = this.tether;
+
+        this.climber.getTransform().position.y = this.tetherLength / 2;
 
         this.generate();
 
@@ -77,9 +111,15 @@ export class SpaceStation implements OrbitalFacility {
         const centerWorld = boundingVectors.max.add(boundingVectors.min).scale(0.5);
         const deltaPosition = this.getTransform().getAbsolutePosition().subtract(centerWorld);
 
+        this.tether.parent = this.getTransform();
+
         this.getTransform()
             .getChildTransformNodes(true)
             .forEach((transform) => transform.position.addInPlace(deltaPosition));
+
+        this.getTransform()
+            .getChildTransformNodes(true)
+            .forEach((transform) => transform.rotateAround(Vector3.Zero(), Axis.Z, -Math.PI / 2));
 
         setRotationQuaternion(this.getTransform(), this.model.physics.axialTilt);
 
@@ -100,7 +140,7 @@ export class SpaceStation implements OrbitalFacility {
     }
 
     getSubTargets(): Targetable[] {
-        return this.getLandingPads();
+        return [this.climber, ...this.getLandingPads()];
     }
 
     handleLandingRequest(request: LandingRequest): LandingPad | null {
@@ -142,22 +182,11 @@ export class SpaceStation implements OrbitalFacility {
         const solarPanelSurface = this.model.solarPanelSurfaceM2;
         const habitatSurface = this.model.totalHabitatSurfaceM2;
 
-        const engineBay = new EngineBay(this.scene);
-        engineBay.getTransform().parent = this.getTransform();
-        let lastNode = engineBay.getTransform();
-        this.engineBays.push(engineBay);
+        let lastNode: TransformNode = this.tether;
 
         const rng = getRngFromSeed(this.model.seed);
 
         lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(rng(564) * 5), rng);
-
-        const solarSection = new SolarSection(solarPanelSurface, Settings.SEED_HALF_RANGE * rng(31), this.scene);
-        solarSection.getTransform().parent = this.getTransform();
-        this.placeNode(solarSection.getTransform(), lastNode);
-        lastNode = solarSection.getTransform();
-        this.solarSections.push(solarSection);
-
-        lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(rng(23) * 5), rng);
 
         const habitatType = wheelOfFortune(
             [
@@ -190,6 +219,14 @@ export class SpaceStation implements OrbitalFacility {
         this.placeNode(newNode, lastNode);
         newNode.parent = this.root;
         lastNode = newNode;
+
+        lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(rng(23) * 5), rng);
+
+        const solarSection = new SolarSection(solarPanelSurface, Settings.SEED_HALF_RANGE * rng(31), this.scene);
+        solarSection.getTransform().parent = this.getTransform();
+        this.placeNode(solarSection.getTransform(), lastNode);
+        lastNode = solarSection.getTransform();
+        this.solarSections.push(solarSection);
 
         lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(rng(23) * 5), rng);
 
@@ -230,13 +267,27 @@ export class SpaceStation implements OrbitalFacility {
     }
 
     update(stellarObjects: Transformable[], parents: OrbitalObject[], cameraWorldPosition: Vector3, deltaSeconds: number) {
+        this.elapsedSeconds += deltaSeconds;
+
         this.solarSections.forEach((solarSection) => solarSection.update(stellarObjects, cameraWorldPosition));
         this.utilitySections.forEach((utilitySection) => utilitySection.update(stellarObjects, cameraWorldPosition));
         this.helixHabitats.forEach((helixHabitat) => helixHabitat.update(stellarObjects, cameraWorldPosition, deltaSeconds));
         this.ringHabitats.forEach((ringHabitat) => ringHabitat.update(stellarObjects, cameraWorldPosition, deltaSeconds));
         this.cylinderHabitats.forEach((cylinderHabitat) => cylinderHabitat.update(stellarObjects, cameraWorldPosition, deltaSeconds));
         this.landingBays.forEach((landingBay) => landingBay.update(stellarObjects, cameraWorldPosition, deltaSeconds));
-        this.engineBays.forEach((engineBay) => engineBay.update(stellarObjects, cameraWorldPosition));
+
+        this.tetherMaterial.update(stellarObjects);
+
+        const climberSpeed = 300 / 3.6; // 300 km/h in m/s
+        const roundTripDuration = (2 * this.tetherLength) / climberSpeed;
+
+        this.climber.getTransform().position.y = remap(
+            clamp(1.05 * triangleWave(this.elapsedSeconds / roundTripDuration), 0, 1),
+            0,
+            1,
+            -this.tetherLength / 2,
+            this.tetherLength / 2
+        );
     }
 
     getTransform(): TransformNode {
@@ -250,7 +301,10 @@ export class SpaceStation implements OrbitalFacility {
         this.ringHabitats.forEach((ringHabitat) => ringHabitat.dispose());
         this.cylinderHabitats.forEach((cylinderHabitat) => cylinderHabitat.dispose());
         this.landingBays.forEach((landingBay) => landingBay.dispose());
-        this.engineBays.forEach((engineBay) => engineBay.dispose());
+        this.tether.dispose();
+        this.tetherMaterial.dispose();
+
+        this.climber.dispose();
 
         this.root.dispose();
     }

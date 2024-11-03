@@ -130,6 +130,24 @@ export const SpaceStationAdjectives: string[] = [
     "Zenith"
 ];
 
+export const SpaceElevatorAdjectives: string[] = [
+    "Ascension",
+    "Ascending",
+    "Bridge",
+    "Climb",
+    "Climbing",
+    "Elevated",
+    "Elevation",
+    "Elevator",
+    "Ladder",
+    "Lift",
+    "Lifting",
+    "Rising",
+    "Skyward",
+    "Soaring",
+    "Upward"
+];
+
 /**
  * Generate a space station name using a noise based rng and a given sample index
  * @param rng The noise based rng with a range of [0, 1]
@@ -137,6 +155,12 @@ export const SpaceStationAdjectives: string[] = [
  */
 export function generateSpaceStationName(rng: (index: number) => number, sampleIndex: number) {
     const adjective = SpaceStationAdjectives[Math.floor(rng(sampleIndex) * SpaceStationAdjectives.length)];
+    const name = SpaceStationNames[Math.floor(rng(sampleIndex + 1) * SpaceStationNames.length)];
+    return `${name}${uniformRandBool(0.5, rng, sampleIndex + 2) ? "'s" : ""} ${adjective}`;
+}
+
+export function generateSpaceElevatorName(rng: (index: number) => number, sampleIndex: number) {
+    const adjective = SpaceElevatorAdjectives[Math.floor(rng(sampleIndex) * SpaceElevatorAdjectives.length)];
     const name = SpaceStationNames[Math.floor(rng(sampleIndex + 1) * SpaceStationNames.length)];
     return `${name}${uniformRandBool(0.5, rng, sampleIndex + 2) ? "'s" : ""} ${adjective}`;
 }

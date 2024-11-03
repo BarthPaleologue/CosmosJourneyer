@@ -24,14 +24,7 @@ import { TypedObject } from "../architecture/typedObject";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Matrix } from "@babylonjs/core/Maths/math";
 import { smoothstep } from "../utils/math";
-
-export const enum ObjectTargetCursorType {
-    CELESTIAL_BODY,
-    FACILITY,
-    ANOMALY,
-    LANDING_PAD,
-    STAR_SYSTEM
-}
+import { ObjectTargetCursorType, Targetable } from "../architecture/targetable";
 
 export class ObjectTargetCursor {
     readonly htmlRoot: HTMLDivElement;
@@ -62,7 +55,7 @@ export class ObjectTargetCursor {
 
     private isInformationEnabled = false;
 
-    constructor(object: Transformable & HasBoundingSphere & TypedObject, iconType: ObjectTargetCursorType, minDistance: number, maxDistance: number) {
+    constructor(object: Targetable) {
         this.htmlRoot = document.createElement("div");
         this.htmlRoot.classList.add("targetCursorRoot");
         this.htmlRoot.dataset.name = object.getTransform().name + " Target Cursor Root";
@@ -70,7 +63,7 @@ export class ObjectTargetCursor {
         this.cursor = document.createElement("div");
         this.cursor.classList.add("targetCursor");
 
-        switch (iconType) {
+        switch (object.targetInfo.type) {
             case ObjectTargetCursorType.CELESTIAL_BODY:
                 this.cursor.classList.add("rounded");
                 this.minSize = 5;
@@ -130,8 +123,8 @@ export class ObjectTargetCursor {
 
         this.object = object;
 
-        this.minDistance = minDistance;
-        this.maxDistance = maxDistance;
+        this.minDistance = object.targetInfo.minDistance;
+        this.maxDistance = object.targetInfo.maxDistance;
     }
 
     setTarget(isTarget: boolean) {
@@ -159,8 +152,8 @@ export class ObjectTargetCursor {
             );
 
             this.htmlRoot.classList.remove("hidden");
-            this.htmlRoot.style.left = `${this.screenCoordinates.x * 100}vw`;
-            this.htmlRoot.style.top = `${this.screenCoordinates.y * 100}vh`;
+            this.htmlRoot.style.left = `${this.screenCoordinates.x * camera.getEngine().getRenderWidth()}px`;
+            this.htmlRoot.style.top = `${this.screenCoordinates.y * camera.getEngine().getRenderHeight()}px`;
         } else {
             this.htmlRoot.classList.add("hidden");
         }

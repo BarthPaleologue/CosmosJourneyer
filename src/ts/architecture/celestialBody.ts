@@ -18,11 +18,12 @@
 import { OrbitalObject, OrbitalObjectModel } from "./orbitalObject";
 import { HasPostProcesses } from "./hasPostProcesses";
 import { CanHaveRings, CanHaveRingsModel } from "./canHaveRings";
+import { Targetable } from "./targetable";
 
 /**
  * Describes all celestial bodies (a combination of OrbitalObject, CanHaveRings and HasPostProcesses)
  */
-export interface CelestialBody extends OrbitalObject, CanHaveRings, HasPostProcesses {
+export interface CelestialBody extends OrbitalObject, CanHaveRings, HasPostProcesses, Targetable {
     /**
      * The underlying model describing the data of the celestial body
      */

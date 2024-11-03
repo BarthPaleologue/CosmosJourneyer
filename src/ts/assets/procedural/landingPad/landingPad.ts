@@ -8,11 +8,10 @@ import { LandingPadMaterial } from "./landingPadMaterial";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { CollisionMask, Settings } from "../../../settings";
-import { TypedObject } from "../../../architecture/typedObject";
 import i18n from "../../../i18n";
-import { HasBoundingSphere } from "../../../architecture/hasBoundingSphere";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { Objects } from "../../objects";
+import { ObjectTargetCursorType, Targetable, TargetInfo } from "../../../architecture/targetable";
 
 export const enum LandingPadSize {
     SMALL = 1,
@@ -20,7 +19,7 @@ export const enum LandingPadSize {
     LARGE = 3
 }
 
-export class LandingPad implements Transformable, TypedObject, HasBoundingSphere {
+export class LandingPad implements Targetable {
     private readonly deck: Mesh;
     private readonly deckAggregate: PhysicsAggregate;
 
@@ -32,6 +31,8 @@ export class LandingPad implements Transformable, TypedObject, HasBoundingSphere
     readonly padSize: LandingPadSize;
 
     private readonly boundingRadius: number;
+
+    readonly targetInfo: TargetInfo;
 
     constructor(padNumber: number, padSize: LandingPadSize, scene: Scene) {
         this.padSize = padSize;
@@ -89,6 +90,12 @@ export class LandingPad implements Transformable, TypedObject, HasBoundingSphere
                 this.crates.push(crate);
             }
         }
+
+        this.targetInfo = {
+            type: ObjectTargetCursorType.LANDING_PAD,
+            minDistance: this.getBoundingRadius() * 4.0,
+            maxDistance: 2e3
+        };
     }
 
     update(stellarObjects: Transformable[], cameraWorldPosition: Vector3): void {

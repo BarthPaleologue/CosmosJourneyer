@@ -16,13 +16,13 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import spaceStationHTML from "../../../html/spaceStationUI.html";
-import { SpaceStationModel } from "../../spacestation/spacestationModel";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { generateInfoHTML } from "./spaceStationInfos";
 import { Player } from "../../player/player";
 import { generateMissionsDom } from "./spaceStationMissions";
 import { Settings } from "../../settings";
 import { OrbitalObjectModel } from "../../architecture/orbitalObject";
+import { OrbitalFacilityModel } from "../../spacestation/orbitalFacility";
 
 const enum MainPanelState {
     NONE,
@@ -34,7 +34,7 @@ export class SpaceStationLayer {
     private parentNode: HTMLElement;
     private spaceStationHeader: HTMLElement;
 
-    private currentStation: SpaceStationModel | null = null;
+    private currentStation: OrbitalFacilityModel | null = null;
     private currentStationParents: OrbitalObjectModel[] = [];
 
     private readonly playerName: HTMLElement;
@@ -135,7 +135,7 @@ export class SpaceStationLayer {
         return this.parentNode.style.visibility !== "hidden";
     }
 
-    public setStation(station: SpaceStationModel, stationParents: OrbitalObjectModel[], player: Player) {
+    public setStation(station: OrbitalFacilityModel, stationParents: OrbitalObjectModel[], player: Player) {
         this.currentStation = station;
         this.currentStationParents = stationParents;
         this.spaceStationHeader.innerHTML = `

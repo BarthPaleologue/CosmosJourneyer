@@ -22,7 +22,6 @@ import { normalRandom, randRangeInt } from "extended-random";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { Settings } from "../../settings";
 import { TelluricPlanetaryMassObjectPhysicsInfo } from "../../architecture/physicsInfo";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { clamp } from "terrain-generation";
@@ -70,10 +69,16 @@ export function newSeededTelluricSatelliteModel(seed: number, name: string, pare
     // when pressure is close to 1, the max temperature is close to the min temperature (the atmosphere does thermal regulation)
     const maxTemperature = minTemperature + Math.exp(-pressure) * randRangeInt(30, 200, rng, 81);
 
+    // this average is an approximation of a quaternion average
+    // see https://math.stackexchange.com/questions/61146/averaging-quaternions
+    const parentAverageAxialTilt: Quaternion = parentBodies.reduce((sum, body) => sum.add(body.physics.axialTilt), Quaternion.Zero());
+    parentAverageAxialTilt.scaleInPlace(1 / parentBodies.length);
+    parentAverageAxialTilt.normalize();
+
     const physicalProperties: TelluricPlanetaryMassObjectPhysicsInfo = {
         mass: mass,
-        axialTilt: 0,
-        rotationPeriod: (60 * 60 * 24) / 10,
+        axialTilt: parentAverageAxialTilt,
+        siderealDayDuration: (60 * 60 * 24) / 10,
         minTemperature: minTemperature,
         maxTemperature: maxTemperature,
         pressure: pressure,
@@ -82,8 +87,6 @@ export function newSeededTelluricSatelliteModel(seed: number, name: string, pare
     };
 
     physicalProperties.oceanLevel = Settings.OCEAN_DEPTH * physicalProperties.waterAmount * physicalProperties.pressure;
-
-    const orbitalPlaneNormal = Vector3.Up().applyRotationQuaternionInPlace(Quaternion.RotationAxis(Axis.X, (rng(GenerationSteps.ORBIT + 20) - 0.5) * 0.2));
 
     // Todo: do not hardcode
     let orbitRadius = 2e9 + rng(GenerationSteps.ORBIT) * 15e9;
@@ -101,11 +104,11 @@ export function newSeededTelluricSatelliteModel(seed: number, name: string, pare
         radius: orbitRadius,
         p: orbitalP,
         period: getOrbitalPeriod(orbitRadius, parentMassSum),
-        normalToPlane: orbitalPlaneNormal
+        orientation: parentAverageAxialTilt
     };
 
     // tidal lock
-    physicalProperties.rotationPeriod = orbit.period;
+    physicalProperties.siderealDayDuration = orbit.period;
 
     const canHaveLiquidWater = hasLiquidWater(physicalProperties.pressure, physicalProperties.minTemperature, physicalProperties.maxTemperature);
     if (!canHaveLiquidWater) physicalProperties.oceanLevel = 0;

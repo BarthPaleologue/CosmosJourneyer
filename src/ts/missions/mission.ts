@@ -17,11 +17,11 @@
 
 import { MissionNode, MissionNodeSerialized } from "./nodes/missionNode";
 import { MissionContext } from "./missionContext";
-import { SpaceStationModel } from "../spacestation/spacestationModel";
 import { getObjectModelByUniverseId, getUniverseIdForSpaceStationModel } from "../utils/coordinates/orbitalObjectId";
 import i18n from "../i18n";
 import { StarSystemCoordinates, UniverseObjectId } from "../utils/coordinates/universeCoordinates";
 import { deserializeMissionNode } from "./nodes/deserializeNode";
+import { OrbitalFacilityModel } from "../spacestation/orbitalFacility";
 
 /**
  * Registered mission types. Those are used to display localized strings in the UI
@@ -60,7 +60,7 @@ export class Mission {
     /**
      * The space station that gave the mission
      */
-    readonly missionGiver: SpaceStationModel;
+    readonly missionGiver: OrbitalFacilityModel;
 
     /**
      * The type of the mission (useful for displaying localized strings)
@@ -74,7 +74,7 @@ export class Mission {
      * @param missionGiver The space station that gave the mission
      * @param missionType The type of the mission (useful for displaying localized strings)
      */
-    constructor(tree: MissionNode, reward: number, missionGiver: SpaceStationModel, missionType: MissionType) {
+    constructor(tree: MissionNode, reward: number, missionGiver: OrbitalFacilityModel, missionType: MissionType) {
         this.tree = tree;
         this.reward = reward;
         this.missionGiver = missionGiver;
@@ -166,7 +166,7 @@ export class Mission {
         return new Mission(
             deserializeMissionNode(missionSerialized.tree),
             missionSerialized.reward,
-            getObjectModelByUniverseId(missionSerialized.missionGiver) as SpaceStationModel,
+            getObjectModelByUniverseId(missionSerialized.missionGiver) as OrbitalFacilityModel,
             missionSerialized.type
         );
     }

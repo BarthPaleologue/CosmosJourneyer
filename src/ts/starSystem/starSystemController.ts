@@ -49,18 +49,22 @@ import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates"
 import { wait } from "../utils/wait";
 import { Planet } from "../architecture/planet";
 import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
+import { OrbitalFacility } from "../spacestation/orbitalFacility";
+import { SpaceStationModel } from "../spacestation/spacestationModel";
+import { SpaceElevator } from "../spacestation/spaceElevator";
+import { SpaceElevatorModel } from "../spacestation/spaceElevatorModel";
 
 export type PlanetarySystem = {
     readonly planets: Planet[];
     readonly satellites: TelluricPlanet[];
-    readonly spaceStations: SpaceStation[];
+    readonly spaceStations: OrbitalFacility[];
 };
 
 export type SubStarSystem = {
     readonly stellarObjects: StellarObject[];
     readonly planetarySystems: PlanetarySystem[];
     readonly anomalies: CelestialBody[];
-    readonly spaceStations: SpaceStation[];
+    readonly spaceStations: OrbitalFacility[];
 };
 
 /**
@@ -176,13 +180,20 @@ export class StarSystemController {
             await wait(this.timeOut);
         }
 
-        const spaceStations: SpaceStation[] = [];
-        for (const spaceStationModel of subSystemModel.spaceStations) {
-            const spaceStation = new SpaceStation(spaceStationModel, this.scene);
-            spaceStations.push(spaceStation);
-            spaceStation.getTransform().setAbsolutePosition(new Vector3(this.offset * ++this.loadingIndex, 0, 0));
+        const spaceStations: OrbitalFacility[] = [];
+        for (const orbitalFacilityModel of subSystemModel.orbitalFacilities) {
+            let orbitalFacility: OrbitalFacility;
+            switch (orbitalFacilityModel.type) {
+                case OrbitalObjectType.SPACE_STATION:
+                    orbitalFacility = new SpaceStation(orbitalFacilityModel as SpaceStationModel, this.scene);
+                    break;
+                case OrbitalObjectType.SPACE_ELEVATOR:
+                    throw new Error("A space elevator orbiting a star??? Sounds like a bad idea");
+            }
+            spaceStations.push(orbitalFacility);
+            orbitalFacility.getTransform().setAbsolutePosition(new Vector3(this.offset * ++this.loadingIndex, 0, 0));
 
-            this.objectToParents.set(spaceStation, stellarObjects);
+            this.objectToParents.set(orbitalFacility, stellarObjects);
 
             await wait(this.timeOut);
         }
@@ -234,14 +245,26 @@ export class StarSystemController {
             await wait(this.timeOut);
         }
 
-        const spaceStations: SpaceStation[] = [];
-        for (const spaceStationModel of planetarySystemModel.spaceStations) {
-            console.log("Loading space station:", spaceStationModel.name);
-            const spaceStation = new SpaceStation(spaceStationModel, this.scene);
-            spaceStations.push(spaceStation);
-            spaceStation.getTransform().setAbsolutePosition(new Vector3(this.offset * ++this.loadingIndex, 0, 0));
+        const spaceStations: OrbitalFacility[] = [];
+        for (const orbitalFacilityModel of planetarySystemModel.orbitalFacilities) {
+            console.log("Loading space station:", orbitalFacilityModel.name);
 
-            this.objectToParents.set(spaceStation, planets);
+            let orbitalFacility: OrbitalFacility;
+
+            switch (orbitalFacilityModel.type) {
+                case OrbitalObjectType.SPACE_STATION:
+                    orbitalFacility = new SpaceStation(orbitalFacilityModel as SpaceStationModel, this.scene);
+                    break;
+
+                case OrbitalObjectType.SPACE_ELEVATOR:
+                    orbitalFacility = new SpaceElevator(orbitalFacilityModel as SpaceElevatorModel, this.scene);
+                    break;
+            }
+
+            spaceStations.push(orbitalFacility);
+            orbitalFacility.getTransform().setAbsolutePosition(new Vector3(this.offset * ++this.loadingIndex, 0, 0));
+
+            this.objectToParents.set(orbitalFacility, planets);
 
             await wait(this.timeOut);
         }
@@ -258,23 +281,15 @@ export class StarSystemController {
      * @param position The position from which we want to find the nearest orbital object
      */
     public getNearestOrbitalObject(position: Vector3): OrbitalObject {
-        const celestialBodies = this.getCelestialBodies();
-        const spaceStations = this.getSpaceStations();
-        if (celestialBodies.length + spaceStations.length === 0) throw new Error("There are no orbital objects in the solar system");
-        let nearest: OrbitalObject = celestialBodies[0];
+        const orbitalObjects = this.getOrbitalObjects();
+
+        if (orbitalObjects.length === 0) throw new Error("There are no orbital objects in the solar system");
+        let nearest: OrbitalObject = orbitalObjects[0];
         let smallerDistance = Number.POSITIVE_INFINITY;
-        for (const body of celestialBodies) {
-            const distance = body.getTransform().getAbsolutePosition().subtract(position).length() - body.getRadius();
+        for (const body of orbitalObjects) {
+            const distance = body.getTransform().getAbsolutePosition().subtract(position).length() - body.getBoundingRadius();
             if (distance < smallerDistance) {
                 nearest = body;
-                smallerDistance = distance;
-            }
-        }
-
-        for (const spacestation of spaceStations) {
-            const distance = spacestation.getTransform().getAbsolutePosition().subtract(position).length();
-            if (distance < smallerDistance && distance < spacestation.getBoundingRadius() * 20) {
-                nearest = spacestation;
                 smallerDistance = distance;
             }
         }
@@ -285,10 +300,10 @@ export class StarSystemController {
     /**
      * Returns all the space stations in the star system
      */
-    public getSpaceStations(): SpaceStation[] {
-        const solarSpaceStations: SpaceStation[] = this.subSystems.flatMap((subSystem) => subSystem.spaceStations);
-        const planetSpaceStations: SpaceStation[] = this.subSystems.flatMap((subSystem) => subSystem.planetarySystems.flatMap((planetarySystem) => planetarySystem.spaceStations));
-        return solarSpaceStations.concat(planetSpaceStations);
+    public getOrbitalFacilities(): OrbitalFacility[] {
+        const solarFacilities: OrbitalFacility[] = this.subSystems.flatMap((subSystem) => subSystem.spaceStations);
+        const planetFacilities: OrbitalFacility[] = this.subSystems.flatMap((subSystem) => subSystem.planetarySystems.flatMap((planetarySystem) => planetarySystem.spaceStations));
+        return solarFacilities.concat(planetFacilities);
     }
 
     /**
@@ -315,7 +330,7 @@ export class StarSystemController {
      * Returns all the orbital objects in the star system
      */
     public getOrbitalObjects(): OrbitalObject[] {
-        return [...this.getCelestialBodies(), ...this.getSpaceStations()];
+        return [...this.getCelestialBodies(), ...this.getOrbitalFacilities()];
     }
 
     /**
@@ -459,7 +474,7 @@ export class StarSystemController {
 
         const celestialBodies = this.getCelestialBodies();
         const stellarObjects = this.getStellarObjects();
-        const spaceStations = this.getSpaceStations();
+        const orbitalFacilities = this.getOrbitalFacilities();
         const orbitalObjects = this.getOrbitalObjects();
 
         // The nearest body might have to be treated separately
@@ -473,18 +488,30 @@ export class StarSystemController {
         // When we are a bit further, we only need to compensate the translation as it would be unnatural not to see the body rotating
         const distanceOfNearestToControls = Vector3.Distance(nearestOrbitalObject.getTransform().getAbsolutePosition(), controller.getTransform().getAbsolutePosition());
 
-        const shouldCompensateTranslation = distanceOfNearestToControls < nearestOrbitalObject.getBoundingRadius() * (nearestOrbitalObject instanceof SpaceStation ? 200 : 10);
-
+        const shouldCompensateTranslation =
+            distanceOfNearestToControls < nearestOrbitalObject.getBoundingRadius() * (nearestOrbitalObject.model.type === OrbitalObjectType.SPACE_STATION ? 200 : 10);
+        
         // compensate rotation when close to the body
         let shouldCompensateRotation = distanceOfNearestToControls < nearestOrbitalObject.getBoundingRadius() * 3;
         if (nearestOrbitalObject === nearestCelestialBody && ringUniforms !== null) {
             // or in the vicinity of the rings
             shouldCompensateRotation = shouldCompensateRotation || distanceOfNearestToControls < ringUniforms.model.ringEnd * nearestOrbitalObject.getBoundingRadius();
         }
-        // and never compensate the rotation of a space station
-        shouldCompensateRotation = shouldCompensateRotation && !(nearestOrbitalObject instanceof SpaceStation);
-        // also never compensate the rotation of a black hole
+        // never compensate the rotation of a black hole
         shouldCompensateRotation = shouldCompensateRotation && !(nearestOrbitalObject instanceof BlackHole);
+
+        // first, all other objects are updated normally
+        for (const object of orbitalObjects) {
+            if (object === nearestOrbitalObject) continue;
+
+            const parents = this.objectToParents.get(object);
+            if (parents === undefined) {
+                throw new Error(`Parents of ${object.model.name} are not defined`);
+            }
+
+            OrbitalObjectUtils.SetOrbitalPosition(object, parents, this.elapsedSeconds);
+            OrbitalObjectUtils.UpdateRotation(object, deltaSeconds);
+        }
 
         // ROTATION COMPENSATION
         // If we have to compensate the rotation of the nearest body, there are multiple things to take into account
@@ -498,26 +525,28 @@ export class StarSystemController {
         if (shouldCompensateRotation) {
             const dThetaNearest = OrbitalObjectUtils.GetRotationAngle(nearestOrbitalObject, deltaSeconds);
 
+            const nearestObjectRotationAxis = nearestOrbitalObject.getRotationAxis();
+
             for (const object of orbitalObjects) {
                 const orbit = object.model.orbit;
 
                 // the normal to the orbit planes must be rotated as well (even the one of the nearest body)
-                const rotation = Quaternion.RotationAxis(nearestOrbitalObject.getRotationAxis(), -dThetaNearest);
-                orbit.normalToPlane.applyRotationQuaternionInPlace(rotation);
+                const rotation = Quaternion.RotationAxis(nearestObjectRotationAxis, -dThetaNearest);
+                rotation.multiplyToRef(orbit.orientation, orbit.orientation);
 
                 if (object === nearestOrbitalObject) continue;
 
                 // All other bodies must revolve around it for consistency (finally we can say the sun revolves around the earth!)
-                rotateAround(object.getTransform(), nearestOrbitalObject.getTransform().getAbsolutePosition(), nearestOrbitalObject.getRotationAxis(), -dThetaNearest);
+                rotateAround(object.getTransform(), nearestOrbitalObject.getTransform().getAbsolutePosition(), nearestObjectRotationAxis, -dThetaNearest);
             }
 
             this.systemTargets.forEach((target) => {
-                rotateAround(target.getTransform(), nearestOrbitalObject.getTransform().getAbsolutePosition(), nearestOrbitalObject.getRotationAxis(), -dThetaNearest);
+                rotateAround(target.getTransform(), nearestOrbitalObject.getTransform().getAbsolutePosition(), nearestObjectRotationAxis, -dThetaNearest);
             });
 
             // the starfield is rotated to give the impression the nearest body is rotating, which is only an illusion
-            const starfieldAdditionalRotation = Matrix.RotationAxis(nearestOrbitalObject.getRotationAxis(), dThetaNearest);
-            this.starFieldBox.setRotationMatrix(this.starFieldBox.getRotationMatrix().multiply(starfieldAdditionalRotation));
+            const starfieldAdditionalRotation = Matrix.RotationAxis(nearestObjectRotationAxis, dThetaNearest);
+            this.starFieldBox.setRotationMatrix(starfieldAdditionalRotation.multiply(this.starFieldBox.getRotationMatrix()));
         } else {
             // if we don't compensate the rotation of the nearest body, we must simply update its rotation
             OrbitalObjectUtils.UpdateRotation(nearestOrbitalObject, deltaSeconds);
@@ -552,19 +581,6 @@ export class StarSystemController {
             translate(nearestOrbitalObject.getTransform(), nearestBodyDisplacement);
         }
 
-        // finally, all other objects are updated normally
-        for (const object of orbitalObjects) {
-            if (object === nearestOrbitalObject) continue;
-
-            const parents = this.objectToParents.get(object);
-            if (parents === undefined) {
-                throw new Error(`Parents of ${object.model.name} are not defined`);
-            }
-
-            OrbitalObjectUtils.SetOrbitalPosition(object, parents, this.elapsedSeconds);
-            OrbitalObjectUtils.UpdateRotation(object, deltaSeconds);
-        }
-
         controller.update(deltaSeconds);
 
         for (const object of celestialBodies) {
@@ -582,9 +598,9 @@ export class StarSystemController {
         }
 
         const cameraWorldPosition = controller.getTransform().getAbsolutePosition();
-        for (const spaceStation of spaceStations) {
-            spaceStation.update(stellarObjects, cameraWorldPosition, deltaSeconds);
-            spaceStation.computeCulling(controller.getActiveCameras());
+        for (const orbitalFacility of orbitalFacilities) {
+            orbitalFacility.update(stellarObjects, this.objectToParents.get(orbitalFacility) ?? [], cameraWorldPosition, deltaSeconds);
+            orbitalFacility.computeCulling(controller.getActiveCameras());
         }
 
         // floating origin

@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { getNeighborStarSystemCoordinates } from "../utils/getNeighborStarSystems";
-import { SpaceStationModel } from "../spacestation/spacestationModel";
 import { newSightSeeingMission } from "./sightSeeingMission";
 import { uniformRandBool } from "extended-random";
 import { SystemObjectType } from "../utils/coordinates/universeCoordinates";
@@ -27,6 +26,7 @@ import { StarSystemModel, StarSystemModelUtils } from "../starSystem/starSystemM
 import { getRngFromSeed } from "../utils/getRngFromSeed";
 import { getSystemModelFromCoordinates } from "../starSystem/modelFromCoordinates";
 import { OrbitalObjectType } from "../architecture/orbitalObject";
+import { OrbitalFacilityModel } from "../spacestation/orbitalFacility";
 
 /**
  * Generates sightseeing missions available at the given space station for the player. Missions are generated based on the current timestamp (hourly basis).
@@ -35,7 +35,7 @@ import { OrbitalObjectType } from "../architecture/orbitalObject";
  * @param player The player for which the missions are generated
  * @param timestampMillis The current timestamp in milliseconds
  */
-export function generateSightseeingMissions(spaceStationModel: SpaceStationModel, starSystemModel: StarSystemModel, player: Player, timestampMillis: number): Mission[] {
+export function generateSightseeingMissions(spaceStationModel: OrbitalFacilityModel, starSystemModel: StarSystemModel, player: Player, timestampMillis: number): Mission[] {
     const currentHour = Math.floor(timestampMillis / 1000 / 60 / 60);
 
     const starSystem = starSystemModel;

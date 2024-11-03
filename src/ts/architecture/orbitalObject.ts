@@ -82,8 +82,8 @@ export class OrbitalObjectUtils {
      * @constructor
      */
     static GetRotationAngle(object: OrbitalObject, deltaTime: number): number {
-        if (object.model.physics.rotationPeriod === 0) return 0;
-        return (2 * Math.PI * deltaTime) / object.model.physics.rotationPeriod;
+        if (object.model.physics.siderealDayDuration === 0) return 0;
+        return (2 * Math.PI * deltaTime) / object.model.physics.siderealDayDuration;
     }
 
     /**
@@ -142,7 +142,8 @@ export const enum OrbitalObjectType {
     GAS_PLANET = 1002,
     MANDELBULB = 2000,
     JULIA_SET = 2001,
-    SPACE_STATION = 3000
+    SPACE_STATION = 3000,
+    SPACE_ELEVATOR = 3001
 }
 
 export const SatelliteTypes = [OrbitalObjectType.TELLURIC_SATELLITE, OrbitalObjectType.SPACE_STATION];

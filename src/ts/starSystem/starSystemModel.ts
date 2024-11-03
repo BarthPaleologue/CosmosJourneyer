@@ -19,9 +19,9 @@ import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates"
 import { StellarObjectModel } from "../architecture/stellarObject";
 import { PlanetaryMassObjectModel } from "../architecture/planetaryMassObject";
 import { AnomalyModel } from "../anomalies/anomaly";
-import { SpaceStationModel } from "../spacestation/spacestationModel";
 import { PlanetModel } from "../architecture/planet";
 import { TelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModel";
+import { OrbitalFacilityModel } from "../spacestation/orbitalFacility";
 
 /**
  * Data model for a planetary system. It holds all the information necessary to generate and render a planetary system.
@@ -43,7 +43,7 @@ export type PlanetarySystemModel = {
     /**
      * The space stations orbiting the planet.
      */
-    spaceStations: SpaceStationModel[];
+    orbitalFacilities: OrbitalFacilityModel[];
 };
 
 /**
@@ -71,7 +71,7 @@ export type SubStarSystemModel = {
     /**
      * The space stations orbiting the stellar objects in the sub star system.
      */
-    spaceStations: SpaceStationModel[];
+    orbitalFacilities: OrbitalFacilityModel[];
 };
 
 /**
@@ -132,9 +132,9 @@ export class StarSystemModelUtils {
      * @param starSystem The star system to get the space stations from.
      * @constructor
      */
-    static GetSpaceStations(starSystem: StarSystemModel): SpaceStationModel[] {
-        const stellarSpaceStations = starSystem.subSystems.flatMap((subSystem) => subSystem.spaceStations);
-        const planetarySpaceStations = starSystem.subSystems.flatMap((subSystem) => subSystem.planetarySystems.flatMap((planetarySystem) => planetarySystem.spaceStations));
+    static GetSpaceStations(starSystem: StarSystemModel): OrbitalFacilityModel[] {
+        const stellarSpaceStations = starSystem.subSystems.flatMap((subSystem) => subSystem.orbitalFacilities);
+        const planetarySpaceStations = starSystem.subSystems.flatMap((subSystem) => subSystem.planetarySystems.flatMap((planetarySystem) => planetarySystem.orbitalFacilities));
 
         return stellarSpaceStations.concat(planetarySpaceStations);
     }

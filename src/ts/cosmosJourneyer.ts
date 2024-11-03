@@ -404,7 +404,7 @@ export class CosmosJourneyer {
             const nearestOrbitalObject = this.starSystemView.getStarSystem().getNearestOrbitalObject(shipPosition);
             const correspondingSpaceStation = this.starSystemView
                 .getStarSystem()
-                .getSpaceStations()
+                .getOrbitalFacilities()
                 .find((station) => station === nearestOrbitalObject);
             if (correspondingSpaceStation === undefined) {
                 throw new Error("Tried loading a save with a pad number, but the closest orbital objects does not have landing pads!");

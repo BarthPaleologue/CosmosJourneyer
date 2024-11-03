@@ -15,14 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Settings } from "../settings";
+import { Quaternion } from "@babylonjs/core/Maths/math";
 
 export type Orbit = {
     radius: number;
     p: number;
     period: number;
-    normalToPlane: Vector3;
+    orientation: Quaternion;
 };
 
 /**
@@ -50,14 +51,9 @@ export function getPointOnOrbitLocal(settings: Orbit, t: number): Vector3 {
  * @returns
  */
 export function getPointOnOrbit(centerOfMass: Vector3, settings: Orbit, t: number): Vector3 {
-    const localPosition = getPointOnOrbitLocal(settings, t);
-
-    // rotate orbital plane
-    const rotationAxis = Vector3.Up().equalsWithEpsilon(settings.normalToPlane) ? Vector3.Up() : Vector3.Cross(Vector3.Up(), settings.normalToPlane).normalize();
-    const angle = Vector3.GetAngleBetweenVectors(Vector3.Up(), settings.normalToPlane, rotationAxis);
-    const rotationMatrix = Matrix.RotationAxis(rotationAxis, angle);
-
-    return Vector3.TransformCoordinates(localPosition, rotationMatrix).addInPlace(centerOfMass);
+    return getPointOnOrbitLocal(settings, t) // local position
+        .applyRotationQuaternionInPlace(settings.orientation) // apply orbit orientation
+        .addInPlace(centerOfMass); // translate to center of mass
 }
 
 /**

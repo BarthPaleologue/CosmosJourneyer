@@ -21,7 +21,6 @@ import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { clamp } from "../../utils/math";
 import { getOrbitalPeriod, getPeriapsis, Orbit } from "../../orbit/orbit";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PlanetaryMassObjectPhysicsInfo } from "../../architecture/physicsInfo";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { newSeededRingsModel } from "../../rings/ringsModel";
@@ -50,21 +49,19 @@ export function newSeededGasPlanetModel(seed: number, name: string, parentBodies
         orbitRadius += maxRadius * 1.5;
     }
 
-    const orbitalPlaneNormal = Vector3.Up().applyRotationQuaternionInPlace(Quaternion.RotationAxis(Axis.X, (rng(GenerationSteps.ORBIT + 20) - 0.5) * 0.2));
-
     const parentMassSum = parentBodies.reduce((sum, body) => sum + body.physics.mass, 0);
     const orbit: Orbit = {
         radius: orbitRadius,
         p: 2, //orbitalP,
         period: getOrbitalPeriod(orbitRadius, parentMassSum),
-        normalToPlane: orbitalPlaneNormal
+        orientation: Quaternion.RotationAxis(Axis.X, (rng(GenerationSteps.ORBIT + 20 - 0.5) * 0.2))
     };
 
     const physicalProperties: PlanetaryMassObjectPhysicsInfo = {
         //FIXME: when Settings.Earth radius gets to 1:1 scale, change this value by a variable in settings
         mass: Settings.JUPITER_MASS * (radius / 69_911e3) ** 3,
-        axialTilt: normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT),
-        rotationPeriod: (24 * 60 * 60) / 10,
+        axialTilt: Quaternion.RotationAxis(Axis.X, normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT)),
+        siderealDayDuration: (24 * 60 * 60) / 10,
         minTemperature: -180,
         maxTemperature: 200,
         pressure: 1

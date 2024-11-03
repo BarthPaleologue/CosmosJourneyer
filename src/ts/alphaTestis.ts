@@ -20,17 +20,18 @@ import "../styles/index.scss";
 import { Settings } from "./settings";
 import { positionNearObjectBrightSide } from "./utils/positionNearObject";
 import { CosmosJourneyer } from "./cosmosJourneyer";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { newSeededGasPlanetModel } from "./planets/gasPlanet/gasPlanetModel";
 import { SpaceShipControlsInputs } from "./spaceship/spaceShipControlsInputs";
 
 import { newSeededStarModel } from "./stellarObjects/star/starModel";
-import { newSeededSpaceStationModel } from "./spacestation/spacestationModel";
 import { StarSystemModel } from "./starSystem/starSystemModel";
 import { StarSystemCoordinates } from "./utils/coordinates/universeCoordinates";
 import { CustomSystemRegistry } from "./starSystem/customSystemRegistry";
 import { newSeededTelluricSatelliteModel } from "./planets/telluricPlanet/telluricSatelliteModel";
 import { newSeededTelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModel";
+import { newSeededSpaceElevatorModel } from "./spacestation/spaceElevatorModel";
+import { getOrbitRadiusFromPeriod } from "./utils/physics";
+import { Quaternion } from "@babylonjs/core/Maths/math";
 
 const engine = await CosmosJourneyer.CreateAsync();
 
@@ -69,11 +70,13 @@ const hecateModel = newSeededTelluricPlanetModel(253, "Hécate", [sunModel]);
 hecateModel.physics.minTemperature = -40;
 hecateModel.physics.maxTemperature = 30;
 
+hecateModel.physics.siderealDayDuration = 6 * 60 * 60;
+
 hecateModel.orbit.period = 60 * 60 * 24 * 365.25;
 hecateModel.orbit.radius = 25000 * hecateModel.radius;
-hecateModel.orbit.normalToPlane = Vector3.Up();
+hecateModel.orbit.orientation = Quaternion.Identity();
 
-const spaceStationModel = newSeededSpaceStationModel(0, [sunModel], systemCoordinates, [hecateModel]);
+const spaceStationModel = newSeededSpaceElevatorModel(0, [sunModel], systemCoordinates, hecateModel);
 
 //physicsViewer.showBody(spaceStation.aggregate.body);
 /*for(const landingpad of spaceStation.landingPads) {
@@ -82,19 +85,18 @@ const spaceStationModel = newSeededSpaceStationModel(0, [sunModel], systemCoordi
 
 const moonModel = newSeededTelluricSatelliteModel(23, "Manaleth", [hecateModel]);
 moonModel.physics.mass = 2;
-moonModel.physics.rotationPeriod = 7 * 60 * 60;
+moonModel.physics.siderealDayDuration = 28 * 60 * 60;
 moonModel.physics.minTemperature = -180;
 moonModel.physics.maxTemperature = 200;
 moonModel.physics.waterAmount = 0.9;
 
-moonModel.orbit.period = moonModel.physics.rotationPeriod;
-moonModel.orbit.radius = 8 * hecateModel.radius;
-moonModel.orbit.normalToPlane = Vector3.Up();
+moonModel.orbit.period = moonModel.physics.siderealDayDuration;
+moonModel.orbit.radius = getOrbitRadiusFromPeriod(moonModel.orbit.period, hecateModel.physics.mass);
 
 const aresModel = newSeededTelluricPlanetModel(0.3725, "Ares", [sunModel]);
 if (aresModel.clouds !== null) aresModel.clouds.coverage = 1;
 aresModel.physics.mass = 7;
-aresModel.physics.rotationPeriod = (24 * 60 * 60) / 30;
+aresModel.physics.siderealDayDuration = (24 * 60 * 60) / 30;
 aresModel.physics.minTemperature = -30;
 aresModel.physics.maxTemperature = 20;
 aresModel.physics.pressure = 0.5;
@@ -103,7 +105,6 @@ aresModel.physics.oceanLevel = 0;
 
 aresModel.orbit.period = 60 * 60 * 24 * 365.24;
 aresModel.orbit.radius = 25020 * hecateModel.radius;
-aresModel.orbit.normalToPlane = Vector3.Up();
 
 //aresModel.terrainSettings.continents_fragmentation = 0.0;
 //aresModel.terrainSettings.continent_base_height = 10e3;
@@ -112,7 +113,7 @@ aresModel.orbit.normalToPlane = Vector3.Up();
 const andromaqueModel = newSeededGasPlanetModel(0.28711440474126226, "Andromaque", [sunModel]);
 andromaqueModel.orbit.period = 60 * 60 * 24 * 365.25;
 andromaqueModel.orbit.radius = 25300 * hecateModel.radius;
-andromaqueModel.orbit.normalToPlane = Vector3.Up();
+andromaqueModel.orbit.orientation = Quaternion.Identity();
 
 const starSystemModel: StarSystemModel = {
     name: systemName,
@@ -121,12 +122,12 @@ const starSystemModel: StarSystemModel = {
         {
             stellarObjects: [sunModel],
             planetarySystems: [
-                { planets: [hecateModel], satellites: [moonModel], spaceStations: [spaceStationModel] },
-                { planets: [aresModel], satellites: [], spaceStations: [] },
-                { planets: [andromaqueModel], satellites: [], spaceStations: [] }
+                { planets: [hecateModel], satellites: [moonModel], orbitalFacilities: [spaceStationModel] },
+                { planets: [aresModel], satellites: [], orbitalFacilities: [] },
+                { planets: [andromaqueModel], satellites: [], orbitalFacilities: [] }
             ],
             anomalies: [],
-            spaceStations: []
+            orbitalFacilities: []
         }
     ]
 };

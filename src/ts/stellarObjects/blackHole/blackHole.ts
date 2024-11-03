@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
@@ -27,6 +26,9 @@ import { StellarObject } from "../../architecture/stellarObject";
 import { Cullable } from "../../utils/cullable";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { orbitalObjectTypeToDisplay } from "../../utils/strings/orbitalObjectTypeToDisplay";
+
+import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
+import { setRotationQuaternion } from "../../uberCore/transforms/basicTransform";
 
 export class BlackHole implements StellarObject, Cullable {
     readonly name: string;
@@ -43,13 +45,15 @@ export class BlackHole implements StellarObject, Cullable {
 
     readonly asteroidField = null;
 
+    readonly targetInfo: TargetInfo;
+
     constructor(model: BlackHoleModel, scene: Scene) {
         this.model = model;
 
         this.name = this.model.name;
 
         this.transform = new TransformNode(this.model.name, scene);
-        this.transform.rotate(Axis.X, this.model.physics.axialTilt);
+        setRotationQuaternion(this.getTransform(), this.model.physics.axialTilt);
 
         this.light = new PointLight(`${this.model.name}Light`, Vector3.Zero(), scene);
         //this.light.diffuse.fromArray(getRgbFromTemperature(this.model.physicalProperties.temperature).asArray());
@@ -58,6 +62,8 @@ export class BlackHole implements StellarObject, Cullable {
         if (this.model.physics.accretionDiskRadius === 0) this.light.intensity = 0;
 
         this.postProcesses.push(PostProcessType.BLACK_HOLE);
+
+        this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());
     }
 
     getTransform(): TransformNode {

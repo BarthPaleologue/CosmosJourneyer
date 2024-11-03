@@ -17,34 +17,20 @@
 
 import "../styles/index.scss";
 
-import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import "@babylonjs/core/Materials/standardMaterial";
 import "@babylonjs/core/Loading/loadingScreen";
 import "@babylonjs/core/Misc/screenshotTools";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import "@babylonjs/core/Meshes/thinInstanceMesh";
-import {
-    Axis,
-    Color3,
-    DirectionalLight,
-    HavokPlugin,
-    HemisphericLight,
-    MeshBuilder,
-    PBRMaterial,
-    PhysicsAggregate,
-    PhysicsShapeType,
-    PhysicsViewer,
-    Texture
-} from "@babylonjs/core";
+import { DirectionalLight, HavokPlugin, HemisphericLight } from "@babylonjs/core";
 import { Assets } from "./assets/assets";
-import { Scene, StandardMaterial } from "@babylonjs/core";
-import { translate } from "./uberCore/transforms/basicTransform";
 import { DefaultControls } from "./defaultControls/defaultControls";
-import { AsteroidField } from "./asteroidFields/asteroidField";
 import HavokPhysics from "@babylonjs/havok";
-import { Textures } from "./assets/textures";
-import { StarFieldBox } from "./starSystem/starFieldBox";
+import { SpaceElevatorClimber } from "./spacestation/spaceElevatorClimber";
+import { Scene } from "@babylonjs/core/scene";
+import { TransformNode } from "@babylonjs/core/Meshes";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -77,53 +63,24 @@ directionalLight.intensity = 0.7;
 const hemi = new HemisphericLight("hemi", Vector3.Up(), scene);
 hemi.intensity = 0.4;
 
-const scaler = 500;
+const sunTransform = new TransformNode("sunTransform", scene);
+sunTransform.position = directionalLight.direction.scale(-100);
 
-defaultControls.getTransform().position.z = -200 * scaler;
-defaultControls.getTransform().position.y = 20 * scaler;
-defaultControls.speed *= scaler;
-camera.maxZ *= scaler;
+const sunTransformable = {
+    transform: sunTransform,
+    getTransform: () => sunTransform,
+    dispose: () => sunTransform.dispose()
+};
 
-const skybox = new StarFieldBox(scene);
+const climber = new SpaceElevatorClimber(scene);
 
-const sphere = MeshBuilder.CreateSphere("box", { diameter: 20 * scaler }, scene);
-
-const pbr = new PBRMaterial("pbr", scene);
-sphere.material = pbr;
-
-pbr.albedoColor = new Color3(1.0, 0.766, 0.336);
-pbr.metallic = 1.0; // set to 1 to only use it from the metallicRoughnessTexture
-pbr.roughness = 0; // set to 1 to only use it from the metallicRoughnessTexture
-
-const sphereAggregate = new PhysicsAggregate(sphere, PhysicsShapeType.SPHERE, { mass: 0 }, scene);
-
-const beltRadius = 100 * scaler;
-const beltSpread = 20 * scaler;
-
-const belt = new AsteroidField(42, sphere, beltRadius, beltSpread, scene);
-
-const torus = MeshBuilder.CreateTorus("torus", { diameter: 2 * beltRadius, thickness: 2 * beltSpread, tessellation: 32 }, scene);
-torus.visibility = 0.1;
-torus.parent = sphere;
-torus.scaling.y = 0.1 / scaler;
-
-const physicsViewer = new PhysicsViewer(scene);
-
-const rotation = Matrix.Identity();
+defaultControls.getTransform().position.copyFromFloats(0, 5, -5);
+defaultControls.getTransform().lookAt(climber.getTransform().position);
 
 scene.onBeforeRenderObservable.add(() => {
     defaultControls.update(engine.getDeltaTime() / 1000);
 
-    belt.update(defaultControls.getTransform().getAbsolutePosition(), engine.getDeltaTime() / 1000);
-
-    rotation.copyFrom(rotation.multiply(Matrix.RotationAxis(Vector3.Up(), 0.001)));
-
-    skybox.setRotationMatrix(rotation);
-
-    //sphere.rotate(Axis.Y, 0.002);
-    /*scene.meshes.forEach((mesh) => {
-        if (mesh.physicsBody) physicsViewer.showBody(mesh.physicsBody);
-    });*/
+    climber.update([sunTransformable]);
 });
 
 scene.executeWhenReady(() => {

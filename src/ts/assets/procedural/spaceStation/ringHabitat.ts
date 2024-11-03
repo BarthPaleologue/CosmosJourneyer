@@ -26,12 +26,12 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { createRing } from "../../../utils/geometry/ringBuilder";
-import { SpaceStationModel } from "../../../spacestation/spacestationModel";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { getRngFromSeed } from "../../../utils/getRngFromSeed";
 import { createEnvironmentAggregate } from "../../../utils/havok";
 import { computeRingRotationPeriod } from "../../../utils/physics";
+import { OrbitalFacilityModel } from "../../../spacestation/orbitalFacility";
 
 export class RingHabitat implements Transformable {
     private readonly root: TransformNode;
@@ -54,7 +54,7 @@ export class RingHabitat implements Transformable {
 
     readonly habitableSurface: number;
 
-    constructor(stationModel: SpaceStationModel, requiredHabitableSurface: number, seed: number, scene: Scene) {
+    constructor(stationModel: OrbitalFacilityModel, requiredHabitableSurface: number, seed: number, scene: Scene) {
         this.root = new TransformNode("RingHabitatRoot", scene);
 
         this.rng = getRngFromSeed(seed);

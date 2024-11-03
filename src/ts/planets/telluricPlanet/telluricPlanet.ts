@@ -17,7 +17,6 @@
 
 import { Direction } from "../../utils/direction";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { TelluricPlanetMaterial } from "./telluricPlanetMaterial";
 import { TelluricPlanetaryMassObjectModel } from "./telluricPlanetaryMassObjectModel";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
@@ -32,11 +31,13 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { RingsUniforms } from "../../rings/ringsUniform";
-import { rotate } from "../../uberCore/transforms/basicTransform";
+import { setRotationQuaternion } from "../../uberCore/transforms/basicTransform";
 import { CloudsUniforms } from "../../clouds/cloudsUniforms";
 import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { orbitalObjectTypeToDisplay } from "../../utils/strings/orbitalObjectTypeToDisplay";
+import { OrbitalObjectType } from "../../architecture/orbitalObject";
+import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
 
 export class TelluricPlanet implements PlanetaryMassObject, Cullable {
     readonly sides: ChunkTree[]; // stores the 6 sides of the sphere
@@ -55,6 +56,8 @@ export class TelluricPlanet implements PlanetaryMassObject, Cullable {
 
     readonly cloudsUniforms: CloudsUniforms | null;
 
+    readonly targetInfo: TargetInfo;
+
     /**
      * New Telluric Planet
      * @param model The model to build the planet or a seed for the planet in [-1, 1]
@@ -65,8 +68,7 @@ export class TelluricPlanet implements PlanetaryMassObject, Cullable {
 
         this.transform = new TransformNode(this.model.name, scene);
 
-        rotate(this.transform, Axis.X, this.model.physics.axialTilt);
-        this.transform.computeWorldMatrix(true);
+        setRotationQuaternion(this.getTransform(), this.model.physics.axialTilt);
 
         this.aggregate = new PhysicsAggregate(
             this.getTransform(),
@@ -116,6 +118,9 @@ export class TelluricPlanet implements PlanetaryMassObject, Cullable {
             new ChunkTree(Direction.RIGHT, this.model, this.aggregate, this.material, scene),
             new ChunkTree(Direction.LEFT, this.model, this.aggregate, this.material, scene)
         ];
+
+        this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());
+        this.targetInfo.maxDistance = this.model.type === OrbitalObjectType.TELLURIC_SATELLITE ? this.model.orbit.radius * 8.0 : 0;
     }
 
     getTransform(): TransformNode {

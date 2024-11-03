@@ -19,7 +19,6 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { normalRandom, randRange } from "extended-random";
 import { clamp } from "../../utils/math";
 import { getOrbitalPeriod, getPeriapsis, Orbit } from "../../orbit/orbit";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { OrbitalObjectPhysicsInfo } from "../../architecture/physicsInfo";
@@ -27,6 +26,8 @@ import { AnomalyModel } from "../anomaly";
 
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { OrbitalObjectType } from "../../architecture/orbitalObject";
+import { Quaternion } from "@babylonjs/core/Maths/math";
+import { Axis } from "@babylonjs/core/Maths/math.axis";
 
 export type MandelbulbModel = AnomalyModel & {
     readonly type: OrbitalObjectType.MANDELBULB;
@@ -53,13 +54,13 @@ export function newSeededMandelbulbModel(seed: number, name: string, parentBodie
         radius: orbitRadius,
         p: orbitalP,
         period: getOrbitalPeriod(orbitRadius, parentMassSum),
-        normalToPlane: Vector3.Up()
+        orientation: Quaternion.Identity()
     };
 
     const physicalProperties: OrbitalObjectPhysicsInfo = {
         mass: 10,
-        rotationPeriod: 0,
-        axialTilt: normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT)
+        siderealDayDuration: 0,
+        axialTilt: Quaternion.RotationAxis(Axis.X, normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT))
     };
 
     return {

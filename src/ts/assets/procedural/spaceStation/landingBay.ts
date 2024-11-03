@@ -27,13 +27,13 @@ import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { LandingPad, LandingPadSize } from "../landingPad/landingPad";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { createRing } from "../../../utils/geometry/ringBuilder";
-import { SpaceStationModel } from "../../../spacestation/spacestationModel";
 import { LandingBayMaterial } from "./landingBayMaterial";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 
 import { getRngFromSeed } from "../../../utils/getRngFromSeed";
 import { createEnvironmentAggregate } from "../../../utils/havok";
 import { computeRingRotationPeriod } from "../../../utils/physics";
+import { OrbitalFacilityModel } from "../../../spacestation/orbitalFacility";
 
 export class LandingBay {
     private readonly root: TransformNode;
@@ -53,7 +53,7 @@ export class LandingBay {
 
     readonly landingPads: LandingPad[] = [];
 
-    constructor(stationModel: SpaceStationModel, seed: number, scene: Scene) {
+    constructor(stationModel: OrbitalFacilityModel, seed: number, scene: Scene) {
         this.root = new TransformNode("LandingBayRoot", scene);
 
         this.rng = getRngFromSeed(seed);

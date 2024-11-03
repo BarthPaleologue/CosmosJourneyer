@@ -87,7 +87,7 @@ export class BlackHolePostProcess extends PostProcess implements ObjectPostProce
         });
 
         const schwarzschildRadius = blackHole.model.radius;
-        const kerrMetricA = getKerrMetricA(blackHole.model.physics.mass, blackHole.model.physics.rotationPeriod);
+        const kerrMetricA = getKerrMetricA(blackHole.model.physics.mass, blackHole.model.physics.siderealDayDuration);
 
         this.onApplyObservable.add((effect) => {
             if (this.activeCamera === null) {

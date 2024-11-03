@@ -15,13 +15,17 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Quaternion } from "@babylonjs/core/Maths/math";
+
 export type OrbitalObjectPhysicsInfo = {
     mass: number;
     /**
-     * Time needed for the object to rotate on its axis in seconds
+     * Time needed for the object to rotate 360° on its axis in seconds.
+     * It is slightly different from the duration of solar day which is the time it takes for the sun to be at the same position in the sky.
+     * @see https://en.wikipedia.org/wiki/Sidereal_time
      */
-    rotationPeriod: number;
-    axialTilt: number;
+    siderealDayDuration: number;
+    axialTilt: Quaternion;
 };
 
 export type StellarObjectPhysicsInfo = OrbitalObjectPhysicsInfo & {

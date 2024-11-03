@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Mission, MissionType } from "./mission";
-import { SpaceStationModel } from "../spacestation/spacestationModel";
 import { SystemObjectType, UniverseObjectId } from "../utils/coordinates/universeCoordinates";
 import { getStarGalacticPosition } from "../utils/coordinates/starSystemCoordinatesUtils";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -24,6 +23,7 @@ import { MissionNode } from "./nodes/missionNode";
 import { MissionFlyByNode } from "./nodes/actions/sightseeing/missionFlyByNode";
 import { MissionTerminatorLandingNode } from "./nodes/actions/sightseeing/missionTerminatorLandingNode";
 import { MissionAsteroidFieldNode } from "./nodes/actions/sightseeing/missionAsteroidFieldNode";
+import { OrbitalFacilityModel } from "../spacestation/orbitalFacility";
 
 /**
  * Sightseeing mission types are a subset of mission types.
@@ -57,7 +57,7 @@ function generateMissionTree(target: SightSeeingTarget): MissionNode {
  * @param target The target of the sightseeing mission.
  * @returns The new sightseeing mission.
  */
-export function newSightSeeingMission(missionGiver: SpaceStationModel, target: SightSeeingTarget): Mission {
+export function newSightSeeingMission(missionGiver: OrbitalFacilityModel, target: SightSeeingTarget): Mission {
     const missionTree = generateMissionTree(target);
 
     const targetSystemCoordinates = target.objectId.starSystemCoordinates;

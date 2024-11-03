@@ -201,8 +201,8 @@ export class ShipControls implements Controls {
         return this.closestLandableFacility;
     }
 
-    public update(deltaTime: number): Vector3 {
-        this.spaceship.update(deltaTime);
+    public update(deltaSeconds: number): Vector3 {
+        this.spaceship.update(deltaSeconds);
 
         let [inputRoll, inputPitch] = SpaceShipControlsInputs.map.rollPitch.value;
         if (SpaceShipControlsInputs.map.ignorePointer.value > 0) {
@@ -211,7 +211,7 @@ export class ShipControls implements Controls {
         }
 
         if (this.spaceship.getWarpDrive().isDisabled()) {
-            this.spaceship.increaseMainEngineThrottle(deltaTime * SpaceShipControlsInputs.map.throttle.value);
+            this.spaceship.increaseMainEngineThrottle(deltaSeconds * SpaceShipControlsInputs.map.throttle.value);
 
             if (SpaceShipControlsInputs.map.upDown.value !== 0) {
                 if (this.spaceship.isLanded()) {
@@ -225,12 +225,12 @@ export class ShipControls implements Controls {
                 );
             }
         } else {
-            this.spaceship.getWarpDrive().increaseThrottle(0.5 * deltaTime * SpaceShipControlsInputs.map.throttle.value);
+            this.spaceship.getWarpDrive().increaseThrottle(0.5 * deltaSeconds * SpaceShipControlsInputs.map.throttle.value);
         }
 
         if (!this.spaceship.isLanded()) {
-            roll(this.getTransform(), 2.0 * inputRoll * deltaTime);
-            pitch(this.getTransform(), 2.0 * inputPitch * deltaTime);
+            roll(this.getTransform(), 2.0 * inputRoll * deltaSeconds);
+            pitch(this.getTransform(), 2.0 * inputPitch * deltaSeconds);
         }
 
         // camera shake
@@ -240,7 +240,7 @@ export class ShipControls implements Controls {
             this.thirdPersonCamera.radius += (Math.random() - 0.5) / 100;
         }
 
-        this.thirdPersonCamera.fov = moveTowards(this.thirdPersonCamera.fov, this.targetFov, this.targetFov === this.baseFov ? 2.0 * deltaTime : 0.3 * deltaTime);
+        this.thirdPersonCamera.fov = moveTowards(this.thirdPersonCamera.fov, this.targetFov, this.targetFov === this.baseFov ? 2.0 * deltaSeconds : 0.3 * deltaSeconds);
 
         this.getActiveCameras().forEach((camera) => camera.getViewMatrix(true));
 
