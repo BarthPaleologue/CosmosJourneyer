@@ -44,7 +44,7 @@ import { AudioMasks } from "./audio/audioMasks";
 import { GeneralInputs } from "./inputs/generalInputs";
 import { createNotification } from "./utils/notification";
 import { LoadingScreen } from "./uberCore/loadingScreen";
-import i18n from "./i18n";
+import i18n, { initI18n } from "./i18n";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Sounds } from "./assets/sounds";
 import { TutorialLayer } from "./ui/tutorial/tutorialLayer";
@@ -214,6 +214,8 @@ export class CosmosJourneyer {
         window.addEventListener("resize", () => {
             engine.resize(true);
         });
+
+        await initI18n();
 
         // Log informations about the gpu and the api used
         console.log(`API: ${engine.isWebGPU ? "WebGPU" : "WebGL" + engine.version}`);
