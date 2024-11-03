@@ -54,7 +54,7 @@ export class AxisRenderer {
                 updatable: false
             },
             {
-                color: Color3.White(),
+                color: new Color3(0.4, 0.4, 0.4),
                 width: 5,
                 colorMode: GreasedLineMeshColorMode.COLOR_MODE_SET,
                 sizeAttenuation: true

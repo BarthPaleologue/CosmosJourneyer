@@ -43,7 +43,7 @@ export class OrbitRenderer {
 
     private createOrbitMesh(orbitalObject: OrbitalObject, scene: Scene) {
         const orbit = orbitalObject.model.orbit;
-        const nbSteps = 1000;
+        const nbSteps = Math.max(100, Math.round(Math.sqrt(orbit.radius / 200e3)));
         const timestep = orbit.period / nbSteps;
         const points: Vector3[] = [];
 
@@ -60,7 +60,7 @@ export class OrbitRenderer {
                 updatable: false
             },
             {
-                color: Color3.White(),
+                color: new Color3(0.4, 0.4, 0.4),
                 width: 5,
                 colorMode: GreasedLineMeshColorMode.COLOR_MODE_SET,
                 sizeAttenuation: true
