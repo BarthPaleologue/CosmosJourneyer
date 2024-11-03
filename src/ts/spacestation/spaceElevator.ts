@@ -44,6 +44,7 @@ import { SpaceElevatorClimber } from "./spaceElevatorClimber";
 import { remap, triangleWave } from "../utils/math";
 import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
 import { setRotationQuaternion } from "../uberCore/transforms/basicTransform";
+import { Axis } from "@babylonjs/core/Maths/math.axis";
 
 export class SpaceElevator implements OrbitalFacility {
     readonly name: string;
@@ -115,6 +116,8 @@ export class SpaceElevator implements OrbitalFacility {
         this.getTransform()
             .getChildTransformNodes(true)
             .forEach((transform) => transform.position.addInPlace(deltaPosition));
+
+        this.getTransform().getChildTransformNodes(true).forEach((transform) => transform.rotateAround(Vector3.Zero(), Axis.Z, -Math.PI / 2));
 
         setRotationQuaternion(this.getTransform(), this.model.physics.axialTilt);
 
@@ -263,11 +266,6 @@ export class SpaceElevator implements OrbitalFacility {
 
     update(stellarObjects: Transformable[], parents: OrbitalObject[], cameraWorldPosition: Vector3, deltaSeconds: number) {
         this.elapsedSeconds += deltaSeconds;
-
-        const parentPosition = parents[0].getTransform().getAbsolutePosition();
-        const currentPositon = this.getTransform().getAbsolutePosition();
-
-        setUpVector(this.getTransform(), currentPositon.subtract(parentPosition).normalize());
 
         this.solarSections.forEach((solarSection) => solarSection.update(stellarObjects, cameraWorldPosition));
         this.utilitySections.forEach((utilitySection) => utilitySection.update(stellarObjects, cameraWorldPosition));

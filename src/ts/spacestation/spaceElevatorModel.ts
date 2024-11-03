@@ -51,7 +51,7 @@ export function newSeededSpaceElevatorModel(
     const physicalProperties: OrbitalObjectPhysicsInfo = {
         mass: 1,
         siderealDayDuration: parentSiderealDayDuration,
-        axialTilt: Quaternion.RotationAxis(Axis.X, Math.PI / 2)
+        axialTilt: parentAxialTilt
     };
 
     const faction = getFactionFromCoordinates(starSystemCoordinates, rng);

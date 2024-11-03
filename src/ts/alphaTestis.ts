@@ -70,8 +70,7 @@ const hecateModel = newSeededTelluricPlanetModel(253, "Hécate", [sunModel]);
 hecateModel.physics.minTemperature = -40;
 hecateModel.physics.maxTemperature = 30;
 
-hecateModel.physics.siderealDayDuration = 24 * 60 * 60;
-hecateModel.physics.axialTilt = Quaternion.Identity();
+hecateModel.physics.siderealDayDuration = 6 * 60 * 60;
 
 hecateModel.orbit.period = 60 * 60 * 24 * 365.25;
 hecateModel.orbit.radius = 25000 * hecateModel.radius;
@@ -93,7 +92,6 @@ moonModel.physics.waterAmount = 0.9;
 
 moonModel.orbit.period = moonModel.physics.siderealDayDuration;
 moonModel.orbit.radius = getOrbitRadiusFromPeriod(moonModel.orbit.period, hecateModel.physics.mass);
-moonModel.orbit.orientation = Quaternion.Identity();
 
 const aresModel = newSeededTelluricPlanetModel(0.3725, "Ares", [sunModel]);
 if (aresModel.clouds !== null) aresModel.clouds.coverage = 1;
