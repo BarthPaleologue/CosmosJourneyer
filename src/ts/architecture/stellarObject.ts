@@ -18,6 +18,7 @@
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { CelestialBody, CelestialBodyModel } from "./celestialBody";
 import { StellarObjectPhysicsInfo } from "./physicsInfo";
+import { OrbitalObjectType } from "./orbitalObject";
 
 export interface StellarObject extends CelestialBody {
     model: StellarObjectModel;
@@ -27,4 +28,6 @@ export interface StellarObject extends CelestialBody {
 
 export type StellarObjectModel = CelestialBodyModel & {
     physics: StellarObjectPhysicsInfo;
+
+    type: OrbitalObjectType.STAR | OrbitalObjectType.NEUTRON_STAR | OrbitalObjectType.BLACK_HOLE;
 };
