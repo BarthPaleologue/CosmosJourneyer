@@ -28,6 +28,7 @@ import { GenerationSteps } from "../../utils/generationSteps";
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { OrbitalObjectType } from "../../architecture/orbitalObject";
 import { Quaternion } from "@babylonjs/core/Maths/math";
+import { getBlackBodyLuminosity, getMainSequenceStarLifetime } from "../../utils/physics";
 
 export type StarModel = StellarObjectModel & {
     readonly type: OrbitalObjectType.STAR;
@@ -64,9 +65,17 @@ export function newSeededStarModel(seed: number, name: string, parentBodies: Cel
 
     const rings = uniformRandBool(RING_PROPORTION, rng, GenerationSteps.RINGS) ? newSeededRingsModel(rng) : null;
 
+    const starLuminosity = getBlackBodyLuminosity(physicalProperties.blackBodyTemperature, radius);
+
+    // the lifetime of main sequence stars depends on its mass and luminosity
+    const lifeTime = getMainSequenceStarLifetime(physicalProperties.mass, starLuminosity);
+
+    const birthYear = randRangeInt(Math.max(0, Settings.GREGORIAN_YEAR_0 - lifeTime), Settings.GREGORIAN_YEAR_0, rng, GenerationSteps.BIRTH_YEAR);
+
     return {
         name: name,
         seed: seed,
+        birthYear: birthYear,
         type: OrbitalObjectType.STAR,
         radius: radius,
         orbit: orbit,

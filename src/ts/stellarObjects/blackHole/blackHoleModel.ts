@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { getOrbitalPeriod, Orbit } from "../../orbit/orbit";
-import { normalRandom } from "extended-random";
+import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { BlackHolePhysicsInfo } from "../../architecture/physicsInfo";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { StellarObjectModel } from "../../architecture/stellarObject";
@@ -68,9 +68,13 @@ export function newSeededBlackHoleModel(seed: number, name: string, parentBodies
         blackBodyTemperature: 7_000
     };
 
+    // stellar black hole can pretty much have any birth year as they have an almost infinite lifespan
+    const birthYear = randRangeInt(0, Settings.GREGORIAN_YEAR_0, rng, GenerationSteps.BIRTH_YEAR);
+
     return {
         seed,
         name,
+        birthYear,
         rings: null,
         type: OrbitalObjectType.BLACK_HOLE,
         radius,

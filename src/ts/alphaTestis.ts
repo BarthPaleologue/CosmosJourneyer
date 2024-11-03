@@ -83,7 +83,7 @@ const spaceStationModel = newSeededSpaceElevatorModel(0, [sunModel], systemCoord
     physicsViewer.showBody(landingpad.aggregate.body);
 }*/
 
-const moonModel = newSeededTelluricSatelliteModel(23, "Manaleth", [hecateModel]);
+const moonModel = newSeededTelluricSatelliteModel(23, "Manaleth", [hecateModel], [sunModel]);
 moonModel.physics.mass = 2;
 moonModel.physics.siderealDayDuration = 28 * 60 * 60;
 moonModel.physics.minTemperature = -180;

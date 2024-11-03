@@ -146,7 +146,7 @@ export function newSeededStarSystemModel(seed: SystemSeed): StarSystemModel {
         for (let j = 0; j < nbMoons; j++) {
             const satelliteName = `${planetarySystemName}${Alphabet[j]}`;
             const satelliteSeed = centeredRand(planetarySystemRng, GenerationSteps.MOONS + j) * Settings.SEED_HALF_RANGE;
-            const satelliteModel = newSeededTelluricSatelliteModel(satelliteSeed, satelliteName, planets);
+            const satelliteModel = newSeededTelluricSatelliteModel(satelliteSeed, satelliteName, planets, stellarObjects);
             satellites.push(satelliteModel);
         }
     });
