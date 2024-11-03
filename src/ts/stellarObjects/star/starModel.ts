@@ -46,7 +46,7 @@ export function newSeededStarModel(seed: number, name: string, parentBodies: Cel
         mass: 1.9885e30, //TODO: compute mass from physical properties
         siderealDayDuration: 24 * 60 * 60,
         blackBodyTemperature: temperature,
-        axialTilt: 0
+        axialTilt: Quaternion.Identity()
     };
 
     const radius = getRandomRadiusFromStellarType(stellarType, rng);

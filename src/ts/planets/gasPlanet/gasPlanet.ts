@@ -18,7 +18,6 @@
 import { GasPlanetMaterial } from "./gasPlanetMaterial";
 import { GasPlanetModel } from "./gasPlanetModel";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
@@ -37,6 +36,7 @@ import { orbitalObjectTypeToDisplay } from "../../utils/strings/orbitalObjectTyp
 import { Planet } from "../../architecture/planet";
 
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
+import { setRotationQuaternion } from "../../uberCore/transforms/basicTransform";
 
 export class GasPlanet implements Planet, Cullable {
     private readonly mesh: Mesh;
@@ -99,7 +99,7 @@ export class GasPlanet implements Planet, Cullable {
             this.asteroidField = null;
         }
 
-        this.getTransform().rotate(Axis.X, this.model.physics.axialTilt);
+        setRotationQuaternion(this.getTransform(), this.model.physics.axialTilt);
 
         this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());
     }

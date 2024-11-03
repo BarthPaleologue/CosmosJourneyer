@@ -23,7 +23,6 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Light } from "@babylonjs/core/Lights/light";
 import { setRotationQuaternion } from "../../uberCore/transforms/basicTransform";
-import { Quaternion } from "@babylonjs/core/Maths/math";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
@@ -94,7 +93,7 @@ export class Star implements StellarObject, Cullable {
         this.material = new StarMaterial(this.model, scene);
         this.mesh.material = this.material;
 
-        setRotationQuaternion(this.getTransform(), Quaternion.Identity());
+        setRotationQuaternion(this.getTransform(), this.model.physics.axialTilt);
 
         this.postProcesses.push(PostProcessType.VOLUMETRIC_LIGHT, PostProcessType.LENS_FLARE);
         if (this.model.rings !== null) {

@@ -26,7 +26,6 @@ import { HelixHabitat } from "../assets/procedural/spaceStation/helixHabitat";
 import { RingHabitat } from "../assets/procedural/spaceStation/ringHabitat";
 import { Transformable } from "../architecture/transformable";
 import { SolarSection } from "../assets/procedural/spaceStation/solarSection";
-import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { wheelOfFortune } from "../utils/random";
 import { CylinderHabitat } from "../assets/procedural/spaceStation/cylinderHabitat";
 import { LandingBay } from "../assets/procedural/spaceStation/landingBay";
@@ -37,7 +36,6 @@ import { getRngFromSeed } from "../utils/getRngFromSeed";
 import { orbitalObjectTypeToDisplay } from "../utils/strings/orbitalObjectTypeToDisplay";
 import { OrbitalFacility } from "./orbitalFacility";
 import { SpaceElevatorModel } from "./spaceElevatorModel";
-import { setUpVector } from "../uberCore/transforms/basicTransform";
 import { OrbitalObject } from "../architecture/orbitalObject";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { MetalSectionMaterial } from "../assets/procedural/spaceStation/metalSectionMaterial";
@@ -45,6 +43,7 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { SpaceElevatorClimber } from "./spaceElevatorClimber";
 import { remap, triangleWave } from "../utils/math";
 import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
+import { setRotationQuaternion } from "../uberCore/transforms/basicTransform";
 
 export class SpaceElevator implements OrbitalFacility {
     readonly name: string;
@@ -117,8 +116,7 @@ export class SpaceElevator implements OrbitalFacility {
             .getChildTransformNodes(true)
             .forEach((transform) => transform.position.addInPlace(deltaPosition));
 
-        this.root.rotate(Axis.X, this.model.physics.axialTilt);
-        this.root.rotate(Axis.Z, this.model.physics.axialTilt);
+        setRotationQuaternion(this.getTransform(), this.model.physics.axialTilt);
 
         const extendSize = boundingVectors.max.subtract(boundingVectors.min).scale(0.5);
         this.boundingRadius = Math.max(extendSize.x, extendSize.y, extendSize.z);

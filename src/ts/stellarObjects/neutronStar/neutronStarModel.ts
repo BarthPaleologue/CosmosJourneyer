@@ -41,7 +41,7 @@ export function newSeededNeutronStarModel(seed: number, name: string, parentBodi
         mass: 1000,
         siderealDayDuration: 24 * 60 * 60,
         blackBodyTemperature: temperature,
-        axialTilt: 0
+        axialTilt: Quaternion.Identity()
     };
 
     const radius = clamp(normalRandom(10e3, 1e3, rng, GenerationSteps.RADIUS), 2e3, 50e3);

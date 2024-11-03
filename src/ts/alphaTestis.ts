@@ -71,7 +71,7 @@ hecateModel.physics.minTemperature = -40;
 hecateModel.physics.maxTemperature = 30;
 
 hecateModel.physics.siderealDayDuration = 24 * 60 * 60;
-hecateModel.physics.axialTilt = 0;
+hecateModel.physics.axialTilt = Quaternion.Identity();
 
 hecateModel.orbit.period = 60 * 60 * 24 * 365.25;
 hecateModel.orbit.radius = 25000 * hecateModel.radius;

@@ -35,6 +35,7 @@ import { getRngFromSeed } from "../utils/getRngFromSeed";
 import { getSphereRadiatedEnergyFlux } from "../utils/physics";
 import { OrbitalFacilityModel } from "./orbitalFacility";
 import { Quaternion } from "@babylonjs/core/Maths/math";
+import { Axis } from "@babylonjs/core/Maths/math.axis";
 
 export type SpaceStationModel = OrbitalFacilityModel & {
     readonly type: OrbitalObjectType.SPACE_STATION;
@@ -64,7 +65,7 @@ export function newSeededSpaceStationModel(
     const physicalProperties: OrbitalObjectPhysicsInfo = {
         mass: 1,
         siderealDayDuration: 0,
-        axialTilt: 2 * rng(GenerationSteps.AXIAL_TILT) * Math.PI
+        axialTilt: Quaternion.RotationAxis(Axis.X, 2 * rng(GenerationSteps.AXIAL_TILT) * Math.PI)
     };
 
     const faction = getFactionFromCoordinates(starSystemCoordinates, rng);

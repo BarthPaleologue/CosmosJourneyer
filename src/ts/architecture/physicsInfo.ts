@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Quaternion } from "@babylonjs/core/Maths/math";
+
 export type OrbitalObjectPhysicsInfo = {
     mass: number;
     /**
@@ -23,7 +25,7 @@ export type OrbitalObjectPhysicsInfo = {
      * @see https://en.wikipedia.org/wiki/Sidereal_time
      */
     siderealDayDuration: number;
-    axialTilt: number;
+    axialTilt: Quaternion;
 };
 
 export type StellarObjectPhysicsInfo = OrbitalObjectPhysicsInfo & {

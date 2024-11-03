@@ -18,7 +18,6 @@
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { JuliaSetModel } from "./juliaSetModel";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
-import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -26,6 +25,7 @@ import { Cullable } from "../../utils/cullable";
 import { CelestialBody } from "../../architecture/celestialBody";
 import { orbitalObjectTypeToDisplay } from "../../utils/strings/orbitalObjectTypeToDisplay";
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
+import { setRotationQuaternion } from "../../uberCore/transforms/basicTransform";
 
 export class JuliaSet implements CelestialBody, Cullable {
     readonly model: JuliaSetModel;
@@ -51,7 +51,7 @@ export class JuliaSet implements CelestialBody, Cullable {
 
         this.postProcesses.push(PostProcessType.JULIA_SET);
 
-        this.getTransform().rotate(Axis.X, this.model.physics.axialTilt);
+        setRotationQuaternion(this.getTransform(), this.model.physics.axialTilt);
 
         this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());
     }

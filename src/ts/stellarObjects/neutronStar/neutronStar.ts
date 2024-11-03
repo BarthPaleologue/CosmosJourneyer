@@ -30,7 +30,6 @@ import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { getRgbFromTemperature } from "../../utils/specrend";
 import { Light } from "@babylonjs/core/Lights/light";
 import { setRotationQuaternion } from "../../uberCore/transforms/basicTransform";
-import { Quaternion } from "@babylonjs/core/Maths/math";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { RingsUniforms } from "../../rings/ringsUniform";
 import { Camera } from "@babylonjs/core/Cameras/camera";
@@ -98,7 +97,7 @@ export class NeutronStar implements StellarObject, Cullable {
         this.material = new StarMaterial(this.model, scene);
         this.mesh.material = this.material;
 
-        setRotationQuaternion(this.getTransform(), Quaternion.Identity());
+        setRotationQuaternion(this.getTransform(), this.model.physics.axialTilt);
 
         this.postProcesses.push(PostProcessType.VOLUMETRIC_LIGHT, PostProcessType.LENS_FLARE, PostProcessType.MATTER_JETS);
         if (this.model.rings !== null) {

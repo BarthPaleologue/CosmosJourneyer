@@ -3,7 +3,6 @@ import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates"
 import { CelestialBodyModel } from "../architecture/celestialBody";
 import { getRngFromSeed } from "../utils/getRngFromSeed";
 import { generateSpaceElevatorName } from "../utils/strings/spaceStationNameGenerator";
-import { GenerationSteps } from "../utils/generationSteps";
 import { Orbit } from "../orbit/orbit";
 import { OrbitalObjectPhysicsInfo } from "../architecture/physicsInfo";
 import { getFactionFromCoordinates } from "../society/factions";
@@ -16,6 +15,7 @@ import { OrbitalObjectType } from "../architecture/orbitalObject";
 
 import { OrbitalFacilityModel } from "./orbitalFacility";
 import { Quaternion } from "@babylonjs/core/Maths/math";
+import { Axis } from "@babylonjs/core/Maths/math.axis";
 
 export type SpaceElevatorModel = OrbitalFacilityModel & {
     readonly type: OrbitalObjectType.SPACE_ELEVATOR;
@@ -49,7 +49,7 @@ export function newSeededSpaceElevatorModel(
     const physicalProperties: OrbitalObjectPhysicsInfo = {
         mass: 1,
         siderealDayDuration: parentSiderealDayDuration,
-        axialTilt: 2 * rng(GenerationSteps.AXIAL_TILT) * Math.PI
+        axialTilt: Quaternion.RotationAxis(Axis.X, Math.PI / 2)
     };
 
     const faction = getFactionFromCoordinates(starSystemCoordinates, rng);

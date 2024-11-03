@@ -26,7 +26,6 @@ import { HelixHabitat } from "../assets/procedural/spaceStation/helixHabitat";
 import { RingHabitat } from "../assets/procedural/spaceStation/ringHabitat";
 import { Transformable } from "../architecture/transformable";
 import { SolarSection } from "../assets/procedural/spaceStation/solarSection";
-import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { wheelOfFortune } from "../utils/random";
 import { CylinderHabitat } from "../assets/procedural/spaceStation/cylinderHabitat";
 import { LandingBay } from "../assets/procedural/spaceStation/landingBay";
@@ -40,6 +39,7 @@ import { OrbitalFacility } from "./orbitalFacility";
 import { SpaceStationModel } from "./spacestationModel";
 import { OrbitalObject } from "../architecture/orbitalObject";
 import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
+import { setRotationQuaternion } from "../uberCore/transforms/basicTransform";
 
 export class SpaceStation implements OrbitalFacility {
     readonly name: string;
@@ -81,8 +81,7 @@ export class SpaceStation implements OrbitalFacility {
             .getChildTransformNodes(true)
             .forEach((transform) => transform.position.addInPlace(deltaPosition));
 
-        this.root.rotate(Axis.X, this.model.physics.axialTilt);
-        this.root.rotate(Axis.Z, this.model.physics.axialTilt);
+        setRotationQuaternion(this.getTransform(), this.model.physics.axialTilt);
 
         const extendSize = boundingVectors.max.subtract(boundingVectors.min).scale(0.5);
         this.boundingRadius = Math.max(extendSize.x, extendSize.y, extendSize.z);

@@ -24,7 +24,7 @@ import { SpaceStation } from "../spacestation/spaceStation";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { Mandelbulb } from "../anomalies/mandelbulb/mandelbulb";
-import { rotateAround, translate } from "../uberCore/transforms/basicTransform";
+import { getRotationQuaternion, rotateAround, translate } from "../uberCore/transforms/basicTransform";
 import { Star } from "../stellarObjects/star/star";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
@@ -525,26 +525,28 @@ export class StarSystemController {
         if (shouldCompensateRotation) {
             const dThetaNearest = OrbitalObjectUtils.GetRotationAngle(nearestOrbitalObject, deltaSeconds);
 
+            const nearestObjectRotationAxis = nearestOrbitalObject.getRotationAxis();
+
             for (const object of orbitalObjects) {
                 const orbit = object.model.orbit;
 
                 // the normal to the orbit planes must be rotated as well (even the one of the nearest body)
-                const rotation = Quaternion.RotationAxis(nearestOrbitalObject.getRotationAxis(), -dThetaNearest);
-                orbit.orientation.multiplyInPlace(rotation); //.applyRotationQuaternionInPlace(rotation);
+                const rotation = Quaternion.RotationAxis(nearestObjectRotationAxis, -dThetaNearest);
+                rotation.multiplyToRef(orbit.orientation, orbit.orientation);
 
                 if (object === nearestOrbitalObject) continue;
 
                 // All other bodies must revolve around it for consistency (finally we can say the sun revolves around the earth!)
-                rotateAround(object.getTransform(), nearestOrbitalObject.getTransform().getAbsolutePosition(), nearestOrbitalObject.getRotationAxis(), -dThetaNearest);
+                rotateAround(object.getTransform(), nearestOrbitalObject.getTransform().getAbsolutePosition(), nearestObjectRotationAxis, -dThetaNearest);
             }
 
             this.systemTargets.forEach((target) => {
-                rotateAround(target.getTransform(), nearestOrbitalObject.getTransform().getAbsolutePosition(), nearestOrbitalObject.getRotationAxis(), -dThetaNearest);
+                rotateAround(target.getTransform(), nearestOrbitalObject.getTransform().getAbsolutePosition(), nearestObjectRotationAxis, -dThetaNearest);
             });
 
             // the starfield is rotated to give the impression the nearest body is rotating, which is only an illusion
-            const starfieldAdditionalRotation = Matrix.RotationAxis(nearestOrbitalObject.getRotationAxis(), dThetaNearest);
-            this.starFieldBox.setRotationMatrix(this.starFieldBox.getRotationMatrix().multiply(starfieldAdditionalRotation));
+            const starfieldAdditionalRotation = Matrix.RotationAxis(nearestObjectRotationAxis, dThetaNearest);
+            this.starFieldBox.setRotationMatrix(starfieldAdditionalRotation.multiply(this.starFieldBox.getRotationMatrix()));
         } else {
             // if we don't compensate the rotation of the nearest body, we must simply update its rotation
             OrbitalObjectUtils.UpdateRotation(nearestOrbitalObject, deltaSeconds);

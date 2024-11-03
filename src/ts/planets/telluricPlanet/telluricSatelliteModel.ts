@@ -22,7 +22,6 @@ import { normalRandom, randRangeInt } from "extended-random";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { Settings } from "../../settings";
 import { TelluricPlanetaryMassObjectPhysicsInfo } from "../../architecture/physicsInfo";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { clamp } from "terrain-generation";
@@ -70,9 +69,15 @@ export function newSeededTelluricSatelliteModel(seed: number, name: string, pare
     // when pressure is close to 1, the max temperature is close to the min temperature (the atmosphere does thermal regulation)
     const maxTemperature = minTemperature + Math.exp(-pressure) * randRangeInt(30, 200, rng, 81);
 
+    // this average is an approximation of a quaternion average
+    // see https://math.stackexchange.com/questions/61146/averaging-quaternions
+    const parentAverageAxialTilt: Quaternion = parentBodies.reduce((sum, body) => sum.add(body.physics.axialTilt), Quaternion.Zero());
+    parentAverageAxialTilt.scaleInPlace(1 / parentBodies.length);
+    parentAverageAxialTilt.normalize();
+
     const physicalProperties: TelluricPlanetaryMassObjectPhysicsInfo = {
         mass: mass,
-        axialTilt: 0,
+        axialTilt: parentAverageAxialTilt,
         siderealDayDuration: (60 * 60 * 24) / 10,
         minTemperature: minTemperature,
         maxTemperature: maxTemperature,
@@ -99,7 +104,7 @@ export function newSeededTelluricSatelliteModel(seed: number, name: string, pare
         radius: orbitRadius,
         p: orbitalP,
         period: getOrbitalPeriod(orbitRadius, parentMassSum),
-        orientation: Quaternion.RotationAxis(Axis.X, (rng(GenerationSteps.ORBIT + 20) - 0.5) * 0.2)
+        orientation: parentAverageAxialTilt
     };
 
     // tidal lock
