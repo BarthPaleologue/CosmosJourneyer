@@ -298,19 +298,12 @@ export class MainMenu {
             reader.onload = (event) => {
                 if (event.target === null) throw new Error("event.target is null");
                 const data = event.target.result as string;
-                try {
-                    const loadingSaveData = parseSaveFileData(data);
-                    if (loadingSaveData.data === null) return;
-                    const saveFileData = loadingSaveData.data;
-                    loadingSaveData.logs.forEach((log) => createNotification(log, 60_000));
-                    this.startAnimation(() => this.onLoadSaveObservable.notifyObservers(saveFileData));
-                } catch (e) {
-                    console.error(e);
-                    dropFileZone.classList.add("invalid");
-                    alert(
-                        "Invalid save file. Please check your save file against the current format at https://barthpaleologue.github.io/CosmosJourneyer/docs/types/saveFile_saveFileData.SaveFileData.html\nYou can open an issue here if the issue persists: https://github.com/BarthPaleologue/CosmosJourneyer"
-                    );
-                }
+
+                const loadingSaveData = parseSaveFileData(data);
+                loadingSaveData.logs.forEach((log) => createNotification(log, 60_000));
+                if (loadingSaveData.data === null) return;
+                const saveFileData = loadingSaveData.data;
+                this.startAnimation(() => this.onLoadSaveObservable.notifyObservers(saveFileData));
             };
             reader.readAsText(file);
         });
@@ -328,9 +321,9 @@ export class MainMenu {
                     if (event.target === null) throw new Error("event.target is null");
                     const data = event.target.result as string;
                     const loadingSaveData = parseSaveFileData(data);
+                    loadingSaveData.logs.forEach((log) => createNotification(log, 60_000));
                     if (loadingSaveData.data === null) return;
                     const saveFileData = loadingSaveData.data;
-                    loadingSaveData.logs.forEach((log) => createNotification(log, 60_000));
                     this.startAnimation(() => this.onLoadSaveObservable.notifyObservers(saveFileData));
                 };
                 reader.readAsText(file);
