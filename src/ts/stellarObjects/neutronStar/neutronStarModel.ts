@@ -25,6 +25,12 @@ export type NeutronStarModel = CelestialBodyModelBase<OrbitalObjectType.NEUTRON_
         readonly blackBodyTemperature: number;
 
         /**
+         * The birth year of the star system. 0 corresponds to the big bang.
+         * The birth year corresponds to the year when a stellar object was formed in the star system (first fusion for a star, creation of a singularity for a black hole, etc.).
+         */
+        readonly birthYear: number;
+
+        /**
          * The angle between the magnetic dipole axis and the rotation axis.
          * If the magnetic field were perfectly aligned with the rotation axis, this angle would be 0.
          */

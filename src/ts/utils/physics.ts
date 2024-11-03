@@ -22,7 +22,7 @@ import { Settings } from "../settings";
  * @param temperatureKelvin The temperature of the black body in Kelvin.
  */
 export function getRadiatedEnergyFlux(temperatureKelvin: number) {
-    return 5.67e-8 * temperatureKelvin ** 4;
+    return Settings.STEFAN_BOLTZMANN_CONSTANT * temperatureKelvin ** 4;
 }
 
 /**
@@ -194,4 +194,22 @@ export function getOrbitRadiusFromPeriod(period: number, parentMass: number) {
 export function getApparentGravityOnSpaceTether(period: number, mass: number, distance: number) {
     const omega = (2 * Math.PI) / period;
     return (-Settings.G * mass) / (distance * distance) + distance * omega * omega;
+}
+
+/**
+ * Returns the lifetime (years) of a main sequence star given its mass (kg) and luminosity (W)
+ * @param mass The mass of the star in kilograms
+ * @param luminosity The luminosity of the star in watts
+ * @see https://en.wikipedia.org/wiki/Main_sequence#Lifetime
+ */
+export function getMainSequenceStarLifetime(mass: number, luminosity: number) {
+    return (mass / Settings.SOLAR_MASS) * (Settings.SOLAR_LUMINOSITY / luminosity) * 10 ** 10;
+}
+
+/**
+ * Returns the current year in the universe since the big bang
+ * This is based on the approximation that the year 0 in the Gregorian calendar corresponds to 13.8 billion years after the big bang
+ */
+export function getCurrentUniverseYear(): number {
+    return Settings.GREGORIAN_YEAR_0 + new Date().getFullYear();
 }
