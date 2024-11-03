@@ -1,4 +1,7 @@
 import { UniverseCoordinates } from "../utils/coordinates/universeCoordinates";
+import projectInfo from "../../../package.json";
+import i18n from "../i18n";
+
 import { SerializedPlayer } from "../player/player";
 
 /**
@@ -29,8 +32,26 @@ export type SaveFileData = {
 /**
  * Parses a string into a SaveFileData object. Throws an error if the string is not a valid save file data.
  * @param jsonString The string to parse.
- * @throws Error if the string is not a valid save file data.
+ * @returns The parsed SaveFileData object. Returns null if the string is not valid.
  */
-export function parseSaveFileData(jsonString: string): SaveFileData {
-    return JSON.parse(jsonString);
+export function parseSaveFileData(jsonString: string): { data: SaveFileData | null; logs: string[] } {
+    let saveData: SaveFileData;
+    const logs: string[] = [];
+    try {
+        saveData = JSON.parse(jsonString) as SaveFileData;
+    } catch (e) {
+        logs.push(i18n.t("notifications:invalidSaveFileJson", { error: e }));
+        return { data: null, logs };
+    }
+
+    if (saveData.version !== projectInfo.version) {
+        logs.push(
+            i18n.t("notifications:saveVersionMismatch", {
+                currentVersion: projectInfo.version,
+                saveVersion: saveData.version
+            })
+        );
+    }
+
+    return { data: saveData, logs };
 }

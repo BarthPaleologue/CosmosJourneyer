@@ -20,6 +20,7 @@ import { getSystemModelFromCoordinates } from "../starSystem/modelFromCoordinate
 import { getStarSystemCoordinatesFromSeed } from "../starSystem/systemSeed";
 import { StarSystemModel, StarSystemModelUtils } from "../starSystem/starSystemModel";
 import { OrbitalObjectType } from "../architecture/orbitalObject";
+import { createNotification } from "../utils/notification";
 
 export class MainMenu {
     readonly scene: UberScene;
@@ -298,7 +299,10 @@ export class MainMenu {
                 if (event.target === null) throw new Error("event.target is null");
                 const data = event.target.result as string;
                 try {
-                    const saveFileData = parseSaveFileData(data);
+                    const loadingSaveData = parseSaveFileData(data);
+                    if (loadingSaveData.data === null) return;
+                    const saveFileData = loadingSaveData.data;
+                    loadingSaveData.logs.forEach((log) => createNotification(log, 60_000));
                     this.startAnimation(() => this.onLoadSaveObservable.notifyObservers(saveFileData));
                 } catch (e) {
                     console.error(e);
@@ -323,7 +327,10 @@ export class MainMenu {
                 reader.onload = (event) => {
                     if (event.target === null) throw new Error("event.target is null");
                     const data = event.target.result as string;
-                    const saveFileData = parseSaveFileData(data);
+                    const loadingSaveData = parseSaveFileData(data);
+                    if (loadingSaveData.data === null) return;
+                    const saveFileData = loadingSaveData.data;
+                    loadingSaveData.logs.forEach((log) => createNotification(log, 60_000));
                     this.startAnimation(() => this.onLoadSaveObservable.notifyObservers(saveFileData));
                 };
                 reader.readAsText(file);
