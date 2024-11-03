@@ -44,7 +44,7 @@ import { AudioMasks } from "./audio/audioMasks";
 import { GeneralInputs } from "./inputs/generalInputs";
 import { createNotification } from "./utils/notification";
 import { LoadingScreen } from "./uberCore/loadingScreen";
-import i18n from "./i18n";
+import i18n, { initI18n } from "./i18n";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Sounds } from "./assets/sounds";
 import { TutorialLayer } from "./ui/tutorial/tutorialLayer";
@@ -215,6 +215,8 @@ export class CosmosJourneyer {
             engine.resize(true);
         });
 
+        await initI18n();
+
         // Log informations about the gpu and the api used
         console.log(`API: ${engine.isWebGPU ? "WebGPU" : "WebGL" + engine.version}`);
         console.log(`GPU detected: ${engine.extractDriverInfo()}`);
@@ -381,7 +383,8 @@ export class CosmosJourneyer {
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
-        link.download = "save.json";
+        const dateString = new Date().toLocaleString().replace(/[^0-9a-zA-Z]/g, "_"); // avoid special characters in the filename
+        link.download = `CMDR_${this.player.name}_${dateString}.json`;
         link.click();
     }
 
@@ -391,6 +394,16 @@ export class CosmosJourneyer {
      * @param saveData The save file data to load
      */
     public async loadSaveData(saveData: SaveFileData): Promise<void> {
+        if (saveData.version !== projectInfo.version) {
+            createNotification(
+                i18n.t("notifications:saveVersionMismatch", {
+                    currentVersion: projectInfo.version,
+                    saveVersion: saveData.version
+                }),
+                60_000
+            );
+        }
+
         const newPlayer = saveData.player !== undefined ? Player.Deserialize(saveData.player) : Player.Default();
         this.player.copyFrom(newPlayer);
 

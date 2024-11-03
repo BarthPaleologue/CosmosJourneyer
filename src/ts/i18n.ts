@@ -30,25 +30,27 @@ function loadResources() {
     return resources;
 }
 
-// init language to url parameter if defined, otherwise use the browser language
-const urlParams = new URLSearchParams(window.location.search);
-const language = urlParams.get("lang") || navigator.language;
+export async function initI18n() {
+    // init language to url parameter if defined, otherwise use the browser language
+    const urlParams = new URLSearchParams(window.location.search);
+    const language = urlParams.get("lang") || navigator.language;
 
-await init({
-    lng: language, // change this if you want to test a specific language
-    debug: process.env.NODE_ENV === "development",
-    fallbackLng: "en-US",
-    resources: loadResources()
-});
+    await init({
+        lng: language, // change this if you want to test a specific language
+        debug: process.env.NODE_ENV === "development",
+        fallbackLng: "en-US",
+        resources: loadResources()
+    });
 
-// perform all static translations
-document.querySelectorAll("*[data-i18n]").forEach((element) => {
-    const key = element.getAttribute("data-i18n");
-    if (key === null) throw new Error("data-i18n attribute is null");
+    // perform all static translations
+    document.querySelectorAll("*[data-i18n]").forEach((element) => {
+        const key = element.getAttribute("data-i18n");
+        if (key === null) throw new Error("data-i18n attribute is null");
 
-    // this should be safe as we are not doing any interpolation
-    // (as long as the translation are reviewed before being merged of course)
-    element.innerHTML = t(key);
-});
+        // this should be safe as we are not doing any interpolation
+        // (as long as the translation are reviewed before being merged of course)
+        element.innerHTML = t(key);
+    });
+}
 
 export default i18next;

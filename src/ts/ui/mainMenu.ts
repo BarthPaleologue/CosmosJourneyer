@@ -20,6 +20,7 @@ import { getSystemModelFromCoordinates } from "../starSystem/modelFromCoordinate
 import { getStarSystemCoordinatesFromSeed } from "../starSystem/systemSeed";
 import { StarSystemModel, StarSystemModelUtils } from "../starSystem/starSystemModel";
 import { OrbitalObjectType } from "../architecture/orbitalObject";
+import { createNotification } from "../utils/notification";
 
 export class MainMenu {
     readonly scene: UberScene;
@@ -297,16 +298,12 @@ export class MainMenu {
             reader.onload = (event) => {
                 if (event.target === null) throw new Error("event.target is null");
                 const data = event.target.result as string;
-                try {
-                    const saveFileData = parseSaveFileData(data);
-                    this.startAnimation(() => this.onLoadSaveObservable.notifyObservers(saveFileData));
-                } catch (e) {
-                    console.error(e);
-                    dropFileZone.classList.add("invalid");
-                    alert(
-                        "Invalid save file. Please check your save file against the current format at https://barthpaleologue.github.io/CosmosJourneyer/docs/types/saveFile_saveFileData.SaveFileData.html\nYou can open an issue here if the issue persists: https://github.com/BarthPaleologue/CosmosJourneyer"
-                    );
-                }
+
+                const loadingSaveData = parseSaveFileData(data);
+                loadingSaveData.logs.forEach((log) => createNotification(log, 60_000));
+                if (loadingSaveData.data === null) return;
+                const saveFileData = loadingSaveData.data;
+                this.startAnimation(() => this.onLoadSaveObservable.notifyObservers(saveFileData));
             };
             reader.readAsText(file);
         });
@@ -323,7 +320,10 @@ export class MainMenu {
                 reader.onload = (event) => {
                     if (event.target === null) throw new Error("event.target is null");
                     const data = event.target.result as string;
-                    const saveFileData = parseSaveFileData(data);
+                    const loadingSaveData = parseSaveFileData(data);
+                    loadingSaveData.logs.forEach((log) => createNotification(log, 60_000));
+                    if (loadingSaveData.data === null) return;
+                    const saveFileData = loadingSaveData.data;
                     this.startAnimation(() => this.onLoadSaveObservable.notifyObservers(saveFileData));
                 };
                 reader.readAsText(file);
