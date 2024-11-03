@@ -1,3 +1,4 @@
+@use "sass:meta";
 //  This file is part of Cosmos Journeyer
 //
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
@@ -44,12 +45,12 @@
       padding: 20px 10px 0 10px;
     }
 
-    @import "../utils/colorPicker";
+    @include meta.load-css("../utils/colorPicker");
 
     .range-slider {
       margin-top: -5%;
     }
 
-    @import "../utils/checkbox";
+    @include meta.load-css("../utils/checkbox");
   }
 }

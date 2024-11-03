@@ -15,9 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-@import "notifications.scss";
+@use "sass:meta";
+@use "notifications.scss";
 
-@import "currentMissionDisplay.scss";
+@use "currentMissionDisplay.scss";
 
 #helmetOverlay {
   position: absolute;
@@ -31,7 +32,7 @@
 
   font-family: Nasalization, sans-serif;
 
-  @import "targetHelper.scss";
+  @include meta.load-css("targetHelper.scss");
 
   .cursor {
     position: absolute;
