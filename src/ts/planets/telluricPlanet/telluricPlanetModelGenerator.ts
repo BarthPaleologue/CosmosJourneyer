@@ -19,22 +19,23 @@ import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { Settings } from "../../settings";
-import { celsiusToKelvin, hasLiquidWater } from "../../utils/physics";
+import { celsiusToKelvin, getCurrentUniverseYear, getTidalLockingTimescale, hasLiquidWater } from "../../utils/physics";
 import { CloudsModel, newCloudsModel } from "../../clouds/cloudsModel";
-import { Orbit } from "../../orbit/orbit";
+import { getOrbitalPeriod, Orbit } from "../../orbit/orbit";
 import { newSeededRingsModel, RingsModel } from "../../rings/ringsModel";
 import { clamp } from "../../utils/math";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { TelluricPlanetModel } from "./telluricPlanetModel";
-import { CelestialBodyModel } from "../../architecture/orbitalObjectModel";
+import { StellarObjectModel } from "../../architecture/orbitalObjectModel";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { OceanModel } from "../../ocean/oceanModel";
 import { AtmosphereModel } from "../../atmosphere/atmosphereModel";
+import { Lerp } from "@babylonjs/core/Maths/math.scalar.functions";
 
 export function newSeededTelluricPlanetModel(
     seed: number,
     name: string,
-    parentBodies: CelestialBodyModel[]
+    parentBodies: StellarObjectModel[]
 ): TelluricPlanetModel {
     const rng = getRngFromSeed(seed);
 
@@ -69,7 +70,9 @@ export function newSeededTelluricPlanetModel(
         minTemperature + Math.exp(-pressure / Settings.EARTH_SEA_LEVEL_PRESSURE) * randRangeInt(30, 200, rng, 81);
 
     const axialTilt = normalRandom(0, 0.2, rng, GenerationSteps.AXIAL_TILT);
-    const siderealDaySeconds = (60 * 60 * 24) / 10;
+
+    const parentMassSum = parentBodies.reduce((sum, body) => sum + body.mass, 0);
+
     const waterAmount = Math.max(normalRandom(1.0, 0.3, rng, GenerationSteps.WATER_AMOUNT), 0);
 
     const canHaveLiquidWater = hasLiquidWater(pressure, minTemperature, maxTemperature);
@@ -123,6 +126,17 @@ export function newSeededTelluricPlanetModel(
 
         mountains_frequency: (60 * radius) / 1000e3
     };
+
+    const tidalLockingTimescale = getTidalLockingTimescale(parentMassSum, mass, orbitRadius, radius, 0);
+
+    const parentMaxBirthYear = parentBodies.reduce((max, body) => Math.max(max, body.birthYear), 0);
+    const currentAge = getCurrentUniverseYear() - parentMaxBirthYear;
+
+    const tidalLockingFactor = Math.min(1, currentAge / tidalLockingTimescale);
+
+    const orbitalPeriod = getOrbitalPeriod(orbit.semiMajorAxis, parentMassSum);
+
+    const siderealDaySeconds = Lerp(60 * 60 * 24, orbitalPeriod, tidalLockingFactor);
 
     const rings: RingsModel | null = uniformRandBool(0.6, rng, GenerationSteps.RINGS) ? newSeededRingsModel(rng) : null;
 
