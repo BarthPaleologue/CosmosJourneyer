@@ -383,7 +383,8 @@ export class CosmosJourneyer {
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
-        link.download = "save.json";
+        const dateString = new Date().toLocaleString().replace(/[^0-9a-zA-Z]/g, "_"); // avoid special characters in the filename
+        link.download = `CMDR_${this.player.name}_${dateString}.json`;
         link.click();
     }
 
