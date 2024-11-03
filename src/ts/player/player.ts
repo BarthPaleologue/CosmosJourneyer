@@ -6,6 +6,9 @@ export type SerializedPlayer = {
     name: string;
     balance: number;
     creationDate: string;
+
+    visitedSystemHistory: StarSystemCoordinates[];
+
     currentItinerary: StarSystemCoordinates[];
     systemBookmarks: StarSystemCoordinates[];
 
@@ -18,6 +21,8 @@ export class Player {
     balance: number;
     creationDate: Date;
 
+    visitedSystemHistory: StarSystemCoordinates[] = [];
+
     currentItinerary: StarSystemCoordinates[];
     systemBookmarks: StarSystemCoordinates[];
 
@@ -28,6 +33,7 @@ export class Player {
         name: string,
         balance: number,
         creationDate: Date,
+        visitedSystemHistory: StarSystemCoordinates[],
         currentItinerary: StarSystemCoordinates[],
         systemBookmarks: StarSystemCoordinates[],
         currentMissions: Mission[],
@@ -36,6 +42,7 @@ export class Player {
         this.name = name;
         this.balance = balance;
         this.creationDate = creationDate;
+        this.visitedSystemHistory = visitedSystemHistory;
         this.currentItinerary = currentItinerary;
         this.systemBookmarks = systemBookmarks;
         this.currentMissions = currentMissions;
@@ -43,7 +50,7 @@ export class Player {
     }
 
     public static Default(): Player {
-        return new Player("Python", 10_000, new Date(), [], [], [], []);
+        return new Player("Python", 10_000, new Date(), [], [], [], [], []);
     }
 
     public static Deserialize(serializedPlayer: SerializedPlayer): Player {
@@ -51,6 +58,7 @@ export class Player {
             serializedPlayer.name,
             serializedPlayer.balance,
             new Date(serializedPlayer.creationDate),
+            serializedPlayer.visitedSystemHistory,
             serializedPlayer.currentItinerary,
             serializedPlayer.systemBookmarks,
             serializedPlayer.currentMissions.map((mission) => Mission.Deserialize(mission)),
@@ -63,6 +71,7 @@ export class Player {
             name: player.name,
             balance: player.balance,
             creationDate: player.creationDate.toISOString(),
+            visitedSystemHistory: player.visitedSystemHistory,
             currentItinerary: player.currentItinerary,
             systemBookmarks: player.systemBookmarks,
             currentMissions: player.currentMissions.map((mission) => mission.serialize()),
@@ -74,6 +83,7 @@ export class Player {
         this.name = player.name;
         this.balance = player.balance;
         this.creationDate = player.creationDate;
+        this.visitedSystemHistory = player.visitedSystemHistory;
         this.currentItinerary = player.currentItinerary;
         this.systemBookmarks = player.systemBookmarks;
         this.currentMissions = player.currentMissions;
