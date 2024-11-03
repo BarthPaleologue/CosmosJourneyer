@@ -37,11 +37,13 @@ export function newSeededSpaceElevatorModel(
 
     const orbitRadius = getOrbitRadiusFromPeriod(parentSiderealDayDuration, parentBody.physics.mass);
 
+    const parentAxialTilt: Quaternion = parentBody.physics.axialTilt;
+
     const orbit: Orbit = {
         radius: orbitRadius,
         p: 2,
         period: parentSiderealDayDuration,
-        orientation: Quaternion.Identity(),
+        orientation: parentAxialTilt,
     };
 
     const tetherLength = orbitRadius - parentBody.radius;
