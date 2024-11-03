@@ -27,9 +27,7 @@
     justify-content: flex-start;
     pointer-events: all;
 
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    background: rgba(0, 0, 0, 0.8);
 
     animation: popIn 0.5s ease-in-out;
     animation-fill-mode: forwards;
