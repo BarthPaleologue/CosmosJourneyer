@@ -15,7 +15,6 @@ import { OrbitalObjectType } from "../architecture/orbitalObject";
 
 import { OrbitalFacilityModel } from "./orbitalFacility";
 import { Quaternion } from "@babylonjs/core/Maths/math";
-import { Axis } from "@babylonjs/core/Maths/math.axis";
 
 export type SpaceElevatorModel = OrbitalFacilityModel & {
     readonly type: OrbitalObjectType.SPACE_ELEVATOR;

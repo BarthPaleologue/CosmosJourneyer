@@ -206,7 +206,12 @@ export function newSeededStarSystemModel(seed: SystemSeed): StarSystemModel {
         planetarySystemsWithStations.forEach((planetarySystem) => {
             const spaceStationSeed = centeredRand(systemRng, GenerationSteps.SPACE_STATIONS + planetarySystem.planets.length) * Settings.SEED_HALF_RANGE;
 
-            if (uniformRandBool(0.5, systemRng, 657) && planetarySystem.planets.length === 1 && planetarySystem.planets[0].type === OrbitalObjectType.TELLURIC_PLANET) {
+            if (
+                uniformRandBool(0.5, systemRng, 657) && // 50% chance of having a space elevator
+                planetarySystem.planets.length === 1 && // I don't want to imagine the complexity of a space elevator in a close binary system
+                planetarySystem.planets[0].type === OrbitalObjectType.TELLURIC_PLANET && // space elevators can't be built on gas giants yet
+                planetarySystem.planets[0].rings === null // can't have rings because the tether would be at risk
+            ) {
                 const spaceElevatorModel = newSeededSpaceElevatorModel(spaceStationSeed, stellarObjects, coordinates, planetarySystem.planets[0]);
                 planetarySystem.orbitalFacilities.push(spaceElevatorModel);
             } else {
