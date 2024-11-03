@@ -24,7 +24,6 @@ import { getStarGalacticPosition } from "../../../../utils/coordinates/starSyste
 import { parseDistance } from "../../../../utils/strings/parseToStrings";
 import { Settings } from "../../../../settings";
 import i18n from "../../../../i18n";
-import { getGlobalKeyboardLayoutMap } from "../../../../utils/keyboardAPI";
 import { pressInteractionToStrings } from "../../../../utils/strings/inputControlsString";
 import { GeneralInputs } from "../../../../inputs/generalInputs";
 import { getSystemModelFromCoordinates } from "../../../../starSystem/modelFromCoordinates";
@@ -115,7 +114,7 @@ export class MissionFlyByNode implements MissionNode {
         });
     }
 
-    async describeNextTask(context: MissionContext): Promise<string> {
+    describeNextTask(context: MissionContext, keyboardLayout: Map<string, string>): string {
         if (this.isCompleted()) {
             return i18n.t("missions:flyBy:missionCompleted");
         }
@@ -128,8 +127,6 @@ export class MissionFlyByNode implements MissionNode {
         const distance = Vector3.Distance(targetSystemPosition, currentSystemPosition);
 
         const targetObject = getObjectModelByUniverseId(this.objectId);
-
-        const keyboardLayout = await getGlobalKeyboardLayoutMap();
 
         switch (this.state) {
             case FlyByState.NOT_IN_SYSTEM:

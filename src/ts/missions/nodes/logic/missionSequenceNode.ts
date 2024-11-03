@@ -78,10 +78,10 @@ export class MissionSequenceNode implements MissionNode {
         return this.children.map((child) => child.describe(originSystemCoordinates)).join(" then ");
     }
 
-    describeNextTask(context: MissionContext): Promise<string> {
-        if (this.hasCompletedLock) return Promise.resolve("Mission completed");
-        if (this.activeChildIndex >= this.children.length) return Promise.resolve("Mission completed");
-        return this.children[this.activeChildIndex].describeNextTask(context);
+    describeNextTask(context: MissionContext, keyboardLayout: Map<string, string>): string {
+        if (this.hasCompletedLock) return "Mission completed";
+        if (this.activeChildIndex >= this.children.length) return "Mission completed";
+        return this.children[this.activeChildIndex].describeNextTask(context, keyboardLayout);
     }
 
     getTargetSystems(): StarSystemCoordinates[] {

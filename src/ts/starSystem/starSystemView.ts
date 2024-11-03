@@ -37,12 +37,7 @@ import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge"
 import { DefaultControls } from "../defaultControls/defaultControls";
 import { CharacterControls } from "../characterControls/characterControls";
 import { Assets } from "../assets/assets";
-import {
-    getForwardDirection,
-    getRotationQuaternion,
-    setRotationQuaternion,
-    translate
-} from "../uberCore/transforms/basicTransform";
+import { getForwardDirection, getRotationQuaternion, setRotationQuaternion, translate } from "../uberCore/transforms/basicTransform";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { View } from "../utils/view";
@@ -179,6 +174,8 @@ export class StarSystemView implements View {
 
     readonly postProcessManager: PostProcessManager;
 
+    private keyboardLayoutMap: Map<string, string> = new Map();
+
     /**
      * Creates an empty star system view with a scene, a gui and a havok plugin
      * To fill it with a star system, use `loadStarSystem` and then `initStarSystem`
@@ -195,6 +192,10 @@ export class StarSystemView implements View {
         const canvas = engine.getRenderingCanvas();
         if (canvas === null) throw new Error("Canvas is null");
         this.bodyEditor.setCanvas(canvas);
+
+        getGlobalKeyboardLayoutMap().then((keyboardLayoutMap) => {
+            this.keyboardLayoutMap = keyboardLayoutMap;
+        });
 
         StarSystemInputs.map.toggleUi.on("complete", () => {
             this.isUiEnabled = !this.isUiEnabled;
@@ -594,7 +595,7 @@ export class StarSystemView implements View {
         Materials.GRASS_DEPTH_MATERIAL.update(stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
     }
 
-    public async updateAfterRender() {
+    public updateAfterRender() {
         if (this.isLoadingSystem) return;
 
         const starSystem = this.getStarSystem();
@@ -604,7 +605,6 @@ export class StarSystemView implements View {
         const activeControls = this.scene.getActiveControls();
 
         const nearestCelestialBody = starSystem.getNearestCelestialBody(activeControls.getTransform().getAbsolutePosition());
-        const nearestOrbitalObject = starSystem.getNearestOrbitalObject(activeControls.getTransform().getAbsolutePosition());
 
         this.bodyEditor.update(nearestCelestialBody, this.postProcessManager, this.scene);
 
@@ -614,7 +614,7 @@ export class StarSystemView implements View {
             physicsEngine: this.scene.getPhysicsEngine() as PhysicsEngineV2
         };
 
-        await this.spaceShipLayer.update(nearestOrbitalObject, activeControls.getTransform(), missionContext);
+        this.spaceShipLayer.update(activeControls.getTransform(), missionContext, this.keyboardLayoutMap);
 
         this.targetCursorLayer.update(activeControls.getActiveCameras()[0]);
         const targetLandingPad = this.spaceshipControls.spaceship.getTargetLandingPad();

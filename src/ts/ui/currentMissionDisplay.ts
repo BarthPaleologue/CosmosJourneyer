@@ -123,7 +123,7 @@ export class CurrentMissionDisplay {
         });
     }
 
-    public async update(context: MissionContext) {
+    public update(context: MissionContext, keyboardLayout: Map<string, string>) {
         const allMissions = this.player.completedMissions.concat(this.player.currentMissions);
         if (this.activeMission === null && this.player.currentMissions.length !== 0) {
             this.setMission(this.player.currentMissions[0]);
@@ -135,10 +135,7 @@ export class CurrentMissionDisplay {
 
         this.rootNode.classList.toggle("completed", this.activeMission.tree.isCompleted());
 
-        const newDescriptionText = this.activeMission.describe();
-        if (newDescriptionText !== this.missionPanelDescription.innerText) this.missionPanelDescription.innerText = newDescriptionText;
-
-        const nextTaskText = await this.activeMission.describeNextTask(context);
+        const nextTaskText = this.activeMission.describeNextTask(context, keyboardLayout);
         if (nextTaskText !== this.missionPanelNextTask.innerText) this.missionPanelNextTask.innerText = nextTaskText;
     }
 

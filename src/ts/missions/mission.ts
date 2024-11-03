@@ -84,9 +84,10 @@ export class Mission {
     /**
      * Describes the next task that the player has to complete given the current mission context
      * @param context The current mission context
+     * @param keyboardLayout The keyboard layout map to localize the keys
      */
-    async describeNextTask(context: MissionContext): Promise<string> {
-        return await this.tree.describeNextTask(context);
+    describeNextTask(context: MissionContext, keyboardLayout: Map<string, string>): string {
+        return this.tree.describeNextTask(context, keyboardLayout);
     }
 
     /**

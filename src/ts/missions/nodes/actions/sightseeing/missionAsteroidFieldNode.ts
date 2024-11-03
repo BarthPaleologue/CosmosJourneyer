@@ -27,7 +27,6 @@ import { parseDistance } from "../../../../utils/strings/parseToStrings";
 import { Settings } from "../../../../settings";
 import { pressInteractionToStrings } from "../../../../utils/strings/inputControlsString";
 import { GeneralInputs } from "../../../../inputs/generalInputs";
-import { getGlobalKeyboardLayoutMap } from "../../../../utils/keyboardAPI";
 import { getSystemModelFromCoordinates } from "../../../../starSystem/modelFromCoordinates";
 
 const enum AsteroidFieldMissionState {
@@ -134,7 +133,7 @@ export class MissionAsteroidFieldNode implements MissionNode {
         });
     }
 
-    async describeNextTask(context: MissionContext): Promise<string> {
+    describeNextTask(context: MissionContext, keyboardLayout: Map<string, string>): string {
         if (this.isCompleted()) {
             return i18n.t("missions:asteroidField:missionCompleted");
         }
@@ -147,8 +146,6 @@ export class MissionAsteroidFieldNode implements MissionNode {
         const distance = Vector3.Distance(targetSystemPosition, currentSystemPosition);
 
         const targetObject = getObjectModelByUniverseId(this.objectId);
-
-        const keyboardLayout = await getGlobalKeyboardLayoutMap();
 
         switch (this.state) {
             case AsteroidFieldMissionState.NOT_IN_SYSTEM:
