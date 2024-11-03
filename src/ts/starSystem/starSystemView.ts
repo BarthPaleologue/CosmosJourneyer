@@ -71,6 +71,7 @@ import { getSystemModelFromCoordinates } from "./modelFromCoordinates";
 import { StarSystemModel } from "./starSystemModel";
 import { OrbitalObjectType } from "../architecture/orbitalObject";
 import { OrbitalFacility } from "../spacestation/orbitalFacility";
+import { getStarGalacticPosition } from "../utils/coordinates/starSystemCoordinatesUtils";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -417,6 +418,8 @@ export class StarSystemView implements View {
             this.starSystem.dispose();
             this.targetCursorLayer.reset();
             this.spaceStationLayer.reset();
+
+            this.player.visitedSystemHistory.push(this.starSystem.model.coordinates);
         }
 
         this.starSystem = new StarSystemController(starSystemModel, this.scene);
@@ -458,11 +461,32 @@ export class StarSystemView implements View {
         const firstBody = celestialBodies[0];
         if (firstBody === undefined) throw new Error("No bodies in star system");
 
-        const activeController = this.scene.getActiveControls();
-        let controllerDistanceFactor = 7;
+        const activeControls = this.scene.getActiveControls();
+        let controllerDistanceFactor = 4;
         if (firstBody instanceof BlackHole) controllerDistanceFactor = 5;
         else if (firstBody instanceof NeutronStar) controllerDistanceFactor = 100_000;
-        positionNearObjectBrightSide(activeController, firstBody, starSystem, controllerDistanceFactor);
+        if (this.player.visitedSystemHistory.length === 0) {
+            positionNearObjectBrightSide(activeControls, firstBody, starSystem, controllerDistanceFactor);
+        } else {
+            // place player in the direction of the previous system (where we came from)
+            const currentSystemPosition = getStarGalacticPosition(starSystem.model.coordinates);
+            const previousSystemPosition = getStarGalacticPosition(this.player.visitedSystemHistory[this.player.visitedSystemHistory.length - 1]);
+
+            // compute direction from previous system to current system
+            const placementDirection = previousSystemPosition.subtract(currentSystemPosition).normalize();
+            Vector3.TransformCoordinatesToRef(placementDirection, starSystem.starFieldBox.getRotationMatrix(), placementDirection);
+
+            // offset the player from the first body
+            const positionOffset = placementDirection.scale(controllerDistanceFactor * firstBody.getBoundingRadius());
+            activeControls.getTransform().setAbsolutePosition(firstBody.getTransform().getAbsolutePosition().add(positionOffset));
+
+            // put the player back to the origin of the star system
+            starSystem.translateEverythingNow(activeControls.getTransform().getAbsolutePosition().negate());
+            activeControls.getTransform().setAbsolutePosition(Vector3.Zero());
+
+            // look at the first body
+            activeControls.getTransform().lookAt(firstBody.getTransform().getAbsolutePosition());
+        }
 
         starSystem.initPostProcesses(this.postProcessManager);
 
