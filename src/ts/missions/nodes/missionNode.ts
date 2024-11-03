@@ -49,8 +49,9 @@ export interface MissionNode {
     /**
      * Describes the next task to be done in the mission subtree.
      * @param context The mission context.
+     * @param keyboardLayout The keyboard layout map to localize the keys.
      */
-    describeNextTask(context: MissionContext): Promise<string>;
+    describeNextTask(context: MissionContext, keyboardLayout: Map<string, string>): string;
 
     /**
      * Returns the target systems of the subtree.

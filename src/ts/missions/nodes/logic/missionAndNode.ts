@@ -58,9 +58,9 @@ export class MissionAndNode implements MissionNode {
         return this.children.map((child) => child.describe(originSystemCoordinates)).join(` ${i18n.t("common:and")} `);
     }
 
-    describeNextTask(context: MissionContext): Promise<string> {
-        if (this.hasCompletedLock) return Promise.resolve("Mission completed");
-        return Promise.resolve(this.children.map((child) => child.describeNextTask(context)).join(` ${i18n.t("common:and")} `));
+    describeNextTask(context: MissionContext, keyboardLayout: Map<string, string>): string {
+        if (this.hasCompletedLock) return "Mission completed";
+        return this.children.map((child) => child.describeNextTask(context, keyboardLayout)).join(` ${i18n.t("common:and")} `);
     }
 
     getTargetSystems(): StarSystemCoordinates[] {

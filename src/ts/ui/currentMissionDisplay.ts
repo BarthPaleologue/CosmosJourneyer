@@ -28,6 +28,10 @@ export class CurrentMissionDisplay {
 
     private readonly missionPanel: HTMLElement;
 
+    private readonly missionPanelTitle: HTMLElement;
+    private readonly missionPanelDescription: HTMLElement;
+    private readonly missionPanelNextTask: HTMLElement;
+
     private readonly buttonContainer: HTMLElement;
 
     private readonly previousMissionButton: HTMLElement;
@@ -47,6 +51,15 @@ export class CurrentMissionDisplay {
         this.missionPanel = document.createElement("div");
         this.missionPanel.classList.add("missionPanel");
         this.rootNode.appendChild(this.missionPanel);
+
+        this.missionPanelTitle = document.createElement("h2");
+        this.missionPanel.appendChild(this.missionPanelTitle);
+
+        this.missionPanelDescription = document.createElement("p");
+        this.missionPanel.appendChild(this.missionPanelDescription);
+
+        this.missionPanelNextTask = document.createElement("p");
+        this.missionPanel.appendChild(this.missionPanelNextTask);
 
         this.buttonContainer = document.createElement("div");
         this.buttonContainer.classList.add("buttonContainer");
@@ -110,7 +123,7 @@ export class CurrentMissionDisplay {
         });
     }
 
-    public async update(context: MissionContext) {
+    public update(context: MissionContext, keyboardLayout: Map<string, string>) {
         const allMissions = this.player.completedMissions.concat(this.player.currentMissions);
         if (this.activeMission === null && this.player.currentMissions.length !== 0) {
             this.setMission(this.player.currentMissions[0]);
@@ -122,26 +135,8 @@ export class CurrentMissionDisplay {
 
         this.rootNode.classList.toggle("completed", this.activeMission.tree.isCompleted());
 
-        const descriptionBlocks = this.rootNode.querySelectorAll<HTMLParagraphElement>(".missionPanel p");
-        const descriptionBlock = descriptionBlocks[0];
-        const newDescriptionText = this.activeMission.describe();
-        if (newDescriptionText !== descriptionBlock.innerText) descriptionBlock.innerText = newDescriptionText;
-
-        const nextTaskBlock = descriptionBlocks[1];
-        const nextTaskText = await this.activeMission.describeNextTask(context);
-        if (nextTaskText !== nextTaskBlock.innerText) nextTaskBlock.innerText = nextTaskText;
-
-        this.buttonContainer.remove();
-        if (allMissions.length > 1) {
-            this.rootNode.appendChild(this.buttonContainer);
-        }
-
-        if (this.activeMission !== null) {
-            const allMissions = this.player.completedMissions.concat(this.player.currentMissions);
-            const missionIndex = allMissions.indexOf(this.activeMission);
-
-            this.missionCounter.innerText = `${missionIndex + 1}/${allMissions.length}`;
-        }
+        const nextTaskText = this.activeMission.describeNextTask(context, keyboardLayout);
+        if (nextTaskText !== this.missionPanelNextTask.innerText) this.missionPanelNextTask.innerText = nextTaskText;
     }
 
     public setNextMission() {
@@ -186,32 +181,20 @@ export class CurrentMissionDisplay {
 
     private setMission(mission: Mission) {
         this.activeMission = mission;
+        this.missionPanelTitle.innerText = mission.getTypeString();
+        this.missionPanelDescription.innerText = mission.describe();
 
-        this.missionPanel.innerHTML = "";
-
-        const missionTitle = document.createElement("h2");
-        missionTitle.innerText = mission.getTypeString();
-        this.missionPanel.appendChild(missionTitle);
-
-        const missionDescription = document.createElement("p");
-        missionDescription.innerText = mission.describe();
-        this.missionPanel.appendChild(missionDescription);
-
-        const missionNextTask = document.createElement("p");
-        this.missionPanel.appendChild(missionNextTask);
+        const allMissions = this.player.completedMissions.concat(this.player.currentMissions);
+        const missionIndex = allMissions.indexOf(this.activeMission);
+        this.missionCounter.innerText = `${missionIndex + 1}/${allMissions.length}`;
     }
 
     private setNoMissionActive() {
-        this.missionPanel.innerHTML = "";
+        this.missionPanelTitle.innerText = "No active mission";
+        this.missionPanelDescription.innerText = "You can get missions at space stations.";
+    }
 
-        const defaultPanelH2 = document.createElement("h2");
-        defaultPanelH2.innerText = "You don't have any active mission yet";
-        this.missionPanel.appendChild(defaultPanelH2);
-
-        const defaultPanelP = document.createElement("p");
-        defaultPanelP.innerText = "You can get missions at space stations.";
-        this.missionPanel.appendChild(defaultPanelP);
-
-        this.buttonContainer.remove();
+    public dispose() {
+        this.rootNode.remove();
     }
 }
