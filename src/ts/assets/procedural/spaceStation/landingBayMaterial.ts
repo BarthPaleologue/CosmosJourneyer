@@ -75,7 +75,8 @@ export class LandingBayMaterial extends ShaderMaterial {
                 width: textureResolution * aspectRatio,
                 height: textureResolution
             },
-            scene
+            scene,
+            true
         );
 
         const font_size = 128;
