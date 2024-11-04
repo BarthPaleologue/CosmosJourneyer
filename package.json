@@ -61,6 +61,7 @@
     "serve:prod": "http-server dist -p 8080",
     "format": "prettier --config .prettierrc src//**/*.{js,jsx,json,ts} --write",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules npx jest",
+    "test:coverage": "cross-env NODE_OPTIONS=--experimental-vm-modules npx jest --coverage",
     "docs": "typedoc --options typedoc.json",
     "serve:docs": "http-server docs -p 8081",
     "lint:check": "eslint src/ts --config .eslintrc.js",

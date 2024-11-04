@@ -30,7 +30,7 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { getRngFromSeed } from "../../../utils/getRngFromSeed";
 import { createEnvironmentAggregate } from "../../../utils/havok";
-import { computeRingRotationPeriod } from "../../../utils/physics";
+import { getRotationPeriodForArtificialGravity } from "../../../utils/physics";
 
 export class HelixHabitat implements Transformable {
     private readonly root: TransformNode;
@@ -137,7 +137,7 @@ export class HelixHabitat implements Transformable {
     }
 
     update(stellarObjects: Transformable[], cameraWorldPosition: Vector3, deltaSeconds: number) {
-        this.getTransform().rotate(Axis.Y, deltaSeconds / computeRingRotationPeriod(this.radius, Settings.G_EARTH));
+        this.getTransform().rotate(Axis.Y, deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, Settings.G_EARTH));
         this.helixMaterial.update(stellarObjects);
         this.metalSectionMaterial.update(stellarObjects);
 

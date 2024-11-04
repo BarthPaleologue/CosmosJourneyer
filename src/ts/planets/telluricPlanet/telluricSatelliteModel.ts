@@ -26,7 +26,7 @@ import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { clamp } from "terrain-generation";
 import { getOrbitalPeriod, getPeriapsis, Orbit } from "../../orbit/orbit";
-import { hasLiquidWater } from "../../utils/physics";
+import { celsiusToKelvin, hasLiquidWater } from "../../utils/physics";
 import { CloudsModel, newCloudsModel } from "../../clouds/cloudsModel";
 import { TelluricPlanetaryMassObjectModel } from "./telluricPlanetaryMassObjectModel";
 
@@ -65,9 +65,9 @@ export function newSeededTelluricSatelliteModel(seed: number, name: string, pare
     }
 
     //TODO: use distance to star to determine min temperature when using 1:1 scale
-    const minTemperature = Math.max(-273, normalRandom(-20, 30, rng, 80));
+    const minTemperature = Math.max(0, normalRandom(celsiusToKelvin(-20), 30, rng, 80));
     // when pressure is close to 1, the max temperature is close to the min temperature (the atmosphere does thermal regulation)
-    const maxTemperature = minTemperature + Math.exp(-pressure) * randRangeInt(30, 200, rng, 81);
+    const maxTemperature = minTemperature + Math.exp(-pressure) * randRangeInt(celsiusToKelvin(30), celsiusToKelvin(200), rng, 81);
 
     // this average is an approximation of a quaternion average
     // see https://math.stackexchange.com/questions/61146/averaging-quaternions
