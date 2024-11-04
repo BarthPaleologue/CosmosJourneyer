@@ -118,9 +118,18 @@ describe("hasLiquidWater", () => {
     });
 
     test("ice world", () => {
-        const pressure = 1.0; // in pascal
+        const pressure = 101325; // in pascal
         const minTemperature = 273.15 - 60; // in Kelvin
         const maxTemperature = 273.15 - 20; // in Kelvin
+
+        const canHaveLiquidWater = hasLiquidWater(pressure, minTemperature, maxTemperature);
+        expect(canHaveLiquidWater).toBe(false);
+    });
+
+    test("airless world", () => {
+        const pressure = 0.0; // in pascal
+        const minTemperature = 273.15 - 20; // in Kelvin
+        const maxTemperature = 273.15 + 100; // in Kelvin
 
         const canHaveLiquidWater = hasLiquidWater(pressure, minTemperature, maxTemperature);
         expect(canHaveLiquidWater).toBe(false);

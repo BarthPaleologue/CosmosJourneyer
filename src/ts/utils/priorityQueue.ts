@@ -83,17 +83,6 @@ export class PriorityQueue<T> {
     }
 
     /**
-     * Removes and returns the element at the top of the queue, and adds a new element to the queue
-     * @param value The element to add to the queue
-     */
-    replace(value: T): T | undefined {
-        const replacedValue = this.peek();
-        this.#heap[topIndex] = value;
-        this.#siftDown();
-        return replacedValue;
-    }
-
-    /**
      * Removes all elements from the queue
      */
     clear(): void {

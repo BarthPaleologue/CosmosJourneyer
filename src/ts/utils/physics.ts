@@ -130,15 +130,18 @@ export function hasLiquidWater(pressure: number, minTemperature: number, maxTemp
     const waterBoilingPoint = waterBoilingTemperature(pressure);
     const waterFreezingPoint = celsiusToKelvin(0);
     const epsilon = 0.05;
-    if (pressure > epsilon) {
-        // if temperature is too high, there is no ocean (desert world)
-        if (maxTemperature > waterBoilingPoint) return false;
-        // if temperature is too low, there is no ocean (frozen world)
-        if (maxTemperature < waterFreezingPoint) return false;
-    } else {
-        // if pressure is too low, there is no ocean (sterile world)
-        return false;
-    }
+
+    // if pressure is too low, there is no ocean (airless world)
+    if (pressure < epsilon) return false;
+
+    // if boiling point is lower than freezing point, ice sublimates instead of melting
+    if (waterBoilingPoint < waterFreezingPoint) return false;
+
+    // if temperature is too high, there is no ocean (desert world)
+    if (minTemperature > waterBoilingPoint) return false;
+
+    // if temperature is too low, there is no ocean (frozen world)
+    if (maxTemperature < waterFreezingPoint) return false;
 
     return true;
 }
