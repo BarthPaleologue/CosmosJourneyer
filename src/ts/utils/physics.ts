@@ -46,16 +46,16 @@ export function getSphereRadiatedEnergyFlux(temperatureKelvin: number, radius: n
 
 /**
  * Calculates the boiling point of water at a given pressure.
- * @param pressure The pressure of the atmosphere in bars
+ * @param pressure The pressure of the atmosphere in pascal.
  * @returns The boiling point of water at the given pressure in Kelvin
  * @see https://en.wikipedia.org/wiki/Boiling_point?oldformat=true#Saturation_temperature_and_pressure
  * @see https://www.omnicalculator.com/chemistry/boiling-point
  * @see https://www.desmos.com/calculator/ctxerbh48s
  */
 export function waterBoilingTemperature(pressure: number): number {
-    const P1 = 1.0;
+    const P1 = 101325.0; // sea level pressure on Earth in pascal
     const P2 = pressure;
-    const T1 = celsiusToKelvin(100.0);
+    const T1 = celsiusToKelvin(100.0); // boiling point of water at sea level on Earth in Kelvin
     const DH = 40660.0;
     const R = 8.314;
     if (P2 <= 0.0) return 0.0; // when pressure is 0, water cannot exist in liquid state
@@ -122,7 +122,7 @@ export function celsiusToKelvin(celsius: number) {
 
 /**
  * Determines if the temperature range of a planet overlaps with the liquid water range given its pressure
- * @param pressure The pressure of the atmosphere in bars
+ * @param pressure The pressure of the atmosphere in pascal
  * @param minTemperature The minimum temperature of the planet in Kelvin
  * @param maxTemperature The maximum temperature of the planet in Kelvin
  */

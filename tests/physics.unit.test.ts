@@ -58,14 +58,14 @@ test("computeMeanTemperature", () => {
 
 describe("waterBoilingPointCelsius", () => {
     test("earth", () => {
-        const earthPressure = 1; // in bars
+        const earthPressure = 101325; // in pascal
         const boilingPoint = waterBoilingTemperature(earthPressure);
         expect(boilingPoint).toBeGreaterThan(273.15 + 99);
         expect(boilingPoint).toBeLessThan(273.15 + 101);
     });
 
     test("moon", () => {
-        const moonPressure = 0; // in bars
+        const moonPressure = 0; // in pascal
         const boilingPoint = waterBoilingTemperature(moonPressure);
         expect(boilingPoint).toBe(0);
     });
@@ -91,7 +91,7 @@ test("gravitationalLensing", () => {
 
 describe("hasLiquidWater", () => {
     test("earth-like planet", () => {
-        const pressure = 1; // in bars
+        const pressure = 101325; // in pascal
         const minTemperature = 273.15 - 20; // in Kelvin
         const maxTemperature = 273.15 + 100; // in Kelvin
 
@@ -100,7 +100,7 @@ describe("hasLiquidWater", () => {
     });
 
     test("mars-like planet", () => {
-        const pressure = 0.006; // in bars
+        const pressure = 610; // in pascal
         const minTemperature = 273.15 - 60; // in Kelvin
         const maxTemperature = 273.15 + 20; // in Kelvin
 
@@ -109,7 +109,7 @@ describe("hasLiquidWater", () => {
     });
 
     test("venus-like planet", () => {
-        const pressure = 92; // in bars
+        const pressure = 9.2e6; // in pascal
         const minTemperature = 273.15 + 400; // in Kelvin
         const maxTemperature = 273.15 + 800; // in Kelvin
 
@@ -118,7 +118,7 @@ describe("hasLiquidWater", () => {
     });
 
     test("ice world", () => {
-        const pressure = 1.0; // in bars
+        const pressure = 1.0; // in pascal
         const minTemperature = 273.15 - 60; // in Kelvin
         const maxTemperature = 273.15 - 20; // in Kelvin
 

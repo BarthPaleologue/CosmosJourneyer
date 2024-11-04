@@ -57,7 +57,7 @@ export type PlanetaryMassObjectPhysicsInfo = OrbitalObjectPhysicsInfo & {
     maxTemperature: number;
 
     /**
-     * Pressure of the atmosphere in bars
+     * Pressure of the atmosphere in pascal
      */
     pressure: number;
 };

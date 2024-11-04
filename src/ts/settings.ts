@@ -92,6 +92,11 @@ export const Settings = {
     CELSIUS_TO_KELVIN: 273.15,
 
     /**
+     * The sea level pressure on Earth in Pascals.
+     */
+    EARTH_SEA_LEVEL_PRESSURE: 101325,
+
+    /**
      * The mass of the sun in kilograms.
      */
     SOLAR_MASS: 1.989e30,

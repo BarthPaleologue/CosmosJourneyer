@@ -34,6 +34,7 @@ import { Textures } from "../../assets/textures";
 import { Matrix } from "@babylonjs/core/Maths/math";
 
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
+import { Settings } from "../../settings";
 
 const TelluricPlanetMaterialUniformNames = {
     WORLD: "world",
@@ -153,7 +154,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
         const lut = new ProceduralTexture(`${model.name}MaterialLut`, 4096, "telluricPlanetLut", scene, null, true, false);
         lut.setFloat(TelluricPlanetMaterialUniformNames.MIN_TEMPERATURE, this.planetModel.physics.minTemperature);
         lut.setFloat(TelluricPlanetMaterialUniformNames.MAX_TEMPERATURE, this.planetModel.physics.maxTemperature);
-        lut.setFloat(TelluricPlanetMaterialUniformNames.PRESSURE, this.planetModel.physics.pressure);
+        lut.setFloat(TelluricPlanetMaterialUniformNames.PRESSURE, this.planetModel.physics.pressure / Settings.EARTH_SEA_LEVEL_PRESSURE);
         lut.refreshRate = 0;
         lut.executeWhenReady(() => {
             this.setTexture(TelluricPlanetMaterialSamplerNames.LUT, lut);
@@ -200,7 +201,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
 
         this.setFloat(TelluricPlanetMaterialUniformNames.MIN_TEMPERATURE, this.planetModel.physics.minTemperature);
         this.setFloat(TelluricPlanetMaterialUniformNames.MAX_TEMPERATURE, this.planetModel.physics.maxTemperature);
-        this.setFloat(TelluricPlanetMaterialUniformNames.PRESSURE, this.planetModel.physics.pressure);
+        this.setFloat(TelluricPlanetMaterialUniformNames.PRESSURE, this.planetModel.physics.pressure / Settings.EARTH_SEA_LEVEL_PRESSURE);
         this.setFloat(TelluricPlanetMaterialUniformNames.WATER_AMOUNT, this.planetModel.physics.waterAmount);
 
         this.setFloat(

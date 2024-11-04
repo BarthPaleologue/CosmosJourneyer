@@ -23,7 +23,6 @@ import { GenerationSteps } from "../../utils/generationSteps";
 import { Settings } from "../../settings";
 import { TelluricPlanetaryMassObjectPhysicsInfo } from "../../architecture/physicsInfo";
 import { Quaternion } from "@babylonjs/core/Maths/math";
-import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { clamp } from "terrain-generation";
 import { getOrbitalPeriod, getPeriapsis, Orbit } from "../../orbit/orbit";
 import { celsiusToKelvin, hasLiquidWater } from "../../utils/physics";
@@ -59,7 +58,7 @@ export function newSeededTelluricSatelliteModel(seed: number, name: string, pare
         mass = Settings.EARTH_MASS * (radius / 6_371e3) ** 3;
     }
 
-    let pressure = Math.max(normalRandom(0.9, 0.2, rng, GenerationSteps.PRESSURE), 0);
+    let pressure = Math.max(normalRandom(Settings.EARTH_SEA_LEVEL_PRESSURE, 0.2 * Settings.EARTH_SEA_LEVEL_PRESSURE, rng, GenerationSteps.PRESSURE), 0);
     if (isSatelliteOfTelluric || radius <= 0.3 * Settings.EARTH_RADIUS) {
         pressure = 0;
     }
@@ -67,7 +66,7 @@ export function newSeededTelluricSatelliteModel(seed: number, name: string, pare
     //TODO: use distance to star to determine min temperature when using 1:1 scale
     const minTemperature = Math.max(0, normalRandom(celsiusToKelvin(-20), 30, rng, 80));
     // when pressure is close to 1, the max temperature is close to the min temperature (the atmosphere does thermal regulation)
-    const maxTemperature = minTemperature + Math.exp(-pressure) * randRangeInt(celsiusToKelvin(30), celsiusToKelvin(200), rng, 81);
+    const maxTemperature = minTemperature + Math.exp(-pressure / Settings.EARTH_SEA_LEVEL_PRESSURE) * randRangeInt(celsiusToKelvin(30), celsiusToKelvin(200), rng, 81);
 
     // this average is an approximation of a quaternion average
     // see https://math.stackexchange.com/questions/61146/averaging-quaternions
@@ -86,7 +85,7 @@ export function newSeededTelluricSatelliteModel(seed: number, name: string, pare
         oceanLevel: 0
     };
 
-    physicalProperties.oceanLevel = Settings.OCEAN_DEPTH * physicalProperties.waterAmount * physicalProperties.pressure;
+    physicalProperties.oceanLevel = Settings.OCEAN_DEPTH * physicalProperties.waterAmount * physicalProperties.pressure / Settings.EARTH_SEA_LEVEL_PRESSURE;
 
     // Todo: do not hardcode
     let orbitRadius = 2e9 + rng(GenerationSteps.ORBIT) * 15e9;
