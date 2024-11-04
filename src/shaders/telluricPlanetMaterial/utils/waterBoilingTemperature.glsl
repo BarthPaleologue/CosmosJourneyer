@@ -18,12 +18,17 @@
 // https://www.omnicalculator.com/chemistry/boiling-point
 // https://www.wikiwand.com/en/Boiling_point#/Saturation_temperature_and_pressure
 // https://www.desmos.com/calculator/ctxerbh48s
-float waterBoilingPointCelsius(float pressure) {
-    float P1 = 1.0;
+
+/**
+ * @param {number} pressure in pascal
+ * @returns {number} water boiling temperature in Kelvin
+*/
+float waterBoilingTemperature(float pressure) {
+    float P1 = 101325.0;// sea level pressure on Earth in pascal
     float P2 = pressure;
-    float T1 = 100.0 + 273.15;
+    float T1 = 273.15 + 100.0;// boiling point of water at sea level on Earth in Kelvin
     float DH = 40660.0;
     float R = 8.314;
-    if(P2 > 0.0) return (1.0 / ((1.0 / T1) + log(P1 / P2) * (R / DH))) - 273.15;
-    return -273.15;
+    if (P2 <= 0.0) return 0.0;// when pressure is 0, water cannot exist in liquid state
+    return 1.0 / (1.0 / T1 + log(P1 / P2) * (R / DH));
 }

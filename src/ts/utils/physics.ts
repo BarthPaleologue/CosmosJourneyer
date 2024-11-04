@@ -121,6 +121,15 @@ export function celsiusToKelvin(celsius: number) {
 }
 
 /**
+ * Converts a temperature in Kelvin to Celsius
+ * @param kelvin The temperature in Kelvin
+ * @returns The temperature in Celsius
+ */
+export function kelvinToCelsius(kelvin: number) {
+    return kelvin - Settings.CELSIUS_TO_KELVIN;
+}
+
+/**
  * Determines if the temperature range of a planet overlaps with the liquid water range given its pressure
  * @param pressure The pressure of the atmosphere in pascal
  * @param minTemperature The minimum temperature of the planet in Kelvin

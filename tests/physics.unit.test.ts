@@ -28,7 +28,7 @@ import {
     getSchwarzschildRadius,
     getSphereRadiatedEnergyFlux,
     getSphereTotalRadiatedEnergy,
-    hasLiquidWater,
+    hasLiquidWater, kelvinToCelsius,
     waterBoilingTemperature
 } from "../src/ts/utils/physics";
 
@@ -36,6 +36,12 @@ test("celsiusToKelvin", () => {
     expect(celsiusToKelvin(0)).toBe(273.15);
     expect(celsiusToKelvin(100)).toBe(373.15);
     expect(celsiusToKelvin(-273.15)).toBe(0);
+});
+
+test("kelvinToCelsius", () => {
+    expect(kelvinToCelsius(0)).toBe(-273.15);
+    expect(kelvinToCelsius(273.15)).toBe(0);
+    expect(kelvinToCelsius(373.15)).toBe(100);
 });
 
 test("computeMeanTemperature", () => {
