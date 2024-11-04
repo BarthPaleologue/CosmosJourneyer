@@ -191,7 +191,8 @@ export class Textures {
                     width: padNumberTextureResolution,
                     height: padNumberTextureResolution * Settings.LANDING_PAD_ASPECT_RATIO
                 },
-                scene
+                scene,
+                true
             );
 
             //Add text to dynamic texture

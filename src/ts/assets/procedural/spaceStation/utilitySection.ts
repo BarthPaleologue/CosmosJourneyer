@@ -27,8 +27,9 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { CollisionMask } from "../../../settings";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { getRngFromSeed } from "../../../utils/getRngFromSeed";
+import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 
 export class UtilitySection implements Transformable {
     private readonly attachment: Mesh;
@@ -40,7 +41,7 @@ export class UtilitySection implements Transformable {
     private readonly metalSectionMaterial: MetalSectionMaterial;
 
     private readonly tanks: AbstractMesh[] = [];
-    private readonly tankAggregates: PhysicsAggregate[] = [];
+    private readonly tankBodies: PhysicsBody[] = [];
 
     constructor(seed: number, scene: Scene) {
         this.metalSectionMaterial = new MetalSectionMaterial(scene);
@@ -95,19 +96,21 @@ export class UtilitySection implements Transformable {
             this.attachmentAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
 
             this.tanks.forEach((tank) => {
-                const tankAggregate = new PhysicsAggregate(tank, PhysicsShapeType.SPHERE, { mass: 0 });
-                tankAggregate.body.disablePreStep = false;
-                tankAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
-                tankAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
+                const tankBody = new PhysicsBody(tank, PhysicsMotionType.STATIC, false, this.getTransform().getScene());
+                tankBody.setMassProperties({ mass: 0 });
+                tankBody.disablePreStep = false;
+                tankBody.shape = Objects.SPHERICAL_TANK_PHYSICS_SHAPE;
+                tankBody.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+                tankBody.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
 
-                this.tankAggregates.push(tankAggregate);
+                this.tankBodies.push(tankBody);
             });
         } else if (distanceToCamera > 360e3 && this.attachmentAggregate !== null) {
             this.attachmentAggregate?.dispose();
             this.attachmentAggregate = null;
 
-            this.tankAggregates.forEach((tankAggregate) => tankAggregate.dispose());
-            this.tankAggregates.length = 0;
+            this.tankBodies.forEach((tankBody) => tankBody.dispose());
+            this.tankBodies.length = 0;
         }
     }
 
@@ -120,6 +123,6 @@ export class UtilitySection implements Transformable {
         this.attachmentAggregate?.dispose();
         this.metalSectionMaterial.dispose();
         this.tanks.forEach((tank) => tank.dispose());
-        this.tankAggregates.forEach((tankAggregate) => tankAggregate.dispose());
+        this.tankBodies.forEach((tankAggregate) => tankAggregate.dispose());
     }
 }

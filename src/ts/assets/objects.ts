@@ -41,8 +41,9 @@ import sphericalTank from "../../asset/SpaceStationParts/sphericalTank.glb";
 import stationEngine from "../../asset/SpaceStationParts/engine.glb";
 
 import { CollisionMask } from "../settings";
-import { PhysicsShape, PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
+import { PhysicsShape, PhysicsShapeMesh, PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { Vector3 } from "@babylonjs/core/Maths/math";
 
 export class Objects {
     private static WANDERER: Mesh;
@@ -60,6 +61,7 @@ export class Objects {
     public static GRASS_BLADES: Mesh[] = [];
 
     public static SPHERICAL_TANK: Mesh;
+    public static SPHERICAL_TANK_PHYSICS_SHAPE: PhysicsShape;
     public static STATION_ENGINE: Mesh;
 
     public static CRATE: Mesh;
@@ -189,8 +191,13 @@ export class Objects {
             const boundingBox = Objects.SPHERICAL_TANK.getBoundingInfo().boundingBox;
             const maxDimension = Math.max(boundingBox.extendSize.x, boundingBox.extendSize.y, boundingBox.extendSize.z);
 
-            Objects.SPHERICAL_TANK.scalingDeterminant = 20 / maxDimension;
+            const targetDimension = 20;
+
+            Objects.SPHERICAL_TANK.scaling.scaleInPlace(targetDimension / maxDimension);
             Objects.SPHERICAL_TANK.bakeCurrentTransformIntoVertices();
+
+            //FIXME: the scaling of the radius is caused by an issue with the mesh
+            Objects.SPHERICAL_TANK_PHYSICS_SHAPE = new PhysicsShapeSphere(Vector3.Zero(), targetDimension * 2.5, scene)
 
             console.log("SphericalTank loaded");
         };
