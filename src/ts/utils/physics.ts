@@ -45,29 +45,31 @@ export function getSphereRadiatedEnergyFlux(temperatureKelvin: number, radius: n
 }
 
 /**
- *
- * @param pressure
+ * Calculates the boiling point of water at a given pressure.
+ * @param pressure The pressure of the atmosphere in pascal.
+ * @returns The boiling point of water at the given pressure in Kelvin
+ * @see https://en.wikipedia.org/wiki/Boiling_point?oldformat=true#Saturation_temperature_and_pressure
  * @see https://www.omnicalculator.com/chemistry/boiling-point
- * @see https://www.wikiwand.com/en/Boiling_point#/Saturation_temperature_and_pressure
  * @see https://www.desmos.com/calculator/ctxerbh48s
  */
-export function waterBoilingPointCelsius(pressure: number): number {
-    const P1 = 1.0;
+export function waterBoilingTemperature(pressure: number): number {
+    const P1 = 101325.0; // sea level pressure on Earth in pascal
     const P2 = pressure;
-    const T1 = 100.0 + 273.15;
+    const T1 = celsiusToKelvin(100.0); // boiling point of water at sea level on Earth in Kelvin
     const DH = 40660.0;
     const R = 8.314;
-    if (P2 > 0.0) return 1.0 / (1.0 / T1 + Math.log(P1 / P2) * (R / DH)) - 273.15;
-    return -273.15;
+    if (P2 <= 0.0) return 0.0; // when pressure is 0, water cannot exist in liquid state
+    return 1.0 / (1.0 / T1 + Math.log(P1 / P2) * (R / DH));
 }
 
 /**
  * Computes the mean temperature of a planet given the properties of its star and itself
- * @param starTemperature The temperature of the star
- * @param starRadius The radius of the star
- * @param starDistance The distance between the planet and the star
- * @param planetAlbedo The albedo of the planet
- * @param planetGreenHouseEffect The greenhouse effect of the planet
+ * @param starTemperature The temperature of the star in Kelvin
+ * @param starRadius The radius of the star in meters
+ * @param starDistance The distance between the planet and the star in meters
+ * @param planetAlbedo The albedo of the planet (0 = black, 1 = white)
+ * @param planetGreenHouseEffect The greenhouse effect of the planet (0 = none, 1 = total)
+ * @returns The mean temperature of the planet in Kelvin
  */
 export function computeMeanTemperature(starTemperature: number, starRadius: number, starDistance: number, planetAlbedo: number, planetGreenHouseEffect: number) {
     return starTemperature * Math.pow(((1 - planetAlbedo) * starRadius ** 2) / (4 * (1 - planetGreenHouseEffect) * starDistance ** 2), 0.25);
@@ -76,8 +78,8 @@ export function computeMeanTemperature(starTemperature: number, starRadius: numb
 /**
  * Returns an estimate of the radius of a star given its mass. This is only an approximation!
  * This can be used to estimate the angular momentum of a black hole.
- * @param mass The mass of the object
- * @constructor
+ * @param mass The mass of the object in kg
+ * @returns The estimated radius of the object in meters
  * @see https://en.wikipedia.org/wiki/Main_sequence#Sample_parameters
  */
 export function estimateStarRadiusFromMass(mass: number) {
@@ -101,27 +103,54 @@ export function getGravitationalLensFocalDistance(mass: number, radius: number) 
 
 /**
  * Compute the rotation period for a ring of given radius to simulate a given gravity.
- * @param radius The radius of the ring
- * @param gravity The gravity to simulate
+ * @param radius The radius of the ring in meters
+ * @param gravity The gravity to simulate at the inner surface of the ring in m/s²
  */
-export function computeRingRotationPeriod(radius: number, gravity: number): number {
-    // g = v * v / r and T = 2 * pi * r / v => v = sqrt(g * r) and T = 2 * pi * r / sqrt(g * r) = 2 * pi * sqrt(r / g)
+export function getRotationPeriodForArtificialGravity(radius: number, gravity: number): number {
+    // g = v² / r and T = 2 * pi * r / v => v = sqrt(g * r) and T = 2 * pi * r / sqrt(g * r) = 2 * pi * sqrt(r / g)
     return 2 * Math.PI * Math.sqrt(radius / gravity);
 }
 
+/**
+ * Converts a temperature in Celsius to Kelvin
+ * @param celsius The temperature in Celsius
+ * @returns The temperature in Kelvin
+ */
+export function celsiusToKelvin(celsius: number) {
+    return celsius + Settings.CELSIUS_TO_KELVIN;
+}
+
+/**
+ * Converts a temperature in Kelvin to Celsius
+ * @param kelvin The temperature in Kelvin
+ * @returns The temperature in Celsius
+ */
+export function kelvinToCelsius(kelvin: number) {
+    return kelvin - Settings.CELSIUS_TO_KELVIN;
+}
+
+/**
+ * Determines if the temperature range of a planet overlaps with the liquid water range given its pressure
+ * @param pressure The pressure of the atmosphere in pascal
+ * @param minTemperature The minimum temperature of the planet in Kelvin
+ * @param maxTemperature The maximum temperature of the planet in Kelvin
+ */
 export function hasLiquidWater(pressure: number, minTemperature: number, maxTemperature: number): boolean {
-    const waterBoilingPoint = waterBoilingPointCelsius(pressure);
-    const waterFreezingPoint = 0.0;
+    const waterBoilingPoint = waterBoilingTemperature(pressure);
+    const waterFreezingPoint = celsiusToKelvin(0);
     const epsilon = 0.05;
-    if (pressure > epsilon) {
-        // if temperature is too high, there is no ocean (desert world)
-        if (maxTemperature > waterBoilingPoint) return false;
-        // if temperature is too low, there is no ocean (frozen world)
-        if (maxTemperature < waterFreezingPoint) return false;
-    } else {
-        // if pressure is too low, there is no ocean (sterile world)
-        return false;
-    }
+
+    // if pressure is too low, there is no ocean (airless world)
+    if (pressure < epsilon) return false;
+
+    // if boiling point is lower than freezing point, ice sublimates instead of melting
+    if (waterBoilingPoint < waterFreezingPoint) return false;
+
+    // if temperature is too high, there is no ocean (desert world)
+    if (minTemperature > waterBoilingPoint) return false;
+
+    // if temperature is too low, there is no ocean (frozen world)
+    if (maxTemperature < waterFreezingPoint) return false;
 
     return true;
 }
@@ -138,11 +167,12 @@ export function getSchwarzschildRadius(mass: number): number {
 /**
  * Returns the orbital period of an object in seconds given its radius and the mass of the parent object
  * @param period The period of the orbit in seconds
- * @param mass The mass of the parent object in kilograms
+ * @param parentMass The mass of the parent object in kilograms
+ * @returns The radius of the orbit in meters
  */
-export function getOrbitRadiusFromPeriod(period: number, mass: number) {
+export function getOrbitRadiusFromPeriod(period: number, parentMass: number) {
     const omega = (2 * Math.PI) / period;
-    return Math.cbrt((Settings.G * mass) / (omega * omega));
+    return Math.cbrt((Settings.G * parentMass) / (omega * omega));
 }
 
 /**
@@ -155,16 +185,4 @@ export function getOrbitRadiusFromPeriod(period: number, mass: number) {
 export function getApparentGravityOnSpaceTether(period: number, mass: number, distance: number) {
     const omega = (2 * Math.PI) / period;
     return (-Settings.G * mass) / (distance * distance) + distance * omega * omega;
-}
-
-/**
- * Returns the necessary length of a tether to simulate a given gravity at the end of the tether of a space elevator
- * This is an approximation that only works when GM/r² << w²r (which tends to be the case for space elevators)
- * @param period The rotation period of the tether in seconds (typically the same as the parent object for a classic space elevator)
- * @param mass The mass of the parent object in kilograms
- * @param gravity The gravity to simulate at the end of the tether in m/s²
- */
-export function getTetherLengthForGravity(period: number, mass: number, gravity: number) {
-    const omega = (2 * Math.PI) / period;
-    return gravity / (omega * omega);
 }

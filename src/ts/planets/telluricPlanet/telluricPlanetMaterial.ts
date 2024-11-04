@@ -34,6 +34,7 @@ import { Textures } from "../../assets/textures";
 import { Matrix } from "@babylonjs/core/Maths/math";
 
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
+import { Settings } from "../../settings";
 
 const TelluricPlanetMaterialUniformNames = {
     WORLD: "world",

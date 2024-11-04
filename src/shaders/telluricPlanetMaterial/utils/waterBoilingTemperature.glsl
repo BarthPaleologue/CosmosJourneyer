@@ -15,14 +15,20 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Settings } from "../src/ts/settings";
-import { getGravitationalLensFocalDistance } from "../src/ts/utils/physics";
+// https://www.omnicalculator.com/chemistry/boiling-point
+// https://www.wikiwand.com/en/Boiling_point#/Saturation_temperature_and_pressure
+// https://www.desmos.com/calculator/ctxerbh48s
 
-test("gravitationalLensing", () => {
-    const solarMass = 1.989e30; // in kg
-    const solarRadius = 6.9634e8; // in meters
-
-    const focalLength = getGravitationalLensFocalDistance(solarMass, solarRadius);
-    expect(focalLength).toBeGreaterThan(530 * Settings.AU);
-    expect(focalLength).toBeLessThan(550 * Settings.AU);
-});
+/**
+ * @param {number} pressure in pascal
+ * @returns {number} water boiling temperature in Kelvin
+*/
+float waterBoilingTemperature(float pressure) {
+    float P1 = 101325.0;// sea level pressure on Earth in pascal
+    float P2 = pressure;
+    float T1 = 273.15 + 100.0;// boiling point of water at sea level on Earth in Kelvin
+    float DH = 40660.0;
+    float R = 8.314;
+    if (P2 <= 0.0) return 0.0;// when pressure is 0, water cannot exist in liquid state
+    return 1.0 / (1.0 / T1 + log(P1 / P2) * (R / DH));
+}

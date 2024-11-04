@@ -18,7 +18,11 @@
 import { Quaternion } from "@babylonjs/core/Maths/math";
 
 export type OrbitalObjectPhysicsInfo = {
+    /**
+     * Mass of the object in kilograms
+     */
     mass: number;
+
     /**
      * Time needed for the object to rotate 360° on its axis in seconds.
      * It is slightly different from the duration of solar day which is the time it takes for the sun to be at the same position in the sky.
@@ -36,12 +40,25 @@ export type StellarObjectPhysicsInfo = OrbitalObjectPhysicsInfo & {
 };
 
 export type BlackHolePhysicsInfo = StellarObjectPhysicsInfo & {
+    /**
+     * Radius of the event horizon in meters
+     */
     accretionDiskRadius: number;
 };
 
 export type PlanetaryMassObjectPhysicsInfo = OrbitalObjectPhysicsInfo & {
+    /**
+     * Minimum temperature of the object in Kelvin
+     */
     minTemperature: number;
+    /**
+     * Maximum temperature of the object in Kelvin
+     */
     maxTemperature: number;
+
+    /**
+     * Pressure of the atmosphere in pascal
+     */
     pressure: number;
 };
 

@@ -31,16 +31,16 @@ uniform float pressure;
 
 #include "../../utils/remap.glsl";
 
-#include "./waterBoilingPointCelsius.glsl";
+#include "./waterBoilingTemperature.glsl";
 
 #include "../../utils/smoothSharpener.glsl";
 
 void main() {
     vec3 sphere = toSphere(vUV);
 
-    float waterMeltingPoint = 0.0;// fairly good approximation
+    float waterMeltingPoint = 273.15;// fairly good approximation
     float waterMeltingPoint01 = remap(waterMeltingPoint, minTemperature, maxTemperature, 0.0, 1.0);
-    float waterBoilingPoint01 = remap(waterBoilingPointCelsius(pressure), minTemperature, maxTemperature, 0.0, 1.0);
+    float waterBoilingPoint01 = remap(waterBoilingTemperature(pressure), minTemperature, maxTemperature, 0.0, 1.0);
 
     float moisture01 = completeNoise(sphere * 2.0, 5, 2.0, 2.0) * sqrt(1.0 - waterMeltingPoint01) * waterBoilingPoint01;
     moisture01 = smoothSharpener(moisture01, 2.0);

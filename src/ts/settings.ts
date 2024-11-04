@@ -89,6 +89,13 @@ export const Settings = {
      */
     AU: 150e9,
 
+    CELSIUS_TO_KELVIN: 273.15,
+
+    /**
+     * The sea level pressure on Earth in Pascals.
+     */
+    EARTH_SEA_LEVEL_PRESSURE: 101325,
+
     /**
      * The mass of the sun in kilograms.
      */

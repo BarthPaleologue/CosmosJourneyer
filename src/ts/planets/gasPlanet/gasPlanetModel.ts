@@ -64,7 +64,8 @@ export function newSeededGasPlanetModel(seed: number, name: string, parentBodies
         siderealDayDuration: (24 * 60 * 60) / 10,
         minTemperature: -180,
         maxTemperature: 200,
-        pressure: 1
+        //FIXME: this is a placeholder value
+        pressure: Settings.EARTH_SEA_LEVEL_PRESSURE
     };
 
     const rings = uniformRandBool(0.8, rng, GenerationSteps.RINGS) ? newSeededRingsModel(rng) : null;

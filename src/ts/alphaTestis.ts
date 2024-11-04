@@ -99,7 +99,7 @@ aresModel.physics.mass = 7;
 aresModel.physics.siderealDayDuration = (24 * 60 * 60) / 30;
 aresModel.physics.minTemperature = -30;
 aresModel.physics.maxTemperature = 20;
-aresModel.physics.pressure = 0.5;
+aresModel.physics.pressure = Settings.EARTH_SEA_LEVEL_PRESSURE * 0.5;
 aresModel.physics.waterAmount = 0.2;
 aresModel.physics.oceanLevel = 0;
 

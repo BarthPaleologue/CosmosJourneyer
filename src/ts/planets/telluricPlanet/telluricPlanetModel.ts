@@ -23,7 +23,7 @@ import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { Settings } from "../../settings";
 import { TelluricPlanetaryMassObjectPhysicsInfo } from "../../architecture/physicsInfo";
-import { hasLiquidWater } from "../../utils/physics";
+import { celsiusToKelvin, hasLiquidWater } from "../../utils/physics";
 import { CloudsModel, newCloudsModel } from "../../clouds/cloudsModel";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Quaternion } from "@babylonjs/core/Maths/math";
@@ -46,13 +46,13 @@ export function newSeededTelluricPlanetModel(seed: number, name: string, parentB
     //TODO: make mass dependent on more physical properties like density
     const mass = Settings.EARTH_MASS * (radius / 6_371e3) ** 3;
 
-    let pressure = Math.max(normalRandom(0.9, 0.2, rng, GenerationSteps.PRESSURE), 0);
+    let pressure = Math.max(normalRandom(Settings.EARTH_SEA_LEVEL_PRESSURE, 0.2 * Settings.EARTH_SEA_LEVEL_PRESSURE, rng, GenerationSteps.PRESSURE), 0);
     if (radius <= 0.3 * Settings.EARTH_RADIUS) pressure = 0;
 
     //TODO: use distance to star to determine min temperature when using 1:1 scale
-    const minTemperature = Math.max(-273, normalRandom(-20, 30, rng, 80));
+    const minTemperature = Math.max(0, normalRandom(celsiusToKelvin(-20), 30, rng, 80));
     // when pressure is close to 1, the max temperature is close to the min temperature (the atmosphere does thermal regulation)
-    const maxTemperature = minTemperature + Math.exp(-pressure) * randRangeInt(30, 200, rng, 81);
+    const maxTemperature = minTemperature + Math.exp(-pressure / Settings.EARTH_SEA_LEVEL_PRESSURE) * randRangeInt(celsiusToKelvin(30), celsiusToKelvin(200), rng, 81);
 
     const physicalProperties: TelluricPlanetaryMassObjectPhysicsInfo = {
         mass: mass,
@@ -65,7 +65,7 @@ export function newSeededTelluricPlanetModel(seed: number, name: string, parentB
         oceanLevel: 0
     };
 
-    physicalProperties.oceanLevel = Settings.OCEAN_DEPTH * physicalProperties.waterAmount * physicalProperties.pressure;
+    physicalProperties.oceanLevel = Settings.OCEAN_DEPTH * physicalProperties.waterAmount * physicalProperties.pressure / Settings.EARTH_SEA_LEVEL_PRESSURE;
 
     const canHaveLiquidWater = hasLiquidWater(physicalProperties.pressure, physicalProperties.minTemperature, physicalProperties.maxTemperature);
     if (!canHaveLiquidWater) physicalProperties.oceanLevel = 0;

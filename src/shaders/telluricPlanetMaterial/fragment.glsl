@@ -85,7 +85,7 @@ vec3 saturate(vec3 color) {
     return clamp(color, 0.0, 1.0);
 }
 
-#include "./utils/waterBoilingPointCelsius.glsl";
+#include "./utils/waterBoilingTemperature.glsl";
 
 #include "./utils/computeTemperature01.glsl";
 
@@ -125,9 +125,9 @@ void main() {
 
     // Temperatures
 
-    float waterMeltingPoint = 0.0;// fairly good approximation
+    float waterMeltingPoint = 273.15; // fairly good approximation
     float waterMeltingPoint01 = (waterMeltingPoint - minTemperature) / (maxTemperature - minTemperature);
-    float waterBoilingPoint01 = (waterBoilingPointCelsius(pressure) - minTemperature) / (maxTemperature - minTemperature);
+    float waterBoilingPoint01 = (waterBoilingTemperature(pressure) - minTemperature) / (maxTemperature - minTemperature);
 
     //https://qph.fs.quoracdn.net/main-qimg-6a0fa3c05fb4db3d7d081680aec4b541
     //float co2SublimationTemperature = 0.0; // https://www.wikiwand.com/en/Sublimation_(phase_transition)#/CO2

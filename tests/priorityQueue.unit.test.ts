@@ -49,6 +49,13 @@ test("PriorityList", () => {
     expect(queue.size()).toBe(3);
     expect(queue.peek()).toBe(2);
 
+    const findResult = queue.find((v) => v === 0);
+    expect(findResult).toBeDefined();
+    expect(findResult).toBe(0);
+
+    const notFoundResult = queue.find((v) => v === 4);
+    expect(notFoundResult).toBeUndefined();
+
     queue.clear();
     expect(queue.isEmpty()).toBe(true);
     expect(queue.size()).toBe(0);
