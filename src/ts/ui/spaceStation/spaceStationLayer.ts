@@ -23,11 +23,13 @@ import { generateMissionsDom } from "./spaceStationMissions";
 import { Settings } from "../../settings";
 import { OrbitalObjectModel } from "../../architecture/orbitalObject";
 import { OrbitalFacilityModel } from "../../spacestation/orbitalFacility";
+import { generateSpaceshipDom } from "./spaceshipDock";
 
 const enum MainPanelState {
     NONE,
     INFO,
-    MISSIONS
+    MISSIONS,
+    SPACE_SHIP
 }
 
 export class SpaceStationLayer {
@@ -43,6 +45,8 @@ export class SpaceStationLayer {
     private readonly mainPanel: HTMLElement;
 
     private readonly missionsButton: HTMLElement;
+
+    private readonly spaceshipButton: HTMLElement;
 
     private readonly infoButton: HTMLElement;
 
@@ -77,6 +81,16 @@ export class SpaceStationLayer {
             this.setMainPanelState(MainPanelState.MISSIONS);
         });
 
+
+        const spaceshipButton = document.querySelector<HTMLElement>(".spaceStationAction.spaceshipButton");
+        if (spaceshipButton === null) {
+            throw new Error("Spaceship button not found");
+        }
+        this.spaceshipButton = spaceshipButton;
+        this.spaceshipButton.addEventListener("click", () => {
+            this.setMainPanelState(MainPanelState.SPACE_SHIP);
+        });
+
         const infoButton = document.querySelector<HTMLElement>(".spaceStationAction.infoButton");
         if (infoButton === null) {
             throw new Error("Info button not found");
@@ -103,21 +117,24 @@ export class SpaceStationLayer {
             this.mainPanelState = state;
         }
 
+        if (this.currentStation === null) {
+            throw new Error("No current station");
+        }
+
         switch (this.mainPanelState) {
             case MainPanelState.INFO:
-                if (this.currentStation === null) {
-                    throw new Error("No current station");
-                }
                 this.mainPanel.classList.remove("hidden");
                 this.mainPanel.innerHTML = generateInfoHTML(this.currentStation, this.currentStationParents);
                 break;
             case MainPanelState.MISSIONS:
-                if (this.currentStation === null) {
-                    throw new Error("No current station");
-                }
                 this.mainPanel.classList.remove("hidden");
                 this.mainPanel.innerHTML = "";
                 this.mainPanel.appendChild(generateMissionsDom(this.currentStation, this.player));
+                break;
+            case MainPanelState.SPACE_SHIP:
+                this.mainPanel.classList.remove("hidden");
+                this.mainPanel.innerHTML = "";
+                this.mainPanel.appendChild(generateSpaceshipDom(this.currentStation, this.player));
                 break;
             case MainPanelState.NONE:
                 this.mainPanel.classList.add("hidden");
