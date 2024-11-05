@@ -6,6 +6,7 @@
     "copiedToClipboard": "Copied to clipboard",
     "howToLiftOff": "Hold {{bindingsString}} to lift off.",
     "howToHyperSpace": "Align your ship with the system target using the target helper on the bottom right of your screen then press {{bindingsString}} to make a hyperspace jump.",
+    "notEnoughFuel": "Cannot perform the hyperspace jump. Not enough fuel! You can refuel at a station or scooping around a star or gas giant.",
     "saveVersionMismatch": "[VERSION_WARNING] The save file version ({{saveVersion}}) does not match the current version ({{currentVersion}}). Loading may result in unexpected behavior.",
     "invalidSaveFileJson": "[JSON_ERROR] The save file is invalid: {{error}}. Fix the file before trying to load it again."
 }

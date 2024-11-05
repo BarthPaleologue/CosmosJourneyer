@@ -30,7 +30,7 @@ import { setEnabledBody } from "../utils/havok";
 import { getForwardDirection, getUpwardDirection, rotate, setRotationQuaternion, translate } from "../uberCore/transforms/basicTransform";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
-import { CollisionMask } from "../settings";
+import { CollisionMask, Settings } from "../settings";
 import { Transformable } from "../architecture/transformable";
 import { WarpTunnel } from "../utils/warpTunnel";
 import { Quaternion } from "@babylonjs/core/Maths/math";
@@ -69,7 +69,7 @@ export const DefaultSerializedSpaceship: SerializedSpaceship = {
     name: "Wanderer",
     type: ShipType.WANDERER,
     fuelTanks: [{ currentFuel: 100, maxFuel: 100 }]
-}
+};
 
 export class Spaceship implements Transformable {
     readonly name: string;
@@ -103,7 +103,7 @@ export class Spaceship implements Transformable {
 
     private mainThrusters: MainThruster[] = [];
 
-    readonly fuelTanks: FuelTank[] = [new FuelTank(100)];
+    readonly fuelTanks: FuelTank[] = [];
 
     readonly enableWarpDriveSound: AudioInstance;
     readonly disableWarpDriveSound: AudioInstance;
@@ -583,6 +583,39 @@ export class Spaceship implements Transformable {
         if (this.state === ShipState.LANDING) {
             this.land(deltaSeconds);
         }
+
+        const distanceTravelledLY = this.getSpeed() * deltaSeconds / Settings.LIGHT_YEAR;
+        const fuelToBurn = this.warpDrive.getFuelConsumption(distanceTravelledLY);
+        if(fuelToBurn < this.getRemainingFuel()) {
+            this.burnFuel(fuelToBurn);
+        } else {
+            this.emergencyStopWarpDrive();
+            this.mainEngineThrottle = 0;
+        }
+    }
+
+    public getTotalFuelCapacity(): number {
+        return this.fuelTanks.reduce((acc, tank) => acc + tank.getMaxFuel(), 0);
+    }
+
+    public getRemainingFuel(): number {
+        return this.fuelTanks.reduce((acc, tank) => acc + tank.getCurrentFuel(), 0);
+    }
+
+    public burnFuel(amount: number): number {
+        if (amount > this.getRemainingFuel()) {
+            throw new Error("Not enough fuel in the tanks.");
+        }
+
+        let fuelLeftToBurn = amount;
+        for (const tank of this.fuelTanks) {
+            const tankRemainingBefore = tank.getCurrentFuel();
+            tank.burnFuel(Math.min(fuelLeftToBurn, tankRemainingBefore));
+            const tankRemainingAfter = tank.getCurrentFuel();
+            fuelLeftToBurn -= tankRemainingBefore - tankRemainingAfter;
+        }
+
+        return amount - fuelLeftToBurn;
     }
 
     public static CreateDefault(scene: Scene): Spaceship {

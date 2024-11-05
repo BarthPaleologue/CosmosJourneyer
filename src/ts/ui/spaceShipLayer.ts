@@ -34,6 +34,8 @@ export class SpaceShipLayer {
     private readonly targetDot: HTMLElement;
     private currentTarget: TransformNode | null = null;
 
+    private readonly fuelIndicator: HTMLElement;
+
     private readonly currentMissionDisplay: CurrentMissionDisplay;
 
     private readonly player: Player;
@@ -52,6 +54,8 @@ export class SpaceShipLayer {
 
         this.targetHelper = document.getElementById("targetHelper") as HTMLElement;
         this.targetDot = document.getElementById("targetDot") as HTMLElement;
+
+        this.fuelIndicator = document.getElementById("fuelIndicator") as HTMLElement;
 
         this.currentMissionDisplay = new CurrentMissionDisplay(player);
         this.rootNode.appendChild(this.currentMissionDisplay.rootNode);
@@ -118,6 +122,11 @@ export class SpaceShipLayer {
         const speedIndicator = document.getElementById("speed");
         if (speedIndicator === null) throw new Error("Speed indicator not found");
         speedIndicator.innerText = parseSpeed(speed);
+    }
+
+    displayFuel(fuelRemainingFraction: number, nextJumpFuelFraction: number) {
+        this.fuelIndicator.style.setProperty("--currentFuelLevel", `${(fuelRemainingFraction * 100).toFixed(0)}%`);
+        this.fuelIndicator.style.setProperty("--fuelLevelAfterJump", `${((fuelRemainingFraction - nextJumpFuelFraction) * 100).toFixed(0)}%`);
     }
 
     dispose() {

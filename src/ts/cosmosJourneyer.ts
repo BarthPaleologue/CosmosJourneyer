@@ -231,6 +231,7 @@ export class CosmosJourneyer {
         const starSystemView = new StarSystemView(player, engine, havokInstance);
 
         await starSystemView.initAssets();
+        starSystemView.resetPlayer();
 
         return new CosmosJourneyer(player, engine, starSystemView);
     }
@@ -406,6 +407,7 @@ export class CosmosJourneyer {
 
         const newPlayer = saveData.player !== undefined ? Player.Deserialize(saveData.player) : Player.Default();
         this.player.copyFrom(newPlayer);
+        this.starSystemView.resetPlayer();
 
         await this.loadUniverseCoordinates(saveData.universeCoordinates);
 

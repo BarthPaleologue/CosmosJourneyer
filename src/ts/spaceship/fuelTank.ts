@@ -22,6 +22,21 @@ export class FuelTank {
         return fuelToAdd;
     }
 
+    burnFuel(amount: number): void {
+        if (amount > this.currentFuel) {
+            throw new Error("Not enough fuel in the tank.");
+        }
+        this.currentFuel -= amount;
+    }
+
+    getCurrentFuel() {
+        return this.currentFuel;
+    }
+
+    getMaxFuel() {
+        return this.maxFuel;
+    }
+
     serialize(): SerializedFuelTank {
         return {
             currentFuel: this.currentFuel,
