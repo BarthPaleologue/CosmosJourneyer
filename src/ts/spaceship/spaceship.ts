@@ -618,6 +618,18 @@ export class Spaceship implements Transformable {
         return amount - fuelLeftToBurn;
     }
 
+    public refuel(amount: number): number {
+        let fuelLeftToRefuel = amount;
+        for (const tank of this.fuelTanks) {
+            const tankRemainingBefore = tank.getCurrentFuel();
+            tank.fill(Math.min(fuelLeftToRefuel, tank.getMaxFuel() - tankRemainingBefore));
+            const tankRemainingAfter = tank.getCurrentFuel();
+            fuelLeftToRefuel -= tankRemainingAfter - tankRemainingBefore;
+        }
+
+        return amount - fuelLeftToRefuel;
+    }
+
     public static CreateDefault(scene: Scene): Spaceship {
         return Spaceship.Deserialize(DefaultSerializedSpaceship, scene);
     }
