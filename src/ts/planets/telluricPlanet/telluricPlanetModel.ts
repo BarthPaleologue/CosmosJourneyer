@@ -52,7 +52,7 @@ export function newSeededTelluricPlanetModel(seed: number, name: string, parentB
     //TODO: use distance to star to determine min temperature when using 1:1 scale
     const minTemperature = Math.max(0, normalRandom(celsiusToKelvin(-20), 30, rng, 80));
     // when pressure is close to 1, the max temperature is close to the min temperature (the atmosphere does thermal regulation)
-    const maxTemperature = minTemperature + Math.exp(-pressure / Settings.EARTH_SEA_LEVEL_PRESSURE) * randRangeInt(celsiusToKelvin(30), celsiusToKelvin(200), rng, 81);
+    const maxTemperature = minTemperature + Math.exp(-pressure / Settings.EARTH_SEA_LEVEL_PRESSURE) * randRangeInt(30, 200, rng, 81);
 
     const physicalProperties: TelluricPlanetaryMassObjectPhysicsInfo = {
         mass: mass,
