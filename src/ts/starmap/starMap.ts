@@ -60,6 +60,13 @@ import { getSystemModelFromCoordinates } from "../starSystem/modelFromCoordinate
 import { StarSystemModelUtils } from "../starSystem/starSystemModel";
 import { OrbitalObjectType } from "../architecture/orbitalObject";
 
+// register cosmos journeyer as part of window object
+declare global {
+    interface Window {
+        starMap: StarMap;
+    }
+}
+
 export class StarMap implements View {
     readonly scene: Scene;
     private readonly controls: StarMapControls;
@@ -303,6 +310,8 @@ export class StarMap implements View {
             if (activeCamera === null) throw new Error("No active camera!");
             this.starMapUI.update(activeCamera.globalPosition, this.starMapCenterPosition);
         });
+
+        window.starMap = this;
     }
 
     private drawPath(path: StarSystemCoordinates[]) {

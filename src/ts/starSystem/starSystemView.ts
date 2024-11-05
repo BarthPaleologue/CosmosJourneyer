@@ -74,6 +74,13 @@ import { OrbitalFacility } from "../spacestation/orbitalFacility";
 import { getStarGalacticPosition } from "../utils/coordinates/starSystemCoordinatesUtils";
 import { Spaceship } from "../spaceship/spaceship";
 
+// register cosmos journeyer as part of window object
+declare global {
+    interface Window {
+        starSystemView: StarSystemView;
+    }
+}
+
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
  * player's spaceship, character and GUI. It also handles the loading of the star system and its initialization.
@@ -413,6 +420,8 @@ export class StarSystemView implements View {
             globalRoot: inspectorRoot,
         });
         */
+
+        window.starSystemView = this;
     }
 
     /**

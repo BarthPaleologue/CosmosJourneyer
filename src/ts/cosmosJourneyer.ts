@@ -61,6 +61,13 @@ const enum EngineState {
     PAUSED
 }
 
+// register cosmos journeyer as part of window object
+declare global {
+    interface Window {
+        cosmosJourneyer: CosmosJourneyer;
+    }
+}
+
 /**
  * Main class of Cosmos Journeyer. It handles the underlying BabylonJS engine, and the communication between
  * the starmap view and the star system view. It also provides utility methods to take screenshots and record videos.
@@ -182,6 +189,8 @@ export class CosmosJourneyer {
             if (!this.isPaused()) this.pause();
             else this.resume();
         });
+
+        window.cosmosJourneyer = this;
     }
 
     /**
