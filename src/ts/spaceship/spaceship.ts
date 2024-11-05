@@ -47,6 +47,7 @@ import { createNotification } from "../utils/notification";
 import { OrbitalObject } from "../architecture/orbitalObject";
 import { CelestialBody } from "../architecture/celestialBody";
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
+import { FuelTank, SerializedFuelTank } from "./fuelTank";
 
 const enum ShipState {
     FLYING,
@@ -54,7 +55,25 @@ const enum ShipState {
     LANDED
 }
 
+export const enum ShipType {
+    WANDERER
+}
+
+export type SerializedSpaceship = {
+    name: string;
+    type: ShipType;
+    fuelTanks: SerializedFuelTank[];
+};
+
+export const DefaultSerializedSpaceship: SerializedSpaceship = {
+    name: "Wanderer",
+    type: ShipType.WANDERER,
+    fuelTanks: [{ currentFuel: 100, maxFuel: 100 }]
+}
+
 export class Spaceship implements Transformable {
+    readonly name: string;
+
     readonly instanceRoot: AbstractMesh;
 
     readonly aggregate: PhysicsAggregate;
@@ -84,6 +103,8 @@ export class Spaceship implements Transformable {
 
     private mainThrusters: MainThruster[] = [];
 
+    readonly fuelTanks: FuelTank[] = [new FuelTank(100)];
+
     readonly enableWarpDriveSound: AudioInstance;
     readonly disableWarpDriveSound: AudioInstance;
     readonly acceleratingWarpDriveSound: AudioInstance;
@@ -100,7 +121,9 @@ export class Spaceship implements Transformable {
 
     readonly onTakeOff = new Observable<void>();
 
-    constructor(scene: Scene) {
+    private constructor(serializedSpaceShip: SerializedSpaceship, scene: Scene) {
+        this.name = serializedSpaceShip.name;
+
         this.instanceRoot = Objects.CreateWandererInstance();
         setRotationQuaternion(this.instanceRoot, Quaternion.Identity());
 
@@ -141,6 +164,8 @@ export class Spaceship implements Transformable {
         this.deceleratingWarpDriveSound = new AudioInstance(Sounds.DECELERATING_WARP_DRIVE_SOUND, AudioMasks.STAR_SYSTEM_VIEW, 0, false, this.getTransform());
         this.hyperSpaceSound = new AudioInstance(Sounds.HYPER_SPACE_SOUND, AudioMasks.HYPER_SPACE, 0, false, this.getTransform());
         this.thrusterSound = new AudioInstance(Sounds.THRUSTER_SOUND, AudioMasks.STAR_SYSTEM_VIEW, 0, false, this.getTransform());
+
+        this.fuelTanks = serializedSpaceShip.fuelTanks.map((tank) => FuelTank.Deserialize(tank));
 
         AudioManager.RegisterSound(this.enableWarpDriveSound);
         AudioManager.RegisterSound(this.disableWarpDriveSound);
@@ -558,6 +583,22 @@ export class Spaceship implements Transformable {
         if (this.state === ShipState.LANDING) {
             this.land(deltaSeconds);
         }
+    }
+
+    public static CreateDefault(scene: Scene): Spaceship {
+        return Spaceship.Deserialize(DefaultSerializedSpaceship, scene);
+    }
+
+    public static Deserialize(serializedSpaceship: SerializedSpaceship, scene: Scene): Spaceship {
+        return new Spaceship(serializedSpaceship, scene);
+    }
+
+    public serialize(): SerializedSpaceship {
+        return {
+            name: this.name,
+            type: ShipType.WANDERER,
+            fuelTanks: this.fuelTanks.map((tank) => tank.serialize())
+        };
     }
 
     public dispose() {

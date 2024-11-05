@@ -53,8 +53,8 @@ export class ShipControls implements Controls {
 
     private closestLandableFacility: (Transformable & ManagesLandingPads) | null = null;
 
-    constructor(scene: Scene) {
-        this.spaceship = new Spaceship(scene);
+    constructor(spaceship: Spaceship, scene: Scene) {
+        this.spaceship = spaceship;
 
         this.firstPersonCamera = new FreeCamera("shipFirstPersonCamera", Vector3.Zero(), scene);
         this.firstPersonCamera.parent = this.getTransform();

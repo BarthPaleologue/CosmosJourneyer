@@ -72,6 +72,7 @@ import { StarSystemModel } from "./starSystemModel";
 import { OrbitalObjectType } from "../architecture/orbitalObject";
 import { OrbitalFacility } from "../spacestation/orbitalFacility";
 import { getStarGalacticPosition } from "../utils/coordinates/starSystemCoordinatesUtils";
+import { Spaceship } from "../spaceship/spaceship";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -534,7 +535,13 @@ export class StarSystemView implements View {
         this.defaultControls.speed = 0.2 * Settings.EARTH_RADIUS;
         this.defaultControls.getActiveCameras().forEach((camera) => (camera.maxZ = maxZ));
 
-        this.spaceshipControls = new ShipControls(this.scene);
+        const spaceshipSerialized = this.player.serializedSpaceships.shift();
+        if (spaceshipSerialized === undefined) throw new Error("No spaceship serialized in player");
+
+        const spaceship = Spaceship.Deserialize(spaceshipSerialized, this.scene);
+        this.player.instancedSpaceships.push(spaceship);
+
+        this.spaceshipControls = new ShipControls(spaceship, this.scene);
         this.spaceshipControls.getActiveCameras().forEach((camera) => (camera.maxZ = maxZ));
 
         this.characterControls = new CharacterControls(this.scene);
