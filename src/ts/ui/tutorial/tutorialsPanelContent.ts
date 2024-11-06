@@ -23,16 +23,16 @@ export class TutorialsPanelContent {
             tutorialDiv.classList.add("tutorial");
 
             const title = document.createElement("h2");
-            title.textContent = tutorial.title;
+            title.textContent = tutorial.getTitle();
             tutorialDiv.appendChild(title);
 
             const coverImage = document.createElement("img");
             coverImage.src = tutorial.coverImageSrc;
-            coverImage.alt = tutorial.title;
+            coverImage.alt = tutorial.getTitle();
             tutorialDiv.appendChild(coverImage);
 
             const description = document.createElement("p");
-            description.textContent = tutorial.description;
+            description.textContent = tutorial.getDescription();
             tutorialDiv.appendChild(description);
 
             this.htmlRoot.appendChild(tutorialDiv);
@@ -50,7 +50,7 @@ export class TutorialsPanelContent {
 
                     const orbitalObject = getObjectBySystemId(tutorial.universeObjectId, starSystemView.getStarSystem());
                     if (orbitalObject === null) {
-                        throw new Error(`Orbital object not found for tutorial ${tutorial.title}. ID: ${JSON.stringify(tutorial.universeObjectId)}`);
+                        throw new Error(`Orbital object not found for tutorial ${tutorial.getTitle()}. ID: ${JSON.stringify(tutorial.universeObjectId)}`);
                     }
 
                     const correspondingCelestialBody = starSystemView
