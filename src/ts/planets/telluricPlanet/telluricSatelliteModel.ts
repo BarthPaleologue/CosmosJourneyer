@@ -76,9 +76,14 @@ export function newSeededTelluricSatelliteModel(seed: number, name: string, pare
     parentAverageAxialTilt.scaleInPlace(1 / parentBodies.length);
     parentAverageAxialTilt.normalize();
 
+    const parentRotationAxis = Vector3.Up().applyRotationQuaternionInPlace(parentAverageAxialTilt);
+    const orbitOrientation = parentAverageAxialTilt.clone();
+    Quaternion.RotationAxis(parentRotationAxis, rng(GenerationSteps.ORBIT + 20) * 2 * Math.PI).multiplyToRef(orbitOrientation, orbitOrientation);
+    Quaternion.RotationAxis(randomDirection(rng, GenerationSteps.ORBIT + 30), normalRandom(0, Math.PI / 12, rng, GenerationSteps.ORBIT + 10)).multiplyToRef(orbitOrientation, orbitOrientation);
+
     const physicalProperties: TelluricPlanetaryMassObjectPhysicsInfo = {
         mass: mass,
-        axialTilt: parentAverageAxialTilt,
+        axialTilt: orbitOrientation,
         siderealDayDuration: (60 * 60 * 24) / 10,
         minTemperature: minTemperature,
         maxTemperature: maxTemperature,
@@ -96,11 +101,6 @@ export function newSeededTelluricSatelliteModel(seed: number, name: string, pare
     let orbitRadius = parentMaxRadius * clamp(normalRandom(2.0, 0.3, rng, GenerationSteps.ORBIT), 1.2, 3.0);
     orbitRadius += parentMaxRadius * clamp(normalRandom(10, 4, rng, GenerationSteps.ORBIT), 1, 50);
     orbitRadius += 2.0 * Math.max(0, parentMaxRadius - getPeriapsis(orbitRadius, orbitalP));
-
-    const parentRotationAxis = Vector3.Up().applyRotationQuaternionInPlace(parentAverageAxialTilt);
-    const orbitOrientation = parentAverageAxialTilt.clone();
-    Quaternion.RotationAxis(parentRotationAxis, rng(GenerationSteps.ORBIT + 20) * 2 * Math.PI).multiplyToRef(orbitOrientation, orbitOrientation);
-    Quaternion.RotationAxis(randomDirection(rng, GenerationSteps.ORBIT + 30), normalRandom(0, Math.PI / 12, rng, GenerationSteps.ORBIT + 10)).multiplyToRef(orbitOrientation, orbitOrientation);
 
     const parentMassSum = parentBodies.reduce((sum, body) => sum + body.physics.mass, 0);
     const orbit: Orbit = {
