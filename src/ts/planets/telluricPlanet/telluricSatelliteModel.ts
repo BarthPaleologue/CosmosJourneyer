@@ -89,14 +89,11 @@ export function newSeededTelluricSatelliteModel(seed: number, name: string, pare
 
     physicalProperties.oceanLevel = (Settings.OCEAN_DEPTH * physicalProperties.waterAmount * physicalProperties.pressure) / Settings.EARTH_SEA_LEVEL_PRESSURE;
 
-    // Todo: do not hardcode
-    let orbitRadius = 2e9 + rng(GenerationSteps.ORBIT) * 15e9;
-
-    const orbitalP = 2; //clamp(normalRandom(2.0, 0.3, this.rng, GenerationSteps.Orbit + 80), 0.7, 3.0);
+    const orbitalP = 2;
 
     const parentMaxRadius = parentBodies.reduce((max, body) => Math.max(max, body.radius), 0);
 
-    orbitRadius = parentMaxRadius * clamp(normalRandom(2.0, 0.3, rng, GenerationSteps.ORBIT), 1.2, 3.0);
+    let orbitRadius = parentMaxRadius * clamp(normalRandom(2.0, 0.3, rng, GenerationSteps.ORBIT), 1.2, 3.0);
     orbitRadius += parentMaxRadius * clamp(normalRandom(10, 4, rng, GenerationSteps.ORBIT), 1, 50);
     orbitRadius += 2.0 * Math.max(0, parentMaxRadius - getPeriapsis(orbitRadius, orbitalP));
 
