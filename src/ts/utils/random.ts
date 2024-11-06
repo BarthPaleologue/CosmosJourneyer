@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Vector3 } from "@babylonjs/core/Maths/math";
+
 /**
  * A useful function to randomly choose an option from a list of options, each option having a weight.
  * @param options An array of tuples, each tuple being an option of type T and its weight. (The weights don't have to add up to 1.0, they are normalized internally.)
@@ -71,4 +73,10 @@ export function pickPseudoRandomItems<T>(items: T[], nbItemsToPick: number, rng:
     }
 
     return results;
+}
+
+export function randomDirection(rng: (index: number) => number, baseIndex: number): Vector3 {
+    const theta = rng(baseIndex) * 2 * Math.PI;
+    const phi = (rng(baseIndex + 1) - 0.5) * Math.PI;
+    return new Vector3(Math.sin(phi) * Math.cos(theta), Math.sin(phi) * Math.sin(theta), Math.cos(phi));
 }

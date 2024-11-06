@@ -159,7 +159,7 @@ export function newSeededStarSystemModel(seed: SystemSeed): StarSystemModel {
             [1, 0.04],
             [2, 0.01]
         ],
-        systemRng(GenerationSteps.ANOMALIES * 16)
+        systemRng(GenerationSteps.ANOMALIES)
     );
     for (let i = 0; i < nbAnomalies; i++) {
         const anomalySeed = centeredRand(systemRng, GenerationSteps.ANOMALIES + i * 100) * Settings.SEED_HALF_RANGE;
