@@ -22,12 +22,14 @@ import { normalRandom, randRangeInt } from "extended-random";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { Settings } from "../../settings";
 import { TelluricPlanetaryMassObjectPhysicsInfo } from "../../architecture/physicsInfo";
-import { Quaternion } from "@babylonjs/core/Maths/math";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math";
 import { clamp } from "terrain-generation";
 import { getOrbitalPeriod, getPeriapsis, Orbit } from "../../orbit/orbit";
 import { celsiusToKelvin, hasLiquidWater } from "../../utils/physics";
 import { CloudsModel, newCloudsModel } from "../../clouds/cloudsModel";
 import { TelluricPlanetaryMassObjectModel } from "./telluricPlanetaryMassObjectModel";
+import { Axis } from "@babylonjs/core/Maths/math.axis";
+import { randomDirection } from "../../utils/random";
 
 export type TelluricSatelliteModel = TelluricPlanetaryMassObjectModel & {
     readonly type: OrbitalObjectType.TELLURIC_SATELLITE;
@@ -85,7 +87,7 @@ export function newSeededTelluricSatelliteModel(seed: number, name: string, pare
         oceanLevel: 0
     };
 
-    physicalProperties.oceanLevel = Settings.OCEAN_DEPTH * physicalProperties.waterAmount * physicalProperties.pressure / Settings.EARTH_SEA_LEVEL_PRESSURE;
+    physicalProperties.oceanLevel = (Settings.OCEAN_DEPTH * physicalProperties.waterAmount * physicalProperties.pressure) / Settings.EARTH_SEA_LEVEL_PRESSURE;
 
     // Todo: do not hardcode
     let orbitRadius = 2e9 + rng(GenerationSteps.ORBIT) * 15e9;
@@ -98,12 +100,17 @@ export function newSeededTelluricSatelliteModel(seed: number, name: string, pare
     orbitRadius += parentMaxRadius * clamp(normalRandom(10, 4, rng, GenerationSteps.ORBIT), 1, 50);
     orbitRadius += 2.0 * Math.max(0, parentMaxRadius - getPeriapsis(orbitRadius, orbitalP));
 
+    const parentRotationAxis = Vector3.Up().applyRotationQuaternionInPlace(parentAverageAxialTilt);
+    const orbitOrientation = parentAverageAxialTilt.clone();
+    Quaternion.RotationAxis(parentRotationAxis, rng(GenerationSteps.ORBIT + 20) * 2 * Math.PI).multiplyToRef(orbitOrientation, orbitOrientation);
+    Quaternion.RotationAxis(randomDirection(rng, GenerationSteps.ORBIT + 30), (rng(GenerationSteps.ORBIT + 10) * Math.PI) / 24).multiplyToRef(orbitOrientation, orbitOrientation);
+
     const parentMassSum = parentBodies.reduce((sum, body) => sum + body.physics.mass, 0);
     const orbit: Orbit = {
         radius: orbitRadius,
         p: orbitalP,
         period: getOrbitalPeriod(orbitRadius, parentMassSum),
-        orientation: parentAverageAxialTilt
+        orientation: orbitOrientation
     };
 
     // tidal lock
