@@ -1,12 +1,13 @@
 import { Player } from "../../player/player";
 import { OrbitalFacilityModel } from "../../spacestation/orbitalFacility";
 import { Sounds } from "../../assets/sounds";
+import i18n from "../../i18n";
 
 export function generateSpaceshipDom(stationModel: OrbitalFacilityModel, player: Player): HTMLDivElement {
     const mainContainer = document.createElement("div");
 
     const spaceshipH2 = document.createElement("h2");
-    spaceshipH2.innerText = "Spaceship management";
+    spaceshipH2.innerText = i18n.t("spaceStation:shipHangar");
     mainContainer.appendChild(spaceshipH2);
 
     const spaceship = player.instancedSpaceships[0];
@@ -28,7 +29,8 @@ export function generateSpaceshipDom(stationModel: OrbitalFacilityModel, player:
     fuelManagementContainer.appendChild(fuelText);
 
     const refuelButton = document.createElement("button");
-    refuelButton.innerText = "Refuel";
+    refuelButton.innerText = i18n.t("spaceStation:refuel");
+
     refuelButton.addEventListener("click", () => {
         Sounds.MENU_SELECT_SOUND.play();
         const fuelAmount = spaceship.getTotalFuelCapacity() - spaceship.getRemainingFuel();
@@ -40,12 +42,12 @@ export function generateSpaceshipDom(stationModel: OrbitalFacilityModel, player:
     fuelManagementContainer.appendChild(refuelButton);
 
     const otherSpaceshipH2 = document.createElement("h2");
-    otherSpaceshipH2.innerText = "Other spaceships";
+    otherSpaceshipH2.innerText = i18n.t("spaceStation:otherSpaceships");
     mainContainer.appendChild(otherSpaceshipH2);
 
     if (player.serializedSpaceships.length === 0) {
         const noSpaceshipP = document.createElement("p");
-        noSpaceshipP.innerText = "You have no other spaceship";
+        noSpaceshipP.innerText = i18n.t("spaceStation:noOtherSpaceship");
         mainContainer.appendChild(noSpaceshipP);
     }
 
