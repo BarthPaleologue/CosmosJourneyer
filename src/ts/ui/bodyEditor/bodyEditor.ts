@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import editorHTML from "../../../html/bodyEditor.html";
 import { TelluricPlanet } from "../../planets/telluricPlanet/telluricPlanet";
 import "handle-sliderjs/dist/css/style2.css";
 import { ColorMode } from "../../planets/telluricPlanet/colorSettingsInterface";
@@ -67,17 +66,6 @@ export class BodyEditor {
     private readonly panels: EditorPanel[];
 
     constructor(visibility: EditorVisibility = EditorVisibility.FULL) {
-        if (document.querySelector("#editorPanelContainer") !== null) {
-            document.querySelector("#editorPanelContainer")?.remove();
-        }
-        if (document.querySelector("#toolbar") !== null) {
-            document.querySelector("#toolbar")?.remove();
-        }
-        if (document.querySelector("#navBar") !== null) {
-            document.querySelector("#navBar")?.remove();
-        }
-
-        document.body.insertAdjacentHTML("beforeend", editorHTML);
         this.navBar = document.getElementById("navBar") as HTMLElement;
 
         this.generalPanel = new GeneralPanel();

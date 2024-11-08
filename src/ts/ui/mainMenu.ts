@@ -2,7 +2,6 @@ import { UberScene } from "../uberCore/uberScene";
 import { DefaultControls } from "../defaultControls/defaultControls";
 import { StarSystemView } from "../starSystem/starSystemView";
 import { positionNearObjectAsteroidField, positionNearObjectWithStarVisible } from "../utils/positionNearObject";
-import mainMenuHTML from "../../html/mainMenu.html";
 import { getForwardDirection } from "../uberCore/transforms/basicTransform";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformRotationAnimation } from "../uberCore/transforms/animations/rotation";
@@ -141,8 +140,6 @@ export class MainMenu {
         this.universeObjectId = allowedIdentifiers[randomIndex];
         const coordinates = this.universeObjectId.starSystemCoordinates;
         this.starSystemModel = getSystemModelFromCoordinates(coordinates);
-
-        document.body.insertAdjacentHTML("beforeend", mainMenuHTML);
 
         const htmlRoot = document.getElementById("mainMenu");
         if (htmlRoot === null) throw new Error("#mainMenu does not exist!");
