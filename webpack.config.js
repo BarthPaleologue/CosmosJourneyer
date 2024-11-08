@@ -87,7 +87,7 @@ const config = {
         new HtmlWebpackPlugin({
             title: "Playground - Cosmos Journeyer",
             filename: "playground.html",
-            template: path.join(htmlPath, "index.html"),
+            template: path.join(htmlPath, "emptyIndex.html"),
             chunks: ["playground"]
         }),
         new HtmlWebpackPlugin({
@@ -96,7 +96,7 @@ const config = {
                 description: "XR test for Cosmos Journeyer."
             },
             filename: "xr.html",
-            template: path.join(htmlPath, "index.html"),
+            template: path.join(htmlPath, "emptyIndex.html"),
             chunks: ["xr"]
         }),
         new HtmlWebpackPlugin({
@@ -105,7 +105,7 @@ const config = {
                 description: "Space station generator for Cosmos Journeyer."
             },
             filename: "spaceStationGenerator.html",
-            template: path.join(htmlPath, "index.html"),
+            template: path.join(htmlPath, "emptyIndex.html"),
             chunks: ["spaceStationGenerator"]
         }),
         new HtmlWebpackPlugin({
@@ -114,7 +114,7 @@ const config = {
                 description: "Debug assets visualization for Cosmos Journeyer."
             },
             filename: "debugAssets.html",
-            template: path.join(htmlPath, "index.html"),
+            template: path.join(htmlPath, "emptyIndex.html"),
             chunks: ["debugAssets"]
         }),
         new MiniCssExtractPlugin()
