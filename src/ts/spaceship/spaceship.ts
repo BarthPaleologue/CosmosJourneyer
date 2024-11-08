@@ -48,6 +48,7 @@ import { OrbitalObject } from "../architecture/orbitalObject";
 import { CelestialBody } from "../architecture/celestialBody";
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { FuelTank, SerializedFuelTank } from "./fuelTank";
+import { FuelScoop } from "./fuelScoop";
 
 const enum ShipState {
     FLYING,
@@ -63,12 +64,16 @@ export type SerializedSpaceship = {
     name: string;
     type: ShipType;
     fuelTanks: SerializedFuelTank[];
+    fuelScoop: FuelScoop | null;
 };
 
 export const DefaultSerializedSpaceship: SerializedSpaceship = {
     name: "Wanderer",
     type: ShipType.WANDERER,
-    fuelTanks: [{ currentFuel: 100, maxFuel: 100 }]
+    fuelTanks: [{ currentFuel: 100, maxFuel: 100 }],
+    fuelScoop: {
+        fuelPerSecond: 1
+    }
 };
 
 export class Spaceship implements Transformable {
@@ -103,7 +108,9 @@ export class Spaceship implements Transformable {
 
     private mainThrusters: MainThruster[] = [];
 
-    readonly fuelTanks: FuelTank[] = [];
+    readonly fuelTanks: FuelTank[];
+
+    readonly fuelScoop: FuelScoop | null;
 
     readonly enableWarpDriveSound: AudioInstance;
     readonly disableWarpDriveSound: AudioInstance;
@@ -166,6 +173,8 @@ export class Spaceship implements Transformable {
         this.thrusterSound = new AudioInstance(Sounds.THRUSTER_SOUND, AudioMasks.STAR_SYSTEM_VIEW, 0, false, this.getTransform());
 
         this.fuelTanks = serializedSpaceShip.fuelTanks.map((tank) => FuelTank.Deserialize(tank));
+
+        this.fuelScoop = serializedSpaceShip.fuelScoop;
 
         AudioManager.RegisterSound(this.enableWarpDriveSound);
         AudioManager.RegisterSound(this.disableWarpDriveSound);
@@ -584,9 +593,9 @@ export class Spaceship implements Transformable {
             this.land(deltaSeconds);
         }
 
-        const distanceTravelledLY = this.getSpeed() * deltaSeconds / Settings.LIGHT_YEAR;
+        const distanceTravelledLY = (this.getSpeed() * deltaSeconds) / Settings.LIGHT_YEAR;
         const fuelToBurn = this.warpDrive.getFuelConsumption(distanceTravelledLY);
-        if(fuelToBurn < this.getRemainingFuel()) {
+        if (fuelToBurn < this.getRemainingFuel()) {
             this.burnFuel(fuelToBurn);
         } else {
             this.emergencyStopWarpDrive();
@@ -642,7 +651,8 @@ export class Spaceship implements Transformable {
         return {
             name: this.name,
             type: ShipType.WANDERER,
-            fuelTanks: this.fuelTanks.map((tank) => tank.serialize())
+            fuelTanks: this.fuelTanks.map((tank) => tank.serialize()),
+            fuelScoop: this.fuelScoop
         };
     }
 
