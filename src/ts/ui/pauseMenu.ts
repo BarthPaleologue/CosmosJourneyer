@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Observable } from "@babylonjs/core/Misc/observable";
-import pauseMenuHTML from "../../html/pauseMenu.html";
 import i18n from "../i18n";
 import { Sounds } from "../assets/sounds";
 import { PanelType, SidePanels } from "./sidePanels";
@@ -43,7 +42,6 @@ export class PauseMenu {
     constructor(sidePanels: SidePanels) {
         this.sidePanels = sidePanels;
 
-        document.body.insertAdjacentHTML("beforeend", pauseMenuHTML);
         this.rootNode = document.getElementById("pauseMenu") as HTMLElement;
         this.mask = document.getElementById("pauseMask") as HTMLElement;
 

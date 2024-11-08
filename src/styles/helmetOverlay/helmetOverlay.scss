@@ -30,6 +30,8 @@
   pointer-events: none;
   cursor: none;
 
+  visibility: hidden;
+
   font-family: Nasalization, sans-serif;
 
   @include meta.load-css("targetHelper.scss");
