@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import spaceStationHTML from "../../../html/spaceStationUI.html";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { generateInfoHTML } from "./spaceStationInfos";
 import { Player } from "../../player/player";
@@ -61,9 +60,6 @@ export class SpaceStationLayer {
     constructor(player: Player) {
         this.player = player;
 
-        if (document.querySelector("#spaceStationUI") === null) {
-            document.body.insertAdjacentHTML("beforeend", spaceStationHTML);
-        }
         this.parentNode = document.getElementById("spaceStationUI") as HTMLElement;
         this.spaceStationHeader = document.getElementById("spaceStationHeader") as HTMLElement;
 

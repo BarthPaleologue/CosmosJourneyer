@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import overlayHTML from "../../html/helmetOverlay.html";
 import { parseSpeed } from "../utils/strings/parseToStrings";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -43,9 +42,6 @@ export class SpaceShipLayer {
     constructor(player: Player) {
         this.player = player;
 
-        if (document.querySelector("#helmetOverlay") === null) {
-            document.body.insertAdjacentHTML("beforeend", overlayHTML);
-        }
         this.rootNode = document.getElementById("helmetOverlay") as HTMLElement;
 
         this.cursor = document.createElement("div");

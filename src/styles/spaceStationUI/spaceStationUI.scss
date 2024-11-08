@@ -14,6 +14,8 @@ $gaps: 10px;
 
   padding: $gaps;
 
+  visibility: hidden;
+
   display: grid;
   grid-template-columns: 70% auto;
   grid-template-rows: 15vh auto;
@@ -149,6 +151,7 @@ $gaps: 10px;
         }
       }
     }
+<<<<<<< HEAD
 
     .spaceshipContainer {
       background: var(--accent-color-dark);
@@ -183,6 +186,8 @@ $gaps: 10px;
         }
       }
     }
+=======
+>>>>>>> main
   }
 
   #spaceStationActions {

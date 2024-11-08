@@ -5,21 +5,27 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" lang="en"
-          content="Cosmos Journeyer is an infinite universe explorable right in your web browser.">
-    <meta name="description" lang="fr"
-          content="Cosmos Journeyer est un univers infini explorable directement dans votre navigateur web.">
     <meta name="keywords"
-          content="planet, engine, procedural, universe, procedural universe, procedural planet, procedural planets, procedural universe engine, procedural planet engine, procedural universe generator">
+          content="space, exploration, game, open-source, planet, procedural, universe, procedural universe, procedural planet, webgl, webgpu">
     <meta name="author" content="Barthélemy Paléologue">
     <meta name="robots" content="index, follow">
-    <title>Cosmos Journeyer</title>
+    <title><%= htmlWebpackPlugin.options.title %></title>
 </head>
 
 <body>
 <canvas id="renderer"></canvas>
 
 <div id="inspectorLayer"></div>
+
+<%= require('html-loader!./bodyEditor.html').default %>
+
+<%= require('html-loader!./spaceStationUI.html').default %>
+
+<%= require('html-loader!./helmetOverlay.html').default %>
+
+<%= require('html-loader!./mainMenu.html').default %>
+
+<%= require('html-loader!./pauseMenu.html').default %>
 
 <div id="loadSavePanel" class="sidePanel">
     <div id="dropFileZone">

@@ -1,303 +1,305 @@
-<nav id="navBar">
-    <div id="generalLink">General</div>
-    <div id="starPhysicLink">Star</div>
-    <div id="blackHolePhysicLink">Black Hole</div>
-    <div id="physicLink">Physic</div>
-    <div id="oceanLink">Ocean</div>
-    <div id="surfaceLink">Surface</div>
-    <div id="gazCloudsLink">Gaz Clouds</div>
-    <div id="cloudsLink">Clouds</div>
-    <div id="atmosphereLink">Atmosphere</div>
-    <div id="ringsLink">Rings</div>
-</nav>
+<section id="bodyEditor">
+    <nav id="navBar">
+        <div id="generalLink">General</div>
+        <div id="starPhysicLink">Star</div>
+        <div id="blackHolePhysicLink">Black Hole</div>
+        <div id="physicLink">Physic</div>
+        <div id="oceanLink">Ocean</div>
+        <div id="surfaceLink">Surface</div>
+        <div id="gazCloudsLink">Gaz Clouds</div>
+        <div id="cloudsLink">Clouds</div>
+        <div id="atmosphereLink">Atmosphere</div>
+        <div id="ringsLink">Rings</div>
+    </nav>
 
-<div id="editorPanelContainer">
-    <div class="ui" id="generalUI">
-        <h1>General</h1>
+    <div id="editorPanelContainer" hidden="hidden">
+        <div class="ui" id="generalUI">
+            <h1>General</h1>
 
-        <div id="axialTiltX">
-            <p>Axial Tilt X</p>
+            <div id="axialTiltX">
+                <p>Axial Tilt X</p>
+            </div>
+
+            <div id="axialTiltZ">
+                <p>Axial Tilt Z</p>
+            </div>
+
+            <div id="timeModifier">
+                <p>Time speed : </p>
+            </div>
+
+            <div id="cameraFOV">
+                <p>Camera FOV : </p>
+            </div>
+
+            <div id="exposure">
+                <p>Exposure : </p>
+            </div>
+            <div id="gamma">
+                <p>Gamma : </p>
+            </div>
+            <div id="brightness">
+                <p>Brightness : </p>
+            </div>
+            <div id="contrast">
+                <p>Contrast : </p>
+            </div>
+            <div id="saturation">
+                <p>Saturation : </p>
+            </div>
+            <div id="bloomThreshold">
+                <p>Bloom Threshold : </p>
+            </div>
+            <div id="bloomWeight">
+                <p>Bloom Weight : </p>
+            </div>
+            <div id="bloomKernel">
+                <p>Bloom Kernel : </p>
+            </div>
         </div>
 
-        <div id="axialTiltZ">
-            <p>Axial Tilt Z</p>
-        </div>
+        <div class="ui" id="starPhysicUI">
 
-        <div id="timeModifier">
-            <p>Time speed : </p>
-        </div>
+            <h1>Star</h1>
 
-        <div id="cameraFOV">
-            <p>Camera FOV : </p>
-        </div>
-
-        <div id="exposure">
             <p>Exposure : </p>
+            <div id="starExposure"></div>
+
+            <p>Decay : </p>
+            <div id="decay"></div>
+
         </div>
-        <div id="gamma">
-            <p>Gamma : </p>
+
+        <div class="ui" id="blackHolePhysicUI">
+
+            <h1>Black Hole</h1>
+
+            <p>Disk Radius: </p>
+            <div id="diskRadius"></div>
+
+            <p>Minkowski warping factor</p>
+            <div id="minkowskiWarpingFactor"></div>
         </div>
-        <div id="brightness">
-            <p>Brightness : </p>
+
+        <div class="ui" id="physicUI">
+            <h1>Physics</h1>
+
+            <p>Minimum Temperature : </p>
+            <div id="minTemperature"></div>
+
+            <p>Maximum Temperature : </p>
+            <div id="maxTemperature"></div>
         </div>
-        <div id="contrast">
-            <p>Contrast : </p>
+
+        <div class="ui" id="oceanUI">
+            <h1>Ocean</h1>
+
+            <div id="oceanToggler" class="container">
+                <p>Enable</p>
+                <input type="checkbox" checked>
+                <span class="checkmark"></span>
+            </div>
+
+            <p>Alpha Modifier : </p>
+            <div id="alphaModifier"></div>
+
+            <p>Depth Modifier : </p>
+            <div id="depthModifier"></div>
+
+            <p>Specular Power : </p>
+            <div id="specularPower"></div>
+
+            <p>Smoothness : </p>
+            <div id="smoothness"></div>
+
+            <p>Wave Blending Sharpness : </p>
+            <div id="waveBlendingSharpness"></div>
+
         </div>
-        <div id="saturation">
-            <p>Saturation : </p>
+        <div class="ui" id="surfaceUI">
+
+            <h1>Surface Color</h1>
+
+            <div class="colorPickerContainer">
+                <p>Snow Color :</p>
+                <input type="color" id="snowColor">
+            </div>
+
+            <div class="colorPickerContainer">
+                <p>Plain Color :</p>
+                <input type="color" id="plainColor">
+            </div>
+
+            <div class="colorPickerContainer">
+                <p>Steep Color :</p>
+                <input type="color" id="steepColor">
+            </div>
+
+            <div class="colorPickerContainer">
+                <p>Beach Sand Color :</p>
+                <input type="color" id="sandColor">
+            </div>
+
+            <div class="colorPickerContainer">
+                <p>Desert Sand Color :</p>
+                <input type="color" id="desertColor">
+            </div>
+
+            <div class="colorPickerContainer">
+                <p>Sea Bottom Color :</p>
+                <input type="color" id="bottomColor">
+            </div>
+
+
+            <p>Sand Size : </p>
+            <div id="sandSize"></div>
+
+            <p>Steep Sharpness : </p>
+            <div id="steepSharpness"></div>
+
+            <p>Normal Sharpness : </p>
+            <div id="normalSharpness"></div>
+
         </div>
-        <div id="bloomThreshold">
-            <p>Bloom Threshold : </p>
+        <div class="ui" id="gazCloudsUI">
+
+            <h1>Gaz Clouds</h1>
+
+            <div class="colorPickerContainer">
+                <p>Gaz Color 1 :</p>
+                <input type="color" id="gazColor1">
+            </div>
+
+            <div class="colorPickerContainer">
+                <p>Gaz Color 2 :</p>
+                <input type="color" id="gazColor2">
+            </div>
+
+            <div class="colorPickerContainer">
+                <p>Gaz Color 3 :</p>
+                <input type="color" id="gazColor3">
+            </div>
+
+            <p>Color Sharpness : </p>
+            <div id="colorSharpness"></div>
+
         </div>
-        <div id="bloomWeight">
-            <p>Bloom Weight : </p>
+        <div class="ui" id="cloudsUI">
+
+            <h1>Clouds</h1>
+
+            <div id="cloudsToggler" class="container">
+                <p>Enable</p>
+                <input type="checkbox" checked>
+                <span class="checkmark"></span>
+            </div>
+
+            <div class="colorPickerContainer">
+                <p>Cloud Color :</p>
+                <input type="color" id="cloudColor">
+            </div>
+
+            <p>Frequency : </p>
+            <div id="cloudFrequency"></div>
+
+            <p>Detail Frequency : </p>
+            <div id="cloudDetailFrequency"></div>
+
+            <p>Coverage : </p>
+            <div id="cloudCoverage"></div>
+
+            <p>Sharpness : </p>
+            <div id="cloudSharpness"></div>
+
+            <p>Main speed : </p>
+            <div id="worleySpeed"></div>
+
+            <p>Detail speed : </p>
+            <div id="detailSpeed"></div>
+
         </div>
-        <div id="bloomKernel">
-            <p>Bloom Kernel : </p>
+
+        <div class="ui" id="atmosphereUI">
+            <h1>Atmosphere</h1>
+
+            <div id="atmosphereToggler" class="container">
+                <p>Enable</p>
+                <input type="checkbox" checked>
+                <span class="checkmark"></span>
+            </div>
+
+            <p>Intensity : </p>
+            <div id="intensity"></div>
+
+            <p>Atmosphere thickness : </p>
+            <div id="atmosphereRadius"></div>
+
+            <p>Rayleigh scattering height falloff: </p>
+            <div id="rayleighHeight"></div>
+
+            <div class="colorPickerContainer">
+                <p>Rayleigh scattering :</p>
+                <input type="color" id="rayleighScattering">
+            </div>
+
+            <p>Mie scattering height falloff: </p>
+            <div id="mieHeight"></div>
+
+            <div class="colorPickerContainer">
+                <p>Rayleigh scattering :</p>
+                <input type="color" id="mieScattering">
+            </div>
+
+            <p>Mie Asymmetry:</p>
+            <div id="mieAsymmetry"></div>
+
+            <p>Ozone layer height</p>
+            <div id="ozoneLayerHeight"></div>
+
+            <div class="colorPickerContainer">
+                <p>Rayleigh scattering :</p>
+                <input type="color" id="ozoneAbsorption">
+            </div>
+
+            <p>Ozone height falloff: </p>
+            <div id="ozoneHeight"></div>
+
+        </div>
+        <div class="ui" id="ringsUI">
+
+            <h1>Rings</h1>
+
+            <div id="ringsToggler" class="container">
+                <p>Enable</p>
+                <input type="checkbox" checked>
+                <span class="checkmark"></span>
+            </div>
+
+            <div class="colorPickerContainer">
+                <p>Rings Color :</p>
+                <input type="color" id="ringColor">
+            </div>
+
+            <p>Rings minRadius : </p>
+            <div id="ringsMinRadius"></div>
+
+            <p>Rings maxRadius : </p>
+            <div id="ringsMaxRadius"></div>
+
+            <p>Rings Frequency : </p>
+            <div id="ringsFrequency"></div>
+
+            <p>Rings Opacity : </p>
+            <div id="ringsOpacity"></div>
         </div>
     </div>
 
-    <div class="ui" id="starPhysicUI">
-
-        <h1>Star</h1>
-
-        <p>Exposure : </p>
-        <div id="starExposure"></div>
-
-        <p>Decay : </p>
-        <div id="decay"></div>
+    <div id="toolbar" hidden="hidden">
+        <img id="defaultMapButton" src="../asset/buttonIcons/defaultmap.png">
+        <img id="moistureMapButton" src="../asset/buttonIcons/moisturemap.png">
+        <img id="temperatureMapButton" src="../asset/buttonIcons/temperaturemap.png">
+        <img id="normalMapButton" src="../asset/buttonIcons/normalmap.png">
+        <img id="heightMapButton" src="../asset/buttonIcons/heightmap.png">
 
     </div>
-
-    <div class="ui" id="blackHolePhysicUI">
-
-        <h1>Black Hole</h1>
-
-        <p>Disk Radius: </p>
-        <div id="diskRadius"></div>
-
-        <p>Minkowski warping factor</p>
-        <div id="minkowskiWarpingFactor"></div>
-    </div>
-
-    <div class="ui" id="physicUI">
-        <h1>Physics</h1>
-
-        <p>Minimum Temperature : </p>
-        <div id="minTemperature"></div>
-
-        <p>Maximum Temperature : </p>
-        <div id="maxTemperature"></div>
-    </div>
-
-    <div class="ui" id="oceanUI">
-        <h1>Ocean</h1>
-
-        <div id="oceanToggler" class="container">
-            <p>Enable</p>
-            <input type="checkbox" checked>
-            <span class="checkmark"></span>
-        </div>
-
-        <p>Alpha Modifier : </p>
-        <div id="alphaModifier"></div>
-
-        <p>Depth Modifier : </p>
-        <div id="depthModifier"></div>
-
-        <p>Specular Power : </p>
-        <div id="specularPower"></div>
-
-        <p>Smoothness : </p>
-        <div id="smoothness"></div>
-
-        <p>Wave Blending Sharpness : </p>
-        <div id="waveBlendingSharpness"></div>
-
-    </div>
-    <div class="ui" id="surfaceUI">
-
-        <h1>Surface Color</h1>
-
-        <div class="colorPickerContainer">
-            <p>Snow Color :</p>
-            <input type="color" id="snowColor">
-        </div>
-
-        <div class="colorPickerContainer">
-            <p>Plain Color :</p>
-            <input type="color" id="plainColor">
-        </div>
-
-        <div class="colorPickerContainer">
-            <p>Steep Color :</p>
-            <input type="color" id="steepColor">
-        </div>
-
-        <div class="colorPickerContainer">
-            <p>Beach Sand Color :</p>
-            <input type="color" id="sandColor">
-        </div>
-
-        <div class="colorPickerContainer">
-            <p>Desert Sand Color :</p>
-            <input type="color" id="desertColor">
-        </div>
-
-        <div class="colorPickerContainer">
-            <p>Sea Bottom Color :</p>
-            <input type="color" id="bottomColor">
-        </div>
-
-
-        <p>Sand Size : </p>
-        <div id="sandSize"></div>
-
-        <p>Steep Sharpness : </p>
-        <div id="steepSharpness"></div>
-
-        <p>Normal Sharpness : </p>
-        <div id="normalSharpness"></div>
-
-    </div>
-    <div class="ui" id="gazCloudsUI">
-
-        <h1>Gaz Clouds</h1>
-
-        <div class="colorPickerContainer">
-            <p>Gaz Color 1 :</p>
-            <input type="color" id="gazColor1">
-        </div>
-
-        <div class="colorPickerContainer">
-            <p>Gaz Color 2 :</p>
-            <input type="color" id="gazColor2">
-        </div>
-
-        <div class="colorPickerContainer">
-            <p>Gaz Color 3 :</p>
-            <input type="color" id="gazColor3">
-        </div>
-
-        <p>Color Sharpness : </p>
-        <div id="colorSharpness"></div>
-
-    </div>
-    <div class="ui" id="cloudsUI">
-
-        <h1>Clouds</h1>
-
-        <div id="cloudsToggler" class="container">
-            <p>Enable</p>
-            <input type="checkbox" checked>
-            <span class="checkmark"></span>
-        </div>
-
-        <div class="colorPickerContainer">
-            <p>Cloud Color :</p>
-            <input type="color" id="cloudColor">
-        </div>
-
-        <p>Frequency : </p>
-        <div id="cloudFrequency"></div>
-
-        <p>Detail Frequency : </p>
-        <div id="cloudDetailFrequency"></div>
-
-        <p>Coverage : </p>
-        <div id="cloudCoverage"></div>
-
-        <p>Sharpness : </p>
-        <div id="cloudSharpness"></div>
-
-        <p>Main speed : </p>
-        <div id="worleySpeed"></div>
-
-        <p>Detail speed : </p>
-        <div id="detailSpeed"></div>
-
-    </div>
-
-    <div class="ui" id="atmosphereUI">
-        <h1>Atmosphere</h1>
-
-        <div id="atmosphereToggler" class="container">
-            <p>Enable</p>
-            <input type="checkbox" checked>
-            <span class="checkmark"></span>
-        </div>
-
-        <p>Intensity : </p>
-        <div id="intensity"></div>
-
-        <p>Atmosphere thickness : </p>
-        <div id="atmosphereRadius"></div>
-
-        <p>Rayleigh scattering height falloff: </p>
-        <div id="rayleighHeight"></div>
-
-        <div class="colorPickerContainer">
-            <p>Rayleigh scattering :</p>
-            <input type="color" id="rayleighScattering">
-        </div>
-
-        <p>Mie scattering height falloff: </p>
-        <div id="mieHeight"></div>
-
-        <div class="colorPickerContainer">
-            <p>Rayleigh scattering :</p>
-            <input type="color" id="mieScattering">
-        </div>
-
-        <p>Mie Asymmetry:</p>
-        <div id="mieAsymmetry"></div>
-
-        <p>Ozone layer height</p>
-        <div id="ozoneLayerHeight"></div>
-
-        <div class="colorPickerContainer">
-            <p>Rayleigh scattering :</p>
-            <input type="color" id="ozoneAbsorption">
-        </div>
-
-        <p>Ozone height falloff: </p>
-        <div id="ozoneHeight"></div>
-
-    </div>
-    <div class="ui" id="ringsUI">
-
-        <h1>Rings</h1>
-
-        <div id="ringsToggler" class="container">
-            <p>Enable</p>
-            <input type="checkbox" checked>
-            <span class="checkmark"></span>
-        </div>
-
-        <div class="colorPickerContainer">
-            <p>Rings Color :</p>
-            <input type="color" id="ringColor">
-        </div>
-
-        <p>Rings minRadius : </p>
-        <div id="ringsMinRadius"></div>
-
-        <p>Rings maxRadius : </p>
-        <div id="ringsMaxRadius"></div>
-
-        <p>Rings Frequency : </p>
-        <div id="ringsFrequency"></div>
-
-        <p>Rings Opacity : </p>
-        <div id="ringsOpacity"></div>
-    </div>
-</div>
-
-<div id="toolbar">
-    <img id="defaultMapButton" src="../asset/buttonIcons/defaultmap.png">
-    <img id="moistureMapButton" src="../asset/buttonIcons/moisturemap.png">
-    <img id="temperatureMapButton" src="../asset/buttonIcons/temperaturemap.png">
-    <img id="normalMapButton" src="../asset/buttonIcons/normalmap.png">
-    <img id="heightMapButton" src="../asset/buttonIcons/heightmap.png">
-
-</div>
+</section>
