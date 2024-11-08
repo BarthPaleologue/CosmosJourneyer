@@ -59,9 +59,9 @@ export class ShadowPostProcess extends PostProcess implements ObjectPostProcess 
 
         const ShadowUniformNames = {
             STAR_RADIUSES: "star_radiuses",
-            HAS_RINGS: "has_rings",
-            HAS_CLOUDS: "has_clouds",
-            HAS_OCEAN: "has_ocean"
+            HAS_RINGS: "shadowUniforms_hasRings",
+            HAS_CLOUDS: "shadowUniforms_hasClouds",
+            HAS_OCEAN: "shadowUniforms_hasOcean"
         };
 
         const uniforms: string[] = [
