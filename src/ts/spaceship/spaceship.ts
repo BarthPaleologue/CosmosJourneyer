@@ -498,7 +498,19 @@ export class Spaceship implements Transformable {
             this.onFuelScoopStart.notifyObservers();
         }
 
-        this.refuel(this.fuelScoop.fuelPerSecond * deltaSeconds);
+        let fuelAvailability;
+        switch (this.nearestCelestialBody.model.type) {
+            case OrbitalObjectType.STAR:
+                fuelAvailability = 1;
+                break;
+            case OrbitalObjectType.GAS_PLANET:
+                fuelAvailability = 0.3;
+                break;
+            default:
+                fuelAvailability = 0;
+        }
+
+        this.refuel(this.fuelScoop.fuelPerSecond * fuelAvailability * deltaSeconds);
     }
 
     public update(deltaSeconds: number) {
