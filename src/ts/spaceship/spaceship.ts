@@ -44,7 +44,7 @@ import { Objects } from "../assets/objects";
 import { Sounds } from "../assets/sounds";
 import { LandingPad } from "../assets/procedural/landingPad/landingPad";
 import { createNotification } from "../utils/notification";
-import { OrbitalObject } from "../architecture/orbitalObject";
+import { OrbitalObject, OrbitalObjectType } from "../architecture/orbitalObject";
 import { CelestialBody } from "../architecture/celestialBody";
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { FuelTank, SerializedFuelTank } from "./fuelTank";
@@ -72,7 +72,7 @@ export const DefaultSerializedSpaceship: SerializedSpaceship = {
     type: ShipType.WANDERER,
     fuelTanks: [{ currentFuel: 100, maxFuel: 100 }],
     fuelScoop: {
-        fuelPerSecond: 1
+        fuelPerSecond: 2.5
     }
 };
 
@@ -111,6 +111,7 @@ export class Spaceship implements Transformable {
     readonly fuelTanks: FuelTank[];
 
     readonly fuelScoop: FuelScoop | null;
+    private isFuelScooping = false;
 
     readonly enableWarpDriveSound: AudioInstance;
     readonly disableWarpDriveSound: AudioInstance;
@@ -118,6 +119,9 @@ export class Spaceship implements Transformable {
     readonly deceleratingWarpDriveSound: AudioInstance;
     readonly hyperSpaceSound: AudioInstance;
     readonly thrusterSound: AudioInstance;
+
+    readonly onFuelScoopStart = new Observable<void>();
+    readonly onFuelScoopEnd = new Observable<void>();
 
     readonly onWarpDriveEnabled = new Observable<void>();
     readonly onWarpDriveDisabled = new Observable<boolean>();
@@ -473,6 +477,30 @@ export class Spaceship implements Transformable {
         return canEngage;
     }
 
+    private handleFuelScoop(deltaSeconds: number) {
+        if (this.fuelScoop === null) return;
+        if (this.nearestCelestialBody === null) return;
+        if (![OrbitalObjectType.STAR, OrbitalObjectType.GAS_PLANET].includes(this.nearestCelestialBody.model.type)) return;
+
+        const distanceToBody = Vector3.Distance(this.getTransform().getAbsolutePosition(), this.nearestCelestialBody.getTransform().getAbsolutePosition());
+        const currentFuelPercentage = this.getRemainingFuel() / this.getTotalFuelCapacity();
+        if (currentFuelPercentage === 1 || distanceToBody > this.nearestCelestialBody.getBoundingRadius() * 1.5) {
+            if (this.isFuelScooping) {
+                this.isFuelScooping = false;
+                this.onFuelScoopEnd.notifyObservers();
+            }
+
+            return;
+        }
+
+        if (!this.isFuelScooping) {
+            this.isFuelScooping = true;
+            this.onFuelScoopStart.notifyObservers();
+        }
+
+        this.refuel(this.fuelScoop.fuelPerSecond * deltaSeconds);
+    }
+
     public update(deltaSeconds: number) {
         this.mainEngineTargetSpeed = this.mainEngineThrottle * 500;
 
@@ -482,6 +510,8 @@ export class Spaceship implements Transformable {
 
         let closestDistance = Number.POSITIVE_INFINITY;
         let objectHalfThickness = 0;
+
+        this.handleFuelScoop(deltaSeconds);
 
         if (this.warpDrive.isEnabled()) {
             if (!this.canEngageWarpDrive()) {

@@ -44,6 +44,9 @@ import warpDriveEmergencyShutDownSound from "../../asset/sound/voice/WarpDriveEm
 import warpDriveDisengagedSound from "../../asset/sound/voice/WarpDriveDisengagedCharlotte.mp3";
 import engagingWarpDriveSound from "../../asset/sound/voice/EngagingWarpDriveCharlotte.mp3";
 
+import fuelScoopingVoice from "../../asset/sound/voice/FuelScoopingCharlotte.mp3";
+import fuelScoopingCompleteVoice from "../../asset/sound/voice/FuelScoopingCompleteCharlotte.mp3";
+
 import straussBlueDanube from "../../asset/sound/Strauss_The_Blue_Danube_Waltz.mp3";
 
 export class Sounds {
@@ -82,6 +85,9 @@ export class Sounds {
     public static WARP_DRIVE_EMERGENCY_SHUT_DOWN: Sound;
     public static WARP_DRIVE_DISENGAGED: Sound;
     public static ENGAGING_WARP_DRIVE: Sound;
+
+    public static FUEL_SCOOPING_VOICE: Sound;
+    public static FUEL_SCOOPING_COMPLETE_VOICE: Sound;
 
     public static STRAUSS_BLUE_DANUBE: Sound;
 
@@ -302,6 +308,18 @@ export class Sounds {
         engagingWarpDriveSoundTask.onSuccess = (task) => {
             Sounds.ENGAGING_WARP_DRIVE = new Sound("EngagingWarpDrive", task.data, scene);
             console.log("Engaging warp drive sound loaded");
+        };
+
+        const fuelScoopingVoiceTask = manager.addBinaryFileTask("fuelScoopingVoiceTask", fuelScoopingVoice);
+        fuelScoopingVoiceTask.onSuccess = (task) => {
+            Sounds.FUEL_SCOOPING_VOICE = new Sound("FuelScoopingVoice", task.data, scene);
+            console.log("Fuel scooping voice loaded");
+        };
+
+        const fuelScoopingCompleteVoiceTask = manager.addBinaryFileTask("fuelScoopingCompleteVoiceTask", fuelScoopingCompleteVoice);
+        fuelScoopingCompleteVoiceTask.onSuccess = (task) => {
+            Sounds.FUEL_SCOOPING_COMPLETE_VOICE = new Sound("FuelScoopingCompleteVoice", task.data, scene);
+            console.log("Fuel scooping complete voice loaded");
         };
     }
 }

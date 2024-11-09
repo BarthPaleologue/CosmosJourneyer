@@ -144,6 +144,14 @@ export class ShipControls implements Controls {
         this.baseFov = this.thirdPersonCamera.fov;
         this.targetFov = this.baseFov;
 
+        this.spaceship.onFuelScoopStart.add(() => {
+            Sounds.EnqueuePlay(Sounds.FUEL_SCOOPING_VOICE);
+        });
+
+        this.spaceship.onFuelScoopEnd.add(() => {
+            Sounds.EnqueuePlay(Sounds.FUEL_SCOOPING_COMPLETE_VOICE);
+        });
+
         this.spaceship.onLandingObservable.add(async () => {
             const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
             Sounds.EnqueuePlay(Sounds.LANDING_COMPLETE);
