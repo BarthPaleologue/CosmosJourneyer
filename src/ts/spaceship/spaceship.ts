@@ -713,6 +713,9 @@ export class Spaceship implements Transformable {
         this.onWarpDriveEnabled.clear();
         this.onWarpDriveDisabled.clear();
 
+        this.onFuelScoopStart.clear();
+        this.onFuelScoopEnd.clear();
+
         this.onPlanetaryLandingEngaged.clear();
         this.onLandingObservable.clear();
     }
