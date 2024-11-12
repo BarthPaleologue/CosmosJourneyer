@@ -146,14 +146,16 @@ export class CosmosJourneyer {
         this.pauseMenu.onResume.add(() => this.resume());
         this.pauseMenu.onScreenshot.add(() => this.takeScreenshot());
         this.pauseMenu.onShare.add(() => {
-            const saveData = this.generateSaveData();
+            this.engine.onEndFrameObservable.addOnce(() => {
+                const saveData = this.generateSaveData();
 
-            const urlData = encodeBase64(JSON.stringify(saveData.universeCoordinates));
+                const urlData = encodeBase64(JSON.stringify(saveData.universeCoordinates));
 
-            const payload = `universeCoordinates=${urlData}`;
-            const url = new URL(`https://barthpaleologue.github.io/CosmosJourneyer/?${payload}`);
-            navigator.clipboard.writeText(url.toString()).then(() => {
-                createNotification(i18n.t("notifications:copiedToClipboard"), 2000);
+                const payload = `universeCoordinates=${urlData}`;
+                const url = new URL(`https://barthpaleologue.github.io/CosmosJourneyer/?${payload}`);
+                navigator.clipboard.writeText(url.toString()).then(() => {
+                    createNotification(i18n.t("notifications:copiedToClipboard"), 2000);
+                });
             });
         });
         this.pauseMenu.onSave.add(() => this.downloadSaveFile());
@@ -389,14 +391,16 @@ export class CosmosJourneyer {
      * Generates save file data and downloads it as a json file
      */
     public downloadSaveFile(): void {
-        const saveData = this.generateSaveData();
-        const blob = new Blob([JSON.stringify(saveData)], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        const dateString = new Date().toLocaleString().replace(/[^0-9a-zA-Z]/g, "_"); // avoid special characters in the filename
-        link.download = `CMDR_${this.player.name}_${dateString}.json`;
-        link.click();
+        this.engine.onEndFrameObservable.addOnce(() => {
+            const saveData = this.generateSaveData();
+            const blob = new Blob([JSON.stringify(saveData)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            const dateString = new Date().toLocaleString().replace(/[^0-9a-zA-Z]/g, "_"); // avoid special characters in the filename
+            link.download = `CMDR_${this.player.name}_${dateString}.json`;
+            link.click();
+        });
     }
 
     /**
