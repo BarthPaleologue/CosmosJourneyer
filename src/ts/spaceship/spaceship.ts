@@ -484,7 +484,7 @@ export class Spaceship implements Transformable {
 
         const distanceToBody = Vector3.Distance(this.getTransform().getAbsolutePosition(), this.nearestCelestialBody.getTransform().getAbsolutePosition());
         const currentFuelPercentage = this.getRemainingFuel() / this.getTotalFuelCapacity();
-        if (currentFuelPercentage === 1 || distanceToBody > this.nearestCelestialBody.getBoundingRadius() * 1.5) {
+        if (Math.abs(currentFuelPercentage - 1) < 0.01 || distanceToBody > this.nearestCelestialBody.getBoundingRadius() * 1.7) {
             if (this.isFuelScooping) {
                 this.isFuelScooping = false;
                 this.onFuelScoopEnd.notifyObservers();
