@@ -131,7 +131,7 @@ export class CosmosJourneyer {
             await this.loadSaveData(tutorial.saveData);
             this.resume();
             this.tutorialLayer.setTutorial(tutorial.getTitle(), await tutorial.getContentPanelsHtml());
-            this.starSystemView.targetCursorLayer.setEnabled(true);
+            this.starSystemView.setUIEnabled(true);
             this.starSystemView.getSpaceshipControls().spaceship.disableWarpDrive();
             this.starSystemView.getSpaceshipControls().spaceship.setMainEngineThrottle(0);
             Settings.TIME_MULTIPLIER = 1;
