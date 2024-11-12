@@ -6,9 +6,16 @@ import station1ImageSrc from "../../asset/tutorials/stationLandingTutorial/stati
 import stationLandingBayImageSrc from "../../asset/tutorials/stationLandingTutorial/stationLandingBay.webp";
 import stationPadApproachImageSrc from "../../asset/tutorials/stationLandingTutorial/stationPadApproach.webp";
 import stationServicesImageSrc from "../../asset/tutorials/stationLandingTutorial/stationServices.webp";
+import saveData from "../../asset/tutorials/stationLandingTutorial/save.json";
 import i18n from "../i18n";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
+import { parseSaveFileData } from "../saveFile/saveFileData";
+
+const parsedSaveData = parseSaveFileData(JSON.stringify(saveData));
+if (parsedSaveData.data === null) {
+    throw new Error("StationLandingTutorial: saveData is null");
+}
 
 export const StationLandingTutorial: Tutorial = {
     getTitle() {
@@ -18,6 +25,7 @@ export const StationLandingTutorial: Tutorial = {
     getDescription() {
         return i18n.t("tutorials:stationLanding:description");
     },
+    saveData: parsedSaveData.data,
     async getContentPanelsHtml(): Promise<string[]> {
         const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
         const presentationPanelHtml = `
@@ -42,7 +50,7 @@ export const StationLandingTutorial: Tutorial = {
             <p>${i18n.t("tutorials:stationLanding:whereLandingBay")}</p>
             
             <p>${i18n.t("tutorials:stationLanding:landingRequest", {
-                keys: pressInteractionToStrings(SpaceShipControlsInputs.map.emitLandingRequest, keyboardLayoutMap).join(` ${i18n.t("common:or")} `)
+            keys: pressInteractionToStrings(SpaceShipControlsInputs.map.emitLandingRequest, keyboardLayoutMap).join(` ${i18n.t("common:or")} `)
         })}</p>
             
         </div>`;

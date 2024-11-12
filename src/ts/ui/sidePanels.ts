@@ -23,7 +23,7 @@ export class SidePanels {
     private readonly creditsPanel: HTMLElement;
     private readonly aboutPanel: HTMLElement;
 
-    constructor(starSystemView: StarSystemView) {
+    constructor() {
         const loadSavePanel = document.getElementById("loadSavePanel");
         if (loadSavePanel === null) throw new Error("#loadSavePanel does not exist!");
         this.loadSavePanel = loadSavePanel;
@@ -33,7 +33,7 @@ export class SidePanels {
         const tutorialsPanel = document.getElementById("tutorials");
         if (tutorialsPanel === null) throw new Error("#tutorials does not exist!");
         this.tutorialsPanel = tutorialsPanel;
-        this.tutorialsPanelContent = new TutorialsPanelContent(starSystemView);
+        this.tutorialsPanelContent = new TutorialsPanelContent();
         this.tutorialsPanel.appendChild(this.tutorialsPanelContent.htmlRoot);
         this.tutorialsPanelContent.onTutorialSelected.add(() => {
             this.hideActivePanel();

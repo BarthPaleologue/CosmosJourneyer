@@ -15,14 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { UniverseObjectId } from "../utils/coordinates/universeCoordinates";
+import { SaveFileData } from "../saveFile/saveFileData";
 
 export interface Tutorial {
     getTitle(): string;
     coverImageSrc: string;
     getDescription(): string;
 
-    universeObjectId?: UniverseObjectId;
+    saveData: SaveFileData;
 
     getContentPanelsHtml(): Promise<string[]>;
 }

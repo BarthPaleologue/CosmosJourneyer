@@ -113,7 +113,7 @@ export class CosmosJourneyer {
 
         this.tutorialLayer = new TutorialLayer();
 
-        this.sidePanels = new SidePanels(this.starSystemView);
+        this.sidePanels = new SidePanels();
 
         this.mainMenu = new MainMenu(this.sidePanels, starSystemView);
         this.mainMenu.onStartObservable.add(async () => {
@@ -128,6 +128,7 @@ export class CosmosJourneyer {
 
         this.sidePanels.tutorialsPanelContent.onTutorialSelected.add(async (tutorial) => {
             this.mainMenu.hide();
+            await this.loadSaveData(tutorial.saveData);
             this.resume();
             this.tutorialLayer.setTutorial(tutorial.getTitle(), await tutorial.getContentPanelsHtml());
             this.starSystemView.targetCursorLayer.setEnabled(true);
@@ -205,17 +206,17 @@ export class CosmosJourneyer {
         // Init BabylonJS engine (use webgpu if ?webgpu is in the url)
         const engine = window.location.search.includes("webgpu")
             ? await EngineFactory.CreateAsync(canvas, {
-                  twgslOptions: {
-                      wasmPath: new URL("./utils/TWGSL/twgsl.wasm", import.meta.url).href,
-                      jsPath: new URL("./utils/TWGSL/twgsl.js", import.meta.url).href
-                  }
-              })
+                twgslOptions: {
+                    wasmPath: new URL("./utils/TWGSL/twgsl.wasm", import.meta.url).href,
+                    jsPath: new URL("./utils/TWGSL/twgsl.js", import.meta.url).href
+                }
+            })
             : new Engine(canvas, true, {
-                  // the preserveDrawingBuffer option is required for the screenshot feature to work
-                  preserveDrawingBuffer: true,
-                  useHighPrecisionMatrix: true,
-                  doNotHandleContextLost: true
-              });
+                // the preserveDrawingBuffer option is required for the screenshot feature to work
+                preserveDrawingBuffer: true,
+                useHighPrecisionMatrix: true,
+                doNotHandleContextLost: true
+            });
 
         engine.useReverseDepthBuffer = true;
         engine.loadingScreen = new LoadingScreen(canvas);
