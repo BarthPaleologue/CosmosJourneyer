@@ -30,7 +30,7 @@ import { CustomSystemRegistry } from "./starSystem/customSystemRegistry";
 import { newSeededTelluricSatelliteModel } from "./planets/telluricPlanet/telluricSatelliteModel";
 import { newSeededTelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModel";
 import { newSeededSpaceElevatorModel } from "./spacestation/spaceElevatorModel";
-import { getOrbitRadiusFromPeriod } from "./utils/physics";
+import { celsiusToKelvin, getOrbitRadiusFromPeriod } from "./utils/physics";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 
 const engine = await CosmosJourneyer.CreateAsync();
@@ -67,8 +67,8 @@ terminaModel.orbit.period = 60 * 60;
 const termina = StarSystemHelper.makeStar(starSystem, terminaModel);*/
 
 const hecateModel = newSeededTelluricPlanetModel(253, "Hécate", [sunModel]);
-hecateModel.physics.minTemperature = -40;
-hecateModel.physics.maxTemperature = 30;
+hecateModel.physics.minTemperature = celsiusToKelvin(-40);
+hecateModel.physics.maxTemperature = celsiusToKelvin(30);
 
 hecateModel.physics.siderealDayDuration = 6 * 60 * 60;
 
@@ -86,8 +86,8 @@ const spaceStationModel = newSeededSpaceElevatorModel(0, [sunModel], systemCoord
 const moonModel = newSeededTelluricSatelliteModel(23, "Manaleth", [hecateModel]);
 moonModel.physics.mass = 2;
 moonModel.physics.siderealDayDuration = 28 * 60 * 60;
-moonModel.physics.minTemperature = -180;
-moonModel.physics.maxTemperature = 200;
+moonModel.physics.minTemperature = celsiusToKelvin(-180);
+moonModel.physics.maxTemperature = celsiusToKelvin(200);
 moonModel.physics.waterAmount = 0.9;
 
 moonModel.orbit.period = moonModel.physics.siderealDayDuration;
@@ -97,8 +97,8 @@ const aresModel = newSeededTelluricPlanetModel(0.3725, "Ares", [sunModel]);
 if (aresModel.clouds !== null) aresModel.clouds.coverage = 1;
 aresModel.physics.mass = 7;
 aresModel.physics.siderealDayDuration = (24 * 60 * 60) / 30;
-aresModel.physics.minTemperature = -30;
-aresModel.physics.maxTemperature = 20;
+aresModel.physics.minTemperature = celsiusToKelvin(-30);
+aresModel.physics.maxTemperature = celsiusToKelvin(20);
 aresModel.physics.pressure = Settings.EARTH_SEA_LEVEL_PRESSURE * 0.5;
 aresModel.physics.waterAmount = 0.2;
 aresModel.physics.oceanLevel = 0;

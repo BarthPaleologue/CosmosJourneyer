@@ -32,9 +32,13 @@ import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import { getStarSystemCoordinatesFromSeed } from "../starSystem/systemSeed";
 
 export const FlightTutorial: Tutorial = {
-    title: i18n.t("tutorials:flightTutorial:title"),
+    getTitle() {
+        return i18n.t("tutorials:flightTutorial:title");
+    },
     coverImageSrc: welcomeImageSrc,
-    description: i18n.t("tutorials:flightTutorial:description"),
+    getDescription() {
+        return i18n.t("tutorials:flightTutorial:description");
+    },
 
     universeObjectId: {
         starSystemCoordinates: getStarSystemCoordinatesFromSeed({

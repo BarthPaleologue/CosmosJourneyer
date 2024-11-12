@@ -13,7 +13,7 @@ $gaps: 10px;
   font-family: variables.$main-font;
 
   padding: $gaps;
-    
+
   visibility: hidden;
 
   display: grid;
@@ -147,6 +147,40 @@ $gaps: 10px;
             &.accepted {
               background: var(--accent-color-light);
             }
+          }
+        }
+      }
+    }
+
+    .spaceshipContainer {
+      background: var(--accent-color-dark);
+      padding: 20px;
+
+      h3 {
+        margin-block: 0;
+      }
+
+      .fuelManagementContainer {
+        display: flex;
+
+        p {
+          flex-grow: 1;
+        }
+
+        button {
+          background: var(--accent-color);
+          outline: none;
+          border: none;
+          color: white;
+          font-family: variables.$main-font;
+          padding: 1.0vmin;
+          font-size: var(--text-size);
+
+          transition: variables.$transition-time;
+
+          &:hover {
+            background: var(--accent-color-light);
+            cursor: pointer;
           }
         }
       }

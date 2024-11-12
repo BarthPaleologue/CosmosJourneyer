@@ -7,9 +7,13 @@ import i18n from "../i18n";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 
 export const TemplateTutorial: Tutorial = {
-    title: "Template Tutorial",
+    getTitle() {
+        return "Template Tutorial";
+    },
     coverImageSrc: welcomeImageSrc,
-    description: "This is a template tutorial to help building more tutorials!",
+    getDescription() {
+        return "This is a template tutorial to help building more tutorials!";
+    },
     async getContentPanelsHtml(): Promise<string[]> {
         const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
         const welcomePanelHtml = `

@@ -30,7 +30,7 @@ import { setEnabledBody } from "../utils/havok";
 import { getForwardDirection, getUpwardDirection, rotate, setRotationQuaternion, translate } from "../uberCore/transforms/basicTransform";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
-import { CollisionMask } from "../settings";
+import { CollisionMask, Settings } from "../settings";
 import { Transformable } from "../architecture/transformable";
 import { WarpTunnel } from "../utils/warpTunnel";
 import { Quaternion } from "@babylonjs/core/Maths/math";
@@ -44,9 +44,11 @@ import { Objects } from "../assets/objects";
 import { Sounds } from "../assets/sounds";
 import { LandingPad } from "../assets/procedural/landingPad/landingPad";
 import { createNotification } from "../utils/notification";
-import { OrbitalObject } from "../architecture/orbitalObject";
+import { OrbitalObject, OrbitalObjectType } from "../architecture/orbitalObject";
 import { CelestialBody } from "../architecture/celestialBody";
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
+import { FuelTank, SerializedFuelTank } from "./fuelTank";
+import { FuelScoop } from "./fuelScoop";
 
 const enum ShipState {
     FLYING,
@@ -54,7 +56,29 @@ const enum ShipState {
     LANDED
 }
 
+export const enum ShipType {
+    WANDERER
+}
+
+export type SerializedSpaceship = {
+    name: string;
+    type: ShipType;
+    fuelTanks: SerializedFuelTank[];
+    fuelScoop: FuelScoop | null;
+};
+
+export const DefaultSerializedSpaceship: SerializedSpaceship = {
+    name: "Wanderer",
+    type: ShipType.WANDERER,
+    fuelTanks: [{ currentFuel: 100, maxFuel: 100 }],
+    fuelScoop: {
+        fuelPerSecond: 2.5
+    }
+};
+
 export class Spaceship implements Transformable {
+    readonly name: string;
+
     readonly instanceRoot: AbstractMesh;
 
     readonly aggregate: PhysicsAggregate;
@@ -84,12 +108,20 @@ export class Spaceship implements Transformable {
 
     private mainThrusters: MainThruster[] = [];
 
+    readonly fuelTanks: FuelTank[];
+
+    readonly fuelScoop: FuelScoop | null;
+    private isFuelScooping = false;
+
     readonly enableWarpDriveSound: AudioInstance;
     readonly disableWarpDriveSound: AudioInstance;
     readonly acceleratingWarpDriveSound: AudioInstance;
     readonly deceleratingWarpDriveSound: AudioInstance;
     readonly hyperSpaceSound: AudioInstance;
     readonly thrusterSound: AudioInstance;
+
+    readonly onFuelScoopStart = new Observable<void>();
+    readonly onFuelScoopEnd = new Observable<void>();
 
     readonly onWarpDriveEnabled = new Observable<void>();
     readonly onWarpDriveDisabled = new Observable<boolean>();
@@ -100,7 +132,9 @@ export class Spaceship implements Transformable {
 
     readonly onTakeOff = new Observable<void>();
 
-    constructor(scene: Scene) {
+    private constructor(serializedSpaceShip: SerializedSpaceship, scene: Scene) {
+        this.name = serializedSpaceShip.name;
+
         this.instanceRoot = Objects.CreateWandererInstance();
         setRotationQuaternion(this.instanceRoot, Quaternion.Identity());
 
@@ -141,6 +175,10 @@ export class Spaceship implements Transformable {
         this.deceleratingWarpDriveSound = new AudioInstance(Sounds.DECELERATING_WARP_DRIVE_SOUND, AudioMasks.STAR_SYSTEM_VIEW, 0, false, this.getTransform());
         this.hyperSpaceSound = new AudioInstance(Sounds.HYPER_SPACE_SOUND, AudioMasks.HYPER_SPACE, 0, false, this.getTransform());
         this.thrusterSound = new AudioInstance(Sounds.THRUSTER_SOUND, AudioMasks.STAR_SYSTEM_VIEW, 0, false, this.getTransform());
+
+        this.fuelTanks = serializedSpaceShip.fuelTanks.map((tank) => FuelTank.Deserialize(tank));
+
+        this.fuelScoop = serializedSpaceShip.fuelScoop;
 
         AudioManager.RegisterSound(this.enableWarpDriveSound);
         AudioManager.RegisterSound(this.disableWarpDriveSound);
@@ -439,6 +477,42 @@ export class Spaceship implements Transformable {
         return canEngage;
     }
 
+    private handleFuelScoop(deltaSeconds: number) {
+        if (this.fuelScoop === null) return;
+        if (this.nearestCelestialBody === null) return;
+        if (![OrbitalObjectType.STAR, OrbitalObjectType.GAS_PLANET].includes(this.nearestCelestialBody.model.type)) return;
+
+        const distanceToBody = Vector3.Distance(this.getTransform().getAbsolutePosition(), this.nearestCelestialBody.getTransform().getAbsolutePosition());
+        const currentFuelPercentage = this.getRemainingFuel() / this.getTotalFuelCapacity();
+        if (Math.abs(currentFuelPercentage - 1) < 0.01 || distanceToBody > this.nearestCelestialBody.getBoundingRadius() * 1.7) {
+            if (this.isFuelScooping) {
+                this.isFuelScooping = false;
+                this.onFuelScoopEnd.notifyObservers();
+            }
+
+            return;
+        }
+
+        if (!this.isFuelScooping) {
+            this.isFuelScooping = true;
+            this.onFuelScoopStart.notifyObservers();
+        }
+
+        let fuelAvailability;
+        switch (this.nearestCelestialBody.model.type) {
+            case OrbitalObjectType.STAR:
+                fuelAvailability = 1;
+                break;
+            case OrbitalObjectType.GAS_PLANET:
+                fuelAvailability = 0.3;
+                break;
+            default:
+                fuelAvailability = 0;
+        }
+
+        this.refuel(this.fuelScoop.fuelPerSecond * fuelAvailability * deltaSeconds);
+    }
+
     public update(deltaSeconds: number) {
         this.mainEngineTargetSpeed = this.mainEngineThrottle * 500;
 
@@ -448,6 +522,8 @@ export class Spaceship implements Transformable {
 
         let closestDistance = Number.POSITIVE_INFINITY;
         let objectHalfThickness = 0;
+
+        this.handleFuelScoop(deltaSeconds);
 
         if (this.warpDrive.isEnabled()) {
             if (!this.canEngageWarpDrive()) {
@@ -558,6 +634,68 @@ export class Spaceship implements Transformable {
         if (this.state === ShipState.LANDING) {
             this.land(deltaSeconds);
         }
+
+        const distanceTravelledLY = (this.getSpeed() * deltaSeconds) / Settings.LIGHT_YEAR;
+        const fuelToBurn = this.warpDrive.getFuelConsumption(distanceTravelledLY);
+        if (fuelToBurn < this.getRemainingFuel()) {
+            this.burnFuel(fuelToBurn);
+        } else {
+            this.emergencyStopWarpDrive();
+            this.mainEngineThrottle = 0;
+        }
+    }
+
+    public getTotalFuelCapacity(): number {
+        return this.fuelTanks.reduce((acc, tank) => acc + tank.getMaxFuel(), 0);
+    }
+
+    public getRemainingFuel(): number {
+        return this.fuelTanks.reduce((acc, tank) => acc + tank.getCurrentFuel(), 0);
+    }
+
+    public burnFuel(amount: number): number {
+        if (amount > this.getRemainingFuel()) {
+            throw new Error("Not enough fuel in the tanks.");
+        }
+
+        let fuelLeftToBurn = amount;
+        for (const tank of this.fuelTanks) {
+            const tankRemainingBefore = tank.getCurrentFuel();
+            tank.burnFuel(Math.min(fuelLeftToBurn, tankRemainingBefore));
+            const tankRemainingAfter = tank.getCurrentFuel();
+            fuelLeftToBurn -= tankRemainingBefore - tankRemainingAfter;
+        }
+
+        return amount - fuelLeftToBurn;
+    }
+
+    public refuel(amount: number): number {
+        let fuelLeftToRefuel = amount;
+        for (const tank of this.fuelTanks) {
+            const tankRemainingBefore = tank.getCurrentFuel();
+            tank.fill(Math.min(fuelLeftToRefuel, tank.getMaxFuel() - tankRemainingBefore));
+            const tankRemainingAfter = tank.getCurrentFuel();
+            fuelLeftToRefuel -= tankRemainingAfter - tankRemainingBefore;
+        }
+
+        return amount - fuelLeftToRefuel;
+    }
+
+    public static CreateDefault(scene: Scene): Spaceship {
+        return Spaceship.Deserialize(DefaultSerializedSpaceship, scene);
+    }
+
+    public static Deserialize(serializedSpaceship: SerializedSpaceship, scene: Scene): Spaceship {
+        return new Spaceship(serializedSpaceship, scene);
+    }
+
+    public serialize(): SerializedSpaceship {
+        return {
+            name: this.name,
+            type: ShipType.WANDERER,
+            fuelTanks: this.fuelTanks.map((tank) => tank.serialize()),
+            fuelScoop: this.fuelScoop
+        };
     }
 
     public dispose() {

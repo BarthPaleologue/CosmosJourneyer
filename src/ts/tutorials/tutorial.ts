@@ -18,9 +18,9 @@
 import { UniverseObjectId } from "../utils/coordinates/universeCoordinates";
 
 export interface Tutorial {
-    title: string;
+    getTitle(): string;
     coverImageSrc: string;
-    description: string;
+    getDescription(): string;
 
     universeObjectId?: UniverseObjectId;
 

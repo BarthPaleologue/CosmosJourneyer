@@ -72,6 +72,14 @@ import { StarSystemModel } from "./starSystemModel";
 import { OrbitalObjectType } from "../architecture/orbitalObject";
 import { OrbitalFacility } from "../spacestation/orbitalFacility";
 import { getStarGalacticPosition } from "../utils/coordinates/starSystemCoordinatesUtils";
+import { Spaceship } from "../spaceship/spaceship";
+
+// register cosmos journeyer as part of window object
+declare global {
+    interface Window {
+        starSystemView: StarSystemView;
+    }
+}
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -251,6 +259,19 @@ export class StarSystemView implements View {
 
             const shipControls = this.getSpaceshipControls();
 
+            const currentSystemPosition = getStarGalacticPosition(this.getStarSystem().model.coordinates);
+            const targetSystemPosition = getStarGalacticPosition(target.systemCoordinates);
+
+            const distanceLY = Vector3.Distance(currentSystemPosition, targetSystemPosition);
+
+            const fuelForJump = shipControls.spaceship.getWarpDrive().getFuelConsumption(distanceLY);
+
+            if (shipControls.spaceship.getRemainingFuel() < fuelForJump) {
+                createNotification(i18n.t("notifications:notEnoughFuel"), 5000);
+                this.jumpLock = false;
+                return;
+            }
+
             // first, align spaceship with target
             const currentForward = getForwardDirection(shipControls.getTransform());
             const targetForward = target.getTransform().getAbsolutePosition().subtract(shipControls.getTransform().getAbsolutePosition()).normalize();
@@ -270,7 +291,6 @@ export class StarSystemView implements View {
             });
 
             // then, initiate hyper space jump
-
             if (!this.spaceshipControls?.spaceship.getWarpDrive().isEnabled()) this.spaceshipControls?.spaceship.enableWarpDrive();
             this.spaceshipControls?.spaceship.hyperSpaceTunnel.setEnabled(true);
             this.spaceshipControls?.spaceship.warpTunnel.getTransform().setEnabled(false);
@@ -280,6 +300,8 @@ export class StarSystemView implements View {
                 const deltaSeconds = this.scene.getEngine().getDeltaTime() / 1000;
                 this.spaceshipControls?.spaceship.hyperSpaceTunnel.update(deltaSeconds);
             });
+
+            this.spaceshipControls?.spaceship.burnFuel(fuelForJump);
 
             const starSystemCoordinates = target.systemCoordinates;
             const systemModel = getSystemModelFromCoordinates(starSystemCoordinates);
@@ -398,6 +420,8 @@ export class StarSystemView implements View {
             globalRoot: inspectorRoot,
         });
         */
+
+        window.starSystemView = this;
     }
 
     /**
@@ -522,11 +546,17 @@ export class StarSystemView implements View {
 
     /**
      * Initializes the assets using the scene of the star system view.
-     * It then initializes the default controls, the spaceship controls and the character controls with the associated 3D models and cameras.
-     * This method must be awaited before doing anything that requires the assets or the controls to be initialized.
      */
     public async initAssets() {
         await Assets.Init(this.scene);
+    }
+
+    /**
+     * Call this when the player object is changed when loading a save.
+     * It will remove the current controls and recreate them based on the player object.
+     */
+    public resetPlayer() {
+        this.spaceshipControls?.dispose();
 
         const maxZ = Settings.EARTH_RADIUS * 1e5;
 
@@ -534,7 +564,14 @@ export class StarSystemView implements View {
         this.defaultControls.speed = 0.2 * Settings.EARTH_RADIUS;
         this.defaultControls.getActiveCameras().forEach((camera) => (camera.maxZ = maxZ));
 
-        this.spaceshipControls = new ShipControls(this.scene);
+        const spaceshipSerialized = this.player.serializedSpaceships.shift();
+        if (spaceshipSerialized === undefined) throw new Error("No spaceship serialized in player");
+
+        const spaceship = Spaceship.Deserialize(spaceshipSerialized, this.scene);
+        this.player.instancedSpaceships.push(spaceship);
+
+        this.spaceshipControls = new ShipControls(spaceship, this.scene);
+
         this.spaceshipControls.getActiveCameras().forEach((camera) => (camera.maxZ = maxZ));
 
         this.characterControls = new CharacterControls(this.scene);
@@ -577,6 +614,22 @@ export class StarSystemView implements View {
         } else {
             this.spaceShipLayer.displaySpeed(this.spaceshipControls.spaceship.getThrottle(), this.spaceshipControls.spaceship.getSpeed());
         }
+
+        //const currentSystemPosition = getStarGalacticPosition(starSystem.model.coordinates);
+        //const nextSystemPosition = this.player.currentItinerary.length > 1 ? getStarGalacticPosition(this.player.currentItinerary[1]) : currentSystemPosition;
+        //const distanceLY = Vector3.Distance(currentSystemPosition, nextSystemPosition);
+
+        const target = this.targetCursorLayer.getTarget();
+
+        const distanceLY =
+            target !== null ? Vector3.Distance(this.spaceshipControls.getTransform().getAbsolutePosition(), target.getTransform().getAbsolutePosition()) / Settings.LIGHT_YEAR : 0;
+
+        const fuelForJump = warpDrive.getFuelConsumption(distanceLY);
+
+        this.spaceShipLayer.displayFuel(
+            this.spaceshipControls.spaceship.getRemainingFuel() / this.spaceshipControls.spaceship.getTotalFuelCapacity(),
+            fuelForJump / this.spaceshipControls.spaceship.getTotalFuelCapacity()
+        );
 
         this.characterControls.setClosestWalkableObject(nearestOrbitalObject);
         this.spaceshipControls.spaceship.setClosestWalkableObject(nearestOrbitalObject);

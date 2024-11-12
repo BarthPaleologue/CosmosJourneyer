@@ -1,0 +1,17 @@
+{
+  "missions": "Missions",
+  "missionsDescription": "Find your next destination",
+  "market": "Market",
+  "marketDescription": "Buy and sell resources",
+  "explorationCenter": "Exploration Center",
+  "explorationCenterDescription": "Sell your discoveries to the Encyclopaedia",
+  "shipHangar": "Ship Hangar",
+  "shipHangarDescription": "Refuel and outfit your ship",
+  "stationInformation": "Station",
+  "stationInformationDescription": "Station information",
+  "takeOff": "Take Off",
+  "takeOffDescription": "Continue your journey",
+  "refuel": "Refuel",
+  "otherSpaceships": "Other Spaceships",
+  "noOtherSpaceship": "No other spaceship"
+}

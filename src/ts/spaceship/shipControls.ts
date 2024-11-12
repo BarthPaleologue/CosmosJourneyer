@@ -53,8 +53,8 @@ export class ShipControls implements Controls {
 
     private closestLandableFacility: (Transformable & ManagesLandingPads) | null = null;
 
-    constructor(scene: Scene) {
-        this.spaceship = new Spaceship(scene);
+    constructor(spaceship: Spaceship, scene: Scene) {
+        this.spaceship = spaceship;
 
         this.firstPersonCamera = new FreeCamera("shipFirstPersonCamera", Vector3.Zero(), scene);
         this.firstPersonCamera.parent = this.getTransform();
@@ -143,6 +143,14 @@ export class ShipControls implements Controls {
 
         this.baseFov = this.thirdPersonCamera.fov;
         this.targetFov = this.baseFov;
+
+        this.spaceship.onFuelScoopStart.add(() => {
+            Sounds.EnqueuePlay(Sounds.FUEL_SCOOPING_VOICE);
+        });
+
+        this.spaceship.onFuelScoopEnd.add(() => {
+            Sounds.EnqueuePlay(Sounds.FUEL_SCOOPING_COMPLETE_VOICE);
+        });
 
         this.spaceship.onLandingObservable.add(async () => {
             const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();

@@ -22,7 +22,12 @@ module.exports = {
   "rules": {
     "import/no-cycle": "error",
     "import/no-unresolved": "warn",
-    "@typescript-eslint/switch-exhaustiveness-check": "error",
+    "@typescript-eslint/switch-exhaustiveness-check": [
+        "error",
+        {
+            "considerDefaultExhaustiveForUnions": true
+        }
+    ],
     "@typescript-eslint/no-inferrable-types": "warn",
     "@typescript-eslint/no-unused-vars": "warn",
     "@typescript-eslint/no-explicit-any": "warn",

@@ -61,6 +61,13 @@ const enum EngineState {
     PAUSED
 }
 
+// register cosmos journeyer as part of window object
+declare global {
+    interface Window {
+        cosmosJourneyer: CosmosJourneyer;
+    }
+}
+
 /**
  * Main class of Cosmos Journeyer. It handles the underlying BabylonJS engine, and the communication between
  * the starmap view and the star system view. It also provides utility methods to take screenshots and record videos.
@@ -110,7 +117,7 @@ export class CosmosJourneyer {
 
         this.mainMenu = new MainMenu(this.sidePanels, starSystemView);
         this.mainMenu.onStartObservable.add(async () => {
-            this.tutorialLayer.setTutorial(FlightTutorial.title, await FlightTutorial.getContentPanelsHtml());
+            this.tutorialLayer.setTutorial(FlightTutorial.getTitle(), await FlightTutorial.getContentPanelsHtml());
 
             this.starSystemView.switchToSpaceshipControls();
         });
@@ -122,7 +129,7 @@ export class CosmosJourneyer {
         this.sidePanels.tutorialsPanelContent.onTutorialSelected.add(async (tutorial) => {
             this.mainMenu.hide();
             this.resume();
-            this.tutorialLayer.setTutorial(tutorial.title, await tutorial.getContentPanelsHtml());
+            this.tutorialLayer.setTutorial(tutorial.getTitle(), await tutorial.getContentPanelsHtml());
             this.starSystemView.targetCursorLayer.setEnabled(true);
             this.starSystemView.getSpaceshipControls().spaceship.disableWarpDrive();
             this.starSystemView.getSpaceshipControls().spaceship.setMainEngineThrottle(0);
@@ -182,6 +189,8 @@ export class CosmosJourneyer {
             if (!this.isPaused()) this.pause();
             else this.resume();
         });
+
+        window.cosmosJourneyer = this;
     }
 
     /**
@@ -231,6 +240,7 @@ export class CosmosJourneyer {
         const starSystemView = new StarSystemView(player, engine, havokInstance);
 
         await starSystemView.initAssets();
+        starSystemView.resetPlayer();
 
         return new CosmosJourneyer(player, engine, starSystemView);
     }
@@ -406,6 +416,7 @@ export class CosmosJourneyer {
 
         const newPlayer = saveData.player !== undefined ? Player.Deserialize(saveData.player) : Player.Default();
         this.player.copyFrom(newPlayer);
+        this.starSystemView.resetPlayer();
 
         await this.loadUniverseCoordinates(saveData.universeCoordinates);
 
