@@ -192,6 +192,7 @@ export class CurrentMissionDisplay {
     private setNoMissionActive() {
         this.missionPanelTitle.innerText = "No active mission";
         this.missionPanelDescription.innerText = "You can get missions at space stations.";
+        this.missionCounter.innerText = "0/0";
     }
 
     public dispose() {
