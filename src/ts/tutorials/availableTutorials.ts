@@ -17,5 +17,6 @@
 
 import { Tutorial } from "./tutorial";
 import { FlightTutorial } from "./flightTutorial";
+import { StationLandingTutorial } from "./stationLandingTutorial";
 
-export const AvailableTutorials: Tutorial[] = [FlightTutorial];
+export const AvailableTutorials: Tutorial[] = [FlightTutorial, StationLandingTutorial];
