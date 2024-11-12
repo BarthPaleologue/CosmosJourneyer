@@ -53,6 +53,11 @@ export class ShipControls implements Controls {
 
     private closestLandableFacility: (Transformable & ManagesLandingPads) | null = null;
 
+    private toggleWarpDriveHandler: () => void;
+    private landingHandler: () => void;
+    private emitLandingRequestHandler: () => void;
+    private throttleToZeroHandler: () => void;
+
     constructor(spaceship: Spaceship, scene: Scene) {
         this.spaceship = spaceship;
 
@@ -67,7 +72,7 @@ export class ShipControls implements Controls {
 
         this.scene = scene;
 
-        SpaceShipControlsInputs.map.toggleWarpDrive.on("complete", async () => {
+        this.toggleWarpDriveHandler = async () => {
             if (!this.spaceship.canEngageWarpDrive() && this.spaceship.getWarpDrive().isDisabled()) {
                 Sounds.CANNOT_ENGAGE_WARP_DRIVE.play();
                 return;
@@ -96,9 +101,11 @@ export class ShipControls implements Controls {
                     }
                 }
             }
-        });
+        };
 
-        SpaceShipControlsInputs.map.landing.on("complete", async () => {
+        SpaceShipControlsInputs.map.toggleWarpDrive.on("complete", this.toggleWarpDriveHandler);
+
+        this.landingHandler = async () => {
             const keyboardLayout = await getGlobalKeyboardLayoutMap();
             if (this.spaceship.isWarpDriveEnabled()) {
                 const relevantKeys = pressInteractionToStrings(SpaceShipControlsInputs.map.toggleWarpDrive, keyboardLayout);
@@ -118,9 +125,11 @@ export class ShipControls implements Controls {
             }
 
             this.spaceship.engagePlanetaryLanding(null);
-        });
+        };
 
-        SpaceShipControlsInputs.map.emitLandingRequest.on("complete", () => {
+        SpaceShipControlsInputs.map.landing.on("complete", this.landingHandler);
+
+        this.emitLandingRequestHandler = () => {
             if (this.spaceship.isLanded() || this.spaceship.isLanding()) return;
             if (this.closestLandableFacility === null) return;
             const landingPad = this.closestLandableFacility.handleLandingRequest({ minimumPadSize: LandingPadSize.SMALL });
@@ -134,12 +143,16 @@ export class ShipControls implements Controls {
             Sounds.STRAUSS_BLUE_DANUBE.setVolume(1, 1);
             createNotification(`Landing request granted. Proceed to pad ${landingPad.padNumber}`, 30000);
             this.spaceship.engageLandingOnPad(landingPad);
-        });
+        };
 
-        SpaceShipControlsInputs.map.throttleToZero.on("complete", () => {
+        SpaceShipControlsInputs.map.emitLandingRequest.on("complete", this.emitLandingRequestHandler);
+
+        this.throttleToZeroHandler = () => {
             this.spaceship.setMainEngineThrottle(0);
             this.spaceship.getWarpDrive().increaseThrottle(-this.spaceship.getWarpDrive().getThrottle());
-        });
+        };
+
+        SpaceShipControlsInputs.map.throttleToZero.on("complete", this.throttleToZeroHandler);
 
         this.baseFov = this.thirdPersonCamera.fov;
         this.targetFov = this.baseFov;
@@ -256,6 +269,11 @@ export class ShipControls implements Controls {
     }
 
     dispose() {
+        SpaceShipControlsInputs.map.toggleWarpDrive.off("complete", this.toggleWarpDriveHandler);
+        SpaceShipControlsInputs.map.landing.off("complete", this.landingHandler);
+        SpaceShipControlsInputs.map.emitLandingRequest.off("complete", this.emitLandingRequestHandler);
+        SpaceShipControlsInputs.map.throttleToZero.off("complete", this.throttleToZeroHandler);
+
         this.spaceship.dispose();
         this.thirdPersonCamera.dispose();
         this.firstPersonCamera.dispose();
