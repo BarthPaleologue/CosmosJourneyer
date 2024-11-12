@@ -59,7 +59,7 @@ float sphereOccultation(vec3 rayDir, float maximumDistance) {
             vec3 closestPointToPlanetCenter = camera_position + rayDir * maximumDistance + towardLight * (t0 + t1) * 0.5;
             float closestDistanceToPlanetCenter = length(closestPointToPlanetCenter - object_position);
             float r01 = remap(closestDistanceToPlanetCenter, 0.0, object_radius, 0.0, 1.0);
-            return 0.2 + 0.8 * smoothstep(0.85, 1.0, r01);
+            return 0.01 + 0.99 * smoothstep(0.85, 1.0, r01);
         }
     }
     return 1.0;
@@ -76,10 +76,10 @@ float ringOccultation(vec3 rayDir, float maximumDistance) {
         float t2;
         if (rayIntersectsPlane(camera_position + rayDir * maximumDistance, towardLight, object_position, object_rotationAxis, 0.001, t2)) {
             vec3 shadowSamplePoint = camera_position + rayDir * maximumDistance + t2 * towardLight;
-            accDensity += ringDensityAtPoint(shadowSamplePoint) * rings_opacity;
+            accDensity += pow(ringDensityAtPoint(shadowSamplePoint), 0.5) * rings_opacity * smoothstep(15000.0 * 2.0, 15000.0 * 5.0, t2);
         }
     }
-    return pow(1.0 - accDensity, 4.0) * 0.8 + 0.2;
+    return pow(1.0 - accDensity, 4.0) * 0.99 + 0.01;
 }
 
 void main() {
