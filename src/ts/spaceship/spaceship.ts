@@ -89,6 +89,8 @@ export class Spaceship implements Transformable {
     private mainEngineThrottle = 0;
     private mainEngineTargetSpeed = 0;
 
+    private readonly thrusterForce = 8000;
+
     /**
      * Maximum speed of the ship in m/s
      * @private
@@ -601,9 +603,9 @@ export class Spaceship implements Transformable {
             else this.thrusterSound.setTargetVolume(0);
 
             if (forwardSpeed < this.mainEngineTargetSpeed) {
-                this.aggregate.body.applyForce(forwardDirection.scale(3000), this.aggregate.body.getObjectCenterWorld());
+                this.aggregate.body.applyForce(forwardDirection.scale(this.thrusterForce), this.aggregate.body.getObjectCenterWorld());
             } else {
-                this.aggregate.body.applyForce(forwardDirection.scale(-3000), this.aggregate.body.getObjectCenterWorld());
+                this.aggregate.body.applyForce(forwardDirection.scale(-0.7 * this.thrusterForce), this.aggregate.body.getObjectCenterWorld());
             }
 
             this.mainThrusters.forEach((thruster) => {
