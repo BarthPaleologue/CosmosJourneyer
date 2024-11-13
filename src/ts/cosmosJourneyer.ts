@@ -132,8 +132,13 @@ export class CosmosJourneyer {
             this.resume();
             this.tutorialLayer.setTutorial(tutorial.getTitle(), await tutorial.getContentPanelsHtml());
             this.starSystemView.setUIEnabled(true);
-            this.starSystemView.getSpaceshipControls().spaceship.disableWarpDrive();
-            this.starSystemView.getSpaceshipControls().spaceship.setMainEngineThrottle(0);
+
+            const targetObject = getObjectBySystemId(tutorial.saveData.universeCoordinates.universeObjectId, this.starSystemView.getStarSystem());
+            if (targetObject === null) {
+                throw new Error("Could not find the target object of the tutorial even though it should be in the star system");
+            }
+            this.starSystemView.getSpaceshipControls().getTransform().lookAt(targetObject.getTransform().getAbsolutePosition());
+
             Settings.TIME_MULTIPLIER = 1;
         });
 
