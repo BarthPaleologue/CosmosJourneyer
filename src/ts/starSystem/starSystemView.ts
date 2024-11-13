@@ -299,6 +299,7 @@ export class StarSystemView implements View {
             const observer = this.scene.onBeforeRenderObservable.add(() => {
                 const deltaSeconds = this.scene.getEngine().getDeltaTime() / 1000;
                 this.spaceshipControls?.spaceship.hyperSpaceTunnel.update(deltaSeconds);
+                this.spaceshipControls?.spaceship.warpTunnel.update(deltaSeconds);
             });
 
             this.spaceshipControls?.spaceship.burnFuel(fuelForJump);
