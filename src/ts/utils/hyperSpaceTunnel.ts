@@ -12,6 +12,7 @@ import warpConeVertex from "../../shaders/warpConeMaterial/vertex.glsl";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Transformable } from "../architecture/transformable";
 import { Textures } from "../assets/textures";
+import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 
 /**
  * @see https://playground.babylonjs.com/#W9LE0U#28
@@ -37,7 +38,7 @@ export class HyperSpaceTunnel implements Transformable {
     readonly v2: Vector3;
 
     readonly spaceLines: LinesMesh;
-    readonly warpCone: Mesh;
+    readonly hyperTunnel: Mesh;
 
     readonly warpConeMaterial: ShaderMaterial;
 
@@ -82,21 +83,24 @@ export class HyperSpaceTunnel implements Transformable {
             scene
         );
 
-        this.warpCone = MeshBuilder.CreateCylinder(
-            "cone",
+        const path: Vector3[] = [];
+        const nbPoint = 10;
+        const tunnelOffset = 500;
+        path.push(new Vector3(0, 0, -200));
+        for(let i = 0; i < nbPoint; i++) {
+            path.push(new Vector3(0, tunnelOffset * (i / nbPoint) ** 4, 800 * i / nbPoint));
+        }
+
+        this.hyperTunnel = MeshBuilder.CreateTube(
+            "hyperTunnel",
             {
-                diameterTop: this.diameterTop,
-                diameterBottom: this.diameterBottom,
-                height: this.positiveDepth + this.negativeDepth,
+                radius: this.diameterBottom / 2,
+                path: path,
                 sideOrientation: Mesh.BACKSIDE,
-                subdivisions: 64
+                tessellation: 64
             },
             scene
         );
-        this.warpCone.parent = this.parent;
-        this.warpCone.rotation.x = Math.PI / 2;
-        this.warpCone.position.z = this.positiveDepth / 2;
-        this.warpCone.bakeCurrentTransformIntoVertices();
 
         Effect.ShadersStore["warpConeMaterialFragmentShader"] = warpConeFragment;
         Effect.ShadersStore["warpConeMaterialVertexShader"] = warpConeVertex;
@@ -107,7 +111,7 @@ export class HyperSpaceTunnel implements Transformable {
         });
         this.warpConeMaterial.setTexture("warpNoise", Textures.SEAMLESS_PERLIN);
 
-        this.warpCone.material = this.warpConeMaterial;
+        this.hyperTunnel.material = this.warpConeMaterial;
     }
 
     private getRandomStartingPositions(): [Vector3, Vector3] {
@@ -135,7 +139,7 @@ export class HyperSpaceTunnel implements Transformable {
 
     setEnabled(enabled: boolean) {
         this.spaceLines.setEnabled(enabled);
-        this.warpCone.setEnabled(enabled);
+        this.hyperTunnel.setEnabled(enabled);
     }
 
     getTransform(): TransformNode {
@@ -170,7 +174,7 @@ export class HyperSpaceTunnel implements Transformable {
         if (this.parent === null) return;
 
         this.spaceLines.position = this.parent.getAbsolutePosition();
-        this.warpCone.position = this.parent.getAbsolutePosition();
+        this.hyperTunnel.position = this.parent.getAbsolutePosition();
 
         const targetForward = getForwardDirection(this.parent);
         const currentForward = getForwardDirection(this.getTransform());
@@ -181,11 +185,11 @@ export class HyperSpaceTunnel implements Transformable {
         const theta = Math.acos(Vector3.Dot(currentForward, targetForward));
 
         rotate(this.spaceLines, rotationAxis, theta);
-        rotate(this.warpCone, rotationAxis, theta);
+        rotate(this.hyperTunnel, rotationAxis, theta);
     }
 
     dispose() {
         this.spaceLines.dispose();
-        this.warpCone.dispose();
+        this.hyperTunnel.dispose();
     }
 }
