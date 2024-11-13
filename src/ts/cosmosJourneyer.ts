@@ -213,17 +213,17 @@ export class CosmosJourneyer {
         // Init BabylonJS engine (use webgpu if ?webgpu is in the url)
         const engine = window.location.search.includes("webgpu")
             ? await EngineFactory.CreateAsync(canvas, {
-                twgslOptions: {
-                    wasmPath: new URL("./utils/TWGSL/twgsl.wasm", import.meta.url).href,
-                    jsPath: new URL("./utils/TWGSL/twgsl.js", import.meta.url).href
-                }
-            })
+                  twgslOptions: {
+                      wasmPath: new URL("./utils/TWGSL/twgsl.wasm", import.meta.url).href,
+                      jsPath: new URL("./utils/TWGSL/twgsl.js", import.meta.url).href
+                  }
+              })
             : new Engine(canvas, true, {
-                // the preserveDrawingBuffer option is required for the screenshot feature to work
-                preserveDrawingBuffer: true,
-                useHighPrecisionMatrix: true,
-                doNotHandleContextLost: true
-            });
+                  // the preserveDrawingBuffer option is required for the screenshot feature to work
+                  preserveDrawingBuffer: true,
+                  useHighPrecisionMatrix: true,
+                  doNotHandleContextLost: true
+              });
 
         engine.useReverseDepthBuffer = true;
         engine.loadingScreen = new LoadingScreen(canvas);

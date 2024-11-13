@@ -40,5 +40,5 @@ export function triangleWave(x: number) {
 }
 
 export function remap(value: number, from1: number, to1: number, from2: number, to2: number) {
-    return from2 + (value - from1) * (to2 - from2) / (to1 - from1);
+    return from2 + ((value - from1) * (to2 - from2)) / (to1 - from1);
 }

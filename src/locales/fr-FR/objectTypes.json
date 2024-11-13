@@ -1,14 +1,14 @@
 {
-  "starSystem": "Système Solaire",
-  "star": "Étoile de type {{stellarType}}",
-  "neutronStar": "Étoile à Neutrons",
-  "blackHole": "Trou Noir",
-  "gasPlanet": "Planète Gazeuse",
-  "telluricPlanet": "Planète Tellurique",
-  "telluricMoon": "Lune Tellurique",
-  "spaceStation": "Station Spatiale",
-  "spaceElevator": "Ascenseur Spatial",
-  "spaceElevatorClimber": "Nacelle de l'Ascenseur Spatial",
-  "anomaly": "Anomalie",
-  "landingPad": "Plateforme d'Atterrissage"
+    "starSystem": "Système Solaire",
+    "star": "Étoile de type {{stellarType}}",
+    "neutronStar": "Étoile à Neutrons",
+    "blackHole": "Trou Noir",
+    "gasPlanet": "Planète Gazeuse",
+    "telluricPlanet": "Planète Tellurique",
+    "telluricMoon": "Lune Tellurique",
+    "spaceStation": "Station Spatiale",
+    "spaceElevator": "Ascenseur Spatial",
+    "spaceElevatorClimber": "Nacelle de l'Ascenseur Spatial",
+    "anomaly": "Anomalie",
+    "landingPad": "Plateforme d'Atterrissage"
 }

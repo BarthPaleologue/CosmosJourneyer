@@ -1,13 +1,13 @@
 {
-  "title": "Stations spatiales",
-  "description": "Apprenez à atterrir à une station spatiale.",
-  "welcome": "Bienvenue, Commandant ! Ce tutoriel vous apprendra à atterrir à une station spatiale.",
-  "whatAreStations": "Les stations spatiales sont de grandes installations orbitales où vous pouvez trouver des missions, prendre soin de votre vaisseau et échanger des marchandises.",
-  "whereLandingBay": "Pour atterrir, vous devez trouver la baie d'atterrissage comme indiqué sur l'image. La baie est un petit anneau à l'une des extrémités de la station.",
-  "landingRequest": "Pour accéder à la baie, commencez par envoyer une demande d'atterrissage à la station en utilisant {{keys}}.",
-  "requestAccepted": "Une fois votre demande acceptée, vous pouvez vous rapprocher de votre plateforme d'atterrissage.",
-  "beCareful": "Aller trop vite pourrait entraîner le crash de votre vaisseau dans la station, alors soyez prudent !",
-  "autoLanding": "Le vaisseau atterrira en toute sécurité lors de l'approche finale.",
-  "services1": "Une fois votre vaisseau atterri, vous pouvez accéder aux différents services de la station.",
-  "services2": "Prenez le temps de les explorer. Vous pouvez prendre de nouvelles missions, ravitailler votre vaisseau et plus encore avant de repartir dans l'espace !"
+    "title": "Stations spatiales",
+    "description": "Apprenez à atterrir à une station spatiale.",
+    "welcome": "Bienvenue, Commandant ! Ce tutoriel vous apprendra à atterrir à une station spatiale.",
+    "whatAreStations": "Les stations spatiales sont de grandes installations orbitales où vous pouvez trouver des missions, prendre soin de votre vaisseau et échanger des marchandises.",
+    "whereLandingBay": "Pour atterrir, vous devez trouver la baie d'atterrissage comme indiqué sur l'image. La baie est un petit anneau à l'une des extrémités de la station.",
+    "landingRequest": "Pour accéder à la baie, commencez par envoyer une demande d'atterrissage à la station en utilisant {{keys}}.",
+    "requestAccepted": "Une fois votre demande acceptée, vous pouvez vous rapprocher de votre plateforme d'atterrissage.",
+    "beCareful": "Aller trop vite pourrait entraîner le crash de votre vaisseau dans la station, alors soyez prudent !",
+    "autoLanding": "Le vaisseau atterrira en toute sécurité lors de l'approche finale.",
+    "services1": "Une fois votre vaisseau atterri, vous pouvez accéder aux différents services de la station.",
+    "services2": "Prenez le temps de les explorer. Vous pouvez prendre de nouvelles missions, ravitailler votre vaisseau et plus encore avant de repartir dans l'espace !"
 }

@@ -41,7 +41,7 @@ export function parseSaveFileData(jsonString: string): { data: SaveFileData | nu
         saveData = JSON.parse(jsonString) as SaveFileData;
     } catch (e) {
         logs.push(i18n.t("notifications:invalidSaveFileJson", { error: e }));
-        logs.forEach(log => console.warn(log));
+        logs.forEach((log) => console.warn(log));
         return { data: null, logs };
     }
 
@@ -54,6 +54,6 @@ export function parseSaveFileData(jsonString: string): { data: SaveFileData | nu
         );
     }
 
-    logs.forEach(log => console.warn(log));
+    logs.forEach((log) => console.warn(log));
     return { data: saveData, logs };
 }

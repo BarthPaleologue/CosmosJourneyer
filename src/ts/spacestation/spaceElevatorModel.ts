@@ -42,7 +42,7 @@ export function newSeededSpaceElevatorModel(
         radius: orbitRadius,
         p: 2,
         period: parentSiderealDayDuration,
-        orientation: parentAxialTilt,
+        orientation: parentAxialTilt
     };
 
     const tetherLength = orbitRadius - parentBody.radius;

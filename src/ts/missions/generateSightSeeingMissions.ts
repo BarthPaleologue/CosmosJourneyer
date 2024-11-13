@@ -51,7 +51,7 @@ export function generateSightseeingMissions(spaceStationModel: OrbitalFacilityMo
     neighborSystems.forEach(([systemCoordinates, coordinates, distance]) => {
         const systemModel = getSystemModelFromCoordinates(systemCoordinates);
         for (let anomalyIndex = 0; anomalyIndex < StarSystemModelUtils.GetAnomalies(systemModel).length; anomalyIndex++) {
-            if (!uniformRandBool(1.0 / (1.0 + 1.5 * distance), rng, (38 + anomalyIndex + currentHour + coordinates.length()))) continue;
+            if (!uniformRandBool(1.0 / (1.0 + 1.5 * distance), rng, 38 + anomalyIndex + currentHour + coordinates.length())) continue;
             anomalyFlyByMissions.push(
                 newSightSeeingMission(spaceStationModel, {
                     type: MissionType.SIGHT_SEEING_FLY_BY,

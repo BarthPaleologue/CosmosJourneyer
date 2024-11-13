@@ -1,1 +1,40 @@
-{"version":"1.9.0","player":{"name":"Python","balance":10000,"creationDate":"2024-11-12T16:46:36.350Z","visitedSystemHistory":[{"starSectorX":1,"starSectorY":1,"starSectorZ":0,"localX":0.06908151068216262,"localY":0.2013149646582617,"localZ":0.3978719603726044},{"starSectorX":0,"starSectorY":0,"starSectorZ":1,"localX":-0.3591535053491376,"localY":0.22225331036478901,"localZ":-0.07379512236164654},{"starSectorX":1,"starSectorY":1,"starSectorZ":0,"localX":-0.0002619188745794365,"localY":-0.46821933564181406,"localZ":-0.10624213358678025},{"starSectorX":0,"starSectorY":0,"starSectorZ":0,"localX":0.49137314641446483,"localY":0.48043087077347135,"localZ":0.38353311777279386}],"currentItinerary":[],"systemBookmarks":[],"currentMissions":[],"completedMissions":[],"spaceShips":[{"name":"Wanderer","type":0,"fuelTanks":[{"currentFuel":100.00000915308298,"maxFuel":100}],"fuelScoop":{"fuelPerSecond":2.5}}]},"universeCoordinates":{"universeObjectId":{"objectType":3,"objectIndex":0,"starSystemCoordinates":{"starSectorX":0,"starSectorY":0,"starSectorZ":1,"localX":-0.3591535053491376,"localY":0.22225331036478901,"localZ":-0.07379512236164654}},"positionX":14941.20427319581,"positionY":26483.537806588298,"positionZ":847.5077208470792,"rotationQuaternionX":0.10931781751356179,"rotationQuaternionY":-0.5861110144530876,"rotationQuaternionZ":-0.523800402799024,"rotationQuaternionW":0.6084049980141658}}
+{
+    "version": "1.9.0",
+    "player": {
+        "name": "Python",
+        "balance": 10000,
+        "creationDate": "2024-11-12T16:46:36.350Z",
+        "visitedSystemHistory": [
+            { "starSectorX": 1, "starSectorY": 1, "starSectorZ": 0, "localX": 0.06908151068216262, "localY": 0.2013149646582617, "localZ": 0.3978719603726044 },
+            { "starSectorX": 0, "starSectorY": 0, "starSectorZ": 1, "localX": -0.3591535053491376, "localY": 0.22225331036478901, "localZ": -0.07379512236164654 },
+            { "starSectorX": 1, "starSectorY": 1, "starSectorZ": 0, "localX": -0.0002619188745794365, "localY": -0.46821933564181406, "localZ": -0.10624213358678025 },
+            { "starSectorX": 0, "starSectorY": 0, "starSectorZ": 0, "localX": 0.49137314641446483, "localY": 0.48043087077347135, "localZ": 0.38353311777279386 }
+        ],
+        "currentItinerary": [],
+        "systemBookmarks": [],
+        "currentMissions": [],
+        "completedMissions": [],
+        "spaceShips": [{ "name": "Wanderer", "type": 0, "fuelTanks": [{ "currentFuel": 100.00000915308298, "maxFuel": 100 }], "fuelScoop": { "fuelPerSecond": 2.5 } }]
+    },
+    "universeCoordinates": {
+        "universeObjectId": {
+            "objectType": 3,
+            "objectIndex": 0,
+            "starSystemCoordinates": {
+                "starSectorX": 0,
+                "starSectorY": 0,
+                "starSectorZ": 1,
+                "localX": -0.3591535053491376,
+                "localY": 0.22225331036478901,
+                "localZ": -0.07379512236164654
+            }
+        },
+        "positionX": 14941.20427319581,
+        "positionY": 26483.537806588298,
+        "positionZ": 847.5077208470792,
+        "rotationQuaternionX": 0.10931781751356179,
+        "rotationQuaternionY": -0.5861110144530876,
+        "rotationQuaternionZ": -0.523800402799024,
+        "rotationQuaternionW": 0.6084049980141658
+    }
+}

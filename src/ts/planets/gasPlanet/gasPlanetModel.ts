@@ -54,7 +54,7 @@ export function newSeededGasPlanetModel(seed: number, name: string, parentBodies
         radius: orbitRadius,
         p: 2, //orbitalP,
         period: getOrbitalPeriod(orbitRadius, parentMassSum),
-        orientation: Quaternion.RotationAxis(Axis.X, (rng(GenerationSteps.ORBIT + 20 - 0.5) * 0.2))
+        orientation: Quaternion.RotationAxis(Axis.X, rng(GenerationSteps.ORBIT + 20 - 0.5) * 0.2)
     };
 
     const physicalProperties: PlanetaryMassObjectPhysicsInfo = {

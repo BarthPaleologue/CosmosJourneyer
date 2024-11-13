@@ -77,7 +77,6 @@ export class SpaceStationLayer {
             this.setMainPanelState(MainPanelState.MISSIONS);
         });
 
-
         const spaceshipButton = document.querySelector<HTMLElement>(".spaceStationAction.spaceshipButton");
         if (spaceshipButton === null) {
             throw new Error("Spaceship button not found");

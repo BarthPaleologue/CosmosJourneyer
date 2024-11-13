@@ -65,7 +65,7 @@ export function newSeededTelluricPlanetModel(seed: number, name: string, parentB
         oceanLevel: 0
     };
 
-    physicalProperties.oceanLevel = Settings.OCEAN_DEPTH * physicalProperties.waterAmount * physicalProperties.pressure / Settings.EARTH_SEA_LEVEL_PRESSURE;
+    physicalProperties.oceanLevel = (Settings.OCEAN_DEPTH * physicalProperties.waterAmount * physicalProperties.pressure) / Settings.EARTH_SEA_LEVEL_PRESSURE;
 
     const canHaveLiquidWater = hasLiquidWater(physicalProperties.pressure, physicalProperties.minTemperature, physicalProperties.maxTemperature);
     if (!canHaveLiquidWater) physicalProperties.oceanLevel = 0;
