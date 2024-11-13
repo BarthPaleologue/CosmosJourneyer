@@ -578,9 +578,15 @@ export class Spaceship implements Transformable {
                     const ringsMinDistance = asteroidField.minRadius;
                     const ringsMaxDistance = asteroidField.maxRadius;
 
-                    if (distanceAboveRings < asteroidField.patchThickness * 1000 && planarDistance > ringsMinDistance - 100e3 && planarDistance < ringsMaxDistance + 100e3) {
-                        closestDistance = distanceAboveRings;
-                        objectHalfThickness = asteroidField.patchThickness / 4;
+                    const isAboveRings = planarDistance > ringsMinDistance && planarDistance < ringsMaxDistance;
+
+                    let distanceToRings = isAboveRings
+                        ? Math.abs(distanceAboveRings)
+                        : Math.sqrt(Math.min((planarDistance - ringsMinDistance) ** 2, (planarDistance - ringsMaxDistance) ** 2) + distanceAboveRings ** 2);
+
+                    if (distanceToRings < closestDistance) {
+                        closestDistance = distanceToRings;
+                        objectHalfThickness = asteroidField.patchThickness / 2;
                     }
                 }
             }
