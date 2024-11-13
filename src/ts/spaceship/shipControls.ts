@@ -258,7 +258,7 @@ export class ShipControls implements Controls {
             this.thirdPersonCamera.radius += (Math.random() - 0.5) / 100;
         }
 
-        this.targetFov = Tools.ToRadians(60 + 20 * this.spaceship.getThrottle());
+        this.targetFov = Tools.ToRadians(60 + 10 * this.spaceship.getThrottle());
 
         this.thirdPersonCamera.fov = Lerp(this.thirdPersonCamera.fov, this.targetFov, 0.4);
 
