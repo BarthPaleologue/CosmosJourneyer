@@ -35,6 +35,8 @@ import { Sounds } from "../assets/sounds";
 import { LandingPadSize } from "../assets/procedural/landingPad/landingPad";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import { moveTowards } from "../utils/math";
+import { CameraShakeAnimation } from "../uberCore/transforms/animations/cameraShake";
+import { Tools } from "@babylonjs/core/Misc/tools";
 
 export class ShipControls implements Controls {
     readonly spaceship: Spaceship;
@@ -42,21 +44,20 @@ export class ShipControls implements Controls {
     readonly thirdPersonCamera: ArcRotateCamera;
     readonly firstPersonCamera: FreeCamera;
 
+    private readonly cameraShakeAnimation: CameraShakeAnimation;
+
     private readonly scene: Scene;
 
     private isCameraShaking = false;
 
     static BASE_CAMERA_RADIUS = 60;
 
-    private baseFov: number;
-    private targetFov: number;
-
     private closestLandableFacility: (Transformable & ManagesLandingPads) | null = null;
 
-    private toggleWarpDriveHandler: () => void;
-    private landingHandler: () => void;
-    private emitLandingRequestHandler: () => void;
-    private throttleToZeroHandler: () => void;
+    private readonly toggleWarpDriveHandler: () => void;
+    private readonly landingHandler: () => void;
+    private readonly emitLandingRequestHandler: () => void;
+    private readonly throttleToZeroHandler: () => void;
 
     constructor(spaceship: Spaceship, scene: Scene) {
         this.spaceship = spaceship;
@@ -69,6 +70,8 @@ export class ShipControls implements Controls {
         this.thirdPersonCamera.parent = this.getTransform();
         this.thirdPersonCamera.lowerRadiusLimit = 10;
         this.thirdPersonCamera.upperRadiusLimit = 500;
+
+        this.cameraShakeAnimation = new CameraShakeAnimation(this.thirdPersonCamera, 0.1, 1.5);
 
         this.scene = scene;
 
@@ -83,12 +86,10 @@ export class ShipControls implements Controls {
             this.spaceship.toggleWarpDrive();
             if (this.spaceship.getWarpDrive().isEnabled()) {
                 Sounds.ENGAGING_WARP_DRIVE.play();
-                this.shakeCamera(1500);
-                this.targetFov = this.baseFov * 3.0;
+                this.cameraShakeAnimation.reset();
             } else {
                 Sounds.WARP_DRIVE_DISENGAGED.play();
-                this.shakeCamera(1500);
-                this.targetFov = this.baseFov * 0.5;
+                this.cameraShakeAnimation.reset();
 
                 if (this.closestLandableFacility !== null) {
                     const distanceToLandingFacility = Vector3.Distance(
@@ -154,9 +155,6 @@ export class ShipControls implements Controls {
 
         SpaceShipControlsInputs.map.throttleToZero.on("complete", this.throttleToZeroHandler);
 
-        this.baseFov = this.thirdPersonCamera.fov;
-        this.targetFov = this.baseFov;
-
         this.spaceship.onFuelScoopStart.add(() => {
             Sounds.EnqueuePlay(Sounds.FUEL_SCOOPING_VOICE);
         });
@@ -198,14 +196,6 @@ export class ShipControls implements Controls {
         });
     }
 
-    private shakeCamera(duration: number) {
-        this.isCameraShaking = true;
-        setTimeout(() => {
-            this.isCameraShaking = false;
-            this.targetFov = this.baseFov;
-        }, duration);
-    }
-
     public getTransform(): TransformNode {
         return this.spaceship.getTransform();
     }
@@ -224,6 +214,8 @@ export class ShipControls implements Controls {
 
     public update(deltaSeconds: number): Vector3 {
         this.spaceship.update(deltaSeconds);
+
+        if (!this.cameraShakeAnimation.isFinished()) this.cameraShakeAnimation.update(deltaSeconds);
 
         let [inputRoll, inputPitch] = SpaceShipControlsInputs.map.rollPitch.value;
         if (SpaceShipControlsInputs.map.ignorePointer.value > 0) {
@@ -252,7 +244,7 @@ export class ShipControls implements Controls {
         if (!this.spaceship.isLanded()) {
             roll(this.getTransform(), 2.0 * inputRoll * deltaSeconds);
             yaw(this.getTransform(), -1.0 * inputRoll * deltaSeconds);
-            pitch(this.getTransform(), 2.0 * inputPitch * deltaSeconds);
+            pitch(this.getTransform(), 3.0 * inputPitch * deltaSeconds);
         }
 
         // camera shake
@@ -262,7 +254,7 @@ export class ShipControls implements Controls {
             this.thirdPersonCamera.radius += (Math.random() - 0.5) / 100;
         }
 
-        this.thirdPersonCamera.fov = moveTowards(this.thirdPersonCamera.fov, this.targetFov, this.targetFov === this.baseFov ? 2.0 * deltaSeconds : 0.3 * deltaSeconds);
+        this.thirdPersonCamera.fov = Tools.ToRadians(60 + 20 * this.spaceship.getThrottle());
 
         this.getActiveCameras().forEach((camera) => camera.getViewMatrix(true));
 
