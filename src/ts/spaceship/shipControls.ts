@@ -17,7 +17,7 @@
 
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { getUpwardDirection, pitch, roll } from "../uberCore/transforms/basicTransform";
+import { getUpwardDirection, pitch, roll, yaw } from "../uberCore/transforms/basicTransform";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Controls } from "../uberCore/controls";
 import { Camera } from "@babylonjs/core/Cameras/camera";
@@ -251,6 +251,7 @@ export class ShipControls implements Controls {
 
         if (!this.spaceship.isLanded()) {
             roll(this.getTransform(), 2.0 * inputRoll * deltaSeconds);
+            yaw(this.getTransform(), -1.0 * inputRoll * deltaSeconds);
             pitch(this.getTransform(), 2.0 * inputPitch * deltaSeconds);
         }
 
