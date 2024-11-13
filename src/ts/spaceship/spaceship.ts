@@ -89,6 +89,8 @@ export class Spaceship implements Transformable {
     private mainEngineThrottle = 0;
     private mainEngineTargetSpeed = 0;
 
+    private readonly maxSpeed = 900;
+
     private closestWalkableObject: (Transformable & HasBoundingSphere) | null = null;
 
     private landingTarget: Transformable | null = null;
@@ -520,7 +522,7 @@ export class Spaceship implements Transformable {
     }
 
     public update(deltaSeconds: number) {
-        this.mainEngineTargetSpeed = this.mainEngineThrottle * 500;
+        this.mainEngineTargetSpeed = this.mainEngineThrottle * this.maxSpeed;
 
         const warpSpeed = getForwardDirection(this.aggregate.transformNode).scale(this.warpDrive.getWarpSpeed());
         this.warpTunnel.update(deltaSeconds);
