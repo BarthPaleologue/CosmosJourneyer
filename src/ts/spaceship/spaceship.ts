@@ -455,7 +455,13 @@ export class Spaceship implements Transformable {
     }
 
     public canEngageWarpDrive() {
-        let canEngage = true;
+        if (this.nearestOrbitalObject !== null) {
+            const distanceToObject = Vector3.Distance(this.getTransform().getAbsolutePosition(), this.nearestOrbitalObject.getTransform().getAbsolutePosition());
+            if (distanceToObject < this.nearestOrbitalObject.getBoundingRadius() * 1.03) {
+                return false;
+            }
+        }
+
         if (this.nearestCelestialBody !== null) {
             // if the spaceship goes too close to planetary rings, stop the warp drive to avoid collision with asteroids
             const asteroidField = this.nearestCelestialBody.asteroidField;
@@ -469,12 +475,12 @@ export class Spaceship implements Transformable {
                 const ringsMaxDistance = asteroidField.maxRadius;
 
                 if (distanceAboveRings < asteroidField.patchThickness / 2 && planarDistance > ringsMinDistance && planarDistance < ringsMaxDistance) {
-                    canEngage = false;
+                    return false;
                 }
             }
         }
 
-        return canEngage;
+        return true;
     }
 
     private handleFuelScoop(deltaSeconds: number) {
