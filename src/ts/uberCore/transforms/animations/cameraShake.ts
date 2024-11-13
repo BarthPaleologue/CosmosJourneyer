@@ -36,6 +36,14 @@ export class CameraShakeAnimation implements CustomAnimation {
         this.duration = duration;
     }
 
+    private sumOfSines(t: number, frequency: number, phase: number): number {
+        let sum = 0;
+        for (let i = 0; i < 5; i++) {
+            sum += Math.sin(2 * Math.PI * frequency * t * 2 ** i + phase) / 2 ** i;
+        }
+        return sum;
+    }
+
     update(deltaSeconds: number) {
         if (this.isFinished()) return;
 
@@ -45,8 +53,8 @@ export class CameraShakeAnimation implements CustomAnimation {
 
         const frequency = 10;
 
-        this.camera.alpha += Math.sin(2 * Math.PI * frequency * t) * this.intensity;
-        this.camera.beta += Math.cos(2 * Math.PI * frequency * t) * this.intensity;
+        this.camera.alpha += this.sumOfSines(t, frequency, 0) * this.intensity;
+        this.camera.beta += this.sumOfSines(t, frequency, 0.38) * this.intensity;
     }
 
     reset() {

@@ -37,6 +37,7 @@ import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import { moveTowards } from "../utils/math";
 import { CameraShakeAnimation } from "../uberCore/transforms/animations/cameraShake";
 import { Tools } from "@babylonjs/core/Misc/tools";
+import { Lerp } from "@babylonjs/core/Maths/math.scalar.functions";
 
 export class ShipControls implements Controls {
     readonly spaceship: Spaceship;
@@ -53,6 +54,8 @@ export class ShipControls implements Controls {
     static BASE_CAMERA_RADIUS = 60;
 
     private closestLandableFacility: (Transformable & ManagesLandingPads) | null = null;
+
+    private targetFov = Tools.ToRadians(60);
 
     private readonly toggleWarpDriveHandler: () => void;
     private readonly landingHandler: () => void;
@@ -71,7 +74,7 @@ export class ShipControls implements Controls {
         this.thirdPersonCamera.lowerRadiusLimit = 10;
         this.thirdPersonCamera.upperRadiusLimit = 500;
 
-        this.cameraShakeAnimation = new CameraShakeAnimation(this.thirdPersonCamera, 0.1, 1.5);
+        this.cameraShakeAnimation = new CameraShakeAnimation(this.thirdPersonCamera, 0.006, 1.0);
 
         this.scene = scene;
 
@@ -87,6 +90,7 @@ export class ShipControls implements Controls {
             if (this.spaceship.getWarpDrive().isEnabled()) {
                 Sounds.ENGAGING_WARP_DRIVE.play();
                 this.cameraShakeAnimation.reset();
+                this.spaceship.setMainEngineThrottle(0);
             } else {
                 Sounds.WARP_DRIVE_DISENGAGED.play();
                 this.cameraShakeAnimation.reset();
@@ -254,7 +258,9 @@ export class ShipControls implements Controls {
             this.thirdPersonCamera.radius += (Math.random() - 0.5) / 100;
         }
 
-        this.thirdPersonCamera.fov = Tools.ToRadians(60 + 20 * this.spaceship.getThrottle());
+        this.targetFov = Tools.ToRadians(60 + 20 * this.spaceship.getThrottle());
+
+        this.thirdPersonCamera.fov = Lerp(this.thirdPersonCamera.fov, this.targetFov, 0.4);
 
         this.getActiveCameras().forEach((camera) => camera.getViewMatrix(true));
 
