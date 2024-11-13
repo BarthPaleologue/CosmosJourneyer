@@ -89,7 +89,11 @@ export class Spaceship implements Transformable {
     private mainEngineThrottle = 0;
     private mainEngineTargetSpeed = 0;
 
-    private readonly maxSpeed = 900;
+    /**
+     * Maximum speed of the ship in m/s
+     * @private
+     */
+    private readonly maxSpeed = 1400;
 
     private closestWalkableObject: (Transformable & HasBoundingSphere) | null = null;
 
