@@ -469,14 +469,27 @@ export class Spaceship implements Transformable {
             const asteroidField = this.nearestCelestialBody.asteroidField;
 
             if (asteroidField !== null) {
-                const relativePosition = this.getTransform().getAbsolutePosition().subtract(this.nearestCelestialBody.getTransform().getAbsolutePosition());
-                const distanceAboveRings = Math.abs(Vector3.Dot(relativePosition, this.nearestCelestialBody.getRotationAxis()));
-                const planarDistance = relativePosition.subtract(this.nearestCelestialBody.getRotationAxis().scale(distanceAboveRings)).length();
+                const inverseWorld = this.nearestCelestialBody.getTransform().getWorldMatrix().clone().invert();
+                const relativePosition = Vector3.TransformCoordinates(this.getTransform().getAbsolutePosition(), inverseWorld);
+                const relativeForward = Vector3.TransformNormal(getForwardDirection(this.getTransform()), inverseWorld);
+                const distanceAboveRings = relativePosition.y;
+                const planarDistance = Math.sqrt(relativePosition.x * relativePosition.x + relativePosition.z * relativePosition.z);
+
+                const nbSecondsPrediction = 0.5;
+                const nextRelativePosition = relativePosition.add(relativeForward.scale(this.getSpeed() * nbSecondsPrediction));
+                const nextDistanceAboveRings = nextRelativePosition.y;
+                const nextPlanarDistance = Math.sqrt(nextRelativePosition.x * nextRelativePosition.x + nextRelativePosition.z * nextRelativePosition.z);
 
                 const ringsMinDistance = asteroidField.minRadius;
                 const ringsMaxDistance = asteroidField.maxRadius;
 
-                if (distanceAboveRings < asteroidField.patchThickness / 2 && planarDistance > ringsMinDistance && planarDistance < ringsMaxDistance) {
+                const isAboveRing = planarDistance > ringsMinDistance && planarDistance < ringsMaxDistance;
+                const willBeAboveRing = nextPlanarDistance > ringsMinDistance && nextPlanarDistance < ringsMaxDistance;
+
+                const isInRing = Math.abs(distanceAboveRings) < asteroidField.patchThickness / 2 && isAboveRing;
+                const willCrossRing = Math.sign(distanceAboveRings) !== Math.sign(nextDistanceAboveRings) && (willBeAboveRing || isAboveRing);
+
+                if (isInRing || willCrossRing) {
                     return false;
                 }
             }
