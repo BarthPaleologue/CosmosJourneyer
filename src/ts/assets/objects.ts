@@ -197,7 +197,7 @@ export class Objects {
             Objects.SPHERICAL_TANK.bakeCurrentTransformIntoVertices();
 
             //FIXME: the scaling of the radius is caused by an issue with the mesh
-            Objects.SPHERICAL_TANK_PHYSICS_SHAPE = new PhysicsShapeSphere(Vector3.Zero(), targetDimension * 2.5, scene)
+            Objects.SPHERICAL_TANK_PHYSICS_SHAPE = new PhysicsShapeSphere(Vector3.Zero(), targetDimension * 2.5, scene);
 
             console.log("SphericalTank loaded");
         };

@@ -1,0 +1,13 @@
+{
+    "title": "Space stations",
+    "description": "Learn how to land at a space station.",
+    "welcome": "Welcome, Commander! This tutorial will teach you how to land at a space station.",
+    "whatAreStations": "Space stations are large orbital facilities where you can find missions, take care of your ship and trade commodities.",
+    "whereLandingBay": "In order to land, you must find the landing bay as shown in the picture. The bay is a small ring at one of the station ends.",
+    "landingRequest": "To get access to the bay, start by sending a landing request to the station using {{keys}}.",
+    "requestAccepted": "Once your request is accepted, you can get closer to your landing pad.",
+    "beCareful": "Going to fast might result in your ship crashing in the station, so be careful!",
+    "autoLanding": "The ship will land itself safely during the final approach.",
+    "services1": "Once your ship has landed, you can access the various services of the station.",
+    "services2": "Take your time to explore them. You can take new missions, refuel your ship and more before leaving for space again!"
+}

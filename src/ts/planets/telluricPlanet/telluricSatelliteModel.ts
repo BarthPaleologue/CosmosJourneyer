@@ -79,7 +79,10 @@ export function newSeededTelluricSatelliteModel(seed: number, name: string, pare
     const parentRotationAxis = Vector3.Up().applyRotationQuaternionInPlace(parentAverageAxialTilt);
     const orbitOrientation = parentAverageAxialTilt.clone();
     Quaternion.RotationAxis(parentRotationAxis, rng(GenerationSteps.ORBIT + 20) * 2 * Math.PI).multiplyToRef(orbitOrientation, orbitOrientation);
-    Quaternion.RotationAxis(randomDirection(rng, GenerationSteps.ORBIT + 30), normalRandom(0, Math.PI / 12, rng, GenerationSteps.ORBIT + 10)).multiplyToRef(orbitOrientation, orbitOrientation);
+    Quaternion.RotationAxis(randomDirection(rng, GenerationSteps.ORBIT + 30), normalRandom(0, Math.PI / 12, rng, GenerationSteps.ORBIT + 10)).multiplyToRef(
+        orbitOrientation,
+        orbitOrientation
+    );
 
     const physicalProperties: TelluricPlanetaryMassObjectPhysicsInfo = {
         mass: mass,

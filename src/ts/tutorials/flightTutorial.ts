@@ -27,9 +27,14 @@ import rotationImageSrc from "../../asset/tutorials/flightTutorial/rotation.webp
 import thrustImageSrc from "../../asset/tutorials/flightTutorial/thrust.webp";
 import warpImageSrc from "../../asset/tutorials/flightTutorial/warp.webp";
 import congratsImageSrc from "../../asset/tutorials/flightTutorial/congrats.webp";
-import { SystemObjectType } from "../utils/coordinates/universeCoordinates";
+import saveData from "../../asset/tutorials/flightTutorial/save.json";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
-import { getStarSystemCoordinatesFromSeed } from "../starSystem/systemSeed";
+import { parseSaveFileData } from "../saveFile/saveFileData";
+
+const parsedSaveData = parseSaveFileData(JSON.stringify(saveData));
+if (parsedSaveData.data === null) {
+    throw new Error("StationLandingTutorial: saveData is null");
+}
 
 export const FlightTutorial: Tutorial = {
     getTitle() {
@@ -40,16 +45,7 @@ export const FlightTutorial: Tutorial = {
         return i18n.t("tutorials:flightTutorial:description");
     },
 
-    universeObjectId: {
-        starSystemCoordinates: getStarSystemCoordinatesFromSeed({
-            starSectorX: 0,
-            starSectorY: 0,
-            starSectorZ: 1,
-            index: 1
-        }),
-        objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
-        objectIndex: 1
-    },
+    saveData: parsedSaveData.data,
 
     async getContentPanelsHtml(): Promise<string[]> {
         const keybordLayoutMap = await getGlobalKeyboardLayoutMap();

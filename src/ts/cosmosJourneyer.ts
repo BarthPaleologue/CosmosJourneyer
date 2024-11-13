@@ -113,7 +113,7 @@ export class CosmosJourneyer {
 
         this.tutorialLayer = new TutorialLayer();
 
-        this.sidePanels = new SidePanels(this.starSystemView);
+        this.sidePanels = new SidePanels();
 
         this.mainMenu = new MainMenu(this.sidePanels, starSystemView);
         this.mainMenu.onStartObservable.add(async () => {
@@ -128,11 +128,17 @@ export class CosmosJourneyer {
 
         this.sidePanels.tutorialsPanelContent.onTutorialSelected.add(async (tutorial) => {
             this.mainMenu.hide();
+            await this.loadSaveData(tutorial.saveData);
             this.resume();
             this.tutorialLayer.setTutorial(tutorial.getTitle(), await tutorial.getContentPanelsHtml());
-            this.starSystemView.targetCursorLayer.setEnabled(true);
-            this.starSystemView.getSpaceshipControls().spaceship.disableWarpDrive();
-            this.starSystemView.getSpaceshipControls().spaceship.setMainEngineThrottle(0);
+            this.starSystemView.setUIEnabled(true);
+
+            const targetObject = getObjectBySystemId(tutorial.saveData.universeCoordinates.universeObjectId, this.starSystemView.getStarSystem());
+            if (targetObject === null) {
+                throw new Error("Could not find the target object of the tutorial even though it should be in the star system");
+            }
+            this.starSystemView.getSpaceshipControls().getTransform().lookAt(targetObject.getTransform().getAbsolutePosition());
+
             Settings.TIME_MULTIPLIER = 1;
         });
 
@@ -145,14 +151,16 @@ export class CosmosJourneyer {
         this.pauseMenu.onResume.add(() => this.resume());
         this.pauseMenu.onScreenshot.add(() => this.takeScreenshot());
         this.pauseMenu.onShare.add(() => {
-            const saveData = this.generateSaveData();
+            this.engine.onEndFrameObservable.addOnce(() => {
+                const saveData = this.generateSaveData();
 
-            const urlData = encodeBase64(JSON.stringify(saveData.universeCoordinates));
+                const urlData = encodeBase64(JSON.stringify(saveData.universeCoordinates));
 
-            const payload = `universeCoordinates=${urlData}`;
-            const url = new URL(`https://barthpaleologue.github.io/CosmosJourneyer/?${payload}`);
-            navigator.clipboard.writeText(url.toString()).then(() => {
-                createNotification(i18n.t("notifications:copiedToClipboard"), 2000);
+                const payload = `universeCoordinates=${urlData}`;
+                const url = new URL(`https://barthpaleologue.github.io/CosmosJourneyer/?${payload}`);
+                navigator.clipboard.writeText(url.toString()).then(() => {
+                    createNotification(i18n.t("notifications:copiedToClipboard"), 2000);
+                });
             });
         });
         this.pauseMenu.onSave.add(() => this.downloadSaveFile());
@@ -353,11 +361,11 @@ export class CosmosJourneyer {
 
         // Finding the position of the player in the nearest orbital object's frame of reference
         const currentWorldPosition = spaceShipControls.getTransform().getAbsolutePosition();
-        const nearestOrbitalObjectInverseWorld = nearestOrbitalObject.getTransform().getWorldMatrix().clone().invert();
+        const nearestOrbitalObjectInverseWorld = nearestOrbitalObject.getTransform().computeWorldMatrix(true).clone().invert();
         const currentLocalPosition = Vector3.TransformCoordinates(currentWorldPosition, nearestOrbitalObjectInverseWorld);
         const distanceToNearestOrbitalObject = currentLocalPosition.length();
-        if (distanceToNearestOrbitalObject < nearestOrbitalObject.getBoundingRadius() + 200e3) {
-            currentLocalPosition.scaleInPlace((nearestOrbitalObject.getBoundingRadius() + 200e3) / distanceToNearestOrbitalObject);
+        if (distanceToNearestOrbitalObject < nearestOrbitalObject.getBoundingRadius() * 1.1) {
+            currentLocalPosition.scaleInPlace((nearestOrbitalObject.getBoundingRadius() * 1.1) / distanceToNearestOrbitalObject);
         }
 
         // Finding the rotation of the player in the nearest orbital object's frame of reference
@@ -388,14 +396,16 @@ export class CosmosJourneyer {
      * Generates save file data and downloads it as a json file
      */
     public downloadSaveFile(): void {
-        const saveData = this.generateSaveData();
-        const blob = new Blob([JSON.stringify(saveData)], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        const dateString = new Date().toLocaleString().replace(/[^0-9a-zA-Z]/g, "_"); // avoid special characters in the filename
-        link.download = `CMDR_${this.player.name}_${dateString}.json`;
-        link.click();
+        this.engine.onEndFrameObservable.addOnce(() => {
+            const saveData = this.generateSaveData();
+            const blob = new Blob([JSON.stringify(saveData)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            const dateString = new Date().toLocaleString().replace(/[^0-9a-zA-Z]/g, "_"); // avoid special characters in the filename
+            link.download = `CMDR_${this.player.name}_${dateString}.json`;
+            link.click();
+        });
     }
 
     /**

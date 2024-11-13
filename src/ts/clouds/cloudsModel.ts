@@ -38,7 +38,7 @@ export function newCloudsModel(planetRadius: number, cloudLayerHeight: number, w
         specularPower: 2,
         frequency: 4,
         detailFrequency: 12,
-        coverage: 0.75 * Math.exp(-waterAmount * pressure / Settings.EARTH_SEA_LEVEL_PRESSURE),
+        coverage: 0.75 * Math.exp((-waterAmount * pressure) / Settings.EARTH_SEA_LEVEL_PRESSURE),
         sharpness: 2.5,
         color: new Color3(0.8, 0.8, 0.8),
         worleySpeed: 0.0005,

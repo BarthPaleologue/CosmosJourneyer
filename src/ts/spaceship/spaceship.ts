@@ -517,6 +517,7 @@ export class Spaceship implements Transformable {
         this.mainEngineTargetSpeed = this.mainEngineThrottle * 500;
 
         const warpSpeed = getForwardDirection(this.aggregate.transformNode).scale(this.warpDrive.getWarpSpeed());
+        this.warpTunnel.update(deltaSeconds);
 
         const currentForwardSpeed = Vector3.Dot(warpSpeed, this.aggregate.transformNode.getDirection(Axis.Z));
 
@@ -712,6 +713,9 @@ export class Spaceship implements Transformable {
 
         this.onWarpDriveEnabled.clear();
         this.onWarpDriveDisabled.clear();
+
+        this.onFuelScoopStart.clear();
+        this.onFuelScoopEnd.clear();
 
         this.onPlanetaryLandingEngaged.clear();
         this.onLandingObservable.clear();
