@@ -38,6 +38,7 @@ import { moveTowards } from "../utils/math";
 import { CameraShakeAnimation } from "../uberCore/transforms/animations/cameraShake";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { Lerp } from "@babylonjs/core/Maths/math.scalar.functions";
+import { quickAnimation } from "../uberCore/transforms/animations/quickAnimation";
 
 export class ShipControls implements Controls {
     readonly spaceship: Spaceship;
@@ -61,6 +62,7 @@ export class ShipControls implements Controls {
     private readonly landingHandler: () => void;
     private readonly emitLandingRequestHandler: () => void;
     private readonly throttleToZeroHandler: () => void;
+    private readonly resetCameraHandler: () => void;
 
     constructor(spaceship: Spaceship, scene: Scene) {
         this.spaceship = spaceship;
@@ -158,6 +160,15 @@ export class ShipControls implements Controls {
         };
 
         SpaceShipControlsInputs.map.throttleToZero.on("complete", this.throttleToZeroHandler);
+
+        this.resetCameraHandler = () => {
+            quickAnimation(this.thirdPersonCamera, "alpha", this.thirdPersonCamera.alpha, -3.14 / 2, 200);
+            quickAnimation(this.thirdPersonCamera, "beta", this.thirdPersonCamera.beta, 3.14 / 2.2, 200);
+            quickAnimation(this.thirdPersonCamera, "radius", this.thirdPersonCamera.radius, ShipControls.BASE_CAMERA_RADIUS, 200);
+            quickAnimation(this.thirdPersonCamera, "target", this.thirdPersonCamera.target, Vector3.Zero(), 200);
+        };
+
+        SpaceShipControlsInputs.map.resetCamera.on("complete", this.resetCameraHandler);
 
         this.spaceship.onFuelScoopStart.add(() => {
             Sounds.EnqueuePlay(Sounds.FUEL_SCOOPING_VOICE);
@@ -272,6 +283,7 @@ export class ShipControls implements Controls {
         SpaceShipControlsInputs.map.landing.off("complete", this.landingHandler);
         SpaceShipControlsInputs.map.emitLandingRequest.off("complete", this.emitLandingRequestHandler);
         SpaceShipControlsInputs.map.throttleToZero.off("complete", this.throttleToZeroHandler);
+        SpaceShipControlsInputs.map.resetCamera.off("complete", this.resetCameraHandler);
 
         this.spaceship.dispose();
         this.thirdPersonCamera.dispose();
