@@ -236,9 +236,9 @@ export class ChunkTree implements Cullable {
         return chunk;
     }
 
-    public computeCulling(cameras: Camera[]): void {
+    public computeCulling(camera: Camera): void {
         this.executeOnEveryChunk((chunk: PlanetChunk) => {
-            chunk.computeCulling(cameras);
+            chunk.computeCulling(camera);
         });
     }
 

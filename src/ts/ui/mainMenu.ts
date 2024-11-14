@@ -393,7 +393,7 @@ export class MainMenu {
                 return;
             }
 
-            this.controls.getActiveCameras().forEach((camera) => camera.getViewMatrix());
+            this.controls.getActiveCamera().getViewMatrix();
 
             starSystemController.applyFloatingOrigin();
             starSystemController.updateShaders(0.0, this.starSystemView.postProcessManager);

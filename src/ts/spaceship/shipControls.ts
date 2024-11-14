@@ -215,8 +215,12 @@ export class ShipControls implements Controls {
         return this.spaceship.getTransform();
     }
 
-    public getActiveCameras(): Camera[] {
-        return [this.thirdPersonCamera];
+    public getActiveCamera(): Camera {
+        return this.thirdPersonCamera;
+    }
+
+    public getCameras(): Camera[] {
+        return [this.thirdPersonCamera, this.firstPersonCamera];
     }
 
     public setClosestLandableFacility(facility: (Transformable & ManagesLandingPads) | null) {
@@ -273,7 +277,7 @@ export class ShipControls implements Controls {
 
         this.thirdPersonCamera.fov = Lerp(this.thirdPersonCamera.fov, this.targetFov, 0.4);
 
-        this.getActiveCameras().forEach((camera) => camera.getViewMatrix(true));
+        this.getActiveCamera().getViewMatrix();
 
         return this.getTransform().getAbsolutePosition();
     }

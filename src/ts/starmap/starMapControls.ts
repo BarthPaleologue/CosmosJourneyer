@@ -51,7 +51,11 @@ export class StarMapControls implements Controls {
         this.thirdPersonCamera.parent = this.transform;
     }
 
-    public getActiveCameras(): Camera[] {
+    public getActiveCamera(): Camera {
+        return this.thirdPersonCamera;
+    }
+
+    public getCameras(): Camera[] {
         return [this.thirdPersonCamera];
     }
 

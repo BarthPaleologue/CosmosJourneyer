@@ -586,23 +586,23 @@ export class StarSystemController {
         controller.update(deltaSeconds);
 
         for (const object of celestialBodies) {
-            object.asteroidField?.update(controller.getActiveCameras()[0].globalPosition, deltaSeconds);
+            object.asteroidField?.update(controller.getActiveCamera().globalPosition, deltaSeconds);
         }
 
         for (const body of this.telluricBodies) {
             // Meshes with LOD are updated (surface quadtrees)
             body.updateLOD(controller.getTransform().getAbsolutePosition(), chunkForge);
-            body.computeCulling(controller.getActiveCameras());
+            body.computeCulling(controller.getActiveCamera());
         }
 
         for (const object of this.gasPlanets) {
-            object.computeCulling(controller.getActiveCameras());
+            object.computeCulling(controller.getActiveCamera());
         }
 
         const cameraWorldPosition = controller.getTransform().getAbsolutePosition();
         for (const orbitalFacility of orbitalFacilities) {
             orbitalFacility.update(stellarObjects, this.objectToParents.get(orbitalFacility) ?? [], cameraWorldPosition, deltaSeconds);
-            orbitalFacility.computeCulling(controller.getActiveCameras());
+            orbitalFacility.computeCulling(controller.getActiveCamera());
         }
 
         // floating origin

@@ -82,7 +82,7 @@ export class BlackHole implements StellarObject, Cullable {
         return orbitalObjectTypeToDisplay(this.model);
     }
 
-    public computeCulling(cameras: Camera[]): void {
+    public computeCulling(camera: Camera): void {
         return;
     }
 

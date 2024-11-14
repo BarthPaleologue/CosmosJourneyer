@@ -31,6 +31,8 @@ import HavokPhysics from "@babylonjs/havok";
 import { SpaceElevatorClimber } from "./spacestation/spaceElevatorClimber";
 import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes";
+import { HyperSpaceTunnel } from "./utils/hyperSpaceTunnel";
+import { Axis } from "@babylonjs/core/Maths/math.axis";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -50,7 +52,7 @@ scene.enablePhysics(new Vector3(0, 0, 0), havokPlugin);
 
 const defaultControls = new DefaultControls(scene);
 
-const camera = defaultControls.getActiveCameras()[0];
+const camera = defaultControls.getActiveCamera();
 camera.attachControl();
 
 scene.enableDepthRenderer(camera, false, true);
@@ -72,15 +74,18 @@ const sunTransformable = {
     dispose: () => sunTransform.dispose()
 };
 
-const climber = new SpaceElevatorClimber(scene);
+/*const climber = new SpaceElevatorClimber(scene);
 
 defaultControls.getTransform().position.copyFromFloats(0, 5, -5);
-defaultControls.getTransform().lookAt(climber.getTransform().position);
+defaultControls.getTransform().lookAt(climber.getTransform().position);*/
+
+const hyperSpaceTunnel = new HyperSpaceTunnel(Axis.Z, scene);
 
 scene.onBeforeRenderObservable.add(() => {
     defaultControls.update(engine.getDeltaTime() / 1000);
 
-    climber.update([sunTransformable]);
+    hyperSpaceTunnel.update(engine.getDeltaTime() / 1000);
+    //climber.update([sunTransformable]);
 });
 
 scene.executeWhenReady(() => {

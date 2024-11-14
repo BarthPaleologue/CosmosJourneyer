@@ -129,13 +129,8 @@ export class SpaceStation implements OrbitalFacility {
         return orbitalObjectTypeToDisplay(this.model);
     }
 
-    public computeCulling(cameras: Camera[]): void {
-        let isVisible = false;
-        for (const camera of cameras) {
-            isVisible = isVisible || isSizeOnScreenEnough(this, camera);
-        }
-
-        this.getTransform().setEnabled(isVisible);
+    public computeCulling(camera: Camera): void {
+        this.getTransform().setEnabled(isSizeOnScreenEnough(this, camera));
     }
 
     private generate() {

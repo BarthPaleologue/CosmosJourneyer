@@ -557,13 +557,15 @@ export class StarSystemView implements View {
      * It will remove the current controls and recreate them based on the player object.
      */
     public resetPlayer() {
+        this.defaultControls?.dispose();
         this.spaceshipControls?.dispose();
+        this.characterControls?.dispose();
 
         const maxZ = Settings.EARTH_RADIUS * 1e5;
 
         this.defaultControls = new DefaultControls(this.scene);
         this.defaultControls.speed = 0.2 * Settings.EARTH_RADIUS;
-        this.defaultControls.getActiveCameras().forEach((camera) => (camera.maxZ = maxZ));
+        this.defaultControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
 
         const spaceshipSerialized = this.player.serializedSpaceships.shift();
         if (spaceshipSerialized === undefined) throw new Error("No spaceship serialized in player");
@@ -573,11 +575,11 @@ export class StarSystemView implements View {
 
         this.spaceshipControls = new ShipControls(spaceship, this.scene);
 
-        this.spaceshipControls.getActiveCameras().forEach((camera) => (camera.maxZ = maxZ));
+        this.spaceshipControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
 
         this.characterControls = new CharacterControls(this.scene);
         this.characterControls.getTransform().setEnabled(false);
-        this.characterControls.getActiveCameras().forEach((camera) => (camera.maxZ = maxZ));
+        this.characterControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
 
         this.scene.setActiveControls(this.spaceshipControls);
     }
@@ -694,7 +696,7 @@ export class StarSystemView implements View {
 
         this.spaceShipLayer.update(activeControls.getTransform(), missionContext, this.keyboardLayoutMap);
 
-        this.targetCursorLayer.update(activeControls.getActiveCameras()[0]);
+        this.targetCursorLayer.update(activeControls.getActiveCamera());
         const targetLandingPad = this.spaceshipControls.spaceship.getTargetLandingPad();
         if (targetLandingPad !== null && !this.spaceshipControls.spaceship.isLanded() && this.targetCursorLayer.getTarget() !== targetLandingPad) {
             this.targetCursorLayer.setTarget(targetLandingPad);

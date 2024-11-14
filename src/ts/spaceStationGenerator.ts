@@ -58,7 +58,7 @@ await Assets.Init(scene);
 const defaultControls = new DefaultControls(scene);
 defaultControls.speed = 2000;
 
-const camera = defaultControls.getActiveCameras()[0];
+const camera = defaultControls.getActiveCamera();
 camera.maxZ = 100e3;
 camera.attachControl(canvas, true);
 

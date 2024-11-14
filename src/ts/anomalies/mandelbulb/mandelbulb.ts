@@ -77,7 +77,7 @@ export class Mandelbulb implements CelestialBody, Cullable {
         return orbitalObjectTypeToDisplay(this.model);
     }
 
-    computeCulling(cameras: Camera[]): void {
+    computeCulling(camera: Camera): void {
         // do nothing
     }
 

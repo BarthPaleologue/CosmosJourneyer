@@ -18,5 +18,5 @@
 import { Camera } from "@babylonjs/core/Cameras/camera";
 
 export interface Cullable {
-    computeCulling(cameras: Camera[]): void;
+    computeCulling(camera: Camera): void;
 }
