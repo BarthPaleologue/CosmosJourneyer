@@ -395,8 +395,8 @@ export class StarSystemView implements View {
             this.updateBeforeRender(deltaSeconds);
         });
 
-        this.scene.onAfterRenderObservable.add(async () => {
-            await this.updateAfterRender();
+        this.scene.onAfterRenderObservable.add(() => {
+            this.updateAfterRender();
         });
 
         window.addEventListener("resize", () => {

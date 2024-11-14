@@ -1,9 +1,8 @@
 import { Scene } from "@babylonjs/core/scene";
-import { Color4 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { getForwardDirection, rotate } from "../uberCore/transforms/basicTransform";
-import { LinesMesh, TransformNode } from "@babylonjs/core/Meshes";
+import { TransformNode } from "@babylonjs/core/Meshes";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 
@@ -18,40 +17,21 @@ import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
  * @see https://playground.babylonjs.com/#W9LE0U#28
  */
 export class HyperSpaceTunnel implements Transformable {
-    maxNbDrops = 500;
-    maxLineSize = 12.0;
-    positiveDepth = 600.0;
-    negativeDepth = 100.0;
-    radius = 50;
-    minSpeed = 200.0;
-    maxSpeed = 400.0;
-
-    drops: [Vector3, Vector3][] = [];
-    speeds: number[] = [];
-    colors: [Color4, Color4][] = [];
-    deltaSpeed: number;
-
     private parent: TransformNode | null = null;
 
     readonly direction: Vector3;
     readonly v1: Vector3;
     readonly v2: Vector3;
 
-    readonly spaceLines: LinesMesh;
     readonly hyperTunnel: Mesh;
 
     readonly warpConeMaterial: ShaderMaterial;
 
-    private throttle = 1;
-
-    private diameterTop = 0;
-    private diameterBottom = 160;
+    private tunnelDiameter = 160;
 
     private elapsedSeconds = 0;
 
     constructor(direction: Vector3, scene: Scene) {
-        this.deltaSpeed = this.maxSpeed - this.minSpeed;
-
         this.direction = direction;
 
         // find two orthogonal vectors to the direction vector (see  https://en.wikipedia.org/wiki/Gram%E2%80%93Schmidt_process)
@@ -63,28 +43,8 @@ export class HyperSpaceTunnel implements Transformable {
         this.v1 = v1;
         this.v2 = v2;
 
-        for (let d = 0; d < this.maxNbDrops; d++) {
-            this.drops.push(this.getRandomStartingPositions());
-
-            const color0 = new Color4(1.0, 1.0, 0.7, 1.0);
-            const color1 = new Color4(1.0, 1.0, 0.7, 1.0);
-            this.colors.push([color0, color1]);
-
-            this.speeds.push(this.minSpeed + this.deltaSpeed * Math.random());
-        }
-
-        this.spaceLines = MeshBuilder.CreateLineSystem(
-            "rain",
-            {
-                lines: this.drops,
-                updatable: true,
-                colors: this.colors
-            },
-            scene
-        );
-
         const path: Vector3[] = [];
-        const nbPoint = 10;
+        const nbPoint = 100;
         const tunnelOffset = 500;
         path.push(new Vector3(0, 0, -200));
         for(let i = 0; i < nbPoint; i++) {
@@ -94,10 +54,10 @@ export class HyperSpaceTunnel implements Transformable {
         this.hyperTunnel = MeshBuilder.CreateTube(
             "hyperTunnel",
             {
-                radius: this.diameterBottom / 2,
+                radius: this.tunnelDiameter / 2,
                 path: path,
                 sideOrientation: Mesh.BACKSIDE,
-                tessellation: 64
+                tessellation: 128
             },
             scene
         );
@@ -114,66 +74,25 @@ export class HyperSpaceTunnel implements Transformable {
         this.hyperTunnel.material = this.warpConeMaterial;
     }
 
-    private getRandomStartingPositions(): [Vector3, Vector3] {
-        const theta = Math.random() * Math.PI * 2;
-        const radiusScaling = 1 + (Math.random() * 2 - 1) * 0.5;
-
-        const p0 = new Vector3(Math.cos(theta), Math.sin(theta), 0).scale((radiusScaling * this.diameterTop) / 2);
-        const p1 = new Vector3(Math.cos(theta), Math.sin(theta), 0).scale((radiusScaling * this.diameterBottom) / 2);
-        p0.addInPlace(this.direction.scale(this.positiveDepth));
-        p1.subtractInPlace(this.direction.scale(this.negativeDepth));
-
-        const direction = p1.subtract(p0).normalize();
-
-        const lineSize = this.maxLineSize * Math.random();
-
-        const point0 = p0;
-        const point1 = point0.add(direction.scale(lineSize));
-
-        return [point0, point1];
-    }
-
     setParent(parent: TransformNode) {
         this.parent = parent;
     }
 
     setEnabled(enabled: boolean) {
-        this.spaceLines.setEnabled(enabled);
         this.hyperTunnel.setEnabled(enabled);
     }
 
     getTransform(): TransformNode {
-        return this.spaceLines;
-    }
-
-    rainFalls(deltaTime: number) {
-        for (let d = 0; d < this.maxNbDrops; d++) {
-            const drop = this.drops[d];
-            const speed = this.speeds[d] * this.throttle;
-            const direction = drop[0].subtract(drop[1]).normalize();
-            drop[0].subtractInPlace(direction.scale(speed * deltaTime));
-            drop[1].subtractInPlace(direction.scale(speed * deltaTime));
-
-            if (drop[0].dot(this.direction) < -this.negativeDepth) {
-                const [point0, point1] = this.getRandomStartingPositions();
-
-                drop[0].copyFrom(point0);
-                drop[1].copyFrom(point1);
-            }
-        }
+        return this.hyperTunnel;
     }
 
     update(deltaSeconds: number) {
         this.elapsedSeconds += deltaSeconds;
 
         this.warpConeMaterial.setFloat("time", this.elapsedSeconds);
-        this.rainFalls(deltaSeconds);
-
-        MeshBuilder.CreateLineSystem("rain", { lines: this.drops, instance: this.spaceLines });
 
         if (this.parent === null) return;
 
-        this.spaceLines.position = this.parent.getAbsolutePosition();
         this.hyperTunnel.position = this.parent.getAbsolutePosition();
 
         const rotationFrequency = 0.05;
@@ -187,12 +106,10 @@ export class HyperSpaceTunnel implements Transformable {
         const rotationAxis = Vector3.Cross(currentForward, targetForward);
         const theta = Math.acos(Vector3.Dot(currentForward, targetForward));
 
-        rotate(this.spaceLines, rotationAxis, theta);
         rotate(this.hyperTunnel, rotationAxis, theta);
     }
 
     dispose() {
-        this.spaceLines.dispose();
         this.hyperTunnel.dispose();
     }
 }

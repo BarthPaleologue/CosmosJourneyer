@@ -35,8 +35,7 @@ void main() {
     densitySamplePoint2.x /= 2.0;
 
     float noise = perlin(samplePoint, 4);
-    noise = pow(noise, 2.0);
-    noise = smoothstep(0.1, 1.0, noise);
+    noise = pow(noise, 4.0);
 
     float density1 = perlin(densitySamplePoint, 1);
     density1 = smoothSharpener(density1, 8.0);
@@ -44,7 +43,7 @@ void main() {
     noise *= density1;
 
     float noise2 = perlin(samplePoint2, 4);
-    noise2 = pow(noise2, 2.0);
+    noise2 = pow(noise2, 6.0);
     noise2 = smoothstep(0.1, 1.0, noise2);
 
     float density2 = perlin(densitySamplePoint2, 1);
@@ -52,18 +51,18 @@ void main() {
 
     noise2 *= density2;
 
-    float brightEnd = pow(sin(vUV.y), 2.0);
+    float brightEnd = 0.6 * smoothstep(0.2, 1.0, vUV.y);
 
     float rays = pow(sin(vUV.x * 3.1415 * 4.0 + time), 4.0);
     rays *= 0.2 + sin(time * 2.0) * 0.1;
 
-    vec3 finalColor = noise * vec3(0.7, 0.7, 1.0);
+    vec3 finalColor = noise * vec3(1.2, 1.2, 2.0) * 3.0;
 
-    finalColor = mix(finalColor, vec3(1.0, 0.7, 0.7), noise2);
+    finalColor += noise2 * vec3(0.9, 1.0, 0.9);
 
-    finalColor = mix(finalColor, vec3(0.9, 0.9, 1.0), brightEnd);
+    finalColor = mix(finalColor, vec3(1.0, 1.0, 1.0), brightEnd);
 
-    finalColor += vec3(1.0, 0.9, 0.9) * rays;
+    finalColor += 0.5 * vec3(1.0, 0.9, 0.9) * rays;
 
     gl_FragColor = vec4(finalColor, 1.0); // apply color and lighting
 } 

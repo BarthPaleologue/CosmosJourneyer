@@ -124,9 +124,11 @@ export class StarSystemController {
      * This instantiates all stars, planets, satellites, anomalies and space stations in the star system.
      */
     public async load() {
+        await wait(1000);
         for (const subSystem of this.model.subSystems) {
             this.subSystems.push(await this.loadSubSystem(subSystem));
         }
+        await wait(1000);
     }
 
     private async loadSubSystem(subSystemModel: SubStarSystemModel): Promise<SubStarSystem> {
