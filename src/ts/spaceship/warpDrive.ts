@@ -188,8 +188,8 @@ export class WarpDrive implements ReadonlyWarpDrive {
         // use lerp smoothing to reach target speed, while making it a bit harder to decelerate
         this.currentSpeed =
             this.currentSpeed < this.maxTargetSpeed
-                ? Lerp(this.currentSpeed, this.throttle * this.maxTargetSpeed, 0.2) // acceleration
-                : Lerp(this.currentSpeed, this.throttle * this.maxTargetSpeed, 0.15); // deceleration
+                ? Lerp(this.currentSpeed, this.throttle * this.maxTargetSpeed, 0.1) // acceleration
+                : Lerp(this.currentSpeed, this.throttle * this.maxTargetSpeed, 0.05); // deceleration
         this.currentSpeed = clamp(this.currentSpeed, WarpDrive.MIN_WARP_SPEED, WarpDrive.MAX_WARP_SPEED);
     }
 
