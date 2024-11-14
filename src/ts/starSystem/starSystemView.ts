@@ -337,7 +337,6 @@ export class StarSystemView implements View {
                 this.spaceShipLayer.setVisibility(false);
 
                 this.scene.setActiveControls(characterControls);
-                this.postProcessManager.rebuild();
 
                 shipControls.spaceship.acceleratingWarpDriveSound.setTargetVolume(0);
                 shipControls.spaceship.deceleratingWarpDriveSound.setTargetVolume(0);
@@ -349,8 +348,6 @@ export class StarSystemView implements View {
 
                 this.scene.setActiveControls(shipControls);
                 SpaceShipControlsInputs.setEnabled(true);
-
-                this.postProcessManager.rebuild();
 
                 if (shipControls.spaceship.isLanded()) {
                     const bindings = SpaceShipControlsInputs.map.upDown.bindings;
@@ -557,6 +554,8 @@ export class StarSystemView implements View {
      * It will remove the current controls and recreate them based on the player object.
      */
     public resetPlayer() {
+        this.postProcessManager.reset();
+
         this.defaultControls?.dispose();
         this.spaceshipControls?.dispose();
         this.characterControls?.dispose();
@@ -770,7 +769,6 @@ export class StarSystemView implements View {
         CharacterInputs.setEnabled(false);
         this.scene.setActiveControls(shipControls);
         setRotationQuaternion(shipControls.getTransform(), getRotationQuaternion(defaultControls.getTransform()).clone());
-        this.postProcessManager.rebuild();
 
         shipControls.spaceship.setEnabled(true, this.havokPlugin);
         SpaceShipControlsInputs.setEnabled(true);
@@ -791,7 +789,6 @@ export class StarSystemView implements View {
         characterControls.getTransform().setAbsolutePosition(defaultControls.getTransform().absolutePosition);
         this.scene.setActiveControls(characterControls);
         setRotationQuaternion(characterControls.getTransform(), getRotationQuaternion(defaultControls.getTransform()).clone());
-        this.postProcessManager.rebuild();
 
         shipControls.spaceship.warpTunnel.setThrottle(0);
         shipControls.spaceship.setEnabled(false, this.havokPlugin);
@@ -822,7 +819,6 @@ export class StarSystemView implements View {
 
         this.scene.setActiveControls(defaultControls);
         setRotationQuaternion(defaultControls.getTransform(), getRotationQuaternion(shipControls.getTransform()).clone());
-        this.postProcessManager.rebuild();
 
         if (showHelpNotification) {
             const horizontalKeys = dPadCompositeToString(DefaultControlsInputs.map.move.bindings[0].control as DPadComposite, keyboardLayoutMap);
