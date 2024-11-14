@@ -147,11 +147,11 @@ export class WarpTunnel implements Transformable {
 
             if (progression < 0.5) {
                 const t = progression / 0.5;
-                particle.color = Color4.Lerp(new Color4(0, 0, 1, 1), new Color4(0, 1, 1, 1), t);
+                particle.color = Color4.Lerp(new Color4(0.7, 0.7, 1, 1), new Color4(0.7, 1, 1, 1), t);
                 particle.scaling = Vector3.Lerp(Vector3.Zero(), this.particleScaling, Math.min(t * 2, 1));
             } else {
                 const t = (progression - 0.5) / 0.5;
-                particle.color = Color4.Lerp(new Color4(0, 1, 1, 1), new Color4(1, 0, 1, 1), t);
+                particle.color = Color4.Lerp(new Color4(0.7, 1, 1, 1), new Color4(1, 1, 1, 1), t);
                 particle.scaling = Vector3.Lerp(this.particleScaling, Vector3.Zero(), t * t);
             }
 
