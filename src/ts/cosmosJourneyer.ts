@@ -95,6 +95,18 @@ export class CosmosJourneyer {
 
     private readonly player: Player;
 
+    /**
+     * The number of seconds elapsed since the start of the engine
+     */
+    private elapsedSeconds = 0;
+
+    /**
+     * The period of time in seconds between each autosave
+     */
+    private readonly autoSavePeriodSeconds = 60 * 5;
+
+    private autoSaveTimerSeconds = 0;
+
     private constructor(player: Player, engine: AbstractEngine, starSystemView: StarSystemView) {
         this.engine = engine;
         this.player = player;
@@ -177,6 +189,11 @@ export class CosmosJourneyer {
 
         window.addEventListener("resize", () => {
             this.engine.resize(true);
+        });
+
+        window.addEventListener("beforeunload", () => {
+            if (this.mainMenu.isVisible()) return; // don't autosave if the main menu is visible: the player is not in the game yet
+            this.performAutoSave();
         });
 
         GeneralInputs.map.toggleStarMap.on("complete", () => {
@@ -285,6 +302,18 @@ export class CosmosJourneyer {
 
         this.engine.runRenderLoop(() => {
             const deltaSeconds = this.engine.getDeltaTime() / 1000;
+            this.elapsedSeconds += deltaSeconds;
+
+            this.autoSaveTimerSeconds += deltaSeconds;
+            if (this.autoSaveTimerSeconds >= this.autoSavePeriodSeconds) {
+                this.autoSaveTimerSeconds %= this.autoSavePeriodSeconds;
+
+                if (!this.mainMenu.isVisible()) {
+                    // don't autosave if the main menu is visible: the player is not in the game yet
+                    this.performAutoSave();
+                }
+            }
+
             updateInputDevices();
             updateNotifications(deltaSeconds);
             AudioManager.Update(deltaSeconds);
@@ -383,6 +412,7 @@ export class CosmosJourneyer {
 
         return {
             version: projectInfo.version,
+            timestamp: Date.now(),
             player: Player.Serialize(this.player),
             universeCoordinates: {
                 universeObjectId: universeObjectId,
@@ -396,6 +426,21 @@ export class CosmosJourneyer {
             },
             padNumber: spaceship.isLandedAtFacility() ? spaceship.getTargetLandingPad()?.padNumber : undefined
         };
+    }
+
+    /**
+     * Generate save file data and store it in the autosaves hashmap in local storage
+     */
+    public performAutoSave(): void {
+        const saveData = this.generateSaveData();
+
+        // use creation date as key to avoid overwriting other cmdr's autosave
+        const creationDate = saveData.player.creationDate;
+
+        // store in a hashmap in local storage
+        const autosaves = JSON.parse(localStorage.getItem("autosaves") || "{}");
+        autosaves[creationDate] = saveData;
+        localStorage.setItem("autosaves", JSON.stringify(autosaves));
     }
 
     /**

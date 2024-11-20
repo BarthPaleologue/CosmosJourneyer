@@ -14,6 +14,11 @@ export type SaveFileData = {
     version: string;
 
     /**
+     * The timestamp when the save file was created.
+     */
+    timestamp: number;
+
+    /**
      * The player data.
      */
     player: SerializedPlayer;
