@@ -38,6 +38,7 @@ import { CameraShakeAnimation } from "../uberCore/transforms/animations/cameraSh
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { Lerp } from "@babylonjs/core/Maths/math.scalar.functions";
 import { quickAnimation } from "../uberCore/transforms/animations/quickAnimation";
+import { Observable } from "@babylonjs/core/Misc/observable";
 
 export class ShipControls implements Controls {
     private spaceship: Spaceship;
@@ -54,6 +55,8 @@ export class ShipControls implements Controls {
     private closestLandableFacility: (Transformable & ManagesLandingPads) | null = null;
 
     private targetFov = Tools.ToRadians(60);
+
+    readonly onToggleWarpDrive: Observable<boolean> = new Observable();
 
     private readonly toggleWarpDriveHandler: () => void;
     private readonly landingHandler: () => void;
@@ -293,6 +296,11 @@ export class ShipControls implements Controls {
 
         this.spaceship.onWarpDriveDisabled.add((isEmergency) => {
             if (isEmergency) Sounds.WARP_DRIVE_EMERGENCY_SHUT_DOWN.play();
+            this.onToggleWarpDrive.notifyObservers(false);
+        });
+
+        this.spaceship.onWarpDriveEnabled.add(() => {
+            this.onToggleWarpDrive.notifyObservers(true);
         });
     }
 
@@ -301,6 +309,8 @@ export class ShipControls implements Controls {
     }
 
     dispose() {
+        this.onToggleWarpDrive.clear();
+
         SpaceShipControlsInputs.map.toggleWarpDrive.off("complete", this.toggleWarpDriveHandler);
         SpaceShipControlsInputs.map.landing.off("complete", this.landingHandler);
         SpaceShipControlsInputs.map.emitLandingRequest.off("complete", this.emitLandingRequestHandler);

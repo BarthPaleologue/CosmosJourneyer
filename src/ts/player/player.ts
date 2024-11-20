@@ -3,6 +3,10 @@ import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates"
 import { warnIfUndefined } from "../utils/notification";
 import { DefaultSerializedSpaceship, SerializedSpaceship, Spaceship } from "../spaceship/spaceship";
 
+export type CompletedTutorials = {
+    stationLandingCompleted: boolean;
+};
+
 export type SerializedPlayer = {
     name: string;
     balance: number;
@@ -17,6 +21,8 @@ export type SerializedPlayer = {
     completedMissions: MissionSerialized[];
 
     spaceShips: SerializedSpaceship[];
+
+    tutorials: CompletedTutorials;
 };
 
 export class Player {
@@ -35,51 +41,62 @@ export class Player {
     serializedSpaceships: SerializedSpaceship[] = [];
     instancedSpaceships: Spaceship[] = [];
 
+    tutorials: CompletedTutorials;
+
     static DEFAULT_NAME = "Python";
     static DEFAULT_BALANCE = 10_000;
 
-    private constructor(
-        name: string,
-        balance: number,
-        creationDate: Date,
-        visitedSystemHistory: StarSystemCoordinates[],
-        currentItinerary: StarSystemCoordinates[],
-        systemBookmarks: StarSystemCoordinates[],
-        currentMissions: Mission[],
-        completedMissions: Mission[],
-        serializedSpaceships: SerializedSpaceship[]
-    ) {
-        this.name = name;
-        this.balance = balance;
-        this.creationDate = creationDate;
-        this.visitedSystemHistory = visitedSystemHistory;
-        this.currentItinerary = currentItinerary;
-        this.systemBookmarks = systemBookmarks;
-        this.currentMissions = currentMissions;
-        this.completedMissions = completedMissions;
-        this.serializedSpaceships = serializedSpaceships;
+    private constructor(serializedPlayer: SerializedPlayer) {
+        this.name = warnIfUndefined(serializedPlayer.name, Player.DEFAULT_NAME, `[PLAYER_DATA_WARNING] Name was undefined. Defaulting to ${Player.DEFAULT_NAME}`);
+        this.balance = warnIfUndefined(serializedPlayer.balance, Player.DEFAULT_BALANCE, `[PLAYER_DATA_WARNING] Balance was undefined. Defaulting to ${Player.DEFAULT_BALANCE}`);
+        this.creationDate = new Date(
+            warnIfUndefined(serializedPlayer.creationDate, new Date().toISOString(), `[PLAYER_DATA_WARNING] Creation date was undefined. Defaulting to current date`)
+        );
+        this.visitedSystemHistory = warnIfUndefined(
+            serializedPlayer.visitedSystemHistory,
+            [],
+            `[PLAYER_DATA_WARNING] Visited system history was undefined. Defaulting to empty array`
+        );
+        this.currentItinerary = warnIfUndefined(serializedPlayer.currentItinerary, [], `[PLAYER_DATA_WARNING] Current itinerary was undefined. Defaulting to empty array`);
+        this.systemBookmarks = warnIfUndefined(serializedPlayer.systemBookmarks, [], `[PLAYER_DATA_WARNING] System bookmarks were undefined. Defaulting to empty array`);
+        this.currentMissions = warnIfUndefined(serializedPlayer.currentMissions, [], `[PLAYER_DATA_WARNING] Current missions were undefined. Defaulting to empty array`).map(
+            (mission) => Mission.Deserialize(mission)
+        );
+        this.completedMissions = warnIfUndefined(serializedPlayer.completedMissions, [], `[PLAYER_DATA_WARNING] Completed missions were undefined. Defaulting to empty array`).map(
+            (mission) => Mission.Deserialize(mission)
+        );
+        this.serializedSpaceships = warnIfUndefined(
+            serializedPlayer.spaceShips,
+            [DefaultSerializedSpaceship],
+            `[PLAYER_DATA_WARNING] Spaceships were undefined. Defaulting to the default spaceship`
+        );
+
+        this.tutorials = warnIfUndefined(
+            serializedPlayer.tutorials,
+            { stationLandingCompleted: false },
+            `[PLAYER_DATA_WARNING] Tutorials were undefined. Defaulting to no tutorials completed`
+        );
     }
 
     public static Default(): Player {
-        return new Player(Player.DEFAULT_NAME, Player.DEFAULT_BALANCE, new Date(), [], [], [], [], [], [DefaultSerializedSpaceship]);
+        return new Player({
+            name: Player.DEFAULT_NAME,
+            balance: Player.DEFAULT_BALANCE,
+            creationDate: new Date().toISOString(),
+            visitedSystemHistory: [],
+            currentItinerary: [],
+            systemBookmarks: [],
+            currentMissions: [],
+            completedMissions: [],
+            spaceShips: [DefaultSerializedSpaceship],
+            tutorials: {
+                stationLandingCompleted: false
+            }
+        });
     }
 
     public static Deserialize(serializedPlayer: SerializedPlayer): Player {
-        return new Player(
-            warnIfUndefined(serializedPlayer.name, Player.DEFAULT_NAME, `[PLAYER_DATA_WARNING] Name was undefined. Defaulting to ${Player.DEFAULT_NAME}`),
-            warnIfUndefined(serializedPlayer.balance, Player.DEFAULT_BALANCE, `[PLAYER_DATA_WARNING] Balance was undefined. Defaulting to ${Player.DEFAULT_BALANCE}`),
-            new Date(warnIfUndefined(serializedPlayer.creationDate, new Date().toISOString(), `[PLAYER_DATA_WARNING] Creation date was undefined. Defaulting to current date`)),
-            warnIfUndefined(serializedPlayer.visitedSystemHistory, [], `[PLAYER_DATA_WARNING] Visited system history was undefined. Defaulting to empty array`),
-            warnIfUndefined(serializedPlayer.currentItinerary, [], `[PLAYER_DATA_WARNING] Current itinerary was undefined. Defaulting to empty array`),
-            warnIfUndefined(serializedPlayer.systemBookmarks, [], `[PLAYER_DATA_WARNING] System bookmarks were undefined. Defaulting to empty array`),
-            warnIfUndefined(serializedPlayer.currentMissions, [], `[PLAYER_DATA_WARNING] Current missions were undefined. Defaulting to empty array`).map((mission) =>
-                Mission.Deserialize(mission)
-            ),
-            warnIfUndefined(serializedPlayer.completedMissions, [], `[PLAYER_DATA_WARNING] Completed missions were undefined. Defaulting to empty array`).map((mission) =>
-                Mission.Deserialize(mission)
-            ),
-            warnIfUndefined(serializedPlayer.spaceShips, [DefaultSerializedSpaceship], `[PLAYER_DATA_WARNING] Spaceships were undefined. Defaulting to the default spaceship`)
-        );
+        return new Player(serializedPlayer);
     }
 
     public static Serialize(player: Player): SerializedPlayer {
@@ -92,7 +109,8 @@ export class Player {
             systemBookmarks: player.systemBookmarks,
             currentMissions: player.currentMissions.map((mission) => mission.serialize()),
             completedMissions: player.completedMissions.map((mission) => mission.serialize()),
-            spaceShips: player.serializedSpaceships.concat(player.instancedSpaceships.map((spaceship) => spaceship.serialize()))
+            spaceShips: player.serializedSpaceships.concat(player.instancedSpaceships.map((spaceship) => spaceship.serialize())),
+            tutorials: player.tutorials
         };
     }
 
