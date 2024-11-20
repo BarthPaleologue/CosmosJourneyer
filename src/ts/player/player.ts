@@ -117,7 +117,7 @@ export class Player {
             name: player.name,
             balance: player.balance,
             creationDate: player.creationDate.toISOString(),
-            timePlayedSeconds: player.timePlayedSeconds,
+            timePlayedSeconds: Math.round(player.timePlayedSeconds),
             visitedSystemHistory: player.visitedSystemHistory,
             currentItinerary: player.currentItinerary,
             systemBookmarks: player.systemBookmarks,
