@@ -528,7 +528,7 @@ export class PostProcessManager {
         this.renderingPipeline.addEffect(this.colorCorrectionRenderEffect);
 
         this.renderingPipelineManager.addPipeline(this.renderingPipeline);
-        this.renderingPipelineManager.attachCamerasToRenderPipeline(this.renderingPipeline.name, this.scene.getActiveCameras());
+        this.renderingPipelineManager.attachCamerasToRenderPipeline(this.renderingPipeline.name, this.scene.cameras);
     }
 
     /**

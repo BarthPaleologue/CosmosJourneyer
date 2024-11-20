@@ -21,7 +21,6 @@ import { Slider } from "handle-sliderjs";
 import { Settings } from "../../../settings";
 import { ColorCorrection } from "../../../postProcesses/colorCorrection";
 import { getRotationQuaternion, rotate } from "../../../uberCore/transforms/basicTransform";
-
 import { HasBoundingSphere } from "../../../architecture/hasBoundingSphere";
 import { Transformable } from "../../../architecture/transformable";
 import { Scene } from "@babylonjs/core/scene";

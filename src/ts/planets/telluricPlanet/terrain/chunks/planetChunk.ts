@@ -229,45 +229,34 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
         this.disposed = true;
     }
 
-    computeCulling(cameras: Camera[]) {
+    computeCulling(camera: Camera) {
         if (!this.isLoaded()) return;
 
-        let isVisible = false;
+        // chunks on the other side of the planet are culled
+        // as chunks have dimensions, we use the bounding sphere to do conservative culling
+        const chunkToCameraDir = camera.globalPosition.subtract(this.getTransform().getAbsolutePosition()).normalize();
+        const closestPointToCamera = this.getTransform().getAbsolutePosition().add(chunkToCameraDir.scale(this.getBoundingRadius()));
+        const conservativeSphereNormal = closestPointToCamera.subtract(this.parent.getAbsolutePosition()).normalizeToNew();
+        const observerToCenter = camera.globalPosition.subtract(this.parent.getAbsolutePosition()).normalizeToNew();
 
-        for (const camera of cameras) {
-            // chunks on the other side of the planet are culled
-            // as chunks have dimensions, we use the bounding sphere to do conservative culling
-            const chunkToCameraDir = camera.globalPosition.subtract(this.getTransform().getAbsolutePosition()).normalize();
-            const closestPointToCamera = this.getTransform().getAbsolutePosition().add(chunkToCameraDir.scale(this.getBoundingRadius()));
-            const conservativeSphereNormal = closestPointToCamera.subtract(this.parent.getAbsolutePosition()).normalizeToNew();
-            const observerToCenter = camera.globalPosition.subtract(this.parent.getAbsolutePosition()).normalizeToNew();
-            if (Vector3.Dot(observerToCenter, conservativeSphereNormal) < 0) {
-                continue;
-            }
-
-            if (isSizeOnScreenEnough(this, camera, 0.002 / 5)) {
-                isVisible = true;
-                break;
-            }
-        }
+        const isVisible = (Vector3.Dot(observerToCenter, conservativeSphereNormal) >= 0 && isSizeOnScreenEnough(this, camera, 0.002 / 5));
 
         this.mesh.setEnabled(isVisible);
 
         this.instancePatches.forEach((patch) => {
             let isVisible = false;
             let minDistance = Number.MAX_VALUE;
-            for (const camera of cameras) {
-                const distanceVector = camera.globalPosition.subtract(this.getTransform().getAbsolutePosition());
+            const distanceVector = camera.globalPosition.subtract(this.getTransform().getAbsolutePosition());
 
-                // instance patches are not rendered when the chunk is too far
-                const sphereNormal = this.getTransform().getAbsolutePosition().subtract(this.parent.getAbsolutePosition()).normalizeToNew();
+            // instance patches are not rendered when the chunk is too far
+            const sphereNormal = this.getTransform().getAbsolutePosition().subtract(this.parent.getAbsolutePosition()).normalizeToNew();
 
-                const normalComponent = sphereNormal.scale(distanceVector.dot(sphereNormal));
-                const tangentialDistance = distanceVector.subtract(normalComponent).length();
+            const normalComponent = sphereNormal.scale(distanceVector.dot(sphereNormal));
+            const tangentialDistance = distanceVector.subtract(normalComponent).length();
 
-                isVisible = isVisible || tangentialDistance < 200;
-                minDistance = Math.min(minDistance, tangentialDistance);
-            }
+            isVisible = isVisible || tangentialDistance < 200;
+            minDistance = Math.min(minDistance, tangentialDistance);
+
             patch.setEnabled(isVisible);
             patch.handleLod(minDistance);
         });

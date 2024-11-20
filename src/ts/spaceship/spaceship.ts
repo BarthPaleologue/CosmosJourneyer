@@ -89,6 +89,14 @@ export class Spaceship implements Transformable {
     private mainEngineThrottle = 0;
     private mainEngineTargetSpeed = 0;
 
+    private readonly thrusterForce = 8000;
+
+    /**
+     * Maximum speed of the ship in m/s
+     * @private
+     */
+    private readonly maxSpeed = 1400;
+
     private closestWalkableObject: (Transformable & HasBoundingSphere) | null = null;
 
     private landingTarget: Transformable | null = null;
@@ -455,26 +463,45 @@ export class Spaceship implements Transformable {
     }
 
     public canEngageWarpDrive() {
-        let canEngage = true;
+        if (this.nearestOrbitalObject !== null) {
+            const distanceToObject = Vector3.Distance(this.getTransform().getAbsolutePosition(), this.nearestOrbitalObject.getTransform().getAbsolutePosition());
+            if (distanceToObject < this.nearestOrbitalObject.getBoundingRadius() * 1.03) {
+                return false;
+            }
+        }
+
         if (this.nearestCelestialBody !== null) {
             // if the spaceship goes too close to planetary rings, stop the warp drive to avoid collision with asteroids
             const asteroidField = this.nearestCelestialBody.asteroidField;
 
             if (asteroidField !== null) {
-                const relativePosition = this.getTransform().getAbsolutePosition().subtract(this.nearestCelestialBody.getTransform().getAbsolutePosition());
-                const distanceAboveRings = Math.abs(Vector3.Dot(relativePosition, this.nearestCelestialBody.getRotationAxis()));
-                const planarDistance = relativePosition.subtract(this.nearestCelestialBody.getRotationAxis().scale(distanceAboveRings)).length();
+                const inverseWorld = this.nearestCelestialBody.getTransform().getWorldMatrix().clone().invert();
+                const relativePosition = Vector3.TransformCoordinates(this.getTransform().getAbsolutePosition(), inverseWorld);
+                const relativeForward = Vector3.TransformNormal(getForwardDirection(this.getTransform()), inverseWorld);
+                const distanceAboveRings = relativePosition.y;
+                const planarDistance = Math.sqrt(relativePosition.x * relativePosition.x + relativePosition.z * relativePosition.z);
+
+                const nbSecondsPrediction = 0.5;
+                const nextRelativePosition = relativePosition.add(relativeForward.scale(this.getSpeed() * nbSecondsPrediction));
+                const nextDistanceAboveRings = nextRelativePosition.y;
+                const nextPlanarDistance = Math.sqrt(nextRelativePosition.x * nextRelativePosition.x + nextRelativePosition.z * nextRelativePosition.z);
 
                 const ringsMinDistance = asteroidField.minRadius;
                 const ringsMaxDistance = asteroidField.maxRadius;
 
-                if (distanceAboveRings < asteroidField.patchThickness / 2 && planarDistance > ringsMinDistance && planarDistance < ringsMaxDistance) {
-                    canEngage = false;
+                const isAboveRing = planarDistance > ringsMinDistance && planarDistance < ringsMaxDistance;
+                const willBeAboveRing = nextPlanarDistance > ringsMinDistance && nextPlanarDistance < ringsMaxDistance;
+
+                const isInRing = Math.abs(distanceAboveRings) < asteroidField.patchThickness / 2 && isAboveRing;
+                const willCrossRing = Math.sign(distanceAboveRings) !== Math.sign(nextDistanceAboveRings) && (willBeAboveRing || isAboveRing);
+
+                if (isInRing || willCrossRing) {
+                    return false;
                 }
             }
         }
 
-        return canEngage;
+        return true;
     }
 
     private handleFuelScoop(deltaSeconds: number) {
@@ -514,7 +541,7 @@ export class Spaceship implements Transformable {
     }
 
     public update(deltaSeconds: number) {
-        this.mainEngineTargetSpeed = this.mainEngineThrottle * 500;
+        this.mainEngineTargetSpeed = this.mainEngineThrottle * this.maxSpeed;
 
         const warpSpeed = getForwardDirection(this.aggregate.transformNode).scale(this.warpDrive.getWarpSpeed());
         this.warpTunnel.update(deltaSeconds);
@@ -551,9 +578,15 @@ export class Spaceship implements Transformable {
                     const ringsMinDistance = asteroidField.minRadius;
                     const ringsMaxDistance = asteroidField.maxRadius;
 
-                    if (distanceAboveRings < asteroidField.patchThickness * 1000 && planarDistance > ringsMinDistance - 100e3 && planarDistance < ringsMaxDistance + 100e3) {
-                        closestDistance = distanceAboveRings;
-                        objectHalfThickness = asteroidField.patchThickness / 4;
+                    const isAboveRings = planarDistance > ringsMinDistance && planarDistance < ringsMaxDistance;
+
+                    const distanceToRings = isAboveRings
+                        ? Math.abs(distanceAboveRings)
+                        : Math.sqrt(Math.min((planarDistance - ringsMinDistance) ** 2, (planarDistance - ringsMaxDistance) ** 2) + distanceAboveRings ** 2);
+
+                    if (distanceToRings < closestDistance) {
+                        closestDistance = distanceToRings;
+                        objectHalfThickness = asteroidField.patchThickness / 2;
                     }
                 }
             }
@@ -576,9 +609,9 @@ export class Spaceship implements Transformable {
             else this.thrusterSound.setTargetVolume(0);
 
             if (forwardSpeed < this.mainEngineTargetSpeed) {
-                this.aggregate.body.applyForce(forwardDirection.scale(3000), this.aggregate.body.getObjectCenterWorld());
+                this.aggregate.body.applyForce(forwardDirection.scale(this.thrusterForce), this.aggregate.body.getObjectCenterWorld());
             } else {
-                this.aggregate.body.applyForce(forwardDirection.scale(-3000), this.aggregate.body.getObjectCenterWorld());
+                this.aggregate.body.applyForce(forwardDirection.scale(-0.7 * this.thrusterForce), this.aggregate.body.getObjectCenterWorld());
             }
 
             this.mainThrusters.forEach((thruster) => {

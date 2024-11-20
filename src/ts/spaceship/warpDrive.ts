@@ -17,6 +17,7 @@
 
 import { Settings } from "../settings";
 import { clamp, moveTowards } from "../utils/math";
+import { Lerp } from "@babylonjs/core/Maths/math.scalar.functions";
 
 const enum WarpDriveState {
     /**
@@ -83,7 +84,7 @@ export class WarpDrive implements ReadonlyWarpDrive {
      */
     private static readonly MAX_WARP_SPEED = 10 * Settings.C;
 
-    private static readonly MIN_WARP_SPEED = 10e3;
+    private static readonly MIN_WARP_SPEED = 30e3;
 
     /**
      * Target speed of the warp drive in m/s. It is computed based on the distance to the closest body and the user throttle.
@@ -153,8 +154,10 @@ export class WarpDrive implements ReadonlyWarpDrive {
     public updateMaxTargetSpeed(closestObjectDistance: number, closestObjectRadius: number): number {
         const speedThreshold = 10e3;
 
-        const closeSpeed = (speedThreshold * 0.1 * Math.max(0, closestObjectDistance - closestObjectRadius)) / speedThreshold;
-        const deepSpaceSpeed = speedThreshold * ((0.1 * Math.max(0, closestObjectDistance - closestObjectRadius)) / speedThreshold) ** 1.2;
+        const collisionDistance = Math.max(0, closestObjectDistance - closestObjectRadius);
+
+        const closeSpeed = (speedThreshold * 0.1 * collisionDistance) / speedThreshold;
+        const deepSpaceSpeed = speedThreshold * ((0.1 * collisionDistance) / speedThreshold) ** 1.2;
         this.maxTargetSpeed = clamp(Math.max(closeSpeed, deepSpaceSpeed), WarpDrive.MIN_WARP_SPEED, WarpDrive.MAX_WARP_SPEED);
         return this.maxTargetSpeed;
     }
@@ -182,8 +185,11 @@ export class WarpDrive implements ReadonlyWarpDrive {
      * @param deltaSeconds The time elapsed since the last update in seconds.
      */
     private updateWarpDriveSpeed(currentForwardSpeed: number, closestObjectDistance: number, deltaSeconds: number): void {
-        const deltaSpeed = 2e3 * deltaSeconds + Math.min(0.5 * closestObjectDistance, Settings.C) * deltaSeconds;
-        this.currentSpeed = moveTowards(this.currentSpeed, this.throttle * this.maxTargetSpeed, deltaSpeed);
+        // use lerp smoothing to reach target speed, while making it a bit harder to decelerate
+        this.currentSpeed =
+            this.currentSpeed < this.maxTargetSpeed
+                ? Lerp(this.currentSpeed, this.throttle * this.maxTargetSpeed, 0.1) // acceleration
+                : Lerp(this.currentSpeed, this.throttle * this.maxTargetSpeed, 0.05); // deceleration
         this.currentSpeed = clamp(this.currentSpeed, WarpDrive.MIN_WARP_SPEED, WarpDrive.MAX_WARP_SPEED);
     }
 

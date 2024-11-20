@@ -64,17 +64,20 @@ export class UberScene extends Scene {
      */
     public setActiveControls(controls: Controls) {
         this.activeControls = controls;
-        this.setActiveCameras(controls.getActiveCameras());
+        this.setActiveCamera(controls.getActiveCamera());
     }
 
     /**
-     * Sets the active cameras for the scene and the depth renderer. If the depth renderer does not exist, it is created.
-     * @param cameras The new active cameras.
+     * Sets the active camera for the scene and the depth renderer. If the depth renderer does not exist, it is created.
+     * @param camera The new active camera.
      */
-    public setActiveCameras(cameras: Camera[]) {
+    public setActiveCamera(camera: Camera) {
         if (this.activeCameras !== null) this.activeCameras.forEach((camera) => camera.detachControl());
-        this.activeCameras = cameras;
-        this.activeCameras.forEach((camera) => camera.attachControl(true));
+        if(this.activeCamera !== null) this.activeCamera.detachControl();
+
+        this.activeCamera = camera;
+        this.activeCameras = [camera];
+        camera.attachControl(true);
     }
 
     /**

@@ -49,8 +49,12 @@ export class DefaultControls implements Controls {
         this.camera.fov = Settings.FOV;
     }
 
-    public getActiveCameras(): Camera[] {
+    public getCameras(): Camera[] {
         return [this.camera];
+    }
+
+    public getActiveCamera(): Camera {
+        return this.camera;
     }
 
     public getTransform(): TransformNode {
@@ -100,7 +104,7 @@ export class DefaultControls implements Controls {
         displacement.addInPlace(rightDisplacement);
 
         translate(this.transform, displacement);
-        this.getActiveCameras().forEach((camera) => camera.getViewMatrix());
+        this.getActiveCamera().getViewMatrix();
 
         return displacement;
     }

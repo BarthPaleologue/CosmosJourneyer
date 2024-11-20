@@ -66,11 +66,16 @@ export class WarpTunnel implements Transformable {
     private readonly tunnelAxis1 = Vector3.Zero();
     private readonly tunnelAxis2 = Vector3.Zero();
 
+    private particleSpeed = 200;
+
+    private emitPeriod = 1;
+    private emitCounter = 0;
+
     private lastDeltaSeconds = 0;
 
     constructor(parent: TransformNode, scene: Scene) {
         this.anchor = new TransformNode("anchor", scene);
-        this.anchor.position = new Vector3(0, 0, WarpTunnel.TUNNEL_LENGTH);
+        this.anchor.position = new Vector3(0, 0, WarpTunnel.TUNNEL_LENGTH / 2);
         this.anchor.rotationQuaternion = Quaternion.Identity();
         this.anchor.computeWorldMatrix(true);
 
@@ -108,7 +113,7 @@ export class WarpTunnel implements Transformable {
                 } else {
                     this.nbParticlesAlive++;
                 }
-                particle.position.z = RandomRange(-WarpTunnel.TUNNEL_LENGTH / 2, WarpTunnel.TUNNEL_LENGTH);
+                particle.position.z = RandomRange(-WarpTunnel.TUNNEL_LENGTH / 2, WarpTunnel.TUNNEL_LENGTH / 2);
             }
         };
 
@@ -124,7 +129,7 @@ export class WarpTunnel implements Transformable {
         SPS.updateParticle = (particle) => {
             if (!particle.isVisible) return particle;
 
-            particle.velocity.copyFrom(particle.props.direction.scale(200 * (1 + this.throttle)));
+            particle.velocity.copyFrom(particle.props.direction.scale(this.particleSpeed));
 
             particle.position.addInPlace(particle.velocity.scale(this.lastDeltaSeconds));
             particle.position.addInPlace(this.spaceshipDisplacement);
@@ -132,26 +137,21 @@ export class WarpTunnel implements Transformable {
             const relativePosition = particle.position.subtract(this.parent.position);
             const localZ = relativePosition.dot(this.spaceshipForward);
 
-            if (localZ < -WarpTunnel.TUNNEL_LENGTH / 2 || relativePosition.length() > WarpTunnel.TUNNEL_LENGTH) {
-                if (this.nbParticlesAlive <= this.targetNbParticles) {
-                    this.initParticle(particle);
-                } else {
-                    SPS.recycleParticle(particle);
-                    this.nbParticlesAlive--;
-
-                    return particle;
-                }
+            if (localZ < -WarpTunnel.TUNNEL_LENGTH / 2 || relativePosition.length() > WarpTunnel.TUNNEL_LENGTH / 2) {
+                SPS.recycleParticle(particle);
+                this.nbParticlesAlive--;
+                return particle;
             }
 
-            const progression = 1.0 - RangeToPercent(localZ, -WarpTunnel.TUNNEL_LENGTH / 2, WarpTunnel.TUNNEL_LENGTH);
+            const progression = 1.0 - RangeToPercent(localZ, -WarpTunnel.TUNNEL_LENGTH / 2, WarpTunnel.TUNNEL_LENGTH / 2);
 
             if (progression < 0.5) {
                 const t = progression / 0.5;
-                particle.color = Color4.Lerp(new Color4(0, 0, 1, 1), new Color4(0, 1, 1, 1), t);
+                particle.color = Color4.Lerp(new Color4(0.7, 0.7, 1, 1), new Color4(0.7, 1, 1, 1), t);
                 particle.scaling = Vector3.Lerp(Vector3.Zero(), this.particleScaling, Math.min(t * 2, 1));
             } else {
                 const t = (progression - 0.5) / 0.5;
-                particle.color = Color4.Lerp(new Color4(0, 1, 1, 1), new Color4(1, 0, 1, 1), t);
+                particle.color = Color4.Lerp(new Color4(0.7, 1, 1, 1), new Color4(1, 1, 1, 1), t);
                 particle.scaling = Vector3.Lerp(this.particleScaling, Vector3.Zero(), t * t);
             }
 
@@ -202,6 +202,8 @@ export class WarpTunnel implements Transformable {
     update(deltaSeconds: number) {
         this.lastDeltaSeconds = deltaSeconds;
 
+        this.particleSpeed = 200 * (1 + this.throttle);
+
         const newShipPosition = this.parent.getAbsolutePosition().clone();
 
         this.spaceshipDisplacement.copyFrom(newShipPosition.subtract(this.oldShipPosition));
@@ -212,12 +214,20 @@ export class WarpTunnel implements Transformable {
 
         this.updateGlobals();
 
-        if (this.nbParticlesAlive < this.targetNbParticles && this.recycledParticles.length > 0) {
-            if (Math.random() < this.targetNbParticles / WarpTunnel.MAX_NB_PARTICLES) {
+        if (this.targetNbParticles > 0) {
+            this.emitPeriod = WarpTunnel.TUNNEL_LENGTH / (this.particleSpeed * this.targetNbParticles);
+
+            this.emitCounter += deltaSeconds;
+
+            while (this.emitCounter > this.emitPeriod && this.nbParticlesAlive < this.targetNbParticles && this.recycledParticles.length > 0) {
+                this.emitCounter -= this.emitPeriod;
                 this.instanceFromStock();
                 this.nbParticlesAlive++;
             }
         }
+
+        // prevent counter from growing indefinitely
+        this.emitCounter = this.emitCounter % this.emitPeriod;
 
         if (this.nbParticlesAlive === 0 && this.solidParticleSystem.mesh.isEnabled()) {
             this.solidParticleSystem.mesh.setEnabled(false);

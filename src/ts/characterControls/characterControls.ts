@@ -172,7 +172,7 @@ export class CharacterControls implements Controls {
 
         this.targetAnim = this.idleAnim;
 
-        this.thirdPersonCamera = new ArcRotateCamera("camera", 1.0, -Math.PI / 4, 40, new Vector3(0, 1.5, 0), scene);
+        this.thirdPersonCamera = new ArcRotateCamera("characterThirdPersonCamera", 1.0, -Math.PI / 4, 40, new Vector3(0, 1.5, 0), scene);
         this.thirdPersonCamera.lowerRadiusLimit = 2;
         this.thirdPersonCamera.upperRadiusLimit = 500;
         this.thirdPersonCamera.minZ = 1;
@@ -185,7 +185,11 @@ export class CharacterControls implements Controls {
         this.closestWalkableObject = object;
     }
 
-    public getActiveCameras(): Camera[] {
+    public getActiveCamera(): Camera {
+        return this.thirdPersonCamera;
+    }
+
+    public getCameras(): Camera[] {
         return [this.thirdPersonCamera];
     }
 
@@ -341,7 +345,7 @@ export class CharacterControls implements Controls {
 
         translate(this.getTransform(), displacement);
 
-        this.getActiveCameras().forEach((camera) => camera.getViewMatrix());
+        this.getActiveCamera().getViewMatrix();
 
         return displacement;
     }

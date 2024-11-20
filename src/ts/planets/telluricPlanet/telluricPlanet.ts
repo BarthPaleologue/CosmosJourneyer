@@ -160,8 +160,8 @@ export class TelluricPlanet implements PlanetaryMassObject, Cullable {
         return this.getRadius() + this.model.physics.oceanLevel;
     }
 
-    public computeCulling(cameras: Camera[]): void {
-        for (const side of this.sides) side.computeCulling(cameras);
+    public computeCulling(camera: Camera): void {
+        for (const side of this.sides) side.computeCulling(camera);
     }
 
     public dispose(): void {

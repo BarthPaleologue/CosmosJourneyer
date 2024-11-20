@@ -123,23 +123,27 @@ export class CosmosJourneyer {
         });
 
         this.mainMenu.onLoadSaveObservable.add(async (saveData: SaveFileData) => {
-            await this.loadSaveData(saveData);
+            engine.onEndFrameObservable.addOnce(async () => {
+                await this.loadSaveData(saveData);
+            });
         });
 
         this.sidePanels.tutorialsPanelContent.onTutorialSelected.add(async (tutorial) => {
-            this.mainMenu.hide();
-            await this.loadSaveData(tutorial.saveData);
-            this.resume();
-            this.tutorialLayer.setTutorial(tutorial.getTitle(), await tutorial.getContentPanelsHtml());
-            this.starSystemView.setUIEnabled(true);
+            engine.onEndFrameObservable.addOnce(async () => {
+                this.mainMenu.hide();
+                await this.loadSaveData(tutorial.saveData);
+                this.resume();
+                this.tutorialLayer.setTutorial(tutorial.getTitle(), await tutorial.getContentPanelsHtml());
+                this.starSystemView.setUIEnabled(true);
 
-            const targetObject = getObjectBySystemId(tutorial.saveData.universeCoordinates.universeObjectId, this.starSystemView.getStarSystem());
-            if (targetObject === null) {
-                throw new Error("Could not find the target object of the tutorial even though it should be in the star system");
-            }
-            this.starSystemView.getSpaceshipControls().getTransform().lookAt(targetObject.getTransform().getAbsolutePosition());
+                const targetObject = getObjectBySystemId(tutorial.saveData.universeCoordinates.universeObjectId, this.starSystemView.getStarSystem());
+                if (targetObject === null) {
+                    throw new Error("Could not find the target object of the tutorial even though it should be in the star system");
+                }
+                this.starSystemView.getSpaceshipControls().getTransform().lookAt(targetObject.getTransform().getAbsolutePosition());
 
-            Settings.TIME_MULTIPLIER = 1;
+                Settings.TIME_MULTIPLIER = 1;
+            });
         });
 
         this.starSystemView.onInitStarSystem.add(() => {
@@ -354,6 +358,8 @@ export class CosmosJourneyer {
 
         const spaceShipControls = this.starSystemView.getSpaceshipControls();
 
+        const spaceship = spaceShipControls.getSpaceship();
+
         // Finding the index of the nearest orbital object
         const nearestOrbitalObject = currentStarSystem.getNearestOrbitalObject(spaceShipControls.getTransform().getAbsolutePosition());
         const nearestOrbitalObjectIndex = currentStarSystem.getOrbitalObjects().indexOf(nearestOrbitalObject);
@@ -388,7 +394,7 @@ export class CosmosJourneyer {
                 rotationQuaternionZ: currentLocalRotation.z,
                 rotationQuaternionW: currentLocalRotation.w
             },
-            padNumber: spaceShipControls.spaceship.isLandedAtFacility() ? spaceShipControls.spaceship.getTargetLandingPad()?.padNumber : undefined
+            padNumber: spaceship.isLandedAtFacility() ? spaceship.getTargetLandingPad()?.padNumber : undefined
         };
     }
 
@@ -449,7 +455,7 @@ export class CosmosJourneyer {
                 throw new Error(`Could not find the pad with number ${padNumber} at this station: ${correspondingSpaceStation.model.name}`);
             }
 
-            this.starSystemView.getSpaceshipControls().spaceship.spawnOnPad(landingPad);
+            this.starSystemView.getSpaceshipControls().getSpaceship().spawnOnPad(landingPad);
         }
 
         if (this.player.currentItinerary.length > 1) {
@@ -498,10 +504,7 @@ export class CosmosJourneyer {
         setRotationQuaternion(playerTransform, currentWorldRotationQuaternion);
 
         // updates camera position
-        this.starSystemView
-            .getSpaceshipControls()
-            .getActiveCameras()
-            .forEach((camera) => camera.getViewMatrix(true));
+        this.starSystemView.getSpaceshipControls().getActiveCamera().getViewMatrix(true);
 
         // re-centers the star system
         this.starSystemView.getStarSystem().applyFloatingOrigin();

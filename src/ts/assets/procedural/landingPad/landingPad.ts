@@ -94,7 +94,7 @@ export class LandingPad implements Targetable {
         this.targetInfo = {
             type: ObjectTargetCursorType.LANDING_PAD,
             minDistance: this.getBoundingRadius() * 4.0,
-            maxDistance: 2e3
+            maxDistance: this.getBoundingRadius() * 6.0
         };
     }
 

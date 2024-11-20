@@ -96,16 +96,21 @@ export class Player {
         };
     }
 
+    /**
+     * Performs a deep copy of the player
+     * @param player the player to copy from
+     */
     public copyFrom(player: Player) {
-        this.name = player.name;
-        this.balance = player.balance;
-        this.creationDate = player.creationDate;
-        this.visitedSystemHistory = player.visitedSystemHistory;
-        this.currentItinerary = player.currentItinerary;
-        this.systemBookmarks = player.systemBookmarks;
-        this.currentMissions = player.currentMissions;
-        this.completedMissions = player.completedMissions;
-        this.serializedSpaceships = player.serializedSpaceships;
-        this.instancedSpaceships = player.instancedSpaceships;
+        const playerClone = structuredClone(player);
+        this.name = playerClone.name;
+        this.balance = playerClone.balance;
+        this.creationDate = playerClone.creationDate;
+        this.visitedSystemHistory = playerClone.visitedSystemHistory;
+        this.currentItinerary = playerClone.currentItinerary;
+        this.systemBookmarks = playerClone.systemBookmarks;
+        this.currentMissions = playerClone.currentMissions;
+        this.completedMissions = playerClone.completedMissions;
+        this.serializedSpaceships = playerClone.serializedSpaceships;
+        this.instancedSpaceships = playerClone.instancedSpaceships;
     }
 }

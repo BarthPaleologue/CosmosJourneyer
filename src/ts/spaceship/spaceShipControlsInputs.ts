@@ -95,6 +95,12 @@ const nextMissionInteraction = new PressInteraction(
     })
 );
 
+const resetCameraInteraction = new PressInteraction(
+    new Action({
+        bindings: [keyboard.getControl("Numpad0")]
+    })
+);
+
 export const SpaceShipControlsInputs = new InputMap<{
     landing: PressInteraction;
     emitLandingRequest: PressInteraction;
@@ -106,6 +112,7 @@ export const SpaceShipControlsInputs = new InputMap<{
     throttleToZero: PressInteraction;
     previousMission: PressInteraction;
     nextMission: PressInteraction;
+    resetCamera: PressInteraction;
 }>("SpaceShipInputs", {
     landing: landingInteraction,
     emitLandingRequest: emitLandingRequest,
@@ -116,7 +123,8 @@ export const SpaceShipControlsInputs = new InputMap<{
     ignorePointer: ignorePointer,
     throttleToZero: throttleToZeroInteraction,
     previousMission: previousMissionInteraction,
-    nextMission: nextMissionInteraction
+    nextMission: nextMissionInteraction,
+    resetCamera: resetCameraInteraction
 });
 
 SpaceShipControlsInputs.setEnabled(false);

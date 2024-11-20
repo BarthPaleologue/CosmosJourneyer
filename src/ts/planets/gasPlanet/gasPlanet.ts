@@ -124,14 +124,9 @@ export class GasPlanet implements Planet, Cullable {
         return orbitalObjectTypeToDisplay(this.model);
     }
 
-    public computeCulling(cameras: Camera[]): void {
-        let isVisible = false;
-        for (const camera of cameras) {
-            isVisible = isVisible || isSizeOnScreenEnough(this, camera);
-        }
-
+    public computeCulling(camera: Camera): void {
         // the mesh is hidden if it is not visible from any camera
-        this.mesh.isVisible = isVisible;
+        this.mesh.isVisible = isSizeOnScreenEnough(this, camera);
     }
 
     public dispose(): void {

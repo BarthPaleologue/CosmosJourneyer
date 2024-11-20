@@ -140,9 +140,9 @@ export class StarMap implements View {
         });
 
         this.controls = new StarMapControls(this.scene);
-        this.controls.getActiveCameras().forEach((camera) => (camera.minZ = 0.01));
+        this.controls.getCameras().forEach((camera) => (camera.minZ = 0.01));
 
-        this.controls.getActiveCameras()[0].attachControl();
+        this.controls.getActiveCamera().attachControl();
 
         this.player = player;
 
@@ -164,7 +164,7 @@ export class StarMap implements View {
             this.focusOnCurrentSystem();
         });
 
-        const pipeline = new DefaultRenderingPipeline("pipeline", false, this.scene, this.controls.getActiveCameras());
+        const pipeline = new DefaultRenderingPipeline("pipeline", false, this.scene, this.controls.getCameras());
         pipeline.fxaaEnabled = true;
         pipeline.bloomEnabled = true;
         pipeline.bloomThreshold = 0.0;
@@ -340,7 +340,7 @@ export class StarMap implements View {
     public translateCameraBackToOrigin(camera: Camera) {
         const translationToOrigin = camera.globalPosition.negate();
         this.controls.getTransform().position.addInPlace(translationToOrigin);
-        this.controls.getActiveCameras().forEach((camera) => camera.getViewMatrix(true));
+        this.controls.getActiveCamera().getViewMatrix(true);
         this.starMapCenterPosition.addInPlace(translationToOrigin);
         for (const mesh of this.scene.meshes) mesh.position.addInPlace(translationToOrigin);
     }
@@ -380,7 +380,7 @@ export class StarMap implements View {
 
         const translation = sectorCoordinates.subtract(this.currentStarSectorCoordinates).scaleInPlace(Settings.STAR_SECTOR_SIZE);
         translate(this.controls.getTransform(), translation);
-        this.controls.getActiveCameras().forEach((camera) => camera.getViewMatrix(true));
+        this.controls.getActiveCamera().getViewMatrix(true);
         this.acknowledgeCameraMovement();
 
         this.focusOnCurrentSystem(true);

@@ -114,10 +114,8 @@ export function positionNearObjectWithStarVisible(transformable: Controls, objec
 
     roll(transformable.getTransform(), -Math.PI / 8);
 
-    transformable.getActiveCameras().forEach((camera) => {
-        camera.getViewMatrix(true);
-        camera.getProjectionMatrix(true);
-    });
+    transformable.getActiveCamera().getViewMatrix(true);
+    transformable.getActiveCamera().getProjectionMatrix(true);
 }
 
 export function positionNearObjectAsteroidField(body: Transformable & CanHaveRings & HasBoundingSphere, starSystem: StarSystemController): Vector3 {
@@ -136,19 +134,4 @@ export function positionNearObjectAsteroidField(body: Transformable & CanHaveRin
     const lateralDirection = Vector3.Cross(dirToStar, upDirection).normalize();
 
     return bodyPosition.add(lateralDirection.scale(asteroidFieldAverageRadius)).add(upDirection.scale(asteroidField.patchThickness));
-
-    /*
-    transformable.getTransform().setAbsolutePosition(targetPosition);
-    transformable.getTransform().lookAt(bodyPosition);
-
-    starSystem.translateEverythingNow(transformable.getTransform().getAbsolutePosition().negate());
-    transformable.getTransform().setAbsolutePosition(Vector3.Zero());
-
-    transformable.getTransform().computeWorldMatrix(true);
-
-    transformable.getActiveCameras().forEach((camera) => {
-        camera.getViewMatrix(true);
-        camera.getProjectionMatrix(true);
-    });
-    */
 }
