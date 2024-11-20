@@ -74,9 +74,50 @@ export class SaveLoadingPanelContent {
         this.cmdrList = document.createElement("div");
         this.cmdrList.classList.add("cmdrList");
         this.htmlRoot.appendChild(this.cmdrList);
+
+        this.populateCmdrList();
     }
 
     populateCmdrList() {
+        const autoSavesDict: LocalStorageAutoSaves = JSON.parse(localStorage.getItem(Settings.AUTO_SAVE_KEY) ?? "{}");
+        const manualSavesDict: LocalStorageManualSaves = JSON.parse(localStorage.getItem(Settings.MANUAL_SAVE_KEY) ?? "{}");
+
+        // Get all cmdr UUIDs (union of auto saves and manual saves)
+        const cmdrUuids = Object.keys(autoSavesDict);
+        Object.keys(manualSavesDict).forEach((cmdrUuid) => {
+            if (!cmdrUuids.includes(cmdrUuid)) cmdrUuids.push(cmdrUuid);
+        });
+
+        cmdrUuids.forEach((cmdrUuid) => {
+            const cmdrDiv = document.createElement("div");
+            cmdrDiv.classList.add("cmdr");
+            this.cmdrList.appendChild(cmdrDiv);
+
+            const latestSave = autoSavesDict[cmdrUuid] ?? manualSavesDict[cmdrUuid][0];
+
+            const cmdrHeader = document.createElement("div");
+            cmdrHeader.classList.add("cmdrHeader");
+            cmdrDiv.appendChild(cmdrHeader);
+
+            const cmdrName = document.createElement("h3");
+            cmdrName.innerText = latestSave.player.name;
+            cmdrHeader.appendChild(cmdrName);
+
+            const cmdrLastPlayed = document.createElement("p");
+            cmdrLastPlayed.innerText = `Last played on ${new Date(latestSave.timestamp).toLocaleString()}`;
+            cmdrHeader.appendChild(cmdrLastPlayed);
+
+            const cmdrPlayTime = document.createElement("p");
+            cmdrPlayTime.innerText = `Play time: ${latestSave.player.timePlayedSeconds} seconds`;
+            cmdrHeader.appendChild(cmdrPlayTime);
+
+            const continueButton = document.createElement("button");
+            continueButton.innerText = i18n.t("sidePanel:continue");
+            continueButton.addEventListener("click", () => {
+                this.onLoadSaveObservable.notifyObservers(latestSave);
+            });
+            cmdrDiv.appendChild(continueButton);
+        });
     }
 
     private async parseFile(file: File): Promise<SaveFileData> {
