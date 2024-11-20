@@ -178,7 +178,7 @@ export class PostProcessManager {
      */
     readonly fxaaRenderEffect: PostProcessRenderEffect;
 
-    private bloomRenderEffect: BloomEffect;
+    readonly bloomRenderEffect: BloomEffect;
 
     constructor(scene: UberScene) {
         this.scene = scene;
@@ -441,10 +441,6 @@ export class PostProcessManager {
         const shadowRenderEffect = new PostProcessRenderEffect(this.engine, "ShadowRenderEffect", () => this.shadows);
         const lensFlareRenderEffect = new PostProcessRenderEffect(this.engine, "LensFlareRenderEffect", () => this.lensFlares);
 
-        this.scene.cameras.forEach((camera) => this.bloomRenderEffect.disposeEffects(camera));
-        this.bloomRenderEffect = new BloomEffect(this.scene, 1.0, 0.3, 32, Constants.TEXTURETYPE_HALF_FLOAT);
-        this.bloomRenderEffect.threshold = 0.0;
-
         this.renderingPipeline.addEffect(shadowRenderEffect);
 
         // other objects are viewed in their space configuration
@@ -555,8 +551,6 @@ export class PostProcessManager {
                     postProcess.dispose(camera);
                 });
             });
-
-            this.bloomRenderEffect.disposeEffects(camera);
         });
 
         this.objectPostProcesses.forEach((postProcessList) => {
