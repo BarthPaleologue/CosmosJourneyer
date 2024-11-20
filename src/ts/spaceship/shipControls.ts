@@ -176,45 +176,7 @@ export class ShipControls implements Controls {
 
         SpaceShipControlsInputs.map.resetCamera.on("complete", this.resetCameraHandler);
 
-        this.spaceship.onFuelScoopStart.add(() => {
-            Sounds.EnqueuePlay(Sounds.FUEL_SCOOPING_VOICE);
-        });
-
-        this.spaceship.onFuelScoopEnd.add(() => {
-            Sounds.EnqueuePlay(Sounds.FUEL_SCOOPING_COMPLETE_VOICE);
-        });
-
-        this.spaceship.onLandingObservable.add(async () => {
-            const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
-            Sounds.EnqueuePlay(Sounds.LANDING_COMPLETE);
-            Sounds.STRAUSS_BLUE_DANUBE.setVolume(0, 2);
-            Sounds.STRAUSS_BLUE_DANUBE.stop(2);
-
-            if (!this.getSpaceship().isLandedAtFacility()) {
-                const bindingsString = pressInteractionToStrings(StarSystemInputs.map.toggleSpaceShipCharacter, keyboardLayoutMap).join(", ");
-                createNotification(i18n.t("notifications:landingComplete", { bindingsString: bindingsString }), 5000);
-            }
-        });
-
-        this.spaceship.onPlanetaryLandingEngaged.add(() => {
-            createNotification(i18n.t("notifications:landingSequenceEngaged"), 5000);
-            Sounds.EnqueuePlay(Sounds.INITIATING_PLANETARY_LANDING);
-        });
-
-        this.spaceship.onLandingCancelled.add(() => {
-            createNotification(i18n.t("notifications:landingCancelled"), 5000);
-            Sounds.STRAUSS_BLUE_DANUBE.setVolume(0, 2);
-            Sounds.STRAUSS_BLUE_DANUBE.stop(2);
-        });
-
-        this.spaceship.onTakeOff.add(() => {
-            //FIXME: localize
-            createNotification("Takeoff successful", 2000);
-        });
-
-        this.spaceship.onWarpDriveDisabled.add((isEmergency) => {
-            if (isEmergency) Sounds.WARP_DRIVE_EMERGENCY_SHUT_DOWN.play();
-        });
+        this.setSpaceship(spaceship);
     }
 
     public getTransform(): TransformNode {
@@ -292,6 +254,46 @@ export class ShipControls implements Controls {
         this.spaceship = ship;
         this.thirdPersonCamera.parent = this.getTransform();
         this.firstPersonCamera.parent = this.getTransform();
+
+        this.spaceship.onFuelScoopStart.add(() => {
+            Sounds.EnqueuePlay(Sounds.FUEL_SCOOPING_VOICE);
+        });
+
+        this.spaceship.onFuelScoopEnd.add(() => {
+            Sounds.EnqueuePlay(Sounds.FUEL_SCOOPING_COMPLETE_VOICE);
+        });
+
+        this.spaceship.onLandingObservable.add(async () => {
+            const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
+            Sounds.EnqueuePlay(Sounds.LANDING_COMPLETE);
+            Sounds.STRAUSS_BLUE_DANUBE.setVolume(0, 2);
+            Sounds.STRAUSS_BLUE_DANUBE.stop(2);
+
+            if (!this.getSpaceship().isLandedAtFacility()) {
+                const bindingsString = pressInteractionToStrings(StarSystemInputs.map.toggleSpaceShipCharacter, keyboardLayoutMap).join(", ");
+                createNotification(i18n.t("notifications:landingComplete", { bindingsString: bindingsString }), 5000);
+            }
+        });
+
+        this.spaceship.onPlanetaryLandingEngaged.add(() => {
+            createNotification(i18n.t("notifications:landingSequenceEngaged"), 5000);
+            Sounds.EnqueuePlay(Sounds.INITIATING_PLANETARY_LANDING);
+        });
+
+        this.spaceship.onLandingCancelled.add(() => {
+            createNotification(i18n.t("notifications:landingCancelled"), 5000);
+            Sounds.STRAUSS_BLUE_DANUBE.setVolume(0, 2);
+            Sounds.STRAUSS_BLUE_DANUBE.stop(2);
+        });
+
+        this.spaceship.onTakeOff.add(() => {
+            //FIXME: localize
+            createNotification("Takeoff successful", 2000);
+        });
+
+        this.spaceship.onWarpDriveDisabled.add((isEmergency) => {
+            if (isEmergency) Sounds.WARP_DRIVE_EMERGENCY_SHUT_DOWN.play();
+        });
     }
 
     getSpaceship(): Spaceship {
@@ -305,7 +307,7 @@ export class ShipControls implements Controls {
         SpaceShipControlsInputs.map.throttleToZero.off("complete", this.throttleToZeroHandler);
         SpaceShipControlsInputs.map.resetCamera.off("complete", this.resetCameraHandler);
 
-        this.spaceship?.dispose();
+        this.spaceship.dispose();
         this.thirdPersonCamera.dispose();
         this.firstPersonCamera.dispose();
     }
