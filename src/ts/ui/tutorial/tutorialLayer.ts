@@ -4,6 +4,7 @@ import i18n from "../../i18n";
 import { Sounds } from "../../assets/sounds";
 import { IDisposable } from "@babylonjs/core/scene";
 import { getGlobalKeyboardLayoutMap } from "../../utils/keyboardAPI";
+import { Observable } from "@babylonjs/core/Misc/observable";
 
 export class TutorialLayer implements IDisposable {
     private readonly layerRoot: HTMLDivElement;
@@ -25,6 +26,8 @@ export class TutorialLayer implements IDisposable {
     private tutorialPanelsHtml: string[] = [];
 
     private currentPanelIndex = 0;
+
+    readonly onQuitTutorial: Observable<void> = new Observable();
 
     constructor() {
         this.layerRoot = document.createElement("div");
@@ -94,12 +97,7 @@ export class TutorialLayer implements IDisposable {
         document.body.appendChild(this.layerRoot);
 
         TutorialControlsInputs.map.quitTutorial.on("complete", () => {
-            this.setEnabled(false);
-            this.quitButton.animate([{ transform: "scale(1)" }, { transform: "scale(1.1)" }, { transform: "scale(1)" }], {
-                duration: 200,
-                easing: "ease"
-            });
-            Sounds.MENU_SELECT_SOUND.play();
+            this.quitTutorial();
         });
 
         TutorialControlsInputs.map.prevPanel.on("complete", () => {
@@ -124,11 +122,23 @@ export class TutorialLayer implements IDisposable {
     }
 
     public setTutorial(name: string, panels: string[]) {
+        if (this.isEnabled()) this.quitTutorial();
         this.title.innerText = name;
         this.tutorialPanelsHtml = panels;
         this.currentPanelIndex = 0;
         this.updatePanelState();
         this.setEnabled(true);
+    }
+
+    public quitTutorial() {
+        this.setEnabled(false);
+        this.quitButton.animate([{ transform: "scale(1)" }, { transform: "scale(1.1)" }, { transform: "scale(1)" }], {
+            duration: 200,
+            easing: "ease"
+        });
+        Sounds.MENU_SELECT_SOUND.play();
+
+        this.onQuitTutorial.notifyObservers();
     }
 
     public setEnabled(enabled: boolean) {
@@ -146,5 +156,6 @@ export class TutorialLayer implements IDisposable {
 
     dispose(): void {
         this.layerRoot.remove();
+        this.onQuitTutorial.clear();
     }
 }

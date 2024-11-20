@@ -54,6 +54,8 @@ import { Settings } from "./settings";
 import { Player } from "./player/player";
 import { getObjectBySystemId, getUniverseObjectId } from "./utils/coordinates/orbitalObjectId";
 import { getSystemModelFromCoordinates } from "./starSystem/modelFromCoordinates";
+import { Tutorial } from "./tutorials/tutorial";
+import { StationLandingTutorial } from "./tutorials/stationLandingTutorial";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -129,20 +131,16 @@ export class CosmosJourneyer {
         });
 
         this.sidePanels.tutorialsPanelContent.onTutorialSelected.add(async (tutorial) => {
-            engine.onEndFrameObservable.addOnce(async () => {
-                this.mainMenu.hide();
-                await this.loadSaveData(tutorial.saveData);
-                this.resume();
-                this.tutorialLayer.setTutorial(tutorial.getTitle(), await tutorial.getContentPanelsHtml());
-                this.starSystemView.setUIEnabled(true);
+            await this.loadTutorial(tutorial);
+        });
 
-                const targetObject = getObjectBySystemId(tutorial.saveData.universeCoordinates.universeObjectId, this.starSystemView.getStarSystem());
-                if (targetObject === null) {
-                    throw new Error("Could not find the target object of the tutorial even though it should be in the star system");
-                }
-                this.starSystemView.getSpaceshipControls().getTransform().lookAt(targetObject.getTransform().getAbsolutePosition());
-
-                Settings.TIME_MULTIPLIER = 1;
+        this.starSystemView.getSpaceshipControls().onToggleWarpDrive.add(async (isWarpDriveEnabled) => {
+            if (isWarpDriveEnabled) return;
+            if (this.starSystemView.getSpaceshipControls().getClosestLandableFacility() === null) return;
+            if (this.player.tutorials.stationLandingCompleted) return;
+            this.tutorialLayer.setTutorial(StationLandingTutorial.getTitle(), await StationLandingTutorial.getContentPanelsHtml());
+            this.tutorialLayer.onQuitTutorial.addOnce(() => {
+                this.player.tutorials.stationLandingCompleted = true;
             });
         });
 
@@ -411,6 +409,24 @@ export class CosmosJourneyer {
             const dateString = new Date().toLocaleString().replace(/[^0-9a-zA-Z]/g, "_"); // avoid special characters in the filename
             link.download = `CMDR_${this.player.name}_${dateString}.json`;
             link.click();
+        });
+    }
+
+    public async loadTutorial(tutorial: Tutorial) {
+        this.engine.onEndFrameObservable.addOnce(async () => {
+            this.mainMenu.hide();
+            await this.loadSaveData(tutorial.saveData);
+            this.resume();
+            this.tutorialLayer.setTutorial(tutorial.getTitle(), await tutorial.getContentPanelsHtml());
+            this.starSystemView.setUIEnabled(true);
+
+            const targetObject = getObjectBySystemId(tutorial.saveData.universeCoordinates.universeObjectId, this.starSystemView.getStarSystem());
+            if (targetObject === null) {
+                throw new Error("Could not find the target object of the tutorial even though it should be in the star system");
+            }
+            this.starSystemView.getSpaceshipControls().getTransform().lookAt(targetObject.getTransform().getAbsolutePosition());
+
+            Settings.TIME_MULTIPLIER = 1;
         });
     }
 
