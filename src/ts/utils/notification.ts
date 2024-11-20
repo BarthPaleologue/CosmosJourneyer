@@ -1,51 +1,99 @@
 import { Sounds } from "../assets/sounds";
 
+class Notification {
+    private progressSeconds = 0;
+    private readonly progressDurationSeconds;
+    private removalProgressSeconds = 0;
+    private readonly removalDurationSeconds = 0.5;
+
+    readonly htmlRoot: HTMLDivElement;
+
+    private isBeingRemoved = false;
+
+    constructor(text: string, durationSeconds: number) {
+        const container = document.getElementById("notificationContainer");
+        if (container === null) throw new Error("No notification container found");
+
+        this.htmlRoot = document.createElement("div");
+        this.htmlRoot.classList.add("notification");
+
+        const textNode = document.createElement("p");
+        textNode.textContent = text;
+
+        this.htmlRoot.appendChild(textNode);
+
+        const progress = document.createElement("div");
+        progress.classList.add("notification-progress");
+
+        const progressBar = document.createElement("div");
+        progressBar.classList.add("notification-progress-bar");
+        progress.appendChild(progressBar);
+
+        this.htmlRoot.appendChild(progress);
+
+        container.appendChild(this.htmlRoot);
+
+        Sounds.MENU_SELECT_SOUND.play();
+
+        // animate progress bar
+        progressBar.style.animation = `progress ${durationSeconds}s linear`;
+        this.progressDurationSeconds = durationSeconds;
+    }
+
+    update(deltaSeconds: number): void {
+        if (this.progressSeconds < this.progressDurationSeconds) {
+            this.progressSeconds += deltaSeconds;
+        } else {
+            this.removalProgressSeconds += deltaSeconds;
+        }
+    }
+
+    getProgress(): number {
+        return Math.max(0, Math.min(1, this.progressSeconds / this.progressDurationSeconds));
+    }
+
+    startRemoval(): void {
+        this.isBeingRemoved = true;
+        this.htmlRoot.style.animation = `popOut ${this.removalDurationSeconds}s ease-in-out`;
+    }
+
+    hasRemovalStarted() {
+        return this.isBeingRemoved;
+    }
+
+    getRemovalProgress(): number {
+        return Math.max(0, Math.min(1, this.removalProgressSeconds / this.removalDurationSeconds));
+    }
+
+    dispose(): void {
+        this.htmlRoot.remove();
+    }
+}
+
+let activeNotifications: Notification[] = [];
+
+export function updateNotifications(deltaSeconds: number): void {
+    activeNotifications.forEach((notification) => {
+        notification.update(deltaSeconds);
+        if (notification.getProgress() === 1 && !notification.hasRemovalStarted()) {
+            notification.startRemoval();
+        }
+        if (notification.getRemovalProgress() === 1) {
+            notification.dispose();
+        }
+    });
+
+    activeNotifications = activeNotifications.filter((notification) => notification.getRemovalProgress() < 1);
+}
+
 /**
  * Create a notification with a text and a duration (in ms)
  * @param text The text to display
- * @param duration The duration of the notification in ms
+ * @param durationMillis The duration of the notification in ms
  */
-export function createNotification(text: string, duration: number) {
-    const container = document.getElementById("notificationContainer");
-    if (container === null) throw new Error("No notification container found");
-
-    const newNotification = document.createElement("div");
-    newNotification.classList.add("notification");
-
-    const textNode = document.createElement("p");
-    textNode.textContent = text;
-
-    newNotification.appendChild(textNode);
-
-    const progress = document.createElement("div");
-    progress.classList.add("notification-progress");
-
-    const progressBar = document.createElement("div");
-    progressBar.classList.add("notification-progress-bar");
-    progress.appendChild(progressBar);
-
-    newNotification.appendChild(progress);
-
-    container.appendChild(newNotification);
-
-    Sounds.MENU_SELECT_SOUND.play();
-
-    // animate progress bar
-    progressBar.style.animation = `progress ${duration}ms linear`;
-
-    const removeNotification = () => {
-        newNotification.style.animation = "popOut 0.5s ease-in-out";
-        setTimeout(() => {
-            newNotification.remove();
-        }, 450);
-    };
-
-    const timeOut = setTimeout(removeNotification, duration);
-
-    newNotification.addEventListener("click", () => {
-        clearTimeout(timeOut);
-        removeNotification();
-    });
+export function createNotification(text: string, durationMillis: number) {
+    const notification = new Notification(text, durationMillis / 1000);
+    activeNotifications.push(notification);
 }
 
 /**

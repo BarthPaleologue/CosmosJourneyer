@@ -42,7 +42,7 @@ import { updateInputDevices } from "./inputs/devices";
 import { AudioManager } from "./audio/audioManager";
 import { AudioMasks } from "./audio/audioMasks";
 import { GeneralInputs } from "./inputs/generalInputs";
-import { createNotification } from "./utils/notification";
+import { createNotification, updateNotifications } from "./utils/notification";
 import { LoadingScreen } from "./uberCore/loadingScreen";
 import i18n, { initI18n } from "./i18n";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
@@ -284,8 +284,10 @@ export class CosmosJourneyer {
         this.starSystemView.initStarSystem();
 
         this.engine.runRenderLoop(() => {
+            const deltaSeconds = this.engine.getDeltaTime() / 1000;
             updateInputDevices();
-            AudioManager.Update(this.engine.getDeltaTime() / 1000);
+            updateNotifications(deltaSeconds);
+            AudioManager.Update(deltaSeconds);
             Sounds.Update();
 
             if (this.isPaused()) return;
