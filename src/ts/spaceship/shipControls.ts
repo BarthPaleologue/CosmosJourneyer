@@ -40,7 +40,7 @@ import { Lerp } from "@babylonjs/core/Maths/math.scalar.functions";
 import { quickAnimation } from "../uberCore/transforms/animations/quickAnimation";
 
 export class ShipControls implements Controls {
-    private spaceship: Spaceship | null;
+    private spaceship: Spaceship;
 
     readonly thirdPersonCameraDefaultRadius = 60;
     readonly thirdPersonCameraDefaultAlpha = -3.14 / 2;
@@ -50,8 +50,6 @@ export class ShipControls implements Controls {
     readonly firstPersonCamera: FreeCamera;
 
     private readonly cameraShakeAnimation: CameraShakeAnimation;
-
-    private readonly scene: Scene;
 
     private closestLandableFacility: (Transformable & ManagesLandingPads) | null = null;
 
@@ -83,8 +81,6 @@ export class ShipControls implements Controls {
         this.thirdPersonCamera.upperRadiusLimit = 500;
 
         this.cameraShakeAnimation = new CameraShakeAnimation(this.thirdPersonCamera, 0.006, 1.0);
-
-        this.scene = scene;
 
         this.toggleWarpDriveHandler = async () => {
             const spaceship = this.getSpaceship();
@@ -299,10 +295,6 @@ export class ShipControls implements Controls {
     }
 
     getSpaceship(): Spaceship {
-        if (this.spaceship === null) {
-            throw new Error("Spaceship is null");
-        }
-
         return this.spaceship;
     }
 
