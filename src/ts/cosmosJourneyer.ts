@@ -31,7 +31,7 @@ import { PauseMenu } from "./ui/pauseMenu";
 import { StarSystemView } from "./starSystem/starSystemView";
 import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
 import { MainMenu } from "./ui/mainMenu";
-import { SaveFileData } from "./saveFile/saveFileData";
+import { LocalStorageAutoSaves, LocalStorageManualSaves, SaveFileData } from "./saveFile/saveFileData";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { setRotationQuaternion } from "./uberCore/transforms/basicTransform";
@@ -440,14 +440,14 @@ export class CosmosJourneyer {
         // use player uuid as key to avoid overwriting other cmdr's save
         const uuid = saveData.player.uuid;
 
-        const localStorageKey = "saves";
+        const localStorageKey = Settings.MANUAL_SAVE_KEY;
 
         // store in a hashmap in local storage
-        const saves: { [key: string]: SaveFileData[] } = JSON.parse(localStorage.getItem(localStorageKey) || "{}");
-        saves[uuid] = saves[uuid] || [];
-        saves[uuid].unshift(saveData);
+        const manualSaves: LocalStorageManualSaves = JSON.parse(localStorage.getItem(localStorageKey) || "{}");
+        manualSaves[uuid] = manualSaves[uuid] || [];
+        manualSaves[uuid].unshift(saveData);
 
-        localStorage.setItem(localStorageKey, JSON.stringify(saves));
+        localStorage.setItem(localStorageKey, JSON.stringify(manualSaves));
     }
 
     /**
@@ -459,10 +459,10 @@ export class CosmosJourneyer {
         // use player uuid as key to avoid overwriting other cmdr's autosave
         const uuid = saveData.player.uuid;
 
-        const localStorageKey = "autosaves";
+        const localStorageKey = Settings.AUTO_SAVE_KEY;
 
         // store in a hashmap in local storage
-        const autosaves = JSON.parse(localStorage.getItem(localStorageKey) || "{}");
+        const autosaves: LocalStorageAutoSaves = JSON.parse(localStorage.getItem(localStorageKey) || "{}");
         autosaves[uuid] = saveData;
         localStorage.setItem(localStorageKey, JSON.stringify(autosaves));
     }

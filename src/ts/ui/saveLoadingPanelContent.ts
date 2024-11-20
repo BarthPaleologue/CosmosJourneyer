@@ -1,10 +1,13 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
 import i18n from "../i18n";
-import { parseSaveFileData, SaveFileData } from "../saveFile/saveFileData";
+import { LocalStorageAutoSaves, LocalStorageManualSaves, parseSaveFileData, SaveFileData } from "../saveFile/saveFileData";
 import { createNotification } from "../utils/notification";
+import { Settings } from "../settings";
 
 export class SaveLoadingPanelContent {
     readonly htmlRoot: HTMLElement;
+
+    readonly cmdrList: HTMLElement;
 
     readonly onLoadSaveObservable: Observable<SaveFileData> = new Observable<SaveFileData>();
 
@@ -67,6 +70,13 @@ export class SaveLoadingPanelContent {
             };
             fileInput.click();
         });
+
+        this.cmdrList = document.createElement("div");
+        this.cmdrList.classList.add("cmdrList");
+        this.htmlRoot.appendChild(this.cmdrList);
+    }
+
+    populateCmdrList() {
     }
 
     private async parseFile(file: File): Promise<SaveFileData> {

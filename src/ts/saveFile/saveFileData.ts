@@ -62,3 +62,15 @@ export function parseSaveFileData(jsonString: string): { data: SaveFileData | nu
     logs.forEach((log) => console.warn(log));
     return { data: saveData, logs };
 }
+
+/**
+ * Describes the structure of the local storage manual saves object.
+ * Each cmdr has a unique key and the value is an array of save file data.
+ */
+export type LocalStorageManualSaves = { [key: string]: SaveFileData[] };
+
+/**
+ * Describes the structure of the local storage auto saves object.
+ * Each cmdr has a unique key and the value is a save file data. Auto saves are overwritten on each auto save.
+ */
+export type LocalStorageAutoSaves = { [key: string]: SaveFileData };
