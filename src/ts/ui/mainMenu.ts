@@ -186,7 +186,9 @@ export class MainMenu {
         const loadSaveButton = document.getElementById("loadSaveButton");
         if (loadSaveButton === null) throw new Error("#loadSaveButton does not exist!");
 
-        this.initLoadSavePanel();
+        this.sidePanels.loadSavePanelContent.onLoadSaveObservable.add((saveFileData) => {
+            this.startAnimation(() => this.onLoadSaveObservable.notifyObservers(saveFileData));
+        });
 
         loadSaveButton.addEventListener("click", () => {
             this.sidePanels.toggleActivePanel(PanelType.LOAD_SAVE);
@@ -251,82 +253,6 @@ export class MainMenu {
         this.starSystemView.targetCursorLayer.setEnabled(false);
 
         this.htmlRoot.style.display = "block";
-    }
-
-    /**
-     * Initializes the load save panel to be able to drop a file or click on the drop zone to load a save file
-     * @private
-     */
-    private initLoadSavePanel() {
-        const dropFileZone = document.getElementById("dropFileZone");
-        if (dropFileZone === null) throw new Error("#dropFileZone does not exist!");
-
-        dropFileZone.addEventListener("dragover", (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            dropFileZone.classList.add("dragover");
-            dropFileZone.classList.remove("invalid");
-            if (event.dataTransfer === null) throw new Error("event.dataTransfer is null");
-            event.dataTransfer.dropEffect = "copy";
-        });
-
-        dropFileZone.addEventListener("dragleave", (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            dropFileZone.classList.remove("dragover");
-        });
-
-        dropFileZone.addEventListener("drop", (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            dropFileZone.classList.remove("dragover");
-
-            if (event.dataTransfer === null) throw new Error("event.dataTransfer is null");
-            if (event.dataTransfer.files.length === 0) throw new Error("event.dataTransfer.files is empty");
-
-            const file = event.dataTransfer.files[0];
-            if (file.type !== "application/json") {
-                dropFileZone.classList.add("invalid");
-                alert("File is not a JSON file");
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                if (event.target === null) throw new Error("event.target is null");
-                const data = event.target.result as string;
-
-                const loadingSaveData = parseSaveFileData(data);
-                loadingSaveData.logs.forEach((log) => createNotification(log, 60_000));
-                if (loadingSaveData.data === null) return;
-                const saveFileData = loadingSaveData.data;
-                this.startAnimation(() => this.onLoadSaveObservable.notifyObservers(saveFileData));
-            };
-            reader.readAsText(file);
-        });
-
-        dropFileZone.addEventListener("click", () => {
-            const fileInput = document.createElement("input");
-            fileInput.type = "file";
-            fileInput.accept = "application/json";
-            fileInput.onchange = () => {
-                if (fileInput.files === null) throw new Error("fileInput.files is null");
-                if (fileInput.files.length === 0) throw new Error("fileInput.files is empty");
-                const file = fileInput.files[0];
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    if (event.target === null) throw new Error("event.target is null");
-                    const data = event.target.result as string;
-                    const loadingSaveData = parseSaveFileData(data);
-                    loadingSaveData.logs.forEach((log) => createNotification(log, 60_000));
-                    if (loadingSaveData.data === null) return;
-                    const saveFileData = loadingSaveData.data;
-                    this.startAnimation(() => this.onLoadSaveObservable.notifyObservers(saveFileData));
-                };
-                reader.readAsText(file);
-            };
-            fileInput.click();
-        });
     }
 
     private startAnimation(onAnimationFinished: () => void) {

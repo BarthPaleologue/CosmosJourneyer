@@ -1,6 +1,6 @@
 import { initSettingsPanel } from "./settingsPanel";
 import { TutorialsPanelContent } from "./tutorial/tutorialsPanelContent";
-import { StarSystemView } from "../starSystem/starSystemView";
+import { SaveLoadingPanelContent } from "./saveLoadingPanelContent";
 
 export const enum PanelType {
     LOAD_SAVE,
@@ -13,7 +13,10 @@ export const enum PanelType {
 
 export class SidePanels {
     private activeRightPanel: HTMLElement | null = null;
+
     private readonly loadSavePanel: HTMLElement;
+    readonly loadSavePanelContent: SaveLoadingPanelContent;
+    
     private readonly settingsPanel: HTMLElement;
 
     private readonly tutorialsPanel: HTMLElement;
@@ -27,6 +30,9 @@ export class SidePanels {
         const loadSavePanel = document.getElementById("loadSavePanel");
         if (loadSavePanel === null) throw new Error("#loadSavePanel does not exist!");
         this.loadSavePanel = loadSavePanel;
+
+        this.loadSavePanelContent = new SaveLoadingPanelContent();
+        this.loadSavePanel.appendChild(this.loadSavePanelContent.htmlRoot);
 
         this.settingsPanel = initSettingsPanel();
 
