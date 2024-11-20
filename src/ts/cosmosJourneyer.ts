@@ -132,8 +132,8 @@ export class CosmosJourneyer {
         this.mainMenu = new MainMenu(this.sidePanels, starSystemView);
         this.mainMenu.onStartObservable.add(async () => {
             this.tutorialLayer.setTutorial(FlightTutorial.getTitle(), await FlightTutorial.getContentPanelsHtml());
-
             this.starSystemView.switchToSpaceshipControls();
+            this.performAutoSave();
         });
 
         this.mainMenu.onLoadSaveObservable.add(async (saveData: SaveFileData) => {
@@ -548,6 +548,8 @@ export class CosmosJourneyer {
         if (this.player.currentItinerary.length > 1) {
             this.starSystemView.setSystemAsTarget(this.player.currentItinerary[1]);
         }
+
+        this.performAutoSave();
     }
 
     /**
