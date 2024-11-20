@@ -358,6 +358,8 @@ export class CosmosJourneyer {
 
         const spaceShipControls = this.starSystemView.getSpaceshipControls();
 
+        const spaceship = spaceShipControls.getSpaceship();
+
         // Finding the index of the nearest orbital object
         const nearestOrbitalObject = currentStarSystem.getNearestOrbitalObject(spaceShipControls.getTransform().getAbsolutePosition());
         const nearestOrbitalObjectIndex = currentStarSystem.getOrbitalObjects().indexOf(nearestOrbitalObject);
@@ -392,7 +394,7 @@ export class CosmosJourneyer {
                 rotationQuaternionZ: currentLocalRotation.z,
                 rotationQuaternionW: currentLocalRotation.w
             },
-            padNumber: spaceShipControls.spaceship.isLandedAtFacility() ? spaceShipControls.spaceship.getTargetLandingPad()?.padNumber : undefined
+            padNumber: spaceship.isLandedAtFacility() ? spaceship.getTargetLandingPad()?.padNumber : undefined
         };
     }
 
@@ -453,7 +455,7 @@ export class CosmosJourneyer {
                 throw new Error(`Could not find the pad with number ${padNumber} at this station: ${correspondingSpaceStation.model.name}`);
             }
 
-            this.starSystemView.getSpaceshipControls().spaceship.spawnOnPad(landingPad);
+            this.starSystemView.getSpaceshipControls().getSpaceship().spawnOnPad(landingPad);
         }
 
         if (this.player.currentItinerary.length > 1) {

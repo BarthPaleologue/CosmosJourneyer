@@ -259,14 +259,16 @@ export class StarSystemView implements View {
 
             const shipControls = this.getSpaceshipControls();
 
+            const spaceship = shipControls.getSpaceship();
+
             const currentSystemPosition = getStarGalacticPosition(this.getStarSystem().model.coordinates);
             const targetSystemPosition = getStarGalacticPosition(target.systemCoordinates);
 
             const distanceLY = Vector3.Distance(currentSystemPosition, targetSystemPosition);
 
-            const fuelForJump = shipControls.spaceship.getWarpDrive().getFuelConsumption(distanceLY);
+            const fuelForJump = spaceship.getWarpDrive().getFuelConsumption(distanceLY);
 
-            if (shipControls.spaceship.getRemainingFuel() < fuelForJump) {
+            if (spaceship.getRemainingFuel() < fuelForJump) {
                 createNotification(i18n.t("notifications:notEnoughFuel"), 5000);
                 this.jumpLock = false;
                 return;
@@ -291,27 +293,27 @@ export class StarSystemView implements View {
             });
 
             // then, initiate hyper space jump
-            if (!this.spaceshipControls?.spaceship.getWarpDrive().isEnabled()) this.spaceshipControls?.spaceship.enableWarpDrive();
-            this.spaceshipControls?.spaceship.hyperSpaceTunnel.setEnabled(true);
-            this.spaceshipControls?.spaceship.warpTunnel.getTransform().setEnabled(false);
-            this.spaceshipControls?.spaceship.hyperSpaceSound.setTargetVolume(1);
+            if (!spaceship.getWarpDrive().isEnabled()) spaceship.enableWarpDrive();
+            spaceship.hyperSpaceTunnel.setEnabled(true);
+            spaceship.warpTunnel.getTransform().setEnabled(false);
+            spaceship.hyperSpaceSound.setTargetVolume(1);
             AudioManager.SetMask(AudioMasks.HYPER_SPACE);
             const observer = this.scene.onBeforeRenderObservable.add(() => {
                 const deltaSeconds = this.scene.getEngine().getDeltaTime() / 1000;
-                this.spaceshipControls?.spaceship.hyperSpaceTunnel.update(deltaSeconds);
-                this.spaceshipControls?.spaceship.warpTunnel.update(deltaSeconds);
+                spaceship.hyperSpaceTunnel.update(deltaSeconds);
+                spaceship.warpTunnel.update(deltaSeconds);
             });
 
-            this.spaceshipControls?.spaceship.burnFuel(fuelForJump);
+            spaceship.burnFuel(fuelForJump);
 
             const starSystemCoordinates = target.systemCoordinates;
             const systemModel = getSystemModelFromCoordinates(starSystemCoordinates);
             await this.loadStarSystem(systemModel);
             this.initStarSystem();
 
-            this.spaceshipControls?.spaceship.hyperSpaceTunnel.setEnabled(false);
-            this.spaceshipControls?.spaceship.warpTunnel.getTransform().setEnabled(true);
-            this.spaceshipControls?.spaceship.hyperSpaceSound.setTargetVolume(0);
+            spaceship.hyperSpaceTunnel.setEnabled(false);
+            spaceship.warpTunnel.getTransform().setEnabled(true);
+            spaceship.hyperSpaceSound.setTargetVolume(0);
 
             AudioManager.SetMask(AudioMasks.STAR_SYSTEM_VIEW);
             observer.remove();
@@ -321,6 +323,7 @@ export class StarSystemView implements View {
         StarSystemInputs.map.toggleSpaceShipCharacter.on("complete", async () => {
             const characterControls = this.getCharacterControls();
             const shipControls = this.getSpaceshipControls();
+            const spaceship = shipControls.getSpaceship();
 
             const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
 
@@ -338,8 +341,8 @@ export class StarSystemView implements View {
 
                 this.scene.setActiveControls(characterControls);
 
-                shipControls.spaceship.acceleratingWarpDriveSound.setTargetVolume(0);
-                shipControls.spaceship.deceleratingWarpDriveSound.setTargetVolume(0);
+                spaceship.acceleratingWarpDriveSound.setTargetVolume(0);
+                spaceship.deceleratingWarpDriveSound.setTargetVolume(0);
             } else if (this.scene.getActiveControls() === characterControls) {
                 console.log("embark");
 
@@ -349,7 +352,7 @@ export class StarSystemView implements View {
                 this.scene.setActiveControls(shipControls);
                 SpaceShipControlsInputs.setEnabled(true);
 
-                if (shipControls.spaceship.isLanded()) {
+                if (spaceship.isLanded()) {
                     const bindings = SpaceShipControlsInputs.map.upDown.bindings;
                     const control = bindings[0].control;
                     if (!(control instanceof AxisComposite)) {
@@ -406,7 +409,7 @@ export class StarSystemView implements View {
         this.spaceStationLayer = new SpaceStationLayer(this.player);
         this.spaceStationLayer.setVisibility(false);
         this.spaceStationLayer.onTakeOffObservable.add(() => {
-            this.spaceshipControls?.spaceship.takeOff();
+            this.getSpaceshipControls().getSpaceship().takeOff();
         });
 
         this.targetCursorLayer = new TargetCursorLayer();
@@ -556,15 +559,13 @@ export class StarSystemView implements View {
     public resetPlayer() {
         this.postProcessManager.reset();
 
-        this.defaultControls?.dispose();
-        this.spaceshipControls?.dispose();
-        this.characterControls?.dispose();
-
         const maxZ = Settings.EARTH_RADIUS * 1e5;
 
-        this.defaultControls = new DefaultControls(this.scene);
-        this.defaultControls.speed = 0.2 * Settings.EARTH_RADIUS;
-        this.defaultControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
+        if (this.defaultControls === null) {
+            this.defaultControls = new DefaultControls(this.scene);
+            this.defaultControls.speed = 0.2 * Settings.EARTH_RADIUS;
+            this.defaultControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
+        }
 
         const spaceshipSerialized = this.player.serializedSpaceships.shift();
         if (spaceshipSerialized === undefined) throw new Error("No spaceship serialized in player");
@@ -572,13 +573,21 @@ export class StarSystemView implements View {
         const spaceship = Spaceship.Deserialize(spaceshipSerialized, this.scene);
         this.player.instancedSpaceships.push(spaceship);
 
-        this.spaceshipControls = new ShipControls(spaceship, this.scene);
+        if (this.spaceshipControls === null) {
+            this.spaceshipControls = new ShipControls(spaceship, this.scene);
+            this.spaceshipControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
+        } else {
+            const oldSpaceship = this.spaceshipControls.getSpaceship();
+            this.spaceshipControls.reset();
+            this.spaceshipControls.setSpaceship(spaceship);
+            oldSpaceship.dispose();
+        }
 
-        this.spaceshipControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
-
-        this.characterControls = new CharacterControls(this.scene);
-        this.characterControls.getTransform().setEnabled(false);
-        this.characterControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
+        if (this.characterControls === null) {
+            this.characterControls = new CharacterControls(this.scene);
+            this.characterControls.getTransform().setEnabled(false);
+            this.characterControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
+        }
 
         this.scene.setActiveControls(this.spaceshipControls);
     }
@@ -607,14 +616,16 @@ export class StarSystemView implements View {
         const nearestOrbitalObject = starSystem.getNearestOrbitalObject(this.scene.getActiveControls().getTransform().getAbsolutePosition());
         const nearestCelestialBody = starSystem.getNearestCelestialBody(this.scene.getActiveControls().getTransform().getAbsolutePosition());
 
-        this.spaceshipControls.spaceship.setNearestOrbitalObject(nearestOrbitalObject);
-        this.spaceshipControls.spaceship.setNearestCelestialBody(nearestCelestialBody);
+        const spaceship = this.spaceshipControls.getSpaceship();
 
-        const warpDrive = this.spaceshipControls.spaceship.getWarpDrive();
+        spaceship.setNearestOrbitalObject(nearestOrbitalObject);
+        spaceship.setNearestCelestialBody(nearestCelestialBody);
+
+        const warpDrive = spaceship.getWarpDrive();
         if (warpDrive.isEnabled()) {
-            this.spaceShipLayer.displaySpeed(warpDrive.getThrottle(), this.spaceshipControls.spaceship.getSpeed());
+            this.spaceShipLayer.displaySpeed(warpDrive.getThrottle(), spaceship.getSpeed());
         } else {
-            this.spaceShipLayer.displaySpeed(this.spaceshipControls.spaceship.getThrottle(), this.spaceshipControls.spaceship.getSpeed());
+            this.spaceShipLayer.displaySpeed(spaceship.getThrottle(), spaceship.getSpeed());
         }
 
         //const currentSystemPosition = getStarGalacticPosition(starSystem.model.coordinates);
@@ -628,13 +639,10 @@ export class StarSystemView implements View {
 
         const fuelForJump = warpDrive.getFuelConsumption(distanceLY);
 
-        this.spaceShipLayer.displayFuel(
-            this.spaceshipControls.spaceship.getRemainingFuel() / this.spaceshipControls.spaceship.getTotalFuelCapacity(),
-            fuelForJump / this.spaceshipControls.spaceship.getTotalFuelCapacity()
-        );
+        this.spaceShipLayer.displayFuel(spaceship.getRemainingFuel() / spaceship.getTotalFuelCapacity(), fuelForJump / spaceship.getTotalFuelCapacity());
 
         this.characterControls.setClosestWalkableObject(nearestOrbitalObject);
-        this.spaceshipControls.spaceship.setClosestWalkableObject(nearestOrbitalObject);
+        spaceship.setClosestWalkableObject(nearestOrbitalObject);
 
         if (nearestOrbitalObject.model.type === OrbitalObjectType.SPACE_STATION || nearestOrbitalObject.model.type === OrbitalObjectType.SPACE_ELEVATOR) {
             this.spaceshipControls.setClosestLandableFacility(nearestOrbitalObject as OrbitalFacility);
@@ -685,6 +693,8 @@ export class StarSystemView implements View {
 
         const nearestCelestialBody = starSystem.getNearestCelestialBody(activeControls.getTransform().getAbsolutePosition());
 
+        const spaceship = this.spaceshipControls.getSpaceship();
+
         this.bodyEditor.update(nearestCelestialBody, this.postProcessManager, this.scene);
 
         const missionContext: MissionContext = {
@@ -696,12 +706,12 @@ export class StarSystemView implements View {
         this.spaceShipLayer.update(activeControls.getTransform(), missionContext, this.keyboardLayoutMap);
 
         this.targetCursorLayer.update(activeControls.getActiveCamera());
-        const targetLandingPad = this.spaceshipControls.spaceship.getTargetLandingPad();
-        if (targetLandingPad !== null && !this.spaceshipControls.spaceship.isLanded() && this.targetCursorLayer.getTarget() !== targetLandingPad) {
+        const targetLandingPad = spaceship.getTargetLandingPad();
+        if (targetLandingPad !== null && !spaceship.isLanded() && this.targetCursorLayer.getTarget() !== targetLandingPad) {
             this.targetCursorLayer.setTarget(targetLandingPad);
         }
 
-        if (this.spaceshipControls.spaceship.isLandedAtFacility() && this.isUiEnabled) {
+        if (spaceship.isLandedAtFacility() && this.isUiEnabled) {
             this.spaceStationLayer.setVisibility(true);
             const facility = this.spaceshipControls.getClosestLandableFacility();
             this.getStarSystem()
@@ -721,8 +731,8 @@ export class StarSystemView implements View {
             this.spaceStationLayer.setVisibility(false);
         }
 
-        this.targetCursorLayer.setEnabled(this.isUiEnabled && !this.spaceshipControls.spaceship.isLandedAtFacility());
-        this.spaceShipLayer.setVisibility(this.isUiEnabled && activeControls === this.spaceshipControls && !this.spaceshipControls.spaceship.isLandedAtFacility());
+        this.targetCursorLayer.setEnabled(this.isUiEnabled && !spaceship.isLandedAtFacility());
+        this.spaceShipLayer.setVisibility(this.isUiEnabled && activeControls === this.spaceshipControls && !spaceship.isLandedAtFacility());
     }
 
     /**
@@ -770,7 +780,7 @@ export class StarSystemView implements View {
         this.scene.setActiveControls(shipControls);
         setRotationQuaternion(shipControls.getTransform(), getRotationQuaternion(defaultControls.getTransform()).clone());
 
-        shipControls.spaceship.setEnabled(true, this.havokPlugin);
+        shipControls.getSpaceship().setEnabled(true, this.havokPlugin);
         SpaceShipControlsInputs.setEnabled(true);
     }
 
@@ -790,8 +800,9 @@ export class StarSystemView implements View {
         this.scene.setActiveControls(characterControls);
         setRotationQuaternion(characterControls.getTransform(), getRotationQuaternion(defaultControls.getTransform()).clone());
 
-        shipControls.spaceship.warpTunnel.setThrottle(0);
-        shipControls.spaceship.setEnabled(false, this.havokPlugin);
+        const spaceship = shipControls.getSpaceship();
+        spaceship.warpTunnel.setThrottle(0);
+        spaceship.setEnabled(false, this.havokPlugin);
         SpaceShipControlsInputs.setEnabled(false);
         this.stopBackgroundSounds();
     }
@@ -811,8 +822,9 @@ export class StarSystemView implements View {
         characterControls.getTransform().setEnabled(false);
         CharacterInputs.setEnabled(false);
 
-        shipControls.spaceship.warpTunnel.setThrottle(0);
-        shipControls.spaceship.setEnabled(false, this.havokPlugin);
+        const spaceship = shipControls.getSpaceship();
+        spaceship.warpTunnel.setThrottle(0);
+        spaceship.setEnabled(false, this.havokPlugin);
         SpaceShipControlsInputs.setEnabled(false);
 
         this.stopBackgroundSounds();
@@ -832,9 +844,10 @@ export class StarSystemView implements View {
      * Stops the background sounds of the spaceship
      */
     public stopBackgroundSounds() {
-        this.spaceshipControls?.spaceship.acceleratingWarpDriveSound.setTargetVolume(0);
-        this.spaceshipControls?.spaceship.deceleratingWarpDriveSound.setTargetVolume(0);
-        this.spaceshipControls?.spaceship.thrusterSound.setTargetVolume(0);
+        const spaceship = this.getSpaceshipControls().getSpaceship();
+        spaceship.acceleratingWarpDriveSound.setTargetVolume(0);
+        spaceship.deceleratingWarpDriveSound.setTargetVolume(0);
+        spaceship.thrusterSound.setTargetVolume(0);
     }
 
     /**

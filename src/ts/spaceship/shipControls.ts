@@ -34,25 +34,24 @@ import { ManagesLandingPads } from "../utils/managesLandingPads";
 import { Sounds } from "../assets/sounds";
 import { LandingPadSize } from "../assets/procedural/landingPad/landingPad";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
-import { moveTowards } from "../utils/math";
 import { CameraShakeAnimation } from "../uberCore/transforms/animations/cameraShake";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { Lerp } from "@babylonjs/core/Maths/math.scalar.functions";
 import { quickAnimation } from "../uberCore/transforms/animations/quickAnimation";
 
 export class ShipControls implements Controls {
-    readonly spaceship: Spaceship;
+    private spaceship: Spaceship | null;
 
+    readonly thirdPersonCameraDefaultRadius = 60;
+    readonly thirdPersonCameraDefaultAlpha = -3.14 / 2;
+    readonly thirdPersonCameraDefaultBeta = 3.14 / 2.2;
     readonly thirdPersonCamera: ArcRotateCamera;
+
     readonly firstPersonCamera: FreeCamera;
 
     private readonly cameraShakeAnimation: CameraShakeAnimation;
 
     private readonly scene: Scene;
-
-    private isCameraShaking = false;
-
-    static BASE_CAMERA_RADIUS = 60;
 
     private closestLandableFacility: (Transformable & ManagesLandingPads) | null = null;
 
@@ -71,7 +70,14 @@ export class ShipControls implements Controls {
         this.firstPersonCamera.parent = this.getTransform();
         this.firstPersonCamera.position = new Vector3(0, 1.2, 4);
 
-        this.thirdPersonCamera = new ArcRotateCamera("shipThirdPersonCamera", -3.14 / 2, 3.14 / 2.2, ShipControls.BASE_CAMERA_RADIUS, Vector3.Zero(), scene);
+        this.thirdPersonCamera = new ArcRotateCamera(
+            "shipThirdPersonCamera",
+            this.thirdPersonCameraDefaultAlpha,
+            this.thirdPersonCameraDefaultBeta,
+            this.thirdPersonCameraDefaultRadius,
+            Vector3.Zero(),
+            scene
+        );
         this.thirdPersonCamera.parent = this.getTransform();
         this.thirdPersonCamera.lowerRadiusLimit = 10;
         this.thirdPersonCamera.upperRadiusLimit = 500;
@@ -81,18 +87,19 @@ export class ShipControls implements Controls {
         this.scene = scene;
 
         this.toggleWarpDriveHandler = async () => {
-            if (!this.spaceship.canEngageWarpDrive() && this.spaceship.getWarpDrive().isDisabled()) {
+            const spaceship = this.getSpaceship();
+            if (!spaceship.canEngageWarpDrive() && spaceship.getWarpDrive().isDisabled()) {
                 Sounds.CANNOT_ENGAGE_WARP_DRIVE.play();
                 return;
             }
 
             const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
 
-            this.spaceship.toggleWarpDrive();
-            if (this.spaceship.getWarpDrive().isEnabled()) {
+            spaceship.toggleWarpDrive();
+            if (spaceship.getWarpDrive().isEnabled()) {
                 Sounds.ENGAGING_WARP_DRIVE.play();
                 this.cameraShakeAnimation.reset();
-                this.spaceship.setMainEngineThrottle(0);
+                spaceship.setMainEngineThrottle(0);
             } else {
                 Sounds.WARP_DRIVE_DISENGAGED.play();
                 this.cameraShakeAnimation.reset();
@@ -113,14 +120,15 @@ export class ShipControls implements Controls {
         SpaceShipControlsInputs.map.toggleWarpDrive.on("complete", this.toggleWarpDriveHandler);
 
         this.landingHandler = async () => {
+            const spaceship = this.getSpaceship();
             const keyboardLayout = await getGlobalKeyboardLayoutMap();
-            if (this.spaceship.isWarpDriveEnabled()) {
+            if (spaceship.isWarpDriveEnabled()) {
                 const relevantKeys = pressInteractionToStrings(SpaceShipControlsInputs.map.toggleWarpDrive, keyboardLayout);
                 createNotification(`Cannot land while warp drive is enabled. You can use ${relevantKeys} to toggle your warp drive.`, 5000);
                 return;
             }
 
-            const closestWalkableObject = this.spaceship.getClosestWalkableObject();
+            const closestWalkableObject = spaceship.getClosestWalkableObject();
             if (closestWalkableObject === null) return;
 
             const distance = Vector3.Distance(this.getTransform().getAbsolutePosition(), closestWalkableObject.getTransform().getAbsolutePosition());
@@ -131,13 +139,14 @@ export class ShipControls implements Controls {
                 return;
             }
 
-            this.spaceship.engagePlanetaryLanding(null);
+            spaceship.engagePlanetaryLanding(null);
         };
 
         SpaceShipControlsInputs.map.landing.on("complete", this.landingHandler);
 
         this.emitLandingRequestHandler = () => {
-            if (this.spaceship.isLanded() || this.spaceship.isLanding()) return;
+            const spaceship = this.getSpaceship();
+            if (spaceship.isLanded() || spaceship.isLanding()) return;
             if (this.closestLandableFacility === null) return;
             const landingPad = this.closestLandableFacility.handleLandingRequest({ minimumPadSize: LandingPadSize.SMALL });
             if (landingPad === null) {
@@ -149,14 +158,15 @@ export class ShipControls implements Controls {
             Sounds.STRAUSS_BLUE_DANUBE.play();
             Sounds.STRAUSS_BLUE_DANUBE.setVolume(1, 1);
             createNotification(`Landing request granted. Proceed to pad ${landingPad.padNumber}`, 30000);
-            this.spaceship.engageLandingOnPad(landingPad);
+            spaceship.engageLandingOnPad(landingPad);
         };
 
         SpaceShipControlsInputs.map.emitLandingRequest.on("complete", this.emitLandingRequestHandler);
 
         this.throttleToZeroHandler = () => {
-            this.spaceship.setMainEngineThrottle(0);
-            this.spaceship.getWarpDrive().increaseThrottle(-this.spaceship.getWarpDrive().getThrottle());
+            const spaceship = this.getSpaceship();
+            spaceship.setMainEngineThrottle(0);
+            spaceship.getWarpDrive().increaseThrottle(-spaceship.getWarpDrive().getThrottle());
         };
 
         SpaceShipControlsInputs.map.throttleToZero.on("complete", this.throttleToZeroHandler);
@@ -164,7 +174,7 @@ export class ShipControls implements Controls {
         this.resetCameraHandler = () => {
             quickAnimation(this.thirdPersonCamera, "alpha", this.thirdPersonCamera.alpha, -3.14 / 2, 200);
             quickAnimation(this.thirdPersonCamera, "beta", this.thirdPersonCamera.beta, 3.14 / 2.2, 200);
-            quickAnimation(this.thirdPersonCamera, "radius", this.thirdPersonCamera.radius, ShipControls.BASE_CAMERA_RADIUS, 200);
+            quickAnimation(this.thirdPersonCamera, "radius", this.thirdPersonCamera.radius, this.thirdPersonCameraDefaultRadius, 200);
             quickAnimation(this.thirdPersonCamera, "target", this.thirdPersonCamera.target, Vector3.Zero(), 200);
         };
 
@@ -184,7 +194,7 @@ export class ShipControls implements Controls {
             Sounds.STRAUSS_BLUE_DANUBE.setVolume(0, 2);
             Sounds.STRAUSS_BLUE_DANUBE.stop(2);
 
-            if (!this.spaceship.isLandedAtFacility()) {
+            if (!this.getSpaceship().isLandedAtFacility()) {
                 const bindingsString = pressInteractionToStrings(StarSystemInputs.map.toggleSpaceShipCharacter, keyboardLayoutMap).join(", ");
                 createNotification(i18n.t("notifications:landingComplete", { bindingsString: bindingsString }), 5000);
             }
@@ -212,7 +222,7 @@ export class ShipControls implements Controls {
     }
 
     public getTransform(): TransformNode {
-        return this.spaceship.getTransform();
+        return this.getSpaceship().getTransform();
     }
 
     public getActiveCamera(): Camera {
@@ -232,7 +242,8 @@ export class ShipControls implements Controls {
     }
 
     public update(deltaSeconds: number): Vector3 {
-        this.spaceship.update(deltaSeconds);
+        const spaceship = this.getSpaceship();
+        spaceship.update(deltaSeconds);
 
         if (!this.cameraShakeAnimation.isFinished()) this.cameraShakeAnimation.update(deltaSeconds);
 
@@ -242,44 +253,57 @@ export class ShipControls implements Controls {
             inputPitch *= 0;
         }
 
-        if (this.spaceship.getWarpDrive().isDisabled()) {
-            this.spaceship.increaseMainEngineThrottle(deltaSeconds * SpaceShipControlsInputs.map.throttle.value);
+        if (spaceship.getWarpDrive().isDisabled()) {
+            spaceship.increaseMainEngineThrottle(deltaSeconds * SpaceShipControlsInputs.map.throttle.value);
 
             if (SpaceShipControlsInputs.map.upDown.value !== 0) {
-                if (this.spaceship.isLanded()) {
-                    this.spaceship.takeOff();
-                } else if (this.spaceship.isLanding()) {
-                    this.spaceship.cancelLanding();
+                if (spaceship.isLanded()) {
+                    spaceship.takeOff();
+                } else if (spaceship.isLanding()) {
+                    spaceship.cancelLanding();
                 }
-                this.spaceship.aggregate.body.applyForce(
+                spaceship.aggregate.body.applyForce(
                     getUpwardDirection(this.getTransform()).scale(9.8 * 10 * SpaceShipControlsInputs.map.upDown.value),
-                    this.spaceship.aggregate.body.getObjectCenterWorld()
+                    spaceship.aggregate.body.getObjectCenterWorld()
                 );
             }
         } else {
-            this.spaceship.getWarpDrive().increaseThrottle(0.5 * deltaSeconds * SpaceShipControlsInputs.map.throttle.value);
+            spaceship.getWarpDrive().increaseThrottle(0.5 * deltaSeconds * SpaceShipControlsInputs.map.throttle.value);
         }
 
-        if (!this.spaceship.isLanded()) {
+        if (!spaceship.isLanded()) {
             roll(this.getTransform(), 2.0 * inputRoll * deltaSeconds);
             yaw(this.getTransform(), -1.0 * inputRoll * deltaSeconds);
             pitch(this.getTransform(), 3.0 * inputPitch * deltaSeconds);
         }
 
-        // camera shake
-        if (this.isCameraShaking) {
-            this.thirdPersonCamera.alpha += (Math.random() - 0.5) / 100;
-            this.thirdPersonCamera.beta += (Math.random() - 0.5) / 100;
-            this.thirdPersonCamera.radius += (Math.random() - 0.5) / 100;
-        }
-
-        this.targetFov = Tools.ToRadians(60 + 10 * this.spaceship.getThrottle());
+        this.targetFov = Tools.ToRadians(60 + 10 * spaceship.getThrottle());
 
         this.thirdPersonCamera.fov = Lerp(this.thirdPersonCamera.fov, this.targetFov, 0.4);
 
         this.getActiveCamera().getViewMatrix();
 
         return this.getTransform().getAbsolutePosition();
+    }
+
+    reset() {
+        this.resetCameraHandler();
+        this.cameraShakeAnimation.reset();
+        this.closestLandableFacility = null;
+    }
+
+    setSpaceship(ship: Spaceship) {
+        this.spaceship = ship;
+        this.thirdPersonCamera.parent = this.getTransform();
+        this.firstPersonCamera.parent = this.getTransform();
+    }
+
+    getSpaceship(): Spaceship {
+        if (this.spaceship === null) {
+            throw new Error("Spaceship is null");
+        }
+
+        return this.spaceship;
     }
 
     dispose() {
@@ -289,7 +313,7 @@ export class ShipControls implements Controls {
         SpaceShipControlsInputs.map.throttleToZero.off("complete", this.throttleToZeroHandler);
         SpaceShipControlsInputs.map.resetCamera.off("complete", this.resetCameraHandler);
 
-        this.spaceship.dispose();
+        this.spaceship?.dispose();
         this.thirdPersonCamera.dispose();
         this.firstPersonCamera.dispose();
     }

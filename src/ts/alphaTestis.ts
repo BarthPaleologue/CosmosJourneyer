@@ -164,5 +164,5 @@ document.addEventListener("keydown", (e) => {
     if (engine.isPaused()) return;
 });
 
-starSystemView.getSpaceshipControls().spaceship.enableWarpDrive();
+starSystemView.getSpaceshipControls().getSpaceship().enableWarpDrive();
 SpaceShipControlsInputs.setEnabled(true);
