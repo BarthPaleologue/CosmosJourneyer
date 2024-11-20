@@ -434,12 +434,12 @@ export class CosmosJourneyer {
     public performAutoSave(): void {
         const saveData = this.generateSaveData();
 
-        // use creation date as key to avoid overwriting other cmdr's autosave
-        const creationDate = saveData.player.creationDate;
+        // use player uuid as key to avoid overwriting other cmdr's autosave
+        const uuid = saveData.player.uuid;
 
         // store in a hashmap in local storage
         const autosaves = JSON.parse(localStorage.getItem("autosaves") || "{}");
-        autosaves[creationDate] = saveData;
+        autosaves[uuid] = saveData;
         localStorage.setItem("autosaves", JSON.stringify(autosaves));
     }
 

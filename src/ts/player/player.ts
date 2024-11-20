@@ -8,8 +8,12 @@ export type CompletedTutorials = {
 };
 
 export type SerializedPlayer = {
+    uuid: string;
+
     name: string;
+
     balance: number;
+    
     creationDate: string;
 
     visitedSystemHistory: StarSystemCoordinates[];
@@ -26,6 +30,7 @@ export type SerializedPlayer = {
 };
 
 export class Player {
+    uuid: string;
     name: string;
     balance: number;
     creationDate: Date;
@@ -47,6 +52,7 @@ export class Player {
     static DEFAULT_BALANCE = 10_000;
 
     private constructor(serializedPlayer: SerializedPlayer) {
+        this.uuid = serializedPlayer.uuid;
         this.name = warnIfUndefined(serializedPlayer.name, Player.DEFAULT_NAME, `[PLAYER_DATA_WARNING] Name was undefined. Defaulting to ${Player.DEFAULT_NAME}`);
         this.balance = warnIfUndefined(serializedPlayer.balance, Player.DEFAULT_BALANCE, `[PLAYER_DATA_WARNING] Balance was undefined. Defaulting to ${Player.DEFAULT_BALANCE}`);
         this.creationDate = new Date(
@@ -80,6 +86,7 @@ export class Player {
 
     public static Default(): Player {
         return new Player({
+            uuid: crypto.randomUUID(),
             name: Player.DEFAULT_NAME,
             balance: Player.DEFAULT_BALANCE,
             creationDate: new Date().toISOString(),
@@ -101,6 +108,7 @@ export class Player {
 
     public static Serialize(player: Player): SerializedPlayer {
         return {
+            uuid: player.uuid,
             name: player.name,
             balance: player.balance,
             creationDate: player.creationDate.toISOString(),
@@ -120,6 +128,7 @@ export class Player {
      */
     public copyFrom(player: Player) {
         const playerClone = structuredClone(player);
+        this.uuid = playerClone.uuid;
         this.name = playerClone.name;
         this.balance = playerClone.balance;
         this.creationDate = playerClone.creationDate;
@@ -130,5 +139,6 @@ export class Player {
         this.completedMissions = playerClone.completedMissions;
         this.serializedSpaceships = playerClone.serializedSpaceships;
         this.instancedSpaceships = playerClone.instancedSpaceships;
+        this.tutorials = playerClone.tutorials;
     }
 }
