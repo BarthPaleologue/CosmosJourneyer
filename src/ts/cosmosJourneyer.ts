@@ -304,6 +304,8 @@ export class CosmosJourneyer {
             const deltaSeconds = this.engine.getDeltaTime() / 1000;
             this.elapsedSeconds += deltaSeconds;
 
+            this.player.timePlayedSeconds += deltaSeconds;
+
             this.autoSaveTimerSeconds += deltaSeconds;
             if (this.autoSaveTimerSeconds >= this.autoSavePeriodSeconds) {
                 this.autoSaveTimerSeconds %= this.autoSavePeriodSeconds;

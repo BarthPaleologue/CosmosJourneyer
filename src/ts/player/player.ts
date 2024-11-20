@@ -16,6 +16,8 @@ export type SerializedPlayer = {
     
     creationDate: string;
 
+    timePlayedSeconds: number;
+
     visitedSystemHistory: StarSystemCoordinates[];
 
     currentItinerary: StarSystemCoordinates[];
@@ -34,6 +36,7 @@ export class Player {
     name: string;
     balance: number;
     creationDate: Date;
+    timePlayedSeconds: number;
 
     visitedSystemHistory: StarSystemCoordinates[] = [];
 
@@ -58,6 +61,7 @@ export class Player {
         this.creationDate = new Date(
             warnIfUndefined(serializedPlayer.creationDate, new Date().toISOString(), `[PLAYER_DATA_WARNING] Creation date was undefined. Defaulting to current date`)
         );
+        this.timePlayedSeconds = warnIfUndefined(serializedPlayer.timePlayedSeconds, 0, `[PLAYER_DATA_WARNING] Time played was undefined. Defaulting to 0`);
         this.visitedSystemHistory = warnIfUndefined(
             serializedPlayer.visitedSystemHistory,
             [],
@@ -90,6 +94,7 @@ export class Player {
             name: Player.DEFAULT_NAME,
             balance: Player.DEFAULT_BALANCE,
             creationDate: new Date().toISOString(),
+            timePlayedSeconds: 0,
             visitedSystemHistory: [],
             currentItinerary: [],
             systemBookmarks: [],
@@ -112,6 +117,7 @@ export class Player {
             name: player.name,
             balance: player.balance,
             creationDate: player.creationDate.toISOString(),
+            timePlayedSeconds: player.timePlayedSeconds,
             visitedSystemHistory: player.visitedSystemHistory,
             currentItinerary: player.currentItinerary,
             systemBookmarks: player.systemBookmarks,
@@ -132,6 +138,7 @@ export class Player {
         this.name = playerClone.name;
         this.balance = playerClone.balance;
         this.creationDate = playerClone.creationDate;
+        this.timePlayedSeconds = playerClone.timePlayedSeconds;
         this.visitedSystemHistory = playerClone.visitedSystemHistory;
         this.currentItinerary = playerClone.currentItinerary;
         this.systemBookmarks = playerClone.systemBookmarks;
