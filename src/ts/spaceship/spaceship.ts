@@ -580,7 +580,7 @@ export class Spaceship implements Transformable {
 
                     const isAboveRings = planarDistance > ringsMinDistance && planarDistance < ringsMaxDistance;
 
-                    let distanceToRings = isAboveRings
+                    const distanceToRings = isAboveRings
                         ? Math.abs(distanceAboveRings)
                         : Math.sqrt(Math.min((planarDistance - ringsMinDistance) ** 2, (planarDistance - ringsMaxDistance) ** 2) + distanceAboveRings ** 2);
 
