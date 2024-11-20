@@ -177,7 +177,11 @@ export class CosmosJourneyer {
                 });
             });
         });
-        this.pauseMenu.onSave.add(() => this.downloadSaveFile());
+        this.pauseMenu.onSave.add(() => {
+            this.saveToLocalStorage();
+            this.downloadSaveFile();
+            createNotification(i18n.t("notifications:saveOk"), 2000);
+        });
 
         window.addEventListener("blur", () => {
             if (!this.mainMenu?.isVisible()) this.pause();
@@ -430,6 +434,22 @@ export class CosmosJourneyer {
         };
     }
 
+    public saveToLocalStorage(): void {
+        const saveData = this.generateSaveData();
+
+        // use player uuid as key to avoid overwriting other cmdr's save
+        const uuid = saveData.player.uuid;
+
+        const localStorageKey = "saves";
+
+        // store in a hashmap in local storage
+        const saves: { [key: string]: SaveFileData[] } = JSON.parse(localStorage.getItem(localStorageKey) || "{}");
+        saves[uuid] = saves[uuid] || [];
+        saves[uuid].unshift(saveData);
+
+        localStorage.setItem(localStorageKey, JSON.stringify(saves));
+    }
+
     /**
      * Generate save file data and store it in the autosaves hashmap in local storage
      */
@@ -439,10 +459,12 @@ export class CosmosJourneyer {
         // use player uuid as key to avoid overwriting other cmdr's autosave
         const uuid = saveData.player.uuid;
 
+        const localStorageKey = "autosaves";
+
         // store in a hashmap in local storage
-        const autosaves = JSON.parse(localStorage.getItem("autosaves") || "{}");
+        const autosaves = JSON.parse(localStorage.getItem(localStorageKey) || "{}");
         autosaves[uuid] = saveData;
-        localStorage.setItem("autosaves", JSON.stringify(autosaves));
+        localStorage.setItem(localStorageKey, JSON.stringify(autosaves));
     }
 
     /**
