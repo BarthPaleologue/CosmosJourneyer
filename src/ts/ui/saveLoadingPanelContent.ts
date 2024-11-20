@@ -3,6 +3,7 @@ import i18n from "../i18n";
 import { LocalStorageAutoSaves, LocalStorageManualSaves, parseSaveFileData, SaveFileData } from "../saveFile/saveFileData";
 import { createNotification } from "../utils/notification";
 import { Settings } from "../settings";
+import { parseSeconds } from "../utils/strings/parseToStrings";
 
 export class SaveLoadingPanelContent {
     readonly htmlRoot: HTMLElement;
@@ -110,7 +111,7 @@ export class SaveLoadingPanelContent {
             cmdrHeader.appendChild(cmdrLastPlayed);
 
             const cmdrPlayTime = document.createElement("p");
-            cmdrPlayTime.innerText = `Play time: ${latestSave.player.timePlayedSeconds} seconds`;
+            cmdrPlayTime.innerText = `Played for ${parseSeconds(latestSave.player.timePlayedSeconds)}`;
             cmdrHeader.appendChild(cmdrPlayTime);
 
             const continueButton = document.createElement("button");
