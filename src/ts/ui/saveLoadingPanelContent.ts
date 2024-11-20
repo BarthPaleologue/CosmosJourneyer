@@ -93,7 +93,9 @@ export class SaveLoadingPanelContent {
             cmdrDiv.classList.add("cmdr");
             this.cmdrList.appendChild(cmdrDiv);
 
-            const latestSave = autoSavesDict[cmdrUuid] ?? manualSavesDict[cmdrUuid][0];
+            const manualSaves = manualSavesDict[cmdrUuid] ?? [];
+
+            const latestSave = autoSavesDict[cmdrUuid] ?? manualSaves[0];
 
             const cmdrHeader = document.createElement("div");
             cmdrHeader.classList.add("cmdrHeader");
@@ -117,7 +119,83 @@ export class SaveLoadingPanelContent {
                 this.onLoadSaveObservable.notifyObservers(latestSave);
             });
             cmdrDiv.appendChild(continueButton);
+
+            const savesList = document.createElement("div");
+            savesList.classList.add("savesList");
+            cmdrDiv.appendChild(savesList);
+
+            const autoSaveDiv = this.createSaveDiv(autoSavesDict[cmdrUuid], true);
+            savesList.appendChild(autoSaveDiv);
+
+            manualSaves.forEach((manualSave) => {
+                const manualSaveDiv = this.createSaveDiv(manualSave, false);
+                savesList.appendChild(manualSaveDiv);
+            });
+
+            const expandButton = document.createElement("div");
+            expandButton.classList.add("expandButton");
+            expandButton.innerText = "+";
+            expandButton.addEventListener("click", () => {
+                cmdrDiv.classList.toggle("expanded");
+                expandButton.innerText = cmdrDiv.classList.contains("expanded") ? "-" : "+";
+            });
+            cmdrHeader.appendChild(expandButton);
         });
+    }
+
+    private createSaveDiv(save: SaveFileData, isAutoSave: boolean): HTMLElement {
+        const saveDiv = document.createElement("div");
+        saveDiv.classList.add("saveContainer");
+
+        const saveHeader = document.createElement("div");
+        saveHeader.classList.add("saveHeader");
+        saveDiv.appendChild(saveHeader);
+
+        const saveName = document.createElement("p");
+        saveName.innerText = (isAutoSave ? `[Auto] ` : "") + new Date(save.timestamp).toLocaleString();
+        saveHeader.appendChild(saveName);
+
+        const saveButtons = document.createElement("div");
+        saveButtons.classList.add("saveButtons");
+        saveDiv.appendChild(saveButtons);
+
+        const loadButton = document.createElement("button");
+        loadButton.innerText = i18n.t("sidePanel:load");
+        loadButton.addEventListener("click", () => {
+            this.onLoadSaveObservable.notifyObservers(save);
+        });
+        saveButtons.appendChild(loadButton);
+
+        const downloadButton = document.createElement("button");
+        downloadButton.innerText = i18n.t("sidePanel:download");
+        downloadButton.addEventListener("click", () => {
+            const blob = new Blob([JSON.stringify(save)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `${save.player.name}_${save.timestamp}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+        saveButtons.appendChild(downloadButton);
+
+        const deleteButton = document.createElement("button");
+        deleteButton.innerText = i18n.t("sidePanel:delete");
+        deleteButton.addEventListener("click", () => {
+            const autoSavesDict: LocalStorageAutoSaves = JSON.parse(localStorage.getItem(Settings.AUTO_SAVE_KEY) ?? "{}");
+            const manualSavesDict: LocalStorageManualSaves = JSON.parse(localStorage.getItem(Settings.MANUAL_SAVE_KEY) ?? "{}");
+
+            if (isAutoSave) {
+                delete autoSavesDict[save.player.uuid];
+            } else {
+                manualSavesDict[save.player.uuid] = manualSavesDict[save.player.uuid].filter((manualSave) => manualSave.timestamp !== save.timestamp);
+            }
+
+            saveDiv.remove();
+        });
+        saveButtons.appendChild(deleteButton);
+
+        return saveDiv;
     }
 
     private async parseFile(file: File): Promise<SaveFileData> {
