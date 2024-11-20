@@ -179,7 +179,7 @@ export class CosmosJourneyer {
         });
         this.pauseMenu.onSave.add(() => {
             this.saveToLocalStorage();
-            this.downloadSaveFile();
+            this.performAutoSave();
             createNotification(i18n.t("notifications:saveOk"), 2000);
         });
 
