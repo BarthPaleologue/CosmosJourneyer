@@ -1,5 +1,14 @@
 @use "variables";
 
+@keyframes loadingAnimation {
+    0% {
+        background-position: 100% 0;
+    }
+    100% {
+        background-position: 0 0;
+    }
+}
+
 button {
     --button-bg-color: var(--accent-color);
     --button-hover-bg-color: var(--accent-color-light);
@@ -7,7 +16,7 @@ button {
     background-color: var(--button-bg-color);
     color: white;
     font-family: variables.$main-font;
-    padding: 1.0vmin;
+    padding: 1vmin;
     font-size: var(--text-size);
     border: none;
     outline: none;
@@ -24,8 +33,21 @@ button {
     }
 
     &.danger {
-        --button-bg-color: red;
-        --button-hover-bg-color: darkred;
+        --button-bg-color: #c20202;
+        --button-hover-bg-color: red;
         --button-active-bg-color: darkred;
+    }
+
+    &:disabled {
+        --button-bg-color: var(--disabled-color);
+        --button-hover-bg-color: var(--disabled-color);
+        --button-active-bg-color: var(--disabled-color);
+        cursor: not-allowed;
+        color: rgb(200, 200, 200);
+    }
+
+    &.loading {
+        background: linear-gradient(90deg, var(--button-bg-color), rgb(200, 200, 200), var(--button-bg-color)) 0 0 / 200% 100% no-repeat;
+        animation: loadingAnimation 1s infinite ease-in-out alternate;
     }
 }
