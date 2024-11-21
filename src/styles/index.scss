@@ -140,6 +140,8 @@ body {
 
     @include meta.load-css("button.scss");
 
+    @include meta.load-css("dialog.scss");
+
     #renderer {
         z-index: 1;
         float: left;

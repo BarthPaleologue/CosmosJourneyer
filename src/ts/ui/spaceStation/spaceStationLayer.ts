@@ -23,6 +23,9 @@ import { Settings } from "../../settings";
 import { OrbitalObjectModel } from "../../architecture/orbitalObject";
 import { OrbitalFacilityModel } from "../../spacestation/orbitalFacility";
 import { generateSpaceshipDom } from "./spaceshipDock";
+import editIconPath from "../../../asset/icons/edit.webp";
+import { promptModal } from "../../utils/dialogModal";
+import i18n from "../../i18n";
 
 const enum MainPanelState {
     NONE,
@@ -148,14 +151,32 @@ export class SpaceStationLayer {
     }
 
     public setStation(station: OrbitalFacilityModel, stationParents: OrbitalObjectModel[], player: Player) {
+        if (this.currentStation === station) return;
         this.currentStation = station;
         this.currentStationParents = stationParents;
         this.spaceStationHeader.innerHTML = `
-            <p class="welcomeTo">Welcome to</p>
+            <p class="welcomeTo">${i18n.t("spaceStation:welcomeTo")}</p>
             <p class="spaceStationName">${station.name}</p>`;
 
         this.playerName.textContent = `CMDR ${player.name}`;
         this.playerBalance.textContent = `Balance: ${Settings.CREDIT_SYMBOL}${player.balance.toLocaleString()}`;
+
+        const changeNameButton = document.createElement("button");
+        changeNameButton.classList.add("icon");
+        this.playerName.appendChild(changeNameButton);
+
+        const editIcon = document.createElement("img");
+        editIcon.src = editIconPath;
+        changeNameButton.appendChild(editIcon);
+
+        changeNameButton.addEventListener("click", async () => {
+            const newName = await promptModal(i18n.t("spaceStation:cmdrNameChangePrompt"), player.name);
+            if (newName !== null) {
+                player.name = newName;
+                this.playerName.textContent = `CMDR ${player.name}`;
+                this.playerName.appendChild(changeNameButton);
+            }
+        });
     }
 
     public reset() {
