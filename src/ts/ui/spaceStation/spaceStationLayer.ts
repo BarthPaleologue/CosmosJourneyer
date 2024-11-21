@@ -169,7 +169,7 @@ export class SpaceStationLayer {
         changeNameButton.appendChild(editIcon);
 
         changeNameButton.addEventListener("click", async () => {
-            const newName = await promptModal("Enter your new name", player.name);
+            const newName = await promptModal("How do you want to be called Commander?", player.name);
             if (newName !== null) {
                 player.name = newName;
                 this.playerName.textContent = `CMDR ${player.name}`;

@@ -1,0 +1,47 @@
+@use "variables";
+
+::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+dialog {
+    border-radius: 20px;
+    padding: 20px;
+    z-index: 1000;
+
+    color: white;
+    font-family: variables.$main-font;
+    font-size: var(--text-size);
+
+    overflow: hidden;
+
+    background: rgba(0, 0, 0, 0.8);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5) inset, 0 0 10px rgba(255, 255, 255, 0.5);
+
+    form {
+        display: flex;
+        flex-direction: column;
+
+        input {
+            background: black;
+            color: white;
+            border: none;
+            border-bottom: 2px solid white;
+            outline: none;
+            font-family: variables.$main-font;
+            font-size: var(--text-size);
+            transition: .2s;
+
+            &:focus {
+                border-bottom: 2px solid var(--accent-color);
+            }
+        }
+
+        menu {
+            display: flex;
+            padding-inline-start: 0;
+            justify-content: center;
+            column-gap: 10px;
+        }
+    }
+}
