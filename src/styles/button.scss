@@ -18,11 +18,18 @@ button {
     font-family: variables.$main-font;
     padding: 1vmin;
     font-size: var(--text-size);
+    line-height: var(--text-size);
     border: none;
     outline: none;
-    padding: 10px 20px;
     cursor: pointer;
     transition: background-color 0.3s;
+
+    &.icon {
+        display: flex;
+        img {
+            height: calc(var(--text-size));
+        }
+    }
 
     &:hover {
         background-color: var(--button-hover-bg-color);

@@ -4,6 +4,11 @@ import { LocalStorageAutoSaves, LocalStorageManualSaves, parseSaveFileData, Save
 import { createNotification } from "../utils/notification";
 import { Settings } from "../settings";
 import { Sounds } from "../assets/sounds";
+import expandIconPath from "../../asset/icons/expand.webp";
+import collapseIconPath from "../../asset/icons/collapse.webp";
+import loadIconPath from "../../asset/icons/play.webp";
+import downloadIconPath from "../../asset/icons/download.webp";
+import trashIconPath from "../../asset/icons/trash.webp";
 
 export class SaveLoadingPanelContent {
     readonly htmlRoot: HTMLElement;
@@ -152,12 +157,19 @@ export class SaveLoadingPanelContent {
                 savesList.appendChild(manualSaveDiv);
             });
 
+            const expandIcon = document.createElement("img");
+            expandIcon.src = expandIconPath;
+
+            const collapseIcon = document.createElement("img");
+            collapseIcon.src = collapseIconPath;
+
             const expandButton = document.createElement("button");
-            expandButton.classList.add("expandButton");
-            expandButton.innerText = "+";
+            expandButton.classList.add("expandButton", "icon");
+            expandButton.appendChild(expandIcon);
             expandButton.addEventListener("click", () => {
                 savesList.classList.toggle("hidden");
-                expandButton.innerText = savesList.classList.contains("hidden") ? "+" : "-";
+                expandButton.innerHTML = "";
+                expandButton.appendChild(savesList.classList.contains("hidden") ? expandIcon : collapseIcon);
             });
             cmdrHeaderButtons.appendChild(expandButton);
         });
@@ -180,15 +192,19 @@ export class SaveLoadingPanelContent {
         saveDiv.appendChild(saveButtons);
 
         const loadButton = document.createElement("button");
-        loadButton.innerText = i18n.t("sidePanel:load");
+        loadButton.classList.add("icon");
         loadButton.addEventListener("click", () => {
             Sounds.MENU_SELECT_SOUND.play();
             this.onLoadSaveObservable.notifyObservers(save);
         });
         saveButtons.appendChild(loadButton);
 
+        const loadIcon = document.createElement("img");
+        loadIcon.src = loadIconPath;
+        loadButton.appendChild(loadIcon);
+
         const downloadButton = document.createElement("button");
-        downloadButton.innerText = i18n.t("sidePanel:download");
+        downloadButton.classList.add("icon");
         downloadButton.addEventListener("click", () => {
             Sounds.MENU_SELECT_SOUND.play();
             const blob = new Blob([JSON.stringify(save)], { type: "application/json" });
@@ -201,9 +217,12 @@ export class SaveLoadingPanelContent {
         });
         saveButtons.appendChild(downloadButton);
 
+        const downloadIcon = document.createElement("img");
+        downloadIcon.src = downloadIconPath;
+        downloadButton.appendChild(downloadIcon);
+
         const deleteButton = document.createElement("button");
-        deleteButton.classList.add("danger");
-        deleteButton.innerText = i18n.t("sidePanel:delete");
+        deleteButton.classList.add("danger", "icon");
         deleteButton.addEventListener("click", () => {
             Sounds.MENU_SELECT_SOUND.play();
             const autoSavesDict: LocalStorageAutoSaves = JSON.parse(localStorage.getItem(Settings.AUTO_SAVE_KEY) ?? "{}");
@@ -215,9 +234,21 @@ export class SaveLoadingPanelContent {
                 manualSavesDict[save.player.uuid] = manualSavesDict[save.player.uuid].filter((manualSave) => manualSave.timestamp !== save.timestamp);
             }
 
+            if (autoSavesDict[save.player.uuid] === undefined && (manualSavesDict[save.player.uuid] ?? []).length === 0) {
+                delete manualSavesDict[save.player.uuid];
+                saveDiv.parentElement?.parentElement?.remove();
+            }
+
             saveDiv.remove();
+
+            localStorage.setItem(Settings.AUTO_SAVE_KEY, JSON.stringify(autoSavesDict));
+            localStorage.setItem(Settings.MANUAL_SAVE_KEY, JSON.stringify(manualSavesDict));
         });
         saveButtons.appendChild(deleteButton);
+
+        const trashIcon = document.createElement("img");
+        trashIcon.src = trashIconPath;
+        deleteButton.appendChild(trashIcon);
 
         return saveDiv;
     }
