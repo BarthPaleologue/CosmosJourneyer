@@ -64,6 +64,7 @@ export class SaveLoadingPanelContent {
         });
 
         dropFileZone.addEventListener("click", () => {
+            Sounds.MENU_SELECT_SOUND.play();
             const fileInput = document.createElement("input");
             fileInput.type = "file";
             fileInput.accept = "application/json";
@@ -144,6 +145,7 @@ export class SaveLoadingPanelContent {
             const continueButton = document.createElement("button");
             continueButton.classList.add("icon", "large");
             continueButton.addEventListener("click", () => {
+                Sounds.MENU_SELECT_SOUND.play();
                 this.onLoadSaveObservable.notifyObservers(latestSave);
             });
             cmdrHeaderButtons.appendChild(continueButton);
@@ -176,6 +178,7 @@ export class SaveLoadingPanelContent {
             expandButton.classList.add("expandButton", "icon", "large");
             expandButton.appendChild(expandIcon);
             expandButton.addEventListener("click", () => {
+                Sounds.MENU_SELECT_SOUND.play();
                 savesList.classList.toggle("hidden");
                 expandButton.innerHTML = "";
                 expandButton.appendChild(savesList.classList.contains("hidden") ? expandIcon : collapseIcon);

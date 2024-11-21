@@ -1,3 +1,5 @@
+import { Sounds } from "../assets/sounds";
+
 export function promptModal(prompt: string, defaultValue: string = ""): Promise<string | null> {
     const modal = document.createElement("dialog");
     modal.innerHTML = `
@@ -31,6 +33,7 @@ export function promptModal(prompt: string, defaultValue: string = ""): Promise<
         });
 
         modal.addEventListener("close", () => {
+            Sounds.MENU_SELECT_SOUND.play();
             if (modal.returnValue === "ok") {
                 resolve(input.value);
             } else {
