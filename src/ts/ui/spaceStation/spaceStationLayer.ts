@@ -23,7 +23,7 @@ import { Settings } from "../../settings";
 import { OrbitalObjectModel } from "../../architecture/orbitalObject";
 import { OrbitalFacilityModel } from "../../spacestation/orbitalFacility";
 import { generateSpaceshipDom } from "./spaceshipDock";
-import { promptModal } from "../../utils/dialogModal";
+import { promptModalString } from "../../utils/dialogModal";
 import i18n from "../../i18n";
 import { Sounds } from "../../assets/sounds";
 
@@ -77,7 +77,7 @@ export class SpaceStationLayer {
         this.editPlayerNameButton = document.querySelector<HTMLElement>("#spaceStationUI .playerName button") as HTMLElement;
         this.editPlayerNameButton.addEventListener("click", async () => {
             Sounds.MENU_SELECT_SOUND.play();
-            const newName = await promptModal(i18n.t("spaceStation:cmdrNameChangePrompt"), player.name);
+            const newName = await promptModalString(i18n.t("spaceStation:cmdrNameChangePrompt"), player.name);
             if (newName === null) return;
             player.name = newName;
             this.updatePlayerName();

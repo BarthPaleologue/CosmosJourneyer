@@ -10,7 +10,7 @@ import loadIconPath from "../../asset/icons/play.webp";
 import editIconPath from "../../asset/icons/edit.webp";
 import downloadIconPath from "../../asset/icons/download.webp";
 import trashIconPath from "../../asset/icons/trash.webp";
-import { promptModal } from "../utils/dialogModal";
+import { promptModalString } from "../utils/dialogModal";
 
 export class SaveLoadingPanelContent {
     readonly htmlRoot: HTMLElement;
@@ -160,7 +160,7 @@ export class SaveLoadingPanelContent {
             editNameButton.classList.add("icon", "large");
             editNameButton.addEventListener("click", async () => {
                 Sounds.MENU_SELECT_SOUND.play();
-                const newName = await promptModal(i18n.t("sidePanel:cmdrNameChangePrompt"), latestSave.player.name);
+                const newName = await promptModalString(i18n.t("sidePanel:cmdrNameChangePrompt"), latestSave.player.name);
                 if (newName === null) return;
                 
                 if(autoSavesDict[cmdrUuid] !== undefined) {
