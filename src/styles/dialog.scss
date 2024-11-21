@@ -12,6 +12,8 @@ dialog {
     font-family: variables.$main-font;
     font-size: var(--text-size);
 
+    max-width: 40%;
+
     overflow: hidden;
 
     background: rgba(0, 0, 0, 0.8);

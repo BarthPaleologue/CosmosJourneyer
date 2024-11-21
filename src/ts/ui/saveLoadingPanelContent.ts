@@ -7,8 +7,10 @@ import { Sounds } from "../assets/sounds";
 import expandIconPath from "../../asset/icons/expand.webp";
 import collapseIconPath from "../../asset/icons/collapse.webp";
 import loadIconPath from "../../asset/icons/play.webp";
+import editIconPath from "../../asset/icons/edit.webp";
 import downloadIconPath from "../../asset/icons/download.webp";
 import trashIconPath from "../../asset/icons/trash.webp";
+import { promptModalString } from "../utils/dialogModal";
 
 export class SaveLoadingPanelContent {
     readonly htmlRoot: HTMLElement;
@@ -64,6 +66,7 @@ export class SaveLoadingPanelContent {
         });
 
         dropFileZone.addEventListener("click", () => {
+            Sounds.MENU_SELECT_SOUND.play();
             const fileInput = document.createElement("input");
             fileInput.type = "file";
             fileInput.accept = "application/json";
@@ -144,6 +147,7 @@ export class SaveLoadingPanelContent {
             const continueButton = document.createElement("button");
             continueButton.classList.add("icon", "large");
             continueButton.addEventListener("click", () => {
+                Sounds.MENU_SELECT_SOUND.play();
                 this.onLoadSaveObservable.notifyObservers(latestSave);
             });
             cmdrHeaderButtons.appendChild(continueButton);
@@ -151,6 +155,32 @@ export class SaveLoadingPanelContent {
             const loadIcon = document.createElement("img");
             loadIcon.src = loadIconPath;
             continueButton.appendChild(loadIcon);
+
+            const editNameButton = document.createElement("button");
+            editNameButton.classList.add("icon", "large");
+            editNameButton.addEventListener("click", async () => {
+                Sounds.MENU_SELECT_SOUND.play();
+                const newName = await promptModalString(i18n.t("sidePanel:cmdrNameChangePrompt"), latestSave.player.name);
+                if (newName === null) return;
+                
+                if(autoSavesDict[cmdrUuid] !== undefined) {
+                    autoSavesDict[cmdrUuid].player.name = newName;
+                }
+                
+                manualSaves.forEach((manualSave) => {
+                    manualSave.player.name = newName;
+                });
+                
+                cmdrName.innerText = newName;
+
+                localStorage.setItem(Settings.AUTO_SAVE_KEY, JSON.stringify(autoSavesDict));
+                localStorage.setItem(Settings.MANUAL_SAVE_KEY, JSON.stringify(manualSavesDict));
+            });
+            cmdrHeaderButtons.appendChild(editNameButton);
+
+            const editIcon = document.createElement("img");
+            editIcon.src = editIconPath;
+            editNameButton.appendChild(editIcon);
 
             const savesList = document.createElement("div");
 
@@ -176,6 +206,7 @@ export class SaveLoadingPanelContent {
             expandButton.classList.add("expandButton", "icon", "large");
             expandButton.appendChild(expandIcon);
             expandButton.addEventListener("click", () => {
+                Sounds.MENU_SELECT_SOUND.play();
                 savesList.classList.toggle("hidden");
                 expandButton.innerHTML = "";
                 expandButton.appendChild(savesList.classList.contains("hidden") ? expandIcon : collapseIcon);

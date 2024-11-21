@@ -3,6 +3,7 @@
     "dropASaveFileHere": "Déposez un fichier de sauvegarde ici",
     "lastPlayedOn": "Dernière exploration le {{val, datetime}}",
     "journeyedFor": "Exploré pendant {{nbHours}} heures",
+    "cmdrNameChangePrompt": "Comment souhaitez-vous appeler ce Commandant ? Cette action affectera toutes les sauvegardes de ce Commandant.",
     "tutorials": "Tutoriels",
     "settings": "Paramètres",
     "contribute": "Contribuer",
