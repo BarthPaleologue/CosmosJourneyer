@@ -115,7 +115,11 @@ export const Settings = {
 
     LANDING_PAD_ASPECT_RATIO: 1.618,
 
-    MAIN_FONT: "Nasalization"
+    MAIN_FONT: "Nasalization",
+
+    MANUAL_SAVE_KEY: "saves",
+
+    AUTO_SAVE_KEY: "autosaves",
 };
 
 export const CollisionMask = {

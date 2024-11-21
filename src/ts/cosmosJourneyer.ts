@@ -31,7 +31,7 @@ import { PauseMenu } from "./ui/pauseMenu";
 import { StarSystemView } from "./starSystem/starSystemView";
 import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
 import { MainMenu } from "./ui/mainMenu";
-import { SaveFileData } from "./saveFile/saveFileData";
+import { LocalStorageAutoSaves, LocalStorageManualSaves, SaveFileData } from "./saveFile/saveFileData";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { setRotationQuaternion } from "./uberCore/transforms/basicTransform";
@@ -95,6 +95,18 @@ export class CosmosJourneyer {
 
     private readonly player: Player;
 
+    /**
+     * The number of seconds elapsed since the start of the engine
+     */
+    private elapsedSeconds = 0;
+
+    /**
+     * The period of time in seconds between each autosave
+     */
+    private readonly autoSavePeriodSeconds = 60 * 5;
+
+    private autoSaveTimerSeconds = 0;
+
     private constructor(player: Player, engine: AbstractEngine, starSystemView: StarSystemView) {
         this.engine = engine;
         this.player = player;
@@ -120,8 +132,8 @@ export class CosmosJourneyer {
         this.mainMenu = new MainMenu(this.sidePanels, starSystemView);
         this.mainMenu.onStartObservable.add(async () => {
             this.tutorialLayer.setTutorial(FlightTutorial.getTitle(), await FlightTutorial.getContentPanelsHtml());
-
             this.starSystemView.switchToSpaceshipControls();
+            this.performAutoSave();
         });
 
         this.mainMenu.onLoadSaveObservable.add(async (saveData: SaveFileData) => {
@@ -165,7 +177,11 @@ export class CosmosJourneyer {
                 });
             });
         });
-        this.pauseMenu.onSave.add(() => this.downloadSaveFile());
+        this.pauseMenu.onSave.add(() => {
+            this.saveToLocalStorage();
+            this.performAutoSave();
+            createNotification(i18n.t("notifications:saveOk"), 2000);
+        });
 
         window.addEventListener("blur", () => {
             if (!this.mainMenu?.isVisible()) this.pause();
@@ -177,6 +193,11 @@ export class CosmosJourneyer {
 
         window.addEventListener("resize", () => {
             this.engine.resize(true);
+        });
+
+        window.addEventListener("beforeunload", () => {
+            if (this.mainMenu.isVisible()) return; // don't autosave if the main menu is visible: the player is not in the game yet
+            this.performAutoSave();
         });
 
         GeneralInputs.map.toggleStarMap.on("complete", () => {
@@ -285,6 +306,20 @@ export class CosmosJourneyer {
 
         this.engine.runRenderLoop(() => {
             const deltaSeconds = this.engine.getDeltaTime() / 1000;
+            this.elapsedSeconds += deltaSeconds;
+
+            this.player.timePlayedSeconds += deltaSeconds;
+
+            this.autoSaveTimerSeconds += deltaSeconds;
+            if (this.autoSaveTimerSeconds >= this.autoSavePeriodSeconds) {
+                this.autoSaveTimerSeconds %= this.autoSavePeriodSeconds;
+
+                if (!this.mainMenu.isVisible()) {
+                    // don't autosave if the main menu is visible: the player is not in the game yet
+                    this.performAutoSave();
+                }
+            }
+
             updateInputDevices();
             updateNotifications(deltaSeconds);
             AudioManager.Update(deltaSeconds);
@@ -383,6 +418,7 @@ export class CosmosJourneyer {
 
         return {
             version: projectInfo.version,
+            timestamp: Date.now(),
             player: Player.Serialize(this.player),
             universeCoordinates: {
                 universeObjectId: universeObjectId,
@@ -396,6 +432,39 @@ export class CosmosJourneyer {
             },
             padNumber: spaceship.isLandedAtFacility() ? spaceship.getTargetLandingPad()?.padNumber : undefined
         };
+    }
+
+    public saveToLocalStorage(): void {
+        const saveData = this.generateSaveData();
+
+        // use player uuid as key to avoid overwriting other cmdr's save
+        const uuid = saveData.player.uuid;
+
+        const localStorageKey = Settings.MANUAL_SAVE_KEY;
+
+        // store in a hashmap in local storage
+        const manualSaves: LocalStorageManualSaves = JSON.parse(localStorage.getItem(localStorageKey) || "{}");
+        manualSaves[uuid] = manualSaves[uuid] || [];
+        manualSaves[uuid].unshift(saveData);
+
+        localStorage.setItem(localStorageKey, JSON.stringify(manualSaves));
+    }
+
+    /**
+     * Generate save file data and store it in the autosaves hashmap in local storage
+     */
+    public performAutoSave(): void {
+        const saveData = this.generateSaveData();
+
+        // use player uuid as key to avoid overwriting other cmdr's autosave
+        const uuid = saveData.player.uuid;
+
+        const localStorageKey = Settings.AUTO_SAVE_KEY;
+
+        // store in a hashmap in local storage
+        const autosaves: LocalStorageAutoSaves = JSON.parse(localStorage.getItem(localStorageKey) || "{}");
+        autosaves[uuid] = saveData;
+        localStorage.setItem(localStorageKey, JSON.stringify(autosaves));
     }
 
     /**
@@ -479,6 +548,8 @@ export class CosmosJourneyer {
         if (this.player.currentItinerary.length > 1) {
             this.starSystemView.setSystemAsTarget(this.player.currentItinerary[1]);
         }
+
+        this.performAutoSave();
     }
 
     /**

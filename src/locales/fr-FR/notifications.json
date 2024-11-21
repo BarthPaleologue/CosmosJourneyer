@@ -8,5 +8,6 @@
     "howToHyperSpace": "Alignez votre vaisseau avec la cible du système de destination à l'aide du radar de cible en bas à droite de l'écran. Appuyez ensuite sur {{bindingsString}} pour enclencher le saut hyperspatial.",
     "notEnoughFuel": "Saut hyperspatial impossible. Carburant insuffisant! Le carburant peut être acheté en station ou récolté autour d'une étoile ou d'une géante gazeuse.",
     "saveVersionMismatch": "[VERSION_WARNING] La version du fichier de sauvegarde ({{saveVersion}}) ne correspond pas à la version actuelle ({{currentVersion}}). Le chargement peut entraîner un comportement inattendu.",
-    "invalidSaveFileJson": "[JSON_ERROR] Le fichier de sauvegarde est invalide: {{error}}. Réparez le fichier avant de réessayer de le charger."
+    "invalidSaveFileJson": "[JSON_ERROR] Le fichier de sauvegarde est invalide: {{error}}. Réparez le fichier avant de réessayer de le charger.",
+    "saveOk": "Sauvegardé avec succès dans le stockage local."
 }

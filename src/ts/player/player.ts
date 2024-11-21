@@ -8,9 +8,15 @@ export type CompletedTutorials = {
 };
 
 export type SerializedPlayer = {
+    uuid: string;
+
     name: string;
+
     balance: number;
+    
     creationDate: string;
+
+    timePlayedSeconds: number;
 
     visitedSystemHistory: StarSystemCoordinates[];
 
@@ -26,9 +32,11 @@ export type SerializedPlayer = {
 };
 
 export class Player {
+    uuid: string;
     name: string;
     balance: number;
     creationDate: Date;
+    timePlayedSeconds: number;
 
     visitedSystemHistory: StarSystemCoordinates[] = [];
 
@@ -47,11 +55,13 @@ export class Player {
     static DEFAULT_BALANCE = 10_000;
 
     private constructor(serializedPlayer: SerializedPlayer) {
+        this.uuid = warnIfUndefined(serializedPlayer.uuid, crypto.randomUUID(), `[PLAYER_DATA_WARNING] Uuid was undefined. Defaulting to random UUID`);
         this.name = warnIfUndefined(serializedPlayer.name, Player.DEFAULT_NAME, `[PLAYER_DATA_WARNING] Name was undefined. Defaulting to ${Player.DEFAULT_NAME}`);
         this.balance = warnIfUndefined(serializedPlayer.balance, Player.DEFAULT_BALANCE, `[PLAYER_DATA_WARNING] Balance was undefined. Defaulting to ${Player.DEFAULT_BALANCE}`);
         this.creationDate = new Date(
             warnIfUndefined(serializedPlayer.creationDate, new Date().toISOString(), `[PLAYER_DATA_WARNING] Creation date was undefined. Defaulting to current date`)
         );
+        this.timePlayedSeconds = warnIfUndefined(serializedPlayer.timePlayedSeconds, 0, `[PLAYER_DATA_WARNING] Time played was undefined. Defaulting to 0`);
         this.visitedSystemHistory = warnIfUndefined(
             serializedPlayer.visitedSystemHistory,
             [],
@@ -80,9 +90,11 @@ export class Player {
 
     public static Default(): Player {
         return new Player({
+            uuid: crypto.randomUUID(),
             name: Player.DEFAULT_NAME,
             balance: Player.DEFAULT_BALANCE,
             creationDate: new Date().toISOString(),
+            timePlayedSeconds: 0,
             visitedSystemHistory: [],
             currentItinerary: [],
             systemBookmarks: [],
@@ -101,9 +113,11 @@ export class Player {
 
     public static Serialize(player: Player): SerializedPlayer {
         return {
+            uuid: player.uuid,
             name: player.name,
             balance: player.balance,
             creationDate: player.creationDate.toISOString(),
+            timePlayedSeconds: Math.round(player.timePlayedSeconds),
             visitedSystemHistory: player.visitedSystemHistory,
             currentItinerary: player.currentItinerary,
             systemBookmarks: player.systemBookmarks,
@@ -120,9 +134,11 @@ export class Player {
      */
     public copyFrom(player: Player) {
         const playerClone = structuredClone(player);
+        this.uuid = playerClone.uuid;
         this.name = playerClone.name;
         this.balance = playerClone.balance;
         this.creationDate = playerClone.creationDate;
+        this.timePlayedSeconds = playerClone.timePlayedSeconds;
         this.visitedSystemHistory = playerClone.visitedSystemHistory;
         this.currentItinerary = playerClone.currentItinerary;
         this.systemBookmarks = playerClone.systemBookmarks;
@@ -130,5 +146,6 @@ export class Player {
         this.completedMissions = playerClone.completedMissions;
         this.serializedSpaceships = playerClone.serializedSpaceships;
         this.instancedSpaceships = playerClone.instancedSpaceships;
+        this.tutorials = playerClone.tutorials;
     }
 }
