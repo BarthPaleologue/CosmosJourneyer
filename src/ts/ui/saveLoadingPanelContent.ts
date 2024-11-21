@@ -10,7 +10,7 @@ import loadIconPath from "../../asset/icons/play.webp";
 import editIconPath from "../../asset/icons/edit.webp";
 import downloadIconPath from "../../asset/icons/download.webp";
 import trashIconPath from "../../asset/icons/trash.webp";
-import { promptModalString } from "../utils/dialogModal";
+import { promptModalBoolean, promptModalString } from "../utils/dialogModal";
 
 export class SaveLoadingPanelContent {
     readonly htmlRoot: HTMLElement;
@@ -263,8 +263,12 @@ export class SaveLoadingPanelContent {
 
         const deleteButton = document.createElement("button");
         deleteButton.classList.add("danger", "icon", "large");
-        deleteButton.addEventListener("click", () => {
+        deleteButton.addEventListener("click", async () => {
             Sounds.MENU_SELECT_SOUND.play();
+
+            const shouldProceed = await promptModalBoolean(i18n.t("sidePanel:deleteSavePrompt"));
+            if (!shouldProceed) return;
+
             const autoSavesDict: LocalStorageAutoSaves = JSON.parse(localStorage.getItem(Settings.AUTO_SAVE_KEY) ?? "{}");
             const manualSavesDict: LocalStorageManualSaves = JSON.parse(localStorage.getItem(Settings.MANUAL_SAVE_KEY) ?? "{}");
 

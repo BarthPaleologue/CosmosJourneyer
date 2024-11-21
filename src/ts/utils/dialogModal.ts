@@ -34,3 +34,27 @@ export function promptModalString(prompt: string, defaultValue: string = ""): Pr
         });
     });
 }
+
+
+export function promptModalBoolean(prompt: string): Promise<boolean> {
+    const modal = document.createElement("dialog");
+    modal.innerHTML = `
+        <form method="dialog">
+            <p>${prompt}</p>
+            <menu>
+                <button value="cancel">Cancel</button>
+                <button value="ok">Do it!</button>
+            </menu>
+        </form>
+    `;
+    document.body.appendChild(modal);
+    modal.showModal();
+
+    return new Promise((resolve) => {
+        modal.addEventListener("close", () => {
+            Sounds.MENU_SELECT_SOUND.play();
+            resolve(modal.returnValue === "ok");
+            modal.remove();
+        });
+    });
+}
