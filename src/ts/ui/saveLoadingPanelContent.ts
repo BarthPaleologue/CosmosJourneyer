@@ -7,8 +7,10 @@ import { Sounds } from "../assets/sounds";
 import expandIconPath from "../../asset/icons/expand.webp";
 import collapseIconPath from "../../asset/icons/collapse.webp";
 import loadIconPath from "../../asset/icons/play.webp";
+import editIconPath from "../../asset/icons/edit.webp";
 import downloadIconPath from "../../asset/icons/download.webp";
 import trashIconPath from "../../asset/icons/trash.webp";
+import { promptModal } from "../utils/dialogModal";
 
 export class SaveLoadingPanelContent {
     readonly htmlRoot: HTMLElement;
@@ -153,6 +155,32 @@ export class SaveLoadingPanelContent {
             const loadIcon = document.createElement("img");
             loadIcon.src = loadIconPath;
             continueButton.appendChild(loadIcon);
+
+            const editNameButton = document.createElement("button");
+            editNameButton.classList.add("icon", "large");
+            editNameButton.addEventListener("click", async () => {
+                Sounds.MENU_SELECT_SOUND.play();
+                const newName = await promptModal(i18n.t("sidePanel:cmdrNameChangePrompt"), latestSave.player.name);
+                if (newName === null) return;
+                
+                if(autoSavesDict[cmdrUuid] !== undefined) {
+                    autoSavesDict[cmdrUuid].player.name = newName;
+                }
+                
+                manualSaves.forEach((manualSave) => {
+                    manualSave.player.name = newName;
+                });
+                
+                cmdrName.innerText = newName;
+
+                localStorage.setItem(Settings.AUTO_SAVE_KEY, JSON.stringify(autoSavesDict));
+                localStorage.setItem(Settings.MANUAL_SAVE_KEY, JSON.stringify(manualSavesDict));
+            });
+            cmdrHeaderButtons.appendChild(editNameButton);
+
+            const editIcon = document.createElement("img");
+            editIcon.src = editIconPath;
+            editNameButton.appendChild(editIcon);
 
             const savesList = document.createElement("div");
 

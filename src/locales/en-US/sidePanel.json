@@ -3,6 +3,7 @@
     "dropASaveFileHere": "Drop a save file here",
     "lastPlayedOn": "Last explored on {{val, datetime}}",
     "journeyedFor": "Journeyed for {{nbHours}} hours",
+    "cmdrNameChangePrompt": "How would you like to name this Commander? This action will affect all saves of this Commander.",
     "settings": "Settings",
     "tutorials": "Tutorials",
     "contribute": "Contribute",
