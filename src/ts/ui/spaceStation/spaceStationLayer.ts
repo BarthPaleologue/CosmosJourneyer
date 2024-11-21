@@ -24,6 +24,7 @@ import { OrbitalObjectModel } from "../../architecture/orbitalObject";
 import { OrbitalFacilityModel } from "../../spacestation/orbitalFacility";
 import { generateSpaceshipDom } from "./spaceshipDock";
 import editIconPath from "../../../asset/icons/edit.webp";
+import { promptModal } from "../../utils/dialogModal";
 
 const enum MainPanelState {
     NONE,
@@ -166,6 +167,15 @@ export class SpaceStationLayer {
         const editIcon = document.createElement("img");
         editIcon.src = editIconPath;
         changeNameButton.appendChild(editIcon);
+
+        changeNameButton.addEventListener("click", async () => {
+            const newName = await promptModal("Enter your new name", player.name);
+            if (newName !== null) {
+                player.name = newName;
+                this.playerName.textContent = `CMDR ${player.name}`;
+                this.playerName.appendChild(changeNameButton);
+            }
+        });
     }
 
     public reset() {
