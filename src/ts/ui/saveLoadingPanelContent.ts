@@ -59,7 +59,7 @@ export class SaveLoadingPanelContent {
                 return;
             }
 
-            const saveFileData = await this.parseFile(file);
+            const saveFileData = await this.parseSaveFile(file);
             this.onLoadSaveObservable.notifyObservers(saveFileData);
         });
 
@@ -71,7 +71,7 @@ export class SaveLoadingPanelContent {
                 if (fileInput.files === null) throw new Error("fileInput.files is null");
                 if (fileInput.files.length === 0) throw new Error("fileInput.files is empty");
                 const file = fileInput.files[0];
-                const saveFileData = await this.parseFile(file);
+                const saveFileData = await this.parseSaveFile(file);
                 this.onLoadSaveObservable.notifyObservers(saveFileData);
             };
             fileInput.click();
@@ -125,11 +125,16 @@ export class SaveLoadingPanelContent {
             cmdrHeaderText.appendChild(cmdrName);
 
             const cmdrLastPlayed = document.createElement("p");
-            cmdrLastPlayed.innerText = `Last played on ${new Date(latestSave.timestamp).toLocaleString()}`;
+            cmdrLastPlayed.innerText = i18n.t("sidePanel:lastPlayedOn", {
+                val: new Date(latestSave.timestamp),
+                formatParams: {
+                    val: { weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric" },
+                }
+            });
             cmdrHeaderText.appendChild(cmdrLastPlayed);
 
             const cmdrPlayTime = document.createElement("p");
-            cmdrPlayTime.innerText = `Played for ${Math.ceil(latestSave.player.timePlayedSeconds / 60 / 60)} hours`;
+            cmdrPlayTime.innerText = i18n.t("sidePanel:journeyedFor", { nbHours: Math.ceil(latestSave.player.timePlayedSeconds / 60 / 60) });
             cmdrHeaderText.appendChild(cmdrPlayTime);
 
             const cmdrHeaderButtons = document.createElement("div");
@@ -257,7 +262,7 @@ export class SaveLoadingPanelContent {
         return saveDiv;
     }
 
-    private async parseFile(file: File): Promise<SaveFileData> {
+    private async parseSaveFile(rawSaveFile: File): Promise<SaveFileData> {
         return new Promise<SaveFileData>((resolve, reject) => {
             const reader = new FileReader();
             reader.onload = (event) => {
@@ -268,7 +273,7 @@ export class SaveLoadingPanelContent {
                 if (loadingSaveData.data === null) return;
                 resolve(loadingSaveData.data);
             };
-            reader.readAsText(file);
+            reader.readAsText(rawSaveFile);
         });
     }
 }

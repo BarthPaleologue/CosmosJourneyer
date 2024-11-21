@@ -1,6 +1,8 @@
 {
     "loadSave": "Charger une sauvegarde",
     "dropASaveFileHere": "Déposez un fichier de sauvegarde ici",
+    "lastPlayedOn": "Dernière exploration le {{val, datetime}}",
+    "journeyedFor": "Exploré pendant {{nbHours}} heures",
     "tutorials": "Tutoriels",
     "settings": "Paramètres",
     "contribute": "Contribuer",
