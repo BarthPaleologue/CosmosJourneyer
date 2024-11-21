@@ -1,0 +1,31 @@
+@use "variables";
+
+button {
+    --button-bg-color: var(--accent-color);
+    --button-hover-bg-color: var(--accent-color-light);
+    --button-active-bg-color: var(--accent-color-dark);
+    background-color: var(--button-bg-color);
+    color: white;
+    font-family: variables.$main-font;
+    padding: 1.0vmin;
+    font-size: var(--text-size);
+    border: none;
+    outline: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+
+    &:hover {
+        background-color: var(--button-hover-bg-color);
+    }
+
+    &:active {
+        background-color: var(--button-active-bg-color);
+    }
+
+    &.danger {
+        --button-bg-color: red;
+        --button-hover-bg-color: darkred;
+        --button-active-bg-color: darkred;
+    }
+}

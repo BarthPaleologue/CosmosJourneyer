@@ -138,6 +138,8 @@ body {
 
   @include meta.load-css("saveLoadingPanelContent.scss");
 
+  @include meta.load-css("button.scss");
+
   #renderer {
     z-index: 1;
     float: left;

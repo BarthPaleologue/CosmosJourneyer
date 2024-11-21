@@ -199,6 +199,7 @@ export class SaveLoadingPanelContent {
         saveButtons.appendChild(downloadButton);
 
         const deleteButton = document.createElement("button");
+        deleteButton.classList.add("danger");
         deleteButton.innerText = i18n.t("sidePanel:delete");
         deleteButton.addEventListener("click", () => {
             const autoSavesDict: LocalStorageAutoSaves = JSON.parse(localStorage.getItem(Settings.AUTO_SAVE_KEY) ?? "{}");
