@@ -81,7 +81,7 @@ export class SaveLoadingPanelContent {
 
     populateCmdrList() {
         this.cmdrList.innerHTML = "";
-        
+
         const autoSavesDict: LocalStorageAutoSaves = JSON.parse(localStorage.getItem(Settings.AUTO_SAVE_KEY) ?? "{}");
         const manualSavesDict: LocalStorageManualSaves = JSON.parse(localStorage.getItem(Settings.MANUAL_SAVE_KEY) ?? "{}");
 
@@ -89,6 +89,13 @@ export class SaveLoadingPanelContent {
         const cmdrUuids = Object.keys(autoSavesDict);
         Object.keys(manualSavesDict).forEach((cmdrUuid) => {
             if (!cmdrUuids.includes(cmdrUuid)) cmdrUuids.push(cmdrUuid);
+        });
+
+        // Sort cmdr UUIDs by latest save timestamp to have the most recent save at the top
+        cmdrUuids.sort((a, b) => {
+            const aLatestSave = autoSavesDict[a] ?? manualSavesDict[a][0];
+            const bLatestSave = autoSavesDict[b] ?? manualSavesDict[b][0];
+            return bLatestSave.timestamp - aLatestSave.timestamp;
         });
 
         cmdrUuids.forEach((cmdrUuid) => {
