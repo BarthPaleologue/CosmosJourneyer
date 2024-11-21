@@ -21,141 +21,145 @@
 @use "variables";
 
 @font-face {
-  font-family: 'Nasalization';
-  src: url('./nasalization/nasalization-rg.otf') format('opentype');
+    font-family: "Nasalization";
+    src: url("./nasalization/nasalization-rg.otf") format("opentype");
 }
 
 *,
 *::before,
 *::after {
-  box-sizing: content-box;
+    box-sizing: content-box;
 }
 
 // scroll bar
 ::-webkit-scrollbar {
-  width: 10px;
+    width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: color.adjust(#888, $lightness: -50%, $space: hsl);
+    background: color.adjust(#888, $lightness: -50%, $space: hsl);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #888;
-  //border-radius: 5px;
-  transition: 0.2s;
+    background: #888;
+    //border-radius: 5px;
+    transition: 0.2s;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+    background: #555;
 }
 
 :root {
-  --text-size: 2vmin;
-  --h2-size: calc(1.5 * var(--text-size));
-  --h1-size: calc(2.0 * var(--text-size));
-  --menu-items-size: 3.2vmin;
-  --accent-color: #002b6a;
-  --accent-color-dark: #001a3f;
-  --accent-color-light: #003f9f;
-  --disabled-color: rgb(100, 100, 100);
+    --text-size: 2vmin;
+    --h2-size: calc(1.5 * var(--text-size));
+    --h1-size: calc(2 * var(--text-size));
+    --menu-items-size: 3.2vmin;
+    --accent-color: #002b6a;
+    --accent-color-dark: #001a3f;
+    --accent-color-light: #003f9f;
+    --disabled-color: rgb(100, 100, 100);
 }
 
 body {
-  margin: 0;
-  overflow: hidden;
-  user-select: none;
-  background: black;
-
-  .leftSideMenu {
-    list-style-type: none;
-    padding: 0;
-    row-gap: 10px;
-    display: flex;
-    flex-direction: column;
-    width: fit-content;
-    position: absolute;
-    top: 65vh;
-    left: 2.5vw;
-    transform: translateY(-50%);
-    transition: variables.$transition-time ease-in-out;
-
-    z-index: 10;
-
-    li {
-      color: white;
-      font-family: variables.$main-font;
-      font-size: var(--menu-items-size);
-      line-height: 1.5em;
-      cursor: pointer;
-      padding: 5px 20px;
-      transition: variables.$transition-time;
-
-      &:hover {
-        background: var(--accent-color);
-      }
-
-      &.disabled {
-        color: grey;
-        cursor: not-allowed;
-      }
-
-      &.disabled:hover {
-        background: black;
-      }
-
-      &:active {
-        background: var(--accent-color-dark);
-      }
-    }
-  }
-
-  @include meta.load-css("bodyEditor/nav");
-
-  @include meta.load-css("bodyEditor/panels");
-
-  @include meta.load-css("helmetOverlay/helmetOverlay");
-
-  @include meta.load-css("spaceStationUI/spaceStationUI");
-
-  @include meta.load-css("pauseMenu/index.scss");
-
-  @include meta.load-css("mainMenu.scss");
-
-  @include meta.load-css("inputs.scss");
-
-  @include meta.load-css("loadingScreen.scss");
-
-  @include meta.load-css("targetCursors.scss");
-
-  @include meta.load-css("starMapUI.scss");
-
-  @include meta.load-css("tutorialLayer.scss");
-
-  @include meta.load-css("tutorialsMenuPanel.scss");
-
-  @include meta.load-css("inspectorLayer.scss");
-
-  @include meta.load-css("saveLoadingPanelContent.scss");
-
-  @include meta.load-css("button.scss");
-
-  #renderer {
-    z-index: 1;
-    float: left;
-    cursor: none;
-  }
-
-  #planetName {
-    position: absolute;
-    color: white;
-    bottom: 0;
     margin: 0;
-    font-size: 200%;
-    padding: 10px 20px;
-    font-family: sans-serif;
-    background: rgba(0, 0, 0, .7);
-  }
+    overflow: hidden;
+    user-select: none;
+    background: black;
 
-  @include meta.load-css("bodyEditor/toolbar");
+    .leftSideMenu {
+        list-style-type: none;
+        padding: 0;
+        row-gap: 10px;
+        display: flex;
+        flex-direction: column;
+        width: fit-content;
+        position: absolute;
+        top: 65vh;
+        left: 2.5vw;
+        transform: translateY(-50%);
+        transition: variables.$transition-time ease-in-out;
+
+        z-index: 10;
+
+        li {
+            color: white;
+            font-family: variables.$main-font;
+            font-size: var(--menu-items-size);
+            line-height: 1.5em;
+            cursor: pointer;
+            padding: 5px 20px;
+            transition: variables.$transition-time;
+
+            &:hover {
+                background: var(--accent-color);
+            }
+
+            &.disabled {
+                color: grey;
+                cursor: not-allowed;
+            }
+
+            &.disabled:hover {
+                background: black;
+            }
+
+            &:active {
+                background: var(--accent-color-dark);
+            }
+        }
+    }
+
+    @include meta.load-css("bodyEditor/nav");
+
+    @include meta.load-css("bodyEditor/panels");
+
+    @include meta.load-css("helmetOverlay/helmetOverlay");
+
+    @include meta.load-css("spaceStationUI/spaceStationUI");
+
+    @include meta.load-css("pauseMenu/index.scss");
+
+    @include meta.load-css("mainMenu.scss");
+
+    @include meta.load-css("inputs.scss");
+
+    @include meta.load-css("loadingScreen.scss");
+
+    @include meta.load-css("targetCursors.scss");
+
+    @include meta.load-css("starMapUI.scss");
+
+    @include meta.load-css("tutorialLayer.scss");
+
+    @include meta.load-css("tutorialsMenuPanel.scss");
+
+    @include meta.load-css("inspectorLayer.scss");
+
+    @include meta.load-css("saveLoadingPanelContent.scss");
+
+    @include meta.load-css("button.scss");
+
+    #renderer {
+        z-index: 1;
+        float: left;
+        cursor: none;
+    }
+
+    #planetName {
+        position: absolute;
+        color: white;
+        bottom: 0;
+        margin: 0;
+        font-size: 200%;
+        padding: 10px 20px;
+        font-family: sans-serif;
+        background: rgba(0, 0, 0, 0.7);
+    }
+
+    .babylonUnmuteIcon {
+        background-size: 100% !important;
+    }
+
+    @include meta.load-css("bodyEditor/toolbar");
 }

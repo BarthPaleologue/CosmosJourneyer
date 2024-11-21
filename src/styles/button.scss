@@ -13,12 +13,13 @@ button {
     --button-bg-color: var(--accent-color);
     --button-hover-bg-color: var(--accent-color-light);
     --button-active-bg-color: var(--accent-color-dark);
+    --size: var(--text-size);
     background-color: var(--button-bg-color);
     color: white;
     font-family: variables.$main-font;
     padding: 1vmin;
-    font-size: var(--text-size);
-    line-height: var(--text-size);
+    font-size: var(--size);
+    line-height: var(--size);
     border: none;
     outline: none;
     cursor: pointer;
@@ -27,8 +28,12 @@ button {
     &.icon {
         display: flex;
         img {
-            height: calc(var(--text-size));
+            height: calc(var(--size));
         }
+    }
+
+    &.large {
+        --size: calc(1.2 * var(--text-size));
     }
 
     &:hover {

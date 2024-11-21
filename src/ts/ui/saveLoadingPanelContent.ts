@@ -137,11 +137,15 @@ export class SaveLoadingPanelContent {
             cmdrHeader.appendChild(cmdrHeaderButtons);
 
             const continueButton = document.createElement("button");
-            continueButton.innerText = i18n.t("sidePanel:continue");
+            continueButton.classList.add("icon", "large");
             continueButton.addEventListener("click", () => {
                 this.onLoadSaveObservable.notifyObservers(latestSave);
             });
             cmdrHeaderButtons.appendChild(continueButton);
+
+            const loadIcon = document.createElement("img");
+            loadIcon.src = loadIconPath;
+            continueButton.appendChild(loadIcon);
 
             const savesList = document.createElement("div");
 
@@ -164,7 +168,7 @@ export class SaveLoadingPanelContent {
             collapseIcon.src = collapseIconPath;
 
             const expandButton = document.createElement("button");
-            expandButton.classList.add("expandButton", "icon");
+            expandButton.classList.add("expandButton", "icon", "large");
             expandButton.appendChild(expandIcon);
             expandButton.addEventListener("click", () => {
                 savesList.classList.toggle("hidden");
@@ -192,7 +196,7 @@ export class SaveLoadingPanelContent {
         saveDiv.appendChild(saveButtons);
 
         const loadButton = document.createElement("button");
-        loadButton.classList.add("icon");
+        loadButton.classList.add("icon", "large");
         loadButton.addEventListener("click", () => {
             Sounds.MENU_SELECT_SOUND.play();
             this.onLoadSaveObservable.notifyObservers(save);
@@ -204,7 +208,7 @@ export class SaveLoadingPanelContent {
         loadButton.appendChild(loadIcon);
 
         const downloadButton = document.createElement("button");
-        downloadButton.classList.add("icon");
+        downloadButton.classList.add("icon", "large");
         downloadButton.addEventListener("click", () => {
             Sounds.MENU_SELECT_SOUND.play();
             const blob = new Blob([JSON.stringify(save)], { type: "application/json" });
@@ -222,7 +226,7 @@ export class SaveLoadingPanelContent {
         downloadButton.appendChild(downloadIcon);
 
         const deleteButton = document.createElement("button");
-        deleteButton.classList.add("danger", "icon");
+        deleteButton.classList.add("danger", "icon", "large");
         deleteButton.addEventListener("click", () => {
             Sounds.MENU_SELECT_SOUND.play();
             const autoSavesDict: LocalStorageAutoSaves = JSON.parse(localStorage.getItem(Settings.AUTO_SAVE_KEY) ?? "{}");
