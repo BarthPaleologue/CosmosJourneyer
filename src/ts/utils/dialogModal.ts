@@ -7,8 +7,8 @@ export function promptModalString(prompt: string, defaultValue: string = ""): Pr
             <p>${prompt}</p>
             <input type="text" value="${defaultValue}">
             <menu>
-                <button type="button" value="cancel">Cancel</button>
-                <button formmethod="dialog" value="ok">OK</button>
+                <button type="reset" value="cancel">Cancel</button>
+                <button type="submit" value="ok">OK</button>
             </menu>
         </form>
     `;
@@ -21,6 +21,13 @@ export function promptModalString(prompt: string, defaultValue: string = ""): Pr
         input.select();
         input.addEventListener("keydown", (e) => {
             e.stopPropagation();
+        });
+
+        // on reset, close the modal and resolve with null
+        modal.addEventListener("reset", () => {
+            Sounds.MENU_SELECT_SOUND.play();
+            resolve(null);
+            modal.remove();
         });
 
         modal.addEventListener("close", () => {
