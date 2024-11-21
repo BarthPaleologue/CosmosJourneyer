@@ -1,4 +1,5 @@
 {
+    "welcomeTo": "Welcome to",
     "missions": "Missions",
     "missionsDescription": "Find your next destination",
     "market": "Market",
@@ -13,5 +14,6 @@
     "takeOffDescription": "Continue your journey",
     "refuel": "Refuel",
     "otherSpaceships": "Other Spaceships",
-    "noOtherSpaceship": "No other spaceship"
+    "noOtherSpaceship": "No other spaceship",
+    "cmdrNameChangePrompt": "How do you want to be called Commander?"
 }

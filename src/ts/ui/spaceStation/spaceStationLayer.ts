@@ -25,6 +25,7 @@ import { OrbitalFacilityModel } from "../../spacestation/orbitalFacility";
 import { generateSpaceshipDom } from "./spaceshipDock";
 import editIconPath from "../../../asset/icons/edit.webp";
 import { promptModal } from "../../utils/dialogModal";
+import i18n from "../../i18n";
 
 const enum MainPanelState {
     NONE,
@@ -154,7 +155,7 @@ export class SpaceStationLayer {
         this.currentStation = station;
         this.currentStationParents = stationParents;
         this.spaceStationHeader.innerHTML = `
-            <p class="welcomeTo">Welcome to</p>
+            <p class="welcomeTo">${i18n.t("spaceStation:welcomeTo")}</p>
             <p class="spaceStationName">${station.name}</p>`;
 
         this.playerName.textContent = `CMDR ${player.name}`;
@@ -169,7 +170,7 @@ export class SpaceStationLayer {
         changeNameButton.appendChild(editIcon);
 
         changeNameButton.addEventListener("click", async () => {
-            const newName = await promptModal("How do you want to be called Commander?", player.name);
+            const newName = await promptModal(i18n.t("spaceStation:cmdrNameChangePrompt"), player.name);
             if (newName !== null) {
                 player.name = newName;
                 this.playerName.textContent = `CMDR ${player.name}`;
