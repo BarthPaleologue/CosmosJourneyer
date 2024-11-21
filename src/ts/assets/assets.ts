@@ -45,7 +45,6 @@ export class Assets {
             Objects.CRATE.material = Materials.CRATE_MATERIAL;
 
             console.log("Assets loaded");
-            scene.getEngine().loadingScreen.loadingUIText = i18next.t("common:fullscreen");
             Assets.IS_READY = true;
         };
 
