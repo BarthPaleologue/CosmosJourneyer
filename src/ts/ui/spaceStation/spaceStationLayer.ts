@@ -23,9 +23,9 @@ import { Settings } from "../../settings";
 import { OrbitalObjectModel } from "../../architecture/orbitalObject";
 import { OrbitalFacilityModel } from "../../spacestation/orbitalFacility";
 import { generateSpaceshipDom } from "./spaceshipDock";
-import editIconPath from "../../../asset/icons/edit.webp";
 import { promptModal } from "../../utils/dialogModal";
 import i18n from "../../i18n";
+import { Sounds } from "../../assets/sounds";
 
 const enum MainPanelState {
     NONE,
@@ -41,7 +41,11 @@ export class SpaceStationLayer {
     private currentStation: OrbitalFacilityModel | null = null;
     private currentStationParents: OrbitalObjectModel[] = [];
 
+    private readonly spaceStationName: HTMLElement;
+
     private readonly playerName: HTMLElement;
+    private readonly editPlayerNameButton: HTMLElement;
+
     private readonly playerBalance: HTMLElement;
 
     private readonly mainPanel: HTMLElement;
@@ -66,7 +70,19 @@ export class SpaceStationLayer {
         this.parentNode = document.getElementById("spaceStationUI") as HTMLElement;
         this.spaceStationHeader = document.getElementById("spaceStationHeader") as HTMLElement;
 
-        this.playerName = document.querySelector<HTMLElement>("#spaceStationUI .playerName") as HTMLElement;
+        this.spaceStationName = document.querySelector<HTMLElement>("#spaceStationUI .spaceStationName") as HTMLElement;
+
+        this.playerName = document.querySelector<HTMLElement>("#spaceStationUI .playerName h2") as HTMLElement;
+
+        this.editPlayerNameButton = document.querySelector<HTMLElement>("#spaceStationUI .playerName button") as HTMLElement;
+        this.editPlayerNameButton.addEventListener("click", async () => {
+            Sounds.MENU_SELECT_SOUND.play();
+            const newName = await promptModal(i18n.t("spaceStation:cmdrNameChangePrompt"), player.name);
+            if (newName === null) return;
+            player.name = newName;
+            this.updatePlayerName();
+        });
+
         this.playerBalance = document.querySelector<HTMLElement>("#spaceStationUI .playerBalance") as HTMLElement;
 
         this.mainPanel = document.querySelector<HTMLElement>("#spaceStationUI .mainContainer") as HTMLElement;
@@ -154,29 +170,18 @@ export class SpaceStationLayer {
         if (this.currentStation === station) return;
         this.currentStation = station;
         this.currentStationParents = stationParents;
-        this.spaceStationHeader.innerHTML = `
-            <p class="welcomeTo">${i18n.t("spaceStation:welcomeTo")}</p>
-            <p class="spaceStationName">${station.name}</p>`;
+        this.spaceStationName.textContent = station.name;
 
-        this.playerName.textContent = `CMDR ${player.name}`;
-        this.playerBalance.textContent = `Balance: ${Settings.CREDIT_SYMBOL}${player.balance.toLocaleString()}`;
+        this.updatePlayerName();
+        this.updatePlayerBalance();
+    }
 
-        const changeNameButton = document.createElement("button");
-        changeNameButton.classList.add("icon");
-        this.playerName.appendChild(changeNameButton);
+    private updatePlayerName() {
+        this.playerName.textContent = `CMDR ${this.player.name}`;
+    }
 
-        const editIcon = document.createElement("img");
-        editIcon.src = editIconPath;
-        changeNameButton.appendChild(editIcon);
-
-        changeNameButton.addEventListener("click", async () => {
-            const newName = await promptModal(i18n.t("spaceStation:cmdrNameChangePrompt"), player.name);
-            if (newName !== null) {
-                player.name = newName;
-                this.playerName.textContent = `CMDR ${player.name}`;
-                this.playerName.appendChild(changeNameButton);
-            }
-        });
+    private updatePlayerBalance() {
+        this.playerBalance.textContent = `Balance: ${Settings.CREDIT_SYMBOL}${this.player.balance.toLocaleString()}`;
     }
 
     public reset() {

@@ -1,16 +1,18 @@
 <section id="spaceStationUI">
     <div id="spaceStationHeader">
-        <p></p>
+        <p class="welcomeTo" data-i18n="spaceStation:welcomeTo"></p>
+        <p class="spaceStationName"></p>`
     </div>
 
     <div id="playerInfo">
-        <h2 class="playerName"></h2>
+        <div class="playerName">
+            <h2></h2>
+            <button type="button" class="icon"><img src="../asset/icons/edit.webp" /></button>
+        </div>
         <p class="playerBalance"></p>
     </div>
 
-    <div class="mainContainer hidden">
-
-    </div>
+    <div class="mainContainer hidden"></div>
 
     <div id="spaceStationActions">
         <div class="spaceStationAction missionsButton">
@@ -50,6 +52,5 @@
             <h2 data-i18n="spaceStation:takeOff">Take off</h2>
             <p data-i18n="spaceStation:takeOffDescription">Journey to the stars again!</p>
         </div>
-
     </div>
 </section>
