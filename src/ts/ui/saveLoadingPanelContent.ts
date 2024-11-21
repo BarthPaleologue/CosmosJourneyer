@@ -3,7 +3,7 @@ import i18n from "../i18n";
 import { LocalStorageAutoSaves, LocalStorageManualSaves, parseSaveFileData, SaveFileData } from "../saveFile/saveFileData";
 import { createNotification } from "../utils/notification";
 import { Settings } from "../settings";
-import { parseSeconds } from "../utils/strings/parseToStrings";
+import { Sounds } from "../assets/sounds";
 
 export class SaveLoadingPanelContent {
     readonly htmlRoot: HTMLElement;
@@ -139,6 +139,7 @@ export class SaveLoadingPanelContent {
             cmdrHeaderButtons.appendChild(continueButton);
 
             const savesList = document.createElement("div");
+
             savesList.classList.add("savesList");
             savesList.classList.add("hidden"); // Hidden by default
             cmdrDiv.appendChild(savesList);
@@ -181,6 +182,7 @@ export class SaveLoadingPanelContent {
         const loadButton = document.createElement("button");
         loadButton.innerText = i18n.t("sidePanel:load");
         loadButton.addEventListener("click", () => {
+            Sounds.MENU_SELECT_SOUND.play();
             this.onLoadSaveObservable.notifyObservers(save);
         });
         saveButtons.appendChild(loadButton);
@@ -188,6 +190,7 @@ export class SaveLoadingPanelContent {
         const downloadButton = document.createElement("button");
         downloadButton.innerText = i18n.t("sidePanel:download");
         downloadButton.addEventListener("click", () => {
+            Sounds.MENU_SELECT_SOUND.play();
             const blob = new Blob([JSON.stringify(save)], { type: "application/json" });
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
@@ -202,6 +205,7 @@ export class SaveLoadingPanelContent {
         deleteButton.classList.add("danger");
         deleteButton.innerText = i18n.t("sidePanel:delete");
         deleteButton.addEventListener("click", () => {
+            Sounds.MENU_SELECT_SOUND.play();
             const autoSavesDict: LocalStorageAutoSaves = JSON.parse(localStorage.getItem(Settings.AUTO_SAVE_KEY) ?? "{}");
             const manualSavesDict: LocalStorageManualSaves = JSON.parse(localStorage.getItem(Settings.MANUAL_SAVE_KEY) ?? "{}");
 
