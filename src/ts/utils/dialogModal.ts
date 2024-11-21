@@ -7,8 +7,8 @@ export function promptModal(prompt: string, defaultValue: string = ""): Promise<
             <p>${prompt}</p>
             <input type="text" value="${defaultValue}">
             <menu>
-                <button value="cancel">Cancel</button>
-                <button value="ok">OK</button>
+                <button type="button" value="cancel">Cancel</button>
+                <button formmethod="dialog" value="ok">OK</button>
             </menu>
         </form>
     `;
@@ -21,15 +21,6 @@ export function promptModal(prompt: string, defaultValue: string = ""): Promise<
         input.select();
         input.addEventListener("keydown", (e) => {
             e.stopPropagation();
-            if (e.key === "Enter") {
-                modal.returnValue = "ok";
-                modal.close();
-                resolve(input.value);
-            } else if (e.key === "Escape") {
-                modal.returnValue = "cancel";
-                modal.close();
-                resolve(null);
-            }
         });
 
         modal.addEventListener("close", () => {
