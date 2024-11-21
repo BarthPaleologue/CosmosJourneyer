@@ -167,23 +167,6 @@ $gaps: 10px;
                 p {
                     flex-grow: 1;
                 }
-
-                button {
-                    background: var(--accent-color);
-                    outline: none;
-                    border: none;
-                    color: white;
-                    font-family: variables.$main-font;
-                    padding: 1vmin;
-                    font-size: var(--text-size);
-
-                    transition: variables.$transition-time;
-
-                    &:hover {
-                        background: var(--accent-color-light);
-                        cursor: pointer;
-                    }
-                }
             }
         }
     }

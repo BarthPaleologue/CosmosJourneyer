@@ -1,11 +1,10 @@
 @use "variables";
 
 ::backdrop {
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.8);
 }
 
 dialog {
-    border-radius: 20px;
     padding: 20px;
     z-index: 1000;
 
