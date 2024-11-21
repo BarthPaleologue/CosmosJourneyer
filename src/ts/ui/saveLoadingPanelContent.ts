@@ -80,6 +80,8 @@ export class SaveLoadingPanelContent {
     }
 
     populateCmdrList() {
+        this.cmdrList.innerHTML = "";
+        
         const autoSavesDict: LocalStorageAutoSaves = JSON.parse(localStorage.getItem(Settings.AUTO_SAVE_KEY) ?? "{}");
         const manualSavesDict: LocalStorageManualSaves = JSON.parse(localStorage.getItem(Settings.MANUAL_SAVE_KEY) ?? "{}");
 
@@ -102,27 +104,36 @@ export class SaveLoadingPanelContent {
             cmdrHeader.classList.add("cmdrHeader");
             cmdrDiv.appendChild(cmdrHeader);
 
+            const cmdrHeaderText = document.createElement("div");
+            cmdrHeaderText.classList.add("cmdrHeaderText");
+            cmdrHeader.appendChild(cmdrHeaderText);
+
             const cmdrName = document.createElement("h3");
             cmdrName.innerText = latestSave.player.name;
-            cmdrHeader.appendChild(cmdrName);
+            cmdrHeaderText.appendChild(cmdrName);
 
             const cmdrLastPlayed = document.createElement("p");
             cmdrLastPlayed.innerText = `Last played on ${new Date(latestSave.timestamp).toLocaleString()}`;
-            cmdrHeader.appendChild(cmdrLastPlayed);
+            cmdrHeaderText.appendChild(cmdrLastPlayed);
 
             const cmdrPlayTime = document.createElement("p");
-            cmdrPlayTime.innerText = `Played for ${parseSeconds(latestSave.player.timePlayedSeconds)}`;
-            cmdrHeader.appendChild(cmdrPlayTime);
+            cmdrPlayTime.innerText = `Played for ${Math.ceil(latestSave.player.timePlayedSeconds / 60 / 60)} hours`;
+            cmdrHeaderText.appendChild(cmdrPlayTime);
+
+            const cmdrHeaderButtons = document.createElement("div");
+            cmdrHeaderButtons.classList.add("cmdrHeaderButtons");
+            cmdrHeader.appendChild(cmdrHeaderButtons);
 
             const continueButton = document.createElement("button");
             continueButton.innerText = i18n.t("sidePanel:continue");
             continueButton.addEventListener("click", () => {
                 this.onLoadSaveObservable.notifyObservers(latestSave);
             });
-            cmdrDiv.appendChild(continueButton);
+            cmdrHeaderButtons.appendChild(continueButton);
 
             const savesList = document.createElement("div");
             savesList.classList.add("savesList");
+            savesList.classList.add("hidden"); // Hidden by default
             cmdrDiv.appendChild(savesList);
 
             const autoSaveDiv = this.createSaveDiv(autoSavesDict[cmdrUuid], true);
@@ -133,14 +144,14 @@ export class SaveLoadingPanelContent {
                 savesList.appendChild(manualSaveDiv);
             });
 
-            const expandButton = document.createElement("div");
+            const expandButton = document.createElement("button");
             expandButton.classList.add("expandButton");
             expandButton.innerText = "+";
             expandButton.addEventListener("click", () => {
-                cmdrDiv.classList.toggle("expanded");
-                expandButton.innerText = cmdrDiv.classList.contains("expanded") ? "-" : "+";
+                savesList.classList.toggle("hidden");
+                expandButton.innerText = savesList.classList.contains("hidden") ? "+" : "-";
             });
-            cmdrHeader.appendChild(expandButton);
+            cmdrHeaderButtons.appendChild(expandButton);
         });
     }
 
@@ -148,13 +159,13 @@ export class SaveLoadingPanelContent {
         const saveDiv = document.createElement("div");
         saveDiv.classList.add("saveContainer");
 
-        const saveHeader = document.createElement("div");
-        saveHeader.classList.add("saveHeader");
-        saveDiv.appendChild(saveHeader);
+        const saveText = document.createElement("div");
+        saveText.classList.add("saveText");
+        saveDiv.appendChild(saveText);
 
         const saveName = document.createElement("p");
         saveName.innerText = (isAutoSave ? `[Auto] ` : "") + new Date(save.timestamp).toLocaleString();
-        saveHeader.appendChild(saveName);
+        saveText.appendChild(saveName);
 
         const saveButtons = document.createElement("div");
         saveButtons.classList.add("saveButtons");

@@ -136,6 +136,8 @@ body {
 
   @include meta.load-css("inspectorLayer.scss");
 
+  @include meta.load-css("saveLoadingPanelContent.scss");
+
   #renderer {
     z-index: 1;
     float: left;

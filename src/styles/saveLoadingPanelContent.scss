@@ -1,0 +1,68 @@
+#loadSavePanel {
+    padding-bottom: 10px;
+}
+
+.saveLoadingPanelContent {
+    display: flex;
+    flex-direction: column;
+    row-gap: 10px;
+}
+
+.cmdrList {
+    display: flex;
+    flex-direction: column;
+    row-gap: 10px;
+    padding: 0 10px;
+
+    .cmdr {
+        --cmdr-color: rgba(50, 50, 50, 0.5);
+        .cmdrHeader {
+            display: flex;
+            justify-content: space-between;
+            background: var(--cmdr-color);
+            padding: 10px;
+
+            .cmdrHeaderText {
+                display: flex;
+                flex-direction: column;
+                row-gap: 10px;
+
+                h3,
+                p {
+                    margin-block: 0;
+                }
+            }
+
+            .cmdrHeaderButtons {
+                display: flex;
+                column-gap: 10px;
+            }
+        }
+
+        .savesList {
+            display: flex;
+            flex-direction: column;
+            &.hidden {
+                display: none;
+            }
+
+            .saveContainer {
+                background: linear-gradient(90deg, var(--cmdr-color) 10px, rgba(0, 0, 0, 0.5) 10px);
+                padding: 10px;
+                display: flex;
+                justify-content: space-between;
+
+                .saveText {
+                    display: flex;
+                    flex-direction: column;
+                    row-gap: 10px;
+                }
+
+                .saveButtons {
+                    display: flex;
+                    column-gap: 10px;
+                }
+            }
+        }
+    }
+}
