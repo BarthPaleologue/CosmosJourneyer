@@ -23,6 +23,7 @@ import { Settings } from "../../settings";
 import { OrbitalObjectModel } from "../../architecture/orbitalObject";
 import { OrbitalFacilityModel } from "../../spacestation/orbitalFacility";
 import { generateSpaceshipDom } from "./spaceshipDock";
+import editIconPath from "../../../asset/icons/edit.webp";
 
 const enum MainPanelState {
     NONE,
@@ -148,6 +149,7 @@ export class SpaceStationLayer {
     }
 
     public setStation(station: OrbitalFacilityModel, stationParents: OrbitalObjectModel[], player: Player) {
+        if (this.currentStation === station) return;
         this.currentStation = station;
         this.currentStationParents = stationParents;
         this.spaceStationHeader.innerHTML = `
@@ -156,6 +158,14 @@ export class SpaceStationLayer {
 
         this.playerName.textContent = `CMDR ${player.name}`;
         this.playerBalance.textContent = `Balance: ${Settings.CREDIT_SYMBOL}${player.balance.toLocaleString()}`;
+
+        const changeNameButton = document.createElement("button");
+        changeNameButton.classList.add("icon");
+        this.playerName.appendChild(changeNameButton);
+
+        const editIcon = document.createElement("img");
+        editIcon.src = editIconPath;
+        changeNameButton.appendChild(editIcon);
     }
 
     public reset() {
