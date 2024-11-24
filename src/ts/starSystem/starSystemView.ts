@@ -170,6 +170,16 @@ export class StarSystemView implements View {
     readonly onInitStarSystem = new Observable<void>();
 
     /**
+     * An observable that notifies when the player is about to jump to another star system.
+     */
+    readonly onBeforeJump = new Observable<void>();
+
+    /**
+     * An observable that notifies when the player has jumped to another star system.
+     */
+    readonly onAfterJump = new Observable<void>();
+
+    /**
      * A lock to prevent multiple executions of the jump to system action
      * @private
      */
@@ -292,6 +302,8 @@ export class StarSystemView implements View {
                 });
             });
 
+            this.onBeforeJump.notifyObservers();
+
             // then, initiate hyper space jump
             if (!spaceship.getWarpDrive().isEnabled()) spaceship.enableWarpDrive();
             spaceship.hyperSpaceTunnel.setEnabled(true);
@@ -318,6 +330,8 @@ export class StarSystemView implements View {
             AudioManager.SetMask(AudioMasks.STAR_SYSTEM_VIEW);
             observer.remove();
             this.jumpLock = false;
+
+            this.onAfterJump.notifyObservers();
         });
 
         StarSystemInputs.map.toggleSpaceShipCharacter.on("complete", async () => {
@@ -590,6 +604,10 @@ export class StarSystemView implements View {
         }
 
         this.scene.setActiveControls(this.spaceshipControls);
+    }
+
+    public isJumpingBetweenSystems() {
+        return this.jumpLock;
     }
 
     /**

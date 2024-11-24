@@ -112,6 +112,14 @@ export class CosmosJourneyer {
         this.player = player;
 
         this.starSystemView = starSystemView;
+        this.starSystemView.onBeforeJump.add(() => {
+            // in case something goes wrong during the jump, we want to save the player's progress
+            this.createAutoSave();
+        });
+        this.starSystemView.onAfterJump.add(() => {
+            // always save the player's progress after a jump
+            this.createAutoSave();
+        });
 
         // Init starmap view
         this.starMap = new StarMap(this.player, this.engine);
@@ -133,7 +141,7 @@ export class CosmosJourneyer {
         this.mainMenu.onStartObservable.add(async () => {
             this.tutorialLayer.setTutorial(FlightTutorial.getTitle(), await FlightTutorial.getContentPanelsHtml());
             this.starSystemView.switchToSpaceshipControls();
-            this.performAutoSave();
+            this.createAutoSave();
         });
 
         this.mainMenu.onLoadSaveObservable.add(async (saveData: SaveFileData) => {
@@ -154,6 +162,10 @@ export class CosmosJourneyer {
             this.tutorialLayer.onQuitTutorial.addOnce(() => {
                 this.player.tutorials.stationLandingCompleted = true;
             });
+        });
+
+        this.starSystemView.getSpaceshipControls().onCompleteLanding.add(() => {
+            this.createAutoSave();
         });
 
         this.starSystemView.onInitStarSystem.add(() => {
@@ -179,7 +191,7 @@ export class CosmosJourneyer {
         });
         this.pauseMenu.onSave.add(() => {
             this.saveToLocalStorage();
-            this.performAutoSave();
+            this.createAutoSave();
             createNotification(i18n.t("notifications:saveOk"), 2000);
         });
 
@@ -197,7 +209,7 @@ export class CosmosJourneyer {
 
         window.addEventListener("beforeunload", () => {
             if (this.mainMenu.isVisible()) return; // don't autosave if the main menu is visible: the player is not in the game yet
-            this.performAutoSave();
+            this.createAutoSave();
         });
 
         GeneralInputs.map.toggleStarMap.on("complete", () => {
@@ -314,9 +326,10 @@ export class CosmosJourneyer {
             if (this.autoSaveTimerSeconds >= this.autoSavePeriodSeconds) {
                 this.autoSaveTimerSeconds %= this.autoSavePeriodSeconds;
 
-                if (!this.mainMenu.isVisible()) {
+                if (!this.mainMenu.isVisible() && !this.starSystemView.isJumpingBetweenSystems()) {
                     // don't autosave if the main menu is visible: the player is not in the game yet
-                    this.performAutoSave();
+                    // don't autosave when jumping between systems
+                    this.createAutoSave();
                 }
             }
 
@@ -453,7 +466,7 @@ export class CosmosJourneyer {
     /**
      * Generate save file data and store it in the autosaves hashmap in local storage
      */
-    public performAutoSave(): void {
+    public createAutoSave(): void {
         const saveData = this.generateSaveData();
 
         // use player uuid as key to avoid overwriting other cmdr's autosave
@@ -549,7 +562,7 @@ export class CosmosJourneyer {
             this.starSystemView.setSystemAsTarget(this.player.currentItinerary[1]);
         }
 
-        this.performAutoSave();
+        this.createAutoSave();
     }
 
     /**
