@@ -101,8 +101,8 @@ export class SaveLoadingPanelContent {
 
         // Sort cmdr UUIDs by latest save timestamp to have the most recent save at the top
         cmdrUuids.sort((a, b) => {
-            const aLatestSave = autoSavesDict[a] ?? manualSavesDict[a][0];
-            const bLatestSave = autoSavesDict[b] ?? manualSavesDict[b][0];
+            const aLatestSave = autoSavesDict[a][0] ?? manualSavesDict[a][0];
+            const bLatestSave = autoSavesDict[b][0] ?? manualSavesDict[b][0];
             return bLatestSave.timestamp - aLatestSave.timestamp;
         });
 
@@ -111,9 +111,11 @@ export class SaveLoadingPanelContent {
             cmdrDiv.classList.add("cmdr");
             this.cmdrList.appendChild(cmdrDiv);
 
+            const autoSaves = autoSavesDict[cmdrUuid] ?? [];
+
             const manualSaves = manualSavesDict[cmdrUuid] ?? [];
 
-            const latestSave = autoSavesDict[cmdrUuid] ?? manualSaves[0];
+            const latestSave = autoSaves[0] ?? manualSaves[0];
 
             const cmdrHeader = document.createElement("div");
             cmdrHeader.classList.add("cmdrHeader");
@@ -163,9 +165,9 @@ export class SaveLoadingPanelContent {
                 const newName = await promptModalString(i18n.t("sidePanel:cmdrNameChangePrompt"), latestSave.player.name);
                 if (newName === null) return;
                 
-                if(autoSavesDict[cmdrUuid] !== undefined) {
-                    autoSavesDict[cmdrUuid].player.name = newName;
-                }
+                autoSaves.forEach((autoSave) => {
+                    autoSave.player.name = newName;
+                });
                 
                 manualSaves.forEach((manualSave) => {
                     manualSave.player.name = newName;
@@ -188,12 +190,12 @@ export class SaveLoadingPanelContent {
             savesList.classList.add("hidden"); // Hidden by default
             cmdrDiv.appendChild(savesList);
 
-            const autoSaveDiv = this.createSaveDiv(autoSavesDict[cmdrUuid], true);
-            savesList.appendChild(autoSaveDiv);
+            const allSaves = autoSaves.concat(manualSaves);
+            allSaves.sort((a, b) => b.timestamp - a.timestamp);
 
-            manualSaves.forEach((manualSave) => {
-                const manualSaveDiv = this.createSaveDiv(manualSave, false);
-                savesList.appendChild(manualSaveDiv);
+            allSaves.forEach((save) => {
+                const saveDiv = this.createSaveDiv(save, autoSaves.includes(save));
+                savesList.appendChild(saveDiv);
             });
 
             const expandIcon = document.createElement("img");

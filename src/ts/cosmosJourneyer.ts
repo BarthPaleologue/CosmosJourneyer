@@ -476,8 +476,14 @@ export class CosmosJourneyer {
 
         // store in a hashmap in local storage
         const autosaves: LocalStorageAutoSaves = JSON.parse(localStorage.getItem(localStorageKey) || "{}");
-        autosaves[uuid] = saveData;
+        autosaves[uuid] = autosaves[uuid] || [];
+        autosaves[uuid].unshift(saveData); // enqueue the new autosave
+        while (autosaves[uuid].length > Settings.MAX_AUTO_SAVES) {
+            autosaves[uuid].pop(); // dequeue the oldest autosave
+        }
         localStorage.setItem(localStorageKey, JSON.stringify(autosaves));
+
+        this.autoSaveTimerSeconds = 0;
     }
 
     /**
