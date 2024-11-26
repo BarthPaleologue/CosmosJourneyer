@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Observable } from "@babylonjs/core/Misc/observable";
-import i18n from "../i18n";
 import { Sounds } from "../assets/sounds";
 import { PanelType, SidePanels } from "./sidePanels";
 
@@ -29,6 +28,7 @@ export class PauseMenu {
     private readonly contributeButton: HTMLElement;
     private readonly tutorialsButton: HTMLElement;
     private readonly settingsButton: HTMLElement;
+    private readonly loadButton: HTMLElement;
     private readonly saveButton: HTMLElement;
     private readonly resumeButton: HTMLElement;
 
@@ -47,11 +47,9 @@ export class PauseMenu {
 
         this.screenshotButton = document.getElementById("screenshotButton") as HTMLElement;
         this.screenshotButton.addEventListener("click", () => this.onScreenshot.notifyObservers());
-        this.screenshotButton.innerText = i18n.t("pauseMenu:screenshot");
 
         this.shareButton = document.getElementById("shareButton") as HTMLElement;
         this.shareButton.addEventListener("click", () => this.onShare.notifyObservers());
-        this.shareButton.innerText = i18n.t("pauseMenu:share");
 
         this.contributeButton = document.getElementById("pauseContributeButton") as HTMLElement;
         this.contributeButton.addEventListener("click", () => {
@@ -59,7 +57,6 @@ export class PauseMenu {
 
             this.sidePanels.toggleActivePanel(PanelType.CONTRIBUTE);
         });
-        this.contributeButton.innerText = i18n.t("pauseMenu:contribute");
 
         this.tutorialsButton = document.getElementById("pauseTutorialsButton") as HTMLElement;
         this.tutorialsButton.addEventListener("click", () => {
@@ -67,7 +64,6 @@ export class PauseMenu {
 
             this.sidePanels.toggleActivePanel(PanelType.TUTORIALS);
         });
-        this.tutorialsButton.innerText = i18n.t("pauseMenu:tutorials");
 
         this.settingsButton = document.getElementById("pauseSettingsButton") as HTMLElement;
         this.settingsButton.addEventListener("click", () => {
@@ -75,15 +71,19 @@ export class PauseMenu {
 
             this.sidePanels.toggleActivePanel(PanelType.SETTINGS);
         });
-        this.settingsButton.innerText = i18n.t("pauseMenu:settings");
+
+        this.loadButton = document.getElementById("loadButton") as HTMLElement;
+        this.loadButton.addEventListener("click", () => {
+            Sounds.MENU_SELECT_SOUND.play();
+
+            this.sidePanels.toggleActivePanel(PanelType.LOAD_SAVE);
+        });
 
         this.saveButton = document.getElementById("saveButton") as HTMLElement;
         this.saveButton.addEventListener("click", () => this.onSave.notifyObservers());
-        this.saveButton.innerText = i18n.t("pauseMenu:save");
 
         this.resumeButton = document.getElementById("resumeButton") as HTMLElement;
         this.resumeButton.addEventListener("click", () => this.onResume.notifyObservers());
-        this.resumeButton.innerText = i18n.t("pauseMenu:resume");
 
         document.querySelectorAll("#pauseMenu li").forEach((li) => {
             // play a sound when hovering over a button
