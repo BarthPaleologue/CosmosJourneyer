@@ -40,8 +40,6 @@ const starSystemView = engine.starSystemView;
 // const physicsViewer = new PhysicsViewer();
 // physicsViewer.showBody(spaceshipController.aggregate.body);
 
-console.log(`Time is going ${Settings.TIME_MULTIPLIER} time${Settings.TIME_MULTIPLIER > 1 ? "s" : ""} faster than in reality`);
-
 const systemName = "Alpha Testis";
 const systemCoordinates: StarSystemCoordinates = {
     starSectorX: 0,

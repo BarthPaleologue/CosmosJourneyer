@@ -515,8 +515,6 @@ export class CosmosJourneyer {
                 throw new Error("Could not find the target object of the tutorial even though it should be in the star system");
             }
             this.starSystemView.getSpaceshipControls().getTransform().lookAt(targetObject.getTransform().getAbsolutePosition());
-
-            Settings.TIME_MULTIPLIER = 1;
         });
     }
 

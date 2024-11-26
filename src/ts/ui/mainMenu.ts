@@ -245,8 +245,6 @@ export class MainMenu {
             }
             positionNearObjectWithStarVisible(this.controls, targetObject, this.starSystemView.getStarSystem(), nbRadius);
 
-            Settings.TIME_MULTIPLIER = 3;
-
             Sounds.MAIN_MENU_BACKGROUND_MUSIC.play();
         });
 
@@ -257,7 +255,6 @@ export class MainMenu {
 
     private startAnimation(onAnimationFinished: () => void) {
         this.sidePanels.hideActivePanel();
-        Settings.TIME_MULTIPLIER = 1;
 
         const starSystemController = this.starSystemView.getStarSystem();
 
