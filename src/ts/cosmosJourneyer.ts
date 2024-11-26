@@ -567,8 +567,6 @@ export class CosmosJourneyer {
         if (this.player.currentItinerary.length > 1) {
             this.starSystemView.setSystemAsTarget(this.player.currentItinerary[1]);
         }
-
-        this.createAutoSave();
     }
 
     /**
