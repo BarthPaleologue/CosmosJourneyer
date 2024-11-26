@@ -186,9 +186,10 @@ export class SpaceStationLayer {
 
     public reset() {
         this.currentStation = null;
-        this.spaceStationHeader.innerHTML = "";
+        this.spaceStationName.textContent = "";
         this.playerName.textContent = "";
         this.playerBalance.textContent = "";
+        this.mainPanel.classList.add("hidden");
         this.mainPanel.innerHTML = "";
     }
 }
