@@ -120,6 +120,8 @@ export const Settings = {
     MANUAL_SAVE_KEY: "saves",
 
     AUTO_SAVE_KEY: "autosaves",
+
+    MAX_AUTO_SAVES: 5,
 };
 
 export const CollisionMask = {

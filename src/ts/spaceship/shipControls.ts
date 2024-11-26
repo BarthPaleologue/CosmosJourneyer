@@ -58,6 +58,8 @@ export class ShipControls implements Controls {
 
     readonly onToggleWarpDrive: Observable<boolean> = new Observable();
 
+    readonly onCompleteLanding: Observable<void> = new Observable();
+
     private readonly toggleWarpDriveHandler: () => void;
     private readonly landingHandler: () => void;
     private readonly emitLandingRequestHandler: () => void;
@@ -302,6 +304,10 @@ export class ShipControls implements Controls {
         this.spaceship.onWarpDriveEnabled.add(() => {
             this.onToggleWarpDrive.notifyObservers(true);
         });
+
+        this.spaceship.onLandingObservable.add(() => {
+            this.onCompleteLanding.notifyObservers();
+        });
     }
 
     getSpaceship(): Spaceship {
@@ -310,6 +316,7 @@ export class ShipControls implements Controls {
 
     dispose() {
         this.onToggleWarpDrive.clear();
+        this.onCompleteLanding.clear();
 
         SpaceShipControlsInputs.map.toggleWarpDrive.off("complete", this.toggleWarpDriveHandler);
         SpaceShipControlsInputs.map.landing.off("complete", this.landingHandler);

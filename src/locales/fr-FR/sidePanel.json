@@ -5,6 +5,8 @@
     "journeyedFor": "Exploré pendant {{nbHours}} heures",
     "cmdrNameChangePrompt": "Comment souhaitez-vous appeler ce Commandant ? Cette action affectera toutes les sauvegardes de ce Commandant.",
     "deleteSavePrompt": "La suppression de cette sauvegarde est irréversible. Vous pouvez toujours télécharger une copie avant ! Êtes-vous sûr de vouloir continuer ?",
+    "landedAt": "Posé à {{location}}",
+    "near": "Près de {{location}}",
     "tutorials": "Tutoriels",
     "settings": "Paramètres",
     "contribute": "Contribuer",

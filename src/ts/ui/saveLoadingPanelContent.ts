@@ -11,6 +11,7 @@ import editIconPath from "../../asset/icons/edit.webp";
 import downloadIconPath from "../../asset/icons/download.webp";
 import trashIconPath from "../../asset/icons/trash.webp";
 import { promptModalBoolean, promptModalString } from "../utils/dialogModal";
+import { getObjectModelByUniverseId } from "../utils/coordinates/orbitalObjectId";
 
 export class SaveLoadingPanelContent {
     readonly htmlRoot: HTMLElement;
@@ -101,8 +102,8 @@ export class SaveLoadingPanelContent {
 
         // Sort cmdr UUIDs by latest save timestamp to have the most recent save at the top
         cmdrUuids.sort((a, b) => {
-            const aLatestSave = autoSavesDict[a] ?? manualSavesDict[a][0];
-            const bLatestSave = autoSavesDict[b] ?? manualSavesDict[b][0];
+            const aLatestSave = autoSavesDict[a][0] ?? manualSavesDict[a][0];
+            const bLatestSave = autoSavesDict[b][0] ?? manualSavesDict[b][0];
             return bLatestSave.timestamp - aLatestSave.timestamp;
         });
 
@@ -111,9 +112,11 @@ export class SaveLoadingPanelContent {
             cmdrDiv.classList.add("cmdr");
             this.cmdrList.appendChild(cmdrDiv);
 
+            const autoSaves = autoSavesDict[cmdrUuid] ?? [];
+
             const manualSaves = manualSavesDict[cmdrUuid] ?? [];
 
-            const latestSave = autoSavesDict[cmdrUuid] ?? manualSaves[0];
+            const latestSave = autoSaves[0] ?? manualSaves[0];
 
             const cmdrHeader = document.createElement("div");
             cmdrHeader.classList.add("cmdrHeader");
@@ -131,7 +134,7 @@ export class SaveLoadingPanelContent {
             cmdrLastPlayed.innerText = i18n.t("sidePanel:lastPlayedOn", {
                 val: new Date(latestSave.timestamp),
                 formatParams: {
-                    val: { weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric" },
+                    val: { weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric" }
                 }
             });
             cmdrHeaderText.appendChild(cmdrLastPlayed);
@@ -162,15 +165,15 @@ export class SaveLoadingPanelContent {
                 Sounds.MENU_SELECT_SOUND.play();
                 const newName = await promptModalString(i18n.t("sidePanel:cmdrNameChangePrompt"), latestSave.player.name);
                 if (newName === null) return;
-                
-                if(autoSavesDict[cmdrUuid] !== undefined) {
-                    autoSavesDict[cmdrUuid].player.name = newName;
-                }
-                
+
+                autoSaves.forEach((autoSave) => {
+                    autoSave.player.name = newName;
+                });
+
                 manualSaves.forEach((manualSave) => {
                     manualSave.player.name = newName;
                 });
-                
+
                 cmdrName.innerText = newName;
 
                 localStorage.setItem(Settings.AUTO_SAVE_KEY, JSON.stringify(autoSavesDict));
@@ -188,12 +191,12 @@ export class SaveLoadingPanelContent {
             savesList.classList.add("hidden"); // Hidden by default
             cmdrDiv.appendChild(savesList);
 
-            const autoSaveDiv = this.createSaveDiv(autoSavesDict[cmdrUuid], true);
-            savesList.appendChild(autoSaveDiv);
+            const allSaves = autoSaves.concat(manualSaves);
+            allSaves.sort((a, b) => b.timestamp - a.timestamp);
 
-            manualSaves.forEach((manualSave) => {
-                const manualSaveDiv = this.createSaveDiv(manualSave, false);
-                savesList.appendChild(manualSaveDiv);
+            allSaves.forEach((save) => {
+                const saveDiv = this.createSaveDiv(save, autoSaves.includes(save));
+                savesList.appendChild(saveDiv);
             });
 
             const expandIcon = document.createElement("img");
@@ -226,6 +229,16 @@ export class SaveLoadingPanelContent {
         const saveName = document.createElement("p");
         saveName.innerText = (isAutoSave ? `[Auto] ` : "") + new Date(save.timestamp).toLocaleString();
         saveText.appendChild(saveName);
+
+        const saveLocation = document.createElement("p");
+        const isLanded = save.padNumber !== undefined;
+        saveLocation.innerText = i18n.t(isLanded ? "sidePanel:landedAt" : "sidePanel:near", {
+            location: getObjectModelByUniverseId(save.universeCoordinates.universeObjectId).name,
+            interpolation: {
+                escapeValue: false
+            }
+        });
+        saveText.appendChild(saveLocation);
 
         const saveButtons = document.createElement("div");
         saveButtons.classList.add("saveButtons");
