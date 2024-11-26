@@ -5,6 +5,8 @@
     "journeyedFor": "Journeyed for {{nbHours}} hours",
     "cmdrNameChangePrompt": "How would you like to name this Commander? This action will affect all saves of this Commander.",
     "deleteSavePrompt": "Deleting this save is irreversible. You can still download a backup first! Are you sure you want to proceed?",
+    "landedAt": "Landed at {{location}}",
+    "near": "Near {{location}}",
     "settings": "Settings",
     "tutorials": "Tutorials",
     "contribute": "Contribute",

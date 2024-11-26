@@ -11,6 +11,7 @@ import editIconPath from "../../asset/icons/edit.webp";
 import downloadIconPath from "../../asset/icons/download.webp";
 import trashIconPath from "../../asset/icons/trash.webp";
 import { promptModalBoolean, promptModalString } from "../utils/dialogModal";
+import { getObjectModelByUniverseId } from "../utils/coordinates/orbitalObjectId";
 
 export class SaveLoadingPanelContent {
     readonly htmlRoot: HTMLElement;
@@ -133,7 +134,7 @@ export class SaveLoadingPanelContent {
             cmdrLastPlayed.innerText = i18n.t("sidePanel:lastPlayedOn", {
                 val: new Date(latestSave.timestamp),
                 formatParams: {
-                    val: { weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric" },
+                    val: { weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric" }
                 }
             });
             cmdrHeaderText.appendChild(cmdrLastPlayed);
@@ -164,15 +165,15 @@ export class SaveLoadingPanelContent {
                 Sounds.MENU_SELECT_SOUND.play();
                 const newName = await promptModalString(i18n.t("sidePanel:cmdrNameChangePrompt"), latestSave.player.name);
                 if (newName === null) return;
-                
+
                 autoSaves.forEach((autoSave) => {
                     autoSave.player.name = newName;
                 });
-                
+
                 manualSaves.forEach((manualSave) => {
                     manualSave.player.name = newName;
                 });
-                
+
                 cmdrName.innerText = newName;
 
                 localStorage.setItem(Settings.AUTO_SAVE_KEY, JSON.stringify(autoSavesDict));
@@ -228,6 +229,16 @@ export class SaveLoadingPanelContent {
         const saveName = document.createElement("p");
         saveName.innerText = (isAutoSave ? `[Auto] ` : "") + new Date(save.timestamp).toLocaleString();
         saveText.appendChild(saveName);
+
+        const saveLocation = document.createElement("p");
+        const isLanded = save.padNumber !== undefined;
+        saveLocation.innerText = i18n.t(isLanded ? "sidePanel:landedAt" : "sidePanel:near", {
+            location: getObjectModelByUniverseId(save.universeCoordinates.universeObjectId).name,
+            interpolation: {
+                escapeValue: false
+            }
+        });
+        saveText.appendChild(saveLocation);
 
         const saveButtons = document.createElement("div");
         saveButtons.classList.add("saveButtons");
