@@ -29,7 +29,6 @@ export class MainMenu {
     readonly starSystemModel: StarSystemModel;
 
     readonly onStartObservable = new Observable<void>();
-    readonly onLoadSaveObservable = new Observable<SaveFileData>();
     readonly onContributeObservable = new Observable<void>();
     readonly onCreditsObservable = new Observable<void>();
     readonly onAboutObservable = new Observable<void>();
@@ -186,12 +185,12 @@ export class MainMenu {
         const loadSaveButton = document.getElementById("loadSaveButton");
         if (loadSaveButton === null) throw new Error("#loadSaveButton does not exist!");
 
-        this.sidePanels.loadSavePanelContent.onLoadSaveObservable.add((saveFileData) => {
-            this.startAnimation(() => this.onLoadSaveObservable.notifyObservers(saveFileData));
-        });
-
         loadSaveButton.addEventListener("click", () => {
             this.sidePanels.toggleActivePanel(PanelType.LOAD_SAVE);
+        });
+
+        this.sidePanels.loadSavePanelContent.onLoadSaveObservable.add(() => {
+            this.hide();
         });
 
         const settingsButton = document.getElementById("settingsButton");
@@ -245,8 +244,6 @@ export class MainMenu {
             }
             positionNearObjectWithStarVisible(this.controls, targetObject, this.starSystemView.getStarSystem(), nbRadius);
 
-            Settings.TIME_MULTIPLIER = 3;
-
             Sounds.MAIN_MENU_BACKGROUND_MUSIC.play();
         });
 
@@ -257,7 +254,6 @@ export class MainMenu {
 
     private startAnimation(onAnimationFinished: () => void) {
         this.sidePanels.hideActivePanel();
-        Settings.TIME_MULTIPLIER = 1;
 
         const starSystemController = this.starSystemView.getStarSystem();
 

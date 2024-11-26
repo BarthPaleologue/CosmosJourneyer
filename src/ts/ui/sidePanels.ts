@@ -93,6 +93,10 @@ export class SidePanels {
             return;
         }
 
+        if(type === PanelType.LOAD_SAVE) {
+            this.loadSavePanelContent.populateCmdrList();
+        }
+
         if (this.activeRightPanel !== null) {
             this.hideActivePanel();
         }

@@ -28,6 +28,7 @@ import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 
 const engine = await CosmosJourneyer.CreateAsync();
+engine.setAutoSaveEnabled(false);
 
 const starSystemView = engine.starSystemView;
 

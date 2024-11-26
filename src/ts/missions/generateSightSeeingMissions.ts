@@ -37,7 +37,6 @@ import { OrbitalFacilityModel } from "../spacestation/orbitalFacility";
  */
 export function generateSightseeingMissions(spaceStationModel: OrbitalFacilityModel, starSystemModel: StarSystemModel, player: Player, timestampMillis: number): Mission[] {
     const currentHour = Math.floor(timestampMillis / 1000 / 60 / 60) % (24 * 30);
-    console.log(currentHour);
 
     const starSystem = starSystemModel;
 

@@ -107,6 +107,8 @@ export class CosmosJourneyer {
 
     private autoSaveTimerSeconds = 0;
 
+    private isAutoSaveEnabled = true;
+
     private constructor(player: Player, engine: AbstractEngine, starSystemView: StarSystemView) {
         this.engine = engine;
         this.player = player;
@@ -136,18 +138,22 @@ export class CosmosJourneyer {
         this.tutorialLayer = new TutorialLayer();
 
         this.sidePanels = new SidePanels();
+        this.sidePanels.loadSavePanelContent.onLoadSaveObservable.add(async (saveData: SaveFileData) => {
+            engine.onEndFrameObservable.addOnce(async () => {
+                if (this.isPaused()) {
+                    this.createAutoSave(); // from the pause menu, create autosave of the current game before loading a save
+                }
+                this.resume();
+                this.starSystemView.setUIEnabled(true);
+                await this.loadSaveData(saveData);
+            });
+        });
 
         this.mainMenu = new MainMenu(this.sidePanels, starSystemView);
         this.mainMenu.onStartObservable.add(async () => {
             this.tutorialLayer.setTutorial(FlightTutorial.getTitle(), await FlightTutorial.getContentPanelsHtml());
             this.starSystemView.switchToSpaceshipControls();
             this.createAutoSave();
-        });
-
-        this.mainMenu.onLoadSaveObservable.add(async (saveData: SaveFileData) => {
-            engine.onEndFrameObservable.addOnce(async () => {
-                await this.loadSaveData(saveData);
-            });
         });
 
         this.sidePanels.tutorialsPanelContent.onTutorialSelected.add(async (tutorial) => {
@@ -463,10 +469,15 @@ export class CosmosJourneyer {
         localStorage.setItem(localStorageKey, JSON.stringify(manualSaves));
     }
 
+    public setAutoSaveEnabled(isEnabled: boolean): void {
+        this.isAutoSaveEnabled = isEnabled;
+    }
+
     /**
      * Generate save file data and store it in the autosaves hashmap in local storage
      */
     public createAutoSave(): void {
+        if (!this.isAutoSaveEnabled) return;
         const saveData = this.generateSaveData();
 
         // use player uuid as key to avoid overwriting other cmdr's autosave
@@ -515,8 +526,6 @@ export class CosmosJourneyer {
                 throw new Error("Could not find the target object of the tutorial even though it should be in the star system");
             }
             this.starSystemView.getSpaceshipControls().getTransform().lookAt(targetObject.getTransform().getAbsolutePosition());
-
-            Settings.TIME_MULTIPLIER = 1;
         });
     }
 

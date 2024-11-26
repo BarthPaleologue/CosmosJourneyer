@@ -84,8 +84,6 @@ export class SaveLoadingPanelContent {
         this.cmdrList = document.createElement("div");
         this.cmdrList.classList.add("cmdrList");
         this.htmlRoot.appendChild(this.cmdrList);
-
-        this.populateCmdrList();
     }
 
     populateCmdrList() {
