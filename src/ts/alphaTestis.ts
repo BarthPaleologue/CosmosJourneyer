@@ -34,6 +34,7 @@ import { celsiusToKelvin, getOrbitRadiusFromPeriod } from "./utils/physics";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 
 const engine = await CosmosJourneyer.CreateAsync();
+engine.setAutoSaveEnabled(false);
 
 const starSystemView = engine.starSystemView;
 

@@ -107,6 +107,8 @@ export class CosmosJourneyer {
 
     private autoSaveTimerSeconds = 0;
 
+    private isAutoSaveEnabled = true;
+
     private constructor(player: Player, engine: AbstractEngine, starSystemView: StarSystemView) {
         this.engine = engine;
         this.player = player;
@@ -138,7 +140,7 @@ export class CosmosJourneyer {
         this.sidePanels = new SidePanels();
         this.sidePanels.loadSavePanelContent.onLoadSaveObservable.add(async (saveData: SaveFileData) => {
             engine.onEndFrameObservable.addOnce(async () => {
-                if(this.isPaused()) {
+                if (this.isPaused()) {
                     this.createAutoSave(); // from the pause menu, create autosave of the current game before loading a save
                 }
                 this.resume();
@@ -467,10 +469,15 @@ export class CosmosJourneyer {
         localStorage.setItem(localStorageKey, JSON.stringify(manualSaves));
     }
 
+    public setAutoSaveEnabled(isEnabled: boolean): void {
+        this.isAutoSaveEnabled = isEnabled;
+    }
+
     /**
      * Generate save file data and store it in the autosaves hashmap in local storage
      */
     public createAutoSave(): void {
+        if (!this.isAutoSaveEnabled) return;
         const saveData = this.generateSaveData();
 
         // use player uuid as key to avoid overwriting other cmdr's autosave
