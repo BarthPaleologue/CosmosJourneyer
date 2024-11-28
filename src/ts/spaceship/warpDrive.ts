@@ -16,8 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Settings } from "../settings";
-import { clamp, moveTowards } from "../utils/math";
-import { Lerp } from "@babylonjs/core/Maths/math.scalar.functions";
+import { clamp, lerpSmooth, moveTowards } from "../utils/math";
 
 const enum WarpDriveState {
     /**
@@ -188,8 +187,8 @@ export class WarpDrive implements ReadonlyWarpDrive {
         // use lerp smoothing to reach target speed, while making it a bit harder to decelerate
         this.currentSpeed =
             this.currentSpeed < this.maxTargetSpeed
-                ? Lerp(this.currentSpeed, this.throttle * this.maxTargetSpeed, 0.1) // acceleration
-                : Lerp(this.currentSpeed, this.throttle * this.maxTargetSpeed, 0.05); // deceleration
+                ? lerpSmooth(this.currentSpeed, this.throttle * this.maxTargetSpeed, 0.1, deltaSeconds) // acceleration
+                : lerpSmooth(this.currentSpeed, this.throttle * this.maxTargetSpeed, 0.6, deltaSeconds); // deceleration
         this.currentSpeed = clamp(this.currentSpeed, WarpDrive.MIN_WARP_SPEED, WarpDrive.MAX_WARP_SPEED);
     }
 

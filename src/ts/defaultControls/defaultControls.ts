@@ -27,7 +27,7 @@ import { Quaternion } from "@babylonjs/core/Maths/math";
 import { LocalDirection } from "../uberCore/localDirections";
 import { DefaultControlsInputs } from "./defaultControlsInputs";
 import { Settings } from "../settings";
-import { Scalar } from "@babylonjs/core/Maths/math.scalar";
+import { lerpSmooth } from "../utils/math";
 
 export class DefaultControls implements Controls {
     private readonly transform: TransformNode;
@@ -62,11 +62,11 @@ export class DefaultControls implements Controls {
     }
 
     public update(deltaSeconds: number): Vector3 {
-        const inertiaFactor = Scalar.Clamp(deltaSeconds * 10, 0, 1);
+        const inertiaHalfLifeSeconds = 0.07;
 
-        this.rotationInertia.x = Scalar.Lerp(this.rotationInertia.x, DefaultControlsInputs.map.roll.value, inertiaFactor);
-        this.rotationInertia.y = Scalar.Lerp(this.rotationInertia.y, DefaultControlsInputs.map.pitch.value, inertiaFactor);
-        this.rotationInertia.z = Scalar.Lerp(this.rotationInertia.z, DefaultControlsInputs.map.yaw.value, inertiaFactor);
+        this.rotationInertia.x = lerpSmooth(this.rotationInertia.x, DefaultControlsInputs.map.roll.value, inertiaHalfLifeSeconds, deltaSeconds);
+        this.rotationInertia.y = lerpSmooth(this.rotationInertia.y, DefaultControlsInputs.map.pitch.value, inertiaHalfLifeSeconds, deltaSeconds);
+        this.rotationInertia.z = lerpSmooth(this.rotationInertia.z, DefaultControlsInputs.map.yaw.value, inertiaHalfLifeSeconds, deltaSeconds);
 
         roll(this.transform, this.rotationInertia.x * this.rotationSpeed * deltaSeconds);
         pitch(this.transform, this.rotationInertia.y * this.rotationSpeed * deltaSeconds);
@@ -83,9 +83,9 @@ export class DefaultControls implements Controls {
 
         this.speed *= 1 + DefaultControlsInputs.map.changeSpeed.value / 20;
 
-        this.inertia.x = Scalar.Lerp(this.inertia.x, DefaultControlsInputs.map.move.value[0], inertiaFactor);
-        this.inertia.z = Scalar.Lerp(this.inertia.z, DefaultControlsInputs.map.move.value[1], inertiaFactor);
-        this.inertia.y = Scalar.Lerp(this.inertia.y, DefaultControlsInputs.map.upDown.value, inertiaFactor);
+        this.inertia.x = lerpSmooth(this.inertia.x, DefaultControlsInputs.map.move.value[0], inertiaHalfLifeSeconds, deltaSeconds);
+        this.inertia.z = lerpSmooth(this.inertia.z, DefaultControlsInputs.map.move.value[1], inertiaHalfLifeSeconds, deltaSeconds);
+        this.inertia.y = lerpSmooth(this.inertia.y, DefaultControlsInputs.map.upDown.value, inertiaHalfLifeSeconds, deltaSeconds);
 
         const displacement = Vector3.Zero();
 

@@ -36,9 +36,9 @@ import { LandingPadSize } from "../assets/procedural/landingPad/landingPad";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import { CameraShakeAnimation } from "../uberCore/transforms/animations/cameraShake";
 import { Tools } from "@babylonjs/core/Misc/tools";
-import { Lerp } from "@babylonjs/core/Maths/math.scalar.functions";
 import { quickAnimation } from "../uberCore/transforms/animations/quickAnimation";
 import { Observable } from "@babylonjs/core/Misc/observable";
+import { lerpSmooth } from "../utils/math";
 
 export class ShipControls implements Controls {
     private spaceship: Spaceship;
@@ -59,6 +59,8 @@ export class ShipControls implements Controls {
     readonly onToggleWarpDrive: Observable<boolean> = new Observable();
 
     readonly onCompleteLanding: Observable<void> = new Observable();
+
+    private readonly rotationInertia = Vector3.Zero();
 
     private readonly toggleWarpDriveHandler: () => void;
     private readonly landingHandler: () => void;
@@ -234,15 +236,18 @@ export class ShipControls implements Controls {
             spaceship.getWarpDrive().increaseThrottle(0.5 * deltaSeconds * SpaceShipControlsInputs.map.throttle.value);
         }
 
+        this.rotationInertia.x = lerpSmooth(this.rotationInertia.x, inputRoll, 0.07, deltaSeconds);
+        this.rotationInertia.y = lerpSmooth(this.rotationInertia.y, inputPitch, 0.07, deltaSeconds);
+
         if (!spaceship.isLanded()) {
-            roll(this.getTransform(), 2.0 * inputRoll * deltaSeconds);
-            yaw(this.getTransform(), -1.0 * inputRoll * deltaSeconds);
-            pitch(this.getTransform(), 3.0 * inputPitch * deltaSeconds);
+            roll(this.getTransform(), 2.0 * this.rotationInertia.x * deltaSeconds);
+            yaw(this.getTransform(), -1.0 * this.rotationInertia.x * deltaSeconds);
+            pitch(this.getTransform(), 3.0 * this.rotationInertia.y * deltaSeconds);
         }
 
         this.targetFov = Tools.ToRadians(60 + 10 * spaceship.getThrottle());
 
-        this.thirdPersonCamera.fov = Lerp(this.thirdPersonCamera.fov, this.targetFov, 0.4);
+        this.thirdPersonCamera.fov = lerpSmooth(this.thirdPersonCamera.fov, this.targetFov, 0.08, deltaSeconds);
 
         this.getActiveCamera().getViewMatrix();
 
