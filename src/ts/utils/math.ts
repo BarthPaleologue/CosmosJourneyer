@@ -42,3 +42,16 @@ export function triangleWave(x: number) {
 export function remap(value: number, from1: number, to1: number, from2: number, to2: number) {
     return from2 + ((value - from1) * (to2 - from2)) / (to1 - from1);
 }
+
+/**
+ * Frame-rate independent lerp based on Freya Holmer's tweet.
+ * @param a The start value
+ * @param b The target value
+ * @param halfLife The half-life of the lerp (in seconds)
+ * @param deltaSeconds The time delta (in seconds)
+ * @returns The interpolated value
+ * @see https://x.com/FreyaHolmer/status/1757836988495847568
+ */
+export function lerpSmooth(a: number, b: number, halfLife: number, deltaSeconds: number) {
+    return b + (a - b) * 2 ** (-deltaSeconds / halfLife);
+}
