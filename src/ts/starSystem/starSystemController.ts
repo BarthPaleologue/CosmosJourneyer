@@ -107,6 +107,8 @@ export class StarSystemController {
     private loadingIndex = 0;
     private offset = 1e8;
 
+    private maxLoadingIndex = 0;
+
     /**
      * Creates a new star system controller from a given model and scene
      * Note that the star system is not loaded until the load method is called
@@ -119,11 +121,24 @@ export class StarSystemController {
         this.model = model;
     }
 
+    public getLoadingProgress(): number {
+        return this.loadingIndex / this.maxLoadingIndex;
+    }
+
     /**
      * Loads the star system from the underlying data model.
      * This instantiates all stars, planets, satellites, anomalies and space stations in the star system.
      */
     public async load() {
+        let numberOfObjects = 0;
+        for (const subSystem of this.model.subSystems) {
+            numberOfObjects += subSystem.stellarObjects.length + subSystem.anomalies.length + subSystem.orbitalFacilities.length;
+            for(const planetarySystem of subSystem.planetarySystems) {
+                numberOfObjects += planetarySystem.planets.length + planetarySystem.satellites.length + planetarySystem.orbitalFacilities.length;
+            }
+        }
+        this.maxLoadingIndex = numberOfObjects;
+
         await wait(1000);
         for (const subSystem of this.model.subSystems) {
             this.subSystems.push(await this.loadSubSystem(subSystem));

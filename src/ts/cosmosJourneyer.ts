@@ -328,6 +328,8 @@ export class CosmosJourneyer {
 
             this.player.timePlayedSeconds += deltaSeconds;
 
+            (this.engine.loadingScreen as LoadingScreen).setProgressPercentage(this.starSystemView.getStarSystem().getLoadingProgress() * 100);
+
             this.autoSaveTimerSeconds += deltaSeconds;
             if (this.autoSaveTimerSeconds >= this.autoSavePeriodSeconds) {
                 this.autoSaveTimerSeconds %= this.autoSavePeriodSeconds;

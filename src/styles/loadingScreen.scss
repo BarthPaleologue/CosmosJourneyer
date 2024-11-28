@@ -1,49 +1,74 @@
 #babylonjsLoadingDiv {
-  opacity: 0;
-  transition: opacity 1.5s ease;
-  pointer-events: none;
-  display: grid;
-  grid-template-rows: 100%;
-  grid-template-columns: 100%;
-  justify-items: center;
-  align-items: center;
-  z-index: 100;
-}
+    opacity: 0;
+    transition: opacity 1.5s ease;
+    pointer-events: none;
+    display: grid;
+    grid-template-rows: 100%;
+    grid-template-columns: 100%;
+    justify-items: center;
+    align-items: center;
+    z-index: 100;
+    background-image: url(../asset/loadingScreens/loadingScreen1.webp) !important;
+    background-size: cover;
 
-.imageSpinnerContainer {
-  width: 300px;
-  grid-column: 1;
-  grid-row: 1;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  position: absolute;
+    h1 {
+        position: absolute;
+        top: 0;
+    }
 
-  .loadingSpinner {
-    animation: spin1 0.75s infinite linear;
-    transform-origin: 50% 50%;
-  }
+    --column-gap: 1vw;
+    --logoSize: 5vw;
+    --progressBarHeight: 0.5vmin;
+
+    .progressBarContainer {
+        position: absolute;
+        bottom: 3%;
+        width: 70%;
+        display: flex;
+        align-items: center;
+        column-gap: var(--column-gap);
+        margin-left: calc(var(--logoSize) + var(--logoSize));
+    }
+
+    .progressBar {
+        --progress: 0;
+        flex-grow: 1;
+        height: var(--progressBarHeight);
+        background: linear-gradient(to right, rgba(255, 255, 255, 0.9) var(--progress), rgba(0, 0, 0, 0.9) var(--progress));
+    }
+
+    .imageSpinnerContainer {
+        width: var(--logoSize);
+        position: relative;
+
+        .loadingSpinner {
+            animation: spin1 0.75s infinite linear;
+            transform-origin: 50% 50%;
+        }
+    }
 }
 
 .loadingText {
-  margin-top: 160px;
-  font-family: Nasalization, sans-serif;
-  font-size: 1.5em;
-  color: white;
-  z-index: 1;
-  text-align: center;
+    margin-top: 160px;
+    font-family: Nasalization, sans-serif;
+    font-size: 1.5em;
+    color: white;
+    z-index: 1;
+    text-align: center;
 
-  position: absolute;
-  left: 0;
-  width: 100%;
-  top: 50%;
+    position: absolute;
+    left: 0;
+    width: 100%;
+    top: 50%;
+
+    display: none;
 }
 
 @keyframes spin1 {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
