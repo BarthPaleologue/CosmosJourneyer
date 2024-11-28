@@ -17,6 +17,15 @@
 
 @use "variables";
 
+h1 {
+  font-family: 'Nasalization', sans-serif;
+  font-size: 13vmin;
+  text-align: center;
+  color: white;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+  transition: 0.1s;
+}
+
 #mainMenu {
   position: absolute;
   width: 100vw;
@@ -25,15 +34,6 @@
   z-index: 42;
 
   display: none;
-
-  h1 {
-    font-family: 'Nasalization', sans-serif;
-    font-size: 13vmin;
-    text-align: center;
-    color: white;
-    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-    transition: 0.1s;
-  }
 
   #version {
     position: absolute;
