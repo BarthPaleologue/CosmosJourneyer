@@ -3,5 +3,9 @@
     "getCloserToTarget": "Approchez vous de {{objectName}}",
     "here": "ici",
     "accept": "Accepter",
-    "accepted": "Acceptée"
+    "accepted": "Acceptée",
+    "noActiveMission": "Pas de mission active",
+    "whereToGetMissions": "Vous pouvez obtenir des missions dans les stations spatiales.",
+    "next": "Suivant",
+    "previous": "Précédent"
 }

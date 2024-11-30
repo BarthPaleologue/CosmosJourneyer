@@ -3,5 +3,9 @@
     "getCloserToTarget": "Fly closer to {{objectName}}",
     "here": "here",
     "accept": "Accept",
-    "accepted": "Accepted"
+    "accepted": "Accepted",
+    "noActiveMission": "No active mission",
+    "whereToGetMissions": "You can get missions at space stations.",
+    "next": "Next",
+    "previous": "Previous"
 }

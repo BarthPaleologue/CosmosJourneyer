@@ -22,6 +22,7 @@ import { MissionContext } from "../missions/missionContext";
 import { pressInteractionToStrings } from "../utils/strings/inputControlsString";
 import { Sounds } from "../assets/sounds";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
+import i18n from "../i18n";
 
 export class CurrentMissionDisplay {
     readonly rootNode: HTMLElement;
@@ -69,7 +70,7 @@ export class CurrentMissionDisplay {
         this.buttonContainer.appendChild(this.previousMissionButton);
 
         const previousSpan = document.createElement("span");
-        previousSpan.innerText = "Previous";
+        previousSpan.innerText = i18n.t("missions:common:previous");
         this.previousMissionButton.appendChild(previousSpan);
 
         this.missionCounter = document.createElement("p");
@@ -79,7 +80,7 @@ export class CurrentMissionDisplay {
         this.buttonContainer.appendChild(this.nextMissionButton);
 
         const nextSpan = document.createElement("span");
-        nextSpan.innerText = "Next";
+        nextSpan.innerText = i18n.t("missions:common:next");
         this.nextMissionButton.appendChild(nextSpan);
 
         getGlobalKeyboardLayoutMap().then((keyboardLayoutMap) => {
@@ -190,8 +191,8 @@ export class CurrentMissionDisplay {
     }
 
     private setNoMissionActive() {
-        this.missionPanelTitle.innerText = "No active mission";
-        this.missionPanelDescription.innerText = "You can get missions at space stations.";
+        this.missionPanelTitle.innerText = i18n.t("missions:common:noActiveMission");
+        this.missionPanelDescription.innerText = i18n.t("missions:common:whereToGetMissions");
         this.missionCounter.innerText = "0/0";
     }
 
