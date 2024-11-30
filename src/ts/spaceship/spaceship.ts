@@ -38,7 +38,7 @@ import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { HyperSpaceTunnel } from "../utils/hyperSpaceTunnel";
 import { AudioInstance } from "../utils/audioInstance";
 import { AudioManager } from "../audio/audioManager";
-import { MainThruster } from "./mainThruster";
+import { Thruster } from "./thruster";
 import { AudioMasks } from "../audio/audioMasks";
 import { Objects } from "../assets/objects";
 import { Sounds } from "../assets/sounds";
@@ -114,7 +114,7 @@ export class Spaceship implements Transformable {
 
     private targetLandingPad: LandingPad | null = null;
 
-    private mainThrusters: MainThruster[] = [];
+    private mainThrusters: Thruster[] = [];
 
     readonly fuelTanks: FuelTank[];
 
@@ -140,6 +140,8 @@ export class Spaceship implements Transformable {
 
     readonly onTakeOff = new Observable<void>();
 
+    readonly boundingExtent: Vector3;
+
     private constructor(serializedSpaceShip: SerializedSpaceship, scene: Scene) {
         this.name = serializedSpaceShip.name;
 
@@ -157,7 +159,7 @@ export class Spaceship implements Transformable {
         );
         for (const child of this.instanceRoot.getChildMeshes()) {
             if (child.name.includes("mainThruster")) {
-                const mainThruster = new MainThruster(child, getForwardDirection(this.instanceRoot).negate(), this.aggregate);
+                const mainThruster = new Thruster(child, getForwardDirection(this.instanceRoot).negate(), this.aggregate);
                 this.mainThrusters.push(mainThruster);
                 continue;
             }
@@ -187,6 +189,10 @@ export class Spaceship implements Transformable {
         this.fuelTanks = serializedSpaceShip.fuelTanks.map((tank) => FuelTank.Deserialize(tank));
 
         this.fuelScoop = serializedSpaceShip.fuelScoop;
+
+        const {min: boundingMin, max: boundingMax} = this.getTransform().getHierarchyBoundingVectors();
+
+        this.boundingExtent = boundingMax.subtract(boundingMin);
 
         AudioManager.RegisterSound(this.enableWarpDriveSound);
         AudioManager.RegisterSound(this.disableWarpDriveSound);
@@ -351,7 +357,7 @@ export class Spaceship implements Transformable {
         this.getTransform().setParent(null);
         this.engageLandingOnPad(landingPad);
         this.getTransform().rotationQuaternion = Quaternion.Identity();
-        this.getTransform().position.copyFromFloats(0, 1.5, 0);
+        this.getTransform().position.copyFromFloats(0, this.boundingExtent.y / 2, 0);
         this.getTransform().parent = landingPad.getTransform();
         this.completeLanding();
     }
@@ -407,7 +413,7 @@ export class Spaceship implements Transformable {
                     rotate(this.getTransform(), axis, Math.min(0.4 * deltaTime, theta));
                 }
 
-                if (Math.abs(distance) < 0.3 && Math.abs(theta) < 0.01) {
+                if (Math.abs(distance) < this.boundingExtent.y / 2 && Math.abs(theta) < 0.01) {
                     this.completeLanding();
                 }
             }
@@ -437,7 +443,7 @@ export class Spaceship implements Transformable {
 
         this.aggregate.body.setLinearVelocity(directionToTarget.scale(Math.min(Math.max(1, distance), 20)));
 
-        if (distance < 3.0) {
+        if (distance <= (landingPad.padHeight + this.boundingExtent.y) / 2) {
             this.completeLanding();
             return;
         }

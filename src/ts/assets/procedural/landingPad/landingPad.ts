@@ -34,6 +34,8 @@ export class LandingPad implements Targetable {
 
     readonly targetInfo: TargetInfo;
 
+    readonly padHeight = 0.5;
+
     constructor(padNumber: number, padSize: LandingPadSize, scene: Scene) {
         this.padSize = padSize;
 
@@ -51,7 +53,7 @@ export class LandingPad implements Targetable {
             {
                 width: width,
                 depth: depth,
-                height: 0.5
+                height: this.padHeight
             },
             scene
         );
