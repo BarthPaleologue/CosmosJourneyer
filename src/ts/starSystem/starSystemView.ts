@@ -73,6 +73,7 @@ import { OrbitalObjectType } from "../architecture/orbitalObject";
 import { OrbitalFacility } from "../spacestation/orbitalFacility";
 import { getStarGalacticPosition } from "../utils/coordinates/starSystemCoordinatesUtils";
 import { Spaceship } from "../spaceship/spaceship";
+import { Inspector } from '@babylonjs/inspector';
 
 // register cosmos journeyer as part of window object
 declare global {
@@ -347,7 +348,7 @@ export class StarSystemView implements View {
                 characterControls.getTransform().setEnabled(true);
                 CharacterInputs.setEnabled(true);
                 characterControls.getTransform().setAbsolutePosition(shipControls.getTransform().absolutePosition);
-                translate(characterControls.getTransform(), getForwardDirection(shipControls.getTransform()).scale(10));
+                translate(characterControls.getTransform(), getForwardDirection(shipControls.getTransform()).scale(3 + shipControls.getSpaceship().boundingExtent.z / 2));
 
                 setRotationQuaternion(characterControls.getTransform(), getRotationQuaternion(shipControls.getTransform()).clone());
                 SpaceShipControlsInputs.setEnabled(false);
@@ -427,14 +428,12 @@ export class StarSystemView implements View {
         });
 
         this.targetCursorLayer = new TargetCursorLayer();
-
-        /*
+        
         const inspectorRoot = document.getElementById("inspectorLayer");
         if(inspectorRoot === null) throw new Error("Inspector root not found");
-        Inspector.Show(this.scene, {
+        /*Inspector.Show(this.scene, {
             globalRoot: inspectorRoot,
-        });
-        */
+        });*/
 
         window.starSystemView = this;
     }

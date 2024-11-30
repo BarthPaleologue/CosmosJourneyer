@@ -15,14 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Vector3 } from "@babylonjs/core/Maths/math";
-import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { AbstractMesh, MeshBuilder } from "@babylonjs/core/Meshes";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { SolidPlume } from "../utils/solidPlume";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { Materials } from "../assets/materials";
 
-export abstract class AbstractThruster {
+export class Thruster {
+    protected readonly maxAuthority = 3e3;
+
     readonly mesh: AbstractMesh;
 
     readonly helperMesh: AbstractMesh;
@@ -33,22 +35,28 @@ export abstract class AbstractThruster {
 
     readonly parentAggregate: PhysicsAggregate;
 
-    protected constructor(mesh: AbstractMesh, direction: Vector3, parentAggregate: PhysicsAggregate) {
+    constructor(mesh: AbstractMesh, direction: Vector3, parentAggregate: PhysicsAggregate) {
         this.mesh = mesh;
 
         this.plume = new SolidPlume(mesh, mesh.getScene());
+        this.plume.solidParticleSystem.mesh.parent = mesh;
 
         this.parentAggregate = parentAggregate;
 
         const thrusterHelper = MeshBuilder.CreateCylinder(this.mesh.name + "Helper", { height: 0.5, diameterTop: 0, diameterBottom: 0.5 }, mesh.getScene());
-        const cubeMaterial = new StandardMaterial("cubeMat", mesh.getScene());
-        cubeMaterial.diffuseColor = Color3.White();
-        cubeMaterial.emissiveColor = Color3.White();
-        thrusterHelper.material = cubeMaterial;
+        thrusterHelper.material = Materials.DebugMaterial("ThrusterHelperMaterial", false, false, mesh.getScene());
         thrusterHelper.parent = mesh;
 
         this.helperMesh = thrusterHelper;
-        this.helperMesh.isVisible = false;
+        this.helperMesh.isVisible = true;
+    }
+
+    public setThrottle(throttle: number): void {
+        this.throttle = throttle;
+    }
+
+    public updateThrottle(delta: number): void {
+        this.throttle = Math.max(Math.min(1, this.throttle + delta), 0);
     }
 
     public getThrottle(): number {
@@ -57,7 +65,6 @@ export abstract class AbstractThruster {
 
     public update(deltaSeconds: number): void {
         this.plume.update(deltaSeconds);
-
         this.plume.setThrottle(this.throttle);
 
         if (this.throttle > 0) {
