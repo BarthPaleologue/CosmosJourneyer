@@ -91,6 +91,10 @@ export class Spaceship implements Transformable {
 
     private readonly thrusterForce = 8000;
 
+    readonly maxRollSpeed = 2.0;
+    readonly maxYawSpeed = 1.0;
+    readonly maxPitchSpeed = 3.0;
+
     /**
      * Maximum speed of the ship in m/s
      * @private
