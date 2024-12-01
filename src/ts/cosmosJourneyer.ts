@@ -57,6 +57,7 @@ import { getSystemModelFromCoordinates } from "./starSystem/modelFromCoordinates
 import { Tutorial } from "./tutorials/tutorial";
 import { StationLandingTutorial } from "./tutorials/stationLandingTutorial";
 import { promptModalBoolean } from "./utils/dialogModal";
+import { FuelScoopTutorial } from "./tutorials/fuelScoopTutorial";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -119,9 +120,16 @@ export class CosmosJourneyer {
             // in case something goes wrong during the jump, we want to save the player's progress
             this.createAutoSave();
         });
-        this.starSystemView.onAfterJump.add(() => {
+        this.starSystemView.onAfterJump.add(async () => {
             // always save the player's progress after a jump
             this.createAutoSave();
+
+            if (!this.player.tutorials.fuelScoopingCompleted) {
+                await this.tutorialLayer.setTutorial(FuelScoopTutorial);
+                this.tutorialLayer.onQuitTutorial.addOnce(() => {
+                    this.player.tutorials.fuelScoopingCompleted = true;
+                });
+            }
         });
 
         // Init starmap view
@@ -152,7 +160,7 @@ export class CosmosJourneyer {
 
         this.mainMenu = new MainMenu(this.sidePanels, starSystemView);
         this.mainMenu.onStartObservable.add(async () => {
-            this.tutorialLayer.setTutorial(FlightTutorial.getTitle(), await FlightTutorial.getContentPanelsHtml());
+            await this.tutorialLayer.setTutorial(FlightTutorial);
             this.starSystemView.switchToSpaceshipControls();
             this.createAutoSave();
         });
@@ -172,7 +180,7 @@ export class CosmosJourneyer {
             if (isWarpDriveEnabled) return;
             if (this.starSystemView.getSpaceshipControls().getClosestLandableFacility() === null) return;
             if (this.player.tutorials.stationLandingCompleted) return;
-            this.tutorialLayer.setTutorial(StationLandingTutorial.getTitle(), await StationLandingTutorial.getContentPanelsHtml());
+            await this.tutorialLayer.setTutorial(StationLandingTutorial);
             this.tutorialLayer.onQuitTutorial.addOnce(() => {
                 this.player.tutorials.stationLandingCompleted = true;
             });
@@ -528,7 +536,7 @@ export class CosmosJourneyer {
             this.mainMenu.hide();
             await this.loadSaveData(tutorial.saveData);
             this.resume();
-            this.tutorialLayer.setTutorial(tutorial.getTitle(), await tutorial.getContentPanelsHtml());
+            await this.tutorialLayer.setTutorial(tutorial);
             this.starSystemView.setUIEnabled(true);
 
             const targetObject = getObjectBySystemId(tutorial.saveData.universeCoordinates.universeObjectId, this.starSystemView.getStarSystem());
