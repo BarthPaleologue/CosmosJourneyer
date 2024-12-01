@@ -17,7 +17,7 @@
 
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { getUpwardDirection, pitch, roll, yaw } from "../uberCore/transforms/basicTransform";
+import { getForwardDirection, getRightDirection, getUpwardDirection, pitch, roll, yaw } from "../uberCore/transforms/basicTransform";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Controls } from "../uberCore/controls";
 import { Camera } from "@babylonjs/core/Cameras/camera";
@@ -232,17 +232,37 @@ export class ShipControls implements Controls {
                     spaceship.aggregate.body.getObjectCenterWorld()
                 );
             }
+
+            if (!spaceship.isLanded()) {
+                const shipForward = getForwardDirection(this.getTransform());
+                const shipUp = getUpwardDirection(this.getTransform());
+                const shipRight = getRightDirection(this.getTransform());
+
+                const angularVelocity = spaceship.aggregate.body.getAngularVelocity();
+
+                const currentRoll = angularVelocity.dot(shipForward);
+                const targetRoll = this.spaceship.maxRollSpeed * inputRoll;
+                angularVelocity.addInPlace(shipForward.scale(0.5 * (targetRoll - currentRoll)));
+
+                const currentYaw = angularVelocity.dot(shipUp);
+                const targetYaw = -this.spaceship.maxYawSpeed * inputRoll;
+                angularVelocity.addInPlace(shipUp.scale(0.5 * (targetYaw - currentYaw)));
+
+                const currentPitch = angularVelocity.dot(shipRight);
+                const targetPitch = -this.spaceship.maxPitchSpeed * inputPitch;
+                angularVelocity.addInPlace(shipRight.scale(0.5 * (targetPitch - currentPitch)));
+
+                spaceship.aggregate.body.setAngularVelocity(angularVelocity);
+            }
         } else {
             spaceship.getWarpDrive().increaseThrottle(0.5 * deltaSeconds * SpaceShipControlsInputs.map.throttle.value);
-        }
 
-        this.rotationInertia.x = lerpSmooth(this.rotationInertia.x, inputRoll, 0.07, deltaSeconds);
-        this.rotationInertia.y = lerpSmooth(this.rotationInertia.y, inputPitch, 0.07, deltaSeconds);
+            this.rotationInertia.x = lerpSmooth(this.rotationInertia.x, inputRoll, 0.07, deltaSeconds);
+            this.rotationInertia.y = lerpSmooth(this.rotationInertia.y, inputPitch, 0.07, deltaSeconds);
 
-        if (!spaceship.isLanded()) {
-            roll(this.getTransform(), 2.0 * this.rotationInertia.x * deltaSeconds);
-            yaw(this.getTransform(), -1.0 * this.rotationInertia.x * deltaSeconds);
-            pitch(this.getTransform(), 3.0 * this.rotationInertia.y * deltaSeconds);
+            roll(this.getTransform(), this.spaceship.maxRollSpeed * this.rotationInertia.x * deltaSeconds);
+            yaw(this.getTransform(), -this.spaceship.maxYawSpeed * this.rotationInertia.x * deltaSeconds);
+            pitch(this.getTransform(), this.spaceship.maxPitchSpeed * this.rotationInertia.y * deltaSeconds);
         }
 
         this.targetFov = Tools.ToRadians(60 + 10 * spaceship.getThrottle());
