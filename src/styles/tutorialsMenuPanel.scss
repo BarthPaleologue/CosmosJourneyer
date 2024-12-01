@@ -4,7 +4,6 @@
   .tutorialsMenuContainer {
     display: flex;
     justify-content: center;
-    width: 100%;
     padding: 0 20px 20px 20px;
     align-items: stretch;
     column-gap: 20px;
@@ -14,14 +13,12 @@
     &>* {
       width: $tileWidth;
       background: rgba(0, 0, 0, 0.8);
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.1) inset, 0 0 10px rgba(255, 255, 255, 0.1);
+      box-shadow: 0 0 5px rgba(255, 255, 255, 0.5) inset;
 
       transition: 0.2s;
 
-      border-radius: 20px;
-
       &:hover {
-        box-shadow: 0 0 10px rgba(255, 255, 255, 0.5) inset, 0 0 10px rgba(255, 255, 255, 0.5);
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.8) inset;
         cursor: pointer;
       }
     }

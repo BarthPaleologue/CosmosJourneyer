@@ -1,0 +1,8 @@
+{
+    "title": "Fuel Scooping",
+    "description": "Learn how to manage your fuel in space.",
+    "welcome": "Welcome, Commander! This tutorial will teach you how to avoid running out of fuel during your exploration.",
+    "whatIsFuel": "All ships consume fuel to travel through space between stars. Without fuel, you could end up stranded far from any civilization!",
+    "whereFuelIcon": "Your ship's fuel level is indicated by the gauge at the bottom right of the interface (highlighted in yellow in the image above).\n\n The gauge is initially white and empties with each use of the frame shift drive. The further the destination, the more the gauge empties.",
+    "howToFuelScoop": "It is possible to collect fuel around stars and gas giants. To do this, fly as close as possible to the star and watch the fuel gauge increase."
+}
