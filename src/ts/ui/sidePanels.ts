@@ -41,9 +41,6 @@ export class SidePanels {
         this.tutorialsPanel = tutorialsPanel;
         this.tutorialsPanelContent = new TutorialsPanelContent();
         this.tutorialsPanel.appendChild(this.tutorialsPanelContent.htmlRoot);
-        this.tutorialsPanelContent.onTutorialSelected.add(() => {
-            this.hideActivePanel();
-        });
 
         const contributePanel = document.getElementById("contribute");
         if (contributePanel === null) throw new Error("#contribute does not exist!");

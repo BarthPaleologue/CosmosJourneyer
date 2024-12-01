@@ -56,6 +56,7 @@ import { getObjectBySystemId, getUniverseObjectId } from "./utils/coordinates/or
 import { getSystemModelFromCoordinates } from "./starSystem/modelFromCoordinates";
 import { Tutorial } from "./tutorials/tutorial";
 import { StationLandingTutorial } from "./tutorials/stationLandingTutorial";
+import { promptModalBoolean } from "./utils/dialogModal";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -157,6 +158,13 @@ export class CosmosJourneyer {
         });
 
         this.sidePanels.tutorialsPanelContent.onTutorialSelected.add(async (tutorial) => {
+            if (!this.mainMenu.isVisible()) {
+                // if the main menu is not visible, then we are in game and we need to ask the player if they want to leave their game
+                this.createAutoSave();
+                const shouldLoadTutorial = await promptModalBoolean(i18n.t("tutorials:common:loadTutorialWillLeaveGame"));
+                if (!shouldLoadTutorial) return;
+            }
+            this.sidePanels.hideActivePanel();
             await this.loadTutorial(tutorial);
         });
 
