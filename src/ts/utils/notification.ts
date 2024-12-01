@@ -106,7 +106,7 @@ export function createNotification(text: string, durationMillis: number) {
 export function warnIfUndefined<T>(value: T | undefined, defaultValue: T, message: string): T {
     if (value === undefined) {
         console.warn(message);
-        createNotification(message, 60_000);
+        createNotification(message, 10_000);
         return defaultValue;
     }
     return value;
