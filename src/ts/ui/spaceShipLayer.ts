@@ -66,7 +66,7 @@ export class SpaceShipLayer {
             const distanceToCenter = Math.sqrt((event.clientX - window.innerWidth / 2) ** 2 + (event.clientY - window.innerHeight / 2) ** 2);
             const normalizedDistance = Math.min(distanceToCenter / Math.min(window.innerWidth, window.innerHeight), 1);
 
-            this.cursor.style.opacity = `${smoothstep(0.1, 0.3, normalizedDistance)}`;
+            this.cursor.style.opacity = `${smoothstep(0.1, 0.2, normalizedDistance)}`;
         });
     }
 
