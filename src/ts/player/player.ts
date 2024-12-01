@@ -5,6 +5,7 @@ import { DefaultSerializedSpaceship, SerializedSpaceship, Spaceship } from "../s
 
 export type CompletedTutorials = {
     stationLandingCompleted: boolean;
+    fuelScoopingCompleted: boolean;
 };
 
 export type SerializedPlayer = {
@@ -13,7 +14,7 @@ export type SerializedPlayer = {
     name: string;
 
     balance: number;
-    
+
     creationDate: string;
 
     timePlayedSeconds: number;
@@ -83,8 +84,19 @@ export class Player {
 
         this.tutorials = warnIfUndefined(
             serializedPlayer.tutorials,
-            { stationLandingCompleted: false },
+            { stationLandingCompleted: false, fuelScoopingCompleted: false },
             `[PLAYER_DATA_WARNING] Tutorials were undefined. Defaulting to no tutorials completed`
+        );
+
+        this.tutorials.stationLandingCompleted = warnIfUndefined(
+            this.tutorials.stationLandingCompleted,
+            false,
+            `[PLAYER_DATA_WARNING] Station landing tutorial completed was undefined. Defaulting to false`
+        );
+        this.tutorials.fuelScoopingCompleted = warnIfUndefined(
+            this.tutorials.fuelScoopingCompleted,
+            false,
+            `[PLAYER_DATA_WARNING] Fuel scooping tutorial completed was undefined. Defaulting to false`
         );
     }
 
@@ -102,7 +114,8 @@ export class Player {
             completedMissions: [],
             spaceShips: [DefaultSerializedSpaceship],
             tutorials: {
-                stationLandingCompleted: false
+                stationLandingCompleted: false,
+                fuelScoopingCompleted: false
             }
         });
     }

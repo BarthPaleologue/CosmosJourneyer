@@ -1,0 +1,8 @@
+{
+    "title": "Gestion du carburant",
+    "description": "Apprenez à gérer votre carburant dans l'espace.",
+    "welcome": "Bienvenue, Commandant ! Ce tutoriel vous apprendra à éviter la panne sèche lors de votre exploration.",
+    "whatIsFuel": "Tous les vaisseaux consomment du carburant pour traverser l'espace entre les étoiles. Sans carburant, vous pourriez finir coincé loin de toute civilisation !",
+    "whereFuelIcon": "Le niveau de carburant de votre vaisseau est indiqué par la jauge en bas à droite de l'interface (encadrée en jaune dans l'image ci-dessus).\n\n La jauge est initialement blanche et se vide à chaque utilisation du moteur à distortion. Plus la destination est éloignée et plus la jauge se vide.",
+    "howToFuelScoop": "Il est possible de récolter du carburant autour des étoiles et des géantes gazeuses. Pour cela, volez au plus près de l'astre et observez la jauge de carburant augmenter."
+}

@@ -5,6 +5,7 @@ import { Sounds } from "../../assets/sounds";
 import { IDisposable } from "@babylonjs/core/scene";
 import { getGlobalKeyboardLayoutMap } from "../../utils/keyboardAPI";
 import { Observable } from "@babylonjs/core/Misc/observable";
+import { Tutorial } from "../../tutorials/tutorial";
 
 export class TutorialLayer implements IDisposable {
     private readonly layerRoot: HTMLDivElement;
@@ -121,10 +122,10 @@ export class TutorialLayer implements IDisposable {
         });
     }
 
-    public setTutorial(name: string, panels: string[]) {
+    public async setTutorial(tutorial: Tutorial) {
         if (this.isEnabled()) this.quitTutorial();
-        this.title.innerText = name;
-        this.tutorialPanelsHtml = panels;
+        this.title.innerText = tutorial.getTitle();
+        this.tutorialPanelsHtml = await tutorial.getContentPanelsHtml();
         this.currentPanelIndex = 0;
         this.updatePanelState();
         this.setEnabled(true);
