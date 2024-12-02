@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Scene } from "@babylonjs/core/scene";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import i18n from "../i18n";
@@ -31,6 +30,7 @@ import { getSystemModelFromCoordinates } from "../starSystem/modelFromCoordinate
 import { StarSystemModelUtils } from "../starSystem/starSystemModel";
 
 import { orbitalObjectTypeToDisplay } from "../utils/strings/orbitalObjectTypeToDisplay";
+import { Observable } from "@babylonjs/core/Misc/observable";
 
 export class StarMapUI {
     readonly htmlRoot: HTMLDivElement;
@@ -64,15 +64,17 @@ export class StarMapUI {
     readonly shortHandUIPlotItineraryButton: HTMLButtonElement;
     readonly shortHandUIBookmarkButton: StarMapBookmarkButton;
 
-    private selectedMesh: AbstractMesh | null = null;
-    private hoveredMesh: AbstractMesh | null = null;
-    private currentMesh: AbstractMesh | null = null;
+    private selectedSystem: StarSystemCoordinates | null = null;
+    private hoveredSystem: StarSystemCoordinates | null = null;
+    private currentSystem: StarSystemCoordinates | null = null;
 
     private systemIcons: SystemIcons[] = [];
 
     private readonly scene: Scene;
 
     private readonly player: Player;
+
+    readonly onSystemFocusObservable = new Observable<StarSystemCoordinates>();
 
     constructor(scene: Scene, player: Player) {
         this.scene = scene;
@@ -91,6 +93,10 @@ export class StarMapUI {
         this.selectedSystemCursor = document.createElement("div");
         this.selectedSystemCursor.classList.add("targetCursor", "rounded");
         this.selectedSystemCursorContainer.appendChild(this.selectedSystemCursor);
+        this.selectedSystemCursor.addEventListener("click", () => {
+            if (this.selectedSystem === null) return;
+            this.onSystemFocusObservable.notifyObservers(this.selectedSystem);
+        });
 
         this.hoveredSystemCursorContainer = document.createElement("div");
         this.hoveredSystemCursorContainer.classList.add("targetCursorRoot");
@@ -99,6 +105,10 @@ export class StarMapUI {
         this.hoveredSystemCursor = document.createElement("div");
         this.hoveredSystemCursor.classList.add("targetCursor", "rounded");
         this.hoveredSystemCursorContainer.appendChild(this.hoveredSystemCursor);
+        this.hoveredSystemCursor.addEventListener("click", () => {
+            if (this.hoveredSystem === null) return;
+            this.onSystemFocusObservable.notifyObservers(this.hoveredSystem);
+        });
 
         this.currentSystemCursorContainer = document.createElement("div");
         this.currentSystemCursorContainer.classList.add("targetCursorRoot");
@@ -107,6 +117,10 @@ export class StarMapUI {
         this.currentSystemCursor = document.createElement("div");
         this.currentSystemCursor.classList.add("targetCursor", "rounded", "target");
         this.currentSystemCursorContainer.appendChild(this.currentSystemCursor);
+        this.currentSystemCursor.addEventListener("click", () => {
+            if (this.currentSystem === null) return;
+            this.onSystemFocusObservable.notifyObservers(this.currentSystem);
+        });
 
         this.cursor = document.createElement("div");
         this.cursor.classList.add("targetCursor");
@@ -223,17 +237,22 @@ export class StarMapUI {
         });
 
         // disable the plot itinerary button if the selected mesh is the current mesh
-        this.shortHandUIPlotItineraryButton.disabled = this.selectedMesh === this.currentMesh;
+        this.shortHandUIPlotItineraryButton.disabled =
+            this.selectedSystem !== null && this.currentSystem !== null && starSystemCoordinatesEquals(this.selectedSystem, this.currentSystem);
 
         const scalingBase = 100;
         const minScale = 5.0;
-        if (this.selectedMesh !== null) {
-            const selectedMeshScreenCoordinates = Vector3.Project(this.selectedMesh.position, Matrix.IdentityReadOnly, camera.getTransformationMatrix(), camera.viewport);
-            this.selectedSystemCursor.classList.toggle("transparent", selectedMeshScreenCoordinates.z < 0 || this.selectedMesh === this.currentMesh);
+        if (this.selectedSystem !== null) {
+            const selectedSystemWorldPosition = getStarGalacticPosition(this.selectedSystem).addInPlace(centerOfUniversePosition);
+            const selectedMeshScreenCoordinates = Vector3.Project(selectedSystemWorldPosition, Matrix.IdentityReadOnly, camera.getTransformationMatrix(), camera.viewport);
+            this.selectedSystemCursorContainer.classList.toggle(
+                "transparent",
+                selectedMeshScreenCoordinates.z < 0 || (this.currentSystem !== null && starSystemCoordinatesEquals(this.selectedSystem, this.currentSystem))
+            );
             this.selectedSystemCursorContainer.style.left = `${selectedMeshScreenCoordinates.x * 100}vw`;
             this.selectedSystemCursorContainer.style.top = `${selectedMeshScreenCoordinates.y * 100}vh`;
 
-            const distance = Vector3.Distance(this.selectedMesh.getAbsolutePosition(), playerPosition);
+            const distance = Vector3.Distance(selectedSystemWorldPosition, playerPosition);
             const scale = Math.max(minScale, scalingBase / distance);
             this.selectedSystemCursorContainer.style.setProperty("--dim", `${scale}vh`);
 
@@ -244,63 +263,50 @@ export class StarMapUI {
             this.shortHandUI.style.transform = `translate(calc(${(selectedMeshScreenCoordinates.x * width).toFixed(0)}px + ${xOffset}px), calc(${(selectedMeshScreenCoordinates.y * height).toFixed(0)}px - 50%))`;
         } else {
             this.shortHandUI.style.visibility = "hidden";
-            this.selectedSystemCursor.classList.add("transparent");
+            this.selectedSystemCursorContainer.classList.add("transparent");
         }
 
-        if (this.hoveredMesh !== null && this.hoveredMesh !== this.currentMesh) {
-            const meshScreenCoordinates = Vector3.Project(this.hoveredMesh.position, Matrix.IdentityReadOnly, camera.getTransformationMatrix(), camera.viewport);
-            this.hoveredSystemCursor.classList.toggle("transparent", meshScreenCoordinates.z < 0);
+        if (this.hoveredSystem !== null && this.currentSystem !== null && !starSystemCoordinatesEquals(this.hoveredSystem, this.currentSystem)) {
+            const hoveredSystemWorldPosition = getStarGalacticPosition(this.hoveredSystem).addInPlace(centerOfUniversePosition);
+            const meshScreenCoordinates = Vector3.Project(hoveredSystemWorldPosition, Matrix.IdentityReadOnly, camera.getTransformationMatrix(), camera.viewport);
+            this.hoveredSystemCursorContainer.classList.toggle("transparent", meshScreenCoordinates.z < 0);
             this.hoveredSystemCursorContainer.style.left = `${meshScreenCoordinates.x * 100}vw`;
             this.hoveredSystemCursorContainer.style.top = `${meshScreenCoordinates.y * 100}vh`;
 
-            const distance = Vector3.Distance(this.hoveredMesh.getAbsolutePosition(), playerPosition);
+            const distance = Vector3.Distance(hoveredSystemWorldPosition, playerPosition);
             const scale = Math.max(minScale, scalingBase / distance);
             this.hoveredSystemCursorContainer.style.setProperty("--dim", `${scale}vh`);
         } else {
-            this.hoveredSystemCursor.classList.add("transparent");
+            this.hoveredSystemCursorContainer.classList.add("transparent");
         }
 
-        if (this.currentMesh !== null) {
-            const meshScreenCoordinates = Vector3.Project(this.currentMesh.position, Matrix.IdentityReadOnly, camera.getTransformationMatrix(), camera.viewport);
-            this.currentSystemCursor.classList.toggle("transparent", meshScreenCoordinates.z < 0);
+        if (this.currentSystem !== null) {
+            const currentSystemWorldPosition = getStarGalacticPosition(this.currentSystem).addInPlace(centerOfUniversePosition);
+            const meshScreenCoordinates = Vector3.Project(currentSystemWorldPosition, Matrix.IdentityReadOnly, camera.getTransformationMatrix(), camera.viewport);
+            this.currentSystemCursorContainer.classList.toggle("transparent", meshScreenCoordinates.z < 0);
             this.currentSystemCursorContainer.style.left = `${meshScreenCoordinates.x * 100}vw`;
             this.currentSystemCursorContainer.style.top = `${meshScreenCoordinates.y * 100}vh`;
 
-            const distance = Vector3.Distance(this.currentMesh.getAbsolutePosition(), playerPosition);
+            const distance = Vector3.Distance(currentSystemWorldPosition, playerPosition);
             const scale = Math.max(minScale, scalingBase / distance);
             this.currentSystemCursorContainer.style.setProperty("--dim", `${scale}vh`);
         } else {
-            this.currentSystemCursor.classList.add("transparent");
+            this.currentSystemCursorContainer.classList.add("transparent");
         }
     }
 
-    setSelectedMesh(mesh: AbstractMesh) {
-        const camera = this.scene.activeCamera;
-        if (camera === null) {
-            throw new Error("No active camera found");
-        }
-
-        this.selectedMesh = mesh;
+    setHoveredSystem(system: StarSystemCoordinates | null) {
+        if (system === this.currentSystem || system === this.selectedSystem) return;
+        this.hoveredSystem = system;
     }
 
-    setHoveredMesh(mesh: AbstractMesh | null) {
-        if (mesh === this.currentMesh || mesh === this.selectedMesh) return;
-        this.hoveredMesh = mesh;
-    }
-
-    setCurrentMesh(mesh: AbstractMesh | null) {
-        this.currentMesh = mesh;
-    }
-
-    getCurrentPickedMesh() {
-        return this.selectedMesh;
-    }
-
-    getCurrentHoveredMesh() {
-        return this.hoveredMesh;
+    setCurrentSystem(systemCoordinates: StarSystemCoordinates) {
+        this.currentSystem = systemCoordinates;
     }
 
     setSelectedSystem(targetSystemCoordinates: StarSystemCoordinates, currentSystemCoordinates: StarSystemCoordinates | null) {
+        this.selectedSystem = targetSystemCoordinates;
+
         const targetPosition = getStarGalacticPosition(targetSystemCoordinates);
 
         const targetSystemModel = getSystemModelFromCoordinates(targetSystemCoordinates);
@@ -350,10 +356,6 @@ export class StarMapUI {
             this.factions.textContent = `${i18n.t("starMap:factions")}: ${i18n.t("starMap:none")}`;
             this.shortHandUIFactions.textContent = `${i18n.t("starMap:factions")}: ${i18n.t("starMap:none")}`;
         }
-    }
-
-    detachUIFromMesh() {
-        this.selectedMesh = null;
     }
 
     rebuildSystemIcons() {

@@ -312,6 +312,7 @@ export class CosmosJourneyer {
 
     public pause(): void {
         if (this.isPaused()) return;
+        if (this.mainMenu.isVisible()) return;
         this.state = EngineState.PAUSED;
 
         if (this.activeView === this.starSystemView) this.starSystemView.stopBackgroundSounds();

@@ -8,7 +8,12 @@
   column-gap: max(3vh, 20px);
 
   translate: calc(var(--dim) * -0.5) -50%;
-  pointer-events: none;
+  transition: opacity 0.2s;
+
+  &.transparent {
+    opacity: 0;
+    pointer-events: none;
+  }
 
   .targetCursor {
     --s: max(2.0vmin, calc(var(--dim) * 0.4)); /* the size on the corner */
@@ -41,10 +46,6 @@
     &.target {
       outline-color: goldenrod;
       scale: 1.05;
-    }
-
-    &.transparent {
-      opacity: 0;
     }
   }
 
