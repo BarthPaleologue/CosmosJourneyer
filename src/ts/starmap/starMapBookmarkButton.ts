@@ -39,7 +39,7 @@ export class StarMapBookmarkButton {
 
     setSelectedSystemSeed(starSystemCoordinates: StarSystemCoordinates) {
         this.selectedSystemCoordinates = starSystemCoordinates;
-        this.isSelectedSystemBookmarked = this.player.systemBookmarks.find((bookmark) => !starSystemCoordinatesEquals(bookmark, starSystemCoordinates)) !== undefined;
+        this.isSelectedSystemBookmarked = this.player.systemBookmarks.find((bookmark) => starSystemCoordinatesEquals(bookmark, starSystemCoordinates)) !== undefined;
         this.rootNode.classList.toggle("bookmarked", this.isSelectedSystemBookmarked);
         this.rootNode.textContent = this.isSelectedSystemBookmarked ? i18n.t("starMap:bookmarked") : i18n.t("starMap:bookmark");
     }
