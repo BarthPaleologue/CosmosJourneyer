@@ -74,6 +74,9 @@ import { OrbitalFacility } from "../spacestation/orbitalFacility";
 import { getStarGalacticPosition } from "../utils/coordinates/starSystemCoordinatesUtils";
 import { Spaceship } from "../spaceship/spaceship";
 import { Inspector } from '@babylonjs/inspector';
+import { Transformable } from "../architecture/transformable";
+import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
+import { TypedObject } from "../architecture/typedObject";
 
 // register cosmos journeyer as part of window object
 declare global {
@@ -246,19 +249,7 @@ export class StarSystemView implements View {
 
         StarSystemInputs.map.setTarget.on("complete", () => {
             const closestObjectToCenter = this.targetCursorLayer.getClosestToScreenCenterOrbitalObject();
-
-            if (this.targetCursorLayer.getTarget() === closestObjectToCenter) {
-                this.spaceShipLayer.setTarget(null);
-                this.targetCursorLayer.setTarget(null);
-                Sounds.TARGET_UNLOCK_SOUND.play();
-                return;
-            }
-
-            if (closestObjectToCenter === null) return;
-
-            this.spaceShipLayer.setTarget(closestObjectToCenter.getTransform());
-            this.targetCursorLayer.setTarget(closestObjectToCenter);
-            Sounds.TARGET_LOCK_SOUND.play();
+            this.setTarget(closestObjectToCenter);
         });
 
         StarSystemInputs.map.jumpToSystem.on("complete", async () => {
@@ -888,6 +879,21 @@ export class StarSystemView implements View {
 
     public setUIEnabled(enabled: boolean) {
         this.isUiEnabled = enabled;
+    }
+
+    public setTarget(target: Transformable & HasBoundingSphere & TypedObject | null) {
+        if (this.targetCursorLayer.getTarget() === target) {
+            this.spaceShipLayer.setTarget(null);
+            this.targetCursorLayer.setTarget(null);
+            Sounds.TARGET_UNLOCK_SOUND.play();
+            return;
+        }
+
+        if (target === null) return;
+
+        this.spaceShipLayer.setTarget(target.getTransform());
+        this.targetCursorLayer.setTarget(target);
+        Sounds.TARGET_LOCK_SOUND.play();
     }
 
     /**

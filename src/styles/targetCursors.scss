@@ -10,6 +10,8 @@
   translate: calc(var(--dim) * -0.5) -50%;
   transition: opacity 0.2s;
 
+  cursor: none;
+
   &.transparent {
     opacity: 0;
     pointer-events: none;
