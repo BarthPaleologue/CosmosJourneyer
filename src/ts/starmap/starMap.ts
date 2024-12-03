@@ -520,7 +520,7 @@ export class StarMap implements View {
 
                 this.selectedSystemCoordinates = starSystemCoordinates;
 
-                this.focusCameraOnStar(initializedInstance);
+                this.focusOnSystem(starSystemCoordinates);
             })
         );
 
@@ -530,10 +530,17 @@ export class StarMap implements View {
         else this.loadedStarSectors.get(data.sectorString)?.starInstances.push(initializedInstance);
     }
 
-    private focusCameraOnStar(starInstance: InstancedMesh, skipAnimation = false) {
+    public focusOnCurrentSystem(skipAnimation = false) {
+        if (this.currentSystemCoordinates === null) return console.warn("No current system seed!");
+        this.focusOnSystem(this.currentSystemCoordinates);
+    }
+
+    public focusOnSystem(starSystemCoordinates: StarSystemCoordinates, skipAnimation = false) {
+        const starSystemPosition = getStarGalacticPosition(starSystemCoordinates).add(this.starMapCenterPosition);
+
         const cameraDir = this.controls.thirdPersonCamera.getDirection(Vector3.Forward(this.scene.useRightHandedSystem));
 
-        const cameraToStarDir = starInstance.position.subtract(this.controls.thirdPersonCamera.globalPosition).normalize();
+        const cameraToStarDir = starSystemPosition.subtract(this.controls.thirdPersonCamera.globalPosition).normalize();
 
         const rotationAngle = Math.acos(Vector3.Dot(cameraDir, cameraToStarDir));
 
@@ -541,15 +548,15 @@ export class StarMap implements View {
 
         // if the rotation axis has a length different from 1, it means the cross product was made between very close vectors : no rotation is needed
         if (skipAnimation) {
-            this.controls.getTransform().lookAt(starInstance.position);
+            this.controls.getTransform().lookAt(starSystemPosition);
             this.controls.getTransform().computeWorldMatrix(true);
         } else if (rotationAngle > 0.02) {
             const rotationAxis = Vector3.Cross(cameraDir, cameraToStarDir).normalize();
             this.rotationAnimation = new TransformRotationAnimation(this.controls.getTransform(), rotationAxis, rotationAngle, animationDurationSeconds);
         }
 
-        const transformToStarDir = starInstance.position.subtract(this.controls.getTransform().getAbsolutePosition()).normalize();
-        const distance = starInstance.position.subtract(this.controls.getTransform().getAbsolutePosition()).length();
+        const transformToStarDir = starSystemPosition.subtract(this.controls.getTransform().getAbsolutePosition()).normalize();
+        const distance = starSystemPosition.subtract(this.controls.getTransform().getAbsolutePosition()).length();
         const targetPosition = this.controls.getTransform().getAbsolutePosition().add(transformToStarDir.scaleInPlace(distance));
 
         // if the transform is already in the right position, do not animate
@@ -564,27 +571,9 @@ export class StarMap implements View {
             this.radiusAnimation = new CameraRadiusAnimation(this.controls.thirdPersonCamera, targetRadius, animationDurationSeconds);
         }
 
-        this.starMapUI.setHoveredSystem(null);
-    }
-
-    public focusOnCurrentSystem(skipAnimation = false) {
-        if (this.currentSystemCoordinates === null) return console.warn("No current system seed!");
-
-        const instance = this.coordinatesToInstanceMap.get(JSON.stringify(this.currentSystemCoordinates));
-        if (instance === undefined) throw new Error("The current system has no instance!");
-
-        this.starMapUI.setSelectedSystem(this.currentSystemCoordinates, this.currentSystemCoordinates);
-
-        this.focusCameraOnStar(instance, skipAnimation);
-    }
-
-    public focusOnSystem(starSystemCoordinates: StarSystemCoordinates) {
-        const instance = this.coordinatesToInstanceMap.get(JSON.stringify(starSystemCoordinates));
-        if (instance === undefined) throw new Error("The system has no instance!");
-
+        this.selectedSystemCoordinates = starSystemCoordinates;
         this.starMapUI.setSelectedSystem(starSystemCoordinates, this.currentSystemCoordinates);
-
-        this.focusCameraOnStar(instance);
+        this.starMapUI.setHoveredSystem(null);
     }
 
     private fadeIn(instance: InstancedMesh) {

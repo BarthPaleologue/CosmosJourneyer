@@ -8,14 +8,18 @@ export const enum SystemIconMask {
 export class SystemIcons {
     readonly htmlRoot: HTMLElement;
 
-    readonly systemCoordinates: StarSystemCoordinates;
+    private systemCoordinates: StarSystemCoordinates;
 
     private readonly bookmarkIcon: HTMLElement;
 
     private readonly missionIcon: HTMLElement;
 
+    private iconMask: number;
+
     constructor(starSystemCoordinates: StarSystemCoordinates, iconMask: number) {
         this.systemCoordinates = starSystemCoordinates;
+
+        this.iconMask = iconMask;
 
         this.htmlRoot = document.createElement("div");
         this.htmlRoot.classList.add("systemIcons");
@@ -33,18 +37,32 @@ export class SystemIcons {
         }
     }
 
-    update(iconMask: number): void {
-        if (iconMask & SystemIconMask.BOOKMARK) {
+    update(systemCoordinates: StarSystemCoordinates, iconMask: number): void {
+        this.systemCoordinates = systemCoordinates;
+
+        const doesDisplayBookmark = this.iconMask & SystemIconMask.BOOKMARK;
+        const shouldDisplayBookmark = iconMask & SystemIconMask.BOOKMARK;
+
+        if (shouldDisplayBookmark && !doesDisplayBookmark) {
             this.htmlRoot.appendChild(this.bookmarkIcon);
-        } else {
+        } else if (!shouldDisplayBookmark && doesDisplayBookmark) {
             this.bookmarkIcon.remove();
         }
 
-        if (iconMask & SystemIconMask.MISSION) {
+        const doesDisplayMission = this.iconMask & SystemIconMask.MISSION;
+        const shouldDisplayMission = iconMask & SystemIconMask.MISSION;
+
+        if (shouldDisplayMission && !doesDisplayMission) {
             this.htmlRoot.appendChild(this.missionIcon);
-        } else {
+        } else if (!shouldDisplayMission && doesDisplayMission) {
             this.missionIcon.remove();
         }
+
+        this.iconMask = iconMask;
+    }
+
+    getSystemCoordinates(): StarSystemCoordinates {
+        return this.systemCoordinates;
     }
 
     dispose() {

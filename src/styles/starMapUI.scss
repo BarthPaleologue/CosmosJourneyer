@@ -1,211 +1,222 @@
 @use "variables";
 
 @keyframes loadingAnimation {
-  0% {
-    background-position: 100% 0;
-  }
-  100% {
-    background-position: 0 0;
-  }
+    0% {
+        background-position: 100% 0;
+    }
+    100% {
+        background-position: 0 0;
+    }
 }
 
 .starMapUI {
-  cursor: none;
-  z-index: 30;
+    cursor: none;
+    z-index: 30;
 
-  .cursor {
-    position: absolute;
-    width: 2vh;
-    height: 2vh;
-    z-index: 31;
-    transform: translate(-50%, -50%);
-    outline: white 0.3vh solid;
-    background: rgba(0, 0, 0, 0.8);
-    border-radius: 50%;
-    pointer-events: none;
-    transform-origin: center;
-    scale: 1;
-    transition: scale variables.$transition-time variables.$bezier-overshoot;
-  }
-
-  .systemIcons {
-    position: absolute;
-    width: 30px;
-
-    display: flex;
-    flex-direction: column;
-
-    row-gap: 10px;
-
-    transform: translateY(-50%) translateX(calc(-100% - 25px));
-
-    &.transparent {
-      opacity: 0;
+    .cursor {
+        position: absolute;
+        width: 2vh;
+        height: 2vh;
+        z-index: 31;
+        transform: translate(-50%, -50%);
+        outline: white 0.3vh solid;
+        background: rgba(0, 0, 0, 0.8);
+        border-radius: 50%;
+        pointer-events: none;
+        transform-origin: center;
+        scale: 1;
+        transition: scale variables.$transition-time variables.$bezier-overshoot;
     }
 
-    .bookmarkIcon {
-      width: 100%;
-      aspect-ratio: 1;
+    .systemIcons {
+        position: absolute;
+        width: 30px;
 
-      background-image: url('../asset/icons/bookmark.webp');
-      background-size: contain;
-    }
+        display: flex;
+        flex-direction: column;
 
-    .missionIcon {
-      width: 100%;
-      aspect-ratio: 1;
+        row-gap: 10px;
 
-      background-image: url('../asset/icons/mission.webp');
-      background-size: contain;
-    }
-  }
+        transform: translateY(-50%) translateX(calc(-100% - 25px));
 
-  .shortHandUI {
-    position: absolute;
-    //background: rgba(0, 0, 0, 0.8);
-    //box-shadow: 0 0 10px rgba(0, 0, 0, 0.5), 0 0 10px rgba(255, 255, 255, 0.5) inset;
-    //backdrop-filter: $backdrop-blur;
-
-    display: flex;
-    row-gap: 1.0vmin;
-    flex-direction: column;
-
-    z-index: 5;
-
-    color: white;
-    font-family: variables.$main-font;
-    padding: 2vmin;
-
-    h2, p {
-      margin-block: 0;
-    }
-
-    h2 {
-      font-size: var(--h2-size);
-    }
-
-    p {
-      font-size: var(--text-size);
-    }
-
-    .buttonContainer {
-      display: flex;
-      column-gap: 0.5vmin;
-    }
-
-    button {
-      background: var(--accent-color);
-      outline: none;
-      border: none;
-      cursor: none;
-      color: white;
-      font-family: variables.$main-font;
-      padding: 1.0vmin;
-      font-size: var(--text-size);
-
-      transition: variables.$transition-time;
-
-      &:hover {
-        background: var(--accent-color-light);
-      }
-
-      &:disabled {
-        background: var(--disabled-color);
-        color: rgb(200, 200, 200);
-
-        &:hover {
-          background: var(--disabled-color);
+        div {
+            transition: 0.2s;
+            &:hover {
+                filter: brightness(1.2);
+            }
         }
 
-        &:active {
-          background: var(--disabled-color);
-        }
-      }
-
-      &:active {
-        background: var(--accent-color-dark);
-      }
-
-      &.bookmarked {
-        background: goldenrod;
-
-        &:active {
-          background: darkgoldenrod;
+        &.transparent {
+            opacity: 0;
         }
 
-        &:hover {
-          background: gold;
+        .bookmarkIcon {
+            width: 100%;
+            aspect-ratio: 1;
+
+            background-image: url("../asset/icons/bookmark.webp");
+            background-size: contain;
         }
-      }
 
-      &.loading {
-        // animate background with linear gradient going from accent color to light accent color to accent color again
-        background: linear-gradient(90deg, var(--accent-color), rgb(200, 200, 200), var(--accent-color)) 0 0 / 200% 100% no-repeat;
-        animation: loadingAnimation 1s infinite linear alternate;
-      }
-    }
-  }
+        .missionIcon {
+            width: 100%;
+            aspect-ratio: 1;
 
-  .starMapInfoPanel {
-    position: absolute;
-    height: 100vh;
-    width: 25vw;
-
-    overflow-y: auto;
-
-    box-shadow: 0 0 20px black;
-    background: rgba(0, 0, 0, 0.8);
-
-    display: flex;
-    flex-direction: column;
-
-    padding: 0 0.7vw;
-
-    color: white;
-    font-family: Nasalization, sans-serif;
-
-    h1, p {
-      margin-block: 0.5vh;
+            background-image: url("../asset/icons/mission.webp");
+            background-size: contain;
+        }
     }
 
-    .starMapInfoPanelStarPreview {
-      width: 15vmin;
-      height: 15vmin;
-      background: white;
-      align-self: center;
-      border-radius: 50%;
-      box-shadow: 0 0 30px white;
-      margin: 3vh 0;
+    .shortHandUI {
+        position: absolute;
+        //background: rgba(0, 0, 0, 0.8);
+        //box-shadow: 0 0 10px rgba(0, 0, 0, 0.5), 0 0 10px rgba(255, 255, 255, 0.5) inset;
+        //backdrop-filter: $backdrop-blur;
+
+        display: flex;
+        row-gap: 1vmin;
+        flex-direction: column;
+
+        z-index: 5;
+
+        color: white;
+        font-family: variables.$main-font;
+        padding: 2vmin;
+
+        h2,
+        p {
+            margin-block: 0;
+        }
+
+        h2 {
+            font-size: var(--h2-size);
+        }
+
+        p {
+            font-size: var(--text-size);
+        }
+
+        .buttonContainer {
+            display: flex;
+            column-gap: 0.5vmin;
+        }
+
+        button {
+            background: var(--accent-color);
+            outline: none;
+            border: none;
+            cursor: none;
+            color: white;
+            font-family: variables.$main-font;
+            padding: 1vmin;
+            font-size: var(--text-size);
+
+            transition: variables.$transition-time;
+
+            &:hover {
+                background: var(--accent-color-light);
+            }
+
+            &:disabled {
+                background: var(--disabled-color);
+                color: rgb(200, 200, 200);
+
+                &:hover {
+                    background: var(--disabled-color);
+                }
+
+                &:active {
+                    background: var(--disabled-color);
+                }
+            }
+
+            &:active {
+                background: var(--accent-color-dark);
+            }
+
+            &.bookmarked {
+                background: goldenrod;
+
+                &:active {
+                    background: darkgoldenrod;
+                }
+
+                &:hover {
+                    background: gold;
+                }
+            }
+
+            &.loading {
+                // animate background with linear gradient going from accent color to light accent color to accent color again
+                background: linear-gradient(90deg, var(--accent-color), rgb(200, 200, 200), var(--accent-color)) 0 0 / 200% 100% no-repeat;
+                animation: loadingAnimation 1s infinite linear alternate;
+            }
+        }
     }
 
-    .starMapInfoPanelTitle {
-      text-align: center;
-      font-size: var(--h1-size);
+    .starMapInfoPanel {
+        position: absolute;
+        height: 100vh;
+        width: 25vw;
+
+        overflow-y: auto;
+
+        box-shadow: 0 0 20px black;
+        background: rgba(0, 0, 0, 0.8);
+
+        display: flex;
+        flex-direction: column;
+
+        padding: 0 0.7vw;
+
+        color: white;
+        font-family: Nasalization, sans-serif;
+
+        z-index: 10;
+
+        h1,
+        p {
+            margin-block: 0.5vh;
+        }
+
+        .starMapInfoPanelStarPreview {
+            width: 15vmin;
+            height: 15vmin;
+            background: white;
+            align-self: center;
+            border-radius: 50%;
+            box-shadow: 0 0 30px white;
+            margin: 3vh 0;
+        }
+
+        .starMapInfoPanelTitle {
+            text-align: center;
+            font-size: var(--h1-size);
+        }
+
+        .starMapInfoPanelStarSector {
+            padding: 0 1vw;
+            font-size: var(--h2-size);
+            text-align: center;
+        }
+
+        h2 {
+            font-size: var(--h2-size);
+        }
+
+        p {
+            font-size: var(--text-size);
+        }
+
+        hr {
+            width: 100%;
+            margin: 1vh auto;
+            border: 0;
+            border-top: 1px solid white;
+        }
     }
 
-    .starMapInfoPanelStarSector {
-      padding: 0 1vw;
-      font-size: var(--h2-size);
-      text-align: center;
+    &.hidden {
+        display: none;
     }
-
-    h2 {
-      font-size: var(--h2-size);
-    }
-
-    p {
-      font-size: var(--text-size);
-    }
-
-    hr {
-      width: 100%;
-      margin: 1vh auto;
-      border: 0;
-      border-top: 1px solid white;
-    }
-  }
-
-  &.hidden {
-    display: none;
-  }
 }

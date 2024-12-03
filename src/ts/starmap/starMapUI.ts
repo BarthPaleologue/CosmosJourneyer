@@ -224,7 +224,7 @@ export class StarMapUI {
         this.rebuildSystemIcons();
 
         this.systemIcons.forEach((systemIcons) => {
-            const systemPosition = getStarGalacticPosition(systemIcons.systemCoordinates);
+            const systemPosition = getStarGalacticPosition(systemIcons.getSystemCoordinates());
             const systemUniversePosition = systemPosition.add(centerOfUniversePosition);
             const screenCoordinates = Vector3.Project(systemUniversePosition, Matrix.IdentityReadOnly, camera.getTransformationMatrix(), camera.viewport);
             systemIcons.htmlRoot.classList.toggle("transparent", screenCoordinates.z < 0);
@@ -371,13 +371,13 @@ export class StarMapUI {
         const systemIconsToKeep: SystemIcons[] = [];
 
         this.systemIcons.forEach((systemIcons) => {
-            const system = systemIcons.systemCoordinates;
+            const system = systemIcons.getSystemCoordinates();
             if (!systemsWithIcons.includes(system)) {
                 systemIcons.dispose();
                 return;
             }
 
-            systemIcons.update(SystemIcons.IconMaskForSystem(system, bookmarkedSystems, targetSystems));
+            systemIcons.update(system, SystemIcons.IconMaskForSystem(system, bookmarkedSystems, targetSystems));
 
             systemIconsToKeep.push(systemIcons);
             systemsWithIcons.splice(systemsWithIcons.indexOf(system), 1);
@@ -387,6 +387,10 @@ export class StarMapUI {
 
         systemsWithIcons.forEach((system) => {
             const icon = new SystemIcons(system, SystemIcons.IconMaskForSystem(system, bookmarkedSystems, targetSystems));
+            icon.htmlRoot.addEventListener("click", () => {
+                this.onSystemFocusObservable.notifyObservers(icon.getSystemCoordinates());
+            });
+            
             this.htmlRoot.appendChild(icon.htmlRoot);
             this.systemIcons.push(icon);
         });
