@@ -18,6 +18,7 @@
 import { StarSystemController } from "../starSystem/starSystemController";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
+import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates";
 
 /**
  * Describes information used by mission nodes to update their state
@@ -27,6 +28,10 @@ export type MissionContext = {
      * The current star system the player is in
      */
     currentSystem: StarSystemController;
+    /**
+     * The current itinerary of the player
+     */
+    currentItinerary: StarSystemCoordinates[];
     /**
      * The world position of the player
      */

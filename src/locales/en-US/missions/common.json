@@ -1,5 +1,7 @@
 {
-    "travelToTargetSystem": "Travel to {{systemName}} ({{distance}}). Press {{starMapKey}} to open the Star Map.",
+    "travelToTargetSystem": "Travel to {{systemName}} ({{distance}}).",
+    "openStarMap": "Press {{starMapKey}} to open the Star Map.",
+    "travelToNextSystem": "Continue your journey by passing through {{systemName}} ({{distance}}). There are {{nbJumps}} jumps left before reaching your destination.",
     "getCloserToTarget": "Fly closer to {{objectName}}",
     "here": "here",
     "accept": "Accept",

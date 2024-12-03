@@ -28,6 +28,7 @@ import { parseDistance } from "../../../../utils/strings/parseToStrings";
 import { pressInteractionToStrings } from "../../../../utils/strings/inputControlsString";
 import { GeneralInputs } from "../../../../inputs/generalInputs";
 import { getSystemModelFromCoordinates } from "../../../../starSystem/modelFromCoordinates";
+import { getGoToSystemInstructions } from "../../../common";
 
 const enum LandMissionState {
     NOT_IN_SYSTEM,
@@ -150,22 +151,11 @@ export class MissionTerminatorLandingNode implements MissionNode {
             return i18n.t("missions:terminatorLanding:missionCompleted");
         }
 
-        const targetSystemModel = getSystemModelFromCoordinates(this.targetSystemCoordinates);
-        const currentSystemModel = context.currentSystem.model;
-
-        const targetSystemPosition = getStarGalacticPosition(this.targetSystemCoordinates);
-        const currentSystemPosition = getStarGalacticPosition(currentSystemModel.coordinates);
-        const distance = Vector3.Distance(targetSystemPosition, currentSystemPosition);
-
         const targetObject = getObjectModelByUniverseId(this.objectId);
 
         switch (this.state) {
             case LandMissionState.NOT_IN_SYSTEM:
-                return i18n.t("missions:common:travelToTargetSystem", {
-                    systemName: targetSystemModel.name,
-                    distance: parseDistance(distance * Settings.LIGHT_YEAR),
-                    starMapKey: pressInteractionToStrings(GeneralInputs.map.toggleStarMap, keyboardLayout).join(` ${i18n.t("common:or")} `)
-                });
+                return getGoToSystemInstructions(context, this.targetSystemCoordinates, keyboardLayout);
             case LandMissionState.TOO_FAR_IN_SYSTEM:
                 return i18n.t("missions:terminatorLanding:getCloserToTerminator", {
                     objectName: targetObject.name

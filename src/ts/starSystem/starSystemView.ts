@@ -672,6 +672,7 @@ export class StarSystemView implements View {
         // update missions
         const missionContext: MissionContext = {
             currentSystem: starSystem,
+            currentItinerary: this.player.currentItinerary,
             playerPosition: this.scene.getActiveControls().getTransform().getAbsolutePosition(),
             physicsEngine: this.scene.getPhysicsEngine() as PhysicsEngineV2
         };
@@ -716,6 +717,7 @@ export class StarSystemView implements View {
 
         const missionContext: MissionContext = {
             currentSystem: starSystem,
+            currentItinerary: this.player.currentItinerary,
             playerPosition: activeControls.getTransform().getAbsolutePosition(),
             physicsEngine: this.scene.getPhysicsEngine() as PhysicsEngineV2
         };
