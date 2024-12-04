@@ -30,6 +30,7 @@ import { getSystemModelFromCoordinates } from "../../../../starSystem/modelFromC
 
 import { orbitalObjectTypeToDisplay } from "../../../../utils/strings/orbitalObjectTypeToDisplay";
 import { getGoToSystemInstructions } from "../../../common";
+import { OrbitalObjectType } from "../../../../architecture/orbitalObject";
 
 const enum FlyByState {
     NOT_IN_SYSTEM,
@@ -95,7 +96,27 @@ export class MissionFlyByNode implements MissionNode {
 
         const distance = Vector3.Distance(playerPosition, targetObject.getTransform().getAbsolutePosition());
 
-        const distanceThreshold = targetObject.getBoundingRadius() * 3;
+        let thresholdMultiplier = 1;
+        switch (targetObject.model.type) {
+            case OrbitalObjectType.STAR:
+            case OrbitalObjectType.TELLURIC_PLANET:
+            case OrbitalObjectType.TELLURIC_SATELLITE:
+            case OrbitalObjectType.GAS_PLANET:
+            case OrbitalObjectType.MANDELBULB:
+            case OrbitalObjectType.JULIA_SET:
+            case OrbitalObjectType.SPACE_STATION:
+            case OrbitalObjectType.SPACE_ELEVATOR:
+                thresholdMultiplier = 3;
+                break;
+            case OrbitalObjectType.NEUTRON_STAR:
+                thresholdMultiplier = 50;
+                break;
+            case OrbitalObjectType.BLACK_HOLE:
+                thresholdMultiplier = 10;
+                break;
+        }
+
+        const distanceThreshold = targetObject.getBoundingRadius() * thresholdMultiplier;
 
         if (distance < distanceThreshold) {
             this.state = FlyByState.CLOSE_ENOUGH;
