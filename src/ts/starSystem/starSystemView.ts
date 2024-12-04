@@ -492,7 +492,7 @@ export class StarSystemView implements View {
 
         const activeControls = this.scene.getActiveControls();
         let controllerDistanceFactor = 4;
-        if (firstBody instanceof BlackHole) controllerDistanceFactor = 5;
+        if (firstBody instanceof BlackHole) controllerDistanceFactor = 50;
         else if (firstBody instanceof NeutronStar) controllerDistanceFactor = 100_000;
         if (this.player.visitedSystemHistory.length === 0) {
             positionNearObjectBrightSide(activeControls, firstBody, starSystem, controllerDistanceFactor);
