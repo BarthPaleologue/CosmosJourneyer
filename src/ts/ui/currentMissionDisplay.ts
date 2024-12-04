@@ -129,10 +129,19 @@ export class CurrentMissionDisplay {
         if (this.activeMission === null && this.player.currentMissions.length !== 0) {
             this.setMission(this.player.currentMissions[0]);
         } else if (this.activeMission === null && allMissions.length !== 0) {
-            this.setMission(allMissions[0]);
+            const defaultMission = allMissions.at(0);
+            if (defaultMission !== undefined) this.setMission(defaultMission);
+            else this.setNoMissionActive();
         }
 
         if (this.activeMission === null) return;
+
+        if (allMissions.indexOf(this.activeMission) === -1) {
+            const defaultMission = allMissions.at(0);
+            if (defaultMission !== undefined) this.setMission(defaultMission);
+            else this.setNoMissionActive();
+            return;
+        }
 
         this.rootNode.classList.toggle("completed", this.activeMission.tree.isCompleted());
 
@@ -148,7 +157,10 @@ export class CurrentMissionDisplay {
         const allMissions = this.player.completedMissions.concat(this.player.currentMissions);
         const currentMissionIndex = allMissions.indexOf(this.activeMission);
         if (currentMissionIndex === -1) {
-            throw new Error("Could not find current mission in all missions");
+            const defaultMission = allMissions.at(0);
+            if (defaultMission !== undefined) this.setMission(defaultMission);
+            else this.setNoMissionActive();
+            return;
         }
 
         const nextMission = allMissions.at(currentMissionIndex + 1);
@@ -167,7 +179,10 @@ export class CurrentMissionDisplay {
         const allMissions = this.player.completedMissions.concat(this.player.currentMissions);
         const currentMissionIndex = allMissions.indexOf(this.activeMission);
         if (currentMissionIndex === -1) {
-            throw new Error("Could not find current mission in all missions");
+            const defaultMission = allMissions.at(0);
+            if (defaultMission !== undefined) this.setMission(defaultMission);
+            else this.setNoMissionActive();
+            return;
         }
 
         if (currentMissionIndex === 0) return;
@@ -191,9 +206,13 @@ export class CurrentMissionDisplay {
     }
 
     private setNoMissionActive() {
+        this.activeMission = null;
+
         this.missionPanelTitle.innerText = i18n.t("missions:common:noActiveMission");
         this.missionPanelDescription.innerText = i18n.t("missions:common:whereToGetMissions");
         this.missionCounter.innerText = "0/0";
+
+        this.rootNode.classList.remove("completed");
     }
 
     public dispose() {
