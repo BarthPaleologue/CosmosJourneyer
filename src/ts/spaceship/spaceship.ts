@@ -749,6 +749,9 @@ export class Spaceship implements Transformable {
         AudioManager.DisposeSound(this.deceleratingWarpDriveSound);
         AudioManager.DisposeSound(this.thrusterSound);
 
+        this.mainThrusters.forEach((thruster) => thruster.dispose());
+        this.mainThrusters.length = 0;
+
         this.warpTunnel.dispose();
         this.hyperSpaceTunnel.dispose();
         this.aggregate.dispose();

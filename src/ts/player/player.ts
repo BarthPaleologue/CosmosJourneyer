@@ -146,19 +146,18 @@ export class Player {
      * @param player the player to copy from
      */
     public copyFrom(player: Player) {
-        const playerClone = structuredClone(player);
-        this.uuid = playerClone.uuid;
-        this.name = playerClone.name;
-        this.balance = playerClone.balance;
-        this.creationDate = playerClone.creationDate;
-        this.timePlayedSeconds = playerClone.timePlayedSeconds;
-        this.visitedSystemHistory = playerClone.visitedSystemHistory;
-        this.currentItinerary = playerClone.currentItinerary;
-        this.systemBookmarks = playerClone.systemBookmarks;
-        this.currentMissions = playerClone.currentMissions;
-        this.completedMissions = playerClone.completedMissions;
-        this.serializedSpaceships = playerClone.serializedSpaceships;
-        this.instancedSpaceships = playerClone.instancedSpaceships;
-        this.tutorials = playerClone.tutorials;
+        this.uuid = player.uuid;
+        this.name = player.name;
+        this.balance = player.balance;
+        this.creationDate = new Date(player.creationDate);
+        this.timePlayedSeconds = player.timePlayedSeconds;
+        this.visitedSystemHistory = player.visitedSystemHistory.map((system) => structuredClone(system));
+        this.currentItinerary = player.currentItinerary.map((system) => structuredClone(system));
+        this.systemBookmarks = player.systemBookmarks.map((system) => structuredClone(system));
+        this.currentMissions = player.currentMissions.map(mission => Mission.Deserialize(mission.serialize()))
+        this.completedMissions = player.completedMissions.map(mission => Mission.Deserialize(mission.serialize()))
+        this.serializedSpaceships = player.serializedSpaceships.map((spaceship) => structuredClone(spaceship));
+        this.instancedSpaceships = [...player.instancedSpaceships];
+        this.tutorials = structuredClone(player.tutorials);
     }
 }

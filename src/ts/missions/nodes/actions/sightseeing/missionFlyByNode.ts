@@ -29,6 +29,8 @@ import { GeneralInputs } from "../../../../inputs/generalInputs";
 import { getSystemModelFromCoordinates } from "../../../../starSystem/modelFromCoordinates";
 
 import { orbitalObjectTypeToDisplay } from "../../../../utils/strings/orbitalObjectTypeToDisplay";
+import { getGoToSystemInstructions } from "../../../common";
+import { OrbitalObjectType } from "../../../../architecture/orbitalObject";
 
 const enum FlyByState {
     NOT_IN_SYSTEM,
@@ -94,7 +96,27 @@ export class MissionFlyByNode implements MissionNode {
 
         const distance = Vector3.Distance(playerPosition, targetObject.getTransform().getAbsolutePosition());
 
-        const distanceThreshold = targetObject.getBoundingRadius() * 3;
+        let thresholdMultiplier = 1;
+        switch (targetObject.model.type) {
+            case OrbitalObjectType.STAR:
+            case OrbitalObjectType.TELLURIC_PLANET:
+            case OrbitalObjectType.TELLURIC_SATELLITE:
+            case OrbitalObjectType.GAS_PLANET:
+            case OrbitalObjectType.MANDELBULB:
+            case OrbitalObjectType.JULIA_SET:
+            case OrbitalObjectType.SPACE_STATION:
+            case OrbitalObjectType.SPACE_ELEVATOR:
+                thresholdMultiplier = 3;
+                break;
+            case OrbitalObjectType.NEUTRON_STAR:
+                thresholdMultiplier = 50;
+                break;
+            case OrbitalObjectType.BLACK_HOLE:
+                thresholdMultiplier = 10;
+                break;
+        }
+
+        const distanceThreshold = targetObject.getBoundingRadius() * thresholdMultiplier;
 
         if (distance < distanceThreshold) {
             this.state = FlyByState.CLOSE_ENOUGH;
@@ -119,22 +141,11 @@ export class MissionFlyByNode implements MissionNode {
             return i18n.t("missions:flyBy:missionCompleted");
         }
 
-        const targetSystemModel = getSystemModelFromCoordinates(this.targetSystemCoordinates);
-        const currentSystemModel = context.currentSystem.model;
-
-        const targetSystemPosition = getStarGalacticPosition(this.targetSystemCoordinates);
-        const currentSystemPosition = getStarGalacticPosition(currentSystemModel.coordinates);
-        const distance = Vector3.Distance(targetSystemPosition, currentSystemPosition);
-
         const targetObject = getObjectModelByUniverseId(this.objectId);
 
         switch (this.state) {
             case FlyByState.NOT_IN_SYSTEM:
-                return i18n.t("missions:common:travelToTargetSystem", {
-                    systemName: targetSystemModel.name,
-                    distance: parseDistance(distance * Settings.LIGHT_YEAR),
-                    starMapKey: pressInteractionToStrings(GeneralInputs.map.toggleStarMap, keyboardLayout).join(` ${i18n.t("common:or")} `)
-                });
+                return getGoToSystemInstructions(context, this.targetSystemCoordinates, keyboardLayout);
             case FlyByState.TOO_FAR_IN_SYSTEM:
                 return i18n.t("missions:common:getCloserToTarget", {
                     objectName: targetObject.name

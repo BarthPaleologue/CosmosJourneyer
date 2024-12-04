@@ -74,6 +74,9 @@ import { OrbitalFacility } from "../spacestation/orbitalFacility";
 import { getStarGalacticPosition } from "../utils/coordinates/starSystemCoordinatesUtils";
 import { Spaceship } from "../spaceship/spaceship";
 import { Inspector } from '@babylonjs/inspector';
+import { Transformable } from "../architecture/transformable";
+import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
+import { TypedObject } from "../architecture/typedObject";
 
 // register cosmos journeyer as part of window object
 declare global {
@@ -246,19 +249,7 @@ export class StarSystemView implements View {
 
         StarSystemInputs.map.setTarget.on("complete", () => {
             const closestObjectToCenter = this.targetCursorLayer.getClosestToScreenCenterOrbitalObject();
-
-            if (this.targetCursorLayer.getTarget() === closestObjectToCenter) {
-                this.spaceShipLayer.setTarget(null);
-                this.targetCursorLayer.setTarget(null);
-                Sounds.TARGET_UNLOCK_SOUND.play();
-                return;
-            }
-
-            if (closestObjectToCenter === null) return;
-
-            this.spaceShipLayer.setTarget(closestObjectToCenter.getTransform());
-            this.targetCursorLayer.setTarget(closestObjectToCenter);
-            Sounds.TARGET_LOCK_SOUND.play();
+            this.setTarget(closestObjectToCenter);
         });
 
         StarSystemInputs.map.jumpToSystem.on("complete", async () => {
@@ -501,7 +492,7 @@ export class StarSystemView implements View {
 
         const activeControls = this.scene.getActiveControls();
         let controllerDistanceFactor = 4;
-        if (firstBody instanceof BlackHole) controllerDistanceFactor = 5;
+        if (firstBody instanceof BlackHole) controllerDistanceFactor = 50;
         else if (firstBody instanceof NeutronStar) controllerDistanceFactor = 100_000;
         if (this.player.visitedSystemHistory.length === 0) {
             positionNearObjectBrightSide(activeControls, firstBody, starSystem, controllerDistanceFactor);
@@ -672,6 +663,7 @@ export class StarSystemView implements View {
         // update missions
         const missionContext: MissionContext = {
             currentSystem: starSystem,
+            currentItinerary: this.player.currentItinerary,
             playerPosition: this.scene.getActiveControls().getTransform().getAbsolutePosition(),
             physicsEngine: this.scene.getPhysicsEngine() as PhysicsEngineV2
         };
@@ -716,6 +708,7 @@ export class StarSystemView implements View {
 
         const missionContext: MissionContext = {
             currentSystem: starSystem,
+            currentItinerary: this.player.currentItinerary,
             playerPosition: activeControls.getTransform().getAbsolutePosition(),
             physicsEngine: this.scene.getPhysicsEngine() as PhysicsEngineV2
         };
@@ -886,6 +879,21 @@ export class StarSystemView implements View {
 
     public setUIEnabled(enabled: boolean) {
         this.isUiEnabled = enabled;
+    }
+
+    public setTarget(target: Transformable & HasBoundingSphere & TypedObject | null) {
+        if (this.targetCursorLayer.getTarget() === target) {
+            this.spaceShipLayer.setTarget(null);
+            this.targetCursorLayer.setTarget(null);
+            Sounds.TARGET_UNLOCK_SOUND.play();
+            return;
+        }
+
+        if (target === null) return;
+
+        this.spaceShipLayer.setTarget(target.getTransform());
+        this.targetCursorLayer.setTarget(target);
+        Sounds.TARGET_LOCK_SOUND.play();
     }
 
     /**

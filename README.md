@@ -139,19 +139,21 @@ First, clone the repository and install the dependencies with `pnpm install`.
 
 ### Web
 
-To build the web version of Cosmos Journeyer, run `pnpm run build`. Everything will be built in the `dist` folder.
+To build the web version of Cosmos Journeyer, run `pnpm build`. Everything will be built in the `dist` folder.
+
+To start the production server version, run `pnpm serve:prod`. The development version can be started with `pnpm serve`. 
 
 ### Tauri
 
 Cosmos Journeyer can be built as a desktop application using Tauri!
 
-First you will need a bazillion dependencies, here is a list of some of them if you are using a Debian base OS:
+First you will need a bazillion dependencies, here is a list of some of them if you are using a Debian based OS:
 
 ```bash
 sudo apt install -y libwebkit2gtk-4.0-dev libgtk-3-dev libsoup2.4-dev libjavascriptcoregtk-4.0-dev librsvg2-dev libwebkit2gtk-4.0-dev libappindicator3-dev patchelf
 ```
 
-Then you can build the application with `pnpm tauri build`.
+Then you can build the application with `pnpm tauri build` or run it with `pnpm tauri dev`.
 
 ## Contributors
 

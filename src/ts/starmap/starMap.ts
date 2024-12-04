@@ -151,6 +151,9 @@ export class StarMap implements View {
         this.backgroundMusic.sound.play();
 
         this.starMapUI = new StarMapUI(this.scene, this.player);
+        this.starMapUI.onSystemFocusObservable.add((starSystemCoordinates) => {
+            this.focusOnSystem(starSystemCoordinates);
+        });
 
         this.starMapUI.shortHandUIPlotItineraryButton.addEventListener("click", () => {
             if (this.currentSystemCoordinates === null) throw new Error("current system seed is null!");
@@ -370,13 +373,13 @@ export class StarMap implements View {
         const sectorCoordinates = new Vector3(starSystemCoordinates.starSectorX, starSystemCoordinates.starSectorY, starSystemCoordinates.starSectorZ);
 
         if (this.loadedStarSectors.has(vector3ToString(sectorCoordinates))) {
-            this.starMapUI.setCurrentMesh(this.coordinatesToInstanceMap.get(JSON.stringify(this.currentSystemCoordinates)) as InstancedMesh);
+            this.starMapUI.setCurrentSystem(starSystemCoordinates);
             this.focusOnCurrentSystem();
             return;
         }
 
         this.registerStarSector(sectorCoordinates, true);
-        this.starMapUI.setCurrentMesh(this.coordinatesToInstanceMap.get(JSON.stringify(this.currentSystemCoordinates)) as InstancedMesh);
+        this.starMapUI.setCurrentSystem(starSystemCoordinates);
 
         const translation = sectorCoordinates.subtract(this.currentStarSectorCoordinates).scaleInPlace(Settings.STAR_SECTOR_SIZE);
         translate(this.controls.getTransform(), translation);
@@ -488,37 +491,36 @@ export class StarMap implements View {
         const objectColor = getRgbFromTemperature(stellarObjectModel.physics.blackBodyTemperature);
         initializedInstance.instancedBuffers.color = new Color4(objectColor.r, objectColor.g, objectColor.b, 0.0);
 
-        if (!recycled) {
-            initializedInstance.isPickable = true;
-            initializedInstance.actionManager = new ActionManager(this.scene);
-
-            initializedInstance.actionManager.registerAction(
-                new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, () => {
-                    this.starMapUI.setHoveredMesh(initializedInstance);
-                    Sounds.MENU_HOVER_SOUND.play();
-                })
-            );
-
-            initializedInstance.actionManager.registerAction(
-                new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, () => {
-                    this.starMapUI.setHoveredMesh(null);
-                })
-            );
-        } else {
+        if (recycled) {
             initializedInstance.setEnabled(true);
-            initializedInstance.actionManager?.unregisterAction(initializedInstance.actionManager.actions[2]);
         }
+
+        initializedInstance.isPickable = true;
+        initializedInstance.actionManager?.dispose();
+        initializedInstance.actionManager = new ActionManager(this.scene);
+
+        initializedInstance.actionManager.registerAction(
+            new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, () => {
+                this.starMapUI.setHoveredSystem(starSystemCoordinates);
+                Sounds.MENU_HOVER_SOUND.play();
+            })
+        );
+
+        initializedInstance.actionManager.registerAction(
+            new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, () => {
+                this.starMapUI.setHoveredSystem(null);
+            })
+        );
 
         initializedInstance.actionManager?.registerAction(
             new ExecuteCodeAction(ActionManager.OnPickTrigger, () => {
                 Sounds.STAR_MAP_CLICK_SOUND.play();
 
-                this.starMapUI.setSelectedMesh(initializedInstance);
                 this.starMapUI.setSelectedSystem(starSystemCoordinates, this.currentSystemCoordinates);
 
                 this.selectedSystemCoordinates = starSystemCoordinates;
 
-                this.focusCameraOnStar(initializedInstance);
+                this.focusOnSystem(starSystemCoordinates);
             })
         );
 
@@ -528,10 +530,17 @@ export class StarMap implements View {
         else this.loadedStarSectors.get(data.sectorString)?.starInstances.push(initializedInstance);
     }
 
-    private focusCameraOnStar(starInstance: InstancedMesh, skipAnimation = false) {
+    public focusOnCurrentSystem(skipAnimation = false) {
+        if (this.currentSystemCoordinates === null) return console.warn("No current system seed!");
+        this.focusOnSystem(this.currentSystemCoordinates);
+    }
+
+    public focusOnSystem(starSystemCoordinates: StarSystemCoordinates, skipAnimation = false) {
+        const starSystemPosition = getStarGalacticPosition(starSystemCoordinates).add(this.starMapCenterPosition);
+
         const cameraDir = this.controls.thirdPersonCamera.getDirection(Vector3.Forward(this.scene.useRightHandedSystem));
 
-        const cameraToStarDir = starInstance.position.subtract(this.controls.thirdPersonCamera.globalPosition).normalize();
+        const cameraToStarDir = starSystemPosition.subtract(this.controls.thirdPersonCamera.globalPosition).normalize();
 
         const rotationAngle = Math.acos(Vector3.Dot(cameraDir, cameraToStarDir));
 
@@ -539,15 +548,15 @@ export class StarMap implements View {
 
         // if the rotation axis has a length different from 1, it means the cross product was made between very close vectors : no rotation is needed
         if (skipAnimation) {
-            this.controls.getTransform().lookAt(starInstance.position);
+            this.controls.getTransform().lookAt(starSystemPosition);
             this.controls.getTransform().computeWorldMatrix(true);
         } else if (rotationAngle > 0.02) {
             const rotationAxis = Vector3.Cross(cameraDir, cameraToStarDir).normalize();
             this.rotationAnimation = new TransformRotationAnimation(this.controls.getTransform(), rotationAxis, rotationAngle, animationDurationSeconds);
         }
 
-        const transformToStarDir = starInstance.position.subtract(this.controls.getTransform().getAbsolutePosition()).normalize();
-        const distance = starInstance.position.subtract(this.controls.getTransform().getAbsolutePosition()).length();
+        const transformToStarDir = starSystemPosition.subtract(this.controls.getTransform().getAbsolutePosition()).normalize();
+        const distance = starSystemPosition.subtract(this.controls.getTransform().getAbsolutePosition()).length();
         const targetPosition = this.controls.getTransform().getAbsolutePosition().add(transformToStarDir.scaleInPlace(distance));
 
         // if the transform is already in the right position, do not animate
@@ -562,19 +571,9 @@ export class StarMap implements View {
             this.radiusAnimation = new CameraRadiusAnimation(this.controls.thirdPersonCamera, targetRadius, animationDurationSeconds);
         }
 
-        this.starMapUI.setHoveredMesh(null);
-    }
-
-    public focusOnCurrentSystem(skipAnimation = false) {
-        if (this.currentSystemCoordinates === null) return console.warn("No current system seed!");
-
-        const instance = this.coordinatesToInstanceMap.get(JSON.stringify(this.currentSystemCoordinates));
-        if (instance === undefined) throw new Error("The current system has no instance!");
-
-        this.starMapUI.setSelectedMesh(instance);
-        this.starMapUI.setSelectedSystem(this.currentSystemCoordinates, this.currentSystemCoordinates);
-
-        this.focusCameraOnStar(instance, skipAnimation);
+        this.selectedSystemCoordinates = starSystemCoordinates;
+        this.starMapUI.setSelectedSystem(starSystemCoordinates, this.currentSystemCoordinates);
+        this.starMapUI.setHoveredSystem(null);
     }
 
     private fadeIn(instance: InstancedMesh) {
@@ -588,8 +587,6 @@ export class StarMap implements View {
     private fadeOutThenRecycle(instance: InstancedMesh, recyclingList: InstancedMesh[]) {
         instance.animations = [StarMap.FADE_OUT_ANIMATION];
         instance.getScene().beginAnimation(instance, 0, StarMap.FADE_OUT_DURATION / 60, false, 1, () => {
-            if (this.starMapUI.getCurrentPickedMesh() === instance) this.starMapUI.detachUIFromMesh();
-            if (this.starMapUI.getCurrentHoveredMesh() === instance) this.starMapUI.setHoveredMesh(null);
             instance.setEnabled(false);
 
             const seed = this.instanceToCoordinatesMap.get(instance);

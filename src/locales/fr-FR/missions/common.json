@@ -1,5 +1,7 @@
 {
-    "travelToTargetSystem": "Voyagez jusqu'à {{systemName}} ({{distance}}). Appuyez sur {{starMapKey}} pour ouvrir la carte stellaire.",
+    "travelToTargetSystem": "Voyagez jusqu'à {{systemName}} ({{distance}}).",
+    "openStarMap": "Appuyez sur {{starMapKey}} pour ouvrir la carte stellaire.",
+    "travelToNextSystem": "Poursuivez votre voyage en passant par {{systemName}} ({{distance}}). Il reste {{nbJumps}} sauts avant d'arriver à destination.",
     "getCloserToTarget": "Approchez vous de {{objectName}}",
     "here": "ici",
     "accept": "Accepter",
