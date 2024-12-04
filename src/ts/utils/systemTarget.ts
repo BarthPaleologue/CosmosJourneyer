@@ -4,6 +4,7 @@ import i18n from "../i18n";
 import { StarSystemCoordinates } from "./coordinates/universeCoordinates";
 import { getSystemModelFromCoordinates } from "../starSystem/modelFromCoordinates";
 import { ObjectTargetCursorType, Targetable } from "../architecture/targetable";
+import { Settings } from "../settings";
 
 export class SystemTarget implements Targetable {
     readonly name: string;
@@ -13,8 +14,8 @@ export class SystemTarget implements Targetable {
 
     readonly targetInfo = {
         type: ObjectTargetCursorType.STAR_SYSTEM,
-        minDistance: 0,
-        maxDistance: 0
+        minDistance: Settings.LIGHT_YEAR * 2,
+        maxDistance: Settings.LIGHT_YEAR * 0.2,
     };
 
     constructor(systemCoordinates: StarSystemCoordinates, scene: Scene) {
