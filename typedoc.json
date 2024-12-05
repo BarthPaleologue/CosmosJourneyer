@@ -1,7 +1,7 @@
 {
   "name": "Cosmos Journeyer API Documentation",
   "out": "docs",
-  "theme": "default",
+  "theme": "typedoc-github-theme",
   "exclude": [
     "**/node_modules/**/*.*",
     "**/test/**/*.*"
@@ -19,6 +19,5 @@
     "@alpha": false,
     "@beta": false
   },
-  "plugin": ["typedoc-material-theme", "typedoc-plugin-missing-exports"],
-  "themeColor": "#cb9820"
+  "plugin": ["typedoc-github-theme", "typedoc-plugin-missing-exports"],
 }
