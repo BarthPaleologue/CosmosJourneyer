@@ -43,7 +43,7 @@ import { AudioMasks } from "../audio/audioMasks";
 import { Objects } from "../assets/objects";
 import { Sounds } from "../assets/sounds";
 import { LandingPad } from "../assets/procedural/landingPad/landingPad";
-import { createNotification } from "../utils/notification";
+import { createNotification, NotificationType } from "../utils/notification";
 import { OrbitalObject, OrbitalObjectType } from "../architecture/orbitalObject";
 import { CelestialBody } from "../architecture/celestialBody";
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
@@ -644,8 +644,8 @@ export class Spaceship implements Transformable {
                 const distanceToPad = shipRelativePosition.length();
                 const verticalDistance = Vector3.Dot(shipRelativePosition, this.targetLandingPad.getTransform().up);
                 if (distanceToPad < 600 && verticalDistance > 0) {
-                    if (this.state !== ShipState.LANDING) {
-                        createNotification("Automatic landing procedure engaged", 10000);
+                    if (this.state !== ShipState.LANDING) { //FIXME: move this in ship controls before adding NPC ships
+                        createNotification(NotificationType.SPACESHIP, "Automatic landing procedure engaged", 10000);
                     }
                     this.state = ShipState.LANDING;
                     this.landOnPad(this.targetLandingPad);

@@ -50,7 +50,7 @@ import { StarMapControls } from "./starMapControls";
 import { CameraRadiusAnimation } from "../uberCore/transforms/animations/radius";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { StellarPathfinder } from "./stellarPathfinder";
-import { createNotification } from "../utils/notification";
+import { createNotification, NotificationType } from "../utils/notification";
 import { getStarGalacticPosition } from "../utils/coordinates/starSystemCoordinatesUtils";
 import { Player } from "../player/player";
 import { Settings } from "../settings";
@@ -297,7 +297,7 @@ export class StarMap implements View {
 
                     this.onTargetSetObservable.notifyObservers(path[1]);
                 } else if (this.stellarPathfinder.getNbIterations() >= pathfinderMaxIterations) {
-                    createNotification(`Could not find a path to the target system after ${pathfinderMaxIterations} iterations`, 5000);
+                    createNotification(NotificationType.INFO, `Could not find a path to the target system after ${pathfinderMaxIterations} iterations`, 5000);
                 }
             }
 

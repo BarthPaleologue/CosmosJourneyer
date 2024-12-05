@@ -25,7 +25,7 @@ import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { Spaceship } from "./spaceship";
 import { SpaceShipControlsInputs } from "./spaceShipControlsInputs";
-import { createNotification } from "../utils/notification";
+import { createNotification, NotificationType } from "../utils/notification";
 import { StarSystemInputs } from "../inputs/starSystemInputs";
 import { pressInteractionToStrings } from "../utils/strings/inputControlsString";
 import i18n from "../i18n";
@@ -114,7 +114,7 @@ export class ShipControls implements Controls {
                     );
                     if (distanceToLandingFacility < 500e3) {
                         const bindingsString = pressInteractionToStrings(SpaceShipControlsInputs.map.emitLandingRequest, keyboardLayoutMap).join(", ");
-                        createNotification(`Don't forget to send a landing request with ${bindingsString} before approaching the facility`, 5000);
+                        createNotification(NotificationType.SPACE_STATION, `Don't forget to send a landing request with ${bindingsString} before approaching the facility`, 5000);
                     }
                 }
             }
@@ -127,7 +127,7 @@ export class ShipControls implements Controls {
             const keyboardLayout = await getGlobalKeyboardLayoutMap();
             if (spaceship.isWarpDriveEnabled()) {
                 const relevantKeys = pressInteractionToStrings(SpaceShipControlsInputs.map.toggleWarpDrive, keyboardLayout);
-                createNotification(`Cannot land while warp drive is enabled. You can use ${relevantKeys} to toggle your warp drive.`, 5000);
+                createNotification(NotificationType.SPACESHIP, `Cannot land while warp drive is enabled. You can use ${relevantKeys} to toggle your warp drive.`, 5000);
                 return;
             }
 
@@ -138,7 +138,7 @@ export class ShipControls implements Controls {
 
             // If the object is too far, don't engage landing
             if (distance > closestWalkableObject.getBoundingRadius() + 100e3) {
-                createNotification("Too high to land", 2000);
+                createNotification(NotificationType.SPACESHIP, "Too high to land", 2000);
                 return;
             }
 
@@ -153,14 +153,14 @@ export class ShipControls implements Controls {
             if (this.closestLandableFacility === null) return;
             const landingPad = this.closestLandableFacility.handleLandingRequest({ minimumPadSize: LandingPadSize.SMALL });
             if (landingPad === null) {
-                createNotification("Landing request rejected", 2000);
+                createNotification(NotificationType.SPACE_STATION, "Landing request rejected", 2000);
                 return;
             }
 
             Sounds.EnqueuePlay(Sounds.LANDING_REQUEST_GRANTED);
             Sounds.STRAUSS_BLUE_DANUBE.play();
             Sounds.STRAUSS_BLUE_DANUBE.setVolume(1, 1);
-            createNotification(`Landing request granted. Proceed to pad ${landingPad.padNumber}`, 30000);
+            createNotification(NotificationType.SPACE_STATION, `Landing request granted. Proceed to pad ${landingPad.padNumber}`, 30000);
             spaceship.engageLandingOnPad(landingPad);
         };
 
@@ -301,24 +301,24 @@ export class ShipControls implements Controls {
 
             if (!this.getSpaceship().isLandedAtFacility()) {
                 const bindingsString = pressInteractionToStrings(StarSystemInputs.map.toggleSpaceShipCharacter, keyboardLayoutMap).join(", ");
-                createNotification(i18n.t("notifications:landingComplete", { bindingsString: bindingsString }), 5000);
+                createNotification(NotificationType.SPACESHIP, i18n.t("notifications:landingComplete", { bindingsString: bindingsString }), 5000);
             }
         });
 
         this.spaceship.onPlanetaryLandingEngaged.add(() => {
-            createNotification(i18n.t("notifications:landingSequenceEngaged"), 5000);
+            createNotification(NotificationType.SPACESHIP, i18n.t("notifications:landingSequenceEngaged"), 5000);
             Sounds.EnqueuePlay(Sounds.INITIATING_PLANETARY_LANDING);
         });
 
         this.spaceship.onLandingCancelled.add(() => {
-            createNotification(i18n.t("notifications:landingCancelled"), 5000);
+            createNotification(NotificationType.SPACESHIP, i18n.t("notifications:landingCancelled"), 5000);
             Sounds.STRAUSS_BLUE_DANUBE.setVolume(0, 2);
             Sounds.STRAUSS_BLUE_DANUBE.stop(2);
         });
 
         this.spaceship.onTakeOff.add(() => {
             //FIXME: localize
-            createNotification("Takeoff successful", 2000);
+            createNotification(NotificationType.SPACESHIP, "Takeoff successful", 2000);
         });
 
         this.spaceship.onWarpDriveDisabled.add((isEmergency) => {

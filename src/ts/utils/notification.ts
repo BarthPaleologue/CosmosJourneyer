@@ -1,4 +1,15 @@
 import { Sounds } from "../assets/sounds";
+import explorationIcon from "../../asset/icons/space-exploration.webp";
+import spaceshipIcon from "../../asset/icons/spaceship_gear.webp";
+import spaceStationIcon from "../../asset/icons/space-station.webp";
+import informationIcon from "../../asset/icons/information.webp";
+
+export const enum NotificationType {
+    INFO,
+    SPACESHIP,
+    EXPLORATION,
+    SPACE_STATION
+}
 
 class Notification {
     private progressSeconds = 0;
@@ -10,17 +21,38 @@ class Notification {
 
     private isBeingRemoved = false;
 
-    constructor(text: string, durationSeconds: number) {
+    constructor(type: NotificationType, text: string, durationSeconds: number) {
         const container = document.getElementById("notificationContainer");
         if (container === null) throw new Error("No notification container found");
 
         this.htmlRoot = document.createElement("div");
         this.htmlRoot.classList.add("notification");
 
+        const contentContainer = document.createElement("div");
+        contentContainer.classList.add("notification-content");
+        this.htmlRoot.appendChild(contentContainer);
+
+        const iconNode = document.createElement("img");
+        switch (type) {
+            case NotificationType.INFO:
+                iconNode.src = informationIcon;
+                break;
+            case NotificationType.SPACESHIP:
+                iconNode.src = spaceshipIcon;
+                break;
+            case NotificationType.EXPLORATION:
+                iconNode.src = explorationIcon;
+                break;
+            case NotificationType.SPACE_STATION:
+                iconNode.src = spaceStationIcon;
+                break;
+        }
+        iconNode.classList.add("notification-icon");
+        contentContainer.appendChild(iconNode);
+
         const textNode = document.createElement("p");
         textNode.textContent = text;
-
-        this.htmlRoot.appendChild(textNode);
+        contentContainer.appendChild(textNode);
 
         const progress = document.createElement("div");
         progress.classList.add("notification-progress");
@@ -91,8 +123,8 @@ export function updateNotifications(deltaSeconds: number): void {
  * @param text The text to display
  * @param durationMillis The duration of the notification in ms
  */
-export function createNotification(text: string, durationMillis: number) {
-    const notification = new Notification(text, durationMillis / 1000);
+export function createNotification(type: NotificationType, text: string, durationMillis: number) {
+    const notification = new Notification(type, text, durationMillis / 1000);
     activeNotifications.push(notification);
 }
 
@@ -106,7 +138,7 @@ export function createNotification(text: string, durationMillis: number) {
 export function warnIfUndefined<T>(value: T | undefined, defaultValue: T, message: string): T {
     if (value === undefined) {
         console.warn(message);
-        createNotification(message, 10_000);
+        createNotification(NotificationType.INFO, message, 10_000);
         return defaultValue;
     }
     return value;
