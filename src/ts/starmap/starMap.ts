@@ -63,7 +63,7 @@ import { OrbitalObjectType } from "../architecture/orbitalObject";
 // register cosmos journeyer as part of window object
 declare global {
     interface Window {
-        starMap: StarMap;
+        StarMap: StarMap;
     }
 }
 
@@ -314,7 +314,7 @@ export class StarMap implements View {
             this.starMapUI.update(activeCamera.globalPosition, this.starMapCenterPosition);
         });
 
-        window.starMap = this;
+        window.StarMap = this;
     }
 
     private drawPath(path: StarSystemCoordinates[]) {

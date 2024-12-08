@@ -68,7 +68,7 @@ const enum EngineState {
 // register cosmos journeyer as part of window object
 declare global {
     interface Window {
-        cosmosJourneyer: CosmosJourneyer;
+        CosmosJourneyer: CosmosJourneyer;
     }
 }
 
@@ -265,7 +265,7 @@ export class CosmosJourneyer {
             else this.resume();
         });
 
-        window.cosmosJourneyer = this;
+        window.CosmosJourneyer = this;
     }
 
     /**

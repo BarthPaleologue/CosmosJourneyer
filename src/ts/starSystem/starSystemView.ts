@@ -81,7 +81,7 @@ import { TypedObject } from "../architecture/typedObject";
 // register cosmos journeyer as part of window object
 declare global {
     interface Window {
-        starSystemView: StarSystemView;
+        StarSystemView: StarSystemView;
     }
 }
 
@@ -433,7 +433,7 @@ export class StarSystemView implements View {
             globalRoot: inspectorRoot,
         });*/
 
-        window.starSystemView = this;
+        window.StarSystemView = this;
     }
 
     /**
