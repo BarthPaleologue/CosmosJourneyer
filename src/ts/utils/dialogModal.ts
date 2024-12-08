@@ -42,7 +42,6 @@ export function promptModalString(prompt: string, defaultValue: string = ""): Pr
     });
 }
 
-
 export function promptModalBoolean(prompt: string): Promise<boolean> {
     const modal = document.createElement("dialog");
     modal.innerHTML = `

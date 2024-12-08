@@ -16,7 +16,7 @@ export class SidePanels {
 
     private readonly loadSavePanel: HTMLElement;
     readonly loadSavePanelContent: SaveLoadingPanelContent;
-    
+
     private readonly settingsPanel: HTMLElement;
 
     private readonly tutorialsPanel: HTMLElement;
@@ -90,7 +90,7 @@ export class SidePanels {
             return;
         }
 
-        if(type === PanelType.LOAD_SAVE) {
+        if (type === PanelType.LOAD_SAVE) {
             this.loadSavePanelContent.populateCmdrList();
         }
 

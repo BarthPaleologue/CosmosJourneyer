@@ -390,7 +390,7 @@ export class StarMapUI {
             icon.htmlRoot.addEventListener("click", () => {
                 this.onSystemFocusObservable.notifyObservers(icon.getSystemCoordinates());
             });
-            
+
             this.htmlRoot.appendChild(icon.htmlRoot);
             this.systemIcons.push(icon);
         });
