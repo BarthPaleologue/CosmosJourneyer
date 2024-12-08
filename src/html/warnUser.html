@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keyboard Layout Detection</title>
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 1000;
+        }
+        .modal.active {
+            display: block;
+        }
+        .modal button {
+            background-color: #ff3b3b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Modal -->
+<div id="keyboardWarningModal" class="modal">
+    <p>Since your browser does not support keyboard layout detection, QWERTY will be assumed.</p>
+    <button onclick="closeModal()">OK</button>
+</div>
+
+<script>
+    // Detect if the browser is Firefox
+    function isFirefox() {
+        return /Firefox/i.test(navigator.userAgent);
+    }
+
+    // Show the modal if the browser is Firefox
+    if (isFirefox()) {
+        document.getElementById('keyboardWarningModal').classList.add('active');
+    }
+
+    // Close the modal
+    function closeModal() {
+        document.getElementById('keyboardWarningModal').classList.remove('active');
+    }
+</script>
+
+</body>
+</html>
