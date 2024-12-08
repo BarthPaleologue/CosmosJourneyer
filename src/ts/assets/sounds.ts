@@ -33,6 +33,9 @@ import hyperSpaceSound from "../../asset/sound/539503__timbre_endless-decelerati
 import thrusterSound from "../../asset/sound/318688__limitsnap_creations__rocket-thrust-effect.mp3";
 import starMapBackgroundMusic from "../../asset/sound/455855__andrewkn__wandering.mp3";
 
+import echoedBlipSound from "../../asset/sound/554089__copyc4t__echoed-blip.mp3";
+import errorBleepSound from "../../asset/sound/372197__original_sound__error-bleep-4.mp3";
+
 import initiatingPlanetaryLandingSound from "../../asset/sound/voice/InitiatingPlanetaryLandingCharlotte.mp3";
 import landingRequestSound from "../../asset/sound/voice/LandingRequestGrantedCharlotte.mp3";
 import landingCompleteSound from "../../asset/sound/voice/LandingCompleteCharlotte.mp3";
@@ -236,6 +239,18 @@ export class Sounds {
             });
 
             console.log("Thruster sound loaded");
+        };
+
+        const echoedBlipSoundTask = manager.addBinaryFileTask("echoedBlipSoundTask", echoedBlipSound);
+        echoedBlipSoundTask.onSuccess = (task) => {
+            Sounds.MENU_SELECT_SOUND = new Sound("EchoedBlipSound", task.data, scene);
+            console.log("Echoed blip sound loaded");
+        };
+
+        const errorBleepSoundTask = manager.addBinaryFileTask("errorBleepSoundTask", errorBleepSound);
+        errorBleepSoundTask.onSuccess = (task) => {
+            Sounds.MENU_SELECT_SOUND = new Sound("ErrorBleepSound", task.data, scene);
+            console.log("Error bleep sound loaded");
         };
 
         const starMapBackgroundMusicTask = manager.addBinaryFileTask("starMapBackgroundMusicTask", starMapBackgroundMusic);
