@@ -131,6 +131,9 @@ export class CosmosJourneyer {
                 });
             }
         });
+        this.starSystemView.onNewDiscovery.add(() => {
+            this.createAutoSave();
+        });
 
         // Init starmap view
         this.starMap = new StarMap(this.player, this.engine);

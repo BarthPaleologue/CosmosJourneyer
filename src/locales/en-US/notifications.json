@@ -9,5 +9,6 @@
     "notEnoughFuel": "Cannot perform the hyperspace jump. Not enough fuel! You can refuel at a station or scooping around a star or gas giant.",
     "saveVersionMismatch": "[VERSION_WARNING] The save file version ({{saveVersion}}) does not match the current version ({{currentVersion}}). Loading may result in unexpected behavior.",
     "invalidSaveFileJson": "[JSON_ERROR] The save file is invalid: {{error}}. Fix the file before trying to load it again.",
-    "saveOk": "Saved to local storage successfully"
+    "saveOk": "Saved to local storage successfully",
+    "newDiscovery": "Discovered {{objectName}}. Data recorded."
 }

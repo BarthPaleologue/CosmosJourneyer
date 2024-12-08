@@ -1,5 +1,5 @@
 import { Mission, MissionSerialized } from "../missions/mission";
-import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates";
+import { StarSystemCoordinates, UniverseObjectId } from "../utils/coordinates/universeCoordinates";
 import { warnIfUndefined } from "../utils/notification";
 import { DefaultSerializedSpaceship, SerializedSpaceship, Spaceship } from "../spaceship/spaceship";
 
@@ -21,6 +21,11 @@ export type SerializedPlayer = {
 
     visitedSystemHistory: StarSystemCoordinates[];
 
+    visitedObjectsHistory: {
+        notInEncyclopaedia: UniverseObjectId[];
+        inEncyclopaedia: UniverseObjectId[];
+    };
+
     currentItinerary: StarSystemCoordinates[];
     systemBookmarks: StarSystemCoordinates[];
 
@@ -40,6 +45,13 @@ export class Player {
     timePlayedSeconds: number;
 
     visitedSystemHistory: StarSystemCoordinates[] = [];
+
+    private visitedObjectsHistory: {
+        notInEncyclopaedia: UniverseObjectId[];
+        inEncyclopaedia: UniverseObjectId[];
+    };
+
+    private readonly visitedObjects: Set<string> = new Set();
 
     currentItinerary: StarSystemCoordinates[];
     systemBookmarks: StarSystemCoordinates[];
@@ -63,11 +75,25 @@ export class Player {
             warnIfUndefined(serializedPlayer.creationDate, new Date().toISOString(), `[PLAYER_DATA_WARNING] Creation date was undefined. Defaulting to current date`)
         );
         this.timePlayedSeconds = warnIfUndefined(serializedPlayer.timePlayedSeconds, 0, `[PLAYER_DATA_WARNING] Time played was undefined. Defaulting to 0`);
+
         this.visitedSystemHistory = warnIfUndefined(
             serializedPlayer.visitedSystemHistory,
             [],
             `[PLAYER_DATA_WARNING] Visited system history was undefined. Defaulting to empty array`
         );
+        this.visitedObjectsHistory = warnIfUndefined(
+            serializedPlayer.visitedObjectsHistory,
+            { notInEncyclopaedia: [], inEncyclopaedia: [] },
+            `[PLAYER_DATA_WARNING] Visited objects history was undefined. Defaulting to empty arrays`
+        );
+
+        this.visitedObjectsHistory.notInEncyclopaedia.forEach((objectId) => {
+            this.visitedObjects.add(JSON.stringify(objectId));
+        });
+        this.visitedObjectsHistory.inEncyclopaedia.forEach((objectId) => {
+            this.visitedObjects.add(JSON.stringify(objectId));
+        });
+
         this.currentItinerary = warnIfUndefined(serializedPlayer.currentItinerary, [], `[PLAYER_DATA_WARNING] Current itinerary was undefined. Defaulting to empty array`);
         this.systemBookmarks = warnIfUndefined(serializedPlayer.systemBookmarks, [], `[PLAYER_DATA_WARNING] System bookmarks were undefined. Defaulting to empty array`);
         this.currentMissions = warnIfUndefined(serializedPlayer.currentMissions, [], `[PLAYER_DATA_WARNING] Current missions were undefined. Defaulting to empty array`).map(
@@ -100,6 +126,30 @@ export class Player {
         );
     }
 
+    /**
+     * Returns true if the player has visited the given object, false otherwise.
+     * @param objectId The object to check if the player has visited it.
+     * @returns True if the player has visited the object, false otherwise.
+     */
+    hasVisitedObject(objectId: UniverseObjectId): boolean {
+        return this.visitedObjects.has(JSON.stringify(objectId)) ?? false;
+    }
+
+    /**
+     * Adds the given object to the list of visited objects if it is not already in the list.
+     * @param objectId The object to add to the list of visited objects.
+     * @returns True if the object was added, false if it was already in the list.
+     */
+    addVisitedObjectIfNew(objectId: UniverseObjectId) {
+        if(this.hasVisitedObject(objectId)) {
+            return false;
+        }
+        this.visitedObjects.add(JSON.stringify(objectId));
+        this.visitedObjectsHistory.notInEncyclopaedia.push(objectId);
+
+        return true;
+    }
+
     public static Default(): Player {
         return new Player({
             uuid: crypto.randomUUID(),
@@ -108,6 +158,7 @@ export class Player {
             creationDate: new Date().toISOString(),
             timePlayedSeconds: 0,
             visitedSystemHistory: [],
+            visitedObjectsHistory: { inEncyclopaedia: [], notInEncyclopaedia: [] },
             currentItinerary: [],
             systemBookmarks: [],
             currentMissions: [],
@@ -132,6 +183,7 @@ export class Player {
             creationDate: player.creationDate.toISOString(),
             timePlayedSeconds: Math.round(player.timePlayedSeconds),
             visitedSystemHistory: player.visitedSystemHistory,
+            visitedObjectsHistory: player.visitedObjectsHistory,
             currentItinerary: player.currentItinerary,
             systemBookmarks: player.systemBookmarks,
             currentMissions: player.currentMissions.map((mission) => mission.serialize()),
@@ -152,10 +204,20 @@ export class Player {
         this.creationDate = new Date(player.creationDate);
         this.timePlayedSeconds = player.timePlayedSeconds;
         this.visitedSystemHistory = player.visitedSystemHistory.map((system) => structuredClone(system));
+        
+        this.visitedObjectsHistory = {
+            notInEncyclopaedia: player.visitedObjectsHistory.notInEncyclopaedia.map((objectId) => structuredClone(objectId)),
+            inEncyclopaedia: player.visitedObjectsHistory.inEncyclopaedia.map((objectId) => structuredClone(objectId))
+        };
+        this.visitedObjects.clear();
+        player.visitedObjects.forEach((objectId) => {
+            this.visitedObjects.add(objectId);
+        });
+        
         this.currentItinerary = player.currentItinerary.map((system) => structuredClone(system));
         this.systemBookmarks = player.systemBookmarks.map((system) => structuredClone(system));
-        this.currentMissions = player.currentMissions.map(mission => Mission.Deserialize(mission.serialize()))
-        this.completedMissions = player.completedMissions.map(mission => Mission.Deserialize(mission.serialize()))
+        this.currentMissions = player.currentMissions.map((mission) => Mission.Deserialize(mission.serialize()));
+        this.completedMissions = player.completedMissions.map((mission) => Mission.Deserialize(mission.serialize()));
         this.serializedSpaceships = player.serializedSpaceships.map((spaceship) => structuredClone(spaceship));
         this.instancedSpaceships = [...player.instancedSpaceships];
         this.tutorials = structuredClone(player.tutorials);

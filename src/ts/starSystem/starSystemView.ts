@@ -66,14 +66,14 @@ import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import { MissionContext } from "../missions/missionContext";
 import { Mission } from "../missions/mission";
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/universeCoordinates";
+import { StarSystemCoordinates, starSystemCoordinatesEquals, UniverseObjectId } from "../utils/coordinates/universeCoordinates";
 import { getSystemModelFromCoordinates } from "./modelFromCoordinates";
 import { StarSystemModel } from "./starSystemModel";
 import { OrbitalObjectType } from "../architecture/orbitalObject";
 import { OrbitalFacility } from "../spacestation/orbitalFacility";
 import { getStarGalacticPosition } from "../utils/coordinates/starSystemCoordinatesUtils";
 import { Spaceship } from "../spaceship/spaceship";
-import { Inspector } from '@babylonjs/inspector';
+import { Inspector } from "@babylonjs/inspector";
 import { Transformable } from "../architecture/transformable";
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { TypedObject } from "../architecture/typedObject";
@@ -194,6 +194,8 @@ export class StarSystemView implements View {
      * @private
      */
     private isLoadingSystem = false;
+
+    readonly onNewDiscovery = new Observable<UniverseObjectId>();
 
     readonly postProcessManager: PostProcessManager;
 
@@ -364,7 +366,11 @@ export class StarSystemView implements View {
                     if (!(control instanceof AxisComposite)) {
                         throw new Error("Up down is not an axis composite");
                     }
-                    createNotification(NotificationType.SPACESHIP, i18n.t("notifications:howToLiftOff", { bindingsString: axisCompositeToString(control, keyboardLayoutMap)[1][1] }), 5000);
+                    createNotification(
+                        NotificationType.SPACESHIP,
+                        i18n.t("notifications:howToLiftOff", { bindingsString: axisCompositeToString(control, keyboardLayoutMap)[1][1] }),
+                        5000
+                    );
                 }
             }
         });
@@ -419,9 +425,9 @@ export class StarSystemView implements View {
         });
 
         this.targetCursorLayer = new TargetCursorLayer();
-        
+
         const inspectorRoot = document.getElementById("inspectorLayer");
-        if(inspectorRoot === null) throw new Error("Inspector root not found");
+        if (inspectorRoot === null) throw new Error("Inspector root not found");
         /*Inspector.Show(this.scene, {
             globalRoot: inspectorRoot,
         });*/
@@ -623,6 +629,19 @@ export class StarSystemView implements View {
 
         const nearestOrbitalObject = starSystem.getNearestOrbitalObject(this.scene.getActiveControls().getTransform().getAbsolutePosition());
         const nearestCelestialBody = starSystem.getNearestCelestialBody(this.scene.getActiveControls().getTransform().getAbsolutePosition());
+
+        const distanceToNearesetCelestialBody2 = Vector3.DistanceSquared(
+            nearestCelestialBody.getTransform().getAbsolutePosition(),
+            this.scene.getActiveControls().getTransform().getAbsolutePosition()
+        );
+        if (distanceToNearesetCelestialBody2 < (nearestCelestialBody.getBoundingRadius() * 2) ** 2) {
+            const universeId = getUniverseObjectId(nearestCelestialBody, starSystem);
+            const isNewDiscovery = this.player.addVisitedObjectIfNew(universeId);
+            if (isNewDiscovery) {
+                createNotification(NotificationType.EXPLORATION, i18n.t("notifications:newDiscovery", { objectName: nearestCelestialBody.model.name }), 10000);
+                this.onNewDiscovery.notifyObservers(universeId);
+            }
+        }
 
         const spaceship = this.spaceshipControls.getSpaceship();
 
@@ -881,7 +900,7 @@ export class StarSystemView implements View {
         this.isUiEnabled = enabled;
     }
 
-    public setTarget(target: Transformable & HasBoundingSphere & TypedObject | null) {
+    public setTarget(target: (Transformable & HasBoundingSphere & TypedObject) | null) {
         if (this.targetCursorLayer.getTarget() === target) {
             this.spaceShipLayer.setTarget(null);
             this.targetCursorLayer.setTarget(null);
