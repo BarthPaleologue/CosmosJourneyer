@@ -644,7 +644,8 @@ export class Spaceship implements Transformable {
                 const distanceToPad = shipRelativePosition.length();
                 const verticalDistance = Vector3.Dot(shipRelativePosition, this.targetLandingPad.getTransform().up);
                 if (distanceToPad < 600 && verticalDistance > 0) {
-                    if (this.state !== ShipState.LANDING) { //FIXME: move this in ship controls before adding NPC ships
+                    if (this.state !== ShipState.LANDING) {
+                        //FIXME: move this in ship controls before adding NPC ships
                         createNotification(NotificationOrigin.SPACESHIP, NotificationIntent.INFO, "Automatic landing procedure engaged", 10000);
                     }
                     this.state = ShipState.LANDING;

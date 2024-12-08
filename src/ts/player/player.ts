@@ -141,7 +141,7 @@ export class Player {
      * @returns True if the object was added, false if it was already in the list.
      */
     addVisitedObjectIfNew(objectId: UniverseObjectId) {
-        if(this.hasVisitedObject(objectId)) {
+        if (this.hasVisitedObject(objectId)) {
             return false;
         }
         this.visitedObjects.add(JSON.stringify(objectId));
@@ -204,7 +204,7 @@ export class Player {
         this.creationDate = new Date(player.creationDate);
         this.timePlayedSeconds = player.timePlayedSeconds;
         this.visitedSystemHistory = player.visitedSystemHistory.map((system) => structuredClone(system));
-        
+
         this.visitedObjectsHistory = {
             notInEncyclopaedia: player.visitedObjectsHistory.notInEncyclopaedia.map((objectId) => structuredClone(objectId)),
             inEncyclopaedia: player.visitedObjectsHistory.inEncyclopaedia.map((objectId) => structuredClone(objectId))
@@ -213,7 +213,7 @@ export class Player {
         player.visitedObjects.forEach((objectId) => {
             this.visitedObjects.add(objectId);
         });
-        
+
         this.currentItinerary = player.currentItinerary.map((system) => structuredClone(system));
         this.systemBookmarks = player.systemBookmarks.map((system) => structuredClone(system));
         this.currentMissions = player.currentMissions.map((mission) => Mission.Deserialize(mission.serialize()));

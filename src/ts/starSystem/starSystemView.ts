@@ -639,7 +639,12 @@ export class StarSystemView implements View {
             const universeId = getUniverseObjectId(nearestCelestialBody, starSystem);
             const isNewDiscovery = this.player.addVisitedObjectIfNew(universeId);
             if (isNewDiscovery) {
-                createNotification(NotificationOrigin.EXPLORATION, NotificationIntent.SUCCESS, i18n.t("notifications:newDiscovery", { objectName: nearestCelestialBody.model.name }), 15_000);
+                createNotification(
+                    NotificationOrigin.EXPLORATION,
+                    NotificationIntent.SUCCESS,
+                    i18n.t("notifications:newDiscovery", { objectName: nearestCelestialBody.model.name }),
+                    15_000
+                );
                 this.onNewDiscovery.notifyObservers(universeId);
             }
         }

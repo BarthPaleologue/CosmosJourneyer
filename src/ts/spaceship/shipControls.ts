@@ -115,7 +115,12 @@ export class ShipControls implements Controls {
                     if (distanceToLandingFacility < 500e3) {
                         const bindingsString = pressInteractionToStrings(SpaceShipControlsInputs.map.emitLandingRequest, keyboardLayoutMap).join(", ");
                         //FIXME: localize
-                        createNotification(NotificationOrigin.SPACE_STATION, NotificationIntent.INFO, `Don't forget to send a landing request with ${bindingsString} before approaching the facility`, 5000);
+                        createNotification(
+                            NotificationOrigin.SPACE_STATION,
+                            NotificationIntent.INFO,
+                            `Don't forget to send a landing request with ${bindingsString} before approaching the facility`,
+                            5000
+                        );
                     }
                 }
             }

@@ -297,7 +297,12 @@ export class StarMap implements View {
 
                     this.onTargetSetObservable.notifyObservers(path[1]);
                 } else if (this.stellarPathfinder.getNbIterations() >= pathfinderMaxIterations) {
-                    createNotification(NotificationOrigin.GENERAL, NotificationIntent.ERROR, `Could not find a path to the target system after ${pathfinderMaxIterations} iterations`, 5000);
+                    createNotification(
+                        NotificationOrigin.GENERAL,
+                        NotificationIntent.ERROR,
+                        `Could not find a path to the target system after ${pathfinderMaxIterations} iterations`,
+                        5000
+                    );
                 }
             }
 
