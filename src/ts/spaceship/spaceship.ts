@@ -194,7 +194,7 @@ export class Spaceship implements Transformable {
 
         this.fuelScoop = serializedSpaceShip.fuelScoop;
 
-        const {min: boundingMin, max: boundingMax} = this.getTransform().getHierarchyBoundingVectors();
+        const { min: boundingMin, max: boundingMax } = this.getTransform().getHierarchyBoundingVectors();
 
         this.boundingExtent = boundingMax.subtract(boundingMin);
 

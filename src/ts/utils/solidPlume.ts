@@ -168,5 +168,4 @@ export class SolidPlume {
 
         if (this.nbParticlesAlive > 0) this.solidParticleSystem.setParticles();
     }
-    
 }
