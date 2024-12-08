@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: [ "main" ]
 jobs:
-  eslint:
+  format-check:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
