@@ -47,8 +47,8 @@ export class HyperSpaceTunnel implements Transformable {
         const nbPoint = 100;
         const tunnelOffset = 500;
         path.push(new Vector3(0, 0, -200));
-        for(let i = 0; i < nbPoint; i++) {
-            path.push(new Vector3(0, tunnelOffset * (i / nbPoint) ** 4, 800 * i / nbPoint));
+        for (let i = 0; i < nbPoint; i++) {
+            path.push(new Vector3(0, tunnelOffset * (i / nbPoint) ** 4, (800 * i) / nbPoint));
         }
 
         this.hyperTunnel = MeshBuilder.CreateTube(

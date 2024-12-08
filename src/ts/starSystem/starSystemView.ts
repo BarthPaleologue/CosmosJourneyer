@@ -73,7 +73,7 @@ import { OrbitalObjectType } from "../architecture/orbitalObject";
 import { OrbitalFacility } from "../spacestation/orbitalFacility";
 import { getStarGalacticPosition } from "../utils/coordinates/starSystemCoordinatesUtils";
 import { Spaceship } from "../spaceship/spaceship";
-import { Inspector } from '@babylonjs/inspector';
+import { Inspector } from "@babylonjs/inspector";
 import { Transformable } from "../architecture/transformable";
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { TypedObject } from "../architecture/typedObject";
@@ -419,9 +419,9 @@ export class StarSystemView implements View {
         });
 
         this.targetCursorLayer = new TargetCursorLayer();
-        
+
         const inspectorRoot = document.getElementById("inspectorLayer");
-        if(inspectorRoot === null) throw new Error("Inspector root not found");
+        if (inspectorRoot === null) throw new Error("Inspector root not found");
         /*Inspector.Show(this.scene, {
             globalRoot: inspectorRoot,
         });*/
@@ -881,7 +881,7 @@ export class StarSystemView implements View {
         this.isUiEnabled = enabled;
     }
 
-    public setTarget(target: Transformable & HasBoundingSphere & TypedObject | null) {
+    public setTarget(target: (Transformable & HasBoundingSphere & TypedObject) | null) {
         if (this.targetCursorLayer.getTarget() === target) {
             this.spaceShipLayer.setTarget(null);
             this.targetCursorLayer.setTarget(null);
