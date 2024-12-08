@@ -4,11 +4,18 @@ import spaceshipIcon from "../../asset/icons/spaceship_gear.webp";
 import spaceStationIcon from "../../asset/icons/space-station.webp";
 import informationIcon from "../../asset/icons/information.webp";
 
-export const enum NotificationType {
-    INFO,
-    SPACESHIP,
-    EXPLORATION,
-    SPACE_STATION
+export const enum NotificationOrigin {
+    GENERAL = "info",
+    SPACESHIP = "spaceship",
+    EXPLORATION = "exploration",
+    SPACE_STATION = "space-station"
+}
+
+export const enum NotificationIntent {
+    INFO = "info",
+    SUCCESS = "success",
+    WARNING = "warning",
+    ERROR = "error"
 }
 
 class Notification {
@@ -21,29 +28,29 @@ class Notification {
 
     private isBeingRemoved = false;
 
-    constructor(type: NotificationType, text: string, durationSeconds: number) {
+    constructor(origin: NotificationOrigin, intent: NotificationIntent, text: string, durationSeconds: number) {
         const container = document.getElementById("notificationContainer");
         if (container === null) throw new Error("No notification container found");
 
         this.htmlRoot = document.createElement("div");
-        this.htmlRoot.classList.add("notification");
+        this.htmlRoot.classList.add("notification", origin);
 
         const contentContainer = document.createElement("div");
         contentContainer.classList.add("notification-content");
         this.htmlRoot.appendChild(contentContainer);
 
         const iconNode = document.createElement("img");
-        switch (type) {
-            case NotificationType.INFO:
+        switch (origin) {
+            case NotificationOrigin.GENERAL:
                 iconNode.src = informationIcon;
                 break;
-            case NotificationType.SPACESHIP:
+            case NotificationOrigin.SPACESHIP:
                 iconNode.src = spaceshipIcon;
                 break;
-            case NotificationType.EXPLORATION:
+            case NotificationOrigin.EXPLORATION:
                 iconNode.src = explorationIcon;
                 break;
-            case NotificationType.SPACE_STATION:
+            case NotificationOrigin.SPACE_STATION:
                 iconNode.src = spaceStationIcon;
                 break;
         }
@@ -65,7 +72,20 @@ class Notification {
 
         container.appendChild(this.htmlRoot);
 
-        Sounds.MENU_SELECT_SOUND.play();
+        switch (intent) {
+            case NotificationIntent.INFO:
+                Sounds.MENU_SELECT_SOUND.play();
+                break;
+            case NotificationIntent.SUCCESS:
+                Sounds.ECHOED_BLIP_SOUND.play();
+                break;
+            case NotificationIntent.WARNING:
+                Sounds.MENU_SELECT_SOUND.play();
+                break;
+            case NotificationIntent.ERROR:
+                Sounds.ERROR_BLEEP_SOUND.play();
+                break;
+        }
 
         // animate progress bar
         progressBar.style.animation = `progress ${durationSeconds}s linear`;
@@ -123,8 +143,8 @@ export function updateNotifications(deltaSeconds: number): void {
  * @param text The text to display
  * @param durationMillis The duration of the notification in ms
  */
-export function createNotification(type: NotificationType, text: string, durationMillis: number) {
-    const notification = new Notification(type, text, durationMillis / 1000);
+export function createNotification(type: NotificationOrigin, intent: NotificationIntent, text: string, durationMillis: number) {
+    const notification = new Notification(type, intent, text, durationMillis / 1000);
     activeNotifications.push(notification);
 }
 
@@ -138,7 +158,7 @@ export function createNotification(type: NotificationType, text: string, duratio
 export function warnIfUndefined<T>(value: T | undefined, defaultValue: T, message: string): T {
     if (value === undefined) {
         console.warn(message);
-        createNotification(NotificationType.INFO, message, 10_000);
+        createNotification(NotificationOrigin.GENERAL, NotificationIntent.WARNING, message, 10_000);
         return defaultValue;
     }
     return value;

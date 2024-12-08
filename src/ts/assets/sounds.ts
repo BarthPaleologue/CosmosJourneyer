@@ -75,6 +75,9 @@ export class Sounds {
 
     public static THRUSTER_SOUND: Sound;
 
+    public static ECHOED_BLIP_SOUND: Sound;
+    public static ERROR_BLEEP_SOUND: Sound;
+
     public static STAR_MAP_BACKGROUND_MUSIC: Sound;
     public static MAIN_MENU_BACKGROUND_MUSIC: Sound;
 
@@ -243,13 +246,13 @@ export class Sounds {
 
         const echoedBlipSoundTask = manager.addBinaryFileTask("echoedBlipSoundTask", echoedBlipSound);
         echoedBlipSoundTask.onSuccess = (task) => {
-            Sounds.MENU_SELECT_SOUND = new Sound("EchoedBlipSound", task.data, scene);
+            Sounds.ECHOED_BLIP_SOUND = new Sound("EchoedBlipSound", task.data, scene);
             console.log("Echoed blip sound loaded");
         };
 
         const errorBleepSoundTask = manager.addBinaryFileTask("errorBleepSoundTask", errorBleepSound);
         errorBleepSoundTask.onSuccess = (task) => {
-            Sounds.MENU_SELECT_SOUND = new Sound("ErrorBleepSound", task.data, scene);
+            Sounds.ERROR_BLEEP_SOUND = new Sound("ErrorBleepSound", task.data, scene);
             console.log("Error bleep sound loaded");
         };
 

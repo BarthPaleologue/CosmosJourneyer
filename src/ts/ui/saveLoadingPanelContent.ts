@@ -1,7 +1,7 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
 import i18n from "../i18n";
 import { LocalStorageAutoSaves, LocalStorageManualSaves, parseSaveFileData, SaveFileData } from "../saveFile/saveFileData";
-import { createNotification, NotificationType } from "../utils/notification";
+import { createNotification, NotificationIntent, NotificationOrigin } from "../utils/notification";
 import { Settings } from "../settings";
 import { Sounds } from "../assets/sounds";
 import expandIconPath from "../../asset/icons/expand.webp";
@@ -315,7 +315,7 @@ export class SaveLoadingPanelContent {
                 if (event.target === null) throw new Error("event.target is null");
                 const data = event.target.result as string;
                 const loadingSaveData = parseSaveFileData(data);
-                loadingSaveData.logs.forEach((log) => createNotification(NotificationType.INFO, log, 60_000));
+                loadingSaveData.logs.forEach((log) => createNotification(NotificationOrigin.GENERAL, NotificationIntent.WARNING, log, 60_000));
                 if (loadingSaveData.data === null) return;
                 resolve(loadingSaveData.data);
             };

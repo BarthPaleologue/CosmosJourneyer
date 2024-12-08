@@ -43,7 +43,7 @@ import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { View } from "../utils/view";
 import { SystemTarget } from "../utils/systemTarget";
 import { StarSystemInputs } from "../inputs/starSystemInputs";
-import { createNotification, NotificationType } from "../utils/notification";
+import { createNotification, NotificationIntent, NotificationOrigin } from "../utils/notification";
 import { axisCompositeToString, dPadCompositeToString } from "../utils/strings/inputControlsString";
 import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
 import { AxisComposite } from "@brianchirls/game-input/browser";
@@ -273,7 +273,7 @@ export class StarSystemView implements View {
             const fuelForJump = spaceship.getWarpDrive().getFuelConsumption(distanceLY);
 
             if (spaceship.getRemainingFuel() < fuelForJump) {
-                createNotification(NotificationType.SPACESHIP, i18n.t("notifications:notEnoughFuel"), 5000);
+                createNotification(NotificationOrigin.SPACESHIP, NotificationIntent.ERROR, i18n.t("notifications:notEnoughFuel"), 5000);
                 this.jumpLock = false;
                 return;
             }
@@ -367,7 +367,8 @@ export class StarSystemView implements View {
                         throw new Error("Up down is not an axis composite");
                     }
                     createNotification(
-                        NotificationType.SPACESHIP,
+                        NotificationOrigin.SPACESHIP,
+                        NotificationIntent.INFO,
                         i18n.t("notifications:howToLiftOff", { bindingsString: axisCompositeToString(control, keyboardLayoutMap)[1][1] }),
                         5000
                     );
@@ -638,7 +639,7 @@ export class StarSystemView implements View {
             const universeId = getUniverseObjectId(nearestCelestialBody, starSystem);
             const isNewDiscovery = this.player.addVisitedObjectIfNew(universeId);
             if (isNewDiscovery) {
-                createNotification(NotificationType.EXPLORATION, i18n.t("notifications:newDiscovery", { objectName: nearestCelestialBody.model.name }), 10000);
+                createNotification(NotificationOrigin.EXPLORATION, NotificationIntent.SUCCESS, i18n.t("notifications:newDiscovery", { objectName: nearestCelestialBody.model.name }), 15_000);
                 this.onNewDiscovery.notifyObservers(universeId);
             }
         }
@@ -865,7 +866,7 @@ export class StarSystemView implements View {
             const horizontalKeys = dPadCompositeToString(DefaultControlsInputs.map.move.bindings[0].control as DPadComposite, keyboardLayoutMap);
             const verticalKeys = axisCompositeToString(DefaultControlsInputs.map.upDown.bindings[0].control as AxisComposite, keyboardLayoutMap);
             const keys = horizontalKeys.concat(verticalKeys);
-            createNotification(NotificationType.INFO, `Move using ${keys.map((key) => key[1].replace("Key", "")).join(", ")}`, 2000000);
+            createNotification(NotificationOrigin.GENERAL, NotificationIntent.INFO, `Move using ${keys.map((key) => key[1].replace("Key", "")).join(", ")}`, 2000000);
         }
     }
 

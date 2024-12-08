@@ -42,7 +42,7 @@ import { updateInputDevices } from "./inputs/devices";
 import { AudioManager } from "./audio/audioManager";
 import { AudioMasks } from "./audio/audioMasks";
 import { GeneralInputs } from "./inputs/generalInputs";
-import { createNotification, NotificationType, updateNotifications } from "./utils/notification";
+import { createNotification, NotificationIntent, NotificationOrigin, updateNotifications } from "./utils/notification";
 import { LoadingScreen } from "./uberCore/loadingScreen";
 import i18n, { initI18n } from "./i18n";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
@@ -217,14 +217,14 @@ export class CosmosJourneyer {
                 const payload = `universeCoordinates=${urlData}`;
                 const url = new URL(`https://barthpaleologue.github.io/CosmosJourneyer/?${payload}`);
                 navigator.clipboard.writeText(url.toString()).then(() => {
-                    createNotification(NotificationType.INFO, i18n.t("notifications:copiedToClipboard"), 2000);
+                    createNotification(NotificationOrigin.GENERAL, NotificationIntent.INFO, i18n.t("notifications:copiedToClipboard"), 2000);
                 });
             });
         });
         this.pauseMenu.onSave.add(() => {
             this.saveToLocalStorage();
             this.createAutoSave();
-            createNotification(NotificationType.INFO, i18n.t("notifications:saveOk"), 2000);
+            createNotification(NotificationOrigin.GENERAL, NotificationIntent.INFO, i18n.t("notifications:saveOk"), 2000);
         });
 
         window.addEventListener("blur", () => {
@@ -566,7 +566,8 @@ export class CosmosJourneyer {
     public async loadSaveData(saveData: SaveFileData): Promise<void> {
         if (saveData.version !== projectInfo.version) {
             createNotification(
-                NotificationType.INFO,
+                NotificationOrigin.GENERAL,
+                NotificationIntent.WARNING,
                 i18n.t("notifications:saveVersionMismatch", {
                     currentVersion: projectInfo.version,
                     saveVersion: saveData.version
