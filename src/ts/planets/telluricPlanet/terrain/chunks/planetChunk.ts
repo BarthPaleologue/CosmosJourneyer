@@ -239,7 +239,7 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
         const conservativeSphereNormal = closestPointToCamera.subtract(this.parent.getAbsolutePosition()).normalizeToNew();
         const observerToCenter = camera.globalPosition.subtract(this.parent.getAbsolutePosition()).normalizeToNew();
 
-        const isVisible = (Vector3.Dot(observerToCenter, conservativeSphereNormal) >= 0 && isSizeOnScreenEnough(this, camera, 0.002 / 5));
+        const isVisible = Vector3.Dot(observerToCenter, conservativeSphereNormal) >= 0 && isSizeOnScreenEnough(this, camera, 0.002 / 5);
 
         this.mesh.setEnabled(isVisible);
 

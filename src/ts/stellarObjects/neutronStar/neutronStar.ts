@@ -144,7 +144,6 @@ export class NeutronStar implements StellarObject, Cullable {
         return this.getRadius();
     }
 
-
     public computeCulling(camera: Camera): void {
         this.mesh.isVisible = isSizeOnScreenEnough(this, camera);
     }
