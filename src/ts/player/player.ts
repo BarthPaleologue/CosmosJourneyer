@@ -154,8 +154,8 @@ export class Player {
         this.visitedSystemHistory = player.visitedSystemHistory.map((system) => structuredClone(system));
         this.currentItinerary = player.currentItinerary.map((system) => structuredClone(system));
         this.systemBookmarks = player.systemBookmarks.map((system) => structuredClone(system));
-        this.currentMissions = player.currentMissions.map(mission => Mission.Deserialize(mission.serialize()))
-        this.completedMissions = player.completedMissions.map(mission => Mission.Deserialize(mission.serialize()))
+        this.currentMissions = player.currentMissions.map((mission) => Mission.Deserialize(mission.serialize()));
+        this.completedMissions = player.completedMissions.map((mission) => Mission.Deserialize(mission.serialize()));
         this.serializedSpaceships = player.serializedSpaceships.map((spaceship) => structuredClone(spaceship));
         this.instancedSpaceships = [...player.instancedSpaceships];
         this.tutorials = structuredClone(player.tutorials);

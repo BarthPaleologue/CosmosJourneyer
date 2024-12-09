@@ -1,11 +1,11 @@
-name: ESLint Check
+name: Format Check
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 jobs:
-  eslint:
+  format-check:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -23,5 +23,5 @@ jobs:
         cache: 'pnpm'
     - name: Install dependencies
       run: pnpm install
-    - name: Lint
-      run: pnpm run lint:check
+    - name: Format check
+      run: pnpm run format:check

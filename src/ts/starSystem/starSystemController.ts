@@ -133,7 +133,7 @@ export class StarSystemController {
         let numberOfObjects = 0;
         for (const subSystem of this.model.subSystems) {
             numberOfObjects += subSystem.stellarObjects.length + subSystem.anomalies.length + subSystem.orbitalFacilities.length;
-            for(const planetarySystem of subSystem.planetarySystems) {
+            for (const planetarySystem of subSystem.planetarySystems) {
                 numberOfObjects += planetarySystem.planets.length + planetarySystem.satellites.length + planetarySystem.orbitalFacilities.length;
             }
         }
