@@ -1,6 +1,7 @@
 import { ILoadingScreen } from "@babylonjs/core/Loading/loadingScreen";
 import { Nullable } from "@babylonjs/core/types";
 import i18next from "../i18n";
+import { alertModal } from "../utils/dialogModal";
 
 export class LoadingScreen implements ILoadingScreen {
     private loadingDiv: Nullable<HTMLDivElement> = null;
@@ -92,11 +93,11 @@ export class LoadingScreen implements ILoadingScreen {
     /**
      * Function called to hide the loading screen
      */
-    public hideLoadingUI(): void {
+    public async hideLoadingUI(): Promise<void> {
         if (!this.loadingDiv) {
             return;
         }
-
+    
         const onTransitionEnd = () => {
             if (this.loadingTextDiv) {
                 this.loadingTextDiv.remove();
@@ -108,10 +109,21 @@ export class LoadingScreen implements ILoadingScreen {
             }
             window.removeEventListener("resize", this.resizeLoadingUI);
         };
-
+    
+        // Set opacity to initiate the transition
         this.loadingDiv.style.opacity = "0";
         this.loadingDiv.addEventListener("transitionend", onTransitionEnd);
+    
+        // Wait for the modal to be acknowledged
+        const isFirefox = /Firefox/i.test(navigator.userAgent);
+        if (isFirefox) {
+            await alertModal(
+                "Since your browser does not support keyboard layout detection, QWERTY will be assumed."
+            );
+            console.log("User acknowledged the keyboard layout warning.");
+        }
     }
+    
 
     public setProgressPercentage(percentage: number) {
         this.loadingUIText = `${i18next.t("common:loading")} ${percentage.toFixed(0)}%`;

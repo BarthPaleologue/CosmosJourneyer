@@ -65,3 +65,25 @@ export function promptModalBoolean(prompt: string): Promise<boolean> {
         });
     });
 }
+
+export function alertModal(message: string): Promise<void> {
+    const modal = document.createElement("dialog");
+    modal.innerHTML = `
+        <form method="dialog">
+            <p>${message}</p>
+            <menu>
+                <button value="ok">OK</button>
+            </menu>
+        </form>
+    `;
+    document.body.appendChild(modal);
+    modal.showModal();
+
+    return new Promise((resolve) => {
+        modal.addEventListener("close", () => {
+            Sounds.MENU_SELECT_SOUND.play();
+            resolve();
+            modal.remove();
+        });
+    });
+}
