@@ -320,8 +320,6 @@ export class CosmosJourneyer {
             );
         }
 
-        await alertModal("Loading Complete! Welcome to Cosmos Journeyer."); 
-
         return new CosmosJourneyer(player, engine, starSystemView);
     }
 
