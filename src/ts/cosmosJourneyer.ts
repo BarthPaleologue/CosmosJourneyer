@@ -314,6 +314,12 @@ export class CosmosJourneyer {
         await starSystemView.initAssets();
         starSystemView.resetPlayer();
 
+        if (!navigator.keyboard) {
+            await alertModal(
+                "Your keyboard layout could not be detected. The QWERTY layout will be assumed by default."
+            );
+        }
+
         await alertModal("Loading Complete! Welcome to Cosmos Journeyer."); 
 
         return new CosmosJourneyer(player, engine, starSystemView);
