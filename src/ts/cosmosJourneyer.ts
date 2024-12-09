@@ -56,7 +56,7 @@ import { getObjectBySystemId, getUniverseObjectId } from "./utils/coordinates/or
 import { getSystemModelFromCoordinates } from "./starSystem/modelFromCoordinates";
 import { Tutorial } from "./tutorials/tutorial";
 import { StationLandingTutorial } from "./tutorials/stationLandingTutorial";
-import { promptModalBoolean } from "./utils/dialogModal";
+import { promptModalBoolean, alertModal } from "./utils/dialogModal";
 import { FuelScoopTutorial } from "./tutorials/fuelScoopTutorial";
 
 const enum EngineState {
@@ -316,6 +316,10 @@ export class CosmosJourneyer {
 
         await starSystemView.initAssets();
         starSystemView.resetPlayer();
+
+        if (!navigator.keyboard) {
+            await alertModal("Your keyboard layout could not be detected. The QWERTY layout will be assumed by default.");
+        }
 
         return new CosmosJourneyer(player, engine, starSystemView);
     }
