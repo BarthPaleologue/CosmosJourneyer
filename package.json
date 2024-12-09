@@ -64,7 +64,7 @@
     "serve": "webpack serve",
     "serve:prod": "http-server dist -p 8080",
     "format:check": "prettier --config .prettierrc src//**/*.{js,jsx,json,ts} --check",
-    "format": "prettier --config .prettierrc src//**/*.{js,jsx,json,ts} --write",
+    "format": "prettier --config .prettierrc src//**/*.{js,json,ts} --write",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules npx jest",
     "test:coverage": "cross-env NODE_OPTIONS=--experimental-vm-modules npx jest --coverage",
     "docs": "typedoc --options typedoc.json",
