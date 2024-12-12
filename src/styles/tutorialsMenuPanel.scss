@@ -42,6 +42,8 @@
       flex-direction: column;
       justify-content: flex-start;
       align-items: center;
+      row-gap: 10px;
+      padding: 10px;
 
       h2 {
         color: white;
@@ -51,7 +53,7 @@
       }
 
       img {
-        width: 90%;
+        width: 100%;
       }
 
       p {
