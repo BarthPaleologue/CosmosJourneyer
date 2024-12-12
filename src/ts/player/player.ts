@@ -2,6 +2,7 @@ import { Mission, MissionSerialized } from "../missions/mission";
 import { StarSystemCoordinates, UniverseObjectId } from "../utils/coordinates/universeCoordinates";
 import { warnIfUndefined } from "../utils/notification";
 import { DefaultSerializedSpaceship, SerializedSpaceship, Spaceship } from "../spaceship/spaceship";
+import { SpaceDiscoveryData } from "../society/encyclopaediaGalactica";
 
 export type CompletedTutorials = {
     stationLandingCompleted: boolean;
@@ -22,8 +23,8 @@ export type SerializedPlayer = {
     visitedSystemHistory: StarSystemCoordinates[];
 
     visitedObjectsHistory: {
-        notInEncyclopaedia: UniverseObjectId[];
-        inEncyclopaedia: UniverseObjectId[];
+        notInEncyclopaedia: SpaceDiscoveryData[];
+        inEncyclopaedia: SpaceDiscoveryData[];
     };
 
     currentItinerary: StarSystemCoordinates[];
@@ -47,8 +48,8 @@ export class Player {
     visitedSystemHistory: StarSystemCoordinates[] = [];
 
     private visitedObjectsHistory: {
-        notInEncyclopaedia: UniverseObjectId[];
-        inEncyclopaedia: UniverseObjectId[];
+        notInEncyclopaedia: SpaceDiscoveryData[];
+        inEncyclopaedia: SpaceDiscoveryData[];
     };
 
     private readonly visitedObjects: Set<string> = new Set();
@@ -145,7 +146,7 @@ export class Player {
             return false;
         }
         this.visitedObjects.add(JSON.stringify(objectId));
-        this.visitedObjectsHistory.notInEncyclopaedia.push(objectId);
+        this.visitedObjectsHistory.notInEncyclopaedia.push({ objectId, discoveryTimestamp: Date.now(), explorerName: this.name });
 
         return true;
     }
