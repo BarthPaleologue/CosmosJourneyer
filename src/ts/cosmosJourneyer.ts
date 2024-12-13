@@ -58,6 +58,7 @@ import { Tutorial } from "./tutorials/tutorial";
 import { StationLandingTutorial } from "./tutorials/stationLandingTutorial";
 import { promptModalBoolean, alertModal } from "./utils/dialogModal";
 import { FuelScoopTutorial } from "./tutorials/fuelScoopTutorial";
+import { EncyclopaediaGalactica } from "./society/encyclopaediaGalactica";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -97,6 +98,8 @@ export class CosmosJourneyer {
 
     private readonly player: Player;
 
+    private readonly encyclopaedia: EncyclopaediaGalactica;
+
     /**
      * The number of seconds elapsed since the start of the engine
      */
@@ -114,6 +117,11 @@ export class CosmosJourneyer {
     private constructor(player: Player, engine: AbstractEngine, starSystemView: StarSystemView) {
         this.engine = engine;
         this.player = player;
+
+        this.encyclopaedia = new EncyclopaediaGalactica();
+        this.player.personalDiscoveries.local.forEach((discovery) => {
+            this.encyclopaedia.contributeDiscoveryIfNew(discovery);
+        });
 
         this.starSystemView = starSystemView;
         this.starSystemView.onBeforeJump.add(() => {
@@ -585,6 +593,10 @@ export class CosmosJourneyer {
 
         const newPlayer = saveData.player !== undefined ? Player.Deserialize(saveData.player) : Player.Default();
         this.player.copyFrom(newPlayer);
+        this.encyclopaedia.reset();
+        this.player.personalDiscoveries.local.forEach((discovery) => {
+            this.encyclopaedia.contributeDiscoveryIfNew(discovery);
+        });
         this.starSystemView.resetPlayer();
 
         await this.loadUniverseCoordinates(saveData.universeCoordinates);

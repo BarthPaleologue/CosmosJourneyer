@@ -151,4 +151,8 @@ export class EncyclopaediaGalactica {
 
         return valueFromDistance * objectTypeMultiplier;
     }
+
+    public reset() {
+        this.spaceExplorationData.clear();
+    }
 }
