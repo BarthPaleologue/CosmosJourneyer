@@ -193,7 +193,7 @@ export class StarSystemView implements View {
      * Whether the star system is currently loading or not
      * @private
      */
-    private isLoadingSystem = false;
+    private _isLoadingSystem = false;
 
     readonly onNewDiscovery = new Observable<UniverseObjectId>();
 
@@ -441,10 +441,10 @@ export class StarSystemView implements View {
      * @param starSystemModel
      */
     public async loadStarSystem(starSystemModel: StarSystemModel) {
-        if (this.isLoadingSystem) {
+        if (this._isLoadingSystem) {
             throw new Error("Cannot load a new star system while the current one is loading");
         }
-        this.isLoadingSystem = true;
+        this._isLoadingSystem = true;
 
         if (this.starSystem !== null) {
             this.spaceshipControls?.setClosestLandableFacility(null);
@@ -553,7 +553,7 @@ export class StarSystemView implements View {
         this.onInitStarSystem.notifyObservers();
         this.scene.getEngine().loadingScreen.hideLoadingUI();
 
-        this.isLoadingSystem = false;
+        this._isLoadingSystem = false;
     }
 
     /**
@@ -607,12 +607,16 @@ export class StarSystemView implements View {
         return this.jumpLock;
     }
 
+    public isLoadingSystem() {
+        return this._isLoadingSystem;
+    }
+
     /**
      * Updates the system view. It updates the underlying star system, the UI, the chunk forge and the controls
      * @param deltaSeconds the time elapsed since the last update in seconds
      */
     public updateBeforePhysics(deltaSeconds: number) {
-        if (this.isLoadingSystem) return;
+        if (this._isLoadingSystem) return;
 
         const starSystem = this.getStarSystem();
 
@@ -622,7 +626,7 @@ export class StarSystemView implements View {
     }
 
     public updateBeforeRender(deltaSeconds: number) {
-        if (this.isLoadingSystem) return;
+        if (this._isLoadingSystem) return;
 
         const starSystem = this.getStarSystem();
         if (this.spaceshipControls === null) throw new Error("Spaceship controls is null");
@@ -717,7 +721,7 @@ export class StarSystemView implements View {
     }
 
     public updateAfterRender() {
-        if (this.isLoadingSystem) return;
+        if (this._isLoadingSystem) return;
 
         const starSystem = this.getStarSystem();
         if (this.spaceshipControls === null) throw new Error("Spaceship controls is null");

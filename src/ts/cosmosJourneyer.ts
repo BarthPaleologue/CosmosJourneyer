@@ -231,11 +231,11 @@ export class CosmosJourneyer {
         });
 
         window.addEventListener("blur", () => {
-            if (!this.mainMenu?.isVisible()) this.pause();
+            if (!this.mainMenu?.isVisible() && !this.starSystemView.isLoadingSystem()) this.pause();
         });
 
         window.addEventListener("mouseleave", () => {
-            if (!this.mainMenu?.isVisible()) this.pause();
+            if (!this.mainMenu?.isVisible() && !this.starSystemView.isLoadingSystem()) this.pause();
         });
 
         window.addEventListener("resize", () => {
