@@ -22,9 +22,9 @@ export type SerializedPlayer = {
 
     visitedSystemHistory: StarSystemCoordinates[];
 
-    visitedObjectsHistory: {
-        notInEncyclopaedia: SpaceDiscoveryData[];
-        inEncyclopaedia: SpaceDiscoveryData[];
+    personalDiscoveries: {
+        local: SpaceDiscoveryData[];
+        uploaded: SpaceDiscoveryData[];
     };
 
     currentItinerary: StarSystemCoordinates[];
@@ -47,9 +47,9 @@ export class Player {
 
     visitedSystemHistory: StarSystemCoordinates[] = [];
 
-    private visitedObjectsHistory: {
-        notInEncyclopaedia: SpaceDiscoveryData[];
-        inEncyclopaedia: SpaceDiscoveryData[];
+    private personalDiscoveries: {
+        local: SpaceDiscoveryData[];
+        uploaded: SpaceDiscoveryData[];
     };
 
     private readonly visitedObjects: Set<string> = new Set();
@@ -82,16 +82,16 @@ export class Player {
             [],
             `[PLAYER_DATA_WARNING] Visited system history was undefined. Defaulting to empty array`
         );
-        this.visitedObjectsHistory = warnIfUndefined(
-            serializedPlayer.visitedObjectsHistory,
-            { notInEncyclopaedia: [], inEncyclopaedia: [] },
+        this.personalDiscoveries = warnIfUndefined(
+            serializedPlayer.personalDiscoveries,
+            { local: [], uploaded: [] },
             `[PLAYER_DATA_WARNING] Visited objects history was undefined. Defaulting to empty arrays`
         );
 
-        this.visitedObjectsHistory.notInEncyclopaedia.forEach((objectId) => {
+        this.personalDiscoveries.local.forEach((objectId) => {
             this.visitedObjects.add(JSON.stringify(objectId));
         });
-        this.visitedObjectsHistory.inEncyclopaedia.forEach((objectId) => {
+        this.personalDiscoveries.uploaded.forEach((objectId) => {
             this.visitedObjects.add(JSON.stringify(objectId));
         });
 
@@ -146,7 +146,7 @@ export class Player {
             return false;
         }
         this.visitedObjects.add(JSON.stringify(objectId));
-        this.visitedObjectsHistory.notInEncyclopaedia.push({ objectId, discoveryTimestamp: Date.now(), explorerName: this.name });
+        this.personalDiscoveries.local.push({ objectId, discoveryTimestamp: Date.now(), explorerName: this.name });
 
         return true;
     }
@@ -159,7 +159,7 @@ export class Player {
             creationDate: new Date().toISOString(),
             timePlayedSeconds: 0,
             visitedSystemHistory: [],
-            visitedObjectsHistory: { inEncyclopaedia: [], notInEncyclopaedia: [] },
+            personalDiscoveries: { uploaded: [], local: [] },
             currentItinerary: [],
             systemBookmarks: [],
             currentMissions: [],
@@ -184,7 +184,7 @@ export class Player {
             creationDate: player.creationDate.toISOString(),
             timePlayedSeconds: Math.round(player.timePlayedSeconds),
             visitedSystemHistory: player.visitedSystemHistory,
-            visitedObjectsHistory: player.visitedObjectsHistory,
+            personalDiscoveries: player.personalDiscoveries,
             currentItinerary: player.currentItinerary,
             systemBookmarks: player.systemBookmarks,
             currentMissions: player.currentMissions.map((mission) => mission.serialize()),
@@ -206,9 +206,9 @@ export class Player {
         this.timePlayedSeconds = player.timePlayedSeconds;
         this.visitedSystemHistory = player.visitedSystemHistory.map((system) => structuredClone(system));
 
-        this.visitedObjectsHistory = {
-            notInEncyclopaedia: player.visitedObjectsHistory.notInEncyclopaedia.map((objectId) => structuredClone(objectId)),
-            inEncyclopaedia: player.visitedObjectsHistory.inEncyclopaedia.map((objectId) => structuredClone(objectId))
+        this.personalDiscoveries = {
+            local: player.personalDiscoveries.local.map((objectId) => structuredClone(objectId)),
+            uploaded: player.personalDiscoveries.uploaded.map((objectId) => structuredClone(objectId))
         };
         this.visitedObjects.clear();
         player.visitedObjects.forEach((objectId) => {
