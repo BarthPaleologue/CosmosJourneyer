@@ -26,12 +26,14 @@ import { generateSpaceshipDom } from "./spaceshipDock";
 import { promptModalString } from "../../utils/dialogModal";
 import i18n from "../../i18n";
 import { Sounds } from "../../assets/sounds";
+import { EncyclopaediaGalactica } from "../../society/encyclopaediaGalactica";
 
 const enum MainPanelState {
     NONE,
     INFO,
     MISSIONS,
-    SPACE_SHIP
+    SPACE_SHIP,
+    EXPLORATION_CENTER
 }
 
 export class SpaceStationLayer {
@@ -51,6 +53,8 @@ export class SpaceStationLayer {
 
     private readonly missionsButton: HTMLElement;
 
+    private readonly explorationCenterButton: HTMLElement;
+
     private readonly spaceshipButton: HTMLElement;
 
     private readonly infoButton: HTMLElement;
@@ -63,8 +67,11 @@ export class SpaceStationLayer {
 
     readonly player: Player;
 
-    constructor(player: Player) {
+    private readonly encyclopaedia: EncyclopaediaGalactica;
+
+    constructor(player: Player, encyclopaedia: EncyclopaediaGalactica) {
         this.player = player;
+        this.encyclopaedia = encyclopaedia;
 
         this.parentNode = document.getElementById("spaceStationUI") as HTMLElement;
 
@@ -101,6 +108,15 @@ export class SpaceStationLayer {
         this.spaceshipButton = spaceshipButton;
         this.spaceshipButton.addEventListener("click", () => {
             this.setMainPanelState(MainPanelState.SPACE_SHIP);
+        });
+
+        const explorationCenterButton = document.querySelector<HTMLElement>(".spaceStationAction.explorationCenterButton");
+        if (explorationCenterButton === null) {
+            throw new Error("Exploration center button not found");
+        }
+        this.explorationCenterButton = explorationCenterButton;
+        this.explorationCenterButton.addEventListener("click", () => {
+            this.setMainPanelState(MainPanelState.EXPLORATION_CENTER);
         });
 
         const infoButton = document.querySelector<HTMLElement>(".spaceStationAction.infoButton");
@@ -147,6 +163,11 @@ export class SpaceStationLayer {
                 this.mainPanel.classList.remove("hidden");
                 this.mainPanel.innerHTML = "";
                 this.mainPanel.appendChild(generateSpaceshipDom(this.currentStation, this.player));
+                break;
+            case MainPanelState.EXPLORATION_CENTER:
+                this.mainPanel.classList.remove("hidden");
+                this.mainPanel.innerHTML = "";
+                //this.mainPanel.appendChild(generateExplorationCenterDom(this.encyclopaedia, this.player));
                 break;
             case MainPanelState.NONE:
                 this.mainPanel.classList.add("hidden");

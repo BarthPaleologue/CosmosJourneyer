@@ -47,7 +47,7 @@ export class Player {
 
     visitedSystemHistory: StarSystemCoordinates[] = [];
 
-    private personalDiscoveries: {
+    personalDiscoveries: {
         local: SpaceDiscoveryData[];
         uploaded: SpaceDiscoveryData[];
     };

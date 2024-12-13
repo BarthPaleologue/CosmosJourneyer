@@ -114,11 +114,11 @@ export class CosmosJourneyer {
 
     private isAutoSaveEnabled = true;
 
-    private constructor(player: Player, engine: AbstractEngine, starSystemView: StarSystemView) {
+    private constructor(player: Player, engine: AbstractEngine, starSystemView: StarSystemView, encyclopaedia: EncyclopaediaGalactica) {
         this.engine = engine;
         this.player = player;
 
-        this.encyclopaedia = new EncyclopaediaGalactica();
+        this.encyclopaedia = encyclopaedia;
         this.player.personalDiscoveries.local.forEach((discovery) => {
             this.encyclopaedia.contributeDiscoveryIfNew(discovery);
         });
@@ -144,7 +144,7 @@ export class CosmosJourneyer {
         });
 
         // Init starmap view
-        this.starMap = new StarMap(this.player, this.engine);
+        this.starMap = new StarMap(this.player, this.engine, this.encyclopaedia);
         this.starMap.onTargetSetObservable.add((systemCoordinates: StarSystemCoordinates) => {
             this.starSystemView.setSystemAsTarget(systemCoordinates);
         });
@@ -322,8 +322,10 @@ export class CosmosJourneyer {
 
         const player = Player.Default();
 
+        const encyclopaedia = new EncyclopaediaGalactica();
+
         // Init star system view
-        const starSystemView = new StarSystemView(player, engine, havokInstance);
+        const starSystemView = new StarSystemView(player, engine, havokInstance, encyclopaedia);
 
         await starSystemView.initAssets();
         starSystemView.resetPlayer();
@@ -332,7 +334,7 @@ export class CosmosJourneyer {
             await alertModal("Your keyboard layout could not be detected. The QWERTY layout will be assumed by default.");
         }
 
-        return new CosmosJourneyer(player, engine, starSystemView);
+        return new CosmosJourneyer(player, engine, starSystemView, encyclopaedia);
     }
 
     public pause(): void {
