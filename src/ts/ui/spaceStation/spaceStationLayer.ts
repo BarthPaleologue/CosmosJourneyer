@@ -36,7 +36,6 @@ const enum MainPanelState {
 
 export class SpaceStationLayer {
     private parentNode: HTMLElement;
-    private spaceStationHeader: HTMLElement;
 
     private currentStation: OrbitalFacilityModel | null = null;
     private currentStationParents: OrbitalObjectModel[] = [];
@@ -68,7 +67,6 @@ export class SpaceStationLayer {
         this.player = player;
 
         this.parentNode = document.getElementById("spaceStationUI") as HTMLElement;
-        this.spaceStationHeader = document.getElementById("spaceStationHeader") as HTMLElement;
 
         this.spaceStationName = document.querySelector<HTMLElement>("#spaceStationUI .spaceStationName") as HTMLElement;
 
