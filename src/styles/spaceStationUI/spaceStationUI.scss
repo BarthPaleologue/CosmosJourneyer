@@ -69,8 +69,7 @@ $gaps: 10px;
         scale: 1;
         transition: 0.2s ease-in-out;
 
-        padding: 0 20px;
-        overflow-y: auto;
+        padding: 10px;
 
         &.hidden {
             scale: 0;
@@ -233,4 +232,33 @@ $gaps: 10px;
             }
         }
     }
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+    row-gap: 10px;
+}
+
+.flex-row {
+    display: flex;
+    column-gap: 10px;
+}
+
+.overflow-y-auto {
+    overflow-y: auto;
+}
+
+.listItemContainer {
+    background: var(--accent-color-dark);
+    padding: 20px;
+}
+
+.discoveryDetails {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    background: var(--accent-color-dark);
 }

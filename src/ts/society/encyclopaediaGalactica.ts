@@ -105,7 +105,7 @@ export class EncyclopaediaGalactica {
      * @param object The object to evaluate.
      * @returns The estimated value of the object in credits.
      */
-    public evaluate(object: UniverseObjectId) {
+    public estimateDiscovery(object: UniverseObjectId) {
         if (this.hasObjectBeenDiscovered(object)) {
             return this.redundantDataPrice;
         }
@@ -149,7 +149,7 @@ export class EncyclopaediaGalactica {
                 break;
         }
 
-        return valueFromDistance * objectTypeMultiplier;
+        return Math.ceil(valueFromDistance * objectTypeMultiplier);
     }
 
     public reset() {

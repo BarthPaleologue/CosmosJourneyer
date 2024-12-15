@@ -1,3 +1,20 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Affero General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Affero General Public License for more details.
+//
+//  You should have received a copy of the GNU Affero General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { Mission, MissionSerialized } from "../missions/mission";
 import { StarSystemCoordinates, UniverseObjectId } from "../utils/coordinates/universeCoordinates";
 import { warnIfUndefined } from "../utils/notification";
@@ -22,7 +39,7 @@ export type SerializedPlayer = {
 
     visitedSystemHistory: StarSystemCoordinates[];
 
-    personalDiscoveries: {
+    discoveries: {
         local: SpaceDiscoveryData[];
         uploaded: SpaceDiscoveryData[];
     };
@@ -47,7 +64,7 @@ export class Player {
 
     visitedSystemHistory: StarSystemCoordinates[] = [];
 
-    personalDiscoveries: {
+    discoveries: {
         local: SpaceDiscoveryData[];
         uploaded: SpaceDiscoveryData[];
     };
@@ -82,16 +99,16 @@ export class Player {
             [],
             `[PLAYER_DATA_WARNING] Visited system history was undefined. Defaulting to empty array`
         );
-        this.personalDiscoveries = warnIfUndefined(
-            serializedPlayer.personalDiscoveries,
+        this.discoveries = warnIfUndefined(
+            serializedPlayer.discoveries,
             { local: [], uploaded: [] },
             `[PLAYER_DATA_WARNING] Visited objects history was undefined. Defaulting to empty arrays`
         );
 
-        this.personalDiscoveries.local.forEach((objectId) => {
+        this.discoveries.local.forEach((objectId) => {
             this.visitedObjects.add(JSON.stringify(objectId));
         });
-        this.personalDiscoveries.uploaded.forEach((objectId) => {
+        this.discoveries.uploaded.forEach((objectId) => {
             this.visitedObjects.add(JSON.stringify(objectId));
         });
 
@@ -146,7 +163,7 @@ export class Player {
             return false;
         }
         this.visitedObjects.add(JSON.stringify(objectId));
-        this.personalDiscoveries.local.push({ objectId, discoveryTimestamp: Date.now(), explorerName: this.name });
+        this.discoveries.local.push({ objectId, discoveryTimestamp: Date.now(), explorerName: this.name });
 
         return true;
     }
@@ -159,7 +176,7 @@ export class Player {
             creationDate: new Date().toISOString(),
             timePlayedSeconds: 0,
             visitedSystemHistory: [],
-            personalDiscoveries: { uploaded: [], local: [] },
+            discoveries: { uploaded: [], local: [] },
             currentItinerary: [],
             systemBookmarks: [],
             currentMissions: [],
@@ -184,7 +201,7 @@ export class Player {
             creationDate: player.creationDate.toISOString(),
             timePlayedSeconds: Math.round(player.timePlayedSeconds),
             visitedSystemHistory: player.visitedSystemHistory,
-            personalDiscoveries: player.personalDiscoveries,
+            discoveries: player.discoveries,
             currentItinerary: player.currentItinerary,
             systemBookmarks: player.systemBookmarks,
             currentMissions: player.currentMissions.map((mission) => mission.serialize()),
@@ -206,9 +223,9 @@ export class Player {
         this.timePlayedSeconds = player.timePlayedSeconds;
         this.visitedSystemHistory = player.visitedSystemHistory.map((system) => structuredClone(system));
 
-        this.personalDiscoveries = {
-            local: player.personalDiscoveries.local.map((objectId) => structuredClone(objectId)),
-            uploaded: player.personalDiscoveries.uploaded.map((objectId) => structuredClone(objectId))
+        this.discoveries = {
+            local: player.discoveries.local.map((objectId) => structuredClone(objectId)),
+            uploaded: player.discoveries.uploaded.map((objectId) => structuredClone(objectId))
         };
         this.visitedObjects.clear();
         player.visitedObjects.forEach((objectId) => {

@@ -119,7 +119,7 @@ export class CosmosJourneyer {
         this.player = player;
 
         this.encyclopaedia = encyclopaedia;
-        this.player.personalDiscoveries.local.forEach((discovery) => {
+        this.player.discoveries.uploaded.forEach((discovery) => {
             this.encyclopaedia.contributeDiscoveryIfNew(discovery);
         });
 
@@ -596,7 +596,7 @@ export class CosmosJourneyer {
         const newPlayer = saveData.player !== undefined ? Player.Deserialize(saveData.player) : Player.Default();
         this.player.copyFrom(newPlayer);
         this.encyclopaedia.reset();
-        this.player.personalDiscoveries.local.forEach((discovery) => {
+        this.player.discoveries.uploaded.forEach((discovery) => {
             this.encyclopaedia.contributeDiscoveryIfNew(discovery);
         });
         this.starSystemView.resetPlayer();

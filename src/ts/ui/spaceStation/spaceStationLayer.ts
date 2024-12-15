@@ -27,6 +27,7 @@ import { promptModalString } from "../../utils/dialogModal";
 import i18n from "../../i18n";
 import { Sounds } from "../../assets/sounds";
 import { EncyclopaediaGalactica } from "../../society/encyclopaediaGalactica";
+import { generateExplorationCenterDom } from "./explorationCenterPanel";
 
 const enum MainPanelState {
     NONE,
@@ -167,7 +168,7 @@ export class SpaceStationLayer {
             case MainPanelState.EXPLORATION_CENTER:
                 this.mainPanel.classList.remove("hidden");
                 this.mainPanel.innerHTML = "";
-                //this.mainPanel.appendChild(generateExplorationCenterDom(this.encyclopaedia, this.player));
+                this.mainPanel.appendChild(generateExplorationCenterDom(this.encyclopaedia, this.player));
                 break;
             case MainPanelState.NONE:
                 this.mainPanel.classList.add("hidden");
