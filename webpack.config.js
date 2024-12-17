@@ -29,7 +29,8 @@ const config = {
         headers: {
             "Cross-Origin-Opener-Policy": "same-origin",
             "Cross-Origin-Embedder-Policy": "same-origin"
-        }
+        },
+        compress: true
     },
 
     plugins: [
@@ -117,7 +118,9 @@ const config = {
             template: path.join(htmlPath, "emptyIndex.html"),
             chunks: ["debugAssets"]
         }),
-        new MiniCssExtractPlugin()
+        new MiniCssExtractPlugin({
+            filename: "[name].[contenthash].css"
+        })
     ],
 
     module: {
@@ -129,16 +132,19 @@ const config = {
             },
             {
                 test: /\.css$/i,
-                use: [MiniCssExtractPlugin.loader, "css-loader"]
+                use: [MiniCssExtractPlugin.loader, "css-loader"],
+                exclude: ["/node_modules/"]
             },
 
             {
                 test: /\.s[ac]ss$/i,
-                use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"]
+                use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
+                exclude: ["/node_modules/"]
             },
             {
                 test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif|webp|glb|obj|mp3|babylon|env|dds)$/i,
-                type: "asset"
+                type: "asset",
+                exclude: ["/node_modules/"]
             },
             {
                 test: /\.(glsl|vs|fs|vert|frag|fx)$/,
@@ -160,11 +166,36 @@ module.exports = () => {
         config.mode = "production";
     } else {
         config.mode = "development";
-        config.devtool = "source-map";
+        config.devtool = "eval-cheap-module-source-map";
     }
     config.experiments = {
         asyncWebAssembly: true,
         topLevelAwait: true
+    };
+    // taken from https://webpack.js.org/plugins/split-chunks-plugin/
+    config.optimization = {
+        minimize: isProduction,
+        splitChunks: {
+            chunks: "async",
+            minSize: 20000,
+            minRemainingSize: 0,
+            minChunks: 1,
+            maxAsyncRequests: 30,
+            maxInitialRequests: 30,
+            enforceSizeThreshold: 50000,
+            cacheGroups: {
+                defaultVendors: {
+                    test: /[\\/]node_modules[\\/]/,
+                    priority: -10,
+                    reuseExistingChunk: true
+                },
+                default: {
+                    minChunks: 2,
+                    priority: -20,
+                    reuseExistingChunk: true
+                }
+            }
+        }
     };
     return config;
 };
