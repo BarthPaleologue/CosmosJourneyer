@@ -95,7 +95,7 @@ export class CosmosJourneyer {
 
     private videoRecorder: VideoRecorder | null = null;
 
-    private readonly player: Player;
+    readonly player: Player;
 
     /**
      * The number of seconds elapsed since the start of the engine
@@ -154,7 +154,7 @@ export class CosmosJourneyer {
                 }
                 this.resume();
                 this.starSystemView.setUIEnabled(true);
-                await this.loadSaveData(saveData);
+                await this.loadSave(saveData);
             });
         });
 
@@ -212,10 +212,9 @@ export class CosmosJourneyer {
             this.engine.onEndFrameObservable.addOnce(() => {
                 const saveData = this.generateSaveData();
 
+                const urlRoot = window.location.href.split("?")[0];
                 const urlData = encodeBase64(JSON.stringify(saveData.universeCoordinates));
-
-                const payload = `universeCoordinates=${urlData}`;
-                const url = new URL(`https://barthpaleologue.github.io/CosmosJourneyer/?${payload}`);
+                const url = new URL(`${urlRoot}?universeCoordinates=${urlData}`);
                 navigator.clipboard.writeText(url.toString()).then(() => {
                     createNotification(i18n.t("notifications:copiedToClipboard"), 2000);
                 });
@@ -513,6 +512,8 @@ export class CosmosJourneyer {
         if (!this.isAutoSaveEnabled) return;
         const saveData = this.generateSaveData();
 
+        if (saveData.player.uuid === Settings.SHARED_POSITION_SAVE_UUID) return; // don't autosave shared position
+
         // use player uuid as key to avoid overwriting other cmdr's autosave
         const uuid = saveData.player.uuid;
 
@@ -549,7 +550,7 @@ export class CosmosJourneyer {
     public async loadTutorial(tutorial: Tutorial) {
         this.engine.onEndFrameObservable.addOnce(async () => {
             this.mainMenu.hide();
-            await this.loadSaveData(tutorial.saveData);
+            await this.loadSave(tutorial.saveData);
             this.resume();
             await this.tutorialLayer.setTutorial(tutorial);
             this.starSystemView.setUIEnabled(true);
@@ -567,7 +568,7 @@ export class CosmosJourneyer {
      * This will perform engine initialization if the engine is not initialized.
      * @param saveData The save file data to load
      */
-    public async loadSaveData(saveData: SaveFileData): Promise<void> {
+    public async loadSave(saveData: SaveFileData): Promise<void> {
         if (saveData.version !== projectInfo.version) {
             createNotification(
                 i18n.t("notifications:saveVersionMismatch", {

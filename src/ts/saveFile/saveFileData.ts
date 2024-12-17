@@ -3,6 +3,7 @@ import projectInfo from "../../../package.json";
 import i18n from "../i18n";
 
 import { SerializedPlayer } from "../player/player";
+import { encodeBase64 } from "../utils/base64";
 
 /**
  * Data structure for the save file to allow restoring current star system and position.
@@ -61,6 +62,12 @@ export function parseSaveFileData(jsonString: string): { data: SaveFileData | nu
 
     logs.forEach((log) => console.warn(log));
     return { data: saveData, logs };
+}
+
+export function createUrlFromSave(data: SaveFileData): URL {
+    const urlRoot = window.location.href.split("?")[0];
+    const saveString = encodeBase64(JSON.stringify(data));
+    return new URL(`${urlRoot}?save=${saveString}`);
 }
 
 /**
