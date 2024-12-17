@@ -33,9 +33,10 @@ const saveString = urlParams.get("save");
 
 if (universeCoordinatesString !== null) {
     engine.player.copyFrom(Player.Default());
-    engine.player.name = Settings.SHARED_POSITION_SAVE_UUID;
+    engine.player.uuid = Settings.SHARED_POSITION_SAVE_UUID;
     const jsonString = decodeBase64(universeCoordinatesString);
-    engine.loadUniverseCoordinates(JSON.parse(jsonString));
+    await engine.loadUniverseCoordinates(JSON.parse(jsonString));
+    engine.starSystemView.setUIEnabled(true);
 } else if (saveString !== null) {
     const jsonString = decodeBase64(saveString);
     const result = parseSaveFileData(jsonString);
@@ -44,7 +45,8 @@ if (universeCoordinatesString !== null) {
         console.warn(log);
     });
     if (result.data !== null) {
-        engine.loadSave(result.data);
+        await engine.loadSave(result.data);
+        engine.starSystemView.setUIEnabled(true);
     } else {
         await alertModal("Error, this save file is invalid. See the console for more details.");
     }

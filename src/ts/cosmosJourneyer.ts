@@ -31,7 +31,7 @@ import { PauseMenu } from "./ui/pauseMenu";
 import { StarSystemView } from "./starSystem/starSystemView";
 import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
 import { MainMenu } from "./ui/mainMenu";
-import { LocalStorageAutoSaves, LocalStorageManualSaves, SaveFileData } from "./saveFile/saveFileData";
+import { getSavesFromLocalStorage, SaveFileData, writeSavesToLocalStorage } from "./saveFile/saveFileData";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { setRotationQuaternion } from "./uberCore/transforms/basicTransform";
@@ -56,7 +56,7 @@ import { getObjectBySystemId, getUniverseObjectId } from "./utils/coordinates/or
 import { getSystemModelFromCoordinates } from "./starSystem/modelFromCoordinates";
 import { Tutorial } from "./tutorials/tutorial";
 import { StationLandingTutorial } from "./tutorials/stationLandingTutorial";
-import { promptModalBoolean, alertModal } from "./utils/dialogModal";
+import { promptModalBoolean, alertModal, promptModalString } from "./utils/dialogModal";
 import { FuelScoopTutorial } from "./tutorials/fuelScoopTutorial";
 
 const enum EngineState {
@@ -113,7 +113,20 @@ export class CosmosJourneyer {
 
     private constructor(player: Player, engine: AbstractEngine, starSystemView: StarSystemView) {
         this.engine = engine;
+
         this.player = player;
+        this.player.onNameChangedObservable.add((newName) => {
+            // when name changes, rewrite the name in all saves
+            const saves = getSavesFromLocalStorage();
+            const cmdrSaves = saves[this.player.uuid];
+
+            if (cmdrSaves === undefined) return;
+
+            cmdrSaves.manual.forEach((save) => (save.player.name = newName));
+            cmdrSaves.auto.forEach((save) => (save.player.name = newName));
+
+            writeSavesToLocalStorage(saves);
+        });
 
         this.starSystemView = starSystemView;
         this.starSystemView.onBeforeJump.add(() => {
@@ -220,10 +233,10 @@ export class CosmosJourneyer {
                 });
             });
         });
-        this.pauseMenu.onSave.add(() => {
-            this.saveToLocalStorage();
-            this.createAutoSave();
-            createNotification(i18n.t("notifications:saveOk"), 2000);
+        this.pauseMenu.onSave.add(async () => {
+            const saveSuccess = await this.saveToLocalStorage();
+            if (saveSuccess) createNotification(i18n.t("notifications:saveOk"), 2000);
+            else createNotification(i18n.t("notifications:cantSaveTutorial"), 2000);
         });
 
         window.addEventListener("blur", () => {
@@ -485,20 +498,26 @@ export class CosmosJourneyer {
         };
     }
 
-    public saveToLocalStorage(): void {
+    public async saveToLocalStorage(): Promise<boolean> {
+        if (this.player.uuid === Settings.TUTORIAL_SAVE_UUID) return false; // don't save in tutorial
+        if (this.player.uuid === Settings.SHARED_POSITION_SAVE_UUID) {
+            this.player.uuid = crypto.randomUUID();
+            this.player.setName((await promptModalString(i18n.t("spaceStation:cmdrNameChangePrompt"), this.player.getName())) ?? "Python");
+        }
+
         const saveData = this.generateSaveData();
 
         // use player uuid as key to avoid overwriting other cmdr's save
         const uuid = saveData.player.uuid;
 
-        const localStorageKey = Settings.MANUAL_SAVE_KEY;
-
         // store in a hashmap in local storage
-        const manualSaves: LocalStorageManualSaves = JSON.parse(localStorage.getItem(localStorageKey) || "{}");
-        manualSaves[uuid] = manualSaves[uuid] || [];
-        manualSaves[uuid].unshift(saveData);
+        const saves = getSavesFromLocalStorage();
+        saves[uuid] = saves[uuid] || { manual: [], auto: [] };
+        saves[uuid].manual.unshift(saveData);
 
-        localStorage.setItem(localStorageKey, JSON.stringify(manualSaves));
+        writeSavesToLocalStorage(saves);
+
+        return true;
     }
 
     public setAutoSaveEnabled(isEnabled: boolean): void {
@@ -510,23 +529,23 @@ export class CosmosJourneyer {
      */
     public createAutoSave(): void {
         if (!this.isAutoSaveEnabled) return;
-        const saveData = this.generateSaveData();
 
-        if (saveData.player.uuid === Settings.SHARED_POSITION_SAVE_UUID) return; // don't autosave shared position
+        const saveData = this.generateSaveData();
 
         // use player uuid as key to avoid overwriting other cmdr's autosave
         const uuid = saveData.player.uuid;
 
-        const localStorageKey = Settings.AUTO_SAVE_KEY;
+        if (uuid === Settings.SHARED_POSITION_SAVE_UUID) return; // don't autosave shared position
+        if (uuid === Settings.TUTORIAL_SAVE_UUID) return; // don't autosave in tutorial
 
         // store in a hashmap in local storage
-        const autosaves: LocalStorageAutoSaves = JSON.parse(localStorage.getItem(localStorageKey) || "{}");
-        autosaves[uuid] = autosaves[uuid] || [];
-        autosaves[uuid].unshift(saveData); // enqueue the new autosave
-        while (autosaves[uuid].length > Settings.MAX_AUTO_SAVES) {
-            autosaves[uuid].pop(); // dequeue the oldest autosave
+        const saves = getSavesFromLocalStorage();
+        saves[uuid] = saves[uuid] || { manual: [], auto: [] };
+        saves[uuid].auto.unshift(saveData); // enqueue the new autosave
+        while (saves[uuid].auto.length > Settings.MAX_AUTO_SAVES) {
+            saves[uuid].auto.pop(); // dequeue the oldest autosave
         }
-        localStorage.setItem(localStorageKey, JSON.stringify(autosaves));
+        writeSavesToLocalStorage(saves);
 
         this.autoSaveTimerSeconds = 0;
     }
@@ -542,7 +561,7 @@ export class CosmosJourneyer {
             const link = document.createElement("a");
             link.href = url;
             const dateString = new Date().toLocaleString().replace(/[^0-9a-zA-Z]/g, "_"); // avoid special characters in the filename
-            link.download = `CMDR_${this.player.name}_${dateString}.json`;
+            link.download = `CMDR_${this.player.getName()}_${dateString}.json`;
             link.click();
         });
     }
@@ -551,6 +570,7 @@ export class CosmosJourneyer {
         this.engine.onEndFrameObservable.addOnce(async () => {
             this.mainMenu.hide();
             await this.loadSave(tutorial.saveData);
+            this.player.uuid = Settings.TUTORIAL_SAVE_UUID;
             this.resume();
             await this.tutorialLayer.setTutorial(tutorial);
             this.starSystemView.setUIEnabled(true);
