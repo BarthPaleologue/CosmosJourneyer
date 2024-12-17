@@ -95,7 +95,7 @@ export class CosmosJourneyer {
 
     private videoRecorder: VideoRecorder | null = null;
 
-    private readonly player: Player;
+    readonly player: Player;
 
     /**
      * The number of seconds elapsed since the start of the engine
@@ -511,6 +511,8 @@ export class CosmosJourneyer {
     public createAutoSave(): void {
         if (!this.isAutoSaveEnabled) return;
         const saveData = this.generateSaveData();
+
+        if (saveData.player.uuid === Settings.SHARED_POSITION_SAVE_UUID) return; // don't autosave shared position
 
         // use player uuid as key to avoid overwriting other cmdr's autosave
         const uuid = saveData.player.uuid;

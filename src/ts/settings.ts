@@ -121,7 +121,9 @@ export const Settings = {
 
     AUTO_SAVE_KEY: "autosaves",
 
-    MAX_AUTO_SAVES: 5
+    MAX_AUTO_SAVES: 5,
+
+    SHARED_POSITION_SAVE_UUID: "sharedPositionSave"
 };
 
 export const CollisionMask = {
