@@ -323,12 +323,17 @@ export class SaveLoadingPanelContent {
 
             if (isAutoSave) {
                 autoSavesDict[save.player.uuid] = autoSavesDict[save.player.uuid].filter((autoSave) => autoSave.timestamp !== save.timestamp);
+                if (autoSavesDict[save.player.uuid].length === 0) {
+                    delete autoSavesDict[save.player.uuid];
+                }
             } else {
                 manualSavesDict[save.player.uuid] = manualSavesDict[save.player.uuid].filter((manualSave) => manualSave.timestamp !== save.timestamp);
+                if (manualSavesDict[save.player.uuid].length === 0) {
+                    delete manualSavesDict[save.player.uuid];
+                }
             }
 
-            if (autoSavesDict[save.player.uuid] === undefined && (manualSavesDict[save.player.uuid] ?? []).length === 0) {
-                delete manualSavesDict[save.player.uuid];
+            if (autoSavesDict[save.player.uuid] === undefined && manualSavesDict[save.player.uuid] === undefined) {
                 saveDiv.parentElement?.parentElement?.remove();
             }
 
