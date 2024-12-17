@@ -123,7 +123,9 @@ export const Settings = {
 
     MAX_AUTO_SAVES: 5,
 
-    SHARED_POSITION_SAVE_UUID: "sharedPositionSave"
+    SHARED_POSITION_SAVE_UUID: "sharedPositionSave",
+
+    TUTORIAL_SAVE_UUID: "tutorialSave"
 };
 
 export const CollisionMask = {

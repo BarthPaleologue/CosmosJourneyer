@@ -94,6 +94,12 @@ export class SaveLoadingPanelContent {
         const autoSavesDict: LocalStorageAutoSaves = JSON.parse(localStorage.getItem(Settings.AUTO_SAVE_KEY) ?? "{}");
         const manualSavesDict: LocalStorageManualSaves = JSON.parse(localStorage.getItem(Settings.MANUAL_SAVE_KEY) ?? "{}");
 
+        // concatenate all saves and sort them by timestamp for each cmdr
+        const allSavesDict: { [key: string]: SaveFileData[] } = { ...autoSavesDict, ...manualSavesDict };
+        for (const cmdrUuid in allSavesDict) {
+            allSavesDict[cmdrUuid].sort((a, b) => b.timestamp - a.timestamp);
+        }
+
         // Get all cmdr UUIDs (union of auto saves and manual saves)
         const cmdrUuids = Object.keys(autoSavesDict);
         Object.keys(manualSavesDict).forEach((cmdrUuid) => {
@@ -102,8 +108,8 @@ export class SaveLoadingPanelContent {
 
         // Sort cmdr UUIDs by latest save timestamp to have the most recent save at the top
         cmdrUuids.sort((a, b) => {
-            const aLatestSave = autoSavesDict[a][0] ?? manualSavesDict[a][0];
-            const bLatestSave = autoSavesDict[b][0] ?? manualSavesDict[b][0];
+            const aLatestSave = allSavesDict[a][0];
+            const bLatestSave = allSavesDict[b][0];
             return bLatestSave.timestamp - aLatestSave.timestamp;
         });
 
@@ -116,7 +122,10 @@ export class SaveLoadingPanelContent {
 
             const manualSaves = manualSavesDict[cmdrUuid] ?? [];
 
-            const latestSave = autoSaves[0] ?? manualSaves[0];
+            const allSaves = autoSaves.concat(manualSaves);
+            allSaves.sort((a, b) => b.timestamp - a.timestamp);
+
+            const latestSave = allSaves[0];
 
             const cmdrHeader = document.createElement("div");
             cmdrHeader.classList.add("cmdrHeader");
@@ -205,9 +214,6 @@ export class SaveLoadingPanelContent {
             savesList.classList.add("savesList");
             savesList.classList.add("hidden"); // Hidden by default
             cmdrDiv.appendChild(savesList);
-
-            const allSaves = autoSaves.concat(manualSaves);
-            allSaves.sort((a, b) => b.timestamp - a.timestamp);
 
             allSaves.forEach((save) => {
                 const saveDiv = this.createSaveDiv(save, autoSaves.includes(save));

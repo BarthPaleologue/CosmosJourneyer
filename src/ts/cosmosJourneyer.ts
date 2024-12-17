@@ -56,7 +56,7 @@ import { getObjectBySystemId, getUniverseObjectId } from "./utils/coordinates/or
 import { getSystemModelFromCoordinates } from "./starSystem/modelFromCoordinates";
 import { Tutorial } from "./tutorials/tutorial";
 import { StationLandingTutorial } from "./tutorials/stationLandingTutorial";
-import { promptModalBoolean, alertModal } from "./utils/dialogModal";
+import { promptModalBoolean, alertModal, promptModalString } from "./utils/dialogModal";
 import { FuelScoopTutorial } from "./tutorials/fuelScoopTutorial";
 
 const enum EngineState {
@@ -220,10 +220,10 @@ export class CosmosJourneyer {
                 });
             });
         });
-        this.pauseMenu.onSave.add(() => {
-            this.saveToLocalStorage();
-            this.createAutoSave();
-            createNotification(i18n.t("notifications:saveOk"), 2000);
+        this.pauseMenu.onSave.add(async () => {
+            const saveSuccess = await this.saveToLocalStorage();
+            if (saveSuccess) createNotification(i18n.t("notifications:saveOk"), 2000);
+            else createNotification(i18n.t("notifications:cantSaveTutorial"), 2000);
         });
 
         window.addEventListener("blur", () => {
@@ -485,7 +485,13 @@ export class CosmosJourneyer {
         };
     }
 
-    public saveToLocalStorage(): void {
+    public async saveToLocalStorage(): Promise<boolean> {
+        if (this.player.uuid === Settings.TUTORIAL_SAVE_UUID) return false; // don't save in tutorial
+        if (this.player.uuid === Settings.SHARED_POSITION_SAVE_UUID) {
+            this.player.uuid = crypto.randomUUID();
+            this.player.name = (await promptModalString(i18n.t("spaceStation:cmdrNameChangePrompt"), this.player.name)) ?? "Python";
+        }
+
         const saveData = this.generateSaveData();
 
         // use player uuid as key to avoid overwriting other cmdr's save
@@ -499,6 +505,8 @@ export class CosmosJourneyer {
         manualSaves[uuid].unshift(saveData);
 
         localStorage.setItem(localStorageKey, JSON.stringify(manualSaves));
+
+        return true;
     }
 
     public setAutoSaveEnabled(isEnabled: boolean): void {
@@ -510,12 +518,14 @@ export class CosmosJourneyer {
      */
     public createAutoSave(): void {
         if (!this.isAutoSaveEnabled) return;
-        const saveData = this.generateSaveData();
 
-        if (saveData.player.uuid === Settings.SHARED_POSITION_SAVE_UUID) return; // don't autosave shared position
+        const saveData = this.generateSaveData();
 
         // use player uuid as key to avoid overwriting other cmdr's autosave
         const uuid = saveData.player.uuid;
+
+        if (uuid === Settings.SHARED_POSITION_SAVE_UUID) return; // don't autosave shared position
+        if (uuid === Settings.TUTORIAL_SAVE_UUID) return; // don't autosave in tutorial
 
         const localStorageKey = Settings.AUTO_SAVE_KEY;
 
@@ -551,6 +561,7 @@ export class CosmosJourneyer {
         this.engine.onEndFrameObservable.addOnce(async () => {
             this.mainMenu.hide();
             await this.loadSave(tutorial.saveData);
+            this.player.uuid = Settings.TUTORIAL_SAVE_UUID;
             this.resume();
             await this.tutorialLayer.setTutorial(tutorial);
             this.starSystemView.setUIEnabled(true);
