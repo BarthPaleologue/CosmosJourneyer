@@ -1,6 +1,6 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
 import i18n from "../i18n";
-import { LocalStorageAutoSaves, LocalStorageManualSaves, parseSaveFileData, SaveFileData } from "../saveFile/saveFileData";
+import { createUrlFromSave, LocalStorageAutoSaves, LocalStorageManualSaves, parseSaveFileData, SaveFileData } from "../saveFile/saveFileData";
 import { createNotification } from "../utils/notification";
 import { Settings } from "../settings";
 import { Sounds } from "../assets/sounds";
@@ -10,8 +10,10 @@ import loadIconPath from "../../asset/icons/play.webp";
 import editIconPath from "../../asset/icons/edit.webp";
 import downloadIconPath from "../../asset/icons/download.webp";
 import trashIconPath from "../../asset/icons/trash.webp";
+import shareIconPath from "../../asset/icons/link.webp";
 import { promptModalBoolean, promptModalString } from "../utils/dialogModal";
 import { getObjectModelByUniverseId } from "../utils/coordinates/orbitalObjectId";
+import { encodeBase64 } from "../utils/base64";
 
 export class SaveLoadingPanelContent {
     readonly htmlRoot: HTMLElement;
@@ -157,6 +159,21 @@ export class SaveLoadingPanelContent {
             loadIcon.src = loadIconPath;
             continueButton.appendChild(loadIcon);
 
+            const shareButton = document.createElement("button");
+            shareButton.classList.add("icon", "large");
+            shareButton.addEventListener("click", () => {
+                Sounds.MENU_SELECT_SOUND.play();
+                const url = createUrlFromSave(latestSave);
+                navigator.clipboard.writeText(url.toString()).then(() => {
+                    createNotification(i18n.t("notifications:copiedToClipboard"), 5000);
+                });
+            });
+            cmdrHeaderButtons.appendChild(shareButton);
+
+            const shareIcon = document.createElement("img");
+            shareIcon.src = shareIconPath;
+            shareButton.appendChild(shareIcon);
+
             const editNameButton = document.createElement("button");
             editNameButton.classList.add("icon", "large");
             editNameButton.addEventListener("click", async () => {
@@ -253,6 +270,21 @@ export class SaveLoadingPanelContent {
         const loadIcon = document.createElement("img");
         loadIcon.src = loadIconPath;
         loadButton.appendChild(loadIcon);
+
+        const shareButton = document.createElement("button");
+        shareButton.classList.add("icon", "large");
+        shareButton.addEventListener("click", () => {
+            Sounds.MENU_SELECT_SOUND.play();
+            const url = createUrlFromSave(save);
+            navigator.clipboard.writeText(url.toString()).then(() => {
+                createNotification(i18n.t("notifications:copiedToClipboard"), 5000);
+            });
+        });
+        saveButtons.appendChild(shareButton);
+
+        const shareIcon = document.createElement("img");
+        shareIcon.src = shareIconPath;
+        shareButton.appendChild(shareIcon);
 
         const downloadButton = document.createElement("button");
         downloadButton.classList.add("icon", "large");
