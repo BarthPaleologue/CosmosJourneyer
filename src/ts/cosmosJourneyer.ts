@@ -113,7 +113,20 @@ export class CosmosJourneyer {
 
     private constructor(player: Player, engine: AbstractEngine, starSystemView: StarSystemView) {
         this.engine = engine;
+
         this.player = player;
+        this.player.onNameChangedObservable.add((newName) => {
+            // when name changes, rewrite the name in all saves
+            const saves = getSavesFromLocalStorage();
+            const cmdrSaves = saves[this.player.uuid];
+
+            if (cmdrSaves === undefined) return;
+
+            cmdrSaves.manual.forEach((save) => (save.player.name = newName));
+            cmdrSaves.auto.forEach((save) => (save.player.name = newName));
+
+            writeSavesToLocalStorage(saves);
+        });
 
         this.starSystemView = starSystemView;
         this.starSystemView.onBeforeJump.add(() => {
@@ -489,7 +502,7 @@ export class CosmosJourneyer {
         if (this.player.uuid === Settings.TUTORIAL_SAVE_UUID) return false; // don't save in tutorial
         if (this.player.uuid === Settings.SHARED_POSITION_SAVE_UUID) {
             this.player.uuid = crypto.randomUUID();
-            this.player.name = (await promptModalString(i18n.t("spaceStation:cmdrNameChangePrompt"), this.player.name)) ?? "Python";
+            this.player.setName((await promptModalString(i18n.t("spaceStation:cmdrNameChangePrompt"), this.player.getName())) ?? "Python");
         }
 
         const saveData = this.generateSaveData();
@@ -548,7 +561,7 @@ export class CosmosJourneyer {
             const link = document.createElement("a");
             link.href = url;
             const dateString = new Date().toLocaleString().replace(/[^0-9a-zA-Z]/g, "_"); // avoid special characters in the filename
-            link.download = `CMDR_${this.player.name}_${dateString}.json`;
+            link.download = `CMDR_${this.player.getName()}_${dateString}.json`;
             link.click();
         });
     }

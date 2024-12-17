@@ -77,9 +77,9 @@ export class SpaceStationLayer {
         this.editPlayerNameButton = document.querySelector<HTMLElement>("#spaceStationUI .playerName button") as HTMLElement;
         this.editPlayerNameButton.addEventListener("click", async () => {
             Sounds.MENU_SELECT_SOUND.play();
-            const newName = await promptModalString(i18n.t("spaceStation:cmdrNameChangePrompt"), player.name);
+            const newName = await promptModalString(i18n.t("spaceStation:cmdrNameChangePrompt"), player.getName());
             if (newName === null) return;
-            player.name = newName;
+            player.setName(newName);
             this.updatePlayerName();
         });
 
@@ -177,7 +177,7 @@ export class SpaceStationLayer {
     }
 
     private updatePlayerName() {
-        this.playerName.textContent = `CMDR ${this.player.name}`;
+        this.playerName.textContent = `CMDR ${this.player.getName()}`;
     }
 
     private updatePlayerBalance() {
