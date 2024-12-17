@@ -117,9 +117,7 @@ export const Settings = {
 
     MAIN_FONT: "Nasalization",
 
-    MANUAL_SAVE_KEY: "saves",
-
-    AUTO_SAVE_KEY: "autosaves",
+    SAVES_KEY: "saves",
 
     MAX_AUTO_SAVES: 5,
 
