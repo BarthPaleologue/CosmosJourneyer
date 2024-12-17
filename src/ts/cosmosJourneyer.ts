@@ -31,7 +31,7 @@ import { PauseMenu } from "./ui/pauseMenu";
 import { StarSystemView } from "./starSystem/starSystemView";
 import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
 import { MainMenu } from "./ui/mainMenu";
-import { LocalStorageSaves, SaveFileData } from "./saveFile/saveFileData";
+import { getSavesFromLocalStorage, SaveFileData, writeSavesToLocalStorage } from "./saveFile/saveFileData";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { setRotationQuaternion } from "./uberCore/transforms/basicTransform";
@@ -497,14 +497,12 @@ export class CosmosJourneyer {
         // use player uuid as key to avoid overwriting other cmdr's save
         const uuid = saveData.player.uuid;
 
-        const localStorageKey = Settings.SAVES_KEY;
-
         // store in a hashmap in local storage
-        const saves: LocalStorageSaves = JSON.parse(localStorage.getItem(localStorageKey) || "{}");
+        const saves = getSavesFromLocalStorage();
         saves[uuid] = saves[uuid] || { manual: [], auto: [] };
         saves[uuid].manual.unshift(saveData);
 
-        localStorage.setItem(localStorageKey, JSON.stringify(saves));
+        writeSavesToLocalStorage(saves);
 
         return true;
     }
@@ -527,16 +525,14 @@ export class CosmosJourneyer {
         if (uuid === Settings.SHARED_POSITION_SAVE_UUID) return; // don't autosave shared position
         if (uuid === Settings.TUTORIAL_SAVE_UUID) return; // don't autosave in tutorial
 
-        const localStorageKey = Settings.SAVES_KEY;
-
         // store in a hashmap in local storage
-        const saves: LocalStorageSaves = JSON.parse(localStorage.getItem(localStorageKey) || "{}");
+        const saves = getSavesFromLocalStorage();
         saves[uuid] = saves[uuid] || { manual: [], auto: [] };
         saves[uuid].auto.unshift(saveData); // enqueue the new autosave
         while (saves[uuid].auto.length > Settings.MAX_AUTO_SAVES) {
             saves[uuid].auto.pop(); // dequeue the oldest autosave
         }
-        localStorage.setItem(localStorageKey, JSON.stringify(saves));
+        writeSavesToLocalStorage(saves);
 
         this.autoSaveTimerSeconds = 0;
     }

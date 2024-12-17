@@ -1,8 +1,7 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
 import i18n from "../i18n";
-import { createUrlFromSave, LocalStorageSaves, parseSaveFileData, SaveFileData } from "../saveFile/saveFileData";
+import { createUrlFromSave, getSavesFromLocalStorage, parseSaveFileData, SaveFileData, writeSavesToLocalStorage } from "../saveFile/saveFileData";
 import { createNotification } from "../utils/notification";
-import { Settings } from "../settings";
 import { Sounds } from "../assets/sounds";
 import expandIconPath from "../../asset/icons/expand.webp";
 import collapseIconPath from "../../asset/icons/collapse.webp";
@@ -90,7 +89,7 @@ export class SaveLoadingPanelContent {
     populateCmdrList() {
         this.cmdrList.innerHTML = "";
 
-        const saves: LocalStorageSaves = JSON.parse(localStorage.getItem(Settings.SAVES_KEY) ?? "{}");
+        const saves = getSavesFromLocalStorage();
 
         const flatSortedSaves: Map<string, SaveFileData[]> = new Map();
         for (const uuid in saves) {
@@ -200,7 +199,7 @@ export class SaveLoadingPanelContent {
 
                 cmdrName.innerText = newName;
 
-                localStorage.setItem(Settings.SAVES_KEY, JSON.stringify(saves));
+                writeSavesToLocalStorage(saves);
             });
             cmdrHeaderButtons.appendChild(editNameButton);
 
@@ -317,7 +316,7 @@ export class SaveLoadingPanelContent {
             const shouldProceed = await promptModalBoolean(i18n.t("sidePanel:deleteSavePrompt"));
             if (!shouldProceed) return;
 
-            const saves: LocalStorageSaves = JSON.parse(localStorage.getItem(Settings.SAVES_KEY) ?? "{}");
+            const saves = getSavesFromLocalStorage();
 
             if (isAutoSave) {
                 saves[save.player.uuid].auto = saves[save.player.uuid].auto.filter((autoSave) => autoSave.timestamp !== save.timestamp);
@@ -332,7 +331,7 @@ export class SaveLoadingPanelContent {
 
             saveDiv.remove();
 
-            localStorage.setItem(Settings.SAVES_KEY, JSON.stringify(saves));
+            writeSavesToLocalStorage(saves);
         });
         saveButtons.appendChild(deleteButton);
 

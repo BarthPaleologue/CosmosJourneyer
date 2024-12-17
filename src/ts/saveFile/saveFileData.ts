@@ -4,6 +4,7 @@ import i18n from "../i18n";
 
 import { SerializedPlayer } from "../player/player";
 import { encodeBase64 } from "../utils/base64";
+import { Settings } from "../settings";
 
 /**
  * Data structure for the save file to allow restoring current star system and position.
@@ -85,3 +86,11 @@ export type LocalStorageSaves = {
         auto: SaveFileData[];
     };
 };
+
+export function getSavesFromLocalStorage(): LocalStorageSaves {
+    return JSON.parse(localStorage.getItem(Settings.SAVES_KEY) ?? "{}");
+}
+
+export function writeSavesToLocalStorage(saves: LocalStorageSaves): void {
+    localStorage.setItem(Settings.SAVES_KEY, JSON.stringify(saves));
+}
