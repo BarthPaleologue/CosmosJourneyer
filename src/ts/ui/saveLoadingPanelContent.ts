@@ -322,7 +322,7 @@ export class SaveLoadingPanelContent {
             const manualSavesDict: LocalStorageManualSaves = JSON.parse(localStorage.getItem(Settings.MANUAL_SAVE_KEY) ?? "{}");
 
             if (isAutoSave) {
-                delete autoSavesDict[save.player.uuid];
+                autoSavesDict[save.player.uuid] = autoSavesDict[save.player.uuid].filter((autoSave) => autoSave.timestamp !== save.timestamp);
             } else {
                 manualSavesDict[save.player.uuid] = manualSavesDict[save.player.uuid].filter((manualSave) => manualSave.timestamp !== save.timestamp);
             }
