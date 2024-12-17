@@ -16,7 +16,7 @@ Planets are fully explorable from orbit down to the surface, and the universe is
 
 ## My vision for the project
 
-*Disclaimer: This vision for Cosmos Journeyer is a long-term guiding light and may not reflect the game’s current state. Development is ongoing, and there’s still a long way to go!*
+_Disclaimer: This vision for Cosmos Journeyer is a long-term guiding light and may not reflect the game’s current state. Development is ongoing, and there’s still a long way to go!_
 
 ### Themes and atmosphere
 
@@ -50,7 +50,7 @@ The gameplay experience is also designed to be relaxing. I plan to incorporate u
 
 ### Main tutorial
 
-Following the example set by the Great Plateau in *Zelda: Breath of the Wild*, the game begins in a self-contained star cluster that players cannot leave until they reach a specific milestone. This could be achieved by designing a star cluster that forms a disconnected graph, isolated from the rest of the universe through carefully chosen distances and a limited initial jump range.
+Following the example set by the Great Plateau in _Zelda: Breath of the Wild_, the game begins in a self-contained star cluster that players cannot leave until they reach a specific milestone. This could be achieved by designing a star cluster that forms a disconnected graph, isolated from the rest of the universe through carefully chosen distances and a limited initial jump range.
 
 This introductory star cluster would be fully handcrafted to make the best possible first impression on players. The story would guide them through significant locations in a logical sequence—such as space stations, a black hole, and a planet terminator—to introduce the narrative while also presenting mini-tutorials along the way.
 
@@ -105,7 +105,7 @@ The documentation is online at https://barthpaleologue.github.io/CosmosJourneyer
 Additionally, the [ARCHITECTURE.md](./ARCHITECTURE.md) file contains a big picture explanation of the architecture of
 the project.
 
-To build it locally, run `npm run docs` and then `npm run serve:docs` to serve it at `localhost:8081`.
+To build it locally, run `npm run build:docs` and then `npm run serve:docs` to serve it at `localhost:8081`.
 
 ## Roadmap
 
@@ -141,7 +141,7 @@ First, clone the repository and install the dependencies with `pnpm install`.
 
 To build the web version of Cosmos Journeyer, run `pnpm build`. Everything will be built in the `dist` folder.
 
-To start the production server version, run `pnpm serve:prod`. The development version can be started with `pnpm serve`. 
+To start the production server version, run `pnpm serve:prod`. The development version can be started with `pnpm serve`.
 
 ### Tauri
 
