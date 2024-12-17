@@ -25,6 +25,7 @@
     "font": "Police",
     "music": "Musique",
     "soundEffects": "Effets sonores",
+    "specialThanks": "Remerciements",
     "about": "À propos",
     "aboutText": "Bienvenue cher explorateur !\nJe suis le créateur de Cosmos Journeyer, et je suis ravi que vous soyez intéressé. Longtemps, j'ai rêvé de faire ce project. En 2016 déjà lorsque je travaillais sur mon Planétarium en 3D, j'imaginais rendre les planètes entièrement explorables. Mais mes connaissances en informatique graphique étaient alors trop limitées.\n\nJ'ai commencé Cosmos Journeyer bien des années plus tard, comme une façon d'échapper au stress des concours des classes préparatoires. Cela a commencé par un petit générateur de planètes, que j'appelais PlanetEngine (\"moteur à planète\"). Mais plus je travaillais dessus, et plus j'avais des nouvelles idées. Après plus de 3 années de travail, je peux dire que le projet est allé bien au delà de ce que j'imaginais pouvoir faire au début.\n\nIl serait illusoire de penser que je puisse seul terminer Cosmos Journeyer un jour. C'est pourquoi j'ai décidé de rendre le projet open-source, afin que chacun puisse l'utiliser et le modifier à sa guise, et même contribuer au projet dans les années à venir.\n\nJ'espère que vous aimerez Cosmos Journeyer autant que j'aime le créer !",
     "emailContact": "Si vous avez des questions sur Cosmos Journeyer, n'hésitez pas à me contacter à <a href=\"mailto:barth.paleologue@cosmosjourneyer.com\">barth.paleologue@cosmosjourneyer.com</a>"
