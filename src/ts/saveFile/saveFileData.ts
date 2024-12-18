@@ -3,6 +3,8 @@ import projectInfo from "../../../package.json";
 import i18n from "../i18n";
 
 import { SerializedPlayer } from "../player/player";
+import { encodeBase64 } from "../utils/base64";
+import { Settings } from "../settings";
 
 /**
  * Data structure for the save file to allow restoring current star system and position.
@@ -63,14 +65,32 @@ export function parseSaveFileData(jsonString: string): { data: SaveFileData | nu
     return { data: saveData, logs };
 }
 
-/**
- * Describes the structure of the local storage manual saves object.
- * Each cmdr has a unique key and the value is an array of save file data.
- */
-export type LocalStorageManualSaves = { [key: string]: SaveFileData[] };
+export function createUrlFromSave(data: SaveFileData): URL {
+    const urlRoot = window.location.href.split("?")[0];
+    const saveString = encodeBase64(JSON.stringify(data));
+    return new URL(`${urlRoot}?save=${saveString}`);
+}
 
 /**
- * Describes the structure of the local storage auto saves object.
- * Each cmdr has a unique key and the value is a save file data. Auto saves are overwritten on each auto save.
+ * Describes the structure of the local storage saves object.
  */
-export type LocalStorageAutoSaves = { [key: string]: SaveFileData[] };
+export type LocalStorageSaves = {
+    [uuid: string]: {
+        /**
+         * The manual saves of the cmdr.
+         */
+        manual: SaveFileData[];
+        /**
+         * The auto saves of the cmdr.
+         */
+        auto: SaveFileData[];
+    };
+};
+
+export function getSavesFromLocalStorage(): LocalStorageSaves {
+    return JSON.parse(localStorage.getItem(Settings.SAVES_KEY) ?? "{}");
+}
+
+export function writeSavesToLocalStorage(saves: LocalStorageSaves): void {
+    localStorage.setItem(Settings.SAVES_KEY, JSON.stringify(saves));
+}

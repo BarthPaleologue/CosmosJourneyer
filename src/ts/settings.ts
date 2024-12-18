@@ -117,11 +117,13 @@ export const Settings = {
 
     MAIN_FONT: "Nasalization",
 
-    MANUAL_SAVE_KEY: "saves",
+    SAVES_KEY: "saves",
 
-    AUTO_SAVE_KEY: "autosaves",
+    MAX_AUTO_SAVES: 5,
 
-    MAX_AUTO_SAVES: 5
+    SHARED_POSITION_SAVE_UUID: "sharedPositionSave",
+
+    TUTORIAL_SAVE_UUID: "tutorialSave"
 };
 
 export const CollisionMask = {

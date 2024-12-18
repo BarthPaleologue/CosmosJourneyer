@@ -31,7 +31,7 @@ import { PauseMenu } from "./ui/pauseMenu";
 import { StarSystemView } from "./starSystem/starSystemView";
 import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
 import { MainMenu } from "./ui/mainMenu";
-import { LocalStorageAutoSaves, LocalStorageManualSaves, SaveFileData } from "./saveFile/saveFileData";
+import { getSavesFromLocalStorage, SaveFileData, writeSavesToLocalStorage } from "./saveFile/saveFileData";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { setRotationQuaternion } from "./uberCore/transforms/basicTransform";
@@ -56,7 +56,7 @@ import { getObjectBySystemId, getUniverseObjectId } from "./utils/coordinates/or
 import { getSystemModelFromCoordinates } from "./starSystem/modelFromCoordinates";
 import { Tutorial } from "./tutorials/tutorial";
 import { StationLandingTutorial } from "./tutorials/stationLandingTutorial";
-import { promptModalBoolean, alertModal } from "./utils/dialogModal";
+import { promptModalBoolean, alertModal, promptModalString } from "./utils/dialogModal";
 import { FuelScoopTutorial } from "./tutorials/fuelScoopTutorial";
 import { EncyclopaediaGalactica } from "./society/encyclopaediaGalactica";
 
@@ -96,7 +96,7 @@ export class CosmosJourneyer {
 
     private videoRecorder: VideoRecorder | null = null;
 
-    private readonly player: Player;
+    readonly player: Player;
 
     private readonly encyclopaedia: EncyclopaediaGalactica;
 
@@ -116,7 +116,20 @@ export class CosmosJourneyer {
 
     private constructor(player: Player, engine: AbstractEngine, starSystemView: StarSystemView, encyclopaedia: EncyclopaediaGalactica) {
         this.engine = engine;
+
         this.player = player;
+        this.player.onNameChangedObservable.add((newName) => {
+            // when name changes, rewrite the name in all saves
+            const saves = getSavesFromLocalStorage();
+            const cmdrSaves = saves[this.player.uuid];
+
+            if (cmdrSaves === undefined) return;
+
+            cmdrSaves.manual.forEach((save) => (save.player.name = newName));
+            cmdrSaves.auto.forEach((save) => (save.player.name = newName));
+
+            writeSavesToLocalStorage(saves);
+        });
 
         this.encyclopaedia = encyclopaedia;
         this.player.discoveries.uploaded.forEach((discovery) => {
@@ -165,7 +178,7 @@ export class CosmosJourneyer {
                 }
                 this.resume();
                 this.starSystemView.setUIEnabled(true);
-                await this.loadSaveData(saveData);
+                await this.loadSave(saveData);
             });
         });
 
@@ -223,19 +236,18 @@ export class CosmosJourneyer {
             this.engine.onEndFrameObservable.addOnce(() => {
                 const saveData = this.generateSaveData();
 
+                const urlRoot = window.location.href.split("?")[0];
                 const urlData = encodeBase64(JSON.stringify(saveData.universeCoordinates));
-
-                const payload = `universeCoordinates=${urlData}`;
-                const url = new URL(`https://barthpaleologue.github.io/CosmosJourneyer/?${payload}`);
+                const url = new URL(`${urlRoot}?universeCoordinates=${urlData}`);
                 navigator.clipboard.writeText(url.toString()).then(() => {
                     createNotification(NotificationOrigin.GENERAL, NotificationIntent.INFO, i18n.t("notifications:copiedToClipboard"), 2000);
                 });
             });
         });
-        this.pauseMenu.onSave.add(() => {
-            this.saveToLocalStorage();
-            this.createAutoSave();
-            createNotification(NotificationOrigin.GENERAL, NotificationIntent.INFO, i18n.t("notifications:saveOk"), 2000);
+        this.pauseMenu.onSave.add(async () => {
+            const saveSuccess = await this.saveToLocalStorage();
+            if (saveSuccess) createNotification(NotificationOrigin.GENERAL, NotificationIntent.SUCCESS, i18n.t("notifications:saveOk"), 2000);
+            else createNotification(NotificationOrigin.GENERAL, NotificationIntent.ERROR, i18n.t("notifications:cantSaveTutorial"), 2000);
         });
 
         window.addEventListener("blur", () => {
@@ -499,20 +511,26 @@ export class CosmosJourneyer {
         };
     }
 
-    public saveToLocalStorage(): void {
+    public async saveToLocalStorage(): Promise<boolean> {
+        if (this.player.uuid === Settings.TUTORIAL_SAVE_UUID) return false; // don't save in tutorial
+        if (this.player.uuid === Settings.SHARED_POSITION_SAVE_UUID) {
+            this.player.uuid = crypto.randomUUID();
+            this.player.setName((await promptModalString(i18n.t("spaceStation:cmdrNameChangePrompt"), this.player.getName())) ?? "Python");
+        }
+
         const saveData = this.generateSaveData();
 
         // use player uuid as key to avoid overwriting other cmdr's save
         const uuid = saveData.player.uuid;
 
-        const localStorageKey = Settings.MANUAL_SAVE_KEY;
-
         // store in a hashmap in local storage
-        const manualSaves: LocalStorageManualSaves = JSON.parse(localStorage.getItem(localStorageKey) || "{}");
-        manualSaves[uuid] = manualSaves[uuid] || [];
-        manualSaves[uuid].unshift(saveData);
+        const saves = getSavesFromLocalStorage();
+        saves[uuid] = saves[uuid] || { manual: [], auto: [] };
+        saves[uuid].manual.unshift(saveData);
 
-        localStorage.setItem(localStorageKey, JSON.stringify(manualSaves));
+        writeSavesToLocalStorage(saves);
+
+        return true;
     }
 
     public setAutoSaveEnabled(isEnabled: boolean): void {
@@ -524,21 +542,23 @@ export class CosmosJourneyer {
      */
     public createAutoSave(): void {
         if (!this.isAutoSaveEnabled) return;
+
         const saveData = this.generateSaveData();
 
         // use player uuid as key to avoid overwriting other cmdr's autosave
         const uuid = saveData.player.uuid;
 
-        const localStorageKey = Settings.AUTO_SAVE_KEY;
+        if (uuid === Settings.SHARED_POSITION_SAVE_UUID) return; // don't autosave shared position
+        if (uuid === Settings.TUTORIAL_SAVE_UUID) return; // don't autosave in tutorial
 
         // store in a hashmap in local storage
-        const autosaves: LocalStorageAutoSaves = JSON.parse(localStorage.getItem(localStorageKey) || "{}");
-        autosaves[uuid] = autosaves[uuid] || [];
-        autosaves[uuid].unshift(saveData); // enqueue the new autosave
-        while (autosaves[uuid].length > Settings.MAX_AUTO_SAVES) {
-            autosaves[uuid].pop(); // dequeue the oldest autosave
+        const saves = getSavesFromLocalStorage();
+        saves[uuid] = saves[uuid] || { manual: [], auto: [] };
+        saves[uuid].auto.unshift(saveData); // enqueue the new autosave
+        while (saves[uuid].auto.length > Settings.MAX_AUTO_SAVES) {
+            saves[uuid].auto.pop(); // dequeue the oldest autosave
         }
-        localStorage.setItem(localStorageKey, JSON.stringify(autosaves));
+        writeSavesToLocalStorage(saves);
 
         this.autoSaveTimerSeconds = 0;
     }
@@ -554,7 +574,7 @@ export class CosmosJourneyer {
             const link = document.createElement("a");
             link.href = url;
             const dateString = new Date().toLocaleString().replace(/[^0-9a-zA-Z]/g, "_"); // avoid special characters in the filename
-            link.download = `CMDR_${this.player.name}_${dateString}.json`;
+            link.download = `CMDR_${this.player.getName()}_${dateString}.json`;
             link.click();
         });
     }
@@ -562,7 +582,8 @@ export class CosmosJourneyer {
     public async loadTutorial(tutorial: Tutorial) {
         this.engine.onEndFrameObservable.addOnce(async () => {
             this.mainMenu.hide();
-            await this.loadSaveData(tutorial.saveData);
+            await this.loadSave(tutorial.saveData);
+            this.player.uuid = Settings.TUTORIAL_SAVE_UUID;
             this.resume();
             await this.tutorialLayer.setTutorial(tutorial);
             this.starSystemView.setUIEnabled(true);
@@ -580,7 +601,7 @@ export class CosmosJourneyer {
      * This will perform engine initialization if the engine is not initialized.
      * @param saveData The save file data to load
      */
-    public async loadSaveData(saveData: SaveFileData): Promise<void> {
+    public async loadSave(saveData: SaveFileData): Promise<void> {
         if (saveData.version !== projectInfo.version) {
             createNotification(
                 NotificationOrigin.GENERAL,

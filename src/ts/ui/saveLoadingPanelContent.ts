@@ -1,8 +1,7 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
 import i18n from "../i18n";
-import { LocalStorageAutoSaves, LocalStorageManualSaves, parseSaveFileData, SaveFileData } from "../saveFile/saveFileData";
 import { createNotification, NotificationIntent, NotificationOrigin } from "../utils/notification";
-import { Settings } from "../settings";
+import { createUrlFromSave, getSavesFromLocalStorage, parseSaveFileData, SaveFileData, writeSavesToLocalStorage } from "../saveFile/saveFileData";
 import { Sounds } from "../assets/sounds";
 import expandIconPath from "../../asset/icons/expand.webp";
 import collapseIconPath from "../../asset/icons/collapse.webp";
@@ -10,6 +9,7 @@ import loadIconPath from "../../asset/icons/play.webp";
 import editIconPath from "../../asset/icons/edit.webp";
 import downloadIconPath from "../../asset/icons/download.webp";
 import trashIconPath from "../../asset/icons/trash.webp";
+import shareIconPath from "../../asset/icons/link.webp";
 import { promptModalBoolean, promptModalString } from "../utils/dialogModal";
 import { getObjectModelByUniverseId } from "../utils/coordinates/orbitalObjectId";
 
@@ -89,19 +89,24 @@ export class SaveLoadingPanelContent {
     populateCmdrList() {
         this.cmdrList.innerHTML = "";
 
-        const autoSavesDict: LocalStorageAutoSaves = JSON.parse(localStorage.getItem(Settings.AUTO_SAVE_KEY) ?? "{}");
-        const manualSavesDict: LocalStorageManualSaves = JSON.parse(localStorage.getItem(Settings.MANUAL_SAVE_KEY) ?? "{}");
+        const saves = getSavesFromLocalStorage();
 
-        // Get all cmdr UUIDs (union of auto saves and manual saves)
-        const cmdrUuids = Object.keys(autoSavesDict);
-        Object.keys(manualSavesDict).forEach((cmdrUuid) => {
-            if (!cmdrUuids.includes(cmdrUuid)) cmdrUuids.push(cmdrUuid);
+        const flatSortedSaves: Map<string, SaveFileData[]> = new Map();
+        for (const uuid in saves) {
+            flatSortedSaves.set(uuid, saves[uuid].manual.concat(saves[uuid].auto));
+        }
+        flatSortedSaves.forEach((saves) => {
+            saves.sort((a, b) => b.timestamp - a.timestamp);
         });
+
+        // Get all cmdr UUIDs
+        const cmdrUuids = Object.keys(saves);
 
         // Sort cmdr UUIDs by latest save timestamp to have the most recent save at the top
         cmdrUuids.sort((a, b) => {
-            const aLatestSave = autoSavesDict[a][0] ?? manualSavesDict[a][0];
-            const bLatestSave = autoSavesDict[b][0] ?? manualSavesDict[b][0];
+            const aLatestSave = flatSortedSaves.get(a)?.at(0);
+            const bLatestSave = flatSortedSaves.get(b)?.at(0);
+            if (aLatestSave === undefined || bLatestSave === undefined) throw new Error("aLatestSave or bLatestSave is undefined");
             return bLatestSave.timestamp - aLatestSave.timestamp;
         });
 
@@ -110,11 +115,16 @@ export class SaveLoadingPanelContent {
             cmdrDiv.classList.add("cmdr");
             this.cmdrList.appendChild(cmdrDiv);
 
-            const autoSaves = autoSavesDict[cmdrUuid] ?? [];
+            const cmdrSaves = saves[cmdrUuid];
 
-            const manualSaves = manualSavesDict[cmdrUuid] ?? [];
+            const autoSaves = cmdrSaves.auto;
 
-            const latestSave = autoSaves[0] ?? manualSaves[0];
+            const manualSaves = cmdrSaves.manual;
+
+            const allSaves = autoSaves.concat(manualSaves);
+            allSaves.sort((a, b) => b.timestamp - a.timestamp);
+
+            const latestSave = allSaves[0];
 
             const cmdrHeader = document.createElement("div");
             cmdrHeader.classList.add("cmdrHeader");
@@ -157,6 +167,21 @@ export class SaveLoadingPanelContent {
             loadIcon.src = loadIconPath;
             continueButton.appendChild(loadIcon);
 
+            const shareButton = document.createElement("button");
+            shareButton.classList.add("icon", "large");
+            shareButton.addEventListener("click", () => {
+                Sounds.MENU_SELECT_SOUND.play();
+                const url = createUrlFromSave(latestSave);
+                navigator.clipboard.writeText(url.toString()).then(() => {
+                    createNotification(NotificationOrigin.GENERAL, NotificationIntent.SUCCESS, i18n.t("notifications:copiedToClipboard"), 5000);
+                });
+            });
+            cmdrHeaderButtons.appendChild(shareButton);
+
+            const shareIcon = document.createElement("img");
+            shareIcon.src = shareIconPath;
+            shareButton.appendChild(shareIcon);
+
             const editNameButton = document.createElement("button");
             editNameButton.classList.add("icon", "large");
             editNameButton.addEventListener("click", async () => {
@@ -174,8 +199,7 @@ export class SaveLoadingPanelContent {
 
                 cmdrName.innerText = newName;
 
-                localStorage.setItem(Settings.AUTO_SAVE_KEY, JSON.stringify(autoSavesDict));
-                localStorage.setItem(Settings.MANUAL_SAVE_KEY, JSON.stringify(manualSavesDict));
+                writeSavesToLocalStorage(saves);
             });
             cmdrHeaderButtons.appendChild(editNameButton);
 
@@ -188,9 +212,6 @@ export class SaveLoadingPanelContent {
             savesList.classList.add("savesList");
             savesList.classList.add("hidden"); // Hidden by default
             cmdrDiv.appendChild(savesList);
-
-            const allSaves = autoSaves.concat(manualSaves);
-            allSaves.sort((a, b) => b.timestamp - a.timestamp);
 
             allSaves.forEach((save) => {
                 const saveDiv = this.createSaveDiv(save, autoSaves.includes(save));
@@ -254,6 +275,21 @@ export class SaveLoadingPanelContent {
         loadIcon.src = loadIconPath;
         loadButton.appendChild(loadIcon);
 
+        const shareButton = document.createElement("button");
+        shareButton.classList.add("icon", "large");
+        shareButton.addEventListener("click", () => {
+            Sounds.MENU_SELECT_SOUND.play();
+            const url = createUrlFromSave(save);
+            navigator.clipboard.writeText(url.toString()).then(() => {
+                createNotification(NotificationOrigin.GENERAL, NotificationIntent.INFO, i18n.t("notifications:copiedToClipboard"), 5000);
+            });
+        });
+        saveButtons.appendChild(shareButton);
+
+        const shareIcon = document.createElement("img");
+        shareIcon.src = shareIconPath;
+        shareButton.appendChild(shareIcon);
+
         const downloadButton = document.createElement("button");
         downloadButton.classList.add("icon", "large");
         downloadButton.addEventListener("click", () => {
@@ -280,24 +316,22 @@ export class SaveLoadingPanelContent {
             const shouldProceed = await promptModalBoolean(i18n.t("sidePanel:deleteSavePrompt"));
             if (!shouldProceed) return;
 
-            const autoSavesDict: LocalStorageAutoSaves = JSON.parse(localStorage.getItem(Settings.AUTO_SAVE_KEY) ?? "{}");
-            const manualSavesDict: LocalStorageManualSaves = JSON.parse(localStorage.getItem(Settings.MANUAL_SAVE_KEY) ?? "{}");
+            const saves = getSavesFromLocalStorage();
 
             if (isAutoSave) {
-                delete autoSavesDict[save.player.uuid];
+                saves[save.player.uuid].auto = saves[save.player.uuid].auto.filter((autoSave) => autoSave.timestamp !== save.timestamp);
             } else {
-                manualSavesDict[save.player.uuid] = manualSavesDict[save.player.uuid].filter((manualSave) => manualSave.timestamp !== save.timestamp);
+                saves[save.player.uuid].manual = saves[save.player.uuid].manual.filter((manualSave) => manualSave.timestamp !== save.timestamp);
             }
 
-            if (autoSavesDict[save.player.uuid] === undefined && (manualSavesDict[save.player.uuid] ?? []).length === 0) {
-                delete manualSavesDict[save.player.uuid];
+            if (saves[save.player.uuid].auto.length === 0 && saves[save.player.uuid].manual.length === 0) {
+                delete saves[save.player.uuid];
                 saveDiv.parentElement?.parentElement?.remove();
             }
 
             saveDiv.remove();
 
-            localStorage.setItem(Settings.AUTO_SAVE_KEY, JSON.stringify(autoSavesDict));
-            localStorage.setItem(Settings.MANUAL_SAVE_KEY, JSON.stringify(manualSavesDict));
+            writeSavesToLocalStorage(saves);
         });
         saveButtons.appendChild(deleteButton);
 

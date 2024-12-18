@@ -20,6 +20,7 @@ import { StarSystemCoordinates, UniverseObjectId } from "../utils/coordinates/un
 import { warnIfUndefined } from "../utils/notification";
 import { DefaultSerializedSpaceship, SerializedSpaceship, Spaceship } from "../spaceship/spaceship";
 import { SpaceDiscoveryData } from "../society/encyclopaediaGalactica";
+import { Observable } from "@babylonjs/core/Misc/observable";
 
 export type CompletedTutorials = {
     stationLandingCompleted: boolean;
@@ -57,7 +58,7 @@ export type SerializedPlayer = {
 
 export class Player {
     uuid: string;
-    name: string;
+    private name: string;
     balance: number;
     creationDate: Date;
     timePlayedSeconds: number;
@@ -84,6 +85,8 @@ export class Player {
 
     static DEFAULT_NAME = "Python";
     static DEFAULT_BALANCE = 10_000;
+
+    readonly onNameChangedObservable = new Observable<string>();
 
     private constructor(serializedPlayer: SerializedPlayer) {
         this.uuid = warnIfUndefined(serializedPlayer.uuid, crypto.randomUUID(), `[PLAYER_DATA_WARNING] Uuid was undefined. Defaulting to random UUID`);
@@ -239,5 +242,14 @@ export class Player {
         this.serializedSpaceships = player.serializedSpaceships.map((spaceship) => structuredClone(spaceship));
         this.instancedSpaceships = [...player.instancedSpaceships];
         this.tutorials = structuredClone(player.tutorials);
+    }
+
+    public setName(name: string) {
+        this.name = name;
+        this.onNameChangedObservable.notifyObservers(name);
+    }
+
+    public getName(): string {
+        return this.name;
     }
 }
