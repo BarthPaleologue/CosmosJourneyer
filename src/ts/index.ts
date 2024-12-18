@@ -23,7 +23,7 @@ import { parseSaveFileData } from "./saveFile/saveFileData";
 import { Settings } from "./settings";
 import { decodeBase64 } from "./utils/base64";
 import { alertModal } from "./utils/dialogModal";
-import { createNotification } from "./utils/notification";
+import { createNotification, NotificationIntent, NotificationOrigin } from "./utils/notification";
 
 const engine = await CosmosJourneyer.CreateAsync();
 
@@ -41,7 +41,7 @@ if (universeCoordinatesString !== null) {
     const jsonString = decodeBase64(saveString);
     const result = parseSaveFileData(jsonString);
     result.logs.forEach((log) => {
-        createNotification(log, 5_000);
+        createNotification(NotificationOrigin.GENERAL, NotificationIntent.WARNING, log, 5_000);
         console.warn(log);
     });
     if (result.data !== null) {
