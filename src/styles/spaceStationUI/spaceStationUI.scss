@@ -249,6 +249,18 @@ $gaps: 10px;
 
     .discoveryPanel {
         height: 100%;
+
+        & > div {
+            flex-grow: 1;
+            .discoveryList {
+            }
+
+            .discoveryDetails {
+                align-items: center;
+                justify-content: center;
+                background: var(--accent-color-dark);
+            }
+        }
     }
 }
 
@@ -273,7 +285,7 @@ $gaps: 10px;
 
 .listItemContainer {
     background: var(--accent-color-dark);
-    padding: 20px;
+    padding: 10px;
 }
 
 .flex-1 {
@@ -284,11 +296,6 @@ $gaps: 10px;
     flex: 2;
 }
 
-.discoveryList {
-}
-
-.discoveryDetails {
-    align-items: center;
-    justify-content: center;
-    background: var(--accent-color-dark);
+.flex-3 {
+    flex: 3;
 }

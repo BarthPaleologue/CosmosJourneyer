@@ -74,7 +74,7 @@ export function generateExplorationCenterDom(encyclopaedia: EncyclopaediaGalacti
     });
 
     const discoveryDetails = document.createElement("div");
-    discoveryDetails.classList.add("flex-column", "flex-2", "discoveryDetails");
+    discoveryDetails.classList.add("flex-column", "flex-3", "discoveryDetails");
     horizontalContainer.appendChild(discoveryDetails);
 
     const discoveryPlaceholderText = document.createElement("p");
