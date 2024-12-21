@@ -25,19 +25,13 @@
     src: url("./nasalization/nasalization-rg.otf") format("opentype");
 }
 
-*,
-*::before,
-*::after {
-    box-sizing: content-box;
-}
-
 // scroll bar
 ::-webkit-scrollbar {
     width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-    background: color.adjust(#888, $lightness: -50%, $space: hsl);
+    background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {

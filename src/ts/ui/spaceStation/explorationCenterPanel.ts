@@ -23,7 +23,7 @@ import { getObjectModelByUniverseId } from "../../utils/coordinates/orbitalObjec
 
 export function generateExplorationCenterDom(encyclopaedia: EncyclopaediaGalactica, player: Player) {
     const root = document.createElement("div");
-    root.classList.add("flex-column");
+    root.classList.add("flex-column", "discoveryPanel");
 
     const title = document.createElement("h2");
     title.textContent = "Exploration Center";
@@ -38,7 +38,7 @@ export function generateExplorationCenterDom(encyclopaedia: EncyclopaediaGalacti
     root.appendChild(horizontalContainer);
 
     const discoveryList = document.createElement("div");
-    discoveryList.classList.add("flex-column", "overflow-y-auto");
+    discoveryList.classList.add("flex-column", "overflow-y-auto", "flex-1", "discoveryList");
     horizontalContainer.appendChild(discoveryList);
 
     player.discoveries.local.forEach((discovery) => {
@@ -74,7 +74,7 @@ export function generateExplorationCenterDom(encyclopaedia: EncyclopaediaGalacti
     });
 
     const discoveryDetails = document.createElement("div");
-    discoveryDetails.classList.add("flex-column", "discoveryDetails");
+    discoveryDetails.classList.add("flex-column", "flex-2", "discoveryDetails");
     horizontalContainer.appendChild(discoveryDetails);
 
     const discoveryPlaceholderText = document.createElement("p");
