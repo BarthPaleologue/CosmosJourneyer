@@ -118,9 +118,7 @@ const config = {
             template: path.join(htmlPath, "emptyIndex.html"),
             chunks: ["debugAssets"]
         }),
-        new MiniCssExtractPlugin({
-            filename: "[name].[contenthash].css"
-        })
+        new MiniCssExtractPlugin()
     ],
 
     module: {
