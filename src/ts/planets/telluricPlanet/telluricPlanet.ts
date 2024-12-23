@@ -35,7 +35,7 @@ import { setRotationQuaternion } from "../../uberCore/transforms/basicTransform"
 import { CloudsUniforms } from "../../clouds/cloudsUniforms";
 import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
-import { orbitalObjectTypeToDisplay } from "../../utils/strings/orbitalObjectTypeToDisplay";
+import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
 import { OrbitalObjectType } from "../../architecture/orbitalObject";
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
 
@@ -136,7 +136,7 @@ export class TelluricPlanet implements PlanetaryMassObject, Cullable {
     }
 
     getTypeName(): string {
-        return orbitalObjectTypeToDisplay(this.model);
+        return getOrbitalObjectTypeToI18nString(this.model);
     }
 
     /**

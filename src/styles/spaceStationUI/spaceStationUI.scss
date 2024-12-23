@@ -253,12 +253,17 @@ $gaps: 10px;
         & > div {
             flex-grow: 1;
             .discoveryList {
+                padding-right: 10px;
             }
 
             .discoveryDetails {
-                align-items: center;
-                justify-content: center;
                 background: var(--accent-color-dark);
+                padding: 10px;
+
+                &.empty {
+                    align-items: center;
+                    justify-content: center;
+                }
             }
         }
     }
@@ -286,6 +291,13 @@ $gaps: 10px;
 .listItemContainer {
     background: var(--accent-color-dark);
     padding: 10px;
+    cursor: pointer;
+    transition: variables.$transition-time;
+
+    &:hover {
+        background: var(--accent-color);
+        box-shadow: 0 0 10px white inset;
+    }
 }
 
 .flex-1 {

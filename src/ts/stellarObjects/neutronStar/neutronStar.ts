@@ -36,7 +36,7 @@ import { Camera } from "@babylonjs/core/Cameras/camera";
 import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
 import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
-import { orbitalObjectTypeToDisplay } from "../../utils/strings/orbitalObjectTypeToDisplay";
+import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
 
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
 
@@ -121,7 +121,7 @@ export class NeutronStar implements StellarObject, Cullable {
     }
 
     getTypeName(): string {
-        return orbitalObjectTypeToDisplay(this.model);
+        return getOrbitalObjectTypeToI18nString(this.model);
     }
 
     getRotationAxis(): Vector3 {

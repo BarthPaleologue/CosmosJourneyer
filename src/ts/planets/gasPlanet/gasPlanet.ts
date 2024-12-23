@@ -32,7 +32,7 @@ import { RingsUniforms } from "../../rings/ringsUniform";
 import { Transformable } from "../../architecture/transformable";
 import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
-import { orbitalObjectTypeToDisplay } from "../../utils/strings/orbitalObjectTypeToDisplay";
+import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
 import { Planet } from "../../architecture/planet";
 
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
@@ -121,7 +121,7 @@ export class GasPlanet implements Planet, Cullable {
     }
 
     getTypeName(): string {
-        return orbitalObjectTypeToDisplay(this.model);
+        return getOrbitalObjectTypeToI18nString(this.model);
     }
 
     public computeCulling(camera: Camera): void {

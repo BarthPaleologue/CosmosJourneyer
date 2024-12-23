@@ -29,7 +29,7 @@ import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coo
 import { getSystemModelFromCoordinates } from "../starSystem/modelFromCoordinates";
 import { StarSystemModelUtils } from "../starSystem/starSystemModel";
 
-import { orbitalObjectTypeToDisplay } from "../utils/strings/orbitalObjectTypeToDisplay";
+import { getOrbitalObjectTypeToI18nString } from "../utils/strings/orbitalObjectTypeToDisplay";
 import { Observable } from "@babylonjs/core/Misc/observable";
 
 export class StarMapUI {
@@ -319,7 +319,7 @@ export class StarMapUI {
         //TODO: when implementing binary star systems, this will need to be updated to display all stellar objects and not just the first one
         const starModel = StarSystemModelUtils.GetStellarObjects(targetSystemModel)[0];
 
-        this.shortHandUISystemType.textContent = orbitalObjectTypeToDisplay(starModel);
+        this.shortHandUISystemType.textContent = getOrbitalObjectTypeToI18nString(starModel);
         this.shortHandUIBookmarkButton.setSelectedSystemSeed(targetSystemModel.coordinates);
 
         const objectColor = getRgbFromTemperature(starModel.physics.blackBodyTemperature);

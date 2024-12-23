@@ -15,11 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Sounds } from "../../assets/sounds";
 import { Player } from "../../player/player";
 import { Settings } from "../../settings";
-import { EncyclopaediaGalactica } from "../../society/encyclopaediaGalactica";
+import { EncyclopaediaGalactica, SpaceDiscoveryData } from "../../society/encyclopaediaGalactica";
 import { getObjectModelByUniverseId } from "../../utils/coordinates/orbitalObjectId";
+import { DiscoveryDetails } from "./discoveryDetails";
 
 export function generateExplorationCenterDom(encyclopaedia: EncyclopaediaGalactica, player: Player) {
     const root = document.createElement("div");
@@ -41,11 +41,23 @@ export function generateExplorationCenterDom(encyclopaedia: EncyclopaediaGalacti
     discoveryList.classList.add("flex-column", "overflow-y-auto", "flex-1", "discoveryList");
     horizontalContainer.appendChild(discoveryList);
 
+    const discoveryToHtmlItem = new Map<SpaceDiscoveryData, HTMLDivElement>();
+
+    const discoveryDetails = new DiscoveryDetails(player, encyclopaedia);
+    discoveryDetails.onSellDiscovery.add((discovery) => {
+        discoveryToHtmlItem.get(discovery)?.remove();
+    });
+    horizontalContainer.appendChild(discoveryDetails.htmlRoot);
+
     player.discoveries.local.forEach((discovery) => {
         const objectModel = getObjectModelByUniverseId(discovery.objectId);
 
         const discoveryItem = document.createElement("div");
         discoveryItem.classList.add("listItemContainer");
+        discoveryItem.addEventListener("click", () => {
+            discoveryDetails.setDiscovery(discovery);
+        });
+        discoveryToHtmlItem.set(discovery, discoveryItem);
         discoveryList.appendChild(discoveryItem);
 
         const discoveryName = document.createElement("h3");
@@ -59,27 +71,7 @@ export function generateExplorationCenterDom(encyclopaedia: EncyclopaediaGalacti
         const discoveryValue = document.createElement("p");
         discoveryValue.textContent = `Value: ${encyclopaedia.estimateDiscovery(discovery.objectId).toLocaleString()}${Settings.CREDIT_SYMBOL}`;
         discoveryItem.appendChild(discoveryValue);
-
-        const sellDiscoveryButton = document.createElement("button");
-        sellDiscoveryButton.textContent = "Sell";
-        sellDiscoveryButton.addEventListener("click", () => {
-            Sounds.ECHOED_BLIP_SOUND.play();
-            const value = encyclopaedia.estimateDiscovery(discovery.objectId);
-            player.balance += value;
-            player.discoveries.local = player.discoveries.local.filter((d) => d !== discovery);
-            player.discoveries.uploaded.push(discovery);
-            discoveryItem.remove();
-        });
-        discoveryItem.appendChild(sellDiscoveryButton);
     });
-
-    const discoveryDetails = document.createElement("div");
-    discoveryDetails.classList.add("flex-column", "flex-3", "discoveryDetails");
-    horizontalContainer.appendChild(discoveryDetails);
-
-    const discoveryPlaceholderText = document.createElement("p");
-    discoveryPlaceholderText.textContent = "Select a discovery to see more details.";
-    discoveryDetails.appendChild(discoveryPlaceholderText);
 
     return root;
 }

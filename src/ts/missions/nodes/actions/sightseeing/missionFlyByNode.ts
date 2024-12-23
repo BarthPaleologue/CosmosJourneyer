@@ -28,7 +28,7 @@ import { pressInteractionToStrings } from "../../../../utils/strings/inputContro
 import { GeneralInputs } from "../../../../inputs/generalInputs";
 import { getSystemModelFromCoordinates } from "../../../../starSystem/modelFromCoordinates";
 
-import { orbitalObjectTypeToDisplay } from "../../../../utils/strings/orbitalObjectTypeToDisplay";
+import { getOrbitalObjectTypeToI18nString } from "../../../../utils/strings/orbitalObjectTypeToDisplay";
 import { getGoToSystemInstructions } from "../../../common";
 import { OrbitalObjectType } from "../../../../architecture/orbitalObject";
 
@@ -130,7 +130,7 @@ export class MissionFlyByNode implements MissionNode {
         const objectModel = getObjectModelByUniverseId(this.objectId);
         const systemModel = getSystemModelFromCoordinates(this.targetSystemCoordinates);
         return i18n.t("missions:sightseeing:describeFlyBy", {
-            objectType: orbitalObjectTypeToDisplay(objectModel),
+            objectType: getOrbitalObjectTypeToI18nString(objectModel),
             systemName: systemModel.name,
             distance: distance > 0 ? parseDistance(distance * Settings.LIGHT_YEAR) : i18n.t("missions:common:here")
         });

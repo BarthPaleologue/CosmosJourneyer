@@ -25,7 +25,7 @@ import { BlackHoleModel } from "./blackHoleModel";
 import { StellarObject } from "../../architecture/stellarObject";
 import { Cullable } from "../../utils/cullable";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { orbitalObjectTypeToDisplay } from "../../utils/strings/orbitalObjectTypeToDisplay";
+import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
 
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
 import { setRotationQuaternion } from "../../uberCore/transforms/basicTransform";
@@ -79,7 +79,7 @@ export class BlackHole implements StellarObject, Cullable {
     }
 
     getTypeName(): string {
-        return orbitalObjectTypeToDisplay(this.model);
+        return getOrbitalObjectTypeToI18nString(this.model);
     }
 
     public computeCulling(camera: Camera): void {
