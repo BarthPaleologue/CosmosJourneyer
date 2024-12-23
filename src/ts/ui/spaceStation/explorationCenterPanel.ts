@@ -21,71 +21,80 @@ import { EncyclopaediaGalactica, SpaceDiscoveryData } from "../../society/encycl
 import { getObjectModelByUniverseId } from "../../utils/coordinates/orbitalObjectId";
 import { DiscoveryDetails } from "./discoveryDetails";
 
-export function generateExplorationCenterDom(encyclopaedia: EncyclopaediaGalactica, player: Player) {
-    const root = document.createElement("div");
-    root.classList.add("flex-column", "discoveryPanel");
+export class ExplorationCenterPanel {
+    readonly htmlRoot: HTMLDivElement;
+    readonly discoveryList: HTMLDivElement;
+    readonly discoveryDetails: DiscoveryDetails;
 
-    const title = document.createElement("h2");
-    title.textContent = "Exploration Center";
-    root.appendChild(title);
+    private readonly discoveryToHtmlItem = new Map<SpaceDiscoveryData, HTMLDivElement>();
 
-    const discoveryListTitle = document.createElement("h3");
-    discoveryListTitle.textContent = "New discoveries";
-    root.appendChild(discoveryListTitle);
+    constructor(encyclopaedia: EncyclopaediaGalactica, player: Player) {
+        this.htmlRoot = document.createElement("div");
+        this.htmlRoot.classList.add("flex-column", "discoveryPanel");
 
-    const horizontalContainer = document.createElement("div");
-    horizontalContainer.classList.add("flex-row");
-    root.appendChild(horizontalContainer);
+        const title = document.createElement("h2");
+        title.textContent = "Exploration Center";
+        this.htmlRoot.appendChild(title);
 
-    const discoveryList = document.createElement("div");
-    discoveryList.classList.add("flex-column", "overflow-y-auto", "flex-1", "discoveryList");
-    horizontalContainer.appendChild(discoveryList);
+        const discoveryListTitle = document.createElement("h3");
+        discoveryListTitle.textContent = "New discoveries";
+        this.htmlRoot.appendChild(discoveryListTitle);
 
-    const discoveryToHtmlItem = new Map<SpaceDiscoveryData, HTMLDivElement>();
+        const horizontalContainer = document.createElement("div");
+        horizontalContainer.classList.add("flex-row");
+        this.htmlRoot.appendChild(horizontalContainer);
 
-    const discoveryDetails = new DiscoveryDetails(player, encyclopaedia);
-    discoveryDetails.onSellDiscovery.add((discovery) => {
-        discoveryToHtmlItem.get(discovery)?.remove();
-    });
-    horizontalContainer.appendChild(discoveryDetails.htmlRoot);
+        this.discoveryList = document.createElement("div");
+        this.discoveryList.classList.add("flex-column", "overflow-y-auto", "flex-1", "discoveryList");
+        horizontalContainer.appendChild(this.discoveryList);
 
-    if (player.discoveries.local.length === 0) {
-        const container = document.createElement("div");
-        container.classList.add("listItemContainer");
-        discoveryList.appendChild(container);
-
-        const noDiscoveryTitle = document.createElement("h3");
-        noDiscoveryTitle.innerText = "No new discoveries";
-        container.appendChild(noDiscoveryTitle);
-
-        const noDiscoveryText = document.createElement("p");
-        noDiscoveryText.innerText = "The universe awaits!";
-        container.appendChild(noDiscoveryText);
+        this.discoveryDetails = new DiscoveryDetails(player, encyclopaedia);
+        this.discoveryDetails.onSellDiscovery.add((discovery) => {
+            this.discoveryToHtmlItem.get(discovery)?.remove();
+        });
+        horizontalContainer.appendChild(this.discoveryDetails.htmlRoot);
     }
 
-    player.discoveries.local.forEach(async (discovery) => {
-        const objectModel = getObjectModelByUniverseId(discovery.objectId);
+    populate(player: Player, encyclopaedia: EncyclopaediaGalactica) {
+        this.discoveryList.innerHTML = "";
+        this.discoveryToHtmlItem.clear();
 
-        const discoveryItem = document.createElement("div");
-        discoveryItem.classList.add("listItemContainer");
-        discoveryItem.addEventListener("click", () => {
-            discoveryDetails.setDiscovery(discovery);
+        if (player.discoveries.local.length === 0) {
+            const container = document.createElement("div");
+            container.classList.add("listItemContainer");
+            this.discoveryList.appendChild(container);
+
+            const noDiscoveryTitle = document.createElement("h3");
+            noDiscoveryTitle.innerText = "No new discoveries";
+            container.appendChild(noDiscoveryTitle);
+
+            const noDiscoveryText = document.createElement("p");
+            noDiscoveryText.innerText = "The universe awaits!";
+            container.appendChild(noDiscoveryText);
+        }
+
+        player.discoveries.local.forEach(async (discovery) => {
+            const objectModel = getObjectModelByUniverseId(discovery.objectId);
+
+            const discoveryItem = document.createElement("div");
+            discoveryItem.classList.add("listItemContainer");
+            discoveryItem.addEventListener("click", () => {
+                this.discoveryDetails.setDiscovery(discovery);
+            });
+            this.discoveryToHtmlItem.set(discovery, discoveryItem);
+            this.discoveryList.appendChild(discoveryItem);
+
+            const discoveryName = document.createElement("h3");
+            discoveryName.textContent = objectModel.name;
+            discoveryItem.appendChild(discoveryName);
+
+            const discoveryDate = document.createElement("p");
+            discoveryDate.textContent = new Date(discovery.discoveryTimestamp).toLocaleDateString();
+            discoveryItem.appendChild(discoveryDate);
+
+            const discoveryValue = document.createElement("p");
+            discoveryValue.textContent = `Value: ${(await encyclopaedia.estimateDiscovery(discovery.objectId)).toLocaleString()}${Settings.CREDIT_SYMBOL}`;
+            discoveryItem.appendChild(discoveryValue);
         });
-        discoveryToHtmlItem.set(discovery, discoveryItem);
-        discoveryList.appendChild(discoveryItem);
-
-        const discoveryName = document.createElement("h3");
-        discoveryName.textContent = objectModel.name;
-        discoveryItem.appendChild(discoveryName);
-
-        const discoveryDate = document.createElement("p");
-        discoveryDate.textContent = new Date(discovery.discoveryTimestamp).toLocaleDateString();
-        discoveryItem.appendChild(discoveryDate);
-
-        const discoveryValue = document.createElement("p");
-        discoveryValue.textContent = `Value: ${(await encyclopaedia.estimateDiscovery(discovery.objectId)).toLocaleString()}${Settings.CREDIT_SYMBOL}`;
-        discoveryItem.appendChild(discoveryValue);
-    });
-
-    return root;
+    }
 }

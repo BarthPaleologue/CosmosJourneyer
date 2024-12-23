@@ -27,7 +27,7 @@ import { promptModalString } from "../../utils/dialogModal";
 import i18n from "../../i18n";
 import { Sounds } from "../../assets/sounds";
 import { EncyclopaediaGalactica } from "../../society/encyclopaediaGalactica";
-import { generateExplorationCenterDom } from "./explorationCenterPanel";
+import { ExplorationCenterPanel } from "./explorationCenterPanel";
 
 const enum MainPanelState {
     NONE,
@@ -64,6 +64,8 @@ export class SpaceStationLayer {
 
     private mainPanelState: MainPanelState = MainPanelState.NONE;
 
+    readonly explorationCenterPanel: ExplorationCenterPanel;
+
     readonly onTakeOffObservable = new Observable<void>();
 
     readonly player: Player;
@@ -75,6 +77,8 @@ export class SpaceStationLayer {
         this.encyclopaedia = encyclopaedia;
 
         this.parentNode = document.getElementById("spaceStationUI") as HTMLElement;
+
+        this.explorationCenterPanel = new ExplorationCenterPanel(encyclopaedia, player);
 
         this.spaceStationName = document.querySelector<HTMLElement>("#spaceStationUI .spaceStationName") as HTMLElement;
 
@@ -168,7 +172,8 @@ export class SpaceStationLayer {
             case MainPanelState.EXPLORATION_CENTER:
                 this.mainPanel.classList.remove("hidden");
                 this.mainPanel.innerHTML = "";
-                this.mainPanel.appendChild(generateExplorationCenterDom(this.encyclopaedia, this.player));
+                this.explorationCenterPanel.populate(this.player, this.encyclopaedia);
+                this.mainPanel.appendChild(this.explorationCenterPanel.htmlRoot);
                 break;
             case MainPanelState.NONE:
                 this.mainPanel.classList.add("hidden");
