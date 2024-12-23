@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { parseDistance, parseSeconds } from "../utils/strings/parseToStrings";
+import { parseDistance, parseSecondsRough } from "../utils/strings/parseToStrings";
 import { getAngularSize } from "../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Transformable } from "../architecture/transformable";
@@ -180,7 +180,7 @@ export class ObjectTargetCursor {
         this.distanceText.innerText = parseDistance(distance);
 
         const nbSeconds = distance / speed;
-        this.etaText.innerText = "ETA: " + (speed > 0 ? parseSeconds(nbSeconds) : "∞");
+        this.etaText.innerText = "ETA: " + (speed > 0 ? parseSecondsRough(nbSeconds) : "∞");
 
         this.lastDistance = distance;
     }

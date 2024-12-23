@@ -4,6 +4,7 @@ import { Player } from "../../player/player";
 import { EncyclopaediaGalactica, SpaceDiscoveryData } from "../../society/encyclopaediaGalactica";
 import { getObjectModelByUniverseId } from "../../utils/coordinates/orbitalObjectId";
 import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
+import { parseSecondsPrecise } from "../../utils/strings/parseToStrings";
 
 export class DiscoveryDetails {
     readonly htmlRoot: HTMLElement;
@@ -18,6 +19,8 @@ export class DiscoveryDetails {
 
     readonly objectType: HTMLParagraphElement;
 
+    readonly siderealDayDuration: HTMLParagraphElement;
+
     readonly sellDiscoveryButton: HTMLButtonElement;
 
     constructor(player: Player, encyclopaedia: EncyclopaediaGalactica) {
@@ -30,6 +33,8 @@ export class DiscoveryDetails {
         this.objectName = document.createElement("h3");
 
         this.objectType = document.createElement("p");
+
+        this.siderealDayDuration = document.createElement("p");
 
         this.sellDiscoveryButton = document.createElement("button");
         this.sellDiscoveryButton.textContent = "Sell";
@@ -68,6 +73,9 @@ export class DiscoveryDetails {
 
         this.objectType.innerText = getOrbitalObjectTypeToI18nString(model);
         this.htmlRoot.appendChild(this.objectType);
+
+        this.siderealDayDuration.innerText = parseSecondsPrecise(model.physics.siderealDaySeconds);
+        this.htmlRoot.appendChild(this.siderealDayDuration);
 
         this.htmlRoot.appendChild(this.sellDiscoveryButton);
     }
