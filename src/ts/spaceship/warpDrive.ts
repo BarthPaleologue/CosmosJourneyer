@@ -74,6 +74,11 @@ export interface ReadonlyWarpDrive {
 
 export class WarpDrive implements ReadonlyWarpDrive {
     /**
+     * The default throttle value for the warp drive.
+     */
+    public readonly defaultThrottle: number = 0.5;
+
+    /**
      * The throttle of the warp drive (target speed is modulated by this value).
      */
     private throttle = 1;
@@ -109,6 +114,7 @@ export class WarpDrive implements ReadonlyWarpDrive {
      */
     public enable(): void {
         this.state = WarpDriveState.ENABLED;
+        this.throttle = this.defaultThrottle;
     }
 
     /**
