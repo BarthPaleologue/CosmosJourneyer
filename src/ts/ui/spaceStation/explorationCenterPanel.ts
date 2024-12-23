@@ -49,6 +49,20 @@ export function generateExplorationCenterDom(encyclopaedia: EncyclopaediaGalacti
     });
     horizontalContainer.appendChild(discoveryDetails.htmlRoot);
 
+    if (player.discoveries.local.length === 0) {
+        const container = document.createElement("div");
+        container.classList.add("listItemContainer");
+        discoveryList.appendChild(container);
+
+        const noDiscoveryTitle = document.createElement("h3");
+        noDiscoveryTitle.innerText = "No new discoveries";
+        container.appendChild(noDiscoveryTitle);
+
+        const noDiscoveryText = document.createElement("p");
+        noDiscoveryText.innerText = "The universe awaits!";
+        container.appendChild(noDiscoveryText);
+    }
+
     player.discoveries.local.forEach(async (discovery) => {
         const objectModel = getObjectModelByUniverseId(discovery.objectId);
 
