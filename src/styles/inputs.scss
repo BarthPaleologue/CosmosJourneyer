@@ -1,73 +1,89 @@
+@use "variables";
+
+input {
+    background: transparent;
+    color: white;
+    border: none;
+    padding: 5px;
+    border-bottom: 2px solid white;
+    outline: none;
+    font-family: variables.$main-font;
+    font-size: var(--text-size);
+    transition: 0.2s;
+
+    &:focus {
+        border-bottom: 2px solid var(--accent-color);
+    }
+}
+
 .map {
-  color: white;
-
-  display: flex;
-  flex-direction: column;
-
-  h3 {
-    margin-bottom: 0.5em;
-  }
-
-  .actionMultiple,
-  .actionSingle {
-    font-family: Nasalization, sans-serif;
-    border-top: 1px solid white;
-
-    & > p {
-      text-transform: capitalize;
-    }
-  }
-
-  .actionSingle,
-  .subAction {
-    transition: .2s;
-    padding: 10px;
-
-    &:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-    }
-  }
-
-
-  .actionSingle {
-    display: flex;
-    justify-content: space-between;
-    flex-direction: row;
-  }
-
-  .actionMultiple {
+    color: white;
 
     display: flex;
     flex-direction: column;
-    padding: 10px;
 
+    h3 {
+        margin-bottom: 0.5em;
+    }
+
+    .actionMultiple,
+    .actionSingle {
+        font-family: Nasalization, sans-serif;
+        border-top: 1px solid white;
+
+        & > p {
+            text-transform: capitalize;
+        }
+    }
+
+    .actionSingle,
     .subAction {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
+        transition: 0.2s;
+        padding: 10px;
 
-      padding-left: 30px;
-
-      & > p {
-        text-transform: capitalize;
-        padding-left: 10px;
-        border-left: 1px solid white;
-      }
+        &:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
     }
-  }
 
-  .valuesContainer {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    column-gap: 10px;
-
-    p {
-      padding: 0 10px;
-      border: 1px solid white;
-      min-width: 50px;
-      text-align: center;
+    .actionSingle {
+        display: flex;
+        justify-content: space-between;
+        flex-direction: row;
     }
-  }
+
+    .actionMultiple {
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+
+        .subAction {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+
+            padding-left: 30px;
+
+            & > p {
+                text-transform: capitalize;
+                padding-left: 10px;
+                border-left: 1px solid white;
+            }
+        }
+    }
+
+    .valuesContainer {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        column-gap: 10px;
+
+        p {
+            padding: 0 10px;
+            border: 1px solid white;
+            min-width: 50px;
+            text-align: center;
+        }
+    }
 }

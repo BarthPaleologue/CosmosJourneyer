@@ -25,6 +25,10 @@
     src: url("./nasalization/nasalization-rg.otf") format("opentype");
 }
 
+[hidden] {
+    display: none !important;
+}
+
 // scroll bar
 ::-webkit-scrollbar {
     width: 10px;

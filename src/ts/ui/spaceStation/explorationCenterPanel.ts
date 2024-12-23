@@ -99,6 +99,13 @@ export class ExplorationCenterPanel {
         horizontalContainer.appendChild(this.discoveryDetails.htmlRoot);
     }
 
+    private filterDiscoveryListByQuery(query: string) {
+        for (const listItem of this.discoveryList.children) {
+            if (!(listItem instanceof HTMLDivElement)) continue;
+            listItem.hidden = !listItem.innerHTML.toLowerCase().includes(query);
+        }
+    }
+
     populate() {
         this.discoveryList.innerHTML = "";
         this.discoveryToHtmlItem.clear();
@@ -115,7 +122,18 @@ export class ExplorationCenterPanel {
             const noDiscoveryText = document.createElement("p");
             noDiscoveryText.innerText = "The universe awaits!";
             container.appendChild(noDiscoveryText);
+
+            return;
         }
+
+        const searchField = document.createElement("input");
+        searchField.type = "search";
+        searchField.placeholder = "Search for a discovery";
+        searchField.addEventListener("click", (e) => {
+            e.stopPropagation();
+            this.filterDiscoveryListByQuery(searchField.value.toLowerCase());
+        });
+        this.discoveryList.appendChild(searchField);
 
         const discoveries: SpaceDiscoveryData[] = [];
         switch (this.filter) {
