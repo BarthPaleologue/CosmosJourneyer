@@ -36,9 +36,20 @@ export class ExplorationCenterPanel {
         title.textContent = "Exploration Center";
         this.htmlRoot.appendChild(title);
 
-        const discoveryListTitle = document.createElement("h3");
-        discoveryListTitle.textContent = "New discoveries";
-        this.htmlRoot.appendChild(discoveryListTitle);
+        const discoveryListSelect = document.createElement("select");
+        this.htmlRoot.appendChild(discoveryListSelect);
+
+        const optionLocal = document.createElement("option");
+        optionLocal.innerText = "Local";
+        discoveryListSelect.appendChild(optionLocal);
+
+        const optionUploaded = document.createElement("option");
+        optionUploaded.innerText = "Uploaded";
+        discoveryListSelect.appendChild(optionUploaded);
+
+        const optionAll = document.createElement("option");
+        optionAll.innerText = "All";
+        discoveryListSelect.appendChild(optionAll);
 
         const horizontalContainer = document.createElement("div");
         horizontalContainer.classList.add("flex-row");

@@ -132,6 +132,8 @@ body {
 
     @include meta.load-css("saveLoadingPanelContent.scss");
 
+    @include meta.load-css("select.scss");
+
     @include meta.load-css("button.scss");
 
     @include meta.load-css("dialog.scss");
