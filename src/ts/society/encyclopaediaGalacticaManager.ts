@@ -5,18 +5,29 @@ export class EncyclopaediaGalacticaManager implements EncyclopaediaGalactica {
     readonly backends: EncyclopaediaGalactica[] = [];
 
     public async contributeDiscoveryIfNew(data: SpaceDiscoveryData): Promise<boolean> {
-        return this.backends.every(async (backend) => await backend.contributeDiscoveryIfNew(data));
+        let hasBeenContributed = false;
+        for (const backend of this.backends) {
+            hasBeenContributed = hasBeenContributed || (await backend.contributeDiscoveryIfNew(data));
+        }
+
+        return hasBeenContributed;
     }
 
     public async hasObjectBeenDiscovered(objectId: UniverseObjectId): Promise<boolean> {
-        return await this.backends.every(async (backend) => await backend.hasObjectBeenDiscovered(objectId));
+        for (const backend of this.backends) {
+            if (await backend.hasObjectBeenDiscovered(objectId)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
-    public estimateDiscovery(object: UniverseObjectId): Promise<number> {
+    public async estimateDiscovery(object: UniverseObjectId): Promise<number> {
         let sum = 0;
-        this.backends.forEach(async (backend) => {
+        for (const backend of this.backends) {
             sum += await backend.estimateDiscovery(object);
-        });
+        }
 
         return Promise.resolve(sum);
     }
