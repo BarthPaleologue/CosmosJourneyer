@@ -172,7 +172,7 @@ export class SpaceStationLayer {
             case MainPanelState.EXPLORATION_CENTER:
                 this.mainPanel.classList.remove("hidden");
                 this.mainPanel.innerHTML = "";
-                this.explorationCenterPanel.populate(this.player, this.encyclopaedia);
+                this.explorationCenterPanel.populate();
                 this.mainPanel.appendChild(this.explorationCenterPanel.htmlRoot);
                 break;
             case MainPanelState.NONE:

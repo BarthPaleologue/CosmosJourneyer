@@ -28,7 +28,14 @@ export class DiscoveryDetails {
 
     readonly sellDiscoveryButton: HTMLButtonElement;
 
+    private readonly player: Player;
+
+    private readonly encyclopaedia: EncyclopaediaGalactica;
+
     constructor(player: Player, encyclopaedia: EncyclopaediaGalactica) {
+        this.player = player;
+        this.encyclopaedia = encyclopaedia;
+
         this.htmlRoot = document.createElement("div");
         this.htmlRoot.classList.add("flex-column", "flex-3", "discoveryDetails");
 
@@ -70,12 +77,12 @@ export class DiscoveryDetails {
         this.htmlRoot.classList.toggle("empty", discovery === null);
         this.currentDiscovery = discovery;
 
-        if (discovery === null) {
+        if (this.currentDiscovery === null) {
             this.htmlRoot.appendChild(this.placeHolderText);
             return;
         }
 
-        const model = getObjectModelByUniverseId(discovery.objectId);
+        const model = getObjectModelByUniverseId(this.currentDiscovery.objectId);
 
         this.objectName.innerText = model.name;
         this.htmlRoot.appendChild(this.objectName);
@@ -92,6 +99,8 @@ export class DiscoveryDetails {
         this.orbitRadius.innerText = i18n.t("orbit:radius", { value: parseDistance(model.orbit.radius) });
         this.htmlRoot.appendChild(this.orbitRadius);
 
-        this.htmlRoot.appendChild(this.sellDiscoveryButton);
+        if (this.player.discoveries.local.includes(this.currentDiscovery)) {
+            this.htmlRoot.appendChild(this.sellDiscoveryButton);
+        }
     }
 }
