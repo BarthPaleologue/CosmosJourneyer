@@ -6,7 +6,7 @@
     "shortLs": "{{count}} ls",
     "years_one": "{{count}} year",
     "years_other": "{{count}} years",
-    "days_one": "{{count}} days",
+    "days_one": "{{count}} day",
     "days_other": "{{count}} days",
     "hours_one": "{{count}} hour",
     "hours_other": "{{count}} hours",

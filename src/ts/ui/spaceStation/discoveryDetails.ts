@@ -80,10 +80,10 @@ export class DiscoveryDetails {
         this.objectName.innerText = model.name;
         this.htmlRoot.appendChild(this.objectName);
 
-        this.objectType.innerText = getOrbitalObjectTypeToI18nString(model);
+        this.objectType.innerText = i18n.t("orbitalObject:type", { value: getOrbitalObjectTypeToI18nString(model) });
         this.htmlRoot.appendChild(this.objectType);
 
-        this.siderealDayDuration.innerText = parseSecondsPrecise(model.physics.siderealDaySeconds);
+        this.siderealDayDuration.innerText = i18n.t("orbitalObject:siderealDayDuration", { value: parseSecondsPrecise(model.physics.siderealDaySeconds) });
         this.htmlRoot.appendChild(this.siderealDayDuration);
 
         this.orbitDuration.innerText = i18n.t("orbit:period", { value: parseSecondsPrecise(model.orbit.period) });
