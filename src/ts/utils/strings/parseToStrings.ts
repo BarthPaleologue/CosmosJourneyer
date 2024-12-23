@@ -35,7 +35,7 @@ export function parseDistance(distance: number): string {
         return i18n.t("units:shortM", { count: Number(distance.toFixed(0)) });
     } else if (distance < 1_000_000) {
         return i18n.t("units:shortKm", { count: Number((distance / 1000).toFixed(2)) });
-    } else if (distance < 20_000_000) {
+    } else if (distance < 300_000_000) {
         return i18n.t("units:shortMm", { count: Number((distance / 1_000_000).toFixed(2)) });
     } else if (distance < 0.1 * Settings.LIGHT_YEAR) {
         return i18n.t("units:shortLs", { count: Number((distance / Settings.C).toFixed(2)) });
