@@ -5,6 +5,7 @@ import { EncyclopaediaGalactica, SpaceDiscoveryData } from "../../society/encycl
 import { getObjectModelByUniverseId } from "../../utils/coordinates/orbitalObjectId";
 import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
 import { parseDistance, parseSecondsPrecise } from "../../utils/strings/parseToStrings";
+import i18n from "../../i18n";
 
 export class DiscoveryDetails {
     readonly htmlRoot: HTMLElement;
@@ -85,10 +86,10 @@ export class DiscoveryDetails {
         this.siderealDayDuration.innerText = parseSecondsPrecise(model.physics.siderealDaySeconds);
         this.htmlRoot.appendChild(this.siderealDayDuration);
 
-        this.orbitDuration.innerText = parseSecondsPrecise(model.orbit.period);
+        this.orbitDuration.innerText = i18n.t("orbit:period", { value: parseSecondsPrecise(model.orbit.period) });
         this.htmlRoot.appendChild(this.orbitDuration);
 
-        this.orbitRadius.innerText = parseDistance(model.orbit.radius);
+        this.orbitRadius.innerText = i18n.t("orbit:radius", { value: parseDistance(model.orbit.radius) });
         this.htmlRoot.appendChild(this.orbitRadius);
 
         this.htmlRoot.appendChild(this.sellDiscoveryButton);

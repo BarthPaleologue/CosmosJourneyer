@@ -19,12 +19,12 @@ import { Settings } from "../../settings";
 import i18n from "../../i18n";
 
 export function parseSpeed(speed: number): string {
-    if (speed < 1000) {
+    if (speed < 1_000) {
         return `${speed.toFixed(0)} m/s`;
-    } else if (speed < 1000000) {
-        return `${(speed / 1000).toFixed(2)} km/s`;
-    } else if (speed < 20000000) {
-        return `${(speed / 1000000).toFixed(2)} Mm/s`;
+    } else if (speed < 1_000_000) {
+        return `${(speed / 1_000).toFixed(2)} km/s`;
+    } else if (speed < 20_000_000) {
+        return `${(speed / 1_000_000).toFixed(2)} Mm/s`;
     } else {
         return `${(speed / Settings.C).toFixed(2)} c`;
     }
@@ -34,7 +34,7 @@ export function parseDistance(distance: number): string {
     if (distance < 1_000) {
         return i18n.t("units:shortM", { count: Number(distance.toFixed(0)) });
     } else if (distance < 1_000_000) {
-        return i18n.t("units:shortKm", { count: Number((distance / 1000).toFixed(2)) });
+        return i18n.t("units:shortKm", { count: Number((distance / 1_000).toFixed(2)) });
     } else if (distance < 300_000_000) {
         return i18n.t("units:shortMm", { count: Number((distance / 1_000_000).toFixed(2)) });
     } else if (distance < 0.1 * Settings.LIGHT_YEAR) {
