@@ -37,7 +37,7 @@ export class DiscoveryDetails {
         this.encyclopaedia = encyclopaedia;
 
         this.htmlRoot = document.createElement("div");
-        this.htmlRoot.classList.add("flex-column", "flex-3", "discoveryDetails");
+        this.htmlRoot.classList.add("flex-column", "discoveryDetails");
 
         this.placeHolderText = document.createElement("p");
         this.placeHolderText.textContent = "Select a discovery to see more details.";

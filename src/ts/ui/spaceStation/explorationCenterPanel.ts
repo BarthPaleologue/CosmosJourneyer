@@ -87,7 +87,7 @@ export class ExplorationCenterPanel {
         this.htmlRoot.appendChild(horizontalContainer);
 
         this.discoveryList = document.createElement("div");
-        this.discoveryList.classList.add("flex-column", "overflow-y-auto", "flex-1", "discoveryList");
+        this.discoveryList.classList.add("flex-column", "overflow-y-auto", "discoveryList");
         horizontalContainer.appendChild(this.discoveryList);
 
         this.discoveryDetails = new DiscoveryDetails(player, encyclopaedia);
@@ -103,7 +103,7 @@ export class ExplorationCenterPanel {
 
         if (this.player.discoveries.local.length === 0) {
             const container = document.createElement("div");
-            container.classList.add("listItemContainer");
+            container.classList.add("listItemContainer", "flex-column");
             this.discoveryList.appendChild(container);
 
             const noDiscoveryTitle = document.createElement("h3");
@@ -131,7 +131,7 @@ export class ExplorationCenterPanel {
             const objectModel = getObjectModelByUniverseId(discovery.objectId);
 
             const discoveryItem = document.createElement("div");
-            discoveryItem.classList.add("listItemContainer");
+            discoveryItem.classList.add("listItemContainer", "flex-column");
             discoveryItem.addEventListener("click", () => {
                 this.discoveryDetails.setDiscovery(discovery);
             });

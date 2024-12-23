@@ -254,15 +254,27 @@ $gaps: 10px;
             flex-grow: 1;
             .discoveryList {
                 padding-right: 10px;
+
+                & > div {
+                    min-height: fit-content;
+                    & > * {
+                        margin: 0;
+                    }
+                }
             }
 
             .discoveryDetails {
                 background: var(--accent-color-dark);
                 padding: 10px;
+                flex-grow: 1;
 
                 &.empty {
                     align-items: center;
                     justify-content: center;
+                }
+
+                & > * {
+                    margin: 0;
                 }
             }
         }
