@@ -56,7 +56,7 @@ export function newSeededJuliaSetModel(seed: number, name: string, parentBodies:
 
     const physicalProperties: OrbitalObjectPhysicsInfo = {
         mass: 10,
-        siderealDayDuration: 0,
+        siderealDaySeconds: 0,
         axialTilt: Quaternion.RotationAxis(Axis.X, normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT))
     };
 

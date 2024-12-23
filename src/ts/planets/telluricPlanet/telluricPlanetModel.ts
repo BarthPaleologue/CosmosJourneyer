@@ -57,7 +57,7 @@ export function newSeededTelluricPlanetModel(seed: number, name: string, parentB
     const physicalProperties: TelluricPlanetaryMassObjectPhysicsInfo = {
         mass: mass,
         axialTilt: Quaternion.RotationAxis(Axis.X, normalRandom(0, 0.2, rng, GenerationSteps.AXIAL_TILT)),
-        siderealDayDuration: (60 * 60 * 24) / 10,
+        siderealDaySeconds: (60 * 60 * 24) / 10,
         minTemperature: minTemperature,
         maxTemperature: maxTemperature,
         pressure: pressure,
