@@ -34,6 +34,8 @@ export class ExplorationCenterPanel {
 
     private filter: ExplorationCenterFilter = ExplorationCenterFilter.ALL;
 
+    private selectedDiscovery: HTMLDivElement | null = null;
+
     private readonly discoveryToHtmlItem = new Map<SpaceDiscoveryData, HTMLDivElement>();
 
     private readonly player: Player;
@@ -133,6 +135,12 @@ export class ExplorationCenterPanel {
             const discoveryItem = document.createElement("div");
             discoveryItem.classList.add("listItemContainer", "flex-column");
             discoveryItem.addEventListener("click", () => {
+                if (this.selectedDiscovery !== null) {
+                    this.selectedDiscovery.classList.remove("selected");
+                }
+                this.selectedDiscovery = discoveryItem;
+                this.selectedDiscovery.classList.add("selected");
+
                 this.discoveryDetails.setDiscovery(discovery);
             });
             this.discoveryToHtmlItem.set(discovery, discoveryItem);

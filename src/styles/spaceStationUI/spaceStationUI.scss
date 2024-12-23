@@ -255,8 +255,13 @@ $gaps: 10px;
             .discoveryList {
                 padding-right: 10px;
 
-                & > div {
+                .listItemContainer {
                     min-height: fit-content;
+
+                    &.selected {
+                        background: var(--accent-color-light);
+                    }
+
                     & > * {
                         margin: 0;
                     }
