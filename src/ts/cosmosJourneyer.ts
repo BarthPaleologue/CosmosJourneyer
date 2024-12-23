@@ -59,6 +59,8 @@ import { StationLandingTutorial } from "./tutorials/stationLandingTutorial";
 import { promptModalBoolean, alertModal, promptModalString } from "./utils/dialogModal";
 import { FuelScoopTutorial } from "./tutorials/fuelScoopTutorial";
 import { EncyclopaediaGalactica } from "./society/encyclopaediaGalactica";
+import { EncyclopaediaGalacticaManager } from "./society/encyclopaediaGalacticaManager";
+import { EncyclopaediaGalacticaLocal } from "./society/encyclopaediaGalacticaLocal";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -98,7 +100,7 @@ export class CosmosJourneyer {
 
     readonly player: Player;
 
-    private readonly encyclopaedia: EncyclopaediaGalactica;
+    private readonly encyclopaedia: EncyclopaediaGalacticaManager;
 
     /**
      * The number of seconds elapsed since the start of the engine
@@ -114,7 +116,7 @@ export class CosmosJourneyer {
 
     private isAutoSaveEnabled = true;
 
-    private constructor(player: Player, engine: AbstractEngine, starSystemView: StarSystemView, encyclopaedia: EncyclopaediaGalactica) {
+    private constructor(player: Player, engine: AbstractEngine, starSystemView: StarSystemView, encyclopaedia: EncyclopaediaGalacticaManager) {
         this.engine = engine;
 
         this.player = player;
@@ -334,7 +336,8 @@ export class CosmosJourneyer {
 
         const player = Player.Default();
 
-        const encyclopaedia = new EncyclopaediaGalactica();
+        const encyclopaedia = new EncyclopaediaGalacticaManager();
+        encyclopaedia.backends.push(new EncyclopaediaGalacticaLocal());
 
         // Init star system view
         const starSystemView = new StarSystemView(player, engine, havokInstance, encyclopaedia);
@@ -616,7 +619,6 @@ export class CosmosJourneyer {
 
         const newPlayer = saveData.player !== undefined ? Player.Deserialize(saveData.player) : Player.Default();
         this.player.copyFrom(newPlayer);
-        this.encyclopaedia.reset();
         this.player.discoveries.uploaded.forEach((discovery) => {
             this.encyclopaedia.contributeDiscoveryIfNew(discovery);
         });

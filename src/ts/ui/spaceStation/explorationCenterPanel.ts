@@ -49,7 +49,7 @@ export function generateExplorationCenterDom(encyclopaedia: EncyclopaediaGalacti
     });
     horizontalContainer.appendChild(discoveryDetails.htmlRoot);
 
-    player.discoveries.local.forEach((discovery) => {
+    player.discoveries.local.forEach(async (discovery) => {
         const objectModel = getObjectModelByUniverseId(discovery.objectId);
 
         const discoveryItem = document.createElement("div");
@@ -69,7 +69,7 @@ export function generateExplorationCenterDom(encyclopaedia: EncyclopaediaGalacti
         discoveryItem.appendChild(discoveryDate);
 
         const discoveryValue = document.createElement("p");
-        discoveryValue.textContent = `Value: ${encyclopaedia.estimateDiscovery(discovery.objectId).toLocaleString()}${Settings.CREDIT_SYMBOL}`;
+        discoveryValue.textContent = `Value: ${(await encyclopaedia.estimateDiscovery(discovery.objectId)).toLocaleString()}${Settings.CREDIT_SYMBOL}`;
         discoveryItem.appendChild(discoveryValue);
     });
 

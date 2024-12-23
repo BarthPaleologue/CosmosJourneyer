@@ -47,13 +47,13 @@ export class DiscoveryDetails {
 
         this.sellDiscoveryButton = document.createElement("button");
         this.sellDiscoveryButton.textContent = "Sell";
-        this.sellDiscoveryButton.addEventListener("click", () => {
+        this.sellDiscoveryButton.addEventListener("click", async () => {
             if (this.currentDiscovery === null) {
                 throw new Error("The sell button should not be displayed when currentDiscovery is null");
             }
 
             Sounds.ECHOED_BLIP_SOUND.play();
-            const value = encyclopaedia.estimateDiscovery(this.currentDiscovery.objectId);
+            const value = await encyclopaedia.estimateDiscovery(this.currentDiscovery.objectId);
             player.balance += value;
             player.discoveries.local = player.discoveries.local.filter((d) => d !== this.currentDiscovery);
             player.discoveries.uploaded.push(this.currentDiscovery);
