@@ -3,5 +3,6 @@
     "fullscreen": "Appuyez sur F11 pour entrer en plein écran !",
     "or": "ou",
     "and": "et",
-    "sellFor": "Vendre pour {{price}}"
+    "sellFor": "Vendre pour {{price}}",
+    "sellAllFor": "Vendre tout pour {{price}}"
 }

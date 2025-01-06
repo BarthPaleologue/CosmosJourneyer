@@ -3,5 +3,6 @@
     "fullscreen": "Press F11 to enable fullscreen",
     "or": "or",
     "and": "and",
-    "sellFor": "Sell for {{price}}"
+    "sellFor": "Sell for {{price}}",
+    "sellAllFor": "Sell all for {{price}}"
 }

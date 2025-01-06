@@ -102,8 +102,8 @@ export class SpaceStationLayer {
             throw new Error("Missions button not found");
         }
         this.missionsButton = missionsButton;
-        this.missionsButton.addEventListener("click", () => {
-            this.setMainPanelState(MainPanelState.MISSIONS);
+        this.missionsButton.addEventListener("click", async () => {
+            await this.setMainPanelState(MainPanelState.MISSIONS);
         });
 
         const spaceshipButton = document.querySelector<HTMLElement>(".spaceStationAction.spaceshipButton");
@@ -111,8 +111,8 @@ export class SpaceStationLayer {
             throw new Error("Spaceship button not found");
         }
         this.spaceshipButton = spaceshipButton;
-        this.spaceshipButton.addEventListener("click", () => {
-            this.setMainPanelState(MainPanelState.SPACE_SHIP);
+        this.spaceshipButton.addEventListener("click", async () => {
+            await this.setMainPanelState(MainPanelState.SPACE_SHIP);
         });
 
         const explorationCenterButton = document.querySelector<HTMLElement>(".spaceStationAction.explorationCenterButton");
@@ -120,8 +120,8 @@ export class SpaceStationLayer {
             throw new Error("Exploration center button not found");
         }
         this.explorationCenterButton = explorationCenterButton;
-        this.explorationCenterButton.addEventListener("click", () => {
-            this.setMainPanelState(MainPanelState.EXPLORATION_CENTER);
+        this.explorationCenterButton.addEventListener("click", async () => {
+            await this.setMainPanelState(MainPanelState.EXPLORATION_CENTER);
         });
 
         const infoButton = document.querySelector<HTMLElement>(".spaceStationAction.infoButton");
@@ -129,8 +129,8 @@ export class SpaceStationLayer {
             throw new Error("Info button not found");
         }
         this.infoButton = infoButton;
-        this.infoButton.addEventListener("click", () => {
-            this.setMainPanelState(MainPanelState.INFO);
+        this.infoButton.addEventListener("click", async () => {
+            await this.setMainPanelState(MainPanelState.INFO);
         });
 
         const takeOffButton = document.querySelector<HTMLElement>(".spaceStationAction.takeOffButton");
@@ -143,7 +143,7 @@ export class SpaceStationLayer {
         });
     }
 
-    private setMainPanelState(state: MainPanelState) {
+    private async setMainPanelState(state: MainPanelState) {
         if (this.mainPanelState === state) {
             this.mainPanelState = MainPanelState.NONE;
         } else {
@@ -172,7 +172,7 @@ export class SpaceStationLayer {
             case MainPanelState.EXPLORATION_CENTER:
                 this.mainPanel.classList.remove("hidden");
                 this.mainPanel.innerHTML = "";
-                this.explorationCenterPanel.populate();
+                await this.explorationCenterPanel.populate();
                 this.mainPanel.appendChild(this.explorationCenterPanel.htmlRoot);
                 break;
             case MainPanelState.NONE:

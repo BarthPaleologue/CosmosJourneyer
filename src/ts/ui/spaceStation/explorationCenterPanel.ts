@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import i18n from "../../i18n";
 import { Player } from "../../player/player";
 import { Settings } from "../../settings";
 import { EncyclopaediaGalactica, SpaceDiscoveryData } from "../../society/encyclopaediaGalactica";
@@ -36,6 +37,8 @@ export class ExplorationCenterPanel {
 
     private selectedDiscovery: HTMLDivElement | null = null;
 
+    private readonly sellAllButton: HTMLButtonElement;
+
     private readonly discoveryToHtmlItem = new Map<SpaceDiscoveryData, HTMLDivElement>();
 
     private readonly player: Player;
@@ -52,8 +55,25 @@ export class ExplorationCenterPanel {
         title.textContent = "Exploration Center";
         this.htmlRoot.appendChild(title);
 
+        const buttonHorizontalContainer = document.createElement("div");
+        buttonHorizontalContainer.classList.add("flex-row", "buttonHorizontalContainer");
+        this.htmlRoot.appendChild(buttonHorizontalContainer);
+
         const discoveryListSelect = document.createElement("select");
-        this.htmlRoot.appendChild(discoveryListSelect);
+        buttonHorizontalContainer.appendChild(discoveryListSelect);
+
+        this.sellAllButton = document.createElement("button");
+        this.sellAllButton.textContent = "Sell all";
+        this.sellAllButton.addEventListener("click", async () => {
+            for (const discovery of this.player.discoveries.local) {
+                const value = await encyclopaedia.estimateDiscovery(discovery.objectId);
+                player.balance += value;
+                player.discoveries.local = player.discoveries.local.filter((d) => d !== discovery);
+                player.discoveries.uploaded.push(discovery);
+            }
+            await this.populate();
+        });
+        buttonHorizontalContainer.appendChild(this.sellAllButton);
 
         const optionLocal = document.createElement("option");
         optionLocal.innerText = "Local";
@@ -71,13 +91,13 @@ export class ExplorationCenterPanel {
         discoveryListSelect.appendChild(optionAll);
 
         discoveryListSelect.value = ExplorationCenterFilter.ALL;
-        discoveryListSelect.addEventListener("change", () => {
+        discoveryListSelect.addEventListener("change", async () => {
             switch (discoveryListSelect.value) {
                 case ExplorationCenterFilter.LOCAL_ONLY:
                 case ExplorationCenterFilter.UPLOADED_ONLY:
                 case ExplorationCenterFilter.ALL:
                     this.filter = discoveryListSelect.value;
-                    this.populate();
+                    await this.populate();
                     break;
                 default:
                     throw new Error("Invalid value of discoveryListSelect!");
@@ -85,7 +105,7 @@ export class ExplorationCenterPanel {
         });
 
         const horizontalContainer = document.createElement("div");
-        horizontalContainer.classList.add("flex-row");
+        horizontalContainer.classList.add("flex-row", "contentHorizontalContainer");
         this.htmlRoot.appendChild(horizontalContainer);
 
         this.discoveryList = document.createElement("div");
@@ -93,8 +113,8 @@ export class ExplorationCenterPanel {
         horizontalContainer.appendChild(this.discoveryList);
 
         this.discoveryDetails = new DiscoveryDetails(player, encyclopaedia);
-        this.discoveryDetails.onSellDiscovery.add((discovery) => {
-            this.populate();
+        this.discoveryDetails.onSellDiscovery.add(async (discovery) => {
+            await this.populate();
         });
         horizontalContainer.appendChild(this.discoveryDetails.htmlRoot);
     }
@@ -106,11 +126,30 @@ export class ExplorationCenterPanel {
         }
     }
 
-    populate() {
+    async populate() {
         this.discoveryList.innerHTML = "";
         this.discoveryToHtmlItem.clear();
 
-        if (this.player.discoveries.local.length === 0) {
+        const discoveries: SpaceDiscoveryData[] = [];
+        switch (this.filter) {
+            case ExplorationCenterFilter.LOCAL_ONLY:
+                discoveries.push(...this.player.discoveries.local);
+                break;
+            case ExplorationCenterFilter.UPLOADED_ONLY:
+                discoveries.push(...this.player.discoveries.uploaded);
+                break;
+            case ExplorationCenterFilter.ALL:
+                discoveries.push(...this.player.discoveries.local, ...this.player.discoveries.uploaded);
+        }
+
+        let totalValue = 0;
+        for (const discovery of this.player.discoveries.local) {
+            totalValue += await this.encyclopaedia.estimateDiscovery(discovery.objectId);
+        }
+        this.sellAllButton.toggleAttribute("disabled", totalValue === 0);
+        this.sellAllButton.innerText = i18n.t("common:sellAllFor", { price: `${totalValue.toLocaleString()}${Settings.CREDIT_SYMBOL}` });
+
+        if (discoveries.length === 0) {
             const container = document.createElement("div");
             container.classList.add("listItemContainer", "flex-column");
             this.discoveryList.appendChild(container);
@@ -136,18 +175,6 @@ export class ExplorationCenterPanel {
             this.filterDiscoveryListByQuery(searchField.value.toLowerCase());
         });
         this.discoveryList.appendChild(searchField);
-
-        const discoveries: SpaceDiscoveryData[] = [];
-        switch (this.filter) {
-            case ExplorationCenterFilter.LOCAL_ONLY:
-                discoveries.push(...this.player.discoveries.local);
-                break;
-            case ExplorationCenterFilter.UPLOADED_ONLY:
-                discoveries.push(...this.player.discoveries.uploaded);
-                break;
-            case ExplorationCenterFilter.ALL:
-                discoveries.push(...this.player.discoveries.local, ...this.player.discoveries.uploaded);
-        }
 
         discoveries.forEach(async (discovery) => {
             const objectModel = getObjectModelByUniverseId(discovery.objectId);

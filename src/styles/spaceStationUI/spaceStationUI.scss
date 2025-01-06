@@ -250,7 +250,14 @@ $gaps: 10px;
     .discoveryPanel {
         height: 100%;
 
-        & > div {
+        .buttonHorizontalContainer {
+            min-height: unset;
+            select {
+                flex-grow: 1;
+            }
+        }
+
+        .contentHorizontalContainer {
             flex-grow: 1;
             .discoveryList {
                 padding-right: 10px;
