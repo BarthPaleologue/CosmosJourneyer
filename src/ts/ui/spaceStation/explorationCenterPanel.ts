@@ -129,8 +129,10 @@ export class ExplorationCenterPanel {
         const searchField = document.createElement("input");
         searchField.type = "search";
         searchField.placeholder = "Search for a discovery";
-        searchField.addEventListener("click", (e) => {
+        searchField.addEventListener("keydown", (e) => {
             e.stopPropagation();
+        });
+        searchField.addEventListener("input", (e) => {
             this.filterDiscoveryListByQuery(searchField.value.toLowerCase());
         });
         this.discoveryList.appendChild(searchField);
