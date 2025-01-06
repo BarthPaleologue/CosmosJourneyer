@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Sounds } from "../../assets/sounds";
 import i18n from "../../i18n";
 import { Player } from "../../player/player";
 import { Settings } from "../../settings";
@@ -65,6 +66,8 @@ export class ExplorationCenterPanel {
         this.sellAllButton = document.createElement("button");
         this.sellAllButton.textContent = "Sell all";
         this.sellAllButton.addEventListener("click", async () => {
+            Sounds.SUCCESS.play();
+
             for (const discovery of this.player.discoveries.local) {
                 const value = await encyclopaedia.estimateDiscovery(discovery.objectId);
                 player.balance += value;
@@ -92,6 +95,8 @@ export class ExplorationCenterPanel {
 
         discoveryListSelect.value = ExplorationCenterFilter.ALL;
         discoveryListSelect.addEventListener("change", async () => {
+            Sounds.MENU_SELECT_SOUND.play();
+
             switch (discoveryListSelect.value) {
                 case ExplorationCenterFilter.LOCAL_ONLY:
                 case ExplorationCenterFilter.UPLOADED_ONLY:
@@ -102,6 +107,9 @@ export class ExplorationCenterPanel {
                 default:
                     throw new Error("Invalid value of discoveryListSelect!");
             }
+        });
+        discoveryListSelect.addEventListener("click", () => {
+            Sounds.MENU_SELECT_SOUND.play();
         });
 
         const horizontalContainer = document.createElement("div");
@@ -183,6 +191,8 @@ export class ExplorationCenterPanel {
             discoveryItem.classList.add("listItemContainer", "flex-column");
             discoveryItem.classList.toggle("uploaded", this.player.discoveries.uploaded.includes(discovery));
             discoveryItem.addEventListener("click", async () => {
+                Sounds.MENU_SELECT_SOUND.play();
+
                 if (this.selectedDiscovery !== null) {
                     this.selectedDiscovery.classList.remove("selected");
                 }

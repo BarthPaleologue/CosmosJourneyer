@@ -77,13 +77,13 @@ class Notification {
                 Sounds.MENU_SELECT_SOUND.play();
                 break;
             case NotificationIntent.SUCCESS:
-                Sounds.ECHOED_BLIP_SOUND.play();
+                Sounds.SUCCESS.play();
                 break;
             case NotificationIntent.WARNING:
                 Sounds.MENU_SELECT_SOUND.play();
                 break;
             case NotificationIntent.ERROR:
-                Sounds.ERROR_BLEEP_SOUND.play();
+                Sounds.ERROR.play();
                 break;
         }
 

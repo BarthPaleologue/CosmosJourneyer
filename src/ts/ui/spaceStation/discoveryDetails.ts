@@ -60,7 +60,7 @@ export class DiscoveryDetails {
                 throw new Error("The sell button should not be displayed when currentDiscovery is null");
             }
 
-            Sounds.ECHOED_BLIP_SOUND.play();
+            Sounds.SUCCESS.play();
             const value = await encyclopaedia.estimateDiscovery(this.currentDiscovery.objectId);
             player.balance += value;
             player.discoveries.local = player.discoveries.local.filter((d) => d !== this.currentDiscovery);
