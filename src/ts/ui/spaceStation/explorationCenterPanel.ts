@@ -154,14 +154,14 @@ export class ExplorationCenterPanel {
 
             const discoveryItem = document.createElement("div");
             discoveryItem.classList.add("listItemContainer", "flex-column");
-            discoveryItem.addEventListener("click", () => {
+            discoveryItem.addEventListener("click", async () => {
                 if (this.selectedDiscovery !== null) {
                     this.selectedDiscovery.classList.remove("selected");
                 }
                 this.selectedDiscovery = discoveryItem;
                 this.selectedDiscovery.classList.add("selected");
 
-                this.discoveryDetails.setDiscovery(discovery);
+                await this.discoveryDetails.setDiscovery(discovery);
             });
             this.discoveryToHtmlItem.set(discovery, discoveryItem);
             this.discoveryList.appendChild(discoveryItem);

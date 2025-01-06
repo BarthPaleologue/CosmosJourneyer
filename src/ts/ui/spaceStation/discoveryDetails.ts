@@ -6,6 +6,7 @@ import { getObjectModelByUniverseId } from "../../utils/coordinates/orbitalObjec
 import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
 import { parseDistance, parseSecondsPrecise } from "../../utils/strings/parseToStrings";
 import i18n from "../../i18n";
+import { Settings } from "../../settings";
 
 export class DiscoveryDetails {
     readonly htmlRoot: HTMLElement;
@@ -42,7 +43,7 @@ export class DiscoveryDetails {
         this.placeHolderText = document.createElement("p");
         this.placeHolderText.textContent = "Select a discovery to see more details.";
 
-        this.objectName = document.createElement("h3");
+        this.objectName = document.createElement("h2");
 
         this.objectType = document.createElement("p");
 
@@ -66,13 +67,13 @@ export class DiscoveryDetails {
             player.discoveries.uploaded.push(this.currentDiscovery);
 
             this.onSellDiscovery.notifyObservers(this.currentDiscovery);
-            this.setDiscovery(null);
+            await this.setDiscovery(null);
         });
 
         this.setDiscovery(null);
     }
 
-    setDiscovery(discovery: SpaceDiscoveryData | null) {
+    async setDiscovery(discovery: SpaceDiscoveryData | null) {
         this.htmlRoot.innerHTML = "";
         this.htmlRoot.classList.toggle("empty", discovery === null);
         this.currentDiscovery = discovery;
@@ -101,6 +102,10 @@ export class DiscoveryDetails {
 
         if (this.player.discoveries.local.includes(this.currentDiscovery)) {
             this.htmlRoot.appendChild(this.sellDiscoveryButton);
+
+            this.sellDiscoveryButton.textContent = i18n.t("common:sellFor", {
+                price: `${(await this.encyclopaedia.estimateDiscovery(this.currentDiscovery.objectId)).toLocaleString()}${Settings.CREDIT_SYMBOL}`
+            });
         }
     }
 }

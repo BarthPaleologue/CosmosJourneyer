@@ -2,5 +2,6 @@
     "loading": "Loading, please wait...",
     "fullscreen": "Press F11 to enable fullscreen",
     "or": "or",
-    "and": "and"
+    "and": "and",
+    "sellFor": "Sell for {{price}}"
 }

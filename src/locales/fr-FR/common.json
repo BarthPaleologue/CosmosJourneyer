@@ -2,5 +2,6 @@
     "loading": "Chargement...",
     "fullscreen": "Appuyez sur F11 pour entrer en plein écran !",
     "or": "ou",
-    "and": "et"
+    "and": "et",
+    "sellFor": "Vendre pour {{price}}"
 }
