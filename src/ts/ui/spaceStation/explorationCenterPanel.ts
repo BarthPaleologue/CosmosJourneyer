@@ -154,6 +154,7 @@ export class ExplorationCenterPanel {
 
             const discoveryItem = document.createElement("div");
             discoveryItem.classList.add("listItemContainer", "flex-column");
+            discoveryItem.classList.toggle("uploaded", this.player.discoveries.uploaded.includes(discovery));
             discoveryItem.addEventListener("click", async () => {
                 if (this.selectedDiscovery !== null) {
                     this.selectedDiscovery.classList.remove("selected");
