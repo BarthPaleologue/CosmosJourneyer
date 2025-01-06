@@ -103,6 +103,7 @@ export class SpaceStationLayer {
         }
         this.missionsButton = missionsButton;
         this.missionsButton.addEventListener("click", async () => {
+            Sounds.MENU_SELECT_SOUND.play();
             await this.setMainPanelState(MainPanelState.MISSIONS);
         });
 
@@ -112,6 +113,7 @@ export class SpaceStationLayer {
         }
         this.spaceshipButton = spaceshipButton;
         this.spaceshipButton.addEventListener("click", async () => {
+            Sounds.MENU_SELECT_SOUND.play();
             await this.setMainPanelState(MainPanelState.SPACE_SHIP);
         });
 
@@ -121,6 +123,7 @@ export class SpaceStationLayer {
         }
         this.explorationCenterButton = explorationCenterButton;
         this.explorationCenterButton.addEventListener("click", async () => {
+            Sounds.MENU_SELECT_SOUND.play();
             await this.setMainPanelState(MainPanelState.EXPLORATION_CENTER);
         });
 
@@ -130,6 +133,7 @@ export class SpaceStationLayer {
         }
         this.infoButton = infoButton;
         this.infoButton.addEventListener("click", async () => {
+            Sounds.MENU_SELECT_SOUND.play();
             await this.setMainPanelState(MainPanelState.INFO);
         });
 
@@ -139,6 +143,7 @@ export class SpaceStationLayer {
         }
         this.takeOffButton = takeOffButton;
         this.takeOffButton.addEventListener("click", () => {
+            Sounds.MENU_SELECT_SOUND.play();
             this.onTakeOffObservable.notifyObservers();
         });
     }
