@@ -41,7 +41,7 @@ export class DiscoveryDetails {
         this.htmlRoot.classList.add("flex-column", "discoveryDetails");
 
         this.placeHolderText = document.createElement("p");
-        this.placeHolderText.textContent = "Select a discovery to see more details.";
+        this.placeHolderText.textContent = i18n.t("explorationCenter:detailsPlaceholder");
 
         this.objectName = document.createElement("h2");
 

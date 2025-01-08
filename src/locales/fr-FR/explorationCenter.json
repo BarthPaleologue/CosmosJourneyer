@@ -1,0 +1,12 @@
+{
+    "explorationCenter": "Centre d'exploration",
+    "activeEncyclopaediaInstances": "Instances actives de l'Encyclopaedia : {{value}}",
+    "addNewInstance": "Ajouter une nouvelle instance",
+    "filterLocal": "Données locales",
+    "filterUploaded": "Données téléchargées",
+    "filterAll": "Toutes les données",
+    "searchForADiscovery": "Chercher une découverte",
+    "noDiscoveryTitle": "Pas de nouvelles découvertes",
+    "noDiscoveryText": "L'univers vous attend !",
+    "detailsPlaceholder": "Sélectionnez une découverte pour voir plus de détails."
+}

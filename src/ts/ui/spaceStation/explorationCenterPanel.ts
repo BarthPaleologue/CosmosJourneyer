@@ -56,7 +56,7 @@ export class ExplorationCenterPanel {
         this.htmlRoot.classList.add("flex-column", "discoveryPanel");
 
         const title = document.createElement("h2");
-        title.textContent = "Exploration Center";
+        title.textContent = i18n.t("explorationCenter:explorationCenter");
         this.htmlRoot.appendChild(title);
 
         const encyclopaediaContainer = document.createElement("div");
@@ -64,11 +64,13 @@ export class ExplorationCenterPanel {
         this.htmlRoot.appendChild(encyclopaediaContainer);
 
         const activeInstances = document.createElement("p");
-        activeInstances.textContent = `Active Encyclopaedia instances: ${encyclopaedia.getBackendString()}`;
+        activeInstances.textContent = i18n.t("explorationCenter:activeEncyclopaediaInstances", {
+            value: encyclopaedia.getBackendString()
+        });
         encyclopaediaContainer.appendChild(activeInstances);
 
         const addEncyclopaediaInstanceButton = document.createElement("button");
-        addEncyclopaediaInstanceButton.textContent = "Add instance";
+        addEncyclopaediaInstanceButton.textContent = i18n.t("explorationCenter:addNewInstance");
         addEncyclopaediaInstanceButton.addEventListener("click", async () => {
             Sounds.MENU_SELECT_SOUND.play();
 
@@ -78,7 +80,9 @@ export class ExplorationCenterPanel {
             const newEncyclopaedia = new EncyclopaediaGalacticaOnline(new URL(connectionInfo.encyclopaediaUrlBase), connectionInfo.accountId, connectionInfo.password);
             encyclopaedia.backends.push(newEncyclopaedia);
 
-            activeInstances.textContent = `Active Encyclopaedia instances: ${encyclopaedia.getBackendString()}`;
+            activeInstances.textContent = i18n.t("explorationCenter:activeEncyclopaediaInstances", {
+                value: encyclopaedia.getBackendString()
+            });
         });
         encyclopaediaContainer.appendChild(addEncyclopaediaInstanceButton);
 
@@ -90,7 +94,6 @@ export class ExplorationCenterPanel {
         buttonHorizontalContainer.appendChild(discoveryListSelect);
 
         this.sellAllButton = document.createElement("button");
-        this.sellAllButton.textContent = "Sell all";
         this.sellAllButton.addEventListener("click", async () => {
             Sounds.SUCCESS.play();
 
@@ -105,17 +108,17 @@ export class ExplorationCenterPanel {
         buttonHorizontalContainer.appendChild(this.sellAllButton);
 
         const optionLocal = document.createElement("option");
-        optionLocal.innerText = "Local";
+        optionLocal.innerText = i18n.t("explorationCenter:filterLocal");
         optionLocal.value = ExplorationCenterFilter.LOCAL_ONLY;
         discoveryListSelect.appendChild(optionLocal);
 
         const optionUploaded = document.createElement("option");
-        optionUploaded.innerText = "Uploaded";
+        optionUploaded.innerText = i18n.t("explorationCenter:filterUploaded");
         optionUploaded.value = ExplorationCenterFilter.UPLOADED_ONLY;
         discoveryListSelect.appendChild(optionUploaded);
 
         const optionAll = document.createElement("option");
-        optionAll.innerText = "All";
+        optionAll.innerText = i18n.t("explorationCenter:filterAll");
         optionAll.value = ExplorationCenterFilter.ALL;
         discoveryListSelect.appendChild(optionAll);
 
@@ -189,11 +192,11 @@ export class ExplorationCenterPanel {
             this.discoveryList.appendChild(container);
 
             const noDiscoveryTitle = document.createElement("h3");
-            noDiscoveryTitle.innerText = "No new discoveries";
+            noDiscoveryTitle.innerText = i18n.t("explorationCenter:noDiscoveryTitle");
             container.appendChild(noDiscoveryTitle);
 
             const noDiscoveryText = document.createElement("p");
-            noDiscoveryText.innerText = "The universe awaits!";
+            noDiscoveryText.innerText = i18n.t("explorationCenter:noDiscoveryText");
             container.appendChild(noDiscoveryText);
 
             return;
@@ -201,7 +204,7 @@ export class ExplorationCenterPanel {
 
         const searchField = document.createElement("input");
         searchField.type = "search";
-        searchField.placeholder = "Search for a discovery";
+        searchField.placeholder = i18n.t("explorationCenter:searchForADiscovery");
         searchField.addEventListener("keydown", (e) => {
             e.stopPropagation();
         });
@@ -237,16 +240,6 @@ export class ExplorationCenterPanel {
             const discoveryDate = document.createElement("p");
             discoveryDate.textContent = new Date(discovery.discoveryTimestamp).toLocaleDateString();
             discoveryItem.appendChild(discoveryDate);
-
-            if (this.player.discoveries.local.includes(discovery)) {
-                const discoveryValue = document.createElement("p");
-                discoveryValue.textContent = `Value: ${(await this.encyclopaedia.estimateDiscovery(discovery.objectId)).toLocaleString()}${Settings.CREDIT_SYMBOL}`;
-                discoveryItem.appendChild(discoveryValue);
-            } else {
-                const alreadyUploaded = document.createElement("p");
-                alreadyUploaded.textContent = "Data already uploaded";
-                discoveryItem.appendChild(alreadyUploaded);
-            }
         });
     }
 }
