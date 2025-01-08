@@ -30,6 +30,9 @@ import thatZenMoment from "../../asset/sound/music/That_Zen_Moment.ogg";
 import echoesOfTime from "../../asset/sound/music/Echoes_of_Time_v2.ogg";
 import danseMorialta from "../../asset/sound/music/Danse_Morialta.mp3";
 import peaceOfMind from "../../asset/sound/music/Peace_of_Mind.ogg";
+import spacialWinds from "../../asset/sound/music/Horror_Spacial_Winds.mp3";
+import mesmerize from "../../asset/sound/music/Mesmerize.ogg";
+import reawakening from "../../asset/sound/music/Reawakening.mp3";
 
 export class Musics {
     public static STAR_MAP: Sound;
@@ -51,6 +54,12 @@ export class Musics {
     public static DANSE_MORIALTA: Sound;
 
     public static PEACE_OF_MIND: Sound;
+
+    public static SPACIAL_WINDS: Sound;
+
+    public static MESMERIZE: Sound;
+
+    public static REAWAKENING: Sound;
 
     public static EnqueueTasks(manager: AssetsManager, scene: Scene) {
         const starMapBackgroundMusicTask = manager.addBinaryFileTask("starMapBackgroundMusicTask", starMapBackgroundMusic);
@@ -110,6 +119,24 @@ export class Musics {
         peaceOfMindTask.onSuccess = (task) => {
             Musics.PEACE_OF_MIND = new Sound("PeaceOfMind", task.data, scene);
             console.log("Peace of Mind sound loaded");
+        };
+
+        const spacialWindsTask = manager.addBinaryFileTask("spacialWindsTask", spacialWinds);
+        spacialWindsTask.onSuccess = (task) => {
+            Musics.SPACIAL_WINDS = new Sound("SpacialWinds", task.data, scene);
+            console.log("Spacial Winds sound loaded");
+        };
+
+        const mesmerizeTask = manager.addBinaryFileTask("mesmerizeTask", mesmerize);
+        mesmerizeTask.onSuccess = (task) => {
+            Musics.MESMERIZE = new Sound("Mesmerize", task.data, scene);
+            console.log("Mesmerize sound loaded");
+        };
+
+        const reawakeningTask = manager.addBinaryFileTask("reawakeningTask", reawakening);
+        reawakeningTask.onSuccess = (task) => {
+            Musics.REAWAKENING = new Sound("Reawakening", task.data, scene);
+            console.log("Reawakening sound loaded");
         };
     }
 }

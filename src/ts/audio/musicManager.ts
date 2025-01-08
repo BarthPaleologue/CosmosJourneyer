@@ -54,21 +54,43 @@ export class MusicManager {
         const playerPosition = this.starSystemView.scene.getActiveControls().getTransform().getAbsolutePosition();
         const closestOrbitalObject = this.starSystemView.getStarSystem().getNearestOrbitalObject(playerPosition);
 
-        const musicPriorityMap = new Map<Sound, number>();
         if (!isInStarSystemView) {
-            musicPriorityMap.set(Musics.STAR_MAP, (musicPriorityMap.get(Musics.STAR_MAP) ?? 0) + 200);
+            this.setMusic(Musics.STAR_MAP);
+            return;
         }
         if (isInMainMenu) {
-            musicPriorityMap.set(Musics.MAIN_MENU, (musicPriorityMap.get(Musics.MAIN_MENU) ?? 0) + 190);
+            this.setMusic(Musics.MAIN_MENU);
+            return;
         }
         if (spaceship.isLanding()) {
-            musicPriorityMap.set(Musics.STRAUSS_BLUE_DANUBE, (musicPriorityMap.get(Musics.STRAUSS_BLUE_DANUBE) ?? 0) + 180);
+            this.setMusic(Musics.STRAUSS_BLUE_DANUBE);
+            return;
         }
-        if (!spaceship.isLanded() && closestOrbitalObject.model.type === OrbitalObjectType.BLACK_HOLE) {
-            musicPriorityMap.set(Musics.ECHOES_OF_TIME, (musicPriorityMap.get(Musics.ECHOES_OF_TIME) ?? 0) + 170);
+
+        const musicPriorityMap = new Map<Sound, number>();
+        if (!spaceship.isLanded()) {
+            switch (closestOrbitalObject.model.type) {
+                case OrbitalObjectType.BLACK_HOLE:
+                    musicPriorityMap.set(Musics.ECHOES_OF_TIME, (musicPriorityMap.get(Musics.ECHOES_OF_TIME) ?? 0) + 200);
+                    break;
+
+                case OrbitalObjectType.MANDELBULB:
+                case OrbitalObjectType.JULIA_SET:
+                    musicPriorityMap.set(Musics.SPACIAL_WINDS, (musicPriorityMap.get(Musics.SPACIAL_WINDS) ?? 0) + 200);
+                    break;
+
+                case OrbitalObjectType.STAR:
+                case OrbitalObjectType.NEUTRON_STAR:
+                case OrbitalObjectType.TELLURIC_PLANET:
+                case OrbitalObjectType.TELLURIC_SATELLITE:
+                case OrbitalObjectType.GAS_PLANET:
+                case OrbitalObjectType.SPACE_STATION:
+                case OrbitalObjectType.SPACE_ELEVATOR:
+                    break;
+            }
         }
         if (spaceship.isWarpDriveEnabled()) {
-            const suitableMusics = [Musics.ATLANTEAN_TWILIGHT, Musics.INFINITE_PERSPECTIVE, Musics.DANSE_MORIALTA];
+            const suitableMusics = [Musics.ATLANTEAN_TWILIGHT, Musics.INFINITE_PERSPECTIVE, Musics.DANSE_MORIALTA, Musics.MESMERIZE];
             if (this.currentMusic !== null && suitableMusics.includes(this.currentMusic)) {
                 musicPriorityMap.set(this.currentMusic, (musicPriorityMap.get(this.currentMusic) ?? 0) + 160);
             } else {
@@ -84,7 +106,7 @@ export class MusicManager {
             }
         }
         if (isOnFoot) {
-            const suitableMusics = [Musics.THAT_ZEN_MOMENT, Musics.DEEP_RELAXATION, Musics.PEACE_OF_MIND];
+            const suitableMusics = [Musics.THAT_ZEN_MOMENT, Musics.DEEP_RELAXATION, Musics.PEACE_OF_MIND, Musics.MESMERIZE, Musics.REAWAKENING];
             if (this.currentMusic !== null && suitableMusics.includes(this.currentMusic)) {
                 musicPriorityMap.set(this.currentMusic, (musicPriorityMap.get(this.currentMusic) ?? 0) + 140);
             } else {
