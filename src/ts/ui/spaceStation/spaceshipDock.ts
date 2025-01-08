@@ -35,7 +35,7 @@ export function generateSpaceshipDom(stationModel: OrbitalFacilityModel, player:
         Sounds.MENU_SELECT_SOUND.play();
         const fuelAmount = spaceship.getTotalFuelCapacity() - spaceship.getRemainingFuel();
         const fuelUnitPrice = 10;
-        player.balance -= fuelAmount * fuelUnitPrice;
+        player.pay(fuelAmount * fuelUnitPrice);
         spaceship.refuel(fuelAmount);
         fuelText.innerText = `Fuel: ${spaceship.getRemainingFuel()} / ${spaceship.getTotalFuelCapacity()}`;
     });

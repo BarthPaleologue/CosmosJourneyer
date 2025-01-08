@@ -68,13 +68,14 @@ export class SpaceStationLayer {
 
     readonly onTakeOffObservable = new Observable<void>();
 
-    readonly player: Player;
-
-    private readonly encyclopaedia: EncyclopaediaGalacticaManager;
-
     constructor(player: Player, encyclopaedia: EncyclopaediaGalacticaManager) {
-        this.player = player;
-        this.encyclopaedia = encyclopaedia;
+        player.onBalanceChangedObservable.add((balance) => {
+            this.updatePlayerBalance(balance);
+        });
+
+        player.onNameChangedObservable.add((name) => {
+            this.updatePlayerName(name);
+        });
 
         this.parentNode = document.getElementById("spaceStationUI") as HTMLElement;
 
@@ -90,7 +91,6 @@ export class SpaceStationLayer {
             const newName = await promptModalString(i18n.t("spaceStation:cmdrNameChangePrompt"), player.getName());
             if (newName === null) return;
             player.setName(newName);
-            this.updatePlayerName();
         });
 
         this.playerBalance = document.querySelector<HTMLElement>("#spaceStationUI .playerBalance") as HTMLElement;
@@ -104,7 +104,7 @@ export class SpaceStationLayer {
         this.missionsButton = missionsButton;
         this.missionsButton.addEventListener("click", async () => {
             Sounds.MENU_SELECT_SOUND.play();
-            await this.setMainPanelState(MainPanelState.MISSIONS);
+            await this.setMainPanelState(MainPanelState.MISSIONS, player);
         });
 
         const spaceshipButton = document.querySelector<HTMLElement>(".spaceStationAction.spaceshipButton");
@@ -114,7 +114,7 @@ export class SpaceStationLayer {
         this.spaceshipButton = spaceshipButton;
         this.spaceshipButton.addEventListener("click", async () => {
             Sounds.MENU_SELECT_SOUND.play();
-            await this.setMainPanelState(MainPanelState.SPACE_SHIP);
+            await this.setMainPanelState(MainPanelState.SPACE_SHIP, player);
         });
 
         const explorationCenterButton = document.querySelector<HTMLElement>(".spaceStationAction.explorationCenterButton");
@@ -124,7 +124,7 @@ export class SpaceStationLayer {
         this.explorationCenterButton = explorationCenterButton;
         this.explorationCenterButton.addEventListener("click", async () => {
             Sounds.MENU_SELECT_SOUND.play();
-            await this.setMainPanelState(MainPanelState.EXPLORATION_CENTER);
+            await this.setMainPanelState(MainPanelState.EXPLORATION_CENTER, player);
         });
 
         const infoButton = document.querySelector<HTMLElement>(".spaceStationAction.infoButton");
@@ -134,7 +134,7 @@ export class SpaceStationLayer {
         this.infoButton = infoButton;
         this.infoButton.addEventListener("click", async () => {
             Sounds.MENU_SELECT_SOUND.play();
-            await this.setMainPanelState(MainPanelState.INFO);
+            await this.setMainPanelState(MainPanelState.INFO, player);
         });
 
         const takeOffButton = document.querySelector<HTMLElement>(".spaceStationAction.takeOffButton");
@@ -148,7 +148,7 @@ export class SpaceStationLayer {
         });
     }
 
-    private async setMainPanelState(state: MainPanelState) {
+    private async setMainPanelState(state: MainPanelState, player: Player) {
         if (this.mainPanelState === state) {
             this.mainPanelState = MainPanelState.NONE;
         } else {
@@ -167,12 +167,12 @@ export class SpaceStationLayer {
             case MainPanelState.MISSIONS:
                 this.mainPanel.classList.remove("hidden");
                 this.mainPanel.innerHTML = "";
-                this.mainPanel.appendChild(generateMissionsDom(this.currentStation, this.player));
+                this.mainPanel.appendChild(generateMissionsDom(this.currentStation, player));
                 break;
             case MainPanelState.SPACE_SHIP:
                 this.mainPanel.classList.remove("hidden");
                 this.mainPanel.innerHTML = "";
-                this.mainPanel.appendChild(generateSpaceshipDom(this.currentStation, this.player));
+                this.mainPanel.appendChild(generateSpaceshipDom(this.currentStation, player));
                 break;
             case MainPanelState.EXPLORATION_CENTER:
                 this.mainPanel.classList.remove("hidden");
@@ -202,16 +202,16 @@ export class SpaceStationLayer {
         this.currentStationParents = stationParents;
         this.spaceStationName.textContent = station.name;
 
-        this.updatePlayerName();
-        this.updatePlayerBalance();
+        this.updatePlayerName(player.getName());
+        this.updatePlayerBalance(player.getBalance());
     }
 
-    private updatePlayerName() {
-        this.playerName.textContent = `CMDR ${this.player.getName()}`;
+    private updatePlayerName(name: string) {
+        this.playerName.textContent = `CMDR ${name}`;
     }
 
-    private updatePlayerBalance() {
-        this.playerBalance.textContent = `Balance: ${Settings.CREDIT_SYMBOL}${this.player.balance.toLocaleString()}`;
+    private updatePlayerBalance(balance: number) {
+        this.playerBalance.textContent = `Balance: ${Settings.CREDIT_SYMBOL}${balance.toLocaleString()}`;
     }
 
     public reset() {

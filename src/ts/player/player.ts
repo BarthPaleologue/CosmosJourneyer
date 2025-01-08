@@ -58,8 +58,8 @@ export type SerializedPlayer = {
 
 export class Player {
     uuid: string;
-    private name: string;
-    balance: number;
+    #name: string;
+    #balance: number;
     creationDate: Date;
     timePlayedSeconds: number;
 
@@ -87,11 +87,12 @@ export class Player {
     static DEFAULT_BALANCE = 10_000;
 
     readonly onNameChangedObservable = new Observable<string>();
+    readonly onBalanceChangedObservable = new Observable<number>();
 
     private constructor(serializedPlayer: SerializedPlayer) {
         this.uuid = warnIfUndefined(serializedPlayer.uuid, crypto.randomUUID(), `[PLAYER_DATA_WARNING] Uuid was undefined. Defaulting to random UUID`);
-        this.name = warnIfUndefined(serializedPlayer.name, Player.DEFAULT_NAME, `[PLAYER_DATA_WARNING] Name was undefined. Defaulting to ${Player.DEFAULT_NAME}`);
-        this.balance = warnIfUndefined(serializedPlayer.balance, Player.DEFAULT_BALANCE, `[PLAYER_DATA_WARNING] Balance was undefined. Defaulting to ${Player.DEFAULT_BALANCE}`);
+        this.#name = warnIfUndefined(serializedPlayer.name, Player.DEFAULT_NAME, `[PLAYER_DATA_WARNING] Name was undefined. Defaulting to ${Player.DEFAULT_NAME}`);
+        this.#balance = warnIfUndefined(serializedPlayer.balance, Player.DEFAULT_BALANCE, `[PLAYER_DATA_WARNING] Balance was undefined. Defaulting to ${Player.DEFAULT_BALANCE}`);
         this.creationDate = new Date(
             warnIfUndefined(serializedPlayer.creationDate, new Date().toISOString(), `[PLAYER_DATA_WARNING] Creation date was undefined. Defaulting to current date`)
         );
@@ -166,7 +167,7 @@ export class Player {
             return false;
         }
         this.visitedObjects.add(JSON.stringify(objectId));
-        this.discoveries.local.push({ objectId, discoveryTimestamp: Date.now(), explorerName: this.name });
+        this.discoveries.local.push({ objectId, discoveryTimestamp: Date.now(), explorerName: this.getName() });
 
         return true;
     }
@@ -199,8 +200,8 @@ export class Player {
     public static Serialize(player: Player): SerializedPlayer {
         return {
             uuid: player.uuid,
-            name: player.name,
-            balance: player.balance,
+            name: player.getName(),
+            balance: player.getBalance(),
             creationDate: player.creationDate.toISOString(),
             timePlayedSeconds: Math.round(player.timePlayedSeconds),
             visitedSystemHistory: player.visitedSystemHistory,
@@ -220,8 +221,8 @@ export class Player {
      */
     public copyFrom(player: Player) {
         this.uuid = player.uuid;
-        this.name = player.name;
-        this.balance = player.balance;
+        this.setName(player.getName());
+        this.setBalance(player.getBalance());
         this.creationDate = new Date(player.creationDate);
         this.timePlayedSeconds = player.timePlayedSeconds;
         this.visitedSystemHistory = player.visitedSystemHistory.map((system) => structuredClone(system));
@@ -245,11 +246,28 @@ export class Player {
     }
 
     public setName(name: string) {
-        this.name = name;
+        this.#name = name;
         this.onNameChangedObservable.notifyObservers(name);
     }
 
     public getName(): string {
-        return this.name;
+        return this.#name;
+    }
+
+    public setBalance(balance: number) {
+        this.#balance = balance;
+        this.onBalanceChangedObservable.notifyObservers(balance);
+    }
+
+    public getBalance(): number {
+        return this.#balance;
+    }
+
+    public pay(amount: number): void {
+        this.setBalance(this.getBalance() - amount);
+    }
+
+    public earn(amount: number): void {
+        this.setBalance(this.getBalance() + amount);
     }
 }

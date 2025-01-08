@@ -707,7 +707,7 @@ export class StarSystemView implements View {
             if (mission.isCompleted()) return;
             mission.update(missionContext);
             if (mission.isCompleted()) {
-                this.player.balance += mission.getReward();
+                this.player.earn(mission.getReward());
                 Sounds.EnqueuePlay(Sounds.MISSION_COMPLETE);
                 newlyCompletedMissions.push(mission);
             }

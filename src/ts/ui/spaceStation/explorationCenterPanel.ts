@@ -99,7 +99,7 @@ export class ExplorationCenterPanel {
 
             for (const discovery of this.player.discoveries.local) {
                 const value = await encyclopaedia.estimateDiscovery(discovery.objectId);
-                player.balance += value;
+                player.earn(value);
                 player.discoveries.local = player.discoveries.local.filter((d) => d !== discovery);
                 player.discoveries.uploaded.push(discovery);
             }
