@@ -653,6 +653,7 @@ export class StarSystemView implements View {
                     i18n.t("notifications:newDiscovery", { objectName: nearestCelestialBody.model.name }),
                     15_000
                 );
+                Sounds.EnqueuePlay(Sounds.NEW_DISCOVERY);
                 this.onNewDiscovery.notifyObservers(universeId);
             }
         }
