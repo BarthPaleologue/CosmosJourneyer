@@ -47,10 +47,10 @@ export class CurrentMissionDisplay {
         this.player = player;
 
         this.rootNode = document.createElement("div");
-        this.rootNode.classList.add("currentMissionDisplay");
+        this.rootNode.classList.add("currentMissionDisplay", "flex-column");
 
         this.missionPanel = document.createElement("div");
-        this.missionPanel.classList.add("missionPanel");
+        this.missionPanel.classList.add("missionPanel", "flex-column");
         this.rootNode.appendChild(this.missionPanel);
 
         this.missionPanelTitle = document.createElement("h2");
@@ -126,6 +126,8 @@ export class CurrentMissionDisplay {
 
     public update(context: MissionContext, keyboardLayout: Map<string, string>) {
         const allMissions = this.player.completedMissions.concat(this.player.currentMissions);
+        this.buttonContainer.hidden = allMissions.length <= 1;
+
         if (this.activeMission === null && this.player.currentMissions.length !== 0) {
             this.setMission(this.player.currentMissions[0]);
         } else if (this.activeMission === null && allMissions.length !== 0) {
