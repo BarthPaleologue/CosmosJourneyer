@@ -62,7 +62,7 @@ export class DiscoveryDetails {
 
             Sounds.SUCCESS.play();
             const value = await encyclopaedia.estimateDiscovery(this.currentDiscovery.objectId);
-            player.balance += value;
+            player.earn(value);
             player.discoveries.local = player.discoveries.local.filter((d) => d !== this.currentDiscovery);
             player.discoveries.uploaded.push(this.currentDiscovery);
 
