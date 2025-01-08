@@ -34,7 +34,7 @@ import { LandingRequest } from "../utils/managesLandingPads";
 import { Settings } from "../settings";
 import { EngineBay } from "../assets/procedural/spaceStation/engineBay";
 import { getRngFromSeed } from "../utils/getRngFromSeed";
-import { orbitalObjectTypeToDisplay } from "../utils/strings/orbitalObjectTypeToDisplay";
+import { getOrbitalObjectTypeToI18nString } from "../utils/strings/orbitalObjectTypeToDisplay";
 import { OrbitalFacility } from "./orbitalFacility";
 import { SpaceStationModel } from "./spacestationModel";
 import { OrbitalObject } from "../architecture/orbitalObject";
@@ -126,7 +126,7 @@ export class SpaceStation implements OrbitalFacility {
     }
 
     getTypeName(): string {
-        return orbitalObjectTypeToDisplay(this.model);
+        return getOrbitalObjectTypeToI18nString(this.model);
     }
 
     public computeCulling(camera: Camera): void {

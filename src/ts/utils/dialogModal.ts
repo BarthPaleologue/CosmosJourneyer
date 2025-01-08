@@ -86,3 +86,81 @@ export function alertModal(message: string): Promise<void> {
         });
     });
 }
+
+export function connectEncyclopaediaGalacticaModal(): Promise<{ encyclopaediaUrlBase: string; accountId: string; password: string } | null> {
+    const modal = document.createElement("dialog");
+    document.body.appendChild(modal);
+
+    const form = document.createElement("form");
+    form.method = "dialog";
+    form.classList.add("flex-column");
+    modal.appendChild(form);
+
+    const description = document.createElement("p");
+    description.textContent = "Connect to an instance of the Encyclopaedia";
+    form.appendChild(description);
+
+    const urlInput = document.createElement("input");
+    urlInput.type = "url";
+    urlInput.placeholder = "https://cosmosjourneyer.com/encyclopaediaTest/";
+    urlInput.required = true;
+    form.appendChild(urlInput);
+
+    const accountIdInput = document.createElement("input");
+    accountIdInput.type = "text";
+    accountIdInput.placeholder = "accountId";
+    form.appendChild(accountIdInput);
+
+    const passwordInput = document.createElement("input");
+    passwordInput.type = "password";
+    passwordInput.placeholder = "password";
+    form.appendChild(passwordInput);
+
+    const menu = document.createElement("menu");
+    form.appendChild(menu);
+
+    const cancelButton = document.createElement("button");
+    cancelButton.type = "reset";
+    cancelButton.value = "cancel";
+    cancelButton.textContent = "Cancel";
+    menu.appendChild(cancelButton);
+
+    const connectButton = document.createElement("button");
+    connectButton.type = "submit";
+    connectButton.value = "connect";
+    connectButton.textContent = "Connect";
+    menu.appendChild(connectButton);
+
+    modal.showModal();
+
+    urlInput.focus();
+    urlInput.select();
+    modal.querySelectorAll("input").forEach((input) =>
+        input.addEventListener("keydown", (e) => {
+            e.stopPropagation();
+        })
+    );
+
+    return new Promise((resolve) => {
+        // on reset, close the modal and resolve with null
+        modal.addEventListener("reset", () => {
+            Sounds.MENU_SELECT_SOUND.play();
+            resolve(null);
+            modal.remove();
+        });
+
+        modal.addEventListener("close", () => {
+            Sounds.MENU_SELECT_SOUND.play();
+            if (modal.returnValue === "connect") {
+                resolve({
+                    encyclopaediaUrlBase: urlInput.value,
+                    accountId: accountIdInput.value,
+                    password: passwordInput.value
+                });
+            } else {
+                resolve(null);
+            }
+            modal.remove();
+        });
+    });
+}

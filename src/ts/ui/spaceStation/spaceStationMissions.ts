@@ -43,19 +43,19 @@ export function generateMissionsDom(stationModel: OrbitalFacilityModel, player: 
 
     contactStations.sort((a, b) => a[1] - b[1]);
 
-    const mainContainer = document.createElement("div");
+    const htmlRoot = document.createElement("div");
 
     const missionH2 = document.createElement("h2");
     missionH2.innerText = "Missions";
-    mainContainer.appendChild(missionH2);
+    htmlRoot.appendChild(missionH2);
 
     const explorationMissionH3 = document.createElement("h3");
     explorationMissionH3.innerText = "Exploration";
-    mainContainer.appendChild(explorationMissionH3);
+    htmlRoot.appendChild(explorationMissionH3);
 
     const missionList = document.createElement("div");
     missionList.className = "missionList";
-    mainContainer.appendChild(missionList);
+    htmlRoot.appendChild(missionList);
 
     sightSeeingMissions.forEach((mission) => {
         const missionContainer = new MissionContainer(mission, player);
@@ -64,17 +64,17 @@ export function generateMissionsDom(stationModel: OrbitalFacilityModel, player: 
 
     const terraformationMissionH3 = document.createElement("h3");
     terraformationMissionH3.innerText = "Terraformation";
-    mainContainer.appendChild(terraformationMissionH3);
+    htmlRoot.appendChild(terraformationMissionH3);
 
     const tradingMissionH3 = document.createElement("h3");
     tradingMissionH3.innerText = "Trading";
-    mainContainer.appendChild(tradingMissionH3);
+    htmlRoot.appendChild(tradingMissionH3);
 
     contactStations.forEach(([station, distance]) => {
         const stationP = document.createElement("p");
         stationP.innerText = `${station.name} in ${starSystem.name} (${parseDistance(distance * Settings.LIGHT_YEAR)})`;
-        mainContainer.appendChild(stationP);
+        htmlRoot.appendChild(stationP);
     });
 
-    return mainContainer;
+    return htmlRoot;
 }

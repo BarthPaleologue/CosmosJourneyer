@@ -32,7 +32,7 @@ export function newSeededSpaceElevatorModel(
 
     const name = generateSpaceElevatorName(rng, 2756);
 
-    const parentSiderealDayDuration = parentBody.physics.siderealDayDuration;
+    const parentSiderealDayDuration = parentBody.physics.siderealDaySeconds;
 
     const orbitRadius = getOrbitRadiusFromPeriod(parentSiderealDayDuration, parentBody.physics.mass);
 
@@ -49,7 +49,7 @@ export function newSeededSpaceElevatorModel(
 
     const physicalProperties: OrbitalObjectPhysicsInfo = {
         mass: 1,
-        siderealDayDuration: parentSiderealDayDuration,
+        siderealDaySeconds: parentSiderealDayDuration,
         axialTilt: parentAxialTilt
     };
 

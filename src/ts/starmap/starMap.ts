@@ -50,7 +50,7 @@ import { StarMapControls } from "./starMapControls";
 import { CameraRadiusAnimation } from "../uberCore/transforms/animations/radius";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { StellarPathfinder } from "./stellarPathfinder";
-import { createNotification } from "../utils/notification";
+import { createNotification, NotificationIntent, NotificationOrigin } from "../utils/notification";
 import { getStarGalacticPosition } from "../utils/coordinates/starSystemCoordinatesUtils";
 import { Player } from "../player/player";
 import { Settings } from "../settings";
@@ -59,11 +59,12 @@ import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coo
 import { getSystemModelFromCoordinates } from "../starSystem/modelFromCoordinates";
 import { StarSystemModelUtils } from "../starSystem/starSystemModel";
 import { OrbitalObjectType } from "../architecture/orbitalObject";
+import { EncyclopaediaGalactica } from "../society/encyclopaediaGalactica";
 
 // register cosmos journeyer as part of window object
 declare global {
     interface Window {
-        starMap: StarMap;
+        StarMap: StarMap;
     }
 }
 
@@ -78,6 +79,8 @@ export class StarMap implements View {
     private radiusAnimation: CameraRadiusAnimation | null = null;
 
     private readonly player: Player;
+
+    private readonly encyclopaedia: EncyclopaediaGalactica;
 
     /**
      * The position of the center of the starmap in world space.
@@ -131,7 +134,7 @@ export class StarMap implements View {
     private static readonly SHIMMER_ANIMATION = new Animation("shimmer", "instancedBuffers.color.a", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
     private static readonly SHIMMER_DURATION = 1000;
 
-    constructor(player: Player, engine: AbstractEngine) {
+    constructor(player: Player, engine: AbstractEngine, encyclopaedia: EncyclopaediaGalactica) {
         this.scene = new Scene(engine);
         this.scene.clearColor = new Color4(0, 0, 0, 1);
         this.scene.useRightHandedSystem = true;
@@ -145,6 +148,8 @@ export class StarMap implements View {
         this.controls.getActiveCamera().attachControl();
 
         this.player = player;
+
+        this.encyclopaedia = encyclopaedia;
 
         this.backgroundMusic = new AudioInstance(Sounds.STAR_MAP_BACKGROUND_MUSIC, AudioMasks.STAR_MAP_VIEW, 1, false, null);
         AudioManager.RegisterSound(this.backgroundMusic);
@@ -297,7 +302,12 @@ export class StarMap implements View {
 
                     this.onTargetSetObservable.notifyObservers(path[1]);
                 } else if (this.stellarPathfinder.getNbIterations() >= pathfinderMaxIterations) {
-                    createNotification(`Could not find a path to the target system after ${pathfinderMaxIterations} iterations`, 5000);
+                    createNotification(
+                        NotificationOrigin.GENERAL,
+                        NotificationIntent.ERROR,
+                        `Could not find a path to the target system after ${pathfinderMaxIterations} iterations`,
+                        5000
+                    );
                 }
             }
 
@@ -314,7 +324,7 @@ export class StarMap implements View {
             this.starMapUI.update(activeCamera.globalPosition, this.starMapCenterPosition);
         });
 
-        window.starMap = this;
+        window.StarMap = this;
     }
 
     private drawPath(path: StarSystemCoordinates[]) {

@@ -10,5 +10,6 @@
     "saveVersionMismatch": "[VERSION_WARNING] The save file version ({{saveVersion}}) does not match the current version ({{currentVersion}}). Loading may result in unexpected behavior.",
     "invalidSaveFileJson": "[JSON_ERROR] The save file is invalid: {{error}}. Fix the file before trying to load it again.",
     "saveOk": "Saved to local storage successfully",
-    "cantSaveTutorial": "Cannot save during a tutorial"
+    "cantSaveTutorial": "Cannot save during a tutorial",
+    "newDiscovery": "Discovered {{objectName}}. Data recorded."
 }

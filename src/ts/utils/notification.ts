@@ -1,4 +1,22 @@
 import { Sounds } from "../assets/sounds";
+import explorationIcon from "../../asset/icons/space-exploration.webp";
+import spaceshipIcon from "../../asset/icons/spaceship_gear.webp";
+import spaceStationIcon from "../../asset/icons/space-station.webp";
+import informationIcon from "../../asset/icons/information.webp";
+
+export const enum NotificationOrigin {
+    GENERAL = "info",
+    SPACESHIP = "spaceship",
+    EXPLORATION = "exploration",
+    SPACE_STATION = "space-station"
+}
+
+export const enum NotificationIntent {
+    INFO = "info",
+    SUCCESS = "success",
+    WARNING = "warning",
+    ERROR = "error"
+}
 
 class Notification {
     private progressSeconds = 0;
@@ -10,17 +28,38 @@ class Notification {
 
     private isBeingRemoved = false;
 
-    constructor(text: string, durationSeconds: number) {
+    constructor(origin: NotificationOrigin, intent: NotificationIntent, text: string, durationSeconds: number) {
         const container = document.getElementById("notificationContainer");
         if (container === null) throw new Error("No notification container found");
 
         this.htmlRoot = document.createElement("div");
-        this.htmlRoot.classList.add("notification");
+        this.htmlRoot.classList.add("notification", origin);
+
+        const contentContainer = document.createElement("div");
+        contentContainer.classList.add("notification-content");
+        this.htmlRoot.appendChild(contentContainer);
+
+        const iconNode = document.createElement("img");
+        switch (origin) {
+            case NotificationOrigin.GENERAL:
+                iconNode.src = informationIcon;
+                break;
+            case NotificationOrigin.SPACESHIP:
+                iconNode.src = spaceshipIcon;
+                break;
+            case NotificationOrigin.EXPLORATION:
+                iconNode.src = explorationIcon;
+                break;
+            case NotificationOrigin.SPACE_STATION:
+                iconNode.src = spaceStationIcon;
+                break;
+        }
+        iconNode.classList.add("notification-icon");
+        contentContainer.appendChild(iconNode);
 
         const textNode = document.createElement("p");
         textNode.textContent = text;
-
-        this.htmlRoot.appendChild(textNode);
+        contentContainer.appendChild(textNode);
 
         const progress = document.createElement("div");
         progress.classList.add("notification-progress");
@@ -33,7 +72,20 @@ class Notification {
 
         container.appendChild(this.htmlRoot);
 
-        Sounds.MENU_SELECT_SOUND.play();
+        switch (intent) {
+            case NotificationIntent.INFO:
+                Sounds.MENU_SELECT_SOUND.play();
+                break;
+            case NotificationIntent.SUCCESS:
+                Sounds.SUCCESS.play();
+                break;
+            case NotificationIntent.WARNING:
+                Sounds.MENU_SELECT_SOUND.play();
+                break;
+            case NotificationIntent.ERROR:
+                Sounds.ERROR.play();
+                break;
+        }
 
         // animate progress bar
         progressBar.style.animation = `progress ${durationSeconds}s linear`;
@@ -91,8 +143,8 @@ export function updateNotifications(deltaSeconds: number): void {
  * @param text The text to display
  * @param durationMillis The duration of the notification in ms
  */
-export function createNotification(text: string, durationMillis: number) {
-    const notification = new Notification(text, durationMillis / 1000);
+export function createNotification(type: NotificationOrigin, intent: NotificationIntent, text: string, durationMillis: number) {
+    const notification = new Notification(type, intent, text, durationMillis / 1000);
     activeNotifications.push(notification);
 }
 
@@ -106,7 +158,7 @@ export function createNotification(text: string, durationMillis: number) {
 export function warnIfUndefined<T>(value: T | undefined, defaultValue: T, message: string): T {
     if (value === undefined) {
         console.warn(message);
-        createNotification(message, 10_000);
+        createNotification(NotificationOrigin.GENERAL, NotificationIntent.WARNING, message, 10_000);
         return defaultValue;
     }
     return value;

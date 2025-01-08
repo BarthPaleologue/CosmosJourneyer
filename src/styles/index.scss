@@ -25,10 +25,8 @@
     src: url("./nasalization/nasalization-rg.otf") format("opentype");
 }
 
-*,
-*::before,
-*::after {
-    box-sizing: content-box;
+[hidden] {
+    display: none !important;
 }
 
 // scroll bar
@@ -37,7 +35,7 @@
 }
 
 ::-webkit-scrollbar-track {
-    background: color.adjust(#888, $lightness: -50%, $space: hsl);
+    background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -59,6 +57,7 @@
     --accent-color-dark: #001a3f;
     --accent-color-light: #003f9f;
     --disabled-color: rgb(100, 100, 100);
+    --main-font: "Nasalization", sans-serif;
 }
 
 body {
@@ -137,6 +136,8 @@ body {
     @include meta.load-css("inspectorLayer.scss");
 
     @include meta.load-css("saveLoadingPanelContent.scss");
+
+    @include meta.load-css("select.scss");
 
     @include meta.load-css("button.scss");
 

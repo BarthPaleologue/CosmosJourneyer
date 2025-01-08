@@ -42,7 +42,7 @@ import { updateInputDevices } from "./inputs/devices";
 import { AudioManager } from "./audio/audioManager";
 import { AudioMasks } from "./audio/audioMasks";
 import { GeneralInputs } from "./inputs/generalInputs";
-import { createNotification, updateNotifications } from "./utils/notification";
+import { createNotification, NotificationIntent, NotificationOrigin, updateNotifications } from "./utils/notification";
 import { LoadingScreen } from "./uberCore/loadingScreen";
 import i18n, { initI18n } from "./i18n";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
@@ -58,6 +58,8 @@ import { Tutorial } from "./tutorials/tutorial";
 import { StationLandingTutorial } from "./tutorials/stationLandingTutorial";
 import { promptModalBoolean, alertModal, promptModalString } from "./utils/dialogModal";
 import { FuelScoopTutorial } from "./tutorials/fuelScoopTutorial";
+import { EncyclopaediaGalacticaManager } from "./society/encyclopaediaGalacticaManager";
+import { EncyclopaediaGalacticaLocal } from "./society/encyclopaediaGalacticaLocal";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -68,7 +70,7 @@ const enum EngineState {
 // register cosmos journeyer as part of window object
 declare global {
     interface Window {
-        cosmosJourneyer: CosmosJourneyer;
+        CosmosJourneyer: CosmosJourneyer;
     }
 }
 
@@ -97,6 +99,8 @@ export class CosmosJourneyer {
 
     readonly player: Player;
 
+    private readonly encyclopaedia: EncyclopaediaGalacticaManager;
+
     /**
      * The number of seconds elapsed since the start of the engine
      */
@@ -111,7 +115,7 @@ export class CosmosJourneyer {
 
     private isAutoSaveEnabled = true;
 
-    private constructor(player: Player, engine: AbstractEngine, starSystemView: StarSystemView) {
+    private constructor(player: Player, engine: AbstractEngine, starSystemView: StarSystemView, encyclopaedia: EncyclopaediaGalacticaManager) {
         this.engine = engine;
 
         this.player = player;
@@ -126,6 +130,11 @@ export class CosmosJourneyer {
             cmdrSaves.auto.forEach((save) => (save.player.name = newName));
 
             writeSavesToLocalStorage(saves);
+        });
+
+        this.encyclopaedia = encyclopaedia;
+        this.player.discoveries.uploaded.forEach((discovery) => {
+            this.encyclopaedia.contributeDiscoveryIfNew(discovery);
         });
 
         this.starSystemView = starSystemView;
@@ -144,9 +153,12 @@ export class CosmosJourneyer {
                 });
             }
         });
+        this.starSystemView.onNewDiscovery.add(() => {
+            this.createAutoSave();
+        });
 
         // Init starmap view
-        this.starMap = new StarMap(this.player, this.engine);
+        this.starMap = new StarMap(this.player, this.engine, this.encyclopaedia);
         this.starMap.onTargetSetObservable.add((systemCoordinates: StarSystemCoordinates) => {
             this.starSystemView.setSystemAsTarget(systemCoordinates);
         });
@@ -229,14 +241,14 @@ export class CosmosJourneyer {
                 const urlData = encodeBase64(JSON.stringify(saveData.universeCoordinates));
                 const url = new URL(`${urlRoot}?universeCoordinates=${urlData}`);
                 navigator.clipboard.writeText(url.toString()).then(() => {
-                    createNotification(i18n.t("notifications:copiedToClipboard"), 2000);
+                    createNotification(NotificationOrigin.GENERAL, NotificationIntent.INFO, i18n.t("notifications:copiedToClipboard"), 2000);
                 });
             });
         });
         this.pauseMenu.onSave.add(async () => {
             const saveSuccess = await this.saveToLocalStorage();
-            if (saveSuccess) createNotification(i18n.t("notifications:saveOk"), 2000);
-            else createNotification(i18n.t("notifications:cantSaveTutorial"), 2000);
+            if (saveSuccess) createNotification(NotificationOrigin.GENERAL, NotificationIntent.SUCCESS, i18n.t("notifications:saveOk"), 2000);
+            else createNotification(NotificationOrigin.GENERAL, NotificationIntent.ERROR, i18n.t("notifications:cantSaveTutorial"), 2000);
         });
 
         window.addEventListener("blur", () => {
@@ -277,7 +289,7 @@ export class CosmosJourneyer {
             else this.resume();
         });
 
-        window.cosmosJourneyer = this;
+        window.CosmosJourneyer = this;
     }
 
     /**
@@ -323,8 +335,11 @@ export class CosmosJourneyer {
 
         const player = Player.Default();
 
+        const encyclopaedia = new EncyclopaediaGalacticaManager();
+        encyclopaedia.backends.push(new EncyclopaediaGalacticaLocal());
+
         // Init star system view
-        const starSystemView = new StarSystemView(player, engine, havokInstance);
+        const starSystemView = new StarSystemView(player, engine, havokInstance, encyclopaedia);
 
         await starSystemView.initAssets();
         starSystemView.resetPlayer();
@@ -333,7 +348,7 @@ export class CosmosJourneyer {
             await alertModal("Your keyboard layout could not be detected. The QWERTY layout will be assumed by default.");
         }
 
-        return new CosmosJourneyer(player, engine, starSystemView);
+        return new CosmosJourneyer(player, engine, starSystemView, encyclopaedia);
     }
 
     public pause(): void {
@@ -591,6 +606,8 @@ export class CosmosJourneyer {
     public async loadSave(saveData: SaveFileData): Promise<void> {
         if (saveData.version !== projectInfo.version) {
             createNotification(
+                NotificationOrigin.GENERAL,
+                NotificationIntent.WARNING,
                 i18n.t("notifications:saveVersionMismatch", {
                     currentVersion: projectInfo.version,
                     saveVersion: saveData.version
@@ -601,6 +618,9 @@ export class CosmosJourneyer {
 
         const newPlayer = saveData.player !== undefined ? Player.Deserialize(saveData.player) : Player.Default();
         this.player.copyFrom(newPlayer);
+        this.player.discoveries.uploaded.forEach((discovery) => {
+            this.encyclopaedia.contributeDiscoveryIfNew(discovery);
+        });
         this.starSystemView.resetPlayer();
 
         await this.loadUniverseCoordinates(saveData.universeCoordinates);

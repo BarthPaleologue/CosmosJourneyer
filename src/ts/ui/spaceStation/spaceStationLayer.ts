@@ -26,17 +26,19 @@ import { generateSpaceshipDom } from "./spaceshipDock";
 import { promptModalString } from "../../utils/dialogModal";
 import i18n from "../../i18n";
 import { Sounds } from "../../assets/sounds";
+import { ExplorationCenterPanel } from "./explorationCenterPanel";
+import { EncyclopaediaGalacticaManager } from "../../society/encyclopaediaGalacticaManager";
 
 const enum MainPanelState {
     NONE,
     INFO,
     MISSIONS,
-    SPACE_SHIP
+    SPACE_SHIP,
+    EXPLORATION_CENTER
 }
 
 export class SpaceStationLayer {
     private parentNode: HTMLElement;
-    private spaceStationHeader: HTMLElement;
 
     private currentStation: OrbitalFacilityModel | null = null;
     private currentStationParents: OrbitalObjectModel[] = [];
@@ -52,6 +54,8 @@ export class SpaceStationLayer {
 
     private readonly missionsButton: HTMLElement;
 
+    private readonly explorationCenterButton: HTMLElement;
+
     private readonly spaceshipButton: HTMLElement;
 
     private readonly infoButton: HTMLElement;
@@ -60,15 +64,21 @@ export class SpaceStationLayer {
 
     private mainPanelState: MainPanelState = MainPanelState.NONE;
 
+    readonly explorationCenterPanel: ExplorationCenterPanel;
+
     readonly onTakeOffObservable = new Observable<void>();
 
     readonly player: Player;
 
-    constructor(player: Player) {
+    private readonly encyclopaedia: EncyclopaediaGalacticaManager;
+
+    constructor(player: Player, encyclopaedia: EncyclopaediaGalacticaManager) {
         this.player = player;
+        this.encyclopaedia = encyclopaedia;
 
         this.parentNode = document.getElementById("spaceStationUI") as HTMLElement;
-        this.spaceStationHeader = document.getElementById("spaceStationHeader") as HTMLElement;
+
+        this.explorationCenterPanel = new ExplorationCenterPanel(encyclopaedia, player);
 
         this.spaceStationName = document.querySelector<HTMLElement>("#spaceStationUI .spaceStationName") as HTMLElement;
 
@@ -92,8 +102,9 @@ export class SpaceStationLayer {
             throw new Error("Missions button not found");
         }
         this.missionsButton = missionsButton;
-        this.missionsButton.addEventListener("click", () => {
-            this.setMainPanelState(MainPanelState.MISSIONS);
+        this.missionsButton.addEventListener("click", async () => {
+            Sounds.MENU_SELECT_SOUND.play();
+            await this.setMainPanelState(MainPanelState.MISSIONS);
         });
 
         const spaceshipButton = document.querySelector<HTMLElement>(".spaceStationAction.spaceshipButton");
@@ -101,8 +112,19 @@ export class SpaceStationLayer {
             throw new Error("Spaceship button not found");
         }
         this.spaceshipButton = spaceshipButton;
-        this.spaceshipButton.addEventListener("click", () => {
-            this.setMainPanelState(MainPanelState.SPACE_SHIP);
+        this.spaceshipButton.addEventListener("click", async () => {
+            Sounds.MENU_SELECT_SOUND.play();
+            await this.setMainPanelState(MainPanelState.SPACE_SHIP);
+        });
+
+        const explorationCenterButton = document.querySelector<HTMLElement>(".spaceStationAction.explorationCenterButton");
+        if (explorationCenterButton === null) {
+            throw new Error("Exploration center button not found");
+        }
+        this.explorationCenterButton = explorationCenterButton;
+        this.explorationCenterButton.addEventListener("click", async () => {
+            Sounds.MENU_SELECT_SOUND.play();
+            await this.setMainPanelState(MainPanelState.EXPLORATION_CENTER);
         });
 
         const infoButton = document.querySelector<HTMLElement>(".spaceStationAction.infoButton");
@@ -110,8 +132,9 @@ export class SpaceStationLayer {
             throw new Error("Info button not found");
         }
         this.infoButton = infoButton;
-        this.infoButton.addEventListener("click", () => {
-            this.setMainPanelState(MainPanelState.INFO);
+        this.infoButton.addEventListener("click", async () => {
+            Sounds.MENU_SELECT_SOUND.play();
+            await this.setMainPanelState(MainPanelState.INFO);
         });
 
         const takeOffButton = document.querySelector<HTMLElement>(".spaceStationAction.takeOffButton");
@@ -120,11 +143,12 @@ export class SpaceStationLayer {
         }
         this.takeOffButton = takeOffButton;
         this.takeOffButton.addEventListener("click", () => {
+            Sounds.MENU_SELECT_SOUND.play();
             this.onTakeOffObservable.notifyObservers();
         });
     }
 
-    private setMainPanelState(state: MainPanelState) {
+    private async setMainPanelState(state: MainPanelState) {
         if (this.mainPanelState === state) {
             this.mainPanelState = MainPanelState.NONE;
         } else {
@@ -149,6 +173,12 @@ export class SpaceStationLayer {
                 this.mainPanel.classList.remove("hidden");
                 this.mainPanel.innerHTML = "";
                 this.mainPanel.appendChild(generateSpaceshipDom(this.currentStation, this.player));
+                break;
+            case MainPanelState.EXPLORATION_CENTER:
+                this.mainPanel.classList.remove("hidden");
+                this.mainPanel.innerHTML = "";
+                await this.explorationCenterPanel.populate();
+                this.mainPanel.appendChild(this.explorationCenterPanel.htmlRoot);
                 break;
             case MainPanelState.NONE:
                 this.mainPanel.classList.add("hidden");

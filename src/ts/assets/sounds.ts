@@ -33,11 +33,16 @@ import hyperSpaceSound from "../../asset/sound/539503__timbre_endless-decelerati
 import thrusterSound from "../../asset/sound/318688__limitsnap_creations__rocket-thrust-effect.mp3";
 import starMapBackgroundMusic from "../../asset/sound/455855__andrewkn__wandering.mp3";
 
+import echoedBlipSound from "../../asset/sound/554089__copyc4t__echoed-blip.mp3";
+import errorBleepSound from "../../asset/sound/372197__original_sound__error-bleep-4.mp3";
+
 import initiatingPlanetaryLandingSound from "../../asset/sound/voice/InitiatingPlanetaryLandingCharlotte.mp3";
 import landingRequestSound from "../../asset/sound/voice/LandingRequestGrantedCharlotte.mp3";
 import landingCompleteSound from "../../asset/sound/voice/LandingCompleteCharlotte.mp3";
 
 import missionCompleteSound from "../../asset/sound/voice/MissionCompleteCharlotte.mp3";
+
+import newDiscoverySound from "../../asset/sound/voice/NewDiscoveryCharlotte.mp3";
 
 import cannotEngageWarpDriveSound from "../../asset/sound/voice/CannotEngageWarpDriveCharlotte.mp3";
 import warpDriveEmergencyShutDownSound from "../../asset/sound/voice/WarpDriveEmergencyShutdownCharlotte.mp3";
@@ -72,6 +77,9 @@ export class Sounds {
 
     public static THRUSTER_SOUND: Sound;
 
+    public static SUCCESS: Sound;
+    public static ERROR: Sound;
+
     public static STAR_MAP_BACKGROUND_MUSIC: Sound;
     public static MAIN_MENU_BACKGROUND_MUSIC: Sound;
 
@@ -80,6 +88,8 @@ export class Sounds {
     public static LANDING_COMPLETE: Sound;
 
     public static MISSION_COMPLETE: Sound;
+
+    public static NEW_DISCOVERY: Sound;
 
     public static CANNOT_ENGAGE_WARP_DRIVE: Sound;
     public static WARP_DRIVE_EMERGENCY_SHUT_DOWN: Sound;
@@ -238,6 +248,18 @@ export class Sounds {
             console.log("Thruster sound loaded");
         };
 
+        const echoedBlipSoundTask = manager.addBinaryFileTask("echoedBlipSoundTask", echoedBlipSound);
+        echoedBlipSoundTask.onSuccess = (task) => {
+            Sounds.SUCCESS = new Sound("EchoedBlipSound", task.data, scene);
+            console.log("Echoed blip sound loaded");
+        };
+
+        const errorBleepSoundTask = manager.addBinaryFileTask("errorBleepSoundTask", errorBleepSound);
+        errorBleepSoundTask.onSuccess = (task) => {
+            Sounds.ERROR = new Sound("ErrorBleepSound", task.data, scene);
+            console.log("Error bleep sound loaded");
+        };
+
         const starMapBackgroundMusicTask = manager.addBinaryFileTask("starMapBackgroundMusicTask", starMapBackgroundMusic);
         starMapBackgroundMusicTask.onSuccess = (task) => {
             Sounds.STAR_MAP_BACKGROUND_MUSIC = new Sound("StarMapBackgroundMusic", task.data, scene, null, {
@@ -278,6 +300,12 @@ export class Sounds {
         missionCompleteSoundTask.onSuccess = (task) => {
             Sounds.MISSION_COMPLETE = new Sound("MissionComplete", task.data, scene);
             console.log("Mission complete sound loaded");
+        };
+
+        const newDiscoverySoundTask = manager.addBinaryFileTask("newDiscoverySoundTask", newDiscoverySound);
+        newDiscoverySoundTask.onSuccess = (task) => {
+            Sounds.NEW_DISCOVERY = new Sound("NewDiscovery", task.data, scene);
+            console.log("New discovery sound loaded");
         };
 
         const straussBlueDanubeTask = manager.addBinaryFileTask("straussBlueDanubeTask", straussBlueDanube);

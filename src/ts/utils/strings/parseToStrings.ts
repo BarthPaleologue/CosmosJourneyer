@@ -19,45 +19,67 @@ import { Settings } from "../../settings";
 import i18n from "../../i18n";
 
 export function parseSpeed(speed: number): string {
-    if (speed < 1000) {
+    if (speed < 1_000) {
         return `${speed.toFixed(0)} m/s`;
-    } else if (speed < 1000000) {
-        return `${(speed / 1000).toFixed(2)} km/s`;
-    } else if (speed < 20000000) {
-        return `${(speed / 1000000).toFixed(2)} Mm/s`;
+    } else if (speed < 1_000_000) {
+        return `${(speed / 1_000).toFixed(2)} km/s`;
+    } else if (speed < 20_000_000) {
+        return `${(speed / 1_000_000).toFixed(2)} Mm/s`;
     } else {
         return `${(speed / Settings.C).toFixed(2)} c`;
     }
 }
 
 export function parseDistance(distance: number): string {
-    if (distance < 1000) {
-        return `${distance.toFixed(0)} m`;
-    } else if (distance < 1000000) {
-        return `${(distance / 1000).toFixed(2)} km`;
-    } else if (distance < 20000000) {
-        return `${(distance / 1000000).toFixed(2)} Mm`;
+    if (distance < 1_000) {
+        return i18n.t("units:shortM", { count: Number(distance.toFixed(0)) });
+    } else if (distance < 1_000_000) {
+        return i18n.t("units:shortKm", { count: Number((distance / 1_000).toFixed(2)) });
+    } else if (distance < 300_000_000) {
+        return i18n.t("units:shortMm", { count: Number((distance / 1_000_000).toFixed(2)) });
     } else if (distance < 0.1 * Settings.LIGHT_YEAR) {
-        return `${(distance / Settings.C).toFixed(2)} ${i18n.t("units:ls")}`;
+        return i18n.t("units:shortLs", { count: Number((distance / Settings.C).toFixed(2)) });
     } else {
-        return `${(distance / Settings.LIGHT_YEAR).toFixed(2)} ${i18n.t("units:ly")}`;
+        return i18n.t("units:shortLy", { count: Number((distance / Settings.LIGHT_YEAR).toFixed(2)) });
     }
 }
 
-export function parseSeconds(seconds: number): string {
+export function parseSecondsRough(seconds: number): string {
     if (seconds < 60) {
-        return `${seconds.toFixed(0)} s`;
-    } else if (seconds < 3600) {
-        return `${(seconds / 60).toFixed(0)} min`;
-    } else if (seconds < 86400) {
-        return `${(seconds / 3600).toFixed(0)} h`;
-    } else if (seconds < 604800) {
-        return `${(seconds / (60 * 60 * 24)).toFixed(0)} d`;
-    } else if (seconds < 31557600 * 10) {
-        return `${(seconds / (60 * 60 * 24 * 365.25)).toFixed(0)} y`;
+        return i18n.t("units:shortSeconds", { count: Number(seconds.toFixed(0)) });
+    } else if (seconds < 60 * 60) {
+        return i18n.t("units:shortMinutes", { count: Number((seconds / 60).toFixed(0)) });
+    } else if (seconds < 60 * 60 * 24) {
+        return i18n.t("units:shortHours", { count: Number((seconds / 3600).toFixed(0)) });
+    } else if (seconds < 60 * 60 * 24 * 365.25) {
+        return i18n.t("units:shortDays", { count: Number((seconds / (60 * 60 * 24)).toFixed(0)) });
+    } else if (seconds < 60 * 60 * 24 * 365.25 * 10) {
+        return i18n.t("units:shortYears", { count: Number((seconds / (60 * 60 * 24 * 365.25)).toFixed(0)) });
     } else {
         return `∞`;
     }
+}
+
+export function parseSecondsPrecise(seconds: number): string {
+    let secondsLeft = seconds;
+    const nbYears = Math.floor(secondsLeft / (60 * 60 * 24 * 365.25));
+    secondsLeft -= nbYears * 365.25 * 24 * 60 * 60;
+    const nbDays = Math.floor(secondsLeft / (24 * 60 * 60));
+    secondsLeft -= nbDays * 24 * 60 * 60;
+    const nbHours = Math.floor(secondsLeft / (60 * 60));
+    secondsLeft -= nbHours * 60 * 60;
+    const nbMinutes = Math.floor(secondsLeft / 60);
+    secondsLeft -= nbMinutes * 60;
+    const nbSeconds = Math.floor(secondsLeft);
+
+    const result: string[] = [];
+    if (nbYears > 0) result.push(i18n.t("units:years", { count: nbYears }));
+    if (nbDays > 0) result.push(i18n.t("units:days", { count: nbDays }));
+    if (nbHours > 0) result.push(i18n.t("units:hours", { count: nbHours }));
+    if (nbMinutes > 0) result.push(i18n.t("units:minutes", { count: nbMinutes }));
+    if (nbSeconds > 0) result.push(i18n.t("units:seconds", { count: nbSeconds }));
+
+    return result.join(" ");
 }
 
 /**

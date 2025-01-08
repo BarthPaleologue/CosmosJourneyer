@@ -1,0 +1,18 @@
+@use "variables";
+
+select {
+    background: var(--accent-color-dark);
+    outline: none;
+    padding: 10px;
+    font-size: var(--text-size);
+    border: none;
+    color: white;
+    font-family: var(--main-font);
+    cursor: pointer;
+    transition: 0.2s;
+
+    &:hover {
+        background: var(--accent-color);
+        box-shadow: 0 0 10px white inset;
+    }
+}

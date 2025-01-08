@@ -28,7 +28,7 @@ export type OrbitalObjectPhysicsInfo = {
      * It is slightly different from the duration of solar day which is the time it takes for the sun to be at the same position in the sky.
      * @see https://en.wikipedia.org/wiki/Sidereal_time
      */
-    siderealDayDuration: number;
+    siderealDaySeconds: number;
     axialTilt: Quaternion;
 };
 

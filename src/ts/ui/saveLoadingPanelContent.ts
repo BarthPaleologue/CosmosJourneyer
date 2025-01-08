@@ -1,7 +1,7 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
 import i18n from "../i18n";
+import { createNotification, NotificationIntent, NotificationOrigin } from "../utils/notification";
 import { createUrlFromSave, getSavesFromLocalStorage, parseSaveFileData, SaveFileData, writeSavesToLocalStorage } from "../saveFile/saveFileData";
-import { createNotification } from "../utils/notification";
 import { Sounds } from "../assets/sounds";
 import expandIconPath from "../../asset/icons/expand.webp";
 import collapseIconPath from "../../asset/icons/collapse.webp";
@@ -173,7 +173,7 @@ export class SaveLoadingPanelContent {
                 Sounds.MENU_SELECT_SOUND.play();
                 const url = createUrlFromSave(latestSave);
                 navigator.clipboard.writeText(url.toString()).then(() => {
-                    createNotification(i18n.t("notifications:copiedToClipboard"), 5000);
+                    createNotification(NotificationOrigin.GENERAL, NotificationIntent.SUCCESS, i18n.t("notifications:copiedToClipboard"), 5000);
                 });
             });
             cmdrHeaderButtons.appendChild(shareButton);
@@ -281,7 +281,7 @@ export class SaveLoadingPanelContent {
             Sounds.MENU_SELECT_SOUND.play();
             const url = createUrlFromSave(save);
             navigator.clipboard.writeText(url.toString()).then(() => {
-                createNotification(i18n.t("notifications:copiedToClipboard"), 5000);
+                createNotification(NotificationOrigin.GENERAL, NotificationIntent.INFO, i18n.t("notifications:copiedToClipboard"), 5000);
             });
         });
         saveButtons.appendChild(shareButton);
@@ -349,7 +349,7 @@ export class SaveLoadingPanelContent {
                 if (event.target === null) throw new Error("event.target is null");
                 const data = event.target.result as string;
                 const loadingSaveData = parseSaveFileData(data);
-                loadingSaveData.logs.forEach((log) => createNotification(log, 60_000));
+                loadingSaveData.logs.forEach((log) => createNotification(NotificationOrigin.GENERAL, NotificationIntent.WARNING, log, 60_000));
                 if (loadingSaveData.data === null) return;
                 resolve(loadingSaveData.data);
             };

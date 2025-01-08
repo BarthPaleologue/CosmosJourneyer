@@ -69,7 +69,7 @@ const hecateModel = newSeededTelluricPlanetModel(253, "Hécate", [sunModel]);
 hecateModel.physics.minTemperature = celsiusToKelvin(-40);
 hecateModel.physics.maxTemperature = celsiusToKelvin(30);
 
-hecateModel.physics.siderealDayDuration = 6 * 60 * 60;
+hecateModel.physics.siderealDaySeconds = 6 * 60 * 60;
 
 hecateModel.orbit.period = 60 * 60 * 24 * 365.25;
 hecateModel.orbit.radius = 25000 * hecateModel.radius;
@@ -84,18 +84,18 @@ const spaceStationModel = newSeededSpaceElevatorModel(0, [sunModel], systemCoord
 
 const moonModel = newSeededTelluricSatelliteModel(23, "Manaleth", [hecateModel]);
 moonModel.physics.mass = 2;
-moonModel.physics.siderealDayDuration = 28 * 60 * 60;
+moonModel.physics.siderealDaySeconds = 28 * 60 * 60;
 moonModel.physics.minTemperature = celsiusToKelvin(-180);
 moonModel.physics.maxTemperature = celsiusToKelvin(200);
 moonModel.physics.waterAmount = 0.9;
 
-moonModel.orbit.period = moonModel.physics.siderealDayDuration;
+moonModel.orbit.period = moonModel.physics.siderealDaySeconds;
 moonModel.orbit.radius = getOrbitRadiusFromPeriod(moonModel.orbit.period, hecateModel.physics.mass);
 
 const aresModel = newSeededTelluricPlanetModel(0.3725, "Ares", [sunModel]);
 if (aresModel.clouds !== null) aresModel.clouds.coverage = 1;
 aresModel.physics.mass = 7;
-aresModel.physics.siderealDayDuration = (24 * 60 * 60) / 30;
+aresModel.physics.siderealDaySeconds = (24 * 60 * 60) / 30;
 aresModel.physics.minTemperature = celsiusToKelvin(-30);
 aresModel.physics.maxTemperature = celsiusToKelvin(20);
 aresModel.physics.pressure = Settings.EARTH_SEA_LEVEL_PRESSURE * 0.5;

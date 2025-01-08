@@ -35,7 +35,7 @@ import { RingsUniforms } from "../../rings/ringsUniform";
 import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { getRgbFromTemperature } from "../../utils/specrend";
-import { orbitalObjectTypeToDisplay } from "../../utils/strings/orbitalObjectTypeToDisplay";
+import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
 
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
 
@@ -125,7 +125,7 @@ export class Star implements StellarObject, Cullable {
     }
 
     getTypeName(): string {
-        return orbitalObjectTypeToDisplay(this.model);
+        return getOrbitalObjectTypeToI18nString(this.model);
     }
 
     public updateMaterial(deltaTime: number): void {

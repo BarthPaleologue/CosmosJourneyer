@@ -10,5 +10,6 @@
     "saveVersionMismatch": "[VERSION_WARNING] La version du fichier de sauvegarde ({{saveVersion}}) ne correspond pas à la version actuelle ({{currentVersion}}). Le chargement peut entraîner un comportement inattendu.",
     "invalidSaveFileJson": "[JSON_ERROR] Le fichier de sauvegarde est invalide: {{error}}. Réparez le fichier avant de réessayer de le charger.",
     "saveOk": "Sauvegardé avec succès dans le stockage local.",
-    "cantSaveTutorial": "Impossible de sauvegarder pendant un tutoriel."
+    "cantSaveTutorial": "Impossible de sauvegarder pendant un tutoriel.",
+    "newDiscovery": "Découverte de {{objectName}}. Enregistrement des données effectuées."
 }

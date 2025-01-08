@@ -1,4 +1,22 @@
 {
-    "ly": "al",
-    "ls": "sl"
+    "shortM": "{{count}} m",
+    "shortKm": "{{count}} km",
+    "shortMm": "{{count}} Mm",
+    "shortLy": "{{count}} al",
+    "shortLs": "{{count}} sl",
+    "years_one": "{{count}} année",
+    "years_other": "{{count}} années",
+    "days_one": "{{count}} jour",
+    "days_other": "{{count}} jours",
+    "hours_one": "{{count}} heure",
+    "hours_other": "{{count}} heures",
+    "minutes_one": "{{count}} minute",
+    "minutes_other": "{{count}} minutes",
+    "seconds_one": "{{count}} seconde",
+    "seconds_other": "{{count}} secondes",
+    "shortYears": "{{count}} a",
+    "shortDays": "{{count}} j",
+    "shortHours": "{{count}} h",
+    "shortMinutes": "{{count}} m",
+    "shortSeconds": "{{count}} s"
 }

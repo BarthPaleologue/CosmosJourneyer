@@ -43,7 +43,7 @@ import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { View } from "../utils/view";
 import { SystemTarget } from "../utils/systemTarget";
 import { StarSystemInputs } from "../inputs/starSystemInputs";
-import { createNotification } from "../utils/notification";
+import { createNotification, NotificationIntent, NotificationOrigin } from "../utils/notification";
 import { axisCompositeToString, dPadCompositeToString } from "../utils/strings/inputControlsString";
 import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
 import { AxisComposite } from "@brianchirls/game-input/browser";
@@ -66,7 +66,7 @@ import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import { MissionContext } from "../missions/missionContext";
 import { Mission } from "../missions/mission";
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/universeCoordinates";
+import { StarSystemCoordinates, starSystemCoordinatesEquals, UniverseObjectId } from "../utils/coordinates/universeCoordinates";
 import { getSystemModelFromCoordinates } from "./modelFromCoordinates";
 import { StarSystemModel } from "./starSystemModel";
 import { OrbitalObjectType } from "../architecture/orbitalObject";
@@ -77,11 +77,12 @@ import { Inspector } from "@babylonjs/inspector";
 import { Transformable } from "../architecture/transformable";
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { TypedObject } from "../architecture/typedObject";
+import { EncyclopaediaGalacticaManager } from "../society/encyclopaediaGalacticaManager";
 
 // register cosmos journeyer as part of window object
 declare global {
     interface Window {
-        starSystemView: StarSystemView;
+        StarSystemView: StarSystemView;
     }
 }
 
@@ -109,6 +110,8 @@ export class StarSystemView implements View {
     private isUiEnabled = true;
 
     private readonly player: Player;
+
+    private readonly encyclopaedia: EncyclopaediaGalacticaManager;
 
     /**
      * A debug HTML UI to change the properties of the closest celestial body
@@ -195,6 +198,8 @@ export class StarSystemView implements View {
      */
     private _isLoadingSystem = false;
 
+    readonly onNewDiscovery = new Observable<UniverseObjectId>();
+
     readonly postProcessManager: PostProcessManager;
 
     private keyboardLayoutMap: Map<string, string> = new Map();
@@ -206,8 +211,9 @@ export class StarSystemView implements View {
      * @param engine The BabylonJS engine
      * @param havokInstance The Havok physics instance
      */
-    constructor(player: Player, engine: AbstractEngine, havokInstance: HavokPhysicsWithBindings) {
+    constructor(player: Player, engine: AbstractEngine, havokInstance: HavokPhysicsWithBindings, encyclopaedia: EncyclopaediaGalacticaManager) {
         this.player = player;
+        this.encyclopaedia = encyclopaedia;
 
         this.spaceShipLayer = new SpaceShipLayer(this.player);
         this.bodyEditor = new BodyEditor(EditorVisibility.HIDDEN);
@@ -271,7 +277,7 @@ export class StarSystemView implements View {
             const fuelForJump = spaceship.getWarpDrive().getFuelConsumption(distanceLY);
 
             if (spaceship.getRemainingFuel() < fuelForJump) {
-                createNotification(i18n.t("notifications:notEnoughFuel"), 5000);
+                createNotification(NotificationOrigin.SPACESHIP, NotificationIntent.ERROR, i18n.t("notifications:notEnoughFuel"), 5000);
                 this.jumpLock = false;
                 return;
             }
@@ -364,7 +370,12 @@ export class StarSystemView implements View {
                     if (!(control instanceof AxisComposite)) {
                         throw new Error("Up down is not an axis composite");
                     }
-                    createNotification(i18n.t("notifications:howToLiftOff", { bindingsString: axisCompositeToString(control, keyboardLayoutMap)[1][1] }), 5000);
+                    createNotification(
+                        NotificationOrigin.SPACESHIP,
+                        NotificationIntent.INFO,
+                        i18n.t("notifications:howToLiftOff", { bindingsString: axisCompositeToString(control, keyboardLayoutMap)[1][1] }),
+                        5000
+                    );
                 }
             }
         });
@@ -412,7 +423,7 @@ export class StarSystemView implements View {
         this.bodyEditor.resize();
         this.spaceShipLayer.setVisibility(false);
 
-        this.spaceStationLayer = new SpaceStationLayer(this.player);
+        this.spaceStationLayer = new SpaceStationLayer(this.player, this.encyclopaedia);
         this.spaceStationLayer.setVisibility(false);
         this.spaceStationLayer.onTakeOffObservable.add(() => {
             this.getSpaceshipControls().getSpaceship().takeOff();
@@ -426,7 +437,7 @@ export class StarSystemView implements View {
             globalRoot: inspectorRoot,
         });*/
 
-        window.starSystemView = this;
+        window.StarSystemView = this;
     }
 
     /**
@@ -627,6 +638,25 @@ export class StarSystemView implements View {
 
         const nearestOrbitalObject = starSystem.getNearestOrbitalObject(this.scene.getActiveControls().getTransform().getAbsolutePosition());
         const nearestCelestialBody = starSystem.getNearestCelestialBody(this.scene.getActiveControls().getTransform().getAbsolutePosition());
+
+        const distanceToNearesetCelestialBody2 = Vector3.DistanceSquared(
+            nearestCelestialBody.getTransform().getAbsolutePosition(),
+            this.scene.getActiveControls().getTransform().getAbsolutePosition()
+        );
+        if (distanceToNearesetCelestialBody2 < (nearestCelestialBody.getBoundingRadius() * 2) ** 2) {
+            const universeId = getUniverseObjectId(nearestCelestialBody, starSystem);
+            const isNewDiscovery = this.player.addVisitedObjectIfNew(universeId);
+            if (isNewDiscovery) {
+                createNotification(
+                    NotificationOrigin.EXPLORATION,
+                    NotificationIntent.SUCCESS,
+                    i18n.t("notifications:newDiscovery", { objectName: nearestCelestialBody.model.name }),
+                    15_000
+                );
+                Sounds.EnqueuePlay(Sounds.NEW_DISCOVERY);
+                this.onNewDiscovery.notifyObservers(universeId);
+            }
+        }
 
         const spaceship = this.spaceshipControls.getSpaceship();
 
@@ -850,7 +880,7 @@ export class StarSystemView implements View {
             const horizontalKeys = dPadCompositeToString(DefaultControlsInputs.map.move.bindings[0].control as DPadComposite, keyboardLayoutMap);
             const verticalKeys = axisCompositeToString(DefaultControlsInputs.map.upDown.bindings[0].control as AxisComposite, keyboardLayoutMap);
             const keys = horizontalKeys.concat(verticalKeys);
-            createNotification(`Move using ${keys.map((key) => key[1].replace("Key", "")).join(", ")}`, 20000);
+            createNotification(NotificationOrigin.GENERAL, NotificationIntent.INFO, `Move using ${keys.map((key) => key[1].replace("Key", "")).join(", ")}`, 2000000);
         }
     }
 

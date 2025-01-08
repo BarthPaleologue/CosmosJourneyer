@@ -33,7 +33,7 @@ import { LandingPad } from "../assets/procedural/landingPad/landingPad";
 import { LandingRequest } from "../utils/managesLandingPads";
 import { Settings } from "../settings";
 import { getRngFromSeed } from "../utils/getRngFromSeed";
-import { orbitalObjectTypeToDisplay } from "../utils/strings/orbitalObjectTypeToDisplay";
+import { getOrbitalObjectTypeToI18nString } from "../utils/strings/orbitalObjectTypeToDisplay";
 import { OrbitalFacility } from "./orbitalFacility";
 import { SpaceElevatorModel } from "./spaceElevatorModel";
 import { OrbitalObject } from "../architecture/orbitalObject";
@@ -166,7 +166,7 @@ export class SpaceElevator implements OrbitalFacility {
     }
 
     getTypeName(): string {
-        return orbitalObjectTypeToDisplay(this.model);
+        return getOrbitalObjectTypeToI18nString(this.model);
     }
 
     public computeCulling(camera: Camera): void {

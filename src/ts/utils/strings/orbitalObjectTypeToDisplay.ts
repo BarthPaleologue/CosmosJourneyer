@@ -20,7 +20,7 @@ import { getStellarTypeFromTemperature } from "../../stellarObjects/star/starMod
 import { StellarObjectModel } from "../../architecture/stellarObject";
 import { OrbitalObjectModel, OrbitalObjectType } from "../../architecture/orbitalObject";
 
-export function orbitalObjectTypeToDisplay(model: OrbitalObjectModel): string {
+export function getOrbitalObjectTypeToI18nString(model: OrbitalObjectModel): string {
     switch (model.type) {
         case OrbitalObjectType.MANDELBULB:
         case OrbitalObjectType.JULIA_SET:
