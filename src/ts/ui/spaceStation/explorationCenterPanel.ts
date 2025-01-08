@@ -19,8 +19,11 @@ import { Sounds } from "../../assets/sounds";
 import i18n from "../../i18n";
 import { Player } from "../../player/player";
 import { Settings } from "../../settings";
-import { EncyclopaediaGalactica, SpaceDiscoveryData } from "../../society/encyclopaediaGalactica";
+import { SpaceDiscoveryData } from "../../society/encyclopaediaGalactica";
+import { EncyclopaediaGalacticaManager } from "../../society/encyclopaediaGalacticaManager";
+import { EncyclopaediaGalacticaOnline } from "../../society/encyclopaediaGalacticaOnline";
 import { getObjectModelByUniverseId } from "../../utils/coordinates/orbitalObjectId";
+import { connectEncyclopaediaGalacticaModal } from "../../utils/dialogModal";
 import { DiscoveryDetails } from "./discoveryDetails";
 
 const enum ExplorationCenterFilter {
@@ -43,9 +46,9 @@ export class ExplorationCenterPanel {
     private readonly discoveryToHtmlItem = new Map<SpaceDiscoveryData, HTMLDivElement>();
 
     private readonly player: Player;
-    private readonly encyclopaedia: EncyclopaediaGalactica;
+    private readonly encyclopaedia: EncyclopaediaGalacticaManager;
 
-    constructor(encyclopaedia: EncyclopaediaGalactica, player: Player) {
+    constructor(encyclopaedia: EncyclopaediaGalacticaManager, player: Player) {
         this.player = player;
         this.encyclopaedia = encyclopaedia;
 
@@ -55,6 +58,29 @@ export class ExplorationCenterPanel {
         const title = document.createElement("h2");
         title.textContent = "Exploration Center";
         this.htmlRoot.appendChild(title);
+
+        const encyclopaediaContainer = document.createElement("div");
+        encyclopaediaContainer.classList.add("flex-row", "encyclopaediaContainer");
+        this.htmlRoot.appendChild(encyclopaediaContainer);
+
+        const activeInstances = document.createElement("p");
+        activeInstances.textContent = `Active Encyclopaedia instances: ${encyclopaedia.getBackendString()}`;
+        encyclopaediaContainer.appendChild(activeInstances);
+
+        const addEncyclopaediaInstanceButton = document.createElement("button");
+        addEncyclopaediaInstanceButton.textContent = "Add instance";
+        addEncyclopaediaInstanceButton.addEventListener("click", async () => {
+            Sounds.MENU_SELECT_SOUND.play();
+
+            const connectionInfo = await connectEncyclopaediaGalacticaModal();
+            if (connectionInfo === null) return;
+
+            const newEncyclopaedia = new EncyclopaediaGalacticaOnline(new URL(connectionInfo.encyclopaediaUrlBase), connectionInfo.accountId, connectionInfo.password);
+            encyclopaedia.backends.push(newEncyclopaedia);
+
+            activeInstances.textContent = `Active Encyclopaedia instances: ${encyclopaedia.getBackendString()}`;
+        });
+        encyclopaediaContainer.appendChild(addEncyclopaediaInstanceButton);
 
         const buttonHorizontalContainer = document.createElement("div");
         buttonHorizontalContainer.classList.add("flex-row", "buttonHorizontalContainer");

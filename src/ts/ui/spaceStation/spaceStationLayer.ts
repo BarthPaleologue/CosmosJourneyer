@@ -26,8 +26,8 @@ import { generateSpaceshipDom } from "./spaceshipDock";
 import { promptModalString } from "../../utils/dialogModal";
 import i18n from "../../i18n";
 import { Sounds } from "../../assets/sounds";
-import { EncyclopaediaGalactica } from "../../society/encyclopaediaGalactica";
 import { ExplorationCenterPanel } from "./explorationCenterPanel";
+import { EncyclopaediaGalacticaManager } from "../../society/encyclopaediaGalacticaManager";
 
 const enum MainPanelState {
     NONE,
@@ -70,9 +70,9 @@ export class SpaceStationLayer {
 
     readonly player: Player;
 
-    private readonly encyclopaedia: EncyclopaediaGalactica;
+    private readonly encyclopaedia: EncyclopaediaGalacticaManager;
 
-    constructor(player: Player, encyclopaedia: EncyclopaediaGalactica) {
+    constructor(player: Player, encyclopaedia: EncyclopaediaGalacticaManager) {
         this.player = player;
         this.encyclopaedia = encyclopaedia;
 

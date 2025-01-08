@@ -77,7 +77,7 @@ import { Inspector } from "@babylonjs/inspector";
 import { Transformable } from "../architecture/transformable";
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { TypedObject } from "../architecture/typedObject";
-import { EncyclopaediaGalactica } from "../society/encyclopaediaGalactica";
+import { EncyclopaediaGalacticaManager } from "../society/encyclopaediaGalacticaManager";
 
 // register cosmos journeyer as part of window object
 declare global {
@@ -111,7 +111,7 @@ export class StarSystemView implements View {
 
     private readonly player: Player;
 
-    private readonly encyclopaedia: EncyclopaediaGalactica;
+    private readonly encyclopaedia: EncyclopaediaGalacticaManager;
 
     /**
      * A debug HTML UI to change the properties of the closest celestial body
@@ -211,7 +211,7 @@ export class StarSystemView implements View {
      * @param engine The BabylonJS engine
      * @param havokInstance The Havok physics instance
      */
-    constructor(player: Player, engine: AbstractEngine, havokInstance: HavokPhysicsWithBindings, encyclopaedia: EncyclopaediaGalactica) {
+    constructor(player: Player, engine: AbstractEngine, havokInstance: HavokPhysicsWithBindings, encyclopaedia: EncyclopaediaGalacticaManager) {
         this.player = player;
         this.encyclopaedia = encyclopaedia;
 

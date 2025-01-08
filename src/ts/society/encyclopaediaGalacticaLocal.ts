@@ -108,4 +108,8 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
     public reset() {
         this.spaceExplorationData.clear();
     }
+
+    public getBackendString(): string {
+        return "Local";
+    }
 }

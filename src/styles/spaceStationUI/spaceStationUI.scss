@@ -250,6 +250,13 @@ $gaps: 10px;
     .discoveryPanel {
         height: 100%;
 
+        .encyclopaediaContainer {
+            min-height: unset;
+            p {
+                flex-grow: 1;
+            }
+        }
+
         .buttonHorizontalContainer {
             min-height: unset;
             select {

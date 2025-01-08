@@ -58,7 +58,6 @@ import { Tutorial } from "./tutorials/tutorial";
 import { StationLandingTutorial } from "./tutorials/stationLandingTutorial";
 import { promptModalBoolean, alertModal, promptModalString } from "./utils/dialogModal";
 import { FuelScoopTutorial } from "./tutorials/fuelScoopTutorial";
-import { EncyclopaediaGalactica } from "./society/encyclopaediaGalactica";
 import { EncyclopaediaGalacticaManager } from "./society/encyclopaediaGalacticaManager";
 import { EncyclopaediaGalacticaLocal } from "./society/encyclopaediaGalacticaLocal";
 

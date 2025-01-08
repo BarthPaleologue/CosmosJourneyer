@@ -31,4 +31,8 @@ export class EncyclopaediaGalacticaManager implements EncyclopaediaGalactica {
 
         return Promise.resolve(sum);
     }
+
+    public getBackendString(): string {
+        return this.backends.map((backend) => backend.getBackendString()).join(", ");
+    }
 }

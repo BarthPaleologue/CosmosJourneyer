@@ -45,6 +45,11 @@ export interface EncyclopaediaGalactica {
      */
     contributeDiscoveryIfNew(data: SpaceDiscoveryData): Promise<boolean>;
 
+    /**
+     * Finds out if an object has already been discovered.
+     * @param objectId The ID of the object to check.
+     * @returns True if the object has been discovered, false otherwise.
+     */
     hasObjectBeenDiscovered(objectId: UniverseObjectId): Promise<boolean>;
 
     /**
@@ -53,4 +58,9 @@ export interface EncyclopaediaGalactica {
      * @returns The estimated value of the object in credits.
      */
     estimateDiscovery(object: UniverseObjectId): Promise<number>;
+
+    /**
+     * Gets a human readable string for the encyclopaedia backend.
+     */
+    getBackendString(): string;
 }
