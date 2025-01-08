@@ -71,8 +71,6 @@ export class StarMap implements View {
     readonly scene: Scene;
     private readonly controls: StarMapControls;
 
-    private readonly backgroundMusic: AudioInstance;
-
     private rotationAnimation: TransformRotationAnimation | null = null;
     private translationAnimation: TransformTranslationAnimation | null = null;
     private radiusAnimation: CameraRadiusAnimation | null = null;
@@ -177,16 +175,6 @@ export class StarMap implements View {
         this.starSystemDatabase = starSystemDatabase;
 
         this.stellarPathfinder = new StellarPathfinder(starSystemDatabase);
-
-        this.backgroundMusic = new AudioInstance(
-            Sounds.STAR_MAP_BACKGROUND_MUSIC,
-            AudioMasks.STAR_MAP_VIEW,
-            1,
-            false,
-            null
-        );
-        AudioManager.RegisterSound(this.backgroundMusic);
-        this.backgroundMusic.sound.play();
 
         this.starMapUI = new StarMapUI(this.scene, this.player, this.starSystemDatabase);
         this.starMapUI.onSystemFocusObservable.add((starSystemCoordinates) => {

@@ -228,8 +228,6 @@ export class MainMenu {
                 this.starSystemView.getStarSystem(),
                 nbRadius
             );
-
-            Sounds.MAIN_MENU_BACKGROUND_MUSIC.play();
         });
 
         this.starSystemView.targetCursorLayer.setEnabled(false);
@@ -294,8 +292,6 @@ export class MainMenu {
             }
         );
 
-        Sounds.MAIN_MENU_BACKGROUND_MUSIC.setVolume(0, this.startAnimationDurationSeconds);
-
         const animationCallback = () => {
             const deltaTime = this.scene.getEngine().getDeltaTime() / 1000;
 
@@ -305,7 +301,6 @@ export class MainMenu {
                 this.scene.onBeforePhysicsObservable.removeCallback(animationCallback);
                 if (this.htmlRoot === null) throw new Error("MainMenu is null");
                 this.htmlRoot.style.display = "none";
-                Sounds.MAIN_MENU_BACKGROUND_MUSIC.stop();
 
                 this.starSystemView.setUIEnabled(true);
                 onAnimationFinished();
@@ -341,7 +336,6 @@ export class MainMenu {
         this.hideMenu();
         this.sidePanels.hideActivePanel();
         this.htmlRoot.style.display = "none";
-        Sounds.MAIN_MENU_BACKGROUND_MUSIC.setVolume(0, 2);
     }
 
     public isVisible() {

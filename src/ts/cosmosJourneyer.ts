@@ -61,6 +61,7 @@ import { EncyclopaediaGalacticaManager } from "./society/encyclopaediaGalacticaM
 import { EncyclopaediaGalacticaLocal } from "./society/encyclopaediaGalacticaLocal";
 import { StarSystemDatabase } from "./starSystem/starSystemDatabase";
 import { registerCustomSystems } from "./starSystem/customSystems/registerCustomSystems";
+import { MusicManager } from "./audio/musicManager";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -85,6 +86,8 @@ export class CosmosJourneyer {
 
     readonly starSystemView: StarSystemView;
     readonly starMap: StarMap;
+
+    readonly musicManager: MusicManager;
 
     readonly mainMenu: MainMenu;
     readonly pauseMenu: PauseMenu;
@@ -296,6 +299,8 @@ export class CosmosJourneyer {
                 );
         });
 
+        this.musicManager = new MusicManager(this.starSystemView);
+
         window.addEventListener("blur", () => {
             if (!this.mainMenu?.isVisible() && !this.starSystemView.isLoadingSystem()) this.pause();
         });
@@ -455,6 +460,11 @@ export class CosmosJourneyer {
             updateNotifications(deltaSeconds);
             AudioManager.Update(deltaSeconds);
             Sounds.Update();
+            this.musicManager.update(
+                this.isPaused(),
+                this.activeView === this.starSystemView,
+                this.mainMenu.isVisible()
+            );
 
             if (this.isPaused()) return;
             this.activeView.render();
