@@ -45,7 +45,7 @@ export class EngineBay implements Transformable {
         );
         this.skirt.convertToFlatShadedMesh();
 
-        this.skirtMaterial = new MetalSectionMaterial(scene);
+        this.skirtMaterial = new MetalSectionMaterial("EngineBayMetalSectionMaterial", scene);
 
         this.skirt.material = this.skirtMaterial;
         this.skirt.parent = this.root;
@@ -78,9 +78,7 @@ export class EngineBay implements Transformable {
         this.engineShape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
     }
 
-    update(stellarObjects: Transformable[], cameraWorldPosition: Vector3) {
-        this.skirtMaterial.update(stellarObjects);
-
+    update(cameraWorldPosition: Vector3) {
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
         if (distanceToCamera < 350e3 && this.skirtAggregate === null) {
             this.skirtAggregate = createEnvironmentAggregate(this.skirt, PhysicsShapeType.MESH, this.scene);

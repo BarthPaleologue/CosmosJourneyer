@@ -84,7 +84,7 @@ export class SolarSection implements Transformable {
         );
         this.attachment.convertToFlatShadedMesh();
 
-        this.metalSectionMaterial = new MetalSectionMaterial(scene);
+        this.metalSectionMaterial = new MetalSectionMaterial("SolarSectionMetalMaterial", scene);
         this.attachment.material = this.metalSectionMaterial;
 
         this.solarPanelMaterial = new SolarPanelMaterial("SolarSectionPanelMaterial", scene);
@@ -251,9 +251,7 @@ export class SolarSection implements Transformable {
         }
     }
 
-    update(stellarObjects: Transformable[], cameraWorldPosition: Vector3) {
-        this.metalSectionMaterial.update(stellarObjects);
-
+    update(cameraWorldPosition: Vector3) {
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
 
         if (distanceToCamera < 350e3 && this.attachmentAggregate === null) {

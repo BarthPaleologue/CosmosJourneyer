@@ -15,73 +15,75 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Scene } from "@babylonjs/core/scene";
-import { Effect } from "@babylonjs/core/Materials/effect";
-import {
-    setStellarObjectUniforms,
-    StellarObjectUniformNames
-} from "../../../postProcesses/uniforms/stellarObjectUniforms";
-import { Transformable } from "../../../architecture/transformable";
-
-import metalSectionMaterialFragment from "../../../../shaders/metalSectionMaterial/fragment.glsl";
-import metalSectionMaterialVertex from "../../../../shaders/metalSectionMaterial/vertex.glsl";
 import { Textures } from "../../textures";
+import { MaterialPluginBase } from "@babylonjs/core/Materials/materialPluginBase";
+import { Material } from "@babylonjs/core/Materials/material";
+import { MaterialDefines } from "@babylonjs/core/Materials/materialDefines";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import { ShaderLanguage } from "@babylonjs/core/Materials/shaderLanguage";
+import { Nullable } from "@babylonjs/core/types";
+import { PBRMetallicRoughnessMaterial } from "@babylonjs/core/Materials/PBR/pbrMetallicRoughnessMaterial";
 
-const MetalSectionUniformNames = {
-    WORLD: "world",
-    WORLD_VIEW_PROJECTION: "worldViewProjection",
-    CAMERA_POSITION: "cameraPosition"
-};
+export class MetalSectionMaterialPlugin extends MaterialPluginBase {
+    static NAME = "MetalSectionMaterialPlugin";
 
-const MetalSectionSamplerNames = {
-    ALBEDO_MAP: "albedoMap",
-    NORMAL_MAP: "normalMap",
-    METALLIC_MAP: "metallicMap",
-    ROUGHNESS_MAP: "roughnessMap"
-};
-
-export class MetalSectionMaterial extends ShaderMaterial {
-    private stellarObjects: Transformable[] = [];
-
-    constructor(scene: Scene) {
-        const shaderName = "metalSectionMaterial";
-        if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
-            Effect.ShadersStore[`${shaderName}FragmentShader`] = metalSectionMaterialFragment;
-        }
-        if (Effect.ShadersStore[`${shaderName}VertexShader`] === undefined) {
-            Effect.ShadersStore[`${shaderName}VertexShader`] = metalSectionMaterialVertex;
-        }
-
-        super(`MetalSectionMaterial`, scene, shaderName, {
-            attributes: ["position", "normal", "uv"],
-            uniforms: [...Object.values(MetalSectionUniformNames), ...Object.values(StellarObjectUniformNames)],
-            samplers: [...Object.values(MetalSectionSamplerNames)]
-        });
-
-        this.onBindObservable.add(() => {
-            const activeCamera = scene.activeCamera;
-            if (activeCamera === null) {
-                throw new Error("No active camera");
-            }
-
-            this.getEffect().setVector3(MetalSectionUniformNames.CAMERA_POSITION, activeCamera.globalPosition);
-
-            this.getEffect().setTexture(MetalSectionSamplerNames.ALBEDO_MAP, Textures.METAL_PANELS_ALBEDO);
-            this.getEffect().setTexture(MetalSectionSamplerNames.NORMAL_MAP, Textures.METAL_PANELS_NORMAL);
-            this.getEffect().setTexture(MetalSectionSamplerNames.METALLIC_MAP, Textures.METAL_PANELS_METALLIC);
-            this.getEffect().setTexture(MetalSectionSamplerNames.ROUGHNESS_MAP, Textures.METAL_PANELS_ROUGHNESS);
-
-            setStellarObjectUniforms(this.getEffect(), this.stellarObjects);
-        });
+    constructor(material: Material) {
+        super(material, MetalSectionMaterialPlugin.NAME, 200);
     }
 
-    update(stellarObjects: Transformable[]): void {
-        this.stellarObjects = stellarObjects;
+    setEnabled(enabled: boolean) {
+        this._enable(enabled);
     }
 
-    dispose(forceDisposeEffect?: boolean, forceDisposeTextures?: boolean, notBoundToMesh?: boolean) {
-        super.dispose(forceDisposeEffect, forceDisposeTextures, notBoundToMesh);
-        this.stellarObjects.length = 0;
+    // Also, you should always associate a define with your plugin because the list of defines (and their values)
+    // is what triggers a recompilation of the shader: a shader is recompiled only if a value of a define changes.
+    prepareDefines(defines: MaterialDefines, scene: Scene, mesh: AbstractMesh) {
+        super.prepareDefines(defines, scene, mesh);
+    }
+
+    getClassName() {
+        return "SolarPanelMaterialPlugin";
+    }
+
+    // This is used to inform the system which language is supported
+    isCompatible(shaderLanguage: ShaderLanguage): boolean {
+        switch (shaderLanguage) {
+            case ShaderLanguage.GLSL:
+            case ShaderLanguage.WGSL:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    getCustomCode(shaderType: string, shaderLanguage?: ShaderLanguage): Nullable<{ [p: string]: string }> {
+        if (shaderType === "fragment") {
+            return {
+                CUSTOM_FRAGMENT_MAIN_BEGIN: `
+                    vec2 vAlbedoUV = vec2(fract(6.0 * vAlbedoUV.x), fract(vPositionUVW.y / 50.0));
+                `
+            };
+        }
+
+        // for other shader types we're not doing anything, return null
+        return null;
+    }
+}
+
+export class MetalSectionMaterial extends PBRMetallicRoughnessMaterial {
+    constructor(name: string, scene: Scene) {
+        super(name, scene);
+
+        this.baseTexture = Textures.METAL_PANELS_ALBEDO;
+        this.normalTexture = Textures.METAL_PANELS_NORMAL;
+        this.metallicRoughnessTexture = Textures.METAL_PANELS_METALLIC_ROUGHNESS;
+        this.occlusionTexture = Textures.METAL_PANELS_AMBIENT_OCCLUSION;
+
+        const plugin = this.pluginManager?.getPlugin(MetalSectionMaterialPlugin.NAME);
+        if (plugin === null) {
+            throw new Error("Plugin not found");
+        }
+        (plugin as MetalSectionMaterialPlugin).setEnabled(true);
     }
 }

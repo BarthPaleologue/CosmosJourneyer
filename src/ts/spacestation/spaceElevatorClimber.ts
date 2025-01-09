@@ -1,6 +1,5 @@
 import { Scene } from "@babylonjs/core/scene";
 import { CreateBox, CreateTube, TransformNode } from "@babylonjs/core/Meshes";
-import { Transformable } from "../architecture/transformable";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
@@ -24,7 +23,7 @@ export class SpaceElevatorClimber implements Targetable {
         this.transform = new TransformNode("SpaceElevatorClimber", scene);
 
         this.solarPanelMaterial = new SolarPanelMaterial("SpaceElevatorClimberSolarPanelMaterial", scene);
-        this.metalSectionMaterial = new MetalSectionMaterial(scene);
+        this.metalSectionMaterial = new MetalSectionMaterial("SpaceElevatorClimberMetalSectionMaterial", scene);
 
         const angleSubtracted = Math.PI / 6;
         const minAngle = -Math.PI / 2 + angleSubtracted / 2;
@@ -129,10 +128,6 @@ export class SpaceElevatorClimber implements Targetable {
 
     getTypeName(): string {
         return i18n.t("objectTypes:spaceElevatorClimber");
-    }
-
-    update(stellarObjects: Transformable[]) {
-        this.metalSectionMaterial.update(stellarObjects);
     }
 
     getTransform() {

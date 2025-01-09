@@ -72,7 +72,7 @@ export class RingHabitat implements Transformable {
 
         const attachmentNbSides = 4 + 2 * Math.floor(this.rng(1) * 2);
 
-        this.metalSectionMaterial = new MetalSectionMaterial(scene);
+        this.metalSectionMaterial = new MetalSectionMaterial("RingHabitatMetalSectionMaterial", scene);
 
         this.habitableSurface = height * (2 * Math.PI * (this.radius + deltaRadius / 2));
 
@@ -133,7 +133,6 @@ export class RingHabitat implements Transformable {
             deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, Settings.G_EARTH)
         );
         this.ringMaterial.update(stellarObjects);
-        this.metalSectionMaterial.update(stellarObjects);
 
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
         if (distanceToCamera < 350e3 && this.attachmentAggregate === null) {
