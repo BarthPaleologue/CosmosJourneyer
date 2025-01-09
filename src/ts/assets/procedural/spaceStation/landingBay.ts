@@ -62,7 +62,7 @@ export class LandingBay {
 
         const deltaRadius = this.radius / 3;
 
-        this.metalSectionMaterial = new MetalSectionMaterial(scene);
+        this.metalSectionMaterial = new MetalSectionMaterial("LandingBayMetalSectionMaterial", scene);
 
         const heightFactor = 2 + Math.floor(this.rng(0) * 3);
 
@@ -155,7 +155,6 @@ export class LandingBay {
     update(stellarObjects: Transformable[], cameraWorldPosition: Vector3, deltaSeconds: number) {
         this.getTransform().rotate(Axis.Y, deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, Settings.G_EARTH * 0.1));
         this.landingBayMaterial.update(stellarObjects);
-        this.metalSectionMaterial.update(stellarObjects);
         this.landingPads.forEach((landingPad) => landingPad.update(stellarObjects, cameraWorldPosition));
 
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());

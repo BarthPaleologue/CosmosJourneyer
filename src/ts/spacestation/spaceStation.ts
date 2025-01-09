@@ -225,13 +225,13 @@ export class SpaceStation implements OrbitalFacility {
     }
 
     update(stellarObjects: Transformable[], parents: OrbitalObject[], cameraWorldPosition: Vector3, deltaSeconds: number) {
-        this.solarSections.forEach((solarSection) => solarSection.update(stellarObjects, cameraWorldPosition));
-        this.utilitySections.forEach((utilitySection) => utilitySection.update(stellarObjects, cameraWorldPosition));
+        this.solarSections.forEach((solarSection) => solarSection.update(cameraWorldPosition));
+        this.utilitySections.forEach((utilitySection) => utilitySection.update(cameraWorldPosition));
         this.helixHabitats.forEach((helixHabitat) => helixHabitat.update(stellarObjects, cameraWorldPosition, deltaSeconds));
         this.ringHabitats.forEach((ringHabitat) => ringHabitat.update(stellarObjects, cameraWorldPosition, deltaSeconds));
         this.cylinderHabitats.forEach((cylinderHabitat) => cylinderHabitat.update(stellarObjects, cameraWorldPosition, deltaSeconds));
         this.landingBays.forEach((landingBay) => landingBay.update(stellarObjects, cameraWorldPosition, deltaSeconds));
-        this.engineBays.forEach((engineBay) => engineBay.update(stellarObjects, cameraWorldPosition));
+        this.engineBays.forEach((engineBay) => engineBay.update(cameraWorldPosition));
     }
 
     getTransform(): TransformNode {

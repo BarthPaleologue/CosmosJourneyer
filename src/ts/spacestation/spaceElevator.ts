@@ -96,7 +96,7 @@ export class SpaceElevator implements OrbitalFacility {
         );
         this.tether.convertToFlatShadedMesh();
 
-        this.tetherMaterial = new MetalSectionMaterial(scene);
+        this.tetherMaterial = new MetalSectionMaterial("TetherMaterial", scene);
         this.tether.material = this.tetherMaterial;
 
         this.climber = new SpaceElevatorClimber(scene);
@@ -264,14 +264,12 @@ export class SpaceElevator implements OrbitalFacility {
     update(stellarObjects: Transformable[], parents: OrbitalObject[], cameraWorldPosition: Vector3, deltaSeconds: number) {
         this.elapsedSeconds += deltaSeconds;
 
-        this.solarSections.forEach((solarSection) => solarSection.update(stellarObjects, cameraWorldPosition));
-        this.utilitySections.forEach((utilitySection) => utilitySection.update(stellarObjects, cameraWorldPosition));
+        this.solarSections.forEach((solarSection) => solarSection.update(cameraWorldPosition));
+        this.utilitySections.forEach((utilitySection) => utilitySection.update(cameraWorldPosition));
         this.helixHabitats.forEach((helixHabitat) => helixHabitat.update(stellarObjects, cameraWorldPosition, deltaSeconds));
         this.ringHabitats.forEach((ringHabitat) => ringHabitat.update(stellarObjects, cameraWorldPosition, deltaSeconds));
         this.cylinderHabitats.forEach((cylinderHabitat) => cylinderHabitat.update(stellarObjects, cameraWorldPosition, deltaSeconds));
         this.landingBays.forEach((landingBay) => landingBay.update(stellarObjects, cameraWorldPosition, deltaSeconds));
-
-        this.tetherMaterial.update(stellarObjects);
 
         const climberSpeed = 300 / 3.6; // 300 km/h in m/s
         const roundTripDuration = (2 * this.tetherLength) / climberSpeed;

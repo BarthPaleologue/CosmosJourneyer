@@ -25,6 +25,7 @@ import { Textures } from "./textures";
 import { RegisterMaterialPlugin } from "@babylonjs/core/Materials/materialPluginManager";
 import { ClimberRingPluginMaterial } from "../materials/climberRingMaterial";
 import { SolarPanelMaterialPlugin } from "./procedural/solarPanel/solarPanelMaterial";
+import { MetalSectionMaterialPlugin } from "./procedural/spaceStation/metalSectionMaterial";
 
 export class Materials {
     public static BUTTERFLY_MATERIAL: ButterflyMaterial;
@@ -54,6 +55,11 @@ export class Materials {
 
         RegisterMaterialPlugin(SolarPanelMaterialPlugin.NAME, (material) => {
             new SolarPanelMaterialPlugin(material);
+            return null;
+        });
+
+        RegisterMaterialPlugin(MetalSectionMaterialPlugin.NAME, (material) => {
+            new MetalSectionMaterialPlugin(material);
             return null;
         });
     }

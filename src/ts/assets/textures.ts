@@ -61,6 +61,7 @@ import spaceStationAmbientOcclusion from "../../asset/spaceStationMaterial/space
 
 import metalPanelsAlbdeo from "../../asset/metalPanelMaterial/sci-fi-panel1-albedo.webp";
 import metalPanelsNormal from "../../asset/metalPanelMaterial/sci-fi-panel1-normal-dx.webp";
+import metalPanelsMetallicRoughness from "../../asset/metalPanelMaterial/metallicRoughness.webp";
 import metalPanelsRoughness from "../../asset/metalPanelMaterial/sci-fi-panel1-roughness.webp";
 import metalPanelsMetallic from "../../asset/metalPanelMaterial/sci-fi-panel1-metallic.webp";
 import metalPanelsAmbientOcclusion from "../../asset/metalPanelMaterial/sci-fi-panel1-ao.webp";
@@ -114,6 +115,7 @@ export class Textures {
 
     static METAL_PANELS_ALBEDO: Texture;
     static METAL_PANELS_NORMAL: Texture;
+    static METAL_PANELS_METALLIC_ROUGHNESS: Texture;
     static METAL_PANELS_METALLIC: Texture;
     static METAL_PANELS_ROUGHNESS: Texture;
     static METAL_PANELS_AMBIENT_OCCLUSION: Texture;
@@ -162,6 +164,7 @@ export class Textures {
 
         manager.addTextureTask("MetalPanelsAlbedo", metalPanelsAlbdeo).onSuccess = (task) => (Textures.METAL_PANELS_ALBEDO = task.texture);
         manager.addTextureTask("MetalPanelsNormal", metalPanelsNormal).onSuccess = (task) => (Textures.METAL_PANELS_NORMAL = task.texture);
+        manager.addTextureTask("MetalPanelsMetallicRoughness", metalPanelsMetallicRoughness).onSuccess = (task) => (Textures.METAL_PANELS_METALLIC_ROUGHNESS = task.texture);
         manager.addTextureTask("MetalPanelsMetallic", metalPanelsMetallic).onSuccess = (task) => (Textures.METAL_PANELS_METALLIC = task.texture);
         manager.addTextureTask("MetalPanelsRoughness", metalPanelsRoughness).onSuccess = (task) => (Textures.METAL_PANELS_ROUGHNESS = task.texture);
         manager.addTextureTask("MetalPanelsAmbientOcclusion", metalPanelsAmbientOcclusion).onSuccess = (task) => (Textures.METAL_PANELS_AMBIENT_OCCLUSION = task.texture);
