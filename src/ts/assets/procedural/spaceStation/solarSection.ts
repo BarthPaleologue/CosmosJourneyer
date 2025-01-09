@@ -87,7 +87,7 @@ export class SolarSection implements Transformable {
         this.metalSectionMaterial = new MetalSectionMaterial(scene);
         this.attachment.material = this.metalSectionMaterial;
 
-        this.solarPanelMaterial = new SolarPanelMaterial(scene);
+        this.solarPanelMaterial = new SolarPanelMaterial("SolarSectionPanelMaterial", scene);
 
         const hexagonOffset = attachmentThickness * (1 - Math.sqrt(3) / 2);
 
@@ -252,7 +252,6 @@ export class SolarSection implements Transformable {
     }
 
     update(stellarObjects: Transformable[], cameraWorldPosition: Vector3) {
-        this.solarPanelMaterial.update(stellarObjects);
         this.metalSectionMaterial.update(stellarObjects);
 
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());

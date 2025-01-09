@@ -51,8 +51,7 @@ import butterflyTexture from "../../asset/butterfly.webp";
 
 import solarPanelAlbedo from "../../asset/SolarPanelMaterial/SolarPanel002_2K-PNG_Color.webp";
 import solarPanelNormal from "../../asset/SolarPanelMaterial/SolarPanel002_2K-PNG_NormalDX.webp";
-import solarPanelMetallic from "../../asset/SolarPanelMaterial/SolarPanel002_2K-PNG_Metalness.webp";
-import solarPanelRoughness from "../../asset/SolarPanelMaterial/SolarPanel002_2K-PNG_Roughness.webp";
+import solarPanelMetallicRoughness from "../../asset/SolarPanelMaterial/metallicRougness.webp";
 
 import spaceStationAlbedo from "../../asset/spaceStationMaterial/spaceship-panels1-albedo.webp";
 import spaceStationNormal from "../../asset/spaceStationMaterial/spaceship-panels1-normal-dx.webp";
@@ -105,8 +104,7 @@ export class Textures {
 
     static SOLAR_PANEL_ALBEDO: Texture;
     static SOLAR_PANEL_NORMAL: Texture;
-    static SOLAR_PANEL_METALLIC: Texture;
-    static SOLAR_PANEL_ROUGHNESS: Texture;
+    static SOLAR_PANEL_METALLIC_ROUGHNESS: Texture;
 
     static SPACE_STATION_ALBEDO: Texture;
     static SPACE_STATION_NORMAL: Texture;
@@ -154,8 +152,7 @@ export class Textures {
 
         manager.addTextureTask("SolarPanelAlbedo", solarPanelAlbedo).onSuccess = (task) => (Textures.SOLAR_PANEL_ALBEDO = task.texture);
         manager.addTextureTask("SolarPanelNormal", solarPanelNormal).onSuccess = (task) => (Textures.SOLAR_PANEL_NORMAL = task.texture);
-        manager.addTextureTask("SolarPanelMetallic", solarPanelMetallic).onSuccess = (task) => (Textures.SOLAR_PANEL_METALLIC = task.texture);
-        manager.addTextureTask("SolarPanelRoughness", solarPanelRoughness).onSuccess = (task) => (Textures.SOLAR_PANEL_ROUGHNESS = task.texture);
+        manager.addTextureTask("SolarPanelMetallicRoughness", solarPanelMetallicRoughness).onSuccess = (task) => (Textures.SOLAR_PANEL_METALLIC_ROUGHNESS = task.texture);
 
         manager.addTextureTask("SpaceStationAlbedo", spaceStationAlbedo).onSuccess = (task) => (Textures.SPACE_STATION_ALBEDO = task.texture);
         manager.addTextureTask("SpaceStationNormal", spaceStationNormal).onSuccess = (task) => (Textures.SPACE_STATION_NORMAL = task.texture);

@@ -24,6 +24,7 @@ import { PBRMetallicRoughnessMaterial } from "@babylonjs/core/Materials/PBR/pbrM
 import { Textures } from "./textures";
 import { RegisterMaterialPlugin } from "@babylonjs/core/Materials/materialPluginManager";
 import { ClimberRingPluginMaterial } from "../materials/climberRingMaterial";
+import { SolarPanelMaterialPlugin } from "./procedural/solarPanel/solarPanelMaterial";
 
 export class Materials {
     public static BUTTERFLY_MATERIAL: ButterflyMaterial;
@@ -48,6 +49,11 @@ export class Materials {
 
         RegisterMaterialPlugin(ClimberRingPluginMaterial.NAME, (material) => {
             new ClimberRingPluginMaterial(material);
+            return null;
+        });
+
+        RegisterMaterialPlugin(SolarPanelMaterialPlugin.NAME, (material) => {
+            new SolarPanelMaterialPlugin(material);
             return null;
         });
     }
