@@ -1,70 +1,71 @@
-import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Scene } from "@babylonjs/core/scene";
-import { Effect } from "@babylonjs/core/Materials/effect";
-import {
-    setStellarObjectUniforms,
-    StellarObjectUniformNames
-} from "../../../postProcesses/uniforms/stellarObjectUniforms";
-import { Transformable } from "../../../architecture/transformable";
-
-import solarPanelMaterialFragment from "../../../../shaders/solarPanelMaterial/fragment.glsl";
-import solarPanelMaterialVertex from "../../../../shaders/solarPanelMaterial/vertex.glsl";
 import { Textures } from "../../textures";
+import { Material } from "@babylonjs/core/Materials/material";
+import { MaterialPluginBase } from "@babylonjs/core/Materials/materialPluginBase";
+import { MaterialDefines } from "@babylonjs/core/Materials/materialDefines";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import { ShaderLanguage } from "@babylonjs/core/Materials/shaderLanguage";
+import { Nullable } from "@babylonjs/core/types";
+import { PBRMetallicRoughnessMaterial } from "@babylonjs/core/Materials/PBR/pbrMetallicRoughnessMaterial";
 
-const SolarPanelUniformNames = {
-    WORLD: "world",
-    WORLD_VIEW_PROJECTION: "worldViewProjection",
-    CAMERA_POSITION: "cameraPosition"
-};
+export class SolarPanelMaterialPlugin extends MaterialPluginBase {
+    static NAME = "SolarPanelMaterialPlugin";
 
-const SolarPanelSamplerNames = {
-    ALBEDO_MAP: "albedoMap",
-    NORMAL_MAP: "normalMap",
-    METALLIC_MAP: "metallicMap",
-    ROUGHNESS_MAP: "roughnessMap"
-};
-
-export class SolarPanelMaterial extends ShaderMaterial {
-    private stellarObjects: Transformable[] = [];
-
-    constructor(scene: Scene) {
-        const shaderName = "solarPanelMaterial";
-        if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
-            Effect.ShadersStore[`${shaderName}FragmentShader`] = solarPanelMaterialFragment;
-        }
-        if (Effect.ShadersStore[`${shaderName}VertexShader`] === undefined) {
-            Effect.ShadersStore[`${shaderName}VertexShader`] = solarPanelMaterialVertex;
-        }
-
-        super(`SolarPanelMaterial`, scene, shaderName, {
-            attributes: ["position", "normal"],
-            uniforms: [...Object.values(SolarPanelUniformNames), ...Object.values(StellarObjectUniformNames)],
-            samplers: [...Object.values(SolarPanelSamplerNames)]
-        });
-
-        this.onBindObservable.add(() => {
-            const activeCamera = scene.activeCamera;
-            if (activeCamera === null) {
-                throw new Error("No active camera");
-            }
-
-            this.getEffect().setVector3(SolarPanelUniformNames.CAMERA_POSITION, activeCamera.globalPosition);
-
-            this.getEffect().setTexture(SolarPanelSamplerNames.ALBEDO_MAP, Textures.SOLAR_PANEL_ALBEDO);
-            this.getEffect().setTexture(SolarPanelSamplerNames.NORMAL_MAP, Textures.SOLAR_PANEL_NORMAL);
-            this.getEffect().setTexture(SolarPanelSamplerNames.METALLIC_MAP, Textures.SOLAR_PANEL_METALLIC);
-            this.getEffect().setTexture(SolarPanelSamplerNames.ROUGHNESS_MAP, Textures.SOLAR_PANEL_ROUGHNESS);
-
-            setStellarObjectUniforms(this.getEffect(), this.stellarObjects);
-        });
+    constructor(material: Material) {
+        super(material, SolarPanelMaterialPlugin.NAME, 200);
     }
 
-    update(stellarObjects: Transformable[]): void {
-        this.stellarObjects = stellarObjects;
+    setEnabled(enabled: boolean) {
+        this._enable(enabled);
     }
 
-    dispose(forceDisposeEffect?: boolean, forceDisposeTextures?: boolean, notBoundToMesh?: boolean) {
-        super.dispose(forceDisposeEffect, forceDisposeTextures, notBoundToMesh);
-        this.stellarObjects.length = 0;
+    // Also, you should always associate a define with your plugin because the list of defines (and their values)
+    // is what triggers a recompilation of the shader: a shader is recompiled only if a value of a define changes.
+    prepareDefines(defines: MaterialDefines, scene: Scene, mesh: AbstractMesh) {
+        super.prepareDefines(defines, scene, mesh);
+    }
+
+    getClassName() {
+        return "SolarPanelMaterialPlugin";
+    }
+
+    // This is used to inform the system which language is supported
+    isCompatible(shaderLanguage: ShaderLanguage): boolean {
+        switch (shaderLanguage) {
+            case ShaderLanguage.GLSL:
+            case ShaderLanguage.WGSL:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    getCustomCode(shaderType: string, shaderLanguage?: ShaderLanguage): Nullable<{ [p: string]: string }> {
+        if (shaderType === "fragment") {
+            return {
+                CUSTOM_FRAGMENT_MAIN_BEGIN: `
+                    vec2 vAlbedoUV = fract(vPositionUVW.xz * 0.01);
+                `
+            };
+        }
+
+        // for other shader types we're not doing anything, return null
+        return null;
+    }
+}
+
+export class SolarPanelMaterial extends PBRMetallicRoughnessMaterial {
+    constructor(name: string, scene: Scene) {
+        super(name, scene);
+
+        this.baseTexture = Textures.SOLAR_PANEL_ALBEDO;
+        this.normalTexture = Textures.SOLAR_PANEL_NORMAL;
+        this.metallicRoughnessTexture = Textures.SOLAR_PANEL_METALLIC_ROUGHNESS;
+
+        const plugin = this.pluginManager?.getPlugin(SolarPanelMaterialPlugin.NAME);
+        if (plugin === null) {
+            throw new Error("Plugin not found");
+        }
+        (plugin as SolarPanelMaterialPlugin).setEnabled(true);
     }
 }

@@ -23,7 +23,7 @@ export class SpaceElevatorClimber implements Targetable {
     constructor(scene: Scene) {
         this.transform = new TransformNode("SpaceElevatorClimber", scene);
 
-        this.solarPanelMaterial = new SolarPanelMaterial(scene);
+        this.solarPanelMaterial = new SolarPanelMaterial("SpaceElevatorClimberSolarPanelMaterial", scene);
         this.metalSectionMaterial = new MetalSectionMaterial(scene);
 
         const angleSubtracted = Math.PI / 6;
@@ -132,7 +132,6 @@ export class SpaceElevatorClimber implements Targetable {
     }
 
     update(stellarObjects: Transformable[]) {
-        this.solarPanelMaterial.update(stellarObjects);
         this.metalSectionMaterial.update(stellarObjects);
     }
 
