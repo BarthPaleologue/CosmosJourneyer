@@ -135,7 +135,9 @@ CustomSystemRegistry.RegisterSystem(starSystemModel);
 
 const starSystem = await starSystemView.loadStarSystem(starSystemModel);
 
-engine.init(true);
+engine.init(true).then(()=>{
+    console.log("Engine initialized");
+}).catch(console.error);
 
 const planets = starSystem.getPlanets();
 
