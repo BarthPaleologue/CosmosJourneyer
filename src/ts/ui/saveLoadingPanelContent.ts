@@ -277,7 +277,7 @@ export class SaveLoadingPanelContent {
 
         const shareButton = document.createElement("button");
         shareButton.classList.add("icon", "large");
-        shareButton.addEventListener("click", async() => {
+        shareButton.addEventListener("click", async () => {
             Sounds.MENU_SELECT_SOUND.play();
             const url = createUrlFromSave(save);
             await navigator.clipboard.writeText(url.toString()).then(() => {
