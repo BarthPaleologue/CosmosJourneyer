@@ -30,6 +30,8 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { getRngFromSeed } from "../../../utils/getRngFromSeed";
 import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
+import { Material } from "@babylonjs/core/Materials/material";
+import { Materials } from "../../materials";
 
 export class UtilitySection implements Transformable {
     private readonly attachment: Mesh;
@@ -38,13 +40,13 @@ export class UtilitySection implements Transformable {
 
     private attachmentAggregate: PhysicsAggregate | null = null;
 
-    private readonly metalSectionMaterial: MetalSectionMaterial;
+    private readonly metalSectionMaterial: Material;
 
     private readonly tanks: AbstractMesh[] = [];
     private readonly tankBodies: PhysicsBody[] = [];
 
     constructor(seed: number, scene: Scene) {
-        this.metalSectionMaterial = new MetalSectionMaterial("UtilitySectionMetalMaterial", scene);
+        this.metalSectionMaterial = Materials.CRATE_MATERIAL; //new MetalSectionMaterial("UtilitySectionMetalMaterial", scene);
 
         this.rng = getRngFromSeed(seed);
 

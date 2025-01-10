@@ -45,6 +45,8 @@ import { clamp, remap, triangleWave } from "../utils/math";
 import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
 import { setRotationQuaternion } from "../uberCore/transforms/basicTransform";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
+import { Material } from "@babylonjs/core/Materials/material";
+import { Materials } from "../assets/materials";
 
 export class SpaceElevator implements OrbitalFacility {
     readonly name: string;
@@ -60,7 +62,7 @@ export class SpaceElevator implements OrbitalFacility {
 
     private readonly tether: Mesh;
     private readonly tetherLength: number;
-    private readonly tetherMaterial: MetalSectionMaterial;
+    private readonly tetherMaterial: Material;
 
     private readonly climber: SpaceElevatorClimber;
 
@@ -96,7 +98,7 @@ export class SpaceElevator implements OrbitalFacility {
         );
         this.tether.convertToFlatShadedMesh();
 
-        this.tetherMaterial = new MetalSectionMaterial("TetherMaterial", scene);
+        this.tetherMaterial = Materials.CRATE_MATERIAL; //new MetalSectionMaterial("TetherMaterial", scene);
         this.tether.material = this.tetherMaterial;
 
         this.climber = new SpaceElevatorClimber(scene);

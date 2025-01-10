@@ -13,13 +13,15 @@ import { CollisionMask } from "../../../settings";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { createEnvironmentAggregate } from "../../../utils/havok";
+import { Material } from "@babylonjs/core/Materials/material";
+import { Materials } from "../../materials";
 
 export class EngineBay implements Transformable {
     private readonly root: TransformNode;
 
     private readonly skirt: Mesh;
     private skirtAggregate: PhysicsAggregate | null = null;
-    private readonly skirtMaterial: MetalSectionMaterial;
+    private readonly skirtMaterial: Material;
 
     private readonly engines: AbstractMesh[] = [];
     private readonly engineBodies: PhysicsBody[] = [];
@@ -45,7 +47,7 @@ export class EngineBay implements Transformable {
         );
         this.skirt.convertToFlatShadedMesh();
 
-        this.skirtMaterial = new MetalSectionMaterial("EngineBayMetalSectionMaterial", scene);
+        this.skirtMaterial = Materials.CRATE_MATERIAL; //new MetalSectionMaterial("EngineBayMetalSectionMaterial", scene);
 
         this.skirt.material = this.skirtMaterial;
         this.skirt.parent = this.root;

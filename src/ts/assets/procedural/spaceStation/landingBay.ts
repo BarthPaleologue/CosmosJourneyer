@@ -34,6 +34,8 @@ import { getRngFromSeed } from "../../../utils/getRngFromSeed";
 import { createEnvironmentAggregate } from "../../../utils/havok";
 import { getRotationPeriodForArtificialGravity } from "../../../utils/physics";
 import { OrbitalFacilityModel } from "../../../spacestation/orbitalFacility";
+import { Material } from "@babylonjs/core/Materials/material";
+import { Materials } from "../../materials";
 
 export class LandingBay {
     private readonly root: TransformNode;
@@ -43,7 +45,7 @@ export class LandingBay {
     private readonly radius: number;
 
     private readonly landingBayMaterial: LandingBayMaterial;
-    private readonly metalSectionMaterial: MetalSectionMaterial;
+    private readonly metalSectionMaterial: Material;
 
     private readonly ring: Mesh;
     private ringAggregate: PhysicsAggregate | null = null;
@@ -62,7 +64,7 @@ export class LandingBay {
 
         const deltaRadius = this.radius / 3;
 
-        this.metalSectionMaterial = new MetalSectionMaterial("LandingBayMetalSectionMaterial", scene);
+        this.metalSectionMaterial = Materials.CRATE_MATERIAL; //new MetalSectionMaterial("LandingBayMetalSectionMaterial", scene);
 
         const heightFactor = 2 + Math.floor(this.rng(0) * 3);
 
