@@ -22,10 +22,6 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { PBRMetallicRoughnessMaterial } from "@babylonjs/core/Materials/PBR/pbrMetallicRoughnessMaterial";
 import { Textures } from "./textures";
-import { RegisterMaterialPlugin } from "@babylonjs/core/Materials/materialPluginManager";
-import { ClimberRingPluginMaterial } from "../materials/climberRingMaterial";
-import { SolarPanelMaterialPlugin } from "./procedural/solarPanel/solarPanelMaterial";
-import { MetalSectionMaterialPlugin } from "./procedural/spaceStation/metalSectionMaterial";
 
 export class Materials {
     public static BUTTERFLY_MATERIAL: ButterflyMaterial;
@@ -47,21 +43,6 @@ export class Materials {
         Materials.CRATE_MATERIAL.baseTexture = Textures.CRATE_ALBEDO;
         Materials.CRATE_MATERIAL.normalTexture = Textures.CRATE_NORMAL;
         Materials.CRATE_MATERIAL.metallicRoughnessTexture = Textures.CRATE_METALLIC_ROUGHNESS;
-
-        RegisterMaterialPlugin(ClimberRingPluginMaterial.NAME, (material) => {
-            new ClimberRingPluginMaterial(material);
-            return null;
-        });
-
-        RegisterMaterialPlugin(SolarPanelMaterialPlugin.NAME, (material) => {
-            new SolarPanelMaterialPlugin(material);
-            return null;
-        });
-
-        RegisterMaterialPlugin(MetalSectionMaterialPlugin.NAME, (material) => {
-            new MetalSectionMaterialPlugin(material);
-            return null;
-        });
     }
 
     static DebugMaterial(name: string, diffuse: boolean, wireframe: boolean, scene: Scene) {

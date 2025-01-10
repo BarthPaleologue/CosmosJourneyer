@@ -29,6 +29,8 @@ import { Scene } from "@babylonjs/core/scene";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { getRngFromSeed } from "../../../utils/getRngFromSeed";
 import { createEnvironmentAggregate } from "../../../utils/havok";
+import { Material } from "@babylonjs/core/Materials/material";
+import { Materials } from "../../materials";
 
 export class SolarSection implements Transformable {
     private readonly attachment: Mesh;
@@ -42,8 +44,8 @@ export class SolarSection implements Transformable {
     private readonly solarPanels: AbstractMesh[] = [];
     private readonly solarPanelAggregates: PhysicsAggregate[] = [];
 
-    private readonly metalSectionMaterial: MetalSectionMaterial;
-    private readonly solarPanelMaterial: SolarPanelMaterial;
+    private readonly metalSectionMaterial: Material;
+    private readonly solarPanelMaterial: Material;
 
     constructor(requiredSurface: number, seed: number, scene: Scene) {
         this.rng = getRngFromSeed(seed);
@@ -84,10 +86,10 @@ export class SolarSection implements Transformable {
         );
         this.attachment.convertToFlatShadedMesh();
 
-        this.metalSectionMaterial = new MetalSectionMaterial("SolarSectionMetalMaterial", scene);
+        this.metalSectionMaterial = Materials.CRATE_MATERIAL; //new MetalSectionMaterial("SolarSectionMetalMaterial", scene);
         this.attachment.material = this.metalSectionMaterial;
 
-        this.solarPanelMaterial = new SolarPanelMaterial("SolarSectionPanelMaterial", scene);
+        this.solarPanelMaterial = new SolarPanelMaterial(scene);
 
         const hexagonOffset = attachmentThickness * (1 - Math.sqrt(3) / 2);
 

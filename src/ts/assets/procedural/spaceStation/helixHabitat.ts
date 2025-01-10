@@ -31,6 +31,8 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import { getRngFromSeed } from "../../../utils/getRngFromSeed";
 import { createEnvironmentAggregate } from "../../../utils/havok";
 import { getRotationPeriodForArtificialGravity } from "../../../utils/physics";
+import { Material } from "@babylonjs/core/Materials/material";
+import { Materials } from "../../materials";
 
 export class HelixHabitat implements Transformable {
     private readonly root: TransformNode;
@@ -49,7 +51,7 @@ export class HelixHabitat implements Transformable {
     private helix2Aggregate: PhysicsAggregate | null = null;
 
     private readonly helixMaterial: HelixHabitatMaterial;
-    private readonly metalSectionMaterial: MetalSectionMaterial;
+    private readonly metalSectionMaterial: Material;
 
     private readonly arms: Mesh[] = [];
     private readonly armAggregates: PhysicsAggregate[] = [];
@@ -78,7 +80,7 @@ export class HelixHabitat implements Transformable {
 
         const attachmentNbSides = 6 + 2 * Math.floor(this.rng(4) * 2);
 
-        this.metalSectionMaterial = new MetalSectionMaterial("HelixHabitatMetalSectionMaterial", scene);
+        this.metalSectionMaterial = Materials.CRATE_MATERIAL; //new MetalSectionMaterial("HelixHabitatMetalSectionMaterial", scene);
 
         this.attachment = MeshBuilder.CreateCylinder(
             "HelixHabitatAttachment",

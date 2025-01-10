@@ -23,7 +23,6 @@ import { RingHabitatMaterial } from "./ringHabitatMaterial";
 import { Transformable } from "../../../architecture/transformable";
 import { Settings } from "../../../settings";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { MetalSectionMaterial } from "./metalSectionMaterial";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { createRing } from "../../../utils/geometry/ringBuilder";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
@@ -32,6 +31,8 @@ import { getRngFromSeed } from "../../../utils/getRngFromSeed";
 import { createEnvironmentAggregate } from "../../../utils/havok";
 import { getRotationPeriodForArtificialGravity } from "../../../utils/physics";
 import { OrbitalFacilityModel } from "../../../architecture/orbitalObjectModel";
+import { Material } from "@babylonjs/core/Materials/material";
+import { Materials } from "../../materials";
 
 export class RingHabitat implements Transformable {
     private readonly root: TransformNode;
@@ -41,7 +42,7 @@ export class RingHabitat implements Transformable {
     private readonly radius: number;
 
     private readonly ringMaterial: RingHabitatMaterial;
-    private readonly metalSectionMaterial: MetalSectionMaterial;
+    private readonly metalSectionMaterial: Material;
 
     private readonly ring: Mesh;
     private ringAggregate: PhysicsAggregate | null = null;
@@ -72,7 +73,7 @@ export class RingHabitat implements Transformable {
 
         const attachmentNbSides = 4 + 2 * Math.floor(this.rng(1) * 2);
 
-        this.metalSectionMaterial = new MetalSectionMaterial("RingHabitatMetalSectionMaterial", scene);
+        this.metalSectionMaterial = Materials.CRATE_MATERIAL; //new MetalSectionMaterial("RingHabitatMetalSectionMaterial", scene);
 
         this.habitableSurface = height * (2 * Math.PI * (this.radius + deltaRadius / 2));
 
