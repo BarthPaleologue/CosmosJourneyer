@@ -133,8 +133,8 @@ export class CosmosJourneyer {
         });
 
         this.encyclopaedia = encyclopaedia;
-        this.player.discoveries.uploaded.forEach((discovery) => {
-            this.encyclopaedia.contributeDiscoveryIfNew(discovery);
+        this.player.discoveries.uploaded.forEach(async (discovery) => {
+            await this.encyclopaedia.contributeDiscoveryIfNew(discovery);
         });
 
         this.starSystemView = starSystemView;
@@ -234,13 +234,13 @@ export class CosmosJourneyer {
         this.pauseMenu.onResume.add(() => this.resume());
         this.pauseMenu.onScreenshot.add(() => this.takeScreenshot());
         this.pauseMenu.onShare.add(() => {
-            this.engine.onEndFrameObservable.addOnce(() => {
+            this.engine.onEndFrameObservable.addOnce(async () => {
                 const saveData = this.generateSaveData();
 
                 const urlRoot = window.location.href.split("?")[0];
                 const urlData = encodeBase64(JSON.stringify(saveData.universeCoordinates));
                 const url = new URL(`${urlRoot}?universeCoordinates=${urlData}`);
-                navigator.clipboard.writeText(url.toString()).then(() => {
+                await navigator.clipboard.writeText(url.toString()).then(() => {
                     createNotification(NotificationOrigin.GENERAL, NotificationIntent.INFO, i18n.t("notifications:copiedToClipboard"), 2000);
                 });
             });
@@ -278,9 +278,9 @@ export class CosmosJourneyer {
             this.takeScreenshot();
         });
 
-        GeneralInputs.map.videoCapture.on("complete", () => {
+        GeneralInputs.map.videoCapture.on("complete", async () => {
             if (this.mainMenu?.isVisible()) return;
-            this.takeVideoCapture();
+            await this.takeVideoCapture();
         });
 
         GeneralInputs.map.togglePause.on("complete", () => {
@@ -443,7 +443,7 @@ export class CosmosJourneyer {
         Tools.CreateScreenshot(this.engine, camera, { precision: 1 });
     }
 
-    public takeVideoCapture(): void {
+    public async takeVideoCapture(): Promise<void> {
         if (!VideoRecorder.IsSupported(this.engine)) {
             console.warn("Your browser does not support video recording!");
             return;
@@ -460,7 +460,7 @@ export class CosmosJourneyer {
         if (this.videoRecorder.isRecording) {
             this.videoRecorder.stopRecording();
         } else {
-            this.videoRecorder.startRecording("planetEngine.webm", Number(prompt("Enter video duration in seconds", "10"))).then();
+            await this.videoRecorder.startRecording("planetEngine.webm", Number(prompt("Enter video duration in seconds", "10"))).then();
         }
     }
 
@@ -618,8 +618,8 @@ export class CosmosJourneyer {
 
         const newPlayer = saveData.player !== undefined ? Player.Deserialize(saveData.player) : Player.Default();
         this.player.copyFrom(newPlayer);
-        this.player.discoveries.uploaded.forEach((discovery) => {
-            this.encyclopaedia.contributeDiscoveryIfNew(discovery);
+        this.player.discoveries.uploaded.forEach(async (discovery) => {
+            await this.encyclopaedia.contributeDiscoveryIfNew(discovery);
         });
         this.starSystemView.resetPlayer();
 

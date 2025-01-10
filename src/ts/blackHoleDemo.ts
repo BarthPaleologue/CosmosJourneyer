@@ -64,9 +64,7 @@ CustomSystemRegistry.RegisterSystem(starSystemModel);
 
 const starSystem = await starSystemView.loadStarSystem(starSystemModel);
 
-engine.init(true).then(()=>{
-    console.log("Engine initialized");
-}).catch(console.error);
+await engine.init(true);
 
 await starSystemView.switchToDefaultControls(true);
 
