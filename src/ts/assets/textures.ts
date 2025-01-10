@@ -55,6 +55,7 @@ import solarPanelMetallicRoughness from "../../asset/SolarPanelMaterial/metallic
 
 import spaceStationAlbedo from "../../asset/spaceStationMaterial/spaceship-panels1-albedo.webp";
 import spaceStationNormal from "../../asset/spaceStationMaterial/spaceship-panels1-normal-dx.webp";
+import spaceStationMetallicRoughness from "../../asset/spaceStationMaterial/metallicRoughness.webp";
 import spaceStationMetallic from "../../asset/spaceStationMaterial/spaceship-panels1-metallic.webp";
 import spaceStationRoughness from "../../asset/spaceStationMaterial/spaceship-panels1-roughness.webp";
 import spaceStationAmbientOcclusion from "../../asset/spaceStationMaterial/spaceship-panels1-ao.webp";
@@ -109,6 +110,7 @@ export class Textures {
 
     static SPACE_STATION_ALBEDO: Texture;
     static SPACE_STATION_NORMAL: Texture;
+    static SPACE_STATION_METALLIC_ROUGHNESS: Texture;
     static SPACE_STATION_METALLIC: Texture;
     static SPACE_STATION_ROUGHNESS: Texture;
     static SPACE_STATION_AMBIENT_OCCLUSION: Texture;
@@ -158,6 +160,7 @@ export class Textures {
 
         manager.addTextureTask("SpaceStationAlbedo", spaceStationAlbedo).onSuccess = (task) => (Textures.SPACE_STATION_ALBEDO = task.texture);
         manager.addTextureTask("SpaceStationNormal", spaceStationNormal).onSuccess = (task) => (Textures.SPACE_STATION_NORMAL = task.texture);
+        manager.addTextureTask("SpaceStationMetallicRoughness", spaceStationMetallicRoughness).onSuccess = (task) => (Textures.SPACE_STATION_METALLIC_ROUGHNESS = task.texture);
         manager.addTextureTask("SpaceStationMetallic", spaceStationMetallic).onSuccess = (task) => (Textures.SPACE_STATION_METALLIC = task.texture);
         manager.addTextureTask("SpaceStationRoughness", spaceStationRoughness).onSuccess = (task) => (Textures.SPACE_STATION_ROUGHNESS = task.texture);
         manager.addTextureTask("SpaceStationAmbientOcclusion", spaceStationAmbientOcclusion).onSuccess = (task) => (Textures.SPACE_STATION_AMBIENT_OCCLUSION = task.texture);
