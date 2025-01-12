@@ -37,14 +37,13 @@ import { getOrbitalObjectTypeToI18nString } from "../utils/strings/orbitalObject
 import { OrbitalFacilityBase } from "./orbitalFacility";
 import { SpaceElevatorModel } from "./spaceElevatorModel";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { MetalSectionMaterial } from "../assets/procedural/spaceStation/metalSectionMaterial";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { SpaceElevatorClimber } from "./spaceElevatorClimber";
 import { clamp, remap, triangleWave } from "../utils/math";
 import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
 import { setUpVector } from "../uberCore/transforms/basicTransform";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
-import { Material } from "@babylonjs/core/Materials/material";
-import { Materials } from "../assets/materials";
 
 export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPACE_ELEVATOR> {
     readonly name: string;
@@ -62,7 +61,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
 
     private readonly tether: Mesh;
     private readonly tetherLength: number;
-    private readonly tetherMaterial: Material;
+    private readonly tetherMaterial: MetalSectionMaterial;
 
     private readonly climber: SpaceElevatorClimber;
 
@@ -102,7 +101,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
         );
         this.tether.convertToFlatShadedMesh();
 
-        this.tetherMaterial = Materials.CRATE_MATERIAL; //new MetalSectionMaterial("TetherMaterial", scene);
+        this.tetherMaterial = new MetalSectionMaterial("TetherMaterial", scene);
         this.tether.material = this.tetherMaterial;
 
         this.climber = new SpaceElevatorClimber(scene);
@@ -304,8 +303,6 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
 
         this.elapsedSeconds += deltaSeconds;
 
-        this.solarSections.forEach((solarSection) => solarSection.update(cameraWorldPosition));
-        this.utilitySections.forEach((utilitySection) => utilitySection.update(cameraWorldPosition));
         this.helixHabitats.forEach((helixHabitat) =>
             helixHabitat.update(stellarObjects, cameraWorldPosition, deltaSeconds)
         );

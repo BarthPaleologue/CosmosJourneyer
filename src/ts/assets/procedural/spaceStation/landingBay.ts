@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { MetalSectionMaterial } from "./metalSectionMaterial";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -32,8 +33,6 @@ import { getRngFromSeed } from "../../../utils/getRngFromSeed";
 import { createEnvironmentAggregate } from "../../../utils/havok";
 import { getRotationPeriodForArtificialGravity } from "../../../utils/physics";
 import { OrbitalFacilityModel } from "../../../architecture/orbitalObjectModel";
-import { Material } from "@babylonjs/core/Materials/material";
-import { Materials } from "../../materials";
 
 export class LandingBay {
     private readonly root: TransformNode;
@@ -43,7 +42,7 @@ export class LandingBay {
     private readonly radius: number;
 
     private readonly landingBayMaterial: LandingBayMaterial;
-    private readonly metalSectionMaterial: Material;
+    private readonly metalSectionMaterial: MetalSectionMaterial;
 
     private readonly ring: Mesh;
     private ringAggregate: PhysicsAggregate | null = null;
@@ -62,7 +61,7 @@ export class LandingBay {
 
         const deltaRadius = this.radius / 3;
 
-        this.metalSectionMaterial = Materials.CRATE_MATERIAL; //new MetalSectionMaterial("LandingBayMetalSectionMaterial", scene);
+        this.metalSectionMaterial = new MetalSectionMaterial("LandingBayMetalSectionMaterial", scene);
 
         const heightFactor = 2 + Math.floor(this.rng(0) * 3);
 

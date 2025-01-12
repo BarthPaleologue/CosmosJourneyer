@@ -30,7 +30,6 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import { getRngFromSeed } from "../../../utils/getRngFromSeed";
 import { createEnvironmentAggregate } from "../../../utils/havok";
 import { Material } from "@babylonjs/core/Materials/material";
-import { Materials } from "../../materials";
 
 export class SolarSection implements Transformable {
     private readonly attachment: Mesh;
@@ -86,7 +85,7 @@ export class SolarSection implements Transformable {
         );
         this.attachment.convertToFlatShadedMesh();
 
-        this.metalSectionMaterial = Materials.CRATE_MATERIAL; //new MetalSectionMaterial("SolarSectionMetalMaterial", scene);
+        this.metalSectionMaterial = new MetalSectionMaterial("SolarSectionMetalMaterial", scene);
         this.attachment.material = this.metalSectionMaterial;
 
         this.solarPanelMaterial = new SolarPanelMaterial(scene);
