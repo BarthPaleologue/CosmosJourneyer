@@ -4,10 +4,10 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { SolarPanelMaterial } from "../assets/procedural/solarPanel/solarPanelMaterial";
-import { ClimberRingMaterial } from "../materials/climberRingMaterial";
 import i18n from "../i18n";
 import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
 import { Material } from "@babylonjs/core/Materials/material";
+import { MetalSectionMaterial } from "../assets/procedural/spaceStation/metalSectionMaterial";
 
 export class SpaceElevatorClimber implements Targetable {
     private readonly transform: TransformNode;
@@ -23,7 +23,7 @@ export class SpaceElevatorClimber implements Targetable {
         this.transform = new TransformNode("SpaceElevatorClimber", scene);
 
         this.solarPanelMaterial = new SolarPanelMaterial(scene);
-        this.metalSectionMaterial = this.solarPanelMaterial; //new MetalSectionMaterial("SpaceElevatorClimberMetalSectionMaterial", scene);
+        this.metalSectionMaterial = new MetalSectionMaterial("SpaceElevatorClimberMetalSectionMaterial", scene);
 
         const angleSubtracted = Math.PI / 6;
         const minAngle = -Math.PI / 2 + angleSubtracted / 2;

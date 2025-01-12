@@ -47,7 +47,7 @@ export class EngineBay implements Transformable {
         );
         this.skirt.convertToFlatShadedMesh();
 
-        this.skirtMaterial = Materials.CRATE_MATERIAL; //new MetalSectionMaterial("EngineBayMetalSectionMaterial", scene);
+        this.skirtMaterial = new MetalSectionMaterial("EngineBayMetalSectionMaterial", scene);
 
         this.skirt.material = this.skirtMaterial;
         this.skirt.parent = this.root;
