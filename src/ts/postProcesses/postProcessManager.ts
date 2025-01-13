@@ -255,7 +255,7 @@ export class PostProcessManager {
      * @param blackHole A black hole
      */
     public addBlackHole(blackHole: BlackHole) {
-        const blackHolePostProcess = new BlackHolePostProcess(blackHole.getTransform(), blackHole.model, this.scene);
+        const blackHolePostProcess = new BlackHolePostProcess(blackHole.getTransform(), blackHole.blackHoleUniforms, this.scene);
         this.blackHoles.push(blackHolePostProcess);
 
         this.celestialBodyToPostProcesses.set(blackHole, [blackHolePostProcess]);

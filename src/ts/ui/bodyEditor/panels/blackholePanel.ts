@@ -15,9 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { BlackHoleUniforms } from "../../../stellarObjects/blackHole/blackHoleUniforms";
 import { EditorPanel } from "../editorPanel";
 import { Slider } from "handle-sliderjs";
-import { BlackHoleUniforms } from "../../../stellarObjects/blackHole/blackHolePostProcess";
 
 export class BlackholePanel extends EditorPanel {
     constructor() {

@@ -39,7 +39,6 @@ import { Scene } from "@babylonjs/core/scene";
 import { AtmosphericScatteringPostProcess } from "../../postProcesses/atmosphericScatteringPostProcess";
 import { OceanPostProcess } from "../../postProcesses/oceanPostProcess";
 import { VolumetricLight } from "../../postProcesses/volumetricLight";
-import { BlackHolePostProcess } from "../../stellarObjects/blackHole/blackHolePostProcess";
 
 export const enum EditorVisibility {
     HIDDEN,
@@ -221,12 +220,9 @@ export class BodyEditor {
                 this.starPanel.init(volumetricLight);
             }
         } else if (body instanceof BlackHole) {
-            const blackHole = postProcesses.find((pp) => pp instanceof BlackHolePostProcess);
-            if (blackHole !== undefined) {
-                this.blackHolePanel.enable();
-                this.blackHolePanel.setVisibility(this.currentPanel === this.blackHolePanel);
-                this.blackHolePanel.init(blackHole.blackHoleUniforms);
-            }
+            this.blackHolePanel.enable();
+            this.blackHolePanel.setVisibility(this.currentPanel === this.blackHolePanel);
+            this.blackHolePanel.init(body.blackHoleUniforms);
         }
 
         if (this.currentPanel !== null) {
