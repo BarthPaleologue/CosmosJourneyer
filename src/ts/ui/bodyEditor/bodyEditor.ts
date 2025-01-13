@@ -39,6 +39,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { AtmosphericScatteringPostProcess } from "../../postProcesses/atmosphericScatteringPostProcess";
 import { OceanPostProcess } from "../../postProcesses/oceanPostProcess";
 import { VolumetricLight } from "../../postProcesses/volumetricLight";
+import { TelluricPlanetMaterial } from "../../planets/telluricPlanet/telluricPlanetMaterial";
 
 export const enum EditorVisibility {
     HIDDEN,
@@ -185,7 +186,7 @@ export class BodyEditor {
             }
 
             if (body instanceof TelluricPlanet) {
-                this.initToolbar(body);
+                this.initToolbar(body.material);
 
                 this.surfacePanel.enable();
                 this.surfacePanel.setVisibility(this.currentPanel === this.surfacePanel);
@@ -232,22 +233,21 @@ export class BodyEditor {
         }
     }
 
-    public initToolbar(planet: TelluricPlanet) {
-        const material = planet.material;
+    public initToolbar(planetMaterial: TelluricPlanetMaterial) {
         document.getElementById("defaultMapButton")?.addEventListener("click", () => {
-            material.setColorMode(ColorMode.DEFAULT);
+            planetMaterial.setColorMode(ColorMode.DEFAULT);
         });
         document.getElementById("moistureMapButton")?.addEventListener("click", () => {
-            material.setColorMode(material.getColorMode() !== ColorMode.MOISTURE ? ColorMode.MOISTURE : ColorMode.DEFAULT);
+            planetMaterial.setColorMode(planetMaterial.getColorMode() !== ColorMode.MOISTURE ? ColorMode.MOISTURE : ColorMode.DEFAULT);
         });
         document.getElementById("temperatureMapButton")?.addEventListener("click", () => {
-            material.setColorMode(material.getColorMode() !== ColorMode.TEMPERATURE ? ColorMode.TEMPERATURE : ColorMode.DEFAULT);
+            planetMaterial.setColorMode(planetMaterial.getColorMode() !== ColorMode.TEMPERATURE ? ColorMode.TEMPERATURE : ColorMode.DEFAULT);
         });
         document.getElementById("normalMapButton")?.addEventListener("click", () => {
-            material.setColorMode(material.getColorMode() !== ColorMode.NORMAL ? ColorMode.NORMAL : ColorMode.DEFAULT);
+            planetMaterial.setColorMode(planetMaterial.getColorMode() !== ColorMode.NORMAL ? ColorMode.NORMAL : ColorMode.DEFAULT);
         });
         document.getElementById("heightMapButton")?.addEventListener("click", () => {
-            material.setColorMode(material.getColorMode() !== ColorMode.HEIGHT ? ColorMode.HEIGHT : ColorMode.DEFAULT);
+            planetMaterial.setColorMode(planetMaterial.getColorMode() !== ColorMode.HEIGHT ? ColorMode.HEIGHT : ColorMode.DEFAULT);
         });
     }
 
