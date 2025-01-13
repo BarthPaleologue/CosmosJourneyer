@@ -16,9 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import mandelbulbFragment from "../../../shaders/mandelbulb.glsl";
-import { ObjectPostProcess, UpdatablePostProcess } from "../../postProcesses/objectPostProcess";
+import { UpdatablePostProcess } from "../../postProcesses/updatablePostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { Mandelbulb } from "./mandelbulb";
 import { StellarObject } from "../../architecture/stellarObject";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Camera } from "@babylonjs/core/Cameras/camera";
@@ -29,20 +28,21 @@ import { SamplerUniformNames, setSamplerUniforms } from "../../postProcesses/uni
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { Scene } from "@babylonjs/core/scene";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { MandelbulbModel } from "./mandelbulbModel";
 
 export interface MandelbulbSettings {
     rotationPeriod: number;
 }
 
-export class MandelbulbPostProcess extends PostProcess implements ObjectPostProcess, UpdatablePostProcess {
+export class MandelbulbPostProcess extends PostProcess implements UpdatablePostProcess {
     readonly settings: MandelbulbSettings;
-    readonly object: Mandelbulb;
 
     private elapsedSeconds = 0;
 
     private activeCamera: Camera | null = null;
 
-    constructor(mandelbulb: Mandelbulb, scene: Scene, stellarObjects: StellarObject[]) {
+    constructor(transform: TransformNode, boundingRadius: number, mandelbulbModel: MandelbulbModel, scene: Scene, stellarObjects: StellarObject[]) {
         const shaderName = "mandelbulb";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = mandelbulbFragment;
@@ -67,9 +67,8 @@ export class MandelbulbPostProcess extends PostProcess implements ObjectPostProc
 
         const samplers: string[] = Object.values(SamplerUniformNames);
 
-        super(mandelbulb.model.name, shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
+        super(transform.name, shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
 
-        this.object = mandelbulb;
         this.settings = settings;
 
         this.onActivateObservable.add((camera) => {
@@ -83,10 +82,10 @@ export class MandelbulbPostProcess extends PostProcess implements ObjectPostProc
 
             setCameraUniforms(effect, this.activeCamera);
             setStellarObjectUniforms(effect, stellarObjects);
-            setObjectUniforms(effect, mandelbulb);
+            setObjectUniforms(effect, transform, boundingRadius);
 
-            effect.setFloat(MandelbulbUniformNames.POWER, mandelbulb.model.power);
-            effect.setColor3(MandelbulbUniformNames.ACCENT_COLOR, mandelbulb.model.accentColor);
+            effect.setFloat(MandelbulbUniformNames.POWER, mandelbulbModel.power);
+            effect.setColor3(MandelbulbUniformNames.ACCENT_COLOR, mandelbulbModel.accentColor);
             effect.setFloat(MandelbulbUniformNames.ELAPSED_SECONDS, this.elapsedSeconds);
 
             setSamplerUniforms(effect, this.activeCamera, scene);

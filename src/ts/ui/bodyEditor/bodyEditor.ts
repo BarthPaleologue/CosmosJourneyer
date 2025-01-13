@@ -36,6 +36,12 @@ import { Star } from "../../stellarObjects/star/star";
 import { BlackHole } from "../../stellarObjects/blackHole/blackHole";
 import { CelestialBody } from "../../architecture/celestialBody";
 import { Scene } from "@babylonjs/core/scene";
+import { AtmosphericScatteringPostProcess } from "../../postProcesses/atmosphericScatteringPostProcess";
+import { FlatCloudsPostProcess } from "../../clouds/flatCloudsPostProcess";
+import { OceanPostProcess } from "../../postProcesses/oceanPostProcess";
+import { VolumetricLight } from "../../postProcesses/volumetricLight";
+import { BlackHolePostProcess } from "../../stellarObjects/blackHole/blackHolePostProcess";
+import { RingsPostProcess } from "../../rings/ringsPostProcess";
 
 export const enum EditorVisibility {
     HIDDEN,
@@ -165,16 +171,18 @@ export class BodyEditor {
         this.generalPanel.setVisibility(this.currentPanel === this.generalPanel);
         this.generalPanel.init(body, postProcessManager.colorCorrection, postProcessManager.bloomRenderEffect, scene);
 
-        const rings = postProcessManager.getRings(body);
-        if (rings) {
+        const postProcesses = postProcessManager.celestialBodyToPostProcesses.get(body) ?? [];
+
+        const rings = postProcesses.find((pp) => pp instanceof RingsPostProcess);
+        if (rings !== undefined) {
             this.ringsPanel.enable();
             this.ringsPanel.setVisibility(this.currentPanel === this.ringsPanel);
             this.ringsPanel.init(body, rings);
         }
 
         if (body instanceof TelluricPlanet || body instanceof GasPlanet) {
-            const atmosphere = postProcessManager.getAtmosphere(body as TelluricPlanet);
-            if (atmosphere) {
+            const atmosphere = postProcesses.find((pp) => pp instanceof AtmosphericScatteringPostProcess);
+            if (atmosphere !== undefined) {
                 this.atmospherePanel.enable();
                 this.atmospherePanel.setVisibility(this.currentPanel === this.atmospherePanel);
                 this.atmospherePanel.init(body, atmosphere);
@@ -191,15 +199,15 @@ export class BodyEditor {
                 this.physicPanel.setVisibility(this.currentPanel === this.physicPanel);
                 this.physicPanel.init(body);
 
-                const clouds = postProcessManager.getClouds(body as TelluricPlanet);
-                if (clouds) {
+                const clouds = postProcesses.find((pp) => pp instanceof FlatCloudsPostProcess);
+                if (clouds !== undefined) {
                     this.cloudsPanel.enable();
                     this.cloudsPanel.setVisibility(this.currentPanel === this.cloudsPanel);
                     this.cloudsPanel.init(body, clouds);
                 }
 
-                const ocean = postProcessManager.getOcean(body as TelluricPlanet);
-                if (ocean) {
+                const ocean = postProcesses.find((pp) => pp instanceof OceanPostProcess);
+                if (ocean !== undefined) {
                     this.oceanPanel.enable();
                     this.oceanPanel.setVisibility(this.currentPanel === this.oceanPanel);
                     this.oceanPanel.init(body, ocean);
@@ -210,15 +218,15 @@ export class BodyEditor {
                 this.gazCloudsPanel.init(body);
             }
         } else if (body instanceof Star) {
-            const volumetricLight = postProcessManager.getVolumetricLight(body as Star);
-            if (volumetricLight) {
+            const volumetricLight = postProcesses.find((pp) => pp instanceof VolumetricLight);
+            if (volumetricLight !== undefined) {
                 this.starPanel.enable();
                 this.starPanel.setVisibility(this.currentPanel === this.starPanel);
                 this.starPanel.init(volumetricLight);
             }
         } else if (body instanceof BlackHole) {
-            const blackHole = postProcessManager.getBlackHole(body as BlackHole);
-            if (blackHole) {
+            const blackHole = postProcesses.find((pp) => pp instanceof BlackHolePostProcess);
+            if (blackHole !== undefined) {
                 this.blackHolePanel.enable();
                 this.blackHolePanel.setVisibility(this.currentPanel === this.blackHolePanel);
                 this.blackHolePanel.init(body, blackHole);

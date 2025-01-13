@@ -17,7 +17,6 @@
 
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { JuliaSetModel } from "./juliaSetModel";
-import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -31,8 +30,6 @@ export class JuliaSet implements CelestialBody, Cullable {
     readonly model: JuliaSetModel;
 
     private readonly transform: TransformNode;
-
-    readonly postProcesses: PostProcessType[] = [];
 
     readonly ringsUniforms = null;
     readonly asteroidField = null;
@@ -48,8 +45,6 @@ export class JuliaSet implements CelestialBody, Cullable {
         this.model = model;
 
         this.transform = new TransformNode(this.model.name, scene);
-
-        this.postProcesses.push(PostProcessType.JULIA_SET);
 
         setRotationQuaternion(this.getTransform(), this.model.physics.axialTilt);
 

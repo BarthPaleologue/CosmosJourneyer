@@ -26,17 +26,14 @@ import { VolumetricLight } from "./volumetricLight";
 import { BlackHolePostProcess } from "../stellarObjects/blackHole/blackHolePostProcess";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { ColorCorrection } from "./colorCorrection";
-import { makeSplitRenderEffects } from "../utils/extractRelevantPostProcesses";
-import { CloudsPostProcess } from "../clouds/volumetricCloudsPostProcess";
 import { FxaaPostProcess } from "@babylonjs/core/PostProcesses/fxaaPostProcess";
 import { PostProcessRenderEffect } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderEffect";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManagerSceneComponent";
-import { PostProcessType } from "./postProcessTypes";
 import { MandelbulbPostProcess } from "../anomalies/mandelbulb/mandelbulbPostProcess";
 import { ShadowPostProcess } from "./shadowPostProcess";
 import { LensFlarePostProcess } from "./lensFlarePostProcess";
-import { UpdatablePostProcess } from "./objectPostProcess";
+import { UpdatablePostProcess } from "./updatablePostProcess";
 import { MatterJetPostProcess } from "./matterJetPostProcess";
 import { Mandelbulb } from "../anomalies/mandelbulb/mandelbulb";
 import { Star } from "../stellarObjects/star/star";
@@ -53,8 +50,9 @@ import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { BloomEffect } from "@babylonjs/core/PostProcesses/bloomEffect";
 import { Constants } from "@babylonjs/core/Engines/constants";
-import { PlanetaryMassObject } from "../architecture/planetaryMassObject";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { getRgbFromTemperature } from "../utils/specrend";
+import { PostProcessType } from "./postProcessTypes";
 
 /**
  * The order in which the post processes are rendered when away from a planet
@@ -127,17 +125,17 @@ export class PostProcessManager {
      */
     private currentBody: CelestialBody | null = null;
 
-    private readonly volumetricLights: VolumetricLight[] = [];
-    private readonly oceans: OceanPostProcess[] = [];
-    private readonly clouds: FlatCloudsPostProcess[] = [];
-    private readonly atmospheres: AtmosphericScatteringPostProcess[] = [];
-    private readonly rings: RingsPostProcess[] = [];
-    private readonly mandelbulbs: MandelbulbPostProcess[] = [];
-    private readonly juliaSets: JuliaSetPostProcess[] = [];
-    private readonly blackHoles: BlackHolePostProcess[] = [];
-    private readonly matterJets: MatterJetPostProcess[] = [];
-    private readonly shadows: ShadowPostProcess[] = [];
-    private readonly lensFlares: LensFlarePostProcess[] = [];
+    readonly volumetricLights: VolumetricLight[] = [];
+    readonly oceans: OceanPostProcess[] = [];
+    readonly clouds: FlatCloudsPostProcess[] = [];
+    readonly atmospheres: AtmosphericScatteringPostProcess[] = [];
+    readonly rings: RingsPostProcess[] = [];
+    readonly mandelbulbs: MandelbulbPostProcess[] = [];
+    readonly juliaSets: JuliaSetPostProcess[] = [];
+    readonly blackHoles: BlackHolePostProcess[] = [];
+    readonly matterJets: MatterJetPostProcess[] = [];
+    readonly shadows: ShadowPostProcess[] = [];
+    readonly lensFlares: LensFlarePostProcess[] = [];
 
     private readonly objectPostProcesses: PostProcess[][] = [
         this.volumetricLights,
@@ -157,6 +155,8 @@ export class PostProcessManager {
      * All post processes that are updated every frame.
      */
     private readonly updatablePostProcesses: UpdatablePostProcess[][] = [this.oceans, this.clouds, this.blackHoles, this.matterJets, this.mandelbulbs, this.juliaSets];
+
+    readonly celestialBodyToPostProcesses: Map<CelestialBody, PostProcess[]> = new Map();
 
     /**
      * The color correction post process responsible for tone mapping, saturation, contrast, brightness and gamma.
@@ -207,84 +207,138 @@ export class PostProcessManager {
         this.bloomRenderEffect.threshold = 0.0;
     }
 
-    /**
-     * Creates a new Ocean postprocess for the given planet and adds it to the manager.
-     * @param planet A telluric planet
-     * @param stellarObjects An array of stars or black holes
-     */
-    public addOcean(planet: TelluricPlanet, stellarObjects: StellarObject[]) {
-        const ocean = new OceanPostProcess(planet, stellarObjects, this.scene);
-        this.oceans.push(ocean);
+    private makeSplitRenderEffects(name: string, body: CelestialBody, postProcesses: PostProcess[], engine: AbstractEngine): [PostProcessRenderEffect, PostProcessRenderEffect] {
+        const bodyPostProcesses = this.celestialBodyToPostProcesses.get(body);
+        if (bodyPostProcesses === undefined) throw new Error(`No post processes found for body ${body.model.name}`);
+        const relevantPostProcesses = postProcesses.filter((postProcess) => bodyPostProcesses.includes(postProcess));
+        if (relevantPostProcesses === undefined) throw new Error(`No post process found for body ${body.model.name} in ${name}`);
+
+        const otherPostProcesses = postProcesses.filter((postProcess) => !relevantPostProcesses.includes(postProcess));
+
+        const otherRenderEffect = new PostProcessRenderEffect(engine, `other${name}RenderEffect`, () => {
+            return otherPostProcesses;
+        });
+        const relevantRenderEffect = new PostProcessRenderEffect(engine, `body${name}RenderEffect`, () => {
+            return relevantPostProcesses;
+        });
+
+        return [otherRenderEffect, relevantRenderEffect];
+    }
+
+    public addStar(star: Star, excludedMeshes: AbstractMesh[]) {
+        const volumetricLight = new VolumetricLight(star.mesh, excludedMeshes, this.scene);
+        const lensFlare = new LensFlarePostProcess(star.getTransform(), star.getBoundingRadius(), getRgbFromTemperature(star.model.physics.blackBodyTemperature), this.scene);
+
+        this.volumetricLights.push(volumetricLight);
+        this.lensFlares.push(lensFlare);
+
+        this.celestialBodyToPostProcesses.set(star, [volumetricLight, lensFlare]);
+    }
+
+    public addNeutronStar(neutronStar: NeutronStar, excludedMeshes: AbstractMesh[]) {
+        const volumetricLight = new VolumetricLight(neutronStar.mesh, excludedMeshes, this.scene);
+        const lensFlare = new LensFlarePostProcess(
+            neutronStar.getTransform(),
+            neutronStar.getBoundingRadius(),
+            getRgbFromTemperature(neutronStar.model.physics.blackBodyTemperature),
+            this.scene
+        );
+
+        this.volumetricLights.push(volumetricLight);
+        this.lensFlares.push(lensFlare);
+
+        this.celestialBodyToPostProcesses.set(neutronStar, [volumetricLight, lensFlare]);
     }
 
     /**
-     * Returns the ocean post process for the given planet. Throws an error if no ocean is found.
-     * @param planet A telluric planet
+     * Creates a new BlackHole postprocess for the given black hole and adds it to the manager.
+     * @param blackHole A black hole
      */
-    public getOcean(planet: TelluricPlanet): OceanPostProcess | null {
-        return this.oceans.find((ocean) => ocean.object === planet) ?? null;
+    public addBlackHole(blackHole: BlackHole) {
+        const blackHolePostProcess = new BlackHolePostProcess(blackHole.getTransform(), blackHole.model, this.scene);
+        this.blackHoles.push(blackHolePostProcess);
+
+        this.celestialBodyToPostProcesses.set(blackHole, [blackHolePostProcess]);
     }
 
-    /**
-     * Creates a new Clouds postprocess for the given planet and adds it to the manager.
-     * @param planet A telluric planet
-     * @param stellarObjects An array of stars or black holes
-     */
-    public addClouds(planet: TelluricPlanet, stellarObjects: StellarObject[]) {
-        const uniforms = planet.getCloudsUniforms();
-        if (uniforms === null)
-            throw new Error(
-                `PostProcessManager: addClouds: uniforms are null. This should not be possible as the postprocess should not be created if the body has no clouds. Body: ${planet.model.name}`
+    public addTelluricPlanet(planet: TelluricPlanet, stellarObjects: StellarObject[]) {
+        const postProcesses: PostProcess[] = [];
+
+        if (planet.model.physics.pressure > 0.05) {
+            const atmosphereThickness = Settings.EARTH_ATMOSPHERE_THICKNESS * Math.max(1, planet.model.radius / Settings.EARTH_RADIUS);
+            const atmosphere = new AtmosphericScatteringPostProcess(
+                planet.getTransform(),
+                planet.getBoundingRadius(),
+                planet.model,
+                atmosphereThickness,
+                stellarObjects,
+                this.scene
             );
-        this.clouds.push(new FlatCloudsPostProcess(planet, uniforms, stellarObjects, this.scene));
-    }
+            this.atmospheres.push(atmosphere);
+            postProcesses.push(atmosphere);
+        }
 
-    /**
-     * Returns the clouds post process for the given planet. Throws an error if no clouds are found.
-     * @param planet A telluric planet
-     */
-    public getClouds(planet: TelluricPlanet): CloudsPostProcess | null {
-        return this.clouds.find((clouds) => clouds.object === planet) ?? null;
-    }
+        if (planet.model.physics.oceanLevel > 0) {
+            const ocean = new OceanPostProcess(planet.getTransform(), planet.getBoundingRadius(), planet.model, stellarObjects, this.scene);
+            this.oceans.push(ocean);
+            postProcesses.push(ocean);
+        }
 
-    /**
-     * Creates a new Atmosphere postprocess for the given planet and adds it to the manager.
-     * @param planet A gas or telluric planet
-     * @param stellarObjects An array of stars or black holes
-     */
-    public addAtmosphere(planet: GasPlanet | TelluricPlanet, stellarObjects: StellarObject[]) {
-        const atmosphere = new AtmosphericScatteringPostProcess(
-            planet,
-            Settings.EARTH_ATMOSPHERE_THICKNESS * Math.max(1, planet.model.radius / Settings.EARTH_RADIUS),
+        if (planet.cloudsUniforms !== null) {
+            const clouds = new FlatCloudsPostProcess(planet.getTransform(), planet.getBoundingRadius(), planet.cloudsUniforms, stellarObjects, this.scene);
+            this.clouds.push(clouds);
+            postProcesses.push(clouds);
+        }
+
+        if (planet.ringsUniforms !== null) {
+            const rings = new RingsPostProcess(planet.getTransform(), planet.ringsUniforms, planet.model, stellarObjects, this.scene);
+            this.rings.push(rings);
+            postProcesses.push(rings);
+        }
+
+        const shadow = new ShadowPostProcess(
+            planet.getTransform(),
+            planet.getBoundingRadius(),
+            planet.ringsUniforms,
+            planet.cloudsUniforms,
+            planet.model.physics.oceanLevel > 0,
             stellarObjects,
             this.scene
         );
-        this.atmospheres.push(atmosphere);
+        this.shadows.push(shadow);
+        postProcesses.push(shadow);
+
+        this.celestialBodyToPostProcesses.set(planet, postProcesses);
     }
 
-    /**
-     * Returns the atmosphere post process for the given planet. Throws an error if no atmosphere is found.
-     * @param planet A gas or telluric planet
-     */
-    public getAtmosphere(planet: PlanetaryMassObject): AtmosphericScatteringPostProcess | null {
-        return this.atmospheres.find((atmosphere) => atmosphere.object === planet) ?? null;
-    }
+    public addGasPlanet(planet: GasPlanet, stellarObjects: StellarObject[]) {
+        const postProcesses: PostProcess[] = [];
 
-    /**
-     * Creates a Rings postprocess for the given body and adds it to the manager.
-     * @param body A body
-     * @param stellarObjects An array of stars or black holes
-     */
-    public addRings(body: CelestialBody, stellarObjects: StellarObject[]) {
-        this.rings.push(new RingsPostProcess(body, stellarObjects, this.scene));
-    }
+        if (planet.model.physics.pressure > 0.05) {
+            const atmosphereThickness = Settings.EARTH_ATMOSPHERE_THICKNESS * Math.max(1, planet.model.radius / Settings.EARTH_RADIUS);
+            const atmosphere = new AtmosphericScatteringPostProcess(
+                planet.getTransform(),
+                planet.getBoundingRadius(),
+                planet.model,
+                atmosphereThickness,
+                stellarObjects,
+                this.scene
+            );
+            this.atmospheres.push(atmosphere);
+            postProcesses.push(atmosphere);
+        }
 
-    /**
-     * Returns the rings post process for the given body. Throws an error if no rings are found.
-     * @param body A body
-     */
-    public getRings(body: CelestialBody): RingsPostProcess | null {
-        return this.rings.find((rings) => rings.object === body) ?? null;
+        if (planet.ringsUniforms !== null) {
+            const rings = new RingsPostProcess(planet.getTransform(), planet.ringsUniforms, planet.model, stellarObjects, this.scene);
+            this.rings.push(rings);
+            postProcesses.push(rings);
+        }
+
+        const shadow = new ShadowPostProcess(planet.getTransform(), planet.getBoundingRadius(), planet.ringsUniforms, null, false, stellarObjects, this.scene);
+        this.shadows.push(shadow);
+        postProcesses.push(shadow);
+
+        this.celestialBodyToPostProcesses.set(planet, postProcesses);
     }
 
     /**
@@ -293,7 +347,10 @@ export class PostProcessManager {
      * @param stellarObjects An array of stars or black holes
      */
     public addMandelbulb(body: Mandelbulb, stellarObjects: StellarObject[]) {
-        this.mandelbulbs.push(new MandelbulbPostProcess(body, this.scene, stellarObjects));
+        const mandelbulb = new MandelbulbPostProcess(body.getTransform(), body.getBoundingRadius(), body.model, this.scene, stellarObjects);
+        this.mandelbulbs.push(mandelbulb);
+
+        this.celestialBodyToPostProcesses.set(body, [mandelbulb]);
     }
 
     /**
@@ -302,73 +359,10 @@ export class PostProcessManager {
      * @param stellarObjects An array of stars or black holes
      */
     public addJuliaSet(juliaSet: JuliaSet, stellarObjects: StellarObject[]) {
-        this.juliaSets.push(new JuliaSetPostProcess(juliaSet, this.scene, stellarObjects));
-    }
+        const juliaSetPostProcess = new JuliaSetPostProcess(juliaSet.getTransform(), juliaSet.getBoundingRadius(), juliaSet.model.accentColor, this.scene, stellarObjects);
+        this.juliaSets.push(juliaSetPostProcess);
 
-    /**
-     * Creates a new VolumetricLight postprocess for the given star and adds it to the manager.
-     * @param star A star
-     * @param excludedMeshes
-     */
-    public addVolumetricLight(star: Star | NeutronStar, excludedMeshes: AbstractMesh[]) {
-        this.volumetricLights.push(new VolumetricLight(star, excludedMeshes, this.scene));
-    }
-
-    /**
-     * Returns the volumetric light post process for the given star. Throws an error if no volumetric light is found.
-     * @param star A star
-     */
-    public getVolumetricLight(star: Star | NeutronStar): VolumetricLight | null {
-        return this.volumetricLights.find((vl) => vl.object === star) ?? null;
-    }
-
-    /**
-     * Creates a new BlackHole postprocess for the given black hole and adds it to the manager.
-     * @param blackHole A black hole
-     */
-    public addBlackHole(blackHole: BlackHole) {
-        this.blackHoles.push(new BlackHolePostProcess(blackHole, this.scene));
-    }
-
-    /**
-     * Returns the black hole post process for the given black hole. Throws an error if no black hole is found.
-     * @param blackHole A black hole
-     */
-    public getBlackHole(blackHole: BlackHole): BlackHolePostProcess | null {
-        return this.blackHoles.find((bh) => bh.object === blackHole) ?? null;
-    }
-
-    /**
-     * Creates a new MatterJet postprocess for the given neutron star and adds it to the manager.
-     * @param neutronStar A neutron star
-     */
-    public addMatterJet(neutronStar: NeutronStar) {
-        this.matterJets.push(new MatterJetPostProcess(neutronStar, this.scene));
-    }
-
-    /**
-     * Returns the matter jet post process for the given neutron star. Throws an error if no matter jet is found.
-     * @param neutronStar A neutron star
-     */
-    public getMatterJet(neutronStar: NeutronStar): MatterJetPostProcess | null {
-        return this.matterJets.find((mj) => mj.object === neutronStar) ?? null;
-    }
-
-    /**
-     * Creates a new Shadow postprocess for the given body and adds it to the manager.
-     * @param body A celestial body
-     * @param stellarObjects An array of stellar objects
-     */
-    public addShadowCaster(body: CelestialBody, stellarObjects: StellarObject[]) {
-        this.shadows.push(new ShadowPostProcess(body, stellarObjects, this.scene));
-    }
-
-    /**
-     * Creates a new LensFlare postprocess for the given stellar object and adds it to the manager.
-     * @param stellarObject A stellar object (usually a star or a neutron star)
-     */
-    public addLensFlare(stellarObject: StellarObject) {
-        this.lensFlares.push(new LensFlarePostProcess(stellarObject, this.scene));
+        this.celestialBodyToPostProcesses.set(juliaSet, [juliaSetPostProcess]);
     }
 
     /**
@@ -380,8 +374,8 @@ export class PostProcessManager {
     public setCelestialBody(body: CelestialBody) {
         this.currentBody = body;
 
-        const rings = this.getRings(body);
-        const switchLimit = rings !== null ? rings.ringsUniforms.model.ringStart : 2;
+        const rings = this.celestialBodyToPostProcesses.get(body)?.find((pp) => pp instanceof RingsPostProcess);
+        const switchLimit = rings !== undefined ? rings.ringsUniforms.model.ringStart : 2;
         const distance2 = Vector3.DistanceSquared(body.getTransform().getAbsolutePosition(), this.scene.getActiveControls().getTransform().getAbsolutePosition());
         if (distance2 < (switchLimit * body.getBoundingRadius()) ** 2) this.setSurfaceOrder();
         else this.setSpaceOrder();
@@ -424,20 +418,20 @@ export class PostProcessManager {
 
         this.renderingPipeline = new PostProcessRenderPipeline(this.scene.getEngine(), "renderingPipeline");
 
-        const [otherVolumetricLightsRenderEffect, bodyVolumetricLightsRenderEffect] = makeSplitRenderEffects(
+        const [otherVolumetricLightsRenderEffect, bodyVolumetricLightsRenderEffect] = this.makeSplitRenderEffects(
             "VolumetricLights",
             this.getCurrentBody(),
             this.volumetricLights,
             this.engine
         );
-        const [otherBlackHolesRenderEffect, bodyBlackHolesRenderEffect] = makeSplitRenderEffects("BlackHoles", this.getCurrentBody(), this.blackHoles, this.engine);
-        const [otherOceansRenderEffect, bodyOceansRenderEffect] = makeSplitRenderEffects("Oceans", this.getCurrentBody(), this.oceans, this.engine);
-        const [otherCloudsRenderEffect, bodyCloudsRenderEffect] = makeSplitRenderEffects("Clouds", this.getCurrentBody(), this.clouds, this.engine);
-        const [otherAtmospheresRenderEffect, bodyAtmospheresRenderEffect] = makeSplitRenderEffects("Atmospheres", this.getCurrentBody(), this.atmospheres, this.engine);
-        const [otherRingsRenderEffect, bodyRingsRenderEffect] = makeSplitRenderEffects("Rings", this.getCurrentBody(), this.rings, this.engine);
-        const [otherMandelbulbsRenderEffect, bodyMandelbulbsRenderEffect] = makeSplitRenderEffects("Mandelbulbs", this.getCurrentBody(), this.mandelbulbs, this.engine);
-        const [otherJuliaSetsRenderEffect, bodyJuliaSetRenderEffect] = makeSplitRenderEffects("JuliaSets", this.getCurrentBody(), this.juliaSets, this.engine);
-        const [otherMatterJetsRenderEffect, bodyMatterJetsRenderEffect] = makeSplitRenderEffects("MatterJets", this.getCurrentBody(), this.matterJets, this.engine);
+        const [otherBlackHolesRenderEffect, bodyBlackHolesRenderEffect] = this.makeSplitRenderEffects("BlackHoles", this.getCurrentBody(), this.blackHoles, this.engine);
+        const [otherOceansRenderEffect, bodyOceansRenderEffect] = this.makeSplitRenderEffects("Oceans", this.getCurrentBody(), this.oceans, this.engine);
+        const [otherCloudsRenderEffect, bodyCloudsRenderEffect] = this.makeSplitRenderEffects("Clouds", this.getCurrentBody(), this.clouds, this.engine);
+        const [otherAtmospheresRenderEffect, bodyAtmospheresRenderEffect] = this.makeSplitRenderEffects("Atmospheres", this.getCurrentBody(), this.atmospheres, this.engine);
+        const [otherRingsRenderEffect, bodyRingsRenderEffect] = this.makeSplitRenderEffects("Rings", this.getCurrentBody(), this.rings, this.engine);
+        const [otherMandelbulbsRenderEffect, bodyMandelbulbsRenderEffect] = this.makeSplitRenderEffects("Mandelbulbs", this.getCurrentBody(), this.mandelbulbs, this.engine);
+        const [otherJuliaSetsRenderEffect, bodyJuliaSetRenderEffect] = this.makeSplitRenderEffects("JuliaSets", this.getCurrentBody(), this.juliaSets, this.engine);
+        const [otherMatterJetsRenderEffect, bodyMatterJetsRenderEffect] = this.makeSplitRenderEffects("MatterJets", this.getCurrentBody(), this.matterJets, this.engine);
         const shadowRenderEffect = new PostProcessRenderEffect(this.engine, "ShadowRenderEffect", () => this.shadows);
         const lensFlareRenderEffect = new PostProcessRenderEffect(this.engine, "LensFlareRenderEffect", () => this.lensFlares);
 
@@ -556,5 +550,7 @@ export class PostProcessManager {
         this.objectPostProcesses.forEach((postProcessList) => {
             postProcessList.length = 0;
         });
+
+        this.celestialBodyToPostProcesses.clear();
     }
 }

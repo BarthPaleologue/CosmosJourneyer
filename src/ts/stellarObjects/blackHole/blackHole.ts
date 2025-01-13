@@ -19,7 +19,6 @@ import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 import { Light } from "@babylonjs/core/Lights/light";
-import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { BlackHoleModel } from "./blackHoleModel";
 import { StellarObject } from "../../architecture/stellarObject";
@@ -38,8 +37,6 @@ export class BlackHole implements StellarObject, Cullable {
     readonly light: PointLight;
 
     readonly model: BlackHoleModel;
-
-    readonly postProcesses: PostProcessType[] = [];
 
     readonly ringsUniforms = null;
 
@@ -60,8 +57,6 @@ export class BlackHole implements StellarObject, Cullable {
         this.light.falloffType = Light.FALLOFF_STANDARD;
         this.light.parent = this.getTransform();
         if (this.model.physics.accretionDiskRadius === 0) this.light.intensity = 0;
-
-        this.postProcesses.push(PostProcessType.BLACK_HOLE);
 
         this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());
     }

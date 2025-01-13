@@ -19,7 +19,6 @@ import { Direction } from "../../utils/direction";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TelluricPlanetMaterial } from "./telluricPlanetMaterial";
 import { TelluricPlanetaryMassObjectModel } from "./telluricPlanetaryMassObjectModel";
-import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { ChunkTree } from "./terrain/chunks/chunkTree";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
@@ -48,8 +47,6 @@ export class TelluricPlanet implements PlanetaryMassObject, Cullable {
 
     private readonly transform: TransformNode;
     readonly aggregate: PhysicsAggregate;
-
-    readonly postProcesses: PostProcessType[] = [];
 
     readonly ringsUniforms: RingsUniforms | null;
     readonly asteroidField: AsteroidField | null;
@@ -84,13 +81,7 @@ export class TelluricPlanet implements PlanetaryMassObject, Cullable {
         const physicsShape = new PhysicsShapeSphere(Vector3.Zero(), this.model.radius, scene);
         this.aggregate.shape.addChildFromParent(this.getTransform(), physicsShape, this.getTransform());
 
-        this.postProcesses.push(PostProcessType.SHADOW);
-
-        if (this.model.physics.oceanLevel > 0) this.postProcesses.push(PostProcessType.OCEAN);
-        if (this.model.physics.pressure > 0.05) this.postProcesses.push(PostProcessType.ATMOSPHERE);
-
         if (this.model.rings !== null) {
-            this.postProcesses.push(PostProcessType.RING);
             this.ringsUniforms = new RingsUniforms(this.model.rings, scene);
 
             const averageRadius = (this.model.radius * (this.model.rings.ringStart + this.model.rings.ringEnd)) / 2;
@@ -102,7 +93,6 @@ export class TelluricPlanet implements PlanetaryMassObject, Cullable {
         }
 
         if (this.model.clouds !== null) {
-            this.postProcesses.push(PostProcessType.CLOUDS);
             this.cloudsUniforms = new CloudsUniforms(this.model.clouds, scene);
         } else {
             this.cloudsUniforms = null;

@@ -32,6 +32,7 @@ import { newSeededTelluricPlanetModel } from "./planets/telluricPlanet/telluricP
 import { newSeededSpaceElevatorModel } from "./spacestation/spaceElevatorModel";
 import { celsiusToKelvin, getOrbitRadiusFromPeriod } from "./utils/physics";
 import { Quaternion } from "@babylonjs/core/Maths/math";
+import { AtmosphericScatteringPostProcess } from "./postProcesses/atmosphericScatteringPostProcess";
 
 const engine = await CosmosJourneyer.CreateAsync();
 engine.setAutoSaveEnabled(false);
@@ -151,8 +152,8 @@ if (ares === undefined) {
     throw new Error("Ares not found");
 }
 
-const aresAtmosphere = starSystemView.postProcessManager.getAtmosphere(ares);
-if (aresAtmosphere) {
+const aresAtmosphere = starSystemView.postProcessManager.celestialBodyToPostProcesses.get(ares)?.find((pp) => pp instanceof AtmosphericScatteringPostProcess);
+if (aresAtmosphere !== undefined) {
     aresAtmosphere.atmosphereUniforms.rayleighScatteringCoefficients.x *= 4;
     aresAtmosphere.atmosphereUniforms.rayleighScatteringCoefficients.z /= 3;
 } else {

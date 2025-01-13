@@ -18,9 +18,6 @@
 import atmosphericScatteringFragment from "../../shaders/atmosphericScatteringFragment.glsl";
 
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
-import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
-import { ObjectPostProcess } from "./objectPostProcess";
 import { Transformable } from "../architecture/transformable";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Camera } from "@babylonjs/core/Cameras/camera";
@@ -32,9 +29,10 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { Scene } from "@babylonjs/core/scene";
 import { Textures } from "../assets/textures";
-
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Settings } from "../settings";
+import { OrbitalObjectModel } from "../architecture/orbitalObject";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
 export type AtmosphereUniforms = {
     /**
@@ -90,20 +88,26 @@ export type AtmosphereUniforms = {
     lightIntensity: number;
 };
 
-export class AtmosphericScatteringPostProcess extends PostProcess implements ObjectPostProcess {
+export class AtmosphericScatteringPostProcess extends PostProcess {
     readonly atmosphereUniforms: AtmosphereUniforms;
-    readonly object: TelluricPlanet | GasPlanet;
 
     private activeCamera: Camera | null = null;
 
-    constructor(planet: GasPlanet | TelluricPlanet, atmosphereThickness: number, stellarObjects: Transformable[], scene: Scene) {
+    constructor(
+        planetTransform: TransformNode,
+        planetBoundingRadius: number,
+        planetModel: OrbitalObjectModel,
+        atmosphereThickness: number,
+        stellarObjects: Transformable[],
+        scene: Scene
+    ) {
         const shaderName = "atmosphericScattering";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = atmosphericScatteringFragment;
         }
 
         const atmosphereUniforms: AtmosphereUniforms = {
-            atmosphereRadius: planet.getBoundingRadius() + atmosphereThickness,
+            atmosphereRadius: planetBoundingRadius + atmosphereThickness,
             rayleighHeight: (8e3 * atmosphereThickness) / Settings.EARTH_ATMOSPHERE_THICKNESS,
             rayleighScatteringCoefficients: new Vector3(5.8e-6, 13.5e-6, 33.1e-6).scaleInPlace(Settings.EARTH_ATMOSPHERE_THICKNESS / atmosphereThickness),
             mieHeight: (1.2e3 * atmosphereThickness) / Settings.EARTH_ATMOSPHERE_THICKNESS,
@@ -142,7 +146,7 @@ export class AtmosphericScatteringPostProcess extends PostProcess implements Obj
         const samplers: string[] = [...Object.values(SamplerUniformNames), ...Object.values(AtmosphereSamplerNames)];
 
         super(
-            `${planet.model.name}AtmospherePostProcess`,
+            `${planetModel.name}AtmospherePostProcess`,
             shaderName,
             uniforms,
             samplers,
@@ -155,7 +159,6 @@ export class AtmosphericScatteringPostProcess extends PostProcess implements Obj
             Constants.TEXTURETYPE_HALF_FLOAT
         );
 
-        this.object = planet;
         this.atmosphereUniforms = atmosphereUniforms;
 
         this.onActivateObservable.add((camera) => {
@@ -169,7 +172,7 @@ export class AtmosphericScatteringPostProcess extends PostProcess implements Obj
 
             setCameraUniforms(effect, this.activeCamera);
             setStellarObjectUniforms(effect, stellarObjects);
-            setObjectUniforms(effect, planet);
+            setObjectUniforms(effect, planetTransform, planetBoundingRadius);
 
             effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_RADIUS, atmosphereUniforms.atmosphereRadius);
             effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_RAYLEIGH_HEIGHT, atmosphereUniforms.rayleighHeight);

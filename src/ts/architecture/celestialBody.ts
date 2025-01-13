@@ -16,14 +16,13 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { OrbitalObject, OrbitalObjectModel } from "./orbitalObject";
-import { HasPostProcesses } from "./hasPostProcesses";
 import { CanHaveRings, CanHaveRingsModel } from "./canHaveRings";
 import { Targetable } from "./targetable";
 
 /**
- * Describes all celestial bodies (a combination of OrbitalObject, CanHaveRings and HasPostProcesses)
+ * Describes all celestial bodies (a combination of OrbitalObject, CanHaveRings)
  */
-export interface CelestialBody extends OrbitalObject, CanHaveRings, HasPostProcesses, Targetable {
+export interface CelestialBody extends OrbitalObject, CanHaveRings, Targetable {
     /**
      * The underlying model describing the data of the celestial body
      */

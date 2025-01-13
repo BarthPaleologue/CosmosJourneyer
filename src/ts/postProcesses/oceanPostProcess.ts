@@ -18,9 +18,8 @@
 import { Effect } from "@babylonjs/core/Materials/effect";
 
 import oceanFragment from "../../shaders/oceanFragment.glsl";
-import { ObjectPostProcess, UpdatablePostProcess } from "./objectPostProcess";
+import { UpdatablePostProcess } from "./updatablePostProcess";
 import { Transformable } from "../architecture/transformable";
-import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms";
 import { setStellarObjectUniforms, StellarObjectUniformNames } from "./uniforms/stellarObjectUniforms";
@@ -31,6 +30,8 @@ import { Constants } from "@babylonjs/core/Engines/constants";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Scene } from "@babylonjs/core/scene";
 import { Textures } from "../assets/textures";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { TelluricPlanetaryMassObjectModel } from "../planets/telluricPlanet/telluricPlanetaryMassObjectModel";
 
 export type OceanUniforms = {
     smoothness: number;
@@ -41,13 +42,13 @@ export type OceanUniforms = {
     time: number;
 };
 
-export class OceanPostProcess extends PostProcess implements ObjectPostProcess, UpdatablePostProcess {
+export class OceanPostProcess extends PostProcess implements UpdatablePostProcess {
     readonly oceanUniforms: OceanUniforms;
-    readonly object: Transformable;
+    readonly planetTransform: TransformNode;
 
     private activeCamera: Camera | null = null;
 
-    constructor(planet: TelluricPlanet, stellarObjects: Transformable[], scene: Scene) {
+    constructor(planetTransform: TransformNode, boundingRadius: number, planetModel: TelluricPlanetaryMassObjectModel, stellarObjects: Transformable[], scene: Scene) {
         const shaderName = "ocean";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = oceanFragment;
@@ -88,7 +89,7 @@ export class OceanPostProcess extends PostProcess implements ObjectPostProcess, 
         const samplers: string[] = [...Object.values(SamplerUniformNames), ...Object.values(OceanSamplerNames)];
 
         super(
-            `${planet.model.name}OceanPostProcess`,
+            `${planetModel.name}OceanPostProcess`,
             shaderName,
             uniforms,
             samplers,
@@ -101,7 +102,7 @@ export class OceanPostProcess extends PostProcess implements ObjectPostProcess, 
             Constants.TEXTURETYPE_HALF_FLOAT
         );
 
-        this.object = planet;
+        this.planetTransform = planetTransform;
         this.oceanUniforms = oceanUniforms;
 
         this.onActivateObservable.add((camera) => (this.activeCamera = camera));
@@ -113,15 +114,15 @@ export class OceanPostProcess extends PostProcess implements ObjectPostProcess, 
 
             setCameraUniforms(effect, this.activeCamera);
             setStellarObjectUniforms(effect, stellarObjects);
-            setObjectUniforms(effect, planet);
+            setObjectUniforms(effect, planetTransform, boundingRadius);
 
-            effect.setFloat(OceanUniformNames.OCEAN_RADIUS, planet.getRadius() + planet.model.physics.oceanLevel);
+            effect.setFloat(OceanUniformNames.OCEAN_RADIUS, planetModel.radius + planetModel.physics.oceanLevel);
             effect.setFloat(OceanUniformNames.OCEAN_SMOOTHNESS, oceanUniforms.smoothness);
             effect.setFloat(OceanUniformNames.OCEAN_SPECULAR_POWER, oceanUniforms.specularPower);
             effect.setFloat(OceanUniformNames.OCEAN_ALPHA_MODIFIER, oceanUniforms.alphaModifier);
             effect.setFloat(OceanUniformNames.OCEAN_DEPTH_MODIFIER, oceanUniforms.depthModifier);
             effect.setFloat(OceanUniformNames.OCEAN_WAVE_BLENDING_SHARPNESS, oceanUniforms.waveBlendingSharpness);
-            effect.setMatrix(OceanUniformNames.PLANET_INVERSE_ROTATION_MATRIX, planet.getTransform().getWorldMatrix().getRotationMatrix().transpose());
+            effect.setMatrix(OceanUniformNames.PLANET_INVERSE_ROTATION_MATRIX, planetTransform.getWorldMatrix().getRotationMatrix().transpose());
             effect.setFloat(OceanUniformNames.TIME, oceanUniforms.time % 100000); //TODO: do not hardcode the 100000
 
             setSamplerUniforms(effect, this.activeCamera, scene);
