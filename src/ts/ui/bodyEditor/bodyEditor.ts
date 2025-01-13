@@ -190,11 +190,11 @@ export class BodyEditor {
 
                 this.surfacePanel.enable();
                 this.surfacePanel.setVisibility(this.currentPanel === this.surfacePanel);
-                this.surfacePanel.init(body);
+                this.surfacePanel.init(body.material);
 
                 this.physicPanel.enable();
                 this.physicPanel.setVisibility(this.currentPanel === this.physicPanel);
-                this.physicPanel.init(body);
+                this.physicPanel.init(body.model.physics, body.material);
 
                 if (body.cloudsUniforms !== null) {
                     this.cloudsPanel.enable();
