@@ -16,19 +16,18 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { EditorPanel } from "../editorPanel";
-import { GasPlanet } from "../../../planets/gasPlanet/gasPlanet";
 import { clearAllEventListenersById } from "../../../utils/html";
 import { Slider } from "handle-sliderjs";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { GasPlanetMaterial } from "../../../planets/gasPlanet/gasPlanetMaterial";
 
 export class GasCloudsPanel extends EditorPanel {
     constructor() {
         super("gazClouds");
     }
-    init(planet: GasPlanet) {
+    init(material: GasPlanetMaterial) {
         for (const slider of this.sliders) slider.remove();
 
-        const material = planet.material;
         const colorSettings = material.colorSettings;
 
         const gazColor1Picker = clearAllEventListenersById("gazColor1") as HTMLInputElement;
@@ -50,7 +49,7 @@ export class GasCloudsPanel extends EditorPanel {
         });
 
         this.sliders = [
-            new Slider("colorSharpness", document.getElementById("colorSharpness") as HTMLElement, 0, 100, planet.material.colorSettings.colorSharpness * 10, (val: number) => {
+            new Slider("colorSharpness", document.getElementById("colorSharpness") as HTMLElement, 0, 100, material.colorSettings.colorSharpness * 10, (val: number) => {
                 colorSettings.colorSharpness = val / 10;
                 material.updateConstants();
             })

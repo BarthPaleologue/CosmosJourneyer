@@ -37,11 +37,9 @@ import { BlackHole } from "../../stellarObjects/blackHole/blackHole";
 import { CelestialBody } from "../../architecture/celestialBody";
 import { Scene } from "@babylonjs/core/scene";
 import { AtmosphericScatteringPostProcess } from "../../postProcesses/atmosphericScatteringPostProcess";
-import { FlatCloudsPostProcess } from "../../clouds/flatCloudsPostProcess";
 import { OceanPostProcess } from "../../postProcesses/oceanPostProcess";
 import { VolumetricLight } from "../../postProcesses/volumetricLight";
 import { BlackHolePostProcess } from "../../stellarObjects/blackHole/blackHolePostProcess";
-import { RingsPostProcess } from "../../rings/ringsPostProcess";
 
 export const enum EditorVisibility {
     HIDDEN,
@@ -173,11 +171,10 @@ export class BodyEditor {
 
         const postProcesses = postProcessManager.celestialBodyToPostProcesses.get(body) ?? [];
 
-        const rings = postProcesses.find((pp) => pp instanceof RingsPostProcess);
-        if (rings !== undefined) {
+        if (body.ringsUniforms !== null) {
             this.ringsPanel.enable();
             this.ringsPanel.setVisibility(this.currentPanel === this.ringsPanel);
-            this.ringsPanel.init(body, rings);
+            this.ringsPanel.init(body.ringsUniforms);
         }
 
         if (body instanceof TelluricPlanet || body instanceof GasPlanet) {
@@ -185,7 +182,7 @@ export class BodyEditor {
             if (atmosphere !== undefined) {
                 this.atmospherePanel.enable();
                 this.atmospherePanel.setVisibility(this.currentPanel === this.atmospherePanel);
-                this.atmospherePanel.init(body, atmosphere);
+                this.atmospherePanel.init(body.getRadius(), atmosphere.atmosphereUniforms);
             }
 
             if (body instanceof TelluricPlanet) {
@@ -199,23 +196,22 @@ export class BodyEditor {
                 this.physicPanel.setVisibility(this.currentPanel === this.physicPanel);
                 this.physicPanel.init(body);
 
-                const clouds = postProcesses.find((pp) => pp instanceof FlatCloudsPostProcess);
-                if (clouds !== undefined) {
+                if (body.cloudsUniforms !== null) {
                     this.cloudsPanel.enable();
                     this.cloudsPanel.setVisibility(this.currentPanel === this.cloudsPanel);
-                    this.cloudsPanel.init(body, clouds);
+                    this.cloudsPanel.init(body.getBoundingRadius(), body.cloudsUniforms);
                 }
 
                 const ocean = postProcesses.find((pp) => pp instanceof OceanPostProcess);
                 if (ocean !== undefined) {
                     this.oceanPanel.enable();
                     this.oceanPanel.setVisibility(this.currentPanel === this.oceanPanel);
-                    this.oceanPanel.init(body, ocean);
+                    this.oceanPanel.init(ocean.oceanUniforms);
                 }
             } else {
                 this.gazCloudsPanel.enable();
                 this.gazCloudsPanel.setVisibility(this.currentPanel === this.gazCloudsPanel);
-                this.gazCloudsPanel.init(body);
+                this.gazCloudsPanel.init(body.material);
             }
         } else if (body instanceof Star) {
             const volumetricLight = postProcesses.find((pp) => pp instanceof VolumetricLight);
@@ -229,7 +225,7 @@ export class BodyEditor {
             if (blackHole !== undefined) {
                 this.blackHolePanel.enable();
                 this.blackHolePanel.setVisibility(this.currentPanel === this.blackHolePanel);
-                this.blackHolePanel.init(body, blackHole);
+                this.blackHolePanel.init(blackHole.blackHoleUniforms);
             }
         }
 
