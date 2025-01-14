@@ -427,8 +427,6 @@ export class StarSystemController {
         const celestialBodies = this.getCelestialBodies();
         const stellarObjects = this.getStellarObjects();
 
-        console.log("init postprocesses");
-
         for (const object of celestialBodies) {
             switch (object.model.type) {
                 case OrbitalObjectType.STAR:
