@@ -19,9 +19,9 @@ import { EditorPanel } from "../editorPanel";
 import { clearAllEventListenersById } from "../../../utils/html";
 import { Settings } from "../../../settings";
 import { Slider } from "handle-sliderjs";
-import { AtmosphereUniforms } from "../../../postProcesses/atmosphericScatteringPostProcess";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { AtmosphereUniforms } from "../../../atmosphere/atmosphereUniforms";
 
 export class AtmospherePanel extends EditorPanel {
     constructor() {

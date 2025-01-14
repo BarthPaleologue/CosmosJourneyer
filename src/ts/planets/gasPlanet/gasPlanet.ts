@@ -36,6 +36,8 @@ import { Planet } from "../../architecture/planet";
 
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
 import { setRotationQuaternion } from "../../uberCore/transforms/basicTransform";
+import { AtmosphereUniforms } from "../../atmosphere/atmosphereUniforms";
+import { Settings } from "../../settings";
 
 export class GasPlanet implements Planet, Cullable {
     private readonly mesh: Mesh;
@@ -43,6 +45,8 @@ export class GasPlanet implements Planet, Cullable {
 
     readonly aggregate: PhysicsAggregate;
     readonly model: GasPlanetModel;
+
+    readonly atmosphereUniforms: AtmosphereUniforms;
 
     readonly ringsUniforms: RingsUniforms | null;
     readonly asteroidField: AsteroidField | null;
@@ -82,6 +86,9 @@ export class GasPlanet implements Planet, Cullable {
 
         this.material = new GasPlanetMaterial(this.model.name, this.model, scene);
         this.mesh.material = this.material;
+
+        const atmosphereThickness = Settings.EARTH_ATMOSPHERE_THICKNESS * Math.max(1, this.model.radius / Settings.EARTH_RADIUS);
+        this.atmosphereUniforms = new AtmosphereUniforms(this.getBoundingRadius(), atmosphereThickness);
 
         if (this.model.rings !== null) {
             this.ringsUniforms = new RingsUniforms(this.model.rings, scene);

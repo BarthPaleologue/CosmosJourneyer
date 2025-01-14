@@ -32,7 +32,7 @@ import { newSeededTelluricPlanetModel } from "./planets/telluricPlanet/telluricP
 import { newSeededSpaceElevatorModel } from "./spacestation/spaceElevatorModel";
 import { celsiusToKelvin, getOrbitRadiusFromPeriod } from "./utils/physics";
 import { Quaternion } from "@babylonjs/core/Maths/math";
-import { AtmosphericScatteringPostProcess } from "./postProcesses/atmosphericScatteringPostProcess";
+import { AtmosphericScatteringPostProcess } from "./atmosphere/atmosphericScatteringPostProcess";
 
 const engine = await CosmosJourneyer.CreateAsync();
 engine.setAutoSaveEnabled(false);

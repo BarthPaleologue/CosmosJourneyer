@@ -36,7 +36,6 @@ import { Star } from "../../stellarObjects/star/star";
 import { BlackHole } from "../../stellarObjects/blackHole/blackHole";
 import { CelestialBody } from "../../architecture/celestialBody";
 import { Scene } from "@babylonjs/core/scene";
-import { AtmosphericScatteringPostProcess } from "../../postProcesses/atmosphericScatteringPostProcess";
 import { OceanPostProcess } from "../../postProcesses/oceanPostProcess";
 import { VolumetricLight } from "../../postProcesses/volumetricLight";
 import { TelluricPlanetMaterial } from "../../planets/telluricPlanet/telluricPlanetMaterial";
@@ -178,11 +177,10 @@ export class BodyEditor {
         }
 
         if (body instanceof TelluricPlanet || body instanceof GasPlanet) {
-            const atmosphere = postProcesses.find((pp) => pp instanceof AtmosphericScatteringPostProcess);
-            if (atmosphere !== undefined) {
+            if (body.atmosphereUniforms !== null) {
                 this.atmospherePanel.enable();
                 this.atmospherePanel.setVisibility(this.currentPanel === this.atmospherePanel);
-                this.atmospherePanel.init(body.getRadius(), atmosphere.atmosphereUniforms);
+                this.atmospherePanel.init(body.getRadius(), body.atmosphereUniforms);
             }
 
             if (body instanceof TelluricPlanet) {

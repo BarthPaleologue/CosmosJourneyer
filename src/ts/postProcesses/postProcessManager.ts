@@ -20,7 +20,7 @@ import { OceanPostProcess } from "./oceanPostProcess";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { FlatCloudsPostProcess } from "../clouds/flatCloudsPostProcess";
 import { Settings } from "../settings";
-import { AtmosphericScatteringPostProcess } from "./atmosphericScatteringPostProcess";
+import { AtmosphericScatteringPostProcess } from "../atmosphere/atmosphericScatteringPostProcess";
 import { RingsPostProcess } from "../rings/ringsPostProcess";
 import { VolumetricLight } from "./volumetricLight";
 import { BlackHolePostProcess } from "../stellarObjects/blackHole/blackHolePostProcess";
@@ -264,16 +264,8 @@ export class PostProcessManager {
     public addTelluricPlanet(planet: TelluricPlanet, stellarObjects: StellarObject[]) {
         const postProcesses: PostProcess[] = [];
 
-        if (planet.model.physics.pressure > 0.05) {
-            const atmosphereThickness = Settings.EARTH_ATMOSPHERE_THICKNESS * Math.max(1, planet.model.radius / Settings.EARTH_RADIUS);
-            const atmosphere = new AtmosphericScatteringPostProcess(
-                planet.getTransform(),
-                planet.getBoundingRadius(),
-                planet.model,
-                atmosphereThickness,
-                stellarObjects,
-                this.scene
-            );
+        if (planet.atmosphereUniforms !== null) {
+            const atmosphere = new AtmosphericScatteringPostProcess(planet.getTransform(), planet.getBoundingRadius(), planet.atmosphereUniforms, stellarObjects, this.scene);
             this.atmospheres.push(atmosphere);
             postProcesses.push(atmosphere);
         }
@@ -314,16 +306,8 @@ export class PostProcessManager {
     public addGasPlanet(planet: GasPlanet, stellarObjects: StellarObject[]) {
         const postProcesses: PostProcess[] = [];
 
-        if (planet.model.physics.pressure > 0.05) {
-            const atmosphereThickness = Settings.EARTH_ATMOSPHERE_THICKNESS * Math.max(1, planet.model.radius / Settings.EARTH_RADIUS);
-            const atmosphere = new AtmosphericScatteringPostProcess(
-                planet.getTransform(),
-                planet.getBoundingRadius(),
-                planet.model,
-                atmosphereThickness,
-                stellarObjects,
-                this.scene
-            );
+        if (planet.atmosphereUniforms !== null) {
+            const atmosphere = new AtmosphericScatteringPostProcess(planet.getTransform(), planet.getBoundingRadius(), planet.atmosphereUniforms, stellarObjects, this.scene);
             this.atmospheres.push(atmosphere);
             postProcesses.push(atmosphere);
         }

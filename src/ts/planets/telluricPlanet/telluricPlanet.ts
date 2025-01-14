@@ -37,6 +37,8 @@ import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
 import { OrbitalObjectType } from "../../architecture/orbitalObject";
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
+import { AtmosphereUniforms } from "../../atmosphere/atmosphereUniforms";
+import { Settings } from "../../settings";
 
 export class TelluricPlanet implements PlanetaryMassObject, Cullable {
     readonly sides: ChunkTree[]; // stores the 6 sides of the sphere
@@ -47,6 +49,8 @@ export class TelluricPlanet implements PlanetaryMassObject, Cullable {
 
     private readonly transform: TransformNode;
     readonly aggregate: PhysicsAggregate;
+
+    readonly atmosphereUniforms: AtmosphereUniforms | null;
 
     readonly ringsUniforms: RingsUniforms | null;
     readonly asteroidField: AsteroidField | null;
@@ -80,6 +84,13 @@ export class TelluricPlanet implements PlanetaryMassObject, Cullable {
         this.aggregate.body.disablePreStep = false;
         const physicsShape = new PhysicsShapeSphere(Vector3.Zero(), this.model.radius, scene);
         this.aggregate.shape.addChildFromParent(this.getTransform(), physicsShape, this.getTransform());
+
+        if (this.model.physics.pressure > 0.05) {
+            const atmosphereThickness = Settings.EARTH_ATMOSPHERE_THICKNESS * Math.max(1, this.model.radius / Settings.EARTH_RADIUS);
+            this.atmosphereUniforms = new AtmosphereUniforms(this.getBoundingRadius(), atmosphereThickness);
+        } else {
+            this.atmosphereUniforms = null;
+        }
 
         if (this.model.rings !== null) {
             this.ringsUniforms = new RingsUniforms(this.model.rings, scene);
