@@ -17,14 +17,14 @@
 
 import { EditorPanel } from "../editorPanel";
 import { Slider } from "handle-sliderjs";
-import { VolumetricLight } from "../../../postProcesses/volumetricLight";
+import { VolumetricLightUniforms } from "../../../volumetricLight/volumetricLightUniforms";
 
 export class StarPanel extends EditorPanel {
     constructor() {
         super("starPhysic");
     }
 
-    init(volumetricLight: VolumetricLight) {
+    init(volumetricLight: VolumetricLightUniforms) {
         for (const slider of this.sliders) slider.remove();
 
         this.sliders = [

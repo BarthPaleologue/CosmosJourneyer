@@ -15,45 +15,47 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import flatCloudsFragment from "../../shaders/flatCloudsFragment.glsl";
-
 import { Effect } from "@babylonjs/core/Materials/effect";
+
+import oceanFragment from "../../shaders/oceanFragment.glsl";
 import { UpdatablePostProcess } from "../postProcesses/updatablePostProcess";
 import { Transformable } from "../architecture/transformable";
-import { CloudsSamplerNames, CloudsUniformNames, CloudsUniforms } from "./cloudsUniforms";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
-import { Camera } from "@babylonjs/core/Cameras/camera";
-import { ObjectUniformNames, setObjectUniforms } from "../postProcesses/uniforms/objectUniforms";
-import { setStellarObjectUniforms, StellarObjectUniformNames } from "../postProcesses/uniforms/stellarObjectUniforms";
 import { CameraUniformNames, setCameraUniforms } from "../postProcesses/uniforms/cameraUniforms";
+import { setStellarObjectUniforms, StellarObjectUniformNames } from "../postProcesses/uniforms/stellarObjectUniforms";
+import { ObjectUniformNames, setObjectUniforms } from "../postProcesses/uniforms/objectUniforms";
 import { SamplerUniformNames, setSamplerUniforms } from "../postProcesses/uniforms/samplerUniforms";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
+import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { OceanUniforms } from "./oceanUniforms";
 
-export class FlatCloudsPostProcess extends PostProcess implements UpdatablePostProcess {
-    readonly cloudUniforms: CloudsUniforms;
+export class OceanPostProcess extends PostProcess implements UpdatablePostProcess {
+    readonly planetTransform: TransformNode;
+
+    readonly oceanUniforms: OceanUniforms;
 
     private activeCamera: Camera | null = null;
 
-    constructor(planetTransform: TransformNode, boundingRadius: number, cloudUniforms: CloudsUniforms, stellarObjects: Transformable[], scene: Scene) {
-        const shaderName = "flatClouds";
+    constructor(planetTransform: TransformNode, boundingRadius: number, oceanUniforms: OceanUniforms, stellarObjects: Transformable[], scene: Scene) {
+        const shaderName = "ocean";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
-            Effect.ShadersStore[`${shaderName}FragmentShader`] = flatCloudsFragment;
+            Effect.ShadersStore[`${shaderName}FragmentShader`] = oceanFragment;
         }
 
         const uniforms: string[] = [
-            ...Object.values(ObjectUniformNames),
-            ...Object.values(StellarObjectUniformNames),
             ...Object.values(CameraUniformNames),
-            ...Object.values(CloudsUniformNames)
+            ...Object.values(StellarObjectUniformNames),
+            ...Object.values(ObjectUniformNames),
+            ...oceanUniforms.getUniformNames()
         ];
 
-        const samplers: string[] = [...Object.values(SamplerUniformNames), ...Object.values(CloudsSamplerNames)];
+        const samplers: string[] = [...Object.values(SamplerUniformNames), ...oceanUniforms.getSamplerNames()];
 
         super(
-            `${planetTransform.name}CloudsPostProcess`,
+            `${planetTransform.name}OceanPostProcess`,
             shaderName,
             uniforms,
             samplers,
@@ -66,27 +68,28 @@ export class FlatCloudsPostProcess extends PostProcess implements UpdatablePostP
             Constants.TEXTURETYPE_HALF_FLOAT
         );
 
-        this.cloudUniforms = cloudUniforms;
+        this.planetTransform = planetTransform;
+        this.oceanUniforms = oceanUniforms;
 
-        this.onActivateObservable.add((camera) => {
-            this.activeCamera = camera;
-        });
+        this.onActivateObservable.add((camera) => (this.activeCamera = camera));
 
         this.onApplyObservable.add((effect) => {
             if (this.activeCamera === null) {
-                throw new Error("FlatCloudsPostProcess: activeCamera is null");
+                throw new Error("Camera is null");
             }
+
             setCameraUniforms(effect, this.activeCamera);
             setStellarObjectUniforms(effect, stellarObjects);
             setObjectUniforms(effect, planetTransform, boundingRadius);
-            this.cloudUniforms.setUniforms(effect);
 
-            this.cloudUniforms.setSamplers(effect);
+            oceanUniforms.setUniforms(effect, planetTransform);
+
             setSamplerUniforms(effect, this.activeCamera, scene);
+            oceanUniforms.setSamplers(effect);
         });
     }
 
-    public update(deltaTime: number): void {
-        this.cloudUniforms.update(deltaTime);
+    public update(deltaTime: number) {
+        this.oceanUniforms.time += deltaTime;
     }
 }

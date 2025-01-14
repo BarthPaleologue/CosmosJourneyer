@@ -17,7 +17,6 @@
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Matrix, Quaternion } from "@babylonjs/core/Maths/math";
-import { PostProcessType } from "../postProcesses/postProcessTypes";
 import { PostProcessManager } from "../postProcesses/postProcessManager";
 import { UberScene } from "../uberCore/uberScene";
 import { SpaceStation } from "../spacestation/spaceStation";
@@ -357,6 +356,10 @@ export class StarSystemController {
         return this.subSystems.flatMap((subSystem) => subSystem.planetarySystems.flatMap((planetarySystem) => planetarySystem.planets));
     }
 
+    public getTelluricPlanets(): TelluricPlanet[] {
+        return this.getPlanets().filter((planet) => planet instanceof TelluricPlanet);
+    }
+
     /**
      * Returns all the planetary mass objects in the star system. (Planets first, then satellites)
      */
@@ -423,53 +426,37 @@ export class StarSystemController {
     public initPostProcesses(postProcessManager: PostProcessManager): void {
         const celestialBodies = this.getCelestialBodies();
         const stellarObjects = this.getStellarObjects();
+
         for (const object of celestialBodies) {
-            for (const postProcess of object.postProcesses) {
-                switch (postProcess) {
-                    case PostProcessType.RING:
-                        postProcessManager.addRings(object, stellarObjects);
-                        break;
-                    case PostProcessType.ATMOSPHERE:
-                        if (!(object instanceof GasPlanet) && !(object instanceof TelluricPlanet))
-                            throw new Error("Atmosphere post process can only be added to gas or telluric planets. Source:" + object.model.name);
-                        postProcessManager.addAtmosphere(object as GasPlanet | TelluricPlanet, stellarObjects);
-                        break;
-                    case PostProcessType.CLOUDS:
-                        if (!(object instanceof TelluricPlanet)) throw new Error("Clouds post process can only be added to telluric planets. Source:" + object.model.name);
-                        postProcessManager.addClouds(object as TelluricPlanet, stellarObjects);
-                        break;
-                    case PostProcessType.OCEAN:
-                        if (!(object instanceof TelluricPlanet)) throw new Error("Ocean post process can only be added to telluric planets. Source:" + object.model.name);
-                        postProcessManager.addOcean(object as TelluricPlanet, stellarObjects);
-                        break;
-                    case PostProcessType.VOLUMETRIC_LIGHT:
-                        if (!(object instanceof Star) && !(object instanceof NeutronStar))
-                            throw new Error("Volumetric light post process can only be added to stars and neutron stars. Source:" + object.model.name);
-                        postProcessManager.addVolumetricLight(object, [this.starFieldBox.mesh]);
-                        break;
-                    case PostProcessType.MANDELBULB:
-                        if (!(object instanceof Mandelbulb)) throw new Error("Mandelbulb post process can only be added to mandelbulbs. Source:" + object.model.name);
-                        postProcessManager.addMandelbulb(object as Mandelbulb, stellarObjects);
-                        break;
-                    case PostProcessType.JULIA_SET:
-                        if (!(object instanceof JuliaSet)) throw new Error("Julia set post process can only be added to julia sets. Source:" + object.model.name);
-                        postProcessManager.addJuliaSet(object as JuliaSet, stellarObjects);
-                        break;
-                    case PostProcessType.BLACK_HOLE:
-                        if (!(object instanceof BlackHole)) throw new Error("Black hole post process can only be added to black holes. Source:" + object.model.name);
-                        postProcessManager.addBlackHole(object as BlackHole);
-                        break;
-                    case PostProcessType.MATTER_JETS:
-                        if (!(object instanceof NeutronStar)) throw new Error("Matter jets post process can only be added to neutron stars. Source:" + object.model.name);
-                        postProcessManager.addMatterJet(object as NeutronStar);
-                        break;
-                    case PostProcessType.SHADOW:
-                        postProcessManager.addShadowCaster(object, stellarObjects);
-                        break;
-                    case PostProcessType.LENS_FLARE:
-                        postProcessManager.addLensFlare(object as StellarObject);
-                        break;
-                }
+            switch (object.model.type) {
+                case OrbitalObjectType.STAR:
+                    postProcessManager.addStar(object as Star, [this.starFieldBox.mesh]);
+                    break;
+                case OrbitalObjectType.NEUTRON_STAR:
+                    postProcessManager.addNeutronStar(object as NeutronStar, [this.starFieldBox.mesh]);
+                    break;
+                case OrbitalObjectType.BLACK_HOLE:
+                    postProcessManager.addBlackHole(object as BlackHole);
+                    break;
+                case OrbitalObjectType.TELLURIC_PLANET:
+                    postProcessManager.addTelluricPlanet(object as TelluricPlanet, stellarObjects);
+                    break;
+                case OrbitalObjectType.TELLURIC_SATELLITE:
+                    postProcessManager.addTelluricPlanet(object as TelluricPlanet, stellarObjects);
+                    break;
+                case OrbitalObjectType.GAS_PLANET:
+                    postProcessManager.addGasPlanet(object as GasPlanet, stellarObjects);
+                    break;
+                case OrbitalObjectType.MANDELBULB:
+                    postProcessManager.addMandelbulb(object as Mandelbulb, stellarObjects);
+                    break;
+                case OrbitalObjectType.JULIA_SET:
+                    postProcessManager.addJuliaSet(object as JuliaSet, stellarObjects);
+                    break;
+                case OrbitalObjectType.SPACE_STATION:
+                    break;
+                case OrbitalObjectType.SPACE_ELEVATOR:
+                    break;
             }
         }
 

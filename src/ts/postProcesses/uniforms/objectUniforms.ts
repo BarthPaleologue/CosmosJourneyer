@@ -16,8 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { Transformable } from "../../architecture/transformable";
-import { HasBoundingSphere } from "../../architecture/hasBoundingSphere";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
 export const ObjectUniformNames = {
     OBJECT_POSITION: "object_position",
@@ -26,9 +25,9 @@ export const ObjectUniformNames = {
     OBJECT_SCALING_DETERMINANT: "object_scaling_determinant"
 };
 
-export function setObjectUniforms(effect: Effect, object: Transformable & HasBoundingSphere): void {
-    effect.setVector3(ObjectUniformNames.OBJECT_POSITION, object.getTransform().getAbsolutePosition());
-    effect.setFloat(ObjectUniformNames.OBJECT_RADIUS, object.getBoundingRadius());
-    effect.setVector3(ObjectUniformNames.OBJECT_ROTATION_AXIS, object.getTransform().up);
-    effect.setFloat(ObjectUniformNames.OBJECT_SCALING_DETERMINANT, object.getTransform().scalingDeterminant);
+export function setObjectUniforms(effect: Effect, transform: TransformNode, boundingRadius: number): void {
+    effect.setVector3(ObjectUniformNames.OBJECT_POSITION, transform.getAbsolutePosition());
+    effect.setFloat(ObjectUniformNames.OBJECT_RADIUS, boundingRadius);
+    effect.setVector3(ObjectUniformNames.OBJECT_ROTATION_AXIS, transform.up);
+    effect.setFloat(ObjectUniformNames.OBJECT_SCALING_DETERMINANT, transform.scalingDeterminant);
 }

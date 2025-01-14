@@ -15,8 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { PostProcessType } from "../postProcesses/postProcessTypes";
-
-export interface HasPostProcesses {
-    postProcesses: PostProcessType[];
+export class VolumetricLightUniforms {
+    exposure = 0.26;
+    decay = 0.95;
 }

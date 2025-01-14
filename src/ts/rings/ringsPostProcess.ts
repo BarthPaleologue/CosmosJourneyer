@@ -16,10 +16,9 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import ringsFragment from "../../shaders/ringsFragment.glsl";
-import { ObjectPostProcess } from "../postProcesses/objectPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { RingsSamplerNames, RingsUniformNames, RingsUniforms } from "./ringsUniform";
-import { CelestialBody } from "../architecture/celestialBody";
+import { CelestialBodyModel } from "../architecture/celestialBody";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { ObjectUniformNames, setObjectUniforms } from "../postProcesses/uniforms/objectUniforms";
@@ -30,24 +29,17 @@ import { Constants } from "@babylonjs/core/Engines/constants";
 import { SamplerUniformNames, setSamplerUniforms } from "../postProcesses/uniforms/samplerUniforms";
 import { Transformable } from "../architecture/transformable";
 import { Scene } from "@babylonjs/core/scene";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
-export class RingsPostProcess extends PostProcess implements ObjectPostProcess {
+export class RingsPostProcess extends PostProcess {
     readonly ringsUniforms: RingsUniforms;
-    readonly object: CelestialBody;
 
     private activeCamera: Camera | null = null;
 
-    constructor(body: CelestialBody, stellarObjects: Transformable[], scene: Scene) {
+    constructor(bodyTransform: TransformNode, ringsUniforms: RingsUniforms, bodyModel: CelestialBodyModel, stellarObjects: Transformable[], scene: Scene) {
         const shaderName = "rings";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = ringsFragment;
-        }
-
-        const ringsUniforms = body.ringsUniforms;
-        if (ringsUniforms === null) {
-            throw new Error(
-                `RingsPostProcess: ringsUniforms are null. This should not be possible as the postprocess should not be created if the body has no rings. Body: ${body.model.name}`
-            );
         }
 
         const uniforms: string[] = [
@@ -60,7 +52,7 @@ export class RingsPostProcess extends PostProcess implements ObjectPostProcess {
         const samplers: string[] = [...Object.values(SamplerUniformNames), ...Object.values(RingsSamplerNames)];
 
         super(
-            `${body.model.name}RingPostProcess`,
+            `${bodyModel.name}RingPostProcess`,
             shaderName,
             uniforms,
             samplers,
@@ -73,7 +65,6 @@ export class RingsPostProcess extends PostProcess implements ObjectPostProcess {
             Constants.TEXTURETYPE_HALF_FLOAT
         );
 
-        this.object = body;
         this.ringsUniforms = ringsUniforms;
 
         this.onActivateObservable.add((camera) => {
@@ -87,7 +78,7 @@ export class RingsPostProcess extends PostProcess implements ObjectPostProcess {
 
             setCameraUniforms(effect, this.activeCamera);
             setStellarObjectUniforms(effect, stellarObjects);
-            setObjectUniforms(effect, this.object);
+            setObjectUniforms(effect, bodyTransform, bodyModel.radius);
 
             this.ringsUniforms.setUniforms(effect);
             this.ringsUniforms.setSamplers(effect);

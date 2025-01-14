@@ -17,8 +17,7 @@
 
 import matterJetFragment from "../../shaders/matterjet.glsl";
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { ObjectPostProcess, UpdatablePostProcess } from "./objectPostProcess";
-import { StellarObject } from "../architecture/stellarObject";
+import { UpdatablePostProcess } from "./updatablePostProcess";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { ObjectUniformNames, setObjectUniforms } from "./uniforms/objectUniforms";
 import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms";
@@ -27,6 +26,7 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Scene } from "@babylonjs/core/scene";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
 export type MatterJetUniforms = {
     // the rotation period in seconds of the matter jet
@@ -37,13 +37,12 @@ export type MatterJetUniforms = {
 /**
  * Post process for rendering matter jets that are used by neutron stars for example
  */
-export class MatterJetPostProcess extends PostProcess implements ObjectPostProcess, UpdatablePostProcess {
+export class MatterJetPostProcess extends PostProcess implements UpdatablePostProcess {
     matterJetUniforms: MatterJetUniforms;
-    object: StellarObject;
 
     private activeCamera: Camera | null = null;
 
-    constructor(stellarObject: StellarObject, scene: Scene) {
+    constructor(stellarTransform: TransformNode, boundingRadius: number, scene: Scene) {
         const shaderName = "matterjet";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = matterJetFragment;
@@ -65,7 +64,7 @@ export class MatterJetPostProcess extends PostProcess implements ObjectPostProce
         const samplers: string[] = Object.values(SamplerUniformNames);
 
         super(
-            `${stellarObject.model.name}MatterJetPostProcess`,
+            `${stellarTransform.name}MatterJetPostProcess`,
             shaderName,
             uniforms,
             samplers,
@@ -78,7 +77,6 @@ export class MatterJetPostProcess extends PostProcess implements ObjectPostProce
             Constants.TEXTURETYPE_HALF_FLOAT
         );
 
-        this.object = stellarObject;
         this.matterJetUniforms = settings;
 
         this.onActivateObservable.add((camera) => {
@@ -91,11 +89,11 @@ export class MatterJetPostProcess extends PostProcess implements ObjectPostProce
             }
 
             setCameraUniforms(effect, this.activeCamera);
-            setObjectUniforms(effect, stellarObject);
+            setObjectUniforms(effect, stellarTransform, boundingRadius);
 
             effect.setFloat(MatterJetUniformNames.TIME, this.matterJetUniforms.time % (this.matterJetUniforms.rotationPeriod * 10000));
             effect.setFloat(MatterJetUniformNames.ROTATION_PERIOD, this.matterJetUniforms.rotationPeriod);
-            effect.setVector3(MatterJetUniformNames.ROTATION_AXIS, stellarObject.getRotationAxis());
+            effect.setVector3(MatterJetUniformNames.ROTATION_AXIS, stellarTransform.up);
 
             setSamplerUniforms(effect, this.activeCamera, scene);
         });

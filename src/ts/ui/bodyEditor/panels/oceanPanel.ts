@@ -15,39 +15,38 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { OceanUniforms } from "../../../ocean/oceanUniforms";
 import { EditorPanel } from "../editorPanel";
 import { Slider } from "handle-sliderjs";
-import { OceanPostProcess } from "../../../postProcesses/oceanPostProcess";
-import { CelestialBody } from "../../../architecture/celestialBody";
 
 export class OceanPanel extends EditorPanel {
     constructor() {
         super("ocean");
     }
-    init(planet: CelestialBody, ocean: OceanPostProcess) {
+    init(oceanUniforms: OceanUniforms) {
         for (const slider of this.sliders) slider.remove();
 
         this.sliders = [
-            new Slider("alphaModifier", document.getElementById("alphaModifier") as HTMLElement, 0, 200, ocean.oceanUniforms.alphaModifier * 10000, (val: number) => {
-                ocean.oceanUniforms.alphaModifier = val / 10000;
+            new Slider("alphaModifier", document.getElementById("alphaModifier") as HTMLElement, 0, 200, oceanUniforms.alphaModifier * 10000, (val: number) => {
+                oceanUniforms.alphaModifier = val / 10000;
             }),
-            new Slider("depthModifier", document.getElementById("depthModifier") as HTMLElement, 0, 70, ocean.oceanUniforms.depthModifier * 10000, (val: number) => {
-                ocean.oceanUniforms.depthModifier = val / 10000;
+            new Slider("depthModifier", document.getElementById("depthModifier") as HTMLElement, 0, 70, oceanUniforms.depthModifier * 10000, (val: number) => {
+                oceanUniforms.depthModifier = val / 10000;
             }),
-            new Slider("specularPower", document.getElementById("specularPower") as HTMLElement, 0, 100, ocean.oceanUniforms.specularPower * 10, (val: number) => {
-                ocean.oceanUniforms.specularPower = val / 10;
+            new Slider("specularPower", document.getElementById("specularPower") as HTMLElement, 0, 100, oceanUniforms.specularPower * 10, (val: number) => {
+                oceanUniforms.specularPower = val / 10;
             }),
-            new Slider("smoothness", document.getElementById("smoothness") as HTMLElement, 0, 100, ocean.oceanUniforms.smoothness * 100, (val: number) => {
-                ocean.oceanUniforms.smoothness = val / 100;
+            new Slider("smoothness", document.getElementById("smoothness") as HTMLElement, 0, 100, oceanUniforms.smoothness * 100, (val: number) => {
+                oceanUniforms.smoothness = val / 100;
             }),
             new Slider(
                 "waveBlendingSharpness",
                 document.getElementById("waveBlendingSharpness") as HTMLElement,
                 0,
                 100,
-                ocean.oceanUniforms.waveBlendingSharpness * 100,
+                oceanUniforms.waveBlendingSharpness * 100,
                 (val: number) => {
-                    ocean.oceanUniforms.waveBlendingSharpness = val / 100;
+                    oceanUniforms.waveBlendingSharpness = val / 100;
                 }
             )
         ];

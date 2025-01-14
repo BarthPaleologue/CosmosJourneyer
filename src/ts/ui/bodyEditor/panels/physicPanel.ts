@@ -17,39 +17,26 @@
 
 import { EditorPanel } from "../editorPanel";
 import { Slider } from "handle-sliderjs";
-import { TelluricPlanet } from "../../../planets/telluricPlanet/telluricPlanet";
 import { celsiusToKelvin, kelvinToCelsius } from "../../../utils/physics";
+import { TelluricPlanetMaterial } from "../../../planets/telluricPlanet/telluricPlanetMaterial";
+import { TelluricPlanetaryMassObjectPhysicsInfo } from "../../../architecture/physicsInfo";
 
 export class PhysicPanel extends EditorPanel {
     constructor() {
         super("physic");
     }
-    init(planet: TelluricPlanet) {
+    init(planetPhysics: TelluricPlanetaryMassObjectPhysicsInfo, planetMaterial: TelluricPlanetMaterial) {
         for (const slider of this.sliders) slider.remove();
 
         this.sliders = [
-            new Slider(
-                "minTemperature",
-                document.getElementById("minTemperature") as HTMLElement,
-                -273,
-                300,
-                kelvinToCelsius(planet.model.physics.minTemperature),
-                (val: number) => {
-                    planet.model.physics.minTemperature = celsiusToKelvin(val);
-                    planet.material.updateConstants();
-                }
-            ),
-            new Slider(
-                "maxTemperature",
-                document.getElementById("maxTemperature") as HTMLElement,
-                -273,
-                300,
-                kelvinToCelsius(planet.model.physics.maxTemperature),
-                (val: number) => {
-                    planet.model.physics.maxTemperature = celsiusToKelvin(val);
-                    planet.material.updateConstants();
-                }
-            )
+            new Slider("minTemperature", document.getElementById("minTemperature") as HTMLElement, -273, 300, kelvinToCelsius(planetPhysics.minTemperature), (val: number) => {
+                planetPhysics.minTemperature = celsiusToKelvin(val);
+                planetMaterial.updateConstants();
+            }),
+            new Slider("maxTemperature", document.getElementById("maxTemperature") as HTMLElement, -273, 300, kelvinToCelsius(planetPhysics.maxTemperature), (val: number) => {
+                planetPhysics.maxTemperature = celsiusToKelvin(val);
+                planetMaterial.updateConstants();
+            })
         ];
     }
 }

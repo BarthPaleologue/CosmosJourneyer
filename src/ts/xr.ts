@@ -58,7 +58,7 @@ function createMandelbulb(): TransformNode {
     const mandelbulb = new Mandelbulb(mandelBulbModel, scene);
     mandelbulb.getTransform().scalingDeterminant = 1 / 400e3;
 
-    const mandelbulbPP = new MandelbulbPostProcess(mandelbulb, scene, []);
+    const mandelbulbPP = new MandelbulbPostProcess(mandelbulb.getTransform(), mandelbulb.getBoundingRadius(), mandelBulbModel, scene, []);
     scene.cameras.forEach((camera) => camera.attachPostProcess(mandelbulbPP));
     scene.onNewCameraAddedObservable.add((camera) => {
         camera.attachPostProcess(mandelbulbPP);
@@ -77,7 +77,7 @@ function createJulia(): TransformNode {
     const julia = new JuliaSet(juliaModel, scene);
     julia.getTransform().scalingDeterminant = 1 / 400e3;
 
-    const juliaPP = new JuliaSetPostProcess(julia, scene, []);
+    const juliaPP = new JuliaSetPostProcess(julia.getTransform(), julia.getBoundingRadius(), juliaModel.accentColor, scene, []);
     scene.cameras.forEach((camera) => camera.attachPostProcess(juliaPP));
     scene.onNewCameraAddedObservable.add((camera) => {
         camera.attachPostProcess(juliaPP);

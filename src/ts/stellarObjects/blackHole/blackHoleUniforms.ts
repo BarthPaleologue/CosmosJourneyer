@@ -1,0 +1,72 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Affero General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Affero General Public License for more details.
+//
+//  You should have received a copy of the GNU Affero General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+import { Effect } from "@babylonjs/core/Materials/effect";
+import { BlackHoleModel, getKerrMetricA } from "./blackHoleModel";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { getForwardDirection } from "../../uberCore/transforms/basicTransform";
+import { Textures } from "../../assets/textures";
+
+export const BlackHoleUniformNames = {
+    STARFIELD_ROTATION: "starfieldRotation",
+    TIME: "time",
+    SCHWARZSCHILD_RADIUS: "schwarzschildRadius",
+    FRAME_DRAGGING_FACTOR: "frameDraggingFactor",
+    ACCRETION_DISK_RADIUS: "accretionDiskRadius",
+    WARPING_MINKOWSKI_FACTOR: "warpingMinkowskiFactor",
+    ROTATION_PERIOD: "rotationPeriod",
+    ROTATION_AXIS: "rotationAxis",
+    FORWARD_AXIS: "forwardAxis"
+};
+
+export const BlackHoleSamplerNames = {
+    STARFIELD_TEXTURE: "starfieldTexture"
+};
+
+export class BlackHoleUniforms {
+    accretionDiskRadius: number;
+    rotationPeriod: number;
+    warpingMinkowskiFactor: number;
+    schwarzschildRadius: number;
+    frameDraggingFactor: number;
+    time = 0;
+
+    constructor(blackHoleModel: BlackHoleModel) {
+        this.accretionDiskRadius = blackHoleModel.physics.accretionDiskRadius;
+        this.rotationPeriod = 1.5;
+        this.warpingMinkowskiFactor = 2.0;
+        this.schwarzschildRadius = blackHoleModel.radius;
+        const kerrMetricA = getKerrMetricA(blackHoleModel.physics.mass, blackHoleModel.physics.siderealDaySeconds);
+        this.frameDraggingFactor = kerrMetricA / blackHoleModel.physics.mass;
+    }
+
+    public setUniforms(effect: Effect, blackHoleTransform: TransformNode) {
+        effect.setMatrix(BlackHoleUniformNames.STARFIELD_ROTATION, Textures.MILKY_WAY.getReflectionTextureMatrix());
+        effect.setFloat(BlackHoleUniformNames.TIME, this.time);
+        effect.setFloat(BlackHoleUniformNames.SCHWARZSCHILD_RADIUS, this.schwarzschildRadius);
+        effect.setFloat(BlackHoleUniformNames.FRAME_DRAGGING_FACTOR, this.frameDraggingFactor);
+        effect.setFloat(BlackHoleUniformNames.ACCRETION_DISK_RADIUS, this.accretionDiskRadius);
+        effect.setFloat(BlackHoleUniformNames.WARPING_MINKOWSKI_FACTOR, this.warpingMinkowskiFactor);
+        effect.setFloat(BlackHoleUniformNames.ROTATION_PERIOD, this.rotationPeriod);
+        effect.setVector3(BlackHoleUniformNames.ROTATION_AXIS, blackHoleTransform.up);
+        effect.setVector3(BlackHoleUniformNames.FORWARD_AXIS, getForwardDirection(blackHoleTransform));
+    }
+
+    public setSamplers(effect: Effect) {
+        effect.setTexture(BlackHoleSamplerNames.STARFIELD_TEXTURE, Textures.MILKY_WAY);
+    }
+}

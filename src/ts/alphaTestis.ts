@@ -137,7 +137,7 @@ const starSystem = await starSystemView.loadStarSystem(starSystemModel);
 
 engine.init(true);
 
-const planets = starSystem.getPlanets();
+const planets = starSystem.getTelluricPlanets();
 
 const hecate = planets.find((planet) => planet.model === hecateModel);
 if (hecate === undefined) {
@@ -151,10 +151,9 @@ if (ares === undefined) {
     throw new Error("Ares not found");
 }
 
-const aresAtmosphere = starSystemView.postProcessManager.getAtmosphere(ares);
-if (aresAtmosphere) {
-    aresAtmosphere.atmosphereUniforms.rayleighScatteringCoefficients.x *= 4;
-    aresAtmosphere.atmosphereUniforms.rayleighScatteringCoefficients.z /= 3;
+if (ares.atmosphereUniforms !== null) {
+    ares.atmosphereUniforms.rayleighScatteringCoefficients.x *= 4;
+    ares.atmosphereUniforms.rayleighScatteringCoefficients.z /= 3;
 } else {
     console.warn("No atmosphere found for Ares");
 }

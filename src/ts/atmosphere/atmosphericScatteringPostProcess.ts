@@ -15,12 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import flatCloudsFragment from "../../shaders/flatCloudsFragment.glsl";
+import atmosphericScatteringFragment from "../../shaders/atmosphericScatteringFragment.glsl";
 
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { UpdatablePostProcess } from "../postProcesses/updatablePostProcess";
 import { Transformable } from "../architecture/transformable";
-import { CloudsSamplerNames, CloudsUniformNames, CloudsUniforms } from "./cloudsUniforms";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { ObjectUniformNames, setObjectUniforms } from "../postProcesses/uniforms/objectUniforms";
@@ -31,29 +29,28 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { AtmosphereUniforms } from "./atmosphereUniforms";
 
-export class FlatCloudsPostProcess extends PostProcess implements UpdatablePostProcess {
-    readonly cloudUniforms: CloudsUniforms;
-
+export class AtmosphericScatteringPostProcess extends PostProcess {
     private activeCamera: Camera | null = null;
 
-    constructor(planetTransform: TransformNode, boundingRadius: number, cloudUniforms: CloudsUniforms, stellarObjects: Transformable[], scene: Scene) {
-        const shaderName = "flatClouds";
+    constructor(planetTransform: TransformNode, planetBoundingRadius: number, atmosphereUniforms: AtmosphereUniforms, stellarObjects: Transformable[], scene: Scene) {
+        const shaderName = "atmosphericScattering";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
-            Effect.ShadersStore[`${shaderName}FragmentShader`] = flatCloudsFragment;
+            Effect.ShadersStore[`${shaderName}FragmentShader`] = atmosphericScatteringFragment;
         }
 
         const uniforms: string[] = [
             ...Object.values(ObjectUniformNames),
             ...Object.values(StellarObjectUniformNames),
             ...Object.values(CameraUniformNames),
-            ...Object.values(CloudsUniformNames)
+            ...atmosphereUniforms.getUniformNames()
         ];
 
-        const samplers: string[] = [...Object.values(SamplerUniformNames), ...Object.values(CloudsSamplerNames)];
+        const samplers: string[] = [...Object.values(SamplerUniformNames), ...atmosphereUniforms.getSamplerNames()];
 
         super(
-            `${planetTransform.name}CloudsPostProcess`,
+            `${planetTransform.name}AtmospherePostProcess`,
             shaderName,
             uniforms,
             samplers,
@@ -66,27 +63,22 @@ export class FlatCloudsPostProcess extends PostProcess implements UpdatablePostP
             Constants.TEXTURETYPE_HALF_FLOAT
         );
 
-        this.cloudUniforms = cloudUniforms;
-
         this.onActivateObservable.add((camera) => {
             this.activeCamera = camera;
         });
 
         this.onApplyObservable.add((effect) => {
             if (this.activeCamera === null) {
-                throw new Error("FlatCloudsPostProcess: activeCamera is null");
+                throw new Error("Camera is null");
             }
+
             setCameraUniforms(effect, this.activeCamera);
             setStellarObjectUniforms(effect, stellarObjects);
-            setObjectUniforms(effect, planetTransform, boundingRadius);
-            this.cloudUniforms.setUniforms(effect);
+            setObjectUniforms(effect, planetTransform, planetBoundingRadius);
 
-            this.cloudUniforms.setSamplers(effect);
+            atmosphereUniforms.setUniforms(effect);
+
             setSamplerUniforms(effect, this.activeCamera, scene);
         });
-    }
-
-    public update(deltaTime: number): void {
-        this.cloudUniforms.update(deltaTime);
     }
 }

@@ -74,7 +74,6 @@ classDiagram
     StellarObject <|-- CelestialBody
     CelestialBody <|-- OrbitalObject
     SpaceStation <|-- OrbitalObject
-    CelestialBody <|-- HasPostProcesses
     OrbitalObject <|-- BoundingSphere
     OrbitalObject <|-- Transformable
 
@@ -92,7 +91,6 @@ To sum up, an `OrbitalObject` is an object that can rotate around another `Orbit
 `CelestialBody` builds up on top of `OrbitalObject` by adding the notion of `BODY_TYPE` and `radius` that is expected from spherical objects.
 
 `CelestialBody` are spherical orbital objects that encompasses both planets and stellar objects.
-They can have specific post-processes applied to them (like atmosphere, clouds, rings...), which is why they also implement `HasPostProcesses`.
 
 `StellarObject` builds on top of `CelestialBody` by adding a `PointLight` that is used to light up the scene. They also have a `STELLAR_TYPE` that describes their type (star, black hole, neutron star).
 

@@ -16,13 +16,11 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import lensFlareFragment from "../../shaders/lensflare.glsl";
-import { ObjectPostProcess } from "./objectPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
-import { Matrix } from "@babylonjs/core/Maths/math";
-import { StellarObject } from "../architecture/stellarObject";
+import { Color3, Matrix } from "@babylonjs/core/Maths/math";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { ObjectUniformNames, setObjectUniforms } from "./uniforms/objectUniforms";
 import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms";
@@ -31,8 +29,8 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Scene } from "@babylonjs/core/scene";
-import { getRgbFromTemperature } from "../utils/specrend";
 import { moveTowards } from "../utils/math";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
 export type LensFlareSettings = {
     visibility: number;
@@ -40,13 +38,12 @@ export type LensFlareSettings = {
     clipPosition: Vector3;
 };
 
-export class LensFlarePostProcess extends PostProcess implements ObjectPostProcess {
+export class LensFlarePostProcess extends PostProcess {
     readonly settings: LensFlareSettings;
-    readonly object: StellarObject;
 
     private activeCamera: Camera | null = null;
 
-    constructor(object: StellarObject, scene: Scene) {
+    constructor(stellarTransform: TransformNode, boundingRadius: number, color: Color3, scene: Scene) {
         const shaderName = "lensflare";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = lensFlareFragment;
@@ -70,7 +67,7 @@ export class LensFlarePostProcess extends PostProcess implements ObjectPostProce
         const samplers: string[] = Object.values(SamplerUniformNames);
 
         super(
-            object.model.name + "LensFlare",
+            stellarTransform.name + "LensFlare",
             shaderName,
             uniforms,
             samplers,
@@ -83,10 +80,9 @@ export class LensFlarePostProcess extends PostProcess implements ObjectPostProce
             Constants.TEXTURETYPE_HALF_FLOAT
         );
 
-        this.object = object;
         this.settings = settings;
 
-        const flareColor = getRgbFromTemperature(object.model.physics.blackBodyTemperature);
+        const flareColor = color;
 
         this.onActivateObservable.add((camera) => {
             this.activeCamera = camera;
@@ -98,19 +94,19 @@ export class LensFlarePostProcess extends PostProcess implements ObjectPostProce
             }
 
             setCameraUniforms(effect, this.activeCamera);
-            setObjectUniforms(effect, object);
+            setObjectUniforms(effect, stellarTransform, boundingRadius);
 
             effect.setColor3(LensFlareUniformNames.FLARE_COLOR, flareColor);
 
-            const clipPosition = Vector3.Project(object.getTransform().getAbsolutePosition(), Matrix.IdentityReadOnly, scene.getTransformMatrix(), this.activeCamera.viewport);
+            const clipPosition = Vector3.Project(stellarTransform.getAbsolutePosition(), Matrix.IdentityReadOnly, scene.getTransformMatrix(), this.activeCamera.viewport);
             settings.behindCamera = clipPosition.z < 0;
             effect.setVector3(LensFlareUniformNames.CLIP_POSITION, clipPosition);
 
             const raycastResult = new PhysicsRaycastResult();
             const start = this.activeCamera.globalPosition;
-            const end = object.getTransform().getAbsolutePosition();
+            const end = stellarTransform.getAbsolutePosition();
             (scene.getPhysicsEngine() as PhysicsEngineV2).raycastToRef(start, end, raycastResult);
-            const occulted = raycastResult.hasHit && raycastResult.body?.transformNode !== object.getTransform();
+            const occulted = raycastResult.hasHit && raycastResult.body?.transformNode !== stellarTransform;
 
             const isNotVisible = occulted || settings.behindCamera;
 

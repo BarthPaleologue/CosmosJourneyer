@@ -474,6 +474,7 @@ export class StarSystemView implements View {
      */
     public initStarSystem(): void {
         const starSystem = this.getStarSystem();
+        starSystem.initPostProcesses(this.postProcessManager);
         starSystem.initPositions(2, this.chunkForge, this.postProcessManager);
         this.targetCursorLayer.reset();
 
@@ -527,8 +528,6 @@ export class StarSystemView implements View {
             // look at the first body
             activeControls.getTransform().lookAt(firstBody.getTransform().getAbsolutePosition());
         }
-
-        starSystem.initPostProcesses(this.postProcessManager);
 
         getNeighborStarSystemCoordinates(starSystem.model.coordinates, Math.min(Settings.PLAYER_JUMP_RANGE_LY, Settings.VISIBLE_NEIGHBORHOOD_MAX_RADIUS_LY)).forEach(
             ([neighborCoordinates, position, distance]) => {

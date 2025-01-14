@@ -19,7 +19,6 @@ import { GasPlanetMaterial } from "./gasPlanetMaterial";
 import { GasPlanetModel } from "./gasPlanetModel";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -37,6 +36,8 @@ import { Planet } from "../../architecture/planet";
 
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
 import { setRotationQuaternion } from "../../uberCore/transforms/basicTransform";
+import { AtmosphereUniforms } from "../../atmosphere/atmosphereUniforms";
+import { Settings } from "../../settings";
 
 export class GasPlanet implements Planet, Cullable {
     private readonly mesh: Mesh;
@@ -45,7 +46,7 @@ export class GasPlanet implements Planet, Cullable {
     readonly aggregate: PhysicsAggregate;
     readonly model: GasPlanetModel;
 
-    postProcesses: PostProcessType[] = [];
+    readonly atmosphereUniforms: AtmosphereUniforms;
 
     readonly ringsUniforms: RingsUniforms | null;
     readonly asteroidField: AsteroidField | null;
@@ -86,9 +87,10 @@ export class GasPlanet implements Planet, Cullable {
         this.material = new GasPlanetMaterial(this.model.name, this.model, scene);
         this.mesh.material = this.material;
 
-        this.postProcesses.push(PostProcessType.ATMOSPHERE, PostProcessType.SHADOW);
+        const atmosphereThickness = Settings.EARTH_ATMOSPHERE_THICKNESS * Math.max(1, this.model.radius / Settings.EARTH_RADIUS);
+        this.atmosphereUniforms = new AtmosphereUniforms(this.getBoundingRadius(), atmosphereThickness);
+
         if (this.model.rings !== null) {
-            this.postProcesses.push(PostProcessType.RING);
             this.ringsUniforms = new RingsUniforms(this.model.rings, scene);
 
             const averageRadius = (this.model.radius * (this.model.rings.ringStart + this.model.rings.ringEnd)) / 2;

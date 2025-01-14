@@ -19,16 +19,15 @@ import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 import { Light } from "@babylonjs/core/Lights/light";
-import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { BlackHoleModel } from "./blackHoleModel";
 import { StellarObject } from "../../architecture/stellarObject";
 import { Cullable } from "../../utils/cullable";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
-
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
 import { setRotationQuaternion } from "../../uberCore/transforms/basicTransform";
+import { BlackHoleUniforms } from "./blackHoleUniforms";
 
 export class BlackHole implements StellarObject, Cullable {
     readonly name: string;
@@ -39,11 +38,11 @@ export class BlackHole implements StellarObject, Cullable {
 
     readonly model: BlackHoleModel;
 
-    readonly postProcesses: PostProcessType[] = [];
-
     readonly ringsUniforms = null;
 
     readonly asteroidField = null;
+
+    readonly blackHoleUniforms: BlackHoleUniforms;
 
     readonly targetInfo: TargetInfo;
 
@@ -61,7 +60,7 @@ export class BlackHole implements StellarObject, Cullable {
         this.light.parent = this.getTransform();
         if (this.model.physics.accretionDiskRadius === 0) this.light.intensity = 0;
 
-        this.postProcesses.push(PostProcessType.BLACK_HOLE);
+        this.blackHoleUniforms = new BlackHoleUniforms(this.model);
 
         this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());
     }

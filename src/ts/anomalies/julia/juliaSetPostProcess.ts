@@ -16,9 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import juliaFragment from "../../../shaders/juliaSet.glsl";
-import { ObjectPostProcess, UpdatablePostProcess } from "../../postProcesses/objectPostProcess";
+import { UpdatablePostProcess } from "../../postProcesses/updatablePostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { JuliaSet } from "./juliaSet";
 import { StellarObject } from "../../architecture/stellarObject";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Camera } from "@babylonjs/core/Cameras/camera";
@@ -29,15 +28,15 @@ import { SamplerUniformNames, setSamplerUniforms } from "../../postProcesses/uni
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { Scene } from "@babylonjs/core/scene";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 
-export class JuliaSetPostProcess extends PostProcess implements ObjectPostProcess, UpdatablePostProcess {
-    readonly object: JuliaSet;
-
+export class JuliaSetPostProcess extends PostProcess implements UpdatablePostProcess {
     private elapsedSeconds = 0;
 
     private activeCamera: Camera | null = null;
 
-    constructor(julia: JuliaSet, scene: Scene, stellarObjects: StellarObject[]) {
+    constructor(transform: TransformNode, boundingRadius: number, accentColor: Color3, scene: Scene, stellarObjects: StellarObject[]) {
         const shaderName = "julia";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = juliaFragment;
@@ -57,9 +56,7 @@ export class JuliaSetPostProcess extends PostProcess implements ObjectPostProces
 
         const samplers: string[] = Object.values(SamplerUniformNames);
 
-        super(julia.model.name, shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
-
-        this.object = julia;
+        super(transform.name, shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
 
         this.onActivateObservable.add((camera) => {
             this.activeCamera = camera;
@@ -72,10 +69,10 @@ export class JuliaSetPostProcess extends PostProcess implements ObjectPostProces
 
             setCameraUniforms(effect, this.activeCamera);
             setStellarObjectUniforms(effect, stellarObjects);
-            setObjectUniforms(effect, julia);
+            setObjectUniforms(effect, transform, boundingRadius);
 
             effect.setFloat(JuliaUniformNames.ELAPSED_SECONDS, this.elapsedSeconds);
-            effect.setColor3(JuliaUniformNames.ACCENT_COLOR, julia.model.accentColor);
+            effect.setColor3(JuliaUniformNames.ACCENT_COLOR, accentColor);
 
             setSamplerUniforms(effect, this.activeCamera, scene);
         });

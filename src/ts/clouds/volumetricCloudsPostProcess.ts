@@ -16,13 +16,10 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import volumetricCloudsFragment from "../../shaders/volumetricCloudsFragment.glsl";
-import { ObjectPostProcess } from "../postProcesses/objectPostProcess";
+
 import { FlatCloudsPostProcess } from "./flatCloudsPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { CloudsUniforms } from "./cloudsUniforms";
-
-import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
-import { Transformable } from "../architecture/transformable";
 import { StellarObject } from "../architecture/stellarObject";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Camera } from "@babylonjs/core/Cameras/camera";
@@ -33,16 +30,16 @@ import { SamplerUniformNames, setSamplerUniforms } from "../postProcesses/unifor
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { Scene } from "@babylonjs/core/scene";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
 export type CloudsPostProcess = FlatCloudsPostProcess | VolumetricCloudsPostProcess;
 
-export class VolumetricCloudsPostProcess extends PostProcess implements ObjectPostProcess {
+export class VolumetricCloudsPostProcess extends PostProcess {
     readonly cloudUniforms: CloudsUniforms;
-    readonly object: Transformable;
 
     private activeCamera: Camera | null = null;
 
-    constructor(name: string, planet: Transformable & HasBoundingSphere, cloudsUniforms: CloudsUniforms, scene: Scene, stars: StellarObject[]) {
+    constructor(name: string, transform: TransformNode, boundingRadius: number, cloudsUniforms: CloudsUniforms, scene: Scene, stars: StellarObject[]) {
         const shaderName = "volumetricClouds";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = volumetricCloudsFragment;
@@ -64,7 +61,6 @@ export class VolumetricCloudsPostProcess extends PostProcess implements ObjectPo
 
         super(name, shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
 
-        this.object = planet;
         this.cloudUniforms = cloudsUniforms;
 
         this.onActivateObservable.add((camera) => {
@@ -77,11 +73,11 @@ export class VolumetricCloudsPostProcess extends PostProcess implements ObjectPo
             }
 
             setCameraUniforms(effect, this.activeCamera);
-            setObjectUniforms(effect, planet);
+            setObjectUniforms(effect, transform, boundingRadius);
             setStellarObjectUniforms(effect, stars);
 
-            effect.setFloat(VolumetricCloudsUniformNames.CLOUD_LAYER_MIN_HEIGHT, planet.getBoundingRadius());
-            effect.setFloat(VolumetricCloudsUniformNames.CLOUD_LAYER_MAX_HEIGHT, planet.getBoundingRadius() + 30e3);
+            effect.setFloat(VolumetricCloudsUniformNames.CLOUD_LAYER_MIN_HEIGHT, boundingRadius);
+            effect.setFloat(VolumetricCloudsUniformNames.CLOUD_LAYER_MAX_HEIGHT, boundingRadius + 30e3);
 
             setSamplerUniforms(effect, this.activeCamera, scene);
         });
