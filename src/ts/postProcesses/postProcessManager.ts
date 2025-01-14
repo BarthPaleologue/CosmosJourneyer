@@ -22,7 +22,7 @@ import { FlatCloudsPostProcess } from "../clouds/flatCloudsPostProcess";
 import { Settings } from "../settings";
 import { AtmosphericScatteringPostProcess } from "../atmosphere/atmosphericScatteringPostProcess";
 import { RingsPostProcess } from "../rings/ringsPostProcess";
-import { VolumetricLight } from "./volumetricLight";
+import { VolumetricLight } from "../volumetricLight/volumetricLight";
 import { BlackHolePostProcess } from "../stellarObjects/blackHole/blackHolePostProcess";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { ColorCorrection } from "./colorCorrection";
@@ -226,7 +226,7 @@ export class PostProcessManager {
     }
 
     public addStar(star: Star, excludedMeshes: AbstractMesh[]) {
-        const volumetricLight = new VolumetricLight(star.mesh, excludedMeshes, this.scene);
+        const volumetricLight = new VolumetricLight(star.mesh, star.volumetricLightUniforms, excludedMeshes, this.scene);
         const lensFlare = new LensFlarePostProcess(star.getTransform(), star.getBoundingRadius(), getRgbFromTemperature(star.model.physics.blackBodyTemperature), this.scene);
 
         this.volumetricLights.push(volumetricLight);
@@ -236,7 +236,7 @@ export class PostProcessManager {
     }
 
     public addNeutronStar(neutronStar: NeutronStar, excludedMeshes: AbstractMesh[]) {
-        const volumetricLight = new VolumetricLight(neutronStar.mesh, excludedMeshes, this.scene);
+        const volumetricLight = new VolumetricLight(neutronStar.mesh, neutronStar.volumetricLightUniforms, excludedMeshes, this.scene);
         const lensFlare = new LensFlarePostProcess(
             neutronStar.getTransform(),
             neutronStar.getBoundingRadius(),

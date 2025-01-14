@@ -36,8 +36,8 @@ import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
 import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
-
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
+import { VolumetricLightUniforms } from "../../volumetricLight/volumetricLightUniforms";
 
 export class NeutronStar implements StellarObject, Cullable {
     readonly model: NeutronStarModel;
@@ -48,6 +48,8 @@ export class NeutronStar implements StellarObject, Cullable {
     private readonly material: StarMaterial;
 
     readonly aggregate: PhysicsAggregate;
+
+    readonly volumetricLightUniforms = new VolumetricLightUniforms();
 
     readonly ringsUniforms: RingsUniforms | null;
 

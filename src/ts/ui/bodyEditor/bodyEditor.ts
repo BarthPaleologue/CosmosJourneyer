@@ -36,7 +36,6 @@ import { Star } from "../../stellarObjects/star/star";
 import { BlackHole } from "../../stellarObjects/blackHole/blackHole";
 import { CelestialBody } from "../../architecture/celestialBody";
 import { Scene } from "@babylonjs/core/scene";
-import { VolumetricLight } from "../../postProcesses/volumetricLight";
 import { TelluricPlanetMaterial } from "../../planets/telluricPlanet/telluricPlanetMaterial";
 
 export const enum EditorVisibility {
@@ -167,8 +166,6 @@ export class BodyEditor {
         this.generalPanel.setVisibility(this.currentPanel === this.generalPanel);
         this.generalPanel.init(body, postProcessManager.colorCorrection, postProcessManager.bloomRenderEffect, scene);
 
-        const postProcesses = postProcessManager.celestialBodyToPostProcesses.get(body) ?? [];
-
         if (body.ringsUniforms !== null) {
             this.ringsPanel.enable();
             this.ringsPanel.setVisibility(this.currentPanel === this.ringsPanel);
@@ -210,12 +207,9 @@ export class BodyEditor {
                 this.gazCloudsPanel.init(body.material);
             }
         } else if (body instanceof Star) {
-            const volumetricLight = postProcesses.find((pp) => pp instanceof VolumetricLight);
-            if (volumetricLight !== undefined) {
-                this.starPanel.enable();
-                this.starPanel.setVisibility(this.currentPanel === this.starPanel);
-                this.starPanel.init(volumetricLight);
-            }
+            this.starPanel.enable();
+            this.starPanel.setVisibility(this.currentPanel === this.starPanel);
+            this.starPanel.init(body.volumetricLightUniforms);
         } else if (body instanceof BlackHole) {
             this.blackHolePanel.enable();
             this.blackHolePanel.setVisibility(this.currentPanel === this.blackHolePanel);
