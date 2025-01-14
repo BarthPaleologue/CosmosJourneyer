@@ -36,7 +36,6 @@ import { Star } from "../../stellarObjects/star/star";
 import { BlackHole } from "../../stellarObjects/blackHole/blackHole";
 import { CelestialBody } from "../../architecture/celestialBody";
 import { Scene } from "@babylonjs/core/scene";
-import { OceanPostProcess } from "../../postProcesses/oceanPostProcess";
 import { VolumetricLight } from "../../postProcesses/volumetricLight";
 import { TelluricPlanetMaterial } from "../../planets/telluricPlanet/telluricPlanetMaterial";
 
@@ -200,11 +199,10 @@ export class BodyEditor {
                     this.cloudsPanel.init(body.getBoundingRadius(), body.cloudsUniforms);
                 }
 
-                const ocean = postProcesses.find((pp) => pp instanceof OceanPostProcess);
-                if (ocean !== undefined) {
+                if (body.oceanUniforms !== null) {
                     this.oceanPanel.enable();
                     this.oceanPanel.setVisibility(this.currentPanel === this.oceanPanel);
-                    this.oceanPanel.init(ocean.oceanUniforms);
+                    this.oceanPanel.init(body.oceanUniforms);
                 }
             } else {
                 this.gazCloudsPanel.enable();

@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { UberScene } from "../uberCore/uberScene";
-import { OceanPostProcess } from "./oceanPostProcess";
+import { OceanPostProcess } from "../ocean/oceanPostProcess";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { FlatCloudsPostProcess } from "../clouds/flatCloudsPostProcess";
 import { Settings } from "../settings";
@@ -270,8 +270,8 @@ export class PostProcessManager {
             postProcesses.push(atmosphere);
         }
 
-        if (planet.model.physics.oceanLevel > 0) {
-            const ocean = new OceanPostProcess(planet.getTransform(), planet.getBoundingRadius(), planet.model, stellarObjects, this.scene);
+        if (planet.oceanUniforms !== null) {
+            const ocean = new OceanPostProcess(planet.getTransform(), planet.getBoundingRadius(), planet.oceanUniforms, stellarObjects, this.scene);
             this.oceans.push(ocean);
             postProcesses.push(ocean);
         }

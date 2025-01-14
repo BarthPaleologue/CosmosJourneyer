@@ -32,7 +32,6 @@ import { newSeededTelluricPlanetModel } from "./planets/telluricPlanet/telluricP
 import { newSeededSpaceElevatorModel } from "./spacestation/spaceElevatorModel";
 import { celsiusToKelvin, getOrbitRadiusFromPeriod } from "./utils/physics";
 import { Quaternion } from "@babylonjs/core/Maths/math";
-import { AtmosphericScatteringPostProcess } from "./atmosphere/atmosphericScatteringPostProcess";
 
 const engine = await CosmosJourneyer.CreateAsync();
 engine.setAutoSaveEnabled(false);
@@ -138,7 +137,7 @@ const starSystem = await starSystemView.loadStarSystem(starSystemModel);
 
 engine.init(true);
 
-const planets = starSystem.getPlanets();
+const planets = starSystem.getTelluricPlanets();
 
 const hecate = planets.find((planet) => planet.model === hecateModel);
 if (hecate === undefined) {
@@ -152,10 +151,9 @@ if (ares === undefined) {
     throw new Error("Ares not found");
 }
 
-const aresAtmosphere = starSystemView.postProcessManager.celestialBodyToPostProcesses.get(ares)?.find((pp) => pp instanceof AtmosphericScatteringPostProcess);
-if (aresAtmosphere !== undefined) {
-    aresAtmosphere.atmosphereUniforms.rayleighScatteringCoefficients.x *= 4;
-    aresAtmosphere.atmosphereUniforms.rayleighScatteringCoefficients.z /= 3;
+if (ares.atmosphereUniforms !== null) {
+    ares.atmosphereUniforms.rayleighScatteringCoefficients.x *= 4;
+    ares.atmosphereUniforms.rayleighScatteringCoefficients.z /= 3;
 } else {
     console.warn("No atmosphere found for Ares");
 }

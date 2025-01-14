@@ -356,6 +356,10 @@ export class StarSystemController {
         return this.subSystems.flatMap((subSystem) => subSystem.planetarySystems.flatMap((planetarySystem) => planetarySystem.planets));
     }
 
+    public getTelluricPlanets(): TelluricPlanet[] {
+        return this.getPlanets().filter((planet) => planet instanceof TelluricPlanet);
+    }
+
     /**
      * Returns all the planetary mass objects in the star system. (Planets first, then satellites)
      */

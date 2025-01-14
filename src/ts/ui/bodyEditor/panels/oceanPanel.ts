@@ -15,9 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { OceanUniforms } from "../../../ocean/oceanUniforms";
 import { EditorPanel } from "../editorPanel";
 import { Slider } from "handle-sliderjs";
-import { OceanUniforms } from "../../../postProcesses/oceanPostProcess";
 
 export class OceanPanel extends EditorPanel {
     constructor() {

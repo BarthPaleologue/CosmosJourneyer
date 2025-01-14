@@ -39,6 +39,7 @@ import { OrbitalObjectType } from "../../architecture/orbitalObject";
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
 import { AtmosphereUniforms } from "../../atmosphere/atmosphereUniforms";
 import { Settings } from "../../settings";
+import { OceanUniforms } from "../../ocean/oceanUniforms";
 
 export class TelluricPlanet implements PlanetaryMassObject, Cullable {
     readonly sides: ChunkTree[]; // stores the 6 sides of the sphere
@@ -51,6 +52,8 @@ export class TelluricPlanet implements PlanetaryMassObject, Cullable {
     readonly aggregate: PhysicsAggregate;
 
     readonly atmosphereUniforms: AtmosphereUniforms | null;
+
+    readonly oceanUniforms: OceanUniforms | null;
 
     readonly ringsUniforms: RingsUniforms | null;
     readonly asteroidField: AsteroidField | null;
@@ -90,6 +93,12 @@ export class TelluricPlanet implements PlanetaryMassObject, Cullable {
             this.atmosphereUniforms = new AtmosphereUniforms(this.getBoundingRadius(), atmosphereThickness);
         } else {
             this.atmosphereUniforms = null;
+        }
+
+        if (this.model.physics.oceanLevel > 0) {
+            this.oceanUniforms = new OceanUniforms(this.getRadius(), this.model.physics.oceanLevel);
+        } else {
+            this.oceanUniforms = null;
         }
 
         if (this.model.rings !== null) {
