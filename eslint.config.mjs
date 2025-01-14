@@ -99,5 +99,6 @@ export default [{
             format: ["PascalCase"],
             leadingUnderscore: "forbid",
         }],
+        "@typescript-eslint/require-array-sort-compare": "error"
     },
 }];
