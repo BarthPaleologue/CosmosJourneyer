@@ -53,13 +53,13 @@ import { SidePanels } from "./ui/sidePanels";
 import { Settings } from "./settings";
 import { Player } from "./player/player";
 import { getObjectBySystemId, getUniverseObjectId } from "./utils/coordinates/orbitalObjectId";
-import { getSystemModelFromCoordinates } from "./starSystem/modelFromCoordinates";
 import { Tutorial } from "./tutorials/tutorial";
 import { StationLandingTutorial } from "./tutorials/stationLandingTutorial";
 import { promptModalBoolean, alertModal, promptModalString } from "./utils/dialogModal";
 import { FuelScoopTutorial } from "./tutorials/fuelScoopTutorial";
 import { EncyclopaediaGalacticaManager } from "./society/encyclopaediaGalacticaManager";
 import { EncyclopaediaGalacticaLocal } from "./society/encyclopaediaGalacticaLocal";
+import { StarSystemDatabase } from "./starSystem/starSystemDatabase";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -99,7 +99,9 @@ export class CosmosJourneyer {
 
     readonly player: Player;
 
-    private readonly encyclopaedia: EncyclopaediaGalacticaManager;
+    readonly encyclopaedia: EncyclopaediaGalacticaManager;
+
+    readonly starSystemDatabase: StarSystemDatabase;
 
     /**
      * The number of seconds elapsed since the start of the engine
@@ -115,7 +117,13 @@ export class CosmosJourneyer {
 
     private isAutoSaveEnabled = true;
 
-    private constructor(player: Player, engine: AbstractEngine, starSystemView: StarSystemView, encyclopaedia: EncyclopaediaGalacticaManager) {
+    private constructor(
+        player: Player,
+        engine: AbstractEngine,
+        starSystemView: StarSystemView,
+        encyclopaedia: EncyclopaediaGalacticaManager,
+        starSystemDatabase: StarSystemDatabase
+    ) {
         this.engine = engine;
 
         this.player = player;
@@ -131,6 +139,8 @@ export class CosmosJourneyer {
 
             writeSavesToLocalStorage(saves);
         });
+
+        this.starSystemDatabase = starSystemDatabase;
 
         this.encyclopaedia = encyclopaedia;
         this.player.discoveries.uploaded.forEach((discovery) => {
@@ -158,7 +168,7 @@ export class CosmosJourneyer {
         });
 
         // Init starmap view
-        this.starMap = new StarMap(this.player, this.engine, this.encyclopaedia);
+        this.starMap = new StarMap(this.player, this.engine, this.encyclopaedia, this.starSystemDatabase);
         this.starMap.onTargetSetObservable.add((systemCoordinates: StarSystemCoordinates) => {
             this.starSystemView.setSystemAsTarget(systemCoordinates);
         });
@@ -171,7 +181,7 @@ export class CosmosJourneyer {
 
         this.tutorialLayer = new TutorialLayer();
 
-        this.sidePanels = new SidePanels();
+        this.sidePanels = new SidePanels(this.starSystemDatabase);
         this.sidePanels.loadSavePanelContent.onLoadSaveObservable.add(async (saveData: SaveFileData) => {
             engine.onEndFrameObservable.addOnce(async () => {
                 if (this.isPaused()) {
@@ -183,7 +193,7 @@ export class CosmosJourneyer {
             });
         });
 
-        this.mainMenu = new MainMenu(this.sidePanels, starSystemView);
+        this.mainMenu = new MainMenu(this.sidePanels, this.starSystemView, this.starSystemDatabase);
         this.mainMenu.onStartObservable.add(async () => {
             await this.tutorialLayer.setTutorial(FlightTutorial);
             this.starSystemView.switchToSpaceshipControls();
@@ -333,13 +343,15 @@ export class CosmosJourneyer {
         const havokInstance = await HavokPhysics();
         console.log(`Havok initialized`);
 
+        const starSystemDatabase = new StarSystemDatabase();
+
         const player = Player.Default();
 
         const encyclopaedia = new EncyclopaediaGalacticaManager();
-        encyclopaedia.backends.push(new EncyclopaediaGalacticaLocal());
+        encyclopaedia.backends.push(new EncyclopaediaGalacticaLocal(starSystemDatabase));
 
         // Init star system view
-        const starSystemView = new StarSystemView(player, engine, havokInstance, encyclopaedia);
+        const starSystemView = new StarSystemView(player, engine, havokInstance, encyclopaedia, starSystemDatabase);
 
         await starSystemView.initAssets();
         starSystemView.resetPlayer();
@@ -348,7 +360,7 @@ export class CosmosJourneyer {
             await alertModal("Your keyboard layout could not be detected. The QWERTY layout will be assumed by default.");
         }
 
-        return new CosmosJourneyer(player, engine, starSystemView, encyclopaedia);
+        return new CosmosJourneyer(player, engine, starSystemView, encyclopaedia, starSystemDatabase);
     }
 
     public pause(): void {
@@ -662,7 +674,7 @@ export class CosmosJourneyer {
 
         const universeObjectId = universeCoordinates.universeObjectId;
 
-        const systemModel = getSystemModelFromCoordinates(universeObjectId.starSystemCoordinates);
+        const systemModel = this.starSystemDatabase.getSystemModelFromCoordinates(universeObjectId.starSystemCoordinates);
         await this.starSystemView.loadStarSystem(systemModel);
 
         if (this.state === EngineState.UNINITIALIZED) await this.init(true);

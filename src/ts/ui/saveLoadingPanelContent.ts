@@ -12,6 +12,7 @@ import trashIconPath from "../../asset/icons/trash.webp";
 import shareIconPath from "../../asset/icons/link.webp";
 import { promptModalBoolean, promptModalString } from "../utils/dialogModal";
 import { getObjectModelByUniverseId } from "../utils/coordinates/orbitalObjectId";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 
 export class SaveLoadingPanelContent {
     readonly htmlRoot: HTMLElement;
@@ -86,7 +87,7 @@ export class SaveLoadingPanelContent {
         this.htmlRoot.appendChild(this.cmdrList);
     }
 
-    populateCmdrList() {
+    populateCmdrList(starSystemDatabase: StarSystemDatabase) {
         this.cmdrList.innerHTML = "";
 
         const saves = getSavesFromLocalStorage();
@@ -214,7 +215,7 @@ export class SaveLoadingPanelContent {
             cmdrDiv.appendChild(savesList);
 
             allSaves.forEach((save) => {
-                const saveDiv = this.createSaveDiv(save, autoSaves.includes(save));
+                const saveDiv = this.createSaveDiv(save, autoSaves.includes(save), starSystemDatabase);
                 savesList.appendChild(saveDiv);
             });
 
@@ -237,7 +238,7 @@ export class SaveLoadingPanelContent {
         });
     }
 
-    private createSaveDiv(save: SaveFileData, isAutoSave: boolean): HTMLElement {
+    private createSaveDiv(save: SaveFileData, isAutoSave: boolean, starSystemDatabase: StarSystemDatabase): HTMLElement {
         const saveDiv = document.createElement("div");
         saveDiv.classList.add("saveContainer");
 
@@ -252,7 +253,7 @@ export class SaveLoadingPanelContent {
         const saveLocation = document.createElement("p");
         const isLanded = save.padNumber !== undefined;
         saveLocation.innerText = i18n.t(isLanded ? "sidePanel:landedAt" : "sidePanel:near", {
-            location: getObjectModelByUniverseId(save.universeCoordinates.universeObjectId).name,
+            location: getObjectModelByUniverseId(save.universeCoordinates.universeObjectId, starSystemDatabase).name,
             interpolation: {
                 escapeValue: false
             }

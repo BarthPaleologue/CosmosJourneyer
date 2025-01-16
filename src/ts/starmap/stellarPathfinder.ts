@@ -15,11 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getStarGalacticPosition } from "../utils/coordinates/starSystemCoordinatesUtils";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getNeighborStarSystemCoordinates } from "../utils/getNeighborStarSystems";
 import { PriorityQueue } from "../utils/priorityQueue";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/universeCoordinates";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 
 type Node = {
     coordinates: StarSystemCoordinates;
@@ -54,6 +54,12 @@ export class StellarPathfinder {
 
     private lastExploredNode: Node | null = null;
 
+    private starSystemDatabase: StarSystemDatabase;
+
+    public constructor(starSystemDatabase: StarSystemDatabase) {
+        this.starSystemDatabase = starSystemDatabase;
+    }
+
     /**
      * Initialize the pathfinder
      * @param startSystemCoordinates The seed of the starting system
@@ -70,12 +76,12 @@ export class StellarPathfinder {
 
         this.startSystem = {
             coordinates: startSystemCoordinates,
-            position: getStarGalacticPosition(startSystemCoordinates)
+            position: this.starSystemDatabase.getSystemGalacticPosition(startSystemCoordinates)
         };
 
         this.targetSystem = {
             coordinates: targetSystemCoordinates,
-            position: getStarGalacticPosition(targetSystemCoordinates)
+            position: this.starSystemDatabase.getSystemGalacticPosition(targetSystemCoordinates)
         };
 
         this.jumpRange = jumpRange;
@@ -97,7 +103,7 @@ export class StellarPathfinder {
     }
 
     private getNeighbors(node: Node): [Node, number][] {
-        const stellarNeighbors = getNeighborStarSystemCoordinates(node.coordinates, this.jumpRange);
+        const stellarNeighbors = getNeighborStarSystemCoordinates(node.coordinates, this.jumpRange, this.starSystemDatabase);
         return stellarNeighbors.map<[Node, number]>(([coordinates, position, distance]) => [
             {
                 coordinates: coordinates,

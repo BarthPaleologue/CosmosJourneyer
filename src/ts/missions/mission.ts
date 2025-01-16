@@ -17,11 +17,10 @@
 
 import { MissionNode, MissionNodeSerialized } from "./nodes/missionNode";
 import { MissionContext } from "./missionContext";
-import { getObjectModelByUniverseId, getUniverseIdForSpaceStationModel } from "../utils/coordinates/orbitalObjectId";
 import i18n from "../i18n";
 import { StarSystemCoordinates, UniverseObjectId } from "../utils/coordinates/universeCoordinates";
 import { deserializeMissionNode } from "./nodes/deserializeNode";
-import { OrbitalFacilityModel } from "../spacestation/orbitalFacility";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 
 /**
  * Registered mission types. Those are used to display localized strings in the UI
@@ -60,7 +59,7 @@ export class Mission {
     /**
      * The space station that gave the mission
      */
-    readonly missionGiver: OrbitalFacilityModel;
+    readonly missionGiver: UniverseObjectId;
 
     /**
      * The type of the mission (useful for displaying localized strings)
@@ -74,7 +73,7 @@ export class Mission {
      * @param missionGiver The space station that gave the mission
      * @param missionType The type of the mission (useful for displaying localized strings)
      */
-    constructor(tree: MissionNode, reward: number, missionGiver: OrbitalFacilityModel, missionType: MissionType) {
+    constructor(tree: MissionNode, reward: number, missionGiver: UniverseObjectId, missionType: MissionType) {
         this.tree = tree;
         this.reward = reward;
         this.missionGiver = missionGiver;
@@ -86,8 +85,8 @@ export class Mission {
      * @param context The current mission context
      * @param keyboardLayout The keyboard layout map to localize the keys
      */
-    describeNextTask(context: MissionContext, keyboardLayout: Map<string, string>): string {
-        return this.tree.describeNextTask(context, keyboardLayout);
+    describeNextTask(context: MissionContext, keyboardLayout: Map<string, string>, starSystemDatabase: StarSystemDatabase): string {
+        return this.tree.describeNextTask(context, keyboardLayout, starSystemDatabase);
     }
 
     /**
@@ -131,8 +130,8 @@ export class Mission {
     /**
      * Returns a string describing the mission using the mission tree and the origin seed
      */
-    describe(): string {
-        return this.tree.describe(this.missionGiver.starSystemCoordinates);
+    describe(starSystemDatabase: StarSystemDatabase): string {
+        return this.tree.describe(this.missionGiver.starSystemCoordinates, starSystemDatabase);
     }
 
     /**
@@ -147,7 +146,7 @@ export class Mission {
      */
     serialize(): MissionSerialized {
         return {
-            missionGiver: getUniverseIdForSpaceStationModel(this.missionGiver),
+            missionGiver: this.missionGiver,
             tree: this.tree.serialize(),
             reward: this.reward,
             type: this.missionType
@@ -164,11 +163,6 @@ export class Mission {
     }
 
     static Deserialize(missionSerialized: MissionSerialized) {
-        return new Mission(
-            deserializeMissionNode(missionSerialized.tree),
-            missionSerialized.reward,
-            getObjectModelByUniverseId(missionSerialized.missionGiver) as OrbitalFacilityModel,
-            missionSerialized.type
-        );
+        return new Mission(deserializeMissionNode(missionSerialized.tree), missionSerialized.reward, missionSerialized.missionGiver, missionSerialized.type);
     }
 }

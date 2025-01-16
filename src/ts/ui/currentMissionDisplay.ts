@@ -23,6 +23,7 @@ import { pressInteractionToStrings } from "../utils/strings/inputControlsString"
 import { Sounds } from "../assets/sounds";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import i18n from "../i18n";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 
 export class CurrentMissionDisplay {
     readonly rootNode: HTMLElement;
@@ -43,7 +44,7 @@ export class CurrentMissionDisplay {
 
     private readonly player: Player;
 
-    constructor(player: Player) {
+    constructor(player: Player, starSystemDatabase: StarSystemDatabase) {
         this.player = player;
 
         this.rootNode = document.createElement("div");
@@ -102,11 +103,11 @@ export class CurrentMissionDisplay {
         if (this.player.currentMissions.length === 0) {
             this.setNoMissionActive();
         } else {
-            this.setMission(this.player.currentMissions[0]);
+            this.setMission(this.player.currentMissions[0], starSystemDatabase);
         }
 
         SpaceShipControlsInputs.map.previousMission.on("complete", () => {
-            this.setPreviousMission();
+            this.setPreviousMission(starSystemDatabase);
             this.previousMissionButton.animate([{ transform: "scale(1)" }, { transform: "scale(1.1)" }, { transform: "scale(1)" }], {
                 duration: 200,
                 easing: "ease"
@@ -115,7 +116,7 @@ export class CurrentMissionDisplay {
         });
 
         SpaceShipControlsInputs.map.nextMission.on("complete", () => {
-            this.setNextMission();
+            this.setNextMission(starSystemDatabase);
             this.nextMissionButton.animate([{ transform: "scale(1)" }, { transform: "scale(1.1)" }, { transform: "scale(1)" }], {
                 duration: 200,
                 easing: "ease"
@@ -124,15 +125,15 @@ export class CurrentMissionDisplay {
         });
     }
 
-    public update(context: MissionContext, keyboardLayout: Map<string, string>) {
+    public update(context: MissionContext, keyboardLayout: Map<string, string>, starSystemDatabase: StarSystemDatabase) {
         const allMissions = this.player.completedMissions.concat(this.player.currentMissions);
         this.buttonContainer.hidden = allMissions.length <= 1;
 
         if (this.activeMission === null && this.player.currentMissions.length !== 0) {
-            this.setMission(this.player.currentMissions[0]);
+            this.setMission(this.player.currentMissions[0], starSystemDatabase);
         } else if (this.activeMission === null && allMissions.length !== 0) {
             const defaultMission = allMissions.at(0);
-            if (defaultMission !== undefined) this.setMission(defaultMission);
+            if (defaultMission !== undefined) this.setMission(defaultMission, starSystemDatabase);
             else this.setNoMissionActive();
         }
 
@@ -140,18 +141,18 @@ export class CurrentMissionDisplay {
 
         if (allMissions.indexOf(this.activeMission) === -1) {
             const defaultMission = allMissions.at(0);
-            if (defaultMission !== undefined) this.setMission(defaultMission);
+            if (defaultMission !== undefined) this.setMission(defaultMission, starSystemDatabase);
             else this.setNoMissionActive();
             return;
         }
 
         this.rootNode.classList.toggle("completed", this.activeMission.tree.isCompleted());
 
-        const nextTaskText = this.activeMission.describeNextTask(context, keyboardLayout);
+        const nextTaskText = this.activeMission.describeNextTask(context, keyboardLayout, starSystemDatabase);
         if (nextTaskText !== this.missionPanelNextTask.innerText) this.missionPanelNextTask.innerText = nextTaskText;
     }
 
-    public setNextMission() {
+    public setNextMission(starSystemDatabase: StarSystemDatabase) {
         if (this.activeMission === null) {
             return;
         }
@@ -160,7 +161,7 @@ export class CurrentMissionDisplay {
         const currentMissionIndex = allMissions.indexOf(this.activeMission);
         if (currentMissionIndex === -1) {
             const defaultMission = allMissions.at(0);
-            if (defaultMission !== undefined) this.setMission(defaultMission);
+            if (defaultMission !== undefined) this.setMission(defaultMission, starSystemDatabase);
             else this.setNoMissionActive();
             return;
         }
@@ -170,10 +171,10 @@ export class CurrentMissionDisplay {
             return;
         }
 
-        this.setMission(nextMission);
+        this.setMission(nextMission, starSystemDatabase);
     }
 
-    public setPreviousMission() {
+    public setPreviousMission(starSystemDatabase: StarSystemDatabase) {
         if (this.activeMission === null) {
             return;
         }
@@ -182,7 +183,7 @@ export class CurrentMissionDisplay {
         const currentMissionIndex = allMissions.indexOf(this.activeMission);
         if (currentMissionIndex === -1) {
             const defaultMission = allMissions.at(0);
-            if (defaultMission !== undefined) this.setMission(defaultMission);
+            if (defaultMission !== undefined) this.setMission(defaultMission, starSystemDatabase);
             else this.setNoMissionActive();
             return;
         }
@@ -194,13 +195,13 @@ export class CurrentMissionDisplay {
             return;
         }
 
-        this.setMission(previousMission);
+        this.setMission(previousMission, starSystemDatabase);
     }
 
-    private setMission(mission: Mission) {
+    private setMission(mission: Mission, starSystemDatabase: StarSystemDatabase) {
         this.activeMission = mission;
         this.missionPanelTitle.innerText = mission.getTypeString();
-        this.missionPanelDescription.innerText = mission.describe();
+        this.missionPanelDescription.innerText = mission.describe(starSystemDatabase);
 
         const allMissions = this.player.completedMissions.concat(this.player.currentMissions);
         const missionIndex = allMissions.indexOf(this.activeMission);

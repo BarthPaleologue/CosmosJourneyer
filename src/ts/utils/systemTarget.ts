@@ -2,9 +2,9 @@ import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import i18n from "../i18n";
 import { StarSystemCoordinates } from "./coordinates/universeCoordinates";
-import { getSystemModelFromCoordinates } from "../starSystem/modelFromCoordinates";
 import { ObjectTargetCursorType, Targetable } from "../architecture/targetable";
 import { Settings } from "../settings";
+import { StarSystemModel } from "../starSystem/starSystemModel";
 
 export class SystemTarget implements Targetable {
     readonly name: string;
@@ -18,11 +18,10 @@ export class SystemTarget implements Targetable {
         maxDistance: Settings.LIGHT_YEAR * 0.2
     };
 
-    constructor(systemCoordinates: StarSystemCoordinates, scene: Scene) {
-        const systemModel = getSystemModelFromCoordinates(systemCoordinates);
+    constructor(systemModel: StarSystemModel, scene: Scene) {
         this.name = systemModel.name;
         this.transform = new TransformNode(this.name, scene);
-        this.systemCoordinates = systemCoordinates;
+        this.systemCoordinates = systemModel.coordinates;
     }
 
     getTransform(): TransformNode {

@@ -26,7 +26,7 @@ import { GenerationSteps } from "../utils/generationSteps";
 import { CropType, CropTypes, getEdibleEnergyPerHaPerDay } from "../utils/agriculture";
 import { randomPieChart } from "../utils/random";
 import { generateSpaceStationName } from "../utils/strings/spaceStationNameGenerator";
-import { getFactionFromCoordinates } from "../society/factions";
+import { getFactionFromGalacticPosition } from "../society/factions";
 import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
 import { Settings } from "../settings";
 import { StellarObjectModel } from "../architecture/stellarObject";
@@ -45,6 +45,7 @@ export function newSeededSpaceStationModel(
     seed: number,
     stellarObjectModels: StellarObjectModel[],
     starSystemCoordinates: StarSystemCoordinates,
+    starSystemPosition: Vector3,
     parentBodies: CelestialBodyModel[]
 ): SpaceStationModel {
     const rng = getRngFromSeed(seed);
@@ -68,7 +69,7 @@ export function newSeededSpaceStationModel(
         axialTilt: Quaternion.RotationAxis(Axis.X, 2 * rng(GenerationSteps.AXIAL_TILT) * Math.PI)
     };
 
-    const faction = getFactionFromCoordinates(starSystemCoordinates, rng);
+    const faction = getFactionFromGalacticPosition(starSystemPosition, rng);
 
     //TODO: make this dependent on economic model
     const population = 2_000_000;

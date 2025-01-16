@@ -37,7 +37,6 @@ import { JuliaSet } from "../anomalies/julia/juliaSet";
 import { StarFieldBox } from "./starFieldBox";
 import { PlanetarySystemModel, StarSystemModel, SubStarSystemModel } from "./starSystemModel";
 import { Settings } from "../settings";
-import { getStarGalacticPosition } from "../utils/coordinates/starSystemCoordinatesUtils";
 import { GasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 import { MandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModel";
 import { JuliaSetModel } from "../anomalies/julia/juliaSetModel";
@@ -52,6 +51,7 @@ import { OrbitalFacility } from "../spacestation/orbitalFacility";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
 import { SpaceElevator } from "../spacestation/spaceElevator";
 import { SpaceElevatorModel } from "../spacestation/spaceElevatorModel";
+import { StarSystemDatabase } from "./starSystemDatabase";
 
 export type PlanetarySystem = {
     readonly planets: Planet[];
@@ -658,16 +658,17 @@ export class StarSystemController {
         postProcessManager.update(deltaSeconds);
     }
 
-    addSystemTarget(targetCoordinates: StarSystemCoordinates): SystemTarget {
-        const currentSystemUniversePosition = getStarGalacticPosition(this.model.coordinates);
-        const targetSystemUniversePosition = getStarGalacticPosition(targetCoordinates);
+    addSystemTarget(targetCoordinates: StarSystemCoordinates, starSystemDatabase: StarSystemDatabase): SystemTarget {
+        const currentSystemUniversePosition = starSystemDatabase.getSystemGalacticPosition(this.model.coordinates);
+        const targetSystemUniversePosition = starSystemDatabase.getSystemGalacticPosition(targetCoordinates);
 
         const distance = Vector3.Distance(currentSystemUniversePosition, targetSystemUniversePosition) * Settings.LIGHT_YEAR;
 
         const direction = targetSystemUniversePosition.subtract(currentSystemUniversePosition).scaleInPlace(Settings.LIGHT_YEAR / distance);
         Vector3.TransformCoordinatesToRef(direction, this.starFieldBox.getRotationMatrix(), direction);
 
-        const placeholderTransform = new SystemTarget(targetCoordinates, this.scene);
+        const systemModel = starSystemDatabase.getSystemModelFromCoordinates(targetCoordinates);
+        const placeholderTransform = new SystemTarget(systemModel, this.scene);
         placeholderTransform.getTransform().position.copyFrom(direction.scale(distance));
 
         this.systemTargets.push(placeholderTransform);

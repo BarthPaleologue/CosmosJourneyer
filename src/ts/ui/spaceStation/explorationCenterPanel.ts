@@ -22,6 +22,7 @@ import { Settings } from "../../settings";
 import { SpaceDiscoveryData } from "../../society/encyclopaediaGalactica";
 import { EncyclopaediaGalacticaManager } from "../../society/encyclopaediaGalacticaManager";
 import { EncyclopaediaGalacticaOnline } from "../../society/encyclopaediaGalacticaOnline";
+import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
 import { getObjectModelByUniverseId } from "../../utils/coordinates/orbitalObjectId";
 import { connectEncyclopaediaGalacticaModal } from "../../utils/dialogModal";
 import { DiscoveryDetails } from "./discoveryDetails";
@@ -48,7 +49,7 @@ export class ExplorationCenterPanel {
     private readonly player: Player;
     private readonly encyclopaedia: EncyclopaediaGalacticaManager;
 
-    constructor(encyclopaedia: EncyclopaediaGalacticaManager, player: Player) {
+    constructor(encyclopaedia: EncyclopaediaGalacticaManager, player: Player, starSystemDatabase: StarSystemDatabase) {
         this.player = player;
         this.encyclopaedia = encyclopaedia;
 
@@ -103,7 +104,7 @@ export class ExplorationCenterPanel {
                 player.discoveries.local = player.discoveries.local.filter((d) => d !== discovery);
                 player.discoveries.uploaded.push(discovery);
             }
-            await this.populate();
+            await this.populate(starSystemDatabase);
         });
         buttonHorizontalContainer.appendChild(this.sellAllButton);
 
@@ -131,7 +132,7 @@ export class ExplorationCenterPanel {
                 case ExplorationCenterFilter.UPLOADED_ONLY:
                 case ExplorationCenterFilter.ALL:
                     this.filter = discoveryListSelect.value;
-                    await this.populate();
+                    await this.populate(starSystemDatabase);
                     break;
                 default:
                     throw new Error("Invalid value of discoveryListSelect!");
@@ -149,9 +150,9 @@ export class ExplorationCenterPanel {
         this.discoveryList.classList.add("flex-column", "overflow-y-auto", "discoveryList");
         horizontalContainer.appendChild(this.discoveryList);
 
-        this.discoveryDetails = new DiscoveryDetails(player, encyclopaedia);
+        this.discoveryDetails = new DiscoveryDetails(player, encyclopaedia, starSystemDatabase);
         this.discoveryDetails.onSellDiscovery.add(async (discovery) => {
-            await this.populate();
+            await this.populate(starSystemDatabase);
         });
         horizontalContainer.appendChild(this.discoveryDetails.htmlRoot);
     }
@@ -163,7 +164,7 @@ export class ExplorationCenterPanel {
         }
     }
 
-    async populate() {
+    async populate(starSystemDatabase: StarSystemDatabase) {
         this.discoveryList.innerHTML = "";
         this.discoveryToHtmlItem.clear();
 
@@ -214,7 +215,7 @@ export class ExplorationCenterPanel {
         this.discoveryList.appendChild(searchField);
 
         discoveries.forEach(async (discovery) => {
-            const objectModel = getObjectModelByUniverseId(discovery.objectId);
+            const objectModel = getObjectModelByUniverseId(discovery.objectId, starSystemDatabase);
 
             const discoveryItem = document.createElement("div");
             discoveryItem.classList.add("listItemContainer", "flex-column");
@@ -228,7 +229,7 @@ export class ExplorationCenterPanel {
                 this.selectedDiscovery = discoveryItem;
                 this.selectedDiscovery.classList.add("selected");
 
-                await this.discoveryDetails.setDiscovery(discovery);
+                await this.discoveryDetails.setDiscovery(discovery, starSystemDatabase);
             });
             this.discoveryToHtmlItem.set(discovery, discoveryItem);
             this.discoveryList.appendChild(discoveryItem);

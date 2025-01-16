@@ -23,6 +23,7 @@ import { Player } from "../player/player";
 import { CurrentMissionDisplay } from "./currentMissionDisplay";
 import { MissionContext } from "../missions/missionContext";
 import { smoothstep } from "../utils/math";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 
 export class SpaceShipLayer {
     private readonly rootNode: HTMLElement;
@@ -39,7 +40,7 @@ export class SpaceShipLayer {
 
     private readonly player: Player;
 
-    constructor(player: Player) {
+    constructor(player: Player, starSystemDatabase: StarSystemDatabase) {
         this.player = player;
 
         this.rootNode = document.getElementById("helmetOverlay") as HTMLElement;
@@ -53,7 +54,7 @@ export class SpaceShipLayer {
 
         this.fuelIndicator = document.getElementById("fuelIndicator") as HTMLElement;
 
-        this.currentMissionDisplay = new CurrentMissionDisplay(player);
+        this.currentMissionDisplay = new CurrentMissionDisplay(player, starSystemDatabase);
         this.rootNode.appendChild(this.currentMissionDisplay.rootNode);
 
         document.addEventListener("mousemove", (event) => {
@@ -89,7 +90,7 @@ export class SpaceShipLayer {
         this.currentTarget = target;
     }
 
-    public update(currentControls: TransformNode, missionContext: MissionContext, keyboardLayout: Map<string, string>) {
+    public update(currentControls: TransformNode, missionContext: MissionContext, keyboardLayout: Map<string, string>, starSystemDatabase: StarSystemDatabase) {
         if (this.currentTarget !== null) {
             const directionWorld = this.currentTarget.getAbsolutePosition().subtract(currentControls.getAbsolutePosition()).normalize();
             const directionLocal = Vector3.TransformNormal(directionWorld, Matrix.Invert(currentControls.getWorldMatrix()));
@@ -102,7 +103,7 @@ export class SpaceShipLayer {
             this.targetDot.style.left = `${50 - 50 * directionLocal.x}%`;
         }
 
-        this.currentMissionDisplay.update(missionContext, keyboardLayout);
+        this.currentMissionDisplay.update(missionContext, keyboardLayout, starSystemDatabase);
     }
 
     displaySpeed(shipThrottle: number, speed: number) {

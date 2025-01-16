@@ -21,14 +21,11 @@ import { StarSystemCoordinates, starSystemCoordinatesEquals, UniverseObjectId, u
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { clamp } from "../../../../utils/math";
 import { getObjectBySystemId, getObjectModelByUniverseId } from "../../../../utils/coordinates/orbitalObjectId";
-import { getStarGalacticPosition } from "../../../../utils/coordinates/starSystemCoordinatesUtils";
 import i18n from "../../../../i18n";
 import { parseDistance } from "../../../../utils/strings/parseToStrings";
 import { Settings } from "../../../../settings";
-import { pressInteractionToStrings } from "../../../../utils/strings/inputControlsString";
-import { GeneralInputs } from "../../../../inputs/generalInputs";
-import { getSystemModelFromCoordinates } from "../../../../starSystem/modelFromCoordinates";
 import { getGoToSystemInstructions } from "../../../common";
+import { StarSystemDatabase } from "../../../../starSystem/starSystemDatabase";
 
 const enum AsteroidFieldMissionState {
     NOT_IN_SYSTEM,
@@ -123,10 +120,13 @@ export class MissionAsteroidFieldNode implements MissionNode {
         }
     }
 
-    describe(originSystemCoordinates: StarSystemCoordinates): string {
-        const distance = Vector3.Distance(getStarGalacticPosition(originSystemCoordinates), getStarGalacticPosition(this.targetSystemCoordinates));
-        const objectModel = getObjectModelByUniverseId(this.objectId);
-        const systemModel = getSystemModelFromCoordinates(this.targetSystemCoordinates);
+    describe(originSystemCoordinates: StarSystemCoordinates, starSystemDatabase: StarSystemDatabase): string {
+        const distance = Vector3.Distance(
+            starSystemDatabase.getSystemGalacticPosition(originSystemCoordinates),
+            starSystemDatabase.getSystemGalacticPosition(this.targetSystemCoordinates)
+        );
+        const objectModel = getObjectModelByUniverseId(this.objectId, starSystemDatabase);
+        const systemModel = starSystemDatabase.getSystemModelFromCoordinates(this.targetSystemCoordinates);
         return i18n.t("missions:sightseeing:describeAsteroidFieldTrek", {
             objectName: objectModel.name,
             systemName: systemModel.name,
@@ -134,16 +134,16 @@ export class MissionAsteroidFieldNode implements MissionNode {
         });
     }
 
-    describeNextTask(context: MissionContext, keyboardLayout: Map<string, string>): string {
+    describeNextTask(context: MissionContext, keyboardLayout: Map<string, string>, starSystemDatabase: StarSystemDatabase): string {
         if (this.isCompleted()) {
             return i18n.t("missions:asteroidField:missionCompleted");
         }
 
-        const targetObject = getObjectModelByUniverseId(this.objectId);
+        const targetObject = getObjectModelByUniverseId(this.objectId, starSystemDatabase);
 
         switch (this.state) {
             case AsteroidFieldMissionState.NOT_IN_SYSTEM:
-                return getGoToSystemInstructions(context, this.targetSystemCoordinates, keyboardLayout);
+                return getGoToSystemInstructions(context, this.targetSystemCoordinates, keyboardLayout, starSystemDatabase);
             case AsteroidFieldMissionState.TOO_FAR_IN_SYSTEM:
                 return i18n.t("missions:common:getCloserToTarget", {
                     objectName: targetObject.name

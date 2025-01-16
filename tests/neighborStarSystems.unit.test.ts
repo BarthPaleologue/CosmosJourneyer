@@ -17,12 +17,13 @@
 
 import { getNeighborStarSystemCoordinates } from "../src/ts/utils/getNeighborStarSystems";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-
 import { starSystemCoordinatesEquals } from "../src/ts/utils/coordinates/universeCoordinates";
-import { getStarSystemCoordinatesFromSeed } from "../src/ts/starSystem/systemSeed";
+import { StarSystemDatabase } from "../src/ts/starSystem/starSystemDatabase";
 
 test("getNeighborStarSystemCoordinates", () => {
-    const systemCoordinates = getStarSystemCoordinatesFromSeed({
+    const starSystemDatabase = new StarSystemDatabase();
+
+    const systemCoordinates = starSystemDatabase.getSystemCoordinatesFromSeed({
         starSectorX: 0,
         starSectorY: 0,
         starSectorZ: 0,
@@ -32,7 +33,7 @@ test("getNeighborStarSystemCoordinates", () => {
     for (let i = 0; i < 10; i++) {
         const searchRadius = 5 * i;
 
-        const neighbors = getNeighborStarSystemCoordinates(systemCoordinates, searchRadius);
+        const neighbors = getNeighborStarSystemCoordinates(systemCoordinates, searchRadius, starSystemDatabase);
         neighbors.forEach((neighbor) => {
             const [starSystemCoordinates, position, distance] = neighbor;
             expect(position).toBeInstanceOf(Vector3);

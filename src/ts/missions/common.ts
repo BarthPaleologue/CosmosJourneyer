@@ -3,17 +3,21 @@ import i18n from "../i18n";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/universeCoordinates";
 import { parseDistance } from "../utils/strings/parseToStrings";
 import { MissionContext } from "./missionContext";
-import { getStarGalacticPosition } from "../utils/coordinates/starSystemCoordinatesUtils";
 import { Settings } from "../settings";
 import { GeneralInputs } from "../inputs/generalInputs";
 import { pressInteractionToStrings } from "../utils/strings/inputControlsString";
-import { getSystemModelFromCoordinates } from "../starSystem/modelFromCoordinates";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 
-export function getGoToSystemInstructions(missionContext: MissionContext, targetSystemCoordinates: StarSystemCoordinates, keyboardLayout: Map<string, string>): string {
+export function getGoToSystemInstructions(
+    missionContext: MissionContext,
+    targetSystemCoordinates: StarSystemCoordinates,
+    keyboardLayout: Map<string, string>,
+    starSystemDatabase: StarSystemDatabase
+): string {
     const currentPlayerDestination = missionContext.currentItinerary.at(-1);
     const isPlayerGoingToTargetSystem = currentPlayerDestination !== undefined && starSystemCoordinatesEquals(currentPlayerDestination, targetSystemCoordinates);
 
-    const currentSystemPosition = getStarGalacticPosition(missionContext.currentSystem.model.coordinates);
+    const currentSystemPosition = starSystemDatabase.getSystemGalacticPosition(missionContext.currentSystem.model.coordinates);
 
     if (!isPlayerGoingToTargetSystem) {
         return i18n.t("missions:common:openStarMap", {
@@ -21,12 +25,12 @@ export function getGoToSystemInstructions(missionContext: MissionContext, target
         });
     } else {
         const nextSystemCoordinates = missionContext.currentItinerary[1];
-        const nextSystemModel = nextSystemCoordinates !== undefined ? getSystemModelFromCoordinates(nextSystemCoordinates) : undefined;
+        const nextSystemModel = nextSystemCoordinates !== undefined ? starSystemDatabase.getSystemModelFromCoordinates(nextSystemCoordinates) : undefined;
         if (nextSystemModel === undefined) {
             throw new Error("Next system model in itinerary is undefined and yet the player has an itinerary to the target system?!");
         }
 
-        const distanceToNextSystem = Vector3.Distance(getStarGalacticPosition(nextSystemModel.coordinates), currentSystemPosition);
+        const distanceToNextSystem = Vector3.Distance(starSystemDatabase.getSystemGalacticPosition(nextSystemModel.coordinates), currentSystemPosition);
 
         return i18n.t("missions:common:travelToNextSystem", {
             systemName: nextSystemModel.name,

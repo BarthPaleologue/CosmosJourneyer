@@ -20,8 +20,6 @@ import { Settings } from "../settings";
 import { generateStarName } from "../utils/strings/starNameGenerator";
 import { wheelOfFortune } from "../utils/random";
 import { PlanetarySystemModel, StarSystemModel } from "./starSystemModel";
-import { StarSector } from "../starmap/starSector";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { hashVec3 } from "../utils/hashVec3";
 import { StellarObjectModel } from "../architecture/stellarObject";
 import { AnomalyModel } from "../anomalies/anomaly";
@@ -36,11 +34,12 @@ import { getRngFromSeed } from "../utils/getRngFromSeed";
 import { romanNumeral } from "../utils/strings/romanNumerals";
 import { newSeededSpaceStationModel } from "../spacestation/spacestationModel";
 import { SystemSeed } from "./systemSeed";
-import { isSystemInHumanBubble } from "../society/starSystemSociety";
 import { OrbitalObjectType } from "../architecture/orbitalObject";
 import { newSeededTelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModel";
 import { newSeededTelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 import { newSeededSpaceElevatorModel } from "../spacestation/spaceElevatorModel";
+import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 const enum GenerationSteps {
     NAME,
@@ -60,19 +59,7 @@ const enum GenerationSteps {
  * @param seed The seed of the star system.
  * @returns The data model of the generated star system.
  */
-export function newSeededStarSystemModel(seed: SystemSeed): StarSystemModel {
-    // extract coordinates from seed
-    const starSector = new StarSector(new Vector3(seed.starSectorX, seed.starSectorY, seed.starSectorZ));
-    const localPosition = starSector.getLocalPositionOfStar(seed.index);
-    const coordinates = {
-        starSectorX: seed.starSectorX,
-        starSectorY: seed.starSectorY,
-        starSectorZ: seed.starSectorZ,
-        localX: localPosition.x,
-        localY: localPosition.y,
-        localZ: localPosition.z
-    };
-
+export function newSeededStarSystemModel(seed: SystemSeed, coordinates: StarSystemCoordinates, position: Vector3, isCivilized: boolean): StarSystemModel {
     // init pseudo-random number generator
     const cellRNG = getRngFromSeed(hashVec3(seed.starSectorX, seed.starSectorY, seed.starSectorZ));
     const hash = centeredRand(cellRNG, 1 + seed.index) * Settings.SEED_HALF_RANGE;
@@ -176,7 +163,7 @@ export function newSeededStarSystemModel(seed: SystemSeed): StarSystemModel {
         }
     }
 
-    if (isSystemInHumanBubble(coordinates)) {
+    if (isCivilized) {
         // finally, space station are placed
         const planetarySystemToScore = new Map<PlanetarySystemModel, number>();
 
@@ -212,10 +199,10 @@ export function newSeededStarSystemModel(seed: SystemSeed): StarSystemModel {
                 planetarySystem.planets[0].type === OrbitalObjectType.TELLURIC_PLANET && // space elevators can't be built on gas giants yet
                 planetarySystem.planets[0].rings === null // can't have rings because the tether would be at risk
             ) {
-                const spaceElevatorModel = newSeededSpaceElevatorModel(spaceStationSeed, stellarObjects, coordinates, planetarySystem.planets[0]);
+                const spaceElevatorModel = newSeededSpaceElevatorModel(spaceStationSeed, stellarObjects, coordinates, position, planetarySystem.planets[0]);
                 planetarySystem.orbitalFacilities.push(spaceElevatorModel);
             } else {
-                const spaceStationModel = newSeededSpaceStationModel(spaceStationSeed, stellarObjects, coordinates, planetarySystem.planets);
+                const spaceStationModel = newSeededSpaceStationModel(spaceStationSeed, stellarObjects, coordinates, position, planetarySystem.planets);
                 planetarySystem.orbitalFacilities.push(spaceStationModel);
             }
         });

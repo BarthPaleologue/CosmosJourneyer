@@ -19,10 +19,8 @@ import "../styles/index.scss";
 
 import { positionNearObjectBrightSide } from "./utils/positionNearObject";
 import { CosmosJourneyer } from "./cosmosJourneyer";
-
 import { newSeededBlackHoleModel } from "./stellarObjects/blackHole/blackHoleModel";
 import { StarSystemModel } from "./starSystem/starSystemModel";
-import { CustomSystemRegistry } from "./starSystem/customSystemRegistry";
 import { newSeededTelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModel";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Quaternion } from "@babylonjs/core/Maths/math";
@@ -60,7 +58,7 @@ const starSystemModel: StarSystemModel = {
     ]
 };
 
-CustomSystemRegistry.RegisterSystem(starSystemModel);
+engine.starSystemDatabase.registerCustomSystem(starSystemModel);
 
 const starSystem = await starSystemView.loadStarSystem(starSystemModel);
 

@@ -67,17 +67,15 @@ import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import { MissionContext } from "../missions/missionContext";
 import { Mission } from "../missions/mission";
 import { StarSystemCoordinates, starSystemCoordinatesEquals, UniverseObjectId } from "../utils/coordinates/universeCoordinates";
-import { getSystemModelFromCoordinates } from "./modelFromCoordinates";
 import { StarSystemModel } from "./starSystemModel";
 import { OrbitalObjectType } from "../architecture/orbitalObject";
 import { OrbitalFacility } from "../spacestation/orbitalFacility";
-import { getStarGalacticPosition } from "../utils/coordinates/starSystemCoordinatesUtils";
 import { Spaceship } from "../spaceship/spaceship";
-import { Inspector } from "@babylonjs/inspector";
 import { Transformable } from "../architecture/transformable";
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { TypedObject } from "../architecture/typedObject";
 import { EncyclopaediaGalacticaManager } from "../society/encyclopaediaGalacticaManager";
+import { StarSystemDatabase } from "./starSystemDatabase";
 
 // register cosmos journeyer as part of window object
 declare global {
@@ -112,6 +110,8 @@ export class StarSystemView implements View {
     private readonly player: Player;
 
     private readonly encyclopaedia: EncyclopaediaGalacticaManager;
+
+    private readonly starSystemDatabase: StarSystemDatabase;
 
     /**
      * A debug HTML UI to change the properties of the closest celestial body
@@ -211,11 +211,18 @@ export class StarSystemView implements View {
      * @param engine The BabylonJS engine
      * @param havokInstance The Havok physics instance
      */
-    constructor(player: Player, engine: AbstractEngine, havokInstance: HavokPhysicsWithBindings, encyclopaedia: EncyclopaediaGalacticaManager) {
+    constructor(
+        player: Player,
+        engine: AbstractEngine,
+        havokInstance: HavokPhysicsWithBindings,
+        encyclopaedia: EncyclopaediaGalacticaManager,
+        starSystemDatabase: StarSystemDatabase
+    ) {
         this.player = player;
         this.encyclopaedia = encyclopaedia;
+        this.starSystemDatabase = starSystemDatabase;
 
-        this.spaceShipLayer = new SpaceShipLayer(this.player);
+        this.spaceShipLayer = new SpaceShipLayer(this.player, this.starSystemDatabase);
         this.bodyEditor = new BodyEditor(EditorVisibility.HIDDEN);
 
         const canvas = engine.getRenderingCanvas();
@@ -269,8 +276,8 @@ export class StarSystemView implements View {
 
             const spaceship = shipControls.getSpaceship();
 
-            const currentSystemPosition = getStarGalacticPosition(this.getStarSystem().model.coordinates);
-            const targetSystemPosition = getStarGalacticPosition(target.systemCoordinates);
+            const currentSystemPosition = this.starSystemDatabase.getSystemGalacticPosition(this.getStarSystem().model.coordinates);
+            const targetSystemPosition = this.starSystemDatabase.getSystemGalacticPosition(target.systemCoordinates);
 
             const distanceLY = Vector3.Distance(currentSystemPosition, targetSystemPosition);
 
@@ -317,7 +324,7 @@ export class StarSystemView implements View {
             spaceship.burnFuel(fuelForJump);
 
             const starSystemCoordinates = target.systemCoordinates;
-            const systemModel = getSystemModelFromCoordinates(starSystemCoordinates);
+            const systemModel = this.starSystemDatabase.getSystemModelFromCoordinates(starSystemCoordinates);
             await this.loadStarSystem(systemModel);
             this.initStarSystem();
 
@@ -423,7 +430,7 @@ export class StarSystemView implements View {
         this.bodyEditor.resize();
         this.spaceShipLayer.setVisibility(false);
 
-        this.spaceStationLayer = new SpaceStationLayer(this.player, this.encyclopaedia);
+        this.spaceStationLayer = new SpaceStationLayer(this.player, this.encyclopaedia, this.starSystemDatabase);
         this.spaceStationLayer.setVisibility(false);
         this.spaceStationLayer.onTakeOffObservable.add(() => {
             this.getSpaceshipControls().getSpaceship().takeOff();
@@ -510,8 +517,8 @@ export class StarSystemView implements View {
             positionNearObjectBrightSide(activeControls, firstBody, starSystem, controllerDistanceFactor);
         } else {
             // place player in the direction of the previous system (where we came from)
-            const currentSystemPosition = getStarGalacticPosition(starSystem.model.coordinates);
-            const previousSystemPosition = getStarGalacticPosition(this.player.visitedSystemHistory[this.player.visitedSystemHistory.length - 1]);
+            const currentSystemPosition = this.starSystemDatabase.getSystemGalacticPosition(starSystem.model.coordinates);
+            const previousSystemPosition = this.starSystemDatabase.getSystemGalacticPosition(this.player.visitedSystemHistory[this.player.visitedSystemHistory.length - 1]);
 
             // compute direction from previous system to current system
             const placementDirection = previousSystemPosition.subtract(currentSystemPosition).normalize();
@@ -529,12 +536,14 @@ export class StarSystemView implements View {
             activeControls.getTransform().lookAt(firstBody.getTransform().getAbsolutePosition());
         }
 
-        getNeighborStarSystemCoordinates(starSystem.model.coordinates, Math.min(Settings.PLAYER_JUMP_RANGE_LY, Settings.VISIBLE_NEIGHBORHOOD_MAX_RADIUS_LY)).forEach(
-            ([neighborCoordinates, position, distance]) => {
-                const systemTarget = this.getStarSystem().addSystemTarget(neighborCoordinates);
-                this.targetCursorLayer.addObject(systemTarget);
-            }
-        );
+        getNeighborStarSystemCoordinates(
+            starSystem.model.coordinates,
+            Math.min(Settings.PLAYER_JUMP_RANGE_LY, Settings.VISIBLE_NEIGHBORHOOD_MAX_RADIUS_LY),
+            this.starSystemDatabase
+        ).forEach(([neighborCoordinates, position, distance]) => {
+            const systemTarget = this.getStarSystem().addSystemTarget(neighborCoordinates, this.starSystemDatabase);
+            this.targetCursorLayer.addObject(systemTarget);
+        });
 
         if (this.player.currentItinerary.length >= 2) {
             const targetCoordinates = this.player.currentItinerary[1];
@@ -746,7 +755,7 @@ export class StarSystemView implements View {
             physicsEngine: this.scene.getPhysicsEngine() as PhysicsEngineV2
         };
 
-        this.spaceShipLayer.update(activeControls.getTransform(), missionContext, this.keyboardLayoutMap);
+        this.spaceShipLayer.update(activeControls.getTransform(), missionContext, this.keyboardLayoutMap, this.starSystemDatabase);
 
         this.targetCursorLayer.update(activeControls.getActiveCamera());
         const targetLandingPad = spaceship.getTargetLandingPad();
@@ -939,7 +948,7 @@ export class StarSystemView implements View {
             .getSystemTargets()
             .find((systemTarget) => starSystemCoordinatesEquals(systemTarget.systemCoordinates, targetSeed));
         if (target === undefined) {
-            target = this.getStarSystem().addSystemTarget(targetSeed);
+            target = this.getStarSystem().addSystemTarget(targetSeed, this.starSystemDatabase);
             this.targetCursorLayer.addObject(target);
         }
         this.targetCursorLayer.setTarget(target);
