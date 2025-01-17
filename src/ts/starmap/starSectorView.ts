@@ -33,7 +33,7 @@ export type BuildData = {
     position: Vector3;
 };
 
-export class StarSector {
+export class StarSectorView {
     /**
      * The star instances of the sector
      */

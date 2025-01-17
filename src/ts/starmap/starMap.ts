@@ -18,7 +18,7 @@
 import starTexture from "../../asset/textures/starParticle.png";
 import blackHoleTexture from "../../asset/textures/blackholeParticleSmall.png";
 
-import { BuildData, StarSector, vector3ToString } from "./starSector";
+import { BuildData, StarSectorView, vector3ToString } from "./starSectorView";
 import { StarMapUI } from "./starMapUI";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -106,7 +106,7 @@ export class StarMap implements View {
     private selectedSystemCoordinates: StarSystemCoordinates | null = null;
     private currentSystemCoordinates: StarSystemCoordinates | null = null;
 
-    private readonly loadedStarSectors: Map<string, StarSector> = new Map<string, StarSector>();
+    private readonly loadedStarSectors: Map<string, StarSectorView> = new Map<string, StarSectorView>();
 
     private readonly coordinatesToInstanceMap: Map<string, InstancedMesh> = new Map();
     private readonly instanceToCoordinatesMap: Map<InstancedMesh, string> = new Map();
@@ -367,8 +367,8 @@ export class StarMap implements View {
      * @param coordinates The coordinates of the sector
      * @param generateNow
      */
-    private registerStarSector(coordinates: Vector3, generateNow = false): StarSector {
-        const starSector = new StarSector(coordinates, this.starSystemDatabase);
+    private registerStarSector(coordinates: Vector3, generateNow = false): StarSectorView {
+        const starSector = new StarSectorView(coordinates, this.starSystemDatabase);
         this.loadedStarSectors.set(starSector.getKey(), starSector);
 
         if (!generateNow) this.starBuildStack.push(...starSector.generate());
@@ -443,7 +443,7 @@ export class StarMap implements View {
             if (this.loadedStarSectors.has(sectorKey)) continue; // already generated
 
             // don't generate star sectors that are not in the frustum
-            const bb = StarSector.GetBoundingBox(coordinates.scale(Settings.STAR_SECTOR_SIZE), this.starMapCenterPosition);
+            const bb = StarSectorView.GetBoundingBox(coordinates.scale(Settings.STAR_SECTOR_SIZE), this.starMapCenterPosition);
             if (!activeCamera.isInFrustum(bb)) continue;
 
             this.registerStarSector(coordinates);
