@@ -104,7 +104,12 @@ export class StarSystemDatabase {
             throw new Error(`Seed not found for coordinates ${JSON.stringify(coordinates)}. It was not found in the custom system registry either.`);
         }
 
-        return this.applyPlugins(newSeededStarSystemModel(seed, coordinates, this.getSystemGalacticPosition(coordinates), this.isSystemInHumanBubble(coordinates)));
+        // init pseudo-random number generator
+        const cellRNG = getRngFromSeed(hashVec3(coordinates.starSectorX, coordinates.starSectorY, coordinates.starSectorZ));
+        const hash = centeredRand(cellRNG, 1 + seed.index) * Settings.SEED_HALF_RANGE;
+        const systemRng = getRngFromSeed(hash);
+
+        return this.applyPlugins(newSeededStarSystemModel(systemRng, coordinates, this.getSystemGalacticPosition(coordinates), this.isSystemInHumanBubble(coordinates)));
     }
 
     public getSystemModelsInStarSector(sectorX: number, sectorY: number, sectorZ: number) {

@@ -20,7 +20,6 @@ import { Settings } from "../settings";
 import { generateStarName } from "../utils/strings/starNameGenerator";
 import { wheelOfFortune } from "../utils/random";
 import { PlanetarySystemModel, StarSystemModel } from "./starSystemModel";
-import { hashVec3 } from "../utils/hashVec3";
 import { StellarObjectModel } from "../architecture/stellarObject";
 import { AnomalyModel } from "../anomalies/anomaly";
 import { Alphabet, ReversedGreekAlphabet } from "../utils/strings/parseToStrings";
@@ -33,7 +32,6 @@ import { newSeededJuliaSetModel } from "../anomalies/julia/juliaSetModel";
 import { getRngFromSeed } from "../utils/getRngFromSeed";
 import { romanNumeral } from "../utils/strings/romanNumerals";
 import { newSeededSpaceStationModel } from "../spacestation/spacestationModel";
-import { SystemSeed } from "./systemSeed";
 import { OrbitalObjectType } from "../architecture/orbitalObject";
 import { newSeededTelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModel";
 import { newSeededTelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
@@ -59,12 +57,7 @@ const enum GenerationSteps {
  * @param seed The seed of the star system.
  * @returns The data model of the generated star system.
  */
-export function newSeededStarSystemModel(seed: SystemSeed, coordinates: StarSystemCoordinates, position: Vector3, isCivilized: boolean): StarSystemModel {
-    // init pseudo-random number generator
-    const cellRNG = getRngFromSeed(hashVec3(seed.starSectorX, seed.starSectorY, seed.starSectorZ));
-    const hash = centeredRand(cellRNG, 1 + seed.index) * Settings.SEED_HALF_RANGE;
-    const systemRng = getRngFromSeed(hash);
-
+export function newSeededStarSystemModel(systemRng: (step: number) => number, coordinates: StarSystemCoordinates, position: Vector3, isCivilized: boolean): StarSystemModel {
     const systemName = generateStarName(systemRng, GenerationSteps.NAME);
 
     // generate stellar objects of the system first (we can assume the other objects don't have a significant influence on the stellar objects)
