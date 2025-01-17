@@ -179,7 +179,7 @@ export class StellarPathfinder {
 
     /**
      * Get the path between the start and target systems (ordered from start to target)
-     * @returns An array of SystemSeed objects representing the path between the start and target systems
+     * @returns An array of StarSystemCoordinates objects representing the path between the start and target systems
      * @throws An error if the pathfinder has not been initialized
      * @throws An error if no path has been found
      */
