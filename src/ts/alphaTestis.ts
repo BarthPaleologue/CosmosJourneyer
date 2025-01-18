@@ -22,11 +22,9 @@ import { positionNearObjectBrightSide } from "./utils/positionNearObject";
 import { CosmosJourneyer } from "./cosmosJourneyer";
 import { newSeededGasPlanetModel } from "./planets/gasPlanet/gasPlanetModel";
 import { SpaceShipControlsInputs } from "./spaceship/spaceShipControlsInputs";
-
 import { newSeededStarModel } from "./stellarObjects/star/starModel";
 import { StarSystemModel } from "./starSystem/starSystemModel";
 import { StarSystemCoordinates } from "./utils/coordinates/universeCoordinates";
-import { CustomSystemRegistry } from "./starSystem/customSystemRegistry";
 import { newSeededTelluricSatelliteModel } from "./planets/telluricPlanet/telluricSatelliteModel";
 import { newSeededTelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModel";
 import { newSeededSpaceElevatorModel } from "./spacestation/spaceElevatorModel";
@@ -44,7 +42,7 @@ const starSystemView = engine.starSystemView;
 const systemName = "Alpha Testis";
 const systemCoordinates: StarSystemCoordinates = {
     starSectorX: 0,
-    starSectorY: 0,
+    starSectorY: 1,
     starSectorZ: 0,
     localX: 0,
     localY: 0,
@@ -75,7 +73,7 @@ hecateModel.orbit.period = 60 * 60 * 24 * 365.25;
 hecateModel.orbit.radius = 25000 * hecateModel.radius;
 hecateModel.orbit.orientation = Quaternion.Identity();
 
-const spaceStationModel = newSeededSpaceElevatorModel(0, [sunModel], systemCoordinates, hecateModel);
+const spaceStationModel = newSeededSpaceElevatorModel(0, [sunModel], systemCoordinates, engine.starSystemDatabase.getSystemGalacticPosition(systemCoordinates), hecateModel);
 
 //physicsViewer.showBody(spaceStation.aggregate.body);
 /*for(const landingpad of spaceStation.landingPads) {
@@ -131,7 +129,7 @@ const starSystemModel: StarSystemModel = {
     ]
 };
 
-CustomSystemRegistry.RegisterSystem(starSystemModel);
+engine.starSystemDatabase.registerCustomSystem(starSystemModel);
 
 const starSystem = await starSystemView.loadStarSystem(starSystemModel);
 

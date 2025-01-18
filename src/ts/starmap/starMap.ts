@@ -18,7 +18,7 @@
 import starTexture from "../../asset/textures/starParticle.png";
 import blackHoleTexture from "../../asset/textures/blackholeParticleSmall.png";
 
-import { BuildData, StarSector, vector3ToString } from "./starSector";
+import { BuildData, StarSectorView, vector3ToString } from "./starSectorView";
 import { StarMapUI } from "./starMapUI";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -51,15 +51,14 @@ import { CameraRadiusAnimation } from "../uberCore/transforms/animations/radius"
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { StellarPathfinder } from "./stellarPathfinder";
 import { createNotification, NotificationIntent, NotificationOrigin } from "../utils/notification";
-import { getStarGalacticPosition } from "../utils/coordinates/starSystemCoordinatesUtils";
 import { Player } from "../player/player";
 import { Settings } from "../settings";
 import { getRgbFromTemperature } from "../utils/specrend";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/universeCoordinates";
-import { getSystemModelFromCoordinates } from "../starSystem/modelFromCoordinates";
 import { StarSystemModelUtils } from "../starSystem/starSystemModel";
 import { OrbitalObjectType } from "../architecture/orbitalObject";
 import { EncyclopaediaGalactica } from "../society/encyclopaediaGalactica";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 
 // register cosmos journeyer as part of window object
 declare global {
@@ -81,6 +80,8 @@ export class StarMap implements View {
     private readonly player: Player;
 
     private readonly encyclopaedia: EncyclopaediaGalactica;
+
+    private readonly starSystemDatabase: StarSystemDatabase;
 
     /**
      * The position of the center of the starmap in world space.
@@ -105,14 +106,14 @@ export class StarMap implements View {
     private selectedSystemCoordinates: StarSystemCoordinates | null = null;
     private currentSystemCoordinates: StarSystemCoordinates | null = null;
 
-    private readonly loadedStarSectors: Map<string, StarSector> = new Map<string, StarSector>();
+    private readonly loadedStarSectors: Map<string, StarSectorView> = new Map<string, StarSectorView>();
 
     private readonly coordinatesToInstanceMap: Map<string, InstancedMesh> = new Map();
     private readonly instanceToCoordinatesMap: Map<InstancedMesh, string> = new Map();
 
     private readonly travelLine: ThickLines;
 
-    private readonly stellarPathfinder: StellarPathfinder = new StellarPathfinder();
+    private readonly stellarPathfinder: StellarPathfinder;
 
     public readonly onTargetSetObservable: Observable<StarSystemCoordinates> = new Observable();
 
@@ -134,7 +135,7 @@ export class StarMap implements View {
     private static readonly SHIMMER_ANIMATION = new Animation("shimmer", "instancedBuffers.color.a", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
     private static readonly SHIMMER_DURATION = 1000;
 
-    constructor(player: Player, engine: AbstractEngine, encyclopaedia: EncyclopaediaGalactica) {
+    constructor(player: Player, engine: AbstractEngine, encyclopaedia: EncyclopaediaGalactica, starSystemDatabase: StarSystemDatabase) {
         this.scene = new Scene(engine);
         this.scene.clearColor = new Color4(0, 0, 0, 1);
         this.scene.useRightHandedSystem = true;
@@ -150,12 +151,15 @@ export class StarMap implements View {
         this.player = player;
 
         this.encyclopaedia = encyclopaedia;
+        this.starSystemDatabase = starSystemDatabase;
+
+        this.stellarPathfinder = new StellarPathfinder(starSystemDatabase);
 
         this.backgroundMusic = new AudioInstance(Sounds.STAR_MAP_BACKGROUND_MUSIC, AudioMasks.STAR_MAP_VIEW, 1, false, null);
         AudioManager.RegisterSound(this.backgroundMusic);
         this.backgroundMusic.sound.play();
 
-        this.starMapUI = new StarMapUI(this.scene, this.player);
+        this.starMapUI = new StarMapUI(this.scene, this.player, this.starSystemDatabase);
         this.starMapUI.onSystemFocusObservable.add((starSystemCoordinates) => {
             this.focusOnSystem(starSystemCoordinates);
         });
@@ -329,7 +333,7 @@ export class StarMap implements View {
 
     private drawPath(path: StarSystemCoordinates[]) {
         const points = path.map((coordinates) => {
-            return getStarGalacticPosition(coordinates);
+            return this.starSystemDatabase.getSystemGalacticPosition(coordinates);
         });
         this.travelLine.setPoints(points);
     }
@@ -363,8 +367,8 @@ export class StarMap implements View {
      * @param coordinates The coordinates of the sector
      * @param generateNow
      */
-    private registerStarSector(coordinates: Vector3, generateNow = false): StarSector {
-        const starSector = new StarSector(coordinates);
+    private registerStarSector(coordinates: Vector3, generateNow = false): StarSectorView {
+        const starSector = new StarSectorView(coordinates, this.starSystemDatabase);
         this.loadedStarSectors.set(starSector.getKey(), starSector);
 
         if (!generateNow) this.starBuildStack.push(...starSector.generate());
@@ -439,7 +443,7 @@ export class StarMap implements View {
             if (this.loadedStarSectors.has(sectorKey)) continue; // already generated
 
             // don't generate star sectors that are not in the frustum
-            const bb = StarSector.GetBoundingBox(coordinates.scale(Settings.STAR_SECTOR_SIZE), this.starMapCenterPosition);
+            const bb = StarSectorView.GetBoundingBox(coordinates.scale(Settings.STAR_SECTOR_SIZE), this.starMapCenterPosition);
             if (!activeCamera.isInFrustum(bb)) continue;
 
             this.registerStarSector(coordinates);
@@ -465,7 +469,7 @@ export class StarMap implements View {
 
     private createInstance(data: BuildData) {
         const starSystemCoordinates = data.coordinates;
-        const starSystemModel = getSystemModelFromCoordinates(starSystemCoordinates);
+        const starSystemModel = this.starSystemDatabase.getSystemModelFromCoordinates(starSystemCoordinates);
 
         //TODO: when implementing binary star systems, this will need to be updated to display all stellar objects and not just the first one
         const stellarObjectModel = StarSystemModelUtils.GetStellarObjects(starSystemModel)[0];
@@ -526,7 +530,7 @@ export class StarMap implements View {
             new ExecuteCodeAction(ActionManager.OnPickTrigger, () => {
                 Sounds.STAR_MAP_CLICK_SOUND.play();
 
-                this.starMapUI.setSelectedSystem(starSystemCoordinates, this.currentSystemCoordinates);
+                this.starMapUI.setSelectedSystem(starSystemModel, this.currentSystemCoordinates);
 
                 this.selectedSystemCoordinates = starSystemCoordinates;
 
@@ -546,7 +550,7 @@ export class StarMap implements View {
     }
 
     public focusOnSystem(starSystemCoordinates: StarSystemCoordinates, skipAnimation = false) {
-        const starSystemPosition = getStarGalacticPosition(starSystemCoordinates).add(this.starMapCenterPosition);
+        const starSystemPosition = this.starSystemDatabase.getSystemGalacticPosition(starSystemCoordinates).add(this.starMapCenterPosition);
 
         const cameraDir = this.controls.thirdPersonCamera.getDirection(Vector3.Forward(this.scene.useRightHandedSystem));
 
@@ -582,7 +586,8 @@ export class StarMap implements View {
         }
 
         this.selectedSystemCoordinates = starSystemCoordinates;
-        this.starMapUI.setSelectedSystem(starSystemCoordinates, this.currentSystemCoordinates);
+        const starSystemModel = this.starSystemDatabase.getSystemModelFromCoordinates(starSystemCoordinates);
+        this.starMapUI.setSelectedSystem(starSystemModel, this.currentSystemCoordinates);
         this.starMapUI.setHoveredSystem(null);
     }
 

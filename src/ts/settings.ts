@@ -91,6 +91,8 @@ export const Settings = {
 
     CELSIUS_TO_KELVIN: 273.15,
 
+    BAR_TO_PASCAL: 100_000,
+
     /**
      * The sea level pressure on Earth in Pascals.
      */
@@ -130,10 +132,3 @@ export const CollisionMask = {
     ENVIRONMENT: 0b00000001,
     DYNAMIC_OBJECTS: 0b00000010
 };
-
-const densityRng = getRngFromSeed(Settings.UNIVERSE_SEED);
-let densitySampleStep = 0;
-const densityPerlin = makeNoise3D(() => {
-    return densityRng(densitySampleStep++);
-});
-export const UniverseDensity = (x: number, y: number, z: number) => (1.0 - Math.abs(densityPerlin(x * 0.2, y * 0.2, z * 0.2))) ** 8;

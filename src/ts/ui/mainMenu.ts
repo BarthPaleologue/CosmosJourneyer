@@ -1,3 +1,20 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Affero General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Affero General Public License for more details.
+//
+//  You should have received a copy of the GNU Affero General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { UberScene } from "../uberCore/uberScene";
 import { DefaultControls } from "../defaultControls/defaultControls";
 import { StarSystemView } from "../starSystem/starSystemView";
@@ -7,19 +24,15 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformRotationAnimation } from "../uberCore/transforms/animations/rotation";
 import { TransformTranslationAnimation } from "../uberCore/transforms/animations/translation";
 import { Observable } from "@babylonjs/core/Misc/observable";
-import { parseSaveFileData, SaveFileData } from "../saveFile/saveFileData";
 import packageInfo from "../../../package.json";
-import { Settings } from "../settings";
 import i18n from "../i18n";
 import { Sounds } from "../assets/sounds";
 import { PanelType, SidePanels } from "./sidePanels";
 import { SystemObjectType, UniverseObjectId } from "../utils/coordinates/universeCoordinates";
 import { getObjectBySystemId } from "../utils/coordinates/orbitalObjectId";
-import { getSystemModelFromCoordinates } from "../starSystem/modelFromCoordinates";
-import { getStarSystemCoordinatesFromSeed } from "../starSystem/systemSeed";
 import { StarSystemModel, StarSystemModelUtils } from "../starSystem/starSystemModel";
 import { OrbitalObjectType } from "../architecture/orbitalObject";
-import { createNotification } from "../utils/notification";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 
 export class MainMenu {
     readonly scene: UberScene;
@@ -43,7 +56,7 @@ export class MainMenu {
 
     private readonly startAnimationDurationSeconds = 5;
 
-    constructor(sidePanels: SidePanels, starSystemView: StarSystemView) {
+    constructor(sidePanels: SidePanels, starSystemView: StarSystemView, starSystemDatabase: StarSystemDatabase) {
         this.sidePanels = sidePanels;
         this.starSystemView = starSystemView;
 
@@ -54,82 +67,42 @@ export class MainMenu {
 
         const allowedIdentifiers: UniverseObjectId[] = [
             {
-                starSystemCoordinates: getStarSystemCoordinatesFromSeed({
-                    starSectorX: 1,
-                    starSectorY: 1,
-                    starSectorZ: 0,
-                    index: 7
-                }),
+                starSystemCoordinates: starSystemDatabase.getSystemCoordinatesFromSeed(1, 1, 0, 7),
                 objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
                 objectIndex: 1
             },
             {
-                starSystemCoordinates: getStarSystemCoordinatesFromSeed({
-                    starSectorX: 0,
-                    starSectorY: 0,
-                    starSectorZ: 0,
-                    index: 0
-                }),
+                starSystemCoordinates: starSystemDatabase.getSystemCoordinatesFromSeed(0, 0, 0, 0),
                 objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
                 objectIndex: 1
             },
             {
-                starSystemCoordinates: getStarSystemCoordinatesFromSeed({
-                    starSectorX: 0,
-                    starSectorY: 0,
-                    starSectorZ: 1,
-                    index: 4
-                }),
+                starSystemCoordinates: starSystemDatabase.getSystemCoordinatesFromSeed(0, 0, 1, 4),
                 objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
                 objectIndex: 3
             },
             {
-                starSystemCoordinates: getStarSystemCoordinatesFromSeed({
-                    starSectorX: 0,
-                    starSectorY: 0,
-                    starSectorZ: 1,
-                    index: 9
-                }),
+                starSystemCoordinates: starSystemDatabase.getSystemCoordinatesFromSeed(0, 0, 1, 9),
                 objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
                 objectIndex: 0
             },
             {
-                starSystemCoordinates: getStarSystemCoordinatesFromSeed({
-                    starSectorX: 0,
-                    starSectorY: 0,
-                    starSectorZ: 1,
-                    index: 1
-                }),
+                starSystemCoordinates: starSystemDatabase.getSystemCoordinatesFromSeed(0, 0, 1, 1),
                 objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
                 objectIndex: 1
             },
             {
-                starSystemCoordinates: getStarSystemCoordinatesFromSeed({
-                    starSectorX: 1,
-                    starSectorY: 1,
-                    starSectorZ: 0,
-                    index: 12
-                }),
+                starSystemCoordinates: starSystemDatabase.getSystemCoordinatesFromSeed(1, 1, 0, 12),
                 objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
                 objectIndex: 0
             },
             {
-                starSystemCoordinates: getStarSystemCoordinatesFromSeed({
-                    starSectorX: 1,
-                    starSectorY: 1,
-                    starSectorZ: 0,
-                    index: 5
-                }),
+                starSystemCoordinates: starSystemDatabase.getSystemCoordinatesFromSeed(1, 1, 0, 5),
                 objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
                 objectIndex: 0
             },
             {
-                starSystemCoordinates: getStarSystemCoordinatesFromSeed({
-                    starSectorX: 0,
-                    starSectorY: 0,
-                    starSectorZ: 0,
-                    index: 17
-                }),
+                starSystemCoordinates: starSystemDatabase.getSystemCoordinatesFromSeed(0, 0, 0, 17),
                 objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
                 objectIndex: 2
             }
@@ -138,7 +111,7 @@ export class MainMenu {
         const randomIndex = Math.floor(Math.random() * allowedIdentifiers.length);
         this.universeObjectId = allowedIdentifiers[randomIndex];
         const coordinates = this.universeObjectId.starSystemCoordinates;
-        this.starSystemModel = getSystemModelFromCoordinates(coordinates);
+        this.starSystemModel = starSystemDatabase.getSystemModelFromCoordinates(coordinates);
 
         const htmlRoot = document.getElementById("mainMenu");
         if (htmlRoot === null) throw new Error("#mainMenu does not exist!");

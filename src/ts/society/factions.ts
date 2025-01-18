@@ -1,4 +1,4 @@
-import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getPowerPlayData } from "./powerplay";
 import { uniformRandBool } from "extended-random";
 
@@ -22,8 +22,8 @@ export function factionToString(faction: Faction): string {
     }
 }
 
-export function getFactionFromCoordinates(starSystemCoordinates: StarSystemCoordinates, rng: (index: number) => number): Faction {
-    const powerplayData = getPowerPlayData(starSystemCoordinates);
+export function getFactionFromGalacticPosition(starSystemPosition: Vector3, rng: (index: number) => number): Faction {
+    const powerplayData = getPowerPlayData(starSystemPosition);
 
     const isMaterialist = uniformRandBool(powerplayData.materialistSpiritualist, rng, 249);
     const isCapitalist = uniformRandBool(powerplayData.capitalistCommunist, rng, 498);

@@ -2,8 +2,8 @@ import { OrbitalObjectType } from "../architecture/orbitalObject";
 import { GasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 import { TelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModel";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { getObjectModelByUniverseId } from "../utils/coordinates/orbitalObjectId";
-import { getStarGalacticPosition } from "../utils/coordinates/starSystemCoordinatesUtils";
 import { UniverseObjectId } from "../utils/coordinates/universeCoordinates";
 import { EncyclopaediaGalactica, SpaceDiscoveryData } from "./encyclopaediaGalactica";
 
@@ -18,6 +18,12 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
      * This is the symbolic price of redundant data.
      */
     private readonly redundantDataPrice = 100;
+
+    private readonly starSystemDatabase: StarSystemDatabase;
+
+    constructor(starSystemDatabase: StarSystemDatabase) {
+        this.starSystemDatabase = starSystemDatabase;
+    }
 
     public contributeDiscoveryIfNew(data: SpaceDiscoveryData): Promise<boolean> {
         const key = JSON.stringify(data.objectId);
@@ -63,8 +69,8 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
             return Promise.resolve(this.redundantDataPrice);
         }
 
-        const model = getObjectModelByUniverseId(object);
-        const systemGalacticPosition = getStarGalacticPosition(object.starSystemCoordinates);
+        const model = getObjectModelByUniverseId(object, this.starSystemDatabase);
+        const systemGalacticPosition = this.starSystemDatabase.getSystemGalacticPosition(object.starSystemCoordinates);
 
         const distanceFromSolLy = systemGalacticPosition.length();
 

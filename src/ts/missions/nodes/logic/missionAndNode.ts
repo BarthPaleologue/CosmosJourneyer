@@ -20,6 +20,7 @@ import { MissionContext } from "../../missionContext";
 import i18n from "../../../i18n";
 
 import { StarSystemCoordinates } from "../../../utils/coordinates/universeCoordinates";
+import { StarSystemDatabase } from "../../../starSystem/starSystemDatabase";
 
 export type MissionAndNodeSerialized = MissionNodeSerialized;
 
@@ -54,13 +55,13 @@ export class MissionAndNode implements MissionNode {
         this.hasCompletedLock = this.children.every((child) => child.isCompleted());
     }
 
-    describe(originSystemCoordinates: StarSystemCoordinates): string {
-        return this.children.map((child) => child.describe(originSystemCoordinates)).join(` ${i18n.t("common:and")} `);
+    describe(originSystemCoordinates: StarSystemCoordinates, starSystemDatabase: StarSystemDatabase): string {
+        return this.children.map((child) => child.describe(originSystemCoordinates, starSystemDatabase)).join(` ${i18n.t("common:and")} `);
     }
 
-    describeNextTask(context: MissionContext, keyboardLayout: Map<string, string>): string {
+    describeNextTask(context: MissionContext, keyboardLayout: Map<string, string>, starSystemDatabase: StarSystemDatabase): string {
         if (this.hasCompletedLock) return "Mission completed";
-        return this.children.map((child) => child.describeNextTask(context, keyboardLayout)).join(` ${i18n.t("common:and")} `);
+        return this.children.map((child) => child.describeNextTask(context, keyboardLayout, starSystemDatabase)).join(` ${i18n.t("common:and")} `);
     }
 
     getTargetSystems(): StarSystemCoordinates[] {
