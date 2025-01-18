@@ -16,8 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { StarSystemDatabase } from "../starSystemDatabase";
-import { getSolSystemModel } from "./sol";
+// import { getSolSystemModel } from "./sol";
 
 export function registerCustomSystems(starSystemDatabase: StarSystemDatabase) {
-    starSystemDatabase.registerCustomSystem(getSolSystemModel());
+    // starSystemDatabase.registerCustomSystem(getSolSystemModel());
 }
