@@ -23,13 +23,12 @@ import { GenerationSteps } from "../../utils/generationSteps";
 import { Settings } from "../../settings";
 import { TelluricPlanetaryMassObjectPhysicsInfo } from "../../architecture/physicsInfo";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math";
-import { clamp } from "terrain-generation";
 import { getOrbitalPeriod, getPeriapsis, Orbit } from "../../orbit/orbit";
 import { celsiusToKelvin, hasLiquidWater } from "../../utils/physics";
 import { CloudsModel, newCloudsModel } from "../../clouds/cloudsModel";
 import { TelluricPlanetaryMassObjectModel } from "./telluricPlanetaryMassObjectModel";
-import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { randomDirection } from "../../utils/random";
+import { clamp } from "../../utils/math";
 
 export type TelluricSatelliteModel = TelluricPlanetaryMassObjectModel & {
     readonly type: OrbitalObjectType.TELLURIC_SATELLITE;

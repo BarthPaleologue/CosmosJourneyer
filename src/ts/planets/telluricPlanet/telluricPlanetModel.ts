@@ -28,9 +28,9 @@ import { CloudsModel, newCloudsModel } from "../../clouds/cloudsModel";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { getOrbitalPeriod, Orbit } from "../../orbit/orbit";
-import { clamp } from "terrain-generation";
 import { newSeededRingsModel, RingsModel } from "../../rings/ringsModel";
 import { TelluricPlanetaryMassObjectModel } from "./telluricPlanetaryMassObjectModel";
+import { clamp } from "../../utils/math";
 
 export type TelluricPlanetModel = PlanetModel &
     TelluricPlanetaryMassObjectModel & {
