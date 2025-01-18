@@ -12,6 +12,8 @@ For example, planets are part of the celestial bodies.
 graph TD
     A[CosmosJourneyer<br><sub>The main entry point for the project</sub>] --> B[StarMap]
     A --> C[Main & Pause Menus<br><sub>Handles loading/unloading of systems and manages data<br>that do not depend on the current star system</sub>]
+    A --> EG[Encyclopaedia Galactica<br><sub>Manages player discoveries</sub>]
+    A --> SSDB[StarSystemDatabase<br><sub>Generates star system data on demand</sub>]
     A --> D[StarSystemView]
 
     subgraph StarSystemView
