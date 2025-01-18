@@ -25,7 +25,6 @@ import { Settings } from "../../settings";
 import { TelluricPlanetaryMassObjectPhysicsInfo } from "../../architecture/physicsInfo";
 import { celsiusToKelvin, hasLiquidWater } from "../../utils/physics";
 import { CloudsModel, newCloudsModel } from "../../clouds/cloudsModel";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { getOrbitalPeriod, Orbit } from "../../orbit/orbit";

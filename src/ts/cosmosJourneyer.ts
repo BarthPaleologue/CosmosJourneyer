@@ -60,6 +60,7 @@ import { FuelScoopTutorial } from "./tutorials/fuelScoopTutorial";
 import { EncyclopaediaGalacticaManager } from "./society/encyclopaediaGalacticaManager";
 import { EncyclopaediaGalacticaLocal } from "./society/encyclopaediaGalacticaLocal";
 import { StarSystemDatabase } from "./starSystem/starSystemDatabase";
+import { registerCustomSystems } from "./starSystem/customSystems/registerCustomSystems";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -344,6 +345,7 @@ export class CosmosJourneyer {
         console.log(`Havok initialized`);
 
         const starSystemDatabase = new StarSystemDatabase();
+        registerCustomSystems(starSystemDatabase);
 
         const player = Player.Default();
 

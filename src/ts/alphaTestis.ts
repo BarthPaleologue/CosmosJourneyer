@@ -42,7 +42,7 @@ const starSystemView = engine.starSystemView;
 const systemName = "Alpha Testis";
 const systemCoordinates: StarSystemCoordinates = {
     starSectorX: 0,
-    starSectorY: 0,
+    starSectorY: 1,
     starSectorZ: 0,
     localX: 0,
     localY: 0,

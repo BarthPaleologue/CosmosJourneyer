@@ -91,6 +91,8 @@ export const Settings = {
 
     CELSIUS_TO_KELVIN: 273.15,
 
+    BAR_TO_PASCAL: 100_000,
+
     /**
      * The sea level pressure on Earth in Pascals.
      */
