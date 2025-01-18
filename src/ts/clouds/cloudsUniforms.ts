@@ -16,12 +16,12 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
-import { gcd } from "terrain-generation";
 import { Scene } from "@babylonjs/core/scene";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import flatCloudLUT from "../../shaders/textures/flatCloudLUT.glsl";
 import { CloudsModel } from "./cloudsModel";
 import { Textures } from "../assets/textures";
+import { gcd } from "../utils/math";
 
 export const CloudsUniformNames = {
     LAYER_RADIUS: "clouds_layerRadius",
@@ -84,7 +84,9 @@ export class CloudsUniforms {
         effect.setFloat(CloudsUniformNames.SPECULAR_POWER, this.model.specularPower);
         effect.setFloat(
             CloudsUniformNames.TIME,
-            -this.elapsedSeconds % ((2 * Math.PI * gcd(this.model.worleySpeed * 10000, this.model.detailSpeed * 10000)) / this.model.worleySpeed)
+            -this.elapsedSeconds %
+                ((2 * Math.PI * gcd(this.model.worleySpeed * 10000, this.model.detailSpeed * 10000)) /
+                    this.model.worleySpeed)
         );
     }
 

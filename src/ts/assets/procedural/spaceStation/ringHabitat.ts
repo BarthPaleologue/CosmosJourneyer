@@ -128,18 +128,33 @@ export class RingHabitat implements Transformable {
     }
 
     update(stellarObjects: Transformable[], cameraWorldPosition: Vector3, deltaSeconds: number) {
-        this.getTransform().rotate(Axis.Y, deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, Settings.G_EARTH));
+        this.getTransform().rotate(
+            Axis.Y,
+            deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, Settings.G_EARTH)
+        );
         this.ringMaterial.update(stellarObjects);
         this.metalSectionMaterial.update(stellarObjects);
 
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
         if (distanceToCamera < 350e3 && this.attachmentAggregate === null) {
-            this.attachmentAggregate = createEnvironmentAggregate(this.attachment, PhysicsShapeType.MESH, this.getTransform().getScene());
+            this.attachmentAggregate = createEnvironmentAggregate(
+                this.attachment,
+                PhysicsShapeType.MESH,
+                this.getTransform().getScene()
+            );
             this.arms.forEach((arm) => {
-                const armAggregate = createEnvironmentAggregate(arm, PhysicsShapeType.MESH, this.getTransform().getScene());
+                const armAggregate = createEnvironmentAggregate(
+                    arm,
+                    PhysicsShapeType.MESH,
+                    this.getTransform().getScene()
+                );
                 this.armAggregates.push(armAggregate);
             });
-            this.ringAggregate = createEnvironmentAggregate(this.ring, PhysicsShapeType.MESH, this.getTransform().getScene());
+            this.ringAggregate = createEnvironmentAggregate(
+                this.ring,
+                PhysicsShapeType.MESH,
+                this.getTransform().getScene()
+            );
         } else if (distanceToCamera > 360e3 && this.attachmentAggregate !== null) {
             this.attachmentAggregate?.dispose();
             this.attachmentAggregate = null;

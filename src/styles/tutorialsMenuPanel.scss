@@ -1,68 +1,68 @@
 .sidePanel#tutorials {
-  overflow-x: hidden;
+    overflow-x: hidden;
 
-  .tutorialsMenuContainer {
-    display: flex;
-    justify-content: center;
-    padding: 0 20px 20px 20px;
-    align-items: stretch;
-    column-gap: 20px;
+    .tutorialsMenuContainer {
+        display: flex;
+        justify-content: center;
+        padding: 0 20px 20px 20px;
+        align-items: stretch;
+        column-gap: 20px;
 
-    $tileWidth: 300px;
+        $tileWidth: 300px;
 
-    &>* {
-      width: $tileWidth;
-      background: rgba(0, 0, 0, 0.8);
-      box-shadow: 0 0 5px rgba(255, 255, 255, 0.5) inset;
+        & > * {
+            width: $tileWidth;
+            background: rgba(0, 0, 0, 0.8);
+            box-shadow: 0 0 5px rgba(255, 255, 255, 0.5) inset;
 
-      transition: 0.2s;
+            transition: 0.2s;
 
-      &:hover {
-        box-shadow: 0 0 10px rgba(255, 255, 255, 0.8) inset;
-        cursor: pointer;
-      }
+            &:hover {
+                box-shadow: 0 0 10px rgba(255, 255, 255, 0.8) inset;
+                cursor: pointer;
+            }
+        }
+
+        .moreWillCome {
+            color: white;
+            font-family: Nasalization, sans-serif;
+            font-size: 2em;
+            text-align: center;
+            margin-block: 0;
+            display: flex;
+            align-items: center;
+
+            &:hover {
+                cursor: default;
+            }
+        }
+
+        .tutorial {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            row-gap: 10px;
+            padding: 10px;
+
+            h2 {
+                color: white;
+                font-family: Nasalization, sans-serif;
+                font-size: 3em;
+                margin-block: 0.6em;
+            }
+
+            img {
+                width: 100%;
+            }
+
+            p {
+                color: white;
+                font-family: Nasalization, sans-serif;
+                line-height: 1.5em;
+                font-size: 1.25em;
+                padding: 0 20px;
+            }
+        }
     }
-
-    .moreWillCome {
-      color: white;
-      font-family: Nasalization, sans-serif;
-      font-size: 2em;
-      text-align: center;
-      margin-block: 0;
-      display: flex;
-      align-items: center;
-
-      &:hover {
-        cursor: default;
-      }
-    }
-
-    .tutorial {
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      align-items: center;
-      row-gap: 10px;
-      padding: 10px;
-
-      h2 {
-        color: white;
-        font-family: Nasalization, sans-serif;
-        font-size: 3em;
-        margin-block: 0.6em;
-      }
-
-      img {
-        width: 100%;
-      }
-
-      p {
-        color: white;
-        font-family: Nasalization, sans-serif;
-        line-height: 1.5em;
-        font-size: 1.25em;
-        padding: 0 20px;
-      }
-    }
-  }
 }

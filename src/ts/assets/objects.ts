@@ -234,17 +234,25 @@ export class Objects {
             if (loadingScreen instanceof LoadingScreen) {
                 loadingScreen.setProgressPercentage((100 * (totalCount - remainingCount)) / totalCount);
             } else {
-                loadingScreen.loadingUIText = i18next.t("common:loading") + " " + ((100 * (totalCount - remainingCount)) / totalCount).toFixed(0) + "%";
+                loadingScreen.loadingUIText =
+                    i18next.t("common:loading") +
+                    " " +
+                    ((100 * (totalCount - remainingCount)) / totalCount).toFixed(0) +
+                    "%";
             }
         };
     }
 
     static CreateWandererInstance(): InstancedMesh {
-        return Objects.WANDERER.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
+        return Objects.WANDERER.instantiateHierarchy(null, {
+            doNotInstantiate: false
+        }) as InstancedMesh;
     }
 
     static CreateBananaInstance(): InstancedMesh {
-        return Objects.BANANA.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
+        return Objects.BANANA.instantiateHierarchy(null, {
+            doNotInstantiate: false
+        }) as InstancedMesh;
     }
 
     static CreateBananaClone(sizeInMeters: number): Mesh {
@@ -257,6 +265,8 @@ export class Objects {
     }
 
     static CreateCharacterInstance(): InstancedMesh {
-        return Objects.CHARACTER.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
+        return Objects.CHARACTER.instantiateHierarchy(null, {
+            doNotInstantiate: false
+        }) as InstancedMesh;
     }
 }

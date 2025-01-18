@@ -43,7 +43,14 @@ export class AsteroidPatch {
 
     private readonly batchSize = 10;
 
-    constructor(positions: Vector3[], rotations: Quaternion[], typeIndices: number[], rotationAxes: Vector3[], rotationSpeeds: number[], parent: TransformNode) {
+    constructor(
+        positions: Vector3[],
+        rotations: Quaternion[],
+        typeIndices: number[],
+        rotationAxes: Vector3[],
+        rotationSpeeds: number[],
+        parent: TransformNode
+    ) {
         this.parent = parent;
 
         this.positions = positions;
@@ -71,15 +78,27 @@ export class AsteroidPatch {
     public update(controlsPosition: Vector3, deltaSeconds: number): void {
         this.instances.forEach((instance, index) => {
             const distanceToCamera = Vector3.Distance(controlsPosition, instance.getAbsolutePosition());
-            if (distanceToCamera < this.physicsRadius && (instance.physicsBody === null || instance.physicsBody === undefined)) {
-                const instancePhysicsBody = new PhysicsBody(instance, PhysicsMotionType.DYNAMIC, false, this.parent.getScene());
+            if (
+                distanceToCamera < this.physicsRadius &&
+                (instance.physicsBody === null || instance.physicsBody === undefined)
+            ) {
+                const instancePhysicsBody = new PhysicsBody(
+                    instance,
+                    PhysicsMotionType.DYNAMIC,
+                    false,
+                    this.parent.getScene()
+                );
                 instancePhysicsBody.setMassProperties({ mass: 1000 });
                 instancePhysicsBody.setAngularVelocity(this.rotationAxes[index].scale(this.rotationSpeeds[index]));
                 instancePhysicsBody.setAngularDamping(0);
                 instancePhysicsBody.disablePreStep = false;
                 instancePhysicsBody.shape = Objects.ASTEROID_PHYSICS_SHAPES[this.typeIndices[index]];
                 this.instancePhysicsBodies.push(instancePhysicsBody);
-            } else if (distanceToCamera > this.physicsRadius + 1000 && instance.physicsBody !== null && instance.physicsBody !== undefined) {
+            } else if (
+                distanceToCamera > this.physicsRadius + 1000 &&
+                instance.physicsBody !== null &&
+                instance.physicsBody !== undefined
+            ) {
                 const body = this.instancePhysicsBodies.find((body) => body === instance.physicsBody);
                 if (body) {
                     body.dispose();
@@ -97,7 +116,9 @@ export class AsteroidPatch {
         for (let i = 0; i < this.batchSize; i++) {
             if (this.nbInstances === this.positions.length) return;
 
-            const instance = Objects.ASTEROIDS[this.typeIndices[this.nbInstances]].createInstance(`${this.parent.name}_AsteroidInstance${this.nbInstances}`);
+            const instance = Objects.ASTEROIDS[this.typeIndices[this.nbInstances]].createInstance(
+                `${this.parent.name}_AsteroidInstance${this.nbInstances}`
+            );
             instance.position.copyFrom(this.positions[this.nbInstances]);
             instance.rotationQuaternion = this.rotations[this.nbInstances];
             instance.isPickable = false;

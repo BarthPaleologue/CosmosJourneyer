@@ -50,7 +50,10 @@ export class AxisRenderer {
         const rotationAxisHelper = CreateGreasedLine(
             `${orbitalObject.getTransform().name}AxisHelper`,
             {
-                points: [new Vector3(0, -orbitalObject.getBoundingRadius() * 2, 0), new Vector3(0, orbitalObject.getBoundingRadius() * 2, 0)],
+                points: [
+                    new Vector3(0, -orbitalObject.getBoundingRadius() * 2, 0),
+                    new Vector3(0, orbitalObject.getBoundingRadius() * 2, 0)
+                ],
                 updatable: false
             },
             {

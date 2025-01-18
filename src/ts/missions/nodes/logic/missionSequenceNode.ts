@@ -17,8 +17,8 @@
 
 import { MissionNode, MissionNodeSerialized, MissionNodeType } from "../missionNode";
 import { MissionContext } from "../../missionContext";
-
 import { StarSystemCoordinates } from "../../../utils/coordinates/universeCoordinates";
+import { StarSystemDatabase } from "../../../starSystem/starSystemDatabase";
 
 export type MissionSequenceNodeSerialized = MissionNodeSerialized & {
     activeChildIndex: number;
@@ -69,19 +69,25 @@ export class MissionSequenceNode implements MissionNode {
      */
     setActiveChildIndex(index: number) {
         if (index < 0 || index >= this.children.length) {
-            throw new Error(`Invalid index ${index} for mission sequence node. Must be between 0 and ${this.children.length - 1}`);
+            throw new Error(
+                `Invalid index ${index} for mission sequence node. Must be between 0 and ${this.children.length - 1}`
+            );
         }
         this.activeChildIndex = index;
     }
 
-    describe(originSystemCoordinates: StarSystemCoordinates): string {
-        return this.children.map((child) => child.describe(originSystemCoordinates)).join(" then ");
+    describe(originSystemCoordinates: StarSystemCoordinates, starSystemDatabase: StarSystemDatabase): string {
+        return this.children.map((child) => child.describe(originSystemCoordinates, starSystemDatabase)).join(" then ");
     }
 
-    describeNextTask(context: MissionContext, keyboardLayout: Map<string, string>): string {
+    describeNextTask(
+        context: MissionContext,
+        keyboardLayout: Map<string, string>,
+        starSystemDatabase: StarSystemDatabase
+    ): string {
         if (this.hasCompletedLock) return "Mission completed";
         if (this.activeChildIndex >= this.children.length) return "Mission completed";
-        return this.children[this.activeChildIndex].describeNextTask(context, keyboardLayout);
+        return this.children[this.activeChildIndex].describeNextTask(context, keyboardLayout, starSystemDatabase);
     }
 
     getTargetSystems(): StarSystemCoordinates[] {

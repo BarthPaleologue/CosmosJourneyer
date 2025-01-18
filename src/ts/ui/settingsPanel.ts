@@ -2,8 +2,19 @@ import { InputMaps } from "../inputs/inputMaps";
 import Action from "@brianchirls/game-input/Action";
 import Interaction from "@brianchirls/game-input/interactions/Interaction";
 import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
-import { axisCompositeToString, buttonInputToString, dPadCompositeToString, stickInputToString, vector2ToString } from "../utils/strings/inputControlsString";
-import { AxisComposite, ButtonInputControl, StickInputControl, Vector2InputControl } from "@brianchirls/game-input/browser";
+import {
+    axisCompositeToString,
+    buttonInputToString,
+    dPadCompositeToString,
+    stickInputToString,
+    vector2ToString
+} from "../utils/strings/inputControlsString";
+import {
+    AxisComposite,
+    ButtonInputControl,
+    StickInputControl,
+    Vector2InputControl
+} from "@brianchirls/game-input/browser";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 
 export function initSettingsPanel(): HTMLElement {
@@ -27,7 +38,10 @@ export function initSettingsPanel(): HTMLElement {
                 const subActionMap: Map<string, string[]> = new Map();
 
                 const actionOrInteraction = action as Action | Interaction;
-                const bindings = actionOrInteraction instanceof Action ? actionOrInteraction.bindings : actionOrInteraction.action.bindings;
+                const bindings =
+                    actionOrInteraction instanceof Action
+                        ? actionOrInteraction.bindings
+                        : actionOrInteraction.action.bindings;
                 bindings.forEach((binding) => {
                     if (binding.control instanceof DPadComposite) {
                         const strings = dPadCompositeToString(binding.control, keyboardLayoutMap);

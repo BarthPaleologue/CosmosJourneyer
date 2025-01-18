@@ -34,7 +34,11 @@
         --progress: 0;
         flex-grow: 1;
         height: var(--progressBarHeight);
-        background: linear-gradient(to right, rgba(255, 255, 255, 0.9) var(--progress), rgba(0, 0, 0, 0.9) var(--progress));
+        background: linear-gradient(
+            to right,
+            rgba(255, 255, 255, 0.9) var(--progress),
+            rgba(0, 0, 0, 0.9) var(--progress)
+        );
     }
 
     .imageSpinnerContainer {

@@ -1,25 +1,25 @@
 name: Build Pull Request
 on:
-  pull_request:
-    branches: [ "main" ]
+    pull_request:
+        branches: ["main"]
 jobs:
-  build:
-    timeout-minutes: 30
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [20]
-    steps:
-    - uses: actions/checkout@v4
-    - uses: pnpm/action-setup@v4
-      with:
-        version: 8
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'pnpm'
-    - name: Install dependencies
-      run: pnpm install
-    - name: Build
-      run: pnpm run build
+    build:
+        timeout-minutes: 30
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version: [20]
+        steps:
+            - uses: actions/checkout@v4
+            - uses: pnpm/action-setup@v4
+              with:
+                  version: 8
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: "pnpm"
+            - name: Install dependencies
+              run: pnpm install
+            - name: Build
+              run: pnpm run build

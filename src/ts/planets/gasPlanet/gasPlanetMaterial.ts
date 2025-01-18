@@ -25,7 +25,10 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import { Scene } from "@babylonjs/core/scene";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Transformable } from "../../architecture/transformable";
-import { setStellarObjectUniforms, StellarObjectUniformNames } from "../../postProcesses/uniforms/stellarObjectUniforms";
+import {
+    setStellarObjectUniforms,
+    StellarObjectUniformNames
+} from "../../postProcesses/uniforms/stellarObjectUniforms";
 
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
 
@@ -68,7 +71,11 @@ export class GasPlanetMaterial extends ShaderMaterial {
 
         const color1 = Color3.FromHSV(hue1 % 360, randRange(0.4, 0.9, rng, 72), randRange(0.7, 0.9, rng, 73));
         const color2 = Color3.FromHSV(hue2 % 360, randRange(0.6, 0.9, rng, 74), randRange(0.0, 0.3, rng, 75));
-        const color3 = Color3.FromHSV((hue1 + divergence) % 360, randRange(0.4, 0.9, rng, 76), randRange(0.7, 0.9, rng, 77));
+        const color3 = Color3.FromHSV(
+            (hue1 + divergence) % 360,
+            randRange(0.4, 0.9, rng, 76),
+            randRange(0.7, 0.9, rng, 77)
+        );
 
         this.colorSettings = {
             color1: color1,

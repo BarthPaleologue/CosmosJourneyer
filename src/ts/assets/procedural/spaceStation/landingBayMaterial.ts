@@ -22,7 +22,10 @@ import { Transformable } from "../../../architecture/transformable";
 
 import landingBayMaterialFragment from "../../../../shaders/landingBayMaterial/fragment.glsl";
 import landingBayMaterialVertex from "../../../../shaders/landingBayMaterial/vertex.glsl";
-import { setStellarObjectUniforms, StellarObjectUniformNames } from "../../../postProcesses/uniforms/stellarObjectUniforms";
+import {
+    setStellarObjectUniforms,
+    StellarObjectUniformNames
+} from "../../../postProcesses/uniforms/stellarObjectUniforms";
 import { Textures } from "../../textures";
 import { Settings } from "../../../settings";
 import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
@@ -49,7 +52,13 @@ const LandingBaySamplerNames = {
 export class LandingBayMaterial extends ShaderMaterial {
     private stellarObjects: Transformable[] = [];
 
-    constructor(stationModel: OrbitalFacilityModel, meanRadius: number, deltaRadius: number, height: number, scene: Scene) {
+    constructor(
+        stationModel: OrbitalFacilityModel,
+        meanRadius: number,
+        deltaRadius: number,
+        height: number,
+        scene: Scene
+    ) {
         const shaderName = "landingBayMaterial";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = landingBayMaterialFragment;
@@ -82,7 +91,16 @@ export class LandingBayMaterial extends ShaderMaterial {
         const font_size = 128;
 
         //Add text to dynamic texture
-        namePlateTexture.drawText(stationModel.name, null, null, `${font_size}px ${Settings.MAIN_FONT}`, "white", null, true, true);
+        namePlateTexture.drawText(
+            stationModel.name,
+            null,
+            null,
+            `${font_size}px ${Settings.MAIN_FONT}`,
+            "white",
+            null,
+            true,
+            true
+        );
 
         this.onBindObservable.add(() => {
             const activeCamera = scene.activeCamera;

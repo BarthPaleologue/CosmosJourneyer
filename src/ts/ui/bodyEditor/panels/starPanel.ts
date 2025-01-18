@@ -17,23 +17,37 @@
 
 import { EditorPanel } from "../editorPanel";
 import { Slider } from "handle-sliderjs";
-import { VolumetricLight } from "../../../postProcesses/volumetricLight";
+import { VolumetricLightUniforms } from "../../../volumetricLight/volumetricLightUniforms";
 
 export class StarPanel extends EditorPanel {
     constructor() {
         super("starPhysic");
     }
 
-    init(volumetricLight: VolumetricLight) {
+    init(volumetricLight: VolumetricLightUniforms) {
         for (const slider of this.sliders) slider.remove();
 
         this.sliders = [
-            new Slider("starExposure", document.getElementById("starExposure") as HTMLElement, 0, 200, volumetricLight.exposure * 100, (val: number) => {
-                volumetricLight.exposure = val / 100;
-            }),
-            new Slider("decay", document.getElementById("decay") as HTMLElement, 0, 200, volumetricLight.decay * 100, (val: number) => {
-                volumetricLight.decay = val / 100;
-            })
+            new Slider(
+                "starExposure",
+                document.getElementById("starExposure") as HTMLElement,
+                0,
+                200,
+                volumetricLight.exposure * 100,
+                (val: number) => {
+                    volumetricLight.exposure = val / 100;
+                }
+            ),
+            new Slider(
+                "decay",
+                document.getElementById("decay") as HTMLElement,
+                0,
+                200,
+                volumetricLight.decay * 100,
+                (val: number) => {
+                    volumetricLight.decay = val / 100;
+                }
+            )
         ];
     }
 }

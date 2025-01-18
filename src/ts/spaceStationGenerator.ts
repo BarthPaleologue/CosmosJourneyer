@@ -36,6 +36,7 @@ import { Settings } from "./settings";
 import { StarFieldBox } from "./starSystem/starFieldBox";
 import { newSeededStarModel } from "./stellarObjects/star/starModel";
 import { newSeededSpaceStationModel } from "./spacestation/spacestationModel";
+import { StarSystemDatabase } from "./starSystem/starSystemDatabase";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -78,13 +79,22 @@ const coordinates = {
     localZ: 0
 };
 
+const systemDatabase = new StarSystemDatabase();
+const systemPosition = systemDatabase.getSystemGalacticPosition(coordinates);
+
 const sunModel = newSeededStarModel(456, "Untitled Star", []);
 const sun = new Star(sunModel, scene);
 sun.getTransform().position = new Vector3(7, 2, 5).normalize().scaleInPlace(distanceToStar);
 
 const starfieldBox = new StarFieldBox(scene);
 
-const spaceStationModel = newSeededSpaceStationModel(Math.random() * Settings.SEED_HALF_RANGE, [sunModel], coordinates, [sunModel]);
+const spaceStationModel = newSeededSpaceStationModel(
+    Math.random() * Settings.SEED_HALF_RANGE,
+    [sunModel],
+    coordinates,
+    systemPosition,
+    [sunModel]
+);
 spaceStationModel.orbit.radius = distanceToStar;
 
 const spaceStation = new SpaceStation(spaceStationModel, scene);

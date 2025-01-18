@@ -1,34 +1,26 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta
+            name="keywords"
+            content="space, exploration, game, open-source, planet, procedural, universe, procedural universe, procedural planet, webgl, webgpu"
+        />
+        <meta name="author" content="Barthélemy Paléologue" />
+        <meta name="robots" content="index, follow" />
+        <title><%= htmlWebpackPlugin.options.title %></title>
+    </head>
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="keywords"
-          content="space, exploration, game, open-source, planet, procedural, universe, procedural universe, procedural planet, webgl, webgpu">
-    <meta name="author" content="Barthélemy Paléologue">
-    <meta name="robots" content="index, follow">
-    <title><%= htmlWebpackPlugin.options.title %></title>
-</head>
+    <body>
+        <canvas id="renderer"></canvas>
 
-<body>
-<canvas id="renderer"></canvas>
+        <div id="inspectorLayer"></div>
 
-<div id="inspectorLayer"></div>
-
-<%= require('html-loader!./bodyEditor.html').default %>
-
-<%= require('html-loader!./spaceStationUI.html').default %>
-
-<%= require('html-loader!./helmetOverlay.html').default %>
-
-<%= require('html-loader!./mainMenu.html').default %>
-
-<%= require('html-loader!./pauseMenu.html').default %>
-
-<%= require('html-loader!./sidePanels.html').default %>
-
-</body>
-
+        <%= require('html-loader!./bodyEditor.html').default %> <%= require('html-loader!./spaceStationUI.html').default
+        %> <%= require('html-loader!./helmetOverlay.html').default %> <%= require('html-loader!./mainMenu.html').default
+        %> <%= require('html-loader!./pauseMenu.html').default %> <%= require('html-loader!./sidePanels.html').default
+        %>
+    </body>
 </html>

@@ -15,21 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getSolarPanelSurfaceFromEnergyRequirement } from "../src/ts/utils/solarPanels";
-import { getSphereRadiatedEnergyFlux } from "../src/ts/utils/physics";
+import { StarSystemDatabase } from "../starSystemDatabase";
+// import { getSolSystemModel } from "./sol";
 
-test("solarPanelSurfaceCalculation", () => {
-    // test with ISS data
-    const efficiency = 0.07;
-    const sunTemperature = 5778;
-    const sunExposure = 0.5;
-    const distanceToSun = 1.496e11;
-    const sunRadius = 6.9634e8;
-    const energyRequirement = 120000;
-
-    const solarFlux = getSphereRadiatedEnergyFlux(sunTemperature, sunRadius, distanceToSun) * sunExposure;
-
-    const solarPanelSurface = getSolarPanelSurfaceFromEnergyRequirement(efficiency, energyRequirement, solarFlux);
-    expect(solarPanelSurface).toBeGreaterThanOrEqual(2400);
-    expect(solarPanelSurface).toBeLessThanOrEqual(2600);
-});
+export function registerCustomSystems(starSystemDatabase: StarSystemDatabase) {
+    // starSystemDatabase.registerCustomSystem(getSolSystemModel());
+}

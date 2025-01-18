@@ -96,7 +96,11 @@ export class HyperSpaceTunnel implements Transformable {
         this.hyperTunnel.position = this.parent.getAbsolutePosition();
 
         const rotationFrequency = 0.05;
-        this.hyperTunnel.rotate(Axis.Z, 0.005 * Math.sin(2.0 * Math.PI * rotationFrequency * this.elapsedSeconds), Space.LOCAL);
+        this.hyperTunnel.rotate(
+            Axis.Z,
+            0.005 * Math.sin(2.0 * Math.PI * rotationFrequency * this.elapsedSeconds),
+            Space.LOCAL
+        );
 
         const targetForward = getForwardDirection(this.parent);
         const currentForward = getForwardDirection(this.getTransform());

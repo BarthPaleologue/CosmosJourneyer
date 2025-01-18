@@ -19,7 +19,6 @@ import { Direction } from "../../utils/direction";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TelluricPlanetMaterial } from "./telluricPlanetMaterial";
 import { TelluricPlanetaryMassObjectModel } from "./telluricPlanetaryMassObjectModel";
-import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { ChunkTree } from "./terrain/chunks/chunkTree";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
@@ -38,6 +37,9 @@ import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
 import { OrbitalObjectType } from "../../architecture/orbitalObject";
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
+import { AtmosphereUniforms } from "../../atmosphere/atmosphereUniforms";
+import { Settings } from "../../settings";
+import { OceanUniforms } from "../../ocean/oceanUniforms";
 
 export class TelluricPlanet implements PlanetaryMassObject, Cullable {
     readonly sides: ChunkTree[]; // stores the 6 sides of the sphere
@@ -49,7 +51,9 @@ export class TelluricPlanet implements PlanetaryMassObject, Cullable {
     private readonly transform: TransformNode;
     readonly aggregate: PhysicsAggregate;
 
-    readonly postProcesses: PostProcessType[] = [];
+    readonly atmosphereUniforms: AtmosphereUniforms | null;
+
+    readonly oceanUniforms: OceanUniforms | null;
 
     readonly ringsUniforms: RingsUniforms | null;
     readonly asteroidField: AsteroidField | null;
@@ -84,25 +88,38 @@ export class TelluricPlanet implements PlanetaryMassObject, Cullable {
         const physicsShape = new PhysicsShapeSphere(Vector3.Zero(), this.model.radius, scene);
         this.aggregate.shape.addChildFromParent(this.getTransform(), physicsShape, this.getTransform());
 
-        this.postProcesses.push(PostProcessType.SHADOW);
+        if (this.model.physics.pressure > 0.05) {
+            const atmosphereThickness =
+                Settings.EARTH_ATMOSPHERE_THICKNESS * Math.max(1, this.model.radius / Settings.EARTH_RADIUS);
+            this.atmosphereUniforms = new AtmosphereUniforms(this.getBoundingRadius(), atmosphereThickness);
+        } else {
+            this.atmosphereUniforms = null;
+        }
 
-        if (this.model.physics.oceanLevel > 0) this.postProcesses.push(PostProcessType.OCEAN);
-        if (this.model.physics.pressure > 0.05) this.postProcesses.push(PostProcessType.ATMOSPHERE);
+        if (this.model.physics.oceanLevel > 0) {
+            this.oceanUniforms = new OceanUniforms(this.getRadius(), this.model.physics.oceanLevel);
+        } else {
+            this.oceanUniforms = null;
+        }
 
         if (this.model.rings !== null) {
-            this.postProcesses.push(PostProcessType.RING);
             this.ringsUniforms = new RingsUniforms(this.model.rings, scene);
 
             const averageRadius = (this.model.radius * (this.model.rings.ringStart + this.model.rings.ringEnd)) / 2;
             const spread = (this.model.radius * (this.model.rings.ringEnd - this.model.rings.ringStart)) / 2;
-            this.asteroidField = new AsteroidField(this.model.rings.seed, this.getTransform(), averageRadius, spread, scene);
+            this.asteroidField = new AsteroidField(
+                this.model.rings.seed,
+                this.getTransform(),
+                averageRadius,
+                spread,
+                scene
+            );
         } else {
             this.ringsUniforms = null;
             this.asteroidField = null;
         }
 
         if (this.model.clouds !== null) {
-            this.postProcesses.push(PostProcessType.CLOUDS);
             this.cloudsUniforms = new CloudsUniforms(this.model.clouds, scene);
         } else {
             this.cloudsUniforms = null;
@@ -120,7 +137,8 @@ export class TelluricPlanet implements PlanetaryMassObject, Cullable {
         ];
 
         this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());
-        this.targetInfo.maxDistance = this.model.type === OrbitalObjectType.TELLURIC_SATELLITE ? this.model.orbit.radius * 8.0 : 0;
+        this.targetInfo.maxDistance =
+            this.model.type === OrbitalObjectType.TELLURIC_SATELLITE ? this.model.orbit.radius * 8.0 : 0;
     }
 
     getTransform(): TransformNode {

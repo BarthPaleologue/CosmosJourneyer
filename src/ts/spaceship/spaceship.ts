@@ -20,14 +20,24 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { WarpDrive } from "./warpDrive";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { IPhysicsCollisionEvent, PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import {
+    IPhysicsCollisionEvent,
+    PhysicsMotionType,
+    PhysicsShapeType
+} from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { setEnabledBody } from "../utils/havok";
-import { getForwardDirection, getUpwardDirection, rotate, setRotationQuaternion, translate } from "../uberCore/transforms/basicTransform";
+import {
+    getForwardDirection,
+    getUpwardDirection,
+    rotate,
+    setRotationQuaternion,
+    translate
+} from "../uberCore/transforms/basicTransform";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { CollisionMask, Settings } from "../settings";
@@ -163,7 +173,11 @@ export class Spaceship implements Transformable {
         );
         for (const child of this.instanceRoot.getChildMeshes()) {
             if (child.name.includes("mainThruster")) {
-                const mainThruster = new Thruster(child, getForwardDirection(this.instanceRoot).negate(), this.aggregate);
+                const mainThruster = new Thruster(
+                    child,
+                    getForwardDirection(this.instanceRoot).negate(),
+                    this.aggregate
+                );
                 this.mainThrusters.push(mainThruster);
                 continue;
             }
@@ -183,12 +197,48 @@ export class Spaceship implements Transformable {
         this.hyperSpaceTunnel.setParent(this.getTransform());
         this.hyperSpaceTunnel.setEnabled(false);
 
-        this.enableWarpDriveSound = new AudioInstance(Sounds.ENABLE_WARP_DRIVE_SOUND, AudioMasks.STAR_SYSTEM_VIEW, 1, true, this.getTransform());
-        this.disableWarpDriveSound = new AudioInstance(Sounds.DISABLE_WARP_DRIVE_SOUND, AudioMasks.STAR_SYSTEM_VIEW, 1, true, this.getTransform());
-        this.acceleratingWarpDriveSound = new AudioInstance(Sounds.ACCELERATING_WARP_DRIVE_SOUND, AudioMasks.STAR_SYSTEM_VIEW, 0, false, this.getTransform());
-        this.deceleratingWarpDriveSound = new AudioInstance(Sounds.DECELERATING_WARP_DRIVE_SOUND, AudioMasks.STAR_SYSTEM_VIEW, 0, false, this.getTransform());
-        this.hyperSpaceSound = new AudioInstance(Sounds.HYPER_SPACE_SOUND, AudioMasks.HYPER_SPACE, 0, false, this.getTransform());
-        this.thrusterSound = new AudioInstance(Sounds.THRUSTER_SOUND, AudioMasks.STAR_SYSTEM_VIEW, 0, false, this.getTransform());
+        this.enableWarpDriveSound = new AudioInstance(
+            Sounds.ENABLE_WARP_DRIVE_SOUND,
+            AudioMasks.STAR_SYSTEM_VIEW,
+            1,
+            true,
+            this.getTransform()
+        );
+        this.disableWarpDriveSound = new AudioInstance(
+            Sounds.DISABLE_WARP_DRIVE_SOUND,
+            AudioMasks.STAR_SYSTEM_VIEW,
+            1,
+            true,
+            this.getTransform()
+        );
+        this.acceleratingWarpDriveSound = new AudioInstance(
+            Sounds.ACCELERATING_WARP_DRIVE_SOUND,
+            AudioMasks.STAR_SYSTEM_VIEW,
+            0,
+            false,
+            this.getTransform()
+        );
+        this.deceleratingWarpDriveSound = new AudioInstance(
+            Sounds.DECELERATING_WARP_DRIVE_SOUND,
+            AudioMasks.STAR_SYSTEM_VIEW,
+            0,
+            false,
+            this.getTransform()
+        );
+        this.hyperSpaceSound = new AudioInstance(
+            Sounds.HYPER_SPACE_SOUND,
+            AudioMasks.HYPER_SPACE,
+            0,
+            false,
+            this.getTransform()
+        );
+        this.thrusterSound = new AudioInstance(
+            Sounds.THRUSTER_SOUND,
+            AudioMasks.STAR_SYSTEM_VIEW,
+            0,
+            false,
+            this.getTransform()
+        );
 
         this.fuelTanks = serializedSpaceShip.fuelTanks.map((tank) => FuelTank.Deserialize(tank));
 
@@ -291,7 +341,9 @@ export class Spaceship implements Transformable {
      * @returns The speed of the ship in m/s
      */
     public getSpeed(): number {
-        return this.warpDrive.isEnabled() ? this.warpDrive.getWarpSpeed() : this.aggregate.body.getLinearVelocity().dot(getForwardDirection(this.getTransform()));
+        return this.warpDrive.isEnabled()
+            ? this.warpDrive.getWarpSpeed()
+            : this.aggregate.body.getLinearVelocity().dot(getForwardDirection(this.getTransform()));
     }
 
     public getThrottle(): number {
@@ -395,18 +447,27 @@ export class Spaceship implements Transformable {
 
     private land(deltaTime: number) {
         if (this.landingTarget !== null) {
-            const gravityDir = this.landingTarget.getTransform().getAbsolutePosition().subtract(this.getTransform().getAbsolutePosition()).normalize();
+            const gravityDir = this.landingTarget
+                .getTransform()
+                .getAbsolutePosition()
+                .subtract(this.getTransform().getAbsolutePosition())
+                .normalize();
             const start = this.getTransform().getAbsolutePosition().add(gravityDir.scale(-50e3));
             const end = this.getTransform().getAbsolutePosition().add(gravityDir.scale(50e3));
 
-            (this.scene.getPhysicsEngine() as PhysicsEngineV2).raycastToRef(start, end, this.raycastResult, { collideWith: CollisionMask.ENVIRONMENT });
+            (this.scene.getPhysicsEngine() as PhysicsEngineV2).raycastToRef(start, end, this.raycastResult, {
+                collideWith: CollisionMask.ENVIRONMENT
+            });
             if (this.raycastResult.hasHit) {
                 const landingSpotNormal = this.raycastResult.hitNormalWorld;
 
                 const landingSpot = this.raycastResult.hitPointWorld.add(this.raycastResult.hitNormalWorld.scale(1.0));
 
                 const distance = landingSpot.subtract(this.getTransform().getAbsolutePosition()).dot(gravityDir);
-                translate(this.getTransform(), gravityDir.scale(Math.min(10 * deltaTime * Math.sign(distance), distance)));
+                translate(
+                    this.getTransform(),
+                    gravityDir.scale(Math.min(10 * deltaTime * Math.sign(distance), distance))
+                );
 
                 const currentUp = getUpwardDirection(this.getTransform());
                 const targetUp = landingSpotNormal;
@@ -467,14 +528,21 @@ export class Spaceship implements Transformable {
 
         // dampen rotation that is not along any of the rotation axis
         const angularVelocity = this.aggregate.body.getAngularVelocity();
-        const noiseAngularVelocity = angularVelocity.subtract(upRotationAxis.scale(Vector3.Dot(angularVelocity, upRotationAxis)));
-        noiseAngularVelocity.subtractInPlace(forwardRotationAxis.scale(Vector3.Dot(noiseAngularVelocity, forwardRotationAxis)));
+        const noiseAngularVelocity = angularVelocity.subtract(
+            upRotationAxis.scale(Vector3.Dot(angularVelocity, upRotationAxis))
+        );
+        noiseAngularVelocity.subtractInPlace(
+            forwardRotationAxis.scale(Vector3.Dot(noiseAngularVelocity, forwardRotationAxis))
+        );
         this.aggregate.body.applyAngularImpulse(noiseAngularVelocity.scale(-0.1));
     }
 
     public canEngageWarpDrive() {
         if (this.nearestOrbitalObject !== null) {
-            const distanceToObject = Vector3.Distance(this.getTransform().getAbsolutePosition(), this.nearestOrbitalObject.getTransform().getAbsolutePosition());
+            const distanceToObject = Vector3.Distance(
+                this.getTransform().getAbsolutePosition(),
+                this.nearestOrbitalObject.getTransform().getAbsolutePosition()
+            );
             if (distanceToObject < this.nearestOrbitalObject.getBoundingRadius() * 1.03) {
                 return false;
             }
@@ -486,15 +554,24 @@ export class Spaceship implements Transformable {
 
             if (asteroidField !== null) {
                 const inverseWorld = this.nearestCelestialBody.getTransform().getWorldMatrix().clone().invert();
-                const relativePosition = Vector3.TransformCoordinates(this.getTransform().getAbsolutePosition(), inverseWorld);
+                const relativePosition = Vector3.TransformCoordinates(
+                    this.getTransform().getAbsolutePosition(),
+                    inverseWorld
+                );
                 const relativeForward = Vector3.TransformNormal(getForwardDirection(this.getTransform()), inverseWorld);
                 const distanceAboveRings = relativePosition.y;
-                const planarDistance = Math.sqrt(relativePosition.x * relativePosition.x + relativePosition.z * relativePosition.z);
+                const planarDistance = Math.sqrt(
+                    relativePosition.x * relativePosition.x + relativePosition.z * relativePosition.z
+                );
 
                 const nbSecondsPrediction = 0.5;
-                const nextRelativePosition = relativePosition.add(relativeForward.scale(this.getSpeed() * nbSecondsPrediction));
+                const nextRelativePosition = relativePosition.add(
+                    relativeForward.scale(this.getSpeed() * nbSecondsPrediction)
+                );
                 const nextDistanceAboveRings = nextRelativePosition.y;
-                const nextPlanarDistance = Math.sqrt(nextRelativePosition.x * nextRelativePosition.x + nextRelativePosition.z * nextRelativePosition.z);
+                const nextPlanarDistance = Math.sqrt(
+                    nextRelativePosition.x * nextRelativePosition.x + nextRelativePosition.z * nextRelativePosition.z
+                );
 
                 const ringsMinDistance = asteroidField.minRadius;
                 const ringsMaxDistance = asteroidField.maxRadius;
@@ -503,7 +580,9 @@ export class Spaceship implements Transformable {
                 const willBeAboveRing = nextPlanarDistance > ringsMinDistance && nextPlanarDistance < ringsMaxDistance;
 
                 const isInRing = Math.abs(distanceAboveRings) < asteroidField.patchThickness / 2 && isAboveRing;
-                const willCrossRing = Math.sign(distanceAboveRings) !== Math.sign(nextDistanceAboveRings) && (willBeAboveRing || isAboveRing);
+                const willCrossRing =
+                    Math.sign(distanceAboveRings) !== Math.sign(nextDistanceAboveRings) &&
+                    (willBeAboveRing || isAboveRing);
 
                 if (isInRing || willCrossRing) {
                     return false;
@@ -517,11 +596,18 @@ export class Spaceship implements Transformable {
     private handleFuelScoop(deltaSeconds: number) {
         if (this.fuelScoop === null) return;
         if (this.nearestCelestialBody === null) return;
-        if (![OrbitalObjectType.STAR, OrbitalObjectType.GAS_PLANET].includes(this.nearestCelestialBody.model.type)) return;
+        if (![OrbitalObjectType.STAR, OrbitalObjectType.GAS_PLANET].includes(this.nearestCelestialBody.model.type))
+            return;
 
-        const distanceToBody = Vector3.Distance(this.getTransform().getAbsolutePosition(), this.nearestCelestialBody.getTransform().getAbsolutePosition());
+        const distanceToBody = Vector3.Distance(
+            this.getTransform().getAbsolutePosition(),
+            this.nearestCelestialBody.getTransform().getAbsolutePosition()
+        );
         const currentFuelPercentage = this.getRemainingFuel() / this.getTotalFuelCapacity();
-        if (Math.abs(currentFuelPercentage - 1) < 0.01 || distanceToBody > this.nearestCelestialBody.getBoundingRadius() * 1.7) {
+        if (
+            Math.abs(currentFuelPercentage - 1) < 0.01 ||
+            distanceToBody > this.nearestCelestialBody.getBoundingRadius() * 1.7
+        ) {
             if (this.isFuelScooping) {
                 this.isFuelScooping = false;
                 this.onFuelScoopEnd.notifyObservers();
@@ -569,7 +655,10 @@ export class Spaceship implements Transformable {
             }
 
             if (this.nearestOrbitalObject !== null) {
-                const distanceToClosestOrbitalObject = Vector3.Distance(this.getTransform().getAbsolutePosition(), this.nearestOrbitalObject.getTransform().getAbsolutePosition());
+                const distanceToClosestOrbitalObject = Vector3.Distance(
+                    this.getTransform().getAbsolutePosition(),
+                    this.nearestOrbitalObject.getTransform().getAbsolutePosition()
+                );
                 const orbitalObjectRadius = this.nearestOrbitalObject.getBoundingRadius();
 
                 closestDistance = Math.min(closestDistance, distanceToClosestOrbitalObject);
@@ -581,9 +670,15 @@ export class Spaceship implements Transformable {
                 const asteroidField = this.nearestCelestialBody.asteroidField;
 
                 if (asteroidField !== null) {
-                    const relativePosition = this.getTransform().getAbsolutePosition().subtract(this.nearestCelestialBody.getTransform().getAbsolutePosition());
-                    const distanceAboveRings = Math.abs(Vector3.Dot(relativePosition, this.nearestCelestialBody.getRotationAxis()));
-                    const planarDistance = relativePosition.subtract(this.nearestCelestialBody.getRotationAxis().scale(distanceAboveRings)).length();
+                    const relativePosition = this.getTransform()
+                        .getAbsolutePosition()
+                        .subtract(this.nearestCelestialBody.getTransform().getAbsolutePosition());
+                    const distanceAboveRings = Math.abs(
+                        Vector3.Dot(relativePosition, this.nearestCelestialBody.getRotationAxis())
+                    );
+                    const planarDistance = relativePosition
+                        .subtract(this.nearestCelestialBody.getRotationAxis().scale(distanceAboveRings))
+                        .length();
 
                     const ringsMinDistance = asteroidField.minRadius;
                     const ringsMaxDistance = asteroidField.maxRadius;
@@ -592,7 +687,13 @@ export class Spaceship implements Transformable {
 
                     const distanceToRings = isAboveRings
                         ? Math.abs(distanceAboveRings)
-                        : Math.sqrt(Math.min((planarDistance - ringsMinDistance) ** 2, (planarDistance - ringsMaxDistance) ** 2) + distanceAboveRings ** 2);
+                        : Math.sqrt(
+                              Math.min(
+                                  (planarDistance - ringsMinDistance) ** 2,
+                                  (planarDistance - ringsMaxDistance) ** 2
+                              ) +
+                                  distanceAboveRings ** 2
+                          );
 
                     if (distanceToRings < closestDistance) {
                         closestDistance = distanceToRings;
@@ -605,7 +706,8 @@ export class Spaceship implements Transformable {
         this.warpDrive.update(currentForwardSpeed, closestDistance, objectHalfThickness, deltaSeconds);
 
         // the warp throttle goes from 0.1 to 1 smoothly using an inverse function
-        if (this.warpDrive.isEnabled()) this.warpTunnel.setThrottle(1 - 1 / (1.1 * (1 + 1e-7 * this.warpDrive.getWarpSpeed())));
+        if (this.warpDrive.isEnabled())
+            this.warpTunnel.setThrottle(1 - 1 / (1.1 * (1 + 1e-7 * this.warpDrive.getWarpSpeed())));
         else this.warpTunnel.setThrottle(0);
 
         if (this.warpDrive.isDisabled() && this.state !== ShipState.LANDED) {
@@ -619,9 +721,15 @@ export class Spaceship implements Transformable {
             else this.thrusterSound.setTargetVolume(0);
 
             if (forwardSpeed < this.mainEngineTargetSpeed) {
-                this.aggregate.body.applyForce(forwardDirection.scale(this.thrusterForce), this.aggregate.body.getObjectCenterWorld());
+                this.aggregate.body.applyForce(
+                    forwardDirection.scale(this.thrusterForce),
+                    this.aggregate.body.getObjectCenterWorld()
+                );
             } else {
-                this.aggregate.body.applyForce(forwardDirection.scale(-0.7 * this.thrusterForce), this.aggregate.body.getObjectCenterWorld());
+                this.aggregate.body.applyForce(
+                    forwardDirection.scale(-0.7 * this.thrusterForce),
+                    this.aggregate.body.getObjectCenterWorld()
+                );
             }
 
             this.mainThrusters.forEach((thruster) => {
@@ -632,7 +740,11 @@ export class Spaceship implements Transformable {
             this.aggregate.body.applyForce(otherSpeed.scale(-10), this.aggregate.body.getObjectCenterWorld());
 
             if (this.closestWalkableObject !== null) {
-                const gravityDir = this.closestWalkableObject.getTransform().getAbsolutePosition().subtract(this.getTransform().getAbsolutePosition()).normalize();
+                const gravityDir = this.closestWalkableObject
+                    .getTransform()
+                    .getAbsolutePosition()
+                    .subtract(this.getTransform().getAbsolutePosition())
+                    .normalize();
                 this.aggregate.body.applyForce(gravityDir.scale(9.8), this.aggregate.body.getObjectCenterWorld());
             }
 
@@ -640,13 +752,20 @@ export class Spaceship implements Transformable {
             this.deceleratingWarpDriveSound.setTargetVolume(0);
 
             if (this.targetLandingPad !== null) {
-                const shipRelativePosition = this.getTransform().getAbsolutePosition().subtract(this.targetLandingPad.getTransform().getAbsolutePosition());
+                const shipRelativePosition = this.getTransform()
+                    .getAbsolutePosition()
+                    .subtract(this.targetLandingPad.getTransform().getAbsolutePosition());
                 const distanceToPad = shipRelativePosition.length();
                 const verticalDistance = Vector3.Dot(shipRelativePosition, this.targetLandingPad.getTransform().up);
                 if (distanceToPad < 600 && verticalDistance > 0) {
                     if (this.state !== ShipState.LANDING) {
                         //FIXME: move this in ship controls before adding NPC ships
-                        createNotification(NotificationOrigin.SPACESHIP, NotificationIntent.INFO, "Automatic landing procedure engaged", 10000);
+                        createNotification(
+                            NotificationOrigin.SPACESHIP,
+                            NotificationIntent.INFO,
+                            "Automatic landing procedure engaged",
+                            10000
+                        );
                     }
                     this.state = ShipState.LANDING;
                     this.landOnPad(this.targetLandingPad);

@@ -20,9 +20,6 @@ import { Settings } from "../settings";
 import { generateStarName } from "../utils/strings/starNameGenerator";
 import { wheelOfFortune } from "../utils/random";
 import { PlanetarySystemModel, StarSystemModel } from "./starSystemModel";
-import { StarSector } from "../starmap/starSector";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { hashVec3 } from "../utils/hashVec3";
 import { StellarObjectModel } from "../architecture/stellarObject";
 import { AnomalyModel } from "../anomalies/anomaly";
 import { Alphabet, ReversedGreekAlphabet } from "../utils/strings/parseToStrings";
@@ -35,12 +32,12 @@ import { newSeededJuliaSetModel } from "../anomalies/julia/juliaSetModel";
 import { getRngFromSeed } from "../utils/getRngFromSeed";
 import { romanNumeral } from "../utils/strings/romanNumerals";
 import { newSeededSpaceStationModel } from "../spacestation/spacestationModel";
-import { SystemSeed } from "./systemSeed";
-import { isSystemInHumanBubble } from "../society/starSystemSociety";
 import { OrbitalObjectType } from "../architecture/orbitalObject";
 import { newSeededTelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModel";
 import { newSeededTelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 import { newSeededSpaceElevatorModel } from "../spacestation/spaceElevatorModel";
+import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 const enum GenerationSteps {
     NAME,
@@ -60,24 +57,12 @@ const enum GenerationSteps {
  * @param seed The seed of the star system.
  * @returns The data model of the generated star system.
  */
-export function newSeededStarSystemModel(seed: SystemSeed): StarSystemModel {
-    // extract coordinates from seed
-    const starSector = new StarSector(new Vector3(seed.starSectorX, seed.starSectorY, seed.starSectorZ));
-    const localPosition = starSector.getLocalPositionOfStar(seed.index);
-    const coordinates = {
-        starSectorX: seed.starSectorX,
-        starSectorY: seed.starSectorY,
-        starSectorZ: seed.starSectorZ,
-        localX: localPosition.x,
-        localY: localPosition.y,
-        localZ: localPosition.z
-    };
-
-    // init pseudo-random number generator
-    const cellRNG = getRngFromSeed(hashVec3(seed.starSectorX, seed.starSectorY, seed.starSectorZ));
-    const hash = centeredRand(cellRNG, 1 + seed.index) * Settings.SEED_HALF_RANGE;
-    const systemRng = getRngFromSeed(hash);
-
+export function newSeededStarSystemModel(
+    systemRng: (step: number) => number,
+    coordinates: StarSystemCoordinates,
+    position: Vector3,
+    isCivilized: boolean
+): StarSystemModel {
     const systemName = generateStarName(systemRng, GenerationSteps.NAME);
 
     // generate stellar objects of the system first (we can assume the other objects don't have a significant influence on the stellar objects)
@@ -105,9 +90,14 @@ export function newSeededStarSystemModel(seed: SystemSeed): StarSystemModel {
     // Afterward planets are generated. We can assume they only depend on the stellar objects.
     const planetarySystems: PlanetarySystemModel[] = [];
     //Fixme: planets need to work with black holes as well at some point
-    const nbPlanets = stellarObjects[0].type === OrbitalObjectType.BLACK_HOLE ? 0 : randRangeInt(0, 7, systemRng, GenerationSteps.NB_PLANETS);
+    const nbPlanets =
+        stellarObjects[0].type === OrbitalObjectType.BLACK_HOLE
+            ? 0
+            : randRangeInt(0, 7, systemRng, GenerationSteps.NB_PLANETS);
     for (let i = 0; i < nbPlanets; i++) {
-        const bodyType = uniformRandBool(0.5, systemRng, GenerationSteps.PLANET_TYPE + i) ? OrbitalObjectType.TELLURIC_PLANET : OrbitalObjectType.GAS_PLANET;
+        const bodyType = uniformRandBool(0.5, systemRng, GenerationSteps.PLANET_TYPE + i)
+            ? OrbitalObjectType.TELLURIC_PLANET
+            : OrbitalObjectType.GAS_PLANET;
         const planetName = `${systemName} ${romanNumeral(i + 1)}`;
 
         const seed = centeredRand(systemRng, GenerationSteps.PLANETS + i) * Settings.SEED_HALF_RANGE;
@@ -138,14 +128,17 @@ export function newSeededStarSystemModel(seed: SystemSeed): StarSystemModel {
         planets.forEach((planet) => {
             const planetRng = getRngFromSeed(planet.seed);
             nbMoons +=
-                planet.type === OrbitalObjectType.GAS_PLANET ? randRangeInt(0, 3, planetRng, GenerationSteps.NB_MOONS) : randRangeInt(0, 2, planetRng, GenerationSteps.NB_MOONS);
+                planet.type === OrbitalObjectType.GAS_PLANET
+                    ? randRangeInt(0, 3, planetRng, GenerationSteps.NB_MOONS)
+                    : randRangeInt(0, 2, planetRng, GenerationSteps.NB_MOONS);
         });
         const seedSum = planets.reduce((acc, planet) => acc + planet.seed, 0);
         const planetarySystemName = planets.map((planet) => planet.name).join("-");
         const planetarySystemRng = getRngFromSeed(seedSum);
         for (let j = 0; j < nbMoons; j++) {
             const satelliteName = `${planetarySystemName}${Alphabet[j]}`;
-            const satelliteSeed = centeredRand(planetarySystemRng, GenerationSteps.MOONS + j) * Settings.SEED_HALF_RANGE;
+            const satelliteSeed =
+                centeredRand(planetarySystemRng, GenerationSteps.MOONS + j) * Settings.SEED_HALF_RANGE;
             const satelliteModel = newSeededTelluricSatelliteModel(satelliteSeed, satelliteName, planets);
             satellites.push(satelliteModel);
         }
@@ -163,7 +156,9 @@ export function newSeededStarSystemModel(seed: SystemSeed): StarSystemModel {
     );
     for (let i = 0; i < nbAnomalies; i++) {
         const anomalySeed = centeredRand(systemRng, GenerationSteps.ANOMALIES + i * 100) * Settings.SEED_HALF_RANGE;
-        const anomalyType = uniformRandBool(0.5, systemRng, GenerationSteps.ANOMALIES + i * 300) ? OrbitalObjectType.MANDELBULB : OrbitalObjectType.JULIA_SET;
+        const anomalyType = uniformRandBool(0.5, systemRng, GenerationSteps.ANOMALIES + i * 300)
+            ? OrbitalObjectType.MANDELBULB
+            : OrbitalObjectType.JULIA_SET;
         const anomalyName = `${systemName} ${ReversedGreekAlphabet[i].toUpperCase()}`;
 
         switch (anomalyType) {
@@ -176,7 +171,7 @@ export function newSeededStarSystemModel(seed: SystemSeed): StarSystemModel {
         }
     }
 
-    if (isSystemInHumanBubble(coordinates)) {
+    if (isCivilized) {
         // finally, space station are placed
         const planetarySystemToScore = new Map<PlanetarySystemModel, number>();
 
@@ -199,12 +194,17 @@ export function newSeededStarSystemModel(seed: SystemSeed): StarSystemModel {
             return scoreB - scoreA;
         });
 
-        const nbStations = Math.min(planetarySystems.length, Math.max(1, systemRng(77) * Math.floor(planetarySystems.length / 2)));
+        const nbStations = Math.min(
+            planetarySystems.length,
+            Math.max(1, systemRng(77) * Math.floor(planetarySystems.length / 2))
+        );
 
         const planetarySystemsWithStations = sortedPlanetarySystems.slice(0, nbStations);
 
         planetarySystemsWithStations.forEach((planetarySystem) => {
-            const spaceStationSeed = centeredRand(systemRng, GenerationSteps.SPACE_STATIONS + planetarySystem.planets.length) * Settings.SEED_HALF_RANGE;
+            const spaceStationSeed =
+                centeredRand(systemRng, GenerationSteps.SPACE_STATIONS + planetarySystem.planets.length) *
+                Settings.SEED_HALF_RANGE;
 
             if (
                 uniformRandBool(0.5, systemRng, 657) && // 50% chance of having a space elevator
@@ -212,10 +212,22 @@ export function newSeededStarSystemModel(seed: SystemSeed): StarSystemModel {
                 planetarySystem.planets[0].type === OrbitalObjectType.TELLURIC_PLANET && // space elevators can't be built on gas giants yet
                 planetarySystem.planets[0].rings === null // can't have rings because the tether would be at risk
             ) {
-                const spaceElevatorModel = newSeededSpaceElevatorModel(spaceStationSeed, stellarObjects, coordinates, planetarySystem.planets[0]);
+                const spaceElevatorModel = newSeededSpaceElevatorModel(
+                    spaceStationSeed,
+                    stellarObjects,
+                    coordinates,
+                    position,
+                    planetarySystem.planets[0]
+                );
                 planetarySystem.orbitalFacilities.push(spaceElevatorModel);
             } else {
-                const spaceStationModel = newSeededSpaceStationModel(spaceStationSeed, stellarObjects, coordinates, planetarySystem.planets);
+                const spaceStationModel = newSeededSpaceStationModel(
+                    spaceStationSeed,
+                    stellarObjects,
+                    coordinates,
+                    position,
+                    planetarySystem.planets
+                );
                 planetarySystem.orbitalFacilities.push(spaceStationModel);
             }
         });

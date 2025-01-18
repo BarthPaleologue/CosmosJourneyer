@@ -17,40 +17,40 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #editorPanelContainer {
-  float: right;
-  position: relative;
-  margin-top: 38px;
-  height: calc(100vh - 38px);
-  .ui {
-    background: rgb(0, 0, 0);
-    width: 300px;
-    height: 100%;
-    z-index: 2;
-    overflow-y: auto;
-    position: absolute;
-    top: 0;
-    right: 0;
+    float: right;
+    position: relative;
+    margin-top: 38px;
+    height: calc(100vh - 38px);
+    .ui {
+        background: rgb(0, 0, 0);
+        width: 300px;
+        height: 100%;
+        z-index: 2;
+        overflow-y: auto;
+        position: absolute;
+        top: 0;
+        right: 0;
 
-    h1 {
-      font-family: sans-serif;
-      color: white;
-      margin: 20px 5px 5px;
-      text-align: center;
+        h1 {
+            font-family: sans-serif;
+            color: white;
+            margin: 20px 5px 5px;
+            text-align: center;
+        }
+
+        p {
+            font-family: sans-serif;
+            color: white;
+            margin-block-end: 0;
+            padding: 20px 10px 0 10px;
+        }
+
+        @include meta.load-css("../utils/colorPicker");
+
+        .range-slider {
+            margin-top: -5%;
+        }
+
+        @include meta.load-css("../utils/checkbox");
     }
-
-    p {
-      font-family: sans-serif;
-      color: white;
-      margin-block-end: 0;
-      padding: 20px 10px 0 10px;
-    }
-
-    @include meta.load-css("../utils/colorPicker");
-
-    .range-slider {
-      margin-top: -5%;
-    }
-
-    @include meta.load-css("../utils/checkbox");
-  }
 }

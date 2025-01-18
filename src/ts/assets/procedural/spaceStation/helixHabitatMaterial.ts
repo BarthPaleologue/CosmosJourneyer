@@ -22,7 +22,10 @@ import { Transformable } from "../../../architecture/transformable";
 
 import helixHabitatMaterialFragment from "../../../../shaders/helixHabitatMaterial/fragment.glsl";
 import helixHabitatMaterialVertex from "../../../../shaders/helixHabitatMaterial/vertex.glsl";
-import { setStellarObjectUniforms, StellarObjectUniformNames } from "../../../postProcesses/uniforms/stellarObjectUniforms";
+import {
+    setStellarObjectUniforms,
+    StellarObjectUniformNames
+} from "../../../postProcesses/uniforms/stellarObjectUniforms";
 import { Textures } from "../../textures";
 
 const HelixHabitatUniformNames = {

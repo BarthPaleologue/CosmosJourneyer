@@ -4,10 +4,10 @@ import { StellarObject } from "../../architecture/stellarObject";
 import { SystemObjectId, UniverseObjectId, SystemObjectType } from "./universeCoordinates";
 import { PlanetaryMassObject } from "../../architecture/planetaryMassObject";
 import { SpaceStation } from "../../spacestation/spaceStation";
-import { getSystemModelFromCoordinates } from "../../starSystem/modelFromCoordinates";
 import { StarSystemModelUtils } from "../../starSystem/starSystemModel";
 import { CelestialBody } from "../../architecture/celestialBody";
 import { OrbitalFacilityModel } from "../../spacestation/orbitalFacility";
+import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
 
 /**
  * Get the object ID of the given orbital object within the star system.
@@ -19,7 +19,9 @@ export function getSystemObjectId(orbitalObject: OrbitalObject, starSystem: Star
     let objectIndex: number;
     if ((objectIndex = starSystem.getStellarObjects().indexOf(orbitalObject as StellarObject)) !== -1) {
         objectType = SystemObjectType.STELLAR_OBJECT;
-    } else if ((objectIndex = starSystem.getPlanetaryMassObjects().indexOf(orbitalObject as PlanetaryMassObject)) !== -1) {
+    } else if (
+        (objectIndex = starSystem.getPlanetaryMassObjects().indexOf(orbitalObject as PlanetaryMassObject)) !== -1
+    ) {
         objectType = SystemObjectType.PLANETARY_MASS_OBJECT;
     } else if ((objectIndex = starSystem.getAnomalies().indexOf(orbitalObject as CelestialBody)) !== -1) {
         objectType = SystemObjectType.ANOMALY;
@@ -45,7 +47,10 @@ export function getUniverseObjectId(orbitalObject: OrbitalObject, starSystem: St
     };
 }
 
-export function getObjectBySystemId(systemObjectId: SystemObjectId, starSystem: StarSystemController): OrbitalObject | null {
+export function getObjectBySystemId(
+    systemObjectId: SystemObjectId,
+    starSystem: StarSystemController
+): OrbitalObject | null {
     let orbitalObject;
     switch (systemObjectId.objectType) {
         case SystemObjectType.STELLAR_OBJECT:
@@ -70,9 +75,12 @@ export function getObjectBySystemId(systemObjectId: SystemObjectId, starSystem: 
     return orbitalObject;
 }
 
-export function getObjectModelByUniverseId(universeObjectId: UniverseObjectId): OrbitalObjectModel {
+export function getObjectModelByUniverseId(
+    universeObjectId: UniverseObjectId,
+    starSystemDatabase: StarSystemDatabase
+): OrbitalObjectModel {
     const starSystemCoordinates = universeObjectId.starSystemCoordinates;
-    const starSystemModel = getSystemModelFromCoordinates(starSystemCoordinates);
+    const starSystemModel = starSystemDatabase.getSystemModelFromCoordinates(starSystemCoordinates);
 
     switch (universeObjectId.objectType) {
         case SystemObjectType.STELLAR_OBJECT:
@@ -88,8 +96,11 @@ export function getObjectModelByUniverseId(universeObjectId: UniverseObjectId): 
     }
 }
 
-export function getUniverseIdForSpaceStationModel(spaceStationModel: OrbitalFacilityModel): UniverseObjectId {
-    const systemModel = getSystemModelFromCoordinates(spaceStationModel.starSystemCoordinates);
+export function getUniverseIdForSpaceStationModel(
+    spaceStationModel: OrbitalFacilityModel,
+    starSystemDatabase: StarSystemDatabase
+): UniverseObjectId {
+    const systemModel = starSystemDatabase.getSystemModelFromCoordinates(spaceStationModel.starSystemCoordinates);
 
     const spaceStationModels = StarSystemModelUtils.GetSpaceStations(systemModel);
     const index = spaceStationModels.findIndex((model) => model.seed === spaceStationModel.seed);

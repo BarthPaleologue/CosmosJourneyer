@@ -81,19 +81,19 @@ export type StarSystemModel = {
     /**
      * The name of the star system.
      */
-    readonly name: string;
+    name: string;
 
     /**
      * The coordinates of the star system in the universe.
      * They are used for identification purposes and to generate the star system.
      */
-    readonly coordinates: StarSystemCoordinates;
+    coordinates: StarSystemCoordinates;
 
     /**
      * Data models for system hierarchies inside the star system. (There can be multiple sub star systems in a star system, for example a binary star system).
      * Usually, there is only one sub star system with a single star.
      */
-    readonly subSystems: SubStarSystemModel[];
+    subSystems: SubStarSystemModel[];
 };
 
 /**
@@ -124,7 +124,9 @@ export class StarSystemModelUtils {
      * @constructor
      */
     static GetPlanets(starSystem: StarSystemModel): PlanetaryMassObjectModel[] {
-        return starSystem.subSystems.flatMap((subSystem) => subSystem.planetarySystems.flatMap((planetarySystem) => planetarySystem.planets));
+        return starSystem.subSystems.flatMap((subSystem) =>
+            subSystem.planetarySystems.flatMap((planetarySystem) => planetarySystem.planets)
+        );
     }
 
     /**
@@ -134,7 +136,9 @@ export class StarSystemModelUtils {
      */
     static GetSpaceStations(starSystem: StarSystemModel): OrbitalFacilityModel[] {
         const stellarSpaceStations = starSystem.subSystems.flatMap((subSystem) => subSystem.orbitalFacilities);
-        const planetarySpaceStations = starSystem.subSystems.flatMap((subSystem) => subSystem.planetarySystems.flatMap((planetarySystem) => planetarySystem.orbitalFacilities));
+        const planetarySpaceStations = starSystem.subSystems.flatMap((subSystem) =>
+            subSystem.planetarySystems.flatMap((planetarySystem) => planetarySystem.orbitalFacilities)
+        );
 
         return stellarSpaceStations.concat(planetarySpaceStations);
     }

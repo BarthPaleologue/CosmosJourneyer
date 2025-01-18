@@ -17,7 +17,6 @@
 
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { MandelbulbModel } from "./mandelbulbModel";
-import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -33,8 +32,6 @@ export class Mandelbulb implements CelestialBody, Cullable {
 
     private readonly transform: TransformNode;
 
-    readonly postProcesses: PostProcessType[] = [];
-
     readonly asteroidField = null;
     readonly ringsUniforms = null;
 
@@ -49,8 +46,6 @@ export class Mandelbulb implements CelestialBody, Cullable {
         this.model = model;
 
         this.transform = new TransformNode(this.model.name, scene);
-
-        this.postProcesses.push(PostProcessType.MANDELBULB);
 
         setRotationQuaternion(this.getTransform(), this.model.physics.axialTilt);
 

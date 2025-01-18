@@ -16,25 +16,37 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { EditorPanel } from "../editorPanel";
-import { TelluricPlanet } from "../../../planets/telluricPlanet/telluricPlanet";
 import { Slider } from "handle-sliderjs";
+import { TelluricPlanetMaterial } from "../../../planets/telluricPlanet/telluricPlanetMaterial";
 
 export class SurfacePanel extends EditorPanel {
     constructor() {
         super("surface");
     }
-    init(planet: TelluricPlanet) {
+    init(planetMaterial: TelluricPlanetMaterial) {
         for (const slider of this.sliders) slider.remove();
 
-        const material = planet.material;
-
         this.sliders = [
-            new Slider("sandSize", document.getElementById("sandSize") as HTMLElement, 0, 300, planet.material.getBeachSize() / 10, (val: number) => {
-                material.setBeachSize(val * 10);
-            }),
-            new Slider("steepSharpness", document.getElementById("steepSharpness") as HTMLElement, 0, 100, planet.material.getSteepSharpness() * 10, (val: number) => {
-                material.setSteepSharpness(val / 10);
-            })
+            new Slider(
+                "sandSize",
+                document.getElementById("sandSize") as HTMLElement,
+                0,
+                300,
+                planetMaterial.getBeachSize() / 10,
+                (val: number) => {
+                    planetMaterial.setBeachSize(val * 10);
+                }
+            ),
+            new Slider(
+                "steepSharpness",
+                document.getElementById("steepSharpness") as HTMLElement,
+                0,
+                100,
+                planetMaterial.getSteepSharpness() * 10,
+                (val: number) => {
+                    planetMaterial.setSteepSharpness(val / 10);
+                }
+            )
         ];
     }
 }

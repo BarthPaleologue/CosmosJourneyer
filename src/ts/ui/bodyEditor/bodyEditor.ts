@@ -36,6 +36,7 @@ import { Star } from "../../stellarObjects/star/star";
 import { BlackHole } from "../../stellarObjects/blackHole/blackHole";
 import { CelestialBody } from "../../architecture/celestialBody";
 import { Scene } from "@babylonjs/core/scene";
+import { TelluricPlanetMaterial } from "../../planets/telluricPlanet/telluricPlanetMaterial";
 
 export const enum EditorVisibility {
     HIDDEN,
@@ -165,64 +166,54 @@ export class BodyEditor {
         this.generalPanel.setVisibility(this.currentPanel === this.generalPanel);
         this.generalPanel.init(body, postProcessManager.colorCorrection, postProcessManager.bloomRenderEffect, scene);
 
-        const rings = postProcessManager.getRings(body);
-        if (rings) {
+        if (body.ringsUniforms !== null) {
             this.ringsPanel.enable();
             this.ringsPanel.setVisibility(this.currentPanel === this.ringsPanel);
-            this.ringsPanel.init(body, rings);
+            this.ringsPanel.init(body.ringsUniforms);
         }
 
         if (body instanceof TelluricPlanet || body instanceof GasPlanet) {
-            const atmosphere = postProcessManager.getAtmosphere(body as TelluricPlanet);
-            if (atmosphere) {
+            if (body.atmosphereUniforms !== null) {
                 this.atmospherePanel.enable();
                 this.atmospherePanel.setVisibility(this.currentPanel === this.atmospherePanel);
-                this.atmospherePanel.init(body, atmosphere);
+                this.atmospherePanel.init(body.getRadius(), body.atmosphereUniforms);
             }
 
             if (body instanceof TelluricPlanet) {
-                this.initToolbar(body);
+                this.initToolbar(body.material);
 
                 this.surfacePanel.enable();
                 this.surfacePanel.setVisibility(this.currentPanel === this.surfacePanel);
-                this.surfacePanel.init(body);
+                this.surfacePanel.init(body.material);
 
                 this.physicPanel.enable();
                 this.physicPanel.setVisibility(this.currentPanel === this.physicPanel);
-                this.physicPanel.init(body);
+                this.physicPanel.init(body.model.physics, body.material);
 
-                const clouds = postProcessManager.getClouds(body as TelluricPlanet);
-                if (clouds) {
+                if (body.cloudsUniforms !== null) {
                     this.cloudsPanel.enable();
                     this.cloudsPanel.setVisibility(this.currentPanel === this.cloudsPanel);
-                    this.cloudsPanel.init(body, clouds);
+                    this.cloudsPanel.init(body.getBoundingRadius(), body.cloudsUniforms);
                 }
 
-                const ocean = postProcessManager.getOcean(body as TelluricPlanet);
-                if (ocean) {
+                if (body.oceanUniforms !== null) {
                     this.oceanPanel.enable();
                     this.oceanPanel.setVisibility(this.currentPanel === this.oceanPanel);
-                    this.oceanPanel.init(body, ocean);
+                    this.oceanPanel.init(body.oceanUniforms);
                 }
             } else {
                 this.gazCloudsPanel.enable();
                 this.gazCloudsPanel.setVisibility(this.currentPanel === this.gazCloudsPanel);
-                this.gazCloudsPanel.init(body);
+                this.gazCloudsPanel.init(body.material);
             }
         } else if (body instanceof Star) {
-            const volumetricLight = postProcessManager.getVolumetricLight(body as Star);
-            if (volumetricLight) {
-                this.starPanel.enable();
-                this.starPanel.setVisibility(this.currentPanel === this.starPanel);
-                this.starPanel.init(volumetricLight);
-            }
+            this.starPanel.enable();
+            this.starPanel.setVisibility(this.currentPanel === this.starPanel);
+            this.starPanel.init(body.volumetricLightUniforms);
         } else if (body instanceof BlackHole) {
-            const blackHole = postProcessManager.getBlackHole(body as BlackHole);
-            if (blackHole) {
-                this.blackHolePanel.enable();
-                this.blackHolePanel.setVisibility(this.currentPanel === this.blackHolePanel);
-                this.blackHolePanel.init(body, blackHole);
-            }
+            this.blackHolePanel.enable();
+            this.blackHolePanel.setVisibility(this.currentPanel === this.blackHolePanel);
+            this.blackHolePanel.init(body.blackHoleUniforms);
         }
 
         if (this.currentPanel !== null) {
@@ -232,22 +223,29 @@ export class BodyEditor {
         }
     }
 
-    public initToolbar(planet: TelluricPlanet) {
-        const material = planet.material;
+    public initToolbar(planetMaterial: TelluricPlanetMaterial) {
         document.getElementById("defaultMapButton")?.addEventListener("click", () => {
-            material.setColorMode(ColorMode.DEFAULT);
+            planetMaterial.setColorMode(ColorMode.DEFAULT);
         });
         document.getElementById("moistureMapButton")?.addEventListener("click", () => {
-            material.setColorMode(material.getColorMode() !== ColorMode.MOISTURE ? ColorMode.MOISTURE : ColorMode.DEFAULT);
+            planetMaterial.setColorMode(
+                planetMaterial.getColorMode() !== ColorMode.MOISTURE ? ColorMode.MOISTURE : ColorMode.DEFAULT
+            );
         });
         document.getElementById("temperatureMapButton")?.addEventListener("click", () => {
-            material.setColorMode(material.getColorMode() !== ColorMode.TEMPERATURE ? ColorMode.TEMPERATURE : ColorMode.DEFAULT);
+            planetMaterial.setColorMode(
+                planetMaterial.getColorMode() !== ColorMode.TEMPERATURE ? ColorMode.TEMPERATURE : ColorMode.DEFAULT
+            );
         });
         document.getElementById("normalMapButton")?.addEventListener("click", () => {
-            material.setColorMode(material.getColorMode() !== ColorMode.NORMAL ? ColorMode.NORMAL : ColorMode.DEFAULT);
+            planetMaterial.setColorMode(
+                planetMaterial.getColorMode() !== ColorMode.NORMAL ? ColorMode.NORMAL : ColorMode.DEFAULT
+            );
         });
         document.getElementById("heightMapButton")?.addEventListener("click", () => {
-            material.setColorMode(material.getColorMode() !== ColorMode.HEIGHT ? ColorMode.HEIGHT : ColorMode.DEFAULT);
+            planetMaterial.setColorMode(
+                planetMaterial.getColorMode() !== ColorMode.HEIGHT ? ColorMode.HEIGHT : ColorMode.DEFAULT
+            );
         });
     }
 

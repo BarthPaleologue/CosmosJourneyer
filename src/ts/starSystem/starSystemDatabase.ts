@@ -1,0 +1,403 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Affero General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Affero General Public License for more details.
+//
+//  You should have received a copy of the GNU Affero General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+import { StarSystemModel } from "./starSystemModel";
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/universeCoordinates";
+import { newSeededStarSystemModel } from "./seededStarSystemModel";
+import { hashVec3 } from "../utils/hashVec3";
+import { getRngFromSeed } from "../utils/getRngFromSeed";
+import { Settings } from "../settings";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { centeredRand } from "extended-random";
+import { makeNoise3D } from "fast-simplex-noise/lib/3d";
+
+/**
+ * The StarSystemDatabase defines the content of the universe.
+ * It is responsible for generating star system models and system positions in the galaxy.
+ */
+export class StarSystemDatabase {
+    /**
+     * Maps star sectors to the custom systems they contain.
+     */
+    private readonly starSectorToCustomSystems: Map<string, StarSystemModel[]> = new Map();
+
+    /**
+     * Maps coordinates to custom systems.
+     */
+    private readonly coordinatesToCustomSystems: Map<string, StarSystemModel> = new Map();
+
+    /**
+     * Maps coordinates to plugins that modify the system at these coordinates.
+     */
+    private readonly coordinatesToSinglePlugins: Map<string, (systemModel: StarSystemModel) => StarSystemModel> =
+        new Map();
+
+    /**
+     * List plugins that can modify multiple systems at once
+     */
+    private readonly generalPlugins: {
+        /**
+         * @param systemModel The system model to test.
+         * @returns true if the plugin should apply to the given system, false otherwise.
+         */
+        predicate: (systemModel: StarSystemModel) => boolean;
+        /**
+         * The plugin to apply to the system.
+         * @param systemModel The system model to modify.
+         * @returns A pointer to the modified system model, or a new system model.
+         */
+        plugin: (systemModel: StarSystemModel) => StarSystemModel;
+    }[] = [];
+
+    /**
+     * Function that returns the density of the universe in a given star sector.
+     */
+    private readonly universeDensity: (starSectorX: number, starSectorY: number, starSectorZ: number) => number;
+
+    constructor() {
+        const densityRng = getRngFromSeed(Settings.UNIVERSE_SEED);
+        let densitySampleStep = 0;
+        const densityPerlin = makeNoise3D(() => {
+            return densityRng(densitySampleStep++);
+        });
+
+        this.universeDensity = (x: number, y: number, z: number) =>
+            (1.0 - Math.abs(densityPerlin(x * 0.2, y * 0.2, z * 0.2))) ** 8;
+    }
+
+    /**
+     * Converts a star sector to a string. This is useful for using the star sector as a key in a map.
+     * @param sectorX
+     * @param sectorY
+     * @param sectorZ
+     * @returns A string representation of the star sector.
+     */
+    private starSectorToString(sectorX: number, sectorY: number, sectorZ: number): string {
+        return `${sectorX}|${sectorY}|${sectorZ}`;
+    }
+
+    /**
+     * Adds the given system to the database
+     * @param system The system to register
+     */
+    public registerCustomSystem(system: StarSystemModel) {
+        const sectorKey = this.starSectorToString(
+            system.coordinates.starSectorX,
+            system.coordinates.starSectorY,
+            system.coordinates.starSectorZ
+        );
+        const systems = this.starSectorToCustomSystems.get(sectorKey);
+        if (systems === undefined) {
+            this.starSectorToCustomSystems.set(sectorKey, [system]);
+        } else {
+            systems.push(system);
+        }
+
+        this.coordinatesToCustomSystems.set(JSON.stringify(system.coordinates), system);
+    }
+
+    /**
+     * @param sectorX
+     * @param sectorY
+     * @param sectorZ
+     * @returns The list of only the custom systems in the given sector.
+     */
+    private getCustomSystemsFromSector(sectorX: number, sectorY: number, sectorZ: number): StarSystemModel[] {
+        const sectorKey = this.starSectorToString(sectorX, sectorY, sectorZ);
+        const systems = this.starSectorToCustomSystems.get(sectorKey);
+        if (systems === undefined) {
+            return [];
+        }
+        return systems;
+    }
+
+    private getCustomSystemFromCoordinates(coordinates: StarSystemCoordinates): StarSystemModel | undefined {
+        return this.coordinatesToCustomSystems.get(JSON.stringify(coordinates));
+    }
+
+    /**
+     * Register a plugin that modifies a single system.
+     * @param coordinates The coordinates of the system to modify.
+     * @param plugin The plugin to apply to the system.
+     */
+    public registerSinglePlugin(
+        coordinates: StarSystemCoordinates,
+        plugin: (systemModel: StarSystemModel) => StarSystemModel
+    ) {
+        this.coordinatesToSinglePlugins.set(JSON.stringify(coordinates), plugin);
+    }
+
+    /**
+     * Register a plugin that modifies multiple systems.
+     * @param predicate The predicate used to match systems.
+     * @param plugin The plugin to apply to the matched systems.
+     */
+    public registerGeneralPlugin(
+        predicate: (systemModel: StarSystemModel) => boolean,
+        plugin: (systemModel: StarSystemModel) => StarSystemModel
+    ) {
+        this.generalPlugins.push({ predicate, plugin });
+    }
+
+    /**
+     * Check if a system is in the human bubble.
+     * @param systemCoordinates The coordinates of the system to check.
+     * @returns true if the system is in the human bubble, false otherwise.
+     */
+    public isSystemInHumanBubble(systemCoordinates: StarSystemCoordinates): boolean {
+        const systemPosition = this.getSystemGalacticPosition(systemCoordinates);
+        const distanceToSolLy = systemPosition.length();
+
+        return distanceToSolLy < Settings.HUMAN_BUBBLE_RADIUS_LY;
+    }
+
+    /**
+     * @param coordinates The coordinates of the system you want the model of.
+     * @returns The StarSystemModel for the given coordinates.
+     * @throws An error if the seed is not found for the given coordinates.
+     */
+    public getSystemModelFromCoordinates(coordinates: StarSystemCoordinates): StarSystemModel {
+        const customSystem = this.getCustomSystemFromCoordinates(coordinates);
+        if (customSystem !== undefined) {
+            return this.applyPlugins(customSystem);
+        }
+
+        const generatedSystemCoordinates = this.getGeneratedSystemCoordinatesInStarSector(
+            coordinates.starSectorX,
+            coordinates.starSectorY,
+            coordinates.starSectorZ
+        );
+        const index = generatedSystemCoordinates.findIndex((otherCoordinates) =>
+            starSystemCoordinatesEquals(coordinates, otherCoordinates)
+        );
+        if (index === -1) {
+            throw new Error(
+                `Seed not found for coordinates ${JSON.stringify(coordinates)}. It was not found in the custom system registry either.`
+            );
+        }
+
+        // init pseudo-random number generator
+        const cellRNG = getRngFromSeed(
+            hashVec3(coordinates.starSectorX, coordinates.starSectorY, coordinates.starSectorZ)
+        );
+        const hash = centeredRand(cellRNG, 1 + index) * Settings.SEED_HALF_RANGE;
+        const systemRng = getRngFromSeed(hash);
+
+        return this.applyPlugins(
+            newSeededStarSystemModel(
+                systemRng,
+                coordinates,
+                this.getSystemGalacticPosition(coordinates),
+                this.isSystemInHumanBubble(coordinates)
+            )
+        );
+    }
+
+    private getGeneratedSystemCoordinatesInStarSector(sectorX: number, sectorY: number, sectorZ: number) {
+        const localPositions = this.getGeneratedLocalPositionsInStarSector(sectorX, sectorY, sectorZ);
+
+        return localPositions.map((localPosition) => {
+            return {
+                starSectorX: sectorX,
+                starSectorY: sectorY,
+                starSectorZ: sectorZ,
+                localX: localPosition.x,
+                localY: localPosition.y,
+                localZ: localPosition.z
+            };
+        });
+    }
+
+    /**
+     * @param sectorX
+     * @param sectorY
+     * @param sectorZ
+     * @returns The coordinates of the systems in the given star sector.
+     */
+    public getSystemCoordinatesInStarSector(
+        sectorX: number,
+        sectorY: number,
+        sectorZ: number
+    ): StarSystemCoordinates[] {
+        const generatedSystemCoordinates = this.getGeneratedSystemCoordinatesInStarSector(sectorX, sectorY, sectorZ);
+
+        const customSystemModels = this.getCustomSystemsFromSector(sectorX, sectorY, sectorZ);
+        const customSystemCoordinates = customSystemModels.map((model) => {
+            return model.coordinates;
+        });
+
+        return generatedSystemCoordinates.concat(customSystemCoordinates);
+    }
+
+    /**
+     * @param sectorX
+     * @param sectorY
+     * @param sectorZ
+     * @returns All system models (custom and generated) in the given star sector.
+     */
+    public getSystemModelsInStarSector(sectorX: number, sectorY: number, sectorZ: number) {
+        const generatedModels: StarSystemModel[] = [];
+
+        const generatedSystemCoordinates = this.getGeneratedSystemCoordinatesInStarSector(sectorX, sectorY, sectorZ);
+
+        for (const systemCoordinates of generatedSystemCoordinates) {
+            const systemModel = this.getSystemModelFromCoordinates(systemCoordinates);
+            generatedModels.push(systemModel);
+        }
+
+        const customSystemModels = this.getCustomSystemsFromSector(sectorX, sectorY, sectorZ);
+
+        const allModels = generatedModels.concat(customSystemModels);
+
+        return allModels.map((model) => {
+            return this.applyPlugins(model);
+        });
+    }
+
+    /**
+     * @param starSectorX
+     * @param starSectorY
+     * @param starSectorZ
+     * @param index The index of the generated system in the star sector.
+     * @returns The system coordinates of the system generated given the seed.
+     */
+    public getSystemCoordinatesFromSeed(
+        starSectorX: number,
+        starSectorY: number,
+        starSectorZ: number,
+        index: number
+    ): StarSystemCoordinates {
+        const systemLocalPositions = this.getGeneratedLocalPositionsInStarSector(starSectorX, starSectorY, starSectorZ);
+        const systemLocalPosition = systemLocalPositions.at(index);
+        if (systemLocalPosition === undefined) {
+            throw new Error(
+                `Local position not found for seed ${index} in star sector ${starSectorX}, ${starSectorY}, ${starSectorZ}`
+            );
+        }
+
+        return {
+            starSectorX: starSectorX,
+            starSectorY: starSectorY,
+            starSectorZ: starSectorZ,
+            localX: systemLocalPosition.x,
+            localY: systemLocalPosition.y,
+            localZ: systemLocalPosition.z
+        };
+    }
+
+    /**
+     * @param coordinates The coordinates of the system you want the position of.
+     * @returns The position of the given system in the galaxy.
+     */
+    public getSystemGalacticPosition(coordinates: StarSystemCoordinates) {
+        return new Vector3(
+            (coordinates.starSectorX + coordinates.localX) * Settings.STAR_SECTOR_SIZE,
+            (coordinates.starSectorY + coordinates.localY) * Settings.STAR_SECTOR_SIZE,
+            (coordinates.starSectorZ + coordinates.localZ) * Settings.STAR_SECTOR_SIZE
+        );
+    }
+
+    /**
+     * @param sectorX
+     * @param sectorY
+     * @param sectorZ
+     * @returns The list of all local positions of generated systems in the given star sector (range is [-0.5, 0.5]).
+     */
+    private getGeneratedLocalPositionsInStarSector(sectorX: number, sectorY: number, sectorZ: number) {
+        const rng = getRngFromSeed(hashVec3(sectorX, sectorY, sectorZ));
+
+        const density = this.universeDensity(sectorX, sectorY, sectorZ);
+
+        const nbGeneratedStars = 40 * density * rng(0);
+
+        const localPositions: Vector3[] = [];
+
+        for (let i = 0; i < nbGeneratedStars; i++) {
+            const starLocalPosition = new Vector3(
+                centeredRand(rng, 10 * i + 1) / 2,
+                centeredRand(rng, 10 * i + 2) / 2,
+                centeredRand(rng, 10 * i + 3) / 2
+            );
+
+            localPositions.push(starLocalPosition);
+        }
+
+        return localPositions;
+    }
+
+    /**
+     * @param sectorX
+     * @param sectorY
+     * @param sectorZ
+     * @returns The list of all local positions of systems in the given star sector (range is [-0.5, 0.5]).
+     */
+    private getSystemLocalPositionsInStarSector(sectorX: number, sectorY: number, sectorZ: number) {
+        const localPositions: Vector3[] = [];
+
+        localPositions.push(...this.getGeneratedLocalPositionsInStarSector(sectorX, sectorY, sectorZ));
+
+        const customSystemModels = this.getCustomSystemsFromSector(sectorX, sectorY, sectorZ);
+
+        for (const systemModel of customSystemModels) {
+            localPositions.push(
+                new Vector3(
+                    systemModel.coordinates.localX,
+                    systemModel.coordinates.localY,
+                    systemModel.coordinates.localZ
+                )
+            );
+        }
+
+        return localPositions;
+    }
+
+    /**
+     * @param sectorX
+     * @param sectorY
+     * @param sectorZ
+     * @returns The positions of all systems in the given star sector in galactic space.
+     */
+    public getSystemPositionsInStarSector(sectorX: number, sectorY: number, sectorZ: number) {
+        const localPositions = this.getSystemLocalPositionsInStarSector(sectorX, sectorY, sectorZ);
+
+        const sectorPosition = new Vector3(sectorX, sectorY, sectorZ);
+
+        return localPositions.map((localPosition) => {
+            return localPosition.addInPlace(sectorPosition).scaleInPlace(Settings.STAR_SECTOR_SIZE);
+        });
+    }
+
+    /**
+     * @param model The system model to apply the plugins to.
+     * @returns The modified system model, or a new system model.
+     */
+    private applyPlugins(model: StarSystemModel): StarSystemModel {
+        let newModel = model;
+        const singlePlugin = this.coordinatesToSinglePlugins.get(JSON.stringify(model.coordinates));
+        if (singlePlugin !== undefined) {
+            newModel = singlePlugin(model);
+        }
+
+        for (const generalPlugin of this.generalPlugins) {
+            if (generalPlugin.predicate(newModel)) {
+                newModel = generalPlugin.plugin(newModel);
+            }
+        }
+
+        return newModel;
+    }
+}

@@ -24,9 +24,10 @@ import { TelluricPlanetaryMassObjectModel } from "../planets/telluricPlanet/tell
 import { Mission, MissionType } from "./mission";
 import { StarSystemModel, StarSystemModelUtils } from "../starSystem/starSystemModel";
 import { getRngFromSeed } from "../utils/getRngFromSeed";
-import { getSystemModelFromCoordinates } from "../starSystem/modelFromCoordinates";
 import { OrbitalObjectType } from "../architecture/orbitalObject";
 import { OrbitalFacilityModel } from "../spacestation/orbitalFacility";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { getUniverseIdForSpaceStationModel } from "../utils/coordinates/orbitalObjectId";
 
 /**
  * Generates sightseeing missions available at the given space station for the player. Missions are generated based on the current timestamp (hourly basis).
@@ -35,7 +36,13 @@ import { OrbitalFacilityModel } from "../spacestation/orbitalFacility";
  * @param player The player for which the missions are generated
  * @param timestampMillis The current timestamp in milliseconds
  */
-export function generateSightseeingMissions(spaceStationModel: OrbitalFacilityModel, starSystemModel: StarSystemModel, player: Player, timestampMillis: number): Mission[] {
+export function generateSightseeingMissions(
+    spaceStationModel: OrbitalFacilityModel,
+    starSystemModel: StarSystemModel,
+    starSystemDatabase: StarSystemDatabase,
+    player: Player,
+    timestampMillis: number
+): Mission[] {
     const currentHour = Math.floor(timestampMillis / 1000 / 60 / 60) % (24 * 30);
 
     const starSystem = starSystemModel;
@@ -46,45 +53,70 @@ export function generateSightseeingMissions(spaceStationModel: OrbitalFacilityMo
 
     const rng = getRngFromSeed(spaceStationModel.seed);
 
-    const neighborSystems = getNeighborStarSystemCoordinates(starSystem.coordinates, 75);
+    const spaceStationUniverseId = getUniverseIdForSpaceStationModel(spaceStationModel, starSystemDatabase);
+
+    const neighborSystems = getNeighborStarSystemCoordinates(starSystem.coordinates, 75, starSystemDatabase);
     neighborSystems.forEach(([systemCoordinates, coordinates, distance]) => {
-        const systemModel = getSystemModelFromCoordinates(systemCoordinates);
-        for (let anomalyIndex = 0; anomalyIndex < StarSystemModelUtils.GetAnomalies(systemModel).length; anomalyIndex++) {
-            if (!uniformRandBool(1.0 / (1.0 + 1.5 * distance), rng, 38 + anomalyIndex + currentHour + coordinates.length())) continue;
+        const systemModel = starSystemDatabase.getSystemModelFromCoordinates(systemCoordinates);
+        for (
+            let anomalyIndex = 0;
+            anomalyIndex < StarSystemModelUtils.GetAnomalies(systemModel).length;
+            anomalyIndex++
+        ) {
+            if (
+                !uniformRandBool(
+                    1.0 / (1.0 + 1.5 * distance),
+                    rng,
+                    38 + anomalyIndex + currentHour + coordinates.length()
+                )
+            )
+                continue;
             anomalyFlyByMissions.push(
-                newSightSeeingMission(spaceStationModel, {
-                    type: MissionType.SIGHT_SEEING_FLY_BY,
-                    objectId: {
-                        starSystemCoordinates: systemCoordinates,
-                        objectType: SystemObjectType.ANOMALY,
-                        objectIndex: anomalyIndex
-                    }
-                })
+                newSightSeeingMission(
+                    spaceStationUniverseId,
+                    {
+                        type: MissionType.SIGHT_SEEING_FLY_BY,
+                        objectId: {
+                            starSystemCoordinates: systemCoordinates,
+                            objectType: SystemObjectType.ANOMALY,
+                            objectIndex: anomalyIndex
+                        }
+                    },
+                    starSystemDatabase
+                )
             );
         }
         StarSystemModelUtils.GetStellarObjects(systemModel).forEach((model, stellarObjectIndex) => {
             if (model.type === OrbitalObjectType.NEUTRON_STAR) {
                 neutronStarFlyByMissions.push(
-                    newSightSeeingMission(spaceStationModel, {
-                        type: MissionType.SIGHT_SEEING_FLY_BY,
-                        objectId: {
-                            starSystemCoordinates: systemCoordinates,
-                            objectType: SystemObjectType.STELLAR_OBJECT,
-                            objectIndex: stellarObjectIndex
-                        }
-                    })
+                    newSightSeeingMission(
+                        spaceStationUniverseId,
+                        {
+                            type: MissionType.SIGHT_SEEING_FLY_BY,
+                            objectId: {
+                                starSystemCoordinates: systemCoordinates,
+                                objectType: SystemObjectType.STELLAR_OBJECT,
+                                objectIndex: stellarObjectIndex
+                            }
+                        },
+                        starSystemDatabase
+                    )
                 );
             }
             if (model.type === OrbitalObjectType.BLACK_HOLE) {
                 blackHoleFlyByMissions.push(
-                    newSightSeeingMission(spaceStationModel, {
-                        type: MissionType.SIGHT_SEEING_FLY_BY,
-                        objectId: {
-                            starSystemCoordinates: systemCoordinates,
-                            objectType: SystemObjectType.STELLAR_OBJECT,
-                            objectIndex: stellarObjectIndex
-                        }
-                    })
+                    newSightSeeingMission(
+                        spaceStationUniverseId,
+                        {
+                            type: MissionType.SIGHT_SEEING_FLY_BY,
+                            objectId: {
+                                starSystemCoordinates: systemCoordinates,
+                                objectType: SystemObjectType.STELLAR_OBJECT,
+                                objectIndex: stellarObjectIndex
+                            }
+                        },
+                        starSystemDatabase
+                    )
                 );
             }
         });
@@ -98,14 +130,18 @@ export function generateSightseeingMissions(spaceStationModel: OrbitalFacilityMo
     StarSystemModelUtils.GetPlanetaryMassObjects(currentSystemModel).forEach((celestialBodyModel, index) => {
         if (celestialBodyModel.rings !== null) {
             asteroidFieldMissions.push(
-                newSightSeeingMission(spaceStationModel, {
-                    type: MissionType.SIGHT_SEEING_ASTEROID_FIELD,
-                    objectId: {
-                        starSystemCoordinates: currentSystemModel.coordinates,
-                        objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
-                        objectIndex: index
-                    }
-                })
+                newSightSeeingMission(
+                    spaceStationUniverseId,
+                    {
+                        type: MissionType.SIGHT_SEEING_ASTEROID_FIELD,
+                        objectId: {
+                            starSystemCoordinates: currentSystemModel.coordinates,
+                            objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
+                            objectIndex: index
+                        }
+                    },
+                    starSystemDatabase
+                )
             );
         }
 
@@ -113,21 +149,34 @@ export function generateSightseeingMissions(spaceStationModel: OrbitalFacilityMo
             const telluricPlanetModel = celestialBodyModel as TelluricPlanetaryMassObjectModel;
             if (telluricPlanetModel.physics.oceanLevel === 0) {
                 terminatorLandingMissions.push(
-                    newSightSeeingMission(spaceStationModel, {
-                        type: MissionType.SIGHT_SEEING_TERMINATOR_LANDING,
-                        objectId: {
-                            starSystemCoordinates: currentSystemModel.coordinates,
-                            objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
-                            objectIndex: index
-                        }
-                    })
+                    newSightSeeingMission(
+                        spaceStationUniverseId,
+                        {
+                            type: MissionType.SIGHT_SEEING_TERMINATOR_LANDING,
+                            objectId: {
+                                starSystemCoordinates: currentSystemModel.coordinates,
+                                objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
+                                objectIndex: index
+                            }
+                        },
+                        starSystemDatabase
+                    )
                 );
             }
         }
     });
 
-    const allMissions = blackHoleFlyByMissions.concat(neutronStarFlyByMissions, anomalyFlyByMissions, asteroidFieldMissions, terminatorLandingMissions);
+    const allMissions = blackHoleFlyByMissions.concat(
+        neutronStarFlyByMissions,
+        anomalyFlyByMissions,
+        asteroidFieldMissions,
+        terminatorLandingMissions
+    );
 
     // filter missions to avoid duplicates with already accepted missions of the player
-    return allMissions.filter((mission) => player.currentMissions.concat(player.completedMissions).every((currentMission) => !mission.equals(currentMission)));
+    return allMissions.filter((mission) =>
+        player.currentMissions
+            .concat(player.completedMissions)
+            .every((currentMission) => !mission.equals(currentMission))
+    );
 }

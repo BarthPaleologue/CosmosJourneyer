@@ -17,18 +17,20 @@
 
 import { Mission, MissionType } from "./mission";
 import { SystemObjectType, UniverseObjectId } from "../utils/coordinates/universeCoordinates";
-import { getStarGalacticPosition } from "../utils/coordinates/starSystemCoordinatesUtils";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MissionNode } from "./nodes/missionNode";
 import { MissionFlyByNode } from "./nodes/actions/sightseeing/missionFlyByNode";
 import { MissionTerminatorLandingNode } from "./nodes/actions/sightseeing/missionTerminatorLandingNode";
 import { MissionAsteroidFieldNode } from "./nodes/actions/sightseeing/missionAsteroidFieldNode";
-import { OrbitalFacilityModel } from "../spacestation/orbitalFacility";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 
 /**
  * Sightseeing mission types are a subset of mission types.
  */
-export type SightSeeingType = MissionType.SIGHT_SEEING_FLY_BY | MissionType.SIGHT_SEEING_TERMINATOR_LANDING | MissionType.SIGHT_SEEING_ASTEROID_FIELD;
+export type SightSeeingType =
+    | MissionType.SIGHT_SEEING_FLY_BY
+    | MissionType.SIGHT_SEEING_TERMINATOR_LANDING
+    | MissionType.SIGHT_SEEING_ASTEROID_FIELD;
 
 /**
  * Defines a target for a sightseeing mission and the type of sightseeing mission.
@@ -57,14 +59,20 @@ function generateMissionTree(target: SightSeeingTarget): MissionNode {
  * @param target The target of the sightseeing mission.
  * @returns The new sightseeing mission.
  */
-export function newSightSeeingMission(missionGiver: OrbitalFacilityModel, target: SightSeeingTarget): Mission {
+export function newSightSeeingMission(
+    missionGiver: UniverseObjectId,
+    target: SightSeeingTarget,
+    starSystemDatabase: StarSystemDatabase
+): Mission {
     const missionTree = generateMissionTree(target);
 
     const targetSystemCoordinates = target.objectId.starSystemCoordinates;
 
-    const missionGiverGalacticCoordinates = getStarGalacticPosition(missionGiver.starSystemCoordinates);
+    const missionGiverGalacticCoordinates = starSystemDatabase.getSystemGalacticPosition(
+        missionGiver.starSystemCoordinates
+    );
 
-    const targetGalacticCoordinates = getStarGalacticPosition(targetSystemCoordinates);
+    const targetGalacticCoordinates = starSystemDatabase.getSystemGalacticPosition(targetSystemCoordinates);
     const distanceLY = Vector3.Distance(missionGiverGalacticCoordinates, targetGalacticCoordinates);
 
     // reward far away targets more

@@ -87,7 +87,11 @@ export function alertModal(message: string): Promise<void> {
     });
 }
 
-export function connectEncyclopaediaGalacticaModal(): Promise<{ encyclopaediaUrlBase: string; accountId: string; password: string } | null> {
+export function connectEncyclopaediaGalacticaModal(): Promise<{
+    encyclopaediaUrlBase: string;
+    accountId: string;
+    password: string;
+} | null> {
     const modal = document.createElement("dialog");
     document.body.appendChild(modal);
 

@@ -28,7 +28,13 @@ export class AudioInstance {
 
     readonly mask: number;
 
-    constructor(baseSound: Sound, mask: number, initialTargetVolume: number, isPonctual: boolean, parent: TransformNode | null) {
+    constructor(
+        baseSound: Sound,
+        mask: number,
+        initialTargetVolume: number,
+        isPonctual: boolean,
+        parent: TransformNode | null
+    ) {
         const clonedSound = baseSound.clone();
         if (clonedSound === null) throw new Error("Cloned sound was null!");
         this.sound = clonedSound;
@@ -81,9 +87,19 @@ export class AudioInstance {
         }
 
         this.sound.setVolume(
-            moveTowards(this.sound.getVolume(), this.targetVolume * this.volumeMultiplier * this.spatialVolumeMultiplier * this.maskFactor, this.blendSpeed * deltaSeconds)
+            moveTowards(
+                this.sound.getVolume(),
+                this.targetVolume * this.volumeMultiplier * this.spatialVolumeMultiplier * this.maskFactor,
+                this.blendSpeed * deltaSeconds
+            )
         );
-        this.sound.setPlaybackRate(moveTowards(this.sound.getPlaybackRate(), this.targetPlaybackSpeed * this.playbackSpeedMultiplier, this.blendSpeed * deltaSeconds));
+        this.sound.setPlaybackRate(
+            moveTowards(
+                this.sound.getPlaybackRate(),
+                this.targetPlaybackSpeed * this.playbackSpeedMultiplier,
+                this.blendSpeed * deltaSeconds
+            )
+        );
 
         /*if (this.parent !== null) {
             const worldPosition = Vector3.TransformCoordinates(this.localPosition, this.parent.getWorldMatrix());

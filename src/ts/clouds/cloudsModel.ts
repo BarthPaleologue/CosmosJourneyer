@@ -31,7 +31,12 @@ export type CloudsModel = {
     detailSpeed: number;
 };
 
-export function newCloudsModel(planetRadius: number, cloudLayerHeight: number, waterAmount: number, pressure: number): CloudsModel {
+export function newCloudsModel(
+    planetRadius: number,
+    cloudLayerHeight: number,
+    waterAmount: number,
+    pressure: number
+): CloudsModel {
     return {
         layerRadius: planetRadius + cloudLayerHeight,
         smoothness: 0.7,

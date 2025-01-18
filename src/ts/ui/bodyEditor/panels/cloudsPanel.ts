@@ -20,53 +20,87 @@ import { clearAllEventListenersById } from "../../../utils/html";
 import { Settings } from "../../../settings";
 import { Slider } from "handle-sliderjs";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { CloudsPostProcess } from "../../../clouds/volumetricCloudsPostProcess";
-import { CelestialBody } from "../../../architecture/celestialBody";
+import { CloudsUniforms } from "../../../clouds/cloudsUniforms";
 
 export class CloudsPanel extends EditorPanel {
     constructor() {
         super("clouds");
     }
-    init(planet: CelestialBody, flatClouds: CloudsPostProcess) {
+    init(planetBoundingRadius: number, cloudUniforms: CloudsUniforms) {
         for (const slider of this.sliders) slider.remove();
 
         const cloudsToggler = clearAllEventListenersById("cloudsToggler");
         cloudsToggler.addEventListener("click", () => {
             const checkbox = document.querySelectorAll("input[type='checkbox']")[1] as HTMLInputElement;
             checkbox.checked = !checkbox.checked;
-            flatClouds.cloudUniforms.model.layerRadius = checkbox.checked ? planet.getBoundingRadius() + Settings.CLOUD_LAYER_HEIGHT : 0;
+            cloudUniforms.model.layerRadius = checkbox.checked ? planetBoundingRadius + Settings.CLOUD_LAYER_HEIGHT : 0;
         });
         const cloudColorPicker = clearAllEventListenersById("cloudColor") as HTMLInputElement;
-        cloudColorPicker.value = flatClouds.cloudUniforms.model.color.toHexString();
+        cloudColorPicker.value = cloudUniforms.model.color.toHexString();
         cloudColorPicker.addEventListener("input", () => {
-            flatClouds.cloudUniforms.model.color = Color3.FromHexString(cloudColorPicker.value);
+            cloudUniforms.model.color = Color3.FromHexString(cloudColorPicker.value);
         });
         this.sliders = [
-            new Slider("cloudFrequency", document.getElementById("cloudFrequency") as HTMLElement, 0, 20, flatClouds.cloudUniforms.model.frequency, (val: number) => {
-                flatClouds.cloudUniforms.model.frequency = val;
-            }),
+            new Slider(
+                "cloudFrequency",
+                document.getElementById("cloudFrequency") as HTMLElement,
+                0,
+                20,
+                cloudUniforms.model.frequency,
+                (val: number) => {
+                    cloudUniforms.model.frequency = val;
+                }
+            ),
             new Slider(
                 "cloudDetailFrequency",
                 document.getElementById("cloudDetailFrequency") as HTMLElement,
                 0,
                 50,
-                flatClouds.cloudUniforms.model.detailFrequency,
+                cloudUniforms.model.detailFrequency,
                 (val: number) => {
-                    flatClouds.cloudUniforms.model.detailFrequency = val;
+                    cloudUniforms.model.detailFrequency = val;
                 }
             ),
-            new Slider("cloudCoverage", document.getElementById("cloudCoverage") as HTMLElement, 0, 200, 100 + flatClouds.cloudUniforms.model.coverage * 100, (val: number) => {
-                flatClouds.cloudUniforms.model.coverage = (val - 100) / 100;
-            }),
-            new Slider("cloudSharpness", document.getElementById("cloudSharpness") as HTMLElement, 1, 100, flatClouds.cloudUniforms.model.sharpness * 10, (val: number) => {
-                flatClouds.cloudUniforms.model.sharpness = val / 10;
-            }),
-            new Slider("worleySpeed", document.getElementById("worleySpeed") as HTMLElement, 0.0, 200.0, flatClouds.cloudUniforms.model.worleySpeed * 10000, (val: number) => {
-                flatClouds.cloudUniforms.model.worleySpeed = val / 10000;
-            }),
-            new Slider("detailSpeed", document.getElementById("detailSpeed") as HTMLElement, 0, 200, flatClouds.cloudUniforms.model.detailSpeed * 10000, (val: number) => {
-                flatClouds.cloudUniforms.model.detailSpeed = val / 10000;
-            })
+            new Slider(
+                "cloudCoverage",
+                document.getElementById("cloudCoverage") as HTMLElement,
+                0,
+                200,
+                100 + cloudUniforms.model.coverage * 100,
+                (val: number) => {
+                    cloudUniforms.model.coverage = (val - 100) / 100;
+                }
+            ),
+            new Slider(
+                "cloudSharpness",
+                document.getElementById("cloudSharpness") as HTMLElement,
+                1,
+                100,
+                cloudUniforms.model.sharpness * 10,
+                (val: number) => {
+                    cloudUniforms.model.sharpness = val / 10;
+                }
+            ),
+            new Slider(
+                "worleySpeed",
+                document.getElementById("worleySpeed") as HTMLElement,
+                0.0,
+                200.0,
+                cloudUniforms.model.worleySpeed * 10000,
+                (val: number) => {
+                    cloudUniforms.model.worleySpeed = val / 10000;
+                }
+            ),
+            new Slider(
+                "detailSpeed",
+                document.getElementById("detailSpeed") as HTMLElement,
+                0,
+                200,
+                cloudUniforms.model.detailSpeed * 10000,
+                (val: number) => {
+                    cloudUniforms.model.detailSpeed = val / 10000;
+                }
+            )
         ];
     }
 }

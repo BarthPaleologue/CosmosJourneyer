@@ -21,122 +21,126 @@
 @use "currentMissionDisplay.scss";
 
 #helmetOverlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  z-index: 30;
-  pointer-events: none;
-  cursor: none;
-
-  visibility: hidden;
-
-  font-family: Nasalization, sans-serif;
-
-  @include meta.load-css("targetHelper.scss");
-
-  .cursor {
     position: absolute;
-    width: 30px;
-    height: 40px;
-    transform-origin: center;
-    background: url('../asset/shipCursor.webp') no-repeat center;
-    background-size: cover;
-    pointer-events: none;
-    filter: drop-shadow(0 0 1px black) hue-rotate(-30deg);
-  }
-
-  #bodyData {
-    position: absolute;
-    bottom: 0;
+    top: 0;
     left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 30;
+    pointer-events: none;
+    cursor: none;
 
-    p {
-      margin-block-start: 0;
-      margin-block-end: 0;
-      padding: 5px 10px;
-      text-shadow: white 0 0 3px;
+    visibility: hidden;
+
+    font-family: Nasalization, sans-serif;
+
+    @include meta.load-css("targetHelper.scss");
+
+    .cursor {
+        position: absolute;
+        width: 30px;
+        height: 40px;
+        transform-origin: center;
+        background: url("../asset/shipCursor.webp") no-repeat center;
+        background-size: cover;
+        pointer-events: none;
+        filter: drop-shadow(0 0 1px black) hue-rotate(-30deg);
     }
 
-    #bodyName {
-      font-size: 200%;
-      color: white;
+    #bodyData {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+
+        p {
+            margin-block-start: 0;
+            margin-block-end: 0;
+            padding: 5px 10px;
+            text-shadow: white 0 0 3px;
+        }
+
+        #bodyName {
+            font-size: 200%;
+            color: white;
+        }
+
+        #bodySeed {
+            color: white;
+        }
     }
 
-    #bodySeed {
-      color: white;
-    }
-  }
+    #throttle {
+        margin-bottom: 5px;
+        width: 50px;
+        height: 400px;
 
-  #throttle {
-    margin-bottom: 5px;
-    width: 50px;
-    height: 400px;
+        position: absolute;
+        bottom: 50px;
+        right: 5px;
 
-    position: absolute;
-    bottom: 50px;
-    right: 5px;
+        border-top: 1px solid white;
 
-    border-top: 1px solid white;
+        display: flex;
+        align-items: flex-end;
 
-    display: flex;
-    align-items: flex-end;
+        background: rgba(0, 0, 0, 0.7);
 
-    background: rgba(0, 0, 0, 0.7);
-
-    #throttleStripes {
-      background: repeating-linear-gradient(to top,
-              rgba(128, 255, 128, 1.0),
-              rgba(128, 255, 128, 1.0) 4px,
-              transparent 4px,
-              transparent 8px
-      );
-      height: 100%;
-      width: 100%;
-
-      &.reversed {
-        background: repeating-linear-gradient(to bottom,
-                rgba(255, 128, 128, 1.0),
-                rgba(255, 128, 128, 1.0) 4px,
+        #throttleStripes {
+            background: repeating-linear-gradient(
+                to top,
+                rgba(128, 255, 128, 1),
+                rgba(128, 255, 128, 1) 4px,
                 transparent 4px,
                 transparent 8px
-        );
-      }
+            );
+            height: 100%;
+            width: 100%;
+
+            &.reversed {
+                background: repeating-linear-gradient(
+                    to bottom,
+                    rgba(255, 128, 128, 1),
+                    rgba(255, 128, 128, 1) 4px,
+                    transparent 4px,
+                    transparent 8px
+                );
+            }
+        }
     }
-  }
 
-  #speed {
-    position: absolute;
-    bottom: 5px;
-    right: 5px;
-    color: white;
-    font-family: Nasalization, sans-serif;
-    font-size: 2em;
-  }
+    #speed {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        color: white;
+        font-family: Nasalization, sans-serif;
+        font-size: 2em;
+    }
 
-  #fuelIndicator {
-    position: absolute;
-    bottom: 55px;
-    right: 70px;
-    width: 50px;
-    height: 50px;
+    #fuelIndicator {
+        position: absolute;
+        bottom: 55px;
+        right: 70px;
+        width: 50px;
+        height: 50px;
 
-    padding: 10px;
+        padding: 10px;
 
-    // vertical gradient for the fuel level (white from bottom to fuel level after jump, then cyan from fuel level after jump to current fuel level then transparent)
-    --currentFuelLevel: 70%;
-    --fuelLevelAfterJump: 50%;
-    --fuelLevelAfterJumpColor: cyan;
-    --currentFuelLevelColor: white;
-    background: linear-gradient(to top,
+        // vertical gradient for the fuel level (white from bottom to fuel level after jump, then cyan from fuel level after jump to current fuel level then transparent)
+        --currentFuelLevel: 70%;
+        --fuelLevelAfterJump: 50%;
+        --fuelLevelAfterJumpColor: cyan;
+        --currentFuelLevelColor: white;
+        background: linear-gradient(
+            to top,
             var(--currentFuelLevelColor) 0 var(--fuelLevelAfterJump),
             var(--fuelLevelAfterJumpColor) var(--fuelLevelAfterJump) var(--currentFuelLevel),
-            rgba(255, 255, 255, 0.2) var(--currentFuelLevel) 100%);
+            rgba(255, 255, 255, 0.2) var(--currentFuelLevel) 100%
+        );
 
-    img {
-      width: 100%;
-      height: 100%;
+        img {
+            width: 100%;
+            height: 100%;
+        }
     }
-  }
 }

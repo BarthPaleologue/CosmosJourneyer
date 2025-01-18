@@ -119,7 +119,12 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
      * @param alignedInstancesMatrixBuffer the matrix buffer containing the vertically aligned instances matrix
      * @param averageHeight
      */
-    public init(vertexData: VertexData, instancesMatrixBuffer: Float32Array, alignedInstancesMatrixBuffer: Float32Array, averageHeight: number) {
+    public init(
+        vertexData: VertexData,
+        instancesMatrixBuffer: Float32Array,
+        alignedInstancesMatrixBuffer: Float32Array,
+        averageHeight: number
+    ) {
         if (this.hasBeenDisposed()) {
             throw new Error(`Tried to init ${this.mesh.name} but it has been disposed`);
         }
@@ -157,7 +162,11 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
         rockPatch.createInstances([{ mesh: Objects.ROCK, distance: 0 }]);
         this.instancePatches.push(rockPatch);
 
-        if (this.planetModel.physics.pressure > 0 && this.planetModel.physics.oceanLevel > 0 && this.getAverageHeight() > this.planetModel.physics.oceanLevel + 50) {
+        if (
+            this.planetModel.physics.pressure > 0 &&
+            this.planetModel.physics.oceanLevel > 0 &&
+            this.getAverageHeight() > this.planetModel.physics.oceanLevel + 50
+        ) {
             const treePatch = new InstancePatch(this.parent, randomDownSample(instancesMatrixBuffer, 4800));
             treePatch.createInstances([{ mesh: Objects.TREE, distance: 0 }]);
             this.instancePatches.push(treePatch);
@@ -180,7 +189,10 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
             Materials.BUTTERFLY_DEPTH_MATERIAL.setPlanet(this.parent);
 
             for (const depthRenderer of Object.values(this.getTransform().getScene()._depthRenderer)) {
-                depthRenderer.setMaterialForRendering(butterflyPatch.getLodMeshes(), Materials.BUTTERFLY_DEPTH_MATERIAL);
+                depthRenderer.setMaterialForRendering(
+                    butterflyPatch.getLodMeshes(),
+                    Materials.BUTTERFLY_DEPTH_MATERIAL
+                );
                 depthRenderer.setMaterialForRendering(grassPatch.getLodMeshes(), Materials.GRASS_DEPTH_MATERIAL);
             }
         }
@@ -192,7 +204,9 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
      */
     public updatePosition() {
         if (this.aggregate === null) return;
-        this.getTransform().setAbsolutePosition(Vector3.TransformCoordinates(this.planetLocalPosition, this.parent.getWorldMatrix()));
+        this.getTransform().setAbsolutePosition(
+            Vector3.TransformCoordinates(this.planetLocalPosition, this.parent.getWorldMatrix())
+        );
     }
 
     public getAverageHeight(): number {
@@ -235,11 +249,17 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
         // chunks on the other side of the planet are culled
         // as chunks have dimensions, we use the bounding sphere to do conservative culling
         const chunkToCameraDir = camera.globalPosition.subtract(this.getTransform().getAbsolutePosition()).normalize();
-        const closestPointToCamera = this.getTransform().getAbsolutePosition().add(chunkToCameraDir.scale(this.getBoundingRadius()));
-        const conservativeSphereNormal = closestPointToCamera.subtract(this.parent.getAbsolutePosition()).normalizeToNew();
+        const closestPointToCamera = this.getTransform()
+            .getAbsolutePosition()
+            .add(chunkToCameraDir.scale(this.getBoundingRadius()));
+        const conservativeSphereNormal = closestPointToCamera
+            .subtract(this.parent.getAbsolutePosition())
+            .normalizeToNew();
         const observerToCenter = camera.globalPosition.subtract(this.parent.getAbsolutePosition()).normalizeToNew();
 
-        const isVisible = Vector3.Dot(observerToCenter, conservativeSphereNormal) >= 0 && isSizeOnScreenEnough(this, camera, 0.002 / 5);
+        const isVisible =
+            Vector3.Dot(observerToCenter, conservativeSphereNormal) >= 0 &&
+            isSizeOnScreenEnough(this, camera, 0.002 / 5);
 
         this.mesh.setEnabled(isVisible);
 
@@ -249,7 +269,10 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
             const distanceVector = camera.globalPosition.subtract(this.getTransform().getAbsolutePosition());
 
             // instance patches are not rendered when the chunk is too far
-            const sphereNormal = this.getTransform().getAbsolutePosition().subtract(this.parent.getAbsolutePosition()).normalizeToNew();
+            const sphereNormal = this.getTransform()
+                .getAbsolutePosition()
+                .subtract(this.parent.getAbsolutePosition())
+                .normalizeToNew();
 
             const normalComponent = sphereNormal.scale(distanceVector.dot(sphereNormal));
             const tangentialDistance = distanceVector.subtract(normalComponent).length();

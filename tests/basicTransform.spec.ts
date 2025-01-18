@@ -15,38 +15,34 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+
 import { Scene } from "@babylonjs/core/scene";
+import { Vector3 } from "@babylonjs/core/Maths/math";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { getTransformationQuaternion } from "../src/ts/utils/algebra";
+import {
+    getBackwardDirection,
+    getForwardDirection,
+    getLeftDirection,
+    getRightDirection
+} from "../src/ts/uberCore/transforms/basicTransform";
+import { expect, describe, it } from "vitest";
 
 const engine = new NullEngine();
 const scene = new Scene(engine);
 
 describe("BasicTransform", () => {
-  const transform = new TransformNode("transform", scene);
-  it("exists", () => expect(transform).toBeDefined());
-});
-
-test("getTransformationQuaternion", () => {
-  const from = new Vector3(1, 0, 0);
-  const to = new Vector3(0, 1, 0);
-  const quaternion = getTransformationQuaternion(from, to);
-  expect(quaternion).toBeDefined();
-  expect(quaternion).toBeInstanceOf(Quaternion);
-  expect(quaternion).toHaveProperty("x");
-  expect(quaternion).toHaveProperty("y");
-  expect(quaternion).toHaveProperty("z");
-  expect(quaternion).toHaveProperty("w");
-
-  from.copyFromFloats(0, 1, 0);
-  to.copyFromFloats(0, 1, 0);
-  const quaternion2 = getTransformationQuaternion(from, to);
-  expect(quaternion2).toBeDefined();
-  expect(quaternion2).toBeInstanceOf(Quaternion);
-  expect(quaternion2.x).toEqual(0);
-  expect(quaternion2.y).toEqual(0);
-  expect(quaternion2.z).toEqual(0);
-  expect(quaternion2.w).toEqual(1);
+    const transform = new TransformNode("transform", scene);
+    it("is oriented forward", () => {
+        expect(getForwardDirection(transform).equals(new Vector3(0, 0, 1))).to.be.true;
+        expect(getBackwardDirection(transform).equals(new Vector3(0, 0, -1))).to.be.true;
+        expect(getLeftDirection(transform).equals(new Vector3(1, 0, 0))).to.be.true;
+        expect(getRightDirection(transform).equals(new Vector3(-1, 0, 0))).to.be.true;
+    });
+    it("can rotate around a pivot", () => {
+        transform.setAbsolutePosition(new Vector3(1, 0, 0));
+        transform.rotateAround(new Vector3(0, 0, 0), new Vector3(0, 1, 0), Math.PI / 2);
+        expect(transform.getAbsolutePosition().equals(new Vector3(0, 0, -1))).to.be.true;
+    });
 });

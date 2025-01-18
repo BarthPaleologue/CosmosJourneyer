@@ -18,157 +18,154 @@
 @use "variables";
 
 h1 {
-  font-family: 'Nasalization', sans-serif;
-  font-size: 13vmin;
-  text-align: center;
-  color: white;
-  text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-  transition: 0.1s;
+    font-family: "Nasalization", sans-serif;
+    font-size: 13vmin;
+    text-align: center;
+    color: white;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+    transition: 0.1s;
 }
 
 #mainMenu {
-  position: absolute;
-  width: 100vw;
-  height: 100vh;
-
-  z-index: 42;
-
-  display: none;
-
-  #version {
     position: absolute;
-    bottom: 0;
-    right: 0;
-    margin-block: 0;
-    color: white;
-    font-family: Nasalization, sans-serif;
-    font-size: 1.5em;
-    padding: 10px;
-    transition: 0.2s ease-in-out;
+    width: 100vw;
+    height: 100vh;
 
-    a {
-      color: white;
-      transition: 0.1s;
-      text-decoration: underline solid rgba(255, 255, 255, 0.5);
+    z-index: 42;
 
-      &:hover {
-        text-decoration: underline solid white;
-      }
+    display: none;
+
+    #version {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        margin-block: 0;
+        color: white;
+        font-family: Nasalization, sans-serif;
+        font-size: 1.5em;
+        padding: 10px;
+        transition: 0.2s ease-in-out;
+
+        a {
+            color: white;
+            transition: 0.1s;
+            text-decoration: underline solid rgba(255, 255, 255, 0.5);
+
+            &:hover {
+                text-decoration: underline solid white;
+            }
+        }
     }
-  }
 }
 
-
 .sidePanel {
-  position: absolute;
-  max-width: 1400px;
-  width: 72%;
-  right: 2.5vw;
-  height: 60vh;
-  bottom: 7.5vh;
-  transition: 0.2s ease-in-out;
-  z-index: 50;
+    position: absolute;
+    max-width: 1400px;
+    width: 72%;
+    right: 2.5vw;
+    height: 60vh;
+    bottom: 7.5vh;
+    transition: 0.2s ease-in-out;
+    z-index: 50;
 
-  overflow-y: auto;
+    overflow-y: auto;
 
-  transform: scale(0);
-  opacity: 0;
+    transform: scale(0);
+    opacity: 0;
 
-  box-shadow: 0 0 20px black;
-  background: rgba(0, 0, 0, 0.8);
+    box-shadow: 0 0 20px black;
+    background: rgba(0, 0, 0, 0.8);
 
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-  row-gap: 10px;
-
-  &.visible {
-    transform: scale(1);
-    opacity: 1;
-  }
-
-  h2 {
-    color: white;
-    text-align: center;
-    font-family: Nasalization, sans-serif;
-    font-size: 3em;
-    margin-block: 0.6em;
-  }
-
-  h3 {
-    color: white;
-    font-family: Nasalization, sans-serif;
-    font-size: 2em;
-    margin-block-end: 0.5em;
-  }
-
-  #dropFileZone {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    transition: 0.1s;
-    border: 3px dashed grey;
     padding: 20px;
+    row-gap: 10px;
 
-    &.dragover {
-      background: rgba(255, 255, 255, 0.1);
+    &.visible {
+        transform: scale(1);
+        opacity: 1;
     }
 
-    &:hover {
-      background: rgba(255, 255, 255, 0.05);
+    h2 {
+        color: white;
+        text-align: center;
+        font-family: Nasalization, sans-serif;
+        font-size: 3em;
+        margin-block: 0.6em;
     }
 
-    &.invalid {
-      background: rgba(255, 0, 0, 0.1);
+    h3 {
+        color: white;
+        font-family: Nasalization, sans-serif;
+        font-size: 2em;
+        margin-block-end: 0.5em;
+    }
+
+    #dropFileZone {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: 0.1s;
+        border: 3px dashed grey;
+        padding: 20px;
+
+        &.dragover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        &.invalid {
+            background: rgba(255, 0, 0, 0.1);
+        }
+
+        p {
+            color: white;
+            font-family: Nasalization, sans-serif;
+            font-size: 1.5em;
+            text-align: center;
+            line-height: 1.5em;
+        }
     }
 
     p {
-      color: white;
-      font-family: Nasalization, sans-serif;
-      font-size: 1.5em;
-      text-align: center;
-      line-height: 1.5em;
+        color: white;
+        font-family: Nasalization, sans-serif;
+        line-height: 1.5em;
+        font-size: 1.25em;
+        margin-block: 0;
+
+        &[data-i18n] {
+            white-space: pre-line; // necessary to use \n in the text
+        }
+
+        &.signature {
+            text-align: right;
+            font-style: italic;
+            padding-right: 60px;
+            margin: 40px 0;
+        }
     }
-  }
 
-  p {
-    color: white;
-    font-family: Nasalization, sans-serif;
-    line-height: 1.5em;
-    font-size: 1.25em;
-    margin-block: 0;
+    a {
+        color: white;
+        transition: 0.1s;
+        text-decoration: underline solid rgba(255, 255, 255, 0.5);
 
-    &[data-i18n] {
-      white-space: pre-line; // necessary to use \n in the text
+        &:hover {
+            text-decoration: underline solid white;
+        }
     }
-
-    &.signature {
-      text-align: right;
-      font-style: italic;
-      padding-right: 60px;
-      margin: 40px 0;
-    }
-  }
-
-  a {
-    color: white;
-    transition: 0.1s;
-    text-decoration: underline solid rgba(255, 255, 255, 0.5);
-
-    &:hover {
-      text-decoration: underline solid white;
-    }
-  }
 }
 
 #credits {
-
-.contributors-image {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;   
-  }
+    .contributors-image {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+    }
 }
-

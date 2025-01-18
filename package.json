@@ -11,12 +11,12 @@
         "@eslint/js": "^9.17.0",
         "@tauri-apps/cli": "2.1.0",
         "@types/d3": "^7.4.3",
-        "@types/jest": "^29.5.14",
         "@types/seedrandom": "^3.0.8",
         "@types/webpack": "^5.28.5",
         "@types/webpack-env": "^1.18.5",
         "@typescript-eslint/eslint-plugin": "^8.18.1",
         "@typescript-eslint/parser": "^8.18.1",
+        "@vitest/coverage-v8": "3.0.2",
         "@webpack-cli/generators": "^3.0.7",
         "cross-env": "^7.0.3",
         "css-loader": "^7.1.2",
@@ -31,7 +31,6 @@
         "html-webpack-plugin": "^5.6.3",
         "http-server": "^14.1.1",
         "i18next": "^24.1.2",
-        "jest": "^29.7.0",
         "mini-css-extract-plugin": "^2.9.2",
         "prettier": "^3.4.2",
         "raw-loader": "^4.0.2",
@@ -40,7 +39,6 @@
         "squirrel-noise": "^1.0.0",
         "style-loader": "^4.0.0",
         "terrain-generation": "^1.8.0",
-        "ts-jest": "^29.2.5",
         "ts-loader": "^9.5.1",
         "ts-node": "^10.9.2",
         "ts-shader-loader": "^2.0.2",
@@ -49,6 +47,7 @@
         "typedoc-plugin-missing-exports": "^3.1.0",
         "typescript": "~5.7.2",
         "typescript-plugin-css-modules": "^5.1.0",
+        "vitest": "^3.0.2",
         "webpack": "^5.97.1",
         "webpack-cli": "^5.1.4",
         "webpack-dev-server": "^5.2.0"
@@ -56,17 +55,43 @@
     "version": "1.9.0",
     "description": "Cosmos Journeyer is a space exploration game featuring fully explorable planets, across millions of star systems. It is built using Babylon.JS, and a lot of passion.",
     "name": "cosmos-journeyer",
+    "homepage": "https://cosmosjourneyer.com",
+    "author": {
+        "name": "Barthélemy Paléologue",
+        "email": "barth.paleologue@cosmosjourneyer.com",
+        "url": "https://barth.paleologue.fr"
+    },
+    "license": "AGPL-3.0-only",
+    "type": "module",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/BarthPaleologue/CosmosJourneyer"
+    },
+    "bugs": {
+        "url": "https://github.com/BarthPaleologue/CosmosJourneyer/issues",
+        "email": "barth.paleologue@cosmosjourneyer.com"
+    },
+    "keywords": [
+        "space",
+        "game",
+        "exploration",
+        "babylonjs",
+        "procedural-generation",
+        "webgl",
+        "webgpu"
+    ],
+    "contributors": [],
     "scripts": {
         "build": "webpack --mode=production --node-env=production",
         "serve": "webpack serve --progress",
         "serve:prod": "http-server dist -p 8080",
-        "format:check": "prettier --config .prettierrc \"src/**/*.{js,json,ts}\" --check",
-        "format": "prettier --config .prettierrc \"src/**/*.{js,json,ts}\"  --write",
-        "test": "cross-env NODE_OPTIONS=--experimental-vm-modules npx jest",
-        "test:coverage": "cross-env NODE_OPTIONS=--experimental-vm-modules npx jest --coverage",
+        "format:check": "prettier . --check",
+        "format": "prettier . --write",
+        "test": "vitest run",
+        "test:coverage": "vitest run --coverage",
         "build:docs": "typedoc --options typedoc.json",
         "serve:docs": "http-server docs -p 8081",
-        "lint:check": "eslint src/ts --config eslint.config.mjs",
-        "lint:fix": "eslint src/ts --fix --config eslint.config.mjs"
+        "lint:check": "eslint .",
+        "lint:fix": "eslint . --fix"
     }
 }

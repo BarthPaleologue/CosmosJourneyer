@@ -1,3 +1,20 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Affero General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Affero General Public License for more details.
+//
+//  You should have received a copy of the GNU Affero General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { getNeighborStarSystemCoordinates } from "../../utils/getNeighborStarSystems";
 import { parseDistance } from "../../utils/strings/parseToStrings";
 import { Settings } from "../../settings";
@@ -5,11 +22,10 @@ import { uniformRandBool } from "extended-random";
 import { generateSightseeingMissions } from "../../missions/generateSightSeeingMissions";
 import { Player } from "../../player/player";
 import { MissionContainer } from "./missionContainer";
-
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
-import { getSystemModelFromCoordinates } from "../../starSystem/modelFromCoordinates";
 import { StarSystemModelUtils } from "../../starSystem/starSystemModel";
 import { OrbitalFacilityModel } from "../../spacestation/orbitalFacility";
+import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
 
 /**
  * Generates all missions available at the given space station for the player. Missions are generated based on the current timestamp (hourly basis).
@@ -17,27 +33,41 @@ import { OrbitalFacilityModel } from "../../spacestation/orbitalFacility";
  * @param player The player for which the missions are generated
  * @returns The DOM element containing the generated missions as HTML
  */
-export function generateMissionsDom(stationModel: OrbitalFacilityModel, player: Player): HTMLDivElement {
-    const starSystemModel = getSystemModelFromCoordinates(stationModel.starSystemCoordinates);
-    const sightSeeingMissions = generateSightseeingMissions(stationModel, starSystemModel, player, Date.now());
+export function generateMissionsDom(
+    stationModel: OrbitalFacilityModel,
+    player: Player,
+    starSystemDatabase: StarSystemDatabase
+): HTMLDivElement {
+    const starSystemModel = starSystemDatabase.getSystemModelFromCoordinates(stationModel.starSystemCoordinates);
+    const sightSeeingMissions = generateSightseeingMissions(
+        stationModel,
+        starSystemModel,
+        starSystemDatabase,
+        player,
+        Date.now()
+    );
 
     const starSystem = starSystemModel;
-    const neighborSystems = getNeighborStarSystemCoordinates(starSystem.coordinates, 75);
+    const neighborSystems = getNeighborStarSystemCoordinates(starSystem.coordinates, 75, starSystemDatabase);
 
     const rng = getRngFromSeed(stationModel.seed);
 
     let neighborSpaceStations: [OrbitalFacilityModel, number][] = [];
     neighborSystems.forEach(([coordinates, position, distance], index) => {
-        const systemModel = getSystemModelFromCoordinates(coordinates);
-        const spaceStations = StarSystemModelUtils.GetSpaceStations(systemModel).map<[OrbitalFacilityModel, number]>((stationModel) => {
-            return [stationModel, distance];
-        });
+        const systemModel = starSystemDatabase.getSystemModelFromCoordinates(coordinates);
+        const spaceStations = StarSystemModelUtils.GetSpaceStations(systemModel).map<[OrbitalFacilityModel, number]>(
+            (stationModel) => {
+                return [stationModel, distance];
+            }
+        );
         neighborSpaceStations = neighborSpaceStations.concat(spaceStations);
     });
 
     const contactStations = neighborSpaceStations
         // prune list randomly based on distance
-        .filter(([station, distance], index) => uniformRandBool(1.0 / (1.0 + 0.02 * (distance * distance)), rng, 325 + index))
+        .filter(([station, distance], index) =>
+            uniformRandBool(1.0 / (1.0 + 0.02 * (distance * distance)), rng, 325 + index)
+        )
         // filter out stations of the same faction
         .filter(([station, distance]) => station.faction === stationModel.faction);
 
@@ -58,7 +88,7 @@ export function generateMissionsDom(stationModel: OrbitalFacilityModel, player: 
     htmlRoot.appendChild(missionList);
 
     sightSeeingMissions.forEach((mission) => {
-        const missionContainer = new MissionContainer(mission, player);
+        const missionContainer = new MissionContainer(mission, player, starSystemDatabase);
         missionList.appendChild(missionContainer.rootNode);
     });
 

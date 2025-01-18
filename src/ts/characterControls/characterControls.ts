@@ -165,14 +165,26 @@ export class CharacterControls implements Controls {
             this.swimmingForwardAnim
         ];
 
-        this.groundedState = new AnimationState(this.idleAnim, [this.walkAnim, this.walkBackAnim, this.sambaAnim, this.runningAnim]);
+        this.groundedState = new AnimationState(this.idleAnim, [
+            this.walkAnim,
+            this.walkBackAnim,
+            this.sambaAnim,
+            this.runningAnim
+        ]);
         this.fallingState = new AnimationState(this.fallingIdleAnim, [this.skyDivingAnim]);
         this.swimmingState = new AnimationState(this.swimmingIdleAnim, [this.swimmingForwardAnim]);
         this.currentAnimationState = this.groundedState;
 
         this.targetAnim = this.idleAnim;
 
-        this.thirdPersonCamera = new ArcRotateCamera("characterThirdPersonCamera", 1.0, -Math.PI / 4, 40, new Vector3(0, 1.5, 0), scene);
+        this.thirdPersonCamera = new ArcRotateCamera(
+            "characterThirdPersonCamera",
+            1.0,
+            -Math.PI / 4,
+            40,
+            new Vector3(0, 1.5, 0),
+            scene
+        );
         this.thirdPersonCamera.lowerRadiusLimit = 2;
         this.thirdPersonCamera.upperRadiusLimit = 500;
         this.thirdPersonCamera.minZ = 1;
@@ -209,19 +221,29 @@ export class CharacterControls implements Controls {
         }
 
         if (this.closestWalkableObject !== null) {
-            const up = character.getAbsolutePosition().subtract(this.closestWalkableObject.getTransform().getAbsolutePosition()).normalize();
+            const up = character
+                .getAbsolutePosition()
+                .subtract(this.closestWalkableObject.getTransform().getAbsolutePosition())
+                .normalize();
             setUpVector(character, up);
         }
 
-        (this.scene.getPhysicsEngine() as PhysicsEngineV2).raycastToRef(start, end, this.raycastResult, { collideWith: CollisionMask.ENVIRONMENT });
+        (this.scene.getPhysicsEngine() as PhysicsEngineV2).raycastToRef(start, end, this.raycastResult, {
+            collideWith: CollisionMask.ENVIRONMENT
+        });
         if (this.raycastResult.hasHit) {
             const up = character.up;
             let distance = Vector3.Dot(character.getAbsolutePosition().subtract(this.raycastResult.hitPointWorld), up);
 
             // if closestWalkableObject is a telluric planet, the distance is the min between the distance to the ground and the distance to the water level
             if (this.closestWalkableObject !== null && this.closestWalkableObject instanceof TelluricPlanet) {
-                const waterLevel = this.closestWalkableObject.model.physics.oceanLevel + this.closestWalkableObject.getRadius();
-                const distanceToWater = Vector3.Distance(this.getTransform().getAbsolutePosition(), this.closestWalkableObject.getTransform().getAbsolutePosition()) - waterLevel;
+                const waterLevel =
+                    this.closestWalkableObject.model.physics.oceanLevel + this.closestWalkableObject.getRadius();
+                const distanceToWater =
+                    Vector3.Distance(
+                        this.getTransform().getAbsolutePosition(),
+                        this.closestWalkableObject.getTransform().getAbsolutePosition()
+                    ) - waterLevel;
                 distance = Math.min(distance, distanceToWater + 1.3);
             }
 
@@ -230,9 +252,13 @@ export class CharacterControls implements Controls {
                 translate(character, up.scale(-distance));
 
                 if (this.closestWalkableObject !== null && this.closestWalkableObject instanceof TelluricPlanet) {
-                    const waterLevel = this.closestWalkableObject.model.physics.oceanLevel + this.closestWalkableObject.getRadius();
+                    const waterLevel =
+                        this.closestWalkableObject.model.physics.oceanLevel + this.closestWalkableObject.getRadius();
                     const distanceToWater =
-                        Vector3.Distance(this.getTransform().getAbsolutePosition(), this.closestWalkableObject.getTransform().getAbsolutePosition()) - waterLevel;
+                        Vector3.Distance(
+                            this.getTransform().getAbsolutePosition(),
+                            this.closestWalkableObject.getTransform().getAbsolutePosition()
+                        ) - waterLevel;
                     if (distanceToWater < 0) {
                         this.currentAnimationState = this.swimmingState;
                     } else {
@@ -255,15 +281,23 @@ export class CharacterControls implements Controls {
         const displacement = Vector3.Zero();
 
         if (this.walkAnim.weight > 0.0) {
-            this.character.moveWithCollisions(this.character.forward.scaleInPlace(-this.characterWalkSpeed * deltaTime * this.walkAnim.weight));
+            this.character.moveWithCollisions(
+                this.character.forward.scaleInPlace(-this.characterWalkSpeed * deltaTime * this.walkAnim.weight)
+            );
         }
 
         if (this.walkBackAnim.weight > 0.0) {
-            this.character.moveWithCollisions(this.character.forward.scaleInPlace(this.characterWalkSpeedBackwards * deltaTime * this.walkBackAnim.weight));
+            this.character.moveWithCollisions(
+                this.character.forward.scaleInPlace(
+                    this.characterWalkSpeedBackwards * deltaTime * this.walkBackAnim.weight
+                )
+            );
         }
 
         if (this.runningAnim.weight > 0.0) {
-            this.character.moveWithCollisions(this.character.forward.scaleInPlace(-this.characterRunSpeed * deltaTime * this.runningAnim.weight));
+            this.character.moveWithCollisions(
+                this.character.forward.scaleInPlace(-this.characterRunSpeed * deltaTime * this.runningAnim.weight)
+            );
         }
 
         const [xMove, yMove] = CharacterInputs.map.move.value;
@@ -273,7 +307,9 @@ export class CharacterControls implements Controls {
             this.swimmingState.currentAnimation = this.swimmingIdleAnim;
             if (yMove > 0) {
                 this.swimmingState.currentAnimation = this.swimmingForwardAnim;
-                this.character.moveWithCollisions(this.character.forward.scaleInPlace(-this.characterSwimSpeed * deltaTime));
+                this.character.moveWithCollisions(
+                    this.character.forward.scaleInPlace(-this.characterSwimSpeed * deltaTime)
+                );
             }
         } else if (this.currentAnimationState === this.groundedState) {
             this.groundedState.currentAnimation = this.idleAnim;

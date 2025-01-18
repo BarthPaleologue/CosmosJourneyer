@@ -18,6 +18,7 @@
 import { MissionContext } from "../missionContext";
 
 import { StarSystemCoordinates } from "../../utils/coordinates/universeCoordinates";
+import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
 
 /**
  * Describes any node in the mission tree.
@@ -44,14 +45,18 @@ export interface MissionNode {
      * Describes the node recursively.
      * @param originSystemCoordinates The seed of the system where the mission has been given.
      */
-    describe(originSystemCoordinates: StarSystemCoordinates): string;
+    describe(originSystemCoordinates: StarSystemCoordinates, starSystemDatabase: StarSystemDatabase): string;
 
     /**
      * Describes the next task to be done in the mission subtree.
      * @param context The mission context.
      * @param keyboardLayout The keyboard layout map to localize the keys.
      */
-    describeNextTask(context: MissionContext, keyboardLayout: Map<string, string>): string;
+    describeNextTask(
+        context: MissionContext,
+        keyboardLayout: Map<string, string>,
+        starSystemDatabase: StarSystemDatabase
+    ): string;
 
     /**
      * Returns the target systems of the subtree.

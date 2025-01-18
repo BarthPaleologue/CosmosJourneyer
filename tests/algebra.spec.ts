@@ -15,23 +15,17 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { romanNumeral } from "../src/ts/utils/strings/romanNumerals";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { getTransformationQuaternion } from "../src/ts/utils/algebra";
+import { expect, test } from "vitest";
 
-test("romanNumeral", () => {
-    expect(romanNumeral(1)).toBe("I");
-    expect(romanNumeral(3)).toBe("III");
-    expect(romanNumeral(4)).toBe("IV");
-    expect(romanNumeral(5)).toBe("V");
-    expect(romanNumeral(9)).toBe("IX");
-    expect(romanNumeral(10)).toBe("X");
-    expect(romanNumeral(11)).toBe("XI");
-    expect(romanNumeral(40)).toBe("XL");
-    expect(romanNumeral(50)).toBe("L");
-    expect(romanNumeral(90)).toBe("XC");
-    expect(romanNumeral(100)).toBe("C");
-    expect(romanNumeral(400)).toBe("CD");
-    expect(romanNumeral(500)).toBe("D");
-    expect(romanNumeral(900)).toBe("CM");
-    expect(romanNumeral(1000)).toBe("M");
-    expect(romanNumeral(3999)).toBe("MMMCMXCIX");
+test("getTransformationQuaternion", () => {
+    const from = new Vector3(0, 1, 0);
+    const to = new Vector3(0, 1, 0);
+
+    const quaternion2 = getTransformationQuaternion(from, to);
+    expect(quaternion2.x).to.equal(0);
+    expect(quaternion2.y).to.equal(0);
+    expect(quaternion2.z).to.equal(0);
+    expect(quaternion2.w).to.equal(1);
 });

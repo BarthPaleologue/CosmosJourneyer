@@ -75,7 +75,13 @@ export class ChunkTree implements Cullable {
      * @param material
      * @param scene
      */
-    constructor(direction: Direction, planetModel: TelluricPlanetaryMassObjectModel, parentAggregate: PhysicsAggregate, material: Material, scene: Scene) {
+    constructor(
+        direction: Direction,
+        planetModel: TelluricPlanetaryMassObjectModel,
+        parentAggregate: PhysicsAggregate,
+        material: Material,
+        scene: Scene
+    ) {
         this.rootChunkLength = planetModel.radius * 2;
         this.planetName = planetModel.name;
         this.planetSeed = planetModel.seed;
@@ -86,7 +92,9 @@ export class ChunkTree implements Cullable {
         this.minDepth = 0;
 
         // max depth is minimal depth to get a certain minimum space between vertices
-        this.maxDepth = Math.ceil(Math.log2(this.rootChunkLength / (Settings.MIN_DISTANCE_BETWEEN_VERTICES * Settings.VERTEX_RESOLUTION)));
+        this.maxDepth = Math.ceil(
+            Math.log2(this.rootChunkLength / (Settings.MIN_DISTANCE_BETWEEN_VERTICES * Settings.VERTEX_RESOLUTION))
+        );
 
         this.scene = scene;
 
@@ -149,17 +157,29 @@ export class ChunkTree implements Cullable {
      * @param walked The position of the current root relative to the absolute root
      * @returns The updated tree
      */
-    private updateLODRecursively(observerPositionW: Vector3, chunkForge: ChunkForge, tree: QuadTree = this.tree, walked: number[] = []): QuadTree {
+    private updateLODRecursively(
+        observerPositionW: Vector3,
+        chunkForge: ChunkForge,
+        tree: QuadTree = this.tree,
+        walked: number[] = []
+    ): QuadTree {
         if (walked.length === this.maxDepth) return tree;
 
-        const nodeRelativePosition = getChunkSphereSpacePositionFromPath(walked, this.direction, this.rootChunkLength / 2, getRotationQuaternion(this.parent));
+        const nodeRelativePosition = getChunkSphereSpacePositionFromPath(
+            walked,
+            this.direction,
+            this.rootChunkLength / 2,
+            getRotationQuaternion(this.parent)
+        );
 
         const nodePositionSphere = nodeRelativePosition.normalizeToNew();
         const observerPositionSphere = observerPositionW.subtract(this.parent.getAbsolutePosition()).normalize();
 
         const totalRadius =
             this.planetModel.radius +
-            (this.planetModel.terrainSettings.max_mountain_height + this.planetModel.terrainSettings.continent_base_height + this.planetModel.terrainSettings.max_bump_height) *
+            (this.planetModel.terrainSettings.max_mountain_height +
+                this.planetModel.terrainSettings.continent_base_height +
+                this.planetModel.terrainSettings.max_bump_height) *
                 0.5;
 
         const observerRelativePosition = observerPositionW.subtract(this.parent.getAbsolutePosition());
@@ -168,7 +188,10 @@ export class ChunkTree implements Cullable {
         const nodeGreatCircleDistance = Math.acos(Vector3.Dot(nodePositionSphere, observerPositionSphere));
         const nodeLength = this.rootChunkLength / 2 ** walked.length;
 
-        const chunkGreatDistanceFactor = Math.max(0.0, nodeGreatCircleDistance - (8 * nodeLength) / (2 * Math.PI * this.planetModel.radius));
+        const chunkGreatDistanceFactor = Math.max(
+            0.0,
+            nodeGreatCircleDistance - (8 * nodeLength) / (2 * Math.PI * this.planetModel.radius)
+        );
         const observerDistanceFactor = Math.max(0.0, observerDistanceToCenter - totalRadius) / this.planetModel.radius;
 
         let kernel = this.maxDepth;
@@ -217,7 +240,15 @@ export class ChunkTree implements Cullable {
      * @returns The new Chunk
      */
     private createChunk(path: number[], chunkForge: ChunkForge): PlanetChunk {
-        const chunk = new PlanetChunk(path, this.direction, this.parentAggregate, this.material, this.planetModel, this.rootChunkLength, this.scene);
+        const chunk = new PlanetChunk(
+            path,
+            this.direction,
+            this.parentAggregate,
+            this.material,
+            this.planetModel,
+            this.rootChunkLength,
+            this.scene
+        );
 
         const buildTask: BuildTask = {
             type: TaskType.BUILD,

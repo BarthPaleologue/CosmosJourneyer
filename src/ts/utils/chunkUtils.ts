@@ -67,7 +67,12 @@ export function getChunkPlaneSpacePositionFromPath(chunkLength: number, path: nu
  * @param planetRotationQuaternion
  * @returns the position in planet space
  */
-export function getChunkSphereSpacePositionFromPath(path: number[], direction: Direction, planetRadius: number, planetRotationQuaternion: Quaternion): Vector3 {
+export function getChunkSphereSpacePositionFromPath(
+    path: number[],
+    direction: Direction,
+    planetRadius: number,
+    planetRotationQuaternion: Quaternion
+): Vector3 {
     // on récupère la position dans le plan
     const position = getChunkPlaneSpacePositionFromPath(2 * planetRadius, path);
 

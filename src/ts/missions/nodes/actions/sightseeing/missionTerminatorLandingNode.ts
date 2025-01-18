@@ -17,18 +17,20 @@
 
 import { MissionNode, MissionNodeSerialized, MissionNodeType } from "../../missionNode";
 import { MissionContext } from "../../../missionContext";
-import { StarSystemCoordinates, starSystemCoordinatesEquals, UniverseObjectId, universeObjectIdEquals } from "../../../../utils/coordinates/universeCoordinates";
+import {
+    StarSystemCoordinates,
+    starSystemCoordinatesEquals,
+    UniverseObjectId,
+    universeObjectIdEquals
+} from "../../../../utils/coordinates/universeCoordinates";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { CollisionMask, Settings } from "../../../../settings";
 import { getObjectBySystemId, getObjectModelByUniverseId } from "../../../../utils/coordinates/orbitalObjectId";
-import { getStarGalacticPosition } from "../../../../utils/coordinates/starSystemCoordinatesUtils";
 import i18n from "../../../../i18n";
 import { parseDistance } from "../../../../utils/strings/parseToStrings";
-import { pressInteractionToStrings } from "../../../../utils/strings/inputControlsString";
-import { GeneralInputs } from "../../../../inputs/generalInputs";
-import { getSystemModelFromCoordinates } from "../../../../starSystem/modelFromCoordinates";
 import { getGoToSystemInstructions } from "../../../common";
+import { StarSystemDatabase } from "../../../../starSystem/starSystemDatabase";
 
 const enum LandMissionState {
     NOT_IN_SYSTEM,
@@ -102,7 +104,14 @@ export class MissionTerminatorLandingNode implements MissionNode {
 
         const downDirection = targetObjectPosition.subtract(playerPosition).normalize();
 
-        context.physicsEngine.raycastToRef(playerPosition, playerPosition.add(downDirection.scale(5)), this.raycastResult, { collideWith: CollisionMask.ENVIRONMENT });
+        context.physicsEngine.raycastToRef(
+            playerPosition,
+            playerPosition.add(downDirection.scale(5)),
+            this.raycastResult,
+            {
+                collideWith: CollisionMask.ENVIRONMENT
+            }
+        );
         if (this.raycastResult.hasHit) {
             if (this.raycastResult.body?.transformNode.parent !== targetObject.getTransform()) {
                 this.state = LandMissionState.TOO_FAR_IN_SYSTEM;
@@ -110,9 +119,18 @@ export class MissionTerminatorLandingNode implements MissionNode {
             }
 
             const stellarObjects = currentSystem.getStellarObjects();
-            const stellarMassSum = stellarObjects.reduce((sum, stellarObject) => sum + stellarObject.model.physics.mass, 0);
+            const stellarMassSum = stellarObjects.reduce(
+                (sum, stellarObject) => sum + stellarObject.model.physics.mass,
+                0
+            );
             const stellarBarycenter = stellarObjects
-                .reduce((sum, stellarObject) => sum.add(stellarObject.getTransform().getAbsolutePosition().scale(stellarObject.model.physics.mass)), Vector3.Zero())
+                .reduce(
+                    (sum, stellarObject) =>
+                        sum.add(
+                            stellarObject.getTransform().getAbsolutePosition().scale(stellarObject.model.physics.mass)
+                        ),
+                    Vector3.Zero()
+                )
                 .scaleInPlace(1 / stellarMassSum);
 
             const objectToPlayer = downDirection.negate();
@@ -135,10 +153,13 @@ export class MissionTerminatorLandingNode implements MissionNode {
         this.state = LandMissionState.TOO_FAR_IN_SYSTEM;
     }
 
-    describe(originSystemCoordinates: StarSystemCoordinates): string {
-        const distance = Vector3.Distance(getStarGalacticPosition(originSystemCoordinates), getStarGalacticPosition(this.targetSystemCoordinates));
-        const objectModel = getObjectModelByUniverseId(this.objectId);
-        const systemModel = getSystemModelFromCoordinates(this.targetSystemCoordinates);
+    describe(originSystemCoordinates: StarSystemCoordinates, starSystemDatabase: StarSystemDatabase): string {
+        const distance = Vector3.Distance(
+            starSystemDatabase.getSystemGalacticPosition(originSystemCoordinates),
+            starSystemDatabase.getSystemGalacticPosition(this.targetSystemCoordinates)
+        );
+        const objectModel = getObjectModelByUniverseId(this.objectId, starSystemDatabase);
+        const systemModel = starSystemDatabase.getSystemModelFromCoordinates(this.targetSystemCoordinates);
         return i18n.t("missions:sightseeing:describeTerminatorLanding", {
             objectName: objectModel.name,
             systemName: systemModel.name,
@@ -146,16 +167,25 @@ export class MissionTerminatorLandingNode implements MissionNode {
         });
     }
 
-    describeNextTask(context: MissionContext, keyboardLayout: Map<string, string>): string {
+    describeNextTask(
+        context: MissionContext,
+        keyboardLayout: Map<string, string>,
+        starSystemDatabase: StarSystemDatabase
+    ): string {
         if (this.isCompleted()) {
             return i18n.t("missions:terminatorLanding:missionCompleted");
         }
 
-        const targetObject = getObjectModelByUniverseId(this.objectId);
+        const targetObject = getObjectModelByUniverseId(this.objectId, starSystemDatabase);
 
         switch (this.state) {
             case LandMissionState.NOT_IN_SYSTEM:
-                return getGoToSystemInstructions(context, this.targetSystemCoordinates, keyboardLayout);
+                return getGoToSystemInstructions(
+                    context,
+                    this.targetSystemCoordinates,
+                    keyboardLayout,
+                    starSystemDatabase
+                );
             case LandMissionState.TOO_FAR_IN_SYSTEM:
                 return i18n.t("missions:terminatorLanding:getCloserToTerminator", {
                     objectName: targetObject.name

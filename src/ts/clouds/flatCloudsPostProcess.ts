@@ -15,10 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Effect } from "@babylonjs/core/Materials/effect";
-
 import flatCloudsFragment from "../../shaders/flatCloudsFragment.glsl";
-import { ObjectPostProcess, UpdatablePostProcess } from "../postProcesses/objectPostProcess";
+
+import { Effect } from "@babylonjs/core/Materials/effect";
+import { UpdatablePostProcess } from "../postProcesses/updatablePostProcess";
 import { Transformable } from "../architecture/transformable";
 import { CloudsSamplerNames, CloudsUniformNames, CloudsUniforms } from "./cloudsUniforms";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
@@ -29,16 +29,21 @@ import { CameraUniformNames, setCameraUniforms } from "../postProcesses/uniforms
 import { SamplerUniformNames, setSamplerUniforms } from "../postProcesses/uniforms/samplerUniforms";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
-import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { Scene } from "@babylonjs/core/scene";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
-export class FlatCloudsPostProcess extends PostProcess implements ObjectPostProcess, UpdatablePostProcess {
+export class FlatCloudsPostProcess extends PostProcess implements UpdatablePostProcess {
     readonly cloudUniforms: CloudsUniforms;
-    readonly object: Transformable & HasBoundingSphere;
 
     private activeCamera: Camera | null = null;
 
-    constructor(planet: Transformable & HasBoundingSphere, cloudUniforms: CloudsUniforms, stellarObjects: Transformable[], scene: Scene) {
+    constructor(
+        planetTransform: TransformNode,
+        boundingRadius: number,
+        cloudUniforms: CloudsUniforms,
+        stellarObjects: Transformable[],
+        scene: Scene
+    ) {
         const shaderName = "flatClouds";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = flatCloudsFragment;
@@ -54,7 +59,7 @@ export class FlatCloudsPostProcess extends PostProcess implements ObjectPostProc
         const samplers: string[] = [...Object.values(SamplerUniformNames), ...Object.values(CloudsSamplerNames)];
 
         super(
-            `${planet.getTransform().name}CloudsPostProcess`,
+            `${planetTransform.name}CloudsPostProcess`,
             shaderName,
             uniforms,
             samplers,
@@ -67,7 +72,6 @@ export class FlatCloudsPostProcess extends PostProcess implements ObjectPostProc
             Constants.TEXTURETYPE_HALF_FLOAT
         );
 
-        this.object = planet;
         this.cloudUniforms = cloudUniforms;
 
         this.onActivateObservable.add((camera) => {
@@ -80,7 +84,7 @@ export class FlatCloudsPostProcess extends PostProcess implements ObjectPostProc
             }
             setCameraUniforms(effect, this.activeCamera);
             setStellarObjectUniforms(effect, stellarObjects);
-            setObjectUniforms(effect, this.object);
+            setObjectUniforms(effect, planetTransform, boundingRadius);
             this.cloudUniforms.setUniforms(effect);
 
             this.cloudUniforms.setSamplers(effect);

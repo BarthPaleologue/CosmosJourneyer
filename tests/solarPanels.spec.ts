@@ -15,21 +15,22 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
-import { Transformable } from "../architecture/transformable";
+import { getSolarPanelSurfaceFromEnergyRequirement } from "../src/ts/utils/solarPanels";
+import { getSphereRadiatedEnergyFlux } from "../src/ts/utils/physics";
+import { expect, test } from "vitest";
 
-export interface UpdatablePostProcess extends PostProcess {
-    /**
-     * Updates the post process internal clock so that time-dependent effects can be updated.
-     * @param deltaTime The time in seconds since the last update
-     */
-    update(deltaTime: number): void;
-}
+test("solarPanelSurfaceCalculation", () => {
+    // test with ISS data
+    const efficiency = 0.07;
+    const sunTemperature = 5778;
+    const sunExposure = 0.5;
+    const distanceToSun = 1.496e11;
+    const sunRadius = 6.9634e8;
+    const energyRequirement = 120000;
 
-export interface ObjectPostProcess extends PostProcess {
-    /**
-     * The object this post process will be attached to.
-     * This makes sense for raymarching and raytracing shaders that need to know the position of the object.
-     */
-    readonly object: Transformable;
-}
+    const solarFlux = getSphereRadiatedEnergyFlux(sunTemperature, sunRadius, distanceToSun) * sunExposure;
+
+    const solarPanelSurface = getSolarPanelSurfaceFromEnergyRequirement(efficiency, energyRequirement, solarFlux);
+    expect(solarPanelSurface).toBeGreaterThanOrEqual(2400);
+    expect(solarPanelSurface).toBeLessThanOrEqual(2600);
+});

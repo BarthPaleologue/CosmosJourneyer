@@ -100,7 +100,13 @@ export class SpaceElevatorClimber implements Targetable {
         solarPanel1.position.x = globalRadius + solarPanelWidth / 2;
         solarPanel1.parent = this.transform;
 
-        const angles = [solarPanelAngleSpacing, -solarPanelAngleSpacing, Math.PI + solarPanelAngleSpacing, Math.PI - solarPanelAngleSpacing, Math.PI];
+        const angles = [
+            solarPanelAngleSpacing,
+            -solarPanelAngleSpacing,
+            Math.PI + solarPanelAngleSpacing,
+            Math.PI - solarPanelAngleSpacing,
+            Math.PI
+        ];
 
         angles.forEach((angle, index) => {
             const solarPanel2 = solarPanel1.clone(`ClimberSolarPanel${index + 2}`);

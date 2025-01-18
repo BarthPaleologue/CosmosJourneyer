@@ -54,9 +54,15 @@ export const FlightTutorial: Tutorial = {
             <img src="${welcomeImageSrc}" alt="Welcome to Cosmos Journeyer">
             <p>${i18n.t("tutorials:flightTutorial:welcome")}</p>
             ${i18n.t("tutorials:common:navigationInfo", {
-                nextKeys: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keybordLayoutMap).join(` ${i18n.t("common:or")} `),
-                previousKeys: pressInteractionToStrings(TutorialControlsInputs.map.prevPanel, keybordLayoutMap).join(` ${i18n.t("common:or")} `),
-                quitKeys: pressInteractionToStrings(TutorialControlsInputs.map.quitTutorial, keybordLayoutMap).join(` ${i18n.t("common:or")} `)
+                nextKeys: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keybordLayoutMap).join(
+                    ` ${i18n.t("common:or")} `
+                ),
+                previousKeys: pressInteractionToStrings(TutorialControlsInputs.map.prevPanel, keybordLayoutMap).join(
+                    ` ${i18n.t("common:or")} `
+                ),
+                quitKeys: pressInteractionToStrings(TutorialControlsInputs.map.quitTutorial, keybordLayoutMap).join(
+                    ` ${i18n.t("common:or")} `
+                )
             })}
         </div>`;
 
@@ -81,7 +87,9 @@ export const FlightTutorial: Tutorial = {
             <p>${i18n.t("tutorials:flightTutorial:spaceShipThrustText1", {
                 keyIncrease: throttleStrings[1][1],
                 keyDecrease: throttleStrings[0][1],
-                keyKill: pressInteractionToStrings(SpaceShipControlsInputs.map.throttleToZero, keybordLayoutMap).join(` ${i18n.t("common:or")} `)
+                keyKill: pressInteractionToStrings(SpaceShipControlsInputs.map.throttleToZero, keybordLayoutMap).join(
+                    ` ${i18n.t("common:or")} `
+                )
             })}</p>
             <img src="${thrustImageSrc}" alt="Spaceship Thrust">
             <p>${i18n.t("tutorials:flightTutorial:spaceShipThrustText2")}</p>
@@ -103,7 +111,9 @@ export const FlightTutorial: Tutorial = {
             <p>${i18n.t("tutorials:flightTutorial:congratulationsText1")}</p>
             
             ${i18n.t("tutorials:common:tutorialEnding", {
-                keyQuit: pressInteractionToStrings(TutorialControlsInputs.map.quitTutorial, keybordLayoutMap).join(` ${i18n.t("common:or")} `)
+                keyQuit: pressInteractionToStrings(TutorialControlsInputs.map.quitTutorial, keybordLayoutMap).join(
+                    ` ${i18n.t("common:or")} `
+                )
             })}
         </div>`;
 

@@ -59,7 +59,8 @@ button {
     }
 
     &.loading {
-        background: linear-gradient(90deg, var(--button-bg-color), rgb(200, 200, 200), var(--button-bg-color)) 0 0 / 200% 100% no-repeat;
+        background: linear-gradient(90deg, var(--button-bg-color), rgb(200, 200, 200), var(--button-bg-color)) 0 0 /
+            200% 100% no-repeat;
         animation: loadingAnimation 1s infinite ease-in-out alternate;
     }
 }

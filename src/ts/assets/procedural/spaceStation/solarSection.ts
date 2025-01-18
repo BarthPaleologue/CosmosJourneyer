@@ -258,13 +258,25 @@ export class SolarSection implements Transformable {
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
 
         if (distanceToCamera < 350e3 && this.attachmentAggregate === null) {
-            this.attachmentAggregate = createEnvironmentAggregate(this.attachment, PhysicsShapeType.MESH, this.getTransform().getScene());
+            this.attachmentAggregate = createEnvironmentAggregate(
+                this.attachment,
+                PhysicsShapeType.MESH,
+                this.getTransform().getScene()
+            );
             this.arms.forEach((arm) => {
-                const armAggregate = createEnvironmentAggregate(arm, PhysicsShapeType.MESH, this.getTransform().getScene());
+                const armAggregate = createEnvironmentAggregate(
+                    arm,
+                    PhysicsShapeType.MESH,
+                    this.getTransform().getScene()
+                );
                 this.armAggregates.push(armAggregate);
             });
             this.solarPanels.forEach((solarPanel) => {
-                const solarPanelAggregate = createEnvironmentAggregate(solarPanel, PhysicsShapeType.BOX, this.getTransform().getScene());
+                const solarPanelAggregate = createEnvironmentAggregate(
+                    solarPanel,
+                    PhysicsShapeType.BOX,
+                    this.getTransform().getScene()
+                );
                 this.solarPanelAggregates.push(solarPanelAggregate);
             });
         } else if (distanceToCamera > 360e3 && this.attachmentAggregate !== null) {

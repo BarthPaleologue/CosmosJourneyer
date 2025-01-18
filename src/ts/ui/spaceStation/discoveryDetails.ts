@@ -1,3 +1,20 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Affero General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Affero General Public License for more details.
+//
+//  You should have received a copy of the GNU Affero General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { Observable } from "@babylonjs/core";
 import { Sounds } from "../../assets/sounds";
 import { Player } from "../../player/player";
@@ -7,6 +24,7 @@ import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObj
 import { parseDistance, parseSecondsPrecise } from "../../utils/strings/parseToStrings";
 import i18n from "../../i18n";
 import { Settings } from "../../settings";
+import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
 
 export class DiscoveryDetails {
     readonly htmlRoot: HTMLElement;
@@ -33,7 +51,7 @@ export class DiscoveryDetails {
 
     private readonly encyclopaedia: EncyclopaediaGalactica;
 
-    constructor(player: Player, encyclopaedia: EncyclopaediaGalactica) {
+    constructor(player: Player, encyclopaedia: EncyclopaediaGalactica, starSystemDatabase: StarSystemDatabase) {
         this.player = player;
         this.encyclopaedia = encyclopaedia;
 
@@ -67,13 +85,13 @@ export class DiscoveryDetails {
             player.discoveries.uploaded.push(this.currentDiscovery);
 
             this.onSellDiscovery.notifyObservers(this.currentDiscovery);
-            await this.setDiscovery(null);
+            await this.setDiscovery(null, starSystemDatabase);
         });
 
-        this.setDiscovery(null);
+        this.setDiscovery(null, starSystemDatabase);
     }
 
-    async setDiscovery(discovery: SpaceDiscoveryData | null) {
+    async setDiscovery(discovery: SpaceDiscoveryData | null, starSystemDatabase: StarSystemDatabase) {
         this.htmlRoot.innerHTML = "";
         this.htmlRoot.classList.toggle("empty", discovery === null);
         this.currentDiscovery = discovery;
@@ -83,21 +101,29 @@ export class DiscoveryDetails {
             return;
         }
 
-        const model = getObjectModelByUniverseId(this.currentDiscovery.objectId);
+        const model = getObjectModelByUniverseId(this.currentDiscovery.objectId, starSystemDatabase);
 
         this.objectName.innerText = model.name;
         this.htmlRoot.appendChild(this.objectName);
 
-        this.objectType.innerText = i18n.t("orbitalObject:type", { value: getOrbitalObjectTypeToI18nString(model) });
+        this.objectType.innerText = i18n.t("orbitalObject:type", {
+            value: getOrbitalObjectTypeToI18nString(model)
+        });
         this.htmlRoot.appendChild(this.objectType);
 
-        this.siderealDayDuration.innerText = i18n.t("orbitalObject:siderealDayDuration", { value: parseSecondsPrecise(model.physics.siderealDaySeconds) });
+        this.siderealDayDuration.innerText = i18n.t("orbitalObject:siderealDayDuration", {
+            value: parseSecondsPrecise(model.physics.siderealDaySeconds)
+        });
         this.htmlRoot.appendChild(this.siderealDayDuration);
 
-        this.orbitDuration.innerText = i18n.t("orbit:period", { value: parseSecondsPrecise(model.orbit.period) });
+        this.orbitDuration.innerText = i18n.t("orbit:period", {
+            value: parseSecondsPrecise(model.orbit.period)
+        });
         this.htmlRoot.appendChild(this.orbitDuration);
 
-        this.orbitRadius.innerText = i18n.t("orbit:radius", { value: parseDistance(model.orbit.radius) });
+        this.orbitRadius.innerText = i18n.t("orbit:radius", {
+            value: parseDistance(model.orbit.radius)
+        });
         this.htmlRoot.appendChild(this.orbitRadius);
 
         if (this.player.discoveries.local.includes(this.currentDiscovery)) {

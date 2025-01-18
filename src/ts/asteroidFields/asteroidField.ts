@@ -93,7 +93,10 @@ export class AsteroidField implements IDisposable {
             const patchCellZ = value.cellZ;
             const patch = value.patch;
 
-            if ((cameraCellX - patchCellX) ** 2 + cameraCellY * cameraCellY + (cameraCellZ - patchCellZ) ** 2 >= this.neighborCellsRenderRadius * this.neighborCellsRenderRadius) {
+            if (
+                (cameraCellX - patchCellX) ** 2 + cameraCellY * cameraCellY + (cameraCellZ - patchCellZ) ** 2 >=
+                this.neighborCellsRenderRadius * this.neighborCellsRenderRadius
+            ) {
                 patch.clearInstances();
                 patch.dispose();
 
@@ -110,25 +113,37 @@ export class AsteroidField implements IDisposable {
                 const cellZ = cameraCellZ + z;
 
                 const radiusSquared = (cellX * this.patchSize) ** 2 + (cellZ * this.patchSize) ** 2;
-                if (radiusSquared < this.minRadius * this.minRadius || radiusSquared > this.maxRadius * this.maxRadius) continue;
+                if (radiusSquared < this.minRadius * this.minRadius || radiusSquared > this.maxRadius * this.maxRadius)
+                    continue;
 
                 if (this.patches.has(`${cellX};${cellZ}`)) continue;
 
-                if ((cameraCellX - cellX) ** 2 + cameraCellY * cameraCellY + (cameraCellZ - cellZ) ** 2 >= this.neighborCellsRenderRadius * this.neighborCellsRenderRadius)
+                if (
+                    (cameraCellX - cellX) ** 2 + cameraCellY * cameraCellY + (cameraCellZ - cellZ) ** 2 >=
+                    this.neighborCellsRenderRadius * this.neighborCellsRenderRadius
+                )
                     continue;
 
                 const cellCoords = new Vector3(cellX * this.patchSize, 0, cellZ * this.patchSize);
 
-                const [positions, rotations, typeIndices, rotationAxes, rotationSpeeds] = AsteroidField.CreateAsteroidBuffer(
-                    cellCoords,
-                    this.resolution,
-                    this.patchSize,
-                    this.patchThickness,
-                    this.minRadius,
-                    this.maxRadius,
-                    this.rng
+                const [positions, rotations, typeIndices, rotationAxes, rotationSpeeds] =
+                    AsteroidField.CreateAsteroidBuffer(
+                        cellCoords,
+                        this.resolution,
+                        this.patchSize,
+                        this.patchThickness,
+                        this.minRadius,
+                        this.maxRadius,
+                        this.rng
+                    );
+                const patch = new AsteroidPatch(
+                    positions,
+                    rotations,
+                    typeIndices,
+                    rotationAxes,
+                    rotationSpeeds,
+                    this.parent
                 );
-                const patch = new AsteroidPatch(positions, rotations, typeIndices, rotationAxes, rotationSpeeds, this.parent);
                 patch.createInstances();
 
                 this.patches.set(`${cellX};${cellZ}`, { patch: patch, cellX: cellX, cellZ: cellZ });
@@ -191,13 +206,23 @@ export class AsteroidField implements IDisposable {
 
                 positions.push(new Vector3(positionX, positionY, positionZ));
 
-                const initialRotationAxis = new Vector3(rng(asteroidIndex + 9512) - 0.5, rng(asteroidIndex + 7456) - 0.5, rng(asteroidIndex + 7410) - 0.5).normalize();
+                const initialRotationAxis = new Vector3(
+                    rng(asteroidIndex + 9512) - 0.5,
+                    rng(asteroidIndex + 7456) - 0.5,
+                    rng(asteroidIndex + 7410) - 0.5
+                ).normalize();
                 const initialRotationAngle = rng(asteroidIndex + 4239) * 2 * Math.PI;
 
                 rotations.push(Quaternion.RotationAxis(initialRotationAxis, initialRotationAngle));
                 asteroidTypeIndices.push(asteroidTypeIndex);
 
-                rotationAxes.push(new Vector3(rng(asteroidIndex + 9630) - 0.5, rng(asteroidIndex + 3256) - 0.5, rng(asteroidIndex + 8520) - 0.5).normalize());
+                rotationAxes.push(
+                    new Vector3(
+                        rng(asteroidIndex + 9630) - 0.5,
+                        rng(asteroidIndex + 3256) - 0.5,
+                        rng(asteroidIndex + 8520) - 0.5
+                    ).normalize()
+                );
                 rotationSpeeds.push(rng(asteroidIndex + 1569) * 0.2);
             }
         }

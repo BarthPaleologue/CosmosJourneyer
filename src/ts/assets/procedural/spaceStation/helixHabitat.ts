@@ -66,7 +66,9 @@ export class HelixHabitat implements Transformable {
 
         const requiredHabitableSurfacePerHelix = requiredHabitableSurface / 2;
 
-        const nbSpires = Math.ceil(requiredHabitableSurfacePerHelix / (2 * Math.PI * this.radius * deltaRadius * thicknessMultipler));
+        const nbSpires = Math.ceil(
+            requiredHabitableSurfacePerHelix / (2 * Math.PI * this.radius * deltaRadius * thicknessMultipler)
+        );
 
         this.radius = requiredHabitableSurfacePerHelix / (2 * Math.PI * nbSpires * deltaRadius * thicknessMultipler);
 
@@ -95,7 +97,15 @@ export class HelixHabitat implements Transformable {
 
         const tessellation = 360;
 
-        this.helix1 = createHelix(this.radius, deltaRadius, deltaRadius * thicknessMultipler, tessellation, nbSpires, pitch, scene);
+        this.helix1 = createHelix(
+            this.radius,
+            deltaRadius,
+            deltaRadius * thicknessMultipler,
+            tessellation,
+            nbSpires,
+            pitch,
+            scene
+        );
 
         this.helix2 = this.helix1.clone();
         this.helix2.rotate(Axis.Y, Math.PI, Space.WORLD);
@@ -137,19 +147,38 @@ export class HelixHabitat implements Transformable {
     }
 
     update(stellarObjects: Transformable[], cameraWorldPosition: Vector3, deltaSeconds: number) {
-        this.getTransform().rotate(Axis.Y, deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, Settings.G_EARTH));
+        this.getTransform().rotate(
+            Axis.Y,
+            deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, Settings.G_EARTH)
+        );
         this.helixMaterial.update(stellarObjects);
         this.metalSectionMaterial.update(stellarObjects);
 
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
 
         if (distanceToCamera < 350e3 && this.attachmentAggregate === null) {
-            this.attachmentAggregate = createEnvironmentAggregate(this.attachment, PhysicsShapeType.MESH, this.getTransform().getScene());
-            this.helix1Aggregate = createEnvironmentAggregate(this.helix1, PhysicsShapeType.MESH, this.getTransform().getScene());
-            this.helix2Aggregate = createEnvironmentAggregate(this.helix2, PhysicsShapeType.MESH, this.getTransform().getScene());
+            this.attachmentAggregate = createEnvironmentAggregate(
+                this.attachment,
+                PhysicsShapeType.MESH,
+                this.getTransform().getScene()
+            );
+            this.helix1Aggregate = createEnvironmentAggregate(
+                this.helix1,
+                PhysicsShapeType.MESH,
+                this.getTransform().getScene()
+            );
+            this.helix2Aggregate = createEnvironmentAggregate(
+                this.helix2,
+                PhysicsShapeType.MESH,
+                this.getTransform().getScene()
+            );
 
             this.arms.forEach((arm) => {
-                const armAggregate = createEnvironmentAggregate(arm, PhysicsShapeType.MESH, this.getTransform().getScene());
+                const armAggregate = createEnvironmentAggregate(
+                    arm,
+                    PhysicsShapeType.MESH,
+                    this.getTransform().getScene()
+                );
                 this.armAggregates.push(armAggregate);
             });
         } else if (distanceToCamera > 360e3 && this.attachmentAggregate !== null) {

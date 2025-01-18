@@ -41,7 +41,10 @@ export type SaveFileData = {
  * @param jsonString The string to parse.
  * @returns The parsed SaveFileData object. Returns null if the string is not valid.
  */
-export function parseSaveFileData(jsonString: string): { data: SaveFileData | null; logs: string[] } {
+export function parseSaveFileData(jsonString: string): {
+    data: SaveFileData | null;
+    logs: string[];
+} {
     let saveData: SaveFileData;
     const logs: string[] = [];
     try {

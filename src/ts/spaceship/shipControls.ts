@@ -17,7 +17,14 @@
 
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { getForwardDirection, getRightDirection, getUpwardDirection, pitch, roll, yaw } from "../uberCore/transforms/basicTransform";
+import {
+    getForwardDirection,
+    getRightDirection,
+    getUpwardDirection,
+    pitch,
+    roll,
+    yaw
+} from "../uberCore/transforms/basicTransform";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Controls } from "../uberCore/controls";
 import { Camera } from "@babylonjs/core/Cameras/camera";
@@ -84,7 +91,14 @@ export class ShipControls implements Controls {
             scene
         );
         this.thirdPersonCamera.parent = this.getTransform();
-        this.thirdPersonCamera.lowerRadiusLimit = (1.2 * Math.max(this.spaceship.boundingExtent.x, this.spaceship.boundingExtent.y, this.spaceship.boundingExtent.z)) / 2;
+        this.thirdPersonCamera.lowerRadiusLimit =
+            (1.2 *
+                Math.max(
+                    this.spaceship.boundingExtent.x,
+                    this.spaceship.boundingExtent.y,
+                    this.spaceship.boundingExtent.z
+                )) /
+            2;
         this.thirdPersonCamera.upperRadiusLimit = 500;
 
         this.cameraShakeAnimation = new CameraShakeAnimation(this.thirdPersonCamera, 0.006, 1.0);
@@ -113,7 +127,10 @@ export class ShipControls implements Controls {
                         this.closestLandableFacility.getTransform().getAbsolutePosition()
                     );
                     if (distanceToLandingFacility < 500e3) {
-                        const bindingsString = pressInteractionToStrings(SpaceShipControlsInputs.map.emitLandingRequest, keyboardLayoutMap).join(", ");
+                        const bindingsString = pressInteractionToStrings(
+                            SpaceShipControlsInputs.map.emitLandingRequest,
+                            keyboardLayoutMap
+                        ).join(", ");
                         //FIXME: localize
                         createNotification(
                             NotificationOrigin.SPACE_STATION,
@@ -132,7 +149,10 @@ export class ShipControls implements Controls {
             const spaceship = this.getSpaceship();
             const keyboardLayout = await getGlobalKeyboardLayoutMap();
             if (spaceship.isWarpDriveEnabled()) {
-                const relevantKeys = pressInteractionToStrings(SpaceShipControlsInputs.map.toggleWarpDrive, keyboardLayout);
+                const relevantKeys = pressInteractionToStrings(
+                    SpaceShipControlsInputs.map.toggleWarpDrive,
+                    keyboardLayout
+                );
                 createNotification(
                     NotificationOrigin.SPACESHIP,
                     NotificationIntent.ERROR,
@@ -145,7 +165,10 @@ export class ShipControls implements Controls {
             const closestWalkableObject = spaceship.getClosestWalkableObject();
             if (closestWalkableObject === null) return;
 
-            const distance = Vector3.Distance(this.getTransform().getAbsolutePosition(), closestWalkableObject.getTransform().getAbsolutePosition());
+            const distance = Vector3.Distance(
+                this.getTransform().getAbsolutePosition(),
+                closestWalkableObject.getTransform().getAbsolutePosition()
+            );
 
             // If the object is too far, don't engage landing
             if (distance > closestWalkableObject.getBoundingRadius() + 100e3) {
@@ -162,16 +185,28 @@ export class ShipControls implements Controls {
             const spaceship = this.getSpaceship();
             if (spaceship.isLanded() || spaceship.isLanding()) return;
             if (this.closestLandableFacility === null) return;
-            const landingPad = this.closestLandableFacility.handleLandingRequest({ minimumPadSize: LandingPadSize.SMALL });
+            const landingPad = this.closestLandableFacility.handleLandingRequest({
+                minimumPadSize: LandingPadSize.SMALL
+            });
             if (landingPad === null) {
-                createNotification(NotificationOrigin.SPACE_STATION, NotificationIntent.ERROR, "Landing request rejected", 2000);
+                createNotification(
+                    NotificationOrigin.SPACE_STATION,
+                    NotificationIntent.ERROR,
+                    "Landing request rejected",
+                    2000
+                );
                 return;
             }
 
             Sounds.EnqueuePlay(Sounds.LANDING_REQUEST_GRANTED);
             Sounds.STRAUSS_BLUE_DANUBE.play();
             Sounds.STRAUSS_BLUE_DANUBE.setVolume(1, 1);
-            createNotification(NotificationOrigin.SPACE_STATION, NotificationIntent.SUCCESS, `Landing request granted. Proceed to pad ${landingPad.padNumber}`, 30000);
+            createNotification(
+                NotificationOrigin.SPACE_STATION,
+                NotificationIntent.SUCCESS,
+                `Landing request granted. Proceed to pad ${landingPad.padNumber}`,
+                30000
+            );
             spaceship.engageLandingOnPad(landingPad);
         };
 
@@ -188,7 +223,13 @@ export class ShipControls implements Controls {
         this.resetCameraHandler = () => {
             quickAnimation(this.thirdPersonCamera, "alpha", this.thirdPersonCamera.alpha, -3.14 / 2, 200);
             quickAnimation(this.thirdPersonCamera, "beta", this.thirdPersonCamera.beta, 3.14 / 2.2, 200);
-            quickAnimation(this.thirdPersonCamera, "radius", this.thirdPersonCamera.radius, this.thirdPersonCameraDefaultRadius, 200);
+            quickAnimation(
+                this.thirdPersonCamera,
+                "radius",
+                this.thirdPersonCamera.radius,
+                this.thirdPersonCameraDefaultRadius,
+                200
+            );
             quickAnimation(this.thirdPersonCamera, "target", this.thirdPersonCamera.target, Vector3.Zero(), 200);
         };
 
@@ -311,18 +352,36 @@ export class ShipControls implements Controls {
             Sounds.STRAUSS_BLUE_DANUBE.stop(2);
 
             if (!this.getSpaceship().isLandedAtFacility()) {
-                const bindingsString = pressInteractionToStrings(StarSystemInputs.map.toggleSpaceShipCharacter, keyboardLayoutMap).join(", ");
-                createNotification(NotificationOrigin.SPACESHIP, NotificationIntent.INFO, i18n.t("notifications:landingComplete", { bindingsString: bindingsString }), 5000);
+                const bindingsString = pressInteractionToStrings(
+                    StarSystemInputs.map.toggleSpaceShipCharacter,
+                    keyboardLayoutMap
+                ).join(", ");
+                createNotification(
+                    NotificationOrigin.SPACESHIP,
+                    NotificationIntent.INFO,
+                    i18n.t("notifications:landingComplete", { bindingsString: bindingsString }),
+                    5000
+                );
             }
         });
 
         this.spaceship.onPlanetaryLandingEngaged.add(() => {
-            createNotification(NotificationOrigin.SPACESHIP, NotificationIntent.INFO, i18n.t("notifications:landingSequenceEngaged"), 5000);
+            createNotification(
+                NotificationOrigin.SPACESHIP,
+                NotificationIntent.INFO,
+                i18n.t("notifications:landingSequenceEngaged"),
+                5000
+            );
             Sounds.EnqueuePlay(Sounds.INITIATING_PLANETARY_LANDING);
         });
 
         this.spaceship.onLandingCancelled.add(() => {
-            createNotification(NotificationOrigin.SPACESHIP, NotificationIntent.INFO, i18n.t("notifications:landingCancelled"), 5000);
+            createNotification(
+                NotificationOrigin.SPACESHIP,
+                NotificationIntent.INFO,
+                i18n.t("notifications:landingCancelled"),
+                5000
+            );
             Sounds.STRAUSS_BLUE_DANUBE.setVolume(0, 2);
             Sounds.STRAUSS_BLUE_DANUBE.stop(2);
         });

@@ -19,9 +19,9 @@ Pull requests are welcome! If you want to contribute code, please follow these s
 1. Get familiar with the project by reading the [architecture document](ARCHITECTURE.md)
 2. Fork the repository
 3. Create a new branch from the `main` branch:
-   ```sh
-   git checkout -b [name_of_your_new_branch]
-   ```
+    ```sh
+    git checkout -b [name_of_your_new_branch]
+    ```
 4. Commit & push your changes
 5. Open a pull request to the `main` branch
 
@@ -37,11 +37,11 @@ Cosmos Journeyer is available in multiple languages, but you can add more or imp
 
 ### Modifying existing language
 
-To make a change in an existing language, go to `src/locales` and find the language you want to modify by its code. 
-For example if you want to modify the American English translation, you will find the `en-us` folder. 
+To make a change in an existing language, go to `src/locales` and find the language you want to modify by its code.
+For example if you want to modify the American English translation, you will find the `en-us` folder.
 Inside this folder are many JSON files containing the various words and sentences used throughout the project.
 
-Make the changes you want by editing the files and then open a pull request. If you don't have/don't want to create a GitHub account, you can email the files at 
+Make the changes you want by editing the files and then open a pull request. If you don't have/don't want to create a GitHub account, you can email the files at
 [barth.paleologue@cosmosjourneyer.com](mailto:barth.paleologue@cosmosjourneyer.com). In any case you will be credited for your work.
 
 ### Adding a new language

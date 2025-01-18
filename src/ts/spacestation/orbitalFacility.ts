@@ -52,5 +52,10 @@ export interface OrbitalFacility extends OrbitalObject, ManagesLandingPads, Cull
 
     getSubTargets(): Targetable[];
 
-    update(stellarObjects: Transformable[], parents: OrbitalObject[], cameraWorldPosition: Vector3, deltaSeconds: number): void;
+    update(
+        stellarObjects: Transformable[],
+        parents: OrbitalObject[],
+        cameraWorldPosition: Vector3,
+        deltaSeconds: number
+    ): void;
 }

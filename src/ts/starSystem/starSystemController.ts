@@ -17,7 +17,6 @@
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Matrix, Quaternion } from "@babylonjs/core/Maths/math";
-import { PostProcessType } from "../postProcesses/postProcessTypes";
 import { PostProcessManager } from "../postProcesses/postProcessManager";
 import { UberScene } from "../uberCore/uberScene";
 import { SpaceStation } from "../spacestation/spaceStation";
@@ -38,7 +37,6 @@ import { JuliaSet } from "../anomalies/julia/juliaSet";
 import { StarFieldBox } from "./starFieldBox";
 import { PlanetarySystemModel, StarSystemModel, SubStarSystemModel } from "./starSystemModel";
 import { Settings } from "../settings";
-import { getStarGalacticPosition } from "../utils/coordinates/starSystemCoordinatesUtils";
 import { GasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 import { MandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModel";
 import { JuliaSetModel } from "../anomalies/julia/juliaSetModel";
@@ -53,6 +51,7 @@ import { OrbitalFacility } from "../spacestation/orbitalFacility";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
 import { SpaceElevator } from "../spacestation/spaceElevator";
 import { SpaceElevatorModel } from "../spacestation/spaceElevatorModel";
+import { StarSystemDatabase } from "./starSystemDatabase";
 
 export type PlanetarySystem = {
     readonly planets: Planet[];
@@ -132,9 +131,13 @@ export class StarSystemController {
     public async load() {
         let numberOfObjects = 0;
         for (const subSystem of this.model.subSystems) {
-            numberOfObjects += subSystem.stellarObjects.length + subSystem.anomalies.length + subSystem.orbitalFacilities.length;
+            numberOfObjects +=
+                subSystem.stellarObjects.length + subSystem.anomalies.length + subSystem.orbitalFacilities.length;
             for (const planetarySystem of subSystem.planetarySystems) {
-                numberOfObjects += planetarySystem.planets.length + planetarySystem.satellites.length + planetarySystem.orbitalFacilities.length;
+                numberOfObjects +=
+                    planetarySystem.planets.length +
+                    planetarySystem.satellites.length +
+                    planetarySystem.orbitalFacilities.length;
             }
         }
         this.maxLoadingIndex = numberOfObjects;
@@ -223,7 +226,10 @@ export class StarSystemController {
         };
     }
 
-    private async loadPlanetarySystem(planetarySystemModel: PlanetarySystemModel, stellarObjects: StellarObject[]): Promise<PlanetarySystem> {
+    private async loadPlanetarySystem(
+        planetarySystemModel: PlanetarySystemModel,
+        stellarObjects: StellarObject[]
+    ): Promise<PlanetarySystem> {
         const planets: Planet[] = [];
         for (const planetModel of planetarySystemModel.planets) {
             console.log("Loading planet", planetModel.name);
@@ -304,7 +310,8 @@ export class StarSystemController {
         let nearest: OrbitalObject = orbitalObjects[0];
         let smallerDistance = Number.POSITIVE_INFINITY;
         for (const body of orbitalObjects) {
-            const distance = body.getTransform().getAbsolutePosition().subtract(position).length() - body.getBoundingRadius();
+            const distance =
+                body.getTransform().getAbsolutePosition().subtract(position).length() - body.getBoundingRadius();
             if (distance < smallerDistance) {
                 nearest = body;
                 smallerDistance = distance;
@@ -319,7 +326,9 @@ export class StarSystemController {
      */
     public getOrbitalFacilities(): OrbitalFacility[] {
         const solarFacilities: OrbitalFacility[] = this.subSystems.flatMap((subSystem) => subSystem.spaceStations);
-        const planetFacilities: OrbitalFacility[] = this.subSystems.flatMap((subSystem) => subSystem.planetarySystems.flatMap((planetarySystem) => planetarySystem.spaceStations));
+        const planetFacilities: OrbitalFacility[] = this.subSystems.flatMap((subSystem) =>
+            subSystem.planetarySystems.flatMap((planetarySystem) => planetarySystem.spaceStations)
+        );
         return solarFacilities.concat(planetFacilities);
     }
 
@@ -329,7 +338,12 @@ export class StarSystemController {
     public getCelestialBodies(): CelestialBody[] {
         const celestialBodies: CelestialBody[] = this.subSystems.flatMap((subSystem) => subSystem.stellarObjects);
         celestialBodies.push(
-            ...this.subSystems.flatMap((subSystem) => subSystem.planetarySystems.flatMap((planetarySystem) => [...planetarySystem.planets, ...planetarySystem.satellites]))
+            ...this.subSystems.flatMap((subSystem) =>
+                subSystem.planetarySystems.flatMap((planetarySystem) => [
+                    ...planetarySystem.planets,
+                    ...planetarySystem.satellites
+                ])
+            )
         );
         celestialBodies.push(...this.subSystems.flatMap((subSystem) => subSystem.anomalies));
 
@@ -354,7 +368,13 @@ export class StarSystemController {
      * Returns all the planets in the star system
      */
     public getPlanets(): PlanetaryMassObject[] {
-        return this.subSystems.flatMap((subSystem) => subSystem.planetarySystems.flatMap((planetarySystem) => planetarySystem.planets));
+        return this.subSystems.flatMap((subSystem) =>
+            subSystem.planetarySystems.flatMap((planetarySystem) => planetarySystem.planets)
+        );
+    }
+
+    public getTelluricPlanets(): TelluricPlanet[] {
+        return this.getPlanets().filter((planet) => planet instanceof TelluricPlanet);
     }
 
     /**
@@ -411,7 +431,11 @@ export class StarSystemController {
     /**
      * Inits the post processes and moves the system forward in time to the current time (it is additive)
      */
-    public initPositions(nbWarmUpUpdates: number, chunkForge: ChunkForge, postProcessManager: PostProcessManager): void {
+    public initPositions(
+        nbWarmUpUpdates: number,
+        chunkForge: ChunkForge,
+        postProcessManager: PostProcessManager
+    ): void {
         this.update(Date.now() / 1000, chunkForge, postProcessManager);
         for (let i = 0; i < nbWarmUpUpdates; i++) this.update(1 / 60, chunkForge, postProcessManager);
     }
@@ -423,57 +447,43 @@ export class StarSystemController {
     public initPostProcesses(postProcessManager: PostProcessManager): void {
         const celestialBodies = this.getCelestialBodies();
         const stellarObjects = this.getStellarObjects();
+
         for (const object of celestialBodies) {
-            for (const postProcess of object.postProcesses) {
-                switch (postProcess) {
-                    case PostProcessType.RING:
-                        postProcessManager.addRings(object, stellarObjects);
-                        break;
-                    case PostProcessType.ATMOSPHERE:
-                        if (!(object instanceof GasPlanet) && !(object instanceof TelluricPlanet))
-                            throw new Error("Atmosphere post process can only be added to gas or telluric planets. Source:" + object.model.name);
-                        postProcessManager.addAtmosphere(object as GasPlanet | TelluricPlanet, stellarObjects);
-                        break;
-                    case PostProcessType.CLOUDS:
-                        if (!(object instanceof TelluricPlanet)) throw new Error("Clouds post process can only be added to telluric planets. Source:" + object.model.name);
-                        postProcessManager.addClouds(object as TelluricPlanet, stellarObjects);
-                        break;
-                    case PostProcessType.OCEAN:
-                        if (!(object instanceof TelluricPlanet)) throw new Error("Ocean post process can only be added to telluric planets. Source:" + object.model.name);
-                        postProcessManager.addOcean(object as TelluricPlanet, stellarObjects);
-                        break;
-                    case PostProcessType.VOLUMETRIC_LIGHT:
-                        if (!(object instanceof Star) && !(object instanceof NeutronStar))
-                            throw new Error("Volumetric light post process can only be added to stars and neutron stars. Source:" + object.model.name);
-                        postProcessManager.addVolumetricLight(object, [this.starFieldBox.mesh]);
-                        break;
-                    case PostProcessType.MANDELBULB:
-                        if (!(object instanceof Mandelbulb)) throw new Error("Mandelbulb post process can only be added to mandelbulbs. Source:" + object.model.name);
-                        postProcessManager.addMandelbulb(object as Mandelbulb, stellarObjects);
-                        break;
-                    case PostProcessType.JULIA_SET:
-                        if (!(object instanceof JuliaSet)) throw new Error("Julia set post process can only be added to julia sets. Source:" + object.model.name);
-                        postProcessManager.addJuliaSet(object as JuliaSet, stellarObjects);
-                        break;
-                    case PostProcessType.BLACK_HOLE:
-                        if (!(object instanceof BlackHole)) throw new Error("Black hole post process can only be added to black holes. Source:" + object.model.name);
-                        postProcessManager.addBlackHole(object as BlackHole);
-                        break;
-                    case PostProcessType.MATTER_JETS:
-                        if (!(object instanceof NeutronStar)) throw new Error("Matter jets post process can only be added to neutron stars. Source:" + object.model.name);
-                        postProcessManager.addMatterJet(object as NeutronStar);
-                        break;
-                    case PostProcessType.SHADOW:
-                        postProcessManager.addShadowCaster(object, stellarObjects);
-                        break;
-                    case PostProcessType.LENS_FLARE:
-                        postProcessManager.addLensFlare(object as StellarObject);
-                        break;
-                }
+            switch (object.model.type) {
+                case OrbitalObjectType.STAR:
+                    postProcessManager.addStar(object as Star, [this.starFieldBox.mesh]);
+                    break;
+                case OrbitalObjectType.NEUTRON_STAR:
+                    postProcessManager.addNeutronStar(object as NeutronStar, [this.starFieldBox.mesh]);
+                    break;
+                case OrbitalObjectType.BLACK_HOLE:
+                    postProcessManager.addBlackHole(object as BlackHole);
+                    break;
+                case OrbitalObjectType.TELLURIC_PLANET:
+                    postProcessManager.addTelluricPlanet(object as TelluricPlanet, stellarObjects);
+                    break;
+                case OrbitalObjectType.TELLURIC_SATELLITE:
+                    postProcessManager.addTelluricPlanet(object as TelluricPlanet, stellarObjects);
+                    break;
+                case OrbitalObjectType.GAS_PLANET:
+                    postProcessManager.addGasPlanet(object as GasPlanet, stellarObjects);
+                    break;
+                case OrbitalObjectType.MANDELBULB:
+                    postProcessManager.addMandelbulb(object as Mandelbulb, stellarObjects);
+                    break;
+                case OrbitalObjectType.JULIA_SET:
+                    postProcessManager.addJuliaSet(object as JuliaSet, stellarObjects);
+                    break;
+                case OrbitalObjectType.SPACE_STATION:
+                    break;
+                case OrbitalObjectType.SPACE_ELEVATOR:
+                    break;
             }
         }
 
-        postProcessManager.setCelestialBody(this.getNearestCelestialBody(this.scene.getActiveControls().getTransform().getAbsolutePosition()));
+        postProcessManager.setCelestialBody(
+            this.getNearestCelestialBody(this.scene.getActiveControls().getTransform().getAbsolutePosition())
+        );
         postProcessManager.rebuild();
     }
 
@@ -503,16 +513,23 @@ export class StarSystemController {
         // Depending on the distance to the nearest body, we might have to compensate its translation and/or rotation
         // If we are very close, we want both translation and rotation to be compensated, so that the body appears to be fixed
         // When we are a bit further, we only need to compensate the translation as it would be unnatural not to see the body rotating
-        const distanceOfNearestToControls = Vector3.Distance(nearestOrbitalObject.getTransform().getAbsolutePosition(), controller.getTransform().getAbsolutePosition());
+        const distanceOfNearestToControls = Vector3.Distance(
+            nearestOrbitalObject.getTransform().getAbsolutePosition(),
+            controller.getTransform().getAbsolutePosition()
+        );
 
         const shouldCompensateTranslation =
-            distanceOfNearestToControls < nearestOrbitalObject.getBoundingRadius() * (nearestOrbitalObject.model.type === OrbitalObjectType.SPACE_STATION ? 200 : 10);
+            distanceOfNearestToControls <
+            nearestOrbitalObject.getBoundingRadius() *
+                (nearestOrbitalObject.model.type === OrbitalObjectType.SPACE_STATION ? 200 : 10);
 
         // compensate rotation when close to the body
         let shouldCompensateRotation = distanceOfNearestToControls < nearestOrbitalObject.getBoundingRadius() * 3;
         if (nearestOrbitalObject === nearestCelestialBody && ringUniforms !== null) {
             // or in the vicinity of the rings
-            shouldCompensateRotation = shouldCompensateRotation || distanceOfNearestToControls < ringUniforms.model.ringEnd * nearestOrbitalObject.getBoundingRadius();
+            shouldCompensateRotation =
+                shouldCompensateRotation ||
+                distanceOfNearestToControls < ringUniforms.model.ringEnd * nearestOrbitalObject.getBoundingRadius();
         }
         // never compensate the rotation of a black hole
         shouldCompensateRotation = shouldCompensateRotation && !(nearestOrbitalObject instanceof BlackHole);
@@ -554,16 +571,28 @@ export class StarSystemController {
                 if (object === nearestOrbitalObject) continue;
 
                 // All other bodies must revolve around it for consistency (finally we can say the sun revolves around the earth!)
-                rotateAround(object.getTransform(), nearestOrbitalObject.getTransform().getAbsolutePosition(), nearestObjectRotationAxis, -dThetaNearest);
+                rotateAround(
+                    object.getTransform(),
+                    nearestOrbitalObject.getTransform().getAbsolutePosition(),
+                    nearestObjectRotationAxis,
+                    -dThetaNearest
+                );
             }
 
             this.systemTargets.forEach((target) => {
-                rotateAround(target.getTransform(), nearestOrbitalObject.getTransform().getAbsolutePosition(), nearestObjectRotationAxis, -dThetaNearest);
+                rotateAround(
+                    target.getTransform(),
+                    nearestOrbitalObject.getTransform().getAbsolutePosition(),
+                    nearestObjectRotationAxis,
+                    -dThetaNearest
+                );
             });
 
             // the starfield is rotated to give the impression the nearest body is rotating, which is only an illusion
             const starfieldAdditionalRotation = Matrix.RotationAxis(nearestObjectRotationAxis, dThetaNearest);
-            this.starFieldBox.setRotationMatrix(starfieldAdditionalRotation.multiply(this.starFieldBox.getRotationMatrix()));
+            this.starFieldBox.setRotationMatrix(
+                starfieldAdditionalRotation.multiply(this.starFieldBox.getRotationMatrix())
+            );
         } else {
             // if we don't compensate the rotation of the nearest body, we must simply update its rotation
             OrbitalObjectUtils.UpdateRotation(nearestOrbitalObject, deltaSeconds);
@@ -578,7 +607,11 @@ export class StarSystemController {
         if (nearestObjectParents === undefined) {
             throw new Error("Nearest object parents are not defined");
         }
-        const newPosition = OrbitalObjectUtils.GetOrbitalPosition(nearestOrbitalObject, nearestObjectParents, this.elapsedSeconds);
+        const newPosition = OrbitalObjectUtils.GetOrbitalPosition(
+            nearestOrbitalObject,
+            nearestObjectParents,
+            this.elapsedSeconds
+        );
 
         const nearestBodyDisplacement = newPosition.subtract(initialPosition);
         if (shouldCompensateTranslation) {
@@ -616,7 +649,12 @@ export class StarSystemController {
 
         const cameraWorldPosition = controller.getTransform().getAbsolutePosition();
         for (const orbitalFacility of orbitalFacilities) {
-            orbitalFacility.update(stellarObjects, this.objectToParents.get(orbitalFacility) ?? [], cameraWorldPosition, deltaSeconds);
+            orbitalFacility.update(
+                stellarObjects,
+                this.objectToParents.get(orbitalFacility) ?? [],
+                cameraWorldPosition,
+                deltaSeconds
+            );
             orbitalFacility.computeCulling(controller.getActiveCamera());
         }
 
@@ -653,7 +691,9 @@ export class StarSystemController {
      * @param postProcessManager
      */
     public updateShaders(deltaSeconds: number, postProcessManager: PostProcessManager) {
-        const nearestBody = this.getNearestCelestialBody(this.scene.getActiveControls().getTransform().getAbsolutePosition());
+        const nearestBody = this.getNearestCelestialBody(
+            this.scene.getActiveControls().getTransform().getAbsolutePosition()
+        );
 
         const stellarObjects = this.getStellarObjects();
         const planetaryMassObjects = this.getPlanetaryMassObjects();
@@ -671,16 +711,20 @@ export class StarSystemController {
         postProcessManager.update(deltaSeconds);
     }
 
-    addSystemTarget(targetCoordinates: StarSystemCoordinates): SystemTarget {
-        const currentSystemUniversePosition = getStarGalacticPosition(this.model.coordinates);
-        const targetSystemUniversePosition = getStarGalacticPosition(targetCoordinates);
+    addSystemTarget(targetCoordinates: StarSystemCoordinates, starSystemDatabase: StarSystemDatabase): SystemTarget {
+        const currentSystemUniversePosition = starSystemDatabase.getSystemGalacticPosition(this.model.coordinates);
+        const targetSystemUniversePosition = starSystemDatabase.getSystemGalacticPosition(targetCoordinates);
 
-        const distance = Vector3.Distance(currentSystemUniversePosition, targetSystemUniversePosition) * Settings.LIGHT_YEAR;
+        const distance =
+            Vector3.Distance(currentSystemUniversePosition, targetSystemUniversePosition) * Settings.LIGHT_YEAR;
 
-        const direction = targetSystemUniversePosition.subtract(currentSystemUniversePosition).scaleInPlace(Settings.LIGHT_YEAR / distance);
+        const direction = targetSystemUniversePosition
+            .subtract(currentSystemUniversePosition)
+            .scaleInPlace(Settings.LIGHT_YEAR / distance);
         Vector3.TransformCoordinatesToRef(direction, this.starFieldBox.getRotationMatrix(), direction);
 
-        const placeholderTransform = new SystemTarget(targetCoordinates, this.scene);
+        const systemModel = starSystemDatabase.getSystemModelFromCoordinates(targetCoordinates);
+        const placeholderTransform = new SystemTarget(systemModel, this.scene);
         placeholderTransform.getTransform().position.copyFrom(direction.scale(distance));
 
         this.systemTargets.push(placeholderTransform);

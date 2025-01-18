@@ -55,3 +55,10 @@ export function remap(value: number, from1: number, to1: number, from2: number, 
 export function lerpSmooth(a: number, b: number, halfLife: number, deltaSeconds: number) {
     return b + (a - b) * 2 ** (-deltaSeconds / halfLife);
 }
+
+export function gcd(a: number, b: number): number {
+    if (b === 0) {
+        return a;
+    }
+    return gcd(b, a % b);
+}

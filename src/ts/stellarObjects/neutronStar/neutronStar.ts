@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { NeutronStarModel } from "./neutronStarModel";
-import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { StellarObject } from "../../architecture/stellarObject";
 import { Cullable } from "../../utils/cullable";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
@@ -37,8 +36,8 @@ import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
 import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
-
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
+import { VolumetricLightUniforms } from "../../volumetricLight/volumetricLightUniforms";
 
 export class NeutronStar implements StellarObject, Cullable {
     readonly model: NeutronStarModel;
@@ -50,7 +49,7 @@ export class NeutronStar implements StellarObject, Cullable {
 
     readonly aggregate: PhysicsAggregate;
 
-    readonly postProcesses: PostProcessType[] = [];
+    readonly volumetricLightUniforms = new VolumetricLightUniforms();
 
     readonly ringsUniforms: RingsUniforms | null;
 
@@ -99,15 +98,18 @@ export class NeutronStar implements StellarObject, Cullable {
 
         setRotationQuaternion(this.getTransform(), this.model.physics.axialTilt);
 
-        this.postProcesses.push(PostProcessType.VOLUMETRIC_LIGHT, PostProcessType.LENS_FLARE, PostProcessType.MATTER_JETS);
         if (this.model.rings !== null) {
-            this.postProcesses.push(PostProcessType.RING);
-
             this.ringsUniforms = new RingsUniforms(this.model.rings, scene);
 
             const averageRadius = (this.model.radius * (this.model.rings.ringStart + this.model.rings.ringEnd)) / 2;
             const spread = (this.model.radius * (this.model.rings.ringEnd - this.model.rings.ringStart)) / 2;
-            this.asteroidField = new AsteroidField(this.model.rings.seed, this.getTransform(), averageRadius, spread, scene);
+            this.asteroidField = new AsteroidField(
+                this.model.rings.seed,
+                this.getTransform(),
+                averageRadius,
+                spread,
+                scene
+            );
         } else {
             this.ringsUniforms = null;
             this.asteroidField = null;

@@ -23,6 +23,7 @@ import { Player } from "../player/player";
 import { CurrentMissionDisplay } from "./currentMissionDisplay";
 import { MissionContext } from "../missions/missionContext";
 import { smoothstep } from "../utils/math";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 
 export class SpaceShipLayer {
     private readonly rootNode: HTMLElement;
@@ -39,7 +40,7 @@ export class SpaceShipLayer {
 
     private readonly player: Player;
 
-    constructor(player: Player) {
+    constructor(player: Player, starSystemDatabase: StarSystemDatabase) {
         this.player = player;
 
         this.rootNode = document.getElementById("helmetOverlay") as HTMLElement;
@@ -53,7 +54,7 @@ export class SpaceShipLayer {
 
         this.fuelIndicator = document.getElementById("fuelIndicator") as HTMLElement;
 
-        this.currentMissionDisplay = new CurrentMissionDisplay(player);
+        this.currentMissionDisplay = new CurrentMissionDisplay(player, starSystemDatabase);
         this.rootNode.appendChild(this.currentMissionDisplay.rootNode);
 
         document.addEventListener("mousemove", (event) => {
@@ -63,7 +64,9 @@ export class SpaceShipLayer {
             const theta = Math.atan2(event.clientY - window.innerHeight / 2, event.clientX - window.innerWidth / 2);
             this.cursor.style.transform = `translate(-50%, -50%) rotate(${Math.PI / 2 + theta}rad)`;
 
-            const distanceToCenter = Math.sqrt((event.clientX - window.innerWidth / 2) ** 2 + (event.clientY - window.innerHeight / 2) ** 2);
+            const distanceToCenter = Math.sqrt(
+                (event.clientX - window.innerWidth / 2) ** 2 + (event.clientY - window.innerHeight / 2) ** 2
+            );
             const normalizedDistance = Math.min(distanceToCenter / Math.min(window.innerWidth, window.innerHeight), 1);
 
             this.cursor.style.opacity = `${smoothstep(0.1, 0.2, normalizedDistance)}`;
@@ -89,10 +92,21 @@ export class SpaceShipLayer {
         this.currentTarget = target;
     }
 
-    public update(currentControls: TransformNode, missionContext: MissionContext, keyboardLayout: Map<string, string>) {
+    public update(
+        currentControls: TransformNode,
+        missionContext: MissionContext,
+        keyboardLayout: Map<string, string>,
+        starSystemDatabase: StarSystemDatabase
+    ) {
         if (this.currentTarget !== null) {
-            const directionWorld = this.currentTarget.getAbsolutePosition().subtract(currentControls.getAbsolutePosition()).normalize();
-            const directionLocal = Vector3.TransformNormal(directionWorld, Matrix.Invert(currentControls.getWorldMatrix()));
+            const directionWorld = this.currentTarget
+                .getAbsolutePosition()
+                .subtract(currentControls.getAbsolutePosition())
+                .normalize();
+            const directionLocal = Vector3.TransformNormal(
+                directionWorld,
+                Matrix.Invert(currentControls.getWorldMatrix())
+            );
 
             // set class of targetDot based on sign of directionLocal.z
             this.targetDot.className = directionLocal.z > 0 ? "targetDot" : "targetDot behind";
@@ -102,7 +116,7 @@ export class SpaceShipLayer {
             this.targetDot.style.left = `${50 - 50 * directionLocal.x}%`;
         }
 
-        this.currentMissionDisplay.update(missionContext, keyboardLayout);
+        this.currentMissionDisplay.update(missionContext, keyboardLayout, starSystemDatabase);
     }
 
     displaySpeed(shipThrottle: number, speed: number) {
@@ -122,7 +136,10 @@ export class SpaceShipLayer {
 
     displayFuel(fuelRemainingFraction: number, nextJumpFuelFraction: number) {
         this.fuelIndicator.style.setProperty("--currentFuelLevel", `${(fuelRemainingFraction * 100).toFixed(0)}%`);
-        this.fuelIndicator.style.setProperty("--fuelLevelAfterJump", `${((fuelRemainingFraction - nextJumpFuelFraction) * 100).toFixed(0)}%`);
+        this.fuelIndicator.style.setProperty(
+            "--fuelLevelAfterJump",
+            `${((fuelRemainingFraction - nextJumpFuelFraction) * 100).toFixed(0)}%`
+        );
     }
 
     dispose() {

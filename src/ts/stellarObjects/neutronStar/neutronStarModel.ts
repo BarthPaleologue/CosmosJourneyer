@@ -32,7 +32,11 @@ export type NeutronStarModel = StellarObjectModel & {
     readonly type: OrbitalObjectType.NEUTRON_STAR;
 };
 
-export function newSeededNeutronStarModel(seed: number, name: string, parentBodies: CelestialBodyModel[]): NeutronStarModel {
+export function newSeededNeutronStarModel(
+    seed: number,
+    name: string,
+    parentBodies: CelestialBodyModel[]
+): NeutronStarModel {
     const rng = getRngFromSeed(seed);
 
     const temperature = randRangeInt(200_000, 5_000_000_000, rng, GenerationSteps.TEMPERATURE);

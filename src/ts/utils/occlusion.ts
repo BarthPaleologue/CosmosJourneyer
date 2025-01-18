@@ -17,7 +17,12 @@
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-export function rayIntersectSphere(rayOrigin: Vector3, rayDir: Vector3, spherePosition: Vector3, sphereRadius: number): [boolean, number, number] {
+export function rayIntersectSphere(
+    rayOrigin: Vector3,
+    rayDir: Vector3,
+    spherePosition: Vector3,
+    sphereRadius: number
+): [boolean, number, number] {
     const relativeOrigin = rayOrigin.subtract(spherePosition); // rayOrigin in sphere space
 
     const a = 1.0;

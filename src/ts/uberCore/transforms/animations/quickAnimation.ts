@@ -13,5 +13,15 @@ import { Animation } from "@babylonjs/core/Animations/animation";
 export function quickAnimation<K, T>(targetObject: K, whichprop: string, initialValue: T, targetval: T, speed: number) {
     const ease = new CubicEase();
     ease.setEasingMode(EasingFunction.EASINGMODE_EASEINOUT);
-    Animation.CreateAndStartAnimation("quickAnimation", targetObject, whichprop, speed, 120, initialValue, targetval, 0, ease);
+    Animation.CreateAndStartAnimation(
+        "quickAnimation",
+        targetObject,
+        whichprop,
+        speed,
+        120,
+        initialValue,
+        targetval,
+        0,
+        ease
+    );
 }

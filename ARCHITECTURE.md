@@ -8,7 +8,48 @@ The following diagram is not an inheritance diagram, but a composition diagram. 
 
 For example, planets are part of the celestial bodies.
 
-![Cosmos Journeyer's Architecture Diagram](coverImages/architecture_diagram.png)
+```mermaid
+graph TD
+    A[CosmosJourneyer<br><sub>The main entry point for the project</sub>] --> B[StarMap]
+    A --> C[Main & Pause Menus<br><sub>Handles loading/unloading of systems and manages data<br>that do not depend on the current star system</sub>]
+    A --> EG[Encyclopaedia Galactica<br><sub>Manages player discoveries</sub>]
+    A --> SSDB[StarSystemDatabase<br><sub>Generates star system data on demand</sub>]
+    A --> D[StarSystemView]
+
+    subgraph StarSystemView
+
+
+        D --> E[StarSystemController<br><sub>Manages everything relevant to the current star system</sub>]
+        D --> F[PostProcessManager]
+        D --> G[Axis & Orbit Renderers<br><sub>Displays the orbits and rotation axis of all orbital objects</sub>]
+        D --> H[ChunkForge<br><sub>Creates the new chunks for the surface of telluric planets</sub>]
+
+        E --> I[StarSystemModel<br><sub>The blueprint used to instantiate<br>the current star system</sub>]
+        E --> J[Orbital Objects]
+
+        subgraph Orbital Objects
+
+            J --> K[Celestial Bodies]
+            J --> L[Space Stations]
+
+            K --> M[Stellar Objects]
+            K --> N[Planets]
+
+            M --> O[Star]
+            M --> P[Neutron Star]
+            M --> Q[Black Hole]
+
+            N --> R[Telluric Planets]
+            N --> S[Gas Planets]
+
+        end
+
+    end
+
+    %% Styling for annotation text
+    classDef subtext font-size:10px, fill:#f9f, stroke-width:0px;
+
+```
 
 ## Orbital Object's interfaces relations
 
@@ -16,7 +57,29 @@ Even though you could argue the existence of an "is a" relationship between `Cel
 
 This means that in the previous diagram, in the `Orbital Objects` tree, are only classes the concrete types: `Star`, `BlackHole`, `NeutronStar`, `TelluricPlanet`, `GasPlanet`, and `SpaceStation`. The rest is only interfaces:
 
-![Orbital Object's interfaces relations](coverImages/orbitalObjectsInterfaces.png)
+```mermaid
+
+classDiagram
+    class OrbitalObject {
+        +getOrbitSettings()
+        +getRotationAxis()
+        +updateOrbitPosition()
+        +updateRotation()
+    }
+
+    TelluricPlanet <|-- Planet
+    GasPlanet <|-- Planet
+    Star <|-- StellarObject
+    BlackHole <|-- StellarObject
+    NeutronStar <|-- StellarObject
+    Planet <|-- CelestialBody
+    StellarObject <|-- CelestialBody
+    CelestialBody <|-- OrbitalObject
+    SpaceStation <|-- OrbitalObject
+    OrbitalObject <|-- BoundingSphere
+    OrbitalObject <|-- Transformable
+
+```
 
 It all starts with simple `Transformable` and `BoundingSphere`:
 those are simple objects that possess a BaylonJS `TransformNode` for their position, rotation, scaling and a bounding volume to make simple calculations for distances.
@@ -30,7 +93,6 @@ To sum up, an `OrbitalObject` is an object that can rotate around another `Orbit
 `CelestialBody` builds up on top of `OrbitalObject` by adding the notion of `BODY_TYPE` and `radius` that is expected from spherical objects.
 
 `CelestialBody` are spherical orbital objects that encompasses both planets and stellar objects.
-They can have specific post-processes applied to them (like atmosphere, clouds, rings...), which is why they also implement `HasPostProcesses`.
 
 `StellarObject` builds on top of `CelestialBody` by adding a `PointLight` that is used to light up the scene. They also have a `STELLAR_TYPE` that describes their type (star, black hole, neutron star).
 

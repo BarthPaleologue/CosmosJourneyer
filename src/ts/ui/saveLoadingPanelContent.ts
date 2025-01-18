@@ -1,7 +1,13 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
 import i18n from "../i18n";
 import { createNotification, NotificationIntent, NotificationOrigin } from "../utils/notification";
-import { createUrlFromSave, getSavesFromLocalStorage, parseSaveFileData, SaveFileData, writeSavesToLocalStorage } from "../saveFile/saveFileData";
+import {
+    createUrlFromSave,
+    getSavesFromLocalStorage,
+    parseSaveFileData,
+    SaveFileData,
+    writeSavesToLocalStorage
+} from "../saveFile/saveFileData";
 import { Sounds } from "../assets/sounds";
 import expandIconPath from "../../asset/icons/expand.webp";
 import collapseIconPath from "../../asset/icons/collapse.webp";
@@ -12,6 +18,7 @@ import trashIconPath from "../../asset/icons/trash.webp";
 import shareIconPath from "../../asset/icons/link.webp";
 import { promptModalBoolean, promptModalString } from "../utils/dialogModal";
 import { getObjectModelByUniverseId } from "../utils/coordinates/orbitalObjectId";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 
 export class SaveLoadingPanelContent {
     readonly htmlRoot: HTMLElement;
@@ -86,7 +93,7 @@ export class SaveLoadingPanelContent {
         this.htmlRoot.appendChild(this.cmdrList);
     }
 
-    populateCmdrList() {
+    populateCmdrList(starSystemDatabase: StarSystemDatabase) {
         this.cmdrList.innerHTML = "";
 
         const saves = getSavesFromLocalStorage();
@@ -106,7 +113,8 @@ export class SaveLoadingPanelContent {
         cmdrUuids.sort((a, b) => {
             const aLatestSave = flatSortedSaves.get(a)?.at(0);
             const bLatestSave = flatSortedSaves.get(b)?.at(0);
-            if (aLatestSave === undefined || bLatestSave === undefined) throw new Error("aLatestSave or bLatestSave is undefined");
+            if (aLatestSave === undefined || bLatestSave === undefined)
+                throw new Error("aLatestSave or bLatestSave is undefined");
             return bLatestSave.timestamp - aLatestSave.timestamp;
         });
 
@@ -142,13 +150,22 @@ export class SaveLoadingPanelContent {
             cmdrLastPlayed.innerText = i18n.t("sidePanel:lastPlayedOn", {
                 val: new Date(latestSave.timestamp),
                 formatParams: {
-                    val: { weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric" }
+                    val: {
+                        weekday: "long",
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                        hour: "numeric",
+                        minute: "numeric"
+                    }
                 }
             });
             cmdrHeaderText.appendChild(cmdrLastPlayed);
 
             const cmdrPlayTime = document.createElement("p");
-            cmdrPlayTime.innerText = i18n.t("sidePanel:journeyedFor", { nbHours: Math.ceil(latestSave.player.timePlayedSeconds / 60 / 60) });
+            cmdrPlayTime.innerText = i18n.t("sidePanel:journeyedFor", {
+                nbHours: Math.ceil(latestSave.player.timePlayedSeconds / 60 / 60)
+            });
             cmdrHeaderText.appendChild(cmdrPlayTime);
 
             const cmdrHeaderButtons = document.createElement("div");
@@ -173,7 +190,12 @@ export class SaveLoadingPanelContent {
                 Sounds.MENU_SELECT_SOUND.play();
                 const url = createUrlFromSave(latestSave);
                 await navigator.clipboard.writeText(url.toString()).then(() => {
-                    createNotification(NotificationOrigin.GENERAL, NotificationIntent.SUCCESS, i18n.t("notifications:copiedToClipboard"), 5000);
+                    createNotification(
+                        NotificationOrigin.GENERAL,
+                        NotificationIntent.SUCCESS,
+                        i18n.t("notifications:copiedToClipboard"),
+                        5000
+                    );
                 });
             });
             cmdrHeaderButtons.appendChild(shareButton);
@@ -186,7 +208,10 @@ export class SaveLoadingPanelContent {
             editNameButton.classList.add("icon", "large");
             editNameButton.addEventListener("click", async () => {
                 Sounds.MENU_SELECT_SOUND.play();
-                const newName = await promptModalString(i18n.t("sidePanel:cmdrNameChangePrompt"), latestSave.player.name);
+                const newName = await promptModalString(
+                    i18n.t("sidePanel:cmdrNameChangePrompt"),
+                    latestSave.player.name
+                );
                 if (newName === null) return;
 
                 autoSaves.forEach((autoSave) => {
@@ -214,7 +239,7 @@ export class SaveLoadingPanelContent {
             cmdrDiv.appendChild(savesList);
 
             allSaves.forEach((save) => {
-                const saveDiv = this.createSaveDiv(save, autoSaves.includes(save));
+                const saveDiv = this.createSaveDiv(save, autoSaves.includes(save), starSystemDatabase);
                 savesList.appendChild(saveDiv);
             });
 
@@ -237,7 +262,11 @@ export class SaveLoadingPanelContent {
         });
     }
 
-    private createSaveDiv(save: SaveFileData, isAutoSave: boolean): HTMLElement {
+    private createSaveDiv(
+        save: SaveFileData,
+        isAutoSave: boolean,
+        starSystemDatabase: StarSystemDatabase
+    ): HTMLElement {
         const saveDiv = document.createElement("div");
         saveDiv.classList.add("saveContainer");
 
@@ -252,7 +281,7 @@ export class SaveLoadingPanelContent {
         const saveLocation = document.createElement("p");
         const isLanded = save.padNumber !== undefined;
         saveLocation.innerText = i18n.t(isLanded ? "sidePanel:landedAt" : "sidePanel:near", {
-            location: getObjectModelByUniverseId(save.universeCoordinates.universeObjectId).name,
+            location: getObjectModelByUniverseId(save.universeCoordinates.universeObjectId, starSystemDatabase).name,
             interpolation: {
                 escapeValue: false
             }
@@ -281,7 +310,12 @@ export class SaveLoadingPanelContent {
             Sounds.MENU_SELECT_SOUND.play();
             const url = createUrlFromSave(save);
             await navigator.clipboard.writeText(url.toString()).then(() => {
-                createNotification(NotificationOrigin.GENERAL, NotificationIntent.INFO, i18n.t("notifications:copiedToClipboard"), 5000);
+                createNotification(
+                    NotificationOrigin.GENERAL,
+                    NotificationIntent.INFO,
+                    i18n.t("notifications:copiedToClipboard"),
+                    5000
+                );
             });
         });
         saveButtons.appendChild(shareButton);
@@ -319,9 +353,13 @@ export class SaveLoadingPanelContent {
             const saves = getSavesFromLocalStorage();
 
             if (isAutoSave) {
-                saves[save.player.uuid].auto = saves[save.player.uuid].auto.filter((autoSave) => autoSave.timestamp !== save.timestamp);
+                saves[save.player.uuid].auto = saves[save.player.uuid].auto.filter(
+                    (autoSave) => autoSave.timestamp !== save.timestamp
+                );
             } else {
-                saves[save.player.uuid].manual = saves[save.player.uuid].manual.filter((manualSave) => manualSave.timestamp !== save.timestamp);
+                saves[save.player.uuid].manual = saves[save.player.uuid].manual.filter(
+                    (manualSave) => manualSave.timestamp !== save.timestamp
+                );
             }
 
             if (saves[save.player.uuid].auto.length === 0 && saves[save.player.uuid].manual.length === 0) {
@@ -349,7 +387,9 @@ export class SaveLoadingPanelContent {
                 if (event.target === null) throw new Error("event.target is null");
                 const data = event.target.result as string;
                 const loadingSaveData = parseSaveFileData(data);
-                loadingSaveData.logs.forEach((log) => createNotification(NotificationOrigin.GENERAL, NotificationIntent.WARNING, log, 60_000));
+                loadingSaveData.logs.forEach((log) =>
+                    createNotification(NotificationOrigin.GENERAL, NotificationIntent.WARNING, log, 60_000)
+                );
                 if (loadingSaveData.data === null) return;
                 resolve(loadingSaveData.data);
             };

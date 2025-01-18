@@ -16,11 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import shadowFragment from "../../shaders/shadowFragment.glsl";
-import { ObjectPostProcess } from "./objectPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { PostProcessType } from "./postProcessTypes";
 import { RingsSamplerNames, RingsUniformNames, RingsUniforms } from "../rings/ringsUniform";
-import { CelestialBody } from "../architecture/celestialBody";
 import { StellarObject } from "../architecture/stellarObject";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Camera } from "@babylonjs/core/Cameras/camera";
@@ -31,6 +28,8 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUniforms";
 import { Scene } from "@babylonjs/core/scene";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { CloudsUniforms } from "../clouds/cloudsUniforms";
 
 export type ShadowUniforms = {
     hasRings: boolean;
@@ -38,23 +37,30 @@ export type ShadowUniforms = {
     hasOcean: boolean;
 };
 
-export class ShadowPostProcess extends PostProcess implements ObjectPostProcess {
-    readonly object: CelestialBody;
+export class ShadowPostProcess extends PostProcess {
     readonly shadowUniforms: ShadowUniforms;
     readonly ringsUniforms: RingsUniforms | null;
 
     private activeCamera: Camera | null = null;
 
-    constructor(body: CelestialBody, stellarObjects: StellarObject[], scene: Scene) {
+    constructor(
+        transform: TransformNode,
+        boundingRadius: number,
+        ringsUniforms: RingsUniforms | null,
+        cloudsUniforms: CloudsUniforms | null,
+        hasOcean: boolean,
+        stellarObjects: StellarObject[],
+        scene: Scene
+    ) {
         const shaderName = "shadow";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = shadowFragment;
         }
 
         const shadowUniforms: ShadowUniforms = {
-            hasRings: body.ringsUniforms !== null,
-            hasClouds: body.postProcesses.includes(PostProcessType.CLOUDS),
-            hasOcean: body.postProcesses.includes(PostProcessType.OCEAN)
+            hasRings: ringsUniforms !== null,
+            hasClouds: cloudsUniforms !== null,
+            hasOcean: hasOcean
         };
 
         const ShadowUniformNames = {
@@ -75,7 +81,7 @@ export class ShadowPostProcess extends PostProcess implements ObjectPostProcess 
         const samplers: string[] = [...Object.values(SamplerUniformNames), ...Object.values(RingsSamplerNames)];
 
         super(
-            `${body.model.name}ShadowPostProcess`,
+            `${transform.name}ShadowPostProcess`,
             shaderName,
             uniforms,
             samplers,
@@ -88,9 +94,8 @@ export class ShadowPostProcess extends PostProcess implements ObjectPostProcess 
             Constants.TEXTURETYPE_HALF_FLOAT
         );
 
-        this.object = body;
         this.shadowUniforms = shadowUniforms;
-        this.ringsUniforms = body.ringsUniforms;
+        this.ringsUniforms = ringsUniforms;
 
         this.onActivateObservable.add((camera) => {
             this.activeCamera = camera;
@@ -103,7 +108,7 @@ export class ShadowPostProcess extends PostProcess implements ObjectPostProcess 
 
             setCameraUniforms(effect, this.activeCamera);
             setStellarObjectUniforms(effect, stellarObjects);
-            setObjectUniforms(effect, body);
+            setObjectUniforms(effect, transform, boundingRadius);
 
             effect.setFloatArray(
                 ShadowUniformNames.STAR_RADIUSES,

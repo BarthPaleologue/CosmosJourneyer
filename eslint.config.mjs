@@ -15,91 +15,125 @@ const compat = new FlatCompat({
     allConfig: js.configs.all
 });
 
-export default [{
-    ignores: ["src/ts/utils/TWGSL"],
-}, ...fixupConfigRules(compat.extends(
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:import/errors",
-    "plugin:import/warnings",
-    "plugin:import/typescript",
-)), {
-    plugins: {
-        "@typescript-eslint": fixupPluginRules(typescriptEslint),
+export default [
+    {
+        ignores: [
+            "src/ts/utils/TWGSL",
+            "node_modules",
+            "src-tauri",
+            "webpack.config.js",
+            "tsconfig.json",
+            "eslint.config.mjs",
+            "dist",
+            "docs",
+            "src/asset",
+            "coverage"
+        ]
     },
-
-    languageOptions: {
-        globals: {
-            ...globals.browser,
+    ...fixupConfigRules(
+        compat.extends(
+            "eslint:recommended",
+            "plugin:@typescript-eslint/recommended",
+            "plugin:import/errors",
+            "plugin:import/warnings",
+            "plugin:import/typescript"
+        )
+    ),
+    {
+        plugins: {
+            "@typescript-eslint": fixupPluginRules(typescriptEslint)
         },
 
-        parser: tsParser,
-        ecmaVersion: "latest",
-        sourceType: "module",
+        languageOptions: {
+            globals: {
+                ...globals.browser
+            },
 
-        parserOptions: {
-            project: "./tsconfig.json",
+            parser: tsParser,
+            ecmaVersion: "latest",
+            sourceType: "module",
+
+            parserOptions: {
+                project: "./tsconfig.json"
+            }
         },
-    },
 
-    rules: {
-        "import/no-cycle": "error",
-        "import/no-unresolved": "warn",
+        rules: {
+            "import/no-cycle": "error",
+            "import/no-unresolved": "warn",
 
-        "@typescript-eslint/switch-exhaustiveness-check": ["error", {
-            considerDefaultExhaustiveForUnions: true,
-        }],
+            "@typescript-eslint/switch-exhaustiveness-check": [
+                "error",
+                {
+                    considerDefaultExhaustiveForUnions: true
+                }
+            ],
 
-        "@typescript-eslint/no-floating-promises": "error",
+            "@typescript-eslint/no-floating-promises": "error",
+            "@typescript-eslint/no-inferrable-types": "warn",
+            "@typescript-eslint/no-unused-vars": "warn",
+            "@typescript-eslint/no-explicit-any": "warn",
+            eqeqeq: "error",
 
-        "@typescript-eslint/no-inferrable-types": "warn",
-        "@typescript-eslint/no-unused-vars": "warn",
-        "@typescript-eslint/no-explicit-any": "warn",
-        eqeqeq: "error",
+            "no-restricted-syntax": [
+                "error",
+                {
+                    selector: "TSEnumDeclaration:not([const=true])",
+                    message: "Don't declare non-const enums"
+                }
+            ],
 
-        "no-restricted-syntax": ["error", {
-            selector: "TSEnumDeclaration:not([const=true])",
-            message: "Don't declare non-const enums",
-        }],
-
-        "@typescript-eslint/naming-convention": ["error", {
-            selector: "enumMember",
-            format: ["UPPER_CASE"],
-        }, {
-            selector: "memberLike",
-            modifiers: ["public", "static"],
-            format: ["PascalCase", "UPPER_CASE"],
-            leadingUnderscore: "forbid",
-        }, {
-            selector: "memberLike",
-            modifiers: ["private", "static"],
-            format: ["PascalCase", "UPPER_CASE"],
-            leadingUnderscore: "forbid",
-        }, {
-            selector: "typeLike",
-            format: ["PascalCase"],
-        }, {
-            selector: "variable",
-            modifiers: ["exported", "const", "global"],
-            format: ["PascalCase"],
-            leadingUnderscore: "forbid",
-        }, {
-            selector: "function",
-            format: ["camelCase", "snake_case"],
-            leadingUnderscore: "forbid",
-        }, {
-            selector: "function",
-            modifiers: ["exported", "global"],
-            format: ["camelCase"],
-            leadingUnderscore: "forbid",
-        }, {
-            selector: "interface",
-            format: ["PascalCase"],
-            leadingUnderscore: "forbid",
-        }, {
-            selector: "class",
-            format: ["PascalCase"],
-            leadingUnderscore: "forbid",
-        }],
-    },
-}];
+            "@typescript-eslint/naming-convention": [
+                "error",
+                {
+                    selector: "enumMember",
+                    format: ["UPPER_CASE"]
+                },
+                {
+                    selector: "memberLike",
+                    modifiers: ["public", "static"],
+                    format: ["PascalCase", "UPPER_CASE"],
+                    leadingUnderscore: "forbid"
+                },
+                {
+                    selector: "memberLike",
+                    modifiers: ["private", "static"],
+                    format: ["PascalCase", "UPPER_CASE"],
+                    leadingUnderscore: "forbid"
+                },
+                {
+                    selector: "typeLike",
+                    format: ["PascalCase"]
+                },
+                {
+                    selector: "variable",
+                    modifiers: ["exported", "const", "global"],
+                    format: ["PascalCase"],
+                    leadingUnderscore: "forbid"
+                },
+                {
+                    selector: "function",
+                    format: ["camelCase", "snake_case"],
+                    leadingUnderscore: "forbid"
+                },
+                {
+                    selector: "function",
+                    modifiers: ["exported", "global"],
+                    format: ["camelCase"],
+                    leadingUnderscore: "forbid"
+                },
+                {
+                    selector: "interface",
+                    format: ["PascalCase"],
+                    leadingUnderscore: "forbid"
+                },
+                {
+                    selector: "class",
+                    format: ["PascalCase"],
+                    leadingUnderscore: "forbid"
+                }
+            ],
+            "@typescript-eslint/require-array-sort-compare": "error"
+        }
+    }
+];

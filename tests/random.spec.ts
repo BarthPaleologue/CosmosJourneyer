@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { pickPseudoRandomItems, randomPieChart } from "../src/ts/utils/random";
+import { expect, test } from "vitest";
 
 test("pickPseudoRandomItems", () => {
     const items = [0, 1, 2, 3, 4, 5];
@@ -37,14 +38,14 @@ test("pickPseudoRandomItems", () => {
 
 test("randomPieChart", () => {
     const rng = (index: number) => Math.random();
-    for(let i = 0; i < 1000; i++) {
-        const nbSlices = 1 + Math.floor(Math.random() * 20)
+    for (let i = 0; i < 1000; i++) {
+        const nbSlices = 1 + Math.floor(Math.random() * 20);
         const pieChart = randomPieChart(nbSlices, rng, 0);
 
         expect(pieChart.length).toBe(nbSlices);
 
         let sum = 0;
-        pieChart.forEach(slice => sum += slice);
+        pieChart.forEach((slice) => (sum += slice));
         expect(sum).toBeCloseTo(1.0);
     }
 });

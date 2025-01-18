@@ -16,25 +16,25 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 .colorPickerContainer {
-  display: block;
+    display: block;
 
-  p {
-    display: inline-block;
-    padding: 0 !important;
-  }
-
-  input {
-    -webkit-appearance: none;
-    border: none;
-    width: 32px;
-    height: 16px;
-
-    &::-webkit-color-swatch-wrapper {
-      padding: 0;
+    p {
+        display: inline-block;
+        padding: 0 !important;
     }
 
-    &::-webkit-color-swatch {
-      border: none;
+    input {
+        -webkit-appearance: none;
+        border: none;
+        width: 32px;
+        height: 16px;
+
+        &::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        &::-webkit-color-swatch {
+            border: none;
+        }
     }
-  }
 }

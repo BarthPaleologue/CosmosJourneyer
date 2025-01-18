@@ -5,7 +5,7 @@ import { getRngFromSeed } from "../utils/getRngFromSeed";
 import { generateSpaceElevatorName } from "../utils/strings/spaceStationNameGenerator";
 import { Orbit } from "../orbit/orbit";
 import { OrbitalObjectPhysicsInfo } from "../architecture/physicsInfo";
-import { getFactionFromCoordinates } from "../society/factions";
+import { getFactionFromGalacticPosition } from "../society/factions";
 import { randomPieChart } from "../utils/random";
 import { CropType, CropTypes, getEdibleEnergyPerHaPerDay } from "../utils/agriculture";
 import { getOrbitRadiusFromPeriod, getSphereRadiatedEnergyFlux } from "../utils/physics";
@@ -14,7 +14,7 @@ import { Settings } from "../settings";
 import { OrbitalObjectType } from "../architecture/orbitalObject";
 
 import { OrbitalFacilityModel } from "./orbitalFacility";
-import { Quaternion } from "@babylonjs/core/Maths/math";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math";
 
 export type SpaceElevatorModel = OrbitalFacilityModel & {
     readonly type: OrbitalObjectType.SPACE_ELEVATOR;
@@ -26,6 +26,7 @@ export function newSeededSpaceElevatorModel(
     seed: number,
     stellarObjectModels: StellarObjectModel[],
     starSystemCoordinates: StarSystemCoordinates,
+    starSystemPosition: Vector3,
     parentBody: CelestialBodyModel
 ): SpaceElevatorModel {
     const rng = getRngFromSeed(seed);
@@ -53,7 +54,7 @@ export function newSeededSpaceElevatorModel(
         axialTilt: parentAxialTilt
     };
 
-    const faction = getFactionFromCoordinates(starSystemCoordinates, rng);
+    const faction = getFactionFromGalacticPosition(starSystemPosition, rng);
 
     //TODO: make this dependent on economic model
     const population = 2_000_000;
@@ -74,14 +75,19 @@ export function newSeededSpaceElevatorModel(
         const exposureTimeFraction = 0.5;
         const starRadius = stellarObject.radius;
         const starTemperature = stellarObject.physics.blackBodyTemperature;
-        totalStellarFlux += getSphereRadiatedEnergyFlux(starTemperature, starRadius, distanceToStar) * exposureTimeFraction;
+        totalStellarFlux +=
+            getSphereRadiatedEnergyFlux(starTemperature, starRadius, distanceToStar) * exposureTimeFraction;
     });
 
     const totalEnergyConsumptionKWh = population * energyConsumptionPerCapitaKWh;
 
     const solarPanelEfficiency = 0.4;
 
-    const solarPanelSurfaceM2 = getSolarPanelSurfaceFromEnergyRequirement(solarPanelEfficiency, totalEnergyConsumptionKWh, totalStellarFlux);
+    const solarPanelSurfaceM2 = getSolarPanelSurfaceFromEnergyRequirement(
+        solarPanelEfficiency,
+        totalEnergyConsumptionKWh,
+        totalStellarFlux
+    );
 
     const housingSurfaceHa = (100 * population) / populationDensity; // convert km² to ha
     let agricultureSurfaceHa = 0;

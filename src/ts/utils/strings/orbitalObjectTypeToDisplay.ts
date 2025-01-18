@@ -36,7 +36,9 @@ export function getOrbitalObjectTypeToI18nString(model: OrbitalObjectModel): str
         case OrbitalObjectType.SPACE_ELEVATOR:
             return i18n.t("objectTypes:spaceElevator");
         case OrbitalObjectType.STAR:
-            return i18n.t("objectTypes:star", { stellarType: getStellarTypeFromTemperature((model as StellarObjectModel).physics.blackBodyTemperature) });
+            return i18n.t("objectTypes:star", {
+                stellarType: getStellarTypeFromTemperature((model as StellarObjectModel).physics.blackBodyTemperature)
+            });
         case OrbitalObjectType.NEUTRON_STAR:
             return i18n.t("objectTypes:neutronStar");
         case OrbitalObjectType.BLACK_HOLE:

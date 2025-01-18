@@ -40,7 +40,11 @@ export function getAngularSize(objectPosition: Vector3, objectRadius: number, ca
  * @returns Whether the object is bigger than the threshold
  */
 export function isSizeOnScreenEnough(object: HasBoundingSphere & Transformable, camera: Camera, threshold = 0.005) {
-    const angularSize = getAngularSize(object.getTransform().getAbsolutePosition(), object.getBoundingRadius(), camera.globalPosition);
+    const angularSize = getAngularSize(
+        object.getTransform().getAbsolutePosition(),
+        object.getBoundingRadius(),
+        camera.globalPosition
+    );
 
     return angularSize / camera.fov > threshold;
 }
