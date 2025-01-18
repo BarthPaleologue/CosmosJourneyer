@@ -37,7 +37,13 @@ export class FlatCloudsPostProcess extends PostProcess implements UpdatablePostP
 
     private activeCamera: Camera | null = null;
 
-    constructor(planetTransform: TransformNode, boundingRadius: number, cloudUniforms: CloudsUniforms, stellarObjects: Transformable[], scene: Scene) {
+    constructor(
+        planetTransform: TransformNode,
+        boundingRadius: number,
+        cloudUniforms: CloudsUniforms,
+        stellarObjects: Transformable[],
+        scene: Scene
+    ) {
         const shaderName = "flatClouds";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = flatCloudsFragment;

@@ -21,7 +21,12 @@ import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { getBackwardDirection, getForwardDirection, getLeftDirection, getRightDirection } from "../src/ts/uberCore/transforms/basicTransform";
+import {
+    getBackwardDirection,
+    getForwardDirection,
+    getLeftDirection,
+    getRightDirection
+} from "../src/ts/uberCore/transforms/basicTransform";
 import { expect, describe, it } from "vitest";
 
 const engine = new NullEngine();

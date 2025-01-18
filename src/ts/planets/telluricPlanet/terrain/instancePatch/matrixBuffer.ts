@@ -79,7 +79,13 @@ export function decomposeModelMatrix(matrix: Float32Array, position: Vector3, ro
     const rotationMatrix = Matrix.Identity();
     rotationMatrix.setRowFromFloats(0, matrix[0] / uniformScale, matrix[1] / uniformScale, matrix[2] / uniformScale, 0);
     rotationMatrix.setRowFromFloats(1, matrix[4] / uniformScale, matrix[5] / uniformScale, matrix[6] / uniformScale, 0);
-    rotationMatrix.setRowFromFloats(2, matrix[8] / uniformScale, matrix[9] / uniformScale, matrix[10] / uniformScale, 0);
+    rotationMatrix.setRowFromFloats(
+        2,
+        matrix[8] / uniformScale,
+        matrix[9] / uniformScale,
+        matrix[10] / uniformScale,
+        0
+    );
     rotationMatrix.setRowFromFloats(3, 0, 0, 0, 1);
 
     rotation.copyFrom(Quaternion.FromRotationMatrix(rotationMatrix));

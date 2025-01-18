@@ -56,7 +56,11 @@ export class StarSectorView {
         this.coordinates = coordinates;
         this.position = coordinates.scale(Settings.STAR_SECTOR_SIZE);
 
-        this.systemModels = starSystemDatabase.getSystemModelsInStarSector(this.coordinates.x, this.coordinates.y, this.coordinates.z);
+        this.systemModels = starSystemDatabase.getSystemModelsInStarSector(
+            this.coordinates.x,
+            this.coordinates.y,
+            this.coordinates.z
+        );
         this.systemPositions = this.systemModels.map((systemModel) => {
             return starSystemDatabase.getSystemGalacticPosition(systemModel.coordinates);
         });
@@ -85,7 +89,11 @@ export class StarSectorView {
         return new BoundingBox(
             new Vector3(-1, -1, -1).scaleInPlace(Settings.STAR_SECTOR_SIZE / 2),
             new Vector3(1, 1, 1).scaleInPlace(Settings.STAR_SECTOR_SIZE / 2),
-            Matrix.Translation(position.x + globalNodePosition.x, position.y + globalNodePosition.y, position.z + globalNodePosition.z)
+            Matrix.Translation(
+                position.x + globalNodePosition.x,
+                position.y + globalNodePosition.y,
+                position.z + globalNodePosition.z
+            )
         );
     }
 }

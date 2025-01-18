@@ -87,7 +87,8 @@ export class GasPlanet implements Planet, Cullable {
         this.material = new GasPlanetMaterial(this.model.name, this.model, scene);
         this.mesh.material = this.material;
 
-        const atmosphereThickness = Settings.EARTH_ATMOSPHERE_THICKNESS * Math.max(1, this.model.radius / Settings.EARTH_RADIUS);
+        const atmosphereThickness =
+            Settings.EARTH_ATMOSPHERE_THICKNESS * Math.max(1, this.model.radius / Settings.EARTH_RADIUS);
         this.atmosphereUniforms = new AtmosphereUniforms(this.getBoundingRadius(), atmosphereThickness);
 
         if (this.model.rings !== null) {
@@ -95,7 +96,13 @@ export class GasPlanet implements Planet, Cullable {
 
             const averageRadius = (this.model.radius * (this.model.rings.ringStart + this.model.rings.ringEnd)) / 2;
             const spread = (this.model.radius * (this.model.rings.ringEnd - this.model.rings.ringStart)) / 2;
-            this.asteroidField = new AsteroidField(this.model.rings.seed, this.getTransform(), averageRadius, spread, scene);
+            this.asteroidField = new AsteroidField(
+                this.model.rings.seed,
+                this.getTransform(),
+                averageRadius,
+                spread,
+                scene
+            );
         } else {
             this.ringsUniforms = null;
             this.asteroidField = null;

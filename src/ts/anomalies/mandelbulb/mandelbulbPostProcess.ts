@@ -23,7 +23,10 @@ import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { ObjectUniformNames, setObjectUniforms } from "../../postProcesses/uniforms/objectUniforms";
 import { CameraUniformNames, setCameraUniforms } from "../../postProcesses/uniforms/cameraUniforms";
-import { setStellarObjectUniforms, StellarObjectUniformNames } from "../../postProcesses/uniforms/stellarObjectUniforms";
+import {
+    setStellarObjectUniforms,
+    StellarObjectUniformNames
+} from "../../postProcesses/uniforms/stellarObjectUniforms";
 import { SamplerUniformNames, setSamplerUniforms } from "../../postProcesses/uniforms/samplerUniforms";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
@@ -42,7 +45,13 @@ export class MandelbulbPostProcess extends PostProcess implements UpdatablePostP
 
     private activeCamera: Camera | null = null;
 
-    constructor(transform: TransformNode, boundingRadius: number, mandelbulbModel: MandelbulbModel, scene: Scene, stellarObjects: StellarObject[]) {
+    constructor(
+        transform: TransformNode,
+        boundingRadius: number,
+        mandelbulbModel: MandelbulbModel,
+        scene: Scene,
+        stellarObjects: StellarObject[]
+    ) {
         const shaderName = "mandelbulb";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = mandelbulbFragment;
@@ -67,7 +76,19 @@ export class MandelbulbPostProcess extends PostProcess implements UpdatablePostP
 
         const samplers: string[] = Object.values(SamplerUniformNames);
 
-        super(transform.name, shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
+        super(
+            transform.name,
+            shaderName,
+            uniforms,
+            samplers,
+            1,
+            null,
+            Texture.BILINEAR_SAMPLINGMODE,
+            scene.getEngine(),
+            false,
+            null,
+            Constants.TEXTURETYPE_HALF_FLOAT
+        );
 
         this.settings = settings;
 

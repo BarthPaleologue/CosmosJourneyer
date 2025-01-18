@@ -62,7 +62,15 @@ function handle_build(data: TransferBuildData): void {
         terrain_settings
     );
 
-    const result = build_chunk_vertex_data(buildData, verticesPositions, indices, normals, instances_matrix_buffer, aligned_instances_matrix_buffer, scatter_per_square_meter);
+    const result = build_chunk_vertex_data(
+        buildData,
+        verticesPositions,
+        indices,
+        normals,
+        instances_matrix_buffer,
+        aligned_instances_matrix_buffer,
+        scatter_per_square_meter
+    );
 
     instances_matrix_buffer = instances_matrix_buffer.subarray(0, result.nb_instances_created * 16);
     aligned_instances_matrix_buffer = aligned_instances_matrix_buffer.subarray(0, result.nb_instances_created * 16);
@@ -77,7 +85,13 @@ function handle_build(data: TransferBuildData): void {
             averageHeight: result.average_height
         } as ReturnedChunkData,
         {
-            transfer: [verticesPositions.buffer, indices.buffer, normals.buffer, instances_matrix_buffer.buffer, aligned_instances_matrix_buffer.buffer]
+            transfer: [
+                verticesPositions.buffer,
+                indices.buffer,
+                normals.buffer,
+                instances_matrix_buffer.buffer,
+                aligned_instances_matrix_buffer.buffer
+            ]
         }
     );
 

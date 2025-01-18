@@ -29,14 +29,28 @@ export class PhysicPanel extends EditorPanel {
         for (const slider of this.sliders) slider.remove();
 
         this.sliders = [
-            new Slider("minTemperature", document.getElementById("minTemperature") as HTMLElement, -273, 300, kelvinToCelsius(planetPhysics.minTemperature), (val: number) => {
-                planetPhysics.minTemperature = celsiusToKelvin(val);
-                planetMaterial.updateConstants();
-            }),
-            new Slider("maxTemperature", document.getElementById("maxTemperature") as HTMLElement, -273, 300, kelvinToCelsius(planetPhysics.maxTemperature), (val: number) => {
-                planetPhysics.maxTemperature = celsiusToKelvin(val);
-                planetMaterial.updateConstants();
-            })
+            new Slider(
+                "minTemperature",
+                document.getElementById("minTemperature") as HTMLElement,
+                -273,
+                300,
+                kelvinToCelsius(planetPhysics.minTemperature),
+                (val: number) => {
+                    planetPhysics.minTemperature = celsiusToKelvin(val);
+                    planetMaterial.updateConstants();
+                }
+            ),
+            new Slider(
+                "maxTemperature",
+                document.getElementById("maxTemperature") as HTMLElement,
+                -273,
+                300,
+                kelvinToCelsius(planetPhysics.maxTemperature),
+                (val: number) => {
+                    planetPhysics.maxTemperature = celsiusToKelvin(val);
+                    planetMaterial.updateConstants();
+                }
+            )
         ];
     }
 }

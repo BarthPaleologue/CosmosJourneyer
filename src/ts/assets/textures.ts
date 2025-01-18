@@ -130,53 +130,90 @@ export class Textures {
     static LANDING_PAD_NUMBER_TEXTURES: DynamicTexture[] = [];
 
     static EnqueueTasks(manager: AssetsManager, scene: Scene) {
-        manager.addTextureTask("RockNormalMetallicMap", rockNormalMetallicMap).onSuccess = (task) => (Textures.ROCK_NORMAL_METALLIC_MAP = task.texture);
-        manager.addTextureTask("RockAlbedoRoughnessMap", rockAlbedoRoughnessMap).onSuccess = (task) => (Textures.ROCK_ALBEDO_ROUGHNESS_MAP = task.texture);
+        manager.addTextureTask("RockNormalMetallicMap", rockNormalMetallicMap).onSuccess = (task) =>
+            (Textures.ROCK_NORMAL_METALLIC_MAP = task.texture);
+        manager.addTextureTask("RockAlbedoRoughnessMap", rockAlbedoRoughnessMap).onSuccess = (task) =>
+            (Textures.ROCK_ALBEDO_ROUGHNESS_MAP = task.texture);
 
-        manager.addTextureTask("GrassNormalMetallicMap", grassNormalMetallicMap).onSuccess = (task) => (Textures.GRASS_NORMAL_METALLIC_MAP = task.texture);
-        manager.addTextureTask("GrassAlbedoRoughnessMap", grassAlbedoRoughnessMap).onSuccess = (task) => (Textures.GRASS_ALBEDO_ROUGHNESS_MAP = task.texture);
+        manager.addTextureTask("GrassNormalMetallicMap", grassNormalMetallicMap).onSuccess = (task) =>
+            (Textures.GRASS_NORMAL_METALLIC_MAP = task.texture);
+        manager.addTextureTask("GrassAlbedoRoughnessMap", grassAlbedoRoughnessMap).onSuccess = (task) =>
+            (Textures.GRASS_ALBEDO_ROUGHNESS_MAP = task.texture);
 
-        manager.addTextureTask("SnowNormalMetallicMap", snowNormalMetallicMap).onSuccess = (task) => (Textures.SNOW_NORMAL_METALLIC_MAP = task.texture);
-        manager.addTextureTask("SnowAlbedoRoughness", snowAlbedoRoughnessMap).onSuccess = (task) => (Textures.SNOW_ALBEDO_ROUGHNESS_MAP = task.texture);
+        manager.addTextureTask("SnowNormalMetallicMap", snowNormalMetallicMap).onSuccess = (task) =>
+            (Textures.SNOW_NORMAL_METALLIC_MAP = task.texture);
+        manager.addTextureTask("SnowAlbedoRoughness", snowAlbedoRoughnessMap).onSuccess = (task) =>
+            (Textures.SNOW_ALBEDO_ROUGHNESS_MAP = task.texture);
 
-        manager.addTextureTask("SandNormalMetallicMap", sandNormalMetallicMap).onSuccess = (task) => (Textures.SAND_NORMAL_METALLIC_MAP = task.texture);
-        manager.addTextureTask("SandAlbedoRoughnessMap", sandAlbedoRoughnessMap).onSuccess = (task) => (Textures.SAND_ALBEDO_ROUGHNESS_MAP = task.texture);
+        manager.addTextureTask("SandNormalMetallicMap", sandNormalMetallicMap).onSuccess = (task) =>
+            (Textures.SAND_NORMAL_METALLIC_MAP = task.texture);
+        manager.addTextureTask("SandAlbedoRoughnessMap", sandAlbedoRoughnessMap).onSuccess = (task) =>
+            (Textures.SAND_ALBEDO_ROUGHNESS_MAP = task.texture);
 
-        manager.addTextureTask("WaterNormalMap1", waterNormal1).onSuccess = (task) => (Textures.WATER_NORMAL_MAP_1 = task.texture);
-        manager.addTextureTask("WaterNormalMap2", waterNormal2).onSuccess = (task) => (Textures.WATER_NORMAL_MAP_2 = task.texture);
+        manager.addTextureTask("WaterNormalMap1", waterNormal1).onSuccess = (task) =>
+            (Textures.WATER_NORMAL_MAP_1 = task.texture);
+        manager.addTextureTask("WaterNormalMap2", waterNormal2).onSuccess = (task) =>
+            (Textures.WATER_NORMAL_MAP_2 = task.texture);
 
-        manager.addTextureTask("PlumeParticle", plumeParticle).onSuccess = (task) => (Textures.PLUME_PARTICLE = task.texture);
-        manager.addTextureTask("FlareTexture", flareParticle).onSuccess = (task) => (Textures.FLARE_TEXTURE = task.texture);
+        manager.addTextureTask("PlumeParticle", plumeParticle).onSuccess = (task) =>
+            (Textures.PLUME_PARTICLE = task.texture);
+        manager.addTextureTask("FlareTexture", flareParticle).onSuccess = (task) =>
+            (Textures.FLARE_TEXTURE = task.texture);
 
         manager.addTextureTask("Butterfly", butterflyTexture).onSuccess = (task) => (Textures.BUTTERFLY = task.texture);
 
-        manager.addTextureTask("SeamlessPerlin", seamlessPerlin).onSuccess = (task) => (Textures.SEAMLESS_PERLIN = task.texture);
+        manager.addTextureTask("SeamlessPerlin", seamlessPerlin).onSuccess = (task) =>
+            (Textures.SEAMLESS_PERLIN = task.texture);
 
-        manager.addTextureTask("SolarPanelAlbedo", solarPanelAlbedo).onSuccess = (task) => (Textures.SOLAR_PANEL_ALBEDO = task.texture);
-        manager.addTextureTask("SolarPanelNormal", solarPanelNormal).onSuccess = (task) => (Textures.SOLAR_PANEL_NORMAL = task.texture);
-        manager.addTextureTask("SolarPanelMetallic", solarPanelMetallic).onSuccess = (task) => (Textures.SOLAR_PANEL_METALLIC = task.texture);
-        manager.addTextureTask("SolarPanelRoughness", solarPanelRoughness).onSuccess = (task) => (Textures.SOLAR_PANEL_ROUGHNESS = task.texture);
+        manager.addTextureTask("SolarPanelAlbedo", solarPanelAlbedo).onSuccess = (task) =>
+            (Textures.SOLAR_PANEL_ALBEDO = task.texture);
+        manager.addTextureTask("SolarPanelNormal", solarPanelNormal).onSuccess = (task) =>
+            (Textures.SOLAR_PANEL_NORMAL = task.texture);
+        manager.addTextureTask("SolarPanelMetallic", solarPanelMetallic).onSuccess = (task) =>
+            (Textures.SOLAR_PANEL_METALLIC = task.texture);
+        manager.addTextureTask("SolarPanelRoughness", solarPanelRoughness).onSuccess = (task) =>
+            (Textures.SOLAR_PANEL_ROUGHNESS = task.texture);
 
-        manager.addTextureTask("SpaceStationAlbedo", spaceStationAlbedo).onSuccess = (task) => (Textures.SPACE_STATION_ALBEDO = task.texture);
-        manager.addTextureTask("SpaceStationNormal", spaceStationNormal).onSuccess = (task) => (Textures.SPACE_STATION_NORMAL = task.texture);
-        manager.addTextureTask("SpaceStationMetallic", spaceStationMetallic).onSuccess = (task) => (Textures.SPACE_STATION_METALLIC = task.texture);
-        manager.addTextureTask("SpaceStationRoughness", spaceStationRoughness).onSuccess = (task) => (Textures.SPACE_STATION_ROUGHNESS = task.texture);
-        manager.addTextureTask("SpaceStationAmbientOcclusion", spaceStationAmbientOcclusion).onSuccess = (task) => (Textures.SPACE_STATION_AMBIENT_OCCLUSION = task.texture);
+        manager.addTextureTask("SpaceStationAlbedo", spaceStationAlbedo).onSuccess = (task) =>
+            (Textures.SPACE_STATION_ALBEDO = task.texture);
+        manager.addTextureTask("SpaceStationNormal", spaceStationNormal).onSuccess = (task) =>
+            (Textures.SPACE_STATION_NORMAL = task.texture);
+        manager.addTextureTask("SpaceStationMetallic", spaceStationMetallic).onSuccess = (task) =>
+            (Textures.SPACE_STATION_METALLIC = task.texture);
+        manager.addTextureTask("SpaceStationRoughness", spaceStationRoughness).onSuccess = (task) =>
+            (Textures.SPACE_STATION_ROUGHNESS = task.texture);
+        manager.addTextureTask("SpaceStationAmbientOcclusion", spaceStationAmbientOcclusion).onSuccess = (task) =>
+            (Textures.SPACE_STATION_AMBIENT_OCCLUSION = task.texture);
 
-        manager.addTextureTask("MetalPanelsAlbedo", metalPanelsAlbdeo).onSuccess = (task) => (Textures.METAL_PANELS_ALBEDO = task.texture);
-        manager.addTextureTask("MetalPanelsNormal", metalPanelsNormal).onSuccess = (task) => (Textures.METAL_PANELS_NORMAL = task.texture);
-        manager.addTextureTask("MetalPanelsMetallic", metalPanelsMetallic).onSuccess = (task) => (Textures.METAL_PANELS_METALLIC = task.texture);
-        manager.addTextureTask("MetalPanelsRoughness", metalPanelsRoughness).onSuccess = (task) => (Textures.METAL_PANELS_ROUGHNESS = task.texture);
-        manager.addTextureTask("MetalPanelsAmbientOcclusion", metalPanelsAmbientOcclusion).onSuccess = (task) => (Textures.METAL_PANELS_AMBIENT_OCCLUSION = task.texture);
+        manager.addTextureTask("MetalPanelsAlbedo", metalPanelsAlbdeo).onSuccess = (task) =>
+            (Textures.METAL_PANELS_ALBEDO = task.texture);
+        manager.addTextureTask("MetalPanelsNormal", metalPanelsNormal).onSuccess = (task) =>
+            (Textures.METAL_PANELS_NORMAL = task.texture);
+        manager.addTextureTask("MetalPanelsMetallic", metalPanelsMetallic).onSuccess = (task) =>
+            (Textures.METAL_PANELS_METALLIC = task.texture);
+        manager.addTextureTask("MetalPanelsRoughness", metalPanelsRoughness).onSuccess = (task) =>
+            (Textures.METAL_PANELS_ROUGHNESS = task.texture);
+        manager.addTextureTask("MetalPanelsAmbientOcclusion", metalPanelsAmbientOcclusion).onSuccess = (task) =>
+            (Textures.METAL_PANELS_AMBIENT_OCCLUSION = task.texture);
 
         manager.addTextureTask("CrateAlbedo", crateAlbedo).onSuccess = (task) => (Textures.CRATE_ALBEDO = task.texture);
         manager.addTextureTask("CrateNormal", crateNormal).onSuccess = (task) => (Textures.CRATE_NORMAL = task.texture);
-        manager.addTextureTask("CrateMetallicRoughness", crateMetallicRoughness).onSuccess = (task) => (Textures.CRATE_METALLIC_ROUGHNESS = task.texture);
-        manager.addTextureTask("CrateAmbientOcclusion", crateAmbientOcclusion).onSuccess = (task) => (Textures.CRATE_AMBIENT_OCCLUSION = task.texture);
+        manager.addTextureTask("CrateMetallicRoughness", crateMetallicRoughness).onSuccess = (task) =>
+            (Textures.CRATE_METALLIC_ROUGHNESS = task.texture);
+        manager.addTextureTask("CrateAmbientOcclusion", crateAmbientOcclusion).onSuccess = (task) =>
+            (Textures.CRATE_AMBIENT_OCCLUSION = task.texture);
 
         manager.addCubeTextureTask("SkyBox", skyBox).onSuccess = (task) => (Textures.MILKY_WAY = task.texture);
 
-        Textures.ATMOSPHERE_LUT = new ProceduralTexture("atmosphereLUT", 100, { fragmentSource: atmosphereLUT }, scene, undefined, false, false);
+        Textures.ATMOSPHERE_LUT = new ProceduralTexture(
+            "atmosphereLUT",
+            100,
+            { fragmentSource: atmosphereLUT },
+            scene,
+            undefined,
+            false,
+            false
+        );
         Textures.ATMOSPHERE_LUT.refreshRate = 0;
 
         this.CURSOR_IMAGE_URL = cursorImage;

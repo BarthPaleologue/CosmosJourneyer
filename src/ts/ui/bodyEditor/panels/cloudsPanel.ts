@@ -41,24 +41,66 @@ export class CloudsPanel extends EditorPanel {
             cloudUniforms.model.color = Color3.FromHexString(cloudColorPicker.value);
         });
         this.sliders = [
-            new Slider("cloudFrequency", document.getElementById("cloudFrequency") as HTMLElement, 0, 20, cloudUniforms.model.frequency, (val: number) => {
-                cloudUniforms.model.frequency = val;
-            }),
-            new Slider("cloudDetailFrequency", document.getElementById("cloudDetailFrequency") as HTMLElement, 0, 50, cloudUniforms.model.detailFrequency, (val: number) => {
-                cloudUniforms.model.detailFrequency = val;
-            }),
-            new Slider("cloudCoverage", document.getElementById("cloudCoverage") as HTMLElement, 0, 200, 100 + cloudUniforms.model.coverage * 100, (val: number) => {
-                cloudUniforms.model.coverage = (val - 100) / 100;
-            }),
-            new Slider("cloudSharpness", document.getElementById("cloudSharpness") as HTMLElement, 1, 100, cloudUniforms.model.sharpness * 10, (val: number) => {
-                cloudUniforms.model.sharpness = val / 10;
-            }),
-            new Slider("worleySpeed", document.getElementById("worleySpeed") as HTMLElement, 0.0, 200.0, cloudUniforms.model.worleySpeed * 10000, (val: number) => {
-                cloudUniforms.model.worleySpeed = val / 10000;
-            }),
-            new Slider("detailSpeed", document.getElementById("detailSpeed") as HTMLElement, 0, 200, cloudUniforms.model.detailSpeed * 10000, (val: number) => {
-                cloudUniforms.model.detailSpeed = val / 10000;
-            })
+            new Slider(
+                "cloudFrequency",
+                document.getElementById("cloudFrequency") as HTMLElement,
+                0,
+                20,
+                cloudUniforms.model.frequency,
+                (val: number) => {
+                    cloudUniforms.model.frequency = val;
+                }
+            ),
+            new Slider(
+                "cloudDetailFrequency",
+                document.getElementById("cloudDetailFrequency") as HTMLElement,
+                0,
+                50,
+                cloudUniforms.model.detailFrequency,
+                (val: number) => {
+                    cloudUniforms.model.detailFrequency = val;
+                }
+            ),
+            new Slider(
+                "cloudCoverage",
+                document.getElementById("cloudCoverage") as HTMLElement,
+                0,
+                200,
+                100 + cloudUniforms.model.coverage * 100,
+                (val: number) => {
+                    cloudUniforms.model.coverage = (val - 100) / 100;
+                }
+            ),
+            new Slider(
+                "cloudSharpness",
+                document.getElementById("cloudSharpness") as HTMLElement,
+                1,
+                100,
+                cloudUniforms.model.sharpness * 10,
+                (val: number) => {
+                    cloudUniforms.model.sharpness = val / 10;
+                }
+            ),
+            new Slider(
+                "worleySpeed",
+                document.getElementById("worleySpeed") as HTMLElement,
+                0.0,
+                200.0,
+                cloudUniforms.model.worleySpeed * 10000,
+                (val: number) => {
+                    cloudUniforms.model.worleySpeed = val / 10000;
+                }
+            ),
+            new Slider(
+                "detailSpeed",
+                document.getElementById("detailSpeed") as HTMLElement,
+                0,
+                200,
+                cloudUniforms.model.detailSpeed * 10000,
+                (val: number) => {
+                    cloudUniforms.model.detailSpeed = val / 10000;
+                }
+            )
         ];
     }
 }

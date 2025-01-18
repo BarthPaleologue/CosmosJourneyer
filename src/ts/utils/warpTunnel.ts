@@ -143,7 +143,8 @@ export class WarpTunnel implements Transformable {
                 return particle;
             }
 
-            const progression = 1.0 - RangeToPercent(localZ, -WarpTunnel.TUNNEL_LENGTH / 2, WarpTunnel.TUNNEL_LENGTH / 2);
+            const progression =
+                1.0 - RangeToPercent(localZ, -WarpTunnel.TUNNEL_LENGTH / 2, WarpTunnel.TUNNEL_LENGTH / 2);
 
             if (progression < 0.5) {
                 const t = progression / 0.5;
@@ -180,7 +181,9 @@ export class WarpTunnel implements Transformable {
 
     private updateGlobals() {
         this.particleRotationQuaternion.copyFrom(this.anchor.absoluteRotationQuaternion);
-        this.particleDirection.copyFrom(this.parent.getAbsolutePosition().subtract(this.anchor.getAbsolutePosition()).normalize());
+        this.particleDirection.copyFrom(
+            this.parent.getAbsolutePosition().subtract(this.anchor.getAbsolutePosition()).normalize()
+        );
 
         this.tunnelAxis1.copyFrom(this.particleDirection.add(new Vector3(Math.random(), Math.random(), Math.random())));
         this.tunnelAxis1.subtractInPlace(this.particleDirection.scale(this.tunnelAxis1.dot(this.particleDirection)));
@@ -219,7 +222,11 @@ export class WarpTunnel implements Transformable {
 
             this.emitCounter += deltaSeconds;
 
-            while (this.emitCounter > this.emitPeriod && this.nbParticlesAlive < this.targetNbParticles && this.recycledParticles.length > 0) {
+            while (
+                this.emitCounter > this.emitPeriod &&
+                this.nbParticlesAlive < this.targetNbParticles &&
+                this.recycledParticles.length > 0
+            ) {
                 this.emitCounter -= this.emitPeriod;
                 this.instanceFromStock();
                 this.nbParticlesAlive++;
@@ -240,7 +247,8 @@ export class WarpTunnel implements Transformable {
 
     setThrottle(throttle: number) {
         this.throttle = throttle;
-        this.targetNbParticles = throttle === 0 ? 0 : Math.floor(Math.max(this.throttle, 0.1) * WarpTunnel.MAX_NB_PARTICLES);
+        this.targetNbParticles =
+            throttle === 0 ? 0 : Math.floor(Math.max(this.throttle, 0.1) * WarpTunnel.MAX_NB_PARTICLES);
     }
 
     getTransform(): TransformNode {

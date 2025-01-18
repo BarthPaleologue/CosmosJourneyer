@@ -86,7 +86,9 @@ export class SpaceStationLayer {
 
         this.playerName = document.querySelector<HTMLElement>("#spaceStationUI .playerName h2") as HTMLElement;
 
-        this.editPlayerNameButton = document.querySelector<HTMLElement>("#spaceStationUI .playerName button") as HTMLElement;
+        this.editPlayerNameButton = document.querySelector<HTMLElement>(
+            "#spaceStationUI .playerName button"
+        ) as HTMLElement;
         this.editPlayerNameButton.addEventListener("click", async () => {
             Sounds.MENU_SELECT_SOUND.play();
             const newName = await promptModalString(i18n.t("spaceStation:cmdrNameChangePrompt"), player.getName());
@@ -118,7 +120,9 @@ export class SpaceStationLayer {
             await this.setMainPanelState(MainPanelState.SPACE_SHIP, player, starSystemDatabase);
         });
 
-        const explorationCenterButton = document.querySelector<HTMLElement>(".spaceStationAction.explorationCenterButton");
+        const explorationCenterButton = document.querySelector<HTMLElement>(
+            ".spaceStationAction.explorationCenterButton"
+        );
         if (explorationCenterButton === null) {
             throw new Error("Exploration center button not found");
         }

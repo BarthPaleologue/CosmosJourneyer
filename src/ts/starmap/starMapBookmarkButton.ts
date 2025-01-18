@@ -28,7 +28,9 @@ export class StarMapBookmarkButton {
                 this.rootNode.classList.add("bookmarked");
                 this.rootNode.textContent = i18n.t("starMap:bookmarked");
             } else {
-                this.player.systemBookmarks = this.player.systemBookmarks.filter((bookmark) => !starSystemCoordinatesEquals(bookmark, currentSystemSeed));
+                this.player.systemBookmarks = this.player.systemBookmarks.filter(
+                    (bookmark) => !starSystemCoordinatesEquals(bookmark, currentSystemSeed)
+                );
                 this.rootNode.classList.remove("bookmarked");
                 this.rootNode.textContent = i18n.t("starMap:bookmark");
             }
@@ -39,8 +41,13 @@ export class StarMapBookmarkButton {
 
     setSelectedSystemSeed(starSystemCoordinates: StarSystemCoordinates) {
         this.selectedSystemCoordinates = starSystemCoordinates;
-        this.isSelectedSystemBookmarked = this.player.systemBookmarks.find((bookmark) => starSystemCoordinatesEquals(bookmark, starSystemCoordinates)) !== undefined;
+        this.isSelectedSystemBookmarked =
+            this.player.systemBookmarks.find((bookmark) =>
+                starSystemCoordinatesEquals(bookmark, starSystemCoordinates)
+            ) !== undefined;
         this.rootNode.classList.toggle("bookmarked", this.isSelectedSystemBookmarked);
-        this.rootNode.textContent = this.isSelectedSystemBookmarked ? i18n.t("starMap:bookmarked") : i18n.t("starMap:bookmark");
+        this.rootNode.textContent = this.isSelectedSystemBookmarked
+            ? i18n.t("starMap:bookmarked")
+            : i18n.t("starMap:bookmark");
     }
 }

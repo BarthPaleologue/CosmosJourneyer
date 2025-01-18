@@ -23,7 +23,10 @@ import grassFragment from "../../../../shaders/grassMaterial/grassFragment.glsl"
 import grassVertex from "../../../../shaders/grassMaterial/grassVertex.glsl";
 import { Transformable } from "../../../architecture/transformable";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { setStellarObjectUniforms, StellarObjectUniformNames } from "../../../postProcesses/uniforms/stellarObjectUniforms";
+import {
+    setStellarObjectUniforms,
+    StellarObjectUniformNames
+} from "../../../postProcesses/uniforms/stellarObjectUniforms";
 import { Textures } from "../../textures";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
@@ -86,7 +89,10 @@ export class GrassMaterial extends ShaderMaterial {
             this.getEffect().setVector3(GrassMaterialUniformNames.CAMERA_POSITION, activeCamera.globalPosition);
 
             if (this.planet !== null) {
-                this.getEffect().setVector3(GrassMaterialUniformNames.PLANET_POSITION, this.planet.getAbsolutePosition());
+                this.getEffect().setVector3(
+                    GrassMaterialUniformNames.PLANET_POSITION,
+                    this.planet.getAbsolutePosition()
+                );
                 this.getEffect().setMatrix(GrassMaterialUniformNames.PLANET_WORLD, this.planet.getWorldMatrix());
             }
         });

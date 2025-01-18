@@ -28,12 +28,26 @@ export class StarPanel extends EditorPanel {
         for (const slider of this.sliders) slider.remove();
 
         this.sliders = [
-            new Slider("starExposure", document.getElementById("starExposure") as HTMLElement, 0, 200, volumetricLight.exposure * 100, (val: number) => {
-                volumetricLight.exposure = val / 100;
-            }),
-            new Slider("decay", document.getElementById("decay") as HTMLElement, 0, 200, volumetricLight.decay * 100, (val: number) => {
-                volumetricLight.decay = val / 100;
-            })
+            new Slider(
+                "starExposure",
+                document.getElementById("starExposure") as HTMLElement,
+                0,
+                200,
+                volumetricLight.exposure * 100,
+                (val: number) => {
+                    volumetricLight.exposure = val / 100;
+                }
+            ),
+            new Slider(
+                "decay",
+                document.getElementById("decay") as HTMLElement,
+                0,
+                200,
+                volumetricLight.decay * 100,
+                (val: number) => {
+                    volumetricLight.decay = val / 100;
+                }
+            )
         ];
     }
 }

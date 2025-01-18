@@ -1,8 +1,8 @@
 exclude:
-  - 'src/ts/assets/**/*.ts'
-  - 'src/ts/utils/**/*.ts'
-  - 'src/ts/uberCore/**/*.ts'
-  - 'src/ts/inputs/**/*.ts'
-  - 'src/ts/architecture/**/*.ts'
-  - 'src/ts/settings.ts'
-  - 'src/ts/i18n.ts'
+    - "src/ts/assets/**/*.ts"
+    - "src/ts/utils/**/*.ts"
+    - "src/ts/uberCore/**/*.ts"
+    - "src/ts/inputs/**/*.ts"
+    - "src/ts/architecture/**/*.ts"
+    - "src/ts/settings.ts"
+    - "src/ts/i18n.ts"

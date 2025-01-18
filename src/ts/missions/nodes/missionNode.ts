@@ -52,7 +52,11 @@ export interface MissionNode {
      * @param context The mission context.
      * @param keyboardLayout The keyboard layout map to localize the keys.
      */
-    describeNextTask(context: MissionContext, keyboardLayout: Map<string, string>, starSystemDatabase: StarSystemDatabase): string;
+    describeNextTask(
+        context: MissionContext,
+        keyboardLayout: Map<string, string>,
+        starSystemDatabase: StarSystemDatabase
+    ): string;
 
     /**
      * Returns the target systems of the subtree.

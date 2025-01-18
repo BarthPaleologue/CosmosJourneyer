@@ -17,7 +17,12 @@
 
 import { MissionNode, MissionNodeSerialized, MissionNodeType } from "../../missionNode";
 import { MissionContext } from "../../../missionContext";
-import { StarSystemCoordinates, starSystemCoordinatesEquals, UniverseObjectId, universeObjectIdEquals } from "../../../../utils/coordinates/universeCoordinates";
+import {
+    StarSystemCoordinates,
+    starSystemCoordinatesEquals,
+    UniverseObjectId,
+    universeObjectIdEquals
+} from "../../../../utils/coordinates/universeCoordinates";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { CollisionMask, Settings } from "../../../../settings";
@@ -99,7 +104,14 @@ export class MissionTerminatorLandingNode implements MissionNode {
 
         const downDirection = targetObjectPosition.subtract(playerPosition).normalize();
 
-        context.physicsEngine.raycastToRef(playerPosition, playerPosition.add(downDirection.scale(5)), this.raycastResult, { collideWith: CollisionMask.ENVIRONMENT });
+        context.physicsEngine.raycastToRef(
+            playerPosition,
+            playerPosition.add(downDirection.scale(5)),
+            this.raycastResult,
+            {
+                collideWith: CollisionMask.ENVIRONMENT
+            }
+        );
         if (this.raycastResult.hasHit) {
             if (this.raycastResult.body?.transformNode.parent !== targetObject.getTransform()) {
                 this.state = LandMissionState.TOO_FAR_IN_SYSTEM;
@@ -107,9 +119,18 @@ export class MissionTerminatorLandingNode implements MissionNode {
             }
 
             const stellarObjects = currentSystem.getStellarObjects();
-            const stellarMassSum = stellarObjects.reduce((sum, stellarObject) => sum + stellarObject.model.physics.mass, 0);
+            const stellarMassSum = stellarObjects.reduce(
+                (sum, stellarObject) => sum + stellarObject.model.physics.mass,
+                0
+            );
             const stellarBarycenter = stellarObjects
-                .reduce((sum, stellarObject) => sum.add(stellarObject.getTransform().getAbsolutePosition().scale(stellarObject.model.physics.mass)), Vector3.Zero())
+                .reduce(
+                    (sum, stellarObject) =>
+                        sum.add(
+                            stellarObject.getTransform().getAbsolutePosition().scale(stellarObject.model.physics.mass)
+                        ),
+                    Vector3.Zero()
+                )
                 .scaleInPlace(1 / stellarMassSum);
 
             const objectToPlayer = downDirection.negate();
@@ -146,7 +167,11 @@ export class MissionTerminatorLandingNode implements MissionNode {
         });
     }
 
-    describeNextTask(context: MissionContext, keyboardLayout: Map<string, string>, starSystemDatabase: StarSystemDatabase): string {
+    describeNextTask(
+        context: MissionContext,
+        keyboardLayout: Map<string, string>,
+        starSystemDatabase: StarSystemDatabase
+    ): string {
         if (this.isCompleted()) {
             return i18n.t("missions:terminatorLanding:missionCompleted");
         }
@@ -155,7 +180,12 @@ export class MissionTerminatorLandingNode implements MissionNode {
 
         switch (this.state) {
             case LandMissionState.NOT_IN_SYSTEM:
-                return getGoToSystemInstructions(context, this.targetSystemCoordinates, keyboardLayout, starSystemDatabase);
+                return getGoToSystemInstructions(
+                    context,
+                    this.targetSystemCoordinates,
+                    keyboardLayout,
+                    starSystemDatabase
+                );
             case LandMissionState.TOO_FAR_IN_SYSTEM:
                 return i18n.t("missions:terminatorLanding:getCloserToTerminator", {
                     objectName: targetObject.name

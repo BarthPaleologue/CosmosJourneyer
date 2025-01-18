@@ -35,13 +35,21 @@ export type MandelbulbModel = AnomalyModel & {
     readonly accentColor: Color3;
 };
 
-export function newSeededMandelbulbModel(seed: number, name: string, parentBodies: CelestialBodyModel[]): MandelbulbModel {
+export function newSeededMandelbulbModel(
+    seed: number,
+    name: string,
+    parentBodies: CelestialBodyModel[]
+): MandelbulbModel {
     const rng = getRngFromSeed(seed);
 
     const radius = 1000e3;
 
     const power = randRange(4.0, 8.0, rng, GenerationSteps.POWER);
-    const accentColor = Color3.FromHSV(360 * rng(GenerationSteps.ACCENT_COLOR), rng(GenerationSteps.ACCENT_COLOR + 123) * 0.5, 0.8);
+    const accentColor = Color3.FromHSV(
+        360 * rng(GenerationSteps.ACCENT_COLOR),
+        rng(GenerationSteps.ACCENT_COLOR + 123) * 0.5,
+        0.8
+    );
 
     // Todo: do not hardcode
     let orbitRadius = rng(GenerationSteps.ORBIT) * 15e9;

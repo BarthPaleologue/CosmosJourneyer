@@ -17,7 +17,12 @@
 
 import { MissionNode, MissionNodeSerialized, MissionNodeType } from "../../missionNode";
 import { MissionContext } from "../../../missionContext";
-import { StarSystemCoordinates, starSystemCoordinatesEquals, UniverseObjectId, universeObjectIdEquals } from "../../../../utils/coordinates/universeCoordinates";
+import {
+    StarSystemCoordinates,
+    starSystemCoordinatesEquals,
+    UniverseObjectId,
+    universeObjectIdEquals
+} from "../../../../utils/coordinates/universeCoordinates";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { clamp } from "../../../../utils/math";
 import { getObjectBySystemId, getObjectModelByUniverseId } from "../../../../utils/coordinates/orbitalObjectId";
@@ -100,13 +105,17 @@ export class MissionAsteroidFieldNode implements MissionNode {
         const playerPositionWorld = context.playerPosition;
 
         // everything will be computed in local space from here
-        const playerPosition = Vector3.TransformCoordinates(playerPositionWorld, celestialBody.getTransform().getWorldMatrix().clone().invert());
+        const playerPosition = Vector3.TransformCoordinates(
+            playerPositionWorld,
+            celestialBody.getTransform().getWorldMatrix().clone().invert()
+        );
 
         const projectionOnPlane = new Vector3(playerPosition.x, 0, playerPosition.z);
         const distanceToCenterOfBodyInPlane = projectionOnPlane.length();
 
         const clampedLocalPosition = projectionOnPlane.scaleInPlace(
-            clamp(distanceToCenterOfBodyInPlane, asteroidField.minRadius, asteroidField.maxRadius) / distanceToCenterOfBodyInPlane
+            clamp(distanceToCenterOfBodyInPlane, asteroidField.minRadius, asteroidField.maxRadius) /
+                distanceToCenterOfBodyInPlane
         );
 
         const distance = Vector3.Distance(playerPosition, clampedLocalPosition);
@@ -134,7 +143,11 @@ export class MissionAsteroidFieldNode implements MissionNode {
         });
     }
 
-    describeNextTask(context: MissionContext, keyboardLayout: Map<string, string>, starSystemDatabase: StarSystemDatabase): string {
+    describeNextTask(
+        context: MissionContext,
+        keyboardLayout: Map<string, string>,
+        starSystemDatabase: StarSystemDatabase
+    ): string {
         if (this.isCompleted()) {
             return i18n.t("missions:asteroidField:missionCompleted");
         }
@@ -143,7 +156,12 @@ export class MissionAsteroidFieldNode implements MissionNode {
 
         switch (this.state) {
             case AsteroidFieldMissionState.NOT_IN_SYSTEM:
-                return getGoToSystemInstructions(context, this.targetSystemCoordinates, keyboardLayout, starSystemDatabase);
+                return getGoToSystemInstructions(
+                    context,
+                    this.targetSystemCoordinates,
+                    keyboardLayout,
+                    starSystemDatabase
+                );
             case AsteroidFieldMissionState.TOO_FAR_IN_SYSTEM:
                 return i18n.t("missions:common:getCloserToTarget", {
                     objectName: targetObject.name

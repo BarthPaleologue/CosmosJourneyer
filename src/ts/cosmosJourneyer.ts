@@ -203,8 +203,14 @@ export class CosmosJourneyer {
                 .getStarSystem()
                 .getOrbitalFacilities()
                 .reduce((closest, current) => {
-                    const currentDistance = Vector3.DistanceSquared(spaceshipPosition, current.getTransform().getAbsolutePosition());
-                    const closestDistance = Vector3.DistanceSquared(spaceshipPosition, closest.getTransform().getAbsolutePosition());
+                    const currentDistance = Vector3.DistanceSquared(
+                        spaceshipPosition,
+                        current.getTransform().getAbsolutePosition()
+                    );
+                    const closestDistance = Vector3.DistanceSquared(
+                        spaceshipPosition,
+                        closest.getTransform().getAbsolutePosition()
+                    );
                     return currentDistance < closestDistance ? current : closest;
                 });
             this.starSystemView.setTarget(closestSpaceStation);
@@ -215,7 +221,9 @@ export class CosmosJourneyer {
             if (!this.mainMenu.isVisible()) {
                 // if the main menu is not visible, then we are in game and we need to ask the player if they want to leave their game
                 this.createAutoSave();
-                const shouldLoadTutorial = await promptModalBoolean(i18n.t("tutorials:common:loadTutorialWillLeaveGame"));
+                const shouldLoadTutorial = await promptModalBoolean(
+                    i18n.t("tutorials:common:loadTutorialWillLeaveGame")
+                );
                 if (!shouldLoadTutorial) return;
             }
             this.sidePanels.hideActivePanel();
@@ -252,14 +260,31 @@ export class CosmosJourneyer {
                 const urlData = encodeBase64(JSON.stringify(saveData.universeCoordinates));
                 const url = new URL(`${urlRoot}?universeCoordinates=${urlData}`);
                 navigator.clipboard.writeText(url.toString()).then(() => {
-                    createNotification(NotificationOrigin.GENERAL, NotificationIntent.INFO, i18n.t("notifications:copiedToClipboard"), 2000);
+                    createNotification(
+                        NotificationOrigin.GENERAL,
+                        NotificationIntent.INFO,
+                        i18n.t("notifications:copiedToClipboard"),
+                        2000
+                    );
                 });
             });
         });
         this.pauseMenu.onSave.add(async () => {
             const saveSuccess = await this.saveToLocalStorage();
-            if (saveSuccess) createNotification(NotificationOrigin.GENERAL, NotificationIntent.SUCCESS, i18n.t("notifications:saveOk"), 2000);
-            else createNotification(NotificationOrigin.GENERAL, NotificationIntent.ERROR, i18n.t("notifications:cantSaveTutorial"), 2000);
+            if (saveSuccess)
+                createNotification(
+                    NotificationOrigin.GENERAL,
+                    NotificationIntent.SUCCESS,
+                    i18n.t("notifications:saveOk"),
+                    2000
+                );
+            else
+                createNotification(
+                    NotificationOrigin.GENERAL,
+                    NotificationIntent.ERROR,
+                    i18n.t("notifications:cantSaveTutorial"),
+                    2000
+                );
         });
 
         window.addEventListener("blur", () => {
@@ -359,7 +384,9 @@ export class CosmosJourneyer {
         starSystemView.resetPlayer();
 
         if (!navigator.keyboard) {
-            await alertModal("Your keyboard layout could not be detected. The QWERTY layout will be assumed by default.");
+            await alertModal(
+                "Your keyboard layout could not be detected. The QWERTY layout will be assumed by default."
+            );
         }
 
         return new CosmosJourneyer(player, engine, starSystemView, encyclopaedia, starSystemDatabase);
@@ -400,7 +427,9 @@ export class CosmosJourneyer {
 
             this.player.timePlayedSeconds += deltaSeconds;
 
-            (this.engine.loadingScreen as LoadingScreen).setProgressPercentage(this.starSystemView.getStarSystem().getLoadingProgress() * 100);
+            (this.engine.loadingScreen as LoadingScreen).setProgressPercentage(
+                this.starSystemView.getStarSystem().getLoadingProgress() * 100
+            );
 
             this.autoSaveTimerSeconds += deltaSeconds;
             if (this.autoSaveTimerSeconds >= this.autoSavePeriodSeconds) {
@@ -474,7 +503,9 @@ export class CosmosJourneyer {
         if (this.videoRecorder.isRecording) {
             this.videoRecorder.stopRecording();
         } else {
-            this.videoRecorder.startRecording("planetEngine.webm", Number(prompt("Enter video duration in seconds", "10"))).then();
+            this.videoRecorder
+                .startRecording("planetEngine.webm", Number(prompt("Enter video duration in seconds", "10")))
+                .then();
         }
     }
 
@@ -489,22 +520,36 @@ export class CosmosJourneyer {
         const spaceship = spaceShipControls.getSpaceship();
 
         // Finding the index of the nearest orbital object
-        const nearestOrbitalObject = currentStarSystem.getNearestOrbitalObject(spaceShipControls.getTransform().getAbsolutePosition());
+        const nearestOrbitalObject = currentStarSystem.getNearestOrbitalObject(
+            spaceShipControls.getTransform().getAbsolutePosition()
+        );
         const nearestOrbitalObjectIndex = currentStarSystem.getOrbitalObjects().indexOf(nearestOrbitalObject);
         if (nearestOrbitalObjectIndex === -1) throw new Error("Nearest orbital object not found");
 
         // Finding the position of the player in the nearest orbital object's frame of reference
         const currentWorldPosition = spaceShipControls.getTransform().getAbsolutePosition();
-        const nearestOrbitalObjectInverseWorld = nearestOrbitalObject.getTransform().computeWorldMatrix(true).clone().invert();
-        const currentLocalPosition = Vector3.TransformCoordinates(currentWorldPosition, nearestOrbitalObjectInverseWorld);
+        const nearestOrbitalObjectInverseWorld = nearestOrbitalObject
+            .getTransform()
+            .computeWorldMatrix(true)
+            .clone()
+            .invert();
+        const currentLocalPosition = Vector3.TransformCoordinates(
+            currentWorldPosition,
+            nearestOrbitalObjectInverseWorld
+        );
         const distanceToNearestOrbitalObject = currentLocalPosition.length();
         if (distanceToNearestOrbitalObject < nearestOrbitalObject.getBoundingRadius() * 1.1) {
-            currentLocalPosition.scaleInPlace((nearestOrbitalObject.getBoundingRadius() * 1.1) / distanceToNearestOrbitalObject);
+            currentLocalPosition.scaleInPlace(
+                (nearestOrbitalObject.getBoundingRadius() * 1.1) / distanceToNearestOrbitalObject
+            );
         }
 
         // Finding the rotation of the player in the nearest orbital object's frame of reference
         const currentWorldRotation = spaceShipControls.getTransform().absoluteRotationQuaternion;
-        const nearestOrbitalObjectInverseRotation = nearestOrbitalObject.getTransform().absoluteRotationQuaternion.clone().invert();
+        const nearestOrbitalObjectInverseRotation = nearestOrbitalObject
+            .getTransform()
+            .absoluteRotationQuaternion.clone()
+            .invert();
         const currentLocalRotation = currentWorldRotation.multiply(nearestOrbitalObjectInverseRotation);
 
         const universeObjectId = getUniverseObjectId(nearestOrbitalObject, currentStarSystem);
@@ -531,7 +576,10 @@ export class CosmosJourneyer {
         if (this.player.uuid === Settings.TUTORIAL_SAVE_UUID) return false; // don't save in tutorial
         if (this.player.uuid === Settings.SHARED_POSITION_SAVE_UUID) {
             this.player.uuid = crypto.randomUUID();
-            this.player.setName((await promptModalString(i18n.t("spaceStation:cmdrNameChangePrompt"), this.player.getName())) ?? "Python");
+            this.player.setName(
+                (await promptModalString(i18n.t("spaceStation:cmdrNameChangePrompt"), this.player.getName())) ??
+                    "Python"
+            );
         }
 
         const saveData = this.generateSaveData();
@@ -604,11 +652,19 @@ export class CosmosJourneyer {
             await this.tutorialLayer.setTutorial(tutorial);
             this.starSystemView.setUIEnabled(true);
 
-            const targetObject = getObjectBySystemId(tutorial.saveData.universeCoordinates.universeObjectId, this.starSystemView.getStarSystem());
+            const targetObject = getObjectBySystemId(
+                tutorial.saveData.universeCoordinates.universeObjectId,
+                this.starSystemView.getStarSystem()
+            );
             if (targetObject === null) {
-                throw new Error("Could not find the target object of the tutorial even though it should be in the star system");
+                throw new Error(
+                    "Could not find the target object of the tutorial even though it should be in the star system"
+                );
             }
-            this.starSystemView.getSpaceshipControls().getTransform().lookAt(targetObject.getTransform().getAbsolutePosition());
+            this.starSystemView
+                .getSpaceshipControls()
+                .getTransform()
+                .lookAt(targetObject.getTransform().getAbsolutePosition());
         });
     }
 
@@ -650,12 +706,16 @@ export class CosmosJourneyer {
                 .getOrbitalFacilities()
                 .find((station) => station === nearestOrbitalObject);
             if (correspondingSpaceStation === undefined) {
-                throw new Error("Tried loading a save with a pad number, but the closest orbital objects does not have landing pads!");
+                throw new Error(
+                    "Tried loading a save with a pad number, but the closest orbital objects does not have landing pads!"
+                );
             }
 
             const landingPad = correspondingSpaceStation.getLandingPads().at(padNumber);
             if (landingPad === undefined) {
-                throw new Error(`Could not find the pad with number ${padNumber} at this station: ${correspondingSpaceStation.model.name}`);
+                throw new Error(
+                    `Could not find the pad with number ${padNumber} at this station: ${correspondingSpaceStation.model.name}`
+                );
             }
 
             this.starSystemView.getSpaceshipControls().getSpaceship().spawnOnPad(landingPad);
@@ -676,7 +736,9 @@ export class CosmosJourneyer {
 
         const universeObjectId = universeCoordinates.universeObjectId;
 
-        const systemModel = this.starSystemDatabase.getSystemModelFromCoordinates(universeObjectId.starSystemCoordinates);
+        const systemModel = this.starSystemDatabase.getSystemModelFromCoordinates(
+            universeObjectId.starSystemCoordinates
+        );
         await this.starSystemView.loadStarSystem(systemModel);
 
         if (this.state === EngineState.UNINITIALIZED) await this.init(true);
@@ -688,11 +750,17 @@ export class CosmosJourneyer {
 
         const nearestOrbitalObject = getObjectBySystemId(universeObjectId, this.starSystemView.getStarSystem());
         if (nearestOrbitalObject === null) {
-            throw new Error(`Could not find the nearest orbital object with index ${universeObjectId.objectIndex} and type ${universeObjectId.objectType}`);
+            throw new Error(
+                `Could not find the nearest orbital object with index ${universeObjectId.objectIndex} and type ${universeObjectId.objectType}`
+            );
         }
 
         const nearestOrbitalObjectWorld = nearestOrbitalObject.getTransform().getWorldMatrix();
-        const currentLocalPosition = new Vector3(universeCoordinates.positionX, universeCoordinates.positionY, universeCoordinates.positionZ);
+        const currentLocalPosition = new Vector3(
+            universeCoordinates.positionX,
+            universeCoordinates.positionY,
+            universeCoordinates.positionZ
+        );
         const currentWorldPosition = Vector3.TransformCoordinates(currentLocalPosition, nearestOrbitalObjectWorld);
         playerTransform.setAbsolutePosition(currentWorldPosition);
 
@@ -703,7 +771,9 @@ export class CosmosJourneyer {
             universeCoordinates.rotationQuaternionZ,
             universeCoordinates.rotationQuaternionW
         );
-        const currentWorldRotationQuaternion = currentLocalRotationQuaternion.multiply(nearestOrbitalObjectWorldRotation);
+        const currentWorldRotationQuaternion = currentLocalRotationQuaternion.multiply(
+            nearestOrbitalObjectWorldRotation
+        );
         setRotationQuaternion(playerTransform, currentWorldRotationQuaternion);
 
         // updates camera position

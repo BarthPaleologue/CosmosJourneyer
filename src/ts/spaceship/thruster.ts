@@ -48,7 +48,11 @@ export class Thruster {
 
         this.parentAggregate = parentAggregate;
 
-        const thrusterHelper = MeshBuilder.CreateCylinder(this.mesh.name + "Helper", { height: 0.5, diameterTop: 0, diameterBottom: 0.5 }, mesh.getScene());
+        const thrusterHelper = MeshBuilder.CreateCylinder(
+            this.mesh.name + "Helper",
+            { height: 0.5, diameterTop: 0, diameterBottom: 0.5 },
+            mesh.getScene()
+        );
         thrusterHelper.material = Materials.DebugMaterial("ThrusterHelperMaterial", false, false, mesh.getScene());
         thrusterHelper.parent = mesh;
 
@@ -76,7 +80,8 @@ export class Thruster {
         this.plume.update(deltaSeconds);
         this.plume.setThrottle(this.throttle);
 
-        this.light.intensity = this.lightMinIntensity + (this.lightMaxIntensity - this.lightMinIntensity) * this.throttle;
+        this.light.intensity =
+            this.lightMinIntensity + (this.lightMaxIntensity - this.lightMinIntensity) * this.throttle;
 
         if (this.throttle > 0) {
             this.helperMesh.scaling = new Vector3(0.8, 0.8, 0.8);

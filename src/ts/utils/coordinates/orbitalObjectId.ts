@@ -19,7 +19,9 @@ export function getSystemObjectId(orbitalObject: OrbitalObject, starSystem: Star
     let objectIndex: number;
     if ((objectIndex = starSystem.getStellarObjects().indexOf(orbitalObject as StellarObject)) !== -1) {
         objectType = SystemObjectType.STELLAR_OBJECT;
-    } else if ((objectIndex = starSystem.getPlanetaryMassObjects().indexOf(orbitalObject as PlanetaryMassObject)) !== -1) {
+    } else if (
+        (objectIndex = starSystem.getPlanetaryMassObjects().indexOf(orbitalObject as PlanetaryMassObject)) !== -1
+    ) {
         objectType = SystemObjectType.PLANETARY_MASS_OBJECT;
     } else if ((objectIndex = starSystem.getAnomalies().indexOf(orbitalObject as CelestialBody)) !== -1) {
         objectType = SystemObjectType.ANOMALY;
@@ -45,7 +47,10 @@ export function getUniverseObjectId(orbitalObject: OrbitalObject, starSystem: St
     };
 }
 
-export function getObjectBySystemId(systemObjectId: SystemObjectId, starSystem: StarSystemController): OrbitalObject | null {
+export function getObjectBySystemId(
+    systemObjectId: SystemObjectId,
+    starSystem: StarSystemController
+): OrbitalObject | null {
     let orbitalObject;
     switch (systemObjectId.objectType) {
         case SystemObjectType.STELLAR_OBJECT:
@@ -70,7 +75,10 @@ export function getObjectBySystemId(systemObjectId: SystemObjectId, starSystem: 
     return orbitalObject;
 }
 
-export function getObjectModelByUniverseId(universeObjectId: UniverseObjectId, starSystemDatabase: StarSystemDatabase): OrbitalObjectModel {
+export function getObjectModelByUniverseId(
+    universeObjectId: UniverseObjectId,
+    starSystemDatabase: StarSystemDatabase
+): OrbitalObjectModel {
     const starSystemCoordinates = universeObjectId.starSystemCoordinates;
     const starSystemModel = starSystemDatabase.getSystemModelFromCoordinates(starSystemCoordinates);
 
@@ -88,7 +96,10 @@ export function getObjectModelByUniverseId(universeObjectId: UniverseObjectId, s
     }
 }
 
-export function getUniverseIdForSpaceStationModel(spaceStationModel: OrbitalFacilityModel, starSystemDatabase: StarSystemDatabase): UniverseObjectId {
+export function getUniverseIdForSpaceStationModel(
+    spaceStationModel: OrbitalFacilityModel,
+    starSystemDatabase: StarSystemDatabase
+): UniverseObjectId {
     const systemModel = starSystemDatabase.getSystemModelFromCoordinates(spaceStationModel.starSystemCoordinates);
 
     const spaceStationModels = StarSystemModelUtils.GetSpaceStations(systemModel);

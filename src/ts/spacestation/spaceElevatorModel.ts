@@ -75,14 +75,19 @@ export function newSeededSpaceElevatorModel(
         const exposureTimeFraction = 0.5;
         const starRadius = stellarObject.radius;
         const starTemperature = stellarObject.physics.blackBodyTemperature;
-        totalStellarFlux += getSphereRadiatedEnergyFlux(starTemperature, starRadius, distanceToStar) * exposureTimeFraction;
+        totalStellarFlux +=
+            getSphereRadiatedEnergyFlux(starTemperature, starRadius, distanceToStar) * exposureTimeFraction;
     });
 
     const totalEnergyConsumptionKWh = population * energyConsumptionPerCapitaKWh;
 
     const solarPanelEfficiency = 0.4;
 
-    const solarPanelSurfaceM2 = getSolarPanelSurfaceFromEnergyRequirement(solarPanelEfficiency, totalEnergyConsumptionKWh, totalStellarFlux);
+    const solarPanelSurfaceM2 = getSolarPanelSurfaceFromEnergyRequirement(
+        solarPanelEfficiency,
+        totalEnergyConsumptionKWh,
+        totalStellarFlux
+    );
 
     const housingSurfaceHa = (100 * population) / populationDensity; // convert km² to ha
     let agricultureSurfaceHa = 0;

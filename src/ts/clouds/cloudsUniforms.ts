@@ -84,7 +84,9 @@ export class CloudsUniforms {
         effect.setFloat(CloudsUniformNames.SPECULAR_POWER, this.model.specularPower);
         effect.setFloat(
             CloudsUniformNames.TIME,
-            -this.elapsedSeconds % ((2 * Math.PI * gcd(this.model.worleySpeed * 10000, this.model.detailSpeed * 10000)) / this.model.worleySpeed)
+            -this.elapsedSeconds %
+                ((2 * Math.PI * gcd(this.model.worleySpeed * 10000, this.model.detailSpeed * 10000)) /
+                    this.model.worleySpeed)
         );
     }
 

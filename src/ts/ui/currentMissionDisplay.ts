@@ -108,24 +108,34 @@ export class CurrentMissionDisplay {
 
         SpaceShipControlsInputs.map.previousMission.on("complete", () => {
             this.setPreviousMission(starSystemDatabase);
-            this.previousMissionButton.animate([{ transform: "scale(1)" }, { transform: "scale(1.1)" }, { transform: "scale(1)" }], {
-                duration: 200,
-                easing: "ease"
-            });
+            this.previousMissionButton.animate(
+                [{ transform: "scale(1)" }, { transform: "scale(1.1)" }, { transform: "scale(1)" }],
+                {
+                    duration: 200,
+                    easing: "ease"
+                }
+            );
             Sounds.MENU_SELECT_SOUND.play();
         });
 
         SpaceShipControlsInputs.map.nextMission.on("complete", () => {
             this.setNextMission(starSystemDatabase);
-            this.nextMissionButton.animate([{ transform: "scale(1)" }, { transform: "scale(1.1)" }, { transform: "scale(1)" }], {
-                duration: 200,
-                easing: "ease"
-            });
+            this.nextMissionButton.animate(
+                [{ transform: "scale(1)" }, { transform: "scale(1.1)" }, { transform: "scale(1)" }],
+                {
+                    duration: 200,
+                    easing: "ease"
+                }
+            );
             Sounds.MENU_SELECT_SOUND.play();
         });
     }
 
-    public update(context: MissionContext, keyboardLayout: Map<string, string>, starSystemDatabase: StarSystemDatabase) {
+    public update(
+        context: MissionContext,
+        keyboardLayout: Map<string, string>,
+        starSystemDatabase: StarSystemDatabase
+    ) {
         const allMissions = this.player.completedMissions.concat(this.player.currentMissions);
         this.buttonContainer.hidden = allMissions.length <= 1;
 

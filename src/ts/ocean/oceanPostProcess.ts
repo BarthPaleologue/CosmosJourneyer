@@ -39,7 +39,13 @@ export class OceanPostProcess extends PostProcess implements UpdatablePostProces
 
     private activeCamera: Camera | null = null;
 
-    constructor(planetTransform: TransformNode, boundingRadius: number, oceanUniforms: OceanUniforms, stellarObjects: Transformable[], scene: Scene) {
+    constructor(
+        planetTransform: TransformNode,
+        boundingRadius: number,
+        oceanUniforms: OceanUniforms,
+        stellarObjects: Transformable[],
+        scene: Scene
+    ) {
         const shaderName = "ocean";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = oceanFragment;

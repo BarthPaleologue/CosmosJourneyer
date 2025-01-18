@@ -34,7 +34,13 @@ import { AtmosphereUniforms } from "./atmosphereUniforms";
 export class AtmosphericScatteringPostProcess extends PostProcess {
     private activeCamera: Camera | null = null;
 
-    constructor(planetTransform: TransformNode, planetBoundingRadius: number, atmosphereUniforms: AtmosphereUniforms, stellarObjects: Transformable[], scene: Scene) {
+    constructor(
+        planetTransform: TransformNode,
+        planetBoundingRadius: number,
+        atmosphereUniforms: AtmosphereUniforms,
+        stellarObjects: Transformable[],
+        scene: Scene
+    ) {
         const shaderName = "atmosphericScattering";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = atmosphericScatteringFragment;

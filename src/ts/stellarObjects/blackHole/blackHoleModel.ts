@@ -39,7 +39,11 @@ export type BlackHoleModel = StellarObjectModel & {
     readonly physics: BlackHolePhysicsInfo;
 };
 
-export function newSeededBlackHoleModel(seed: number, name: string, parentBodies: CelestialBodyModel[]): BlackHoleModel {
+export function newSeededBlackHoleModel(
+    seed: number,
+    name: string,
+    parentBodies: CelestialBodyModel[]
+): BlackHoleModel {
     const rng = getRngFromSeed(seed);
 
     //FIXME: do not hardcode

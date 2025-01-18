@@ -57,9 +57,15 @@ export class MissionXorNode implements MissionNode {
         return this.children.map((child) => child.describe(originSystemCoordinates, starSystemDatabase)).join(" xor ");
     }
 
-    describeNextTask(context: MissionContext, keyboardLayout: Map<string, string>, starSystemDatabase: StarSystemDatabase): string {
+    describeNextTask(
+        context: MissionContext,
+        keyboardLayout: Map<string, string>,
+        starSystemDatabase: StarSystemDatabase
+    ): string {
         if (this.hasCompletedLock) return "Mission completed";
-        return this.children.map((child) => child.describeNextTask(context, keyboardLayout, starSystemDatabase)).join(" xor ");
+        return this.children
+            .map((child) => child.describeNextTask(context, keyboardLayout, starSystemDatabase))
+            .join(" xor ");
     }
 
     getTargetSystems(): StarSystemCoordinates[] {

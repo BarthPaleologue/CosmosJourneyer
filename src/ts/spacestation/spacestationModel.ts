@@ -52,7 +52,10 @@ export function newSeededSpaceStationModel(
 
     const name = generateSpaceStationName(rng, 2756);
 
-    const parentMaxRadius = parentBodies.reduce((max, body) => Math.max(max, body.radius, (body.rings?.ringEnd || 0) * body.radius), 0);
+    const parentMaxRadius = parentBodies.reduce(
+        (max, body) => Math.max(max, body.radius, (body.rings?.ringEnd || 0) * body.radius),
+        0
+    );
     const orbitRadius = (2 + clamp(normalRandom(2, 1, rng, GenerationSteps.ORBIT), 0, 10)) * parentMaxRadius;
 
     const parentMassSum = parentBodies.reduce((sum, body) => sum + body.physics.mass, 0);
@@ -94,14 +97,19 @@ export function newSeededSpaceStationModel(
         const exposureTimeFraction = 0.5;
         const starRadius = stellarObject.radius;
         const starTemperature = stellarObject.physics.blackBodyTemperature;
-        totalStellarFlux += getSphereRadiatedEnergyFlux(starTemperature, starRadius, distanceToStar) * exposureTimeFraction;
+        totalStellarFlux +=
+            getSphereRadiatedEnergyFlux(starTemperature, starRadius, distanceToStar) * exposureTimeFraction;
     });
 
     const totalEnergyConsumptionKWh = population * energyConsumptionPerCapitaKWh;
 
     const solarPanelEfficiency = 0.4;
 
-    const solarPanelSurfaceM2 = getSolarPanelSurfaceFromEnergyRequirement(solarPanelEfficiency, totalEnergyConsumptionKWh, totalStellarFlux);
+    const solarPanelSurfaceM2 = getSolarPanelSurfaceFromEnergyRequirement(
+        solarPanelEfficiency,
+        totalEnergyConsumptionKWh,
+        totalStellarFlux
+    );
 
     const housingSurfaceHa = (100 * population) / populationDensity; // convert km² to ha
     let agricultureSurfaceHa = 0;

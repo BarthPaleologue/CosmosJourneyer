@@ -35,7 +35,9 @@ export class AtmospherePanel extends EditorPanel {
         atmosphereToggler.addEventListener("click", () => {
             const checkbox = document.querySelectorAll("input[type='checkbox']")[2] as HTMLInputElement;
             checkbox.checked = !checkbox.checked;
-            atmosphereUniforms.atmosphereRadius = checkbox.checked ? planetRadius + Settings.EARTH_ATMOSPHERE_THICKNESS : 0;
+            atmosphereUniforms.atmosphereRadius = checkbox.checked
+                ? planetRadius + Settings.EARTH_ATMOSPHERE_THICKNESS
+                : 0;
         });
 
         const rayleighScatteringColorPicker = document.getElementById("rayleighScattering") as HTMLInputElement;
@@ -48,7 +50,11 @@ export class AtmospherePanel extends EditorPanel {
         rayleighScatteringColorPicker.addEventListener("input", () => {
             const color = rayleighScatteringColorPicker.value;
             const color01 = Color3.FromHexString(color);
-            atmosphereUniforms.rayleighScatteringCoefficients = new Vector3(color01.r, color01.g, color01.b).scaleInPlace(rayleighConversionFactor);
+            atmosphereUniforms.rayleighScatteringCoefficients = new Vector3(
+                color01.r,
+                color01.g,
+                color01.b
+            ).scaleInPlace(rayleighConversionFactor);
         });
 
         const mieScatteringColorPicker = document.getElementById("mieScattering") as HTMLInputElement;
@@ -61,7 +67,9 @@ export class AtmospherePanel extends EditorPanel {
         mieScatteringColorPicker.addEventListener("input", () => {
             const color = mieScatteringColorPicker.value;
             const color01 = Color3.FromHexString(color);
-            atmosphereUniforms.mieScatteringCoefficients = new Vector3(color01.r, color01.g, color01.b).scaleInPlace(mieConversionFactor);
+            atmosphereUniforms.mieScatteringCoefficients = new Vector3(color01.r, color01.g, color01.b).scaleInPlace(
+                mieConversionFactor
+            );
         });
 
         const ozoneAbsorptionColorPicker = document.getElementById("ozoneAbsorption") as HTMLInputElement;
@@ -74,13 +82,22 @@ export class AtmospherePanel extends EditorPanel {
         ozoneAbsorptionColorPicker.addEventListener("input", () => {
             const color = ozoneAbsorptionColorPicker.value;
             const color01 = Color3.FromHexString(color);
-            atmosphereUniforms.ozoneAbsorptionCoefficients = new Vector3(color01.r, color01.g, color01.b).scaleInPlace(ozoneConversionFactor);
+            atmosphereUniforms.ozoneAbsorptionCoefficients = new Vector3(color01.r, color01.g, color01.b).scaleInPlace(
+                ozoneConversionFactor
+            );
         });
 
         this.sliders = [
-            new Slider("intensity", document.getElementById("intensity") as HTMLElement, 0, 60, atmosphereUniforms.lightIntensity, (val: number) => {
-                atmosphereUniforms.lightIntensity = val;
-            }),
+            new Slider(
+                "intensity",
+                document.getElementById("intensity") as HTMLElement,
+                0,
+                60,
+                atmosphereUniforms.lightIntensity,
+                (val: number) => {
+                    atmosphereUniforms.lightIntensity = val;
+                }
+            ),
             new Slider(
                 "atmosphereRadius",
                 document.getElementById("atmosphereRadius") as HTMLElement,
@@ -91,21 +108,56 @@ export class AtmospherePanel extends EditorPanel {
                     atmosphereUniforms.atmosphereRadius = planetRadius + val * 10000;
                 }
             ),
-            new Slider("rayleighHeight", document.getElementById("rayleighHeight") as HTMLElement, 0, 50, atmosphereUniforms.rayleighHeight / 1e3, (val: number) => {
-                atmosphereUniforms.rayleighHeight = val * 1e3;
-            }),
-            new Slider("mieHeight", document.getElementById("mieHeight") as HTMLElement, 0, 50, atmosphereUniforms.mieHeight / 1e2, (val: number) => {
-                atmosphereUniforms.mieHeight = val * 1e2;
-            }),
-            new Slider("mieAsymmetry", document.getElementById("mieAsymmetry")!, -100, 100, atmosphereUniforms.mieAsymmetry * 100, (val: number) => {
-                atmosphereUniforms.mieAsymmetry = val / 100;
-            }),
-            new Slider("ozoneLayerHeight", document.getElementById("ozoneLayerHeight") as HTMLElement, 0, 50, atmosphereUniforms.ozoneHeight / 1e3, (val: number) => {
-                atmosphereUniforms.ozoneHeight = val * 1e3;
-            }),
-            new Slider("ozoneHeight", document.getElementById("ozoneHeight") as HTMLElement, 0, 50, atmosphereUniforms.ozoneFalloff / 1e3, (val: number) => {
-                atmosphereUniforms.ozoneFalloff = val * 1e3;
-            })
+            new Slider(
+                "rayleighHeight",
+                document.getElementById("rayleighHeight") as HTMLElement,
+                0,
+                50,
+                atmosphereUniforms.rayleighHeight / 1e3,
+                (val: number) => {
+                    atmosphereUniforms.rayleighHeight = val * 1e3;
+                }
+            ),
+            new Slider(
+                "mieHeight",
+                document.getElementById("mieHeight") as HTMLElement,
+                0,
+                50,
+                atmosphereUniforms.mieHeight / 1e2,
+                (val: number) => {
+                    atmosphereUniforms.mieHeight = val * 1e2;
+                }
+            ),
+            new Slider(
+                "mieAsymmetry",
+                document.getElementById("mieAsymmetry")!,
+                -100,
+                100,
+                atmosphereUniforms.mieAsymmetry * 100,
+                (val: number) => {
+                    atmosphereUniforms.mieAsymmetry = val / 100;
+                }
+            ),
+            new Slider(
+                "ozoneLayerHeight",
+                document.getElementById("ozoneLayerHeight") as HTMLElement,
+                0,
+                50,
+                atmosphereUniforms.ozoneHeight / 1e3,
+                (val: number) => {
+                    atmosphereUniforms.ozoneHeight = val * 1e3;
+                }
+            ),
+            new Slider(
+                "ozoneHeight",
+                document.getElementById("ozoneHeight") as HTMLElement,
+                0,
+                50,
+                atmosphereUniforms.ozoneFalloff / 1e3,
+                (val: number) => {
+                    atmosphereUniforms.ozoneFalloff = val * 1e3;
+                }
+            )
         ];
     }
 }

@@ -163,7 +163,11 @@ export class WarpDrive implements ReadonlyWarpDrive {
 
         const closeSpeed = (speedThreshold * 0.1 * collisionDistance) / speedThreshold;
         const deepSpaceSpeed = speedThreshold * ((0.1 * collisionDistance) / speedThreshold) ** 1.2;
-        this.maxTargetSpeed = clamp(Math.max(closeSpeed, deepSpaceSpeed), WarpDrive.MIN_WARP_SPEED, WarpDrive.MAX_WARP_SPEED);
+        this.maxTargetSpeed = clamp(
+            Math.max(closeSpeed, deepSpaceSpeed),
+            WarpDrive.MIN_WARP_SPEED,
+            WarpDrive.MAX_WARP_SPEED
+        );
         return this.maxTargetSpeed;
     }
 
@@ -189,7 +193,11 @@ export class WarpDrive implements ReadonlyWarpDrive {
      * @param closestObjectDistance
      * @param deltaSeconds The time elapsed since the last update in seconds.
      */
-    private updateWarpDriveSpeed(currentForwardSpeed: number, closestObjectDistance: number, deltaSeconds: number): void {
+    private updateWarpDriveSpeed(
+        currentForwardSpeed: number,
+        closestObjectDistance: number,
+        deltaSeconds: number
+    ): void {
         // use lerp smoothing to reach target speed, while making it a bit harder to decelerate
         this.currentSpeed =
             this.currentSpeed < this.maxTargetSpeed
@@ -205,12 +213,18 @@ export class WarpDrive implements ReadonlyWarpDrive {
      * @param closestObjectRadius
      * @param deltaSeconds The time elapsed since the last update in seconds.
      */
-    public update(currentForwardSpeed: number, closestObjectDistance: number, closestObjectRadius: number, deltaSeconds: number): void {
+    public update(
+        currentForwardSpeed: number,
+        closestObjectDistance: number,
+        closestObjectRadius: number,
+        deltaSeconds: number
+    ): void {
         switch (this.state) {
             case WarpDriveState.DISENGAGING:
                 this.maxTargetSpeed *= 0.9;
                 this.currentSpeed *= 0.9;
-                if (this.maxTargetSpeed <= WarpDrive.MIN_WARP_SPEED && this.currentSpeed <= WarpDrive.MIN_WARP_SPEED) this.disable();
+                if (this.maxTargetSpeed <= WarpDrive.MIN_WARP_SPEED && this.currentSpeed <= WarpDrive.MIN_WARP_SPEED)
+                    this.disable();
                 break;
             case WarpDriveState.ENABLED:
                 this.updateMaxTargetSpeed(closestObjectDistance, closestObjectRadius);

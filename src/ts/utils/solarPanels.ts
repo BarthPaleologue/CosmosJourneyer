@@ -21,6 +21,10 @@
  * @param energyRequirement The energy requirement in watts.
  * @param stellarEnergyFlux The incoming average energy flux from the stars in watts per square meter.
  */
-export function getSolarPanelSurfaceFromEnergyRequirement(efficiency: number, energyRequirement: number, stellarEnergyFlux: number) {
+export function getSolarPanelSurfaceFromEnergyRequirement(
+    efficiency: number,
+    energyRequirement: number,
+    stellarEnergyFlux: number
+) {
     return energyRequirement / (efficiency * stellarEnergyFlux);
 }

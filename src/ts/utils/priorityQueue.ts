@@ -115,8 +115,14 @@ export class PriorityQueue<T> {
 
     #siftDown(): void {
         let node = topIndex;
-        while ((leftIndex(node) < this.size() && this.#greater(leftIndex(node), node)) || (rightIndex(node) < this.size() && this.#greater(rightIndex(node), node))) {
-            const maxChild = rightIndex(node) < this.size() && this.#greater(rightIndex(node), leftIndex(node)) ? rightIndex(node) : leftIndex(node);
+        while (
+            (leftIndex(node) < this.size() && this.#greater(leftIndex(node), node)) ||
+            (rightIndex(node) < this.size() && this.#greater(rightIndex(node), node))
+        ) {
+            const maxChild =
+                rightIndex(node) < this.size() && this.#greater(rightIndex(node), leftIndex(node))
+                    ? rightIndex(node)
+                    : leftIndex(node);
             this.#swap(node, maxChild);
             node = maxChild;
         }

@@ -39,7 +39,14 @@ export class VolumetricCloudsPostProcess extends PostProcess {
 
     private activeCamera: Camera | null = null;
 
-    constructor(name: string, transform: TransformNode, boundingRadius: number, cloudsUniforms: CloudsUniforms, scene: Scene, stars: StellarObject[]) {
+    constructor(
+        name: string,
+        transform: TransformNode,
+        boundingRadius: number,
+        cloudsUniforms: CloudsUniforms,
+        scene: Scene,
+        stars: StellarObject[]
+    ) {
         const shaderName = "volumetricClouds";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = volumetricCloudsFragment;
@@ -59,7 +66,19 @@ export class VolumetricCloudsPostProcess extends PostProcess {
 
         const samplers: string[] = Object.values(SamplerUniformNames);
 
-        super(name, shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
+        super(
+            name,
+            shaderName,
+            uniforms,
+            samplers,
+            1,
+            null,
+            Texture.BILINEAR_SAMPLINGMODE,
+            scene.getEngine(),
+            false,
+            null,
+            Constants.TEXTURETYPE_HALF_FLOAT
+        );
 
         this.cloudUniforms = cloudsUniforms;
 

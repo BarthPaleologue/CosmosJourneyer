@@ -1,12 +1,11 @@
 // Generated using webpack-cli https://github.com/webpack/webpack-cli
-
-const path = require("path");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const webpack = require("webpack");
+import path from "path";
+import HtmlWebpackPlugin from "html-webpack-plugin";
+import MiniCssExtractPlugin from "mini-css-extract-plugin";
+import webpack from "webpack";
 
 const isProduction = process.env.NODE_ENV === "production";
-const htmlPath = path.join(__dirname, "/src/html/");
+const htmlPath = path.join(import.meta.dirname, "/src/html/");
 
 const config = {
     entry: {
@@ -20,7 +19,7 @@ const config = {
     },
     output: {
         filename: "[name].[contenthash].js",
-        path: path.resolve(__dirname, "dist")
+        path: path.resolve(import.meta.dirname, "dist")
     },
     devServer: {
         open: false,
@@ -159,7 +158,7 @@ const config = {
     }
 };
 
-module.exports = () => {
+export default () => {
     if (isProduction) {
         config.mode = "production";
     } else {

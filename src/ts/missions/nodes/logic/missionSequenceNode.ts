@@ -69,7 +69,9 @@ export class MissionSequenceNode implements MissionNode {
      */
     setActiveChildIndex(index: number) {
         if (index < 0 || index >= this.children.length) {
-            throw new Error(`Invalid index ${index} for mission sequence node. Must be between 0 and ${this.children.length - 1}`);
+            throw new Error(
+                `Invalid index ${index} for mission sequence node. Must be between 0 and ${this.children.length - 1}`
+            );
         }
         this.activeChildIndex = index;
     }
@@ -78,7 +80,11 @@ export class MissionSequenceNode implements MissionNode {
         return this.children.map((child) => child.describe(originSystemCoordinates, starSystemDatabase)).join(" then ");
     }
 
-    describeNextTask(context: MissionContext, keyboardLayout: Map<string, string>, starSystemDatabase: StarSystemDatabase): string {
+    describeNextTask(
+        context: MissionContext,
+        keyboardLayout: Map<string, string>,
+        starSystemDatabase: StarSystemDatabase
+    ): string {
         if (this.hasCompletedLock) return "Mission completed";
         if (this.activeChildIndex >= this.children.length) return "Mission completed";
         return this.children[this.activeChildIndex].describeNextTask(context, keyboardLayout, starSystemDatabase);

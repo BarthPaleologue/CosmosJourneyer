@@ -50,7 +50,18 @@ class ColourSystem {
     xWhite: number;
     yWhite: number; /* White point x, y */
     gamma: number; /* Gamma correction for system */
-    constructor(name: string, xRed: number, yRed: number, xGreen: number, yGreen: number, xBlue: number, yBlue: number, xWhite: number, yWhite: number, gamma: number) {
+    constructor(
+        name: string,
+        xRed: number,
+        yRed: number,
+        xGreen: number,
+        yGreen: number,
+        xBlue: number,
+        yBlue: number,
+        xWhite: number,
+        yWhite: number,
+        gamma: number
+    ) {
         this.name = name;
         this.xRed = xRed;
         this.yRed = yRed;
@@ -82,12 +93,78 @@ const IlluminantE = [0.33333333, 0.33333333]; /* CIE equal-energy illuminant */
 const GAMMA_REC709 = 0; /* Rec. 709 */
 
 /* Name                  xRed    yRed    xGreen  yGreen  xBlue  yBlue    White point        Gamma   */
-const NTSCsystem = new ColourSystem("NTSC", 0.67, 0.33, 0.21, 0.71, 0.14, 0.08, IlluminantC[0], IlluminantC[1], GAMMA_REC709);
-const EBUsystem = new ColourSystem("EBU (PAL/SECAM)", 0.64, 0.33, 0.29, 0.6, 0.15, 0.06, IlluminantD65[0], IlluminantD65[1], GAMMA_REC709);
-const SMPTEsystem = new ColourSystem("SMPTE", 0.63, 0.34, 0.31, 0.595, 0.155, 0.07, IlluminantD65[0], IlluminantD65[1], GAMMA_REC709);
-const HDTVsystem = new ColourSystem("HDTV", 0.67, 0.33, 0.21, 0.71, 0.15, 0.06, IlluminantD65[0], IlluminantD65[1], GAMMA_REC709);
-const CIEsystem = new ColourSystem("CIE", 0.7355, 0.2645, 0.2658, 0.7243, 0.1669, 0.0085, IlluminantE[0], IlluminantE[1], GAMMA_REC709);
-const Rec709system = new ColourSystem("CIE REC 709", 0.64, 0.33, 0.3, 0.6, 0.15, 0.06, IlluminantD65[0], IlluminantD65[1], GAMMA_REC709);
+const NTSCsystem = new ColourSystem(
+    "NTSC",
+    0.67,
+    0.33,
+    0.21,
+    0.71,
+    0.14,
+    0.08,
+    IlluminantC[0],
+    IlluminantC[1],
+    GAMMA_REC709
+);
+const EBUsystem = new ColourSystem(
+    "EBU (PAL/SECAM)",
+    0.64,
+    0.33,
+    0.29,
+    0.6,
+    0.15,
+    0.06,
+    IlluminantD65[0],
+    IlluminantD65[1],
+    GAMMA_REC709
+);
+const SMPTEsystem = new ColourSystem(
+    "SMPTE",
+    0.63,
+    0.34,
+    0.31,
+    0.595,
+    0.155,
+    0.07,
+    IlluminantD65[0],
+    IlluminantD65[1],
+    GAMMA_REC709
+);
+const HDTVsystem = new ColourSystem(
+    "HDTV",
+    0.67,
+    0.33,
+    0.21,
+    0.71,
+    0.15,
+    0.06,
+    IlluminantD65[0],
+    IlluminantD65[1],
+    GAMMA_REC709
+);
+const CIEsystem = new ColourSystem(
+    "CIE",
+    0.7355,
+    0.2645,
+    0.2658,
+    0.7243,
+    0.1669,
+    0.0085,
+    IlluminantE[0],
+    IlluminantE[1],
+    GAMMA_REC709
+);
+const Rec709system = new ColourSystem(
+    "CIE REC 709",
+    0.64,
+    0.33,
+    0.3,
+    0.6,
+    0.15,
+    0.06,
+    IlluminantD65[0],
+    IlluminantD65[1],
+    GAMMA_REC709
+);
 
 /*                          UPVP_TO_XY
 
@@ -464,7 +541,9 @@ export function demonstrate() {
         [r, g, b] = xyz_to_rgb(cs, x, y, z);
         [r, g, b] = constrain_rgb(r, g, b);
         [r, g, b] = norm_rgb(r, g, b);
-        console.log(`  ${t} K      ${x.toFixed(4)} ${y.toFixed(4)} ${z.toFixed(4)}   ${r.toFixed(3)} ${g.toFixed(3)} ${b.toFixed(3)}`);
+        console.log(
+            `  ${t} K      ${x.toFixed(4)} ${y.toFixed(4)} ${z.toFixed(4)}   ${r.toFixed(3)} ${g.toFixed(3)} ${b.toFixed(3)}`
+        );
     }
 }
 

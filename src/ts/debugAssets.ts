@@ -73,9 +73,17 @@ for (const rootMesh of scene.meshes) {
     if (rootMesh.parent !== null) continue;
     meshCounter++;
     const extent = rootMesh.getHierarchyBoundingVectors();
-    const maxDimension = Math.max(extent.max.x - extent.min.x, extent.max.y - extent.min.y, extent.max.z - extent.min.z);
+    const maxDimension = Math.max(
+        extent.max.x - extent.min.x,
+        extent.max.y - extent.min.y,
+        extent.max.z - extent.min.z
+    );
     rootMesh.scaling.scaleInPlace(1 / maxDimension);
-    rootMesh.position = new Vector3(sideLength + (meshCounter % sideLength) - sideLength / 2, 0, Math.floor(meshCounter / sideLength) - sideLength / 2);
+    rootMesh.position = new Vector3(
+        sideLength + (meshCounter % sideLength) - sideLength / 2,
+        0,
+        Math.floor(meshCounter / sideLength) - sideLength / 2
+    );
 }
 
 const transformNodes = scene.transformNodes.slice();
@@ -84,7 +92,10 @@ for (const transform of transformNodes) {
 }
 
 for (let i = 0; i < scene.textures.length; i++) {
-    showTexture(scene.textures[i], new Vector3((i % sideLength) - sideLength / 2, 0, Math.floor(i / sideLength) - sideLength / 2));
+    showTexture(
+        scene.textures[i],
+        new Vector3((i % sideLength) - sideLength / 2, 0, Math.floor(i / sideLength) - sideLength / 2)
+    );
 }
 
 scene.executeWhenReady(() => {

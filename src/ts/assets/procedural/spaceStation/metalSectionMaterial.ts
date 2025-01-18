@@ -18,7 +18,10 @@
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Scene } from "@babylonjs/core/scene";
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { setStellarObjectUniforms, StellarObjectUniformNames } from "../../../postProcesses/uniforms/stellarObjectUniforms";
+import {
+    setStellarObjectUniforms,
+    StellarObjectUniformNames
+} from "../../../postProcesses/uniforms/stellarObjectUniforms";
 import { Transformable } from "../../../architecture/transformable";
 
 import metalSectionMaterialFragment from "../../../../shaders/metalSectionMaterial/fragment.glsl";

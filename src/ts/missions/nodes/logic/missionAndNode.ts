@@ -56,12 +56,20 @@ export class MissionAndNode implements MissionNode {
     }
 
     describe(originSystemCoordinates: StarSystemCoordinates, starSystemDatabase: StarSystemDatabase): string {
-        return this.children.map((child) => child.describe(originSystemCoordinates, starSystemDatabase)).join(` ${i18n.t("common:and")} `);
+        return this.children
+            .map((child) => child.describe(originSystemCoordinates, starSystemDatabase))
+            .join(` ${i18n.t("common:and")} `);
     }
 
-    describeNextTask(context: MissionContext, keyboardLayout: Map<string, string>, starSystemDatabase: StarSystemDatabase): string {
+    describeNextTask(
+        context: MissionContext,
+        keyboardLayout: Map<string, string>,
+        starSystemDatabase: StarSystemDatabase
+    ): string {
         if (this.hasCompletedLock) return "Mission completed";
-        return this.children.map((child) => child.describeNextTask(context, keyboardLayout, starSystemDatabase)).join(` ${i18n.t("common:and")} `);
+        return this.children
+            .map((child) => child.describeNextTask(context, keyboardLayout, starSystemDatabase))
+            .join(` ${i18n.t("common:and")} `);
     }
 
     getTargetSystems(): StarSystemCoordinates[] {

@@ -15,22 +15,36 @@ export function getGoToSystemInstructions(
     starSystemDatabase: StarSystemDatabase
 ): string {
     const currentPlayerDestination = missionContext.currentItinerary.at(-1);
-    const isPlayerGoingToTargetSystem = currentPlayerDestination !== undefined && starSystemCoordinatesEquals(currentPlayerDestination, targetSystemCoordinates);
+    const isPlayerGoingToTargetSystem =
+        currentPlayerDestination !== undefined &&
+        starSystemCoordinatesEquals(currentPlayerDestination, targetSystemCoordinates);
 
-    const currentSystemPosition = starSystemDatabase.getSystemGalacticPosition(missionContext.currentSystem.model.coordinates);
+    const currentSystemPosition = starSystemDatabase.getSystemGalacticPosition(
+        missionContext.currentSystem.model.coordinates
+    );
 
     if (!isPlayerGoingToTargetSystem) {
         return i18n.t("missions:common:openStarMap", {
-            starMapKey: pressInteractionToStrings(GeneralInputs.map.toggleStarMap, keyboardLayout).join(` ${i18n.t("common:or")} `)
+            starMapKey: pressInteractionToStrings(GeneralInputs.map.toggleStarMap, keyboardLayout).join(
+                ` ${i18n.t("common:or")} `
+            )
         });
     } else {
         const nextSystemCoordinates = missionContext.currentItinerary[1];
-        const nextSystemModel = nextSystemCoordinates !== undefined ? starSystemDatabase.getSystemModelFromCoordinates(nextSystemCoordinates) : undefined;
+        const nextSystemModel =
+            nextSystemCoordinates !== undefined
+                ? starSystemDatabase.getSystemModelFromCoordinates(nextSystemCoordinates)
+                : undefined;
         if (nextSystemModel === undefined) {
-            throw new Error("Next system model in itinerary is undefined and yet the player has an itinerary to the target system?!");
+            throw new Error(
+                "Next system model in itinerary is undefined and yet the player has an itinerary to the target system?!"
+            );
         }
 
-        const distanceToNextSystem = Vector3.Distance(starSystemDatabase.getSystemGalacticPosition(nextSystemModel.coordinates), currentSystemPosition);
+        const distanceToNextSystem = Vector3.Distance(
+            starSystemDatabase.getSystemGalacticPosition(nextSystemModel.coordinates),
+            currentSystemPosition
+        );
 
         return i18n.t("missions:common:travelToNextSystem", {
             systemName: nextSystemModel.name,

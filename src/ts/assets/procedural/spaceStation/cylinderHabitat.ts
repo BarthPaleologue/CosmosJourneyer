@@ -74,13 +74,20 @@ export class CylinderHabitat implements Transformable {
     }
 
     update(stellarObjects: Transformable[], cameraWorldPosition: Vector3, deltaSeconds: number) {
-        this.getTransform().rotate(Axis.Y, deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, Settings.G_EARTH));
+        this.getTransform().rotate(
+            Axis.Y,
+            deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, Settings.G_EARTH)
+        );
         this.cylinderMaterial.update(stellarObjects);
 
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
 
         if (distanceToCamera < 350e3 && this.cylinderAggregate === null) {
-            this.cylinderAggregate = createEnvironmentAggregate(this.cylinder, PhysicsShapeType.MESH, this.getTransform().getScene());
+            this.cylinderAggregate = createEnvironmentAggregate(
+                this.cylinder,
+                PhysicsShapeType.MESH,
+                this.getTransform().getScene()
+            );
         } else if (distanceToCamera > 360e3 && this.cylinderAggregate !== null) {
             this.cylinderAggregate.dispose();
             this.cylinderAggregate = null;

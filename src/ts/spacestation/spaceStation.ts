@@ -169,7 +169,12 @@ export class SpaceStation implements OrbitalFacility {
             this.helixHabitats.push(helixHabitat);
             newNode = helixHabitat.getTransform();
         } else if (habitatType === SpaceStationNodeType.RING_HABITAT) {
-            const ringHabitat = new RingHabitat(this.model, habitatSurface, Settings.SEED_HALF_RANGE * rng(27), this.scene);
+            const ringHabitat = new RingHabitat(
+                this.model,
+                habitatSurface,
+                Settings.SEED_HALF_RANGE * rng(27),
+                this.scene
+            );
             this.ringHabitats.push(ringHabitat);
             newNode = ringHabitat.getTransform();
         } else if (habitatType === SpaceStationNodeType.CYLINDER_HABITAT) {
@@ -195,10 +200,17 @@ export class SpaceStation implements OrbitalFacility {
         landingBay.getTransform().parent = this.getTransform();
     }
 
-    private addUtilitySections(lastNode: TransformNode, nbSections: number, rng: (index: number) => number): TransformNode {
+    private addUtilitySections(
+        lastNode: TransformNode,
+        nbSections: number,
+        rng: (index: number) => number
+    ): TransformNode {
         let newLastNode = lastNode;
         for (let i = 0; i < nbSections; i++) {
-            const utilitySection = new UtilitySection(rng(132 + 10 * this.utilitySections.length) * Settings.SEED_HALF_RANGE, this.scene);
+            const utilitySection = new UtilitySection(
+                rng(132 + 10 * this.utilitySections.length) * Settings.SEED_HALF_RANGE,
+                this.scene
+            );
             this.utilitySections.push(utilitySection);
 
             this.placeNode(utilitySection.getTransform(), newLastNode);
@@ -224,12 +236,23 @@ export class SpaceStation implements OrbitalFacility {
         node.position = parent.position.add(parent.up.scale(previousSectionSizeY + newSectionY));
     }
 
-    update(stellarObjects: Transformable[], parents: OrbitalObject[], cameraWorldPosition: Vector3, deltaSeconds: number) {
+    update(
+        stellarObjects: Transformable[],
+        parents: OrbitalObject[],
+        cameraWorldPosition: Vector3,
+        deltaSeconds: number
+    ) {
         this.solarSections.forEach((solarSection) => solarSection.update(stellarObjects, cameraWorldPosition));
         this.utilitySections.forEach((utilitySection) => utilitySection.update(stellarObjects, cameraWorldPosition));
-        this.helixHabitats.forEach((helixHabitat) => helixHabitat.update(stellarObjects, cameraWorldPosition, deltaSeconds));
-        this.ringHabitats.forEach((ringHabitat) => ringHabitat.update(stellarObjects, cameraWorldPosition, deltaSeconds));
-        this.cylinderHabitats.forEach((cylinderHabitat) => cylinderHabitat.update(stellarObjects, cameraWorldPosition, deltaSeconds));
+        this.helixHabitats.forEach((helixHabitat) =>
+            helixHabitat.update(stellarObjects, cameraWorldPosition, deltaSeconds)
+        );
+        this.ringHabitats.forEach((ringHabitat) =>
+            ringHabitat.update(stellarObjects, cameraWorldPosition, deltaSeconds)
+        );
+        this.cylinderHabitats.forEach((cylinderHabitat) =>
+            cylinderHabitat.update(stellarObjects, cameraWorldPosition, deltaSeconds)
+        );
         this.landingBays.forEach((landingBay) => landingBay.update(stellarObjects, cameraWorldPosition, deltaSeconds));
         this.engineBays.forEach((engineBay) => engineBay.update(stellarObjects, cameraWorldPosition));
     }

@@ -274,14 +274,26 @@ $gaps: 10px;
 
                     &.uploaded {
                         --color-frontier: 95%;
-                        background: linear-gradient(90deg, var(--accent-color-dark) var(--color-frontier), green var(--color-frontier));
+                        background: linear-gradient(
+                            90deg,
+                            var(--accent-color-dark) var(--color-frontier),
+                            green var(--color-frontier)
+                        );
 
                         &:hover {
-                            background: linear-gradient(90deg, var(--accent-color) var(--color-frontier), green var(--color-frontier));
+                            background: linear-gradient(
+                                90deg,
+                                var(--accent-color) var(--color-frontier),
+                                green var(--color-frontier)
+                            );
                         }
 
                         &.selected {
-                            background: linear-gradient(90deg, var(--accent-color-light) var(--color-frontier), green var(--color-frontier));
+                            background: linear-gradient(
+                                90deg,
+                                var(--accent-color-light) var(--color-frontier),
+                                green var(--color-frontier)
+                            );
                         }
                     }
 

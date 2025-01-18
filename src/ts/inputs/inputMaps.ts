@@ -7,4 +7,12 @@ import { StarSystemInputs } from "./starSystemInputs";
 import { StarMapInputs } from "../starmap/starMapInputs";
 import { TutorialControlsInputs } from "../ui/tutorial/tutorialLayerInputs";
 
-export const InputMaps: InputMap<any>[] = [GeneralInputs, StarSystemInputs, StarMapInputs, SpaceShipControlsInputs, CharacterInputs, DefaultControlsInputs, TutorialControlsInputs];
+export const InputMaps: InputMap<any>[] = [
+    GeneralInputs,
+    StarSystemInputs,
+    StarMapInputs,
+    SpaceShipControlsInputs,
+    CharacterInputs,
+    DefaultControlsInputs,
+    TutorialControlsInputs
+];

@@ -34,7 +34,11 @@ export type GasPlanetModel = PlanetModel & {
     readonly type: OrbitalObjectType.GAS_PLANET;
 };
 
-export function newSeededGasPlanetModel(seed: number, name: string, parentBodies: CelestialBodyModel[]): GasPlanetModel {
+export function newSeededGasPlanetModel(
+    seed: number,
+    name: string,
+    parentBodies: CelestialBodyModel[]
+): GasPlanetModel {
     const rng = getRngFromSeed(seed);
 
     const radius = randRangeInt(Settings.EARTH_RADIUS * 4, Settings.EARTH_RADIUS * 20, rng, GenerationSteps.RADIUS);

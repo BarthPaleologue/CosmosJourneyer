@@ -9,7 +9,16 @@ export const enum CropType {
     CASSAVA
 }
 
-export const CropTypes: CropType[] = [CropType.POTATO, CropType.YAM, CropType.SWEET_POTATO, CropType.RICE, CropType.PEANUT, CropType.WHEAT, CropType.LENTIL, CropType.CASSAVA];
+export const CropTypes: CropType[] = [
+    CropType.POTATO,
+    CropType.YAM,
+    CropType.SWEET_POTATO,
+    CropType.RICE,
+    CropType.PEANUT,
+    CropType.WHEAT,
+    CropType.LENTIL,
+    CropType.CASSAVA
+];
 
 /**
  * Edible energy in kcal/ha/day for different plant species

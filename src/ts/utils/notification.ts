@@ -143,7 +143,12 @@ export function updateNotifications(deltaSeconds: number): void {
  * @param text The text to display
  * @param durationMillis The duration of the notification in ms
  */
-export function createNotification(type: NotificationOrigin, intent: NotificationIntent, text: string, durationMillis: number) {
+export function createNotification(
+    type: NotificationOrigin,
+    intent: NotificationIntent,
+    text: string,
+    durationMillis: number
+) {
     const notification = new Notification(type, intent, text, durationMillis / 1000);
     activeNotifications.push(notification);
 }

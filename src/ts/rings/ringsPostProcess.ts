@@ -36,7 +36,13 @@ export class RingsPostProcess extends PostProcess {
 
     private activeCamera: Camera | null = null;
 
-    constructor(bodyTransform: TransformNode, ringsUniforms: RingsUniforms, bodyModel: CelestialBodyModel, stellarObjects: Transformable[], scene: Scene) {
+    constructor(
+        bodyTransform: TransformNode,
+        ringsUniforms: RingsUniforms,
+        bodyModel: CelestialBodyModel,
+        stellarObjects: Transformable[],
+        scene: Scene
+    ) {
         const shaderName = "rings";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = ringsFragment;

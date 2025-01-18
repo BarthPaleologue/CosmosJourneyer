@@ -42,18 +42,46 @@ export class RingsPanel extends EditorPanel {
         });
 
         this.sliders = [
-            new Slider("ringsMinRadius", document.getElementById("ringsMinRadius") as HTMLElement, 100, 200, ringsUniforms.model.ringStart * 100, (val: number) => {
-                ringsUniforms.model.ringStart = val / 100;
-            }),
-            new Slider("ringsMaxRadius", document.getElementById("ringsMaxRadius") as HTMLElement, 150, 400, ringsUniforms.model.ringEnd * 100, (val: number) => {
-                ringsUniforms.model.ringEnd = val / 100;
-            }),
-            new Slider("ringsFrequency", document.getElementById("ringsFrequency") as HTMLElement, 10, 100, ringsUniforms.model.ringFrequency, (val: number) => {
-                ringsUniforms.model.ringFrequency = val;
-            }),
-            new Slider("ringsOpacity", document.getElementById("ringsOpacity") as HTMLElement, 0, 100, ringsUniforms.model.ringOpacity * 100, (val: number) => {
-                ringsUniforms.model.ringOpacity = val / 100;
-            })
+            new Slider(
+                "ringsMinRadius",
+                document.getElementById("ringsMinRadius") as HTMLElement,
+                100,
+                200,
+                ringsUniforms.model.ringStart * 100,
+                (val: number) => {
+                    ringsUniforms.model.ringStart = val / 100;
+                }
+            ),
+            new Slider(
+                "ringsMaxRadius",
+                document.getElementById("ringsMaxRadius") as HTMLElement,
+                150,
+                400,
+                ringsUniforms.model.ringEnd * 100,
+                (val: number) => {
+                    ringsUniforms.model.ringEnd = val / 100;
+                }
+            ),
+            new Slider(
+                "ringsFrequency",
+                document.getElementById("ringsFrequency") as HTMLElement,
+                10,
+                100,
+                ringsUniforms.model.ringFrequency,
+                (val: number) => {
+                    ringsUniforms.model.ringFrequency = val;
+                }
+            ),
+            new Slider(
+                "ringsOpacity",
+                document.getElementById("ringsOpacity") as HTMLElement,
+                0,
+                100,
+                ringsUniforms.model.ringOpacity * 100,
+                (val: number) => {
+                    ringsUniforms.model.ringOpacity = val / 100;
+                }
+            )
         ];
     }
 }
