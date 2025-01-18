@@ -1,4 +1,5 @@
 import { parseSaveFileData } from "../src/ts/saveFile/saveFileData";
+import { expect, test } from "vitest";
 
 test("Loading a correct save file", () => {
     const saveFileString = `

@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { romanNumeral } from "../src/ts/utils/strings/romanNumerals";
+import { expect, test } from "vitest";
 
 test("romanNumeral", () => {
     expect(romanNumeral(1)).toBe("I");

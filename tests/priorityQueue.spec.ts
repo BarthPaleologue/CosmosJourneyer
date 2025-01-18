@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { PriorityQueue } from "../src/ts/utils/priorityQueue";
+import { expect, test } from "vitest";
 
 test("PriorityList", () => {
     const queue = new PriorityQueue<number>((a, b) => a > b);

@@ -28,9 +28,11 @@ import {
     getSchwarzschildRadius,
     getSphereRadiatedEnergyFlux,
     getSphereTotalRadiatedEnergy,
-    hasLiquidWater, kelvinToCelsius,
+    hasLiquidWater,
+    kelvinToCelsius,
     waterBoilingTemperature
 } from "../src/ts/utils/physics";
+import { expect, test, describe } from "vitest";
 
 test("celsiusToKelvin", () => {
     expect(celsiusToKelvin(0)).toBe(273.15);
