@@ -17,6 +17,7 @@
 
 import { getSolarPanelSurfaceFromEnergyRequirement } from "../src/ts/utils/solarPanels";
 import { getSphereRadiatedEnergyFlux } from "../src/ts/utils/physics";
+import { expect, test } from "vitest";
 
 test("solarPanelSurfaceCalculation", () => {
     // test with ISS data
