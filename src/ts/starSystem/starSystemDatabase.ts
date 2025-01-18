@@ -23,7 +23,6 @@ import { getRngFromSeed } from "../utils/getRngFromSeed";
 import { Settings } from "../settings";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { centeredRand } from "extended-random";
-import { SystemSeed } from "./systemSeed";
 import { makeNoise3D } from "fast-simplex-noise/lib/3d";
 
 export class StarSystemDatabase {
@@ -99,26 +98,25 @@ export class StarSystemDatabase {
             return this.applyPlugins(customSystem);
         }
 
-        const seed = this.getSeedFromCoordinates(coordinates);
-        if (seed === null) {
+        const generatedSystemCoordinates = this.getGeneratedSystemCoordinatesInStarSector(coordinates.starSectorX, coordinates.starSectorY, coordinates.starSectorZ);
+        const index = generatedSystemCoordinates.findIndex((otherCoordinates) => starSystemCoordinatesEquals(coordinates, otherCoordinates));
+        if (index === -1) {
             throw new Error(`Seed not found for coordinates ${JSON.stringify(coordinates)}. It was not found in the custom system registry either.`);
         }
 
         // init pseudo-random number generator
         const cellRNG = getRngFromSeed(hashVec3(coordinates.starSectorX, coordinates.starSectorY, coordinates.starSectorZ));
-        const hash = centeredRand(cellRNG, 1 + seed.index) * Settings.SEED_HALF_RANGE;
+        const hash = centeredRand(cellRNG, 1 + index) * Settings.SEED_HALF_RANGE;
         const systemRng = getRngFromSeed(hash);
 
         return this.applyPlugins(newSeededStarSystemModel(systemRng, coordinates, this.getSystemGalacticPosition(coordinates), this.isSystemInHumanBubble(coordinates)));
     }
 
-    public getSystemModelsInStarSector(sectorX: number, sectorY: number, sectorZ: number) {
-        const generatedModels: StarSystemModel[] = [];
-
+    private getGeneratedSystemCoordinatesInStarSector(sectorX: number, sectorY: number, sectorZ: number) {
         const localPositions = this.getGeneratedLocalPositionsInStarSector(sectorX, sectorY, sectorZ);
 
-        for (const localPosition of localPositions) {
-            const systemCoordinates: StarSystemCoordinates = {
+        return localPositions.map((localPosition) => {
+            return {
                 starSectorX: sectorX,
                 starSectorY: sectorY,
                 starSectorZ: sectorZ,
@@ -126,7 +124,32 @@ export class StarSystemDatabase {
                 localY: localPosition.y,
                 localZ: localPosition.z
             };
+        });
+    }
 
+    public getSystemCoordinatesInStarSector(sectorX: number, sectorY: number, sectorZ: number) {
+        const generatedSystemCoordinates = this.getGeneratedSystemCoordinatesInStarSector(sectorX, sectorY, sectorZ);
+
+        const customSystemModels = this.getCustomSystemsFromSector(sectorX, sectorY, sectorZ);
+        const customSystemCoordinates = customSystemModels.map((model) => {
+            return model.coordinates;
+        });
+
+        return generatedSystemCoordinates.concat(customSystemCoordinates);
+    }
+
+    /**
+     * @param sectorX
+     * @param sectorY
+     * @param sectorZ
+     * @returns All system models (custom and generated) in the given star sector.
+     */
+    public getSystemModelsInStarSector(sectorX: number, sectorY: number, sectorZ: number) {
+        const generatedModels: StarSystemModel[] = [];
+
+        const generatedSystemCoordinates = this.getGeneratedSystemCoordinatesInStarSector(sectorX, sectorY, sectorZ);
+
+        for (const systemCoordinates of generatedSystemCoordinates) {
             const systemModel = this.getSystemModelFromCoordinates(systemCoordinates);
             generatedModels.push(systemModel);
         }
@@ -140,40 +163,17 @@ export class StarSystemDatabase {
         });
     }
 
-    /**
-     * From a system coordinates, try to find the seed of the system.
-     * @param coordinates The coordinates of the system.
-     * @returns The seed of the system, or null if not found.
-     */
-    public getSeedFromCoordinates(coordinates: StarSystemCoordinates): SystemSeed | null {
-        const systemLocalPositions = this.getGeneratedLocalPositionsInStarSector(coordinates.starSectorX, coordinates.starSectorY, coordinates.starSectorZ);
-        const indexOfSystem = systemLocalPositions.findIndex((localPosition) => {
-            return localPosition.x === coordinates.localX && localPosition.y === coordinates.localY && localPosition.z === coordinates.localZ;
-        });
-
-        if (indexOfSystem === -1) {
-            return null;
-        }
-
-        return {
-            starSectorX: coordinates.starSectorX,
-            starSectorY: coordinates.starSectorY,
-            starSectorZ: coordinates.starSectorZ,
-            index: indexOfSystem
-        };
-    }
-
-    public getSystemCoordinatesFromSeed(systemSeed: SystemSeed): StarSystemCoordinates {
-        const systemLocalPositions = this.getGeneratedLocalPositionsInStarSector(systemSeed.starSectorX, systemSeed.starSectorY, systemSeed.starSectorZ);
-        const systemLocalPosition = systemLocalPositions.at(systemSeed.index);
+    public getSystemCoordinatesFromSeed(starSectorX: number, starSectorY: number, starSectorZ: number, index: number): StarSystemCoordinates {
+        const systemLocalPositions = this.getGeneratedLocalPositionsInStarSector(starSectorX, starSectorY, starSectorZ);
+        const systemLocalPosition = systemLocalPositions.at(index);
         if (systemLocalPosition === undefined) {
-            throw new Error(`Local position not found for seed ${JSON.stringify(systemSeed)}`);
+            throw new Error(`Local position not found for seed ${index} in star sector ${starSectorX}, ${starSectorY}, ${starSectorZ}`);
         }
 
         return {
-            starSectorX: systemSeed.starSectorX,
-            starSectorY: systemSeed.starSectorY,
-            starSectorZ: systemSeed.starSectorZ,
+            starSectorX: starSectorX,
+            starSectorY: starSectorY,
+            starSectorZ: starSectorZ,
             localX: systemLocalPosition.x,
             localY: systemLocalPosition.y,
             localZ: systemLocalPosition.z

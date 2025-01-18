@@ -40,22 +40,11 @@ export function getNeighborStarSystemCoordinates(
 
     return starSectorCoordinates.flatMap((starSector) => {
         const starPositions = starSystemDatabase.getSystemPositionsInStarSector(starSector.x, starSector.y, starSector.z);
-        const starLocalPositions = starSystemDatabase.getSystemLocalPositionsInStarSector(starSector.x, starSector.y, starSector.z);
+        const systemCoordinates = starSystemDatabase.getSystemCoordinatesInStarSector(starSector.x, starSector.y, starSector.z);
         return starPositions
             .map<[StarSystemCoordinates, Vector3, number]>((position, index) => {
                 const distance = Vector3.Distance(position, currentSystemPosition);
-                return [
-                    {
-                        starSectorX: starSector.x,
-                        starSectorY: starSector.y,
-                        starSectorZ: starSector.z,
-                        localX: starLocalPositions[index].x,
-                        localY: starLocalPositions[index].y,
-                        localZ: starLocalPositions[index].z
-                    },
-                    position,
-                    distance
-                ];
+                return [systemCoordinates[index], position, distance];
             })
             .filter(([neighborCoordinates, position, distance]) => {
                 return distance <= radius && !starSystemCoordinatesEquals(neighborCoordinates, starSystemCoordinates);

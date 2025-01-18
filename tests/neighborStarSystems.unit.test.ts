@@ -23,12 +23,7 @@ import { StarSystemDatabase } from "../src/ts/starSystem/starSystemDatabase";
 test("getNeighborStarSystemCoordinates", () => {
     const starSystemDatabase = new StarSystemDatabase();
 
-    const systemCoordinates = starSystemDatabase.getSystemCoordinatesFromSeed({
-        starSectorX: 0,
-        starSectorY: 0,
-        starSectorZ: 0,
-        index: 0
-    });
+    const systemCoordinates = starSystemDatabase.getSystemCoordinatesFromSeed(0.0, 0.0, 0.0, 0);
 
     for (let i = 0; i < 10; i++) {
         const searchRadius = 5 * i;

@@ -67,82 +67,42 @@ export class MainMenu {
 
         const allowedIdentifiers: UniverseObjectId[] = [
             {
-                starSystemCoordinates: starSystemDatabase.getSystemCoordinatesFromSeed({
-                    starSectorX: 1,
-                    starSectorY: 1,
-                    starSectorZ: 0,
-                    index: 7
-                }),
+                starSystemCoordinates: starSystemDatabase.getSystemCoordinatesFromSeed(1, 1, 0, 7),
                 objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
                 objectIndex: 1
             },
             {
-                starSystemCoordinates: starSystemDatabase.getSystemCoordinatesFromSeed({
-                    starSectorX: 0,
-                    starSectorY: 0,
-                    starSectorZ: 0,
-                    index: 0
-                }),
+                starSystemCoordinates: starSystemDatabase.getSystemCoordinatesFromSeed(0, 0, 0, 0),
                 objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
                 objectIndex: 1
             },
             {
-                starSystemCoordinates: starSystemDatabase.getSystemCoordinatesFromSeed({
-                    starSectorX: 0,
-                    starSectorY: 0,
-                    starSectorZ: 1,
-                    index: 4
-                }),
+                starSystemCoordinates: starSystemDatabase.getSystemCoordinatesFromSeed(0, 0, 1, 4),
                 objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
                 objectIndex: 3
             },
             {
-                starSystemCoordinates: starSystemDatabase.getSystemCoordinatesFromSeed({
-                    starSectorX: 0,
-                    starSectorY: 0,
-                    starSectorZ: 1,
-                    index: 9
-                }),
+                starSystemCoordinates: starSystemDatabase.getSystemCoordinatesFromSeed(0, 0, 1, 9),
                 objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
                 objectIndex: 0
             },
             {
-                starSystemCoordinates: starSystemDatabase.getSystemCoordinatesFromSeed({
-                    starSectorX: 0,
-                    starSectorY: 0,
-                    starSectorZ: 1,
-                    index: 1
-                }),
+                starSystemCoordinates: starSystemDatabase.getSystemCoordinatesFromSeed(0, 0, 1, 1),
                 objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
                 objectIndex: 1
             },
             {
-                starSystemCoordinates: starSystemDatabase.getSystemCoordinatesFromSeed({
-                    starSectorX: 1,
-                    starSectorY: 1,
-                    starSectorZ: 0,
-                    index: 12
-                }),
+                starSystemCoordinates: starSystemDatabase.getSystemCoordinatesFromSeed(1, 1, 0, 12),
                 objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
                 objectIndex: 0
             },
             {
-                starSystemCoordinates: starSystemDatabase.getSystemCoordinatesFromSeed({
-                    starSectorX: 1,
-                    starSectorY: 1,
-                    starSectorZ: 0,
-                    index: 5
-                }),
+                starSystemCoordinates: starSystemDatabase.getSystemCoordinatesFromSeed(1, 1, 0, 5),
                 objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
                 objectIndex: 0
             },
             {
-                starSystemCoordinates: starSystemDatabase.getSystemCoordinatesFromSeed({
-                    starSectorX: 0,
-                    starSectorY: 0,
-                    starSectorZ: 0,
-                    index: 17
-                }),
+                starSystemCoordinates: starSystemDatabase.getSystemCoordinatesFromSeed(0, 0, 0, 17),
                 objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
                 objectIndex: 2
             }
