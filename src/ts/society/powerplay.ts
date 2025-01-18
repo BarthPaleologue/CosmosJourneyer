@@ -26,7 +26,8 @@ const materialistSpiritualistPerlin = makeNoise3D(() => {
     return materialistSpiritualistRng(materialistSpiritualistSampleStep++);
 });
 
-export const MaterialistSpiritualistAxis = (x: number, y: number, z: number) => materialistSpiritualistPerlin(x * 0.2, y * 0.2, z * 0.2) * 0.5 + 0.5;
+export const MaterialistSpiritualistAxis = (x: number, y: number, z: number) =>
+    materialistSpiritualistPerlin(x * 0.2, y * 0.2, z * 0.2) * 0.5 + 0.5;
 
 const capitalistCommunistRng = getRngFromSeed(Settings.POWER_PLAY_SEED + 598);
 let capitalistCommunistSampleStep = 0;
@@ -34,7 +35,8 @@ const capitalistCommunistPerlin = makeNoise3D(() => {
     return capitalistCommunistRng(capitalistCommunistSampleStep++);
 });
 
-export const CapitalistCommunistAxis = (x: number, y: number, z: number) => capitalistCommunistPerlin(x * 0.2, y * 0.2, z * 0.2) * 0.5 + 0.5;
+export const CapitalistCommunistAxis = (x: number, y: number, z: number) =>
+    capitalistCommunistPerlin(x * 0.2, y * 0.2, z * 0.2) * 0.5 + 0.5;
 
 export function getPowerPlayData(systemGalacticPosition: Vector3) {
     const coords = systemGalacticPosition;

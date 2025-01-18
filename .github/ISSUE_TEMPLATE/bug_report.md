@@ -1,10 +1,9 @@
 ---
 name: Bug report
 about: Create a report to help us improve
-title: ''
-labels: ''
-assignees: ''
-
+title: ""
+labels: ""
+assignees: ""
 ---
 
 **Describe the bug**
@@ -14,6 +13,7 @@ A clear and concise description of what the bug is.
 **To Reproduce**
 
 Steps to reproduce the behavior:
+
 1. Go to '...'
 2. Click on '...'
 3. Unexpected behavior '...'
@@ -32,8 +32,8 @@ If you have a save file to reproduce the bug easily, please drop it there, it wi
 
 **Backend informations**
 
- - OS: [e.g. Windows, Ubuntu, MacOS]
- - Browser [e.g. Firefox, Chrome, Safari]
+- OS: [e.g. Windows, Ubuntu, MacOS]
+- Browser [e.g. Firefox, Chrome, Safari]
 
 **Additional context**
 

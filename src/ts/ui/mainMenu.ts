@@ -210,12 +210,20 @@ export class MainMenu {
 
         this.starSystemView.onInitStarSystem.addOnce(async () => {
             await this.starSystemView.switchToDefaultControls(false);
-            const nbRadius = StarSystemModelUtils.GetStellarObjects(this.starSystemModel)[0].type === OrbitalObjectType.BLACK_HOLE ? 8 : 2;
+            const nbRadius =
+                StarSystemModelUtils.GetStellarObjects(this.starSystemModel)[0].type === OrbitalObjectType.BLACK_HOLE
+                    ? 8
+                    : 2;
             const targetObject = getObjectBySystemId(this.universeObjectId, this.starSystemView.getStarSystem());
             if (targetObject === null) {
                 throw new Error(`Could not find object with ID ${JSON.stringify(this.universeObjectId)}`);
             }
-            positionNearObjectWithStarVisible(this.controls, targetObject, this.starSystemView.getStarSystem(), nbRadius);
+            positionNearObjectWithStarVisible(
+                this.controls,
+                targetObject,
+                this.starSystemView.getStarSystem(),
+                nbRadius
+            );
 
             Sounds.MAIN_MENU_BACKGROUND_MUSIC.play();
         });
@@ -240,14 +248,27 @@ export class MainMenu {
         if (celestialBody === undefined) {
             throw new Error("No corresponding celestial body found");
         }
-        const newForward = celestialBody.getTransform().getAbsolutePosition().subtract(this.controls.getTransform().getAbsolutePosition()).normalize();
+        const newForward = celestialBody
+            .getTransform()
+            .getAbsolutePosition()
+            .subtract(this.controls.getTransform().getAbsolutePosition())
+            .normalize();
         const axis = Vector3.Cross(currentForward, newForward);
         const angle = Vector3.GetAngleBetweenVectors(currentForward, newForward, axis);
 
         const targetPosition = positionNearObjectAsteroidField(celestialBody, starSystemController);
 
-        const rotationAnimation = new TransformRotationAnimation(this.controls.getTransform(), axis, angle, this.startAnimationDurationSeconds);
-        const translationAnimation = new TransformTranslationAnimation(this.controls.getTransform(), targetPosition, this.startAnimationDurationSeconds);
+        const rotationAnimation = new TransformRotationAnimation(
+            this.controls.getTransform(),
+            axis,
+            angle,
+            this.startAnimationDurationSeconds
+        );
+        const translationAnimation = new TransformTranslationAnimation(
+            this.controls.getTransform(),
+            targetPosition,
+            this.startAnimationDurationSeconds
+        );
 
         if (this.title === null) throw new Error("Title is null");
 

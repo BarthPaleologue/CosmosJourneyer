@@ -59,7 +59,11 @@ export class MatterJetPostProcess extends PostProcess implements UpdatablePostPr
             ROTATION_AXIS: "rotationAxis"
         };
 
-        const uniforms: string[] = [...Object.values(ObjectUniformNames), ...Object.values(CameraUniformNames), ...Object.values(MatterJetUniformNames)];
+        const uniforms: string[] = [
+            ...Object.values(ObjectUniformNames),
+            ...Object.values(CameraUniformNames),
+            ...Object.values(MatterJetUniformNames)
+        ];
 
         const samplers: string[] = Object.values(SamplerUniformNames);
 
@@ -91,7 +95,10 @@ export class MatterJetPostProcess extends PostProcess implements UpdatablePostPr
             setCameraUniforms(effect, this.activeCamera);
             setObjectUniforms(effect, stellarTransform, boundingRadius);
 
-            effect.setFloat(MatterJetUniformNames.TIME, this.matterJetUniforms.time % (this.matterJetUniforms.rotationPeriod * 10000));
+            effect.setFloat(
+                MatterJetUniformNames.TIME,
+                this.matterJetUniforms.time % (this.matterJetUniforms.rotationPeriod * 10000)
+            );
             effect.setFloat(MatterJetUniformNames.ROTATION_PERIOD, this.matterJetUniforms.rotationPeriod);
             effect.setVector3(MatterJetUniformNames.ROTATION_AXIS, stellarTransform.up);
 

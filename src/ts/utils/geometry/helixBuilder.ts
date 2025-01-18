@@ -12,7 +12,14 @@ import { Scene } from "@babylonjs/core/scene";
  * @param pitch The distance between two spires.
  * @param tesselation The number of sides of the spiral.
  */
-export function createHelixVertexData(radius: number, thickness: number, height: number, nbSpires: number, pitch: number, tesselation: number) {
+export function createHelixVertexData(
+    radius: number,
+    thickness: number,
+    height: number,
+    nbSpires: number,
+    pitch: number,
+    tesselation: number
+) {
     const indices: number[] = [];
     const positions: number[] = [];
     const normals: number[] = [];
@@ -121,7 +128,15 @@ export function createHelixVertexData(radius: number, thickness: number, height:
     return vertexData;
 }
 
-export function createHelix(radius: number, thickness: number, height: number, tesselation: number, nbSpires: number, pitch: number, scene: Scene) {
+export function createHelix(
+    radius: number,
+    thickness: number,
+    height: number,
+    tesselation: number,
+    nbSpires: number,
+    pitch: number,
+    scene: Scene
+) {
     const vertexData = createHelixVertexData(radius, thickness, height, nbSpires, pitch, tesselation);
     const ring = new Mesh("ring", scene);
     vertexData.applyToMesh(ring);

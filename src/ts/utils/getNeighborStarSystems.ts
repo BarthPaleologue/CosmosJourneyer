@@ -30,17 +30,37 @@ export function getNeighborStarSystemCoordinates(
     const starSectorRadius = Math.ceil(radius / starSectorSize);
 
     const starSectorCoordinates: Vector3[] = [];
-    for (let x = starSystemCoordinates.starSectorX - starSectorRadius; x <= starSystemCoordinates.starSectorX + starSectorRadius; x++) {
-        for (let y = starSystemCoordinates.starSectorY - starSectorRadius; y <= starSystemCoordinates.starSectorY + starSectorRadius; y++) {
-            for (let z = starSystemCoordinates.starSectorZ - starSectorRadius; z <= starSystemCoordinates.starSectorZ + starSectorRadius; z++) {
+    for (
+        let x = starSystemCoordinates.starSectorX - starSectorRadius;
+        x <= starSystemCoordinates.starSectorX + starSectorRadius;
+        x++
+    ) {
+        for (
+            let y = starSystemCoordinates.starSectorY - starSectorRadius;
+            y <= starSystemCoordinates.starSectorY + starSectorRadius;
+            y++
+        ) {
+            for (
+                let z = starSystemCoordinates.starSectorZ - starSectorRadius;
+                z <= starSystemCoordinates.starSectorZ + starSectorRadius;
+                z++
+            ) {
                 starSectorCoordinates.push(new Vector3(x, y, z));
             }
         }
     }
 
     return starSectorCoordinates.flatMap((starSector) => {
-        const starPositions = starSystemDatabase.getSystemPositionsInStarSector(starSector.x, starSector.y, starSector.z);
-        const systemCoordinates = starSystemDatabase.getSystemCoordinatesInStarSector(starSector.x, starSector.y, starSector.z);
+        const starPositions = starSystemDatabase.getSystemPositionsInStarSector(
+            starSector.x,
+            starSector.y,
+            starSector.z
+        );
+        const systemCoordinates = starSystemDatabase.getSystemCoordinatesInStarSector(
+            starSector.x,
+            starSector.y,
+            starSector.z
+        );
         return starPositions
             .map<[StarSystemCoordinates, Vector3, number]>((position, index) => {
                 const distance = Vector3.Distance(position, currentSystemPosition);

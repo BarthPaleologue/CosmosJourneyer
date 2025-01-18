@@ -65,7 +65,11 @@ export function setMaxLinVel(havokPlugin: HavokPlugin, maxLinVel: number, maxAng
     tsbuf[229] = maxAngVel;
 }
 
-export function createEnvironmentAggregate(mesh: AbstractMesh, physicsShapeType: PhysicsShapeType, scene: Scene): PhysicsAggregate {
+export function createEnvironmentAggregate(
+    mesh: AbstractMesh,
+    physicsShapeType: PhysicsShapeType,
+    scene: Scene
+): PhysicsAggregate {
     const aggregate = new PhysicsAggregate(mesh, physicsShapeType, { mass: 0 }, scene);
     aggregate.body.disablePreStep = false;
     aggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;

@@ -33,9 +33,19 @@ import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
  * @param player The player for which the missions are generated
  * @returns The DOM element containing the generated missions as HTML
  */
-export function generateMissionsDom(stationModel: OrbitalFacilityModel, player: Player, starSystemDatabase: StarSystemDatabase): HTMLDivElement {
+export function generateMissionsDom(
+    stationModel: OrbitalFacilityModel,
+    player: Player,
+    starSystemDatabase: StarSystemDatabase
+): HTMLDivElement {
     const starSystemModel = starSystemDatabase.getSystemModelFromCoordinates(stationModel.starSystemCoordinates);
-    const sightSeeingMissions = generateSightseeingMissions(stationModel, starSystemModel, starSystemDatabase, player, Date.now());
+    const sightSeeingMissions = generateSightseeingMissions(
+        stationModel,
+        starSystemModel,
+        starSystemDatabase,
+        player,
+        Date.now()
+    );
 
     const starSystem = starSystemModel;
     const neighborSystems = getNeighborStarSystemCoordinates(starSystem.coordinates, 75, starSystemDatabase);
@@ -45,15 +55,19 @@ export function generateMissionsDom(stationModel: OrbitalFacilityModel, player: 
     let neighborSpaceStations: [OrbitalFacilityModel, number][] = [];
     neighborSystems.forEach(([coordinates, position, distance], index) => {
         const systemModel = starSystemDatabase.getSystemModelFromCoordinates(coordinates);
-        const spaceStations = StarSystemModelUtils.GetSpaceStations(systemModel).map<[OrbitalFacilityModel, number]>((stationModel) => {
-            return [stationModel, distance];
-        });
+        const spaceStations = StarSystemModelUtils.GetSpaceStations(systemModel).map<[OrbitalFacilityModel, number]>(
+            (stationModel) => {
+                return [stationModel, distance];
+            }
+        );
         neighborSpaceStations = neighborSpaceStations.concat(spaceStations);
     });
 
     const contactStations = neighborSpaceStations
         // prune list randomly based on distance
-        .filter(([station, distance], index) => uniformRandBool(1.0 / (1.0 + 0.02 * (distance * distance)), rng, 325 + index))
+        .filter(([station, distance], index) =>
+            uniformRandBool(1.0 / (1.0 + 0.02 * (distance * distance)), rng, 325 + index)
+        )
         // filter out stations of the same faction
         .filter(([station, distance]) => station.faction === stationModel.faction);
 

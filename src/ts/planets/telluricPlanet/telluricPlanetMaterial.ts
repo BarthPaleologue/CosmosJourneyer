@@ -29,7 +29,10 @@ import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedural
 import { Transformable } from "../../architecture/transformable";
 import { Scene } from "@babylonjs/core/scene";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { setStellarObjectUniforms, StellarObjectUniformNames } from "../../postProcesses/uniforms/stellarObjectUniforms";
+import {
+    setStellarObjectUniforms,
+    StellarObjectUniformNames
+} from "../../postProcesses/uniforms/stellarObjectUniforms";
 import { Textures } from "../../assets/textures";
 import { Matrix } from "@babylonjs/core/Maths/math";
 
@@ -108,7 +111,10 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
 
         super(`${model.name}SurfaceColor`, scene, shaderName, {
             attributes: ["position", "normal"],
-            uniforms: [...Object.values(TelluricPlanetMaterialUniformNames), ...Object.values(StellarObjectUniformNames)],
+            uniforms: [
+                ...Object.values(TelluricPlanetMaterialUniformNames),
+                ...Object.values(StellarObjectUniformNames)
+            ],
             samplers: [...Object.values(TelluricPlanetMaterialSamplerNames)]
         });
 
@@ -151,7 +157,15 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
         }
 
         this.setTexture("lut", Textures.EMPTY_TEXTURE);
-        const lut = new ProceduralTexture(`${model.name}MaterialLut`, 4096, "telluricPlanetLut", scene, null, true, false);
+        const lut = new ProceduralTexture(
+            `${model.name}MaterialLut`,
+            4096,
+            "telluricPlanetLut",
+            scene,
+            null,
+            true,
+            false
+        );
         lut.setFloat(TelluricPlanetMaterialUniformNames.MIN_TEMPERATURE, this.planetModel.physics.minTemperature);
         lut.setFloat(TelluricPlanetMaterialUniformNames.MAX_TEMPERATURE, this.planetModel.physics.maxTemperature);
         lut.setFloat(TelluricPlanetMaterialUniformNames.PRESSURE, this.planetModel.physics.pressure);
@@ -171,7 +185,10 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
         this.onBindObservable.add((mesh) => {
             const activeCamera = mesh.getScene().activeCamera;
             if (activeCamera === null) throw new Error("No active camera in the scene");
-            this.getEffect().setVector3(TelluricPlanetMaterialUniformNames.CAMERA_POSITION, activeCamera.globalPosition);
+            this.getEffect().setVector3(
+                TelluricPlanetMaterialUniformNames.CAMERA_POSITION,
+                activeCamera.globalPosition
+            );
             this.getEffect().setVector3(TelluricPlanetMaterialUniformNames.CHUNK_POSITION_PLANET_SPACE, mesh.position);
         });
     }
@@ -206,7 +223,9 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
 
         this.setFloat(
             TelluricPlanetMaterialUniformNames.MAX_ELEVATION,
-            this.planetModel.terrainSettings.continent_base_height + this.planetModel.terrainSettings.max_mountain_height + this.planetModel.terrainSettings.max_bump_height
+            this.planetModel.terrainSettings.continent_base_height +
+                this.planetModel.terrainSettings.max_mountain_height +
+                this.planetModel.terrainSettings.max_bump_height
         );
     }
 

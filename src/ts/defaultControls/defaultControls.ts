@@ -19,7 +19,16 @@ import { Controls } from "../uberCore/controls";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { getForwardDirection, getRightDirection, getUpwardDirection, pitch, roll, setRotationQuaternion, translate, yaw } from "../uberCore/transforms/basicTransform";
+import {
+    getForwardDirection,
+    getRightDirection,
+    getUpwardDirection,
+    pitch,
+    roll,
+    setRotationQuaternion,
+    translate,
+    yaw
+} from "../uberCore/transforms/basicTransform";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { getTransformationQuaternion } from "../utils/algebra";
@@ -64,9 +73,24 @@ export class DefaultControls implements Controls {
     public update(deltaSeconds: number): Vector3 {
         const inertiaHalfLifeSeconds = 0.07;
 
-        this.rotationInertia.x = lerpSmooth(this.rotationInertia.x, DefaultControlsInputs.map.roll.value, inertiaHalfLifeSeconds, deltaSeconds);
-        this.rotationInertia.y = lerpSmooth(this.rotationInertia.y, DefaultControlsInputs.map.pitch.value, inertiaHalfLifeSeconds, deltaSeconds);
-        this.rotationInertia.z = lerpSmooth(this.rotationInertia.z, DefaultControlsInputs.map.yaw.value, inertiaHalfLifeSeconds, deltaSeconds);
+        this.rotationInertia.x = lerpSmooth(
+            this.rotationInertia.x,
+            DefaultControlsInputs.map.roll.value,
+            inertiaHalfLifeSeconds,
+            deltaSeconds
+        );
+        this.rotationInertia.y = lerpSmooth(
+            this.rotationInertia.y,
+            DefaultControlsInputs.map.pitch.value,
+            inertiaHalfLifeSeconds,
+            deltaSeconds
+        );
+        this.rotationInertia.z = lerpSmooth(
+            this.rotationInertia.z,
+            DefaultControlsInputs.map.yaw.value,
+            inertiaHalfLifeSeconds,
+            deltaSeconds
+        );
 
         roll(this.transform, this.rotationInertia.x * this.rotationSpeed * deltaSeconds);
         pitch(this.transform, this.rotationInertia.y * this.rotationSpeed * deltaSeconds);
@@ -77,15 +101,32 @@ export class DefaultControls implements Controls {
 
         if (!cameraForward.equalsWithEpsilon(transformForward)) {
             const rotation = getTransformationQuaternion(transformForward, cameraForward);
-            this.transform.rotationQuaternion = rotation.multiply(this.transform.rotationQuaternion ?? Quaternion.Identity());
+            this.transform.rotationQuaternion = rotation.multiply(
+                this.transform.rotationQuaternion ?? Quaternion.Identity()
+            );
             this.camera.rotationQuaternion = Quaternion.Identity();
         }
 
         this.speed *= 1 + DefaultControlsInputs.map.changeSpeed.value / 20;
 
-        this.inertia.x = lerpSmooth(this.inertia.x, DefaultControlsInputs.map.move.value[0], inertiaHalfLifeSeconds, deltaSeconds);
-        this.inertia.z = lerpSmooth(this.inertia.z, DefaultControlsInputs.map.move.value[1], inertiaHalfLifeSeconds, deltaSeconds);
-        this.inertia.y = lerpSmooth(this.inertia.y, DefaultControlsInputs.map.upDown.value, inertiaHalfLifeSeconds, deltaSeconds);
+        this.inertia.x = lerpSmooth(
+            this.inertia.x,
+            DefaultControlsInputs.map.move.value[0],
+            inertiaHalfLifeSeconds,
+            deltaSeconds
+        );
+        this.inertia.z = lerpSmooth(
+            this.inertia.z,
+            DefaultControlsInputs.map.move.value[1],
+            inertiaHalfLifeSeconds,
+            deltaSeconds
+        );
+        this.inertia.y = lerpSmooth(
+            this.inertia.y,
+            DefaultControlsInputs.map.upDown.value,
+            inertiaHalfLifeSeconds,
+            deltaSeconds
+        );
 
         const displacement = Vector3.Zero();
 

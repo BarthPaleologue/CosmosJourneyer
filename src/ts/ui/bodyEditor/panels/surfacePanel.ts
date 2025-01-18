@@ -27,12 +27,26 @@ export class SurfacePanel extends EditorPanel {
         for (const slider of this.sliders) slider.remove();
 
         this.sliders = [
-            new Slider("sandSize", document.getElementById("sandSize") as HTMLElement, 0, 300, planetMaterial.getBeachSize() / 10, (val: number) => {
-                planetMaterial.setBeachSize(val * 10);
-            }),
-            new Slider("steepSharpness", document.getElementById("steepSharpness") as HTMLElement, 0, 100, planetMaterial.getSteepSharpness() * 10, (val: number) => {
-                planetMaterial.setSteepSharpness(val / 10);
-            })
+            new Slider(
+                "sandSize",
+                document.getElementById("sandSize") as HTMLElement,
+                0,
+                300,
+                planetMaterial.getBeachSize() / 10,
+                (val: number) => {
+                    planetMaterial.setBeachSize(val * 10);
+                }
+            ),
+            new Slider(
+                "steepSharpness",
+                document.getElementById("steepSharpness") as HTMLElement,
+                0,
+                100,
+                planetMaterial.getSteepSharpness() * 10,
+                (val: number) => {
+                    planetMaterial.setSteepSharpness(val / 10);
+                }
+            )
         ];
     }
 }

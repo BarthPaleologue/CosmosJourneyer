@@ -78,7 +78,11 @@ export class ExplorationCenterPanel {
             const connectionInfo = await connectEncyclopaediaGalacticaModal();
             if (connectionInfo === null) return;
 
-            const newEncyclopaedia = new EncyclopaediaGalacticaOnline(new URL(connectionInfo.encyclopaediaUrlBase), connectionInfo.accountId, connectionInfo.password);
+            const newEncyclopaedia = new EncyclopaediaGalacticaOnline(
+                new URL(connectionInfo.encyclopaediaUrlBase),
+                connectionInfo.accountId,
+                connectionInfo.password
+            );
             encyclopaedia.backends.push(newEncyclopaedia);
 
             activeInstances.textContent = i18n.t("explorationCenter:activeEncyclopaediaInstances", {
@@ -185,7 +189,9 @@ export class ExplorationCenterPanel {
             totalValue += await this.encyclopaedia.estimateDiscovery(discovery.objectId);
         }
         this.sellAllButton.toggleAttribute("disabled", totalValue === 0);
-        this.sellAllButton.innerText = i18n.t("common:sellAllFor", { price: `${totalValue.toLocaleString()}${Settings.CREDIT_SYMBOL}` });
+        this.sellAllButton.innerText = i18n.t("common:sellAllFor", {
+            price: `${totalValue.toLocaleString()}${Settings.CREDIT_SYMBOL}`
+        });
 
         if (discoveries.length === 0) {
             const container = document.createElement("div");

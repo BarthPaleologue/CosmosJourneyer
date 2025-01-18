@@ -69,10 +69,16 @@ export class SystemIcons {
         this.htmlRoot.remove();
     }
 
-    static IconMaskForSystem(system: StarSystemCoordinates, bookmarkedSystems: StarSystemCoordinates[], targetSystems: StarSystemCoordinates[]): number {
+    static IconMaskForSystem(
+        system: StarSystemCoordinates,
+        bookmarkedSystems: StarSystemCoordinates[],
+        targetSystems: StarSystemCoordinates[]
+    ): number {
         let iconMask = 0;
-        if (bookmarkedSystems.find((bookmarkedSystem) => starSystemCoordinatesEquals(bookmarkedSystem, system))) iconMask |= SystemIconMask.BOOKMARK;
-        if (targetSystems.find((targetSystem) => starSystemCoordinatesEquals(targetSystem, system))) iconMask |= SystemIconMask.MISSION;
+        if (bookmarkedSystems.find((bookmarkedSystem) => starSystemCoordinatesEquals(bookmarkedSystem, system)))
+            iconMask |= SystemIconMask.BOOKMARK;
+        if (targetSystems.find((targetSystem) => starSystemCoordinatesEquals(targetSystem, system)))
+            iconMask |= SystemIconMask.MISSION;
         return iconMask;
     }
 }

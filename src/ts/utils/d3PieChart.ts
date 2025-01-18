@@ -17,7 +17,11 @@
 
 import { arc, interpolateViridis, pie, PieArcDatum, scaleSequential } from "d3";
 
-export function makeD3PieChart<T>(data: T[], extractProportion: (d: T) => number, extractLegend: (d: T) => string): string {
+export function makeD3PieChart<T>(
+    data: T[],
+    extractProportion: (d: T) => number,
+    extractLegend: (d: T) => string
+): string {
     const pieGenerator = pie<T>().value(extractProportion);
 
     const parsedData = pieGenerator(data);

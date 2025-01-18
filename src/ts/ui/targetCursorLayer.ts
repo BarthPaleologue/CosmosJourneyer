@@ -99,8 +99,10 @@ export class TargetCursorLayer implements IDisposable {
     public update(camera: Camera) {
         for (const targetCursor of this.targetCursors) {
             targetCursor.update(camera);
-            const distanceToCenterSquared = (targetCursor.screenCoordinates.x - 0.5) ** 2 + (targetCursor.screenCoordinates.y - 0.5) ** 2;
-            const isHovered = distanceToCenterSquared < 0.1 * 0.1 && targetCursor.object === this.closestToScreenCenterOrbitalObject;
+            const distanceToCenterSquared =
+                (targetCursor.screenCoordinates.x - 0.5) ** 2 + (targetCursor.screenCoordinates.y - 0.5) ** 2;
+            const isHovered =
+                distanceToCenterSquared < 0.1 * 0.1 && targetCursor.object === this.closestToScreenCenterOrbitalObject;
             const isTarget = targetCursor.object === this.target;
             targetCursor.setTarget(isTarget);
             targetCursor.setInformationEnabled(isTarget || isHovered);

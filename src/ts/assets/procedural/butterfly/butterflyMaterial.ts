@@ -25,7 +25,10 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Transformable } from "../../../architecture/transformable";
 import { Textures } from "../../textures";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { setStellarObjectUniforms, StellarObjectUniformNames } from "../../../postProcesses/uniforms/stellarObjectUniforms";
+import {
+    setStellarObjectUniforms,
+    StellarObjectUniformNames
+} from "../../../postProcesses/uniforms/stellarObjectUniforms";
 
 const ButterflyMaterialUniformNames = {
     WORLD: "world",
@@ -86,7 +89,10 @@ export class ButterflyMaterial extends ShaderMaterial {
             this.getEffect().setVector3(ButterflyMaterialUniformNames.CAMERA_POSITION, activeCamera.globalPosition);
 
             if (this.planet !== null) {
-                this.getEffect().setVector3(ButterflyMaterialUniformNames.PLANET_POSITION, this.planet.getAbsolutePosition());
+                this.getEffect().setVector3(
+                    ButterflyMaterialUniformNames.PLANET_POSITION,
+                    this.planet.getAbsolutePosition()
+                );
                 this.getEffect().setMatrix(ButterflyMaterialUniformNames.PLANET_WORLD, this.planet.getWorldMatrix());
             }
         });

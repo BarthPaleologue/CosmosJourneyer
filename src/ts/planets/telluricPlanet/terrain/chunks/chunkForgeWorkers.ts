@@ -117,7 +117,13 @@ export class ChunkForgeWorkers implements ChunkForge {
             // if the chunk has been disposed, we skip it
             task = this.applyTaskQueue.shift();
         }
-        if (task) task.chunk.init(task.vertexData, task.instancesMatrixBuffer, task.alignedInstancesMatrixBuffer, task.averageHeight);
+        if (task)
+            task.chunk.init(
+                task.vertexData,
+                task.instancesMatrixBuffer,
+                task.alignedInstancesMatrixBuffer,
+                task.averageHeight
+            );
     }
 
     /**

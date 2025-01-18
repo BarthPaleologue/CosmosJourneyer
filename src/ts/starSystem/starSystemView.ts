@@ -37,7 +37,12 @@ import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge"
 import { DefaultControls } from "../defaultControls/defaultControls";
 import { CharacterControls } from "../characterControls/characterControls";
 import { Assets } from "../assets/assets";
-import { getForwardDirection, getRotationQuaternion, setRotationQuaternion, translate } from "../uberCore/transforms/basicTransform";
+import {
+    getForwardDirection,
+    getRotationQuaternion,
+    setRotationQuaternion,
+    translate
+} from "../uberCore/transforms/basicTransform";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { View } from "../utils/view";
@@ -66,7 +71,11 @@ import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import { MissionContext } from "../missions/missionContext";
 import { Mission } from "../missions/mission";
-import { StarSystemCoordinates, starSystemCoordinatesEquals, UniverseObjectId } from "../utils/coordinates/universeCoordinates";
+import {
+    StarSystemCoordinates,
+    starSystemCoordinatesEquals,
+    UniverseObjectId
+} from "../utils/coordinates/universeCoordinates";
 import { StarSystemModel } from "./starSystemModel";
 import { OrbitalObjectType } from "../architecture/orbitalObject";
 import { OrbitalFacility } from "../spacestation/orbitalFacility";
@@ -247,7 +256,11 @@ export class StarSystemView implements View {
         });
 
         StarSystemInputs.map.toggleDebugUi.on("complete", () => {
-            this.bodyEditor.setVisibility(this.bodyEditor.getVisibility() === EditorVisibility.HIDDEN ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
+            this.bodyEditor.setVisibility(
+                this.bodyEditor.getVisibility() === EditorVisibility.HIDDEN
+                    ? EditorVisibility.NAVBAR
+                    : EditorVisibility.HIDDEN
+            );
         });
 
         StarSystemInputs.map.cycleViews.on("complete", async () => {
@@ -276,7 +289,9 @@ export class StarSystemView implements View {
 
             const spaceship = shipControls.getSpaceship();
 
-            const currentSystemPosition = this.starSystemDatabase.getSystemGalacticPosition(this.getStarSystem().model.coordinates);
+            const currentSystemPosition = this.starSystemDatabase.getSystemGalacticPosition(
+                this.getStarSystem().model.coordinates
+            );
             const targetSystemPosition = this.starSystemDatabase.getSystemGalacticPosition(target.systemCoordinates);
 
             const distanceLY = Vector3.Distance(currentSystemPosition, targetSystemPosition);
@@ -284,19 +299,33 @@ export class StarSystemView implements View {
             const fuelForJump = spaceship.getWarpDrive().getFuelConsumption(distanceLY);
 
             if (spaceship.getRemainingFuel() < fuelForJump) {
-                createNotification(NotificationOrigin.SPACESHIP, NotificationIntent.ERROR, i18n.t("notifications:notEnoughFuel"), 5000);
+                createNotification(
+                    NotificationOrigin.SPACESHIP,
+                    NotificationIntent.ERROR,
+                    i18n.t("notifications:notEnoughFuel"),
+                    5000
+                );
                 this.jumpLock = false;
                 return;
             }
 
             // first, align spaceship with target
             const currentForward = getForwardDirection(shipControls.getTransform());
-            const targetForward = target.getTransform().getAbsolutePosition().subtract(shipControls.getTransform().getAbsolutePosition()).normalize();
+            const targetForward = target
+                .getTransform()
+                .getAbsolutePosition()
+                .subtract(shipControls.getTransform().getAbsolutePosition())
+                .normalize();
 
             const rotationAxis = Vector3.Cross(currentForward, targetForward);
             const rotationAngle = Vector3.GetAngleBetweenVectors(currentForward, targetForward, rotationAxis);
 
-            const rotationAnimation = new TransformRotationAnimation(shipControls.getTransform(), rotationAxis, rotationAngle, rotationAngle * 2);
+            const rotationAnimation = new TransformRotationAnimation(
+                shipControls.getTransform(),
+                rotationAxis,
+                rotationAngle,
+                rotationAngle * 2
+            );
             await new Promise<void>((resolve) => {
                 const observer = this.scene.onBeforePhysicsObservable.add(() => {
                     rotationAnimation.update(this.scene.getEngine().getDeltaTime() / 1000);
@@ -352,9 +381,17 @@ export class StarSystemView implements View {
                 characterControls.getTransform().setEnabled(true);
                 CharacterInputs.setEnabled(true);
                 characterControls.getTransform().setAbsolutePosition(shipControls.getTransform().absolutePosition);
-                translate(characterControls.getTransform(), getForwardDirection(shipControls.getTransform()).scale(3 + shipControls.getSpaceship().boundingExtent.z / 2));
+                translate(
+                    characterControls.getTransform(),
+                    getForwardDirection(shipControls.getTransform()).scale(
+                        3 + shipControls.getSpaceship().boundingExtent.z / 2
+                    )
+                );
 
-                setRotationQuaternion(characterControls.getTransform(), getRotationQuaternion(shipControls.getTransform()).clone());
+                setRotationQuaternion(
+                    characterControls.getTransform(),
+                    getRotationQuaternion(shipControls.getTransform()).clone()
+                );
                 SpaceShipControlsInputs.setEnabled(false);
                 this.spaceShipLayer.setVisibility(false);
 
@@ -380,7 +417,9 @@ export class StarSystemView implements View {
                     createNotification(
                         NotificationOrigin.SPACESHIP,
                         NotificationIntent.INFO,
-                        i18n.t("notifications:howToLiftOff", { bindingsString: axisCompositeToString(control, keyboardLayoutMap)[1][1] }),
+                        i18n.t("notifications:howToLiftOff", {
+                            bindingsString: axisCompositeToString(control, keyboardLayoutMap)[1][1]
+                        }),
                         5000
                     );
                 }
@@ -517,16 +556,26 @@ export class StarSystemView implements View {
             positionNearObjectBrightSide(activeControls, firstBody, starSystem, controllerDistanceFactor);
         } else {
             // place player in the direction of the previous system (where we came from)
-            const currentSystemPosition = this.starSystemDatabase.getSystemGalacticPosition(starSystem.model.coordinates);
-            const previousSystemPosition = this.starSystemDatabase.getSystemGalacticPosition(this.player.visitedSystemHistory[this.player.visitedSystemHistory.length - 1]);
+            const currentSystemPosition = this.starSystemDatabase.getSystemGalacticPosition(
+                starSystem.model.coordinates
+            );
+            const previousSystemPosition = this.starSystemDatabase.getSystemGalacticPosition(
+                this.player.visitedSystemHistory[this.player.visitedSystemHistory.length - 1]
+            );
 
             // compute direction from previous system to current system
             const placementDirection = previousSystemPosition.subtract(currentSystemPosition).normalize();
-            Vector3.TransformCoordinatesToRef(placementDirection, starSystem.starFieldBox.getRotationMatrix(), placementDirection);
+            Vector3.TransformCoordinatesToRef(
+                placementDirection,
+                starSystem.starFieldBox.getRotationMatrix(),
+                placementDirection
+            );
 
             // offset the player from the first body
             const positionOffset = placementDirection.scale(controllerDistanceFactor * firstBody.getBoundingRadius());
-            activeControls.getTransform().setAbsolutePosition(firstBody.getTransform().getAbsolutePosition().add(positionOffset));
+            activeControls
+                .getTransform()
+                .setAbsolutePosition(firstBody.getTransform().getAbsolutePosition().add(positionOffset));
 
             // put the player back to the origin of the star system
             starSystem.translateEverythingNow(activeControls.getTransform().getAbsolutePosition().negate());
@@ -644,8 +693,12 @@ export class StarSystemView implements View {
         if (this.spaceshipControls === null) throw new Error("Spaceship controls is null");
         if (this.characterControls === null) throw new Error("Character controls is null");
 
-        const nearestOrbitalObject = starSystem.getNearestOrbitalObject(this.scene.getActiveControls().getTransform().getAbsolutePosition());
-        const nearestCelestialBody = starSystem.getNearestCelestialBody(this.scene.getActiveControls().getTransform().getAbsolutePosition());
+        const nearestOrbitalObject = starSystem.getNearestOrbitalObject(
+            this.scene.getActiveControls().getTransform().getAbsolutePosition()
+        );
+        const nearestCelestialBody = starSystem.getNearestCelestialBody(
+            this.scene.getActiveControls().getTransform().getAbsolutePosition()
+        );
 
         const distanceToNearesetCelestialBody2 = Vector3.DistanceSquared(
             nearestCelestialBody.getTransform().getAbsolutePosition(),
@@ -658,7 +711,9 @@ export class StarSystemView implements View {
                 createNotification(
                     NotificationOrigin.EXPLORATION,
                     NotificationIntent.SUCCESS,
-                    i18n.t("notifications:newDiscovery", { objectName: nearestCelestialBody.model.name }),
+                    i18n.t("notifications:newDiscovery", {
+                        objectName: nearestCelestialBody.model.name
+                    }),
                     15_000
                 );
                 Sounds.EnqueuePlay(Sounds.NEW_DISCOVERY);
@@ -685,16 +740,27 @@ export class StarSystemView implements View {
         const target = this.targetCursorLayer.getTarget();
 
         const distanceLY =
-            target !== null ? Vector3.Distance(this.spaceshipControls.getTransform().getAbsolutePosition(), target.getTransform().getAbsolutePosition()) / Settings.LIGHT_YEAR : 0;
+            target !== null
+                ? Vector3.Distance(
+                      this.spaceshipControls.getTransform().getAbsolutePosition(),
+                      target.getTransform().getAbsolutePosition()
+                  ) / Settings.LIGHT_YEAR
+                : 0;
 
         const fuelForJump = warpDrive.getFuelConsumption(distanceLY);
 
-        this.spaceShipLayer.displayFuel(spaceship.getRemainingFuel() / spaceship.getTotalFuelCapacity(), fuelForJump / spaceship.getTotalFuelCapacity());
+        this.spaceShipLayer.displayFuel(
+            spaceship.getRemainingFuel() / spaceship.getTotalFuelCapacity(),
+            fuelForJump / spaceship.getTotalFuelCapacity()
+        );
 
         this.characterControls.setClosestWalkableObject(nearestOrbitalObject);
         spaceship.setClosestWalkableObject(nearestOrbitalObject);
 
-        if (nearestOrbitalObject.model.type === OrbitalObjectType.SPACE_STATION || nearestOrbitalObject.model.type === OrbitalObjectType.SPACE_ELEVATOR) {
+        if (
+            nearestOrbitalObject.model.type === OrbitalObjectType.SPACE_STATION ||
+            nearestOrbitalObject.model.type === OrbitalObjectType.SPACE_ELEVATOR
+        ) {
             this.spaceshipControls.setClosestLandableFacility(nearestOrbitalObject as OrbitalFacility);
         } else {
             this.spaceshipControls.setClosestLandableFacility(null);
@@ -727,10 +793,26 @@ export class StarSystemView implements View {
         const stellarObjects = starSystem.getStellarObjects();
 
         // update dynamic materials
-        Materials.BUTTERFLY_MATERIAL.update(stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
-        Materials.BUTTERFLY_DEPTH_MATERIAL.update(stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
-        Materials.GRASS_MATERIAL.update(stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
-        Materials.GRASS_DEPTH_MATERIAL.update(stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
+        Materials.BUTTERFLY_MATERIAL.update(
+            stellarObjects,
+            this.scene.getActiveControls().getTransform().getAbsolutePosition(),
+            deltaSeconds
+        );
+        Materials.BUTTERFLY_DEPTH_MATERIAL.update(
+            stellarObjects,
+            this.scene.getActiveControls().getTransform().getAbsolutePosition(),
+            deltaSeconds
+        );
+        Materials.GRASS_MATERIAL.update(
+            stellarObjects,
+            this.scene.getActiveControls().getTransform().getAbsolutePosition(),
+            deltaSeconds
+        );
+        Materials.GRASS_DEPTH_MATERIAL.update(
+            stellarObjects,
+            this.scene.getActiveControls().getTransform().getAbsolutePosition(),
+            deltaSeconds
+        );
     }
 
     public updateAfterRender() {
@@ -742,7 +824,9 @@ export class StarSystemView implements View {
 
         const activeControls = this.scene.getActiveControls();
 
-        const nearestCelestialBody = starSystem.getNearestCelestialBody(activeControls.getTransform().getAbsolutePosition());
+        const nearestCelestialBody = starSystem.getNearestCelestialBody(
+            activeControls.getTransform().getAbsolutePosition()
+        );
 
         const spaceship = this.spaceshipControls.getSpaceship();
 
@@ -755,11 +839,20 @@ export class StarSystemView implements View {
             physicsEngine: this.scene.getPhysicsEngine() as PhysicsEngineV2
         };
 
-        this.spaceShipLayer.update(activeControls.getTransform(), missionContext, this.keyboardLayoutMap, this.starSystemDatabase);
+        this.spaceShipLayer.update(
+            activeControls.getTransform(),
+            missionContext,
+            this.keyboardLayoutMap,
+            this.starSystemDatabase
+        );
 
         this.targetCursorLayer.update(activeControls.getActiveCamera());
         const targetLandingPad = spaceship.getTargetLandingPad();
-        if (targetLandingPad !== null && !spaceship.isLanded() && this.targetCursorLayer.getTarget() !== targetLandingPad) {
+        if (
+            targetLandingPad !== null &&
+            !spaceship.isLanded() &&
+            this.targetCursorLayer.getTarget() !== targetLandingPad
+        ) {
             this.targetCursorLayer.setTarget(targetLandingPad);
         }
 
@@ -784,7 +877,9 @@ export class StarSystemView implements View {
         }
 
         this.targetCursorLayer.setEnabled(this.isUiEnabled && !spaceship.isLandedAtFacility());
-        this.spaceShipLayer.setVisibility(this.isUiEnabled && activeControls === this.spaceshipControls && !spaceship.isLandedAtFacility());
+        this.spaceShipLayer.setVisibility(
+            this.isUiEnabled && activeControls === this.spaceshipControls && !spaceship.isLandedAtFacility()
+        );
     }
 
     /**
@@ -830,7 +925,10 @@ export class StarSystemView implements View {
         characterControls.getTransform().setEnabled(false);
         CharacterInputs.setEnabled(false);
         this.scene.setActiveControls(shipControls);
-        setRotationQuaternion(shipControls.getTransform(), getRotationQuaternion(defaultControls.getTransform()).clone());
+        setRotationQuaternion(
+            shipControls.getTransform(),
+            getRotationQuaternion(defaultControls.getTransform()).clone()
+        );
 
         shipControls.getSpaceship().setEnabled(true, this.havokPlugin);
         SpaceShipControlsInputs.setEnabled(true);
@@ -850,7 +948,10 @@ export class StarSystemView implements View {
         CharacterInputs.setEnabled(true);
         characterControls.getTransform().setAbsolutePosition(defaultControls.getTransform().absolutePosition);
         this.scene.setActiveControls(characterControls);
-        setRotationQuaternion(characterControls.getTransform(), getRotationQuaternion(defaultControls.getTransform()).clone());
+        setRotationQuaternion(
+            characterControls.getTransform(),
+            getRotationQuaternion(defaultControls.getTransform()).clone()
+        );
 
         const spaceship = shipControls.getSpaceship();
         spaceship.warpTunnel.setThrottle(0);
@@ -882,13 +983,27 @@ export class StarSystemView implements View {
         this.stopBackgroundSounds();
 
         this.scene.setActiveControls(defaultControls);
-        setRotationQuaternion(defaultControls.getTransform(), getRotationQuaternion(shipControls.getTransform()).clone());
+        setRotationQuaternion(
+            defaultControls.getTransform(),
+            getRotationQuaternion(shipControls.getTransform()).clone()
+        );
 
         if (showHelpNotification) {
-            const horizontalKeys = dPadCompositeToString(DefaultControlsInputs.map.move.bindings[0].control as DPadComposite, keyboardLayoutMap);
-            const verticalKeys = axisCompositeToString(DefaultControlsInputs.map.upDown.bindings[0].control as AxisComposite, keyboardLayoutMap);
+            const horizontalKeys = dPadCompositeToString(
+                DefaultControlsInputs.map.move.bindings[0].control as DPadComposite,
+                keyboardLayoutMap
+            );
+            const verticalKeys = axisCompositeToString(
+                DefaultControlsInputs.map.upDown.bindings[0].control as AxisComposite,
+                keyboardLayoutMap
+            );
             const keys = horizontalKeys.concat(verticalKeys);
-            createNotification(NotificationOrigin.GENERAL, NotificationIntent.INFO, `Move using ${keys.map((key) => key[1].replace("Key", "")).join(", ")}`, 2000000);
+            createNotification(
+                NotificationOrigin.GENERAL,
+                NotificationIntent.INFO,
+                `Move using ${keys.map((key) => key[1].replace("Key", "")).join(", ")}`,
+                2000000
+            );
         }
     }
 

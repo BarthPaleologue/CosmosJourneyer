@@ -66,7 +66,11 @@ export class StellarPathfinder {
      * @param targetSystemCoordinates The seed of the target system
      * @param jumpRange The jump range of the ship in light years
      */
-    public init(startSystemCoordinates: StarSystemCoordinates, targetSystemCoordinates: StarSystemCoordinates, jumpRange: number) {
+    public init(
+        startSystemCoordinates: StarSystemCoordinates,
+        targetSystemCoordinates: StarSystemCoordinates,
+        jumpRange: number
+    ) {
         this.coordinatesToPrevious.clear();
         this.openList.clear();
         this.closedList = [];
@@ -103,7 +107,11 @@ export class StellarPathfinder {
     }
 
     private getNeighbors(node: Node): [Node, number][] {
-        const stellarNeighbors = getNeighborStarSystemCoordinates(node.coordinates, this.jumpRange, this.starSystemDatabase);
+        const stellarNeighbors = getNeighborStarSystemCoordinates(
+            node.coordinates,
+            this.jumpRange,
+            this.starSystemDatabase
+        );
         return stellarNeighbors.map<[Node, number]>(([coordinates, position, distance]) => [
             {
                 coordinates: coordinates,
@@ -154,7 +162,9 @@ export class StellarPathfinder {
             const G = currentNode.G + distance;
             const H = this.getHeuristic(neighbor);
 
-            const openNode = this.openList.find((node) => starSystemCoordinatesEquals(node.coordinates, neighbor.coordinates));
+            const openNode = this.openList.find((node) =>
+                starSystemCoordinatesEquals(node.coordinates, neighbor.coordinates)
+            );
             if (openNode !== undefined) {
                 // if the neighbor is already in the open list, update its G value if the new path is shorter
                 if (G < openNode.G) {

@@ -122,7 +122,11 @@ export class LandingBay {
         let padNumber = 0;
         for (let row = 0; row < heightFactor; row++) {
             for (let i = 0; i < nbPads; i++) {
-                const landingPad = new LandingPad(padNumber++, (i + row) % 2 === 0 ? LandingPadSize.SMALL : LandingPadSize.MEDIUM, scene);
+                const landingPad = new LandingPad(
+                    padNumber++,
+                    (i + row) % 2 === 0 ? LandingPadSize.SMALL : LandingPadSize.MEDIUM,
+                    scene
+                );
                 landingPad.getTransform().parent = this.getTransform();
 
                 landingPad.getTransform().rotate(Axis.Z, Math.PI / 2, Space.LOCAL);
@@ -131,9 +135,21 @@ export class LandingBay {
 
                 landingPad.getTransform().rotate(Axis.Y, Math.PI / 2, Space.LOCAL);
 
-                landingPad.getTransform().translate(Vector3.Up(), -(this.radius - deltaRadius / 2) * Math.cos(Math.PI / nbPads), Space.LOCAL);
+                landingPad
+                    .getTransform()
+                    .translate(
+                        Vector3.Up(),
+                        -(this.radius - deltaRadius / 2) * Math.cos(Math.PI / nbPads),
+                        Space.LOCAL
+                    );
 
-                landingPad.getTransform().translate(Vector3.Forward(scene.useRightHandedSystem), row * deltaRadius - ((heightFactor - 1) * deltaRadius) / 2, Space.LOCAL);
+                landingPad
+                    .getTransform()
+                    .translate(
+                        Vector3.Forward(scene.useRightHandedSystem),
+                        row * deltaRadius - ((heightFactor - 1) * deltaRadius) / 2,
+                        Space.LOCAL
+                    );
 
                 this.landingPads.push(landingPad);
             }
@@ -153,7 +169,10 @@ export class LandingBay {
     }
 
     update(stellarObjects: Transformable[], cameraWorldPosition: Vector3, deltaSeconds: number) {
-        this.getTransform().rotate(Axis.Y, deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, Settings.G_EARTH * 0.1));
+        this.getTransform().rotate(
+            Axis.Y,
+            deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, Settings.G_EARTH * 0.1)
+        );
         this.landingBayMaterial.update(stellarObjects);
         this.metalSectionMaterial.update(stellarObjects);
         this.landingPads.forEach((landingPad) => landingPad.update(stellarObjects, cameraWorldPosition));
@@ -161,9 +180,17 @@ export class LandingBay {
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
 
         if (distanceToCamera < 350e3 && this.ringAggregate === null) {
-            this.ringAggregate = createEnvironmentAggregate(this.ring, PhysicsShapeType.MESH, this.getTransform().getScene());
+            this.ringAggregate = createEnvironmentAggregate(
+                this.ring,
+                PhysicsShapeType.MESH,
+                this.getTransform().getScene()
+            );
             this.arms.forEach((arm) => {
-                const armAggregate = createEnvironmentAggregate(arm, PhysicsShapeType.BOX, this.getTransform().getScene());
+                const armAggregate = createEnvironmentAggregate(
+                    arm,
+                    PhysicsShapeType.BOX,
+                    this.getTransform().getScene()
+                );
                 this.armAggregates.push(armAggregate);
             });
         } else if (distanceToCamera > 360e3 && this.ringAggregate !== null) {

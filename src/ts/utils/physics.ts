@@ -71,8 +71,17 @@ export function waterBoilingTemperature(pressure: number): number {
  * @param planetGreenHouseEffect The greenhouse effect of the planet (0 = none, 1 = total)
  * @returns The mean temperature of the planet in Kelvin
  */
-export function computeMeanTemperature(starTemperature: number, starRadius: number, starDistance: number, planetAlbedo: number, planetGreenHouseEffect: number) {
-    return starTemperature * Math.pow(((1 - planetAlbedo) * starRadius ** 2) / (4 * (1 - planetGreenHouseEffect) * starDistance ** 2), 0.25);
+export function computeMeanTemperature(
+    starTemperature: number,
+    starRadius: number,
+    starDistance: number,
+    planetAlbedo: number,
+    planetGreenHouseEffect: number
+) {
+    return (
+        starTemperature *
+        Math.pow(((1 - planetAlbedo) * starRadius ** 2) / (4 * (1 - planetGreenHouseEffect) * starDistance ** 2), 0.25)
+    );
 }
 
 /**

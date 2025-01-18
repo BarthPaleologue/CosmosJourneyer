@@ -1,95 +1,94 @@
 .tutorialLayer {
-  z-index: 35;
-  pointer-events: none;
-  position: relative;
+    z-index: 35;
+    pointer-events: none;
+    position: relative;
 
-  .tutorialPanel {
-    position: absolute;
-    height: 100vh;
-    box-shadow: 0 0 20px black;
-    background: rgba(0, 0, 0, 0.8);
-    width: 30vw;
-    left: 0;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-
-    font-family: 'Nasalization', sans-serif;
-
-    transform: translate(0);
-    transition: transform 0.5s ease-in-out;
-
-    &.hidden {
-        transform: translate(-100%);
-    }
-
-    h1 {
-      text-align: center;
-      color: white;
-      flex-grow: 0;
-      margin-block-end: 2vh;
-      margin-block-start: 2vh;
-      font-size: var(--h1-size);
-    }
-
-    .tutorialContentContainer {
-      overflow-y: auto;
-      flex-grow: 1;
-
-      .tutorialContent {
-        p {
-          color: white;
-          padding: 0 0.7vw;
-          line-height: 1.5em;
-          font-size: var(--text-size);
-        }
-
-        h2 {
-          color: white;
-          padding: 0 0.7vw;
-          font-size: var(--h2-size);
-          margin-block-start: 0;
-          margin-block-end: 1vh;
-        }
-
-        img {
-          width: 100%;
-          height: auto;
-          flex-grow: 0;
-        }
-      }
-    }
-
-    .tutorialControls {
-      flex-grow: 0;
-      width: 100%;
-      display: flex;
-      justify-content: space-evenly;
-      margin-bottom: 1vh;
-
-      p {
-        background: white;
-        color: black;
-        padding: 0.3vw;
-        font-size: calc(var(--text-size) * 0.75);
+    .tutorialPanel {
+        position: absolute;
+        height: 100vh;
+        box-shadow: 0 0 20px black;
+        background: rgba(0, 0, 0, 0.8);
+        width: 30vw;
+        left: 0;
 
         display: flex;
+        flex-direction: column;
         align-items: center;
-        margin-block: 0;
+        justify-content: space-between;
 
-        span {
-          padding: 0.3vw;
+        font-family: "Nasalization", sans-serif;
 
-          &.keySpan {
-            font-weight: bold;
-            background: rgba(0, 0, 0, 0.3);
-            font-size: calc(var(--text-size) * 0.75);
-          }
+        transform: translate(0);
+        transition: transform 0.5s ease-in-out;
+
+        &.hidden {
+            transform: translate(-100%);
         }
 
-      }
+        h1 {
+            text-align: center;
+            color: white;
+            flex-grow: 0;
+            margin-block-end: 2vh;
+            margin-block-start: 2vh;
+            font-size: var(--h1-size);
+        }
+
+        .tutorialContentContainer {
+            overflow-y: auto;
+            flex-grow: 1;
+
+            .tutorialContent {
+                p {
+                    color: white;
+                    padding: 0 0.7vw;
+                    line-height: 1.5em;
+                    font-size: var(--text-size);
+                }
+
+                h2 {
+                    color: white;
+                    padding: 0 0.7vw;
+                    font-size: var(--h2-size);
+                    margin-block-start: 0;
+                    margin-block-end: 1vh;
+                }
+
+                img {
+                    width: 100%;
+                    height: auto;
+                    flex-grow: 0;
+                }
+            }
+        }
+
+        .tutorialControls {
+            flex-grow: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-evenly;
+            margin-bottom: 1vh;
+
+            p {
+                background: white;
+                color: black;
+                padding: 0.3vw;
+                font-size: calc(var(--text-size) * 0.75);
+
+                display: flex;
+                align-items: center;
+                margin-block: 0;
+
+                span {
+                    padding: 0.3vw;
+
+                    &.keySpan {
+                        font-weight: bold;
+                        background: rgba(0, 0, 0, 0.3);
+                        font-size: calc(var(--text-size) * 0.75);
+                    }
+                }
+            }
+        }
     }
-  }
 }

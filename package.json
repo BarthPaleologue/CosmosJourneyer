@@ -55,17 +55,43 @@
     "version": "1.9.0",
     "description": "Cosmos Journeyer is a space exploration game featuring fully explorable planets, across millions of star systems. It is built using Babylon.JS, and a lot of passion.",
     "name": "cosmos-journeyer",
+    "homepage": "https://cosmosjourneyer.com",
+    "author": {
+        "name": "Barthélemy Paléologue",
+        "email": "barth.paleologue@cosmosjourneyer.com",
+        "url": "https://barth.paleologue.fr"
+    },
+    "license": "AGPL-3.0-only",
+    "type": "module",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/BarthPaleologue/CosmosJourneyer"
+    },
+    "bugs": {
+        "url": "https://github.com/BarthPaleologue/CosmosJourneyer/issues",
+        "email": "barth.paleologue@cosmosjourneyer.com"
+    },
+    "keywords": [
+        "space",
+        "game",
+        "exploration",
+        "babylonjs",
+        "procedural-generation",
+        "webgl",
+        "webgpu"
+    ],
+    "contributors": [],
     "scripts": {
         "build": "webpack --mode=production --node-env=production",
         "serve": "webpack serve --progress",
         "serve:prod": "http-server dist -p 8080",
-        "format:check": "prettier --config .prettierrc src//**/*.{js,jsx,json,ts} --check",
-        "format": "prettier --config .prettierrc src//**/*.{js,json,ts} --write",
+        "format:check": "prettier . --check",
+        "format": "prettier . --write",
         "test": "vitest run",
         "test:coverage": "vitest run --coverage",
         "build:docs": "typedoc --options typedoc.json",
         "serve:docs": "http-server docs -p 8081",
-        "lint:check": "eslint src/ts --config eslint.config.mjs",
-        "lint:fix": "eslint src/ts --fix --config eslint.config.mjs"
+        "lint:check": "eslint .",
+        "lint:fix": "eslint . --fix"
     }
 }

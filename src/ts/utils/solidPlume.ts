@@ -119,7 +119,11 @@ export class SolidPlume {
         const r = SolidPlume.PLUME_RADIUS * Math.sqrt(Math.random());
         const theta = Math.random() * 2 * Math.PI;
 
-        const position = new Vector3(r * Math.cos(theta), r * Math.sin(theta), Math.random() * SolidPlume.TUNNEL_LENGTH);
+        const position = new Vector3(
+            r * Math.cos(theta),
+            r * Math.sin(theta),
+            Math.random() * SolidPlume.TUNNEL_LENGTH
+        );
 
         particle.position.copyFrom(position);
 
@@ -150,7 +154,11 @@ export class SolidPlume {
 
             this.emitCounter += deltaSeconds;
 
-            while (this.emitCounter > this.emitPeriod && this.nbParticlesAlive < this.targetNbParticles && this.recycledParticles.length > 0) {
+            while (
+                this.emitCounter > this.emitPeriod &&
+                this.nbParticlesAlive < this.targetNbParticles &&
+                this.recycledParticles.length > 0
+            ) {
                 this.emitCounter -= this.emitPeriod;
                 this.instanceFromStock();
                 this.nbParticlesAlive++;

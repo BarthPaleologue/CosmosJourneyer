@@ -93,12 +93,18 @@ export class AtmosphereUniforms {
     constructor(planetBoundingRadius: number, atmosphereThickness: number) {
         this.atmosphereRadius = planetBoundingRadius + atmosphereThickness;
         this.rayleighHeight = (8e3 * atmosphereThickness) / Settings.EARTH_ATMOSPHERE_THICKNESS;
-        this.rayleighScatteringCoefficients = new Vector3(5.8e-6, 13.5e-6, 33.1e-6).scaleInPlace(Settings.EARTH_ATMOSPHERE_THICKNESS / atmosphereThickness);
+        this.rayleighScatteringCoefficients = new Vector3(5.8e-6, 13.5e-6, 33.1e-6).scaleInPlace(
+            Settings.EARTH_ATMOSPHERE_THICKNESS / atmosphereThickness
+        );
         this.mieHeight = (1.2e3 * atmosphereThickness) / Settings.EARTH_ATMOSPHERE_THICKNESS;
-        this.mieScatteringCoefficients = new Vector3(3.9e-6, 3.9e-6, 3.9e-6).scaleInPlace(Settings.EARTH_ATMOSPHERE_THICKNESS / atmosphereThickness);
+        this.mieScatteringCoefficients = new Vector3(3.9e-6, 3.9e-6, 3.9e-6).scaleInPlace(
+            Settings.EARTH_ATMOSPHERE_THICKNESS / atmosphereThickness
+        );
         this.mieAsymmetry = 0.8;
         this.ozoneHeight = (25e3 * atmosphereThickness) / Settings.EARTH_ATMOSPHERE_THICKNESS;
-        this.ozoneAbsorptionCoefficients = new Vector3(0.6e-6, 1.8e-6, 0.085e-6).scaleInPlace(Settings.EARTH_ATMOSPHERE_THICKNESS / atmosphereThickness);
+        this.ozoneAbsorptionCoefficients = new Vector3(0.6e-6, 1.8e-6, 0.085e-6).scaleInPlace(
+            Settings.EARTH_ATMOSPHERE_THICKNESS / atmosphereThickness
+        );
         this.ozoneFalloff = (5e3 * atmosphereThickness) / Settings.EARTH_ATMOSPHERE_THICKNESS;
         this.lightIntensity = 15;
     }

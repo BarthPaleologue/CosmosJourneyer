@@ -65,7 +65,10 @@ export class OceanUniforms {
         effect.setFloat(OceanUniformNames.OCEAN_ALPHA_MODIFIER, this.alphaModifier);
         effect.setFloat(OceanUniformNames.OCEAN_DEPTH_MODIFIER, this.depthModifier);
         effect.setFloat(OceanUniformNames.OCEAN_WAVE_BLENDING_SHARPNESS, this.waveBlendingSharpness);
-        effect.setMatrix(OceanUniformNames.PLANET_INVERSE_ROTATION_MATRIX, planetTransform.getWorldMatrix().getRotationMatrix().transpose());
+        effect.setMatrix(
+            OceanUniformNames.PLANET_INVERSE_ROTATION_MATRIX,
+            planetTransform.getWorldMatrix().getRotationMatrix().transpose()
+        );
         effect.setFloat(OceanUniformNames.TIME, this.time % 100000); //FIXME: do not hardcode the 100000
     }
 

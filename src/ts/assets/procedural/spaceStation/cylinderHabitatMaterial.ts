@@ -22,7 +22,10 @@ import { Transformable } from "../../../architecture/transformable";
 
 import cylinderHabitatMaterialFragment from "../../../../shaders/cylinderHabitatMaterial/fragment.glsl";
 import cylinderHabitatMaterialVertex from "../../../../shaders/cylinderHabitatMaterial/vertex.glsl";
-import { setStellarObjectUniforms, StellarObjectUniformNames } from "../../../postProcesses/uniforms/stellarObjectUniforms";
+import {
+    setStellarObjectUniforms,
+    StellarObjectUniformNames
+} from "../../../postProcesses/uniforms/stellarObjectUniforms";
 import { Textures } from "../../textures";
 
 const CylinderHabitatUniformNames = {
@@ -75,7 +78,10 @@ export class CylinderHabitatMaterial extends ShaderMaterial {
             this.getEffect().setTexture(CylinderHabitatSamplerNames.NORMAL, Textures.SPACE_STATION_NORMAL);
             this.getEffect().setTexture(CylinderHabitatSamplerNames.METALLIC, Textures.SPACE_STATION_METALLIC);
             this.getEffect().setTexture(CylinderHabitatSamplerNames.ROUGHNESS, Textures.SPACE_STATION_ROUGHNESS);
-            this.getEffect().setTexture(CylinderHabitatSamplerNames.OCCLUSION, Textures.SPACE_STATION_AMBIENT_OCCLUSION);
+            this.getEffect().setTexture(
+                CylinderHabitatSamplerNames.OCCLUSION,
+                Textures.SPACE_STATION_AMBIENT_OCCLUSION
+            );
         });
     }
 

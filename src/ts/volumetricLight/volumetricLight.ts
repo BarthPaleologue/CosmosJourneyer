@@ -23,9 +23,24 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { VolumetricLightUniforms } from "./volumetricLightUniforms";
 
 export class VolumetricLight extends VolumetricLightScatteringPostProcess {
-    constructor(starMesh: Mesh, volumetricLightUniforms: VolumetricLightUniforms, excludedMeshes: AbstractMesh[], scene: Scene) {
+    constructor(
+        starMesh: Mesh,
+        volumetricLightUniforms: VolumetricLightUniforms,
+        excludedMeshes: AbstractMesh[],
+        scene: Scene
+    ) {
         if (scene.activeCameras === null || scene.activeCameras.length === 0) throw new Error("no camera");
-        super(`${starMesh.name}VolumetricLight`, 1, null, starMesh, 100, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, scene);
+        super(
+            `${starMesh.name}VolumetricLight`,
+            1,
+            null,
+            starMesh,
+            100,
+            Texture.BILINEAR_SAMPLINGMODE,
+            scene.getEngine(),
+            false,
+            scene
+        );
 
         // This is necessary because BabylonJS post process sets the scene using the camera. However, I don't pass a camera to the constructor as I use a PostProcessRenderPipeline.
         this._scene = scene;

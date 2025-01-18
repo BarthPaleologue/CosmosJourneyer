@@ -34,7 +34,11 @@ export type TelluricSatelliteModel = TelluricPlanetaryMassObjectModel & {
     readonly type: OrbitalObjectType.TELLURIC_SATELLITE;
 };
 
-export function newSeededTelluricSatelliteModel(seed: number, name: string, parentBodies: CelestialBodyModel[]): TelluricSatelliteModel {
+export function newSeededTelluricSatelliteModel(
+    seed: number,
+    name: string,
+    parentBodies: CelestialBodyModel[]
+): TelluricSatelliteModel {
     const rng = getRngFromSeed(seed);
 
     const isSatelliteOfTelluric = parentBodies.some((parent) => parent.type === OrbitalObjectType.TELLURIC_PLANET);
@@ -59,7 +63,15 @@ export function newSeededTelluricSatelliteModel(seed: number, name: string, pare
         mass = Settings.EARTH_MASS * (radius / 6_371e3) ** 3;
     }
 
-    let pressure = Math.max(normalRandom(Settings.EARTH_SEA_LEVEL_PRESSURE, 0.2 * Settings.EARTH_SEA_LEVEL_PRESSURE, rng, GenerationSteps.PRESSURE), 0);
+    let pressure = Math.max(
+        normalRandom(
+            Settings.EARTH_SEA_LEVEL_PRESSURE,
+            0.2 * Settings.EARTH_SEA_LEVEL_PRESSURE,
+            rng,
+            GenerationSteps.PRESSURE
+        ),
+        0
+    );
     if (isSatelliteOfTelluric || radius <= 0.3 * Settings.EARTH_RADIUS) {
         pressure = 0;
     }
@@ -67,21 +79,28 @@ export function newSeededTelluricSatelliteModel(seed: number, name: string, pare
     //TODO: use distance to star to determine min temperature when using 1:1 scale
     const minTemperature = Math.max(0, normalRandom(celsiusToKelvin(-20), 30, rng, 80));
     // when pressure is close to 1, the max temperature is close to the min temperature (the atmosphere does thermal regulation)
-    const maxTemperature = minTemperature + Math.exp(-pressure / Settings.EARTH_SEA_LEVEL_PRESSURE) * randRangeInt(30, 200, rng, 81);
+    const maxTemperature =
+        minTemperature + Math.exp(-pressure / Settings.EARTH_SEA_LEVEL_PRESSURE) * randRangeInt(30, 200, rng, 81);
 
     // this average is an approximation of a quaternion average
     // see https://math.stackexchange.com/questions/61146/averaging-quaternions
-    const parentAverageAxialTilt: Quaternion = parentBodies.reduce((sum, body) => sum.add(body.physics.axialTilt), Quaternion.Zero());
+    const parentAverageAxialTilt: Quaternion = parentBodies.reduce(
+        (sum, body) => sum.add(body.physics.axialTilt),
+        Quaternion.Zero()
+    );
     parentAverageAxialTilt.scaleInPlace(1 / parentBodies.length);
     parentAverageAxialTilt.normalize();
 
     const parentRotationAxis = Vector3.Up().applyRotationQuaternionInPlace(parentAverageAxialTilt);
     const orbitOrientation = parentAverageAxialTilt.clone();
-    Quaternion.RotationAxis(parentRotationAxis, rng(GenerationSteps.ORBIT + 20) * 2 * Math.PI).multiplyToRef(orbitOrientation, orbitOrientation);
-    Quaternion.RotationAxis(randomDirection(rng, GenerationSteps.ORBIT + 30), normalRandom(0, Math.PI / 12, rng, GenerationSteps.ORBIT + 10)).multiplyToRef(
+    Quaternion.RotationAxis(parentRotationAxis, rng(GenerationSteps.ORBIT + 20) * 2 * Math.PI).multiplyToRef(
         orbitOrientation,
         orbitOrientation
     );
+    Quaternion.RotationAxis(
+        randomDirection(rng, GenerationSteps.ORBIT + 30),
+        normalRandom(0, Math.PI / 12, rng, GenerationSteps.ORBIT + 10)
+    ).multiplyToRef(orbitOrientation, orbitOrientation);
 
     const physicalProperties: TelluricPlanetaryMassObjectPhysicsInfo = {
         mass: mass,
@@ -94,7 +113,9 @@ export function newSeededTelluricSatelliteModel(seed: number, name: string, pare
         oceanLevel: 0
     };
 
-    physicalProperties.oceanLevel = (Settings.OCEAN_DEPTH * physicalProperties.waterAmount * physicalProperties.pressure) / Settings.EARTH_SEA_LEVEL_PRESSURE;
+    physicalProperties.oceanLevel =
+        (Settings.OCEAN_DEPTH * physicalProperties.waterAmount * physicalProperties.pressure) /
+        Settings.EARTH_SEA_LEVEL_PRESSURE;
 
     const orbitalP = 2;
 
@@ -115,17 +136,29 @@ export function newSeededTelluricSatelliteModel(seed: number, name: string, pare
     // tidal lock
     physicalProperties.siderealDaySeconds = orbit.period;
 
-    const canHaveLiquidWater = hasLiquidWater(physicalProperties.pressure, physicalProperties.minTemperature, physicalProperties.maxTemperature);
+    const canHaveLiquidWater = hasLiquidWater(
+        physicalProperties.pressure,
+        physicalProperties.minTemperature,
+        physicalProperties.maxTemperature
+    );
     if (!canHaveLiquidWater) physicalProperties.oceanLevel = 0;
 
     const clouds: CloudsModel | null =
         physicalProperties.oceanLevel > 0
-            ? newCloudsModel(radius + physicalProperties.oceanLevel, Settings.CLOUD_LAYER_HEIGHT, physicalProperties.waterAmount, physicalProperties.pressure)
+            ? newCloudsModel(
+                  radius + physicalProperties.oceanLevel,
+                  Settings.CLOUD_LAYER_HEIGHT,
+                  physicalProperties.waterAmount,
+                  physicalProperties.pressure
+              )
             : null;
 
     const terrainSettings = {
         continents_frequency: radius / Settings.EARTH_RADIUS,
-        continents_fragmentation: physicalProperties.pressure > 0 ? clamp(normalRandom(0.65, 0.03, rng, GenerationSteps.TERRAIN), 0, 0.95) : 0,
+        continents_fragmentation:
+            physicalProperties.pressure > 0
+                ? clamp(normalRandom(0.65, 0.03, rng, GenerationSteps.TERRAIN), 0, 0.95)
+                : 0,
 
         bumps_frequency: (30 * radius) / Settings.EARTH_RADIUS,
 

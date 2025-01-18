@@ -148,7 +148,8 @@
 
             &.loading {
                 // animate background with linear gradient going from accent color to light accent color to accent color again
-                background: linear-gradient(90deg, var(--accent-color), rgb(200, 200, 200), var(--accent-color)) 0 0 / 200% 100% no-repeat;
+                background: linear-gradient(90deg, var(--accent-color), rgb(200, 200, 200), var(--accent-color)) 0 0 /
+                    200% 100% no-repeat;
                 animation: loadingAnimation 1s infinite linear alternate;
             }
         }

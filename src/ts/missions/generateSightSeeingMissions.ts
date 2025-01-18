@@ -58,8 +58,19 @@ export function generateSightseeingMissions(
     const neighborSystems = getNeighborStarSystemCoordinates(starSystem.coordinates, 75, starSystemDatabase);
     neighborSystems.forEach(([systemCoordinates, coordinates, distance]) => {
         const systemModel = starSystemDatabase.getSystemModelFromCoordinates(systemCoordinates);
-        for (let anomalyIndex = 0; anomalyIndex < StarSystemModelUtils.GetAnomalies(systemModel).length; anomalyIndex++) {
-            if (!uniformRandBool(1.0 / (1.0 + 1.5 * distance), rng, 38 + anomalyIndex + currentHour + coordinates.length())) continue;
+        for (
+            let anomalyIndex = 0;
+            anomalyIndex < StarSystemModelUtils.GetAnomalies(systemModel).length;
+            anomalyIndex++
+        ) {
+            if (
+                !uniformRandBool(
+                    1.0 / (1.0 + 1.5 * distance),
+                    rng,
+                    38 + anomalyIndex + currentHour + coordinates.length()
+                )
+            )
+                continue;
             anomalyFlyByMissions.push(
                 newSightSeeingMission(
                     spaceStationUniverseId,
@@ -155,8 +166,17 @@ export function generateSightseeingMissions(
         }
     });
 
-    const allMissions = blackHoleFlyByMissions.concat(neutronStarFlyByMissions, anomalyFlyByMissions, asteroidFieldMissions, terminatorLandingMissions);
+    const allMissions = blackHoleFlyByMissions.concat(
+        neutronStarFlyByMissions,
+        anomalyFlyByMissions,
+        asteroidFieldMissions,
+        terminatorLandingMissions
+    );
 
     // filter missions to avoid duplicates with already accepted missions of the player
-    return allMissions.filter((mission) => player.currentMissions.concat(player.completedMissions).every((currentMission) => !mission.equals(currentMission)));
+    return allMissions.filter((mission) =>
+        player.currentMissions
+            .concat(player.completedMissions)
+            .every((currentMission) => !mission.equals(currentMission))
+    );
 }

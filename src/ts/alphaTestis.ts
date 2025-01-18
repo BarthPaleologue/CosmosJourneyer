@@ -73,7 +73,13 @@ hecateModel.orbit.period = 60 * 60 * 24 * 365.25;
 hecateModel.orbit.radius = 25000 * hecateModel.radius;
 hecateModel.orbit.orientation = Quaternion.Identity();
 
-const spaceStationModel = newSeededSpaceElevatorModel(0, [sunModel], systemCoordinates, engine.starSystemDatabase.getSystemGalacticPosition(systemCoordinates), hecateModel);
+const spaceStationModel = newSeededSpaceElevatorModel(
+    0,
+    [sunModel],
+    systemCoordinates,
+    engine.starSystemDatabase.getSystemGalacticPosition(systemCoordinates),
+    hecateModel
+);
 
 //physicsViewer.showBody(spaceStation.aggregate.body);
 /*for(const landingpad of spaceStation.landingPads) {
@@ -119,7 +125,11 @@ const starSystemModel: StarSystemModel = {
         {
             stellarObjects: [sunModel],
             planetarySystems: [
-                { planets: [hecateModel], satellites: [moonModel], orbitalFacilities: [spaceStationModel] },
+                {
+                    planets: [hecateModel],
+                    satellites: [moonModel],
+                    orbitalFacilities: [spaceStationModel]
+                },
                 { planets: [aresModel], satellites: [], orbitalFacilities: [] },
                 { planets: [andromaqueModel], satellites: [], orbitalFacilities: [] }
             ],

@@ -35,7 +35,8 @@ export function rotate(transformNode: TransformNode, axis: Vector3, amount: numb
 }
 
 export function getRotationQuaternion(transformNode: TransformNode): Quaternion {
-    if (transformNode.rotationQuaternion === undefined) throw new Error(`Undefined quaternion for ${transformNode.name}`);
+    if (transformNode.rotationQuaternion === undefined)
+        throw new Error(`Undefined quaternion for ${transformNode.name}`);
     if (transformNode.rotationQuaternion === null) throw new Error(`Null quaternion for ${transformNode.name}`);
     return transformNode.rotationQuaternion;
 }

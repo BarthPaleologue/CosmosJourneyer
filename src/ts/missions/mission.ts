@@ -85,7 +85,11 @@ export class Mission {
      * @param context The current mission context
      * @param keyboardLayout The keyboard layout map to localize the keys
      */
-    describeNextTask(context: MissionContext, keyboardLayout: Map<string, string>, starSystemDatabase: StarSystemDatabase): string {
+    describeNextTask(
+        context: MissionContext,
+        keyboardLayout: Map<string, string>,
+        starSystemDatabase: StarSystemDatabase
+    ): string {
         return this.tree.describeNextTask(context, keyboardLayout, starSystemDatabase);
     }
 
@@ -163,6 +167,11 @@ export class Mission {
     }
 
     static Deserialize(missionSerialized: MissionSerialized) {
-        return new Mission(deserializeMissionNode(missionSerialized.tree), missionSerialized.reward, missionSerialized.missionGiver, missionSerialized.type);
+        return new Mission(
+            deserializeMissionNode(missionSerialized.tree),
+            missionSerialized.reward,
+            missionSerialized.missionGiver,
+            missionSerialized.type
+        );
     }
 }

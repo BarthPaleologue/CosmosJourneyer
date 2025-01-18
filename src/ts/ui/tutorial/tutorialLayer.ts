@@ -104,20 +104,26 @@ export class TutorialLayer implements IDisposable {
         TutorialControlsInputs.map.prevPanel.on("complete", () => {
             this.currentPanelIndex = Math.max(0, this.currentPanelIndex - 1);
             this.updatePanelState();
-            this.prevButton.animate([{ transform: "scale(1)" }, { transform: "scale(1.1)" }, { transform: "scale(1)" }], {
-                duration: 200,
-                easing: "ease"
-            });
+            this.prevButton.animate(
+                [{ transform: "scale(1)" }, { transform: "scale(1.1)" }, { transform: "scale(1)" }],
+                {
+                    duration: 200,
+                    easing: "ease"
+                }
+            );
             Sounds.MENU_SELECT_SOUND.play();
         });
 
         TutorialControlsInputs.map.nextPanel.on("complete", () => {
             this.currentPanelIndex = Math.min(this.tutorialPanelsHtml.length - 1, this.currentPanelIndex + 1);
             this.updatePanelState();
-            this.nextButton.animate([{ transform: "scale(1)" }, { transform: "scale(1.1)" }, { transform: "scale(1)" }], {
-                duration: 200,
-                easing: "ease"
-            });
+            this.nextButton.animate(
+                [{ transform: "scale(1)" }, { transform: "scale(1.1)" }, { transform: "scale(1)" }],
+                {
+                    duration: 200,
+                    easing: "ease"
+                }
+            );
             Sounds.MENU_SELECT_SOUND.play();
         });
     }

@@ -22,7 +22,10 @@ import { Transformable } from "../../../architecture/transformable";
 
 import ringHabitatMaterialFragment from "../../../../shaders/ringHabitatMaterial/fragment.glsl";
 import ringHabitatMaterialVertex from "../../../../shaders/ringHabitatMaterial/vertex.glsl";
-import { setStellarObjectUniforms, StellarObjectUniformNames } from "../../../postProcesses/uniforms/stellarObjectUniforms";
+import {
+    setStellarObjectUniforms,
+    StellarObjectUniformNames
+} from "../../../postProcesses/uniforms/stellarObjectUniforms";
 import { Textures } from "../../textures";
 
 import { OrbitalFacilityModel } from "../../../spacestation/orbitalFacility";
@@ -47,7 +50,13 @@ const RingHabitatSamplerNames = {
 export class RingHabitatMaterial extends ShaderMaterial {
     private stellarObjects: Transformable[] = [];
 
-    constructor(stationModel: OrbitalFacilityModel, meanRadius: number, deltaRadius: number, height: number, scene: Scene) {
+    constructor(
+        stationModel: OrbitalFacilityModel,
+        meanRadius: number,
+        deltaRadius: number,
+        height: number,
+        scene: Scene
+    ) {
         const shaderName = "ringHabitatMaterial";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = ringHabitatMaterialFragment;

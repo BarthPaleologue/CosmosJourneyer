@@ -52,13 +52,25 @@ test("computeMeanTemperature", () => {
     const sunEarthDistance = 1.496e11; // in meters
     const earthAlbedo = 0.3;
 
-    const meanTemperatureWithoutGreenHouseEffect = computeMeanTemperature(sunTemperature, sunRadius, sunEarthDistance, earthAlbedo, 0);
+    const meanTemperatureWithoutGreenHouseEffect = computeMeanTemperature(
+        sunTemperature,
+        sunRadius,
+        sunEarthDistance,
+        earthAlbedo,
+        0
+    );
     const targetEarthTemperatureWithoutGreenHouseEffect = 255; // in Kelvin
     expect(meanTemperatureWithoutGreenHouseEffect).toBeGreaterThan(targetEarthTemperatureWithoutGreenHouseEffect - 5);
     expect(meanTemperatureWithoutGreenHouseEffect).toBeLessThan(targetEarthTemperatureWithoutGreenHouseEffect + 5);
 
     const greenHouseEffect = 0.4;
-    const meanTemperatureWithGreenHouseEffect = computeMeanTemperature(sunTemperature, sunRadius, sunEarthDistance, earthAlbedo, greenHouseEffect);
+    const meanTemperatureWithGreenHouseEffect = computeMeanTemperature(
+        sunTemperature,
+        sunRadius,
+        sunEarthDistance,
+        earthAlbedo,
+        greenHouseEffect
+    );
     const targetEarthTemperatureWithGreenHouseEffect = 289; // in Kelvin
     expect(meanTemperatureWithGreenHouseEffect).toBeGreaterThan(targetEarthTemperatureWithGreenHouseEffect - 5);
     expect(meanTemperatureWithGreenHouseEffect).toBeLessThan(targetEarthTemperatureWithGreenHouseEffect + 5);
@@ -197,17 +209,29 @@ describe("getApparentGravityOnSpaceTether", () => {
         const earthMass = 5.972e24; // in kg
         const earthSiderealDayDuration = 86164.1; // in seconds
         const geostationaryOrbitRadius = 42_164e3; // in meters
-        const apparentGravity = getApparentGravityOnSpaceTether(earthSiderealDayDuration, earthMass, geostationaryOrbitRadius);
+        const apparentGravity = getApparentGravityOnSpaceTether(
+            earthSiderealDayDuration,
+            earthMass,
+            geostationaryOrbitRadius
+        );
 
         // The apparent gravity should be zero at the geostationary orbit
         expect(apparentGravity).toBeCloseTo(0);
 
         // and should increase as we move further away from the geostationary orbit
-        const apparentGravityAboveGeoOrbit = getApparentGravityOnSpaceTether(earthSiderealDayDuration, earthMass, geostationaryOrbitRadius + 10_000e3);
+        const apparentGravityAboveGeoOrbit = getApparentGravityOnSpaceTether(
+            earthSiderealDayDuration,
+            earthMass,
+            geostationaryOrbitRadius + 10_000e3
+        );
         expect(apparentGravityAboveGeoOrbit).toBeGreaterThan(0);
 
         // and should decrease as we move closer to earth
-        const apparentGravityBelowGeoOrbit = getApparentGravityOnSpaceTether(earthSiderealDayDuration, earthMass, geostationaryOrbitRadius - 10_000e3);
+        const apparentGravityBelowGeoOrbit = getApparentGravityOnSpaceTether(
+            earthSiderealDayDuration,
+            earthMass,
+            geostationaryOrbitRadius - 10_000e3
+        );
         expect(apparentGravityBelowGeoOrbit).toBeLessThan(0);
     });
 });

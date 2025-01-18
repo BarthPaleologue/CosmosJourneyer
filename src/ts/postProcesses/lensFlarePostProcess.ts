@@ -62,7 +62,11 @@ export class LensFlarePostProcess extends PostProcess {
             ASPECT_RATIO: "aspectRatio"
         };
 
-        const uniforms: string[] = [...Object.values(ObjectUniformNames), ...Object.values(CameraUniformNames), ...Object.values(LensFlareUniformNames)];
+        const uniforms: string[] = [
+            ...Object.values(ObjectUniformNames),
+            ...Object.values(CameraUniformNames),
+            ...Object.values(LensFlareUniformNames)
+        ];
 
         const samplers: string[] = Object.values(SamplerUniformNames);
 
@@ -98,7 +102,12 @@ export class LensFlarePostProcess extends PostProcess {
 
             effect.setColor3(LensFlareUniformNames.FLARE_COLOR, flareColor);
 
-            const clipPosition = Vector3.Project(stellarTransform.getAbsolutePosition(), Matrix.IdentityReadOnly, scene.getTransformMatrix(), this.activeCamera.viewport);
+            const clipPosition = Vector3.Project(
+                stellarTransform.getAbsolutePosition(),
+                Matrix.IdentityReadOnly,
+                scene.getTransformMatrix(),
+                this.activeCamera.viewport
+            );
             settings.behindCamera = clipPosition.z < 0;
             effect.setVector3(LensFlareUniformNames.CLIP_POSITION, clipPosition);
 

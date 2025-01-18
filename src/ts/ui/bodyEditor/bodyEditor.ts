@@ -228,16 +228,24 @@ export class BodyEditor {
             planetMaterial.setColorMode(ColorMode.DEFAULT);
         });
         document.getElementById("moistureMapButton")?.addEventListener("click", () => {
-            planetMaterial.setColorMode(planetMaterial.getColorMode() !== ColorMode.MOISTURE ? ColorMode.MOISTURE : ColorMode.DEFAULT);
+            planetMaterial.setColorMode(
+                planetMaterial.getColorMode() !== ColorMode.MOISTURE ? ColorMode.MOISTURE : ColorMode.DEFAULT
+            );
         });
         document.getElementById("temperatureMapButton")?.addEventListener("click", () => {
-            planetMaterial.setColorMode(planetMaterial.getColorMode() !== ColorMode.TEMPERATURE ? ColorMode.TEMPERATURE : ColorMode.DEFAULT);
+            planetMaterial.setColorMode(
+                planetMaterial.getColorMode() !== ColorMode.TEMPERATURE ? ColorMode.TEMPERATURE : ColorMode.DEFAULT
+            );
         });
         document.getElementById("normalMapButton")?.addEventListener("click", () => {
-            planetMaterial.setColorMode(planetMaterial.getColorMode() !== ColorMode.NORMAL ? ColorMode.NORMAL : ColorMode.DEFAULT);
+            planetMaterial.setColorMode(
+                planetMaterial.getColorMode() !== ColorMode.NORMAL ? ColorMode.NORMAL : ColorMode.DEFAULT
+            );
         });
         document.getElementById("heightMapButton")?.addEventListener("click", () => {
-            planetMaterial.setColorMode(planetMaterial.getColorMode() !== ColorMode.HEIGHT ? ColorMode.HEIGHT : ColorMode.DEFAULT);
+            planetMaterial.setColorMode(
+                planetMaterial.getColorMode() !== ColorMode.HEIGHT ? ColorMode.HEIGHT : ColorMode.DEFAULT
+            );
         });
     }
 

@@ -16,17 +16,17 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #toolbar {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  z-index: 3;
-  img {
-    width: 50px;
-    cursor: pointer;
-    background: transparent;
-    transition: .2s;
-    &:hover {
-      background: gray;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 3;
+    img {
+        width: 50px;
+        cursor: pointer;
+        background: transparent;
+        transition: 0.2s;
+        &:hover {
+            background: gray;
+        }
     }
-  }
 }

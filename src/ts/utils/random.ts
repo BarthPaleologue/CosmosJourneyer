@@ -64,7 +64,12 @@ export function randomPieChart(nbSlices: number, rng: (index: number) => number,
     return results.map((result) => result / sum);
 }
 
-export function pickPseudoRandomItems<T>(items: T[], nbItemsToPick: number, rng: (index: number) => number, baseIndex: number): T[] {
+export function pickPseudoRandomItems<T>(
+    items: T[],
+    nbItemsToPick: number,
+    rng: (index: number) => number,
+    baseIndex: number
+): T[] {
     const itemsCopy = Array.from(items);
     const results: T[] = [];
     for (let i = 0; i < nbItemsToPick; i++) {

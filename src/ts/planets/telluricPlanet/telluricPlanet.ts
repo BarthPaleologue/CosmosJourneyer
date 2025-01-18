@@ -89,7 +89,8 @@ export class TelluricPlanet implements PlanetaryMassObject, Cullable {
         this.aggregate.shape.addChildFromParent(this.getTransform(), physicsShape, this.getTransform());
 
         if (this.model.physics.pressure > 0.05) {
-            const atmosphereThickness = Settings.EARTH_ATMOSPHERE_THICKNESS * Math.max(1, this.model.radius / Settings.EARTH_RADIUS);
+            const atmosphereThickness =
+                Settings.EARTH_ATMOSPHERE_THICKNESS * Math.max(1, this.model.radius / Settings.EARTH_RADIUS);
             this.atmosphereUniforms = new AtmosphereUniforms(this.getBoundingRadius(), atmosphereThickness);
         } else {
             this.atmosphereUniforms = null;
@@ -106,7 +107,13 @@ export class TelluricPlanet implements PlanetaryMassObject, Cullable {
 
             const averageRadius = (this.model.radius * (this.model.rings.ringStart + this.model.rings.ringEnd)) / 2;
             const spread = (this.model.radius * (this.model.rings.ringEnd - this.model.rings.ringStart)) / 2;
-            this.asteroidField = new AsteroidField(this.model.rings.seed, this.getTransform(), averageRadius, spread, scene);
+            this.asteroidField = new AsteroidField(
+                this.model.rings.seed,
+                this.getTransform(),
+                averageRadius,
+                spread,
+                scene
+            );
         } else {
             this.ringsUniforms = null;
             this.asteroidField = null;
@@ -130,7 +137,8 @@ export class TelluricPlanet implements PlanetaryMassObject, Cullable {
         ];
 
         this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());
-        this.targetInfo.maxDistance = this.model.type === OrbitalObjectType.TELLURIC_SATELLITE ? this.model.orbit.radius * 8.0 : 0;
+        this.targetInfo.maxDistance =
+            this.model.type === OrbitalObjectType.TELLURIC_SATELLITE ? this.model.orbit.radius * 8.0 : 0;
     }
 
     getTransform(): TransformNode {

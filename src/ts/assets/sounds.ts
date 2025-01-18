@@ -200,7 +200,10 @@ export class Sounds {
             console.log("Disable warp drive sound loaded");
         };
 
-        const acceleratingWarpDriveSoundTask = manager.addBinaryFileTask("acceleratingWarpDriveSoundTask", acceleratingWarpDriveSound);
+        const acceleratingWarpDriveSoundTask = manager.addBinaryFileTask(
+            "acceleratingWarpDriveSoundTask",
+            acceleratingWarpDriveSound
+        );
         acceleratingWarpDriveSoundTask.onSuccess = (task) => {
             Sounds.ACCELERATING_WARP_DRIVE_SOUND = new Sound("AcceleratingWarpDriveSound", task.data, scene);
             Sounds.ACCELERATING_WARP_DRIVE_SOUND.updateOptions({
@@ -212,7 +215,10 @@ export class Sounds {
             console.log("Accelerating warp drive sound loaded");
         };
 
-        const deceleratingWarpDriveSoundTask = manager.addBinaryFileTask("deceleratingWarpDriveSoundTask", deceleratingWarpDriveSound);
+        const deceleratingWarpDriveSoundTask = manager.addBinaryFileTask(
+            "deceleratingWarpDriveSoundTask",
+            deceleratingWarpDriveSound
+        );
         deceleratingWarpDriveSoundTask.onSuccess = (task) => {
             Sounds.DECELERATING_WARP_DRIVE_SOUND = new Sound("DeceleratingWarpDriveSound", task.data, scene);
             Sounds.DECELERATING_WARP_DRIVE_SOUND.updateOptions({
@@ -260,7 +266,10 @@ export class Sounds {
             console.log("Error bleep sound loaded");
         };
 
-        const starMapBackgroundMusicTask = manager.addBinaryFileTask("starMapBackgroundMusicTask", starMapBackgroundMusic);
+        const starMapBackgroundMusicTask = manager.addBinaryFileTask(
+            "starMapBackgroundMusicTask",
+            starMapBackgroundMusic
+        );
         starMapBackgroundMusicTask.onSuccess = (task) => {
             Sounds.STAR_MAP_BACKGROUND_MUSIC = new Sound("StarMapBackgroundMusic", task.data, scene, null, {
                 loop: true
@@ -269,7 +278,10 @@ export class Sounds {
             console.log("Star map background music loaded");
         };
 
-        const mainMenuBackgroundMusicTask = manager.addBinaryFileTask("mainMenuBackgroundMusicTask", starMapBackgroundMusic);
+        const mainMenuBackgroundMusicTask = manager.addBinaryFileTask(
+            "mainMenuBackgroundMusicTask",
+            starMapBackgroundMusic
+        );
         mainMenuBackgroundMusicTask.onSuccess = (task) => {
             Sounds.MAIN_MENU_BACKGROUND_MUSIC = new Sound("MainMenuBackgroundMusic", task.data, scene, null, {
                 loop: true
@@ -278,7 +290,10 @@ export class Sounds {
             console.log("Main menu background music loaded");
         };
 
-        const initiatingPlanetaryLandingSoundTask = manager.addBinaryFileTask("initiatingPlanetaryLandingSoundTask", initiatingPlanetaryLandingSound);
+        const initiatingPlanetaryLandingSoundTask = manager.addBinaryFileTask(
+            "initiatingPlanetaryLandingSoundTask",
+            initiatingPlanetaryLandingSound
+        );
         initiatingPlanetaryLandingSoundTask.onSuccess = (task) => {
             Sounds.INITIATING_PLANETARY_LANDING = new Sound("InitiatingPlanetaryLanding", task.data, scene);
             console.log("Initiating planetary landing sound loaded");
@@ -314,25 +329,37 @@ export class Sounds {
             console.log("Strauss Blue Danube sound loaded");
         };
 
-        const cannotEngageWarpDriveSoundTask = manager.addBinaryFileTask("cannotEngageWarpDriveSoundTask", cannotEngageWarpDriveSound);
+        const cannotEngageWarpDriveSoundTask = manager.addBinaryFileTask(
+            "cannotEngageWarpDriveSoundTask",
+            cannotEngageWarpDriveSound
+        );
         cannotEngageWarpDriveSoundTask.onSuccess = (task) => {
             Sounds.CANNOT_ENGAGE_WARP_DRIVE = new Sound("CannotEngageWarpDrive", task.data, scene);
             console.log("Cannot engage warp drive sound loaded");
         };
 
-        const warpDriveEmergencyShutDownSoundTask = manager.addBinaryFileTask("warpDriveEmergencyShutDownSoundTask", warpDriveEmergencyShutDownSound);
+        const warpDriveEmergencyShutDownSoundTask = manager.addBinaryFileTask(
+            "warpDriveEmergencyShutDownSoundTask",
+            warpDriveEmergencyShutDownSound
+        );
         warpDriveEmergencyShutDownSoundTask.onSuccess = (task) => {
             Sounds.WARP_DRIVE_EMERGENCY_SHUT_DOWN = new Sound("WarpDriveEmergencyShutDown", task.data, scene);
             console.log("Warp drive emergency shut down sound loaded");
         };
 
-        const warpDriveDisengagedSoundTask = manager.addBinaryFileTask("warpDriveDisengagedSoundTask", warpDriveDisengagedSound);
+        const warpDriveDisengagedSoundTask = manager.addBinaryFileTask(
+            "warpDriveDisengagedSoundTask",
+            warpDriveDisengagedSound
+        );
         warpDriveDisengagedSoundTask.onSuccess = (task) => {
             Sounds.WARP_DRIVE_DISENGAGED = new Sound("WarpDriveDisengaged", task.data, scene);
             console.log("Warp drive disengaged sound loaded");
         };
 
-        const engagingWarpDriveSoundTask = manager.addBinaryFileTask("engagingWarpDriveSoundTask", engagingWarpDriveSound);
+        const engagingWarpDriveSoundTask = manager.addBinaryFileTask(
+            "engagingWarpDriveSoundTask",
+            engagingWarpDriveSound
+        );
         engagingWarpDriveSoundTask.onSuccess = (task) => {
             Sounds.ENGAGING_WARP_DRIVE = new Sound("EngagingWarpDrive", task.data, scene);
             console.log("Engaging warp drive sound loaded");
@@ -344,7 +371,10 @@ export class Sounds {
             console.log("Fuel scooping voice loaded");
         };
 
-        const fuelScoopingCompleteVoiceTask = manager.addBinaryFileTask("fuelScoopingCompleteVoiceTask", fuelScoopingCompleteVoice);
+        const fuelScoopingCompleteVoiceTask = manager.addBinaryFileTask(
+            "fuelScoopingCompleteVoiceTask",
+            fuelScoopingCompleteVoice
+        );
         fuelScoopingCompleteVoiceTask.onSuccess = (task) => {
             Sounds.FUEL_SCOOPING_COMPLETE_VOICE = new Sound("FuelScoopingCompleteVoice", task.data, scene);
             console.log("Fuel scooping complete voice loaded");

@@ -40,7 +40,9 @@ export function parseDistance(distance: number): string {
     } else if (distance < 0.1 * Settings.LIGHT_YEAR) {
         return i18n.t("units:shortLs", { count: Number((distance / Settings.C).toFixed(2)) });
     } else {
-        return i18n.t("units:shortLy", { count: Number((distance / Settings.LIGHT_YEAR).toFixed(2)) });
+        return i18n.t("units:shortLy", {
+            count: Number((distance / Settings.LIGHT_YEAR).toFixed(2))
+        });
     }
 }
 
@@ -54,7 +56,9 @@ export function parseSecondsRough(seconds: number): string {
     } else if (seconds < 60 * 60 * 24 * 365.25) {
         return i18n.t("units:shortDays", { count: Number((seconds / (60 * 60 * 24)).toFixed(0)) });
     } else if (seconds < 60 * 60 * 24 * 365.25 * 10) {
-        return i18n.t("units:shortYears", { count: Number((seconds / (60 * 60 * 24 * 365.25)).toFixed(0)) });
+        return i18n.t("units:shortYears", {
+            count: Number((seconds / (60 * 60 * 24 * 365.25)).toFixed(0))
+        });
     } else {
         return `∞`;
     }

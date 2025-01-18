@@ -17,7 +17,12 @@
 
 import { MissionNode, MissionNodeSerialized, MissionNodeType } from "../../missionNode";
 import { MissionContext } from "../../../missionContext";
-import { StarSystemCoordinates, starSystemCoordinatesEquals, UniverseObjectId, universeObjectIdEquals } from "../../../../utils/coordinates/universeCoordinates";
+import {
+    StarSystemCoordinates,
+    starSystemCoordinatesEquals,
+    UniverseObjectId,
+    universeObjectIdEquals
+} from "../../../../utils/coordinates/universeCoordinates";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getObjectBySystemId, getObjectModelByUniverseId } from "../../../../utils/coordinates/orbitalObjectId";
 import { parseDistance } from "../../../../utils/strings/parseToStrings";
@@ -135,7 +140,11 @@ export class MissionFlyByNode implements MissionNode {
         });
     }
 
-    describeNextTask(context: MissionContext, keyboardLayout: Map<string, string>, starSystemDatabase: StarSystemDatabase): string {
+    describeNextTask(
+        context: MissionContext,
+        keyboardLayout: Map<string, string>,
+        starSystemDatabase: StarSystemDatabase
+    ): string {
         if (this.isCompleted()) {
             return i18n.t("missions:flyBy:missionCompleted");
         }
@@ -144,7 +153,12 @@ export class MissionFlyByNode implements MissionNode {
 
         switch (this.state) {
             case FlyByState.NOT_IN_SYSTEM:
-                return getGoToSystemInstructions(context, this.targetSystemCoordinates, keyboardLayout, starSystemDatabase);
+                return getGoToSystemInstructions(
+                    context,
+                    this.targetSystemCoordinates,
+                    keyboardLayout,
+                    starSystemDatabase
+                );
             case FlyByState.TOO_FAR_IN_SYSTEM:
                 return i18n.t("missions:common:getCloserToTarget", {
                     objectName: targetObject.name

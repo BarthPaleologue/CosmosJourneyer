@@ -103,7 +103,13 @@ export class NeutronStar implements StellarObject, Cullable {
 
             const averageRadius = (this.model.radius * (this.model.rings.ringStart + this.model.rings.ringEnd)) / 2;
             const spread = (this.model.radius * (this.model.rings.ringEnd - this.model.rings.ringStart)) / 2;
-            this.asteroidField = new AsteroidField(this.model.rings.seed, this.getTransform(), averageRadius, spread, scene);
+            this.asteroidField = new AsteroidField(
+                this.model.rings.seed,
+                this.getTransform(),
+                averageRadius,
+                spread,
+                scene
+            );
         } else {
             this.ringsUniforms = null;
             this.asteroidField = null;

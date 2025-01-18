@@ -38,7 +38,11 @@ export function newSeededJuliaSetModel(seed: number, name: string, parentBodies:
 
     const radius = 1000e3;
 
-    const accentColor = Color3.FromHSV(360 * rng(GenerationSteps.ACCENT_COLOR), rng(GenerationSteps.ACCENT_COLOR + 123) * 0.5, 0.8);
+    const accentColor = Color3.FromHSV(
+        360 * rng(GenerationSteps.ACCENT_COLOR),
+        rng(GenerationSteps.ACCENT_COLOR + 123) * 0.5,
+        0.8
+    );
 
     // Todo: do not hardcode
     let orbitRadius = rng(GenerationSteps.ORBIT) * 15e9;
