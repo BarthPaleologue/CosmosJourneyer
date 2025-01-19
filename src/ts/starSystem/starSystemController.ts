@@ -82,7 +82,6 @@ export class StarSystemController {
 
     /**
      * Translation of the system data model in terms of actual 3D objects
-     * @type {StarSystemModel}
      */
     readonly subSystems: SubStarSystem[] = [];
 
