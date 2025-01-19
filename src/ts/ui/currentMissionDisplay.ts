@@ -84,7 +84,7 @@ export class CurrentMissionDisplay {
         nextSpan.innerText = i18n.t("missions:common:next");
         this.nextMissionButton.appendChild(nextSpan);
 
-        getGlobalKeyboardLayoutMap().then((keyboardLayoutMap) => {
+        void getGlobalKeyboardLayoutMap().then((keyboardLayoutMap) => {
             pressInteractionToStrings(SpaceShipControlsInputs.map.previousMission, keyboardLayoutMap).forEach((key) => {
                 const previousKeySpan = document.createElement("span");
                 previousKeySpan.classList.add("keySpan");
