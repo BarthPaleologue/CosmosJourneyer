@@ -45,7 +45,7 @@ uniform sampler2D depthSampler;
 #define MARCHINGITERATIONS 64
 
 #define MARCHINGSTEP 1.0
-#define EPSILON 0.001
+#define EPSILON 0.0001
 
 // cosine based palette, 4 vec3 params
 vec3 cosineColor(in float t, in vec3 a, in vec3 b, in vec3 c, in vec3 d) {
@@ -76,30 +76,74 @@ vec2 sdf(vec3 position){
   return vec2((length(p.xyz) - C1) / p.w - C2, p.w);
 }
 
-// TRACING A PATH : 
-// measuring the distance to the nearest object on the x coordinate
-// and returning the color index on the y coordinate
-vec2 rayMarch(vec3 origin, vec3 ray, out float steps) {
-    //t is the point at which we are in the measuring of the distance
-    float depth = 0.0;
-    steps = 0.0;
-    float c = 0.0;
+float closeObj = 0.0;
+const float PI = 3.14159;
 
-    for (int i = 0; i < MARCHINGITERATIONS; i++) {
-        vec3 path = origin + ray * depth;
-        vec2 dist = sdf(path);
-        // we want t to be as large as possible at each step but not too big to induce artifacts
-        depth += MARCHINGSTEP * dist.x;
-        c += dist.y;
-        steps++;
+float rayMarch(vec3 ro, vec3 rd) {
+    float t = 0.5;
+    float d = 0.0;
+    float w = 1.3;
+    float ld = 0.0;
+    float ls = 0.0;
+    float s = 0.0;
+    float cerr = 10000.0;
+    float ct = 0.0;
+    float pixradius = 1e-3;
+    vec2 c;
+    int inter = 0;
+    for (int i = 0; i < 64; i++) {
+        ld = d;
+        c = sdf(ro + rd * t);
+        d = c.x;
+        
+        //Detect intersections missed by over-relaxation
+        if(w > 1.0 && abs(ld) + abs(d) < s){
+            s -= w * s;
+            w = 1.0;
+            t += s;
+            continue;
+        }
+        s = w * d;
+        
+        float err = d / t;
+        
+        if(abs(err) < abs(cerr)){
+            ct = t;
+            cerr = err;
+        }
+        
+        //Intersect when d / t < one pixel
+        if(abs(err) < pixradius){
+            inter = 1;
+            break;
+        }
+        
+        t += s;
+        if(t > 30.0){
+            break;
+        }
     }
-
-    return vec2(depth, c);
+    closeObj = c.y;
+    if(inter == 0){
+        ct = -1.0;
+    }
+    return ct;
 }
 
 float contrast(float val, float contrast_offset, float contrast_mid_level)
 {
     return clamp((val - contrast_mid_level) * (1. + contrast_offset) + contrast_mid_level, 0., 1.);
+}
+
+float map(vec3 p){
+    return sdf(p).x;
+}
+
+//Approximate normal
+vec3 getNormal(vec3 p){
+    return normalize(vec3(map(vec3(p.x + 0.0001, p.yz)) - map(vec3(p.x - 0.0001, p.yz)),
+                          map(vec3(p.x, p.y + 0.0001, p.z)) - map(vec3(p.x, p.y - 0.0001, p.z)),
+                	      map(vec3(p.xy, p.z + 0.0001)) - map(vec3(p.xy, p.z - 0.0001))));
 }
 
 void main() {
@@ -125,8 +169,26 @@ void main() {
     origin *= inverseScaling;
 
     float steps;
-    vec2 mandelDepth = rayMarch(origin, rayDir, steps);
+    float rayDepth = rayMarch(origin, rayDir);
+    if(rayDepth == -1.0){
+        gl_FragColor = screenColor;
+        return;
+    } else {
+        //float realDepth = impactPoint + rayDepth / inverseScaling;
 
+        vec3 intersectionPoint = origin + rayDepth * rayDir;
+
+        vec3 normal = getNormal(intersectionPoint);
+        vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+        float ndl = max(0.0, dot(normal, lightDir));
+
+        vec3 diffuse = vec3(1.0, 1.0, 1.0) * ndl;
+        
+        gl_FragColor = vec4(diffuse, 1.0);
+        return;
+    }
+
+/*
     float realDepth = impactPoint + mandelDepth.x / inverseScaling;
 
     if (maximumDistance < realDepth) {
@@ -180,6 +242,6 @@ void main() {
 
     mandelbulbColor.xyz *= clamp(ndl, 0.3, 1.0);
 
-    gl_FragColor = mix(mandelbulbColor, screenColor, smoothstep(2.0, 15.0, intersectionDistance));
+    gl_FragColor = mix(mandelbulbColor, screenColor, smoothstep(2.0, 15.0, intersectionDistance));*/
 
 }
