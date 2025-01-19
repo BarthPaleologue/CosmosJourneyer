@@ -167,10 +167,9 @@ export class StarSystemDatabase {
 
     /**
      * @param coordinates The coordinates of the system you want the model of.
-     * @returns The StarSystemModel for the given coordinates.
-     * @throws An error if the seed is not found for the given coordinates.
+     * @returns The StarSystemModel for the given coordinates, or null if the system is not found.
      */
-    public getSystemModelFromCoordinates(coordinates: StarSystemCoordinates): StarSystemModel {
+    public getSystemModelFromCoordinates(coordinates: StarSystemCoordinates): StarSystemModel | null {
         const customSystem = this.getCustomSystemFromCoordinates(coordinates);
         if (customSystem !== undefined) {
             return this.applyPlugins(customSystem);
@@ -185,9 +184,7 @@ export class StarSystemDatabase {
             starSystemCoordinatesEquals(coordinates, otherCoordinates)
         );
         if (index === -1) {
-            throw new Error(
-                `Seed not found for coordinates ${JSON.stringify(coordinates)}. It was not found in the custom system registry either.`
-            );
+            return null;
         }
 
         // init pseudo-random number generator
@@ -256,6 +253,9 @@ export class StarSystemDatabase {
 
         for (const systemCoordinates of generatedSystemCoordinates) {
             const systemModel = this.getSystemModelFromCoordinates(systemCoordinates);
+            if (systemModel === null) {
+                throw new Error("Generated system not found in the database!");
+            }
             generatedModels.push(systemModel);
         }
 

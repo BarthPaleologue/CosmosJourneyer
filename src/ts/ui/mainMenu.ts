@@ -111,7 +111,11 @@ export class MainMenu {
         const randomIndex = Math.floor(Math.random() * allowedIdentifiers.length);
         this.universeObjectId = allowedIdentifiers[randomIndex];
         const coordinates = this.universeObjectId.starSystemCoordinates;
-        this.starSystemModel = starSystemDatabase.getSystemModelFromCoordinates(coordinates);
+        const starSystemModel = starSystemDatabase.getSystemModelFromCoordinates(coordinates);
+        if (starSystemModel === null) {
+            throw new Error("Cannot find star system model for coordinates " + JSON.stringify(coordinates));
+        }
+        this.starSystemModel = starSystemModel;
 
         const htmlRoot = document.getElementById("mainMenu");
         if (htmlRoot === null) throw new Error("#mainMenu does not exist!");

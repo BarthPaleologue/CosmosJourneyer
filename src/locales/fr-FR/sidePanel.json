@@ -7,6 +7,7 @@
     "deleteSavePrompt": "La suppression de cette sauvegarde est irréversible. Vous pouvez toujours télécharger une copie avant ! Êtes-vous sûr de vouloir continuer ?",
     "landedAt": "Posé à {{location}}",
     "near": "Près de {{location}}",
+    "locationNotFound": "Erreur: Localisation introuvable dans la base de données",
     "tutorials": "Tutoriels",
     "settings": "Paramètres",
     "contribute": "Contribuer",

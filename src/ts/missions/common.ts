@@ -30,14 +30,14 @@ export function getGoToSystemInstructions(
             )
         });
     } else {
-        const nextSystemCoordinates = missionContext.currentItinerary[1];
+        const nextSystemCoordinates = missionContext.currentItinerary.at(1);
         const nextSystemModel =
             nextSystemCoordinates !== undefined
                 ? starSystemDatabase.getSystemModelFromCoordinates(nextSystemCoordinates)
-                : undefined;
-        if (nextSystemModel === undefined) {
+                : null;
+        if (nextSystemModel === null) {
             throw new Error(
-                "Next system model in itinerary is undefined and yet the player has an itinerary to the target system?!"
+                "Next system model in itinerary is null and yet the player has an itinerary to the target system?!"
             );
         }
 

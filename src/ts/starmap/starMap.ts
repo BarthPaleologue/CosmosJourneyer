@@ -533,6 +533,11 @@ export class StarMap implements View {
     private createInstance(data: BuildData) {
         const starSystemCoordinates = data.coordinates;
         const starSystemModel = this.starSystemDatabase.getSystemModelFromCoordinates(starSystemCoordinates);
+        if (starSystemModel === null) {
+            throw new Error(
+                `Could not find star system model for coordinates ${JSON.stringify(starSystemCoordinates)}`
+            );
+        }
 
         //TODO: when implementing binary star systems, this will need to be updated to display all stellar objects and not just the first one
         const stellarObjectModel = StarSystemModelUtils.GetStellarObjects(starSystemModel)[0];
@@ -676,6 +681,10 @@ export class StarMap implements View {
 
         this.selectedSystemCoordinates = starSystemCoordinates;
         const starSystemModel = this.starSystemDatabase.getSystemModelFromCoordinates(starSystemCoordinates);
+        if (starSystemModel === null)
+            throw new Error(
+                `Could not find star system model for coordinates ${JSON.stringify(starSystemCoordinates)}`
+            );
         this.starMapUI.setSelectedSystem(starSystemModel, this.currentSystemCoordinates);
         this.starMapUI.setHoveredSystem(null);
     }

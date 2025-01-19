@@ -78,9 +78,12 @@ export function getObjectBySystemId(
 export function getObjectModelByUniverseId(
     universeObjectId: UniverseObjectId,
     starSystemDatabase: StarSystemDatabase
-): OrbitalObjectModel {
+): OrbitalObjectModel | null {
     const starSystemCoordinates = universeObjectId.starSystemCoordinates;
     const starSystemModel = starSystemDatabase.getSystemModelFromCoordinates(starSystemCoordinates);
+    if (starSystemModel === null) {
+        return null;
+    }
 
     switch (universeObjectId.objectType) {
         case SystemObjectType.STELLAR_OBJECT:
@@ -101,6 +104,9 @@ export function getUniverseIdForSpaceStationModel(
     starSystemDatabase: StarSystemDatabase
 ): UniverseObjectId {
     const systemModel = starSystemDatabase.getSystemModelFromCoordinates(spaceStationModel.starSystemCoordinates);
+    if (systemModel === null) {
+        throw new Error("Star system model not found in database");
+    }
 
     const spaceStationModels = StarSystemModelUtils.GetSpaceStations(systemModel);
     const index = spaceStationModels.findIndex((model) => model.seed === spaceStationModel.seed);

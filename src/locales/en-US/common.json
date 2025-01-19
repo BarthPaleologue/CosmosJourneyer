@@ -4,5 +4,6 @@
     "or": "or",
     "and": "and",
     "sellFor": "Sell for {{price}}",
-    "sellAllFor": "Sell all for {{price}}"
+    "sellAllFor": "Sell all for {{price}}",
+    "unknown": "Unknown"
 }

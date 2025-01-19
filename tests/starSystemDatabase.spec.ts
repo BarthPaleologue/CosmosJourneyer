@@ -52,7 +52,8 @@ describe("StarSystemDatabase", () => {
 
             database.registerSinglePlugin(coordinates, plugin);
             const model = database.getSystemModelFromCoordinates(coordinates);
-            expect(model.name).toBe("Modified System");
+            expect(model).not.toBeNull();
+            expect(model?.name).toBe("Modified System");
         });
     });
 

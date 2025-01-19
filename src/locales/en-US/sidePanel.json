@@ -7,6 +7,7 @@
     "deleteSavePrompt": "Deleting this save is irreversible. You can still download a backup first! Are you sure you want to proceed?",
     "landedAt": "Landed at {{location}}",
     "near": "Near {{location}}",
+    "locationNotFound": "Error: Location not found in database",
     "settings": "Settings",
     "tutorials": "Tutorials",
     "contribute": "Contribute",

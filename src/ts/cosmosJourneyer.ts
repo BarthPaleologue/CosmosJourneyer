@@ -739,6 +739,9 @@ export class CosmosJourneyer {
         const systemModel = this.starSystemDatabase.getSystemModelFromCoordinates(
             universeObjectId.starSystemCoordinates
         );
+        if (systemModel === null) {
+            throw new Error("Cannot load universe coordinates: system model not found");
+        }
         await this.starSystemView.loadStarSystem(systemModel);
 
         if (this.state === EngineState.UNINITIALIZED) await this.init(true);
