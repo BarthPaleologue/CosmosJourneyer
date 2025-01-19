@@ -33,6 +33,9 @@ import { Color4 } from "@babylonjs/core/Maths/math.color";
 import { ArcRotateCamera, Engine } from "@babylonjs/core";
 import { newSeededMandelbulbModel } from "./anomalies/mandelbulb/mandelbulbModel";
 import { newSeededJuliaSetModel } from "./anomalies/julia/juliaSetModel";
+import { newSeededMandelboxModel } from "./anomalies/mandelbox/mandelboxModel";
+import { MandelboxPostProcess } from "./anomalies/mandelbox/mandelboxPostProcess";
+import { Mandelbox } from "./anomalies/mandelbox/mandelbox";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -103,6 +106,31 @@ function createJulia(): TransformNode {
     return julia.getTransform();
 }
 
+function createMandelbox(): TransformNode {
+    const mandelboxModel = newSeededMandelboxModel(Math.random() * 100_000, "XR Anomaly", []);
+    const mandelbox = new Mandelbox(mandelboxModel, scene);
+    mandelbox.getTransform().scalingDeterminant = 1 / 400e3;
+
+    const mandelboxPP = new MandelboxPostProcess(
+        mandelbox.getTransform(),
+        mandelbox.getBoundingRadius(),
+        mandelboxModel,
+        scene,
+        []
+    );
+    scene.cameras.forEach((camera) => camera.attachPostProcess(mandelboxPP));
+    scene.onNewCameraAddedObservable.add((camera) => {
+        camera.attachPostProcess(mandelboxPP);
+    });
+
+    scene.onBeforeRenderObservable.add(() => {
+        const deltaSeconds = engine.getDeltaTime() / 1000;
+        mandelboxPP.update(deltaSeconds);
+    });
+
+    return mandelbox.getTransform();
+}
+
 const sceneType = urlParams.get("scene");
 
 if (sceneType === "mandelbulb") {
@@ -110,7 +138,7 @@ if (sceneType === "mandelbulb") {
 } else if (sceneType === "julia") {
     createJulia();
 } else {
-    createMandelbulb();
+    createMandelbox();
 }
 
 const xr = await scene.createDefaultXRExperienceAsync();

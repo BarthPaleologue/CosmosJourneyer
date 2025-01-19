@@ -53,6 +53,8 @@ import { Constants } from "@babylonjs/core/Engines/constants";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getRgbFromTemperature } from "../utils/specrend";
 import { PostProcessType } from "./postProcessTypes";
+import { MandelboxPostProcess } from "../anomalies/mandelbox/mandelboxPostProcess";
+import { Mandelbox } from "../anomalies/mandelbox/mandelbox";
 
 /**
  * The order in which the post processes are rendered when away from a planet
@@ -65,6 +67,7 @@ const spaceRenderingOrder: PostProcessType[] = [
     PostProcessType.ATMOSPHERE,
     PostProcessType.MANDELBULB,
     PostProcessType.JULIA_SET,
+    PostProcessType.MANDELBOX,
     PostProcessType.RING,
     PostProcessType.BLACK_HOLE
 ];
@@ -78,6 +81,7 @@ const surfaceRenderingOrder: PostProcessType[] = [
     PostProcessType.BLACK_HOLE,
     PostProcessType.MANDELBULB,
     PostProcessType.JULIA_SET,
+    PostProcessType.MANDELBOX,
     PostProcessType.RING,
     PostProcessType.OCEAN,
     PostProcessType.CLOUDS,
@@ -131,6 +135,7 @@ export class PostProcessManager {
     readonly atmospheres: AtmosphericScatteringPostProcess[] = [];
     readonly rings: RingsPostProcess[] = [];
     readonly mandelbulbs: MandelbulbPostProcess[] = [];
+    readonly mandelboxes: MandelboxPostProcess[] = [];
     readonly juliaSets: JuliaSetPostProcess[] = [];
     readonly blackHoles: BlackHolePostProcess[] = [];
     readonly matterJets: MatterJetPostProcess[] = [];
@@ -144,6 +149,7 @@ export class PostProcessManager {
         this.atmospheres,
         this.rings,
         this.mandelbulbs,
+        this.mandelboxes,
         this.juliaSets,
         this.blackHoles,
         this.matterJets,
@@ -160,6 +166,7 @@ export class PostProcessManager {
         this.blackHoles,
         this.matterJets,
         this.mandelbulbs,
+        this.mandelboxes,
         this.juliaSets
     ];
 
@@ -449,6 +456,19 @@ export class PostProcessManager {
         this.celestialBodyToPostProcesses.set(juliaSet, [juliaSetPostProcess]);
     }
 
+    public addMandelbox(body: Mandelbox, stellarObjects: StellarObject[]) {
+        const mandelbox = new MandelboxPostProcess(
+            body.getTransform(),
+            body.getBoundingRadius(),
+            body.model,
+            this.scene,
+            stellarObjects
+        );
+        this.mandelboxes.push(mandelbox);
+
+        this.celestialBodyToPostProcesses.set(body, [mandelbox]);
+    }
+
     /**
      * Sets the current celestial body of the post process manager.
      * It should be the closest body to the active camera, in order to split the post processes that are specific to this body from the others.
@@ -553,6 +573,12 @@ export class PostProcessManager {
             this.juliaSets,
             this.engine
         );
+        const [otherMandelboxesRenderEffect, bodyMandelboxRenderEffect] = this.makeSplitRenderEffects(
+            "Mandelboxes",
+            this.getCurrentBody(),
+            this.mandelboxes,
+            this.engine
+        );
         const [otherMatterJetsRenderEffect, bodyMatterJetsRenderEffect] = this.makeSplitRenderEffects(
             "MatterJets",
             this.getCurrentBody(),
@@ -598,6 +624,9 @@ export class PostProcessManager {
                 case PostProcessType.JULIA_SET:
                     this.renderingPipeline.addEffect(otherJuliaSetsRenderEffect);
                     break;
+                case PostProcessType.MANDELBOX:
+                    this.renderingPipeline.addEffect(otherMandelboxesRenderEffect);
+                    break;
                 case PostProcessType.SHADOW:
                     //this.renderingPipeline.addEffect(otherShadowRenderEffect);
                     break;
@@ -636,6 +665,9 @@ export class PostProcessManager {
                     break;
                 case PostProcessType.JULIA_SET:
                     this.renderingPipeline.addEffect(bodyJuliaSetRenderEffect);
+                    break;
+                case PostProcessType.MANDELBOX:
+                    this.renderingPipeline.addEffect(bodyMandelboxRenderEffect);
                     break;
                 case PostProcessType.LENS_FLARE:
                     //this.renderingPipeline.addEffect(bodyLensFlaresRenderEffect);

@@ -52,6 +52,8 @@ import { SpaceStationModel } from "../spacestation/spacestationModel";
 import { SpaceElevator } from "../spacestation/spaceElevator";
 import { SpaceElevatorModel } from "../spacestation/spaceElevatorModel";
 import { StarSystemDatabase } from "./starSystemDatabase";
+import { Mandelbox } from "../anomalies/mandelbox/mandelbox";
+import { MandelboxModel } from "../anomalies/mandelbox/mandelboxModel";
 
 export type PlanetarySystem = {
     readonly planets: Planet[];
@@ -188,6 +190,9 @@ export class StarSystemController {
                     break;
                 case OrbitalObjectType.JULIA_SET:
                     anomaly = new JuliaSet(anomalyModel as JuliaSetModel, this.scene);
+                    break;
+                case OrbitalObjectType.MANDELBOX:
+                    anomaly = new Mandelbox(anomalyModel as MandelboxModel, this.scene);
                     break;
             }
             anomalies.push(anomaly);
@@ -472,6 +477,9 @@ export class StarSystemController {
                     break;
                 case OrbitalObjectType.JULIA_SET:
                     postProcessManager.addJuliaSet(object as JuliaSet, stellarObjects);
+                    break;
+                case OrbitalObjectType.MANDELBOX:
+                    postProcessManager.addMandelbox(object as Mandelbox, stellarObjects);
                     break;
                 case OrbitalObjectType.SPACE_STATION:
                     break;
