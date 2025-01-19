@@ -88,7 +88,7 @@ export class DiscoveryDetails {
             await this.setDiscovery(null, starSystemDatabase);
         });
 
-        this.setDiscovery(null, starSystemDatabase);
+        void this.setDiscovery(null, starSystemDatabase);
     }
 
     async setDiscovery(discovery: SpaceDiscoveryData | null, starSystemDatabase: StarSystemDatabase) {

@@ -1,6 +1,6 @@
 import { Sounds } from "../assets/sounds";
 
-export function promptModalString(prompt: string, defaultValue: string = ""): Promise<string | null> {
+export function promptModalString(prompt: string, defaultValue = ""): Promise<string | null> {
     const modal = document.createElement("dialog");
     modal.innerHTML = `
         <form method="dialog">

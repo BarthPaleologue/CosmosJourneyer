@@ -238,7 +238,7 @@ export class StarSystemView implements View {
         if (canvas === null) throw new Error("Canvas is null");
         this.bodyEditor.setCanvas(canvas);
 
-        getGlobalKeyboardLayoutMap().then((keyboardLayoutMap) => {
+        void getGlobalKeyboardLayoutMap().then((keyboardLayoutMap) => {
             this.keyboardLayoutMap = keyboardLayoutMap;
         });
 

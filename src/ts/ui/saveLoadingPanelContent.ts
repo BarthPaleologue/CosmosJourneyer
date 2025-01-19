@@ -186,10 +186,10 @@ export class SaveLoadingPanelContent {
 
             const shareButton = document.createElement("button");
             shareButton.classList.add("icon", "large");
-            shareButton.addEventListener("click", () => {
+            shareButton.addEventListener("click", async () => {
                 Sounds.MENU_SELECT_SOUND.play();
                 const url = createUrlFromSave(latestSave);
-                navigator.clipboard.writeText(url.toString()).then(() => {
+                await navigator.clipboard.writeText(url.toString()).then(() => {
                     createNotification(
                         NotificationOrigin.GENERAL,
                         NotificationIntent.SUCCESS,
@@ -306,10 +306,10 @@ export class SaveLoadingPanelContent {
 
         const shareButton = document.createElement("button");
         shareButton.classList.add("icon", "large");
-        shareButton.addEventListener("click", () => {
+        shareButton.addEventListener("click", async () => {
             Sounds.MENU_SELECT_SOUND.play();
             const url = createUrlFromSave(save);
-            navigator.clipboard.writeText(url.toString()).then(() => {
+            await navigator.clipboard.writeText(url.toString()).then(() => {
                 createNotification(
                     NotificationOrigin.GENERAL,
                     NotificationIntent.INFO,

@@ -20,7 +20,7 @@ export class EncyclopaediaGalacticaOnline implements EncyclopaediaGalactica {
         this.estimateDiscoveryEndPoint = new URL("estimateDiscovery", this.base);
 
         // connect to the server
-        fetch(this.loginEndPoint, {
+        void fetch(this.loginEndPoint, {
             method: "POST",
             mode: "cors",
             cache: "no-cache",
