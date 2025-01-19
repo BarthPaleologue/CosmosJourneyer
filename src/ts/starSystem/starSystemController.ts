@@ -52,7 +52,6 @@ import { SpaceStationModel } from "../spacestation/spacestationModel";
 import { SpaceElevator } from "../spacestation/spaceElevator";
 import { SpaceElevatorModel } from "../spacestation/spaceElevatorModel";
 import { StarSystemDatabase } from "./starSystemDatabase";
-import { AiPlayerControls } from "../player/aiPlayerControls";
 
 export type PlanetarySystem = {
     readonly planets: Planet[];
@@ -83,7 +82,6 @@ export class StarSystemController {
 
     /**
      * Translation of the system data model in terms of actual 3D objects
-     * @type {StarSystemModel}
      */
     readonly subSystems: SubStarSystem[] = [];
 
@@ -108,8 +106,6 @@ export class StarSystemController {
     private offset = 1e8;
 
     private maxLoadingIndex = 0;
-
-    readonly aiPlayers: AiPlayerControls[] = [];
 
     /**
      * Creates a new star system controller from a given model and scene
@@ -150,11 +146,6 @@ export class StarSystemController {
             this.subSystems.push(await this.loadSubSystem(subSystem));
         }
         await wait(1000);
-
-        for (let i = 0; i < 7; i++) {
-            const aiPlayer = new AiPlayerControls();
-            this.aiPlayers.push(aiPlayer);
-        }
     }
 
     private async loadSubSystem(subSystemModel: SubStarSystemModel): Promise<SubStarSystem> {
@@ -748,9 +739,6 @@ export class StarSystemController {
      * Disposes all the bodies in the system
      */
     public dispose() {
-        this.aiPlayers.forEach((aiPlayer) => aiPlayer.dispose());
-        this.aiPlayers.length = 0;
-
         this.objectToParents.clear();
         this.telluricBodies.length = 0;
         this.gasPlanets.length = 0;

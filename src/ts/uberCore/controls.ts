@@ -29,7 +29,7 @@ export interface Controls extends Transformable {
 
     /**
      * Makes the controller listen to all its inputs and returns the displacement to apply to the player
-     * @param deltaTime the time between 2 frames
+     * @param deltaSeconds the time between 2 frames
      */
-    update(deltaTime: number): Vector3;
+    update(deltaSeconds: number): Vector3;
 }

@@ -85,6 +85,8 @@ import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { TypedObject } from "../architecture/typedObject";
 import { EncyclopaediaGalacticaManager } from "../society/encyclopaediaGalacticaManager";
 import { StarSystemDatabase } from "./starSystemDatabase";
+import { AiPlayerControls } from "../player/aiPlayerControls";
+import { LandingPadSize } from "../assets/procedural/landingPad/landingPad";
 
 // register cosmos journeyer as part of window object
 declare global {
@@ -117,6 +119,8 @@ export class StarSystemView implements View {
     private isUiEnabled = true;
 
     private readonly player: Player;
+
+    private readonly aiPlayers: AiPlayerControls[] = [];
 
     private readonly encyclopaedia: EncyclopaediaGalacticaManager;
 
@@ -497,6 +501,9 @@ export class StarSystemView implements View {
         this._isLoadingSystem = true;
 
         if (this.starSystem !== null) {
+            this.aiPlayers.forEach((aiPlayer) => aiPlayer.dispose());
+            this.aiPlayers.length = 0;
+
             this.spaceshipControls?.setClosestLandableFacility(null);
             this.characterControls?.setClosestWalkableObject(null);
             this.chunkForge.reset();
@@ -537,6 +544,24 @@ export class StarSystemView implements View {
             spaceStation.getSubTargets().forEach((landingPad) => {
                 this.targetCursorLayer.addObject(landingPad);
             });
+
+            for (let i = 0; i < 7; i++) {
+                const aiPlayer = new AiPlayerControls(this.scene);
+
+                const landingPad = spaceStation.handleLandingRequest({
+                    minimumPadSize: LandingPadSize.SMALL
+                });
+
+                if (landingPad === null) {
+                    aiPlayer.dispose();
+                    break;
+                }
+
+                console.log("allow AI player to landing pad", landingPad.padNumber);
+
+                this.aiPlayers.push(aiPlayer);
+                aiPlayer.spaceshipControls.spaceship.spawnOnPad(landingPad);
+            }
         });
 
         this.orbitRenderer.setOrbitalObjects(starSystem.objectToParents, this.scene);

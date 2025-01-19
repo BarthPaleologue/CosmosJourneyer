@@ -15,15 +15,30 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Scene } from "@babylonjs/core/scene";
+import { AiSpaceshipControls } from "../spaceship/aiSpaceshipControls";
+import { Spaceship } from "../spaceship/spaceship";
 import { Player } from "./player";
 
 export class AiPlayerControls {
     readonly player: Player;
+    readonly spaceshipControls: AiSpaceshipControls;
 
-    constructor() {
+    constructor(scene: Scene) {
         this.player = Player.Default();
         this.player.setName("AI");
+
+        const spaceshipSerialized = this.player.serializedSpaceships.shift();
+        if (spaceshipSerialized === undefined) {
+            throw new Error("No spaceship serialized for AI player");
+        }
+
+        const spaceship = Spaceship.Deserialize(spaceshipSerialized, scene);
+
+        this.spaceshipControls = new AiSpaceshipControls(spaceship, scene);
     }
 
-    dispose() {}
+    dispose() {
+        this.spaceshipControls.dispose();
+    }
 }
