@@ -74,6 +74,8 @@ export class SpaceElevator implements OrbitalFacility {
 
     readonly targetInfo: TargetInfo;
 
+    private readonly unavailableLandingPads = new Set<LandingPad>();
+
     constructor(model: SpaceElevatorModel, scene: Scene) {
         this.model = model;
 
@@ -146,6 +148,9 @@ export class SpaceElevator implements OrbitalFacility {
     handleLandingRequest(request: LandingRequest): LandingPad | null {
         const availableLandingPads = this.getLandingPads()
             .filter((landingPad) => {
+                return !this.unavailableLandingPads.has(landingPad);
+            })
+            .filter((landingPad) => {
                 return landingPad.padSize >= request.minimumPadSize;
             })
             .sort((a, b) => {
@@ -154,7 +159,20 @@ export class SpaceElevator implements OrbitalFacility {
 
         if (availableLandingPads.length === 0) return null;
 
+        this.markPadAsUnavailable(availableLandingPads[0]);
         return availableLandingPads[0];
+    }
+
+    public cancelLandingRequest(landingPad: LandingPad) {
+        this.markPadAsAvailable(landingPad);
+    }
+
+    private markPadAsUnavailable(landingPad: LandingPad) {
+        this.unavailableLandingPads.add(landingPad);
+    }
+
+    private markPadAsAvailable(landingPad: LandingPad) {
+        this.unavailableLandingPads.delete(landingPad);
     }
 
     getRotationAxis(): Vector3 {

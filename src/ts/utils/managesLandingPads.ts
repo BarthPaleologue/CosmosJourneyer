@@ -7,5 +7,7 @@ export type LandingRequest = {
 export interface ManagesLandingPads {
     handleLandingRequest(request: LandingRequest): LandingPad | null;
 
+    cancelLandingRequest(pad: LandingPad): void;
+
     getLandingPads(): LandingPad[];
 }

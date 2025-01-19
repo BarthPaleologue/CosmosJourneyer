@@ -545,7 +545,7 @@ export class StarSystemView implements View {
                 this.targetCursorLayer.addObject(landingPad);
             });
 
-            for (let i = 0; i < 7; i++) {
+            for (let i = 0; i < Math.ceil(Math.random() * 15); i++) {
                 const aiPlayer = new AiPlayerControls(this.scene);
 
                 const landingPad = spaceStation.handleLandingRequest({
@@ -556,8 +556,6 @@ export class StarSystemView implements View {
                     aiPlayer.dispose();
                     break;
                 }
-
-                console.log("allow AI player to landing pad", landingPad.padNumber);
 
                 this.aiPlayers.push(aiPlayer);
                 aiPlayer.spaceshipControls.spaceship.spawnOnPad(landingPad);

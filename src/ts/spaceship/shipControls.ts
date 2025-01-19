@@ -275,8 +275,16 @@ export class ShipControls implements Controls {
 
             if (SpaceShipControlsInputs.map.upDown.value !== 0) {
                 if (spaceship.isLanded()) {
+                    const currentLandingPad = spaceship.getTargetLandingPad();
+                    if (currentLandingPad !== null) {
+                        this.closestLandableFacility?.cancelLandingRequest(currentLandingPad);
+                    }
                     spaceship.takeOff();
                 } else if (spaceship.isLanding()) {
+                    const currentLandingPad = spaceship.getTargetLandingPad();
+                    if (currentLandingPad !== null) {
+                        this.closestLandableFacility?.cancelLandingRequest(currentLandingPad);
+                    }
                     spaceship.cancelLanding();
                 }
                 spaceship.aggregate.body.applyForce(
