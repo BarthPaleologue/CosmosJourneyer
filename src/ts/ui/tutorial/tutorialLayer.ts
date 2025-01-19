@@ -64,7 +64,7 @@ export class TutorialLayer implements IDisposable {
         nextButtonTextSpan.innerText = i18n.t("tutorials:common:next");
         this.nextButton.appendChild(nextButtonTextSpan);
 
-        getGlobalKeyboardLayoutMap().then((keyboardLayoutMap) => {
+        void getGlobalKeyboardLayoutMap().then((keyboardLayoutMap) => {
             pressInteractionToStrings(TutorialControlsInputs.map.quitTutorial, keyboardLayoutMap).forEach((key) => {
                 const stopKeySpan = document.createElement("span");
                 stopKeySpan.classList.add("keySpan");

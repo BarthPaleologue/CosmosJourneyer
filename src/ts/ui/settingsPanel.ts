@@ -21,7 +21,7 @@ export function initSettingsPanel(): HTMLElement {
     const settingsPanel = document.getElementById("settingsPanel");
     if (settingsPanel === null) throw new Error("#settings does not exist!");
 
-    getGlobalKeyboardLayoutMap().then((keyboardLayoutMap) => {
+    void getGlobalKeyboardLayoutMap().then((keyboardLayoutMap) => {
         InputMaps.forEach((inputMap) => {
             // create a div
             // the name of the map will be an h3

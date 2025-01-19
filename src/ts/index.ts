@@ -51,5 +51,5 @@ if (universeCoordinatesString !== null) {
         await alertModal("Error, this save file is invalid. See the console for more details.");
     }
 } else {
-    engine.init(false);
+    await engine.init(false);
 }

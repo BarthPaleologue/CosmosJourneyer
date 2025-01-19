@@ -62,7 +62,7 @@ engine.starSystemDatabase.registerCustomSystem(starSystemModel);
 
 const starSystem = await starSystemView.loadStarSystem(starSystemModel);
 
-engine.init(true);
+await engine.init(true);
 
 await starSystemView.switchToDefaultControls(true);
 
