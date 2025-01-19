@@ -723,6 +723,9 @@ export class StarSystemController {
         Vector3.TransformCoordinatesToRef(direction, this.starFieldBox.getRotationMatrix(), direction);
 
         const systemModel = starSystemDatabase.getSystemModelFromCoordinates(targetCoordinates);
+        if (systemModel === null) {
+            throw new Error(`System model for coordinates ${targetCoordinates} is null`);
+        }
         const placeholderTransform = new SystemTarget(systemModel, this.scene);
         placeholderTransform.getTransform().position.copyFrom(direction.scale(distance));
 

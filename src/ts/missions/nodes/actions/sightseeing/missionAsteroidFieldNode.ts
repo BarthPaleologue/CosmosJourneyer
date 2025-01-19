@@ -136,6 +136,9 @@ export class MissionAsteroidFieldNode implements MissionNode {
         );
         const objectModel = getObjectModelByUniverseId(this.objectId, starSystemDatabase);
         const systemModel = starSystemDatabase.getSystemModelFromCoordinates(this.targetSystemCoordinates);
+        if (objectModel === null || systemModel === null) {
+            throw new Error(`Could not find object with ID ${JSON.stringify(this.objectId)}`);
+        }
         return i18n.t("missions:sightseeing:describeAsteroidFieldTrek", {
             objectName: objectModel.name,
             systemName: systemModel.name,
@@ -153,6 +156,9 @@ export class MissionAsteroidFieldNode implements MissionNode {
         }
 
         const targetObject = getObjectModelByUniverseId(this.objectId, starSystemDatabase);
+        if (targetObject === null) {
+            throw new Error(`Could not find object with ID ${JSON.stringify(this.objectId)}`);
+        }
 
         switch (this.state) {
             case AsteroidFieldMissionState.NOT_IN_SYSTEM:

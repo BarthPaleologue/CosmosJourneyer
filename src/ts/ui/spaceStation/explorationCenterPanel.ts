@@ -241,7 +241,7 @@ export class ExplorationCenterPanel {
             this.discoveryList.appendChild(discoveryItem);
 
             const discoveryName = document.createElement("h3");
-            discoveryName.textContent = objectModel.name;
+            discoveryName.textContent = objectModel?.name ?? i18n.t("common:unknown");
             discoveryItem.appendChild(discoveryName);
 
             const discoveryDate = document.createElement("p");

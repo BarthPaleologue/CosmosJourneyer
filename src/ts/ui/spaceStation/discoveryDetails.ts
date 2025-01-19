@@ -103,26 +103,26 @@ export class DiscoveryDetails {
 
         const model = getObjectModelByUniverseId(this.currentDiscovery.objectId, starSystemDatabase);
 
-        this.objectName.innerText = model.name;
+        this.objectName.innerText = model?.name ?? i18n.t("common:unknown");
         this.htmlRoot.appendChild(this.objectName);
 
         this.objectType.innerText = i18n.t("orbitalObject:type", {
-            value: getOrbitalObjectTypeToI18nString(model)
+            value: model !== null ? getOrbitalObjectTypeToI18nString(model) : i18n.t("common:unknown")
         });
         this.htmlRoot.appendChild(this.objectType);
 
         this.siderealDayDuration.innerText = i18n.t("orbitalObject:siderealDayDuration", {
-            value: parseSecondsPrecise(model.physics.siderealDaySeconds)
+            value: model !== null ? parseSecondsPrecise(model.physics.siderealDaySeconds) : i18n.t("common:unknown")
         });
         this.htmlRoot.appendChild(this.siderealDayDuration);
 
         this.orbitDuration.innerText = i18n.t("orbit:period", {
-            value: parseSecondsPrecise(model.orbit.period)
+            value: model !== null ? parseSecondsPrecise(model.orbit.period) : i18n.t("common:unknown")
         });
         this.htmlRoot.appendChild(this.orbitDuration);
 
         this.orbitRadius.innerText = i18n.t("orbit:radius", {
-            value: parseDistance(model.orbit.radius)
+            value: model !== null ? parseDistance(model.orbit.radius) : i18n.t("common:unknown")
         });
         this.htmlRoot.appendChild(this.orbitRadius);
 

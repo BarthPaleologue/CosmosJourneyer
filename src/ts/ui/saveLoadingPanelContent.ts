@@ -280,8 +280,9 @@ export class SaveLoadingPanelContent {
 
         const saveLocation = document.createElement("p");
         const isLanded = save.padNumber !== undefined;
+        const nearestObject = getObjectModelByUniverseId(save.universeCoordinates.universeObjectId, starSystemDatabase);
         saveLocation.innerText = i18n.t(isLanded ? "sidePanel:landedAt" : "sidePanel:near", {
-            location: getObjectModelByUniverseId(save.universeCoordinates.universeObjectId, starSystemDatabase).name,
+            location: nearestObject?.name ?? i18n.t("sidePanel:locationNotFound"),
             interpolation: {
                 escapeValue: false
             }
