@@ -742,9 +742,9 @@ export class StarSystemView implements View {
         const distanceLY =
             target !== null
                 ? Vector3.Distance(
-                    this.spaceshipControls.getTransform().getAbsolutePosition(),
-                    target.getTransform().getAbsolutePosition()
-                ) / Settings.LIGHT_YEAR
+                      this.spaceshipControls.getTransform().getAbsolutePosition(),
+                      target.getTransform().getAbsolutePosition()
+                  ) / Settings.LIGHT_YEAR
                 : 0;
 
         const fuelForJump = warpDrive.getFuelConsumption(distanceLY);
