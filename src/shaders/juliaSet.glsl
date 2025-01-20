@@ -138,7 +138,7 @@ void main() {
     // scale down so that everything happens in a sphere of radius 2
     float inverseScaling = 1.0 / (0.5 * object_radius * object_scaling_determinant);
 
-    vec3 origin = camera_position + impactPoint * rayDir - object_position;// the ray origin in world space
+    vec3 origin = camera_position; // the ray origin in world space
     origin *= inverseScaling;
 
     float steps;
