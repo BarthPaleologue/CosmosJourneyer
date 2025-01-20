@@ -38,6 +38,7 @@ import { newSeededTelluricPlanetModel } from "../planets/telluricPlanet/telluric
 import { newSeededSpaceElevatorModel } from "../spacestation/spaceElevatorModel";
 import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { newSeededMandelboxModel } from "../anomalies/mandelbox/mandelboxModel";
 
 const enum GenerationSteps {
     NAME,
@@ -156,9 +157,15 @@ export function newSeededStarSystemModel(
     );
     for (let i = 0; i < nbAnomalies; i++) {
         const anomalySeed = centeredRand(systemRng, GenerationSteps.ANOMALIES + i * 100) * Settings.SEED_HALF_RANGE;
-        const anomalyType = uniformRandBool(0.5, systemRng, GenerationSteps.ANOMALIES + i * 300)
-            ? OrbitalObjectType.MANDELBULB
-            : OrbitalObjectType.JULIA_SET;
+        const anomalyType: OrbitalObjectType.MANDELBULB | OrbitalObjectType.JULIA_SET | OrbitalObjectType.MANDELBOX =
+            wheelOfFortune(
+                [
+                    [OrbitalObjectType.MANDELBULB, 1],
+                    [OrbitalObjectType.JULIA_SET, 1],
+                    [OrbitalObjectType.MANDELBOX, 1]
+                ],
+                systemRng(GenerationSteps.ANOMALIES + i * 300)
+            );
         const anomalyName = `${systemName} ${ReversedGreekAlphabet[i].toUpperCase()}`;
 
         switch (anomalyType) {
@@ -167,6 +174,9 @@ export function newSeededStarSystemModel(
                 break;
             case OrbitalObjectType.JULIA_SET:
                 anomalies.push(newSeededJuliaSetModel(anomalySeed, anomalyName, stellarObjects));
+                break;
+            case OrbitalObjectType.MANDELBOX:
+                anomalies.push(newSeededMandelboxModel(anomalySeed, anomalyName, stellarObjects));
                 break;
         }
     }

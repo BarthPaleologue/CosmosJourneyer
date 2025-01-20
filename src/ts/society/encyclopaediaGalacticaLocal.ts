@@ -105,6 +105,9 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
             case OrbitalObjectType.JULIA_SET:
                 objectTypeMultiplier = 2;
                 break;
+            case OrbitalObjectType.MANDELBOX:
+                objectTypeMultiplier = 2;
+                break;
             case OrbitalObjectType.SPACE_STATION:
             case OrbitalObjectType.SPACE_ELEVATOR:
                 objectTypeMultiplier = 0;

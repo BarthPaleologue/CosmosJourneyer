@@ -24,6 +24,7 @@ export function getOrbitalObjectTypeToI18nString(model: OrbitalObjectModel): str
     switch (model.type) {
         case OrbitalObjectType.MANDELBULB:
         case OrbitalObjectType.JULIA_SET:
+        case OrbitalObjectType.MANDELBOX:
             return i18n.t("objectTypes:anomaly");
         case OrbitalObjectType.GAS_PLANET:
             return i18n.t("objectTypes:gasPlanet");
