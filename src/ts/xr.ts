@@ -53,6 +53,7 @@ const camera = new ArcRotateCamera("ArcRotateCamera", 0, 3.14 / 3, 5, Vector3.Ze
 camera.attachControl(canvas, true);
 camera.lowerRadiusLimit = 0.5;
 camera.wheelPrecision *= 100;
+camera.minZ = 0.01;
 
 const depthRenderer = scene.enableDepthRenderer(null, false, true);
 
