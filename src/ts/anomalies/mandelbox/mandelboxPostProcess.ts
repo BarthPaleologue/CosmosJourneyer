@@ -64,7 +64,9 @@ export class MandelboxPostProcess extends PostProcess implements UpdatablePostPr
         const MandelboxUniformNames = {
             POWER: "power",
             ACCENT_COLOR: "accentColor",
-            ELAPSED_SECONDS: "elapsedSeconds"
+            ELAPSED_SECONDS: "elapsedSeconds",
+            MR2: "mr2",
+            SPREAD: "spread"
         };
 
         const uniforms: string[] = [
@@ -105,7 +107,8 @@ export class MandelboxPostProcess extends PostProcess implements UpdatablePostPr
             setStellarObjectUniforms(effect, stellarObjects);
             setObjectUniforms(effect, transform, boundingRadius);
 
-            effect.setFloat(MandelboxUniformNames.POWER, model.power);
+            effect.setFloat(MandelboxUniformNames.MR2, model.mr2);
+            effect.setFloat(MandelboxUniformNames.SPREAD, model.spread);
             effect.setColor3(MandelboxUniformNames.ACCENT_COLOR, model.accentColor);
             effect.setFloat(MandelboxUniformNames.ELAPSED_SECONDS, this.elapsedSeconds);
 

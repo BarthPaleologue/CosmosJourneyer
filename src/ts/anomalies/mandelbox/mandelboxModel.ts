@@ -30,8 +30,17 @@ import { Axis } from "@babylonjs/core/Maths/math.axis";
 
 export type MandelboxModel = AnomalyModel & {
     readonly type: OrbitalObjectType.MANDELBOX;
-    readonly power: number;
     readonly accentColor: Color3;
+
+    /**
+     * distance estimator parameter (range is [0-1])
+     */
+    readonly mr2: number;
+
+    /**
+     * distance estimator parameter (range is [1.0, 1.5])
+     */
+    readonly spread: number;
 };
 
 export function newSeededMandelboxModel(
@@ -43,7 +52,8 @@ export function newSeededMandelboxModel(
 
     const radius = 1000e3;
 
-    const power = randRange(4.0, 8.0, rng, GenerationSteps.POWER);
+    const mr2 = randRange(0.0, 1.0, rng, GenerationSteps.POWER);
+    const spread = randRange(1.0, 1.5, rng, GenerationSteps.POWER + 1);
     const accentColor = Color3.FromHSV(
         360 * rng(GenerationSteps.ACCENT_COLOR),
         rng(GenerationSteps.ACCENT_COLOR + 123) * 0.5,
@@ -76,8 +86,9 @@ export function newSeededMandelboxModel(
         rings: null,
         name,
         type: OrbitalObjectType.MANDELBOX,
+        mr2,
+        spread,
         accentColor,
-        power,
         orbit,
         physics: physicalProperties
     };
