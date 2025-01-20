@@ -82,27 +82,26 @@ float distanceEstimator(vec3 position) {
 float rayMarch(vec3 rayOrigin, vec3 rayDepth) {
     float currentDepth = 0.5;
     float newDistance = 0.0;
-    float w = 1.3;
+    float stepSizeFactor = 1.3;
     float oldDistance = 0.0;
     float ls = 0.0;
-    float s = 0.0;
+    float stepSize = 0.0;
     float cerr = 10000.0;
     float ct = 0.0;
     float pixradius = 1e-3;
-    vec2 color;
     int inter = 0;
     for (int i = 0; i < 64; i++) {
         oldDistance = newDistance;
         newDistance = distanceEstimator(rayOrigin + rayDepth * currentDepth);
         
         //Detect intersections missed by over-relaxation
-        if(w > 1.0 && abs(oldDistance) + abs(newDistance) < s){
-            s -= w * s;
-            w = 1.0;
-            currentDepth += s;
+        if(stepSizeFactor > 1.0 && abs(oldDistance) + abs(newDistance) < stepSize){
+            stepSize -= stepSizeFactor * stepSize;
+            stepSizeFactor = 1.0;
+            currentDepth += stepSize;
             continue;
         }
-        s = w * newDistance;
+        stepSize = stepSizeFactor * newDistance;
         
         float err = newDistance / currentDepth;
         
@@ -112,15 +111,15 @@ float rayMarch(vec3 rayOrigin, vec3 rayDepth) {
         }
         
         //Intersect when d / t < one pixel
-        if(abs(err) < pixradius){
+        if(abs(err) < pixradius) {
             inter = 1;
             break;
         }
         
-        currentDepth += s;
-        if(currentDepth > 30.0){
+        currentDepth += stepSize;
+        /*if(currentDepth > 30.0){
             break;
-        }
+        }*/
     }
     if(inter == 0){
         ct = -1.0;
