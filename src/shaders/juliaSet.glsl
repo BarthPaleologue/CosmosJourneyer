@@ -126,7 +126,6 @@ float map(vec3 p){
     return sdf(p).x;
 }
 
-
 //Determine if a point is in shadow - 1.0 = not in shadow
 float getShadow(vec3 rayOrigin, vec3 rayDir, vec3 starPosition) {
     float t = 0.01;
@@ -135,7 +134,7 @@ float getShadow(vec3 rayOrigin, vec3 rayDir, vec3 starPosition) {
     for(int iter = 0; iter < 64; iter++){
         d = map(rayOrigin + rayDir * t);
         if(d < 0.0001){
-            return 0.0;
+            return 0.5;
         }
         if(t > length(rayOrigin - starPosition) - 0.5){
             break;
@@ -165,7 +164,7 @@ void main() {
     // scale down so that everything happens in a sphere of radius 2
     float inverseScaling = 1.0 / (0.5 * object_radius * object_scaling_determinant);
 
-    vec3 origin = camera_position + rayDir * impactPoint; // the ray origin in world space
+    vec3 origin = camera_position + rayDir * impactPoint - object_position; // the ray origin in world space
     origin *= inverseScaling;
 
     float steps;
@@ -195,7 +194,7 @@ void main() {
 
     intersectionPoint = origin + juliaDepthAndIndex.x * rayDir;
 
-    vec3 intersectionPointW = intersectionPoint / inverseScaling;
+    vec3 intersectionPointW = object_position + intersectionPoint / inverseScaling;
 
     float intersectionDistance = length(intersectionPoint);
 

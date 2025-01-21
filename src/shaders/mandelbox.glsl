@@ -80,7 +80,7 @@ float distanceEstimator(vec3 position) {
 }
 
 float rayMarch(vec3 rayOrigin, vec3 rayDepth) {
-    float currentDepth = 0.5;
+    float currentDepth = 0.01;
     float newDistance = 0.0;
     float stepSizeFactor = 1.3;
     float oldDistance = 0.0;
@@ -146,7 +146,7 @@ float getShadow(vec3 rayOrigin, vec3 rayDir, vec3 starPosition) {
     for(int iter = 0; iter < 64; iter++){
         d = map(rayOrigin + rayDir * t);
         if(d < 0.0001){
-            return 0.0;
+            return 0.5;
         }
         if(t > length(rayOrigin - starPosition) - 0.5){
             break;
@@ -176,7 +176,7 @@ void main() {
     // scale down so that everything happens in a sphere of radius 2
     float inverseScaling = 3.0 * SCALE / (1.0 * object_radius * object_scaling_determinant);
 
-    vec3 origin = camera_position; // the ray origin in world space
+    vec3 origin = camera_position - object_position; // the ray origin in world space
     origin *= inverseScaling;
 
     float steps;
@@ -188,20 +188,14 @@ void main() {
 
     vec3 intersectionPoint = origin + rayDepth * rayDir;
 
-    vec3 intersectionPointW = intersectionPoint / inverseScaling;
+    vec3 intersectionPointW = object_position + intersectionPoint / inverseScaling;
 
     if(length(intersectionPointW - camera_position) > maximumDistance) {
-        float shadow = 1.0;
-        for (int i = 0; i < nbStars; i++) {
-            vec3 starDir = normalize(star_positions[i] - intersectionPointW);
-            shadow = min(shadow, getShadow(intersectionPoint, starDir, star_positions[i]));
-        }
-        gl_FragColor = screenColor * shadow;
+        gl_FragColor = screenColor;
         return;
     }
 
     vec3 normal = getNormal(intersectionPoint);
-
 
     vec3 albedo = accentColor;
     float roughness = 0.4;
