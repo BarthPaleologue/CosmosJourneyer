@@ -115,5 +115,6 @@ export class MandelbulbPostProcess extends PostProcess implements UpdatablePostP
 
     public update(deltaSeconds: number): void {
         this.elapsedSeconds += deltaSeconds;
+        this.elapsedSeconds %= 60 * 60;
     }
 }

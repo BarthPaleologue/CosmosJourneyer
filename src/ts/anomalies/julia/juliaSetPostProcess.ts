@@ -101,5 +101,6 @@ export class JuliaSetPostProcess extends PostProcess implements UpdatablePostPro
 
     public update(deltaSeconds: number): void {
         this.elapsedSeconds += deltaSeconds;
+        this.elapsedSeconds %= 60 * 60;
     }
 }
