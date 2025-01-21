@@ -24,6 +24,7 @@ export const enum PostProcessType {
     MATTER_JETS,
     MANDELBULB,
     JULIA_SET,
+    MANDELBOX,
     BLACK_HOLE,
     SHADOW,
     LENS_FLARE

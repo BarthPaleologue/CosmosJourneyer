@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import mandelbulbFragment from "../../../shaders/mandelbulb.glsl";
+import mandelboxFragment from "../../../shaders/mandelbox.glsl";
 import { UpdatablePostProcess } from "../../postProcesses/updatablePostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { StellarObject } from "../../architecture/stellarObject";
@@ -32,14 +32,14 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { MandelbulbModel } from "./mandelbulbModel";
+import { MandelboxModel } from "./mandelboxModel";
 
-export interface MandelbulbSettings {
+export interface MandelboxSettings {
     rotationPeriod: number;
 }
 
-export class MandelbulbPostProcess extends PostProcess implements UpdatablePostProcess {
-    readonly settings: MandelbulbSettings;
+export class MandelboxPostProcess extends PostProcess implements UpdatablePostProcess {
+    readonly settings: MandelboxSettings;
 
     private elapsedSeconds = 0;
 
@@ -48,30 +48,32 @@ export class MandelbulbPostProcess extends PostProcess implements UpdatablePostP
     constructor(
         transform: TransformNode,
         boundingRadius: number,
-        mandelbulbModel: MandelbulbModel,
+        model: MandelboxModel,
         scene: Scene,
         stellarObjects: StellarObject[]
     ) {
-        const shaderName = "mandelbulb";
+        const shaderName = "mandelbox";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
-            Effect.ShadersStore[`${shaderName}FragmentShader`] = mandelbulbFragment;
+            Effect.ShadersStore[`${shaderName}FragmentShader`] = mandelboxFragment;
         }
 
-        const settings: MandelbulbSettings = {
+        const settings: MandelboxSettings = {
             rotationPeriod: 1.5
         };
 
-        const MandelbulbUniformNames = {
+        const MandelboxUniformNames = {
             POWER: "power",
             ACCENT_COLOR: "accentColor",
-            ELAPSED_SECONDS: "elapsedSeconds"
+            ELAPSED_SECONDS: "elapsedSeconds",
+            MR2: "mr2",
+            SPREAD: "spread"
         };
 
         const uniforms: string[] = [
             ...Object.values(ObjectUniformNames),
             ...Object.values(CameraUniformNames),
             ...Object.values(StellarObjectUniformNames),
-            ...Object.values(MandelbulbUniformNames)
+            ...Object.values(MandelboxUniformNames)
         ];
 
         const samplers: string[] = Object.values(SamplerUniformNames);
@@ -105,9 +107,10 @@ export class MandelbulbPostProcess extends PostProcess implements UpdatablePostP
             setStellarObjectUniforms(effect, stellarObjects);
             setObjectUniforms(effect, transform, boundingRadius);
 
-            effect.setFloat(MandelbulbUniformNames.POWER, mandelbulbModel.power);
-            effect.setColor3(MandelbulbUniformNames.ACCENT_COLOR, mandelbulbModel.accentColor);
-            effect.setFloat(MandelbulbUniformNames.ELAPSED_SECONDS, this.elapsedSeconds);
+            effect.setFloat(MandelboxUniformNames.MR2, model.mr2);
+            effect.setFloat(MandelboxUniformNames.SPREAD, model.spread);
+            effect.setColor3(MandelboxUniformNames.ACCENT_COLOR, model.accentColor);
+            effect.setFloat(MandelboxUniformNames.ELAPSED_SECONDS, this.elapsedSeconds);
 
             setSamplerUniforms(effect, this.activeCamera, scene);
         });
@@ -115,6 +118,5 @@ export class MandelbulbPostProcess extends PostProcess implements UpdatablePostP
 
     public update(deltaSeconds: number): void {
         this.elapsedSeconds += deltaSeconds;
-        this.elapsedSeconds %= 60 * 60;
     }
 }

@@ -21,7 +21,8 @@ precision highp float;
 
 varying vec2 vUV;
 
-uniform float power;
+uniform float mr2;
+uniform float spread;
 uniform vec3 accentColor;
 uniform float elapsedSeconds;
 
@@ -44,13 +45,10 @@ uniform sampler2D depthSampler;
 
 #include "./utils/pbr.glsl";
 
-#define MARCHINGITERATIONS 32
+#define MARCHINGITERATIONS 64
 
 #define MARCHINGSTEP 1.0
-#define EPSILON 0.001
-
-#define MAXMANDELBROTDIST 3.0
-#define MANDELBROTSTEPS 15
+#define EPSILON 0.0001
 
 // cosine based palette, 4 vec3 params
 vec3 cosineColor(in float t, in vec3 a, in vec3 b, in vec3 c, in vec3 d) {
@@ -60,69 +58,85 @@ vec3 palette (float t) {
     return cosineColor(t, vec3(0.5, 0.5, 0.5), vec3(0.5, 0.5, 0.5), vec3(0.07, 0.07, 0.07), accentColor);
 }
 
-// distance estimator to a mandelbulb set
-// returns the distance to the set on the x coordinate 
-// and the color on the y coordinate
-vec2 sdf(vec3 pos) {
-    float Power = power + 4.0 * sin(elapsedSeconds * 0.1);
-    vec3 z = pos;
-    float dr = 1.0;
-    float r = 0.0;
-    for (int i = 0; i < MANDELBROTSTEPS; i++) {
-        r = length(z);
-        if (r > MAXMANDELBROTDIST) break;
+// Mandelbox DE from 
+// http://www.fractalforums.com/3d-fractal-generation/a-mandelbox-distance-estimate-formula/msg21412/#msg21412
+// taken from https://www.shadertoy.com/view/llGXDR
+#define ITERS 10
+#define SCALE 3.0
 
-        // convert to polar coordinates
-        float theta = acos(z.z / r);
-        float phi = atan(z.y, z.x);
-        dr = pow(r, Power - 1.0) * Power * dr + 1.0;
+float distanceEstimator(vec3 position) {
+    float MR2 = mr2;
+    vec4 scalevec = vec4(SCALE, SCALE, SCALE, abs(SCALE)) / MR2;
+    float C1 = abs(SCALE-1.0), C2 = pow(abs(SCALE), float(1-ITERS));
 
-        // scale and rotate the point
-        float zr = pow(r, Power);
-        theta *= Power;
-        phi *= Power;
-
-        // convert back to cartesian coordinates
-        z = zr * vec3(sin(theta) * cos(phi), sin(phi) * sin(theta), cos(theta));
-        z += pos;
-    }
-
-    float distance = 0.5 * log(r) * r / dr;
-    float colorIndex = 50.0 * pow(dr, 0.128 / float(MARCHINGITERATIONS));
-
-    return vec2(distance, colorIndex);
+  vec4 p = vec4(position.xyz, 1.0), p0 = vec4(position.xyz, 1.0);  // p.w is knighty's DEfactor
+  for (int i=0; i<ITERS; i++) {
+    p.xyz = clamp(p.xyz, -1.0, 1.0) * 2.0 - p.xyz;  // box fold: min3, max3, mad3
+    float r2 = dot(p.xyz, p.xyz);  // dp3
+    p.xyzw *= clamp(max(MR2/r2, MR2), 0.0, 1.0);  // sphere fold: div1, max1.sat, mul4
+    p.xyzw = p*scalevec + p0 * spread;  // mad4
+  }
+  return (length(p.xyz) - C1) / p.w - C2;
 }
 
-// TRACING A PATH : 
-// measuring the distance to the nearest object on the x coordinate
-// and returning the color index on the y coordinate
-vec2 rayMarch(vec3 origin, vec3 ray, out float steps) {
-    //t is the point at which we are in the measuring of the distance
-    float depth = 0.0;
-    steps = 0.0;
-    float c = 0.0;
-
-    for (int i = 0; i < MARCHINGITERATIONS; i++) {
-        vec3 path = origin + ray * depth;
-        vec2 dist = sdf(path);
-        // we want t to be as large as possible at each step but not too big to induce artifacts
-        depth += MARCHINGSTEP * dist.x;
-        c += dist.y;
-        steps++;
+float rayMarch(vec3 rayOrigin, vec3 rayDepth) {
+    float currentDepth = 0.01;
+    float newDistance = 0.0;
+    float stepSizeFactor = 1.3;
+    float oldDistance = 0.0;
+    float ls = 0.0;
+    float stepSize = 0.0;
+    float cerr = 10000.0;
+    float ct = 0.0;
+    float pixradius = 1e-3;
+    int inter = 0;
+    for (int i = 0; i < 64; i++) {
+        oldDistance = newDistance;
+        newDistance = distanceEstimator(rayOrigin + rayDepth * currentDepth);
+        
+        //Detect intersections missed by over-relaxation
+        if(stepSizeFactor > 1.0 && abs(oldDistance) + abs(newDistance) < stepSize){
+            stepSize -= stepSizeFactor * stepSize;
+            stepSizeFactor = 1.0;
+            currentDepth += stepSize;
+            continue;
+        }
+        stepSize = stepSizeFactor * newDistance;
+        
+        float err = newDistance / currentDepth;
+        
+        if(abs(err) < abs(cerr)){
+            ct = currentDepth;
+            cerr = err;
+        }
+        
+        //Intersect when d / t < one pixel
+        if(abs(err) < pixradius) {
+            inter = 1;
+            break;
+        }
+        
+        currentDepth += stepSize;
+        /*if(currentDepth > 30.0){
+            break;
+        }*/
     }
-
-    return vec2(depth, c);
-}
-
-float contrast(float val, float contrast_offset, float contrast_mid_level)
-{
-    return clamp((val - contrast_mid_level) * (1. + contrast_offset) + contrast_mid_level, 0., 1.);
+    if(inter == 0){
+        ct = -1.0;
+    }
+    return ct;
 }
 
 float map(vec3 p){
-    return sdf(p).x;
+    return distanceEstimator(p);
 }
 
+//Approximate normal
+vec3 getNormal(vec3 p){
+    return normalize(vec3(map(vec3(p.x + 0.0001, p.yz)) - map(vec3(p.x - 0.0001, p.yz)),
+                          map(vec3(p.x, p.y + 0.0001, p.z)) - map(vec3(p.x, p.y - 0.0001, p.z)),
+                	      map(vec3(p.xy, p.z + 0.0001)) - map(vec3(p.xy, p.z - 0.0001))));
+}
 
 //Determine if a point is in shadow - 1.0 = not in shadow
 float getShadow(vec3 rayOrigin, vec3 rayDir, vec3 starPosition) {
@@ -143,7 +157,6 @@ float getShadow(vec3 rayOrigin, vec3 rayDir, vec3 starPosition) {
     return 0.5 + 0.5 * shadow;
 }
 
-
 void main() {
     vec4 screenColor = texture2D(textureSampler, vUV);// the current screen color
 
@@ -156,58 +169,39 @@ void main() {
 
     float impactPoint, escapePoint;
     if (!(rayIntersectSphere(camera_position, rayDir, object_position, object_radius * object_scaling_determinant, impactPoint, escapePoint))) {
-        gl_FragColor = screenColor;// if not intersecting with atmosphere, return original color
-        return;
-    }
-
-    // scale down so that everything happens in a sphere of radius 2
-    float inverseScaling = 1.0 / (0.5 * object_radius * object_scaling_determinant);
-
-    vec3 origin = camera_position + rayDir * impactPoint - object_position; // the ray origin in world space
-    origin *= inverseScaling;
-
-    float steps;
-    vec2 mandelDepth = rayMarch(origin, rayDir, steps);
-
-    float realDepth = impactPoint + mandelDepth.x / inverseScaling;
-
-    if (maximumDistance < realDepth) {
         gl_FragColor = screenColor;
         return;
     }
 
-    vec3 intersectionPoint = origin + mandelDepth.x * rayDir;
+    // scale down so that everything happens in a sphere of radius 2
+    float inverseScaling = 3.0 * SCALE / (1.0 * object_radius * object_scaling_determinant);
 
-    // compute normal and anti-aliasing at the same time
-    vec3 p = intersectionPoint;
-    float delta = EPSILON * 2.0;
-    vec2 x1 = sdf(vec3(p.x + delta, p.y, p.z));
-    vec2 x2 = sdf(vec3(p.x - delta, p.y, p.z));
-    vec2 y1 = sdf(vec3(p.x, p.y + delta, p.z));
-    vec2 y2 = sdf(vec3(p.x, p.y - delta, p.z));
-    vec2 z1 = sdf(vec3(p.x, p.y, p.z + delta));
-    vec2 z2 = sdf(vec3(p.x, p.y, p.z - delta));
+    vec3 origin = camera_position - object_position; // the ray origin in world space
+    origin *= inverseScaling;
 
-    mandelDepth += x1 + x2 + y1 + y2 + z1 + z2;
-    mandelDepth /= 7.0;
+    float steps;
+    float rayDepth = rayMarch(origin, rayDir);
+    if(rayDepth == -1.0){
+        gl_FragColor = screenColor;
+        return;
+    }
 
-    intersectionPoint = origin + mandelDepth.x * rayDir;
+    vec3 intersectionPoint = origin + rayDepth * rayDir;
 
     vec3 intersectionPointW = object_position + intersectionPoint / inverseScaling;
 
-    float intersectionDistance = length(intersectionPoint);
+    if(length(intersectionPointW - camera_position) > maximumDistance) {
+        gl_FragColor = screenColor;
+        return;
+    }
 
-    vec3 albedo = palette(mandelDepth.y);
-    float roughness = 0.5;
-    float metallic = 0.5;
+    vec3 normal = getNormal(intersectionPoint);
+
+    vec3 albedo = accentColor;
+    float roughness = 0.4;
+    float metallic = 0.2;
     vec3 viewDir = normalize(camera_position - intersectionPointW);
 
-    vec3 normal = normalize(vec3(
-        x1.x - x2.x,
-        y1.x - y2.x,
-        z1.x - z2.x
-    ));
-    
     vec3 color = vec3(0.0);
     for (int i = 0; i < nbStars; i++) {
         vec3 starDir = normalize(star_positions[i] - object_position);
@@ -222,16 +216,7 @@ void main() {
         color += calculateLight(albedo, normal, roughness, metallic, lightDir, viewDir, lightColor) * shadow;
     }
 
-    float ao = steps * 0.01;
-    ao = 1.0 - ao / (ao + 0.5);// reinhard
-    const float contrast_offset = 0.3;
-    const float contrast_mid_level = 0.5;
-    ao = contrast(ao, contrast_offset, contrast_mid_level);
-
     color = smoothstep(0.0, 0.8, color * 2.0) * 2.0;
 
-    color *= (0.5 + 0.5 * ao);
-
-    gl_FragColor = mix(vec4(color, 1.0), screenColor, smoothstep(2.0, 15.0, intersectionDistance));
-
+    gl_FragColor = vec4(color, 1.0);
 }
