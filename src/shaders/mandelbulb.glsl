@@ -42,7 +42,9 @@ uniform sampler2D depthSampler;
 
 #include "./utils/saturate.glsl";
 
-#define MARCHINGITERATIONS 64
+#include "./utils/pbr.glsl";
+
+#define MARCHINGITERATIONS 32
 
 #define MARCHINGSTEP 1.0
 #define EPSILON 0.001
@@ -117,6 +119,30 @@ float contrast(float val, float contrast_offset, float contrast_mid_level)
     return clamp((val - contrast_mid_level) * (1. + contrast_offset) + contrast_mid_level, 0., 1.);
 }
 
+float map(vec3 p){
+    return sdf(p).x;
+}
+
+
+//Determine if a point is in shadow - 1.0 = not in shadow
+float getShadow(vec3 rayOrigin, vec3 rayDir, vec3 starPosition) {
+    float t = 0.01;
+    float d = 0.0;
+    float shadow = 1.0;
+    for(int iter = 0; iter < 64; iter++){
+        d = map(rayOrigin + rayDir * t);
+        if(d < 0.0001){
+            return 0.0;
+        }
+        if(t > length(rayOrigin - starPosition) - 0.5){
+            break;
+        }
+        shadow = min(shadow, 32.0 * d / t);
+        t += d;
+    }
+    return 0.5 + 0.5 * shadow;
+}
+
 void main() {
     vec4 screenColor = texture2D(textureSampler, vUV);// the current screen color
 
@@ -136,7 +162,7 @@ void main() {
     // scale down so that everything happens in a sphere of radius 2
     float inverseScaling = 1.0 / (0.5 * object_radius * object_scaling_determinant);
 
-    vec3 origin = camera_position; // the ray origin in world space
+    vec3 origin = camera_position + rayDir * impactPoint; // the ray origin in world space
     origin *= inverseScaling;
 
     float steps;
@@ -166,9 +192,34 @@ void main() {
 
     intersectionPoint = origin + mandelDepth.x * rayDir;
 
+    vec3 intersectionPointW = intersectionPoint / inverseScaling;
+
     float intersectionDistance = length(intersectionPoint);
 
-    vec4 mandelbulbColor = vec4(palette(mandelDepth.y), 1.0);
+    vec3 albedo = palette(mandelDepth.y);
+    float roughness = 0.5;
+    float metallic = 0.5;
+    vec3 viewDir = normalize(camera_position - intersectionPointW);
+
+    vec3 normal = normalize(vec3(
+        x1.x - x2.x,
+        y1.x - y2.x,
+        z1.x - z2.x
+    ));
+    
+    vec3 color = vec3(0.0);
+    for (int i = 0; i < nbStars; i++) {
+        vec3 starDir = normalize(star_positions[i] - object_position);
+        float shadow = getShadow(intersectionPoint, starDir, star_positions[i]);
+        color += calculateLight(albedo, normal, roughness, metallic, starDir, viewDir, star_colors[i]) * shadow;
+    }
+
+    if(nbStars == 0) {
+        vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+        vec3 lightColor = vec3(1.0);
+        float shadow = getShadow(intersectionPoint, lightDir, intersectionPoint + lightDir * 100.0);
+        color += calculateLight(albedo, normal, roughness, metallic, lightDir, viewDir, lightColor) * shadow;
+    }
 
     float ao = steps * 0.01;
     ao = 1.0 - ao / (ao + 0.5);// reinhard
@@ -176,25 +227,10 @@ void main() {
     const float contrast_mid_level = 0.5;
     ao = contrast(ao, contrast_offset, contrast_mid_level);
 
-    mandelbulbColor.xyz *= ao * 2.0;
+    color = smoothstep(0.0, 0.8, color * 2.0) * 2.0;
 
-    vec3 normal = normalize(vec3(
-        x1.x - x2.x,
-        y1.x - y2.x,
-        z1.x - z2.x
-    ));
-    float ndl = 0.0;
-    for (int i = 0; i < nbStars; i++) {
-        vec3 starDir = normalize(star_positions[i] - object_position);
-        ndl += max(0.0, dot(normal, starDir));
-    }
+    color *= (0.5 + 0.5 * ao);
 
-    if(nbStars == 0) {
-        ndl = 1.0;
-    }
-
-    mandelbulbColor.xyz *= clamp(ndl, 0.3, 1.0);
-
-    gl_FragColor = mix(mandelbulbColor, screenColor, smoothstep(2.0, 15.0, intersectionDistance));
+    gl_FragColor = mix(vec4(color, 1.0), screenColor, smoothstep(2.0, 15.0, intersectionDistance));
 
 }
