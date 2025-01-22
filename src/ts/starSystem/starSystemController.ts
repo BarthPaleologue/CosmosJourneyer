@@ -54,6 +54,8 @@ import { SpaceElevatorModel } from "../spacestation/spaceElevatorModel";
 import { StarSystemDatabase } from "./starSystemDatabase";
 import { Mandelbox } from "../anomalies/mandelbox/mandelbox";
 import { MandelboxModel } from "../anomalies/mandelbox/mandelboxModel";
+import { SierpinskiPyramid } from "../anomalies/sierpinskiPyramid/sierpinskiPyramid";
+import { SierpinskiPyramidModel } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidModel";
 
 export type PlanetarySystem = {
     readonly planets: Planet[];
@@ -193,6 +195,9 @@ export class StarSystemController {
                     break;
                 case OrbitalObjectType.MANDELBOX:
                     anomaly = new Mandelbox(anomalyModel as MandelboxModel, this.scene);
+                    break;
+                case OrbitalObjectType.SIERPINSKI_PYRAMID:
+                    anomaly = new SierpinskiPyramid(anomalyModel as SierpinskiPyramidModel, this.scene);
                     break;
             }
             anomalies.push(anomaly);
@@ -480,6 +485,9 @@ export class StarSystemController {
                     break;
                 case OrbitalObjectType.MANDELBOX:
                     postProcessManager.addMandelbox(object as Mandelbox, stellarObjects);
+                    break;
+                case OrbitalObjectType.SIERPINSKI_PYRAMID:
+                    postProcessManager.addSierpinskiPyramid(object as SierpinskiPyramid, stellarObjects);
                     break;
                 case OrbitalObjectType.SPACE_STATION:
                     break;

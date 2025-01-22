@@ -19,7 +19,6 @@ import { UberScene } from "../uberCore/uberScene";
 import { OceanPostProcess } from "../ocean/oceanPostProcess";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { FlatCloudsPostProcess } from "../clouds/flatCloudsPostProcess";
-import { Settings } from "../settings";
 import { AtmosphericScatteringPostProcess } from "../atmosphere/atmosphericScatteringPostProcess";
 import { RingsPostProcess } from "../rings/ringsPostProcess";
 import { VolumetricLight } from "../volumetricLight/volumetricLight";
@@ -55,6 +54,8 @@ import { getRgbFromTemperature } from "../utils/specrend";
 import { PostProcessType } from "./postProcessTypes";
 import { MandelboxPostProcess } from "../anomalies/mandelbox/mandelboxPostProcess";
 import { Mandelbox } from "../anomalies/mandelbox/mandelbox";
+import { SierpinskiPyramidPostProcess } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidPostProcess";
+import { SierpinskiPyramid } from "../anomalies/sierpinskiPyramid/sierpinskiPyramid";
 
 /**
  * The order in which the post processes are rendered when away from a planet
@@ -68,6 +69,7 @@ const spaceRenderingOrder: PostProcessType[] = [
     PostProcessType.MANDELBULB,
     PostProcessType.JULIA_SET,
     PostProcessType.MANDELBOX,
+    PostProcessType.SIERPINSKI_PYRAMID,
     PostProcessType.RING,
     PostProcessType.BLACK_HOLE
 ];
@@ -82,6 +84,7 @@ const surfaceRenderingOrder: PostProcessType[] = [
     PostProcessType.MANDELBULB,
     PostProcessType.JULIA_SET,
     PostProcessType.MANDELBOX,
+    PostProcessType.SIERPINSKI_PYRAMID,
     PostProcessType.RING,
     PostProcessType.OCEAN,
     PostProcessType.CLOUDS,
@@ -136,6 +139,7 @@ export class PostProcessManager {
     readonly rings: RingsPostProcess[] = [];
     readonly mandelbulbs: MandelbulbPostProcess[] = [];
     readonly mandelboxes: MandelboxPostProcess[] = [];
+    readonly sierpinskiPyramids: SierpinskiPyramidPostProcess[] = [];
     readonly juliaSets: JuliaSetPostProcess[] = [];
     readonly blackHoles: BlackHolePostProcess[] = [];
     readonly matterJets: MatterJetPostProcess[] = [];
@@ -149,8 +153,9 @@ export class PostProcessManager {
         this.atmospheres,
         this.rings,
         this.mandelbulbs,
-        this.mandelboxes,
         this.juliaSets,
+        this.mandelboxes,
+        this.sierpinskiPyramids,
         this.blackHoles,
         this.matterJets,
         this.shadows,
@@ -166,8 +171,9 @@ export class PostProcessManager {
         this.blackHoles,
         this.matterJets,
         this.mandelbulbs,
+        this.juliaSets,
         this.mandelboxes,
-        this.juliaSets
+        this.sierpinskiPyramids
     ];
 
     readonly celestialBodyToPostProcesses: Map<CelestialBody, PostProcess[]> = new Map();
@@ -469,6 +475,19 @@ export class PostProcessManager {
         this.celestialBodyToPostProcesses.set(body, [mandelbox]);
     }
 
+    public addSierpinskiPyramid(body: SierpinskiPyramid, stellarObjects: StellarObject[]) {
+        const sierpinskiPyramid = new SierpinskiPyramidPostProcess(
+            body.getTransform(),
+            body.getBoundingRadius(),
+            body.model,
+            this.scene,
+            stellarObjects
+        );
+        this.sierpinskiPyramids.push(sierpinskiPyramid);
+
+        this.celestialBodyToPostProcesses.set(body, [sierpinskiPyramid]);
+    }
+
     /**
      * Sets the current celestial body of the post process manager.
      * It should be the closest body to the active camera, in order to split the post processes that are specific to this body from the others.
@@ -579,6 +598,12 @@ export class PostProcessManager {
             this.mandelboxes,
             this.engine
         );
+        const [otherSierpinskiPyramidsRenderEffect, bodySierpinskiPyramidsRenderEffect] = this.makeSplitRenderEffects(
+            "SierpinskiPyramids",
+            this.getCurrentBody(),
+            this.sierpinskiPyramids,
+            this.engine
+        );
         const [otherMatterJetsRenderEffect, bodyMatterJetsRenderEffect] = this.makeSplitRenderEffects(
             "MatterJets",
             this.getCurrentBody(),
@@ -627,6 +652,9 @@ export class PostProcessManager {
                 case PostProcessType.MANDELBOX:
                     this.renderingPipeline.addEffect(otherMandelboxesRenderEffect);
                     break;
+                case PostProcessType.SIERPINSKI_PYRAMID:
+                    this.renderingPipeline.addEffect(otherSierpinskiPyramidsRenderEffect);
+                    break;
                 case PostProcessType.SHADOW:
                     //this.renderingPipeline.addEffect(otherShadowRenderEffect);
                     break;
@@ -668,6 +696,9 @@ export class PostProcessManager {
                     break;
                 case PostProcessType.MANDELBOX:
                     this.renderingPipeline.addEffect(bodyMandelboxRenderEffect);
+                    break;
+                case PostProcessType.SIERPINSKI_PYRAMID:
+                    this.renderingPipeline.addEffect(bodySierpinskiPyramidsRenderEffect);
                     break;
                 case PostProcessType.LENS_FLARE:
                     //this.renderingPipeline.addEffect(bodyLensFlaresRenderEffect);
