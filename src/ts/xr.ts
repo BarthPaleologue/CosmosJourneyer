@@ -30,12 +30,16 @@ import { Scene } from "@babylonjs/core/scene";
 import { JuliaSet } from "./anomalies/julia/juliaSet";
 import { JuliaSetPostProcess } from "./anomalies/julia/juliaSetPostProcess";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
-import { ArcRotateCamera, Engine } from "@babylonjs/core";
+import { ArcRotateCamera, Engine, PostProcess } from "@babylonjs/core";
 import { newSeededMandelbulbModel } from "./anomalies/mandelbulb/mandelbulbModel";
 import { newSeededJuliaSetModel } from "./anomalies/julia/juliaSetModel";
 import { newSeededMandelboxModel } from "./anomalies/mandelbox/mandelboxModel";
 import { MandelboxPostProcess } from "./anomalies/mandelbox/mandelboxPostProcess";
 import { Mandelbox } from "./anomalies/mandelbox/mandelbox";
+import { UpdatablePostProcess } from "./postProcesses/updatablePostProcess";
+import { newSeededSierpinskiPyramidModel } from "./anomalies/sierpinskiPyramid/sierpinskiPyramidModel";
+import { SierpinskiPyramid } from "./anomalies/sierpinskiPyramid/sierpinskiPyramid";
+import { SierpinskiPyramidPostProcess } from "./anomalies/sierpinskiPyramid/sierpinskiPyramidPostProcess";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -69,15 +73,8 @@ function createMandelbulb(): TransformNode {
         scene,
         []
     );
-    scene.cameras.forEach((camera) => camera.attachPostProcess(mandelbulbPP));
-    scene.onNewCameraAddedObservable.add((camera) => {
-        camera.attachPostProcess(mandelbulbPP);
-    });
 
-    scene.onBeforeRenderObservable.add(() => {
-        const deltaSeconds = engine.getDeltaTime() / 1000;
-        mandelbulbPP.update(deltaSeconds);
-    });
+    setupPP(mandelbulbPP);
 
     return mandelbulb.getTransform();
 }
@@ -94,15 +91,8 @@ function createJulia(): TransformNode {
         scene,
         []
     );
-    scene.cameras.forEach((camera) => camera.attachPostProcess(juliaPP));
-    scene.onNewCameraAddedObservable.add((camera) => {
-        camera.attachPostProcess(juliaPP);
-    });
 
-    scene.onBeforeRenderObservable.add(() => {
-        const deltaSeconds = engine.getDeltaTime() / 1000;
-        juliaPP.update(deltaSeconds);
-    });
+    setupPP(juliaPP);
 
     return julia.getTransform();
 }
@@ -119,17 +109,40 @@ function createMandelbox(): TransformNode {
         scene,
         []
     );
-    scene.cameras.forEach((camera) => camera.attachPostProcess(mandelboxPP));
+
+    setupPP(mandelboxPP);
+
+    return mandelbox.getTransform();
+}
+
+function createSierpinskiPyramid(): TransformNode {
+    const sierpinskiPyramidModel = newSeededSierpinskiPyramidModel(Math.random() * 100_000, "XR Anomaly", []);
+    const sierpinskiPyramid = new SierpinskiPyramid(sierpinskiPyramidModel, scene);
+    sierpinskiPyramid.getTransform().scalingDeterminant = 1 / 400e3;
+
+    const sierpinskiPyramidPP = new SierpinskiPyramidPostProcess(
+        sierpinskiPyramid.getTransform(),
+        sierpinskiPyramid.getBoundingRadius(),
+        sierpinskiPyramidModel,
+        scene,
+        []
+    );
+
+    setupPP(sierpinskiPyramidPP);
+
+    return sierpinskiPyramid.getTransform();
+}
+
+function setupPP(pp: PostProcess & UpdatablePostProcess) {
+    scene.cameras.forEach((camera) => camera.attachPostProcess(pp));
     scene.onNewCameraAddedObservable.add((camera) => {
-        camera.attachPostProcess(mandelboxPP);
+        camera.attachPostProcess(pp);
     });
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
-        mandelboxPP.update(deltaSeconds);
+        pp.update(deltaSeconds);
     });
-
-    return mandelbox.getTransform();
 }
 
 const sceneType = urlParams.get("scene");
@@ -138,8 +151,10 @@ if (sceneType === "mandelbulb") {
     createMandelbulb();
 } else if (sceneType === "julia") {
     createJulia();
-} else {
+} else if (sceneType === "mandelbox") {
     createMandelbox();
+} else {
+    createSierpinskiPyramid();
 }
 
 const xr = await scene.createDefaultXRExperienceAsync();
