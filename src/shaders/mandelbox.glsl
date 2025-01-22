@@ -17,8 +17,6 @@
 
 precision highp float;
 
-// based on https://www.shadertoy.com/view/tsc3Rj and https://www.shadertoy.com/view/wdjGWR
-
 varying vec2 vUV;
 
 uniform float mr2;
@@ -46,19 +44,6 @@ uniform sampler2D depthSampler;
 
 #include "./utils/pbr.glsl";
 
-#define MARCHINGITERATIONS 64
-
-#define MARCHINGSTEP 1.0
-#define EPSILON 0.0001
-
-// cosine based palette, 4 vec3 params
-vec3 cosineColor(in float t, in vec3 a, in vec3 b, in vec3 c, in vec3 d) {
-    return a + b * cos(6.28318*(c*t+d));
-}
-vec3 palette (float t) {
-    return cosineColor(t, vec3(0.5, 0.5, 0.5), vec3(0.5, 0.5, 0.5), vec3(0.07, 0.07, 0.07), accentColor);
-}
-
 // Mandelbox DE from 
 // http://www.fractalforums.com/3d-fractal-generation/a-mandelbox-distance-estimate-formula/msg21412/#msg21412
 // taken from https://www.shadertoy.com/view/llGXDR
@@ -85,7 +70,6 @@ float rayMarch(vec3 rayOrigin, vec3 rayDepth) {
     float newDistance = 0.0;
     float stepSizeFactor = 1.3;
     float oldDistance = 0.0;
-    float ls = 0.0;
     float stepSize = 0.0;
     float cerr = 10000.0;
     float ct = 0.0;
@@ -180,7 +164,6 @@ void main() {
     vec3 origin = camera_position - object_position; // the ray origin in world space
     origin *= inverseScaling;
 
-    float steps;
     float rayDepth = rayMarch(origin, rayDir);
     if(rayDepth == -1.0){
         gl_FragColor = screenColor;

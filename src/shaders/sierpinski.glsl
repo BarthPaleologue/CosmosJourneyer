@@ -17,8 +17,6 @@
 
 precision highp float;
 
-// based on https://www.shadertoy.com/view/tsc3Rj and https://www.shadertoy.com/view/wdjGWR
-
 varying vec2 vUV;
 
 uniform vec3 accentColor;
@@ -78,7 +76,6 @@ float rayMarch(vec3 rayOrigin, vec3 rayDepth) {
     float newDistance = 0.0;
     float stepSizeFactor = 1.3;
     float oldDistance = 0.0;
-    float ls = 0.0;
     float stepSize = 0.0;
     float cerr = 10000.0;
     float ct = 0.0;
@@ -173,7 +170,6 @@ void main() {
     vec3 origin = camera_position - object_position; // the ray origin in world space
     origin *= inverseScaling;
 
-    float steps;
     float rayDepth = rayMarch(origin, rayDir);
     if(rayDepth == -1.0){
         gl_FragColor = screenColor;

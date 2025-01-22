@@ -34,13 +34,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { SierpinskiPyramidModel } from "./sierpinskiPyramidModel";
 
-export interface SierpinskiPyramidSettings {
-    rotationPeriod: number;
-}
-
 export class SierpinskiPyramidPostProcess extends PostProcess implements UpdatablePostProcess {
-    readonly settings: SierpinskiPyramidSettings;
-
     private elapsedSeconds = 0;
 
     private activeCamera: Camera | null = null;
@@ -56,10 +50,6 @@ export class SierpinskiPyramidPostProcess extends PostProcess implements Updatab
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = sierpinskiFragment;
         }
-
-        const settings: SierpinskiPyramidSettings = {
-            rotationPeriod: 1.5
-        };
 
         const SierpinskiPyramidUniformNames = {
             ACCENT_COLOR: "accentColor",
@@ -89,8 +79,6 @@ export class SierpinskiPyramidPostProcess extends PostProcess implements Updatab
             null,
             Constants.TEXTURETYPE_HALF_FLOAT
         );
-
-        this.settings = settings;
 
         this.onActivateObservable.add((camera) => {
             this.activeCamera = camera;

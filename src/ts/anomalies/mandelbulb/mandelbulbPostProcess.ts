@@ -34,13 +34,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { MandelbulbModel } from "./mandelbulbModel";
 
-export interface MandelbulbSettings {
-    rotationPeriod: number;
-}
-
 export class MandelbulbPostProcess extends PostProcess implements UpdatablePostProcess {
-    readonly settings: MandelbulbSettings;
-
     private elapsedSeconds = 0;
 
     private activeCamera: Camera | null = null;
@@ -56,10 +50,6 @@ export class MandelbulbPostProcess extends PostProcess implements UpdatablePostP
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = mandelbulbFragment;
         }
-
-        const settings: MandelbulbSettings = {
-            rotationPeriod: 1.5
-        };
 
         const MandelbulbUniformNames = {
             POWER: "power",
@@ -89,8 +79,6 @@ export class MandelbulbPostProcess extends PostProcess implements UpdatablePostP
             null,
             Constants.TEXTURETYPE_HALF_FLOAT
         );
-
-        this.settings = settings;
 
         this.onActivateObservable.add((camera) => {
             this.activeCamera = camera;

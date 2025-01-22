@@ -34,13 +34,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { MandelboxModel } from "./mandelboxModel";
 
-export interface MandelboxSettings {
-    rotationPeriod: number;
-}
-
 export class MandelboxPostProcess extends PostProcess implements UpdatablePostProcess {
-    readonly settings: MandelboxSettings;
-
     private elapsedSeconds = 0;
 
     private activeCamera: Camera | null = null;
@@ -57,12 +51,7 @@ export class MandelboxPostProcess extends PostProcess implements UpdatablePostPr
             Effect.ShadersStore[`${shaderName}FragmentShader`] = mandelboxFragment;
         }
 
-        const settings: MandelboxSettings = {
-            rotationPeriod: 1.5
-        };
-
         const MandelboxUniformNames = {
-            POWER: "power",
             ACCENT_COLOR: "accentColor",
             ELAPSED_SECONDS: "elapsedSeconds",
             MR2: "mr2",
@@ -92,8 +81,6 @@ export class MandelboxPostProcess extends PostProcess implements UpdatablePostPr
             null,
             Constants.TEXTURETYPE_HALF_FLOAT
         );
-
-        this.settings = settings;
 
         this.onActivateObservable.add((camera) => {
             this.activeCamera = camera;
