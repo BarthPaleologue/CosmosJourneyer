@@ -106,6 +106,7 @@ export class MissionFlyByNode implements MissionNode {
             case OrbitalObjectType.MANDELBULB:
             case OrbitalObjectType.JULIA_SET:
             case OrbitalObjectType.MANDELBOX:
+            case OrbitalObjectType.SIERPINSKI_PYRAMID:
             case OrbitalObjectType.SPACE_STATION:
             case OrbitalObjectType.SPACE_ELEVATOR:
                 thresholdMultiplier = 3;
