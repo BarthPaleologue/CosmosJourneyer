@@ -66,7 +66,8 @@ export class MandelboxPostProcess extends PostProcess implements UpdatablePostPr
             ACCENT_COLOR: "accentColor",
             ELAPSED_SECONDS: "elapsedSeconds",
             MR2: "mr2",
-            SPREAD: "spread"
+            SPREAD: "spread",
+            AVERAGE_SCREEN_SIZE: "averageScreenSize"
         };
 
         const uniforms: string[] = [
@@ -111,6 +112,10 @@ export class MandelboxPostProcess extends PostProcess implements UpdatablePostPr
             effect.setFloat(MandelboxUniformNames.SPREAD, model.spread);
             effect.setColor3(MandelboxUniformNames.ACCENT_COLOR, model.accentColor);
             effect.setFloat(MandelboxUniformNames.ELAPSED_SECONDS, this.elapsedSeconds);
+            effect.setFloat(
+                MandelboxUniformNames.AVERAGE_SCREEN_SIZE,
+                (scene.getEngine().getRenderWidth() + scene.getEngine().getRenderHeight()) / 2
+            );
 
             setSamplerUniforms(effect, this.activeCamera, scene);
         });

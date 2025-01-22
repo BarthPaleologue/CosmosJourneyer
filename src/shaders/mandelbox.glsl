@@ -25,6 +25,7 @@ uniform float mr2;
 uniform float spread;
 uniform vec3 accentColor;
 uniform float elapsedSeconds;
+uniform float averageScreenSize;
 
 #include "./utils/stars.glsl";
 
@@ -88,7 +89,7 @@ float rayMarch(vec3 rayOrigin, vec3 rayDepth) {
     float stepSize = 0.0;
     float cerr = 10000.0;
     float ct = 0.0;
-    float pixradius = 1e-3;
+    float pixradius = 1.0 / averageScreenSize;
     int inter = 0;
     for (int i = 0; i < 64; i++) {
         oldDistance = newDistance;
