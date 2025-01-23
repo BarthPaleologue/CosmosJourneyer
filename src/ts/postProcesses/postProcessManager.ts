@@ -56,6 +56,8 @@ import { MandelboxPostProcess } from "../anomalies/mandelbox/mandelboxPostProces
 import { Mandelbox } from "../anomalies/mandelbox/mandelbox";
 import { SierpinskiPyramidPostProcess } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidPostProcess";
 import { SierpinskiPyramid } from "../anomalies/sierpinskiPyramid/sierpinskiPyramid";
+import { MengerSpongePostProcess } from "../anomalies/mengerSponge/mengerSpongePostProcess";
+import { MengerSponge } from "../anomalies/mengerSponge/mengerSponge";
 
 /**
  * The order in which the post processes are rendered when away from a planet
@@ -70,6 +72,7 @@ const spaceRenderingOrder: PostProcessType[] = [
     PostProcessType.JULIA_SET,
     PostProcessType.MANDELBOX,
     PostProcessType.SIERPINSKI_PYRAMID,
+    PostProcessType.MENGER_SPONGE,
     PostProcessType.RING,
     PostProcessType.BLACK_HOLE
 ];
@@ -85,6 +88,7 @@ const surfaceRenderingOrder: PostProcessType[] = [
     PostProcessType.JULIA_SET,
     PostProcessType.MANDELBOX,
     PostProcessType.SIERPINSKI_PYRAMID,
+    PostProcessType.MENGER_SPONGE,
     PostProcessType.RING,
     PostProcessType.OCEAN,
     PostProcessType.CLOUDS,
@@ -140,6 +144,7 @@ export class PostProcessManager {
     readonly mandelbulbs: MandelbulbPostProcess[] = [];
     readonly mandelboxes: MandelboxPostProcess[] = [];
     readonly sierpinskiPyramids: SierpinskiPyramidPostProcess[] = [];
+    readonly mengerSponges: MengerSpongePostProcess[] = [];
     readonly juliaSets: JuliaSetPostProcess[] = [];
     readonly blackHoles: BlackHolePostProcess[] = [];
     readonly matterJets: MatterJetPostProcess[] = [];
@@ -156,6 +161,7 @@ export class PostProcessManager {
         this.juliaSets,
         this.mandelboxes,
         this.sierpinskiPyramids,
+        this.mengerSponges,
         this.blackHoles,
         this.matterJets,
         this.shadows,
@@ -488,6 +494,19 @@ export class PostProcessManager {
         this.celestialBodyToPostProcesses.set(body, [sierpinskiPyramid]);
     }
 
+    public addMengerSponge(body: MengerSponge, stellarObjects: StellarObject[]) {
+        const mengerSponge = new MengerSpongePostProcess(
+            body.getTransform(),
+            body.getBoundingRadius(),
+            body.model,
+            this.scene,
+            stellarObjects
+        );
+        this.mengerSponges.push(mengerSponge);
+
+        this.celestialBodyToPostProcesses.set(body, [mengerSponge]);
+    }
+
     /**
      * Sets the current celestial body of the post process manager.
      * It should be the closest body to the active camera, in order to split the post processes that are specific to this body from the others.
@@ -604,6 +623,12 @@ export class PostProcessManager {
             this.sierpinskiPyramids,
             this.engine
         );
+        const [otherMengerSpongesRenderEffect, bodyMengerSpongesRenderEffect] = this.makeSplitRenderEffects(
+            "MengerSponges",
+            this.getCurrentBody(),
+            this.mengerSponges,
+            this.engine
+        );
         const [otherMatterJetsRenderEffect, bodyMatterJetsRenderEffect] = this.makeSplitRenderEffects(
             "MatterJets",
             this.getCurrentBody(),
@@ -655,6 +680,9 @@ export class PostProcessManager {
                 case PostProcessType.SIERPINSKI_PYRAMID:
                     this.renderingPipeline.addEffect(otherSierpinskiPyramidsRenderEffect);
                     break;
+                case PostProcessType.MENGER_SPONGE:
+                    this.renderingPipeline.addEffect(otherMengerSpongesRenderEffect);
+                    break;
                 case PostProcessType.SHADOW:
                     //this.renderingPipeline.addEffect(otherShadowRenderEffect);
                     break;
@@ -699,6 +727,9 @@ export class PostProcessManager {
                     break;
                 case PostProcessType.SIERPINSKI_PYRAMID:
                     this.renderingPipeline.addEffect(bodySierpinskiPyramidsRenderEffect);
+                    break;
+                case PostProcessType.MENGER_SPONGE:
+                    this.renderingPipeline.addEffect(bodyMengerSpongesRenderEffect);
                     break;
                 case PostProcessType.LENS_FLARE:
                     //this.renderingPipeline.addEffect(bodyLensFlaresRenderEffect);

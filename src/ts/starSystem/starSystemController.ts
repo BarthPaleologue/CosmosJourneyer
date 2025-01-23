@@ -56,6 +56,8 @@ import { Mandelbox } from "../anomalies/mandelbox/mandelbox";
 import { MandelboxModel } from "../anomalies/mandelbox/mandelboxModel";
 import { SierpinskiPyramid } from "../anomalies/sierpinskiPyramid/sierpinskiPyramid";
 import { SierpinskiPyramidModel } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidModel";
+import { MengerSponge } from "../anomalies/mengerSponge/mengerSponge";
+import { MengerSpongeModel } from "../anomalies/mengerSponge/mengerSpongeModel";
 
 export type PlanetarySystem = {
     readonly planets: Planet[];
@@ -198,6 +200,9 @@ export class StarSystemController {
                     break;
                 case OrbitalObjectType.SIERPINSKI_PYRAMID:
                     anomaly = new SierpinskiPyramid(anomalyModel as SierpinskiPyramidModel, this.scene);
+                    break;
+                case OrbitalObjectType.MENGER_SPONGE:
+                    anomaly = new MengerSponge(anomalyModel as MengerSpongeModel, this.scene);
                     break;
             }
             anomalies.push(anomaly);
@@ -488,6 +493,9 @@ export class StarSystemController {
                     break;
                 case OrbitalObjectType.SIERPINSKI_PYRAMID:
                     postProcessManager.addSierpinskiPyramid(object as SierpinskiPyramid, stellarObjects);
+                    break;
+                case OrbitalObjectType.MENGER_SPONGE:
+                    postProcessManager.addMengerSponge(object as MengerSponge, stellarObjects);
                     break;
                 case OrbitalObjectType.SPACE_STATION:
                     break;

@@ -103,6 +103,7 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
             case OrbitalObjectType.JULIA_SET:
             case OrbitalObjectType.MANDELBOX:
             case OrbitalObjectType.SIERPINSKI_PYRAMID:
+            case OrbitalObjectType.MENGER_SPONGE:
                 objectTypeMultiplier = 2;
                 break;
             case OrbitalObjectType.SPACE_STATION:

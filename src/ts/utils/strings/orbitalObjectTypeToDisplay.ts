@@ -26,6 +26,7 @@ export function getOrbitalObjectTypeToI18nString(model: OrbitalObjectModel): str
         case OrbitalObjectType.JULIA_SET:
         case OrbitalObjectType.MANDELBOX:
         case OrbitalObjectType.SIERPINSKI_PYRAMID:
+        case OrbitalObjectType.MENGER_SPONGE:
             return i18n.t("objectTypes:anomaly");
         case OrbitalObjectType.GAS_PLANET:
             return i18n.t("objectTypes:gasPlanet");
