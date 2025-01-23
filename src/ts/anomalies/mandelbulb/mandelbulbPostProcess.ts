@@ -54,7 +54,8 @@ export class MandelbulbPostProcess extends PostProcess implements UpdatablePostP
         const MandelbulbUniformNames = {
             POWER: "power",
             ACCENT_COLOR: "accentColor",
-            ELAPSED_SECONDS: "elapsedSeconds"
+            ELAPSED_SECONDS: "elapsedSeconds",
+            AVERAGE_SCREEN_SIZE: "averageScreenSize"
         };
 
         const uniforms: string[] = [
@@ -96,6 +97,10 @@ export class MandelbulbPostProcess extends PostProcess implements UpdatablePostP
             effect.setFloat(MandelbulbUniformNames.POWER, mandelbulbModel.power);
             effect.setColor3(MandelbulbUniformNames.ACCENT_COLOR, mandelbulbModel.accentColor);
             effect.setFloat(MandelbulbUniformNames.ELAPSED_SECONDS, this.elapsedSeconds);
+            effect.setFloat(
+                MandelbulbUniformNames.AVERAGE_SCREEN_SIZE,
+                (scene.getEngine().getRenderWidth() + scene.getEngine().getRenderHeight()) / 2
+            );
 
             setSamplerUniforms(effect, this.activeCamera, scene);
         });
