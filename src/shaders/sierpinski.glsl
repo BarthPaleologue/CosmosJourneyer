@@ -42,6 +42,7 @@ uniform sampler2D depthSampler;
 
 #include "./utils/pbr.glsl";
 
+// https://www.shadertoy.com/view/4dl3Wl
 float distanceEstimator(vec3 z) {
     const float yOffset = 0.3;
     const vec3 va = vec3(  0.0,  yOffset + 0.57735,  0.0 );
