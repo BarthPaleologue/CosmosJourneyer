@@ -15,20 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Camera } from "@babylonjs/core/Cameras/camera";
-import { MandelbulbModel } from "./mandelbulbModel";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Cullable } from "../../utils/cullable";
-import { CelestialBody } from "../../architecture/celestialBody";
-import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
+import { CelestialBody, CelestialBodyModel } from "../architecture/celestialBody";
+import { TargetInfo, defaultTargetInfoCelestialBody } from "../architecture/targetable";
+import { setRotationQuaternion } from "../uberCore/transforms/basicTransform";
+import { getOrbitalObjectTypeToI18nString } from "./strings/orbitalObjectTypeToDisplay";
 
-import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
-import { setRotationQuaternion } from "../../uberCore/transforms/basicTransform";
-
-export class Mandelbulb implements CelestialBody, Cullable {
-    readonly model: MandelbulbModel;
+export class EmptyCelestialBody<T extends CelestialBodyModel> implements CelestialBody {
+    readonly model: T;
 
     private readonly transform: TransformNode;
 
@@ -42,7 +38,7 @@ export class Mandelbulb implements CelestialBody, Cullable {
      * @param model The model to create the planet from or a seed for the planet in [-1, 1]
      * @param scene
      */
-    constructor(model: MandelbulbModel, scene: Scene) {
+    constructor(model: T, scene: Scene) {
         this.model = model;
 
         this.transform = new TransformNode(this.model.name, scene);
@@ -70,10 +66,6 @@ export class Mandelbulb implements CelestialBody, Cullable {
 
     getTypeName(): string {
         return getOrbitalObjectTypeToI18nString(this.model);
-    }
-
-    computeCulling(camera: Camera): void {
-        // do nothing
     }
 
     dispose() {
