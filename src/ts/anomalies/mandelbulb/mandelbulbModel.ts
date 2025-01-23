@@ -44,7 +44,7 @@ export function newSeededMandelbulbModel(
 
     const radius = 1000e3;
 
-    const power = randRange(4.0, 8.0, rng, GenerationSteps.POWER);
+    const power = randRange(7.0, 10.0, rng, GenerationSteps.POWER);
     const accentColor = Color3.FromHSV(
         360 * rng(GenerationSteps.ACCENT_COLOR),
         rng(GenerationSteps.ACCENT_COLOR + 123) * 0.5,
