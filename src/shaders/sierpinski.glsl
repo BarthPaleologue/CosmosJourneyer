@@ -74,7 +74,7 @@ float distanceEstimator(vec3 z) {
 
 float rayMarch(vec3 rayOrigin, vec3 rayDir, float initialDepth) {
     float currentDepth = initialDepth;
-    float newDistance = 0.0;
+    float newDistance = initialDepth;
     float stepSizeFactor = 1.3;
     float oldDistance = 0.0;
     float stepSize = 0.0;
@@ -171,7 +171,7 @@ void main() {
     vec3 origin = camera_position - object_position; // the ray origin in world space
     origin *= inverseScaling;
 
-    float rayDepth = rayMarch(origin, rayDir, 0.0);
+    float rayDepth = rayMarch(origin, rayDir, max(impactPoint, 0.0) * inverseScaling);
     if(rayDepth == -1.0){
         gl_FragColor = screenColor;
         return;

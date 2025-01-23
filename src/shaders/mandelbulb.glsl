@@ -45,8 +45,7 @@ uniform sampler2D depthSampler;
 
 #include "./utils/pbr.glsl";
 
-#define MARCHINGITERATIONS 32
-#define MAXMANDELBROTDIST 3.0
+#define MARCHINGITERATIONS 64
 #define MANDELBROTSTEPS 15
 
 // cosine based palette, 4 vec3 params
@@ -67,7 +66,7 @@ vec2 distanceEstimator(vec3 pos) {
     float r = 0.0;
     for (int i = 0; i < MANDELBROTSTEPS; i++) {
         r = length(z);
-        if (r > MAXMANDELBROTDIST) break;
+        if (r > 1.5) break;
 
         // convert to polar coordinates
         float theta = acos(z.z / r);
@@ -98,7 +97,7 @@ float contrast(float val, float contrast_offset, float contrast_mid_level)
 
 vec2 rayMarch(vec3 rayOrigin, vec3 rayDir, float initialDepth, out float steps) {
     float currentDepth = initialDepth;
-    float newDistance = 0.0;
+    float newDistance = initialDepth;
     float stepSizeFactor = 1.3;
     float oldDistance = 0.0;
     float stepSize = 0.0;
@@ -201,7 +200,7 @@ void main() {
     origin *= inverseScaling;
 
     float steps;
-    vec2 rayInfo = rayMarch(origin, rayDir, impactPoint * inverseScaling, steps);
+    vec2 rayInfo = rayMarch(origin, rayDir, max(impactPoint, 0.0) * inverseScaling, steps);
     float rayDepth = rayInfo.x;
     float rayColor = rayInfo.y;
     if(rayDepth == -1.0){

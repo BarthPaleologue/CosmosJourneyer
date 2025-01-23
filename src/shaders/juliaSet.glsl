@@ -93,9 +93,9 @@ vec2 sdf(vec3 pos)
 // TRACING A PATH : 
 // measuring the distance to the nearest object on the x coordinate
 // and returning the color index on the y coordinate
-vec2 rayMarch(vec3 origin, vec3 ray, out float steps) {
+vec2 rayMarch(vec3 origin, vec3 ray, float initialDepth, out float steps) {
     //t is the point at which we are in the measuring of the distance
-    float depth = 0.0;
+    float depth = initialDepth;
     steps = 0.0;
     float c = 0.0;
 
@@ -163,11 +163,11 @@ void main() {
     // scale down so that everything happens in a sphere of radius 2
     float inverseScaling = 1.0 / (0.5 * object_radius * object_scaling_determinant);
 
-    vec3 origin = camera_position + rayDir * impactPoint - object_position; // the ray origin in world space
+    vec3 origin = camera_position - object_position; // the ray origin in world space
     origin *= inverseScaling;
 
     float steps;
-    vec2 juliaDepthAndIndex = rayMarch(origin, rayDir, steps);
+    vec2 juliaDepthAndIndex = rayMarch(origin, rayDir, max(impactPoint, 0.0) * inverseScaling, steps);
 
     float realDepth = impactPoint + juliaDepthAndIndex.x / inverseScaling;
 
