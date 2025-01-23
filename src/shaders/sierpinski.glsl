@@ -72,8 +72,8 @@ float distanceEstimator(vec3 z) {
 	return distance;
 }
 
-float rayMarch(vec3 rayOrigin, vec3 rayDepth) {
-    float currentDepth = 0.01;
+float rayMarch(vec3 rayOrigin, vec3 rayDir, float initialDepth) {
+    float currentDepth = initialDepth;
     float newDistance = 0.0;
     float stepSizeFactor = 1.3;
     float oldDistance = 0.0;
@@ -84,7 +84,7 @@ float rayMarch(vec3 rayOrigin, vec3 rayDepth) {
     int inter = 0;
     for (int i = 0; i < 64; i++) {
         oldDistance = newDistance;
-        newDistance = distanceEstimator(rayOrigin + rayDepth * currentDepth);
+        newDistance = distanceEstimator(rayOrigin + rayDir * currentDepth);
         
         //Detect intersections missed by over-relaxation
         if(stepSizeFactor > 1.0 && abs(oldDistance) + abs(newDistance) < stepSize){
@@ -171,7 +171,7 @@ void main() {
     vec3 origin = camera_position - object_position; // the ray origin in world space
     origin *= inverseScaling;
 
-    float rayDepth = rayMarch(origin, rayDir);
+    float rayDepth = rayMarch(origin, rayDir, impactPoint * inverseScaling);
     if(rayDepth == -1.0){
         gl_FragColor = screenColor;
         return;
