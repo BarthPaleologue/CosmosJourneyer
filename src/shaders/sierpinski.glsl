@@ -171,7 +171,7 @@ void main() {
     vec3 origin = camera_position - object_position; // the ray origin in world space
     origin *= inverseScaling;
 
-    float rayDepth = rayMarch(origin, rayDir, impactPoint * inverseScaling);
+    float rayDepth = rayMarch(origin, rayDir, 0.0);
     if(rayDepth == -1.0){
         gl_FragColor = screenColor;
         return;
