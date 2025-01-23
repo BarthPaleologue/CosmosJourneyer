@@ -43,10 +43,11 @@ uniform sampler2D depthSampler;
 #include "./utils/pbr.glsl";
 
 float distanceEstimator(vec3 z) {
-    const vec3 va = vec3(  0.0,  0.57735,  0.0 );
-    const vec3 vb = vec3(  0.0, -1.0,  1.15470 );
-    const vec3 vc = vec3(  1.0, -1.0, -0.57735 );
-    const vec3 vd = vec3( -1.0, -1.0, -0.57735 );
+    const float yOffset = 0.3;
+    const vec3 va = vec3(  0.0,  yOffset + 0.57735,  0.0 );
+    const vec3 vb = vec3(  0.0, -1.0 + yOffset,  1.15470 );
+    const vec3 vc = vec3(  1.0, -1.0 + yOffset, -0.57735 );
+    const vec3 vd = vec3( -1.0, -1.0 + yOffset, -0.57735 );
     
     vec3 p = z;
 	float a = 0.0;
