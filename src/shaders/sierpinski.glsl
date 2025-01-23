@@ -17,15 +17,11 @@
 
 precision highp float;
 
-// based on https://www.shadertoy.com/view/tsc3Rj and https://www.shadertoy.com/view/wdjGWR
-
 varying vec2 vUV;
 
-uniform float time;
-uniform float planetRadius;
-
-uniform float power;
 uniform vec3 accentColor;
+uniform float elapsedSeconds;
+uniform float averageScreenSize;
 
 #include "./utils/stars.glsl";
 
@@ -42,19 +38,16 @@ uniform sampler2D depthSampler;
 
 #include "./utils/rayIntersectSphere.glsl";
 
-#define MARCHINGITERATIONS 100
+#include "./utils/saturate.glsl";
 
-#define MARCHINGSTEP 1.0
-#define EPSILON 0.0002
+#include "./utils/pbr.glsl";
 
-#define MAX_DIST 3.0
-
-float sdf(vec3 z)
-{
-    const vec3 va = vec3(  0.0,  0.57735,  0.0 );
-    const vec3 vb = vec3(  0.0, -1.0,  1.15470 );
-    const vec3 vc = vec3(  1.0, -1.0, -0.57735 );
-    const vec3 vd = vec3( -1.0, -1.0, -0.57735 );
+float distanceEstimator(vec3 z) {
+    const float yOffset = 0.3;
+    const vec3 va = vec3(  0.0,  yOffset + 0.57735,  0.0 );
+    const vec3 vb = vec3(  0.0, -1.0 + yOffset,  1.15470 );
+    const vec3 vc = vec3(  1.0, -1.0 + yOffset, -0.57735 );
+    const vec3 vd = vec3( -1.0, -1.0 + yOffset, -0.57735 );
     
     vec3 p = z;
 	float a = 0.0;
@@ -79,49 +72,81 @@ float sdf(vec3 z)
 	return distance;
 }
 
-
-// TRACING A PATH : 
-// measuring the distance to the nearest object on the x coordinate
-// and returning the color index on the y coordinate
-float rayMarch(vec3 origin, vec3 ray, float maxDist) {
-    //t is the point at which we are in the measuring of the distance
-    float depth = 0.0;
-    float c = 0.0;
-    
-    for (int i = 0; i < MARCHINGITERATIONS; i++) {
-    	vec3 path = origin + ray * depth;	
-    	float dist = sdf(path);    	
-        depth += MARCHINGSTEP * dist;
-
-        if (dist < EPSILON) return depth;
-        if (dist > maxDist) return 1e20;
+float rayMarch(vec3 rayOrigin, vec3 rayDir, float initialDepth) {
+    float currentDepth = initialDepth;
+    float newDistance = initialDepth;
+    float stepSizeFactor = 1.3;
+    float oldDistance = 0.0;
+    float stepSize = 0.0;
+    float cerr = 10000.0;
+    float ct = 0.0;
+    float pixradius = 1.0 / averageScreenSize;
+    int inter = 0;
+    for (int i = 0; i < 64; i++) {
+        oldDistance = newDistance;
+        newDistance = distanceEstimator(rayOrigin + rayDir * currentDepth);
+        
+        //Detect intersections missed by over-relaxation
+        if(stepSizeFactor > 1.0 && abs(oldDistance) + abs(newDistance) < stepSize){
+            stepSize -= stepSizeFactor * stepSize;
+            stepSizeFactor = 1.0;
+            currentDepth += stepSize;
+            continue;
+        }
+        stepSize = stepSizeFactor * newDistance;
+        
+        float err = newDistance / currentDepth;
+        
+        if(abs(err) < abs(cerr)){
+            ct = currentDepth;
+            cerr = err;
+        }
+        
+        //Intersect when d / t < one pixel
+        if(abs(err) < pixradius) {
+            inter = 1;
+            break;
+        }
+        
+        currentDepth += stepSize;
+        /*if(currentDepth > 30.0){
+            break;
+        }*/
     }
-
-    return depth;
+    if(inter == 0){
+        ct = -1.0;
+    }
+    return ct;
 }
 
-float calcOcclusion( in vec3 pos, in vec3 nor )
-{
-	float ao = 0.0;
-    float sca = 1.0;
-    for( int i=0; i<8; i++ )
-    {
-        float h = 0.001 + 0.5*pow(float(i)/7.0,1.5);
-        float d = sdf( pos + h*nor );
-        ao += -(d-h)*sca;
-        sca *= 0.95;
-    }
-    return clamp( 1.0 - 0.8*ao, 0.0, 1.0 );
+float map(vec3 p){
+    return distanceEstimator(p);
 }
 
-vec3 estimate_normal(const vec3 p, const float delta)
-{
-    vec3 normal = vec3(
-            sdf(vec3(p.x + delta, p.y, p.z)) - sdf(vec3(p.x - delta, p.y, p.z)),
-            sdf(vec3(p.x, p.y + delta, p.z)) - sdf(vec3(p.x, p.y - delta, p.z)),
-            sdf(vec3(p.x, p.y, p.z  + delta)) - sdf(vec3(p.x, p.y, p.z - delta))
-    );
-    return normalize(normal);
+//Approximate normal
+vec3 getNormal(vec3 p){
+    return normalize(vec3(map(vec3(p.x + 0.0001, p.yz)) - map(vec3(p.x - 0.0001, p.yz)),
+                          map(vec3(p.x, p.y + 0.0001, p.z)) - map(vec3(p.x, p.y - 0.0001, p.z)),
+                	      map(vec3(p.xy, p.z + 0.0001)) - map(vec3(p.xy, p.z - 0.0001))));
+}
+
+//Determine if a point is in shadow - 1.0 = not in shadow
+float getShadow(vec3 rayOrigin, vec3 rayDir, vec3 starPosition) {
+    float t = 0.01;
+    float d = 0.0;
+    float shadow = 1.0;
+    for(int iter = 0; iter < 64; iter++){
+        d = map(rayOrigin + rayDir * t);
+        if(d < 0.0001){
+            return 0.5;
+        }
+        if(t > length(rayOrigin - starPosition) - 0.5){
+            break;
+        }
+        shadow = min(shadow, 32.0 * d / t);
+        t += d;
+    }
+    return 0.5 + 0.5 * shadow;
 }
 
 void main() {
@@ -133,45 +158,56 @@ void main() {
     float depth = texture2D(depthSampler, vUV).r;// the depth corresponding to the pixel in the depth map
     // actual depth of the scene
     float maximumDistance = length(pixelWorldPosition - camera_position) * remap(depth, 0.0, 1.0, camera_near, camera_far);
-    
+
     float impactPoint, escapePoint;
-    if (!(rayIntersectSphere(camera_position, rayDir, object_position, planetRadius, impactPoint, escapePoint))) {
-        gl_FragColor = screenColor;// if not intersecting with atmosphere, return original color
+    if (!(rayIntersectSphere(camera_position, rayDir, object_position, object_radius * object_scaling_determinant, impactPoint, escapePoint))) {
+        gl_FragColor = screenColor;
         return;
     }
 
-    // we apply inverse scaling to make the situation roughly equivalent to a fractal of size 1
-    float inverseScaling = 1.0 / (0.6 * planetRadius);
+    // scale down so that everything happens in a sphere of radius 2
+    float inverseScaling = 2.0 / (1.0 * object_radius * object_scaling_determinant);
 
     vec3 origin = camera_position - object_position; // the ray origin in world space
     origin *= inverseScaling;
 
-    float rayDepth = rayMarch(origin, rayDir, MAX_DIST + impactPoint * inverseScaling);
-
-    float realDepth = rayDepth / inverseScaling;
-
-    if(maximumDistance < realDepth) {
+    float rayDepth = rayMarch(origin, rayDir, max(impactPoint, 0.0) * inverseScaling);
+    if(rayDepth == -1.0){
         gl_FragColor = screenColor;
         return;
     }
 
     vec3 intersectionPoint = origin + rayDepth * rayDir;
-    float intersectionDistance = length(intersectionPoint);
 
-    vec4 mandelbulbColor = vec4(accentColor, 1.0);
+    vec3 intersectionPointW = object_position + intersectionPoint / inverseScaling;
 
-    vec3 normal = estimate_normal(intersectionPoint, EPSILON);
-    
-    float occ = calcOcclusion(intersectionPoint, normal);
-    
-    float ndl = 0.0;
-    for(int i = 0; i < nbStars; i++) {
-        vec3 starDir = normalize(star_positions[i] - object_position);
-        ndl += max(0.0, dot(normal, starDir));
+    if(length(intersectionPointW - camera_position) > maximumDistance) {
+        gl_FragColor = screenColor;
+        return;
     }
 
-    mandelbulbColor.xyz *= clamp(ndl, 0.5, 1.0) * occ * 2.0;
+    vec3 normal = getNormal(intersectionPoint);
 
-    gl_FragColor = vec4(mandelbulbColor.xyz, 1.0);
+    vec3 albedo = accentColor;
+    float roughness = 0.4;
+    float metallic = 0.2;
+    vec3 viewDir = normalize(camera_position - intersectionPointW);
 
+    vec3 color = vec3(0.0);
+    for (int i = 0; i < nbStars; i++) {
+        vec3 starDir = normalize(star_positions[i] - object_position);
+        float shadow = getShadow(intersectionPoint, starDir, star_positions[i]);
+        color += calculateLight(albedo, normal, roughness, metallic, starDir, viewDir, star_colors[i]) * shadow;
+    }
+
+    if(nbStars == 0) {
+        vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+        vec3 lightColor = vec3(1.0);
+        float shadow = getShadow(intersectionPoint, lightDir, intersectionPoint + lightDir * 100.0);
+        color += calculateLight(albedo, normal, roughness, metallic, lightDir, viewDir, lightColor) * shadow;
+    }
+
+    color = smoothstep(0.0, 0.8, color * 2.0) * 2.0;
+
+    gl_FragColor = vec4(color, 1.0);
 }

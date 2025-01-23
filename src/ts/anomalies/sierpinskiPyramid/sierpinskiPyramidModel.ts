@@ -16,35 +16,32 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { normalRandom, randRange } from "extended-random";
+import { normalRandom } from "extended-random";
 import { clamp } from "../../utils/math";
 import { getOrbitalPeriod, getPeriapsis, Orbit } from "../../orbit/orbit";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { OrbitalObjectPhysicsInfo } from "../../architecture/physicsInfo";
 import { AnomalyModel } from "../anomaly";
-
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { OrbitalObjectType } from "../../architecture/orbitalObject";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 
-export type MandelbulbModel = AnomalyModel & {
-    readonly type: OrbitalObjectType.MANDELBULB;
-    readonly power: number;
+export type SierpinskiPyramidModel = AnomalyModel & {
+    readonly type: OrbitalObjectType.SIERPINSKI_PYRAMID;
     readonly accentColor: Color3;
 };
 
-export function newSeededMandelbulbModel(
+export function newSeededSierpinskiPyramidModel(
     seed: number,
     name: string,
     parentBodies: CelestialBodyModel[]
-): MandelbulbModel {
+): SierpinskiPyramidModel {
     const rng = getRngFromSeed(seed);
 
-    const radius = 1000e3;
+    const radius = 200e3;
 
-    const power = randRange(7.0, 10.0, rng, GenerationSteps.POWER);
     const accentColor = Color3.FromHSV(
         360 * rng(GenerationSteps.ACCENT_COLOR),
         rng(GenerationSteps.ACCENT_COLOR + 123) * 0.5,
@@ -76,9 +73,8 @@ export function newSeededMandelbulbModel(
         radius,
         rings: null,
         name,
-        type: OrbitalObjectType.MANDELBULB,
+        type: OrbitalObjectType.SIERPINSKI_PYRAMID,
         accentColor,
-        power,
         orbit,
         physics: physicalProperties
     };

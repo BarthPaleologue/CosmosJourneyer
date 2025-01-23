@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import mandelboxFragment from "../../../shaders/mandelbox.glsl";
+import sierpinskiFragment from "../../../shaders/sierpinski.glsl";
 import { UpdatablePostProcess } from "../../postProcesses/updatablePostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { StellarObject } from "../../architecture/stellarObject";
@@ -32,9 +32,9 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { MandelboxModel } from "./mandelboxModel";
+import { SierpinskiPyramidModel } from "./sierpinskiPyramidModel";
 
-export class MandelboxPostProcess extends PostProcess implements UpdatablePostProcess {
+export class SierpinskiPyramidPostProcess extends PostProcess implements UpdatablePostProcess {
     private elapsedSeconds = 0;
 
     private activeCamera: Camera | null = null;
@@ -42,20 +42,18 @@ export class MandelboxPostProcess extends PostProcess implements UpdatablePostPr
     constructor(
         transform: TransformNode,
         boundingRadius: number,
-        model: MandelboxModel,
+        model: SierpinskiPyramidModel,
         scene: Scene,
         stellarObjects: StellarObject[]
     ) {
-        const shaderName = "mandelbox";
+        const shaderName = "SierpinskiPyramid";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
-            Effect.ShadersStore[`${shaderName}FragmentShader`] = mandelboxFragment;
+            Effect.ShadersStore[`${shaderName}FragmentShader`] = sierpinskiFragment;
         }
 
-        const MandelboxUniformNames = {
+        const SierpinskiPyramidUniformNames = {
             ACCENT_COLOR: "accentColor",
             ELAPSED_SECONDS: "elapsedSeconds",
-            MR2: "mr2",
-            SPREAD: "spread",
             AVERAGE_SCREEN_SIZE: "averageScreenSize"
         };
 
@@ -63,7 +61,7 @@ export class MandelboxPostProcess extends PostProcess implements UpdatablePostPr
             ...Object.values(ObjectUniformNames),
             ...Object.values(CameraUniformNames),
             ...Object.values(StellarObjectUniformNames),
-            ...Object.values(MandelboxUniformNames)
+            ...Object.values(SierpinskiPyramidUniformNames)
         ];
 
         const samplers: string[] = Object.values(SamplerUniformNames);
@@ -95,12 +93,10 @@ export class MandelboxPostProcess extends PostProcess implements UpdatablePostPr
             setStellarObjectUniforms(effect, stellarObjects);
             setObjectUniforms(effect, transform, boundingRadius);
 
-            effect.setFloat(MandelboxUniformNames.MR2, model.mr2);
-            effect.setFloat(MandelboxUniformNames.SPREAD, model.spread);
-            effect.setColor3(MandelboxUniformNames.ACCENT_COLOR, model.accentColor);
-            effect.setFloat(MandelboxUniformNames.ELAPSED_SECONDS, this.elapsedSeconds);
+            effect.setColor3(SierpinskiPyramidUniformNames.ACCENT_COLOR, model.accentColor);
+            effect.setFloat(SierpinskiPyramidUniformNames.ELAPSED_SECONDS, this.elapsedSeconds);
             effect.setFloat(
-                MandelboxUniformNames.AVERAGE_SCREEN_SIZE,
+                SierpinskiPyramidUniformNames.AVERAGE_SCREEN_SIZE,
                 (scene.getEngine().getRenderWidth() + scene.getEngine().getRenderHeight()) / 2
             );
 

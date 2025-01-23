@@ -39,6 +39,7 @@ import { newSeededSpaceElevatorModel } from "../spacestation/spaceElevatorModel"
 import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { newSeededMandelboxModel } from "../anomalies/mandelbox/mandelboxModel";
+import { newSeededSierpinskiPyramidModel } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidModel";
 
 const enum GenerationSteps {
     NAME,
@@ -157,15 +158,19 @@ export function newSeededStarSystemModel(
     );
     for (let i = 0; i < nbAnomalies; i++) {
         const anomalySeed = centeredRand(systemRng, GenerationSteps.ANOMALIES + i * 100) * Settings.SEED_HALF_RANGE;
-        const anomalyType: OrbitalObjectType.MANDELBULB | OrbitalObjectType.JULIA_SET | OrbitalObjectType.MANDELBOX =
-            wheelOfFortune(
-                [
-                    [OrbitalObjectType.MANDELBULB, 1],
-                    [OrbitalObjectType.JULIA_SET, 1],
-                    [OrbitalObjectType.MANDELBOX, 1]
-                ],
-                systemRng(GenerationSteps.ANOMALIES + i * 300)
-            );
+        const anomalyType:
+            | OrbitalObjectType.MANDELBULB
+            | OrbitalObjectType.JULIA_SET
+            | OrbitalObjectType.MANDELBOX
+            | OrbitalObjectType.SIERPINSKI_PYRAMID = wheelOfFortune(
+            [
+                [OrbitalObjectType.MANDELBULB, 1],
+                [OrbitalObjectType.MANDELBOX, 1],
+                [OrbitalObjectType.JULIA_SET, 1],
+                [OrbitalObjectType.SIERPINSKI_PYRAMID, 1]
+            ],
+            systemRng(GenerationSteps.ANOMALIES + i * 300)
+        );
         const anomalyName = `${systemName} ${ReversedGreekAlphabet[i].toUpperCase()}`;
 
         switch (anomalyType) {
@@ -177,6 +182,9 @@ export function newSeededStarSystemModel(
                 break;
             case OrbitalObjectType.MANDELBOX:
                 anomalies.push(newSeededMandelboxModel(anomalySeed, anomalyName, stellarObjects));
+                break;
+            case OrbitalObjectType.SIERPINSKI_PYRAMID:
+                anomalies.push(newSeededSierpinskiPyramidModel(anomalySeed, anomalyName, stellarObjects));
                 break;
         }
     }

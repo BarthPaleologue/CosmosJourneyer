@@ -100,12 +100,9 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
                 objectTypeMultiplier = this.evaluateGasPlanetMultiplier(model as GasPlanetModel);
                 break;
             case OrbitalObjectType.MANDELBULB:
-                objectTypeMultiplier = 2;
-                break;
             case OrbitalObjectType.JULIA_SET:
-                objectTypeMultiplier = 2;
-                break;
             case OrbitalObjectType.MANDELBOX:
+            case OrbitalObjectType.SIERPINSKI_PYRAMID:
                 objectTypeMultiplier = 2;
                 break;
             case OrbitalObjectType.SPACE_STATION:
