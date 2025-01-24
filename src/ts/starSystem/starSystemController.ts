@@ -22,7 +22,6 @@ import { UberScene } from "../uberCore/uberScene";
 import { SpaceStation } from "../spacestation/spaceStation";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
-import { Mandelbulb } from "../anomalies/mandelbulb/mandelbulb";
 import { rotateAround, translate } from "../uberCore/transforms/basicTransform";
 import { Star } from "../stellarObjects/star/star";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
@@ -33,7 +32,6 @@ import { CelestialBody } from "../architecture/celestialBody";
 import { StellarObject } from "../architecture/stellarObject";
 import { PlanetaryMassObject } from "../architecture/planetaryMassObject";
 import { SystemTarget } from "../utils/systemTarget";
-import { JuliaSet } from "../anomalies/julia/juliaSet";
 import { StarFieldBox } from "./starFieldBox";
 import { PlanetarySystemModel, StarSystemModel, SubStarSystemModel } from "./starSystemModel";
 import { Settings } from "../settings";
@@ -52,10 +50,10 @@ import { SpaceStationModel } from "../spacestation/spacestationModel";
 import { SpaceElevator } from "../spacestation/spaceElevator";
 import { SpaceElevatorModel } from "../spacestation/spaceElevatorModel";
 import { StarSystemDatabase } from "./starSystemDatabase";
-import { Mandelbox } from "../anomalies/mandelbox/mandelbox";
 import { MandelboxModel } from "../anomalies/mandelbox/mandelboxModel";
-import { SierpinskiPyramid } from "../anomalies/sierpinskiPyramid/sierpinskiPyramid";
 import { SierpinskiPyramidModel } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidModel";
+import { MengerSpongeModel } from "../anomalies/mengerSponge/mengerSpongeModel";
+import { EmptyCelestialBody } from "../utils/emptyCelestialBody";
 
 export type PlanetarySystem = {
     readonly planets: Planet[];
@@ -188,16 +186,22 @@ export class StarSystemController {
             let anomaly: CelestialBody;
             switch (anomalyModel.type) {
                 case OrbitalObjectType.MANDELBULB:
-                    anomaly = new Mandelbulb(anomalyModel as MandelbulbModel, this.scene);
+                    anomaly = new EmptyCelestialBody<MandelbulbModel>(anomalyModel as MandelbulbModel, this.scene);
                     break;
                 case OrbitalObjectType.JULIA_SET:
-                    anomaly = new JuliaSet(anomalyModel as JuliaSetModel, this.scene);
+                    anomaly = new EmptyCelestialBody<JuliaSetModel>(anomalyModel as JuliaSetModel, this.scene);
                     break;
                 case OrbitalObjectType.MANDELBOX:
-                    anomaly = new Mandelbox(anomalyModel as MandelboxModel, this.scene);
+                    anomaly = new EmptyCelestialBody<MandelboxModel>(anomalyModel as MandelboxModel, this.scene);
                     break;
                 case OrbitalObjectType.SIERPINSKI_PYRAMID:
-                    anomaly = new SierpinskiPyramid(anomalyModel as SierpinskiPyramidModel, this.scene);
+                    anomaly = new EmptyCelestialBody<SierpinskiPyramidModel>(
+                        anomalyModel as SierpinskiPyramidModel,
+                        this.scene
+                    );
+                    break;
+                case OrbitalObjectType.MENGER_SPONGE:
+                    anomaly = new EmptyCelestialBody<MengerSpongeModel>(anomalyModel as MengerSpongeModel, this.scene);
                     break;
             }
             anomalies.push(anomaly);
@@ -478,16 +482,44 @@ export class StarSystemController {
                     postProcessManager.addGasPlanet(object as GasPlanet, stellarObjects);
                     break;
                 case OrbitalObjectType.MANDELBULB:
-                    postProcessManager.addMandelbulb(object as Mandelbulb, stellarObjects);
+                    postProcessManager.addMandelbulb(
+                        object.getTransform(),
+                        object.getRadius(),
+                        object.model as MandelbulbModel,
+                        stellarObjects
+                    );
                     break;
                 case OrbitalObjectType.JULIA_SET:
-                    postProcessManager.addJuliaSet(object as JuliaSet, stellarObjects);
+                    postProcessManager.addJuliaSet(
+                        object.getTransform(),
+                        object.getRadius(),
+                        object.model as JuliaSetModel,
+                        stellarObjects
+                    );
                     break;
                 case OrbitalObjectType.MANDELBOX:
-                    postProcessManager.addMandelbox(object as Mandelbox, stellarObjects);
+                    postProcessManager.addMandelbox(
+                        object.getTransform(),
+                        object.getRadius(),
+                        object.model as MandelboxModel,
+                        stellarObjects
+                    );
                     break;
                 case OrbitalObjectType.SIERPINSKI_PYRAMID:
-                    postProcessManager.addSierpinskiPyramid(object as SierpinskiPyramid, stellarObjects);
+                    postProcessManager.addSierpinskiPyramid(
+                        object.getTransform(),
+                        object.getRadius(),
+                        object.model as SierpinskiPyramidModel,
+                        stellarObjects
+                    );
+                    break;
+                case OrbitalObjectType.MENGER_SPONGE:
+                    postProcessManager.addMengerSponge(
+                        object.getTransform(),
+                        object.getRadius(),
+                        object.model as MengerSpongeModel,
+                        stellarObjects
+                    );
                     break;
                 case OrbitalObjectType.SPACE_STATION:
                     break;

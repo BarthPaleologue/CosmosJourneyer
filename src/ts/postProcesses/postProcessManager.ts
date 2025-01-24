@@ -34,7 +34,6 @@ import { ShadowPostProcess } from "./shadowPostProcess";
 import { LensFlarePostProcess } from "./lensFlarePostProcess";
 import { UpdatablePostProcess } from "./updatablePostProcess";
 import { MatterJetPostProcess } from "./matterJetPostProcess";
-import { Mandelbulb } from "../anomalies/mandelbulb/mandelbulb";
 import { Star } from "../stellarObjects/star/star";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
@@ -43,7 +42,6 @@ import { StellarObject } from "../architecture/stellarObject";
 import { PostProcessRenderPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipeline";
 import { PostProcessRenderPipelineManager } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManager";
 import { JuliaSetPostProcess } from "../anomalies/julia/juliaSetPostProcess";
-import { JuliaSet } from "../anomalies/julia/juliaSet";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
@@ -53,9 +51,14 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getRgbFromTemperature } from "../utils/specrend";
 import { PostProcessType } from "./postProcessTypes";
 import { MandelboxPostProcess } from "../anomalies/mandelbox/mandelboxPostProcess";
-import { Mandelbox } from "../anomalies/mandelbox/mandelbox";
 import { SierpinskiPyramidPostProcess } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidPostProcess";
-import { SierpinskiPyramid } from "../anomalies/sierpinskiPyramid/sierpinskiPyramid";
+import { MengerSpongePostProcess } from "../anomalies/mengerSponge/mengerSpongePostProcess";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { MandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModel";
+import { JuliaSetModel } from "../anomalies/julia/juliaSetModel";
+import { MandelboxModel } from "../anomalies/mandelbox/mandelboxModel";
+import { SierpinskiPyramidModel } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidModel";
+import { MengerSpongeModel } from "../anomalies/mengerSponge/mengerSpongeModel";
 
 /**
  * The order in which the post processes are rendered when away from a planet
@@ -70,6 +73,7 @@ const spaceRenderingOrder: PostProcessType[] = [
     PostProcessType.JULIA_SET,
     PostProcessType.MANDELBOX,
     PostProcessType.SIERPINSKI_PYRAMID,
+    PostProcessType.MENGER_SPONGE,
     PostProcessType.RING,
     PostProcessType.BLACK_HOLE
 ];
@@ -85,6 +89,7 @@ const surfaceRenderingOrder: PostProcessType[] = [
     PostProcessType.JULIA_SET,
     PostProcessType.MANDELBOX,
     PostProcessType.SIERPINSKI_PYRAMID,
+    PostProcessType.MENGER_SPONGE,
     PostProcessType.RING,
     PostProcessType.OCEAN,
     PostProcessType.CLOUDS,
@@ -140,6 +145,7 @@ export class PostProcessManager {
     readonly mandelbulbs: MandelbulbPostProcess[] = [];
     readonly mandelboxes: MandelboxPostProcess[] = [];
     readonly sierpinskiPyramids: SierpinskiPyramidPostProcess[] = [];
+    readonly mengerSponges: MengerSpongePostProcess[] = [];
     readonly juliaSets: JuliaSetPostProcess[] = [];
     readonly blackHoles: BlackHolePostProcess[] = [];
     readonly matterJets: MatterJetPostProcess[] = [];
@@ -156,6 +162,7 @@ export class PostProcessManager {
         this.juliaSets,
         this.mandelboxes,
         this.sierpinskiPyramids,
+        this.mengerSponges,
         this.blackHoles,
         this.matterJets,
         this.shadows,
@@ -176,7 +183,7 @@ export class PostProcessManager {
         this.sierpinskiPyramids
     ];
 
-    readonly celestialBodyToPostProcesses: Map<CelestialBody, PostProcess[]> = new Map();
+    readonly celestialBodyToPostProcesses: Map<TransformNode, PostProcess[]> = new Map();
 
     /**
      * The color correction post process responsible for tone mapping, saturation, contrast, brightness and gamma.
@@ -245,7 +252,7 @@ export class PostProcessManager {
         postProcesses: PostProcess[],
         engine: AbstractEngine
     ): [PostProcessRenderEffect, PostProcessRenderEffect] {
-        const bodyPostProcesses = this.celestialBodyToPostProcesses.get(body);
+        const bodyPostProcesses = this.celestialBodyToPostProcesses.get(body.getTransform());
         if (bodyPostProcesses === undefined) throw new Error(`No post processes found for body ${body.model.name}`);
         const relevantPostProcesses = postProcesses.filter((postProcess) => bodyPostProcesses.includes(postProcess));
         if (relevantPostProcesses === undefined)
@@ -280,7 +287,7 @@ export class PostProcessManager {
         this.volumetricLights.push(volumetricLight);
         this.lensFlares.push(lensFlare);
 
-        this.celestialBodyToPostProcesses.set(star, [volumetricLight, lensFlare]);
+        this.celestialBodyToPostProcesses.set(star.getTransform(), [volumetricLight, lensFlare]);
     }
 
     public addNeutronStar(neutronStar: NeutronStar, excludedMeshes: AbstractMesh[]) {
@@ -300,7 +307,7 @@ export class PostProcessManager {
         this.volumetricLights.push(volumetricLight);
         this.lensFlares.push(lensFlare);
 
-        this.celestialBodyToPostProcesses.set(neutronStar, [volumetricLight, lensFlare]);
+        this.celestialBodyToPostProcesses.set(neutronStar.getTransform(), [volumetricLight, lensFlare]);
     }
 
     /**
@@ -315,7 +322,7 @@ export class PostProcessManager {
         );
         this.blackHoles.push(blackHolePostProcess);
 
-        this.celestialBodyToPostProcesses.set(blackHole, [blackHolePostProcess]);
+        this.celestialBodyToPostProcesses.set(blackHole.getTransform(), [blackHolePostProcess]);
     }
 
     public addTelluricPlanet(planet: TelluricPlanet, stellarObjects: StellarObject[]) {
@@ -381,7 +388,7 @@ export class PostProcessManager {
         this.shadows.push(shadow);
         postProcesses.push(shadow);
 
-        this.celestialBodyToPostProcesses.set(planet, postProcesses);
+        this.celestialBodyToPostProcesses.set(planet.getTransform(), postProcesses);
     }
 
     public addGasPlanet(planet: GasPlanet, stellarObjects: StellarObject[]) {
@@ -423,69 +430,92 @@ export class PostProcessManager {
         this.shadows.push(shadow);
         postProcesses.push(shadow);
 
-        this.celestialBodyToPostProcesses.set(planet, postProcesses);
+        this.celestialBodyToPostProcesses.set(planet.getTransform(), postProcesses);
     }
-
     /**
      * Creates a new Mandelbulb postprocess for the given body and adds it to the manager.
-     * @param body A body
+     * @param transform The transform of the body
+     * @param radius The bounding radius of the body
+     * @param model The model of the Mandelbulb
      * @param stellarObjects An array of stars or black holes
      */
-    public addMandelbulb(body: Mandelbulb, stellarObjects: StellarObject[]) {
-        const mandelbulb = new MandelbulbPostProcess(
-            body.getTransform(),
-            body.getBoundingRadius(),
-            body.model,
-            this.scene,
-            stellarObjects
-        );
+    public addMandelbulb(
+        transform: TransformNode,
+        radius: number,
+        model: MandelbulbModel,
+        stellarObjects: StellarObject[]
+    ) {
+        const mandelbulb = new MandelbulbPostProcess(transform, radius, model, this.scene, stellarObjects);
         this.mandelbulbs.push(mandelbulb);
 
-        this.celestialBodyToPostProcesses.set(body, [mandelbulb]);
+        this.celestialBodyToPostProcesses.set(transform, [mandelbulb]);
     }
 
     /**
      * Creates a new Julia set postprocess for the given julia set and adds it to the manager.
-     * @param juliaSet A julia set
+     * @param transform The transform of the Julia set
+     * @param radius The bounding radius of the Julia set
+     * @param model The model of the Julia set
      * @param stellarObjects An array of stars or black holes
      */
-    public addJuliaSet(juliaSet: JuliaSet, stellarObjects: StellarObject[]) {
+    public addJuliaSet(
+        transform: TransformNode,
+        radius: number,
+        model: JuliaSetModel,
+        stellarObjects: StellarObject[]
+    ) {
         const juliaSetPostProcess = new JuliaSetPostProcess(
-            juliaSet.getTransform(),
-            juliaSet.getBoundingRadius(),
-            juliaSet.model.accentColor,
+            transform,
+            radius,
+            model.accentColor,
             this.scene,
             stellarObjects
         );
         this.juliaSets.push(juliaSetPostProcess);
 
-        this.celestialBodyToPostProcesses.set(juliaSet, [juliaSetPostProcess]);
+        this.celestialBodyToPostProcesses.set(transform, [juliaSetPostProcess]);
     }
 
-    public addMandelbox(body: Mandelbox, stellarObjects: StellarObject[]) {
-        const mandelbox = new MandelboxPostProcess(
-            body.getTransform(),
-            body.getBoundingRadius(),
-            body.model,
-            this.scene,
-            stellarObjects
-        );
+    public addMandelbox(
+        transform: TransformNode,
+        radius: number,
+        model: MandelboxModel,
+        stellarObjects: StellarObject[]
+    ) {
+        const mandelbox = new MandelboxPostProcess(transform, radius, model, this.scene, stellarObjects);
         this.mandelboxes.push(mandelbox);
 
-        this.celestialBodyToPostProcesses.set(body, [mandelbox]);
+        this.celestialBodyToPostProcesses.set(transform, [mandelbox]);
     }
 
-    public addSierpinskiPyramid(body: SierpinskiPyramid, stellarObjects: StellarObject[]) {
+    public addSierpinskiPyramid(
+        transform: TransformNode,
+        radius: number,
+        model: SierpinskiPyramidModel,
+        stellarObjects: StellarObject[]
+    ) {
         const sierpinskiPyramid = new SierpinskiPyramidPostProcess(
-            body.getTransform(),
-            body.getBoundingRadius(),
-            body.model,
+            transform,
+            radius,
+            model,
             this.scene,
             stellarObjects
         );
         this.sierpinskiPyramids.push(sierpinskiPyramid);
 
-        this.celestialBodyToPostProcesses.set(body, [sierpinskiPyramid]);
+        this.celestialBodyToPostProcesses.set(transform, [sierpinskiPyramid]);
+    }
+
+    public addMengerSponge(
+        transform: TransformNode,
+        radius: number,
+        model: MengerSpongeModel,
+        stellarObjects: StellarObject[]
+    ) {
+        const mengerSponge = new MengerSpongePostProcess(transform, radius, model, this.scene, stellarObjects);
+        this.mengerSponges.push(mengerSponge);
+
+        this.celestialBodyToPostProcesses.set(transform, [mengerSponge]);
     }
 
     /**
@@ -497,7 +527,9 @@ export class PostProcessManager {
     public setCelestialBody(body: CelestialBody) {
         this.currentBody = body;
 
-        const rings = this.celestialBodyToPostProcesses.get(body)?.find((pp) => pp instanceof RingsPostProcess);
+        const rings = this.celestialBodyToPostProcesses
+            .get(body.getTransform())
+            ?.find((pp) => pp instanceof RingsPostProcess);
         const switchLimit = rings !== undefined ? rings.ringsUniforms.model.ringStart : 2;
         const distance2 = Vector3.DistanceSquared(
             body.getTransform().getAbsolutePosition(),
@@ -604,6 +636,12 @@ export class PostProcessManager {
             this.sierpinskiPyramids,
             this.engine
         );
+        const [otherMengerSpongesRenderEffect, bodyMengerSpongesRenderEffect] = this.makeSplitRenderEffects(
+            "MengerSponges",
+            this.getCurrentBody(),
+            this.mengerSponges,
+            this.engine
+        );
         const [otherMatterJetsRenderEffect, bodyMatterJetsRenderEffect] = this.makeSplitRenderEffects(
             "MatterJets",
             this.getCurrentBody(),
@@ -655,6 +693,9 @@ export class PostProcessManager {
                 case PostProcessType.SIERPINSKI_PYRAMID:
                     this.renderingPipeline.addEffect(otherSierpinskiPyramidsRenderEffect);
                     break;
+                case PostProcessType.MENGER_SPONGE:
+                    this.renderingPipeline.addEffect(otherMengerSpongesRenderEffect);
+                    break;
                 case PostProcessType.SHADOW:
                     //this.renderingPipeline.addEffect(otherShadowRenderEffect);
                     break;
@@ -699,6 +740,9 @@ export class PostProcessManager {
                     break;
                 case PostProcessType.SIERPINSKI_PYRAMID:
                     this.renderingPipeline.addEffect(bodySierpinskiPyramidsRenderEffect);
+                    break;
+                case PostProcessType.MENGER_SPONGE:
+                    this.renderingPipeline.addEffect(bodyMengerSpongesRenderEffect);
                     break;
                 case PostProcessType.LENS_FLARE:
                     //this.renderingPipeline.addEffect(bodyLensFlaresRenderEffect);

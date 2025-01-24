@@ -21,7 +21,7 @@ import { generateStarName } from "../utils/strings/starNameGenerator";
 import { wheelOfFortune } from "../utils/random";
 import { PlanetarySystemModel, StarSystemModel } from "./starSystemModel";
 import { StellarObjectModel } from "../architecture/stellarObject";
-import { AnomalyModel } from "../anomalies/anomaly";
+import { AnomalyModel, AnomalyObjectType } from "../anomalies/anomaly";
 import { Alphabet, ReversedGreekAlphabet } from "../utils/strings/parseToStrings";
 import { newSeededStarModel } from "../stellarObjects/star/starModel";
 import { newSeededBlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
@@ -40,6 +40,7 @@ import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates"
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { newSeededMandelboxModel } from "../anomalies/mandelbox/mandelboxModel";
 import { newSeededSierpinskiPyramidModel } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidModel";
+import { newSeededMengerSpongeModel } from "../anomalies/mengerSponge/mengerSpongeModel";
 
 const enum GenerationSteps {
     NAME,
@@ -150,24 +151,20 @@ export function newSeededStarSystemModel(
     const anomalies: AnomalyModel[] = [];
     const nbAnomalies = wheelOfFortune(
         [
-            [0, 0.95],
-            [1, 0.04],
-            [2, 0.01]
+            [0, 0.96],
+            [1, 0.04]
         ],
         systemRng(GenerationSteps.ANOMALIES)
     );
     for (let i = 0; i < nbAnomalies; i++) {
         const anomalySeed = centeredRand(systemRng, GenerationSteps.ANOMALIES + i * 100) * Settings.SEED_HALF_RANGE;
-        const anomalyType:
-            | OrbitalObjectType.MANDELBULB
-            | OrbitalObjectType.JULIA_SET
-            | OrbitalObjectType.MANDELBOX
-            | OrbitalObjectType.SIERPINSKI_PYRAMID = wheelOfFortune(
+        const anomalyType: AnomalyObjectType = wheelOfFortune(
             [
                 [OrbitalObjectType.MANDELBULB, 1],
                 [OrbitalObjectType.MANDELBOX, 1],
                 [OrbitalObjectType.JULIA_SET, 1],
-                [OrbitalObjectType.SIERPINSKI_PYRAMID, 1]
+                [OrbitalObjectType.SIERPINSKI_PYRAMID, 1],
+                [OrbitalObjectType.MENGER_SPONGE, 1]
             ],
             systemRng(GenerationSteps.ANOMALIES + i * 300)
         );
@@ -185,6 +182,9 @@ export function newSeededStarSystemModel(
                 break;
             case OrbitalObjectType.SIERPINSKI_PYRAMID:
                 anomalies.push(newSeededSierpinskiPyramidModel(anomalySeed, anomalyName, stellarObjects));
+                break;
+            case OrbitalObjectType.MENGER_SPONGE:
+                anomalies.push(newSeededMengerSpongeModel(anomalySeed, anomalyName, stellarObjects));
                 break;
         }
     }

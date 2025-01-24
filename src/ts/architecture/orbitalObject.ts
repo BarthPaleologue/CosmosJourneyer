@@ -144,6 +144,7 @@ export const enum OrbitalObjectType {
     JULIA_SET = 2001,
     MANDELBOX = 2002,
     SIERPINSKI_PYRAMID = 2003,
+    MENGER_SPONGE = 2004,
     SPACE_STATION = 3000,
     SPACE_ELEVATOR = 3001
 }

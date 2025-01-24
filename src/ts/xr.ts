@@ -24,22 +24,24 @@ import "@babylonjs/core/Misc/screenshotTools";
 import "@babylonjs/core/Rendering/depthRendererSceneComponent";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import "@babylonjs/core/Meshes/thinInstanceMesh";
-import { Mandelbulb } from "./anomalies/mandelbulb/mandelbulb";
 import { MandelbulbPostProcess } from "./anomalies/mandelbulb/mandelbulbPostProcess";
 import { Scene } from "@babylonjs/core/scene";
-import { JuliaSet } from "./anomalies/julia/juliaSet";
 import { JuliaSetPostProcess } from "./anomalies/julia/juliaSetPostProcess";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
 import { ArcRotateCamera, Engine, PostProcess } from "@babylonjs/core";
-import { newSeededMandelbulbModel } from "./anomalies/mandelbulb/mandelbulbModel";
-import { newSeededJuliaSetModel } from "./anomalies/julia/juliaSetModel";
-import { newSeededMandelboxModel } from "./anomalies/mandelbox/mandelboxModel";
+import { MandelbulbModel, newSeededMandelbulbModel } from "./anomalies/mandelbulb/mandelbulbModel";
+import { JuliaSetModel, newSeededJuliaSetModel } from "./anomalies/julia/juliaSetModel";
+import { MandelboxModel, newSeededMandelboxModel } from "./anomalies/mandelbox/mandelboxModel";
 import { MandelboxPostProcess } from "./anomalies/mandelbox/mandelboxPostProcess";
-import { Mandelbox } from "./anomalies/mandelbox/mandelbox";
 import { UpdatablePostProcess } from "./postProcesses/updatablePostProcess";
-import { newSeededSierpinskiPyramidModel } from "./anomalies/sierpinskiPyramid/sierpinskiPyramidModel";
-import { SierpinskiPyramid } from "./anomalies/sierpinskiPyramid/sierpinskiPyramid";
+import {
+    newSeededSierpinskiPyramidModel,
+    SierpinskiPyramidModel
+} from "./anomalies/sierpinskiPyramid/sierpinskiPyramidModel";
 import { SierpinskiPyramidPostProcess } from "./anomalies/sierpinskiPyramid/sierpinskiPyramidPostProcess";
+import { EmptyCelestialBody } from "./utils/emptyCelestialBody";
+import { MengerSpongeModel, newSeededMengerSpongeModel } from "./anomalies/mengerSponge/mengerSpongeModel";
+import { MengerSpongePostProcess } from "./anomalies/mengerSponge/mengerSpongePostProcess";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -63,7 +65,7 @@ const depthRenderer = scene.enableDepthRenderer(null, false, true);
 
 function createMandelbulb(): TransformNode {
     const mandelBulbModel = newSeededMandelbulbModel(Math.random() * 100_000, "XR Anomaly", []);
-    const mandelbulb = new Mandelbulb(mandelBulbModel, scene);
+    const mandelbulb = new EmptyCelestialBody<MandelbulbModel>(mandelBulbModel, scene);
     mandelbulb.getTransform().scalingDeterminant = 1 / 400e3;
 
     const mandelbulbPP = new MandelbulbPostProcess(
@@ -81,7 +83,7 @@ function createMandelbulb(): TransformNode {
 
 function createJulia(): TransformNode {
     const juliaModel = newSeededJuliaSetModel(Math.random() * 100_000, "XR Anomaly", []);
-    const julia = new JuliaSet(juliaModel, scene);
+    const julia = new EmptyCelestialBody<JuliaSetModel>(juliaModel, scene);
     julia.getTransform().scalingDeterminant = 1 / 400e3;
 
     const juliaPP = new JuliaSetPostProcess(
@@ -99,8 +101,8 @@ function createJulia(): TransformNode {
 
 function createMandelbox(): TransformNode {
     const mandelboxModel = newSeededMandelboxModel(Math.random() * 100_000, "XR Anomaly", []);
-    const mandelbox = new Mandelbox(mandelboxModel, scene);
-    mandelbox.getTransform().scalingDeterminant = 1 / 400e3;
+    const mandelbox = new EmptyCelestialBody<MandelboxModel>(mandelboxModel, scene);
+    mandelbox.getTransform().scalingDeterminant = 1 / 100e3;
 
     const mandelboxPP = new MandelboxPostProcess(
         mandelbox.getTransform(),
@@ -117,8 +119,8 @@ function createMandelbox(): TransformNode {
 
 function createSierpinskiPyramid(): TransformNode {
     const sierpinskiPyramidModel = newSeededSierpinskiPyramidModel(Math.random() * 100_000, "XR Anomaly", []);
-    const sierpinskiPyramid = new SierpinskiPyramid(sierpinskiPyramidModel, scene);
-    sierpinskiPyramid.getTransform().scalingDeterminant = 1 / 400e3;
+    const sierpinskiPyramid = new EmptyCelestialBody<SierpinskiPyramidModel>(sierpinskiPyramidModel, scene);
+    sierpinskiPyramid.getTransform().scalingDeterminant = 1 / 100e3;
 
     const sierpinskiPyramidPP = new SierpinskiPyramidPostProcess(
         sierpinskiPyramid.getTransform(),
@@ -131,6 +133,24 @@ function createSierpinskiPyramid(): TransformNode {
     setupPP(sierpinskiPyramidPP);
 
     return sierpinskiPyramid.getTransform();
+}
+
+function createMengerSponge(): TransformNode {
+    const mengerSpongeModel = newSeededMengerSpongeModel(Math.random() * 100_000, "XR Anomaly", []);
+    const mengerSponge = new EmptyCelestialBody<MengerSpongeModel>(mengerSpongeModel, scene);
+    mengerSponge.getTransform().scalingDeterminant = 1 / 100e3;
+
+    const mengerSpongePP = new MengerSpongePostProcess(
+        mengerSponge.getTransform(),
+        mengerSponge.getBoundingRadius(),
+        mengerSpongeModel,
+        scene,
+        []
+    );
+
+    setupPP(mengerSpongePP);
+
+    return mengerSponge.getTransform();
 }
 
 function setupPP(pp: PostProcess & UpdatablePostProcess) {
@@ -153,8 +173,10 @@ if (sceneType === "mandelbulb") {
     createJulia();
 } else if (sceneType === "mandelbox") {
     createMandelbox();
-} else {
+} else if (sceneType === "pyramid") {
     createSierpinskiPyramid();
+} else {
+    createMengerSponge();
 }
 
 const xr = await scene.createDefaultXRExperienceAsync();

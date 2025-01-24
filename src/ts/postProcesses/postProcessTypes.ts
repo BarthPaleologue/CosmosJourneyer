@@ -26,6 +26,7 @@ export const enum PostProcessType {
     JULIA_SET,
     MANDELBOX,
     SIERPINSKI_PYRAMID,
+    MENGER_SPONGE,
     BLACK_HOLE,
     SHADOW,
     LENS_FLARE

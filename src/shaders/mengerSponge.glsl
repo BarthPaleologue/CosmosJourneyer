@@ -19,8 +19,6 @@ precision highp float;
 
 varying vec2 vUV;
 
-uniform float mr2;
-uniform float spread;
 uniform vec3 accentColor;
 uniform float elapsedSeconds;
 uniform float averageScreenSize;
@@ -44,25 +42,45 @@ uniform sampler2D depthSampler;
 
 #include "./utils/pbr.glsl";
 
-// Mandelbox DE from 
-// http://www.fractalforums.com/3d-fractal-generation/a-mandelbox-distance-estimate-formula/msg21412/#msg21412
-// taken from https://www.shadertoy.com/view/llGXDR
-#define ITERS 10
-#define SCALE 3.0
+float sdBox( vec3 p, vec3 b ) {
+  vec3  di = abs(p) - b;
+  float mc = max(di.x,max(di.y,di.z));
+  return min(mc,length(max(di,0.0)));
+}
 
-float distanceEstimator(vec3 position) {
-    float MR2 = mr2;
-    vec4 scalevec = vec4(SCALE, SCALE, SCALE, abs(SCALE)) / MR2;
-    float C1 = abs(SCALE-1.0), C2 = pow(abs(SCALE), float(1-ITERS));
+float boxIntersect( in vec3 ro, in vec3 rd, in vec3 rad ) {
+    vec3 m = 1.0/rd;
+    vec3 n = m*ro;
+    vec3 k = abs(m)*rad;
+	
+    vec3 t1 = -n - k;
+    vec3 t2 = -n + k;
 
-  vec4 p = vec4(position.xyz, 1.0), p0 = vec4(position.xyz, 1.0);  // p.w is knighty's DEfactor
-  for (int i=0; i<ITERS; i++) {
-    p.xyz = clamp(p.xyz, -1.0, 1.0) * 2.0 - p.xyz;  // box fold: min3, max3, mad3
-    float r2 = dot(p.xyz, p.xyz);  // dp3
-    p.xyzw *= clamp(max(MR2/r2, MR2), 0.0, 1.0);  // sphere fold: div1, max1.sat, mul4
-    p.xyzw = p*scalevec + p0 * spread;  // mad4
-  }
-  return (length(p.xyz) - C1) / p.w - C2;
+	float tN = max( max( t1.x, t1.y ), t1.z );
+	float tF = min( min( t2.x, t2.y ), t2.z );
+	
+	if( tN > tF || tF < 0.0) return 1e30;
+	return tN;
+}
+
+//https://www.shadertoy.com/view/XttfRN
+float distanceEstimator( in vec3 p ) {
+    float d = sdBox(p,vec3(1.0));
+    float s = .5;
+    for( int m=0; m<7; m++ ) {
+        vec3 a = fract( p*s )-.5;
+        s *= 3.;
+        vec3 r = abs(1.-6.*abs(a));
+        float da = max(r.x,r.y);
+        float db = max(r.y,r.z);
+        float dc = max(r.z,r.x);
+        float c = (min(da,min(db,dc))-1.0)/(2.*s);
+
+        if( c>d ) {
+          d = c;
+        }
+    }
+    return d;
 }
 
 #include "./utils/rayMarching.glsl";
@@ -84,7 +102,7 @@ void main() {
     }
 
     // scale down so that everything happens in a sphere of radius 2
-    float inverseScaling = 3.0 * SCALE / (1.0 * object_radius * object_scaling_determinant);
+    float inverseScaling = 2.0 / (1.0 * object_radius * object_scaling_determinant);
 
     vec3 origin = camera_position - object_position; // the ray origin in world space
     origin *= inverseScaling;
