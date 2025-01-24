@@ -40,6 +40,8 @@ import {
 } from "./anomalies/sierpinskiPyramid/sierpinskiPyramidModel";
 import { SierpinskiPyramidPostProcess } from "./anomalies/sierpinskiPyramid/sierpinskiPyramidPostProcess";
 import { EmptyCelestialBody } from "./utils/emptyCelestialBody";
+import { MengerSpongeModel, newSeededMengerSpongeModel } from "./anomalies/mengerSponge/mengerSpongeModel";
+import { MengerSpongePostProcess } from "./anomalies/mengerSponge/mengerSpongePostProcess";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -100,7 +102,7 @@ function createJulia(): TransformNode {
 function createMandelbox(): TransformNode {
     const mandelboxModel = newSeededMandelboxModel(Math.random() * 100_000, "XR Anomaly", []);
     const mandelbox = new EmptyCelestialBody<MandelboxModel>(mandelboxModel, scene);
-    mandelbox.getTransform().scalingDeterminant = 1 / 400e3;
+    mandelbox.getTransform().scalingDeterminant = 1 / 100e3;
 
     const mandelboxPP = new MandelboxPostProcess(
         mandelbox.getTransform(),
@@ -118,7 +120,7 @@ function createMandelbox(): TransformNode {
 function createSierpinskiPyramid(): TransformNode {
     const sierpinskiPyramidModel = newSeededSierpinskiPyramidModel(Math.random() * 100_000, "XR Anomaly", []);
     const sierpinskiPyramid = new EmptyCelestialBody<SierpinskiPyramidModel>(sierpinskiPyramidModel, scene);
-    sierpinskiPyramid.getTransform().scalingDeterminant = 1 / 400e3;
+    sierpinskiPyramid.getTransform().scalingDeterminant = 1 / 100e3;
 
     const sierpinskiPyramidPP = new SierpinskiPyramidPostProcess(
         sierpinskiPyramid.getTransform(),
@@ -131,6 +133,24 @@ function createSierpinskiPyramid(): TransformNode {
     setupPP(sierpinskiPyramidPP);
 
     return sierpinskiPyramid.getTransform();
+}
+
+function createMengerSponge(): TransformNode {
+    const mengerSpongeModel = newSeededMengerSpongeModel(Math.random() * 100_000, "XR Anomaly", []);
+    const mengerSponge = new EmptyCelestialBody<MengerSpongeModel>(mengerSpongeModel, scene);
+    mengerSponge.getTransform().scalingDeterminant = 1 / 100e3;
+
+    const mengerSpongePP = new MengerSpongePostProcess(
+        mengerSponge.getTransform(),
+        mengerSponge.getBoundingRadius(),
+        mengerSpongeModel,
+        scene,
+        []
+    );
+
+    setupPP(mengerSpongePP);
+
+    return mengerSponge.getTransform();
 }
 
 function setupPP(pp: PostProcess & UpdatablePostProcess) {
@@ -153,8 +173,10 @@ if (sceneType === "mandelbulb") {
     createJulia();
 } else if (sceneType === "mandelbox") {
     createMandelbox();
-} else {
+} else if (sceneType === "pyramid") {
     createSierpinskiPyramid();
+} else {
+    createMengerSponge();
 }
 
 const xr = await scene.createDefaultXRExperienceAsync();
