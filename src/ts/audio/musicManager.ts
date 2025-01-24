@@ -132,12 +132,7 @@ export class MusicManager {
         }
 
         if (spaceship.isWarpDriveEnabled()) {
-            const suitableMusics = [
-                Musics.ATLANTEAN_TWILIGHT,
-                Musics.INFINITE_PERSPECTIVE,
-                Musics.DANSE_MORIALTA,
-                Musics.MESMERIZE
-            ];
+            const suitableMusics = [Musics.ATLANTEAN_TWILIGHT, Musics.INFINITE_PERSPECTIVE, Musics.MESMERIZE];
 
             this.setMusicFromSelection(suitableMusics);
             return;

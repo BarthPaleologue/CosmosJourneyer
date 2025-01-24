@@ -28,7 +28,6 @@ import atlanteanTwilight from "../../asset/sound/music/Atlantean_Twilight.mp3";
 import infinitePerspective from "../../asset/sound/music/Infinite_Perspective.ogg";
 import thatZenMoment from "../../asset/sound/music/That_Zen_Moment.ogg";
 import echoesOfTime from "../../asset/sound/music/Echoes_of_Time_v2.ogg";
-import danseMorialta from "../../asset/sound/music/Danse_Morialta.mp3";
 import peaceOfMind from "../../asset/sound/music/Peace_of_Mind.ogg";
 import spacialWinds from "../../asset/sound/music/Horror_Spacial_Winds.mp3";
 import mesmerize from "../../asset/sound/music/Mesmerize.ogg";
@@ -51,8 +50,6 @@ export class Musics {
 
     public static ECHOES_OF_TIME: Sound;
 
-    public static DANSE_MORIALTA: Sound;
-
     public static PEACE_OF_MIND: Sound;
 
     public static SPACIAL_WINDS: Sound;
@@ -62,7 +59,10 @@ export class Musics {
     public static REAWAKENING: Sound;
 
     public static EnqueueTasks(manager: AssetsManager, scene: Scene) {
-        const starMapBackgroundMusicTask = manager.addBinaryFileTask("starMapBackgroundMusicTask", starMapBackgroundMusic);
+        const starMapBackgroundMusicTask = manager.addBinaryFileTask(
+            "starMapBackgroundMusicTask",
+            starMapBackgroundMusic
+        );
         starMapBackgroundMusicTask.onSuccess = (task) => {
             Musics.STAR_MAP = new Sound("StarMapBackgroundMusic", task.data, scene, null, {
                 loop: true
@@ -107,12 +107,6 @@ export class Musics {
         echoesOfTimeTask.onSuccess = (task) => {
             Musics.ECHOES_OF_TIME = new Sound("EchoesOfTime", task.data, scene);
             console.log("Echoes of Time sound loaded");
-        };
-
-        const danseMorialtaTask = manager.addBinaryFileTask("danseMorialtaTask", danseMorialta);
-        danseMorialtaTask.onSuccess = (task) => {
-            Musics.DANSE_MORIALTA = new Sound("DanseMorialta", task.data, scene);
-            console.log("Danse Morialta sound loaded");
         };
 
         const peaceOfMindTask = manager.addBinaryFileTask("peaceOfMindTask", peaceOfMind);
