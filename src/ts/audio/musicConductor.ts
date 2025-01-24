@@ -103,11 +103,13 @@ export class MusicConductor {
             this.setMusic(Musics.STAR_MAP);
             return;
         }
+
         if (isInMainMenu) {
             this.setMusic(Musics.MAIN_MENU);
             return;
         }
-        if (spaceship.isLanding()) {
+
+        if (!spaceship.isLanded() && spaceship.getTargetLandingPad() !== null) {
             this.setMusic(Musics.STRAUSS_BLUE_DANUBE);
             return;
         }
