@@ -93,6 +93,10 @@ export class MusicConductor {
             return;
         }
 
+        if (this.starSystemView.isLoadingSystem()) {
+            return;
+        }
+
         const shipControls = this.starSystemView.getSpaceshipControls();
         const spaceship = shipControls.getSpaceship();
         const isOnFoot = this.starSystemView.scene.getActiveControls() === this.starSystemView.getCharacterControls();
