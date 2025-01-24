@@ -463,7 +463,8 @@ export class CosmosJourneyer {
             this.musicManager.update(
                 this.isPaused(),
                 this.activeView === this.starSystemView,
-                this.mainMenu.isVisible()
+                this.mainMenu.isVisible(),
+                deltaSeconds
             );
 
             if (this.isPaused()) return;

@@ -7,6 +7,11 @@ import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 export class MusicManager {
     private currentMusic: Sound | null = null;
 
+    /**
+     * The number of seconds to wait before playing a new music.
+     */
+    private silenceSeconds = 0;
+
     private volume = 1;
     private readonly fadeSeconds = 1;
 
@@ -63,7 +68,7 @@ export class MusicManager {
         }
     }
 
-    public update(isPaused: boolean, isInStarSystemView: boolean, isInMainMenu: boolean) {
+    public update(isPaused: boolean, isInStarSystemView: boolean, isInMainMenu: boolean, deltaSeconds: number) {
         if (isPaused && this.currentMusic?.isPlaying) {
             this.currentMusic.pause();
             return;
@@ -75,6 +80,12 @@ export class MusicManager {
         // if the music has finished playing, set it to null
         if (!isPaused && this.currentMusic !== null && !this.currentMusic.isPlaying) {
             this.currentMusic = null;
+            this.silenceSeconds = 30 + (Math.random() - 0.5) * 20;
+        }
+
+        if (this.silenceSeconds > 0) {
+            this.silenceSeconds -= deltaSeconds;
+            return;
         }
 
         const spaceship = this.starSystemView.getSpaceshipControls().getSpaceship();
