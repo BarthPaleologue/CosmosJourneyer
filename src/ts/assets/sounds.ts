@@ -200,7 +200,7 @@ export class Sounds {
             Sounds.ACCELERATING_WARP_DRIVE_SOUND = new Sound("AcceleratingWarpDriveSound", task.data, scene);
             Sounds.ACCELERATING_WARP_DRIVE_SOUND.updateOptions({
                 playbackRate: 1.0,
-                volume: 0.1,
+                volume: 0.3,
                 loop: true
             });
 
@@ -215,7 +215,7 @@ export class Sounds {
             Sounds.DECELERATING_WARP_DRIVE_SOUND = new Sound("DeceleratingWarpDriveSound", task.data, scene);
             Sounds.DECELERATING_WARP_DRIVE_SOUND.updateOptions({
                 playbackRate: 1.0,
-                volume: 0.1,
+                volume: 0.3,
                 loop: true
             });
 
