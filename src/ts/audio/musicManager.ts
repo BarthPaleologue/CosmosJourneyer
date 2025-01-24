@@ -3,6 +3,7 @@ import { Musics } from "../assets/musics";
 import { StarSystemView } from "../starSystem/starSystemView";
 import { OrbitalObjectType } from "../architecture/orbitalObject";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export class MusicManager {
     private currentMusic: Sound | null = null;
@@ -93,6 +94,11 @@ export class MusicManager {
         const playerPosition = this.starSystemView.scene.getActiveControls().getTransform().getAbsolutePosition();
         const closestOrbitalObject = this.starSystemView.getStarSystem().getNearestOrbitalObject(playerPosition);
 
+        const distanceToClosestObject = Vector3.Distance(
+            playerPosition,
+            closestOrbitalObject.getTransform().getAbsolutePosition()
+        );
+
         if (!isInStarSystemView) {
             this.setMusic(Musics.STAR_MAP);
             return;
@@ -117,8 +123,11 @@ export class MusicManager {
                 case OrbitalObjectType.MANDELBOX:
                 case OrbitalObjectType.SIERPINSKI_PYRAMID:
                 case OrbitalObjectType.MENGER_SPONGE:
-                    this.setMusicFromSelection([Musics.SPACIAL_WINDS]);
-                    return;
+                    if (distanceToClosestObject < closestOrbitalObject.getBoundingRadius() * 100) {
+                        this.setMusicFromSelection([Musics.SPACIAL_WINDS]);
+                        return;
+                    }
+                    break;
 
                 case OrbitalObjectType.STAR:
                 case OrbitalObjectType.NEUTRON_STAR:
