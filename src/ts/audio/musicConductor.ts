@@ -93,7 +93,8 @@ export class MusicConductor {
             return;
         }
 
-        const spaceship = this.starSystemView.getSpaceshipControls().getSpaceship();
+        const shipControls = this.starSystemView.getSpaceshipControls();
+        const spaceship = shipControls.getSpaceship();
         const isOnFoot = this.starSystemView.scene.getActiveControls() === this.starSystemView.getCharacterControls();
         const playerPosition = this.starSystemView.scene.getActiveControls().getTransform().getAbsolutePosition();
         const closestOrbitalObject = this.starSystemView.getStarSystem().getNearestOrbitalObject(playerPosition);
@@ -121,7 +122,7 @@ export class MusicConductor {
         if (!spaceship.isLanded()) {
             switch (closestOrbitalObject.model.type) {
                 case OrbitalObjectType.BLACK_HOLE:
-                    this.setMusicFromSelection([Musics.ECHOES_OF_TIME]);
+                    this.setMusicFromSelection([Musics.SOARING]);
                     return;
 
                 case OrbitalObjectType.MANDELBULB:
@@ -130,7 +131,7 @@ export class MusicConductor {
                 case OrbitalObjectType.SIERPINSKI_PYRAMID:
                 case OrbitalObjectType.MENGER_SPONGE:
                     if (distanceToClosestObject < closestOrbitalObject.getBoundingRadius() * 100) {
-                        this.setMusicFromSelection([Musics.SPACIAL_WINDS]);
+                        this.setMusicFromSelection([Musics.SPACIAL_WINDS, Musics.ECHOES_OF_TIME]);
                         return;
                     }
                     break;
@@ -140,9 +141,16 @@ export class MusicConductor {
                 case OrbitalObjectType.TELLURIC_PLANET:
                 case OrbitalObjectType.TELLURIC_SATELLITE:
                 case OrbitalObjectType.GAS_PLANET:
+                    break;
                 case OrbitalObjectType.SPACE_STATION:
                 case OrbitalObjectType.SPACE_ELEVATOR:
-                    break;
+                    if (
+                        !spaceship.isWarpDriveEnabled() &&
+                        distanceToClosestObject < closestOrbitalObject.getBoundingRadius() * 10
+                    ) {
+                        this.setMusic(Musics.EQUATORIAL_COMPLEX);
+                        return;
+                    }
             }
         }
 

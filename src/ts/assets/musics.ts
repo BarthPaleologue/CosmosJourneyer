@@ -32,6 +32,8 @@ import peaceOfMind from "../../asset/sound/music/Peace_of_Mind.ogg";
 import spacialWinds from "../../asset/sound/music/Horror_Spacial_Winds.mp3";
 import mesmerize from "../../asset/sound/music/Mesmerize.ogg";
 import reawakening from "../../asset/sound/music/Reawakening.mp3";
+import equatorialComplex from "../../asset/sound/music/Equatorial-Complex.ogg";
+import soaring from "../../asset/sound/music/Soaring.ogg";
 
 export class Musics {
     public static STAR_MAP: Sound;
@@ -57,6 +59,10 @@ export class Musics {
     public static MESMERIZE: Sound;
 
     public static REAWAKENING: Sound;
+
+    public static EQUATORIAL_COMPLEX: Sound;
+
+    public static SOARING: Sound;
 
     public static EnqueueTasks(manager: AssetsManager, scene: Scene) {
         const starMapBackgroundMusicTask = manager.addBinaryFileTask(
@@ -131,6 +137,18 @@ export class Musics {
         reawakeningTask.onSuccess = (task) => {
             Musics.REAWAKENING = new Sound("Reawakening", task.data, scene);
             console.log("Reawakening sound loaded");
+        };
+
+        const equatorialComplexTask = manager.addBinaryFileTask("equatorialComplexTask", equatorialComplex);
+        equatorialComplexTask.onSuccess = (task) => {
+            Musics.EQUATORIAL_COMPLEX = new Sound("EquatorialComplex", task.data, scene);
+            console.log("Equatorial Complex sound loaded");
+        };
+
+        const soaringTask = manager.addBinaryFileTask("soaringTask", soaring);
+        soaringTask.onSuccess = (task) => {
+            Musics.SOARING = new Sound("Soaring", task.data, scene);
+            console.log("Soaring sound loaded");
         };
     }
 }
