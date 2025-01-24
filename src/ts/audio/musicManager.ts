@@ -15,6 +15,14 @@ export class MusicManager {
         this.starSystemView = starSystemView;
     }
 
+    public setMusicFromSelection(musicSelection: Sound[]) {
+        if (this.currentMusic !== null && musicSelection.includes(this.currentMusic)) {
+            return;
+        }
+
+        this.setMusic(musicSelection[Math.floor(Math.random() * musicSelection.length)]);
+    }
+
     public setMusic(sound: Sound) {
         if (this.currentMusic === sound) {
             return;
@@ -49,6 +57,11 @@ export class MusicManager {
             return;
         }
 
+        // if the music has finished playing, set it to null
+        if (!isPaused && this.currentMusic !== null && !this.currentMusic.isPlaying) {
+            this.currentMusic = null;
+        }
+
         const spaceship = this.starSystemView.getSpaceshipControls().getSpaceship();
         const isOnFoot = this.starSystemView.scene.getActiveControls() === this.starSystemView.getCharacterControls();
         const playerPosition = this.starSystemView.scene.getActiveControls().getTransform().getAbsolutePosition();
@@ -67,17 +80,19 @@ export class MusicManager {
             return;
         }
 
-        const musicPriorityMap = new Map<Sound, number>();
         if (!spaceship.isLanded()) {
             switch (closestOrbitalObject.model.type) {
                 case OrbitalObjectType.BLACK_HOLE:
-                    musicPriorityMap.set(Musics.ECHOES_OF_TIME, (musicPriorityMap.get(Musics.ECHOES_OF_TIME) ?? 0) + 200);
-                    break;
+                    this.setMusicFromSelection([Musics.ECHOES_OF_TIME]);
+                    return;
 
                 case OrbitalObjectType.MANDELBULB:
                 case OrbitalObjectType.JULIA_SET:
-                    musicPriorityMap.set(Musics.SPACIAL_WINDS, (musicPriorityMap.get(Musics.SPACIAL_WINDS) ?? 0) + 200);
-                    break;
+                case OrbitalObjectType.MANDELBOX:
+                case OrbitalObjectType.SIERPINSKI_PYRAMID:
+                case OrbitalObjectType.MENGER_SPONGE:
+                    this.setMusicFromSelection([Musics.SPACIAL_WINDS]);
+                    return;
 
                 case OrbitalObjectType.STAR:
                 case OrbitalObjectType.NEUTRON_STAR:
@@ -89,44 +104,36 @@ export class MusicManager {
                     break;
             }
         }
+
         if (spaceship.isWarpDriveEnabled()) {
-            const suitableMusics = [Musics.ATLANTEAN_TWILIGHT, Musics.INFINITE_PERSPECTIVE, Musics.DANSE_MORIALTA, Musics.MESMERIZE];
-            if (this.currentMusic !== null && suitableMusics.includes(this.currentMusic)) {
-                musicPriorityMap.set(this.currentMusic, (musicPriorityMap.get(this.currentMusic) ?? 0) + 160);
-            } else {
-                suitableMusics.forEach((music) => musicPriorityMap.set(music, (musicPriorityMap.get(music) ?? 0) + 160));
-            }
+            const suitableMusics = [
+                Musics.ATLANTEAN_TWILIGHT,
+                Musics.INFINITE_PERSPECTIVE,
+                Musics.DANSE_MORIALTA,
+                Musics.MESMERIZE
+            ];
+
+            this.setMusicFromSelection(suitableMusics);
+            return;
         }
+
         if (!spaceship.isLanded() && !spaceship.isWarpDriveEnabled()) {
             const suitableMusics = [Musics.THAT_ZEN_MOMENT, Musics.DEEP_RELAXATION, Musics.PEACE_OF_MIND];
-            if (this.currentMusic !== null && suitableMusics.includes(this.currentMusic)) {
-                musicPriorityMap.set(this.currentMusic, (musicPriorityMap.get(this.currentMusic) ?? 0) + 150);
-            } else {
-                suitableMusics.forEach((music) => musicPriorityMap.set(music, (musicPriorityMap.get(music) ?? 0) + 150));
-            }
+            this.setMusicFromSelection(suitableMusics);
+            return;
         }
+
         if (isOnFoot) {
-            const suitableMusics = [Musics.THAT_ZEN_MOMENT, Musics.DEEP_RELAXATION, Musics.PEACE_OF_MIND, Musics.MESMERIZE, Musics.REAWAKENING];
-            if (this.currentMusic !== null && suitableMusics.includes(this.currentMusic)) {
-                musicPriorityMap.set(this.currentMusic, (musicPriorityMap.get(this.currentMusic) ?? 0) + 140);
-            } else {
-                suitableMusics.forEach((music) => musicPriorityMap.set(music, (musicPriorityMap.get(music) ?? 0) + 140));
-            }
-        }
+            const suitableMusics = [
+                Musics.THAT_ZEN_MOMENT,
+                Musics.DEEP_RELAXATION,
+                Musics.PEACE_OF_MIND,
+                Musics.MESMERIZE,
+                Musics.REAWAKENING
+            ];
 
-        const sortedMusic = Array.from(musicPriorityMap.entries()).sort((a, b) => b[1] - a[1]);
-        const highestPriorityMusic = sortedMusic.at(0);
-        if (highestPriorityMusic === undefined) {
+            this.setMusicFromSelection(suitableMusics);
             return;
         }
-
-        const highestPriority = highestPriorityMusic[1];
-        const possibleMusics = sortedMusic.filter((music) => music[1] === highestPriority);
-        if (possibleMusics.length === 0) {
-            return;
-        }
-
-        const randomIndex = Math.floor(Math.random() * possibleMusics.length);
-        this.setMusic(possibleMusics[randomIndex][0]);
     }
 }
