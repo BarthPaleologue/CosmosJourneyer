@@ -5,7 +5,7 @@ import { OrbitalObjectType } from "../architecture/orbitalObject";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-export class MusicManager {
+export class MusicConductor {
     private currentMusic: Sound | null = null;
 
     /**
