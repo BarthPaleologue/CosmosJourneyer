@@ -167,5 +167,7 @@ export class MusicConductor {
             this.setMusicFromSelection(suitableMusics);
             return;
         }
+
+        this.silenceSeconds = 30 + (Math.random() - 0.5) * 20;
     }
 }
