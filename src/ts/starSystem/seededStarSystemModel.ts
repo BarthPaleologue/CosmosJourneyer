@@ -151,9 +151,8 @@ export function newSeededStarSystemModel(
     const anomalies: AnomalyModel[] = [];
     const nbAnomalies = wheelOfFortune(
         [
-            [0, 0.95],
-            [1, 0.04],
-            [2, 0.01]
+            [0, 0.96],
+            [1, 0.04]
         ],
         systemRng(GenerationSteps.ANOMALIES)
     );
