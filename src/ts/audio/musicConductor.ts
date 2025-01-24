@@ -44,8 +44,8 @@ export class MusicConductor {
         this.setMusic(musicSelection[Math.floor(Math.random() * musicSelection.length)]);
     }
 
-    public setMusic(sound: Sound) {
-        if (this.currentMusic === sound) {
+    public setMusic(newMusic: Sound | null) {
+        if (this.currentMusic === newMusic) {
             return;
         }
 
@@ -54,7 +54,11 @@ export class MusicConductor {
             this.currentMusic.stop(this.fadeSeconds);
         }
 
-        this.currentMusic = sound;
+        if (newMusic === null) {
+            return;
+        }
+
+        this.currentMusic = newMusic;
         this.currentMusic.stop();
         this.currentMusic.setVolume(0);
         this.currentMusic.play();
@@ -168,6 +172,6 @@ export class MusicConductor {
             return;
         }
 
-        this.silenceSeconds = 30 + (Math.random() - 0.5) * 20;
+        this.setMusic(null);
     }
 }
