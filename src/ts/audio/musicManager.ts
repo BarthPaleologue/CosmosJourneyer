@@ -2,6 +2,7 @@ import { Sound } from "@babylonjs/core/Audio/sound";
 import { Musics } from "../assets/musics";
 import { StarSystemView } from "../starSystem/starSystemView";
 import { OrbitalObjectType } from "../architecture/orbitalObject";
+import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 
 export class MusicManager {
     private currentMusic: Sound | null = null;
@@ -13,6 +14,20 @@ export class MusicManager {
 
     constructor(starSystemView: StarSystemView) {
         this.starSystemView = starSystemView;
+
+        const audioEngine = AbstractEngine.audioEngine;
+
+        if (audioEngine === null) {
+            throw new Error("Audio context is null");
+        }
+
+        audioEngine.onAudioUnlockedObservable.add(() => {
+            if (this.currentMusic !== null) {
+                const copy = this.currentMusic;
+                this.currentMusic = null;
+                this.setMusic(copy);
+            }
+        });
     }
 
     public setMusicFromSelection(musicSelection: Sound[]) {
