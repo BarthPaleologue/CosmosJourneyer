@@ -17,7 +17,7 @@
 
 import { Transformable } from "./transformable";
 import { HasBoundingSphere } from "./hasBoundingSphere";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math";
+import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math";
 import { getRotationQuaternion, setRotationQuaternion, translate } from "../uberCore/transforms/basicTransform";
 import { OrbitalObjectPhysicsInfo } from "./physicsInfo";
 import { TypedObject } from "./typedObject";
@@ -43,9 +43,14 @@ export class OrbitalObjectUtils {
      * @param elapsedSeconds The time elapsed since the beginning of time in seconds
      * @constructor
      */
-    static GetOrbitalPosition(object: OrbitalObject, parents: OrbitalObject[], elapsedSeconds: number): Vector3 {
+    static GetOrbitalPosition(
+        object: OrbitalObject,
+        parents: OrbitalObject[],
+        referencePlaneRotation: Matrix,
+        elapsedSeconds: number
+    ): Vector3 {
         const orbit = object.model.orbit;
-        if (orbit.period === 0 || parents.length === 0) return object.getTransform().getAbsolutePosition();
+        if (orbit.semiMajorAxis === 0 || parents.length === 0) return object.getTransform().getAbsolutePosition();
 
         const barycenter = Vector3.Zero(); //object.parent.getTransform().getAbsolutePosition();
         let sumOfMasses = 0;
@@ -56,7 +61,7 @@ export class OrbitalObjectUtils {
         }
         barycenter.scaleInPlace(1 / sumOfMasses);
 
-        return getPointOnOrbit(barycenter, orbit, elapsedSeconds);
+        return getPointOnOrbit(barycenter, sumOfMasses, orbit, elapsedSeconds, referencePlaneRotation);
     }
 
     /**
@@ -66,12 +71,22 @@ export class OrbitalObjectUtils {
      * @param elapsedSeconds The time elapsed since the beginning of time in seconds
      * @constructor
      */
-    static SetOrbitalPosition(object: OrbitalObject, parents: OrbitalObject[], elapsedSeconds: number): void {
+    static SetOrbitalPosition(
+        object: OrbitalObject,
+        parents: OrbitalObject[],
+        referencePlaneRotation: Matrix,
+        elapsedSeconds: number
+    ): void {
         const orbit = object.model.orbit;
-        if (orbit.period === 0 || parents.length === 0) return;
+        if (orbit.semiMajorAxis === 0 || parents.length === 0) return;
 
         const oldPosition = object.getTransform().getAbsolutePosition();
-        const newPosition = OrbitalObjectUtils.GetOrbitalPosition(object, parents, elapsedSeconds);
+        const newPosition = OrbitalObjectUtils.GetOrbitalPosition(
+            object,
+            parents,
+            referencePlaneRotation,
+            elapsedSeconds
+        );
         translate(object.getTransform(), newPosition.subtractInPlace(oldPosition));
     }
 

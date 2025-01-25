@@ -20,8 +20,8 @@ import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { CelestialBody, CelestialBodyModel } from "../architecture/celestialBody";
 import { TargetInfo, defaultTargetInfoCelestialBody } from "../architecture/targetable";
-import { setRotationQuaternion } from "../uberCore/transforms/basicTransform";
 import { getOrbitalObjectTypeToI18nString } from "./strings/orbitalObjectTypeToDisplay";
+import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 
 export class EmptyCelestialBody<T extends CelestialBodyModel> implements CelestialBody {
     readonly model: T;
@@ -42,8 +42,7 @@ export class EmptyCelestialBody<T extends CelestialBodyModel> implements Celesti
         this.model = model;
 
         this.transform = new TransformNode(this.model.name, scene);
-
-        setRotationQuaternion(this.getTransform(), this.model.physics.axialTilt);
+        this.transform.rotate(Axis.X, this.model.orbit.inclination + this.model.physics.axialTilt, Space.WORLD);
 
         this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());
     }

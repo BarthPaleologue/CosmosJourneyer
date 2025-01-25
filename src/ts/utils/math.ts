@@ -62,3 +62,29 @@ export function gcd(a: number, b: number): number {
     }
     return gcd(b, a % b);
 }
+
+/**
+ * Finds the value that minimizes of the given function using the Newton-Raphson method.
+ * @param f The function to minimize
+ * @param startingPoint The starting point for the search
+ * @param maxIterations The maximum number of iterations to perform for the search
+ * @returns The value that minimizes the function
+ */
+export function findMinimumNewtonRaphson(f: (x: number) => number, startingPoint: number, maxIterations = 100) {
+    const delta = 1e-4;
+    const tolerance = 1e-8;
+
+    let x = startingPoint;
+    for (let i = 0; i < maxIterations; i++) {
+        const fx = f(x);
+        if (Math.abs(fx) < tolerance) {
+            break;
+        }
+
+        const derivative = (f(x + delta) - fx) / delta;
+        const step = fx / derivative;
+        x -= step;
+    }
+
+    return x;
+}

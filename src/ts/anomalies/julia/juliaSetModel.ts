@@ -15,25 +15,23 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { normalRandom } from "extended-random";
+import { normalRandom, randRange } from "extended-random";
 import { clamp } from "../../utils/math";
-import { getOrbitalPeriod, getPeriapsis, Orbit } from "../../orbit/orbit";
+import { Orbit } from "../../orbit/orbit";
 import { OrbitalObjectPhysicsInfo } from "../../architecture/physicsInfo";
-import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { AnomalyModel } from "../anomaly";
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { OrbitalObjectType } from "../../architecture/orbitalObject";
-import { Quaternion } from "@babylonjs/core/Maths/math";
-import { Axis } from "@babylonjs/core/Maths/math.axis";
+import { Tools } from "@babylonjs/core/Misc/tools";
 
 export type JuliaSetModel = AnomalyModel & {
     readonly type: OrbitalObjectType.JULIA_SET;
     readonly accentColor: Color3;
 };
 
-export function newSeededJuliaSetModel(seed: number, name: string, parentBodies: CelestialBodyModel[]): JuliaSetModel {
+export function newSeededJuliaSetModel(seed: number, name: string): JuliaSetModel {
     const rng = getRngFromSeed(seed);
 
     const radius = 1000e3;
@@ -45,23 +43,24 @@ export function newSeededJuliaSetModel(seed: number, name: string, parentBodies:
     );
 
     // Todo: do not hardcode
-    let orbitRadius = rng(GenerationSteps.ORBIT) * 15e9;
+    const orbitRadius = rng(GenerationSteps.ORBIT) * 15e9;
 
     const orbitalP = clamp(0.5, 3.0, normalRandom(1.0, 0.3, rng, GenerationSteps.ORBIT + 80));
-    orbitRadius += orbitRadius - getPeriapsis(orbitRadius, orbitalP);
 
-    const parentMassSum = parentBodies?.reduce((sum, body) => sum + body.physics.mass, 0) ?? 0;
     const orbit: Orbit = {
-        radius: orbitRadius,
+        semiMajorAxis: orbitRadius,
         p: orbitalP,
-        period: getOrbitalPeriod(orbitRadius, parentMassSum),
-        orientation: Quaternion.Identity()
+        inclination: Tools.ToRadians(normalRandom(90, 20, rng, GenerationSteps.ORBIT + 160)),
+        eccentricity: randRange(0.1, 0.9, rng, GenerationSteps.ORBIT + 240),
+        longitudeOfAscendingNode: randRange(0, 2 * Math.PI, rng, GenerationSteps.ORBIT + 320),
+        argumentOfPeriapsis: randRange(0, 2 * Math.PI, rng, GenerationSteps.ORBIT + 400),
+        initialMeanAnomaly: randRange(0, 2 * Math.PI, rng, GenerationSteps.ORBIT + 480)
     };
 
     const physicalProperties: OrbitalObjectPhysicsInfo = {
         mass: 10,
         siderealDaySeconds: 0,
-        axialTilt: Quaternion.RotationAxis(Axis.X, normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT))
+        axialTilt: normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT)
     };
 
     return {

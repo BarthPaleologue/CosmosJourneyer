@@ -15,19 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getOrbitalPeriod, Orbit } from "../../orbit/orbit";
+import { Orbit } from "../../orbit/orbit";
 import { normalRandom } from "extended-random";
 import { BlackHolePhysicsInfo } from "../../architecture/physicsInfo";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { StellarObjectModel } from "../../architecture/stellarObject";
 import { Settings } from "../../settings";
 import { GenerationSteps } from "../../utils/generationSteps";
-
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { OrbitalObjectType } from "../../architecture/orbitalObject";
 import { estimateStarRadiusFromMass } from "../../utils/physics";
-import { Quaternion } from "@babylonjs/core/Maths/math";
-import { Axis } from "@babylonjs/core/Maths/math.axis";
 
 export type BlackHoleModel = StellarObjectModel & {
     readonly type: OrbitalObjectType.BLACK_HOLE;
@@ -54,19 +51,21 @@ export function newSeededBlackHoleModel(
     // TODO: do not hardcode
     const orbitRadius = parentBodies.length === 0 ? 0 : 2 * (parentMaxRadius + radius);
 
-    const parentMassSum = parentBodies?.reduce((sum, body) => sum + body.physics.mass, 0) ?? 0;
     const orbit: Orbit = {
-        radius: orbitRadius,
+        semiMajorAxis: parentBodies.length > 0 ? orbitRadius : 0,
+        eccentricity: 0,
         p: 2,
-        period: getOrbitalPeriod(orbitRadius, parentMassSum),
-        orientation: Quaternion.Identity()
+        inclination: 0,
+        longitudeOfAscendingNode: 0,
+        argumentOfPeriapsis: 0,
+        initialMeanAnomaly: 0
     };
 
     const physicalProperties: BlackHolePhysicsInfo = {
         mass: getMassFromSchwarzschildRadius(radius),
         //FIXME: do not hardcode
         siderealDaySeconds: 1.5e-19,
-        axialTilt: Quaternion.RotationAxis(Axis.X, normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT)),
+        axialTilt: normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT),
         accretionDiskRadius: radius * normalRandom(12, 3, rng, 7777),
         //TODO: compute temperature of accretion disk (function of rotation speed)
         blackBodyTemperature: 7_000

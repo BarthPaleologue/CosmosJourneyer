@@ -19,17 +19,15 @@ import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 import { Light } from "@babylonjs/core/Lights/light";
-import { Camera } from "@babylonjs/core/Cameras/camera";
 import { BlackHoleModel } from "./blackHoleModel";
 import { StellarObject } from "../../architecture/stellarObject";
-import { Cullable } from "../../utils/cullable";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
-import { setRotationQuaternion } from "../../uberCore/transforms/basicTransform";
 import { BlackHoleUniforms } from "./blackHoleUniforms";
+import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 
-export class BlackHole implements StellarObject, Cullable {
+export class BlackHole implements StellarObject {
     readonly name: string;
 
     private readonly transform: TransformNode;
@@ -52,7 +50,7 @@ export class BlackHole implements StellarObject, Cullable {
         this.name = this.model.name;
 
         this.transform = new TransformNode(this.model.name, scene);
-        setRotationQuaternion(this.getTransform(), this.model.physics.axialTilt);
+        this.getTransform().rotate(Axis.X, this.model.orbit.inclination + this.model.physics.axialTilt, Space.WORLD);
 
         this.light = new PointLight(`${this.model.name}Light`, Vector3.Zero(), scene);
         //this.light.diffuse.fromArray(getRgbFromTemperature(this.model.physicalProperties.temperature).asArray());
@@ -79,10 +77,6 @@ export class BlackHole implements StellarObject, Cullable {
 
     getTypeName(): string {
         return getOrbitalObjectTypeToI18nString(this.model);
-    }
-
-    public computeCulling(camera: Camera): void {
-        return;
     }
 
     public getRadius(): number {

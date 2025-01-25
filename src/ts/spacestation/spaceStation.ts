@@ -40,6 +40,7 @@ import { SpaceStationModel } from "./spacestationModel";
 import { OrbitalObject } from "../architecture/orbitalObject";
 import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
 import { setRotationQuaternion } from "../uberCore/transforms/basicTransform";
+import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 
 export class SpaceStation implements OrbitalFacility {
     readonly name: string;
@@ -83,7 +84,7 @@ export class SpaceStation implements OrbitalFacility {
             .getChildTransformNodes(true)
             .forEach((transform) => transform.position.addInPlace(deltaPosition));
 
-        setRotationQuaternion(this.getTransform(), this.model.physics.axialTilt);
+        this.getTransform().rotate(Axis.X, this.model.orbit.inclination + this.model.physics.axialTilt, Space.WORLD);
 
         const extendSize = boundingVectors.max.subtract(boundingVectors.min).scale(0.5);
         this.boundingRadius = Math.max(extendSize.x, extendSize.y, extendSize.z);

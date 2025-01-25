@@ -43,8 +43,7 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { SpaceElevatorClimber } from "./spaceElevatorClimber";
 import { clamp, remap, triangleWave } from "../utils/math";
 import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
-import { setRotationQuaternion } from "../uberCore/transforms/basicTransform";
-import { Axis } from "@babylonjs/core/Maths/math.axis";
+import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 
 export class SpaceElevator implements OrbitalFacility {
     readonly name: string;
@@ -123,7 +122,7 @@ export class SpaceElevator implements OrbitalFacility {
             .getChildTransformNodes(true)
             .forEach((transform) => transform.rotateAround(Vector3.Zero(), Axis.Z, -Math.PI / 2));
 
-        setRotationQuaternion(this.getTransform(), this.model.physics.axialTilt);
+        this.getTransform().rotate(Axis.X, this.model.orbit.inclination + this.model.physics.axialTilt, Space.WORLD);
 
         const extendSize = boundingVectors.max.subtract(boundingVectors.min).scale(0.5);
         this.boundingRadius = Math.max(extendSize.x, extendSize.y, extendSize.z);

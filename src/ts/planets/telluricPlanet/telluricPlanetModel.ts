@@ -25,9 +25,7 @@ import { Settings } from "../../settings";
 import { TelluricPlanetaryMassObjectPhysicsInfo } from "../../architecture/physicsInfo";
 import { celsiusToKelvin, hasLiquidWater } from "../../utils/physics";
 import { CloudsModel, newCloudsModel } from "../../clouds/cloudsModel";
-import { Quaternion } from "@babylonjs/core/Maths/math";
-import { Axis } from "@babylonjs/core/Maths/math.axis";
-import { getOrbitalPeriod, Orbit } from "../../orbit/orbit";
+import { Orbit } from "../../orbit/orbit";
 import { newSeededRingsModel, RingsModel } from "../../rings/ringsModel";
 import { TelluricPlanetaryMassObjectModel } from "./telluricPlanetaryMassObjectModel";
 import { clamp } from "../../utils/math";
@@ -68,7 +66,7 @@ export function newSeededTelluricPlanetModel(
 
     const physicalProperties: TelluricPlanetaryMassObjectPhysicsInfo = {
         mass: mass,
-        axialTilt: Quaternion.RotationAxis(Axis.X, normalRandom(0, 0.2, rng, GenerationSteps.AXIAL_TILT)),
+        axialTilt: normalRandom(0, 0.2, rng, GenerationSteps.AXIAL_TILT),
         siderealDaySeconds: (60 * 60 * 24) / 10,
         minTemperature: minTemperature,
         maxTemperature: maxTemperature,
@@ -102,14 +100,14 @@ export function newSeededTelluricPlanetModel(
     // Todo: do not hardcode
     const orbitRadius = 2e9 + rng(GenerationSteps.ORBIT) * 15e9 + parentMaxRadius * 1.5;
 
-    const orbitalP = 2; //clamp(normalRandom(2.0, 0.3, this.rng, GenerationSteps.Orbit + 80), 0.7, 3.0);
-
-    const parentMassSum = parentBodies.reduce((sum, body) => sum + body.physics.mass, 0);
     const orbit: Orbit = {
-        radius: orbitRadius,
-        p: orbitalP,
-        period: getOrbitalPeriod(orbitRadius, parentMassSum),
-        orientation: Quaternion.RotationAxis(Axis.X, (rng(GenerationSteps.ORBIT + 20) - 0.5) * 0.2)
+        semiMajorAxis: orbitRadius,
+        p: 2,
+        inclination: 0,
+        eccentricity: 0,
+        longitudeOfAscendingNode: 0,
+        argumentOfPeriapsis: 0,
+        initialMeanAnomaly: 0
     };
 
     const terrainSettings = {

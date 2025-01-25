@@ -33,11 +33,10 @@ import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
 import { Planet } from "../../architecture/planet";
-
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
-import { setRotationQuaternion } from "../../uberCore/transforms/basicTransform";
 import { AtmosphereUniforms } from "../../atmosphere/atmosphereUniforms";
 import { Settings } from "../../settings";
+import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 
 export class GasPlanet implements Planet, Cullable {
     private readonly mesh: Mesh;
@@ -108,7 +107,7 @@ export class GasPlanet implements Planet, Cullable {
             this.asteroidField = null;
         }
 
-        setRotationQuaternion(this.getTransform(), this.model.physics.axialTilt);
+        this.getTransform().rotate(Axis.X, this.model.orbit.inclination + this.model.physics.axialTilt, Space.WORLD);
 
         this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());
     }

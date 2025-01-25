@@ -30,7 +30,6 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { RingsUniforms } from "../../rings/ringsUniform";
-import { setRotationQuaternion } from "../../uberCore/transforms/basicTransform";
 import { CloudsUniforms } from "../../clouds/cloudsUniforms";
 import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
@@ -40,6 +39,7 @@ import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/t
 import { AtmosphereUniforms } from "../../atmosphere/atmosphereUniforms";
 import { Settings } from "../../settings";
 import { OceanUniforms } from "../../ocean/oceanUniforms";
+import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 
 export class TelluricPlanet implements PlanetaryMassObject, Cullable {
     readonly sides: ChunkTree[]; // stores the 6 sides of the sphere
@@ -72,7 +72,7 @@ export class TelluricPlanet implements PlanetaryMassObject, Cullable {
 
         this.transform = new TransformNode(this.model.name, scene);
 
-        setRotationQuaternion(this.getTransform(), this.model.physics.axialTilt);
+        this.getTransform().rotate(Axis.X, this.model.orbit.inclination + this.model.physics.axialTilt, Space.WORLD);
 
         this.aggregate = new PhysicsAggregate(
             this.getTransform(),
@@ -138,7 +138,7 @@ export class TelluricPlanet implements PlanetaryMassObject, Cullable {
 
         this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());
         this.targetInfo.maxDistance =
-            this.model.type === OrbitalObjectType.TELLURIC_SATELLITE ? this.model.orbit.radius * 8.0 : 0;
+            this.model.type === OrbitalObjectType.TELLURIC_SATELLITE ? this.model.orbit.semiMajorAxis * 8.0 : 0;
     }
 
     getTransform(): TransformNode {

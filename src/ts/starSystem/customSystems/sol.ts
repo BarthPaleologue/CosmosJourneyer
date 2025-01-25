@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { OrbitalObjectType } from "../../architecture/orbitalObject";
 import { StarModel } from "../../stellarObjects/star/starModel";
 import { StarSystemModel } from "../starSystemModel";
@@ -24,6 +23,7 @@ import { Settings } from "../../settings";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { celsiusToKelvin } from "../../utils/physics";
 import { TelluricSatelliteModel } from "../../planets/telluricPlanet/telluricSatelliteModel";
+import { Tools } from "@babylonjs/core/Misc/tools";
 
 export function getSolSystemModel(): StarSystemModel {
     const sun: StarModel = {
@@ -33,14 +33,17 @@ export function getSolSystemModel(): StarSystemModel {
         physics: {
             mass: 1.989e30,
             blackBodyTemperature: 5778,
-            axialTilt: Quaternion.Identity(),
+            axialTilt: Tools.ToRadians(7.25),
             siderealDaySeconds: 60 * 60 * 24 * 25.67
         },
         orbit: {
-            radius: 0,
-            period: 0,
+            semiMajorAxis: 0,
+            eccentricity: 0,
             p: 2,
-            orientation: Quaternion.Identity()
+            inclination: 0,
+            longitudeOfAscendingNode: 0,
+            argumentOfPeriapsis: 0,
+            initialMeanAnomaly: 0
         },
         rings: null,
         seed: 0
@@ -52,7 +55,7 @@ export function getSolSystemModel(): StarSystemModel {
         radius: 2_439.7e3,
         physics: {
             mass: 3.301e23,
-            axialTilt: Quaternion.Identity(),
+            axialTilt: Tools.ToRadians(0.034),
             siderealDaySeconds: 60 * 60 * 24 * 58.646,
             oceanLevel: 0,
             waterAmount: 0,
@@ -61,10 +64,13 @@ export function getSolSystemModel(): StarSystemModel {
             maxTemperature: 437
         },
         orbit: {
-            radius: 0.38 * Settings.AU,
-            period: 60 * 60 * 24 * 87.9691,
+            semiMajorAxis: 0.38 * Settings.AU,
+            eccentricity: 0.2056,
             p: 2,
-            orientation: Quaternion.Identity()
+            inclination: Tools.ToRadians(7),
+            longitudeOfAscendingNode: Tools.ToRadians(48.331),
+            argumentOfPeriapsis: Tools.ToRadians(29.124),
+            initialMeanAnomaly: 0
         },
         terrainSettings: {
             continents_fragmentation: 0.1,
@@ -89,7 +95,7 @@ export function getSolSystemModel(): StarSystemModel {
         radius: 6_051.8e3,
         physics: {
             mass: 4.8e20,
-            axialTilt: Quaternion.Identity(),
+            axialTilt: Tools.ToRadians(177.36),
             siderealDaySeconds: 60 * 60 * 24 * 243.025,
             oceanLevel: 0,
             waterAmount: 0,
@@ -98,9 +104,12 @@ export function getSolSystemModel(): StarSystemModel {
             maxTemperature: 763
         },
         orbit: {
-            radius: 108_209_500e3,
-            orientation: Quaternion.Identity(),
-            period: 224.701 * 24 * 60 * 60,
+            semiMajorAxis: 108_209_500e3,
+            eccentricity: 0.0067,
+            inclination: Tools.ToRadians(3.39),
+            longitudeOfAscendingNode: Tools.ToRadians(76.68),
+            argumentOfPeriapsis: Tools.ToRadians(54.88),
+            initialMeanAnomaly: 0,
             p: 2
         },
         terrainSettings: {
@@ -137,7 +146,7 @@ export function getSolSystemModel(): StarSystemModel {
         radius: 6_371e3,
         physics: {
             mass: 5.972e24,
-            axialTilt: Quaternion.Identity(),
+            axialTilt: Tools.ToRadians(23.44),
             siderealDaySeconds: 60 * 60 * 24,
             oceanLevel: 10e3,
             waterAmount: 1,
@@ -146,9 +155,12 @@ export function getSolSystemModel(): StarSystemModel {
             maxTemperature: celsiusToKelvin(50)
         },
         orbit: {
-            radius: 149_597_870e3,
-            orientation: Quaternion.Identity(),
-            period: 365.25 * 24 * 60 * 60,
+            semiMajorAxis: 149_597_870e3,
+            eccentricity: 0.0167,
+            inclination: Tools.ToRadians(0),
+            longitudeOfAscendingNode: Tools.ToRadians(0),
+            argumentOfPeriapsis: Tools.ToRadians(114.20783),
+            initialMeanAnomaly: 0,
             p: 2
         },
         terrainSettings: {
@@ -185,7 +197,7 @@ export function getSolSystemModel(): StarSystemModel {
         radius: 1_737.1e3,
         physics: {
             mass: 7.342e22,
-            axialTilt: Quaternion.Identity(),
+            axialTilt: Tools.ToRadians(6.68),
             siderealDaySeconds: 60 * 60 * 24 * 27.322,
             oceanLevel: 0,
             waterAmount: 0,
@@ -194,10 +206,13 @@ export function getSolSystemModel(): StarSystemModel {
             maxTemperature: 100
         },
         orbit: {
-            radius: 384_400e3,
-            period: 60 * 60 * 24 * 27.322,
-            p: 2,
-            orientation: Quaternion.Identity()
+            semiMajorAxis: 384_400e3,
+            eccentricity: 0.0549,
+            inclination: Tools.ToRadians(5.145),
+            longitudeOfAscendingNode: Tools.ToRadians(125.08),
+            argumentOfPeriapsis: Tools.ToRadians(318.15),
+            initialMeanAnomaly: 0,
+            p: 2
         },
         terrainSettings: {
             continents_fragmentation: 0.1,
@@ -222,7 +237,7 @@ export function getSolSystemModel(): StarSystemModel {
         radius: 3_389.5e3,
         physics: {
             mass: 6.4171e23,
-            axialTilt: Quaternion.Identity(),
+            axialTilt: Tools.ToRadians(25.19),
             siderealDaySeconds: 60 * 60 * 24 * 1.027,
             oceanLevel: 0,
             waterAmount: 0,
@@ -231,10 +246,13 @@ export function getSolSystemModel(): StarSystemModel {
             maxTemperature: celsiusToKelvin(20)
         },
         orbit: {
-            radius: 227_939_200e3,
-            period: 60 * 60 * 24 * 687,
-            p: 2,
-            orientation: Quaternion.Identity()
+            semiMajorAxis: 227_939_200e3,
+            eccentricity: 0.0934,
+            inclination: Tools.ToRadians(1.85),
+            longitudeOfAscendingNode: Tools.ToRadians(49.558),
+            argumentOfPeriapsis: Tools.ToRadians(286.502),
+            initialMeanAnomaly: 0,
+            p: 2
         },
         terrainSettings: {
             continents_fragmentation: 0.1,
@@ -259,7 +277,7 @@ export function getSolSystemModel(): StarSystemModel {
         radius: 69_911e3,
         physics: {
             mass: 1.898e27,
-            axialTilt: Quaternion.Identity(),
+            axialTilt: Tools.ToRadians(3.13),
             siderealDaySeconds: 60 * 60 * 9.925,
             oceanLevel: 0,
             waterAmount: 0,
@@ -268,10 +286,13 @@ export function getSolSystemModel(): StarSystemModel {
             maxTemperature: celsiusToKelvin(-145)
         },
         orbit: {
-            radius: 778_547_200e3,
-            period: 60 * 60 * 24 * 4_332,
-            p: 2,
-            orientation: Quaternion.Identity()
+            semiMajorAxis: 778_547_200e3,
+            eccentricity: 0.0934,
+            inclination: Tools.ToRadians(1.85),
+            longitudeOfAscendingNode: Tools.ToRadians(49.558),
+            argumentOfPeriapsis: Tools.ToRadians(286.502),
+            initialMeanAnomaly: 0,
+            p: 2
         },
         terrainSettings: {
             continents_fragmentation: 0.1,
@@ -296,7 +317,7 @@ export function getSolSystemModel(): StarSystemModel {
         radius: 58_232e3,
         physics: {
             mass: 5.683e26,
-            axialTilt: Quaternion.Identity(),
+            axialTilt: Tools.ToRadians(26.73),
             siderealDaySeconds: 60 * 60 * 10.656,
             oceanLevel: 0,
             waterAmount: 0,
@@ -305,10 +326,13 @@ export function getSolSystemModel(): StarSystemModel {
             maxTemperature: celsiusToKelvin(-178)
         },
         orbit: {
-            radius: 1_433_449_370e3,
-            period: 60 * 60 * 24 * 10_759,
-            p: 2,
-            orientation: Quaternion.Identity()
+            semiMajorAxis: 1_433_449_370e3,
+            eccentricity: 0.0565,
+            inclination: Tools.ToRadians(2.49),
+            longitudeOfAscendingNode: Tools.ToRadians(113.715),
+            argumentOfPeriapsis: Tools.ToRadians(336.092),
+            initialMeanAnomaly: 0,
+            p: 2
         },
         terrainSettings: {
             continents_fragmentation: 0.1,
@@ -340,7 +364,7 @@ export function getSolSystemModel(): StarSystemModel {
         radius: 25_362e3,
         physics: {
             mass: 8.681e25,
-            axialTilt: Quaternion.Identity(),
+            axialTilt: Tools.ToRadians(97.77),
             siderealDaySeconds: 60 * 60 * 17.24,
             oceanLevel: 0,
             waterAmount: 0,
@@ -349,10 +373,13 @@ export function getSolSystemModel(): StarSystemModel {
             maxTemperature: celsiusToKelvin(-224)
         },
         orbit: {
-            radius: 2_872_463_270e3,
-            period: 60 * 60 * 24 * 30_687,
-            p: 2,
-            orientation: Quaternion.Identity()
+            semiMajorAxis: 2_872_463_270e3,
+            eccentricity: 0.0565,
+            inclination: Tools.ToRadians(0.77),
+            longitudeOfAscendingNode: Tools.ToRadians(74.229),
+            argumentOfPeriapsis: Tools.ToRadians(96.541),
+            initialMeanAnomaly: 0,
+            p: 2
         },
         terrainSettings: {
             continents_fragmentation: 0.1,
@@ -377,7 +404,7 @@ export function getSolSystemModel(): StarSystemModel {
         radius: 24_622e3,
         physics: {
             mass: 1.024e26,
-            axialTilt: Quaternion.Identity(),
+            axialTilt: Tools.ToRadians(28.32),
             siderealDaySeconds: 60 * 60 * 16.11,
             oceanLevel: 0,
             waterAmount: 0,
@@ -386,10 +413,13 @@ export function getSolSystemModel(): StarSystemModel {
             maxTemperature: celsiusToKelvin(-214)
         },
         orbit: {
-            radius: 4_495_060_000e3,
-            period: 60 * 60 * 24 * 60_190,
-            p: 2,
-            orientation: Quaternion.Identity()
+            semiMajorAxis: 4_495_060_000e3,
+            eccentricity: 0.0086,
+            inclination: Tools.ToRadians(1.77),
+            longitudeOfAscendingNode: Tools.ToRadians(131.72169),
+            argumentOfPeriapsis: Tools.ToRadians(265.646853),
+            initialMeanAnomaly: 0,
+            p: 2
         },
         terrainSettings: {
             continents_fragmentation: 0.1,

@@ -77,6 +77,8 @@ export class StarSystemController {
 
     readonly starFieldBox: StarFieldBox;
 
+    private referencePlaneRotation = Matrix.Identity();
+
     /**
      * The model of the star system that describes it and generates the randomness
      */
@@ -590,7 +592,7 @@ export class StarSystemController {
                 throw new Error(`Parents of ${object.model.name} are not defined`);
             }
 
-            OrbitalObjectUtils.SetOrbitalPosition(object, parents, this.elapsedSeconds);
+            OrbitalObjectUtils.SetOrbitalPosition(object, parents, this.referencePlaneRotation, this.elapsedSeconds);
             OrbitalObjectUtils.UpdateRotation(object, deltaSeconds);
         }
 
@@ -607,14 +609,15 @@ export class StarSystemController {
             const dThetaNearest = OrbitalObjectUtils.GetRotationAngle(nearestOrbitalObject, deltaSeconds);
 
             const nearestObjectRotationAxis = nearestOrbitalObject.getRotationAxis();
+            const rotation = Matrix.RotationAxis(nearestObjectRotationAxis, -dThetaNearest);
+
+            // the normal to the orbit planes must be rotated as well (even the one of the nearest body)
+            rotation.multiplyToRef(this.referencePlaneRotation, this.referencePlaneRotation);
+
+            // the starfield is rotated to give the impression the nearest body is rotating, which is only an illusion
+            this.referencePlaneRotation.transposeToRef(this.starFieldBox.getRotationMatrix());
 
             for (const object of orbitalObjects) {
-                const orbit = object.model.orbit;
-
-                // the normal to the orbit planes must be rotated as well (even the one of the nearest body)
-                const rotation = Quaternion.RotationAxis(nearestObjectRotationAxis, -dThetaNearest);
-                rotation.multiplyToRef(orbit.orientation, orbit.orientation);
-
                 if (object === nearestOrbitalObject) continue;
 
                 // All other bodies must revolve around it for consistency (finally we can say the sun revolves around the earth!)
@@ -634,12 +637,6 @@ export class StarSystemController {
                     -dThetaNearest
                 );
             });
-
-            // the starfield is rotated to give the impression the nearest body is rotating, which is only an illusion
-            const starfieldAdditionalRotation = Matrix.RotationAxis(nearestObjectRotationAxis, dThetaNearest);
-            this.starFieldBox.setRotationMatrix(
-                starfieldAdditionalRotation.multiply(this.starFieldBox.getRotationMatrix())
-            );
         } else {
             // if we don't compensate the rotation of the nearest body, we must simply update its rotation
             OrbitalObjectUtils.UpdateRotation(nearestOrbitalObject, deltaSeconds);
@@ -657,6 +654,7 @@ export class StarSystemController {
         const newPosition = OrbitalObjectUtils.GetOrbitalPosition(
             nearestOrbitalObject,
             nearestObjectParents,
+            this.referencePlaneRotation,
             this.elapsedSeconds
         );
 
@@ -784,6 +782,10 @@ export class StarSystemController {
 
     getSystemTargets(): SystemTarget[] {
         return this.systemTargets;
+    }
+
+    public getReferencePlaneRotation(): Matrix {
+        return this.referencePlaneRotation;
     }
 
     /**
