@@ -176,7 +176,7 @@ export class MusicConductor {
             return;
         }
 
-        if (isOnFoot) {
+        if (isOnFoot || spaceship.isLanded()) {
             const suitableMusics = [
                 Musics.THAT_ZEN_MOMENT,
                 Musics.DEEP_RELAXATION,
