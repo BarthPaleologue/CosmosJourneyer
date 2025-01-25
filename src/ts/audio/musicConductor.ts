@@ -14,7 +14,7 @@ export class MusicConductor {
     private silenceSeconds = 0;
 
     private volume = 1;
-    private readonly fadeSeconds = 1;
+    private readonly fadeSeconds = 3;
 
     private pauseMusicWhenPaused = false;
 
@@ -54,6 +54,11 @@ export class MusicConductor {
         if (this.currentMusic !== null) {
             this.currentMusic.setVolume(0, this.fadeSeconds);
             this.currentMusic.stop(this.fadeSeconds);
+            this.currentMusic = null;
+
+            // some silence between two musics
+            this.silenceSeconds = this.fadeSeconds;
+            return;
         }
 
         if (newMusic === null) {
