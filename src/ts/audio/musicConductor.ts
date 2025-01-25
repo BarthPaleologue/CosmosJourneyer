@@ -16,6 +16,8 @@ export class MusicConductor {
     private volume = 1;
     private readonly fadeSeconds = 1;
 
+    private pauseMusicWhenPaused = false;
+
     private readonly starSystemView: StarSystemView;
 
     constructor(starSystemView: StarSystemView) {
@@ -74,7 +76,7 @@ export class MusicConductor {
     }
 
     public update(isPaused: boolean, isInStarSystemView: boolean, isInMainMenu: boolean, deltaSeconds: number) {
-        if (isPaused && this.currentMusic?.isPlaying) {
+        if (isPaused && this.pauseMusicWhenPaused && this.currentMusic?.isPlaying) {
             this.currentMusic.pause();
             return;
         } else if (!isPaused && this.currentMusic?.isPaused) {
