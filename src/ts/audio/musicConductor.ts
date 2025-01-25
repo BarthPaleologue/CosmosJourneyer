@@ -130,39 +130,37 @@ export class MusicConductor {
             return;
         }
 
-        if (!spaceship.isLanded()) {
-            switch (closestOrbitalObject.model.type) {
-                case OrbitalObjectType.BLACK_HOLE:
-                    this.setMusicFromSelection([Musics.SOARING]);
+        switch (closestOrbitalObject.model.type) {
+            case OrbitalObjectType.BLACK_HOLE:
+                this.setMusicFromSelection([Musics.SOARING]);
+                return;
+
+            case OrbitalObjectType.MANDELBULB:
+            case OrbitalObjectType.JULIA_SET:
+            case OrbitalObjectType.MANDELBOX:
+            case OrbitalObjectType.SIERPINSKI_PYRAMID:
+            case OrbitalObjectType.MENGER_SPONGE:
+                if (distanceToClosestObject < closestOrbitalObject.getBoundingRadius() * 100) {
+                    this.setMusicFromSelection([Musics.SPACIAL_WINDS, Musics.ECHOES_OF_TIME]);
                     return;
+                }
+                break;
 
-                case OrbitalObjectType.MANDELBULB:
-                case OrbitalObjectType.JULIA_SET:
-                case OrbitalObjectType.MANDELBOX:
-                case OrbitalObjectType.SIERPINSKI_PYRAMID:
-                case OrbitalObjectType.MENGER_SPONGE:
-                    if (distanceToClosestObject < closestOrbitalObject.getBoundingRadius() * 100) {
-                        this.setMusicFromSelection([Musics.SPACIAL_WINDS, Musics.ECHOES_OF_TIME]);
-                        return;
-                    }
-                    break;
-
-                case OrbitalObjectType.STAR:
-                case OrbitalObjectType.NEUTRON_STAR:
-                case OrbitalObjectType.TELLURIC_PLANET:
-                case OrbitalObjectType.TELLURIC_SATELLITE:
-                case OrbitalObjectType.GAS_PLANET:
-                    break;
-                case OrbitalObjectType.SPACE_STATION:
-                case OrbitalObjectType.SPACE_ELEVATOR:
-                    if (
-                        !spaceship.isWarpDriveEnabled() &&
-                        distanceToClosestObject < closestOrbitalObject.getBoundingRadius() * 10
-                    ) {
-                        this.setMusic(Musics.EQUATORIAL_COMPLEX);
-                        return;
-                    }
-            }
+            case OrbitalObjectType.STAR:
+            case OrbitalObjectType.NEUTRON_STAR:
+            case OrbitalObjectType.TELLURIC_PLANET:
+            case OrbitalObjectType.TELLURIC_SATELLITE:
+            case OrbitalObjectType.GAS_PLANET:
+                break;
+            case OrbitalObjectType.SPACE_STATION:
+            case OrbitalObjectType.SPACE_ELEVATOR:
+                if (
+                    !spaceship.isWarpDriveEnabled() &&
+                    distanceToClosestObject < closestOrbitalObject.getBoundingRadius() * 10
+                ) {
+                    this.setMusic(Musics.EQUATORIAL_COMPLEX);
+                    return;
+                }
         }
 
         if (spaceship.isWarpDriveEnabled()) {
