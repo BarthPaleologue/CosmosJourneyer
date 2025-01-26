@@ -10,16 +10,17 @@ export default defineConfig({
   base: "/",
   build: {
     rollupOptions: {
-      input: {
-        main: resolve(__dirname, "./src/ts/index.ts"),
-        alphaTestis: resolve(__dirname, "./src/ts/alphaTestis.ts"),
-        blackHole: resolve(__dirname, "./src/ts/blackHoleDemo.ts"),
-        playground: resolve(__dirname, "./src/ts/playground.ts"),
-        xr: resolve(__dirname, "./src/ts/xr.ts"),
-        spaceStationGenerator: resolve(__dirname, "./src/ts/spaceStationGenerator.ts"),
-        debugAssets: resolve(__dirname, "./src/ts/debugAssets.ts"),
+        input: {
+          main: resolve(__dirname, "./src/ts/index.ts"),
+          alphaTestis: resolve(__dirname, "./src/ts/alphaTestis.ts"),
+          blackHole: resolve(__dirname, "./src/ts/blackHoleDemo.ts"),
+          playground: resolve(__dirname, "./src/ts/playground.ts"),
+          xr: resolve(__dirname, "./src/ts/xr.ts"),
+          spaceStationGenerator: resolve(__dirname, "./src/ts/spaceStationGenerator.ts"),
+          debugAssets: resolve(__dirname, "./src/ts/debugAssets.ts"),
+        },
       },
-    },
+      
     outDir: "dist",
     sourcemap: !isProduction,
     minify: isProduction ? "terser" : false,

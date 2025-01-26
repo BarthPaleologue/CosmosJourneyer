@@ -85,7 +85,7 @@
     ],
     "contributors": [],
     "scripts": {
-        "build": "vite --mode=production --node-env=production",
+        "build": "vite build --mode=production",
         "serve": "vite",
         "serve:prod": "http-server dist -p 8080",
         "format:check": "prettier . --check",
