@@ -48,7 +48,7 @@ jobs:
               run: npm install -g pnpm
             - name: Install dependencies
               run: pnpm install
-            - name: Build with Webpack
+            - name: Build with Vite
               run: pnpm run build
             - name: Generate documentation
               run: pnpm run build:docs
