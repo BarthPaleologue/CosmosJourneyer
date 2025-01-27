@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import i18next from "../i18n";
 import { AssetsManager } from "@babylonjs/core/Misc/assetsManager";
 import { Scene } from "@babylonjs/core/scene";
 import { Textures } from "./textures";

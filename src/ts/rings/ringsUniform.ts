@@ -21,6 +21,7 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import { RingsModel } from "./ringsModel";
 import { Textures } from "../assets/textures";
 import { RingsLut } from "./ringsLut";
+import { LutPoolManager } from "../assets/lutPoolManager";
 
 export const RingsUniformNames = {
     RING_START: "rings_start",
@@ -43,7 +44,8 @@ export class RingsUniforms {
     constructor(model: RingsModel, scene: Scene) {
         this.model = model;
 
-        this.lut = new RingsLut(model, scene);
+        this.lut = LutPoolManager.GetRingsLut(scene);
+        this.lut.setModel(model);
     }
 
     public setUniforms(effect: Effect) {
@@ -75,6 +77,6 @@ export class RingsUniforms {
     }
 
     public dispose() {
-        this.lut.dispose();
+        LutPoolManager.ReturnRingsLut(this.lut);
     }
 }

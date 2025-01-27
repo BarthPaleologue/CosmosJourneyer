@@ -26,7 +26,7 @@ export class RingsLut {
 
     private lutReady = false;
 
-    constructor(model: RingsModel, scene: Scene) {
+    constructor(scene: Scene) {
         if (Effect.ShadersStore[`ringsLUTFragmentShader`] === undefined) {
             Effect.ShadersStore[`ringsLUTFragmentShader`] = ringsLUT;
         }
@@ -43,8 +43,6 @@ export class RingsLut {
             true,
             false
         );
-
-        this.setModel(model);
 
         this.lut.executeWhenReady(() => {
             this.lutReady = true;
