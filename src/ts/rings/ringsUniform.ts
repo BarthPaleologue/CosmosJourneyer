@@ -17,11 +17,10 @@
 
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Scene } from "@babylonjs/core/scene";
-import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import { Effect } from "@babylonjs/core/Materials/effect";
-import ringsLUT from "../../shaders/textures/ringsLUT.glsl";
 import { RingsModel } from "./ringsModel";
 import { Textures } from "../assets/textures";
+import { RingsLut } from "./ringsLut";
 
 export const RingsUniformNames = {
     RING_START: "rings_start",
@@ -36,7 +35,7 @@ export const RingsSamplerNames = {
 };
 
 export class RingsUniforms {
-    private readonly lut: ProceduralTexture;
+    private readonly lut: RingsLut;
     private lutReady = false;
 
     readonly model: RingsModel;
@@ -44,31 +43,7 @@ export class RingsUniforms {
     constructor(model: RingsModel, scene: Scene) {
         this.model = model;
 
-        if (Effect.ShadersStore[`ringsLUTFragmentShader`] === undefined) {
-            Effect.ShadersStore[`ringsLUTFragmentShader`] = ringsLUT;
-        }
-
-        this.lut = new ProceduralTexture(
-            "ringsLUT",
-            {
-                width: 4096,
-                height: 1
-            },
-            "ringsLUT",
-            scene,
-            undefined,
-            true,
-            false
-        );
-        this.lut.setFloat("seed", model.seed);
-        this.lut.setFloat("frequency", model.ringFrequency);
-        this.lut.setFloat("ringStart", model.ringStart);
-        this.lut.setFloat("ringEnd", model.ringEnd);
-        this.lut.refreshRate = 0;
-
-        this.lut.executeWhenReady(() => {
-            this.lutReady = true;
-        });
+        this.lut = new RingsLut(model, scene);
     }
 
     public setUniforms(effect: Effect) {
@@ -88,8 +63,8 @@ export class RingsUniforms {
     }
 
     public setSamplers(effect: Effect) {
-        if (this.lutReady) {
-            effect.setTexture(RingsSamplerNames.RING_LUT, this.lut);
+        if (this.lut.isReady()) {
+            effect.setTexture(RingsSamplerNames.RING_LUT, this.lut.getTexture());
         } else {
             RingsUniforms.SetEmptySamplers(effect);
         }
