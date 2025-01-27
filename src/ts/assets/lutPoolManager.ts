@@ -17,6 +17,7 @@
 
 import { Scene } from "@babylonjs/core/scene";
 import { RingsLut } from "../rings/ringsLut";
+import { TelluricPlanetMaterialLut } from "../planets/telluricPlanet/telluricPlanetMaterialLut";
 
 export class LutPoolManager {
     private static RINGS_LUT_POOL: RingsLut[] = [];
@@ -27,7 +28,15 @@ export class LutPoolManager {
 
     static ReturnRingsLut(lut: RingsLut): void {
         this.RINGS_LUT_POOL.push(lut);
+    }
 
-        console.log("Rings LUT pool size: " + this.RINGS_LUT_POOL.length);
+    private static TELLURIC_PLANET_MATERIAL_LUT_POOL: TelluricPlanetMaterialLut[] = [];
+
+    static GetTelluricPlanetMaterialLut(scene: Scene): TelluricPlanetMaterialLut {
+        return this.TELLURIC_PLANET_MATERIAL_LUT_POOL.pop() ?? new TelluricPlanetMaterialLut(scene);
+    }
+
+    static ReturnTelluricPlanetMaterialLut(lut: TelluricPlanetMaterialLut): void {
+        this.TELLURIC_PLANET_MATERIAL_LUT_POOL.push(lut);
     }
 }
