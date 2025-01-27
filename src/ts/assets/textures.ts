@@ -17,7 +17,6 @@
 
 import { AssetsManager } from "@babylonjs/core/Misc/assetsManager";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import { Scene } from "@babylonjs/core/scene";
 import "@babylonjs/core/Materials/Textures/Loaders/envTextureLoader";
 import "@babylonjs/core/Helpers/sceneHelpers";
@@ -40,7 +39,6 @@ import waterNormal2 from "../../asset/textures/waterNormalMap4.jpg";
 import plumeParticle from "../../asset/textures/plume.png";
 import flareParticle from "../../asset/flare.png";
 import seamlessPerlin from "../../asset/perlin.webp";
-import atmosphereLUT from "../../shaders/textures/atmosphereLUT.glsl";
 import empty from "../../asset/oneBlackPixel.webp";
 
 import skyBox from "../../asset/skybox/milkyway.env";
@@ -98,8 +96,6 @@ export class Textures {
     static EMPTY_TEXTURE: Texture;
 
     static CURSOR_IMAGE_URL: string;
-
-    static ATMOSPHERE_LUT: ProceduralTexture;
 
     static SEAMLESS_PERLIN: Texture;
 
@@ -204,17 +200,6 @@ export class Textures {
             (Textures.CRATE_AMBIENT_OCCLUSION = task.texture);
 
         manager.addCubeTextureTask("SkyBox", skyBox).onSuccess = (task) => (Textures.MILKY_WAY = task.texture);
-
-        Textures.ATMOSPHERE_LUT = new ProceduralTexture(
-            "atmosphereLUT",
-            100,
-            { fragmentSource: atmosphereLUT },
-            scene,
-            undefined,
-            false,
-            false
-        );
-        Textures.ATMOSPHERE_LUT.refreshRate = 0;
 
         this.CURSOR_IMAGE_URL = cursorImage;
 

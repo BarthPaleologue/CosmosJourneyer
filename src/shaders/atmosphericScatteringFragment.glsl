@@ -29,8 +29,6 @@ varying vec2 vUV;// screen coordinates
 uniform sampler2D textureSampler;// the original screen texture
 uniform sampler2D depthSampler;// the depth map of the camera
 
-uniform sampler2D atmosphereLUT;
-
 #include "./utils/stars.glsl";
 
 #include "./utils/camera.glsl";
