@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { ColorMode } from "./colorSettingsInterface";
-
 import surfaceMaterialFragment from "../../../shaders/telluricPlanetMaterial/fragment.glsl";
 import surfaceMaterialVertex from "../../../shaders/telluricPlanetMaterial/vertex.glsl";
 import { Assets } from "../../assets/assets";
@@ -24,8 +23,6 @@ import { centeredRand } from "extended-random";
 import { TelluricPlanetaryMassObjectModel } from "./telluricPlanetaryMassObjectModel";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
-import lutFragment from "../../../shaders/telluricPlanetMaterial/utils/lut.glsl";
-import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import { Transformable } from "../../architecture/transformable";
 import { Scene } from "@babylonjs/core/scene";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
@@ -35,9 +32,8 @@ import {
 } from "../../postProcesses/uniforms/stellarObjectUniforms";
 import { Textures } from "../../assets/textures";
 import { Matrix } from "@babylonjs/core/Maths/math";
-
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
-import { Settings } from "../../settings";
+import { LutPoolManager } from "../../assets/lutPoolManager";
 
 const TelluricPlanetMaterialUniformNames = {
     WORLD: "world",
@@ -152,30 +148,15 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
             }
         }
 
-        if (Effect.ShadersStore["telluricPlanetLutFragmentShader"] === undefined) {
-            Effect.ShadersStore["telluricPlanetLutFragmentShader"] = lutFragment;
-        }
-
         this.setTexture("lut", Textures.EMPTY_TEXTURE);
-        const lut = new ProceduralTexture(
-            `${model.name}MaterialLut`,
-            4096,
-            "telluricPlanetLut",
-            scene,
-            null,
-            true,
-            false
-        );
-        lut.setFloat(TelluricPlanetMaterialUniformNames.MIN_TEMPERATURE, this.planetModel.physics.minTemperature);
-        lut.setFloat(TelluricPlanetMaterialUniformNames.MAX_TEMPERATURE, this.planetModel.physics.maxTemperature);
-        lut.setFloat(TelluricPlanetMaterialUniformNames.PRESSURE, this.planetModel.physics.pressure);
-        lut.refreshRate = 0;
-        lut.executeWhenReady(() => {
-            this.setTexture(TelluricPlanetMaterialSamplerNames.LUT, lut);
+        const lut = LutPoolManager.GetTelluricPlanetMaterialLut(scene);
+        lut.setPlanetPhysicsInfo(this.planetModel.physics);
+        lut.getTexture().executeWhenReady(() => {
+            this.setTexture(TelluricPlanetMaterialSamplerNames.LUT, lut.getTexture());
         });
 
         this.onDisposeObservable.addOnce(() => {
-            lut.dispose();
+            LutPoolManager.ReturnTelluricPlanetMaterialLut(lut);
         });
 
         this.updateTextures();

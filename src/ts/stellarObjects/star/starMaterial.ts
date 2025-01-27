@@ -20,12 +20,11 @@ import starMaterialVertex from "../../../shaders/starMaterial/vertex.glsl";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Scene } from "@babylonjs/core/scene";
-import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
-import lutFragment from "../../../shaders/starMaterial/utils/lut.glsl";
 import { StellarObjectModel } from "../../architecture/stellarObject";
 import { Textures } from "../../assets/textures";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { getRgbFromTemperature } from "../../utils/specrend";
+import { LutPoolManager } from "../../assets/lutPoolManager";
 
 const StarMaterialUniformNames = {
     WORLD: "world",
@@ -40,7 +39,6 @@ const StarMaterialSamplerNames = {
 };
 
 export class StarMaterial extends ShaderMaterial {
-    private readonly starModel: StellarObjectModel;
     private readonly starSeed: number;
 
     private readonly starColor: Color3;
@@ -62,18 +60,12 @@ export class StarMaterial extends ShaderMaterial {
             samplers: [...Object.values(StarMaterialSamplerNames)]
         });
 
-        if (Effect.ShadersStore["starLutFragmentShader"] === undefined) {
-            Effect.ShadersStore["starLutFragmentShader"] = lutFragment;
-        }
-
         this.setTexture("lut", Textures.EMPTY_TEXTURE);
-        const lut = new ProceduralTexture(`${model.name}MaterialLut`, 4096, "starLut", scene, null, true, false);
-        lut.refreshRate = 0;
-        lut.executeWhenReady(() => {
-            this.setTexture(StarMaterialSamplerNames.LUT, lut);
+        const lut = LutPoolManager.GetStarMaterialLut(scene);
+        lut.getTexture().executeWhenReady(() => {
+            this.setTexture(StarMaterialSamplerNames.LUT, lut.getTexture());
         });
 
-        this.starModel = model;
         this.starSeed = model.seed;
 
         this.starColor = getRgbFromTemperature(model.physics.blackBodyTemperature);
@@ -85,7 +77,7 @@ export class StarMaterial extends ShaderMaterial {
         });
 
         this.onDisposeObservable.addOnce(() => {
-            lut.dispose();
+            LutPoolManager.ReturnStarMaterialLut(lut);
         });
     }
 
