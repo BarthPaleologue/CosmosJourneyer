@@ -38,16 +38,16 @@ export class TelluricPlanetMaterialLut {
             true,
             false
         );
+
+        this.lut.refreshRate = 0;
     }
 
     setPlanetPhysicsInfo(physics: TelluricPlanetaryMassObjectPhysicsInfo) {
         this.lut.setFloat("minTemperature", physics.minTemperature);
         this.lut.setFloat("maxTemperature", physics.maxTemperature);
         this.lut.setFloat("pressure", physics.pressure);
-        this.lut.refreshRate = 1;
-        this.lut.onGeneratedObservable.addOnce(() => {
-            this.lut.refreshRate = 0;
-        });
+
+        this.lut.resetRefreshCounter();
     }
 
     getTexture(): ProceduralTexture {

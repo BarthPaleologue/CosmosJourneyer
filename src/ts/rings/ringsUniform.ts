@@ -37,7 +37,6 @@ export const RingsSamplerNames = {
 
 export class RingsUniforms {
     private readonly lut: RingsLut;
-    private lutReady = false;
 
     readonly model: RingsModel;
 

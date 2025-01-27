@@ -24,8 +24,6 @@ import ringsLUT from "../../shaders/textures/ringsLUT.glsl";
 export class RingsLut {
     private readonly lut: ProceduralTexture;
 
-    private lutReady = false;
-
     constructor(scene: Scene) {
         if (Effect.ShadersStore[`ringsLUTFragmentShader`] === undefined) {
             Effect.ShadersStore[`ringsLUTFragmentShader`] = ringsLUT;
@@ -44,9 +42,7 @@ export class RingsLut {
             false
         );
 
-        this.lut.executeWhenReady(() => {
-            this.lutReady = true;
-        });
+        this.lut.refreshRate = 0;
     }
 
     setModel(model: RingsModel): void {
@@ -55,14 +51,11 @@ export class RingsLut {
         this.lut.setFloat("ringStart", model.ringStart);
         this.lut.setFloat("ringEnd", model.ringEnd);
 
-        this.lut.refreshRate = 1;
-        this.lut.onGeneratedObservable.addOnce(() => {
-            this.lut.refreshRate = 0;
-        });
+        this.lut.resetRefreshCounter();
     }
 
     isReady(): boolean {
-        return this.lutReady;
+        return this.lut.isReady();
     }
 
     getTexture(): ProceduralTexture {
