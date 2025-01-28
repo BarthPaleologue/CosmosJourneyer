@@ -53,7 +53,7 @@ export class AtmosphericScatteringPostProcess extends PostProcess {
             ...atmosphereUniforms.getUniformNames()
         ];
 
-        const samplers: string[] = [...Object.values(SamplerUniformNames), ...atmosphereUniforms.getSamplerNames()];
+        const samplers: string[] = [...Object.values(SamplerUniformNames)];
 
         super(
             `${planetTransform.name}AtmospherePostProcess`,

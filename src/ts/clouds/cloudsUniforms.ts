@@ -15,13 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import { Scene } from "@babylonjs/core/scene";
 import { Effect } from "@babylonjs/core/Materials/effect";
-import flatCloudLUT from "../../shaders/textures/flatCloudLUT.glsl";
 import { CloudsModel } from "./cloudsModel";
 import { Textures } from "../assets/textures";
 import { gcd } from "../utils/math";
+import { CloudsLut } from "./cloudsLut";
+import { LutPoolManager } from "../assets/lutPoolManager";
 
 export const CloudsUniformNames = {
     LAYER_RADIUS: "clouds_layerRadius",
@@ -44,27 +44,15 @@ export const CloudsSamplerNames = {
 export class CloudsUniforms {
     readonly model: CloudsModel;
 
-    readonly lut: ProceduralTexture;
-
-    private isLutReady = false;
+    readonly lut: CloudsLut;
 
     private elapsedSeconds = 0;
 
     constructor(model: CloudsModel, scene: Scene) {
         this.model = model;
 
-        if (Effect.ShadersStore[`flatCloudsLUTFragmentShader`] === undefined) {
-            Effect.ShadersStore[`flatCloudsLUTFragmentShader`] = flatCloudLUT;
-        }
-
-        this.lut = new ProceduralTexture("flatCloudLUT", 4096, "flatCloudsLUT", scene, undefined, true, false);
-        this.lut.setFloat("worleyFrequency", this.model.frequency);
-        this.lut.setFloat("detailFrequency", this.model.detailFrequency);
-        this.lut.refreshRate = 0;
-
-        this.lut.executeWhenReady(() => {
-            this.isLutReady = true;
-        });
+        this.lut = LutPoolManager.GetCloudsLut(scene);
+        this.lut.setModel(model);
     }
 
     public update(deltaSeconds: number) {
@@ -91,14 +79,14 @@ export class CloudsUniforms {
     }
 
     public setSamplers(effect: Effect) {
-        if (this.isLutReady) {
-            effect.setTexture(CloudsSamplerNames.LUT, this.lut);
+        if (this.lut.isReady()) {
+            effect.setTexture(CloudsSamplerNames.LUT, this.lut.getTexture());
         } else {
             effect.setTexture(CloudsSamplerNames.LUT, Textures.EMPTY_TEXTURE);
         }
     }
 
     public dispose() {
-        this.lut.dispose();
+        LutPoolManager.ReturnCloudsLut(this.lut);
     }
 }

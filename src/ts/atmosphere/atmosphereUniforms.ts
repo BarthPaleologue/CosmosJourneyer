@@ -18,7 +18,6 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Settings } from "../settings";
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { Textures } from "../assets/textures";
 
 const AtmosphereUniformNames = {
     ATMOSPHERE_RADIUS: "atmosphere_radius",
@@ -31,10 +30,6 @@ const AtmosphereUniformNames = {
     ATMOSPHERE_OZONE_COEFFS: "atmosphere_ozoneCoeffs",
     ATMOSPHERE_OZONE_FALLOFF: "atmosphere_ozoneFalloff",
     ATMOSPHERE_SUN_INTENSITY: "atmosphere_sunIntensity"
-};
-
-const AtmosphereSamplerNames = {
-    ATMOSPHERE_LUT: "atmosphereLUT"
 };
 
 export class AtmosphereUniforms {
@@ -124,13 +119,5 @@ export class AtmosphereUniforms {
 
     getUniformNames(): string[] {
         return Object.values(AtmosphereUniformNames);
-    }
-
-    setSamplers(effect: Effect) {
-        effect.setTexture(AtmosphereSamplerNames.ATMOSPHERE_LUT, Textures.ATMOSPHERE_LUT);
-    }
-
-    getSamplerNames(): string[] {
-        return Object.values(AtmosphereSamplerNames);
     }
 }
