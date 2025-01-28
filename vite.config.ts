@@ -28,6 +28,43 @@ const bannerText = `
 export default defineConfig(({ mode }) => {
     const isProduction = mode === "production";
 
+    // Define the shape of the pages object to prevent TypeScript error
+    type PageContext = {
+        title: string;
+        description?: string;
+    };
+
+    const pages: Record<string, PageContext> = {
+        "src/html/index.html": {
+            title: "Cosmos Journeyer",
+            description:
+                "Cosmos Journeyer is an immersive space exploration game focused on the beauty and vastness of the universe. Embark on a personal journey through breathtaking cosmic landscapes, uncover strange anomalies, and engage in relaxing activities on alien worlds."
+        },
+        "src/html/alphaTestis.html": {
+            title: "Alpha Testis - Cosmos Journeyer",
+            description: "Testing system for Cosmos Journeyer."
+        },
+        "src/html/blackHole.html": {
+            title: "Black Hole - Cosmos Journeyer",
+            description: "Black hole simulation for Cosmos Journeyer with light bending and accretion disk."
+        },
+        "src/html/playground.html": {
+            title: "Playground - Cosmos Journeyer"
+        },
+        "src/html/xr.html": {
+            title: "XR - Cosmos Journeyer",
+            description: "XR test for Cosmos Journeyer."
+        },
+        "src/html/spaceStationGenerator.html": {
+            title: "Space Station Generator - Cosmos Journeyer",
+            description: "Space station generator for Cosmos Journeyer."
+        },
+        "src/html/debugAssets.html": {
+            title: "Debug Assets - Cosmos Journeyer",
+            description: "Debug assets visualization for Cosmos Journeyer."
+        }
+    };
+
     return {
         root: ".",
         base: "/", // Base path for deployment
@@ -70,11 +107,13 @@ export default defineConfig(({ mode }) => {
             tsconfigPaths(), // Auto-resolve TS path aliases
             vitePluginBanner(bannerText),
             handlebars({
-                partialDirectory: resolve(__dirname, "src/html"),
-                context: {
-                    meta: {
-                        description: "Default description for Cosmos Journeyer."
-                    }
+                artialDirectory: resolve(__dirname, "src/html/partials"),
+                context: (pagePath: string | number) => {
+                    const page = pages[pagePath];
+                    return {
+                        ...page,
+                        title: process.env.VITE_APP_TITLE || page.title
+                    };
                 }
             }),
             glsl()
@@ -82,7 +121,7 @@ export default defineConfig(({ mode }) => {
         css: {
             preprocessorOptions: {
                 scss: {
-                    additionalData: `@use "@/styles/variables.scss";` // Pre-load global SCSS variables
+                    additionalData: `@use "@/styles/variables.scss";`
                 }
             }
         },
