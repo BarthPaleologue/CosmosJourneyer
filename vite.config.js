@@ -1,10 +1,9 @@
-import { defineConfig } from 'vite';
-import { resolve } from 'path';
-import react from '@vitejs/plugin-react'; // For JSX/React
-import tsconfigPaths from 'vite-tsconfig-paths';
-import vitePluginBanner from 'vite-plugin-banner';
-import handlebars from 'vite-plugin-handlebars'; // For injecting variables into HTML templates
-import glsl from 'vite-plugin-glsl';
+import { defineConfig } from "vite";
+import { resolve } from "path";
+import tsconfigPaths from "vite-tsconfig-paths";
+import vitePluginBanner from "vite-plugin-banner";
+import handlebars from "vite-plugin-handlebars"; // For injecting variables into HTML templates
+import glsl from "vite-plugin-glsl";
 
 // Define a shared banner
 const bannerText = `
@@ -27,73 +26,85 @@ const bannerText = `
 `;
 
 export default defineConfig(({ mode }) => {
-  const isProduction = mode === 'production';
+    const isProduction = mode === "production";
 
-  return {
-    root: 'src',
-    base: '/', // Base path for deployment
-    build: {
-      outDir: resolve(__dirname, 'dist'),
-      sourcemap: !isProduction,
-      rollupOptions: {
-        input: {
-          main: resolve(__dirname, 'src/ts/index.ts'),
-          alphaTestis: resolve(__dirname, 'src/ts/alphaTestis.ts'),
-          blackHole: resolve(__dirname, 'src/ts/blackHoleDemo.ts'),
-          playground: resolve(__dirname, 'src/ts/playground.ts'),
-          xr: resolve(__dirname, 'src/ts/xr.ts'),
-          spaceStationGenerator: resolve(__dirname, 'src/ts/spaceStationGenerator.ts'),
-          debugAssets: resolve(__dirname, 'src/ts/debugAssets.ts'),
+    return {
+        root: "src",
+        base: "/", // Base path for deployment
+        build: {
+            outDir: resolve(__dirname, "dist"),
+            sourcemap: !isProduction,
+            rollupOptions: {
+                input: {
+                    main: resolve(__dirname, "src/ts/index.ts"),
+                    alphaTestis: resolve(__dirname, "src/ts/alphaTestis.ts"),
+                    blackHole: resolve(__dirname, "src/ts/blackHoleDemo.ts"),
+                    playground: resolve(__dirname, "src/ts/playground.ts"),
+                    xr: resolve(__dirname, "src/ts/xr.ts"),
+                    spaceStationGenerator: resolve(__dirname, "src/ts/spaceStationGenerator.ts"),
+                    debugAssets: resolve(__dirname, "src/ts/debugAssets.ts")
+                },
+                output: {
+                    entryFileNames: "[name].[hash].js",
+                    chunkFileNames: "[name].[hash].js",
+                    assetFileNames: "[name].[hash].[ext]"
+                }
+            }
         },
-        output: {
-          entryFileNames: '[name].[hash].js',
-          chunkFileNames: '[name].[hash].js',
-          assetFileNames: '[name].[hash].[ext]',
+        resolve: {
+            alias: {
+                "@": resolve(__dirname, "src")
+            },
+            extensions: [".ts", ".tsx", ".js"]
         },
-      },
-    },
-    resolve: {
-      alias: {
-        '@': resolve(__dirname, 'src'),
-      },
-      extensions: ['.ts', '.tsx', '.js'],
-    },
-    server: {
-      port: 8080,
-      host: 'localhost',
-      open: false,
-      headers: {
-        'Cross-Origin-Opener-Policy': 'same-origin',
-        'Cross-Origin-Embedder-Policy': 'same-origin',
-      },
-    },
-    plugins: [
-      react(), // For React JSX
-      tsconfigPaths(), // Auto-resolve TS path aliases
-      vitePluginBanner(bannerText), // Inject the banner into built files
-      handlebars({
-        partialDirectory: resolve(__dirname, 'src/html'),
-        context: {
-          meta: {
-            description: 'Default description for Cosmos Journeyer.',
-          },
+        server: {
+            port: 8080,
+            host: "localhost",
+            open: false,
+            headers: {
+                "Cross-Origin-Opener-Policy": "same-origin",
+                "Cross-Origin-Embedder-Policy": "same-origin"
+            }
         },
-      }),
-      glsl(),
-    ],
-    css: {
-      preprocessorOptions: {
-        scss: {
-          additionalData: `@use "@/styles/variables.scss";`, // Pre-load global SCSS variables
+        plugins: [
+            tsconfigPaths(), // Auto-resolve TS path aliases
+            vitePluginBanner(bannerText),
+            handlebars({
+                partialDirectory: resolve(__dirname, "src/html"),
+                context: {
+                    meta: {
+                        description: "Default description for Cosmos Journeyer."
+                    }
+                }
+            }),
+            glsl()
+        ],
+        css: {
+            preprocessorOptions: {
+                scss: {
+                    additionalData: `@use "@/styles/variables.scss";` // Pre-load global SCSS variables
+                }
+            }
         },
-      },
-    },
-    assetsInclude: ['**/*.glb', '**/*.env', '**/*.babylon', '**/*.ts'], // Include .glb and .env  and .babylon and .ts files as assets
-    optimizeDeps: {
-      include: [],
-    },
-    esbuild: {
-      banner: bannerText, // Add the banner directly via esbuild
-    },
-  };
+        assetsInclude: [
+            "**/*.glb",
+            "**/*.env",
+            "**/*.babylon",
+            "**/*.ts",
+            "**/*.eot",
+            "**/*.svg",
+            "**/*.ttf",
+            "**/*.woff",
+            "**/*.woff2",
+            "**/*.png",
+            "**/*.jpg",
+            "**/*.gif",
+            "**/*.webp",
+            "**/*.obj",
+            "**/*.mp3",
+            "**/*.dds"
+        ], // Include .glb and .env  and .babylon and .ts files as assets
+        optimizeDeps: {},
+        esbuild: {}
+    };
 });

@@ -42,7 +42,7 @@ export async function initI18n() {
         lng: language, // change this if you want to test a specific language
         debug: process.env.NODE_ENV === "development",
         fallbackLng: "en-US",
-        resources: resources,
+        resources: resources
     });
 
     // perform all static translations
@@ -52,7 +52,7 @@ export async function initI18n() {
 
         // this should be safe as we are not doing any interpolation
         // (as long as the translation are reviewed before being merged of course)
-        element.textContent = t(key);
+        element.innerHTML = t(key);
     });
 }
 
