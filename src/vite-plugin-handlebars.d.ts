@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-declare module 'vite-plugin-handlebars' {
+declare module "vite-plugin-handlebars" {
     const value: any;
     export default value;
 }
