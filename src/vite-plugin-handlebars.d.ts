@@ -15,17 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { expect, test } from "vitest";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { getTransformationQuaternion } from "../src/ts/utils/algebra";
-
-test("getTransformationQuaternion", () => {
-    const from = new Vector3(0, 1, 0);
-    const to = new Vector3(0, 1, 0);
-
-    const quaternion = getTransformationQuaternion(from, to);
-    expect(quaternion.x).toBe(0);
-    expect(quaternion.y).toBe(0);
-    expect(quaternion.z).toBe(0);
-    expect(quaternion.w).toBe(1);
-});
+declare module 'vite-plugin-handlebars' {
+    const value: any;
+    export default value;
+}

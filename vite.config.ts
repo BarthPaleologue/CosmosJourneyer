@@ -29,7 +29,7 @@ export default defineConfig(({ mode }) => {
     const isProduction = mode === "production";
 
     return {
-        root: "src",
+        root: ".",
         base: "/", // Base path for deployment
         build: {
             outDir: resolve(__dirname, "dist"),
@@ -55,7 +55,7 @@ export default defineConfig(({ mode }) => {
             alias: {
                 "@": resolve(__dirname, "src")
             },
-            extensions: [".ts", ".tsx", ".js"]
+            extensions: [".ts", ".js"]
         },
         server: {
             port: 8080,
@@ -103,7 +103,7 @@ export default defineConfig(({ mode }) => {
             "**/*.obj",
             "**/*.mp3",
             "**/*.dds"
-        ], // Include .glb and .env  and .babylon and .ts files as assets
+        ],
         optimizeDeps: {},
         esbuild: {}
     };

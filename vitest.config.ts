@@ -15,17 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { expect, test } from "vitest";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { getTransformationQuaternion } from "../src/ts/utils/algebra";
+import { defineConfig } from "vite";
 
-test("getTransformationQuaternion", () => {
-    const from = new Vector3(0, 1, 0);
-    const to = new Vector3(0, 1, 0);
-
-    const quaternion = getTransformationQuaternion(from, to);
-    expect(quaternion.x).toBe(0);
-    expect(quaternion.y).toBe(0);
-    expect(quaternion.z).toBe(0);
-    expect(quaternion.w).toBe(1);
-});
+export default defineConfig({
+    test: {
+      globals: true,
+      environment: 'node',
+      include: ['tests/**/*.spec.ts'], 
+    },
+  });
+  
