@@ -221,8 +221,12 @@ export function newSeededStarSystemModel(
 
         planetarySystemsWithStations.forEach((planetarySystem) => {
             const spaceStationSeed =
-                centeredRand(systemRng, GenerationSteps.SPACE_STATIONS + planetarySystem.planets.length) *
-                Settings.SEED_HALF_RANGE;
+                centeredRand(
+                    systemRng,
+                    GenerationSteps.SPACE_STATIONS +
+                        planetarySystem.planets.length +
+                        planetarySystem.orbitalFacilities.length
+                ) * Settings.SEED_HALF_RANGE;
 
             if (
                 uniformRandBool(0.5, systemRng, 657) && // 50% chance of having a space elevator
