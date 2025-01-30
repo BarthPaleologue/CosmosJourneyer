@@ -55,7 +55,6 @@ async function loadWasm() {
     wasm = moduleInstance as unknown as TerrainWasmModule;
 }
 
-
 // Ensure WASM is loaded before processing
 self.onmessage = async (e) => {
     if (!wasm) {

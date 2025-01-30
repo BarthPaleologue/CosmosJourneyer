@@ -4,7 +4,7 @@ import tsconfigPaths from "vite-tsconfig-paths";
 import vitePluginBanner from "vite-plugin-banner";
 import glsl from "vite-plugin-glsl";
 import wasm from "vite-plugin-wasm";
-import fs from 'fs';
+import fs from "fs";
 import topLevelAwait from "vite-plugin-top-level-await";
 
 // Define a shared banner
@@ -27,42 +27,43 @@ const bannerText = `
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 `;
 
-const htmlFiles = fs.readdirSync(path.resolve(__dirname, 'src/html')).filter(file => file.endsWith('.html'));
+const htmlFiles = fs.readdirSync(path.resolve(__dirname, "src/html")).filter((file) => file.endsWith(".html"));
 
 // Define the type for `input` explicitly
-const input: Record<string, string> = htmlFiles.reduce((acc, file) => {
-  acc[file.replace('.html', '')] = path.resolve(__dirname, 'src/html', file);
-  return acc;
-}, {} as Record<string, string>);
-
+const input: Record<string, string> = htmlFiles.reduce(
+    (acc, file) => {
+        acc[file.replace(".html", "")] = path.resolve(__dirname, "src/html", file);
+        return acc;
+    },
+    {} as Record<string, string>
+);
 
 export default defineConfig(({ mode }) => {
-
     return {
-        root: './src',
-        publicDir: '../public',
+        root: "./src",
+        publicDir: "../public",
         build: {
-        outDir: '../dist',
-        target: 'esnext',
-        emptyOutDir: true,
-        rollupOptions: {
-        input: {
-              main: path.resolve(__dirname, 'src/ts/index.ts'),
-              alphaTestis: path.resolve(__dirname, 'src/ts/alphaTestis.ts'),
-              blackHole: path.resolve(__dirname, 'src/ts/blackHoleDemo.ts'),
-              playground: path.resolve(__dirname, 'src/ts/playground.ts'),
-              xr: path.resolve(__dirname, 'src/ts/xr.ts'),
-              spaceStationGenerator: path.resolve(__dirname, 'src/ts/spaceStationGenerator.ts'),
-              debugAssets: path.resolve(__dirname, 'src/ts/debugAssets.ts')
-      },
-      output: {
-        entryFileNames: '[name].[hash].js',
-        assetFileNames: '[name].[hash][extname]'
-      }
-    },
-    sourcemap: mode === 'development' ? 'inline' : false,
-    minify: mode === 'production' ? 'esbuild' : false
-  },
+            outDir: "../dist",
+            target: "esnext",
+            emptyOutDir: true,
+            rollupOptions: {
+                input: {
+                    main: path.resolve(__dirname, "src/ts/index.ts"),
+                    alphaTestis: path.resolve(__dirname, "src/ts/alphaTestis.ts"),
+                    blackHole: path.resolve(__dirname, "src/ts/blackHoleDemo.ts"),
+                    playground: path.resolve(__dirname, "src/ts/playground.ts"),
+                    xr: path.resolve(__dirname, "src/ts/xr.ts"),
+                    spaceStationGenerator: path.resolve(__dirname, "src/ts/spaceStationGenerator.ts"),
+                    debugAssets: path.resolve(__dirname, "src/ts/debugAssets.ts")
+                },
+                output: {
+                    entryFileNames: "[name].[hash].js",
+                    assetFileNames: "[name].[hash][extname]"
+                }
+            },
+            sourcemap: mode === "development" ? "inline" : false,
+            minify: mode === "production" ? "esbuild" : false
+        },
         resolve: {
             alias: {
                 "@": resolve(__dirname, "src")
@@ -78,13 +79,7 @@ export default defineConfig(({ mode }) => {
                 "Cross-Origin-Embedder-Policy": "same-origin"
             }
         },
-        plugins: [
-            tsconfigPaths(),
-            vitePluginBanner(bannerText),
-            glsl(),
-            wasm(),
-            topLevelAwait()
-        ],
+        plugins: [tsconfigPaths(), vitePluginBanner(bannerText), glsl(), wasm(), topLevelAwait()],
         css: {
             preprocessorOptions: {
                 scss: {
@@ -110,6 +105,6 @@ export default defineConfig(({ mode }) => {
             "**/*.dds"
         ],
         optimizeDeps: {},
-        esbuild: { target: 'esnext',},
+        esbuild: { target: "esnext" }
     };
 });
