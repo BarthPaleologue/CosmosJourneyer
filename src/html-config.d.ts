@@ -15,15 +15,4 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-
-vec2 toUV(in vec3 n)
-{
-    vec2 uv;
-
-    uv.x = atan(-n.x, n.z);
-    uv.x = (uv.x + PI / 2.0) / (PI * 2.0) + PI * (28.670 / 360.0);
-
-    uv.y = acos(n.y) / PI;
-
-    return uv;
-}
+declare module 'vite-plugin-html-config';

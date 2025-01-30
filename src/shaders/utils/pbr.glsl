@@ -18,7 +18,6 @@
 // taken from https://github.com/BarthPaleologue/feather/blob/main/assets/shaders/pbr/fragment.glsl
 // based on https://learnopengl.com/PBR/Lighting
 
-#include "./pi.glsl";
 
 float DistributionGGX(vec3 N, vec3 H, float roughness) {
     float a      = roughness*roughness;
