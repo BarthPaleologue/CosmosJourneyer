@@ -44,7 +44,7 @@ export default defineConfig(({ mode }) => {
         publicDir: "../public",
         build: {
             outDir: "../dist",
-            target: "esnext",
+            target: "es2022",
             emptyOutDir: true,
             rollupOptions: {
                 input: {
@@ -105,6 +105,6 @@ export default defineConfig(({ mode }) => {
             "**/*.dds"
         ],
         optimizeDeps: {},
-        esbuild: { target: "esnext" }
+        esbuild: {}
     };
 });

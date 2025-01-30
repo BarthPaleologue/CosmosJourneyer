@@ -18,53 +18,30 @@
 import { TransferBuildData } from "../chunks/workerDataTypes";
 import { ReturnedChunkData } from "../chunks/taskTypes";
 import { Settings } from "../../../../settings";
-import wasmModule from "terrain-generation/terrain_generation_bg.wasm?init";
+import wasmInit from "terrain-generation/terrain_generation_bg.wasm?init";
+import { TerrainWasmModule } from "terrain-generation";
+import { init } from "terrain-generation/terrain_generation_bg.wasm";
 
-// Define the expected structure of the WASM module
-type TerrainWasmModule = {
-    build_chunk_vertex_data: (
-        buildData: any,
-        verticesPositions: Float32Array,
-        indices: Uint16Array,
-        normals: Float32Array,
-        instances_matrix_buffer: Float32Array,
-        aligned_instances_matrix_buffer: Float32Array,
-        scatter_per_square_meter: number
-    ) => {
-        nb_instances_created: number;
-        average_height: number;
-    };
-    BuildData: new (
-        planetDiameter: number,
-        depth: number,
-        direction: number,
-        positionX: number,
-        positionY: number,
-        positionZ: number,
-        seed: number,
-        nbVerticesPerSide: number,
-        terrainSettings: any
-    ) => any;
-    TerrainSettings: new () => any;
-};
-
-let wasm: TerrainWasmModule;
+let wasm: TerrainWasmModule | null = null;
 
 async function loadWasm() {
-    const moduleInstance = await wasmModule();
-    wasm = moduleInstance as unknown as TerrainWasmModule;
+    wasm = (await wasmInit()) as unknown as TerrainWasmModule;
 }
 
-// Ensure WASM is loaded before processing
-self.onmessage = async (e) => {
-    if (!wasm) {
-        await loadWasm();
-    }
-    handle_build(e.data as TransferBuildData);
-};
+loadWasm();
 
 function handle_build(data: TransferBuildData): void {
+    if (!wasm) {
+        console.error("Wasm module not initialized!");
+        return;
+    }
+
     const { build_chunk_vertex_data, BuildData, TerrainSettings } = wasm;
+
+    if (!build_chunk_vertex_data || !BuildData || !TerrainSettings) {
+        console.error("Wasm module functions are missing.");
+        return;
+    }
 
     const nbVerticesPerSide = data.nbVerticesPerSide;
     const nbSubdivisions = nbVerticesPerSide - 1;

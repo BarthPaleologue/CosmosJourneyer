@@ -10,7 +10,7 @@
         />
         <meta name="author" content="Barthélemy Paléologue" />
         <meta name="robots" content="index, follow" />
-        <title>{{ import.meta.env.VITE_APP_TITLE }}</title>
+        <title>Cosmos Journeyer</title>
     </head>
 
     <body>
@@ -18,9 +18,6 @@
 
         <div id="inspectorLayer"></div>
 
-        <%= require('html-loader!./bodyEditor.html').default %> <%= require('html-loader!./spaceStationUI.html').default
-        %> <%= require('html-loader!./helmetOverlay.html').default %> <%= require('html-loader!./mainMenu.html').default
-        %> <%= require('html-loader!./pauseMenu.html').default %> <%= require('html-loader!./sidePanels.html').default
-        %>
+        <script type="module" src="/src/main.ts"></script>
     </body>
 </html>
