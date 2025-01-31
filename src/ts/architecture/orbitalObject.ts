@@ -17,7 +17,7 @@
 
 import { Transformable } from "./transformable";
 import { HasBoundingSphere } from "./hasBoundingSphere";
-import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math";
+import { Matrix, Quaternion, Space, Vector3 } from "@babylonjs/core/Maths/math";
 import { getRotationQuaternion, setRotationQuaternion, translate } from "../uberCore/transforms/basicTransform";
 import { OrbitalObjectPhysicsInfo } from "./physicsInfo";
 import { TypedObject } from "./typedObject";
@@ -80,14 +80,15 @@ export class OrbitalObjectUtils {
         const orbit = object.model.orbit;
         if (orbit.semiMajorAxis === 0 || parents.length === 0) return;
 
-        const oldPosition = object.getTransform().getAbsolutePosition();
         const newPosition = OrbitalObjectUtils.GetOrbitalPosition(
             object,
             parents,
             referencePlaneRotation,
             elapsedSeconds
         );
-        translate(object.getTransform(), newPosition.subtractInPlace(oldPosition));
+
+        object.getTransform().position = newPosition;
+        object.getTransform().computeWorldMatrix(true);
     }
 
     /**
@@ -111,10 +112,8 @@ export class OrbitalObjectUtils {
         const dtheta = OrbitalObjectUtils.GetRotationAngle(object, deltaTime);
         if (dtheta === 0) return;
 
-        const elementaryRotationQuaternion = Quaternion.RotationAxis(object.getRotationAxis(), dtheta);
-        const newQuaternion = elementaryRotationQuaternion.multiply(getRotationQuaternion(object.getTransform()));
-
-        setRotationQuaternion(object.getTransform(), newQuaternion);
+        object.getTransform().rotate(object.getRotationAxis(), dtheta, Space.WORLD);
+        object.getTransform().computeWorldMatrix(true);
     }
 }
 
