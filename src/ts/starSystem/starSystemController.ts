@@ -546,7 +546,8 @@ export class StarSystemController {
     public update(deltaSeconds: number, chunkForge: ChunkForge, postProcessManager: PostProcessManager): void {
         this.elapsedSeconds += deltaSeconds;
 
-        const controller = this.scene.getActiveControls();
+        const controls = this.scene.getActiveControls();
+        const controlsPosition = controls.getTransform().getAbsolutePosition();
 
         const celestialBodies = this.getCelestialBodies();
         const stellarObjects = this.getStellarObjects();
@@ -555,16 +556,16 @@ export class StarSystemController {
 
         // The nearest body might have to be treated separately
         // The first step is to find the nearest body
-        const nearestOrbitalObject = this.getNearestOrbitalObject(controller.getTransform().getAbsolutePosition());
-        const nearestCelestialBody = this.getNearestCelestialBody(controller.getTransform().getAbsolutePosition());
+        const nearestOrbitalObject = this.getNearestOrbitalObject(controlsPosition);
+        const nearestCelestialBody = this.getNearestCelestialBody(controlsPosition);
         const ringUniforms = nearestCelestialBody.ringsUniforms;
 
         // Depending on the distance to the nearest body, we might have to compensate its translation and/or rotation
         // If we are very close, we want both translation and rotation to be compensated, so that the body appears to be fixed
         // When we are a bit further, we only need to compensate the translation as it would be unnatural not to see the body rotating
         const distanceOfNearestToControls = Vector3.Distance(
-            nearestOrbitalObject.getTransform().getAbsolutePosition(),
-            controller.getTransform().getAbsolutePosition()
+            nearestOrbitalObject.getTransform().position,
+            controlsPosition
         );
 
         const shouldCompensateTranslation =
@@ -623,7 +624,7 @@ export class StarSystemController {
                 // All other bodies must revolve around it for consistency (finally we can say the sun revolves around the earth!)
                 rotateAround(
                     object.getTransform(),
-                    nearestOrbitalObject.getTransform().getAbsolutePosition(),
+                    nearestOrbitalObject.getTransform().position,
                     nearestObjectRotationAxis,
                     -dThetaNearest
                 );
@@ -632,7 +633,7 @@ export class StarSystemController {
             this.systemTargets.forEach((target) => {
                 rotateAround(
                     target.getTransform(),
-                    nearestOrbitalObject.getTransform().getAbsolutePosition(),
+                    nearestOrbitalObject.getTransform().position,
                     nearestObjectRotationAxis,
                     -dThetaNearest
                 );
@@ -646,7 +647,7 @@ export class StarSystemController {
         // Compensating the translation is much easier in comparison. We save the initial position of the nearest body and
         // compute what would be its next position if it were to move normally.
         // This gives us a translation vector that we can negate and apply to all other bodies.
-        const initialPosition = nearestOrbitalObject.getTransform().getAbsolutePosition().clone();
+        const initialPosition = nearestOrbitalObject.getTransform().position.clone();
         const nearestObjectParents = this.objectToParents.get(nearestOrbitalObject);
         if (nearestObjectParents === undefined) {
             throw new Error("Nearest object parents are not defined");
@@ -676,23 +677,23 @@ export class StarSystemController {
             translate(nearestOrbitalObject.getTransform(), nearestBodyDisplacement);
         }
 
-        controller.update(deltaSeconds);
+        controls.update(deltaSeconds);
 
         for (const object of celestialBodies) {
-            object.asteroidField?.update(controller.getActiveCamera().globalPosition, deltaSeconds);
+            object.asteroidField?.update(controls.getActiveCamera().globalPosition, deltaSeconds);
         }
 
         for (const body of this.telluricBodies) {
             // Meshes with LOD are updated (surface quadtrees)
-            body.updateLOD(controller.getTransform().getAbsolutePosition(), chunkForge);
-            body.computeCulling(controller.getActiveCamera());
+            body.updateLOD(controls.getTransform().getAbsolutePosition(), chunkForge);
+            body.computeCulling(controls.getActiveCamera());
         }
 
         for (const object of this.gasPlanets) {
-            object.computeCulling(controller.getActiveCamera());
+            object.computeCulling(controls.getActiveCamera());
         }
 
-        const cameraWorldPosition = controller.getTransform().getAbsolutePosition();
+        const cameraWorldPosition = controls.getTransform().getAbsolutePosition();
         for (const orbitalFacility of orbitalFacilities) {
             orbitalFacility.update(
                 stellarObjects,
@@ -700,7 +701,7 @@ export class StarSystemController {
                 cameraWorldPosition,
                 deltaSeconds
             );
-            orbitalFacility.computeCulling(controller.getActiveCamera());
+            orbitalFacility.computeCulling(controls.getActiveCamera());
         }
 
         // floating origin
