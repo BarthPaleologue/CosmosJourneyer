@@ -44,13 +44,13 @@ export class OrbitalObjectUtils {
         elapsedSeconds: number
     ): Vector3 {
         const orbit = object.model.orbit;
-        if (orbit.semiMajorAxis === 0 || parents.length === 0) return object.getTransform().getAbsolutePosition();
+        if (orbit.semiMajorAxis === 0 || parents.length === 0) return object.getTransform().position;
 
-        const barycenter = Vector3.Zero(); //object.parent.getTransform().getAbsolutePosition();
+        const barycenter = Vector3.Zero();
         let sumOfMasses = 0;
         for (const parent of parents) {
             const mass = parent.model.physics.mass;
-            barycenter.addInPlace(parent.getTransform().getAbsolutePosition().scale(mass));
+            barycenter.addInPlace(parent.getTransform().position.scale(mass));
             sumOfMasses += mass;
         }
         barycenter.scaleInPlace(1 / sumOfMasses);
@@ -107,9 +107,9 @@ export class OrbitalObjectUtils {
 
         rotation.multiplyToRef(referencePlaneRotation, rotation);
 
-        const objectRotationQuaternion = object.getTransform().rotationQuaternion;
+        let objectRotationQuaternion = object.getTransform().rotationQuaternion;
         if (objectRotationQuaternion === null) {
-            throw new Error("Rotation quaternion is null");
+            objectRotationQuaternion = object.getTransform().rotationQuaternion = Quaternion.Identity();
         }
 
         Quaternion.FromRotationMatrixToRef(rotation, objectRotationQuaternion);
