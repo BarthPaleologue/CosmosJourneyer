@@ -39,7 +39,6 @@ import { OrbitalFacility } from "./orbitalFacility";
 import { SpaceStationModel } from "./spacestationModel";
 import { OrbitalObject } from "../architecture/orbitalObject";
 import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
-import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 
 export class SpaceStation implements OrbitalFacility {
     readonly name: string;
@@ -133,10 +132,6 @@ export class SpaceStation implements OrbitalFacility {
 
     private markPadAsAvailable(landingPad: LandingPad) {
         this.unavailableLandingPads.delete(landingPad);
-    }
-
-    getRotationAxis(): Vector3 {
-        return this.getTransform().up;
     }
 
     public getBoundingRadius(): number {

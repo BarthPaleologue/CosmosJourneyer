@@ -66,10 +66,6 @@ export class BlackHole implements StellarObject {
         return this.transform;
     }
 
-    getRotationAxis(): Vector3 {
-        return this.getTransform().up;
-    }
-
     getLight(): PointLight {
         return this.light;
     }

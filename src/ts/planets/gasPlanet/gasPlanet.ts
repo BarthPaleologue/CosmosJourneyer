@@ -36,7 +36,6 @@ import { Planet } from "../../architecture/planet";
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
 import { AtmosphereUniforms } from "../../atmosphere/atmosphereUniforms";
 import { Settings } from "../../settings";
-import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 
 export class GasPlanet implements Planet, Cullable {
     private readonly mesh: Mesh;
@@ -121,10 +120,6 @@ export class GasPlanet implements Planet, Cullable {
 
     public getBoundingRadius(): number {
         return this.model.radius;
-    }
-
-    getRotationAxis(): Vector3 {
-        return this.getTransform().up;
     }
 
     getTypeName(): string {

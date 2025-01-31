@@ -124,10 +124,6 @@ export class NeutronStar implements StellarObject, Cullable {
         return getOrbitalObjectTypeToI18nString(this.model);
     }
 
-    getRotationAxis(): Vector3 {
-        return this.getTransform().up;
-    }
-
     getLight(): PointLight {
         return this.light;
     }

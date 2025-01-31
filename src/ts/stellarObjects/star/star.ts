@@ -116,10 +116,6 @@ export class Star implements StellarObject, Cullable {
         return this.mesh;
     }
 
-    getRotationAxis(): Vector3 {
-        return this.getTransform().up;
-    }
-
     getLight(): PointLight {
         return this.light;
     }

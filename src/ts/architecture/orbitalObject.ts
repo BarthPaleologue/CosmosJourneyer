@@ -27,11 +27,6 @@ import { getPointOnOrbit, Orbit } from "../orbit/orbit";
  */
 export interface OrbitalObject extends Transformable, HasBoundingSphere, TypedObject {
     readonly model: OrbitalObjectModel;
-
-    /**
-     * The rotation axis around which the object rotates on itself
-     */
-    getRotationAxis(): Vector3;
 }
 
 export class OrbitalObjectUtils {

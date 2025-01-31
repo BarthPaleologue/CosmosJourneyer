@@ -17,7 +17,7 @@
 
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { CelestialBody, CelestialBodyModel } from "../architecture/celestialBody";
 import { TargetInfo, defaultTargetInfoCelestialBody } from "../architecture/targetable";
 import { getOrbitalObjectTypeToI18nString } from "./strings/orbitalObjectTypeToDisplay";
@@ -48,10 +48,6 @@ export class EmptyCelestialBody<T extends CelestialBodyModel> implements Celesti
 
     getTransform(): TransformNode {
         return this.transform;
-    }
-
-    getRotationAxis(): Vector3 {
-        return this.getTransform().up;
     }
 
     getRadius(): number {

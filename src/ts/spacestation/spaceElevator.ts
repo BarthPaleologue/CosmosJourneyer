@@ -174,10 +174,6 @@ export class SpaceElevator implements OrbitalFacility {
         this.unavailableLandingPads.delete(landingPad);
     }
 
-    getRotationAxis(): Vector3 {
-        return this.getTransform().up;
-    }
-
     public getBoundingRadius(): number {
         return this.boundingRadius;
     }

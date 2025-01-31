@@ -668,10 +668,10 @@ export class Spaceship implements Transformable {
                         .getAbsolutePosition()
                         .subtract(this.nearestCelestialBody.getTransform().getAbsolutePosition());
                     const distanceAboveRings = Math.abs(
-                        Vector3.Dot(relativePosition, this.nearestCelestialBody.getRotationAxis())
+                        Vector3.Dot(relativePosition, this.nearestCelestialBody.getTransform().up)
                     );
                     const planarDistance = relativePosition
-                        .subtract(this.nearestCelestialBody.getRotationAxis().scale(distanceAboveRings))
+                        .subtract(this.nearestCelestialBody.getTransform().up.scale(distanceAboveRings))
                         .length();
 
                     const ringsMinDistance = asteroidField.minRadius;

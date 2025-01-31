@@ -41,10 +41,6 @@ export class OrbitalObjectWrapper<Model extends OrbitalObjectModel> implements O
         return this.boundingRadius;
     }
 
-    getRotationAxis(): Vector3 {
-        return this.getTransform().up;
-    }
-
     getTypeName(): string {
         return "Wrapped Orbital Object";
     }

@@ -608,7 +608,7 @@ export class StarSystemController {
         if (shouldCompensateRotation) {
             const dThetaNearest = OrbitalObjectUtils.GetRotationAngle(nearestOrbitalObject, deltaSeconds);
 
-            const nearestObjectRotationAxis = nearestOrbitalObject.getRotationAxis();
+            const nearestObjectRotationAxis = nearestOrbitalObject.getTransform().up;
             const rotation = Matrix.RotationAxis(nearestObjectRotationAxis, -dThetaNearest);
 
             // the normal to the orbit planes must be rotated as well (even the one of the nearest body)

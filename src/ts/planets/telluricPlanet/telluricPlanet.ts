@@ -39,7 +39,6 @@ import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/t
 import { AtmosphereUniforms } from "../../atmosphere/atmosphereUniforms";
 import { Settings } from "../../settings";
 import { OceanUniforms } from "../../ocean/oceanUniforms";
-import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 
 export class TelluricPlanet implements PlanetaryMassObject, Cullable {
     readonly sides: ChunkTree[]; // stores the 6 sides of the sphere
@@ -142,10 +141,6 @@ export class TelluricPlanet implements PlanetaryMassObject, Cullable {
 
     getTransform(): TransformNode {
         return this.transform;
-    }
-
-    getRotationAxis(): Vector3 {
-        return this.getTransform().up;
     }
 
     getCloudsUniforms(): CloudsUniforms | null {
