@@ -5,11 +5,12 @@ import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { OrbitalObjectWrapper } from "../utils/orbitalObjectWrapper";
-import { OrbitalObject, OrbitalObjectType } from "../architecture/orbitalObject";
+import { OrbitalObject, OrbitalObjectType, OrbitalObjectUtils } from "../architecture/orbitalObject";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { OrbitRenderer } from "../orbit/orbitRenderer";
 import { AxisRenderer } from "../orbit/axisRenderer";
 import { getPointOnOrbit } from "../orbit/orbit";
+import { Axis } from "@babylonjs/core/Maths/math.axis";
 
 export function createOrbitalDemoScene(engine: AbstractEngine): Scene {
     const scene = new Scene(engine);
@@ -107,21 +108,15 @@ export function createOrbitalDemoScene(engine: AbstractEngine): Scene {
         elapsedSeconds += deltaSeconds;
         defaultControls.update(deltaSeconds);
 
-        earth.getTransform().position = getPointOnOrbit(
-            sun.getTransform().position,
-            sun.model.physics.mass,
-            earth.model.orbit,
-            elapsedSeconds,
-            referencePlaneRotation
-        );
+        const referencePlaneDeltaRotation = Matrix.RotationAxis(Axis.Y, deltaSeconds * 0.1);
 
-        moon.getTransform().position = getPointOnOrbit(
-            earth.getTransform().position,
-            earth.model.physics.mass,
-            moon.model.orbit,
-            elapsedSeconds,
-            referencePlaneRotation
-        );
+        referencePlaneRotation.multiplyToRef(referencePlaneDeltaRotation, referencePlaneRotation);
+
+        OrbitalObjectUtils.SetOrbitalPosition(earth, [sun], referencePlaneRotation, elapsedSeconds);
+        OrbitalObjectUtils.UpdateRotation(earth, deltaSeconds);
+
+        OrbitalObjectUtils.SetOrbitalPosition(moon, [earth], referencePlaneRotation, elapsedSeconds);
+        OrbitalObjectUtils.UpdateRotation(moon, deltaSeconds);
 
         orbitRenderer.update(referencePlaneRotation);
     });
