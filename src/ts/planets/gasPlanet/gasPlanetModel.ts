@@ -25,6 +25,7 @@ import { GenerationSteps } from "../../utils/generationSteps";
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { OrbitalObjectType } from "../../architecture/orbitalObject";
 import { PlanetModel } from "../../architecture/planet";
+import { Tools } from "@babylonjs/core/Misc/tools";
 
 export type GasPlanetModel = PlanetModel & {
     readonly type: OrbitalObjectType.GAS_PLANET;
@@ -42,15 +43,27 @@ export function newSeededGasPlanetModel(
     // Todo: do not hardcode
     let orbitRadius = rng(GenerationSteps.ORBIT) * 15e9;
 
+    let parentAverageInclination = 0;
+    let parentAverageAxialTilt = 0;
     if (parentBodies.length > 0) {
         const maxRadius = parentBodies.reduce((max, body) => Math.max(max, body.radius), 0);
         orbitRadius += maxRadius * 1.5;
+
+        for (const parent of parentBodies) {
+            parentAverageInclination += parent.orbit.inclination;
+            parentAverageAxialTilt += parent.physics.axialTilt;
+        }
+        parentAverageInclination /= parentBodies.length;
+        parentAverageAxialTilt /= parentBodies.length;
     }
 
     const orbit: Orbit = {
         semiMajorAxis: orbitRadius,
         p: 2,
-        inclination: 0,
+        inclination:
+            parentAverageInclination +
+            parentAverageAxialTilt +
+            Tools.ToRadians(normalRandom(0, 5, rng, GenerationSteps.ORBIT + 10)),
         eccentricity: 0,
         longitudeOfAscendingNode: 0,
         argumentOfPeriapsis: 0,

@@ -34,6 +34,7 @@ import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates"
 import { getRngFromSeed } from "../utils/getRngFromSeed";
 import { getSphereRadiatedEnergyFlux } from "../utils/physics";
 import { OrbitalFacilityModel } from "./orbitalFacility";
+import { Tools } from "@babylonjs/core/Misc/tools";
 
 export type SpaceStationModel = OrbitalFacilityModel & {
     readonly type: OrbitalObjectType.SPACE_STATION;
@@ -59,7 +60,7 @@ export function newSeededSpaceStationModel(
     const orbit: Orbit = {
         semiMajorAxis: orbitRadius,
         p: 2,
-        inclination: 0,
+        inclination: Tools.ToRadians(normalRandom(0, 10, rng, GenerationSteps.ORBIT + 10)),
         eccentricity: 0,
         longitudeOfAscendingNode: 0,
         argumentOfPeriapsis: 0,

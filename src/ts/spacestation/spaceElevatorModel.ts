@@ -56,7 +56,7 @@ export function newSeededSpaceElevatorModel(
     const orbit: Orbit = {
         semiMajorAxis: orbitRadius,
         p: 2,
-        inclination: 0,
+        inclination: parentBody.orbit.inclination + parentBody.physics.axialTilt,
         eccentricity: 0,
         longitudeOfAscendingNode: 0,
         argumentOfPeriapsis: 0,

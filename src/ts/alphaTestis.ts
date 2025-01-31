@@ -68,7 +68,7 @@ hecateModel.physics.maxTemperature = celsiusToKelvin(30);
 
 hecateModel.physics.siderealDaySeconds = 6 * 60 * 60;
 
-hecateModel.orbit.semiMajorAxis = 25000 * hecateModel.radius;
+hecateModel.orbit.semiMajorAxis = 21000 * hecateModel.radius;
 
 const spaceStationModel = newSeededSpaceElevatorModel(
     0,
@@ -94,7 +94,6 @@ moonModel.orbit.semiMajorAxis = getOrbitRadiusFromPeriod(
     moonModel.physics.siderealDaySeconds,
     hecateModel.physics.mass
 );
-moonModel.orbit.inclination = Tools.ToRadians(25);
 
 const aresModel = newSeededTelluricPlanetModel(0.3725, "Ares", [sunModel]);
 if (aresModel.clouds !== null) aresModel.clouds.coverage = 1;
@@ -106,7 +105,7 @@ aresModel.physics.pressure = Settings.EARTH_SEA_LEVEL_PRESSURE * 0.5;
 aresModel.physics.waterAmount = 0.2;
 aresModel.physics.oceanLevel = 0;
 
-aresModel.orbit.semiMajorAxis = 25020 * hecateModel.radius;
+aresModel.orbit.semiMajorAxis = 25100 * hecateModel.radius;
 
 //aresModel.terrainSettings.continents_fragmentation = 0.0;
 //aresModel.terrainSettings.continent_base_height = 10e3;
@@ -115,7 +114,6 @@ aresModel.orbit.semiMajorAxis = 25020 * hecateModel.radius;
 const andromaqueModel = newSeededGasPlanetModel(0.28711440474126226, "Andromaque", [sunModel]);
 andromaqueModel.orbit.semiMajorAxis = 25300 * hecateModel.radius;
 andromaqueModel.orbit.eccentricity = 0.8;
-andromaqueModel.orbit.inclination = Tools.ToRadians(70);
 
 const starSystemModel: StarSystemModel = {
     name: systemName,

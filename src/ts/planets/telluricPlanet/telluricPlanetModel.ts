@@ -29,6 +29,7 @@ import { Orbit } from "../../orbit/orbit";
 import { newSeededRingsModel, RingsModel } from "../../rings/ringsModel";
 import { TelluricPlanetaryMassObjectModel } from "./telluricPlanetaryMassObjectModel";
 import { clamp } from "../../utils/math";
+import { Tools } from "@babylonjs/core/Misc/tools";
 
 export type TelluricPlanetModel = PlanetModel &
     TelluricPlanetaryMassObjectModel & {
@@ -100,10 +101,22 @@ export function newSeededTelluricPlanetModel(
     // Todo: do not hardcode
     const orbitRadius = 2e9 + rng(GenerationSteps.ORBIT) * 15e9 + parentMaxRadius * 1.5;
 
+    let parentAverageInclination = 0;
+    let parentAverageAxialTilt = 0;
+    for (const parent of parentBodies) {
+        parentAverageInclination += parent.orbit.inclination;
+        parentAverageAxialTilt += parent.physics.axialTilt;
+    }
+    parentAverageInclination /= parentBodies.length;
+    parentAverageAxialTilt /= parentBodies.length;
+
     const orbit: Orbit = {
         semiMajorAxis: orbitRadius,
         p: 2,
-        inclination: 0,
+        inclination:
+            parentAverageInclination +
+            parentAverageAxialTilt +
+            Tools.ToRadians(normalRandom(0, 5, rng, GenerationSteps.ORBIT + 10)),
         eccentricity: 0,
         longitudeOfAscendingNode: 0,
         argumentOfPeriapsis: 0,

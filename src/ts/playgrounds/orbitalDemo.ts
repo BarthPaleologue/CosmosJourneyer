@@ -51,8 +51,8 @@ export function createOrbitalDemoScene(engine: AbstractEngine): Scene {
             argumentOfPeriapsis: 0,
             semiMajorAxis: 10,
             initialMeanAnomaly: 0,
-            longitudeOfAscendingNode: 0,
-            inclination: 0,
+            longitudeOfAscendingNode: 1.7,
+            inclination: Tools.ToRadians(23.5),
             eccentricity: 0.5,
             p: 2
         },
@@ -72,7 +72,7 @@ export function createOrbitalDemoScene(engine: AbstractEngine): Scene {
             semiMajorAxis: 3,
             initialMeanAnomaly: 0,
             longitudeOfAscendingNode: 0,
-            inclination: Tools.ToRadians(45),
+            inclination: earth.model.orbit.inclination + earth.model.physics.axialTilt, //Tools.ToRadians(45),
             eccentricity: 0.7,
             p: 2
         },

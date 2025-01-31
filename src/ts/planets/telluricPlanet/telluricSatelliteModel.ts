@@ -27,6 +27,7 @@ import { celsiusToKelvin, hasLiquidWater } from "../../utils/physics";
 import { CloudsModel, newCloudsModel } from "../../clouds/cloudsModel";
 import { TelluricPlanetaryMassObjectModel } from "./telluricPlanetaryMassObjectModel";
 import { clamp } from "../../utils/math";
+import { Tools } from "@babylonjs/core/Misc/tools";
 
 export type TelluricSatelliteModel = TelluricPlanetaryMassObjectModel & {
     readonly type: OrbitalObjectType.TELLURIC_SATELLITE;
@@ -102,10 +103,23 @@ export function newSeededTelluricSatelliteModel(
     orbitRadius += 2.0 * parentMaxRadius;
 
     const parentMassSum = parentBodies.reduce((sum, body) => sum + body.physics.mass, 0);
+
+    let parentAverageInclination = 0;
+    let parentAverageAxialTilt = 0;
+    for (const parent of parentBodies) {
+        parentAverageInclination += parent.orbit.inclination;
+        parentAverageAxialTilt += parent.physics.axialTilt;
+    }
+    parentAverageInclination /= parentBodies.length;
+    parentAverageAxialTilt /= parentBodies.length;
+
     const orbit: Orbit = {
         semiMajorAxis: orbitRadius,
         p: 2,
-        inclination: 0,
+        inclination:
+            parentAverageInclination +
+            parentAverageAxialTilt +
+            Tools.ToRadians(normalRandom(0, 5, rng, GenerationSteps.ORBIT + 10)),
         eccentricity: 0,
         longitudeOfAscendingNode: 0,
         argumentOfPeriapsis: 0,
