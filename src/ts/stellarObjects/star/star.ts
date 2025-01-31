@@ -20,7 +20,7 @@ import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { StarMaterial } from "./starMaterial";
 import { StarModel } from "./starModel";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Light } from "@babylonjs/core/Lights/light";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
@@ -34,10 +34,8 @@ import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { getRgbFromTemperature } from "../../utils/specrend";
 import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
-
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
 import { VolumetricLightUniforms } from "../../volumetricLight/volumetricLightUniforms";
-import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 
 export class Star implements StellarObject, Cullable {
     readonly mesh: Mesh;
@@ -72,6 +70,7 @@ export class Star implements StellarObject, Cullable {
             },
             scene
         );
+        this.mesh.rotationQuaternion = Quaternion.Identity();
 
         this.aggregate = new PhysicsAggregate(
             this.getTransform(),
@@ -92,8 +91,6 @@ export class Star implements StellarObject, Cullable {
 
         this.material = new StarMaterial(this.model, scene);
         this.mesh.material = this.material;
-
-        this.getTransform().rotate(Axis.X, this.model.orbit.inclination + this.model.physics.axialTilt, Space.WORLD);
 
         if (this.model.rings !== null) {
             this.ringsUniforms = new RingsUniforms(this.model.rings, scene);

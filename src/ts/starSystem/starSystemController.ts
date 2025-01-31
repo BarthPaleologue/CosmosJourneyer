@@ -593,7 +593,7 @@ export class StarSystemController {
             }
 
             OrbitalObjectUtils.SetOrbitalPosition(object, parents, this.referencePlaneRotation, this.elapsedSeconds);
-            OrbitalObjectUtils.UpdateRotation(object, deltaSeconds);
+            OrbitalObjectUtils.SetRotation(object, this.referencePlaneRotation, this.elapsedSeconds);
         }
 
         // ROTATION COMPENSATION
@@ -639,7 +639,7 @@ export class StarSystemController {
             });
         } else {
             // if we don't compensate the rotation of the nearest body, we must simply update its rotation
-            OrbitalObjectUtils.UpdateRotation(nearestOrbitalObject, deltaSeconds);
+            OrbitalObjectUtils.SetRotation(nearestOrbitalObject, this.referencePlaneRotation, this.elapsedSeconds);
         }
 
         // TRANSLATION COMPENSATION

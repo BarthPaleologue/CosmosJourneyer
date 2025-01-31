@@ -24,7 +24,7 @@ import { StarMaterial } from "../star/starMaterial";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { getRgbFromTemperature } from "../../utils/specrend";
 import { Light } from "@babylonjs/core/Lights/light";
@@ -37,7 +37,6 @@ import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
 import { VolumetricLightUniforms } from "../../volumetricLight/volumetricLightUniforms";
-import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 
 export class NeutronStar implements StellarObject, Cullable {
     readonly model: NeutronStarModel;
@@ -73,6 +72,7 @@ export class NeutronStar implements StellarObject, Cullable {
             },
             scene
         );
+        this.mesh.rotationQuaternion = Quaternion.Identity();
 
         this.aggregate = new PhysicsAggregate(
             this.getTransform(),
@@ -95,8 +95,6 @@ export class NeutronStar implements StellarObject, Cullable {
 
         this.material = new StarMaterial(this.model, scene);
         this.mesh.material = this.material;
-
-        this.getTransform().rotate(Axis.X, this.model.orbit.inclination + this.model.physics.axialTilt, Space.WORLD);
 
         if (this.model.rings !== null) {
             this.ringsUniforms = new RingsUniforms(this.model.rings, scene);

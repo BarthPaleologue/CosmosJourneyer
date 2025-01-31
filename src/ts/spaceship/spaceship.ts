@@ -31,13 +31,7 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { setEnabledBody } from "../utils/havok";
-import {
-    getForwardDirection,
-    getUpwardDirection,
-    rotate,
-    setRotationQuaternion,
-    translate
-} from "../uberCore/transforms/basicTransform";
+import { getForwardDirection, getUpwardDirection, rotate, translate } from "../uberCore/transforms/basicTransform";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { CollisionMask, Settings } from "../settings";
@@ -160,7 +154,7 @@ export class Spaceship implements Transformable {
         this.name = serializedSpaceShip.name;
 
         this.instanceRoot = Objects.CreateWandererInstance();
-        setRotationQuaternion(this.instanceRoot, Quaternion.Identity());
+        this.instanceRoot.rotationQuaternion = Quaternion.Identity();
 
         this.aggregate = new PhysicsAggregate(
             this.instanceRoot,

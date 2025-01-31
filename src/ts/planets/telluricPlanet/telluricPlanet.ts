@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Direction } from "../../utils/direction";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TelluricPlanetMaterial } from "./telluricPlanetMaterial";
 import { TelluricPlanetaryMassObjectModel } from "./telluricPlanetaryMassObjectModel";
 import { Camera } from "@babylonjs/core/Cameras/camera";
@@ -71,8 +71,7 @@ export class TelluricPlanet implements PlanetaryMassObject, Cullable {
         this.model = model;
 
         this.transform = new TransformNode(this.model.name, scene);
-
-        this.getTransform().rotate(Axis.X, this.model.orbit.inclination + this.model.physics.axialTilt, Space.WORLD);
+        this.transform.rotationQuaternion = Quaternion.Identity();
 
         this.aggregate = new PhysicsAggregate(
             this.getTransform(),

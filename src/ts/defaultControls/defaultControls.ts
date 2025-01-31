@@ -25,7 +25,6 @@ import {
     getUpwardDirection,
     pitch,
     roll,
-    setRotationQuaternion,
     translate,
     yaw
 } from "../uberCore/transforms/basicTransform";
@@ -50,7 +49,7 @@ export class DefaultControls implements Controls {
 
     constructor(scene: Scene) {
         this.transform = new TransformNode("playerController", scene);
-        setRotationQuaternion(this.getTransform(), Quaternion.Identity());
+        this.transform.rotationQuaternion = Quaternion.Identity();
 
         this.camera = new FreeCamera("defaultFirstPersonCamera", Vector3.Zero(), scene);
         this.camera.parent = this.transform;

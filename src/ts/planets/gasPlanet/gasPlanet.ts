@@ -21,7 +21,7 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
@@ -68,6 +68,7 @@ export class GasPlanet implements Planet, Cullable {
             },
             scene
         );
+        this.mesh.rotationQuaternion = Quaternion.Identity();
 
         this.aggregate = new PhysicsAggregate(
             this.getTransform(),
@@ -106,8 +107,6 @@ export class GasPlanet implements Planet, Cullable {
             this.ringsUniforms = null;
             this.asteroidField = null;
         }
-
-        this.getTransform().rotate(Axis.X, this.model.orbit.inclination + this.model.physics.axialTilt, Space.WORLD);
 
         this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());
     }

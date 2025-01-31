@@ -17,21 +17,20 @@
 
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { OrbitalObject, OrbitalObjectModel } from "../architecture/orbitalObject";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export class OrbitalObjectWrapper<Model extends OrbitalObjectModel> implements OrbitalObject {
-    private _transform: TransformNode;
+    private readonly _transform: TransformNode;
     readonly model: Model;
     private readonly boundingRadius: number;
     constructor(transform: TransformNode, model: Model) {
         this._transform = transform;
+        this._transform.rotationQuaternion = Quaternion.Identity();
+
         this.model = model;
 
         const boundingVectors = this.getTransform().getHierarchyBoundingVectors();
         this.boundingRadius = boundingVectors.max.subtract(boundingVectors.min).length() / 2;
-
-        this.getTransform().rotate(Axis.Z, this.model.orbit.inclination + this.model.physics.axialTilt, Space.WORLD);
     }
 
     getTransform(): TransformNode {

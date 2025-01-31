@@ -19,7 +19,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { isSizeOnScreenEnough } from "../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { SpaceStationNodeType } from "../assets/procedural/spaceStation/spaceStationNode";
 import { UtilitySection } from "../assets/procedural/spaceStation/utilitySection";
 import { HelixHabitat } from "../assets/procedural/spaceStation/helixHabitat";
@@ -43,7 +43,7 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { SpaceElevatorClimber } from "./spaceElevatorClimber";
 import { clamp, remap, triangleWave } from "../utils/math";
 import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
-import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
+import { Axis } from "@babylonjs/core/Maths/math.axis";
 
 export class SpaceElevator implements OrbitalFacility {
     readonly name: string;
@@ -81,6 +81,8 @@ export class SpaceElevator implements OrbitalFacility {
         this.name = this.model.name;
 
         this.root = new TransformNode(this.name, scene);
+        this.root.rotationQuaternion = Quaternion.Identity();
+
         this.scene = scene;
 
         const tetherThickness = 10;
@@ -121,8 +123,6 @@ export class SpaceElevator implements OrbitalFacility {
         this.getTransform()
             .getChildTransformNodes(true)
             .forEach((transform) => transform.rotateAround(Vector3.Zero(), Axis.Z, -Math.PI / 2));
-
-        this.getTransform().rotate(Axis.X, this.model.orbit.inclination + this.model.physics.axialTilt, Space.WORLD);
 
         const extendSize = boundingVectors.max.subtract(boundingVectors.min).scale(0.5);
         this.boundingRadius = Math.max(extendSize.x, extendSize.y, extendSize.z);

@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 import { Light } from "@babylonjs/core/Lights/light";
 import { BlackHoleModel } from "./blackHoleModel";
@@ -25,7 +25,6 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
 import { BlackHoleUniforms } from "./blackHoleUniforms";
-import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 
 export class BlackHole implements StellarObject {
     readonly name: string;
@@ -50,7 +49,7 @@ export class BlackHole implements StellarObject {
         this.name = this.model.name;
 
         this.transform = new TransformNode(this.model.name, scene);
-        this.getTransform().rotate(Axis.X, this.model.orbit.inclination + this.model.physics.axialTilt, Space.WORLD);
+        this.transform.rotationQuaternion = Quaternion.Identity();
 
         this.light = new PointLight(`${this.model.name}Light`, Vector3.Zero(), scene);
         //this.light.diffuse.fromArray(getRgbFromTemperature(this.model.physicalProperties.temperature).asArray());

@@ -17,8 +17,7 @@
 
 import { Transformable } from "./transformable";
 import { HasBoundingSphere } from "./hasBoundingSphere";
-import { Matrix, Quaternion, Space, Vector3 } from "@babylonjs/core/Maths/math";
-import { getRotationQuaternion, setRotationQuaternion, translate } from "../uberCore/transforms/basicTransform";
+import { Axis, Matrix, Quaternion, Space, Vector3 } from "@babylonjs/core/Maths/math";
 import { OrbitalObjectPhysicsInfo } from "./physicsInfo";
 import { TypedObject } from "./typedObject";
 import { getPointOnOrbit, Orbit } from "../orbit/orbit";
@@ -92,27 +91,39 @@ export class OrbitalObjectUtils {
     }
 
     /**
-     * Computes the rotation to apply in the current frame to the object around its axis. This does not update the rotation of the object (see UpdateRotation)
+     * Computes the rotation angle of the object around its axis for a given time
      * @param object The object we want to compute the rotation of
-     * @param deltaTime The time elapsed since the last update
+     * @param deltaSeconds The time span in seconds
      * @constructor
      */
-    static GetRotationAngle(object: OrbitalObject, deltaTime: number): number {
+    static GetRotationAngle(object: OrbitalObject, deltaSeconds: number): number {
         if (object.model.physics.siderealDaySeconds === 0) return 0;
-        return (2 * Math.PI * deltaTime) / object.model.physics.siderealDaySeconds;
+        return (2 * Math.PI * deltaSeconds) / object.model.physics.siderealDaySeconds;
     }
 
     /**
-     * Updates the rotation of the body around its axis
-     * @param object
-     * @param deltaTime The time elapsed since the last update
-     * @constructor
+     * Sets the rotation of the object around its axis
+     * @param object The object we want to update the rotation of
+     * @param referencePlaneRotation The rotation of the reference plane
+     * @param elapsedSeconds The time elapsed since the beginning of time in seconds
      */
-    static UpdateRotation(object: OrbitalObject, deltaTime: number): void {
-        const dtheta = OrbitalObjectUtils.GetRotationAngle(object, deltaTime);
-        if (dtheta === 0) return;
+    static SetRotation(object: OrbitalObject, referencePlaneRotation: Matrix, elapsedSeconds: number) {
+        const rotation = Matrix.RotationAxis(Axis.Z, object.model.orbit.inclination + object.model.physics.axialTilt);
 
-        object.getTransform().rotate(object.getRotationAxis(), dtheta, Space.WORLD);
+        rotation.multiplyToRef(referencePlaneRotation, rotation);
+
+        const objectRotationQuaternion = object.getTransform().rotationQuaternion;
+        if (objectRotationQuaternion === null) {
+            throw new Error("Rotation quaternion is null");
+        }
+
+        Quaternion.FromRotationMatrixToRef(rotation, objectRotationQuaternion);
+        object.getTransform().computeWorldMatrix(true);
+
+        const rotationAroundAxis = OrbitalObjectUtils.GetRotationAngle(object, elapsedSeconds);
+        if (rotationAroundAxis === 0) return;
+
+        object.getTransform().rotate(Axis.Y, rotationAroundAxis, Space.LOCAL);
         object.getTransform().computeWorldMatrix(true);
     }
 }

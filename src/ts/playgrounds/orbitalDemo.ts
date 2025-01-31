@@ -2,15 +2,13 @@ import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 import { DefaultControls } from "../defaultControls/defaultControls";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
-import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { OrbitalObjectWrapper } from "../utils/orbitalObjectWrapper";
 import { OrbitalObject, OrbitalObjectType, OrbitalObjectUtils } from "../architecture/orbitalObject";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { OrbitRenderer } from "../orbit/orbitRenderer";
 import { AxisRenderer } from "../orbit/axisRenderer";
-import { getPointOnOrbit } from "../orbit/orbit";
-import { Axis } from "@babylonjs/core/Maths/math.axis";
 
 export function createOrbitalDemoScene(engine: AbstractEngine): Scene {
     const scene = new Scene(engine);
@@ -87,6 +85,8 @@ export function createOrbitalDemoScene(engine: AbstractEngine): Scene {
         }
     });
 
+    const bodies = [sun, earth, moon];
+
     const bodyToParents = new Map<OrbitalObject, OrbitalObject[]>();
     bodyToParents.set(earth, [sun]);
     bodyToParents.set(moon, [earth]);
@@ -97,26 +97,36 @@ export function createOrbitalDemoScene(engine: AbstractEngine): Scene {
 
     const axisRenderer = new AxisRenderer();
     axisRenderer.setVisibility(true);
-    axisRenderer.setOrbitalObjects([sun, earth, moon], scene);
+    axisRenderer.setOrbitalObjects(bodies, scene);
 
     const referencePlaneRotation = Matrix.Identity();
+    const referencePlaneDeltaRotation = Matrix.Identity();
 
     let elapsedSeconds = 0;
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
+
         elapsedSeconds += deltaSeconds;
         defaultControls.update(deltaSeconds);
 
-        const referencePlaneDeltaRotation = Matrix.RotationAxis(Axis.Y, deltaSeconds * 0.1);
-
+        Matrix.FromQuaternionToRef(
+            defaultControls.getTransform().rotationQuaternion?.clone().invertInPlace() ?? Quaternion.Identity(),
+            referencePlaneDeltaRotation
+        );
+        defaultControls.getTransform().rotationQuaternion = Quaternion.Identity();
+        defaultControls.getTransform().computeWorldMatrix(true);
         referencePlaneRotation.multiplyToRef(referencePlaneDeltaRotation, referencePlaneRotation);
 
-        OrbitalObjectUtils.SetOrbitalPosition(earth, [sun], referencePlaneRotation, elapsedSeconds);
-        OrbitalObjectUtils.UpdateRotation(earth, deltaSeconds);
-
-        OrbitalObjectUtils.SetOrbitalPosition(moon, [earth], referencePlaneRotation, elapsedSeconds);
-        OrbitalObjectUtils.UpdateRotation(moon, deltaSeconds);
+        bodies.forEach((body) => {
+            OrbitalObjectUtils.SetOrbitalPosition(
+                body,
+                bodyToParents.get(body) ?? [],
+                referencePlaneRotation,
+                elapsedSeconds
+            );
+            OrbitalObjectUtils.SetRotation(body, referencePlaneRotation, elapsedSeconds);
+        });
 
         orbitRenderer.update(referencePlaneRotation);
     });
