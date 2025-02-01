@@ -232,8 +232,17 @@ export class CosmosJourneyer {
 
         this.starSystemView.getSpaceshipControls().onToggleWarpDrive.add(async (isWarpDriveEnabled) => {
             if (isWarpDriveEnabled) return;
-            if (this.starSystemView.getSpaceshipControls().getClosestLandableFacility() === null) return;
             if (this.player.tutorials.stationLandingCompleted) return;
+
+            const shipControls = this.starSystemView.getSpaceshipControls();
+            const closestLandableFacility = shipControls.getClosestLandableFacility();
+            if (closestLandableFacility === null) return;
+
+            const shipPosition = shipControls.getTransform().getAbsolutePosition();
+            const facilityPosition = closestLandableFacility.getTransform().position;
+            const limitDistance = 10 * closestLandableFacility.getBoundingRadius();
+            if (Vector3.DistanceSquared(shipPosition, facilityPosition) > limitDistance ** 2) return;
+
             await this.tutorialLayer.setTutorial(StationLandingTutorial);
             this.tutorialLayer.onQuitTutorial.addOnce(() => {
                 this.player.tutorials.stationLandingCompleted = true;

@@ -17,17 +17,15 @@
 
 import { randRange, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../../settings";
-import { getOrbitalPeriod, Orbit } from "../../orbit/orbit";
+import { Orbit } from "../../orbit/orbit";
 import { StellarObjectPhysicsInfo } from "../../architecture/physicsInfo";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { wheelOfFortune } from "../../utils/random";
 import { StellarObjectModel } from "../../architecture/stellarObject";
 import { newSeededRingsModel } from "../../rings/ringsModel";
 import { GenerationSteps } from "../../utils/generationSteps";
-
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { OrbitalObjectType } from "../../architecture/orbitalObject";
-import { Quaternion } from "@babylonjs/core/Maths/math";
 
 export type StarModel = StellarObjectModel & {
     readonly type: OrbitalObjectType.STAR;
@@ -46,7 +44,7 @@ export function newSeededStarModel(seed: number, name: string, parentBodies: Cel
         mass: 1.9885e30, //TODO: compute mass from physical properties
         siderealDaySeconds: 24 * 60 * 60,
         blackBodyTemperature: temperature,
-        axialTilt: Quaternion.Identity()
+        axialTilt: 0
     };
 
     const radius = getRandomRadiusFromStellarType(stellarType, rng);
@@ -54,12 +52,14 @@ export function newSeededStarModel(seed: number, name: string, parentBodies: Cel
     // TODO: do not hardcode
     const orbitRadius = rng(GenerationSteps.ORBIT) * 5000000e3;
 
-    const parentMassSum = parentBodies?.reduce((sum, body) => sum + body.physics.mass, 0) ?? 0;
     const orbit: Orbit = {
-        radius: orbitRadius,
+        semiMajorAxis: parentBodies.length > 0 ? orbitRadius : 0,
+        eccentricity: 0,
         p: 2,
-        period: getOrbitalPeriod(orbitRadius, parentMassSum),
-        orientation: Quaternion.Identity()
+        inclination: 0,
+        longitudeOfAscendingNode: 0,
+        argumentOfPeriapsis: 0,
+        initialMeanAnomaly: 0
     };
 
     const rings = uniformRandBool(RING_PROPORTION, rng, GenerationSteps.RINGS) ? newSeededRingsModel(rng) : null;

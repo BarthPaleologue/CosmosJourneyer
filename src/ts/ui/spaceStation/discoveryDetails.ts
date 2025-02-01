@@ -116,13 +116,13 @@ export class DiscoveryDetails {
         });
         this.htmlRoot.appendChild(this.siderealDayDuration);
 
-        this.orbitDuration.innerText = i18n.t("orbit:period", {
+        /*this.orbitDuration.innerText = i18n.t("orbit:period", {
             value: model !== null ? parseSecondsPrecise(model.orbit.period) : i18n.t("common:unknown")
-        });
+        });*/
         this.htmlRoot.appendChild(this.orbitDuration);
 
         this.orbitRadius.innerText = i18n.t("orbit:radius", {
-            value: model !== null ? parseDistance(model.orbit.radius) : i18n.t("common:unknown")
+            value: model !== null ? parseDistance(model.orbit.semiMajorAxis) : i18n.t("common:unknown")
         });
         this.htmlRoot.appendChild(this.orbitRadius);
 

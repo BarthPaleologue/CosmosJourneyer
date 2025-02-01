@@ -12,6 +12,8 @@
 
     cursor: none;
 
+    pointer-events: none;
+
     &.transparent {
         opacity: 0;
         pointer-events: none;

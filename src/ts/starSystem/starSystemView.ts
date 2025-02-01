@@ -792,7 +792,7 @@ export class StarSystemView implements View {
             this.spaceshipControls.setClosestLandableFacility(null);
         }
 
-        this.orbitRenderer.update();
+        this.orbitRenderer.update(this.getStarSystem().getReferencePlaneRotation());
 
         // update missions
         const missionContext: MissionContext = {

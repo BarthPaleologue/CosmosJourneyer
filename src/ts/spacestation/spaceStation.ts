@@ -19,7 +19,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { isSizeOnScreenEnough } from "../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { SpaceStationNodeType } from "../assets/procedural/spaceStation/spaceStationNode";
 import { UtilitySection } from "../assets/procedural/spaceStation/utilitySection";
 import { HelixHabitat } from "../assets/procedural/spaceStation/helixHabitat";
@@ -39,7 +39,6 @@ import { OrbitalFacility } from "./orbitalFacility";
 import { SpaceStationModel } from "./spacestationModel";
 import { OrbitalObject } from "../architecture/orbitalObject";
 import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
-import { setRotationQuaternion } from "../uberCore/transforms/basicTransform";
 
 export class SpaceStation implements OrbitalFacility {
     readonly name: string;
@@ -70,6 +69,8 @@ export class SpaceStation implements OrbitalFacility {
         this.name = this.model.name;
 
         this.root = new TransformNode(this.name, scene);
+        this.root.rotationQuaternion = Quaternion.Identity();
+
         this.scene = scene;
 
         this.generate();
@@ -82,8 +83,6 @@ export class SpaceStation implements OrbitalFacility {
         this.getTransform()
             .getChildTransformNodes(true)
             .forEach((transform) => transform.position.addInPlace(deltaPosition));
-
-        setRotationQuaternion(this.getTransform(), this.model.physics.axialTilt);
 
         const extendSize = boundingVectors.max.subtract(boundingVectors.min).scale(0.5);
         this.boundingRadius = Math.max(extendSize.x, extendSize.y, extendSize.z);
@@ -133,10 +132,6 @@ export class SpaceStation implements OrbitalFacility {
 
     private markPadAsAvailable(landingPad: LandingPad) {
         this.unavailableLandingPads.delete(landingPad);
-    }
-
-    getRotationAxis(): Vector3 {
-        return this.getTransform().up;
     }
 
     public getBoundingRadius(): number {

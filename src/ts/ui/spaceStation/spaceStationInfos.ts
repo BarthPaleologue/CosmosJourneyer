@@ -21,17 +21,22 @@ import { CropType, cropTypeToString } from "../../utils/agriculture";
 import { makeD3PieChart } from "../../utils/d3PieChart";
 import { OrbitalObjectModel } from "../../architecture/orbitalObject";
 import { OrbitalFacilityModel } from "../../spacestation/orbitalFacility";
+import { getOrbitalPeriod } from "../../orbit/orbit";
 
 export function generateInfoHTML(model: OrbitalFacilityModel, parentModels: OrbitalObjectModel[]): string {
     const agricultureMix = model.agricultureMix;
 
     const parentName = parentModels.map((parentModel) => parentModel.name).join("-");
 
+    const parentMassSum = parentModels.reduce((sum, parentModel) => sum + parentModel.physics.mass, 0);
+
+    const stationOrbitalPeriod = getOrbitalPeriod(model.orbit.semiMajorAxis, parentMassSum);
+
     return `
         <h2>General information</h2>
         
-        <p>${model.name} is orbiting ${parentName} at a distance of ${(model.orbit.radius * 0.001).toLocaleString(undefined, { maximumSignificantDigits: 3 })}km. 
-        One orbit around ${parentName} takes ${(model.orbit.period / (24 * 60 * 60)).toLocaleString(undefined, { maximumSignificantDigits: 3 })} days</p>
+        <p>${model.name} is orbiting ${parentName} at a distance of ${(model.orbit.semiMajorAxis * 1e-3).toLocaleString(undefined, { maximumSignificantDigits: 3 })}km. 
+        One orbit around ${parentName} takes ${(stationOrbitalPeriod / (24 * 60 * 60)).toLocaleString(undefined, { maximumSignificantDigits: 3 })} days</p>
 
         <p>${model.name} is affiliated to ${factionToString(model.faction)}</p>
 

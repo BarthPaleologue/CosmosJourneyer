@@ -20,9 +20,8 @@ import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { StarMaterial } from "./starMaterial";
 import { StarModel } from "./starModel";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Light } from "@babylonjs/core/Lights/light";
-import { setRotationQuaternion } from "../../uberCore/transforms/basicTransform";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
 import { TransformNode } from "@babylonjs/core/Meshes";
@@ -35,7 +34,6 @@ import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { getRgbFromTemperature } from "../../utils/specrend";
 import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
-
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
 import { VolumetricLightUniforms } from "../../volumetricLight/volumetricLightUniforms";
 
@@ -72,6 +70,7 @@ export class Star implements StellarObject, Cullable {
             },
             scene
         );
+        this.mesh.rotationQuaternion = Quaternion.Identity();
 
         this.aggregate = new PhysicsAggregate(
             this.getTransform(),
@@ -92,8 +91,6 @@ export class Star implements StellarObject, Cullable {
 
         this.material = new StarMaterial(this.model, scene);
         this.mesh.material = this.material;
-
-        setRotationQuaternion(this.getTransform(), this.model.physics.axialTilt);
 
         if (this.model.rings !== null) {
             this.ringsUniforms = new RingsUniforms(this.model.rings, scene);
@@ -117,10 +114,6 @@ export class Star implements StellarObject, Cullable {
 
     getTransform(): TransformNode {
         return this.mesh;
-    }
-
-    getRotationAxis(): Vector3 {
-        return this.getTransform().up;
     }
 
     getLight(): PointLight {
