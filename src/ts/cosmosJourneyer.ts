@@ -59,6 +59,7 @@ import { promptModalBoolean, alertModal, promptModalString } from "./utils/dialo
 import { FuelScoopTutorial } from "./tutorials/fuelScoopTutorial";
 import { EncyclopaediaGalacticaManager } from "./society/encyclopaediaGalacticaManager";
 import { EncyclopaediaGalacticaLocal } from "./society/encyclopaediaGalacticaLocal";
+import { MusicConductor } from "./audio/musicConductor";
 import { StarSystemDatabase } from "./starSystem/starSystemDatabase";
 import { registerCustomSystems } from "./starSystem/customSystems/registerCustomSystems";
 
@@ -85,6 +86,8 @@ export class CosmosJourneyer {
 
     readonly starSystemView: StarSystemView;
     readonly starMap: StarMap;
+
+    readonly musicConductor: MusicConductor;
 
     readonly mainMenu: MainMenu;
     readonly pauseMenu: PauseMenu;
@@ -296,6 +299,8 @@ export class CosmosJourneyer {
                 );
         });
 
+        this.musicConductor = new MusicConductor(this.starSystemView);
+
         window.addEventListener("blur", () => {
             if (!this.mainMenu?.isVisible() && !this.starSystemView.isLoadingSystem()) this.pause();
         });
@@ -455,6 +460,12 @@ export class CosmosJourneyer {
             updateNotifications(deltaSeconds);
             AudioManager.Update(deltaSeconds);
             Sounds.Update();
+            this.musicConductor.update(
+                this.isPaused(),
+                this.activeView === this.starSystemView,
+                this.mainMenu.isVisible(),
+                deltaSeconds
+            );
 
             if (this.isPaused()) return;
             this.activeView.render();

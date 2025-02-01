@@ -31,7 +31,6 @@ import acceleratingWarpDriveSound from "../../asset/sound/539503__timbre__endles
 import deceleratingWarpDriveSound from "../../asset/sound/539503__timbre_endless-deceleration.mp3";
 import hyperSpaceSound from "../../asset/sound/539503__timbre_endless-deceleration-hyperspace.mp3";
 import thrusterSound from "../../asset/sound/318688__limitsnap_creations__rocket-thrust-effect.mp3";
-import starMapBackgroundMusic from "../../asset/sound/455855__andrewkn__wandering.mp3";
 
 import echoedBlipSound from "../../asset/sound/554089__copyc4t__echoed-blip.mp3";
 import errorBleepSound from "../../asset/sound/372197__original_sound__error-bleep-4.mp3";
@@ -51,8 +50,6 @@ import engagingWarpDriveSound from "../../asset/sound/voice/EngagingWarpDriveCha
 
 import fuelScoopingVoice from "../../asset/sound/voice/FuelScoopingCharlotte.mp3";
 import fuelScoopingCompleteVoice from "../../asset/sound/voice/FuelScoopingCompleteCharlotte.mp3";
-
-import straussBlueDanube from "../../asset/sound/Strauss_The_Blue_Danube_Waltz.mp3";
 
 export class Sounds {
     public static OUCH_SOUND: Sound;
@@ -80,9 +77,6 @@ export class Sounds {
     public static SUCCESS: Sound;
     public static ERROR: Sound;
 
-    public static STAR_MAP_BACKGROUND_MUSIC: Sound;
-    public static MAIN_MENU_BACKGROUND_MUSIC: Sound;
-
     public static INITIATING_PLANETARY_LANDING: Sound;
     public static LANDING_REQUEST_GRANTED: Sound;
     public static LANDING_COMPLETE: Sound;
@@ -98,8 +92,6 @@ export class Sounds {
 
     public static FUEL_SCOOPING_VOICE: Sound;
     public static FUEL_SCOOPING_COMPLETE_VOICE: Sound;
-
-    public static STRAUSS_BLUE_DANUBE: Sound;
 
     private static IS_PLAYING = false;
     private static QUEUE: Sound[] = [];
@@ -208,7 +200,7 @@ export class Sounds {
             Sounds.ACCELERATING_WARP_DRIVE_SOUND = new Sound("AcceleratingWarpDriveSound", task.data, scene);
             Sounds.ACCELERATING_WARP_DRIVE_SOUND.updateOptions({
                 playbackRate: 1.0,
-                volume: 0.1,
+                volume: 0.3,
                 loop: true
             });
 
@@ -223,7 +215,7 @@ export class Sounds {
             Sounds.DECELERATING_WARP_DRIVE_SOUND = new Sound("DeceleratingWarpDriveSound", task.data, scene);
             Sounds.DECELERATING_WARP_DRIVE_SOUND.updateOptions({
                 playbackRate: 1.0,
-                volume: 0.1,
+                volume: 0.3,
                 loop: true
             });
 
@@ -266,30 +258,6 @@ export class Sounds {
             console.log("Error bleep sound loaded");
         };
 
-        const starMapBackgroundMusicTask = manager.addBinaryFileTask(
-            "starMapBackgroundMusicTask",
-            starMapBackgroundMusic
-        );
-        starMapBackgroundMusicTask.onSuccess = (task) => {
-            Sounds.STAR_MAP_BACKGROUND_MUSIC = new Sound("StarMapBackgroundMusic", task.data, scene, null, {
-                loop: true
-            });
-
-            console.log("Star map background music loaded");
-        };
-
-        const mainMenuBackgroundMusicTask = manager.addBinaryFileTask(
-            "mainMenuBackgroundMusicTask",
-            starMapBackgroundMusic
-        );
-        mainMenuBackgroundMusicTask.onSuccess = (task) => {
-            Sounds.MAIN_MENU_BACKGROUND_MUSIC = new Sound("MainMenuBackgroundMusic", task.data, scene, null, {
-                loop: true
-            });
-
-            console.log("Main menu background music loaded");
-        };
-
         const initiatingPlanetaryLandingSoundTask = manager.addBinaryFileTask(
             "initiatingPlanetaryLandingSoundTask",
             initiatingPlanetaryLandingSound
@@ -321,12 +289,6 @@ export class Sounds {
         newDiscoverySoundTask.onSuccess = (task) => {
             Sounds.NEW_DISCOVERY = new Sound("NewDiscovery", task.data, scene);
             console.log("New discovery sound loaded");
-        };
-
-        const straussBlueDanubeTask = manager.addBinaryFileTask("straussBlueDanubeTask", straussBlueDanube);
-        straussBlueDanubeTask.onSuccess = (task) => {
-            Sounds.STRAUSS_BLUE_DANUBE = new Sound("StraussBlueDanube", task.data, scene);
-            console.log("Strauss Blue Danube sound loaded");
         };
 
         const cannotEngageWarpDriveSoundTask = manager.addBinaryFileTask(

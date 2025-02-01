@@ -200,8 +200,6 @@ export class ShipControls implements Controls {
             }
 
             Sounds.EnqueuePlay(Sounds.LANDING_REQUEST_GRANTED);
-            Sounds.STRAUSS_BLUE_DANUBE.play();
-            Sounds.STRAUSS_BLUE_DANUBE.setVolume(1, 1);
             createNotification(
                 NotificationOrigin.SPACE_STATION,
                 NotificationIntent.SUCCESS,
@@ -357,8 +355,6 @@ export class ShipControls implements Controls {
         this.spaceship.onLandingObservable.add(async () => {
             const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
             Sounds.EnqueuePlay(Sounds.LANDING_COMPLETE);
-            Sounds.STRAUSS_BLUE_DANUBE.setVolume(0, 2);
-            Sounds.STRAUSS_BLUE_DANUBE.stop(2);
 
             if (!this.getSpaceship().isLandedAtFacility()) {
                 const bindingsString = pressInteractionToStrings(
@@ -391,8 +387,6 @@ export class ShipControls implements Controls {
                 i18n.t("notifications:landingCancelled"),
                 5000
             );
-            Sounds.STRAUSS_BLUE_DANUBE.setVolume(0, 2);
-            Sounds.STRAUSS_BLUE_DANUBE.stop(2);
         });
 
         this.spaceship.onTakeOff.add(() => {

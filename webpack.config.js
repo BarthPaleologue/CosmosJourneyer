@@ -139,7 +139,7 @@ const config = {
                 exclude: ["/node_modules/"]
             },
             {
-                test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif|webp|glb|obj|mp3|babylon|env|dds)$/i,
+                test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif|webp|glb|obj|mp3|ogg|babylon|env|dds)$/i,
                 type: "asset",
                 exclude: ["/node_modules/"]
             },
