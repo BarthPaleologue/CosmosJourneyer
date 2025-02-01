@@ -584,23 +584,6 @@ export class StarSystemController {
         // never compensate the rotation of a black hole
         shouldCompensateRotation = shouldCompensateRotation && !(nearestOrbitalObject instanceof BlackHole);
 
-        // first, all other objects are updated normally
-        for (const object of orbitalObjects) {
-            if (object === nearestOrbitalObject) continue;
-
-            const parents = this.objectToParents.get(object);
-            if (parents === undefined) {
-                throw new Error(`Parents of ${object.model.name} are not defined`);
-            }
-
-            OrbitalObjectUtils.SetOrbitalPosition(object, parents, this.referencePlaneRotation, this.elapsedSeconds);
-            OrbitalObjectUtils.SetRotation(object, this.referencePlaneRotation, this.elapsedSeconds);
-        }
-
-        for (const systemTarget of this.systemTargets) {
-            systemTarget.updatePosition(this.referencePlaneRotation);
-        }
-
         // ROTATION COMPENSATION
         // If we have to compensate the rotation of the nearest body, we must rotate the reference plane instead
         if (shouldCompensateRotation) {
@@ -623,6 +606,23 @@ export class StarSystemController {
         } else {
             // if we don't compensate the rotation of the nearest body, we must simply update its rotation
             OrbitalObjectUtils.SetRotation(nearestOrbitalObject, this.referencePlaneRotation, this.elapsedSeconds);
+        }
+
+        // then, all other objects are updated normally
+        for (const object of orbitalObjects) {
+            if (object === nearestOrbitalObject) continue;
+
+            const parents = this.objectToParents.get(object);
+            if (parents === undefined) {
+                throw new Error(`Parents of ${object.model.name} are not defined`);
+            }
+
+            OrbitalObjectUtils.SetOrbitalPosition(object, parents, this.referencePlaneRotation, this.elapsedSeconds);
+            OrbitalObjectUtils.SetRotation(object, this.referencePlaneRotation, this.elapsedSeconds);
+        }
+
+        for (const systemTarget of this.systemTargets) {
+            systemTarget.updatePosition(this.referencePlaneRotation);
         }
 
         // TRANSLATION COMPENSATION
