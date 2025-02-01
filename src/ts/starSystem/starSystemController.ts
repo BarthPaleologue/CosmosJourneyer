@@ -77,7 +77,9 @@ export class StarSystemController {
 
     readonly starFieldBox: StarFieldBox;
 
-    private referencePlaneRotation = Matrix.Identity();
+    private readonly referencePlaneRotation = Matrix.Identity();
+
+    private readonly referencePosition = new Vector3(0, 0, 0);
 
     /**
      * The model of the star system that describes it and generates the randomness
@@ -608,23 +610,6 @@ export class StarSystemController {
             OrbitalObjectUtils.SetRotation(nearestOrbitalObject, this.referencePlaneRotation, this.elapsedSeconds);
         }
 
-        // then, all other objects are updated normally
-        for (const object of orbitalObjects) {
-            if (object === nearestOrbitalObject) continue;
-
-            const parents = this.objectToParents.get(object);
-            if (parents === undefined) {
-                throw new Error(`Parents of ${object.model.name} are not defined`);
-            }
-
-            OrbitalObjectUtils.SetOrbitalPosition(object, parents, this.referencePlaneRotation, this.elapsedSeconds);
-            OrbitalObjectUtils.SetRotation(object, this.referencePlaneRotation, this.elapsedSeconds);
-        }
-
-        for (const systemTarget of this.systemTargets) {
-            systemTarget.updatePosition(this.referencePlaneRotation);
-        }
-
         // TRANSLATION COMPENSATION
         // We save the initial position of the nearest body and
         // compute what would be its next position if it were to move normally.
@@ -650,9 +635,28 @@ export class StarSystemController {
                 // the body is translated so that the nearest body can stay in place
                 translate(object.getTransform(), negatedDisplacement);
             }
+
+            this.referencePosition.addInPlace(negatedDisplacement);
         } else {
             // if we don't compensate the translation of the nearest body, we must simply update its position
             translate(nearestOrbitalObject.getTransform(), nearestBodyDisplacement);
+        }
+
+        // then, all other objects are updated normally
+        for (const object of orbitalObjects) {
+            if (object === nearestOrbitalObject) continue;
+
+            const parents = this.objectToParents.get(object);
+            if (parents === undefined) {
+                throw new Error(`Parents of ${object.model.name} are not defined`);
+            }
+
+            OrbitalObjectUtils.SetOrbitalPosition(object, parents, this.referencePlaneRotation, this.elapsedSeconds);
+            OrbitalObjectUtils.SetRotation(object, this.referencePlaneRotation, this.elapsedSeconds);
+        }
+
+        for (const systemTarget of this.systemTargets) {
+            systemTarget.updatePosition(this.referencePlaneRotation, this.referencePosition);
         }
 
         controls.update(deltaSeconds);
@@ -695,7 +699,7 @@ export class StarSystemController {
     public translateEverythingNow(displacement: Vector3): void {
         const orbitalObjects = this.getOrbitalObjects();
         for (const object of orbitalObjects) translate(object.getTransform(), displacement);
-        this.systemTargets.forEach((target) => translate(target.getTransform(), displacement));
+        this.referencePosition.addInPlace(displacement);
     }
 
     public applyFloatingOrigin() {
