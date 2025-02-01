@@ -46,6 +46,7 @@ import { Tools } from "@babylonjs/core/Misc/tools";
 import { quickAnimation } from "../uberCore/transforms/animations/quickAnimation";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { lerpSmooth } from "../utils/math";
+import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 
 export class ShipControls implements Controls {
     private spaceship: Spaceship;
@@ -59,7 +60,7 @@ export class ShipControls implements Controls {
 
     private readonly cameraShakeAnimation: CameraShakeAnimation;
 
-    private closestLandableFacility: (Transformable & ManagesLandingPads) | null = null;
+    private closestLandableFacility: (Transformable & HasBoundingSphere & ManagesLandingPads) | null = null;
 
     private targetFov = Tools.ToRadians(60);
 
@@ -250,11 +251,11 @@ export class ShipControls implements Controls {
         return [this.thirdPersonCamera, this.firstPersonCamera];
     }
 
-    public setClosestLandableFacility(facility: (Transformable & ManagesLandingPads) | null) {
+    public setClosestLandableFacility(facility: (Transformable & HasBoundingSphere & ManagesLandingPads) | null) {
         this.closestLandableFacility = facility;
     }
 
-    public getClosestLandableFacility(): (Transformable & ManagesLandingPads) | null {
+    public getClosestLandableFacility(): (Transformable & HasBoundingSphere & ManagesLandingPads) | null {
         return this.closestLandableFacility;
     }
 
