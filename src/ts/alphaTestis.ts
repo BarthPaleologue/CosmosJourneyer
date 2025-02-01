@@ -90,6 +90,8 @@ moonModel.physics.minTemperature = celsiusToKelvin(-180);
 moonModel.physics.maxTemperature = celsiusToKelvin(200);
 moonModel.physics.waterAmount = 0.9;
 
+moonModel.orbit.inclination = Tools.ToRadians(45);
+
 moonModel.orbit.semiMajorAxis = getOrbitRadiusFromPeriod(
     moonModel.physics.siderealDaySeconds,
     hecateModel.physics.mass

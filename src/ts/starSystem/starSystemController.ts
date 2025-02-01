@@ -598,18 +598,17 @@ export class StarSystemController {
         }
 
         // ROTATION COMPENSATION
-        // If we have to compensate the rotation of the nearest body, there are multiple things to take into account
-        // The orbital plane of the body can be described using its normal vector. When the body is not rotating, the normal vector will rotate in its stead.
-        // You can draw a simple example to understand this: have a simple planet and its moon, but the moon's rotation axis on itself is tilted heavily.
-        // Therefore, we have to rotate all the orbital planes accordingly.
-        // Using the same example as before, it is trivial to see the planet will have to rotate around its moon.
-        // Adding more bodies, we see that all bodies must rotate around the fixed moon.
-        // By doing so, their rotation axis on themselves except the fixed one must as well be rotated in the same way.
-        // Last but not least, the background starfield must be rotated in the opposite direction to give the impression the moon is rotating.
+        // If we have to compensate the rotation of the nearest body, we must rotate the reference plane instead
         if (shouldCompensateRotation) {
             const dThetaNearest = OrbitalObjectUtils.GetRotationAngle(nearestOrbitalObject, deltaSeconds);
 
-            const nearestObjectRotationAxis = nearestOrbitalObject.getTransform().up;
+            const nearestObjectRotationAxis = nearestOrbitalObject.getTransform().up.clone();
+            Vector3.TransformNormalToRef(
+                nearestObjectRotationAxis,
+                this.referencePlaneRotation.transpose(),
+                nearestObjectRotationAxis
+            );
+
             const rotation = Matrix.RotationAxis(nearestObjectRotationAxis, -dThetaNearest);
 
             // the normal to the orbit planes must be rotated as well (even the one of the nearest body)
@@ -617,18 +616,6 @@ export class StarSystemController {
 
             // the starfield is rotated to give the impression the nearest body is rotating, which is only an illusion
             this.referencePlaneRotation.transposeToRef(this.starFieldBox.getRotationMatrix());
-
-            for (const object of orbitalObjects) {
-                if (object === nearestOrbitalObject) continue;
-
-                // All other bodies must revolve around it for consistency (finally we can say the sun revolves around the earth!)
-                rotateAround(
-                    object.getTransform(),
-                    nearestOrbitalObject.getTransform().position,
-                    nearestObjectRotationAxis,
-                    -dThetaNearest
-                );
-            }
 
             this.systemTargets.forEach((target) => {
                 rotateAround(
@@ -644,7 +631,7 @@ export class StarSystemController {
         }
 
         // TRANSLATION COMPENSATION
-        // Compensating the translation is much easier in comparison. We save the initial position of the nearest body and
+        // We save the initial position of the nearest body and
         // compute what would be its next position if it were to move normally.
         // This gives us a translation vector that we can negate and apply to all other bodies.
         const initialPosition = nearestOrbitalObject.getTransform().position.clone();
