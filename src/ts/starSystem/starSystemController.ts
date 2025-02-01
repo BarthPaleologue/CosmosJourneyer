@@ -316,6 +316,27 @@ export class StarSystemController {
         };
     }
 
+    public getMostInfluentialObject(position: Vector3): OrbitalObject {
+        const orbitalObjects = this.getOrbitalObjects();
+        if (orbitalObjects.length === 0) {
+            throw new Error("There are no orbital objects in the solar system");
+        }
+
+        let bestRelativeDistance = Number.POSITIVE_INFINITY;
+        let bestObject: OrbitalObject = orbitalObjects[0];
+        for (const object of orbitalObjects) {
+            const distance = Vector3.Distance(object.getTransform().position, position);
+            const relativeDistance = distance / object.getBoundingRadius();
+
+            if (relativeDistance < bestRelativeDistance) {
+                bestRelativeDistance = relativeDistance;
+                bestObject = object;
+            }
+        }
+
+        return bestObject;
+    }
+
     /**
      * Returns the nearest orbital object to the given position
      * @param position The position from which we want to find the nearest orbital object
@@ -558,7 +579,7 @@ export class StarSystemController {
 
         // The nearest body might have to be treated separately
         // The first step is to find the nearest body
-        const nearestOrbitalObject = this.getNearestOrbitalObject(controlsPosition);
+        const nearestOrbitalObject = this.getMostInfluentialObject(controlsPosition);
         const nearestCelestialBody = this.getNearestCelestialBody(controlsPosition);
         const ringUniforms = nearestCelestialBody.ringsUniforms;
 
