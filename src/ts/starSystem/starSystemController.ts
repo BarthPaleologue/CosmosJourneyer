@@ -597,6 +597,10 @@ export class StarSystemController {
             OrbitalObjectUtils.SetRotation(object, this.referencePlaneRotation, this.elapsedSeconds);
         }
 
+        for (const systemTarget of this.systemTargets) {
+            systemTarget.updatePosition(this.referencePlaneRotation);
+        }
+
         // ROTATION COMPENSATION
         // If we have to compensate the rotation of the nearest body, we must rotate the reference plane instead
         if (shouldCompensateRotation) {
@@ -611,20 +615,11 @@ export class StarSystemController {
 
             const rotation = Matrix.RotationAxis(nearestObjectRotationAxis, -dThetaNearest);
 
-            // the normal to the orbit planes must be rotated as well (even the one of the nearest body)
+            // update the reference plane rotation
             rotation.multiplyToRef(this.referencePlaneRotation, this.referencePlaneRotation);
 
             // the starfield is rotated to give the impression the nearest body is rotating, which is only an illusion
             this.referencePlaneRotation.transposeToRef(this.starFieldBox.getRotationMatrix());
-
-            this.systemTargets.forEach((target) => {
-                rotateAround(
-                    target.getTransform(),
-                    nearestOrbitalObject.getTransform().position,
-                    nearestObjectRotationAxis,
-                    -dThetaNearest
-                );
-            });
         } else {
             // if we don't compensate the rotation of the nearest body, we must simply update its rotation
             OrbitalObjectUtils.SetRotation(nearestOrbitalObject, this.referencePlaneRotation, this.elapsedSeconds);
@@ -655,10 +650,6 @@ export class StarSystemController {
                 // the body is translated so that the nearest body can stay in place
                 translate(object.getTransform(), negatedDisplacement);
             }
-
-            this.systemTargets.forEach((target) => {
-                translate(target.getTransform(), negatedDisplacement);
-            });
         } else {
             // if we don't compensate the translation of the nearest body, we must simply update its position
             translate(nearestOrbitalObject.getTransform(), nearestBodyDisplacement);
@@ -760,8 +751,7 @@ export class StarSystemController {
         if (systemModel === null) {
             throw new Error(`System model for coordinates ${targetCoordinates} is null`);
         }
-        const placeholderTransform = new SystemTarget(systemModel, this.scene);
-        placeholderTransform.getTransform().position.copyFrom(direction.scale(distance));
+        const placeholderTransform = new SystemTarget(systemModel, direction.scale(distance), this.scene);
 
         this.systemTargets.push(placeholderTransform);
 
