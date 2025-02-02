@@ -388,11 +388,13 @@ export class Spaceship implements Transformable {
 
     public cancelLanding() {
         this.state = ShipState.FLYING;
+
+        this.getTransform().setParent(null);
+
         this.aggregate.body.setMotionType(PhysicsMotionType.DYNAMIC);
         this.aggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS | CollisionMask.ENVIRONMENT;
         this.aggregate.shape.filterMembershipMask = CollisionMask.DYNAMIC_OBJECTS;
 
-        this.getTransform().setParent(null);
         this.landingTarget = null;
         this.targetLandingPad = null;
 
@@ -423,12 +425,12 @@ export class Spaceship implements Transformable {
     public takeOff() {
         this.targetLandingPad = null;
 
+        this.getTransform().setParent(null);
+
         this.state = ShipState.FLYING;
         this.aggregate.body.setMotionType(PhysicsMotionType.DYNAMIC);
         this.aggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS | CollisionMask.ENVIRONMENT;
         this.aggregate.shape.filterMembershipMask = CollisionMask.DYNAMIC_OBJECTS;
-
-        this.getTransform().setParent(null);
 
         this.aggregate.body.applyImpulse(this.getTransform().up.scale(200), this.getTransform().getAbsolutePosition());
 
