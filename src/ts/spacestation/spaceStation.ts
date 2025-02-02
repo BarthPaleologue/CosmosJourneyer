@@ -102,15 +102,18 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
         });
     }
 
+    getAvailableLandingPads(): LandingPad[] {
+        return this.getLandingPads().filter((landingPad) => {
+            return !this.unavailableLandingPads.has(landingPad);
+        });
+    }
+
     getSubTargets(): Targetable[] {
         return this.getLandingPads();
     }
 
     public handleLandingRequest(request: LandingRequest): LandingPad | null {
-        const availableLandingPads = this.getLandingPads()
-            .filter((landingPad) => {
-                return !this.unavailableLandingPads.has(landingPad);
-            })
+        const availableLandingPads = this.getAvailableLandingPads()
             .filter((landingPad) => {
                 return landingPad.padSize >= request.minimumPadSize;
             })

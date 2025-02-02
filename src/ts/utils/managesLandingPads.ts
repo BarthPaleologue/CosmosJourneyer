@@ -9,5 +9,13 @@ export interface ManagesLandingPads {
 
     cancelLandingRequest(pad: LandingPad): void;
 
+    /**
+     * Returns all landing pads, including those that are currently in use.
+     */
     getLandingPads(): LandingPad[];
+
+    /**
+     * Returns all landing pads that are currently available for landing.
+     */
+    getAvailableLandingPads(): LandingPad[];
 }
