@@ -731,11 +731,18 @@ export class CosmosJourneyer {
                 );
             }
 
-            const landingPad = correspondingSpaceStation.getLandingPads().at(padNumber);
+            const wantedLandingPad = correspondingSpaceStation.getLandingPads().at(padNumber);
+
+            const isWantedPadFree =
+                wantedLandingPad !== undefined &&
+                correspondingSpaceStation.getAvailableLandingPads().includes(wantedLandingPad);
+
+            const landingPad = isWantedPadFree
+                ? wantedLandingPad
+                : correspondingSpaceStation.getAvailableLandingPads().at(0);
+
             if (landingPad === undefined) {
-                throw new Error(
-                    `Could not find the pad with number ${padNumber} at this station: ${correspondingSpaceStation.model.name}`
-                );
+                throw new Error("The spacestation you are trying to spawn at is full. This should not happen.");
             }
 
             this.starSystemView.getSpaceshipControls().getSpaceship().spawnOnPad(landingPad);

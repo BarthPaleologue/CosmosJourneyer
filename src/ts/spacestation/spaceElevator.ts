@@ -131,6 +131,12 @@ export class SpaceElevator implements OrbitalFacility {
         };
     }
 
+    getAvailableLandingPads(): LandingPad[] {
+        return this.getLandingPads().filter((landingPad) => {
+            return !this.unavailableLandingPads.has(landingPad);
+        });
+    }
+
     getLandingPads(): LandingPad[] {
         return this.landingBays.flatMap((landingBay) => {
             return landingBay.landingPads;
@@ -142,10 +148,7 @@ export class SpaceElevator implements OrbitalFacility {
     }
 
     handleLandingRequest(request: LandingRequest): LandingPad | null {
-        const availableLandingPads = this.getLandingPads()
-            .filter((landingPad) => {
-                return !this.unavailableLandingPads.has(landingPad);
-            })
+        const availableLandingPads = this.getAvailableLandingPads()
             .filter((landingPad) => {
                 return landingPad.padSize >= request.minimumPadSize;
             })
