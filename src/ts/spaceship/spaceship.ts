@@ -353,15 +353,10 @@ export class Spaceship implements Transformable {
         return this.closestWalkableObject;
     }
 
-    public engagePlanetaryLanding(landingTarget: Transformable | null) {
-        console.log("Landing sequence engaged");
+    public engagePlanetaryLanding(landingTarget: Transformable) {
         this.aggregate.body.setMotionType(PhysicsMotionType.ANIMATED);
         this.state = ShipState.LANDING;
-        this.landingTarget = landingTarget !== null ? landingTarget : this.closestWalkableObject;
-        if (this.landingTarget === null) {
-            throw new Error("Landing target is null");
-        }
-
+        this.landingTarget = landingTarget;
         this.onPlanetaryLandingEngaged.notifyObservers();
     }
 
