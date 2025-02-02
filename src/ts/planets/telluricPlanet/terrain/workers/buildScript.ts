@@ -20,7 +20,6 @@ import { ReturnedChunkData } from "../chunks/taskTypes";
 import { Settings } from "../../../../settings";
 import wasmInit from "terrain-generation/terrain_generation_bg.wasm?init";
 import { TerrainWasmModule } from "terrain-generation";
-import { init } from "terrain-generation/terrain_generation_bg.wasm";
 
 let wasm: TerrainWasmModule | null = null;
 
@@ -28,7 +27,7 @@ async function loadWasm() {
     wasm = (await wasmInit()) as unknown as TerrainWasmModule;
 }
 
-loadWasm();
+await loadWasm();
 
 function handle_build(data: TransferBuildData): void {
     if (!wasm) {

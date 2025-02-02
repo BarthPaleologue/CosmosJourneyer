@@ -10,11 +10,12 @@
         />
         <meta name="author" content="Barthélemy Paléologue" />
         <meta name="robots" content="index, follow" />
-        <title>Cosmos Journeyer</title>
+        <title>%VITE_APP_TITLE%</title>
     </head>
 
     <body>
         <canvas id="renderer"></canvas>
-        <script type="module" src="/src/main.ts"></script>
-    </body>
+        <script type="module">
+            document.title = import.meta.env.VITE_APP_TITLE;
+        </script>    </body>
 </html>
