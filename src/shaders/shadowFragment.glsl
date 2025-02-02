@@ -76,7 +76,8 @@ float ringOccultation(vec3 rayDir, float maximumDistance) {
         float t2;
         if (rayIntersectsPlane(camera_position + rayDir * maximumDistance, towardLight, object_position, object_rotationAxis, 0.001, t2)) {
             vec3 shadowSamplePoint = camera_position + rayDir * maximumDistance + t2 * towardLight;
-            accDensity += pow(ringDensityAtPoint(shadowSamplePoint), 0.5) * rings_opacity * smoothstep(15000.0 * 2.0, 15000.0 * 5.0, t2);
+            float nearOccultationFactor = smoothstep(100e3, 150e3, t2); // fade ring shadow when close to the rings
+            accDensity += pow(ringDensityAtPoint(shadowSamplePoint), 0.5) * rings_opacity * nearOccultationFactor;
         }
     }
     return pow(1.0 - accDensity, 4.0) * 0.99 + 0.01;
