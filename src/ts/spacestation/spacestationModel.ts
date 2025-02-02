@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getOrbitalPeriod, Orbit } from "../orbit/orbit";
+import { Orbit } from "../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { OrbitalObjectType } from "../architecture/orbitalObject";
 import { OrbitalObjectPhysicsInfo } from "../architecture/physicsInfo";
@@ -34,8 +34,7 @@ import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates"
 import { getRngFromSeed } from "../utils/getRngFromSeed";
 import { getSphereRadiatedEnergyFlux } from "../utils/physics";
 import { OrbitalFacilityModel } from "./orbitalFacility";
-import { Quaternion } from "@babylonjs/core/Maths/math";
-import { Axis } from "@babylonjs/core/Maths/math.axis";
+import { Tools } from "@babylonjs/core/Misc/tools";
 
 export type SpaceStationModel = OrbitalFacilityModel & {
     readonly type: OrbitalObjectType.SPACE_STATION;
@@ -58,18 +57,20 @@ export function newSeededSpaceStationModel(
     );
     const orbitRadius = (2 + clamp(normalRandom(2, 1, rng, GenerationSteps.ORBIT), 0, 10)) * parentMaxRadius;
 
-    const parentMassSum = parentBodies.reduce((sum, body) => sum + body.physics.mass, 0);
     const orbit: Orbit = {
-        radius: orbitRadius,
+        semiMajorAxis: orbitRadius,
         p: 2,
-        period: getOrbitalPeriod(orbitRadius, parentMassSum),
-        orientation: Quaternion.Identity()
+        inclination: Tools.ToRadians(normalRandom(0, 10, rng, GenerationSteps.ORBIT + 10)),
+        eccentricity: 0,
+        longitudeOfAscendingNode: 0,
+        argumentOfPeriapsis: 0,
+        initialMeanAnomaly: 0
     };
 
     const physicalProperties: OrbitalObjectPhysicsInfo = {
         mass: 1,
         siderealDaySeconds: 0,
-        axialTilt: Quaternion.RotationAxis(Axis.X, 2 * rng(GenerationSteps.AXIAL_TILT) * Math.PI)
+        axialTilt: 2 * rng(GenerationSteps.AXIAL_TILT) * Math.PI
     };
 
     const faction = getFactionFromGalacticPosition(starSystemPosition, rng);
@@ -88,7 +89,7 @@ export function newSeededSpaceStationModel(
     // find average distance to stellar objects
     let distanceToStar = 0;
     parentBodies.forEach((celestialBody) => {
-        distanceToStar += celestialBody.orbit.radius;
+        distanceToStar += celestialBody.orbit.semiMajorAxis;
     });
     distanceToStar /= parentBodies.length;
 

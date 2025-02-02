@@ -17,18 +17,15 @@
 
 import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../../settings";
-import { Quaternion } from "@babylonjs/core/Maths/math";
-import { Axis } from "@babylonjs/core/Maths/math.axis";
-import { clamp } from "../../utils/math";
-import { getOrbitalPeriod, getPeriapsis, Orbit } from "../../orbit/orbit";
+import { Orbit } from "../../orbit/orbit";
 import { PlanetaryMassObjectPhysicsInfo } from "../../architecture/physicsInfo";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { newSeededRingsModel } from "../../rings/ringsModel";
 import { GenerationSteps } from "../../utils/generationSteps";
-
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { OrbitalObjectType } from "../../architecture/orbitalObject";
 import { PlanetModel } from "../../architecture/planet";
+import { Tools } from "@babylonjs/core/Misc/tools";
 
 export type GasPlanetModel = PlanetModel & {
     readonly type: OrbitalObjectType.GAS_PLANET;
@@ -46,25 +43,37 @@ export function newSeededGasPlanetModel(
     // Todo: do not hardcode
     let orbitRadius = rng(GenerationSteps.ORBIT) * 15e9;
 
-    const orbitalP = clamp(0.7, 3.0, normalRandom(2.0, 0.3, rng, GenerationSteps.ORBIT + 80));
-    orbitRadius += orbitRadius - getPeriapsis(orbitRadius, orbitalP);
+    let parentAverageInclination = 0;
+    let parentAverageAxialTilt = 0;
     if (parentBodies.length > 0) {
         const maxRadius = parentBodies.reduce((max, body) => Math.max(max, body.radius), 0);
         orbitRadius += maxRadius * 1.5;
+
+        for (const parent of parentBodies) {
+            parentAverageInclination += parent.orbit.inclination;
+            parentAverageAxialTilt += parent.physics.axialTilt;
+        }
+        parentAverageInclination /= parentBodies.length;
+        parentAverageAxialTilt /= parentBodies.length;
     }
 
-    const parentMassSum = parentBodies.reduce((sum, body) => sum + body.physics.mass, 0);
     const orbit: Orbit = {
-        radius: orbitRadius,
-        p: 2, //orbitalP,
-        period: getOrbitalPeriod(orbitRadius, parentMassSum),
-        orientation: Quaternion.RotationAxis(Axis.X, rng(GenerationSteps.ORBIT + 20 - 0.5) * 0.2)
+        semiMajorAxis: orbitRadius,
+        p: 2,
+        inclination:
+            parentAverageInclination +
+            parentAverageAxialTilt +
+            Tools.ToRadians(normalRandom(0, 5, rng, GenerationSteps.ORBIT + 10)),
+        eccentricity: 0,
+        longitudeOfAscendingNode: 0,
+        argumentOfPeriapsis: 0,
+        initialMeanAnomaly: 0
     };
 
     const physicalProperties: PlanetaryMassObjectPhysicsInfo = {
         //FIXME: when Settings.Earth radius gets to 1:1 scale, change this value by a variable in settings
         mass: Settings.JUPITER_MASS * (radius / 69_911e3) ** 3,
-        axialTilt: Quaternion.RotationAxis(Axis.X, normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT)),
+        axialTilt: normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT),
         siderealDaySeconds: (24 * 60 * 60) / 10,
         minTemperature: -180,
         maxTemperature: 200,

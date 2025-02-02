@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Direction } from "../../utils/direction";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TelluricPlanetMaterial } from "./telluricPlanetMaterial";
 import { TelluricPlanetaryMassObjectModel } from "./telluricPlanetaryMassObjectModel";
 import { Camera } from "@babylonjs/core/Cameras/camera";
@@ -30,7 +30,6 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { RingsUniforms } from "../../rings/ringsUniform";
-import { setRotationQuaternion } from "../../uberCore/transforms/basicTransform";
 import { CloudsUniforms } from "../../clouds/cloudsUniforms";
 import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
@@ -71,8 +70,7 @@ export class TelluricPlanet implements PlanetaryMassObject, Cullable {
         this.model = model;
 
         this.transform = new TransformNode(this.model.name, scene);
-
-        setRotationQuaternion(this.getTransform(), this.model.physics.axialTilt);
+        this.transform.rotationQuaternion = Quaternion.Identity();
 
         this.aggregate = new PhysicsAggregate(
             this.getTransform(),
@@ -138,15 +136,11 @@ export class TelluricPlanet implements PlanetaryMassObject, Cullable {
 
         this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());
         this.targetInfo.maxDistance =
-            this.model.type === OrbitalObjectType.TELLURIC_SATELLITE ? this.model.orbit.radius * 8.0 : 0;
+            this.model.type === OrbitalObjectType.TELLURIC_SATELLITE ? this.model.orbit.semiMajorAxis * 8.0 : 0;
     }
 
     getTransform(): TransformNode {
         return this.transform;
-    }
-
-    getRotationAxis(): Vector3 {
-        return this.getTransform().up;
     }
 
     getCloudsUniforms(): CloudsUniforms | null {

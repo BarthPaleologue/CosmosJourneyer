@@ -5,6 +5,7 @@ import { StarSystemCoordinates } from "./coordinates/universeCoordinates";
 import { ObjectTargetCursorType, Targetable } from "../architecture/targetable";
 import { Settings } from "../settings";
 import { StarSystemModel } from "../starSystem/starSystemModel";
+import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export class SystemTarget implements Targetable {
     readonly name: string;
@@ -12,16 +13,27 @@ export class SystemTarget implements Targetable {
 
     readonly systemCoordinates: StarSystemCoordinates;
 
+    private readonly referencePlanePosition: Vector3;
+
     readonly targetInfo = {
         type: ObjectTargetCursorType.STAR_SYSTEM,
         minDistance: Settings.LIGHT_YEAR * 2,
         maxDistance: Settings.LIGHT_YEAR * 0.2
     };
 
-    constructor(systemModel: StarSystemModel, scene: Scene) {
+    constructor(systemModel: StarSystemModel, referencePlanePosition: Vector3, scene: Scene) {
         this.name = systemModel.name;
         this.transform = new TransformNode(this.name, scene);
         this.systemCoordinates = systemModel.coordinates;
+
+        this.referencePlanePosition = referencePlanePosition;
+        this.transform.position.copyFrom(referencePlanePosition);
+    }
+
+    updatePosition(referencePlaneRotation: Matrix, referencePosition: Vector3) {
+        Vector3.TransformCoordinatesToRef(this.referencePlanePosition, referencePlaneRotation, this.transform.position);
+        this.transform.position.addInPlace(referencePosition);
+        this.transform.computeWorldMatrix(true);
     }
 
     getTransform(): TransformNode {

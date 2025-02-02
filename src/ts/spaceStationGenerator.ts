@@ -95,7 +95,7 @@ const spaceStationModel = newSeededSpaceStationModel(
     systemPosition,
     [sunModel]
 );
-spaceStationModel.orbit.radius = distanceToStar;
+spaceStationModel.orbit.semiMajorAxis = distanceToStar;
 
 const spaceStation = new SpaceStation(spaceStationModel, scene);
 

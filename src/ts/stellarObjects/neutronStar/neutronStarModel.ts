@@ -18,15 +18,13 @@
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { StellarObjectPhysicsInfo } from "../../architecture/physicsInfo";
 import { StellarObjectModel } from "../../architecture/stellarObject";
-import { getOrbitalPeriod, Orbit } from "../../orbit/orbit";
+import { Orbit } from "../../orbit/orbit";
 import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { clamp } from "../../utils/math";
 import { newSeededRingsModel } from "../../rings/ringsModel";
 import { GenerationSteps } from "../../utils/generationSteps";
-
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { OrbitalObjectType } from "../../architecture/orbitalObject";
-import { Quaternion } from "@babylonjs/core/Maths/math";
 
 export type NeutronStarModel = StellarObjectModel & {
     readonly type: OrbitalObjectType.NEUTRON_STAR;
@@ -45,7 +43,7 @@ export function newSeededNeutronStarModel(
         mass: 1000,
         siderealDaySeconds: 24 * 60 * 60,
         blackBodyTemperature: temperature,
-        axialTilt: Quaternion.Identity()
+        axialTilt: 0
     };
 
     const radius = clamp(normalRandom(10e3, 1e3, rng, GenerationSteps.RADIUS), 2e3, 50e3);
@@ -53,12 +51,14 @@ export function newSeededNeutronStarModel(
     // Todo: do not hardcode
     const orbitRadius = rng(GenerationSteps.ORBIT) * 5000000e3;
 
-    const parentMassSum = parentBodies?.reduce((sum, body) => sum + body.physics.mass, 0) ?? 0;
     const orbit: Orbit = {
-        radius: orbitRadius,
+        semiMajorAxis: parentBodies.length > 0 ? orbitRadius : 0,
+        eccentricity: 0,
         p: 2,
-        period: getOrbitalPeriod(orbitRadius, parentMassSum),
-        orientation: Quaternion.Identity()
+        inclination: 0,
+        longitudeOfAscendingNode: 0,
+        argumentOfPeriapsis: 0,
+        initialMeanAnomaly: 0
     };
 
     const ringProportion = 0.02;

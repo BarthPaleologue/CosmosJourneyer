@@ -19,7 +19,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { isSizeOnScreenEnough } from "../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { SpaceStationNodeType } from "../assets/procedural/spaceStation/spaceStationNode";
 import { UtilitySection } from "../assets/procedural/spaceStation/utilitySection";
 import { HelixHabitat } from "../assets/procedural/spaceStation/helixHabitat";
@@ -43,8 +43,8 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { SpaceElevatorClimber } from "./spaceElevatorClimber";
 import { clamp, remap, triangleWave } from "../utils/math";
 import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
-import { setRotationQuaternion } from "../uberCore/transforms/basicTransform";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
+import { setUpVector } from "../uberCore/transforms/basicTransform";
 
 export class SpaceElevator implements OrbitalFacility {
     readonly name: string;
@@ -82,6 +82,8 @@ export class SpaceElevator implements OrbitalFacility {
         this.name = this.model.name;
 
         this.root = new TransformNode(this.name, scene);
+        this.root.rotationQuaternion = Quaternion.Identity();
+
         this.scene = scene;
 
         const tetherThickness = 10;
@@ -118,12 +120,6 @@ export class SpaceElevator implements OrbitalFacility {
         this.getTransform()
             .getChildTransformNodes(true)
             .forEach((transform) => transform.position.addInPlace(deltaPosition));
-
-        this.getTransform()
-            .getChildTransformNodes(true)
-            .forEach((transform) => transform.rotateAround(Vector3.Zero(), Axis.Z, -Math.PI / 2));
-
-        setRotationQuaternion(this.getTransform(), this.model.physics.axialTilt);
 
         const extendSize = boundingVectors.max.subtract(boundingVectors.min).scale(0.5);
         this.boundingRadius = Math.max(extendSize.x, extendSize.y, extendSize.z);
@@ -173,10 +169,6 @@ export class SpaceElevator implements OrbitalFacility {
 
     private markPadAsAvailable(landingPad: LandingPad) {
         this.unavailableLandingPads.delete(landingPad);
-    }
-
-    getRotationAxis(): Vector3 {
-        return this.getTransform().up;
     }
 
     public getBoundingRadius(): number {
@@ -297,6 +289,14 @@ export class SpaceElevator implements OrbitalFacility {
         cameraWorldPosition: Vector3,
         deltaSeconds: number
     ) {
+        if (parents.length !== 1) {
+            throw new Error("Space Elevator should have exactly one parent");
+        }
+
+        const parent = parents[0];
+        const upDirection = this.getTransform().position.subtract(parent.getTransform().position).normalize();
+        setUpVector(this.getTransform(), upDirection);
+
         this.elapsedSeconds += deltaSeconds;
 
         this.solarSections.forEach((solarSection) => solarSection.update(stellarObjects, cameraWorldPosition));

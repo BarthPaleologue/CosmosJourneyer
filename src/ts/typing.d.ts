@@ -17,3 +17,4 @@ declare module "*.babylon";
 declare module "*.wasm";
 
 declare module "*.mp3";
+declare module "*.ogg";

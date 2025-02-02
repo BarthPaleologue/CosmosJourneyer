@@ -16,8 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { CreateGreasedLine, GreasedLineBaseMesh } from "@babylonjs/core/Meshes";
-import { Vector3 } from "@babylonjs/core/Maths/math";
-import { getPointOnOrbitLocal } from "./orbit";
+import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math";
+import { getOrbitalPeriod, getPointOnOrbitLocal } from "./orbit";
 import { OrbitalObject } from "../architecture/orbitalObject";
 import { Scene } from "@babylonjs/core/scene";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
@@ -42,14 +42,17 @@ export class OrbitRenderer {
     }
 
     private createOrbitMesh(orbitalObject: OrbitalObject, scene: Scene) {
+        const parents = this.orbitalObjects.get(orbitalObject) ?? [];
+        const parentMassSum = parents.reduce((sum, parent) => sum + parent.model.physics.mass, 0);
+
         const orbit = orbitalObject.model.orbit;
-        const nbSteps = Math.max(100, Math.round(Math.sqrt(orbit.radius / 200e3)));
-        const timestep = orbit.period / nbSteps;
+        const nbSteps = Math.max(100, Math.round(Math.sqrt(orbit.semiMajorAxis / 200e3)));
+        const timestep = getOrbitalPeriod(orbit.semiMajorAxis, parentMassSum) / nbSteps;
         const points: Vector3[] = [];
 
         for (let step = 0; step < nbSteps; step++) {
             const t = step * timestep;
-            points.push(getPointOnOrbitLocal(orbit, t));
+            points.push(getPointOnOrbitLocal(orbit, parentMassSum, t));
         }
         points.push(points[0]);
 
@@ -81,7 +84,7 @@ export class OrbitRenderer {
         return this._isVisible;
     }
 
-    update() {
+    update(referencePlaneRotation: Matrix) {
         if (!this._isVisible) return;
         for (const [orbitalObject, parents] of this.orbitalObjects) {
             const orbitMesh = this.orbitMeshes.get(orbitalObject);
@@ -97,7 +100,7 @@ export class OrbitRenderer {
             parentBarycenter.scaleInPlace(1 / massSum);
 
             orbitMesh.position = parentBarycenter;
-            orbitMesh.rotationQuaternion = orbitalObject.model.orbit.orientation;
+            orbitMesh.rotationQuaternion = Quaternion.FromRotationMatrix(referencePlaneRotation);
             orbitMesh.computeWorldMatrix(true);
         }
     }

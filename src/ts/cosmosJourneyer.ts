@@ -59,6 +59,7 @@ import { promptModalBoolean, alertModal, promptModalString } from "./utils/dialo
 import { FuelScoopTutorial } from "./tutorials/fuelScoopTutorial";
 import { EncyclopaediaGalacticaManager } from "./society/encyclopaediaGalacticaManager";
 import { EncyclopaediaGalacticaLocal } from "./society/encyclopaediaGalacticaLocal";
+import { MusicConductor } from "./audio/musicConductor";
 import { StarSystemDatabase } from "./starSystem/starSystemDatabase";
 import { registerCustomSystems } from "./starSystem/customSystems/registerCustomSystems";
 
@@ -85,6 +86,8 @@ export class CosmosJourneyer {
 
     readonly starSystemView: StarSystemView;
     readonly starMap: StarMap;
+
+    readonly musicConductor: MusicConductor;
 
     readonly mainMenu: MainMenu;
     readonly pauseMenu: PauseMenu;
@@ -232,8 +235,17 @@ export class CosmosJourneyer {
 
         this.starSystemView.getSpaceshipControls().onToggleWarpDrive.add(async (isWarpDriveEnabled) => {
             if (isWarpDriveEnabled) return;
-            if (this.starSystemView.getSpaceshipControls().getClosestLandableFacility() === null) return;
             if (this.player.tutorials.stationLandingCompleted) return;
+
+            const shipControls = this.starSystemView.getSpaceshipControls();
+            const closestLandableFacility = shipControls.getClosestLandableFacility();
+            if (closestLandableFacility === null) return;
+
+            const shipPosition = shipControls.getTransform().getAbsolutePosition();
+            const facilityPosition = closestLandableFacility.getTransform().position;
+            const limitDistance = 10 * closestLandableFacility.getBoundingRadius();
+            if (Vector3.DistanceSquared(shipPosition, facilityPosition) > limitDistance ** 2) return;
+
             await this.tutorialLayer.setTutorial(StationLandingTutorial);
             this.tutorialLayer.onQuitTutorial.addOnce(() => {
                 this.player.tutorials.stationLandingCompleted = true;
@@ -286,6 +298,8 @@ export class CosmosJourneyer {
                     2000
                 );
         });
+
+        this.musicConductor = new MusicConductor(this.starSystemView);
 
         window.addEventListener("blur", () => {
             if (!this.mainMenu?.isVisible() && !this.starSystemView.isLoadingSystem()) this.pause();
@@ -446,6 +460,12 @@ export class CosmosJourneyer {
             updateNotifications(deltaSeconds);
             AudioManager.Update(deltaSeconds);
             Sounds.Update();
+            this.musicConductor.update(
+                this.isPaused(),
+                this.activeView === this.starSystemView,
+                this.mainMenu.isVisible(),
+                deltaSeconds
+            );
 
             if (this.isPaused()) return;
             this.activeView.render();
