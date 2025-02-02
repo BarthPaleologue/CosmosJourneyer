@@ -440,7 +440,7 @@ export class Spaceship implements Transformable {
         this.onTakeOff.notifyObservers();
     }
 
-    private land(deltaTime: number) {
+    private land(deltaSeconds: number) {
         if (this.landingTarget !== null) {
             const gravityDir = this.landingTarget
                 .getTransform()
@@ -461,7 +461,7 @@ export class Spaceship implements Transformable {
                 const distance = landingSpot.subtract(this.getTransform().getAbsolutePosition()).dot(gravityDir);
                 translate(
                     this.getTransform(),
-                    gravityDir.scale(Math.min(10 * deltaTime * Math.sign(distance), distance))
+                    gravityDir.scale(Math.min(10 * deltaSeconds * Math.sign(distance), distance))
                 );
 
                 const currentUp = getUpwardDirection(this.getTransform());
@@ -470,7 +470,7 @@ export class Spaceship implements Transformable {
                 if (Vector3.Distance(currentUp, targetUp) > 0.01) {
                     const axis = Vector3.Cross(currentUp, targetUp);
                     theta = Math.acos(Vector3.Dot(currentUp, targetUp));
-                    rotate(this.getTransform(), axis, Math.min(0.4 * deltaTime, theta));
+                    rotate(this.getTransform(), axis, Math.min(0.4 * deltaSeconds, theta));
                 }
 
                 if (Math.abs(distance) < this.boundingExtent.y / 2 && Math.abs(theta) < 0.01) {
