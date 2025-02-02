@@ -437,7 +437,7 @@ export class Spaceship implements Transformable {
         this.onTakeOff.notifyObservers();
     }
 
-    private land(deltaSeconds: number) {
+    private landOnSurface(deltaSeconds: number) {
         if (this.landingTarget === null) return;
 
         const gravityDir = this.landingTarget
@@ -796,7 +796,7 @@ export class Spaceship implements Transformable {
         });
 
         if (this.state === ShipState.LANDING) {
-            this.land(deltaSeconds);
+            this.landOnSurface(deltaSeconds);
         }
 
         const distanceTravelledLY = (this.getSpeed() * deltaSeconds) / Settings.LIGHT_YEAR;
