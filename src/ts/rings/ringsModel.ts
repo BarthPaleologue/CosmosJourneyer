@@ -29,9 +29,11 @@ export type RingsModel = {
 };
 
 export function newSeededRingsModel(rng: (step: number) => number): RingsModel {
+    const ringStart = randRange(1.8, 2.2, rng, 1400);
+    const ringSpan = Math.max(0.2, normalRandom(1.0, 0.5, rng, 1405));
     return {
-        ringStart: randRange(1.8, 2.2, rng, 1400),
-        ringEnd: randRange(2.1, 4.0, rng, 1410),
+        ringStart: ringStart,
+        ringEnd: ringStart + ringSpan,
         ringFrequency: 30.0,
         ringOpacity: clamp(normalRandom(0.7, 0.1, rng, 1420), 0, 1),
         ringColor: new Color3(255, 225, 171).scaleInPlace(randRange(0.7, 1.2, rng, 1430) / 255),
