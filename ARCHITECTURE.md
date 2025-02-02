@@ -62,7 +62,6 @@ This means that in the previous diagram, in the `Orbital Objects` tree, are only
 classDiagram
     class OrbitalObject {
         +getOrbitSettings()
-        +getRotationAxis()
         +updateOrbitPosition()
         +updateRotation()
     }

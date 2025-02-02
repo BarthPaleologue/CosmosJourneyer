@@ -22,8 +22,6 @@ import { CosmosJourneyer } from "./cosmosJourneyer";
 import { newSeededBlackHoleModel } from "./stellarObjects/blackHole/blackHoleModel";
 import { StarSystemModel } from "./starSystem/starSystemModel";
 import { newSeededTelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModel";
-import { Axis } from "@babylonjs/core/Maths/math.axis";
-import { Quaternion } from "@babylonjs/core/Maths/math";
 
 const engine = await CosmosJourneyer.CreateAsync();
 engine.setAutoSaveEnabled(false);
@@ -35,8 +33,8 @@ const scene = starSystemView.scene;
 const blackHoleModel = newSeededBlackHoleModel(42, "Gargantua", []);
 
 const millerPlanetModel = newSeededTelluricPlanetModel(47, "Miller", [blackHoleModel]);
-millerPlanetModel.orbit.radius = blackHoleModel.physics.accretionDiskRadius * 4;
-millerPlanetModel.orbit.orientation = Quaternion.RotationAxis(Axis.X, 0.2);
+millerPlanetModel.orbit.semiMajorAxis = blackHoleModel.physics.accretionDiskRadius * 4;
+millerPlanetModel.orbit.inclination = 0.2;
 
 const starSystemModel: StarSystemModel = {
     name: "Black Hole Demo",

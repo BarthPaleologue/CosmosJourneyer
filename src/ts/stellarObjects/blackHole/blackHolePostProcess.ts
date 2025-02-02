@@ -84,6 +84,6 @@ export class BlackHolePostProcess extends PostProcess implements UpdatablePostPr
 
     public update(deltaSeconds: number): void {
         this.blackHoleUniforms.time += deltaSeconds;
-        this.blackHoleUniforms.time %= 60 * 60 * 24;
+        this.blackHoleUniforms.time %= 60 * 60;
     }
 }

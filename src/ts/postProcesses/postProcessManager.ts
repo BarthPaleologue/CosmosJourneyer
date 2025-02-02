@@ -271,43 +271,75 @@ export class PostProcessManager {
     }
 
     public addStar(star: Star, excludedMeshes: AbstractMesh[]) {
+        const postProcesses: PostProcess[] = [];
         const volumetricLight = new VolumetricLight(
             star.mesh,
             star.volumetricLightUniforms,
             excludedMeshes,
             this.scene
         );
+        this.volumetricLights.push(volumetricLight);
+        postProcesses.push(volumetricLight);
+
         const lensFlare = new LensFlarePostProcess(
             star.getTransform(),
             star.getBoundingRadius(),
             getRgbFromTemperature(star.model.physics.blackBodyTemperature),
             this.scene
         );
-
-        this.volumetricLights.push(volumetricLight);
         this.lensFlares.push(lensFlare);
+        postProcesses.push(lensFlare);
 
-        this.celestialBodyToPostProcesses.set(star.getTransform(), [volumetricLight, lensFlare]);
+        if (star.ringsUniforms !== null) {
+            const rings = new RingsPostProcess(star.getTransform(), star.ringsUniforms, star.model, [], this.scene);
+            this.rings.push(rings);
+            postProcesses.push(rings);
+        }
+
+        this.celestialBodyToPostProcesses.set(star.getTransform(), postProcesses);
     }
 
     public addNeutronStar(neutronStar: NeutronStar, excludedMeshes: AbstractMesh[]) {
+        const postProcesses: PostProcess[] = [];
         const volumetricLight = new VolumetricLight(
             neutronStar.mesh,
             neutronStar.volumetricLightUniforms,
             excludedMeshes,
             this.scene
         );
+        this.volumetricLights.push(volumetricLight);
+        postProcesses.push(volumetricLight);
+
         const lensFlare = new LensFlarePostProcess(
             neutronStar.getTransform(),
             neutronStar.getBoundingRadius(),
             getRgbFromTemperature(neutronStar.model.physics.blackBodyTemperature),
             this.scene
         );
-
-        this.volumetricLights.push(volumetricLight);
         this.lensFlares.push(lensFlare);
+        postProcesses.push(lensFlare);
 
-        this.celestialBodyToPostProcesses.set(neutronStar.getTransform(), [volumetricLight, lensFlare]);
+        const matterJets = new MatterJetPostProcess(
+            neutronStar.getTransform(),
+            neutronStar.getBoundingRadius(),
+            this.scene
+        );
+        this.matterJets.push(matterJets);
+        postProcesses.push(matterJets);
+
+        if (neutronStar.ringsUniforms !== null) {
+            const rings = new RingsPostProcess(
+                neutronStar.getTransform(),
+                neutronStar.ringsUniforms,
+                neutronStar.model,
+                [],
+                this.scene
+            );
+            this.rings.push(rings);
+            postProcesses.push(rings);
+        }
+
+        this.celestialBodyToPostProcesses.set(neutronStar.getTransform(), postProcesses);
     }
 
     /**

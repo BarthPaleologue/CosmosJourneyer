@@ -17,8 +17,7 @@
 
 import { Transformable } from "./transformable";
 import { HasBoundingSphere } from "./hasBoundingSphere";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math";
-import { getRotationQuaternion, setRotationQuaternion, translate } from "../uberCore/transforms/basicTransform";
+import { Axis, Matrix, Quaternion, Space, Vector3 } from "@babylonjs/core/Maths/math";
 import { OrbitalObjectPhysicsInfo } from "./physicsInfo";
 import { TypedObject } from "./typedObject";
 import { getPointOnOrbit, Orbit } from "../orbit/orbit";
@@ -28,11 +27,6 @@ import { getPointOnOrbit, Orbit } from "../orbit/orbit";
  */
 export interface OrbitalObject extends Transformable, HasBoundingSphere, TypedObject {
     readonly model: OrbitalObjectModel;
-
-    /**
-     * The rotation axis around which the object rotates on itself
-     */
-    getRotationAxis(): Vector3;
 }
 
 export class OrbitalObjectUtils {
@@ -43,20 +37,25 @@ export class OrbitalObjectUtils {
      * @param elapsedSeconds The time elapsed since the beginning of time in seconds
      * @constructor
      */
-    static GetOrbitalPosition(object: OrbitalObject, parents: OrbitalObject[], elapsedSeconds: number): Vector3 {
+    static GetOrbitalPosition(
+        object: OrbitalObject,
+        parents: OrbitalObject[],
+        referencePlaneRotation: Matrix,
+        elapsedSeconds: number
+    ): Vector3 {
         const orbit = object.model.orbit;
-        if (orbit.period === 0 || parents.length === 0) return object.getTransform().getAbsolutePosition();
+        if (orbit.semiMajorAxis === 0 || parents.length === 0) return object.getTransform().position;
 
-        const barycenter = Vector3.Zero(); //object.parent.getTransform().getAbsolutePosition();
+        const barycenter = Vector3.Zero();
         let sumOfMasses = 0;
         for (const parent of parents) {
             const mass = parent.model.physics.mass;
-            barycenter.addInPlace(parent.getTransform().getAbsolutePosition().scale(mass));
+            barycenter.addInPlace(parent.getTransform().position.scale(mass));
             sumOfMasses += mass;
         }
         barycenter.scaleInPlace(1 / sumOfMasses);
 
-        return getPointOnOrbit(barycenter, orbit, elapsedSeconds);
+        return getPointOnOrbit(barycenter, sumOfMasses, orbit, elapsedSeconds, referencePlaneRotation);
     }
 
     /**
@@ -66,40 +65,61 @@ export class OrbitalObjectUtils {
      * @param elapsedSeconds The time elapsed since the beginning of time in seconds
      * @constructor
      */
-    static SetOrbitalPosition(object: OrbitalObject, parents: OrbitalObject[], elapsedSeconds: number): void {
+    static SetOrbitalPosition(
+        object: OrbitalObject,
+        parents: OrbitalObject[],
+        referencePlaneRotation: Matrix,
+        elapsedSeconds: number
+    ): void {
         const orbit = object.model.orbit;
-        if (orbit.period === 0 || parents.length === 0) return;
+        if (orbit.semiMajorAxis === 0 || parents.length === 0) return;
 
-        const oldPosition = object.getTransform().getAbsolutePosition();
-        const newPosition = OrbitalObjectUtils.GetOrbitalPosition(object, parents, elapsedSeconds);
-        translate(object.getTransform(), newPosition.subtractInPlace(oldPosition));
+        const newPosition = OrbitalObjectUtils.GetOrbitalPosition(
+            object,
+            parents,
+            referencePlaneRotation,
+            elapsedSeconds
+        );
+
+        object.getTransform().position = newPosition;
+        object.getTransform().computeWorldMatrix(true);
     }
 
     /**
-     * Computes the rotation to apply in the current frame to the object around its axis. This does not update the rotation of the object (see UpdateRotation)
+     * Computes the rotation angle of the object around its axis for a given time
      * @param object The object we want to compute the rotation of
-     * @param deltaTime The time elapsed since the last update
+     * @param deltaSeconds The time span in seconds
      * @constructor
      */
-    static GetRotationAngle(object: OrbitalObject, deltaTime: number): number {
+    static GetRotationAngle(object: OrbitalObject, deltaSeconds: number): number {
         if (object.model.physics.siderealDaySeconds === 0) return 0;
-        return (2 * Math.PI * deltaTime) / object.model.physics.siderealDaySeconds;
+        return (2 * Math.PI * deltaSeconds) / object.model.physics.siderealDaySeconds;
     }
 
     /**
-     * Updates the rotation of the body around its axis
-     * @param object
-     * @param deltaTime The time elapsed since the last update
-     * @constructor
+     * Sets the rotation of the object around its axis
+     * @param object The object we want to update the rotation of
+     * @param referencePlaneRotation The rotation of the reference plane
+     * @param elapsedSeconds The time elapsed since the beginning of time in seconds
      */
-    static UpdateRotation(object: OrbitalObject, deltaTime: number): void {
-        const dtheta = OrbitalObjectUtils.GetRotationAngle(object, deltaTime);
-        if (dtheta === 0) return;
+    static SetRotation(object: OrbitalObject, referencePlaneRotation: Matrix, elapsedSeconds: number) {
+        const rotation = Matrix.RotationAxis(Axis.Z, object.model.orbit.inclination + object.model.physics.axialTilt);
 
-        const elementaryRotationQuaternion = Quaternion.RotationAxis(object.getRotationAxis(), dtheta);
-        const newQuaternion = elementaryRotationQuaternion.multiply(getRotationQuaternion(object.getTransform()));
+        rotation.multiplyToRef(referencePlaneRotation, rotation);
 
-        setRotationQuaternion(object.getTransform(), newQuaternion);
+        let objectRotationQuaternion = object.getTransform().rotationQuaternion;
+        if (objectRotationQuaternion === null) {
+            objectRotationQuaternion = object.getTransform().rotationQuaternion = Quaternion.Identity();
+        }
+
+        Quaternion.FromRotationMatrixToRef(rotation, objectRotationQuaternion);
+        object.getTransform().computeWorldMatrix(true);
+
+        const rotationAroundAxis = OrbitalObjectUtils.GetRotationAngle(object, elapsedSeconds);
+        if (rotationAroundAxis === 0) return;
+
+        object.getTransform().rotate(Axis.Y, rotationAroundAxis, Space.LOCAL);
+        object.getTransform().computeWorldMatrix(true);
     }
 }
 

@@ -19,7 +19,7 @@ import { Controls } from "../uberCore/controls";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { setRotationQuaternion, setUpVector, translate } from "../uberCore/transforms/basicTransform";
+import { setUpVector, translate } from "../uberCore/transforms/basicTransform";
 import { AnimationGroup } from "@babylonjs/core/Animations/animationGroup";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { CollisionMask, Settings } from "../settings";
@@ -111,7 +111,7 @@ export class CharacterControls implements Controls {
         this.scene = scene;
 
         this.character = Objects.CreateCharacterInstance();
-        setRotationQuaternion(this.character, Quaternion.Identity());
+        this.getTransform().rotationQuaternion = Quaternion.Identity();
 
         const walkAnim = scene.getAnimationGroupByName("WalkingForward");
         if (walkAnim === null) throw new Error("'WalkingForward' animation not found");

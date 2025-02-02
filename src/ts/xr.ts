@@ -64,7 +64,7 @@ camera.minZ = 0.01;
 const depthRenderer = scene.enableDepthRenderer(null, false, true);
 
 function createMandelbulb(): TransformNode {
-    const mandelBulbModel = newSeededMandelbulbModel(Math.random() * 100_000, "XR Anomaly", []);
+    const mandelBulbModel = newSeededMandelbulbModel(Math.random() * 100_000, "XR Anomaly");
     const mandelbulb = new EmptyCelestialBody<MandelbulbModel>(mandelBulbModel, scene);
     mandelbulb.getTransform().scalingDeterminant = 1 / 400e3;
 
@@ -82,7 +82,7 @@ function createMandelbulb(): TransformNode {
 }
 
 function createJulia(): TransformNode {
-    const juliaModel = newSeededJuliaSetModel(Math.random() * 100_000, "XR Anomaly", []);
+    const juliaModel = newSeededJuliaSetModel(Math.random() * 100_000, "XR Anomaly");
     const julia = new EmptyCelestialBody<JuliaSetModel>(juliaModel, scene);
     julia.getTransform().scalingDeterminant = 1 / 400e3;
 
@@ -100,7 +100,7 @@ function createJulia(): TransformNode {
 }
 
 function createMandelbox(): TransformNode {
-    const mandelboxModel = newSeededMandelboxModel(Math.random() * 100_000, "XR Anomaly", []);
+    const mandelboxModel = newSeededMandelboxModel(Math.random() * 100_000, "XR Anomaly");
     const mandelbox = new EmptyCelestialBody<MandelboxModel>(mandelboxModel, scene);
     mandelbox.getTransform().scalingDeterminant = 1 / 100e3;
 
@@ -118,7 +118,7 @@ function createMandelbox(): TransformNode {
 }
 
 function createSierpinskiPyramid(): TransformNode {
-    const sierpinskiPyramidModel = newSeededSierpinskiPyramidModel(Math.random() * 100_000, "XR Anomaly", []);
+    const sierpinskiPyramidModel = newSeededSierpinskiPyramidModel(Math.random() * 100_000, "XR Anomaly");
     const sierpinskiPyramid = new EmptyCelestialBody<SierpinskiPyramidModel>(sierpinskiPyramidModel, scene);
     sierpinskiPyramid.getTransform().scalingDeterminant = 1 / 100e3;
 
@@ -136,7 +136,7 @@ function createSierpinskiPyramid(): TransformNode {
 }
 
 function createMengerSponge(): TransformNode {
-    const mengerSpongeModel = newSeededMengerSpongeModel(Math.random() * 100_000, "XR Anomaly", []);
+    const mengerSpongeModel = newSeededMengerSpongeModel(Math.random() * 100_000, "XR Anomaly");
     const mengerSponge = new EmptyCelestialBody<MengerSpongeModel>(mengerSpongeModel, scene);
     mengerSponge.getTransform().scalingDeterminant = 1 / 100e3;
 

@@ -22,13 +22,12 @@ import { normalRandom, randRangeInt } from "extended-random";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { Settings } from "../../settings";
 import { TelluricPlanetaryMassObjectPhysicsInfo } from "../../architecture/physicsInfo";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math";
-import { getOrbitalPeriod, getPeriapsis, Orbit } from "../../orbit/orbit";
+import { getOrbitalPeriod, Orbit } from "../../orbit/orbit";
 import { celsiusToKelvin, hasLiquidWater } from "../../utils/physics";
 import { CloudsModel, newCloudsModel } from "../../clouds/cloudsModel";
 import { TelluricPlanetaryMassObjectModel } from "./telluricPlanetaryMassObjectModel";
-import { randomDirection } from "../../utils/random";
 import { clamp } from "../../utils/math";
+import { Tools } from "@babylonjs/core/Misc/tools";
 
 export type TelluricSatelliteModel = TelluricPlanetaryMassObjectModel & {
     readonly type: OrbitalObjectType.TELLURIC_SATELLITE;
@@ -82,29 +81,9 @@ export function newSeededTelluricSatelliteModel(
     const maxTemperature =
         minTemperature + Math.exp(-pressure / Settings.EARTH_SEA_LEVEL_PRESSURE) * randRangeInt(30, 200, rng, 81);
 
-    // this average is an approximation of a quaternion average
-    // see https://math.stackexchange.com/questions/61146/averaging-quaternions
-    const parentAverageAxialTilt: Quaternion = parentBodies.reduce(
-        (sum, body) => sum.add(body.physics.axialTilt),
-        Quaternion.Zero()
-    );
-    parentAverageAxialTilt.scaleInPlace(1 / parentBodies.length);
-    parentAverageAxialTilt.normalize();
-
-    const parentRotationAxis = Vector3.Up().applyRotationQuaternionInPlace(parentAverageAxialTilt);
-    const orbitOrientation = parentAverageAxialTilt.clone();
-    Quaternion.RotationAxis(parentRotationAxis, rng(GenerationSteps.ORBIT + 20) * 2 * Math.PI).multiplyToRef(
-        orbitOrientation,
-        orbitOrientation
-    );
-    Quaternion.RotationAxis(
-        randomDirection(rng, GenerationSteps.ORBIT + 30),
-        normalRandom(0, Math.PI / 12, rng, GenerationSteps.ORBIT + 10)
-    ).multiplyToRef(orbitOrientation, orbitOrientation);
-
     const physicalProperties: TelluricPlanetaryMassObjectPhysicsInfo = {
         mass: mass,
-        axialTilt: orbitOrientation,
+        axialTilt: 0,
         siderealDaySeconds: (60 * 60 * 24) / 10,
         minTemperature: minTemperature,
         maxTemperature: maxTemperature,
@@ -117,24 +96,38 @@ export function newSeededTelluricSatelliteModel(
         (Settings.OCEAN_DEPTH * physicalProperties.waterAmount * physicalProperties.pressure) /
         Settings.EARTH_SEA_LEVEL_PRESSURE;
 
-    const orbitalP = 2;
-
     const parentMaxRadius = parentBodies.reduce((max, body) => Math.max(max, body.radius), 0);
 
     let orbitRadius = parentMaxRadius * clamp(normalRandom(2.0, 0.3, rng, GenerationSteps.ORBIT), 1.2, 3.0);
     orbitRadius += parentMaxRadius * clamp(normalRandom(10, 4, rng, GenerationSteps.ORBIT), 1, 50);
-    orbitRadius += 2.0 * Math.max(0, parentMaxRadius - getPeriapsis(orbitRadius, orbitalP));
+    orbitRadius += 2.0 * parentMaxRadius;
 
     const parentMassSum = parentBodies.reduce((sum, body) => sum + body.physics.mass, 0);
+
+    let parentAverageInclination = 0;
+    let parentAverageAxialTilt = 0;
+    for (const parent of parentBodies) {
+        parentAverageInclination += parent.orbit.inclination;
+        parentAverageAxialTilt += parent.physics.axialTilt;
+    }
+    parentAverageInclination /= parentBodies.length;
+    parentAverageAxialTilt /= parentBodies.length;
+
     const orbit: Orbit = {
-        radius: orbitRadius,
-        p: orbitalP,
-        period: getOrbitalPeriod(orbitRadius, parentMassSum),
-        orientation: orbitOrientation
+        semiMajorAxis: orbitRadius,
+        p: 2,
+        inclination:
+            parentAverageInclination +
+            parentAverageAxialTilt +
+            Tools.ToRadians(normalRandom(0, 5, rng, GenerationSteps.ORBIT + 10)),
+        eccentricity: 0,
+        longitudeOfAscendingNode: 0,
+        argumentOfPeriapsis: 0,
+        initialMeanAnomaly: 0
     };
 
     // tidal lock
-    physicalProperties.siderealDaySeconds = orbit.period;
+    physicalProperties.siderealDaySeconds = getOrbitalPeriod(orbit.semiMajorAxis, parentMassSum);
 
     const canHaveLiquidWater = hasLiquidWater(
         physicalProperties.pressure,

@@ -16,20 +16,17 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 import { Light } from "@babylonjs/core/Lights/light";
-import { Camera } from "@babylonjs/core/Cameras/camera";
 import { BlackHoleModel } from "./blackHoleModel";
 import { StellarObject } from "../../architecture/stellarObject";
-import { Cullable } from "../../utils/cullable";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
-import { setRotationQuaternion } from "../../uberCore/transforms/basicTransform";
 import { BlackHoleUniforms } from "./blackHoleUniforms";
 
-export class BlackHole implements StellarObject, Cullable {
+export class BlackHole implements StellarObject {
     readonly name: string;
 
     private readonly transform: TransformNode;
@@ -52,7 +49,7 @@ export class BlackHole implements StellarObject, Cullable {
         this.name = this.model.name;
 
         this.transform = new TransformNode(this.model.name, scene);
-        setRotationQuaternion(this.getTransform(), this.model.physics.axialTilt);
+        this.transform.rotationQuaternion = Quaternion.Identity();
 
         this.light = new PointLight(`${this.model.name}Light`, Vector3.Zero(), scene);
         //this.light.diffuse.fromArray(getRgbFromTemperature(this.model.physicalProperties.temperature).asArray());
@@ -69,20 +66,12 @@ export class BlackHole implements StellarObject, Cullable {
         return this.transform;
     }
 
-    getRotationAxis(): Vector3 {
-        return this.getTransform().up;
-    }
-
     getLight(): PointLight {
         return this.light;
     }
 
     getTypeName(): string {
         return getOrbitalObjectTypeToI18nString(this.model);
-    }
-
-    public computeCulling(camera: Camera): void {
-        return;
     }
 
     public getRadius(): number {

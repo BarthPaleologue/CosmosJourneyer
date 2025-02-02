@@ -21,7 +21,7 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
@@ -33,9 +33,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
 import { Planet } from "../../architecture/planet";
-
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
-import { setRotationQuaternion } from "../../uberCore/transforms/basicTransform";
 import { AtmosphereUniforms } from "../../atmosphere/atmosphereUniforms";
 import { Settings } from "../../settings";
 
@@ -69,6 +67,7 @@ export class GasPlanet implements Planet, Cullable {
             },
             scene
         );
+        this.mesh.rotationQuaternion = Quaternion.Identity();
 
         this.aggregate = new PhysicsAggregate(
             this.getTransform(),
@@ -108,8 +107,6 @@ export class GasPlanet implements Planet, Cullable {
             this.asteroidField = null;
         }
 
-        setRotationQuaternion(this.getTransform(), this.model.physics.axialTilt);
-
         this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());
     }
 
@@ -123,10 +120,6 @@ export class GasPlanet implements Planet, Cullable {
 
     public getBoundingRadius(): number {
         return this.model.radius;
-    }
-
-    getRotationAxis(): Vector3 {
-        return this.getTransform().up;
     }
 
     getTypeName(): string {
