@@ -18,4 +18,4 @@ async function loadHtml() {
     document.body.insertAdjacentHTML("beforeend", sidePanels);
 }
 
-loadHtml();
+void loadHtml();
