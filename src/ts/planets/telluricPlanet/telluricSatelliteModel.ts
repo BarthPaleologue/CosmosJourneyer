@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { OrbitalObjectType } from "../../architecture/orbitalObject";
+import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { normalRandom, randRangeInt } from "extended-random";

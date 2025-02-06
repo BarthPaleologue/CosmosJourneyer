@@ -24,7 +24,7 @@ import { clamp } from "../../utils/math";
 import { newSeededRingsModel } from "../../rings/ringsModel";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
-import { OrbitalObjectType } from "../../architecture/orbitalObject";
+import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 
 export type NeutronStarModel = StellarObjectModel & {
     readonly type: OrbitalObjectType.NEUTRON_STAR;

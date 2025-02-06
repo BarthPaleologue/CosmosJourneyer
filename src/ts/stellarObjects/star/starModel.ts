@@ -25,7 +25,7 @@ import { StellarObjectModel } from "../../architecture/stellarObject";
 import { newSeededRingsModel } from "../../rings/ringsModel";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
-import { OrbitalObjectType } from "../../architecture/orbitalObject";
+import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 
 export type StarModel = StellarObjectModel & {
     readonly type: OrbitalObjectType.STAR;

@@ -23,7 +23,7 @@ import { GenerationSteps } from "../../utils/generationSteps";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { AnomalyModel } from "../anomaly";
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
-import { OrbitalObjectType } from "../../architecture/orbitalObject";
+import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { Tools } from "@babylonjs/core/Misc/tools";
 
 export type JuliaSetModel = AnomalyModel & {

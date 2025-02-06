@@ -23,7 +23,7 @@ import { StellarObjectModel } from "../../architecture/stellarObject";
 import { Settings } from "../../settings";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
-import { OrbitalObjectType } from "../../architecture/orbitalObject";
+import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { estimateStarRadiusFromMass } from "../../utils/physics";
 
 export type BlackHoleModel = StellarObjectModel & {

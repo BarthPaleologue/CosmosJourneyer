@@ -20,6 +20,7 @@ import { HasBoundingSphere } from "./hasBoundingSphere";
 import { OrbitalObjectPhysicsInfo } from "./physicsInfo";
 import { TypedObject } from "./typedObject";
 import { Orbit } from "../orbit/orbit";
+import { OrbitalObjectType } from "./orbitalObjectType";
 
 /**
  * Describes all objects that can have an orbital trajectory and rotate on themselves
@@ -57,22 +58,6 @@ export type OrbitalObjectModel = {
      */
     readonly physics: OrbitalObjectPhysicsInfo;
 };
-
-export const enum OrbitalObjectType {
-    STAR = 0,
-    NEUTRON_STAR = 1,
-    BLACK_HOLE = 2,
-    TELLURIC_PLANET = 1000,
-    TELLURIC_SATELLITE = 1001,
-    GAS_PLANET = 1002,
-    MANDELBULB = 2000,
-    JULIA_SET = 2001,
-    MANDELBOX = 2002,
-    SIERPINSKI_PYRAMID = 2003,
-    MENGER_SPONGE = 2004,
-    SPACE_STATION = 3000,
-    SPACE_ELEVATOR = 3001
-}
 
 export const SatelliteTypes = [OrbitalObjectType.TELLURIC_SATELLITE, OrbitalObjectType.SPACE_STATION];
 

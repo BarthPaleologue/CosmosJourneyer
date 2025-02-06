@@ -23,7 +23,7 @@ import { GenerationSteps } from "../../utils/generationSteps";
 import { OrbitalObjectPhysicsInfo } from "../../architecture/physicsInfo";
 import { AnomalyModel } from "../anomaly";
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
-import { OrbitalObjectType } from "../../architecture/orbitalObject";
+import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { Tools } from "@babylonjs/core/Misc/tools";
 
 export type MandelbulbModel = AnomalyModel & {

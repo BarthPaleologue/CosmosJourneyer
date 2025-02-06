@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { PlanetModel } from "../../architecture/planet";
-import { OrbitalObjectType } from "../../architecture/orbitalObject";
+import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
