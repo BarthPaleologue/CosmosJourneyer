@@ -22,9 +22,8 @@ import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { Controls } from "../uberCore/controls";
 import { getUpwardDirection, roll, rotateAround } from "../uberCore/transforms/basicTransform";
 import { CanHaveRings } from "../architecture/canHaveRings";
-import { CelestialBody } from "../architecture/celestialBody";
 
-export function nearestBody(objectPosition: Vector3, bodies: CelestialBody[]): CelestialBody {
+export function nearestObject(objectPosition: Vector3, bodies: Transformable[]): Transformable {
     let distance = -1;
     if (bodies.length === 0) throw new Error("no bodieees !");
     let nearest = bodies[0];
@@ -45,7 +44,7 @@ export function positionNearObjectBrightSide(
     nRadius = 3
 ): void {
     // go from the nearest star to be on the sunny side of the object
-    const nearestStar = nearestBody(object.getTransform().getAbsolutePosition(), starSystem.getStellarObjects());
+    const nearestStar = nearestObject(object.getTransform().getAbsolutePosition(), starSystem.getStellarObjects());
 
     if (nearestStar === object) {
         // the object is the nearest star
@@ -83,7 +82,7 @@ export function positionNearObjectWithStarVisible(
     nRadius = 3
 ): void {
     // go from the nearest star to be on the sunny side of the object
-    const nearestStar = nearestBody(object.getTransform().getAbsolutePosition(), starSystem.getStellarObjects());
+    const nearestStar = nearestObject(object.getTransform().getAbsolutePosition(), starSystem.getStellarObjects());
 
     if (nearestStar === object) {
         // the object is the nearest star
@@ -156,7 +155,7 @@ export function positionNearObjectAsteroidField(
 
     const asteroidFieldAverageRadius = asteroidField.averageRadius;
 
-    const nearestStar = nearestBody(bodyPosition, starSystem.getStellarObjects());
+    const nearestStar = nearestObject(bodyPosition, starSystem.getStellarObjects());
     const dirToStar = bodyPosition.subtract(nearestStar.getTransform().getAbsolutePosition()).normalize();
     const upDirection = getUpwardDirection(body.getTransform());
     const lateralDirection = Vector3.Cross(dirToStar, upDirection).normalize();
