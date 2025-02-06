@@ -89,7 +89,7 @@ export class Star implements StellarObject, Cullable {
         this.light.falloffType = Light.FALLOFF_STANDARD;
         this.light.parent = this.getTransform();
 
-        this.material = new StarMaterial(this.model, scene);
+        this.material = new StarMaterial(this.model.seed, this.model.physics.blackBodyTemperature, scene);
         this.mesh.material = this.material;
 
         if (this.model.rings !== null) {
