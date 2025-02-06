@@ -27,35 +27,25 @@ import { Star } from "../stellarObjects/star/star";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge";
-import { OrbitalObject } from "../architecture/orbitalObject";
-import { OrbitalObjectUtils } from "../architecture/orbitalObjectUtils";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
-import { CelestialBody } from "../architecture/celestialBody";
-import { StellarObject } from "../architecture/stellarObject";
-import { PlanetaryMassObject } from "../architecture/planetaryMassObject";
 import { SystemTarget } from "../utils/systemTarget";
 import { StarFieldBox } from "./starFieldBox";
 import { PlanetarySystemModel, StarSystemModel, SubStarSystemModel } from "./starSystemModel";
 import { Settings } from "../settings";
-import { GasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
-import { MandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModel";
-import { JuliaSetModel } from "../anomalies/julia/juliaSetModel";
-import { StarModel } from "../stellarObjects/star/starModel";
-import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
-import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates";
 import { wait } from "../utils/wait";
-import { Planet } from "../architecture/planet";
-import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
-import { OrbitalFacility } from "../spacestation/orbitalFacility";
-import { SpaceStationModel } from "../spacestation/spacestationModel";
 import { SpaceElevator } from "../spacestation/spaceElevator";
-import { SpaceElevatorModel } from "../spacestation/spaceElevatorModel";
 import { StarSystemDatabase } from "./starSystemDatabase";
-import { MandelboxModel } from "../anomalies/mandelbox/mandelboxModel";
-import { SierpinskiPyramidModel } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidModel";
-import { MengerSpongeModel } from "../anomalies/mengerSponge/mengerSpongeModel";
 import { EmptyCelestialBody } from "../utils/emptyCelestialBody";
+import {
+    Anomaly,
+    CelestialBody,
+    OrbitalFacility,
+    OrbitalObject,
+    Planet,
+    StellarObject
+} from "../architecture/orbitalObject";
+import { OrbitalObjectUtils } from "../architecture/orbitalObjectUtils";
 
 export type PlanetarySystem = {
     readonly planets: Planet[];
@@ -66,7 +56,7 @@ export type PlanetarySystem = {
 export type SubStarSystem = {
     readonly stellarObjects: StellarObject[];
     readonly planetarySystems: PlanetarySystem[];
-    readonly anomalies: CelestialBody[];
+    readonly anomalies: Anomaly[];
     readonly spaceStations: OrbitalFacility[];
 };
 
@@ -163,13 +153,13 @@ export class StarSystemController {
             let stellarObject: StellarObject;
             switch (stellarObjectModel.type) {
                 case OrbitalObjectType.STAR:
-                    stellarObject = new Star(stellarObjectModel as StarModel, this.scene);
+                    stellarObject = new Star(stellarObjectModel, this.scene);
                     break;
                 case OrbitalObjectType.BLACK_HOLE:
-                    stellarObject = new BlackHole(stellarObjectModel as BlackHoleModel, this.scene);
+                    stellarObject = new BlackHole(stellarObjectModel, this.scene);
                     break;
                 case OrbitalObjectType.NEUTRON_STAR:
-                    stellarObject = new NeutronStar(stellarObjectModel as NeutronStarModel, this.scene);
+                    stellarObject = new NeutronStar(stellarObjectModel, this.scene);
                     break;
                 default:
                     throw new Error("Unknown stellar object type");
@@ -186,28 +176,25 @@ export class StarSystemController {
             planetarySystems.push(await this.loadPlanetarySystem(planetarySystem, stellarObjects));
         }
 
-        const anomalies: CelestialBody[] = [];
+        const anomalies: Anomaly[] = [];
         for (const anomalyModel of subSystemModel.anomalies) {
             console.log("Loading Anomaly:", anomalyModel.name);
-            let anomaly: CelestialBody;
+            let anomaly: Anomaly;
             switch (anomalyModel.type) {
                 case OrbitalObjectType.MANDELBULB:
-                    anomaly = new EmptyCelestialBody<MandelbulbModel>(anomalyModel as MandelbulbModel, this.scene);
+                    anomaly = new EmptyCelestialBody(anomalyModel, this.scene);
                     break;
                 case OrbitalObjectType.JULIA_SET:
-                    anomaly = new EmptyCelestialBody<JuliaSetModel>(anomalyModel as JuliaSetModel, this.scene);
+                    anomaly = new EmptyCelestialBody(anomalyModel, this.scene);
                     break;
                 case OrbitalObjectType.MANDELBOX:
-                    anomaly = new EmptyCelestialBody<MandelboxModel>(anomalyModel as MandelboxModel, this.scene);
+                    anomaly = new EmptyCelestialBody(anomalyModel, this.scene);
                     break;
                 case OrbitalObjectType.SIERPINSKI_PYRAMID:
-                    anomaly = new EmptyCelestialBody<SierpinskiPyramidModel>(
-                        anomalyModel as SierpinskiPyramidModel,
-                        this.scene
-                    );
+                    anomaly = new EmptyCelestialBody(anomalyModel, this.scene);
                     break;
                 case OrbitalObjectType.MENGER_SPONGE:
-                    anomaly = new EmptyCelestialBody<MengerSpongeModel>(anomalyModel as MengerSpongeModel, this.scene);
+                    anomaly = new EmptyCelestialBody(anomalyModel, this.scene);
                     break;
             }
             anomalies.push(anomaly);
@@ -224,7 +211,7 @@ export class StarSystemController {
             let orbitalFacility: OrbitalFacility;
             switch (orbitalFacilityModel.type) {
                 case OrbitalObjectType.SPACE_STATION:
-                    orbitalFacility = new SpaceStation(orbitalFacilityModel as SpaceStationModel, this.scene);
+                    orbitalFacility = new SpaceStation(orbitalFacilityModel, this.scene);
                     break;
                 case OrbitalObjectType.SPACE_ELEVATOR:
                     throw new Error("A space elevator orbiting a star??? Sounds like a bad idea");
@@ -258,11 +245,11 @@ export class StarSystemController {
             switch (planetModel.type) {
                 case OrbitalObjectType.TELLURIC_PLANET:
                     //FIXME: TelluricPlanet and TelluricSatellite should be 2 different types to avoid casting
-                    planet = new TelluricPlanet(planetModel as TelluricPlanetModel, this.scene) as Planet;
+                    planet = new TelluricPlanet(planetModel, this.scene) as Planet;
                     this.telluricBodies.push(planet as TelluricPlanet);
                     break;
                 case OrbitalObjectType.GAS_PLANET:
-                    planet = new GasPlanet(planetModel as GasPlanetModel, this.scene);
+                    planet = new GasPlanet(planetModel, this.scene);
                     this.gasPlanets.push(planet as GasPlanet);
                     break;
             }
@@ -295,11 +282,11 @@ export class StarSystemController {
 
             switch (orbitalFacilityModel.type) {
                 case OrbitalObjectType.SPACE_STATION:
-                    orbitalFacility = new SpaceStation(orbitalFacilityModel as SpaceStationModel, this.scene);
+                    orbitalFacility = new SpaceStation(orbitalFacilityModel, this.scene);
                     break;
 
                 case OrbitalObjectType.SPACE_ELEVATOR:
-                    orbitalFacility = new SpaceElevator(orbitalFacilityModel as SpaceElevatorModel, this.scene);
+                    orbitalFacility = new SpaceElevator(orbitalFacilityModel, this.scene);
                     break;
             }
 
@@ -407,7 +394,7 @@ export class StarSystemController {
     /**
      * Returns all the planets in the star system
      */
-    public getPlanets(): PlanetaryMassObject[] {
+    public getPlanets(): Planet[] {
         return this.subSystems.flatMap((subSystem) =>
             subSystem.planetarySystems.flatMap((planetarySystem) => planetarySystem.planets)
         );
@@ -420,9 +407,9 @@ export class StarSystemController {
     /**
      * Returns all the planetary mass objects in the star system. (Planets first, then satellites)
      */
-    public getPlanetaryMassObjects(): PlanetaryMassObject[] {
-        const planets: PlanetaryMassObject[] = [];
-        const satellites: PlanetaryMassObject[] = [];
+    public getPlanetaryMassObjects(): Planet[] {
+        const planets: Planet[] = [];
+        const satellites: Planet[] = [];
         this.subSystems.forEach((subSystem) =>
             subSystem.planetarySystems.forEach((planetarySystem) => {
                 planets.push(...planetarySystem.planets);
@@ -436,7 +423,7 @@ export class StarSystemController {
     /**
      * Returns all the anomalies in the star system
      */
-    public getAnomalies(): CelestialBody[] {
+    public getAnomalies(): Anomaly[] {
         return this.subSystems.flatMap((subSystem) => subSystem.anomalies);
     }
 
@@ -489,30 +476,30 @@ export class StarSystemController {
         const stellarObjects = this.getStellarObjects();
 
         for (const object of celestialBodies) {
-            switch (object.model.type) {
+            switch (object.type) {
                 case OrbitalObjectType.STAR:
-                    postProcessManager.addStar(object as Star, [this.starFieldBox.mesh]);
+                    postProcessManager.addStar(object, [this.starFieldBox.mesh]);
                     break;
                 case OrbitalObjectType.NEUTRON_STAR:
-                    postProcessManager.addNeutronStar(object as NeutronStar, [this.starFieldBox.mesh]);
+                    postProcessManager.addNeutronStar(object, [this.starFieldBox.mesh]);
                     break;
                 case OrbitalObjectType.BLACK_HOLE:
-                    postProcessManager.addBlackHole(object as BlackHole);
+                    postProcessManager.addBlackHole(object);
                     break;
                 case OrbitalObjectType.TELLURIC_PLANET:
-                    postProcessManager.addTelluricPlanet(object as TelluricPlanet, stellarObjects);
+                    postProcessManager.addTelluricPlanet(object, stellarObjects);
                     break;
                 case OrbitalObjectType.TELLURIC_SATELLITE:
-                    postProcessManager.addTelluricPlanet(object as TelluricPlanet, stellarObjects);
+                    postProcessManager.addTelluricPlanet(object, stellarObjects);
                     break;
                 case OrbitalObjectType.GAS_PLANET:
-                    postProcessManager.addGasPlanet(object as GasPlanet, stellarObjects);
+                    postProcessManager.addGasPlanet(object, stellarObjects);
                     break;
                 case OrbitalObjectType.MANDELBULB:
                     postProcessManager.addMandelbulb(
                         object.getTransform(),
                         object.getRadius(),
-                        object.model as MandelbulbModel,
+                        object.model,
                         stellarObjects
                     );
                     break;
@@ -520,7 +507,7 @@ export class StarSystemController {
                     postProcessManager.addJuliaSet(
                         object.getTransform(),
                         object.getRadius(),
-                        object.model as JuliaSetModel,
+                        object.model,
                         stellarObjects
                     );
                     break;
@@ -528,7 +515,7 @@ export class StarSystemController {
                     postProcessManager.addMandelbox(
                         object.getTransform(),
                         object.getRadius(),
-                        object.model as MandelboxModel,
+                        object.model,
                         stellarObjects
                     );
                     break;
@@ -536,7 +523,7 @@ export class StarSystemController {
                     postProcessManager.addSierpinskiPyramid(
                         object.getTransform(),
                         object.getRadius(),
-                        object.model as SierpinskiPyramidModel,
+                        object.model,
                         stellarObjects
                     );
                     break;
@@ -544,13 +531,9 @@ export class StarSystemController {
                     postProcessManager.addMengerSponge(
                         object.getTransform(),
                         object.getRadius(),
-                        object.model as MengerSpongeModel,
+                        object.model,
                         stellarObjects
                     );
-                    break;
-                case OrbitalObjectType.SPACE_STATION:
-                    break;
-                case OrbitalObjectType.SPACE_ELEVATOR:
                     break;
             }
         }

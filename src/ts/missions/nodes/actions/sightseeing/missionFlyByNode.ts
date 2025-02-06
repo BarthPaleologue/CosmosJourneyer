@@ -30,7 +30,7 @@ import { Settings } from "../../../../settings";
 import i18n from "../../../../i18n";
 import { getOrbitalObjectTypeToI18nString } from "../../../../utils/strings/orbitalObjectTypeToDisplay";
 import { getGoToSystemInstructions } from "../../../common";
-import { OrbitalObjectType } from "../../../../architecture/orbitalObject";
+import { OrbitalObjectType } from "../../../../architecture/orbitalObjectType";
 import { StarSystemDatabase } from "../../../../starSystem/starSystemDatabase";
 
 const enum FlyByState {
@@ -98,7 +98,7 @@ export class MissionFlyByNode implements MissionNode {
         const distance = Vector3.Distance(playerPosition, targetObject.getTransform().getAbsolutePosition());
 
         let thresholdMultiplier = 1;
-        switch (targetObject.model.type) {
+        switch (targetObject.type) {
             case OrbitalObjectType.STAR:
             case OrbitalObjectType.TELLURIC_PLANET:
             case OrbitalObjectType.TELLURIC_SATELLITE:
@@ -110,6 +110,7 @@ export class MissionFlyByNode implements MissionNode {
             case OrbitalObjectType.MENGER_SPONGE:
             case OrbitalObjectType.SPACE_STATION:
             case OrbitalObjectType.SPACE_ELEVATOR:
+            case OrbitalObjectType.CUSTOM:
                 thresholdMultiplier = 3;
                 break;
             case OrbitalObjectType.NEUTRON_STAR:

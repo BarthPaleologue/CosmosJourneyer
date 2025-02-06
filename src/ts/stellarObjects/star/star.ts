@@ -27,7 +27,7 @@ import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
-import { StellarObject } from "../../architecture/stellarObject";
+import { StellarObjectBase } from "../../architecture/stellarObject";
 import { Cullable } from "../../utils/cullable";
 import { RingsUniforms } from "../../rings/ringsUniform";
 import { Scene } from "@babylonjs/core/scene";
@@ -36,8 +36,9 @@ import { getRgbFromTemperature } from "../../utils/specrend";
 import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
 import { VolumetricLightUniforms } from "../../volumetricLight/volumetricLightUniforms";
+import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 
-export class Star implements StellarObject, Cullable {
+export class Star implements StellarObjectBase<OrbitalObjectType.STAR>, Cullable {
     readonly mesh: Mesh;
     readonly light: PointLight;
     private readonly material: StarMaterial;
@@ -51,6 +52,8 @@ export class Star implements StellarObject, Cullable {
     readonly asteroidField: AsteroidField | null;
 
     readonly model: StarModel;
+
+    readonly type = OrbitalObjectType.STAR;
 
     readonly targetInfo: TargetInfo;
 
@@ -85,11 +88,11 @@ export class Star implements StellarObject, Cullable {
         this.aggregate.body.disablePreStep = false;
 
         this.light = new PointLight(`${this.model.name}Light`, Vector3.Zero(), scene);
-        this.light.diffuse = getRgbFromTemperature(this.model.physics.blackBodyTemperature);
+        this.light.diffuse = getRgbFromTemperature(this.model.blackBodyTemperature);
         this.light.falloffType = Light.FALLOFF_STANDARD;
         this.light.parent = this.getTransform();
 
-        this.material = new StarMaterial(this.model.seed, this.model.physics.blackBodyTemperature, scene);
+        this.material = new StarMaterial(this.model.seed, this.model.blackBodyTemperature, scene);
         this.mesh.material = this.material;
 
         if (this.model.rings !== null) {

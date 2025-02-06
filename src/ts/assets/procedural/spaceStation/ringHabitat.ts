@@ -31,7 +31,7 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import { getRngFromSeed } from "../../../utils/getRngFromSeed";
 import { createEnvironmentAggregate } from "../../../utils/havok";
 import { getRotationPeriodForArtificialGravity } from "../../../utils/physics";
-import { OrbitalFacilityModel } from "../../../spacestation/orbitalFacility";
+import { OrbitalFacilityModel } from "../../../architecture/orbitalObjectModel";
 
 export class RingHabitat implements Transformable {
     private readonly root: TransformNode;

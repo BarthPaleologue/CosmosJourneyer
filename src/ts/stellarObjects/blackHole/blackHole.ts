@@ -20,13 +20,14 @@ import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 import { Light } from "@babylonjs/core/Lights/light";
 import { BlackHoleModel } from "./blackHoleModel";
-import { StellarObject } from "../../architecture/stellarObject";
+import { StellarObjectBase } from "../../architecture/stellarObject";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
 import { BlackHoleUniforms } from "./blackHoleUniforms";
+import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 
-export class BlackHole implements StellarObject {
+export class BlackHole implements StellarObjectBase<OrbitalObjectType.BLACK_HOLE> {
     readonly name: string;
 
     private readonly transform: TransformNode;
@@ -34,6 +35,8 @@ export class BlackHole implements StellarObject {
     readonly light: PointLight;
 
     readonly model: BlackHoleModel;
+
+    readonly type = OrbitalObjectType.BLACK_HOLE;
 
     readonly ringsUniforms = null;
 
@@ -55,7 +58,7 @@ export class BlackHole implements StellarObject {
         //this.light.diffuse.fromArray(getRgbFromTemperature(this.model.physicalProperties.temperature).asArray());
         this.light.falloffType = Light.FALLOFF_STANDARD;
         this.light.parent = this.getTransform();
-        if (this.model.physics.accretionDiskRadius === 0) this.light.intensity = 0;
+        if (this.model.accretionDiskRadius === 0) this.light.intensity = 0;
 
         this.blackHoleUniforms = new BlackHoleUniforms(this.model);
 

@@ -20,14 +20,14 @@ import "../styles/index.scss";
 import { Settings } from "./settings";
 import { positionNearObjectBrightSide } from "./utils/positionNearObject";
 import { CosmosJourneyer } from "./cosmosJourneyer";
-import { newSeededGasPlanetModel } from "./planets/gasPlanet/gasPlanetModel";
+import { newSeededGasPlanetModel } from "./planets/gasPlanet/gasPlanetModelGenerator";
 import { SpaceShipControlsInputs } from "./spaceship/spaceShipControlsInputs";
-import { newSeededStarModel } from "./stellarObjects/star/starModel";
+import { newSeededStarModel } from "./stellarObjects/star/starModelGenerator";
 import { StarSystemModel } from "./starSystem/starSystemModel";
 import { StarSystemCoordinates } from "./utils/coordinates/universeCoordinates";
-import { newSeededTelluricSatelliteModel } from "./planets/telluricPlanet/telluricSatelliteModel";
-import { newSeededTelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModel";
-import { newSeededSpaceElevatorModel } from "./spacestation/spaceElevatorModel";
+import { newSeededTelluricSatelliteModel } from "./planets/telluricPlanet/telluricSatelliteModelGenerator";
+import { newSeededTelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModelGenerator";
+import { newSeededSpaceElevatorModel } from "./spacestation/spaceElevatorModelGenerator";
 import { celsiusToKelvin, getOrbitRadiusFromPeriod } from "./utils/physics";
 import { Tools } from "@babylonjs/core/Misc/tools";
 
@@ -50,7 +50,7 @@ const systemCoordinates: StarSystemCoordinates = {
 };
 
 const sunModel = newSeededStarModel(420, "Weierstrass", []);
-sunModel.physics.blackBodyTemperature = 5778;
+sunModel.blackBodyTemperature = 5778;
 
 /*const secundaModel = new StarModel(-672446, sunModel);
 secundaModel.orbit.semiMajorAxis = 30 * sunModel.radius;
@@ -63,10 +63,8 @@ terminaModel.orbit.period = 60 * 60;
 const termina = StarSystemHelper.makeStar(starSystem, terminaModel);*/
 
 const hecateModel = newSeededTelluricPlanetModel(253, "Hécate", [sunModel]);
-hecateModel.physics.minTemperature = celsiusToKelvin(-40);
-hecateModel.physics.maxTemperature = celsiusToKelvin(30);
-
-hecateModel.physics.siderealDaySeconds = 6 * 60 * 60;
+hecateModel.temperature.min = celsiusToKelvin(-40);
+hecateModel.temperature.max = celsiusToKelvin(30);
 
 hecateModel.orbit.semiMajorAxis = 21000 * hecateModel.radius;
 
@@ -84,28 +82,12 @@ const spaceStationModel = newSeededSpaceElevatorModel(
 }*/
 
 const moonModel = newSeededTelluricSatelliteModel(23, "Manaleth", [hecateModel]);
-moonModel.physics.mass = 2;
-moonModel.physics.siderealDaySeconds = 28 * 60 * 60;
-moonModel.physics.minTemperature = celsiusToKelvin(-180);
-moonModel.physics.maxTemperature = celsiusToKelvin(200);
-moonModel.physics.waterAmount = 0.9;
-
 moonModel.orbit.inclination = Tools.ToRadians(45);
-
-moonModel.orbit.semiMajorAxis = getOrbitRadiusFromPeriod(
-    moonModel.physics.siderealDaySeconds,
-    hecateModel.physics.mass
-);
+moonModel.orbit.semiMajorAxis = getOrbitRadiusFromPeriod(moonModel.siderealDaySeconds, hecateModel.mass);
 
 const aresModel = newSeededTelluricPlanetModel(0.3725, "Ares", [sunModel]);
 if (aresModel.clouds !== null) aresModel.clouds.coverage = 1;
-aresModel.physics.mass = 7;
-aresModel.physics.siderealDaySeconds = (24 * 60 * 60) / 30;
-aresModel.physics.minTemperature = celsiusToKelvin(-30);
-aresModel.physics.maxTemperature = celsiusToKelvin(20);
-aresModel.physics.pressure = Settings.EARTH_SEA_LEVEL_PRESSURE * 0.5;
-aresModel.physics.waterAmount = 0.2;
-aresModel.physics.oceanLevel = 0;
+if (aresModel.atmosphere !== null) aresModel.atmosphere.pressure = Settings.EARTH_SEA_LEVEL_PRESSURE * 0.5;
 
 aresModel.orbit.semiMajorAxis = 25100 * hecateModel.radius;
 

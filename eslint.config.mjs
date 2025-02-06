@@ -62,12 +62,7 @@ export default [
             "import/no-cycle": "error",
             "import/no-unresolved": "warn",
 
-            "@typescript-eslint/switch-exhaustiveness-check": [
-                "error",
-                {
-                    considerDefaultExhaustiveForUnions: true
-                }
-            ],
+            "@typescript-eslint/switch-exhaustiveness-check": "error",
 
             "@typescript-eslint/no-floating-promises": "error",
             "@typescript-eslint/no-inferrable-types": "warn",

@@ -20,27 +20,26 @@ import { Settings } from "../settings";
 import { generateStarName } from "../utils/strings/starNameGenerator";
 import { wheelOfFortune } from "../utils/random";
 import { PlanetarySystemModel, StarSystemModel } from "./starSystemModel";
-import { StellarObjectModel } from "../architecture/stellarObject";
-import { AnomalyModel, AnomalyObjectType } from "../anomalies/anomaly";
+import { StellarObjectModel, AnomalyModel, AnomalyType } from "../architecture/orbitalObjectModel";
 import { Alphabet, ReversedGreekAlphabet } from "../utils/strings/parseToStrings";
-import { newSeededStarModel } from "../stellarObjects/star/starModel";
-import { newSeededBlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
-import { newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
-import { newSeededGasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
-import { newSeededMandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModel";
-import { newSeededJuliaSetModel } from "../anomalies/julia/juliaSetModel";
+import { newSeededStarModel } from "../stellarObjects/star/starModelGenerator";
+import { newSeededBlackHoleModel } from "../stellarObjects/blackHole/blackHoleModelGenerator";
+import { newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModelGenerator";
+import { newSeededGasPlanetModel } from "../planets/gasPlanet/gasPlanetModelGenerator";
+import { newSeededMandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModelGenerator";
+import { newSeededJuliaSetModel } from "../anomalies/julia/juliaSetModelGenerator";
 import { getRngFromSeed } from "../utils/getRngFromSeed";
 import { romanNumeral } from "../utils/strings/romanNumerals";
-import { newSeededSpaceStationModel } from "../spacestation/spacestationModel";
-import { OrbitalObjectType } from "../architecture/orbitalObject";
-import { newSeededTelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModel";
-import { newSeededTelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
-import { newSeededSpaceElevatorModel } from "../spacestation/spaceElevatorModel";
+import { newSeededSpaceStationModel } from "../spacestation/spaceStationModelGenerator";
+import { OrbitalObjectType } from "../architecture/orbitalObjectType";
+import { newSeededTelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModelGenerator";
+import { newSeededTelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModelGenerator";
+import { newSeededSpaceElevatorModel } from "../spacestation/spaceElevatorModelGenerator";
 import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { newSeededMandelboxModel } from "../anomalies/mandelbox/mandelboxModel";
-import { newSeededSierpinskiPyramidModel } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidModel";
-import { newSeededMengerSpongeModel } from "../anomalies/mengerSponge/mengerSpongeModel";
+import { newSeededMandelboxModel } from "../anomalies/mandelbox/mandelboxModelGenerator";
+import { newSeededSierpinskiPyramidModel } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidModelGenerator";
+import { newSeededMengerSpongeModel } from "../anomalies/mengerSponge/mengerSpongeModelGenerator";
 
 const enum GenerationSteps {
     NAME,
@@ -158,7 +157,7 @@ export function newSeededStarSystemModel(
     );
     for (let i = 0; i < nbAnomalies; i++) {
         const anomalySeed = centeredRand(systemRng, GenerationSteps.ANOMALIES + i * 100) * Settings.SEED_HALF_RANGE;
-        const anomalyType: AnomalyObjectType = wheelOfFortune(
+        const anomalyType: AnomalyType = wheelOfFortune(
             [
                 [OrbitalObjectType.MANDELBULB, 1],
                 [OrbitalObjectType.MANDELBOX, 1],

@@ -1,7 +1,7 @@
 import { Sound } from "@babylonjs/core/Audio/sound";
 import { Musics } from "../assets/musics";
 import { StarSystemView } from "../starSystem/starSystemView";
-import { OrbitalObjectType } from "../architecture/orbitalObject";
+import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
@@ -151,6 +151,7 @@ export class MusicConductor {
             case OrbitalObjectType.TELLURIC_PLANET:
             case OrbitalObjectType.TELLURIC_SATELLITE:
             case OrbitalObjectType.GAS_PLANET:
+            case OrbitalObjectType.CUSTOM:
                 break;
             case OrbitalObjectType.SPACE_STATION:
             case OrbitalObjectType.SPACE_ELEVATOR:

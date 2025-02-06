@@ -40,7 +40,7 @@ export class OrbitalObjectUtils {
         const barycenter = Vector3.Zero();
         let sumOfMasses = 0;
         for (const parent of parents) {
-            const mass = parent.model.physics.mass;
+            const mass = parent.model.mass;
             barycenter.addInPlace(parent.getTransform().position.scale(mass));
             sumOfMasses += mass;
         }
@@ -83,8 +83,8 @@ export class OrbitalObjectUtils {
      * @constructor
      */
     static GetRotationAngle(object: OrbitalObject, deltaSeconds: number): number {
-        if (object.model.physics.siderealDaySeconds === 0) return 0;
-        return (2 * Math.PI * deltaSeconds) / object.model.physics.siderealDaySeconds;
+        if (object.model.siderealDaySeconds === 0) return 0;
+        return (2 * Math.PI * deltaSeconds) / object.model.siderealDaySeconds;
     }
 
     /**
@@ -94,7 +94,7 @@ export class OrbitalObjectUtils {
      * @param elapsedSeconds The time elapsed since the beginning of time in seconds
      */
     static SetRotation(object: OrbitalObject, referencePlaneRotation: Matrix, elapsedSeconds: number) {
-        const rotation = Matrix.RotationAxis(Axis.Z, object.model.orbit.inclination + object.model.physics.axialTilt);
+        const rotation = Matrix.RotationAxis(Axis.Z, object.model.orbit.inclination + object.model.axialTilt);
 
         rotation.multiplyToRef(referencePlaneRotation, rotation);
 

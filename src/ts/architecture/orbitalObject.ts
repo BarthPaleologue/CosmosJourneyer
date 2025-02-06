@@ -15,52 +15,33 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Transformable } from "./transformable";
-import { HasBoundingSphere } from "./hasBoundingSphere";
-import { OrbitalObjectPhysicsInfo } from "./physicsInfo";
-import { TypedObject } from "./typedObject";
-import { Orbit } from "../orbit/orbit";
+import { Star } from "../stellarObjects/star/star";
+import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
+import { BlackHole } from "../stellarObjects/blackHole/blackHole";
+import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
+import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
+import { EmptyCelestialBody } from "../utils/emptyCelestialBody";
+import { SpaceStation } from "../spacestation/spaceStation";
+import { SpaceElevator } from "../spacestation/spaceElevator";
+import { CustomOrbitalObject } from "../utils/customOrbitalObject";
 import { OrbitalObjectType } from "./orbitalObjectType";
+
+export type StellarObject = Star | NeutronStar | BlackHole;
+
+export type Planet = TelluricPlanet | GasPlanet;
+
+export type Anomaly =
+    | EmptyCelestialBody<OrbitalObjectType.MENGER_SPONGE>
+    | EmptyCelestialBody<OrbitalObjectType.MANDELBULB>
+    | EmptyCelestialBody<OrbitalObjectType.JULIA_SET>
+    | EmptyCelestialBody<OrbitalObjectType.SIERPINSKI_PYRAMID>
+    | EmptyCelestialBody<OrbitalObjectType.MANDELBOX>;
+
+export type OrbitalFacility = SpaceStation | SpaceElevator;
+
+export type CelestialBody = StellarObject | Planet | Anomaly;
 
 /**
  * Describes all objects that can have an orbital trajectory and rotate on themselves
  */
-export interface OrbitalObject extends Transformable, HasBoundingSphere, TypedObject {
-    readonly model: OrbitalObjectModel;
-}
-
-/**
- * Describes the model of an orbital object
- */
-export type OrbitalObjectModel = {
-    /**
-     * The name of the object
-     */
-    readonly name: string;
-
-    /**
-     * The seed used by the random number generator
-     */
-    readonly seed: number;
-
-    /**
-     * The type of the celestial body
-     */
-    readonly type: OrbitalObjectType;
-
-    /**
-     * Orbit properties of the object
-     */
-    readonly orbit: Orbit;
-
-    /**
-     * Physical properties of the object
-     */
-    readonly physics: OrbitalObjectPhysicsInfo;
-};
-
-export const SatelliteTypes = [OrbitalObjectType.TELLURIC_SATELLITE, OrbitalObjectType.SPACE_STATION];
-
-export function isSatellite(orbitalObjectType: OrbitalObjectType): boolean {
-    return SatelliteTypes.includes(orbitalObjectType);
-}
+export type OrbitalObject = CelestialBody | OrbitalFacility | CustomOrbitalObject;

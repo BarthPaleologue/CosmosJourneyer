@@ -15,81 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
-import { Settings } from "../../settings";
-import { Orbit } from "../../orbit/orbit";
-import { PlanetaryMassObjectPhysicsInfo } from "../../architecture/physicsInfo";
-import { CelestialBodyModel } from "../../architecture/celestialBody";
-import { newSeededRingsModel } from "../../rings/ringsModel";
-import { GenerationSteps } from "../../utils/generationSteps";
-import { getRngFromSeed } from "../../utils/getRngFromSeed";
+import { HasSeed } from "../../architecture/hasSeed";
+import { OrbitalObjectModelBase } from "../../architecture/orbitalObjectModelBase";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
-import { PlanetModel } from "../../architecture/planet";
-import { Tools } from "@babylonjs/core/Misc/tools";
+import { AtmosphereModel } from "../../atmosphere/atmosphereModel";
+import { RingsModel } from "../../rings/ringsModel";
 
-export type GasPlanetModel = PlanetModel & {
-    readonly type: OrbitalObjectType.GAS_PLANET;
-};
-
-export function newSeededGasPlanetModel(
-    seed: number,
-    name: string,
-    parentBodies: CelestialBodyModel[]
-): GasPlanetModel {
-    const rng = getRngFromSeed(seed);
-
-    const radius = randRangeInt(Settings.EARTH_RADIUS * 4, Settings.EARTH_RADIUS * 20, rng, GenerationSteps.RADIUS);
-
-    // Todo: do not hardcode
-    let orbitRadius = rng(GenerationSteps.ORBIT) * 15e9;
-
-    let parentAverageInclination = 0;
-    let parentAverageAxialTilt = 0;
-    if (parentBodies.length > 0) {
-        const maxRadius = parentBodies.reduce((max, body) => Math.max(max, body.radius), 0);
-        orbitRadius += maxRadius * 1.5;
-
-        for (const parent of parentBodies) {
-            parentAverageInclination += parent.orbit.inclination;
-            parentAverageAxialTilt += parent.physics.axialTilt;
-        }
-        parentAverageInclination /= parentBodies.length;
-        parentAverageAxialTilt /= parentBodies.length;
-    }
-
-    const orbit: Orbit = {
-        semiMajorAxis: orbitRadius,
-        p: 2,
-        inclination:
-            parentAverageInclination +
-            parentAverageAxialTilt +
-            Tools.ToRadians(normalRandom(0, 5, rng, GenerationSteps.ORBIT + 10)),
-        eccentricity: 0,
-        longitudeOfAscendingNode: 0,
-        argumentOfPeriapsis: 0,
-        initialMeanAnomaly: 0
+export type GasPlanetModel = OrbitalObjectModelBase<OrbitalObjectType.GAS_PLANET> &
+    HasSeed & {
+        readonly radius: number;
+        readonly atmosphere: AtmosphereModel;
+        readonly rings: RingsModel | null;
     };
-
-    const physicalProperties: PlanetaryMassObjectPhysicsInfo = {
-        //FIXME: when Settings.Earth radius gets to 1:1 scale, change this value by a variable in settings
-        mass: Settings.JUPITER_MASS * (radius / 69_911e3) ** 3,
-        axialTilt: normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT),
-        siderealDaySeconds: (24 * 60 * 60) / 10,
-        minTemperature: -180,
-        maxTemperature: 200,
-        //FIXME: this is a placeholder value
-        pressure: Settings.EARTH_SEA_LEVEL_PRESSURE
-    };
-
-    const rings = uniformRandBool(0.8, rng, GenerationSteps.RINGS) ? newSeededRingsModel(rng) : null;
-
-    return {
-        name: name,
-        seed: seed,
-        type: OrbitalObjectType.GAS_PLANET,
-        radius: radius,
-        orbit: orbit,
-        physics: physicalProperties,
-        rings: rings
-    };
-}

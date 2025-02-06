@@ -40,9 +40,6 @@ import { translate } from "../uberCore/transforms/basicTransform";
 import { ThickLines } from "../utils/thickLines";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { View } from "../utils/view";
-import { AudioInstance } from "../utils/audioInstance";
-import { AudioManager } from "../audio/audioManager";
-import { AudioMasks } from "../audio/audioMasks";
 import { StarMapInputs } from "./starMapInputs";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Sounds } from "../assets/sounds";
@@ -56,7 +53,7 @@ import { Settings } from "../settings";
 import { getRgbFromTemperature } from "../utils/specrend";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/universeCoordinates";
 import { StarSystemModelUtils } from "../starSystem/starSystemModel";
-import { OrbitalObjectType } from "../architecture/orbitalObject";
+import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { EncyclopaediaGalactica } from "../society/encyclopaediaGalactica";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 
@@ -535,10 +532,7 @@ export class StarMap implements View {
         let instance: InstancedMesh | null = null;
         let recycled = false;
 
-        if (
-            stellarObjectModel.type === OrbitalObjectType.STAR ||
-            stellarObjectModel.type === OrbitalObjectType.NEUTRON_STAR
-        ) {
+        if (stellarObjectModel.type !== OrbitalObjectType.BLACK_HOLE) {
             if (this.recycledStars.length > 0) {
                 instance = this.recycledStars[0];
                 instance.name = instanceName;
@@ -561,7 +555,7 @@ export class StarMap implements View {
 
         initializedInstance.position = data.position.add(this.starMapCenterPosition);
 
-        const objectColor = getRgbFromTemperature(stellarObjectModel.physics.blackBodyTemperature);
+        const objectColor = getRgbFromTemperature(stellarObjectModel.blackBodyTemperature);
         initializedInstance.instancedBuffers.color = new Color4(objectColor.r, objectColor.g, objectColor.b, 0.0);
 
         if (recycled) {

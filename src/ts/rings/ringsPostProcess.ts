@@ -18,7 +18,7 @@
 import ringsFragment from "../../shaders/ringsFragment.glsl";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { RingsSamplerNames, RingsUniformNames, RingsUniforms } from "./ringsUniform";
-import { CelestialBodyModel } from "../architecture/celestialBody";
+import { CelestialBodyModel } from "../architecture/orbitalObjectModel";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { ObjectUniformNames, setObjectUniforms } from "../postProcesses/uniforms/objectUniforms";

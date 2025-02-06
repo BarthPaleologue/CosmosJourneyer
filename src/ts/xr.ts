@@ -29,18 +29,15 @@ import { Scene } from "@babylonjs/core/scene";
 import { JuliaSetPostProcess } from "./anomalies/julia/juliaSetPostProcess";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
 import { ArcRotateCamera, Engine, PostProcess } from "@babylonjs/core";
-import { MandelbulbModel, newSeededMandelbulbModel } from "./anomalies/mandelbulb/mandelbulbModel";
-import { JuliaSetModel, newSeededJuliaSetModel } from "./anomalies/julia/juliaSetModel";
-import { MandelboxModel, newSeededMandelboxModel } from "./anomalies/mandelbox/mandelboxModel";
+import { newSeededMandelbulbModel } from "./anomalies/mandelbulb/mandelbulbModelGenerator";
+import { newSeededJuliaSetModel } from "./anomalies/julia/juliaSetModelGenerator";
+import { newSeededMandelboxModel } from "./anomalies/mandelbox/mandelboxModelGenerator";
 import { MandelboxPostProcess } from "./anomalies/mandelbox/mandelboxPostProcess";
 import { UpdatablePostProcess } from "./postProcesses/updatablePostProcess";
-import {
-    newSeededSierpinskiPyramidModel,
-    SierpinskiPyramidModel
-} from "./anomalies/sierpinskiPyramid/sierpinskiPyramidModel";
+import { newSeededSierpinskiPyramidModel } from "./anomalies/sierpinskiPyramid/sierpinskiPyramidModelGenerator";
 import { SierpinskiPyramidPostProcess } from "./anomalies/sierpinskiPyramid/sierpinskiPyramidPostProcess";
 import { EmptyCelestialBody } from "./utils/emptyCelestialBody";
-import { MengerSpongeModel, newSeededMengerSpongeModel } from "./anomalies/mengerSponge/mengerSpongeModel";
+import { newSeededMengerSpongeModel } from "./anomalies/mengerSponge/mengerSpongeModelGenerator";
 import { MengerSpongePostProcess } from "./anomalies/mengerSponge/mengerSpongePostProcess";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
@@ -65,7 +62,7 @@ const depthRenderer = scene.enableDepthRenderer(null, false, true);
 
 function createMandelbulb(): TransformNode {
     const mandelBulbModel = newSeededMandelbulbModel(Math.random() * 100_000, "XR Anomaly");
-    const mandelbulb = new EmptyCelestialBody<MandelbulbModel>(mandelBulbModel, scene);
+    const mandelbulb = new EmptyCelestialBody(mandelBulbModel, scene);
     mandelbulb.getTransform().scalingDeterminant = 1 / 400e3;
 
     const mandelbulbPP = new MandelbulbPostProcess(
@@ -83,7 +80,7 @@ function createMandelbulb(): TransformNode {
 
 function createJulia(): TransformNode {
     const juliaModel = newSeededJuliaSetModel(Math.random() * 100_000, "XR Anomaly");
-    const julia = new EmptyCelestialBody<JuliaSetModel>(juliaModel, scene);
+    const julia = new EmptyCelestialBody(juliaModel, scene);
     julia.getTransform().scalingDeterminant = 1 / 400e3;
 
     const juliaPP = new JuliaSetPostProcess(
@@ -101,7 +98,7 @@ function createJulia(): TransformNode {
 
 function createMandelbox(): TransformNode {
     const mandelboxModel = newSeededMandelboxModel(Math.random() * 100_000, "XR Anomaly");
-    const mandelbox = new EmptyCelestialBody<MandelboxModel>(mandelboxModel, scene);
+    const mandelbox = new EmptyCelestialBody(mandelboxModel, scene);
     mandelbox.getTransform().scalingDeterminant = 1 / 100e3;
 
     const mandelboxPP = new MandelboxPostProcess(
@@ -119,7 +116,7 @@ function createMandelbox(): TransformNode {
 
 function createSierpinskiPyramid(): TransformNode {
     const sierpinskiPyramidModel = newSeededSierpinskiPyramidModel(Math.random() * 100_000, "XR Anomaly");
-    const sierpinskiPyramid = new EmptyCelestialBody<SierpinskiPyramidModel>(sierpinskiPyramidModel, scene);
+    const sierpinskiPyramid = new EmptyCelestialBody(sierpinskiPyramidModel, scene);
     sierpinskiPyramid.getTransform().scalingDeterminant = 1 / 100e3;
 
     const sierpinskiPyramidPP = new SierpinskiPyramidPostProcess(
@@ -137,7 +134,7 @@ function createSierpinskiPyramid(): TransformNode {
 
 function createMengerSponge(): TransformNode {
     const mengerSpongeModel = newSeededMengerSpongeModel(Math.random() * 100_000, "XR Anomaly");
-    const mengerSponge = new EmptyCelestialBody<MengerSpongeModel>(mengerSpongeModel, scene);
+    const mengerSponge = new EmptyCelestialBody(mengerSpongeModel, scene);
     mengerSponge.getTransform().scalingDeterminant = 1 / 100e3;
 
     const mengerSpongePP = new MengerSpongePostProcess(

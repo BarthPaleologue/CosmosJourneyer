@@ -48,11 +48,12 @@ import { Objects } from "../assets/objects";
 import { Sounds } from "../assets/sounds";
 import { LandingPad } from "../assets/procedural/landingPad/landingPad";
 import { createNotification, NotificationIntent, NotificationOrigin } from "../utils/notification";
-import { OrbitalObject, OrbitalObjectType } from "../architecture/orbitalObject";
-import { CelestialBody } from "../architecture/celestialBody";
+import { CelestialBody, OrbitalObject } from "../architecture/orbitalObject";
+import { CelestialBodyBase } from "../architecture/celestialBody";
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { FuelTank, SerializedFuelTank } from "./fuelTank";
 import { FuelScoop } from "./fuelScoop";
+import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 
 const enum ShipState {
     FLYING,
@@ -623,7 +624,15 @@ export class Spaceship implements Transformable {
             case OrbitalObjectType.GAS_PLANET:
                 fuelAvailability = 0.3;
                 break;
-            default:
+            case OrbitalObjectType.NEUTRON_STAR:
+            case OrbitalObjectType.BLACK_HOLE:
+            case OrbitalObjectType.TELLURIC_PLANET:
+            case OrbitalObjectType.TELLURIC_SATELLITE:
+            case OrbitalObjectType.MANDELBULB:
+            case OrbitalObjectType.JULIA_SET:
+            case OrbitalObjectType.MANDELBOX:
+            case OrbitalObjectType.SIERPINSKI_PYRAMID:
+            case OrbitalObjectType.MENGER_SPONGE:
                 fuelAvailability = 0;
         }
 

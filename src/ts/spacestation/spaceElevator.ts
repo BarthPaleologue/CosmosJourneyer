@@ -34,22 +34,23 @@ import { LandingRequest } from "../utils/managesLandingPads";
 import { Settings } from "../settings";
 import { getRngFromSeed } from "../utils/getRngFromSeed";
 import { getOrbitalObjectTypeToI18nString } from "../utils/strings/orbitalObjectTypeToDisplay";
-import { OrbitalFacility } from "./orbitalFacility";
+import { OrbitalFacilityBase } from "./orbitalFacility";
 import { SpaceElevatorModel } from "./spaceElevatorModel";
-import { OrbitalObject } from "../architecture/orbitalObject";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { MetalSectionMaterial } from "../assets/procedural/spaceStation/metalSectionMaterial";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { SpaceElevatorClimber } from "./spaceElevatorClimber";
 import { clamp, remap, triangleWave } from "../utils/math";
 import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
-import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { setUpVector } from "../uberCore/transforms/basicTransform";
+import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 
-export class SpaceElevator implements OrbitalFacility {
+export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPACE_ELEVATOR> {
     readonly name: string;
 
     readonly model: SpaceElevatorModel;
+
+    readonly type = OrbitalObjectType.SPACE_ELEVATOR;
 
     private readonly solarSections: SolarSection[] = [];
     private readonly utilitySections: UtilitySection[] = [];
@@ -285,7 +286,7 @@ export class SpaceElevator implements OrbitalFacility {
 
     update(
         stellarObjects: Transformable[],
-        parents: OrbitalObject[],
+        parents: Transformable[],
         cameraWorldPosition: Vector3,
         deltaSeconds: number
     ) {

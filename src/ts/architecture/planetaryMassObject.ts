@@ -15,16 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { CelestialBody, CelestialBodyModel } from "./celestialBody";
-import { PlanetaryMassObjectPhysicsInfo } from "./physicsInfo";
+import { CelestialBodyBase } from "./celestialBody";
+import { OrbitalObjectType } from "./orbitalObjectType";
 import { Transformable } from "./transformable";
 
-export interface PlanetaryMassObject extends CelestialBody {
-    readonly model: PlanetaryMassObjectModel;
-
+export interface PlanetaryMassObjectBase<T extends OrbitalObjectType> extends CelestialBodyBase<T> {
     updateMaterial(stellarObjects: Transformable[], deltaSeconds: number): void;
 }
-
-export type PlanetaryMassObjectModel = CelestialBodyModel & {
-    readonly physics: PlanetaryMassObjectPhysicsInfo;
-};

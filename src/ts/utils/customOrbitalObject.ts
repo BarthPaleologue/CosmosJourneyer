@@ -16,18 +16,22 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { OrbitalObject, OrbitalObjectModel } from "../architecture/orbitalObject";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion } from "@babylonjs/core/Maths/math.vector";
+import { OrbitalObjectBase } from "../architecture/orbitalObjectBase";
+import { OrbitalObjectModelBase } from "../architecture/orbitalObjectModelBase";
+import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 
-export class OrbitalObjectWrapper<Model extends OrbitalObjectModel> implements OrbitalObject {
+export class CustomOrbitalObject implements OrbitalObjectBase<OrbitalObjectType.CUSTOM> {
     private readonly _transform: TransformNode;
-    readonly model: Model;
+    readonly model: OrbitalObjectModelBase<OrbitalObjectType.CUSTOM>;
+    readonly type: OrbitalObjectType.CUSTOM;
     private readonly boundingRadius: number;
-    constructor(transform: TransformNode, model: Model) {
+    constructor(transform: TransformNode, model: OrbitalObjectModelBase<OrbitalObjectType.CUSTOM>) {
         this._transform = transform;
         this._transform.rotationQuaternion = Quaternion.Identity();
 
         this.model = model;
+        this.type = model.type;
 
         const boundingVectors = this.getTransform().getHierarchyBoundingVectors();
         this.boundingRadius = boundingVectors.max.subtract(boundingVectors.min).length() / 2;

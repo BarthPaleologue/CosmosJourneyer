@@ -1,4 +1,4 @@
-import { OrbitalObjectType } from "../architecture/orbitalObject";
+import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { GasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 import { TelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModel";
@@ -52,7 +52,6 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
     private evaluateTelluricSatelliteMultiplier(model: TelluricSatelliteModel) {
         let multiplier = 0.5;
         if (model.clouds !== null) multiplier += 1.0;
-        if (model.rings !== null) multiplier += 1.0;
 
         return multiplier;
     }
@@ -91,13 +90,13 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
                 objectTypeMultiplier = 10;
                 break;
             case OrbitalObjectType.TELLURIC_PLANET:
-                objectTypeMultiplier = this.evaluateTelluricPlanetMultiplier(model as TelluricPlanetModel);
+                objectTypeMultiplier = this.evaluateTelluricPlanetMultiplier(model);
                 break;
             case OrbitalObjectType.TELLURIC_SATELLITE:
-                objectTypeMultiplier = this.evaluateTelluricSatelliteMultiplier(model as TelluricSatelliteModel);
+                objectTypeMultiplier = this.evaluateTelluricSatelliteMultiplier(model);
                 break;
             case OrbitalObjectType.GAS_PLANET:
-                objectTypeMultiplier = this.evaluateGasPlanetMultiplier(model as GasPlanetModel);
+                objectTypeMultiplier = this.evaluateGasPlanetMultiplier(model);
                 break;
             case OrbitalObjectType.MANDELBULB:
             case OrbitalObjectType.JULIA_SET:
@@ -108,6 +107,7 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
                 break;
             case OrbitalObjectType.SPACE_STATION:
             case OrbitalObjectType.SPACE_ELEVATOR:
+            case OrbitalObjectType.CUSTOM:
                 objectTypeMultiplier = 0;
                 break;
         }

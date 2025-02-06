@@ -22,7 +22,6 @@ import { hide, show } from "../../utils/html";
 import { GasPlanet } from "../../planets/gasPlanet/gasPlanet";
 import { EditorPanel } from "./editorPanel";
 import { GeneralPanel } from "./panels/generalPanel";
-import { PhysicPanel } from "./panels/physicPanel";
 import { StarPanel } from "./panels/starPanel";
 import { SurfacePanel } from "./panels/surfacePanel";
 import { GasCloudsPanel } from "./panels/gasCloudsPanel";
@@ -34,9 +33,9 @@ import { PostProcessManager } from "../../postProcesses/postProcessManager";
 import { BlackholePanel } from "./panels/blackholePanel";
 import { Star } from "../../stellarObjects/star/star";
 import { BlackHole } from "../../stellarObjects/blackHole/blackHole";
-import { CelestialBody } from "../../architecture/celestialBody";
 import { Scene } from "@babylonjs/core/scene";
 import { TelluricPlanetMaterial } from "../../planets/telluricPlanet/telluricPlanetMaterial";
+import { CelestialBody } from "../../architecture/orbitalObject";
 
 export const enum EditorVisibility {
     HIDDEN,
@@ -55,7 +54,6 @@ export class BodyEditor {
     private currentBodyId: string | null = null;
 
     private readonly generalPanel: GeneralPanel;
-    private readonly physicPanel: PhysicPanel;
     private readonly oceanPanel: OceanPanel;
     private readonly surfacePanel: SurfacePanel;
     private readonly gazCloudsPanel: GasCloudsPanel;
@@ -70,7 +68,6 @@ export class BodyEditor {
         this.navBar = document.getElementById("navBar") as HTMLElement;
 
         this.generalPanel = new GeneralPanel();
-        this.physicPanel = new PhysicPanel();
         this.oceanPanel = new OceanPanel();
         this.surfacePanel = new SurfacePanel();
         this.gazCloudsPanel = new GasCloudsPanel();
@@ -81,7 +78,6 @@ export class BodyEditor {
         this.blackHolePanel = new BlackholePanel();
         this.panels = [
             this.generalPanel,
-            this.physicPanel,
             this.oceanPanel,
             this.surfacePanel,
             this.cloudsPanel,
@@ -185,10 +181,6 @@ export class BodyEditor {
                 this.surfacePanel.enable();
                 this.surfacePanel.setVisibility(this.currentPanel === this.surfacePanel);
                 this.surfacePanel.init(body.material);
-
-                this.physicPanel.enable();
-                this.physicPanel.setVisibility(this.currentPanel === this.physicPanel);
-                this.physicPanel.init(body.model.physics, body.material);
 
                 if (body.cloudsUniforms !== null) {
                     this.cloudsPanel.enable();

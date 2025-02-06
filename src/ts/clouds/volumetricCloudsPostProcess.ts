@@ -20,7 +20,7 @@ import volumetricCloudsFragment from "../../shaders/volumetricCloudsFragment.gls
 import { FlatCloudsPostProcess } from "./flatCloudsPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { CloudsUniforms } from "./cloudsUniforms";
-import { StellarObject } from "../architecture/stellarObject";
+import { StellarObject } from "../architecture/orbitalObject";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { ObjectUniformNames, setObjectUniforms } from "../postProcesses/uniforms/objectUniforms";
