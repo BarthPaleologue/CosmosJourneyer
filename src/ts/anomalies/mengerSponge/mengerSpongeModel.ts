@@ -28,7 +28,7 @@ import { Tools } from "@babylonjs/core/Misc/tools";
 
 export type MengerSpongeModel = AnomalyModel & {
     readonly type: OrbitalObjectType.MENGER_SPONGE;
-    readonly accentColor: Color3;
+    readonly color: Color3;
 };
 
 export function newSeededMengerSpongeModel(seed: number, name: string): MengerSpongeModel {
@@ -69,7 +69,7 @@ export function newSeededMengerSpongeModel(seed: number, name: string): MengerSp
         rings: null,
         name,
         type: OrbitalObjectType.MENGER_SPONGE,
-        accentColor,
+        color: accentColor,
         orbit,
         physics: physicalProperties
     };

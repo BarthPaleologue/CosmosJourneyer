@@ -93,7 +93,7 @@ export class MengerSpongePostProcess extends PostProcess implements UpdatablePos
             setStellarObjectUniforms(effect, stellarObjects);
             setObjectUniforms(effect, transform, boundingRadius);
 
-            effect.setColor3(MengerSpongeUniformNames.ACCENT_COLOR, model.accentColor);
+            effect.setColor3(MengerSpongeUniformNames.ACCENT_COLOR, model.color);
             effect.setFloat(MengerSpongeUniformNames.ELAPSED_SECONDS, this.elapsedSeconds);
             effect.setFloat(
                 MengerSpongeUniformNames.AVERAGE_SCREEN_SIZE,

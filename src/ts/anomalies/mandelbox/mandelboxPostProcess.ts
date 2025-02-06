@@ -97,7 +97,7 @@ export class MandelboxPostProcess extends PostProcess implements UpdatablePostPr
 
             effect.setFloat(MandelboxUniformNames.MR2, model.mr2);
             effect.setFloat(MandelboxUniformNames.SPREAD, model.spread);
-            effect.setColor3(MandelboxUniformNames.ACCENT_COLOR, model.accentColor);
+            effect.setColor3(MandelboxUniformNames.ACCENT_COLOR, model.color);
             effect.setFloat(MandelboxUniformNames.ELAPSED_SECONDS, this.elapsedSeconds);
             effect.setFloat(
                 MandelboxUniformNames.AVERAGE_SCREEN_SIZE,

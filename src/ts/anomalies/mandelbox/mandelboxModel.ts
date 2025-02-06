@@ -28,7 +28,7 @@ import { Tools } from "@babylonjs/core/Misc/tools";
 
 export type MandelboxModel = AnomalyModel & {
     readonly type: OrbitalObjectType.MANDELBOX;
-    readonly accentColor: Color3;
+    readonly color: Color3;
 
     /**
      * distance estimator parameter (range is [0-1])
@@ -83,7 +83,7 @@ export function newSeededMandelboxModel(seed: number, name: string): MandelboxMo
         type: OrbitalObjectType.MANDELBOX,
         mr2,
         spread,
-        accentColor,
+        color: accentColor,
         orbit,
         physics: physicalProperties
     };
