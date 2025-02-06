@@ -2,7 +2,7 @@ export const enum SystemObjectType {
     STELLAR_OBJECT,
     PLANETARY_MASS_OBJECT,
     ANOMALY,
-    SPACE_STATION
+    ORBITAL_FACILITY
 }
 
 /**

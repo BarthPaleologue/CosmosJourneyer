@@ -26,7 +26,7 @@ export function getSystemObjectId(orbitalObject: OrbitalObject, starSystem: Star
     } else if ((objectIndex = starSystem.getAnomalies().indexOf(orbitalObject as CelestialBody)) !== -1) {
         objectType = SystemObjectType.ANOMALY;
     } else if ((objectIndex = starSystem.getOrbitalFacilities().indexOf(orbitalObject as SpaceStation)) !== -1) {
-        objectType = SystemObjectType.SPACE_STATION;
+        objectType = SystemObjectType.ORBITAL_FACILITY;
     } else throw new Error("Nearest orbital object not found among any of the universal orbital object types");
 
     return {
@@ -62,7 +62,7 @@ export function getObjectBySystemId(
         case SystemObjectType.ANOMALY:
             orbitalObject = starSystem.getAnomalies().at(systemObjectId.objectIndex);
             break;
-        case SystemObjectType.SPACE_STATION:
+        case SystemObjectType.ORBITAL_FACILITY:
             orbitalObject = starSystem.getOrbitalFacilities().at(systemObjectId.objectIndex);
             break;
         default:
@@ -92,7 +92,7 @@ export function getObjectModelByUniverseId(
             return StarSystemModelUtils.GetPlanetaryMassObjects(starSystemModel)[universeObjectId.objectIndex];
         case SystemObjectType.ANOMALY:
             return StarSystemModelUtils.GetAnomalies(starSystemModel)[universeObjectId.objectIndex];
-        case SystemObjectType.SPACE_STATION:
+        case SystemObjectType.ORBITAL_FACILITY:
             return StarSystemModelUtils.GetSpaceStations(starSystemModel)[universeObjectId.objectIndex];
         default:
             throw new Error(`Unknown universe object type: ${universeObjectId.objectType}`);
@@ -115,7 +115,7 @@ export function getUniverseIdForSpaceStationModel(
     }
 
     return {
-        objectType: SystemObjectType.SPACE_STATION,
+        objectType: SystemObjectType.ORBITAL_FACILITY,
         objectIndex: index,
         starSystemCoordinates: systemModel.coordinates
     };
