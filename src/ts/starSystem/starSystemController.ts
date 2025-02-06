@@ -16,18 +16,19 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Matrix, Quaternion } from "@babylonjs/core/Maths/math";
+import { Matrix } from "@babylonjs/core/Maths/math";
 import { PostProcessManager } from "../postProcesses/postProcessManager";
 import { UberScene } from "../uberCore/uberScene";
 import { SpaceStation } from "../spacestation/spaceStation";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
-import { rotateAround, translate } from "../uberCore/transforms/basicTransform";
+import { translate } from "../uberCore/transforms/basicTransform";
 import { Star } from "../stellarObjects/star/star";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge";
-import { OrbitalObject, OrbitalObjectType, OrbitalObjectUtils } from "../architecture/orbitalObject";
+import { OrbitalObject, OrbitalObjectType } from "../architecture/orbitalObject";
+import { OrbitalObjectUtils } from "../architecture/orbitalObjectUtils";
 import { CelestialBody } from "../architecture/celestialBody";
 import { StellarObject } from "../architecture/stellarObject";
 import { PlanetaryMassObject } from "../architecture/planetaryMassObject";
