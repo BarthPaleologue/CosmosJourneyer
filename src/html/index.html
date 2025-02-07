@@ -8,9 +8,10 @@
             name="keywords"
             content="space, exploration, game, open-source, planet, procedural, universe, procedural universe, procedural planet, webgl, webgpu"
         />
+        <link rel="icon" href="favicon.svg" type="image/svg">
         <meta name="author" content="Barthélemy Paléologue" />
         <meta name="robots" content="index, follow" />
-        <title>%VITE_APP_TITLE%</title>
+        <title><%= htmlWebpackPlugin.options.title %></title>
     </head>
 
     <body>
@@ -18,9 +19,9 @@
 
         <div id="inspectorLayer"></div>
 
-
-        <script type="module" src="/src/ts/i18n.ts"></script>
-        <script type="module" src="/src/ts/index.ts"></script>
-        <script type="module" src="/src/ts/main.ts"></script>
+        <%= require('html-loader!./bodyEditor.html').default %> <%= require('html-loader!./spaceStationUI.html').default
+        %> <%= require('html-loader!./helmetOverlay.html').default %> <%= require('html-loader!./mainMenu.html').default
+        %> <%= require('html-loader!./pauseMenu.html').default %> <%= require('html-loader!./sidePanels.html').default
+        %>
     </body>
 </html>
