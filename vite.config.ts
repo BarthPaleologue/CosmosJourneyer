@@ -5,7 +5,7 @@ import wasm from "vite-plugin-wasm";
 import topLevelAwait from "vite-plugin-top-level-await";
 import { createHtmlPlugin } from "vite-plugin-html";
 import vitePluginBanner from "vite-plugin-banner";
-import handlebars from 'vite-plugin-handlebars';
+import handlebars from "vite-plugin-handlebars";
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -77,10 +77,7 @@ export default defineConfig({
     plugins: [
         wasm(),
         topLevelAwait(),
-        glsl(
-            {warnDuplicatedImports: false,
-            compress: false, 
-            }),
+        glsl(),
         handlebars(),
         vitePluginBanner(bannerText),
         createHtmlPlugin({
