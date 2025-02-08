@@ -15,17 +15,20 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { MissionNode, MissionNodeSerialized, MissionNodeType } from "../missionNode";
+import { MissionNodeBase, MissionNodeSerializedBase, MissionNodeType } from "../missionNode";
 import { MissionContext } from "../../missionContext";
 import { StarSystemCoordinates } from "../../../utils/coordinates/universeCoordinates";
 import { StarSystemDatabase } from "../../../starSystem/starSystemDatabase";
+import type { MissionNode, MissionNodeSerialized } from "../deserializeNode";
 
-export type MissionXorNodeSerialized = MissionNodeSerialized;
+export type MissionXorNodeSerialized = MissionNodeSerializedBase<MissionNodeType.XOR> & {
+    children: MissionNodeSerialized[];
+};
 
 /**
  * Node used to describe a set of tasks where only one must be completed.
  */
-export class MissionXorNode implements MissionNode {
+export class MissionXorNode implements MissionNodeBase<MissionNodeType.XOR> {
     readonly children: MissionNode[];
 
     private hasCompletedLock = false;
@@ -72,7 +75,7 @@ export class MissionXorNode implements MissionNode {
         return this.children.flatMap((child) => child.getTargetSystems());
     }
 
-    serialize(): MissionNodeSerialized {
+    serialize(): MissionXorNodeSerialized {
         return {
             type: MissionNodeType.XOR,
             children: this.children.map((child) => child.serialize())

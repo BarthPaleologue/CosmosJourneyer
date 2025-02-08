@@ -32,17 +32,21 @@ import { Transformable } from "../../architecture/transformable";
 import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
-import { Planet } from "../../architecture/planet";
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
 import { AtmosphereUniforms } from "../../atmosphere/atmosphereUniforms";
 import { Settings } from "../../settings";
+import { PlanetaryMassObjectBase } from "../../architecture/planetaryMassObject";
+import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 
-export class GasPlanet implements Planet, Cullable {
+export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_PLANET>, Cullable {
+    readonly model: GasPlanetModel;
+
+    readonly type = OrbitalObjectType.GAS_PLANET;
+
     private readonly mesh: Mesh;
     readonly material: GasPlanetMaterial;
 
     readonly aggregate: PhysicsAggregate;
-    readonly model: GasPlanetModel;
 
     readonly atmosphereUniforms: AtmosphereUniforms;
 

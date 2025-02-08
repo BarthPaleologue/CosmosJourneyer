@@ -18,7 +18,7 @@
 import mandelbulbFragment from "../../../shaders/mandelbulb.glsl";
 import { UpdatablePostProcess } from "../../postProcesses/updatablePostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { StellarObject } from "../../architecture/stellarObject";
+import { StellarObject } from "../../architecture/orbitalObject";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { ObjectUniformNames, setObjectUniforms } from "../../postProcesses/uniforms/objectUniforms";

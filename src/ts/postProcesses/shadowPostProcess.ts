@@ -18,7 +18,7 @@
 import shadowFragment from "../../shaders/shadowFragment.glsl";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { RingsSamplerNames, RingsUniformNames, RingsUniforms } from "../rings/ringsUniform";
-import { StellarObject } from "../architecture/stellarObject";
+import { StellarObject } from "../architecture/orbitalObject";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { ObjectUniformNames, setObjectUniforms } from "./uniforms/objectUniforms";

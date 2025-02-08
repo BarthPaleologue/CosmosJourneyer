@@ -43,7 +43,7 @@ export class OrbitRenderer {
 
     private createOrbitMesh(orbitalObject: OrbitalObject, scene: Scene) {
         const parents = this.orbitalObjects.get(orbitalObject) ?? [];
-        const parentMassSum = parents.reduce((sum, parent) => sum + parent.model.physics.mass, 0);
+        const parentMassSum = parents.reduce((sum, parent) => sum + parent.model.mass, 0);
 
         const orbit = orbitalObject.model.orbit;
         const nbSteps = Math.max(100, Math.round(Math.sqrt(orbit.semiMajorAxis / 200e3)));
@@ -93,9 +93,9 @@ export class OrbitRenderer {
             }
 
             const parentBarycenter = Vector3.Zero();
-            const massSum = parents.reduce((sum, parent) => sum + parent.model.physics.mass, 0);
+            const massSum = parents.reduce((sum, parent) => sum + parent.model.mass, 0);
             for (const parent of parents) {
-                parentBarycenter.addInPlace(parent.getTransform().position.scale(parent.model.physics.mass));
+                parentBarycenter.addInPlace(parent.getTransform().position.scale(parent.model.mass));
             }
             parentBarycenter.scaleInPlace(1 / massSum);
 

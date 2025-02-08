@@ -16,14 +16,33 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { TerrainSettings } from "./terrain/terrainSettings";
-import { PlanetaryMassObjectModel } from "../../architecture/planetaryMassObject";
-import { TelluricPlanetaryMassObjectPhysicsInfo } from "../../architecture/physicsInfo";
 import { CloudsModel } from "../../clouds/cloudsModel";
+import { CelestialBodyModelBase } from "../../architecture/orbitalObjectModelBase";
+import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
+import { AtmosphereModel } from "../../atmosphere/atmosphereModel";
+import { OceanModel } from "../../ocean/oceanModel";
 
-export type TelluricPlanetaryMassObjectModel = PlanetaryMassObjectModel & {
-    readonly physics: TelluricPlanetaryMassObjectPhysicsInfo;
-
+export type TelluricPlanetaryMassObjectModelBase<T extends OrbitalObjectType> = CelestialBodyModelBase<T> & {
+    readonly waterAmount: number;
     readonly terrainSettings: TerrainSettings;
 
+    /**
+     * The temperature range of the object in Kelvin
+     * TODO: remove when the temperature gets calculated dynamically
+     * @deprecated
+     */
+    readonly temperature: {
+        /**
+         * Minimum temperature of the object in Kelvin
+         */
+        min: number;
+        /**
+         * Maximum temperature of the object in Kelvin
+         */
+        max: number;
+    };
+
+    readonly atmosphere: AtmosphereModel | null;
     readonly clouds: CloudsModel | null;
+    readonly ocean: OceanModel | null;
 };

@@ -19,9 +19,9 @@ import "../styles/index.scss";
 
 import { positionNearObjectBrightSide } from "./utils/positionNearObject";
 import { CosmosJourneyer } from "./cosmosJourneyer";
-import { newSeededBlackHoleModel } from "./stellarObjects/blackHole/blackHoleModel";
 import { StarSystemModel } from "./starSystem/starSystemModel";
-import { newSeededTelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModel";
+import { newSeededTelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModelGenerator";
+import { newSeededBlackHoleModel } from "./stellarObjects/blackHole/blackHoleModelGenerator";
 
 const engine = await CosmosJourneyer.CreateAsync();
 engine.setAutoSaveEnabled(false);
@@ -33,7 +33,7 @@ const scene = starSystemView.scene;
 const blackHoleModel = newSeededBlackHoleModel(42, "Gargantua", []);
 
 const millerPlanetModel = newSeededTelluricPlanetModel(47, "Miller", [blackHoleModel]);
-millerPlanetModel.orbit.semiMajorAxis = blackHoleModel.physics.accretionDiskRadius * 4;
+millerPlanetModel.orbit.semiMajorAxis = blackHoleModel.accretionDiskRadius * 4;
 millerPlanetModel.orbit.inclination = 0.2;
 
 const starSystemModel: StarSystemModel = {

@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { OrbitalObjectType } from "../../architecture/orbitalObject";
+import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { StarModel } from "../../stellarObjects/star/starModel";
 import { StarSystemModel } from "../starSystemModel";
 import { TelluricPlanetModel } from "../../planets/telluricPlanet/telluricPlanetModel";
@@ -24,18 +24,17 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { celsiusToKelvin } from "../../utils/physics";
 import { TelluricSatelliteModel } from "../../planets/telluricPlanet/telluricSatelliteModel";
 import { Tools } from "@babylonjs/core/Misc/tools";
+import { GasPlanetModel } from "../../planets/gasPlanet/gasPlanetModel";
 
 export function getSolSystemModel(): StarSystemModel {
     const sun: StarModel = {
         name: "Sun",
         type: OrbitalObjectType.STAR,
         radius: 695_508e3,
-        physics: {
-            mass: 1.989e30,
-            blackBodyTemperature: 5778,
-            axialTilt: Tools.ToRadians(7.25),
-            siderealDaySeconds: 60 * 60 * 24 * 25.67
-        },
+        mass: 1.989e30,
+        blackBodyTemperature: 5778,
+        axialTilt: Tools.ToRadians(7.25),
+        siderealDaySeconds: 60 * 60 * 24 * 25.67,
         orbit: {
             semiMajorAxis: 0,
             eccentricity: 0,
@@ -53,15 +52,13 @@ export function getSolSystemModel(): StarSystemModel {
         name: "Mercury",
         type: OrbitalObjectType.TELLURIC_PLANET,
         radius: 2_439.7e3,
-        physics: {
-            mass: 3.301e23,
-            axialTilt: Tools.ToRadians(0.034),
-            siderealDaySeconds: 60 * 60 * 24 * 58.646,
-            oceanLevel: 0,
-            waterAmount: 0,
-            pressure: 0,
-            minTemperature: 437,
-            maxTemperature: 437
+        mass: 3.301e23,
+        axialTilt: Tools.ToRadians(0.034),
+        siderealDaySeconds: 60 * 60 * 24 * 58.646,
+        waterAmount: 0,
+        temperature: {
+            min: 437,
+            max: 437
         },
         orbit: {
             semiMajorAxis: 0.38 * Settings.AU,
@@ -84,8 +81,10 @@ export function getSolSystemModel(): StarSystemModel {
 
             mountains_frequency: 0
         },
+        atmosphere: null,
         rings: null,
         clouds: null,
+        ocean: null,
         seed: 0
     };
 
@@ -93,15 +92,13 @@ export function getSolSystemModel(): StarSystemModel {
         name: "Venus",
         type: OrbitalObjectType.TELLURIC_PLANET,
         radius: 6_051.8e3,
-        physics: {
-            mass: 4.8e20,
-            axialTilt: Tools.ToRadians(177.36),
-            siderealDaySeconds: 60 * 60 * 24 * 243.025,
-            oceanLevel: 0,
-            waterAmount: 0,
-            pressure: 93 * Settings.BAR_TO_PASCAL,
-            minTemperature: 719,
-            maxTemperature: 763
+        mass: 4.8e20,
+        axialTilt: Tools.ToRadians(177.36),
+        siderealDaySeconds: 60 * 60 * 24 * 243.025,
+        waterAmount: 0,
+        temperature: {
+            min: 719,
+            max: 763
         },
         orbit: {
             semiMajorAxis: 108_209_500e3,
@@ -125,6 +122,10 @@ export function getSolSystemModel(): StarSystemModel {
             mountains_frequency: 5
         },
         rings: null,
+        atmosphere: {
+            pressure: 93 * Settings.BAR_TO_PASCAL,
+            greenHouseEffectFactor: 0.99
+        },
         clouds: {
             layerRadius: 6_051.8e3 + 10e3,
             smoothness: 0.7,
@@ -137,6 +138,7 @@ export function getSolSystemModel(): StarSystemModel {
             worleySpeed: 0.0005,
             detailSpeed: 0.003
         },
+        ocean: null,
         seed: 0
     };
 
@@ -144,15 +146,13 @@ export function getSolSystemModel(): StarSystemModel {
         name: "Earth",
         type: OrbitalObjectType.TELLURIC_PLANET,
         radius: 6_371e3,
-        physics: {
-            mass: 5.972e24,
-            axialTilt: Tools.ToRadians(23.44),
-            siderealDaySeconds: 60 * 60 * 24,
-            oceanLevel: 10e3,
-            waterAmount: 1,
-            pressure: 1 * Settings.BAR_TO_PASCAL,
-            minTemperature: celsiusToKelvin(-50),
-            maxTemperature: celsiusToKelvin(50)
+        mass: 5.972e24,
+        axialTilt: Tools.ToRadians(23.44),
+        siderealDaySeconds: 60 * 60 * 24,
+        waterAmount: 1,
+        temperature: {
+            min: celsiusToKelvin(-50),
+            max: celsiusToKelvin(50)
         },
         orbit: {
             semiMajorAxis: 149_597_870e3,
@@ -176,6 +176,10 @@ export function getSolSystemModel(): StarSystemModel {
             mountains_frequency: 360
         },
         rings: null,
+        atmosphere: {
+            pressure: 1 * Settings.BAR_TO_PASCAL,
+            greenHouseEffectFactor: 0.5
+        },
         clouds: {
             layerRadius: 6_371e3 + 30e3,
             smoothness: 0.7,
@@ -188,6 +192,9 @@ export function getSolSystemModel(): StarSystemModel {
             worleySpeed: 0.0005,
             detailSpeed: 0.003
         },
+        ocean: {
+            depth: 10e3
+        },
         seed: 0
     };
 
@@ -195,15 +202,13 @@ export function getSolSystemModel(): StarSystemModel {
         name: "Moon",
         type: OrbitalObjectType.TELLURIC_SATELLITE,
         radius: 1_737.1e3,
-        physics: {
-            mass: 7.342e22,
-            axialTilt: Tools.ToRadians(6.68),
-            siderealDaySeconds: 60 * 60 * 24 * 27.322,
-            oceanLevel: 0,
-            waterAmount: 0,
-            pressure: 0,
-            minTemperature: 100,
-            maxTemperature: 100
+        mass: 7.342e22,
+        axialTilt: Tools.ToRadians(6.68),
+        siderealDaySeconds: 60 * 60 * 24 * 27.322,
+        waterAmount: 0,
+        temperature: {
+            min: 100,
+            max: 100
         },
         orbit: {
             semiMajorAxis: 384_400e3,
@@ -226,8 +231,9 @@ export function getSolSystemModel(): StarSystemModel {
 
             mountains_frequency: 0
         },
-        rings: null,
+        atmosphere: null,
         clouds: null,
+        ocean: null,
         seed: 0
     };
 
@@ -235,15 +241,13 @@ export function getSolSystemModel(): StarSystemModel {
         name: "Mars",
         type: OrbitalObjectType.TELLURIC_PLANET,
         radius: 3_389.5e3,
-        physics: {
-            mass: 6.4171e23,
-            axialTilt: Tools.ToRadians(25.19),
-            siderealDaySeconds: 60 * 60 * 24 * 1.027,
-            oceanLevel: 0,
-            waterAmount: 0,
-            pressure: 0.006 * Settings.BAR_TO_PASCAL,
-            minTemperature: celsiusToKelvin(-140),
-            maxTemperature: celsiusToKelvin(20)
+        mass: 6.4171e23,
+        axialTilt: Tools.ToRadians(25.19),
+        siderealDaySeconds: 60 * 60 * 24 * 1.027,
+        waterAmount: 0,
+        temperature: {
+            min: celsiusToKelvin(-140),
+            max: celsiusToKelvin(20)
         },
         orbit: {
             semiMajorAxis: 227_939_200e3,
@@ -266,25 +270,23 @@ export function getSolSystemModel(): StarSystemModel {
 
             mountains_frequency: 0
         },
+        atmosphere: {
+            pressure: 0.006 * Settings.BAR_TO_PASCAL,
+            greenHouseEffectFactor: 0.1
+        },
         rings: null,
         clouds: null,
+        ocean: null,
         seed: 0
     };
 
-    const jupiter: TelluricPlanetModel = {
+    const jupiter: GasPlanetModel = {
         name: "Jupiter",
-        type: OrbitalObjectType.TELLURIC_PLANET,
+        type: OrbitalObjectType.GAS_PLANET,
         radius: 69_911e3,
-        physics: {
-            mass: 1.898e27,
-            axialTilt: Tools.ToRadians(3.13),
-            siderealDaySeconds: 60 * 60 * 9.925,
-            oceanLevel: 0,
-            waterAmount: 0,
-            pressure: 0.1 * Settings.BAR_TO_PASCAL,
-            minTemperature: celsiusToKelvin(-145),
-            maxTemperature: celsiusToKelvin(-145)
-        },
+        mass: 1.898e27,
+        axialTilt: Tools.ToRadians(3.13),
+        siderealDaySeconds: 60 * 60 * 9.925,
         orbit: {
             semiMajorAxis: 778_547_200e3,
             eccentricity: 0.0934,
@@ -294,37 +296,21 @@ export function getSolSystemModel(): StarSystemModel {
             initialMeanAnomaly: 0,
             p: 2
         },
-        terrainSettings: {
-            continents_fragmentation: 0.1,
-            continents_frequency: 1,
-
-            bumps_frequency: 10,
-            max_bump_height: 15e3,
-
-            max_mountain_height: 0e3,
-            continent_base_height: 0,
-
-            mountains_frequency: 0
+        atmosphere: {
+            pressure: Settings.BAR_TO_PASCAL,
+            greenHouseEffectFactor: 0.7
         },
         rings: null,
-        clouds: null,
         seed: 0
     };
 
-    const saturn: TelluricPlanetModel = {
+    const saturn: GasPlanetModel = {
         name: "Saturn",
-        type: OrbitalObjectType.TELLURIC_PLANET,
+        type: OrbitalObjectType.GAS_PLANET,
         radius: 58_232e3,
-        physics: {
-            mass: 5.683e26,
-            axialTilt: Tools.ToRadians(26.73),
-            siderealDaySeconds: 60 * 60 * 10.656,
-            oceanLevel: 0,
-            waterAmount: 0,
-            pressure: 0.1 * Settings.BAR_TO_PASCAL,
-            minTemperature: celsiusToKelvin(-178),
-            maxTemperature: celsiusToKelvin(-178)
-        },
+        mass: 5.683e26,
+        axialTilt: Tools.ToRadians(26.73),
+        siderealDaySeconds: 60 * 60 * 10.656,
         orbit: {
             semiMajorAxis: 1_433_449_370e3,
             eccentricity: 0.0565,
@@ -334,17 +320,9 @@ export function getSolSystemModel(): StarSystemModel {
             initialMeanAnomaly: 0,
             p: 2
         },
-        terrainSettings: {
-            continents_fragmentation: 0.1,
-            continents_frequency: 1,
-
-            bumps_frequency: 10,
-            max_bump_height: 15e3,
-
-            max_mountain_height: 0e3,
-            continent_base_height: 0,
-
-            mountains_frequency: 0
+        atmosphere: {
+            pressure: Settings.BAR_TO_PASCAL,
+            greenHouseEffectFactor: 0.5
         },
         rings: {
             seed: 0,
@@ -354,24 +332,16 @@ export function getSolSystemModel(): StarSystemModel {
             ringOpacity: 0.5,
             ringFrequency: 2
         },
-        clouds: null,
         seed: 0
     };
 
-    const uranus: TelluricPlanetModel = {
+    const uranus: GasPlanetModel = {
         name: "Uranus",
-        type: OrbitalObjectType.TELLURIC_PLANET,
+        type: OrbitalObjectType.GAS_PLANET,
         radius: 25_362e3,
-        physics: {
-            mass: 8.681e25,
-            axialTilt: Tools.ToRadians(97.77),
-            siderealDaySeconds: 60 * 60 * 17.24,
-            oceanLevel: 0,
-            waterAmount: 0,
-            pressure: 0.1 * Settings.BAR_TO_PASCAL,
-            minTemperature: celsiusToKelvin(-224),
-            maxTemperature: celsiusToKelvin(-224)
-        },
+        mass: 8.681e25,
+        axialTilt: Tools.ToRadians(97.77),
+        siderealDaySeconds: 60 * 60 * 17.24,
         orbit: {
             semiMajorAxis: 2_872_463_270e3,
             eccentricity: 0.0565,
@@ -381,37 +351,21 @@ export function getSolSystemModel(): StarSystemModel {
             initialMeanAnomaly: 0,
             p: 2
         },
-        terrainSettings: {
-            continents_fragmentation: 0.1,
-            continents_frequency: 1,
-
-            bumps_frequency: 10,
-            max_bump_height: 15e3,
-
-            max_mountain_height: 0e3,
-            continent_base_height: 0,
-
-            mountains_frequency: 0
+        atmosphere: {
+            pressure: 0.1 * Settings.BAR_TO_PASCAL,
+            greenHouseEffectFactor: 0.5
         },
         rings: null,
-        clouds: null,
         seed: 0
     };
 
-    const neptune: TelluricPlanetModel = {
+    const neptune: GasPlanetModel = {
         name: "Neptune",
-        type: OrbitalObjectType.TELLURIC_PLANET,
+        type: OrbitalObjectType.GAS_PLANET,
         radius: 24_622e3,
-        physics: {
-            mass: 1.024e26,
-            axialTilt: Tools.ToRadians(28.32),
-            siderealDaySeconds: 60 * 60 * 16.11,
-            oceanLevel: 0,
-            waterAmount: 0,
-            pressure: 0.1 * Settings.BAR_TO_PASCAL,
-            minTemperature: celsiusToKelvin(-214),
-            maxTemperature: celsiusToKelvin(-214)
-        },
+        mass: 1.024e26,
+        axialTilt: Tools.ToRadians(28.32),
+        siderealDaySeconds: 60 * 60 * 16.11,
         orbit: {
             semiMajorAxis: 4_495_060_000e3,
             eccentricity: 0.0086,
@@ -421,20 +375,11 @@ export function getSolSystemModel(): StarSystemModel {
             initialMeanAnomaly: 0,
             p: 2
         },
-        terrainSettings: {
-            continents_fragmentation: 0.1,
-            continents_frequency: 1,
-
-            bumps_frequency: 10,
-            max_bump_height: 15e3,
-
-            max_mountain_height: 0e3,
-            continent_base_height: 0,
-
-            mountains_frequency: 0
+        atmosphere: {
+            pressure: 0.1 * Settings.BAR_TO_PASCAL,
+            greenHouseEffectFactor: 0.7
         },
         rings: null,
-        clouds: null,
         seed: 0
     };
 

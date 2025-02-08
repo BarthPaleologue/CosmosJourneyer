@@ -18,13 +18,12 @@
 import { Direction } from "../../utils/direction";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TelluricPlanetMaterial } from "./telluricPlanetMaterial";
-import { TelluricPlanetaryMassObjectModel } from "./telluricPlanetaryMassObjectModel";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { ChunkTree } from "./terrain/chunks/chunkTree";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Transformable } from "../../architecture/transformable";
 import { ChunkForge } from "./terrain/chunks/chunkForge";
-import { PlanetaryMassObject } from "../../architecture/planetaryMassObject";
+import { PlanetaryMassObjectBase } from "../../architecture/planetaryMassObject";
 import { Cullable } from "../../utils/cullable";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
@@ -34,18 +33,27 @@ import { CloudsUniforms } from "../../clouds/cloudsUniforms";
 import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
-import { OrbitalObjectType } from "../../architecture/orbitalObject";
+import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
 import { AtmosphereUniforms } from "../../atmosphere/atmosphereUniforms";
 import { Settings } from "../../settings";
 import { OceanUniforms } from "../../ocean/oceanUniforms";
+import { TelluricPlanetModel } from "./telluricPlanetModel";
+import { TelluricSatelliteModel } from "./telluricSatelliteModel";
 
-export class TelluricPlanet implements PlanetaryMassObject, Cullable {
+export class TelluricPlanet
+    implements
+        PlanetaryMassObjectBase<OrbitalObjectType.TELLURIC_PLANET | OrbitalObjectType.TELLURIC_SATELLITE>,
+        Cullable
+{
+    readonly model: TelluricPlanetModel | TelluricSatelliteModel;
+
+    readonly type: OrbitalObjectType.TELLURIC_PLANET | OrbitalObjectType.TELLURIC_SATELLITE =
+        OrbitalObjectType.TELLURIC_PLANET | OrbitalObjectType.TELLURIC_SATELLITE;
+
     readonly sides: ChunkTree[]; // stores the 6 sides of the sphere
 
     readonly material: TelluricPlanetMaterial;
-
-    readonly model: TelluricPlanetaryMassObjectModel;
 
     private readonly transform: TransformNode;
     readonly aggregate: PhysicsAggregate;
@@ -66,7 +74,7 @@ export class TelluricPlanet implements PlanetaryMassObject, Cullable {
      * @param model The model to build the planet or a seed for the planet in [-1, 1]
      * @param scene
      */
-    constructor(model: TelluricPlanetaryMassObjectModel, scene: Scene) {
+    constructor(model: TelluricPlanetModel | TelluricSatelliteModel, scene: Scene) {
         this.model = model;
 
         this.transform = new TransformNode(this.model.name, scene);
@@ -86,7 +94,7 @@ export class TelluricPlanet implements PlanetaryMassObject, Cullable {
         const physicsShape = new PhysicsShapeSphere(Vector3.Zero(), this.model.radius, scene);
         this.aggregate.shape.addChildFromParent(this.getTransform(), physicsShape, this.getTransform());
 
-        if (this.model.physics.pressure > 0.05) {
+        if (this.model.atmosphere !== null) {
             const atmosphereThickness =
                 Settings.EARTH_ATMOSPHERE_THICKNESS * Math.max(1, this.model.radius / Settings.EARTH_RADIUS);
             this.atmosphereUniforms = new AtmosphereUniforms(this.getBoundingRadius(), atmosphereThickness);
@@ -94,13 +102,13 @@ export class TelluricPlanet implements PlanetaryMassObject, Cullable {
             this.atmosphereUniforms = null;
         }
 
-        if (this.model.physics.oceanLevel > 0) {
-            this.oceanUniforms = new OceanUniforms(this.getRadius(), this.model.physics.oceanLevel);
+        if (this.model.ocean !== null) {
+            this.oceanUniforms = new OceanUniforms(this.getRadius(), this.model.ocean.depth);
         } else {
             this.oceanUniforms = null;
         }
 
-        if (this.model.rings !== null) {
+        if (this.model.type === OrbitalObjectType.TELLURIC_PLANET && this.model.rings !== null) {
             this.ringsUniforms = new RingsUniforms(this.model.rings, scene);
 
             const averageRadius = (this.model.radius * (this.model.rings.ringStart + this.model.rings.ringEnd)) / 2;
@@ -169,7 +177,7 @@ export class TelluricPlanet implements PlanetaryMassObject, Cullable {
     }
 
     public getBoundingRadius(): number {
-        return this.getRadius() + this.model.physics.oceanLevel;
+        return this.getRadius() + (this.model.ocean?.depth ?? 0);
     }
 
     public computeCulling(camera: Camera): void {

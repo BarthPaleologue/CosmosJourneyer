@@ -18,12 +18,16 @@
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
-import { CelestialBody, CelestialBodyModel } from "../architecture/celestialBody";
+import { CelestialBodyBase } from "../architecture/celestialBody";
 import { TargetInfo, defaultTargetInfoCelestialBody } from "../architecture/targetable";
 import { getOrbitalObjectTypeToI18nString } from "./strings/orbitalObjectTypeToDisplay";
+import { CelestialBodyModel } from "../architecture/orbitalObjectModel";
+import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 
-export class EmptyCelestialBody<T extends CelestialBodyModel> implements CelestialBody {
-    readonly model: T;
+export class EmptyCelestialBody<TObjectType extends OrbitalObjectType> implements CelestialBodyBase<TObjectType> {
+    readonly model: Extract<CelestialBodyModel, { type: TObjectType }>;
+
+    readonly type: TObjectType;
 
     private readonly transform: TransformNode;
 
@@ -33,12 +37,13 @@ export class EmptyCelestialBody<T extends CelestialBodyModel> implements Celesti
     readonly targetInfo: TargetInfo;
 
     /**
-     * New Gas Planet
      * @param model The model to create the planet from or a seed for the planet in [-1, 1]
      * @param scene
      */
-    constructor(model: T, scene: Scene) {
+    constructor(model: Extract<CelestialBodyModel, { type: TObjectType }>, scene: Scene) {
         this.model = model;
+
+        this.type = model.type;
 
         this.transform = new TransformNode(this.model.name, scene);
         this.transform.rotationQuaternion = Quaternion.Identity();

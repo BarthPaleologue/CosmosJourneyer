@@ -29,7 +29,7 @@ import {
 import { Textures } from "../../textures";
 import { Settings } from "../../../settings";
 import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
-import { OrbitalFacilityModel } from "../../../spacestation/orbitalFacility";
+import { OrbitalFacilityModel } from "../../../architecture/orbitalObjectModel";
 
 const LandingBayUniformNames = {
     WORLD: "world",

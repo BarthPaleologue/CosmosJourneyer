@@ -15,11 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { MissionNode, MissionNodeSerialized } from "./nodes/missionNode";
 import { MissionContext } from "./missionContext";
 import i18n from "../i18n";
 import { StarSystemCoordinates, UniverseObjectId } from "../utils/coordinates/universeCoordinates";
-import { deserializeMissionNode } from "./nodes/deserializeNode";
+import { deserializeMissionNode, MissionNode, MissionNodeSerialized } from "./nodes/deserializeNode";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 
 /**

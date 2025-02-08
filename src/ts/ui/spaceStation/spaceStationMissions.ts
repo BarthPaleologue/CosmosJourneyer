@@ -24,7 +24,7 @@ import { Player } from "../../player/player";
 import { MissionContainer } from "./missionContainer";
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { StarSystemModelUtils } from "../../starSystem/starSystemModel";
-import { OrbitalFacilityModel } from "../../spacestation/orbitalFacility";
+import { OrbitalFacilityModel } from "../../architecture/orbitalObjectModel";
 import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
 
 /**

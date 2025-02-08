@@ -1,14 +1,33 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Affero General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Affero General Public License for more details.
+//
+//  You should have received a copy of the GNU Affero General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 import { DefaultControls } from "../defaultControls/defaultControls";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { OrbitalObjectWrapper } from "../utils/orbitalObjectWrapper";
-import { OrbitalObject, OrbitalObjectType, OrbitalObjectUtils } from "../architecture/orbitalObject";
+import { CustomOrbitalObject } from "../utils/customOrbitalObject";
+import { OrbitalObject } from "../architecture/orbitalObject";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { OrbitRenderer } from "../orbit/orbitRenderer";
 import { AxisRenderer } from "../orbit/axisRenderer";
+import { OrbitalObjectType } from "../architecture/orbitalObjectType";
+import { OrbitalObjectUtils } from "../architecture/orbitalObjectUtils";
 
 export function createOrbitalDemoScene(engine: AbstractEngine): Scene {
     const scene = new Scene(engine);
@@ -25,7 +44,7 @@ export function createOrbitalDemoScene(engine: AbstractEngine): Scene {
     const hemi = new HemisphericLight("hemi", Vector3.Up(), scene);
     hemi.intensity = 1.0;
 
-    const sun = new OrbitalObjectWrapper(MeshBuilder.CreateSphere("sun", { diameter: 1 }, scene), {
+    const sun = new CustomOrbitalObject(MeshBuilder.CreateSphere("sun", { diameter: 1 }, scene), {
         name: "Sun",
         orbit: {
             argumentOfPeriapsis: 0,
@@ -36,16 +55,13 @@ export function createOrbitalDemoScene(engine: AbstractEngine): Scene {
             eccentricity: 0,
             p: 2
         },
-        type: OrbitalObjectType.STAR,
-        seed: 0,
-        physics: {
-            axialTilt: 0,
-            mass: 1e12,
-            siderealDaySeconds: 0
-        }
+        type: OrbitalObjectType.CUSTOM,
+        axialTilt: 0,
+        mass: 1e12,
+        siderealDaySeconds: 0
     });
 
-    const earth = new OrbitalObjectWrapper(MeshBuilder.CreateSphere("earth", { diameter: 0.5 }, scene), {
+    const earth = new CustomOrbitalObject(MeshBuilder.CreateSphere("earth", { diameter: 0.5 }, scene), {
         name: "Earth",
         orbit: {
             argumentOfPeriapsis: 0,
@@ -56,33 +72,27 @@ export function createOrbitalDemoScene(engine: AbstractEngine): Scene {
             eccentricity: 0.5,
             p: 2
         },
-        type: OrbitalObjectType.TELLURIC_PLANET,
-        seed: 0,
-        physics: {
-            axialTilt: Tools.ToRadians(23.5),
-            mass: 1e11,
-            siderealDaySeconds: 0
-        }
+        type: OrbitalObjectType.CUSTOM,
+        axialTilt: Tools.ToRadians(23.5),
+        mass: 1e11,
+        siderealDaySeconds: 0
     });
 
-    const moon = new OrbitalObjectWrapper(MeshBuilder.CreateSphere("moon", { diameter: 0.2 }, scene), {
+    const moon = new CustomOrbitalObject(MeshBuilder.CreateSphere("moon", { diameter: 0.2 }, scene), {
         name: "Moon",
         orbit: {
             argumentOfPeriapsis: 0,
             semiMajorAxis: 3,
             initialMeanAnomaly: 0,
             longitudeOfAscendingNode: 0,
-            inclination: earth.model.orbit.inclination + earth.model.physics.axialTilt, //Tools.ToRadians(45),
+            inclination: earth.model.orbit.inclination + earth.model.axialTilt, //Tools.ToRadians(45),
             eccentricity: 0.7,
             p: 2
         },
-        type: OrbitalObjectType.TELLURIC_SATELLITE,
-        seed: 0,
-        physics: {
-            axialTilt: 0,
-            mass: 1,
-            siderealDaySeconds: 0
-        }
+        type: OrbitalObjectType.CUSTOM,
+        mass: 1e10,
+        axialTilt: 0,
+        siderealDaySeconds: 0
     });
 
     const bodies = [sun, earth, moon];

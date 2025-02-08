@@ -17,18 +17,16 @@
 
 import { factionToString } from "../../society/factions";
 import { CropType, cropTypeToString } from "../../utils/agriculture";
-
 import { makeD3PieChart } from "../../utils/d3PieChart";
-import { OrbitalObjectModel } from "../../architecture/orbitalObject";
-import { OrbitalFacilityModel } from "../../spacestation/orbitalFacility";
 import { getOrbitalPeriod } from "../../orbit/orbit";
+import { OrbitalFacilityModel, OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
 
 export function generateInfoHTML(model: OrbitalFacilityModel, parentModels: OrbitalObjectModel[]): string {
     const agricultureMix = model.agricultureMix;
 
     const parentName = parentModels.map((parentModel) => parentModel.name).join("-");
 
-    const parentMassSum = parentModels.reduce((sum, parentModel) => sum + parentModel.physics.mass, 0);
+    const parentMassSum = parentModels.reduce((sum, parentModel) => sum + parentModel.mass, 0);
 
     const stationOrbitalPeriod = getOrbitalPeriod(model.orbit.semiMajorAxis, parentMassSum);
 

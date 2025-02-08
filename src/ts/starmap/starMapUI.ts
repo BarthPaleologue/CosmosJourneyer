@@ -357,7 +357,7 @@ export class StarMapUI {
         this.shortHandUISystemType.textContent = getOrbitalObjectTypeToI18nString(starModel);
         this.shortHandUIBookmarkButton.setSelectedSystemSeed(targetSystemModel.coordinates);
 
-        const objectColor = getRgbFromTemperature(starModel.physics.blackBodyTemperature);
+        const objectColor = getRgbFromTemperature(starModel.blackBodyTemperature);
         this.infoPanelStarPreview.style.background = objectColor.toHexString();
         this.infoPanelStarPreview.style.boxShadow = `0 0 20px ${objectColor.toHexString()}`;
 

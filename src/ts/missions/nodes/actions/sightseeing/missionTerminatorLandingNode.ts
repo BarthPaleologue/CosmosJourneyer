@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { MissionNode, MissionNodeSerialized, MissionNodeType } from "../../missionNode";
+import { MissionNodeBase, MissionNodeSerializedBase, MissionNodeType } from "../../missionNode";
 import { MissionContext } from "../../../missionContext";
 import {
     StarSystemCoordinates,
@@ -31,6 +31,7 @@ import i18n from "../../../../i18n";
 import { parseDistance } from "../../../../utils/strings/parseToStrings";
 import { getGoToSystemInstructions } from "../../../common";
 import { StarSystemDatabase } from "../../../../starSystem/starSystemDatabase";
+import type { MissionNode } from "../../deserializeNode";
 
 const enum LandMissionState {
     NOT_IN_SYSTEM,
@@ -38,7 +39,7 @@ const enum LandMissionState {
     LANDED
 }
 
-export type MissionTerminatorLandingNodeSerialized = MissionNodeSerialized & {
+export type MissionTerminatorLandingNodeSerialized = MissionNodeSerializedBase<MissionNodeType.TERMINATOR_LANDING> & {
     objectId: UniverseObjectId;
     state: LandMissionState;
 };
@@ -46,7 +47,7 @@ export type MissionTerminatorLandingNodeSerialized = MissionNodeSerialized & {
 /**
  * Node used to describe a landing mission on a target object near the terminator line
  */
-export class MissionTerminatorLandingNode implements MissionNode {
+export class MissionTerminatorLandingNode implements MissionNodeBase<MissionNodeType.TERMINATOR_LANDING> {
     private state: LandMissionState = LandMissionState.NOT_IN_SYSTEM;
 
     private readonly objectId: UniverseObjectId;
@@ -119,16 +120,11 @@ export class MissionTerminatorLandingNode implements MissionNode {
             }
 
             const stellarObjects = currentSystem.getStellarObjects();
-            const stellarMassSum = stellarObjects.reduce(
-                (sum, stellarObject) => sum + stellarObject.model.physics.mass,
-                0
-            );
+            const stellarMassSum = stellarObjects.reduce((sum, stellarObject) => sum + stellarObject.model.mass, 0);
             const stellarBarycenter = stellarObjects
                 .reduce(
                     (sum, stellarObject) =>
-                        sum.add(
-                            stellarObject.getTransform().getAbsolutePosition().scale(stellarObject.model.physics.mass)
-                        ),
+                        sum.add(stellarObject.getTransform().getAbsolutePosition().scale(stellarObject.model.mass)),
                     Vector3.Zero()
                 )
                 .scaleInPlace(1 / stellarMassSum);
@@ -208,7 +204,6 @@ export class MissionTerminatorLandingNode implements MissionNode {
     serialize(): MissionTerminatorLandingNodeSerialized {
         return {
             type: MissionNodeType.TERMINATOR_LANDING,
-            children: [],
             objectId: this.objectId,
             state: this.state
         };

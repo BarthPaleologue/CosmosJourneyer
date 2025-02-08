@@ -20,7 +20,6 @@ import starMaterialVertex from "../../../shaders/starMaterial/vertex.glsl";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Scene } from "@babylonjs/core/scene";
-import { StellarObjectModel } from "../../architecture/stellarObject";
 import { Textures } from "../../assets/textures";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { getRgbFromTemperature } from "../../utils/specrend";
@@ -45,7 +44,7 @@ export class StarMaterial extends ShaderMaterial {
 
     private elapsedSeconds = 0;
 
-    constructor(model: StellarObjectModel, scene: Scene) {
+    constructor(seed: number, temperature: number, scene: Scene) {
         const shaderName = "starMaterial";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = starMaterialFragment;
@@ -66,9 +65,9 @@ export class StarMaterial extends ShaderMaterial {
             this.setTexture(StarMaterialSamplerNames.LUT, lut.getTexture());
         });
 
-        this.starSeed = model.seed;
+        this.starSeed = seed;
 
-        this.starColor = getRgbFromTemperature(model.physics.blackBodyTemperature);
+        this.starColor = getRgbFromTemperature(temperature);
 
         this.onBindObservable.add(() => {
             this.getEffect().setFloat(StarMaterialUniformNames.TIME, this.elapsedSeconds % 100000);

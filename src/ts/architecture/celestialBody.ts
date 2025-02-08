@@ -15,32 +15,17 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { OrbitalObject, OrbitalObjectModel } from "./orbitalObject";
-import { CanHaveRings, CanHaveRingsModel } from "./canHaveRings";
+import { CanHaveRings } from "./canHaveRings";
+import { OrbitalObjectBase } from "./orbitalObjectBase";
+import { OrbitalObjectType } from "./orbitalObjectType";
 import { Targetable } from "./targetable";
 
 /**
  * Describes all celestial bodies (a combination of OrbitalObject, CanHaveRings)
  */
-export interface CelestialBody extends OrbitalObject, CanHaveRings, Targetable {
-    /**
-     * The underlying model describing the data of the celestial body
-     */
-    readonly model: CelestialBodyModel;
-
+export interface CelestialBodyBase<T extends OrbitalObjectType> extends OrbitalObjectBase<T>, CanHaveRings, Targetable {
     /**
      * Returns the radius of the celestial body
      */
     getRadius(): number;
 }
-
-/**
- * Describes the model of a celestial body
- */
-export type CelestialBodyModel = OrbitalObjectModel &
-    CanHaveRingsModel & {
-        /**
-         * The radius of the celestial body
-         */
-        readonly radius: number;
-    };

@@ -20,7 +20,6 @@ import surfaceMaterialFragment from "../../../shaders/telluricPlanetMaterial/fra
 import surfaceMaterialVertex from "../../../shaders/telluricPlanetMaterial/vertex.glsl";
 import { Assets } from "../../assets/assets";
 import { centeredRand } from "extended-random";
-import { TelluricPlanetaryMassObjectModel } from "./telluricPlanetaryMassObjectModel";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Transformable } from "../../architecture/transformable";
@@ -34,6 +33,8 @@ import { Textures } from "../../assets/textures";
 import { Matrix } from "@babylonjs/core/Maths/math";
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { LutPoolManager } from "../../assets/lutPoolManager";
+import { TelluricPlanetModel } from "./telluricPlanetModel";
+import { TelluricSatelliteModel } from "./telluricSatelliteModel";
 
 const TelluricPlanetMaterialUniformNames = {
     WORLD: "world",
@@ -73,7 +74,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
     /**
      * The model of the planet associated with this material
      */
-    private readonly planetModel: TelluricPlanetaryMassObjectModel;
+    private readonly planetModel: TelluricPlanetModel | TelluricSatelliteModel;
 
     private readonly plainNormalMetallicMap: Texture;
     private readonly plainAlbedoRoughnessMap: Texture;
@@ -96,7 +97,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
      * @param model The model of the planet associated with this material
      * @param scene
      */
-    constructor(model: TelluricPlanetaryMassObjectModel, scene: Scene) {
+    constructor(model: TelluricPlanetModel | TelluricSatelliteModel, scene: Scene) {
         const shaderName = "surfaceMaterial";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
@@ -136,8 +137,8 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
         this.steepNormalMetallic = Textures.ROCK_NORMAL_METALLIC_MAP;
         this.steepAlbedoRoughnessMap = Textures.ROCK_ALBEDO_ROUGHNESS_MAP;
 
-        if (model.physics.oceanLevel === 0) {
-            if (model.physics.pressure > 0) {
+        if (model.ocean === null) {
+            if (model.atmosphere !== null) {
                 // desert world
                 this.plainNormalMetallicMap = Textures.SAND_NORMAL_METALLIC_MAP;
                 this.plainAlbedoRoughnessMap = Textures.SAND_ALBEDO_ROUGHNESS_MAP;
@@ -150,7 +151,11 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
 
         this.setTexture("lut", Textures.EMPTY_TEXTURE);
         const lut = LutPoolManager.GetTelluricPlanetMaterialLut(scene);
-        lut.setPlanetPhysicsInfo(this.planetModel.physics);
+        lut.setPlanetPhysicsInfo(
+            this.planetModel.temperature.min,
+            this.planetModel.temperature.max,
+            this.planetModel.atmosphere?.pressure ?? 0
+        );
         lut.getTexture().executeWhenReady(() => {
             this.setTexture(TelluricPlanetMaterialSamplerNames.LUT, lut.getTexture());
         });
@@ -193,14 +198,14 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
 
         this.setInt(TelluricPlanetMaterialUniformNames.COLOR_MODE, this.colorMode);
 
-        this.setFloat(TelluricPlanetMaterialUniformNames.WATER_LEVEL, this.planetModel.physics.oceanLevel);
+        this.setFloat(TelluricPlanetMaterialUniformNames.WATER_LEVEL, this.planetModel.ocean?.depth ?? 0);
         this.setFloat(TelluricPlanetMaterialUniformNames.BEACH_SIZE, this.beachSize);
         this.setFloat(TelluricPlanetMaterialUniformNames.STEEP_SHARPNESS, this.steepSharpness);
 
-        this.setFloat(TelluricPlanetMaterialUniformNames.MIN_TEMPERATURE, this.planetModel.physics.minTemperature);
-        this.setFloat(TelluricPlanetMaterialUniformNames.MAX_TEMPERATURE, this.planetModel.physics.maxTemperature);
-        this.setFloat(TelluricPlanetMaterialUniformNames.PRESSURE, this.planetModel.physics.pressure);
-        this.setFloat(TelluricPlanetMaterialUniformNames.WATER_AMOUNT, this.planetModel.physics.waterAmount);
+        this.setFloat(TelluricPlanetMaterialUniformNames.MIN_TEMPERATURE, this.planetModel.temperature.min);
+        this.setFloat(TelluricPlanetMaterialUniformNames.MAX_TEMPERATURE, this.planetModel.temperature.max);
+        this.setFloat(TelluricPlanetMaterialUniformNames.PRESSURE, this.planetModel.atmosphere?.pressure ?? 0);
+        this.setFloat(TelluricPlanetMaterialUniformNames.WATER_AMOUNT, this.planetModel.waterAmount);
 
         this.setFloat(
             TelluricPlanetMaterialUniformNames.MAX_ELEVATION,

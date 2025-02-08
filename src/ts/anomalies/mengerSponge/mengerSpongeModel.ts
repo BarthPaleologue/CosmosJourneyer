@@ -16,61 +16,9 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { normalRandom, randRange } from "extended-random";
-import { clamp } from "../../utils/math";
-import { Orbit } from "../../orbit/orbit";
-import { GenerationSteps } from "../../utils/generationSteps";
-import { OrbitalObjectPhysicsInfo } from "../../architecture/physicsInfo";
-import { AnomalyModel } from "../anomaly";
-import { getRngFromSeed } from "../../utils/getRngFromSeed";
-import { OrbitalObjectType } from "../../architecture/orbitalObject";
-import { Tools } from "@babylonjs/core/Misc/tools";
+import { CelestialBodyModelBase } from "../../architecture/orbitalObjectModelBase";
+import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 
-export type MengerSpongeModel = AnomalyModel & {
-    readonly type: OrbitalObjectType.MENGER_SPONGE;
-    readonly accentColor: Color3;
+export type MengerSpongeModel = CelestialBodyModelBase<OrbitalObjectType.MENGER_SPONGE> & {
+    readonly color: Color3;
 };
-
-export function newSeededMengerSpongeModel(seed: number, name: string): MengerSpongeModel {
-    const rng = getRngFromSeed(seed);
-
-    const radius = 200e3;
-
-    const accentColor = Color3.FromHSV(
-        360 * rng(GenerationSteps.ACCENT_COLOR),
-        rng(GenerationSteps.ACCENT_COLOR + 123) * 0.5,
-        0.8
-    );
-
-    // Todo: do not hardcode
-    const orbitRadius = rng(GenerationSteps.ORBIT) * 15e9;
-
-    const orbitalP = clamp(0.5, 3.0, normalRandom(1.0, 0.3, rng, GenerationSteps.ORBIT + 80));
-
-    const orbit: Orbit = {
-        semiMajorAxis: orbitRadius,
-        p: orbitalP,
-        inclination: Tools.ToRadians(normalRandom(90, 20, rng, GenerationSteps.ORBIT + 160)),
-        eccentricity: randRange(0.1, 0.9, rng, GenerationSteps.ORBIT + 240),
-        longitudeOfAscendingNode: randRange(0, 2 * Math.PI, rng, GenerationSteps.ORBIT + 320),
-        argumentOfPeriapsis: randRange(0, 2 * Math.PI, rng, GenerationSteps.ORBIT + 400),
-        initialMeanAnomaly: randRange(0, 2 * Math.PI, rng, GenerationSteps.ORBIT + 480)
-    };
-
-    const physicalProperties: OrbitalObjectPhysicsInfo = {
-        mass: 10,
-        siderealDaySeconds: 0,
-        axialTilt: normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT)
-    };
-
-    return {
-        seed,
-        radius,
-        rings: null,
-        name,
-        type: OrbitalObjectType.MENGER_SPONGE,
-        accentColor,
-        orbit,
-        physics: physicalProperties
-    };
-}

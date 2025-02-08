@@ -15,10 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
+import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import i18n from "../../i18n";
-import { getStellarTypeFromTemperature } from "../../stellarObjects/star/starModel";
-import { StellarObjectModel } from "../../architecture/stellarObject";
-import { OrbitalObjectModel, OrbitalObjectType } from "../../architecture/orbitalObject";
+import { getStellarTypeFromTemperature } from "../../stellarObjects/star/starModelGenerator";
 
 export function getOrbitalObjectTypeToI18nString(model: OrbitalObjectModel): string {
     switch (model.type) {
@@ -40,11 +40,13 @@ export function getOrbitalObjectTypeToI18nString(model: OrbitalObjectModel): str
             return i18n.t("objectTypes:spaceElevator");
         case OrbitalObjectType.STAR:
             return i18n.t("objectTypes:star", {
-                stellarType: getStellarTypeFromTemperature((model as StellarObjectModel).physics.blackBodyTemperature)
+                stellarType: getStellarTypeFromTemperature(model.blackBodyTemperature)
             });
         case OrbitalObjectType.NEUTRON_STAR:
             return i18n.t("objectTypes:neutronStar");
         case OrbitalObjectType.BLACK_HOLE:
             return i18n.t("objectTypes:blackHole");
+        case OrbitalObjectType.CUSTOM:
+            return i18n.t("objectTypes:custom");
     }
 }

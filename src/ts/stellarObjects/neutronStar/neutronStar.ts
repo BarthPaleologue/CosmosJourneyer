@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { NeutronStarModel } from "./neutronStarModel";
-import { StellarObject } from "../../architecture/stellarObject";
+import { StellarObjectBase } from "../../architecture/stellarObject";
 import { Cullable } from "../../utils/cullable";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
@@ -37,9 +37,12 @@ import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
 import { VolumetricLightUniforms } from "../../volumetricLight/volumetricLightUniforms";
+import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 
-export class NeutronStar implements StellarObject, Cullable {
+export class NeutronStar implements StellarObjectBase<OrbitalObjectType.NEUTRON_STAR>, Cullable {
     readonly model: NeutronStarModel;
+
+    readonly type = OrbitalObjectType.NEUTRON_STAR;
 
     readonly mesh: Mesh;
     readonly light: PointLight;
@@ -89,11 +92,11 @@ export class NeutronStar implements StellarObject, Cullable {
         this.aggregate.shape.addChildFromParent(this.getTransform(), physicsShape, this.mesh);
 
         this.light = new PointLight(`${this.model.name}Light`, Vector3.Zero(), scene);
-        this.light.diffuse.fromArray(getRgbFromTemperature(this.model.physics.blackBodyTemperature).asArray());
+        this.light.diffuse.fromArray(getRgbFromTemperature(this.model.blackBodyTemperature).asArray());
         this.light.falloffType = Light.FALLOFF_STANDARD;
         this.light.parent = this.getTransform();
 
-        this.material = new StarMaterial(this.model, scene);
+        this.material = new StarMaterial(this.model.seed, this.model.blackBodyTemperature, scene);
         this.mesh.material = this.material;
 
         if (this.model.rings !== null) {

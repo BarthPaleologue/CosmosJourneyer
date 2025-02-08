@@ -15,16 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { CelestialBodyModel } from "../architecture/celestialBody";
-import { OrbitalObjectType } from "../architecture/orbitalObject";
-
-export type AnomalyObjectType =
-    | OrbitalObjectType.MANDELBULB
-    | OrbitalObjectType.JULIA_SET
-    | OrbitalObjectType.MANDELBOX
-    | OrbitalObjectType.SIERPINSKI_PYRAMID
-    | OrbitalObjectType.MENGER_SPONGE;
-
-export interface AnomalyModel extends CelestialBodyModel {
-    readonly type: AnomalyObjectType;
-}
+export type HasSeed = {
+    /**
+     * The seed to use to generate pseudo-random numbers
+     */
+    readonly seed: number;
+};

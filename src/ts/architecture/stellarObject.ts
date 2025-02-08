@@ -16,18 +16,9 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
-import { CelestialBody, CelestialBodyModel } from "./celestialBody";
-import { StellarObjectPhysicsInfo } from "./physicsInfo";
-import { OrbitalObjectType } from "./orbitalObject";
+import { CelestialBodyBase } from "./celestialBody";
+import { OrbitalObjectType } from "./orbitalObjectType";
 
-export interface StellarObject extends CelestialBody {
-    model: StellarObjectModel;
-
+export interface StellarObjectBase<T extends OrbitalObjectType> extends CelestialBodyBase<T> {
     getLight(): PointLight;
 }
-
-export type StellarObjectModel = CelestialBodyModel & {
-    physics: StellarObjectPhysicsInfo;
-
-    type: OrbitalObjectType.STAR | OrbitalObjectType.NEUTRON_STAR | OrbitalObjectType.BLACK_HOLE;
-};

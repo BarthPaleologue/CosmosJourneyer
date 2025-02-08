@@ -1,13 +1,28 @@
-import { OrbitalObject, OrbitalObjectModel } from "../../architecture/orbitalObject";
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Affero General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Affero General Public License for more details.
+//
+//  You should have received a copy of the GNU Affero General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+import { OrbitalObject } from "../../architecture/orbitalObject";
 import { StarSystemController } from "../../starSystem/starSystemController";
-import { StellarObject } from "../../architecture/stellarObject";
 import { SystemObjectId, UniverseObjectId, SystemObjectType } from "./universeCoordinates";
-import { PlanetaryMassObject } from "../../architecture/planetaryMassObject";
 import { SpaceStation } from "../../spacestation/spaceStation";
 import { StarSystemModelUtils } from "../../starSystem/starSystemModel";
-import { CelestialBody } from "../../architecture/celestialBody";
-import { OrbitalFacilityModel } from "../../spacestation/orbitalFacility";
 import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
+import { OrbitalFacilityModel, OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
+import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 
 /**
  * Get the object ID of the given orbital object within the star system.
@@ -17,21 +32,44 @@ import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
 export function getSystemObjectId(orbitalObject: OrbitalObject, starSystem: StarSystemController): SystemObjectId {
     let objectType: SystemObjectType;
     let objectIndex: number;
-    if ((objectIndex = starSystem.getStellarObjects().indexOf(orbitalObject as StellarObject)) !== -1) {
-        objectType = SystemObjectType.STELLAR_OBJECT;
-    } else if (
-        (objectIndex = starSystem.getPlanetaryMassObjects().indexOf(orbitalObject as PlanetaryMassObject)) !== -1
-    ) {
-        objectType = SystemObjectType.PLANETARY_MASS_OBJECT;
-    } else if ((objectIndex = starSystem.getAnomalies().indexOf(orbitalObject as CelestialBody)) !== -1) {
-        objectType = SystemObjectType.ANOMALY;
-    } else if ((objectIndex = starSystem.getOrbitalFacilities().indexOf(orbitalObject as SpaceStation)) !== -1) {
-        objectType = SystemObjectType.SPACE_STATION;
-    } else throw new Error("Nearest orbital object not found among any of the universal orbital object types");
+
+    switch (orbitalObject.type) {
+        case OrbitalObjectType.STAR:
+        case OrbitalObjectType.NEUTRON_STAR:
+        case OrbitalObjectType.BLACK_HOLE:
+            objectIndex = starSystem.getStellarObjects().indexOf(orbitalObject);
+            objectType = SystemObjectType.STELLAR_OBJECT;
+            break;
+        case OrbitalObjectType.TELLURIC_PLANET:
+        case OrbitalObjectType.TELLURIC_SATELLITE:
+        case OrbitalObjectType.GAS_PLANET:
+            objectIndex = starSystem.getPlanetaryMassObjects().indexOf(orbitalObject);
+            objectType = SystemObjectType.PLANETARY_MASS_OBJECT;
+            break;
+        case OrbitalObjectType.MANDELBULB:
+        case OrbitalObjectType.JULIA_SET:
+        case OrbitalObjectType.MANDELBOX:
+        case OrbitalObjectType.SIERPINSKI_PYRAMID:
+        case OrbitalObjectType.MENGER_SPONGE:
+            objectIndex = starSystem.getAnomalies().indexOf(orbitalObject);
+            objectType = SystemObjectType.ANOMALY;
+            break;
+        case OrbitalObjectType.SPACE_STATION:
+        case OrbitalObjectType.SPACE_ELEVATOR:
+            objectIndex = starSystem.getOrbitalFacilities().indexOf(orbitalObject as SpaceStation);
+            objectType = SystemObjectType.ORBITAL_FACILITY;
+            break;
+        case OrbitalObjectType.CUSTOM:
+            throw new Error("Custom orbital objects are not supported");
+    }
+
+    if (objectIndex === -1) {
+        throw new Error("Orbital object not found in star system");
+    }
 
     return {
         objectType,
-        objectIndex: objectIndex
+        objectIndex
     };
 }
 
@@ -62,7 +100,7 @@ export function getObjectBySystemId(
         case SystemObjectType.ANOMALY:
             orbitalObject = starSystem.getAnomalies().at(systemObjectId.objectIndex);
             break;
-        case SystemObjectType.SPACE_STATION:
+        case SystemObjectType.ORBITAL_FACILITY:
             orbitalObject = starSystem.getOrbitalFacilities().at(systemObjectId.objectIndex);
             break;
         default:
@@ -92,7 +130,7 @@ export function getObjectModelByUniverseId(
             return StarSystemModelUtils.GetPlanetaryMassObjects(starSystemModel)[universeObjectId.objectIndex];
         case SystemObjectType.ANOMALY:
             return StarSystemModelUtils.GetAnomalies(starSystemModel)[universeObjectId.objectIndex];
-        case SystemObjectType.SPACE_STATION:
+        case SystemObjectType.ORBITAL_FACILITY:
             return StarSystemModelUtils.GetSpaceStations(starSystemModel)[universeObjectId.objectIndex];
         default:
             throw new Error(`Unknown universe object type: ${universeObjectId.objectType}`);
@@ -115,7 +153,7 @@ export function getUniverseIdForSpaceStationModel(
     }
 
     return {
-        objectType: SystemObjectType.SPACE_STATION,
+        objectType: SystemObjectType.ORBITAL_FACILITY,
         objectIndex: index,
         starSystemCoordinates: systemModel.coordinates
     };

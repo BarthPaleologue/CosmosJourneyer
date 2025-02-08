@@ -2,19 +2,19 @@
 
 Cosmos Journeyer is an open source project and contributions are welcome! There is too much to do for one person alone. If you want to contribute, please read the following guidelines first.
 
-## How to contribute
-
-### Reporting bugs
+## Reporting bugs
 
 Finding bugs and reporting them is key to make the project better. If you find a bug, please open an issue on the [issue tracker](https://github.com/BarthPaleologue/CosmosJourneyer/issues/new?assignees=&labels=&projects=&template=bug_report.md&title=)
 
-### Suggesting features
+## Suggesting features
 
 If you have an idea for a new feature, please open an issue on the [issue tracker](https://github.com/BarthPaleologue/CosmosJourneyer/issues/new?assignees=&labels=&projects=&template=feature_request.md&title=)
 
-### Pull requests
+## Pull requests
 
-Pull requests are welcome! If you want to contribute code, please follow these steps:
+There is still plenty to do on Cosmos Journeyer. You can check the [issue tracker](https://github.com/BarthPaleologue/CosmosJourneyer/issues) for ideas on what to work on. If you have an idea that is not in the issue tracker, please create a new issue so that we can talk about it!
+
+To contibute follow these steps:
 
 1. Get familiar with the project by reading the [architecture document](ARCHITECTURE.md)
 2. Fork the repository
@@ -22,10 +22,13 @@ Pull requests are welcome! If you want to contribute code, please follow these s
     ```sh
     git checkout -b [name_of_your_new_branch]
     ```
-4. Commit & push your changes
-5. Open a pull request to the `main` branch
+4. Manually test your changes
+5. Commit & push your changes
+6. Open a pull request to the `main` branch
 
 You can open a draft pull request if you want to get feedback on your changes before they are ready to be merged.
+
+Please use **rebase** to keep your branch in sync with main.
 
 Pull request are tested against the linter and the unit tests, make sure you run them before opening a pull request.
 
@@ -58,7 +61,3 @@ http://localhost:8080/?lang=fr-FR
 ```
 
 You only need to replace `fr-FR` with the language code you want to test.
-
-## Contribution ideas
-
-There is still plenty to do on Cosmos Journeyer. You can check the [issue tracker](https://github.com/BarthPaleologue/CosmosJourneyer/issues) for ideas on what to work on.
