@@ -13,8 +13,7 @@ const config = {
         alphaTestis: "./src/ts/alphaTestis.ts",
         blackHole: "./src/ts/blackHoleDemo.ts",
         playground: "./src/ts/playground.ts",
-        xr: "./src/ts/xr.ts",
-        spaceStationGenerator: "./src/ts/spaceStationGenerator.ts"
+        xr: "./src/ts/xr.ts"
     },
     output: {
         filename: "[name].[contenthash].js",
@@ -97,15 +96,6 @@ const config = {
             filename: "xr.html",
             template: path.join(htmlPath, "emptyIndex.html"),
             chunks: ["xr"]
-        }),
-        new HtmlWebpackPlugin({
-            title: "Space station generator - Cosmos Journeyer",
-            meta: {
-                description: "Space station generator for Cosmos Journeyer."
-            },
-            filename: "spaceStationGenerator.html",
-            template: path.join(htmlPath, "emptyIndex.html"),
-            chunks: ["spaceStationGenerator"]
         }),
         new MiniCssExtractPlugin()
     ],
