@@ -14,8 +14,7 @@ const config = {
         blackHole: "./src/ts/blackHoleDemo.ts",
         playground: "./src/ts/playground.ts",
         xr: "./src/ts/xr.ts",
-        spaceStationGenerator: "./src/ts/spaceStationGenerator.ts",
-        debugAssets: "./src/ts/debugAssets.ts"
+        spaceStationGenerator: "./src/ts/spaceStationGenerator.ts"
     },
     output: {
         filename: "[name].[contenthash].js",
@@ -107,15 +106,6 @@ const config = {
             filename: "spaceStationGenerator.html",
             template: path.join(htmlPath, "emptyIndex.html"),
             chunks: ["spaceStationGenerator"]
-        }),
-        new HtmlWebpackPlugin({
-            title: "Debug assets - Cosmos Journeyer",
-            meta: {
-                description: "Debug assets visualization for Cosmos Journeyer."
-            },
-            filename: "debugAssets.html",
-            template: path.join(htmlPath, "emptyIndex.html"),
-            chunks: ["debugAssets"]
         }),
         new MiniCssExtractPlugin()
     ],

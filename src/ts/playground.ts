@@ -26,6 +26,7 @@ import { Scene, Tools } from "@babylonjs/core";
 import { createOrbitalDemoScene } from "./playgrounds/orbitalDemo";
 import { createAutomaticLandingScene } from "./playgrounds/automaticLanding";
 import { createHyperspaceTunnelDemo } from "./playgrounds/hyperspaceTunnel";
+import { createDebugAssetsScene } from "./playgrounds/debugAssets";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -48,6 +49,9 @@ switch (requestedScene) {
         break;
     case "automaticLanding":
         scene = await createAutomaticLandingScene(engine);
+        break;
+    case "debugAssets":
+        scene = await createDebugAssetsScene(engine);
         break;
     default:
         scene = await createAutomaticLandingScene(engine);
