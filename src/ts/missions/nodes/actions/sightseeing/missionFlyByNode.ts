@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { MissionNode, MissionNodeSerialized, MissionNodeType } from "../../missionNode";
+import { MissionNodeBase, MissionNodeSerializedBase, MissionNodeType } from "../../missionNode";
 import { MissionContext } from "../../../missionContext";
 import {
     StarSystemCoordinates,
@@ -32,6 +32,7 @@ import { getOrbitalObjectTypeToI18nString } from "../../../../utils/strings/orbi
 import { getGoToSystemInstructions } from "../../../common";
 import { OrbitalObjectType } from "../../../../architecture/orbitalObjectType";
 import { StarSystemDatabase } from "../../../../starSystem/starSystemDatabase";
+import type { MissionNode } from "../../deserializeNode";
 
 const enum FlyByState {
     NOT_IN_SYSTEM,
@@ -39,7 +40,8 @@ const enum FlyByState {
     CLOSE_ENOUGH
 }
 
-export type MissionFlyByNodeSerialized = MissionNodeSerialized & {
+export type MissionFlyByNodeSerialized = MissionNodeSerializedBase<MissionNodeType.FLY_BY> & {
+    type: MissionNodeType.FLY_BY;
     objectId: UniverseObjectId;
     state: FlyByState;
 };
@@ -47,7 +49,7 @@ export type MissionFlyByNodeSerialized = MissionNodeSerialized & {
 /**
  * Node used to describe a fly-by mission around a target object
  */
-export class MissionFlyByNode implements MissionNode {
+export class MissionFlyByNode implements MissionNodeBase<MissionNodeType.FLY_BY> {
     private state: FlyByState = FlyByState.NOT_IN_SYSTEM;
 
     private readonly objectId: UniverseObjectId;
@@ -185,7 +187,6 @@ export class MissionFlyByNode implements MissionNode {
     serialize(): MissionFlyByNodeSerialized {
         return {
             type: MissionNodeType.FLY_BY,
-            children: [],
             objectId: this.objectId,
             state: this.state
         };

@@ -19,11 +19,12 @@ import { MissionContext } from "../missionContext";
 
 import { StarSystemCoordinates } from "../../utils/coordinates/universeCoordinates";
 import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
+import type { MissionNode } from "./deserializeNode";
 
 /**
  * Describes any node in the mission tree.
  */
-export interface MissionNode {
+export interface MissionNodeBase<T extends MissionNodeType> {
     /**
      * Returns true if the node is completed, false otherwise.
      */
@@ -66,7 +67,7 @@ export interface MissionNode {
     /**
      * Serializes the node recursively.
      */
-    serialize(): MissionNodeSerialized;
+    serialize(): MissionNodeSerializedBase<T>;
 }
 
 /**
@@ -86,7 +87,6 @@ export const enum MissionNodeType {
  * Base type for all serialized mission nodes.
  * Nodes should specialize this type with their relevant fields.
  */
-export type MissionNodeSerialized = {
-    type: MissionNodeType;
-    children: MissionNodeSerialized[];
+export type MissionNodeSerializedBase<T extends MissionNodeType> = {
+    type: T;
 };

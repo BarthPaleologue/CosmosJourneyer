@@ -15,20 +15,38 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { MissionNode, MissionNodeSerialized, MissionNodeType } from "./missionNode";
-import { MissionAndNode, MissionAndNodeSerialized } from "./logic/missionAndNode";
-import { MissionOrNode, MissionOrNodeSerialized } from "./logic/missionOrNode";
+import { MissionNodeType } from "./missionNode";
+import { MissionAndNode, type MissionAndNodeSerialized } from "./logic/missionAndNode";
+import { MissionOrNode, type MissionOrNodeSerialized } from "./logic/missionOrNode";
 import {
     MissionAsteroidFieldNode,
-    MissionAsteroidFieldNodeSerialized
+    type MissionAsteroidFieldNodeSerialized
 } from "./actions/sightseeing/missionAsteroidFieldNode";
-import { MissionFlyByNode, MissionFlyByNodeSerialized } from "./actions/sightseeing/missionFlyByNode";
+import { MissionFlyByNode, type MissionFlyByNodeSerialized } from "./actions/sightseeing/missionFlyByNode";
 import {
     MissionTerminatorLandingNode,
-    MissionTerminatorLandingNodeSerialized
+    type MissionTerminatorLandingNodeSerialized
 } from "./actions/sightseeing/missionTerminatorLandingNode";
-import { MissionXorNode, MissionXorNodeSerialized } from "./logic/missionXorNode";
-import { MissionSequenceNode, MissionSequenceNodeSerialized } from "./logic/missionSequenceNode";
+import { MissionXorNode, type MissionXorNodeSerialized } from "./logic/missionXorNode";
+import { MissionSequenceNode, type MissionSequenceNodeSerialized } from "./logic/missionSequenceNode";
+
+export type MissionNodeSerialized =
+    | MissionAndNodeSerialized
+    | MissionOrNodeSerialized
+    | MissionXorNodeSerialized
+    | MissionSequenceNodeSerialized
+    | MissionAsteroidFieldNodeSerialized
+    | MissionFlyByNodeSerialized
+    | MissionTerminatorLandingNodeSerialized;
+
+export type MissionNode =
+    | MissionAndNode
+    | MissionOrNode
+    | MissionXorNode
+    | MissionSequenceNode
+    | MissionAsteroidFieldNode
+    | MissionFlyByNode
+    | MissionTerminatorLandingNode;
 
 /**
  * Deserialize recursively a mission node.
@@ -37,23 +55,19 @@ import { MissionSequenceNode, MissionSequenceNodeSerialized } from "./logic/miss
 export function deserializeMissionNode(missionNodeSerialized: MissionNodeSerialized): MissionNode {
     switch (missionNodeSerialized.type) {
         case MissionNodeType.AND:
-            return deserializeMissionAndNode(missionNodeSerialized as MissionAndNodeSerialized);
+            return deserializeMissionAndNode(missionNodeSerialized);
         case MissionNodeType.OR:
-            return deserializeMissionOrNode(missionNodeSerialized as MissionOrNodeSerialized);
+            return deserializeMissionOrNode(missionNodeSerialized);
         case MissionNodeType.XOR:
-            return deserializeMissionXorNode(missionNodeSerialized as MissionXorNodeSerialized);
+            return deserializeMissionXorNode(missionNodeSerialized);
         case MissionNodeType.SEQUENCE:
-            return deserializeMissionSequenceNode(missionNodeSerialized as MissionSequenceNodeSerialized);
+            return deserializeMissionSequenceNode(missionNodeSerialized);
         case MissionNodeType.ASTEROID_FIELD:
-            return deserializeMissionAsteroidFieldNode(missionNodeSerialized as MissionAsteroidFieldNodeSerialized);
+            return deserializeMissionAsteroidFieldNode(missionNodeSerialized);
         case MissionNodeType.FLY_BY:
-            return deserializeMissionFlyByNode(missionNodeSerialized as MissionFlyByNodeSerialized);
+            return deserializeMissionFlyByNode(missionNodeSerialized);
         case MissionNodeType.TERMINATOR_LANDING:
-            return deserializeMissionTerminatorLandingNode(
-                missionNodeSerialized as MissionTerminatorLandingNodeSerialized
-            );
-        default:
-            throw new Error(`Unknown mission node type: ${missionNodeSerialized.type}`);
+            return deserializeMissionTerminatorLandingNode(missionNodeSerialized);
     }
 }
 

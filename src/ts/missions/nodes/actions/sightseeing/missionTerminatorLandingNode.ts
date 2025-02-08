@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { MissionNode, MissionNodeSerialized, MissionNodeType } from "../../missionNode";
+import { MissionNodeBase, MissionNodeSerializedBase, MissionNodeType } from "../../missionNode";
 import { MissionContext } from "../../../missionContext";
 import {
     StarSystemCoordinates,
@@ -31,6 +31,7 @@ import i18n from "../../../../i18n";
 import { parseDistance } from "../../../../utils/strings/parseToStrings";
 import { getGoToSystemInstructions } from "../../../common";
 import { StarSystemDatabase } from "../../../../starSystem/starSystemDatabase";
+import type { MissionNode } from "../../deserializeNode";
 
 const enum LandMissionState {
     NOT_IN_SYSTEM,
@@ -38,7 +39,7 @@ const enum LandMissionState {
     LANDED
 }
 
-export type MissionTerminatorLandingNodeSerialized = MissionNodeSerialized & {
+export type MissionTerminatorLandingNodeSerialized = MissionNodeSerializedBase<MissionNodeType.TERMINATOR_LANDING> & {
     objectId: UniverseObjectId;
     state: LandMissionState;
 };
@@ -46,7 +47,7 @@ export type MissionTerminatorLandingNodeSerialized = MissionNodeSerialized & {
 /**
  * Node used to describe a landing mission on a target object near the terminator line
  */
-export class MissionTerminatorLandingNode implements MissionNode {
+export class MissionTerminatorLandingNode implements MissionNodeBase<MissionNodeType.TERMINATOR_LANDING> {
     private state: LandMissionState = LandMissionState.NOT_IN_SYSTEM;
 
     private readonly objectId: UniverseObjectId;
@@ -203,7 +204,6 @@ export class MissionTerminatorLandingNode implements MissionNode {
     serialize(): MissionTerminatorLandingNodeSerialized {
         return {
             type: MissionNodeType.TERMINATOR_LANDING,
-            children: [],
             objectId: this.objectId,
             state: this.state
         };
