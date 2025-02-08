@@ -12,10 +12,7 @@ const config = {
         main: "./src/ts/index.ts",
         alphaTestis: "./src/ts/alphaTestis.ts",
         blackHole: "./src/ts/blackHoleDemo.ts",
-        playground: "./src/ts/playground.ts",
-        xr: "./src/ts/xr.ts",
-        spaceStationGenerator: "./src/ts/spaceStationGenerator.ts",
-        debugAssets: "./src/ts/debugAssets.ts"
+        playground: "./src/ts/playground.ts"
     },
     output: {
         filename: "[name].[contenthash].js",
@@ -89,33 +86,6 @@ const config = {
             filename: "playground.html",
             template: path.join(htmlPath, "emptyIndex.html"),
             chunks: ["playground"]
-        }),
-        new HtmlWebpackPlugin({
-            title: "XR - Cosmos Journeyer",
-            meta: {
-                description: "XR test for Cosmos Journeyer."
-            },
-            filename: "xr.html",
-            template: path.join(htmlPath, "emptyIndex.html"),
-            chunks: ["xr"]
-        }),
-        new HtmlWebpackPlugin({
-            title: "Space station generator - Cosmos Journeyer",
-            meta: {
-                description: "Space station generator for Cosmos Journeyer."
-            },
-            filename: "spaceStationGenerator.html",
-            template: path.join(htmlPath, "emptyIndex.html"),
-            chunks: ["spaceStationGenerator"]
-        }),
-        new HtmlWebpackPlugin({
-            title: "Debug assets - Cosmos Journeyer",
-            meta: {
-                description: "Debug assets visualization for Cosmos Journeyer."
-            },
-            filename: "debugAssets.html",
-            template: path.join(htmlPath, "emptyIndex.html"),
-            chunks: ["debugAssets"]
         }),
         new MiniCssExtractPlugin()
     ],

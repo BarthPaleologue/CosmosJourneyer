@@ -177,7 +177,7 @@ export class ShipControls implements Controls {
                 return;
             }
 
-            spaceship.engagePlanetaryLanding(null);
+            spaceship.engagePlanetaryLanding(closestWalkableObject);
         };
 
         SpaceShipControlsInputs.map.landing.on("complete", this.landingHandler);
@@ -410,6 +410,10 @@ export class ShipControls implements Controls {
 
     getSpaceship(): Spaceship {
         return this.spaceship;
+    }
+
+    static CreateDefault(scene: Scene) {
+        return new ShipControls(Spaceship.CreateDefault(scene), scene);
     }
 
     dispose() {
