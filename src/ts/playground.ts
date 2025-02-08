@@ -22,8 +22,10 @@ import "@babylonjs/core/Materials/standardMaterial";
 import "@babylonjs/core/Loading/loadingScreen";
 import "@babylonjs/core/Misc/screenshotTools";
 import "@babylonjs/core/Meshes/thinInstanceMesh";
-import { Tools } from "@babylonjs/core";
+import { Scene, Tools } from "@babylonjs/core";
 import { createOrbitalDemoScene } from "./playgrounds/orbitalDemo";
+import { createAutomaticLandingScene } from "./playgrounds/automaticLanding";
+import { createHyperspaceTunnelDemo } from "./playgrounds/hyperspaceTunnel";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -33,7 +35,23 @@ const engine = new Engine(canvas, true);
 engine.useReverseDepthBuffer = true;
 engine.displayLoadingUI();
 
-const scene = createOrbitalDemoScene(engine);
+const urlParams = new URLSearchParams(window.location.search);
+const requestedScene = urlParams.get("scene") ?? "";
+
+let scene: Scene;
+switch (requestedScene) {
+    case "orbitalDemo":
+        scene = createOrbitalDemoScene(engine);
+        break;
+    case "tunnel":
+        scene = await createHyperspaceTunnelDemo(engine);
+        break;
+    case "automaticLanding":
+        scene = await createAutomaticLandingScene(engine);
+        break;
+    default:
+        scene = await createAutomaticLandingScene(engine);
+}
 
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
