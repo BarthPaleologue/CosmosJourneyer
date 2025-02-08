@@ -21,11 +21,13 @@ import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { LandingPad, LandingPadSize } from "../assets/procedural/landingPad/landingPad";
 import { Transformable } from "../architecture/transformable";
-import { TransformNode } from "@babylonjs/core";
-import { Assets } from "../assets/assets";
+import { AssetsManager, TransformNode } from "@babylonjs/core";
 import { enablePhysics } from "./utils";
 import { DefaultControls } from "../defaultControls/defaultControls";
 import { Spaceship } from "../spaceship/spaceship";
+import { Objects } from "../assets/objects";
+import { Textures } from "../assets/textures";
+import { Sounds } from "../assets/sounds";
 
 export async function createAutomaticLandingScene(engine: AbstractEngine): Promise<Scene> {
     const scene = new Scene(engine);
@@ -33,7 +35,11 @@ export async function createAutomaticLandingScene(engine: AbstractEngine): Promi
 
     await enablePhysics(scene);
 
-    await Assets.Init(scene);
+    const assetsManager = new AssetsManager(scene);
+    Sounds.EnqueueTasks(assetsManager, scene);
+    Objects.EnqueueTasks(assetsManager, scene);
+    Textures.EnqueueTasks(assetsManager, scene);
+    await assetsManager.loadAsync();
 
     const ship = Spaceship.CreateDefault(scene);
     ship.getTransform().position.copyFromFloats(0, 20, 0);
@@ -46,7 +52,7 @@ export async function createAutomaticLandingScene(engine: AbstractEngine): Promi
     camera.minZ = 0.1;
     camera.attachControl();
 
-    const landingPad = new LandingPad(0, LandingPadSize.SMALL, scene);
+    const landingPad = new LandingPad(42, LandingPadSize.SMALL, scene);
 
     const hemi = new HemisphericLight("hemi", Vector3.Up(), scene);
     hemi.intensity = 1.0;
