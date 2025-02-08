@@ -12,8 +12,7 @@ const config = {
         main: "./src/ts/index.ts",
         alphaTestis: "./src/ts/alphaTestis.ts",
         blackHole: "./src/ts/blackHoleDemo.ts",
-        playground: "./src/ts/playground.ts",
-        xr: "./src/ts/xr.ts"
+        playground: "./src/ts/playground.ts"
     },
     output: {
         filename: "[name].[contenthash].js",
@@ -87,15 +86,6 @@ const config = {
             filename: "playground.html",
             template: path.join(htmlPath, "emptyIndex.html"),
             chunks: ["playground"]
-        }),
-        new HtmlWebpackPlugin({
-            title: "XR - Cosmos Journeyer",
-            meta: {
-                description: "XR test for Cosmos Journeyer."
-            },
-            filename: "xr.html",
-            template: path.join(htmlPath, "emptyIndex.html"),
-            chunks: ["xr"]
         }),
         new MiniCssExtractPlugin()
     ],

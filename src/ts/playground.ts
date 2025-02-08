@@ -28,6 +28,7 @@ import { createAutomaticLandingScene } from "./playgrounds/automaticLanding";
 import { createHyperspaceTunnelDemo } from "./playgrounds/hyperspaceTunnel";
 import { createDebugAssetsScene } from "./playgrounds/debugAssets";
 import { createSpaceStationScene } from "./playgrounds/spaceStation";
+import { createXrScene } from "./playgrounds/xr";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -56,6 +57,9 @@ switch (requestedScene) {
         break;
     case "spaceStation":
         scene = await createSpaceStationScene(engine);
+        break;
+    case "xr":
+        scene = await createXrScene(engine);
         break;
     default:
         scene = await createAutomaticLandingScene(engine);
