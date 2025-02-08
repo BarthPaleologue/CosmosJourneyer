@@ -412,6 +412,10 @@ export class ShipControls implements Controls {
         return this.spaceship;
     }
 
+    static CreateDefault(scene: Scene) {
+        return new ShipControls(Spaceship.CreateDefault(scene), scene);
+    }
+
     dispose() {
         this.onToggleWarpDrive.clear();
         this.onCompleteLanding.clear();
