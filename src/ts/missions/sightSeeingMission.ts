@@ -18,11 +18,11 @@
 import { Mission, MissionType } from "./mission";
 import { SystemObjectType, UniverseObjectId } from "../utils/coordinates/universeCoordinates";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { MissionNode } from "./nodes/missionNode";
 import { MissionFlyByNode } from "./nodes/actions/sightseeing/missionFlyByNode";
 import { MissionTerminatorLandingNode } from "./nodes/actions/sightseeing/missionTerminatorLandingNode";
 import { MissionAsteroidFieldNode } from "./nodes/actions/sightseeing/missionAsteroidFieldNode";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { MissionNode } from "./nodes/deserializeNode";
 
 /**
  * Sightseeing mission types are a subset of mission types.

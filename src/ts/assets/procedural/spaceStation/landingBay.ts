@@ -29,11 +29,10 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { createRing } from "../../../utils/geometry/ringBuilder";
 import { LandingBayMaterial } from "./landingBayMaterial";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
-
 import { getRngFromSeed } from "../../../utils/getRngFromSeed";
 import { createEnvironmentAggregate } from "../../../utils/havok";
 import { getRotationPeriodForArtificialGravity } from "../../../utils/physics";
-import { OrbitalFacilityModel } from "../../../spacestation/orbitalFacility";
+import { OrbitalFacilityModel } from "../../../architecture/orbitalObjectModel";
 
 export class LandingBay {
     private readonly root: TransformNode;

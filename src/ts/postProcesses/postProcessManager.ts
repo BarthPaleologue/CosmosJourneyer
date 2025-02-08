@@ -37,8 +37,6 @@ import { MatterJetPostProcess } from "./matterJetPostProcess";
 import { Star } from "../stellarObjects/star/star";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
-import { CelestialBody } from "../architecture/celestialBody";
-import { StellarObject } from "../architecture/stellarObject";
 import { PostProcessRenderPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipeline";
 import { PostProcessRenderPipelineManager } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManager";
 import { JuliaSetPostProcess } from "../anomalies/julia/juliaSetPostProcess";
@@ -59,6 +57,7 @@ import { JuliaSetModel } from "../anomalies/julia/juliaSetModel";
 import { MandelboxModel } from "../anomalies/mandelbox/mandelboxModel";
 import { SierpinskiPyramidModel } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidModel";
 import { MengerSpongeModel } from "../anomalies/mengerSponge/mengerSpongeModel";
+import { CelestialBody, StellarObject } from "../architecture/orbitalObject";
 
 /**
  * The order in which the post processes are rendered when away from a planet
@@ -284,7 +283,7 @@ export class PostProcessManager {
         const lensFlare = new LensFlarePostProcess(
             star.getTransform(),
             star.getBoundingRadius(),
-            getRgbFromTemperature(star.model.physics.blackBodyTemperature),
+            getRgbFromTemperature(star.model.blackBodyTemperature),
             this.scene
         );
         this.lensFlares.push(lensFlare);
@@ -313,7 +312,7 @@ export class PostProcessManager {
         const lensFlare = new LensFlarePostProcess(
             neutronStar.getTransform(),
             neutronStar.getBoundingRadius(),
-            getRgbFromTemperature(neutronStar.model.physics.blackBodyTemperature),
+            getRgbFromTemperature(neutronStar.model.blackBodyTemperature),
             this.scene
         );
         this.lensFlares.push(lensFlare);
@@ -413,7 +412,7 @@ export class PostProcessManager {
             planet.getBoundingRadius(),
             planet.ringsUniforms,
             planet.cloudsUniforms,
-            planet.model.physics.oceanLevel > 0,
+            planet.model.ocean !== null,
             stellarObjects,
             this.scene
         );

@@ -47,7 +47,7 @@ export function setStellarObjectUniforms(effect: Effect, stellarObjects: Transfo
         flattenColor3Array(
             stellarObjects.map((stellarObject) =>
                 stellarObject instanceof Star
-                    ? getRgbFromTemperature(stellarObject.model.physics.blackBodyTemperature)
+                    ? getRgbFromTemperature(stellarObject.model.blackBodyTemperature)
                     : Color3.White()
             )
         )

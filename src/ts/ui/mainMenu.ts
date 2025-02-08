@@ -31,7 +31,7 @@ import { PanelType, SidePanels } from "./sidePanels";
 import { SystemObjectType, UniverseObjectId } from "../utils/coordinates/universeCoordinates";
 import { getObjectBySystemId } from "../utils/coordinates/orbitalObjectId";
 import { StarSystemModel, StarSystemModelUtils } from "../starSystem/starSystemModel";
-import { OrbitalObjectType } from "../architecture/orbitalObject";
+import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 
 export class MainMenu {

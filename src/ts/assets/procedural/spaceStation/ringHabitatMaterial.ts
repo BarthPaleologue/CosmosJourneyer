@@ -19,7 +19,6 @@ import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Scene } from "@babylonjs/core/scene";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Transformable } from "../../../architecture/transformable";
-
 import ringHabitatMaterialFragment from "../../../../shaders/ringHabitatMaterial/fragment.glsl";
 import ringHabitatMaterialVertex from "../../../../shaders/ringHabitatMaterial/vertex.glsl";
 import {
@@ -27,8 +26,7 @@ import {
     StellarObjectUniformNames
 } from "../../../postProcesses/uniforms/stellarObjectUniforms";
 import { Textures } from "../../textures";
-
-import { OrbitalFacilityModel } from "../../../spacestation/orbitalFacility";
+import { OrbitalFacilityModel } from "../../../architecture/orbitalObjectModel";
 
 const RingHabitatUniformNames = {
     WORLD: "world",

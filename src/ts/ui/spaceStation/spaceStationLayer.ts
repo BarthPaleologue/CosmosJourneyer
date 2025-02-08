@@ -20,8 +20,6 @@ import { generateInfoHTML } from "./spaceStationInfos";
 import { Player } from "../../player/player";
 import { generateMissionsDom } from "./spaceStationMissions";
 import { Settings } from "../../settings";
-import { OrbitalObjectModel } from "../../architecture/orbitalObject";
-import { OrbitalFacilityModel } from "../../spacestation/orbitalFacility";
 import { generateSpaceshipDom } from "./spaceshipDock";
 import { promptModalString } from "../../utils/dialogModal";
 import i18n from "../../i18n";
@@ -29,6 +27,7 @@ import { Sounds } from "../../assets/sounds";
 import { ExplorationCenterPanel } from "./explorationCenterPanel";
 import { EncyclopaediaGalacticaManager } from "../../society/encyclopaediaGalacticaManager";
 import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
+import { OrbitalFacilityModel, OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
 
 const enum MainPanelState {
     NONE,

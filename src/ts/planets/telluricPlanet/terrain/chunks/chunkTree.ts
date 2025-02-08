@@ -21,7 +21,6 @@ import { BuildTask, TaskType } from "./taskTypes";
 import { Settings } from "../../../../settings";
 import { getChunkSphereSpacePositionFromPath } from "../../../../utils/chunkUtils";
 import { TerrainSettings } from "../terrainSettings";
-import { TelluricPlanetaryMassObjectModel } from "../../telluricPlanetaryMassObjectModel";
 import { Material } from "@babylonjs/core/Materials/material";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
@@ -33,6 +32,8 @@ import { ChunkForge } from "./chunkForge";
 import { clamp } from "../../../../utils/math";
 import { Cullable } from "../../../../utils/cullable";
 import { Scene } from "@babylonjs/core/scene";
+import { TelluricPlanetModel } from "../../telluricPlanetModel";
+import { TelluricSatelliteModel } from "../../telluricSatelliteModel";
 
 /**
  * A quadTree is defined recursively
@@ -56,7 +57,7 @@ export class ChunkTree implements Cullable {
 
     private deleteSemaphores: DeleteSemaphore[] = [];
 
-    readonly planetModel: TelluricPlanetaryMassObjectModel;
+    readonly planetModel: TelluricPlanetModel | TelluricSatelliteModel;
 
     readonly planetName: string;
     readonly planetSeed: number;
@@ -77,7 +78,7 @@ export class ChunkTree implements Cullable {
      */
     constructor(
         direction: Direction,
-        planetModel: TelluricPlanetaryMassObjectModel,
+        planetModel: TelluricPlanetModel | TelluricSatelliteModel,
         parentAggregate: PhysicsAggregate,
         material: Material,
         scene: Scene

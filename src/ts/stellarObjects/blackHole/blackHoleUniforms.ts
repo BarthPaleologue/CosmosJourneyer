@@ -16,7 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { BlackHoleModel, getKerrMetricA } from "./blackHoleModel";
+import { BlackHoleModel } from "./blackHoleModel";
+import { getKerrMetricA } from "./blackHoleModelGenerator";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { getForwardDirection } from "../../uberCore/transforms/basicTransform";
 import { Textures } from "../../assets/textures";
@@ -46,12 +47,12 @@ export class BlackHoleUniforms {
     time = 0;
 
     constructor(blackHoleModel: BlackHoleModel) {
-        this.accretionDiskRadius = blackHoleModel.physics.accretionDiskRadius;
+        this.accretionDiskRadius = blackHoleModel.accretionDiskRadius;
         this.rotationPeriod = 1.5;
         this.warpingMinkowskiFactor = 2.0;
         this.schwarzschildRadius = blackHoleModel.radius;
-        const kerrMetricA = getKerrMetricA(blackHoleModel.physics.mass, blackHoleModel.physics.siderealDaySeconds);
-        this.frameDraggingFactor = kerrMetricA / blackHoleModel.physics.mass;
+        const kerrMetricA = getKerrMetricA(blackHoleModel.mass, blackHoleModel.siderealDaySeconds);
+        this.frameDraggingFactor = kerrMetricA / blackHoleModel.mass;
     }
 
     public setUniforms(effect: Effect, blackHoleTransform: TransformNode) {

@@ -77,8 +77,7 @@ import {
     UniverseObjectId
 } from "../utils/coordinates/universeCoordinates";
 import { StarSystemModel } from "./starSystemModel";
-import { OrbitalObjectType } from "../architecture/orbitalObject";
-import { OrbitalFacility } from "../spacestation/orbitalFacility";
+import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { Spaceship } from "../spaceship/spaceship";
 import { Transformable } from "../architecture/transformable";
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
@@ -784,10 +783,10 @@ export class StarSystemView implements View {
         spaceship.setClosestWalkableObject(nearestOrbitalObject);
 
         if (
-            nearestOrbitalObject.model.type === OrbitalObjectType.SPACE_STATION ||
-            nearestOrbitalObject.model.type === OrbitalObjectType.SPACE_ELEVATOR
+            nearestOrbitalObject.type === OrbitalObjectType.SPACE_STATION ||
+            nearestOrbitalObject.type === OrbitalObjectType.SPACE_ELEVATOR
         ) {
-            this.spaceshipControls.setClosestLandableFacility(nearestOrbitalObject as OrbitalFacility);
+            this.spaceshipControls.setClosestLandableFacility(nearestOrbitalObject);
         } else {
             this.spaceshipControls.setClosestLandableFacility(null);
         }

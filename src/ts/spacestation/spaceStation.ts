@@ -35,15 +35,17 @@ import { Settings } from "../settings";
 import { EngineBay } from "../assets/procedural/spaceStation/engineBay";
 import { getRngFromSeed } from "../utils/getRngFromSeed";
 import { getOrbitalObjectTypeToI18nString } from "../utils/strings/orbitalObjectTypeToDisplay";
-import { OrbitalFacility } from "./orbitalFacility";
+import { OrbitalFacilityBase } from "./orbitalFacility";
 import { SpaceStationModel } from "./spacestationModel";
-import { OrbitalObject } from "../architecture/orbitalObject";
 import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
+import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 
-export class SpaceStation implements OrbitalFacility {
+export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE_STATION> {
     readonly name: string;
 
     readonly model: SpaceStationModel;
+
+    readonly type = OrbitalObjectType.SPACE_STATION;
 
     readonly solarSections: SolarSection[] = [];
     readonly utilitySections: UtilitySection[] = [];
@@ -251,7 +253,7 @@ export class SpaceStation implements OrbitalFacility {
 
     update(
         stellarObjects: Transformable[],
-        parents: OrbitalObject[],
+        parents: Transformable[],
         cameraWorldPosition: Vector3,
         deltaSeconds: number
     ) {

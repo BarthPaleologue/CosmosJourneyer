@@ -29,7 +29,6 @@ import { randomDownSample } from "../instancePatch/matrixBuffer";
 import { isSizeOnScreenEnough } from "../../../../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { IPatch } from "../instancePatch/iPatch";
-import { TelluricPlanetaryMassObjectModel } from "../../telluricPlanetaryMassObjectModel";
 import { HasBoundingSphere } from "../../../../architecture/hasBoundingSphere";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { Transformable } from "../../../../architecture/transformable";
@@ -38,6 +37,8 @@ import { InstancePatch } from "../instancePatch/instancePatch";
 import { Cullable } from "../../../../utils/cullable";
 import { Materials } from "../../../../assets/materials";
 import { Objects } from "../../../../assets/objects";
+import { TelluricPlanetModel } from "../../telluricPlanetModel";
+import { TelluricSatelliteModel } from "../../telluricSatelliteModel";
 
 export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
     public readonly mesh: Mesh;
@@ -45,7 +46,7 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
     public readonly cubePosition: Vector3;
     private readonly planetLocalPosition: Vector3;
 
-    private readonly planetModel: TelluricPlanetaryMassObjectModel;
+    private readonly planetModel: TelluricPlanetModel | TelluricSatelliteModel;
 
     private readonly chunkSideLength: number;
 
@@ -68,7 +69,7 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
         direction: Direction,
         parentAggregate: PhysicsAggregate,
         material: Material,
-        planetModel: TelluricPlanetaryMassObjectModel,
+        planetModel: TelluricPlanetModel | TelluricSatelliteModel,
         rootLength: number,
         scene: Scene
     ) {
@@ -163,9 +164,9 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
         this.instancePatches.push(rockPatch);
 
         if (
-            this.planetModel.physics.pressure > 0 &&
-            this.planetModel.physics.oceanLevel > 0 &&
-            this.getAverageHeight() > this.planetModel.physics.oceanLevel + 50
+            this.planetModel.atmosphere !== null &&
+            this.planetModel.ocean !== null &&
+            this.getAverageHeight() > this.planetModel.ocean.depth + 50
         ) {
             const treePatch = new InstancePatch(this.parent, randomDownSample(instancesMatrixBuffer, 4800));
             treePatch.createInstances([{ mesh: Objects.TREE, distance: 0 }]);

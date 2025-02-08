@@ -20,14 +20,13 @@ import { newSightSeeingMission } from "./sightSeeingMission";
 import { uniformRandBool } from "extended-random";
 import { SystemObjectType } from "../utils/coordinates/universeCoordinates";
 import { Player } from "../player/player";
-import { TelluricPlanetaryMassObjectModel } from "../planets/telluricPlanet/telluricPlanetaryMassObjectModel";
 import { Mission, MissionType } from "./mission";
 import { StarSystemModel, StarSystemModelUtils } from "../starSystem/starSystemModel";
 import { getRngFromSeed } from "../utils/getRngFromSeed";
-import { OrbitalObjectType } from "../architecture/orbitalObject";
-import { OrbitalFacilityModel } from "../spacestation/orbitalFacility";
+import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { getUniverseIdForSpaceStationModel } from "../utils/coordinates/orbitalObjectId";
+import { OrbitalFacilityModel } from "../architecture/orbitalObjectModel";
 
 /**
  * Generates sightseeing missions available at the given space station for the player. Missions are generated based on the current timestamp (hourly basis).
@@ -131,7 +130,10 @@ export function generateSightseeingMissions(
     const terminatorLandingMissions: Mission[] = [];
     const currentSystemModel = starSystem;
     StarSystemModelUtils.GetPlanetaryMassObjects(currentSystemModel).forEach((celestialBodyModel, index) => {
-        if (celestialBodyModel.rings !== null) {
+        if (
+            celestialBodyModel.type === OrbitalObjectType.TELLURIC_SATELLITE ||
+            (celestialBodyModel.type === OrbitalObjectType.TELLURIC_PLANET && celestialBodyModel.rings !== null)
+        ) {
             asteroidFieldMissions.push(
                 newSightSeeingMission(
                     spaceStationUniverseId,
@@ -149,8 +151,8 @@ export function generateSightseeingMissions(
         }
 
         if (celestialBodyModel.type === OrbitalObjectType.TELLURIC_PLANET) {
-            const telluricPlanetModel = celestialBodyModel as TelluricPlanetaryMassObjectModel;
-            if (telluricPlanetModel.physics.oceanLevel === 0) {
+            const telluricPlanetModel = celestialBodyModel;
+            if (telluricPlanetModel.ocean === null) {
                 terminatorLandingMissions.push(
                     newSightSeeingMission(
                         spaceStationUniverseId,

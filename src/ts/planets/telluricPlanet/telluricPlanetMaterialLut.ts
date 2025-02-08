@@ -19,7 +19,6 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import lutFragment from "../../../shaders/telluricPlanetMaterial/utils/lut.glsl";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import { Scene } from "@babylonjs/core/scene";
-import { TelluricPlanetaryMassObjectPhysicsInfo } from "../../architecture/physicsInfo";
 
 export class TelluricPlanetMaterialLut {
     private readonly lut: ProceduralTexture;
@@ -42,10 +41,10 @@ export class TelluricPlanetMaterialLut {
         this.lut.refreshRate = 0;
     }
 
-    setPlanetPhysicsInfo(physics: TelluricPlanetaryMassObjectPhysicsInfo) {
-        this.lut.setFloat("minTemperature", physics.minTemperature);
-        this.lut.setFloat("maxTemperature", physics.maxTemperature);
-        this.lut.setFloat("pressure", physics.pressure);
+    setPlanetPhysicsInfo(minTemperature: number, maxTemperature: number, pressure: number) {
+        this.lut.setFloat("minTemperature", minTemperature);
+        this.lut.setFloat("maxTemperature", maxTemperature);
+        this.lut.setFloat("pressure", pressure);
 
         this.lut.resetRefreshCounter();
     }

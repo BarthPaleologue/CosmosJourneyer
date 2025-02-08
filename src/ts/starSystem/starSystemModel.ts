@@ -16,12 +16,14 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates";
-import { StellarObjectModel } from "../architecture/stellarObject";
-import { PlanetaryMassObjectModel } from "../architecture/planetaryMassObject";
-import { AnomalyModel } from "../anomalies/anomaly";
-import { PlanetModel } from "../architecture/planet";
+import {
+    AnomalyModel,
+    OrbitalFacilityModel,
+    PlanetaryMassObjectModel,
+    PlanetModel,
+    StellarObjectModel
+} from "../architecture/orbitalObjectModel";
 import { TelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModel";
-import { OrbitalFacilityModel } from "../spacestation/orbitalFacility";
 
 /**
  * Data model for a planetary system. It holds all the information necessary to generate and render a planetary system.
@@ -123,7 +125,7 @@ export class StarSystemModelUtils {
      * @param starSystem The star system to get the planets from.
      * @constructor
      */
-    static GetPlanets(starSystem: StarSystemModel): PlanetaryMassObjectModel[] {
+    static GetPlanets(starSystem: StarSystemModel): PlanetModel[] {
         return starSystem.subSystems.flatMap((subSystem) =>
             subSystem.planetarySystems.flatMap((planetarySystem) => planetarySystem.planets)
         );

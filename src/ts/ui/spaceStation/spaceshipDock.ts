@@ -1,5 +1,5 @@
 import { Player } from "../../player/player";
-import { OrbitalFacilityModel } from "../../spacestation/orbitalFacility";
+import { OrbitalFacilityModel } from "../../architecture/orbitalObjectModel";
 import { Sounds } from "../../assets/sounds";
 import i18n from "../../i18n";
 

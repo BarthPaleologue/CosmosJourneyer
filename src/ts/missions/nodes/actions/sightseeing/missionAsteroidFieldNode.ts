@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { MissionNode, MissionNodeSerialized, MissionNodeType } from "../../missionNode";
+import { MissionNodeBase, MissionNodeSerializedBase, MissionNodeType } from "../../missionNode";
 import { MissionContext } from "../../../missionContext";
 import {
     StarSystemCoordinates,
@@ -31,6 +31,7 @@ import { parseDistance } from "../../../../utils/strings/parseToStrings";
 import { Settings } from "../../../../settings";
 import { getGoToSystemInstructions } from "../../../common";
 import { StarSystemDatabase } from "../../../../starSystem/starSystemDatabase";
+import type { MissionNode } from "../../deserializeNode";
 
 const enum AsteroidFieldMissionState {
     NOT_IN_SYSTEM,
@@ -38,7 +39,7 @@ const enum AsteroidFieldMissionState {
     CLOSE_ENOUGH
 }
 
-export type MissionAsteroidFieldNodeSerialized = MissionNodeSerialized & {
+export type MissionAsteroidFieldNodeSerialized = MissionNodeSerializedBase<MissionNodeType.ASTEROID_FIELD> & {
     objectId: UniverseObjectId;
     state: AsteroidFieldMissionState;
 };
@@ -46,7 +47,7 @@ export type MissionAsteroidFieldNodeSerialized = MissionNodeSerialized & {
 /**
  * Node used to describe a trek to an asteroid field
  */
-export class MissionAsteroidFieldNode implements MissionNode {
+export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType.ASTEROID_FIELD> {
     private state = AsteroidFieldMissionState.NOT_IN_SYSTEM;
 
     private readonly objectId: UniverseObjectId;
@@ -184,7 +185,6 @@ export class MissionAsteroidFieldNode implements MissionNode {
     serialize(): MissionAsteroidFieldNodeSerialized {
         return {
             type: MissionNodeType.ASTEROID_FIELD,
-            children: [],
             objectId: this.objectId,
             state: this.state
         };

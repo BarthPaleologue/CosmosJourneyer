@@ -18,7 +18,7 @@
 import mandelboxFragment from "../../../shaders/mandelbox.glsl";
 import { UpdatablePostProcess } from "../../postProcesses/updatablePostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { StellarObject } from "../../architecture/stellarObject";
+import { StellarObject } from "../../architecture/orbitalObject";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { ObjectUniformNames, setObjectUniforms } from "../../postProcesses/uniforms/objectUniforms";
@@ -97,7 +97,7 @@ export class MandelboxPostProcess extends PostProcess implements UpdatablePostPr
 
             effect.setFloat(MandelboxUniformNames.MR2, model.mr2);
             effect.setFloat(MandelboxUniformNames.SPREAD, model.spread);
-            effect.setColor3(MandelboxUniformNames.ACCENT_COLOR, model.accentColor);
+            effect.setColor3(MandelboxUniformNames.ACCENT_COLOR, model.color);
             effect.setFloat(MandelboxUniformNames.ELAPSED_SECONDS, this.elapsedSeconds);
             effect.setFloat(
                 MandelboxUniformNames.AVERAGE_SCREEN_SIZE,

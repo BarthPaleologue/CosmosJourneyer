@@ -112,7 +112,7 @@ export class DiscoveryDetails {
         this.htmlRoot.appendChild(this.objectType);
 
         this.siderealDayDuration.innerText = i18n.t("orbitalObject:siderealDayDuration", {
-            value: model !== null ? parseSecondsPrecise(model.physics.siderealDaySeconds) : i18n.t("common:unknown")
+            value: model !== null ? parseSecondsPrecise(model.siderealDaySeconds) : i18n.t("common:unknown")
         });
         this.htmlRoot.appendChild(this.siderealDayDuration);
 
