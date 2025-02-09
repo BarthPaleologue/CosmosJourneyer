@@ -21,13 +21,14 @@ import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { LandingPad, LandingPadSize } from "../assets/procedural/landingPad/landingPad";
 import { Transformable } from "../architecture/transformable";
-import { AssetsManager, TransformNode } from "@babylonjs/core";
+import { AssetsManager, Quaternion, TransformNode } from "@babylonjs/core";
 import { enablePhysics } from "./utils";
 import { DefaultControls } from "../defaultControls/defaultControls";
 import { Spaceship } from "../spaceship/spaceship";
 import { Objects } from "../assets/objects";
 import { Textures } from "../assets/textures";
 import { Sounds } from "../assets/sounds";
+import { randRange } from "extended-random";
 
 export async function createAutomaticLandingScene(engine: AbstractEngine): Promise<Scene> {
     const scene = new Scene(engine);
@@ -42,7 +43,12 @@ export async function createAutomaticLandingScene(engine: AbstractEngine): Promi
     await assetsManager.loadAsync();
 
     const ship = Spaceship.CreateDefault(scene);
-    ship.getTransform().position.copyFromFloats(0, 20, 0);
+    ship.getTransform().position.copyFromFloats(
+        randRange(-50, 50, Math.random, 0),
+        randRange(0, 50, Math.random, 0),
+        randRange(-50, 50, Math.random, 0)
+    );
+    ship.getTransform().rotationQuaternion = Quaternion.Random().normalize();
 
     const defaultControls = new DefaultControls(scene);
     defaultControls.getTransform().position.copyFromFloats(0, 10, -50);
@@ -64,6 +70,8 @@ export async function createAutomaticLandingScene(engine: AbstractEngine): Promi
         getTransform: () => sunTransform,
         dispose: () => sunTransform.dispose()
     };
+
+    ship.engageLandingOnPad(landingPad);
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
