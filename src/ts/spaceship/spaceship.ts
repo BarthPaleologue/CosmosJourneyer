@@ -66,6 +66,7 @@ export const enum ShipType {
 }
 
 export type SerializedSpaceship = {
+    id: string;
     name: string;
     type: ShipType;
     fuelTanks: SerializedFuelTank[];
@@ -73,6 +74,7 @@ export type SerializedSpaceship = {
 };
 
 export const DefaultSerializedSpaceship: SerializedSpaceship = {
+    id: crypto.randomUUID(),
     name: "Wanderer",
     type: ShipType.WANDERER,
     fuelTanks: [{ currentFuel: 100, maxFuel: 100 }],
@@ -82,6 +84,8 @@ export const DefaultSerializedSpaceship: SerializedSpaceship = {
 };
 
 export class Spaceship implements Transformable {
+    readonly id: string;
+
     readonly name: string;
 
     readonly instanceRoot: AbstractMesh;
@@ -152,6 +156,8 @@ export class Spaceship implements Transformable {
     readonly boundingExtent: Vector3;
 
     private constructor(serializedSpaceShip: SerializedSpaceship, scene: Scene) {
+        this.id = serializedSpaceShip.id ?? crypto.randomUUID();
+
         this.name = serializedSpaceShip.name;
 
         this.instanceRoot = Objects.CreateWandererInstance();
@@ -856,6 +862,7 @@ export class Spaceship implements Transformable {
 
     public serialize(): SerializedSpaceship {
         return {
+            id: this.id,
             name: this.name,
             type: ShipType.WANDERER,
             fuelTanks: this.fuelTanks.map((tank) => tank.serialize()),
