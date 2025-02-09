@@ -727,16 +727,19 @@ export class Spaceship implements Transformable {
             if (this.mainEngineThrottle !== 0) this.thrusterSound.setTargetVolume(1);
             else this.thrusterSound.setTargetVolume(0);
 
-            if (forwardSpeed < this.mainEngineTargetSpeed) {
-                this.aggregate.body.applyForce(
-                    forwardDirection.scale(this.thrusterForce),
-                    this.aggregate.body.getObjectCenterWorld()
-                );
-            } else {
-                this.aggregate.body.applyForce(
-                    forwardDirection.scale(-0.7 * this.thrusterForce),
-                    this.aggregate.body.getObjectCenterWorld()
-                );
+            const speedDifference = forwardSpeed - this.mainEngineTargetSpeed;
+            if (Math.abs(speedDifference) > 2) {
+                if (speedDifference < 0) {
+                    this.aggregate.body.applyForce(
+                        forwardDirection.scale(this.thrusterForce),
+                        this.aggregate.body.getObjectCenterWorld()
+                    );
+                } else {
+                    this.aggregate.body.applyForce(
+                        forwardDirection.scale(-0.7 * this.thrusterForce),
+                        this.aggregate.body.getObjectCenterWorld()
+                    );
+                }
             }
 
             this.mainThrusters.forEach((thruster) => {
