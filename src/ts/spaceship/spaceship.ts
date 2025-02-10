@@ -51,7 +51,7 @@ import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { FuelTank, SerializedFuelTank } from "./fuelTank";
 import { FuelScoop } from "./fuelScoop";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
-import { LandingComputer, LandingTargetKind } from "./landingComputer";
+import { LandingComputer, LandingComputerStatusBit, LandingTargetKind } from "./landingComputer";
 import { canEngageWarpDrive } from "./warpDriveUtils";
 import { distanceToAsteroidField } from "../utils/asteroidFields";
 
@@ -196,9 +196,6 @@ export class Spaceship implements Transformable {
         this.collisionObservable = this.aggregate.body.getCollisionObservable();
 
         this.landingComputer = new LandingComputer(this.aggregate, scene.getPhysicsEngine() as PhysicsEngineV2);
-        this.landingComputer.onLandingComplete.add(() => {
-            this.completeLanding();
-        });
 
         this.warpTunnel = new WarpTunnel(this.getTransform(), scene);
         this.hyperSpaceTunnel = new HyperSpaceTunnel(this.getTransform().getDirection(Axis.Z), scene);
@@ -420,6 +417,8 @@ export class Spaceship implements Transformable {
 
         this.landingComputer?.setTarget(null);
 
+        this.targetLandingPad = null;
+
         this.onLandingCancelled.notifyObservers();
     }
 
@@ -613,7 +612,7 @@ export class Spaceship implements Transformable {
 
                 // damp other speed
                 const otherSpeed = linearVelocity.subtract(forwardDirection.scale(forwardSpeed));
-                this.aggregate.body.applyForce(otherSpeed.scale(-10), this.aggregate.body.getObjectCenterWorld());
+                this.aggregate.body.applyForce(otherSpeed.scale(-2), this.aggregate.body.getObjectCenterWorld());
             }
 
             this.mainThrusters.forEach((thruster) => {
@@ -648,7 +647,21 @@ export class Spaceship implements Transformable {
             thruster.update(deltaSeconds);
         });
 
-        this.landingComputer?.update();
+        if (this.landingComputer !== null) {
+            const landingComputerStatus = this.landingComputer.update(deltaSeconds);
+            switch (landingComputerStatus) {
+                case LandingComputerStatusBit.PROGRESS:
+                    break;
+                case LandingComputerStatusBit.COMPLETE:
+                    this.completeLanding();
+                    break;
+                case LandingComputerStatusBit.TIMEOUT:
+                    this.cancelLanding();
+                    break;
+                case LandingComputerStatusBit.IDLE:
+                    break;
+            }
+        }
 
         if (this.isAutoPiloted()) {
             this.setMainEngineThrottle(0);

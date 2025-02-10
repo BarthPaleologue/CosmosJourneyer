@@ -21,7 +21,6 @@ import { LandingPad } from "../assets/procedural/landingPad/landingPad";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { Observable } from "@babylonjs/core/Misc/observable";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { CollisionMask } from "../settings";
 import { getAngleFromQuaternion, getAxisFromQuaternion, getDeltaQuaternion } from "../utils/algebra";
@@ -94,6 +93,13 @@ type LandingPlanStep = {
     };
 };
 
+export const enum LandingComputerStatusBit {
+    PROGRESS = 1 << 0,
+    COMPLETE = 1 << 1,
+    TIMEOUT = 1 << 2,
+    IDLE = 1 << 3
+}
+
 export class LandingComputer {
     private readonly physicsEngine: PhysicsEngineV2;
 
@@ -109,7 +115,8 @@ export class LandingComputer {
 
     private readonly boundingExtent: Vector3;
 
-    readonly onLandingComplete: Observable<void> = new Observable<void>();
+    private elapsedSeconds = 0;
+    private readonly maxSecondsPerPlan = 90;
 
     constructor(aggregate: PhysicsAggregate, physicsEngine: PhysicsEngineV2) {
         this.aggregate = aggregate;
@@ -128,6 +135,7 @@ export class LandingComputer {
     setTarget(target: LandingTarget | null) {
         this.target = target;
         this.currentActionIndex = 0;
+        this.elapsedSeconds = 0;
 
         if (this.target === null) {
             this.actionPlan = null;
@@ -252,15 +260,17 @@ export class LandingComputer {
         ];
     }
 
-    update() {
+    update(deltaSeconds: number): LandingComputerStatusBit {
         if (this.target === null || this.actionPlan === null) {
-            return;
+            return LandingComputerStatusBit.IDLE;
         }
 
         const currentAction = this.actionPlan.at(this.currentActionIndex);
         if (currentAction === undefined) {
-            return;
+            return LandingComputerStatusBit.COMPLETE;
         }
+
+        this.elapsedSeconds += deltaSeconds;
 
         const { position: targetPosition, rotation: targetRotation } = currentAction.getTargetTransform();
         const { position: positionTolerance, rotation: rotationTolerance } = currentAction.tolerance;
@@ -286,13 +296,12 @@ export class LandingComputer {
             currentAngularVelocity.length() < maxRotationSpeedAtTarget
         ) {
             if (this.currentActionIndex === this.actionPlan.length - 1) {
-                this.onLandingComplete.notifyObservers();
                 this.setTarget(null);
-                return;
+                return LandingComputerStatusBit.COMPLETE;
             }
 
             this.currentActionIndex++;
-            return;
+            return LandingComputerStatusBit.PROGRESS;
         }
 
         const currentSpeedTowardTarget = currentLinearVelocity.dot(directionToTarget);
@@ -328,5 +337,12 @@ export class LandingComputer {
         this.aggregate.body.applyAngularImpulse(rotationAxis.scale(rotationImpulseStrength));
 
         this.aggregate.body.applyAngularImpulse(otherRotationSpeed.scale(-2));
+
+        if (this.elapsedSeconds > this.maxSecondsPerPlan) {
+            this.setTarget(null);
+            return LandingComputerStatusBit.TIMEOUT;
+        }
+
+        return LandingComputerStatusBit.PROGRESS;
     }
 }
