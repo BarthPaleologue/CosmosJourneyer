@@ -390,8 +390,21 @@ export class ShipControls implements Controls {
         });
 
         this.spaceship.onTakeOff.add(() => {
-            //FIXME: localize
-            createNotification(NotificationOrigin.SPACESHIP, NotificationIntent.INFO, "Takeoff successful", 2000);
+            createNotification(
+                NotificationOrigin.SPACESHIP,
+                NotificationIntent.INFO,
+                i18n.t("notifications:takeOffSuccess"),
+                2000
+            );
+        });
+
+        this.spaceship.onAutoPilotEngaged.add(() => {
+            createNotification(
+                NotificationOrigin.SPACESHIP,
+                NotificationIntent.INFO,
+                i18n.t("notifications:autoPilotEngaged"),
+                30_000
+            );
         });
 
         this.spaceship.onWarpDriveDisabled.add((isEmergency) => {

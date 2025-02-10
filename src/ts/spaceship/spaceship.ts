@@ -151,6 +151,8 @@ export class Spaceship implements Transformable {
 
     readonly onTakeOff = new Observable<void>();
 
+    readonly onAutoPilotEngaged = new Observable<void>();
+
     readonly boundingExtent: Vector3;
 
     private constructor(serializedSpaceShip: SerializedSpaceship, scene: Scene) {
@@ -375,7 +377,6 @@ export class Spaceship implements Transformable {
     }
 
     public engageLandingOnPad(landingPad: LandingPad) {
-        console.log("Landing on pad", landingPad.getTransform().name);
         this.targetLandingPad = landingPad;
     }
 
@@ -384,7 +385,6 @@ export class Spaceship implements Transformable {
     }
 
     private completeLanding() {
-        console.log("Landing sequence complete");
         this.state = ShipState.LANDED;
 
         this.aggregate.body.setMotionType(PhysicsMotionType.STATIC);
@@ -696,20 +696,14 @@ export class Spaceship implements Transformable {
                 const verticalDistance = Vector3.Dot(shipRelativePosition, this.targetLandingPad.getTransform().up);
                 if (distanceToPad < 600 && verticalDistance > 0) {
                     if (this.state !== ShipState.LANDING) {
-                        //FIXME: move this in ship controls before adding NPC ships
-                        createNotification(
-                            NotificationOrigin.SPACESHIP,
-                            NotificationIntent.INFO,
-                            "Automatic landing procedure engaged",
-                            10000
-                        );
-
                         this.landingComputer.setTarget({
                             kind: LandingTargetKind.LANDING_PAD,
                             landingPad: this.targetLandingPad
                         });
 
                         this.state = ShipState.LANDING;
+
+                        this.onAutoPilotEngaged.notifyObservers();
                     }
                 }
             }
