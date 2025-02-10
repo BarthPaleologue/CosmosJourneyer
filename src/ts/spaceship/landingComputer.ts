@@ -206,14 +206,15 @@ export class LandingComputer {
     }
 
     private createCelestialBodyActionPlan(celestialBody: Transformable): ReadonlyArray<LandingPlanStep> {
-        const shipPosition = this.transform.getAbsolutePosition();
-        const gravityDir = celestialBody.getTransform().getAbsolutePosition().subtract(shipPosition).normalize();
-        const start = shipPosition.add(gravityDir.scale(-50e3));
-        const end = shipPosition.add(gravityDir.scale(50e3));
-
         return [
             {
                 getTargetTransform: () => {
+                    const shipPosition = this.transform.getAbsolutePosition();
+                    const gravityDir = celestialBody.getTransform().position.subtract(shipPosition).normalize();
+
+                    const start = shipPosition.add(gravityDir.scale(-50e3));
+                    const end = shipPosition.add(gravityDir.scale(50e3));
+
                     this.physicsEngine.raycastToRef(start, end, this.raycastResult, {
                         collideWith: CollisionMask.ENVIRONMENT
                     });
