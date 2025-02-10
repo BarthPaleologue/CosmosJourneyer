@@ -650,6 +650,10 @@ export class Spaceship implements Transformable {
 
         this.landingComputer?.update();
 
+        if (this.isAutoPiloted()) {
+            this.setMainEngineThrottle(0);
+        }
+
         const distanceTravelledLY = (this.getSpeed() * deltaSeconds) / Settings.LIGHT_YEAR;
         const fuelToBurn = this.warpDrive.getFuelConsumption(distanceTravelledLY);
         if (fuelToBurn < this.getRemainingFuel()) {
