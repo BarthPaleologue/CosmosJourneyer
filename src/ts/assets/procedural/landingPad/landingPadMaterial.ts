@@ -45,7 +45,7 @@ export class LandingPadMaterial extends ShaderMaterial {
             samplers: [...Object.values(LandingPadSamplerNames)]
         });
 
-        const numberTexture = Textures.LANDING_PAD_NUMBER_TEXTURES.at(padNumber);
+        const numberTexture = Textures.GetLandingPadNumberTexture(padNumber, scene);
         if (numberTexture === undefined) {
             throw new Error(`No texture for pad number ${padNumber}`);
         }

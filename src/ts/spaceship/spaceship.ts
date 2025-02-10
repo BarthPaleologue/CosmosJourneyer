@@ -177,12 +177,13 @@ export class Spaceship implements Transformable {
                 continue;
             }
             const childShape = new PhysicsShapeMesh(child as Mesh, scene);
-            childShape.filterMembershipMask = CollisionMask.DYNAMIC_OBJECTS;
-            childShape.filterCollideMask = CollisionMask.ENVIRONMENT;
             this.aggregate.shape.addChildFromParent(this.instanceRoot, childShape, child);
         }
         this.aggregate.body.disablePreStep = false;
         this.aggregate.body.setAngularDamping(0.9);
+
+        this.aggregate.shape.filterMembershipMask = CollisionMask.DYNAMIC_OBJECTS;
+        this.aggregate.shape.filterCollideMask = CollisionMask.ENVIRONMENT | CollisionMask.DYNAMIC_OBJECTS;
 
         this.aggregate.body.setCollisionCallbackEnabled(true);
         this.collisionObservable = this.aggregate.body.getCollisionObservable();
@@ -353,15 +354,10 @@ export class Spaceship implements Transformable {
         return this.closestWalkableObject;
     }
 
-    public engagePlanetaryLanding(landingTarget: Transformable | null) {
-        console.log("Landing sequence engaged");
+    public engagePlanetaryLanding(landingTarget: Transformable) {
         this.aggregate.body.setMotionType(PhysicsMotionType.ANIMATED);
         this.state = ShipState.LANDING;
-        this.landingTarget = landingTarget !== null ? landingTarget : this.closestWalkableObject;
-        if (this.landingTarget === null) {
-            throw new Error("Landing target is null");
-        }
-
+        this.landingTarget = landingTarget;
         this.onPlanetaryLandingEngaged.notifyObservers();
     }
 
@@ -393,11 +389,13 @@ export class Spaceship implements Transformable {
 
     public cancelLanding() {
         this.state = ShipState.FLYING;
+
+        this.getTransform().setParent(null);
+
         this.aggregate.body.setMotionType(PhysicsMotionType.DYNAMIC);
         this.aggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS | CollisionMask.ENVIRONMENT;
         this.aggregate.shape.filterMembershipMask = CollisionMask.DYNAMIC_OBJECTS;
 
-        this.getTransform().setParent(null);
         this.landingTarget = null;
         this.targetLandingPad = null;
 
@@ -428,54 +426,54 @@ export class Spaceship implements Transformable {
     public takeOff() {
         this.targetLandingPad = null;
 
+        this.getTransform().setParent(null);
+
         this.state = ShipState.FLYING;
         this.aggregate.body.setMotionType(PhysicsMotionType.DYNAMIC);
         this.aggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS | CollisionMask.ENVIRONMENT;
         this.aggregate.shape.filterMembershipMask = CollisionMask.DYNAMIC_OBJECTS;
-
-        this.getTransform().setParent(null);
 
         this.aggregate.body.applyImpulse(this.getTransform().up.scale(200), this.getTransform().getAbsolutePosition());
 
         this.onTakeOff.notifyObservers();
     }
 
-    private land(deltaTime: number) {
-        if (this.landingTarget !== null) {
-            const gravityDir = this.landingTarget
-                .getTransform()
-                .getAbsolutePosition()
-                .subtract(this.getTransform().getAbsolutePosition())
-                .normalize();
-            const start = this.getTransform().getAbsolutePosition().add(gravityDir.scale(-50e3));
-            const end = this.getTransform().getAbsolutePosition().add(gravityDir.scale(50e3));
+    private landOnSurface(deltaSeconds: number) {
+        if (this.landingTarget === null) return;
 
-            (this.scene.getPhysicsEngine() as PhysicsEngineV2).raycastToRef(start, end, this.raycastResult, {
-                collideWith: CollisionMask.ENVIRONMENT
-            });
-            if (this.raycastResult.hasHit) {
-                const landingSpotNormal = this.raycastResult.hitNormalWorld;
+        const gravityDir = this.landingTarget
+            .getTransform()
+            .getAbsolutePosition()
+            .subtract(this.getTransform().getAbsolutePosition())
+            .normalize();
+        const start = this.getTransform().getAbsolutePosition().add(gravityDir.scale(-50e3));
+        const end = this.getTransform().getAbsolutePosition().add(gravityDir.scale(50e3));
 
-                const landingSpot = this.raycastResult.hitPointWorld.add(this.raycastResult.hitNormalWorld.scale(1.0));
+        (this.scene.getPhysicsEngine() as PhysicsEngineV2).raycastToRef(start, end, this.raycastResult, {
+            collideWith: CollisionMask.ENVIRONMENT
+        });
+        if (this.raycastResult.hasHit) {
+            const landingSpotNormal = this.raycastResult.hitNormalWorld;
 
-                const distance = landingSpot.subtract(this.getTransform().getAbsolutePosition()).dot(gravityDir);
-                translate(
-                    this.getTransform(),
-                    gravityDir.scale(Math.min(10 * deltaTime * Math.sign(distance), distance))
-                );
+            const landingSpot = this.raycastResult.hitPointWorld.add(this.raycastResult.hitNormalWorld.scale(1.0));
 
-                const currentUp = getUpwardDirection(this.getTransform());
-                const targetUp = landingSpotNormal;
-                let theta = 0.0;
-                if (Vector3.Distance(currentUp, targetUp) > 0.01) {
-                    const axis = Vector3.Cross(currentUp, targetUp);
-                    theta = Math.acos(Vector3.Dot(currentUp, targetUp));
-                    rotate(this.getTransform(), axis, Math.min(0.4 * deltaTime, theta));
-                }
+            const distance = landingSpot.subtract(this.getTransform().getAbsolutePosition()).dot(gravityDir);
+            translate(
+                this.getTransform(),
+                gravityDir.scale(Math.min(10 * deltaSeconds * Math.sign(distance), distance))
+            );
 
-                if (Math.abs(distance) < this.boundingExtent.y / 2 && Math.abs(theta) < 0.01) {
-                    this.completeLanding();
-                }
+            const currentUp = getUpwardDirection(this.getTransform());
+            const targetUp = landingSpotNormal;
+            let theta = 0.0;
+            if (Vector3.Distance(currentUp, targetUp) > 0.01) {
+                const axis = Vector3.Cross(currentUp, targetUp);
+                theta = Math.acos(Vector3.Dot(currentUp, targetUp));
+                rotate(this.getTransform(), axis, Math.min(0.4 * deltaSeconds, theta));
+            }
+
+            if (Math.abs(distance) < this.boundingExtent.y / 2 && Math.abs(theta) < 0.01) {
+                this.completeLanding();
             }
         }
     }
@@ -799,7 +797,7 @@ export class Spaceship implements Transformable {
         });
 
         if (this.state === ShipState.LANDING) {
-            this.land(deltaSeconds);
+            this.landOnSurface(deltaSeconds);
         }
 
         const distanceTravelledLY = (this.getSpeed() * deltaSeconds) / Settings.LIGHT_YEAR;

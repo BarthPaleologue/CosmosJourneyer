@@ -123,7 +123,7 @@ export class Textures {
 
     static MILKY_WAY: CubeTexture;
 
-    static LANDING_PAD_NUMBER_TEXTURES: DynamicTexture[] = [];
+    private static LANDING_PAD_NUMBER_TEXTURES: Map<number, DynamicTexture> = new Map();
 
     static EnqueueTasks(manager: AssetsManager, scene: Scene) {
         manager.addTextureTask("RockNormalMetallicMap", rockNormalMetallicMap).onSuccess = (task) =>
@@ -204,24 +204,31 @@ export class Textures {
         this.CURSOR_IMAGE_URL = cursorImage;
 
         manager.addTextureTask("EmptyTexture", empty).onSuccess = (task) => (Textures.EMPTY_TEXTURE = task.texture);
+    }
+
+    static GetLandingPadNumberTexture(padNumber: number, scene: Scene): DynamicTexture {
+        const texture = Textures.LANDING_PAD_NUMBER_TEXTURES.get(padNumber);
+        if (texture !== undefined) {
+            return texture;
+        }
 
         const padNumberTextureResolution = 1024;
-        for (let i = 0; i < 100; i++) {
-            const numberTexture = new DynamicTexture(
-                `PadNumberTexture${i}`,
-                {
-                    width: padNumberTextureResolution,
-                    height: padNumberTextureResolution * Settings.LANDING_PAD_ASPECT_RATIO
-                },
-                scene,
-                true
-            );
+        const numberTexture = new DynamicTexture(
+            `PadNumberTexture${padNumber}`,
+            {
+                width: padNumberTextureResolution,
+                height: padNumberTextureResolution * Settings.LANDING_PAD_ASPECT_RATIO
+            },
+            scene,
+            true
+        );
 
-            //Add text to dynamic texture
-            const font = `bold 256px ${Settings.MAIN_FONT}`;
-            numberTexture.drawText(`${i}`, null, null, font, "white", null, true, true);
+        //Add text to dynamic texture
+        const font = `bold 256px ${Settings.MAIN_FONT}`;
+        numberTexture.drawText(`${padNumber}`, null, null, font, "white", null, true, true);
 
-            Textures.LANDING_PAD_NUMBER_TEXTURES.push(numberTexture);
-        }
+        Textures.LANDING_PAD_NUMBER_TEXTURES.set(padNumber, numberTexture);
+
+        return numberTexture;
     }
 }

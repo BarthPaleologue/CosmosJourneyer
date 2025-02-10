@@ -39,8 +39,6 @@ export function createOrbitalDemoScene(engine: AbstractEngine): Scene {
     camera.minZ = 0.1;
     camera.attachControl();
 
-    scene.enableDepthRenderer(camera, false, true);
-
     const hemi = new HemisphericLight("hemi", Vector3.Up(), scene);
     hemi.intensity = 1.0;
 
