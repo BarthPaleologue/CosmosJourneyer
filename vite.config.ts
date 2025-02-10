@@ -40,10 +40,7 @@ export default defineConfig({
                 main: resolve(__dirname, "src/ts/index.ts"),
                 alphaTestis: resolve(__dirname, "src/ts/alphaTestis.ts"),
                 blackHole: resolve(__dirname, "src/ts/blackHoleDemo.ts"),
-                playground: resolve(__dirname, "src/ts/playground.ts"),
-                xr: resolve(__dirname, "src/ts/xr.ts"),
-                spaceStationGenerator: resolve(__dirname, "src/ts/spaceStationGenerator.ts"),
-                debugAssets: resolve(__dirname, "src/ts/debugAssets.ts")
+                playground: resolve(__dirname, "src/ts/playground.ts")
             },
             output: {
                 entryFileNames: "[name].[hash].js",
