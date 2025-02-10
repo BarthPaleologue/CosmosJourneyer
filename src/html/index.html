@@ -10,7 +10,7 @@
         />
         <meta name="author" content="Barthélemy Paléologue" />
         <meta name="robots" content="index, follow" />
-        <title><%= htmlWebpackPlugin.options.title %></title>
+        <title>{{ title }}</title>
     </head>
 
     <body>
@@ -18,9 +18,10 @@
 
         <div id="inspectorLayer"></div>
 
-        <%= require('html-loader!./bodyEditor.html').default %> <%= require('html-loader!./spaceStationUI.html').default
-        %> <%= require('html-loader!./helmetOverlay.html').default %> <%= require('html-loader!./mainMenu.html').default
-        %> <%= require('html-loader!./pauseMenu.html').default %> <%= require('html-loader!./sidePanels.html').default
-        %>
+        <script type="module" src="/src/ts/index.ts"></script>
+        <script type="module" src="/src/ts/main.ts"></script>
+        <script type="module" src="/src/html/bodyEditor.html"></script>
+        <script type="module" src="/src/html/spaceStationUI.html"></script>
+        <script type="module" src="/src/html/helmetOverlay.html"></script>
     </body>
 </html>

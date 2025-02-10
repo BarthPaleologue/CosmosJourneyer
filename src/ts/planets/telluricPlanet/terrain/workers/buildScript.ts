@@ -16,11 +16,32 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { TransferBuildData } from "../chunks/workerDataTypes";
-import { build_chunk_vertex_data, BuildData, TerrainSettings } from "terrain-generation";
 import { ReturnedChunkData } from "../chunks/taskTypes";
 import { Settings } from "../../../../settings";
+import wasmInit from "terrain-generation/terrain_generation_bg.wasm?init";
+import { TerrainWasmModule } from "terrain-generation";
+
+let wasm: TerrainWasmModule | null = null;
+
+async function loadWasm() {
+    wasm = (await wasmInit()) as unknown as TerrainWasmModule;
+}
+
+await loadWasm();
 
 function handle_build(data: TransferBuildData): void {
+    if (!wasm) {
+        console.error("Wasm module not initialized!");
+        return;
+    }
+
+    const { build_chunk_vertex_data, BuildData, TerrainSettings } = wasm;
+
+    if (!build_chunk_vertex_data || !BuildData || !TerrainSettings) {
+        console.error("Wasm module functions are missing.");
+        return;
+    }
+
     const nbVerticesPerSide = data.nbVerticesPerSide;
     const nbSubdivisions = nbVerticesPerSide - 1;
 
@@ -30,7 +51,6 @@ function handle_build(data: TransferBuildData): void {
 
     const size = data.planetDiameter / 2 ** data.depth;
     const space_between_vertices = size / nbSubdivisions;
-    //console.log(data.depth, space_between_vertices);
     const scatter_per_square_meter = space_between_vertices < Settings.MIN_DISTANCE_BETWEEN_VERTICES ? 16 : 0;
 
     const flat_area = size * size;
@@ -50,7 +70,7 @@ function handle_build(data: TransferBuildData): void {
     terrain_settings.bumps_frequency = data.terrainSettings.bumps_frequency;
     terrain_settings.max_bump_height = data.terrainSettings.max_bump_height;
 
-    const buildData: BuildData = new BuildData(
+    const buildData = new BuildData(
         data.planetDiameter,
         data.depth,
         data.direction as number,
