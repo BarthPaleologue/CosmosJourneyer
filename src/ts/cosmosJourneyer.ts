@@ -351,6 +351,7 @@ export class CosmosJourneyer {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
+        // Init BabylonJS engine (use webgpu if ?webgpu is in the url)
         const engine = window.location.search.includes("webgpu")
             ? await EngineFactory.CreateAsync(canvas, {
                   twgslOptions: {
@@ -359,6 +360,7 @@ export class CosmosJourneyer {
                   }
               })
             : new Engine(canvas, true, {
+                  // the preserveDrawingBuffer option is required for the screenshot feature to work
                   preserveDrawingBuffer: true,
                   useHighPrecisionMatrix: true,
                   doNotHandleContextLost: true
