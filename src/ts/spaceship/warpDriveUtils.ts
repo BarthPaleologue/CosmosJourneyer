@@ -38,45 +38,45 @@ export function canEngageWarpDrive(
     }
 
     if (
-        nearestOrbitalObject.type === OrbitalObjectType.GAS_PLANET ||
-        nearestOrbitalObject.type === OrbitalObjectType.TELLURIC_PLANET ||
-        nearestOrbitalObject.type === OrbitalObjectType.STAR ||
-        nearestOrbitalObject.type === OrbitalObjectType.NEUTRON_STAR
+        nearestOrbitalObject.type !== OrbitalObjectType.GAS_PLANET &&
+        nearestOrbitalObject.type !== OrbitalObjectType.TELLURIC_PLANET &&
+        nearestOrbitalObject.type !== OrbitalObjectType.STAR &&
+        nearestOrbitalObject.type !== OrbitalObjectType.NEUTRON_STAR
     ) {
-        // if the spaceship goes too close to planetary rings, stop the warp drive to avoid collision with asteroids
-        const asteroidField = nearestOrbitalObject.asteroidField;
-        if (asteroidField === null) {
-            return true;
-        }
+        return true;
+    }
 
-        const inverseWorld = nearestOrbitalObject.getTransform().getWorldMatrix().clone().invert();
-        const relativePosition = Vector3.TransformCoordinates(shipPosition, inverseWorld);
-        const relativeForward = Vector3.TransformNormal(getForwardDirection(shipTransform), inverseWorld);
-        const distanceAboveRings = relativePosition.y;
-        const planarDistance = Math.sqrt(
-            relativePosition.x * relativePosition.x + relativePosition.z * relativePosition.z
-        );
+    // if the spaceship goes too close to planetary rings, stop the warp drive to avoid collision with asteroids
+    const asteroidField = nearestOrbitalObject.asteroidField;
+    if (asteroidField === null) {
+        return true;
+    }
 
-        const nbSecondsPrediction = 0.5;
-        const nextRelativePosition = relativePosition.add(relativeForward.scale(currentVelocity * nbSecondsPrediction));
-        const nextDistanceAboveRings = nextRelativePosition.y;
-        const nextPlanarDistance = Math.sqrt(
-            nextRelativePosition.x * nextRelativePosition.x + nextRelativePosition.z * nextRelativePosition.z
-        );
+    const inverseWorld = nearestOrbitalObject.getTransform().getWorldMatrix().clone().invert();
+    const relativePosition = Vector3.TransformCoordinates(shipPosition, inverseWorld);
+    const relativeForward = Vector3.TransformNormal(getForwardDirection(shipTransform), inverseWorld);
+    const distanceAboveRings = relativePosition.y;
+    const planarDistance = Math.sqrt(relativePosition.x * relativePosition.x + relativePosition.z * relativePosition.z);
 
-        const ringsMinDistance = asteroidField.minRadius;
-        const ringsMaxDistance = asteroidField.maxRadius;
+    const nbSecondsPrediction = 0.5;
+    const nextRelativePosition = relativePosition.add(relativeForward.scale(currentVelocity * nbSecondsPrediction));
+    const nextDistanceAboveRings = nextRelativePosition.y;
+    const nextPlanarDistance = Math.sqrt(
+        nextRelativePosition.x * nextRelativePosition.x + nextRelativePosition.z * nextRelativePosition.z
+    );
 
-        const isAboveRing = planarDistance > ringsMinDistance && planarDistance < ringsMaxDistance;
-        const willBeAboveRing = nextPlanarDistance > ringsMinDistance && nextPlanarDistance < ringsMaxDistance;
+    const ringsMinDistance = asteroidField.minRadius;
+    const ringsMaxDistance = asteroidField.maxRadius;
 
-        const isInRing = Math.abs(distanceAboveRings) < asteroidField.patchThickness / 2 && isAboveRing;
-        const willCrossRing =
-            Math.sign(distanceAboveRings) !== Math.sign(nextDistanceAboveRings) && (willBeAboveRing || isAboveRing);
+    const isAboveRing = planarDistance > ringsMinDistance && planarDistance < ringsMaxDistance;
+    const willBeAboveRing = nextPlanarDistance > ringsMinDistance && nextPlanarDistance < ringsMaxDistance;
 
-        if (isInRing || willCrossRing) {
-            return false;
-        }
+    const isInRing = Math.abs(distanceAboveRings) < asteroidField.patchThickness / 2 && isAboveRing;
+    const willCrossRing =
+        Math.sign(distanceAboveRings) !== Math.sign(nextDistanceAboveRings) && (willBeAboveRing || isAboveRing);
+
+    if (isInRing || willCrossRing) {
+        return false;
     }
 
     return true;

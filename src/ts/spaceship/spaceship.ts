@@ -523,7 +523,7 @@ export class Spaceship implements Transformable {
 
         if (this.warpDrive.isEnabled()) {
             if (this.nearestOrbitalObject !== null) {
-                if (!canEngageWarpDrive(this.getTransform(), currentForwardSpeed, this.nearestOrbitalObject)) {
+                if (!canEngageWarpDrive(this.getTransform(), this.getSpeed(), this.nearestOrbitalObject)) {
                     this.emergencyStopWarpDrive();
                 }
 
