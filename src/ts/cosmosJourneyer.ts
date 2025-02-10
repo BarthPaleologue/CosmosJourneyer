@@ -351,7 +351,6 @@ export class CosmosJourneyer {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        // Init BabylonJS engine (use webgpu if ?webgpu is in the url)
         const engine = window.location.search.includes("webgpu")
             ? await EngineFactory.CreateAsync(canvas, {
                   twgslOptions: {
@@ -360,7 +359,6 @@ export class CosmosJourneyer {
                   }
               })
             : new Engine(canvas, true, {
-                  // the preserveDrawingBuffer option is required for the screenshot feature to work
                   preserveDrawingBuffer: true,
                   useHighPrecisionMatrix: true,
                   doNotHandleContextLost: true
@@ -375,23 +373,32 @@ export class CosmosJourneyer {
 
         await initI18n();
 
-        // Log informations about the gpu and the api used
+        // Log GPU and API details
         console.log(`API: ${engine.isWebGPU ? "WebGPU" : "WebGL" + engine.version}`);
         console.log(`GPU detected: ${engine.extractDriverInfo()}`);
 
-        // Init Havok physics engine
-        const havokInstance = await HavokPhysics();
-        console.log(`Havok initialized`);
+        async function loadHavok(): Promise<any> {
+            try {
+                const havok = await HavokPhysics({
+                    locateFile: () => "/HavokPhysics.wasm"
+                });
+                console.log("Havok Initialized:", havok);
+                return havok;
+            } catch (err) {
+                console.error("Havok failed to initialize", err);
+                throw new Error("Havok Physics failed to initialize.");
+            }
+        }
+
+        const havokInstance = await loadHavok();
 
         const starSystemDatabase = new StarSystemDatabase();
         registerCustomSystems(starSystemDatabase);
 
         const player = Player.Default();
-
         const encyclopaedia = new EncyclopaediaGalacticaManager();
         encyclopaedia.backends.push(new EncyclopaediaGalacticaLocal(starSystemDatabase));
 
-        // Init star system view
         const starSystemView = new StarSystemView(player, engine, havokInstance, encyclopaedia, starSystemDatabase);
 
         await starSystemView.initAssets();

@@ -18,13 +18,13 @@
 import { TransferBuildData } from "../chunks/workerDataTypes";
 import { ReturnedChunkData } from "../chunks/taskTypes";
 import { Settings } from "../../../../settings";
-import wasmInit from "terrain-generation/terrain_generation_bg.wasm?init";
-import { TerrainWasmModule } from "terrain-generation";
+// @ts-ignore
+import initWasm, { TerrainWasmModule } from "terrain-generation/terrain_generation_bg.js";
 
 let wasm: TerrainWasmModule | null = null;
 
 async function loadWasm() {
-    wasm = (await wasmInit()) as unknown as TerrainWasmModule;
+    wasm = (await initWasm()) as TerrainWasmModule;
 }
 
 await loadWasm();

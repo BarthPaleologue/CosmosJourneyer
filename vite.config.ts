@@ -1,11 +1,13 @@
-import { defineConfig } from "vite";
+import { defineConfig, normalizePath } from "vite";
 import { resolve } from "path";
+import path from "node:path";
 import glsl from "vite-plugin-glsl";
 import wasm from "vite-plugin-wasm";
 import topLevelAwait from "vite-plugin-top-level-await";
 import { createHtmlPlugin } from "vite-plugin-html";
 import vitePluginBanner from "vite-plugin-banner";
 import handlebars from "vite-plugin-handlebars";
+import { viteStaticCopy } from "vite-plugin-static-copy";
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -54,7 +56,7 @@ export default defineConfig({
                     if (id.includes("some-heavy-module")) {
                         return "heavy";
                     }
-                    return null; // Ensure function always returns something
+                    return null;
                 }
             }
         },
@@ -78,8 +80,22 @@ export default defineConfig({
         wasm(),
         topLevelAwait(),
         glsl(),
-        handlebars(),
+        handlebars({
+            context: {
+                title: "Cosmos Journeyer"
+            }
+        }),
         vitePluginBanner(bannerText),
+        viteStaticCopy({
+            targets: [
+                {
+                    src: normalizePath(
+                        path.resolve(__dirname, "./node_modules/@babylonjs/havok/lib/esm/HavokPhysics.wasm")
+                    ),
+                    dest: "public"
+                }
+            ]
+        }),
         createHtmlPlugin({
             minify: isProduction,
             pages: [
@@ -102,21 +118,6 @@ export default defineConfig({
                     filename: "playground.html",
                     template: "src/html/emptyIndex.html",
                     injectOptions: { data: { title: "Playground - Cosmos Journeyer" } }
-                },
-                {
-                    filename: "xr.html",
-                    template: "src/html/emptyIndex.html",
-                    injectOptions: { data: { title: "XR - Cosmos Journeyer" } }
-                },
-                {
-                    filename: "spaceStationGenerator.html",
-                    template: "src/html/emptyIndex.html",
-                    injectOptions: { data: { title: "Space Station Generator - Cosmos Journeyer" } }
-                },
-                {
-                    filename: "debugAssets.html",
-                    template: "src/html/emptyIndex.html",
-                    injectOptions: { data: { title: "Debug Assets - Cosmos Journeyer" } }
                 }
             ]
         })

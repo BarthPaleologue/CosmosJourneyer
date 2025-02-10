@@ -10,21 +10,19 @@
         />
         <meta name="author" content="Barthélemy Paléologue" />
         <meta name="robots" content="index, follow" />
-        <title>{{ VITE_APP_TITLE }}</title>
+        <title>{{ title }}</title>
     </head>
 
     <body>
         <canvas id="renderer"></canvas>
 
         <div id="inspectorLayer"></div>
-
-        <script type="module">
-            document.title = import.meta.env.VITE_APP_TITLE || "Default Title";
-        </script>
+        <div id="helmetOverlay"></div>
 
         <script type="module" src="/src/ts/i18n.ts"></script>
         <script type="module" src="/src/ts/index.ts"></script>
         <script type="module" src="/src/ts/main.ts"></script>
+        <script type="module" src="/src/ts/ui/spaceShipLayer.ts"></script>
         <script type="module" src="/src/html/bodyEditor.html"></script>
         <script type="module" src="/src/html/spaceStationUI.html"></script>
         <script type="module" src="/src/html/helmetOverlay.html"></script>

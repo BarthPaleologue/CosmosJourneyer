@@ -54,6 +54,7 @@
         "vite-plugin-handlebars": "^2.0.0",
         "vite-plugin-html": "^3.2.2",
         "vite-plugin-html-config": "^2.0.2",
+        "vite-plugin-static-copy": "^2.2.0",
         "vite-plugin-top-level-await": "^1.4.4",
         "vite-plugin-wasm": "^3.4.1",
         "vite-tsconfig-paths": "^5.1.4",
