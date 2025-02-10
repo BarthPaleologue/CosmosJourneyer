@@ -376,6 +376,10 @@ export class Spaceship implements Transformable {
         this.onPlanetaryLandingEngaged.notifyObservers();
     }
 
+    public isAutoPiloted() {
+        return this.landingComputer?.getTarget() !== null;
+    }
+
     public engageLandingOnPad(landingPad: LandingPad) {
         this.targetLandingPad = landingPad;
     }
@@ -660,7 +664,7 @@ export class Spaceship implements Transformable {
             if (this.mainEngineThrottle !== 0) this.thrusterSound.setTargetVolume(1);
             else this.thrusterSound.setTargetVolume(0);
 
-            if (this.landingComputer?.getTarget() === null) {
+            if (!this.isAutoPiloted()) {
                 const speedDifference = forwardSpeed - this.mainEngineTargetSpeed;
                 if (Math.abs(speedDifference) > 2) {
                     if (speedDifference < 0) {

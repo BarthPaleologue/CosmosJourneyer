@@ -264,7 +264,7 @@ export class ShipControls implements Controls {
         if (!this.cameraShakeAnimation.isFinished()) this.cameraShakeAnimation.update(deltaSeconds);
 
         let [inputRoll, inputPitch] = SpaceShipControlsInputs.map.rollPitch.value;
-        if (SpaceShipControlsInputs.map.ignorePointer.value > 0) {
+        if (SpaceShipControlsInputs.map.ignorePointer.value > 0 || spaceship.isAutoPiloted()) {
             inputRoll *= 0;
             inputPitch *= 0;
         }
