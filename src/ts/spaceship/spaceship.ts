@@ -413,6 +413,8 @@ export class Spaceship implements Transformable {
         this.aggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS | CollisionMask.ENVIRONMENT;
         this.aggregate.shape.filterMembershipMask = CollisionMask.DYNAMIC_OBJECTS;
 
+        this.landingComputer?.setTarget(null);
+
         this.onLandingCancelled.notifyObservers();
     }
 
