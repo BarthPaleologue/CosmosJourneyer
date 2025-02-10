@@ -46,13 +46,14 @@ import { AudioMasks } from "../audio/audioMasks";
 import { Objects } from "../assets/objects";
 import { Sounds } from "../assets/sounds";
 import { LandingPad } from "../assets/procedural/landingPad/landingPad";
-import { createNotification, NotificationIntent, NotificationOrigin } from "../utils/notification";
 import { CelestialBody, OrbitalObject } from "../architecture/orbitalObject";
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { FuelTank, SerializedFuelTank } from "./fuelTank";
 import { FuelScoop } from "./fuelScoop";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { LandingComputer, LandingTargetKind } from "./landingComputer";
+import { canEngageWarpDrive } from "./warpDriveUtils";
+import { distanceToAsteroidField } from "../utils/asteroidFields";
 
 const enum ShipState {
     FLYING,
@@ -365,6 +366,10 @@ export class Spaceship implements Transformable {
         return this.closestWalkableObject;
     }
 
+    public getNearestOrbitalObject(): OrbitalObject | null {
+        return this.nearestOrbitalObject;
+    }
+
     public engagePlanetaryLanding(landingTarget: Transformable) {
         this.aggregate.body.setMotionType(PhysicsMotionType.ANIMATED);
         this.state = ShipState.LANDING;
@@ -454,62 +459,6 @@ export class Spaceship implements Transformable {
         this.onTakeOff.notifyObservers();
     }
 
-    public canEngageWarpDrive() {
-        if (this.nearestOrbitalObject !== null) {
-            const distanceToObject = Vector3.Distance(
-                this.getTransform().getAbsolutePosition(),
-                this.nearestOrbitalObject.getTransform().getAbsolutePosition()
-            );
-            if (distanceToObject < this.nearestOrbitalObject.getBoundingRadius() * 1.03) {
-                return false;
-            }
-        }
-
-        if (this.nearestCelestialBody !== null) {
-            // if the spaceship goes too close to planetary rings, stop the warp drive to avoid collision with asteroids
-            const asteroidField = this.nearestCelestialBody.asteroidField;
-
-            if (asteroidField !== null) {
-                const inverseWorld = this.nearestCelestialBody.getTransform().getWorldMatrix().clone().invert();
-                const relativePosition = Vector3.TransformCoordinates(
-                    this.getTransform().getAbsolutePosition(),
-                    inverseWorld
-                );
-                const relativeForward = Vector3.TransformNormal(getForwardDirection(this.getTransform()), inverseWorld);
-                const distanceAboveRings = relativePosition.y;
-                const planarDistance = Math.sqrt(
-                    relativePosition.x * relativePosition.x + relativePosition.z * relativePosition.z
-                );
-
-                const nbSecondsPrediction = 0.5;
-                const nextRelativePosition = relativePosition.add(
-                    relativeForward.scale(this.getSpeed() * nbSecondsPrediction)
-                );
-                const nextDistanceAboveRings = nextRelativePosition.y;
-                const nextPlanarDistance = Math.sqrt(
-                    nextRelativePosition.x * nextRelativePosition.x + nextRelativePosition.z * nextRelativePosition.z
-                );
-
-                const ringsMinDistance = asteroidField.minRadius;
-                const ringsMaxDistance = asteroidField.maxRadius;
-
-                const isAboveRing = planarDistance > ringsMinDistance && planarDistance < ringsMaxDistance;
-                const willBeAboveRing = nextPlanarDistance > ringsMinDistance && nextPlanarDistance < ringsMaxDistance;
-
-                const isInRing = Math.abs(distanceAboveRings) < asteroidField.patchThickness / 2 && isAboveRing;
-                const willCrossRing =
-                    Math.sign(distanceAboveRings) !== Math.sign(nextDistanceAboveRings) &&
-                    (willBeAboveRing || isAboveRing);
-
-                if (isInRing || willCrossRing) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
     private handleFuelScoop(deltaSeconds: number) {
         if (this.fuelScoop === null) return;
         if (this.nearestCelestialBody === null) return;
@@ -574,11 +523,11 @@ export class Spaceship implements Transformable {
         let objectHalfThickness = 0;
 
         if (this.warpDrive.isEnabled()) {
-            if (!this.canEngageWarpDrive()) {
-                this.emergencyStopWarpDrive();
-            }
-
             if (this.nearestOrbitalObject !== null) {
+                if (!canEngageWarpDrive(this.getTransform(), currentForwardSpeed, this.nearestOrbitalObject)) {
+                    this.emergencyStopWarpDrive();
+                }
+
                 const distanceToClosestOrbitalObject = Vector3.Distance(
                     this.getTransform().getAbsolutePosition(),
                     this.nearestOrbitalObject.getTransform().getAbsolutePosition()
@@ -594,30 +543,10 @@ export class Spaceship implements Transformable {
                 const asteroidField = this.nearestCelestialBody.asteroidField;
 
                 if (asteroidField !== null) {
-                    const relativePosition = this.getTransform()
-                        .getAbsolutePosition()
-                        .subtract(this.nearestCelestialBody.getTransform().getAbsolutePosition());
-                    const distanceAboveRings = Math.abs(
-                        Vector3.Dot(relativePosition, this.nearestCelestialBody.getTransform().up)
+                    const distanceToRings = distanceToAsteroidField(
+                        this.getTransform().getAbsolutePosition(),
+                        asteroidField
                     );
-                    const planarDistance = relativePosition
-                        .subtract(this.nearestCelestialBody.getTransform().up.scale(distanceAboveRings))
-                        .length();
-
-                    const ringsMinDistance = asteroidField.minRadius;
-                    const ringsMaxDistance = asteroidField.maxRadius;
-
-                    const isAboveRings = planarDistance > ringsMinDistance && planarDistance < ringsMaxDistance;
-
-                    const distanceToRings = isAboveRings
-                        ? Math.abs(distanceAboveRings)
-                        : Math.sqrt(
-                              Math.min(
-                                  (planarDistance - ringsMinDistance) ** 2,
-                                  (planarDistance - ringsMaxDistance) ** 2
-                              ) +
-                                  distanceAboveRings ** 2
-                          );
 
                     if (distanceToRings < closestDistance) {
                         closestDistance = distanceToRings;

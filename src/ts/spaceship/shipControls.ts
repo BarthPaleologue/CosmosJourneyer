@@ -47,6 +47,7 @@ import { quickAnimation } from "../uberCore/transforms/animations/quickAnimation
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { lerpSmooth } from "../utils/math";
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
+import { canEngageWarpDrive } from "./warpDriveUtils";
 
 export class ShipControls implements Controls {
     private spaceship: Spaceship;
@@ -106,7 +107,12 @@ export class ShipControls implements Controls {
 
         this.toggleWarpDriveHandler = async () => {
             const spaceship = this.getSpaceship();
-            if (!spaceship.canEngageWarpDrive() && spaceship.getWarpDrive().isDisabled()) {
+            const nearestOrbitalObject = spaceship.getNearestOrbitalObject();
+            if (
+                spaceship.getWarpDrive().isDisabled() &&
+                nearestOrbitalObject !== null &&
+                !canEngageWarpDrive(spaceship.getTransform(), 0, nearestOrbitalObject)
+            ) {
                 Sounds.CANNOT_ENGAGE_WARP_DRIVE.play();
                 return;
             }
