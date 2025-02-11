@@ -29,6 +29,9 @@ Include the precise steps to reproduce in order to peer review your work.
 Also include screenshots if you can so that reviewers can compare with a baseline.
 -->
 
+- [ ] **Install Dependencies:** `pnpm install`
+- [ ] **Build Project:** `pnpm build`
+- [ ] **Serving To Web:** `pnpm serve`
 - [ ] **Run Tests:** `npm run test` or `pnpm run test`
 - [ ] **Check Formatting:** `npm run format` or `pnpm run format`
 - [ ] **Eslint Check:** `npm run lint:check` or `pnpm run lint:check`
