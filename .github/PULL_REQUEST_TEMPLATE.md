@@ -1,15 +1,18 @@
-## Related Tickets  
-Fixes #ISSUE_NUMBER  
+## Related Tickets
+
+Fixes #ISSUE_NUMBER
+
 <!--  
 Use this format to link issue numbers: Fixes #123 / Closes #123  
 Reference: https://docs.github.com/en/github/managing-your-work-on-github/linking-a-pull-request-to-an-issue-using-a-keyword  
--->  
+-->
 
-## Description  
+## Description
+
 <!--  
 Briefly explain what this PR does.  
 Example: This PR [adds/removes/fixes/replaces] the [feature/bug/etc].  
--->  
+-->
 
 ## Unexpected difficulties
 
@@ -22,8 +25,8 @@ Tell us about it, and what you did to overcome them!
 
 <!--
 Make sure you test your work before opening a PR.
-**Run Tests:** `npm run test` or `pnpm run test` 
-**Check Formatting:** `npm run format` or `pnpm run format`  
+**Run Tests:** `npm run test` or `pnpm run test`
+**Check Formatting:** `npm run format` or `pnpm run format`
 **Eslint Check:** `npm run lint:check` or `pnpm run lint:check`
 Include the precise steps to reproduce in order to peer review your work.
 Also include screenshots if you can so that reviewers can compare with a baseline.
@@ -35,8 +38,9 @@ Also include screenshots if you can so that reviewers can compare with a baselin
 What should we do next to take advantage of this work?
 -->
 
-## Checklist  
-- [ ] My code follows the project’s style guidelines  
-- [ ] I have tested my changes thoroughly  
-- [ ] I have updated relevant documentation (if needed)  
-- [ ] This PR is ready for review 🚀  
+## Checklist
+
+- [ ] My code follows the project’s style guidelines
+- [ ] I have tested my changes thoroughly
+- [ ] I have updated relevant documentation (if needed)
+- [ ] This PR is ready for review 🚀
