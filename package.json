@@ -16,8 +16,6 @@
         "@types/webpack-env": "^1.18.5",
         "@typescript-eslint/eslint-plugin": "^8.18.1",
         "@typescript-eslint/parser": "^8.18.1",
-        "@vitejs/plugin-react": "^4.3.4",
-        "@vitejs/plugin-vue": "^5.2.1",
         "@vitest/coverage-v8": "3.0.2",
         "@webpack-cli/generators": "^3.0.7",
         "cross-env": "^7.0.3",
@@ -49,18 +47,10 @@
         "typedoc-plugin-missing-exports": "^3.1.0",
         "typescript": "~5.7.2",
         "typescript-plugin-css-modules": "^5.1.0",
-<<<<<<< HEAD
         "vitest": "^3.0.5",
         "webpack": "^5.97.1",
         "webpack-cli": "^5.1.4",
         "webpack-dev-server": "^5.2.0"
-=======
-        "vite": "^6.0.11",
-        "vite-plugin-banner": "^0.8.0",
-        "vite-plugin-compression": "^0.5.1",
-        "vite-plugin-html": "^3.2.2",
-        "vitest": "^3.0.2"
->>>>>>> b2dfa745 (Replacing webpack with vite)
     },
     "version": "1.9.0",
     "description": "Cosmos Journeyer is a space exploration game featuring fully explorable planets, across millions of star systems. It is built using Babylon.JS, and a lot of passion.",
@@ -92,8 +82,8 @@
     ],
     "contributors": [],
     "scripts": {
-        "build": "vite --mode=production --node-env=production",
-        "serve": "vite",
+        "build": "webpack --mode=production --node-env=production",
+        "serve": "webpack serve --progress",
         "serve:prod": "http-server dist -p 8080",
         "format:check": "prettier . --check",
         "format": "prettier . --write",
@@ -103,9 +93,5 @@
         "serve:docs": "http-server docs -p 8081",
         "lint:check": "eslint .",
         "lint:fix": "eslint . --fix"
-    },
-    "packageManager": "pnpm@9.15.4+sha512.b2dc20e2fc72b3e18848459b37359a32064663e5627a51e4c74b2c29dd8e8e0491483c3abb40789cfd578bf362fb6ba8261b05f0387d76792ed6e23ea3b1b6a0",
-    "dependencies": {
-        "pnpm": "^9.15.4"
     }
 }
