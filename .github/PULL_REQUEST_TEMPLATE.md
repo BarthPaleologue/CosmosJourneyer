@@ -27,24 +27,22 @@ Tell us about it, and what you did to overcome them!
 Make sure you test your work before opening a PR.
 Include the precise steps to reproduce in order to peer review your work.
 Also include screenshots if you can so that reviewers can compare with a baseline.
--->
 
-- [ ] **Install Dependencies:** `pnpm install`
-- [ ] **Build Project:** `pnpm build`
-- [ ] **Serving To Web:** `pnpm serve`
-- [ ] **Run Tests:** `npm run test` or `pnpm run test`
-- [ ] **Check Formatting:** `npm run format` or `pnpm run format`
-- [ ] **Eslint Check:** `npm run lint:check` or `pnpm run lint:check`
+ Install Dependencies:- `pnpm install`
+ Build Project:- `pnpm build`
+ Serving To Web:- `pnpm serve`
+ Run Tests:- `npm run test` or `pnpm run test`
+ Check Formatting:- `npm run format` or `pnpm run format`
+ Eslint Check:- `npm run lint:check` or `pnpm run lint:check`
+
+My code follows the project’s style guidelines.
+I have tested my changes thoroughly.
+I have updated relevant documentation.
+
+-->
 
 ## Follow-up
 
 <!--
 What should we do next to take advantage of this work?
 -->
-
-## Checklist
-
-- [ ] My code follows the project’s style guidelines
-- [ ] I have tested my changes thoroughly
-- [ ] I have updated relevant documentation (if needed)
-- [ ] This PR is ready for review 🚀
