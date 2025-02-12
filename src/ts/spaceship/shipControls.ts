@@ -303,21 +303,21 @@ export class ShipControls implements Controls {
                 const shipUp = getUpwardDirection(this.getTransform());
                 const shipRight = getRightDirection(this.getTransform());
 
-                const angularVelocity = spaceship.aggregate.body.getAngularVelocity();
+                const angularImpulse = Vector3.Zero();
 
-                const currentRoll = angularVelocity.dot(shipForward);
+                const currentRoll = angularImpulse.dot(shipForward);
                 const targetRoll = this.spaceship.maxRollSpeed * inputRoll;
-                angularVelocity.addInPlace(shipForward.scale(0.5 * (targetRoll - currentRoll)));
+                angularImpulse.addInPlace(shipForward.scale(0.5 * (targetRoll - currentRoll)));
 
-                const currentYaw = angularVelocity.dot(shipUp);
+                const currentYaw = angularImpulse.dot(shipUp);
                 const targetYaw = -this.spaceship.maxYawSpeed * inputRoll;
-                angularVelocity.addInPlace(shipUp.scale(0.5 * (targetYaw - currentYaw)));
+                angularImpulse.addInPlace(shipUp.scale(0.5 * (targetYaw - currentYaw)));
 
-                const currentPitch = angularVelocity.dot(shipRight);
+                const currentPitch = angularImpulse.dot(shipRight);
                 const targetPitch = -this.spaceship.maxPitchSpeed * inputPitch;
-                angularVelocity.addInPlace(shipRight.scale(0.5 * (targetPitch - currentPitch)));
+                angularImpulse.addInPlace(shipRight.scale(0.5 * (targetPitch - currentPitch)));
 
-                spaceship.aggregate.body.setAngularVelocity(angularVelocity);
+                spaceship.aggregate.body.applyAngularImpulse(angularImpulse);
             }
         } else {
             spaceship.getWarpDrive().increaseThrottle(0.5 * deltaSeconds * SpaceShipControlsInputs.map.throttle.value);
