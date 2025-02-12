@@ -249,12 +249,12 @@ export class LandingComputer {
                     rotation: 0.1
                 },
                 maxVelocity: {
-                    linear: 5,
+                    linear: 15,
                     rotation: 0.5
                 },
                 tolerance: {
-                    position: 0.5,
-                    rotation: 0.1
+                    position: 2.0,
+                    rotation: 0.2
                 }
             }
         ];
