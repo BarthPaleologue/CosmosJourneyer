@@ -612,7 +612,7 @@ export class Spaceship implements Transformable {
 
                 // damp other speed
                 const otherSpeed = linearVelocity.subtract(forwardDirection.scale(forwardSpeed));
-                this.aggregate.body.applyForce(otherSpeed.scale(-2), this.aggregate.body.getObjectCenterWorld());
+                this.aggregate.body.applyForce(otherSpeed.scale(-5), this.aggregate.body.getObjectCenterWorld());
             }
 
             this.mainThrusters.forEach((thruster) => {
