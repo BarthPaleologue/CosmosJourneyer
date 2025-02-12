@@ -367,8 +367,7 @@ export class Spaceship implements Transformable {
         return this.nearestOrbitalObject;
     }
 
-    public engagePlanetaryLanding(landingTarget: Transformable) {
-        this.aggregate.body.setMotionType(PhysicsMotionType.ANIMATED);
+    public engageSurfaceLanding(landingTarget: TransformNode) {
         this.state = ShipState.LANDING;
         this.landingComputer?.setTarget({
             kind: LandingTargetKind.CELESTIAL_BODY,

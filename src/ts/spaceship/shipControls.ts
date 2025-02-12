@@ -183,7 +183,7 @@ export class ShipControls implements Controls {
                 return;
             }
 
-            spaceship.engagePlanetaryLanding(closestWalkableObject);
+            spaceship.engageSurfaceLanding(closestWalkableObject.getTransform());
         };
 
         SpaceShipControlsInputs.map.landing.on("complete", this.landingHandler);

@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Transformable } from "../architecture/transformable";
 import { LandingPad } from "../assets/procedural/landingPad/landingPad";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
@@ -37,7 +36,7 @@ export type LandingTargetPad = {
 
 export type LandingTargetCelestialBody = {
     kind: LandingTargetKind.CELESTIAL_BODY;
-    celestialBody: Transformable;
+    celestialBody: TransformNode;
 };
 
 export type LandingTarget = LandingTargetPad | LandingTargetCelestialBody;
@@ -147,7 +146,7 @@ export class LandingComputer {
                 this.actionPlan = this.createLandingPadActionPlan(this.target.landingPad);
                 break;
             case LandingTargetKind.CELESTIAL_BODY:
-                this.actionPlan = this.createCelestialBodyActionPlan(this.target.celestialBody);
+                this.actionPlan = this.createSurfaceActionPlan(this.target.celestialBody);
                 break;
         }
     }
@@ -205,12 +204,12 @@ export class LandingComputer {
         ];
     }
 
-    private createCelestialBodyActionPlan(celestialBody: Transformable): ReadonlyArray<LandingPlanStep> {
+    private createSurfaceActionPlan(celestialBody: TransformNode): ReadonlyArray<LandingPlanStep> {
         return [
             {
                 getTargetTransform: () => {
                     const shipPosition = this.transform.getAbsolutePosition();
-                    const gravityDir = celestialBody.getTransform().position.subtract(shipPosition).normalize();
+                    const gravityDir = celestialBody.position.subtract(shipPosition).normalize();
 
                     const start = shipPosition.add(gravityDir.scale(-50e3));
                     const end = shipPosition.add(gravityDir.scale(50e3));
