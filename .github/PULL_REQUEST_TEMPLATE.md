@@ -28,6 +28,7 @@ Make sure you test your work before opening a PR.
 Include the precise steps to reproduce in order to peer review your work.
 Also include screenshots if you can so that reviewers can compare with a baseline.
 
+Here is a small list of things you can do to check everything is working:
  Install Dependencies:- `pnpm install`
  Build Project:- `pnpm build`
  Serving To Web:- `pnpm serve`
@@ -35,10 +36,7 @@ Also include screenshots if you can so that reviewers can compare with a baselin
  Check Formatting:- `npm run format` or `pnpm run format`
  Eslint Check:- `npm run lint:check` or `pnpm run lint:check`
 
-My code follows the project’s style guidelines.
-I have tested my changes thoroughly.
-I have updated relevant documentation.
-
+Did you document your code?
 -->
 
 ## Follow-up
