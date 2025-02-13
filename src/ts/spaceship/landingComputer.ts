@@ -258,7 +258,7 @@ export class LandingComputer {
                     rotation: 0.5
                 },
                 tolerance: {
-                    position: 2.0,
+                    position: 5.0,
                     rotation: 0.2
                 }
             }
