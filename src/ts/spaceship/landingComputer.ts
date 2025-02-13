@@ -249,8 +249,8 @@ export class LandingComputer {
 
                     return {
                         position: landingSpotPosition,
-                        rotation: this.transform.absoluteRotationQuaternion.multiply(
-                            Quaternion.RotationAxis(axis, theta)
+                        rotation: Quaternion.RotationAxis(axis, theta).multiplyInPlace(
+                            this.transform.absoluteRotationQuaternion
                         )
                     };
                 },
