@@ -224,12 +224,16 @@ export class LandingComputer {
 
                     const landingSpotNormal = this.raycastResult.hitNormalWorld;
 
+                    const landingSpotPosition = this.raycastResult.hitPointWorld.add(
+                        landingSpotNormal.scale(this.boundingExtent.y / 2)
+                    );
+
                     const currentUp = this.transform.up;
                     const targetUp = landingSpotNormal;
 
                     if (currentUp.equalsWithEpsilon(targetUp)) {
                         return {
-                            position: this.raycastResult.hitPointWorld,
+                            position: landingSpotPosition,
                             rotation: this.transform.absoluteRotationQuaternion
                         };
                     }
@@ -238,7 +242,7 @@ export class LandingComputer {
                     const theta = Math.acos(Vector3.Dot(currentUp, targetUp));
 
                     return {
-                        position: this.raycastResult.hitPointWorld,
+                        position: landingSpotPosition,
                         rotation: this.transform.absoluteRotationQuaternion.multiply(
                             Quaternion.RotationAxis(axis, theta)
                         )
