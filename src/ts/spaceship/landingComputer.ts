@@ -58,7 +58,7 @@ type LandingPlanStep = {
          * The rotation to reach
          */
         rotation: Quaternion;
-    };
+    } | null;
 
     /**
      * The maximum velocity at any point during the step
@@ -96,7 +96,8 @@ export const enum LandingComputerStatusBit {
     PROGRESS = 1 << 0,
     COMPLETE = 1 << 1,
     TIMEOUT = 1 << 2,
-    IDLE = 1 << 3
+    IDLE = 1 << 3,
+    NO_LANDING_SPOT = 1 << 4
 }
 
 export class LandingComputer {
@@ -211,15 +212,15 @@ export class LandingComputer {
                     const shipPosition = this.transform.getAbsolutePosition();
                     const gravityDir = celestialBody.position.subtract(shipPosition).normalize();
 
-                    const start = shipPosition.add(gravityDir.scale(-50e3));
-                    const end = shipPosition.add(gravityDir.scale(50e3));
+                    const start = shipPosition.add(gravityDir.scale(-100));
+                    const end = shipPosition.add(gravityDir.scale(500));
 
                     this.physicsEngine.raycastToRef(start, end, this.raycastResult, {
                         collideWith: CollisionMask.ENVIRONMENT
                     });
 
                     if (!this.raycastResult.hasHit) {
-                        throw new Error("No landing spot found");
+                        return null;
                     }
 
                     const landingSpotNormal = this.raycastResult.hitNormalWorld;
@@ -276,7 +277,12 @@ export class LandingComputer {
 
         this.elapsedSeconds += deltaSeconds;
 
-        const { position: targetPosition, rotation: targetRotation } = currentAction.getTargetTransform();
+        const targetTransform = currentAction.getTargetTransform();
+        if (targetTransform === null) {
+            return LandingComputerStatusBit.NO_LANDING_SPOT;
+        }
+
+        const { position: targetPosition, rotation: targetRotation } = targetTransform;
         const { position: positionTolerance, rotation: rotationTolerance } = currentAction.tolerance;
         const { linear: maxSpeedAtTarget, rotation: maxRotationSpeedAtTarget } = currentAction.maxVelocityAtTarget;
         const { linear: maxLinearSpeed, rotation: maxRotationSpeed } = currentAction.maxVelocity;

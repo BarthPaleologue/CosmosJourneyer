@@ -659,6 +659,8 @@ export class Spaceship implements Transformable {
                     break;
                 case LandingComputerStatusBit.IDLE:
                     break;
+                case LandingComputerStatusBit.NO_LANDING_SPOT:
+                    this.cancelLanding();
             }
         }
 
