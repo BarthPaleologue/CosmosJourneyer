@@ -3,6 +3,8 @@
     "landingSequenceEngaged": "Début de la séquence d'atterrissage.",
     "landingComplete": "Atterrissage réussi ! Utilisez {{bindingsString}} pour sortir du vaisseau.",
     "landingCancelled": "Atterrissage annulé.",
+    "autoPilotEngaged": "Pilote automatique activé. Détendez-vous.",
+    "takeOffSuccess": "Décollage réussi.",
     "copiedToClipboard": "Copié dans le presse-papiers.",
     "howToLiftOff": "Maintenez {{bindingsString}} pour décoller.",
     "howToHyperSpace": "Alignez votre vaisseau avec la cible du système de destination à l'aide du radar de cible en bas à droite de l'écran. Appuyez ensuite sur {{bindingsString}} pour enclencher le saut hyperspatial.",

@@ -27,6 +27,18 @@ export function getTransformationQuaternion(from: Vector3, to: Vector3): Quatern
     return Quaternion.RotationAxis(rotationAxis, angle);
 }
 
+export function getDeltaQuaternion(from: Quaternion, to: Quaternion): Quaternion {
+    return to.multiply(from.conjugate());
+}
+
+export function getAngleFromQuaternion(quaternion: Quaternion): number {
+    return 2 * Math.acos(quaternion.w);
+}
+
+export function getAxisFromQuaternion(quaternion: Quaternion): Vector3 {
+    return new Vector3(quaternion.x, quaternion.y, quaternion.z).normalize();
+}
+
 export function flattenVector3Array(vector3Array: Vector3[]): number[] {
     const result: number[] = [];
     for (const vector3 of vector3Array) {

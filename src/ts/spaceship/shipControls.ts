@@ -47,6 +47,7 @@ import { quickAnimation } from "../uberCore/transforms/animations/quickAnimation
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { lerpSmooth } from "../utils/math";
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
+import { canEngageWarpDrive } from "./warpDriveUtils";
 
 export class ShipControls implements Controls {
     private spaceship: Spaceship;
@@ -106,7 +107,12 @@ export class ShipControls implements Controls {
 
         this.toggleWarpDriveHandler = async () => {
             const spaceship = this.getSpaceship();
-            if (!spaceship.canEngageWarpDrive() && spaceship.getWarpDrive().isDisabled()) {
+            const nearestOrbitalObject = spaceship.getNearestOrbitalObject();
+            if (
+                spaceship.getWarpDrive().isDisabled() &&
+                nearestOrbitalObject !== null &&
+                !canEngageWarpDrive(spaceship.getTransform(), 0, nearestOrbitalObject)
+            ) {
                 Sounds.CANNOT_ENGAGE_WARP_DRIVE.play();
                 return;
             }
@@ -177,7 +183,7 @@ export class ShipControls implements Controls {
                 return;
             }
 
-            spaceship.engagePlanetaryLanding(closestWalkableObject);
+            spaceship.engageSurfaceLanding(closestWalkableObject.getTransform());
         };
 
         SpaceShipControlsInputs.map.landing.on("complete", this.landingHandler);
@@ -264,7 +270,7 @@ export class ShipControls implements Controls {
         if (!this.cameraShakeAnimation.isFinished()) this.cameraShakeAnimation.update(deltaSeconds);
 
         let [inputRoll, inputPitch] = SpaceShipControlsInputs.map.rollPitch.value;
-        if (SpaceShipControlsInputs.map.ignorePointer.value > 0) {
+        if (SpaceShipControlsInputs.map.ignorePointer.value > 0 || spaceship.isAutoPiloted()) {
             inputRoll *= 0;
             inputPitch *= 0;
         }
@@ -297,21 +303,21 @@ export class ShipControls implements Controls {
                 const shipUp = getUpwardDirection(this.getTransform());
                 const shipRight = getRightDirection(this.getTransform());
 
-                const angularVelocity = spaceship.aggregate.body.getAngularVelocity();
+                const angularImpulse = Vector3.Zero();
 
-                const currentRoll = angularVelocity.dot(shipForward);
+                const currentRoll = angularImpulse.dot(shipForward);
                 const targetRoll = this.spaceship.maxRollSpeed * inputRoll;
-                angularVelocity.addInPlace(shipForward.scale(0.5 * (targetRoll - currentRoll)));
+                angularImpulse.addInPlace(shipForward.scale(0.5 * (targetRoll - currentRoll)));
 
-                const currentYaw = angularVelocity.dot(shipUp);
+                const currentYaw = angularImpulse.dot(shipUp);
                 const targetYaw = -this.spaceship.maxYawSpeed * inputRoll;
-                angularVelocity.addInPlace(shipUp.scale(0.5 * (targetYaw - currentYaw)));
+                angularImpulse.addInPlace(shipUp.scale(0.5 * (targetYaw - currentYaw)));
 
-                const currentPitch = angularVelocity.dot(shipRight);
+                const currentPitch = angularImpulse.dot(shipRight);
                 const targetPitch = -this.spaceship.maxPitchSpeed * inputPitch;
-                angularVelocity.addInPlace(shipRight.scale(0.5 * (targetPitch - currentPitch)));
+                angularImpulse.addInPlace(shipRight.scale(0.5 * (targetPitch - currentPitch)));
 
-                spaceship.aggregate.body.setAngularVelocity(angularVelocity);
+                spaceship.aggregate.body.applyAngularImpulse(angularImpulse);
             }
         } else {
             spaceship.getWarpDrive().increaseThrottle(0.5 * deltaSeconds * SpaceShipControlsInputs.map.throttle.value);
@@ -390,8 +396,21 @@ export class ShipControls implements Controls {
         });
 
         this.spaceship.onTakeOff.add(() => {
-            //FIXME: localize
-            createNotification(NotificationOrigin.SPACESHIP, NotificationIntent.INFO, "Takeoff successful", 2000);
+            createNotification(
+                NotificationOrigin.SPACESHIP,
+                NotificationIntent.INFO,
+                i18n.t("notifications:takeOffSuccess"),
+                2000
+            );
+        });
+
+        this.spaceship.onAutoPilotEngaged.add(() => {
+            createNotification(
+                NotificationOrigin.SPACESHIP,
+                NotificationIntent.INFO,
+                i18n.t("notifications:autoPilotEngaged"),
+                30_000
+            );
         });
 
         this.spaceship.onWarpDriveDisabled.add((isEmergency) => {

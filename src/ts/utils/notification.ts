@@ -29,8 +29,12 @@ class Notification {
     private isBeingRemoved = false;
 
     constructor(origin: NotificationOrigin, intent: NotificationIntent, text: string, durationSeconds: number) {
-        const container = document.getElementById("notificationContainer");
-        if (container === null) throw new Error("No notification container found");
+        let container = document.getElementById("notificationContainer");
+        if (container === null) {
+            container = document.createElement("div");
+            container.id = "notificationContainer";
+            document.body.appendChild(container);
+        }
 
         this.htmlRoot = document.createElement("div");
         this.htmlRoot.classList.add("notification", origin);

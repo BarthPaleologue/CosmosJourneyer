@@ -576,10 +576,7 @@ export class StarSystemController {
             controlsPosition
         );
 
-        const shouldCompensateTranslation =
-            distanceOfNearestToControls <
-            nearestOrbitalObject.getBoundingRadius() *
-                (nearestOrbitalObject.model.type === OrbitalObjectType.SPACE_STATION ? 200 : 10);
+        const shouldCompensateTranslation = true;
 
         // compensate rotation when close to the body
         let shouldCompensateRotation = distanceOfNearestToControls < nearestOrbitalObject.getBoundingRadius() * 3;
