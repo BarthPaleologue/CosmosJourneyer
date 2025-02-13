@@ -33,6 +33,8 @@ describe("LandingComputer", () => {
             }),
             absoluteRotationQuaternion: new Quaternion(),
             up: Vector3.Up(),
+            right: Vector3.Right(),
+            forward: Vector3.Forward(),
             position: new Vector3(0, 0, 0)
         } as unknown as TransformNode;
 
