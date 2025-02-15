@@ -184,6 +184,8 @@ export class Spaceship implements Transformable {
                 continue;
             }
             const childShape = new PhysicsShapeMesh(child as Mesh, scene);
+            childShape.filterMembershipMask = CollisionMask.DYNAMIC_OBJECTS;
+            childShape.filterCollideMask = CollisionMask.ENVIRONMENT | CollisionMask.DYNAMIC_OBJECTS;
             this.aggregate.shape.addChildFromParent(this.instanceRoot, childShape, child);
         }
         this.aggregate.body.disablePreStep = false;
