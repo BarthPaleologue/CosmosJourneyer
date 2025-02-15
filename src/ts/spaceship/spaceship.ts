@@ -582,6 +582,9 @@ export class Spaceship implements Transformable {
 
     public update(deltaSeconds: number) {
         this.mainEngineTargetSpeed = this.mainEngineThrottle * this.maxSpeed;
+        if (this.targetLandingPad !== null) {
+            this.mainEngineTargetSpeed /= 8;
+        }
 
         this.updateWarpDrive(deltaSeconds);
 
