@@ -307,19 +307,23 @@ export class ShipControls implements Controls {
                 const shipUp = getUpwardDirection(this.getTransform());
                 const shipRight = getRightDirection(this.getTransform());
 
+                const angularVelocity = spaceship.aggregate.body.getAngularVelocity();
+
                 const angularImpulse = Vector3.Zero();
 
-                const currentRoll = angularImpulse.dot(shipForward);
+                const authority = 0.7;
+
+                const currentRoll = angularVelocity.dot(shipForward);
                 const targetRoll = this.spaceship.maxRollSpeed * inputRoll;
-                angularImpulse.addInPlace(shipForward.scale(0.5 * (targetRoll - currentRoll)));
+                angularImpulse.addInPlace(shipForward.scale(authority * (targetRoll - currentRoll)));
 
-                const currentYaw = angularImpulse.dot(shipUp);
+                const currentYaw = angularVelocity.dot(shipUp);
                 const targetYaw = -this.spaceship.maxYawSpeed * inputRoll;
-                angularImpulse.addInPlace(shipUp.scale(0.5 * (targetYaw - currentYaw)));
+                angularImpulse.addInPlace(shipUp.scale(authority * (targetYaw - currentYaw)));
 
-                const currentPitch = angularImpulse.dot(shipRight);
+                const currentPitch = angularVelocity.dot(shipRight);
                 const targetPitch = -this.spaceship.maxPitchSpeed * inputPitch;
-                angularImpulse.addInPlace(shipRight.scale(0.5 * (targetPitch - currentPitch)));
+                angularImpulse.addInPlace(shipRight.scale(authority * (targetPitch - currentPitch)));
 
                 spaceship.aggregate.body.applyAngularImpulse(angularImpulse);
             }
@@ -341,7 +345,7 @@ export class ShipControls implements Controls {
         this.thirdPersonCameraTransform.rotationQuaternion = slerpSmoothToRef(
             this.getTransform().absoluteRotationQuaternion,
             this.thirdPersonCameraTransform.rotationQuaternion ?? Quaternion.Identity(),
-            1.0,
+            0.3,
             deltaSeconds,
             this.thirdPersonCameraTransform.rotationQuaternion ?? Quaternion.Identity()
         );
