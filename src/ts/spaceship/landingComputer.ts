@@ -22,12 +22,7 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { CollisionMask } from "../settings";
-import {
-    getAngleFromQuaternion,
-    getAxisFromQuaternion,
-    getDeltaQuaternion,
-    getTransformationQuaternion
-} from "../utils/algebra";
+import { getAngleFromQuaternion, getAxisFromQuaternion, getDeltaQuaternion } from "../utils/algebra";
 
 export const enum LandingTargetKind {
     LANDING_PAD,
@@ -343,7 +338,7 @@ export class LandingComputer {
         const otherSpeed = currentLinearVelocity.subtract(directionToTarget.scale(currentSpeedTowardTarget));
 
         // damp speed along other directions
-        this.aggregate.body.applyForce(otherSpeed.scale(-2 * mass), currentPosition);
+        this.aggregate.body.applyForce(otherSpeed.scale(-5 * mass), currentPosition);
 
         const deltaRotation = getDeltaQuaternion(currentRotation, targetRotation);
         const rotationAngle = getAngleFromQuaternion(deltaRotation);
@@ -360,9 +355,7 @@ export class LandingComputer {
         this.aggregate.body.applyAngularImpulse(rotationAxis.scale(rotationImpulseStrength));
 
         const otherRotationSpeed = angularVelocity.subtract(rotationAxis.scale(currentRotationSpeed));
-        if (otherRotationSpeed.length() > 1) {
-            this.aggregate.body.applyAngularImpulse(otherRotationSpeed.scale(-2));
-        }
+        this.aggregate.body.applyAngularImpulse(otherRotationSpeed.scale(-2));
 
         if (this.elapsedSeconds > this.maxSecondsPerPlan) {
             this.setTarget(null);
