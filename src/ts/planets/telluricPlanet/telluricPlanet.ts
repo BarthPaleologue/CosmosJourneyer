@@ -48,8 +48,7 @@ export class TelluricPlanet
 {
     readonly model: TelluricPlanetModel | TelluricSatelliteModel;
 
-    readonly type: OrbitalObjectType.TELLURIC_PLANET | OrbitalObjectType.TELLURIC_SATELLITE =
-        OrbitalObjectType.TELLURIC_PLANET | OrbitalObjectType.TELLURIC_SATELLITE;
+    readonly type: OrbitalObjectType.TELLURIC_PLANET | OrbitalObjectType.TELLURIC_SATELLITE;
 
     readonly sides: ChunkTree[]; // stores the 6 sides of the sphere
 
@@ -76,6 +75,8 @@ export class TelluricPlanet
      */
     constructor(model: TelluricPlanetModel | TelluricSatelliteModel, scene: Scene) {
         this.model = model;
+
+        this.type = model.type;
 
         this.transform = new TransformNode(this.model.name, scene);
         this.transform.rotationQuaternion = Quaternion.Identity();

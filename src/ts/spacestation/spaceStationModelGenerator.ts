@@ -50,6 +50,15 @@ export function newSeededSpaceStationModel(
             radius += body.accretionDiskRadius;
         }
 
+        if (
+            body.type === OrbitalObjectType.GAS_PLANET ||
+            body.type === OrbitalObjectType.TELLURIC_PLANET ||
+            body.type === OrbitalObjectType.STAR ||
+            body.type === OrbitalObjectType.NEUTRON_STAR
+        ) {
+            radius += (body.rings?.ringEnd ?? 0) * body.radius;
+        }
+
         return radius;
     }, 0);
     const orbitRadius = (2 + clamp(normalRandom(2, 1, rng, GenerationSteps.ORBIT), 0, 10)) * parentMaxRadius;
