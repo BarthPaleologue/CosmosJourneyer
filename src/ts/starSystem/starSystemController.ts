@@ -46,6 +46,7 @@ import {
     StellarObject
 } from "../architecture/orbitalObject";
 import { OrbitalObjectUtils } from "../architecture/orbitalObjectUtils";
+import { ShipControls } from "../spaceship/shipControls";
 
 export type PlanetarySystem = {
     readonly planets: Planet[];
@@ -706,12 +707,12 @@ export class StarSystemController {
     }
 
     public applyFloatingOrigin() {
-        const controller = this.scene.getActiveControls();
-        if (controller.getTransform().getAbsolutePosition().length() > Settings.FLOATING_ORIGIN_THRESHOLD) {
-            const displacementTranslation = controller.getTransform().getAbsolutePosition().negate();
+        const controls = this.scene.getActiveControls();
+        if (controls.getTransform().getAbsolutePosition().length() > Settings.FLOATING_ORIGIN_THRESHOLD) {
+            const displacementTranslation = controls.getTransform().getAbsolutePosition().negate();
             this.translateEverythingNow(displacementTranslation);
-            if (controller.getTransform().parent === null) {
-                translate(controller.getTransform(), displacementTranslation);
+            if (controls.getTransform().parent === null) {
+                translate(controls.getTransform(), displacementTranslation);
             }
         }
     }
@@ -737,6 +738,8 @@ export class StarSystemController {
             //FIXME: this needs to be refactored to be future proof when adding new stellar objects
             if (stellarObject instanceof Star) stellarObject.updateMaterial(deltaSeconds);
         }
+
+        this.scene.activeCamera?.getViewMatrix(true);
 
         postProcessManager.setCelestialBody(nearestBody);
         postProcessManager.update(deltaSeconds);

@@ -20,7 +20,7 @@ export class SolidPlume {
 
     readonly direction = Axis.Z;
 
-    private particleSpeed = 10;
+    private particleSpeed = 50;
 
     readonly recycledParticles: SolidParticle[] = [];
 

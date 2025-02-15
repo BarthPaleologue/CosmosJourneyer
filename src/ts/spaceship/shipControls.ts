@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Scene } from "@babylonjs/core/scene";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import {
     getForwardDirection,
     getRightDirection,
@@ -45,7 +45,7 @@ import { CameraShakeAnimation } from "../uberCore/transforms/animations/cameraSh
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { quickAnimation } from "../uberCore/transforms/animations/quickAnimation";
 import { Observable } from "@babylonjs/core/Misc/observable";
-import { lerpSmooth } from "../utils/math";
+import { lerpSmooth, slerpSmoothToRef } from "../utils/math";
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { canEngageWarpDrive } from "./warpDriveUtils";
 
@@ -56,6 +56,8 @@ export class ShipControls implements Controls {
     readonly thirdPersonCameraDefaultAlpha = -3.14 / 2;
     readonly thirdPersonCameraDefaultBeta = 3.14 / 2.2;
     readonly thirdPersonCamera: ArcRotateCamera;
+
+    readonly thirdPersonCameraTransform: TransformNode;
 
     readonly firstPersonCamera: FreeCamera;
 
@@ -84,6 +86,8 @@ export class ShipControls implements Controls {
         this.firstPersonCamera.parent = this.getTransform();
         this.firstPersonCamera.position = new Vector3(0, 1.5, 8);
 
+        this.thirdPersonCameraTransform = new TransformNode("thirdPersonCameraTransform", scene);
+
         this.thirdPersonCamera = new ArcRotateCamera(
             "shipThirdPersonCamera",
             this.thirdPersonCameraDefaultAlpha,
@@ -92,7 +96,7 @@ export class ShipControls implements Controls {
             Vector3.Zero(),
             scene
         );
-        this.thirdPersonCamera.parent = this.getTransform();
+        this.thirdPersonCamera.parent = this.thirdPersonCameraTransform;
         this.thirdPersonCamera.lowerRadiusLimit =
             (1.2 *
                 Math.max(
@@ -303,19 +307,23 @@ export class ShipControls implements Controls {
                 const shipUp = getUpwardDirection(this.getTransform());
                 const shipRight = getRightDirection(this.getTransform());
 
+                const angularVelocity = spaceship.aggregate.body.getAngularVelocity();
+
                 const angularImpulse = Vector3.Zero();
 
-                const currentRoll = angularImpulse.dot(shipForward);
+                const authority = 0.7;
+
+                const currentRoll = angularVelocity.dot(shipForward);
                 const targetRoll = this.spaceship.maxRollSpeed * inputRoll;
-                angularImpulse.addInPlace(shipForward.scale(0.5 * (targetRoll - currentRoll)));
+                angularImpulse.addInPlace(shipForward.scale(authority * (targetRoll - currentRoll)));
 
-                const currentYaw = angularImpulse.dot(shipUp);
+                const currentYaw = angularVelocity.dot(shipUp);
                 const targetYaw = -this.spaceship.maxYawSpeed * inputRoll;
-                angularImpulse.addInPlace(shipUp.scale(0.5 * (targetYaw - currentYaw)));
+                angularImpulse.addInPlace(shipUp.scale(authority * (targetYaw - currentYaw)));
 
-                const currentPitch = angularImpulse.dot(shipRight);
+                const currentPitch = angularVelocity.dot(shipRight);
                 const targetPitch = -this.spaceship.maxPitchSpeed * inputPitch;
-                angularImpulse.addInPlace(shipRight.scale(0.5 * (targetPitch - currentPitch)));
+                angularImpulse.addInPlace(shipRight.scale(authority * (targetPitch - currentPitch)));
 
                 spaceship.aggregate.body.applyAngularImpulse(angularImpulse);
             }
@@ -330,11 +338,23 @@ export class ShipControls implements Controls {
             pitch(this.getTransform(), this.spaceship.maxPitchSpeed * this.rotationInertia.y * deltaSeconds);
         }
 
-        this.targetFov = Tools.ToRadians(60 + 10 * spaceship.getThrottle());
+        this.thirdPersonCameraTransform.position =
+            this.getTransform().parent === null
+                ? this.getTransform().position
+                : this.getTransform().getAbsolutePosition();
+        this.thirdPersonCameraTransform.rotationQuaternion = slerpSmoothToRef(
+            this.getTransform().absoluteRotationQuaternion,
+            this.thirdPersonCameraTransform.rotationQuaternion ?? Quaternion.Identity(),
+            0.3,
+            deltaSeconds,
+            this.thirdPersonCameraTransform.rotationQuaternion ?? Quaternion.Identity()
+        );
+        this.thirdPersonCameraTransform.computeWorldMatrix(true);
 
+        this.targetFov = Tools.ToRadians(60 + 10 * spaceship.getThrottle());
         this.thirdPersonCamera.fov = lerpSmooth(this.thirdPersonCamera.fov, this.targetFov, 0.08, deltaSeconds);
 
-        this.getActiveCamera().getViewMatrix();
+        this.getActiveCamera().getViewMatrix(true);
 
         return this.getTransform().getAbsolutePosition();
     }
@@ -347,7 +367,7 @@ export class ShipControls implements Controls {
 
     setSpaceship(ship: Spaceship) {
         this.spaceship = ship;
-        this.thirdPersonCamera.parent = this.getTransform();
+        this.thirdPersonCamera.parent = this.thirdPersonCameraTransform;
         this.firstPersonCamera.parent = this.getTransform();
 
         this.spaceship.onFuelScoopStart.add(() => {
