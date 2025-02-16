@@ -52,7 +52,7 @@ export async function createNeutronStarScene(engine: AbstractEngine): Promise<Sc
 
     const neutronStarModel = newSeededNeutronStarModel(456, "Neutron Star Demo", []);
     const neutronStar = new NeutronStar(neutronStarModel, scene);
-    neutronStar.getTransform().position = new Vector3(0, 0, 1).scaleInPlace(neutronStar.getRadius() * 200);
+    neutronStar.getTransform().position = new Vector3(0, 0, 1).scaleInPlace(neutronStar.getRadius() * 200000);
 
     const volumetricLight = new VolumetricLight(neutronStar.mesh, neutronStar.volumetricLightUniforms, [], scene);
     camera.attachPostProcess(volumetricLight);
