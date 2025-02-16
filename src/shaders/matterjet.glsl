@@ -235,14 +235,14 @@ void main() {
 
     vec3 rayDir = normalize(pixelWorldPosition - camera_position);// normalized direction of the ray
 
-    float scaling_factor = object_radius * 1000.0;
+    float scaling_factor = object_radius * 10000.0;
 
     // move in object's local space to simplify the calculations
     vec3 rayOriginLocalSpace = mat3(inverseRotation) * (camera_position - object_position) / scaling_factor;
     vec3 rayDirLocalSpace = mat3(inverseRotation) * rayDir;
 
     float coneTheta = 0.2;
-    float coneHeight = 100000.0 * object_radius / scaling_factor;
+    float coneHeight = 1000000.0 * object_radius / scaling_factor;
 
     vec3 color = screenColor.rgb;
     float finalAlpha = screenColor.a;
