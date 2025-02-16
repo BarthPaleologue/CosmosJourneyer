@@ -25,6 +25,14 @@ import { OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
 import { NeutronStarModel } from "./neutronStarModel";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 
+/**
+ *
+ * @param seed
+ * @param name
+ * @param parentBodies
+ * @returns
+ * @see https://arxiv.org/pdf/2402.14030 "On the initial spin period distribution of neutron stars"
+ */
 export function newSeededNeutronStarModel(
     seed: number,
     name: string,
@@ -34,7 +42,10 @@ export function newSeededNeutronStarModel(
 
     const temperature = randRangeInt(200_000, 5_000_000_000, rng, GenerationSteps.TEMPERATURE);
     const mass = 1000;
-    const siderealDaySeconds = 24 * 60 * 60;
+
+    // https://arxiv.org/pdf/2402.14030 and https://en.wikipedia.org/wiki/Neutron_star#:~:text=Because%20it%20has%20only%20a,1.4%20ms%20to%2030%20s.
+    const siderealDaySeconds = clamp(1.4e-3, 30, normalRandom(0.5e-2, 5e-3, rng, GenerationSteps.SIDEREAL_DAY_SECONDS));
+
     const blackBodyTemperature = temperature;
     const axialTilt = 0;
 

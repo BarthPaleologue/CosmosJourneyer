@@ -26,7 +26,7 @@ import { MatterJetPostProcess } from "../postProcesses/matterJetPostProcess";
 import { VolumetricLight } from "../volumetricLight/volumetricLight";
 import { translate } from "../uberCore/transforms/basicTransform";
 import { Textures } from "../assets/textures";
-import { AssetsManager } from "@babylonjs/core";
+import { AssetsManager, Axis } from "@babylonjs/core";
 import { LensFlarePostProcess } from "../postProcesses/lensFlarePostProcess";
 import { getRgbFromTemperature } from "../utils/specrend";
 
@@ -79,6 +79,8 @@ export async function createNeutronStarScene(engine: AbstractEngine): Promise<Sc
     scene.onBeforePhysicsObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
         const displacement = defaultControls.update(deltaSeconds);
+
+        neutronStar.getTransform().rotate(Axis.Y, (2 * Math.PI * deltaSeconds) / neutronStarModel.siderealDaySeconds);
 
         translate(defaultControls.getTransform(), displacement.negate());
         translate(neutronStar.getTransform(), displacement.negate());

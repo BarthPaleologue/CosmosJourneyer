@@ -33,5 +33,7 @@ export const enum GenerationSteps {
     WATER_AMOUNT = 1700,
     TERRAIN = 1500,
 
-    DIPOLE_TILT = 1300
+    DIPOLE_TILT = 1300,
+
+    SIDEREAL_DAY_SECONDS = 2500
 }
