@@ -196,6 +196,27 @@ bool rayIntersectCone(vec3 rayOrigin, vec3 rayDir,
     return true;
 }
 
+vec3 rayMarchSpiral(vec3 rayOrigin, vec3 rayDir, float distThrough, int nbSteps, float coneTheta, float coneHeight, out float transmittance) {
+    vec3 col = vec3(0.0);
+    
+    transmittance = 1.0;
+    
+    float stepSize = distThrough / float(nbSteps);
+
+    for(int i = 0; i < nbSteps; i++) {
+        vec3 p = rayOrigin + float(i) * stepSize * rayDir;
+
+        float density = spiralDensity(p, coneTheta * 0.2, coneHeight);
+    
+        vec3 emission = 10.0 * vec3(0.3, 0.6, 1.0) * density;
+        float absorption = 0.2 * density;
+    
+        transmittance *= exp(-absorption * stepSize);
+        col += emission * transmittance * stepSize;
+    }
+
+    return col;
+}
 
 void main() {
     vec4 screenColor = texture2D(textureSampler, vUV);// the current screen color
@@ -209,9 +230,6 @@ void main() {
 
     vec3 rayDir = normalize(pixelWorldPosition - camera_position);// normalized direction of the ray
 
-    vec4 finalColor = screenColor;
-
-    
     // Keep the same raymarching parameters
 
     vec3 rayOriginLocalSpace = mat3(inverseRotation) * (camera_position - object_position);
@@ -225,36 +243,26 @@ void main() {
 
     float coneHeight = 100.0;
 
-    float t, distThrough;
-    if(rayIntersectCone(ro, rd, vec3(0.0), vec3(0.0, 1.0, 0.0), coneHeight, cos(coneTheta), t, distThrough)) {
-        float t1 = t;
-        float t2 = t + distThrough;
+    vec3 col = screenColor.rgb;
 
+    float t, distThrough;
+    if(rayIntersectCone(ro, rd, vec3(0.0), vec3(0.0, 1.0, 0.0), coneHeight, cos(coneTheta), t, distThrough) && t * object_radius < maximumDistance) {
         vec3 startPoint = ro + t * rd;
 
-        vec3 col = vec3(0.0);
-        float transmittance = 1.0;
+        float transmittance;
+        vec3 jetColor = rayMarchSpiral(startPoint, rd, distThrough, 100, coneTheta, coneHeight, transmittance);
 
-        int nbSteps = 100;
-        float stepSize = (t2 - t1) / float(nbSteps);
-
-        for(int i = 0; i < nbSteps; i++) {
-            vec3 p = startPoint + float(i) * stepSize * rd;
-
-            float density = spiralDensity(p, coneTheta * 0.2, coneHeight);
-        
-            vec3 emission = vec3(0.3, 0.6, 1.0) * density;
-            float absorption = 0.2 * density;
-        
-            transmittance *= exp(-absorption * stepSize);
-            col += emission * transmittance * stepSize;
-        }
-
-        col = mix(col, screenColor.rgb, transmittance);
-
-        gl_FragColor = vec4(col, 1.0);// displaying the final color
-        return;
+        col = mix(jetColor, col, transmittance);
     }
 
-    gl_FragColor = vec4(screenColor.rgb, 1.0);// displaying the final color
+    if(rayIntersectCone(ro, rd, vec3(0.0), vec3(0.0, -1.0, 0.0), coneHeight, cos(coneTheta), t, distThrough) && t * object_radius < maximumDistance) {
+        vec3 startPoint = ro + t * rd;
+
+        float transmittance;
+        vec3 jetColor = rayMarchSpiral(startPoint, rd, distThrough, 100, coneTheta, coneHeight, transmittance);
+
+        col = mix(jetColor, col, transmittance);
+    }
+
+    gl_FragColor = vec4(col, 1.0);// displaying the final color
 }
