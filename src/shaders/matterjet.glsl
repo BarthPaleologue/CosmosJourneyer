@@ -70,7 +70,7 @@ float spiralDensity(vec3 p) {
 }
 
 // from https://www.shadertoy.com/view/MtcXWr
-bool rayIntersectCone(vec3 rayOrigin, vec3 rayDir, vec3 conePosition, vec3 coneUp, float coneHeight, float cosTheta, out float t) {
+bool rayIntersectCone(vec3 rayOrigin, vec3 rayDir, vec3 conePosition, vec3 coneUp, float coneHeight, float cosTheta, out float tNear, out float tFar) {
     vec3 co = rayOrigin - conePosition;
 
     float a = dot(rayDir,coneUp)*dot(rayDir,coneUp) - cosTheta*cosTheta;
@@ -94,18 +94,20 @@ bool rayIntersectCone(vec3 rayOrigin, vec3 rayDir, vec3 conePosition, vec3 coneU
         if (abs(h) <= coneHeight)
         {
             hitFound = true;
-            t = t1;
+            tNear = t1;
+            tFar = t2;
             cp = cp1;
         }
     }
-    if (t2 >= 0.0 && (!hitFound || t2 < t))
+    if (t2 >= 0.0 && (!hitFound || t2 < t1))
     {
         vec3 cp2 = rayOrigin + t2 * rayDir - conePosition;
         float h = dot(cp2, coneUp);
         if (abs(h) <= coneHeight)
         {
             hitFound = true;
-            t = t2;
+            tNear = t2;
+            tFar = t1;
             cp = cp2;
         }
     }
@@ -159,13 +161,27 @@ void main() {
     }*/
 
     //t += sdSpiral(ro);
-    float t1;
+    float t1, t2;
 
-    if(rayIntersectCone(ro, rd, vec3(0.0), vec3(0.0, 1.0, 0.0), 100.0, cos(0.5), t1)) {
-        t += t1;
+    if(rayIntersectCone(ro, rd, vec3(0.0), vec3(0.0, 1.0, 0.0), 100.0, cos(0.5), t1, t2)) {
+        vec3 startPoint = ro + t1 * rd;
 
-        col += vec3(1.0, 0.0, 0.0);
-        gl_FragColor = vec4(vec3(1.0, 0.0, 0.0), 1.0);// displaying the final color
+        int nbSteps = 100;
+        float stepSize = (t2 - t1) / float(nbSteps);
+
+        for(int i = 0; i < nbSteps; i++) {
+            vec3 p = startPoint + float(i) * stepSize * rd;
+
+            float density = spiralDensity(p) * 100.0;
+        
+            vec3 emission = vec3(0.3, 0.6, 1.0) * density;
+            float absorption = 0.2 * density;
+        
+            transmittance *= exp(-absorption * stepSize);
+            col += emission * transmittance * stepSize;
+        }
+
+        gl_FragColor = vec4(col, 1.0);// displaying the final color
         return;
     }
 
