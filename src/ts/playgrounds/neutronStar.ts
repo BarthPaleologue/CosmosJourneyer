@@ -57,7 +57,12 @@ export async function createNeutronStarScene(engine: AbstractEngine): Promise<Sc
     const volumetricLight = new VolumetricLight(neutronStar.mesh, neutronStar.volumetricLightUniforms, [], scene);
     camera.attachPostProcess(volumetricLight);
 
-    const matterJets = new MatterJetPostProcess(neutronStar.getTransform(), neutronStar.getRadius(), scene);
+    const matterJets = new MatterJetPostProcess(
+        neutronStar.getTransform(),
+        neutronStar.getRadius(),
+        neutronStar.model.dipoleTilt,
+        scene
+    );
     camera.attachPostProcess(matterJets);
 
     const lensFlare = new LensFlarePostProcess(

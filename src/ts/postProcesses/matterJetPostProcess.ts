@@ -32,17 +32,18 @@ import { Matrix } from "@babylonjs/core/Maths/math.vector";
 export type MatterJetUniforms = {
     elapsedSeconds: number;
     inverseRotation: Matrix;
+    dipoleTilt: number;
 };
 
 /**
  * Post process for rendering matter jets that are used by neutron stars for example
  */
 export class MatterJetPostProcess extends PostProcess implements UpdatablePostProcess {
-    matterJetUniforms: MatterJetUniforms;
+    readonly matterJetUniforms: MatterJetUniforms;
 
     private activeCamera: Camera | null = null;
 
-    constructor(stellarTransform: TransformNode, boundingRadius: number, scene: Scene) {
+    constructor(stellarTransform: TransformNode, boundingRadius: number, dipoleTilt: number, scene: Scene) {
         const shaderName = "matterjet";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = matterJetFragment;
@@ -50,12 +51,14 @@ export class MatterJetPostProcess extends PostProcess implements UpdatablePostPr
 
         const settings: MatterJetUniforms = {
             elapsedSeconds: 0,
-            inverseRotation: Matrix.Identity()
+            inverseRotation: Matrix.Identity(),
+            dipoleTilt: dipoleTilt
         };
 
         const MatterJetUniformNames = {
             TIME: "time",
-            INVERSE_ROTATION: "inverseRotation"
+            INVERSE_ROTATION: "inverseRotation",
+            DIPOLE_TILT: "dipoleTilt"
         };
 
         const uniforms: string[] = [
@@ -100,6 +103,8 @@ export class MatterJetPostProcess extends PostProcess implements UpdatablePostPr
             this.matterJetUniforms.inverseRotation.transposeToRef(this.matterJetUniforms.inverseRotation);
 
             effect.setMatrix(MatterJetUniformNames.INVERSE_ROTATION, this.matterJetUniforms.inverseRotation);
+
+            effect.setFloat(MatterJetUniformNames.DIPOLE_TILT, this.matterJetUniforms.dipoleTilt);
 
             setSamplerUniforms(effect, this.activeCamera, scene);
         });

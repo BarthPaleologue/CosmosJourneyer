@@ -31,5 +31,7 @@ export const enum GenerationSteps {
 
     PRESSURE = 1800,
     WATER_AMOUNT = 1700,
-    TERRAIN = 1500
+    TERRAIN = 1500,
+
+    DIPOLE_TILT = 1300
 }

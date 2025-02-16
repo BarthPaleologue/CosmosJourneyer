@@ -16,13 +16,19 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { HasSeed } from "../../architecture/hasSeed";
-import { OrbitalObjectModelBase } from "../../architecture/orbitalObjectModelBase";
+import { CelestialBodyModelBase } from "../../architecture/orbitalObjectModelBase";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { RingsModel } from "../../rings/ringsModel";
 
-export type NeutronStarModel = OrbitalObjectModelBase<OrbitalObjectType.NEUTRON_STAR> &
+export type NeutronStarModel = CelestialBodyModelBase<OrbitalObjectType.NEUTRON_STAR> &
     HasSeed & {
         readonly blackBodyTemperature: number;
-        readonly radius: number;
+
+        /**
+         * The angle between the magnetic dipole axis and the rotation axis.
+         * If the magnetic field were perfectly aligned with the rotation axis, this angle would be 0.
+         */
+        readonly dipoleTilt: number;
+
         readonly rings: RingsModel | null;
     };

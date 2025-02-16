@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Orbit } from "../../orbit/orbit";
-import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
+import { normalRandom, randRange, randRangeInt, uniformRandBool } from "extended-random";
 import { clamp } from "../../utils/math";
 import { newSeededRingsModel } from "../../rings/ringsModel";
 import { GenerationSteps } from "../../utils/generationSteps";
@@ -40,6 +40,8 @@ export function newSeededNeutronStarModel(
 
     const radius = clamp(normalRandom(10e3, 1e3, rng, GenerationSteps.RADIUS), 2e3, 50e3);
 
+    const dipoleTilt = randRange(-Math.PI / 3, Math.PI / 3, rng, GenerationSteps.DIPOLE_TILT);
+
     // Todo: do not hardcode
     const orbitRadius = rng(GenerationSteps.ORBIT) * 5000000e3;
 
@@ -58,15 +60,16 @@ export function newSeededNeutronStarModel(
     const rings = uniformRandBool(ringProportion, rng, GenerationSteps.RINGS) ? newSeededRingsModel(rng) : null;
 
     return {
-        name: name,
-        seed: seed,
         type: OrbitalObjectType.NEUTRON_STAR,
-        blackBodyTemperature: blackBodyTemperature,
+        name,
+        seed,
+        blackBodyTemperature,
+        dipoleTilt,
         mass,
         siderealDaySeconds,
         axialTilt,
-        radius: radius,
-        orbit: orbit,
-        rings: rings
+        radius,
+        orbit,
+        rings
     };
 }
