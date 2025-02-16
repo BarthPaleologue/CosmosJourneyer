@@ -26,6 +26,8 @@ uniform float time;
 
 uniform mat4 inverseRotation;
 
+uniform float dipoleTilt;
+
 #include "./utils/camera.glsl";
 
 #include "./utils/object.glsl";
@@ -241,7 +243,7 @@ void main() {
     vec3 rayOriginLocalSpace = mat3(inverseRotation) * (camera_position - object_position) / scaling_factor;
     vec3 rayDirLocalSpace = mat3(inverseRotation) * rayDir;
 
-    float coneTheta = 0.2;
+    float coneTheta = dipoleTilt;
     float coneHeight = 1000000.0 * object_radius / scaling_factor;
 
     vec3 color = screenColor.rgb;

@@ -24,5 +24,12 @@ export type NeutronStarModel = OrbitalObjectModelBase<OrbitalObjectType.NEUTRON_
     HasSeed & {
         readonly blackBodyTemperature: number;
         readonly radius: number;
+
+        /**
+         * The angle between the magnetic dipole axis and the rotation axis.
+         * If the magnetic field were perfectly aligned with the rotation axis, this angle would be 0.
+         */
+        readonly dipoleTiltRadians: number;
+
         readonly rings: RingsModel | null;
     };
