@@ -44,7 +44,7 @@ float sdSpiral(vec3 p, float coneTheta, float frequency) {
     // Y-axis is now the spiral direction
     float spiralPos = p.y; // Using Y instead of Z
     float radius = spiralPos * tan(coneTheta);
-    float theta = frequency * spiralPos - sign(spiralPos) * time * 20.0;
+    float theta = frequency * spiralPos;
     
     // Spiral now wraps around Y-axis
     vec3 spiralPoint = vec3(
