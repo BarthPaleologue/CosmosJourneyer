@@ -233,42 +233,40 @@ void main() {
 
     vec3 rayDir = normalize(pixelWorldPosition - camera_position);// normalized direction of the ray
 
-    // Keep the same raymarching parameters
-
-    vec3 rayOriginLocalSpace = mat3(inverseRotation) * (camera_position - object_position);
-
+    // move in object's local space to simplify the calculations
+    vec3 rayOriginLocalSpace = mat3(inverseRotation) * (camera_position - object_position) / object_radius;
     vec3 rayDirLocalSpace = mat3(inverseRotation) * rayDir;
 
-    vec3 ro = rayOriginLocalSpace / object_radius;
-    vec3 rd = rayDirLocalSpace;
-    
     float coneTheta = 0.2;
-
     float coneHeight = 100.0;
 
-    vec3 col = screenColor.rgb;
+    vec3 color = screenColor.rgb;
+    float finalAlpha = screenColor.a;
 
     float t, distThrough;
-    if(rayIntersectCone(ro, rd, coneHeight, cos(coneTheta), t, distThrough) && t * object_radius < maximumDistance) {
-        vec3 startPoint = ro + t * rd;
+    if(rayIntersectCone(rayOriginLocalSpace, rayDirLocalSpace, coneHeight, cos(coneTheta), t, distThrough) && t * object_radius < maximumDistance) {
+        vec3 startPoint = rayOriginLocalSpace + t * rayDirLocalSpace;
 
         float transmittance;
-        vec3 jetColor = rayMarchSpiral(startPoint, rd, distThrough, 100, coneTheta, coneHeight, transmittance);
+        vec3 jetColor = rayMarchSpiral(startPoint, rayDirLocalSpace, distThrough, 100, coneTheta, coneHeight, transmittance);
 
-        col = mix(jetColor, col, transmittance);
+        color = mix(jetColor, color, transmittance);
+        finalAlpha = max(transmittance, finalAlpha);
     }
 
-    ro *= -1.0;
-    rd *= -1.0;
+    // flip the coordinates to display the other cone
+    rayOriginLocalSpace *= -1.0;
+    rayDirLocalSpace *= -1.0;
 
-    if(rayIntersectCone(ro, rd, coneHeight, cos(coneTheta), t, distThrough) && t * object_radius < maximumDistance) {
-        vec3 startPoint = ro + t * rd;
+    if(rayIntersectCone(rayOriginLocalSpace, rayDirLocalSpace, coneHeight, cos(coneTheta), t, distThrough) && t * object_radius < maximumDistance) {
+        vec3 startPoint = rayOriginLocalSpace + t * rayDirLocalSpace;
 
         float transmittance;
-        vec3 jetColor = rayMarchSpiral(startPoint, rd, distThrough, 100, coneTheta, coneHeight, transmittance);
+        vec3 jetColor = rayMarchSpiral(startPoint, rayDirLocalSpace, distThrough, 100, coneTheta, coneHeight, transmittance);
 
-        col = mix(jetColor, col, transmittance);
+        color = mix(jetColor, color, transmittance);
+        finalAlpha = max(transmittance, finalAlpha);
     }
 
-    gl_FragColor = vec4(col, 1.0);// displaying the final color
+    gl_FragColor = vec4(color, finalAlpha);
 }
