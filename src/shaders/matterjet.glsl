@@ -74,19 +74,22 @@ float spiralDensity(vec3 p, float coneTheta, float coneHeight) {
 // If so, 't' is set to the first hit along the ray (entry if outside, exit if inside)
 // and 'distTrough' is set to the chord length of the ray inside the cone.
 bool rayIntersectCone(vec3 rayOrigin, vec3 rayDir,
-                      vec3 coneUp,
                       float coneHeight, float cosTheta,
                       out float t, out float distTrough)
 {
+    vec3 coneUp = vec3(0.0, 1.0, 0.0);
+
+    float cosTheta2 = cosTheta * cosTheta;
+
     // Compute tangent once.
-    float sinTheta = sqrt(max(0.0, 1.0 - cosTheta * cosTheta));
+    float sinTheta = sqrt(max(0.0, 1.0 - cosTheta2));
     float tanTheta = sinTheta / cosTheta;
 
     // --- Determine if ray origin is inside the cone volume ---
     bool inside = false;
     {
         vec3 v = rayOrigin;
-        float h = dot(v, coneUp);
+        float h = v.y;
         if (h >= 0.0 && h <= coneHeight) {
             float rAtH = h * tanTheta;
             float d = length(v - coneUp * h);
@@ -102,9 +105,9 @@ bool rayIntersectCone(vec3 rayOrigin, vec3 rayDir,
     
     // Intersection with the infinite cone's lateral surface.
     vec3 co = rayOrigin;
-    float A = dot(rayDir, coneUp) * dot(rayDir, coneUp) - cosTheta * cosTheta;
-    float B = 2.0 * (dot(rayDir, coneUp) * dot(co, coneUp) - dot(rayDir, co) * cosTheta * cosTheta);
-    float C = dot(co, coneUp) * dot(co, coneUp) - dot(co, co) * cosTheta * cosTheta;
+    float A = rayDir.y * rayDir.y - cosTheta2;
+    float B = 2.0 * (rayDir.y * co.y - dot(rayDir, co) * cosTheta2);
+    float C = co.y * co.y - dot(co, co) * cosTheta2;
     
     float det = B * B - 4.0 * A * C;
     if (det >= 0.0)
@@ -117,7 +120,7 @@ bool rayIntersectCone(vec3 rayOrigin, vec3 rayDir,
         if (t1 >= 0.0)
         {
             vec3 cp1 = rayOrigin + t1 * rayDir;
-            float h1 = dot(cp1, coneUp);
+            float h1 = cp1.y;
             if (h1 >= 0.0 && h1 <= coneHeight)
                 tCandidates[count++] = t1;
         }
@@ -125,7 +128,7 @@ bool rayIntersectCone(vec3 rayOrigin, vec3 rayDir,
         if (t2 >= 0.0)
         {
             vec3 cp2 = rayOrigin + t2 * rayDir;
-            float h2 = dot(cp2, coneUp);
+            float h2 = cp2.y;
             if (h2 >= 0.0 && h2 <= coneHeight)
                 tCandidates[count++] = t2;
         }
@@ -133,10 +136,10 @@ bool rayIntersectCone(vec3 rayOrigin, vec3 rayDir,
     
     // Intersection with the base plane.
     vec3 baseCenter = coneUp * coneHeight;
-    float denom = dot(rayDir, coneUp);
+    float denom = rayDir.y;
     if (abs(denom) > 1e-6)
     {
-        float tBase = dot(baseCenter - rayOrigin, coneUp) / denom;
+        float tBase = (baseCenter - rayOrigin).y / denom;
         if (tBase >= 0.0)
         {
             vec3 hitPoint = rayOrigin + tBase * rayDir;
@@ -246,7 +249,7 @@ void main() {
     vec3 col = screenColor.rgb;
 
     float t, distThrough;
-    if(rayIntersectCone(ro, rd, vec3(0.0, 1.0, 0.0), coneHeight, cos(coneTheta), t, distThrough) && t * object_radius < maximumDistance) {
+    if(rayIntersectCone(ro, rd, coneHeight, cos(coneTheta), t, distThrough) && t * object_radius < maximumDistance) {
         vec3 startPoint = ro + t * rd;
 
         float transmittance;
@@ -255,10 +258,10 @@ void main() {
         col = mix(jetColor, col, transmittance);
     }
 
-    ro.y *= -1.0;
-    rd.y *= -1.0;
+    ro *= -1.0;
+    rd *= -1.0;
 
-    if(rayIntersectCone(ro, rd, vec3(0.0, 1.0, 0.0), coneHeight, cos(coneTheta), t, distThrough) && t * object_radius < maximumDistance) {
+    if(rayIntersectCone(ro, rd, coneHeight, cos(coneTheta), t, distThrough) && t * object_radius < maximumDistance) {
         vec3 startPoint = ro + t * rd;
 
         float transmittance;

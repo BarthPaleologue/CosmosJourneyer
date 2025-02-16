@@ -27,6 +27,8 @@ import { VolumetricLight } from "../volumetricLight/volumetricLight";
 import { translate } from "../uberCore/transforms/basicTransform";
 import { Textures } from "../assets/textures";
 import { AssetsManager } from "@babylonjs/core";
+import { LensFlarePostProcess } from "../postProcesses/lensFlarePostProcess";
+import { getRgbFromTemperature } from "../utils/specrend";
 
 export async function createNeutronStarScene(engine: AbstractEngine): Promise<Scene> {
     const scene = new Scene(engine);
@@ -57,6 +59,14 @@ export async function createNeutronStarScene(engine: AbstractEngine): Promise<Sc
 
     const matterJets = new MatterJetPostProcess(neutronStar.getTransform(), neutronStar.getRadius(), scene);
     camera.attachPostProcess(matterJets);
+
+    const lensFlare = new LensFlarePostProcess(
+        neutronStar.getTransform(),
+        neutronStar.getRadius(),
+        getRgbFromTemperature(neutronStarModel.blackBodyTemperature),
+        scene
+    );
+    camera.attachPostProcess(lensFlare);
 
     camera.maxZ = 1e10;
     defaultControls.getTransform().lookAt(neutronStar.getTransform().position);
