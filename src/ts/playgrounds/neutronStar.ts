@@ -52,7 +52,7 @@ export async function createNeutronStarScene(engine: AbstractEngine): Promise<Sc
 
     const neutronStarModel = newSeededNeutronStarModel(456, "Neutron Star Demo", []);
     const neutronStar = new NeutronStar(neutronStarModel, scene);
-    neutronStar.getTransform().position = new Vector3(0, 0, 1).scaleInPlace(neutronStar.getRadius() * 200000);
+    neutronStar.getTransform().position = new Vector3(0, 0, 1).scaleInPlace(neutronStar.getRadius() * 2000000);
 
     const volumetricLight = new VolumetricLight(neutronStar.mesh, neutronStar.volumetricLightUniforms, [], scene);
     camera.attachPostProcess(volumetricLight);
@@ -68,7 +68,7 @@ export async function createNeutronStarScene(engine: AbstractEngine): Promise<Sc
     );
     camera.attachPostProcess(lensFlare);
 
-    camera.maxZ = 1e10;
+    camera.maxZ = 1e12;
     defaultControls.getTransform().lookAt(neutronStar.getTransform().position);
 
     scene.onBeforePhysicsObservable.add(() => {
