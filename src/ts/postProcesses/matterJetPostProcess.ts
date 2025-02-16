@@ -56,7 +56,8 @@ export class MatterJetPostProcess extends PostProcess implements UpdatablePostPr
         const MatterJetUniformNames = {
             TIME: "time",
             ROTATION_PERIOD: "rotationPeriod",
-            ROTATION_AXIS: "rotationAxis"
+            ROTATION_AXIS: "rotationAxis",
+            INVERSE_ROTATION: "inverseRotation"
         };
 
         const uniforms: string[] = [
@@ -101,6 +102,10 @@ export class MatterJetPostProcess extends PostProcess implements UpdatablePostPr
             );
             effect.setFloat(MatterJetUniformNames.ROTATION_PERIOD, this.matterJetUniforms.rotationPeriod);
             effect.setVector3(MatterJetUniformNames.ROTATION_AXIS, stellarTransform.up);
+            effect.setMatrix(
+                MatterJetUniformNames.INVERSE_ROTATION,
+                stellarTransform.getWorldMatrix().getRotationMatrix().transpose()
+            );
 
             setSamplerUniforms(effect, this.activeCamera, scene);
         });

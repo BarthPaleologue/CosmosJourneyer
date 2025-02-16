@@ -20,12 +20,13 @@ import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { enablePhysics } from "./utils";
 import { DefaultControls } from "../defaultControls/defaultControls";
-import { Assets } from "../assets/assets";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModelGenerator";
 import { MatterJetPostProcess } from "../postProcesses/matterJetPostProcess";
 import { VolumetricLight } from "../volumetricLight/volumetricLight";
 import { translate } from "../uberCore/transforms/basicTransform";
+import { Textures } from "../assets/textures";
+import { AssetsManager } from "@babylonjs/core";
 
 export async function createNeutronStarScene(engine: AbstractEngine): Promise<Scene> {
     const scene = new Scene(engine);
@@ -33,7 +34,9 @@ export async function createNeutronStarScene(engine: AbstractEngine): Promise<Sc
 
     await enablePhysics(scene);
 
-    await Assets.Init(scene);
+    const assetsManager = new AssetsManager(scene);
+    Textures.EnqueueTasks(assetsManager, scene);
+    await assetsManager.loadAsync();
 
     const defaultControls = new DefaultControls(scene);
     defaultControls.speed = 2000;
@@ -55,7 +58,7 @@ export async function createNeutronStarScene(engine: AbstractEngine): Promise<Sc
     const matterJets = new MatterJetPostProcess(neutronStar.getTransform(), neutronStar.getRadius(), scene);
     camera.attachPostProcess(matterJets);
 
-    camera.maxZ = neutronStar.getRadius() * 100;
+    camera.maxZ = 1e10;
     defaultControls.getTransform().lookAt(neutronStar.getTransform().position);
 
     scene.onBeforePhysicsObservable.add(() => {

@@ -24,6 +24,8 @@ uniform sampler2D depthSampler;// the depth map of the camera
 
 uniform float time;
 
+uniform mat4 inverseRotation;
+
 #include "./utils/camera.glsl";
 
 #include "./utils/object.glsl";
@@ -36,79 +38,85 @@ uniform float time;
 
 #include "./utils/removeAxialTilt.glsl";
 
-// from https://www.shadertoy.com/view/MtcXWr
-bool rayIntersectCone(vec3 rayOrigin, vec3 rayDir, vec3 tipPosition, vec3 orientation, float coneAngle, out float t1, out float t2) {
-    vec3 co = rayOrigin - tipPosition;
+float sdSpiral(vec3 p) {
+    float frequency = 2.0;
+    
+    // Y-axis is now the spiral direction
+    float spiralPos = p.y; // Using Y instead of Z
+    float radius = 0.2 * spiralPos;
+    float theta = frequency * spiralPos - sign(spiralPos) * time * 20.0;
+    
+    // Spiral now wraps around Y-axis
+    vec3 spiralPoint = vec3(
+        radius * cos(theta),
+        spiralPos,          // Y position is our spiral progress
+        radius * sin(theta) // Z component completes the circular motion
+    );
+    
+    return length(p - spiralPoint);
+}
 
-    float a = dot(rayDir, orientation)*dot(rayDir, orientation) - coneAngle*coneAngle;
-    float b = 2. * (dot(rayDir, orientation)*dot(co, orientation) - dot(rayDir, co)*coneAngle*coneAngle);
-    float c = dot(co, orientation)*dot(co, orientation) - dot(co, co)*coneAngle*coneAngle;
+float spiralDensity(vec3 p) {    
+    float dist = sdSpiral(p);
+    
+    float density = 0.0;
+    float lengthDecay = 0.3;
+    
+    density += exp(-20.0 * dist*dist) *
+               exp(-0.4 * dist) *
+               exp(-lengthDecay * abs(p.y)); // Fade vertically
+    
+    return density;
+}
+
+// from https://www.shadertoy.com/view/MtcXWr
+bool rayIntersectCone(vec3 rayOrigin, vec3 rayDir, vec3 conePosition, vec3 coneUp, float coneHeight, float cosTheta, out float t) {
+    vec3 co = rayOrigin - conePosition;
+
+    float a = dot(rayDir,coneUp)*dot(rayDir,coneUp) - cosTheta*cosTheta;
+    float b = 2. * (dot(rayDir,coneUp)*dot(co,coneUp) - dot(rayDir,co)*cosTheta*cosTheta);
+    float c = dot(co,coneUp)*dot(co,coneUp) - dot(co,co)*cosTheta*cosTheta;
 
     float det = b*b - 4.*a*c;
     if (det < 0.) return false;
 
     det = sqrt(det);
-    t1 = (-b - det) / (2. * a);
-    t2 = (-b + det) / (2. * a);
+    float t1 = (-b - det) / (2. * a);
+    float t2 = (-b + det) / (2. * a);
 
-    // This is a bit messy; there ought to be a more elegant solution.
-    float t = t1;
-    if (t < 0. || t2 > 0. && t2 < t) t = t2;
-    if (t < 0.) return false;
+    // Determine which of the t, if any, is a solution:
+    bool hitFound = false;
+    vec3 cp;
+    if (t1 >= 0.0)
+    {
+        vec3 cp1 = rayOrigin + t1 * rayDir - conePosition;
+        float h = dot(cp1, coneUp);
+        if (abs(h) <= coneHeight)
+        {
+            hitFound = true;
+            t = t1;
+            cp = cp1;
+        }
+    }
+    if (t2 >= 0.0 && (!hitFound || t2 < t))
+    {
+        vec3 cp2 = rayOrigin + t2 * rayDir - conePosition;
+        float h = dot(cp2, coneUp);
+        if (abs(h) <= coneHeight)
+        {
+            hitFound = true;
+            t = t2;
+            cp = cp2;
+        }
+    }
 
-    vec3 cp = rayOrigin + t*rayDir - tipPosition;
-    float h = dot(cp, orientation);
+    return hitFound;
 
-    vec3 n = normalize(cp * dot(orientation, cp) / dot(cp, cp) - orientation);
+    //if (!hitFound) return false;
 
-    return true;
-}
+    /*vec3 n = normalize(cp * dot(coneUp, cp) / dot(cp, cp) - coneUp);
 
-// see https://www.shadertoy.com/view/tslcW4
-const float a=1.0;
-const float b=.1759;
-const float PI=3.14159265359;
-
-float spiralSDF(float theta, float radius) {
-
-    float t=theta;
-    // t=(t+PI)/(2.*PI);
-    float r=radius;
-
-    float n=(log(r/a)/b-t)/(2.*PI);
-
-    // Cap the spiral
-    // float nm = (log(0.11)/b-t)/(2.0*PI);
-    // n = min(n,nm);
-    // return (n+1.0)/100.0;
-    float upper_r=a*exp(b*(t+2.*PI*ceil(n)));
-    float lower_r=a*exp(b*(t+2.*PI*floor(n)));
-    // float lower_r = 0.0;
-
-    return min(abs(upper_r-r), abs(r-lower_r));
-}
-
-float spiralDensity(vec3 pointOnCone, vec3 coneAxis, float coneMaxHeight) {
-    // Then we rotate that point so that we eliminate the axial tilt of the star from the equation
-    vec3 pointOnYCone = removeAxialTilt(pointOnCone, coneAxis);
-
-    vec2 pointOnXZPlane = vec2(pointOnYCone.x, pointOnYCone.z);
-    float theta = atan(pointOnXZPlane.y, pointOnXZPlane.x) + 3.14 * min(0.0, sign(dot(pointOnCone, coneAxis)));
-    float heightFraction = abs(pointOnYCone.y) / coneMaxHeight;
-
-    float density = 1.0;
-
-    // smoothstep fadeout when the height is too much (outside of cone)
-    density *= 1.0 - smoothstep(0.0, 1.0, heightFraction);
-
-    float d = spiralSDF(theta + time, 0.2 + sqrt(heightFraction) / 2.0) / (0.3 + heightFraction * 2.0);
-    //d = pow(d, 4.0);
-
-    density *= smoothstep(0.6, 1.0, pow(1.0 - d, 8.0)) * 2.0; //smoothstep(0.85, 1.0, 1.0 - d) * 2.0;
-
-    //density *= d * 500.0;
-
-    return density;
+    return Hit(t, n, s.m);*/
 }
 
 void main() {
@@ -125,6 +133,69 @@ void main() {
 
     vec4 finalColor = screenColor;
 
+    
+    // Keep the same raymarching parameters
+    float t = 0.0;
+    const float stepSize = 0.08;
+    const int steps = 256;
+    
+    vec3 col = vec3(0.0);
+    float transmittance = 1.0;
+
+    vec3 rayOriginLocalSpace = mat3(inverseRotation) * (camera_position - object_position);
+
+    vec3 rayDirLocalSpace = mat3(inverseRotation) * rayDir;
+
+    vec3 ro = rayOriginLocalSpace / object_radius;
+    vec3 rd = rayDirLocalSpace;
+    
+    /*for(int i = 0; i < 1; i++) {
+        float dist = sdSpiral(ro + rd * t);
+        t += dist;
+
+        if(dist < 1.0) {
+            break;
+        }
+    }*/
+
+    //t += sdSpiral(ro);
+    float t1;
+
+    if(rayIntersectCone(ro, rd, vec3(0.0), vec3(0.0, 1.0, 0.0), 100.0, cos(0.5), t1)) {
+        t += t1;
+
+        col += vec3(1.0, 0.0, 0.0);
+        gl_FragColor = vec4(vec3(1.0, 0.0, 0.0), 1.0);// displaying the final color
+        return;
+    }
+
+    for(int i = 0; i < steps; i++) {
+        vec3 p = ro + rd * t;
+
+        if(length(p) < 1.0) {
+            transmittance = 1.0;
+            break;
+        }
+
+        float density = spiralDensity(p) * 100.0;
+        
+        vec3 emission = vec3(0.3, 0.6, 1.0) * density;
+        float absorption = 0.2 * density;
+        
+        transmittance *= exp(-absorption * stepSize);
+        col += emission * transmittance * stepSize;
+        
+        t += stepSize;
+        if(transmittance < 0.01 || t > 20.0) break;
+    }
+    
+    //col *= exp(-0.05 * t);
+    col = pow(col, vec3(0.4545));
+
+    col = mix(col, screenColor.rgb, transmittance);
+
+    
+/*
     const float jetHeight = 10000000e3;
     const vec3 jetColor = vec3(0.5, 0.5, 1.0);
 
@@ -146,6 +217,6 @@ void main() {
             finalColor.rgb = mix(finalColor.rgb, jetColor, density1);
         }
     }
-
-    gl_FragColor = finalColor;// displaying the final color
+*/
+    gl_FragColor = vec4(col, 1.0);// displaying the final color
 }
