@@ -58,13 +58,15 @@ float spiralDensity(vec3 p, float coneTheta, float coneHeight) {
     float frequency = 0.1;
     float dist = sdSpiral(p, coneTheta, frequency);
     
-    dist /= 0.1 * abs(p.y);
+    float heightFraction = abs(p.y) / coneHeight;
+
+    dist /= heightFraction;
 
     float density = 1.0;
 
-    density *= exp(-10.0 * dist * dist);
+    density *= exp(-0.1 * dist * dist);
     
-    density *= 1.0 - smoothstep(0.0, 1.0, abs(p.y) / coneHeight); // Cut off at the top
+    density *= 1.0 - smoothstep(0.0, 1.0, heightFraction);
     
     return density;
 }
