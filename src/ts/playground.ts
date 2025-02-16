@@ -30,6 +30,7 @@ import { createDebugAssetsScene } from "./playgrounds/debugAssets";
 import { createSpaceStationScene } from "./playgrounds/spaceStation";
 import { createXrScene } from "./playgrounds/xr";
 import { createFlightDemoScene } from "./playgrounds/flightDemo";
+import { createNeutronStarScene } from "./playgrounds/neutronStar";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -64,6 +65,9 @@ switch (requestedScene) {
         break;
     case "flightDemo":
         scene = await createFlightDemoScene(engine);
+        break;
+    case "neutronStar":
+        scene = await createNeutronStarScene(engine);
         break;
     default:
         scene = await createAutomaticLandingScene(engine);

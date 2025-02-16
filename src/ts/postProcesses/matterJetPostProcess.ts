@@ -42,7 +42,7 @@ export class MatterJetPostProcess extends PostProcess implements UpdatablePostPr
 
     private activeCamera: Camera | null = null;
 
-    constructor(stellarTransform: TransformNode, boundingRadius: number, scene: Scene) {
+    constructor(stellarTransform: TransformNode, boundingRadius: number, dipoleTiltRadians: number, scene: Scene) {
         const shaderName = "matterjet";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = matterJetFragment;
@@ -56,7 +56,9 @@ export class MatterJetPostProcess extends PostProcess implements UpdatablePostPr
         const MatterJetUniformNames = {
             TIME: "time",
             ROTATION_PERIOD: "rotationPeriod",
-            ROTATION_AXIS: "rotationAxis"
+            ROTATION_AXIS: "rotationAxis",
+            INVERSE_ROTATION: "inverseRotation",
+            DIPOLE_TILT: "dipoleTilt"
         };
 
         const uniforms: string[] = [
@@ -101,6 +103,11 @@ export class MatterJetPostProcess extends PostProcess implements UpdatablePostPr
             );
             effect.setFloat(MatterJetUniformNames.ROTATION_PERIOD, this.matterJetUniforms.rotationPeriod);
             effect.setVector3(MatterJetUniformNames.ROTATION_AXIS, stellarTransform.up);
+            effect.setMatrix(
+                MatterJetUniformNames.INVERSE_ROTATION,
+                stellarTransform.getWorldMatrix().getRotationMatrix().transpose()
+            );
+            effect.setFloat(MatterJetUniformNames.DIPOLE_TILT, dipoleTiltRadians);
 
             setSamplerUniforms(effect, this.activeCamera, scene);
         });
