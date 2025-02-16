@@ -38,12 +38,10 @@ uniform mat4 inverseRotation;
 
 #include "./utils/removeAxialTilt.glsl";
 
-float sdSpiral(vec3 p) {
-    float frequency = 2.0;
-    
+float sdSpiral(vec3 p, float coneTheta, float frequency) {    
     // Y-axis is now the spiral direction
     float spiralPos = p.y; // Using Y instead of Z
-    float radius = 0.2 * spiralPos;
+    float radius = spiralPos * tan(coneTheta);
     float theta = frequency * spiralPos - sign(spiralPos) * time * 20.0;
     
     // Spiral now wraps around Y-axis
@@ -56,70 +54,148 @@ float sdSpiral(vec3 p) {
     return length(p - spiralPoint);
 }
 
-float spiralDensity(vec3 p) {    
-    float dist = sdSpiral(p);
+float spiralDensity(vec3 p, float coneTheta, float coneHeight) {    
+    float frequency = 0.1;
+    float dist = sdSpiral(p, coneTheta, frequency);
     
-    float density = 0.0;
-    float lengthDecay = 0.3;
+    dist /= 0.1 * abs(p.y);
+
+    float density = 1.0;
+
+    density *= exp(-10.0 * dist * dist);
     
-    density += exp(-20.0 * dist*dist) *
-               exp(-0.4 * dist) *
-               exp(-lengthDecay * abs(p.y)); // Fade vertically
+    density *= 1.0 - smoothstep(0.0, 1.0, abs(p.y) / coneHeight); // Cut off at the top
     
     return density;
 }
 
 // from https://www.shadertoy.com/view/MtcXWr
-bool rayIntersectCone(vec3 rayOrigin, vec3 rayDir, vec3 conePosition, vec3 coneUp, float coneHeight, float cosTheta, out float tNear, out float tFar) {
+// Returns true if the ray intersects the closed cone.
+// If so, 't' is set to the first hit along the ray (entry if outside, exit if inside)
+// and 'distTrough' is set to the chord length of the ray inside the cone.
+bool rayIntersectCone(vec3 rayOrigin, vec3 rayDir,
+                      vec3 conePosition, vec3 coneUp,
+                      float coneHeight, float cosTheta,
+                      out float t, out float distTrough)
+{
+    // Compute tangent once.
+    float sinTheta = sqrt(max(0.0, 1.0 - cosTheta * cosTheta));
+    float tanTheta = sinTheta / cosTheta;
+
+    // --- Determine if ray origin is inside the cone volume ---
+    bool inside = false;
+    {
+        vec3 v = rayOrigin - conePosition;
+        float h = dot(v, coneUp);
+        if (h >= 0.0 && h <= coneHeight) {
+            float rAtH = h * tanTheta;
+            float d = length(v - coneUp * h);
+            if (d <= rAtH)
+                inside = true;
+        }
+    }
+    
+    // --- Collect candidate intersection t's ---
+    // We will add valid intersections from the lateral surface and the base.
+    float tCandidates[3];
+    int count = 0;
+    
+    // Intersection with the infinite cone's lateral surface.
     vec3 co = rayOrigin - conePosition;
-
-    float a = dot(rayDir,coneUp)*dot(rayDir,coneUp) - cosTheta*cosTheta;
-    float b = 2. * (dot(rayDir,coneUp)*dot(co,coneUp) - dot(rayDir,co)*cosTheta*cosTheta);
-    float c = dot(co,coneUp)*dot(co,coneUp) - dot(co,co)*cosTheta*cosTheta;
-
-    float det = b*b - 4.*a*c;
-    if (det < 0.) return false;
-
-    det = sqrt(det);
-    float t1 = (-b - det) / (2. * a);
-    float t2 = (-b + det) / (2. * a);
-
-    // Determine which of the t, if any, is a solution:
-    bool hitFound = false;
-    vec3 cp;
-    if (t1 >= 0.0)
+    float A = dot(rayDir, coneUp) * dot(rayDir, coneUp) - cosTheta * cosTheta;
+    float B = 2.0 * (dot(rayDir, coneUp) * dot(co, coneUp) - dot(rayDir, co) * cosTheta * cosTheta);
+    float C = dot(co, coneUp) * dot(co, coneUp) - dot(co, co) * cosTheta * cosTheta;
+    
+    float det = B * B - 4.0 * A * C;
+    if (det >= 0.0)
     {
-        vec3 cp1 = rayOrigin + t1 * rayDir - conePosition;
-        float h = dot(cp1, coneUp);
-        if (abs(h) <= coneHeight)
+        float sqrtDet = sqrt(det);
+        float t1 = (-B - sqrtDet) / (2.0 * A);
+        float t2 = (-B + sqrtDet) / (2.0 * A);
+        
+        // Check t1 for validity (only consider if t>=0)
+        if (t1 >= 0.0)
         {
-            hitFound = true;
-            tNear = t1;
-            tFar = t2;
-            cp = cp1;
+            vec3 cp1 = rayOrigin + t1 * rayDir - conePosition;
+            float h1 = dot(cp1, coneUp);
+            if (h1 >= 0.0 && h1 <= coneHeight)
+                tCandidates[count++] = t1;
+        }
+        // Check t2
+        if (t2 >= 0.0)
+        {
+            vec3 cp2 = rayOrigin + t2 * rayDir - conePosition;
+            float h2 = dot(cp2, coneUp);
+            if (h2 >= 0.0 && h2 <= coneHeight)
+                tCandidates[count++] = t2;
         }
     }
-    if (t2 >= 0.0 && (!hitFound || t2 < t1))
+    
+    // Intersection with the base plane.
+    vec3 baseCenter = conePosition + coneUp * coneHeight;
+    float denom = dot(rayDir, coneUp);
+    if (abs(denom) > 1e-6)
     {
-        vec3 cp2 = rayOrigin + t2 * rayDir - conePosition;
-        float h = dot(cp2, coneUp);
-        if (abs(h) <= coneHeight)
+        float tBase = dot(baseCenter - rayOrigin, coneUp) / denom;
+        if (tBase >= 0.0)
         {
-            hitFound = true;
-            tNear = t2;
-            tFar = t1;
-            cp = cp2;
+            vec3 hitPoint = rayOrigin + tBase * rayDir;
+            // Check if hitPoint is within the circular base.
+            float baseRadius = coneHeight * tanTheta;
+            if (length(hitPoint - baseCenter) <= baseRadius)
+                tCandidates[count++] = tBase;
         }
     }
-
-    return hitFound;
-
-    //if (!hitFound) return false;
-
-    /*vec3 n = normalize(cp * dot(coneUp, cp) / dot(cp, cp) - coneUp);
-
-    return Hit(t, n, s.m);*/
+    
+    // If no valid intersections were found, return false.
+    if (count == 0)
+        return false;
+    
+    // --- Sort the candidate intersections in increasing order ---
+    for (int i = 0; i < count - 1; i++)
+    {
+        for (int j = i + 1; j < count; j++)
+        {
+            if (tCandidates[j] < tCandidates[i])
+            {
+                float tmp = tCandidates[i];
+                tCandidates[i] = tCandidates[j];
+                tCandidates[j] = tmp;
+            }
+        }
+    }
+    
+    // --- Determine entry and exit t values ---
+    float tEntry, tExit;
+    if (inside)
+    {
+        // If the ray origin is inside, entry is at t = 0 and the exit is the first candidate.
+        tEntry = 0.0;
+        tExit  = tCandidates[0];
+    }
+    else
+    {
+        // Outside: entry is the first hit, exit is the second (if present).
+        tEntry = tCandidates[0];
+        if (count > 1)
+            tExit = tCandidates[1];
+        else
+            tExit = tEntry; // Tangential hit: chord length is zero.
+    }
+    
+    // Set the outputs.
+    // We return tEntry as the “hit” point (for an outside ray, where the ray first enters the cone;
+    // for an inside ray, tEntry=0 is the starting point so we return the exit instead).
+    if (inside)
+        t = 0.0;
+    else
+        t = tEntry;
+    
+    distTrough = tExit - tEntry;
+    
+    return true;
 }
+
 
 void main() {
     vec4 screenColor = texture2D(textureSampler, vUV);// the current screen color
@@ -137,12 +213,6 @@ void main() {
 
     
     // Keep the same raymarching parameters
-    float t = 0.0;
-    const float stepSize = 0.08;
-    const int steps = 256;
-    
-    vec3 col = vec3(0.0);
-    float transmittance = 1.0;
 
     vec3 rayOriginLocalSpace = mat3(inverseRotation) * (camera_position - object_position);
 
@@ -151,20 +221,19 @@ void main() {
     vec3 ro = rayOriginLocalSpace / object_radius;
     vec3 rd = rayDirLocalSpace;
     
-    /*for(int i = 0; i < 1; i++) {
-        float dist = sdSpiral(ro + rd * t);
-        t += dist;
+    float coneTheta = 0.2;
 
-        if(dist < 1.0) {
-            break;
-        }
-    }*/
+    float coneHeight = 100.0;
 
-    //t += sdSpiral(ro);
-    float t1, t2;
+    float t, distThrough;
+    if(rayIntersectCone(ro, rd, vec3(0.0), vec3(0.0, 1.0, 0.0), coneHeight, cos(coneTheta), t, distThrough)) {
+        float t1 = t;
+        float t2 = t + distThrough;
 
-    if(rayIntersectCone(ro, rd, vec3(0.0), vec3(0.0, 1.0, 0.0), 100.0, cos(0.5), t1, t2)) {
-        vec3 startPoint = ro + t1 * rd;
+        vec3 startPoint = ro + t * rd;
+
+        vec3 col = vec3(0.0);
+        float transmittance = 1.0;
 
         int nbSteps = 100;
         float stepSize = (t2 - t1) / float(nbSteps);
@@ -172,7 +241,7 @@ void main() {
         for(int i = 0; i < nbSteps; i++) {
             vec3 p = startPoint + float(i) * stepSize * rd;
 
-            float density = spiralDensity(p) * 100.0;
+            float density = spiralDensity(p, coneTheta * 0.2, coneHeight);
         
             vec3 emission = vec3(0.3, 0.6, 1.0) * density;
             float absorption = 0.2 * density;
@@ -181,58 +250,11 @@ void main() {
             col += emission * transmittance * stepSize;
         }
 
+        col = mix(col, screenColor.rgb, transmittance);
+
         gl_FragColor = vec4(col, 1.0);// displaying the final color
         return;
     }
 
-    for(int i = 0; i < steps; i++) {
-        vec3 p = ro + rd * t;
-
-        if(length(p) < 1.0) {
-            transmittance = 1.0;
-            break;
-        }
-
-        float density = spiralDensity(p) * 100.0;
-        
-        vec3 emission = vec3(0.3, 0.6, 1.0) * density;
-        float absorption = 0.2 * density;
-        
-        transmittance *= exp(-absorption * stepSize);
-        col += emission * transmittance * stepSize;
-        
-        t += stepSize;
-        if(transmittance < 0.01 || t > 20.0) break;
-    }
-    
-    //col *= exp(-0.05 * t);
-    col = pow(col, vec3(0.4545));
-
-    col = mix(col, screenColor.rgb, transmittance);
-
-    
-/*
-    const float jetHeight = 10000000e3;
-    const vec3 jetColor = vec3(0.5, 0.5, 1.0);
-
-
-    float t1, t2;
-    if (rayIntersectCone(camera_position, rayDir, object_position, object_rotationAxis, 0.95, t1, t2)) {
-        if (t2 > 0.0 && t2 < maximumDistance) {
-            vec3 jetPointPosition2 = camera_position + t2 * rayDir - object_position;
-
-            float density2 = spiralDensity(jetPointPosition2, object_rotationAxis, jetHeight);
-
-            finalColor.rgb = mix(finalColor.rgb, jetColor, density2);
-        }
-        if (t1 > 0.0 && t1 < maximumDistance) {
-            vec3 jetPointPosition1 = camera_position + t1 * rayDir - object_position;
-
-            float density1 = spiralDensity(jetPointPosition1, object_rotationAxis, jetHeight);
-
-            finalColor.rgb = mix(finalColor.rgb, jetColor, density1);
-        }
-    }
-*/
-    gl_FragColor = vec4(col, 1.0);// displaying the final color
+    gl_FragColor = vec4(screenColor.rgb, 1.0);// displaying the final color
 }
