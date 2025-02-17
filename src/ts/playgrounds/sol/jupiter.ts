@@ -58,7 +58,8 @@ export async function createJupiterScene(
     // This attaches the camera to the canvas
     camera.attachControl();
 
-    scene.enableDepthRenderer(null, false, true);
+    const depthRenderer = scene.enableDepthRenderer(null, true, true);
+    depthRenderer.clearColor.set(0, 0, 0, 1);
 
     const light = new PointLight("light1", new Vector3(7, 5, -10).scaleInPlace(scalingFactor), scene);
     light.falloffType = Light.FALLOFF_STANDARD;

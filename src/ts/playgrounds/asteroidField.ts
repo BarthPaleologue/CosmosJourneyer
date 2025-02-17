@@ -48,8 +48,6 @@ export async function createAsteroidFieldScene(
     const camera = defaultControls.getActiveCamera();
     camera.attachControl();
 
-    scene.enableDepthRenderer(camera, false, true);
-
     const asteroids = await loadAsteroids(scene, progressMonitor);
 
     const directionalLight = new DirectionalLight("sun", new Vector3(1, -1, 0), scene);
