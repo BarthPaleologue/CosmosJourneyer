@@ -44,8 +44,6 @@ export async function createSpaceStationScene(engine: AbstractEngine): Promise<S
     camera.maxZ = 100e3;
     camera.attachControl();
 
-    scene.enableDepthRenderer(camera, false, true);
-
     const distanceToStar = Settings.AU;
 
     defaultControls.getTransform().setAbsolutePosition(new Vector3(0, 2, -3).normalize().scaleInPlace(40e3));
