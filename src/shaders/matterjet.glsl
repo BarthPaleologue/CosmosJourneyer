@@ -66,7 +66,7 @@ float spiralDensity(vec3 p, float coneTheta, float coneHeight) {
 
     float density = 1.0;
 
-    density *= exp(-0.1 * dist * dist);
+    density *= exp(-0.02 * dist * dist);
     
     density *= 1.0 - smoothstep(0.0, 1.0, heightFraction);
     
@@ -215,7 +215,7 @@ vec3 rayMarchSpiral(vec3 rayOrigin, vec3 rayDir, float distThrough, int nbSteps,
 
         float density = spiralDensity(p, coneTheta * 0.7, coneHeight);
     
-        vec3 emission = 10.0 * vec3(0.3, 0.6, 1.0) * density;
+        vec3 emission = 3.0 * vec3(0.3, 0.6, 1.0) * density;
         float absorption = 0.2 * density;
     
         transmittance *= exp(-absorption * stepSize);
