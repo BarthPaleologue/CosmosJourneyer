@@ -41,8 +41,6 @@ export async function createHyperspaceTunnelDemo(
     const camera = defaultControls.getActiveCamera();
     camera.attachControl();
 
-    scene.enableDepthRenderer(camera, false, true);
-
     const textures = await loadTextures((loadedCount, totalCount, name) => {
         progressCallback(loadedCount / totalCount, `Loading ${name}`);
     }, scene);
