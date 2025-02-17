@@ -40,7 +40,7 @@ export function newSeededNeutronStarModel(
 ): NeutronStarModel {
     const rng = getRngFromSeed(seed);
 
-    const mass = 1000;
+    const mass = 1.9885e30; //TODO: compute mass from physical properties
 
     // https://arxiv.org/pdf/2402.14030 and https://en.wikipedia.org/wiki/Neutron_star#:~:text=Because%20it%20has%20only%20a,1.4%20ms%20to%2030%20s.
     const siderealDaySeconds = clamp(1.4e-3, 30, normalRandom(0.5e-2, 5e-3, rng, GenerationSteps.SIDEREAL_DAY_SECONDS));
