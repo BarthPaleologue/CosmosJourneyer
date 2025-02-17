@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Orbit } from "../../orbit/orbit";
-import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
+import { normalRandom, randRange, randRangeInt, uniformRandBool } from "extended-random";
 import { clamp } from "../../utils/math";
 import { newSeededRingsModel } from "../../rings/ringsModel";
 import { GenerationSteps } from "../../utils/generationSteps";
@@ -25,6 +25,14 @@ import { OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
 import { NeutronStarModel } from "./neutronStarModel";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 
+/**
+ * Creates a new pseudo-random neutron star model
+ * @param seed The seed to use for the pseudo-random number generator
+ * @param name The name of the neutron star
+ * @param parentBodies The parent bodies of the neutron star (an empty array if it is the primary body of the system)
+ * @returns A new neutron star model
+ * @see https://arxiv.org/pdf/2402.14030 "On the initial spin period distribution of neutron stars"
+ */
 export function newSeededNeutronStarModel(
     seed: number,
     name: string,
@@ -32,13 +40,17 @@ export function newSeededNeutronStarModel(
 ): NeutronStarModel {
     const rng = getRngFromSeed(seed);
 
-    const temperature = randRangeInt(200_000, 5_000_000_000, rng, GenerationSteps.TEMPERATURE);
-    const mass = 1000;
-    const siderealDaySeconds = 24 * 60 * 60;
-    const blackBodyTemperature = temperature;
+    const mass = 1.9885e30; //TODO: compute mass from physical properties
+
+    // https://arxiv.org/pdf/2402.14030 and https://en.wikipedia.org/wiki/Neutron_star#:~:text=Because%20it%20has%20only%20a,1.4%20ms%20to%2030%20s.
+    const siderealDaySeconds = clamp(1.4e-3, 30, normalRandom(0.5e-2, 5e-3, rng, GenerationSteps.SIDEREAL_DAY_SECONDS));
+
+    const blackBodyTemperature = randRangeInt(200_000, 5_000_000_000, rng, GenerationSteps.TEMPERATURE);
     const axialTilt = 0;
 
     const radius = clamp(normalRandom(10e3, 1e3, rng, GenerationSteps.RADIUS), 2e3, 50e3);
+
+    const dipoleTilt = randRange(-Math.PI / 6, Math.PI / 6, rng, GenerationSteps.DIPOLE_TILT);
 
     // Todo: do not hardcode
     const orbitRadius = rng(GenerationSteps.ORBIT) * 5000000e3;
@@ -58,15 +70,16 @@ export function newSeededNeutronStarModel(
     const rings = uniformRandBool(ringProportion, rng, GenerationSteps.RINGS) ? newSeededRingsModel(rng) : null;
 
     return {
-        name: name,
-        seed: seed,
         type: OrbitalObjectType.NEUTRON_STAR,
-        blackBodyTemperature: blackBodyTemperature,
+        name,
+        seed,
+        blackBodyTemperature,
+        dipoleTilt,
         mass,
         siderealDaySeconds,
         axialTilt,
-        radius: radius,
-        orbit: orbit,
-        rings: rings
+        radius,
+        orbit,
+        rings
     };
 }

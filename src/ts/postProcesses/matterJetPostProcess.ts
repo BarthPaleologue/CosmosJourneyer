@@ -27,36 +27,38 @@ import { Constants } from "@babylonjs/core/Engines/constants";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { Matrix } from "@babylonjs/core/Maths/math.vector";
 
 export type MatterJetUniforms = {
-    // the rotation period in seconds of the matter jet
-    rotationPeriod: number;
-    time: number;
+    elapsedSeconds: number;
+    inverseRotation: Matrix;
+    dipoleTilt: number;
 };
 
 /**
  * Post process for rendering matter jets that are used by neutron stars for example
  */
 export class MatterJetPostProcess extends PostProcess implements UpdatablePostProcess {
-    matterJetUniforms: MatterJetUniforms;
+    readonly matterJetUniforms: MatterJetUniforms;
 
     private activeCamera: Camera | null = null;
 
-    constructor(stellarTransform: TransformNode, boundingRadius: number, scene: Scene) {
+    constructor(stellarTransform: TransformNode, boundingRadius: number, dipoleTilt: number, scene: Scene) {
         const shaderName = "matterjet";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = matterJetFragment;
         }
 
         const settings: MatterJetUniforms = {
-            rotationPeriod: 1.5,
-            time: 0
+            elapsedSeconds: 0,
+            inverseRotation: Matrix.Identity(),
+            dipoleTilt: dipoleTilt
         };
 
         const MatterJetUniformNames = {
             TIME: "time",
-            ROTATION_PERIOD: "rotationPeriod",
-            ROTATION_AXIS: "rotationAxis"
+            INVERSE_ROTATION: "inverseRotation",
+            DIPOLE_TILT: "dipoleTilt"
         };
 
         const uniforms: string[] = [
@@ -95,18 +97,20 @@ export class MatterJetPostProcess extends PostProcess implements UpdatablePostPr
             setCameraUniforms(effect, this.activeCamera);
             setObjectUniforms(effect, stellarTransform, boundingRadius);
 
-            effect.setFloat(
-                MatterJetUniformNames.TIME,
-                this.matterJetUniforms.time % (this.matterJetUniforms.rotationPeriod * 10000)
-            );
-            effect.setFloat(MatterJetUniformNames.ROTATION_PERIOD, this.matterJetUniforms.rotationPeriod);
-            effect.setVector3(MatterJetUniformNames.ROTATION_AXIS, stellarTransform.up);
+            effect.setFloat(MatterJetUniformNames.TIME, this.matterJetUniforms.elapsedSeconds % 10000);
+
+            stellarTransform.getWorldMatrix().getRotationMatrixToRef(this.matterJetUniforms.inverseRotation);
+            this.matterJetUniforms.inverseRotation.transposeToRef(this.matterJetUniforms.inverseRotation);
+
+            effect.setMatrix(MatterJetUniformNames.INVERSE_ROTATION, this.matterJetUniforms.inverseRotation);
+
+            effect.setFloat(MatterJetUniformNames.DIPOLE_TILT, this.matterJetUniforms.dipoleTilt);
 
             setSamplerUniforms(effect, this.activeCamera, scene);
         });
     }
 
-    public update(deltaTime: number): void {
-        this.matterJetUniforms.time += deltaTime;
+    public update(deltaSeconds: number): void {
+        this.matterJetUniforms.elapsedSeconds += deltaSeconds;
     }
 }

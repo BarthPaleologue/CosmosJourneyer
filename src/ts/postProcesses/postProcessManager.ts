@@ -321,6 +321,7 @@ export class PostProcessManager {
         const matterJets = new MatterJetPostProcess(
             neutronStar.getTransform(),
             neutronStar.getBoundingRadius(),
+            neutronStar.model.dipoleTilt,
             this.scene
         );
         this.matterJets.push(matterJets);
