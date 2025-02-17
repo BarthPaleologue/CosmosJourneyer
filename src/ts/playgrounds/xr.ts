@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ArcRotateCamera, PostProcess, TransformNode } from "@babylonjs/core";
+import { ArcRotateCamera, Color4, PostProcess, TransformNode } from "@babylonjs/core";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
@@ -49,7 +49,8 @@ export async function createXrScene(
     camera.wheelPrecision *= 100;
     camera.minZ = 0.01;
 
-    const depthRenderer = scene.enableDepthRenderer(null, false, true);
+    const depthRenderer = scene.enableDepthRenderer(null, true, true);
+    depthRenderer.clearColor = new Color4(0, 0, 0, 1);
 
     function createMandelbulb(): TransformNode {
         const mandelBulbModel = newSeededMandelbulbModel("mandelbulb", Math.random() * 100_000, "XR Anomaly", []);
