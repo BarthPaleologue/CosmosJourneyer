@@ -15,16 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { makeNoise3D } from "fast-simplex-noise";
 import { Tools } from "@babylonjs/core/Misc/tools";
-import { getRngFromSeed } from "./utils/getRngFromSeed";
 
 export const Settings = {
     UNIVERSE_SEED: Math.PI,
 
     POWER_PLAY_SEED: 77,
 
-    EARTH_RADIUS: 1000e3, // target is 6000e3
+    EARTH_RADIUS: 6000e3, // target is 6000e3
 
     EARTH_MASS: 5.972e24,
 

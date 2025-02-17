@@ -39,7 +39,7 @@ export function newSeededMandelboxModel(seed: number, name: string): MandelboxMo
     );
 
     // Todo: do not hardcode
-    const orbitRadius = rng(GenerationSteps.ORBIT) * 15e9;
+    const orbitRadius = rng(GenerationSteps.ORBIT) * 90e9;
 
     const orbitalP = clamp(0.5, 3.0, normalRandom(1.0, 0.3, rng, GenerationSteps.ORBIT + 80));
 
