@@ -50,7 +50,7 @@ export function newSeededNeutronStarModel(
 
     const radius = clamp(normalRandom(10e3, 1e3, rng, GenerationSteps.RADIUS), 2e3, 50e3);
 
-    const dipoleTilt = randRange(-Math.PI / 3, Math.PI / 3, rng, GenerationSteps.DIPOLE_TILT);
+    const dipoleTilt = randRange(-Math.PI / 6, Math.PI / 6, rng, GenerationSteps.DIPOLE_TILT);
 
     // Todo: do not hardcode
     const orbitRadius = rng(GenerationSteps.ORBIT) * 5000000e3;

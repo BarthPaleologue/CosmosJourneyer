@@ -213,7 +213,7 @@ vec3 rayMarchSpiral(vec3 rayOrigin, vec3 rayDir, float distThrough, int nbSteps,
     for(int i = 0; i < nbSteps; i++) {
         vec3 p = rayOrigin + float(i) * stepSize * rayDir;
 
-        float density = spiralDensity(p, coneTheta * 0.2, coneHeight);
+        float density = spiralDensity(p, coneTheta * 0.7, coneHeight);
     
         vec3 emission = 10.0 * vec3(0.3, 0.6, 1.0) * density;
         float absorption = 0.2 * density;
