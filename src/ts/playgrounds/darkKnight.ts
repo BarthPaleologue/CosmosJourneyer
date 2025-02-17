@@ -43,8 +43,6 @@ export async function createDarkKnightScene(
     // This attaches the camera to the canvas
     camera.attachControl();
 
-    scene.enableDepthRenderer();
-
     // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
     const light = new HemisphericLight("light1", new Vector3(0, 1, 0), scene);
 
