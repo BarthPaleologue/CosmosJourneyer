@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AbstractEngine, Scene, ArcRotateCamera, Vector3 } from "@babylonjs/core";
+import { AbstractEngine, Scene, ArcRotateCamera, Vector3, Color4 } from "@babylonjs/core";
 import { EmptyCelestialBody } from "../../utils/emptyCelestialBody";
 import { newSeededMandelboxModel } from "../../anomalies/mandelbox/mandelboxModelGenerator";
 import { MandelboxPostProcess } from "../../anomalies/mandelbox/mandelboxPostProcess";
@@ -35,7 +35,8 @@ export function createMandelboxScene(
     camera.wheelPrecision *= 100;
     camera.minZ = 0.01;
 
-    const depthRenderer = scene.enableDepthRenderer(null, false, true);
+    const depthRenderer = scene.enableDepthRenderer(camera, true, true);
+    depthRenderer.clearColor = new Color4(0, 0, 0, 1);
 
     const model = newSeededMandelboxModel(
         "mandelbox",

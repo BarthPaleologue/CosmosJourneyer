@@ -25,7 +25,7 @@ import { newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutron
 import { MatterJetPostProcess } from "../postProcesses/matterJetPostProcess";
 import { VolumetricLight } from "../volumetricLight/volumetricLight";
 import { translate } from "../uberCore/transforms/basicTransform";
-import { Axis } from "@babylonjs/core";
+import { Axis, Color4 } from "@babylonjs/core";
 import { LensFlarePostProcess } from "../postProcesses/lensFlarePostProcess";
 import { getRgbFromTemperature } from "../utils/specrend";
 import { createTexturePools } from "../assets/textures";
@@ -46,10 +46,12 @@ export async function createNeutronStarScene(
 
     const camera = defaultControls.getActiveCamera();
     camera.attachControl();
+    camera.maxZ = 0;
 
     scene.activeCamera = camera;
 
-    scene.enableDepthRenderer(camera, false, true);
+    const depthRenderer = scene.enableDepthRenderer(camera, true, true);
+    depthRenderer.clearColor = new Color4(0, 0, 0, 1);
 
     const neutronStarModel = newSeededNeutronStarModel("neutronStar", 456, "Neutron Star Demo", []);
     const neutronStar = new NeutronStar(neutronStarModel, texturePools, scene);

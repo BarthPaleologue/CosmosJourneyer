@@ -18,7 +18,7 @@
 import "../styles/index.scss";
 
 import "@babylonjs/inspector";
-import { PhysicsViewer, Tools, Engine } from "@babylonjs/core";
+import { PhysicsViewer, Tools, WebGPUEngine } from "@babylonjs/core";
 import { LoadingScreen } from "./uberCore/loadingScreen";
 import { PlaygroundRegistry } from "./playgrounds/playgroundRegistry";
 
@@ -32,7 +32,18 @@ const progressCallback = (progress01: number, text: string) => {
     loadingScreen.loadingUIText = text;
 };
 
-const engine = new Engine(canvas, true);
+const engine = new WebGPUEngine(canvas, {
+    antialias: true,
+    audioEngine: true,
+    useHighPrecisionMatrix: true,
+    doNotHandleContextLost: true
+});
+
+await engine.initAsync(undefined, {
+    wasmPath: new URL("./utils/TWGSL/twgsl.wasm", import.meta.url).href,
+    jsPath: new URL("./utils/TWGSL/twgsl.js", import.meta.url).href
+});
+
 engine.useReverseDepthBuffer = true;
 engine.loadingScreen = loadingScreen;
 engine.displayLoadingUI();

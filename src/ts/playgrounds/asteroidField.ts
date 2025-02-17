@@ -44,8 +44,6 @@ export async function createAsteroidFieldScene(
     const camera = defaultControls.getActiveCamera();
     camera.attachControl();
 
-    scene.enableDepthRenderer(camera, false, true);
-
     const assets = await loadRenderingAssets((loadedCount, totalCount, name) => {
         progressCallback(loadedCount / totalCount, `Loading ${name}`);
     }, scene);
