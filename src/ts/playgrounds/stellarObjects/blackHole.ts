@@ -50,7 +50,8 @@ export async function createBlackHoleScene(
 
     scene.activeCamera = camera;
 
-    scene.enableDepthRenderer(camera, false, true);
+    const depthRenderer = scene.enableDepthRenderer(null, true, true);
+    depthRenderer.clearColor.set(0, 0, 0, 1);
 
     new StarFieldBox(textures.environment.milkyWay, 1000e3, scene);
 
