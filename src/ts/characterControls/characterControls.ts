@@ -33,6 +33,8 @@ import { Transformable } from "../architecture/transformable";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { CharacterInputs } from "./characterControlsInputs";
 import { Objects } from "../assets/objects";
+import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
+import { Skeleton } from "@babylonjs/core/Bones/skeleton";
 
 class AnimationGroupWrapper {
     name: string;
@@ -68,6 +70,14 @@ class AnimationState {
 
 export class CharacterControls implements Controls {
     readonly character: AbstractMesh;
+
+    readonly characterNode: AbstractMesh;
+
+    readonly skeleton: Skeleton;
+
+    readonly headTransform: TransformNode;
+
+    private readonly firstPersonCamera: FreeCamera;
     private readonly thirdPersonCamera: ArcRotateCamera;
 
     private readonly characterWalkSpeed = 1.8;
@@ -177,6 +187,27 @@ export class CharacterControls implements Controls {
 
         this.targetAnim = this.idleAnim;
 
+        this.firstPersonCamera = new FreeCamera("characterFirstPersonCamera", Vector3.Zero(), scene);
+
+        const skeleton = this.character.getChildMeshes().find((mesh) => mesh.skeleton !== null)?.skeleton;
+        if (skeleton === undefined || skeleton === null) throw new Error("Skeleton not found");
+
+        this.skeleton = skeleton;
+
+        const characterNode = this.character.getChildMeshes().find((mesh) => mesh.name.includes("Alpha_Joints"));
+        if (characterNode === undefined) {
+            throw new Error("Could not find the Alpha_Joints node in the character mesh");
+        }
+        this.characterNode = characterNode;
+
+        const headBoneIndex = skeleton.getBoneIndexByName("mixamorig:Head");
+
+        this.headTransform = new TransformNode("headTransform", scene);
+        this.headTransform.scaling.scaleInPlace(20);
+        this.headTransform.attachToBone(skeleton.bones[headBoneIndex], characterNode);
+
+        this.firstPersonCamera.parent = this.headTransform;
+
         this.thirdPersonCamera = new ArcRotateCamera(
             "characterThirdPersonCamera",
             1.0,
@@ -198,11 +229,11 @@ export class CharacterControls implements Controls {
     }
 
     public getActiveCamera(): Camera {
-        return this.thirdPersonCamera;
+        return this.firstPersonCamera;
     }
 
     public getCameras(): Camera[] {
-        return [this.thirdPersonCamera];
+        return [this.firstPersonCamera, this.thirdPersonCamera];
     }
 
     public getTransform(): TransformNode {

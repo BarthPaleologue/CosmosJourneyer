@@ -26,7 +26,8 @@ import {
     PBRMetallicRoughnessMaterial,
     PhysicsAggregate,
     PhysicsShapeType,
-    ShadowGenerator
+    ShadowGenerator,
+    SkeletonViewer
 } from "@babylonjs/core";
 import { enablePhysics } from "./utils";
 import { Objects } from "../assets/objects";
@@ -53,12 +54,19 @@ export async function createCharacterDemoScene(engine: AbstractEngine): Promise<
     const character = new CharacterControls(scene);
     character.getTransform().position.y = 5;
 
+    // Create a skeleton viewer for the mesh
+    const skeletonViewer = new SkeletonViewer(character.skeleton, character.characterNode, scene);
+    skeletonViewer.isEnabled = true; // Enable it
+    skeletonViewer.color = Color3.Red(); // Change default color from white to red
+
     CharacterInputs.setEnabled(true);
 
     shadowGenerator.addShadowCaster(character.character);
 
     const camera = character.getActiveCamera();
     camera.attachControl();
+
+    scene.activeCamera = camera;
 
     const ground = MeshBuilder.CreateBox("ground", { width: 20, height: 1, depth: 20 }, scene);
 
