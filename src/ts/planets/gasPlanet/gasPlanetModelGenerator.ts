@@ -17,19 +17,21 @@
 
 import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../../settings";
-import { Orbit } from "../../orbit/orbit";
+import { getOrbitalPeriod, Orbit } from "../../orbit/orbit";
 import { newSeededRingsModel } from "../../rings/ringsModel";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
-import { CelestialBodyModel } from "../../architecture/orbitalObjectModel";
+import { StellarObjectModel } from "../../architecture/orbitalObjectModel";
 import { GasPlanetModel } from "./gasPlanetModel";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { Tools } from "@babylonjs/core/Misc/tools";
+import { Lerp } from "@babylonjs/core/Maths/math.scalar.functions";
+import { getCurrentUniverseYear, getTidalLockingTimescale } from "../../utils/physics";
 
 export function newSeededGasPlanetModel(
     seed: number,
     name: string,
-    parentBodies: CelestialBodyModel[]
+    parentBodies: StellarObjectModel[]
 ): GasPlanetModel {
     const rng = getRngFromSeed(seed);
 
@@ -64,9 +66,22 @@ export function newSeededGasPlanetModel(
         argumentOfPeriapsis: 0,
         initialMeanAnomaly: 0
     };
+
     const mass = Settings.JUPITER_MASS * (radius / 69_911e3) ** 3;
     const axialTilt = normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT);
-    const siderealDaySeconds = (24 * 60 * 60) / 10;
+
+    const parentMassSum = parentBodies.reduce((sum, body) => sum + body.mass, 0);
+
+    const tidalLockingTimescale = getTidalLockingTimescale(parentMassSum, mass, orbitRadius, radius, 0);
+
+    const parentMaxBirthYear = parentBodies.reduce((max, body) => Math.max(max, body.birthYear), 0);
+    const currentAge = getCurrentUniverseYear() - parentMaxBirthYear;
+
+    const tidalLockingFactor = Math.min(1, currentAge / tidalLockingTimescale);
+
+    const orbitalPeriod = getOrbitalPeriod(orbit.semiMajorAxis, parentMassSum);
+
+    const siderealDaySeconds = Lerp(60 * 60 * 24, orbitalPeriod, tidalLockingFactor);
 
     const rings = uniformRandBool(0.8, rng, GenerationSteps.RINGS) ? newSeededRingsModel(rng) : null;
 

@@ -35,5 +35,7 @@ export const enum GenerationSteps {
 
     DIPOLE_TILT = 1300,
 
-    SIDEREAL_DAY_SECONDS = 2500
+    SIDEREAL_DAY_SECONDS = 2500,
+
+    BIRTH_YEAR = 2200
 }

@@ -16,13 +16,14 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Settings } from "../settings";
+import { Lerp } from "@babylonjs/core/Maths/math.scalar.functions";
 
 /**
  * Applies Stefan-Boltzmann law to calculate the energy flux of a black body.
  * @param temperatureKelvin The temperature of the black body in Kelvin.
  */
 export function getRadiatedEnergyFlux(temperatureKelvin: number) {
-    return 5.67e-8 * temperatureKelvin ** 4;
+    return Settings.STEFAN_BOLTZMANN_CONSTANT * temperatureKelvin ** 4;
 }
 
 /**
@@ -194,4 +195,36 @@ export function getOrbitRadiusFromPeriod(period: number, parentMass: number) {
 export function getApparentGravityOnSpaceTether(period: number, mass: number, distance: number) {
     const omega = (2 * Math.PI) / period;
     return (-Settings.G * mass) / (distance * distance) + distance * omega * omega;
+}
+
+/**
+ * Returns the lifetime (years) of a main sequence star given its mass (kg) and luminosity (W)
+ * @param mass The mass of the star in kilograms
+ * @param luminosity The luminosity of the star in watts
+ * @see https://en.wikipedia.org/wiki/Main_sequence#Lifetime
+ */
+export function getMainSequenceStarLifetime(mass: number, luminosity: number) {
+    return (mass / Settings.SOLAR_MASS) * (Settings.SOLAR_LUMINOSITY / luminosity) * 1e10;
+}
+
+/**
+ * Returns the current year in the universe since the big bang
+ * This is based on the approximation that the year 0 in the Gregorian calendar corresponds to 13.8 billion years after the big bang
+ */
+export function getCurrentUniverseYear(): number {
+    return Settings.GREGORIAN_YEAR_0 + new Date().getFullYear();
+}
+
+/**
+ * Returns the timescale for a satellite to become tidally locked to its parent
+ * @param massParent The mass of the parent object in kilograms
+ * @param massSatellite The mass of the satellite in kilograms
+ * @param semiMajorAxis The semi-major axis of the satellite in meters
+ * @param satelliteRadius The radius of the satellite in meters
+ * @param rockyIcy01 A factor to determine if the satellite is rocky or icy (between 0 and 1, 0 for rocky, 1 for icy)
+ * @see https://en.wikipedia.org/wiki/Tidal_locking#Timescale
+ */
+export function getTidalLockingTimescale(massParent: number, massSatellite: number, semiMajorAxis: number, satelliteRadius: number, rockyIcy01: number) {
+    const mu = Lerp(3e10, 4e9, rockyIcy01);
+    return (6e10 * (satelliteRadius * mu * semiMajorAxis ** 6)) / (massSatellite * massParent * massParent);
 }

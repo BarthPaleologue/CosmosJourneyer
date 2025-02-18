@@ -25,6 +25,12 @@ export type StarModel = OrbitalObjectModelBase<OrbitalObjectType.STAR> &
         readonly radius: number;
 
         /**
+         * The birth year of the star system. 0 corresponds to the big bang.
+         * The birth year corresponds to the year when a stellar object was formed in the star system (first fusion for a star, creation of a singularity for a black hole, etc.).
+         */
+        readonly birthYear: number;
+
+        /**
          * Black body temperature of the object in Kelvin
          */
         blackBodyTemperature: number;
