@@ -27,8 +27,7 @@ import {
     PBRMetallicRoughnessMaterial,
     PhysicsAggregate,
     PhysicsShapeType,
-    ShadowGenerator,
-    SkeletonViewer
+    ShadowGenerator
 } from "@babylonjs/core";
 import { enablePhysics } from "./utils";
 import { Objects } from "../assets/objects";
@@ -59,25 +58,20 @@ export async function createCharacterDemoScene(engine: AbstractEngine): Promise<
     shadowGenerator.useBlurExponentialShadowMap = true;
 
     const character = new CharacterControls(scene);
-    character.getTransform().position.y = 5;
-
-    // Create a skeleton viewer for the mesh
-    const skeletonViewer = new SkeletonViewer(character.skeleton, character.characterNode, scene);
-    skeletonViewer.isEnabled = true; // Enable it
-    skeletonViewer.color = Color3.Red(); // Change default color from white to red
+    character.getTransform().position.y = 30;
 
     CharacterInputs.setEnabled(true);
 
     shadowGenerator.addShadowCaster(character.character);
 
-    const camera = character.getActiveCamera();
+    const camera = character.getCameras()[1];
     camera.attachControl();
 
     scene.activeCamera = camera;
 
-    const ground = MeshBuilder.CreateBox("ground", { width: 20, height: 1, depth: 20 }, scene);
+    const ground = MeshBuilder.CreateIcoSphere("ground", { radius: 20 }, scene);
 
-    const groundAggregate = new PhysicsAggregate(ground, PhysicsShapeType.BOX, { mass: 0 }, scene);
+    const groundAggregate = new PhysicsAggregate(ground, PhysicsShapeType.SPHERE, { mass: 0 }, scene);
 
     const groundMaterial = new PBRMetallicRoughnessMaterial("groundMaterial", scene);
     groundMaterial.baseColor = new Color3(0.5, 0.5, 0.5);
@@ -85,24 +79,37 @@ export async function createCharacterDemoScene(engine: AbstractEngine): Promise<
     ground.receiveShadows = true;
 
     const box1 = MeshBuilder.CreateBox("box1", { width: 1, height: 1, depth: 1 }, scene);
-    box1.position.y = 0.5;
-    box1.position.x = 2;
-    box1.position.z = 4;
+    box1.position.x = 22;
     shadowGenerator.addShadowCaster(box1);
 
     const box1Aggregate = new PhysicsAggregate(box1, PhysicsShapeType.BOX, { mass: 1 }, scene);
 
     const box2 = MeshBuilder.CreateBox("box2", { width: 1, height: 1, depth: 1 }, scene);
-    box2.position.y = 0.5;
-    box2.position.x = -2;
-    box2.position.z = 4;
+    box2.position.x = -22;
     shadowGenerator.addShadowCaster(box2);
 
     const box2Aggregate = new PhysicsAggregate(box2, PhysicsShapeType.BOX, { mass: 1 }, scene);
 
+    character.setClosestWalkableObject({
+        getTransform: () => ground,
+        dispose: () => ground.dispose()
+    });
+
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
         character.update(deltaSeconds);
+
+        const box1Gravity = ground.position
+            .subtract(box1Aggregate.transformNode.position)
+            .normalize()
+            .scaleInPlace(9.81);
+        box1Aggregate.body.applyForce(box1Gravity, box1.position);
+
+        const box2Gravity = ground.position
+            .subtract(box2Aggregate.transformNode.position)
+            .normalize()
+            .scaleInPlace(9.81);
+        box2Aggregate.body.applyForce(box2Gravity, box2.position);
     });
 
     return scene;
