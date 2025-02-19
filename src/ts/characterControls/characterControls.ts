@@ -203,7 +203,7 @@ export class CharacterControls implements Controls {
         }
         this.characterNode = characterNode;
 
-        const headBoneIndex = skeleton.getBoneIndexByName("mixamorig:Head");
+        const headBoneIndex = skeleton.getBoneIndexByName("mixamorig:HeadTop_End");
 
         this.headTransform = new TransformNode("headTransform", scene);
         this.headTransform.scaling.scaleInPlace(20);
