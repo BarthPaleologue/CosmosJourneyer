@@ -22,6 +22,7 @@ import {
     AssetsManager,
     Color3,
     DirectionalLight,
+    HemisphericLight,
     MeshBuilder,
     PBRMetallicRoughnessMaterial,
     PhysicsAggregate,
@@ -31,7 +32,6 @@ import {
 } from "@babylonjs/core";
 import { enablePhysics } from "./utils";
 import { Objects } from "../assets/objects";
-import { CollisionMask } from "../settings";
 import { CharacterControls } from "../characterControls/characterControls";
 import { CharacterInputs } from "../characterControls/characterControlsInputs";
 
@@ -39,7 +39,11 @@ export async function createCharacterDemoScene(engine: AbstractEngine): Promise<
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
-    await enablePhysics(scene);
+    await enablePhysics(scene, new Vector3(0, -9.81, 0));
+
+    engine.getRenderingCanvas()?.addEventListener("click", async () => {
+        await engine.getRenderingCanvas()?.requestPointerLock();
+    });
 
     const assetsManager = new AssetsManager(scene);
     Objects.EnqueueTasks(assetsManager, scene);
@@ -47,6 +51,9 @@ export async function createCharacterDemoScene(engine: AbstractEngine): Promise<
 
     const light = new DirectionalLight("dir01", new Vector3(1, -2, -1), scene);
     light.position = new Vector3(5, 5, 5).scaleInPlace(10);
+
+    const hemi = new HemisphericLight("hemi", new Vector3(0, 1, 0), scene);
+    hemi.intensity = 0.5;
 
     const shadowGenerator = new ShadowGenerator(1024, light);
     shadowGenerator.useBlurExponentialShadowMap = true;
@@ -71,13 +78,27 @@ export async function createCharacterDemoScene(engine: AbstractEngine): Promise<
     const ground = MeshBuilder.CreateBox("ground", { width: 20, height: 1, depth: 20 }, scene);
 
     const groundAggregate = new PhysicsAggregate(ground, PhysicsShapeType.BOX, { mass: 0 }, scene);
-    groundAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
-    groundAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
 
     const groundMaterial = new PBRMetallicRoughnessMaterial("groundMaterial", scene);
     groundMaterial.baseColor = new Color3(0.5, 0.5, 0.5);
     ground.material = groundMaterial;
     ground.receiveShadows = true;
+
+    const box1 = MeshBuilder.CreateBox("box1", { width: 1, height: 1, depth: 1 }, scene);
+    box1.position.y = 0.5;
+    box1.position.x = 2;
+    box1.position.z = 4;
+    shadowGenerator.addShadowCaster(box1);
+
+    const box1Aggregate = new PhysicsAggregate(box1, PhysicsShapeType.BOX, { mass: 1 }, scene);
+
+    const box2 = MeshBuilder.CreateBox("box2", { width: 1, height: 1, depth: 1 }, scene);
+    box2.position.y = 0.5;
+    box2.position.x = -2;
+    box2.position.z = 4;
+    shadowGenerator.addShadowCaster(box2);
+
+    const box2Aggregate = new PhysicsAggregate(box2, PhysicsShapeType.BOX, { mass: 1 }, scene);
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
