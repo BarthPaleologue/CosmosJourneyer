@@ -190,6 +190,7 @@ export class CharacterControls implements Controls {
         this.firstPersonCamera = new FreeCamera("characterFirstPersonCamera", Vector3.Zero(), scene);
         this.firstPersonCamera.minZ = 0.2;
         this.firstPersonCamera.parent = this.getTransform();
+        this.firstPersonCamera.rotationQuaternion = Quaternion.Identity();
 
         const skeleton = this.character.getChildMeshes().find((mesh) => mesh.skeleton !== null)?.skeleton;
         if (skeleton === undefined || skeleton === null) throw new Error("Skeleton not found");
