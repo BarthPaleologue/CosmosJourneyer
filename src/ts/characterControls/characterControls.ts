@@ -25,7 +25,7 @@ import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { CollisionMask, Settings } from "../settings";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
-import { Quaternion } from "@babylonjs/core/Maths/math";
+import { Axis, Quaternion, Space } from "@babylonjs/core/Maths/math";
 import "@babylonjs/core/Collisions/collisionCoordinator";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
@@ -188,9 +188,9 @@ export class CharacterControls implements Controls {
         this.targetAnim = this.idleAnim;
 
         this.firstPersonCamera = new FreeCamera("characterFirstPersonCamera", Vector3.Zero(), scene);
+        this.firstPersonCamera.speed = 0;
         this.firstPersonCamera.minZ = 0.2;
         this.firstPersonCamera.parent = this.getTransform();
-        this.firstPersonCamera.rotationQuaternion = Quaternion.Identity();
 
         const skeleton = this.character.getChildMeshes().find((mesh) => mesh.skeleton !== null)?.skeleton;
         if (skeleton === undefined || skeleton === null) throw new Error("Skeleton not found");
@@ -247,6 +247,11 @@ export class CharacterControls implements Controls {
             this.headTransform.getAbsolutePosition(),
             inverseTransform
         );
+
+        this.getTransform().rotate(Axis.Y, this.firstPersonCamera.rotation.y, Space.LOCAL);
+        this.getTransform().computeWorldMatrix(true);
+        this.firstPersonCamera.rotation.y = 0;
+        this.firstPersonCamera.getViewMatrix(true);
 
         const character = this.getTransform();
         const start = character.getAbsolutePosition().add(character.up.scale(50e3));
@@ -426,6 +431,7 @@ export class CharacterControls implements Controls {
 
     dispose() {
         this.character.dispose();
+        this.firstPersonCamera.dispose();
         this.thirdPersonCamera.dispose();
     }
 }
