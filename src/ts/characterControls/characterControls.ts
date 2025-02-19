@@ -188,6 +188,8 @@ export class CharacterControls implements Controls {
         this.targetAnim = this.idleAnim;
 
         this.firstPersonCamera = new FreeCamera("characterFirstPersonCamera", Vector3.Zero(), scene);
+        this.firstPersonCamera.minZ = 0.2;
+        this.firstPersonCamera.parent = this.getTransform();
 
         const skeleton = this.character.getChildMeshes().find((mesh) => mesh.skeleton !== null)?.skeleton;
         if (skeleton === undefined || skeleton === null) throw new Error("Skeleton not found");
@@ -205,8 +207,6 @@ export class CharacterControls implements Controls {
         this.headTransform = new TransformNode("headTransform", scene);
         this.headTransform.scaling.scaleInPlace(20);
         this.headTransform.attachToBone(skeleton.bones[headBoneIndex], characterNode);
-
-        this.firstPersonCamera.parent = this.headTransform;
 
         this.thirdPersonCamera = new ArcRotateCamera(
             "characterThirdPersonCamera",
@@ -241,6 +241,12 @@ export class CharacterControls implements Controls {
     }
 
     public update(deltaTime: number): Vector3 {
+        const inverseTransform = this.getTransform().getWorldMatrix().clone().invert();
+        this.firstPersonCamera.position = Vector3.TransformCoordinates(
+            this.headTransform.getAbsolutePosition(),
+            inverseTransform
+        );
+
         const character = this.getTransform();
         const start = character.getAbsolutePosition().add(character.up.scale(50e3));
         const end = character.position.add(character.up.scale(-50e3));
