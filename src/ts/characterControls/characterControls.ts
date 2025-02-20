@@ -79,6 +79,7 @@ export class CharacterControls implements Controls {
 
     private readonly firstPersonCamera: FreeCamera;
     private readonly thirdPersonCamera: ArcRotateCamera;
+    private activeCamera: Camera;
 
     private readonly characterWalkSpeed = 1.8;
     private readonly characterWalkSpeedBackwards = 1.2;
@@ -189,7 +190,7 @@ export class CharacterControls implements Controls {
 
         this.firstPersonCamera = new FreeCamera("characterFirstPersonCamera", Vector3.Zero(), scene);
         this.firstPersonCamera.speed = 0;
-        this.firstPersonCamera.minZ = 0.2;
+        this.firstPersonCamera.minZ = 1;
         this.firstPersonCamera.parent = this.getTransform();
 
         const skeleton = this.character.getChildMeshes().find((mesh) => mesh.skeleton !== null)?.skeleton;
@@ -211,9 +212,9 @@ export class CharacterControls implements Controls {
 
         this.thirdPersonCamera = new ArcRotateCamera(
             "characterThirdPersonCamera",
-            1.0,
-            -Math.PI / 4,
-            40,
+            -1.0,
+            Math.PI / 3,
+            10,
             new Vector3(0, 1.5, 0),
             scene
         );
@@ -223,6 +224,27 @@ export class CharacterControls implements Controls {
         this.thirdPersonCamera.maxZ = Settings.EARTH_RADIUS * 5;
         this.thirdPersonCamera.wheelPrecision *= 3;
         this.thirdPersonCamera.parent = this.getTransform();
+
+        this.activeCamera = this.firstPersonCamera;
+        this.setFirstPersonCameraActive();
+
+        CharacterInputs.map.toggleCamera.on("complete", () => {
+            if (this.getActiveCamera() === this.thirdPersonCamera) {
+                this.setFirstPersonCameraActive();
+            } else {
+                this.setThirdPersonCameraActive();
+            }
+        });
+    }
+
+    public setFirstPersonCameraActive() {
+        this.activeCamera = this.firstPersonCamera;
+        this.character.getChildMeshes().forEach((mesh) => mesh.setEnabled(false));
+    }
+
+    public setThirdPersonCameraActive() {
+        this.activeCamera = this.thirdPersonCamera;
+        this.character.getChildMeshes().forEach((mesh) => mesh.setEnabled(true));
     }
 
     public setClosestWalkableObject(object: Transformable | null) {
@@ -230,7 +252,7 @@ export class CharacterControls implements Controls {
     }
 
     public getActiveCamera(): Camera {
-        return this.firstPersonCamera;
+        return this.activeCamera;
     }
 
     public getCameras(): Camera[] {

@@ -48,16 +48,24 @@ const runAction = new Action({
     bindings: [runKey, runButton]
 });
 
+const toggleCameraInteraction = new PressInteraction(
+    new Action({
+        bindings: [keyboard.getControl("KeyB")]
+    })
+);
+
 export const CharacterInputs = new InputMap<{
     move: Action<[number, number]>;
     jump: PressInteraction;
     samba: Action<number>;
     run: Action<number>;
+    toggleCamera: PressInteraction;
 }>("CharacterInputs", {
     move: moveAction,
     jump: jumpInteraction,
     samba: sambaAction,
-    run: runAction
+    run: runAction,
+    toggleCamera: toggleCameraInteraction
 });
 
 CharacterInputs.setEnabled(false);

@@ -60,35 +60,20 @@ export async function createCharacterDemoScene(engine: AbstractEngine): Promise<
     const character = new CharacterControls(scene);
     character.getTransform().position.y = 30;
 
+    character.getActiveCamera().attachControl();
+
     CharacterInputs.setEnabled(true);
 
     shadowGenerator.addShadowCaster(character.character);
 
-    const camera = character.getCameras()[1];
-    camera.attachControl();
-
-    scene.activeCamera = camera;
-
     const ground = MeshBuilder.CreateIcoSphere("ground", { radius: 20 }, scene);
 
-    const groundAggregate = new PhysicsAggregate(ground, PhysicsShapeType.SPHERE, { mass: 0 }, scene);
+    const groundAggregate = new PhysicsAggregate(ground, PhysicsShapeType.MESH, { mass: 0 }, scene);
 
     const groundMaterial = new PBRMetallicRoughnessMaterial("groundMaterial", scene);
     groundMaterial.baseColor = new Color3(0.5, 0.5, 0.5);
     ground.material = groundMaterial;
     ground.receiveShadows = true;
-
-    const box1 = MeshBuilder.CreateBox("box1", { width: 1, height: 1, depth: 1 }, scene);
-    box1.position.x = 22;
-    shadowGenerator.addShadowCaster(box1);
-
-    const box1Aggregate = new PhysicsAggregate(box1, PhysicsShapeType.BOX, { mass: 1 }, scene);
-
-    const box2 = MeshBuilder.CreateBox("box2", { width: 1, height: 1, depth: 1 }, scene);
-    box2.position.x = -22;
-    shadowGenerator.addShadowCaster(box2);
-
-    const box2Aggregate = new PhysicsAggregate(box2, PhysicsShapeType.BOX, { mass: 1 }, scene);
 
     character.setClosestWalkableObject({
         getTransform: () => ground,
@@ -96,20 +81,16 @@ export async function createCharacterDemoScene(engine: AbstractEngine): Promise<
     });
 
     scene.onBeforeRenderObservable.add(() => {
+        if (character.getActiveCamera() !== scene.activeCamera) {
+            scene.activeCamera?.detachControl();
+
+            const camera = character.getActiveCamera();
+            camera.attachControl();
+            scene.activeCamera = camera;
+        }
+
         const deltaSeconds = engine.getDeltaTime() / 1000;
         character.update(deltaSeconds);
-
-        const box1Gravity = ground.position
-            .subtract(box1Aggregate.transformNode.position)
-            .normalize()
-            .scaleInPlace(9.81);
-        box1Aggregate.body.applyForce(box1Gravity, box1.position);
-
-        const box2Gravity = ground.position
-            .subtract(box2Aggregate.transformNode.position)
-            .normalize()
-            .scaleInPlace(9.81);
-        box2Aggregate.body.applyForce(box2Gravity, box2.position);
     });
 
     return scene;
