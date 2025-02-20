@@ -270,7 +270,7 @@ export class StarSystemView implements View {
             if (this.scene.getActiveControls() === this.getSpaceshipControls()) {
                 await this.switchToDefaultControls(true);
             } else if (this.scene.getActiveControls() === this.getDefaultControls()) {
-                this.switchToCharacterControls();
+                await this.switchToCharacterControls();
             } else if (this.scene.getActiveControls() === this.getCharacterControls()) {
                 this.switchToSpaceshipControls();
             }
@@ -941,6 +941,8 @@ export class StarSystemView implements View {
      * Switches the active controller to the spaceship controls
      */
     public switchToSpaceshipControls() {
+        document.exitPointerLock();
+
         const shipControls = this.getSpaceshipControls();
         const characterControls = this.getCharacterControls();
         const defaultControls = this.getDefaultControls();
@@ -962,7 +964,9 @@ export class StarSystemView implements View {
     /**
      * Switches the active controller to the character controls
      */
-    public switchToCharacterControls() {
+    public async switchToCharacterControls() {
+        await this.scene.getEngine().getRenderingCanvas()?.requestPointerLock();
+
         const shipControls = this.getSpaceshipControls();
         const characterControls = this.getCharacterControls();
         const defaultControls = this.getDefaultControls();
@@ -989,6 +993,8 @@ export class StarSystemView implements View {
      * Switches the active controller to the default controls
      */
     public async switchToDefaultControls(showHelpNotification: boolean) {
+        await this.scene.getEngine().getRenderingCanvas()?.requestPointerLock();
+
         const shipControls = this.getSpaceshipControls();
         const characterControls = this.getCharacterControls();
         const defaultControls = this.getDefaultControls();
