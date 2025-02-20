@@ -718,6 +718,11 @@ export class StarSystemView implements View {
         if (this.spaceshipControls === null) throw new Error("Spaceship controls is null");
         if (this.characterControls === null) throw new Error("Character controls is null");
 
+        if (this.scene.getActiveControls().getActiveCamera() !== this.scene.activeCamera) {
+            this.scene.activeCamera?.detachControl();
+            this.scene.setActiveCamera(this.scene.getActiveControls().getActiveCamera());
+        }
+
         const nearestOrbitalObject = starSystem.getNearestOrbitalObject(
             this.scene.getActiveControls().getTransform().getAbsolutePosition()
         );
