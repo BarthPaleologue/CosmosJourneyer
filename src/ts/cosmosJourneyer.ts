@@ -191,7 +191,7 @@ export class CosmosJourneyer {
                 if (this.isPaused()) {
                     this.createAutoSave(); // from the pause menu, create autosave of the current game before loading a save
                 }
-                this.resume();
+                await this.resume();
                 this.starSystemView.setUIEnabled(true);
                 await this.loadSave(saveData);
             });
@@ -200,7 +200,7 @@ export class CosmosJourneyer {
         this.mainMenu = new MainMenu(this.sidePanels, this.starSystemView, this.starSystemDatabase);
         this.mainMenu.onStartObservable.add(async () => {
             await this.tutorialLayer.setTutorial(FlightTutorial);
-            this.starSystemView.switchToSpaceshipControls();
+            await this.starSystemView.switchToSpaceshipControls();
             const spaceshipPosition = this.starSystemView.getSpaceshipControls().getTransform().getAbsolutePosition();
             const closestSpaceStation = this.starSystemView
                 .getStarSystem()
@@ -318,9 +318,9 @@ export class CosmosJourneyer {
             this.createAutoSave();
         });
 
-        GeneralInputs.map.toggleStarMap.on("complete", () => {
+        GeneralInputs.map.toggleStarMap.on("complete", async () => {
             if (this.mainMenu?.isVisible()) return;
-            this.toggleStarMap();
+            await this.toggleStarMap();
         });
 
         GeneralInputs.map.screenshot.on("complete", () => {
@@ -333,10 +333,9 @@ export class CosmosJourneyer {
             await this.takeVideoCapture();
         });
 
-        GeneralInputs.map.togglePause.on("complete", () => {
+        GeneralInputs.map.togglePause.on("complete", async () => {
             if (this.mainMenu?.isVisible()) return;
             if (!this.isPaused()) this.pause();
-            else this.resume();
         });
 
         window.CosmosJourneyer = this;
@@ -395,7 +394,7 @@ export class CosmosJourneyer {
         const starSystemView = new StarSystemView(player, engine, havokInstance, encyclopaedia, starSystemDatabase);
 
         await starSystemView.initAssets();
-        starSystemView.resetPlayer();
+        await starSystemView.resetPlayer();
 
         if (!navigator.keyboard) {
             await alertModal(
@@ -411,17 +410,28 @@ export class CosmosJourneyer {
         if (this.mainMenu.isVisible()) return;
         this.state = EngineState.PAUSED;
 
-        if (this.activeView === this.starSystemView) this.starSystemView.stopBackgroundSounds();
+        document.exitPointerLock();
+
+        if (this.activeView === this.starSystemView) {
+            this.starSystemView.stopBackgroundSounds();
+        }
 
         Sounds.OPEN_PAUSE_MENU_SOUND.play();
         this.pauseMenu.setVisibility(true);
     }
 
-    public resume(): void {
+    public async resume(): Promise<void> {
         if (!this.isPaused()) return;
         this.state = EngineState.RUNNING;
         Sounds.MENU_SELECT_SOUND.play();
         this.pauseMenu.setVisibility(false);
+
+        if (
+            this.activeView === this.starSystemView &&
+            this.starSystemView.scene.getActiveControls().shouldLockPointer()
+        ) {
+            await this.engine.getRenderingCanvas()?.requestPointerLock();
+        }
     }
 
     public isPaused(): boolean {
@@ -476,11 +486,12 @@ export class CosmosJourneyer {
     /**
      * Toggles the star map
      */
-    public toggleStarMap(): void {
+    public async toggleStarMap(): Promise<void> {
         if (this.activeView === this.starSystemView) {
             AudioManager.SetMask(AudioMasks.STAR_MAP_VIEW);
 
             this.starSystemView.targetCursorLayer.setEnabled(false);
+            document.exitPointerLock();
 
             this.starSystemView.detachControl();
             this.starMap.attachControl();
@@ -494,6 +505,10 @@ export class CosmosJourneyer {
 
             AudioManager.SetMask(AudioMasks.STAR_SYSTEM_VIEW);
             this.activeView = this.starSystemView;
+
+            if (this.starSystemView.scene.getActiveControls().shouldLockPointer()) {
+                await this.engine.getRenderingCanvas()?.requestPointerLock();
+            }
         }
     }
 
@@ -668,7 +683,7 @@ export class CosmosJourneyer {
             this.mainMenu.hide();
             await this.loadSave(tutorial.saveData);
             this.player.uuid = Settings.TUTORIAL_SAVE_UUID;
-            this.resume();
+            await this.resume();
             await this.tutorialLayer.setTutorial(tutorial);
             this.starSystemView.setUIEnabled(true);
 
@@ -711,7 +726,7 @@ export class CosmosJourneyer {
         this.player.discoveries.uploaded.forEach(async (discovery) => {
             await this.encyclopaedia.contributeDiscoveryIfNew(discovery);
         });
-        this.starSystemView.resetPlayer();
+        await this.starSystemView.resetPlayer();
 
         await this.loadUniverseCoordinates(saveData.universeCoordinates);
 
@@ -774,7 +789,7 @@ export class CosmosJourneyer {
         if (this.state === EngineState.UNINITIALIZED) await this.init(true);
         else this.starSystemView.initStarSystem();
 
-        this.starSystemView.switchToSpaceshipControls();
+        await this.starSystemView.switchToSpaceshipControls();
 
         const playerTransform = this.starSystemView.scene.getActiveControls().getTransform();
 

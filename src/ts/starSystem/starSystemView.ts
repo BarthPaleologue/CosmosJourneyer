@@ -272,7 +272,7 @@ export class StarSystemView implements View {
             } else if (this.scene.getActiveControls() === this.getDefaultControls()) {
                 await this.switchToCharacterControls();
             } else if (this.scene.getActiveControls() === this.getCharacterControls()) {
-                this.switchToSpaceshipControls();
+                await this.switchToSpaceshipControls();
             }
         });
 
@@ -382,8 +382,6 @@ export class StarSystemView implements View {
             const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
 
             if (this.scene.getActiveControls() === shipControls) {
-                console.log("disembark");
-
                 characterControls.getTransform().setEnabled(true);
                 CharacterInputs.setEnabled(true);
                 characterControls.getTransform().setAbsolutePosition(shipControls.getTransform().absolutePosition);
@@ -401,17 +399,15 @@ export class StarSystemView implements View {
                 SpaceShipControlsInputs.setEnabled(false);
                 this.spaceShipLayer.setVisibility(false);
 
-                this.scene.setActiveControls(characterControls);
+                await this.scene.setActiveControls(characterControls);
 
                 spaceship.acceleratingWarpDriveSound.setTargetVolume(0);
                 spaceship.deceleratingWarpDriveSound.setTargetVolume(0);
             } else if (this.scene.getActiveControls() === characterControls) {
-                console.log("embark");
-
                 characterControls.getTransform().setEnabled(false);
                 CharacterInputs.setEnabled(false);
 
-                this.scene.setActiveControls(shipControls);
+                await this.scene.setActiveControls(shipControls);
                 SpaceShipControlsInputs.setEnabled(true);
 
                 if (spaceship.isLanded()) {
@@ -653,7 +649,7 @@ export class StarSystemView implements View {
      * Call this when the player object is changed when loading a save.
      * It will remove the current controls and recreate them based on the player object.
      */
-    public resetPlayer() {
+    public async resetPlayer() {
         this.postProcessManager.reset();
 
         const maxZ = Settings.EARTH_RADIUS * 1e5;
@@ -686,7 +682,7 @@ export class StarSystemView implements View {
             this.characterControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
         }
 
-        this.scene.setActiveControls(this.spaceshipControls);
+        await this.scene.setActiveControls(this.spaceshipControls);
     }
 
     public isJumpingBetweenSystems() {
@@ -945,9 +941,7 @@ export class StarSystemView implements View {
     /**
      * Switches the active controller to the spaceship controls
      */
-    public switchToSpaceshipControls() {
-        document.exitPointerLock();
-
+    public async switchToSpaceshipControls() {
         const shipControls = this.getSpaceshipControls();
         const characterControls = this.getCharacterControls();
         const defaultControls = this.getDefaultControls();
@@ -956,7 +950,7 @@ export class StarSystemView implements View {
 
         characterControls.getTransform().setEnabled(false);
         CharacterInputs.setEnabled(false);
-        this.scene.setActiveControls(shipControls);
+        await this.scene.setActiveControls(shipControls);
         setRotationQuaternion(
             shipControls.getTransform(),
             getRotationQuaternion(defaultControls.getTransform()).clone()
@@ -970,8 +964,6 @@ export class StarSystemView implements View {
      * Switches the active controller to the character controls
      */
     public async switchToCharacterControls() {
-        await this.scene.getEngine().getRenderingCanvas()?.requestPointerLock();
-
         const shipControls = this.getSpaceshipControls();
         const characterControls = this.getCharacterControls();
         const defaultControls = this.getDefaultControls();
@@ -981,7 +973,7 @@ export class StarSystemView implements View {
         characterControls.getTransform().setEnabled(true);
         CharacterInputs.setEnabled(true);
         characterControls.getTransform().setAbsolutePosition(defaultControls.getTransform().absolutePosition);
-        this.scene.setActiveControls(characterControls);
+        await this.scene.setActiveControls(characterControls);
         setRotationQuaternion(
             characterControls.getTransform(),
             getRotationQuaternion(defaultControls.getTransform()).clone()
@@ -998,8 +990,6 @@ export class StarSystemView implements View {
      * Switches the active controller to the default controls
      */
     public async switchToDefaultControls(showHelpNotification: boolean) {
-        await this.scene.getEngine().getRenderingCanvas()?.requestPointerLock();
-
         const shipControls = this.getSpaceshipControls();
         const characterControls = this.getCharacterControls();
         const defaultControls = this.getDefaultControls();
@@ -1018,7 +1008,7 @@ export class StarSystemView implements View {
 
         this.stopBackgroundSounds();
 
-        this.scene.setActiveControls(defaultControls);
+        await this.scene.setActiveControls(defaultControls);
         setRotationQuaternion(
             defaultControls.getTransform(),
             getRotationQuaternion(shipControls.getTransform()).clone()

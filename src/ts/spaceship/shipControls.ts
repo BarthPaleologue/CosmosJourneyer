@@ -251,6 +251,10 @@ export class ShipControls implements Controls {
         return this.getSpaceship().getTransform();
     }
 
+    public shouldLockPointer(): boolean {
+        return false;
+    }
+
     public getActiveCamera(): Camera {
         return this.thirdPersonCamera;
     }

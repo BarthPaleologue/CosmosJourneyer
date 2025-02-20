@@ -263,6 +263,10 @@ export class CharacterControls implements Controls {
         return this.character;
     }
 
+    public shouldLockPointer(): boolean {
+        return true;
+    }
+
     public update(deltaSeconds: number): Vector3 {
         const inverseTransform = this.getTransform().getWorldMatrix().clone().invert();
         this.firstPersonCamera.position = Vector3.TransformCoordinates(
