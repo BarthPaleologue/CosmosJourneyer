@@ -412,22 +412,26 @@ export class CharacterControls implements Controls {
         const isMoving = this.currentAnimationState.currentAnimation !== this.currentAnimationState.idleAnimation;
 
         // Rotation
-        if (xMove < 0 && isMoving) {
-            const dtheta = this.characterRotationSpeed * deltaTime;
-            this.character.rotate(Vector3.Up(), dtheta);
-            this.thirdPersonCamera.alpha += dtheta;
+        if (this.activeCamera === this.thirdPersonCamera) {
+            if (xMove < 0 && isMoving) {
+                const dtheta = this.characterRotationSpeed * deltaTime;
+                this.character.rotate(Vector3.Up(), dtheta);
+                this.thirdPersonCamera.alpha += dtheta;
 
-            const cameraPosition = this.thirdPersonCamera.target;
-            cameraPosition.applyRotationQuaternionInPlace(Quaternion.RotationAxis(Vector3.Up(), -dtheta));
-            this.thirdPersonCamera.target = cameraPosition;
-        } else if (xMove > 0 && isMoving) {
-            const dtheta = this.characterRotationSpeed * deltaTime;
-            this.character.rotate(Vector3.Up(), -dtheta);
-            this.thirdPersonCamera.alpha -= dtheta;
+                const cameraPosition = this.thirdPersonCamera.target;
+                cameraPosition.applyRotationQuaternionInPlace(Quaternion.RotationAxis(Vector3.Up(), -dtheta));
+                this.thirdPersonCamera.target = cameraPosition;
+            } else if (xMove > 0 && isMoving) {
+                const dtheta = this.characterRotationSpeed * deltaTime;
+                this.character.rotate(Vector3.Up(), -dtheta);
+                this.thirdPersonCamera.alpha -= dtheta;
 
-            const cameraPosition = this.thirdPersonCamera.target;
-            cameraPosition.applyRotationQuaternionInPlace(Quaternion.RotationAxis(Vector3.Up(), dtheta));
-            this.thirdPersonCamera.target = cameraPosition;
+                const cameraPosition = this.thirdPersonCamera.target;
+                cameraPosition.applyRotationQuaternionInPlace(Quaternion.RotationAxis(Vector3.Up(), dtheta));
+                this.thirdPersonCamera.target = cameraPosition;
+            }
+        } else if (this.activeCamera === this.firstPersonCamera) {
+            displacement.addInPlace(this.character.right.scale(xMove * this.characterWalkSpeed * deltaTime));
         }
 
         let weightSum = 0;
