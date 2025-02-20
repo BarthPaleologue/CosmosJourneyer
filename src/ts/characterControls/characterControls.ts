@@ -263,7 +263,7 @@ export class CharacterControls implements Controls {
         return this.character;
     }
 
-    public update(deltaTime: number): Vector3 {
+    public update(deltaSeconds: number): Vector3 {
         const inverseTransform = this.getTransform().getWorldMatrix().clone().invert();
         this.firstPersonCamera.position = Vector3.TransformCoordinates(
             this.headTransform.getAbsolutePosition(),
@@ -281,8 +281,8 @@ export class CharacterControls implements Controls {
 
         if (this.currentAnimationState === this.fallingState) {
             // apply gravity
-            this.jumpVelocity.addInPlace(character.up.scale(-9.8 * deltaTime));
-            translate(character, this.jumpVelocity.scale(deltaTime));
+            this.jumpVelocity.addInPlace(character.up.scale(-9.8 * deltaSeconds));
+            translate(character, this.jumpVelocity.scale(deltaSeconds));
         }
 
         if (this.closestWalkableObject !== null) {
@@ -347,21 +347,21 @@ export class CharacterControls implements Controls {
 
         if (this.walkAnim.weight > 0.0) {
             this.character.moveWithCollisions(
-                this.character.forward.scaleInPlace(-this.characterWalkSpeed * deltaTime * this.walkAnim.weight)
+                this.character.forward.scaleInPlace(-this.characterWalkSpeed * deltaSeconds * this.walkAnim.weight)
             );
         }
 
         if (this.walkBackAnim.weight > 0.0) {
             this.character.moveWithCollisions(
                 this.character.forward.scaleInPlace(
-                    this.characterWalkSpeedBackwards * deltaTime * this.walkBackAnim.weight
+                    this.characterWalkSpeedBackwards * deltaSeconds * this.walkBackAnim.weight
                 )
             );
         }
 
         if (this.runningAnim.weight > 0.0) {
             this.character.moveWithCollisions(
-                this.character.forward.scaleInPlace(-this.characterRunSpeed * deltaTime * this.runningAnim.weight)
+                this.character.forward.scaleInPlace(-this.characterRunSpeed * deltaSeconds * this.runningAnim.weight)
             );
         }
 
@@ -373,7 +373,7 @@ export class CharacterControls implements Controls {
             if (yMove > 0) {
                 this.swimmingState.currentAnimation = this.swimmingForwardAnim;
                 this.character.moveWithCollisions(
-                    this.character.forward.scaleInPlace(-this.characterSwimSpeed * deltaTime)
+                    this.character.forward.scaleInPlace(-this.characterSwimSpeed * deltaSeconds)
                 );
             }
         } else if (this.currentAnimationState === this.groundedState) {
@@ -412,39 +412,29 @@ export class CharacterControls implements Controls {
         const isMoving = this.currentAnimationState.currentAnimation !== this.currentAnimationState.idleAnimation;
 
         // Rotation
-        if (this.activeCamera === this.thirdPersonCamera) {
-            if (xMove < 0 && isMoving) {
-                const dtheta = this.characterRotationSpeed * deltaTime;
-                this.character.rotate(Vector3.Up(), dtheta);
-                this.thirdPersonCamera.alpha += dtheta;
+        if (this.activeCamera === this.thirdPersonCamera && isMoving) {
+            const dtheta = -Math.sign(xMove) * this.characterRotationSpeed * deltaSeconds;
+            this.character.rotate(Vector3.Up(), dtheta);
+            this.thirdPersonCamera.alpha += dtheta;
 
-                const cameraPosition = this.thirdPersonCamera.target;
-                cameraPosition.applyRotationQuaternionInPlace(Quaternion.RotationAxis(Vector3.Up(), -dtheta));
-                this.thirdPersonCamera.target = cameraPosition;
-            } else if (xMove > 0 && isMoving) {
-                const dtheta = this.characterRotationSpeed * deltaTime;
-                this.character.rotate(Vector3.Up(), -dtheta);
-                this.thirdPersonCamera.alpha -= dtheta;
-
-                const cameraPosition = this.thirdPersonCamera.target;
-                cameraPosition.applyRotationQuaternionInPlace(Quaternion.RotationAxis(Vector3.Up(), dtheta));
-                this.thirdPersonCamera.target = cameraPosition;
-            }
+            const cameraPosition = this.thirdPersonCamera.target;
+            cameraPosition.applyRotationQuaternionInPlace(Quaternion.RotationAxis(Vector3.Up(), -dtheta));
+            this.thirdPersonCamera.target = cameraPosition;
         } else if (this.activeCamera === this.firstPersonCamera) {
-            displacement.addInPlace(this.character.right.scale(xMove * this.characterWalkSpeed * deltaTime));
+            displacement.addInPlace(this.character.right.scale(xMove * this.characterWalkSpeed * deltaSeconds));
         }
 
         let weightSum = 0;
         for (const animation of this.nonIdleAnimations) {
             if (animation === this.targetAnim) {
-                animation.moveTowardsWeight(1, deltaTime);
+                animation.moveTowardsWeight(1, deltaSeconds);
             } else {
-                animation.moveTowardsWeight(0, deltaTime);
+                animation.moveTowardsWeight(0, deltaSeconds);
             }
             weightSum += animation.weight;
         }
 
-        this.idleAnim.moveTowardsWeight(Math.min(Math.max(1 - weightSum, 0.0), 1.0), deltaTime);
+        this.idleAnim.moveTowardsWeight(Math.min(Math.max(1 - weightSum, 0.0), 1.0), deltaSeconds);
 
         this.character.computeWorldMatrix(true);
 
