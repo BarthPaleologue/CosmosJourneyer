@@ -27,7 +27,10 @@ import { Settings } from "../settings";
 import { newSeededStarModel } from "../stellarObjects/star/starModelGenerator";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { Star } from "../stellarObjects/star/star";
-import { Assets } from "../assets/assets";
+import { AssetsManager } from "@babylonjs/core";
+import { Textures } from "../assets/textures";
+import { Materials } from "../assets/materials";
+import { Objects } from "../assets/objects";
 
 export async function createSpaceStationScene(engine: AbstractEngine): Promise<Scene> {
     const scene = new Scene(engine);
@@ -35,7 +38,11 @@ export async function createSpaceStationScene(engine: AbstractEngine): Promise<S
 
     await enablePhysics(scene);
 
-    await Assets.Init(scene);
+    const assetsManager = new AssetsManager(scene);
+    Textures.EnqueueTasks(assetsManager, scene);
+    Objects.EnqueueTasks(assetsManager, scene);
+    await assetsManager.loadAsync();
+    Materials.Init(scene);
 
     const defaultControls = new DefaultControls(scene);
     defaultControls.speed = 2000;
@@ -43,8 +50,6 @@ export async function createSpaceStationScene(engine: AbstractEngine): Promise<S
     const camera = defaultControls.getActiveCamera();
     camera.maxZ = 100e3;
     camera.attachControl();
-
-    scene.enableDepthRenderer(camera, false, true);
 
     const distanceToStar = Settings.AU;
 
