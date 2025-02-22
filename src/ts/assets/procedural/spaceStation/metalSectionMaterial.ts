@@ -17,202 +17,71 @@
 
 import { Scene } from "@babylonjs/core/scene";
 import { Textures } from "../../textures";
-import { PerturbNormalBlock } from "@babylonjs/core/Materials/Node/Blocks/Fragment/perturbNormalBlock";
-import { InputBlock } from "@babylonjs/core/Materials/Node/Blocks/Input/inputBlock";
-import { PBRMetallicRoughnessBlock } from "@babylonjs/core/Materials/Node/Blocks/PBR/pbrMetallicRoughnessBlock";
-import { TransformBlock } from "@babylonjs/core/Materials/Node/Blocks/transformBlock";
-import { NodeMaterialSystemValues } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialSystemValues";
 import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
-import { TextureBlock } from "@babylonjs/core/Materials/Node/Blocks/Dual/textureBlock";
-import { FragmentOutputBlock } from "@babylonjs/core/Materials/Node/Blocks/Fragment/fragmentOutputBlock";
-import { VertexOutputBlock } from "@babylonjs/core/Materials/Node/Blocks/Vertex/vertexOutputBlock";
-import { NodeMaterialBlockTargets } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialBlockTargets";
-import { VectorSplitterBlock } from "@babylonjs/core/Materials/Node/Blocks/vectorSplitterBlock";
-import { VectorMergerBlock } from "@babylonjs/core/Materials/Node/Blocks/vectorMergerBlock";
-import { ScaleBlock } from "@babylonjs/core/Materials/Node/Blocks/scaleBlock";
-import { TrigonometryBlock, TrigonometryBlockOperations } from "@babylonjs/core/Materials/Node/Blocks/trigonometryBlock";
+import * as BSL from "../../../utils/bsl";
 
 export class MetalSectionMaterial extends NodeMaterial {
     constructor(name: string, scene: Scene) {
         super(name, scene);
         this.mode = NodeMaterialModes.Material;
 
-        const position = new InputBlock("position");
-        position.target = NodeMaterialBlockTargets.Vertex;
-        position.setAsAttribute("position");
+        // Vertex
 
-        const world = new InputBlock("world");
-        world.target = NodeMaterialBlockTargets.Vertex;
-        world.setAsSystemValue(NodeMaterialSystemValues.World);
+        const position = BSL.vertexAttribute("position");
+        const normal = BSL.vertexAttribute("normal");
+        const meshUV = BSL.vertexAttribute("uv");
 
-        const positionW = new TransformBlock("positionW");
-        positionW.target = NodeMaterialBlockTargets.Vertex;
-        positionW.complementZ = 0;
-        positionW.complementW = 1;
+        const world = BSL.uniformWorld();
+        const positionW = BSL.transformPosition(world, position, BSL.Stage.VERT);
 
-        position.output.connectTo(positionW.vector);
-        world.output.connectTo(positionW.transform);
+        const viewProjection = BSL.uniformViewProjection();
+        const positionClipSpace = BSL.transformPosition(viewProjection, positionW, BSL.Stage.VERT);
 
-        const ViewProjection = new InputBlock("ViewProjection");
-        ViewProjection.target = NodeMaterialBlockTargets.Vertex;
-        ViewProjection.setAsSystemValue(NodeMaterialSystemValues.ViewProjection);
+        const vertexOutput = BSL.outputVertexPosition(positionClipSpace);
 
-        const positionClipSpace = new TransformBlock("positionClipSpace");
-        positionClipSpace.target = NodeMaterialBlockTargets.Vertex;
-        positionClipSpace.complementZ = 0;
-        positionClipSpace.complementW = 1;
+        // Fragment
 
-        positionW.output.connectTo(positionClipSpace.vector);
-        ViewProjection.output.connectTo(positionClipSpace.transform);
+        const normalW = BSL.transformDirection(world, normal, BSL.Stage.FRAG);
 
-        const VertexOutput = new VertexOutputBlock("VertexOutput");
-        VertexOutput.target = NodeMaterialBlockTargets.Vertex;
+        const positionY = BSL.splitVec3(position, BSL.Stage.FRAG).y;
 
-        positionClipSpace.output.connectTo(VertexOutput.vector);
+        const uvY = BSL.mul(positionY, BSL.float(1 / 50), BSL.Stage.FRAG);
 
-        const normal = new InputBlock("normal");
-        normal.target = NodeMaterialBlockTargets.Vertex;
-        normal.setAsAttribute("normal");
+        const scaledMeshUV = BSL.mul(meshUV, BSL.float(6.0), BSL.Stage.FRAG);
 
-        const normalW = new TransformBlock("normalW");
-        normalW.target = NodeMaterialBlockTargets.Vertex;
-        normalW.complementZ = 0;
-        normalW.complementW = 0;
+        const splitScaledMeshUV = BSL.splitVec2(scaledMeshUV, BSL.Stage.FRAG);
 
-        normal.output.connectTo(normalW.vector);
-        world.output.connectTo(normalW.transform);
+        const recombinedUV = BSL.vec2(splitScaledMeshUV.x, uvY, BSL.Stage.FRAG);
 
-        const positionYSplitter = new VectorSplitterBlock("Position Y splitter");
-        positionYSplitter.target = NodeMaterialBlockTargets.Fragment;
+        const uv = BSL.fract(recombinedUV, BSL.Stage.FRAG);
 
-        position.output.connectTo(positionYSplitter.xyzIn);
+        const albedoTexture = BSL.sampleTexture(Textures.METAL_PANELS_ALBEDO, uv, true);
+        const metallicRoughnesstexture = BSL.sampleTexture(Textures.METAL_PANELS_METALLIC_ROUGHNESS, uv, false);
+        const aoTexture = BSL.sampleTexture(Textures.METAL_PANELS_AMBIENT_OCCLUSION, uv, false);
+        const normalTexture = BSL.sampleTexture(Textures.METAL_PANELS_NORMAL, uv, false);
 
-        const positionYToUvY = new InputBlock("Position Y to UV Y scale factor");
-        positionYToUvY.isConstant = true;
-        positionYToUvY.value = 1.0 / 50.0;
-        positionYToUvY.target = NodeMaterialBlockTargets.Fragment;
+        const perturbedNormal = BSL.perturbNormal(uv, positionW, normalW, normalTexture.rgb, BSL.float(1));
 
-        const uvY = new ScaleBlock("Position to UV scale");
-        uvY.target = NodeMaterialBlockTargets.Fragment;
+        const view = BSL.uniformView();
+        const cameraPosition = BSL.uniformCameraPosition();
 
-        positionYSplitter.y.connectTo(uvY.input);
-        positionYToUvY.output.connectTo(uvY.factor);
+        const pbrColor = BSL.pbrMetallicRoughnessMaterial(
+            albedoTexture.rgb,
+            metallicRoughnesstexture.r,
+            metallicRoughnesstexture.g,
+            aoTexture.r,
+            perturbedNormal,
+            normalW,
+            view,
+            cameraPosition,
+            positionW
+        );
 
-        const meshUV = new InputBlock("uv");
-        meshUV.target = NodeMaterialBlockTargets.VertexAndFragment;
-        meshUV.setAsAttribute("uv");
+        const fragmentOutput = BSL.outputFragColor(pbrColor);
 
-        const meshUVScaleFactor = new InputBlock("Mesh UV scale factor");
-        meshUVScaleFactor.isConstant = true;
-        meshUVScaleFactor.value = 6.0;
-
-        const scaledMeshUV = new ScaleBlock("scaledMeshUV");
-        scaledMeshUV.target = NodeMaterialBlockTargets.Fragment;
-
-        meshUV.output.connectTo(scaledMeshUV.input);
-        meshUVScaleFactor.output.connectTo(scaledMeshUV.factor);
-
-        const splitScaledMeshUV = new VectorSplitterBlock("Split mesh UV");
-        splitScaledMeshUV.target = NodeMaterialBlockTargets.Fragment;
-
-        scaledMeshUV.output.connectTo(splitScaledMeshUV.xyIn);
-
-        const recombinedUV = new VectorMergerBlock("Recombined UV");
-        recombinedUV.target = NodeMaterialBlockTargets.Fragment;
-
-        splitScaledMeshUV.x.connectTo(recombinedUV.x);
-        uvY.output.connectTo(recombinedUV.y);
-
-        const uv = new TrigonometryBlock("UV fract");
-        uv.operation = TrigonometryBlockOperations.Fract;
-        uv.target = NodeMaterialBlockTargets.Fragment;
-
-        recombinedUV.xyOut.connectTo(uv.input);
-
-        const albedoTexture = new TextureBlock("albedoTexture");
-        albedoTexture.target = NodeMaterialBlockTargets.VertexAndFragment;
-        albedoTexture.convertToGammaSpace = false;
-        albedoTexture.convertToLinearSpace = true;
-        albedoTexture.disableLevelMultiplication = false;
-        albedoTexture.texture = Textures.METAL_PANELS_ALBEDO;
-
-        uv.output.connectTo(albedoTexture.uv);
-
-        const metallicRoughnesstexture = new TextureBlock("metallicRoughnessTexture");
-        metallicRoughnesstexture.target = NodeMaterialBlockTargets.VertexAndFragment;
-        metallicRoughnesstexture.convertToGammaSpace = false;
-        metallicRoughnesstexture.convertToLinearSpace = false;
-        metallicRoughnesstexture.disableLevelMultiplication = false;
-        metallicRoughnesstexture.texture = Textures.METAL_PANELS_METALLIC_ROUGHNESS;
-
-        uv.output.connectTo(metallicRoughnesstexture.uv);
-
-        const aoTexture = new TextureBlock("aoTexture");
-        aoTexture.target = NodeMaterialBlockTargets.VertexAndFragment;
-        aoTexture.convertToGammaSpace = false;
-        aoTexture.convertToLinearSpace = false;
-        aoTexture.disableLevelMultiplication = false;
-        aoTexture.texture = Textures.METAL_PANELS_AMBIENT_OCCLUSION;
-
-        uv.output.connectTo(aoTexture.uv);
-
-        const normalTexture = new TextureBlock("normalTexture");
-        normalTexture.target = NodeMaterialBlockTargets.VertexAndFragment;
-        normalTexture.convertToGammaSpace = false;
-        normalTexture.convertToLinearSpace = false;
-        normalTexture.disableLevelMultiplication = false;
-        normalTexture.texture = Textures.METAL_PANELS_NORMAL;
-
-        uv.output.connectTo(normalTexture.uv);
-
-        const bumpStrength = new InputBlock("Bump strength");
-        bumpStrength.target = NodeMaterialBlockTargets.Fragment;
-        bumpStrength.value = 1;
-        bumpStrength.matrixMode = 0;
-
-        const Perturbnormal = new PerturbNormalBlock("Perturb normal");
-        Perturbnormal.target = NodeMaterialBlockTargets.Fragment;
-
-        uv.output.connectTo(Perturbnormal.uv);
-        positionW.output.connectTo(Perturbnormal.worldPosition);
-        normalW.output.connectTo(Perturbnormal.worldNormal);
-        normalTexture.rgb.connectTo(Perturbnormal.normalMapColor);
-        bumpStrength.output.connectTo(Perturbnormal.strength);
-
-        const view = new InputBlock("view");
-        view.target = NodeMaterialBlockTargets.Vertex;
-        view.setAsSystemValue(NodeMaterialSystemValues.View);
-
-        const cameraPosition = new InputBlock("cameraPosition");
-        cameraPosition.target = NodeMaterialBlockTargets.VertexAndFragment;
-        cameraPosition.setAsSystemValue(NodeMaterialSystemValues.CameraPosition);
-
-        const PBRMetallicRoughness = new PBRMetallicRoughnessBlock("PBRMetallicRoughness");
-        PBRMetallicRoughness.target = NodeMaterialBlockTargets.Fragment;
-        PBRMetallicRoughness.useEnergyConservation = true;
-        PBRMetallicRoughness.useRadianceOcclusion = true;
-        PBRMetallicRoughness.useHorizonOcclusion = true;
-
-        albedoTexture.rgb.connectTo(PBRMetallicRoughness.baseColor);
-        metallicRoughnesstexture.r.connectTo(PBRMetallicRoughness.metallic);
-        metallicRoughnesstexture.g.connectTo(PBRMetallicRoughness.roughness);
-        aoTexture.r.connectTo(PBRMetallicRoughness.ambientOcc);
-        Perturbnormal.output.connectTo(PBRMetallicRoughness.perturbedNormal);
-        normalW.output.connectTo(PBRMetallicRoughness.worldNormal);
-        view.output.connectTo(PBRMetallicRoughness.view);
-        cameraPosition.output.connectTo(PBRMetallicRoughness.cameraPosition);
-        positionW.output.connectTo(PBRMetallicRoughness.worldPosition);
-
-        const FragmentOutput = new FragmentOutputBlock("FragmentOutput");
-        FragmentOutput.target = NodeMaterialBlockTargets.Fragment;
-        FragmentOutput.convertToGammaSpace = false;
-        FragmentOutput.convertToLinearSpace = false;
-
-        PBRMetallicRoughness.lighting.connectTo(FragmentOutput.rgb);
-
-        this.addOutputNode(VertexOutput);
-        this.addOutputNode(FragmentOutput);
+        this.addOutputNode(vertexOutput);
+        this.addOutputNode(fragmentOutput);
         this.build();
     }
 }
