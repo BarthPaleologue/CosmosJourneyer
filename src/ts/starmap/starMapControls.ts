@@ -63,6 +63,10 @@ export class StarMapControls implements Controls {
         return this.transform;
     }
 
+    public shouldLockPointer(): boolean {
+        return false;
+    }
+
     public update(deltaSeconds: number): Vector3 {
         const inertiaFactor = 0.15;
         const [xMove, zMove] = StarMapInputs.map.move.value;

@@ -69,6 +69,10 @@ export class DefaultControls implements Controls {
         return this.transform;
     }
 
+    public shouldLockPointer(): boolean {
+        return true;
+    }
+
     public update(deltaSeconds: number): Vector3 {
         const inertiaHalfLifeSeconds = 0.07;
 

@@ -27,6 +27,8 @@ export interface Controls extends Transformable {
 
     getCameras(): Camera[];
 
+    shouldLockPointer(): boolean;
+
     /**
      * Makes the controller listen to all its inputs and returns the displacement to apply to the player
      * @param deltaSeconds the time between 2 frames
