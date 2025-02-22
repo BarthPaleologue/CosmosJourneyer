@@ -30,38 +30,35 @@ export class MetalSectionMaterial extends NodeMaterial {
 
         const position = BSL.vertexAttribute("position");
         const normal = BSL.vertexAttribute("normal");
-        const meshUV = BSL.vertexAttribute("uv");
+        const uv = BSL.vertexAttribute("uv");
+
+        const positionY = BSL.split(position).y;
+        const uvY = BSL.mul(positionY, BSL.float(1 / 50));
+
+        const scaledUV = BSL.mul(uv, BSL.float(6.0));
+        const recombinedUV = BSL.vec2(BSL.split(scaledUV).x, uvY);
 
         const world = BSL.uniformWorld();
-        const positionW = BSL.transformPosition(world, position, BSL.Stage.VERT);
+        const positionW = BSL.transformPosition(world, position);
+        const normalW = BSL.transformDirection(world, normal);
 
         const viewProjection = BSL.uniformViewProjection();
-        const positionClipSpace = BSL.transformPosition(viewProjection, positionW, BSL.Stage.VERT);
+        const positionClipSpace = BSL.transformPosition(viewProjection, positionW);
 
         const vertexOutput = BSL.outputVertexPosition(positionClipSpace);
 
         // Fragment
 
-        const normalW = BSL.transformDirection(world, normal, BSL.Stage.FRAG);
+        const proceduralUV = BSL.fract(recombinedUV, { target: BSL.Target.FRAG });
 
-        const positionY = BSL.splitVec3(position, BSL.Stage.FRAG).y;
+        const albedoTexture = BSL.textureSample(Textures.METAL_PANELS_ALBEDO, proceduralUV, {
+            convertToLinearSpace: true
+        });
+        const metallicRoughnesstexture = BSL.textureSample(Textures.METAL_PANELS_METALLIC_ROUGHNESS, proceduralUV);
+        const aoTexture = BSL.textureSample(Textures.METAL_PANELS_AMBIENT_OCCLUSION, proceduralUV);
+        const normalTexture = BSL.textureSample(Textures.METAL_PANELS_NORMAL, proceduralUV);
 
-        const uvY = BSL.mul(positionY, BSL.float(1 / 50), BSL.Stage.FRAG);
-
-        const scaledMeshUV = BSL.mul(meshUV, BSL.float(6.0), BSL.Stage.FRAG);
-
-        const splitScaledMeshUV = BSL.splitVec2(scaledMeshUV, BSL.Stage.FRAG);
-
-        const recombinedUV = BSL.vec2(splitScaledMeshUV.x, uvY, BSL.Stage.FRAG);
-
-        const uv = BSL.fract(recombinedUV, BSL.Stage.FRAG);
-
-        const albedoTexture = BSL.sampleTexture(Textures.METAL_PANELS_ALBEDO, uv, true);
-        const metallicRoughnesstexture = BSL.sampleTexture(Textures.METAL_PANELS_METALLIC_ROUGHNESS, uv, false);
-        const aoTexture = BSL.sampleTexture(Textures.METAL_PANELS_AMBIENT_OCCLUSION, uv, false);
-        const normalTexture = BSL.sampleTexture(Textures.METAL_PANELS_NORMAL, uv, false);
-
-        const perturbedNormal = BSL.perturbNormal(uv, positionW, normalW, normalTexture.rgb, BSL.float(1));
+        const perturbedNormal = BSL.perturbNormal(proceduralUV, positionW, normalW, normalTexture.rgb, BSL.float(1));
 
         const view = BSL.uniformView();
         const cameraPosition = BSL.uniformCameraPosition();

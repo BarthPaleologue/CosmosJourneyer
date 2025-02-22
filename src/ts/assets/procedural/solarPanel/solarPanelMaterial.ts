@@ -31,32 +31,30 @@ export class SolarPanelMaterial extends NodeMaterial {
         const position = BSL.vertexAttribute("position");
         const normal = BSL.vertexAttribute("normal");
 
+        const positionXZ = BSL.xz(position);
+        const positionToUvScale = BSL.mul(positionXZ, BSL.float(0.01));
+
         const world = BSL.uniformWorld();
-        const positionW = BSL.transformPosition(world, position, BSL.Stage.VERT);
+        const positionW = BSL.transformPosition(world, position);
+        const normalW = BSL.transformDirection(world, normal);
 
         const viewProjection = BSL.uniformViewProjection();
-        const positionClipSpace = BSL.transformPosition(viewProjection, positionW, BSL.Stage.VERT);
+        const positionClipSpace = BSL.transformPosition(viewProjection, positionW);
 
         const vertexOutput = BSL.outputVertexPosition(positionClipSpace);
 
         // Fragment Shader
+        const proceduralUV = BSL.fract(positionToUvScale, { target: BSL.Target.FRAG });
 
-        const normalW = BSL.transformDirection(world, normal, BSL.Stage.FRAG);
+        const albedoTexture = BSL.textureSample(Textures.SOLAR_PANEL_ALBEDO, proceduralUV, {
+            convertToLinearSpace: true
+        });
+        const metallicRoughness = BSL.textureSample(Textures.SOLAR_PANEL_METALLIC_ROUGHNESS, proceduralUV);
+        const normalMapValue = BSL.textureSample(Textures.SOLAR_PANEL_NORMAL, proceduralUV);
 
-        const positionXZ = BSL.xz(position, BSL.Stage.FRAG);
-
-        const positionToUvScale = BSL.mul(positionXZ, BSL.float(0.01), BSL.Stage.FRAG);
-
-        const uv = BSL.fract(positionToUvScale, BSL.Stage.FRAG);
-
-        const albedoTexture = BSL.sampleTexture(Textures.SOLAR_PANEL_ALBEDO, uv, true);
-        const metallicRoughness = BSL.sampleTexture(Textures.SOLAR_PANEL_METALLIC_ROUGHNESS, uv, false);
-        const normalMapValue = BSL.sampleTexture(Textures.SOLAR_PANEL_NORMAL, uv, false);
-
-        const perturbedNormal = BSL.perturbNormal(uv, positionW, normalW, normalMapValue.rgb, BSL.float(1));
+        const perturbedNormal = BSL.perturbNormal(proceduralUV, positionW, normalW, normalMapValue.rgb, BSL.float(1));
 
         const view = BSL.uniformView();
-
         const cameraPosition = BSL.uniformCameraPosition();
 
         const pbrLighting = BSL.pbrMetallicRoughnessMaterial(

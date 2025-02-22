@@ -16,13 +16,10 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Scene } from "@babylonjs/core/scene";
-import { InputBlock } from "@babylonjs/core/Materials/Node/Blocks/Input/inputBlock";
 import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
-import { NodeMaterialBlockTargets } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialBlockTargets";
 import { Textures } from "../assets/textures";
 import { Vector2 } from "@babylonjs/core/Maths/math.vector";
-import { MultiplyBlock } from "@babylonjs/core/Materials/Node/Blocks/multiplyBlock";
 import * as BSL from "../utils/bsl";
 
 export class ClimberRingMaterial extends NodeMaterial {
@@ -34,37 +31,32 @@ export class ClimberRingMaterial extends NodeMaterial {
 
         const position = BSL.vertexAttribute("position");
         const normal = BSL.vertexAttribute("normal");
-        const meshUV = BSL.vertexAttribute("uv");
+        const uv = BSL.vertexAttribute("uv");
+
+        const meshUVScaleFactor = BSL.vec(new Vector2(2, 10));
+        const scaledUV = BSL.mul(uv, meshUVScaleFactor);
 
         const world = BSL.uniformWorld();
-
-        const positionW = BSL.transformPosition(world, position, BSL.Stage.VERT);
+        const positionW = BSL.transformPosition(world, position);
+        const normalW = BSL.transformDirection(world, normal);
 
         const viewProjection = BSL.uniformViewProjection();
-
-        const positionClipSpace = BSL.transformPosition(viewProjection, positionW, BSL.Stage.VERT);
+        const positionClipSpace = BSL.transformPosition(viewProjection, positionW);
 
         const vertexOutput = BSL.outputVertexPosition(positionClipSpace);
 
         // Fragment
 
-        const normalW = BSL.transformDirection(world, normal, BSL.Stage.FRAG);
+        const proceduralUV = BSL.fract(scaledUV, { target: BSL.Target.FRAG });
 
-        const meshUVScaleFactor = BSL.vecFromBabylon(new Vector2(2, 10));
+        const albedoTexture = BSL.textureSample(Textures.CRATE_ALBEDO, proceduralUV, { convertToLinearSpace: true });
+        const metallicRoughnesstexture = BSL.textureSample(Textures.CRATE_METALLIC_ROUGHNESS, proceduralUV);
+        const aoTexture = BSL.textureSample(Textures.CRATE_AMBIENT_OCCLUSION, proceduralUV);
+        const normalTexture = BSL.textureSample(Textures.CRATE_NORMAL, proceduralUV);
 
-        const scaledMeshUV = BSL.mulVec(meshUV, meshUVScaleFactor, BSL.Stage.FRAG);
-
-        const uv = BSL.fract(scaledMeshUV, BSL.Stage.FRAG);
-
-        const albedoTexture = BSL.sampleTexture(Textures.CRATE_ALBEDO, uv, true);
-        const metallicRoughnesstexture = BSL.sampleTexture(Textures.CRATE_METALLIC_ROUGHNESS, uv, false);
-        const aoTexture = BSL.sampleTexture(Textures.CRATE_AMBIENT_OCCLUSION, uv, false);
-        const normalTexture = BSL.sampleTexture(Textures.CRATE_NORMAL, uv, false);
-
-        const perturbedNormal = BSL.perturbNormal(uv, positionW, normalW, normalTexture.rgb, BSL.float(1));
+        const perturbedNormal = BSL.perturbNormal(proceduralUV, positionW, normalW, normalTexture.rgb, BSL.float(1));
 
         const view = BSL.uniformView();
-
         const cameraPosition = BSL.uniformCameraPosition();
 
         const pbrColor = BSL.pbrMetallicRoughnessMaterial(
