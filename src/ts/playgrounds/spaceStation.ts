@@ -17,7 +17,6 @@
 
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
-import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { enablePhysics } from "./utils";
 import { DefaultControls } from "../defaultControls/defaultControls";
@@ -82,9 +81,6 @@ export async function createSpaceStationScene(engine: AbstractEngine): Promise<S
     spaceStationModel.orbit.semiMajorAxis = distanceToStar;
 
     const spaceStation = new SpaceStation(spaceStationModel, scene);
-
-    const ambient = new HemisphericLight("Sun", Vector3.Up(), scene);
-    ambient.intensity = 0.1;
 
     scene.onBeforePhysicsObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
