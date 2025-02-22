@@ -24,6 +24,7 @@ import { TextureBlock } from "@babylonjs/core/Materials/Node/Blocks/Dual/texture
 import { FragmentOutputBlock } from "@babylonjs/core/Materials/Node/Blocks/Fragment/fragmentOutputBlock";
 import { PerturbNormalBlock } from "@babylonjs/core/Materials/Node/Blocks/Fragment/perturbNormalBlock";
 import { InputBlock } from "@babylonjs/core/Materials/Node/Blocks/Input/inputBlock";
+import { MultiplyBlock } from "@babylonjs/core/Materials/Node/Blocks/multiplyBlock";
 import { PBRMetallicRoughnessBlock } from "@babylonjs/core/Materials/Node/Blocks/PBR/pbrMetallicRoughnessBlock";
 import { ScaleBlock } from "@babylonjs/core/Materials/Node/Blocks/scaleBlock";
 import { TransformBlock } from "@babylonjs/core/Materials/Node/Blocks/transformBlock";
@@ -38,6 +39,7 @@ import { NodeMaterialBlockTargets } from "@babylonjs/core/Materials/Node/Enums/n
 import { NodeMaterialSystemValues } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialSystemValues";
 import { NodeMaterialConnectionPoint } from "@babylonjs/core/Materials/Node/nodeMaterialBlockConnectionPoint";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { Vector2, Vector3, Vector4 } from "@babylonjs/core/Maths/math.vector";
 
 export const Stage = {
     VERT: NodeMaterialBlockTargets.Vertex,
@@ -183,6 +185,20 @@ export function mul(
     return scaleBlock.output;
 }
 
+export function mulVec(
+    left: NodeMaterialConnectionPoint,
+    right: NodeMaterialConnectionPoint,
+    stage: NodeMaterialBlockTargets
+): NodeMaterialConnectionPoint {
+    const multBlock = new MultiplyBlock("scaledMeshUV");
+    multBlock.target = stage;
+
+    left.connectTo(multBlock.left);
+    right.connectTo(multBlock.right);
+
+    return multBlock.output;
+}
+
 export function merge(
     x: NodeMaterialConnectionPoint,
     y: NodeMaterialConnectionPoint,
@@ -205,6 +221,14 @@ export function merge(
     }
 
     return merger;
+}
+
+export function vecFromBabylon(vec: Vector2 | Vector3 | Vector4) {
+    const meshUVScaleFactor = new InputBlock("Mesh UV scale factor");
+    meshUVScaleFactor.isConstant = true;
+    meshUVScaleFactor.value = vec;
+
+    return meshUVScaleFactor.output;
 }
 
 export function vec2(
