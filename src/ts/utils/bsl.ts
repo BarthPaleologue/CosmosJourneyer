@@ -20,12 +20,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+import { ArcTan2Block } from "@babylonjs/core/Materials/Node/Blocks/arcTan2Block";
 import { TextureBlock } from "@babylonjs/core/Materials/Node/Blocks/Dual/textureBlock";
 import { FragmentOutputBlock } from "@babylonjs/core/Materials/Node/Blocks/Fragment/fragmentOutputBlock";
 import { PerturbNormalBlock } from "@babylonjs/core/Materials/Node/Blocks/Fragment/perturbNormalBlock";
 import { InputBlock } from "@babylonjs/core/Materials/Node/Blocks/Input/inputBlock";
+import { LengthBlock } from "@babylonjs/core/Materials/Node/Blocks/lengthBlock";
+import { LerpBlock } from "@babylonjs/core/Materials/Node/Blocks/lerpBlock";
 import { MultiplyBlock } from "@babylonjs/core/Materials/Node/Blocks/multiplyBlock";
 import { PBRMetallicRoughnessBlock } from "@babylonjs/core/Materials/Node/Blocks/PBR/pbrMetallicRoughnessBlock";
+import { RemapBlock } from "@babylonjs/core/Materials/Node/Blocks/remapBlock";
+import { StepBlock } from "@babylonjs/core/Materials/Node/Blocks/stepBlock";
+import { SubtractBlock } from "@babylonjs/core/Materials/Node/Blocks/subtractBlock";
 import { TransformBlock } from "@babylonjs/core/Materials/Node/Blocks/transformBlock";
 import {
     TrigonometryBlock,
@@ -141,6 +147,10 @@ export function float(value: number, options?: Partial<TargetOptions>): NodeMate
     return inputBlock.output;
 }
 
+export function f(value: number, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
+    return float(value, options);
+}
+
 /**
  * Returns a constant float input block with the given name and value.
  * @param name - The name of the input block.
@@ -249,6 +259,92 @@ export function transformDirection(
 }
 
 /**
+ * Returns a trigonometry operation on the input value.
+ * @param input - The input value.
+ * @param operation - The trigonometry operation to perform.
+ * @param options - Optional target options.
+ */
+export function trig(
+    input: NodeMaterialConnectionPoint,
+    operation: TrigonometryBlockOperations,
+    options?: Partial<TargetOptions>
+): NodeMaterialConnectionPoint {
+    const trigBlock = new TrigonometryBlock("trig");
+    trigBlock.operation = operation;
+    trigBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    input.connectTo(trigBlock.input);
+
+    return trigBlock.output;
+}
+
+/**
+ * Returns the arctangent of y/x using the signs of the arguments to determine the quadrant.
+ * @param x - The x coordinate.
+ * @param y - The y coordinate.
+ * @param options - Optional target options.
+ */
+export function atan2(
+    x: NodeMaterialConnectionPoint,
+    y: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>
+): NodeMaterialConnectionPoint {
+    const atan2Block = new ArcTan2Block("atan2");
+    atan2Block.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    x.connectTo(atan2Block.x);
+    y.connectTo(atan2Block.y);
+
+    return atan2Block.output;
+}
+
+/**
+ * Returns the length (magnitude) of a vector.
+ * @param input - The input vector.
+ * @param options - Optional target options.
+ */
+export function length(
+    input: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>
+): NodeMaterialConnectionPoint {
+    const lengthBlock = new LengthBlock("length");
+    lengthBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    input.connectTo(lengthBlock.value);
+
+    return lengthBlock.output;
+}
+
+/**
+ * Remaps a value from one range to another.
+ * @param input - The input value to remap.
+ * @param sourceMin - The minimum value of the source range.
+ * @param sourceMax - The maximum value of the source range.
+ * @param targetMin - The minimum value of the target range.
+ * @param targetMax - The maximum value of the target range.
+ * @param options - Optional target options.
+ */
+export function remap(
+    input: NodeMaterialConnectionPoint,
+    sourceMin: NodeMaterialConnectionPoint,
+    sourceMax: NodeMaterialConnectionPoint,
+    targetMin: NodeMaterialConnectionPoint,
+    targetMax: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>
+): NodeMaterialConnectionPoint {
+    const remapBlock = new RemapBlock("remap");
+    remapBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    input.connectTo(remapBlock.input);
+    sourceMin.connectTo(remapBlock.sourceMin);
+    sourceMax.connectTo(remapBlock.sourceMax);
+    targetMin.connectTo(remapBlock.targetMin);
+    targetMax.connectTo(remapBlock.targetMax);
+
+    return remapBlock.output;
+}
+
+/**
  * Returns the fractional part of the input value.
  * @param input - The input value.
  * @param options - Optional target options.
@@ -316,6 +412,66 @@ export function merge(
     }
 
     return merger;
+}
+
+/**
+ * Replaces the X component of a vector with a new value.
+ * @param input - The input vector.
+ * @param x - The new X component.
+ * @param options - Optional target options.
+ */
+export function withX(
+    input: NodeMaterialConnectionPoint,
+    x: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>
+) {
+    const splitInput = split(input, options);
+    return merge(x, splitInput.y, splitInput.z, splitInput.w, options);
+}
+
+/**
+ * Replaces the Y component of a vector with a new value.
+ * @param input - The input vector.
+ * @param y - The new Y component.
+ * @param options - Optional target options.
+ */
+export function withY(
+    input: NodeMaterialConnectionPoint,
+    y: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>
+) {
+    const splitInput = split(input, options);
+    return merge(splitInput.x, y, splitInput.z, splitInput.w, options);
+}
+
+/**
+ * Replaces the Z component of a vector with a new value.
+ * @param input - The input vector.
+ * @param z - The new Z component.
+ * @param options - Optional target options.
+ */
+export function withZ(
+    input: NodeMaterialConnectionPoint,
+    z: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>
+) {
+    const splitInput = split(input, options);
+    return merge(splitInput.x, splitInput.y, z, splitInput.w, options);
+}
+
+/**
+ * Replaces the W component of a vector with a new value.
+ * @param input - The input vector.
+ * @param w - The new W component.
+ * @param options - Optional target options.
+ */
+export function withW(
+    input: NodeMaterialConnectionPoint,
+    w: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>
+) {
+    const splitInput = split(input, options);
+    return merge(splitInput.x, splitInput.y, splitInput.z, w, options);
 }
 
 /**
@@ -434,6 +590,84 @@ export function xz(
     inputSplitted.z.connectTo(outputXZ.y);
 
     return outputXZ.xyOut;
+}
+
+/**
+ * Returns the step function: 0 if x < edge, 1 if x >= edge
+ * @param edge - The edge value.
+ * @param x - The input value.
+ * @param options - Optional target options.
+ */
+export function step(
+    edge: NodeMaterialConnectionPoint,
+    x: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>
+) {
+    const stepBlock = new StepBlock("step");
+    stepBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    edge.connectTo(stepBlock.edge);
+    x.connectTo(stepBlock.value);
+
+    return stepBlock.output;
+}
+
+/**
+ * Returns the absolute value of the input.
+ * @param input - The input value.
+ * @param options - Optional target options.
+ */
+export function abs(input: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>) {
+    const absBlock = new TrigonometryBlock("abs");
+    absBlock.operation = TrigonometryBlockOperations.Abs;
+    absBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    input.connectTo(absBlock.input);
+
+    return absBlock.output;
+}
+
+/**
+ * Linearly interpolates between two values based on a gradient factor.
+ * @param x - The first value.
+ * @param y - The second value.
+ * @param a - The gradient factor (0-1).
+ * @param options - Optional target options.
+ */
+export function mix(
+    x: NodeMaterialConnectionPoint,
+    y: NodeMaterialConnectionPoint,
+    a: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>
+) {
+    const mixBlock = new LerpBlock("mix");
+    mixBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    x.connectTo(mixBlock.left);
+    y.connectTo(mixBlock.right);
+    a.connectTo(mixBlock.gradient);
+
+    return mixBlock.output;
+}
+
+/**
+ * Subtracts the right value from the left value.
+ * @param left - The left value.
+ * @param right - The right value to subtract.
+ * @param options - Optional target options.
+ */
+export function sub(
+    left: NodeMaterialConnectionPoint,
+    right: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>
+) {
+    const subBlock = new SubtractBlock("sub");
+    subBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    left.connectTo(subBlock.left);
+    right.connectTo(subBlock.right);
+
+    return subBlock.output;
 }
 
 /**

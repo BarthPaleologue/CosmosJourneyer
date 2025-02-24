@@ -15,43 +15,43 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Scene } from "@babylonjs/core/scene";
-import { Effect } from "@babylonjs/core/Materials/effect";
-import { Transformable } from "../../../architecture/transformable";
-
-import landingBayMaterialFragment from "../../../../shaders/landingBayMaterial/fragment.glsl";
-import landingBayMaterialVertex from "../../../../shaders/landingBayMaterial/vertex.glsl";
-import {
-    setStellarObjectUniforms,
-    StellarObjectUniformNames
-} from "../../../postProcesses/uniforms/stellarObjectUniforms";
-import { Textures } from "../../textures";
-import { Settings } from "../../../settings";
-import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
+import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
+import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
 import { OrbitalFacilityModel } from "../../../architecture/orbitalObjectModel";
+import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
+import { Settings } from "../../../settings";
+import { Textures } from "../../textures";
+import {
+    abs,
+    atan2,
+    f,
+    mix,
+    mul,
+    outputVertexPosition,
+    split,
+    step,
+    sub,
+    Target,
+    transformDirection,
+    transformPosition,
+    uniformViewProjection,
+    uniformWorld,
+    vec2,
+    vertexAttribute,
+    xz,
+    length,
+    remap,
+    textureSample,
+    perturbNormal,
+    pbrMetallicRoughnessMaterial,
+    uniformView,
+    uniformCameraPosition,
+    outputFragColor,
+    fract
+} from "../../../utils/bsl";
 
-const LandingBayUniformNames = {
-    WORLD: "world",
-    WORLD_VIEW_PROJECTION: "worldViewProjection",
-    CAMERA_POSITION: "cameraPosition",
-    MEAN_RADIUS: "meanRadius",
-    DELTA_RADIUS: "deltaRadius",
-    HEIGHT: "height"
-};
-
-const LandingBaySamplerNames = {
-    ALBEDO: "albedoMap",
-    NORMAL: "normalMap",
-    METALLIC: "metallicMap",
-    ROUGHNESS: "roughnessMap",
-    OCCLUSION: "occlusionMap",
-    NAME_PLATE: "namePlate"
-};
-
-export class LandingBayMaterial extends ShaderMaterial {
-    private stellarObjects: Transformable[] = [];
-
+export class LandingBayMaterial extends NodeMaterial {
     constructor(
         stationModel: OrbitalFacilityModel,
         meanRadius: number,
@@ -59,19 +59,8 @@ export class LandingBayMaterial extends ShaderMaterial {
         height: number,
         scene: Scene
     ) {
-        const shaderName = "landingBayMaterial";
-        if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
-            Effect.ShadersStore[`${shaderName}FragmentShader`] = landingBayMaterialFragment;
-        }
-        if (Effect.ShadersStore[`${shaderName}VertexShader`] === undefined) {
-            Effect.ShadersStore[`${shaderName}VertexShader`] = landingBayMaterialVertex;
-        }
-
-        super(`LandingBayMaterial`, scene, shaderName, {
-            attributes: ["position", "normal", "uv"],
-            uniforms: [...Object.values(LandingBayUniformNames), ...Object.values(StellarObjectUniformNames)],
-            samplers: [...Object.values(LandingBaySamplerNames)]
-        });
+        super("LandingBayMaterial", scene);
+        this.mode = NodeMaterialModes.Material;
 
         const circumference = 2 * Math.PI * meanRadius;
 
@@ -102,39 +91,99 @@ export class LandingBayMaterial extends ShaderMaterial {
             true
         );
 
-        this.onBindObservable.add(() => {
-            const activeCamera = scene.activeCamera;
-            if (activeCamera === null) {
-                throw new Error("No active camera");
-            }
-
-            this.getEffect().setVector3(LandingBayUniformNames.CAMERA_POSITION, activeCamera.globalPosition);
-            this.getEffect().setFloat(LandingBayUniformNames.MEAN_RADIUS, meanRadius);
-            this.getEffect().setFloat(LandingBayUniformNames.DELTA_RADIUS, deltaRadius);
-            this.getEffect().setFloat(LandingBayUniformNames.HEIGHT, height);
-
-            setStellarObjectUniforms(this.getEffect(), this.stellarObjects);
-
-            this.getEffect().setTexture(LandingBaySamplerNames.ALBEDO, Textures.SPACE_STATION_ALBEDO);
-            this.getEffect().setTexture(LandingBaySamplerNames.NORMAL, Textures.SPACE_STATION_NORMAL);
-            this.getEffect().setTexture(LandingBaySamplerNames.METALLIC, Textures.SPACE_STATION_METALLIC);
-            this.getEffect().setTexture(LandingBaySamplerNames.ROUGHNESS, Textures.SPACE_STATION_ROUGHNESS);
-            this.getEffect().setTexture(LandingBaySamplerNames.OCCLUSION, Textures.SPACE_STATION_AMBIENT_OCCLUSION);
-
-            this.getEffect().setTexture(LandingBaySamplerNames.NAME_PLATE, namePlateTexture);
-        });
-
-        this.onDisposeObservable.add(() => {
+        this.onDisposeObservable.addOnce(() => {
             namePlateTexture.dispose();
         });
-    }
 
-    update(stellarObjects: Transformable[]) {
-        this.stellarObjects = stellarObjects;
-    }
+        const position = vertexAttribute("position");
+        const normal = vertexAttribute("normal");
+        const uv = vertexAttribute("uv");
 
-    dispose(forceDisposeEffect?: boolean, forceDisposeTextures?: boolean, notBoundToMesh?: boolean) {
-        super.dispose(forceDisposeEffect, forceDisposeTextures, notBoundToMesh);
-        this.stellarObjects.length = 0;
+        const positionXZ = xz(position);
+        const splitPositionXZ = split(positionXZ);
+
+        const world = uniformWorld();
+        const positionW = transformPosition(world, position);
+        const normalW = transformDirection(world, normal);
+
+        // float mask = 1.0 - step(0.02, abs(normal.y));
+        // vUV.y *= mix(1.0, height, mask);
+        const mask = sub(f(1), step(f(0.02), abs(split(normal).y)));
+        const scaledUvY = mul(split(uv).y, mix(f(1.0), f(height), mask));
+
+        const viewProjection = uniformViewProjection();
+        const positionClipSpace = transformPosition(viewProjection, positionW);
+
+        const vertexOutput = outputVertexPosition(positionClipSpace);
+
+        this.addOutputNode(vertexOutput);
+
+        const theta = atan2(splitPositionXZ.y, splitPositionXZ.x, { target: Target.FRAG });
+        const distanceToCenter = length(positionXZ, { target: Target.FRAG });
+
+        const distanceToCenter01 = remap(
+            distanceToCenter,
+            f(meanRadius - deltaRadius / 2.0),
+            f(meanRadius + deltaRadius / 2.0),
+            f(0.0),
+            f(1.0)
+        );
+
+        const proceduralUvX = mul(theta, f(meanRadius / deltaRadius));
+        const proceduralUV = vec2(proceduralUvX, scaledUvY);
+
+        const albedo = textureSample(Textures.SPACE_STATION_ALBEDO, proceduralUV, {
+            convertToLinearSpace: true
+        });
+        const normalMap = textureSample(Textures.SPACE_STATION_NORMAL, proceduralUV);
+        const metallic = textureSample(Textures.SPACE_STATION_METALLIC, proceduralUV);
+        const roughness = textureSample(Textures.SPACE_STATION_ROUGHNESS, proceduralUV);
+        const occlusion = textureSample(Textures.SPACE_STATION_AMBIENT_OCCLUSION, proceduralUV);
+
+        const namePlateUvX = mul(theta, f(1.0 / Math.PI));
+        const namePlateUvY = distanceToCenter01;
+
+        /* if (vNormal.y < 1.0) {
+            namePlateUV *= 0.0;
+        } */
+        const namePlateUvMask = step(f(1.0), split(normal).y);
+        const namePlateUV = mix(vec2(f(0.0), f(0.0)), vec2(namePlateUvX, namePlateUvY), namePlateUvMask);
+
+        const namePlateColor = textureSample(namePlateTexture, fract(namePlateUV));
+        const paintWeight = namePlateColor.a;
+
+        const finalAlbedo = mix(albedo.rgb, namePlateColor.rgb, paintWeight);
+        const finalMetallic = mix(metallic.r, f(0.0), paintWeight);
+        const finalRoughness = mix(roughness.r, f(0.7), paintWeight);
+        const finalAo = mix(occlusion.r, f(1.0), paintWeight);
+
+        const perturbedNormal = perturbNormal(
+            proceduralUV,
+            positionW,
+            normalW,
+            normalMap.rgb,
+            sub(f(1), mul(paintWeight, f(0.7)))
+        );
+
+        const view = uniformView();
+        const cameraPosition = uniformCameraPosition();
+
+        const pbrColor = pbrMetallicRoughnessMaterial(
+            finalAlbedo,
+            finalMetallic,
+            finalRoughness,
+            finalAo,
+            perturbedNormal,
+            normalW,
+            view,
+            cameraPosition,
+            positionW
+        );
+
+        const fragOutput = outputFragColor(pbrColor);
+
+        this.addOutputNode(fragOutput);
+
+        this.build();
     }
 }

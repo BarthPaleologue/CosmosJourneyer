@@ -172,7 +172,6 @@ export class LandingBay {
             Axis.Y,
             deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, Settings.G_EARTH * 0.1)
         );
-        this.landingBayMaterial.update(stellarObjects);
         this.landingPads.forEach((landingPad) => landingPad.update(stellarObjects, cameraWorldPosition));
 
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
