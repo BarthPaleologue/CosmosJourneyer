@@ -95,12 +95,12 @@ export class LandingPadMaterial extends NodeMaterial {
 
         const fullPaintWeight = add(add(paintWeight, borderWeight), circleMask);
 
-        const albedoTexture = textureSample(Textures.METAL_PANELS_ALBEDO, proceduralUV, {
+        const albedoTexture = textureSample(Textures.CONCRETE_ALBEDO, proceduralUV, {
             convertToLinearSpace: true
         });
-        const metallicRoughness = textureSample(Textures.METAL_PANELS_METALLIC_ROUGHNESS, proceduralUV);
-        const normalMapValue = textureSample(Textures.METAL_PANELS_NORMAL, proceduralUV);
-        const ambientOcclusion = textureSample(Textures.METAL_PANELS_AMBIENT_OCCLUSION, proceduralUV);
+        const metallicRoughness = textureSample(Textures.CONCRETE_METALLIC_ROUGHNESS, proceduralUV);
+        const normalMapValue = textureSample(Textures.CONCRETE_NORMAL, proceduralUV);
+        const ambientOcclusion = textureSample(Textures.CONCRETE_AMBIENT_OCCLUSION, proceduralUV);
 
         const finalAlbedo = mix(albedoTexture.rgb, paintAlbedo, fullPaintWeight);
         const finalMetallic = mix(metallicRoughness.r, f(0), fullPaintWeight);

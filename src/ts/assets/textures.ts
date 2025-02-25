@@ -65,6 +65,11 @@ import metalPanelsRoughness from "../../asset/metalPanelMaterial/sci-fi-panel1-r
 import metalPanelsMetallic from "../../asset/metalPanelMaterial/sci-fi-panel1-metallic.webp";
 import metalPanelsAmbientOcclusion from "../../asset/metalPanelMaterial/sci-fi-panel1-ao.webp";
 
+import concreteAlbedo from "../../asset/degraded-concrete-ue/degraded-concrete_albedo.webp";
+import concreteNormal from "../../asset/degraded-concrete-ue/degraded-concrete_normal-dx.webp";
+import concreteMetallicRoughness from "../../asset/degraded-concrete-ue/degraded-concrete_metallic_roughness.webp";
+import concreteAmbientOcclusion from "../../asset/degraded-concrete-ue/degraded-concrete_ao.webp";
+
 import crateAlbedo from "../../asset/crateMaterial/space-crate1-albedo.webp";
 import crateNormal from "../../asset/crateMaterial/space-crate1-normal-dx.webp";
 import crateMetallicRoughness from "../../asset/crateMaterial/space-crate1-metallic-roughness.webp";
@@ -117,6 +122,11 @@ export class Textures {
     static METAL_PANELS_METALLIC: Texture;
     static METAL_PANELS_ROUGHNESS: Texture;
     static METAL_PANELS_AMBIENT_OCCLUSION: Texture;
+
+    static CONCRETE_ALBEDO: Texture;
+    static CONCRETE_NORMAL: Texture;
+    static CONCRETE_METALLIC_ROUGHNESS: Texture;
+    static CONCRETE_AMBIENT_OCCLUSION: Texture;
 
     static CRATE_ALBEDO: Texture;
     static CRATE_NORMAL: Texture;
@@ -195,6 +205,15 @@ export class Textures {
             (Textures.METAL_PANELS_ROUGHNESS = task.texture);
         manager.addTextureTask("MetalPanelsAmbientOcclusion", metalPanelsAmbientOcclusion).onSuccess = (task) =>
             (Textures.METAL_PANELS_AMBIENT_OCCLUSION = task.texture);
+
+        manager.addTextureTask("ConcreteAlbedo", concreteAlbedo).onSuccess = (task) =>
+            (Textures.CONCRETE_ALBEDO = task.texture);
+        manager.addTextureTask("ConcreteNormal", concreteNormal).onSuccess = (task) =>
+            (Textures.CONCRETE_NORMAL = task.texture);
+        manager.addTextureTask("ConcreteMetallicRoughness", concreteMetallicRoughness).onSuccess = (task) =>
+            (Textures.CONCRETE_METALLIC_ROUGHNESS = task.texture);
+        manager.addTextureTask("ConcreteAmbientOcclusion", concreteAmbientOcclusion).onSuccess = (task) =>
+            (Textures.CONCRETE_AMBIENT_OCCLUSION = task.texture);
 
         manager.addTextureTask("CrateAlbedo", crateAlbedo).onSuccess = (task) => (Textures.CRATE_ALBEDO = task.texture);
         manager.addTextureTask("CrateNormal", crateNormal).onSuccess = (task) => (Textures.CRATE_NORMAL = task.texture);
