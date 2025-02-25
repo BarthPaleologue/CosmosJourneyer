@@ -81,7 +81,7 @@ export class LandingBayMaterial extends NodeMaterial {
 
         //Add text to dynamic texture
         namePlateTexture.drawText(
-            stationModel.name,
+            stationModel.name.toUpperCase(),
             null,
             null,
             `${font_size}px ${Settings.MAIN_FONT}`,
