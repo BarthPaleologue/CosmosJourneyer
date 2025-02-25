@@ -20,15 +20,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { LandingPad, LandingPadSize } from "../assets/procedural/landingPad/landingPad";
-import { Transformable } from "../architecture/transformable";
-import {
-    AssetsManager,
-    MeshBuilder,
-    PhysicsAggregate,
-    PhysicsShapeType,
-    Quaternion,
-    TransformNode
-} from "@babylonjs/core";
+import { AssetsManager, MeshBuilder, PhysicsAggregate, PhysicsShapeType, Quaternion } from "@babylonjs/core";
 import { enablePhysics } from "./utils";
 import { DefaultControls } from "../defaultControls/defaultControls";
 import { Spaceship } from "../spaceship/spaceship";
@@ -77,15 +69,7 @@ export async function createAutomaticLandingScene(engine: AbstractEngine): Promi
     groundAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
 
     const hemi = new HemisphericLight("hemi", Vector3.Up(), scene);
-    hemi.intensity = 1.0;
-
-    const sunTransform = new TransformNode("sun", scene);
-    sunTransform.position.copyFromFloats(0, 50, 0);
-
-    const sun: Transformable = {
-        getTransform: () => sunTransform,
-        dispose: () => sunTransform.dispose()
-    };
+    hemi.intensity = 0.7;
 
     //ship.engageLandingOnPad(landingPad);
     ship.engageSurfaceLanding(ground);
