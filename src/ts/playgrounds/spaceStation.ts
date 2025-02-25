@@ -47,7 +47,7 @@ export async function createSpaceStationScene(engine: AbstractEngine): Promise<S
     defaultControls.speed = 2000;
 
     const camera = defaultControls.getActiveCamera();
-    camera.maxZ = 100e3;
+    camera.maxZ = Settings.EARTH_RADIUS * 1e5;
     camera.attachControl();
 
     const distanceToStar = Settings.AU;
