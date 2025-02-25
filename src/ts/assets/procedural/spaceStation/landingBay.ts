@@ -33,6 +33,7 @@ import { getRngFromSeed } from "../../../utils/getRngFromSeed";
 import { createEnvironmentAggregate } from "../../../utils/havok";
 import { getRotationPeriodForArtificialGravity } from "../../../utils/physics";
 import { OrbitalFacilityModel } from "../../../architecture/orbitalObjectModel";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
 
 export class LandingBay {
     private readonly root: TransformNode;
@@ -50,10 +51,16 @@ export class LandingBay {
     private readonly arms: Mesh[] = [];
     private readonly armAggregates: PhysicsAggregate[] = [];
 
+    private readonly centralLight: PointLight;
+
     readonly landingPads: LandingPad[] = [];
 
     constructor(stationModel: OrbitalFacilityModel, seed: number, scene: Scene) {
         this.root = new TransformNode("LandingBayRoot", scene);
+
+        this.centralLight = new PointLight("LandingBayCentralLight", Vector3.Zero(), scene);
+        this.centralLight.parent = this.root;
+        this.centralLight.intensity = 1000;
 
         this.rng = getRngFromSeed(seed);
 
@@ -165,6 +172,8 @@ export class LandingBay {
             .forEach((mesh) => {
                 mesh.position.subtractInPlace(center);
             });
+
+        this.centralLight.includedOnlyMeshes = this.getTransform().getChildMeshes();
     }
 
     update(stellarObjects: Transformable[], cameraWorldPosition: Vector3, deltaSeconds: number) {
@@ -218,5 +227,7 @@ export class LandingBay {
         this.armAggregates.length = 0;
 
         this.landingPads.forEach((landingPad) => landingPad.dispose());
+
+        this.centralLight.dispose();
     }
 }
