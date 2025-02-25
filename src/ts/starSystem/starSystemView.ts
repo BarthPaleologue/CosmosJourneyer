@@ -86,6 +86,7 @@ import { EncyclopaediaGalacticaManager } from "../society/encyclopaediaGalactica
 import { StarSystemDatabase } from "./starSystemDatabase";
 import { AiPlayerControls } from "../player/aiPlayerControls";
 import { LandingPadSize } from "../assets/procedural/landingPad/landingPad";
+import "@babylonjs/inspector";
 
 // register cosmos journeyer as part of window object
 declare global {
