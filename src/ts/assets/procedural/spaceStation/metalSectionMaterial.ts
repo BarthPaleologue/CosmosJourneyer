@@ -36,7 +36,7 @@ export class MetalSectionMaterial extends NodeMaterial {
         const uvY = BSL.mul(positionY, BSL.float(1 / 50));
 
         const scaledUV = BSL.mul(uv, BSL.float(6.0));
-        const recombinedUV = BSL.vec2(BSL.split(scaledUV).x, uvY);
+        const proceduralUV = BSL.vec2(BSL.split(scaledUV).x, uvY);
 
         const world = BSL.uniformWorld();
         const positionW = BSL.transformPosition(world, position);
@@ -48,8 +48,6 @@ export class MetalSectionMaterial extends NodeMaterial {
         const vertexOutput = BSL.outputVertexPosition(positionClipSpace);
 
         // Fragment
-
-        const proceduralUV = BSL.fract(recombinedUV, { target: BSL.Target.FRAG });
 
         const albedoTexture = BSL.textureSample(Textures.METAL_PANELS_ALBEDO, proceduralUV, {
             convertToLinearSpace: true
