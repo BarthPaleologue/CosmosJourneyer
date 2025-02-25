@@ -33,7 +33,7 @@ import { Settings } from "../../../settings";
 
 export class LandingPadMaterial extends NodeMaterial {
     constructor(padNumber: number, scene: Scene) {
-        super("SolarPanelNodeMaterial", scene);
+        super(`LandingPadMaterial${padNumber}`, scene);
         this.mode = NodeMaterialModes.Material;
 
         const numberTexture = Textures.GetLandingPadNumberTexture(padNumber, scene);
