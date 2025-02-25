@@ -97,7 +97,7 @@ export async function createAutomaticLandingScene(engine: AbstractEngine): Promi
 
         defaultControls.update(deltaSeconds);
 
-        landingPad.update([sun], camera.globalPosition);
+        landingPad.update(camera.globalPosition);
     });
 
     return scene;

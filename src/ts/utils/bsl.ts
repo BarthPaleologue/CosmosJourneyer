@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+import { AddBlock } from "@babylonjs/core/Materials/Node/Blocks/addBlock";
 import { ArcTan2Block } from "@babylonjs/core/Materials/Node/Blocks/arcTan2Block";
 import { TextureBlock } from "@babylonjs/core/Materials/Node/Blocks/Dual/textureBlock";
 import { FragmentOutputBlock } from "@babylonjs/core/Materials/Node/Blocks/Fragment/fragmentOutputBlock";
@@ -27,6 +28,8 @@ import { PerturbNormalBlock } from "@babylonjs/core/Materials/Node/Blocks/Fragme
 import { InputBlock } from "@babylonjs/core/Materials/Node/Blocks/Input/inputBlock";
 import { LengthBlock } from "@babylonjs/core/Materials/Node/Blocks/lengthBlock";
 import { LerpBlock } from "@babylonjs/core/Materials/Node/Blocks/lerpBlock";
+import { MaxBlock } from "@babylonjs/core/Materials/Node/Blocks/maxBlock";
+import { MinBlock } from "@babylonjs/core/Materials/Node/Blocks/minBlock";
 import { MultiplyBlock } from "@babylonjs/core/Materials/Node/Blocks/multiplyBlock";
 import { PBRMetallicRoughnessBlock } from "@babylonjs/core/Materials/Node/Blocks/PBR/pbrMetallicRoughnessBlock";
 import { RemapBlock } from "@babylonjs/core/Materials/Node/Blocks/remapBlock";
@@ -650,6 +653,20 @@ export function mix(
     return mixBlock.output;
 }
 
+export function add(
+    left: NodeMaterialConnectionPoint,
+    right: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>
+) {
+    const addBlock = new AddBlock("add");
+    addBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    left.connectTo(addBlock.left);
+    right.connectTo(addBlock.right);
+
+    return addBlock.output;
+}
+
 /**
  * Subtracts the right value from the left value.
  * @param left - The left value.
@@ -668,6 +685,34 @@ export function sub(
     right.connectTo(subBlock.right);
 
     return subBlock.output;
+}
+
+export function min(
+    left: NodeMaterialConnectionPoint,
+    right: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>
+) {
+    const minBlock = new MinBlock("min");
+    minBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    left.connectTo(minBlock.left);
+    right.connectTo(minBlock.right);
+
+    return minBlock.output;
+}
+
+export function max(
+    left: NodeMaterialConnectionPoint,
+    right: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>
+) {
+    const maxBlock = new MaxBlock("max");
+    maxBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    left.connectTo(maxBlock.left);
+    right.connectTo(maxBlock.right);
+
+    return maxBlock.output;
 }
 
 /**

@@ -100,9 +100,7 @@ export class LandingPad implements Targetable {
         };
     }
 
-    update(stellarObjects: Transformable[], cameraWorldPosition: Vector3): void {
-        this.deckMaterial.update(stellarObjects);
-
+    update(cameraWorldPosition: Vector3): void {
         const padCameraDistance2 = Vector3.DistanceSquared(cameraWorldPosition, this.deck.getAbsolutePosition());
         const distanceThreshold = 12e3;
         const isEnabled = padCameraDistance2 < distanceThreshold * distanceThreshold;

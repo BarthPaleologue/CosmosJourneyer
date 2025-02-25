@@ -176,12 +176,12 @@ export class LandingBay {
         this.centralLight.includedOnlyMeshes = this.getTransform().getChildMeshes();
     }
 
-    update(stellarObjects: Transformable[], cameraWorldPosition: Vector3, deltaSeconds: number) {
+    update(cameraWorldPosition: Vector3, deltaSeconds: number) {
         this.getTransform().rotate(
             Axis.Y,
             deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, Settings.G_EARTH * 0.1)
         );
-        this.landingPads.forEach((landingPad) => landingPad.update(stellarObjects, cameraWorldPosition));
+        this.landingPads.forEach((landingPad) => landingPad.update(cameraWorldPosition));
 
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
 

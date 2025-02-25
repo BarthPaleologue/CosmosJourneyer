@@ -312,7 +312,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
         this.cylinderHabitats.forEach((cylinderHabitat) =>
             cylinderHabitat.update(stellarObjects, cameraWorldPosition, deltaSeconds)
         );
-        this.landingBays.forEach((landingBay) => landingBay.update(stellarObjects, cameraWorldPosition, deltaSeconds));
+        this.landingBays.forEach((landingBay) => landingBay.update(cameraWorldPosition, deltaSeconds));
 
         const climberSpeed = 300 / 3.6; // 300 km/h in m/s
         const roundTripDuration = (2 * this.tetherLength) / climberSpeed;

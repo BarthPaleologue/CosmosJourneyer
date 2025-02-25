@@ -1,80 +1,139 @@
-import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Scene } from "@babylonjs/core/scene";
-import { Effect } from "@babylonjs/core/Materials/effect";
-import {
-    setStellarObjectUniforms,
-    StellarObjectUniformNames
-} from "../../../postProcesses/uniforms/stellarObjectUniforms";
-import { Transformable } from "../../../architecture/transformable";
-
-import landingPadMaterialFragment from "../../../../shaders/landingPadMaterial/fragment.glsl";
-import landingPadMaterialVertex from "../../../../shaders/landingPadMaterial/vertex.glsl";
 import { Textures } from "../../textures";
+import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
+import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
+import {
+    add,
+    f,
+    min,
+    mul,
+    outputFragColor,
+    outputVertexPosition,
+    pbrMetallicRoughnessMaterial,
+    perturbNormal,
+    split,
+    step,
+    sub,
+    textureSample,
+    transformDirection,
+    transformPosition,
+    uniformCameraPosition,
+    uniformView,
+    uniformViewProjection,
+    uniformWorld,
+    vec,
+    vec2,
+    vertexAttribute,
+    length,
+    xz,
+    mix
+} from "../../../utils/bsl";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Settings } from "../../../settings";
 
-const LandingPadUniformNames = {
-    WORLD: "world",
-    WORLD_VIEW_PROJECTION: "worldViewProjection",
-    CAMERA_POSITION: "cameraPosition",
-    ASPECT_RATIO: "aspectRatio"
-};
-
-const LandingPadSamplerNames = {
-    ALBEDO_MAP: "albedoMap",
-    NORMAL_MAP: "normalMap",
-    METALLIC_MAP: "metallicMap",
-    ROUGHNESS_MAP: "roughnessMap",
-    NUMBER_TEXTURE: "numberTexture"
-};
-
-export class LandingPadMaterial extends ShaderMaterial {
-    private stellarObjects: Transformable[] = [];
-
+export class LandingPadMaterial extends NodeMaterial {
     constructor(padNumber: number, scene: Scene) {
-        const shaderName = "landingPadMaterial";
-        if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
-            Effect.ShadersStore[`${shaderName}FragmentShader`] = landingPadMaterialFragment;
-        }
-        if (Effect.ShadersStore[`${shaderName}VertexShader`] === undefined) {
-            Effect.ShadersStore[`${shaderName}VertexShader`] = landingPadMaterialVertex;
-        }
-
-        super(`LandingPadMaterial`, scene, shaderName, {
-            attributes: ["position", "normal", "uv"],
-            uniforms: [...Object.values(LandingPadUniformNames), ...Object.values(StellarObjectUniformNames)],
-            samplers: [...Object.values(LandingPadSamplerNames)]
-        });
+        super("SolarPanelNodeMaterial", scene);
+        this.mode = NodeMaterialModes.Material;
 
         const numberTexture = Textures.GetLandingPadNumberTexture(padNumber, scene);
         if (numberTexture === undefined) {
             throw new Error(`No texture for pad number ${padNumber}`);
         }
 
-        this.onBindObservable.add(() => {
-            const activeCamera = scene.activeCamera;
-            if (activeCamera === null) {
-                throw new Error("No active camera");
-            }
+        // Vertex Shader
 
-            this.getEffect().setVector3(LandingPadUniformNames.CAMERA_POSITION, activeCamera.globalPosition);
-            this.getEffect().setFloat(LandingPadUniformNames.ASPECT_RATIO, Settings.LANDING_PAD_ASPECT_RATIO);
+        const position = vertexAttribute("position");
+        const normal = vertexAttribute("normal");
+        const uv = vertexAttribute("uv");
+        const uvSplit = split(uv);
 
-            this.getEffect().setTexture(LandingPadSamplerNames.ALBEDO_MAP, Textures.METAL_PANELS_ALBEDO);
-            this.getEffect().setTexture(LandingPadSamplerNames.NORMAL_MAP, Textures.METAL_PANELS_NORMAL);
-            this.getEffect().setTexture(LandingPadSamplerNames.METALLIC_MAP, Textures.METAL_PANELS_METALLIC);
-            this.getEffect().setTexture(LandingPadSamplerNames.ROUGHNESS_MAP, Textures.METAL_PANELS_ROUGHNESS);
-            this.getEffect().setTexture(LandingPadSamplerNames.NUMBER_TEXTURE, numberTexture);
+        const centeredUV = split(sub(uv, f(0.5)));
+        const centeredUVScaled = vec2(mul(centeredUV.x, f(Settings.LANDING_PAD_ASPECT_RATIO)), centeredUV.y);
 
-            setStellarObjectUniforms(this.getEffect(), this.stellarObjects);
+        const proceduralUV = mul(xz(position), f(0.1));
+
+        const world = uniformWorld();
+        const positionW = transformPosition(world, position);
+        const normalW = transformDirection(world, normal);
+
+        const viewProjection = uniformViewProjection();
+        const positionClipSpace = transformPosition(viewProjection, positionW);
+
+        const vertexOutput = outputVertexPosition(positionClipSpace);
+
+        // Fragment Shader
+
+        //float paintWeight = texture(numberTexture, vec2(1.0 - vUV.y, 1.0 - vUV.x + 0.01)).a;
+        const paintMaskUV = sub(f(1), vec2(uvSplit.y, sub(uvSplit.x, f(0.01))));
+        const paintWeight = textureSample(numberTexture, paintMaskUV).a;
+
+        const paintAlbedo = vec(Vector3.One());
+
+        const borderThickness = f(0.03);
+
+        const borderLeftMask = step(uvSplit.x, borderThickness);
+        const borderRightMask = step(sub(f(1), uvSplit.x), borderThickness);
+
+        const borderX = add(borderLeftMask, borderRightMask);
+
+        const borderTopMask = step(uvSplit.y, borderThickness);
+        const borderBottomMask = step(sub(f(1), uvSplit.y), borderThickness);
+
+        const borderY = add(borderTopMask, borderBottomMask);
+
+        const borderWeight = min(add(borderX, borderY), f(1));
+
+        const circleRadius = f(0.25);
+        const circleThickness = f(0.01);
+        const distToCenter = length(centeredUVScaled);
+
+        const circleMask = mul(
+            step(sub(circleRadius, circleThickness), distToCenter),
+            step(distToCenter, add(circleRadius, circleThickness))
+        );
+
+        const fullPaintWeight = add(add(paintWeight, borderWeight), circleMask);
+
+        const albedoTexture = textureSample(Textures.METAL_PANELS_ALBEDO, proceduralUV, {
+            convertToLinearSpace: true
         });
-    }
+        const metallicRoughness = textureSample(Textures.METAL_PANELS_METALLIC_ROUGHNESS, proceduralUV);
+        const normalMapValue = textureSample(Textures.METAL_PANELS_NORMAL, proceduralUV);
+        const ambientOcclusion = textureSample(Textures.METAL_PANELS_AMBIENT_OCCLUSION, proceduralUV);
 
-    update(stellarObjects: Transformable[]): void {
-        this.stellarObjects = stellarObjects;
-    }
+        const finalAlbedo = mix(albedoTexture.rgb, paintAlbedo, fullPaintWeight);
+        const finalMetallic = mix(metallicRoughness.r, f(0), fullPaintWeight);
+        const finalRoughness = mix(metallicRoughness.g, f(0.7), fullPaintWeight);
+        const finalAmbientOcclusion = mix(ambientOcclusion.r, f(1), fullPaintWeight);
 
-    dispose(forceDisposeEffect?: boolean, forceDisposeTextures?: boolean, notBoundToMesh?: boolean) {
-        super.dispose(forceDisposeEffect, forceDisposeTextures, notBoundToMesh);
-        this.stellarObjects.length = 0;
+        const perturbedNormal = perturbNormal(
+            proceduralUV,
+            positionW,
+            normalW,
+            normalMapValue.rgb,
+            sub(f(1), mul(fullPaintWeight, f(0.5)))
+        );
+
+        const view = uniformView();
+        const cameraPosition = uniformCameraPosition();
+
+        const pbrLighting = pbrMetallicRoughnessMaterial(
+            finalAlbedo,
+            finalMetallic,
+            finalRoughness,
+            finalAmbientOcclusion,
+            perturbedNormal,
+            normalW,
+            view,
+            cameraPosition,
+            positionW
+        );
+
+        const fragOutput = outputFragColor(pbrLighting);
+
+        this.addOutputNode(vertexOutput);
+        this.addOutputNode(fragOutput);
+        this.build();
     }
 }
