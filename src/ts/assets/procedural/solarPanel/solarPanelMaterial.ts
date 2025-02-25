@@ -32,7 +32,7 @@ export class SolarPanelMaterial extends NodeMaterial {
         const normal = BSL.vertexAttribute("normal");
 
         const positionXZ = BSL.xz(position);
-        const positionToUvScale = BSL.mul(positionXZ, BSL.float(0.01));
+        const uv = BSL.mul(positionXZ, BSL.float(0.01));
 
         const world = BSL.uniformWorld();
         const positionW = BSL.transformPosition(world, position);
@@ -44,15 +44,14 @@ export class SolarPanelMaterial extends NodeMaterial {
         const vertexOutput = BSL.outputVertexPosition(positionClipSpace);
 
         // Fragment Shader
-        const proceduralUV = BSL.fract(positionToUvScale, { target: BSL.Target.FRAG });
 
-        const albedoTexture = BSL.textureSample(Textures.SOLAR_PANEL_ALBEDO, proceduralUV, {
+        const albedoTexture = BSL.textureSample(Textures.SOLAR_PANEL_ALBEDO, uv, {
             convertToLinearSpace: true
         });
-        const metallicRoughness = BSL.textureSample(Textures.SOLAR_PANEL_METALLIC_ROUGHNESS, proceduralUV);
-        const normalMapValue = BSL.textureSample(Textures.SOLAR_PANEL_NORMAL, proceduralUV);
+        const metallicRoughness = BSL.textureSample(Textures.SOLAR_PANEL_METALLIC_ROUGHNESS, uv);
+        const normalMapValue = BSL.textureSample(Textures.SOLAR_PANEL_NORMAL, uv);
 
-        const perturbedNormal = BSL.perturbNormal(proceduralUV, positionW, normalW, normalMapValue.rgb, BSL.float(1));
+        const perturbedNormal = BSL.perturbNormal(uv, positionW, normalW, normalMapValue.rgb, BSL.float(1));
 
         const view = BSL.uniformView();
         const cameraPosition = BSL.uniformCameraPosition();
