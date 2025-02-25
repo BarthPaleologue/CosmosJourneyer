@@ -34,7 +34,7 @@ export class ClimberRingMaterial extends NodeMaterial {
         const uv = BSL.vertexAttribute("uv");
 
         const meshUVScaleFactor = BSL.vec(new Vector2(2, 10));
-        const scaledUV = BSL.mul(uv, meshUVScaleFactor);
+        const proceduralUV = BSL.mul(uv, meshUVScaleFactor);
 
         const world = BSL.uniformWorld();
         const positionW = BSL.transformPosition(world, position);
@@ -46,8 +46,6 @@ export class ClimberRingMaterial extends NodeMaterial {
         const vertexOutput = BSL.outputVertexPosition(positionClipSpace);
 
         // Fragment
-
-        const proceduralUV = BSL.fract(scaledUV, { target: BSL.Target.FRAG });
 
         const albedoTexture = BSL.textureSample(Textures.CRATE_ALBEDO, proceduralUV, { convertToLinearSpace: true });
         const metallicRoughnesstexture = BSL.textureSample(Textures.CRATE_METALLIC_ROUGHNESS, proceduralUV);
