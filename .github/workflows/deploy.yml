@@ -80,13 +80,29 @@ jobs:
               uses: actions/deploy-pages@v4
 
     deploy-pr:
-        if: ${{ github.event_name == 'pull_request' }}
-        needs: build-deploy
-        environment:
-            name: github-pages-pr
-            url: ${{ steps.deployment.outputs.page_url }}
-        runs-on: ubuntu-latest
-        steps:
-            - name: Deploy PR Preview to GitHub Pages
-              id: deployment
-              uses: actions/deploy-pages@v4
+      if: ${{ github.event_name == 'pull_request' }}
+      needs: build-deploy
+      environment:
+        name: github-pages-pr
+        url: ${{ steps.deployment.outputs.page_url }}
+      runs-on: ubuntu-latest
+      steps:
+        - name: Download artifact
+          uses: actions/download-artifact@v4
+          with:
+          name: github-pages
+
+        - name: Extract artifact
+          run: tar -xf artifact.tar
+          
+        - name: Move to PR-specific directory
+          run: |
+          PR_NUM=${{ github.event.pull_request.number }}
+          mkdir -p "pr-preview/$PR_NUM"
+          mv * "pr-preview/$PR_NUM/" || true
+          
+        - name: Deploy PR Preview to GitHub Pages
+          id: deployment
+          uses: actions/deploy-pages@v4
+          with:
+          path: pr-preview
