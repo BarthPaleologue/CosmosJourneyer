@@ -480,10 +480,10 @@ export class StarSystemView implements View {
 
         this.targetCursorLayer = new TargetCursorLayer();
 
-        const inspectorRoot = document.getElementById("inspectorLayer");
+        /*const inspectorRoot = document.getElementById("inspectorLayer");
         if (inspectorRoot === null) throw new Error("Inspector root not found");
-        /*Inspector.Show(this.scene, {
-            globalRoot: inspectorRoot,
+        void this.scene.debugLayer.show({
+            globalRoot: inspectorRoot
         });*/
 
         window.StarSystemView = this;
