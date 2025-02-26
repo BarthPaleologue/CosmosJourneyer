@@ -1,6 +1,9 @@
 name: Build & Deploy site to Pages
 
 on:
+    pull_request:
+        branches:
+            - main
     workflow_dispatch:
 
 permissions:
@@ -16,47 +19,74 @@ jobs:
     build-deploy:
         timeout-minutes: 20
         runs-on: ubuntu-latest
+        outputs:
+            artifact-path: ./dist
         steps:
             - name: Checkout
               uses: actions/checkout@v4
+
             - name: Setup Node
               uses: actions/setup-node@v4
               with:
                   node-version: "20"
+
             - name: Setup Pages
               uses: actions/configure-pages@v4
+
             - name: Restore cache
               uses: actions/cache@v4
               with:
                   path: |
                       .cache
+                  # Generate a new cache whenever packages or source files change.
                   key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json', '**/yarn.lock', '**/pnpm-lock.yaml') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+                  # If source files changed but packages didn't, rebuild from a prior cache.
                   restore-keys: |
                       ${{ runner.os }}-${{ hashFiles('**/package-lock.json', '**/yarn.lock', '**/pnpm-lock.yaml') }}-
+
             - name: Install pnpm
               run: npm install -g pnpm
+
             - name: Install dependencies
               run: pnpm install
+
             - name: Build with Webpack
               run: pnpm run build
+
             - name: Generate documentation
               run: pnpm run build:docs
-            - name: debug
+
+            - name: Debug listing
               run: ls -la
+
             - name: Move docs to dist
               run: mv docs dist/docs
+
             - name: Upload artifact
               uses: actions/upload-pages-artifact@v3
               with:
                   path: ./dist
 
-    deploy:
+    deploy-prod:
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        needs: build-deploy
         environment:
             name: github-pages
             url: ${{ steps.deployment.outputs.page_url }}
         runs-on: ubuntu-latest
-        needs: build-deploy
         steps:
             - name: Deploy to GitHub Pages
+              id: deployment
+              uses: actions/deploy-pages@v4
+
+    deploy-pr:
+        if: ${{ github.event_name == 'pull_request' }}
+        needs: build-deploy
+        environment:
+            name: github-pages-pr
+            url: ${{ steps.deployment.outputs.page_url }}
+        runs-on: ubuntu-latest
+        steps:
+            - name: Deploy PR Preview to GitHub Pages
               id: deployment
               uses: actions/deploy-pages@v4
