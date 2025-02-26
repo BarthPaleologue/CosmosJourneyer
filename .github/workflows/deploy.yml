@@ -1,23 +1,20 @@
-name: Build and Deploy Project
-
+name: Deploy
 on:
-    pull_request:
-        branches: [main]
-        types: [opened, synchronize, reopened, closed]
     workflow_dispatch:
 
-concurrency: preview-${{ github.ref }}
+permissions:
+    contents: write
+
+concurrency:
+    group: deploy
+    cancel-in-progress: true
 
 jobs:
-    build_and_deploy:
+    deploy:
+        timeout-minutes: 10
         runs-on: ubuntu-latest
-        permissions:
-            contents: write
-            pull-requests: write
-
         steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
+            - uses: actions/checkout@v4
 
             - name: Setup Node.js with pnpm
               uses: pnpm/action-setup@v4
@@ -27,47 +24,28 @@ jobs:
             - name: Install dependencies
               run: pnpm i
 
+            - name: Check formatting
+              run: pnpm run format:check
+
+            - name: Lint project
+              run: pnpm run lint:check
+
+            - name: Test project
+              run: pnpm run test
+
             - name: Build project
-              run: pnpm build
+              run: pnpm run build
+
+            - name: Build docs
+              run: pnpm run build:docs
+
+            - name: Move docs to dist
+              run: mv docs dist/docs
 
             - name: Deploy to GitHub Pages (Production)
-              if: github.event_name == 'workflow_dispatch'
               uses: JamesIves/github-pages-deploy-action@v4
               with:
                   folder: dist
                   branch: gh-pages
-                  clean-exclude: pr-preview/
-                  force: false # Avoid deleting the pr-preview folder (rebase instead)
-
-            - name: Deploy PR Preview
-              if: github.event_name == 'pull_request'
-              uses: rossjrw/pr-preview-action@v1
-              with:
-                  source-dir: ./dist
-                  preview-branch: gh-pages
-                  umbrella-dir: pr-preview
-                  action: auto
-
-            - name: Get Preview URL
-              if: github.event_name == 'pull_request'
-              id: preview-url
-              run: |
-                  PR_NUMBER=${{ github.event.pull_request.number }}
-                  REPO_NAME=${{ github.event.repository.name }}
-                  OWNER=${{ github.repository_owner }}
-                  echo "url=https://${OWNER}.github.io/${REPO_NAME}/pr-preview/pr-${PR_NUMBER}/" >> $GITHUB_OUTPUT
-
-            - name: Comment on PR with preview URL
-              if: github.event_name == 'pull_request'
-              uses: actions/github-script@v6
-              with:
-                  script: |
-                      const prNumber = context.payload.pull_request.number;
-                      const previewUrl = `${{ steps.preview-url.outputs.url }}`;
-
-                      github.rest.issues.createComment({
-                        issue_number: prNumber,
-                        owner: context.repo.owner,
-                        repo: context.repo.repo,
-                        body: `🔍 **Preview Deployment**\n\nYour changes have been deployed to: [Preview Site](${previewUrl})`
-                      });
+                  clean-exclude: pr-preview
+                  force: false
