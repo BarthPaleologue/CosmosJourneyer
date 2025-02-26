@@ -1,4 +1,3 @@
-import { Transformable } from "../../../architecture/transformable";
 import { Mesh } from "@babylonjs/core/Meshes";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Scene } from "@babylonjs/core/scene";
@@ -12,7 +11,6 @@ import i18n from "../../../i18n";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { Objects } from "../../objects";
 import { ObjectTargetCursorType, Targetable, TargetInfo } from "../../../architecture/targetable";
-import { SpotLight } from "@babylonjs/core/Lights/spotLight";
 
 export const enum LandingPadSize {
     SMALL = 1,
@@ -36,8 +34,6 @@ export class LandingPad implements Targetable {
     readonly targetInfo: TargetInfo;
 
     readonly padHeight = 0.5;
-
-    readonly spotLight: SpotLight;
 
     constructor(padNumber: number, padSize: LandingPadSize, scene: Scene) {
         this.padSize = padSize;
@@ -96,18 +92,6 @@ export class LandingPad implements Targetable {
             }
         }
 
-        this.spotLight = new SpotLight(
-            `LandingPadLight${padNumber}`,
-            Vector3.Up().scaleInPlace(10),
-            Vector3.Down(),
-            Math.PI * 0.9,
-            2,
-            scene
-        );
-        this.spotLight.parent = this.deck;
-        this.spotLight.intensity = 1000.0;
-        this.spotLight.includedOnlyMeshes = [this.deck, ...this.crates];
-
         this.targetInfo = {
             type: ObjectTargetCursorType.LANDING_PAD,
             minDistance: this.getBoundingRadius() * 4.0,
@@ -131,7 +115,6 @@ export class LandingPad implements Targetable {
     }
 
     dispose() {
-        this.spotLight.dispose();
         this.deck.dispose();
         this.deckAggregate.dispose();
         this.deckMaterial.dispose();

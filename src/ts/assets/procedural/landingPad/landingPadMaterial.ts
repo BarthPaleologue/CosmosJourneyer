@@ -26,7 +26,8 @@ import {
     vertexAttribute,
     length,
     xz,
-    mix
+    mix,
+    div
 } from "../../../utils/bsl";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Settings } from "../../../settings";
@@ -130,7 +131,9 @@ export class LandingPadMaterial extends NodeMaterial {
             positionW
         );
 
-        const fragOutput = outputFragColor(pbrLighting);
+        const additionalLight = mul(finalAlbedo, div(f(0.05), add(f(0.05), mul(distToCenter, distToCenter))));
+
+        const fragOutput = outputFragColor(add(pbrLighting, additionalLight));
 
         this.addOutputNode(vertexOutput);
         this.addOutputNode(fragOutput);

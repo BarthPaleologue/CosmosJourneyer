@@ -22,6 +22,7 @@
 
 import { AddBlock } from "@babylonjs/core/Materials/Node/Blocks/addBlock";
 import { ArcTan2Block } from "@babylonjs/core/Materials/Node/Blocks/arcTan2Block";
+import { DivideBlock } from "@babylonjs/core/Materials/Node/Blocks/divideBlock";
 import { TextureBlock } from "@babylonjs/core/Materials/Node/Blocks/Dual/textureBlock";
 import { FragmentOutputBlock } from "@babylonjs/core/Materials/Node/Blocks/Fragment/fragmentOutputBlock";
 import { PerturbNormalBlock } from "@babylonjs/core/Materials/Node/Blocks/Fragment/perturbNormalBlock";
@@ -377,6 +378,20 @@ export function mul(
     options?: Partial<TargetOptions>
 ): NodeMaterialConnectionPoint {
     const mulBlock = new MultiplyBlock("mul");
+    mulBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    left.connectTo(mulBlock.left);
+    right.connectTo(mulBlock.right);
+
+    return mulBlock.output;
+}
+
+export function div(
+    left: NodeMaterialConnectionPoint,
+    right: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>
+): NodeMaterialConnectionPoint {
+    const mulBlock = new DivideBlock("div");
     mulBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
     left.connectTo(mulBlock.left);
