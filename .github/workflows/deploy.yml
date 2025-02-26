@@ -1,108 +1,73 @@
-name: Build & Deploy site to Pages
+name: Build and Deploy Project
 
 on:
     pull_request:
-        branches:
-            - main
+        branches: [main]
+        types: [opened, synchronize, reopened, closed]
     workflow_dispatch:
 
-permissions:
-    contents: read
-    pages: write
-    id-token: write
-
-concurrency:
-    group: "pages"
-    cancel-in-progress: false
+concurrency: preview-${{ github.ref }}
 
 jobs:
-    build-deploy:
-        timeout-minutes: 20
+    build_and_deploy:
         runs-on: ubuntu-latest
-        outputs:
-            artifact-path: ./dist
+        permissions:
+            contents: write
+            pull-requests: write
+
         steps:
-            - name: Checkout
+            - name: Checkout code
               uses: actions/checkout@v4
 
-            - name: Setup Node
-              uses: actions/setup-node@v4
+            - name: Setup Node.js with pnpm
+              uses: pnpm/action-setup@v4
               with:
-                  node-version: "20"
-
-            - name: Setup Pages
-              uses: actions/configure-pages@v4
-
-            - name: Restore cache
-              uses: actions/cache@v4
-              with:
-                  path: |
-                      .cache
-                  # Generate a new cache whenever packages or source files change.
-                  key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json', '**/yarn.lock', '**/pnpm-lock.yaml') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
-                  # If source files changed but packages didn't, rebuild from a prior cache.
-                  restore-keys: |
-                      ${{ runner.os }}-${{ hashFiles('**/package-lock.json', '**/yarn.lock', '**/pnpm-lock.yaml') }}-
-
-            - name: Install pnpm
-              run: npm install -g pnpm
+                  version: 9
 
             - name: Install dependencies
-              run: pnpm install
+              run: pnpm i
 
-            - name: Build with Webpack
-              run: pnpm run build
+            - name: Build project
+              run: pnpm build
 
-            - name: Generate documentation
-              run: pnpm run build:docs
-
-            - name: Debug listing
-              run: ls -la
-
-            - name: Move docs to dist
-              run: mv docs dist/docs
-
-            - name: Upload artifact
-              uses: actions/upload-pages-artifact@v3
+            - name: Deploy to GitHub Pages (Production)
+              if: github.event_name == 'workflow_dispatch'
+              uses: JamesIves/github-pages-deploy-action@v4
               with:
-                  path: ./dist
+                  folder: dist
+                  branch: gh-pages
+                  clean-exclude: pr-preview/
+                  force: false # Avoid deleting the pr-preview folder (rebase instead)
 
-    deploy-prod:
-        if: ${{ github.event_name == 'workflow_dispatch' }}
-        needs: build-deploy
-        environment:
-            name: github-pages
-            url: ${{ steps.deployment.outputs.page_url }}
-        runs-on: ubuntu-latest
-        steps:
-            - name: Deploy to GitHub Pages
-              id: deployment
-              uses: actions/deploy-pages@v4
+            - name: Deploy PR Preview
+              if: github.event_name == 'pull_request'
+              uses: rossjrw/pr-preview-action@v1
+              with:
+                  source-dir: ./dist
+                  preview-branch: gh-pages
+                  umbrella-dir: pr-preview
+                  action: auto
 
-    deploy-pr:
-      if: ${{ github.event_name == 'pull_request' }}
-      needs: build-deploy
-      environment:
-        name: github-pages-pr
-        url: ${{ steps.deployment.outputs.page_url }}
-      runs-on: ubuntu-latest
-      steps:
-        - name: Download artifact
-          uses: actions/download-artifact@v4
-          with:
-          name: github-pages
+            - name: Get Preview URL
+              if: github.event_name == 'pull_request'
+              id: preview-url
+              run: |
+                  PR_NUMBER=${{ github.event.pull_request.number }}
+                  REPO_NAME=${{ github.event.repository.name }}
+                  OWNER=${{ github.repository_owner }}
+                  echo "url=https://${OWNER}.github.io/${REPO_NAME}/pr-preview/pr-${PR_NUMBER}/" >> $GITHUB_OUTPUT
 
-        - name: Extract artifact
-          run: tar -xf artifact.tar
-          
-        - name: Move to PR-specific directory
-          run: |
-          PR_NUM=${{ github.event.pull_request.number }}
-          mkdir -p "pr-preview/$PR_NUM"
-          mv * "pr-preview/$PR_NUM/" || true
-          
-        - name: Deploy PR Preview to GitHub Pages
-          id: deployment
-          uses: actions/deploy-pages@v4
-          with:
-          path: pr-preview
+            - name: Comment on PR with preview URL
+              if: github.event_name == 'pull_request'
+              uses: actions/github-script@v6
+              with:
+                  script: |
+                      const prNumber = context.payload.pull_request.number;
+                      const previewUrl = `${{ steps.preview-url.outputs.url }}`;
+
+                      github.rest.issues.createComment({
+                        issue_number: prNumber,
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        body: `🔍 **Preview Deployment**\n\nYour changes have been deployed to: [Preview Site](${previewUrl})`
+                      });
