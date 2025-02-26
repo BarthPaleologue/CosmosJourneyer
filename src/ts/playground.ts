@@ -17,12 +17,7 @@
 
 import "../styles/index.scss";
 
-import { Engine } from "@babylonjs/core/Engines/engine";
-import "@babylonjs/core/Materials/standardMaterial";
-import "@babylonjs/core/Loading/loadingScreen";
-import "@babylonjs/core/Misc/screenshotTools";
-import "@babylonjs/core/Meshes/thinInstanceMesh";
-import { Scene, Tools } from "@babylonjs/core";
+import { Scene, Tools, WebGPUEngine } from "@babylonjs/core";
 import { createOrbitalDemoScene } from "./playgrounds/orbitalDemo";
 import { createAutomaticLandingScene } from "./playgrounds/automaticLanding";
 import { createHyperspaceTunnelDemo } from "./playgrounds/hyperspaceTunnel";
@@ -37,7 +32,18 @@ const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-const engine = new Engine(canvas, true);
+const engine = new WebGPUEngine(canvas, {
+    antialias: true,
+    audioEngine: true,
+    useHighPrecisionMatrix: true,
+    doNotHandleContextLost: true
+});
+
+await engine.initAsync(undefined, {
+    wasmPath: new URL("./utils/TWGSL/twgsl.wasm", import.meta.url).href,
+    jsPath: new URL("./utils/TWGSL/twgsl.js", import.meta.url).href
+});
+
 engine.useReverseDepthBuffer = true;
 engine.displayLoadingUI();
 

@@ -36,8 +36,6 @@ export async function createHyperspaceTunnelDemo(engine: AbstractEngine) {
     const camera = defaultControls.getActiveCamera();
     camera.attachControl();
 
-    scene.enableDepthRenderer(camera, false, true);
-
     await Assets.Init(scene);
 
     const directionalLight = new DirectionalLight("sun", new Vector3(1, -1, 0), scene);
