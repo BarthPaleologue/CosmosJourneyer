@@ -1,0 +1,26 @@
+name: "Squash gh-pages"
+
+env:
+    NEW_FIRST_COMMIT: HEAD
+    DEFAULT_BRANCH: "gh-pages"
+
+"on":
+    workflow_dispatch:
+    schedule:
+        - cron: "00 11 * * *" # At 11:00 UTC every day
+
+jobs:
+    squash-gh-pages-branch:
+        runs-on: ubuntu-22.04
+        permissions:
+            contents: write
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  ref: ${{ env.DEFAULT_BRANCH }}
+                  fetch-depth: 0
+
+            - uses: myactionway/branch-pruner-action@v2.0
+              with:
+                  new_first_commit: ${{ env.NEW_FIRST_COMMIT }}
+                  branch: ${{ env.DEFAULT_BRANCH }}
