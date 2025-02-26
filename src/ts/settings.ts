@@ -37,6 +37,16 @@ export const Settings = {
      */
     LIGHT_YEAR: 3e8 * 60 * 60 * 24 * 365.25,
 
+    /**
+     * Approximate conversion from Gregorian years to years from the big bang.
+     */
+    GREGORIAN_YEAR_0: 13_800_000_000,
+
+    /**
+     * @see https://en.wikipedia.org/wiki/Stefan%E2%80%93Boltzmann_law
+     */
+    STEFAN_BOLTZMANN_CONSTANT: 5.67e-8,
+
     VERTEX_RESOLUTION: 64,
     MIN_DISTANCE_BETWEEN_VERTICES: 1.5,
 
@@ -107,6 +117,11 @@ export const Settings = {
      * The radius of the sun in meters.
      */
     SOLAR_RADIUS: 696340e3,
+
+    /**
+     * The luminosity of the sun in watts.
+     */
+    SOLAR_LUMINOSITY: 3.828e26,
 
     /**
      * The gravitational acceleration in m/s^2.
