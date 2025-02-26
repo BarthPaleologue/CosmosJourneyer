@@ -70,7 +70,7 @@ export class DefaultControls implements Controls {
     }
 
     public shouldLockPointer(): boolean {
-        return true;
+        return false;
     }
 
     public update(deltaSeconds: number): Vector3 {
