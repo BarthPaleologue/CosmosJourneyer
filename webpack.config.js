@@ -1,7 +1,6 @@
 // Generated using webpack-cli https://github.com/webpack/webpack-cli
 import path from "path";
 import HtmlWebpackPlugin from "html-webpack-plugin";
-import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import webpack from "webpack";
 
 const isProduction = process.env.NODE_ENV === "production";
@@ -86,8 +85,7 @@ const config = {
             filename: "playground.html",
             template: path.join(htmlPath, "emptyIndex.html"),
             chunks: ["playground"]
-        }),
-        new MiniCssExtractPlugin()
+        })
     ],
 
     module: {
@@ -99,18 +97,18 @@ const config = {
             },
             {
                 test: /\.css$/i,
-                use: [MiniCssExtractPlugin.loader, "css-loader"],
+                use: ["style-loader", "css-loader"],
                 exclude: ["/node_modules/"]
             },
 
             {
                 test: /\.s[ac]ss$/i,
-                use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
+                use: ["style-loader", "css-loader", "sass-loader"],
                 exclude: ["/node_modules/"]
             },
             {
-                test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif|webp|glb|obj|mp3|ogg|babylon|env|dds)$/i,
-                type: "asset",
+                test: /\.(eot|svg|ttf|woff|woff2|otf|png|jpg|gif|webp|glb|obj|mp3|ogg|babylon|env|dds)$/i,
+                type: "asset/resource",
                 exclude: ["/node_modules/"]
             },
             {
