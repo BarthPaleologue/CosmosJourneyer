@@ -1,6 +1,7 @@
 // Generated using webpack-cli https://github.com/webpack/webpack-cli
 import path from "path";
 import HtmlWebpackPlugin from "html-webpack-plugin";
+import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import webpack from "webpack";
 
 const isProduction = process.env.NODE_ENV === "production";
@@ -51,6 +52,9 @@ const config = {
         `,
             stage: webpack.Compilation.PROCESS_ASSETS_STAGE_REPORT
         }),
+        new MiniCssExtractPlugin({
+            filename: "[name].[contenthash].css"
+        }),
         new HtmlWebpackPlugin({
             title: "Cosmos Journeyer",
             filename: "index.html",
@@ -97,13 +101,13 @@ const config = {
             },
             {
                 test: /\.css$/i,
-                use: ["style-loader", "css-loader"],
+                use: [MiniCssExtractPlugin.loader, "css-loader"],
                 exclude: ["/node_modules/"]
             },
 
             {
                 test: /\.s[ac]ss$/i,
-                use: ["style-loader", "css-loader", "sass-loader"],
+                use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
                 exclude: ["/node_modules/"]
             },
             {
