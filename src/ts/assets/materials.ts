@@ -22,6 +22,7 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { PBRMetallicRoughnessMaterial } from "@babylonjs/core/Materials/PBR/pbrMetallicRoughnessMaterial";
 import { Textures } from "./textures";
+import { SolarPanelMaterial } from "./procedural/solarPanel/solarPanelMaterial";
 
 export class Materials {
     public static BUTTERFLY_MATERIAL: ButterflyMaterial;
@@ -31,6 +32,8 @@ export class Materials {
     public static GRASS_DEPTH_MATERIAL: GrassMaterial;
 
     public static CRATE_MATERIAL: PBRMetallicRoughnessMaterial;
+
+    public static SOLAR_PANEL: SolarPanelMaterial;
 
     public static Init(scene: Scene) {
         Materials.BUTTERFLY_MATERIAL = new ButterflyMaterial(scene, false);
@@ -43,6 +46,8 @@ export class Materials {
         Materials.CRATE_MATERIAL.baseTexture = Textures.CRATE_ALBEDO;
         Materials.CRATE_MATERIAL.normalTexture = Textures.CRATE_NORMAL;
         Materials.CRATE_MATERIAL.metallicRoughnessTexture = Textures.CRATE_METALLIC_ROUGHNESS;
+
+        Materials.SOLAR_PANEL = new SolarPanelMaterial(scene);
     }
 
     static DebugMaterial(name: string, diffuse: boolean, wireframe: boolean, scene: Scene) {
