@@ -136,8 +136,7 @@ export class LandingBayMaterial extends NodeMaterial {
             convertToLinearSpace: true
         });
         const normalMap = textureSample(Textures.SPACE_STATION_NORMAL, proceduralUV);
-        const metallic = textureSample(Textures.SPACE_STATION_METALLIC, proceduralUV);
-        const roughness = textureSample(Textures.SPACE_STATION_ROUGHNESS, proceduralUV);
+        const metallicRoughness = textureSample(Textures.SPACE_STATION_METALLIC_ROUGHNESS, proceduralUV);
         const occlusion = textureSample(Textures.SPACE_STATION_AMBIENT_OCCLUSION, proceduralUV);
 
         const namePlateUvX = mul(theta, f(1.0 / Math.PI));
@@ -153,8 +152,8 @@ export class LandingBayMaterial extends NodeMaterial {
         const paintWeight = namePlateColor.a;
 
         const finalAlbedo = mix(albedo.rgb, namePlateColor.rgb, paintWeight);
-        const finalMetallic = mix(metallic.r, f(0.0), paintWeight);
-        const finalRoughness = mix(roughness.r, f(0.7), paintWeight);
+        const finalMetallic = mix(metallicRoughness.r, f(0.0), paintWeight);
+        const finalRoughness = mix(metallicRoughness.g, f(0.7), paintWeight);
         const finalAo = mix(occlusion.r, f(1.0), paintWeight);
 
         const perturbedNormal = perturbNormal(
