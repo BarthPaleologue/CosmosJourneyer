@@ -1,0 +1,14 @@
+name: Deploy to VPS
+
+on:
+    push:
+        branches:
+            - gh-pages
+
+jobs:
+    deploy-vps:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Force pull changes from GitHub
+              run: |
+                  ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} "cd ${{ secrets.VPS_DEPLOY_PATH }} && git fetch && sudo git reset --hard origin/gh-pages && sudo git clean -df"
