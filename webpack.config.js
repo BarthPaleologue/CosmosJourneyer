@@ -16,7 +16,8 @@ const config = {
     },
     output: {
         filename: "[name].[contenthash].js",
-        path: path.resolve(import.meta.dirname, "dist")
+        path: path.resolve(import.meta.dirname, "dist"),
+        clean: true
     },
     devServer: {
         open: false,
