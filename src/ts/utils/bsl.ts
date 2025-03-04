@@ -34,6 +34,7 @@ import { MinBlock } from "@babylonjs/core/Materials/Node/Blocks/minBlock";
 import { MultiplyBlock } from "@babylonjs/core/Materials/Node/Blocks/multiplyBlock";
 import { PBRMetallicRoughnessBlock } from "@babylonjs/core/Materials/Node/Blocks/PBR/pbrMetallicRoughnessBlock";
 import { RemapBlock } from "@babylonjs/core/Materials/Node/Blocks/remapBlock";
+import { SmoothStepBlock } from "@babylonjs/core/Materials/Node/Blocks/smoothStepBlock";
 import { StepBlock } from "@babylonjs/core/Materials/Node/Blocks/stepBlock";
 import { SubtractBlock } from "@babylonjs/core/Materials/Node/Blocks/subtractBlock";
 import { TransformBlock } from "@babylonjs/core/Materials/Node/Blocks/transformBlock";
@@ -625,6 +626,22 @@ export function step(
     stepBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
     edge.connectTo(stepBlock.edge);
+    x.connectTo(stepBlock.value);
+
+    return stepBlock.output;
+}
+
+export function smoothstep(
+    edge0: NodeMaterialConnectionPoint,
+    edge1: NodeMaterialConnectionPoint,
+    x: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>
+) {
+    const stepBlock = new SmoothStepBlock("smoothstep");
+    stepBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    edge0.connectTo(stepBlock.edge0);
+    edge1.connectTo(stepBlock.edge1);
     x.connectTo(stepBlock.value);
 
     return stepBlock.output;

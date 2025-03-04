@@ -268,9 +268,7 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
         this.ringHabitats.forEach((ringHabitat) =>
             ringHabitat.update(stellarObjects, cameraWorldPosition, deltaSeconds)
         );
-        this.cylinderHabitats.forEach((cylinderHabitat) =>
-            cylinderHabitat.update(stellarObjects, cameraWorldPosition, deltaSeconds)
-        );
+        this.cylinderHabitats.forEach((cylinderHabitat) => cylinderHabitat.update(cameraWorldPosition, deltaSeconds));
         this.landingBays.forEach((landingBay) => landingBay.update(cameraWorldPosition, deltaSeconds));
         this.engineBays.forEach((engineBay) => engineBay.update(cameraWorldPosition));
     }
