@@ -114,7 +114,7 @@ export function createHelixVertexData(
     indices.push(0, 1, 2);
     indices.push(2, 1, 3);
 
-    const spiralIndexOffset = positions.length / 3 - 4 * 3;
+    const spiralIndexOffset = positions.length / 3 - 4;
 
     indices.push(spiralIndexOffset, spiralIndexOffset + 2, spiralIndexOffset + 1);
     indices.push(spiralIndexOffset + 2, spiralIndexOffset + 3, spiralIndexOffset + 1);
