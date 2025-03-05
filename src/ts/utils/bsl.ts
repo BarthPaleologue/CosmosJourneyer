@@ -20,6 +20,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+/**
+ * BSL (Babylon Shader Language) - A utility module for building node-based materials in Babylon.js
+ *
+ * This module provides a collection of helper functions to create and connect node material blocks
+ * in a more functional and concise way. It abstracts away the complexity of manually creating and
+ * connecting blocks, making shader creation more intuitive and less error-prone.
+ *
+ * The functions in this module follow a consistent pattern:
+ * - They create the necessary node material blocks
+ * - They configure the blocks with the provided options
+ * - They handle the connections between blocks
+ * - They return the relevant output connection point
+ */
+
 import { AddBlock } from "@babylonjs/core/Materials/Node/Blocks/addBlock";
 import { ArcTan2Block } from "@babylonjs/core/Materials/Node/Blocks/arcTan2Block";
 import { DivideBlock } from "@babylonjs/core/Materials/Node/Blocks/divideBlock";
@@ -387,6 +401,13 @@ export function mul(
     return mulBlock.output;
 }
 
+/**
+ * Divides the left value by the right value.
+ * @param left - The dividend value.
+ * @param right - The divisor value.
+ * @param options - Optional target options.
+ * @returns The division result as a connection point.
+ */
 export function div(
     left: NodeMaterialConnectionPoint,
     right: NodeMaterialConnectionPoint,
@@ -591,10 +612,11 @@ export function split(inputVec: NodeMaterialConnectionPoint, options?: Partial<T
 }
 
 /**
- * Returns the xz components of a vec3 / 4.
- * @param inputVec3 - The input vec3 / 4.
- * @param dim - The dimension of the input vector
+ * Creates a vec2 using the input vector's X and Z components.
+ * Useful for projecting 3D positions onto a 2D plane.
+ * @param inputVec - The input vector (must be vec3 or vec4).
  * @param options - Optional target options.
+ * @returns A vec2 containing the X and Z components.
  */
 export function xz(
     inputVec: NodeMaterialConnectionPoint,
@@ -631,6 +653,16 @@ export function step(
     return stepBlock.output;
 }
 
+/**
+ * Returns the smooth step function result.
+ * The return value is 0.0 if x <= edge0, 1.0 if x >= edge1,
+ * and performs smooth Hermite interpolation between 0.0 and 1.0 when edge0 < x < edge1.
+ * @param edge0 - The lower edge of the Hermite function.
+ * @param edge1 - The upper edge of the Hermite function.
+ * @param x - The source value for interpolation.
+ * @param options - Optional target options.
+ * @returns The smoothly interpolated value.
+ */
 export function smoothstep(
     edge0: NodeMaterialConnectionPoint,
     edge1: NodeMaterialConnectionPoint,
@@ -685,6 +717,13 @@ export function mix(
     return mixBlock.output;
 }
 
+/**
+ * Adds two values together.
+ * @param left - The first value to add.
+ * @param right - The second value to add.
+ * @param options - Optional target options.
+ * @returns The sum as a connection point.
+ */
 export function add(
     left: NodeMaterialConnectionPoint,
     right: NodeMaterialConnectionPoint,
@@ -719,6 +758,13 @@ export function sub(
     return subBlock.output;
 }
 
+/**
+ * Returns the minimum of two values.
+ * @param left - The first value to compare.
+ * @param right - The second value to compare.
+ * @param options - Optional target options.
+ * @returns The minimum value as a connection point.
+ */
 export function min(
     left: NodeMaterialConnectionPoint,
     right: NodeMaterialConnectionPoint,
@@ -733,6 +779,13 @@ export function min(
     return minBlock.output;
 }
 
+/**
+ * Returns the maximum of two values.
+ * @param left - The first value to compare.
+ * @param right - The second value to compare.
+ * @param options - Optional target options.
+ * @returns The maximum value as a connection point.
+ */
 export function max(
     left: NodeMaterialConnectionPoint,
     right: NodeMaterialConnectionPoint,
