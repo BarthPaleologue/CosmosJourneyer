@@ -48,7 +48,7 @@ import {
 
 export class RingHabitatMaterial extends NodeMaterial {
     constructor(meanRadius: number, deltaRadius: number, height: number, scene: Scene) {
-        super("LandingBayMaterial", scene);
+        super("RingHabitatMaterial", scene);
         this.mode = NodeMaterialModes.Material;
 
         const position = vertexAttribute("position");

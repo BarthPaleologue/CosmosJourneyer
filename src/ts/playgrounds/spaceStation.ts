@@ -67,7 +67,7 @@ export async function createSpaceStationScene(engine: AbstractEngine): Promise<S
     const systemDatabase = new StarSystemDatabase();
     const systemPosition = systemDatabase.getSystemGalacticPosition(coordinates);
 
-    const sunModel = newSeededStarModel(456, "Untitled Star", []);
+    const sunModel = newSeededStarModel(420, "Untitled Star", []);
     const sun = new Star(sunModel, scene);
     sun.getTransform().position = new Vector3(7, 2, 5).normalize().scaleInPlace(distanceToStar);
 
@@ -89,7 +89,7 @@ export async function createSpaceStationScene(engine: AbstractEngine): Promise<S
 
         const cameraWorldPosition = camera.globalPosition;
 
-        spaceStation.update([sun], [sun], cameraWorldPosition, deltaSeconds);
+        spaceStation.update([sun], cameraWorldPosition, deltaSeconds);
     });
 
     return scene;

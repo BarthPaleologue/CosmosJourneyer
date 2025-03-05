@@ -287,12 +287,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
         node.position = parent.position.add(parent.up.scale(previousSectionSizeY + newSectionY));
     }
 
-    update(
-        stellarObjects: Transformable[],
-        parents: Transformable[],
-        cameraWorldPosition: Vector3,
-        deltaSeconds: number
-    ) {
+    update(parents: Transformable[], cameraWorldPosition: Vector3, deltaSeconds: number) {
         if (parents.length !== 1) {
             throw new Error("Space Elevator should have exactly one parent");
         }
@@ -303,12 +298,8 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
 
         this.elapsedSeconds += deltaSeconds;
 
-        this.helixHabitats.forEach((helixHabitat) =>
-            helixHabitat.update(stellarObjects, cameraWorldPosition, deltaSeconds)
-        );
-        this.ringHabitats.forEach((ringHabitat) =>
-            ringHabitat.update(stellarObjects, cameraWorldPosition, deltaSeconds)
-        );
+        this.helixHabitats.forEach((helixHabitat) => helixHabitat.update(cameraWorldPosition, deltaSeconds));
+        this.ringHabitats.forEach((ringHabitat) => ringHabitat.update(cameraWorldPosition, deltaSeconds));
         this.cylinderHabitats.forEach((cylinderHabitat) => cylinderHabitat.update(cameraWorldPosition, deltaSeconds));
         this.landingBays.forEach((landingBay) => landingBay.update(cameraWorldPosition, deltaSeconds));
 

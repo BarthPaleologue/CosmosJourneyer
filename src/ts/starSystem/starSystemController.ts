@@ -681,12 +681,7 @@ export class StarSystemController {
 
         const cameraWorldPosition = controls.getTransform().getAbsolutePosition();
         for (const orbitalFacility of orbitalFacilities) {
-            orbitalFacility.update(
-                stellarObjects,
-                this.objectToParents.get(orbitalFacility) ?? [],
-                cameraWorldPosition,
-                deltaSeconds
-            );
+            orbitalFacility.update(this.objectToParents.get(orbitalFacility) ?? [], cameraWorldPosition, deltaSeconds);
             orbitalFacility.computeCulling(controls.getActiveCamera());
         }
 

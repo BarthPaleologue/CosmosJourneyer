@@ -127,7 +127,7 @@ export class RingHabitat implements Transformable {
         }
     }
 
-    update(stellarObjects: Transformable[], cameraWorldPosition: Vector3, deltaSeconds: number) {
+    update(cameraWorldPosition: Vector3, deltaSeconds: number) {
         this.getTransform().rotate(
             Axis.Y,
             deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, Settings.G_EARTH)

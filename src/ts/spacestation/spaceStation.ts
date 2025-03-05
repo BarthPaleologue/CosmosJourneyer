@@ -174,9 +174,9 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
 
         const habitatType = wheelOfFortune(
             [
-                [SpaceStationNodeType.RING_HABITAT, 0.5],
+                [SpaceStationNodeType.RING_HABITAT, 0.4],
                 [SpaceStationNodeType.HELIX_HABITAT, 0.3],
-                [SpaceStationNodeType.CYLINDER_HABITAT, 0.2]
+                [SpaceStationNodeType.CYLINDER_HABITAT, 0.3]
             ],
             rng(17)
         );
@@ -254,20 +254,11 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
         node.position = parent.position.add(parent.up.scale(previousSectionSizeY + newSectionY));
     }
 
-    update(
-        stellarObjects: Transformable[],
-        parents: Transformable[],
-        cameraWorldPosition: Vector3,
-        deltaSeconds: number
-    ) {
+    update(parents: Transformable[], cameraWorldPosition: Vector3, deltaSeconds: number) {
         this.solarSections.forEach((solarSection) => solarSection.update(cameraWorldPosition));
         this.utilitySections.forEach((utilitySection) => utilitySection.update(cameraWorldPosition));
-        this.helixHabitats.forEach((helixHabitat) =>
-            helixHabitat.update(stellarObjects, cameraWorldPosition, deltaSeconds)
-        );
-        this.ringHabitats.forEach((ringHabitat) =>
-            ringHabitat.update(stellarObjects, cameraWorldPosition, deltaSeconds)
-        );
+        this.helixHabitats.forEach((helixHabitat) => helixHabitat.update(cameraWorldPosition, deltaSeconds));
+        this.ringHabitats.forEach((ringHabitat) => ringHabitat.update(cameraWorldPosition, deltaSeconds));
         this.cylinderHabitats.forEach((cylinderHabitat) => cylinderHabitat.update(cameraWorldPosition, deltaSeconds));
         this.landingBays.forEach((landingBay) => landingBay.update(cameraWorldPosition, deltaSeconds));
         this.engineBays.forEach((engineBay) => engineBay.update(cameraWorldPosition));

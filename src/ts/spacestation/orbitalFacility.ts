@@ -30,10 +30,5 @@ export interface OrbitalFacilityBase<T extends OrbitalObjectType>
         Targetable {
     getSubTargets(): Targetable[];
 
-    update(
-        stellarObjects: Transformable[],
-        parents: Transformable[],
-        cameraWorldPosition: Vector3,
-        deltaSeconds: number
-    ): void;
+    update(parents: Transformable[], cameraWorldPosition: Vector3, deltaSeconds: number): void;
 }
