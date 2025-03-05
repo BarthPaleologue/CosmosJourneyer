@@ -23,6 +23,7 @@ import "@babylonjs/core/Loading/loadingScreen";
 import "@babylonjs/core/Misc/screenshotTools";
 import "@babylonjs/core/Meshes/thinInstanceMesh";
 import { Scene, Tools } from "@babylonjs/core";
+import "@babylonjs/inspector";
 import { createOrbitalDemoScene } from "./playgrounds/orbitalDemo";
 import { createAutomaticLandingScene } from "./playgrounds/automaticLanding";
 import { createHyperspaceTunnelDemo } from "./playgrounds/hyperspaceTunnel";
@@ -75,6 +76,15 @@ switch (requestedScene) {
         break;
     default:
         scene = await createAutomaticLandingScene(engine);
+}
+
+if (urlParams.get("debug") !== null) {
+    const inspectorRoot = document.createElement("div");
+    document.body.appendChild(inspectorRoot);
+    inspectorRoot.id = "inspectorLayer";
+    await scene.debugLayer.show({
+        globalRoot: inspectorRoot
+    });
 }
 
 scene.executeWhenReady(() => {

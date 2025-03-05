@@ -91,10 +91,17 @@ export function newSeededSpaceStationModel(
     const nbHydroponicLayers = 10;
 
     // find average distance to stellar objects
-    let distanceToStar = 0;
-    parentBodies.forEach((celestialBody) => {
-        distanceToStar += celestialBody.orbit.semiMajorAxis;
-    });
+    let distanceToStar = orbit.semiMajorAxis;
+    parentBodies
+        .filter(
+            (body) =>
+                body.type !== OrbitalObjectType.STAR &&
+                body.type !== OrbitalObjectType.NEUTRON_STAR &&
+                body.type !== OrbitalObjectType.BLACK_HOLE
+        )
+        .forEach((celestialBody) => {
+            distanceToStar += celestialBody.orbit.semiMajorAxis;
+        });
     distanceToStar /= parentBodies.length;
 
     let totalStellarFlux = 0;

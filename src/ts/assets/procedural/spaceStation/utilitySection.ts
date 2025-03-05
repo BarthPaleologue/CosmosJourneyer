@@ -30,6 +30,7 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { getRngFromSeed } from "../../../utils/getRngFromSeed";
 import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
+import { Material } from "@babylonjs/core/Materials/material";
 
 export class UtilitySection implements Transformable {
     private readonly attachment: Mesh;
@@ -38,13 +39,13 @@ export class UtilitySection implements Transformable {
 
     private attachmentAggregate: PhysicsAggregate | null = null;
 
-    private readonly metalSectionMaterial: MetalSectionMaterial;
+    private readonly metalSectionMaterial: Material;
 
     private readonly tanks: AbstractMesh[] = [];
     private readonly tankBodies: PhysicsBody[] = [];
 
     constructor(seed: number, scene: Scene) {
-        this.metalSectionMaterial = new MetalSectionMaterial(scene);
+        this.metalSectionMaterial = new MetalSectionMaterial("UtilitySectionMetalMaterial", scene);
 
         this.rng = getRngFromSeed(seed);
 
@@ -84,9 +85,7 @@ export class UtilitySection implements Transformable {
         }
     }
 
-    update(stellarObjects: Transformable[], cameraWorldPosition: Vector3) {
-        this.metalSectionMaterial.update(stellarObjects);
-
+    update(cameraWorldPosition: Vector3) {
         const distanceToCamera = cameraWorldPosition.subtract(this.getTransform().getAbsolutePosition()).length();
 
         if (distanceToCamera < 350e3 && this.attachmentAggregate === null) {

@@ -1,4 +1,3 @@
-import { Transformable } from "../../../architecture/transformable";
 import { Mesh } from "@babylonjs/core/Meshes";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Scene } from "@babylonjs/core/scene";
@@ -100,9 +99,7 @@ export class LandingPad implements Targetable {
         };
     }
 
-    update(stellarObjects: Transformable[], cameraWorldPosition: Vector3): void {
-        this.deckMaterial.update(stellarObjects);
-
+    update(cameraWorldPosition: Vector3): void {
         const padCameraDistance2 = Vector3.DistanceSquared(cameraWorldPosition, this.deck.getAbsolutePosition());
         const distanceThreshold = 12e3;
         const isEnabled = padCameraDistance2 < distanceThreshold * distanceThreshold;

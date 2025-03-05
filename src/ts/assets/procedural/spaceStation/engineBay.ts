@@ -13,13 +13,14 @@ import { CollisionMask } from "../../../settings";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { createEnvironmentAggregate } from "../../../utils/havok";
+import { Material } from "@babylonjs/core/Materials/material";
 
 export class EngineBay implements Transformable {
     private readonly root: TransformNode;
 
     private readonly skirt: Mesh;
     private skirtAggregate: PhysicsAggregate | null = null;
-    private readonly skirtMaterial: MetalSectionMaterial;
+    private readonly skirtMaterial: Material;
 
     private readonly engines: AbstractMesh[] = [];
     private readonly engineBodies: PhysicsBody[] = [];
@@ -45,7 +46,7 @@ export class EngineBay implements Transformable {
         );
         this.skirt.convertToFlatShadedMesh();
 
-        this.skirtMaterial = new MetalSectionMaterial(scene);
+        this.skirtMaterial = new MetalSectionMaterial("EngineBayMetalSectionMaterial", scene);
 
         this.skirt.material = this.skirtMaterial;
         this.skirt.parent = this.root;
@@ -78,9 +79,7 @@ export class EngineBay implements Transformable {
         this.engineShape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
     }
 
-    update(stellarObjects: Transformable[], cameraWorldPosition: Vector3) {
-        this.skirtMaterial.update(stellarObjects);
-
+    update(cameraWorldPosition: Vector3) {
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
         if (distanceToCamera < 350e3 && this.skirtAggregate === null) {
             this.skirtAggregate = createEnvironmentAggregate(this.skirt, PhysicsShapeType.MESH, this.scene);

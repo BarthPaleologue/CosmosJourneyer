@@ -55,30 +55,31 @@ export class CylinderHabitat implements Transformable {
 
         this.habitableSurface = height * 2 * Math.PI * (this.radius / 2);
 
+        const tesselation = 32;
+
         this.cylinder = MeshBuilder.CreateCylinder(
             "CylinderHabitat",
             {
                 diameter: this.radius * 2,
                 height: height,
-                tessellation: 32
+                tessellation: tesselation
             },
             scene
         );
         this.cylinder.convertToFlatShadedMesh();
 
-        this.cylinderMaterial = new CylinderHabitatMaterial(this.radius, height, scene);
+        this.cylinderMaterial = new CylinderHabitatMaterial(this.radius, height, tesselation, scene);
 
         this.cylinder.material = this.cylinderMaterial;
 
         this.cylinder.parent = this.getTransform();
     }
 
-    update(stellarObjects: Transformable[], cameraWorldPosition: Vector3, deltaSeconds: number) {
+    update(cameraWorldPosition: Vector3, deltaSeconds: number) {
         this.getTransform().rotate(
             Axis.Y,
             deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, Settings.G_EARTH)
         );
-        this.cylinderMaterial.update(stellarObjects);
 
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
 

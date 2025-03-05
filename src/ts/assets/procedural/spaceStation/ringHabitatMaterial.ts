@@ -15,87 +15,104 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Scene } from "@babylonjs/core/scene";
-import { Effect } from "@babylonjs/core/Materials/effect";
-import { Transformable } from "../../../architecture/transformable";
-import ringHabitatMaterialFragment from "../../../../shaders/ringHabitatMaterial/fragment.glsl";
-import ringHabitatMaterialVertex from "../../../../shaders/ringHabitatMaterial/vertex.glsl";
-import {
-    setStellarObjectUniforms,
-    StellarObjectUniformNames
-} from "../../../postProcesses/uniforms/stellarObjectUniforms";
 import { Textures } from "../../textures";
-import { OrbitalFacilityModel } from "../../../architecture/orbitalObjectModel";
+import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
+import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
+import {
+    vertexAttribute,
+    split,
+    uniformWorld,
+    transformPosition,
+    transformDirection,
+    sub,
+    f,
+    step,
+    abs,
+    mul,
+    mix,
+    uniformViewProjection,
+    outputVertexPosition,
+    vec2,
+    textureSample,
+    perturbNormal,
+    uniformView,
+    uniformCameraPosition,
+    pbrMetallicRoughnessMaterial,
+    outputFragColor,
+    smoothstep,
+    fract,
+    vec3,
+    add
+} from "../../../utils/bsl";
 
-const RingHabitatUniformNames = {
-    WORLD: "world",
-    WORLD_VIEW_PROJECTION: "worldViewProjection",
-    CAMERA_POSITION: "cameraPosition",
-    MEAN_RADIUS: "meanRadius",
-    DELTA_RADIUS: "deltaRadius",
-    HEIGHT: "height"
-};
+export class RingHabitatMaterial extends NodeMaterial {
+    constructor(meanRadius: number, deltaRadius: number, height: number, scene: Scene) {
+        super("RingHabitatMaterial", scene);
+        this.mode = NodeMaterialModes.Material;
 
-const RingHabitatSamplerNames = {
-    ALBEDO: "albedoMap",
-    NORMAL: "normalMap",
-    METALLIC: "metallicMap",
-    ROUGHNESS: "roughnessMap",
-    OCCLUSION: "occlusionMap"
-};
+        const position = vertexAttribute("position");
+        const normal = vertexAttribute("normal");
+        const uv = vertexAttribute("uv");
 
-export class RingHabitatMaterial extends ShaderMaterial {
-    private stellarObjects: Transformable[] = [];
+        const world = uniformWorld();
+        const positionW = transformPosition(world, position);
+        const normalW = transformDirection(world, normal);
 
-    constructor(
-        stationModel: OrbitalFacilityModel,
-        meanRadius: number,
-        deltaRadius: number,
-        height: number,
-        scene: Scene
-    ) {
-        const shaderName = "ringHabitatMaterial";
-        if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
-            Effect.ShadersStore[`${shaderName}FragmentShader`] = ringHabitatMaterialFragment;
-        }
-        if (Effect.ShadersStore[`${shaderName}VertexShader`] === undefined) {
-            Effect.ShadersStore[`${shaderName}VertexShader`] = ringHabitatMaterialVertex;
-        }
+        const splitUV = split(uv);
+        const scaledUvX = mul(splitUV.x, f((2.0 * Math.PI * meanRadius) / deltaRadius));
+        // float mask = 1.0 - step(0.02, abs(normal.y));
+        // vUV.y *= mix(1.0, height, mask);
+        const mask = sub(f(1), step(f(0.02), abs(split(normal).y)));
+        const scaledUvY = mul(splitUV.y, mix(f(1.0), f(height), mask));
+        const proceduralUV = vec2(scaledUvX, scaledUvY);
 
-        super(`RingHabitatMaterial`, scene, shaderName, {
-            attributes: ["position", "normal", "uv"],
-            uniforms: [...Object.values(RingHabitatUniformNames), ...Object.values(StellarObjectUniformNames)],
-            samplers: [...Object.values(RingHabitatSamplerNames)]
+        const viewProjection = uniformViewProjection();
+        const positionClipSpace = transformPosition(viewProjection, positionW);
+
+        const vertexOutput = outputVertexPosition(positionClipSpace);
+
+        this.addOutputNode(vertexOutput);
+
+        const albedo = textureSample(Textures.SPACE_STATION_ALBEDO, proceduralUV, {
+            convertToLinearSpace: true
         });
+        const normalMap = textureSample(Textures.SPACE_STATION_NORMAL, proceduralUV);
+        const metallicRoughness = textureSample(Textures.SPACE_STATION_METALLIC_ROUGHNESS, proceduralUV);
+        const occlusion = textureSample(Textures.SPACE_STATION_AMBIENT_OCCLUSION, proceduralUV);
 
-        this.onBindObservable.add(() => {
-            const activeCamera = scene.activeCamera;
-            if (activeCamera === null) {
-                throw new Error("No active camera");
-            }
+        const perturbedNormal = perturbNormal(proceduralUV, positionW, normalW, normalMap.rgb, f(1));
 
-            this.getEffect().setVector3(RingHabitatUniformNames.CAMERA_POSITION, activeCamera.globalPosition);
-            this.getEffect().setFloat(RingHabitatUniformNames.MEAN_RADIUS, meanRadius);
-            this.getEffect().setFloat(RingHabitatUniformNames.DELTA_RADIUS, deltaRadius);
-            this.getEffect().setFloat(RingHabitatUniformNames.HEIGHT, height);
+        const view = uniformView();
+        const cameraPosition = uniformCameraPosition();
 
-            setStellarObjectUniforms(this.getEffect(), this.stellarObjects);
+        const pbrColor = pbrMetallicRoughnessMaterial(
+            albedo.rgb,
+            metallicRoughness.r,
+            metallicRoughness.g,
+            occlusion.r,
+            perturbedNormal,
+            normalW,
+            view,
+            cameraPosition,
+            positionW
+        );
 
-            this.getEffect().setTexture(RingHabitatSamplerNames.ALBEDO, Textures.SPACE_STATION_ALBEDO);
-            this.getEffect().setTexture(RingHabitatSamplerNames.NORMAL, Textures.SPACE_STATION_NORMAL);
-            this.getEffect().setTexture(RingHabitatSamplerNames.METALLIC, Textures.SPACE_STATION_METALLIC);
-            this.getEffect().setTexture(RingHabitatSamplerNames.ROUGHNESS, Textures.SPACE_STATION_ROUGHNESS);
-            this.getEffect().setTexture(RingHabitatSamplerNames.OCCLUSION, Textures.SPACE_STATION_AMBIENT_OCCLUSION);
-        });
-    }
+        const lightEmission = mul(
+            mul(
+                smoothstep(f(0.48), f(0.5), fract(scaledUvX)),
+                sub(f(1), smoothstep(f(0.5), f(0.52), fract(scaledUvX)))
+            ),
+            mul(smoothstep(f(0.4), f(0.45), fract(scaledUvY)), sub(f(1), smoothstep(f(0.55), f(0.6), fract(scaledUvY))))
+        );
 
-    update(stellarObjects: Transformable[]) {
-        this.stellarObjects = stellarObjects;
-    }
+        const lightColor = vec3(f(1), f(1), f(0.7));
 
-    dispose(forceDisposeEffect?: boolean, forceDisposeTextures?: boolean, notBoundToMesh?: boolean) {
-        super.dispose(forceDisposeEffect, forceDisposeTextures, notBoundToMesh);
-        this.stellarObjects.length = 0;
+        const finalColor = add(pbrColor, mul(lightEmission, lightColor));
+        const fragOutput = outputFragColor(finalColor);
+
+        this.addOutputNode(fragOutput);
+
+        this.build();
     }
 }
