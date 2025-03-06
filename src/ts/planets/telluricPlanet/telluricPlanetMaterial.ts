@@ -215,7 +215,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
         );
     }
 
-    public update(planetWorldMatrix: Matrix, stellarObjects: Transformable[]) {
+    public update(planetWorldMatrix: Matrix, stellarObjects: ReadonlyArray<Transformable>) {
         // The add once is important because the material will be bound for every chunk of the planet
         this.onBindObservable.addOnce(() => {
             this.getEffect().setMatrix(TelluricPlanetMaterialUniformNames.PLANET_WORLD_MATRIX, planetWorldMatrix);

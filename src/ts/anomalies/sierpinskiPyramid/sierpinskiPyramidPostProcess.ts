@@ -44,7 +44,7 @@ export class SierpinskiPyramidPostProcess extends PostProcess implements Updatab
         boundingRadius: number,
         model: SierpinskiPyramidModel,
         scene: Scene,
-        stellarObjects: StellarObject[]
+        stellarObjects: ReadonlyArray<StellarObject>
     ) {
         const shaderName = "SierpinskiPyramid";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {

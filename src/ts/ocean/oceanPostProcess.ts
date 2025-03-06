@@ -43,7 +43,7 @@ export class OceanPostProcess extends PostProcess implements UpdatablePostProces
         planetTransform: TransformNode,
         boundingRadius: number,
         oceanUniforms: OceanUniforms,
-        stellarObjects: Transformable[],
+        stellarObjects: ReadonlyArray<Transformable>,
         scene: Scene
     ) {
         const shaderName = "ocean";

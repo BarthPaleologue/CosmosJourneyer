@@ -40,7 +40,7 @@ export class RingsPostProcess extends PostProcess {
         bodyTransform: TransformNode,
         ringsUniforms: RingsUniforms,
         bodyModel: CelestialBodyModel,
-        stellarObjects: Transformable[],
+        stellarObjects: ReadonlyArray<Transformable>,
         scene: Scene
     ) {
         const shaderName = "rings";

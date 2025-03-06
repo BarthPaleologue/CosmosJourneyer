@@ -38,7 +38,7 @@ export class AtmosphericScatteringPostProcess extends PostProcess {
         planetTransform: TransformNode,
         planetBoundingRadius: number,
         atmosphereUniforms: AtmosphereUniforms,
-        stellarObjects: Transformable[],
+        stellarObjects: ReadonlyArray<Transformable>,
         scene: Scene
     ) {
         const shaderName = "atmosphericScattering";

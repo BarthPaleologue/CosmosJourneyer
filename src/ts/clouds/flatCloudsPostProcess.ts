@@ -41,7 +41,7 @@ export class FlatCloudsPostProcess extends PostProcess implements UpdatablePostP
         planetTransform: TransformNode,
         boundingRadius: number,
         cloudUniforms: CloudsUniforms,
-        stellarObjects: Transformable[],
+        stellarObjects: ReadonlyArray<Transformable>,
         scene: Scene
     ) {
         const shaderName = "flatClouds";

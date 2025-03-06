@@ -44,7 +44,7 @@ export class MandelbulbPostProcess extends PostProcess implements UpdatablePostP
         boundingRadius: number,
         mandelbulbModel: MandelbulbModel,
         scene: Scene,
-        stellarObjects: StellarObject[]
+        stellarObjects: ReadonlyArray<StellarObject>
     ) {
         const shaderName = "mandelbulb";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
