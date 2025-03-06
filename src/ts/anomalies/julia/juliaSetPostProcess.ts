@@ -44,7 +44,7 @@ export class JuliaSetPostProcess extends PostProcess implements UpdatablePostPro
         boundingRadius: number,
         accentColor: Color3,
         scene: Scene,
-        stellarObjects: StellarObject[]
+        stellarObjects: ReadonlyArray<StellarObject>
     ) {
         const shaderName = "julia";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {

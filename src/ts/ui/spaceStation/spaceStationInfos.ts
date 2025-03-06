@@ -21,7 +21,7 @@ import { makeD3PieChart } from "../../utils/d3PieChart";
 import { getOrbitalPeriod } from "../../orbit/orbit";
 import { OrbitalFacilityModel, OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
 
-export function generateInfoHTML(model: OrbitalFacilityModel, parentModels: OrbitalObjectModel[]): string {
+export function generateInfoHTML(model: OrbitalFacilityModel, parentModels: ReadonlyArray<OrbitalObjectModel>): string {
     const agricultureMix = model.agricultureMix;
 
     const parentName = parentModels.map((parentModel) => parentModel.name).join("-");

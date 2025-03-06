@@ -44,7 +44,7 @@ export class MengerSpongePostProcess extends PostProcess implements UpdatablePos
         boundingRadius: number,
         model: MengerSpongeModel,
         scene: Scene,
-        stellarObjects: StellarObject[]
+        stellarObjects: ReadonlyArray<StellarObject>
     ) {
         const shaderName = "MengerSponge";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {

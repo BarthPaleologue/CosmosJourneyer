@@ -49,7 +49,7 @@ export class ShadowPostProcess extends PostProcess {
         ringsUniforms: RingsUniforms | null,
         cloudsUniforms: CloudsUniforms | null,
         hasOcean: boolean,
-        stellarObjects: StellarObject[],
+        stellarObjects: ReadonlyArray<StellarObject>,
         scene: Scene
     ) {
         const shaderName = "shadow";

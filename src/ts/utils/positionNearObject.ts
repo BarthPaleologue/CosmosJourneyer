@@ -23,7 +23,7 @@ import { Controls } from "../uberCore/controls";
 import { getUpwardDirection, roll, rotateAround } from "../uberCore/transforms/basicTransform";
 import { CanHaveRings } from "../architecture/canHaveRings";
 
-export function nearestObject(objectPosition: Vector3, bodies: Transformable[]): Transformable {
+export function nearestObject(objectPosition: Vector3, bodies: ReadonlyArray<Transformable>): Transformable {
     let distance = -1;
     if (bodies.length === 0) throw new Error("no bodieees !");
     let nearest = bodies[0];
