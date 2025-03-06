@@ -1,8 +1,7 @@
 // Generated using webpack-cli https://github.com/webpack/webpack-cli
 import path from "path";
 import HtmlWebpackPlugin from "html-webpack-plugin";
-import MiniCssExtractPlugin from "mini-css-extract-plugin";
-import webpack from "webpack";
+import { rspack } from "@rspack/core";
 
 const isProduction = process.env.NODE_ENV === "production";
 const htmlPath = path.join(import.meta.dirname, "/src/html/");
@@ -31,7 +30,7 @@ const config = {
     },
 
     plugins: [
-        new webpack.BannerPlugin({
+        new rspack.BannerPlugin({
             raw: true,
             banner: `/*
  *  This file is part of Cosmos Journeyer
@@ -51,10 +50,9 @@ const config = {
  *  You should have received a copy of the GNU Affero General Public License
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-`,
-            stage: webpack.Compilation.PROCESS_ASSETS_STAGE_REPORT
+`
         }),
-        new MiniCssExtractPlugin({
+        new rspack.CssExtractRspackPlugin({
             filename: "[name].[contenthash].css"
         }),
         new HtmlWebpackPlugin({
@@ -103,13 +101,15 @@ const config = {
             },
             {
                 test: /\.css$/i,
-                use: [MiniCssExtractPlugin.loader, "css-loader"],
+                use: [rspack.CssExtractRspackPlugin.loader, "css-loader"],
+                type: "javascript/auto",
                 exclude: ["/node_modules/"]
             },
 
             {
                 test: /\.s[ac]ss$/i,
-                use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
+                use: [rspack.CssExtractRspackPlugin.loader, "css-loader", "sass-loader"],
+                type: "javascript/auto",
                 exclude: ["/node_modules/"]
             },
             {
@@ -137,23 +137,19 @@ export default () => {
         config.mode = "production";
     } else {
         config.mode = "development";
-        config.devtool = "eval-cheap-module-source-map";
     }
     config.experiments = {
         asyncWebAssembly: true,
         topLevelAwait: true
     };
-    // taken from https://webpack.js.org/plugins/split-chunks-plugin/
     config.optimization = {
         minimize: isProduction,
         splitChunks: {
             chunks: "async",
             minSize: 20000,
-            minRemainingSize: 0,
             minChunks: 1,
             maxAsyncRequests: 30,
             maxInitialRequests: 30,
-            enforceSizeThreshold: 50000,
             cacheGroups: {
                 defaultVendors: {
                     test: /[\\/]node_modules[\\/]/,
