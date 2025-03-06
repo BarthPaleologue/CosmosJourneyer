@@ -44,7 +44,7 @@ export class MandelboxPostProcess extends PostProcess implements UpdatablePostPr
         boundingRadius: number,
         model: MandelboxModel,
         scene: Scene,
-        stellarObjects: StellarObject[]
+        stellarObjects: ReadonlyArray<StellarObject>
     ) {
         const shaderName = "mandelbox";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {

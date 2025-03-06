@@ -41,7 +41,7 @@ export class SpaceStationLayer {
     private parentNode: HTMLElement;
 
     private currentStation: OrbitalFacilityModel | null = null;
-    private currentStationParents: OrbitalObjectModel[] = [];
+    private currentStationParents: ReadonlyArray<OrbitalObjectModel> = [];
 
     private readonly spaceStationName: HTMLElement;
 
@@ -200,7 +200,11 @@ export class SpaceStationLayer {
         return this.parentNode.style.visibility !== "hidden";
     }
 
-    public setStation(station: OrbitalFacilityModel, stationParents: OrbitalObjectModel[], player: Player) {
+    public setStation(
+        station: OrbitalFacilityModel,
+        stationParents: ReadonlyArray<OrbitalObjectModel>,
+        player: Player
+    ) {
         if (this.currentStation === station) return;
         this.currentStation = station;
         this.currentStationParents = stationParents;

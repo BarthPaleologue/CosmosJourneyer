@@ -114,7 +114,7 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
         this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());
     }
 
-    updateMaterial(stellarObjects: Transformable[], deltaSeconds: number): void {
+    updateMaterial(stellarObjects: ReadonlyArray<Transformable>, deltaSeconds: number): void {
         this.material.update(stellarObjects, deltaSeconds);
     }
 

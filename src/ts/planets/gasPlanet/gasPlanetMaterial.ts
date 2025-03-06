@@ -103,7 +103,7 @@ export class GasPlanetMaterial extends ShaderMaterial {
         this.setFloat(GasPlanetMaterialUniformNames.COLOR_SHARPNESS, this.colorSettings.colorSharpness);
     }
 
-    public update(stellarObjects: Transformable[], deltaSeconds: number) {
+    public update(stellarObjects: ReadonlyArray<Transformable>, deltaSeconds: number) {
         this.elapsedSeconds += deltaSeconds;
 
         this.onBindObservable.addOnce(() => {

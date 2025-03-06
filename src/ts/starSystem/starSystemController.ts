@@ -381,14 +381,14 @@ export class StarSystemController {
     /**
      * Returns all the stellar objects in the star system
      */
-    public getStellarObjects(): StellarObject[] {
+    public getStellarObjects(): ReadonlyArray<StellarObject> {
         return this.subSystems.flatMap((subSystem) => subSystem.stellarObjects);
     }
 
     /**
      * Returns all the orbital objects in the star system
      */
-    public getOrbitalObjects(): OrbitalObject[] {
+    public getOrbitalObjects(): ReadonlyArray<OrbitalObject> {
         return [...this.getCelestialBodies(), ...this.getOrbitalFacilities()];
     }
 
@@ -401,7 +401,7 @@ export class StarSystemController {
         );
     }
 
-    public getTelluricPlanets(): TelluricPlanet[] {
+    public getTelluricPlanets(): ReadonlyArray<TelluricPlanet> {
         return this.getPlanets().filter((planet) => planet instanceof TelluricPlanet);
     }
 

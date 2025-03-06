@@ -29,7 +29,7 @@ export const StellarObjectUniformNames = {
 };
 
 //FIXME: take point lights as input instead of transformables
-export function setStellarObjectUniforms(effect: Effect, stellarObjects: Transformable[]): void {
+export function setStellarObjectUniforms(effect: Effect, stellarObjects: ReadonlyArray<Transformable>): void {
     effect.setInt(StellarObjectUniformNames.NB_STARS, stellarObjects.length);
 
     if (stellarObjects.length === 0) {

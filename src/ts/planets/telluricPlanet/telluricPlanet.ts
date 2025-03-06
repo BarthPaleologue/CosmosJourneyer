@@ -169,7 +169,7 @@ export class TelluricPlanet
         for (const side of this.sides) side.update(observerPosition, chunkForge);
     }
 
-    public updateMaterial(stellarObjects: Transformable[], deltaSeconds: number): void {
+    public updateMaterial(stellarObjects: ReadonlyArray<Transformable>, deltaSeconds: number): void {
         this.material.update(this.getTransform().getWorldMatrix(), stellarObjects);
     }
 
