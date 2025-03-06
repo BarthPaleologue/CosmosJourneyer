@@ -81,7 +81,7 @@ export class Thruster {
         this.plume.setThrottle(this.throttle);
 
         this.light.intensity =
-            this.lightMinIntensity + (this.lightMaxIntensity - this.lightMinIntensity) * this.throttle;
+            this.lightMinIntensity + (this.lightMaxIntensity - this.lightMinIntensity) * Math.max(0, this.throttle);
 
         if (this.throttle > 0) {
             this.helperMesh.scaling = new Vector3(0.8, 0.8, 0.8);
