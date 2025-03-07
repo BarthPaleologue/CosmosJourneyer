@@ -1,8 +1,8 @@
 // Generated using webpack-cli https://github.com/webpack/webpack-cli
 import path from "path";
 import HtmlWebpackPlugin from "html-webpack-plugin";
-import MiniCssExtractPlugin from "mini-css-extract-plugin";
-import webpack from "webpack";
+import { rspack } from "@rspack/core";
+import { TsCheckerRspackPlugin } from "ts-checker-rspack-plugin";
 
 const isProduction = process.env.NODE_ENV === "production";
 const htmlPath = path.join(import.meta.dirname, "/src/html/");
@@ -19,6 +19,8 @@ const config = {
         path: path.resolve(import.meta.dirname, "dist"),
         clean: true
     },
+    target: ["web", "es2022"],
+    devtool: isProduction ? false : "source-map",
     devServer: {
         open: false,
         host: "localhost",
@@ -31,7 +33,7 @@ const config = {
     },
 
     plugins: [
-        new webpack.BannerPlugin({
+        new rspack.BannerPlugin({
             raw: true,
             banner: `/*
  *  This file is part of Cosmos Journeyer
@@ -52,11 +54,10 @@ const config = {
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 `,
-            stage: webpack.Compilation.PROCESS_ASSETS_STAGE_REPORT
+            stage: rspack.Compilation.PROCESS_ASSETS_STAGE_REPORT,
+            entryOnly: true
         }),
-        new MiniCssExtractPlugin({
-            filename: "[name].[contenthash].css"
-        }),
+        new TsCheckerRspackPlugin(),
         new HtmlWebpackPlugin({
             title: "Cosmos Journeyer",
             filename: "index.html",
@@ -86,45 +87,39 @@ const config = {
             template: path.join(htmlPath, "index.html"),
             chunks: ["blackHole"]
         }),
-        new HtmlWebpackPlugin({
+        new rspack.HtmlRspackPlugin({
             title: "Playground - Cosmos Journeyer",
             filename: "playground.html",
             template: path.join(htmlPath, "emptyIndex.html"),
             chunks: ["playground"]
         })
     ],
-
+    watchOptions: {
+        ignored: /node_modules/
+    },
     module: {
         rules: [
             {
                 test: /\.(ts|tsx)$/i,
-                loader: "ts-loader",
-                exclude: ["/node_modules/"]
+                loader: "builtin:swc-loader",
+                exclude: [/node_modules/]
             },
-            {
-                test: /\.css$/i,
-                use: [MiniCssExtractPlugin.loader, "css-loader"],
-                exclude: ["/node_modules/"]
-            },
-
             {
                 test: /\.s[ac]ss$/i,
-                use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
-                exclude: ["/node_modules/"]
+                use: [{ loader: "sass-loader", options: { sourceMap: !isProduction } }],
+                type: "css/auto",
+                exclude: [/node_modules/]
             },
             {
                 test: /\.(eot|svg|ttf|woff|woff2|otf|png|jpg|gif|webp|glb|obj|mp3|ogg|babylon|env|dds)$/i,
                 type: "asset/resource",
-                exclude: ["/node_modules/"]
+                exclude: [/node_modules/]
             },
             {
                 test: /\.(glsl|vs|fs|vert|frag|fx)$/,
                 exclude: /node_modules/,
                 use: ["ts-shader-loader"]
             }
-
-            // Add your rules for custom modules here
-            // Learn more about loaders from https://webpack.js.org/loaders/
         ]
     },
     resolve: {
@@ -137,23 +132,20 @@ export default () => {
         config.mode = "production";
     } else {
         config.mode = "development";
-        config.devtool = "eval-cheap-module-source-map";
     }
     config.experiments = {
         asyncWebAssembly: true,
-        topLevelAwait: true
+        topLevelAwait: true,
+        css: true
     };
-    // taken from https://webpack.js.org/plugins/split-chunks-plugin/
     config.optimization = {
         minimize: isProduction,
         splitChunks: {
             chunks: "async",
             minSize: 20000,
-            minRemainingSize: 0,
             minChunks: 1,
             maxAsyncRequests: 30,
             maxInitialRequests: 30,
-            enforceSizeThreshold: 50000,
             cacheGroups: {
                 defaultVendors: {
                     test: /[\\/]node_modules[\\/]/,

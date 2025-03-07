@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Tools } from "@babylonjs/core";
 import { normalRandom, randRangeInt } from "extended-random";
 import { clamp } from "../../utils/math";
 import { PlanetModel } from "../../architecture/orbitalObjectModel";
@@ -29,6 +28,7 @@ import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { celsiusToKelvin, hasLiquidWater } from "../../utils/physics";
 import { TelluricSatelliteModel } from "./telluricSatelliteModel";
 import { AtmosphereModel } from "../../atmosphere/atmosphereModel";
+import { Tools } from "@babylonjs/core/Misc/tools";
 
 export function newSeededTelluricSatelliteModel(
     seed: number,

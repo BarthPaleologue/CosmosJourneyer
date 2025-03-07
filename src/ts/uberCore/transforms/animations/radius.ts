@@ -18,8 +18,8 @@
 import { easeInOutInterpolation } from "./interpolations";
 import { clamp } from "../../../utils/math";
 import { CustomAnimation } from "./animation";
-import { ArcRotateCamera } from "@babylonjs/core";
 import { Lerp } from "@babylonjs/core/Maths/math.scalar.functions";
+import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 
 export class CameraRadiusAnimation implements CustomAnimation {
     private elapsedSeconds = 0;

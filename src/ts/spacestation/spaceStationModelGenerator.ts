@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Vector3, Tools } from "@babylonjs/core";
 import { normalRandom } from "extended-random";
 import { clamp } from "../utils/math";
 import { CelestialBodyModel, StellarObjectModel } from "../architecture/orbitalObjectModel";
@@ -32,6 +31,8 @@ import { randomPieChart } from "../utils/random";
 import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
 import { generateSpaceStationName } from "../utils/strings/spaceStationNameGenerator";
 import { SpaceStationModel } from "./spacestationModel";
+import { Tools } from "@babylonjs/core/Misc/tools";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export function newSeededSpaceStationModel(
     seed: number,
