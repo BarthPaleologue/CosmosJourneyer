@@ -19,6 +19,7 @@ const config = {
         path: path.resolve(import.meta.dirname, "dist"),
         clean: true
     },
+    target: ["web", "es2022"],
     devServer: {
         open: false,
         host: "localhost",
