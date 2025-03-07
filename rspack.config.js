@@ -50,7 +50,9 @@ const config = {
  *  You should have received a copy of the GNU Affero General Public License
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-`
+`,
+            stage: rspack.Compilation.PROCESS_ASSETS_STAGE_REPORT,
+            entryOnly: true
         }),
         new rspack.CssExtractRspackPlugin({
             filename: "[name].[contenthash].css"
@@ -105,7 +107,6 @@ const config = {
                 type: "javascript/auto",
                 exclude: ["/node_modules/"]
             },
-
             {
                 test: /\.s[ac]ss$/i,
                 use: [rspack.CssExtractRspackPlugin.loader, "css-loader", "sass-loader"],
@@ -122,9 +123,6 @@ const config = {
                 exclude: /node_modules/,
                 use: ["ts-shader-loader"]
             }
-
-            // Add your rules for custom modules here
-            // Learn more about loaders from https://webpack.js.org/loaders/
         ]
     },
     resolve: {
