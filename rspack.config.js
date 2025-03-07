@@ -87,7 +87,7 @@ const config = {
             template: path.join(htmlPath, "index.html"),
             chunks: ["blackHole"]
         }),
-        new HtmlWebpackPlugin({
+        new rspack.HtmlRspackPlugin({
             title: "Playground - Cosmos Journeyer",
             filename: "playground.html",
             template: path.join(htmlPath, "emptyIndex.html"),
