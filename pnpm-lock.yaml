@@ -125,9 +125,9 @@ importers:
       terrain-generation:
         specifier: ^1.8.0
         version: 1.8.0
-      ts-loader:
-        specifier: ^9.5.2
-        version: 9.5.2(typescript@5.7.3)(webpack@5.98.0)
+      ts-checker-rspack-plugin:
+        specifier: ^1.1.1
+        version: 1.1.1(@rspack/core@1.2.7)(typescript@5.7.3)
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@22.13.4)(typescript@5.7.3)
@@ -161,6 +161,10 @@ packages:
   '@ampproject/remapping@2.3.0':
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
+
+  '@babel/code-frame@7.26.2':
+    resolution: {integrity: sha512-RJlIHRueQgwWitWgF8OdFYGZX328Ax5BCemNGlqHfplnRT9ESi8JkFlvaVYbS+UubVY6dpv87Fs2u5M29iNFVQ==}
+    engines: {node: '>=6.9.0'}
 
   '@babel/helper-string-parser@7.25.9':
     resolution: {integrity: sha512-4A/SCr/2KLd5jrtOMFzaKjVtAei3+2r/NChoBNoZ3EyP/+GlhoaEGoWOZUmFmoITP7zOJyHIMm+DYRd8o3PvHA==}
@@ -2582,6 +2586,9 @@ packages:
     resolution: {integrity: sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg==}
     engines: {node: '>= 10.13.0'}
 
+  js-tokens@4.0.0:
+    resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
+
   js-yaml@4.1.0:
     resolution: {integrity: sha512-wpxZs9NoxZaJESJGIZTyDEaYpl0FKSA+FB9aJiyemKhMwkxQg63h4T1KJgUGHpTqPDNRcmmYLugrRjJlBtWvRA==}
     hasBin: true
@@ -3523,12 +3530,15 @@ packages:
     peerDependencies:
       typescript: '>=4.8.4'
 
-  ts-loader@9.5.2:
-    resolution: {integrity: sha512-Qo4piXvOTWcMGIgRiuFa6nHNm+54HbYaZCKqc9eeZCLRy3XqafQgwX2F7mofrbJG3g7EEb+lkiR+z2Lic2s3Zw==}
-    engines: {node: '>=12.0.0'}
+  ts-checker-rspack-plugin@1.1.1:
+    resolution: {integrity: sha512-BlpPqnfAmV0TcDg58H+1qV8Zb57ilv0x+ajjnxrVQ6BWgC8HzAdc+TycqDOJ4sZZYIV+hywQGozZFGklzbCR6A==}
+    engines: {node: '>=16.0.0'}
     peerDependencies:
-      typescript: '*'
-      webpack: ^5.0.0
+      '@rspack/core': ^1.0.0
+      typescript: '>=3.8.0'
+    peerDependenciesMeta:
+      '@rspack/core':
+        optional: true
 
   ts-node@10.9.2:
     resolution: {integrity: sha512-f0FFpIdcHgn8zcPSbf1dRevwt047YMnaiJM3u2w2RewrB+fob/zePZcrOyQoLMMO7aBIddLcQIEK5dYjkLnGrQ==}
@@ -3895,6 +3905,12 @@ snapshots:
     dependencies:
       '@jridgewell/gen-mapping': 0.3.8
       '@jridgewell/trace-mapping': 0.3.25
+
+  '@babel/code-frame@7.26.2':
+    dependencies:
+      '@babel/helper-validator-identifier': 7.25.9
+      js-tokens: 4.0.0
+      picocolors: 1.1.1
 
   '@babel/helper-string-parser@7.25.9': {}
 
@@ -6473,6 +6489,8 @@ snapshots:
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
+  js-tokens@4.0.0: {}
+
   js-yaml@4.1.0:
     dependencies:
       argparse: 2.0.1
@@ -7437,15 +7455,17 @@ snapshots:
     dependencies:
       typescript: 5.7.3
 
-  ts-loader@9.5.2(typescript@5.7.3)(webpack@5.98.0):
+  ts-checker-rspack-plugin@1.1.1(@rspack/core@1.2.7)(typescript@5.7.3):
     dependencies:
-      chalk: 4.1.2
-      enhanced-resolve: 5.18.1
-      micromatch: 4.0.8
-      semver: 7.7.1
-      source-map: 0.7.4
+      '@babel/code-frame': 7.26.2
+      '@rspack/lite-tapable': 1.0.1
+      chokidar: 3.6.0
+      memfs: 4.17.0
+      minimatch: 9.0.5
+      picocolors: 1.1.1
       typescript: 5.7.3
-      webpack: 5.98.0
+    optionalDependencies:
+      '@rspack/core': 1.2.7
 
   ts-node@10.9.2(@types/node@22.13.4)(typescript@5.7.3):
     dependencies:

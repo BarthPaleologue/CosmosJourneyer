@@ -39,7 +39,7 @@
         "squirrel-noise": "^1.0.0",
         "style-loader": "^4.0.0",
         "terrain-generation": "^1.8.0",
-        "ts-loader": "^9.5.2",
+        "ts-checker-rspack-plugin": "^1.1.1",
         "ts-node": "^10.9.2",
         "ts-shader-loader": "^2.0.2",
         "typedoc": "^0.27.7",

@@ -2,6 +2,7 @@
 import path from "path";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import { rspack } from "@rspack/core";
+import { TsCheckerRspackPlugin } from "ts-checker-rspack-plugin";
 
 const isProduction = process.env.NODE_ENV === "production";
 const htmlPath = path.join(import.meta.dirname, "/src/html/");
@@ -57,6 +58,7 @@ const config = {
         new rspack.CssExtractRspackPlugin({
             filename: "[name].[contenthash].css"
         }),
+        new TsCheckerRspackPlugin(),
         new HtmlWebpackPlugin({
             title: "Cosmos Journeyer",
             filename: "index.html",
@@ -93,12 +95,14 @@ const config = {
             chunks: ["playground"]
         })
     ],
-
+    watchOptions: {
+        ignored: /node_modules/
+    },
     module: {
         rules: [
             {
                 test: /\.(ts|tsx)$/i,
-                loader: "ts-loader",
+                loader: "builtin:swc-loader",
                 exclude: ["/node_modules/"]
             },
             {
