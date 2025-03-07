@@ -21,7 +21,7 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { SolidPlume } from "../utils/solidPlume";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Materials } from "../assets/materials";
-import { PointLight } from "@babylonjs/core";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
 
 export class Thruster {
     protected readonly maxAuthority = 3e3;
