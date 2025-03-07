@@ -20,6 +20,7 @@ const config = {
         clean: true
     },
     target: ["web", "es2022"],
+    devtool: isProduction ? false : "source-map",
     devServer: {
         open: false,
         host: "localhost",
