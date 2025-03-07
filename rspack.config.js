@@ -103,24 +103,24 @@ const config = {
             {
                 test: /\.(ts|tsx)$/i,
                 loader: "builtin:swc-loader",
-                exclude: ["/node_modules/"]
+                exclude: [/node_modules/]
             },
             {
                 test: /\.css$/i,
                 use: [rspack.CssExtractRspackPlugin.loader, "css-loader"],
-                type: "javascript/auto",
-                exclude: ["/node_modules/"]
+                type: "javascript/auto"
+                // exclude: [/node_modules/] can't be used for now because bodyEditor uses a css file from node_modules
             },
             {
                 test: /\.s[ac]ss$/i,
                 use: [rspack.CssExtractRspackPlugin.loader, "css-loader", "sass-loader"],
                 type: "javascript/auto",
-                exclude: ["/node_modules/"]
+                exclude: [/node_modules/]
             },
             {
                 test: /\.(eot|svg|ttf|woff|woff2|otf|png|jpg|gif|webp|glb|obj|mp3|ogg|babylon|env|dds)$/i,
                 type: "asset/resource",
-                exclude: ["/node_modules/"]
+                exclude: [/node_modules/]
             },
             {
                 test: /\.(glsl|vs|fs|vert|frag|fx)$/,
