@@ -57,9 +57,6 @@ const config = {
             stage: rspack.Compilation.PROCESS_ASSETS_STAGE_REPORT,
             entryOnly: true
         }),
-        new rspack.CssExtractRspackPlugin({
-            filename: "[name].[contenthash].css"
-        }),
         new TsCheckerRspackPlugin(),
         new HtmlWebpackPlugin({
             title: "Cosmos Journeyer",
@@ -108,15 +105,9 @@ const config = {
                 exclude: [/node_modules/]
             },
             {
-                test: /\.css$/i,
-                use: [rspack.CssExtractRspackPlugin.loader, "css-loader"],
-                type: "javascript/auto"
-                // exclude: [/node_modules/] can't be used for now because bodyEditor uses a css file from node_modules
-            },
-            {
                 test: /\.s[ac]ss$/i,
-                use: [rspack.CssExtractRspackPlugin.loader, "css-loader", "sass-loader"],
-                type: "javascript/auto",
+                use: [{ loader: "sass-loader", options: { sourceMap: !isProduction } }],
+                type: "css/auto",
                 exclude: [/node_modules/]
             },
             {
@@ -144,7 +135,8 @@ export default () => {
     }
     config.experiments = {
         asyncWebAssembly: true,
-        topLevelAwait: true
+        topLevelAwait: true,
+        css: true
     };
     config.optimization = {
         minimize: isProduction,
