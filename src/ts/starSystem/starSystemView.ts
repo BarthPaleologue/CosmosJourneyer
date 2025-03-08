@@ -87,6 +87,7 @@ import { StarSystemDatabase } from "./starSystemDatabase";
 import { AiPlayerControls } from "../player/aiPlayerControls";
 import { LandingPadSize } from "../assets/procedural/landingPad/landingPad";
 import "@babylonjs/inspector";
+import { DeepReadonly } from "../utils/types";
 
 // register cosmos journeyer as part of window object
 declare global {
@@ -493,7 +494,7 @@ export class StarSystemView implements View {
      * Dispose the previous star system and incrementally loads the new star system. All the assets are instantiated but the system still need to be initialized
      * @param starSystemModel
      */
-    public async loadStarSystem(starSystemModel: StarSystemModel) {
+    public async loadStarSystem(starSystemModel: DeepReadonly<StarSystemModel>) {
         if (this._isLoadingSystem) {
             throw new Error("Cannot load a new star system while the current one is loading");
         }

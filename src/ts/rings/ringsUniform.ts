@@ -22,6 +22,7 @@ import { RingsModel } from "./ringsModel";
 import { Textures } from "../assets/textures";
 import { RingsLut } from "./ringsLut";
 import { LutPoolManager } from "../assets/lutPoolManager";
+import { DeepReadonly } from "../utils/types";
 
 export const RingsUniformNames = {
     RING_START: "rings_start",
@@ -38,9 +39,9 @@ export const RingsSamplerNames = {
 export class RingsUniforms {
     private readonly lut: RingsLut;
 
-    readonly model: RingsModel;
+    readonly model: DeepReadonly<RingsModel>;
 
-    constructor(model: RingsModel, scene: Scene) {
+    constructor(model: DeepReadonly<RingsModel>, scene: Scene) {
         this.model = model;
 
         this.lut = LutPoolManager.GetRingsLut(scene);

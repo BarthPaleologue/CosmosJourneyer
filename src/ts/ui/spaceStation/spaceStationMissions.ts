@@ -26,6 +26,7 @@ import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { StarSystemModelUtils } from "../../starSystem/starSystemModel";
 import { OrbitalFacilityModel } from "../../architecture/orbitalObjectModel";
 import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
+import { DeepReadonly } from "../../utils/types";
 
 /**
  * Generates all missions available at the given space station for the player. Missions are generated based on the current timestamp (hourly basis).
@@ -34,7 +35,7 @@ import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
  * @returns The DOM element containing the generated missions as HTML
  */
 export function generateMissionsDom(
-    stationModel: OrbitalFacilityModel,
+    stationModel: DeepReadonly<OrbitalFacilityModel>,
     player: Player,
     starSystemDatabase: StarSystemDatabase
 ): HTMLDivElement {
@@ -56,7 +57,7 @@ export function generateMissionsDom(
 
     const rng = getRngFromSeed(stationModel.seed);
 
-    let neighborSpaceStations: [OrbitalFacilityModel, number][] = [];
+    let neighborSpaceStations: [DeepReadonly<OrbitalFacilityModel>, number][] = [];
     neighborSystems.forEach(([coordinates, position, distance], index) => {
         const systemModel = starSystemDatabase.getSystemModelFromCoordinates(coordinates);
         if (systemModel === null) {

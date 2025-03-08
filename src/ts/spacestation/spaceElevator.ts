@@ -44,11 +44,12 @@ import { clamp, remap, triangleWave } from "../utils/math";
 import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
 import { setUpVector } from "../uberCore/transforms/basicTransform";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
+import { DeepReadonly } from "../utils/types";
 
 export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPACE_ELEVATOR> {
     readonly name: string;
 
-    readonly model: SpaceElevatorModel;
+    readonly model: DeepReadonly<SpaceElevatorModel>;
 
     readonly type = OrbitalObjectType.SPACE_ELEVATOR;
 
@@ -77,7 +78,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
 
     private readonly unavailableLandingPads = new Set<LandingPad>();
 
-    constructor(model: SpaceElevatorModel, scene: Scene) {
+    constructor(model: DeepReadonly<SpaceElevatorModel>, scene: Scene) {
         this.model = model;
 
         this.name = this.model.name;
@@ -212,12 +213,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
             this.helixHabitats.push(helixHabitat);
             newNode = helixHabitat.getTransform();
         } else if (habitatType === SpaceStationNodeType.RING_HABITAT) {
-            const ringHabitat = new RingHabitat(
-                this.model,
-                habitatSurface,
-                Settings.SEED_HALF_RANGE * rng(27),
-                this.scene
-            );
+            const ringHabitat = new RingHabitat(habitatSurface, Settings.SEED_HALF_RANGE * rng(27), this.scene);
             this.ringHabitats.push(ringHabitat);
             newNode = ringHabitat.getTransform();
         } else if (habitatType === SpaceStationNodeType.CYLINDER_HABITAT) {

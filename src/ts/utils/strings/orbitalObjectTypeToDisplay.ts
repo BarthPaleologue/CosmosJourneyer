@@ -19,8 +19,9 @@ import { OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import i18n from "../../i18n";
 import { getStellarTypeFromTemperature } from "../../stellarObjects/star/starModelGenerator";
+import { DeepReadonly } from "../types";
 
-export function getOrbitalObjectTypeToI18nString(model: OrbitalObjectModel): string {
+export function getOrbitalObjectTypeToI18nString(model: DeepReadonly<OrbitalObjectModel>): string {
     switch (model.type) {
         case OrbitalObjectType.MANDELBULB:
         case OrbitalObjectType.JULIA_SET:

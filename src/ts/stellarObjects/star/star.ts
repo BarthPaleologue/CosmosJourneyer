@@ -37,6 +37,7 @@ import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObj
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
 import { VolumetricLightUniforms } from "../../volumetricLight/volumetricLightUniforms";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
+import { DeepReadonly } from "../../utils/types";
 
 export class Star implements StellarObjectBase<OrbitalObjectType.STAR>, Cullable {
     readonly mesh: Mesh;
@@ -51,7 +52,7 @@ export class Star implements StellarObjectBase<OrbitalObjectType.STAR>, Cullable
 
     readonly asteroidField: AsteroidField | null;
 
-    readonly model: StarModel;
+    readonly model: DeepReadonly<StarModel>;
 
     readonly type = OrbitalObjectType.STAR;
 
@@ -62,7 +63,7 @@ export class Star implements StellarObjectBase<OrbitalObjectType.STAR>, Cullable
      * @param model The seed of the star in [-1, 1]
      * @param scene
      */
-    constructor(model: StarModel, scene: Scene) {
+    constructor(model: DeepReadonly<StarModel>, scene: Scene) {
         this.model = model;
 
         this.mesh = MeshBuilder.CreateSphere(

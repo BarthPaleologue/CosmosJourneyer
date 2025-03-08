@@ -39,6 +39,7 @@ import { Materials } from "../../../../assets/materials";
 import { Objects } from "../../../../assets/objects";
 import { TelluricPlanetModel } from "../../telluricPlanetModel";
 import { TelluricSatelliteModel } from "../../telluricSatelliteModel";
+import { DeepReadonly } from "../../../../utils/types";
 
 export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
     public readonly mesh: Mesh;
@@ -46,7 +47,7 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
     public readonly cubePosition: Vector3;
     private readonly planetLocalPosition: Vector3;
 
-    private readonly planetModel: TelluricPlanetModel | TelluricSatelliteModel;
+    private readonly planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>;
 
     private readonly chunkSideLength: number;
 
@@ -69,7 +70,7 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
         direction: Direction,
         parentAggregate: PhysicsAggregate,
         material: Material,
-        planetModel: TelluricPlanetModel | TelluricSatelliteModel,
+        planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>,
         rootLength: number,
         scene: Scene
     ) {

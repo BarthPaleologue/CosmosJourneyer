@@ -22,6 +22,7 @@ import { BoundingBox } from "@babylonjs/core/Culling/boundingBox";
 import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { StarSystemModel } from "../starSystem/starSystemModel";
+import { DeepReadonly } from "../utils/types";
 
 export function vector3ToString(v: Vector3): string {
     return `${v.x},${v.y},${v.z}`;
@@ -48,9 +49,9 @@ export class StarSectorView {
      */
     readonly position: Vector3;
 
-    readonly systemModels: StarSystemModel[] = [];
+    readonly systemModels: DeepReadonly<Array<StarSystemModel>>;
 
-    readonly systemPositions: Vector3[] = [];
+    readonly systemPositions: ReadonlyArray<Vector3>;
 
     constructor(coordinates: Vector3, starSystemDatabase: StarSystemDatabase) {
         this.coordinates = coordinates;

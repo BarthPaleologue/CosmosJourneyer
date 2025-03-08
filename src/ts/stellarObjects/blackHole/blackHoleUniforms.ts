@@ -21,6 +21,7 @@ import { getKerrMetricA } from "./blackHoleModelGenerator";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { getForwardDirection } from "../../uberCore/transforms/basicTransform";
 import { Textures } from "../../assets/textures";
+import { DeepReadonly } from "../../utils/types";
 
 export const BlackHoleUniformNames = {
     STARFIELD_ROTATION: "starfieldRotation",
@@ -46,7 +47,7 @@ export class BlackHoleUniforms {
     frameDraggingFactor: number;
     time = 0;
 
-    constructor(blackHoleModel: BlackHoleModel) {
+    constructor(blackHoleModel: DeepReadonly<BlackHoleModel>) {
         this.accretionDiskRadius = blackHoleModel.accretionDiskRadius;
         this.rotationPeriod = 1.5;
         this.warpingMinkowskiFactor = 2.0;

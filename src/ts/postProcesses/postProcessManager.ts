@@ -58,6 +58,7 @@ import { MandelboxModel } from "../anomalies/mandelbox/mandelboxModel";
 import { SierpinskiPyramidModel } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidModel";
 import { MengerSpongeModel } from "../anomalies/mengerSponge/mengerSpongeModel";
 import { CelestialBody, StellarObject } from "../architecture/orbitalObject";
+import { DeepReadonly } from "../utils/types";
 
 /**
  * The order in which the post processes are rendered when away from a planet
@@ -474,7 +475,7 @@ export class PostProcessManager {
     public addMandelbulb(
         transform: TransformNode,
         radius: number,
-        model: MandelbulbModel,
+        model: DeepReadonly<MandelbulbModel>,
         stellarObjects: ReadonlyArray<StellarObject>
     ) {
         const mandelbulb = new MandelbulbPostProcess(transform, radius, model, this.scene, stellarObjects);
@@ -493,7 +494,7 @@ export class PostProcessManager {
     public addJuliaSet(
         transform: TransformNode,
         radius: number,
-        model: JuliaSetModel,
+        model: DeepReadonly<JuliaSetModel>,
         stellarObjects: ReadonlyArray<StellarObject>
     ) {
         const juliaSetPostProcess = new JuliaSetPostProcess(
@@ -511,7 +512,7 @@ export class PostProcessManager {
     public addMandelbox(
         transform: TransformNode,
         radius: number,
-        model: MandelboxModel,
+        model: DeepReadonly<MandelboxModel>,
         stellarObjects: ReadonlyArray<StellarObject>
     ) {
         const mandelbox = new MandelboxPostProcess(transform, radius, model, this.scene, stellarObjects);
@@ -523,7 +524,7 @@ export class PostProcessManager {
     public addSierpinskiPyramid(
         transform: TransformNode,
         radius: number,
-        model: SierpinskiPyramidModel,
+        model: DeepReadonly<SierpinskiPyramidModel>,
         stellarObjects: ReadonlyArray<StellarObject>
     ) {
         const sierpinskiPyramid = new SierpinskiPyramidPostProcess(
@@ -541,7 +542,7 @@ export class PostProcessManager {
     public addMengerSponge(
         transform: TransformNode,
         radius: number,
-        model: MengerSpongeModel,
+        model: DeepReadonly<MengerSpongeModel>,
         stellarObjects: ReadonlyArray<StellarObject>
     ) {
         const mengerSponge = new MengerSpongePostProcess(transform, radius, model, this.scene, stellarObjects);

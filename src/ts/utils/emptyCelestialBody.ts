@@ -23,11 +23,12 @@ import { TargetInfo, defaultTargetInfoCelestialBody } from "../architecture/targ
 import { getOrbitalObjectTypeToI18nString } from "./strings/orbitalObjectTypeToDisplay";
 import { CelestialBodyModel } from "../architecture/orbitalObjectModel";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
+import { DeepReadonly } from "./types";
 
 export class EmptyCelestialBody<TObjectType extends OrbitalObjectType> implements CelestialBodyBase<TObjectType> {
-    readonly model: Extract<CelestialBodyModel, { type: TObjectType }>;
+    readonly model: Extract<DeepReadonly<CelestialBodyModel>, { type: TObjectType }>;
 
-    readonly type: TObjectType;
+    readonly type: DeepReadonly<TObjectType>;
 
     private readonly transform: TransformNode;
 
@@ -40,7 +41,7 @@ export class EmptyCelestialBody<TObjectType extends OrbitalObjectType> implement
      * @param model The model to create the planet from or a seed for the planet in [-1, 1]
      * @param scene
      */
-    constructor(model: Extract<CelestialBodyModel, { type: TObjectType }>, scene: Scene) {
+    constructor(model: Extract<DeepReadonly<CelestialBodyModel>, { type: TObjectType }>, scene: Scene) {
         this.model = model;
 
         this.type = model.type;

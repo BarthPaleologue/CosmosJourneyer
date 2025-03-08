@@ -28,3 +28,7 @@ export function err<T, E>(error: E): Result<T, E> {
 export type DeepPartial<T> = {
     [P in keyof T]?: DeepPartial<T[P]>;
 };
+
+export type DeepReadonly<T> = {
+    readonly [K in keyof T]: DeepReadonly<T[K]>;
+};
