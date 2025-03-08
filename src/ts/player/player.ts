@@ -16,13 +16,14 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Mission } from "../missions/mission";
-import { StarSystemCoordinates, UniverseObjectId } from "../utils/coordinates/universeCoordinates";
+import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
 import { warnIfUndefined } from "../utils/notification";
 import { Spaceship } from "../spaceship/spaceship";
 import { DefaultSerializedSpaceship, SerializedSpaceship } from "../spaceship/serializedSpaceship";
 import { SpaceDiscoveryData } from "../society/encyclopaediaGalactica";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { CompletedTutorials, SerializedPlayer } from "./serializedPlayer";
+import { UniverseObjectId } from "../utils/coordinates/universeObjectId";
 
 export class Player {
     uuid: string;

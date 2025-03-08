@@ -18,7 +18,7 @@
 import { getSolSystemModel } from "../src/ts/starSystem/customSystems/sol";
 import { StarSystemDatabase } from "../src/ts/starSystem/starSystemDatabase";
 import { StarSystemModel } from "../src/ts/starSystem/starSystemModel";
-import { StarSystemCoordinates } from "../src/ts/utils/coordinates/universeCoordinates";
+import { StarSystemCoordinates } from "../src/ts/utils/coordinates/starSystemCoordinates";
 import { expect, describe, it, beforeEach } from "vitest";
 
 describe("StarSystemDatabase", () => {

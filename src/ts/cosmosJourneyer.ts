@@ -36,7 +36,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { setRotationQuaternion } from "./uberCore/transforms/basicTransform";
 import { encodeBase64 } from "./utils/base64";
-import { StarSystemCoordinates, UniverseCoordinates } from "./utils/coordinates/universeCoordinates";
+import { UniverseCoordinates } from "./utils/coordinates/universeCoordinates";
 import { View } from "./utils/view";
 import { updateInputDevices } from "./inputs/devices";
 import { AudioManager } from "./audio/audioManager";
@@ -52,7 +52,6 @@ import { FlightTutorial } from "./tutorials/flightTutorial";
 import { SidePanels } from "./ui/sidePanels";
 import { Settings } from "./settings";
 import { Player } from "./player/player";
-import { getObjectBySystemId, getUniverseObjectId } from "./utils/coordinates/orbitalObjectId";
 import { Tutorial } from "./tutorials/tutorial";
 import { StationLandingTutorial } from "./tutorials/stationLandingTutorial";
 import { promptModalBoolean, alertModal, promptModalString } from "./utils/dialogModal";
@@ -65,6 +64,8 @@ import { registerCustomSystems } from "./starSystem/customSystems/registerCustom
 import { SaveManager } from "./saveFile/saveManager";
 import { SaveLocalBackend } from "./saveFile/saveLocalBackend";
 import { saveLoadingErrorToI18nString } from "./saveFile/saveLoadingError";
+import { StarSystemCoordinates } from "./utils/coordinates/starSystemCoordinates";
+import { getUniverseObjectId } from "./utils/coordinates/universeObjectId";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -465,7 +466,7 @@ export class CosmosJourneyer {
             this.player.timePlayedSeconds += deltaSeconds;
 
             (this.engine.loadingScreen as LoadingScreen).setProgressPercentage(
-                this.starSystemView.getStarSystem().getLoadingProgress() * 100
+                this.starSystemView.loader.getLoadingProgress() * 100
             );
 
             this.autoSaveTimerSeconds += deltaSeconds;
@@ -600,7 +601,7 @@ export class CosmosJourneyer {
             .invert();
         const currentLocalRotation = currentWorldRotation.multiply(nearestOrbitalObjectInverseRotation);
 
-        const universeObjectId = getUniverseObjectId(nearestOrbitalObject, currentStarSystem);
+        const universeObjectId = getUniverseObjectId(nearestOrbitalObject.model, currentStarSystem.model);
 
         return {
             version: projectInfo.version,
@@ -698,11 +699,11 @@ export class CosmosJourneyer {
             await this.tutorialLayer.setTutorial(tutorial);
             this.starSystemView.setUIEnabled(true);
 
-            const targetObject = getObjectBySystemId(
-                tutorial.saveData.universeCoordinates.universeObjectId,
-                this.starSystemView.getStarSystem()
-            );
-            if (targetObject === null) {
+            const targetObject = this.starSystemView
+                .getStarSystem()
+                .getOrbitalObjectById(tutorial.saveData.universeCoordinates.universeObjectId.systemId);
+
+            if (targetObject === undefined) {
                 throw new Error(
                     "Could not find the target object of the tutorial even though it should be in the star system"
                 );
@@ -792,10 +793,13 @@ export class CosmosJourneyer {
 
         const playerTransform = this.starSystemView.scene.getActiveControls().getTransform();
 
-        const nearestOrbitalObject = getObjectBySystemId(universeObjectId, this.starSystemView.getStarSystem());
-        if (nearestOrbitalObject === null) {
+        const nearestOrbitalObject = this.starSystemView
+            .getStarSystem()
+            .getOrbitalObjectById(universeObjectId.systemId);
+
+        if (nearestOrbitalObject === undefined) {
             throw new Error(
-                `Could not find the nearest orbital object with index ${universeObjectId.objectIndex} and type ${universeObjectId.objectType}`
+                `Could not find the nearest orbital object with id ${universeObjectId.systemId} in the star system`
             );
         }
 

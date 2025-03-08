@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { z } from "zod";
-import { UniverseObjectIdSchema } from "../../../../utils/coordinates/universeCoordinates";
+import { UniverseObjectIdSchema } from "../../../../utils/coordinates/universeObjectId";
 import { MissionNodeType } from "../../missionNodeType";
 
 export enum FlyByState {

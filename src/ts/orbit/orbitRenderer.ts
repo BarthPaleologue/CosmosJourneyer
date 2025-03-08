@@ -26,23 +26,28 @@ import { GreasedLineMeshColorMode } from "@babylonjs/core/Materials/GreasedLine/
 export class OrbitRenderer {
     private orbitMeshes: Map<OrbitalObject, GreasedLineBaseMesh> = new Map();
 
-    private orbitalObjects: Map<OrbitalObject, OrbitalObject[]> = new Map();
+    private orbitalObjectToParents: Map<OrbitalObject, ReadonlyArray<OrbitalObject>> = new Map();
 
     private _isVisible = false;
 
-    setOrbitalObjects(orbitalObjects: Map<OrbitalObject, OrbitalObject[]>, scene: Scene) {
+    setOrbitalObjects(orbitalObjects: ReadonlyArray<OrbitalObject>, scene: Scene) {
         this.reset();
-        this.orbitalObjects = orbitalObjects;
 
-        for (const [orbitalObject, parents] of orbitalObjects) {
+        for (const orbitalObject of orbitalObjects) {
             this.createOrbitMesh(orbitalObject, scene);
+
+            const parents = orbitalObjects.filter((parent) =>
+                orbitalObject.model.orbit.parentIds.includes(parent.model.id)
+            );
+
+            this.orbitalObjectToParents.set(orbitalObject, parents);
         }
 
         this.setVisibility(this.isVisible());
     }
 
     private createOrbitMesh(orbitalObject: OrbitalObject, scene: Scene) {
-        const parents = this.orbitalObjects.get(orbitalObject) ?? [];
+        const parents = this.orbitalObjectToParents.get(orbitalObject) ?? [];
         const parentMassSum = parents.reduce((sum, parent) => sum + parent.model.mass, 0);
 
         const orbit = orbitalObject.model.orbit;
@@ -86,7 +91,7 @@ export class OrbitRenderer {
 
     update(referencePlaneRotation: Matrix) {
         if (!this._isVisible) return;
-        for (const [orbitalObject, parents] of this.orbitalObjects) {
+        for (const [orbitalObject, parents] of this.orbitalObjectToParents) {
             const orbitMesh = this.orbitMeshes.get(orbitalObject);
             if (orbitMesh === undefined) {
                 throw new Error("Orbit mesh not found");
@@ -108,6 +113,6 @@ export class OrbitRenderer {
     private reset() {
         this.orbitMeshes.forEach((orbitMesh) => orbitMesh.dispose(false, true));
         this.orbitMeshes.clear();
-        this.orbitalObjects.clear();
+        this.orbitalObjectToParents.clear();
     }
 }

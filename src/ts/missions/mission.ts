@@ -17,11 +17,12 @@
 
 import { MissionContext } from "./missionContext";
 import i18n from "../i18n";
-import { StarSystemCoordinates, UniverseObjectId } from "../utils/coordinates/universeCoordinates";
+import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
 import { deserializeMissionNode } from "./nodes/deserializeNode";
-import { MissionNode } from "./nodes/missionNode";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-import { MissionType, MissionSerialized } from "./missionSerialized";
+import { UniverseObjectId } from "../utils/coordinates/universeObjectId";
+import { MissionNode } from "./nodes/missionNode";
+import { MissionSerialized, MissionType } from "./missionSerialized";
 
 /**
  * General mission abstraction. The mission can have any arbitrary task tree and reward.

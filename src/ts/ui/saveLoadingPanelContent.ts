@@ -11,7 +11,6 @@ import downloadIconPath from "../../asset/icons/download.webp";
 import trashIconPath from "../../asset/icons/trash.webp";
 import shareIconPath from "../../asset/icons/link.webp";
 import { alertModal, promptModalBoolean, promptModalString } from "../utils/dialogModal";
-import { getObjectModelByUniverseId } from "../utils/coordinates/orbitalObjectId";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { Result } from "../utils/types";
 import { SaveManager } from "../saveFile/saveManager";
@@ -266,7 +265,7 @@ export class SaveLoadingPanelContent {
 
         const saveLocation = document.createElement("p");
         const isLanded = save.padNumber !== undefined;
-        const nearestObject = getObjectModelByUniverseId(save.universeCoordinates.universeObjectId, starSystemDatabase);
+        const nearestObject = starSystemDatabase.getObjectModelByUniverseId(save.universeCoordinates.universeObjectId);
         saveLocation.innerText = i18n.t(isLanded ? "sidePanel:landedAt" : "sidePanel:near", {
             location: nearestObject?.name ?? i18n.t("sidePanel:locationNotFound"),
             interpolation: {

@@ -17,9 +17,9 @@
 
 import { getNeighborStarSystemCoordinates } from "../src/ts/utils/getNeighborStarSystems";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { starSystemCoordinatesEquals } from "../src/ts/utils/coordinates/universeCoordinates";
 import { StarSystemDatabase } from "../src/ts/starSystem/starSystemDatabase";
 import { expect, test } from "vitest";
+import { starSystemCoordinatesEquals } from "../src/ts/utils/coordinates/starSystemCoordinates";
 
 test("getNeighborStarSystemCoordinates", () => {
     const starSystemDatabase = new StarSystemDatabase();

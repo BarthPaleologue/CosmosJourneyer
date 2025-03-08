@@ -1,4 +1,4 @@
-import { UniverseObjectId } from "../utils/coordinates/universeCoordinates";
+import { UniverseObjectId } from "../utils/coordinates/universeObjectId";
 import { err, ok, Result } from "../utils/types";
 import { EncyclopaediaGalactica, SpaceDiscoveryData } from "./encyclopaediaGalactica";
 import { z } from "zod";

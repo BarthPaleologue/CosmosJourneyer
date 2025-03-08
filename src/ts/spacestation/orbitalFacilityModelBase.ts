@@ -19,7 +19,7 @@ import { OrbitalObjectModelBase } from "../architecture/orbitalObjectModelBase";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { Faction } from "../society/factions";
 import { CropType } from "../utils/agriculture";
-import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates";
+import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
 
 export type OrbitalFacilityModelBase<T extends OrbitalObjectType> = OrbitalObjectModelBase<T> & {
     readonly starSystemCoordinates: StarSystemCoordinates;

@@ -28,6 +28,7 @@ import { GasPlanetModel } from "../../planets/gasPlanet/gasPlanetModel";
 
 export function getSolSystemModel(): StarSystemModel {
     const sun: StarModel = {
+        id: "sun",
         name: "Sun",
         type: OrbitalObjectType.STAR,
         radius: 695_508e3,
@@ -36,6 +37,7 @@ export function getSolSystemModel(): StarSystemModel {
         axialTilt: Tools.ToRadians(7.25),
         siderealDaySeconds: 60 * 60 * 24 * 25.67,
         orbit: {
+            parentIds: [],
             semiMajorAxis: 0,
             eccentricity: 0,
             p: 2,
@@ -49,6 +51,7 @@ export function getSolSystemModel(): StarSystemModel {
     };
 
     const mercury: TelluricPlanetModel = {
+        id: "mercury",
         name: "Mercury",
         type: OrbitalObjectType.TELLURIC_PLANET,
         radius: 2_439.7e3,
@@ -61,6 +64,7 @@ export function getSolSystemModel(): StarSystemModel {
             max: 437
         },
         orbit: {
+            parentIds: [sun.id],
             semiMajorAxis: 0.38 * Settings.AU,
             eccentricity: 0.2056,
             p: 2,
@@ -89,6 +93,7 @@ export function getSolSystemModel(): StarSystemModel {
     };
 
     const venus: TelluricPlanetModel = {
+        id: "venus",
         name: "Venus",
         type: OrbitalObjectType.TELLURIC_PLANET,
         radius: 6_051.8e3,
@@ -101,6 +106,7 @@ export function getSolSystemModel(): StarSystemModel {
             max: 763
         },
         orbit: {
+            parentIds: [sun.id],
             semiMajorAxis: 108_209_500e3,
             eccentricity: 0.0067,
             inclination: Tools.ToRadians(3.39),
@@ -143,6 +149,7 @@ export function getSolSystemModel(): StarSystemModel {
     };
 
     const earth: TelluricPlanetModel = {
+        id: "earth",
         name: "Earth",
         type: OrbitalObjectType.TELLURIC_PLANET,
         radius: 6_371e3,
@@ -155,6 +162,7 @@ export function getSolSystemModel(): StarSystemModel {
             max: celsiusToKelvin(50)
         },
         orbit: {
+            parentIds: [sun.id],
             semiMajorAxis: 149_597_870e3,
             eccentricity: 0.0167,
             inclination: Tools.ToRadians(0),
@@ -199,6 +207,7 @@ export function getSolSystemModel(): StarSystemModel {
     };
 
     const moon: TelluricSatelliteModel = {
+        id: "moon",
         name: "Moon",
         type: OrbitalObjectType.TELLURIC_SATELLITE,
         radius: 1_737.1e3,
@@ -211,6 +220,7 @@ export function getSolSystemModel(): StarSystemModel {
             max: 100
         },
         orbit: {
+            parentIds: [earth.id],
             semiMajorAxis: 384_400e3,
             eccentricity: 0.0549,
             inclination: Tools.ToRadians(5.145),
@@ -238,6 +248,7 @@ export function getSolSystemModel(): StarSystemModel {
     };
 
     const mars: TelluricPlanetModel = {
+        id: "mars",
         name: "Mars",
         type: OrbitalObjectType.TELLURIC_PLANET,
         radius: 3_389.5e3,
@@ -250,6 +261,7 @@ export function getSolSystemModel(): StarSystemModel {
             max: celsiusToKelvin(20)
         },
         orbit: {
+            parentIds: [sun.id],
             semiMajorAxis: 227_939_200e3,
             eccentricity: 0.0934,
             inclination: Tools.ToRadians(1.85),
@@ -281,6 +293,7 @@ export function getSolSystemModel(): StarSystemModel {
     };
 
     const jupiter: GasPlanetModel = {
+        id: "jupiter",
         name: "Jupiter",
         type: OrbitalObjectType.GAS_PLANET,
         radius: 69_911e3,
@@ -288,6 +301,7 @@ export function getSolSystemModel(): StarSystemModel {
         axialTilt: Tools.ToRadians(3.13),
         siderealDaySeconds: 60 * 60 * 9.925,
         orbit: {
+            parentIds: [sun.id],
             semiMajorAxis: 778_547_200e3,
             eccentricity: 0.0934,
             inclination: Tools.ToRadians(1.85),
@@ -305,6 +319,7 @@ export function getSolSystemModel(): StarSystemModel {
     };
 
     const saturn: GasPlanetModel = {
+        id: "saturn",
         name: "Saturn",
         type: OrbitalObjectType.GAS_PLANET,
         radius: 58_232e3,
@@ -312,6 +327,7 @@ export function getSolSystemModel(): StarSystemModel {
         axialTilt: Tools.ToRadians(26.73),
         siderealDaySeconds: 60 * 60 * 10.656,
         orbit: {
+            parentIds: [sun.id],
             semiMajorAxis: 1_433_449_370e3,
             eccentricity: 0.0565,
             inclination: Tools.ToRadians(2.49),
@@ -336,6 +352,7 @@ export function getSolSystemModel(): StarSystemModel {
     };
 
     const uranus: GasPlanetModel = {
+        id: "uranus",
         name: "Uranus",
         type: OrbitalObjectType.GAS_PLANET,
         radius: 25_362e3,
@@ -343,6 +360,7 @@ export function getSolSystemModel(): StarSystemModel {
         axialTilt: Tools.ToRadians(97.77),
         siderealDaySeconds: 60 * 60 * 17.24,
         orbit: {
+            parentIds: [sun.id],
             semiMajorAxis: 2_872_463_270e3,
             eccentricity: 0.0565,
             inclination: Tools.ToRadians(0.77),
@@ -360,6 +378,7 @@ export function getSolSystemModel(): StarSystemModel {
     };
 
     const neptune: GasPlanetModel = {
+        id: "neptune",
         name: "Neptune",
         type: OrbitalObjectType.GAS_PLANET,
         radius: 24_622e3,
@@ -367,6 +386,7 @@ export function getSolSystemModel(): StarSystemModel {
         axialTilt: Tools.ToRadians(28.32),
         siderealDaySeconds: 60 * 60 * 16.11,
         orbit: {
+            parentIds: [sun.id],
             semiMajorAxis: 4_495_060_000e3,
             eccentricity: 0.0086,
             inclination: Tools.ToRadians(1.77),
@@ -393,54 +413,10 @@ export function getSolSystemModel(): StarSystemModel {
             localY: 0,
             localZ: 0
         },
-        subSystems: [
-            {
-                stellarObjects: [sun],
-                planetarySystems: [
-                    {
-                        planets: [mercury],
-                        satellites: [],
-                        orbitalFacilities: []
-                    },
-                    {
-                        planets: [venus],
-                        satellites: [],
-                        orbitalFacilities: []
-                    },
-                    {
-                        planets: [earth],
-                        satellites: [moon],
-                        orbitalFacilities: []
-                    },
-                    {
-                        planets: [mars],
-                        satellites: [],
-                        orbitalFacilities: []
-                    },
-                    {
-                        planets: [jupiter],
-                        satellites: [],
-                        orbitalFacilities: []
-                    },
-                    {
-                        planets: [saturn],
-                        satellites: [],
-                        orbitalFacilities: []
-                    },
-                    {
-                        planets: [uranus],
-                        satellites: [],
-                        orbitalFacilities: []
-                    },
-                    {
-                        planets: [neptune],
-                        satellites: [],
-                        orbitalFacilities: []
-                    }
-                ],
-                anomalies: [],
-                orbitalFacilities: []
-            }
-        ]
+        stellarObjects: [sun],
+        planets: [mercury, venus, earth, mars, jupiter, saturn, uranus, neptune],
+        satellites: [moon],
+        anomalies: [],
+        orbitalFacilities: []
     };
 }
