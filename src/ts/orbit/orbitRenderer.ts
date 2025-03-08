@@ -26,8 +26,6 @@ import { GreasedLineMeshColorMode } from "@babylonjs/core/Materials/GreasedLine/
 export class OrbitRenderer {
     private orbitMeshes: Map<OrbitalObject, GreasedLineBaseMesh> = new Map();
 
-    private orbitalObjects: ReadonlyArray<OrbitalObject> = [];
-
     private orbitalObjectToParents: Map<OrbitalObject, ReadonlyArray<OrbitalObject>> = new Map();
 
     private _isVisible = false;
@@ -38,7 +36,7 @@ export class OrbitRenderer {
         for (const orbitalObject of orbitalObjects) {
             this.createOrbitMesh(orbitalObject, scene);
 
-            const parents = this.orbitalObjects.filter((parent) =>
+            const parents = orbitalObjects.filter((parent) =>
                 orbitalObject.model.orbit.parentIds.includes(parent.model.id)
             );
 
