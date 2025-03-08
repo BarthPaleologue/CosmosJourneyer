@@ -26,6 +26,7 @@ import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObj
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
 import { BlackHoleUniforms } from "./blackHoleUniforms";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
+import { DeepReadonly } from "../../utils/types";
 
 export class BlackHole implements StellarObjectBase<OrbitalObjectType.BLACK_HOLE> {
     readonly name: string;
@@ -34,7 +35,7 @@ export class BlackHole implements StellarObjectBase<OrbitalObjectType.BLACK_HOLE
 
     readonly light: PointLight;
 
-    readonly model: BlackHoleModel;
+    readonly model: DeepReadonly<BlackHoleModel>;
 
     readonly type = OrbitalObjectType.BLACK_HOLE;
 
@@ -46,7 +47,7 @@ export class BlackHole implements StellarObjectBase<OrbitalObjectType.BLACK_HOLE
 
     readonly targetInfo: TargetInfo;
 
-    constructor(model: BlackHoleModel, scene: Scene) {
+    constructor(model: DeepReadonly<BlackHoleModel>, scene: Scene) {
         this.model = model;
 
         this.name = this.model.name;

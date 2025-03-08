@@ -20,6 +20,7 @@ import flatCloudLUT from "../../shaders/textures/flatCloudLUT.glsl";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Scene } from "@babylonjs/core/scene";
 import { CloudsModel } from "./cloudsModel";
+import { DeepReadonly } from "../utils/types";
 
 export class CloudsLut {
     private readonly lut: ProceduralTexture;
@@ -37,7 +38,7 @@ export class CloudsLut {
         return this.lut.isReady();
     }
 
-    setModel(model: CloudsModel) {
+    setModel(model: DeepReadonly<CloudsModel>) {
         this.lut.setFloat("worleyFrequency", model.frequency);
         this.lut.setFloat("detailFrequency", model.detailFrequency);
         this.lut.resetRefreshCounter();

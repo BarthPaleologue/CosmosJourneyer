@@ -50,10 +50,11 @@ import {
     outputFragColor,
     fract
 } from "../../../utils/bsl";
+import { DeepReadonly } from "../../../utils/types";
 
 export class LandingBayMaterial extends NodeMaterial {
     constructor(
-        stationModel: OrbitalFacilityModel,
+        stationModel: DeepReadonly<OrbitalFacilityModel>,
         meanRadius: number,
         deltaRadius: number,
         height: number,

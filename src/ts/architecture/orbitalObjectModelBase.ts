@@ -16,46 +16,47 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Orbit } from "../orbit/orbit";
+import { DeepReadonly } from "../utils/types";
 import { OrbitalObjectType } from "./orbitalObjectType";
 
 /**
  * Describes the model of an orbital object
  */
 export type OrbitalObjectModelBase<T extends OrbitalObjectType> = {
-    readonly type: T;
+    type: DeepReadonly<T>;
 
     /**
      * The name of the object
      */
-    readonly name: string;
+    name: string;
 
     /**
      * Orbit properties of the object
      */
-    readonly orbit: Orbit;
+    orbit: Orbit;
 
     /**
      * Mass of the object in kilograms
      */
-    readonly mass: number;
+    mass: number;
 
     /**
      * Time needed for the object to rotate 360° on its axis in seconds.
      * It is slightly different from the duration of solar day which is the time it takes for the sun to be at the same position in the sky.
      * @see https://en.wikipedia.org/wiki/Sidereal_time
      */
-    readonly siderealDaySeconds: number;
+    siderealDaySeconds: number;
 
     /**
      * the angle between an object's rotational axis and its orbital axis, which is the line perpendicular to its orbital plane
      * @see https://en.wikipedia.org/wiki/Axial_tilt
      */
-    readonly axialTilt: number;
+    axialTilt: number;
 };
 
 export type CelestialBodyModelBase<T extends OrbitalObjectType> = OrbitalObjectModelBase<T> & {
     /**
      * The radius of the celestial body in meters
      */
-    readonly radius: number;
+    radius: number;
 };

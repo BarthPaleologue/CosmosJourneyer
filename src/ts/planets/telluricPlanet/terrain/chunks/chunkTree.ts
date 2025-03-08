@@ -34,6 +34,7 @@ import { Cullable } from "../../../../utils/cullable";
 import { Scene } from "@babylonjs/core/scene";
 import { TelluricPlanetModel } from "../../telluricPlanetModel";
 import { TelluricSatelliteModel } from "../../telluricSatelliteModel";
+import { DeepReadonly } from "../../../../utils/types";
 
 /**
  * A quadTree is defined recursively
@@ -57,7 +58,7 @@ export class ChunkTree implements Cullable {
 
     private deleteSemaphores: DeleteSemaphore[] = [];
 
-    readonly planetModel: TelluricPlanetModel | TelluricSatelliteModel;
+    readonly planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>;
 
     readonly planetName: string;
     readonly planetSeed: number;
@@ -78,7 +79,7 @@ export class ChunkTree implements Cullable {
      */
     constructor(
         direction: Direction,
-        planetModel: TelluricPlanetModel | TelluricSatelliteModel,
+        planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>,
         parentAggregate: PhysicsAggregate,
         material: Material,
         scene: Scene

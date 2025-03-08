@@ -28,6 +28,7 @@ import { StarSystemModel, StarSystemModelUtils } from "../starSystem/starSystemM
 import { getOrbitalObjectTypeToI18nString } from "../utils/strings/orbitalObjectTypeToDisplay";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { DeepReadonly } from "../utils/types";
 
 export class StarMapUI {
     readonly htmlRoot: HTMLDivElement;
@@ -341,7 +342,10 @@ export class StarMapUI {
         this.currentSystem = systemCoordinates;
     }
 
-    setSelectedSystem(targetSystemModel: StarSystemModel, currentSystemCoordinates: StarSystemCoordinates | null) {
+    setSelectedSystem(
+        targetSystemModel: DeepReadonly<StarSystemModel>,
+        currentSystemCoordinates: StarSystemCoordinates | null
+    ) {
         this.selectedSystem = targetSystemModel.coordinates;
 
         const targetPosition = this.starSystemDatabase.getSystemGalacticPosition(targetSystemModel.coordinates);

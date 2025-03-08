@@ -16,17 +16,18 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { arc, interpolateViridis, pie, PieArcDatum, scaleSequential } from "d3";
+import { DeepReadonly } from "./types";
 
 export function makeD3PieChart<T>(
-    data: T[],
-    extractProportion: (d: T) => number,
-    extractLegend: (d: T) => string
+    data: DeepReadonly<T[]>,
+    extractProportion: (d: DeepReadonly<T>) => number,
+    extractLegend: (d: DeepReadonly<T>) => string
 ): string {
-    const pieGenerator = pie<T>().value(extractProportion);
+    const pieGenerator = pie<DeepReadonly<T>>().value(extractProportion);
 
-    const parsedData = pieGenerator(data);
+    const parsedData = pieGenerator([...data]);
 
-    const arcGenerator = arc<PieArcDatum<T>>().innerRadius(0).outerRadius(200);
+    const arcGenerator = arc<PieArcDatum<DeepReadonly<T>>>().innerRadius(0).outerRadius(200);
 
     const colorGenerator = scaleSequential(interpolateViridis).domain([0, data.length]);
 

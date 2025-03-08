@@ -15,12 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { DeepReadonly } from "../utils/types";
-import { OrbitalObjectModel } from "./orbitalObjectModel";
-import { OrbitalObjectType } from "./orbitalObjectType";
-import { Transformable } from "./transformable";
-
-export interface OrbitalObjectBase<T extends OrbitalObjectType> extends Transformable {
-    type: DeepReadonly<T>;
-    model: Extract<DeepReadonly<OrbitalObjectModel>, { type: T }>;
-}
+export type DeepReadonly<T> = {
+    readonly [K in keyof T]: DeepReadonly<T[K]>;
+};
