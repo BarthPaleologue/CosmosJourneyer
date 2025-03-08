@@ -28,18 +28,18 @@ export type UniverseObjectId = {
     /**
      * The coordinates of the star system.
      */
-    starSystemCoordinates: StarSystemCoordinates;
+    systemCoordinates: StarSystemCoordinates;
 
     /**
      * The id of the object (unique within the star system)
      */
-    systemId: OrbitalObjectId;
+    idInSystem: OrbitalObjectId;
 };
 
 export function universeObjectIdEquals(a: UniverseObjectId, b: UniverseObjectId): boolean {
     return (
-        orbitalObjectIdEquals(a.systemId, b.systemId) &&
-        starSystemCoordinatesEquals(a.starSystemCoordinates, b.starSystemCoordinates)
+        orbitalObjectIdEquals(a.idInSystem, b.idInSystem) &&
+        starSystemCoordinatesEquals(a.systemCoordinates, b.systemCoordinates)
     );
 }
 
@@ -53,7 +53,7 @@ export function getUniverseObjectId(
     starSystem: DeepReadonly<StarSystemModel>
 ): UniverseObjectId {
     return {
-        starSystemCoordinates: starSystem.coordinates,
-        systemId: orbitalObject.id
+        systemCoordinates: starSystem.coordinates,
+        idInSystem: orbitalObject.id
     };
 }

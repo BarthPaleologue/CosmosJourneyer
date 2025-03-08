@@ -189,7 +189,7 @@ export class MainMenu {
             const nbRadius = this.starSystemModel.stellarObjects[0].type === OrbitalObjectType.BLACK_HOLE ? 8 : 2;
             const targetObject = this.starSystemView
                 .getStarSystem()
-                .getOrbitalObjectById(this.universeObjectId.systemId);
+                .getOrbitalObjectById(this.universeObjectId.idInSystem);
             if (targetObject === undefined) {
                 throw new Error(`Could not find object with ID ${JSON.stringify(this.universeObjectId)}`);
             }
@@ -213,7 +213,7 @@ export class MainMenu {
 
         const currentForward = getForwardDirection(this.controls.getTransform());
 
-        const orbitalObject = starSystemController.getOrbitalObjectById(this.universeObjectId.systemId);
+        const orbitalObject = starSystemController.getOrbitalObjectById(this.universeObjectId.idInSystem);
         const celestialBody = starSystemController.getCelestialBodies().find((body) => body === orbitalObject);
         if (celestialBody === undefined) {
             throw new Error("No corresponding celestial body found");

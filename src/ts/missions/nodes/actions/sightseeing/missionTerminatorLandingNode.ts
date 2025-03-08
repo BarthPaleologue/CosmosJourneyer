@@ -56,7 +56,7 @@ export class MissionTerminatorLandingNode implements MissionNodeBase<MissionNode
 
     constructor(objectId: UniverseObjectId) {
         this.objectId = objectId;
-        this.targetSystemCoordinates = objectId.starSystemCoordinates;
+        this.targetSystemCoordinates = objectId.systemCoordinates;
     }
 
     /**
@@ -88,7 +88,7 @@ export class MissionTerminatorLandingNode implements MissionNodeBase<MissionNode
             return;
         }
 
-        const targetObject = currentSystem.getOrbitalObjectById(this.objectId.systemId);
+        const targetObject = currentSystem.getOrbitalObjectById(this.objectId.idInSystem);
         if (targetObject === undefined) {
             throw new Error(`Could not find object with ID ${JSON.stringify(this.objectId)}`);
         }

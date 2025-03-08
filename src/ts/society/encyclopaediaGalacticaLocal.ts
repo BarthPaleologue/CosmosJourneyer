@@ -72,7 +72,7 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
         if (model === null) {
             return Promise.reject("Object model not found for object ID");
         }
-        const systemGalacticPosition = this.starSystemDatabase.getSystemGalacticPosition(object.starSystemCoordinates);
+        const systemGalacticPosition = this.starSystemDatabase.getSystemGalacticPosition(object.systemCoordinates);
 
         const distanceFromSolLy = systemGalacticPosition.length();
 

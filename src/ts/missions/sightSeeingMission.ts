@@ -67,10 +67,10 @@ export function newSightSeeingMission(
 ): Mission {
     const missionTree = generateMissionTree(target);
 
-    const targetSystemCoordinates = target.objectId.starSystemCoordinates;
+    const targetSystemCoordinates = target.objectId.systemCoordinates;
 
     const missionGiverGalacticCoordinates = starSystemDatabase.getSystemGalacticPosition(
-        missionGiver.starSystemCoordinates
+        missionGiver.systemCoordinates
     );
 
     const targetGalacticCoordinates = starSystemDatabase.getSystemGalacticPosition(targetSystemCoordinates);

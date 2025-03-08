@@ -54,7 +54,7 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType
 
     constructor(objectId: UniverseObjectId) {
         this.objectId = objectId;
-        this.targetSystemCoordinates = objectId.starSystemCoordinates;
+        this.targetSystemCoordinates = objectId.systemCoordinates;
     }
 
     /**
@@ -86,7 +86,7 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType
             return;
         }
 
-        const targetObject = currentSystem.getOrbitalObjectById(this.objectId.systemId);
+        const targetObject = currentSystem.getOrbitalObjectById(this.objectId.idInSystem);
         if (targetObject === null) {
             throw new Error(`Could not find object with ID ${JSON.stringify(this.objectId)}`);
         }
