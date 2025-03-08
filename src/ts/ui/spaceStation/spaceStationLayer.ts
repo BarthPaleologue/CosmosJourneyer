@@ -28,6 +28,7 @@ import { ExplorationCenterPanel } from "./explorationCenterPanel";
 import { EncyclopaediaGalacticaManager } from "../../society/encyclopaediaGalacticaManager";
 import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
 import { OrbitalFacilityModel, OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
+import { DeepReadonly } from "../../utils/types";
 
 const enum MainPanelState {
     NONE,
@@ -40,8 +41,8 @@ const enum MainPanelState {
 export class SpaceStationLayer {
     private parentNode: HTMLElement;
 
-    private currentStation: OrbitalFacilityModel | null = null;
-    private currentStationParents: ReadonlyArray<OrbitalObjectModel> = [];
+    private currentStation: DeepReadonly<OrbitalFacilityModel> | null = null;
+    private currentStationParents: DeepReadonly<Array<OrbitalObjectModel>> = [];
 
     private readonly spaceStationName: HTMLElement;
 
@@ -201,8 +202,8 @@ export class SpaceStationLayer {
     }
 
     public setStation(
-        station: OrbitalFacilityModel,
-        stationParents: ReadonlyArray<OrbitalObjectModel>,
+        station: DeepReadonly<OrbitalFacilityModel>,
+        stationParents: DeepReadonly<Array<OrbitalObjectModel>>,
         player: Player
     ) {
         if (this.currentStation === station) return;

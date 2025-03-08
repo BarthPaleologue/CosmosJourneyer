@@ -23,6 +23,7 @@ import { StarSystemModelUtils } from "../../starSystem/starSystemModel";
 import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
 import { OrbitalFacilityModel, OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
+import { DeepReadonly } from "../types";
 
 /**
  * Get the object ID of the given orbital object within the star system.
@@ -116,7 +117,7 @@ export function getObjectBySystemId(
 export function getObjectModelByUniverseId(
     universeObjectId: UniverseObjectId,
     starSystemDatabase: StarSystemDatabase
-): OrbitalObjectModel | null {
+): DeepReadonly<OrbitalObjectModel> | null {
     const starSystemCoordinates = universeObjectId.starSystemCoordinates;
     const starSystemModel = starSystemDatabase.getSystemModelFromCoordinates(starSystemCoordinates);
     if (starSystemModel === null) {
@@ -138,7 +139,7 @@ export function getObjectModelByUniverseId(
 }
 
 export function getUniverseIdForSpaceStationModel(
-    spaceStationModel: OrbitalFacilityModel,
+    spaceStationModel: DeepReadonly<OrbitalFacilityModel>,
     starSystemDatabase: StarSystemDatabase
 ): UniverseObjectId {
     const systemModel = starSystemDatabase.getSystemModelFromCoordinates(spaceStationModel.starSystemCoordinates);

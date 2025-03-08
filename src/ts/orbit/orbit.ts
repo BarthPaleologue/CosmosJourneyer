@@ -19,6 +19,7 @@ import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Settings } from "../settings";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { findMinimumNewtonRaphson } from "../utils/math";
+import { DeepReadonly } from "../utils/types";
 
 /**
  * Represents an orbit in the p-norm space. (Euclidean space for p=2)
@@ -87,7 +88,7 @@ export function keplerEquation(trueAnomaly: number, meanAnomaly: number, eccentr
  * @returns
  * @see https://medium.com/@barth_29567/crazy-orbits-lets-make-squares-c91a427c6b26
  */
-export function getPointOnOrbitLocal(orbit: Orbit, parentMass: number, t: number): Vector3 {
+export function getPointOnOrbitLocal(orbit: DeepReadonly<Orbit>, parentMass: number, t: number): Vector3 {
     const meanAnomaly =
         orbit.initialMeanAnomaly - (2 * Math.PI * t) / getOrbitalPeriod(orbit.semiMajorAxis, parentMass);
 
@@ -132,7 +133,7 @@ export function getPointOnOrbitLocal(orbit: Orbit, parentMass: number, t: number
 export function getPointOnOrbit(
     centerOfMass: Vector3,
     parentMass: number,
-    orbit: Orbit,
+    orbit: DeepReadonly<Orbit>,
     t: number,
     referencePlaneRotation: Matrix
 ): Vector3 {

@@ -33,6 +33,7 @@ import { Constants } from "@babylonjs/core/Engines/constants";
 import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { MandelbulbModel } from "./mandelbulbModel";
+import { DeepReadonly } from "../../utils/types";
 
 export class MandelbulbPostProcess extends PostProcess implements UpdatablePostProcess {
     private elapsedSeconds = 0;
@@ -42,7 +43,7 @@ export class MandelbulbPostProcess extends PostProcess implements UpdatablePostP
     constructor(
         transform: TransformNode,
         boundingRadius: number,
-        mandelbulbModel: MandelbulbModel,
+        mandelbulbModel: DeepReadonly<MandelbulbModel>,
         scene: Scene,
         stellarObjects: ReadonlyArray<StellarObject>
     ) {

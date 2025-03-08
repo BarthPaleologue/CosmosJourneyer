@@ -46,7 +46,7 @@ import {
     StellarObject
 } from "../architecture/orbitalObject";
 import { OrbitalObjectUtils } from "../architecture/orbitalObjectUtils";
-import { ShipControls } from "../spaceship/shipControls";
+import { DeepReadonly } from "../utils/types";
 
 export type PlanetarySystem = {
     readonly planets: Planet[];
@@ -77,7 +77,7 @@ export class StarSystemController {
     /**
      * The model of the star system that describes it and generates the randomness
      */
-    readonly model: StarSystemModel;
+    readonly model: DeepReadonly<StarSystemModel>;
 
     /**
      * Translation of the system data model in terms of actual 3D objects
@@ -112,7 +112,7 @@ export class StarSystemController {
      * @param model The data model of the star system
      * @param scene The scene in which the star system will be rendered
      */
-    constructor(model: StarSystemModel, scene: UberScene) {
+    constructor(model: DeepReadonly<StarSystemModel>, scene: UberScene) {
         this.scene = scene;
         this.starFieldBox = new StarFieldBox(scene);
         this.model = model;
@@ -147,7 +147,7 @@ export class StarSystemController {
         await wait(1000);
     }
 
-    private async loadSubSystem(subSystemModel: SubStarSystemModel): Promise<SubStarSystem> {
+    private async loadSubSystem(subSystemModel: DeepReadonly<SubStarSystemModel>): Promise<SubStarSystem> {
         const stellarObjects: StellarObject[] = [];
         for (const stellarObjectModel of subSystemModel.stellarObjects) {
             console.log("Loading stellar object:", stellarObjectModel.name);
@@ -234,7 +234,7 @@ export class StarSystemController {
     }
 
     private async loadPlanetarySystem(
-        planetarySystemModel: PlanetarySystemModel,
+        planetarySystemModel: DeepReadonly<PlanetarySystemModel>,
         stellarObjects: StellarObject[]
     ): Promise<PlanetarySystem> {
         const planets: Planet[] = [];

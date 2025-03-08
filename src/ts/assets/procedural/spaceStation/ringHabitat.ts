@@ -54,7 +54,7 @@ export class RingHabitat implements Transformable {
 
     readonly habitableSurface: number;
 
-    constructor(stationModel: OrbitalFacilityModel, requiredHabitableSurface: number, seed: number, scene: Scene) {
+    constructor(requiredHabitableSurface: number, seed: number, scene: Scene) {
         this.root = new TransformNode("RingHabitatRoot", scene);
 
         this.rng = getRngFromSeed(seed);

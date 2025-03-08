@@ -20,8 +20,12 @@ import { CropType, cropTypeToString } from "../../utils/agriculture";
 import { makeD3PieChart } from "../../utils/d3PieChart";
 import { getOrbitalPeriod } from "../../orbit/orbit";
 import { OrbitalFacilityModel, OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
+import { DeepReadonly } from "../../utils/types";
 
-export function generateInfoHTML(model: OrbitalFacilityModel, parentModels: ReadonlyArray<OrbitalObjectModel>): string {
+export function generateInfoHTML(
+    model: DeepReadonly<OrbitalFacilityModel>,
+    parentModels: DeepReadonly<Array<OrbitalObjectModel>>
+): string {
     const agricultureMix = model.agricultureMix;
 
     const parentName = parentModels.map((parentModel) => parentModel.name).join("-");

@@ -24,6 +24,7 @@ import { Settings } from "../settings";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { centeredRand } from "extended-random";
 import { makeNoise3D } from "fast-simplex-noise/lib/3d";
+import { DeepReadonly } from "../utils/types";
 
 /**
  * The StarSystemDatabase defines the content of the universe.
@@ -169,7 +170,7 @@ export class StarSystemDatabase {
      * @param coordinates The coordinates of the system you want the model of.
      * @returns The StarSystemModel for the given coordinates, or null if the system is not found.
      */
-    public getSystemModelFromCoordinates(coordinates: StarSystemCoordinates): StarSystemModel | null {
+    public getSystemModelFromCoordinates(coordinates: StarSystemCoordinates): DeepReadonly<StarSystemModel> | null {
         const customSystem = this.getCustomSystemFromCoordinates(coordinates);
         if (customSystem !== undefined) {
             return this.applyPlugins(customSystem);
@@ -229,7 +230,7 @@ export class StarSystemDatabase {
         sectorX: number,
         sectorY: number,
         sectorZ: number
-    ): StarSystemCoordinates[] {
+    ): ReadonlyArray<StarSystemCoordinates> {
         const generatedSystemCoordinates = this.getGeneratedSystemCoordinatesInStarSector(sectorX, sectorY, sectorZ);
 
         const customSystemModels = this.getCustomSystemsFromSector(sectorX, sectorY, sectorZ);
@@ -246,8 +247,12 @@ export class StarSystemDatabase {
      * @param sectorZ
      * @returns All system models (custom and generated) in the given star sector.
      */
-    public getSystemModelsInStarSector(sectorX: number, sectorY: number, sectorZ: number) {
-        const generatedModels: StarSystemModel[] = [];
+    public getSystemModelsInStarSector(
+        sectorX: number,
+        sectorY: number,
+        sectorZ: number
+    ): DeepReadonly<Array<StarSystemModel>> {
+        const generatedModels: DeepReadonly<StarSystemModel>[] = [];
 
         const generatedSystemCoordinates = this.getGeneratedSystemCoordinatesInStarSector(sectorX, sectorY, sectorZ);
 
@@ -261,11 +266,9 @@ export class StarSystemDatabase {
 
         const customSystemModels = this.getCustomSystemsFromSector(sectorX, sectorY, sectorZ);
 
-        const allModels = generatedModels.concat(customSystemModels);
+        const customSystemsAfterPlugins = customSystemModels.map((model) => this.applyPlugins(model));
 
-        return allModels.map((model) => {
-            return this.applyPlugins(model);
-        });
+        return generatedModels.concat(customSystemsAfterPlugins);
     }
 
     /**
@@ -385,7 +388,7 @@ export class StarSystemDatabase {
      * @param model The system model to apply the plugins to.
      * @returns The modified system model, or a new system model.
      */
-    private applyPlugins(model: StarSystemModel): StarSystemModel {
+    private applyPlugins(model: StarSystemModel): DeepReadonly<StarSystemModel> {
         let newModel = model;
         const singlePlugin = this.coordinatesToSinglePlugins.get(JSON.stringify(model.coordinates));
         if (singlePlugin !== undefined) {

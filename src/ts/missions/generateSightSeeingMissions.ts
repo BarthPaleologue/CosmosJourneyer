@@ -28,6 +28,7 @@ import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { getUniverseIdForSpaceStationModel } from "../utils/coordinates/orbitalObjectId";
 import { OrbitalFacilityModel } from "../architecture/orbitalObjectModel";
+import { DeepReadonly } from "../utils/types";
 
 /**
  * Generates sightseeing missions available at the given space station for the player. Missions are generated based on the current timestamp (hourly basis).
@@ -37,8 +38,8 @@ import { OrbitalFacilityModel } from "../architecture/orbitalObjectModel";
  * @param timestampMillis The current timestamp in milliseconds
  */
 export function generateSightseeingMissions(
-    spaceStationModel: OrbitalFacilityModel,
-    starSystemModel: StarSystemModel,
+    spaceStationModel: DeepReadonly<OrbitalFacilityModel>,
+    starSystemModel: DeepReadonly<StarSystemModel>,
     starSystemDatabase: StarSystemDatabase,
     player: Player,
     timestampMillis: number

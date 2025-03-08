@@ -24,6 +24,7 @@ import {
     StellarObjectModel
 } from "../architecture/orbitalObjectModel";
 import { TelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModel";
+import { DeepReadonly } from "../utils/types";
 
 /**
  * Data model for a planetary system. It holds all the information necessary to generate and render a planetary system.
@@ -107,7 +108,7 @@ export class StarSystemModelUtils {
      * @param starSystem The star system to get the stellar objects from.
      * @constructor
      */
-    static GetStellarObjects(starSystem: StarSystemModel): StellarObjectModel[] {
+    static GetStellarObjects(starSystem: DeepReadonly<StarSystemModel>): DeepReadonly<Array<StellarObjectModel>> {
         return starSystem.subSystems.flatMap((subSystem) => subSystem.stellarObjects);
     }
 
@@ -116,7 +117,7 @@ export class StarSystemModelUtils {
      * @param starSystem The star system to get the planetary systems from.
      * @constructor
      */
-    static GetPlanetarySystems(starSystem: StarSystemModel): PlanetarySystemModel[] {
+    static GetPlanetarySystems(starSystem: DeepReadonly<StarSystemModel>): DeepReadonly<Array<PlanetarySystemModel>> {
         return starSystem.subSystems.flatMap((subSystem) => subSystem.planetarySystems);
     }
 
@@ -125,7 +126,7 @@ export class StarSystemModelUtils {
      * @param starSystem The star system to get the planets from.
      * @constructor
      */
-    static GetPlanets(starSystem: StarSystemModel): PlanetModel[] {
+    static GetPlanets(starSystem: DeepReadonly<StarSystemModel>): DeepReadonly<Array<PlanetModel>> {
         return starSystem.subSystems.flatMap((subSystem) =>
             subSystem.planetarySystems.flatMap((planetarySystem) => planetarySystem.planets)
         );
@@ -136,7 +137,7 @@ export class StarSystemModelUtils {
      * @param starSystem The star system to get the space stations from.
      * @constructor
      */
-    static GetSpaceStations(starSystem: StarSystemModel): OrbitalFacilityModel[] {
+    static GetSpaceStations(starSystem: DeepReadonly<StarSystemModel>): DeepReadonly<Array<OrbitalFacilityModel>> {
         const stellarSpaceStations = starSystem.subSystems.flatMap((subSystem) => subSystem.orbitalFacilities);
         const planetarySpaceStations = starSystem.subSystems.flatMap((subSystem) =>
             subSystem.planetarySystems.flatMap((planetarySystem) => planetarySystem.orbitalFacilities)
@@ -150,9 +151,11 @@ export class StarSystemModelUtils {
      * @param starSystem The star system to get the planetary mass objects from.
      * @constructor
      */
-    static GetPlanetaryMassObjects(starSystem: StarSystemModel): PlanetaryMassObjectModel[] {
-        const planets: PlanetaryMassObjectModel[] = [];
-        const satellites: PlanetaryMassObjectModel[] = [];
+    static GetPlanetaryMassObjects(
+        starSystem: DeepReadonly<StarSystemModel>
+    ): DeepReadonly<Array<PlanetaryMassObjectModel>> {
+        const planets: Array<DeepReadonly<PlanetaryMassObjectModel>> = [];
+        const satellites: Array<DeepReadonly<PlanetaryMassObjectModel>> = [];
         starSystem.subSystems.forEach((subSystem) =>
             subSystem.planetarySystems.forEach((planetarySystem) => {
                 planets.push(...planetarySystem.planets);
@@ -168,7 +171,7 @@ export class StarSystemModelUtils {
      * @param starSystem The star system to get the anomalies from.
      * @constructor
      */
-    static GetAnomalies(starSystem: StarSystemModel): AnomalyModel[] {
+    static GetAnomalies(starSystem: DeepReadonly<StarSystemModel>): DeepReadonly<Array<AnomalyModel>> {
         return starSystem.subSystems.flatMap((subSystem) => subSystem.anomalies);
     }
 }

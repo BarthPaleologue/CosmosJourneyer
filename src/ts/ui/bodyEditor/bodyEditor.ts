@@ -26,8 +26,6 @@ import { StarPanel } from "./panels/starPanel";
 import { SurfacePanel } from "./panels/surfacePanel";
 import { GasCloudsPanel } from "./panels/gasCloudsPanel";
 import { AtmospherePanel } from "./panels/atmospherePanel";
-import { CloudsPanel } from "./panels/cloudsPanel";
-import { RingsPanel } from "./panels/ringsPanel";
 import { OceanPanel } from "./panels/oceanPanel";
 import { PostProcessManager } from "../../postProcesses/postProcessManager";
 import { BlackholePanel } from "./panels/blackholePanel";
@@ -57,9 +55,7 @@ export class BodyEditor {
     private readonly oceanPanel: OceanPanel;
     private readonly surfacePanel: SurfacePanel;
     private readonly gazCloudsPanel: GasCloudsPanel;
-    private readonly cloudsPanel: CloudsPanel;
     private readonly atmospherePanel: AtmospherePanel;
-    private readonly ringsPanel: RingsPanel;
     private readonly starPanel: StarPanel;
     private readonly blackHolePanel: BlackholePanel;
     private readonly panels: EditorPanel[];
@@ -71,19 +67,15 @@ export class BodyEditor {
         this.oceanPanel = new OceanPanel();
         this.surfacePanel = new SurfacePanel();
         this.gazCloudsPanel = new GasCloudsPanel();
-        this.cloudsPanel = new CloudsPanel();
         this.atmospherePanel = new AtmospherePanel();
-        this.ringsPanel = new RingsPanel();
         this.starPanel = new StarPanel();
         this.blackHolePanel = new BlackholePanel();
         this.panels = [
             this.generalPanel,
             this.oceanPanel,
             this.surfacePanel,
-            this.cloudsPanel,
             this.gazCloudsPanel,
             this.atmospherePanel,
-            this.ringsPanel,
             this.starPanel,
             this.blackHolePanel
         ];
@@ -162,12 +154,6 @@ export class BodyEditor {
         this.generalPanel.setVisibility(this.currentPanel === this.generalPanel);
         this.generalPanel.init(body, postProcessManager.colorCorrection, postProcessManager.bloomRenderEffect, scene);
 
-        if (body.ringsUniforms !== null) {
-            this.ringsPanel.enable();
-            this.ringsPanel.setVisibility(this.currentPanel === this.ringsPanel);
-            this.ringsPanel.init(body.ringsUniforms);
-        }
-
         if (body instanceof TelluricPlanet || body instanceof GasPlanet) {
             if (body.atmosphereUniforms !== null) {
                 this.atmospherePanel.enable();
@@ -181,12 +167,6 @@ export class BodyEditor {
                 this.surfacePanel.enable();
                 this.surfacePanel.setVisibility(this.currentPanel === this.surfacePanel);
                 this.surfacePanel.init(body.material);
-
-                if (body.cloudsUniforms !== null) {
-                    this.cloudsPanel.enable();
-                    this.cloudsPanel.setVisibility(this.currentPanel === this.cloudsPanel);
-                    this.cloudsPanel.init(body.getBoundingRadius(), body.cloudsUniforms);
-                }
 
                 if (body.oceanUniforms !== null) {
                     this.oceanPanel.enable();

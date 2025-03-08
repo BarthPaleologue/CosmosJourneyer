@@ -34,6 +34,7 @@ import { createEnvironmentAggregate } from "../../../utils/havok";
 import { getRotationPeriodForArtificialGravity } from "../../../utils/physics";
 import { OrbitalFacilityModel } from "../../../architecture/orbitalObjectModel";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { DeepReadonly } from "../../../utils/types";
 
 export class LandingBay {
     private readonly root: TransformNode;
@@ -55,7 +56,7 @@ export class LandingBay {
 
     readonly landingPads: LandingPad[] = [];
 
-    constructor(stationModel: OrbitalFacilityModel, seed: number, scene: Scene) {
+    constructor(stationModel: DeepReadonly<OrbitalFacilityModel>, seed: number, scene: Scene) {
         this.root = new TransformNode("LandingBayRoot", scene);
 
         this.centralLight = new PointLight("LandingBayCentralLight", Vector3.Zero(), scene);

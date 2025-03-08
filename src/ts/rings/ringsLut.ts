@@ -20,6 +20,7 @@ import { RingsModel } from "./ringsModel";
 import { Scene } from "@babylonjs/core/scene";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import ringsLUT from "../../shaders/textures/ringsLUT.glsl";
+import { DeepReadonly } from "../utils/types";
 
 export class RingsLut {
     private readonly lut: ProceduralTexture;
@@ -45,7 +46,7 @@ export class RingsLut {
         this.lut.refreshRate = 0;
     }
 
-    setModel(model: RingsModel): void {
+    setModel(model: DeepReadonly<RingsModel>): void {
         this.lut.setFloat("seed", model.seed);
         this.lut.setFloat("frequency", model.ringFrequency);
         this.lut.setFloat("ringStart", model.ringStart);

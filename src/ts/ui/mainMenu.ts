@@ -33,13 +33,14 @@ import { getObjectBySystemId } from "../utils/coordinates/orbitalObjectId";
 import { StarSystemModel, StarSystemModelUtils } from "../starSystem/starSystemModel";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { DeepReadonly } from "../utils/types";
 
 export class MainMenu {
     readonly scene: UberScene;
     readonly controls: DefaultControls;
 
     readonly starSystemView: StarSystemView;
-    readonly starSystemModel: StarSystemModel;
+    readonly starSystemModel: DeepReadonly<StarSystemModel>;
 
     readonly onStartObservable = new Observable<void>();
     readonly onContributeObservable = new Observable<void>();
