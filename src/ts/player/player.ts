@@ -16,11 +16,12 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Mission, MissionSerialized } from "../missions/mission";
-import { StarSystemCoordinates, UniverseObjectId } from "../utils/coordinates/universeCoordinates";
+import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
 import { warnIfUndefined } from "../utils/notification";
 import { DefaultSerializedSpaceship, SerializedSpaceship, Spaceship } from "../spaceship/spaceship";
 import { SpaceDiscoveryData } from "../society/encyclopaediaGalactica";
 import { Observable } from "@babylonjs/core/Misc/observable";
+import { UniverseObjectId } from "../utils/coordinates/universeObjectId";
 
 export type CompletedTutorials = {
     stationLandingCompleted: boolean;

@@ -17,14 +17,8 @@
 
 import { MissionNodeBase, MissionNodeSerializedBase, MissionNodeType } from "../../missionNode";
 import { MissionContext } from "../../../missionContext";
-import {
-    StarSystemCoordinates,
-    starSystemCoordinatesEquals,
-    UniverseObjectId,
-    universeObjectIdEquals
-} from "../../../../utils/coordinates/universeCoordinates";
+
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { getObjectBySystemId, getObjectModelByUniverseId } from "../../../../utils/coordinates/orbitalObjectId";
 import { parseDistance } from "../../../../utils/strings/parseToStrings";
 import { Settings } from "../../../../settings";
 import i18n from "../../../../i18n";
@@ -33,6 +27,11 @@ import { getGoToSystemInstructions } from "../../../common";
 import { OrbitalObjectType } from "../../../../architecture/orbitalObjectType";
 import { StarSystemDatabase } from "../../../../starSystem/starSystemDatabase";
 import type { MissionNode } from "../../deserializeNode";
+import { UniverseObjectId, universeObjectIdEquals } from "../../../../utils/coordinates/universeObjectId";
+import {
+    StarSystemCoordinates,
+    starSystemCoordinatesEquals
+} from "../../../../utils/coordinates/starSystemCoordinates";
 
 const enum FlyByState {
     NOT_IN_SYSTEM,
@@ -90,8 +89,8 @@ export class MissionFlyByNode implements MissionNodeBase<MissionNodeType.FLY_BY>
             return;
         }
 
-        const targetObject = getObjectBySystemId(this.objectId, currentSystem);
-        if (targetObject === null) {
+        const targetObject = currentSystem.getOrbitalObjectById(this.objectId.systemId);
+        if (targetObject === undefined) {
             throw new Error(`Could not find object with ID ${JSON.stringify(this.objectId)}`);
         }
 
@@ -137,7 +136,7 @@ export class MissionFlyByNode implements MissionNodeBase<MissionNodeType.FLY_BY>
             starSystemDatabase.getSystemGalacticPosition(originSystemCoordinates),
             starSystemDatabase.getSystemGalacticPosition(this.targetSystemCoordinates)
         );
-        const objectModel = getObjectModelByUniverseId(this.objectId, starSystemDatabase);
+        const objectModel = starSystemDatabase.getObjectModelByUniverseId(this.objectId);
         const systemModel = starSystemDatabase.getSystemModelFromCoordinates(this.targetSystemCoordinates);
         if (objectModel === null || systemModel === null) {
             throw new Error(`Could not find object with ID ${JSON.stringify(this.objectId)}`);
@@ -158,7 +157,7 @@ export class MissionFlyByNode implements MissionNodeBase<MissionNodeType.FLY_BY>
             return i18n.t("missions:flyBy:missionCompleted");
         }
 
-        const targetObject = getObjectModelByUniverseId(this.objectId, starSystemDatabase);
+        const targetObject = starSystemDatabase.getObjectModelByUniverseId(this.objectId);
         if (targetObject === null) {
             throw new Error(`Could not find object with ID ${JSON.stringify(this.objectId)}`);
         }

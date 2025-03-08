@@ -1,7 +1,7 @@
 import i18n from "../i18n";
 import { Player } from "../player/player";
 import { Sounds } from "../assets/sounds";
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/universeCoordinates";
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/starSystemCoordinates";
 
 export class StarMapBookmarkButton {
     readonly rootNode: HTMLElement;

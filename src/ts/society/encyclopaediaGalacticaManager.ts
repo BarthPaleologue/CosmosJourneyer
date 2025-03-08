@@ -1,4 +1,4 @@
-import { UniverseObjectId } from "../utils/coordinates/universeCoordinates";
+import { UniverseObjectId } from "../utils/coordinates/universeObjectId";
 import { EncyclopaediaGalactica, SpaceDiscoveryData } from "./encyclopaediaGalactica";
 
 export class EncyclopaediaGalacticaManager implements EncyclopaediaGalactica {

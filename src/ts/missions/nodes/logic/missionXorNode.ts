@@ -17,7 +17,7 @@
 
 import { MissionNodeBase, MissionNodeSerializedBase, MissionNodeType } from "../missionNode";
 import { MissionContext } from "../../missionContext";
-import { StarSystemCoordinates } from "../../../utils/coordinates/universeCoordinates";
+import { StarSystemCoordinates } from "../../../utils/coordinates/starSystemCoordinates";
 import { StarSystemDatabase } from "../../../starSystem/starSystemDatabase";
 import type { MissionNode, MissionNodeSerialized } from "../deserializeNode";
 

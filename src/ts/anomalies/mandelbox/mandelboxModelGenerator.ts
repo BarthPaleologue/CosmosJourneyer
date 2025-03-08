@@ -24,8 +24,14 @@ import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { MandelboxModel } from "./mandelboxModel";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Tools } from "@babylonjs/core/Misc/tools";
+import { OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
+import { createOrbitalObjectId } from "../../utils/coordinates/orbitalObjectId";
 
-export function newSeededMandelboxModel(seed: number, name: string): MandelboxModel {
+export function newSeededMandelboxModel(
+    seed: number,
+    name: string,
+    parentBodies: ReadonlyArray<OrbitalObjectModel>
+): MandelboxModel {
     const rng = getRngFromSeed(seed);
 
     const radius = 200e3;
@@ -43,7 +49,10 @@ export function newSeededMandelboxModel(seed: number, name: string): MandelboxMo
 
     const orbitalP = clamp(0.5, 3.0, normalRandom(1.0, 0.3, rng, GenerationSteps.ORBIT + 80));
 
+    const parentIds = parentBodies.map((body) => body.id);
+
     const orbit: Orbit = {
+        parentIds: parentIds,
         semiMajorAxis: orbitRadius,
         p: orbitalP,
         inclination: Tools.ToRadians(normalRandom(90, 20, rng, GenerationSteps.ORBIT + 160)),
@@ -58,12 +67,13 @@ export function newSeededMandelboxModel(seed: number, name: string): MandelboxMo
     const axialTilt = normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT);
 
     return {
+        type: OrbitalObjectType.MANDELBOX,
+        id: createOrbitalObjectId(parentIds, name),
+        name,
         radius,
         mass,
         siderealDaySeconds,
         axialTilt,
-        name,
-        type: OrbitalObjectType.MANDELBOX,
         mr2,
         spread,
         color: accentColor,

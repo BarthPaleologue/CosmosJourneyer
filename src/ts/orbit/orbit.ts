@@ -15,10 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Settings } from "../settings";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { findMinimumNewtonRaphson } from "../utils/math";
+import { OrbitalObjectId } from "../utils/coordinates/orbitalObjectId";
 import { DeepReadonly } from "../utils/types";
 
 /**
@@ -26,6 +27,11 @@ import { DeepReadonly } from "../utils/types";
  * @see https://en.wikipedia.org/wiki/Orbital_elements
  */
 export type Orbit = {
+    /**
+     * References to the parent bodies
+     */
+    parentIds: Array<OrbitalObjectId>;
+
     /**
      * Half the distance between the apoapsis and periapsis
      */

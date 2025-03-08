@@ -24,8 +24,14 @@ import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { SierpinskiPyramidModel } from "./sierpinskiPyramidModel";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Tools } from "@babylonjs/core/Misc/tools";
+import { OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
+import { createOrbitalObjectId } from "../../utils/coordinates/orbitalObjectId";
 
-export function newSeededSierpinskiPyramidModel(seed: number, name: string): SierpinskiPyramidModel {
+export function newSeededSierpinskiPyramidModel(
+    seed: number,
+    name: string,
+    parentBodies: ReadonlyArray<OrbitalObjectModel>
+): SierpinskiPyramidModel {
     const rng = getRngFromSeed(seed);
 
     const radius = 200e3;
@@ -41,7 +47,10 @@ export function newSeededSierpinskiPyramidModel(seed: number, name: string): Sie
 
     const orbitalP = clamp(0.5, 3.0, normalRandom(1.0, 0.3, rng, GenerationSteps.ORBIT + 80));
 
+    const parentIds = parentBodies.map((body) => body.id);
+
     const orbit: Orbit = {
+        parentIds: parentIds,
         semiMajorAxis: orbitRadius,
         p: orbitalP,
         inclination: Tools.ToRadians(normalRandom(90, 20, rng, GenerationSteps.ORBIT + 160)),
@@ -56,9 +65,10 @@ export function newSeededSierpinskiPyramidModel(seed: number, name: string): Sie
     const axialTilt = normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT);
 
     return {
-        radius,
-        name,
         type: OrbitalObjectType.SIERPINSKI_PYRAMID,
+        id: createOrbitalObjectId(parentIds, name),
+        name,
+        radius,
         accentColor,
         orbit,
         mass,

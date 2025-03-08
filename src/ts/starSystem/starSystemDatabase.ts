@@ -15,8 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { StarSystemModel } from "./starSystemModel";
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/universeCoordinates";
+import { getObjectModelById, StarSystemModel } from "./starSystemModel";
 import { newSeededStarSystemModel } from "./seededStarSystemModel";
 import { hashVec3 } from "../utils/hashVec3";
 import { getRngFromSeed } from "../utils/getRngFromSeed";
@@ -24,6 +23,9 @@ import { Settings } from "../settings";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { centeredRand } from "extended-random";
 import { makeNoise3D } from "fast-simplex-noise/lib/3d";
+import { UniverseObjectId } from "../utils/coordinates/universeObjectId";
+import { OrbitalObjectModel } from "../architecture/orbitalObjectModel";
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/starSystemCoordinates";
 import { DeepReadonly } from "../utils/types";
 
 /**
@@ -303,6 +305,18 @@ export class StarSystemDatabase {
     }
 
     /**
+     * @param starSectorX
+     * @param starSectorY
+     * @param starSectorZ
+     * @param index The index of the generated system in the star sector.
+     * @returns The system model of the system generated given the seed, or null if the system is not found.
+     */
+    public getSystemModelFromSeed(starSectorX: number, starSectorY: number, starSectorZ: number, index: number) {
+        const coordinates = this.getSystemCoordinatesFromSeed(starSectorX, starSectorY, starSectorZ, index);
+        return this.getSystemModelFromCoordinates(coordinates);
+    }
+
+    /**
      * @param coordinates The coordinates of the system you want the position of.
      * @returns The position of the given system in the galaxy.
      */
@@ -382,6 +396,22 @@ export class StarSystemDatabase {
         return localPositions.map((localPosition) => {
             return localPosition.addInPlace(sectorPosition).scaleInPlace(Settings.STAR_SECTOR_SIZE);
         });
+    }
+
+    /**
+     * Searches the database for the given id
+     * @param universeObjectId The id to look for
+     * @param starSystemDatabase The database to look in
+     * @returns The model if it exists, null otherwise
+     */
+    public getObjectModelByUniverseId(universeObjectId: UniverseObjectId): DeepReadonly<OrbitalObjectModel> | null {
+        const starSystemCoordinates = universeObjectId.starSystemCoordinates;
+        const starSystemModel = this.getSystemModelFromCoordinates(starSystemCoordinates);
+        if (starSystemModel === null) {
+            return null;
+        }
+
+        return getObjectModelById(universeObjectId.systemId, starSystemModel);
     }
 
     /**

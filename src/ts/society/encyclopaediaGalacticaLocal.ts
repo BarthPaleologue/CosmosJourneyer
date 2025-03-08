@@ -3,8 +3,7 @@ import { GasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 import { TelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModel";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-import { getObjectModelByUniverseId } from "../utils/coordinates/orbitalObjectId";
-import { UniverseObjectId } from "../utils/coordinates/universeCoordinates";
+import { UniverseObjectId } from "../utils/coordinates/universeObjectId";
 import { DeepReadonly } from "../utils/types";
 import { EncyclopaediaGalactica, SpaceDiscoveryData } from "./encyclopaediaGalactica";
 
@@ -69,7 +68,7 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
             return Promise.resolve(this.redundantDataPrice);
         }
 
-        const model = getObjectModelByUniverseId(object, this.starSystemDatabase);
+        const model = this.starSystemDatabase.getObjectModelByUniverseId(object);
         if (model === null) {
             return Promise.reject("Object model not found for object ID");
         }

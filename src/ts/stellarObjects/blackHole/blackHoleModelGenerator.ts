@@ -24,6 +24,7 @@ import { GenerationSteps } from "../../utils/generationSteps";
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { estimateStarRadiusFromMass } from "../../utils/physics";
 import { BlackHoleModel } from "./blackHoleModel";
+import { createOrbitalObjectId } from "../../utils/coordinates/orbitalObjectId";
 
 export function newSeededBlackHoleModel(
     seed: number,
@@ -40,7 +41,10 @@ export function newSeededBlackHoleModel(
     // TODO: do not hardcode
     const orbitRadius = parentBodies.length === 0 ? 0 : 2 * (parentMaxRadius + radius);
 
+    const parentIds = parentBodies.map((body) => body.id);
+
     const orbit: Orbit = {
+        parentIds: parentIds,
         semiMajorAxis: parentBodies.length > 0 ? orbitRadius : 0,
         eccentricity: 0,
         p: 2,
@@ -57,8 +61,9 @@ export function newSeededBlackHoleModel(
     const blackHoleBlackBodyTemperature = 7_000;
 
     return {
-        name,
         type: OrbitalObjectType.BLACK_HOLE,
+        id: createOrbitalObjectId(parentIds, name),
+        name,
         radius,
         mass: blackHoleMass,
         blackBodyTemperature: blackHoleBlackBodyTemperature,

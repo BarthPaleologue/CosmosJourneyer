@@ -30,6 +30,7 @@ import { CelestialBodyModel } from "../../architecture/orbitalObjectModel";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { OceanModel } from "../../ocean/oceanModel";
 import { AtmosphereModel } from "../../atmosphere/atmosphereModel";
+import { createOrbitalObjectId } from "../../utils/coordinates/orbitalObjectId";
 
 export function newSeededTelluricPlanetModel(
     seed: number,
@@ -98,7 +99,10 @@ export function newSeededTelluricPlanetModel(
     parentAverageInclination /= parentBodies.length;
     parentAverageAxialTilt /= parentBodies.length;
 
+    const parentIds = parentBodies.map((body) => body.id);
+
     const orbit: Orbit = {
+        parentIds: parentIds,
         semiMajorAxis: orbitRadius,
         p: 2,
         inclination:
@@ -128,6 +132,7 @@ export function newSeededTelluricPlanetModel(
 
     return {
         type: OrbitalObjectType.TELLURIC_PLANET,
+        id: createOrbitalObjectId(parentIds, name),
         seed: seed,
         name,
         mass,

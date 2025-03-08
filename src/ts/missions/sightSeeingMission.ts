@@ -16,13 +16,14 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Mission, MissionType } from "./mission";
-import { SystemObjectType, UniverseObjectId } from "../utils/coordinates/universeCoordinates";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MissionFlyByNode } from "./nodes/actions/sightseeing/missionFlyByNode";
 import { MissionTerminatorLandingNode } from "./nodes/actions/sightseeing/missionTerminatorLandingNode";
 import { MissionAsteroidFieldNode } from "./nodes/actions/sightseeing/missionAsteroidFieldNode";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { MissionNode } from "./nodes/deserializeNode";
+import { UniverseObjectId } from "../utils/coordinates/universeObjectId";
+import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 
 /**
  * Sightseeing mission types are a subset of mission types.
@@ -75,9 +76,11 @@ export function newSightSeeingMission(
     const targetGalacticCoordinates = starSystemDatabase.getSystemGalacticPosition(targetSystemCoordinates);
     const distanceLY = Vector3.Distance(missionGiverGalacticCoordinates, targetGalacticCoordinates);
 
+    const targetModel = starSystemDatabase.getObjectModelByUniverseId(target.objectId);
+
     // reward far away targets more
     let reward = Math.max(5_000, 1000 * Math.ceil(distanceLY));
-    if (target.objectId.objectType === SystemObjectType.STELLAR_OBJECT) {
+    if (targetModel?.type === OrbitalObjectType.NEUTRON_STAR || targetModel?.type === OrbitalObjectType.BLACK_HOLE) {
         // reward for stellar objects is higher to nudge the player towards them
         reward *= 1.5;
     }

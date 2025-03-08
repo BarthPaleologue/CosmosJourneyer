@@ -17,9 +17,10 @@
 
 import { MissionContext } from "./missionContext";
 import i18n from "../i18n";
-import { StarSystemCoordinates, UniverseObjectId } from "../utils/coordinates/universeCoordinates";
+import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
 import { deserializeMissionNode, MissionNode, MissionNodeSerialized } from "./nodes/deserializeNode";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { UniverseObjectId } from "../utils/coordinates/universeObjectId";
 
 /**
  * Registered mission types. Those are used to display localized strings in the UI
