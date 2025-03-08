@@ -76,7 +76,7 @@ test("Loading a correct save file", () => {
                     missionGiver: {
                         objectType: 3,
                         objectIndex: 0,
-                        starSystemCoordinates: {
+                        systemCoordinates: {
                             starSectorX: 0,
                             starSectorY: 0,
                             starSectorZ: 0,
@@ -88,7 +88,7 @@ test("Loading a correct save file", () => {
                     tree: {
                         type: 0,
                         objectId: {
-                            starSystemCoordinates: {
+                            systemCoordinates: {
                                 starSectorX: -3,
                                 starSectorY: -1,
                                 starSectorZ: 0,
@@ -111,7 +111,7 @@ test("Loading a correct save file", () => {
             universeObjectId: {
                 objectType: 0,
                 objectIndex: 0,
-                starSystemCoordinates: {
+                systemCoordinates: {
                     starSectorX: 0,
                     starSectorY: 0,
                     starSectorZ: 0,
@@ -151,7 +151,7 @@ test("Loading a minimal save file", () => {
             universeObjectId: {
                 objectType: 0,
                 objectIndex: 0,
-                starSystemCoordinates: {
+                systemCoordinates: {
                     starSectorX: 0,
                     starSectorY: 0,
                     starSectorZ: 0,

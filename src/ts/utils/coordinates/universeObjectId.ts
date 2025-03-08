@@ -23,10 +23,10 @@ import { OrbitalObjectIdSchema, orbitalObjectIdEquals } from "./orbitalObjectId"
 import { starSystemCoordinatesEquals, StarSystemCoordinatesSchema } from "./starSystemCoordinates";
 
 export const UniverseObjectIdSchema = z.object({
-    systemId: OrbitalObjectIdSchema,
+    idInSystem: OrbitalObjectIdSchema,
 
     /** The coordinates of the star system. */
-    starSystemCoordinates: StarSystemCoordinatesSchema
+    systemCoordinates: StarSystemCoordinatesSchema
 });
 
 /**
@@ -36,8 +36,8 @@ export type UniverseObjectId = z.infer<typeof UniverseObjectIdSchema>;
 
 export function universeObjectIdEquals(a: UniverseObjectId, b: UniverseObjectId): boolean {
     return (
-        orbitalObjectIdEquals(a.systemId, b.systemId) &&
-        starSystemCoordinatesEquals(a.starSystemCoordinates, b.starSystemCoordinates)
+        orbitalObjectIdEquals(a.idInSystem, b.idInSystem) &&
+        starSystemCoordinatesEquals(a.systemCoordinates, b.systemCoordinates)
     );
 }
 
@@ -51,7 +51,7 @@ export function getUniverseObjectId(
     starSystem: DeepReadonly<StarSystemModel>
 ): UniverseObjectId {
     return {
-        starSystemCoordinates: starSystem.coordinates,
-        systemId: orbitalObject.id
+        systemCoordinates: starSystem.coordinates,
+        idInSystem: orbitalObject.id
     };
 }

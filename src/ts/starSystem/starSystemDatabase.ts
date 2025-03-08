@@ -405,13 +405,13 @@ export class StarSystemDatabase {
      * @returns The model if it exists, null otherwise
      */
     public getObjectModelByUniverseId(universeObjectId: UniverseObjectId): DeepReadonly<OrbitalObjectModel> | null {
-        const starSystemCoordinates = universeObjectId.starSystemCoordinates;
+        const starSystemCoordinates = universeObjectId.systemCoordinates;
         const starSystemModel = this.getSystemModelFromCoordinates(starSystemCoordinates);
         if (starSystemModel === null) {
             return null;
         }
 
-        return getObjectModelById(universeObjectId.systemId, starSystemModel);
+        return getObjectModelById(universeObjectId.idInSystem, starSystemModel);
     }
 
     /**

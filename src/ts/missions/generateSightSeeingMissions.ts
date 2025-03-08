@@ -76,8 +76,8 @@ export function generateSightseeingMissions(
                     {
                         type: MissionType.SIGHT_SEEING_FLY_BY,
                         objectId: {
-                            starSystemCoordinates: systemCoordinates,
-                            systemId: systemModel.anomalies[anomalyIndex].id
+                            systemCoordinates: systemCoordinates,
+                            idInSystem: systemModel.anomalies[anomalyIndex].id
                         }
                     },
                     starSystemDatabase
@@ -92,8 +92,8 @@ export function generateSightseeingMissions(
                         {
                             type: MissionType.SIGHT_SEEING_FLY_BY,
                             objectId: {
-                                starSystemCoordinates: systemCoordinates,
-                                systemId: model.id
+                                systemCoordinates: systemCoordinates,
+                                idInSystem: model.id
                             }
                         },
                         starSystemDatabase
@@ -107,8 +107,8 @@ export function generateSightseeingMissions(
                         {
                             type: MissionType.SIGHT_SEEING_FLY_BY,
                             objectId: {
-                                starSystemCoordinates: systemCoordinates,
-                                systemId: model.id
+                                systemCoordinates: systemCoordinates,
+                                idInSystem: model.id
                             }
                         },
                         starSystemDatabase
@@ -134,8 +134,8 @@ export function generateSightseeingMissions(
                     {
                         type: MissionType.SIGHT_SEEING_ASTEROID_FIELD,
                         objectId: {
-                            starSystemCoordinates: currentSystemModel.coordinates,
-                            systemId: celestialBodyModel.id
+                            systemCoordinates: currentSystemModel.coordinates,
+                            idInSystem: celestialBodyModel.id
                         }
                     },
                     starSystemDatabase
@@ -152,8 +152,8 @@ export function generateSightseeingMissions(
                         {
                             type: MissionType.SIGHT_SEEING_TERMINATOR_LANDING,
                             objectId: {
-                                starSystemCoordinates: currentSystemModel.coordinates,
-                                systemId: celestialBodyModel.id
+                                systemCoordinates: currentSystemModel.coordinates,
+                                idInSystem: celestialBodyModel.id
                             }
                         },
                         starSystemDatabase

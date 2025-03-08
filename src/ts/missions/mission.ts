@@ -118,7 +118,7 @@ export class Mission {
      * Returns a string describing the mission using the mission tree and the origin seed
      */
     describe(starSystemDatabase: StarSystemDatabase): string {
-        return this.tree.describe(this.missionGiver.starSystemCoordinates, starSystemDatabase);
+        return this.tree.describe(this.missionGiver.systemCoordinates, starSystemDatabase);
     }
 
     /**

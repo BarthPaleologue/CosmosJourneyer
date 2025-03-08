@@ -701,7 +701,7 @@ export class CosmosJourneyer {
 
             const targetObject = this.starSystemView
                 .getStarSystem()
-                .getOrbitalObjectById(tutorial.saveData.universeCoordinates.universeObjectId.systemId);
+                .getOrbitalObjectById(tutorial.saveData.universeCoordinates.universeObjectId.idInSystem);
 
             if (targetObject === undefined) {
                 throw new Error(
@@ -778,9 +778,7 @@ export class CosmosJourneyer {
 
         const universeObjectId = universeCoordinates.universeObjectId;
 
-        const systemModel = this.starSystemDatabase.getSystemModelFromCoordinates(
-            universeObjectId.starSystemCoordinates
-        );
+        const systemModel = this.starSystemDatabase.getSystemModelFromCoordinates(universeObjectId.systemCoordinates);
         if (systemModel === null) {
             throw new Error("Cannot load universe coordinates: system model not found");
         }
@@ -795,11 +793,11 @@ export class CosmosJourneyer {
 
         const nearestOrbitalObject = this.starSystemView
             .getStarSystem()
-            .getOrbitalObjectById(universeObjectId.systemId);
+            .getOrbitalObjectById(universeObjectId.idInSystem);
 
         if (nearestOrbitalObject === undefined) {
             throw new Error(
-                `Could not find the nearest orbital object with id ${universeObjectId.systemId} in the star system`
+                `Could not find the nearest orbital object with id ${universeObjectId.idInSystem} in the star system`
             );
         }
 

@@ -69,7 +69,7 @@ describe("SaveManager", () => {
                         positionY: 0,
                         positionZ: 0,
                         universeObjectId: {
-                            starSystemCoordinates: {
+                            systemCoordinates: {
                                 starSectorX: 0,
                                 starSectorY: 0,
                                 starSectorZ: 0,
@@ -101,7 +101,7 @@ describe("SaveManager", () => {
                         positionY: 0,
                         positionZ: 0,
                         universeObjectId: {
-                            starSystemCoordinates: {
+                            systemCoordinates: {
                                 starSectorX: 0,
                                 starSectorY: 0,
                                 starSectorZ: 0,
