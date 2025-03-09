@@ -17,28 +17,35 @@
 
 import { MissionContext } from "./missionContext";
 import i18n from "../i18n";
-import { StarSystemCoordinates, UniverseObjectId } from "../utils/coordinates/universeCoordinates";
-import { deserializeMissionNode, MissionNode, MissionNodeSerialized } from "./nodes/deserializeNode";
+import {
+    StarSystemCoordinates,
+    UniverseObjectId,
+    UniverseObjectIdSchema
+} from "../utils/coordinates/universeCoordinates";
+import { deserializeMissionNode, MissionNode, MissionNodeSerializedSchema } from "./nodes/deserializeNode";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { z } from "zod";
 
 /**
  * Registered mission types. Those are used to display localized strings in the UI
  */
-export const enum MissionType {
+export enum MissionType {
     SIGHT_SEEING_FLY_BY,
     SIGHT_SEEING_TERMINATOR_LANDING,
     SIGHT_SEEING_ASTEROID_FIELD
 }
 
+export const MissionSerializedSchema = z.object({
+    missionGiver: UniverseObjectIdSchema,
+    tree: MissionNodeSerializedSchema,
+    reward: z.number().default(0),
+    type: z.nativeEnum(MissionType).default(MissionType.SIGHT_SEEING_FLY_BY)
+});
+
 /**
  * Serialized mission object as stored in save files
  */
-export type MissionSerialized = {
-    missionGiver: UniverseObjectId;
-    type: MissionType;
-    tree: MissionNodeSerialized;
-    reward: number;
-};
+export type MissionSerialized = z.infer<typeof MissionSerializedSchema>;
 
 /**
  * General mission abstraction. The mission can have any arbitrary task tree and reward.

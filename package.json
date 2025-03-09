@@ -45,7 +45,8 @@
         "typedoc-plugin-missing-exports": "^3.1.0",
         "typescript": "~5.7.3",
         "typescript-plugin-css-modules": "^5.1.0",
-        "vitest": "^3.0.5"
+        "vitest": "^3.0.5",
+        "zod": "^3.24.2"
     },
     "version": "1.9.0",
     "description": "Cosmos Journeyer is a space exploration game featuring fully explorable planets, across millions of star systems. It is built using Babylon.JS, and a lot of passion.",

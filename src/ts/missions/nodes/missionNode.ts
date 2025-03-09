@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { MissionContext } from "../missionContext";
-
 import { StarSystemCoordinates } from "../../utils/coordinates/universeCoordinates";
 import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
 import type { MissionNode } from "./deserializeNode";

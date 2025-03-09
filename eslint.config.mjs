@@ -70,14 +70,6 @@ export default [
             "@typescript-eslint/no-explicit-any": "warn",
             eqeqeq: "error",
 
-            "no-restricted-syntax": [
-                "error",
-                {
-                    selector: "TSEnumDeclaration:not([const=true])",
-                    message: "Don't declare non-const enums"
-                }
-            ],
-
             "@typescript-eslint/naming-convention": [
                 "error",
                 {

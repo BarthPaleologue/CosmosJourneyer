@@ -21,7 +21,8 @@ import {
     StarSystemCoordinates,
     starSystemCoordinatesEquals,
     UniverseObjectId,
-    universeObjectIdEquals
+    universeObjectIdEquals,
+    UniverseObjectIdSchema
 } from "../../../../utils/coordinates/universeCoordinates";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
@@ -32,8 +33,9 @@ import { parseDistance } from "../../../../utils/strings/parseToStrings";
 import { getGoToSystemInstructions } from "../../../common";
 import { StarSystemDatabase } from "../../../../starSystem/starSystemDatabase";
 import type { MissionNode } from "../../deserializeNode";
+import { z } from "zod";
 
-const enum LandMissionState {
+enum LandMissionState {
     NOT_IN_SYSTEM,
     TOO_FAR_IN_SYSTEM,
     LANDED
@@ -43,6 +45,12 @@ export type MissionTerminatorLandingNodeSerialized = MissionNodeSerializedBase<M
     objectId: UniverseObjectId;
     state: LandMissionState;
 };
+
+export const MissionTerminatorLandingNodeSerializedSchema = z.object({
+    type: z.literal(MissionNodeType.TERMINATOR_LANDING),
+    objectId: UniverseObjectIdSchema,
+    state: z.nativeEnum(LandMissionState)
+});
 
 /**
  * Node used to describe a landing mission on a target object near the terminator line

@@ -21,7 +21,7 @@ import i18n from "../../../i18n";
 
 import { StarSystemCoordinates } from "../../../utils/coordinates/universeCoordinates";
 import { StarSystemDatabase } from "../../../starSystem/starSystemDatabase";
-import type { MissionNode, MissionNodeSerialized } from "../deserializeNode";
+import { type MissionNode, type MissionNodeSerialized } from "../deserializeNode";
 
 export type MissionAndNodeSerialized = MissionNodeSerializedBase<MissionNodeType.AND> & {
     children: MissionNodeSerialized[];
