@@ -73,8 +73,6 @@ export default [
             "no-restricted-syntax": [
                 "error",
                 {
-                    selector: "TSEnumDeclaration:not([const=true])",
-                    message: "Don't declare non-const enums"
                 }
             ],
 
