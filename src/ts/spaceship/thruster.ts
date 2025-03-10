@@ -21,7 +21,7 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { SolidPlume } from "../utils/solidPlume";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Materials } from "../assets/materials";
-import { PointLight } from "@babylonjs/core";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
 
 export class Thruster {
     protected readonly maxAuthority = 3e3;
@@ -81,7 +81,7 @@ export class Thruster {
         this.plume.setThrottle(this.throttle);
 
         this.light.intensity =
-            this.lightMinIntensity + (this.lightMaxIntensity - this.lightMinIntensity) * this.throttle;
+            this.lightMinIntensity + (this.lightMaxIntensity - this.lightMinIntensity) * Math.max(0, this.throttle);
 
         if (this.throttle > 0) {
             this.helperMesh.scaling = new Vector3(0.8, 0.8, 0.8);

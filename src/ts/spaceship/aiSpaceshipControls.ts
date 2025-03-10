@@ -46,6 +46,10 @@ export class AiSpaceshipControls implements Controls {
         return [this.thirdPersonCamera];
     }
 
+    shouldLockPointer(): boolean {
+        return false;
+    }
+
     update(deltaSeconds: number): Vector3 {
         return Vector3.Zero();
     }

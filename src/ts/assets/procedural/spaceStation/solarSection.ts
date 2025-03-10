@@ -21,7 +21,6 @@ import { AbstractMesh, Mesh } from "@babylonjs/core/Meshes";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
-import { SolarPanelMaterial } from "../solarPanel/solarPanelMaterial";
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
@@ -29,6 +28,8 @@ import { Scene } from "@babylonjs/core/scene";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { getRngFromSeed } from "../../../utils/getRngFromSeed";
 import { createEnvironmentAggregate } from "../../../utils/havok";
+import { Material } from "@babylonjs/core/Materials/material";
+import { Materials } from "../../materials";
 
 export class SolarSection implements Transformable {
     private readonly attachment: Mesh;
@@ -42,8 +43,7 @@ export class SolarSection implements Transformable {
     private readonly solarPanels: AbstractMesh[] = [];
     private readonly solarPanelAggregates: PhysicsAggregate[] = [];
 
-    private readonly metalSectionMaterial: MetalSectionMaterial;
-    private readonly solarPanelMaterial: SolarPanelMaterial;
+    private readonly metalSectionMaterial: Material;
 
     constructor(requiredSurface: number, seed: number, scene: Scene) {
         this.rng = getRngFromSeed(seed);
@@ -84,10 +84,8 @@ export class SolarSection implements Transformable {
         );
         this.attachment.convertToFlatShadedMesh();
 
-        this.metalSectionMaterial = new MetalSectionMaterial(scene);
+        this.metalSectionMaterial = new MetalSectionMaterial("SolarSectionMetalMaterial", scene);
         this.attachment.material = this.metalSectionMaterial;
-
-        this.solarPanelMaterial = new SolarPanelMaterial(scene);
 
         const hexagonOffset = attachmentThickness * (1 - Math.sqrt(3) / 2);
 
@@ -158,7 +156,7 @@ export class SolarSection implements Transformable {
                 scene
             );
             panel1.parent = arm;
-            panel1.material = this.solarPanelMaterial;
+            panel1.material = Materials.SOLAR_PANEL;
             panel1.translate(Axis.Y, (panelDimensionY + gap) * (i - (nbPanelsPerSide - 1) / 2));
             panel1.translate(Axis.Z, (panelDimensionX + armThickness - hexagonOffset) / 2);
             panel1.rotate(Axis.Z, Math.PI / 2);
@@ -175,7 +173,7 @@ export class SolarSection implements Transformable {
                 scene
             );
             panel2.parent = arm;
-            panel2.material = this.solarPanelMaterial;
+            panel2.material = Materials.SOLAR_PANEL;
             panel2.translate(Axis.Y, (panelDimensionY + gap) * (i - (nbPanelsPerSide - 1) / 2));
             panel2.translate(Axis.Z, -(panelDimensionX + armThickness - hexagonOffset) / 2);
             panel2.rotate(Axis.Z, Math.PI / 2);
@@ -228,7 +226,7 @@ export class SolarSection implements Transformable {
             solarPanel1.parent = arm;
             solarPanel1.translate(Axis.X, armOffset);
             solarPanel1.translate(Axis.Z, 0.5 * (surfacePerArm / armLength + armThickness - hexagonOffset));
-            solarPanel1.material = this.solarPanelMaterial;
+            solarPanel1.material = Materials.SOLAR_PANEL;
 
             this.solarPanels.push(solarPanel1);
 
@@ -245,16 +243,13 @@ export class SolarSection implements Transformable {
             solarPanel2.parent = arm;
             solarPanel2.translate(Axis.X, armOffset);
             solarPanel2.translate(Axis.Z, -0.5 * (surfacePerArm / armLength + armThickness - hexagonOffset));
-            solarPanel2.material = this.solarPanelMaterial;
+            solarPanel2.material = Materials.SOLAR_PANEL;
 
             this.solarPanels.push(solarPanel2);
         }
     }
 
-    update(stellarObjects: Transformable[], cameraWorldPosition: Vector3) {
-        this.solarPanelMaterial.update(stellarObjects);
-        this.metalSectionMaterial.update(stellarObjects);
-
+    update(cameraWorldPosition: Vector3) {
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
 
         if (distanceToCamera < 350e3 && this.attachmentAggregate === null) {
@@ -306,7 +301,6 @@ export class SolarSection implements Transformable {
         this.solarPanels.forEach((solarPanel) => solarPanel.dispose());
         this.solarPanelAggregates.forEach((solarPanelAggregate) => solarPanelAggregate.dispose());
 
-        this.solarPanelMaterial.dispose();
         this.metalSectionMaterial.dispose();
     }
 }

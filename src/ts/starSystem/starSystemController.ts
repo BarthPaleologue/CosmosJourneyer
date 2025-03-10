@@ -46,6 +46,7 @@ import {
     StellarObject
 } from "../architecture/orbitalObject";
 import { OrbitalObjectUtils } from "../architecture/orbitalObjectUtils";
+import { ShipControls } from "../spaceship/shipControls";
 
 export type PlanetarySystem = {
     readonly planets: Planet[];
@@ -576,10 +577,7 @@ export class StarSystemController {
             controlsPosition
         );
 
-        const shouldCompensateTranslation =
-            distanceOfNearestToControls <
-            nearestOrbitalObject.getBoundingRadius() *
-                (nearestOrbitalObject.model.type === OrbitalObjectType.SPACE_STATION ? 200 : 10);
+        const shouldCompensateTranslation = true;
 
         // compensate rotation when close to the body
         let shouldCompensateRotation = distanceOfNearestToControls < nearestOrbitalObject.getBoundingRadius() * 3;
@@ -683,12 +681,7 @@ export class StarSystemController {
 
         const cameraWorldPosition = controls.getTransform().getAbsolutePosition();
         for (const orbitalFacility of orbitalFacilities) {
-            orbitalFacility.update(
-                stellarObjects,
-                this.objectToParents.get(orbitalFacility) ?? [],
-                cameraWorldPosition,
-                deltaSeconds
-            );
+            orbitalFacility.update(this.objectToParents.get(orbitalFacility) ?? [], cameraWorldPosition, deltaSeconds);
             orbitalFacility.computeCulling(controls.getActiveCamera());
         }
 
@@ -709,12 +702,12 @@ export class StarSystemController {
     }
 
     public applyFloatingOrigin() {
-        const controller = this.scene.getActiveControls();
-        if (controller.getTransform().getAbsolutePosition().length() > Settings.FLOATING_ORIGIN_THRESHOLD) {
-            const displacementTranslation = controller.getTransform().getAbsolutePosition().negate();
+        const controls = this.scene.getActiveControls();
+        if (controls.getTransform().getAbsolutePosition().length() > Settings.FLOATING_ORIGIN_THRESHOLD) {
+            const displacementTranslation = controls.getTransform().getAbsolutePosition().negate();
             this.translateEverythingNow(displacementTranslation);
-            if (controller.getTransform().parent === null) {
-                translate(controller.getTransform(), displacementTranslation);
+            if (controls.getTransform().parent === null) {
+                translate(controls.getTransform(), displacementTranslation);
             }
         }
     }
@@ -740,6 +733,8 @@ export class StarSystemController {
             //FIXME: this needs to be refactored to be future proof when adding new stellar objects
             if (stellarObject instanceof Star) stellarObject.updateMaterial(deltaSeconds);
         }
+
+        this.scene.activeCamera?.getViewMatrix(true);
 
         postProcessManager.setCelestialBody(nearestBody);
         postProcessManager.update(deltaSeconds);

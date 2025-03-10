@@ -1,0 +1,48 @@
+name: Deploy (Main Preview)
+on:
+    push:
+        branches:
+            - main
+
+permissions:
+    contents: write
+
+concurrency:
+    group: main-preview
+    cancel-in-progress: true
+
+jobs:
+    deploy:
+        timeout-minutes: 10
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup Node.js with pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                  version: 9
+
+            - name: Install dependencies
+              run: pnpm i
+
+            - name: Check formatting
+              run: pnpm run format:check
+
+            - name: Lint project
+              run: pnpm run lint:check
+
+            - name: Test project
+              run: pnpm run test
+
+            - name: Build project
+              run: pnpm run build
+
+            - name: Deploy to GitHub Pages (Production)
+              uses: JamesIves/github-pages-deploy-action@v4
+              with:
+                  folder: dist
+                  branch: gh-pages
+                  clean: false
+                  force: false
+                  target-folder: preview

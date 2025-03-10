@@ -15,73 +15,68 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Scene } from "@babylonjs/core/scene";
-import { Effect } from "@babylonjs/core/Materials/effect";
-import {
-    setStellarObjectUniforms,
-    StellarObjectUniformNames
-} from "../../../postProcesses/uniforms/stellarObjectUniforms";
-import { Transformable } from "../../../architecture/transformable";
-
-import metalSectionMaterialFragment from "../../../../shaders/metalSectionMaterial/fragment.glsl";
-import metalSectionMaterialVertex from "../../../../shaders/metalSectionMaterial/vertex.glsl";
 import { Textures } from "../../textures";
+import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
+import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
+import * as BSL from "../../../utils/bsl";
 
-const MetalSectionUniformNames = {
-    WORLD: "world",
-    WORLD_VIEW_PROJECTION: "worldViewProjection",
-    CAMERA_POSITION: "cameraPosition"
-};
+export class MetalSectionMaterial extends NodeMaterial {
+    constructor(name: string, scene: Scene) {
+        super(name, scene);
+        this.mode = NodeMaterialModes.Material;
 
-const MetalSectionSamplerNames = {
-    ALBEDO_MAP: "albedoMap",
-    NORMAL_MAP: "normalMap",
-    METALLIC_MAP: "metallicMap",
-    ROUGHNESS_MAP: "roughnessMap"
-};
+        // Vertex
 
-export class MetalSectionMaterial extends ShaderMaterial {
-    private stellarObjects: Transformable[] = [];
+        const position = BSL.vertexAttribute("position");
+        const normal = BSL.vertexAttribute("normal");
+        const uv = BSL.vertexAttribute("uv");
 
-    constructor(scene: Scene) {
-        const shaderName = "metalSectionMaterial";
-        if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
-            Effect.ShadersStore[`${shaderName}FragmentShader`] = metalSectionMaterialFragment;
-        }
-        if (Effect.ShadersStore[`${shaderName}VertexShader`] === undefined) {
-            Effect.ShadersStore[`${shaderName}VertexShader`] = metalSectionMaterialVertex;
-        }
+        const positionY = BSL.split(position).y;
+        const uvY = BSL.mul(positionY, BSL.float(1 / 50));
 
-        super(`MetalSectionMaterial`, scene, shaderName, {
-            attributes: ["position", "normal", "uv"],
-            uniforms: [...Object.values(MetalSectionUniformNames), ...Object.values(StellarObjectUniformNames)],
-            samplers: [...Object.values(MetalSectionSamplerNames)]
+        const scaledUV = BSL.mul(uv, BSL.float(6.0));
+        const proceduralUV = BSL.vec2(BSL.split(scaledUV).x, uvY);
+
+        const world = BSL.uniformWorld();
+        const positionW = BSL.transformPosition(world, position);
+        const normalW = BSL.transformDirection(world, normal);
+
+        const viewProjection = BSL.uniformViewProjection();
+        const positionClipSpace = BSL.transformPosition(viewProjection, positionW);
+
+        const vertexOutput = BSL.outputVertexPosition(positionClipSpace);
+
+        // Fragment
+
+        const albedoTexture = BSL.textureSample(Textures.METAL_PANELS_ALBEDO, proceduralUV, {
+            convertToLinearSpace: true
         });
+        const metallicRoughnesstexture = BSL.textureSample(Textures.METAL_PANELS_METALLIC_ROUGHNESS, proceduralUV);
+        const aoTexture = BSL.textureSample(Textures.METAL_PANELS_AMBIENT_OCCLUSION, proceduralUV);
+        const normalTexture = BSL.textureSample(Textures.METAL_PANELS_NORMAL, proceduralUV);
 
-        this.onBindObservable.add(() => {
-            const activeCamera = scene.activeCamera;
-            if (activeCamera === null) {
-                throw new Error("No active camera");
-            }
+        const perturbedNormal = BSL.perturbNormal(proceduralUV, positionW, normalW, normalTexture.rgb, BSL.float(1));
 
-            this.getEffect().setVector3(MetalSectionUniformNames.CAMERA_POSITION, activeCamera.globalPosition);
+        const view = BSL.uniformView();
+        const cameraPosition = BSL.uniformCameraPosition();
 
-            this.getEffect().setTexture(MetalSectionSamplerNames.ALBEDO_MAP, Textures.METAL_PANELS_ALBEDO);
-            this.getEffect().setTexture(MetalSectionSamplerNames.NORMAL_MAP, Textures.METAL_PANELS_NORMAL);
-            this.getEffect().setTexture(MetalSectionSamplerNames.METALLIC_MAP, Textures.METAL_PANELS_METALLIC);
-            this.getEffect().setTexture(MetalSectionSamplerNames.ROUGHNESS_MAP, Textures.METAL_PANELS_ROUGHNESS);
+        const pbrColor = BSL.pbrMetallicRoughnessMaterial(
+            albedoTexture.rgb,
+            metallicRoughnesstexture.r,
+            metallicRoughnesstexture.g,
+            aoTexture.r,
+            perturbedNormal,
+            normalW,
+            view,
+            cameraPosition,
+            positionW
+        );
 
-            setStellarObjectUniforms(this.getEffect(), this.stellarObjects);
-        });
-    }
+        const fragmentOutput = BSL.outputFragColor(pbrColor);
 
-    update(stellarObjects: Transformable[]): void {
-        this.stellarObjects = stellarObjects;
-    }
-
-    dispose(forceDisposeEffect?: boolean, forceDisposeTextures?: boolean, notBoundToMesh?: boolean) {
-        super.dispose(forceDisposeEffect, forceDisposeTextures, notBoundToMesh);
-        this.stellarObjects.length = 0;
+        this.addOutputNode(vertexOutput);
+        this.addOutputNode(fragmentOutput);
+        this.build();
     }
 }

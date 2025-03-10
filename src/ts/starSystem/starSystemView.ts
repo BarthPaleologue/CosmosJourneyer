@@ -86,6 +86,7 @@ import { EncyclopaediaGalacticaManager } from "../society/encyclopaediaGalactica
 import { StarSystemDatabase } from "./starSystemDatabase";
 import { AiPlayerControls } from "../player/aiPlayerControls";
 import { LandingPadSize } from "../assets/procedural/landingPad/landingPad";
+import "@babylonjs/inspector";
 
 // register cosmos journeyer as part of window object
 declare global {
@@ -270,9 +271,9 @@ export class StarSystemView implements View {
             if (this.scene.getActiveControls() === this.getSpaceshipControls()) {
                 await this.switchToDefaultControls(true);
             } else if (this.scene.getActiveControls() === this.getDefaultControls()) {
-                this.switchToCharacterControls();
+                await this.switchToCharacterControls();
             } else if (this.scene.getActiveControls() === this.getCharacterControls()) {
-                this.switchToSpaceshipControls();
+                await this.switchToSpaceshipControls();
             }
         });
 
@@ -382,8 +383,6 @@ export class StarSystemView implements View {
             const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
 
             if (this.scene.getActiveControls() === shipControls) {
-                console.log("disembark");
-
                 characterControls.getTransform().setEnabled(true);
                 CharacterInputs.setEnabled(true);
                 characterControls.getTransform().setAbsolutePosition(shipControls.getTransform().absolutePosition);
@@ -401,17 +400,15 @@ export class StarSystemView implements View {
                 SpaceShipControlsInputs.setEnabled(false);
                 this.spaceShipLayer.setVisibility(false);
 
-                this.scene.setActiveControls(characterControls);
+                await this.scene.setActiveControls(characterControls);
 
                 spaceship.acceleratingWarpDriveSound.setTargetVolume(0);
                 spaceship.deceleratingWarpDriveSound.setTargetVolume(0);
             } else if (this.scene.getActiveControls() === characterControls) {
-                console.log("embark");
-
                 characterControls.getTransform().setEnabled(false);
                 CharacterInputs.setEnabled(false);
 
-                this.scene.setActiveControls(shipControls);
+                await this.scene.setActiveControls(shipControls);
                 SpaceShipControlsInputs.setEnabled(true);
 
                 if (spaceship.isLanded()) {
@@ -483,10 +480,10 @@ export class StarSystemView implements View {
 
         this.targetCursorLayer = new TargetCursorLayer();
 
-        const inspectorRoot = document.getElementById("inspectorLayer");
+        /*const inspectorRoot = document.getElementById("inspectorLayer");
         if (inspectorRoot === null) throw new Error("Inspector root not found");
-        /*Inspector.Show(this.scene, {
-            globalRoot: inspectorRoot,
+        void this.scene.debugLayer.show({
+            globalRoot: inspectorRoot
         });*/
 
         window.StarSystemView = this;
@@ -653,7 +650,7 @@ export class StarSystemView implements View {
      * Call this when the player object is changed when loading a save.
      * It will remove the current controls and recreate them based on the player object.
      */
-    public resetPlayer() {
+    public async resetPlayer() {
         this.postProcessManager.reset();
 
         const maxZ = Settings.EARTH_RADIUS * 1e5;
@@ -686,7 +683,7 @@ export class StarSystemView implements View {
             this.characterControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
         }
 
-        this.scene.setActiveControls(this.spaceshipControls);
+        await this.scene.setActiveControls(this.spaceshipControls);
     }
 
     public isJumpingBetweenSystems() {
@@ -717,6 +714,11 @@ export class StarSystemView implements View {
         const starSystem = this.getStarSystem();
         if (this.spaceshipControls === null) throw new Error("Spaceship controls is null");
         if (this.characterControls === null) throw new Error("Character controls is null");
+
+        if (this.scene.getActiveControls().getActiveCamera() !== this.scene.activeCamera) {
+            this.scene.activeCamera?.detachControl();
+            this.scene.setActiveCamera(this.scene.getActiveControls().getActiveCamera());
+        }
 
         const nearestOrbitalObject = starSystem.getNearestOrbitalObject(
             this.scene.getActiveControls().getTransform().getAbsolutePosition()
@@ -940,7 +942,7 @@ export class StarSystemView implements View {
     /**
      * Switches the active controller to the spaceship controls
      */
-    public switchToSpaceshipControls() {
+    public async switchToSpaceshipControls() {
         const shipControls = this.getSpaceshipControls();
         const characterControls = this.getCharacterControls();
         const defaultControls = this.getDefaultControls();
@@ -949,7 +951,7 @@ export class StarSystemView implements View {
 
         characterControls.getTransform().setEnabled(false);
         CharacterInputs.setEnabled(false);
-        this.scene.setActiveControls(shipControls);
+        await this.scene.setActiveControls(shipControls);
         setRotationQuaternion(
             shipControls.getTransform(),
             getRotationQuaternion(defaultControls.getTransform()).clone()
@@ -962,7 +964,7 @@ export class StarSystemView implements View {
     /**
      * Switches the active controller to the character controls
      */
-    public switchToCharacterControls() {
+    public async switchToCharacterControls() {
         const shipControls = this.getSpaceshipControls();
         const characterControls = this.getCharacterControls();
         const defaultControls = this.getDefaultControls();
@@ -972,7 +974,7 @@ export class StarSystemView implements View {
         characterControls.getTransform().setEnabled(true);
         CharacterInputs.setEnabled(true);
         characterControls.getTransform().setAbsolutePosition(defaultControls.getTransform().absolutePosition);
-        this.scene.setActiveControls(characterControls);
+        await this.scene.setActiveControls(characterControls);
         setRotationQuaternion(
             characterControls.getTransform(),
             getRotationQuaternion(defaultControls.getTransform()).clone()
@@ -1007,7 +1009,7 @@ export class StarSystemView implements View {
 
         this.stopBackgroundSounds();
 
-        this.scene.setActiveControls(defaultControls);
+        await this.scene.setActiveControls(defaultControls);
         setRotationQuaternion(
             defaultControls.getTransform(),
             getRotationQuaternion(shipControls.getTransform()).clone()

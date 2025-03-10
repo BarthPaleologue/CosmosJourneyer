@@ -23,12 +23,16 @@ import "@babylonjs/core/Loading/loadingScreen";
 import "@babylonjs/core/Misc/screenshotTools";
 import "@babylonjs/core/Meshes/thinInstanceMesh";
 import { Scene, Tools } from "@babylonjs/core";
+import "@babylonjs/inspector";
 import { createOrbitalDemoScene } from "./playgrounds/orbitalDemo";
 import { createAutomaticLandingScene } from "./playgrounds/automaticLanding";
 import { createHyperspaceTunnelDemo } from "./playgrounds/hyperspaceTunnel";
 import { createDebugAssetsScene } from "./playgrounds/debugAssets";
 import { createSpaceStationScene } from "./playgrounds/spaceStation";
 import { createXrScene } from "./playgrounds/xr";
+import { createFlightDemoScene } from "./playgrounds/flightDemo";
+import { createNeutronStarScene } from "./playgrounds/neutronStar";
+import { createCharacterDemoScene } from "./playgrounds/character";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -61,8 +65,26 @@ switch (requestedScene) {
     case "xr":
         scene = await createXrScene(engine);
         break;
+    case "flightDemo":
+        scene = await createFlightDemoScene(engine);
+        break;
+    case "neutronStar":
+        scene = await createNeutronStarScene(engine);
+        break;
+    case "character":
+        scene = await createCharacterDemoScene(engine);
+        break;
     default:
         scene = await createAutomaticLandingScene(engine);
+}
+
+if (urlParams.get("debug") !== null) {
+    const inspectorRoot = document.createElement("div");
+    document.body.appendChild(inspectorRoot);
+    inspectorRoot.id = "inspectorLayer";
+    await scene.debugLayer.show({
+        globalRoot: inspectorRoot
+    });
 }
 
 scene.executeWhenReady(() => {

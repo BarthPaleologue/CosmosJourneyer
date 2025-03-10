@@ -25,7 +25,7 @@ import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { CollisionMask, Settings } from "../settings";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
-import { Quaternion } from "@babylonjs/core/Maths/math";
+import { Axis, Quaternion, Space } from "@babylonjs/core/Maths/math";
 import "@babylonjs/core/Collisions/collisionCoordinator";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
@@ -33,6 +33,8 @@ import { Transformable } from "../architecture/transformable";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { CharacterInputs } from "./characterControlsInputs";
 import { Objects } from "../assets/objects";
+import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
+import { Skeleton } from "@babylonjs/core/Bones/skeleton";
 
 class AnimationGroupWrapper {
     name: string;
@@ -68,7 +70,16 @@ class AnimationState {
 
 export class CharacterControls implements Controls {
     readonly character: AbstractMesh;
+
+    readonly characterNode: AbstractMesh;
+
+    readonly skeleton: Skeleton;
+
+    readonly headTransform: TransformNode;
+
+    private readonly firstPersonCamera: FreeCamera;
     private readonly thirdPersonCamera: ArcRotateCamera;
+    private activeCamera: Camera;
 
     private readonly characterWalkSpeed = 1.8;
     private readonly characterWalkSpeedBackwards = 1.2;
@@ -177,11 +188,33 @@ export class CharacterControls implements Controls {
 
         this.targetAnim = this.idleAnim;
 
+        this.firstPersonCamera = new FreeCamera("characterFirstPersonCamera", Vector3.Zero(), scene);
+        this.firstPersonCamera.speed = 0;
+        this.firstPersonCamera.minZ = 1;
+        this.firstPersonCamera.parent = this.getTransform();
+
+        const skeleton = this.character.getChildMeshes().find((mesh) => mesh.skeleton !== null)?.skeleton;
+        if (skeleton === undefined || skeleton === null) throw new Error("Skeleton not found");
+
+        this.skeleton = skeleton;
+
+        const characterNode = this.character.getChildMeshes().find((mesh) => mesh.name.includes("Alpha_Joints"));
+        if (characterNode === undefined) {
+            throw new Error("Could not find the Alpha_Joints node in the character mesh");
+        }
+        this.characterNode = characterNode;
+
+        const headBoneIndex = skeleton.getBoneIndexByName("mixamorig:HeadTop_End");
+
+        this.headTransform = new TransformNode("headTransform", scene);
+        this.headTransform.scaling.scaleInPlace(20);
+        this.headTransform.attachToBone(skeleton.bones[headBoneIndex], characterNode);
+
         this.thirdPersonCamera = new ArcRotateCamera(
             "characterThirdPersonCamera",
-            1.0,
-            -Math.PI / 4,
-            40,
+            -1.0,
+            Math.PI / 3,
+            10,
             new Vector3(0, 1.5, 0),
             scene
         );
@@ -191,6 +224,27 @@ export class CharacterControls implements Controls {
         this.thirdPersonCamera.maxZ = Settings.EARTH_RADIUS * 5;
         this.thirdPersonCamera.wheelPrecision *= 3;
         this.thirdPersonCamera.parent = this.getTransform();
+
+        this.activeCamera = this.firstPersonCamera;
+        this.setFirstPersonCameraActive();
+
+        CharacterInputs.map.toggleCamera.on("complete", () => {
+            if (this.getActiveCamera() === this.thirdPersonCamera) {
+                this.setFirstPersonCameraActive();
+            } else {
+                this.setThirdPersonCameraActive();
+            }
+        });
+    }
+
+    public setFirstPersonCameraActive() {
+        this.activeCamera = this.firstPersonCamera;
+        this.character.getChildMeshes().forEach((mesh) => mesh.setEnabled(false));
+    }
+
+    public setThirdPersonCameraActive() {
+        this.activeCamera = this.thirdPersonCamera;
+        this.character.getChildMeshes().forEach((mesh) => mesh.setEnabled(true));
     }
 
     public setClosestWalkableObject(object: Transformable | null) {
@@ -198,26 +252,41 @@ export class CharacterControls implements Controls {
     }
 
     public getActiveCamera(): Camera {
-        return this.thirdPersonCamera;
+        return this.activeCamera;
     }
 
     public getCameras(): Camera[] {
-        return [this.thirdPersonCamera];
+        return [this.firstPersonCamera, this.thirdPersonCamera];
     }
 
     public getTransform(): TransformNode {
         return this.character;
     }
 
-    public update(deltaTime: number): Vector3 {
+    public shouldLockPointer(): boolean {
+        return true;
+    }
+
+    public update(deltaSeconds: number): Vector3 {
+        const inverseTransform = this.getTransform().getWorldMatrix().clone().invert();
+        this.firstPersonCamera.position = Vector3.TransformCoordinates(
+            this.headTransform.getAbsolutePosition(),
+            inverseTransform
+        );
+
+        this.getTransform().rotate(Axis.Y, this.firstPersonCamera.rotation.y, Space.LOCAL);
+        this.getTransform().computeWorldMatrix(true);
+        this.firstPersonCamera.rotation.y = 0;
+        this.firstPersonCamera.getViewMatrix(true);
+
         const character = this.getTransform();
         const start = character.getAbsolutePosition().add(character.up.scale(50e3));
         const end = character.position.add(character.up.scale(-50e3));
 
         if (this.currentAnimationState === this.fallingState) {
             // apply gravity
-            this.jumpVelocity.addInPlace(character.up.scale(-9.8 * deltaTime));
-            translate(character, this.jumpVelocity.scale(deltaTime));
+            this.jumpVelocity.addInPlace(character.up.scale(-9.8 * deltaSeconds));
+            translate(character, this.jumpVelocity.scale(deltaSeconds));
         }
 
         if (this.closestWalkableObject !== null) {
@@ -282,21 +351,21 @@ export class CharacterControls implements Controls {
 
         if (this.walkAnim.weight > 0.0) {
             this.character.moveWithCollisions(
-                this.character.forward.scaleInPlace(-this.characterWalkSpeed * deltaTime * this.walkAnim.weight)
+                this.character.forward.scaleInPlace(-this.characterWalkSpeed * deltaSeconds * this.walkAnim.weight)
             );
         }
 
         if (this.walkBackAnim.weight > 0.0) {
             this.character.moveWithCollisions(
                 this.character.forward.scaleInPlace(
-                    this.characterWalkSpeedBackwards * deltaTime * this.walkBackAnim.weight
+                    this.characterWalkSpeedBackwards * deltaSeconds * this.walkBackAnim.weight
                 )
             );
         }
 
         if (this.runningAnim.weight > 0.0) {
             this.character.moveWithCollisions(
-                this.character.forward.scaleInPlace(-this.characterRunSpeed * deltaTime * this.runningAnim.weight)
+                this.character.forward.scaleInPlace(-this.characterRunSpeed * deltaSeconds * this.runningAnim.weight)
             );
         }
 
@@ -308,7 +377,7 @@ export class CharacterControls implements Controls {
             if (yMove > 0) {
                 this.swimmingState.currentAnimation = this.swimmingForwardAnim;
                 this.character.moveWithCollisions(
-                    this.character.forward.scaleInPlace(-this.characterSwimSpeed * deltaTime)
+                    this.character.forward.scaleInPlace(-this.characterSwimSpeed * deltaSeconds)
                 );
             }
         } else if (this.currentAnimationState === this.groundedState) {
@@ -347,35 +416,29 @@ export class CharacterControls implements Controls {
         const isMoving = this.currentAnimationState.currentAnimation !== this.currentAnimationState.idleAnimation;
 
         // Rotation
-        if (xMove < 0 && isMoving) {
-            const dtheta = this.characterRotationSpeed * deltaTime;
+        if (this.activeCamera === this.thirdPersonCamera && isMoving) {
+            const dtheta = -Math.sign(xMove) * this.characterRotationSpeed * deltaSeconds;
             this.character.rotate(Vector3.Up(), dtheta);
             this.thirdPersonCamera.alpha += dtheta;
 
             const cameraPosition = this.thirdPersonCamera.target;
             cameraPosition.applyRotationQuaternionInPlace(Quaternion.RotationAxis(Vector3.Up(), -dtheta));
             this.thirdPersonCamera.target = cameraPosition;
-        } else if (xMove > 0 && isMoving) {
-            const dtheta = this.characterRotationSpeed * deltaTime;
-            this.character.rotate(Vector3.Up(), -dtheta);
-            this.thirdPersonCamera.alpha -= dtheta;
-
-            const cameraPosition = this.thirdPersonCamera.target;
-            cameraPosition.applyRotationQuaternionInPlace(Quaternion.RotationAxis(Vector3.Up(), dtheta));
-            this.thirdPersonCamera.target = cameraPosition;
+        } else if (this.activeCamera === this.firstPersonCamera) {
+            displacement.addInPlace(this.character.right.scale(xMove * this.characterWalkSpeed * deltaSeconds));
         }
 
         let weightSum = 0;
         for (const animation of this.nonIdleAnimations) {
             if (animation === this.targetAnim) {
-                animation.moveTowardsWeight(1, deltaTime);
+                animation.moveTowardsWeight(1, deltaSeconds);
             } else {
-                animation.moveTowardsWeight(0, deltaTime);
+                animation.moveTowardsWeight(0, deltaSeconds);
             }
             weightSum += animation.weight;
         }
 
-        this.idleAnim.moveTowardsWeight(Math.min(Math.max(1 - weightSum, 0.0), 1.0), deltaTime);
+        this.idleAnim.moveTowardsWeight(Math.min(Math.max(1 - weightSum, 0.0), 1.0), deltaSeconds);
 
         this.character.computeWorldMatrix(true);
 
@@ -388,6 +451,7 @@ export class CharacterControls implements Controls {
 
     dispose() {
         this.character.dispose();
+        this.firstPersonCamera.dispose();
         this.thirdPersonCamera.dispose();
     }
 }

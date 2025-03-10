@@ -1,74 +1,78 @@
-import { MaterialPluginBase } from "@babylonjs/core/Materials/materialPluginBase";
-import { Material } from "@babylonjs/core/Materials/material";
-import { MaterialDefines, ShaderLanguage } from "@babylonjs/core";
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Affero General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Affero General Public License for more details.
+//
+//  You should have received a copy of the GNU Affero General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { Scene } from "@babylonjs/core/scene";
-import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { Nullable } from "@babylonjs/core/types";
+import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
+import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import { Textures } from "../assets/textures";
-import { PBRMetallicRoughnessMaterial } from "@babylonjs/core/Materials/PBR/pbrMetallicRoughnessMaterial";
+import { Vector2 } from "@babylonjs/core/Maths/math.vector";
+import * as BSL from "../utils/bsl";
 
-/**
- * Extend from MaterialPluginBase to create your plugin.
- */
-export class ClimberRingPluginMaterial extends MaterialPluginBase {
-    static NAME = "ClimberRingPluginMaterial";
-
-    constructor(material: Material) {
-        super(material, ClimberRingPluginMaterial.NAME, 200);
-    }
-
-    setEnabled(enabled: boolean) {
-        this._enable(enabled);
-    }
-
-    // Also, you should always associate a define with your plugin because the list of defines (and their values)
-    // is what triggers a recompilation of the shader: a shader is recompiled only if a value of a define changes.
-    prepareDefines(defines: MaterialDefines, scene: Scene, mesh: AbstractMesh) {
-        super.prepareDefines(defines, scene, mesh);
-    }
-
-    getClassName() {
-        return "BlackAndWhitePluginMaterial";
-    }
-
-    // This is used to inform the system which language is supported
-    isCompatible(shaderLanguage: ShaderLanguage): boolean {
-        switch (shaderLanguage) {
-            case ShaderLanguage.GLSL:
-            case ShaderLanguage.WGSL:
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    getCustomCode(shaderType: string, shaderLanguage?: ShaderLanguage): Nullable<{ [p: string]: string }> {
-        if (shaderType === "vertex") {
-            return {
-                CUSTOM_VERTEX_UPDATE_POSITION: `
-                    uvUpdated.y = fract(5.0 * uvUpdated.y);
-                    uvUpdated = fract(2.0 * uvUpdated);
-                `
-            };
-        }
-
-        // for other shader types we're not doing anything, return null
-        return null;
-    }
-}
-
-export class ClimberRingMaterial extends PBRMetallicRoughnessMaterial {
+export class ClimberRingMaterial extends NodeMaterial {
     constructor(name: string, scene: Scene) {
         super(name, scene);
+        this.mode = NodeMaterialModes.Material;
 
-        this.baseTexture = Textures.CRATE_ALBEDO;
-        this.normalTexture = Textures.CRATE_NORMAL;
-        this.metallicRoughnessTexture = Textures.CRATE_METALLIC_ROUGHNESS;
+        // Vertex
 
-        const plugin = this.pluginManager?.getPlugin(ClimberRingPluginMaterial.NAME);
-        if (plugin === null) {
-            throw new Error("Plugin not found");
-        }
-        (plugin as ClimberRingPluginMaterial).setEnabled(true);
+        const position = BSL.vertexAttribute("position");
+        const normal = BSL.vertexAttribute("normal");
+        const uv = BSL.vertexAttribute("uv");
+
+        const meshUVScaleFactor = BSL.vec(new Vector2(2, 10));
+        const proceduralUV = BSL.mul(uv, meshUVScaleFactor);
+
+        const world = BSL.uniformWorld();
+        const positionW = BSL.transformPosition(world, position);
+        const normalW = BSL.transformDirection(world, normal);
+
+        const viewProjection = BSL.uniformViewProjection();
+        const positionClipSpace = BSL.transformPosition(viewProjection, positionW);
+
+        const vertexOutput = BSL.outputVertexPosition(positionClipSpace);
+
+        // Fragment
+
+        const albedoTexture = BSL.textureSample(Textures.CRATE_ALBEDO, proceduralUV, { convertToLinearSpace: true });
+        const metallicRoughnesstexture = BSL.textureSample(Textures.CRATE_METALLIC_ROUGHNESS, proceduralUV);
+        const aoTexture = BSL.textureSample(Textures.CRATE_AMBIENT_OCCLUSION, proceduralUV);
+        const normalTexture = BSL.textureSample(Textures.CRATE_NORMAL, proceduralUV);
+
+        const perturbedNormal = BSL.perturbNormal(proceduralUV, positionW, normalW, normalTexture.rgb, BSL.float(1));
+
+        const view = BSL.uniformView();
+        const cameraPosition = BSL.uniformCameraPosition();
+
+        const pbrColor = BSL.pbrMetallicRoughnessMaterial(
+            albedoTexture.rgb,
+            metallicRoughnesstexture.r,
+            metallicRoughnesstexture.g,
+            aoTexture.r,
+            perturbedNormal,
+            normalW,
+            view,
+            cameraPosition,
+            positionW
+        );
+
+        const fragmentOutput = BSL.outputFragColor(pbrColor);
+
+        this.addOutputNode(vertexOutput);
+        this.addOutputNode(fragmentOutput);
+        this.build();
     }
 }

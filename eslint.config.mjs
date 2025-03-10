@@ -21,7 +21,7 @@ export default [
             "src/ts/utils/TWGSL",
             "node_modules",
             "src-tauri",
-            "webpack.config.js",
+            "rspack.config.js",
             "tsconfig.json",
             "eslint.config.mjs",
             "dist",

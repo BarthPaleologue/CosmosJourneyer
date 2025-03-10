@@ -62,9 +62,15 @@ export class UberScene extends Scene {
      * Sets the active controls for the scene. This also sets the active camera of the scene using the active camera of the controls.
      * @param controls The active controls.
      */
-    public setActiveControls(controls: Controls) {
+    public async setActiveControls(controls: Controls) {
         this.activeControls = controls;
         this.setActiveCamera(controls.getActiveCamera());
+
+        if (controls.shouldLockPointer()) {
+            await this.getEngine().getRenderingCanvas()?.requestPointerLock();
+        } else {
+            document.exitPointerLock();
+        }
     }
 
     /**

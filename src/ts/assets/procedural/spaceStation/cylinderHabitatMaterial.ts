@@ -15,82 +15,127 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Scene } from "@babylonjs/core/scene";
-import { Effect } from "@babylonjs/core/Materials/effect";
-import { Transformable } from "../../../architecture/transformable";
-
-import cylinderHabitatMaterialFragment from "../../../../shaders/cylinderHabitatMaterial/fragment.glsl";
-import cylinderHabitatMaterialVertex from "../../../../shaders/cylinderHabitatMaterial/vertex.glsl";
-import {
-    setStellarObjectUniforms,
-    StellarObjectUniformNames
-} from "../../../postProcesses/uniforms/stellarObjectUniforms";
 import { Textures } from "../../textures";
+import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
+import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
+import {
+    vertexAttribute,
+    xz,
+    split,
+    uniformWorld,
+    transformPosition,
+    transformDirection,
+    sub,
+    f,
+    step,
+    abs,
+    mul,
+    mix,
+    uniformViewProjection,
+    outputVertexPosition,
+    atan2,
+    Target,
+    vec2,
+    textureSample,
+    perturbNormal,
+    uniformView,
+    uniformCameraPosition,
+    pbrMetallicRoughnessMaterial,
+    outputFragColor,
+    length,
+    remap,
+    fract,
+    add,
+    vec3,
+    smoothstep
+} from "../../../utils/bsl";
 
-const CylinderHabitatUniformNames = {
-    WORLD: "world",
-    WORLD_VIEW_PROJECTION: "worldViewProjection",
-    CAMERA_POSITION: "cameraPosition",
-    RADIUS: "radius",
-    HEIGHT: "height"
-};
+export class CylinderHabitatMaterial extends NodeMaterial {
+    constructor(radius: number, height: number, tesselation: number, scene: Scene) {
+        super("CylinderHabitatMaterial", scene);
+        this.mode = NodeMaterialModes.Material;
 
-const CylinderHabitatSamplerNames = {
-    ALBEDO: "albedoMap",
-    NORMAL: "normalMap",
-    METALLIC: "metallicMap",
-    ROUGHNESS: "roughnessMap",
-    OCCLUSION: "occlusionMap"
-};
+        const circumference = 2 * Math.PI * radius;
+        const nbSectors = tesselation;
+        const sectorSize = circumference / nbSectors;
 
-export class CylinderHabitatMaterial extends ShaderMaterial {
-    private stellarObjects: Transformable[] = [];
+        const position = vertexAttribute("position");
+        const normal = vertexAttribute("normal");
+        const uv = vertexAttribute("uv");
 
-    constructor(radius: number, height: number, scene: Scene) {
-        const shaderName = "cylinderHabitatMaterial";
-        if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
-            Effect.ShadersStore[`${shaderName}FragmentShader`] = cylinderHabitatMaterialFragment;
-        }
-        if (Effect.ShadersStore[`${shaderName}VertexShader`] === undefined) {
-            Effect.ShadersStore[`${shaderName}VertexShader`] = cylinderHabitatMaterialVertex;
-        }
+        const positionXZ = xz(position);
+        const splitPositionXZ = split(positionXZ);
 
-        super(`RingHabitatMaterial`, scene, shaderName, {
-            attributes: ["position", "normal", "uv"],
-            uniforms: [...Object.values(CylinderHabitatUniformNames), ...Object.values(StellarObjectUniformNames)],
-            samplers: [...Object.values(CylinderHabitatSamplerNames)]
+        const world = uniformWorld();
+        const positionW = transformPosition(world, position);
+        const normalW = transformDirection(world, normal);
+
+        // float mask = 1.0 - step(0.02, abs(normal.y));
+        // vUV.y *= mix(1.0, height, mask);
+        const mask = sub(f(1), step(f(0.02), abs(split(normal).y)));
+        const scaledUvY = mul(split(uv).y, mix(f(1.0), f(height / sectorSize), mask));
+
+        const viewProjection = uniformViewProjection();
+        const positionClipSpace = transformPosition(viewProjection, positionW);
+
+        const vertexOutput = outputVertexPosition(positionClipSpace);
+
+        this.addOutputNode(vertexOutput);
+
+        const theta = atan2(splitPositionXZ.y, splitPositionXZ.x, { target: Target.FRAG });
+
+        const distanceToCenter = mul(length(positionXZ, { target: Target.FRAG }), f(1.0 / sectorSize));
+
+        const proceduralUvX = remap(theta, f(0), f(2 * Math.PI), f(0), f(nbSectors));
+        const proceduralUvY = mix(distanceToCenter, scaledUvY, mask);
+        const proceduralUV = vec2(proceduralUvX, proceduralUvY);
+
+        const albedo = textureSample(Textures.SPACE_STATION_ALBEDO, proceduralUV, {
+            convertToLinearSpace: true
         });
+        const normalMap = textureSample(Textures.SPACE_STATION_NORMAL, proceduralUV);
+        const metallicRoughness = textureSample(Textures.SPACE_STATION_METALLIC_ROUGHNESS, proceduralUV);
+        const occlusion = textureSample(Textures.SPACE_STATION_AMBIENT_OCCLUSION, proceduralUV);
 
-        this.onBindObservable.add(() => {
-            const activeCamera = scene.activeCamera;
-            if (activeCamera === null) {
-                throw new Error("No active camera");
-            }
+        const perturbedNormal = perturbNormal(proceduralUV, positionW, normalW, normalMap.rgb, f(1));
 
-            this.getEffect().setVector3(CylinderHabitatUniformNames.CAMERA_POSITION, activeCamera.globalPosition);
-            this.getEffect().setFloat(CylinderHabitatUniformNames.RADIUS, radius);
-            this.getEffect().setFloat(CylinderHabitatUniformNames.HEIGHT, height);
+        const view = uniformView();
+        const cameraPosition = uniformCameraPosition();
 
-            setStellarObjectUniforms(this.getEffect(), this.stellarObjects);
+        const pbrColor = pbrMetallicRoughnessMaterial(
+            albedo.rgb,
+            metallicRoughness.r,
+            metallicRoughness.g,
+            occlusion.r,
+            perturbedNormal,
+            normalW,
+            view,
+            cameraPosition,
+            positionW
+        );
 
-            this.getEffect().setTexture(CylinderHabitatSamplerNames.ALBEDO, Textures.SPACE_STATION_ALBEDO);
-            this.getEffect().setTexture(CylinderHabitatSamplerNames.NORMAL, Textures.SPACE_STATION_NORMAL);
-            this.getEffect().setTexture(CylinderHabitatSamplerNames.METALLIC, Textures.SPACE_STATION_METALLIC);
-            this.getEffect().setTexture(CylinderHabitatSamplerNames.ROUGHNESS, Textures.SPACE_STATION_ROUGHNESS);
-            this.getEffect().setTexture(
-                CylinderHabitatSamplerNames.OCCLUSION,
-                Textures.SPACE_STATION_AMBIENT_OCCLUSION
-            );
-        });
-    }
+        const lightEmission = mul(
+            mask,
+            mul(
+                mul(
+                    smoothstep(f(0.48), f(0.5), fract(proceduralUvX)),
+                    sub(f(1), smoothstep(f(0.5), f(0.52), fract(proceduralUvX)))
+                ),
+                mul(
+                    smoothstep(f(0.4), f(0.45), fract(proceduralUvY)),
+                    sub(f(1), smoothstep(f(0.55), f(0.6), fract(proceduralUvY)))
+                )
+            )
+        );
 
-    update(stellarObjects: Transformable[]) {
-        this.stellarObjects = stellarObjects;
-    }
+        const lightColor = vec3(f(1), f(1), f(0.7));
 
-    dispose(forceDisposeEffect?: boolean, forceDisposeTextures?: boolean, notBoundToMesh?: boolean) {
-        super.dispose(forceDisposeEffect, forceDisposeTextures, notBoundToMesh);
-        this.stellarObjects.length = 0;
+        const finalColor = add(pbrColor, mul(lightEmission, lightColor));
+        const fragOutput = outputFragColor(finalColor);
+
+        this.addOutputNode(fragOutput);
+
+        this.build();
     }
 }

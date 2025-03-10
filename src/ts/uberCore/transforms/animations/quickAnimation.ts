@@ -21,7 +21,7 @@ export function quickAnimation<K, T>(targetObject: K, whichprop: string, initial
         120,
         initialValue,
         targetval,
-        0,
+        Animation.ANIMATIONLOOPMODE_CONSTANT,
         ease
     );
 }

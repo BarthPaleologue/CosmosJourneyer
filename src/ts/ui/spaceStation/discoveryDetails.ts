@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Observable } from "@babylonjs/core";
 import { Sounds } from "../../assets/sounds";
 import { Player } from "../../player/player";
 import { EncyclopaediaGalactica, SpaceDiscoveryData } from "../../society/encyclopaediaGalactica";
@@ -25,6 +24,7 @@ import { parseDistance, parseSecondsPrecise } from "../../utils/strings/parseToS
 import i18n from "../../i18n";
 import { Settings } from "../../settings";
 import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
+import { Observable } from "@babylonjs/core/Misc/observable";
 
 export class DiscoveryDetails {
     readonly htmlRoot: HTMLElement;

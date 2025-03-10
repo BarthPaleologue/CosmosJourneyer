@@ -17,7 +17,6 @@
 
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
-import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { enablePhysics } from "./utils";
 import { DefaultControls } from "../defaultControls/defaultControls";
@@ -27,7 +26,10 @@ import { Settings } from "../settings";
 import { newSeededStarModel } from "../stellarObjects/star/starModelGenerator";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { Star } from "../stellarObjects/star/star";
-import { Assets } from "../assets/assets";
+import { AssetsManager } from "@babylonjs/core";
+import { Textures } from "../assets/textures";
+import { Materials } from "../assets/materials";
+import { Objects } from "../assets/objects";
 
 export async function createSpaceStationScene(engine: AbstractEngine): Promise<Scene> {
     const scene = new Scene(engine);
@@ -35,16 +37,18 @@ export async function createSpaceStationScene(engine: AbstractEngine): Promise<S
 
     await enablePhysics(scene);
 
-    await Assets.Init(scene);
+    const assetsManager = new AssetsManager(scene);
+    Textures.EnqueueTasks(assetsManager, scene);
+    Objects.EnqueueTasks(assetsManager, scene);
+    await assetsManager.loadAsync();
+    Materials.Init(scene);
 
     const defaultControls = new DefaultControls(scene);
     defaultControls.speed = 2000;
 
     const camera = defaultControls.getActiveCamera();
-    camera.maxZ = 100e3;
+    camera.maxZ = Settings.EARTH_RADIUS * 1e5;
     camera.attachControl();
-
-    scene.enableDepthRenderer(camera, false, true);
 
     const distanceToStar = Settings.AU;
 
@@ -63,7 +67,7 @@ export async function createSpaceStationScene(engine: AbstractEngine): Promise<S
     const systemDatabase = new StarSystemDatabase();
     const systemPosition = systemDatabase.getSystemGalacticPosition(coordinates);
 
-    const sunModel = newSeededStarModel(456, "Untitled Star", []);
+    const sunModel = newSeededStarModel(420, "Untitled Star", []);
     const sun = new Star(sunModel, scene);
     sun.getTransform().position = new Vector3(7, 2, 5).normalize().scaleInPlace(distanceToStar);
 
@@ -78,9 +82,6 @@ export async function createSpaceStationScene(engine: AbstractEngine): Promise<S
 
     const spaceStation = new SpaceStation(spaceStationModel, scene);
 
-    const ambient = new HemisphericLight("Sun", Vector3.Up(), scene);
-    ambient.intensity = 0.1;
-
     scene.onBeforePhysicsObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
 
@@ -88,7 +89,7 @@ export async function createSpaceStationScene(engine: AbstractEngine): Promise<S
 
         const cameraWorldPosition = camera.globalPosition;
 
-        spaceStation.update([sun], [sun], cameraWorldPosition, deltaSeconds);
+        spaceStation.update([sun], cameraWorldPosition, deltaSeconds);
     });
 
     return scene;

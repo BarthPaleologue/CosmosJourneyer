@@ -1,20 +1,37 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Affero General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Affero General Public License for more details.
+//
+//  You should have received a copy of the GNU Affero General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { Scene } from "@babylonjs/core/scene";
 import { CreateBox, CreateTube, TransformNode } from "@babylonjs/core/Meshes";
-import { Transformable } from "../architecture/transformable";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { SolarPanelMaterial } from "../assets/procedural/solarPanel/solarPanelMaterial";
-import { MetalSectionMaterial } from "../assets/procedural/spaceStation/metalSectionMaterial";
-import { ClimberRingMaterial } from "../materials/climberRingMaterial";
 import i18n from "../i18n";
 import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
+import { Material } from "@babylonjs/core/Materials/material";
+import { MetalSectionMaterial } from "../assets/procedural/spaceStation/metalSectionMaterial";
+import { ClimberRingMaterial } from "../materials/climberRingMaterial";
 
 export class SpaceElevatorClimber implements Targetable {
     private readonly transform: TransformNode;
 
-    private readonly solarPanelMaterial: SolarPanelMaterial;
-    private readonly metalSectionMaterial: MetalSectionMaterial;
+    private readonly solarPanelMaterial: Material;
+    private readonly metalSectionMaterial: Material;
 
     private readonly boundingRadius: number;
 
@@ -24,7 +41,7 @@ export class SpaceElevatorClimber implements Targetable {
         this.transform = new TransformNode("SpaceElevatorClimber", scene);
 
         this.solarPanelMaterial = new SolarPanelMaterial(scene);
-        this.metalSectionMaterial = new MetalSectionMaterial(scene);
+        this.metalSectionMaterial = new MetalSectionMaterial("SpaceElevatorClimberMetalSectionMaterial", scene);
 
         const angleSubtracted = Math.PI / 6;
         const minAngle = -Math.PI / 2 + angleSubtracted / 2;
@@ -129,11 +146,6 @@ export class SpaceElevatorClimber implements Targetable {
 
     getTypeName(): string {
         return i18n.t("objectTypes:spaceElevatorClimber");
-    }
-
-    update(stellarObjects: Transformable[]) {
-        this.solarPanelMaterial.update(stellarObjects);
-        this.metalSectionMaterial.update(stellarObjects);
     }
 
     getTransform() {

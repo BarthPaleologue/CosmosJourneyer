@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Vector3, Tools } from "@babylonjs/core";
 import { normalRandom } from "extended-random";
 import { clamp } from "../utils/math";
 import { CelestialBodyModel, StellarObjectModel } from "../architecture/orbitalObjectModel";
@@ -32,6 +31,8 @@ import { randomPieChart } from "../utils/random";
 import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
 import { generateSpaceStationName } from "../utils/strings/spaceStationNameGenerator";
 import { SpaceStationModel } from "./spacestationModel";
+import { Tools } from "@babylonjs/core/Misc/tools";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export function newSeededSpaceStationModel(
     seed: number,
@@ -48,6 +49,15 @@ export function newSeededSpaceStationModel(
         let radius = body.radius;
         if (body.type === OrbitalObjectType.BLACK_HOLE) {
             radius += body.accretionDiskRadius;
+        }
+
+        if (
+            body.type === OrbitalObjectType.GAS_PLANET ||
+            body.type === OrbitalObjectType.TELLURIC_PLANET ||
+            body.type === OrbitalObjectType.STAR ||
+            body.type === OrbitalObjectType.NEUTRON_STAR
+        ) {
+            radius += (body.rings?.ringEnd ?? 0) * body.radius;
         }
 
         return radius;
@@ -82,10 +92,17 @@ export function newSeededSpaceStationModel(
     const nbHydroponicLayers = 10;
 
     // find average distance to stellar objects
-    let distanceToStar = 0;
-    parentBodies.forEach((celestialBody) => {
-        distanceToStar += celestialBody.orbit.semiMajorAxis;
-    });
+    let distanceToStar = orbit.semiMajorAxis;
+    parentBodies
+        .filter(
+            (body) =>
+                body.type !== OrbitalObjectType.STAR &&
+                body.type !== OrbitalObjectType.NEUTRON_STAR &&
+                body.type !== OrbitalObjectType.BLACK_HOLE
+        )
+        .forEach((celestialBody) => {
+            distanceToStar += celestialBody.orbit.semiMajorAxis;
+        });
     distanceToStar /= parentBodies.length;
 
     let totalStellarFlux = 0;

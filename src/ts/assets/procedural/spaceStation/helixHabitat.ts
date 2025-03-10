@@ -31,6 +31,7 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import { getRngFromSeed } from "../../../utils/getRngFromSeed";
 import { createEnvironmentAggregate } from "../../../utils/havok";
 import { getRotationPeriodForArtificialGravity } from "../../../utils/physics";
+import { Material } from "@babylonjs/core/Materials/material";
 
 export class HelixHabitat implements Transformable {
     private readonly root: TransformNode;
@@ -49,7 +50,7 @@ export class HelixHabitat implements Transformable {
     private helix2Aggregate: PhysicsAggregate | null = null;
 
     private readonly helixMaterial: HelixHabitatMaterial;
-    private readonly metalSectionMaterial: MetalSectionMaterial;
+    private readonly metalSectionMaterial: Material;
 
     private readonly arms: Mesh[] = [];
     private readonly armAggregates: PhysicsAggregate[] = [];
@@ -78,7 +79,7 @@ export class HelixHabitat implements Transformable {
 
         const attachmentNbSides = 6 + 2 * Math.floor(this.rng(4) * 2);
 
-        this.metalSectionMaterial = new MetalSectionMaterial(scene);
+        this.metalSectionMaterial = new MetalSectionMaterial("HelixHabitatMetalSectionMaterial", scene);
 
         this.attachment = MeshBuilder.CreateCylinder(
             "HelixHabitatAttachment",
@@ -146,13 +147,11 @@ export class HelixHabitat implements Transformable {
         }
     }
 
-    update(stellarObjects: Transformable[], cameraWorldPosition: Vector3, deltaSeconds: number) {
+    update(cameraWorldPosition: Vector3, deltaSeconds: number) {
         this.getTransform().rotate(
             Axis.Y,
             deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, Settings.G_EARTH)
         );
-        this.helixMaterial.update(stellarObjects);
-        this.metalSectionMaterial.update(stellarObjects);
 
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
 
