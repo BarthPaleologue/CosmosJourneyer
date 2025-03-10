@@ -73,6 +73,8 @@ export default [
             "no-restricted-syntax": [
                 "error",
                 {
+                    selector: "CallExpression[callee.object.name='Promise'][callee.property.name='reject']",
+                    message: "Using Promise.reject() is not allowed. Consider using Promise<Result> instead."
                 }
             ],
 

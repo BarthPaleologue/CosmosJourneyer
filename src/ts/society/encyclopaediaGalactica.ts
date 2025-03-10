@@ -62,7 +62,7 @@ export interface EncyclopaediaGalactica {
      * @param object The object to evaluate.
      * @returns The estimated value of the object in credits.
      */
-    estimateDiscovery(object: UniverseObjectId): Promise<number>;
+    estimateDiscovery(object: UniverseObjectId): Promise<Result<number, string>>;
 
     /**
      * Gets a human readable string for the encyclopaedia backend.
