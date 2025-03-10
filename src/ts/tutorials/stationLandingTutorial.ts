@@ -13,7 +13,7 @@ import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
 import { parseSaveFileData } from "../saveFile/saveFileData";
 
 const parsedSaveData = parseSaveFileData(JSON.stringify(saveData));
-if (parsedSaveData.data === null) {
+if (!parsedSaveData.success) {
     throw new Error("StationLandingTutorial: saveData is null");
 }
 
@@ -25,7 +25,7 @@ export const StationLandingTutorial: Tutorial = {
     getDescription() {
         return i18n.t("tutorials:stationLanding:description");
     },
-    saveData: parsedSaveData.data,
+    saveData: parsedSaveData.value,
     async getContentPanelsHtml(): Promise<string[]> {
         const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
         const presentationPanelHtml = `

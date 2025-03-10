@@ -9,7 +9,7 @@ import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import { parseSaveFileData } from "../saveFile/saveFileData";
 
 const parsedSaveData = parseSaveFileData(JSON.stringify(saveData));
-if (parsedSaveData.data === null) {
+if (!parsedSaveData.success) {
     throw new Error("StationLandingTutorial: saveData is null");
 }
 
@@ -17,7 +17,7 @@ export const TemplateTutorial: Tutorial = {
     getTitle() {
         return "Template Tutorial";
     },
-    saveData: parsedSaveData.data,
+    saveData: parsedSaveData.value,
     coverImageSrc: welcomeImageSrc,
     getDescription() {
         return "This is a template tutorial to help building more tutorials!";

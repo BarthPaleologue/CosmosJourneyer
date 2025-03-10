@@ -6,6 +6,8 @@ import {
     getSavesFromLocalStorage,
     parseSaveFileData,
     SaveFileData,
+    SaveLoadingError,
+    saveLoadingErrorToI18nString,
     writeSavesToLocalStorage
 } from "../saveFile/saveFileData";
 import { Sounds } from "../assets/sounds";
@@ -19,6 +21,7 @@ import shareIconPath from "../../asset/icons/link.webp";
 import { promptModalBoolean, promptModalString } from "../utils/dialogModal";
 import { getObjectModelByUniverseId } from "../utils/coordinates/orbitalObjectId";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { ok, Result } from "../utils/types";
 
 export class SaveLoadingPanelContent {
     readonly htmlRoot: HTMLElement;
@@ -69,8 +72,19 @@ export class SaveLoadingPanelContent {
                 return;
             }
 
-            const saveFileData = await this.parseSaveFile(file);
-            this.onLoadSaveObservable.notifyObservers(saveFileData);
+            const saveFileDataResult = await this.parseSaveFile(file);
+
+            if (!saveFileDataResult.success) {
+                createNotification(
+                    NotificationOrigin.GENERAL,
+                    NotificationIntent.ERROR,
+                    saveLoadingErrorToI18nString(saveFileDataResult.error),
+                    5000
+                );
+                return;
+            }
+
+            this.onLoadSaveObservable.notifyObservers(saveFileDataResult.value);
         });
 
         dropFileZone.addEventListener("click", () => {
@@ -82,8 +96,18 @@ export class SaveLoadingPanelContent {
                 if (fileInput.files === null) throw new Error("fileInput.files is null");
                 if (fileInput.files.length === 0) throw new Error("fileInput.files is empty");
                 const file = fileInput.files[0];
-                const saveFileData = await this.parseSaveFile(file);
-                this.onLoadSaveObservable.notifyObservers(saveFileData);
+                const saveFileDataResult = await this.parseSaveFile(file);
+                if (!saveFileDataResult.success) {
+                    createNotification(
+                        NotificationOrigin.GENERAL,
+                        NotificationIntent.ERROR,
+                        saveLoadingErrorToI18nString(saveFileDataResult.error),
+                        5000
+                    );
+                    return;
+                }
+
+                this.onLoadSaveObservable.notifyObservers(saveFileDataResult.value);
             };
             fileInput.click();
         });
@@ -94,20 +118,32 @@ export class SaveLoadingPanelContent {
     }
 
     populateCmdrList(starSystemDatabase: StarSystemDatabase) {
+        const saveLoadingResult = getSavesFromLocalStorage();
+        if (!saveLoadingResult.success) {
+            createNotification(
+                NotificationOrigin.GENERAL,
+                NotificationIntent.ERROR,
+                saveLoadingErrorToI18nString(saveLoadingResult.error),
+                5000
+            );
+
+            return;
+        }
+
         this.cmdrList.innerHTML = "";
 
-        const saves = getSavesFromLocalStorage();
+        const allSaves = saveLoadingResult.value;
 
         const flatSortedSaves: Map<string, SaveFileData[]> = new Map();
-        for (const uuid in saves) {
-            flatSortedSaves.set(uuid, saves[uuid].manual.concat(saves[uuid].auto));
+        for (const [uuid, cmdrSaves] of allSaves.entries()) {
+            flatSortedSaves.set(uuid, cmdrSaves.manualSaves.concat(cmdrSaves.autoSaves));
         }
         flatSortedSaves.forEach((saves) => {
             saves.sort((a, b) => b.timestamp - a.timestamp);
         });
 
         // Get all cmdr UUIDs
-        const cmdrUuids = Object.keys(saves);
+        const cmdrUuids = Object.keys(allSaves);
 
         // Sort cmdr UUIDs by latest save timestamp to have the most recent save at the top
         cmdrUuids.sort((a, b) => {
@@ -119,20 +155,17 @@ export class SaveLoadingPanelContent {
         });
 
         cmdrUuids.forEach((cmdrUuid) => {
+            const cmdrSaves = allSaves.get(cmdrUuid);
+            if (cmdrSaves === undefined) return;
+
             const cmdrDiv = document.createElement("div");
             cmdrDiv.classList.add("cmdr");
             this.cmdrList.appendChild(cmdrDiv);
 
-            const cmdrSaves = saves[cmdrUuid];
+            const allCmdrSaves = cmdrSaves.autoSaves.concat(cmdrSaves.manualSaves);
+            allCmdrSaves.sort((a, b) => b.timestamp - a.timestamp);
 
-            const autoSaves = cmdrSaves.auto;
-
-            const manualSaves = cmdrSaves.manual;
-
-            const allSaves = autoSaves.concat(manualSaves);
-            allSaves.sort((a, b) => b.timestamp - a.timestamp);
-
-            const latestSave = allSaves[0];
+            const latestSave = allCmdrSaves[0];
 
             const cmdrHeader = document.createElement("div");
             cmdrHeader.classList.add("cmdrHeader");
@@ -214,17 +247,17 @@ export class SaveLoadingPanelContent {
                 );
                 if (newName === null) return;
 
-                autoSaves.forEach((autoSave) => {
+                cmdrSaves.autoSaves.forEach((autoSave) => {
                     autoSave.player.name = newName;
                 });
 
-                manualSaves.forEach((manualSave) => {
+                cmdrSaves.manualSaves.forEach((manualSave) => {
                     manualSave.player.name = newName;
                 });
 
                 cmdrName.innerText = newName;
 
-                writeSavesToLocalStorage(saves);
+                writeSavesToLocalStorage(allSaves);
             });
             cmdrHeaderButtons.appendChild(editNameButton);
 
@@ -238,8 +271,8 @@ export class SaveLoadingPanelContent {
             savesList.classList.add("hidden"); // Hidden by default
             cmdrDiv.appendChild(savesList);
 
-            allSaves.forEach((save) => {
-                const saveDiv = this.createSaveDiv(save, autoSaves.includes(save), starSystemDatabase);
+            allCmdrSaves.forEach((save) => {
+                const saveDiv = this.createSaveDiv(save, cmdrSaves.autoSaves.includes(save), starSystemDatabase);
                 savesList.appendChild(saveDiv);
             });
 
@@ -351,26 +384,39 @@ export class SaveLoadingPanelContent {
             const shouldProceed = await promptModalBoolean(i18n.t("sidePanel:deleteSavePrompt"));
             if (!shouldProceed) return;
 
-            const saves = getSavesFromLocalStorage();
+            const savesResult = getSavesFromLocalStorage();
+            if (!savesResult.success) {
+                createNotification(
+                    NotificationOrigin.GENERAL,
+                    NotificationIntent.ERROR,
+                    saveLoadingErrorToI18nString(savesResult.error),
+                    5000
+                );
+
+                return;
+            }
+
+            const allSaves = savesResult.value;
+
+            const cmdrSaves = savesResult.value.get(save.player.uuid);
+            if (cmdrSaves === undefined) return;
 
             if (isAutoSave) {
-                saves[save.player.uuid].auto = saves[save.player.uuid].auto.filter(
-                    (autoSave) => autoSave.timestamp !== save.timestamp
-                );
+                cmdrSaves.autoSaves = cmdrSaves.autoSaves.filter((autoSave) => autoSave.timestamp !== save.timestamp);
             } else {
-                saves[save.player.uuid].manual = saves[save.player.uuid].manual.filter(
+                cmdrSaves.manualSaves = cmdrSaves.manualSaves.filter(
                     (manualSave) => manualSave.timestamp !== save.timestamp
                 );
             }
 
-            if (saves[save.player.uuid].auto.length === 0 && saves[save.player.uuid].manual.length === 0) {
-                delete saves[save.player.uuid];
+            if (cmdrSaves.autoSaves.length === 0 && cmdrSaves.manualSaves.length === 0) {
+                allSaves.delete(save.player.uuid);
                 saveDiv.parentElement?.parentElement?.remove();
             }
 
             saveDiv.remove();
 
-            writeSavesToLocalStorage(saves);
+            writeSavesToLocalStorage(allSaves);
         });
         saveButtons.appendChild(deleteButton);
 
@@ -381,18 +427,21 @@ export class SaveLoadingPanelContent {
         return saveDiv;
     }
 
-    private async parseSaveFile(rawSaveFile: File): Promise<SaveFileData> {
-        return new Promise<SaveFileData>((resolve, reject) => {
+    private async parseSaveFile(rawSaveFile: File): Promise<Result<SaveFileData, SaveLoadingError>> {
+        return new Promise((resolve) => {
             const reader = new FileReader();
             reader.onload = (event) => {
                 if (event.target === null) throw new Error("event.target is null");
-                const data = event.target.result as string;
-                const loadingSaveData = parseSaveFileData(data);
-                loadingSaveData.logs.forEach((log) =>
-                    createNotification(NotificationOrigin.GENERAL, NotificationIntent.WARNING, log, 60_000)
-                );
-                if (loadingSaveData.data === null) return;
-                resolve(loadingSaveData.data);
+                const data = event.target.result;
+                if (data === null) throw new Error("data is null");
+                if (data instanceof ArrayBuffer) throw new Error("data is an ArrayBuffer");
+                const loadingSaveDataResult = parseSaveFileData(data);
+                if (!loadingSaveDataResult.success) {
+                    resolve(loadingSaveDataResult);
+                    return;
+                }
+
+                resolve(ok(loadingSaveDataResult.value));
             };
             reader.readAsText(rawSaveFile);
         });

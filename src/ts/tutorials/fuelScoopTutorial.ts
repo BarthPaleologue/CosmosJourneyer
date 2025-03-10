@@ -11,7 +11,7 @@ import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import { parseSaveFileData } from "../saveFile/saveFileData";
 
 const parsedSaveData = parseSaveFileData(JSON.stringify(saveData));
-if (parsedSaveData.data === null) {
+if (!parsedSaveData.success) {
     throw new Error("FuelScoopTutorial: saveData is null");
 }
 
@@ -19,7 +19,7 @@ export const FuelScoopTutorial: Tutorial = {
     getTitle() {
         return i18n.t("tutorials:fuelScooping:title");
     },
-    saveData: parsedSaveData.data,
+    saveData: parsedSaveData.value,
     coverImageSrc: welcomeImageSrc,
     getDescription() {
         return i18n.t("tutorials:fuelScooping:description");

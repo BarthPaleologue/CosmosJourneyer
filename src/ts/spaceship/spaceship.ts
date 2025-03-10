@@ -48,12 +48,13 @@ import { Sounds } from "../assets/sounds";
 import { LandingPad } from "../assets/procedural/landingPad/landingPad";
 import { CelestialBody, OrbitalObject } from "../architecture/orbitalObject";
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
-import { FuelTank, SerializedFuelTank } from "./fuelTank";
-import { FuelScoop } from "./fuelScoop";
+import { FuelTank, SerializedFuelTankSchema } from "./fuelTank";
+import { SerializedFuelScoop, SerializedFuelScoopSchema } from "./fuelScoop";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { LandingComputer, LandingComputerStatusBit, LandingTargetKind } from "./landingComputer";
 import { canEngageWarpDrive } from "./warpDriveUtils";
 import { distanceToAsteroidField } from "../utils/asteroidFields";
+import { z } from "zod";
 
 const enum ShipState {
     FLYING,
@@ -61,27 +62,21 @@ const enum ShipState {
     LANDED
 }
 
-export const enum ShipType {
+export enum ShipType {
     WANDERER
 }
 
-export type SerializedSpaceship = {
-    id: string;
-    name: string;
-    type: ShipType;
-    fuelTanks: SerializedFuelTank[];
-    fuelScoop: FuelScoop | null;
-};
+export const SerializedSpaceshipSchema = z.object({
+    id: z.string().default(() => crypto.randomUUID()),
+    name: z.string().default("Wanderer"),
+    type: z.nativeEnum(ShipType).default(ShipType.WANDERER),
+    fuelTanks: z.array(SerializedFuelTankSchema).default([{ currentFuel: 100, maxFuel: 100 }]),
+    fuelScoop: z.nullable(SerializedFuelScoopSchema).nullable().default({ fuelPerSecond: 2.5 })
+});
 
-export const DefaultSerializedSpaceship: SerializedSpaceship = {
-    id: crypto.randomUUID(),
-    name: "Wanderer",
-    type: ShipType.WANDERER,
-    fuelTanks: [{ currentFuel: 100, maxFuel: 100 }],
-    fuelScoop: {
-        fuelPerSecond: 2.5
-    }
-};
+export type SerializedSpaceship = z.infer<typeof SerializedSpaceshipSchema>;
+
+export const DefaultSerializedSpaceship: SerializedSpaceship = SerializedSpaceshipSchema.parse({});
 
 export class Spaceship implements Transformable {
     readonly id: string;
@@ -130,7 +125,7 @@ export class Spaceship implements Transformable {
 
     readonly fuelTanks: FuelTank[];
 
-    readonly fuelScoop: FuelScoop | null;
+    readonly fuelScoop: SerializedFuelScoop | null;
     private isFuelScooping = false;
 
     readonly enableWarpDriveSound: AudioInstance;

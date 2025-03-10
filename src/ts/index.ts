@@ -40,12 +40,8 @@ if (universeCoordinatesString !== null) {
 } else if (saveString !== null) {
     const jsonString = decodeBase64(saveString);
     const result = parseSaveFileData(jsonString);
-    result.logs.forEach((log) => {
-        createNotification(NotificationOrigin.GENERAL, NotificationIntent.WARNING, log, 5_000);
-        console.warn(log);
-    });
-    if (result.data !== null) {
-        await engine.loadSave(result.data);
+    if (result.success) {
+        await engine.loadSave(result.value);
         engine.starSystemView.setUIEnabled(true);
     } else {
         await alertModal("Error, this save file is invalid. See the console for more details.");

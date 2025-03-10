@@ -21,7 +21,8 @@ import {
     StarSystemCoordinates,
     starSystemCoordinatesEquals,
     UniverseObjectId,
-    universeObjectIdEquals
+    universeObjectIdEquals,
+    UniverseObjectIdSchema
 } from "../../../../utils/coordinates/universeCoordinates";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getObjectBySystemId, getObjectModelByUniverseId } from "../../../../utils/coordinates/orbitalObjectId";
@@ -33,8 +34,9 @@ import { getGoToSystemInstructions } from "../../../common";
 import { OrbitalObjectType } from "../../../../architecture/orbitalObjectType";
 import { StarSystemDatabase } from "../../../../starSystem/starSystemDatabase";
 import type { MissionNode } from "../../deserializeNode";
+import { z } from "zod";
 
-const enum FlyByState {
+enum FlyByState {
     NOT_IN_SYSTEM,
     TOO_FAR_IN_SYSTEM,
     CLOSE_ENOUGH
@@ -45,6 +47,12 @@ export type MissionFlyByNodeSerialized = MissionNodeSerializedBase<MissionNodeTy
     objectId: UniverseObjectId;
     state: FlyByState;
 };
+
+export const MissionFlyByNodeSerializedSchema = z.object({
+    type: z.literal(MissionNodeType.FLY_BY),
+    objectId: UniverseObjectIdSchema,
+    state: z.nativeEnum(FlyByState)
+});
 
 /**
  * Node used to describe a fly-by mission around a target object

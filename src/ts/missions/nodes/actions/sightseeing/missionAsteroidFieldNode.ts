@@ -21,7 +21,8 @@ import {
     StarSystemCoordinates,
     starSystemCoordinatesEquals,
     UniverseObjectId,
-    universeObjectIdEquals
+    universeObjectIdEquals,
+    UniverseObjectIdSchema
 } from "../../../../utils/coordinates/universeCoordinates";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { clamp } from "../../../../utils/math";
@@ -32,8 +33,9 @@ import { Settings } from "../../../../settings";
 import { getGoToSystemInstructions } from "../../../common";
 import { StarSystemDatabase } from "../../../../starSystem/starSystemDatabase";
 import type { MissionNode } from "../../deserializeNode";
+import { z } from "zod";
 
-const enum AsteroidFieldMissionState {
+enum AsteroidFieldMissionState {
     NOT_IN_SYSTEM,
     TOO_FAR_IN_SYSTEM,
     CLOSE_ENOUGH
@@ -43,6 +45,12 @@ export type MissionAsteroidFieldNodeSerialized = MissionNodeSerializedBase<Missi
     objectId: UniverseObjectId;
     state: AsteroidFieldMissionState;
 };
+
+export const MissionAsteroidFieldNodeSerializedSchema = z.object({
+    type: z.literal(MissionNodeType.ASTEROID_FIELD),
+    objectId: UniverseObjectIdSchema,
+    state: z.nativeEnum(AsteroidFieldMissionState)
+});
 
 /**
  * Node used to describe a trek to an asteroid field

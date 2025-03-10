@@ -31,7 +31,12 @@ import { PauseMenu } from "./ui/pauseMenu";
 import { StarSystemView } from "./starSystem/starSystemView";
 import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
 import { MainMenu } from "./ui/mainMenu";
-import { getSavesFromLocalStorage, SaveFileData, writeSavesToLocalStorage } from "./saveFile/saveFileData";
+import {
+    getSavesFromLocalStorage,
+    SaveFileData,
+    saveLoadingErrorToI18nString,
+    writeSavesToLocalStorage
+} from "./saveFile/saveFileData";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { setRotationQuaternion } from "./uberCore/transforms/basicTransform";
@@ -133,15 +138,26 @@ export class CosmosJourneyer {
         this.player = player;
         this.player.onNameChangedObservable.add((newName) => {
             // when name changes, rewrite the name in all saves
-            const saves = getSavesFromLocalStorage();
-            const cmdrSaves = saves[this.player.uuid];
+            const savesResult = getSavesFromLocalStorage();
+            if (!savesResult.success) {
+                createNotification(
+                    NotificationOrigin.GENERAL,
+                    NotificationIntent.ERROR,
+                    saveLoadingErrorToI18nString(savesResult.error),
+                    5000
+                );
+                return;
+            }
 
+            const allSaves = savesResult.value;
+
+            const cmdrSaves = allSaves.get(this.player.uuid);
             if (cmdrSaves === undefined) return;
 
-            cmdrSaves.manual.forEach((save) => (save.player.name = newName));
-            cmdrSaves.auto.forEach((save) => (save.player.name = newName));
+            cmdrSaves.manualSaves.forEach((save) => (save.player.name = newName));
+            cmdrSaves.autoSaves.forEach((save) => (save.player.name = newName));
 
-            writeSavesToLocalStorage(saves);
+            writeSavesToLocalStorage(allSaves);
         });
 
         this.starSystemDatabase = starSystemDatabase;
@@ -623,11 +639,26 @@ export class CosmosJourneyer {
         const uuid = saveData.player.uuid;
 
         // store in a hashmap in local storage
-        const saves = getSavesFromLocalStorage();
-        saves[uuid] = saves[uuid] || { manual: [], auto: [] };
-        saves[uuid].manual.unshift(saveData);
+        const savesResult = getSavesFromLocalStorage();
 
-        writeSavesToLocalStorage(saves);
+        if (!savesResult.success) {
+            createNotification(
+                NotificationOrigin.GENERAL,
+                NotificationIntent.ERROR,
+                saveLoadingErrorToI18nString(savesResult.error),
+                5000
+            );
+
+            return false;
+        }
+
+        const allSaves = savesResult.value;
+
+        const cmdrSaves = allSaves.get(uuid) ?? { manualSaves: [], autoSaves: [] };
+        cmdrSaves.manualSaves.unshift(saveData);
+        allSaves.set(uuid, cmdrSaves);
+
+        writeSavesToLocalStorage(allSaves);
 
         return true;
     }
@@ -651,11 +682,27 @@ export class CosmosJourneyer {
         if (uuid === Settings.TUTORIAL_SAVE_UUID) return; // don't autosave in tutorial
 
         // store in a hashmap in local storage
-        const saves = getSavesFromLocalStorage();
-        saves[uuid] = saves[uuid] || { manual: [], auto: [] };
-        saves[uuid].auto.unshift(saveData); // enqueue the new autosave
-        while (saves[uuid].auto.length > Settings.MAX_AUTO_SAVES) {
-            saves[uuid].auto.pop(); // dequeue the oldest autosave
+        const savesResult = getSavesFromLocalStorage();
+
+        if (!savesResult.success) {
+            createNotification(
+                NotificationOrigin.GENERAL,
+                NotificationIntent.ERROR,
+                saveLoadingErrorToI18nString(savesResult.error),
+                5000
+            );
+
+            return;
+        }
+
+        const saves = savesResult.value;
+
+        const cmdrSaves = saves.get(uuid) ?? { manualSaves: [], autoSaves: [saveData] };
+        cmdrSaves.autoSaves.unshift(saveData); // enqueue the new autosave
+        saves.set(uuid, cmdrSaves);
+
+        while (cmdrSaves.autoSaves.length > Settings.MAX_AUTO_SAVES) {
+            cmdrSaves.autoSaves.pop(); // dequeue the oldest autosave
         }
         writeSavesToLocalStorage(saves);
 

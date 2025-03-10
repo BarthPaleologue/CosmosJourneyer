@@ -131,7 +131,7 @@ test("Loading a correct save file", () => {
 }`;
 
     const parsedSaveFile = parseSaveFileData(saveFileString);
-    expect(parsedSaveFile.data).not.toBeNull();
+    expect(parsedSaveFile.success).toBe(true);
 });
 
 test("Loading a minimal save file", () => {
@@ -172,7 +172,7 @@ test("Loading a minimal save file", () => {
 }`;
 
     const parsedSaveFile = parseSaveFileData(saveFileString);
-    expect(parsedSaveFile.data).not.toBeNull();
+    expect(parsedSaveFile.success).toBe(true);
 });
 
 test("Loading a JSON incorrect save file", () => {
@@ -212,6 +212,5 @@ test("Loading a JSON incorrect save file", () => {
 }`;
 
     const parsedSaveFile = parseSaveFileData(saveFileString);
-    expect(parsedSaveFile.data).toBeNull();
-    expect(parsedSaveFile.logs.length).toBe(1);
+    expect(parsedSaveFile.success).toBe(false);
 });
