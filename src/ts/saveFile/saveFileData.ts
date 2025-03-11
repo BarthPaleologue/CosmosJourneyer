@@ -18,11 +18,9 @@
 import { UniverseCoordinatesSchema } from "../utils/coordinates/universeCoordinates";
 import projectInfo from "../../../package.json";
 import i18n from "../i18n";
-import { SerializedPlayerSchema } from "../player/player";
+import { SerializedPlayerSchema } from "../player/serializedPlayer";
 import { encodeBase64 } from "../utils/base64";
-import { Settings } from "../settings";
 import { z } from "zod";
-import { downloadTextFile } from "../utils/download";
 import { err, ok, Result } from "../utils/types";
 import { alertModal } from "../utils/dialogModal";
 
@@ -121,10 +119,7 @@ export const CmdrSavesSchema = z.object({
 
 export type CmdrSaves = z.infer<typeof CmdrSavesSchema>;
 
-export const LocalStorageSavesSchema = z.record(z.string().uuid(), CmdrSavesSchema);
-
-/** Describes the structure of the local storage saves object. */
-export type LocalStorageSaves = Map<string, CmdrSaves>;
+export const SavesSchema = z.record(z.string().uuid(), CmdrSavesSchema);
 
 export const enum SaveLoadingError {
     INVALID_JSON = "INVALID_JSON",
@@ -138,39 +133,4 @@ export function saveLoadingErrorToI18nString(error: SaveLoadingError): string {
         case SaveLoadingError.INVALID_SAVE:
             return i18n.t("notifications:invalidSaveFile");
     }
-}
-
-export async function getSavesFromLocalStorage(): Promise<Result<LocalStorageSaves, SaveLoadingError>> {
-    const saves = localStorage.getItem(Settings.SAVES_KEY);
-    if (saves === null) {
-        return ok(new Map());
-    }
-
-    try {
-        const parsedSaves = JSON.parse(saves);
-
-        const result = LocalStorageSavesSchema.safeParse(parsedSaves);
-        if (!result.success) {
-            console.error(result.error);
-            return err(SaveLoadingError.INVALID_SAVE);
-        }
-
-        const savesMap = new Map<string, CmdrSaves>();
-        for (const [cmdrName, cmdrSaves] of Object.entries(result.data)) {
-            savesMap.set(cmdrName, cmdrSaves);
-        }
-
-        return ok(savesMap);
-    } catch {
-        return err(SaveLoadingError.INVALID_JSON);
-    }
-}
-
-export function writeSavesToLocalStorage(saves: LocalStorageSaves): void {
-    const savesJson: Record<string, CmdrSaves> = {};
-    for (const [cmdrName, cmdrSaves] of saves) {
-        savesJson[cmdrName] = cmdrSaves;
-    }
-
-    localStorage.setItem(Settings.SAVES_KEY, JSON.stringify(savesJson));
 }

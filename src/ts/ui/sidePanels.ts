@@ -2,6 +2,7 @@ import { initSettingsPanel } from "./settingsPanel";
 import { TutorialsPanelContent } from "./tutorial/tutorialsPanelContent";
 import { SaveLoadingPanelContent } from "./saveLoadingPanelContent";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { SaveManager } from "../saveFile/saveManager";
 
 export const enum PanelType {
     LOAD_SAVE,
@@ -29,8 +30,11 @@ export class SidePanels {
 
     private readonly starSystemDatabase: StarSystemDatabase;
 
-    constructor(starSystemDatabase: StarSystemDatabase) {
+    private readonly saveManager: SaveManager;
+
+    constructor(starSystemDatabase: StarSystemDatabase, saveManager: SaveManager) {
         this.starSystemDatabase = starSystemDatabase;
+        this.saveManager = saveManager;
 
         const loadSavePanel = document.getElementById("loadSavePanel");
         if (loadSavePanel === null) throw new Error("#loadSavePanel does not exist!");
@@ -96,7 +100,7 @@ export class SidePanels {
         }
 
         if (type === PanelType.LOAD_SAVE) {
-            this.loadSavePanelContent.populateCmdrList(this.starSystemDatabase);
+            this.loadSavePanelContent.populateCmdrList(this.starSystemDatabase, this.saveManager);
         }
 
         if (this.activeRightPanel !== null) {

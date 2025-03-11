@@ -31,12 +31,7 @@ import { PauseMenu } from "./ui/pauseMenu";
 import { StarSystemView } from "./starSystem/starSystemView";
 import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
 import { MainMenu } from "./ui/mainMenu";
-import {
-    getSavesFromLocalStorage,
-    SaveFileData,
-    saveLoadingErrorToI18nString,
-    writeSavesToLocalStorage
-} from "./saveFile/saveFileData";
+import { SaveFileData, saveLoadingErrorToI18nString } from "./saveFile/saveFileData";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { setRotationQuaternion } from "./uberCore/transforms/basicTransform";
@@ -67,6 +62,8 @@ import { EncyclopaediaGalacticaLocal } from "./society/encyclopaediaGalacticaLoc
 import { MusicConductor } from "./audio/musicConductor";
 import { StarSystemDatabase } from "./starSystem/starSystemDatabase";
 import { registerCustomSystems } from "./starSystem/customSystems/registerCustomSystems";
+import { SaveManager } from "./saveFile/saveManager";
+import { SaveLocalBackend } from "./saveFile/saveLocalBackend";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -112,6 +109,8 @@ export class CosmosJourneyer {
 
     readonly starSystemDatabase: StarSystemDatabase;
 
+    readonly saveManager: SaveManager;
+
     /**
      * The number of seconds elapsed since the start of the engine
      */
@@ -137,30 +136,19 @@ export class CosmosJourneyer {
 
         this.player = player;
         this.player.onNameChangedObservable.add(async (newName) => {
-            // when name changes, rewrite the name in all saves
-            const savesResult = await getSavesFromLocalStorage();
-            if (!savesResult.success) {
-                createNotification(
-                    NotificationOrigin.GENERAL,
-                    NotificationIntent.ERROR,
-                    saveLoadingErrorToI18nString(savesResult.error),
-                    5000
-                );
-                return;
-            }
-
-            const allSaves = savesResult.value;
-
-            const cmdrSaves = allSaves.get(this.player.uuid);
-            if (cmdrSaves === undefined) return;
-
-            cmdrSaves.manual.forEach((save) => (save.player.name = newName));
-            cmdrSaves.auto.forEach((save) => (save.player.name = newName));
-
-            writeSavesToLocalStorage(allSaves);
+            this.saveManager.renameCmdr(this.player.uuid, newName);
+            this.saveManager.save();
         });
 
         this.starSystemDatabase = starSystemDatabase;
+
+        const saveManagerCreateResult = SaveManager.Create(new SaveLocalBackend());
+        if (!saveManagerCreateResult.success) {
+            void alertModal(saveLoadingErrorToI18nString(saveManagerCreateResult.error));
+            throw new Error("Failed to create save manager");
+        }
+
+        this.saveManager = saveManagerCreateResult.value;
 
         this.encyclopaedia = encyclopaedia;
         this.player.discoveries.uploaded.forEach(async (discovery) => {
@@ -201,7 +189,7 @@ export class CosmosJourneyer {
 
         this.tutorialLayer = new TutorialLayer();
 
-        this.sidePanels = new SidePanels(this.starSystemDatabase);
+        this.sidePanels = new SidePanels(this.starSystemDatabase, this.saveManager);
         this.sidePanels.loadSavePanelContent.onLoadSaveObservable.add(async (saveData: SaveFileData) => {
             engine.onEndFrameObservable.addOnce(async () => {
                 if (this.isPaused()) {
@@ -638,29 +626,11 @@ export class CosmosJourneyer {
         // use player uuid as key to avoid overwriting other cmdr's save
         const uuid = saveData.player.uuid;
 
-        // store in a hashmap in local storage
-        const savesResult = await getSavesFromLocalStorage();
-
-        if (!savesResult.success) {
-            createNotification(
-                NotificationOrigin.GENERAL,
-                NotificationIntent.ERROR,
-                saveLoadingErrorToI18nString(savesResult.error),
-                5000
-            );
-
-            return false;
-        }
-
-        const allSaves = savesResult.value;
-
-        const cmdrSaves = allSaves.get(uuid) ?? { manual: [], auto: [] };
+        const cmdrSaves = this.saveManager.getSavesForCmdr(uuid) ?? { manual: [], auto: [] };
         cmdrSaves.manual.unshift(saveData);
-        allSaves.set(uuid, cmdrSaves);
 
-        writeSavesToLocalStorage(allSaves);
-
-        return true;
+        this.saveManager.setCmdrSaves(uuid, cmdrSaves);
+        return this.saveManager.save();
     }
 
     public setAutoSaveEnabled(isEnabled: boolean): void {
@@ -681,30 +651,15 @@ export class CosmosJourneyer {
         if (uuid === Settings.SHARED_POSITION_SAVE_UUID) return; // don't autosave shared position
         if (uuid === Settings.TUTORIAL_SAVE_UUID) return; // don't autosave in tutorial
 
-        // store in a hashmap in local storage
-        const savesResult = await getSavesFromLocalStorage();
-
-        if (!savesResult.success) {
-            createNotification(
-                NotificationOrigin.GENERAL,
-                NotificationIntent.ERROR,
-                saveLoadingErrorToI18nString(savesResult.error),
-                5000
-            );
-
-            return;
-        }
-
-        const saves = savesResult.value;
-
-        const cmdrSaves = saves.get(uuid) ?? { manual: [], auto: [saveData] };
+        const cmdrSaves = this.saveManager.getSavesForCmdr(uuid) ?? { manual: [], auto: [saveData] };
         cmdrSaves.auto.unshift(saveData); // enqueue the new autosave
-        saves.set(uuid, cmdrSaves);
 
         while (cmdrSaves.auto.length > Settings.MAX_AUTO_SAVES) {
             cmdrSaves.auto.pop(); // dequeue the oldest autosave
         }
-        writeSavesToLocalStorage(saves);
+
+        this.saveManager.setCmdrSaves(uuid, cmdrSaves);
+        this.saveManager.save();
 
         this.autoSaveTimerSeconds = 0;
     }

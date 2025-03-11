@@ -48,35 +48,19 @@ import { Sounds } from "../assets/sounds";
 import { LandingPad } from "../assets/procedural/landingPad/landingPad";
 import { CelestialBody, OrbitalObject } from "../architecture/orbitalObject";
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
-import { FuelTank, SerializedFuelTankSchema } from "./fuelTank";
-import { SerializedFuelScoop, SerializedFuelScoopSchema } from "./fuelScoop";
+import { FuelTank } from "./fuelTank";
+import { SerializedFuelScoop } from "./fuelScoop";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { LandingComputer, LandingComputerStatusBit, LandingTargetKind } from "./landingComputer";
 import { canEngageWarpDrive } from "./warpDriveUtils";
 import { distanceToAsteroidField } from "../utils/asteroidFields";
-import { z } from "zod";
+import { SerializedSpaceship, DefaultSerializedSpaceship, ShipType } from "./serializedSpaceship";
 
 const enum ShipState {
     FLYING,
     LANDING,
     LANDED
 }
-
-export enum ShipType {
-    WANDERER
-}
-
-export const SerializedSpaceshipSchema = z.object({
-    id: z.string().default(() => crypto.randomUUID()),
-    name: z.string().default("Wanderer"),
-    type: z.nativeEnum(ShipType).default(ShipType.WANDERER),
-    fuelTanks: z.array(SerializedFuelTankSchema).default([{ currentFuel: 100, maxFuel: 100 }]),
-    fuelScoop: z.nullable(SerializedFuelScoopSchema).nullable().default({ fuelPerSecond: 2.5 })
-});
-
-export type SerializedSpaceship = z.infer<typeof SerializedSpaceshipSchema>;
-
-export const DefaultSerializedSpaceship: SerializedSpaceship = SerializedSpaceshipSchema.parse({});
 
 export class Spaceship implements Transformable {
     readonly id: string;

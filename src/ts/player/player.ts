@@ -15,58 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Mission, MissionSerializedSchema } from "../missions/mission";
-import {
-    StarSystemCoordinates,
-    StarSystemCoordinatesSchema,
-    UniverseObjectId
-} from "../utils/coordinates/universeCoordinates";
+import { Mission } from "../missions/mission";
+import { StarSystemCoordinates, UniverseObjectId } from "../utils/coordinates/universeCoordinates";
 import { warnIfUndefined } from "../utils/notification";
-import {
-    DefaultSerializedSpaceship,
-    SerializedSpaceship,
-    SerializedSpaceshipSchema,
-    Spaceship
-} from "../spaceship/spaceship";
-import { SpaceDiscoveryData, SpaceDiscoveryDataSchema } from "../society/encyclopaediaGalactica";
+import { Spaceship } from "../spaceship/spaceship";
+import { DefaultSerializedSpaceship, SerializedSpaceship } from "../spaceship/serializedSpaceship";
+import { SpaceDiscoveryData } from "../society/encyclopaediaGalactica";
 import { Observable } from "@babylonjs/core/Misc/observable";
-import { z } from "zod";
-
-export const CompletedTutorialsSchema = z.object({
-    stationLandingCompleted: z.boolean().default(false),
-    fuelScoopingCompleted: z.boolean().default(false)
-});
-
-export type CompletedTutorials = z.infer<typeof CompletedTutorialsSchema>;
-
-export const SerializedPlayerSchema = z.object({
-    uuid: z.string().default(() => crypto.randomUUID()),
-    name: z.string().default("Python"),
-    balance: z.number().default(10_000),
-    creationDate: z.string().default(new Date().toISOString()),
-    timePlayedSeconds: z.number().default(0),
-    visitedSystemHistory: z.array(StarSystemCoordinatesSchema).default([]),
-    discoveries: z
-        .object({
-            local: z.array(SpaceDiscoveryDataSchema).default([]),
-            uploaded: z.array(SpaceDiscoveryDataSchema).default([])
-        })
-        .default({
-            local: [],
-            uploaded: []
-        }),
-    currentItinerary: z.array(StarSystemCoordinatesSchema).default([]),
-    systemBookmarks: z.array(StarSystemCoordinatesSchema).default([]),
-    currentMissions: z.array(MissionSerializedSchema).default([]),
-    completedMissions: z.array(MissionSerializedSchema).default([]),
-    spaceShips: z.array(SerializedSpaceshipSchema).default([DefaultSerializedSpaceship]),
-    tutorials: CompletedTutorialsSchema.default({
-        stationLandingCompleted: false,
-        fuelScoopingCompleted: false
-    })
-});
-
-export type SerializedPlayer = z.infer<typeof SerializedPlayerSchema>;
+import { CompletedTutorials, SerializedPlayer } from "./serializedPlayer";
 
 export class Player {
     uuid: string;
