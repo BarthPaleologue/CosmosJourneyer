@@ -24,6 +24,7 @@ import { Settings } from "../settings";
 import { z } from "zod";
 import { downloadTextFile } from "../utils/download";
 import { err, ok, Result } from "../utils/types";
+import { alertModal } from "../utils/dialogModal";
 
 export const SaveFileSchema = z.object({
     /** The version of CosmosJourneyer that created this save file. */
@@ -69,17 +70,58 @@ export function createUrlFromSave(data: SaveFileData): URL {
     return new URL(`${urlRoot}?save=${saveString}`);
 }
 
+/**
+ * @param schema The schema to use to filter the elements.
+ * @param handleDataLoss A function that will be called with the data that was filtered out.
+ * @returns A preprocessing lambda that will filter out elements that do not match the schema.
+ */
+function safeFilter(
+    schema: z.ZodSchema<unknown, z.ZodTypeDef, unknown>,
+    handleDataLoss: (lostData: { element: unknown; error: z.ZodError<unknown> }[]) => void
+): (data: unknown, ctx: z.RefinementCtx) => unknown {
+    return (data: unknown, ctx: z.RefinementCtx) => {
+        if (!Array.isArray(data)) {
+            return data;
+        }
+
+        const safeElements: unknown[] = [];
+        const filteredData: { element: unknown; error: z.ZodError<unknown> }[] = [];
+        for (const element of data) {
+            const result = schema.safeParse(element);
+            if (!result.success) {
+                filteredData.push({ element, error: result.error });
+                continue;
+            }
+            safeElements.push(result.data);
+        }
+
+        if (safeElements.length !== data.length) {
+            handleDataLoss(filteredData);
+        }
+
+        return safeElements;
+    };
+}
+
+async function handleSaveDataLoss(filteredData: { element: unknown; error: z.ZodError<unknown> }[]): Promise<void> {
+    filteredData.forEach(({ element, error }) => {
+        console.error("Failed to parse save file data", element, error);
+    });
+
+    await alertModal("Some save files could not be validated! Check the console for more information.");
+}
+
 export const CmdrSavesSchema = z.object({
     /** The manual saves of the cmdr. */
-    manualSaves: z.array(SaveFileSchema).default([]),
+    manual: z.preprocess(safeFilter(SaveFileSchema, handleSaveDataLoss), z.array(SaveFileSchema)).default([]),
 
     /** The auto saves of the cmdr. */
-    autoSaves: z.array(SaveFileSchema).default([])
+    auto: z.preprocess(safeFilter(SaveFileSchema, handleSaveDataLoss), z.array(SaveFileSchema)).default([])
 });
 
 export type CmdrSaves = z.infer<typeof CmdrSavesSchema>;
 
-export const LocalStorageSavesSchema = z.record(z.string().uuid(), CmdrSavesSchema).default({});
+export const LocalStorageSavesSchema = z.record(z.string().uuid(), CmdrSavesSchema);
 
 /** Describes the structure of the local storage saves object. */
 export type LocalStorageSaves = Map<string, CmdrSaves>;
@@ -98,7 +140,7 @@ export function saveLoadingErrorToI18nString(error: SaveLoadingError): string {
     }
 }
 
-export function getSavesFromLocalStorage(): Result<LocalStorageSaves, SaveLoadingError> {
+export async function getSavesFromLocalStorage(): Promise<Result<LocalStorageSaves, SaveLoadingError>> {
     const saves = localStorage.getItem(Settings.SAVES_KEY);
     if (saves === null) {
         return ok(new Map());
@@ -109,22 +151,7 @@ export function getSavesFromLocalStorage(): Result<LocalStorageSaves, SaveLoadin
 
         const result = LocalStorageSavesSchema.safeParse(parsedSaves);
         if (!result.success) {
-            downloadTextFile(
-                `
-# Cosmos Journeyer v${projectInfo.version} Error Report
-
-Failed to parse saves from local storage. You can report this error with this file to https://github.com/BarthPaleologue/CosmosJourneyer/issues
-
-## Error
-
-${result.error}
-
-## Save data
-
-${saves}`,
-                "cosmos-journeyer-save-parse-error-report.txt"
-            );
-
+            console.error(result.error);
             return err(SaveLoadingError.INVALID_SAVE);
         }
 

@@ -18,7 +18,7 @@ import editIconPath from "../../asset/icons/edit.webp";
 import downloadIconPath from "../../asset/icons/download.webp";
 import trashIconPath from "../../asset/icons/trash.webp";
 import shareIconPath from "../../asset/icons/link.webp";
-import { promptModalBoolean, promptModalString } from "../utils/dialogModal";
+import { alertModal, promptModalBoolean, promptModalString } from "../utils/dialogModal";
 import { getObjectModelByUniverseId } from "../utils/coordinates/orbitalObjectId";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { ok, Result } from "../utils/types";
@@ -98,12 +98,7 @@ export class SaveLoadingPanelContent {
                 const file = fileInput.files[0];
                 const saveFileDataResult = await this.parseSaveFile(file);
                 if (!saveFileDataResult.success) {
-                    createNotification(
-                        NotificationOrigin.GENERAL,
-                        NotificationIntent.ERROR,
-                        saveLoadingErrorToI18nString(saveFileDataResult.error),
-                        5000
-                    );
+                    await alertModal(saveLoadingErrorToI18nString(saveFileDataResult.error));
                     return;
                 }
 
@@ -117,18 +112,14 @@ export class SaveLoadingPanelContent {
         this.htmlRoot.appendChild(this.cmdrList);
     }
 
-    populateCmdrList(starSystemDatabase: StarSystemDatabase) {
-        const saveLoadingResult = getSavesFromLocalStorage();
+    async populateCmdrList(starSystemDatabase: StarSystemDatabase) {
+        const saveLoadingResult = await getSavesFromLocalStorage();
         if (!saveLoadingResult.success) {
-            createNotification(
-                NotificationOrigin.GENERAL,
-                NotificationIntent.ERROR,
-                saveLoadingErrorToI18nString(saveLoadingResult.error),
-                5000
-            );
-
+            console.log("something went wrong");
+            await alertModal(saveLoadingErrorToI18nString(saveLoadingResult.error));
             return;
         }
+        console.log("all OK lezgo", saveLoadingResult.value);
 
         this.cmdrList.innerHTML = "";
 
@@ -136,7 +127,7 @@ export class SaveLoadingPanelContent {
 
         const flatSortedSaves: Map<string, SaveFileData[]> = new Map();
         for (const [uuid, cmdrSaves] of allSaves.entries()) {
-            flatSortedSaves.set(uuid, cmdrSaves.manualSaves.concat(cmdrSaves.autoSaves));
+            flatSortedSaves.set(uuid, cmdrSaves.manual.concat(cmdrSaves.auto));
         }
         flatSortedSaves.forEach((saves) => {
             saves.sort((a, b) => b.timestamp - a.timestamp);
@@ -162,7 +153,7 @@ export class SaveLoadingPanelContent {
             cmdrDiv.classList.add("cmdr");
             this.cmdrList.appendChild(cmdrDiv);
 
-            const allCmdrSaves = cmdrSaves.autoSaves.concat(cmdrSaves.manualSaves);
+            const allCmdrSaves = cmdrSaves.auto.concat(cmdrSaves.manual);
             allCmdrSaves.sort((a, b) => b.timestamp - a.timestamp);
 
             const latestSave = allCmdrSaves[0];
@@ -247,11 +238,11 @@ export class SaveLoadingPanelContent {
                 );
                 if (newName === null) return;
 
-                cmdrSaves.autoSaves.forEach((autoSave) => {
+                cmdrSaves.auto.forEach((autoSave) => {
                     autoSave.player.name = newName;
                 });
 
-                cmdrSaves.manualSaves.forEach((manualSave) => {
+                cmdrSaves.manual.forEach((manualSave) => {
                     manualSave.player.name = newName;
                 });
 
@@ -272,7 +263,7 @@ export class SaveLoadingPanelContent {
             cmdrDiv.appendChild(savesList);
 
             allCmdrSaves.forEach((save) => {
-                const saveDiv = this.createSaveDiv(save, cmdrSaves.autoSaves.includes(save), starSystemDatabase);
+                const saveDiv = this.createSaveDiv(save, cmdrSaves.auto.includes(save), starSystemDatabase);
                 savesList.appendChild(saveDiv);
             });
 
@@ -384,7 +375,7 @@ export class SaveLoadingPanelContent {
             const shouldProceed = await promptModalBoolean(i18n.t("sidePanel:deleteSavePrompt"));
             if (!shouldProceed) return;
 
-            const savesResult = getSavesFromLocalStorage();
+            const savesResult = await getSavesFromLocalStorage();
             if (!savesResult.success) {
                 createNotification(
                     NotificationOrigin.GENERAL,
@@ -402,14 +393,12 @@ export class SaveLoadingPanelContent {
             if (cmdrSaves === undefined) return;
 
             if (isAutoSave) {
-                cmdrSaves.autoSaves = cmdrSaves.autoSaves.filter((autoSave) => autoSave.timestamp !== save.timestamp);
+                cmdrSaves.auto = cmdrSaves.auto.filter((autoSave) => autoSave.timestamp !== save.timestamp);
             } else {
-                cmdrSaves.manualSaves = cmdrSaves.manualSaves.filter(
-                    (manualSave) => manualSave.timestamp !== save.timestamp
-                );
+                cmdrSaves.manual = cmdrSaves.manual.filter((manualSave) => manualSave.timestamp !== save.timestamp);
             }
 
-            if (cmdrSaves.autoSaves.length === 0 && cmdrSaves.manualSaves.length === 0) {
+            if (cmdrSaves.auto.length === 0 && cmdrSaves.manual.length === 0) {
                 allSaves.delete(save.player.uuid);
                 saveDiv.parentElement?.parentElement?.remove();
             }
