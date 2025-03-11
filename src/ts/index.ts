@@ -19,7 +19,7 @@ import "../styles/index.scss";
 
 import { CosmosJourneyer } from "./cosmosJourneyer";
 import { Player } from "./player/player";
-import { parseSaveFileData } from "./saveFile/saveFileData";
+import { safeParseSave } from "./saveFile/saveFileData";
 import { Settings } from "./settings";
 import { decodeBase64 } from "./utils/base64";
 import { alertModal } from "./utils/dialogModal";
@@ -39,7 +39,7 @@ if (universeCoordinatesString !== null) {
     engine.starSystemView.setUIEnabled(true);
 } else if (saveString !== null) {
     const jsonString = decodeBase64(saveString);
-    const result = parseSaveFileData(jsonString);
+    const result = safeParseSave(jsonString);
     if (result.success) {
         await engine.loadSave(result.value);
         engine.starSystemView.setUIEnabled(true);

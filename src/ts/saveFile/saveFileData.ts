@@ -15,122 +15,63 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { UniverseCoordinatesSchema } from "../utils/coordinates/universeCoordinates";
-import projectInfo from "../../../package.json";
-import i18n from "../i18n";
-import { SerializedPlayerSchema } from "../player/serializedPlayer";
 import { encodeBase64 } from "../utils/base64";
 import { z } from "zod";
-import { err, ok, Result } from "../utils/types";
-import { alertModal } from "../utils/dialogModal";
+import { Result } from "../utils/types";
+import { safeParseSaveV1, SaveSchemaV1 } from "./saveV1";
+import { SaveLoadingError } from "./saveLoadingError";
 
-export const SaveFileSchema = z.object({
-    /** The version of CosmosJourneyer that created this save file. */
-    version: z.string().default(projectInfo.version),
+export const SaveSchema = SaveSchemaV1;
 
-    /** The timestamp when the save file was created. */
-    timestamp: z.number().default(Date.now()),
-
-    /** The player data. */
-    player: SerializedPlayerSchema,
-
-    /** The coordinates of the current star system and the coordinates inside the star system. */
-    universeCoordinates: UniverseCoordinatesSchema,
-
-    /** If the player is landed at a facility, store the pad number to allow graceful respawn at the station. */
-    padNumber: z.number().optional()
-});
-
-/**
- * Data structure for the save file to allow restoring current star system and position.
- */
-export type SaveFileData = z.infer<typeof SaveFileSchema>;
+export type Save = z.infer<typeof SaveSchema>;
 
 /**
  * Parses a string into a SaveFileData object. Throws an error if the string is not a valid save file data.
  * @param jsonString The string to parse.
  * @returns The parsed SaveFileData object. Returns null if the string is not valid.
  */
-export function parseSaveFileData(jsonString: string): Result<SaveFileData, SaveLoadingError> {
-    try {
-        const validJsonString = JSON.parse(jsonString);
-        const saveData = SaveFileSchema.parse(validJsonString);
-
-        return ok(saveData);
-    } catch {
-        return err(SaveLoadingError.INVALID_JSON);
-    }
+export function safeParseSave(jsonString: unknown): Result<Save, SaveLoadingError> {
+    return safeParseSaveV1(jsonString);
 }
 
-export function createUrlFromSave(data: SaveFileData): URL {
+export function createUrlFromSave(data: Save): URL {
     const urlRoot = window.location.href.split("?")[0];
     const saveString = encodeBase64(JSON.stringify(data));
     return new URL(`${urlRoot}?save=${saveString}`);
 }
 
-/**
- * @param schema The schema to use to filter the elements.
- * @param handleDataLoss A function that will be called with the data that was filtered out.
- * @returns A preprocessing lambda that will filter out elements that do not match the schema.
- */
-function safeFilter(
-    schema: z.ZodSchema<unknown, z.ZodTypeDef, unknown>,
-    handleDataLoss: (lostData: { element: unknown; error: z.ZodError<unknown> }[]) => void
-): (data: unknown, ctx: z.RefinementCtx) => unknown {
-    return (data: unknown, ctx: z.RefinementCtx) => {
-        if (!Array.isArray(data)) {
-            return data;
-        }
+export function parseSaveArray(rawSaves: unknown[]): { validSaves: Save[]; invalidSaves: unknown[] } {
+    const validSaves: Save[] = [];
+    const invalidSaves: unknown[] = [];
 
-        const safeElements: unknown[] = [];
-        const filteredData: { element: unknown; error: z.ZodError<unknown> }[] = [];
-        for (const element of data) {
-            const result = schema.safeParse(element);
-            if (!result.success) {
-                filteredData.push({ element, error: result.error });
-                continue;
-            }
-            safeElements.push(result.data);
+    for (const save of rawSaves) {
+        const result = safeParseSave(save);
+        if (result.success) {
+            validSaves.push(result.value);
+        } else {
+            invalidSaves.push(save);
         }
+    }
 
-        if (safeElements.length !== data.length) {
-            handleDataLoss(filteredData);
-        }
-
-        return safeElements;
-    };
+    return { validSaves, invalidSaves };
 }
 
-async function handleSaveDataLoss(filteredData: { element: unknown; error: z.ZodError<unknown> }[]): Promise<void> {
-    filteredData.forEach(({ element, error }) => {
-        console.error("Failed to parse save file data", element, error);
-    });
-
-    await alertModal("Some save files could not be validated! Check the console for more information.");
-}
-
-export const CmdrSavesSchema = z.object({
+export const CmdrSavesSurfaceSchema = z.object({
     /** The manual saves of the cmdr. */
-    manual: z.preprocess(safeFilter(SaveFileSchema, handleSaveDataLoss), z.array(SaveFileSchema)).default([]),
+    manual: z.array(z.unknown()),
 
     /** The auto saves of the cmdr. */
-    auto: z.preprocess(safeFilter(SaveFileSchema, handleSaveDataLoss), z.array(SaveFileSchema)).default([])
+    auto: z.array(z.unknown())
 });
 
-export type CmdrSaves = z.infer<typeof CmdrSavesSchema>;
+export const CmdrSavesDeepSchema = CmdrSavesSurfaceSchema.extend({
+    /** The manual saves of the cmdr. */
+    manual: z.array(SaveSchema),
 
-export const SavesSchema = z.record(z.string().uuid(), CmdrSavesSchema);
+    /** The auto saves of the cmdr. */
+    auto: z.array(SaveSchema)
+});
 
-export const enum SaveLoadingError {
-    INVALID_JSON = "INVALID_JSON",
-    INVALID_SAVE = "INVALID_SAVE"
-}
+export type CmdrSaves = z.infer<typeof CmdrSavesDeepSchema>;
 
-export function saveLoadingErrorToI18nString(error: SaveLoadingError): string {
-    switch (error) {
-        case SaveLoadingError.INVALID_JSON:
-            return i18n.t("notifications:invalidSaveFileJson");
-        case SaveLoadingError.INVALID_SAVE:
-            return i18n.t("notifications:invalidSaveFile");
-    }
-}
+export const SavesSchema = z.record(z.string().uuid(), CmdrSavesSurfaceSchema);

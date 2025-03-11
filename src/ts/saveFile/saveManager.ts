@@ -16,7 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { ok, Result } from "../utils/types";
-import { CmdrSaves, SaveFileData, SaveLoadingError } from "./saveFileData";
+import { CmdrSaves, Save } from "./saveFileData";
+import { SaveLoadingError } from "./saveLoadingError";
 
 /**
  * Interface defining the storage backend for save data.
@@ -33,7 +34,7 @@ export interface SaveBackend {
      * Reads save data from the storage backend.
      * @returns Result containing either the loaded saves or an error
      */
-    read(): Result<Record<string, CmdrSaves>, SaveLoadingError>;
+    read(): Promise<Result<Record<string, CmdrSaves>, SaveLoadingError>>;
 }
 
 /**
@@ -70,8 +71,8 @@ export class SaveManager {
      * @param backend - The storage backend to use
      * @returns Result containing either the created SaveManager or an error
      */
-    public static Create(backend: SaveBackend): Result<SaveManager, SaveLoadingError> {
-        const saveResult = backend.read();
+    public static async CreateAsync(backend: SaveBackend): Promise<Result<SaveManager, SaveLoadingError>> {
+        const saveResult = await backend.read();
         if (!saveResult.success) {
             return saveResult;
         }
@@ -116,7 +117,7 @@ export class SaveManager {
         cmdrSaves.auto.forEach((save) => (save.player.name = newName));
     }
 
-    public deleteSaveForCmdr(cmdrUuid: string, save: SaveFileData): void {
+    public deleteSaveForCmdr(cmdrUuid: string, save: Save): void {
         const cmdrSaves = this.saves.get(cmdrUuid);
         if (cmdrSaves === undefined) {
             return;

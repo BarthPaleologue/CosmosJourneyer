@@ -31,7 +31,7 @@ import { PauseMenu } from "./ui/pauseMenu";
 import { StarSystemView } from "./starSystem/starSystemView";
 import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
 import { MainMenu } from "./ui/mainMenu";
-import { SaveFileData, saveLoadingErrorToI18nString } from "./saveFile/saveFileData";
+import { Save } from "./saveFile/saveFileData";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { setRotationQuaternion } from "./uberCore/transforms/basicTransform";
@@ -64,6 +64,7 @@ import { StarSystemDatabase } from "./starSystem/starSystemDatabase";
 import { registerCustomSystems } from "./starSystem/customSystems/registerCustomSystems";
 import { SaveManager } from "./saveFile/saveManager";
 import { SaveLocalBackend } from "./saveFile/saveLocalBackend";
+import { saveLoadingErrorToI18nString } from "./saveFile/saveLoadingError";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -130,7 +131,8 @@ export class CosmosJourneyer {
         engine: AbstractEngine,
         starSystemView: StarSystemView,
         encyclopaedia: EncyclopaediaGalacticaManager,
-        starSystemDatabase: StarSystemDatabase
+        starSystemDatabase: StarSystemDatabase,
+        saveManager: SaveManager
     ) {
         this.engine = engine;
 
@@ -142,13 +144,7 @@ export class CosmosJourneyer {
 
         this.starSystemDatabase = starSystemDatabase;
 
-        const saveManagerCreateResult = SaveManager.Create(new SaveLocalBackend());
-        if (!saveManagerCreateResult.success) {
-            void alertModal(saveLoadingErrorToI18nString(saveManagerCreateResult.error));
-            throw new Error("Failed to create save manager");
-        }
-
-        this.saveManager = saveManagerCreateResult.value;
+        this.saveManager = saveManager;
 
         this.encyclopaedia = encyclopaedia;
         this.player.discoveries.uploaded.forEach(async (discovery) => {
@@ -190,7 +186,7 @@ export class CosmosJourneyer {
         this.tutorialLayer = new TutorialLayer();
 
         this.sidePanels = new SidePanels(this.starSystemDatabase, this.saveManager);
-        this.sidePanels.loadSavePanelContent.onLoadSaveObservable.add(async (saveData: SaveFileData) => {
+        this.sidePanels.loadSavePanelContent.onLoadSaveObservable.add(async (saveData: Save) => {
             engine.onEndFrameObservable.addOnce(async () => {
                 if (this.isPaused()) {
                     await this.createAutoSave(); // from the pause menu, create autosave of the current game before loading a save
@@ -406,7 +402,20 @@ export class CosmosJourneyer {
             );
         }
 
-        return new CosmosJourneyer(player, engine, starSystemView, encyclopaedia, starSystemDatabase);
+        const saveManagerCreateResult = await SaveManager.CreateAsync(new SaveLocalBackend());
+        if (!saveManagerCreateResult.success) {
+            await alertModal(saveLoadingErrorToI18nString(saveManagerCreateResult.error));
+            throw new Error("Failed to create save manager");
+        }
+
+        return new CosmosJourneyer(
+            player,
+            engine,
+            starSystemView,
+            encyclopaedia,
+            starSystemDatabase,
+            saveManagerCreateResult.value
+        );
     }
 
     public pause(): void {
@@ -551,7 +560,7 @@ export class CosmosJourneyer {
     /**
      * Generates a save file data object from the current star system and the player's position
      */
-    public generateSaveData(): SaveFileData {
+    public generateSaveData(): Save {
         const currentStarSystem = this.starSystemView.getStarSystem();
 
         const spaceShipControls = this.starSystemView.getSpaceshipControls();
@@ -710,19 +719,7 @@ export class CosmosJourneyer {
      * This will perform engine initialization if the engine is not initialized.
      * @param saveData The save file data to load
      */
-    public async loadSave(saveData: SaveFileData): Promise<void> {
-        if (saveData.version !== projectInfo.version) {
-            createNotification(
-                NotificationOrigin.GENERAL,
-                NotificationIntent.WARNING,
-                i18n.t("notifications:saveVersionMismatch", {
-                    currentVersion: projectInfo.version,
-                    saveVersion: saveData.version
-                }),
-                60_000
-            );
-        }
-
+    public async loadSave(saveData: Save): Promise<void> {
         const newPlayer = saveData.player !== undefined ? Player.Deserialize(saveData.player) : Player.Default();
         this.player.copyFrom(newPlayer);
         this.player.discoveries.uploaded.forEach(async (discovery) => {

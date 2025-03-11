@@ -15,36 +15,85 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Settings } from "../settings";
+import { alertModal } from "../utils/dialogModal";
 import { err, ok, Result } from "../utils/types";
-import { CmdrSaves, SavesSchema, SaveLoadingError } from "./saveFileData";
+import { CmdrSaves, Save, SavesSchema, parseSaveArray } from "./saveFileData";
+import { SaveLoadingError, SaveLoadingErrorType } from "./saveLoadingError";
 import { SaveBackend } from "./saveManager";
 
 export class SaveLocalBackend implements SaveBackend {
+    public static readonly SAVES_KEY = "saves";
+    public static readonly BACKUP_SAVE_KEY = "backupSaves";
+
     public write(saves: Record<string, CmdrSaves>): boolean {
-        localStorage.setItem(Settings.SAVES_KEY, JSON.stringify(saves));
+        localStorage.setItem(SaveLocalBackend.SAVES_KEY, JSON.stringify(saves));
 
         return true;
     }
 
-    public read(): Result<Record<string, CmdrSaves>, SaveLoadingError> {
-        const saves = localStorage.getItem(Settings.SAVES_KEY);
-        if (saves === null) {
+    public async read(): Promise<Result<Record<string, CmdrSaves>, SaveLoadingError>> {
+        const rawSaves = localStorage.getItem(SaveLocalBackend.SAVES_KEY);
+        const rawBackupSaves = localStorage.getItem(SaveLocalBackend.BACKUP_SAVE_KEY);
+        if (rawSaves === null && rawBackupSaves === null) {
             return ok({});
         }
 
         try {
-            const parsedSaves = JSON.parse(saves);
+            const parsedSaves = JSON.parse(rawSaves ?? "{}");
+            const parsedBackupSaves = JSON.parse(rawBackupSaves ?? "{}");
 
-            const result = SavesSchema.safeParse(parsedSaves);
-            if (!result.success) {
-                console.error(result.error);
-                return err(SaveLoadingError.INVALID_SAVE);
+            const savesResult = SavesSchema.safeParse(parsedSaves);
+            if (!savesResult.success) {
+                console.error(savesResult.error);
+                return err({ type: SaveLoadingErrorType.INVALID_STORAGE_FORMAT, content: savesResult.error });
             }
 
-            return ok(result.data);
+            const backupSavesResult = SavesSchema.safeParse(parsedBackupSaves);
+            if (!backupSavesResult.success) {
+                console.error(backupSavesResult.error);
+                return err({ type: SaveLoadingErrorType.INVALID_STORAGE_FORMAT, content: backupSavesResult.error });
+            }
+
+            const saves = savesResult.data;
+            const backupSaves = backupSavesResult.data;
+
+            const allSaves = {
+                ...saves,
+                ...backupSaves
+            };
+
+            const correctSaves: Record<string, { manual: Save[]; auto: Save[] }> = {};
+            const corruptedSaves: Record<string, { manual: unknown[]; auto: unknown[] }> = {};
+
+            // filter saves
+            for (const [cmdrUuid, cmdrSaves] of Object.entries(allSaves)) {
+                const parsedManualSaves = parseSaveArray(cmdrSaves.manual);
+                const parsedAutoSaves = parseSaveArray(cmdrSaves.auto);
+
+                correctSaves[cmdrUuid] = {
+                    manual: parsedManualSaves.validSaves,
+                    auto: parsedAutoSaves.validSaves
+                };
+
+                if (parsedManualSaves.invalidSaves.length > 0 || parsedAutoSaves.invalidSaves.length > 0) {
+                    corruptedSaves[cmdrUuid] = {
+                        manual: parsedManualSaves.invalidSaves,
+                        auto: parsedAutoSaves.invalidSaves
+                    };
+                }
+            }
+
+            if (Object.keys(corruptedSaves).length > 0) {
+                console.error("Corrupted saves:", corruptedSaves);
+                localStorage.setItem(SaveLocalBackend.BACKUP_SAVE_KEY, JSON.stringify(corruptedSaves));
+                await alertModal("Some save files could not be validated! Check the console for more information.");
+            } else {
+                localStorage.removeItem(SaveLocalBackend.BACKUP_SAVE_KEY);
+            }
+
+            return ok(correctSaves);
         } catch {
-            return err(SaveLoadingError.INVALID_JSON);
+            return err({ type: SaveLoadingErrorType.INVALID_JSON });
         }
     }
 }

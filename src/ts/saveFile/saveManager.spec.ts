@@ -17,9 +17,10 @@
 
 import { describe, expect, it, vi } from "vitest";
 import { SaveBackend, SaveManager } from "./saveManager";
-import { CmdrSaves, SaveLoadingError } from "./saveFileData";
+import { CmdrSaves } from "./saveFileData";
 import { err, ok, Result } from "../utils/types";
 import { SerializedPlayerSchema } from "../player/serializedPlayer";
+import { SaveLoadingErrorType, SaveLoadingError } from "./saveLoadingError";
 
 /**
  * Mock implementation of SaveBackend for testing
@@ -43,11 +44,11 @@ class MockSaveBackend implements SaveBackend {
         return true;
     }
 
-    public read(): Result<Record<string, CmdrSaves>, SaveLoadingError> {
+    public read(): Promise<Result<Record<string, CmdrSaves>, SaveLoadingError>> {
         if (this.readShouldFail) {
-            return err(SaveLoadingError.INVALID_JSON);
+            return Promise.resolve(err({ type: SaveLoadingErrorType.INVALID_JSON }));
         }
-        return ok(this.mockData);
+        return Promise.resolve(ok(this.mockData));
     }
 }
 
@@ -118,9 +119,9 @@ describe("SaveManager", () => {
     };
 
     describe("Create", () => {
-        it("should create a SaveManager with existing saves", () => {
+        it("should create a SaveManager with existing saves", async () => {
             const backend = new MockSaveBackend(testSaves);
-            const result = SaveManager.Create(backend);
+            const result = await SaveManager.CreateAsync(backend);
 
             expect(result.success).toBe(true);
             if (result.success) {
@@ -129,9 +130,9 @@ describe("SaveManager", () => {
             }
         });
 
-        it("should create a SaveManager with empty saves", () => {
+        it("should create a SaveManager with empty saves", async () => {
             const backend = new MockSaveBackend({});
-            const result = SaveManager.Create(backend);
+            const result = await SaveManager.CreateAsync(backend);
 
             expect(result.success).toBe(true);
             if (result.success) {
@@ -139,22 +140,22 @@ describe("SaveManager", () => {
             }
         });
 
-        it("should handle read errors", () => {
+        it("should handle read errors", async () => {
             const backend = new MockSaveBackend();
             backend.readShouldFail = true;
-            const result = SaveManager.Create(backend);
+            const result = await SaveManager.CreateAsync(backend);
 
             expect(result.success).toBe(false);
             if (!result.success) {
-                expect(result.error).toBe(SaveLoadingError.INVALID_JSON);
+                expect(result.error).toEqual({ type: SaveLoadingErrorType.INVALID_JSON });
             }
         });
     });
 
     describe("getSavesForCmdr", () => {
-        it("should return saves for an existing cmdr", () => {
+        it("should return saves for an existing cmdr", async () => {
             const backend = new MockSaveBackend(testSaves);
-            const result = SaveManager.Create(backend);
+            const result = await SaveManager.CreateAsync(backend);
 
             expect(result.success).toBe(true);
             if (result.success) {
@@ -163,9 +164,9 @@ describe("SaveManager", () => {
             }
         });
 
-        it("should return undefined for a non-existent cmdr", () => {
+        it("should return undefined for a non-existent cmdr", async () => {
             const backend = new MockSaveBackend(testSaves);
-            const result = SaveManager.Create(backend);
+            const result = await SaveManager.CreateAsync(backend);
 
             expect(result.success).toBe(true);
             if (result.success) {
@@ -176,11 +177,11 @@ describe("SaveManager", () => {
     });
 
     describe("save", () => {
-        it("should save data to the backend successfully", () => {
+        it("should save data to the backend successfully", async () => {
             const backend = new MockSaveBackend(testSaves);
             const writeSpy = vi.spyOn(backend, "write");
 
-            const result = SaveManager.Create(backend);
+            const result = await SaveManager.CreateAsync(backend);
             expect(result.success).toBe(true);
 
             if (result.success) {
@@ -193,11 +194,11 @@ describe("SaveManager", () => {
             }
         });
 
-        it("should handle backend write failures", () => {
+        it("should handle backend write failures", async () => {
             const backend = new MockSaveBackend(testSaves);
             backend.writeShouldFail = true;
 
-            const result = SaveManager.Create(backend);
+            const result = await SaveManager.CreateAsync(backend);
             expect(result.success).toBe(true);
 
             if (result.success) {

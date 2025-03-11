@@ -1,13 +1,7 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
 import i18n from "../i18n";
 import { createNotification, NotificationIntent, NotificationOrigin } from "../utils/notification";
-import {
-    createUrlFromSave,
-    parseSaveFileData,
-    SaveFileData,
-    SaveLoadingError,
-    saveLoadingErrorToI18nString
-} from "../saveFile/saveFileData";
+import { createUrlFromSave, Save } from "../saveFile/saveFileData";
 import { Sounds } from "../assets/sounds";
 import expandIconPath from "../../asset/icons/expand.webp";
 import collapseIconPath from "../../asset/icons/collapse.webp";
@@ -19,15 +13,17 @@ import shareIconPath from "../../asset/icons/link.webp";
 import { alertModal, promptModalBoolean, promptModalString } from "../utils/dialogModal";
 import { getObjectModelByUniverseId } from "../utils/coordinates/orbitalObjectId";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-import { ok, Result } from "../utils/types";
+import { Result } from "../utils/types";
 import { SaveManager } from "../saveFile/saveManager";
+import { parseSaveFile } from "../saveFile/saveFile";
+import { SaveLoadingError, saveLoadingErrorToI18nString } from "../saveFile/saveLoadingError";
 
 export class SaveLoadingPanelContent {
     readonly htmlRoot: HTMLElement;
 
     readonly cmdrList: HTMLElement;
 
-    readonly onLoadSaveObservable: Observable<SaveFileData> = new Observable<SaveFileData>();
+    readonly onLoadSaveObservable: Observable<Save> = new Observable<Save>();
 
     constructor() {
         this.htmlRoot = document.createElement("div");
@@ -65,25 +61,7 @@ export class SaveLoadingPanelContent {
             if (event.dataTransfer.files.length === 0) throw new Error("event.dataTransfer.files is empty");
 
             const file = event.dataTransfer.files[0];
-            if (file.type !== "application/json") {
-                dropFileZone.classList.add("invalid");
-                alert("File is not a JSON file");
-                return;
-            }
-
-            const saveFileDataResult = await this.parseSaveFile(file);
-
-            if (!saveFileDataResult.success) {
-                createNotification(
-                    NotificationOrigin.GENERAL,
-                    NotificationIntent.ERROR,
-                    saveLoadingErrorToI18nString(saveFileDataResult.error),
-                    5000
-                );
-                return;
-            }
-
-            this.onLoadSaveObservable.notifyObservers(saveFileDataResult.value);
+            await this.loadSaveFile(file);
         });
 
         dropFileZone.addEventListener("click", () => {
@@ -95,13 +73,7 @@ export class SaveLoadingPanelContent {
                 if (fileInput.files === null) throw new Error("fileInput.files is null");
                 if (fileInput.files.length === 0) throw new Error("fileInput.files is empty");
                 const file = fileInput.files[0];
-                const saveFileDataResult = await this.parseSaveFile(file);
-                if (!saveFileDataResult.success) {
-                    await alertModal(saveLoadingErrorToI18nString(saveFileDataResult.error));
-                    return;
-                }
-
-                this.onLoadSaveObservable.notifyObservers(saveFileDataResult.value);
+                await this.loadSaveFile(file);
             };
             fileInput.click();
         });
@@ -116,7 +88,7 @@ export class SaveLoadingPanelContent {
 
         const cmdrUuids = saveManager.getCmdrUuids();
 
-        const flatSortedSaves: Map<string, SaveFileData[]> = new Map();
+        const flatSortedSaves: Map<string, Save[]> = new Map();
         for (const uuid of cmdrUuids) {
             const cmdrSaves = saveManager.getSavesForCmdr(uuid);
             if (cmdrSaves === undefined) continue;
@@ -276,7 +248,7 @@ export class SaveLoadingPanelContent {
     }
 
     private createSaveDiv(
-        save: SaveFileData,
+        save: Save,
         isAutoSave: boolean,
         starSystemDatabase: StarSystemDatabase,
         saveManager: SaveManager
@@ -388,23 +360,15 @@ export class SaveLoadingPanelContent {
         return saveDiv;
     }
 
-    private async parseSaveFile(rawSaveFile: File): Promise<Result<SaveFileData, SaveLoadingError>> {
-        return new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                if (event.target === null) throw new Error("event.target is null");
-                const data = event.target.result;
-                if (data === null) throw new Error("data is null");
-                if (data instanceof ArrayBuffer) throw new Error("data is an ArrayBuffer");
-                const loadingSaveDataResult = parseSaveFileData(data);
-                if (!loadingSaveDataResult.success) {
-                    resolve(loadingSaveDataResult);
-                    return;
-                }
+    private async loadSaveFile(file: File): Promise<Result<Save, SaveLoadingError>> {
+        const saveFileDataResult = await parseSaveFile(file);
+        if (!saveFileDataResult.success) {
+            console.error(saveFileDataResult.error);
+            await alertModal(saveLoadingErrorToI18nString(saveFileDataResult.error));
+            return saveFileDataResult;
+        }
 
-                resolve(ok(loadingSaveDataResult.value));
-            };
-            reader.readAsText(rawSaveFile);
-        });
+        this.onLoadSaveObservable.notifyObservers(saveFileDataResult.value);
+        return saveFileDataResult;
     }
 }

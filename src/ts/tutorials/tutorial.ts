@@ -15,14 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { SaveFileData } from "../saveFile/saveFileData";
+import { Save } from "../saveFile/saveFileData";
 
 export interface Tutorial {
     getTitle(): string;
     coverImageSrc: string;
     getDescription(): string;
 
-    saveData: SaveFileData;
+    saveData: Save;
 
     getContentPanelsHtml(): Promise<string[]>;
 }

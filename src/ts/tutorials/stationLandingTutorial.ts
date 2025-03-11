@@ -10,10 +10,11 @@ import saveData from "../../asset/tutorials/stationLandingTutorial/save.json";
 import i18n from "../i18n";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
-import { parseSaveFileData } from "../saveFile/saveFileData";
+import { safeParseSave } from "../saveFile/saveFileData";
 
-const parsedSaveData = parseSaveFileData(JSON.stringify(saveData));
-if (!parsedSaveData.success) {
+const parsedSaveDataResult = safeParseSave(saveData);
+if (!parsedSaveDataResult.success) {
+    console.error(parsedSaveDataResult.error);
     throw new Error("StationLandingTutorial: saveData is null");
 }
 
@@ -25,7 +26,7 @@ export const StationLandingTutorial: Tutorial = {
     getDescription() {
         return i18n.t("tutorials:stationLanding:description");
     },
-    saveData: parsedSaveData.value,
+    saveData: parsedSaveDataResult.value,
     async getContentPanelsHtml(): Promise<string[]> {
         const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
         const presentationPanelHtml = `

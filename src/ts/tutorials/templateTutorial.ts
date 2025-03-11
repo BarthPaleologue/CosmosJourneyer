@@ -6,9 +6,9 @@ import welcomeImageSrc from "../../asset/tutorials/flightTutorial/welcome.webp";
 import saveData from "../../asset/tutorials/flightTutorial/save.json";
 import i18n from "../i18n";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
-import { parseSaveFileData } from "../saveFile/saveFileData";
+import { safeParseSave } from "../saveFile/saveFileData";
 
-const parsedSaveData = parseSaveFileData(JSON.stringify(saveData));
+const parsedSaveData = safeParseSave(JSON.stringify(saveData));
 if (!parsedSaveData.success) {
     throw new Error("StationLandingTutorial: saveData is null");
 }
