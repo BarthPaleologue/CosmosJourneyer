@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { MissionSerializedSchema } from "../missions/mission";
+import { MissionSerializedSchema } from "../missions/missionSerialized";
 import { SpaceDiscoveryDataSchema } from "../society/encyclopaediaGalactica";
 import { SerializedSpaceshipSchema, DefaultSerializedSpaceship } from "../spaceship/serializedSpaceship";
 import { StarSystemCoordinatesSchema } from "../utils/coordinates/universeCoordinates";

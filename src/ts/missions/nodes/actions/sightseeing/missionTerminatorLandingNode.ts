@@ -32,7 +32,7 @@ import i18n from "../../../../i18n";
 import { parseDistance } from "../../../../utils/strings/parseToStrings";
 import { getGoToSystemInstructions } from "../../../common";
 import { StarSystemDatabase } from "../../../../starSystem/starSystemDatabase";
-import type { MissionNode } from "../../deserializeNode";
+import type { MissionNode } from "../../missionNode";
 import { z } from "zod";
 
 enum LandMissionState {

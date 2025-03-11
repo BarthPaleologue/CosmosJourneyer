@@ -19,75 +19,17 @@ import { MissionAndNode, MissionAndNodeSerialized } from "./logic/missionAndNode
 import { MissionOrNode, MissionOrNodeSerialized } from "./logic/missionOrNode";
 import {
     MissionAsteroidFieldNode,
-    MissionAsteroidFieldNodeSerialized,
-    MissionAsteroidFieldNodeSerializedSchema
+    MissionAsteroidFieldNodeSerialized
 } from "./actions/sightseeing/missionAsteroidFieldNode";
-import {
-    MissionFlyByNode,
-    MissionFlyByNodeSerialized,
-    MissionFlyByNodeSerializedSchema
-} from "./actions/sightseeing/missionFlyByNode";
+import { MissionFlyByNode, MissionFlyByNodeSerialized } from "./actions/sightseeing/missionFlyByNode";
 import {
     MissionTerminatorLandingNode,
-    MissionTerminatorLandingNodeSerialized,
-    MissionTerminatorLandingNodeSerializedSchema
+    MissionTerminatorLandingNodeSerialized
 } from "./actions/sightseeing/missionTerminatorLandingNode";
 import { MissionXorNode, MissionXorNodeSerialized } from "./logic/missionXorNode";
 import { MissionSequenceNode, MissionSequenceNodeSerialized } from "./logic/missionSequenceNode";
-import { z } from "zod";
-import { MissionNodeType } from "./missionNode";
-
-export type MissionNodeSerialized =
-    | MissionAndNodeSerialized
-    | MissionOrNodeSerialized
-    | MissionXorNodeSerialized
-    | MissionSequenceNodeSerialized
-    | MissionAsteroidFieldNodeSerialized
-    | MissionFlyByNodeSerialized
-    | MissionTerminatorLandingNodeSerialized;
-
-export const MissionNodeSerializedSchema: z.ZodType<MissionNodeSerialized, z.ZodTypeDef, MissionNodeSerialized> =
-    z.lazy(() =>
-        z.discriminatedUnion("type", [
-            MissionFlyByNodeSerializedSchema,
-            MissionTerminatorLandingNodeSerializedSchema,
-            MissionAsteroidFieldNodeSerializedSchema,
-            MissionAndNodeSerializedSchema,
-            MissionOrNodeSerializedSchema,
-            MissionXorNodeSerializedSchema,
-            MissionSequenceNodeSerializedSchema
-        ])
-    );
-
-export const MissionOrNodeSerializedSchema = z.object({
-    type: z.literal(MissionNodeType.OR),
-    children: z.array(MissionNodeSerializedSchema)
-});
-
-export const MissionAndNodeSerializedSchema = z.object({
-    type: z.literal(MissionNodeType.AND),
-    children: z.array(MissionNodeSerializedSchema)
-});
-
-export const MissionXorNodeSerializedSchema = z.object({
-    type: z.literal(MissionNodeType.XOR),
-    children: z.array(MissionNodeSerializedSchema)
-});
-
-export const MissionSequenceNodeSerializedSchema = z.object({
-    type: z.literal(MissionNodeType.SEQUENCE),
-    activeChildIndex: z.number(),
-    children: z.array(MissionNodeSerializedSchema)
-});
-
-export type MissionNode =
-    | MissionAndNode
-    | MissionOrNode
-    | MissionXorNode
-    | MissionSequenceNode
-    | MissionAsteroidFieldNode
-    | MissionFlyByNode
-    | MissionTerminatorLandingNode;
+import { MissionNode, MissionNodeType } from "./missionNode";
+import { MissionNodeSerialized } from "./missionNodeSerialized";
 
 /**
  * Deserialize recursively a mission node.

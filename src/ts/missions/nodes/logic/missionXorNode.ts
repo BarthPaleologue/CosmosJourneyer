@@ -19,7 +19,8 @@ import { MissionNodeBase, MissionNodeSerializedBase, MissionNodeType } from "../
 import { MissionContext } from "../../missionContext";
 import { StarSystemCoordinates } from "../../../utils/coordinates/universeCoordinates";
 import { StarSystemDatabase } from "../../../starSystem/starSystemDatabase";
-import type { MissionNode, MissionNodeSerialized } from "../deserializeNode";
+import type { MissionNode } from "../missionNode";
+import type { MissionNodeSerialized } from "../missionNodeSerialized";
 
 export type MissionXorNodeSerialized = MissionNodeSerializedBase<MissionNodeType.XOR> & {
     children: MissionNodeSerialized[];

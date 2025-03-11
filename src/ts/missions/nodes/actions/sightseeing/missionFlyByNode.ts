@@ -33,7 +33,7 @@ import { getOrbitalObjectTypeToI18nString } from "../../../../utils/strings/orbi
 import { getGoToSystemInstructions } from "../../../common";
 import { OrbitalObjectType } from "../../../../architecture/orbitalObjectType";
 import { StarSystemDatabase } from "../../../../starSystem/starSystemDatabase";
-import type { MissionNode } from "../../deserializeNode";
+import type { MissionNode } from "../../missionNode";
 import { z } from "zod";
 
 enum FlyByState {

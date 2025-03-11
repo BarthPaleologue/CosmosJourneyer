@@ -18,7 +18,13 @@
 import { MissionContext } from "../missionContext";
 import { StarSystemCoordinates } from "../../utils/coordinates/universeCoordinates";
 import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
-import type { MissionNode } from "./deserializeNode";
+import { MissionAsteroidFieldNode } from "./actions/sightseeing/missionAsteroidFieldNode";
+import { MissionFlyByNode } from "./actions/sightseeing/missionFlyByNode";
+import { MissionTerminatorLandingNode } from "./actions/sightseeing/missionTerminatorLandingNode";
+import { MissionAndNode } from "./logic/missionAndNode";
+import { MissionOrNode } from "./logic/missionOrNode";
+import { MissionSequenceNode } from "./logic/missionSequenceNode";
+import { MissionXorNode } from "./logic/missionXorNode";
 
 /**
  * Describes any node in the mission tree.
@@ -89,3 +95,12 @@ export const enum MissionNodeType {
 export type MissionNodeSerializedBase<T extends MissionNodeType> = {
     type: T;
 };
+
+export type MissionNode =
+    | MissionAndNode
+    | MissionOrNode
+    | MissionXorNode
+    | MissionSequenceNode
+    | MissionAsteroidFieldNode
+    | MissionFlyByNode
+    | MissionTerminatorLandingNode;
