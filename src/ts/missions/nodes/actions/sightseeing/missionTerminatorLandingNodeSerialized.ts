@@ -15,19 +15,20 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { MissionAsteroidFieldNode } from "./actions/sightseeing/missionAsteroidFieldNode";
-import type { MissionFlyByNode } from "./actions/sightseeing/missionFlyByNode";
-import type { MissionTerminatorLandingNode } from "./actions/sightseeing/missionTerminatorLandingNode";
-import type { MissionAndNode } from "./logic/missionAndNode";
-import type { MissionOrNode } from "./logic/missionOrNode";
-import type { MissionSequenceNode } from "./logic/missionSequenceNode";
-import type { MissionXorNode } from "./logic/missionXorNode";
+import { MissionNodeType } from "../../missionNodeType";
+import { UniverseObjectIdSchema } from "../../../../utils/coordinates/universeCoordinates";
+import { z } from "zod";
 
-export type MissionNode =
-    | MissionAndNode
-    | MissionOrNode
-    | MissionXorNode
-    | MissionSequenceNode
-    | MissionAsteroidFieldNode
-    | MissionFlyByNode
-    | MissionTerminatorLandingNode;
+export enum LandMissionState {
+    NOT_IN_SYSTEM,
+    TOO_FAR_IN_SYSTEM,
+    LANDED
+}
+
+export const MissionTerminatorLandingNodeSerializedSchema = z.object({
+    type: z.literal(MissionNodeType.TERMINATOR_LANDING),
+    objectId: UniverseObjectIdSchema,
+    state: z.nativeEnum(LandMissionState)
+});
+
+export type MissionTerminatorLandingNodeSerialized = z.infer<typeof MissionTerminatorLandingNodeSerializedSchema>;

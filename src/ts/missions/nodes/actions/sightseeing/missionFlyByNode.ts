@@ -15,14 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { MissionNodeBase, MissionNodeSerializedBase, MissionNodeType } from "../../missionNode";
+import { MissionNode } from "../../missionNode";
+import { MissionNodeType } from "../../missionNodeType";
+import type { MissionNodeBase } from "../../missionNodeBase";
 import { MissionContext } from "../../../missionContext";
 import {
     StarSystemCoordinates,
     starSystemCoordinatesEquals,
     UniverseObjectId,
-    universeObjectIdEquals,
-    UniverseObjectIdSchema
+    universeObjectIdEquals
 } from "../../../../utils/coordinates/universeCoordinates";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getObjectBySystemId, getObjectModelByUniverseId } from "../../../../utils/coordinates/orbitalObjectId";
@@ -33,26 +34,7 @@ import { getOrbitalObjectTypeToI18nString } from "../../../../utils/strings/orbi
 import { getGoToSystemInstructions } from "../../../common";
 import { OrbitalObjectType } from "../../../../architecture/orbitalObjectType";
 import { StarSystemDatabase } from "../../../../starSystem/starSystemDatabase";
-import type { MissionNode } from "../../missionNode";
-import { z } from "zod";
-
-enum FlyByState {
-    NOT_IN_SYSTEM,
-    TOO_FAR_IN_SYSTEM,
-    CLOSE_ENOUGH
-}
-
-export type MissionFlyByNodeSerialized = MissionNodeSerializedBase<MissionNodeType.FLY_BY> & {
-    type: MissionNodeType.FLY_BY;
-    objectId: UniverseObjectId;
-    state: FlyByState;
-};
-
-export const MissionFlyByNodeSerializedSchema = z.object({
-    type: z.literal(MissionNodeType.FLY_BY),
-    objectId: UniverseObjectIdSchema,
-    state: z.nativeEnum(FlyByState)
-});
+import { FlyByState, MissionFlyByNodeSerialized } from "./missionFlyByNodeSerialized";
 
 /**
  * Node used to describe a fly-by mission around a target object

@@ -15,21 +15,25 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { MissionAndNode, MissionAndNodeSerialized } from "./logic/missionAndNode";
-import { MissionOrNode, MissionOrNodeSerialized } from "./logic/missionOrNode";
+import { MissionAndNode } from "./logic/missionAndNode";
+import { MissionOrNode } from "./logic/missionOrNode";
+import { MissionAsteroidFieldNode } from "./actions/sightseeing/missionAsteroidFieldNode";
+import { MissionFlyByNode } from "./actions/sightseeing/missionFlyByNode";
+import { MissionFlyByNodeSerialized } from "./actions/sightseeing/missionFlyByNodeSerialized";
+import { MissionTerminatorLandingNode } from "./actions/sightseeing/missionTerminatorLandingNode";
+import { MissionXorNode } from "./logic/missionXorNode";
+import { MissionSequenceNode } from "./logic/missionSequenceNode";
+import { MissionNode } from "./missionNode";
+import { MissionNodeType } from "./missionNodeType";
 import {
-    MissionAsteroidFieldNode,
-    MissionAsteroidFieldNodeSerialized
-} from "./actions/sightseeing/missionAsteroidFieldNode";
-import { MissionFlyByNode, MissionFlyByNodeSerialized } from "./actions/sightseeing/missionFlyByNode";
-import {
-    MissionTerminatorLandingNode,
-    MissionTerminatorLandingNodeSerialized
-} from "./actions/sightseeing/missionTerminatorLandingNode";
-import { MissionXorNode, MissionXorNodeSerialized } from "./logic/missionXorNode";
-import { MissionSequenceNode, MissionSequenceNodeSerialized } from "./logic/missionSequenceNode";
-import { MissionNode, MissionNodeType } from "./missionNode";
-import { MissionNodeSerialized } from "./missionNodeSerialized";
+    MissionAndNodeSerialized,
+    MissionNodeSerialized,
+    MissionOrNodeSerialized,
+    MissionSequenceNodeSerialized,
+    MissionXorNodeSerialized
+} from "./missionNodeSerialized";
+import { MissionAsteroidFieldNodeSerialized } from "./actions/sightseeing/missionAsteroidFieldNodeSerialized";
+import { MissionTerminatorLandingNodeSerialized } from "./actions/sightseeing/missionTerminatorLandingNodeSerialized";
 
 /**
  * Deserialize recursively a mission node.

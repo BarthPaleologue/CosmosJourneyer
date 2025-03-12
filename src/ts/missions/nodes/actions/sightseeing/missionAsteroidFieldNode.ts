@@ -15,14 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { MissionNodeBase, MissionNodeSerializedBase, MissionNodeType } from "../../missionNode";
+import { MissionNode } from "../../missionNode";
+import { MissionNodeType } from "../../missionNodeType";
+import type { MissionNodeBase } from "../../missionNodeBase";
 import { MissionContext } from "../../../missionContext";
 import {
     StarSystemCoordinates,
     starSystemCoordinatesEquals,
     UniverseObjectId,
-    universeObjectIdEquals,
-    UniverseObjectIdSchema
+    universeObjectIdEquals
 } from "../../../../utils/coordinates/universeCoordinates";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { clamp } from "../../../../utils/math";
@@ -32,25 +33,8 @@ import { parseDistance } from "../../../../utils/strings/parseToStrings";
 import { Settings } from "../../../../settings";
 import { getGoToSystemInstructions } from "../../../common";
 import { StarSystemDatabase } from "../../../../starSystem/starSystemDatabase";
-import type { MissionNode } from "../../missionNode";
 import { z } from "zod";
-
-enum AsteroidFieldMissionState {
-    NOT_IN_SYSTEM,
-    TOO_FAR_IN_SYSTEM,
-    CLOSE_ENOUGH
-}
-
-export type MissionAsteroidFieldNodeSerialized = MissionNodeSerializedBase<MissionNodeType.ASTEROID_FIELD> & {
-    objectId: UniverseObjectId;
-    state: AsteroidFieldMissionState;
-};
-
-export const MissionAsteroidFieldNodeSerializedSchema = z.object({
-    type: z.literal(MissionNodeType.ASTEROID_FIELD),
-    objectId: UniverseObjectIdSchema,
-    state: z.nativeEnum(AsteroidFieldMissionState)
-});
+import { AsteroidFieldMissionState, MissionAsteroidFieldNodeSerialized } from "./missionAsteroidFieldNodeSerialized";
 
 /**
  * Node used to describe a trek to an asteroid field

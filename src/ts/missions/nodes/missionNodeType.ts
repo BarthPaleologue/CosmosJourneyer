@@ -15,19 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { MissionAsteroidFieldNode } from "./actions/sightseeing/missionAsteroidFieldNode";
-import type { MissionFlyByNode } from "./actions/sightseeing/missionFlyByNode";
-import type { MissionTerminatorLandingNode } from "./actions/sightseeing/missionTerminatorLandingNode";
-import type { MissionAndNode } from "./logic/missionAndNode";
-import type { MissionOrNode } from "./logic/missionOrNode";
-import type { MissionSequenceNode } from "./logic/missionSequenceNode";
-import type { MissionXorNode } from "./logic/missionXorNode";
-
-export type MissionNode =
-    | MissionAndNode
-    | MissionOrNode
-    | MissionXorNode
-    | MissionSequenceNode
-    | MissionAsteroidFieldNode
-    | MissionFlyByNode
-    | MissionTerminatorLandingNode;
+/**
+ * Describes the type of mission node. Useful for serialization/deserialization.
+ */
+export const enum MissionNodeType {
+    FLY_BY = 0,
+    TERMINATOR_LANDING = 1,
+    ASTEROID_FIELD = 2,
+    AND = 1000,
+    OR = 1001,
+    XOR = 1002,
+    SEQUENCE = 1003
+}

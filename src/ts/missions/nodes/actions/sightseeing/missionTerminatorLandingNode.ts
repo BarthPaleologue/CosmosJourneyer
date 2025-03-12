@@ -15,14 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { MissionNodeBase, MissionNodeSerializedBase, MissionNodeType } from "../../missionNode";
+import { MissionNode } from "../../missionNode";
+import { MissionNodeType } from "../../missionNodeType";
+import type { MissionNodeBase } from "../../missionNodeBase";
 import { MissionContext } from "../../../missionContext";
 import {
     StarSystemCoordinates,
     starSystemCoordinatesEquals,
     UniverseObjectId,
-    universeObjectIdEquals,
-    UniverseObjectIdSchema
+    universeObjectIdEquals
 } from "../../../../utils/coordinates/universeCoordinates";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
@@ -32,25 +33,7 @@ import i18n from "../../../../i18n";
 import { parseDistance } from "../../../../utils/strings/parseToStrings";
 import { getGoToSystemInstructions } from "../../../common";
 import { StarSystemDatabase } from "../../../../starSystem/starSystemDatabase";
-import type { MissionNode } from "../../missionNode";
-import { z } from "zod";
-
-enum LandMissionState {
-    NOT_IN_SYSTEM,
-    TOO_FAR_IN_SYSTEM,
-    LANDED
-}
-
-export type MissionTerminatorLandingNodeSerialized = MissionNodeSerializedBase<MissionNodeType.TERMINATOR_LANDING> & {
-    objectId: UniverseObjectId;
-    state: LandMissionState;
-};
-
-export const MissionTerminatorLandingNodeSerializedSchema = z.object({
-    type: z.literal(MissionNodeType.TERMINATOR_LANDING),
-    objectId: UniverseObjectIdSchema,
-    state: z.nativeEnum(LandMissionState)
-});
+import { LandMissionState, MissionTerminatorLandingNodeSerialized } from "./missionTerminatorLandingNodeSerialized";
 
 /**
  * Node used to describe a landing mission on a target object near the terminator line
