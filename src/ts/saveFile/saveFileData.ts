@@ -18,7 +18,7 @@
 import { encodeBase64 } from "../utils/base64";
 import { z } from "zod";
 import { Result } from "../utils/types";
-import { safeParseSaveV1, SaveSchemaV1 } from "./saveV1";
+import { safeParseSaveV1, SaveSchemaV1 } from "./v1/saveV1";
 import { SaveLoadingError } from "./saveLoadingError";
 
 export const SaveSchema = SaveSchemaV1;

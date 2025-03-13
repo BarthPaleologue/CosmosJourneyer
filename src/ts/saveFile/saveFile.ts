@@ -15,7 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { err, ok, Result } from "../utils/types";
+import { jsonSafeParse } from "../utils/json";
+import { err, Result } from "../utils/types";
 import { Save, safeParseSave } from "./saveFileData";
 import { SaveLoadingError, SaveLoadingErrorType } from "./saveLoadingError";
 
@@ -28,12 +29,12 @@ export async function parseSaveFile(rawSaveFile: File): Promise<Result<Save, Sav
             if (data === null) throw new Error("data is null");
             if (data instanceof ArrayBuffer) throw new Error("data is an ArrayBuffer");
 
-            try {
-                const parsedData = JSON.parse(data);
-                return resolve(safeParseSave(parsedData));
-            } catch {
+            const parsedData = jsonSafeParse(data);
+            if (parsedData === null) {
                 return resolve(err({ type: SaveLoadingErrorType.INVALID_JSON }));
             }
+
+            return resolve(safeParseSave(parsedData));
         };
         reader.readAsText(rawSaveFile);
     });

@@ -16,11 +16,11 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { z } from "zod";
-import projectInfo from "../../../package.json";
-import { SerializedPlayerSchema } from "../player/serializedPlayer";
-import { UniverseCoordinatesSchema } from "../utils/coordinates/universeCoordinates";
-import { Result, ok, err } from "../utils/types";
-import { SaveLoadingError, SaveLoadingErrorType } from "./saveLoadingError";
+import projectInfo from "../../../../package.json";
+import { SerializedPlayerSchema } from "../../player/serializedPlayer";
+import { UniverseCoordinatesSchema } from "../../utils/coordinates/universeCoordinates";
+import { Result, ok, err } from "../../utils/types";
+import { SaveLoadingError, SaveLoadingErrorType } from "../saveLoadingError";
 
 export const SaveSchemaV1 = z.object({
     /** The version of CosmosJourneyer that created this save file. */

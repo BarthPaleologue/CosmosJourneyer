@@ -1,8 +1,10 @@
-import { safeParseSave } from "./saveFileData";
+import { safeParseSave } from "../saveFileData";
 import { expect, test } from "vitest";
+import { SaveV1 } from "./saveV1";
+import { DeepPartial } from "../../utils/types";
 
 test("Loading a correct save file", () => {
-    const saveFileString = {
+    const saveFileString: DeepPartial<SaveV1> = {
         version: "1.9.0",
         player: {
             name: "Python",
@@ -85,7 +87,6 @@ test("Loading a correct save file", () => {
                     },
                     tree: {
                         type: 0,
-                        children: [],
                         objectId: {
                             starSystemCoordinates: {
                                 starSectorX: -3,
@@ -134,7 +135,7 @@ test("Loading a correct save file", () => {
 });
 
 test("Loading a minimal save file", () => {
-    const saveFileString = {
+    const saveFileString: DeepPartial<SaveV1> = {
         version: "1.9.0",
         player: {
             name: "Python",

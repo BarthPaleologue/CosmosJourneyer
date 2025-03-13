@@ -15,16 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export type Result<T, E> = { success: true; value: T } | { success: false; error: E };
-
-export function ok<T, E>(value: T): Result<T, E> {
-    return { success: true, value };
+export function jsonSafeParse(jsonString: string): Record<string, unknown> | null {
+    try {
+        return JSON.parse(jsonString);
+    } catch {
+        return null;
+    }
 }
-
-export function err<T, E>(error: E): Result<T, E> {
-    return { success: false, error };
-}
-
-export type DeepPartial<T> = {
-    [P in keyof T]?: DeepPartial<T[P]>;
-};

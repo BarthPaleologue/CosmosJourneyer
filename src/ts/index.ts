@@ -22,8 +22,9 @@ import { Player } from "./player/player";
 import { safeParseSave } from "./saveFile/saveFileData";
 import { Settings } from "./settings";
 import { decodeBase64 } from "./utils/base64";
+import { UniverseCoordinatesSchema } from "./utils/coordinates/universeCoordinates";
 import { alertModal } from "./utils/dialogModal";
-import { createNotification, NotificationIntent, NotificationOrigin } from "./utils/notification";
+import { jsonSafeParse } from "./utils/json";
 
 const engine = await CosmosJourneyer.CreateAsync();
 
@@ -35,8 +36,22 @@ if (universeCoordinatesString !== null) {
     engine.player.copyFrom(Player.Default());
     engine.player.uuid = Settings.SHARED_POSITION_SAVE_UUID;
     const jsonString = decodeBase64(universeCoordinatesString);
-    await engine.loadUniverseCoordinates(JSON.parse(jsonString));
-    engine.starSystemView.setUIEnabled(true);
+    const parsedJson = jsonSafeParse(jsonString);
+    if (parsedJson === null) {
+        await alertModal("Error, this universe coordinates URL data is not a valid json.");
+    }
+
+    const universeCoordinates = UniverseCoordinatesSchema.safeParse(parsedJson);
+    if (!universeCoordinates.success) {
+        console.error(universeCoordinates.error);
+        await alertModal(
+            "Error, this universe coordinates URL data do not match the expected schema. Check the console for more information."
+        );
+        await engine.init(false);
+    } else {
+        await engine.loadUniverseCoordinates(universeCoordinates.data);
+        engine.starSystemView.setUIEnabled(true);
+    }
 } else if (saveString !== null) {
     const jsonString = decodeBase64(saveString);
     const result = safeParseSave(jsonString);
@@ -45,6 +60,7 @@ if (universeCoordinatesString !== null) {
         engine.starSystemView.setUIEnabled(true);
     } else {
         await alertModal("Error, this save file is invalid. See the console for more details.");
+        await engine.init(false);
     }
 } else {
     await engine.init(false);
