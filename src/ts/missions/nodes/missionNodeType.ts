@@ -15,14 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Save } from "../saveFile/saveFileData";
-
-export interface Tutorial {
-    getTitle(): string;
-    coverImageSrc: string;
-    getDescription(): string;
-
-    saveData: Save;
-
-    getContentPanelsHtml(): Promise<string[]>;
+/**
+ * Describes the type of mission node. Useful for serialization/deserialization.
+ */
+export const enum MissionNodeType {
+    FLY_BY = 0,
+    TERMINATOR_LANDING = 1,
+    ASTEROID_FIELD = 2,
+    AND = 1000,
+    OR = 1001,
+    XOR = 1002,
+    SEQUENCE = 1003
 }

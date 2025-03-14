@@ -15,14 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Save } from "../saveFile/saveFileData";
-
-export interface Tutorial {
-    getTitle(): string;
-    coverImageSrc: string;
-    getDescription(): string;
-
-    saveData: Save;
-
-    getContentPanelsHtml(): Promise<string[]>;
+export function jsonSafeParse(jsonString: string): Record<string, unknown> | null {
+    try {
+        return JSON.parse(jsonString);
+    } catch {
+        return null;
+    }
 }

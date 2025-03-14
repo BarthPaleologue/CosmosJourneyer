@@ -15,14 +15,28 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Save } from "../saveFile/saveFileData";
+import { z } from "zod";
+import { UniverseObjectIdSchema } from "../utils/coordinates/universeCoordinates";
+import { MissionNodeSerializedSchema } from "./nodes/missionNodeSerialized";
 
-export interface Tutorial {
-    getTitle(): string;
-    coverImageSrc: string;
-    getDescription(): string;
+/**
+ * Registered mission types. Those are used to display localized strings in the UI
+ */
 
-    saveData: Save;
-
-    getContentPanelsHtml(): Promise<string[]>;
+export enum MissionType {
+    SIGHT_SEEING_FLY_BY,
+    SIGHT_SEEING_TERMINATOR_LANDING,
+    SIGHT_SEEING_ASTEROID_FIELD
 }
+
+export const MissionSerializedSchema = z.object({
+    missionGiver: UniverseObjectIdSchema,
+    tree: MissionNodeSerializedSchema,
+    reward: z.number().default(0),
+    type: z.nativeEnum(MissionType).default(MissionType.SIGHT_SEEING_FLY_BY)
+});
+/**
+ * Serialized mission object as stored in save files
+ */
+
+export type MissionSerialized = z.infer<typeof MissionSerializedSchema>;

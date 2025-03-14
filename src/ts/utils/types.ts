@@ -15,14 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Save } from "../saveFile/saveFileData";
+export type Result<T, E> = { success: true; value: T } | { success: false; error: E };
 
-export interface Tutorial {
-    getTitle(): string;
-    coverImageSrc: string;
-    getDescription(): string;
-
-    saveData: Save;
-
-    getContentPanelsHtml(): Promise<string[]>;
+export function ok<T, E>(value: T): Result<T, E> {
+    return { success: true, value };
 }
+
+export function err<T, E>(error: E): Result<T, E> {
+    return { success: false, error };
+}
+
+export type DeepPartial<T> = {
+    [P in keyof T]?: DeepPartial<T[P]>;
+};

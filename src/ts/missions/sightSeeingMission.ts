@@ -15,14 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Mission, MissionType } from "./mission";
+import { Mission } from "./mission";
+import { MissionType } from "./missionSerialized";
 import { SystemObjectType, UniverseObjectId } from "../utils/coordinates/universeCoordinates";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MissionFlyByNode } from "./nodes/actions/sightseeing/missionFlyByNode";
 import { MissionTerminatorLandingNode } from "./nodes/actions/sightseeing/missionTerminatorLandingNode";
 import { MissionAsteroidFieldNode } from "./nodes/actions/sightseeing/missionAsteroidFieldNode";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-import { MissionNode } from "./nodes/deserializeNode";
+import { MissionNode } from "./nodes/missionNode";
 
 /**
  * Sightseeing mission types are a subset of mission types.

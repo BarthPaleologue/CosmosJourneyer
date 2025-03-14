@@ -29,10 +29,11 @@ import warpImageSrc from "../../asset/tutorials/flightTutorial/warp.webp";
 import congratsImageSrc from "../../asset/tutorials/flightTutorial/congrats.webp";
 import saveData from "../../asset/tutorials/flightTutorial/save.json";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
-import { parseSaveFileData } from "../saveFile/saveFileData";
+import { safeParseSave } from "../saveFile/saveFileData";
 
-const parsedSaveData = parseSaveFileData(JSON.stringify(saveData));
-if (parsedSaveData.data === null) {
+const parsedSaveDataResult = safeParseSave(saveData);
+if (!parsedSaveDataResult.success) {
+    console.error(parsedSaveDataResult.error);
     throw new Error("StationLandingTutorial: saveData is null");
 }
 
@@ -45,7 +46,7 @@ export const FlightTutorial: Tutorial = {
         return i18n.t("tutorials:flightTutorial:description");
     },
 
-    saveData: parsedSaveData.data,
+    saveData: parsedSaveDataResult.value,
 
     async getContentPanelsHtml(): Promise<string[]> {
         const keybordLayoutMap = await getGlobalKeyboardLayoutMap();

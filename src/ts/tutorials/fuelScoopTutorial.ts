@@ -8,10 +8,11 @@ import howToFuelScoop from "../../asset/tutorials/fuelScoopTutorial/howToFuelSco
 import saveData from "../../asset/tutorials/fuelScoopTutorial/save.json";
 import i18n from "../i18n";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
-import { parseSaveFileData } from "../saveFile/saveFileData";
+import { safeParseSave } from "../saveFile/saveFileData";
 
-const parsedSaveData = parseSaveFileData(JSON.stringify(saveData));
-if (parsedSaveData.data === null) {
+const parsedSaveDataResult = safeParseSave(saveData);
+if (!parsedSaveDataResult.success) {
+    console.error(parsedSaveDataResult.error);
     throw new Error("FuelScoopTutorial: saveData is null");
 }
 
@@ -19,7 +20,7 @@ export const FuelScoopTutorial: Tutorial = {
     getTitle() {
         return i18n.t("tutorials:fuelScooping:title");
     },
-    saveData: parsedSaveData.data,
+    saveData: parsedSaveDataResult.value,
     coverImageSrc: welcomeImageSrc,
     getDescription() {
         return i18n.t("tutorials:fuelScooping:description");

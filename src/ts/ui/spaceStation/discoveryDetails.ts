@@ -25,6 +25,7 @@ import i18n from "../../i18n";
 import { Settings } from "../../settings";
 import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
 import { Observable } from "@babylonjs/core/Misc/observable";
+import { createNotification, NotificationIntent, NotificationOrigin } from "../../utils/notification";
 
 export class DiscoveryDetails {
     readonly htmlRoot: HTMLElement;
@@ -79,8 +80,13 @@ export class DiscoveryDetails {
             }
 
             Sounds.SUCCESS.play();
-            const value = await encyclopaedia.estimateDiscovery(this.currentDiscovery.objectId);
-            player.earn(value);
+            const valueResult = await encyclopaedia.estimateDiscovery(this.currentDiscovery.objectId);
+            if (!valueResult.success) {
+                createNotification(NotificationOrigin.GENERAL, NotificationIntent.ERROR, valueResult.error, 5_000);
+                return;
+            }
+
+            player.earn(valueResult.value);
             player.discoveries.local = player.discoveries.local.filter((d) => d !== this.currentDiscovery);
             player.discoveries.uploaded.push(this.currentDiscovery);
 

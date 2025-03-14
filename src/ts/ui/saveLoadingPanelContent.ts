@@ -1,13 +1,7 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
 import i18n from "../i18n";
 import { createNotification, NotificationIntent, NotificationOrigin } from "../utils/notification";
-import {
-    createUrlFromSave,
-    getSavesFromLocalStorage,
-    parseSaveFileData,
-    SaveFileData,
-    writeSavesToLocalStorage
-} from "../saveFile/saveFileData";
+import { createUrlFromSave, Save } from "../saveFile/saveFileData";
 import { Sounds } from "../assets/sounds";
 import expandIconPath from "../../asset/icons/expand.webp";
 import collapseIconPath from "../../asset/icons/collapse.webp";
@@ -16,16 +10,20 @@ import editIconPath from "../../asset/icons/edit.webp";
 import downloadIconPath from "../../asset/icons/download.webp";
 import trashIconPath from "../../asset/icons/trash.webp";
 import shareIconPath from "../../asset/icons/link.webp";
-import { promptModalBoolean, promptModalString } from "../utils/dialogModal";
+import { alertModal, promptModalBoolean, promptModalString } from "../utils/dialogModal";
 import { getObjectModelByUniverseId } from "../utils/coordinates/orbitalObjectId";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { Result } from "../utils/types";
+import { SaveManager } from "../saveFile/saveManager";
+import { parseSaveFile } from "../saveFile/saveFile";
+import { SaveLoadingError, saveLoadingErrorToI18nString } from "../saveFile/saveLoadingError";
 
 export class SaveLoadingPanelContent {
     readonly htmlRoot: HTMLElement;
 
     readonly cmdrList: HTMLElement;
 
-    readonly onLoadSaveObservable: Observable<SaveFileData> = new Observable<SaveFileData>();
+    readonly onLoadSaveObservable: Observable<Save> = new Observable<Save>();
 
     constructor() {
         this.htmlRoot = document.createElement("div");
@@ -63,14 +61,7 @@ export class SaveLoadingPanelContent {
             if (event.dataTransfer.files.length === 0) throw new Error("event.dataTransfer.files is empty");
 
             const file = event.dataTransfer.files[0];
-            if (file.type !== "application/json") {
-                dropFileZone.classList.add("invalid");
-                alert("File is not a JSON file");
-                return;
-            }
-
-            const saveFileData = await this.parseSaveFile(file);
-            this.onLoadSaveObservable.notifyObservers(saveFileData);
+            await this.loadSaveFile(file);
         });
 
         dropFileZone.addEventListener("click", () => {
@@ -82,8 +73,7 @@ export class SaveLoadingPanelContent {
                 if (fileInput.files === null) throw new Error("fileInput.files is null");
                 if (fileInput.files.length === 0) throw new Error("fileInput.files is empty");
                 const file = fileInput.files[0];
-                const saveFileData = await this.parseSaveFile(file);
-                this.onLoadSaveObservable.notifyObservers(saveFileData);
+                await this.loadSaveFile(file);
             };
             fileInput.click();
         });
@@ -93,21 +83,20 @@ export class SaveLoadingPanelContent {
         this.htmlRoot.appendChild(this.cmdrList);
     }
 
-    populateCmdrList(starSystemDatabase: StarSystemDatabase) {
+    populateCmdrList(starSystemDatabase: StarSystemDatabase, saveManager: SaveManager) {
         this.cmdrList.innerHTML = "";
 
-        const saves = getSavesFromLocalStorage();
+        const cmdrUuids = saveManager.getCmdrUuids();
 
-        const flatSortedSaves: Map<string, SaveFileData[]> = new Map();
-        for (const uuid in saves) {
-            flatSortedSaves.set(uuid, saves[uuid].manual.concat(saves[uuid].auto));
+        const flatSortedSaves: Map<string, Save[]> = new Map();
+        for (const uuid of cmdrUuids) {
+            const cmdrSaves = saveManager.getSavesForCmdr(uuid);
+            if (cmdrSaves === undefined) continue;
+            flatSortedSaves.set(uuid, cmdrSaves.manual.concat(cmdrSaves.auto));
         }
         flatSortedSaves.forEach((saves) => {
             saves.sort((a, b) => b.timestamp - a.timestamp);
         });
-
-        // Get all cmdr UUIDs
-        const cmdrUuids = Object.keys(saves);
 
         // Sort cmdr UUIDs by latest save timestamp to have the most recent save at the top
         cmdrUuids.sort((a, b) => {
@@ -119,20 +108,17 @@ export class SaveLoadingPanelContent {
         });
 
         cmdrUuids.forEach((cmdrUuid) => {
+            const cmdrSaves = saveManager.getSavesForCmdr(cmdrUuid);
+            if (cmdrSaves === undefined) return;
+
             const cmdrDiv = document.createElement("div");
             cmdrDiv.classList.add("cmdr");
             this.cmdrList.appendChild(cmdrDiv);
 
-            const cmdrSaves = saves[cmdrUuid];
+            const allCmdrSaves = cmdrSaves.auto.concat(cmdrSaves.manual);
+            allCmdrSaves.sort((a, b) => b.timestamp - a.timestamp);
 
-            const autoSaves = cmdrSaves.auto;
-
-            const manualSaves = cmdrSaves.manual;
-
-            const allSaves = autoSaves.concat(manualSaves);
-            allSaves.sort((a, b) => b.timestamp - a.timestamp);
-
-            const latestSave = allSaves[0];
+            const latestSave = allCmdrSaves[0];
 
             const cmdrHeader = document.createElement("div");
             cmdrHeader.classList.add("cmdrHeader");
@@ -214,17 +200,11 @@ export class SaveLoadingPanelContent {
                 );
                 if (newName === null) return;
 
-                autoSaves.forEach((autoSave) => {
-                    autoSave.player.name = newName;
-                });
-
-                manualSaves.forEach((manualSave) => {
-                    manualSave.player.name = newName;
-                });
+                saveManager.renameCmdr(cmdrUuid, newName);
 
                 cmdrName.innerText = newName;
 
-                writeSavesToLocalStorage(saves);
+                saveManager.save();
             });
             cmdrHeaderButtons.appendChild(editNameButton);
 
@@ -238,8 +218,13 @@ export class SaveLoadingPanelContent {
             savesList.classList.add("hidden"); // Hidden by default
             cmdrDiv.appendChild(savesList);
 
-            allSaves.forEach((save) => {
-                const saveDiv = this.createSaveDiv(save, autoSaves.includes(save), starSystemDatabase);
+            allCmdrSaves.forEach((save) => {
+                const saveDiv = this.createSaveDiv(
+                    save,
+                    cmdrSaves.auto.includes(save),
+                    starSystemDatabase,
+                    saveManager
+                );
                 savesList.appendChild(saveDiv);
             });
 
@@ -263,9 +248,10 @@ export class SaveLoadingPanelContent {
     }
 
     private createSaveDiv(
-        save: SaveFileData,
+        save: Save,
         isAutoSave: boolean,
-        starSystemDatabase: StarSystemDatabase
+        starSystemDatabase: StarSystemDatabase,
+        saveManager: SaveManager
     ): HTMLElement {
         const saveDiv = document.createElement("div");
         saveDiv.classList.add("saveContainer");
@@ -351,26 +337,19 @@ export class SaveLoadingPanelContent {
             const shouldProceed = await promptModalBoolean(i18n.t("sidePanel:deleteSavePrompt"));
             if (!shouldProceed) return;
 
-            const saves = getSavesFromLocalStorage();
+            saveManager.deleteSaveForCmdr(save.player.uuid, save);
 
-            if (isAutoSave) {
-                saves[save.player.uuid].auto = saves[save.player.uuid].auto.filter(
-                    (autoSave) => autoSave.timestamp !== save.timestamp
-                );
-            } else {
-                saves[save.player.uuid].manual = saves[save.player.uuid].manual.filter(
-                    (manualSave) => manualSave.timestamp !== save.timestamp
-                );
-            }
+            const cmdrSaves = saveManager.getSavesForCmdr(save.player.uuid);
+            if (cmdrSaves === undefined) return;
 
-            if (saves[save.player.uuid].auto.length === 0 && saves[save.player.uuid].manual.length === 0) {
-                delete saves[save.player.uuid];
+            if (cmdrSaves.auto.length === 0 && cmdrSaves.manual.length === 0) {
+                saveManager.deleteCmdr(save.player.uuid);
                 saveDiv.parentElement?.parentElement?.remove();
             }
 
             saveDiv.remove();
 
-            writeSavesToLocalStorage(saves);
+            saveManager.save();
         });
         saveButtons.appendChild(deleteButton);
 
@@ -381,20 +360,15 @@ export class SaveLoadingPanelContent {
         return saveDiv;
     }
 
-    private async parseSaveFile(rawSaveFile: File): Promise<SaveFileData> {
-        return new Promise<SaveFileData>((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                if (event.target === null) throw new Error("event.target is null");
-                const data = event.target.result as string;
-                const loadingSaveData = parseSaveFileData(data);
-                loadingSaveData.logs.forEach((log) =>
-                    createNotification(NotificationOrigin.GENERAL, NotificationIntent.WARNING, log, 60_000)
-                );
-                if (loadingSaveData.data === null) return;
-                resolve(loadingSaveData.data);
-            };
-            reader.readAsText(rawSaveFile);
-        });
+    private async loadSaveFile(file: File): Promise<Result<Save, SaveLoadingError>> {
+        const saveFileDataResult = await parseSaveFile(file);
+        if (!saveFileDataResult.success) {
+            console.error(saveFileDataResult.error);
+            await alertModal(saveLoadingErrorToI18nString(saveFileDataResult.error));
+            return saveFileDataResult;
+        }
+
+        this.onLoadSaveObservable.notifyObservers(saveFileDataResult.value);
+        return saveFileDataResult;
     }
 }

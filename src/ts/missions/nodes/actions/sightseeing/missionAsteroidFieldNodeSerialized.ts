@@ -15,14 +15,20 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Save } from "../saveFile/saveFileData";
+import { UniverseObjectIdSchema } from "../../../../utils/coordinates/universeCoordinates";
+import { z } from "zod";
+import { MissionNodeType } from "../../missionNodeType";
 
-export interface Tutorial {
-    getTitle(): string;
-    coverImageSrc: string;
-    getDescription(): string;
-
-    saveData: Save;
-
-    getContentPanelsHtml(): Promise<string[]>;
+export enum AsteroidFieldMissionState {
+    NOT_IN_SYSTEM,
+    TOO_FAR_IN_SYSTEM,
+    CLOSE_ENOUGH
 }
+
+export const MissionAsteroidFieldNodeSerializedSchema = z.object({
+    type: z.literal(MissionNodeType.ASTEROID_FIELD),
+    objectId: UniverseObjectIdSchema,
+    state: z.nativeEnum(AsteroidFieldMissionState)
+});
+
+export type MissionAsteroidFieldNodeSerialized = z.infer<typeof MissionAsteroidFieldNodeSerializedSchema>;

@@ -15,14 +15,26 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Save } from "../saveFile/saveFileData";
+/**
+ * Downloads a text file with the given content and filename.
+ * @param content The content of the file.
+ * @param filename The name of the file.
+ */
+export function downloadTextFile(content: string, filename: string) {
+    // Create a Blob with the text content
+    const blob = new Blob([content], { type: "text/plain" });
 
-export interface Tutorial {
-    getTitle(): string;
-    coverImageSrc: string;
-    getDescription(): string;
+    // Create a temporary URL for the Blob
+    const url = URL.createObjectURL(blob);
 
-    saveData: Save;
+    // Create an anchor element
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename; // Set the file name for download
 
-    getContentPanelsHtml(): Promise<string[]>;
+    // Trigger the download
+    a.click();
+
+    // Clean up the URL object
+    URL.revokeObjectURL(url);
 }

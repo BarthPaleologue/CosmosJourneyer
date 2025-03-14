@@ -15,14 +15,20 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Save } from "../saveFile/saveFileData";
+import { z } from "zod";
+import { UniverseObjectIdSchema } from "../../../../utils/coordinates/universeCoordinates";
+import { MissionNodeType } from "../../missionNodeType";
 
-export interface Tutorial {
-    getTitle(): string;
-    coverImageSrc: string;
-    getDescription(): string;
-
-    saveData: Save;
-
-    getContentPanelsHtml(): Promise<string[]>;
+export enum FlyByState {
+    NOT_IN_SYSTEM,
+    TOO_FAR_IN_SYSTEM,
+    CLOSE_ENOUGH
 }
+
+export const MissionFlyByNodeSerializedSchema = z.object({
+    type: z.literal(MissionNodeType.FLY_BY),
+    objectId: UniverseObjectIdSchema,
+    state: z.nativeEnum(FlyByState)
+});
+
+export type MissionFlyByNodeSerialized = z.infer<typeof MissionFlyByNodeSerializedSchema>;

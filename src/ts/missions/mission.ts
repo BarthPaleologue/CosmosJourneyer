@@ -18,27 +18,10 @@
 import { MissionContext } from "./missionContext";
 import i18n from "../i18n";
 import { StarSystemCoordinates, UniverseObjectId } from "../utils/coordinates/universeCoordinates";
-import { deserializeMissionNode, MissionNode, MissionNodeSerialized } from "./nodes/deserializeNode";
+import { deserializeMissionNode } from "./nodes/deserializeNode";
+import { MissionNode } from "./nodes/missionNode";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-
-/**
- * Registered mission types. Those are used to display localized strings in the UI
- */
-export const enum MissionType {
-    SIGHT_SEEING_FLY_BY,
-    SIGHT_SEEING_TERMINATOR_LANDING,
-    SIGHT_SEEING_ASTEROID_FIELD
-}
-
-/**
- * Serialized mission object as stored in save files
- */
-export type MissionSerialized = {
-    missionGiver: UniverseObjectId;
-    type: MissionType;
-    tree: MissionNodeSerialized;
-    reward: number;
-};
+import { MissionType, MissionSerialized } from "./missionSerialized";
 
 /**
  * General mission abstraction. The mission can have any arbitrary task tree and reward.
