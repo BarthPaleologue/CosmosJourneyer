@@ -418,7 +418,7 @@ export class StarSystemDatabase {
      * @param model The system model to apply the plugins to.
      * @returns The modified system model, or a new system model.
      */
-    private applyPlugins(model: StarSystemModel): StarSystemModel {
+    private applyPlugins(model: StarSystemModel): DeepReadonly<StarSystemModel> {
         let newModel = model;
         const singlePlugin = this.coordinatesToSinglePlugins.get(JSON.stringify(model.coordinates));
         if (singlePlugin !== undefined) {
