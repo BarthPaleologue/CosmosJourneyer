@@ -8,7 +8,7 @@ import i18n from "../i18n";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import { safeParseSave } from "../saveFile/saveFileData";
 
-const parsedSaveData = safeParseSave(JSON.stringify(saveData));
+const parsedSaveData = safeParseSave(saveData);
 if (!parsedSaveData.success) {
     throw new Error("StationLandingTutorial: saveData is null");
 }

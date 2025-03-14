@@ -27,11 +27,11 @@ export type Save = z.infer<typeof SaveSchema>;
 
 /**
  * Parses a string into a SaveFileData object. Throws an error if the string is not a valid save file data.
- * @param jsonString The string to parse.
+ * @param json The string to parse.
  * @returns The parsed SaveFileData object. Returns null if the string is not valid.
  */
-export function safeParseSave(jsonString: unknown): Result<Save, SaveLoadingError> {
-    return safeParseSaveV1(jsonString);
+export function safeParseSave(json: Record<string, unknown>): Result<Save, SaveLoadingError> {
+    return safeParseSaveV1(json);
 }
 
 export function createUrlFromSave(data: Save): URL {
@@ -40,7 +40,7 @@ export function createUrlFromSave(data: Save): URL {
     return new URL(`${urlRoot}?save=${saveString}`);
 }
 
-export function parseSaveArray(rawSaves: unknown[]): { validSaves: Save[]; invalidSaves: unknown[] } {
+export function parseSaveArray(rawSaves: Record<string, unknown>[]): { validSaves: Save[]; invalidSaves: unknown[] } {
     const validSaves: Save[] = [];
     const invalidSaves: unknown[] = [];
 
@@ -56,15 +56,15 @@ export function parseSaveArray(rawSaves: unknown[]): { validSaves: Save[]; inval
     return { validSaves, invalidSaves };
 }
 
-export const CmdrSavesSurfaceSchema = z.object({
+export const CmdrSavesShallowSchema = z.object({
     /** The manual saves of the cmdr. */
-    manual: z.array(z.unknown()),
+    manual: z.array(z.record(z.string(), z.unknown())),
 
     /** The auto saves of the cmdr. */
-    auto: z.array(z.unknown())
+    auto: z.array(z.record(z.string(), z.unknown()))
 });
 
-export const CmdrSavesDeepSchema = CmdrSavesSurfaceSchema.extend({
+export const CmdrSavesDeepSchema = CmdrSavesShallowSchema.extend({
     /** The manual saves of the cmdr. */
     manual: z.array(SaveSchema),
 
@@ -74,4 +74,4 @@ export const CmdrSavesDeepSchema = CmdrSavesSurfaceSchema.extend({
 
 export type CmdrSaves = z.infer<typeof CmdrSavesDeepSchema>;
 
-export const SavesSchema = z.record(z.string().uuid(), CmdrSavesSurfaceSchema);
+export const SavesSchema = z.record(z.string().uuid(), CmdrSavesShallowSchema);

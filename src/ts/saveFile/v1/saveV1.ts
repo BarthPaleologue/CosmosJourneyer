@@ -44,8 +44,8 @@ export const SaveSchemaV1 = z.object({
  */
 export type SaveV1 = z.infer<typeof SaveSchemaV1>;
 
-export function safeParseSaveV1(data: unknown): Result<SaveV1, SaveLoadingError> {
-    const result = SaveSchemaV1.safeParse(data);
+export function safeParseSaveV1(json: Record<string, unknown>): Result<SaveV1, SaveLoadingError> {
+    const result = SaveSchemaV1.safeParse(json);
     if (result.success) {
         return ok(result.data);
     }
