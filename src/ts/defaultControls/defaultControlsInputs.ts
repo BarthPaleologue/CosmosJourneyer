@@ -4,10 +4,7 @@ import { InputDevices } from "../inputs/devices";
 import { AxisComposite } from "@brianchirls/game-input/browser";
 import { InputMap } from "../inputs/inputMap";
 
-const gamepad = InputDevices.GAMEPAD;
 const keyboard = InputDevices.KEYBOARD;
-
-const leftStick = gamepad.getControl("leftStick");
 
 // It takes four keys to go in four directions
 const kbdWASD = new DPadComposite({
@@ -22,7 +19,7 @@ const kbdWASD = new DPadComposite({
  * The action will respond to whichever control is used.
  */
 const moveAction = new Action({
-    bindings: [kbdWASD, leftStick]
+    bindings: [kbdWASD]
 });
 
 const keyboardSpeed = new AxisComposite({

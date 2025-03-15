@@ -17,20 +17,22 @@
 
 import { Tutorial } from "../../tutorials/tutorial";
 import { FlightTutorial } from "../../tutorials/flightTutorial";
-import { StationLandingTutorial } from "../../tutorials/stationLandingTutorial";
-import { FuelScoopTutorial } from "../../tutorials/fuelScoopTutorial";
 import i18n from "../../i18n";
 import { Observable } from "@babylonjs/core/Misc/observable";
+import { StationLandingTutorial } from "../../tutorials/stationLandingTutorial";
+import { FuelScoopTutorial } from "../../tutorials/fuelScoopTutorial";
 
 export class TutorialsPanelContent {
     readonly htmlRoot: HTMLElement;
     readonly onTutorialSelected: Observable<Tutorial> = new Observable<Tutorial>();
 
-    private readonly availableTutorials: Tutorial[] = [FlightTutorial, StationLandingTutorial, FuelScoopTutorial];
+    private readonly availableTutorials: ReadonlyArray<Tutorial>;
 
     constructor() {
         this.htmlRoot = document.createElement("div");
         this.htmlRoot.classList.add("tutorialsMenuContainer");
+
+        this.availableTutorials = [new FlightTutorial(), new StationLandingTutorial(), new FuelScoopTutorial()];
 
         this.availableTutorials.forEach((tutorial) => {
             const tutorialDiv = document.createElement("div");

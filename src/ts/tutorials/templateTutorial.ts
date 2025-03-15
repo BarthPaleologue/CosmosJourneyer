@@ -1,27 +1,50 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Affero General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Affero General Public License for more details.
+//
+//  You should have received a copy of the GNU Affero General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { TutorialControlsInputs } from "../ui/tutorial/tutorialLayerInputs";
 import { pressInteractionToStrings } from "../utils/strings/inputControlsString";
 import { Tutorial } from "./tutorial";
-
 import welcomeImageSrc from "../../asset/tutorials/flightTutorial/welcome.webp";
 import saveData from "../../asset/tutorials/flightTutorial/save.json";
 import i18n from "../i18n";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
-import { safeParseSave } from "../saveFile/saveFileData";
+import { safeParseSave, Save } from "../saveFile/saveFileData";
 
-const parsedSaveData = safeParseSave(saveData);
-if (!parsedSaveData.success) {
-    throw new Error("StationLandingTutorial: saveData is null");
-}
+export class TemplateTutorial implements Tutorial {
+    saveData: Save;
+    coverImageSrc = welcomeImageSrc;
 
-export const TemplateTutorial: Tutorial = {
+    constructor() {
+        const parsedSaveData = safeParseSave(saveData);
+        if (!parsedSaveData.success) {
+            throw new Error("StationLandingTutorial: saveData is null");
+        }
+
+        this.saveData = parsedSaveData.value;
+    }
+
     getTitle() {
         return "Template Tutorial";
-    },
-    saveData: parsedSaveData.value,
-    coverImageSrc: welcomeImageSrc,
+    }
+
     getDescription() {
         return "This is a template tutorial to help building more tutorials!";
-    },
+    }
+
     async getContentPanelsHtml(): Promise<string[]> {
         const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
         const welcomePanelHtml = `
@@ -55,4 +78,4 @@ export const TemplateTutorial: Tutorial = {
 
         return [welcomePanelHtml, endPanelHtml];
     }
-};
+}

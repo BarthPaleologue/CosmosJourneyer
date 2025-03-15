@@ -3,14 +3,12 @@ import { InputDevices } from "./devices";
 import Action from "@brianchirls/game-input/Action";
 import PressInteraction from "@brianchirls/game-input/interactions/PressInteraction";
 
-const gamepad = InputDevices.GAMEPAD;
 const keyboard = InputDevices.KEYBOARD;
 
 const togglePauseKey = keyboard.getControl("Escape");
-const togglePauseButton = gamepad.getControl("start");
 
 const togglePauseAction = new Action({
-    bindings: [togglePauseKey, togglePauseButton]
+    bindings: [togglePauseKey]
 });
 
 const togglePauseInteraction = new PressInteraction(togglePauseAction);
@@ -24,10 +22,9 @@ const toggleStarMapAction = new Action({
 const toggleStarMapInteraction = new PressInteraction(toggleStarMapAction);
 
 const screenshotKey = keyboard.getControl("KeyP");
-const screenshotButton = gamepad.getControl("select");
 
 const screenshotAction = new Action({
-    bindings: [screenshotKey, screenshotButton]
+    bindings: [screenshotKey]
 });
 
 const screenshotInteraction = new PressInteraction(screenshotAction);
