@@ -24,7 +24,7 @@ import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 describe("flightTutorial", () => {
     it("does spawn inside of the rings of the planet", () => {
         const starSystemDatabase = new StarSystemDatabase();
-        const flightTutorial = FlightTutorial;
+        const flightTutorial = new FlightTutorial();
 
         const planetModel = getObjectModelByUniverseId(
             flightTutorial.saveData.universeCoordinates.universeObjectId,

@@ -160,7 +160,7 @@ export class CosmosJourneyer {
             await this.createAutoSave();
 
             if (!this.player.tutorials.fuelScoopingCompleted) {
-                await this.tutorialLayer.setTutorial(FuelScoopTutorial);
+                await this.tutorialLayer.setTutorial(new FuelScoopTutorial());
                 this.tutorialLayer.onQuitTutorial.addOnce(() => {
                     this.player.tutorials.fuelScoopingCompleted = true;
                 });
@@ -198,7 +198,7 @@ export class CosmosJourneyer {
 
         this.mainMenu = new MainMenu(this.sidePanels, this.starSystemView, this.starSystemDatabase);
         this.mainMenu.onStartObservable.add(async () => {
-            await this.tutorialLayer.setTutorial(FlightTutorial);
+            await this.tutorialLayer.setTutorial(new FlightTutorial());
             await this.starSystemView.switchToSpaceshipControls();
             const spaceshipPosition = this.starSystemView.getSpaceshipControls().getTransform().getAbsolutePosition();
             const closestSpaceStation = this.starSystemView
@@ -245,7 +245,7 @@ export class CosmosJourneyer {
             const limitDistance = 10 * closestLandableFacility.getBoundingRadius();
             if (Vector3.DistanceSquared(shipPosition, facilityPosition) > limitDistance ** 2) return;
 
-            await this.tutorialLayer.setTutorial(StationLandingTutorial);
+            await this.tutorialLayer.setTutorial(new StationLandingTutorial());
             this.tutorialLayer.onQuitTutorial.addOnce(() => {
                 this.player.tutorials.stationLandingCompleted = true;
             });
