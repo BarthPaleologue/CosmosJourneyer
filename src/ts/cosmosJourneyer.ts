@@ -38,7 +38,6 @@ import { setRotationQuaternion } from "./uberCore/transforms/basicTransform";
 import { encodeBase64 } from "./utils/base64";
 import { StarSystemCoordinates, UniverseCoordinates } from "./utils/coordinates/universeCoordinates";
 import { View } from "./utils/view";
-import { updateInputDevices } from "./inputs/devices";
 import { AudioManager } from "./audio/audioManager";
 import { AudioMasks } from "./audio/audioMasks";
 import { GeneralInputs } from "./inputs/generalInputs";
@@ -479,7 +478,6 @@ export class CosmosJourneyer {
                 }
             }
 
-            updateInputDevices();
             updateNotifications(deltaSeconds);
             AudioManager.Update(deltaSeconds);
             Sounds.Update();
