@@ -1,4 +1,5 @@
 import { UniverseObjectId } from "../utils/coordinates/universeCoordinates";
+import { ok, Result } from "../utils/types";
 import { EncyclopaediaGalactica, SpaceDiscoveryData } from "./encyclopaediaGalactica";
 
 export class EncyclopaediaGalacticaManager implements EncyclopaediaGalactica {
@@ -23,13 +24,18 @@ export class EncyclopaediaGalacticaManager implements EncyclopaediaGalactica {
         return false;
     }
 
-    public async estimateDiscovery(object: UniverseObjectId): Promise<number> {
+    public async estimateDiscovery(object: UniverseObjectId): Promise<Result<number, string>> {
         let sum = 0;
         for (const backend of this.backends) {
-            sum += await backend.estimateDiscovery(object);
+            const result = await backend.estimateDiscovery(object);
+            if (!result.success) {
+                return result;
+            }
+
+            sum += result.value;
         }
 
-        return Promise.resolve(sum);
+        return ok(sum);
     }
 
     public getBackendString(): string {

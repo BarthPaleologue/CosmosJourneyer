@@ -119,8 +119,6 @@ export const Settings = {
 
     MAIN_FONT: "Nasalization",
 
-    SAVES_KEY: "saves",
-
     MAX_AUTO_SAVES: 5,
 
     SHARED_POSITION_SAVE_UUID: "sharedPositionSave",

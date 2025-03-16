@@ -21,7 +21,6 @@ import { axisCompositeToString, pressInteractionToStrings } from "../utils/strin
 import { AxisComposite } from "@brianchirls/game-input/browser";
 import { Tutorial } from "./tutorial";
 import i18n from "../i18n";
-
 import welcomeImageSrc from "../../asset/tutorials/flightTutorial/welcome.webp";
 import rotationImageSrc from "../../asset/tutorials/flightTutorial/rotation.webp";
 import thrustImageSrc from "../../asset/tutorials/flightTutorial/thrust.webp";
@@ -29,23 +28,29 @@ import warpImageSrc from "../../asset/tutorials/flightTutorial/warp.webp";
 import congratsImageSrc from "../../asset/tutorials/flightTutorial/congrats.webp";
 import saveData from "../../asset/tutorials/flightTutorial/save.json";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
-import { parseSaveFileData } from "../saveFile/saveFileData";
+import { safeParseSave, Save } from "../saveFile/saveFileData";
 
-const parsedSaveData = parseSaveFileData(JSON.stringify(saveData));
-if (parsedSaveData.data === null) {
-    throw new Error("StationLandingTutorial: saveData is null");
-}
+export class FlightTutorial implements Tutorial {
+    readonly coverImageSrc = welcomeImageSrc;
+    readonly saveData: Save;
 
-export const FlightTutorial: Tutorial = {
+    constructor() {
+        const parsedSaveDataResult = safeParseSave(saveData);
+        if (!parsedSaveDataResult.success) {
+            console.error(parsedSaveDataResult.error);
+            throw new Error("StationLandingTutorial: saveData is null");
+        }
+
+        this.saveData = parsedSaveDataResult.value;
+    }
+
     getTitle() {
         return i18n.t("tutorials:flightTutorial:title");
-    },
-    coverImageSrc: welcomeImageSrc,
+    }
+
     getDescription() {
         return i18n.t("tutorials:flightTutorial:description");
-    },
-
-    saveData: parsedSaveData.data,
+    }
 
     async getContentPanelsHtml(): Promise<string[]> {
         const keybordLayoutMap = await getGlobalKeyboardLayoutMap();
@@ -119,4 +124,4 @@ export const FlightTutorial: Tutorial = {
 
         return [welcomePanelHtml, rotationPanelHtml, thrustPanelHtml, warpPanelHtml, congratsPanelHtml];
     }
-};
+}

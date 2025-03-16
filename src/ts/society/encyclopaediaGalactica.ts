@@ -15,24 +15,29 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { UniverseObjectId } from "../utils/coordinates/universeCoordinates";
-/**
- * Information about a space discovery
- */
-export type SpaceDiscoveryData = {
+import { UniverseObjectId, UniverseObjectIdSchema } from "../utils/coordinates/universeCoordinates";
+import { z } from "zod";
+import { Result } from "../utils/types";
+
+export const SpaceDiscoveryDataSchema = z.object({
     /**
      * The ID of the object discovered.
      */
-    objectId: UniverseObjectId;
+    objectId: UniverseObjectIdSchema,
     /**
      * The timestamp at which the object was discovered.
      */
-    discoveryTimestamp: number;
+    discoveryTimestamp: z.number().default(0),
     /**
      * The name of the explorer who discovered the object.
      */
-    explorerName: string;
-};
+    explorerName: z.string().default("Unknown")
+});
+
+/**
+ * Information about a space discovery
+ */
+export type SpaceDiscoveryData = z.infer<typeof SpaceDiscoveryDataSchema>;
 
 /**
  * Database holding all the exploration data gathered by players.
@@ -57,7 +62,7 @@ export interface EncyclopaediaGalactica {
      * @param object The object to evaluate.
      * @returns The estimated value of the object in credits.
      */
-    estimateDiscovery(object: UniverseObjectId): Promise<number>;
+    estimateDiscovery(object: UniverseObjectId): Promise<Result<number, string>>;
 
     /**
      * Gets a human readable string for the encyclopaedia backend.

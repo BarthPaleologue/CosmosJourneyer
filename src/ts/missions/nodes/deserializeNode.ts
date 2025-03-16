@@ -15,38 +15,25 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { MissionNodeType } from "./missionNode";
-import { MissionAndNode, type MissionAndNodeSerialized } from "./logic/missionAndNode";
-import { MissionOrNode, type MissionOrNodeSerialized } from "./logic/missionOrNode";
+import { MissionAndNode } from "./logic/missionAndNode";
+import { MissionOrNode } from "./logic/missionOrNode";
+import { MissionAsteroidFieldNode } from "./actions/sightseeing/missionAsteroidFieldNode";
+import { MissionFlyByNode } from "./actions/sightseeing/missionFlyByNode";
+import { MissionFlyByNodeSerialized } from "./actions/sightseeing/missionFlyByNodeSerialized";
+import { MissionTerminatorLandingNode } from "./actions/sightseeing/missionTerminatorLandingNode";
+import { MissionXorNode } from "./logic/missionXorNode";
+import { MissionSequenceNode } from "./logic/missionSequenceNode";
+import { MissionNode } from "./missionNode";
+import { MissionNodeType } from "./missionNodeType";
 import {
-    MissionAsteroidFieldNode,
-    type MissionAsteroidFieldNodeSerialized
-} from "./actions/sightseeing/missionAsteroidFieldNode";
-import { MissionFlyByNode, type MissionFlyByNodeSerialized } from "./actions/sightseeing/missionFlyByNode";
-import {
-    MissionTerminatorLandingNode,
-    type MissionTerminatorLandingNodeSerialized
-} from "./actions/sightseeing/missionTerminatorLandingNode";
-import { MissionXorNode, type MissionXorNodeSerialized } from "./logic/missionXorNode";
-import { MissionSequenceNode, type MissionSequenceNodeSerialized } from "./logic/missionSequenceNode";
-
-export type MissionNodeSerialized =
-    | MissionAndNodeSerialized
-    | MissionOrNodeSerialized
-    | MissionXorNodeSerialized
-    | MissionSequenceNodeSerialized
-    | MissionAsteroidFieldNodeSerialized
-    | MissionFlyByNodeSerialized
-    | MissionTerminatorLandingNodeSerialized;
-
-export type MissionNode =
-    | MissionAndNode
-    | MissionOrNode
-    | MissionXorNode
-    | MissionSequenceNode
-    | MissionAsteroidFieldNode
-    | MissionFlyByNode
-    | MissionTerminatorLandingNode;
+    MissionAndNodeSerialized,
+    MissionNodeSerialized,
+    MissionOrNodeSerialized,
+    MissionSequenceNodeSerialized,
+    MissionXorNodeSerialized
+} from "./missionNodeSerialized";
+import { MissionAsteroidFieldNodeSerialized } from "./actions/sightseeing/missionAsteroidFieldNodeSerialized";
+import { MissionTerminatorLandingNodeSerialized } from "./actions/sightseeing/missionTerminatorLandingNodeSerialized";
 
 /**
  * Deserialize recursively a mission node.

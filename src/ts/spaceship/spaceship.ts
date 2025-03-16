@@ -48,40 +48,19 @@ import { Sounds } from "../assets/sounds";
 import { LandingPad } from "../assets/procedural/landingPad/landingPad";
 import { CelestialBody, OrbitalObject } from "../architecture/orbitalObject";
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
-import { FuelTank, SerializedFuelTank } from "./fuelTank";
-import { FuelScoop } from "./fuelScoop";
+import { FuelTank } from "./fuelTank";
+import { SerializedFuelScoop } from "./fuelScoop";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { LandingComputer, LandingComputerStatusBit, LandingTargetKind } from "./landingComputer";
 import { canEngageWarpDrive } from "./warpDriveUtils";
 import { distanceToAsteroidField } from "../utils/asteroidFields";
+import { SerializedSpaceship, DefaultSerializedSpaceship, ShipType } from "./serializedSpaceship";
 
 const enum ShipState {
     FLYING,
     LANDING,
     LANDED
 }
-
-export const enum ShipType {
-    WANDERER
-}
-
-export type SerializedSpaceship = {
-    id: string;
-    name: string;
-    type: ShipType;
-    fuelTanks: SerializedFuelTank[];
-    fuelScoop: FuelScoop | null;
-};
-
-export const DefaultSerializedSpaceship: SerializedSpaceship = {
-    id: crypto.randomUUID(),
-    name: "Wanderer",
-    type: ShipType.WANDERER,
-    fuelTanks: [{ currentFuel: 100, maxFuel: 100 }],
-    fuelScoop: {
-        fuelPerSecond: 2.5
-    }
-};
 
 export class Spaceship implements Transformable {
     readonly id: string;
@@ -130,7 +109,7 @@ export class Spaceship implements Transformable {
 
     readonly fuelTanks: FuelTank[];
 
-    readonly fuelScoop: FuelScoop | null;
+    readonly fuelScoop: SerializedFuelScoop | null;
     private isFuelScooping = false;
 
     readonly enableWarpDriveSound: AudioInstance;

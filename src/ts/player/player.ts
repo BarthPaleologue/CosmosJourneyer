@@ -15,46 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Mission, MissionSerialized } from "../missions/mission";
+import { Mission } from "../missions/mission";
 import { StarSystemCoordinates, UniverseObjectId } from "../utils/coordinates/universeCoordinates";
 import { warnIfUndefined } from "../utils/notification";
-import { DefaultSerializedSpaceship, SerializedSpaceship, Spaceship } from "../spaceship/spaceship";
+import { Spaceship } from "../spaceship/spaceship";
+import { DefaultSerializedSpaceship, SerializedSpaceship } from "../spaceship/serializedSpaceship";
 import { SpaceDiscoveryData } from "../society/encyclopaediaGalactica";
 import { Observable } from "@babylonjs/core/Misc/observable";
-
-export type CompletedTutorials = {
-    stationLandingCompleted: boolean;
-    fuelScoopingCompleted: boolean;
-};
-
-export type SerializedPlayer = {
-    uuid: string;
-
-    name: string;
-
-    balance: number;
-
-    creationDate: string;
-
-    timePlayedSeconds: number;
-
-    visitedSystemHistory: StarSystemCoordinates[];
-
-    discoveries: {
-        local: SpaceDiscoveryData[];
-        uploaded: SpaceDiscoveryData[];
-    };
-
-    currentItinerary: StarSystemCoordinates[];
-    systemBookmarks: StarSystemCoordinates[];
-
-    currentMissions: MissionSerialized[];
-    completedMissions: MissionSerialized[];
-
-    spaceShips: SerializedSpaceship[];
-
-    tutorials: CompletedTutorials;
-};
+import { CompletedTutorials, SerializedPlayer } from "./serializedPlayer";
 
 export class Player {
     uuid: string;

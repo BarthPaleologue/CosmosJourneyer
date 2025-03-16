@@ -4,12 +4,11 @@ import { InputDevices } from "../inputs/devices";
 import { AxisComposite } from "@brianchirls/game-input/browser";
 import { InputMap } from "../inputs/inputMap";
 
-const gamepad = InputDevices.GAMEPAD;
 const keyboard = InputDevices.KEYBOARD;
 const pointer = InputDevices.POINTER;
 
 const landingAction = new Action({
-    bindings: [keyboard.getControl("KeyL"), gamepad.getControl("A")]
+    bindings: [keyboard.getControl("KeyL")]
 });
 
 const landingInteraction = new PressInteraction(landingAction);

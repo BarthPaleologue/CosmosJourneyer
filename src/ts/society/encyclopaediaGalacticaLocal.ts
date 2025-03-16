@@ -5,6 +5,7 @@ import { TelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatell
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { getObjectModelByUniverseId } from "../utils/coordinates/orbitalObjectId";
 import { UniverseObjectId } from "../utils/coordinates/universeCoordinates";
+import { err, ok, Result } from "../utils/types";
 import { EncyclopaediaGalactica, SpaceDiscoveryData } from "./encyclopaediaGalactica";
 
 export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
@@ -63,14 +64,14 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
         return multiplier;
     }
 
-    public async estimateDiscovery(object: UniverseObjectId): Promise<number> {
+    public async estimateDiscovery(object: UniverseObjectId): Promise<Result<number, string>> {
         if (await this.hasObjectBeenDiscovered(object)) {
-            return Promise.resolve(this.redundantDataPrice);
+            return ok(this.redundantDataPrice);
         }
 
         const model = getObjectModelByUniverseId(object, this.starSystemDatabase);
         if (model === null) {
-            return Promise.reject("Object model not found for object ID");
+            return err("Object model not found for object ID");
         }
         const systemGalacticPosition = this.starSystemDatabase.getSystemGalacticPosition(object.starSystemCoordinates);
 
@@ -112,7 +113,7 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
                 break;
         }
 
-        return Promise.resolve(Math.ceil(valueFromDistance * objectTypeMultiplier));
+        return ok(Math.ceil(valueFromDistance * objectTypeMultiplier));
     }
 
     public reset() {

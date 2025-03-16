@@ -3,7 +3,6 @@ import Action from "@brianchirls/game-input/Action";
 import { InputMap } from "./inputMap";
 import { InputDevices } from "./devices";
 
-const gamepad = InputDevices.GAMEPAD;
 const keyboard = InputDevices.KEYBOARD;
 
 const setTargetAction = new Action({

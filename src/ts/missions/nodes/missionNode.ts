@@ -15,78 +15,19 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { MissionContext } from "../missionContext";
+import type { MissionAsteroidFieldNode } from "./actions/sightseeing/missionAsteroidFieldNode";
+import type { MissionFlyByNode } from "./actions/sightseeing/missionFlyByNode";
+import type { MissionTerminatorLandingNode } from "./actions/sightseeing/missionTerminatorLandingNode";
+import type { MissionAndNode } from "./logic/missionAndNode";
+import type { MissionOrNode } from "./logic/missionOrNode";
+import type { MissionSequenceNode } from "./logic/missionSequenceNode";
+import type { MissionXorNode } from "./logic/missionXorNode";
 
-import { StarSystemCoordinates } from "../../utils/coordinates/universeCoordinates";
-import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
-import type { MissionNode } from "./deserializeNode";
-
-/**
- * Describes any node in the mission tree.
- */
-export interface MissionNodeBase<T extends MissionNodeType> {
-    /**
-     * Returns true if the node is completed, false otherwise.
-     */
-    isCompleted(): boolean;
-
-    /**
-     * Updates the state of the node recursively.
-     * @param context The mission context.
-     */
-    updateState(context: MissionContext): void;
-
-    /**
-     * Returns true if the node is equal to another node, false otherwise.
-     * @param other The other node to compare to.
-     */
-    equals(other: MissionNode): boolean;
-
-    /**
-     * Describes the node recursively.
-     * @param originSystemCoordinates The seed of the system where the mission has been given.
-     */
-    describe(originSystemCoordinates: StarSystemCoordinates, starSystemDatabase: StarSystemDatabase): string;
-
-    /**
-     * Describes the next task to be done in the mission subtree.
-     * @param context The mission context.
-     * @param keyboardLayout The keyboard layout map to localize the keys.
-     */
-    describeNextTask(
-        context: MissionContext,
-        keyboardLayout: Map<string, string>,
-        starSystemDatabase: StarSystemDatabase
-    ): string;
-
-    /**
-     * Returns the target systems of the subtree.
-     */
-    getTargetSystems(): StarSystemCoordinates[];
-
-    /**
-     * Serializes the node recursively.
-     */
-    serialize(): MissionNodeSerializedBase<T>;
-}
-
-/**
- * Describes the type of mission node. Useful for serialization/deserialization.
- */
-export const enum MissionNodeType {
-    FLY_BY = 0,
-    TERMINATOR_LANDING = 1,
-    ASTEROID_FIELD = 2,
-    AND = 1000,
-    OR = 1001,
-    XOR = 1002,
-    SEQUENCE = 1003
-}
-
-/**
- * Base type for all serialized mission nodes.
- * Nodes should specialize this type with their relevant fields.
- */
-export type MissionNodeSerializedBase<T extends MissionNodeType> = {
-    type: T;
-};
+export type MissionNode =
+    | MissionAndNode
+    | MissionOrNode
+    | MissionXorNode
+    | MissionSequenceNode
+    | MissionAsteroidFieldNode
+    | MissionFlyByNode
+    | MissionTerminatorLandingNode;

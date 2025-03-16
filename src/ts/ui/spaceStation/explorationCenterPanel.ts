@@ -25,6 +25,7 @@ import { EncyclopaediaGalacticaOnline } from "../../society/encyclopaediaGalacti
 import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
 import { getObjectModelByUniverseId } from "../../utils/coordinates/orbitalObjectId";
 import { connectEncyclopaediaGalacticaModal } from "../../utils/dialogModal";
+import { createNotification, NotificationIntent, NotificationOrigin } from "../../utils/notification";
 import { DiscoveryDetails } from "./discoveryDetails";
 
 const enum ExplorationCenterFilter {
@@ -103,8 +104,12 @@ export class ExplorationCenterPanel {
             Sounds.SUCCESS.play();
 
             for (const discovery of this.player.discoveries.local) {
-                const value = await encyclopaedia.estimateDiscovery(discovery.objectId);
-                player.earn(value);
+                const valueResult = await encyclopaedia.estimateDiscovery(discovery.objectId);
+                if (!valueResult.success) {
+                    createNotification(NotificationOrigin.GENERAL, NotificationIntent.ERROR, valueResult.error, 5_000);
+                    continue;
+                }
+                player.earn(valueResult.value);
                 player.discoveries.local = player.discoveries.local.filter((d) => d !== discovery);
                 player.discoveries.uploaded.push(discovery);
             }
@@ -186,7 +191,13 @@ export class ExplorationCenterPanel {
 
         let totalValue = 0;
         for (const discovery of this.player.discoveries.local) {
-            totalValue += await this.encyclopaedia.estimateDiscovery(discovery.objectId);
+            const result = await this.encyclopaedia.estimateDiscovery(discovery.objectId);
+            if (!result.success) {
+                createNotification(NotificationOrigin.GENERAL, NotificationIntent.ERROR, result.error, 5_000);
+                continue;
+            }
+
+            totalValue += result.value;
         }
         this.sellAllButton.toggleAttribute("disabled", totalValue === 0);
         this.sellAllButton.innerText = i18n.t("common:sellAllFor", {

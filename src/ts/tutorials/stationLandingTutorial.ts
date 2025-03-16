@@ -1,7 +1,23 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Affero General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Affero General Public License for more details.
+//
+//  You should have received a copy of the GNU Affero General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { TutorialControlsInputs } from "../ui/tutorial/tutorialLayerInputs";
 import { pressInteractionToStrings } from "../utils/strings/inputControlsString";
 import { Tutorial } from "./tutorial";
-
 import station1ImageSrc from "../../asset/tutorials/stationLandingTutorial/station1.webp";
 import stationLandingBayImageSrc from "../../asset/tutorials/stationLandingTutorial/stationLandingBay.webp";
 import stationPadApproachImageSrc from "../../asset/tutorials/stationLandingTutorial/stationPadApproach.webp";
@@ -10,22 +26,31 @@ import saveData from "../../asset/tutorials/stationLandingTutorial/save.json";
 import i18n from "../i18n";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
-import { parseSaveFileData } from "../saveFile/saveFileData";
+import { safeParseSave, Save } from "../saveFile/saveFileData";
 
-const parsedSaveData = parseSaveFileData(JSON.stringify(saveData));
-if (parsedSaveData.data === null) {
-    throw new Error("StationLandingTutorial: saveData is null");
-}
+export class StationLandingTutorial implements Tutorial {
+    coverImageSrc = station1ImageSrc;
 
-export const StationLandingTutorial: Tutorial = {
+    saveData: Save;
+
+    constructor() {
+        const parsedSaveDataResult = safeParseSave(saveData);
+        if (!parsedSaveDataResult.success) {
+            console.error(parsedSaveDataResult.error);
+            throw new Error("StationLandingTutorial: saveData is null");
+        }
+
+        this.saveData = parsedSaveDataResult.value;
+    }
+
     getTitle() {
         return i18n.t("tutorials:stationLanding:title");
-    },
-    coverImageSrc: station1ImageSrc,
+    }
+
     getDescription() {
         return i18n.t("tutorials:stationLanding:description");
-    },
-    saveData: parsedSaveData.data,
+    }
+
     async getContentPanelsHtml(): Promise<string[]> {
         const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
         const presentationPanelHtml = `
@@ -92,4 +117,4 @@ export const StationLandingTutorial: Tutorial = {
 
         return [presentationPanelHtml, landingRequestPanelHtml, landingPanelHtml, stationServicesPanelHtml];
     }
-};
+}

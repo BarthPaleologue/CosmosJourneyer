@@ -15,17 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { MissionNodeBase, MissionNodeSerializedBase, MissionNodeType } from "../missionNode";
+import { MissionAndNodeSerialized } from "../missionNodeSerialized";
+import { MissionNodeType } from "../missionNodeType";
+import { MissionNodeBase } from "../missionNodeBase";
 import { MissionContext } from "../../missionContext";
 import i18n from "../../../i18n";
 
 import { StarSystemCoordinates } from "../../../utils/coordinates/universeCoordinates";
 import { StarSystemDatabase } from "../../../starSystem/starSystemDatabase";
-import type { MissionNode, MissionNodeSerialized } from "../deserializeNode";
-
-export type MissionAndNodeSerialized = MissionNodeSerializedBase<MissionNodeType.AND> & {
-    children: MissionNodeSerialized[];
-};
+import type { MissionNode } from "../missionNode";
 
 /**
  * Node used to describe a set of tasks that must all be completed in any order.

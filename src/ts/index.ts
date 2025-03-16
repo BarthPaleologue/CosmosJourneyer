@@ -19,37 +19,75 @@ import "../styles/index.scss";
 
 import { CosmosJourneyer } from "./cosmosJourneyer";
 import { Player } from "./player/player";
-import { parseSaveFileData } from "./saveFile/saveFileData";
+import { safeParseSave } from "./saveFile/saveFileData";
 import { Settings } from "./settings";
 import { decodeBase64 } from "./utils/base64";
+import { UniverseCoordinatesSchema } from "./utils/coordinates/universeCoordinates";
 import { alertModal } from "./utils/dialogModal";
-import { createNotification, NotificationIntent, NotificationOrigin } from "./utils/notification";
+import { jsonSafeParse } from "./utils/json";
 
-const engine = await CosmosJourneyer.CreateAsync();
-
-const urlParams = new URLSearchParams(window.location.search);
-const universeCoordinatesString = urlParams.get("universeCoordinates");
-const saveString = urlParams.get("save");
-
-if (universeCoordinatesString !== null) {
-    engine.player.copyFrom(Player.Default());
-    engine.player.uuid = Settings.SHARED_POSITION_SAVE_UUID;
-    const jsonString = decodeBase64(universeCoordinatesString);
-    await engine.loadUniverseCoordinates(JSON.parse(jsonString));
-    engine.starSystemView.setUIEnabled(true);
-} else if (saveString !== null) {
-    const jsonString = decodeBase64(saveString);
-    const result = parseSaveFileData(jsonString);
-    result.logs.forEach((log) => {
-        createNotification(NotificationOrigin.GENERAL, NotificationIntent.WARNING, log, 5_000);
-        console.warn(log);
-    });
-    if (result.data !== null) {
-        await engine.loadSave(result.data);
-        engine.starSystemView.setUIEnabled(true);
-    } else {
-        await alertModal("Error, this save file is invalid. See the console for more details.");
-    }
-} else {
+async function simpleInit(engine: CosmosJourneyer) {
     await engine.init(false);
 }
+
+async function initWithCoordinatesString(engine: CosmosJourneyer, universeCoordinatesString: string) {
+    engine.player.copyFrom(Player.Default());
+    engine.player.uuid = Settings.SHARED_POSITION_SAVE_UUID;
+
+    const jsonString = decodeBase64(universeCoordinatesString);
+    const parsedJson = jsonSafeParse(jsonString);
+    if (parsedJson === null) {
+        await alertModal("Error, this universe coordinates URL data is not a valid json.");
+        return await simpleInit(engine);
+    }
+
+    const universeCoordinates = UniverseCoordinatesSchema.safeParse(parsedJson);
+    if (!universeCoordinates.success) {
+        console.error(universeCoordinates.error);
+        await alertModal(
+            "Error, this universe coordinates URL data do not match the expected schema. Check the console for more information."
+        );
+        return await simpleInit(engine);
+    }
+
+    await engine.loadUniverseCoordinates(universeCoordinates.data);
+    engine.starSystemView.setUIEnabled(true);
+}
+
+async function initWithSaveString(engine: CosmosJourneyer, saveString: string) {
+    const jsonString = decodeBase64(saveString);
+    const json = jsonSafeParse(jsonString);
+    if (json === null) {
+        await alertModal("Error, this save file is not a valid json.");
+        return await simpleInit(engine);
+    }
+
+    const result = safeParseSave(json);
+    if (!result.success) {
+        await alertModal("Error, this save file is invalid. See the console for more details.");
+        return await simpleInit(engine);
+    }
+
+    await engine.loadSave(result.value);
+    engine.starSystemView.setUIEnabled(true);
+}
+
+async function startCosmosJourneyer() {
+    const engine = await CosmosJourneyer.CreateAsync();
+
+    const urlParams = new URLSearchParams(window.location.search);
+
+    const universeCoordinatesString = urlParams.get("universeCoordinates");
+    if (universeCoordinatesString !== null) {
+        return await initWithCoordinatesString(engine, universeCoordinatesString);
+    }
+
+    const saveString = urlParams.get("save");
+    if (saveString !== null) {
+        return await initWithSaveString(engine, saveString);
+    }
+
+    await simpleInit(engine);
+}
+
+await startCosmosJourneyer();

@@ -73,8 +73,8 @@ export default [
             "no-restricted-syntax": [
                 "error",
                 {
-                    selector: "TSEnumDeclaration:not([const=true])",
-                    message: "Don't declare non-const enums"
+                    selector: "CallExpression[callee.object.name='Promise'][callee.property.name='reject']",
+                    message: "Using Promise.reject() is not allowed. Consider using Promise<Result> instead."
                 }
             ],
 
