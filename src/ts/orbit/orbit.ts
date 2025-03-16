@@ -92,8 +92,8 @@ export function keplerEquation(trueAnomaly: number, meanAnomaly: number, eccentr
  * @see https://medium.com/@barth_29567/crazy-orbits-lets-make-squares-c91a427c6b26
  */
 export function getPointOnOrbitLocal(orbit: DeepReadonly<Orbit>, parentMass: number, t: number): Vector3 {
-    const meanAnomaly =
-        orbit.initialMeanAnomaly - (2 * Math.PI * t) / getOrbitalPeriod(orbit.semiMajorAxis, parentMass);
+    const orbitalPeriod = getOrbitalPeriod(orbit.semiMajorAxis, parentMass);
+    const meanAnomaly = orbitalPeriod > 0 ? orbit.initialMeanAnomaly - (2 * Math.PI * t) / orbitalPeriod : 0;
 
     const trueAnomaly = findMinimumNewtonRaphson(
         (trueAnomaly) => keplerEquation(trueAnomaly, meanAnomaly, orbit.eccentricity),
