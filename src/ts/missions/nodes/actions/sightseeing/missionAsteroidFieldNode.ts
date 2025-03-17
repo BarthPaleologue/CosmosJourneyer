@@ -32,7 +32,6 @@ import { parseDistance } from "../../../../utils/strings/parseToStrings";
 import { Settings } from "../../../../settings";
 import { getGoToSystemInstructions } from "../../../common";
 import { StarSystemDatabase } from "../../../../starSystem/starSystemDatabase";
-import { z } from "zod";
 import { AsteroidFieldMissionState, MissionAsteroidFieldNodeSerialized } from "./missionAsteroidFieldNodeSerialized";
 
 /**
