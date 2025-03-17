@@ -174,6 +174,10 @@ export class SaveLoadingPanelContent {
             shareButton.addEventListener("click", async () => {
                 Sounds.MENU_SELECT_SOUND.play();
                 const url = createUrlFromSave(latestSave);
+                if (url === null) {
+                    await alertModal("Could not create a URL from the save file.");
+                    return;
+                }
                 await navigator.clipboard.writeText(url.toString()).then(() => {
                     createNotification(
                         NotificationOrigin.GENERAL,
@@ -302,6 +306,10 @@ export class SaveLoadingPanelContent {
         shareButton.addEventListener("click", async () => {
             Sounds.MENU_SELECT_SOUND.play();
             const url = createUrlFromSave(save);
+            if (url === null) {
+                await alertModal("Could not create a URL from the save file.");
+                return;
+            }
             await navigator.clipboard.writeText(url.toString()).then(() => {
                 createNotification(
                     NotificationOrigin.GENERAL,

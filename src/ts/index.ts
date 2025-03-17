@@ -31,6 +31,7 @@ async function initWithSaveString(engine: CosmosJourneyer, saveString: string) {
     const jsonString = decodeBase64(saveString);
     const json = jsonSafeParse(jsonString);
     if (json === null) {
+        console.error(jsonString);
         await alertModal("Error, this save file is not a valid json.");
         return await simpleInit(engine);
     }

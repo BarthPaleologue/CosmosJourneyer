@@ -38,9 +38,13 @@ export function safeParseSave(
     return safeParseSaveV2(json, starSystemDatabase);
 }
 
-export function createUrlFromSave(data: Save): URL {
+export function createUrlFromSave(data: Save): URL | null {
     const urlRoot = window.location.href.split("?")[0];
     const saveString = encodeBase64(JSON.stringify(data));
+    if (saveString === null) {
+        return null;
+    }
+
     return new URL(`${urlRoot}?save=${saveString}`);
 }
 

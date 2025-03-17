@@ -267,6 +267,11 @@ export class CosmosJourneyer {
                 const save = this.generateSaveData();
                 save.player.uuid = Settings.SHARED_POSITION_SAVE_UUID;
                 const url = createUrlFromSave(save);
+                if (url === null) {
+                    await alertModal("Could not create a shareable link.");
+                    return;
+                }
+
                 await navigator.clipboard.writeText(url.toString()).then(() => {
                     createNotification(
                         NotificationOrigin.GENERAL,
