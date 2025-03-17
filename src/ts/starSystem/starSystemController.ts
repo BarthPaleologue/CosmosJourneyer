@@ -47,6 +47,7 @@ import {
 } from "../architecture/orbitalObject";
 import { OrbitalObjectUtils } from "../architecture/orbitalObjectUtils";
 import { DeepReadonly } from "../utils/types";
+import { OrbitalObjectId } from "../utils/coordinates/orbitalObjectId";
 
 export type PlanetarySystem = {
     readonly planets: Planet[];
@@ -769,6 +770,10 @@ export class StarSystemController {
 
     public getReferencePlaneRotation(): Matrix {
         return this.referencePlaneRotation;
+    }
+
+    public getOrbitalObjectById(id: OrbitalObjectId) {
+        return this.getOrbitalObjects().find((object) => object.model.id === id);
     }
 
     /**
