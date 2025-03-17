@@ -69,7 +69,13 @@ export class StarSystemDatabase {
      */
     private readonly universeDensity: (starSectorX: number, starSectorY: number, starSectorZ: number) => number;
 
-    constructor() {
+    /**
+     * Fallback system that is guaranteed to exist
+     * This can be useful for default mechanisms relying on finding a system in the database if nothing is found
+     */
+    readonly fallbackSystem: DeepReadonly<StarSystemModel>;
+
+    constructor(fallbackSystem: StarSystemModel) {
         const densityRng = getRngFromSeed(Settings.UNIVERSE_SEED);
         let densitySampleStep = 0;
         const densityPerlin = makeNoise3D(() => {
@@ -78,6 +84,8 @@ export class StarSystemDatabase {
 
         this.universeDensity = (x: number, y: number, z: number) =>
             (1.0 - Math.abs(densityPerlin(x * 0.2, y * 0.2, z * 0.2))) ** 8;
+
+        this.fallbackSystem = fallbackSystem;
     }
 
     /**
@@ -171,6 +179,10 @@ export class StarSystemDatabase {
      * @returns The StarSystemModel for the given coordinates, or null if the system is not found.
      */
     public getSystemModelFromCoordinates(coordinates: StarSystemCoordinates): DeepReadonly<StarSystemModel> | null {
+        if (starSystemCoordinatesEquals(coordinates, this.fallbackSystem.coordinates)) {
+            return this.fallbackSystem;
+        }
+
         const customSystem = this.getCustomSystemFromCoordinates(coordinates);
         if (customSystem !== undefined) {
             return this.applyPlugins(customSystem);
@@ -230,15 +242,26 @@ export class StarSystemDatabase {
         sectorX: number,
         sectorY: number,
         sectorZ: number
-    ): ReadonlyArray<StarSystemCoordinates> {
+    ): DeepReadonly<Array<StarSystemCoordinates>> {
+        const result: Array<DeepReadonly<StarSystemCoordinates>> = [];
         const generatedSystemCoordinates = this.getGeneratedSystemCoordinatesInStarSector(sectorX, sectorY, sectorZ);
+        result.push(...generatedSystemCoordinates);
 
         const customSystemModels = this.getCustomSystemsFromSector(sectorX, sectorY, sectorZ);
         const customSystemCoordinates = customSystemModels.map((model) => {
             return model.coordinates;
         });
+        result.push(...customSystemCoordinates);
 
-        return generatedSystemCoordinates.concat(customSystemCoordinates);
+        if (
+            this.fallbackSystem.coordinates.starSectorX === sectorX &&
+            this.fallbackSystem.coordinates.starSectorY === sectorY &&
+            this.fallbackSystem.coordinates.starSectorZ === sectorZ
+        ) {
+            result.push(this.fallbackSystem.coordinates);
+        }
+
+        return result;
     }
 
     /**
@@ -352,6 +375,20 @@ export class StarSystemDatabase {
         const localPositions: Vector3[] = [];
 
         localPositions.push(...this.getGeneratedLocalPositionsInStarSector(sectorX, sectorY, sectorZ));
+
+        if (
+            this.fallbackSystem.coordinates.starSectorX === sectorX &&
+            this.fallbackSystem.coordinates.starSectorY === sectorY &&
+            this.fallbackSystem.coordinates.starSectorZ === sectorZ
+        ) {
+            localPositions.push(
+                new Vector3(
+                    this.fallbackSystem.coordinates.localX,
+                    this.fallbackSystem.coordinates.localY,
+                    this.fallbackSystem.coordinates.localZ
+                )
+            );
+        }
 
         const customSystemModels = this.getCustomSystemsFromSector(sectorX, sectorY, sectorZ);
 

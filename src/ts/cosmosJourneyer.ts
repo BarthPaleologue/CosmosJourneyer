@@ -65,6 +65,7 @@ import { registerCustomSystems } from "./starSystem/customSystems/registerCustom
 import { SaveManager } from "./saveFile/saveManager";
 import { SaveLocalBackend } from "./saveFile/saveLocalBackend";
 import { saveLoadingErrorToI18nString } from "./saveFile/saveLoadingError";
+import { getLoneStarSystem } from "./starSystem/customSystems/loneStar";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -380,7 +381,7 @@ export class CosmosJourneyer {
         const havokInstance = await HavokPhysics();
         console.log(`Havok initialized`);
 
-        const starSystemDatabase = new StarSystemDatabase();
+        const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
         registerCustomSystems(starSystemDatabase);
 
         const player = Player.Default();

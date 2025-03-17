@@ -16,8 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { z } from "zod";
-import { SystemObjectIdSchema, systemObjectIdEquals } from "./universeCoordinates";
 import { StarSystemCoordinatesSchema, starSystemCoordinatesEquals } from "./starSystemCoordinates";
+import { systemObjectIdEquals, SystemObjectIdSchema } from "./universeCoordinates";
 
 export const UniverseObjectIdSchema = z.object({
     ...SystemObjectIdSchema.shape,

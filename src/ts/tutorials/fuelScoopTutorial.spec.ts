@@ -19,11 +19,12 @@ import { describe, expect, it } from "vitest";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { FuelScoopTutorial } from "./fuelScoopTutorial";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
+import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
 import { getObjectModelByUniverseId } from "../utils/coordinates/orbitalObjectIdUtils";
 
 describe("FuelScoopTutorial", () => {
     it("spawns near a star", () => {
-        const starSystemDatabase = new StarSystemDatabase();
+        const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
         const tutorial = new FuelScoopTutorial();
 
         const stationModel = getObjectModelByUniverseId(

@@ -20,10 +20,11 @@ import { FlightTutorial } from "./flightTutorial";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { getObjectModelByUniverseId } from "../utils/coordinates/orbitalObjectIdUtils";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
+import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
 
 describe("flightTutorial", () => {
     it("spawns inside of the rings of the planet", () => {
-        const starSystemDatabase = new StarSystemDatabase();
+        const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
         const flightTutorial = new FlightTutorial();
 
         const planetModel = getObjectModelByUniverseId(

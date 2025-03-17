@@ -20,9 +20,10 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { starSystemCoordinatesEquals } from "../src/ts/utils/coordinates/starSystemCoordinates";
 import { StarSystemDatabase } from "../src/ts/starSystem/starSystemDatabase";
 import { expect, test } from "vitest";
+import { getLoneStarSystem } from "../src/ts/starSystem/customSystems/loneStar";
 
 test("getNeighborStarSystemCoordinates", () => {
-    const starSystemDatabase = new StarSystemDatabase();
+    const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
 
     const systemCoordinates = starSystemDatabase.getSystemCoordinatesFromSeed(0.0, 0.0, 0.0, 0);
 

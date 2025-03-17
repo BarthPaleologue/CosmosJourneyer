@@ -20,10 +20,11 @@ import { StationLandingTutorial } from "./stationLandingTutorial";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { getObjectModelByUniverseId } from "../utils/coordinates/orbitalObjectIdUtils";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
+import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
 
 describe("StationLandingTutorial", () => {
     it("spawns near a space station", () => {
-        const starSystemDatabase = new StarSystemDatabase();
+        const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
         const tutorial = new StationLandingTutorial();
 
         const stationModel = getObjectModelByUniverseId(
