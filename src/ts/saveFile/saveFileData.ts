@@ -18,10 +18,11 @@
 import { encodeBase64 } from "../utils/base64";
 import { z } from "zod";
 import { Result } from "../utils/types";
-import { safeParseSaveV1, SaveSchemaV1 } from "./v1/saveV1";
 import { SaveLoadingError } from "./saveLoadingError";
+import { safeParseSaveV2, SaveSchemaV2 } from "./v2/saveV2";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 
-export const SaveSchema = SaveSchemaV1;
+export const SaveSchema = SaveSchemaV2;
 
 export type Save = z.infer<typeof SaveSchema>;
 
@@ -30,8 +31,11 @@ export type Save = z.infer<typeof SaveSchema>;
  * @param json The string to parse.
  * @returns The parsed SaveFileData object. Returns null if the string is not valid.
  */
-export function safeParseSave(json: Record<string, unknown>): Result<Save, SaveLoadingError> {
-    return safeParseSaveV1(json);
+export function safeParseSave(
+    json: Record<string, unknown>,
+    starSystemDatabase: StarSystemDatabase
+): Result<Save, SaveLoadingError> {
+    return safeParseSaveV2(json, starSystemDatabase);
 }
 
 export function createUrlFromSave(data: Save): URL {
@@ -40,16 +44,19 @@ export function createUrlFromSave(data: Save): URL {
     return new URL(`${urlRoot}?save=${saveString}`);
 }
 
-export function parseSaveArray(rawSaves: Record<string, unknown>[]): { validSaves: Save[]; invalidSaves: unknown[] } {
+export function parseSaveArray(
+    rawSaves: Record<string, unknown>[],
+    starSystemDatabase: StarSystemDatabase
+): { validSaves: Save[]; invalidSaves: { save: unknown; error: SaveLoadingError }[] } {
     const validSaves: Save[] = [];
-    const invalidSaves: unknown[] = [];
+    const invalidSaves: { save: unknown; error: SaveLoadingError }[] = [];
 
     for (const save of rawSaves) {
-        const result = safeParseSave(save);
+        const result = safeParseSave(save, starSystemDatabase);
         if (result.success) {
             validSaves.push(result.value);
         } else {
-            invalidSaves.push(save);
+            invalidSaves.push({ save, error: result.error });
         }
     }
 

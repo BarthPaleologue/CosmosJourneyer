@@ -52,7 +52,6 @@ import { Player } from "../player/player";
 import { Settings } from "../settings";
 import { getRgbFromTemperature } from "../utils/specrend";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/starSystemCoordinates";
-import { StarSystemModelUtils } from "../starSystem/starSystemModel";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { EncyclopaediaGalactica } from "../society/encyclopaediaGalactica";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
@@ -525,7 +524,7 @@ export class StarMap implements View {
         }
 
         //TODO: when implementing binary star systems, this will need to be updated to display all stellar objects and not just the first one
-        const stellarObjectModel = StarSystemModelUtils.GetStellarObjects(starSystemModel)[0];
+        const stellarObjectModel = starSystemModel.stellarObjects[0];
 
         const instanceName = JSON.stringify(starSystemCoordinates);
 

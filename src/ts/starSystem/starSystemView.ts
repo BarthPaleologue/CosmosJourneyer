@@ -65,14 +65,11 @@ import { SpaceStationLayer } from "../ui/spaceStation/spaceStationLayer";
 import { Player } from "../player/player";
 import { getNeighborStarSystemCoordinates } from "../utils/getNeighborStarSystems";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
-import { getUniverseObjectId } from "../utils/coordinates/orbitalObjectIdUtils";
 import { DefaultControlsInputs } from "../defaultControls/defaultControlsInputs";
 import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import { MissionContext } from "../missions/missionContext";
 import { Mission } from "../missions/mission";
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/starSystemCoordinates";
-import { UniverseObjectId } from "../utils/coordinates/universeObjectId";
 import { StarSystemModel } from "./starSystemModel";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { Spaceship } from "../spaceship/spaceship";
@@ -84,6 +81,9 @@ import { StarSystemDatabase } from "./starSystemDatabase";
 import { AiPlayerControls } from "../player/aiPlayerControls";
 import { LandingPadSize } from "../assets/procedural/landingPad/landingPad";
 import "@babylonjs/inspector";
+import { getUniverseObjectId, UniverseObjectId } from "../utils/coordinates/universeObjectId";
+import { starSystemCoordinatesEquals, StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
+import { StarSystemLoader } from "./starSystemLoader";
 import { DeepReadonly } from "../utils/types";
 
 // register cosmos journeyer as part of window object
@@ -174,6 +174,11 @@ export class StarSystemView implements View {
      * @private
      */
     private starSystem: StarSystemController | null = null;
+
+    /**
+     * The star system loader used to load the star system. It is constant for the whole game.
+     */
+    readonly loader: StarSystemLoader = new StarSystemLoader();
 
     /**
      * The chunk forge used to generate surface chunks for telluric planets. It is constant for the whole game.
@@ -429,7 +434,7 @@ export class StarSystemView implements View {
 
         StarSystemInputs.map.printDebugInfo.on("complete", () => {
             const object = this.getStarSystem().getNearestOrbitalObject(Vector3.Zero());
-            console.log(getUniverseObjectId(object, this.getStarSystem()));
+            console.log(getUniverseObjectId(object.model, this.getStarSystem().model));
         });
 
         this.scene = new UberScene(engine);
@@ -512,8 +517,7 @@ export class StarSystemView implements View {
             this.player.visitedSystemHistory.push(this.starSystem.model.coordinates);
         }
 
-        this.starSystem = new StarSystemController(starSystemModel, this.scene);
-        await this.starSystem.load();
+        this.starSystem = await StarSystemController.CreateAsync(starSystemModel, this.loader, this.scene);
 
         return this.starSystem;
     }
@@ -559,7 +563,7 @@ export class StarSystemView implements View {
             }
         });
 
-        this.orbitRenderer.setOrbitalObjects(starSystem.objectToParents, this.scene);
+        this.orbitRenderer.setOrbitalObjects(starSystem.getOrbitalObjects(), this.scene);
         this.axisRenderer.setOrbitalObjects(starSystem.getOrbitalObjects(), this.scene);
 
         this.spaceShipLayer.setTarget(null);
@@ -730,7 +734,7 @@ export class StarSystemView implements View {
             this.scene.getActiveControls().getTransform().getAbsolutePosition()
         );
         if (distanceToNearesetCelestialBody2 < (nearestCelestialBody.getBoundingRadius() * 2) ** 2) {
-            const universeId = getUniverseObjectId(nearestCelestialBody, starSystem);
+            const universeId = getUniverseObjectId(nearestCelestialBody.model, starSystem.model);
             const isNewDiscovery = this.player.addVisitedObjectIfNew(universeId);
             if (isNewDiscovery) {
                 createNotification(
@@ -890,7 +894,10 @@ export class StarSystemView implements View {
                     if (spaceStation === facility) {
                         this.spaceStationLayer.setStation(
                             spaceStation.model,
-                            starSystem.getParentsOf(spaceStation).map((station) => station.model),
+                            starSystem
+                                .getOrbitalObjects()
+                                .map((object) => object.model)
+                                .filter((object) => spaceStation.model.orbit.parentIds.includes(object.id)),
                             this.player
                         );
                         return true;

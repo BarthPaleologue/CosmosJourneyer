@@ -46,14 +46,11 @@ const starSystemModel: StarSystemModel = {
         localY: 0,
         localZ: 0
     },
-    subSystems: [
-        {
-            stellarObjects: [blackHoleModel],
-            planetarySystems: [{ planets: [millerPlanetModel], satellites: [], orbitalFacilities: [] }],
-            anomalies: [],
-            orbitalFacilities: []
-        }
-    ]
+    stellarObjects: [blackHoleModel],
+    planets: [millerPlanetModel],
+    satellites: [],
+    anomalies: [],
+    orbitalFacilities: []
 };
 
 engine.starSystemDatabase.registerCustomSystem(starSystemModel);

@@ -24,7 +24,7 @@ import { Player } from "../player/player";
 import { SystemIcons } from "./systemIcons";
 import { getRgbFromTemperature } from "../utils/specrend";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/starSystemCoordinates";
-import { StarSystemModel, StarSystemModelUtils } from "../starSystem/starSystemModel";
+import { StarSystemModel } from "../starSystem/starSystemModel";
 import { getOrbitalObjectTypeToI18nString } from "../utils/strings/orbitalObjectTypeToDisplay";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
@@ -356,7 +356,7 @@ export class StarMapUI {
         }
 
         //TODO: when implementing binary star systems, this will need to be updated to display all stellar objects and not just the first one
-        const starModel = StarSystemModelUtils.GetStellarObjects(targetSystemModel)[0];
+        const starModel = targetSystemModel.stellarObjects[0];
 
         this.shortHandUISystemType.textContent = getOrbitalObjectTypeToI18nString(starModel);
         this.shortHandUIBookmarkButton.setSelectedSystemSeed(targetSystemModel.coordinates);
@@ -371,12 +371,12 @@ export class StarMapUI {
         this.starSector.innerText = `X:${targetSystemModel.coordinates.starSectorX} Y:${targetSystemModel.coordinates.starSectorY} Z:${targetSystemModel.coordinates.starSectorZ}
             x:${targetSystemModel.coordinates.localX.toFixed(2)} y:${targetSystemModel.coordinates.localY.toFixed(2)} z:${targetSystemModel.coordinates.localZ.toFixed(2)}`;
 
-        this.nbPlanets.textContent = `${i18n.t("starMap:planets")}: ${StarSystemModelUtils.GetPlanets(targetSystemModel).length}`;
+        this.nbPlanets.textContent = `${i18n.t("starMap:planets")}: ${targetSystemModel.planets.length}`;
 
         this.distanceToSol.textContent = `${i18n.t("starMap:distanceToSol")}: ${Vector3.Distance(targetPosition, Vector3.Zero()).toFixed(1)} ${i18n.t("units:ly")}`;
 
         if (this.starSystemDatabase.isSystemInHumanBubble(targetSystemModel.coordinates)) {
-            const spaceStations = StarSystemModelUtils.GetSpaceStations(targetSystemModel);
+            const spaceStations = targetSystemModel.orbitalFacilities;
 
             this.nbSpaceStations.textContent = `${i18n.t("starMap:spaceStations")}: ${spaceStations.length}`;
 

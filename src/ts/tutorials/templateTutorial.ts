@@ -23,13 +23,14 @@ import saveData from "../../asset/tutorials/flightTutorial/save.json";
 import i18n from "../i18n";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import { safeParseSave, Save } from "../saveFile/saveFileData";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 
 export class TemplateTutorial implements Tutorial {
     saveData: Save;
     coverImageSrc = welcomeImageSrc;
 
-    constructor() {
-        const parsedSaveData = safeParseSave(saveData);
+    constructor(starSystemDatabase: StarSystemDatabase) {
+        const parsedSaveData = safeParseSave(saveData, starSystemDatabase);
         if (!parsedSaveData.success) {
             throw new Error("StationLandingTutorial: saveData is null");
         }

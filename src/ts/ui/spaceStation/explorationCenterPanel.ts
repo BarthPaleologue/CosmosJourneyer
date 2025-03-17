@@ -23,7 +23,6 @@ import { SpaceDiscoveryData } from "../../society/encyclopaediaGalactica";
 import { EncyclopaediaGalacticaManager } from "../../society/encyclopaediaGalacticaManager";
 import { EncyclopaediaGalacticaOnline } from "../../society/encyclopaediaGalacticaOnline";
 import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
-import { getObjectModelByUniverseId } from "../../utils/coordinates/orbitalObjectIdUtils";
 import { connectEncyclopaediaGalacticaModal } from "../../utils/dialogModal";
 import { createNotification, NotificationIntent, NotificationOrigin } from "../../utils/notification";
 import { DiscoveryDetails } from "./discoveryDetails";
@@ -232,7 +231,7 @@ export class ExplorationCenterPanel {
         this.discoveryList.appendChild(searchField);
 
         discoveries.forEach(async (discovery) => {
-            const objectModel = getObjectModelByUniverseId(discovery.objectId, starSystemDatabase);
+            const objectModel = starSystemDatabase.getObjectModelByUniverseId(discovery.objectId);
 
             const discoveryItem = document.createElement("div");
             discoveryItem.classList.add("listItemContainer", "flex-column");

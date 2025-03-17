@@ -20,17 +20,33 @@ import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { FuelScoopTutorial } from "./fuelScoopTutorial";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
-import { getObjectModelByUniverseId } from "../utils/coordinates/orbitalObjectIdUtils";
 
 describe("FuelScoopTutorial", () => {
     it("spawns near a star", () => {
         const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
-        const tutorial = new FuelScoopTutorial();
+        const tutorial = new FuelScoopTutorial(starSystemDatabase);
 
-        const stationModel = getObjectModelByUniverseId(
-            tutorial.saveData.universeCoordinates.universeObjectId,
-            starSystemDatabase
-        );
+        const saveData = tutorial.saveData;
+
+        expect(saveData.playerLocation.type).toBe("inSpaceship");
+        if (saveData.playerLocation.type !== "inSpaceship") {
+            throw new Error("saveData.playerLocation.type is not inSpaceship");
+        }
+
+        const shipId = saveData.playerLocation.shipId;
+
+        const shipLocation = saveData.shipLocations[shipId];
+        expect(shipLocation).not.toBe(undefined);
+        if (shipLocation === undefined) {
+            throw new Error("shipLocation is undefined");
+        }
+
+        expect(shipLocation.type).toBe("relative");
+        if (shipLocation.type !== "relative") {
+            throw new Error("shipLocation.location.type is not relative");
+        }
+
+        const stationModel = starSystemDatabase.getObjectModelByUniverseId(shipLocation.universeObjectId);
 
         expect(stationModel?.type).toBe(OrbitalObjectType.STAR);
     });

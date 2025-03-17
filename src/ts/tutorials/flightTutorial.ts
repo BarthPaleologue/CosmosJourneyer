@@ -29,13 +29,14 @@ import congratsImageSrc from "../../asset/tutorials/flightTutorial/congrats.webp
 import saveData from "../../asset/tutorials/flightTutorial/save.json";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import { safeParseSave, Save } from "../saveFile/saveFileData";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 
 export class FlightTutorial implements Tutorial {
     readonly coverImageSrc = welcomeImageSrc;
     readonly saveData: Save;
 
-    constructor() {
-        const parsedSaveDataResult = safeParseSave(saveData);
+    constructor(starSystemDatabase: StarSystemDatabase) {
+        const parsedSaveDataResult = safeParseSave(saveData, starSystemDatabase);
         if (!parsedSaveDataResult.success) {
             console.error(parsedSaveDataResult.error);
             throw new Error("StationLandingTutorial: saveData is null");

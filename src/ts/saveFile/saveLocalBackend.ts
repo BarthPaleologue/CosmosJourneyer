@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { alertModal } from "../utils/dialogModal";
 import { jsonSafeParse } from "../utils/json";
 import { err, ok, Result } from "../utils/types";
@@ -32,7 +33,9 @@ export class SaveLocalBackend implements SaveBackend {
         return true;
     }
 
-    public async read(): Promise<Result<Record<string, CmdrSaves>, SaveLoadingError>> {
+    public async read(
+        starSystemDatabase: StarSystemDatabase
+    ): Promise<Result<Record<string, CmdrSaves>, SaveLoadingError>> {
         const rawSaves = localStorage.getItem(SaveLocalBackend.SAVES_KEY);
         const rawBackupSaves = localStorage.getItem(SaveLocalBackend.BACKUP_SAVE_KEY);
         if (rawSaves === null && rawBackupSaves === null) {
@@ -74,8 +77,8 @@ export class SaveLocalBackend implements SaveBackend {
 
         // filter saves
         for (const [cmdrUuid, cmdrSaves] of Object.entries(allSaves)) {
-            const parsedManualSaves = parseSaveArray(cmdrSaves.manual);
-            const parsedAutoSaves = parseSaveArray(cmdrSaves.auto);
+            const parsedManualSaves = parseSaveArray(cmdrSaves.manual, starSystemDatabase);
+            const parsedAutoSaves = parseSaveArray(cmdrSaves.auto, starSystemDatabase);
 
             correctSaves[cmdrUuid] = {
                 manual: parsedManualSaves.validSaves,
@@ -84,14 +87,19 @@ export class SaveLocalBackend implements SaveBackend {
 
             if (parsedManualSaves.invalidSaves.length > 0 || parsedAutoSaves.invalidSaves.length > 0) {
                 corruptedSaves[cmdrUuid] = {
-                    manual: parsedManualSaves.invalidSaves,
-                    auto: parsedAutoSaves.invalidSaves
+                    manual: parsedManualSaves.invalidSaves.map((save) => {
+                        console.error("Corrupted manual save:", save.save, save.error);
+                        return save.save;
+                    }),
+                    auto: parsedAutoSaves.invalidSaves.map((save) => {
+                        console.error("Corrupted auto save:", save.save, save.error);
+                        return save.save;
+                    })
                 };
             }
         }
 
         if (Object.keys(corruptedSaves).length > 0) {
-            console.error("Corrupted saves:", corruptedSaves);
             localStorage.setItem(SaveLocalBackend.BACKUP_SAVE_KEY, JSON.stringify(corruptedSaves));
             await alertModal("Some save files could not be validated! Check the console for more information.");
         } else {

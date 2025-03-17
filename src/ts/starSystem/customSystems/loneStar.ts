@@ -33,69 +33,66 @@ export function getLoneStarSystem(): StarSystemModel {
             localY: 0.2,
             localZ: 0.8
         },
-        subSystems: [
+        stellarObjects: [
             {
-                stellarObjects: [
-                    {
-                        id: "loneStar",
-                        name: "Lone Star",
-                        type: OrbitalObjectType.STAR,
-                        mass: Settings.SOLAR_MASS,
-                        radius: Settings.SOLAR_RADIUS,
-                        blackBodyTemperature: 5778,
-                        axialTilt: 0,
-                        orbit: {
-                            parentIds: [],
-                            semiMajorAxis: 0,
-                            eccentricity: 0,
-                            inclination: 0,
-                            longitudeOfAscendingNode: 0,
-                            argumentOfPeriapsis: 0,
-                            initialMeanAnomaly: 0,
-                            p: 2
-                        },
-                        rings: null,
-                        siderealDaySeconds: 0,
-                        seed: 0
-                    }
-                ],
-                planetarySystems: [],
-                anomalies: [],
-                orbitalFacilities: [
-                    {
-                        id: "loneStarStation",
-                        name: "Lone Star Station",
-                        type: OrbitalObjectType.SPACE_STATION,
-                        mass: 1,
-                        agricultureMix: [[1, CropType.LENTIL]],
-                        agricultureSurfaceHa: 100,
-                        population: 1e6,
-                        axialTilt: 0,
-                        orbit: OrbitSchema.parse({
-                            parentIds: ["loneStar"],
-                            semiMajorAxis: 1e6
-                        }),
-                        totalEnergyConsumptionKWh: 1e6,
-                        seed: 0,
-                        faction: Faction.SATORI_CONCORD,
-                        energyConsumptionPerCapitaKWh: 1e3,
-                        solarPanelEfficiency: 0.4,
-                        siderealDaySeconds: 0,
-                        solarPanelSurfaceM2: 1e3,
-                        starSystemCoordinates: {
-                            starSectorX: 5,
-                            starSectorY: -10,
-                            starSectorZ: 8,
-                            localX: 0.5,
-                            localY: 0.2,
-                            localZ: 0.8
-                        },
-                        housingSurfaceHa: 1e3,
-                        totalHabitatSurfaceM2: 1e6,
-                        populationDensity: 1e3,
-                        nbHydroponicLayers: 10
-                    }
-                ]
+                id: "loneStar",
+                name: "Lone Star",
+                type: OrbitalObjectType.STAR,
+                mass: Settings.SOLAR_MASS,
+                radius: Settings.SOLAR_RADIUS,
+                blackBodyTemperature: 5778,
+                axialTilt: 0,
+                orbit: {
+                    parentIds: [],
+                    semiMajorAxis: 0,
+                    eccentricity: 0,
+                    inclination: 0,
+                    longitudeOfAscendingNode: 0,
+                    argumentOfPeriapsis: 0,
+                    initialMeanAnomaly: 0,
+                    p: 2
+                },
+                rings: null,
+                siderealDaySeconds: 0,
+                seed: 0
+            }
+        ],
+        planets: [],
+        satellites: [],
+        anomalies: [],
+        orbitalFacilities: [
+            {
+                id: "loneStarStation",
+                name: "Lone Star Station",
+                type: OrbitalObjectType.SPACE_STATION,
+                mass: 1,
+                agricultureMix: [[1, CropType.LENTIL]],
+                agricultureSurfaceHa: 100,
+                population: 1e6,
+                axialTilt: 0,
+                orbit: OrbitSchema.parse({
+                    parentIds: ["loneStar"],
+                    semiMajorAxis: 1e6
+                }),
+                totalEnergyConsumptionKWh: 1e6,
+                seed: 0,
+                faction: Faction.SATORI_CONCORD,
+                energyConsumptionPerCapitaKWh: 1e3,
+                solarPanelEfficiency: 0.4,
+                siderealDaySeconds: 0,
+                solarPanelSurfaceM2: 1e3,
+                starSystemCoordinates: {
+                    starSectorX: 5,
+                    starSectorY: -10,
+                    starSectorZ: 8,
+                    localX: 0.5,
+                    localY: 0.2,
+                    localZ: 0.8
+                },
+                housingSurfaceHa: 1e3,
+                totalHabitatSurfaceM2: 1e6,
+                populationDensity: 1e3,
+                nbHydroponicLayers: 10
             }
         ]
     };

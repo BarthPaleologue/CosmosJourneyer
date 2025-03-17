@@ -102,22 +102,11 @@ andromaqueModel.orbit.eccentricity = 0.8;
 const starSystemModel: StarSystemModel = {
     name: systemName,
     coordinates: systemCoordinates,
-    subSystems: [
-        {
-            stellarObjects: [sunModel],
-            planetarySystems: [
-                {
-                    planets: [hecateModel],
-                    satellites: [moonModel],
-                    orbitalFacilities: [spaceStationModel]
-                },
-                { planets: [aresModel], satellites: [], orbitalFacilities: [] },
-                { planets: [andromaqueModel], satellites: [], orbitalFacilities: [] }
-            ],
-            anomalies: [],
-            orbitalFacilities: []
-        }
-    ]
+    stellarObjects: [sunModel],
+    planets: [hecateModel, aresModel, andromaqueModel],
+    satellites: [moonModel],
+    anomalies: [],
+    orbitalFacilities: [spaceStationModel]
 };
 
 engine.starSystemDatabase.registerCustomSystem(starSystemModel);

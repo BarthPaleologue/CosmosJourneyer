@@ -18,7 +18,6 @@
 import { Sounds } from "../../assets/sounds";
 import { Player } from "../../player/player";
 import { EncyclopaediaGalactica, SpaceDiscoveryData } from "../../society/encyclopaediaGalactica";
-import { getObjectModelByUniverseId } from "../../utils/coordinates/orbitalObjectIdUtils";
 import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
 import { parseDistance, parseSecondsPrecise } from "../../utils/strings/parseToStrings";
 import i18n from "../../i18n";
@@ -107,7 +106,7 @@ export class DiscoveryDetails {
             return;
         }
 
-        const model = getObjectModelByUniverseId(this.currentDiscovery.objectId, starSystemDatabase);
+        const model = starSystemDatabase.getObjectModelByUniverseId(this.currentDiscovery.objectId);
 
         this.objectName.innerText = model?.name ?? i18n.t("common:unknown");
         this.htmlRoot.appendChild(this.objectName);

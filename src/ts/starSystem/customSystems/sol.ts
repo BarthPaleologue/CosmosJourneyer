@@ -413,54 +413,10 @@ export function getSolSystemModel(): StarSystemModel {
             localY: 0,
             localZ: 0
         },
-        subSystems: [
-            {
-                stellarObjects: [sun],
-                planetarySystems: [
-                    {
-                        planets: [mercury],
-                        satellites: [],
-                        orbitalFacilities: []
-                    },
-                    {
-                        planets: [venus],
-                        satellites: [],
-                        orbitalFacilities: []
-                    },
-                    {
-                        planets: [earth],
-                        satellites: [moon],
-                        orbitalFacilities: []
-                    },
-                    {
-                        planets: [mars],
-                        satellites: [],
-                        orbitalFacilities: []
-                    },
-                    {
-                        planets: [jupiter],
-                        satellites: [],
-                        orbitalFacilities: []
-                    },
-                    {
-                        planets: [saturn],
-                        satellites: [],
-                        orbitalFacilities: []
-                    },
-                    {
-                        planets: [uranus],
-                        satellites: [],
-                        orbitalFacilities: []
-                    },
-                    {
-                        planets: [neptune],
-                        satellites: [],
-                        orbitalFacilities: []
-                    }
-                ],
-                anomalies: [],
-                orbitalFacilities: []
-            }
-        ]
+        stellarObjects: [sun],
+        planets: [mercury, venus, earth, mars, jupiter, saturn, uranus, neptune],
+        satellites: [moon],
+        anomalies: [],
+        orbitalFacilities: []
     };
 }

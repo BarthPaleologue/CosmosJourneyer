@@ -35,7 +35,7 @@ async function initWithSaveString(engine: CosmosJourneyer, saveString: string) {
         return await simpleInit(engine);
     }
 
-    const result = safeParseSave(json);
+    const result = safeParseSave(json, engine.starSystemDatabase);
     if (!result.success) {
         await alertModal("Error, this save file is invalid. See the console for more details.");
         return await simpleInit(engine);

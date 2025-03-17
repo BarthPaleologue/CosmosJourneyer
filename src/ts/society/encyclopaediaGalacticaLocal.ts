@@ -3,7 +3,6 @@ import { GasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 import { TelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModel";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-import { getObjectModelByUniverseId } from "../utils/coordinates/orbitalObjectIdUtils";
 import { UniverseObjectId } from "../utils/coordinates/universeObjectId";
 import { err, ok, Result, DeepReadonly } from "../utils/types";
 import { EncyclopaediaGalactica, SpaceDiscoveryData } from "./encyclopaediaGalactica";
@@ -69,11 +68,11 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
             return ok(this.redundantDataPrice);
         }
 
-        const model = getObjectModelByUniverseId(object, this.starSystemDatabase);
+        const model = this.starSystemDatabase.getObjectModelByUniverseId(object);
         if (model === null) {
             return err("Object model not found for object ID");
         }
-        const systemGalacticPosition = this.starSystemDatabase.getSystemGalacticPosition(object.starSystemCoordinates);
+        const systemGalacticPosition = this.starSystemDatabase.getSystemGalacticPosition(object.systemCoordinates);
 
         const distanceFromSolLy = systemGalacticPosition.length();
 

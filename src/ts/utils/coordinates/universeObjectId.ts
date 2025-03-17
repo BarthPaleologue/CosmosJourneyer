@@ -17,13 +17,16 @@
 
 import { z } from "zod";
 import { StarSystemCoordinatesSchema, starSystemCoordinatesEquals } from "./starSystemCoordinates";
-import { systemObjectIdEquals, SystemObjectIdSchema } from "./universeCoordinates";
+import { OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
+import { StarSystemModel } from "../../starSystem/starSystemModel";
+import { DeepReadonly } from "../types";
+import { OrbitalObjectIdSchema, orbitalObjectIdEquals } from "./orbitalObjectId";
 
 export const UniverseObjectIdSchema = z.object({
-    ...SystemObjectIdSchema.shape,
+    idInSystem: OrbitalObjectIdSchema,
 
     /** The coordinates of the star system. */
-    starSystemCoordinates: StarSystemCoordinatesSchema
+    systemCoordinates: StarSystemCoordinatesSchema
 });
 
 /**
@@ -32,5 +35,23 @@ export const UniverseObjectIdSchema = z.object({
 export type UniverseObjectId = z.infer<typeof UniverseObjectIdSchema>;
 
 export function universeObjectIdEquals(a: UniverseObjectId, b: UniverseObjectId): boolean {
-    return systemObjectIdEquals(a, b) && starSystemCoordinatesEquals(a.starSystemCoordinates, b.starSystemCoordinates);
+    return (
+        orbitalObjectIdEquals(a.idInSystem, b.idInSystem) &&
+        starSystemCoordinatesEquals(a.systemCoordinates, b.systemCoordinates)
+    );
+}
+
+/**
+ * Get the universe object ID of the given orbital object within the star system.
+ * @param orbitalObject An orbital object within the star system.
+ * @param starSystem The star system controller.
+ */
+export function getUniverseObjectId(
+    orbitalObject: DeepReadonly<OrbitalObjectModel>,
+    starSystem: DeepReadonly<StarSystemModel>
+): UniverseObjectId {
+    return {
+        systemCoordinates: starSystem.coordinates,
+        idInSystem: orbitalObject.id
+    };
 }

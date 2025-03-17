@@ -11,7 +11,6 @@ import downloadIconPath from "../../asset/icons/download.webp";
 import trashIconPath from "../../asset/icons/trash.webp";
 import shareIconPath from "../../asset/icons/link.webp";
 import { alertModal, promptModalBoolean, promptModalString } from "../utils/dialogModal";
-import { getObjectModelByUniverseId } from "../utils/coordinates/orbitalObjectIdUtils";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { Result } from "../utils/types";
 import { SaveManager } from "../saveFile/saveManager";
@@ -25,7 +24,7 @@ export class SaveLoadingPanelContent {
 
     readonly onLoadSaveObservable: Observable<Save> = new Observable<Save>();
 
-    constructor() {
+    constructor(starSystemDatabase: StarSystemDatabase) {
         this.htmlRoot = document.createElement("div");
         this.htmlRoot.classList.add("saveLoadingPanelContent");
 
@@ -61,7 +60,7 @@ export class SaveLoadingPanelContent {
             if (event.dataTransfer.files.length === 0) throw new Error("event.dataTransfer.files is empty");
 
             const file = event.dataTransfer.files[0];
-            await this.loadSaveFile(file);
+            await this.loadSaveFile(file, starSystemDatabase);
         });
 
         dropFileZone.addEventListener("click", () => {
@@ -73,7 +72,7 @@ export class SaveLoadingPanelContent {
                 if (fileInput.files === null) throw new Error("fileInput.files is null");
                 if (fileInput.files.length === 0) throw new Error("fileInput.files is empty");
                 const file = fileInput.files[0];
-                await this.loadSaveFile(file);
+                await this.loadSaveFile(file, starSystemDatabase);
             };
             fileInput.click();
         });
@@ -265,8 +264,15 @@ export class SaveLoadingPanelContent {
         saveText.appendChild(saveName);
 
         const saveLocation = document.createElement("p");
-        const isLanded = save.padNumber !== undefined;
-        const nearestObject = getObjectModelByUniverseId(save.universeCoordinates.universeObjectId, starSystemDatabase);
+        const locationToUse =
+            save.playerLocation.type === "inSpaceship"
+                ? save.shipLocations[save.playerLocation.shipId]
+                : save.playerLocation;
+        if (locationToUse.type === "inSpaceship") {
+            throw new Error("Spaceship inside a spaceship is not supported yet");
+        }
+        const isLanded = locationToUse.type === "atStation";
+        const nearestObject = starSystemDatabase.getObjectModelByUniverseId(locationToUse.universeObjectId);
         saveLocation.innerText = i18n.t(isLanded ? "sidePanel:landedAt" : "sidePanel:near", {
             location: nearestObject?.name ?? i18n.t("sidePanel:locationNotFound"),
             interpolation: {
@@ -360,8 +366,11 @@ export class SaveLoadingPanelContent {
         return saveDiv;
     }
 
-    private async loadSaveFile(file: File): Promise<Result<Save, SaveLoadingError>> {
-        const saveFileDataResult = await parseSaveFile(file);
+    private async loadSaveFile(
+        file: File,
+        starSystemDatabase: StarSystemDatabase
+    ): Promise<Result<Save, SaveLoadingError>> {
+        const saveFileDataResult = await parseSaveFile(file, starSystemDatabase);
         if (!saveFileDataResult.success) {
             console.error(saveFileDataResult.error);
             await alertModal(saveLoadingErrorToI18nString(saveFileDataResult.error));

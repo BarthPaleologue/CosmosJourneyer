@@ -17,13 +17,13 @@
 
 import { Mission } from "./mission";
 import { MissionType } from "./missionSerialized";
-import { SystemObjectType } from "../utils/coordinates/universeCoordinates";
 import { UniverseObjectId } from "../utils/coordinates/universeObjectId";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MissionFlyByNode } from "./nodes/actions/sightseeing/missionFlyByNode";
 import { MissionTerminatorLandingNode } from "./nodes/actions/sightseeing/missionTerminatorLandingNode";
 import { MissionAsteroidFieldNode } from "./nodes/actions/sightseeing/missionAsteroidFieldNode";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { MissionNode } from "./nodes/missionNode";
 
 /**
@@ -68,18 +68,20 @@ export function newSightSeeingMission(
 ): Mission {
     const missionTree = generateMissionTree(target);
 
-    const targetSystemCoordinates = target.objectId.starSystemCoordinates;
+    const targetSystemCoordinates = target.objectId.systemCoordinates;
 
     const missionGiverGalacticCoordinates = starSystemDatabase.getSystemGalacticPosition(
-        missionGiver.starSystemCoordinates
+        missionGiver.systemCoordinates
     );
 
     const targetGalacticCoordinates = starSystemDatabase.getSystemGalacticPosition(targetSystemCoordinates);
     const distanceLY = Vector3.Distance(missionGiverGalacticCoordinates, targetGalacticCoordinates);
 
+    const targetModel = starSystemDatabase.getObjectModelByUniverseId(target.objectId);
+
     // reward far away targets more
     let reward = Math.max(5_000, 1000 * Math.ceil(distanceLY));
-    if (target.objectId.objectType === SystemObjectType.STELLAR_OBJECT) {
+    if (targetModel?.type === OrbitalObjectType.NEUTRON_STAR || targetModel?.type === OrbitalObjectType.BLACK_HOLE) {
         // reward for stellar objects is higher to nudge the player towards them
         reward *= 1.5;
     }

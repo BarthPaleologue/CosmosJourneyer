@@ -19,8 +19,15 @@ import { z } from "zod";
 
 export const OrbitalObjectIdSchema = z.string();
 
+/**
+ * Unique ID for an orbital object within a solar system
+ */
 export type OrbitalObjectId = z.infer<typeof OrbitalObjectIdSchema>;
 
 export function createOrbitalObjectId(parentIds: ReadonlyArray<OrbitalObjectId>, name: string): OrbitalObjectId {
     return `[${parentIds.join("|")}]->${name}`;
+}
+
+export function orbitalObjectIdEquals(a: OrbitalObjectId, b: OrbitalObjectId): boolean {
+    return a === b;
 }

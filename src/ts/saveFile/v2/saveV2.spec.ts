@@ -1,13 +1,14 @@
 import { safeParseSave } from "../saveFileData";
 import { expect, test } from "vitest";
-import { SaveV1 } from "./saveV1";
+import { SaveV2 } from "./saveV2";
 import { DeepPartial } from "../../utils/types";
-import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
 import { getLoneStarSystem } from "../../starSystem/customSystems/loneStar";
+import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
 
 test("Loading a correct save file", () => {
-    const saveFileString: DeepPartial<SaveV1> = {
-        version: "1.9.0",
+    const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
+    const shipId = crypto.randomUUID();
+    const saveFileString: DeepPartial<SaveV2> = {
         player: {
             name: "Python",
             balance: 10000,
@@ -76,8 +77,7 @@ test("Loading a correct save file", () => {
             currentMissions: [
                 {
                     missionGiver: {
-                        objectType: 3,
-                        objectIndex: 0,
+                        idInSystem: starSystemDatabase.fallbackSystem.orbitalFacilities[0].id,
                         systemCoordinates: {
                             starSectorX: 0,
                             starSectorY: 0,
@@ -90,6 +90,7 @@ test("Loading a correct save file", () => {
                     tree: {
                         type: 0,
                         objectId: {
+                            idInSystem: starSystemDatabase.fallbackSystem.stellarObjects[0].id,
                             systemCoordinates: {
                                 starSectorX: -3,
                                 starSectorY: -1,
@@ -97,9 +98,7 @@ test("Loading a correct save file", () => {
                                 localX: 0.2960593378152975,
                                 localY: 0.2122889010758553,
                                 localZ: 0.45815722456116104
-                            },
-                            objectType: 0,
-                            objectIndex: 0
+                            }
                         },
                         state: 0
                     },
@@ -109,37 +108,40 @@ test("Loading a correct save file", () => {
             ],
             completedMissions: []
         },
-        universeCoordinates: {
-            universeObjectId: {
-                objectType: 0,
-                objectIndex: 0,
-                starSystemCoordinates: {
-                    starSectorX: 0,
-                    starSectorY: 0,
-                    starSectorZ: 0,
-                    localX: -0.3993145315439042,
-                    localY: -0.17682292017937773,
-                    localZ: -0.2643619085496114
+        playerLocation: {
+            type: "inSpaceship",
+            shipId: shipId
+        },
+        shipLocations: {
+            [shipId]: {
+                type: "relative",
+                universeObjectId: {
+                    idInSystem: starSystemDatabase.fallbackSystem.stellarObjects[0].id,
+                    systemCoordinates: starSystemDatabase.fallbackSystem.coordinates
+                },
+                position: {
+                    x: -0.3993145315439042,
+                    y: -0.17682292017937773,
+                    z: -0.2643619085496114
+                },
+                rotation: {
+                    x: 0.8044142851159338,
+                    y: 0.5176010021718461,
+                    z: 0.13137419708191372,
+                    w: 0.26028384972653257
                 }
-            },
-            positionX: 357165657.95592666,
-            positionY: 115315171.0305462,
-            positionZ: 113409128.52473554,
-            rotationQuaternionX: 0.8044142851159338,
-            rotationQuaternionY: 0.5176010021718461,
-            rotationQuaternionZ: 0.13137419708191372,
-            rotationQuaternionW: 0.26028384972653257
+            }
         }
     };
 
-    const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
     const parsedSaveFile = safeParseSave(saveFileString, starSystemDatabase);
     expect(parsedSaveFile.success).toBe(true);
 });
 
 test("Loading a minimal save file", () => {
-    const saveFileString: DeepPartial<SaveV1> = {
-        version: "1.9.0",
+    const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
+    const shipId = crypto.randomUUID();
+    const saveFileString: DeepPartial<SaveV2> = {
         player: {
             name: "Python",
             balance: 10000,
@@ -150,30 +152,36 @@ test("Loading a minimal save file", () => {
             currentMissions: [],
             completedMissions: []
         },
-        universeCoordinates: {
-            universeObjectId: {
-                objectType: 0,
-                objectIndex: 0,
-                starSystemCoordinates: {
-                    starSectorX: 0,
-                    starSectorY: 0,
-                    starSectorZ: 0,
-                    localX: -0.3993145315439042,
-                    localY: -0.17682292017937773,
-                    localZ: -0.2643619085496114
+        playerLocation: {
+            type: "inSpaceship",
+            shipId: shipId
+        },
+        shipLocations: {
+            [shipId]: {
+                type: "relative",
+                universeObjectId: {
+                    idInSystem: starSystemDatabase.fallbackSystem.stellarObjects[0].id,
+                    systemCoordinates: starSystemDatabase.fallbackSystem.coordinates
+                },
+                position: {
+                    x: 0,
+                    y: 0,
+                    z: 0
+                },
+                rotation: {
+                    x: 0.8044142851159338,
+                    y: 0.5176010021718461,
+                    z: 0.13137419708191372,
+                    w: 0.26028384972653257
                 }
-            },
-            positionX: 357165657.95592666,
-            positionY: 115315171.0305462,
-            positionZ: 113409128.52473554,
-            rotationQuaternionX: 0.8044142851159338,
-            rotationQuaternionY: 0.5176010021718461,
-            rotationQuaternionZ: 0.13137419708191372,
-            rotationQuaternionW: 0.26028384972653257
+            }
         }
     };
 
-    const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
     const parsedSaveFile = safeParseSave(saveFileString, starSystemDatabase);
+    if (!parsedSaveFile.success) {
+        console.log(parsedSaveFile.error);
+    }
+
     expect(parsedSaveFile.success).toBe(true);
 });

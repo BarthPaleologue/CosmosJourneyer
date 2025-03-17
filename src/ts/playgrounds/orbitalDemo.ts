@@ -106,7 +106,7 @@ export function createOrbitalDemoScene(engine: AbstractEngine): Scene {
     bodyToParents.set(moon, [earth]);
 
     const orbitRenderer = new OrbitRenderer();
-    orbitRenderer.setOrbitalObjects(bodyToParents, scene);
+    orbitRenderer.setOrbitalObjects(bodies, scene);
     orbitRenderer.setVisibility(true);
 
     const axisRenderer = new AxisRenderer();
