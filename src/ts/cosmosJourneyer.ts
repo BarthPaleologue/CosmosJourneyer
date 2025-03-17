@@ -31,7 +31,7 @@ import { PauseMenu } from "./ui/pauseMenu";
 import { StarSystemView } from "./starSystem/starSystemView";
 import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
 import { MainMenu } from "./ui/mainMenu";
-import { Save } from "./saveFile/saveFileData";
+import { createUrlFromSave, Save } from "./saveFile/saveFileData";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { setRotationQuaternion } from "./uberCore/transforms/basicTransform";
@@ -266,11 +266,9 @@ export class CosmosJourneyer {
         this.pauseMenu.onScreenshot.add(() => this.takeScreenshot());
         this.pauseMenu.onShare.add(() => {
             this.engine.onEndFrameObservable.addOnce(async () => {
-                const saveData = this.generateSaveData();
-
-                const urlRoot = window.location.href.split("?")[0];
-                const urlData = encodeBase64(JSON.stringify(saveData.universeCoordinates));
-                const url = new URL(`${urlRoot}?universeCoordinates=${urlData}`);
+                const save = this.generateSaveData();
+                save.player.uuid = Settings.SHARED_POSITION_SAVE_UUID;
+                const url = createUrlFromSave(save);
                 await navigator.clipboard.writeText(url.toString()).then(() => {
                     createNotification(
                         NotificationOrigin.GENERAL,
@@ -697,11 +695,13 @@ export class CosmosJourneyer {
             await this.tutorialLayer.setTutorial(tutorial);
             this.starSystemView.setUIEnabled(true);
 
-            const targetObject = getObjectBySystemId(
-                tutorial.saveData.universeCoordinates.universeObjectId,
-                this.starSystemView.getStarSystem()
-            );
-            if (targetObject === null) {
+            const targetObject = this.starSystemView
+                .getStarSystem()
+                .getNearestOrbitalObject(
+                    this.starSystemView.scene.getActiveControls().getTransform().getAbsolutePosition()
+                );
+
+            if (targetObject === undefined) {
                 throw new Error(
                     "Could not find the target object of the tutorial even though it should be in the star system"
                 );

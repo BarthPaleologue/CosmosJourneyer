@@ -18,40 +18,13 @@
 import "../styles/index.scss";
 
 import { CosmosJourneyer } from "./cosmosJourneyer";
-import { Player } from "./player/player";
 import { safeParseSave } from "./saveFile/saveFileData";
-import { Settings } from "./settings";
 import { decodeBase64 } from "./utils/base64";
-import { UniverseCoordinatesSchema } from "./utils/coordinates/universeCoordinates";
 import { alertModal } from "./utils/dialogModal";
 import { jsonSafeParse } from "./utils/json";
 
 async function simpleInit(engine: CosmosJourneyer) {
     await engine.init(false);
-}
-
-async function initWithCoordinatesString(engine: CosmosJourneyer, universeCoordinatesString: string) {
-    engine.player.copyFrom(Player.Default());
-    engine.player.uuid = Settings.SHARED_POSITION_SAVE_UUID;
-
-    const jsonString = decodeBase64(universeCoordinatesString);
-    const parsedJson = jsonSafeParse(jsonString);
-    if (parsedJson === null) {
-        await alertModal("Error, this universe coordinates URL data is not a valid json.");
-        return await simpleInit(engine);
-    }
-
-    const universeCoordinates = UniverseCoordinatesSchema.safeParse(parsedJson);
-    if (!universeCoordinates.success) {
-        console.error(universeCoordinates.error);
-        await alertModal(
-            "Error, this universe coordinates URL data do not match the expected schema. Check the console for more information."
-        );
-        return await simpleInit(engine);
-    }
-
-    await engine.loadUniverseCoordinates(universeCoordinates.data);
-    engine.starSystemView.setUIEnabled(true);
 }
 
 async function initWithSaveString(engine: CosmosJourneyer, saveString: string) {
@@ -76,11 +49,6 @@ async function startCosmosJourneyer() {
     const engine = await CosmosJourneyer.CreateAsync();
 
     const urlParams = new URLSearchParams(window.location.search);
-
-    const universeCoordinatesString = urlParams.get("universeCoordinates");
-    if (universeCoordinatesString !== null) {
-        return await initWithCoordinatesString(engine, universeCoordinatesString);
-    }
 
     const saveString = urlParams.get("save");
     if (saveString !== null) {
