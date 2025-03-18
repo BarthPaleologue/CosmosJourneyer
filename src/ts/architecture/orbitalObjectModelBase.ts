@@ -16,14 +16,19 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Orbit } from "../orbit/orbit";
-import { DeepReadonly } from "../utils/types";
+import { OrbitalObjectId } from "../utils/coordinates/orbitalObjectId";
 import { OrbitalObjectType } from "./orbitalObjectType";
 
 /**
  * Describes the model of an orbital object
  */
 export type OrbitalObjectModelBase<T extends OrbitalObjectType> = {
-    type: DeepReadonly<T>;
+    type: T;
+
+    /**
+     * The id of the object (unique within the star system)
+     */
+    id: OrbitalObjectId;
 
     /**
      * The name of the object

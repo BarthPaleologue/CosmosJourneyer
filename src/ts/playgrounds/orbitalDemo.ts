@@ -43,8 +43,10 @@ export function createOrbitalDemoScene(engine: AbstractEngine): Scene {
     hemi.intensity = 1.0;
 
     const sun = new CustomOrbitalObject(MeshBuilder.CreateSphere("sun", { diameter: 1 }, scene), {
+        id: "sun",
         name: "Sun",
         orbit: {
+            parentIds: [],
             argumentOfPeriapsis: 0,
             semiMajorAxis: 0,
             initialMeanAnomaly: 0,
@@ -60,8 +62,10 @@ export function createOrbitalDemoScene(engine: AbstractEngine): Scene {
     });
 
     const earth = new CustomOrbitalObject(MeshBuilder.CreateSphere("earth", { diameter: 0.5 }, scene), {
+        id: "earth",
         name: "Earth",
         orbit: {
+            parentIds: [sun.model.id],
             argumentOfPeriapsis: 0,
             semiMajorAxis: 10,
             initialMeanAnomaly: 0,
@@ -77,8 +81,10 @@ export function createOrbitalDemoScene(engine: AbstractEngine): Scene {
     });
 
     const moon = new CustomOrbitalObject(MeshBuilder.CreateSphere("moon", { diameter: 0.2 }, scene), {
+        id: "moon",
         name: "Moon",
         orbit: {
+            parentIds: [earth.model.id],
             argumentOfPeriapsis: 0,
             semiMajorAxis: 3,
             initialMeanAnomaly: 0,

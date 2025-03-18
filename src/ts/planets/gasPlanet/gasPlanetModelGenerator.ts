@@ -25,6 +25,7 @@ import { CelestialBodyModel } from "../../architecture/orbitalObjectModel";
 import { GasPlanetModel } from "./gasPlanetModel";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { Tools } from "@babylonjs/core/Misc/tools";
+import { createOrbitalObjectId } from "../../utils/coordinates/orbitalObjectId";
 
 export function newSeededGasPlanetModel(
     seed: number,
@@ -52,7 +53,10 @@ export function newSeededGasPlanetModel(
         parentAverageAxialTilt /= parentBodies.length;
     }
 
+    const parentIds = parentBodies.map((body) => body.id);
+
     const orbit: Orbit = {
+        parentIds: parentIds,
         semiMajorAxis: orbitRadius,
         p: 2,
         inclination:
@@ -71,9 +75,10 @@ export function newSeededGasPlanetModel(
     const rings = uniformRandBool(0.8, rng, GenerationSteps.RINGS) ? newSeededRingsModel(rng) : null;
 
     return {
+        type: OrbitalObjectType.GAS_PLANET,
+        id: createOrbitalObjectId(parentIds, name),
         name: name,
         seed: seed,
-        type: OrbitalObjectType.GAS_PLANET,
         radius: radius,
         orbit: orbit,
         siderealDaySeconds,

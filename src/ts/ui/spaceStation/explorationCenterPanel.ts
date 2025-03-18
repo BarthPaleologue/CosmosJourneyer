@@ -23,7 +23,7 @@ import { SpaceDiscoveryData } from "../../society/encyclopaediaGalactica";
 import { EncyclopaediaGalacticaManager } from "../../society/encyclopaediaGalacticaManager";
 import { EncyclopaediaGalacticaOnline } from "../../society/encyclopaediaGalacticaOnline";
 import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
-import { getObjectModelByUniverseId } from "../../utils/coordinates/orbitalObjectId";
+import { getObjectModelByUniverseId } from "../../utils/coordinates/orbitalObjectIdUtils";
 import { connectEncyclopaediaGalacticaModal } from "../../utils/dialogModal";
 import { createNotification, NotificationIntent, NotificationOrigin } from "../../utils/notification";
 import { DiscoveryDetails } from "./discoveryDetails";

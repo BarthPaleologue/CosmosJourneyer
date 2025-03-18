@@ -18,7 +18,7 @@
 import { Sounds } from "../../assets/sounds";
 import { Player } from "../../player/player";
 import { EncyclopaediaGalactica, SpaceDiscoveryData } from "../../society/encyclopaediaGalactica";
-import { getObjectModelByUniverseId } from "../../utils/coordinates/orbitalObjectId";
+import { getObjectModelByUniverseId } from "../../utils/coordinates/orbitalObjectIdUtils";
 import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
 import { parseDistance, parseSecondsPrecise } from "../../utils/strings/parseToStrings";
 import i18n from "../../i18n";

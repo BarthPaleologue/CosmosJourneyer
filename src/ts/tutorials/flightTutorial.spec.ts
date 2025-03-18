@@ -18,7 +18,7 @@
 import { describe, expect, it } from "vitest";
 import { FlightTutorial } from "./flightTutorial";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-import { getObjectModelByUniverseId } from "../utils/coordinates/orbitalObjectId";
+import { getObjectModelByUniverseId } from "../utils/coordinates/orbitalObjectIdUtils";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 
 describe("flightTutorial", () => {

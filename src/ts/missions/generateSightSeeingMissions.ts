@@ -26,7 +26,7 @@ import { StarSystemModel, StarSystemModelUtils } from "../starSystem/starSystemM
 import { getRngFromSeed } from "../utils/getRngFromSeed";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-import { getUniverseIdForSpaceStationModel } from "../utils/coordinates/orbitalObjectId";
+import { getUniverseIdForSpaceStationModel } from "../utils/coordinates/orbitalObjectIdUtils";
 import { OrbitalFacilityModel } from "../architecture/orbitalObjectModel";
 import { DeepReadonly } from "../utils/types";
 

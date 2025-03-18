@@ -47,7 +47,7 @@ export async function createXrScene(engine: AbstractEngine): Promise<Scene> {
     const depthRenderer = scene.enableDepthRenderer(null, false, true);
 
     function createMandelbulb(): TransformNode {
-        const mandelBulbModel = newSeededMandelbulbModel(Math.random() * 100_000, "XR Anomaly");
+        const mandelBulbModel = newSeededMandelbulbModel(Math.random() * 100_000, "XR Anomaly", []);
         const mandelbulb = new EmptyCelestialBody(mandelBulbModel, scene);
         mandelbulb.getTransform().scalingDeterminant = 1 / 400e3;
 
@@ -65,7 +65,7 @@ export async function createXrScene(engine: AbstractEngine): Promise<Scene> {
     }
 
     function createJulia(): TransformNode {
-        const juliaModel = newSeededJuliaSetModel(Math.random() * 100_000, "XR Anomaly");
+        const juliaModel = newSeededJuliaSetModel(Math.random() * 100_000, "XR Anomaly", []);
         const julia = new EmptyCelestialBody(juliaModel, scene);
         julia.getTransform().scalingDeterminant = 1 / 400e3;
 
@@ -83,7 +83,7 @@ export async function createXrScene(engine: AbstractEngine): Promise<Scene> {
     }
 
     function createMandelbox(): TransformNode {
-        const mandelboxModel = newSeededMandelboxModel(Math.random() * 100_000, "XR Anomaly");
+        const mandelboxModel = newSeededMandelboxModel(Math.random() * 100_000, "XR Anomaly", []);
         const mandelbox = new EmptyCelestialBody(mandelboxModel, scene);
         mandelbox.getTransform().scalingDeterminant = 1 / 100e3;
 
@@ -101,7 +101,7 @@ export async function createXrScene(engine: AbstractEngine): Promise<Scene> {
     }
 
     function createSierpinskiPyramid(): TransformNode {
-        const sierpinskiPyramidModel = newSeededSierpinskiPyramidModel(Math.random() * 100_000, "XR Anomaly");
+        const sierpinskiPyramidModel = newSeededSierpinskiPyramidModel(Math.random() * 100_000, "XR Anomaly", []);
         const sierpinskiPyramid = new EmptyCelestialBody(sierpinskiPyramidModel, scene);
         sierpinskiPyramid.getTransform().scalingDeterminant = 1 / 100e3;
 
@@ -119,7 +119,7 @@ export async function createXrScene(engine: AbstractEngine): Promise<Scene> {
     }
 
     function createMengerSponge(): TransformNode {
-        const mengerSpongeModel = newSeededMengerSpongeModel(Math.random() * 100_000, "XR Anomaly");
+        const mengerSpongeModel = newSeededMengerSpongeModel(Math.random() * 100_000, "XR Anomaly", []);
         const mengerSponge = new EmptyCelestialBody(mengerSpongeModel, scene);
         mengerSponge.getTransform().scalingDeterminant = 1 / 100e3;
 

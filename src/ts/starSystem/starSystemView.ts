@@ -65,7 +65,7 @@ import { SpaceStationLayer } from "../ui/spaceStation/spaceStationLayer";
 import { Player } from "../player/player";
 import { getNeighborStarSystemCoordinates } from "../utils/getNeighborStarSystems";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
-import { getUniverseObjectId } from "../utils/coordinates/orbitalObjectId";
+import { getUniverseObjectId } from "../utils/coordinates/orbitalObjectIdUtils";
 import { DefaultControlsInputs } from "../defaultControls/defaultControlsInputs";
 import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";

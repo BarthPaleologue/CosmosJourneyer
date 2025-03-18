@@ -29,7 +29,7 @@ import i18n from "../i18n";
 import { Sounds } from "../assets/sounds";
 import { PanelType, SidePanels } from "./sidePanels";
 import { SystemObjectType, UniverseObjectId } from "../utils/coordinates/universeCoordinates";
-import { getObjectBySystemId } from "../utils/coordinates/orbitalObjectId";
+import { getObjectBySystemId } from "../utils/coordinates/orbitalObjectIdUtils";
 import { StarSystemModel, StarSystemModelUtils } from "../starSystem/starSystemModel";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";

@@ -11,7 +11,7 @@ import downloadIconPath from "../../asset/icons/download.webp";
 import trashIconPath from "../../asset/icons/trash.webp";
 import shareIconPath from "../../asset/icons/link.webp";
 import { alertModal, promptModalBoolean, promptModalString } from "../utils/dialogModal";
-import { getObjectModelByUniverseId } from "../utils/coordinates/orbitalObjectId";
+import { getObjectModelByUniverseId } from "../utils/coordinates/orbitalObjectIdUtils";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { Result } from "../utils/types";
 import { SaveManager } from "../saveFile/saveManager";

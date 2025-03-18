@@ -3,7 +3,7 @@ import { GasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 import { TelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModel";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-import { getObjectModelByUniverseId } from "../utils/coordinates/orbitalObjectId";
+import { getObjectModelByUniverseId } from "../utils/coordinates/orbitalObjectIdUtils";
 import { UniverseObjectId } from "../utils/coordinates/universeCoordinates";
 import { err, ok, Result, DeepReadonly } from "../utils/types";
 import { EncyclopaediaGalactica, SpaceDiscoveryData } from "./encyclopaediaGalactica";

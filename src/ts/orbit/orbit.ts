@@ -21,12 +21,18 @@ import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { findMinimumNewtonRaphson } from "../utils/math";
 import { DeepReadonly } from "../utils/types";
 import { z } from "zod";
+import { OrbitalObjectIdSchema } from "../utils/coordinates/orbitalObjectId";
 
 /**
  * Represents an orbit in the p-norm space. (Euclidean space for p=2)
  * @see https://en.wikipedia.org/wiki/Orbital_elements
  */
 export const OrbitSchema = z.object({
+    /**
+     * References to the parent bodies
+     */
+    parentIds: z.array(OrbitalObjectIdSchema),
+
     /**
      * Half the distance between the apoapsis and periapsis
      */

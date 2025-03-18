@@ -29,6 +29,7 @@ import { randomPieChart } from "../utils/random";
 import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
 import { generateSpaceElevatorName } from "../utils/strings/spaceStationNameGenerator";
 import { SpaceElevatorModel } from "./spaceElevatorModel";
+import { createOrbitalObjectId } from "../utils/coordinates/orbitalObjectId";
 
 export function newSeededSpaceElevatorModel(
     seed: number,
@@ -46,6 +47,7 @@ export function newSeededSpaceElevatorModel(
     const orbitRadius = getOrbitRadiusFromPeriod(parentSiderealDayDuration, parentBody.mass);
 
     const orbit: Orbit = {
+        parentIds: [parentBody.id],
         semiMajorAxis: orbitRadius,
         p: 2,
         inclination: parentBody.orbit.inclination + parentBody.axialTilt,
@@ -106,9 +108,10 @@ export function newSeededSpaceElevatorModel(
     const totalHabitatSurfaceM2 = (housingSurfaceHa + agricultureSurfaceHa) * 1000; // convert ha to m²
 
     return {
-        seed,
         type: OrbitalObjectType.SPACE_ELEVATOR,
+        seed,
         starSystemCoordinates: starSystemCoordinates,
+        id: createOrbitalObjectId([parentBody.id], name),
         name,
         orbit,
         mass,

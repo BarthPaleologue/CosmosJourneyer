@@ -19,7 +19,7 @@ import { describe, expect, it } from "vitest";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { FuelScoopTutorial } from "./fuelScoopTutorial";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
-import { getObjectModelByUniverseId } from "../utils/coordinates/orbitalObjectId";
+import { getObjectModelByUniverseId } from "../utils/coordinates/orbitalObjectIdUtils";
 
 describe("FuelScoopTutorial", () => {
     it("spawns near a star", () => {

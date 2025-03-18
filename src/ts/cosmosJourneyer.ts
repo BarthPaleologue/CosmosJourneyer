@@ -51,7 +51,7 @@ import { FlightTutorial } from "./tutorials/flightTutorial";
 import { SidePanels } from "./ui/sidePanels";
 import { Settings } from "./settings";
 import { Player } from "./player/player";
-import { getObjectBySystemId, getUniverseObjectId } from "./utils/coordinates/orbitalObjectId";
+import { getObjectBySystemId, getUniverseObjectId } from "./utils/coordinates/orbitalObjectIdUtils";
 import { Tutorial } from "./tutorials/tutorial";
 import { StationLandingTutorial } from "./tutorials/stationLandingTutorial";
 import { promptModalBoolean, alertModal, promptModalString } from "./utils/dialogModal";

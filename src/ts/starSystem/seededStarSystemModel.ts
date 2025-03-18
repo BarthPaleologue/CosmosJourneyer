@@ -171,19 +171,19 @@ export function newSeededStarSystemModel(
 
         switch (anomalyType) {
             case OrbitalObjectType.MANDELBULB:
-                anomalies.push(newSeededMandelbulbModel(anomalySeed, anomalyName));
+                anomalies.push(newSeededMandelbulbModel(anomalySeed, anomalyName, [stellarObjects[0]]));
                 break;
             case OrbitalObjectType.JULIA_SET:
-                anomalies.push(newSeededJuliaSetModel(anomalySeed, anomalyName));
+                anomalies.push(newSeededJuliaSetModel(anomalySeed, anomalyName, [stellarObjects[0]]));
                 break;
             case OrbitalObjectType.MANDELBOX:
-                anomalies.push(newSeededMandelboxModel(anomalySeed, anomalyName));
+                anomalies.push(newSeededMandelboxModel(anomalySeed, anomalyName, [stellarObjects[0]]));
                 break;
             case OrbitalObjectType.SIERPINSKI_PYRAMID:
-                anomalies.push(newSeededSierpinskiPyramidModel(anomalySeed, anomalyName));
+                anomalies.push(newSeededSierpinskiPyramidModel(anomalySeed, anomalyName, [stellarObjects[0]]));
                 break;
             case OrbitalObjectType.MENGER_SPONGE:
-                anomalies.push(newSeededMengerSpongeModel(anomalySeed, anomalyName));
+                anomalies.push(newSeededMengerSpongeModel(anomalySeed, anomalyName, [stellarObjects[0]]));
                 break;
         }
     }
