@@ -99,11 +99,10 @@ export class SaveLocalBackend implements SaveBackend {
             }
         }
 
+        localStorage.setItem(SaveLocalBackend.BACKUP_SAVE_KEY, JSON.stringify(corruptedSaves));
+
         if (Object.keys(corruptedSaves).length > 0) {
-            localStorage.setItem(SaveLocalBackend.BACKUP_SAVE_KEY, JSON.stringify(corruptedSaves));
             await alertModal("Some save files could not be validated! Check the console for more information.");
-        } else {
-            localStorage.removeItem(SaveLocalBackend.BACKUP_SAVE_KEY);
         }
 
         return ok(correctSaves);
