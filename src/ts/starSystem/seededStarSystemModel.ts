@@ -47,6 +47,7 @@ import { newSeededMandelboxModel } from "../anomalies/mandelbox/mandelboxModelGe
 import { newSeededSierpinskiPyramidModel } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidModelGenerator";
 import { newSeededMengerSpongeModel } from "../anomalies/mengerSponge/mengerSpongeModelGenerator";
 import { TelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModel";
+import { isNonEmptyArray } from "../utils/types";
 
 const enum GenerationSteps {
     NAME,
@@ -232,6 +233,10 @@ export function newSeededStarSystemModel(
                 orbitalFacilities.push(spaceStationModel);
             }
         });
+    }
+
+    if (!isNonEmptyArray(stellarObjects)) {
+        throw new Error("No stellar objects were generated for the star system");
     }
 
     return {

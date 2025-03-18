@@ -25,7 +25,7 @@ import {
 import { TelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModel";
 import { OrbitalObjectId } from "../utils/coordinates/orbitalObjectId";
 import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
-import { DeepReadonly } from "../utils/types";
+import { DeepReadonly, NonEmptyArray } from "../utils/types";
 
 /**
  * Data model for a star system. It holds all the information necessary to generate and render a star system.
@@ -45,7 +45,7 @@ export type StarSystemModel = {
     /**
      * The stellar objects in the star systems (Stars, black holes, etc.)
      */
-    stellarObjects: Array<StellarObjectModel>;
+    stellarObjects: NonEmptyArray<StellarObjectModel>;
 
     /**
      * The planets of the star system.
