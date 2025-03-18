@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
@@ -25,25 +24,32 @@ import { Matrix } from "@babylonjs/core/Maths/math.vector";
 import { Transformable } from "../architecture/transformable";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Textures } from "../assets/textures";
+import { Material } from "@babylonjs/core/Materials/material";
+import { BackgroundMaterial } from "@babylonjs/core/Materials/Background/backgroundMaterial";
+import { RenderingManager } from "@babylonjs/core/Rendering/renderingManager";
 
 export class StarFieldBox implements Transformable {
     readonly mesh: Mesh;
-    readonly material: StandardMaterial;
+    readonly material: Material;
     readonly texture: CubeTexture;
 
     constructor(scene: Scene) {
-        this.mesh = MeshBuilder.CreateBox("skybox", { size: Number.MAX_SAFE_INTEGER }, scene);
+        RenderingManager.MIN_RENDERINGGROUPS = Math.min(-1, RenderingManager.MIN_RENDERINGGROUPS);
+
+        this.mesh = MeshBuilder.CreateBox("skybox", { size: 1000e3 }, scene);
+        this.mesh.renderingGroupId = -1;
 
         this.texture = Textures.MILKY_WAY;
         this.texture.setReflectionTextureMatrix(Matrix.Identity());
 
-        this.material = new StandardMaterial("skyboxMat", scene);
-        this.material.backFaceCulling = false;
-        this.material.disableDepthWrite = true;
-        this.material.reflectionTexture = this.texture;
-        this.material.reflectionTexture.gammaSpace = true;
-        this.material.reflectionTexture.coordinatesMode = Texture.SKYBOX_MODE;
-        this.material.disableLighting = true;
+        const material = new BackgroundMaterial("skyboxMat", scene);
+        material.backFaceCulling = false;
+        material.reflectionTexture = this.texture;
+        material.reflectionTexture.gammaSpace = true;
+        material.reflectionTexture.coordinatesMode = Texture.SKYBOX_MODE;
+        material.disableDepthWrite = true;
+
+        this.material = material;
 
         this.mesh.material = this.material;
         this.mesh.infiniteDistance = true;
