@@ -5,7 +5,7 @@ import { ObjectTargetCursorType, Targetable } from "../architecture/targetable";
 import { Settings } from "../settings";
 import { StarSystemModel } from "../starSystem/starSystemModel";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { StarSystemCoordinates } from "./coordinates/universeCoordinates";
+import { StarSystemCoordinates } from "./coordinates/starSystemCoordinates";
 import { DeepReadonly } from "./types";
 
 export class SystemTarget implements Targetable {

@@ -23,7 +23,7 @@ import { Orbit } from "../orbit/orbit";
 import { Settings } from "../settings";
 import { getFactionFromGalacticPosition } from "../society/factions";
 import { CropTypes, CropType, getEdibleEnergyPerHaPerDay } from "../utils/agriculture";
-import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates";
+import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
 import { GenerationSteps } from "../utils/generationSteps";
 import { getRngFromSeed } from "../utils/getRngFromSeed";
 import { getSphereRadiatedEnergyFlux } from "../utils/physics";

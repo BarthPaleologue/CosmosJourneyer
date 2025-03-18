@@ -18,7 +18,7 @@
 import { StarSystemController } from "../starSystem/starSystemController";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
-import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates";
+import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
 
 /**
  * Describes information used by mission nodes to update their state

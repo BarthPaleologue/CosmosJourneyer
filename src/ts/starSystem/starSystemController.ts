@@ -32,7 +32,7 @@ import { SystemTarget } from "../utils/systemTarget";
 import { StarFieldBox } from "./starFieldBox";
 import { PlanetarySystemModel, StarSystemModel, SubStarSystemModel } from "./starSystemModel";
 import { Settings } from "../settings";
-import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates";
+import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
 import { wait } from "../utils/wait";
 import { SpaceElevator } from "../spacestation/spaceElevator";
 import { StarSystemDatabase } from "./starSystemDatabase";

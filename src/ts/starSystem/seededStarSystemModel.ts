@@ -35,7 +35,7 @@ import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { newSeededTelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModelGenerator";
 import { newSeededTelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModelGenerator";
 import { newSeededSpaceElevatorModel } from "../spacestation/spaceElevatorModelGenerator";
-import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates";
+import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { newSeededMandelboxModel } from "../anomalies/mandelbox/mandelboxModelGenerator";
 import { newSeededSierpinskiPyramidModel } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidModelGenerator";

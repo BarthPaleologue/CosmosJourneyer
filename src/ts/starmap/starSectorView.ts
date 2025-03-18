@@ -19,7 +19,7 @@ import { Settings } from "../settings";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { BoundingBox } from "@babylonjs/core/Culling/boundingBox";
-import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates";
+import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { StarSystemModel } from "../starSystem/starSystemModel";
 import { DeepReadonly } from "../utils/types";

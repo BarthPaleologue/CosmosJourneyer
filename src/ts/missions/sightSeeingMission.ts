@@ -17,7 +17,8 @@
 
 import { Mission } from "./mission";
 import { MissionType } from "./missionSerialized";
-import { SystemObjectType, UniverseObjectId } from "../utils/coordinates/universeCoordinates";
+import { SystemObjectType } from "../utils/coordinates/universeCoordinates";
+import { UniverseObjectId } from "../utils/coordinates/universeObjectId";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MissionFlyByNode } from "./nodes/actions/sightseeing/missionFlyByNode";
 import { MissionTerminatorLandingNode } from "./nodes/actions/sightseeing/missionTerminatorLandingNode";

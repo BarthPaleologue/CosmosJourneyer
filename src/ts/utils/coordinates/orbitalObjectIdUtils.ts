@@ -17,7 +17,8 @@
 
 import { OrbitalObject } from "../../architecture/orbitalObject";
 import { StarSystemController } from "../../starSystem/starSystemController";
-import { SystemObjectId, UniverseObjectId, SystemObjectType } from "./universeCoordinates";
+import { SystemObjectId, SystemObjectType } from "./universeCoordinates";
+import { UniverseObjectId } from "./universeObjectId";
 import { SpaceStation } from "../../spacestation/spaceStation";
 import { StarSystemModelUtils } from "../../starSystem/starSystemModel";
 import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";

@@ -71,11 +71,8 @@ import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import { MissionContext } from "../missions/missionContext";
 import { Mission } from "../missions/mission";
-import {
-    StarSystemCoordinates,
-    starSystemCoordinatesEquals,
-    UniverseObjectId
-} from "../utils/coordinates/universeCoordinates";
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/starSystemCoordinates";
+import { UniverseObjectId } from "../utils/coordinates/universeObjectId";
 import { StarSystemModel } from "./starSystemModel";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { Spaceship } from "../spaceship/spaceship";

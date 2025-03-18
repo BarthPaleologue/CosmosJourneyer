@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
-import { StarSystemCoordinates } from "../../utils/coordinates/universeCoordinates";
+import { StarSystemCoordinates } from "../../utils/coordinates/starSystemCoordinates";
 import { MissionContext } from "../missionContext";
 import { MissionNode } from "./missionNode";
 import { MissionNodeSerialized } from "./missionNodeSerialized";

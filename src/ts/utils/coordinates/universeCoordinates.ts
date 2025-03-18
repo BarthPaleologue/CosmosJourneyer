@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { z } from "zod";
+import { UniverseObjectIdSchema } from "./universeObjectId";
 
 export enum SystemObjectType {
     STELLAR_OBJECT,
@@ -40,65 +41,6 @@ export type SystemObjectId = z.infer<typeof SystemObjectIdSchema>;
 
 export function systemObjectIdEquals(a: SystemObjectId, b: SystemObjectId): boolean {
     return a.objectType === b.objectType && a.objectIndex === b.objectIndex;
-}
-
-export const StarSystemCoordinatesSchema = z.object({
-    /**
-     * Integer coordinates of the star sector along the universe X axis
-     */
-    starSectorX: z.number(),
-    /**
-     * Integer coordinates of the star sector along the universe Y axis
-     */
-    starSectorY: z.number(),
-    /**
-     * Integer coordinates of the star sector along the universe Z axis
-     */
-    starSectorZ: z.number(),
-    /**
-     * Floating point X coordinate of the star system inside the star sector. Must be between -0.5 and 0.5.
-     */
-    localX: z.number(),
-    /**
-     * Floating point Y coordinate of the star system inside the star sector. Must be between -0.5 and 0.5.
-     */
-    localY: z.number(),
-    /**
-     * Floating point Z coordinate of the star system inside the star sector. Must be between -0.5 and 0.5.
-     */
-    localZ: z.number()
-});
-
-/**
- * Describes the coordinates of a star system in the universe
- */
-export type StarSystemCoordinates = z.infer<typeof StarSystemCoordinatesSchema>;
-
-export function starSystemCoordinatesEquals(a: StarSystemCoordinates, b: StarSystemCoordinates): boolean {
-    return (
-        a.starSectorX === b.starSectorX &&
-        a.starSectorY === b.starSectorY &&
-        a.starSectorZ === b.starSectorZ &&
-        a.localX === b.localX &&
-        a.localY === b.localY &&
-        a.localZ === b.localZ
-    );
-}
-
-export const UniverseObjectIdSchema = z.object({
-    ...SystemObjectIdSchema.shape,
-
-    /** The coordinates of the star system. */
-    starSystemCoordinates: StarSystemCoordinatesSchema
-});
-
-/**
- * Data structure that can identify any object within the universe.
- */
-export type UniverseObjectId = z.infer<typeof UniverseObjectIdSchema>;
-
-export function universeObjectIdEquals(a: UniverseObjectId, b: UniverseObjectId): boolean {
-    return systemObjectIdEquals(a, b) && starSystemCoordinatesEquals(a.starSystemCoordinates, b.starSystemCoordinates);
 }
 
 export const UniverseCoordinatesSchema = z.object({

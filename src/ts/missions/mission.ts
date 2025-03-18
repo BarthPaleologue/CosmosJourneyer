@@ -17,7 +17,8 @@
 
 import { MissionContext } from "./missionContext";
 import i18n from "../i18n";
-import { StarSystemCoordinates, UniverseObjectId } from "../utils/coordinates/universeCoordinates";
+import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
+import { UniverseObjectId } from "../utils/coordinates/universeObjectId";
 import { deserializeMissionNode } from "./nodes/deserializeNode";
 import { MissionNode } from "./nodes/missionNode";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";

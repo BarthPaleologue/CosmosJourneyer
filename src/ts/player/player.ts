@@ -16,7 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Mission } from "../missions/mission";
-import { StarSystemCoordinates, UniverseObjectId } from "../utils/coordinates/universeCoordinates";
+import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
+import { UniverseObjectId } from "../utils/coordinates/universeObjectId";
 import { warnIfUndefined } from "../utils/notification";
 import { Spaceship } from "../spaceship/spaceship";
 import { DefaultSerializedSpaceship, SerializedSpaceship } from "../spaceship/serializedSpaceship";

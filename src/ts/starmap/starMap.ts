@@ -51,7 +51,7 @@ import { createNotification, NotificationIntent, NotificationOrigin } from "../u
 import { Player } from "../player/player";
 import { Settings } from "../settings";
 import { getRgbFromTemperature } from "../utils/specrend";
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/universeCoordinates";
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/starSystemCoordinates";
 import { StarSystemModelUtils } from "../starSystem/starSystemModel";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { EncyclopaediaGalactica } from "../society/encyclopaediaGalactica";

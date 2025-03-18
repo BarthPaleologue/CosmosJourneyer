@@ -21,10 +21,9 @@ import type { MissionNodeBase } from "../../missionNodeBase";
 import { MissionContext } from "../../../missionContext";
 import {
     StarSystemCoordinates,
-    starSystemCoordinatesEquals,
-    UniverseObjectId,
-    universeObjectIdEquals
-} from "../../../../utils/coordinates/universeCoordinates";
+    starSystemCoordinatesEquals
+} from "../../../../utils/coordinates/starSystemCoordinates";
+import { UniverseObjectId, universeObjectIdEquals } from "../../../../utils/coordinates/universeObjectId";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { CollisionMask, Settings } from "../../../../settings";

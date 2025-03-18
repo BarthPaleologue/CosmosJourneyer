@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { StarSystemModel } from "./starSystemModel";
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/universeCoordinates";
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/starSystemCoordinates";
 import { newSeededStarSystemModel } from "./seededStarSystemModel";
 import { hashVec3 } from "../utils/hashVec3";
 import { getRngFromSeed } from "../utils/getRngFromSeed";

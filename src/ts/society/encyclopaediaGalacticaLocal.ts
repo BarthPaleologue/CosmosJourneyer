@@ -4,7 +4,7 @@ import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetMod
 import { TelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModel";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { getObjectModelByUniverseId } from "../utils/coordinates/orbitalObjectIdUtils";
-import { UniverseObjectId } from "../utils/coordinates/universeCoordinates";
+import { UniverseObjectId } from "../utils/coordinates/universeObjectId";
 import { err, ok, Result, DeepReadonly } from "../utils/types";
 import { EncyclopaediaGalactica, SpaceDiscoveryData } from "./encyclopaediaGalactica";
 

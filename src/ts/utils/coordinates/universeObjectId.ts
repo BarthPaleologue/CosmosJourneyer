@@ -16,27 +16,21 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { z } from "zod";
-import { UniverseObjectIdSchema } from "../utils/coordinates/universeObjectId";
-import { MissionNodeSerializedSchema } from "./nodes/missionNodeSerialized";
+import { SystemObjectIdSchema, systemObjectIdEquals } from "./universeCoordinates";
+import { StarSystemCoordinatesSchema, starSystemCoordinatesEquals } from "./starSystemCoordinates";
 
-/**
- * Registered mission types. Those are used to display localized strings in the UI
- */
+export const UniverseObjectIdSchema = z.object({
+    ...SystemObjectIdSchema.shape,
 
-export enum MissionType {
-    SIGHT_SEEING_FLY_BY,
-    SIGHT_SEEING_TERMINATOR_LANDING,
-    SIGHT_SEEING_ASTEROID_FIELD
-}
-
-export const MissionSerializedSchema = z.object({
-    missionGiver: UniverseObjectIdSchema,
-    tree: MissionNodeSerializedSchema,
-    reward: z.number().default(0),
-    type: z.nativeEnum(MissionType).default(MissionType.SIGHT_SEEING_FLY_BY)
+    /** The coordinates of the star system. */
+    starSystemCoordinates: StarSystemCoordinatesSchema
 });
-/**
- * Serialized mission object as stored in save files
- */
 
-export type MissionSerialized = z.infer<typeof MissionSerializedSchema>;
+/**
+ * Data structure that can identify any object within the universe.
+ */
+export type UniverseObjectId = z.infer<typeof UniverseObjectIdSchema>;
+
+export function universeObjectIdEquals(a: UniverseObjectId, b: UniverseObjectId): boolean {
+    return systemObjectIdEquals(a, b) && starSystemCoordinatesEquals(a.starSystemCoordinates, b.starSystemCoordinates);
+}

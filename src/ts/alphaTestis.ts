@@ -24,7 +24,7 @@ import { newSeededGasPlanetModel } from "./planets/gasPlanet/gasPlanetModelGener
 import { SpaceShipControlsInputs } from "./spaceship/spaceShipControlsInputs";
 import { newSeededStarModel } from "./stellarObjects/star/starModelGenerator";
 import { StarSystemModel } from "./starSystem/starSystemModel";
-import { StarSystemCoordinates } from "./utils/coordinates/universeCoordinates";
+import { StarSystemCoordinates } from "./utils/coordinates/starSystemCoordinates";
 import { newSeededTelluricSatelliteModel } from "./planets/telluricPlanet/telluricSatelliteModelGenerator";
 import { newSeededTelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModelGenerator";
 import { newSeededSpaceElevatorModel } from "./spacestation/spaceElevatorModelGenerator";

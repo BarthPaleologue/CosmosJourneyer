@@ -23,7 +23,7 @@ import { StarMapBookmarkButton } from "./starMapBookmarkButton";
 import { Player } from "../player/player";
 import { SystemIcons } from "./systemIcons";
 import { getRgbFromTemperature } from "../utils/specrend";
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/universeCoordinates";
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/starSystemCoordinates";
 import { StarSystemModel, StarSystemModelUtils } from "../starSystem/starSystemModel";
 import { getOrbitalObjectTypeToI18nString } from "../utils/strings/orbitalObjectTypeToDisplay";
 import { Observable } from "@babylonjs/core/Misc/observable";
