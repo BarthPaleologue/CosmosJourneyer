@@ -375,6 +375,8 @@ export class StarSystemView implements View {
             observer.remove();
             this.jumpLock = false;
 
+            this.player.visitedSystemHistory.push(this.getStarSystem().model.coordinates);
+
             this.onAfterJump.notifyObservers();
         });
 
