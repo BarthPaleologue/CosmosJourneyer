@@ -54,6 +54,8 @@ export const AtStationCoordinatesSchema = z.object({
     universeObjectId: UniverseObjectIdSchema
 });
 
+export type AtStationCoordinates = z.infer<typeof AtStationCoordinatesSchema>;
+
 export const OnSurfaceCoordinatesSchema = z.object({
     type: z.literal("onSurface"),
 
@@ -64,11 +66,15 @@ export const OnSurfaceCoordinatesSchema = z.object({
     longitude: z.number().default(0)
 });
 
+export type OnSurfaceCoordinates = z.infer<typeof OnSurfaceCoordinatesSchema>;
+
 export const InSpaceshipCoordinatesSchema = z.object({
     type: z.literal("inSpaceship"),
 
     shipId: z.string().uuid()
 });
+
+export type InSpaceshipCoordinates = z.infer<typeof InSpaceshipCoordinatesSchema>;
 
 export const UniverseCoordinatesSchema = z.discriminatedUnion("type", [
     RelativeCoordinatesSchema,

@@ -30,8 +30,11 @@ import { MainMenu } from "./ui/mainMenu";
 import { createUrlFromSave, Save } from "./saveFile/saveFileData";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Quaternion } from "@babylonjs/core/Maths/math";
-import { setRotationQuaternion } from "./uberCore/transforms/basicTransform";
-import { RelativeCoordinates, UniverseCoordinates } from "./utils/coordinates/universeCoordinates";
+import {
+    AtStationCoordinates,
+    RelativeCoordinates,
+    UniverseCoordinates
+} from "./utils/coordinates/universeCoordinates";
 import { View } from "./utils/view";
 import { AudioManager } from "./audio/audioManager";
 import { AudioMasks } from "./audio/audioMasks";
@@ -63,6 +66,7 @@ import { StarSystemCoordinates } from "./utils/coordinates/starSystemCoordinates
 import { getUniverseObjectId } from "./utils/coordinates/universeObjectId";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { OrbitalObjectType } from "./architecture/orbitalObjectType";
+import { positionNearObject } from "./utils/positionNearObject";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -324,9 +328,9 @@ export class CosmosJourneyer {
             await this.toggleStarMap();
         });
 
-        GeneralInputs.map.screenshot.on("complete", () => {
+        GeneralInputs.map.screenshot.on("complete", async () => {
             if (this.mainMenu?.isVisible()) return;
-            this.takeScreenshot();
+            await this.takeScreenshot();
         });
 
         GeneralInputs.map.videoCapture.on("complete", async () => {
@@ -528,10 +532,15 @@ export class CosmosJourneyer {
     /**
      * Takes a screenshot of the current scene. By default, the screenshot is taken at a 4x the resolution of the canvas
      */
-    public takeScreenshot(): void {
+    public async takeScreenshot(): Promise<boolean> {
         const camera = this.activeView.getMainScene().activeCamera;
-        if (camera === null) throw new Error("Cannot take screenshot: camera is null");
+        if (camera === null) {
+            await alertModal("Cannot take screenshot: camera is null");
+            return false;
+        }
+
         Tools.CreateScreenshot(this.engine, camera, { precision: 1 });
+        return true;
     }
 
     public async takeVideoCapture(): Promise<void> {
@@ -577,11 +586,10 @@ export class CosmosJourneyer {
             currentWorldPosition,
             nearestOrbitalObjectInverseWorld
         );
+
         const distanceToNearestOrbitalObject = currentLocalPosition.length();
         if (distanceToNearestOrbitalObject < nearestOrbitalObject.getBoundingRadius() * 1.1) {
-            currentLocalPosition.scaleInPlace(
-                (nearestOrbitalObject.getBoundingRadius() * 1.1) / distanceToNearestOrbitalObject
-            );
+            currentLocalPosition.copyFromFloats(0, 0, nearestOrbitalObject.getBoundingRadius() * 5.0);
         }
 
         // Finding the rotation of the player in the nearest orbital object's frame of reference
@@ -592,6 +600,8 @@ export class CosmosJourneyer {
             .invert();
 
         const currentLocalRotation = currentWorldRotation.multiply(nearestOrbitalObjectInverseRotation);
+
+        console.log(currentLocalPosition, currentLocalRotation);
 
         return {
             type: "relative",
@@ -723,11 +733,6 @@ export class CosmosJourneyer {
                     this.starSystemView.scene.getActiveControls().getTransform().getAbsolutePosition()
                 );
 
-            if (targetObject === undefined) {
-                throw new Error(
-                    "Could not find the target object of the tutorial even though it should be in the star system"
-                );
-            }
             this.starSystemView
                 .getSpaceshipControls()
                 .getTransform()
@@ -741,6 +746,41 @@ export class CosmosJourneyer {
      * @param saveData The save file data to load
      */
     public async loadSave(saveData: Save): Promise<void> {
+        const playerLocation = saveData.playerLocation;
+
+        let locationToUse;
+        if (playerLocation.type !== "inSpaceship") {
+            locationToUse = playerLocation;
+        } else {
+            const shipLocation = saveData.shipLocations[playerLocation.shipId];
+            if (shipLocation === undefined) {
+                await alertModal(
+                    "Player is in spaceship, but said spaceship does not exist. The loading procedure has been aborted."
+                );
+                return;
+            }
+
+            if (shipLocation.type === "inSpaceship") {
+                await alertModal(
+                    "Spaceship inside spaceships is not yet supported. The loading procedure has been aborted."
+                );
+                return;
+            }
+
+            locationToUse = shipLocation;
+        }
+
+        const systemModel = this.starSystemDatabase.getSystemModelFromCoordinates(
+            locationToUse.universeObjectId.systemCoordinates
+        );
+
+        if (systemModel === null) {
+            await alertModal(
+                "Cannot load universe coordinates: system model not found. The loading procedure has been aborted."
+            );
+            return;
+        }
+
         const newPlayer = saveData.player !== undefined ? Player.Deserialize(saveData.player) : Player.Default();
         this.player.copyFrom(newPlayer);
         this.player.discoveries.uploaded.forEach(async (discovery) => {
@@ -750,30 +790,6 @@ export class CosmosJourneyer {
 
         this.engine.loadingScreen.displayLoadingUI();
 
-        const playerLocation = saveData.playerLocation;
-
-        let locationToUse;
-        if (playerLocation.type !== "inSpaceship") {
-            locationToUse = playerLocation;
-        } else {
-            const shipLocation = saveData.shipLocations[playerLocation.shipId];
-            if (shipLocation === undefined) {
-                throw new Error("Could not find the ship location in the save data");
-            }
-
-            if (shipLocation.type === "inSpaceship") {
-                throw new Error("Spaceship inside spaceships is not yet supported");
-            }
-
-            locationToUse = shipLocation;
-        }
-
-        const systemModel = this.starSystemDatabase.getSystemModelFromCoordinates(
-            locationToUse.universeObjectId.systemCoordinates
-        );
-        if (systemModel === null) {
-            throw new Error("Cannot load universe coordinates: system model not found");
-        }
         await this.starSystemView.loadStarSystem(systemModel);
 
         if (this.state === EngineState.UNINITIALIZED) await this.init(true);
@@ -785,62 +801,7 @@ export class CosmosJourneyer {
             await this.starSystemView.switchToCharacterControls();
         }
 
-        const playerTransform = this.starSystemView.scene.getActiveControls().getTransform();
-
-        const nearestOrbitalObject = this.starSystemView
-            .getStarSystem()
-            .getOrbitalObjectById(locationToUse.universeObjectId.idInSystem);
-
-        if (nearestOrbitalObject === undefined) {
-            throw new Error(
-                `Could not find the nearest orbital object with id ${locationToUse.universeObjectId.idInSystem} in the star system`
-            );
-        }
-
-        if (locationToUse.type === "relative") {
-            const nearestOrbitalObjectWorld = nearestOrbitalObject.getTransform().getWorldMatrix();
-            const currentLocalPosition = new Vector3(
-                locationToUse.position.x,
-                locationToUse.position.y,
-                locationToUse.position.z
-            );
-
-            const currentWorldPosition = Vector3.TransformCoordinates(currentLocalPosition, nearestOrbitalObjectWorld);
-            playerTransform.setAbsolutePosition(currentWorldPosition);
-
-            const nearestOrbitalObjectWorldRotation = nearestOrbitalObject.getTransform().absoluteRotationQuaternion;
-            const currentLocalRotationQuaternion = new Quaternion(
-                locationToUse.rotation.x,
-                locationToUse.rotation.y,
-                locationToUse.rotation.z,
-                locationToUse.rotation.w
-            );
-            const currentWorldRotationQuaternion = currentLocalRotationQuaternion.multiply(
-                nearestOrbitalObjectWorldRotation
-            );
-            setRotationQuaternion(playerTransform, currentWorldRotationQuaternion);
-        } else if (locationToUse.type === "atStation") {
-            const station = this.starSystemView
-                .getStarSystem()
-                .getOrbitalObjectById(locationToUse.universeObjectId.idInSystem);
-            if (station === undefined) {
-                throw new Error(
-                    `Could not find the station with id ${locationToUse.universeObjectId.idInSystem} in the star system`
-                );
-            }
-            if (station.type !== OrbitalObjectType.SPACE_STATION && station.type !== OrbitalObjectType.SPACE_ELEVATOR) {
-                throw new Error(
-                    `The station with id ${locationToUse.universeObjectId.idInSystem} is not a space station or a space elevator`
-                );
-            }
-
-            const landingPad = station.getAvailableLandingPads().at(0);
-            if (landingPad === undefined) {
-                throw new Error("The spacestation you are trying to spawn at is full. This should not happen.");
-            }
-
-            this.starSystemView.getSpaceshipControls().getSpaceship().spawnOnPad(landingPad);
-        }
+        await this.loadLocation(locationToUse);
 
         // updates camera position
         this.starSystemView.getSpaceshipControls().getActiveCamera().getViewMatrix(true);
@@ -848,14 +809,114 @@ export class CosmosJourneyer {
         // re-centers the star system
         this.starSystemView.getStarSystem().applyFloatingOrigin();
 
-        // set the ui target to the nearest orbital object
-        this.starSystemView.targetCursorLayer.setTarget(nearestOrbitalObject);
-        this.starSystemView.spaceShipLayer.setTarget(nearestOrbitalObject.getTransform());
-
         this.engine.loadingScreen.hideLoadingUI();
 
         if (this.player.currentItinerary.length > 1) {
             this.starSystemView.setSystemAsTarget(this.player.currentItinerary[1]);
         }
+    }
+
+    public async loadLocation(location: UniverseCoordinates) {
+        if (location.type === "relative") {
+            await this.loadRelativeLocation(location);
+        } else if (location.type === "atStation") {
+            await this.loadAtStationLocation(location);
+        }
+    }
+
+    public async loadRelativeLocation(location: RelativeCoordinates) {
+        const playerTransform = this.starSystemView.scene.getActiveControls().getTransform();
+        const starSystem = this.starSystemView.getStarSystem();
+        const nearestOrbitalObject = starSystem.getOrbitalObjectById(location.universeObjectId.idInSystem);
+
+        if (nearestOrbitalObject === undefined) {
+            const fallbackObject = starSystem.getStellarObjects()[0];
+            positionNearObject(
+                fallbackObject,
+                new Vector3(0, 0, fallbackObject.getBoundingRadius() * 4),
+                new Quaternion(0, 0, 0, 1),
+                playerTransform
+            );
+
+            await alertModal(
+                "The object you are trying to spawn near to could not be found. You will spawn around the first stellar object of the system instead."
+            );
+
+            return;
+        }
+
+        positionNearObject(
+            nearestOrbitalObject,
+            new Vector3(location.position.x, location.position.y, location.position.z),
+            new Quaternion(location.rotation.x, location.rotation.y, location.rotation.z, location.rotation.w),
+            playerTransform
+        );
+
+        const distanceToObject = Vector3.Distance(
+            playerTransform.getAbsolutePosition(),
+            nearestOrbitalObject.getTransform().getAbsolutePosition()
+        );
+        const objectRadius = nearestOrbitalObject.getBoundingRadius();
+
+        console.log(distanceToObject, objectRadius);
+
+        if (distanceToObject < objectRadius * 1.1) {
+            if (distanceToObject < 0.1) {
+                playerTransform.position.addInPlace(new Vector3(0, 0, objectRadius * 5.0));
+            } else {
+                playerTransform.position.scaleInPlace((objectRadius * 1.1) / distanceToObject);
+            }
+        }
+
+        // set the ui target to the nearest orbital object
+        this.starSystemView.targetCursorLayer.setTarget(nearestOrbitalObject);
+        this.starSystemView.spaceShipLayer.setTarget(nearestOrbitalObject.getTransform());
+    }
+
+    public async loadAtStationLocation(location: AtStationCoordinates) {
+        const playerTransform = this.starSystemView.scene.getActiveControls().getTransform();
+        const starSystem = this.starSystemView.getStarSystem();
+        const station = starSystem.getOrbitalObjectById(location.universeObjectId.idInSystem);
+
+        const doesStationExist =
+            station !== undefined &&
+            (station.type === OrbitalObjectType.SPACE_STATION || station.type === OrbitalObjectType.SPACE_ELEVATOR);
+
+        if (!doesStationExist) {
+            const fallbackObject = starSystem.getStellarObjects()[0];
+
+            positionNearObject(
+                fallbackObject,
+                new Vector3(0, 0, fallbackObject.getBoundingRadius() * 4),
+                new Quaternion(0, 0, 0, 1),
+                playerTransform
+            );
+
+            await alertModal(
+                "The space station you are trying to spawn at could not be found. You will spawn around the first stellar object of the system instead."
+            );
+
+            return;
+        }
+
+        const landingPad = station.getAvailableLandingPads().at(0);
+        if (landingPad === undefined) {
+            const fallbackObject = station;
+
+            positionNearObject(
+                fallbackObject,
+                new Vector3(0, 0, fallbackObject.getBoundingRadius() * 4),
+                new Quaternion(0, 0, 0, 1),
+                playerTransform
+            );
+
+            await alertModal(
+                "There are no available pads at the space station you are trying to spawn at. You have been moved outside of the station instead."
+            );
+
+            return;
+        }
+
+        this.starSystemView.getSpaceshipControls().getSpaceship().spawnOnPad(landingPad);
     }
 }
