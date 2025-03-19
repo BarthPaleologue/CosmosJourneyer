@@ -36,7 +36,7 @@ import { SpaceElevator } from "../spacestation/spaceElevator";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { TelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModel";
-import { DeepReadonly } from "../utils/types";
+import { DeepReadonly, isNonEmptyArray, NonEmptyArray } from "../utils/types";
 
 export class StarSystemLoader {
     private loadingIndex: number;
@@ -89,7 +89,7 @@ export class StarSystemLoader {
     private async loadStellarObjects(
         stellarObjectModels: DeepReadonly<Array<StellarObjectModel>>,
         scene: Scene
-    ): Promise<ReadonlyArray<StellarObject>> {
+    ): Promise<Readonly<NonEmptyArray<StellarObject>>> {
         const stellarObjects: StellarObject[] = [];
         for (const stellarObjectModel of stellarObjectModels) {
             console.log("Loading stellar object:", stellarObjectModel.name);
@@ -110,6 +110,10 @@ export class StarSystemLoader {
             stellarObject.getTransform().setAbsolutePosition(new Vector3(this.offset * ++this.loadingIndex, 0, 0));
 
             await wait(this.timeOut);
+        }
+
+        if (!isNonEmptyArray(stellarObjects)) {
+            throw new Error("No stellar objects found in the star system");
         }
 
         return stellarObjects;

@@ -42,7 +42,7 @@ import {
 import { OrbitalObjectUtils } from "../architecture/orbitalObjectUtils";
 import { OrbitalObjectId } from "../utils/coordinates/orbitalObjectId";
 import { StarSystemLoader } from "./starSystemLoader";
-import { DeepReadonly } from "../utils/types";
+import { DeepReadonly, NonEmptyArray } from "../utils/types";
 
 export type PlanetarySystem = {
     readonly planets: Planet[];
@@ -75,15 +75,15 @@ export class StarSystemController {
      */
     readonly model: DeepReadonly<StarSystemModel>;
 
-    private stellarObjects: ReadonlyArray<StellarObject> = [];
+    private readonly stellarObjects: Readonly<NonEmptyArray<StellarObject>>;
 
-    private planets: ReadonlyArray<Planet> = [];
+    private readonly planets: ReadonlyArray<Planet> = [];
 
-    private satellites: ReadonlyArray<TelluricPlanet> = [];
+    private readonly satellites: ReadonlyArray<TelluricPlanet> = [];
 
-    private anomalies: ReadonlyArray<Anomaly> = [];
+    private readonly anomalies: ReadonlyArray<Anomaly> = [];
 
-    private orbitalFacilities: ReadonlyArray<OrbitalFacility> = [];
+    private readonly orbitalFacilities: ReadonlyArray<OrbitalFacility> = [];
 
     private readonly objectToParents: Map<OrbitalObject, OrbitalObject[]> = new Map();
 
@@ -103,7 +103,7 @@ export class StarSystemController {
     private constructor(
         model: DeepReadonly<StarSystemModel>,
         orbitalObjects: {
-            stellarObjects: ReadonlyArray<StellarObject>;
+            stellarObjects: Readonly<NonEmptyArray<StellarObject>>;
             planets: ReadonlyArray<Planet>;
             satellites: ReadonlyArray<TelluricPlanet>;
             anomalies: ReadonlyArray<Anomaly>;
@@ -200,7 +200,7 @@ export class StarSystemController {
     /**
      * Returns all the stellar objects in the star system
      */
-    public getStellarObjects(): ReadonlyArray<StellarObject> {
+    public getStellarObjects(): Readonly<NonEmptyArray<StellarObject>> {
         return this.stellarObjects;
     }
 
@@ -581,19 +581,10 @@ export class StarSystemController {
         this.objectToParents.clear();
 
         this.orbitalFacilities.forEach((facility) => facility.dispose());
-        this.orbitalFacilities = [];
-
         this.anomalies.forEach((anomaly) => anomaly.dispose());
-        this.anomalies = [];
-
         this.satellites.forEach((satellite) => satellite.dispose());
-        this.satellites = [];
-
         this.planets.forEach((planet) => planet.dispose());
-        this.planets = [];
-
         this.stellarObjects.forEach((stellarObject) => stellarObject.dispose());
-        this.stellarObjects = [];
 
         this.systemTargets.forEach((target) => target.dispose());
         this.systemTargets.length = 0;
