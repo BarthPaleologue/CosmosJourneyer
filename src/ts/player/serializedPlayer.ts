@@ -12,7 +12,10 @@ export const CompletedTutorialsSchema = z.object({
 export type CompletedTutorials = z.infer<typeof CompletedTutorialsSchema>;
 
 export const SerializedPlayerSchema = z.object({
-    uuid: z.string().default(() => crypto.randomUUID()),
+    uuid: z
+        .string()
+        .uuid()
+        .default(() => crypto.randomUUID()),
     name: z.string().default("Python"),
     balance: z.number().default(10000),
     creationDate: z.string().default(new Date().toISOString()),

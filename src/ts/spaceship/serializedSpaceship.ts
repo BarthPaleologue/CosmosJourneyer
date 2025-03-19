@@ -7,7 +7,10 @@ export enum ShipType {
 }
 
 export const SerializedSpaceshipSchema = z.object({
-    id: z.string().default(() => crypto.randomUUID()),
+    id: z
+        .string()
+        .uuid()
+        .default(() => crypto.randomUUID()),
     name: z.string().default("Wanderer"),
     type: z.nativeEnum(ShipType).default(ShipType.WANDERER),
     fuelTanks: z.array(SerializedFuelTankSchema).default([{ currentFuel: 100, maxFuel: 100 }]),
