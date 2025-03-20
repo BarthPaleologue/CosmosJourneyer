@@ -21,7 +21,7 @@ import { Player } from "../../player/player";
 import { generateMissionsDom } from "./spaceStationMissions";
 import { Settings } from "../../settings";
 import { generateSpaceshipDom } from "./spaceshipDock";
-import { promptModalString } from "../../utils/dialogModal";
+import { alertModal, promptModalString } from "../../utils/dialogModal";
 import i18n from "../../i18n";
 import { Sounds } from "../../assets/sounds";
 import { ExplorationCenterPanel } from "./explorationCenterPanel";
@@ -161,7 +161,7 @@ export class SpaceStationLayer {
         }
 
         if (this.currentStation === null) {
-            throw new Error("No current station");
+            return await alertModal("No current station");
         }
 
         switch (this.mainPanelState) {
