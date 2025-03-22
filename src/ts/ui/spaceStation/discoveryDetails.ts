@@ -155,11 +155,17 @@ export class DiscoveryDetails {
         this.htmlRoot.appendChild(this.orbitRadius);
 
         if (this.player.discoveries.local.includes(this.currentDiscovery)) {
-            this.htmlRoot.appendChild(this.sellDiscoveryButton);
+            const sellingPrice = await this.encyclopaedia.estimateDiscovery(this.currentDiscovery.objectId);
+            if (sellingPrice.success) {
+                this.htmlRoot.appendChild(this.sellDiscoveryButton);
 
-            this.sellDiscoveryButton.textContent = i18n.t("common:sellFor", {
-                price: `${(await this.encyclopaedia.estimateDiscovery(this.currentDiscovery.objectId)).toLocaleString()}${Settings.CREDIT_SYMBOL}`
-            });
+                this.sellDiscoveryButton.textContent = i18n.t("common:sellFor", {
+                    price: `${sellingPrice.value.toLocaleString()}${Settings.CREDIT_SYMBOL}`
+                });
+            } else {
+                console.error(sellingPrice.error);
+                await alertModal("Could not estimate the selling price. More information in the console.");
+            }
         }
     }
 }
