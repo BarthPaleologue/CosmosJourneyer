@@ -163,10 +163,10 @@ export function computeLpFactor(x: number, y: number, p: number) {
 }
 
 /**
- * Returns the orbital period of a body in seconds
  * @see https://fr.wikipedia.org/wiki/Lois_de_Kepler
  * @param semiMajorAxis
  * @param parentMass
+ * @return The orbital period in seconds or 0 if the parent mass is 0
  */
 export function getOrbitalPeriod(semiMajorAxis: number, parentMass: number) {
     if (parentMass === 0) return 0;
