@@ -20,11 +20,11 @@ import { SerializedFuelScoopSchema } from "./components/fuelScoop";
 import { SerializedFuelTankSchema } from "./components/fuelTank";
 
 export enum ShipType {
-    WANDERER
+    WANDERER = "WANDERER"
 }
 
 export const BaseSpaceshipSchema = z.object({
-    type: z.nativeEnum(ShipType),
+    type: z.nativeEnum(ShipType).default(ShipType.WANDERER),
     id: z.string().uuid(),
     name: z.string()
 });
@@ -32,10 +32,16 @@ export const BaseSpaceshipSchema = z.object({
 export const WandererSchema = BaseSpaceshipSchema.extend({
     type: z.literal(ShipType.WANDERER),
     components: z.object({
-        fuelTank: SerializedFuelTankSchema,
-        fuelScoop: SerializedFuelScoopSchema
+        primary: z.object({
+            fuelTank: SerializedFuelTankSchema
+        }),
+        optional: z.object({
+            fuelScoop: SerializedFuelScoopSchema
+        })
     })
 });
+
+export type SerializedWanderer = z.infer<typeof WandererSchema>;
 
 export const SerializedSpaceshipSchema = z.discriminatedUnion("type", [WandererSchema]);
 
