@@ -24,6 +24,7 @@ import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
 import { NeutronStarModel } from "./neutronStarModel";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
+import { createOrbitalObjectId } from "../../utils/coordinates/orbitalObjectId";
 
 /**
  * Creates a new pseudo-random neutron star model
@@ -55,7 +56,10 @@ export function newSeededNeutronStarModel(
     // Todo: do not hardcode
     const orbitRadius = rng(GenerationSteps.ORBIT) * 5000000e3;
 
+    const parentIds = parentBodies.map((body) => body.id);
+
     const orbit: Orbit = {
+        parentIds: parentIds,
         semiMajorAxis: parentBodies.length > 0 ? orbitRadius : 0,
         eccentricity: 0,
         p: 2,
@@ -71,6 +75,7 @@ export function newSeededNeutronStarModel(
 
     return {
         type: OrbitalObjectType.NEUTRON_STAR,
+        id: createOrbitalObjectId(parentIds, name),
         name,
         seed,
         blackBodyTemperature,

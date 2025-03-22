@@ -38,9 +38,10 @@ import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObj
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
 import { VolumetricLightUniforms } from "../../volumetricLight/volumetricLightUniforms";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
+import { DeepReadonly } from "../../utils/types";
 
 export class NeutronStar implements StellarObjectBase<OrbitalObjectType.NEUTRON_STAR>, Cullable {
-    readonly model: NeutronStarModel;
+    readonly model: DeepReadonly<NeutronStarModel>;
 
     readonly type = OrbitalObjectType.NEUTRON_STAR;
 
@@ -64,7 +65,7 @@ export class NeutronStar implements StellarObjectBase<OrbitalObjectType.NEUTRON_
      * @param model The seed of the star in [-1, 1]
      * @param scene
      */
-    constructor(model: NeutronStarModel, scene: Scene) {
+    constructor(model: DeepReadonly<NeutronStarModel>, scene: Scene) {
         this.model = model;
 
         this.mesh = MeshBuilder.CreateSphere(

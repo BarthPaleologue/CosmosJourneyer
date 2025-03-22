@@ -21,12 +21,10 @@ import type { MissionNodeBase } from "../../missionNodeBase";
 import { MissionContext } from "../../../missionContext";
 import {
     StarSystemCoordinates,
-    starSystemCoordinatesEquals,
-    UniverseObjectId,
-    universeObjectIdEquals
-} from "../../../../utils/coordinates/universeCoordinates";
+    starSystemCoordinatesEquals
+} from "../../../../utils/coordinates/starSystemCoordinates";
+import { UniverseObjectId, universeObjectIdEquals } from "../../../../utils/coordinates/universeObjectId";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { getObjectBySystemId, getObjectModelByUniverseId } from "../../../../utils/coordinates/orbitalObjectId";
 import { parseDistance } from "../../../../utils/strings/parseToStrings";
 import { Settings } from "../../../../settings";
 import i18n from "../../../../i18n";
@@ -48,7 +46,7 @@ export class MissionFlyByNode implements MissionNodeBase<MissionNodeType.FLY_BY>
 
     constructor(objectId: UniverseObjectId) {
         this.objectId = objectId;
-        this.targetSystemCoordinates = objectId.starSystemCoordinates;
+        this.targetSystemCoordinates = objectId.systemCoordinates;
     }
 
     /**
@@ -80,8 +78,8 @@ export class MissionFlyByNode implements MissionNodeBase<MissionNodeType.FLY_BY>
             return;
         }
 
-        const targetObject = getObjectBySystemId(this.objectId, currentSystem);
-        if (targetObject === null) {
+        const targetObject = currentSystem.getOrbitalObjectById(this.objectId.idInSystem);
+        if (targetObject === undefined) {
             throw new Error(`Could not find object with ID ${JSON.stringify(this.objectId)}`);
         }
 
@@ -127,7 +125,7 @@ export class MissionFlyByNode implements MissionNodeBase<MissionNodeType.FLY_BY>
             starSystemDatabase.getSystemGalacticPosition(originSystemCoordinates),
             starSystemDatabase.getSystemGalacticPosition(this.targetSystemCoordinates)
         );
-        const objectModel = getObjectModelByUniverseId(this.objectId, starSystemDatabase);
+        const objectModel = starSystemDatabase.getObjectModelByUniverseId(this.objectId);
         const systemModel = starSystemDatabase.getSystemModelFromCoordinates(this.targetSystemCoordinates);
         if (objectModel === null || systemModel === null) {
             throw new Error(`Could not find object with ID ${JSON.stringify(this.objectId)}`);
@@ -148,7 +146,7 @@ export class MissionFlyByNode implements MissionNodeBase<MissionNodeType.FLY_BY>
             return i18n.t("missions:flyBy:missionCompleted");
         }
 
-        const targetObject = getObjectModelByUniverseId(this.objectId, starSystemDatabase);
+        const targetObject = starSystemDatabase.getObjectModelByUniverseId(this.objectId);
         if (targetObject === null) {
             throw new Error(`Could not find object with ID ${JSON.stringify(this.objectId)}`);
         }

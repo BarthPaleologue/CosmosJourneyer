@@ -28,3 +28,13 @@ export function err<T, E>(error: E): Result<T, E> {
 export type DeepPartial<T> = {
     [P in keyof T]?: DeepPartial<T[P]>;
 };
+
+export type DeepReadonly<T> = {
+    readonly [K in keyof T]: DeepReadonly<T[K]>;
+};
+
+export type NonEmptyArray<T> = [T, ...T[]];
+
+export function isNonEmptyArray<T>(arr: ReadonlyArray<T>): arr is NonEmptyArray<T> {
+    return arr.length > 0;
+}

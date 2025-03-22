@@ -36,7 +36,7 @@ export class AxisRenderer {
      * @param objects
      * @param scene
      */
-    setOrbitalObjects(objects: (Transformable & HasBoundingSphere)[], scene: Scene) {
+    setOrbitalObjects(objects: ReadonlyArray<Transformable & HasBoundingSphere>, scene: Scene) {
         this.reset();
 
         for (const object of objects) {

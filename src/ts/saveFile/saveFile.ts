@@ -15,12 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { jsonSafeParse } from "../utils/json";
 import { err, Result } from "../utils/types";
 import { Save, safeParseSave } from "./saveFileData";
 import { SaveLoadingError, SaveLoadingErrorType } from "./saveLoadingError";
 
-export async function parseSaveFile(rawSaveFile: File): Promise<Result<Save, SaveLoadingError>> {
+export async function parseSaveFile(
+    rawSaveFile: File,
+    starSystemDatabase: StarSystemDatabase
+): Promise<Result<Save, SaveLoadingError>> {
     return new Promise((resolve) => {
         const reader = new FileReader();
         reader.onload = (event) => {
@@ -34,7 +38,7 @@ export async function parseSaveFile(rawSaveFile: File): Promise<Result<Save, Sav
                 return resolve(err({ type: SaveLoadingErrorType.INVALID_JSON }));
             }
 
-            return resolve(safeParseSave(parsedData));
+            return resolve(safeParseSave(parsedData, starSystemDatabase));
         };
         reader.readAsText(rawSaveFile);
     });

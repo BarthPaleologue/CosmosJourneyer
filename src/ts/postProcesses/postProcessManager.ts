@@ -58,6 +58,7 @@ import { MandelboxModel } from "../anomalies/mandelbox/mandelboxModel";
 import { SierpinskiPyramidModel } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidModel";
 import { MengerSpongeModel } from "../anomalies/mengerSponge/mengerSpongeModel";
 import { CelestialBody, StellarObject } from "../architecture/orbitalObject";
+import { DeepReadonly } from "../utils/types";
 
 /**
  * The order in which the post processes are rendered when away from a planet
@@ -357,7 +358,7 @@ export class PostProcessManager {
         this.celestialBodyToPostProcesses.set(blackHole.getTransform(), [blackHolePostProcess]);
     }
 
-    public addTelluricPlanet(planet: TelluricPlanet, stellarObjects: StellarObject[]) {
+    public addTelluricPlanet(planet: TelluricPlanet, stellarObjects: ReadonlyArray<StellarObject>) {
         const postProcesses: PostProcess[] = [];
 
         if (planet.atmosphereUniforms !== null) {
@@ -423,7 +424,7 @@ export class PostProcessManager {
         this.celestialBodyToPostProcesses.set(planet.getTransform(), postProcesses);
     }
 
-    public addGasPlanet(planet: GasPlanet, stellarObjects: StellarObject[]) {
+    public addGasPlanet(planet: GasPlanet, stellarObjects: ReadonlyArray<StellarObject>) {
         const postProcesses: PostProcess[] = [];
 
         if (planet.atmosphereUniforms !== null) {
@@ -474,8 +475,8 @@ export class PostProcessManager {
     public addMandelbulb(
         transform: TransformNode,
         radius: number,
-        model: MandelbulbModel,
-        stellarObjects: StellarObject[]
+        model: DeepReadonly<MandelbulbModel>,
+        stellarObjects: ReadonlyArray<StellarObject>
     ) {
         const mandelbulb = new MandelbulbPostProcess(transform, radius, model, this.scene, stellarObjects);
         this.mandelbulbs.push(mandelbulb);
@@ -493,8 +494,8 @@ export class PostProcessManager {
     public addJuliaSet(
         transform: TransformNode,
         radius: number,
-        model: JuliaSetModel,
-        stellarObjects: StellarObject[]
+        model: DeepReadonly<JuliaSetModel>,
+        stellarObjects: ReadonlyArray<StellarObject>
     ) {
         const juliaSetPostProcess = new JuliaSetPostProcess(
             transform,
@@ -511,8 +512,8 @@ export class PostProcessManager {
     public addMandelbox(
         transform: TransformNode,
         radius: number,
-        model: MandelboxModel,
-        stellarObjects: StellarObject[]
+        model: DeepReadonly<MandelboxModel>,
+        stellarObjects: ReadonlyArray<StellarObject>
     ) {
         const mandelbox = new MandelboxPostProcess(transform, radius, model, this.scene, stellarObjects);
         this.mandelboxes.push(mandelbox);
@@ -523,8 +524,8 @@ export class PostProcessManager {
     public addSierpinskiPyramid(
         transform: TransformNode,
         radius: number,
-        model: SierpinskiPyramidModel,
-        stellarObjects: StellarObject[]
+        model: DeepReadonly<SierpinskiPyramidModel>,
+        stellarObjects: ReadonlyArray<StellarObject>
     ) {
         const sierpinskiPyramid = new SierpinskiPyramidPostProcess(
             transform,
@@ -541,8 +542,8 @@ export class PostProcessManager {
     public addMengerSponge(
         transform: TransformNode,
         radius: number,
-        model: MengerSpongeModel,
-        stellarObjects: StellarObject[]
+        model: DeepReadonly<MengerSpongeModel>,
+        stellarObjects: ReadonlyArray<StellarObject>
     ) {
         const mengerSponge = new MengerSpongePostProcess(transform, radius, model, this.scene, stellarObjects);
         this.mengerSponges.push(mengerSponge);

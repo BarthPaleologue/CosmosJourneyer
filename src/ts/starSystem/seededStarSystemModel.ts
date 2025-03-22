@@ -19,8 +19,14 @@ import { centeredRand, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../settings";
 import { generateStarName } from "../utils/strings/starNameGenerator";
 import { wheelOfFortune } from "../utils/random";
-import { PlanetarySystemModel, StarSystemModel } from "./starSystemModel";
-import { StellarObjectModel, AnomalyModel, AnomalyType } from "../architecture/orbitalObjectModel";
+import { StarSystemModel } from "./starSystemModel";
+import {
+    StellarObjectModel,
+    AnomalyModel,
+    AnomalyType,
+    PlanetModel,
+    OrbitalFacilityModel
+} from "../architecture/orbitalObjectModel";
 import { Alphabet, ReversedGreekAlphabet } from "../utils/strings/parseToStrings";
 import { newSeededStarModel } from "../stellarObjects/star/starModelGenerator";
 import { newSeededBlackHoleModel } from "../stellarObjects/blackHole/blackHoleModelGenerator";
@@ -35,11 +41,13 @@ import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { newSeededTelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModelGenerator";
 import { newSeededTelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModelGenerator";
 import { newSeededSpaceElevatorModel } from "../spacestation/spaceElevatorModelGenerator";
-import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates";
+import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { newSeededMandelboxModel } from "../anomalies/mandelbox/mandelboxModelGenerator";
 import { newSeededSierpinskiPyramidModel } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidModelGenerator";
 import { newSeededMengerSpongeModel } from "../anomalies/mengerSponge/mengerSpongeModelGenerator";
+import { TelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModel";
+import { isNonEmptyArray } from "../utils/types";
 
 const enum GenerationSteps {
     NAME,
@@ -68,29 +76,27 @@ export function newSeededStarSystemModel(
     const systemName = generateStarName(systemRng, GenerationSteps.NAME);
 
     // generate stellar objects of the system first (we can assume the other objects don't have a significant influence on the stellar objects)
-    const stellarObjects: StellarObjectModel[] = [];
-    const nbStellarObjects = 1;
-    for (let i = 0; i < nbStellarObjects; i++) {
-        const stellarObjectType = getBodyTypeOfStellarObject(systemRng, i);
-        const seed = centeredRand(systemRng, GenerationSteps.STARS + i) * Settings.SEED_HALF_RANGE;
-        const stellarObjectName = `${systemName} ${Alphabet[i].toUpperCase()}`;
-        switch (stellarObjectType) {
-            case OrbitalObjectType.STAR:
-                stellarObjects.push(newSeededStarModel(seed, stellarObjectName, []));
-                break;
-            case OrbitalObjectType.BLACK_HOLE:
-                stellarObjects.push(newSeededBlackHoleModel(seed, stellarObjectName, []));
-                break;
-            case OrbitalObjectType.NEUTRON_STAR:
-                stellarObjects.push(newSeededNeutronStarModel(seed, stellarObjectName, []));
-                break;
-            default:
-                throw new Error("Unknown stellar object type");
-        }
+    const stellarObjects: Array<StellarObjectModel> = [];
+
+    const stellarObjectType = getBodyTypeOfStellarObject(systemRng, 0);
+    const seed = centeredRand(systemRng, GenerationSteps.STARS + 0) * Settings.SEED_HALF_RANGE;
+    const stellarObjectName = `${systemName} ${Alphabet[0].toUpperCase()}`;
+    switch (stellarObjectType) {
+        case OrbitalObjectType.STAR:
+            stellarObjects.push(newSeededStarModel(seed, stellarObjectName, []));
+            break;
+        case OrbitalObjectType.BLACK_HOLE:
+            stellarObjects.push(newSeededBlackHoleModel(seed, stellarObjectName, []));
+            break;
+        case OrbitalObjectType.NEUTRON_STAR:
+            stellarObjects.push(newSeededNeutronStarModel(seed, stellarObjectName, []));
+            break;
     }
 
     // Afterward planets are generated. We can assume they only depend on the stellar objects.
-    const planetarySystems: PlanetarySystemModel[] = [];
+    const planets: Array<PlanetModel> = [];
+    const satellites: Array<TelluricSatelliteModel> = [];
+
     //Fixme: planets need to work with black holes as well at some point
     const nbPlanets =
         stellarObjects[0].type === OrbitalObjectType.BLACK_HOLE
@@ -106,48 +112,32 @@ export function newSeededStarSystemModel(
 
         switch (bodyType) {
             case OrbitalObjectType.TELLURIC_PLANET:
-                planetarySystems.push({
-                    planets: [newSeededTelluricPlanetModel(seed, planetName, stellarObjects)],
-                    satellites: [],
-                    orbitalFacilities: []
-                });
+                planets.push(newSeededTelluricPlanetModel(seed, planetName, stellarObjects));
                 break;
             case OrbitalObjectType.GAS_PLANET:
-                planetarySystems.push({
-                    planets: [newSeededGasPlanetModel(seed, planetName, stellarObjects)],
-                    satellites: [],
-                    orbitalFacilities: []
-                });
+                planets.push(newSeededGasPlanetModel(seed, planetName, stellarObjects));
                 break;
-            default:
-                throw new Error("Unknown planet type");
         }
     }
 
     // For each planet, generate satellites
-    planetarySystems.forEach(({ planets, satellites }) => {
-        let nbMoons = 0;
-        planets.forEach((planet) => {
-            const planetRng = getRngFromSeed(planet.seed);
-            nbMoons +=
-                planet.type === OrbitalObjectType.GAS_PLANET
-                    ? randRangeInt(0, 3, planetRng, GenerationSteps.NB_MOONS)
-                    : randRangeInt(0, 2, planetRng, GenerationSteps.NB_MOONS);
-        });
-        const seedSum = planets.reduce((acc, planet) => acc + planet.seed, 0);
-        const planetarySystemName = planets.map((planet) => planet.name).join("-");
-        const planetarySystemRng = getRngFromSeed(seedSum);
+    planets.forEach((planet) => {
+        const planetRng = getRngFromSeed(planet.seed);
+        const nbMoons =
+            planet.type === OrbitalObjectType.GAS_PLANET
+                ? randRangeInt(0, 3, planetRng, GenerationSteps.NB_MOONS)
+                : randRangeInt(0, 2, planetRng, GenerationSteps.NB_MOONS);
+
         for (let j = 0; j < nbMoons; j++) {
-            const satelliteName = `${planetarySystemName}${Alphabet[j]}`;
-            const satelliteSeed =
-                centeredRand(planetarySystemRng, GenerationSteps.MOONS + j) * Settings.SEED_HALF_RANGE;
-            const satelliteModel = newSeededTelluricSatelliteModel(satelliteSeed, satelliteName, planets);
+            const satelliteName = `${planet.name}${Alphabet[j]}`;
+            const satelliteSeed = centeredRand(planetRng, GenerationSteps.MOONS + j) * Settings.SEED_HALF_RANGE;
+            const satelliteModel = newSeededTelluricSatelliteModel(satelliteSeed, satelliteName, [planet]);
             satellites.push(satelliteModel);
         }
     });
 
     // Finally, generate anomalies
-    const anomalies: AnomalyModel[] = [];
+    const anomalies: Array<AnomalyModel> = [];
     const nbAnomalies = wheelOfFortune(
         [
             [0, 0.96],
@@ -171,100 +161,92 @@ export function newSeededStarSystemModel(
 
         switch (anomalyType) {
             case OrbitalObjectType.MANDELBULB:
-                anomalies.push(newSeededMandelbulbModel(anomalySeed, anomalyName));
+                anomalies.push(newSeededMandelbulbModel(anomalySeed, anomalyName, [stellarObjects[0]]));
                 break;
             case OrbitalObjectType.JULIA_SET:
-                anomalies.push(newSeededJuliaSetModel(anomalySeed, anomalyName));
+                anomalies.push(newSeededJuliaSetModel(anomalySeed, anomalyName, [stellarObjects[0]]));
                 break;
             case OrbitalObjectType.MANDELBOX:
-                anomalies.push(newSeededMandelboxModel(anomalySeed, anomalyName));
+                anomalies.push(newSeededMandelboxModel(anomalySeed, anomalyName, [stellarObjects[0]]));
                 break;
             case OrbitalObjectType.SIERPINSKI_PYRAMID:
-                anomalies.push(newSeededSierpinskiPyramidModel(anomalySeed, anomalyName));
+                anomalies.push(newSeededSierpinskiPyramidModel(anomalySeed, anomalyName, [stellarObjects[0]]));
                 break;
             case OrbitalObjectType.MENGER_SPONGE:
-                anomalies.push(newSeededMengerSpongeModel(anomalySeed, anomalyName));
+                anomalies.push(newSeededMengerSpongeModel(anomalySeed, anomalyName, [stellarObjects[0]]));
                 break;
         }
     }
 
+    const orbitalFacilities: Array<OrbitalFacilityModel> = [];
+
     if (isCivilized) {
         // finally, space station are placed
-        const planetarySystemToScore = new Map<PlanetarySystemModel, number>();
+        const planetToScore = new Map<PlanetModel, number>();
 
-        planetarySystems.forEach((planetarySystem) => {
+        planets.forEach((planet) => {
             let score = 0;
-            const nbMoons = planetarySystem.satellites.length;
+            const nbMoons = satellites.filter((satellite) => satellite.orbit.parentIds.includes(planet.id)).length;
             score += nbMoons;
+            score += planet.rings !== null ? 2 : 0;
 
-            const hasRings = planetarySystem.planets.some((planetModel) => planetModel.rings !== null);
-            score += hasRings ? 2 : 0;
-
-            planetarySystemToScore.set(planetarySystem, score);
+            planetToScore.set(planet, score);
         });
 
         // sort planets by potential score
-        const sortedPlanetarySystems = Array.from(planetarySystems);
-        sortedPlanetarySystems.sort((planetA, planetB) => {
-            const scoreA = planetarySystemToScore.get(planetA) ?? 0;
-            const scoreB = planetarySystemToScore.get(planetB) ?? 0;
+        const sortedPlanets = planets.toSorted((planetA, planetB) => {
+            const scoreA = planetToScore.get(planetA) ?? 0;
+            const scoreB = planetToScore.get(planetB) ?? 0;
             return scoreB - scoreA;
         });
 
-        const nbStations = Math.min(
-            planetarySystems.length,
-            Math.max(1, systemRng(77) * Math.floor(planetarySystems.length / 2))
-        );
+        const nbStations = Math.min(planets.length, Math.max(1, systemRng(77) * Math.floor(planets.length / 2)));
 
-        const planetarySystemsWithStations = sortedPlanetarySystems.slice(0, nbStations);
+        const planetsWithStations = sortedPlanets.slice(0, nbStations);
 
-        planetarySystemsWithStations.forEach((planetarySystem) => {
+        planetsWithStations.forEach((planet) => {
             const spaceStationSeed =
-                centeredRand(
-                    systemRng,
-                    GenerationSteps.SPACE_STATIONS +
-                        planetarySystem.planets.length +
-                        planetarySystem.orbitalFacilities.length
-                ) * Settings.SEED_HALF_RANGE;
+                centeredRand(systemRng, GenerationSteps.SPACE_STATIONS + orbitalFacilities.length) *
+                Settings.SEED_HALF_RANGE;
 
             if (
                 uniformRandBool(0.5, systemRng, 657) && // 50% chance of having a space elevator
-                planetarySystem.planets.length === 1 && // I don't want to imagine the complexity of a space elevator in a close binary system
-                planetarySystem.planets[0].type === OrbitalObjectType.TELLURIC_PLANET && // space elevators can't be built on gas giants yet
-                planetarySystem.planets[0].rings === null // can't have rings because the tether would be at risk
+                planet.type === OrbitalObjectType.TELLURIC_PLANET && // space elevators can't be built on gas giants yet
+                planet.rings === null // can't have rings because the tether would be at risk
             ) {
                 const spaceElevatorModel = newSeededSpaceElevatorModel(
                     spaceStationSeed,
                     stellarObjects,
                     coordinates,
                     position,
-                    planetarySystem.planets[0]
+                    planet
                 );
-                planetarySystem.orbitalFacilities.push(spaceElevatorModel);
+                orbitalFacilities.push(spaceElevatorModel);
             } else {
                 const spaceStationModel = newSeededSpaceStationModel(
                     spaceStationSeed,
                     stellarObjects,
                     coordinates,
                     position,
-                    planetarySystem.planets
+                    [planet]
                 );
-                planetarySystem.orbitalFacilities.push(spaceStationModel);
+                orbitalFacilities.push(spaceStationModel);
             }
         });
+    }
+
+    if (!isNonEmptyArray(stellarObjects)) {
+        throw new Error("No stellar objects were generated for the star system");
     }
 
     return {
         name: systemName,
         coordinates,
-        subSystems: [
-            {
-                stellarObjects,
-                planetarySystems,
-                anomalies,
-                orbitalFacilities: []
-            }
-        ]
+        stellarObjects: stellarObjects,
+        planets: planets,
+        satellites: satellites,
+        anomalies: anomalies,
+        orbitalFacilities: orbitalFacilities
     };
 }
 

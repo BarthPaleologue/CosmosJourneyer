@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { StarSystemModel } from "./starSystemModel";
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/universeCoordinates";
+import { getObjectModelById, StarSystemModel } from "./starSystemModel";
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/starSystemCoordinates";
 import { newSeededStarSystemModel } from "./seededStarSystemModel";
 import { hashVec3 } from "../utils/hashVec3";
 import { getRngFromSeed } from "../utils/getRngFromSeed";
@@ -24,6 +24,9 @@ import { Settings } from "../settings";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { centeredRand } from "extended-random";
 import { makeNoise3D } from "fast-simplex-noise/lib/3d";
+import { UniverseObjectId } from "../utils/coordinates/universeObjectId";
+import { OrbitalObjectModel } from "../architecture/orbitalObjectModel";
+import { DeepReadonly } from "../utils/types";
 
 /**
  * The StarSystemDatabase defines the content of the universe.
@@ -68,7 +71,13 @@ export class StarSystemDatabase {
      */
     private readonly universeDensity: (starSectorX: number, starSectorY: number, starSectorZ: number) => number;
 
-    constructor() {
+    /**
+     * Fallback system that is guaranteed to exist
+     * This can be useful for default mechanisms relying on finding a system in the database if nothing is found
+     */
+    readonly fallbackSystem: DeepReadonly<StarSystemModel>;
+
+    constructor(fallbackSystem: StarSystemModel) {
         const densityRng = getRngFromSeed(Settings.UNIVERSE_SEED);
         let densitySampleStep = 0;
         const densityPerlin = makeNoise3D(() => {
@@ -77,6 +86,8 @@ export class StarSystemDatabase {
 
         this.universeDensity = (x: number, y: number, z: number) =>
             (1.0 - Math.abs(densityPerlin(x * 0.2, y * 0.2, z * 0.2))) ** 8;
+
+        this.fallbackSystem = fallbackSystem;
     }
 
     /**
@@ -169,7 +180,11 @@ export class StarSystemDatabase {
      * @param coordinates The coordinates of the system you want the model of.
      * @returns The StarSystemModel for the given coordinates, or null if the system is not found.
      */
-    public getSystemModelFromCoordinates(coordinates: StarSystemCoordinates): StarSystemModel | null {
+    public getSystemModelFromCoordinates(coordinates: StarSystemCoordinates): DeepReadonly<StarSystemModel> | null {
+        if (starSystemCoordinatesEquals(coordinates, this.fallbackSystem.coordinates)) {
+            return this.fallbackSystem;
+        }
+
         const customSystem = this.getCustomSystemFromCoordinates(coordinates);
         if (customSystem !== undefined) {
             return this.applyPlugins(customSystem);
@@ -229,15 +244,26 @@ export class StarSystemDatabase {
         sectorX: number,
         sectorY: number,
         sectorZ: number
-    ): StarSystemCoordinates[] {
+    ): DeepReadonly<Array<StarSystemCoordinates>> {
+        const result: Array<DeepReadonly<StarSystemCoordinates>> = [];
         const generatedSystemCoordinates = this.getGeneratedSystemCoordinatesInStarSector(sectorX, sectorY, sectorZ);
+        result.push(...generatedSystemCoordinates);
 
         const customSystemModels = this.getCustomSystemsFromSector(sectorX, sectorY, sectorZ);
         const customSystemCoordinates = customSystemModels.map((model) => {
             return model.coordinates;
         });
+        result.push(...customSystemCoordinates);
 
-        return generatedSystemCoordinates.concat(customSystemCoordinates);
+        if (
+            this.fallbackSystem.coordinates.starSectorX === sectorX &&
+            this.fallbackSystem.coordinates.starSectorY === sectorY &&
+            this.fallbackSystem.coordinates.starSectorZ === sectorZ
+        ) {
+            result.push(this.fallbackSystem.coordinates);
+        }
+
+        return result;
     }
 
     /**
@@ -246,8 +272,12 @@ export class StarSystemDatabase {
      * @param sectorZ
      * @returns All system models (custom and generated) in the given star sector.
      */
-    public getSystemModelsInStarSector(sectorX: number, sectorY: number, sectorZ: number) {
-        const generatedModels: StarSystemModel[] = [];
+    public getSystemModelsInStarSector(
+        sectorX: number,
+        sectorY: number,
+        sectorZ: number
+    ): DeepReadonly<Array<StarSystemModel>> {
+        const generatedModels: DeepReadonly<StarSystemModel>[] = [];
 
         const generatedSystemCoordinates = this.getGeneratedSystemCoordinatesInStarSector(sectorX, sectorY, sectorZ);
 
@@ -261,11 +291,9 @@ export class StarSystemDatabase {
 
         const customSystemModels = this.getCustomSystemsFromSector(sectorX, sectorY, sectorZ);
 
-        const allModels = generatedModels.concat(customSystemModels);
+        const customSystemsAfterPlugins = customSystemModels.map((model) => this.applyPlugins(model));
 
-        return allModels.map((model) => {
-            return this.applyPlugins(model);
-        });
+        return generatedModels.concat(customSystemsAfterPlugins);
     }
 
     /**
@@ -297,6 +325,18 @@ export class StarSystemDatabase {
             localY: systemLocalPosition.y,
             localZ: systemLocalPosition.z
         };
+    }
+
+    /**
+     * @param starSectorX
+     * @param starSectorY
+     * @param starSectorZ
+     * @param index The index of the generated system in the star sector.
+     * @returns The system model of the system generated given the seed, or null if the system is not found.
+     */
+    public getSystemModelFromSeed(starSectorX: number, starSectorY: number, starSectorZ: number, index: number) {
+        const coordinates = this.getSystemCoordinatesFromSeed(starSectorX, starSectorY, starSectorZ, index);
+        return this.getSystemModelFromCoordinates(coordinates);
     }
 
     /**
@@ -350,6 +390,20 @@ export class StarSystemDatabase {
 
         localPositions.push(...this.getGeneratedLocalPositionsInStarSector(sectorX, sectorY, sectorZ));
 
+        if (
+            this.fallbackSystem.coordinates.starSectorX === sectorX &&
+            this.fallbackSystem.coordinates.starSectorY === sectorY &&
+            this.fallbackSystem.coordinates.starSectorZ === sectorZ
+        ) {
+            localPositions.push(
+                new Vector3(
+                    this.fallbackSystem.coordinates.localX,
+                    this.fallbackSystem.coordinates.localY,
+                    this.fallbackSystem.coordinates.localZ
+                )
+            );
+        }
+
         const customSystemModels = this.getCustomSystemsFromSector(sectorX, sectorY, sectorZ);
 
         for (const systemModel of customSystemModels) {
@@ -382,10 +436,26 @@ export class StarSystemDatabase {
     }
 
     /**
+     * Searches the database for the given id
+     * @param universeObjectId The id to look for
+     * @param starSystemDatabase The database to look in
+     * @returns The model if it exists, null otherwise
+     */
+    public getObjectModelByUniverseId(universeObjectId: UniverseObjectId): DeepReadonly<OrbitalObjectModel> | null {
+        const starSystemCoordinates = universeObjectId.systemCoordinates;
+        const starSystemModel = this.getSystemModelFromCoordinates(starSystemCoordinates);
+        if (starSystemModel === null) {
+            return null;
+        }
+
+        return getObjectModelById(universeObjectId.idInSystem, starSystemModel);
+    }
+
+    /**
      * @param model The system model to apply the plugins to.
      * @returns The modified system model, or a new system model.
      */
-    private applyPlugins(model: StarSystemModel): StarSystemModel {
+    private applyPlugins(model: StarSystemModel): DeepReadonly<StarSystemModel> {
         let newModel = model;
         const singlePlugin = this.coordinatesToSinglePlugins.get(JSON.stringify(model.coordinates));
         if (singlePlugin !== undefined) {

@@ -24,8 +24,14 @@ import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { JuliaSetModel } from "./juliaSetModel";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Tools } from "@babylonjs/core/Misc/tools";
+import { OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
+import { createOrbitalObjectId } from "../../utils/coordinates/orbitalObjectId";
 
-export function newSeededJuliaSetModel(seed: number, name: string): JuliaSetModel {
+export function newSeededJuliaSetModel(
+    seed: number,
+    name: string,
+    parentBodies: ReadonlyArray<OrbitalObjectModel>
+): JuliaSetModel {
     const rng = getRngFromSeed(seed);
 
     const radius = 1000e3;
@@ -41,7 +47,10 @@ export function newSeededJuliaSetModel(seed: number, name: string): JuliaSetMode
 
     const orbitalP = clamp(0.5, 3.0, normalRandom(1.0, 0.3, rng, GenerationSteps.ORBIT + 80));
 
+    const parentIds = parentBodies.map((body) => body.id);
+
     const orbit: Orbit = {
+        parentIds: parentIds,
         semiMajorAxis: orbitRadius,
         p: orbitalP,
         inclination: Tools.ToRadians(normalRandom(90, 20, rng, GenerationSteps.ORBIT + 160)),
@@ -56,6 +65,7 @@ export function newSeededJuliaSetModel(seed: number, name: string): JuliaSetMode
 
     return {
         type: OrbitalObjectType.JULIA_SET,
+        id: createOrbitalObjectId(parentIds, name),
         name,
         radius,
         orbit,

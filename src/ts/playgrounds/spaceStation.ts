@@ -30,6 +30,7 @@ import { AssetsManager } from "@babylonjs/core";
 import { Textures } from "../assets/textures";
 import { Materials } from "../assets/materials";
 import { Objects } from "../assets/objects";
+import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
 
 export async function createSpaceStationScene(engine: AbstractEngine): Promise<Scene> {
     const scene = new Scene(engine);
@@ -64,7 +65,7 @@ export async function createSpaceStationScene(engine: AbstractEngine): Promise<S
         localZ: 0
     };
 
-    const systemDatabase = new StarSystemDatabase();
+    const systemDatabase = new StarSystemDatabase(getLoneStarSystem());
     const systemPosition = systemDatabase.getSystemGalacticPosition(coordinates);
 
     const sunModel = newSeededStarModel(420, "Untitled Star", []);

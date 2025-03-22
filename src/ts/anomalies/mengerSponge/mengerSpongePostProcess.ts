@@ -33,6 +33,7 @@ import { Constants } from "@babylonjs/core/Engines/constants";
 import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { MengerSpongeModel } from "./mengerSpongeModel";
+import { DeepReadonly } from "../../utils/types";
 
 export class MengerSpongePostProcess extends PostProcess implements UpdatablePostProcess {
     private elapsedSeconds = 0;
@@ -42,9 +43,9 @@ export class MengerSpongePostProcess extends PostProcess implements UpdatablePos
     constructor(
         transform: TransformNode,
         boundingRadius: number,
-        model: MengerSpongeModel,
+        model: DeepReadonly<MengerSpongeModel>,
         scene: Scene,
-        stellarObjects: StellarObject[]
+        stellarObjects: ReadonlyArray<StellarObject>
     ) {
         const shaderName = "MengerSponge";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {

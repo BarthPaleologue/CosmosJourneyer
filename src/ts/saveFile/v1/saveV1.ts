@@ -17,10 +17,52 @@
 
 import { z } from "zod";
 import projectInfo from "../../../../package.json";
-import { SerializedPlayerSchema } from "../../player/serializedPlayer";
-import { UniverseCoordinatesSchema } from "../../utils/coordinates/universeCoordinates";
 import { Result, ok, err } from "../../utils/types";
 import { SaveLoadingError, SaveLoadingErrorType } from "../saveLoadingError";
+import { StarSystemCoordinatesSchema } from "../../utils/coordinates/starSystemCoordinates";
+import { DefaultSerializedSpaceship, SerializedSpaceshipSchema } from "../../spaceship/serializedSpaceship";
+import { CompletedTutorialsSchema } from "../../player/serializedPlayer";
+
+export enum SystemObjectType {
+    STELLAR_OBJECT,
+    PLANETARY_MASS_OBJECT,
+    ANOMALY,
+    ORBITAL_FACILITY
+}
+
+const SystemObjectIdSchema = z.object({
+    /**
+     * The type of the object.
+     */
+    objectType: z.nativeEnum(SystemObjectType),
+
+    /**
+     * The index of the object inside the array containing all objects of the given type within the star system.
+     */
+    objectIndex: z.number()
+});
+
+const UniverseObjectIdSchema = z.object({
+    ...SystemObjectIdSchema.shape,
+
+    /** The coordinates of the star system. */
+    starSystemCoordinates: StarSystemCoordinatesSchema
+});
+
+const SpaceDiscoveryDataSchema = z.object({
+    /**
+     * The ID of the object discovered.
+     */
+    objectId: UniverseObjectIdSchema,
+    /**
+     * The timestamp at which the object was discovered.
+     */
+    discoveryTimestamp: z.number().default(0),
+    /**
+     * The name of the explorer who discovered the object.
+     */
+    explorerName: z.string().default("Unknown")
+});
 
 export const SaveSchemaV1 = z.object({
     /** The version of CosmosJourneyer that created this save file. */
@@ -30,10 +72,88 @@ export const SaveSchemaV1 = z.object({
     timestamp: z.number().default(Date.now()),
 
     /** The player data. */
-    player: SerializedPlayerSchema,
+    player: z.object({
+        uuid: z.string().default(() => crypto.randomUUID()),
+        name: z.string().default("Python"),
+        balance: z.number().default(10000),
+        creationDate: z.string().default(new Date().toISOString()),
+        timePlayedSeconds: z.number().default(0),
+        visitedSystemHistory: z.array(StarSystemCoordinatesSchema).default([]),
+        discoveries: z
+            .object({
+                local: z.array(SpaceDiscoveryDataSchema).default([]),
+                uploaded: z.array(SpaceDiscoveryDataSchema).default([])
+            })
+            .default({
+                local: [],
+                uploaded: []
+            }),
+        currentItinerary: z.array(StarSystemCoordinatesSchema).default([]),
+        systemBookmarks: z.array(StarSystemCoordinatesSchema).default([]),
+        currentMissions: z.array(z.unknown()).default([]),
+        completedMissions: z.array(z.unknown()).default([]),
+        spaceShips: z.array(SerializedSpaceshipSchema).default([DefaultSerializedSpaceship]),
+        tutorials: CompletedTutorialsSchema.default({
+            stationLandingCompleted: false,
+            fuelScoopingCompleted: false
+        })
+    }),
 
     /** The coordinates of the current star system and the coordinates inside the star system. */
-    universeCoordinates: UniverseCoordinatesSchema,
+    universeCoordinates: z.object({
+        /**
+         * The coordinates of the body in the universe.
+         */
+        universeObjectId: z.object({
+            /**
+             * The type of the object.
+             */
+            objectType: z.nativeEnum(SystemObjectType),
+
+            /**
+             * The index of the object inside the array containing all objects of the given type within the star system.
+             */
+            objectIndex: z.number(),
+
+            /** The coordinates of the star system. */
+            starSystemCoordinates: StarSystemCoordinatesSchema
+        }),
+
+        /**
+         * The x coordinate of the player's position in the nearest orbital object's frame of reference.
+         */
+        positionX: z.number().default(0),
+
+        /**
+         * The y coordinate of the player's position in the nearest orbital object's frame of reference.
+         */
+        positionY: z.number().default(0),
+
+        /**
+         * The z coordinate of the player's position in the nearest orbital object's frame of reference.
+         */
+        positionZ: z.number().default(0),
+
+        /**
+         * The x component of the player's rotation quaternion in the nearest orbital object's frame of reference.
+         */
+        rotationQuaternionX: z.number().default(0),
+
+        /**
+         * The y component of the player's rotation quaternion in the nearest orbital object's frame of reference.
+         */
+        rotationQuaternionY: z.number().default(0),
+
+        /**
+         * The z component of the player's rotation quaternion in the nearest orbital object's frame of reference.
+         */
+        rotationQuaternionZ: z.number().default(0),
+
+        /**
+         * The w component of the player's rotation quaternion in the nearest orbital object's frame of reference.
+         */
+        rotationQuaternionW: z.number().default(1)
+    }),
 
     /** If the player is landed at a facility, store the pad number to allow graceful respawn at the station. */
     padNumber: z.number().optional()

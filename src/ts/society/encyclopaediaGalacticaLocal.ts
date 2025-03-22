@@ -3,9 +3,8 @@ import { GasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 import { TelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModel";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-import { getObjectModelByUniverseId } from "../utils/coordinates/orbitalObjectId";
-import { UniverseObjectId } from "../utils/coordinates/universeCoordinates";
-import { err, ok, Result } from "../utils/types";
+import { UniverseObjectId } from "../utils/coordinates/universeObjectId";
+import { err, ok, Result, DeepReadonly } from "../utils/types";
 import { EncyclopaediaGalactica, SpaceDiscoveryData } from "./encyclopaediaGalactica";
 
 export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
@@ -42,7 +41,7 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
         return Promise.resolve(this.spaceExplorationData.has(JSON.stringify(objectId)));
     }
 
-    private evaluateTelluricPlanetMultiplier(model: TelluricPlanetModel) {
+    private evaluateTelluricPlanetMultiplier(model: DeepReadonly<TelluricPlanetModel>) {
         let multiplier = 1;
         if (model.clouds !== null) multiplier += 1.0;
         if (model.rings !== null) multiplier += 1.0;
@@ -50,14 +49,14 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
         return multiplier;
     }
 
-    private evaluateTelluricSatelliteMultiplier(model: TelluricSatelliteModel) {
+    private evaluateTelluricSatelliteMultiplier(model: DeepReadonly<TelluricSatelliteModel>) {
         let multiplier = 0.5;
         if (model.clouds !== null) multiplier += 1.0;
 
         return multiplier;
     }
 
-    private evaluateGasPlanetMultiplier(model: GasPlanetModel) {
+    private evaluateGasPlanetMultiplier(model: DeepReadonly<GasPlanetModel>) {
         let multiplier = 1;
         if (model.rings !== null) multiplier += 1.0;
 
@@ -69,11 +68,11 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
             return ok(this.redundantDataPrice);
         }
 
-        const model = getObjectModelByUniverseId(object, this.starSystemDatabase);
+        const model = this.starSystemDatabase.getObjectModelByUniverseId(object);
         if (model === null) {
             return err("Object model not found for object ID");
         }
-        const systemGalacticPosition = this.starSystemDatabase.getSystemGalacticPosition(object.starSystemCoordinates);
+        const systemGalacticPosition = this.starSystemDatabase.getSystemGalacticPosition(object.systemCoordinates);
 
         const distanceFromSolLy = systemGalacticPosition.length();
 

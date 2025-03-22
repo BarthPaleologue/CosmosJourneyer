@@ -15,15 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { StarSystemController } from "../starSystem/starSystemController";
 import { Transformable } from "../architecture/transformable";
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { Controls } from "../uberCore/controls";
-import { getUpwardDirection, roll, rotateAround } from "../uberCore/transforms/basicTransform";
+import { getUpwardDirection, roll, rotateAround, setRotationQuaternion } from "../uberCore/transforms/basicTransform";
 import { CanHaveRings } from "../architecture/canHaveRings";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
-export function nearestObject(objectPosition: Vector3, bodies: Transformable[]): Transformable {
+export function nearestObject(objectPosition: Vector3, bodies: ReadonlyArray<Transformable>): Transformable {
     let distance = -1;
     if (bodies.length === 0) throw new Error("no bodieees !");
     let nearest = bodies[0];
@@ -35,6 +36,30 @@ export function nearestObject(objectPosition: Vector3, bodies: Transformable[]):
         }
     }
     return nearest;
+}
+
+export function positionNearObject(
+    orbitalObject: Transformable & HasBoundingSphere,
+    localPosition: Vector3,
+    localRotation: Quaternion,
+    transform: TransformNode
+) {
+    const objectRadius = orbitalObject.getBoundingRadius();
+    const currentDistance = localPosition.length();
+
+    const safetyFactor = 2;
+
+    const targetDistance = Math.max(objectRadius * safetyFactor, currentDistance);
+
+    const scalingFactor = targetDistance / (currentDistance + 0.0001);
+
+    const objectWorld = orbitalObject.getTransform().getWorldMatrix();
+    const worldPosition = Vector3.TransformCoordinates(localPosition.scale(scalingFactor), objectWorld);
+    transform.setAbsolutePosition(worldPosition);
+
+    const objectQuaternion = orbitalObject.getTransform().absoluteRotationQuaternion;
+    const worldRotation = localRotation.multiply(objectQuaternion);
+    setRotationQuaternion(transform, worldRotation);
 }
 
 export function positionNearObjectBrightSide(

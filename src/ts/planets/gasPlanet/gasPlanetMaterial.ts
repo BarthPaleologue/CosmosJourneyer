@@ -31,6 +31,7 @@ import {
 } from "../../postProcesses/uniforms/stellarObjectUniforms";
 
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
+import { DeepReadonly } from "../../utils/types";
 
 const GasPlanetMaterialUniformNames = {
     WORLD: "world",
@@ -48,7 +49,7 @@ export class GasPlanetMaterial extends ShaderMaterial {
     readonly colorSettings: GazColorSettings;
     private elapsedSeconds = 0;
 
-    constructor(planetName: string, model: GasPlanetModel, scene: Scene) {
+    constructor(planetName: string, model: DeepReadonly<GasPlanetModel>, scene: Scene) {
         const shaderName = "gasPlanetMaterial";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
@@ -103,7 +104,7 @@ export class GasPlanetMaterial extends ShaderMaterial {
         this.setFloat(GasPlanetMaterialUniformNames.COLOR_SHARPNESS, this.colorSettings.colorSharpness);
     }
 
-    public update(stellarObjects: Transformable[], deltaSeconds: number) {
+    public update(stellarObjects: ReadonlyArray<Transformable>, deltaSeconds: number) {
         this.elapsedSeconds += deltaSeconds;
 
         this.onBindObservable.addOnce(() => {

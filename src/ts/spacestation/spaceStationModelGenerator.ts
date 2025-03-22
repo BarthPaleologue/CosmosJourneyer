@@ -23,7 +23,7 @@ import { Orbit } from "../orbit/orbit";
 import { Settings } from "../settings";
 import { getFactionFromGalacticPosition } from "../society/factions";
 import { CropTypes, CropType, getEdibleEnergyPerHaPerDay } from "../utils/agriculture";
-import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates";
+import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
 import { GenerationSteps } from "../utils/generationSteps";
 import { getRngFromSeed } from "../utils/getRngFromSeed";
 import { getSphereRadiatedEnergyFlux } from "../utils/physics";
@@ -33,6 +33,7 @@ import { generateSpaceStationName } from "../utils/strings/spaceStationNameGener
 import { SpaceStationModel } from "./spacestationModel";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { createOrbitalObjectId } from "../utils/coordinates/orbitalObjectId";
 
 export function newSeededSpaceStationModel(
     seed: number,
@@ -64,7 +65,10 @@ export function newSeededSpaceStationModel(
     }, 0);
     const orbitRadius = (2 + clamp(normalRandom(2, 1, rng, GenerationSteps.ORBIT), 0, 10)) * parentMaxRadius;
 
+    const parentIds = parentBodies.map((body) => body.id);
+
     const orbit: Orbit = {
+        parentIds: parentIds,
         semiMajorAxis: orbitRadius,
         p: 2,
         inclination: Tools.ToRadians(normalRandom(0, 10, rng, GenerationSteps.ORBIT + 10)),
@@ -134,9 +138,10 @@ export function newSeededSpaceStationModel(
     const totalHabitatSurfaceM2 = (housingSurfaceHa + agricultureSurfaceHa) * 1000; // convert ha to m²
 
     return {
-        seed,
         type: OrbitalObjectType.SPACE_STATION,
+        seed,
         starSystemCoordinates: starSystemCoordinates,
+        id: createOrbitalObjectId(parentIds, name),
         name,
         orbit,
         mass,

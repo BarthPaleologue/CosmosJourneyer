@@ -18,18 +18,35 @@
 import { describe, expect, it } from "vitest";
 import { FlightTutorial } from "./flightTutorial";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-import { getObjectModelByUniverseId } from "../utils/coordinates/orbitalObjectId";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
+import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
 
 describe("flightTutorial", () => {
     it("spawns inside of the rings of the planet", () => {
-        const starSystemDatabase = new StarSystemDatabase();
-        const flightTutorial = new FlightTutorial();
+        const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
+        const flightTutorial = new FlightTutorial(starSystemDatabase);
 
-        const planetModel = getObjectModelByUniverseId(
-            flightTutorial.saveData.universeCoordinates.universeObjectId,
-            starSystemDatabase
-        );
+        const saveData = flightTutorial.saveData;
+
+        expect(saveData.playerLocation.type).toBe("inSpaceship");
+        if (saveData.playerLocation.type !== "inSpaceship") {
+            throw new Error("saveData.playerLocation.type is not inSpaceship");
+        }
+
+        const shipId = saveData.playerLocation.shipId;
+
+        const shipLocation = saveData.shipLocations[shipId];
+        expect(shipLocation).not.toBe(undefined);
+        if (shipLocation === undefined) {
+            throw new Error("shipLocation is undefined");
+        }
+
+        expect(shipLocation.type).toBe("relative");
+        if (shipLocation.type !== "relative") {
+            throw new Error("shipLocation.location.type is not relative");
+        }
+
+        const planetModel = starSystemDatabase.getObjectModelByUniverseId(shipLocation.universeObjectId);
 
         expect(planetModel).not.toBe(null);
         if (planetModel === null) {
@@ -47,9 +64,7 @@ describe("flightTutorial", () => {
         }
 
         const distanceToPlanet = Math.sqrt(
-            flightTutorial.saveData.universeCoordinates.positionX ** 2 +
-                flightTutorial.saveData.universeCoordinates.positionY ** 2 +
-                flightTutorial.saveData.universeCoordinates.positionZ ** 2
+            shipLocation.position.x ** 2 + shipLocation.position.y ** 2 + shipLocation.position.z ** 2
         );
 
         const distanceToPlanetNormalized = distanceToPlanet / planetModel.radius;

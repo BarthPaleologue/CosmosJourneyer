@@ -15,66 +15,17 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { StarSystemCoordinates } from "../utils/coordinates/universeCoordinates";
 import {
     AnomalyModel,
     OrbitalFacilityModel,
-    PlanetaryMassObjectModel,
+    OrbitalObjectModel,
     PlanetModel,
     StellarObjectModel
 } from "../architecture/orbitalObjectModel";
 import { TelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModel";
-
-/**
- * Data model for a planetary system. It holds all the information necessary to generate and render a planetary system.
- * For example the Earth-Moon system is a planetary system, with the ISS orbiting the Earth.
- * Saturn and its satellites are another planetary system, with many satellites and no space stations (yet!).
- */
-export type PlanetarySystemModel = {
-    /**
-     * The planets of the planetary system.
-     * Usually, there is only one planet in the planetary system.
-     * However, binary planets are possible, like Pluto and Charon
-     */
-    planets: PlanetModel[];
-    /**
-     * The satellites of the planet.
-     */
-    satellites: TelluricSatelliteModel[];
-
-    /**
-     * The space stations orbiting the planet.
-     */
-    orbitalFacilities: OrbitalFacilityModel[];
-};
-
-/**
- * Data model for a sub star system. It holds all the information necessary to generate and render a sub star system.
- * A typical star system like Sol, which has a single star and planets orbiting it, a single sub star system can describe the whole star system.
- */
-export type SubStarSystemModel = {
-    /**
-     * The stellar objects in the sub star system.
-     * Usually, there is only one star in the sub star system.
-     * However, we can imagine more complex scenarios like 2 neutron stars orbiting each other while having planets orbiting them from far away.
-     */
-    stellarObjects: StellarObjectModel[];
-
-    /**
-     * The planetary systems in the sub star system.
-     */
-    planetarySystems: PlanetarySystemModel[];
-
-    /**
-     * The anomalies in the sub star system.
-     */
-    anomalies: AnomalyModel[];
-
-    /**
-     * The space stations orbiting the stellar objects in the sub star system.
-     */
-    orbitalFacilities: OrbitalFacilityModel[];
-};
+import { OrbitalObjectId } from "../utils/coordinates/orbitalObjectId";
+import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
+import { DeepReadonly, NonEmptyArray } from "../utils/types";
 
 /**
  * Data model for a star system. It holds all the information necessary to generate and render a star system.
@@ -92,83 +43,65 @@ export type StarSystemModel = {
     coordinates: StarSystemCoordinates;
 
     /**
-     * Data models for system hierarchies inside the star system. (There can be multiple sub star systems in a star system, for example a binary star system).
-     * Usually, there is only one sub star system with a single star.
+     * The stellar objects in the star systems (Stars, black holes, etc.)
      */
-    subSystems: SubStarSystemModel[];
+    stellarObjects: NonEmptyArray<StellarObjectModel>;
+
+    /**
+     * The planets of the star system.
+     */
+    planets: Array<PlanetModel>;
+
+    /**
+     * The natural satellites of the planets in the star system.
+     */
+    satellites: Array<TelluricSatelliteModel>;
+
+    /**
+     * The orbital anomalies in the star system.
+     */
+    anomalies: Array<AnomalyModel>;
+
+    /**
+     * The orbital facilities in the star system (space station, space elevators, etc.)
+     */
+    orbitalFacilities: Array<OrbitalFacilityModel>;
 };
 
 /**
- * Utility class to manipulate star system models.
+ * Finds the object model corresponding to the given id in the given system model
+ * @param id The id to look for
+ * @param starSystem The star system model to look in
+ * @returns The model if it exists, null otherwise
  */
-export class StarSystemModelUtils {
-    /**
-     * Returns all the stellar objects in the star system.
-     * @param starSystem The star system to get the stellar objects from.
-     * @constructor
-     */
-    static GetStellarObjects(starSystem: StarSystemModel): StellarObjectModel[] {
-        return starSystem.subSystems.flatMap((subSystem) => subSystem.stellarObjects);
+export function getObjectModelById(
+    id: OrbitalObjectId,
+    starSystem: DeepReadonly<StarSystemModel>
+): DeepReadonly<OrbitalObjectModel> | null {
+    const stellarObject = starSystem.stellarObjects.find((object) => object.id === id);
+    if (stellarObject !== undefined) {
+        return stellarObject;
     }
 
-    /**
-     * Returns all the planetary systems in the star system.
-     * @param starSystem The star system to get the planetary systems from.
-     * @constructor
-     */
-    static GetPlanetarySystems(starSystem: StarSystemModel): PlanetarySystemModel[] {
-        return starSystem.subSystems.flatMap((subSystem) => subSystem.planetarySystems);
+    const planet = starSystem.planets.find((object) => object.id === id);
+    if (planet !== undefined) {
+        return planet;
     }
 
-    /**
-     * Returns all the planets in the star system. (excluding satellites)
-     * @param starSystem The star system to get the planets from.
-     * @constructor
-     */
-    static GetPlanets(starSystem: StarSystemModel): PlanetModel[] {
-        return starSystem.subSystems.flatMap((subSystem) =>
-            subSystem.planetarySystems.flatMap((planetarySystem) => planetarySystem.planets)
-        );
+    const satellite = starSystem.satellites.find((object) => object.id === id);
+    if (satellite !== undefined) {
+        return satellite;
     }
 
-    /**
-     * Returns all space stations in the star system.
-     * @param starSystem The star system to get the space stations from.
-     * @constructor
-     */
-    static GetSpaceStations(starSystem: StarSystemModel): OrbitalFacilityModel[] {
-        const stellarSpaceStations = starSystem.subSystems.flatMap((subSystem) => subSystem.orbitalFacilities);
-        const planetarySpaceStations = starSystem.subSystems.flatMap((subSystem) =>
-            subSystem.planetarySystems.flatMap((planetarySystem) => planetarySystem.orbitalFacilities)
-        );
-
-        return stellarSpaceStations.concat(planetarySpaceStations);
+    const anomaly = starSystem.anomalies.find((object) => object.id === id);
+    if (anomaly !== undefined) {
+        return anomaly;
     }
 
-    /**
-     * Returns all the planetary mass objects in the star system. (Planets first, then satellites)
-     * @param starSystem The star system to get the planetary mass objects from.
-     * @constructor
-     */
-    static GetPlanetaryMassObjects(starSystem: StarSystemModel): PlanetaryMassObjectModel[] {
-        const planets: PlanetaryMassObjectModel[] = [];
-        const satellites: PlanetaryMassObjectModel[] = [];
-        starSystem.subSystems.forEach((subSystem) =>
-            subSystem.planetarySystems.forEach((planetarySystem) => {
-                planets.push(...planetarySystem.planets);
-                satellites.push(...planetarySystem.satellites);
-            })
-        );
-
-        return planets.concat(satellites);
+    const orbitalFacility = starSystem.orbitalFacilities.find((object) => object.id === id);
+    if (orbitalFacility !== undefined) {
+        return orbitalFacility;
     }
 
-    /**
-     * Returns all the anomalies in the star system.
-     * @param starSystem The star system to get the anomalies from.
-     * @constructor
-     */
-    static GetAnomalies(starSystem: StarSystemModel): AnomalyModel[] {
-        return starSystem.subSystems.flatMap((subSystem) => subSystem.anomalies);
-    }
+    return null;
 }

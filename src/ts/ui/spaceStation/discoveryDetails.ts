@@ -18,7 +18,6 @@
 import { Sounds } from "../../assets/sounds";
 import { Player } from "../../player/player";
 import { EncyclopaediaGalactica, SpaceDiscoveryData } from "../../society/encyclopaediaGalactica";
-import { getObjectModelByUniverseId } from "../../utils/coordinates/orbitalObjectId";
 import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
 import { parseDistance, parseSecondsPrecise } from "../../utils/strings/parseToStrings";
 import i18n from "../../i18n";
@@ -26,6 +25,9 @@ import { Settings } from "../../settings";
 import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { createNotification, NotificationIntent, NotificationOrigin } from "../../utils/notification";
+import { alertModal } from "../../utils/dialogModal";
+import { getObjectModelById } from "../../starSystem/starSystemModel";
+import { getOrbitalPeriod } from "../../orbit/orbit";
 
 export class DiscoveryDetails {
     readonly htmlRoot: HTMLElement;
@@ -107,28 +109,48 @@ export class DiscoveryDetails {
             return;
         }
 
-        const model = getObjectModelByUniverseId(this.currentDiscovery.objectId, starSystemDatabase);
+        const systemModel = starSystemDatabase.getSystemModelFromCoordinates(
+            this.currentDiscovery.objectId.systemCoordinates
+        );
 
-        this.objectName.innerText = model?.name ?? i18n.t("common:unknown");
+        if (systemModel === null) {
+            console.error(discovery);
+            await alertModal("System could not be found for the discovery. More information in the console.");
+            return;
+        }
+
+        const objectModel = getObjectModelById(this.currentDiscovery.objectId.idInSystem, systemModel);
+        if (objectModel === null) {
+            console.error(discovery);
+            await alertModal("Object could not be found for the discovery. More information in the console.");
+            return;
+        }
+
+        const parentIds = objectModel.orbit.parentIds;
+        const parentModels = parentIds.map((id) => getObjectModelById(id, systemModel));
+        const parentMass = parentModels.reduce((acc, model) => acc + (model?.mass ?? 0), 0);
+
+        this.objectName.innerText = objectModel.name ?? i18n.t("common:unknown");
         this.htmlRoot.appendChild(this.objectName);
 
         this.objectType.innerText = i18n.t("orbitalObject:type", {
-            value: model !== null ? getOrbitalObjectTypeToI18nString(model) : i18n.t("common:unknown")
+            value: getOrbitalObjectTypeToI18nString(objectModel)
         });
         this.htmlRoot.appendChild(this.objectType);
 
         this.siderealDayDuration.innerText = i18n.t("orbitalObject:siderealDayDuration", {
-            value: model !== null ? parseSecondsPrecise(model.siderealDaySeconds) : i18n.t("common:unknown")
+            value: parseSecondsPrecise(objectModel.siderealDaySeconds)
         });
         this.htmlRoot.appendChild(this.siderealDayDuration);
 
-        /*this.orbitDuration.innerText = i18n.t("orbit:period", {
-            value: model !== null ? parseSecondsPrecise(model.orbit.period) : i18n.t("common:unknown")
-        });*/
+        const orbitalPeriod = getOrbitalPeriod(objectModel.orbit.semiMajorAxis, parentMass);
+        this.orbitDuration.innerText = i18n.t("orbit:period", {
+            value: parseSecondsPrecise(orbitalPeriod)
+        });
         this.htmlRoot.appendChild(this.orbitDuration);
 
         this.orbitRadius.innerText = i18n.t("orbit:radius", {
-            value: model !== null ? parseDistance(model.orbit.semiMajorAxis) : i18n.t("common:unknown")
+            value: parseDistance(objectModel.orbit.semiMajorAxis)
         });
         this.htmlRoot.appendChild(this.orbitRadius);
 

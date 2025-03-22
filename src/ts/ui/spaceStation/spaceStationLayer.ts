@@ -21,13 +21,14 @@ import { Player } from "../../player/player";
 import { generateMissionsDom } from "./spaceStationMissions";
 import { Settings } from "../../settings";
 import { generateSpaceshipDom } from "./spaceshipDock";
-import { promptModalString } from "../../utils/dialogModal";
+import { alertModal, promptModalString } from "../../utils/dialogModal";
 import i18n from "../../i18n";
 import { Sounds } from "../../assets/sounds";
 import { ExplorationCenterPanel } from "./explorationCenterPanel";
 import { EncyclopaediaGalacticaManager } from "../../society/encyclopaediaGalacticaManager";
 import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
 import { OrbitalFacilityModel, OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
+import { DeepReadonly } from "../../utils/types";
 
 const enum MainPanelState {
     NONE,
@@ -40,8 +41,8 @@ const enum MainPanelState {
 export class SpaceStationLayer {
     private parentNode: HTMLElement;
 
-    private currentStation: OrbitalFacilityModel | null = null;
-    private currentStationParents: OrbitalObjectModel[] = [];
+    private currentStation: DeepReadonly<OrbitalFacilityModel> | null = null;
+    private currentStationParents: DeepReadonly<Array<OrbitalObjectModel>> = [];
 
     private readonly spaceStationName: HTMLElement;
 
@@ -160,7 +161,7 @@ export class SpaceStationLayer {
         }
 
         if (this.currentStation === null) {
-            throw new Error("No current station");
+            return await alertModal("No current station");
         }
 
         switch (this.mainPanelState) {
@@ -200,7 +201,11 @@ export class SpaceStationLayer {
         return this.parentNode.style.visibility !== "hidden";
     }
 
-    public setStation(station: OrbitalFacilityModel, stationParents: OrbitalObjectModel[], player: Player) {
+    public setStation(
+        station: DeepReadonly<OrbitalFacilityModel>,
+        stationParents: DeepReadonly<Array<OrbitalObjectModel>>,
+        player: Player
+    ) {
         if (this.currentStation === station) return;
         this.currentStation = station;
         this.currentStationParents = stationParents;

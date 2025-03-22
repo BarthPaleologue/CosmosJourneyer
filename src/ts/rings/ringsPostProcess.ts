@@ -30,6 +30,7 @@ import { SamplerUniformNames, setSamplerUniforms } from "../postProcesses/unifor
 import { Transformable } from "../architecture/transformable";
 import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { DeepReadonly } from "../utils/types";
 
 export class RingsPostProcess extends PostProcess {
     readonly ringsUniforms: RingsUniforms;
@@ -39,8 +40,8 @@ export class RingsPostProcess extends PostProcess {
     constructor(
         bodyTransform: TransformNode,
         ringsUniforms: RingsUniforms,
-        bodyModel: CelestialBodyModel,
-        stellarObjects: Transformable[],
+        bodyModel: DeepReadonly<CelestialBodyModel>,
+        stellarObjects: ReadonlyArray<Transformable>,
         scene: Scene
     ) {
         const shaderName = "rings";

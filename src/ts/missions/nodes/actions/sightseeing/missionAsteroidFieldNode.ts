@@ -21,19 +21,16 @@ import type { MissionNodeBase } from "../../missionNodeBase";
 import { MissionContext } from "../../../missionContext";
 import {
     StarSystemCoordinates,
-    starSystemCoordinatesEquals,
-    UniverseObjectId,
-    universeObjectIdEquals
-} from "../../../../utils/coordinates/universeCoordinates";
+    starSystemCoordinatesEquals
+} from "../../../../utils/coordinates/starSystemCoordinates";
+import { UniverseObjectId, universeObjectIdEquals } from "../../../../utils/coordinates/universeObjectId";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { clamp } from "../../../../utils/math";
-import { getObjectBySystemId, getObjectModelByUniverseId } from "../../../../utils/coordinates/orbitalObjectId";
 import i18n from "../../../../i18n";
 import { parseDistance } from "../../../../utils/strings/parseToStrings";
 import { Settings } from "../../../../settings";
 import { getGoToSystemInstructions } from "../../../common";
 import { StarSystemDatabase } from "../../../../starSystem/starSystemDatabase";
-import { z } from "zod";
 import { AsteroidFieldMissionState, MissionAsteroidFieldNodeSerialized } from "./missionAsteroidFieldNodeSerialized";
 
 /**
@@ -48,7 +45,7 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType
 
     constructor(objectId: UniverseObjectId) {
         this.objectId = objectId;
-        this.targetSystemCoordinates = objectId.starSystemCoordinates;
+        this.targetSystemCoordinates = objectId.systemCoordinates;
     }
 
     /**
@@ -80,7 +77,7 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType
             return;
         }
 
-        const targetObject = getObjectBySystemId(this.objectId, currentSystem);
+        const targetObject = currentSystem.getOrbitalObjectById(this.objectId.idInSystem);
         if (targetObject === null) {
             throw new Error(`Could not find object with ID ${JSON.stringify(this.objectId)}`);
         }
@@ -127,7 +124,7 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType
             starSystemDatabase.getSystemGalacticPosition(originSystemCoordinates),
             starSystemDatabase.getSystemGalacticPosition(this.targetSystemCoordinates)
         );
-        const objectModel = getObjectModelByUniverseId(this.objectId, starSystemDatabase);
+        const objectModel = starSystemDatabase.getObjectModelByUniverseId(this.objectId);
         const systemModel = starSystemDatabase.getSystemModelFromCoordinates(this.targetSystemCoordinates);
         if (objectModel === null || systemModel === null) {
             throw new Error(`Could not find object with ID ${JSON.stringify(this.objectId)}`);
@@ -148,7 +145,7 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType
             return i18n.t("missions:asteroidField:missionCompleted");
         }
 
-        const targetObject = getObjectModelByUniverseId(this.objectId, starSystemDatabase);
+        const targetObject = starSystemDatabase.getObjectModelByUniverseId(this.objectId);
         if (targetObject === null) {
             throw new Error(`Could not find object with ID ${JSON.stringify(this.objectId)}`);
         }

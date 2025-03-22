@@ -28,18 +28,19 @@ import packageInfo from "../../../package.json";
 import i18n from "../i18n";
 import { Sounds } from "../assets/sounds";
 import { PanelType, SidePanels } from "./sidePanels";
-import { SystemObjectType, UniverseObjectId } from "../utils/coordinates/universeCoordinates";
-import { getObjectBySystemId } from "../utils/coordinates/orbitalObjectId";
-import { StarSystemModel, StarSystemModelUtils } from "../starSystem/starSystemModel";
+import { StarSystemModel } from "../starSystem/starSystemModel";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { getUniverseObjectId, UniverseObjectId } from "../utils/coordinates/universeObjectId";
+import { DeepReadonly } from "../utils/types";
+import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
 
 export class MainMenu {
     readonly scene: UberScene;
     readonly controls: DefaultControls;
 
     readonly starSystemView: StarSystemView;
-    readonly starSystemModel: StarSystemModel;
+    readonly starSystemModel: DeepReadonly<StarSystemModel>;
 
     readonly onStartObservable = new Observable<void>();
     readonly onContributeObservable = new Observable<void>();
@@ -65,57 +66,28 @@ export class MainMenu {
 
         this.starSystemView.setUIEnabled(false);
 
-        const allowedIdentifiers: UniverseObjectId[] = [
-            {
-                starSystemCoordinates: starSystemDatabase.getSystemCoordinatesFromSeed(1, 1, 0, 7),
-                objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
-                objectIndex: 1
-            },
-            {
-                starSystemCoordinates: starSystemDatabase.getSystemCoordinatesFromSeed(0, 0, 0, 0),
-                objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
-                objectIndex: 1
-            },
-            {
-                starSystemCoordinates: starSystemDatabase.getSystemCoordinatesFromSeed(0, 0, 1, 4),
-                objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
-                objectIndex: 3
-            },
-            {
-                starSystemCoordinates: starSystemDatabase.getSystemCoordinatesFromSeed(0, 0, 1, 9),
-                objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
-                objectIndex: 0
-            },
-            {
-                starSystemCoordinates: starSystemDatabase.getSystemCoordinatesFromSeed(0, 0, 1, 1),
-                objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
-                objectIndex: 1
-            },
-            {
-                starSystemCoordinates: starSystemDatabase.getSystemCoordinatesFromSeed(1, 1, 0, 12),
-                objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
-                objectIndex: 0
-            },
-            {
-                starSystemCoordinates: starSystemDatabase.getSystemCoordinatesFromSeed(1, 1, 0, 5),
-                objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
-                objectIndex: 0
-            },
-            {
-                starSystemCoordinates: starSystemDatabase.getSystemCoordinatesFromSeed(0, 0, 0, 17),
-                objectType: SystemObjectType.PLANETARY_MASS_OBJECT,
-                objectIndex: 2
-            }
-        ];
+        const coordinates: StarSystemCoordinates = {
+            localX: 0.49137314641446483,
+            localY: 0.48043087077347135,
+            localZ: 0.38353311777279386,
+            starSectorX: 0,
+            starSectorY: 0,
+            starSectorZ: 0
+        };
 
-        const randomIndex = Math.floor(Math.random() * allowedIdentifiers.length);
-        this.universeObjectId = allowedIdentifiers[randomIndex];
-        const coordinates = this.universeObjectId.starSystemCoordinates;
-        const starSystemModel = starSystemDatabase.getSystemModelFromCoordinates(coordinates);
-        if (starSystemModel === null) {
-            throw new Error("Cannot find star system model for coordinates " + JSON.stringify(coordinates));
+        const system = starSystemDatabase.getSystemModelFromCoordinates(coordinates);
+        if (system === null) {
+            throw new Error("Cannot find system");
         }
-        this.starSystemModel = starSystemModel;
+
+        const object = system?.planets.at(1);
+        if (object === undefined) {
+            throw new Error("Cannot find planet with index 2");
+        }
+
+        this.universeObjectId = getUniverseObjectId(object, system);
+
+        this.starSystemModel = system;
 
         const htmlRoot = document.getElementById("mainMenu");
         if (htmlRoot === null) throw new Error("#mainMenu does not exist!");
@@ -214,12 +186,11 @@ export class MainMenu {
 
         this.starSystemView.onInitStarSystem.addOnce(async () => {
             await this.starSystemView.switchToDefaultControls(false);
-            const nbRadius =
-                StarSystemModelUtils.GetStellarObjects(this.starSystemModel)[0].type === OrbitalObjectType.BLACK_HOLE
-                    ? 8
-                    : 2;
-            const targetObject = getObjectBySystemId(this.universeObjectId, this.starSystemView.getStarSystem());
-            if (targetObject === null) {
+            const nbRadius = this.starSystemModel.stellarObjects[0].type === OrbitalObjectType.BLACK_HOLE ? 8 : 2;
+            const targetObject = this.starSystemView
+                .getStarSystem()
+                .getOrbitalObjectById(this.universeObjectId.idInSystem);
+            if (targetObject === undefined) {
                 throw new Error(`Could not find object with ID ${JSON.stringify(this.universeObjectId)}`);
             }
             positionNearObjectWithStarVisible(
@@ -242,10 +213,7 @@ export class MainMenu {
 
         const currentForward = getForwardDirection(this.controls.getTransform());
 
-        const orbitalObject = getObjectBySystemId(this.universeObjectId, starSystemController);
-        if (orbitalObject === null) {
-            throw new Error("Could not find object with ID " + JSON.stringify(this.universeObjectId));
-        }
+        const orbitalObject = starSystemController.getOrbitalObjectById(this.universeObjectId.idInSystem);
         const celestialBody = starSystemController.getCelestialBodies().find((body) => body === orbitalObject);
         if (celestialBody === undefined) {
             throw new Error("No corresponding celestial body found");

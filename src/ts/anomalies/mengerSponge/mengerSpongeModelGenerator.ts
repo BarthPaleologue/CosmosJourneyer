@@ -24,8 +24,14 @@ import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { MengerSpongeModel } from "./mengerSpongeModel";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Tools } from "@babylonjs/core/Misc/tools";
+import { OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
+import { createOrbitalObjectId } from "../../utils/coordinates/orbitalObjectId";
 
-export function newSeededMengerSpongeModel(seed: number, name: string): MengerSpongeModel {
+export function newSeededMengerSpongeModel(
+    seed: number,
+    name: string,
+    parentBodies: ReadonlyArray<OrbitalObjectModel>
+): MengerSpongeModel {
     const rng = getRngFromSeed(seed);
 
     const radius = 200e3;
@@ -41,7 +47,10 @@ export function newSeededMengerSpongeModel(seed: number, name: string): MengerSp
 
     const orbitalP = clamp(0.5, 3.0, normalRandom(1.0, 0.3, rng, GenerationSteps.ORBIT + 80));
 
+    const parentIds = parentBodies.map((body) => body.id);
+
     const orbit: Orbit = {
+        parentIds: parentIds,
         semiMajorAxis: orbitRadius,
         p: orbitalP,
         inclination: Tools.ToRadians(normalRandom(90, 20, rng, GenerationSteps.ORBIT + 160)),
@@ -55,9 +64,10 @@ export function newSeededMengerSpongeModel(seed: number, name: string): MengerSp
     const axialTilt = normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT);
 
     return {
-        radius,
-        name,
         type: OrbitalObjectType.MENGER_SPONGE,
+        id: createOrbitalObjectId(parentIds, name),
+        name,
+        radius,
         mass,
         siderealDaySeconds,
         axialTilt,

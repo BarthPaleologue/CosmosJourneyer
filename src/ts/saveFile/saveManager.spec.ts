@@ -21,6 +21,8 @@ import { CmdrSaves } from "./saveFileData";
 import { err, ok, Result } from "../utils/types";
 import { SerializedPlayerSchema } from "../player/serializedPlayer";
 import { SaveLoadingErrorType, SaveLoadingError } from "./saveLoadingError";
+import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 
 /**
  * Mock implementation of SaveBackend for testing
@@ -57,19 +59,14 @@ describe("SaveManager", () => {
         cmdr1: {
             manual: [
                 {
-                    version: "1.0.0",
                     timestamp: 12345,
                     player: SerializedPlayerSchema.parse({}),
-                    universeCoordinates: {
-                        rotationQuaternionX: 0,
-                        rotationQuaternionY: 0,
-                        rotationQuaternionZ: 0,
-                        rotationQuaternionW: 1,
-                        positionX: 0,
-                        positionY: 0,
-                        positionZ: 0,
+                    playerLocation: {
+                        type: "relative",
+                        rotation: { x: 0, y: 0, z: 0, w: 1 },
+                        position: { x: 0, y: 0, z: 0 },
                         universeObjectId: {
-                            starSystemCoordinates: {
+                            systemCoordinates: {
                                 starSectorX: 0,
                                 starSectorY: 0,
                                 starSectorZ: 0,
@@ -77,10 +74,10 @@ describe("SaveManager", () => {
                                 localY: 0,
                                 localZ: 0
                             },
-                            objectType: 0,
-                            objectIndex: 0
+                            idInSystem: "0"
                         }
-                    }
+                    },
+                    shipLocations: {}
                 }
             ],
             auto: []
@@ -89,19 +86,14 @@ describe("SaveManager", () => {
             manual: [],
             auto: [
                 {
-                    version: "1.0.0",
                     timestamp: 67890,
                     player: SerializedPlayerSchema.parse({}),
-                    universeCoordinates: {
-                        rotationQuaternionX: 0,
-                        rotationQuaternionY: 0,
-                        rotationQuaternionZ: 0,
-                        rotationQuaternionW: 1,
-                        positionX: 0,
-                        positionY: 0,
-                        positionZ: 0,
+                    playerLocation: {
+                        type: "relative",
+                        rotation: { x: 0, y: 0, z: 0, w: 1 },
+                        position: { x: 0, y: 0, z: 0 },
                         universeObjectId: {
-                            starSystemCoordinates: {
+                            systemCoordinates: {
                                 starSectorX: 0,
                                 starSectorY: 0,
                                 starSectorZ: 0,
@@ -109,10 +101,10 @@ describe("SaveManager", () => {
                                 localY: 0,
                                 localZ: 0
                             },
-                            objectType: 0,
-                            objectIndex: 0
+                            idInSystem: "0"
                         }
-                    }
+                    },
+                    shipLocations: {}
                 }
             ]
         }
@@ -120,8 +112,9 @@ describe("SaveManager", () => {
 
     describe("Create", () => {
         it("should create a SaveManager with existing saves", async () => {
+            const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
             const backend = new MockSaveBackend(testSaves);
-            const result = await SaveManager.CreateAsync(backend);
+            const result = await SaveManager.CreateAsync(backend, starSystemDatabase);
 
             expect(result.success).toBe(true);
             if (result.success) {
@@ -131,8 +124,9 @@ describe("SaveManager", () => {
         });
 
         it("should create a SaveManager with empty saves", async () => {
+            const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
             const backend = new MockSaveBackend({});
-            const result = await SaveManager.CreateAsync(backend);
+            const result = await SaveManager.CreateAsync(backend, starSystemDatabase);
 
             expect(result.success).toBe(true);
             if (result.success) {
@@ -141,9 +135,10 @@ describe("SaveManager", () => {
         });
 
         it("should handle read errors", async () => {
+            const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
             const backend = new MockSaveBackend();
             backend.readShouldFail = true;
-            const result = await SaveManager.CreateAsync(backend);
+            const result = await SaveManager.CreateAsync(backend, starSystemDatabase);
 
             expect(result.success).toBe(false);
             if (!result.success) {
@@ -154,8 +149,9 @@ describe("SaveManager", () => {
 
     describe("getSavesForCmdr", () => {
         it("should return saves for an existing cmdr", async () => {
+            const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
             const backend = new MockSaveBackend(testSaves);
-            const result = await SaveManager.CreateAsync(backend);
+            const result = await SaveManager.CreateAsync(backend, starSystemDatabase);
 
             expect(result.success).toBe(true);
             if (result.success) {
@@ -165,8 +161,9 @@ describe("SaveManager", () => {
         });
 
         it("should return undefined for a non-existent cmdr", async () => {
+            const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
             const backend = new MockSaveBackend(testSaves);
-            const result = await SaveManager.CreateAsync(backend);
+            const result = await SaveManager.CreateAsync(backend, starSystemDatabase);
 
             expect(result.success).toBe(true);
             if (result.success) {
@@ -178,10 +175,11 @@ describe("SaveManager", () => {
 
     describe("save", () => {
         it("should save data to the backend successfully", async () => {
+            const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
             const backend = new MockSaveBackend(testSaves);
             const writeSpy = vi.spyOn(backend, "write");
 
-            const result = await SaveManager.CreateAsync(backend);
+            const result = await SaveManager.CreateAsync(backend, starSystemDatabase);
             expect(result.success).toBe(true);
 
             if (result.success) {
@@ -195,10 +193,11 @@ describe("SaveManager", () => {
         });
 
         it("should handle backend write failures", async () => {
+            const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
             const backend = new MockSaveBackend(testSaves);
             backend.writeShouldFail = true;
 
-            const result = await SaveManager.CreateAsync(backend);
+            const result = await SaveManager.CreateAsync(backend, starSystemDatabase);
             expect(result.success).toBe(true);
 
             if (result.success) {

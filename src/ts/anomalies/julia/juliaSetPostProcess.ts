@@ -33,6 +33,7 @@ import { Constants } from "@babylonjs/core/Engines/constants";
 import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { DeepReadonly } from "../../utils/types";
 
 export class JuliaSetPostProcess extends PostProcess implements UpdatablePostProcess {
     private elapsedSeconds = 0;
@@ -42,9 +43,9 @@ export class JuliaSetPostProcess extends PostProcess implements UpdatablePostPro
     constructor(
         transform: TransformNode,
         boundingRadius: number,
-        accentColor: Color3,
+        accentColor: DeepReadonly<Color3>,
         scene: Scene,
-        stellarObjects: StellarObject[]
+        stellarObjects: ReadonlyArray<StellarObject>
     ) {
         const shaderName = "julia";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {

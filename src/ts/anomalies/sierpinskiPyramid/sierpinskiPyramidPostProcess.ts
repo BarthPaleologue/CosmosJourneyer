@@ -33,6 +33,7 @@ import { Constants } from "@babylonjs/core/Engines/constants";
 import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { SierpinskiPyramidModel } from "./sierpinskiPyramidModel";
+import { DeepReadonly } from "../../utils/types";
 
 export class SierpinskiPyramidPostProcess extends PostProcess implements UpdatablePostProcess {
     private elapsedSeconds = 0;
@@ -42,9 +43,9 @@ export class SierpinskiPyramidPostProcess extends PostProcess implements Updatab
     constructor(
         transform: TransformNode,
         boundingRadius: number,
-        model: SierpinskiPyramidModel,
+        model: DeepReadonly<SierpinskiPyramidModel>,
         scene: Scene,
-        stellarObjects: StellarObject[]
+        stellarObjects: ReadonlyArray<StellarObject>
     ) {
         const shaderName = "SierpinskiPyramid";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {

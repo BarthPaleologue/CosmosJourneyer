@@ -50,7 +50,7 @@ const ButterflyMaterialSamplerNames = {
 
 export class ButterflyMaterial extends ShaderMaterial {
     private elapsedSeconds = 0;
-    private stars: Transformable[] = [];
+    private stars: ReadonlyArray<Transformable> = [];
     private playerPosition: Vector3 = Vector3.Zero();
 
     private planet: TransformNode | null = null;
@@ -104,7 +104,7 @@ export class ButterflyMaterial extends ShaderMaterial {
         this.planet = planet;
     }
 
-    update(stars: Transformable[], playerPosition: Vector3, deltaSeconds: number) {
+    update(stars: ReadonlyArray<Transformable>, playerPosition: Vector3, deltaSeconds: number) {
         this.elapsedSeconds += deltaSeconds;
         this.stars = stars;
         this.playerPosition = playerPosition;

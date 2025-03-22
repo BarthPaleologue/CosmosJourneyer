@@ -15,41 +15,49 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Settings } from "../settings";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { findMinimumNewtonRaphson } from "../utils/math";
+import { DeepReadonly } from "../utils/types";
+import { z } from "zod";
+import { OrbitalObjectIdSchema } from "../utils/coordinates/orbitalObjectId";
 
 /**
  * Represents an orbit in the p-norm space. (Euclidean space for p=2)
  * @see https://en.wikipedia.org/wiki/Orbital_elements
  */
-export type Orbit = {
+export const OrbitSchema = z.object({
+    /**
+     * References to the parent bodies
+     */
+    parentIds: z.array(OrbitalObjectIdSchema),
+
     /**
      * Half the distance between the apoapsis and periapsis
      */
-    semiMajorAxis: number;
+    semiMajorAxis: z.number(),
 
     /**
      * Shape of the ellipse, describing how much it is elongated compared to a circle
      */
-    eccentricity: number;
+    eccentricity: z.number().default(0),
 
     /**
      * Vertical tilt of the ellipse with respect to the reference plane, measured at the ascending node
      */
-    inclination: number;
+    inclination: z.number().default(0),
 
     /**
      * horizontally orients the ascending node of the ellipse (where the orbit passes from south to north through the reference plane)
      * with respect to the reference frame's vernal point.
      */
-    longitudeOfAscendingNode: number;
+    longitudeOfAscendingNode: z.number().default(0),
 
     /**
      * Defines the orientation of the ellipse in the orbital plane, as an angle measured from the ascending node to the periapsis
      */
-    argumentOfPeriapsis: number;
+    argumentOfPeriapsis: z.number().default(0),
 
     /**
      * The mean anomaly at t=0
@@ -59,14 +67,16 @@ export type Orbit = {
      * It can be converted into the true anomaly ν, which does represent the real geometric angle in the plane of the ellipse,
      * between periapsis (closest approach to the central body) and the position of the orbiting body at any given time
      */
-    initialMeanAnomaly: number;
+    initialMeanAnomaly: z.number().default(0),
 
     /**
      * The norm to use for the orbit. 2 for Euclidean space, other numbers for funky shapes.
      * @see https://medium.com/@barth_29567/crazy-orbits-lets-make-squares-c91a427c6b26
      */
-    p: number;
-};
+    p: z.number().default(2)
+});
+
+export type Orbit = z.infer<typeof OrbitSchema>;
 
 export function getSemiMajorAxis(periapsis: number, apoapsis: number) {
     return (periapsis + apoapsis) / 2;
@@ -87,9 +97,9 @@ export function keplerEquation(trueAnomaly: number, meanAnomaly: number, eccentr
  * @returns
  * @see https://medium.com/@barth_29567/crazy-orbits-lets-make-squares-c91a427c6b26
  */
-export function getPointOnOrbitLocal(orbit: Orbit, parentMass: number, t: number): Vector3 {
-    const meanAnomaly =
-        orbit.initialMeanAnomaly - (2 * Math.PI * t) / getOrbitalPeriod(orbit.semiMajorAxis, parentMass);
+export function getPointOnOrbitLocal(orbit: DeepReadonly<Orbit>, parentMass: number, t: number): Vector3 {
+    const orbitalPeriod = getOrbitalPeriod(orbit.semiMajorAxis, parentMass);
+    const meanAnomaly = orbitalPeriod > 0 ? orbit.initialMeanAnomaly - (2 * Math.PI * t) / orbitalPeriod : 0;
 
     const trueAnomaly = findMinimumNewtonRaphson(
         (trueAnomaly) => keplerEquation(trueAnomaly, meanAnomaly, orbit.eccentricity),
@@ -132,7 +142,7 @@ export function getPointOnOrbitLocal(orbit: Orbit, parentMass: number, t: number
 export function getPointOnOrbit(
     centerOfMass: Vector3,
     parentMass: number,
-    orbit: Orbit,
+    orbit: DeepReadonly<Orbit>,
     t: number,
     referencePlaneRotation: Matrix
 ): Vector3 {
@@ -153,10 +163,10 @@ export function computeLpFactor(x: number, y: number, p: number) {
 }
 
 /**
- * Returns the orbital period of a body in seconds
  * @see https://fr.wikipedia.org/wiki/Lois_de_Kepler
  * @param semiMajorAxis
  * @param parentMass
+ * @return The orbital period in seconds or 0 if the parent mass is 0
  */
 export function getOrbitalPeriod(semiMajorAxis: number, parentMass: number) {
     if (parentMass === 0) return 0;

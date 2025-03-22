@@ -40,13 +40,14 @@ import { Settings } from "../../settings";
 import { OceanUniforms } from "../../ocean/oceanUniforms";
 import { TelluricPlanetModel } from "./telluricPlanetModel";
 import { TelluricSatelliteModel } from "./telluricSatelliteModel";
+import { DeepReadonly } from "../../utils/types";
 
 export class TelluricPlanet
     implements
         PlanetaryMassObjectBase<OrbitalObjectType.TELLURIC_PLANET | OrbitalObjectType.TELLURIC_SATELLITE>,
         Cullable
 {
-    readonly model: TelluricPlanetModel | TelluricSatelliteModel;
+    readonly model: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>;
 
     readonly type: OrbitalObjectType.TELLURIC_PLANET | OrbitalObjectType.TELLURIC_SATELLITE;
 
@@ -73,7 +74,7 @@ export class TelluricPlanet
      * @param model The model to build the planet or a seed for the planet in [-1, 1]
      * @param scene
      */
-    constructor(model: TelluricPlanetModel | TelluricSatelliteModel, scene: Scene) {
+    constructor(model: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>, scene: Scene) {
         this.model = model;
 
         this.type = model.type;
@@ -169,7 +170,7 @@ export class TelluricPlanet
         for (const side of this.sides) side.update(observerPosition, chunkForge);
     }
 
-    public updateMaterial(stellarObjects: Transformable[], deltaSeconds: number): void {
+    public updateMaterial(stellarObjects: ReadonlyArray<Transformable>, deltaSeconds: number): void {
         this.material.update(this.getTransform().getWorldMatrix(), stellarObjects);
     }
 

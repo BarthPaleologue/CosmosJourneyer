@@ -27,14 +27,15 @@ import i18n from "../i18n";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
 import { safeParseSave, Save } from "../saveFile/saveFileData";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 
 export class StationLandingTutorial implements Tutorial {
     coverImageSrc = station1ImageSrc;
 
     saveData: Save;
 
-    constructor() {
-        const parsedSaveDataResult = safeParseSave(saveData);
+    constructor(starSystemDatabase: StarSystemDatabase) {
+        const parsedSaveDataResult = safeParseSave(saveData, starSystemDatabase);
         if (!parsedSaveDataResult.success) {
             console.error(parsedSaveDataResult.error);
             throw new Error("StationLandingTutorial: saveData is null");

@@ -29,6 +29,7 @@ import { celsiusToKelvin, hasLiquidWater } from "../../utils/physics";
 import { TelluricSatelliteModel } from "./telluricSatelliteModel";
 import { AtmosphereModel } from "../../atmosphere/atmosphereModel";
 import { Tools } from "@babylonjs/core/Misc/tools";
+import { createOrbitalObjectId } from "../../utils/coordinates/orbitalObjectId";
 
 export function newSeededTelluricSatelliteModel(
     seed: number,
@@ -115,7 +116,10 @@ export function newSeededTelluricSatelliteModel(
     parentAverageInclination /= parentBodies.length;
     parentAverageAxialTilt /= parentBodies.length;
 
+    const parentIds = parentBodies.map((body) => body.id);
+
     const orbit: Orbit = {
+        parentIds: parentIds,
         semiMajorAxis: orbitRadius,
         p: 2,
         inclination:
@@ -152,6 +156,7 @@ export function newSeededTelluricSatelliteModel(
 
     return {
         type: OrbitalObjectType.TELLURIC_SATELLITE,
+        id: createOrbitalObjectId(parentIds, name),
         seed: seed,
         name,
         mass,

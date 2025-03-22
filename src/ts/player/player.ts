@@ -16,8 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Mission } from "../missions/mission";
-import { StarSystemCoordinates, UniverseObjectId } from "../utils/coordinates/universeCoordinates";
-import { warnIfUndefined } from "../utils/notification";
+import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
+import { UniverseObjectId } from "../utils/coordinates/universeObjectId";
 import { Spaceship } from "../spaceship/spaceship";
 import { DefaultSerializedSpaceship, SerializedSpaceship } from "../spaceship/serializedSpaceship";
 import { SpaceDiscoveryData } from "../society/encyclopaediaGalactica";
@@ -58,45 +58,18 @@ export class Player {
     readonly onBalanceChangedObservable = new Observable<number>();
 
     private constructor(serializedPlayer: SerializedPlayer) {
-        this.uuid = warnIfUndefined(
-            serializedPlayer.uuid,
-            crypto.randomUUID(),
-            `[PLAYER_DATA_WARNING] Uuid was undefined. Defaulting to random UUID`
-        );
-        this.#name = warnIfUndefined(
-            serializedPlayer.name,
-            Player.DEFAULT_NAME,
-            `[PLAYER_DATA_WARNING] Name was undefined. Defaulting to ${Player.DEFAULT_NAME}`
-        );
-        this.#balance = warnIfUndefined(
-            serializedPlayer.balance,
-            Player.DEFAULT_BALANCE,
-            `[PLAYER_DATA_WARNING] Balance was undefined. Defaulting to ${Player.DEFAULT_BALANCE}`
-        );
-        this.creationDate = new Date(
-            warnIfUndefined(
-                serializedPlayer.creationDate,
-                new Date().toISOString(),
-                `[PLAYER_DATA_WARNING] Creation date was undefined. Defaulting to current date`
-            )
-        );
-        this.timePlayedSeconds = warnIfUndefined(
-            serializedPlayer.timePlayedSeconds,
-            0,
-            `[PLAYER_DATA_WARNING] Time played was undefined. Defaulting to 0`
-        );
+        this.uuid = serializedPlayer.uuid;
 
-        this.visitedSystemHistory = warnIfUndefined(
-            serializedPlayer.visitedSystemHistory,
-            [],
-            `[PLAYER_DATA_WARNING] Visited system history was undefined. Defaulting to empty array`
-        );
-        this.discoveries = warnIfUndefined(
-            serializedPlayer.discoveries,
-            { local: [], uploaded: [] },
-            `[PLAYER_DATA_WARNING] Visited objects history was undefined. Defaulting to empty arrays`
-        );
+        this.#name = serializedPlayer.name;
+        this.#balance = serializedPlayer.balance;
 
+        this.creationDate = new Date(serializedPlayer.creationDate);
+
+        this.timePlayedSeconds = serializedPlayer.timePlayedSeconds;
+
+        this.visitedSystemHistory = structuredClone(serializedPlayer.visitedSystemHistory);
+
+        this.discoveries = structuredClone(serializedPlayer.discoveries);
         this.discoveries.local.forEach((objectId) => {
             this.visitedObjects.add(JSON.stringify(objectId));
         });
@@ -104,48 +77,14 @@ export class Player {
             this.visitedObjects.add(JSON.stringify(objectId));
         });
 
-        this.currentItinerary = warnIfUndefined(
-            serializedPlayer.currentItinerary,
-            [],
-            `[PLAYER_DATA_WARNING] Current itinerary was undefined. Defaulting to empty array`
-        );
-        this.systemBookmarks = warnIfUndefined(
-            serializedPlayer.systemBookmarks,
-            [],
-            `[PLAYER_DATA_WARNING] System bookmarks were undefined. Defaulting to empty array`
-        );
-        this.currentMissions = warnIfUndefined(
-            serializedPlayer.currentMissions,
-            [],
-            `[PLAYER_DATA_WARNING] Current missions were undefined. Defaulting to empty array`
-        ).map((mission) => Mission.Deserialize(mission));
-        this.completedMissions = warnIfUndefined(
-            serializedPlayer.completedMissions,
-            [],
-            `[PLAYER_DATA_WARNING] Completed missions were undefined. Defaulting to empty array`
-        ).map((mission) => Mission.Deserialize(mission));
-        this.serializedSpaceships = warnIfUndefined(
-            serializedPlayer.spaceShips,
-            [DefaultSerializedSpaceship],
-            `[PLAYER_DATA_WARNING] Spaceships were undefined. Defaulting to the default spaceship`
-        );
+        this.currentItinerary = structuredClone(serializedPlayer.currentItinerary);
+        this.systemBookmarks = structuredClone(serializedPlayer.systemBookmarks);
+        this.currentMissions = serializedPlayer.currentMissions.map((mission) => Mission.Deserialize(mission));
+        this.completedMissions = serializedPlayer.completedMissions.map((mission) => Mission.Deserialize(mission));
 
-        this.tutorials = warnIfUndefined(
-            serializedPlayer.tutorials,
-            { stationLandingCompleted: false, fuelScoopingCompleted: false },
-            `[PLAYER_DATA_WARNING] Tutorials were undefined. Defaulting to no tutorials completed`
-        );
+        this.serializedSpaceships = structuredClone(serializedPlayer.spaceShips);
 
-        this.tutorials.stationLandingCompleted = warnIfUndefined(
-            this.tutorials.stationLandingCompleted,
-            false,
-            `[PLAYER_DATA_WARNING] Station landing tutorial completed was undefined. Defaulting to false`
-        );
-        this.tutorials.fuelScoopingCompleted = warnIfUndefined(
-            this.tutorials.fuelScoopingCompleted,
-            false,
-            `[PLAYER_DATA_WARNING] Fuel scooping tutorial completed was undefined. Defaulting to false`
-        );
+        this.tutorials = serializedPlayer.tutorials;
     }
 
     /**

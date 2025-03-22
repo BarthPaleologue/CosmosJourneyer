@@ -2,8 +2,9 @@ import { Player } from "../../player/player";
 import { OrbitalFacilityModel } from "../../architecture/orbitalObjectModel";
 import { Sounds } from "../../assets/sounds";
 import i18n from "../../i18n";
+import { DeepReadonly } from "../../utils/types";
 
-export function generateSpaceshipDom(stationModel: OrbitalFacilityModel, player: Player): HTMLDivElement {
+export function generateSpaceshipDom(stationModel: DeepReadonly<OrbitalFacilityModel>, player: Player): HTMLDivElement {
     const mainContainer = document.createElement("div");
 
     const spaceshipH2 = document.createElement("h2");

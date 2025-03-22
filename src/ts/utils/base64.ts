@@ -15,10 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export function encodeBase64(str: string): string {
-    return btoa(str);
+export function encodeBase64(str: string): string | null {
+    try {
+        return window.btoa(encodeURIComponent(str));
+    } catch {
+        return null;
+    }
 }
 
 export function decodeBase64(str: string): string {
-    return atob(str);
+    const base64Decoded = window.atob(str);
+    return decodeURIComponent(base64Decoded);
 }

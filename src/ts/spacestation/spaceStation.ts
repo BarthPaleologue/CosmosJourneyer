@@ -39,11 +39,12 @@ import { OrbitalFacilityBase } from "./orbitalFacility";
 import { SpaceStationModel } from "./spacestationModel";
 import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
+import { DeepReadonly } from "../utils/types";
 
 export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE_STATION> {
     readonly name: string;
 
-    readonly model: SpaceStationModel;
+    readonly model: DeepReadonly<SpaceStationModel>;
 
     readonly type = OrbitalObjectType.SPACE_STATION;
 
@@ -65,7 +66,7 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
 
     private readonly unavailableLandingPads: Set<LandingPad> = new Set();
 
-    constructor(model: SpaceStationModel, scene: Scene) {
+    constructor(model: DeepReadonly<SpaceStationModel>, scene: Scene) {
         this.model = model;
 
         this.name = this.model.name;
@@ -187,12 +188,7 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
             this.helixHabitats.push(helixHabitat);
             newNode = helixHabitat.getTransform();
         } else if (habitatType === SpaceStationNodeType.RING_HABITAT) {
-            const ringHabitat = new RingHabitat(
-                this.model,
-                habitatSurface,
-                Settings.SEED_HALF_RANGE * rng(27),
-                this.scene
-            );
+            const ringHabitat = new RingHabitat(habitatSurface, Settings.SEED_HALF_RANGE * rng(27), this.scene);
             this.ringHabitats.push(ringHabitat);
             newNode = ringHabitat.getTransform();
         } else if (habitatType === SpaceStationNodeType.CYLINDER_HABITAT) {

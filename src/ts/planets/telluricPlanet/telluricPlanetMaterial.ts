@@ -35,6 +35,7 @@ import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { LutPoolManager } from "../../assets/lutPoolManager";
 import { TelluricPlanetModel } from "./telluricPlanetModel";
 import { TelluricSatelliteModel } from "./telluricSatelliteModel";
+import { DeepReadonly } from "../../utils/types";
 
 const TelluricPlanetMaterialUniformNames = {
     WORLD: "world",
@@ -74,7 +75,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
     /**
      * The model of the planet associated with this material
      */
-    private readonly planetModel: TelluricPlanetModel | TelluricSatelliteModel;
+    private readonly planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>;
 
     private readonly plainNormalMetallicMap: Texture;
     private readonly plainAlbedoRoughnessMap: Texture;
@@ -97,7 +98,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
      * @param model The model of the planet associated with this material
      * @param scene
      */
-    constructor(model: TelluricPlanetModel | TelluricSatelliteModel, scene: Scene) {
+    constructor(model: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>, scene: Scene) {
         const shaderName = "surfaceMaterial";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
@@ -215,7 +216,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
         );
     }
 
-    public update(planetWorldMatrix: Matrix, stellarObjects: Transformable[]) {
+    public update(planetWorldMatrix: Matrix, stellarObjects: ReadonlyArray<Transformable>) {
         // The add once is important because the material will be bound for every chunk of the planet
         this.onBindObservable.addOnce(() => {
             this.getEffect().setMatrix(TelluricPlanetMaterialUniformNames.PLANET_WORLD_MATRIX, planetWorldMatrix);

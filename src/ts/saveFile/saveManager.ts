@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { ok, Result } from "../utils/types";
 import { CmdrSaves, Save } from "./saveFileData";
 import { SaveLoadingError } from "./saveLoadingError";
@@ -34,7 +35,7 @@ export interface SaveBackend {
      * Reads save data from the storage backend.
      * @returns Result containing either the loaded saves or an error
      */
-    read(): Promise<Result<Record<string, CmdrSaves>, SaveLoadingError>>;
+    read(starSystemDatabase: StarSystemDatabase): Promise<Result<Record<string, CmdrSaves>, SaveLoadingError>>;
 }
 
 /**
@@ -71,8 +72,11 @@ export class SaveManager {
      * @param backend - The storage backend to use
      * @returns Result containing either the created SaveManager or an error
      */
-    public static async CreateAsync(backend: SaveBackend): Promise<Result<SaveManager, SaveLoadingError>> {
-        const saveResult = await backend.read();
+    public static async CreateAsync(
+        backend: SaveBackend,
+        starSystemDatabase: StarSystemDatabase
+    ): Promise<Result<SaveManager, SaveLoadingError>> {
+        const saveResult = await backend.read(starSystemDatabase);
         if (!saveResult.success) {
             return saveResult;
         }

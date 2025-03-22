@@ -40,7 +40,7 @@ export class SidePanels {
         if (loadSavePanel === null) throw new Error("#loadSavePanel does not exist!");
         this.loadSavePanel = loadSavePanel;
 
-        this.loadSavePanelContent = new SaveLoadingPanelContent();
+        this.loadSavePanelContent = new SaveLoadingPanelContent(starSystemDatabase);
         this.loadSavePanel.appendChild(this.loadSavePanelContent.htmlRoot);
 
         this.settingsPanel = initSettingsPanel();
@@ -48,7 +48,7 @@ export class SidePanels {
         const tutorialsPanel = document.getElementById("tutorials");
         if (tutorialsPanel === null) throw new Error("#tutorials does not exist!");
         this.tutorialsPanel = tutorialsPanel;
-        this.tutorialsPanelContent = new TutorialsPanelContent();
+        this.tutorialsPanelContent = new TutorialsPanelContent(starSystemDatabase);
         this.tutorialsPanel.appendChild(this.tutorialsPanelContent.htmlRoot);
 
         const contributePanel = document.getElementById("contribute");

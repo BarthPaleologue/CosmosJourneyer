@@ -21,6 +21,7 @@ import i18n from "../../i18n";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { StationLandingTutorial } from "../../tutorials/stationLandingTutorial";
 import { FuelScoopTutorial } from "../../tutorials/fuelScoopTutorial";
+import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
 
 export class TutorialsPanelContent {
     readonly htmlRoot: HTMLElement;
@@ -28,11 +29,15 @@ export class TutorialsPanelContent {
 
     private readonly availableTutorials: ReadonlyArray<Tutorial>;
 
-    constructor() {
+    constructor(starSystemDatabase: StarSystemDatabase) {
         this.htmlRoot = document.createElement("div");
         this.htmlRoot.classList.add("tutorialsMenuContainer");
 
-        this.availableTutorials = [new FlightTutorial(), new StationLandingTutorial(), new FuelScoopTutorial()];
+        this.availableTutorials = [
+            new FlightTutorial(starSystemDatabase),
+            new StationLandingTutorial(starSystemDatabase),
+            new FuelScoopTutorial(starSystemDatabase)
+        ];
 
         this.availableTutorials.forEach((tutorial) => {
             const tutorialDiv = document.createElement("div");

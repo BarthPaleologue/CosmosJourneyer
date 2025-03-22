@@ -22,6 +22,7 @@ import { Textures } from "../assets/textures";
 import { gcd } from "../utils/math";
 import { CloudsLut } from "./cloudsLut";
 import { LutPoolManager } from "../assets/lutPoolManager";
+import { DeepReadonly } from "../utils/types";
 
 export const CloudsUniformNames = {
     LAYER_RADIUS: "clouds_layerRadius",
@@ -42,13 +43,13 @@ export const CloudsSamplerNames = {
 };
 
 export class CloudsUniforms {
-    readonly model: CloudsModel;
+    readonly model: DeepReadonly<CloudsModel>;
 
     readonly lut: CloudsLut;
 
     private elapsedSeconds = 0;
 
-    constructor(model: CloudsModel, scene: Scene) {
+    constructor(model: DeepReadonly<CloudsModel>, scene: Scene) {
         this.model = model;
 
         this.lut = LutPoolManager.GetCloudsLut(scene);

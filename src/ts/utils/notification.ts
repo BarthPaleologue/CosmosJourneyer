@@ -156,19 +156,3 @@ export function createNotification(
     const notification = new Notification(type, intent, text, durationMillis / 1000);
     activeNotifications.push(notification);
 }
-
-/**
- * Helper function to log a warning if a value is undefined and return a defined value
- * @param value The value to check
- * @param defaultValue The default value to return if the value is undefined
- * @param message The message to log if the value is undefined
- * @returns The value if it is defined, otherwise the default value
- */
-export function warnIfUndefined<T>(value: T | undefined, defaultValue: T, message: string): T {
-    if (value === undefined) {
-        console.warn(message);
-        createNotification(NotificationOrigin.GENERAL, NotificationIntent.WARNING, message, 10_000);
-        return defaultValue;
-    }
-    return value;
-}

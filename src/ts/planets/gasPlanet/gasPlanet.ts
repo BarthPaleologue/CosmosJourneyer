@@ -37,9 +37,10 @@ import { AtmosphereUniforms } from "../../atmosphere/atmosphereUniforms";
 import { Settings } from "../../settings";
 import { PlanetaryMassObjectBase } from "../../architecture/planetaryMassObject";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
+import { DeepReadonly } from "../../utils/types";
 
 export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_PLANET>, Cullable {
-    readonly model: GasPlanetModel;
+    readonly model: DeepReadonly<GasPlanetModel>;
 
     readonly type = OrbitalObjectType.GAS_PLANET;
 
@@ -60,7 +61,7 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
      * @param model The model to create the planet from or a seed for the planet in [-1, 1]
      * @param scene
      */
-    constructor(model: GasPlanetModel, scene: Scene) {
+    constructor(model: DeepReadonly<GasPlanetModel>, scene: Scene) {
         this.model = model;
 
         this.mesh = MeshBuilder.CreateSphere(
@@ -114,7 +115,7 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
         this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());
     }
 
-    updateMaterial(stellarObjects: Transformable[], deltaSeconds: number): void {
+    updateMaterial(stellarObjects: ReadonlyArray<Transformable>, deltaSeconds: number): void {
         this.material.update(stellarObjects, deltaSeconds);
     }
 
