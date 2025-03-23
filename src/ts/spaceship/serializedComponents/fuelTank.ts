@@ -18,23 +18,42 @@
 import { z } from "zod";
 
 export const SerializedFuelTankSchema = z.object({
-    currentFuel: z.number(),
-    maxFuel: z.number()
+    type: z.literal("fuelTank"),
+    size: z.number(),
+    quality: z.number(),
+    currentFuel01: z.number().min(0).max(1)
 });
 
 export type SerializedFuelTank = z.infer<typeof SerializedFuelTankSchema>;
+
+export function getFuelTankSlot(size: number) {
+    return SerializedFuelTankSchema.refine((tank) => tank.size === size).nullable();
+}
+
+export function getFuelTankSpecs(fuelTank: SerializedFuelTank) {
+    return {
+        maxFuel: 50 * (fuelTank.size + fuelTank.quality / 10)
+    };
+}
 
 export class FuelTank {
     private currentFuel: number;
     private readonly maxFuel: number;
 
+    readonly size: number;
+    readonly quality: number;
+
     /**
      * Creates an empty fuel tank with the given maximum fuel capacity.
      * @param maxFuel The maximum fuel capacity of the tank.
      */
-    constructor(maxFuel: number) {
-        this.currentFuel = 0;
-        this.maxFuel = maxFuel;
+    constructor(serializedFuelTank: SerializedFuelTank) {
+        const specs = getFuelTankSpecs(serializedFuelTank);
+        this.maxFuel = specs.maxFuel;
+        this.currentFuel = specs.maxFuel * serializedFuelTank.currentFuel01;
+
+        this.size = serializedFuelTank.size;
+        this.quality = serializedFuelTank.quality;
     }
 
     fill(amount: number): number {
@@ -60,14 +79,10 @@ export class FuelTank {
 
     serialize(): SerializedFuelTank {
         return {
-            currentFuel: this.currentFuel,
-            maxFuel: this.maxFuel
+            type: "fuelTank",
+            size: this.size,
+            quality: this.quality,
+            currentFuel01: this.currentFuel / this.maxFuel
         };
-    }
-
-    static Deserialize(serializedFuelTank: SerializedFuelTank): FuelTank {
-        const fuelTank = new FuelTank(serializedFuelTank.maxFuel);
-        fuelTank.currentFuel = serializedFuelTank.currentFuel;
-        return fuelTank;
     }
 }

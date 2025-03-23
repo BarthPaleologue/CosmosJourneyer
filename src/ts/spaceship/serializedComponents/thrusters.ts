@@ -17,8 +17,14 @@
 
 import { z } from "zod";
 
-export const SerializedFuelScoopSchema = z.object({
-    fuelPerSecond: z.number().default(1)
+export const SerializedThrustersSchema = z.object({
+    type: z.literal("thrusters"),
+    size: z.number(),
+    quality: z.number()
 });
 
-export type SerializedFuelScoop = z.infer<typeof SerializedFuelScoopSchema>;
+export type SerializedThrusters = z.infer<typeof SerializedThrustersSchema>;
+
+export function getThrustersSlot(size: number) {
+    return SerializedThrustersSchema.refine((thrusters) => thrusters.size === size).nullable();
+}
