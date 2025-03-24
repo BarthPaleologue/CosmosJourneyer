@@ -601,8 +601,6 @@ export class CosmosJourneyer {
 
         const currentLocalRotation = currentWorldRotation.multiply(nearestOrbitalObjectInverseRotation);
 
-        console.log(currentLocalPosition, currentLocalRotation);
-
         return {
             type: "relative",
             universeObjectId: universeObjectId,
@@ -857,8 +855,6 @@ export class CosmosJourneyer {
             nearestOrbitalObject.getTransform().getAbsolutePosition()
         );
         const objectRadius = nearestOrbitalObject.getBoundingRadius();
-
-        console.log(distanceToObject, objectRadius);
 
         if (distanceToObject < objectRadius * 1.1) {
             if (distanceToObject < 0.1) {
