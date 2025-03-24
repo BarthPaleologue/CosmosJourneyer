@@ -289,12 +289,16 @@ export class StarSystemView implements View {
             const target = this.targetCursorLayer.getTarget();
             if (!(target instanceof SystemTarget)) return;
 
+            const shipControls = this.getSpaceshipControls();
+            const spaceship = shipControls.getSpaceship();
+
+            const warpDrive = spaceship.getWarpDrive();
+            if (warpDrive === null) {
+                return;
+            }
+
             if (!this.jumpLock) this.jumpLock = true;
             else return;
-
-            const shipControls = this.getSpaceshipControls();
-
-            const spaceship = shipControls.getSpaceship();
 
             const currentSystemPosition = this.starSystemDatabase.getSystemGalacticPosition(
                 this.getStarSystem().model.coordinates
@@ -303,7 +307,7 @@ export class StarSystemView implements View {
 
             const distanceLY = Vector3.Distance(currentSystemPosition, targetSystemPosition);
 
-            const fuelForJump = spaceship.getWarpDrive().getFuelConsumption(distanceLY);
+            const fuelForJump = warpDrive.getFuelConsumption(distanceLY);
 
             if (spaceship.getRemainingFuel() < fuelForJump) {
                 createNotification(
@@ -346,7 +350,7 @@ export class StarSystemView implements View {
             this.onBeforeJump.notifyObservers();
 
             // then, initiate hyper space jump
-            if (!spaceship.getWarpDrive().isEnabled()) spaceship.enableWarpDrive();
+            if (!warpDrive.isEnabled()) spaceship.enableWarpDrive();
             spaceship.hyperSpaceTunnel.setEnabled(true);
             spaceship.warpTunnel.getTransform().setEnabled(false);
             spaceship.hyperSpaceSound.setTargetVolume(1);
@@ -758,7 +762,7 @@ export class StarSystemView implements View {
         spaceship.setNearestCelestialBody(nearestCelestialBody);
 
         const warpDrive = spaceship.getWarpDrive();
-        if (warpDrive.isEnabled()) {
+        if (warpDrive !== null && warpDrive.isEnabled()) {
             this.spaceShipLayer.displaySpeed(warpDrive.getThrottle(), spaceship.getSpeed());
         } else {
             this.spaceShipLayer.displaySpeed(spaceship.getThrottle(), spaceship.getSpeed());
@@ -778,11 +782,11 @@ export class StarSystemView implements View {
                   ) / Settings.LIGHT_YEAR
                 : 0;
 
-        const fuelForJump = warpDrive.getFuelConsumption(distanceLY);
+        const fuelRequiredForJump = warpDrive?.getFuelConsumption(distanceLY) ?? 0;
 
         this.spaceShipLayer.displayFuel(
             spaceship.getRemainingFuel() / spaceship.getTotalFuelCapacity(),
-            fuelForJump / spaceship.getTotalFuelCapacity()
+            fuelRequiredForJump / spaceship.getTotalFuelCapacity()
         );
 
         this.characterControls.setClosestWalkableObject(nearestOrbitalObject);

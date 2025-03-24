@@ -270,12 +270,17 @@ export class Spaceship implements Transformable {
         this.nearestCelestialBody = celestialBody;
     }
 
-    public isWarpDriveEnabled() {
-        return this.warpDrive.isEnabled();
+    public getWarpDrive(): WarpDrive | null {
+        return this.warpDrive;
     }
 
     public enableWarpDrive() {
-        this.warpDrive.enable();
+        const warpDrive = this.getWarpDrive();
+        if (warpDrive === null) {
+            return;
+        }
+
+        warpDrive.enable();
         this.aggregate.body.setMotionType(PhysicsMotionType.ANIMATED);
 
         this.aggregate.body.setLinearVelocity(Vector3.Zero());
@@ -288,7 +293,12 @@ export class Spaceship implements Transformable {
     }
 
     public disableWarpDrive() {
-        this.warpDrive.disengage();
+        const warpDrive = this.getWarpDrive();
+        if (warpDrive === null) {
+            return;
+        }
+
+        warpDrive.disengage();
         this.aggregate.body.setMotionType(PhysicsMotionType.DYNAMIC);
 
         this.disableWarpDriveSound.sound.play();
@@ -296,7 +306,12 @@ export class Spaceship implements Transformable {
     }
 
     public emergencyStopWarpDrive() {
-        this.warpDrive.emergencyStop();
+        const warpDrive = this.getWarpDrive();
+        if (warpDrive === null) {
+            return;
+        }
+
+        warpDrive.emergencyStop();
         this.aggregate.body.setMotionType(PhysicsMotionType.DYNAMIC);
 
         this.disableWarpDriveSound.sound.play();
@@ -304,20 +319,17 @@ export class Spaceship implements Transformable {
     }
 
     public toggleWarpDrive() {
-        if (!this.warpDrive.isEnabled()) this.enableWarpDrive();
+        const warpDrive = this.getWarpDrive();
+        if (warpDrive === null) {
+            return;
+        }
+
+        if (!warpDrive.isEnabled()) this.enableWarpDrive();
         else this.disableWarpDrive();
     }
 
     public setMainEngineThrottle(throttle: number) {
         this.mainEngineThrottle = throttle;
-    }
-
-    /**
-     * Returns a readonly interface to the warp drive of the ship.
-     * @returns A readonly interface to the warp drive of the ship.
-     */
-    public getWarpDrive(): WarpDrive {
-        return this.warpDrive;
     }
 
     /**
@@ -327,13 +339,15 @@ export class Spaceship implements Transformable {
      * @returns The speed of the ship in m/s
      */
     public getSpeed(): number {
-        return this.warpDrive.isEnabled()
-            ? this.warpDrive.getWarpSpeed()
+        const warpDrive = this.getWarpDrive();
+        return warpDrive?.isEnabled()
+            ? warpDrive.getWarpSpeed()
             : this.aggregate.body.getLinearVelocity().dot(getForwardDirection(this.getTransform()));
     }
 
     public getThrottle(): number {
-        return this.warpDrive.isEnabled() ? this.warpDrive.getThrottle() : this.mainEngineThrottle;
+        const warpDrive = this.getWarpDrive();
+        return warpDrive?.isEnabled() ? warpDrive.getThrottle() : this.mainEngineThrottle;
     }
 
     public increaseMainEngineThrottle(delta: number) {
@@ -493,7 +507,12 @@ export class Spaceship implements Transformable {
     }
 
     private updateWarpDrive(deltaSeconds: number) {
-        const warpSpeed = getForwardDirection(this.aggregate.transformNode).scale(this.warpDrive.getWarpSpeed());
+        const warpDrive = this.getWarpDrive();
+        if (warpDrive === null) {
+            return;
+        }
+
+        const warpSpeed = getForwardDirection(this.aggregate.transformNode).scale(warpDrive.getWarpSpeed());
         this.warpTunnel.update(deltaSeconds);
 
         const currentForwardSpeed = Vector3.Dot(
@@ -504,7 +523,7 @@ export class Spaceship implements Transformable {
         let closestDistance = Number.POSITIVE_INFINITY;
         let objectHalfThickness = 0;
 
-        if (this.warpDrive.isEnabled()) {
+        if (warpDrive.isEnabled()) {
             if (this.nearestOrbitalObject !== null) {
                 if (!canEngageWarpDrive(this.getTransform(), this.getSpeed(), this.nearestOrbitalObject)) {
                     this.emergencyStopWarpDrive();
@@ -545,7 +564,7 @@ export class Spaceship implements Transformable {
 
             this.thrusterSound.setTargetVolume(0);
 
-            if (currentForwardSpeed < this.warpDrive.getWarpSpeed()) {
+            if (currentForwardSpeed < warpDrive.getWarpSpeed()) {
                 this.acceleratingWarpDriveSound.setTargetVolume(1);
                 this.deceleratingWarpDriveSound.setTargetVolume(0);
             } else {
@@ -554,11 +573,10 @@ export class Spaceship implements Transformable {
             }
         }
 
-        this.warpDrive.update(currentForwardSpeed, closestDistance, objectHalfThickness, deltaSeconds);
+        warpDrive.update(currentForwardSpeed, closestDistance, objectHalfThickness, deltaSeconds);
 
         // the warp throttle goes from 0.1 to 1 smoothly using an inverse function
-        if (this.warpDrive.isEnabled())
-            this.warpTunnel.setThrottle(1 - 1 / (1.1 * (1 + 1e-7 * this.warpDrive.getWarpSpeed())));
+        if (warpDrive.isEnabled()) this.warpTunnel.setThrottle(1 - 1 / (1.1 * (1 + 1e-7 * warpDrive.getWarpSpeed())));
         else this.warpTunnel.setThrottle(0);
     }
 
@@ -572,7 +590,7 @@ export class Spaceship implements Transformable {
 
         this.handleFuelScoop(deltaSeconds);
 
-        if (this.warpDrive.isDisabled() && this.state !== ShipState.LANDED) {
+        if (!this.getWarpDrive()?.isEnabled() && this.state !== ShipState.LANDED) {
             const linearVelocity = this.aggregate.body.getLinearVelocity();
             const forwardDirection = getForwardDirection(this.getTransform());
             const forwardSpeed = Vector3.Dot(linearVelocity, forwardDirection);
@@ -656,7 +674,7 @@ export class Spaceship implements Transformable {
         }
 
         const distanceTravelledLY = (this.getSpeed() * deltaSeconds) / Settings.LIGHT_YEAR;
-        const fuelToBurn = this.warpDrive.getFuelConsumption(distanceTravelledLY);
+        const fuelToBurn = this.getWarpDrive()?.getFuelConsumption(distanceTravelledLY) ?? 0;
         if (fuelToBurn < this.getRemainingFuel()) {
             this.burnFuel(fuelToBurn);
         } else {
