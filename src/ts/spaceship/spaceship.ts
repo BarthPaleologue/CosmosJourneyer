@@ -49,12 +49,14 @@ import { LandingPad } from "../assets/procedural/landingPad/landingPad";
 import { CelestialBody, OrbitalObject } from "../architecture/orbitalObject";
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { FuelTank } from "./components/fuelTank";
-import { SerializedFuelScoop } from "./components/fuelScoop";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { LandingComputer, LandingComputerStatusBit, LandingTargetKind } from "./landingComputer";
 import { canEngageWarpDrive } from "./components/warpDriveUtils";
 import { distanceToAsteroidField } from "../utils/asteroidFields";
-import { SerializedSpaceship, DefaultSerializedSpaceship, ShipType } from "./serializedSpaceship";
+import { getDefaultSerializedSpaceship, SerializedSpaceship, ShipType } from "./serializedSpaceship";
+import { OptionalComponent } from "./components/optionalComponents";
+import { FuelScoop } from "./components/fuelScoop";
+import { Thrusters } from "./components/thrusters";
 
 const enum ShipState {
     FLYING,
@@ -63,6 +65,8 @@ const enum ShipState {
 }
 
 export class Spaceship implements Transformable {
+    readonly shipType: ShipType;
+
     readonly id: string;
 
     readonly name: string;
@@ -73,8 +77,6 @@ export class Spaceship implements Transformable {
     private readonly collisionObservable: Observable<IPhysicsCollisionEvent>;
 
     private landingComputer: LandingComputer | null;
-
-    private readonly warpDrive = new WarpDrive(false);
 
     private mainEngineThrottle = 0;
     private mainEngineTargetSpeed = 0;
@@ -105,11 +107,20 @@ export class Spaceship implements Transformable {
 
     private targetLandingPad: LandingPad | null = null;
 
+    readonly components: {
+        primary: {
+            warpDrive: WarpDrive | null;
+            thrusters: Thrusters | null;
+            fuelTank: FuelTank | null;
+        };
+        optional: OptionalComponent[];
+    };
+
     private mainThrusters: Thruster[] = [];
 
     readonly fuelTanks: FuelTank[];
 
-    readonly fuelScoop: SerializedFuelScoop | null;
+    readonly fuelScoop: FuelScoop | null;
     private isFuelScooping = false;
 
     readonly enableWarpDriveSound: AudioInstance;
@@ -139,6 +150,8 @@ export class Spaceship implements Transformable {
         this.id = serializedSpaceShip.id ?? crypto.randomUUID();
 
         this.name = serializedSpaceShip.name;
+
+        this.shipType = serializedSpaceShip.type;
 
         this.instanceRoot = Objects.CreateWandererInstance();
         this.instanceRoot.rotationQuaternion = Quaternion.Identity();
@@ -226,9 +239,46 @@ export class Spaceship implements Transformable {
             this.getTransform()
         );
 
-        this.fuelTanks = serializedSpaceShip.fuelTanks.map((tank) => FuelTank.Deserialize(tank));
+        const optionalComponents = [];
+        for (const optionalComponent of serializedSpaceShip.components.optional) {
+            if (optionalComponent === null) {
+                continue;
+            }
 
-        this.fuelScoop = serializedSpaceShip.fuelScoop;
+            switch (optionalComponent.type) {
+                case "fuelTank":
+                    optionalComponents.push(new FuelTank(optionalComponent));
+                    break;
+                case "fuelScoop":
+                    optionalComponents.push(new FuelScoop(optionalComponent));
+            }
+        }
+
+        this.components = {
+            primary: {
+                warpDrive:
+                    serializedSpaceShip.components.primary.warpDrive !== null
+                        ? new WarpDrive(serializedSpaceShip.components.primary.warpDrive, false)
+                        : null,
+                fuelTank:
+                    serializedSpaceShip.components.primary.fuelTank !== null
+                        ? new FuelTank(serializedSpaceShip.components.primary.fuelTank)
+                        : null,
+                thrusters:
+                    serializedSpaceShip.components.primary.thrusters !== null
+                        ? new Thrusters(serializedSpaceShip.components.primary.thrusters)
+                        : null
+            },
+            optional: optionalComponents
+        };
+
+        this.fuelTanks = []; //serializedSpaceShip.fuelTanks.map((tank) => FuelTank.Deserialize(tank));
+        if (this.components.primary.fuelTank !== null) {
+            this.fuelTanks.push(this.components.primary.fuelTank);
+        }
+        this.fuelTanks.push(...this.components.optional.filter((component) => component.type === "fuelTank"));
+
+        this.fuelScoop = this.components.optional.find((component) => component.type === "fuelScoop") ?? null;
 
         const { min: boundingMin, max: boundingMax } = this.getTransform().getHierarchyBoundingVectors();
 
@@ -271,7 +321,7 @@ export class Spaceship implements Transformable {
     }
 
     public getWarpDrive(): WarpDrive | null {
-        return this.warpDrive;
+        return this.components.primary.warpDrive;
     }
 
     public enableWarpDrive() {
@@ -720,7 +770,7 @@ export class Spaceship implements Transformable {
     }
 
     public static CreateDefault(scene: Scene): Spaceship {
-        return Spaceship.Deserialize(DefaultSerializedSpaceship, scene);
+        return Spaceship.Deserialize(getDefaultSerializedSpaceship(), scene);
     }
 
     public static Deserialize(serializedSpaceship: SerializedSpaceship, scene: Scene): Spaceship {
@@ -728,13 +778,28 @@ export class Spaceship implements Transformable {
     }
 
     public serialize(): SerializedSpaceship {
-        return {
-            id: this.id,
-            name: this.name,
-            type: ShipType.WANDERER,
-            fuelTanks: this.fuelTanks.map((tank) => tank.serialize()),
-            fuelScoop: this.fuelScoop
+        const primaryComponents = {
+            warpDrive: this.getWarpDrive()?.serialize() ?? null,
+            fuelTank: this.components.primary.fuelTank?.serialize() ?? null,
+            thrusters: this.components.primary.thrusters?.serialize() ?? null
         };
+
+        switch (this.shipType) {
+            case ShipType.WANDERER:
+                return {
+                    id: this.id,
+                    name: this.name,
+                    type: this.shipType,
+                    components: {
+                        primary: primaryComponents,
+                        optional: [
+                            this.components.optional[0]?.serialize() ?? null,
+                            this.components.optional[1]?.serialize() ?? null,
+                            this.components.optional[2]?.serialize() ?? null
+                        ]
+                    }
+                };
+        }
     }
 
     public dispose() {

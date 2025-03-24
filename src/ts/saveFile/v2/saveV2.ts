@@ -23,6 +23,7 @@ import { UniverseCoordinates, UniverseCoordinatesSchema } from "../../utils/coor
 import { safeParseSaveV1, SaveV1, SystemObjectType } from "../v1/saveV1";
 import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
 import { OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
+import { getDefaultSerializedSpaceship } from "../../spaceship/serializedSpaceship";
 
 export const SaveSchemaV2 = z.object({
     /** The timestamp when the save file was created. */
@@ -111,7 +112,7 @@ export function migrateV1ToV2(saveV1: SaveV1, starSystemDatabase: StarSystemData
             systemBookmarks: saveV1.player.systemBookmarks,
             currentMissions: [],
             completedMissions: [],
-            spaceShips: saveV1.player.spaceShips,
+            spaceShips: [getDefaultSerializedSpaceship()],
             tutorials: saveV1.player.tutorials
         },
         playerLocation: {

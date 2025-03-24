@@ -19,13 +19,13 @@ import { z } from "zod";
 import { SerializedFuelScoopSchema } from "./fuelScoop";
 import { SerializedFuelTankSchema } from "./fuelTank";
 
-export const ShipOptionalComponentSchema = z.discriminatedUnion("type", [
+export const SerializedOptionalComponentSchema = z.discriminatedUnion("type", [
     SerializedFuelScoopSchema,
     SerializedFuelTankSchema
 ]);
 
-export type ShipOptionalComponent = z.infer<typeof ShipOptionalComponentSchema>;
+export type SerializedOptionalComponent = z.infer<typeof SerializedOptionalComponentSchema>;
 
 export function getOptionalComponentSlot(maxSize: number) {
-    return ShipOptionalComponentSchema.refine((component) => component.size <= maxSize).nullable();
+    return SerializedOptionalComponentSchema.refine((component) => component.size <= maxSize).nullable();
 }

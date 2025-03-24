@@ -16,8 +16,10 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { z } from "zod";
-import { SerializedFuelScoopSchema } from "./components/fuelScoop";
-import { SerializedFuelTankSchema } from "./components/fuelTank";
+import { getFuelTankSlot, SerializedFuelTankSchema } from "./serializedComponents/fuelTank";
+import { getOptionalComponentSlot, SerializedOptionalComponentSchema } from "./serializedComponents/optionalComponents";
+import { getWarpDriveSlot, SerializedWarpDriveSchema } from "./serializedComponents/warpDrive";
+import { getThrustersSlot, SerializedThrustersSchema } from "./serializedComponents/thrusters";
 
 export enum ShipType {
     WANDERER = "WANDERER"
@@ -26,18 +28,26 @@ export enum ShipType {
 export const BaseSpaceshipSchema = z.object({
     type: z.nativeEnum(ShipType).default(ShipType.WANDERER),
     id: z.string().uuid(),
-    name: z.string()
+    name: z.string(),
+    components: z.object({
+        primary: z.object({
+            warpDrive: SerializedWarpDriveSchema,
+            thrusters: SerializedThrustersSchema,
+            fuelTank: SerializedFuelTankSchema
+        }),
+        optional: z.array(SerializedOptionalComponentSchema)
+    })
 });
 
 export const WandererSchema = BaseSpaceshipSchema.extend({
     type: z.literal(ShipType.WANDERER),
     components: z.object({
         primary: z.object({
-            fuelTank: SerializedFuelTankSchema
+            warpDrive: getWarpDriveSlot(3),
+            thrusters: getThrustersSlot(3),
+            fuelTank: getFuelTankSlot(2)
         }),
-        optional: z.object({
-            fuelScoop: SerializedFuelScoopSchema
-        })
+        optional: z.tuple([getOptionalComponentSlot(3), getOptionalComponentSlot(2), getOptionalComponentSlot(2)])
     })
 });
 
@@ -47,4 +57,39 @@ export const SerializedSpaceshipSchema = z.discriminatedUnion("type", [WandererS
 
 export type SerializedSpaceship = z.infer<typeof SerializedSpaceshipSchema>;
 
-export const DefaultSerializedSpaceship: SerializedSpaceship = SerializedSpaceshipSchema.parse({});
+export function getDefaultSerializedSpaceship(): SerializedSpaceship {
+    return WandererSchema.parse({
+        type: ShipType.WANDERER,
+        name: "Wanderer",
+        id: crypto.randomUUID(),
+        components: {
+            primary: {
+                warpDrive: {
+                    type: "warpDrive",
+                    size: 3,
+                    quality: 1
+                },
+                thrusters: {
+                    type: "thrusters",
+                    size: 3,
+                    quality: 1
+                },
+                fuelTank: {
+                    type: "fuelTank",
+                    size: 2,
+                    quality: 1,
+                    currentFuel01: 1
+                }
+            },
+            optional: [
+                null,
+                {
+                    type: "fuelScoop",
+                    size: 2,
+                    quality: 1
+                },
+                null
+            ]
+        }
+    } satisfies SerializedSpaceship);
+}
