@@ -15,23 +15,24 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { z } from "zod";
+import { SerializedThrusters } from "../serializedComponents/thrusters";
 
-export const SerializedFuelTankSchema = z.object({
-    type: z.literal("fuelTank"),
-    size: z.number(),
-    quality: z.number(),
-    currentFuel01: z.number().min(0).max(1)
-});
+export class Thrusters {
+    readonly type;
+    readonly size: number;
+    readonly quality: number;
 
-export type SerializedFuelTank = z.infer<typeof SerializedFuelTankSchema>;
+    constructor(serializedThrusters: SerializedThrusters) {
+        this.type = serializedThrusters.type;
+        this.size = serializedThrusters.size;
+        this.quality = serializedThrusters.quality;
+    }
 
-export function getFuelTankSlot(size: number) {
-    return SerializedFuelTankSchema.refine((tank) => tank.size === size).nullable();
-}
-
-export function getFuelTankSpecs(fuelTank: SerializedFuelTank) {
-    return {
-        maxFuel: 50 * (fuelTank.size + fuelTank.quality / 10)
-    };
+    serialize(): SerializedThrusters {
+        return {
+            type: this.type,
+            size: this.size,
+            quality: this.quality
+        };
+    }
 }

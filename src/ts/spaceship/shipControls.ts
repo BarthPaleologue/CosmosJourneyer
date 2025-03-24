@@ -47,7 +47,7 @@ import { quickAnimation } from "../uberCore/transforms/animations/quickAnimation
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { lerpSmooth, slerpSmoothToRef } from "../utils/math";
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
-import { canEngageWarpDrive } from "./warpDriveUtils";
+import { canEngageWarpDrive } from "./components/warpDriveUtils";
 
 export class ShipControls implements Controls {
     private spaceship: Spaceship;

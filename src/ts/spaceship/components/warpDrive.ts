@@ -15,8 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Settings } from "../settings";
-import { clamp, lerpSmooth, moveTowards } from "../utils/math";
+import { Settings } from "../../settings";
+import { clamp, lerpSmooth } from "../../utils/math";
+import { SerializedWarpDrive } from "../serializedComponents/warpDrive";
 
 const enum WarpDriveState {
     /**
@@ -73,6 +74,8 @@ export interface ReadonlyWarpDrive {
 }
 
 export class WarpDrive implements ReadonlyWarpDrive {
+    readonly type;
+
     /**
      * The default throttle value for the warp drive.
      */
@@ -105,8 +108,24 @@ export class WarpDrive implements ReadonlyWarpDrive {
      */
     private state = WarpDriveState.DISABLED;
 
-    constructor(enabledByDefault = false) {
+    readonly size: number;
+    readonly quality: number;
+
+    constructor(serializedWarpDrive: SerializedWarpDrive, enabledByDefault = false) {
+        this.type = serializedWarpDrive.type;
+
+        this.size = serializedWarpDrive.size;
+        this.quality = serializedWarpDrive.quality;
+
         this.state = enabledByDefault ? WarpDriveState.ENABLED : WarpDriveState.DISABLED;
+    }
+
+    public serialize(): SerializedWarpDrive {
+        return {
+            type: this.type,
+            size: this.size,
+            quality: this.quality
+        };
     }
 
     /**

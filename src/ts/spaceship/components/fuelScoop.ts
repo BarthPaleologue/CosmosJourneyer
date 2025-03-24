@@ -15,23 +15,29 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { z } from "zod";
+import { getFuelScoopSpec, SerializedFuelScoop } from "../serializedComponents/fuelScoop";
 
-export const SerializedFuelTankSchema = z.object({
-    type: z.literal("fuelTank"),
-    size: z.number(),
-    quality: z.number(),
-    currentFuel01: z.number().min(0).max(1)
-});
+export class FuelScoop {
+    readonly type;
+    readonly fuelPerSecond: number;
 
-export type SerializedFuelTank = z.infer<typeof SerializedFuelTankSchema>;
+    readonly size: number;
+    readonly quality: number;
 
-export function getFuelTankSlot(size: number) {
-    return SerializedFuelTankSchema.refine((tank) => tank.size === size).nullable();
-}
+    constructor(serializedFuelScoop: SerializedFuelScoop) {
+        this.type = serializedFuelScoop.type;
+        this.size = serializedFuelScoop.size;
+        this.quality = serializedFuelScoop.quality;
 
-export function getFuelTankSpecs(fuelTank: SerializedFuelTank) {
-    return {
-        maxFuel: 50 * (fuelTank.size + fuelTank.quality / 10)
-    };
+        const spec = getFuelScoopSpec(serializedFuelScoop);
+        this.fuelPerSecond = spec.fuelPerSecond;
+    }
+
+    serialize() {
+        return {
+            type: this.type,
+            size: this.size,
+            quality: this.quality
+        };
+    }
 }

@@ -18,7 +18,7 @@
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { WarpDrive } from "./warpDrive";
+import { WarpDrive } from "./components/warpDrive";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import {
     IPhysicsCollisionEvent,
@@ -52,7 +52,7 @@ import { FuelTank } from "./components/fuelTank";
 import { SerializedFuelScoop } from "./components/fuelScoop";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { LandingComputer, LandingComputerStatusBit, LandingTargetKind } from "./landingComputer";
-import { canEngageWarpDrive } from "./warpDriveUtils";
+import { canEngageWarpDrive } from "./components/warpDriveUtils";
 import { distanceToAsteroidField } from "../utils/asteroidFields";
 import { SerializedSpaceship, DefaultSerializedSpaceship, ShipType } from "./serializedSpaceship";
 
