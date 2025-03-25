@@ -615,9 +615,12 @@ export class StarSystemView implements View {
             activeControls.getTransform().lookAt(firstBody.getTransform().getAbsolutePosition());
         }
 
+        const currentSpaceship = this.spaceshipControls?.getSpaceship();
+        const currentJumpRange = currentSpaceship?.getWarpDrive()?.rangeLY ?? 0;
+
         getNeighborStarSystemCoordinates(
             starSystem.model.coordinates,
-            Math.min(Settings.PLAYER_JUMP_RANGE_LY, Settings.VISIBLE_NEIGHBORHOOD_MAX_RADIUS_LY),
+            Math.min(currentJumpRange, Settings.VISIBLE_NEIGHBORHOOD_MAX_RADIUS_LY),
             this.starSystemDatabase
         ).forEach(([neighborCoordinates, position, distance]) => {
             const systemTarget = this.getStarSystem().addSystemTarget(neighborCoordinates, this.starSystemDatabase);

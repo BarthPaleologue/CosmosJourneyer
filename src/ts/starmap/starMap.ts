@@ -55,6 +55,7 @@ import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coo
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { EncyclopaediaGalactica } from "../society/encyclopaediaGalactica";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { alertModal } from "../utils/dialogModal";
 
 // register cosmos journeyer as part of window object
 declare global {
@@ -177,16 +178,24 @@ export class StarMap implements View {
             this.focusOnSystem(starSystemCoordinates);
         });
 
-        this.starMapUI.shortHandUIPlotItineraryButton.addEventListener("click", () => {
-            if (this.currentSystemCoordinates === null) throw new Error("current system seed is null!");
-            if (this.selectedSystemCoordinates === null) throw new Error("selected system seed is null!");
+        this.starMapUI.shortHandUIPlotItineraryButton.addEventListener("click", async () => {
+            if (this.currentSystemCoordinates === null) return await alertModal("current system seed is null!");
+            if (this.selectedSystemCoordinates === null) return await alertModal("selected system seed is null!");
+
+            const playerCurrentSpaceship = this.player.instancedSpaceships[0];
+            const warpDrive = playerCurrentSpaceship.getWarpDrive();
+
+            if (warpDrive === null) {
+                return await alertModal(
+                    "Your current spaceship has no warp drive! Install a warp drive to plot an itinerary."
+                );
+            }
+
+            const jumpRange = warpDrive.rangeLY;
+
             if (starSystemCoordinatesEquals(this.selectedSystemCoordinates, this.currentSystemCoordinates)) return;
             Sounds.MENU_SELECT_SOUND.play();
-            this.stellarPathfinder.init(
-                this.currentSystemCoordinates,
-                this.selectedSystemCoordinates,
-                Settings.PLAYER_JUMP_RANGE_LY
-            );
+            this.stellarPathfinder.init(this.currentSystemCoordinates, this.selectedSystemCoordinates, jumpRange);
         });
 
         StarMapInputs.map.focusOnCurrentSystem.on("complete", () => {
