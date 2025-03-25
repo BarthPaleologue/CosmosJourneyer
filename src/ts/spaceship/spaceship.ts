@@ -87,12 +87,6 @@ export class Spaceship implements Transformable {
     readonly maxYawSpeed = 1.0;
     readonly maxPitchSpeed = 3.0;
 
-    /**
-     * Maximum speed of the ship in m/s
-     * @private
-     */
-    private readonly maxSpeed = 1400;
-
     private closestWalkableObject: (Transformable & HasBoundingSphere) | null = null;
 
     private state = ShipState.FLYING;
@@ -631,7 +625,7 @@ export class Spaceship implements Transformable {
     }
 
     public update(deltaSeconds: number) {
-        this.mainEngineTargetSpeed = this.mainEngineThrottle * this.maxSpeed;
+        this.mainEngineTargetSpeed = this.mainEngineThrottle * (this.components.primary.thrusters?.maxSpeed ?? 0);
         if (this.targetLandingPad !== null) {
             this.mainEngineTargetSpeed /= 8;
         }

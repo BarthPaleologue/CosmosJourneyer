@@ -15,17 +15,23 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { SerializedThrusters } from "../serializedComponents/thrusters";
+import { getThrustersSpec, SerializedThrusters } from "../serializedComponents/thrusters";
 
 export class Thrusters {
     readonly type;
     readonly size: number;
     readonly quality: number;
 
+    readonly maxSpeed: number;
+
     constructor(serializedThrusters: SerializedThrusters) {
         this.type = serializedThrusters.type;
         this.size = serializedThrusters.size;
         this.quality = serializedThrusters.quality;
+
+        const spec = getThrustersSpec(serializedThrusters);
+
+        this.maxSpeed = spec.maxSpeed;
     }
 
     serialize(): SerializedThrusters {
