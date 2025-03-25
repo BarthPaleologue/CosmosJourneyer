@@ -47,7 +47,7 @@ import { quickAnimation } from "../uberCore/transforms/animations/quickAnimation
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { lerpSmooth, slerpSmoothToRef } from "../utils/math";
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
-import { canEngageWarpDrive } from "./warpDriveUtils";
+import { canEngageWarpDrive } from "./components/warpDriveUtils";
 
 export class ShipControls implements Controls {
     private spaceship: Spaceship;
@@ -111,9 +111,14 @@ export class ShipControls implements Controls {
 
         this.toggleWarpDriveHandler = async () => {
             const spaceship = this.getSpaceship();
+            const warpDrive = spaceship.getWarpDrive();
+            if (warpDrive === null) {
+                return;
+            }
+
             const nearestOrbitalObject = spaceship.getNearestOrbitalObject();
             if (
-                spaceship.getWarpDrive().isDisabled() &&
+                warpDrive.isDisabled() &&
                 nearestOrbitalObject !== null &&
                 !canEngageWarpDrive(spaceship.getTransform(), 0, nearestOrbitalObject)
             ) {
@@ -124,7 +129,7 @@ export class ShipControls implements Controls {
             const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
 
             spaceship.toggleWarpDrive();
-            if (spaceship.getWarpDrive().isEnabled()) {
+            if (warpDrive.isEnabled()) {
                 Sounds.ENGAGING_WARP_DRIVE.play();
                 this.cameraShakeAnimation.reset();
                 spaceship.setMainEngineThrottle(0);
@@ -158,8 +163,9 @@ export class ShipControls implements Controls {
 
         this.landingHandler = async () => {
             const spaceship = this.getSpaceship();
-            const keyboardLayout = await getGlobalKeyboardLayoutMap();
-            if (spaceship.isWarpDriveEnabled()) {
+            const warpDrive = spaceship.getWarpDrive();
+            if (warpDrive !== null && warpDrive.isEnabled()) {
+                const keyboardLayout = await getGlobalKeyboardLayoutMap();
                 const relevantKeys = pressInteractionToStrings(
                     SpaceShipControlsInputs.map.toggleWarpDrive,
                     keyboardLayout
@@ -224,7 +230,11 @@ export class ShipControls implements Controls {
         this.throttleToZeroHandler = () => {
             const spaceship = this.getSpaceship();
             spaceship.setMainEngineThrottle(0);
-            spaceship.getWarpDrive().increaseThrottle(-spaceship.getWarpDrive().getThrottle());
+
+            const warpDrive = spaceship.getWarpDrive();
+            if (warpDrive !== null) {
+                warpDrive.increaseThrottle(-warpDrive.getThrottle());
+            }
         };
 
         SpaceShipControlsInputs.map.throttleToZero.on("complete", this.throttleToZeroHandler);
@@ -283,7 +293,8 @@ export class ShipControls implements Controls {
             inputPitch *= 0;
         }
 
-        if (spaceship.getWarpDrive().isDisabled()) {
+        const warpDrive = spaceship.getWarpDrive();
+        if (warpDrive?.isDisabled()) {
             spaceship.increaseMainEngineThrottle(deltaSeconds * SpaceShipControlsInputs.map.throttle.value);
 
             if (SpaceShipControlsInputs.map.upDown.value !== 0) {
@@ -332,7 +343,7 @@ export class ShipControls implements Controls {
                 spaceship.aggregate.body.applyAngularImpulse(angularImpulse);
             }
         } else {
-            spaceship.getWarpDrive().increaseThrottle(0.5 * deltaSeconds * SpaceShipControlsInputs.map.throttle.value);
+            warpDrive?.increaseThrottle(0.5 * deltaSeconds * SpaceShipControlsInputs.map.throttle.value);
 
             this.rotationInertia.x = lerpSmooth(this.rotationInertia.x, inputRoll, 0.07, deltaSeconds);
             this.rotationInertia.y = lerpSmooth(this.rotationInertia.y, inputPitch, 0.07, deltaSeconds);

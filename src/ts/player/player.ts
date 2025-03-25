@@ -19,7 +19,7 @@ import { Mission } from "../missions/mission";
 import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
 import { UniverseObjectId } from "../utils/coordinates/universeObjectId";
 import { Spaceship } from "../spaceship/spaceship";
-import { DefaultSerializedSpaceship, SerializedSpaceship } from "../spaceship/serializedSpaceship";
+import { getDefaultSerializedSpaceship, SerializedSpaceship } from "../spaceship/serializedSpaceship";
 import { SpaceDiscoveryData } from "../society/encyclopaediaGalactica";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { CompletedTutorials, SerializedPlayer } from "./serializedPlayer";
@@ -128,7 +128,7 @@ export class Player {
             systemBookmarks: [],
             currentMissions: [],
             completedMissions: [],
-            spaceShips: [DefaultSerializedSpaceship],
+            spaceShips: [getDefaultSerializedSpaceship()],
             tutorials: {
                 stationLandingCompleted: false,
                 fuelScoopingCompleted: false

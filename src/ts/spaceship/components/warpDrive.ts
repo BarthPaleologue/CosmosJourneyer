@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Settings } from "../settings";
-import { clamp, lerpSmooth, moveTowards } from "../utils/math";
+import { clamp, lerpSmooth } from "../../utils/math";
+import { getWarpDriveSpec, SerializedWarpDrive } from "../serializedComponents/warpDrive";
 
 const enum WarpDriveState {
     /**
@@ -73,6 +73,8 @@ export interface ReadonlyWarpDrive {
 }
 
 export class WarpDrive implements ReadonlyWarpDrive {
+    readonly type;
+
     /**
      * The default throttle value for the warp drive.
      */
@@ -86,9 +88,11 @@ export class WarpDrive implements ReadonlyWarpDrive {
     /**
      * Maximum speed of the warp drive in m/s. It can be reached when the ship is far from any body and the user throttle is set to 1.
      */
-    private static readonly MAX_WARP_SPEED = 10 * Settings.C;
+    readonly maxWarpSpeed: number;
 
     private static readonly MIN_WARP_SPEED = 30e3;
+
+    readonly rangeLY: number;
 
     /**
      * Target speed of the warp drive in m/s. It is computed based on the distance to the closest body and the user throttle.
@@ -105,8 +109,29 @@ export class WarpDrive implements ReadonlyWarpDrive {
      */
     private state = WarpDriveState.DISABLED;
 
-    constructor(enabledByDefault = false) {
+    readonly size: number;
+    readonly quality: number;
+
+    constructor(serializedWarpDrive: SerializedWarpDrive, enabledByDefault = false) {
+        this.type = serializedWarpDrive.type;
+
+        this.size = serializedWarpDrive.size;
+        this.quality = serializedWarpDrive.quality;
+
+        const spec = getWarpDriveSpec(serializedWarpDrive);
+
+        this.maxWarpSpeed = spec.maxSpeed;
+        this.rangeLY = spec.rangeLy;
+
         this.state = enabledByDefault ? WarpDriveState.ENABLED : WarpDriveState.DISABLED;
+    }
+
+    public serialize(): SerializedWarpDrive {
+        return {
+            type: this.type,
+            size: this.size,
+            quality: this.quality
+        };
     }
 
     /**
@@ -163,11 +188,7 @@ export class WarpDrive implements ReadonlyWarpDrive {
 
         const closeSpeed = (speedThreshold * 0.1 * collisionDistance) / speedThreshold;
         const deepSpaceSpeed = speedThreshold * ((0.1 * collisionDistance) / speedThreshold) ** 1.2;
-        this.maxTargetSpeed = clamp(
-            Math.max(closeSpeed, deepSpaceSpeed),
-            WarpDrive.MIN_WARP_SPEED,
-            WarpDrive.MAX_WARP_SPEED
-        );
+        this.maxTargetSpeed = clamp(Math.max(closeSpeed, deepSpaceSpeed), WarpDrive.MIN_WARP_SPEED, this.maxWarpSpeed);
         return this.maxTargetSpeed;
     }
 
@@ -203,7 +224,7 @@ export class WarpDrive implements ReadonlyWarpDrive {
             this.currentSpeed < this.maxTargetSpeed
                 ? lerpSmooth(this.currentSpeed, this.throttle * this.maxTargetSpeed, 0.1, deltaSeconds) // acceleration
                 : lerpSmooth(this.currentSpeed, this.throttle * this.maxTargetSpeed, 0.6, deltaSeconds); // deceleration
-        this.currentSpeed = clamp(this.currentSpeed, WarpDrive.MIN_WARP_SPEED, WarpDrive.MAX_WARP_SPEED);
+        this.currentSpeed = clamp(this.currentSpeed, WarpDrive.MIN_WARP_SPEED, this.maxWarpSpeed);
     }
 
     /**

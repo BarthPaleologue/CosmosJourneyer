@@ -15,9 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { makeNoise3D } from "fast-simplex-noise";
 import { Tools } from "@babylonjs/core/Misc/tools";
-import { getRngFromSeed } from "./utils/getRngFromSeed";
 
 export const Settings = {
     UNIVERSE_SEED: Math.PI,
@@ -53,7 +51,6 @@ export const Settings = {
 
     HUMAN_BUBBLE_RADIUS_LY: 100,
 
-    PLAYER_JUMP_RANGE_LY: 15,
     VISIBLE_NEIGHBORHOOD_MAX_RADIUS_LY: 20,
 
     CREDIT_SYMBOL: "₽",

@@ -16,10 +16,10 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { OrbitalObject } from "../architecture/orbitalObject";
+import { OrbitalObject } from "../../architecture/orbitalObject";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { getForwardDirection } from "../uberCore/transforms/basicTransform";
-import { OrbitalObjectType } from "../architecture/orbitalObjectType";
+import { getForwardDirection } from "../../uberCore/transforms/basicTransform";
+import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 
 export function canEngageWarpDrive(
     shipTransform: TransformNode,

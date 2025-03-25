@@ -15,26 +15,30 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { z } from "zod";
-
-export const SerializedFuelTankSchema = z.object({
-    currentFuel: z.number(),
-    maxFuel: z.number()
-});
-
-export type SerializedFuelTank = z.infer<typeof SerializedFuelTankSchema>;
+import { getFuelTankSpecs, SerializedFuelTank } from "../serializedComponents/fuelTank";
 
 export class FuelTank {
+    readonly type;
+
     private currentFuel: number;
     private readonly maxFuel: number;
+
+    readonly size: number;
+    readonly quality: number;
 
     /**
      * Creates an empty fuel tank with the given maximum fuel capacity.
      * @param maxFuel The maximum fuel capacity of the tank.
      */
-    constructor(maxFuel: number) {
-        this.currentFuel = 0;
-        this.maxFuel = maxFuel;
+    constructor(serializedFuelTank: SerializedFuelTank) {
+        this.type = serializedFuelTank.type;
+
+        const specs = getFuelTankSpecs(serializedFuelTank);
+        this.maxFuel = specs.maxFuel;
+        this.currentFuel = specs.maxFuel * serializedFuelTank.currentFuel01;
+
+        this.size = serializedFuelTank.size;
+        this.quality = serializedFuelTank.quality;
     }
 
     fill(amount: number): number {
@@ -60,14 +64,10 @@ export class FuelTank {
 
     serialize(): SerializedFuelTank {
         return {
-            currentFuel: this.currentFuel,
-            maxFuel: this.maxFuel
+            type: "fuelTank",
+            size: this.size,
+            quality: this.quality,
+            currentFuel01: this.currentFuel / this.maxFuel
         };
-    }
-
-    static Deserialize(serializedFuelTank: SerializedFuelTank): FuelTank {
-        const fuelTank = new FuelTank(serializedFuelTank.maxFuel);
-        fuelTank.currentFuel = serializedFuelTank.currentFuel;
-        return fuelTank;
     }
 }

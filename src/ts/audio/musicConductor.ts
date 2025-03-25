@@ -130,6 +130,8 @@ export class MusicConductor {
             return;
         }
 
+        const warpDrive = spaceship.getWarpDrive();
+
         switch (closestOrbitalObject.model.type) {
             case OrbitalObjectType.BLACK_HOLE:
                 this.setMusicFromSelection([Musics.SOARING]);
@@ -156,7 +158,7 @@ export class MusicConductor {
             case OrbitalObjectType.SPACE_STATION:
             case OrbitalObjectType.SPACE_ELEVATOR:
                 if (
-                    !spaceship.isWarpDriveEnabled() &&
+                    !warpDrive?.isEnabled() &&
                     distanceToClosestObject < closestOrbitalObject.getBoundingRadius() * 10
                 ) {
                     this.setMusic(Musics.EQUATORIAL_COMPLEX);
@@ -164,14 +166,14 @@ export class MusicConductor {
                 }
         }
 
-        if (spaceship.isWarpDriveEnabled()) {
+        if (warpDrive?.isEnabled()) {
             const suitableMusics = [Musics.ATLANTEAN_TWILIGHT, Musics.INFINITE_PERSPECTIVE, Musics.MESMERIZE];
 
             this.setMusicFromSelection(suitableMusics);
             return;
         }
 
-        if (!spaceship.isLanded() && !spaceship.isWarpDriveEnabled()) {
+        if (!spaceship.isLanded() && !warpDrive?.isEnabled()) {
             const suitableMusics = [Musics.THAT_ZEN_MOMENT, Musics.DEEP_RELAXATION, Musics.PEACE_OF_MIND];
             this.setMusicFromSelection(suitableMusics);
             return;

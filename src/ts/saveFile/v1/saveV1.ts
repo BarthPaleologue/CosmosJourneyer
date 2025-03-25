@@ -20,7 +20,6 @@ import projectInfo from "../../../../package.json";
 import { Result, ok, err } from "../../utils/types";
 import { SaveLoadingError, SaveLoadingErrorType } from "../saveLoadingError";
 import { StarSystemCoordinatesSchema } from "../../utils/coordinates/starSystemCoordinates";
-import { DefaultSerializedSpaceship, SerializedSpaceshipSchema } from "../../spaceship/serializedSpaceship";
 import { CompletedTutorialsSchema } from "../../player/serializedPlayer";
 
 export enum SystemObjectType {
@@ -47,6 +46,30 @@ const UniverseObjectIdSchema = z.object({
 
     /** The coordinates of the star system. */
     starSystemCoordinates: StarSystemCoordinatesSchema
+});
+
+enum ShipType {
+    WANDERER
+}
+
+const SerializedFuelTankSchema = z.object({
+    currentFuel: z.number(),
+    maxFuel: z.number()
+});
+
+const SerializedFuelScoopSchema = z.object({
+    fuelPerSecond: z.number().default(1)
+});
+
+const SerializedSpaceshipSchemaV1 = z.object({
+    id: z
+        .string()
+        .uuid()
+        .default(() => crypto.randomUUID()),
+    name: z.string().default("Wanderer"),
+    type: z.nativeEnum(ShipType).default(ShipType.WANDERER),
+    fuelTanks: z.array(SerializedFuelTankSchema).default([{ currentFuel: 100, maxFuel: 100 }]),
+    fuelScoop: z.nullable(SerializedFuelScoopSchema).nullable().default({ fuelPerSecond: 2.5 })
 });
 
 const SpaceDiscoveryDataSchema = z.object({
@@ -92,7 +115,7 @@ export const SaveSchemaV1 = z.object({
         systemBookmarks: z.array(StarSystemCoordinatesSchema).default([]),
         currentMissions: z.array(z.unknown()).default([]),
         completedMissions: z.array(z.unknown()).default([]),
-        spaceShips: z.array(SerializedSpaceshipSchema).default([DefaultSerializedSpaceship]),
+        spaceShips: z.array(SerializedSpaceshipSchemaV1).default([SerializedSpaceshipSchemaV1.parse({})]),
         tutorials: CompletedTutorialsSchema.default({
             stationLandingCompleted: false,
             fuelScoopingCompleted: false
