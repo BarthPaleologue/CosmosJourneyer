@@ -11,36 +11,38 @@ export function generateSpaceshipDom(stationModel: DeepReadonly<OrbitalFacilityM
     spaceshipH2.innerText = i18n.t("spaceStation:shipHangar");
     mainContainer.appendChild(spaceshipH2);
 
-    const spaceship = player.instancedSpaceships[0];
+    const currentSpaceship = player.instancedSpaceships.at(0);
 
-    const spaceshipContainer = document.createElement("div");
-    spaceshipContainer.classList.add("spaceshipContainer");
-    mainContainer.appendChild(spaceshipContainer);
+    if (currentSpaceship !== undefined) {
+        const spaceshipContainer = document.createElement("div");
+        spaceshipContainer.classList.add("spaceshipContainer");
+        mainContainer.appendChild(spaceshipContainer);
 
-    const spaceshipName = document.createElement("h3");
-    spaceshipName.innerText = spaceship.name;
-    spaceshipContainer.appendChild(spaceshipName);
+        const spaceshipName = document.createElement("h3");
+        spaceshipName.innerText = currentSpaceship.name;
+        spaceshipContainer.appendChild(spaceshipName);
 
-    const fuelManagementContainer = document.createElement("div");
-    fuelManagementContainer.classList.add("fuelManagementContainer");
-    spaceshipContainer.appendChild(fuelManagementContainer);
+        const fuelManagementContainer = document.createElement("div");
+        fuelManagementContainer.classList.add("fuelManagementContainer");
+        spaceshipContainer.appendChild(fuelManagementContainer);
 
-    const fuelText = document.createElement("p");
-    fuelText.innerText = `Fuel: ${spaceship.getRemainingFuel().toFixed(0)} / ${spaceship.getTotalFuelCapacity()}`;
-    fuelManagementContainer.appendChild(fuelText);
+        const fuelText = document.createElement("p");
+        fuelText.innerText = `Fuel: ${currentSpaceship.getRemainingFuel().toFixed(0)} / ${currentSpaceship.getTotalFuelCapacity()}`;
+        fuelManagementContainer.appendChild(fuelText);
 
-    const refuelButton = document.createElement("button");
-    refuelButton.innerText = i18n.t("spaceStation:refuel");
+        const refuelButton = document.createElement("button");
+        refuelButton.innerText = i18n.t("spaceStation:refuel");
 
-    refuelButton.addEventListener("click", () => {
-        Sounds.MENU_SELECT_SOUND.play();
-        const fuelAmount = spaceship.getTotalFuelCapacity() - spaceship.getRemainingFuel();
-        const fuelUnitPrice = 10;
-        player.pay(Math.round(fuelAmount * fuelUnitPrice));
-        spaceship.refuel(fuelAmount);
-        fuelText.innerText = `Fuel: ${spaceship.getRemainingFuel()} / ${spaceship.getTotalFuelCapacity()}`;
-    });
-    fuelManagementContainer.appendChild(refuelButton);
+        refuelButton.addEventListener("click", () => {
+            Sounds.MENU_SELECT_SOUND.play();
+            const fuelAmount = currentSpaceship.getTotalFuelCapacity() - currentSpaceship.getRemainingFuel();
+            const fuelUnitPrice = 10;
+            player.pay(Math.round(fuelAmount * fuelUnitPrice));
+            currentSpaceship.refuel(fuelAmount);
+            fuelText.innerText = `Fuel: ${currentSpaceship.getRemainingFuel()} / ${currentSpaceship.getTotalFuelCapacity()}`;
+        });
+        fuelManagementContainer.appendChild(refuelButton);
+    }
 
     const otherSpaceshipH2 = document.createElement("h2");
     otherSpaceshipH2.innerText = i18n.t("spaceStation:otherSpaceships");
