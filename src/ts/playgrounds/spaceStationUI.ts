@@ -17,29 +17,28 @@
 
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { newSeededSpaceStationModel } from "../spacestation/spaceStationModelGenerator";
-import { Settings } from "../settings";
-import { newSeededStarModel } from "../stellarObjects/star/starModelGenerator";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
 import { SpaceStationLayer } from "../ui/spaceStation/spaceStationLayer";
 import { Player } from "../player/player";
 import { EncyclopaediaGalacticaManager } from "../society/encyclopaediaGalacticaManager";
-import { AssetsManager, FreeCamera } from "@babylonjs/core";
 import { initI18n } from "../i18n";
-import { Sounds } from "../assets/sounds";
+import { Assets } from "../assets/assets";
+import { enablePhysics } from "./utils";
+import { Spaceship } from "../spaceship/spaceship";
+import { ShipControls } from "../spaceship/shipControls";
+import { SpaceStation } from "../spacestation/spaceStation";
+import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 
 export async function createSpaceStationUIScene(engine: AbstractEngine): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
+    await enablePhysics(scene);
+
     await initI18n();
 
-    const assetsManager = new AssetsManager(scene);
-    Sounds.EnqueueTasks(assetsManager, scene);
-
-    await assetsManager.loadAsync();
+    await Assets.Init(scene);
 
     const player = Player.Default();
 
@@ -48,42 +47,44 @@ export async function createSpaceStationUIScene(engine: AbstractEngine): Promise
         throw new Error("No spaceship found in player data");
     }
 
-    const camera = new FreeCamera("camera", new Vector3(0, 0, 0), scene);
-    camera.setTarget(Vector3.Zero());
+    const spaceship = Spaceship.Deserialize(serializedSpaceship, scene);
+    player.instancedSpaceships.push(spaceship);
+
+    const shipControls = new ShipControls(spaceship, scene);
+
+    const camera = shipControls.thirdPersonCamera;
     camera.attachControl();
     scene.activeCamera = camera;
 
-    const distanceToStar = Settings.AU;
-
-    const coordinates = {
-        starSectorX: 0,
-        starSectorY: 0,
-        starSectorZ: 0,
-        localX: 0,
-        localY: 0,
-        localZ: 0
-    };
-
     const systemDatabase = new StarSystemDatabase(getLoneStarSystem());
-    const systemPosition = systemDatabase.getSystemGalacticPosition(coordinates);
 
-    const sunModel = newSeededStarModel(420, "Untitled Star", []);
-
-    const spaceStationModel = newSeededSpaceStationModel(
-        Math.random() * Settings.SEED_HALF_RANGE,
-        [sunModel],
-        coordinates,
-        systemPosition,
-        [sunModel]
-    );
-    spaceStationModel.orbit.semiMajorAxis = distanceToStar;
+    const systemModel = systemDatabase.fallbackSystem;
 
     const encyclopaedia = new EncyclopaediaGalacticaManager();
 
     const spaceStationUI = new SpaceStationLayer(player, encyclopaedia, systemDatabase);
 
-    spaceStationUI.setStation(spaceStationModel, [], player);
+    const stationModel = systemModel.orbitalFacilities[0];
+    if (stationModel.type !== OrbitalObjectType.SPACE_STATION) {
+        throw new Error("First orbital facility is not a space station");
+    }
+
+    const spaceStation = new SpaceStation(stationModel, scene);
+
+    const landingPad = spaceStation.getAvailableLandingPads().at(0);
+    if (landingPad === undefined) {
+        throw new Error("No available landing pad");
+    }
+
+    spaceship.spawnOnPad(landingPad);
+
+    spaceStationUI.setStation(spaceStation.model, [], player);
     spaceStationUI.setVisibility(true);
+
+    scene.onBeforePhysicsObservable.add(() => {
+        const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;
+        shipControls.update(deltaSeconds);
+    });
 
     return scene;
 }
