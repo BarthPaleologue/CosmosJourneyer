@@ -746,7 +746,11 @@ export class StarSystemView implements View {
         const spaceship = this.spaceshipControls.getSpaceship();
         const shipDiscoveryScanner = spaceship.discoveryScanner;
 
-        if (shipDiscoveryScanner !== null && distanceToNearesetCelestialBody2 < shipDiscoveryScanner.range ** 2) {
+        if (
+            shipDiscoveryScanner !== null &&
+            distanceToNearesetCelestialBody2 <
+                (nearestCelestialBody.getBoundingRadius() * shipDiscoveryScanner.relativeRange) ** 2
+        ) {
             const universeId = getUniverseObjectId(nearestCelestialBody.model, starSystem.model);
             const isNewDiscovery = this.player.addVisitedObjectIfNew(universeId);
             if (isNewDiscovery) {

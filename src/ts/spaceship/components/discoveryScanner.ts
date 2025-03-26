@@ -19,7 +19,7 @@ import { getDiscoveryScannerSpec, SerializedDiscoveryScanner } from "../serializ
 
 export class DiscoveryScanner {
     readonly type;
-    readonly range: number;
+    readonly relativeRange: number;
 
     readonly size: number;
     readonly quality: number;
@@ -31,7 +31,7 @@ export class DiscoveryScanner {
 
         const spec = getDiscoveryScannerSpec(serializedDiscoveryScanner);
 
-        this.range = spec.range;
+        this.relativeRange = spec.relativeRange;
     }
 
     serialize() {

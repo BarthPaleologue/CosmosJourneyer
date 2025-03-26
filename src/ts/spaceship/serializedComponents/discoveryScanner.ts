@@ -27,6 +27,6 @@ export type SerializedDiscoveryScanner = z.infer<typeof SerializedDiscoveryScann
 
 export function getDiscoveryScannerSpec(serializedDiscoveryScanner: SerializedDiscoveryScanner) {
     return {
-        range: (serializedDiscoveryScanner.size + serializedDiscoveryScanner.quality / 10) * 1000e3
+        relativeRange: serializedDiscoveryScanner.size + serializedDiscoveryScanner.quality / 10
     };
 }
