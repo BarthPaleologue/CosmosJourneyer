@@ -742,7 +742,11 @@ export class StarSystemView implements View {
             nearestCelestialBody.getTransform().getAbsolutePosition(),
             this.scene.getActiveControls().getTransform().getAbsolutePosition()
         );
-        if (distanceToNearesetCelestialBody2 < (nearestCelestialBody.getBoundingRadius() * 2) ** 2) {
+
+        const spaceship = this.spaceshipControls.getSpaceship();
+        const shipDiscoveryScanner = spaceship.discoveryScanner;
+
+        if (shipDiscoveryScanner !== null && distanceToNearesetCelestialBody2 < shipDiscoveryScanner.range ** 2) {
             const universeId = getUniverseObjectId(nearestCelestialBody.model, starSystem.model);
             const isNewDiscovery = this.player.addVisitedObjectIfNew(universeId);
             if (isNewDiscovery) {
@@ -758,8 +762,6 @@ export class StarSystemView implements View {
                 this.onNewDiscovery.notifyObservers(universeId);
             }
         }
-
-        const spaceship = this.spaceshipControls.getSpaceship();
 
         spaceship.setNearestOrbitalObject(nearestOrbitalObject);
         spaceship.setNearestCelestialBody(nearestCelestialBody);

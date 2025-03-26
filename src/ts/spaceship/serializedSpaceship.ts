@@ -88,7 +88,11 @@ export function getDefaultSerializedSpaceship(): SerializedSpaceship {
                     size: 2,
                     quality: 1
                 },
-                null
+                {
+                    type: "discoveryScanner",
+                    size: 2,
+                    quality: 1
+                }
             ]
         }
     } satisfies SerializedSpaceship);

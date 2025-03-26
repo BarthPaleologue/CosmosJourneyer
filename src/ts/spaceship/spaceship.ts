@@ -57,6 +57,7 @@ import { getDefaultSerializedSpaceship, SerializedSpaceship, ShipType } from "./
 import { OptionalComponent } from "./components/optionalComponents";
 import { FuelScoop } from "./components/fuelScoop";
 import { Thrusters } from "./components/thrusters";
+import { DiscoveryScanner } from "./components/discoveryScanner";
 
 const enum ShipState {
     FLYING,
@@ -116,6 +117,8 @@ export class Spaceship implements Transformable {
 
     readonly fuelScoop: FuelScoop | null;
     private isFuelScooping = false;
+
+    readonly discoveryScanner: DiscoveryScanner | null;
 
     readonly enableWarpDriveSound: AudioInstance;
     readonly disableWarpDriveSound: AudioInstance;
@@ -245,6 +248,10 @@ export class Spaceship implements Transformable {
                     break;
                 case "fuelScoop":
                     optionalComponents.push(new FuelScoop(optionalComponent));
+                    break;
+                case "discoveryScanner":
+                    optionalComponents.push(new DiscoveryScanner(optionalComponent));
+                    break;
             }
         }
 
@@ -273,6 +280,9 @@ export class Spaceship implements Transformable {
         this.fuelTanks.push(...this.components.optional.filter((component) => component.type === "fuelTank"));
 
         this.fuelScoop = this.components.optional.find((component) => component.type === "fuelScoop") ?? null;
+
+        this.discoveryScanner =
+            this.components.optional.find((component) => component.type === "discoveryScanner") ?? null;
 
         const { min: boundingMin, max: boundingMax } = this.getTransform().getHierarchyBoundingVectors();
 

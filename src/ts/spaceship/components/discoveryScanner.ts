@@ -15,8 +15,30 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { DiscoveryScanner } from "./discoveryScanner";
-import { FuelScoop } from "./fuelScoop";
-import { FuelTank } from "./fuelTank";
+import { getDiscoveryScannerSpec, SerializedDiscoveryScanner } from "../serializedComponents/discoveryScanner";
 
-export type OptionalComponent = FuelTank | FuelScoop | DiscoveryScanner;
+export class DiscoveryScanner {
+    readonly type;
+    readonly range: number;
+
+    readonly size: number;
+    readonly quality: number;
+
+    constructor(serializedDiscoveryScanner: SerializedDiscoveryScanner) {
+        this.type = serializedDiscoveryScanner.type;
+        this.size = serializedDiscoveryScanner.size;
+        this.quality = serializedDiscoveryScanner.quality;
+
+        const spec = getDiscoveryScannerSpec(serializedDiscoveryScanner);
+
+        this.range = spec.range;
+    }
+
+    serialize() {
+        return {
+            type: this.type,
+            size: this.size,
+            quality: this.quality
+        };
+    }
+}

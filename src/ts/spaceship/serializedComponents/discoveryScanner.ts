@@ -15,8 +15,18 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { DiscoveryScanner } from "./discoveryScanner";
-import { FuelScoop } from "./fuelScoop";
-import { FuelTank } from "./fuelTank";
+import { z } from "zod";
 
-export type OptionalComponent = FuelTank | FuelScoop | DiscoveryScanner;
+export const SerializedDiscoveryScannerSchema = z.object({
+    type: z.literal("discoveryScanner"),
+    size: z.number(),
+    quality: z.number()
+});
+
+export type SerializedDiscoveryScanner = z.infer<typeof SerializedDiscoveryScannerSchema>;
+
+export function getDiscoveryScannerSpec(serializedDiscoveryScanner: SerializedDiscoveryScanner) {
+    return {
+        range: (serializedDiscoveryScanner.size + serializedDiscoveryScanner.quality / 10) * 1000e3
+    };
+}

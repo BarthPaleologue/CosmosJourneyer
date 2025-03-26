@@ -18,10 +18,12 @@
 import { z } from "zod";
 import { SerializedFuelScoopSchema } from "./fuelScoop";
 import { SerializedFuelTankSchema } from "./fuelTank";
+import { SerializedDiscoveryScannerSchema } from "./discoveryScanner";
 
 export const SerializedOptionalComponentSchema = z.discriminatedUnion("type", [
     SerializedFuelScoopSchema,
-    SerializedFuelTankSchema
+    SerializedFuelTankSchema,
+    SerializedDiscoveryScannerSchema
 ]);
 
 export type SerializedOptionalComponent = z.infer<typeof SerializedOptionalComponentSchema>;
