@@ -30,7 +30,7 @@ $gaps: 10px;
         box-sizing: border-box;
     }
 
-    #spaceStationHeader {
+    .spaceStationHeader {
         display: flex;
         flex-direction: column;
         justify-content: space-evenly;
@@ -51,7 +51,7 @@ $gaps: 10px;
         }
     }
 
-    #playerInfo {
+    .playerInfo {
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -183,7 +183,7 @@ $gaps: 10px;
         }
     }
 
-    #spaceStationActions {
+    .spaceStationActions {
         grid-column-start: 2;
 
         display: flex;
