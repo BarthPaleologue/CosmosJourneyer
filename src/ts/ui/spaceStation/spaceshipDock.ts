@@ -3,6 +3,51 @@ import { OrbitalFacilityModel } from "../../architecture/orbitalObjectModel";
 import { Sounds } from "../../assets/sounds";
 import i18n from "../../i18n";
 import { DeepReadonly } from "../../utils/types";
+import { Spaceship } from "../../spaceship/spaceship";
+
+export function generateOutfittingDom(spaceship: Spaceship, player: Player): HTMLDivElement {
+    const rootHtml = document.createElement("div");
+    rootHtml.style.display = "grid";
+    rootHtml.style.gridTemplateColumns = "1fr 1fr";
+
+    const componentList = document.createElement("div");
+    rootHtml.appendChild(componentList);
+
+    const primaryH2 = document.createElement("h2");
+    primaryH2.innerText = i18n.t("spaceStation:primarySlots");
+    componentList.appendChild(primaryH2);
+
+    const warpDriveSlot = document.createElement("div");
+    warpDriveSlot.textContent = spaceship.getWarpDrive() !== null ? "warp drive" : "no warp drive";
+    warpDriveSlot.classList.add("componentSlot");
+    componentList.appendChild(warpDriveSlot);
+
+    const thrustersSlot = document.createElement("div");
+    thrustersSlot.textContent = spaceship.components.primary.thrusters !== null ? "thrusters" : "no thrusters";
+    thrustersSlot.classList.add("componentSlot");
+    componentList.appendChild(thrustersSlot);
+
+    const fuelTankSlot = document.createElement("div");
+    fuelTankSlot.textContent = spaceship.components.primary.fuelTank !== null ? "fuel tank" : "no fuel tank";
+    fuelTankSlot.classList.add("componentSlot");
+    componentList.appendChild(fuelTankSlot);
+
+    const optionalH2 = document.createElement("h2");
+    optionalH2.innerText = i18n.t("spaceStation:optionalSlots");
+    componentList.appendChild(optionalH2);
+
+    for (const component of spaceship.components.optional) {
+        const componentSlot = document.createElement("div");
+        componentSlot.textContent = component !== null ? "component" : "no component";
+        componentSlot.classList.add("componentSlot");
+        componentList.appendChild(componentSlot);
+    }
+
+    const browseComponents = document.createElement("div");
+    rootHtml.appendChild(browseComponents);
+
+    return rootHtml;
+}
 
 export function generateSpaceshipDom(stationModel: DeepReadonly<OrbitalFacilityModel>, player: Player): HTMLDivElement {
     const mainContainer = document.createElement("div");
@@ -33,6 +78,12 @@ export function generateSpaceshipDom(stationModel: DeepReadonly<OrbitalFacilityM
         const outfittingButton = document.createElement("button");
         outfittingButton.innerText = i18n.t("spaceStation:outfitting");
         fuelManagementContainer.appendChild(outfittingButton);
+
+        outfittingButton.addEventListener("click", () => {
+            Sounds.MENU_SELECT_SOUND.play();
+            const outfittingDom = generateOutfittingDom(currentSpaceship, player);
+            spaceshipContainer.appendChild(outfittingDom);
+        });
 
         const refuelButton = document.createElement("button");
         refuelButton.innerText = i18n.t("spaceStation:refuel");
