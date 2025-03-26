@@ -175,6 +175,7 @@ $gaps: 10px;
             .fuelManagementContainer {
                 display: flex;
                 align-items: center;
+                column-gap: $gaps;
 
                 p {
                     flex-grow: 1;

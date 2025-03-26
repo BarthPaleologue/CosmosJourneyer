@@ -30,6 +30,10 @@ export function generateSpaceshipDom(stationModel: DeepReadonly<OrbitalFacilityM
         fuelText.innerText = `Fuel: ${currentSpaceship.getRemainingFuel().toFixed(0)} / ${currentSpaceship.getTotalFuelCapacity()}`;
         fuelManagementContainer.appendChild(fuelText);
 
+        const outfittingButton = document.createElement("button");
+        outfittingButton.innerText = i18n.t("spaceStation:outfitting");
+        fuelManagementContainer.appendChild(outfittingButton);
+
         const refuelButton = document.createElement("button");
         refuelButton.innerText = i18n.t("spaceStation:refuel");
 
