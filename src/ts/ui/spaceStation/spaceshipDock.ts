@@ -8,7 +8,7 @@ import { Spaceship } from "../../spaceship/spaceship";
 export function generateOutfittingDom(spaceship: Spaceship, player: Player): HTMLDivElement {
     const rootHtml = document.createElement("div");
     rootHtml.style.display = "grid";
-    rootHtml.style.gridTemplateColumns = "1fr 1fr";
+    rootHtml.style.gridTemplateColumns = "1fr 2fr 1fr";
 
     const componentList = document.createElement("div");
     rootHtml.appendChild(componentList);
@@ -44,7 +44,12 @@ export function generateOutfittingDom(spaceship: Spaceship, player: Player): HTM
     }
 
     const browseComponents = document.createElement("div");
+    browseComponents.innerText = "no component selected";
     rootHtml.appendChild(browseComponents);
+
+    const componentSpec = document.createElement("div");
+    componentSpec.innerText = "no component selected";
+    rootHtml.appendChild(componentSpec);
 
     return rootHtml;
 }
