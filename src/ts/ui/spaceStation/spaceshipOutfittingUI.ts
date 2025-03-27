@@ -17,6 +17,7 @@
 
 import i18n from "../../i18n";
 import { Player } from "../../player/player";
+import { Component } from "../../spaceship/components/component";
 import { Spaceship } from "../../spaceship/spaceship";
 import { ComponentSpecUI } from "./componentSpecUI";
 
@@ -55,18 +56,26 @@ export class SpaceshipOutfittingUI {
         warpDriveSlot.classList.add("componentSlot");
         warpDriveSlot.addEventListener("click", () => {
             const shipWarpDrive = spaceship.getWarpDrive();
-            this.componentSpec.displayComponent(shipWarpDrive?.serialize() ?? null);
+            this.handleClickOnComponent(shipWarpDrive);
         });
         this.componentList.appendChild(warpDriveSlot);
 
         const thrustersSlot = document.createElement("div");
         thrustersSlot.textContent = spaceship.components.primary.thrusters !== null ? "thrusters" : "no thrusters";
         thrustersSlot.classList.add("componentSlot");
+        thrustersSlot.addEventListener("click", () => {
+            const shipThrusters = spaceship.components.primary.thrusters;
+            this.handleClickOnComponent(shipThrusters);
+        });
         this.componentList.appendChild(thrustersSlot);
 
         const fuelTankSlot = document.createElement("div");
         fuelTankSlot.textContent = spaceship.components.primary.fuelTank !== null ? "fuel tank" : "no fuel tank";
         fuelTankSlot.classList.add("componentSlot");
+        fuelTankSlot.addEventListener("click", () => {
+            const shipFuelTank = spaceship.components.primary.fuelTank;
+            this.handleClickOnComponent(shipFuelTank);
+        });
         this.componentList.appendChild(fuelTankSlot);
 
         const optionalH2 = document.createElement("h2");
@@ -75,9 +84,16 @@ export class SpaceshipOutfittingUI {
 
         for (const component of spaceship.components.optional) {
             const componentSlot = document.createElement("div");
-            componentSlot.textContent = component !== null ? "component" : "no component";
+            componentSlot.textContent = component !== null ? component.type : "no component";
             componentSlot.classList.add("componentSlot");
+            componentSlot.addEventListener("click", () => {
+                this.handleClickOnComponent(component);
+            });
             this.componentList.appendChild(componentSlot);
         }
+    }
+
+    handleClickOnComponent(component: Component | null) {
+        this.componentSpec.displayComponent(component?.serialize() ?? null);
     }
 }
