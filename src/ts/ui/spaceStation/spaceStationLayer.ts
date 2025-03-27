@@ -20,7 +20,6 @@ import { generateInfoHTML } from "./spaceStationInfos";
 import { Player } from "../../player/player";
 import { generateMissionsDom } from "./spaceStationMissions";
 import { Settings } from "../../settings";
-import { generateSpaceshipDom } from "./spaceshipDock";
 import { alertModal, promptModalString } from "../../utils/dialogModal";
 import i18n from "../../i18n";
 import { Sounds } from "../../assets/sounds";
@@ -37,6 +36,7 @@ import explorationIcon from "../../../asset/icons/telescope.webp";
 import tradingIcon from "../../../asset/icons/trade.webp";
 import infoIcon from "../../../asset/icons/space-station.webp";
 import liftOffIcon from "../../../asset/icons/launch.webp";
+import { SpaceshipDockUI } from "./spaceshipDock";
 
 const enum MainPanelState {
     NONE,
@@ -75,6 +75,8 @@ export class SpaceStationLayer {
     private mainPanelState: MainPanelState = MainPanelState.NONE;
 
     readonly explorationCenterPanel: ExplorationCenterPanel;
+
+    readonly spaceshipDockPanel: SpaceshipDockUI = new SpaceshipDockUI();
 
     readonly onTakeOffObservable = new Observable<void>();
 
@@ -300,7 +302,8 @@ export class SpaceStationLayer {
             case MainPanelState.SPACE_SHIP:
                 this.mainPanel.classList.remove("hidden");
                 this.mainPanel.innerHTML = "";
-                this.mainPanel.appendChild(generateSpaceshipDom(this.currentStation, player));
+                this.spaceshipDockPanel.generate(this.currentStation, player);
+                this.mainPanel.appendChild(this.spaceshipDockPanel.root);
                 break;
             case MainPanelState.EXPLORATION_CENTER:
                 this.mainPanel.classList.remove("hidden");
