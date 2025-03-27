@@ -18,6 +18,7 @@
 import i18n from "../../i18n";
 import { Player } from "../../player/player";
 import { Spaceship } from "../../spaceship/spaceship";
+import { ComponentSpecUI } from "./componentSpecUI";
 
 export class SpaceshipOutfittingUI {
     readonly root: HTMLDivElement;
@@ -26,7 +27,7 @@ export class SpaceshipOutfittingUI {
 
     private readonly browseComponents: HTMLDivElement;
 
-    private readonly componentSpec: HTMLDivElement;
+    private readonly componentSpec: ComponentSpecUI;
 
     constructor() {
         this.root = document.createElement("div");
@@ -40,9 +41,8 @@ export class SpaceshipOutfittingUI {
         this.browseComponents.innerText = "no component selected";
         this.root.appendChild(this.browseComponents);
 
-        this.componentSpec = document.createElement("div");
-        this.componentSpec.innerText = "no component selected";
-        this.root.appendChild(this.componentSpec);
+        this.componentSpec = new ComponentSpecUI();
+        this.root.appendChild(this.componentSpec.root);
     }
 
     generate(spaceship: Spaceship, player: Player) {
@@ -53,6 +53,10 @@ export class SpaceshipOutfittingUI {
         const warpDriveSlot = document.createElement("div");
         warpDriveSlot.textContent = spaceship.getWarpDrive() !== null ? "warp drive" : "no warp drive";
         warpDriveSlot.classList.add("componentSlot");
+        warpDriveSlot.addEventListener("click", () => {
+            const shipWarpDrive = spaceship.getWarpDrive();
+            this.componentSpec.displayComponent(shipWarpDrive?.serialize() ?? null);
+        });
         this.componentList.appendChild(warpDriveSlot);
 
         const thrustersSlot = document.createElement("div");
