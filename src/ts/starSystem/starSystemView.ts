@@ -744,7 +744,7 @@ export class StarSystemView implements View {
         );
 
         const spaceship = this.spaceshipControls.getSpaceship();
-        const shipDiscoveryScanner = spaceship.discoveryScanner;
+        const shipDiscoveryScanner = spaceship.getDiscoveryScanner();
 
         if (
             shipDiscoveryScanner !== null &&

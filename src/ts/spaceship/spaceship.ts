@@ -108,17 +108,12 @@ export class Spaceship implements Transformable {
             thrusters: Thrusters | null;
             fuelTank: FuelTank | null;
         };
-        optional: OptionalComponent[];
+        optional: (OptionalComponent | null)[];
     };
 
     private mainThrusters: Thruster[] = [];
 
-    readonly fuelTanks: FuelTank[];
-
-    readonly fuelScoop: FuelScoop | null;
     private isFuelScooping = false;
-
-    readonly discoveryScanner: DiscoveryScanner | null;
 
     readonly enableWarpDriveSound: AudioInstance;
     readonly disableWarpDriveSound: AudioInstance;
@@ -239,6 +234,7 @@ export class Spaceship implements Transformable {
         const optionalComponents = [];
         for (const optionalComponent of serializedSpaceShip.components.optional) {
             if (optionalComponent === null) {
+                optionalComponents.push(null);
                 continue;
             }
 
@@ -273,17 +269,6 @@ export class Spaceship implements Transformable {
             optional: optionalComponents
         };
 
-        this.fuelTanks = []; //serializedSpaceShip.fuelTanks.map((tank) => FuelTank.Deserialize(tank));
-        if (this.components.primary.fuelTank !== null) {
-            this.fuelTanks.push(this.components.primary.fuelTank);
-        }
-        this.fuelTanks.push(...this.components.optional.filter((component) => component.type === "fuelTank"));
-
-        this.fuelScoop = this.components.optional.find((component) => component.type === "fuelScoop") ?? null;
-
-        this.discoveryScanner =
-            this.components.optional.find((component) => component.type === "discoveryScanner") ?? null;
-
         const { min: boundingMin, max: boundingMax } = this.getTransform().getHierarchyBoundingVectors();
 
         this.boundingExtent = boundingMax.subtract(boundingMin);
@@ -301,6 +286,24 @@ export class Spaceship implements Transformable {
         this.hyperSpaceSound.sound.play();
 
         this.scene = scene;
+    }
+
+    public getFuelTanks(): Array<FuelTank> {
+        const fuelTanks = [];
+        if (this.components.primary.fuelTank !== null) {
+            fuelTanks.push(this.components.primary.fuelTank);
+        }
+        fuelTanks.push(...this.components.optional.filter((component) => component?.type === "fuelTank"));
+
+        return fuelTanks;
+    }
+
+    public getFuelScoop(): FuelScoop | null {
+        return this.components.optional.find((component) => component?.type === "fuelScoop") ?? null;
+    }
+
+    public getDiscoveryScanner(): DiscoveryScanner | null {
+        return this.components.optional.find((component) => component?.type === "discoveryScanner") ?? null;
     }
 
     public setClosestWalkableObject(object: Transformable & HasBoundingSphere) {
@@ -510,7 +513,8 @@ export class Spaceship implements Transformable {
     }
 
     private handleFuelScoop(deltaSeconds: number) {
-        if (this.fuelScoop === null) return;
+        const fuelScoop = this.getFuelScoop();
+        if (fuelScoop === null) return;
         if (this.nearestCelestialBody === null) return;
         if (![OrbitalObjectType.STAR, OrbitalObjectType.GAS_PLANET].includes(this.nearestCelestialBody.model.type))
             return;
@@ -557,7 +561,7 @@ export class Spaceship implements Transformable {
                 fuelAvailability = 0;
         }
 
-        this.refuel(this.fuelScoop.fuelPerSecond * fuelAvailability * deltaSeconds);
+        this.refuel(fuelScoop.fuelPerSecond * fuelAvailability * deltaSeconds);
     }
 
     private updateWarpDrive(deltaSeconds: number) {
@@ -738,11 +742,11 @@ export class Spaceship implements Transformable {
     }
 
     public getTotalFuelCapacity(): number {
-        return this.fuelTanks.reduce((acc, tank) => acc + tank.getMaxFuel(), 0);
+        return this.getFuelTanks().reduce((acc, tank) => acc + tank.getMaxFuel(), 0);
     }
 
     public getRemainingFuel(): number {
-        return this.fuelTanks.reduce((acc, tank) => acc + tank.getCurrentFuel(), 0);
+        return this.getFuelTanks().reduce((acc, tank) => acc + tank.getCurrentFuel(), 0);
     }
 
     public burnFuel(amount: number): number {
@@ -751,7 +755,7 @@ export class Spaceship implements Transformable {
         }
 
         let fuelLeftToBurn = amount;
-        for (const tank of this.fuelTanks) {
+        for (const tank of this.getFuelTanks()) {
             const tankRemainingBefore = tank.getCurrentFuel();
             tank.burnFuel(Math.min(fuelLeftToBurn, tankRemainingBefore));
             const tankRemainingAfter = tank.getCurrentFuel();
@@ -763,7 +767,7 @@ export class Spaceship implements Transformable {
 
     public refuel(amount: number): number {
         let fuelLeftToRefuel = amount;
-        for (const tank of this.fuelTanks) {
+        for (const tank of this.getFuelTanks()) {
             const tankRemainingBefore = tank.getCurrentFuel();
             tank.fill(Math.min(fuelLeftToRefuel, tank.getMaxFuel() - tankRemainingBefore));
             const tankRemainingAfter = tank.getCurrentFuel();
