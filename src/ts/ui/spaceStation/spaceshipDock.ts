@@ -74,6 +74,14 @@ export class SpaceshipDockUI {
 
             outfittingButton.addEventListener("click", () => {
                 Sounds.MENU_SELECT_SOUND.play();
+
+                if (outfittingButton.classList.contains("active")) {
+                    outfittingButton.classList.remove("active");
+                    this.currentSpaceshipContainer.removeChild(this.spaceshipOutfittingUI.root);
+                    return;
+                }
+
+                outfittingButton.classList.add("active");
                 this.spaceshipOutfittingUI.generate(currentSpaceship, player);
                 this.currentSpaceshipContainer.appendChild(this.spaceshipOutfittingUI.root);
             });

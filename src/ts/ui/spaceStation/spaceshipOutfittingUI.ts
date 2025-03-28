@@ -49,6 +49,8 @@ export class SpaceshipOutfittingUI {
     }
 
     generate(spaceship: Spaceship, player: Player) {
+        this.componentList.innerHTML = "";
+
         const primaryH2 = document.createElement("h2");
         primaryH2.innerText = i18n.t("spaceStation:primarySlots");
         this.componentList.appendChild(primaryH2);
