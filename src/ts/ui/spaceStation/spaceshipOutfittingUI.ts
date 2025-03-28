@@ -30,12 +30,14 @@ export class SpaceshipOutfittingUI {
 
     private readonly componentSpec: ComponentSpecUI;
 
+    private activeSlotDiv: HTMLElement | null = null;
+
     constructor() {
         this.root = document.createElement("div");
-        this.root.style.display = "grid";
-        this.root.style.gridTemplateColumns = "1fr 2fr 1fr";
+        this.root.className = "spaceshipOutfittingUI";
 
         this.componentList = document.createElement("div");
+        this.componentList.className = "flex-column";
         this.root.appendChild(this.componentList);
 
         this.browseComponents = document.createElement("div");
@@ -51,31 +53,13 @@ export class SpaceshipOutfittingUI {
         primaryH2.innerText = i18n.t("spaceStation:primarySlots");
         this.componentList.appendChild(primaryH2);
 
-        const warpDriveSlot = document.createElement("div");
-        warpDriveSlot.textContent = spaceship.getWarpDrive() !== null ? "warp drive" : "no warp drive";
-        warpDriveSlot.classList.add("componentSlot");
-        warpDriveSlot.addEventListener("click", () => {
-            const shipWarpDrive = spaceship.getWarpDrive();
-            this.handleClickOnComponent(shipWarpDrive);
-        });
+        const warpDriveSlot = this.createComponentSlot(spaceship.getWarpDrive());
         this.componentList.appendChild(warpDriveSlot);
 
-        const thrustersSlot = document.createElement("div");
-        thrustersSlot.textContent = spaceship.components.primary.thrusters !== null ? "thrusters" : "no thrusters";
-        thrustersSlot.classList.add("componentSlot");
-        thrustersSlot.addEventListener("click", () => {
-            const shipThrusters = spaceship.components.primary.thrusters;
-            this.handleClickOnComponent(shipThrusters);
-        });
+        const thrustersSlot = this.createComponentSlot(spaceship.components.primary.thrusters);
         this.componentList.appendChild(thrustersSlot);
 
-        const fuelTankSlot = document.createElement("div");
-        fuelTankSlot.textContent = spaceship.components.primary.fuelTank !== null ? "fuel tank" : "no fuel tank";
-        fuelTankSlot.classList.add("componentSlot");
-        fuelTankSlot.addEventListener("click", () => {
-            const shipFuelTank = spaceship.components.primary.fuelTank;
-            this.handleClickOnComponent(shipFuelTank);
-        });
+        const fuelTankSlot = this.createComponentSlot(spaceship.components.primary.fuelTank);
         this.componentList.appendChild(fuelTankSlot);
 
         const optionalH2 = document.createElement("h2");
@@ -83,17 +67,32 @@ export class SpaceshipOutfittingUI {
         this.componentList.appendChild(optionalH2);
 
         for (const component of spaceship.components.optional) {
-            const componentSlot = document.createElement("div");
-            componentSlot.textContent = component !== null ? component.type : "no component";
-            componentSlot.classList.add("componentSlot");
-            componentSlot.addEventListener("click", () => {
-                this.handleClickOnComponent(component);
-            });
+            const componentSlot = this.createComponentSlot(component);
             this.componentList.appendChild(componentSlot);
         }
     }
 
-    handleClickOnComponent(component: Component | null) {
+    private createComponentSlot(component: Component | null): HTMLElement {
+        const slot = document.createElement("button");
+        slot.textContent = component !== null ? component.type : "empty slot";
+        slot.classList.add("componentSlot");
+        slot.addEventListener("click", () => {
+            this.handleClickOnComponent(component);
+
+            if (this.activeSlotDiv !== null) {
+                this.activeSlotDiv.classList.remove("active");
+            }
+
+            this.activeSlotDiv = slot;
+            slot.classList.add("active");
+
+            this.browseComponents.innerText = "Browse components";
+        });
+
+        return slot;
+    }
+
+    private handleClickOnComponent(component: Component | null) {
         this.componentSpec.displayComponent(component?.serialize() ?? null);
     }
 }

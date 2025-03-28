@@ -326,6 +326,18 @@ $gaps: 10px;
     }
 }
 
+.spaceshipOutfittingUI {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 20px;
+    column-gap: 10px;
+
+    .componentSlot {
+        padding: 10px;
+    }
+}
+
 .flex-column {
     display: flex;
     flex-direction: column;
