@@ -16,5 +16,7 @@
     "refuel": "Faire le plein",
     "otherSpaceships": "Autres vaisseaux",
     "noOtherSpaceship": "Aucun autre vaisseau",
-    "cmdrNameChangePrompt": "Comment souhaitez-vous être appelé Commandant ?"
+    "cmdrNameChangePrompt": "Comment souhaitez-vous être appelé Commandant ?",
+    "primarySlots": "Primordiaux",
+    "optionalSlots": "Optionnels"
 }

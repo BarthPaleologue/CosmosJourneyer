@@ -16,5 +16,7 @@
     "refuel": "Refuel",
     "otherSpaceships": "Other Spaceships",
     "noOtherSpaceship": "No other spaceship",
-    "cmdrNameChangePrompt": "How do you want to be called Commander?"
+    "cmdrNameChangePrompt": "How do you want to be called Commander?",
+    "primarySlots": "Primary",
+    "optionalSlots": "Optionals"
 }
