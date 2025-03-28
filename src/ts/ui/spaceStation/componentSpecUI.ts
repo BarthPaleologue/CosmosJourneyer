@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Settings } from "../../settings";
 import { SerializedComponent } from "../../spaceship/serializedComponents/component";
 
 export class ComponentSpecUI {
@@ -36,15 +37,8 @@ export class ComponentSpecUI {
         }
 
         const componentName = document.createElement("h3");
-        componentName.textContent = serializedComponent.type;
+        const qualityString = Settings.QUALITY_CHARS.at(serializedComponent.quality) ?? "[ERROR]";
+        componentName.textContent = `${serializedComponent.type} ${serializedComponent.size}${qualityString}`;
         this.root.appendChild(componentName);
-
-        const componentSize = document.createElement("p");
-        componentSize.textContent = `Size: ${serializedComponent.size}`;
-        this.root.appendChild(componentSize);
-
-        const componentQuality = document.createElement("p");
-        componentQuality.textContent = `Quality: ${serializedComponent.quality}`;
-        this.root.appendChild(componentQuality);
     }
 }

@@ -120,7 +120,9 @@ export const Settings = {
 
     SHARED_POSITION_SAVE_UUID: "sharedPositionSave",
 
-    TUTORIAL_SAVE_UUID: "00000000-0000-0000-0000-000000000000"
+    TUTORIAL_SAVE_UUID: "00000000-0000-0000-0000-000000000000",
+
+    QUALITY_CHARS: "FEDCBA"
 };
 
 export const CollisionMask = {
