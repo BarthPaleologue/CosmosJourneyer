@@ -330,8 +330,13 @@ $gaps: 10px;
     display: grid;
     grid-template-columns: 1fr 2fr 1fr;
     background: rgba(0, 0, 0, 0.4);
-    padding: 20px;
-    column-gap: 10px;
+    padding: 10px;
+    column-gap: $gaps;
+
+    div {
+        background: var(--accent-color-dark);
+        padding: 10px;
+    }
 
     .componentSlot {
         padding: 10px;
