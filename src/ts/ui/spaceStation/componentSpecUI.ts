@@ -17,6 +17,14 @@
 
 import { Settings } from "../../settings";
 import { SerializedComponent } from "../../spaceship/serializedComponents/component";
+import {
+    getDiscoveryScannerSpec,
+    SerializedDiscoveryScanner
+} from "../../spaceship/serializedComponents/discoveryScanner";
+import { getFuelScoopSpec, SerializedFuelScoop } from "../../spaceship/serializedComponents/fuelScoop";
+import { getFuelTankSpecs, SerializedFuelTank } from "../../spaceship/serializedComponents/fuelTank";
+import { getThrustersSpec, SerializedThrusters } from "../../spaceship/serializedComponents/thrusters";
+import { getWarpDriveSpec, SerializedWarpDrive } from "../../spaceship/serializedComponents/warpDrive";
 
 export class ComponentSpecUI {
     readonly root: HTMLElement;
@@ -28,7 +36,7 @@ export class ComponentSpecUI {
         this.displayComponent(null);
     }
 
-    displayComponent(serializedComponent: SerializedComponent | null) {
+    public displayComponent(serializedComponent: SerializedComponent | null) {
         this.root.innerHTML = "";
 
         if (serializedComponent === null) {
@@ -40,5 +48,78 @@ export class ComponentSpecUI {
         const qualityString = Settings.QUALITY_CHARS.at(serializedComponent.quality) ?? "[ERROR]";
         componentName.textContent = `${serializedComponent.type} ${serializedComponent.size}${qualityString}`;
         this.root.appendChild(componentName);
+
+        switch (serializedComponent.type) {
+            case "warpDrive":
+                this.root.appendChild(this.displayWarpDrive(serializedComponent));
+                break;
+            case "fuelScoop":
+                this.root.appendChild(this.displayFuelScoop(serializedComponent));
+                break;
+            case "fuelTank":
+                this.root.appendChild(this.displayFuelTank(serializedComponent));
+                break;
+            case "discoveryScanner":
+                this.root.appendChild(this.displayDiscoveryScanner(serializedComponent));
+                break;
+            case "thrusters":
+                this.root.appendChild(this.displayThrusters(serializedComponent));
+                break;
+        }
+    }
+
+    private displayWarpDrive(serializedWarpDrive: SerializedWarpDrive): HTMLDivElement {
+        const spec = getWarpDriveSpec(serializedWarpDrive);
+        const container = document.createElement("div");
+
+        const range = document.createElement("p");
+        range.innerText = `Range: ${spec.rangeLy} LY`;
+        container.appendChild(range);
+
+        return container;
+    }
+
+    private displayFuelScoop(serializedFuelScoop: SerializedFuelScoop): HTMLDivElement {
+        const spec = getFuelScoopSpec(serializedFuelScoop);
+        const container = document.createElement("div");
+
+        const scoopRate = document.createElement("p");
+        scoopRate.innerText = `Scoop rate: ${spec.fuelPerSecond} L/s`;
+        container.appendChild(scoopRate);
+
+        return container;
+    }
+
+    private displayFuelTank(serializedFuelTank: SerializedFuelTank) {
+        const spec = getFuelTankSpecs(serializedFuelTank);
+        const container = document.createElement("div");
+
+        const capacity = document.createElement("p");
+        capacity.innerText = `Capacity: ${spec.maxFuel} L`;
+        container.appendChild(capacity);
+
+        return container;
+    }
+
+    private displayDiscoveryScanner(serializedDiscoveryScanner: SerializedDiscoveryScanner): HTMLDivElement {
+        const spec = getDiscoveryScannerSpec(serializedDiscoveryScanner);
+        const container = document.createElement("div");
+
+        const relativeRange = document.createElement("p");
+        relativeRange.innerText = `Relative range: ${spec.relativeRange}`;
+        container.appendChild(relativeRange);
+
+        return container;
+    }
+
+    private displayThrusters(serializedThrusters: SerializedThrusters): HTMLDivElement {
+        const spec = getThrustersSpec(serializedThrusters);
+        const container = document.createElement("div");
+
+        const maxSpeed = document.createElement("p");
+        maxSpeed.innerText = `Max speed: ${spec.maxSpeed} m/s`;
+        container.appendChild(maxSpeed);
+
+        return container;
     }
 }
