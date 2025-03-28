@@ -19,6 +19,7 @@ import i18n from "../../i18n";
 import { Player } from "../../player/player";
 import { Component } from "../../spaceship/components/component";
 import { Spaceship } from "../../spaceship/spaceship";
+import { ComponentBrowserUI } from "./componentBrowserUI";
 import { ComponentSpecUI } from "./componentSpecUI";
 
 export class SpaceshipOutfittingUI {
@@ -26,7 +27,7 @@ export class SpaceshipOutfittingUI {
 
     private readonly componentList: HTMLDivElement;
 
-    private readonly browseComponents: HTMLDivElement;
+    private readonly componentBrowser: ComponentBrowserUI;
 
     private readonly componentSpec: ComponentSpecUI;
 
@@ -40,9 +41,8 @@ export class SpaceshipOutfittingUI {
         this.componentList.className = "flex-column";
         this.root.appendChild(this.componentList);
 
-        this.browseComponents = document.createElement("div");
-        this.browseComponents.innerText = "no component selected";
-        this.root.appendChild(this.browseComponents);
+        this.componentBrowser = new ComponentBrowserUI();
+        this.root.appendChild(this.componentBrowser.root);
 
         this.componentSpec = new ComponentSpecUI();
         this.root.appendChild(this.componentSpec.root);
@@ -55,13 +55,13 @@ export class SpaceshipOutfittingUI {
         primaryH2.innerText = i18n.t("spaceStation:primarySlots");
         this.componentList.appendChild(primaryH2);
 
-        const warpDriveSlot = this.createComponentSlot(spaceship.getWarpDrive());
+        const warpDriveSlot = this.createComponentSlot(spaceship.getWarpDrive(), false);
         this.componentList.appendChild(warpDriveSlot);
 
-        const thrustersSlot = this.createComponentSlot(spaceship.components.primary.thrusters);
+        const thrustersSlot = this.createComponentSlot(spaceship.components.primary.thrusters, false);
         this.componentList.appendChild(thrustersSlot);
 
-        const fuelTankSlot = this.createComponentSlot(spaceship.components.primary.fuelTank);
+        const fuelTankSlot = this.createComponentSlot(spaceship.components.primary.fuelTank, false);
         this.componentList.appendChild(fuelTankSlot);
 
         const optionalH2 = document.createElement("h2");
@@ -69,12 +69,12 @@ export class SpaceshipOutfittingUI {
         this.componentList.appendChild(optionalH2);
 
         for (const component of spaceship.components.optional) {
-            const componentSlot = this.createComponentSlot(component);
+            const componentSlot = this.createComponentSlot(component, true);
             this.componentList.appendChild(componentSlot);
         }
     }
 
-    private createComponentSlot(component: Component | null): HTMLElement {
+    private createComponentSlot(component: Component | null, optional: boolean): HTMLElement {
         const slot = document.createElement("button");
         slot.textContent = component !== null ? component.type : "empty slot";
         slot.classList.add("componentSlot");
@@ -88,7 +88,11 @@ export class SpaceshipOutfittingUI {
             this.activeSlotDiv = slot;
             slot.classList.add("active");
 
-            this.browseComponents.innerText = "Browse components";
+            if (optional) {
+                this.componentBrowser.browserAllCategories(component?.size ?? 0);
+            } else {
+                this.componentBrowser.browse(component?.type ?? "warpDrive", component?.size ?? 0);
+            }
         });
 
         return slot;
