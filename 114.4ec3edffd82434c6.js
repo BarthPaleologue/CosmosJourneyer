@@ -1,0 +1,4 @@
+"use strict";(globalThis.webpackChunkcosmos_journeyer=globalThis.webpackChunkcosmos_journeyer||[]).push([["114"],{65740:function(e,o,r){r.r(o),r.d(o,{lodPixelShader:()=>t});var a=r(19015);let l="lodPixelShader",i=`#extension GL_EXT_shader_texture_lod : enable
+precision highp float;const float GammaEncodePowerApprox=1.0/2.2;varying vec2 vUV;uniform sampler2D textureSampler;uniform float lod;uniform vec2 texSize;uniform int gamma;void main(void)
+{gl_FragColor=texture2DLodEXT(textureSampler,vUV,lod);if (gamma==0) {gl_FragColor.rgb=pow(gl_FragColor.rgb,vec3(GammaEncodePowerApprox));}}
+`;a.v.ShadersStore[l]=i;let t={name:l,shader:i}}}]);
