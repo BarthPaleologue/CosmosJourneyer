@@ -23,6 +23,7 @@ import { getDefaultSerializedSpaceship, SerializedSpaceship } from "../spaceship
 import { SpaceDiscoveryData } from "../society/encyclopaediaGalactica";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { CompletedTutorials, SerializedPlayer } from "./serializedPlayer";
+import { SerializedComponent } from "../spaceship/serializedComponents/component";
 
 export class Player {
     uuid: string;
@@ -48,6 +49,8 @@ export class Player {
 
     serializedSpaceships: SerializedSpaceship[] = [];
     instancedSpaceships: Spaceship[] = [];
+
+    spareSpaceshipComponents: Array<SerializedComponent> = [];
 
     tutorials: CompletedTutorials;
 
@@ -129,6 +132,7 @@ export class Player {
             currentMissions: [],
             completedMissions: [],
             spaceShips: [getDefaultSerializedSpaceship()],
+            spareSpaceshipComponents: [],
             tutorials: {
                 stationLandingCompleted: false,
                 fuelScoopingCompleted: false
@@ -156,6 +160,7 @@ export class Player {
             spaceShips: player.serializedSpaceships.concat(
                 player.instancedSpaceships.map((spaceship) => spaceship.serialize())
             ),
+            spareSpaceshipComponents: player.spareSpaceshipComponents,
             tutorials: player.tutorials
         };
     }
@@ -187,6 +192,7 @@ export class Player {
         this.completedMissions = player.completedMissions.map((mission) => Mission.Deserialize(mission.serialize()));
         this.serializedSpaceships = player.serializedSpaceships.map((spaceship) => structuredClone(spaceship));
         this.instancedSpaceships = [...player.instancedSpaceships];
+        this.spareSpaceshipComponents = player.spareSpaceshipComponents.map((sparePart) => structuredClone(sparePart));
         this.tutorials = structuredClone(player.tutorials);
     }
 

@@ -53,6 +53,7 @@ import { canEngageWarpDrive } from "./components/warpDriveUtils";
 import { distanceToAsteroidField } from "../utils/asteroidFields";
 import { getDefaultSerializedSpaceship, SerializedSpaceship, ShipType } from "./serializedSpaceship";
 import { SpaceshipInternals } from "./spaceshipInternals";
+import { SerializedComponent } from "./serializedComponents/component";
 
 const enum ShipState {
     FLYING,
@@ -126,7 +127,11 @@ export class Spaceship implements Transformable {
 
     readonly boundingExtent: Vector3;
 
-    private constructor(serializedSpaceShip: SerializedSpaceship, scene: Scene) {
+    private constructor(
+        serializedSpaceShip: SerializedSpaceship,
+        unfitComponents: Array<SerializedComponent>,
+        scene: Scene
+    ) {
         this.id = serializedSpaceShip.id ?? crypto.randomUUID();
 
         this.name = serializedSpaceShip.name;
@@ -219,7 +224,7 @@ export class Spaceship implements Transformable {
             this.getTransform()
         );
 
-        this.internals = new SpaceshipInternals(serializedSpaceShip);
+        this.internals = new SpaceshipInternals(serializedSpaceShip, unfitComponents);
 
         const { min: boundingMin, max: boundingMax } = this.getTransform().getHierarchyBoundingVectors();
 
@@ -719,11 +724,15 @@ export class Spaceship implements Transformable {
     }
 
     public static CreateDefault(scene: Scene): Spaceship {
-        return Spaceship.Deserialize(getDefaultSerializedSpaceship(), scene);
+        return Spaceship.Deserialize(getDefaultSerializedSpaceship(), [], scene);
     }
 
-    public static Deserialize(serializedSpaceship: SerializedSpaceship, scene: Scene): Spaceship {
-        return new Spaceship(serializedSpaceship, scene);
+    public static Deserialize(
+        serializedSpaceship: SerializedSpaceship,
+        unfitComponents: Array<SerializedComponent>,
+        scene: Scene
+    ): Spaceship {
+        return new Spaceship(serializedSpaceship, unfitComponents, scene);
     }
 
     public serialize(): SerializedSpaceship {

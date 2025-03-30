@@ -22,6 +22,7 @@ import { OptionalComponent } from "./components/optionalComponents";
 import { Thrusters } from "./components/thrusters";
 import { WarpDrive } from "./components/warpDrive";
 import { ComponentSlot, OptionalComponentSlot } from "./componentSlot";
+import { SerializedComponent } from "./serializedComponents/component";
 import { SerializedSpaceship, ShipType } from "./serializedSpaceship";
 
 export class SpaceshipInternals {
@@ -35,13 +36,13 @@ export class SpaceshipInternals {
 
     readonly optionals: ReadonlyArray<OptionalComponentSlot>;
 
-    constructor(serializedSpaceShip: SerializedSpaceship) {
-        this.type = serializedSpaceShip.type;
+    constructor(serializedSpaceship: SerializedSpaceship, unfitComponents: Array<SerializedComponent>) {
+        this.type = serializedSpaceship.type;
 
-        const components = serializedSpaceShip.components;
+        const components = serializedSpaceship.components;
         const primary = components.primary;
         const optionals = components.optional;
-        switch (serializedSpaceShip.type) {
+        switch (serializedSpaceship.type) {
             case ShipType.WANDERER:
                 this.primary = {
                     warpDrive: ComponentSlot.NewWarpDrive(3),
@@ -56,9 +57,26 @@ export class SpaceshipInternals {
                 break;
         }
 
-        this.primary.warpDrive.setComponent(primary.warpDrive !== null ? new WarpDrive(primary.warpDrive) : null);
-        this.primary.thrusters.setComponent(primary.thrusters !== null ? new Thrusters(primary.thrusters) : null);
-        this.primary.fuelTank.setComponent(primary.fuelTank !== null ? new FuelTank(primary.fuelTank) : null);
+        if (primary.warpDrive !== null) {
+            const success = this.primary.warpDrive.setComponent(new WarpDrive(primary.warpDrive));
+            if (!success) {
+                unfitComponents.push(primary.warpDrive);
+            }
+        }
+
+        if (primary.thrusters !== null) {
+            const success = this.primary.thrusters.setComponent(new Thrusters(primary.thrusters));
+            if (!success) {
+                unfitComponents.push(primary.thrusters);
+            }
+        }
+
+        if (primary.fuelTank !== null) {
+            const success = this.primary.fuelTank.setComponent(new FuelTank(primary.fuelTank));
+            if (!success) {
+                unfitComponents.push(primary.fuelTank);
+            }
+        }
 
         for (let i = 0; i < optionals.length; i++) {
             const optional = optionals[i];
@@ -80,7 +98,10 @@ export class SpaceshipInternals {
                     break;
             }
 
-            this.optionals[i].setComponent(component);
+            const success = this.optionals[i].setComponent(component);
+            if (!success) {
+                unfitComponents.push(optional);
+            }
         }
     }
 

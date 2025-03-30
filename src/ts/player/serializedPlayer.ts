@@ -3,6 +3,7 @@ import { MissionSerializedSchema } from "../missions/missionSerialized";
 import { SpaceDiscoveryDataSchema } from "../society/encyclopaediaGalactica";
 import { SerializedSpaceshipSchema, getDefaultSerializedSpaceship } from "../spaceship/serializedSpaceship";
 import { StarSystemCoordinatesSchema } from "../utils/coordinates/starSystemCoordinates";
+import { SerializedComponentSchema } from "../spaceship/serializedComponents/component";
 
 export const CompletedTutorialsSchema = z.object({
     stationLandingCompleted: z.boolean().default(false),
@@ -35,6 +36,7 @@ export const SerializedPlayerSchema = z.object({
     currentMissions: z.array(MissionSerializedSchema).default([]),
     completedMissions: z.array(MissionSerializedSchema).default([]),
     spaceShips: z.array(SerializedSpaceshipSchema).default([getDefaultSerializedSpaceship()]),
+    spareSpaceshipComponents: z.array(SerializedComponentSchema).default([]),
     tutorials: CompletedTutorialsSchema.default({
         stationLandingCompleted: false,
         fuelScoopingCompleted: false

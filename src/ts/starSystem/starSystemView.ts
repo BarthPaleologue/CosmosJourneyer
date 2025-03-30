@@ -675,7 +675,7 @@ export class StarSystemView implements View {
         const spaceshipSerialized = this.player.serializedSpaceships.shift();
         if (spaceshipSerialized === undefined) throw new Error("No spaceship serialized in player");
 
-        const spaceship = Spaceship.Deserialize(spaceshipSerialized, this.scene);
+        const spaceship = Spaceship.Deserialize(spaceshipSerialized, this.player.spareSpaceshipComponents, this.scene);
         this.player.instancedSpaceships.push(spaceship);
 
         if (this.spaceshipControls === null) {

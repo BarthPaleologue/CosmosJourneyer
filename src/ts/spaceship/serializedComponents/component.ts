@@ -15,15 +15,19 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { SerializedDiscoveryScanner } from "./discoveryScanner";
-import { SerializedFuelScoop } from "./fuelScoop";
-import { SerializedFuelTank } from "./fuelTank";
-import { SerializedThrusters } from "./thrusters";
-import { SerializedWarpDrive } from "./warpDrive";
+import { z } from "zod";
+import { SerializedDiscoveryScannerSchema } from "./discoveryScanner";
+import { SerializedFuelScoopSchema } from "./fuelScoop";
+import { SerializedFuelTankSchema } from "./fuelTank";
+import { SerializedThrustersSchema } from "./thrusters";
+import { SerializedWarpDriveSchema } from "./warpDrive";
 
-export type SerializedComponent =
-    | SerializedWarpDrive
-    | SerializedFuelScoop
-    | SerializedFuelTank
-    | SerializedDiscoveryScanner
-    | SerializedThrusters;
+export const SerializedComponentSchema = z.discriminatedUnion("type", [
+    SerializedWarpDriveSchema,
+    SerializedFuelScoopSchema,
+    SerializedFuelTankSchema,
+    SerializedDiscoveryScannerSchema,
+    SerializedThrustersSchema
+]);
+
+export type SerializedComponent = z.infer<typeof SerializedComponentSchema>;
