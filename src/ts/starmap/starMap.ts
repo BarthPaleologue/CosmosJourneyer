@@ -183,7 +183,7 @@ export class StarMap implements View {
             if (this.selectedSystemCoordinates === null) return await alertModal("selected system seed is null!");
 
             const playerCurrentSpaceship = this.player.instancedSpaceships[0];
-            const warpDrive = playerCurrentSpaceship.getWarpDrive();
+            const warpDrive = playerCurrentSpaceship?.getInternals().getWarpDrive();
 
             if (warpDrive === null) {
                 return await alertModal(

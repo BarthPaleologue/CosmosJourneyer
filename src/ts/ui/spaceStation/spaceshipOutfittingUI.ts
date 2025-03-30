@@ -18,6 +18,7 @@
 import i18n from "../../i18n";
 import { Player } from "../../player/player";
 import { Component } from "../../spaceship/components/component";
+import { ComponentSlot } from "../../spaceship/componentSlot";
 import { Spaceship } from "../../spaceship/spaceship";
 import { ComponentBrowserUI } from "./componentBrowserUI";
 import { ComponentSpecUI } from "./componentSpecUI";
@@ -51,54 +52,58 @@ export class SpaceshipOutfittingUI {
     generate(spaceship: Spaceship, player: Player) {
         this.componentList.innerHTML = "";
 
+        const shipInternals = spaceship.getInternals();
+
         const primaryH2 = document.createElement("h2");
         primaryH2.innerText = i18n.t("spaceStation:primarySlots");
         this.componentList.appendChild(primaryH2);
 
-        const warpDriveSlot = this.createComponentSlot(spaceship.getWarpDrive(), false);
+        const warpDriveSlot = this.createComponentSlotUI(shipInternals.primary.warpDrive);
         this.componentList.appendChild(warpDriveSlot);
 
-        const thrustersSlot = this.createComponentSlot(spaceship.components.primary.thrusters, false);
+        const thrustersSlot = this.createComponentSlotUI(shipInternals.primary.thrusters);
         this.componentList.appendChild(thrustersSlot);
 
-        const fuelTankSlot = this.createComponentSlot(spaceship.components.primary.fuelTank, false);
+        const fuelTankSlot = this.createComponentSlotUI(shipInternals.primary.fuelTank);
         this.componentList.appendChild(fuelTankSlot);
 
         const optionalH2 = document.createElement("h2");
         optionalH2.innerText = i18n.t("spaceStation:optionalSlots");
         this.componentList.appendChild(optionalH2);
 
-        for (const component of spaceship.components.optional) {
-            const componentSlot = this.createComponentSlot(component, true);
-            this.componentList.appendChild(componentSlot);
+        for (const componentSlot of shipInternals.optionals) {
+            const componentSlotUI = this.createComponentSlotUI(componentSlot);
+            this.componentList.appendChild(componentSlotUI);
         }
     }
 
-    private createComponentSlot(component: Component | null, optional: boolean): HTMLElement {
-        const slot = document.createElement("button");
-        slot.textContent = component !== null ? component.type : "empty slot";
-        slot.classList.add("componentSlot");
-        slot.addEventListener("click", () => {
-            this.handleClickOnComponent(component);
+    private createComponentSlotUI<T extends ReadonlyArray<Component["type"]>>(
+        componentSlot: ComponentSlot<T>
+    ): HTMLElement {
+        const slotUI = document.createElement("button");
+        slotUI.textContent = componentSlot.getComponent()?.type ?? "empty slot";
+        slotUI.classList.add("componentSlot");
+        slotUI.addEventListener("click", () => {
+            this.handleClickOnComponent(componentSlot);
 
             if (this.activeSlotDiv !== null) {
                 this.activeSlotDiv.classList.remove("active");
             }
 
-            this.activeSlotDiv = slot;
-            slot.classList.add("active");
+            this.activeSlotDiv = slotUI;
+            slotUI.classList.add("active");
 
-            if (optional) {
-                this.componentBrowser.browserAllCategories(component?.size ?? 0);
+            if (componentSlot.types.length > 1) {
+                this.componentBrowser.browseCategories(componentSlot.types, componentSlot.maxSize);
             } else {
-                this.componentBrowser.browse(component?.type ?? "warpDrive", component?.size ?? 0);
+                this.componentBrowser.browse(componentSlot.types[0], componentSlot.maxSize);
             }
         });
 
-        return slot;
+        return slotUI;
     }
 
-    private handleClickOnComponent(component: Component | null) {
-        this.componentSpec.displayComponent(component?.serialize() ?? null);
+    private handleClickOnComponent<T extends ReadonlyArray<Component["type"]>>(componentSlot: ComponentSlot<T>) {
+        this.componentSpec.displayComponent(componentSlot.getComponent()?.serialize() ?? null);
     }
 }

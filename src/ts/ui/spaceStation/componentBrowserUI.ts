@@ -26,20 +26,12 @@ export class ComponentBrowserUI {
         this.root.innerText = "no component selected";
     }
 
-    browserAllCategories(maxComponentSize: number) {
+    browseCategories(types: ReadonlyArray<SerializedComponent["type"]>, maxComponentSize: number) {
         this.root.innerHTML = "";
 
-        const warpDriveCategory = this.createCategoryButton("warpDrive", maxComponentSize);
-        this.root.appendChild(warpDriveCategory);
-
-        const fuelTankCategory = this.createCategoryButton("fuelTank", maxComponentSize);
-        this.root.appendChild(fuelTankCategory);
-
-        const fuelScoopCategory = this.createCategoryButton("fuelScoop", maxComponentSize);
-        this.root.appendChild(fuelScoopCategory);
-
-        const thrustersCategory = this.createCategoryButton("thrusters", maxComponentSize);
-        this.root.appendChild(thrustersCategory);
+        types.forEach((type) => {
+            this.root.appendChild(this.createCategoryButton(type, maxComponentSize));
+        });
     }
 
     browse(componentType: SerializedComponent["type"], maxComponentSize: number) {

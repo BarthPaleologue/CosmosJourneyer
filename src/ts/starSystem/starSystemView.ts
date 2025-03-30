@@ -292,7 +292,7 @@ export class StarSystemView implements View {
             const shipControls = this.getSpaceshipControls();
             const spaceship = shipControls.getSpaceship();
 
-            const warpDrive = spaceship.getWarpDrive();
+            const warpDrive = spaceship.getInternals().getWarpDrive();
             if (warpDrive === null) {
                 return;
             }
@@ -616,7 +616,7 @@ export class StarSystemView implements View {
         }
 
         const currentSpaceship = this.spaceshipControls?.getSpaceship();
-        const currentJumpRange = currentSpaceship?.getWarpDrive()?.rangeLY ?? 0;
+        const currentJumpRange = currentSpaceship?.getInternals().getWarpDrive()?.rangeLY ?? 0;
 
         getNeighborStarSystemCoordinates(
             starSystem.model.coordinates,
@@ -744,7 +744,7 @@ export class StarSystemView implements View {
         );
 
         const spaceship = this.spaceshipControls.getSpaceship();
-        const shipDiscoveryScanner = spaceship.getDiscoveryScanner();
+        const shipDiscoveryScanner = spaceship.getInternals().getDiscoveryScanner();
 
         if (
             shipDiscoveryScanner !== null &&
@@ -770,7 +770,7 @@ export class StarSystemView implements View {
         spaceship.setNearestOrbitalObject(nearestOrbitalObject);
         spaceship.setNearestCelestialBody(nearestCelestialBody);
 
-        const warpDrive = spaceship.getWarpDrive();
+        const warpDrive = spaceship.getInternals().getWarpDrive();
         if (warpDrive !== null && warpDrive.isEnabled()) {
             this.spaceShipLayer.displaySpeed(warpDrive.getThrottle(), spaceship.getSpeed());
         } else {
