@@ -16,10 +16,10 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { z } from "zod";
-import { getFuelTankSlot, SerializedFuelTankSchema } from "./serializedComponents/fuelTank";
-import { getOptionalComponentSlot, SerializedOptionalComponentSchema } from "./serializedComponents/optionalComponents";
-import { getWarpDriveSlot, SerializedWarpDriveSchema } from "./serializedComponents/warpDrive";
-import { getThrustersSlot, SerializedThrustersSchema } from "./serializedComponents/thrusters";
+import { SerializedFuelTankSchema } from "./serializedComponents/fuelTank";
+import { SerializedOptionalComponentSchema } from "./serializedComponents/optionalComponents";
+import { SerializedWarpDriveSchema } from "./serializedComponents/warpDrive";
+import { SerializedThrustersSchema } from "./serializedComponents/thrusters";
 
 export enum ShipType {
     WANDERER = "WANDERER"
@@ -43,11 +43,15 @@ export const WandererSchema = BaseSpaceshipSchema.extend({
     type: z.literal(ShipType.WANDERER),
     components: z.object({
         primary: z.object({
-            warpDrive: getWarpDriveSlot(3),
-            thrusters: getThrustersSlot(3),
-            fuelTank: getFuelTankSlot(2)
+            warpDrive: SerializedWarpDriveSchema.nullable(),
+            thrusters: SerializedThrustersSchema.nullable(),
+            fuelTank: SerializedFuelTankSchema.nullable()
         }),
-        optional: z.tuple([getOptionalComponentSlot(3), getOptionalComponentSlot(2), getOptionalComponentSlot(2)])
+        optional: z.tuple([
+            SerializedOptionalComponentSchema.nullable(),
+            SerializedOptionalComponentSchema.nullable(),
+            SerializedOptionalComponentSchema.nullable()
+        ])
     })
 });
 

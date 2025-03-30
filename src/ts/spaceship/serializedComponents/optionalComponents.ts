@@ -27,7 +27,3 @@ export const SerializedOptionalComponentSchema = z.discriminatedUnion("type", [
 ]);
 
 export type SerializedOptionalComponent = z.infer<typeof SerializedOptionalComponentSchema>;
-
-export function getOptionalComponentSlot(maxSize: number) {
-    return SerializedOptionalComponentSchema.refine((component) => component.size <= maxSize).nullable();
-}
