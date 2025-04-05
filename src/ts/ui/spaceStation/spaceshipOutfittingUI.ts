@@ -30,7 +30,13 @@ export class SpaceshipOutfittingUI {
 
     private readonly componentBrowser: ComponentBrowserUI;
 
-    private readonly componentSpec: ComponentSpecUI;
+    private readonly rightPanel: HTMLDivElement;
+
+    private readonly currentComponentSpec: ComponentSpecUI;
+
+    private readonly selectedComponentSpec: ComponentSpecUI;
+
+    private readonly buyButton: HTMLButtonElement;
 
     private activeSlotDiv: HTMLElement | null = null;
 
@@ -45,8 +51,26 @@ export class SpaceshipOutfittingUI {
         this.componentBrowser = new ComponentBrowserUI();
         this.root.appendChild(this.componentBrowser.root);
 
-        this.componentSpec = new ComponentSpecUI();
-        this.root.appendChild(this.componentSpec.root);
+        this.rightPanel = document.createElement("div");
+        this.rightPanel.style.display = "flex";
+        this.rightPanel.style.flexDirection = "column";
+        this.rightPanel.style.background = "transparent";
+        this.rightPanel.style.padding = "0px";
+        this.rightPanel.style.rowGap = "10px";
+        this.root.appendChild(this.rightPanel);
+
+        this.currentComponentSpec = new ComponentSpecUI();
+        this.currentComponentSpec.root.style.flexGrow = "1";
+        this.rightPanel.appendChild(this.currentComponentSpec.root);
+
+        this.selectedComponentSpec = new ComponentSpecUI();
+        this.selectedComponentSpec.root.style.flexGrow = "1";
+        this.rightPanel.appendChild(this.selectedComponentSpec.root);
+
+        this.buyButton = document.createElement("button");
+        this.buyButton.className = "buyButton";
+        this.buyButton.innerText = i18n.t("spaceStation:buy");
+        this.rightPanel.appendChild(this.buyButton);
     }
 
     generate(spaceship: Spaceship, player: Player) {
@@ -104,6 +128,6 @@ export class SpaceshipOutfittingUI {
     }
 
     private handleClickOnComponent<T extends ReadonlyArray<Component["type"]>>(componentSlot: ComponentSlot<T>) {
-        this.componentSpec.displayComponent(componentSlot.getComponent()?.serialize() ?? null);
+        this.currentComponentSpec.displayComponent(componentSlot.getComponent()?.serialize() ?? null);
     }
 }
