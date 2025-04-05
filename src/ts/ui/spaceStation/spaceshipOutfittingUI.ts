@@ -34,6 +34,8 @@ export class SpaceshipOutfittingUI {
 
     private readonly currentComponentSpec: ComponentSpecUI;
 
+    private readonly sellButton: HTMLButtonElement;
+
     private readonly selectedComponentSpec: ComponentSpecUI;
 
     private readonly buyButton: HTMLButtonElement;
@@ -62,6 +64,11 @@ export class SpaceshipOutfittingUI {
         this.currentComponentSpec = new ComponentSpecUI();
         this.currentComponentSpec.root.style.flexGrow = "1";
         this.rightPanel.appendChild(this.currentComponentSpec.root);
+
+        this.sellButton = document.createElement("button");
+        this.sellButton.className = "sellButton";
+        this.sellButton.innerText = i18n.t("spaceStation:sell");
+        this.rightPanel.appendChild(this.sellButton);
 
         this.selectedComponentSpec = new ComponentSpecUI();
         this.selectedComponentSpec.root.style.flexGrow = "1";
