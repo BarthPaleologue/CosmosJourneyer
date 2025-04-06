@@ -186,6 +186,7 @@ export class SpaceshipOutfittingUI {
 
     private handleClickOnSlot(componentSlot: ComponentSlot, player: Player) {
         this.currentComponentSpec.displayComponent(componentSlot.getComponent()?.serialize() ?? null);
+        this.selectedComponentSpec.displayComponent(null);
 
         this.handleSellButtonClick = () => {
             const component = componentSlot.getComponent();
