@@ -73,6 +73,10 @@ export class SpaceshipOutfittingUI {
         this.rightPanel.style.rowGap = "10px";
         this.root.appendChild(this.rightPanel);
 
+        const currentComponentTitle = document.createElement("h3");
+        currentComponentTitle.innerText = "Equipped";
+        this.rightPanel.appendChild(currentComponentTitle);
+
         this.currentComponentSpec = new ComponentSpecUI();
         this.currentComponentSpec.root.style.flexGrow = "1";
         this.currentComponentSpec.root.style.flex = "1";
@@ -103,6 +107,10 @@ export class SpaceshipOutfittingUI {
             this.handleSellButtonClick();
         });
         rowContainer.appendChild(this.sellButton);
+
+        const selectedComponentTitle = document.createElement("h3");
+        selectedComponentTitle.innerText = "Selected";
+        this.rightPanel.appendChild(selectedComponentTitle);
 
         this.selectedComponentSpec = new ComponentSpecUI();
         this.selectedComponentSpec.root.style.flexGrow = "1";
