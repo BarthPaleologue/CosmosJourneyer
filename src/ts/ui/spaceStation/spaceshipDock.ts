@@ -53,6 +53,8 @@ export class SpaceshipDockUI {
     }
 
     public generate(stationModel: DeepReadonly<OrbitalFacilityModel>, player: Player) {
+        this.currentSpaceshipContainer.innerHTML = "";
+
         const currentSpaceship = player.instancedSpaceships.at(0);
 
         if (currentSpaceship !== undefined) {
