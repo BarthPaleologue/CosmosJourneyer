@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Settings } from "../../settings";
-import { SerializedComponent } from "../../spaceship/serializedComponents/component";
+import { getComponentValue, SerializedComponent } from "../../spaceship/serializedComponents/component";
 import {
     getDiscoveryScannerSpec,
     SerializedDiscoveryScanner
@@ -48,6 +48,10 @@ export class ComponentSpecUI {
         const qualityString = Settings.QUALITY_CHARS.at(serializedComponent.quality) ?? "[ERROR]";
         componentName.textContent = `${serializedComponent.type} ${serializedComponent.size}${qualityString}`;
         this.root.appendChild(componentName);
+
+        const componentValue = document.createElement("p");
+        componentValue.innerText = `Value: ${getComponentValue(serializedComponent).toLocaleString()} ${Settings.CREDIT_SYMBOL}`;
+        this.root.appendChild(componentValue);
 
         switch (serializedComponent.type) {
             case "warpDrive":
@@ -117,7 +121,7 @@ export class ComponentSpecUI {
         const container = document.createElement("div");
 
         const maxSpeed = document.createElement("p");
-        maxSpeed.innerText = `Max speed: ${spec.maxSpeed} m/s`;
+        maxSpeed.innerText = `Max speed: ${spec.maxSpeed.toLocaleString(undefined, { maximumSignificantDigits: 3 })} m/s`;
         container.appendChild(maxSpeed);
 
         return container;

@@ -333,7 +333,8 @@ $gaps: 10px;
     padding: 10px;
     column-gap: $gaps;
 
-    div {
+    & > div,
+    .componentSpec {
         background: var(--accent-color-dark);
         padding: 10px;
     }

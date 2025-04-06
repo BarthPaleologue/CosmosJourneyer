@@ -31,3 +31,18 @@ export const SerializedComponentSchema = z.discriminatedUnion("type", [
 ]);
 
 export type SerializedComponent = z.infer<typeof SerializedComponentSchema>;
+
+export function getComponentValue(serializedComponent: SerializedComponent): number {
+    switch (serializedComponent.type) {
+        case "warpDrive":
+            return 30_000 * (serializedComponent.size + serializedComponent.quality / 10);
+        case "fuelScoop":
+            return 10_000 * (serializedComponent.size + serializedComponent.quality / 10);
+        case "fuelTank":
+            return 5_000 * (serializedComponent.size + serializedComponent.quality / 10);
+        case "discoveryScanner":
+            return 8_000 * (serializedComponent.size + serializedComponent.quality / 10);
+        case "thrusters":
+            return 20_000 * (serializedComponent.size + serializedComponent.quality / 10);
+    }
+}
