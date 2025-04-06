@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { SerializedComponent } from "../serializedComponents/component";
 import { DiscoveryScanner } from "./discoveryScanner";
 import { FuelScoop } from "./fuelScoop";
 import { FuelTank } from "./fuelTank";
@@ -22,3 +23,18 @@ import { Thrusters } from "./thrusters";
 import { WarpDrive } from "./warpDrive";
 
 export type Component = WarpDrive | FuelScoop | FuelTank | DiscoveryScanner | Thrusters;
+
+export function deserializeComponent(serializedComponent: SerializedComponent): Component {
+    switch (serializedComponent.type) {
+        case "warpDrive":
+            return new WarpDrive(serializedComponent);
+        case "fuelScoop":
+            return new FuelScoop(serializedComponent);
+        case "fuelTank":
+            return new FuelTank(serializedComponent);
+        case "discoveryScanner":
+            return new DiscoveryScanner(serializedComponent);
+        case "thrusters":
+            return new Thrusters(serializedComponent);
+    }
+}

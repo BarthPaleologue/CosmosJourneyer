@@ -17,8 +17,9 @@
 
 import i18n from "../../i18n";
 import { Player } from "../../player/player";
-import { Component } from "../../spaceship/components/component";
+import { deserializeComponent } from "../../spaceship/components/component";
 import { ComponentSlot } from "../../spaceship/componentSlot";
+import { getComponentValue } from "../../spaceship/serializedComponents/component";
 import { Spaceship } from "../../spaceship/spaceship";
 import { ComponentBrowserUI } from "./componentBrowserUI";
 import { ComponentSpecUI } from "./componentSpecUI";
@@ -155,9 +156,17 @@ export class SpaceshipOutfittingUI {
             slotUI.classList.add("active");
 
             if (componentSlot.types.length > 1) {
-                this.componentBrowser.browseCategories(componentSlot.types, componentSlot.maxSize);
+                this.componentBrowser.browseCategories(
+                    componentSlot.types,
+                    componentSlot.maxSize,
+                    player.spareSpaceshipComponents
+                );
             } else {
-                this.componentBrowser.browse(componentSlot.types[0], componentSlot.maxSize);
+                this.componentBrowser.browse(
+                    componentSlot.types[0],
+                    componentSlot.maxSize,
+                    player.spareSpaceshipComponents
+                );
             }
         });
 
@@ -166,5 +175,50 @@ export class SpaceshipOutfittingUI {
 
     private handleClickOnSlot(componentSlot: ComponentSlot, player: Player) {
         this.currentComponentSpec.displayComponent(componentSlot.getComponent()?.serialize() ?? null);
+
+        this.handleSellButtonClick = () => {
+            const component = componentSlot.getComponent();
+            if (component === null) {
+                return;
+            }
+
+            componentSlot.setComponent(null);
+
+            const componentPrice = getComponentValue(component.serialize());
+            player.earn(componentPrice);
+
+            this.currentComponentSpec.displayComponent(null);
+        };
+
+        this.handleBuyButtonClick = () => {
+            const selectedComponent = this.componentBrowser.getSelectedComponent();
+            if (selectedComponent === null) {
+                return;
+            }
+
+            const currentComponent = componentSlot.getComponent();
+            if (currentComponent !== null) {
+                componentSlot.setComponent(null);
+                player.spareSpaceshipComponents.push(currentComponent.serialize());
+            }
+
+            const componentPrice = getComponentValue(selectedComponent);
+            player.pay(componentPrice);
+            componentSlot.setComponent(deserializeComponent(selectedComponent));
+
+            this.currentComponentSpec.displayComponent(selectedComponent);
+        };
+
+        this.handleUnequipButtonClick = () => {
+            const component = componentSlot.getComponent();
+            if (component === null) {
+                return;
+            }
+
+            componentSlot.setComponent(null);
+            player.spareSpaceshipComponents.push(component.serialize());
+
+            this.currentComponentSpec.displayComponent(null);
+        };
     }
 }

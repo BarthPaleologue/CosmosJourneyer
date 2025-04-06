@@ -15,37 +15,100 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Settings } from "../../settings";
 import { SerializedComponent } from "../../spaceship/serializedComponents/component";
 
 export class ComponentBrowserUI {
     readonly root: HTMLDivElement;
 
+    private selectedComponent: SerializedComponent | null = null;
+
     constructor() {
         this.root = document.createElement("div");
         this.root.classList.add("componentBrowserUI", "flex-row", "flex-wrap");
+        this.root.style.rowGap = "10px";
         this.root.innerText = "no component selected";
     }
 
-    browseCategories(types: ReadonlyArray<SerializedComponent["type"]>, maxComponentSize: number) {
+    public browseCategories(
+        types: ReadonlyArray<SerializedComponent["type"]>,
+        maxComponentSize: number,
+        spareParts: ReadonlyArray<SerializedComponent>
+    ) {
         this.root.innerHTML = "";
 
         types.forEach((type) => {
-            this.root.appendChild(this.createCategoryButton(type, maxComponentSize));
+            this.root.appendChild(this.createCategoryButton(type, maxComponentSize, spareParts));
         });
     }
 
-    browse(componentType: SerializedComponent["type"], maxComponentSize: number) {
+    public browse(
+        componentType: SerializedComponent["type"],
+        maxComponentSize: number,
+        spareParts: ReadonlyArray<SerializedComponent>
+    ) {
         this.root.innerHTML = "";
 
-        this.root.innerText = `Browsing ${componentType} components below size ${maxComponentSize}`;
+        const relevantSpareParts = spareParts.filter(
+            (sparePart) => sparePart.type === componentType && sparePart.size <= maxComponentSize
+        );
+        relevantSpareParts.forEach((sparePart) => {
+            const componentButton = document.createElement("button");
+            componentButton.className = "componentCategory";
+            componentButton.innerText = `${sparePart.type} ${sparePart.size}`;
+            componentButton.addEventListener("click", () => {
+                this.selectedComponent = sparePart;
+            });
+            this.root.appendChild(componentButton);
+        });
+
+        for (let size = 1; size <= maxComponentSize; size++) {
+            for (let quality = 0; quality < Settings.QUALITY_CHARS.length; quality++) {
+                const componentButton = document.createElement("button");
+                componentButton.className = "componentCategory";
+                componentButton.style.flex = "1";
+                componentButton.innerText = `${componentType} ${size}${Settings.QUALITY_CHARS.at(quality)}`;
+                componentButton.addEventListener("click", () => {
+                    switch (componentType) {
+                        case "warpDrive":
+                        case "fuelScoop":
+                        case "discoveryScanner":
+                        case "thrusters":
+                            this.selectedComponent = {
+                                type: componentType,
+                                size: size,
+                                quality: quality
+                            };
+                            break;
+                        case "fuelTank":
+                            this.selectedComponent = {
+                                type: componentType,
+                                size: size,
+                                quality: quality,
+                                currentFuel01: 1
+                            };
+                            break;
+                    }
+                });
+                this.root.appendChild(componentButton);
+            }
+        }
     }
 
-    private createCategoryButton(type: SerializedComponent["type"], maxComponentSize: number): HTMLElement {
+    public getSelectedComponent(): SerializedComponent | null {
+        return this.selectedComponent;
+    }
+
+    private createCategoryButton(
+        type: SerializedComponent["type"],
+        maxComponentSize: number,
+        spareParts: ReadonlyArray<SerializedComponent>
+    ): HTMLElement {
         const categoryButton = document.createElement("button");
         categoryButton.className = "componentCategory";
         categoryButton.innerText = type;
         categoryButton.addEventListener("click", () => {
-            this.browse(type, maxComponentSize);
+            this.browse(type, maxComponentSize, spareParts);
         });
         return categoryButton;
     }
