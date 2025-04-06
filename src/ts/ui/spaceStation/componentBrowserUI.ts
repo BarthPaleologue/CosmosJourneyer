@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Observable } from "@babylonjs/core/Misc/observable";
 import { Settings } from "../../settings";
 import { SerializedComponent } from "../../spaceship/serializedComponents/component";
 
@@ -22,6 +23,8 @@ export class ComponentBrowserUI {
     readonly root: HTMLDivElement;
 
     private selectedComponent: SerializedComponent | null = null;
+
+    readonly onComponentSelect = new Observable<SerializedComponent>();
 
     constructor() {
         this.root = document.createElement("div");
@@ -40,6 +43,11 @@ export class ComponentBrowserUI {
         types.forEach((type) => {
             this.root.appendChild(this.createCategoryButton(type, maxComponentSize, spareParts));
         });
+    }
+
+    private select(serializedComponent: SerializedComponent) {
+        this.selectedComponent = serializedComponent;
+        this.onComponentSelect.notifyObservers(serializedComponent);
     }
 
     public browse(
@@ -65,7 +73,7 @@ export class ComponentBrowserUI {
             componentButton.className = "componentCategory";
             componentButton.innerText = `${sparePart.type} ${sparePart.size}`;
             componentButton.addEventListener("click", () => {
-                this.selectedComponent = sparePart;
+                this.select(sparePart);
             });
             relevantSparePartsContainer.appendChild(componentButton);
         });
@@ -96,19 +104,19 @@ export class ComponentBrowserUI {
                         case "fuelScoop":
                         case "discoveryScanner":
                         case "thrusters":
-                            this.selectedComponent = {
+                            this.select({
                                 type: componentType,
                                 size: size,
                                 quality: quality
-                            };
+                            });
                             break;
                         case "fuelTank":
-                            this.selectedComponent = {
+                            this.select({
                                 type: componentType,
                                 size: size,
                                 quality: quality,
                                 currentFuel01: 1
-                            };
+                            });
                             break;
                     }
                 });

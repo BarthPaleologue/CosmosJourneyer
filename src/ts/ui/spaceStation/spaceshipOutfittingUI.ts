@@ -19,7 +19,7 @@ import i18n from "../../i18n";
 import { Player } from "../../player/player";
 import { deserializeComponent } from "../../spaceship/components/component";
 import { ComponentSlot } from "../../spaceship/componentSlot";
-import { getComponentValue } from "../../spaceship/serializedComponents/component";
+import { getComponentValue, SerializedComponent } from "../../spaceship/serializedComponents/component";
 import { SpaceshipInternals } from "../../spaceship/spaceshipInternals";
 import { ComponentBrowserUI } from "./componentBrowserUI";
 import { ComponentSpecUI } from "./componentSpecUI";
@@ -60,6 +60,9 @@ export class SpaceshipOutfittingUI {
         this.root.appendChild(this.componentList);
 
         this.componentBrowser = new ComponentBrowserUI();
+        this.componentBrowser.onComponentSelect.add((component) => {
+            this.selectedComponentSpec.displayComponent(component);
+        });
         this.root.appendChild(this.componentBrowser.root);
 
         this.rightPanel = document.createElement("div");
