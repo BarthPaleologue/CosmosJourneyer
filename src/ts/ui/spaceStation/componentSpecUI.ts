@@ -40,7 +40,7 @@ export class ComponentSpecUI {
         this.root.innerHTML = "";
 
         if (serializedComponent === null) {
-            this.root.innerText = "no component selected";
+            this.root.innerText = "no component to display";
             return;
         }
 
