@@ -25,7 +25,7 @@ export class ComponentBrowserUI {
 
     constructor() {
         this.root = document.createElement("div");
-        this.root.classList.add("componentBrowserUI", "flex-row", "flex-wrap");
+        this.root.classList.add("componentBrowserUI", "flex-column");
         this.root.style.rowGap = "10px";
         this.root.innerText = "no component selected";
     }
@@ -49,6 +49,14 @@ export class ComponentBrowserUI {
     ) {
         this.root.innerHTML = "";
 
+        const sparePartsTitle = document.createElement("h3");
+        sparePartsTitle.innerText = "Your spare parts";
+        this.root.appendChild(sparePartsTitle);
+
+        const relevantSparePartsContainer = document.createElement("div");
+        relevantSparePartsContainer.classList.add("flex-row", "flex-wrap");
+        this.root.appendChild(relevantSparePartsContainer);
+
         const relevantSpareParts = spareParts.filter(
             (sparePart) => sparePart.type === componentType && sparePart.size <= maxComponentSize
         );
@@ -59,8 +67,22 @@ export class ComponentBrowserUI {
             componentButton.addEventListener("click", () => {
                 this.selectedComponent = sparePart;
             });
-            this.root.appendChild(componentButton);
+            relevantSparePartsContainer.appendChild(componentButton);
         });
+
+        if (relevantSpareParts.length === 0) {
+            const noSpareParts = document.createElement("p");
+            noSpareParts.innerText = "You don't have spare parts available for this slot";
+            relevantSparePartsContainer.appendChild(noSpareParts);
+        }
+
+        const otherSparePartsTitle = document.createElement("h3");
+        otherSparePartsTitle.innerText = "Available spare parts";
+        this.root.appendChild(otherSparePartsTitle);
+
+        const otherSparePartsContainer = document.createElement("div");
+        otherSparePartsContainer.classList.add("flex-row", "flex-wrap");
+        this.root.appendChild(otherSparePartsContainer);
 
         for (let size = 1; size <= maxComponentSize; size++) {
             for (let quality = 0; quality < Settings.QUALITY_CHARS.length; quality++) {
@@ -90,7 +112,7 @@ export class ComponentBrowserUI {
                             break;
                     }
                 });
-                this.root.appendChild(componentButton);
+                otherSparePartsContainer.appendChild(componentButton);
             }
         }
     }
