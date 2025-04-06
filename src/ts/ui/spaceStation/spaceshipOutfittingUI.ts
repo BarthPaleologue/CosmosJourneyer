@@ -62,6 +62,7 @@ export class SpaceshipOutfittingUI {
         this.componentBrowser = new ComponentBrowserUI();
         this.componentBrowser.onComponentSelect.add((component) => {
             this.selectedComponentSpec.displayComponent(component);
+            this.buyButton.disabled = false;
         });
         this.root.appendChild(this.componentBrowser.root);
 
@@ -94,6 +95,7 @@ export class SpaceshipOutfittingUI {
         this.unEquipButton.className = "unEquipButton";
         this.unEquipButton.style.flexGrow = "1";
         this.unEquipButton.innerText = i18n.t("spaceStation:unequip");
+        this.unEquipButton.disabled = true;
         this.unEquipButton.addEventListener("click", () => {
             this.handleUnequipButtonClick();
         });
@@ -103,6 +105,7 @@ export class SpaceshipOutfittingUI {
         this.sellButton.className = "sellButton";
         this.sellButton.style.flexGrow = "1";
         this.sellButton.innerText = i18n.t("spaceStation:sell");
+        this.sellButton.disabled = true;
         this.sellButton.addEventListener("click", () => {
             this.handleSellButtonClick();
         });
@@ -120,6 +123,7 @@ export class SpaceshipOutfittingUI {
         this.buyButton = document.createElement("button");
         this.buyButton.className = "buyButton";
         this.buyButton.innerText = i18n.t("spaceStation:buy");
+        this.buyButton.disabled = true;
         this.buyButton.addEventListener("click", () => {
             this.handleBuyButtonClick();
         });
@@ -186,7 +190,11 @@ export class SpaceshipOutfittingUI {
 
     private handleClickOnSlot(componentSlot: ComponentSlot, player: Player) {
         this.currentComponentSpec.displayComponent(componentSlot.getComponent()?.serialize() ?? null);
+        this.unEquipButton.disabled = componentSlot.getComponent() === null;
+        this.sellButton.disabled = componentSlot.getComponent() === null;
+
         this.selectedComponentSpec.displayComponent(null);
+        this.buyButton.disabled = true;
 
         this.handleSellButtonClick = () => {
             const component = componentSlot.getComponent();
@@ -199,7 +207,7 @@ export class SpaceshipOutfittingUI {
             const componentPrice = getComponentValue(component.serialize());
             player.earn(componentPrice);
 
-            this.currentComponentSpec.displayComponent(null);
+            this.handleClickOnSlot(componentSlot, player);
         };
 
         this.handleBuyButtonClick = () => {
@@ -218,7 +226,7 @@ export class SpaceshipOutfittingUI {
             player.pay(componentPrice);
             componentSlot.setComponent(deserializeComponent(selectedComponent));
 
-            this.currentComponentSpec.displayComponent(selectedComponent);
+            this.handleClickOnSlot(componentSlot, player);
         };
 
         this.handleUnequipButtonClick = () => {
@@ -230,7 +238,7 @@ export class SpaceshipOutfittingUI {
             componentSlot.setComponent(null);
             player.spareSpaceshipComponents.push(component.serialize());
 
-            this.currentComponentSpec.displayComponent(null);
+            this.handleClickOnSlot(componentSlot, player);
         };
     }
 }
