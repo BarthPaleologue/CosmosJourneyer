@@ -19,7 +19,7 @@ import i18n from "../../i18n";
 import { Player } from "../../player/player";
 import { deserializeComponent } from "../../spaceship/components/component";
 import { ComponentSlot } from "../../spaceship/componentSlot";
-import { getComponentValue, SerializedComponent } from "../../spaceship/serializedComponents/component";
+import { getComponentValue } from "../../spaceship/serializedComponents/component";
 import { SpaceshipInternals } from "../../spaceship/spaceshipInternals";
 import { ComponentBrowserUI } from "./componentBrowserUI";
 import { ComponentSpecUI } from "./componentSpecUI";
