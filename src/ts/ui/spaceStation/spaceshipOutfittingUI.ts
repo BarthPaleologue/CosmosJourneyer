@@ -72,6 +72,7 @@ export class SpaceshipOutfittingUI {
 
         this.currentComponentSpec = new ComponentSpecUI();
         this.currentComponentSpec.root.style.flexGrow = "1";
+        this.currentComponentSpec.root.style.flex = "1";
         this.rightPanel.appendChild(this.currentComponentSpec.root);
 
         const rowContainer = document.createElement("div");
@@ -102,6 +103,7 @@ export class SpaceshipOutfittingUI {
 
         this.selectedComponentSpec = new ComponentSpecUI();
         this.selectedComponentSpec.root.style.flexGrow = "1";
+        this.selectedComponentSpec.root.style.flex = "1";
         this.rightPanel.appendChild(this.selectedComponentSpec.root);
 
         this.buyButton = document.createElement("button");
