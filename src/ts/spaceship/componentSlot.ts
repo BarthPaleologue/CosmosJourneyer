@@ -17,53 +17,52 @@
 
 import { Component } from "./components/component";
 
-type AllowedComponent<TComponentTypes extends ReadonlyArray<Component["type"]>> = Extract<
-    Component,
-    { type: TComponentTypes[number] }
->;
-
-export class ComponentSlot<TComponentTypes extends ReadonlyArray<Component["type"]>> {
+export class ComponentSlot {
     readonly maxSize: number;
 
-    readonly types: TComponentTypes;
+    readonly types: ReadonlyArray<Component["type"]>;
 
-    private component: AllowedComponent<TComponentTypes> | null = null;
+    private component: Component | null = null;
 
-    private constructor(maxSize: number, types: TComponentTypes) {
+    private constructor(maxSize: number, types: ReadonlyArray<Component["type"]>) {
         this.maxSize = maxSize;
         this.types = types;
     }
 
-    public static NewWarpDrive(maxSize: number): ComponentSlot<["warpDrive"]> {
+    public static NewWarpDrive(maxSize: number): ComponentSlot {
         return new ComponentSlot(maxSize, ["warpDrive"]);
     }
 
-    public static NewThrusters(maxSize: number): ComponentSlot<["thrusters"]> {
+    public static NewThrusters(maxSize: number): ComponentSlot {
         return new ComponentSlot(maxSize, ["thrusters"]);
     }
 
-    public static NewFuelTank(maxSize: number): ComponentSlot<["fuelTank"]> {
+    public static NewFuelTank(maxSize: number): ComponentSlot {
         return new ComponentSlot(maxSize, ["fuelTank"]);
     }
 
-    public static NewDiscoveryScanner(maxSize: number): ComponentSlot<["discoveryScanner"]> {
+    public static NewDiscoveryScanner(maxSize: number): ComponentSlot {
         return new ComponentSlot(maxSize, ["discoveryScanner"]);
     }
 
-    public static NewFuelScoop(maxSize: number): ComponentSlot<["fuelScoop"]> {
+    public static NewFuelScoop(maxSize: number): ComponentSlot {
         return new ComponentSlot(maxSize, ["fuelScoop"]);
     }
 
-    public static NewOptional(maxSize: number): OptionalComponentSlot {
+    public static NewOptional(maxSize: number): ComponentSlot {
         return new ComponentSlot(maxSize, ["fuelTank", "discoveryScanner", "fuelScoop"]);
     }
 
-    public getComponent(): AllowedComponent<TComponentTypes> | null {
+    public getComponent(): Component | null {
         return this.component;
     }
 
-    public setComponent(component: AllowedComponent<TComponentTypes> | null): boolean {
-        if (component !== null && (!this.types.includes(component.type) || component.size > this.maxSize)) {
+    public setComponent(component: Component | null): boolean {
+        if (component !== null && !this.types.includes(component.type)) {
+            return false;
+        }
+
+        if (component !== null && component.size > this.maxSize) {
             return false;
         }
 
@@ -71,5 +70,3 @@ export class ComponentSlot<TComponentTypes extends ReadonlyArray<Component["type
         return true;
     }
 }
-
-export type OptionalComponentSlot = ComponentSlot<["fuelTank", "discoveryScanner", "fuelScoop"]>;

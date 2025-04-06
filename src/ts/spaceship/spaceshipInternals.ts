@@ -21,20 +21,21 @@ import { FuelTank } from "./components/fuelTank";
 import { OptionalComponent } from "./components/optionalComponents";
 import { Thrusters } from "./components/thrusters";
 import { WarpDrive } from "./components/warpDrive";
-import { ComponentSlot, OptionalComponentSlot } from "./componentSlot";
+import { ComponentSlot } from "./componentSlot";
 import { SerializedComponent } from "./serializedComponents/component";
+import { SerializedOptionalComponent } from "./serializedComponents/optionalComponents";
 import { SerializedSpaceship, ShipType } from "./serializedSpaceship";
 
 export class SpaceshipInternals {
     readonly type: ShipType;
 
-    readonly primary: {
-        warpDrive: ComponentSlot<["warpDrive"]>;
-        thrusters: ComponentSlot<["thrusters"]>;
-        fuelTank: ComponentSlot<["fuelTank"]>;
-    };
+    readonly primary: Readonly<{
+        warpDrive: ComponentSlot;
+        thrusters: ComponentSlot;
+        fuelTank: ComponentSlot;
+    }>;
 
-    readonly optionals: ReadonlyArray<OptionalComponentSlot>;
+    readonly optionals: ReadonlyArray<ComponentSlot>;
 
     constructor(serializedSpaceship: SerializedSpaceship, unfitComponents: Array<SerializedComponent>) {
         this.type = serializedSpaceship.type;
@@ -108,7 +109,7 @@ export class SpaceshipInternals {
     public getFuelTanks(): Array<FuelTank> {
         const fuelTanks: Array<FuelTank> = [];
         const mainFuelTank = this.primary.fuelTank.getComponent();
-        if (mainFuelTank !== null) {
+        if (mainFuelTank !== null && mainFuelTank.type === "fuelTank") {
             fuelTanks.push(mainFuelTank);
         }
         fuelTanks.push(
@@ -137,29 +138,45 @@ export class SpaceshipInternals {
     }
 
     public getWarpDrive(): WarpDrive | null {
-        return this.primary.warpDrive.getComponent();
+        const warpDrive = this.primary.warpDrive.getComponent();
+        if (warpDrive === null || warpDrive.type !== "warpDrive") {
+            return null;
+        }
+
+        return warpDrive;
     }
 
     public getThrusters(): Thrusters | null {
-        return this.primary.thrusters.getComponent();
+        const thrusters = this.primary.thrusters.getComponent();
+        if (thrusters === null || thrusters.type !== "thrusters") {
+            return null;
+        }
+
+        return thrusters;
     }
 
     public serialize(): SerializedSpaceship["components"] {
         const primaryComponents = {
             warpDrive: this.getWarpDrive()?.serialize() ?? null,
-            fuelTank: this.primary.fuelTank?.getComponent()?.serialize() ?? null,
+            fuelTank: this.getFuelTanks()?.at(0)?.serialize() ?? null,
             thrusters: this.getThrusters()?.serialize() ?? null
         };
+
+        const optionals: ReadonlyArray<SerializedOptionalComponent | null> = this.optionals
+            .map((componentSlot) => componentSlot.getComponent()?.serialize() ?? null)
+            .filter(
+                (component) =>
+                    component === null ||
+                    component?.type === "discoveryScanner" ||
+                    component?.type === "fuelTank" ||
+                    component?.type === "fuelScoop"
+            );
 
         switch (this.type) {
             case ShipType.WANDERER:
                 return {
                     primary: primaryComponents,
-                    optional: [
-                        this.optionals[0]?.getComponent()?.serialize() ?? null,
-                        this.optionals[1]?.getComponent()?.serialize() ?? null,
-                        this.optionals[2]?.getComponent()?.serialize() ?? null
-                    ]
+                    optional: [optionals[0], optionals[1], optionals[2]]
                 };
         }
     }

@@ -121,13 +121,13 @@ export class SpaceshipOutfittingUI {
         primaryH2.innerText = i18n.t("spaceStation:primarySlots");
         this.componentList.appendChild(primaryH2);
 
-        const warpDriveSlot = this.createComponentSlotUI(shipInternals.primary.warpDrive);
+        const warpDriveSlot = this.createComponentSlotUI(shipInternals.primary.warpDrive, player);
         this.componentList.appendChild(warpDriveSlot);
 
-        const thrustersSlot = this.createComponentSlotUI(shipInternals.primary.thrusters);
+        const thrustersSlot = this.createComponentSlotUI(shipInternals.primary.thrusters, player);
         this.componentList.appendChild(thrustersSlot);
 
-        const fuelTankSlot = this.createComponentSlotUI(shipInternals.primary.fuelTank);
+        const fuelTankSlot = this.createComponentSlotUI(shipInternals.primary.fuelTank, player);
         this.componentList.appendChild(fuelTankSlot);
 
         const optionalH2 = document.createElement("h2");
@@ -135,19 +135,17 @@ export class SpaceshipOutfittingUI {
         this.componentList.appendChild(optionalH2);
 
         for (const componentSlot of shipInternals.optionals) {
-            const componentSlotUI = this.createComponentSlotUI(componentSlot);
+            const componentSlotUI = this.createComponentSlotUI(componentSlot, player);
             this.componentList.appendChild(componentSlotUI);
         }
     }
 
-    private createComponentSlotUI<T extends ReadonlyArray<Component["type"]>>(
-        componentSlot: ComponentSlot<T>
-    ): HTMLElement {
+    private createComponentSlotUI(componentSlot: ComponentSlot, player: Player): HTMLElement {
         const slotUI = document.createElement("button");
         slotUI.textContent = componentSlot.getComponent()?.type ?? "empty slot";
         slotUI.classList.add("componentSlot");
         slotUI.addEventListener("click", () => {
-            this.handleClickOnComponent(componentSlot);
+            this.handleClickOnSlot(componentSlot, player);
 
             if (this.activeSlotDiv !== null) {
                 this.activeSlotDiv.classList.remove("active");
@@ -166,7 +164,7 @@ export class SpaceshipOutfittingUI {
         return slotUI;
     }
 
-    private handleClickOnComponent<T extends ReadonlyArray<Component["type"]>>(componentSlot: ComponentSlot<T>) {
+    private handleClickOnSlot(componentSlot: ComponentSlot, player: Player) {
         this.currentComponentSpec.displayComponent(componentSlot.getComponent()?.serialize() ?? null);
     }
 }
