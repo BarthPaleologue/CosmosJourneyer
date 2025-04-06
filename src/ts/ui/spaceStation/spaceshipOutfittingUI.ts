@@ -34,6 +34,8 @@ export class SpaceshipOutfittingUI {
 
     private readonly currentComponentSpec: ComponentSpecUI;
 
+    private readonly unEquipButton: HTMLButtonElement;
+
     private readonly sellButton: HTMLButtonElement;
 
     private readonly selectedComponentSpec: ComponentSpecUI;
@@ -41,6 +43,12 @@ export class SpaceshipOutfittingUI {
     private readonly buyButton: HTMLButtonElement;
 
     private activeSlotDiv: HTMLElement | null = null;
+
+    private handleBuyButtonClick: () => void = () => {};
+
+    private handleSellButtonClick: () => void = () => {};
+
+    private handleUnequipButtonClick: () => void = () => {};
 
     constructor() {
         this.root = document.createElement("div");
@@ -65,10 +73,31 @@ export class SpaceshipOutfittingUI {
         this.currentComponentSpec.root.style.flexGrow = "1";
         this.rightPanel.appendChild(this.currentComponentSpec.root);
 
+        const rowContainer = document.createElement("div");
+        rowContainer.style.display = "flex";
+        rowContainer.style.flexDirection = "row";
+        rowContainer.style.columnGap = "10px";
+        rowContainer.style.padding = "0px";
+        rowContainer.style.background = "transparent";
+        this.rightPanel.appendChild(rowContainer);
+
+        this.unEquipButton = document.createElement("button");
+        this.unEquipButton.className = "unEquipButton";
+        this.unEquipButton.style.flexGrow = "1";
+        this.unEquipButton.innerText = i18n.t("spaceStation:unequip");
+        this.unEquipButton.addEventListener("click", () => {
+            this.handleUnequipButtonClick();
+        });
+        rowContainer.appendChild(this.unEquipButton);
+
         this.sellButton = document.createElement("button");
         this.sellButton.className = "sellButton";
+        this.sellButton.style.flexGrow = "1";
         this.sellButton.innerText = i18n.t("spaceStation:sell");
-        this.rightPanel.appendChild(this.sellButton);
+        this.sellButton.addEventListener("click", () => {
+            this.handleSellButtonClick();
+        });
+        rowContainer.appendChild(this.sellButton);
 
         this.selectedComponentSpec = new ComponentSpecUI();
         this.selectedComponentSpec.root.style.flexGrow = "1";
@@ -77,6 +106,9 @@ export class SpaceshipOutfittingUI {
         this.buyButton = document.createElement("button");
         this.buyButton.className = "buyButton";
         this.buyButton.innerText = i18n.t("spaceStation:buy");
+        this.buyButton.addEventListener("click", () => {
+            this.handleBuyButtonClick();
+        });
         this.rightPanel.appendChild(this.buyButton);
     }
 
