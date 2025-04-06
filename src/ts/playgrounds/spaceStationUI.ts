@@ -27,8 +27,6 @@ import { Assets } from "../assets/assets";
 import { enablePhysics } from "./utils";
 import { Spaceship } from "../spaceship/spaceship";
 import { ShipControls } from "../spaceship/shipControls";
-import { SpaceStation } from "../spacestation/spaceStation";
-import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 
 export async function createSpaceStationUIScene(engine: AbstractEngine): Promise<Scene> {
     const scene = new Scene(engine);
@@ -65,26 +63,9 @@ export async function createSpaceStationUIScene(engine: AbstractEngine): Promise
     const spaceStationUI = new SpaceStationLayer(player, encyclopaedia, systemDatabase);
 
     const stationModel = systemModel.orbitalFacilities[0];
-    if (stationModel.type !== OrbitalObjectType.SPACE_STATION) {
-        throw new Error("First orbital facility is not a space station");
-    }
 
-    const spaceStation = new SpaceStation(stationModel, scene);
-
-    const landingPad = spaceStation.getAvailableLandingPads().at(0);
-    if (landingPad === undefined) {
-        throw new Error("No available landing pad");
-    }
-
-    spaceship.spawnOnPad(landingPad);
-
-    spaceStationUI.setStation(spaceStation.model, [], player);
+    spaceStationUI.setStation(stationModel, [], player);
     spaceStationUI.setVisibility(true);
-
-    scene.onBeforePhysicsObservable.add(() => {
-        const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;
-        shipControls.update(deltaSeconds);
-    });
 
     return scene;
 }

@@ -20,7 +20,7 @@ import { Player } from "../../player/player";
 import { deserializeComponent } from "../../spaceship/components/component";
 import { ComponentSlot } from "../../spaceship/componentSlot";
 import { getComponentValue } from "../../spaceship/serializedComponents/component";
-import { Spaceship } from "../../spaceship/spaceship";
+import { SpaceshipInternals } from "../../spaceship/spaceshipInternals";
 import { ComponentBrowserUI } from "./componentBrowserUI";
 import { ComponentSpecUI } from "./componentSpecUI";
 
@@ -115,10 +115,8 @@ export class SpaceshipOutfittingUI {
         this.rightPanel.appendChild(this.buyButton);
     }
 
-    generate(spaceship: Spaceship, player: Player) {
+    generate(shipInternals: SpaceshipInternals, player: Player) {
         this.componentList.innerHTML = "";
-
-        const shipInternals = spaceship.getInternals();
 
         const primaryH2 = document.createElement("h2");
         primaryH2.innerText = i18n.t("spaceStation:primarySlots");
