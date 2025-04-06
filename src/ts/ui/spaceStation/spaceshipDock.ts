@@ -84,7 +84,7 @@ export class SpaceshipDockUI {
                 }
 
                 outfittingButton.classList.add("active");
-                this.spaceshipOutfittingUI.generate(currentSpaceship, player);
+                this.spaceshipOutfittingUI.generate(currentSpaceship.getInternals(), player);
                 this.currentSpaceshipContainer.appendChild(this.spaceshipOutfittingUI.root);
             });
 
