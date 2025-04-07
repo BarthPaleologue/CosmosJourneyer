@@ -352,7 +352,12 @@ export class StarMapUI {
 
         if (currentSystemCoordinates !== null) {
             const currentPosition = this.starSystemDatabase.getSystemGalacticPosition(currentSystemCoordinates);
-            this.shortHandUIDistanceFromCurrent.textContent = `${i18n.t("starMap:distanceFromCurrent")}: ${Vector3.Distance(currentPosition, targetPosition).toFixed(1)} ${i18n.t("units:ly")}`;
+            this.shortHandUIDistanceFromCurrent.textContent = `${i18n.t("starMap:distanceFromCurrent")}: ${i18n.t(
+                "units:shortLy",
+                {
+                    count: Number(Vector3.Distance(currentPosition, targetPosition).toFixed(1))
+                }
+            )}`;
         }
 
         //TODO: when implementing binary star systems, this will need to be updated to display all stellar objects and not just the first one
@@ -373,7 +378,9 @@ export class StarMapUI {
 
         this.nbPlanets.textContent = `${i18n.t("starMap:planets")}: ${targetSystemModel.planets.length}`;
 
-        this.distanceToSol.textContent = `${i18n.t("starMap:distanceToSol")}: ${Vector3.Distance(targetPosition, Vector3.Zero()).toFixed(1)} ${i18n.t("units:ly")}`;
+        this.distanceToSol.textContent = `${i18n.t("starMap:distanceToSol")}: ${i18n.t("units:shortLy", {
+            count: Number(Vector3.Distance(targetPosition, Vector3.Zero()).toFixed(1))
+        })}`;
 
         if (this.starSystemDatabase.isSystemInHumanBubble(targetSystemModel.coordinates)) {
             const spaceStations = targetSystemModel.orbitalFacilities;
