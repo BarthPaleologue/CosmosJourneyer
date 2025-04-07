@@ -76,7 +76,7 @@ export class SpaceStationLayer {
 
     readonly explorationCenterPanel: ExplorationCenterPanel;
 
-    readonly spaceshipDockPanel: SpaceshipDockUI = new SpaceshipDockUI();
+    readonly spaceshipDockPanel: SpaceshipDockUI;
 
     readonly onTakeOffObservable = new Observable<void>();
 
@@ -276,6 +276,8 @@ export class SpaceStationLayer {
             Sounds.MENU_SELECT_SOUND.play();
             this.onTakeOffObservable.notifyObservers();
         });
+
+        this.spaceshipDockPanel = new SpaceshipDockUI(player);
     }
 
     private async setMainPanelState(state: MainPanelState, player: Player, starSystemDatabase: StarSystemDatabase) {

@@ -19,7 +19,7 @@ import i18n from "../../i18n";
 import { Player } from "../../player/player";
 import { deserializeComponent } from "../../spaceship/components/component";
 import { ComponentSlot } from "../../spaceship/componentSlot";
-import { getComponentValue, SerializedComponent } from "../../spaceship/serializedComponents/component";
+import { getComponentValue } from "../../spaceship/serializedComponents/component";
 import { SpaceshipInternals } from "../../spaceship/spaceshipInternals";
 import { ComponentBrowserUI } from "./componentBrowserUI";
 import { ComponentSpecUI } from "./componentSpecUI";
@@ -47,17 +47,9 @@ export class SpaceshipOutfittingUI {
 
     private activeSlotDiv: HTMLElement | null = null;
 
-    private handleBuyEquipButtonClick: () => void = () => {};
+    private activeSlot: ComponentSlot | null = null;
 
-    private handleEquipButtonClick: () => void = () => {};
-
-    private handleSellButtonClick: () => void = () => {};
-
-    private handleStoreButtonClick: () => void = () => {};
-
-    private handleSelectComponent: (component: SerializedComponent) => void = () => {};
-
-    constructor() {
+    constructor(player: Player) {
         this.root = document.createElement("div");
         this.root.className = "spaceshipOutfittingUI";
 
@@ -67,7 +59,12 @@ export class SpaceshipOutfittingUI {
 
         this.componentBrowser = new ComponentBrowserUI();
         this.componentBrowser.onComponentSelect.add((component) => {
-            this.handleSelectComponent(component);
+            this.selectedComponentSpec.displayComponent(component);
+
+            const isComponentOwned = player.spareSpaceshipComponents.has(component);
+
+            this.equipButton.disabled = !isComponentOwned;
+            this.buyEquipButton.disabled = isComponentOwned;
         });
         this.root.appendChild(this.componentBrowser.root);
 
@@ -101,7 +98,19 @@ export class SpaceshipOutfittingUI {
         this.storeButton.innerText = i18n.t("spaceStation:store");
         this.storeButton.disabled = true;
         this.storeButton.addEventListener("click", () => {
-            this.handleStoreButtonClick();
+            if (this.activeSlot === null) {
+                return;
+            }
+
+            const component = this.activeSlot.getComponent();
+            if (component === null) {
+                return;
+            }
+
+            this.activeSlot.setComponent(null);
+            player.spareSpaceshipComponents.add(component.serialize());
+
+            this.handleClickOnSlot(this.activeSlot, player);
         });
         rowContainer.appendChild(this.storeButton);
 
@@ -110,7 +119,21 @@ export class SpaceshipOutfittingUI {
         this.sellButton.innerText = i18n.t("spaceStation:sell");
         this.sellButton.disabled = true;
         this.sellButton.addEventListener("click", () => {
-            this.handleSellButtonClick();
+            if (this.activeSlot === null) {
+                return;
+            }
+
+            const component = this.activeSlot.getComponent();
+            if (component === null) {
+                return;
+            }
+
+            this.activeSlot.setComponent(null);
+
+            const componentPrice = getComponentValue(component.serialize());
+            player.earn(componentPrice);
+
+            this.handleClickOnSlot(this.activeSlot, player);
         });
         rowContainer.appendChild(this.sellButton);
 
@@ -136,7 +159,26 @@ export class SpaceshipOutfittingUI {
         this.buyEquipButton.innerText = i18n.t("spaceStation:buyEquip");
         this.buyEquipButton.disabled = true;
         this.buyEquipButton.addEventListener("click", () => {
-            this.handleBuyEquipButtonClick();
+            if (this.activeSlot === null) {
+                return;
+            }
+
+            const selectedComponent = this.componentBrowser.getSelectedComponent();
+            if (selectedComponent === null) {
+                return;
+            }
+
+            const currentComponent = this.activeSlot.getComponent();
+            if (currentComponent !== null) {
+                this.activeSlot.setComponent(null);
+                player.spareSpaceshipComponents.add(currentComponent.serialize());
+            }
+
+            const componentPrice = getComponentValue(selectedComponent);
+            player.pay(componentPrice);
+            this.activeSlot.setComponent(deserializeComponent(selectedComponent));
+
+            this.handleClickOnSlot(this.activeSlot, player);
         });
         rowContainer2.appendChild(this.buyEquipButton);
 
@@ -145,7 +187,29 @@ export class SpaceshipOutfittingUI {
         this.equipButton.innerText = i18n.t("spaceStation:equip");
         this.equipButton.disabled = true;
         this.equipButton.addEventListener("click", () => {
-            this.handleEquipButtonClick();
+            if (this.activeSlot === null) {
+                return;
+            }
+
+            const selectedComponent = this.componentBrowser.getSelectedComponent();
+            if (selectedComponent === null) {
+                return;
+            }
+
+            if (!player.spareSpaceshipComponents.has(selectedComponent)) {
+                return;
+            }
+
+            const currentComponent = this.activeSlot.getComponent();
+            if (currentComponent !== null) {
+                this.activeSlot.setComponent(null);
+                player.spareSpaceshipComponents.add(currentComponent.serialize());
+            }
+
+            this.activeSlot.setComponent(deserializeComponent(selectedComponent));
+            player.spareSpaceshipComponents.delete(selectedComponent);
+
+            this.handleClickOnSlot(this.activeSlot, player);
         });
         rowContainer2.appendChild(this.equipButton);
     }
@@ -174,15 +238,6 @@ export class SpaceshipOutfittingUI {
             const componentSlotUI = this.createComponentSlotUI(componentSlot, player);
             this.componentList.appendChild(componentSlotUI);
         }
-
-        this.handleSelectComponent = (component) => {
-            this.selectedComponentSpec.displayComponent(component);
-
-            const isComponentOwned = player.spareSpaceshipComponents.has(component);
-
-            this.equipButton.disabled = !isComponentOwned;
-            this.buyEquipButton.disabled = isComponentOwned;
-        };
     }
 
     private createComponentSlotUI(componentSlot: ComponentSlot, player: Player): HTMLElement {
@@ -212,6 +267,8 @@ export class SpaceshipOutfittingUI {
         this.buyEquipButton.disabled = true;
         this.equipButton.disabled = true;
 
+        this.activeSlot = componentSlot;
+
         if (componentSlot.types.length > 1) {
             this.componentBrowser.browseCategories(
                 componentSlot.types,
@@ -225,72 +282,5 @@ export class SpaceshipOutfittingUI {
                 player.spareSpaceshipComponents
             );
         }
-
-        this.handleSellButtonClick = () => {
-            const component = componentSlot.getComponent();
-            if (component === null) {
-                return;
-            }
-
-            componentSlot.setComponent(null);
-
-            const componentPrice = getComponentValue(component.serialize());
-            player.earn(componentPrice);
-
-            this.handleClickOnSlot(componentSlot, player);
-        };
-
-        this.handleBuyEquipButtonClick = () => {
-            const selectedComponent = this.componentBrowser.getSelectedComponent();
-            if (selectedComponent === null) {
-                return;
-            }
-
-            const currentComponent = componentSlot.getComponent();
-            if (currentComponent !== null) {
-                componentSlot.setComponent(null);
-                player.spareSpaceshipComponents.add(currentComponent.serialize());
-            }
-
-            const componentPrice = getComponentValue(selectedComponent);
-            player.pay(componentPrice);
-            componentSlot.setComponent(deserializeComponent(selectedComponent));
-
-            this.handleClickOnSlot(componentSlot, player);
-        };
-
-        this.handleStoreButtonClick = () => {
-            const component = componentSlot.getComponent();
-            if (component === null) {
-                return;
-            }
-
-            componentSlot.setComponent(null);
-            player.spareSpaceshipComponents.add(component.serialize());
-
-            this.handleClickOnSlot(componentSlot, player);
-        };
-
-        this.handleEquipButtonClick = () => {
-            const selectedComponent = this.componentBrowser.getSelectedComponent();
-            if (selectedComponent === null) {
-                return;
-            }
-
-            if (!player.spareSpaceshipComponents.has(selectedComponent)) {
-                return;
-            }
-
-            const currentComponent = componentSlot.getComponent();
-            if (currentComponent !== null) {
-                componentSlot.setComponent(null);
-                player.spareSpaceshipComponents.add(currentComponent.serialize());
-            }
-
-            componentSlot.setComponent(deserializeComponent(selectedComponent));
-            player.spareSpaceshipComponents.delete(selectedComponent);
-
-            this.handleClickOnSlot(componentSlot, player);
-        };
     }
 }

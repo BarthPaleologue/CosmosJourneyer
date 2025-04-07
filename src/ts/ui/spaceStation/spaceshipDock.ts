@@ -31,7 +31,7 @@ export class SpaceshipDockUI {
 
     private readonly spaceshipOutfittingUI: SpaceshipOutfittingUI;
 
-    constructor() {
+    constructor(player: Player) {
         this.root = document.createElement("div");
 
         const spaceshipH2 = document.createElement("h2");
@@ -49,7 +49,7 @@ export class SpaceshipDockUI {
         this.otherSpaceshipContainer = document.createElement("div");
         this.root.appendChild(this.otherSpaceshipContainer);
 
-        this.spaceshipOutfittingUI = new SpaceshipOutfittingUI();
+        this.spaceshipOutfittingUI = new SpaceshipOutfittingUI(player);
     }
 
     public generate(stationModel: DeepReadonly<OrbitalFacilityModel>, player: Player) {
