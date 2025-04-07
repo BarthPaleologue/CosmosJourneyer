@@ -92,7 +92,7 @@ export class ComponentBrowserUI {
         otherSparePartsContainer.classList.add("flex-row", "flex-wrap");
         this.root.appendChild(otherSparePartsContainer);
 
-        for (let size = 1; size <= maxComponentSize; size++) {
+        for (let size = maxComponentSize; size <= maxComponentSize; size++) {
             for (let quality = 0; quality < Settings.QUALITY_CHARS.length; quality++) {
                 const componentButton = document.createElement("button");
                 componentButton.className = "componentCategory";
