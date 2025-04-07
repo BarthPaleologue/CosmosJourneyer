@@ -17,7 +17,7 @@
 
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { Settings } from "../../settings";
-import { SerializedComponent } from "../../spaceship/serializedComponents/component";
+import { getComponentTypeI18n, SerializedComponent } from "../../spaceship/serializedComponents/component";
 
 export class ComponentBrowserUI {
     readonly root: HTMLDivElement;
@@ -57,7 +57,7 @@ export class ComponentBrowserUI {
     ) {
         this.root.innerHTML = "";
 
-        const sparePartsTitle = document.createElement("h3");
+        const sparePartsTitle = document.createElement("h2");
         sparePartsTitle.innerText = "Your spare parts";
         this.root.appendChild(sparePartsTitle);
 
@@ -77,7 +77,7 @@ export class ComponentBrowserUI {
         relevantSpareParts.forEach((sparePart) => {
             const componentButton = document.createElement("button");
             componentButton.className = "componentCategory";
-            componentButton.innerText = `${sparePart.type} ${sparePart.size}${Settings.QUALITY_CHARS.at(sparePart.quality)}`;
+            componentButton.innerText = `${getComponentTypeI18n(sparePart.type)} ${sparePart.size}${Settings.QUALITY_CHARS.at(sparePart.quality)}`;
             componentButton.addEventListener("click", () => {
                 this.select(sparePart);
             });
@@ -90,7 +90,7 @@ export class ComponentBrowserUI {
             relevantSparePartsContainer.appendChild(noSpareParts);
         }
 
-        const otherSparePartsTitle = document.createElement("h3");
+        const otherSparePartsTitle = document.createElement("h2");
         otherSparePartsTitle.innerText = "Available spare parts";
         this.root.appendChild(otherSparePartsTitle);
 
@@ -103,7 +103,7 @@ export class ComponentBrowserUI {
                 const componentButton = document.createElement("button");
                 componentButton.className = "componentCategory";
                 componentButton.style.flex = "1";
-                componentButton.innerText = `${componentType} ${size}${Settings.QUALITY_CHARS.at(quality)}`;
+                componentButton.innerText = `${getComponentTypeI18n(componentType)} ${size}${Settings.QUALITY_CHARS.at(quality)}`;
                 componentButton.addEventListener("click", () => {
                     switch (componentType) {
                         case "warpDrive":
@@ -142,7 +142,7 @@ export class ComponentBrowserUI {
     ): HTMLElement {
         const categoryButton = document.createElement("button");
         categoryButton.className = "componentCategory";
-        categoryButton.innerText = type;
+        categoryButton.innerText = getComponentTypeI18n(type);
         categoryButton.addEventListener("click", () => {
             this.browse(type, maxComponentSize, spareParts);
         });

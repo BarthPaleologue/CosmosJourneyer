@@ -15,8 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import i18n from "../../i18n";
 import { Settings } from "../../settings";
-import { getComponentValue, SerializedComponent } from "../../spaceship/serializedComponents/component";
+import {
+    getComponentTypeI18n,
+    getComponentValue,
+    SerializedComponent
+} from "../../spaceship/serializedComponents/component";
 import {
     getDiscoveryScannerSpec,
     SerializedDiscoveryScanner
@@ -46,7 +51,7 @@ export class ComponentSpecUI {
 
         const componentName = document.createElement("h3");
         const qualityString = Settings.QUALITY_CHARS.at(serializedComponent.quality) ?? "[ERROR]";
-        componentName.textContent = `${serializedComponent.type} ${serializedComponent.size}${qualityString}`;
+        componentName.textContent = `${getComponentTypeI18n(serializedComponent.type)} ${serializedComponent.size}${qualityString}`;
         this.root.appendChild(componentName);
 
         const componentValue = document.createElement("p");
@@ -77,7 +82,7 @@ export class ComponentSpecUI {
         const container = document.createElement("div");
 
         const range = document.createElement("p");
-        range.innerText = `Range: ${spec.rangeLy} LY`;
+        range.innerText = `Range: ${i18n.t("units:shortLy", { count: spec.rangeLy })}`;
         container.appendChild(range);
 
         return container;

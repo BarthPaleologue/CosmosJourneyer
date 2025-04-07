@@ -21,6 +21,7 @@ import { SerializedFuelScoopSchema } from "./fuelScoop";
 import { SerializedFuelTankSchema } from "./fuelTank";
 import { SerializedThrustersSchema } from "./thrusters";
 import { SerializedWarpDriveSchema } from "./warpDrive";
+import i18n from "../../i18n";
 
 export const SerializedComponentSchema = z.discriminatedUnion("type", [
     SerializedWarpDriveSchema,
@@ -44,5 +45,20 @@ export function getComponentValue(serializedComponent: SerializedComponent): num
             return 8_000 * (serializedComponent.size + serializedComponent.quality / 10);
         case "thrusters":
             return 20_000 * (serializedComponent.size + serializedComponent.quality / 10);
+    }
+}
+
+export function getComponentTypeI18n(type: SerializedComponent["type"]): string {
+    switch (type) {
+        case "warpDrive":
+            return i18n.t("components:warpDrive");
+        case "fuelScoop":
+            return i18n.t("components:fuelScoop");
+        case "fuelTank":
+            return i18n.t("components:fuelTank");
+        case "discoveryScanner":
+            return i18n.t("components:discoveryScanner");
+        case "thrusters":
+            return i18n.t("components:thrusters");
     }
 }

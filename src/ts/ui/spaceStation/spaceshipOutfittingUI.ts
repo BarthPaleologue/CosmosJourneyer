@@ -19,7 +19,7 @@ import i18n from "../../i18n";
 import { Player } from "../../player/player";
 import { deserializeComponent } from "../../spaceship/components/component";
 import { ComponentSlot } from "../../spaceship/componentSlot";
-import { getComponentValue } from "../../spaceship/serializedComponents/component";
+import { getComponentTypeI18n, getComponentValue } from "../../spaceship/serializedComponents/component";
 import { SpaceshipInternals } from "../../spaceship/spaceshipInternals";
 import { ComponentBrowserUI } from "./componentBrowserUI";
 import { ComponentSpecUI } from "./componentSpecUI";
@@ -242,7 +242,8 @@ export class SpaceshipOutfittingUI {
 
     private createComponentSlotUI(componentSlot: ComponentSlot, player: Player): HTMLElement {
         const slotUI = document.createElement("button");
-        slotUI.textContent = componentSlot.getComponent()?.type ?? "empty slot";
+        const component = componentSlot.getComponent();
+        slotUI.textContent = component !== null ? getComponentTypeI18n(component.type) : i18n.t("components:emptySlot");
         slotUI.classList.add("componentSlot");
         slotUI.addEventListener("click", () => {
             this.handleClickOnSlot(componentSlot, player);
