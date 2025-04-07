@@ -129,7 +129,7 @@ export class Spaceship implements Transformable {
 
     private constructor(
         serializedSpaceShip: SerializedSpaceship,
-        unfitComponents: Array<SerializedComponent>,
+        unfitComponents: Set<SerializedComponent>,
         scene: Scene
     ) {
         this.id = serializedSpaceShip.id ?? crypto.randomUUID();
@@ -724,12 +724,12 @@ export class Spaceship implements Transformable {
     }
 
     public static CreateDefault(scene: Scene): Spaceship {
-        return Spaceship.Deserialize(getDefaultSerializedSpaceship(), [], scene);
+        return Spaceship.Deserialize(getDefaultSerializedSpaceship(), new Set(), scene);
     }
 
     public static Deserialize(
         serializedSpaceship: SerializedSpaceship,
-        unfitComponents: Array<SerializedComponent>,
+        unfitComponents: Set<SerializedComponent>,
         scene: Scene
     ): Spaceship {
         return new Spaceship(serializedSpaceship, unfitComponents, scene);

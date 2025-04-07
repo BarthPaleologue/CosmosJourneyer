@@ -36,7 +36,7 @@ export class ComponentBrowserUI {
     public browseCategories(
         types: ReadonlyArray<SerializedComponent["type"]>,
         maxComponentSize: number,
-        spareParts: ReadonlyArray<SerializedComponent>
+        spareParts: ReadonlySet<SerializedComponent>
     ) {
         this.root.innerHTML = "";
 
@@ -53,7 +53,7 @@ export class ComponentBrowserUI {
     public browse(
         componentType: SerializedComponent["type"],
         maxComponentSize: number,
-        spareParts: ReadonlyArray<SerializedComponent>
+        spareParts: ReadonlySet<SerializedComponent>
     ) {
         this.root.innerHTML = "";
 
@@ -65,9 +65,15 @@ export class ComponentBrowserUI {
         relevantSparePartsContainer.classList.add("flex-row", "flex-wrap");
         this.root.appendChild(relevantSparePartsContainer);
 
-        const relevantSpareParts = spareParts.filter(
-            (sparePart) => sparePart.type === componentType && sparePart.size <= maxComponentSize
-        );
+        const relevantSpareParts = new Set<SerializedComponent>();
+        for (const sparePart of spareParts) {
+            if (sparePart.type !== componentType || sparePart.size > maxComponentSize) {
+                continue;
+            }
+
+            relevantSpareParts.add(sparePart);
+        }
+
         relevantSpareParts.forEach((sparePart) => {
             const componentButton = document.createElement("button");
             componentButton.className = "componentCategory";
@@ -78,7 +84,7 @@ export class ComponentBrowserUI {
             relevantSparePartsContainer.appendChild(componentButton);
         });
 
-        if (relevantSpareParts.length === 0) {
+        if (relevantSpareParts.size === 0) {
             const noSpareParts = document.createElement("p");
             noSpareParts.innerText = "You don't have spare parts available for this slot";
             relevantSparePartsContainer.appendChild(noSpareParts);
@@ -132,7 +138,7 @@ export class ComponentBrowserUI {
     private createCategoryButton(
         type: SerializedComponent["type"],
         maxComponentSize: number,
-        spareParts: ReadonlyArray<SerializedComponent>
+        spareParts: ReadonlySet<SerializedComponent>
     ): HTMLElement {
         const categoryButton = document.createElement("button");
         categoryButton.className = "componentCategory";

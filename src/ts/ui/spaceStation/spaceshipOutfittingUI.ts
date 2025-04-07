@@ -216,7 +216,7 @@ export class SpaceshipOutfittingUI {
             const currentComponent = componentSlot.getComponent();
             if (currentComponent !== null) {
                 componentSlot.setComponent(null);
-                player.spareSpaceshipComponents.push(currentComponent.serialize());
+                player.spareSpaceshipComponents.add(currentComponent.serialize());
             }
 
             const componentPrice = getComponentValue(selectedComponent);
@@ -233,7 +233,7 @@ export class SpaceshipOutfittingUI {
             }
 
             componentSlot.setComponent(null);
-            player.spareSpaceshipComponents.push(component.serialize());
+            player.spareSpaceshipComponents.add(component.serialize());
 
             this.handleClickOnSlot(componentSlot, player);
         };

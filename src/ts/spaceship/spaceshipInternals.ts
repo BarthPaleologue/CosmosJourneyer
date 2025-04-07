@@ -37,7 +37,7 @@ export class SpaceshipInternals {
 
     readonly optionals: ReadonlyArray<ComponentSlot>;
 
-    constructor(serializedSpaceship: SerializedSpaceship, unfitComponents: Array<SerializedComponent>) {
+    constructor(serializedSpaceship: SerializedSpaceship, unfitComponents: Set<SerializedComponent>) {
         this.type = serializedSpaceship.type;
 
         const components = serializedSpaceship.components;
@@ -61,21 +61,21 @@ export class SpaceshipInternals {
         if (primary.warpDrive !== null) {
             const success = this.primary.warpDrive.setComponent(new WarpDrive(primary.warpDrive));
             if (!success) {
-                unfitComponents.push(primary.warpDrive);
+                unfitComponents.add(primary.warpDrive);
             }
         }
 
         if (primary.thrusters !== null) {
             const success = this.primary.thrusters.setComponent(new Thrusters(primary.thrusters));
             if (!success) {
-                unfitComponents.push(primary.thrusters);
+                unfitComponents.add(primary.thrusters);
             }
         }
 
         if (primary.fuelTank !== null) {
             const success = this.primary.fuelTank.setComponent(new FuelTank(primary.fuelTank));
             if (!success) {
-                unfitComponents.push(primary.fuelTank);
+                unfitComponents.add(primary.fuelTank);
             }
         }
 
@@ -101,7 +101,7 @@ export class SpaceshipInternals {
 
             const success = this.optionals[i].setComponent(component);
             if (!success) {
-                unfitComponents.push(optional);
+                unfitComponents.add(optional);
             }
         }
     }

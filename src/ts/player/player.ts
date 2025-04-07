@@ -50,7 +50,7 @@ export class Player {
     serializedSpaceships: SerializedSpaceship[] = [];
     instancedSpaceships: Spaceship[] = [];
 
-    spareSpaceshipComponents: Array<SerializedComponent> = [];
+    spareSpaceshipComponents: Set<SerializedComponent> = new Set();
 
     tutorials: CompletedTutorials;
 
@@ -160,7 +160,7 @@ export class Player {
             spaceShips: player.serializedSpaceships.concat(
                 player.instancedSpaceships.map((spaceship) => spaceship.serialize())
             ),
-            spareSpaceshipComponents: player.spareSpaceshipComponents,
+            spareSpaceshipComponents: Array.from(player.spareSpaceshipComponents),
             tutorials: player.tutorials
         };
     }
@@ -192,7 +192,7 @@ export class Player {
         this.completedMissions = player.completedMissions.map((mission) => Mission.Deserialize(mission.serialize()));
         this.serializedSpaceships = player.serializedSpaceships.map((spaceship) => structuredClone(spaceship));
         this.instancedSpaceships = [...player.instancedSpaceships];
-        this.spareSpaceshipComponents = player.spareSpaceshipComponents.map((sparePart) => structuredClone(sparePart));
+        this.spareSpaceshipComponents = structuredClone(player.spareSpaceshipComponents);
         this.tutorials = structuredClone(player.tutorials);
     }
 
