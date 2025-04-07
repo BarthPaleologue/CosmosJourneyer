@@ -33,7 +33,7 @@ export class SpaceshipOutfittingUI {
 
     private readonly rightPanel: HTMLDivElement;
 
-    private readonly currentComponentSpec: ComponentSpecUI;
+    private readonly equippedComponentSpec: ComponentSpecUI;
 
     private readonly storeButton: HTMLButtonElement;
 
@@ -76,14 +76,14 @@ export class SpaceshipOutfittingUI {
         this.rightPanel.style.rowGap = "10px";
         this.root.appendChild(this.rightPanel);
 
-        const currentComponentTitle = document.createElement("h3");
-        currentComponentTitle.innerText = "Equipped";
-        this.rightPanel.appendChild(currentComponentTitle);
+        const equippedComponentTitle = document.createElement("h3");
+        equippedComponentTitle.innerText = i18n.t("spaceStation:equippedComponent");
+        this.rightPanel.appendChild(equippedComponentTitle);
 
-        this.currentComponentSpec = new ComponentSpecUI();
-        this.currentComponentSpec.root.style.flexGrow = "1";
-        this.currentComponentSpec.root.style.flex = "1";
-        this.rightPanel.appendChild(this.currentComponentSpec.root);
+        this.equippedComponentSpec = new ComponentSpecUI();
+        this.equippedComponentSpec.root.style.flexGrow = "1";
+        this.equippedComponentSpec.root.style.flex = "1";
+        this.rightPanel.appendChild(this.equippedComponentSpec.root);
 
         const rowContainer = document.createElement("div");
         rowContainer.style.display = "flex";
@@ -95,7 +95,7 @@ export class SpaceshipOutfittingUI {
 
         this.storeButton = document.createElement("button");
         this.storeButton.style.flexGrow = "1";
-        this.storeButton.innerText = i18n.t("spaceStation:store");
+        this.storeButton.innerText = i18n.t("spaceStation:storeButton");
         this.storeButton.disabled = true;
         this.storeButton.addEventListener("click", () => {
             if (this.activeSlot === null) {
@@ -116,7 +116,7 @@ export class SpaceshipOutfittingUI {
 
         this.sellButton = document.createElement("button");
         this.sellButton.style.flexGrow = "1";
-        this.sellButton.innerText = i18n.t("spaceStation:sell");
+        this.sellButton.innerText = i18n.t("spaceStation:sellButton");
         this.sellButton.disabled = true;
         this.sellButton.addEventListener("click", () => {
             if (this.activeSlot === null) {
@@ -138,7 +138,7 @@ export class SpaceshipOutfittingUI {
         rowContainer.appendChild(this.sellButton);
 
         const selectedComponentTitle = document.createElement("h3");
-        selectedComponentTitle.innerText = "Selected";
+        selectedComponentTitle.innerText = i18n.t("spaceStation:selectedComponent");
         this.rightPanel.appendChild(selectedComponentTitle);
 
         this.selectedComponentSpec = new ComponentSpecUI();
@@ -156,7 +156,7 @@ export class SpaceshipOutfittingUI {
 
         this.buyEquipButton = document.createElement("button");
         this.buyEquipButton.style.flexGrow = "1";
-        this.buyEquipButton.innerText = i18n.t("spaceStation:buyEquip");
+        this.buyEquipButton.innerText = i18n.t("spaceStation:buyEquipButton");
         this.buyEquipButton.disabled = true;
         this.buyEquipButton.addEventListener("click", () => {
             if (this.activeSlot === null) {
@@ -184,7 +184,7 @@ export class SpaceshipOutfittingUI {
 
         this.equipButton = document.createElement("button");
         this.equipButton.style.flexGrow = "1";
-        this.equipButton.innerText = i18n.t("spaceStation:equip");
+        this.equipButton.innerText = i18n.t("spaceStation:equipButton");
         this.equipButton.disabled = true;
         this.equipButton.addEventListener("click", () => {
             if (this.activeSlot === null) {
@@ -259,7 +259,7 @@ export class SpaceshipOutfittingUI {
     }
 
     private handleClickOnSlot(componentSlot: ComponentSlot, player: Player) {
-        this.currentComponentSpec.displayComponent(componentSlot.getComponent()?.serialize() ?? null);
+        this.equippedComponentSpec.displayComponent(componentSlot.getComponent()?.serialize() ?? null);
         this.storeButton.disabled = componentSlot.getComponent() === null;
         this.sellButton.disabled = componentSlot.getComponent() === null;
 

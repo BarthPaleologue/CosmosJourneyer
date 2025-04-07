@@ -18,5 +18,11 @@
     "noOtherSpaceship": "No other spaceship",
     "cmdrNameChangePrompt": "How do you want to be called Commander?",
     "primarySlots": "Primary",
-    "optionalSlots": "Optionals"
+    "optionalSlots": "Optionals",
+    "equippedComponent": "Equipped",
+    "storeButton": "Store",
+    "sellButton": "Sell",
+    "selectedComponent": "Selected",
+    "buyEquipButton": "Buy & Equip",
+    "equipButton": "Equip"
 }

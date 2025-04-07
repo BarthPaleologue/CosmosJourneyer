@@ -18,5 +18,11 @@
     "noOtherSpaceship": "Aucun autre vaisseau",
     "cmdrNameChangePrompt": "Comment souhaitez-vous être appelé Commandant ?",
     "primarySlots": "Primordiaux",
-    "optionalSlots": "Optionnels"
+    "optionalSlots": "Optionnels",
+    "equippedComponent": "Équipé",
+    "storeButton": "Stocker",
+    "sellButton": "Vendre",
+    "selectedComponent": "Sélectionné",
+    "buyEquipButton": "Acheter & Équiper",
+    "equipButton": "Équiper"
 }
