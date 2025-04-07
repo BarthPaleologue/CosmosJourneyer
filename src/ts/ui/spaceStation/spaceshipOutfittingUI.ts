@@ -166,20 +166,6 @@ export class SpaceshipOutfittingUI {
 
             this.activeSlotDiv = slotUI;
             slotUI.classList.add("active");
-
-            if (componentSlot.types.length > 1) {
-                this.componentBrowser.browseCategories(
-                    componentSlot.types,
-                    componentSlot.maxSize,
-                    player.spareSpaceshipComponents
-                );
-            } else {
-                this.componentBrowser.browse(
-                    componentSlot.types[0],
-                    componentSlot.maxSize,
-                    player.spareSpaceshipComponents
-                );
-            }
         });
 
         return slotUI;
@@ -192,6 +178,20 @@ export class SpaceshipOutfittingUI {
 
         this.selectedComponentSpec.displayComponent(null);
         this.buyReplaceButton.disabled = true;
+
+        if (componentSlot.types.length > 1) {
+            this.componentBrowser.browseCategories(
+                componentSlot.types,
+                componentSlot.maxSize,
+                player.spareSpaceshipComponents
+            );
+        } else {
+            this.componentBrowser.browse(
+                componentSlot.types[0],
+                componentSlot.maxSize,
+                player.spareSpaceshipComponents
+            );
+        }
 
         this.handleSellButtonClick = () => {
             const component = componentSlot.getComponent();
