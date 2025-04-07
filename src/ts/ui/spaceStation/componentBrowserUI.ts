@@ -71,7 +71,7 @@ export class ComponentBrowserUI {
         relevantSpareParts.forEach((sparePart) => {
             const componentButton = document.createElement("button");
             componentButton.className = "componentCategory";
-            componentButton.innerText = `${sparePart.type} ${sparePart.size}`;
+            componentButton.innerText = `${sparePart.type} ${sparePart.size}${Settings.QUALITY_CHARS.at(sparePart.quality)}`;
             componentButton.addEventListener("click", () => {
                 this.select(sparePart);
             });
