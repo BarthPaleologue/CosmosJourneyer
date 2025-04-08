@@ -24,5 +24,9 @@
     "sellButton": "Sell",
     "selectedComponent": "Selected",
     "buyEquipButton": "Buy & Equip",
-    "equipButton": "Equip"
+    "equipButton": "Equip",
+    "yourSpareParts": "Your spare parts",
+    "availableSpareParts": "Available spare parts",
+    "noComponentSlotSelected": "No component slot selected",
+    "noOwnedSparePartsForSlot": "You don't own compatible spare parts for this slot"
 }

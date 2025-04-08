@@ -18,9 +18,12 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { Settings } from "../../settings";
 import { getComponentTypeI18n, SerializedComponent } from "../../spaceship/serializedComponents/component";
+import i18n from "../../i18n";
 
 export class ComponentBrowserUI {
     readonly root: HTMLDivElement;
+
+    private placeHolderText: HTMLElement;
 
     private selectedComponent: SerializedComponent | null = null;
 
@@ -30,7 +33,15 @@ export class ComponentBrowserUI {
         this.root = document.createElement("div");
         this.root.classList.add("componentBrowserUI", "flex-column");
         this.root.style.rowGap = "10px";
-        this.root.innerText = "no component selected";
+
+        this.placeHolderText = document.createElement("p");
+        this.placeHolderText.innerText = i18n.t("spaceStation:noComponentSlotSelected");
+        this.placeHolderText.style.flexGrow = "1";
+        this.placeHolderText.style.justifyContent = "center";
+        this.placeHolderText.style.textAlign = "center";
+        this.placeHolderText.style.display = "flex";
+        this.placeHolderText.style.alignItems = "center";
+        this.root.appendChild(this.placeHolderText);
     }
 
     public browseCategories(
@@ -58,7 +69,7 @@ export class ComponentBrowserUI {
         this.root.innerHTML = "";
 
         const sparePartsTitle = document.createElement("h2");
-        sparePartsTitle.innerText = "Your spare parts";
+        sparePartsTitle.innerText = i18n.t("spaceStation:yourSpareParts");
         this.root.appendChild(sparePartsTitle);
 
         const relevantSparePartsContainer = document.createElement("div");
@@ -86,12 +97,12 @@ export class ComponentBrowserUI {
 
         if (relevantSpareParts.size === 0) {
             const noSpareParts = document.createElement("p");
-            noSpareParts.innerText = "You don't have spare parts available for this slot";
+            noSpareParts.innerText = i18n.t("spaceStation:noOwnedSparePartsForSlot");
             relevantSparePartsContainer.appendChild(noSpareParts);
         }
 
         const otherSparePartsTitle = document.createElement("h2");
-        otherSparePartsTitle.innerText = "Available spare parts";
+        otherSparePartsTitle.innerText = i18n.t("spaceStation:availableSpareParts");
         this.root.appendChild(otherSparePartsTitle);
 
         const otherSparePartsContainer = document.createElement("div");
