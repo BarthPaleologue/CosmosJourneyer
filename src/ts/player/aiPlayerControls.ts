@@ -33,7 +33,7 @@ export class AiPlayerControls {
             throw new Error("No spaceship serialized for AI player");
         }
 
-        const spaceship = Spaceship.Deserialize(spaceshipSerialized, scene);
+        const spaceship = Spaceship.Deserialize(spaceshipSerialized, this.player.spareSpaceshipComponents, scene);
 
         this.spaceshipControls = new AiSpaceshipControls(spaceship, scene);
     }

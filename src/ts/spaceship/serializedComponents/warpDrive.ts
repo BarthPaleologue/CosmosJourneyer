@@ -26,13 +26,9 @@ export const SerializedWarpDriveSchema = z.object({
 
 export type SerializedWarpDrive = z.infer<typeof SerializedWarpDriveSchema>;
 
-export function getWarpDriveSlot(size: number) {
-    return SerializedWarpDriveSchema.refine((drive) => drive.size === size).nullable();
-}
-
 export function getWarpDriveSpec(warpDrive: SerializedWarpDrive) {
     return {
         maxSpeed: 5 * Settings.C * (warpDrive.size + warpDrive.quality / 10),
-        rangeLy: 6 * (warpDrive.size + warpDrive.quality / 10)
+        rangeLy: 6 * (warpDrive.size + warpDrive.quality / 5)
     };
 }

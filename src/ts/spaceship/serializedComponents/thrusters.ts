@@ -25,10 +25,6 @@ export const SerializedThrustersSchema = z.object({
 
 export type SerializedThrusters = z.infer<typeof SerializedThrustersSchema>;
 
-export function getThrustersSlot(size: number) {
-    return SerializedThrustersSchema.refine((thrusters) => thrusters.size === size).nullable();
-}
-
 export function getThrustersSpec(serializedThrusters: SerializedThrusters) {
     return {
         maxSpeed: 1e3 * (1.0 + serializedThrusters.size / 7.0 + serializedThrusters.quality / 20.0)

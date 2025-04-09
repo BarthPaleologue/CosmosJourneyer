@@ -20,7 +20,6 @@ import { generateInfoHTML } from "./spaceStationInfos";
 import { Player } from "../../player/player";
 import { generateMissionsDom } from "./spaceStationMissions";
 import { Settings } from "../../settings";
-import { generateSpaceshipDom } from "./spaceshipDock";
 import { alertModal, promptModalString } from "../../utils/dialogModal";
 import i18n from "../../i18n";
 import { Sounds } from "../../assets/sounds";
@@ -29,6 +28,15 @@ import { EncyclopaediaGalacticaManager } from "../../society/encyclopaediaGalact
 import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
 import { OrbitalFacilityModel, OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
 import { DeepReadonly } from "../../utils/types";
+
+import editIcon from "../../../asset/icons/edit.webp";
+import missionsIcon from "../../../asset/icons/space-exploration.webp";
+import shipHangarIcon from "../../../asset/icons/spaceship_gear.webp";
+import explorationIcon from "../../../asset/icons/telescope.webp";
+import tradingIcon from "../../../asset/icons/trade.webp";
+import infoIcon from "../../../asset/icons/space-station.webp";
+import liftOffIcon from "../../../asset/icons/launch.webp";
+import { SpaceshipDockUI } from "./spaceshipDock";
 
 const enum MainPanelState {
     NONE,
@@ -39,33 +47,36 @@ const enum MainPanelState {
 }
 
 export class SpaceStationLayer {
-    private parentNode: HTMLElement;
+    readonly rootHtml: HTMLElement;
 
-    private currentStation: DeepReadonly<OrbitalFacilityModel> | null = null;
-    private currentStationParents: DeepReadonly<Array<OrbitalObjectModel>> = [];
+    private readonly header: HTMLElement;
+    private readonly headerWelcome: HTMLElement;
+    private readonly headerStationName: HTMLElement;
 
-    private readonly spaceStationName: HTMLElement;
-
+    private readonly playerInfoContainer: HTMLElement;
+    private readonly playerNameContainer: HTMLElement;
     private readonly playerName: HTMLElement;
     private readonly editPlayerNameButton: HTMLElement;
-
     private readonly playerBalance: HTMLElement;
 
     private readonly mainPanel: HTMLElement;
 
+    private readonly actionsContainer: HTMLElement;
     private readonly missionsButton: HTMLElement;
-
+    private readonly spaceshipHangarButton: HTMLElement;
+    private readonly tradingButton: HTMLElement;
     private readonly explorationCenterButton: HTMLElement;
-
-    private readonly spaceshipButton: HTMLElement;
-
     private readonly infoButton: HTMLElement;
-
     private readonly takeOffButton: HTMLElement;
+
+    private currentStation: DeepReadonly<OrbitalFacilityModel> | null = null;
+    private currentStationParents: DeepReadonly<Array<OrbitalObjectModel>> = [];
 
     private mainPanelState: MainPanelState = MainPanelState.NONE;
 
     readonly explorationCenterPanel: ExplorationCenterPanel;
+
+    readonly spaceshipDockPanel: SpaceshipDockUI;
 
     readonly onTakeOffObservable = new Observable<void>();
 
@@ -78,17 +89,36 @@ export class SpaceStationLayer {
             this.updatePlayerName(name);
         });
 
-        this.parentNode = document.getElementById("spaceStationUI") as HTMLElement;
+        this.rootHtml = document.createElement("div");
+        this.rootHtml.setAttribute("id", "spaceStationUI");
+        document.body.appendChild(this.rootHtml);
 
-        this.explorationCenterPanel = new ExplorationCenterPanel(encyclopaedia, player, starSystemDatabase);
+        this.header = document.createElement("header");
+        this.header.setAttribute("class", "spaceStationHeader");
+        this.rootHtml.appendChild(this.header);
 
-        this.spaceStationName = document.querySelector<HTMLElement>("#spaceStationUI .spaceStationName") as HTMLElement;
+        this.headerWelcome = document.createElement("p");
+        this.headerWelcome.setAttribute("class", "welcomeTo");
+        this.headerWelcome.textContent = i18n.t("spaceStation:welcomeTo");
+        this.header.appendChild(this.headerWelcome);
 
-        this.playerName = document.querySelector<HTMLElement>("#spaceStationUI .playerName h2") as HTMLElement;
+        this.headerStationName = document.createElement("p");
+        this.headerStationName.setAttribute("class", "spaceStationName");
+        this.header.appendChild(this.headerStationName);
 
-        this.editPlayerNameButton = document.querySelector<HTMLElement>(
-            "#spaceStationUI .playerName button"
-        ) as HTMLElement;
+        this.playerInfoContainer = document.createElement("div");
+        this.playerInfoContainer.setAttribute("class", "playerInfo");
+        this.rootHtml.appendChild(this.playerInfoContainer);
+
+        this.playerNameContainer = document.createElement("div");
+        this.playerNameContainer.setAttribute("class", "playerName");
+        this.playerInfoContainer.appendChild(this.playerNameContainer);
+
+        this.playerName = document.createElement("h2");
+        this.playerNameContainer.appendChild(this.playerName);
+
+        this.editPlayerNameButton = document.createElement("button");
+        this.editPlayerNameButton.setAttribute("class", "icon");
         this.editPlayerNameButton.addEventListener("click", async () => {
             Sounds.MENU_SELECT_SOUND.play();
             const newName = await promptModalString(i18n.t("spaceStation:cmdrNameChangePrompt"), player.getName());
@@ -96,61 +126,158 @@ export class SpaceStationLayer {
             player.setName(newName);
         });
 
-        this.playerBalance = document.querySelector<HTMLElement>("#spaceStationUI .playerBalance") as HTMLElement;
+        this.playerNameContainer.appendChild(this.editPlayerNameButton);
 
-        this.mainPanel = document.querySelector<HTMLElement>("#spaceStationUI .mainContainer") as HTMLElement;
+        const editPlayerNameButtonIcon = document.createElement("img");
+        editPlayerNameButtonIcon.setAttribute("src", editIcon);
+        this.editPlayerNameButton.appendChild(editPlayerNameButtonIcon);
 
-        const missionsButton = document.querySelector<HTMLElement>(".spaceStationAction.missionsButton");
-        if (missionsButton === null) {
-            throw new Error("Missions button not found");
-        }
-        this.missionsButton = missionsButton;
+        this.playerBalance = document.createElement("p");
+        this.playerBalance.setAttribute("class", "playerBalance");
+        this.playerInfoContainer.appendChild(this.playerBalance);
+
+        this.mainPanel = document.createElement("div");
+        this.mainPanel.setAttribute("class", "mainContainer hidden");
+        this.rootHtml.appendChild(this.mainPanel);
+
+        this.explorationCenterPanel = new ExplorationCenterPanel(encyclopaedia, player, starSystemDatabase);
+
+        this.actionsContainer = document.createElement("div");
+        this.actionsContainer.setAttribute("class", "spaceStationActions");
+        this.rootHtml.appendChild(this.actionsContainer);
+
+        this.missionsButton = document.createElement("div");
+        this.missionsButton.setAttribute("class", "spaceStationAction missionsButton");
+        this.actionsContainer.appendChild(this.missionsButton);
+
+        const missionButtonIcon = document.createElement("img");
+        missionButtonIcon.setAttribute("src", missionsIcon);
+        missionButtonIcon.setAttribute("alt", "Mission icon");
+        this.missionsButton.appendChild(missionButtonIcon);
+
+        const missionButtonTitle = document.createElement("h2");
+        missionButtonTitle.textContent = i18n.t("spaceStation:missions");
+        this.missionsButton.appendChild(missionButtonTitle);
+
+        const missionButtonDescription = document.createElement("p");
+        missionButtonDescription.textContent = i18n.t("spaceStation:missionsDescription");
+        this.missionsButton.appendChild(missionButtonDescription);
+
+        this.spaceshipHangarButton = document.createElement("div");
+        this.spaceshipHangarButton.setAttribute("class", "spaceStationAction spaceshipButton");
+        this.actionsContainer.appendChild(this.spaceshipHangarButton);
+
+        const spaceshipButtonIcon = document.createElement("img");
+        spaceshipButtonIcon.setAttribute("src", shipHangarIcon);
+        spaceshipButtonIcon.setAttribute("alt", "Spaceship icon");
+        this.spaceshipHangarButton.appendChild(spaceshipButtonIcon);
+
+        const spaceshipButtonTitle = document.createElement("h2");
+        spaceshipButtonTitle.textContent = i18n.t("spaceStation:shipHangar");
+        this.spaceshipHangarButton.appendChild(spaceshipButtonTitle);
+
+        const spaceshipButtonDescription = document.createElement("p");
+        spaceshipButtonDescription.textContent = i18n.t("spaceStation:shipHangarDescription");
+        this.spaceshipHangarButton.appendChild(spaceshipButtonDescription);
+
+        this.explorationCenterButton = document.createElement("div");
+        this.explorationCenterButton.setAttribute("class", "spaceStationAction explorationCenterButton");
+        this.actionsContainer.appendChild(this.explorationCenterButton);
+
+        const explorationButtonIcon = document.createElement("img");
+        explorationButtonIcon.setAttribute("src", explorationIcon);
+        explorationButtonIcon.setAttribute("alt", "Exploration icon");
+        this.explorationCenterButton.appendChild(explorationButtonIcon);
+
+        const explorationButtonTitle = document.createElement("h2");
+        explorationButtonTitle.textContent = i18n.t("spaceStation:explorationCenter");
+        this.explorationCenterButton.appendChild(explorationButtonTitle);
+
+        const explorationButtonDescription = document.createElement("p");
+        explorationButtonDescription.textContent = i18n.t("spaceStation:explorationCenterDescription");
+        this.explorationCenterButton.appendChild(explorationButtonDescription);
+
+        this.tradingButton = document.createElement("div");
+        this.tradingButton.setAttribute("class", "spaceStationAction tradingButton disabled");
+        this.actionsContainer.appendChild(this.tradingButton);
+
+        const tradingButtonIcon = document.createElement("img");
+        tradingButtonIcon.setAttribute("src", tradingIcon);
+        tradingButtonIcon.setAttribute("alt", "Market icon");
+        this.tradingButton.appendChild(tradingButtonIcon);
+
+        const tradingButtonTitle = document.createElement("h2");
+        tradingButtonTitle.textContent = i18n.t("spaceStation:market");
+        this.tradingButton.appendChild(tradingButtonTitle);
+
+        const tradingButtonDescription = document.createElement("p");
+        tradingButtonDescription.textContent = i18n.t("spaceStation:marketDescription");
+        this.tradingButton.appendChild(tradingButtonDescription);
+
+        this.infoButton = document.createElement("div");
+        this.infoButton.setAttribute("class", "spaceStationAction infoButton");
+        this.actionsContainer.appendChild(this.infoButton);
+
+        const infoButtonIcon = document.createElement("img");
+        infoButtonIcon.setAttribute("src", infoIcon);
+        infoButtonIcon.setAttribute("alt", "Info icon");
+        this.infoButton.appendChild(infoButtonIcon);
+
+        const infoButtonTitle = document.createElement("h2");
+        infoButtonTitle.textContent = i18n.t("spaceStation:stationInformation");
+        this.infoButton.appendChild(infoButtonTitle);
+
+        const infoButtonDescription = document.createElement("p");
+        infoButtonDescription.textContent = i18n.t("spaceStation:stationInformationDescription");
+        this.infoButton.appendChild(infoButtonDescription);
+
+        const flexGrow = document.createElement("div");
+        flexGrow.setAttribute("class", "flexGrow");
+        this.actionsContainer.appendChild(flexGrow);
+
+        this.takeOffButton = document.createElement("div");
+        this.takeOffButton.setAttribute("class", "spaceStationAction takeOffButton");
+        this.actionsContainer.appendChild(this.takeOffButton);
+
+        const takeOffButtonIcon = document.createElement("img");
+        takeOffButtonIcon.setAttribute("src", liftOffIcon);
+        takeOffButtonIcon.setAttribute("alt", "Take-off icon");
+        this.takeOffButton.appendChild(takeOffButtonIcon);
+
+        const takeOffButtonTitle = document.createElement("h2");
+        takeOffButtonTitle.textContent = i18n.t("spaceStation:takeOff");
+        this.takeOffButton.appendChild(takeOffButtonTitle);
+
+        const takeOffButtonDescription = document.createElement("p");
+        takeOffButtonDescription.textContent = i18n.t("spaceStation:takeOffDescription");
+        this.takeOffButton.appendChild(takeOffButtonDescription);
+
         this.missionsButton.addEventListener("click", async () => {
             Sounds.MENU_SELECT_SOUND.play();
             await this.setMainPanelState(MainPanelState.MISSIONS, player, starSystemDatabase);
         });
 
-        const spaceshipButton = document.querySelector<HTMLElement>(".spaceStationAction.spaceshipButton");
-        if (spaceshipButton === null) {
-            throw new Error("Spaceship button not found");
-        }
-        this.spaceshipButton = spaceshipButton;
-        this.spaceshipButton.addEventListener("click", async () => {
+        this.spaceshipHangarButton.addEventListener("click", async () => {
             Sounds.MENU_SELECT_SOUND.play();
             await this.setMainPanelState(MainPanelState.SPACE_SHIP, player, starSystemDatabase);
         });
 
-        const explorationCenterButton = document.querySelector<HTMLElement>(
-            ".spaceStationAction.explorationCenterButton"
-        );
-        if (explorationCenterButton === null) {
-            throw new Error("Exploration center button not found");
-        }
-        this.explorationCenterButton = explorationCenterButton;
         this.explorationCenterButton.addEventListener("click", async () => {
             Sounds.MENU_SELECT_SOUND.play();
             await this.setMainPanelState(MainPanelState.EXPLORATION_CENTER, player, starSystemDatabase);
         });
 
-        const infoButton = document.querySelector<HTMLElement>(".spaceStationAction.infoButton");
-        if (infoButton === null) {
-            throw new Error("Info button not found");
-        }
-        this.infoButton = infoButton;
         this.infoButton.addEventListener("click", async () => {
             Sounds.MENU_SELECT_SOUND.play();
             await this.setMainPanelState(MainPanelState.INFO, player, starSystemDatabase);
         });
 
-        const takeOffButton = document.querySelector<HTMLElement>(".spaceStationAction.takeOffButton");
-        if (takeOffButton === null) {
-            throw new Error("Take off button not found");
-        }
-        this.takeOffButton = takeOffButton;
         this.takeOffButton.addEventListener("click", () => {
             Sounds.MENU_SELECT_SOUND.play();
             this.onTakeOffObservable.notifyObservers();
         });
+
+        this.spaceshipDockPanel = new SpaceshipDockUI(player);
     }
 
     private async setMainPanelState(state: MainPanelState, player: Player, starSystemDatabase: StarSystemDatabase) {
@@ -177,7 +304,8 @@ export class SpaceStationLayer {
             case MainPanelState.SPACE_SHIP:
                 this.mainPanel.classList.remove("hidden");
                 this.mainPanel.innerHTML = "";
-                this.mainPanel.appendChild(generateSpaceshipDom(this.currentStation, player));
+                this.spaceshipDockPanel.generate(this.currentStation, player);
+                this.mainPanel.appendChild(this.spaceshipDockPanel.root);
                 break;
             case MainPanelState.EXPLORATION_CENTER:
                 this.mainPanel.classList.remove("hidden");
@@ -193,12 +321,12 @@ export class SpaceStationLayer {
     }
 
     public setVisibility(visible: boolean) {
-        if (this.isVisible() === visible) return;
-        this.parentNode.style.visibility = visible ? "visible" : "hidden";
+        if (this.rootHtml.style.visibility !== "" && this.isVisible() === visible) return;
+        this.rootHtml.style.visibility = visible ? "visible" : "hidden";
     }
 
     public isVisible(): boolean {
-        return this.parentNode.style.visibility !== "hidden";
+        return this.rootHtml.style.visibility !== "hidden";
     }
 
     public setStation(
@@ -209,7 +337,7 @@ export class SpaceStationLayer {
         if (this.currentStation === station) return;
         this.currentStation = station;
         this.currentStationParents = stationParents;
-        this.spaceStationName.textContent = station.name;
+        this.headerStationName.textContent = station.name;
 
         this.updatePlayerName(player.getName());
         this.updatePlayerBalance(player.getBalance());
@@ -225,7 +353,7 @@ export class SpaceStationLayer {
 
     public reset() {
         this.currentStation = null;
-        this.spaceStationName.textContent = "";
+        this.headerStationName.textContent = "";
         this.playerName.textContent = "";
         this.playerBalance.textContent = "";
         this.mainPanel.classList.add("hidden");

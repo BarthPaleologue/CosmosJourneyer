@@ -111,7 +111,7 @@ export class ShipControls implements Controls {
 
         this.toggleWarpDriveHandler = async () => {
             const spaceship = this.getSpaceship();
-            const warpDrive = spaceship.getWarpDrive();
+            const warpDrive = spaceship.getInternals().getWarpDrive();
             if (warpDrive === null) {
                 return;
             }
@@ -163,7 +163,7 @@ export class ShipControls implements Controls {
 
         this.landingHandler = async () => {
             const spaceship = this.getSpaceship();
-            const warpDrive = spaceship.getWarpDrive();
+            const warpDrive = spaceship.getInternals().getWarpDrive();
             if (warpDrive !== null && warpDrive.isEnabled()) {
                 const keyboardLayout = await getGlobalKeyboardLayoutMap();
                 const relevantKeys = pressInteractionToStrings(
@@ -231,7 +231,7 @@ export class ShipControls implements Controls {
             const spaceship = this.getSpaceship();
             spaceship.setMainEngineThrottle(0);
 
-            const warpDrive = spaceship.getWarpDrive();
+            const warpDrive = spaceship.getInternals().getWarpDrive();
             if (warpDrive !== null) {
                 warpDrive.increaseThrottle(-warpDrive.getThrottle());
             }
@@ -293,7 +293,7 @@ export class ShipControls implements Controls {
             inputPitch *= 0;
         }
 
-        const warpDrive = spaceship.getWarpDrive();
+        const warpDrive = spaceship.getInternals().getWarpDrive();
         if (warpDrive?.isDisabled()) {
             spaceship.increaseMainEngineThrottle(deltaSeconds * SpaceShipControlsInputs.map.throttle.value);
 

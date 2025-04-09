@@ -113,6 +113,7 @@ export function migrateV1ToV2(saveV1: SaveV1, starSystemDatabase: StarSystemData
             currentMissions: [],
             completedMissions: [],
             spaceShips: [getDefaultSerializedSpaceship()],
+            spareSpaceshipComponents: [],
             tutorials: saveV1.player.tutorials
         },
         playerLocation: {

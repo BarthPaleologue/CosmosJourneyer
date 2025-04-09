@@ -130,7 +130,7 @@ export class MusicConductor {
             return;
         }
 
-        const warpDrive = spaceship.getWarpDrive();
+        const warpDrive = spaceship.getInternals().getWarpDrive();
 
         switch (closestOrbitalObject.model.type) {
             case OrbitalObjectType.BLACK_HOLE:

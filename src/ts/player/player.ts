@@ -23,6 +23,7 @@ import { getDefaultSerializedSpaceship, SerializedSpaceship } from "../spaceship
 import { SpaceDiscoveryData } from "../society/encyclopaediaGalactica";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { CompletedTutorials, SerializedPlayer } from "./serializedPlayer";
+import { SerializedComponent } from "../spaceship/serializedComponents/component";
 
 export class Player {
     uuid: string;
@@ -48,6 +49,8 @@ export class Player {
 
     serializedSpaceships: SerializedSpaceship[] = [];
     instancedSpaceships: Spaceship[] = [];
+
+    spareSpaceshipComponents: Set<SerializedComponent>;
 
     tutorials: CompletedTutorials;
 
@@ -83,6 +86,8 @@ export class Player {
         this.completedMissions = serializedPlayer.completedMissions.map((mission) => Mission.Deserialize(mission));
 
         this.serializedSpaceships = structuredClone(serializedPlayer.spaceShips);
+
+        this.spareSpaceshipComponents = new Set(serializedPlayer.spareSpaceshipComponents);
 
         this.tutorials = serializedPlayer.tutorials;
     }
@@ -129,6 +134,7 @@ export class Player {
             currentMissions: [],
             completedMissions: [],
             spaceShips: [getDefaultSerializedSpaceship()],
+            spareSpaceshipComponents: [],
             tutorials: {
                 stationLandingCompleted: false,
                 fuelScoopingCompleted: false
@@ -156,6 +162,7 @@ export class Player {
             spaceShips: player.serializedSpaceships.concat(
                 player.instancedSpaceships.map((spaceship) => spaceship.serialize())
             ),
+            spareSpaceshipComponents: Array.from(player.spareSpaceshipComponents),
             tutorials: player.tutorials
         };
     }
@@ -187,6 +194,7 @@ export class Player {
         this.completedMissions = player.completedMissions.map((mission) => Mission.Deserialize(mission.serialize()));
         this.serializedSpaceships = player.serializedSpaceships.map((spaceship) => structuredClone(spaceship));
         this.instancedSpaceships = [...player.instancedSpaceships];
+        this.spareSpaceshipComponents = structuredClone(player.spareSpaceshipComponents);
         this.tutorials = structuredClone(player.tutorials);
     }
 

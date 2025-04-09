@@ -34,6 +34,8 @@ import { createFlightDemoScene } from "./playgrounds/flightDemo";
 import { createNeutronStarScene } from "./playgrounds/neutronStar";
 import { createCharacterDemoScene } from "./playgrounds/character";
 import { createDefaultScene } from "./playgrounds/default";
+import { createSpaceStationUIScene } from "./playgrounds/spaceStationUI";
+import { createStarMapScene } from "./playgrounds/starMap";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -63,6 +65,9 @@ switch (requestedScene) {
     case "spaceStation":
         scene = await createSpaceStationScene(engine);
         break;
+    case "spaceStationUI":
+        scene = await createSpaceStationUIScene(engine);
+        break;
     case "xr":
         scene = await createXrScene(engine);
         break;
@@ -74,6 +79,9 @@ switch (requestedScene) {
         break;
     case "character":
         scene = await createCharacterDemoScene(engine);
+        break;
+    case "starMap":
+        scene = await createStarMapScene(engine);
         break;
     default:
         scene = createDefaultScene(engine);
