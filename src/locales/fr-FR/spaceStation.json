@@ -28,5 +28,13 @@
     "yourSpareParts": "Vos pièces de rechange",
     "availableSpareParts": "Pièces de rechange disponibles",
     "noComponentSlotSelected": "Aucun emplacement de composant sélectionné",
-    "noOwnedSparePartsForSlot": "Vous ne possédez pas de pièces de rechange compatibles pour cet emplacement"
+    "noOwnedSparePartsForSlot": "Vous ne possédez pas de pièces de rechange compatibles pour cet emplacement",
+    "noComponentEquippedOnSlot": "Aucun composant équipé sur cet emplacement",
+    "noComponentSelected": "Aucun composant sélectionné",
+    "value": "Valeur",
+    "range": "Portée",
+    "scoopRate": "Taux de collecte",
+    "capacity": "Capacité",
+    "relativeRange": "Portée relative",
+    "maxSpeed": "Vitesse max"
 }

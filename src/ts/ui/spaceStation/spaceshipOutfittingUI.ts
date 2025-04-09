@@ -80,7 +80,7 @@ export class SpaceshipOutfittingUI {
         equippedComponentTitle.innerText = i18n.t("spaceStation:equippedComponent");
         this.rightPanel.appendChild(equippedComponentTitle);
 
-        this.equippedComponentSpec = new ComponentSpecUI();
+        this.equippedComponentSpec = new ComponentSpecUI(i18n.t("spaceStation:noComponentEquippedOnSlot"));
         this.equippedComponentSpec.root.style.flexGrow = "1";
         this.equippedComponentSpec.root.style.flex = "1";
         this.rightPanel.appendChild(this.equippedComponentSpec.root);
@@ -141,7 +141,7 @@ export class SpaceshipOutfittingUI {
         selectedComponentTitle.innerText = i18n.t("spaceStation:selectedComponent");
         this.rightPanel.appendChild(selectedComponentTitle);
 
-        this.selectedComponentSpec = new ComponentSpecUI();
+        this.selectedComponentSpec = new ComponentSpecUI(i18n.t("spaceStation:noComponentSelected"));
         this.selectedComponentSpec.root.style.flexGrow = "1";
         this.selectedComponentSpec.root.style.flex = "1";
         this.rightPanel.appendChild(this.selectedComponentSpec.root);

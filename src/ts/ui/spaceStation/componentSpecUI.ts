@@ -34,9 +34,19 @@ import { getWarpDriveSpec, SerializedWarpDrive } from "../../spaceship/serialize
 export class ComponentSpecUI {
     readonly root: HTMLElement;
 
-    constructor() {
+    private placeHolderText: HTMLElement;
+
+    constructor(placeHolderText: string) {
         this.root = document.createElement("div");
         this.root.className = "componentSpec";
+
+        this.placeHolderText = document.createElement("p");
+        this.placeHolderText.innerText = placeHolderText;
+        this.placeHolderText.style.flexGrow = "1";
+        this.placeHolderText.style.justifyContent = "center";
+        this.placeHolderText.style.textAlign = "center";
+        this.placeHolderText.style.display = "flex";
+        this.placeHolderText.style.alignItems = "center";
 
         this.displayComponent(null);
     }
@@ -45,7 +55,7 @@ export class ComponentSpecUI {
         this.root.innerHTML = "";
 
         if (serializedComponent === null) {
-            this.root.innerText = "no component to display";
+            this.root.appendChild(this.placeHolderText);
             return;
         }
 
@@ -55,7 +65,7 @@ export class ComponentSpecUI {
         this.root.appendChild(componentName);
 
         const componentValue = document.createElement("p");
-        componentValue.innerText = `Value: ${getComponentValue(serializedComponent).toLocaleString()} ${Settings.CREDIT_SYMBOL}`;
+        componentValue.innerText = `${i18n.t("spaceStation:value")}: ${getComponentValue(serializedComponent).toLocaleString()} ${Settings.CREDIT_SYMBOL}`;
         this.root.appendChild(componentValue);
 
         switch (serializedComponent.type) {
@@ -82,7 +92,7 @@ export class ComponentSpecUI {
         const container = document.createElement("div");
 
         const range = document.createElement("p");
-        range.innerText = `Range: ${i18n.t("units:shortLy", { count: spec.rangeLy })}`;
+        range.innerText = `${i18n.t("spaceStation:range")}: ${i18n.t("units:shortLy", { count: spec.rangeLy })}`;
         container.appendChild(range);
 
         return container;
@@ -93,7 +103,7 @@ export class ComponentSpecUI {
         const container = document.createElement("div");
 
         const scoopRate = document.createElement("p");
-        scoopRate.innerText = `Scoop rate: ${spec.fuelPerSecond} L/s`;
+        scoopRate.innerText = `${i18n.t("spaceStation:scoopRate")}: ${spec.fuelPerSecond} L/s`;
         container.appendChild(scoopRate);
 
         return container;
@@ -104,7 +114,7 @@ export class ComponentSpecUI {
         const container = document.createElement("div");
 
         const capacity = document.createElement("p");
-        capacity.innerText = `Capacity: ${spec.maxFuel} L`;
+        capacity.innerText = `${i18n.t("spaceStation:capacity")}: ${spec.maxFuel} L`;
         container.appendChild(capacity);
 
         return container;
@@ -115,7 +125,7 @@ export class ComponentSpecUI {
         const container = document.createElement("div");
 
         const relativeRange = document.createElement("p");
-        relativeRange.innerText = `Relative range: ${spec.relativeRange}`;
+        relativeRange.innerText = `${i18n.t("spaceStation:relativeRange")}: ${spec.relativeRange}`;
         container.appendChild(relativeRange);
 
         return container;
@@ -126,7 +136,7 @@ export class ComponentSpecUI {
         const container = document.createElement("div");
 
         const maxSpeed = document.createElement("p");
-        maxSpeed.innerText = `Max speed: ${spec.maxSpeed.toLocaleString(undefined, { maximumSignificantDigits: 3 })} m/s`;
+        maxSpeed.innerText = `${i18n.t("spaceStation:maxSpeed")}: ${spec.maxSpeed.toLocaleString(undefined, { maximumSignificantDigits: 3 })} m/s`;
         container.appendChild(maxSpeed);
 
         return container;

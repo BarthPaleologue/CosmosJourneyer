@@ -28,5 +28,13 @@
     "yourSpareParts": "Your spare parts",
     "availableSpareParts": "Available spare parts",
     "noComponentSlotSelected": "No component slot selected",
-    "noOwnedSparePartsForSlot": "You don't own compatible spare parts for this slot"
+    "noOwnedSparePartsForSlot": "You don't own compatible spare parts for this slot",
+    "noComponentEquippedOnSlot": "No component equipped on this slot",
+    "noComponentSelected": "No component selected",
+    "value": "Value",
+    "range": "Range",
+    "scoopRate": "Scoop Rate",
+    "capacity": "Capacity",
+    "relativeRange": "Relative Range",
+    "maxSpeed": "Max Speed"
 }

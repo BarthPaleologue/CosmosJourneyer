@@ -342,6 +342,15 @@ $gaps: 10px;
     .componentSlot {
         padding: 10px;
     }
+
+    .componentSpec {
+        display: flex;
+        flex-direction: column;
+
+        h3 {
+            margin-bottom: 0.5em;
+        }
+    }
 }
 
 .flex-column {
