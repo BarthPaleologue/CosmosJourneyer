@@ -355,7 +355,7 @@ export class StarMapUI {
             this.shortHandUIDistanceFromCurrent.textContent = `${i18n.t("starMap:distanceFromCurrent")}: ${i18n.t(
                 "units:shortLy",
                 {
-                    count: Number(Vector3.Distance(currentPosition, targetPosition).toFixed(1))
+                    value: Vector3.Distance(currentPosition, targetPosition).toFixed(1)
                 }
             )}`;
         }
@@ -379,7 +379,7 @@ export class StarMapUI {
         this.nbPlanets.textContent = `${i18n.t("starMap:planets")}: ${targetSystemModel.planets.length}`;
 
         this.distanceToSol.textContent = `${i18n.t("starMap:distanceToSol")}: ${i18n.t("units:shortLy", {
-            count: Number(Vector3.Distance(targetPosition, Vector3.Zero()).toFixed(1))
+            value: Vector3.Distance(targetPosition, Vector3.Zero()).toFixed(1)
         })}`;
 
         if (this.starSystemDatabase.isSystemInHumanBubble(targetSystemModel.coordinates)) {

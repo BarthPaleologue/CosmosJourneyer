@@ -32,16 +32,16 @@ export function parseSpeed(speed: number): string {
 
 export function parseDistance(distance: number): string {
     if (distance < 1_000) {
-        return i18n.t("units:shortM", { count: Number(distance.toFixed(0)) });
+        return i18n.t("units:shortM", { value: distance.toFixed(0) });
     } else if (distance < 1_000_000) {
-        return i18n.t("units:shortKm", { count: Number((distance / 1_000).toFixed(2)) });
+        return i18n.t("units:shortKm", { value: (distance / 1_000).toFixed(2) });
     } else if (distance < 300_000_000) {
-        return i18n.t("units:shortMm", { count: Number((distance / 1_000_000).toFixed(2)) });
+        return i18n.t("units:shortMm", { value: (distance / 1_000_000).toFixed(2) });
     } else if (distance < 0.1 * Settings.LIGHT_YEAR) {
-        return i18n.t("units:shortLs", { count: Number((distance / Settings.C).toFixed(2)) });
+        return i18n.t("units:shortLs", { value: (distance / Settings.C).toFixed(2) });
     } else {
         return i18n.t("units:shortLy", {
-            count: Number((distance / Settings.LIGHT_YEAR).toFixed(2))
+            value: (distance / Settings.LIGHT_YEAR).toFixed(2)
         });
     }
 }
