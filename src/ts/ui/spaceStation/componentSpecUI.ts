@@ -92,7 +92,7 @@ export class ComponentSpecUI {
         const container = document.createElement("div");
 
         const range = document.createElement("p");
-        range.innerText = `${i18n.t("spaceStation:range")}: ${i18n.t("units:shortLy", { count: spec.rangeLy })}`;
+        range.innerText = `${i18n.t("spaceStation:range")}: ${i18n.t("units:shortLy", { count: Number(spec.rangeLy.toLocaleString(undefined, { maximumSignificantDigits: 3 })) })}`;
         container.appendChild(range);
 
         return container;
