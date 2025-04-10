@@ -14,5 +14,9 @@
     "spaceShipWarpDriveText1": "Se déplacer entre les planètes et les étoiles nécessitera souvent de voyager plus rapidement que la lumière (PRL) afin d'arriver avant la mort de l'univers.",
     "spaceShipWarpDriveText2": "Votre vaisseau est équipé d'un moteur à distorsion pour cela. Appuyer sur {{keyToggle}} activera ou désactivera le moteur à distorsion. L'intensité de la distorsion peut être ajustée comme pour la poussée des moteurs principaux.",
     "spaceShipWarpDriveText3": "Sortez du champ d'astéroïdes par le haut ou le bas, puis activez votre moteur à distorsion pour vous envoler vers les étoiles !",
+    "spaceShipTargetingTitle": "Ciblage",
+    "spaceShipTargetingText1": "Il est facile de se perdre dans l'espace ! Heureusement votre vaisseau est équipé d'un système de ciblage.",
+    "spaceShipTargetingText2": "La cible la plus proche du centre de l'écran peut être vérouillée/dévérouillée en pressant {{keyTarget}}. Les information de la cible vont s'afficher jusqu'à ce que le vaisseau soit assez proche pour rendre le ciblage inutile. Les stations spatiales sont reconnaissables à leur icone carrée.",
+    "spaceShipTargetingText3": "Le radar (situé en bas à droite de l'écran) peut vous aider à recentrer votre cible au centre de l'écran. Un point vide signifie que la cible se trouve derrière le vaisseau alors qu'un point plein indique que la cible se trouve devant le vaisseau.",
     "congratulationsText1": "Félicitations, Commandant ! Vous avez terminé le tutoriel de vol. Vous êtes maintenant prêt à explorer le cosmos. Bonne chance et amusez-vous bien !"
 }

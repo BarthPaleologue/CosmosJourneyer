@@ -14,5 +14,9 @@
     "spaceShipWarpDriveText1": "Moving between planets and stars will often require faster than light (FTL) travel in order to reach your destination before the heat death of the universe.",
     "spaceShipWarpDriveText2": "Your spaceship comes equipped with a warp drive to do just that. Pressing {{keyToggle}} will toggle the warp drive on and off. The warp throttle can be adjusted like for the main engines.",
     "spaceShipWarpDriveText3": "Fly up or down to leave the asteroid field and then engage your warp drive to fly away to the stars!",
+    "spaceShipTargetingTitle": "Targeting",
+    "spaceShipTargetingText1": "Getting lost in space is fairly easy! Thankfully your spaceship comes equipped with a targeting system to help with that.",
+    "spaceShipTargetingText2": "Pressing {{keyTarget}} will target the object closest to the center of the screen. This will display the info until you get close enough (it will then fade out). Space stations have a squarish target icon.",
+    "spaceShipTargetingText3": "The radar (on the bottom right of the screen) can help you with orientation when you are not facing your target. An empty circle means the target is behind your ship, while a full dot means the target is in front of your ship.",
     "congratulationsText1": "Congratulations, Commander! You have completed the flight tutorial. You are now ready to explore the cosmos. Good luck, and have fun!"
 }

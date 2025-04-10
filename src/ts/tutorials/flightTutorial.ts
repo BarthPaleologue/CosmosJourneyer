@@ -25,11 +25,13 @@ import welcomeImageSrc from "../../asset/tutorials/flightTutorial/welcome.webp";
 import rotationImageSrc from "../../asset/tutorials/flightTutorial/rotation.webp";
 import thrustImageSrc from "../../asset/tutorials/flightTutorial/thrust.webp";
 import warpImageSrc from "../../asset/tutorials/flightTutorial/warp.webp";
+import targetImageSrc from "../../asset/tutorials/flightTutorial/target.webp";
 import congratsImageSrc from "../../asset/tutorials/flightTutorial/congrats.webp";
 import saveData from "../../asset/tutorials/flightTutorial/save.json";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import { safeParseSave, Save } from "../saveFile/saveFileData";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { StarSystemInputs } from "../inputs/starSystemInputs";
 
 export class FlightTutorial implements Tutorial {
     readonly coverImageSrc = welcomeImageSrc;
@@ -111,6 +113,15 @@ export class FlightTutorial implements Tutorial {
             <img src="${warpImageSrc}" alt="Warp Drive">
         </div>`;
 
+        const targetingPanelHtml = `
+        <div class="tutorialContent">
+            <h2>${i18n.t("tutorials:flightTutorial:spaceShipTargetingTitle")}</h2>
+            <p>${i18n.t("tutorials:flightTutorial:spaceShipTargetingText1")}</p>
+            <img src="${targetImageSrc}" alt="Spaceship Targeting">
+            <p>${i18n.t("tutorials:flightTutorial:spaceShipTargetingText2", { keyTarget: pressInteractionToStrings(StarSystemInputs.map.setTarget, keybordLayoutMap).join(` ${i18n.t("common:or")} `) })}</p>
+            <p>${i18n.t("tutorials:flightTutorial:spaceShipTargetingText3")}</p>
+        </div>`;
+
         const congratsPanelHtml = `
         <div class="tutorialContent">
             <img src="${congratsImageSrc}" alt="Congratulations!">
@@ -123,6 +134,13 @@ export class FlightTutorial implements Tutorial {
             })}
         </div>`;
 
-        return [welcomePanelHtml, rotationPanelHtml, thrustPanelHtml, warpPanelHtml, congratsPanelHtml];
+        return [
+            welcomePanelHtml,
+            rotationPanelHtml,
+            thrustPanelHtml,
+            warpPanelHtml,
+            targetingPanelHtml,
+            congratsPanelHtml
+        ];
     }
 }
