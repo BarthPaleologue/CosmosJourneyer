@@ -67,7 +67,8 @@ const config = {
             },
             inject: true,
             template: path.join(htmlPath, "index.html"),
-            chunks: ["main"]
+            chunks: ["main"],
+            favicon: path.join(htmlPath, "../asset/favicon.png")
         }),
         new HtmlWebpackPlugin({
             title: "Alpha Testis - Cosmos Journeyer",
@@ -76,7 +77,8 @@ const config = {
             },
             filename: "alphaTestis.html",
             template: path.join(htmlPath, "index.html"),
-            chunks: ["alphaTestis"]
+            chunks: ["alphaTestis"],
+            favicon: path.join(htmlPath, "../asset/favicon.png")
         }),
         new HtmlWebpackPlugin({
             title: "Black Hole - Cosmos Journeyer",
@@ -85,13 +87,15 @@ const config = {
             },
             filename: "blackhole.html",
             template: path.join(htmlPath, "index.html"),
-            chunks: ["blackHole"]
+            chunks: ["blackHole"],
+            favicon: path.join(htmlPath, "../asset/favicon.png")
         }),
         new rspack.HtmlRspackPlugin({
             title: "Playground - Cosmos Journeyer",
             filename: "playground.html",
             template: path.join(htmlPath, "emptyIndex.html"),
-            chunks: ["playground"]
+            chunks: ["playground"],
+            favicon: path.join(htmlPath, "../asset/favicon.png")
         })
     ],
     watchOptions: {
