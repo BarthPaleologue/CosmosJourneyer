@@ -1,9 +1,10 @@
 {
     "moreWillComeSoon": "Plus de tutoriels dans le futur !",
-    "navigationInfo": "<p>Pour avancer dans le tutoriel, appuyez sur {{nextKeys}}. Vous pouvez revenir aux étapes précédentes avec {{previousKeys}}.</p><p>Vous pouvez sortir du tutoriel à tout moment avec {{quitKeys}}.</p>",
+    "navigationInfo": "<p>Pour avancer dans le tutoriel, appuyez sur {{nextKeys}}. Vous pouvez revenir aux étapes précédentes avec {{previousKeys}}.</p>",
     "quit": "Quitter",
     "next": "Suivant",
     "previous": "Précédent",
     "tutorialEnding": "<p>Ce tutoriel et d'autres sont disponibles à tout moment depuis le menu principal et le menu de pause.</p><p>Appuyez sur {{keyQuit}} pour quitter le tutoriel.</p>",
-    "loadTutorialWillLeaveGame": "Charger ce tutorial quittera votre partie actuelle. Une sauvegarde automatique vient d'être effectuée. Continuer de charger le tutoriel ?"
+    "loadTutorialWillLeaveGame": "Charger ce tutoriel quittera votre partie actuelle. Une sauvegarde automatique vient d'être effectuée. Continuer de charger le tutoriel ?",
+    "quitConfirm": "Vous êtes sur le point de quitter le tutoriel. Êtes-vous sûr ?"
 }

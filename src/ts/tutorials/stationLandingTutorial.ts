@@ -68,9 +68,6 @@ export class StationLandingTutorial implements Tutorial {
                 ),
                 previousKeys: pressInteractionToStrings(TutorialControlsInputs.map.prevPanel, keyboardLayoutMap).join(
                     ` ${i18n.t("common:or")} `
-                ),
-                quitKeys: pressInteractionToStrings(TutorialControlsInputs.map.quitTutorial, keyboardLayoutMap).join(
-                    ` ${i18n.t("common:or")} `
                 )
             })}
         </div>`;
@@ -109,7 +106,7 @@ export class StationLandingTutorial implements Tutorial {
             
             <p>${i18n.t("tutorials:common:tutorialEnding", {
                 // This displays a small internationalized text to explain the keys to end the tutorial
-                keyQuit: pressInteractionToStrings(TutorialControlsInputs.map.quitTutorial, keyboardLayoutMap).join(
+                keyQuit: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keyboardLayoutMap).join(
                     ` ${i18n.t("common:or")} `
                 )
             })}

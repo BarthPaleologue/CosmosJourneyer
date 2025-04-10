@@ -17,20 +17,12 @@ const prevPanel = new PressInteraction(
     })
 );
 
-const quitTutorial = new PressInteraction(
-    new Action({
-        bindings: [keyboard.getControl("Delete")]
-    })
-);
-
 export const TutorialControlsInputs = new InputMap<{
     nextPanel: PressInteraction;
     prevPanel: PressInteraction;
-    quitTutorial: PressInteraction;
 }>("TutorialControls", {
     nextPanel,
-    prevPanel,
-    quitTutorial
+    prevPanel
 });
 
 TutorialControlsInputs.setEnabled(false);
