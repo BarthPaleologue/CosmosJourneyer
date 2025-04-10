@@ -6,6 +6,7 @@ import { IDisposable } from "@babylonjs/core/scene";
 import { getGlobalKeyboardLayoutMap } from "../../utils/keyboardAPI";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { Tutorial } from "../../tutorials/tutorial";
+import { promptModalBoolean } from "../../utils/dialogModal";
 
 export class TutorialLayer implements IDisposable {
     private readonly layerRoot: HTMLDivElement;
@@ -17,8 +18,6 @@ export class TutorialLayer implements IDisposable {
     private readonly contentContainer: HTMLDivElement;
 
     private readonly controls: HTMLDivElement;
-
-    private readonly quitButton: HTMLElement;
 
     private readonly prevButton: HTMLElement;
 
@@ -49,11 +48,6 @@ export class TutorialLayer implements IDisposable {
         this.controls = document.createElement("div");
         this.controls.classList.add("tutorialControls");
 
-        this.quitButton = document.createElement("p");
-        const stopButtonTextSpan = document.createElement("span");
-        stopButtonTextSpan.innerText = i18n.t("tutorials:common:quit");
-        this.quitButton.appendChild(stopButtonTextSpan);
-
         this.prevButton = document.createElement("p");
         const prevButtonTextSpan = document.createElement("span");
         prevButtonTextSpan.innerText = i18n.t("tutorials:common:previous");
@@ -65,13 +59,6 @@ export class TutorialLayer implements IDisposable {
         this.nextButton.appendChild(nextButtonTextSpan);
 
         void getGlobalKeyboardLayoutMap().then((keyboardLayoutMap) => {
-            pressInteractionToStrings(TutorialControlsInputs.map.quitTutorial, keyboardLayoutMap).forEach((key) => {
-                const stopKeySpan = document.createElement("span");
-                stopKeySpan.classList.add("keySpan");
-                stopKeySpan.innerText = key;
-                this.quitButton.appendChild(stopKeySpan);
-            });
-
             pressInteractionToStrings(TutorialControlsInputs.map.prevPanel, keyboardLayoutMap).forEach((key) => {
                 const prevKeySpan = document.createElement("span");
                 prevKeySpan.classList.add("keySpan");
@@ -87,7 +74,6 @@ export class TutorialLayer implements IDisposable {
             });
         });
 
-        this.controls.appendChild(this.quitButton);
         this.controls.appendChild(this.prevButton);
         this.controls.appendChild(this.nextButton);
 
@@ -97,11 +83,11 @@ export class TutorialLayer implements IDisposable {
 
         document.body.appendChild(this.layerRoot);
 
-        TutorialControlsInputs.map.quitTutorial.on("complete", () => {
-            this.quitTutorial();
-        });
-
         TutorialControlsInputs.map.prevPanel.on("complete", () => {
+            if (this.currentPanelIndex === 0) {
+                return;
+            }
+
             this.currentPanelIndex = Math.max(0, this.currentPanelIndex - 1);
             this.updatePanelState();
             this.prevButton.animate(
@@ -114,7 +100,15 @@ export class TutorialLayer implements IDisposable {
             Sounds.MENU_SELECT_SOUND.play();
         });
 
-        TutorialControlsInputs.map.nextPanel.on("complete", () => {
+        TutorialControlsInputs.map.nextPanel.on("complete", async () => {
+            if (this.currentPanelIndex === this.tutorialPanelsHtml.length - 1) {
+                if (await promptModalBoolean(i18n.t("tutorials:common:quitConfirm"))) {
+                    this.quitTutorial();
+                }
+
+                return;
+            }
+
             this.currentPanelIndex = Math.min(this.tutorialPanelsHtml.length - 1, this.currentPanelIndex + 1);
             this.updatePanelState();
             this.nextButton.animate(
@@ -139,12 +133,7 @@ export class TutorialLayer implements IDisposable {
 
     public quitTutorial() {
         this.setEnabled(false);
-        this.quitButton.animate([{ transform: "scale(1)" }, { transform: "scale(1.1)" }, { transform: "scale(1)" }], {
-            duration: 200,
-            easing: "ease"
-        });
         Sounds.MENU_SELECT_SOUND.play();
-
         this.onQuitTutorial.notifyObservers();
     }
 
@@ -159,6 +148,8 @@ export class TutorialLayer implements IDisposable {
 
     private updatePanelState() {
         this.contentContainer.innerHTML = this.tutorialPanelsHtml[this.currentPanelIndex];
+
+        this.prevButton.classList.toggle("disabled", this.currentPanelIndex === 0);
     }
 
     dispose(): void {

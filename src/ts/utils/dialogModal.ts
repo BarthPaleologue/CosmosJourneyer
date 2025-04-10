@@ -1,4 +1,5 @@
 import { Sounds } from "../assets/sounds";
+import i18n from "../i18n";
 
 export function promptModalString(prompt: string, defaultValue = ""): Promise<string | null> {
     const modal = document.createElement("dialog");
@@ -7,8 +8,8 @@ export function promptModalString(prompt: string, defaultValue = ""): Promise<st
             <p>${prompt}</p>
             <input type="text" value="${defaultValue}">
             <menu>
-                <button type="reset" value="cancel">Cancel</button>
-                <button type="submit" value="ok">OK</button>
+                <button type="reset" value="cancel">${i18n.t("common:cancel")}</button>
+                <button type="submit" value="ok">${i18n.t("common:ok")}</button>
             </menu>
         </form>
     `;
@@ -48,8 +49,8 @@ export function promptModalBoolean(prompt: string): Promise<boolean> {
         <form method="dialog">
             <p>${prompt}</p>
             <menu>
-                <button value="cancel">Cancel</button>
-                <button value="ok">Do it!</button>
+                <button value="cancel">${i18n.t("common:cancel")}</button>
+                <button value="ok">${i18n.t("common:confirm")}</button>
             </menu>
         </form>
     `;
@@ -71,7 +72,7 @@ export function alertModal(message: string): Promise<void> {
         <form method="dialog">
             <p>${message}</p>
             <menu>
-                <button value="ok">OK</button>
+                <button value="ok">${i18n.t("common:ok")}</button>
             </menu>
         </form>
     `;
@@ -126,7 +127,7 @@ export function connectEncyclopaediaGalacticaModal(): Promise<{
     const cancelButton = document.createElement("button");
     cancelButton.type = "reset";
     cancelButton.value = "cancel";
-    cancelButton.textContent = "Cancel";
+    cancelButton.textContent = i18n.t("common:cancel");
     menu.appendChild(cancelButton);
 
     const connectButton = document.createElement("button");

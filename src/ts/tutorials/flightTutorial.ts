@@ -67,9 +67,6 @@ export class FlightTutorial implements Tutorial {
                 ),
                 previousKeys: pressInteractionToStrings(TutorialControlsInputs.map.prevPanel, keybordLayoutMap).join(
                     ` ${i18n.t("common:or")} `
-                ),
-                quitKeys: pressInteractionToStrings(TutorialControlsInputs.map.quitTutorial, keybordLayoutMap).join(
-                    ` ${i18n.t("common:or")} `
                 )
             })}
         </div>`;
@@ -128,7 +125,7 @@ export class FlightTutorial implements Tutorial {
             <p>${i18n.t("tutorials:flightTutorial:congratulationsText1")}</p>
             
             ${i18n.t("tutorials:common:tutorialEnding", {
-                keyQuit: pressInteractionToStrings(TutorialControlsInputs.map.quitTutorial, keybordLayoutMap).join(
+                keyQuit: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keybordLayoutMap).join(
                     ` ${i18n.t("common:or")} `
                 )
             })}
