@@ -3,10 +3,12 @@
 
     .tutorialsMenuContainer {
         display: flex;
+        flex-wrap: wrap;
         justify-content: center;
         padding: 0 20px 20px 20px;
         align-items: stretch;
         column-gap: 20px;
+        row-gap: 20px;
 
         $tileWidth: 300px;
 
