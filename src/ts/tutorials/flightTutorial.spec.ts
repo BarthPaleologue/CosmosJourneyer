@@ -24,9 +24,15 @@ import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
 describe("flightTutorial", () => {
     it("spawns inside of the rings of the planet", () => {
         const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
-        const flightTutorial = new FlightTutorial(starSystemDatabase);
+        const tutorial = new FlightTutorial();
 
-        const saveData = flightTutorial.saveData;
+        const saveDataResult = tutorial.getSaveData(starSystemDatabase);
+        expect(saveDataResult.success).toBe(true);
+        if (!saveDataResult.success) {
+            throw new Error("saveData is not successful");
+        }
+
+        const saveData = saveDataResult.value;
 
         expect(saveData.playerLocation.type).toBe("inSpaceship");
         if (saveData.playerLocation.type !== "inSpaceship") {

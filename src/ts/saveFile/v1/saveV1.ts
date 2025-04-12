@@ -117,7 +117,9 @@ export const SaveSchemaV1 = z.object({
         completedMissions: z.array(z.unknown()).default([]),
         spaceShips: z.array(SerializedSpaceshipSchemaV1).default([SerializedSpaceshipSchemaV1.parse({})]),
         tutorials: CompletedTutorialsSchema.default({
+            flightCompleted: false,
             stationLandingCompleted: false,
+            starMapCompleted: false,
             fuelScoopingCompleted: false
         })
     }),

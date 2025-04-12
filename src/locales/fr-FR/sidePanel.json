@@ -9,6 +9,7 @@
     "near": "Près de {{location}}",
     "locationNotFound": "Erreur: Localisation introuvable dans la base de données",
     "tutorials": "Tutoriels",
+    "tutorialsWarning": "Si c'est la première fois que vous jouez, vous pouvez simplement commencer une nouvelle partie : les tutoriels seront naturellement présentés au cours de la partie !",
     "settings": "Paramètres",
     "contribute": "Contribuer",
     "bugReports": "Signaler un bug",

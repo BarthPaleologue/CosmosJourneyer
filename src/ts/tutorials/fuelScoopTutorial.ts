@@ -26,19 +26,14 @@ import i18n from "../i18n";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import { safeParseSave, Save } from "../saveFile/saveFileData";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { Result } from "../utils/types";
+import { SaveLoadingError } from "../saveFile/saveLoadingError";
 
 export class FuelScoopTutorial implements Tutorial {
-    saveData: Save;
-    coverImageSrc = welcomeImageSrc;
+    readonly coverImageSrc: string = welcomeImageSrc;
 
-    constructor(starSystemDatabase: StarSystemDatabase) {
-        const parsedSaveDataResult = safeParseSave(saveData, starSystemDatabase);
-        if (!parsedSaveDataResult.success) {
-            console.error(parsedSaveDataResult.error);
-            throw new Error("FuelScoopTutorial: saveData is null");
-        }
-
-        this.saveData = parsedSaveDataResult.value;
+    getSaveData(starSystemDatabase: StarSystemDatabase): Result<Save, SaveLoadingError> {
+        return safeParseSave(saveData, starSystemDatabase);
     }
 
     getTitle() {

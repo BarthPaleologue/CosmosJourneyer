@@ -67,6 +67,7 @@ import { getUniverseObjectId } from "./utils/coordinates/universeObjectId";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { OrbitalObjectType } from "./architecture/orbitalObjectType";
 import { positionNearObject } from "./utils/positionNearObject";
+import { StarMapTutorial } from "./tutorials/starMapTutorial";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -163,7 +164,7 @@ export class CosmosJourneyer {
             await this.createAutoSave();
 
             if (!this.player.tutorials.fuelScoopingCompleted) {
-                await this.tutorialLayer.setTutorial(new FuelScoopTutorial(this.starSystemDatabase));
+                await this.tutorialLayer.setTutorial(new FuelScoopTutorial());
                 this.tutorialLayer.onQuitTutorial.addOnce(() => {
                     this.player.tutorials.fuelScoopingCompleted = true;
                 });
@@ -186,6 +187,7 @@ export class CosmosJourneyer {
         AudioManager.SetMask(AudioMasks.STAR_SYSTEM_VIEW);
 
         this.tutorialLayer = new TutorialLayer();
+        document.body.appendChild(this.tutorialLayer.root);
 
         this.sidePanels = new SidePanels(this.starSystemDatabase, this.saveManager);
         this.sidePanels.loadSavePanelContent.onLoadSaveObservable.add(async (saveData: Save) => {
@@ -201,7 +203,10 @@ export class CosmosJourneyer {
 
         this.mainMenu = new MainMenu(this.sidePanels, this.starSystemView, this.starSystemDatabase);
         this.mainMenu.onStartObservable.add(async () => {
-            await this.tutorialLayer.setTutorial(new FlightTutorial(this.starSystemDatabase));
+            await this.tutorialLayer.setTutorial(new FlightTutorial());
+            this.tutorialLayer.onQuitTutorial.addOnce(() => {
+                this.player.tutorials.flightCompleted = true;
+            });
             await this.starSystemView.switchToSpaceshipControls();
             const spaceshipPosition = this.starSystemView.getSpaceshipControls().getTransform().getAbsolutePosition();
             const closestSpaceStation = this.starSystemView
@@ -248,7 +253,7 @@ export class CosmosJourneyer {
             const limitDistance = 10 * closestLandableFacility.getBoundingRadius();
             if (Vector3.DistanceSquared(shipPosition, facilityPosition) > limitDistance ** 2) return;
 
-            await this.tutorialLayer.setTutorial(new StationLandingTutorial(this.starSystemDatabase));
+            await this.tutorialLayer.setTutorial(new StationLandingTutorial());
             this.tutorialLayer.onQuitTutorial.addOnce(() => {
                 this.player.tutorials.stationLandingCompleted = true;
             });
@@ -261,6 +266,17 @@ export class CosmosJourneyer {
         this.starSystemView.onInitStarSystem.add(() => {
             const starSystemModel = this.starSystemView.getStarSystem().model;
             this.starMap.setCurrentStarSystem(starSystemModel.coordinates);
+        });
+
+        this.starSystemView.spaceStationLayer.onTakeOffObservable.add(async () => {
+            if (this.player.tutorials.starMapCompleted) {
+                return;
+            }
+
+            await this.tutorialLayer.setTutorial(new StarMapTutorial());
+            this.tutorialLayer.onQuitTutorial.addOnce(() => {
+                this.player.tutorials.starMapCompleted = true;
+            });
         });
 
         this.pauseMenu = new PauseMenu(this.sidePanels);
@@ -719,7 +735,18 @@ export class CosmosJourneyer {
     public async loadTutorial(tutorial: Tutorial) {
         this.engine.onEndFrameObservable.addOnce(async () => {
             this.mainMenu.hide();
-            await this.loadSave(tutorial.saveData);
+            const saveResult = tutorial.getSaveData(this.starSystemDatabase);
+            if (!saveResult.success) {
+                console.error(saveResult.error);
+                await alertModal(
+                    i18n.t(
+                        "The tutorial save has errors and could not be loaded! Check the console for more information."
+                    )
+                );
+                return;
+            }
+
+            await this.loadSave(saveResult.value);
             this.player.uuid = Settings.TUTORIAL_SAVE_UUID;
             await this.resume();
             await this.tutorialLayer.setTutorial(tutorial);

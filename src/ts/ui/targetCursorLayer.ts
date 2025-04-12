@@ -83,8 +83,11 @@ export class TargetCursorLayer implements IDisposable {
         this.targetCursors = [];
     }
 
-    public setTarget(object: (Transformable & HasBoundingSphere & TypedObject) | null) {
-        if (this.target === object) {
+    public setTarget(object: (Transformable & HasBoundingSphere & TypedObject) | null, forcedValue?: boolean) {
+        let shouldHide = this.target === object;
+        if (forcedValue !== undefined) shouldHide = !forcedValue;
+
+        if (shouldHide) {
             this.target = null;
             return;
         }

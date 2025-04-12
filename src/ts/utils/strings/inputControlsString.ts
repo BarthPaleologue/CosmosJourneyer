@@ -31,7 +31,7 @@ export function dPadCompositeToString(
         }
         keys.push([key, name]);
     });
-    return keys;
+    return [keys[2], keys[0], keys[3], keys[1]];
 }
 
 export function vector2ToString(input: Vector2InputControl): [string, string][] {

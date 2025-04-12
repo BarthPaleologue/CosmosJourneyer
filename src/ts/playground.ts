@@ -36,6 +36,7 @@ import { createCharacterDemoScene } from "./playgrounds/character";
 import { createDefaultScene } from "./playgrounds/default";
 import { createSpaceStationUIScene } from "./playgrounds/spaceStationUI";
 import { createStarMapScene } from "./playgrounds/starMap";
+import { createTutorialScene } from "./playgrounds/tutorial";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -82,6 +83,9 @@ switch (requestedScene) {
         break;
     case "starMap":
         scene = await createStarMapScene(engine);
+        break;
+    case "tutorial":
+        scene = await createTutorialScene(engine);
         break;
     default:
         scene = createDefaultScene(engine);

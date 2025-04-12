@@ -10,6 +10,7 @@
     "locationNotFound": "Error: Location not found in database",
     "settings": "Settings",
     "tutorials": "Tutorials",
+    "tutorialsWarning": "If this is your first time playing, you can simply start a new game: the tutorials will be naturally presented during the game!",
     "contribute": "Contribute",
     "bugReports": "Bug Reports",
     "bugReportsText": "If you experience any bug during your exploration, please add it to the <a href=\"https://github.com/BarthPaleologue/CosmosJourneyer/issues\">issue tracker</a>. You can also send an email at <a href=\"mailto:barth.paleologue@cosmosjourneyer.com\">barth.paleologue@cosmosjourneyer.com</a>. Sending screenshots and save files can help enormously with the debugging process.",

@@ -24,9 +24,15 @@ import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
 describe("FuelScoopTutorial", () => {
     it("spawns near a star", () => {
         const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
-        const tutorial = new FuelScoopTutorial(starSystemDatabase);
+        const tutorial = new FuelScoopTutorial();
 
-        const saveData = tutorial.saveData;
+        const saveDataResult = tutorial.getSaveData(starSystemDatabase);
+        expect(saveDataResult.success).toBe(true);
+        if (!saveDataResult.success) {
+            throw new Error("saveData is not successful");
+        }
+
+        const saveData = saveDataResult.value;
 
         expect(saveData.playerLocation.type).toBe("inSpaceship");
         if (saveData.playerLocation.type !== "inSpaceship") {

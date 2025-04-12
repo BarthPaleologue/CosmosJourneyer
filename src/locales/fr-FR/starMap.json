@@ -1,9 +1,9 @@
 {
     "distance": "Distance",
     "planets": "Planètes",
-    "plotItinerary": "Planifier l'itinéraire",
-    "bookmark": "Marquer",
-    "bookmarked": "Marqué",
+    "plotItinerary": "Tracer l'itinéraire",
+    "bookmark": "Favoris",
+    "bookmarked": "Favoris",
     "distanceToSol": "Distance à Sol",
     "distanceFromCurrent": "Distance",
     "humanPresence": "Présence humaine",

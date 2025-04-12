@@ -6,7 +6,9 @@ import { StarSystemCoordinatesSchema } from "../utils/coordinates/starSystemCoor
 import { SerializedComponentSchema } from "../spaceship/serializedComponents/component";
 
 export const CompletedTutorialsSchema = z.object({
+    flightCompleted: z.boolean().default(false),
     stationLandingCompleted: z.boolean().default(false),
+    starMapCompleted: z.boolean().default(false),
     fuelScoopingCompleted: z.boolean().default(false)
 });
 
@@ -38,7 +40,9 @@ export const SerializedPlayerSchema = z.object({
     spaceShips: z.array(SerializedSpaceshipSchema).default([getDefaultSerializedSpaceship()]),
     spareSpaceshipComponents: z.array(SerializedComponentSchema).default([]),
     tutorials: CompletedTutorialsSchema.default({
+        flightCompleted: false,
         stationLandingCompleted: false,
+        starMapCompleted: false,
         fuelScoopingCompleted: false
     })
 });
