@@ -24,6 +24,7 @@ import { FuelScoopTutorial } from "../tutorials/fuelScoopTutorial";
 import { StationLandingTutorial } from "../tutorials/stationLandingTutorial";
 import { initI18n } from "../i18n";
 import { Sounds } from "../assets/sounds";
+import { StarMapTutorial } from "../tutorials/starMapTutorial";
 
 export async function createTutorialScene(engine: AbstractEngine): Promise<Scene> {
     const scene = new Scene(engine);
@@ -58,6 +59,9 @@ export async function createTutorialScene(engine: AbstractEngine): Promise<Scene
             break;
         case "stationLanding":
             await tutorialLayer.setTutorial(new StationLandingTutorial());
+            break;
+        case "starMap":
+            await tutorialLayer.setTutorial(new StarMapTutorial());
             break;
     }
 
