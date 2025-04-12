@@ -23,8 +23,11 @@ import {
 } from "../utils/strings/inputControlsString";
 import { Tutorial } from "./tutorial";
 import coverImgSrc from "../../asset/tutorials/starMapTutorial/cover.webp";
+import openImgSrc from "../../asset/tutorials/starMapTutorial/open.webp";
 import controlsImgSrc from "../../asset/tutorials/starMapTutorial/controls.webp";
+import missionImgSrc from "../../asset/tutorials/starMapTutorial/mission.webp";
 import plotItineraryImgSrc from "../../asset/tutorials/starMapTutorial/plotItinerary.webp";
+import jumpImgSrc from "../../asset/tutorials/starMapTutorial/jump.webp";
 import saveData from "../../asset/tutorials/flightTutorial/save.json";
 import i18n from "../i18n";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
@@ -79,6 +82,7 @@ export class StarMapTutorial implements Tutorial {
         <div class="tutorialContent">
             <p>Finding your way among the stars is not trivial without a map.</p> 
             <p>To open the star map, press <strong>${toggleStarMapKeys}</strong>.</p> 
+            <img src="${openImgSrc}" alt="Star map opening" class="tutorialImage">
             <p>Pressing the same key again will close the star map.</p>
         </div>`;
 
@@ -96,14 +100,15 @@ export class StarMapTutorial implements Tutorial {
 
         const howToUseStarMapPanelHtml = `
         <div class="tutorialContent">
-            <p>Once the star map is open, you can use the mouse to move the camera around the center of the view. To translate the center of the view, use <strong>${keys}</strong>.</p>
+            <p>You can drag the camera around the center of the view with the mouse. To translate the center of the view, use <strong>${keys}</strong>.</p>
             <img src="${controlsImgSrc}" alt="Star map controls" class="tutorialImage">
             <p>You can zoom with the mouse wheel, and nearby stars can be selected by clicking on them.</p>
         </div>`;
 
         const howToMissionsPanelHtml = `
         <div class="tutorialContent">
-            <p>If you have taken missions, you will find your destinations thanks to the orange icons on the map.</p>
+            <p>If you have ongoing missions, you can find your destinations thanks to the orange icons on the map.</p>
+            <img src="${missionImgSrc}" alt="Star map controls" class="tutorialImage">
             <p>You can click on the icon to target the system</p>
         </div>`;
 
@@ -111,8 +116,8 @@ export class StarMapTutorial implements Tutorial {
         <div class="tutorialContent">
             <p>Once you have selected a system, its infos will be displayed on the left of the screen.</p>
             <p>You can add it to your bookmarks by clicking the "Bookmark" button.</p>
-            <p>To plot an itinerary, click on the "Plot itinerary" button. This will create a sequence of interstellar jumps for you to follow</p>
             <img src="${plotItineraryImgSrc}" alt="Star map controls" class="tutorialImage">
+            <p>To plot an itinerary, click on the "Plot itinerary" button. This will create a sequence of interstellar jumps for you to follow</p>
         </div>`;
 
         const jumpKeys = pressInteractionToStrings(StarSystemInputs.map.jumpToSystem, keyboardLayoutMap).join(
@@ -123,11 +128,13 @@ export class StarMapTutorial implements Tutorial {
         <div class="tutorialContent">
             <p>To follow your itinerary, close the star map and align your ship with your target.</p>
             <p>Once aligned, press <strong>${jumpKeys}</strong> to warp to the system.</p>
+            <img src="${jumpImgSrc}" alt="Star map controls" class="tutorialImage">
             <p>You can repeat this process until you reach your destination.</p>
         </div>`;
 
         const endPanelHtml = `
         <div class="tutorialContent">
+            <img src="${coverImgSrc}" alt="Welcome to Cosmos Journeyer">
             <p>Congratulations! You now know how to use the star map. I hope you will find it useful in your interstellar adventures!</p>
             ${i18n.t("tutorials:common:tutorialEnding", {
                 // This displays a small internationalized text to explain the keys to end the tutorial
