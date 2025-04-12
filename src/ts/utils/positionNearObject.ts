@@ -23,6 +23,7 @@ import { Controls } from "../uberCore/controls";
 import { getUpwardDirection, roll, rotateAround, setRotationQuaternion } from "../uberCore/transforms/basicTransform";
 import { CanHaveRings } from "../architecture/canHaveRings";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { Lerp } from "@babylonjs/core/Maths/math.scalar.functions";
 
 export function nearestObject(objectPosition: Vector3, bodies: ReadonlyArray<Transformable>): Transformable {
     let distance = -1;
@@ -169,7 +170,8 @@ export function positionNearObjectWithStarVisible(
 
 export function positionNearObjectAsteroidField(
     body: Transformable & CanHaveRings & HasBoundingSphere,
-    starSystem: StarSystemController
+    starSystem: StarSystemController,
+    t: number
 ): Vector3 {
     const asteroidField = body.asteroidField;
     if (asteroidField === null) {
@@ -178,7 +180,7 @@ export function positionNearObjectAsteroidField(
 
     const bodyPosition = body.getTransform().getAbsolutePosition();
 
-    const asteroidFieldAverageRadius = asteroidField.averageRadius;
+    const distanceToPlanet = Lerp(asteroidField.minRadius, asteroidField.maxRadius, t);
 
     const nearestStar = nearestObject(bodyPosition, starSystem.getStellarObjects());
     const dirToStar = bodyPosition.subtract(nearestStar.getTransform().getAbsolutePosition()).normalize();
@@ -186,6 +188,6 @@ export function positionNearObjectAsteroidField(
     const lateralDirection = Vector3.Cross(dirToStar, upDirection).normalize();
 
     return bodyPosition
-        .add(lateralDirection.scale(asteroidFieldAverageRadius))
+        .add(lateralDirection.scale(distanceToPlanet))
         .add(upDirection.scale(asteroidField.patchThickness));
 }

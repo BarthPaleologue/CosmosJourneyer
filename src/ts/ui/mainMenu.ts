@@ -226,7 +226,7 @@ export class MainMenu {
         const axis = Vector3.Cross(currentForward, newForward);
         const angle = Vector3.GetAngleBetweenVectors(currentForward, newForward, axis);
 
-        const targetPosition = positionNearObjectAsteroidField(celestialBody, starSystemController);
+        const targetPosition = positionNearObjectAsteroidField(celestialBody, starSystemController, 0.9);
 
         const rotationAnimation = new TransformRotationAnimation(
             this.controls.getTransform(),
