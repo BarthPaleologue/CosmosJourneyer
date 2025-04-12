@@ -293,6 +293,14 @@ export class StarSystemDatabase {
 
         const customSystemsAfterPlugins = customSystemModels.map((model) => this.applyPlugins(model));
 
+        if (
+            this.fallbackSystem.coordinates.starSectorX === sectorX &&
+            this.fallbackSystem.coordinates.starSectorY === sectorY &&
+            this.fallbackSystem.coordinates.starSectorZ === sectorZ
+        ) {
+            customSystemsAfterPlugins.push(this.fallbackSystem);
+        }
+
         return generatedModels.concat(customSystemsAfterPlugins);
     }
 
