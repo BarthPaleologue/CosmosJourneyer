@@ -48,7 +48,7 @@ export class SidePanels {
         const tutorialsPanel = document.getElementById("tutorials");
         if (tutorialsPanel === null) throw new Error("#tutorials does not exist!");
         this.tutorialsPanel = tutorialsPanel;
-        this.tutorialsPanelContent = new TutorialsPanelContent(starSystemDatabase);
+        this.tutorialsPanelContent = new TutorialsPanelContent();
         this.tutorialsPanel.appendChild(this.tutorialsPanelContent.htmlRoot);
 
         const contributePanel = document.getElementById("contribute");

@@ -163,7 +163,7 @@ export class CosmosJourneyer {
             await this.createAutoSave();
 
             if (!this.player.tutorials.fuelScoopingCompleted) {
-                await this.tutorialLayer.setTutorial(new FuelScoopTutorial(this.starSystemDatabase));
+                await this.tutorialLayer.setTutorial(new FuelScoopTutorial());
                 this.tutorialLayer.onQuitTutorial.addOnce(() => {
                     this.player.tutorials.fuelScoopingCompleted = true;
                 });
@@ -202,7 +202,7 @@ export class CosmosJourneyer {
 
         this.mainMenu = new MainMenu(this.sidePanels, this.starSystemView, this.starSystemDatabase);
         this.mainMenu.onStartObservable.add(async () => {
-            await this.tutorialLayer.setTutorial(new FlightTutorial(this.starSystemDatabase));
+            await this.tutorialLayer.setTutorial(new FlightTutorial());
             await this.starSystemView.switchToSpaceshipControls();
             const spaceshipPosition = this.starSystemView.getSpaceshipControls().getTransform().getAbsolutePosition();
             const closestSpaceStation = this.starSystemView
@@ -249,7 +249,7 @@ export class CosmosJourneyer {
             const limitDistance = 10 * closestLandableFacility.getBoundingRadius();
             if (Vector3.DistanceSquared(shipPosition, facilityPosition) > limitDistance ** 2) return;
 
-            await this.tutorialLayer.setTutorial(new StationLandingTutorial(this.starSystemDatabase));
+            await this.tutorialLayer.setTutorial(new StationLandingTutorial());
             this.tutorialLayer.onQuitTutorial.addOnce(() => {
                 this.player.tutorials.stationLandingCompleted = true;
             });
@@ -720,7 +720,18 @@ export class CosmosJourneyer {
     public async loadTutorial(tutorial: Tutorial) {
         this.engine.onEndFrameObservable.addOnce(async () => {
             this.mainMenu.hide();
-            await this.loadSave(tutorial.saveData);
+            const saveResult = tutorial.getSaveData(this.starSystemDatabase);
+            if (!saveResult.success) {
+                console.error(saveResult.error);
+                await alertModal(
+                    i18n.t(
+                        "The tutorial save has errors and could not be loaded! Check the console for more information."
+                    )
+                );
+                return;
+            }
+
+            await this.loadSave(saveResult.value);
             this.player.uuid = Settings.TUTORIAL_SAVE_UUID;
             await this.resume();
             await this.tutorialLayer.setTutorial(tutorial);

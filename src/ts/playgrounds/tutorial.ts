@@ -20,8 +20,6 @@ import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 import { TutorialLayer } from "../ui/tutorial/tutorialLayer";
 import { FlightTutorial } from "../tutorials/flightTutorial";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
 import { FuelScoopTutorial } from "../tutorials/fuelScoopTutorial";
 import { StationLandingTutorial } from "../tutorials/stationLandingTutorial";
 import { initI18n } from "../i18n";
@@ -48,20 +46,18 @@ export async function createTutorialScene(engine: AbstractEngine): Promise<Scene
     const tutorialLayer = new TutorialLayer();
     document.body.appendChild(tutorialLayer.root);
 
-    const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
-
     const urlParams = new URLSearchParams(window.location.search);
     const requestedTutorial = urlParams.get("tutorial") ?? "flight";
 
     switch (requestedTutorial) {
         case "flight":
-            await tutorialLayer.setTutorial(new FlightTutorial(starSystemDatabase));
+            await tutorialLayer.setTutorial(new FlightTutorial());
             break;
         case "fuelScoop":
-            await tutorialLayer.setTutorial(new FuelScoopTutorial(starSystemDatabase));
+            await tutorialLayer.setTutorial(new FuelScoopTutorial());
             break;
         case "stationLanding":
-            await tutorialLayer.setTutorial(new StationLandingTutorial(starSystemDatabase));
+            await tutorialLayer.setTutorial(new StationLandingTutorial());
             break;
     }
 

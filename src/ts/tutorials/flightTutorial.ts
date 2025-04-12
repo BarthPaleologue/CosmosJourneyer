@@ -32,19 +32,14 @@ import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import { safeParseSave, Save } from "../saveFile/saveFileData";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { StarSystemInputs } from "../inputs/starSystemInputs";
+import { SaveLoadingError } from "../saveFile/saveLoadingError";
+import { Result } from "../utils/types";
 
 export class FlightTutorial implements Tutorial {
-    readonly coverImageSrc = welcomeImageSrc;
-    readonly saveData: Save;
+    readonly coverImageSrc: string = welcomeImageSrc;
 
-    constructor(starSystemDatabase: StarSystemDatabase) {
-        const parsedSaveDataResult = safeParseSave(saveData, starSystemDatabase);
-        if (!parsedSaveDataResult.success) {
-            console.error(parsedSaveDataResult.error);
-            throw new Error("StationLandingTutorial: saveData is null");
-        }
-
-        this.saveData = parsedSaveDataResult.value;
+    getSaveData(starSystemDatabase: StarSystemDatabase): Result<Save, SaveLoadingError> {
+        return safeParseSave(saveData, starSystemDatabase);
     }
 
     getTitle() {

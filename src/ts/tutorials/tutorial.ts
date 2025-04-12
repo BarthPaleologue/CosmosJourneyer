@@ -16,13 +16,16 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Save } from "../saveFile/saveFileData";
+import { SaveLoadingError } from "../saveFile/saveLoadingError";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { Result } from "../utils/types";
 
 export interface Tutorial {
     getTitle(): string;
-    coverImageSrc: string;
+    readonly coverImageSrc: string;
     getDescription(): string;
 
-    saveData: Save;
+    getSaveData(starSystemDatabase: StarSystemDatabase): Result<Save, SaveLoadingError>;
 
     getContentPanelsHtml(): Promise<string[]>;
 }
