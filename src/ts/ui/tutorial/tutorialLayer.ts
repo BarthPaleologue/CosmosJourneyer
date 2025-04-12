@@ -100,9 +100,13 @@ export class TutorialLayer implements IDisposable {
 
         TutorialControlsInputs.map.nextPanel.on("complete", async () => {
             if (this.currentPanelIndex === this.tutorialPanelsHtml.length - 1) {
+                TutorialControlsInputs.setEnabled(false);
                 if (await promptModalBoolean(i18n.t("tutorials:common:quitConfirm"))) {
                     this.quitTutorial();
+                    return;
                 }
+
+                TutorialControlsInputs.setEnabled(true);
 
                 return;
             }
