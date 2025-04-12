@@ -23,6 +23,8 @@ import {
 } from "../utils/strings/inputControlsString";
 import { Tutorial } from "./tutorial";
 import coverImgSrc from "../../asset/tutorials/starMapTutorial/cover.webp";
+import controlsImgSrc from "../../asset/tutorials/starMapTutorial/controls.webp";
+import plotItineraryImgSrc from "../../asset/tutorials/starMapTutorial/plotItinerary.webp";
 import saveData from "../../asset/tutorials/flightTutorial/save.json";
 import i18n from "../i18n";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
@@ -95,6 +97,7 @@ export class StarMapTutorial implements Tutorial {
         const howToUseStarMapPanelHtml = `
         <div class="tutorialContent">
             <p>Once the star map is open, you can use the mouse to move the camera around the center of the view. To translate the center of the view, use <strong>${keys}</strong>.</p>
+            <img src="${controlsImgSrc}" alt="Star map controls" class="tutorialImage">
             <p>You can zoom with the mouse wheel, and nearby stars can be selected by clicking on them.</p>
         </div>`;
 
@@ -109,6 +112,7 @@ export class StarMapTutorial implements Tutorial {
             <p>Once you have selected a system, its infos will be displayed on the left of the screen.</p>
             <p>You can add it to your bookmarks by clicking the "Bookmark" button.</p>
             <p>To plot an itinerary, click on the "Plot itinerary" button. This will create a sequence of interstellar jumps for you to follow</p>
+            <img src="${plotItineraryImgSrc}" alt="Star map controls" class="tutorialImage">
         </div>`;
 
         const jumpKeys = pressInteractionToStrings(StarSystemInputs.map.jumpToSystem, keyboardLayoutMap).join(
