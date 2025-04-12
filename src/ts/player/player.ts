@@ -136,7 +136,9 @@ export class Player {
             spaceShips: [getDefaultSerializedSpaceship()],
             spareSpaceshipComponents: [],
             tutorials: {
+                flightCompleted: false,
                 stationLandingCompleted: false,
+                starMapCompleted: false,
                 fuelScoopingCompleted: false
             }
         });

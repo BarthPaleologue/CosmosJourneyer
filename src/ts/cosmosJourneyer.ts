@@ -67,6 +67,7 @@ import { getUniverseObjectId } from "./utils/coordinates/universeObjectId";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { OrbitalObjectType } from "./architecture/orbitalObjectType";
 import { positionNearObject } from "./utils/positionNearObject";
+import { StarMapTutorial } from "./tutorials/starMapTutorial";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -203,6 +204,9 @@ export class CosmosJourneyer {
         this.mainMenu = new MainMenu(this.sidePanels, this.starSystemView, this.starSystemDatabase);
         this.mainMenu.onStartObservable.add(async () => {
             await this.tutorialLayer.setTutorial(new FlightTutorial());
+            this.tutorialLayer.onQuitTutorial.addOnce(() => {
+                this.player.tutorials.flightCompleted = true;
+            });
             await this.starSystemView.switchToSpaceshipControls();
             const spaceshipPosition = this.starSystemView.getSpaceshipControls().getTransform().getAbsolutePosition();
             const closestSpaceStation = this.starSystemView
@@ -262,6 +266,17 @@ export class CosmosJourneyer {
         this.starSystemView.onInitStarSystem.add(() => {
             const starSystemModel = this.starSystemView.getStarSystem().model;
             this.starMap.setCurrentStarSystem(starSystemModel.coordinates);
+        });
+
+        this.starSystemView.spaceStationLayer.onTakeOffObservable.add(async () => {
+            if (this.player.tutorials.starMapCompleted) {
+                return;
+            }
+
+            await this.tutorialLayer.setTutorial(new StarMapTutorial());
+            this.tutorialLayer.onQuitTutorial.addOnce(() => {
+                this.player.tutorials.starMapCompleted = true;
+            });
         });
 
         this.pauseMenu = new PauseMenu(this.sidePanels);
