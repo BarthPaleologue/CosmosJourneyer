@@ -1113,8 +1113,8 @@ export class StarSystemView implements View {
             target = this.getStarSystem().addSystemTarget(targetSeed, this.starSystemDatabase);
             this.targetCursorLayer.addObject(target);
         }
-        this.targetCursorLayer.setTarget(target);
-        this.spaceShipLayer.setTarget(target.getTransform());
+        this.targetCursorLayer.setTarget(target, true);
+        this.spaceShipLayer.setTarget(target.getTransform(), true);
     }
 
     public render() {
