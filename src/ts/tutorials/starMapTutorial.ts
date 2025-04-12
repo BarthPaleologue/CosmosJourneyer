@@ -28,7 +28,7 @@ import controlsImgSrc from "../../asset/tutorials/starMapTutorial/controls.webp"
 import missionImgSrc from "../../asset/tutorials/starMapTutorial/mission.webp";
 import plotItineraryImgSrc from "../../asset/tutorials/starMapTutorial/plotItinerary.webp";
 import jumpImgSrc from "../../asset/tutorials/starMapTutorial/jump.webp";
-import saveData from "../../asset/tutorials/flightTutorial/save.json";
+import saveData from "../../asset/tutorials/starMapTutorial/save.json";
 import i18n from "../i18n";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import { safeParseSave, Save } from "../saveFile/saveFileData";
