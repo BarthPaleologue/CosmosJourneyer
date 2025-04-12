@@ -46,6 +46,7 @@ export async function createTutorialScene(engine: AbstractEngine): Promise<Scene
     await assetsManager.loadAsync();
 
     const tutorialLayer = new TutorialLayer();
+    document.body.appendChild(tutorialLayer.root);
 
     const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
 

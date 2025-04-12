@@ -9,7 +9,7 @@ import { Tutorial } from "../../tutorials/tutorial";
 import { promptModalBoolean } from "../../utils/dialogModal";
 
 export class TutorialLayer implements IDisposable {
-    private readonly layerRoot: HTMLDivElement;
+    readonly root: HTMLDivElement;
 
     private readonly panel: HTMLDivElement;
 
@@ -30,8 +30,8 @@ export class TutorialLayer implements IDisposable {
     readonly onQuitTutorial: Observable<void> = new Observable();
 
     constructor() {
-        this.layerRoot = document.createElement("div");
-        this.layerRoot.classList.add("tutorialLayer");
+        this.root = document.createElement("div");
+        this.root.classList.add("tutorialLayer");
 
         this.panel = document.createElement("div");
         this.panel.classList.add("tutorialPanel");
@@ -79,9 +79,7 @@ export class TutorialLayer implements IDisposable {
 
         this.panel.appendChild(this.controls);
 
-        this.layerRoot.appendChild(this.panel);
-
-        document.body.appendChild(this.layerRoot);
+        this.root.appendChild(this.panel);
 
         TutorialControlsInputs.map.prevPanel.on("complete", () => {
             if (this.currentPanelIndex === 0) {
@@ -143,7 +141,7 @@ export class TutorialLayer implements IDisposable {
     }
 
     public isEnabled() {
-        return this.layerRoot.style.display === "block";
+        return this.root.style.display === "block";
     }
 
     private updatePanelState() {
@@ -153,7 +151,7 @@ export class TutorialLayer implements IDisposable {
     }
 
     dispose(): void {
-        this.layerRoot.remove();
+        this.root.remove();
         this.onQuitTutorial.clear();
     }
 }

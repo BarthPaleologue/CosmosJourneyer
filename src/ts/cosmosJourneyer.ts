@@ -186,6 +186,7 @@ export class CosmosJourneyer {
         AudioManager.SetMask(AudioMasks.STAR_SYSTEM_VIEW);
 
         this.tutorialLayer = new TutorialLayer();
+        document.body.appendChild(this.tutorialLayer.root);
 
         this.sidePanels = new SidePanels(this.starSystemDatabase, this.saveManager);
         this.sidePanels.loadSavePanelContent.onLoadSaveObservable.add(async (saveData: Save) => {
