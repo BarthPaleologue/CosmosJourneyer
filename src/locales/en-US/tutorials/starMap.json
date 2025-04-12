@@ -1,0 +1,19 @@
+{
+    "title": "Star Map",
+    "description": "Master interstellar travel with the star map.",
+    "welcome": "This tutorial will teach you how to use the star map to master interstellar travel.",
+    "open1": "Finding your way among the stars is not trivial without a map.",
+    "open2": "To open the star map, press <strong>{{keys}}</strong>.",
+    "open3": "Pressing the same key again will close the star map.",
+    "controls1": "You can drag the camera around the center of the view with the mouse. To translate the center of the view, use <strong>{{keys}}</strong>.",
+    "controls2": "You can zoom with the mouse wheel, and nearby stars can be selected by clicking on them.",
+    "missions1": "If you have ongoing missions, you can find your destinations thanks to the orange icons on the map.",
+    "missions2": "You can click on the icon to target the system",
+    "system1": "Once you have selected a system, its infos will be displayed on the left of the screen.",
+    "system2": "You can add it to your bookmarks by clicking the \"Bookmark\" button.",
+    "system3": "To plot an itinerary, click on the \"Plot itinerary\" button. This will create a sequence of interstellar jumps for you to follow",
+    "travel1": "To follow your itinerary, close the star map and align your ship with your target.",
+    "travel2": "Once aligned, press <strong>{{keys}}</strong> to warp to the system.",
+    "travel3": "You can repeat this process until you reach your destination.",
+    "congratulations": "Congratulations! You now know how to use the star map. I hope you will find it useful in your interstellar adventures!"
+}

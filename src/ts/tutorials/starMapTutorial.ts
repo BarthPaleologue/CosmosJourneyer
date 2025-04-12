@@ -49,11 +49,11 @@ export class StarMapTutorial implements Tutorial {
     }
 
     getTitle() {
-        return "Star map Tutorial";
+        return i18n.t("tutorials:starMap:title");
     }
 
     getDescription() {
-        return "Learn how to use the star map.";
+        return i18n.t("tutorials:starMap:description");
     }
 
     async getContentPanelsHtml(): Promise<string[]> {
@@ -61,7 +61,7 @@ export class StarMapTutorial implements Tutorial {
         const welcomePanelHtml = `
         <div class="tutorialContent">
             <img src="${coverImgSrc}" alt="Welcome to Cosmos Journeyer">
-            <p>This tutorial will teach you how to use the star map to master interstellar travel.</p>
+            <p>${i18n.t("tutorials:starMap:welcome")}</p>
             
             ${i18n.t("tutorials:common:navigationInfo", {
                 // This displays a small internationalized text to explain the keys to navigate the tutorial
@@ -80,10 +80,10 @@ export class StarMapTutorial implements Tutorial {
 
         const howToOpenPanelHtml = `
         <div class="tutorialContent">
-            <p>Finding your way among the stars is not trivial without a map.</p> 
-            <p>To open the star map, press <strong>${toggleStarMapKeys}</strong>.</p> 
+            <p>${i18n.t("tutorials:starMap:open1")}</p> 
+            <p>${i18n.t("tutorials:starMap:open2", { keys: toggleStarMapKeys })}</p> 
             <img src="${openImgSrc}" alt="Star map opening" class="tutorialImage">
-            <p>Pressing the same key again will close the star map.</p>
+            <p>${i18n.t("tutorials:starMap:open3")}</p>
         </div>`;
 
         const horizontalKeys = dPadCompositeToString(
@@ -100,24 +100,24 @@ export class StarMapTutorial implements Tutorial {
 
         const howToUseStarMapPanelHtml = `
         <div class="tutorialContent">
-            <p>You can drag the camera around the center of the view with the mouse. To translate the center of the view, use <strong>${keys}</strong>.</p>
+            <p>${i18n.t("tutorials:starMap:controls1", { keys })}</p>
             <img src="${controlsImgSrc}" alt="Star map controls" class="tutorialImage">
-            <p>You can zoom with the mouse wheel, and nearby stars can be selected by clicking on them.</p>
+            <p>${i18n.t("tutorials:starMap:controls2")}</p>
         </div>`;
 
         const howToMissionsPanelHtml = `
         <div class="tutorialContent">
-            <p>If you have ongoing missions, you can find your destinations thanks to the orange icons on the map.</p>
-            <img src="${missionImgSrc}" alt="Star map controls" class="tutorialImage">
-            <p>You can click on the icon to target the system</p>
+            <p>${i18n.t("tutorials:starMap:missions1")}</p>
+            <img src="${missionImgSrc}" alt="Star map missions" class="tutorialImage">
+            <p>${i18n.t("tutorials:starMap:missions2")}</p>
         </div>`;
 
         const howToInteractWithSystemPanelHtml = `
         <div class="tutorialContent">
-            <p>Once you have selected a system, its infos will be displayed on the left of the screen.</p>
-            <p>You can add it to your bookmarks by clicking the "Bookmark" button.</p>
-            <img src="${plotItineraryImgSrc}" alt="Star map controls" class="tutorialImage">
-            <p>To plot an itinerary, click on the "Plot itinerary" button. This will create a sequence of interstellar jumps for you to follow</p>
+            <p>${i18n.t("tutorials:starMap:system1")}</p>
+            <p>${i18n.t("tutorials:starMap:system2")}</p>
+            <img src="${plotItineraryImgSrc}" alt="Star map system interactions" class="tutorialImage">
+            <p>${i18n.t("tutorials:starMap:system3")}</p>
         </div>`;
 
         const jumpKeys = pressInteractionToStrings(StarSystemInputs.map.jumpToSystem, keyboardLayoutMap).join(
@@ -126,16 +126,16 @@ export class StarMapTutorial implements Tutorial {
 
         const howToInterstellarTravelPanelHtml = `
         <div class="tutorialContent">
-            <p>To follow your itinerary, close the star map and align your ship with your target.</p>
-            <p>Once aligned, press <strong>${jumpKeys}</strong> to warp to the system.</p>
-            <img src="${jumpImgSrc}" alt="Star map controls" class="tutorialImage">
-            <p>You can repeat this process until you reach your destination.</p>
+            <p>${i18n.t("tutorials:starMap:travel1")}</p>
+            <p>${i18n.t("tutorials:starMap:travel2", { keys: jumpKeys })}</p>
+            <img src="${jumpImgSrc}" alt="Interstellar jump" class="tutorialImage">
+            <p>${i18n.t("tutorials:starMap:travel3")}</p>
         </div>`;
 
         const endPanelHtml = `
         <div class="tutorialContent">
             <img src="${coverImgSrc}" alt="Welcome to Cosmos Journeyer">
-            <p>Congratulations! You now know how to use the star map. I hope you will find it useful in your interstellar adventures!</p>
+            <p>${i18n.t("tutorials:starMap:congratulations")}</p>
             ${i18n.t("tutorials:common:tutorialEnding", {
                 // This displays a small internationalized text to explain the keys to end the tutorial
                 keyQuit: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keyboardLayoutMap).join(

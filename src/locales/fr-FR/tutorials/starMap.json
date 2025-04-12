@@ -1,0 +1,19 @@
+{
+    "title": "Carte Stellaire",
+    "description": "Maîtrisez le voyage interstellaire avec la carte stellaire.",
+    "welcome": "Ce tutoriel va vous apprendre comment utiliser la carte stellaire pour maîtriser le voyage interstellaire.",
+    "open1": "Trouver son chemin parmi les étoiles peut se révéler délicat sans une carte.",
+    "open2": "Pour ouvrir la carte stellaire, appuyez sur <strong>{{keys}}</strong>.",
+    "open3": "Appuyer à nouveau sur la même touche fermera la carte stellaire.",
+    "controls1": "Vous pouvez déplacer la caméra autour du centre de la vue avec la souris. Pour déplacer le centre de la vue, utilisez <strong>{{keys}}</strong>.",
+    "controls2": "Vous pouvez zoomer avec la molette de la souris, et les étoiles proches peuvent être sélectionnées en cliquant dessus.",
+    "missions1": "Si vous avez des missions en cours, vous pouvez trouver vos destinations grâce aux icônes oranges sur la carte.",
+    "missions2": "Vous pouvez cliquer sur l'icône pour cibler le système",
+    "system1": "Une fois que vous avez sélectionné un système, ses informations s'afficheront sur la gauche de l'écran.",
+    "system2": "Vous pouvez l'ajouter à vos favoris en cliquant sur le bouton \"Favoris\".",
+    "system3": "Pour tracer un itinéraire, cliquez sur le bouton \"Tracer itinéraire\". Cela créera une séquence de sauts interstellaires à suivre",
+    "travel1": "Pour suivre votre itinéraire, fermez la carte stellaire et alignez votre vaisseau avec votre cible.",
+    "travel2": "Une fois aligné, appuyez sur <strong>{{keys}}</strong> pour voyager vers le système.",
+    "travel3": "Vous pouvez répéter ce processus jusqu'à ce que vous atteigniez votre destination.",
+    "congratulations": "Félicitations ! Vous savez maintenant comment utiliser la carte stellaire. J'espère que vous la trouverez utile dans vos aventures spatiales !"
+}
