@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Settings } from "../src/ts/settings";
+import { Settings } from "../settings";
 import {
     celsiusToKelvin,
     computeMeanTemperature,
@@ -31,7 +31,7 @@ import {
     hasLiquidWater,
     kelvinToCelsius,
     waterBoilingTemperature
-} from "../src/ts/utils/physics";
+} from "./physics";
 import { expect, test, describe } from "vitest";
 
 test("celsiusToKelvin", () => {
