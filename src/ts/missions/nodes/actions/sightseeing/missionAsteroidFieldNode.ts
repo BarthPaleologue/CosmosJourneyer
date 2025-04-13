@@ -32,6 +32,8 @@ import { Settings } from "../../../../settings";
 import { getGoToSystemInstructions } from "../../../common";
 import { StarSystemDatabase } from "../../../../starSystem/starSystemDatabase";
 import { AsteroidFieldMissionState, MissionAsteroidFieldNodeSerialized } from "./missionAsteroidFieldNodeSerialized";
+import { getObjectModelById } from "../../../../starSystem/starSystemModel";
+import { OrbitalObjectType } from "../../../../architecture/orbitalObjectType";
 
 /**
  * Node used to describe a trek to an asteroid field
@@ -43,9 +45,37 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType
 
     private readonly targetSystemCoordinates: StarSystemCoordinates;
 
-    constructor(objectId: UniverseObjectId) {
+    private constructor(objectId: UniverseObjectId) {
         this.objectId = objectId;
         this.targetSystemCoordinates = objectId.systemCoordinates;
+    }
+
+    public static New(
+        objectId: UniverseObjectId,
+        starSystemDatabase: StarSystemDatabase
+    ): MissionAsteroidFieldNode | null {
+        const systemModel = starSystemDatabase.getSystemModelFromCoordinates(objectId.systemCoordinates);
+        if (systemModel === null) {
+            return null;
+        }
+
+        const objectModel = getObjectModelById(objectId.idInSystem, systemModel);
+        if (objectModel === null) {
+            return null;
+        }
+
+        if (
+            objectModel.type !== OrbitalObjectType.TELLURIC_PLANET &&
+            objectModel.type !== OrbitalObjectType.GAS_PLANET
+        ) {
+            return null;
+        }
+
+        if (objectModel.rings === null) {
+            return null;
+        }
+
+        return new MissionAsteroidFieldNode(objectId);
     }
 
     /**
@@ -79,17 +109,17 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType
 
         const targetObject = currentSystem.getOrbitalObjectById(this.objectId.idInSystem);
         if (targetObject === null) {
-            throw new Error(`Could not find object with ID ${JSON.stringify(this.objectId)}`);
+            return;
         }
 
         const celestialBody = currentSystem.getCelestialBodies().find((body) => body === targetObject);
         if (celestialBody === undefined) {
-            throw new Error(`Object with ID ${JSON.stringify(this.objectId)} is not a celestial body`);
+            return;
         }
 
         const asteroidField = celestialBody.asteroidField;
         if (asteroidField === null) {
-            throw new Error(`Object with ID ${JSON.stringify(this.objectId)} does not have an asteroid field`);
+            return;
         }
 
         const playerPositionWorld = context.playerPosition;
@@ -127,7 +157,7 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType
         const objectModel = starSystemDatabase.getObjectModelByUniverseId(this.objectId);
         const systemModel = starSystemDatabase.getSystemModelFromCoordinates(this.targetSystemCoordinates);
         if (objectModel === null || systemModel === null) {
-            throw new Error(`Could not find object with ID ${JSON.stringify(this.objectId)}`);
+            return "ERROR: objectModel or systemModel is null";
         }
         return i18n.t("missions:sightseeing:describeAsteroidFieldTrek", {
             objectName: objectModel.name,
@@ -147,7 +177,7 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType
 
         const targetObject = starSystemDatabase.getObjectModelByUniverseId(this.objectId);
         if (targetObject === null) {
-            throw new Error(`Could not find object with ID ${JSON.stringify(this.objectId)}`);
+            return "ERROR: targetObject is null";
         }
 
         switch (this.state) {

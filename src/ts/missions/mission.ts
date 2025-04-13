@@ -149,9 +149,14 @@ export class Mission {
         this.tree.updateState(context);
     }
 
-    static Deserialize(missionSerialized: MissionSerialized) {
+    static Deserialize(missionSerialized: MissionSerialized, starSystemDatabase: StarSystemDatabase): Mission | null {
+        const missionTree = deserializeMissionNode(missionSerialized.tree, starSystemDatabase);
+        if (missionTree === null) {
+            return null;
+        }
+
         return new Mission(
-            deserializeMissionNode(missionSerialized.tree),
+            missionTree,
             missionSerialized.reward,
             missionSerialized.missionGiver,
             missionSerialized.type

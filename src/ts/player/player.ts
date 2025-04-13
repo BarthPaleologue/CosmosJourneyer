@@ -24,6 +24,7 @@ import { SpaceDiscoveryData } from "../society/encyclopaediaGalactica";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { CompletedTutorials, SerializedPlayer } from "./serializedPlayer";
 import { SerializedComponent } from "../spaceship/serializedComponents/component";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 
 export class Player {
     uuid: string;
@@ -60,7 +61,7 @@ export class Player {
     readonly onNameChangedObservable = new Observable<string>();
     readonly onBalanceChangedObservable = new Observable<number>();
 
-    private constructor(serializedPlayer: SerializedPlayer) {
+    private constructor(serializedPlayer: SerializedPlayer, starSystemDatabase: StarSystemDatabase) {
         this.uuid = serializedPlayer.uuid;
 
         this.#name = serializedPlayer.name;
@@ -82,8 +83,12 @@ export class Player {
 
         this.currentItinerary = structuredClone(serializedPlayer.currentItinerary);
         this.systemBookmarks = structuredClone(serializedPlayer.systemBookmarks);
-        this.currentMissions = serializedPlayer.currentMissions.map((mission) => Mission.Deserialize(mission));
-        this.completedMissions = serializedPlayer.completedMissions.map((mission) => Mission.Deserialize(mission));
+        this.currentMissions = serializedPlayer.currentMissions
+            .map((mission) => Mission.Deserialize(mission, starSystemDatabase))
+            .filter((mission) => mission !== null);
+        this.completedMissions = serializedPlayer.completedMissions
+            .map((mission) => Mission.Deserialize(mission, starSystemDatabase))
+            .filter((mission) => mission !== null);
 
         this.serializedSpaceships = structuredClone(serializedPlayer.spaceShips);
 
@@ -120,32 +125,35 @@ export class Player {
         return true;
     }
 
-    public static Default(): Player {
-        return new Player({
-            uuid: crypto.randomUUID(),
-            name: Player.DEFAULT_NAME,
-            balance: Player.DEFAULT_BALANCE,
-            creationDate: new Date().toISOString(),
-            timePlayedSeconds: 0,
-            visitedSystemHistory: [],
-            discoveries: { uploaded: [], local: [] },
-            currentItinerary: [],
-            systemBookmarks: [],
-            currentMissions: [],
-            completedMissions: [],
-            spaceShips: [getDefaultSerializedSpaceship()],
-            spareSpaceshipComponents: [],
-            tutorials: {
-                flightCompleted: false,
-                stationLandingCompleted: false,
-                starMapCompleted: false,
-                fuelScoopingCompleted: false
-            }
-        });
+    public static Default(starSystemDatabase: StarSystemDatabase): Player {
+        return new Player(
+            {
+                uuid: crypto.randomUUID(),
+                name: Player.DEFAULT_NAME,
+                balance: Player.DEFAULT_BALANCE,
+                creationDate: new Date().toISOString(),
+                timePlayedSeconds: 0,
+                visitedSystemHistory: [],
+                discoveries: { uploaded: [], local: [] },
+                currentItinerary: [],
+                systemBookmarks: [],
+                currentMissions: [],
+                completedMissions: [],
+                spaceShips: [getDefaultSerializedSpaceship()],
+                spareSpaceshipComponents: [],
+                tutorials: {
+                    flightCompleted: false,
+                    stationLandingCompleted: false,
+                    starMapCompleted: false,
+                    fuelScoopingCompleted: false
+                }
+            },
+            starSystemDatabase
+        );
     }
 
-    public static Deserialize(serializedPlayer: SerializedPlayer): Player {
-        return new Player(serializedPlayer);
+    public static Deserialize(serializedPlayer: SerializedPlayer, starSystemDatabase: StarSystemDatabase): Player {
+        return new Player(serializedPlayer, starSystemDatabase);
     }
 
     public static Serialize(player: Player): SerializedPlayer {
@@ -173,7 +181,7 @@ export class Player {
      * Performs a deep copy of the player
      * @param player the player to copy from
      */
-    public copyFrom(player: Player) {
+    public copyFrom(player: Player, starSystemDatabase: StarSystemDatabase) {
         this.uuid = player.uuid;
         this.setName(player.getName());
         this.setBalance(player.getBalance());
@@ -192,8 +200,12 @@ export class Player {
 
         this.currentItinerary = player.currentItinerary.map((system) => structuredClone(system));
         this.systemBookmarks = player.systemBookmarks.map((system) => structuredClone(system));
-        this.currentMissions = player.currentMissions.map((mission) => Mission.Deserialize(mission.serialize()));
-        this.completedMissions = player.completedMissions.map((mission) => Mission.Deserialize(mission.serialize()));
+        this.currentMissions = player.currentMissions
+            .map((mission) => Mission.Deserialize(mission.serialize(), starSystemDatabase))
+            .filter((mission) => mission !== null);
+        this.completedMissions = player.completedMissions
+            .map((mission) => Mission.Deserialize(mission.serialize(), starSystemDatabase))
+            .filter((mission) => mission !== null);
         this.serializedSpaceships = player.serializedSpaceships.map((spaceship) => structuredClone(spaceship));
         this.instancedSpaceships = [...player.instancedSpaceships];
         this.spareSpaceshipComponents = structuredClone(player.spareSpaceshipComponents);

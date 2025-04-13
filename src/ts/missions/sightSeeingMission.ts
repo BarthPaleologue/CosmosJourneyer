@@ -42,14 +42,14 @@ export type SightSeeingTarget = {
     objectId: UniverseObjectId;
 };
 
-function generateMissionTree(target: SightSeeingTarget): MissionNode {
+function generateMissionTree(target: SightSeeingTarget, starSystemDatabase: StarSystemDatabase): MissionNode | null {
     switch (target.type) {
         case MissionType.SIGHT_SEEING_FLY_BY:
             return new MissionFlyByNode(target.objectId);
         case MissionType.SIGHT_SEEING_TERMINATOR_LANDING:
             return new MissionTerminatorLandingNode(target.objectId);
         case MissionType.SIGHT_SEEING_ASTEROID_FIELD:
-            return new MissionAsteroidFieldNode(target.objectId);
+            return MissionAsteroidFieldNode.New(target.objectId, starSystemDatabase);
         default:
             throw new Error(`Unknown sight seeing type: ${target.type}`);
     }
@@ -65,8 +65,11 @@ export function newSightSeeingMission(
     missionGiver: UniverseObjectId,
     target: SightSeeingTarget,
     starSystemDatabase: StarSystemDatabase
-): Mission {
-    const missionTree = generateMissionTree(target);
+): Mission | null {
+    const missionTree = generateMissionTree(target, starSystemDatabase);
+    if (missionTree === null) {
+        return null;
+    }
 
     const targetSystemCoordinates = target.objectId.systemCoordinates;
 

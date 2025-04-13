@@ -34,23 +34,27 @@ import {
 } from "./missionNodeSerialized";
 import { MissionAsteroidFieldNodeSerialized } from "./actions/sightseeing/missionAsteroidFieldNodeSerialized";
 import { MissionTerminatorLandingNodeSerialized } from "./actions/sightseeing/missionTerminatorLandingNodeSerialized";
+import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
 
 /**
  * Deserialize recursively a mission node.
  * @param missionNodeSerialized The serialized mission node.
  */
-export function deserializeMissionNode(missionNodeSerialized: MissionNodeSerialized): MissionNode {
+export function deserializeMissionNode(
+    missionNodeSerialized: MissionNodeSerialized,
+    starSystemDatabase: StarSystemDatabase
+): MissionNode | null {
     switch (missionNodeSerialized.type) {
         case MissionNodeType.AND:
-            return deserializeMissionAndNode(missionNodeSerialized);
+            return deserializeMissionAndNode(missionNodeSerialized, starSystemDatabase);
         case MissionNodeType.OR:
-            return deserializeMissionOrNode(missionNodeSerialized);
+            return deserializeMissionOrNode(missionNodeSerialized, starSystemDatabase);
         case MissionNodeType.XOR:
-            return deserializeMissionXorNode(missionNodeSerialized);
+            return deserializeMissionXorNode(missionNodeSerialized, starSystemDatabase);
         case MissionNodeType.SEQUENCE:
-            return deserializeMissionSequenceNode(missionNodeSerialized);
+            return deserializeMissionSequenceNode(missionNodeSerialized, starSystemDatabase);
         case MissionNodeType.ASTEROID_FIELD:
-            return deserializeMissionAsteroidFieldNode(missionNodeSerialized);
+            return deserializeMissionAsteroidFieldNode(missionNodeSerialized, starSystemDatabase);
         case MissionNodeType.FLY_BY:
             return deserializeMissionFlyByNode(missionNodeSerialized);
         case MissionNodeType.TERMINATOR_LANDING:
@@ -58,27 +62,58 @@ export function deserializeMissionNode(missionNodeSerialized: MissionNodeSeriali
     }
 }
 
-function deserializeMissionAndNode(serialized: MissionAndNodeSerialized): MissionAndNode {
-    return new MissionAndNode(serialized.children.map((child) => deserializeMissionNode(child)));
+function deserializeMissionAndNode(
+    serialized: MissionAndNodeSerialized,
+    starSystemDatabase: StarSystemDatabase
+): MissionAndNode {
+    return new MissionAndNode(
+        serialized.children
+            .map((child) => deserializeMissionNode(child, starSystemDatabase))
+            .filter((child) => child !== null)
+    );
 }
 
-function deserializeMissionOrNode(serialized: MissionOrNodeSerialized): MissionOrNode {
-    return new MissionOrNode(serialized.children.map((child) => deserializeMissionNode(child)));
+function deserializeMissionOrNode(
+    serialized: MissionOrNodeSerialized,
+    starSystemDatabase: StarSystemDatabase
+): MissionOrNode {
+    return new MissionOrNode(
+        serialized.children
+            .map((child) => deserializeMissionNode(child, starSystemDatabase))
+            .filter((child) => child !== null)
+    );
 }
 
-function deserializeMissionXorNode(serialized: MissionXorNodeSerialized): MissionXorNode {
-    return new MissionXorNode(serialized.children.map((child) => deserializeMissionNode(child)));
+function deserializeMissionXorNode(
+    serialized: MissionXorNodeSerialized,
+    starSystemDatabase: StarSystemDatabase
+): MissionXorNode {
+    return new MissionXorNode(
+        serialized.children
+            .map((child) => deserializeMissionNode(child, starSystemDatabase))
+            .filter((child) => child !== null)
+    );
 }
 
-function deserializeMissionSequenceNode(serialized: MissionSequenceNodeSerialized): MissionSequenceNode {
-    const missionNode = new MissionSequenceNode(serialized.children.map((child) => deserializeMissionNode(child)));
+function deserializeMissionSequenceNode(
+    serialized: MissionSequenceNodeSerialized,
+    starSystemDatabase: StarSystemDatabase
+): MissionSequenceNode {
+    const missionNode = new MissionSequenceNode(
+        serialized.children
+            .map((child) => deserializeMissionNode(child, starSystemDatabase))
+            .filter((child) => child !== null)
+    );
     missionNode.setActiveChildIndex(serialized.activeChildIndex);
     return missionNode;
 }
 
-function deserializeMissionAsteroidFieldNode(serialized: MissionAsteroidFieldNodeSerialized): MissionAsteroidFieldNode {
-    const missionNode = new MissionAsteroidFieldNode(serialized.objectId);
-    missionNode.setState(serialized.state);
+function deserializeMissionAsteroidFieldNode(
+    serialized: MissionAsteroidFieldNodeSerialized,
+    starSystemDatabase: StarSystemDatabase
+): MissionAsteroidFieldNode | null {
+    const missionNode = MissionAsteroidFieldNode.New(serialized.objectId, starSystemDatabase);
+    missionNode?.setState(serialized.state);
     return missionNode;
 }
 
