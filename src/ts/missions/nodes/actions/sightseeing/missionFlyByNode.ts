@@ -80,7 +80,7 @@ export class MissionFlyByNode implements MissionNodeBase<MissionNodeType.FLY_BY>
 
         const targetObject = currentSystem.getOrbitalObjectById(this.objectId.idInSystem);
         if (targetObject === undefined) {
-            throw new Error(`Could not find object with ID ${JSON.stringify(this.objectId)}`);
+            return;
         }
 
         const playerPosition = context.playerPosition;
@@ -128,7 +128,7 @@ export class MissionFlyByNode implements MissionNodeBase<MissionNodeType.FLY_BY>
         const objectModel = starSystemDatabase.getObjectModelByUniverseId(this.objectId);
         const systemModel = starSystemDatabase.getSystemModelFromCoordinates(this.targetSystemCoordinates);
         if (objectModel === null || systemModel === null) {
-            throw new Error(`Could not find object with ID ${JSON.stringify(this.objectId)}`);
+            return "ERROR: object or system model is null";
         }
         return i18n.t("missions:sightseeing:describeFlyBy", {
             objectType: getOrbitalObjectTypeToI18nString(objectModel),
@@ -148,7 +148,7 @@ export class MissionFlyByNode implements MissionNodeBase<MissionNodeType.FLY_BY>
 
         const targetObject = starSystemDatabase.getObjectModelByUniverseId(this.objectId);
         if (targetObject === null) {
-            throw new Error(`Could not find object with ID ${JSON.stringify(this.objectId)}`);
+            return "ERROR: target object is null";
         }
 
         switch (this.state) {

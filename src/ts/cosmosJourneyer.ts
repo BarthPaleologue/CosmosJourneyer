@@ -406,7 +406,7 @@ export class CosmosJourneyer {
         const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
         registerCustomSystems(starSystemDatabase);
 
-        const player = Player.Default();
+        const player = Player.Default(starSystemDatabase);
 
         const encyclopaedia = new EncyclopaediaGalacticaManager();
         encyclopaedia.backends.push(new EncyclopaediaGalacticaLocal(starSystemDatabase));
@@ -806,8 +806,11 @@ export class CosmosJourneyer {
             return;
         }
 
-        const newPlayer = saveData.player !== undefined ? Player.Deserialize(saveData.player) : Player.Default();
-        this.player.copyFrom(newPlayer);
+        const newPlayer =
+            saveData.player !== undefined
+                ? Player.Deserialize(saveData.player, this.starSystemDatabase)
+                : Player.Default(this.starSystemDatabase);
+        this.player.copyFrom(newPlayer, this.starSystemDatabase);
         this.player.discoveries.uploaded.forEach(async (discovery) => {
             await this.encyclopaedia.contributeDiscoveryIfNew(discovery);
         });

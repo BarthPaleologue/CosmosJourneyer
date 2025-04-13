@@ -553,7 +553,7 @@ export class StarSystemView implements View {
             });
 
             for (let i = 0; i < Math.ceil(Math.random() * 15); i++) {
-                const aiPlayer = new AiPlayerControls(this.scene);
+                const aiPlayer = new AiPlayerControls(this.starSystemDatabase, this.scene);
 
                 const landingPad = spaceStation.getLandingPadManager().handleLandingRequest({
                     minimumPadSize: LandingPadSize.SMALL

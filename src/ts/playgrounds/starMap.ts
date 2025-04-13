@@ -29,9 +29,9 @@ import { initI18n } from "../i18n";
 export async function createStarMapScene(engine: AbstractEngine): Promise<Scene> {
     await initI18n();
 
-    const player = Player.Default();
-
     const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
+
+    const player = Player.Default(starSystemDatabase);
 
     const encyclopaediaGalactica = new EncyclopaediaGalacticaLocal(starSystemDatabase);
 

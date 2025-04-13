@@ -19,13 +19,14 @@ import { Scene } from "@babylonjs/core/scene";
 import { AiSpaceshipControls } from "../spaceship/aiSpaceshipControls";
 import { Spaceship } from "../spaceship/spaceship";
 import { Player } from "./player";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 
 export class AiPlayerControls {
     readonly player: Player;
     readonly spaceshipControls: AiSpaceshipControls;
 
-    constructor(scene: Scene) {
-        this.player = Player.Default();
+    constructor(starSystemDatabase: StarSystemDatabase, scene: Scene) {
+        this.player = Player.Default(starSystemDatabase);
         this.player.setName("AI");
 
         const spaceshipSerialized = this.player.serializedSpaceships.shift();

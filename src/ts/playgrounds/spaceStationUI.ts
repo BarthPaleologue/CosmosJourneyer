@@ -38,7 +38,9 @@ export async function createSpaceStationUIScene(engine: AbstractEngine): Promise
 
     await Assets.Init(scene);
 
-    const player = Player.Default();
+    const systemDatabase = new StarSystemDatabase(getLoneStarSystem());
+
+    const player = Player.Default(systemDatabase);
 
     const serializedSpaceship = player.serializedSpaceships.shift();
     if (serializedSpaceship === undefined) {
@@ -53,8 +55,6 @@ export async function createSpaceStationUIScene(engine: AbstractEngine): Promise
     const camera = shipControls.thirdPersonCamera;
     camera.attachControl();
     scene.activeCamera = camera;
-
-    const systemDatabase = new StarSystemDatabase(getLoneStarSystem());
 
     const systemModel = systemDatabase.fallbackSystem;
 
