@@ -44,7 +44,6 @@ import { Thruster } from "./thruster";
 import { AudioMasks } from "../audio/audioMasks";
 import { Objects } from "../assets/objects";
 import { Sounds } from "../assets/sounds";
-import { LandingPad } from "../assets/procedural/landingPad/landingPad";
 import { CelestialBody, OrbitalObject } from "../architecture/orbitalObject";
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
@@ -54,6 +53,7 @@ import { distanceToAsteroidField } from "../utils/asteroidFields";
 import { getDefaultSerializedSpaceship, SerializedSpaceship, ShipType } from "./serializedSpaceship";
 import { SpaceshipInternals } from "./spaceshipInternals";
 import { SerializedComponent } from "./serializedComponents/component";
+import { ILandingPad } from "../spacestation/landingPad/landingPadManager";
 
 const enum ShipState {
     FLYING,
@@ -96,7 +96,7 @@ export class Spaceship implements Transformable {
 
     private readonly scene: Scene;
 
-    private targetLandingPad: LandingPad | null = null;
+    private targetLandingPad: ILandingPad | null = null;
 
     private readonly internals: SpaceshipInternals;
 
@@ -372,11 +372,11 @@ export class Spaceship implements Transformable {
         return this.landingComputer?.getTarget() !== null;
     }
 
-    public engageLandingOnPad(landingPad: LandingPad) {
+    public engageLandingOnPad(landingPad: ILandingPad) {
         this.targetLandingPad = landingPad;
     }
 
-    public getTargetLandingPad(): LandingPad | null {
+    public getTargetLandingPad(): ILandingPad | null {
         return this.targetLandingPad;
     }
 
@@ -412,7 +412,7 @@ export class Spaceship implements Transformable {
         this.onLandingCancelled.notifyObservers();
     }
 
-    public spawnOnPad(landingPad: LandingPad) {
+    public spawnOnPad(landingPad: ILandingPad) {
         this.getTransform().setParent(null);
         this.engageLandingOnPad(landingPad);
         this.getTransform().rotationQuaternion = Quaternion.Identity();

@@ -37,9 +37,8 @@ import { StarSystemInputs } from "../inputs/starSystemInputs";
 import { pressInteractionToStrings } from "../utils/strings/inputControlsString";
 import i18n from "../i18n";
 import { Transformable } from "../architecture/transformable";
-import { ManagesLandingPads } from "../utils/managesLandingPads";
+import { ManagesLandingPads } from "../spacestation/landingPad/managesLandingPads";
 import { Sounds } from "../assets/sounds";
-import { LandingPadSize } from "../assets/procedural/landingPad/landingPad";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import { CameraShakeAnimation } from "../uberCore/transforms/animations/cameraShake";
 import { Tools } from "@babylonjs/core/Misc/tools";
@@ -48,6 +47,7 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { lerpSmooth, slerpSmoothToRef } from "../utils/math";
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { canEngageWarpDrive } from "./components/warpDriveUtils";
+import { LandingPadSize } from "../spacestation/landingPad/landingPadManager";
 
 export class ShipControls implements Controls {
     private spaceship: Spaceship;
@@ -202,7 +202,7 @@ export class ShipControls implements Controls {
             const spaceship = this.getSpaceship();
             if (spaceship.isLanded() || spaceship.isLanding()) return;
             if (this.closestLandableFacility === null) return;
-            const landingPad = this.closestLandableFacility.handleLandingRequest({
+            const landingPad = this.closestLandableFacility.getLandingPadManager().handleLandingRequest({
                 minimumPadSize: LandingPadSize.SMALL
             });
             if (landingPad === null) {
@@ -219,7 +219,7 @@ export class ShipControls implements Controls {
             createNotification(
                 NotificationOrigin.SPACE_STATION,
                 NotificationIntent.SUCCESS,
-                `Landing request granted. Proceed to pad ${landingPad.padNumber}`,
+                `Landing request granted. Proceed to pad ${landingPad.getPadNumber()}`,
                 30000
             );
             spaceship.engageLandingOnPad(landingPad);
@@ -301,13 +301,13 @@ export class ShipControls implements Controls {
                 if (spaceship.isLanded()) {
                     const currentLandingPad = spaceship.getTargetLandingPad();
                     if (currentLandingPad !== null) {
-                        this.closestLandableFacility?.cancelLandingRequest(currentLandingPad);
+                        this.closestLandableFacility?.getLandingPadManager().cancelLandingRequest(currentLandingPad);
                     }
                     spaceship.takeOff();
                 } else if (spaceship.isLanding()) {
                     const currentLandingPad = spaceship.getTargetLandingPad();
                     if (currentLandingPad !== null) {
-                        this.closestLandableFacility?.cancelLandingRequest(currentLandingPad);
+                        this.closestLandableFacility?.getLandingPadManager().cancelLandingRequest(currentLandingPad);
                     }
                     spaceship.cancelLanding();
                 }

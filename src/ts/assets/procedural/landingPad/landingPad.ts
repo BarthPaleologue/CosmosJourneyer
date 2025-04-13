@@ -10,15 +10,10 @@ import { CollisionMask, Settings } from "../../../settings";
 import i18n from "../../../i18n";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { Objects } from "../../objects";
-import { ObjectTargetCursorType, Targetable, TargetInfo } from "../../../architecture/targetable";
+import { ObjectTargetCursorType, TargetInfo } from "../../../architecture/targetable";
+import { ILandingPad, LandingPadSize } from "../../../spacestation/landingPad/landingPadManager";
 
-export const enum LandingPadSize {
-    SMALL = 1,
-    MEDIUM = 2,
-    LARGE = 3
-}
-
-export class LandingPad implements Targetable {
+export class LandingPad implements ILandingPad {
     private readonly deck: Mesh;
     private readonly deckAggregate: PhysicsAggregate;
 
@@ -27,7 +22,7 @@ export class LandingPad implements Targetable {
     private readonly crates: InstancedMesh[] = [];
 
     readonly padNumber: number;
-    readonly padSize: LandingPadSize;
+    private readonly padSize: LandingPadSize;
 
     private readonly boundingRadius: number;
 
@@ -99,11 +94,16 @@ export class LandingPad implements Targetable {
         };
     }
 
-    update(cameraWorldPosition: Vector3): void {
-        const padCameraDistance2 = Vector3.DistanceSquared(cameraWorldPosition, this.deck.getAbsolutePosition());
-        const distanceThreshold = 12e3;
-        const isEnabled = padCameraDistance2 < distanceThreshold * distanceThreshold;
-        this.getTransform().setEnabled(isEnabled);
+    getPadNumber(): number {
+        return this.padNumber;
+    }
+
+    getPadSize(): LandingPadSize {
+        return this.padSize;
+    }
+
+    getPadHeight(): number {
+        return this.padHeight;
     }
 
     getTransform(): TransformNode {

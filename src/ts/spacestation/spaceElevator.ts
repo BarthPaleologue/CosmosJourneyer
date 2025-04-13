@@ -30,7 +30,6 @@ import { wheelOfFortune } from "../utils/random";
 import { CylinderHabitat } from "../assets/procedural/spaceStation/cylinderHabitat";
 import { LandingBay } from "../assets/procedural/spaceStation/landingBay";
 import { LandingPad } from "../assets/procedural/landingPad/landingPad";
-import { LandingRequest } from "../utils/managesLandingPads";
 import { Settings } from "../settings";
 import { getRngFromSeed } from "../utils/getRngFromSeed";
 import { getOrbitalObjectTypeToI18nString } from "../utils/strings/orbitalObjectTypeToDisplay";
@@ -45,6 +44,7 @@ import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/
 import { setUpVector } from "../uberCore/transforms/basicTransform";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { DeepReadonly } from "../utils/types";
+import { LandingPadManager } from "./landingPad/landingPadManager";
 
 export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPACE_ELEVATOR> {
     readonly name: string;
@@ -76,7 +76,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
 
     readonly targetInfo: TargetInfo;
 
-    private readonly unavailableLandingPads = new Set<LandingPad>();
+    private readonly landingPadManager: LandingPadManager;
 
     constructor(model: DeepReadonly<SpaceElevatorModel>, scene: Scene) {
         this.model = model;
@@ -112,6 +112,13 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
 
         this.generate();
 
+        // Now that landing bays are generated, create the landing pad manager with all pads
+        this.landingPadManager = new LandingPadManager(
+            this.landingBays.flatMap((landingBay) => {
+                return landingBay.landingPads;
+            })
+        );
+
         // center the space station on its center of mass
         const boundingVectors = this.getTransform().getHierarchyBoundingVectors();
         const centerWorld = boundingVectors.max.add(boundingVectors.min).scale(0.5);
@@ -133,47 +140,12 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
         };
     }
 
-    getAvailableLandingPads(): LandingPad[] {
-        return this.getLandingPads().filter((landingPad) => {
-            return !this.unavailableLandingPads.has(landingPad);
-        });
+    getLandingPadManager(): LandingPadManager {
+        return this.landingPadManager;
     }
 
-    getLandingPads(): LandingPad[] {
-        return this.landingBays.flatMap((landingBay) => {
-            return landingBay.landingPads;
-        });
-    }
-
-    getSubTargets(): Targetable[] {
-        return [this.climber, ...this.getLandingPads()];
-    }
-
-    handleLandingRequest(request: LandingRequest): LandingPad | null {
-        const availableLandingPads = this.getAvailableLandingPads()
-            .filter((landingPad) => {
-                return landingPad.padSize >= request.minimumPadSize;
-            })
-            .sort((a, b) => {
-                return a.padSize - b.padSize;
-            });
-
-        if (availableLandingPads.length === 0) return null;
-
-        this.markPadAsUnavailable(availableLandingPads[0]);
-        return availableLandingPads[0];
-    }
-
-    public cancelLandingRequest(landingPad: LandingPad) {
-        this.markPadAsAvailable(landingPad);
-    }
-
-    private markPadAsUnavailable(landingPad: LandingPad) {
-        this.unavailableLandingPads.add(landingPad);
-    }
-
-    private markPadAsAvailable(landingPad: LandingPad) {
-        this.unavailableLandingPads.delete(landingPad);
+    getSubTargets(): ReadonlyArray<Targetable> {
+        return [this.climber, ...this.getLandingPadManager().getLandingPads()];
     }
 
     public getBoundingRadius(): number {
@@ -283,7 +255,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
         node.position = parent.position.add(parent.up.scale(previousSectionSizeY + newSectionY));
     }
 
-    update(parents: Transformable[], cameraWorldPosition: Vector3, deltaSeconds: number) {
+    update(parents: ReadonlyArray<Transformable>, cameraWorldPosition: Vector3, deltaSeconds: number) {
         if (parents.length !== 1) {
             throw new Error("Space Elevator should have exactly one parent");
         }

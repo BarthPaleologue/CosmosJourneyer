@@ -79,12 +79,12 @@ import { TypedObject } from "../architecture/typedObject";
 import { EncyclopaediaGalacticaManager } from "../society/encyclopaediaGalacticaManager";
 import { StarSystemDatabase } from "./starSystemDatabase";
 import { AiPlayerControls } from "../player/aiPlayerControls";
-import { LandingPadSize } from "../assets/procedural/landingPad/landingPad";
 import "@babylonjs/inspector";
 import { getUniverseObjectId, UniverseObjectId } from "../utils/coordinates/universeObjectId";
 import { starSystemCoordinatesEquals, StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
 import { StarSystemLoader } from "./starSystemLoader";
 import { DeepReadonly } from "../utils/types";
+import { LandingPadSize } from "../spacestation/landingPad/landingPadManager";
 
 // register cosmos journeyer as part of window object
 declare global {
@@ -555,7 +555,7 @@ export class StarSystemView implements View {
             for (let i = 0; i < Math.ceil(Math.random() * 15); i++) {
                 const aiPlayer = new AiPlayerControls(this.scene);
 
-                const landingPad = spaceStation.handleLandingRequest({
+                const landingPad = spaceStation.getLandingPadManager().handleLandingRequest({
                     minimumPadSize: LandingPadSize.SMALL
                 });
 

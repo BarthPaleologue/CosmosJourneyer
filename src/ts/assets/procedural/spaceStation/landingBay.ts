@@ -20,11 +20,10 @@ import { MetalSectionMaterial } from "./metalSectionMaterial";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Transformable } from "../../../architecture/transformable";
 import { Settings } from "../../../settings";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
-import { LandingPad, LandingPadSize } from "../landingPad/landingPad";
+import { LandingPad } from "../landingPad/landingPad";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { createRing } from "../../../utils/geometry/ringBuilder";
 import { LandingBayMaterial } from "./landingBayMaterial";
@@ -35,6 +34,7 @@ import { getRotationPeriodForArtificialGravity } from "../../../utils/physics";
 import { OrbitalFacilityModel } from "../../../architecture/orbitalObjectModel";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { DeepReadonly } from "../../../utils/types";
+import { ILandingPad, LandingPadSize } from "../../../spacestation/landingPad/landingPadManager";
 
 export class LandingBay {
     private readonly root: TransformNode;
@@ -54,7 +54,7 @@ export class LandingBay {
 
     private readonly centralLight: PointLight;
 
-    readonly landingPads: LandingPad[] = [];
+    readonly landingPads: ILandingPad[] = [];
 
     constructor(stationModel: DeepReadonly<OrbitalFacilityModel>, seed: number, scene: Scene) {
         this.root = new TransformNode("LandingBayRoot", scene);
@@ -182,7 +182,16 @@ export class LandingBay {
             Axis.Y,
             deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, Settings.G_EARTH * 0.1)
         );
-        this.landingPads.forEach((landingPad) => landingPad.update(cameraWorldPosition));
+
+        this.landingPads.forEach((landingPad) => {
+            const padCameraDistance2 = Vector3.DistanceSquared(
+                cameraWorldPosition,
+                landingPad.getTransform().getAbsolutePosition()
+            );
+            const distanceThreshold = 12e3;
+            const isEnabled = padCameraDistance2 < distanceThreshold * distanceThreshold;
+            landingPad.getTransform().setEnabled(isEnabled);
+        });
 
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
 
