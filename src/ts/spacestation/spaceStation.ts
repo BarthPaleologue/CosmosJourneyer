@@ -30,7 +30,6 @@ import { wheelOfFortune } from "../utils/random";
 import { CylinderHabitat } from "../assets/procedural/spaceStation/cylinderHabitat";
 import { LandingBay } from "../assets/procedural/spaceStation/landingBay";
 import { LandingPad } from "../assets/procedural/landingPad/landingPad";
-import { LandingRequest } from "../utils/managesLandingPads";
 import { Settings } from "../settings";
 import { EngineBay } from "../assets/procedural/spaceStation/engineBay";
 import { getRngFromSeed } from "../utils/getRngFromSeed";
@@ -40,6 +39,7 @@ import { SpaceStationModel } from "./spacestationModel";
 import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { DeepReadonly } from "../utils/types";
+import { LandingPadManager } from "./landingPad/landingPadManager";
 
 export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE_STATION> {
     readonly name: string;
@@ -64,7 +64,7 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
 
     readonly targetInfo: TargetInfo;
 
-    private readonly unavailableLandingPads: Set<LandingPad> = new Set();
+    private readonly landingPadManager: LandingPadManager;
 
     constructor(model: DeepReadonly<SpaceStationModel>, scene: Scene) {
         this.model = model;
@@ -76,7 +76,15 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
 
         this.scene = scene;
 
+        // Generate the station first so we can access the landing pads
         this.generate();
+
+        // Now that landing bays are generated, create the landing pad manager with all pads
+        this.landingPadManager = new LandingPadManager(
+            this.landingBays.flatMap((landingBay) => {
+                return landingBay.landingPads;
+            })
+        );
 
         // center the space station on its center of mass
         const boundingVectors = this.getTransform().getHierarchyBoundingVectors();
@@ -97,47 +105,12 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
         };
     }
 
-    getLandingPads(): LandingPad[] {
-        return this.landingBays.flatMap((landingBay) => {
-            return landingBay.landingPads;
-        });
+    getLandingPadManager(): LandingPadManager {
+        return this.landingPadManager;
     }
 
-    getAvailableLandingPads(): LandingPad[] {
-        return this.getLandingPads().filter((landingPad) => {
-            return !this.unavailableLandingPads.has(landingPad);
-        });
-    }
-
-    getSubTargets(): Targetable[] {
-        return this.getLandingPads();
-    }
-
-    public handleLandingRequest(request: LandingRequest): LandingPad | null {
-        const availableLandingPads = this.getAvailableLandingPads()
-            .filter((landingPad) => {
-                return landingPad.padSize >= request.minimumPadSize;
-            })
-            .sort((a, b) => {
-                return a.padSize - b.padSize;
-            });
-
-        if (availableLandingPads.length === 0) return null;
-
-        this.markPadAsUnavailable(availableLandingPads[0]);
-        return availableLandingPads[0];
-    }
-
-    public cancelLandingRequest(landingPad: LandingPad) {
-        this.markPadAsAvailable(landingPad);
-    }
-
-    private markPadAsUnavailable(landingPad: LandingPad) {
-        this.unavailableLandingPads.add(landingPad);
-    }
-
-    private markPadAsAvailable(landingPad: LandingPad) {
-        this.unavailableLandingPads.delete(landingPad);
+    getSubTargets(): ReadonlyArray<Targetable> {
+        return this.getLandingPadManager().getLandingPads();
     }
 
     public getBoundingRadius(): number {
@@ -250,7 +223,7 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
         node.position = parent.position.add(parent.up.scale(previousSectionSizeY + newSectionY));
     }
 
-    update(parents: Transformable[], cameraWorldPosition: Vector3, deltaSeconds: number) {
+    update(parents: ReadonlyArray<Transformable>, cameraWorldPosition: Vector3, deltaSeconds: number) {
         this.solarSections.forEach((solarSection) => solarSection.update(cameraWorldPosition));
         this.utilitySections.forEach((utilitySection) => utilitySection.update(cameraWorldPosition));
         this.helixHabitats.forEach((helixHabitat) => helixHabitat.update(cameraWorldPosition, deltaSeconds));

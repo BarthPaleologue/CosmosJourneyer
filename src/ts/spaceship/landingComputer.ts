@@ -16,13 +16,13 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { LandingPad } from "../assets/procedural/landingPad/landingPad";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { CollisionMask } from "../settings";
 import { getAngleFromQuaternion, getAxisFromQuaternion, getDeltaQuaternion } from "../utils/algebra";
+import { ILandingPad } from "../spacestation/landingPad/landingPadManager";
 
 export const enum LandingTargetKind {
     LANDING_PAD,
@@ -31,7 +31,7 @@ export const enum LandingTargetKind {
 
 export type LandingTargetPad = {
     kind: LandingTargetKind.LANDING_PAD;
-    landingPad: LandingPad;
+    landingPad: ILandingPad;
 };
 
 export type LandingTargetCelestialBody = {
@@ -152,7 +152,7 @@ export class LandingComputer {
         }
     }
 
-    private createLandingPadActionPlan(landingPad: LandingPad): ReadonlyArray<LandingPlanStep> {
+    private createLandingPadActionPlan(landingPad: ILandingPad): ReadonlyArray<LandingPlanStep> {
         return [
             {
                 getTargetTransform: () => {
@@ -184,7 +184,9 @@ export class LandingComputer {
                             .getTransform()
                             .getAbsolutePosition()
                             .add(
-                                landingPad.getTransform().up.scale((landingPad.padHeight + this.boundingExtent.y) / 2)
+                                landingPad
+                                    .getTransform()
+                                    .up.scale((landingPad.getPadHeight() + this.boundingExtent.y) / 2)
                             ),
                         rotation: landingPad.getTransform().absoluteRotationQuaternion
                     };

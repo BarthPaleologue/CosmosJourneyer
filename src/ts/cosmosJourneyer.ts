@@ -922,7 +922,7 @@ export class CosmosJourneyer {
             return;
         }
 
-        const landingPad = station.getAvailableLandingPads().at(0);
+        const landingPad = station.getLandingPadManager().getAvailableLandingPads().at(0);
         if (landingPad === undefined) {
             const fallbackObject = station;
 

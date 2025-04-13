@@ -19,7 +19,7 @@ import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { LandingPad, LandingPadSize } from "../assets/procedural/landingPad/landingPad";
+import { LandingPad } from "../assets/procedural/landingPad/landingPad";
 import { AssetsManager, MeshBuilder, PhysicsAggregate, PhysicsShapeType, Quaternion } from "@babylonjs/core";
 import { enablePhysics } from "./utils";
 import { DefaultControls } from "../defaultControls/defaultControls";
@@ -29,6 +29,7 @@ import { Textures } from "../assets/textures";
 import { Sounds } from "../assets/sounds";
 import { randRange } from "extended-random";
 import { CollisionMask } from "../settings";
+import { LandingPadSize } from "../spacestation/landingPad/landingPadManager";
 
 export async function createAutomaticLandingScene(engine: AbstractEngine): Promise<Scene> {
     const scene = new Scene(engine);
@@ -80,8 +81,6 @@ export async function createAutomaticLandingScene(engine: AbstractEngine): Promi
         ship.update(deltaSeconds);
 
         defaultControls.update(deltaSeconds);
-
-        landingPad.update(camera.globalPosition);
     });
 
     return scene;

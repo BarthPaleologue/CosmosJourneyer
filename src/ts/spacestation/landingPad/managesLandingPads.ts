@@ -15,20 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ManagesLandingPads } from "./landingPad/managesLandingPads";
-import { Cullable } from "../utils/cullable";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Transformable } from "../architecture/transformable";
-import { Targetable } from "../architecture/targetable";
-import { OrbitalObjectType } from "../architecture/orbitalObjectType";
-import { OrbitalObjectBase } from "../architecture/orbitalObjectBase";
+import { LandingPadManager } from "./landingPadManager";
 
-export interface OrbitalFacilityBase<T extends OrbitalObjectType>
-    extends OrbitalObjectBase<T>,
-        ManagesLandingPads,
-        Cullable,
-        Targetable {
-    getSubTargets(): ReadonlyArray<Targetable>;
-
-    update(parents: ReadonlyArray<Transformable>, cameraWorldPosition: Vector3, deltaSeconds: number): void;
+export interface ManagesLandingPads {
+    /**
+     * Returns the landing pad manager responsible for handling landing operations
+     */
+    getLandingPadManager(): LandingPadManager;
 }
