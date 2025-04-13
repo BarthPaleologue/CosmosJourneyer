@@ -124,10 +124,7 @@ export function generateSightseeingMissions(
     const terminatorLandingMissions: Mission[] = [];
     const currentSystemModel = starSystem;
     [...currentSystemModel.planets, ...currentSystemModel.satellites].forEach((celestialBodyModel, index) => {
-        if (
-            celestialBodyModel.type === OrbitalObjectType.TELLURIC_SATELLITE ||
-            (celestialBodyModel.type === OrbitalObjectType.TELLURIC_PLANET && celestialBodyModel.rings !== null)
-        ) {
+        if (celestialBodyModel.type === OrbitalObjectType.TELLURIC_PLANET && celestialBodyModel.rings !== null) {
             asteroidFieldMissions.push(
                 newSightSeeingMission(
                     spaceStationUniverseId,
