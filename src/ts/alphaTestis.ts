@@ -70,7 +70,6 @@ hecateModel.orbit.semiMajorAxis = 21000 * hecateModel.radius;
 
 const spaceStationModel = newSeededSpaceElevatorModel(
     0,
-    [sunModel],
     systemCoordinates,
     engine.starSystemDatabase.getSystemGalacticPosition(systemCoordinates),
     hecateModel

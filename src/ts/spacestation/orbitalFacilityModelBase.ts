@@ -42,18 +42,5 @@ export type OrbitalFacilityModelBase<T extends OrbitalObjectType> = OrbitalObjec
 
     readonly faction: Faction;
 
-    /**
-     * The total energy consumption of the habitat in KWh
-     */
-    readonly totalEnergyConsumptionKWh: number;
     readonly solarPanelEfficiency: number;
-
-    /**
-     * The surface of solar panels in m²
-     */
-    readonly solarPanelSurfaceM2: number;
-
-    readonly housingSurfaceHa: number;
-    readonly agricultureSurfaceHa: number;
-    readonly totalHabitatSurfaceM2: number;
 };

@@ -1,0 +1,48 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Affero General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Affero General Public License for more details.
+//
+//  You should have received a copy of the GNU Affero General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+import { OrbitalObjectModel, StellarObjectModel } from "../architecture/orbitalObjectModel";
+import { OrbitalObjectType } from "../architecture/orbitalObjectType";
+import { getObjectModelById, StarSystemModel } from "../starSystem/starSystemModel";
+import { DeepReadonly } from "./types";
+
+export function getDistancesToStellarObjects(
+    object: DeepReadonly<OrbitalObjectModel>,
+    systemModel: DeepReadonly<StarSystemModel>
+): ReadonlyMap<DeepReadonly<StellarObjectModel>, number> {
+    const distances: Map<DeepReadonly<StellarObjectModel>, number> = new Map();
+
+    for (const parentId of object.orbit.parentIds) {
+        const parent = getObjectModelById(parentId, systemModel);
+        if (
+            parent === null ||
+            parent.type === OrbitalObjectType.STAR ||
+            parent.type === OrbitalObjectType.NEUTRON_STAR ||
+            parent.type === OrbitalObjectType.BLACK_HOLE
+        ) {
+            continue;
+        }
+
+        const parentDistances = getDistancesToStellarObjects(parent, systemModel);
+        for (const [stellarObject, distance] of parentDistances) {
+            const currentDistance = distances.get(stellarObject) ?? 0;
+            distances.set(stellarObject, currentDistance + distance);
+        }
+    }
+
+    return distances;
+}

@@ -16,12 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Scene } from "@babylonjs/core/scene";
-import {
-    AnomalyModel,
-    OrbitalFacilityModel,
-    PlanetModel,
-    StellarObjectModel
-} from "../architecture/orbitalObjectModel";
+import { AnomalyModel, PlanetModel, StellarObjectModel } from "../architecture/orbitalObjectModel";
 import { wait } from "../utils/wait";
 import { StarSystemModel } from "./starSystemModel";
 import { Anomaly, OrbitalFacility, Planet, StellarObject } from "../architecture/orbitalObject";
@@ -37,6 +32,7 @@ import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { TelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModel";
 import { DeepReadonly, isNonEmptyArray, NonEmptyArray } from "../utils/types";
+import { getDistancesToStellarObjects } from "../utils/distanceToStellarObject";
 
 export class StarSystemLoader {
     private loadingIndex: number;
@@ -73,7 +69,7 @@ export class StarSystemLoader {
         const planets = await this.loadPlanets(systemModel.planets, scene);
         const satellites = await this.loadSatellites(systemModel.satellites, scene);
         const anomalies = await this.loadAnomalies(systemModel.anomalies, scene);
-        const orbitalFacilities = await this.loadOrbitalFacilities(systemModel.orbitalFacilities, scene);
+        const orbitalFacilities = await this.loadOrbitalFacilities(systemModel, scene);
 
         await wait(1000);
 
@@ -155,18 +151,20 @@ export class StarSystemLoader {
     }
 
     private async loadOrbitalFacilities(
-        orbitalFacilityModels: DeepReadonly<Array<OrbitalFacilityModel>>,
+        systemModel: DeepReadonly<StarSystemModel>,
         scene: Scene
     ): Promise<ReadonlyArray<OrbitalFacility>> {
         const orbitalFacilities: OrbitalFacility[] = [];
-        for (const orbitalFacilityModel of orbitalFacilityModels) {
+        for (const orbitalFacilityModel of systemModel.orbitalFacilities) {
+            const distancesToStellarObjects = getDistancesToStellarObjects(orbitalFacilityModel, systemModel);
+
             let orbitalFacility: OrbitalFacility;
             switch (orbitalFacilityModel.type) {
                 case OrbitalObjectType.SPACE_STATION:
-                    orbitalFacility = new SpaceStation(orbitalFacilityModel, scene);
+                    orbitalFacility = new SpaceStation(orbitalFacilityModel, distancesToStellarObjects, scene);
                     break;
                 case OrbitalObjectType.SPACE_ELEVATOR:
-                    orbitalFacility = new SpaceElevator(orbitalFacilityModel, scene);
+                    orbitalFacility = new SpaceElevator(orbitalFacilityModel, distancesToStellarObjects, scene);
             }
             orbitalFacilities.push(orbitalFacility);
             orbitalFacility.getTransform().setAbsolutePosition(new Vector3(this.offset * ++this.loadingIndex, 0, 0));
