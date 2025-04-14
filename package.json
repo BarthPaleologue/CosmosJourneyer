@@ -49,7 +49,7 @@
         "vitest": "^3.0.5",
         "zod": "^3.24.2"
     },
-    "version": "1.9.1",
+    "version": "1.9.2-alpha",
     "description": "Cosmos Journeyer is a space exploration game featuring fully explorable planets, across millions of star systems. It is built using Babylon.JS, and a lot of passion.",
     "name": "cosmos-journeyer",
     "homepage": "https://cosmosjourneyer.com",
