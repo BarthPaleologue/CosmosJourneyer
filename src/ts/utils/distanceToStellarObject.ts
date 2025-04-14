@@ -28,19 +28,22 @@ export function getDistancesToStellarObjects(
 
     for (const parentId of object.orbit.parentIds) {
         const parent = getObjectModelById(parentId, systemModel);
+        if (parent === null) {
+            continue;
+        }
+
         if (
-            parent === null ||
             parent.type === OrbitalObjectType.STAR ||
             parent.type === OrbitalObjectType.NEUTRON_STAR ||
             parent.type === OrbitalObjectType.BLACK_HOLE
         ) {
+            distances.set(parent, object.orbit.semiMajorAxis);
             continue;
         }
 
         const parentDistances = getDistancesToStellarObjects(parent, systemModel);
         for (const [stellarObject, distance] of parentDistances) {
-            const currentDistance = distances.get(stellarObject) ?? 0;
-            distances.set(stellarObject, currentDistance + distance);
+            distances.set(stellarObject, distance);
         }
     }
 

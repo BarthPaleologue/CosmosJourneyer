@@ -29,7 +29,6 @@ import { SolarSection } from "../assets/procedural/spaceStation/solarSection";
 import { wheelOfFortune } from "../utils/random";
 import { CylinderHabitat } from "../assets/procedural/spaceStation/cylinderHabitat";
 import { LandingBay } from "../assets/procedural/spaceStation/landingBay";
-import { LandingPad } from "../assets/procedural/landingPad/landingPad";
 import { Settings } from "../settings";
 import { EngineBay } from "../assets/procedural/spaceStation/engineBay";
 import { getRngFromSeed } from "../utils/getRngFromSeed";
