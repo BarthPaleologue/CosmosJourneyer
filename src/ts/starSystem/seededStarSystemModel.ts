@@ -214,22 +214,10 @@ export function newSeededStarSystemModel(
                 planet.type === OrbitalObjectType.TELLURIC_PLANET && // space elevators can't be built on gas giants yet
                 planet.rings === null // can't have rings because the tether would be at risk
             ) {
-                const spaceElevatorModel = newSeededSpaceElevatorModel(
-                    spaceStationSeed,
-                    stellarObjects,
-                    coordinates,
-                    position,
-                    planet
-                );
+                const spaceElevatorModel = newSeededSpaceElevatorModel(spaceStationSeed, coordinates, position, planet);
                 orbitalFacilities.push(spaceElevatorModel);
             } else {
-                const spaceStationModel = newSeededSpaceStationModel(
-                    spaceStationSeed,
-                    stellarObjects,
-                    coordinates,
-                    position,
-                    [planet]
-                );
+                const spaceStationModel = newSeededSpaceStationModel(spaceStationSeed, coordinates, position, [planet]);
                 orbitalFacilities.push(spaceStationModel);
             }
         });

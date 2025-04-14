@@ -16,24 +16,21 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { PlanetModel, StellarObjectModel } from "../architecture/orbitalObjectModel";
+import { PlanetModel } from "../architecture/orbitalObjectModel";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { Orbit } from "../orbit/orbit";
-import { Settings } from "../settings";
 import { getFactionFromGalacticPosition } from "../society/factions";
-import { CropTypes, CropType, getEdibleEnergyPerHaPerDay } from "../utils/agriculture";
+import { CropTypes, CropType } from "../utils/agriculture";
 import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
 import { getRngFromSeed } from "../utils/getRngFromSeed";
-import { getOrbitRadiusFromPeriod, getSphereRadiatedEnergyFlux } from "../utils/physics";
+import { getOrbitRadiusFromPeriod } from "../utils/physics";
 import { randomPieChart } from "../utils/random";
-import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
 import { generateSpaceElevatorName } from "../utils/strings/spaceStationNameGenerator";
 import { SpaceElevatorModel } from "./spaceElevatorModel";
 import { createOrbitalObjectId } from "../utils/coordinates/orbitalObjectId";
 
 export function newSeededSpaceElevatorModel(
     seed: number,
-    stellarObjectModels: StellarObjectModel[],
     starSystemCoordinates: StarSystemCoordinates,
     starSystemPosition: Vector3,
     parentBody: PlanetModel
@@ -76,36 +73,7 @@ export function newSeededSpaceElevatorModel(
 
     const nbHydroponicLayers = 10;
 
-    // find average distance to stellar objects
-    const distanceToStar = parentBody.orbit.semiMajorAxis;
-
-    let totalStellarFlux = 0;
-    stellarObjectModels.forEach((stellarObject) => {
-        const exposureTimeFraction = 0.5;
-        const starRadius = stellarObject.radius;
-        const starTemperature = stellarObject.blackBodyTemperature;
-        totalStellarFlux +=
-            getSphereRadiatedEnergyFlux(starTemperature, starRadius, distanceToStar) * exposureTimeFraction;
-    });
-
-    const totalEnergyConsumptionKWh = population * energyConsumptionPerCapitaKWh;
-
     const solarPanelEfficiency = 0.4;
-
-    const solarPanelSurfaceM2 = getSolarPanelSurfaceFromEnergyRequirement(
-        solarPanelEfficiency,
-        totalEnergyConsumptionKWh,
-        totalStellarFlux
-    );
-
-    const housingSurfaceHa = (100 * population) / populationDensity; // convert km² to ha
-    let agricultureSurfaceHa = 0;
-    agricultureMix.forEach(([fraction, cropType]) => {
-        agricultureSurfaceHa +=
-            (fraction * population * Settings.INDIVIDUAL_AVERAGE_DAILY_INTAKE) /
-            (Settings.HYDROPONIC_TO_CONVENTIONAL_RATIO * nbHydroponicLayers * getEdibleEnergyPerHaPerDay(cropType));
-    });
-    const totalHabitatSurfaceM2 = (housingSurfaceHa + agricultureSurfaceHa) * 1000; // convert ha to m²
 
     return {
         type: OrbitalObjectType.SPACE_ELEVATOR,
@@ -124,11 +92,6 @@ export function newSeededSpaceElevatorModel(
         agricultureMix,
         nbHydroponicLayers,
         faction,
-        totalEnergyConsumptionKWh,
-        solarPanelEfficiency,
-        solarPanelSurfaceM2,
-        housingSurfaceHa,
-        agricultureSurfaceHa,
-        totalHabitatSurfaceM2
+        solarPanelEfficiency
     };
 }

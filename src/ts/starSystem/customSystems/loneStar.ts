@@ -67,20 +67,17 @@ export function getLoneStarSystem(): StarSystemModel {
                 type: OrbitalObjectType.SPACE_STATION,
                 mass: 1,
                 agricultureMix: [[1, CropType.LENTIL]],
-                agricultureSurfaceHa: 100,
                 population: 1e6,
                 axialTilt: 0,
                 orbit: OrbitSchema.parse({
                     parentIds: ["loneStar"],
                     semiMajorAxis: 1e6
                 }),
-                totalEnergyConsumptionKWh: 1e6,
                 seed: 0,
                 faction: Faction.SATORI_CONCORD,
                 energyConsumptionPerCapitaKWh: 1e3,
                 solarPanelEfficiency: 0.4,
                 siderealDaySeconds: 0,
-                solarPanelSurfaceM2: 1e3,
                 starSystemCoordinates: {
                     starSectorX: 5,
                     starSectorY: -10,
@@ -89,8 +86,6 @@ export function getLoneStarSystem(): StarSystemModel {
                     localY: 0.2,
                     localZ: 0.8
                 },
-                housingSurfaceHa: 1e3,
-                totalHabitatSurfaceM2: 1e6,
                 populationDensity: 1e3,
                 nbHydroponicLayers: 10
             }

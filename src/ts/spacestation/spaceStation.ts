@@ -40,6 +40,10 @@ import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { DeepReadonly } from "../utils/types";
 import { LandingPadManager } from "./landingPad/landingPadManager";
+import { getEdibleEnergyPerHaPerDay } from "../utils/agriculture";
+import { StellarObjectModel } from "../architecture/orbitalObjectModel";
+import { getSphereRadiatedEnergyFlux } from "../utils/physics";
+import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
 
 export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE_STATION> {
     readonly name: string;
@@ -66,7 +70,11 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
 
     private readonly landingPadManager: LandingPadManager;
 
-    constructor(model: DeepReadonly<SpaceStationModel>, scene: Scene) {
+    constructor(
+        model: DeepReadonly<SpaceStationModel>,
+        stellarObjects: ReadonlyMap<DeepReadonly<StellarObjectModel>, number>,
+        scene: Scene
+    ) {
         this.model = model;
 
         this.name = this.model.name;
@@ -77,7 +85,7 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
         this.scene = scene;
 
         // Generate the station first so we can access the landing pads
-        this.generate();
+        this.generate(stellarObjects);
 
         // Now that landing bays are generated, create the landing pad manager with all pads
         this.landingPadManager = new LandingPadManager(
@@ -125,9 +133,31 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
         this.getTransform().setEnabled(isSizeOnScreenEnough(this, camera));
     }
 
-    private generate() {
-        const solarPanelSurface = this.model.solarPanelSurfaceM2;
-        const habitatSurface = this.model.totalHabitatSurfaceM2;
+    private generate(stellarObjects: ReadonlyMap<DeepReadonly<StellarObjectModel>, number>) {
+        let totalStellarFlux = 0;
+        stellarObjects.forEach((distance, model) => {
+            totalStellarFlux += getSphereRadiatedEnergyFlux(model.blackBodyTemperature, model.radius, distance);
+        });
+
+        const solarPanelSurfaceM2 = getSolarPanelSurfaceFromEnergyRequirement(
+            this.model.solarPanelEfficiency,
+            this.model.population * this.model.energyConsumptionPerCapitaKWh,
+            totalStellarFlux
+        );
+
+        const housingSurfaceHa = (100 * this.model.population) / this.model.populationDensity; // convert km² to ha
+        let agricultureSurfaceHa = 0;
+        this.model.agricultureMix.forEach(([fraction, cropType]) => {
+            const requiredDailyKCal = this.model.population * Settings.INDIVIDUAL_AVERAGE_DAILY_INTAKE;
+
+            const KCalPerHa =
+                Settings.HYDROPONIC_TO_CONVENTIONAL_RATIO *
+                this.model.nbHydroponicLayers *
+                getEdibleEnergyPerHaPerDay(cropType);
+
+            agricultureSurfaceHa += (fraction * requiredDailyKCal) / KCalPerHa;
+        });
+        const totalHabitatSurfaceM2 = (housingSurfaceHa + agricultureSurfaceHa) * 1000; // convert ha to m²
 
         const engineBay = new EngineBay(this.scene);
         engineBay.getTransform().parent = this.getTransform();
@@ -138,7 +168,7 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
 
         lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(rng(564) * 5), rng);
 
-        const solarSection = new SolarSection(solarPanelSurface, Settings.SEED_HALF_RANGE * rng(31), this.scene);
+        const solarSection = new SolarSection(solarPanelSurfaceM2, Settings.SEED_HALF_RANGE * rng(31), this.scene);
         solarSection.getTransform().parent = this.getTransform();
         this.placeNode(solarSection.getTransform(), lastNode);
         lastNode = solarSection.getTransform();
@@ -157,15 +187,23 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
 
         let newNode: TransformNode | null = null;
         if (habitatType === SpaceStationNodeType.HELIX_HABITAT) {
-            const helixHabitat = new HelixHabitat(habitatSurface, Settings.SEED_HALF_RANGE * rng(19), this.scene);
+            const helixHabitat = new HelixHabitat(
+                totalHabitatSurfaceM2,
+                Settings.SEED_HALF_RANGE * rng(19),
+                this.scene
+            );
             this.helixHabitats.push(helixHabitat);
             newNode = helixHabitat.getTransform();
         } else if (habitatType === SpaceStationNodeType.RING_HABITAT) {
-            const ringHabitat = new RingHabitat(habitatSurface, Settings.SEED_HALF_RANGE * rng(27), this.scene);
+            const ringHabitat = new RingHabitat(totalHabitatSurfaceM2, Settings.SEED_HALF_RANGE * rng(27), this.scene);
             this.ringHabitats.push(ringHabitat);
             newNode = ringHabitat.getTransform();
         } else if (habitatType === SpaceStationNodeType.CYLINDER_HABITAT) {
-            const cylinderHabitat = new CylinderHabitat(habitatSurface, Settings.SEED_HALF_RANGE * rng(13), this.scene);
+            const cylinderHabitat = new CylinderHabitat(
+                totalHabitatSurfaceM2,
+                Settings.SEED_HALF_RANGE * rng(13),
+                this.scene
+            );
             this.cylinderHabitats.push(cylinderHabitat);
             newNode = cylinderHabitat.getTransform();
         }

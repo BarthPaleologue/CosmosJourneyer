@@ -31,6 +31,8 @@ import { Textures } from "../assets/textures";
 import { Materials } from "../assets/materials";
 import { Objects } from "../assets/objects";
 import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
+import { StarModel } from "../stellarObjects/star/starModel";
+import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 
 export async function createSpaceStationScene(engine: AbstractEngine): Promise<Scene> {
     const scene = new Scene(engine);
@@ -68,20 +70,41 @@ export async function createSpaceStationScene(engine: AbstractEngine): Promise<S
     const systemDatabase = new StarSystemDatabase(getLoneStarSystem());
     const systemPosition = systemDatabase.getSystemGalacticPosition(coordinates);
 
-    const sunModel = newSeededStarModel(420, "Untitled Star", []);
+    const sunModel: StarModel = {
+        type: OrbitalObjectType.STAR,
+        id: "PGStar",
+        name: "PG Star",
+        blackBodyTemperature: 5778,
+        mass: Settings.SOLAR_MASS,
+        radius: Settings.SOLAR_RADIUS,
+        orbit: {
+            p: 2,
+            argumentOfPeriapsis: 0,
+            semiMajorAxis: 0,
+            eccentricity: 0,
+            longitudeOfAscendingNode: 0,
+            inclination: 0,
+            initialMeanAnomaly: 0,
+            parentIds: []
+        },
+        siderealDaySeconds: 0,
+        axialTilt: 0,
+        seed: 0,
+        rings: null
+    };
+
     const sun = new Star(sunModel, scene);
     sun.getTransform().position = new Vector3(7, 2, 5).normalize().scaleInPlace(distanceToStar);
 
     const spaceStationModel = newSeededSpaceStationModel(
         Math.random() * Settings.SEED_HALF_RANGE,
-        [sunModel],
         coordinates,
         systemPosition,
         [sunModel]
     );
     spaceStationModel.orbit.semiMajorAxis = distanceToStar;
 
-    const spaceStation = new SpaceStation(spaceStationModel, scene);
+    const spaceStation = new SpaceStation(spaceStationModel, new Map([[sunModel, distanceToStar]]), scene);
 
     scene.onBeforePhysicsObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;

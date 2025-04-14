@@ -17,18 +17,15 @@
 
 import { normalRandom } from "extended-random";
 import { clamp } from "../utils/math";
-import { CelestialBodyModel, StellarObjectModel } from "../architecture/orbitalObjectModel";
+import { CelestialBodyModel } from "../architecture/orbitalObjectModel";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { Orbit } from "../orbit/orbit";
-import { Settings } from "../settings";
 import { getFactionFromGalacticPosition } from "../society/factions";
-import { CropTypes, CropType, getEdibleEnergyPerHaPerDay } from "../utils/agriculture";
+import { CropTypes, CropType } from "../utils/agriculture";
 import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
 import { GenerationSteps } from "../utils/generationSteps";
 import { getRngFromSeed } from "../utils/getRngFromSeed";
-import { getSphereRadiatedEnergyFlux } from "../utils/physics";
 import { randomPieChart } from "../utils/random";
-import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
 import { generateSpaceStationName } from "../utils/strings/spaceStationNameGenerator";
 import { SpaceStationModel } from "./spacestationModel";
 import { Tools } from "@babylonjs/core/Misc/tools";
@@ -37,7 +34,6 @@ import { createOrbitalObjectId } from "../utils/coordinates/orbitalObjectId";
 
 export function newSeededSpaceStationModel(
     seed: number,
-    stellarObjectModels: StellarObjectModel[],
     starSystemCoordinates: StarSystemCoordinates,
     starSystemPosition: Vector3,
     parentBodies: CelestialBodyModel[]
@@ -95,47 +91,7 @@ export function newSeededSpaceStationModel(
 
     const nbHydroponicLayers = 10;
 
-    // find average distance to stellar objects
-    let distanceToStar = orbit.semiMajorAxis;
-    parentBodies
-        .filter(
-            (body) =>
-                body.type !== OrbitalObjectType.STAR &&
-                body.type !== OrbitalObjectType.NEUTRON_STAR &&
-                body.type !== OrbitalObjectType.BLACK_HOLE
-        )
-        .forEach((celestialBody) => {
-            distanceToStar += celestialBody.orbit.semiMajorAxis;
-        });
-    distanceToStar /= parentBodies.length;
-
-    let totalStellarFlux = 0;
-    stellarObjectModels.forEach((stellarObject) => {
-        const exposureTimeFraction = 0.5;
-        const starRadius = stellarObject.radius;
-        const starTemperature = stellarObject.blackBodyTemperature;
-        totalStellarFlux +=
-            getSphereRadiatedEnergyFlux(starTemperature, starRadius, distanceToStar) * exposureTimeFraction;
-    });
-
-    const totalEnergyConsumptionKWh = population * energyConsumptionPerCapitaKWh;
-
     const solarPanelEfficiency = 0.4;
-
-    const solarPanelSurfaceM2 = getSolarPanelSurfaceFromEnergyRequirement(
-        solarPanelEfficiency,
-        totalEnergyConsumptionKWh,
-        totalStellarFlux
-    );
-
-    const housingSurfaceHa = (100 * population) / populationDensity; // convert km² to ha
-    let agricultureSurfaceHa = 0;
-    agricultureMix.forEach(([fraction, cropType]) => {
-        agricultureSurfaceHa +=
-            (fraction * population * Settings.INDIVIDUAL_AVERAGE_DAILY_INTAKE) /
-            (Settings.HYDROPONIC_TO_CONVENTIONAL_RATIO * nbHydroponicLayers * getEdibleEnergyPerHaPerDay(cropType));
-    });
-    const totalHabitatSurfaceM2 = (housingSurfaceHa + agricultureSurfaceHa) * 1000; // convert ha to m²
 
     return {
         type: OrbitalObjectType.SPACE_STATION,
@@ -153,11 +109,6 @@ export function newSeededSpaceStationModel(
         agricultureMix,
         nbHydroponicLayers,
         faction,
-        totalEnergyConsumptionKWh,
-        solarPanelEfficiency,
-        solarPanelSurfaceM2,
-        housingSurfaceHa,
-        agricultureSurfaceHa,
-        totalHabitatSurfaceM2
+        solarPanelEfficiency
     };
 }
