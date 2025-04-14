@@ -57,8 +57,8 @@ jobs:
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
-                  tagName: __VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version
-                  releaseName: "Cosmos Journeyer __VERSION__"
+                  tagName: v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version
+                  releaseName: "Cosmos Journeyer v__VERSION__"
                   releaseBody: "The new version of Cosmos Journeyer is online at https://barthpaleologue.github.io/CosmosJourneyer/ You can also install the app built using Tauri."
                   releaseDraft: true
                   prerelease: false
