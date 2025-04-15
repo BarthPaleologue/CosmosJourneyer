@@ -21,7 +21,6 @@ import { Textures } from "./textures";
 import { Sounds } from "./sounds";
 import { Materials } from "./materials";
 import { Objects } from "./objects";
-import { Musics } from "./musics";
 
 export class Assets {
     static IS_READY = false;
@@ -35,7 +34,6 @@ export class Assets {
 
         Textures.EnqueueTasks(Assets.MANAGER, scene);
         Sounds.EnqueueTasks(Assets.MANAGER, scene);
-        Musics.EnqueueTasks(Assets.MANAGER, scene);
         Objects.EnqueueTasks(Assets.MANAGER, scene);
 
         Assets.MANAGER.onFinish = () => {

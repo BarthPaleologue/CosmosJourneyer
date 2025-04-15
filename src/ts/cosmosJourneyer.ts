@@ -68,6 +68,7 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { OrbitalObjectType } from "./architecture/orbitalObjectType";
 import { positionNearObject } from "./utils/positionNearObject";
 import { StarMapTutorial } from "./tutorials/starMapTutorial";
+import { loadMusics, Musics } from "./assets/musics";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -132,6 +133,7 @@ export class CosmosJourneyer {
     private constructor(
         player: Player,
         engine: AbstractEngine,
+        musics: Musics,
         starSystemView: StarSystemView,
         encyclopaedia: EncyclopaediaGalacticaManager,
         starSystemDatabase: StarSystemDatabase,
@@ -320,7 +322,7 @@ export class CosmosJourneyer {
                 );
         });
 
-        this.musicConductor = new MusicConductor(this.starSystemView);
+        this.musicConductor = new MusicConductor(musics, this.starSystemView);
 
         window.addEventListener("blur", () => {
             if (!this.mainMenu?.isVisible() && !this.starSystemView.isLoadingSystem()) this.pause();
@@ -415,6 +417,7 @@ export class CosmosJourneyer {
         const starSystemView = new StarSystemView(player, engine, havokInstance, encyclopaedia, starSystemDatabase);
 
         await starSystemView.initAssets();
+        const musics = await loadMusics(() => {});
         await starSystemView.resetPlayer();
 
         if (!navigator.keyboard) {
@@ -432,6 +435,7 @@ export class CosmosJourneyer {
         return new CosmosJourneyer(
             player,
             engine,
+            musics,
             starSystemView,
             encyclopaedia,
             starSystemDatabase,

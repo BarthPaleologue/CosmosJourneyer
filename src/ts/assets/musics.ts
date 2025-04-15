@@ -16,139 +16,93 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Sound } from "@babylonjs/core/Audio/sound";
-import { AssetsManager } from "@babylonjs/core/Misc/assetsManager";
-import { Scene } from "@babylonjs/core/scene";
+import { ISoundOptions } from "@babylonjs/core/Audio/Interfaces/ISoundOptions";
 import "@babylonjs/core/Audio/audioEngine";
 import "@babylonjs/core/Audio/audioSceneComponent";
 
-import starMapBackgroundMusic from "../../asset/sound/music/455855__andrewkn__wandering.mp3";
-import straussBlueDanube from "../../asset/sound/music/Strauss_The_Blue_Danube_Waltz.ogg";
-import deepRelaxation from "../../asset/sound/music/Deep_Relaxation.ogg";
-import atlanteanTwilight from "../../asset/sound/music/Atlantean_Twilight.mp3";
-import infinitePerspective from "../../asset/sound/music/Infinite_Perspective.ogg";
-import thatZenMoment from "../../asset/sound/music/That_Zen_Moment.ogg";
-import echoesOfTime from "../../asset/sound/music/Echoes_of_Time_v2.ogg";
-import peaceOfMind from "../../asset/sound/music/Peace_of_Mind.ogg";
-import spacialWinds from "../../asset/sound/music/Horror_Spacial_Winds.mp3";
-import mesmerize from "../../asset/sound/music/Mesmerize.ogg";
-import reawakening from "../../asset/sound/music/Reawakening.mp3";
-import equatorialComplex from "../../asset/sound/music/Equatorial-Complex.ogg";
-import soaring from "../../asset/sound/music/Soaring.ogg";
+import wanderingPath from "../../asset/sound/music/455855__andrewkn__wandering.mp3";
+import straussBlueDanubePath from "../../asset/sound/music/Strauss_The_Blue_Danube_Waltz.ogg";
+import deepRelaxationPath from "../../asset/sound/music/Deep_Relaxation.ogg";
+import atlanteanTwilightPath from "../../asset/sound/music/Atlantean_Twilight.mp3";
+import infinitePerspectivePath from "../../asset/sound/music/Infinite_Perspective.ogg";
+import thatZenMomentPath from "../../asset/sound/music/That_Zen_Moment.ogg";
+import echoesOfTimePath from "../../asset/sound/music/Echoes_of_Time_v2.ogg";
+import peaceOfMindPath from "../../asset/sound/music/Peace_of_Mind.ogg";
+import spacialWindsPath from "../../asset/sound/music/Horror_Spacial_Winds.mp3";
+import mesmerizePath from "../../asset/sound/music/Mesmerize.ogg";
+import reawakeningPath from "../../asset/sound/music/Reawakening.mp3";
+import equatorialComplexPath from "../../asset/sound/music/Equatorial-Complex.ogg";
+import soaringPath from "../../asset/sound/music/Soaring.ogg";
 
-export class Musics {
-    public static STAR_MAP: Sound;
+export type Musics = {
+    readonly wandering: Sound;
+    readonly straussBlueDanube: Sound;
+    readonly deepRelaxation: Sound;
+    readonly atlanteanTwilight: Sound;
+    readonly infinitePerspective: Sound;
+    readonly thatZenMoment: Sound;
+    readonly echoesOfTime: Sound;
+    readonly peaceOfMind: Sound;
+    readonly spacialWinds: Sound;
+    readonly mesmerize: Sound;
+    readonly reawakening: Sound;
+    readonly equatorialComplex: Sound;
+    readonly soaring: Sound;
+};
 
-    public static MAIN_MENU: Sound;
+export async function loadMusics(
+    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void
+): Promise<Musics> {
+    let loadedCount = 0;
+    let totalCount = 0;
 
-    public static STRAUSS_BLUE_DANUBE: Sound;
+    const loadSoundAsync = (name: string, url: string, options?: ISoundOptions) => {
+        const loadingPromise = new Promise<Sound>((resolve, reject) => {
+            const sound = new Sound(
+                name,
+                url,
+                null,
+                () => {
+                    resolve(sound);
+                },
+                options
+            );
+        });
+        totalCount++;
 
-    public static DEEP_RELAXATION: Sound;
+        return loadingPromise.then((sound) => {
+            progressCallback(++loadedCount, totalCount, sound.name);
+            return sound;
+        });
+    };
 
-    public static ATLANTEAN_TWILIGHT: Sound;
+    const wanderingPromise = loadSoundAsync("Wandering", wanderingPath, { loop: true });
+    const straussBlueDanubePromise = loadSoundAsync("StraussBlueDanube", straussBlueDanubePath);
+    const deepRelaxationPromise = loadSoundAsync("DeepRelaxation", deepRelaxationPath);
+    const atlanteanTwilightPromise = loadSoundAsync("AtlanteanTwilight", atlanteanTwilightPath);
+    const infinitePerspectivePromise = loadSoundAsync("InfinitePerspective", infinitePerspectivePath);
+    const thatZenMomentPromise = loadSoundAsync("ThatZenMoment", thatZenMomentPath);
+    const echoesOfTimePromise = loadSoundAsync("EchoesOfTime", echoesOfTimePath);
+    const peaceOfMindPromise = loadSoundAsync("PeaceOfMind", peaceOfMindPath);
+    const spacialWindsPromise = loadSoundAsync("SpacialWinds", spacialWindsPath);
+    const mesmerizePromise = loadSoundAsync("Mesmerize", mesmerizePath);
+    const reawakeningPromise = loadSoundAsync("Reawakening", reawakeningPath);
+    const equatorialComplexPromise = loadSoundAsync("EquatorialComplex", equatorialComplexPath);
+    const soaringPromise = loadSoundAsync("Soaring", soaringPath);
 
-    public static INFINITE_PERSPECTIVE: Sound;
-
-    public static THAT_ZEN_MOMENT: Sound;
-
-    public static ECHOES_OF_TIME: Sound;
-
-    public static PEACE_OF_MIND: Sound;
-
-    public static SPACIAL_WINDS: Sound;
-
-    public static MESMERIZE: Sound;
-
-    public static REAWAKENING: Sound;
-
-    public static EQUATORIAL_COMPLEX: Sound;
-
-    public static SOARING: Sound;
-
-    public static EnqueueTasks(manager: AssetsManager, scene: Scene) {
-        const starMapBackgroundMusicTask = manager.addBinaryFileTask(
-            "starMapBackgroundMusicTask",
-            starMapBackgroundMusic
-        );
-        starMapBackgroundMusicTask.onSuccess = (task) => {
-            Musics.STAR_MAP = new Sound("StarMapBackgroundMusic", task.data, scene, null, {
-                loop: true
-            });
-
-            Musics.MAIN_MENU = Musics.STAR_MAP;
-
-            console.log("Star map background music loaded");
-        };
-
-        const straussBlueDanubeTask = manager.addBinaryFileTask("straussBlueDanubeTask", straussBlueDanube);
-        straussBlueDanubeTask.onSuccess = (task) => {
-            Musics.STRAUSS_BLUE_DANUBE = new Sound("StraussBlueDanube", task.data, scene);
-            console.log("Strauss Blue Danube sound loaded");
-        };
-
-        const deepRelaxationTask = manager.addBinaryFileTask("deepRelaxationTask", deepRelaxation);
-        deepRelaxationTask.onSuccess = (task) => {
-            Musics.DEEP_RELAXATION = new Sound("DeepRelaxation", task.data, scene);
-            console.log("Deep Relaxation sound loaded");
-        };
-
-        const atlanteanTwilightTask = manager.addBinaryFileTask("atlanteanTwilightTask", atlanteanTwilight);
-        atlanteanTwilightTask.onSuccess = (task) => {
-            Musics.ATLANTEAN_TWILIGHT = new Sound("AtlanteanTwilight", task.data, scene);
-            console.log("Atlantean Twilight sound loaded");
-        };
-
-        const infinitePerspectiveTask = manager.addBinaryFileTask("infinitePerspectiveTask", infinitePerspective);
-        infinitePerspectiveTask.onSuccess = (task) => {
-            Musics.INFINITE_PERSPECTIVE = new Sound("InfinitePerspective", task.data, scene);
-            console.log("Infinite Perspective sound loaded");
-        };
-
-        const thatZenMomentTask = manager.addBinaryFileTask("thatZenMomentTask", thatZenMoment);
-        thatZenMomentTask.onSuccess = (task) => {
-            Musics.THAT_ZEN_MOMENT = new Sound("ThatZenMoment", task.data, scene);
-            console.log("That Zen Moment sound loaded");
-        };
-
-        const echoesOfTimeTask = manager.addBinaryFileTask("echoesOfTimeTask", echoesOfTime);
-        echoesOfTimeTask.onSuccess = (task) => {
-            Musics.ECHOES_OF_TIME = new Sound("EchoesOfTime", task.data, scene);
-            console.log("Echoes of Time sound loaded");
-        };
-
-        const peaceOfMindTask = manager.addBinaryFileTask("peaceOfMindTask", peaceOfMind);
-        peaceOfMindTask.onSuccess = (task) => {
-            Musics.PEACE_OF_MIND = new Sound("PeaceOfMind", task.data, scene);
-            console.log("Peace of Mind sound loaded");
-        };
-
-        const spacialWindsTask = manager.addBinaryFileTask("spacialWindsTask", spacialWinds);
-        spacialWindsTask.onSuccess = (task) => {
-            Musics.SPACIAL_WINDS = new Sound("SpacialWinds", task.data, scene);
-            console.log("Spacial Winds sound loaded");
-        };
-
-        const mesmerizeTask = manager.addBinaryFileTask("mesmerizeTask", mesmerize);
-        mesmerizeTask.onSuccess = (task) => {
-            Musics.MESMERIZE = new Sound("Mesmerize", task.data, scene);
-            console.log("Mesmerize sound loaded");
-        };
-
-        const reawakeningTask = manager.addBinaryFileTask("reawakeningTask", reawakening);
-        reawakeningTask.onSuccess = (task) => {
-            Musics.REAWAKENING = new Sound("Reawakening", task.data, scene);
-            console.log("Reawakening sound loaded");
-        };
-
-        const equatorialComplexTask = manager.addBinaryFileTask("equatorialComplexTask", equatorialComplex);
-        equatorialComplexTask.onSuccess = (task) => {
-            Musics.EQUATORIAL_COMPLEX = new Sound("EquatorialComplex", task.data, scene);
-            console.log("Equatorial Complex sound loaded");
-        };
-
-        const soaringTask = manager.addBinaryFileTask("soaringTask", soaring);
-        soaringTask.onSuccess = (task) => {
-            Musics.SOARING = new Sound("Soaring", task.data, scene);
-            console.log("Soaring sound loaded");
-        };
-    }
+    return {
+        wandering: await wanderingPromise,
+        straussBlueDanube: await straussBlueDanubePromise,
+        deepRelaxation: await deepRelaxationPromise,
+        atlanteanTwilight: await atlanteanTwilightPromise,
+        infinitePerspective: await infinitePerspectivePromise,
+        thatZenMoment: await thatZenMomentPromise,
+        echoesOfTime: await echoesOfTimePromise,
+        peaceOfMind: await peaceOfMindPromise,
+        spacialWinds: await spacialWindsPromise,
+        mesmerize: await mesmerizePromise,
+        reawakening: await reawakeningPromise,
+        equatorialComplex: await equatorialComplexPromise,
+        soaring: await soaringPromise
+    };
 }
