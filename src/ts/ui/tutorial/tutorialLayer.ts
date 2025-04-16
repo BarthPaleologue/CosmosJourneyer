@@ -1,15 +1,17 @@
 import { pressInteractionToStrings } from "../../utils/strings/inputControlsString";
 import { TutorialControlsInputs } from "./tutorialLayerInputs";
 import i18n from "../../i18n";
-import { Sounds } from "../../assets/sounds";
 import { IDisposable } from "@babylonjs/core/scene";
 import { getGlobalKeyboardLayoutMap } from "../../utils/keyboardAPI";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { Tutorial } from "../../tutorials/tutorial";
 import { promptModalBoolean } from "../../utils/dialogModal";
+import { ISoundPlayer, SoundType } from "../../audio/soundPlayer";
 
 export class TutorialLayer implements IDisposable {
     readonly root: HTMLDivElement;
+
+    private readonly soundPlayer: ISoundPlayer;
 
     private readonly panel: HTMLDivElement;
 
@@ -29,7 +31,9 @@ export class TutorialLayer implements IDisposable {
 
     readonly onQuitTutorial: Observable<void> = new Observable();
 
-    constructor() {
+    constructor(soundPlayer: ISoundPlayer) {
+        this.soundPlayer = soundPlayer;
+
         this.root = document.createElement("div");
         this.root.classList.add("tutorialLayer");
 
@@ -95,13 +99,13 @@ export class TutorialLayer implements IDisposable {
                     easing: "ease"
                 }
             );
-            Sounds.MENU_SELECT_SOUND.play();
+            this.soundPlayer.playNow(SoundType.CLICK);
         });
 
         TutorialControlsInputs.map.nextPanel.on("complete", async () => {
             if (this.currentPanelIndex === this.tutorialPanelsHtml.length - 1) {
                 TutorialControlsInputs.setEnabled(false);
-                if (await promptModalBoolean(i18n.t("tutorials:common:quitConfirm"))) {
+                if (await promptModalBoolean(i18n.t("tutorials:common:quitConfirm"), this.soundPlayer)) {
                     this.quitTutorial();
                     return;
                 }
@@ -120,7 +124,7 @@ export class TutorialLayer implements IDisposable {
                     easing: "ease"
                 }
             );
-            Sounds.MENU_SELECT_SOUND.play();
+            this.soundPlayer.playNow(SoundType.CLICK);
         });
     }
 
@@ -135,7 +139,7 @@ export class TutorialLayer implements IDisposable {
 
     public quitTutorial() {
         this.setEnabled(false);
-        Sounds.MENU_SELECT_SOUND.play();
+        this.soundPlayer.playNow(SoundType.CLICK);
         this.onQuitTutorial.notifyObservers();
     }
 

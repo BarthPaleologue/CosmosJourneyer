@@ -130,7 +130,8 @@ export class Spaceship implements Transformable {
     private constructor(
         serializedSpaceShip: SerializedSpaceship,
         unfitComponents: Set<SerializedComponent>,
-        scene: Scene
+        scene: Scene,
+        sounds: Sounds
     ) {
         this.id = serializedSpaceShip.id ?? crypto.randomUUID();
 
@@ -182,42 +183,42 @@ export class Spaceship implements Transformable {
         this.hyperSpaceTunnel.setEnabled(false);
 
         this.enableWarpDriveSound = new AudioInstance(
-            Sounds.ENABLE_WARP_DRIVE_SOUND,
+            sounds.enableWarpDrive,
             AudioMasks.STAR_SYSTEM_VIEW,
             1,
             true,
             this.getTransform()
         );
         this.disableWarpDriveSound = new AudioInstance(
-            Sounds.DISABLE_WARP_DRIVE_SOUND,
+            sounds.disableWarpDrive,
             AudioMasks.STAR_SYSTEM_VIEW,
             1,
             true,
             this.getTransform()
         );
         this.acceleratingWarpDriveSound = new AudioInstance(
-            Sounds.ACCELERATING_WARP_DRIVE_SOUND,
+            sounds.acceleratingWarpDrive,
             AudioMasks.STAR_SYSTEM_VIEW,
             0,
             false,
             this.getTransform()
         );
         this.deceleratingWarpDriveSound = new AudioInstance(
-            Sounds.DECELERATING_WARP_DRIVE_SOUND,
+            sounds.deceleratingWarpDrive,
             AudioMasks.STAR_SYSTEM_VIEW,
             0,
             false,
             this.getTransform()
         );
         this.hyperSpaceSound = new AudioInstance(
-            Sounds.HYPER_SPACE_SOUND,
+            sounds.hyperSpace,
             AudioMasks.HYPER_SPACE,
             0,
             false,
             this.getTransform()
         );
         this.thrusterSound = new AudioInstance(
-            Sounds.THRUSTER_SOUND,
+            sounds.thruster,
             AudioMasks.STAR_SYSTEM_VIEW,
             0,
             false,
@@ -727,16 +728,17 @@ export class Spaceship implements Transformable {
         return amount - fuelLeftToRefuel;
     }
 
-    public static CreateDefault(scene: Scene): Spaceship {
-        return Spaceship.Deserialize(getDefaultSerializedSpaceship(), new Set(), scene);
+    public static CreateDefault(scene: Scene, sounds: Sounds): Spaceship {
+        return Spaceship.Deserialize(getDefaultSerializedSpaceship(), new Set(), scene, sounds);
     }
 
     public static Deserialize(
         serializedSpaceship: SerializedSpaceship,
         unfitComponents: Set<SerializedComponent>,
-        scene: Scene
+        scene: Scene,
+        sounds: Sounds
     ): Spaceship {
-        return new Spaceship(serializedSpaceship, unfitComponents, scene);
+        return new Spaceship(serializedSpaceship, unfitComponents, scene, sounds);
     }
 
     public serialize(): SerializedSpaceship {

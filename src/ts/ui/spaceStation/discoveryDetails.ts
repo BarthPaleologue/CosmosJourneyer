@@ -28,6 +28,8 @@ import { createNotification, NotificationIntent, NotificationOrigin } from "../.
 import { alertModal } from "../../utils/dialogModal";
 import { getObjectModelById } from "../../starSystem/starSystemModel";
 import { getOrbitalPeriod } from "../../orbit/orbit";
+import { Sound } from "@babylonjs/core/Audio/sound";
+import { ISoundPlayer, SoundType } from "../../audio/soundPlayer";
 
 export class DiscoveryDetails {
     readonly htmlRoot: HTMLElement;
@@ -54,7 +56,16 @@ export class DiscoveryDetails {
 
     private readonly encyclopaedia: EncyclopaediaGalactica;
 
-    constructor(player: Player, encyclopaedia: EncyclopaediaGalactica, starSystemDatabase: StarSystemDatabase) {
+    private readonly soundPlayer: ISoundPlayer;
+
+    constructor(
+        player: Player,
+        encyclopaedia: EncyclopaediaGalactica,
+        starSystemDatabase: StarSystemDatabase,
+        soundPlayer: ISoundPlayer
+    ) {
+        this.soundPlayer = soundPlayer;
+
         this.player = player;
         this.encyclopaedia = encyclopaedia;
 
@@ -81,10 +92,16 @@ export class DiscoveryDetails {
                 throw new Error("The sell button should not be displayed when currentDiscovery is null");
             }
 
-            Sounds.SUCCESS.play();
+            this.soundPlayer.playNow(SoundType.SUCCESS);
             const valueResult = await encyclopaedia.estimateDiscovery(this.currentDiscovery.objectId);
             if (!valueResult.success) {
-                createNotification(NotificationOrigin.GENERAL, NotificationIntent.ERROR, valueResult.error, 5_000);
+                createNotification(
+                    NotificationOrigin.GENERAL,
+                    NotificationIntent.ERROR,
+                    valueResult.error,
+                    5_000,
+                    this.soundPlayer
+                );
                 return;
             }
 
@@ -115,14 +132,20 @@ export class DiscoveryDetails {
 
         if (systemModel === null) {
             console.error(discovery);
-            await alertModal("System could not be found for the discovery. More information in the console.");
+            await alertModal(
+                "System could not be found for the discovery. More information in the console.",
+                this.soundPlayer
+            );
             return;
         }
 
         const objectModel = getObjectModelById(this.currentDiscovery.objectId.idInSystem, systemModel);
         if (objectModel === null) {
             console.error(discovery);
-            await alertModal("Object could not be found for the discovery. More information in the console.");
+            await alertModal(
+                "Object could not be found for the discovery. More information in the console.",
+                this.soundPlayer
+            );
             return;
         }
 
@@ -164,7 +187,10 @@ export class DiscoveryDetails {
                 });
             } else {
                 console.error(sellingPrice.error);
-                await alertModal("Could not estimate the selling price. More information in the console.");
+                await alertModal(
+                    "Could not estimate the selling price. More information in the console.",
+                    this.soundPlayer
+                );
             }
         }
     }

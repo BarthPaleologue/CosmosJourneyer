@@ -16,330 +16,143 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Sound } from "@babylonjs/core/Audio/sound";
-import { AssetsManager } from "@babylonjs/core/Misc/assetsManager";
-import { Scene } from "@babylonjs/core/scene";
+import { ISoundOptions } from "@babylonjs/core/Audio/Interfaces/ISoundOptions";
 import "@babylonjs/core/Audio/audioEngine";
 import "@babylonjs/core/Audio/audioSceneComponent";
 
-import ouchSound from "../../asset/sound/ouch.mp3";
-import engineRunningSound from "../../asset/sound/engineRunning.mp3";
-import menuHoverSound from "../../asset/sound/166186__drminky__menu-screen-mouse-over.mp3";
-import targetSound from "../../asset/sound/702805__matrixxx__futuristic-inspect-sound-ui-or-in-game-notification.mp3";
-import enableWarpDriveSound from "../../asset/sound/386992__lollosound__17-distorzione.mp3";
-import disableWarpDriveSound from "../../asset/sound/204418__nhumphrey__large-engine.mp3";
-import acceleratingWarpDriveSound from "../../asset/sound/539503__timbre__endless-acceleration.mp3";
-import deceleratingWarpDriveSound from "../../asset/sound/539503__timbre_endless-deceleration.mp3";
-import hyperSpaceSound from "../../asset/sound/539503__timbre_endless-deceleration-hyperspace.mp3";
-import thrusterSound from "../../asset/sound/318688__limitsnap_creations__rocket-thrust-effect.mp3";
+import ouchSoundPath from "../../asset/sound/ouch.mp3";
+import engineRunningSoundPath from "../../asset/sound/engineRunning.mp3";
+import menuHoverSoundPath from "../../asset/sound/166186__drminky__menu-screen-mouse-over.mp3";
+import targetSoundPath from "../../asset/sound/702805__matrixxx__futuristic-inspect-sound-ui-or-in-game-notification.mp3";
+import enableWarpDriveSoundPath from "../../asset/sound/386992__lollosound__17-distorzione.mp3";
+import disableWarpDriveSoundPath from "../../asset/sound/204418__nhumphrey__large-engine.mp3";
+import acceleratingWarpDriveSoundPath from "../../asset/sound/539503__timbre__endless-acceleration.mp3";
+import deceleratingWarpDriveSoundPath from "../../asset/sound/539503__timbre_endless-deceleration.mp3";
+import hyperSpaceSoundPath from "../../asset/sound/539503__timbre_endless-deceleration-hyperspace.mp3";
+import thrusterSoundPath from "../../asset/sound/318688__limitsnap_creations__rocket-thrust-effect.mp3";
+import echoedBlipSoundPath from "../../asset/sound/554089__copyc4t__echoed-blip.mp3";
+import errorBleepSoundPath from "../../asset/sound/372197__original_sound__error-bleep-4.mp3";
 
-import echoedBlipSound from "../../asset/sound/554089__copyc4t__echoed-blip.mp3";
-import errorBleepSound from "../../asset/sound/372197__original_sound__error-bleep-4.mp3";
+export type Sounds = {
+    readonly ouch: Sound;
+    readonly engineRunning: Sound;
+    readonly menuHover: Sound;
+    readonly menuSelect: Sound;
+    readonly openPauseMenu: Sound;
+    readonly targetLock: Sound;
+    readonly targetUnlock: Sound;
+    readonly enableWarpDrive: Sound;
+    readonly disableWarpDrive: Sound;
+    readonly acceleratingWarpDrive: Sound;
+    readonly deceleratingWarpDrive: Sound;
+    readonly hyperSpace: Sound;
+    readonly thruster: Sound;
+    readonly success: Sound;
+    readonly error: Sound;
+};
 
-import initiatingPlanetaryLandingSound from "../../asset/sound/voice/InitiatingPlanetaryLandingCharlotte.mp3";
-import landingRequestSound from "../../asset/sound/voice/LandingRequestGrantedCharlotte.mp3";
-import landingCompleteSound from "../../asset/sound/voice/LandingCompleteCharlotte.mp3";
+export async function loadSounds(
+    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void,
+    enumerateCallback: (totalCount: number) => void
+): Promise<Sounds> {
+    let loadedCount = 0;
+    let totalCount = 0;
 
-import missionCompleteSound from "../../asset/sound/voice/MissionCompleteCharlotte.mp3";
-
-import newDiscoverySound from "../../asset/sound/voice/NewDiscoveryCharlotte.mp3";
-
-import cannotEngageWarpDriveSound from "../../asset/sound/voice/CannotEngageWarpDriveCharlotte.mp3";
-import warpDriveEmergencyShutDownSound from "../../asset/sound/voice/WarpDriveEmergencyShutdownCharlotte.mp3";
-import warpDriveDisengagedSound from "../../asset/sound/voice/WarpDriveDisengagedCharlotte.mp3";
-import engagingWarpDriveSound from "../../asset/sound/voice/EngagingWarpDriveCharlotte.mp3";
-
-import fuelScoopingVoice from "../../asset/sound/voice/FuelScoopingCharlotte.mp3";
-import fuelScoopingCompleteVoice from "../../asset/sound/voice/FuelScoopingCompleteCharlotte.mp3";
-
-export class Sounds {
-    public static OUCH_SOUND: Sound;
-    public static ENGINE_RUNNING_SOUND: Sound;
-
-    public static MENU_HOVER_SOUND: Sound;
-    public static MENU_SELECT_SOUND: Sound;
-    public static OPEN_PAUSE_MENU_SOUND: Sound;
-
-    public static STAR_MAP_CLICK_SOUND: Sound;
-
-    public static TARGET_LOCK_SOUND: Sound;
-    public static TARGET_UNLOCK_SOUND: Sound;
-
-    public static ENABLE_WARP_DRIVE_SOUND: Sound;
-    public static DISABLE_WARP_DRIVE_SOUND: Sound;
-
-    public static ACCELERATING_WARP_DRIVE_SOUND: Sound;
-    public static DECELERATING_WARP_DRIVE_SOUND: Sound;
-
-    public static HYPER_SPACE_SOUND: Sound;
-
-    public static THRUSTER_SOUND: Sound;
-
-    public static SUCCESS: Sound;
-    public static ERROR: Sound;
-
-    public static INITIATING_PLANETARY_LANDING: Sound;
-    public static LANDING_REQUEST_GRANTED: Sound;
-    public static LANDING_COMPLETE: Sound;
-
-    public static MISSION_COMPLETE: Sound;
-
-    public static NEW_DISCOVERY: Sound;
-
-    public static CANNOT_ENGAGE_WARP_DRIVE: Sound;
-    public static WARP_DRIVE_EMERGENCY_SHUT_DOWN: Sound;
-    public static WARP_DRIVE_DISENGAGED: Sound;
-    public static ENGAGING_WARP_DRIVE: Sound;
-
-    public static FUEL_SCOOPING_VOICE: Sound;
-    public static FUEL_SCOOPING_COMPLETE_VOICE: Sound;
-
-    private static IS_PLAYING = false;
-    private static QUEUE: Sound[] = [];
-
-    public static EnqueuePlay(sound: Sound) {
-        Sounds.QUEUE.push(sound);
-    }
-
-    public static Update() {
-        if (Sounds.IS_PLAYING) return;
-
-        if (Sounds.QUEUE.length === 0) return;
-
-        const sound = Sounds.QUEUE.shift();
-        if (sound === undefined) return;
-
-        Sounds.IS_PLAYING = true;
-        sound.play();
-
-        sound.onEndedObservable.addOnce(() => {
-            Sounds.IS_PLAYING = false;
+    const loadSoundAsync = (name: string, url: string, options?: ISoundOptions) => {
+        const loadingPromise = new Promise<Sound>((resolve, reject) => {
+            const sound = new Sound(
+                name,
+                url,
+                null,
+                () => {
+                    resolve(sound);
+                },
+                options
+            );
         });
-    }
+        totalCount++;
 
-    public static EnqueueTasks(manager: AssetsManager, scene: Scene) {
-        const ouchSoundTask = manager.addBinaryFileTask("ouchSoundTask", ouchSound);
-        ouchSoundTask.onSuccess = (task) => {
-            Sounds.OUCH_SOUND = new Sound("OuchSound", task.data, scene);
+        return loadingPromise.then((sound) => {
+            progressCallback(++loadedCount, totalCount, sound.name);
+            return sound;
+        });
+    };
 
-            console.log("Ouch sound loaded");
-        };
+    const ouchSoundPromise = loadSoundAsync("OuchSound", ouchSoundPath);
 
-        const engineRunningSoundTask = manager.addBinaryFileTask("engineRunningSoundTask", engineRunningSound);
-        engineRunningSoundTask.onSuccess = (task) => {
-            Sounds.ENGINE_RUNNING_SOUND = new Sound("EngineRunningSound", task.data, scene, null, {
-                loop: true
-            });
+    const engineRunningSoundPromise = loadSoundAsync("EngineRunningSound", engineRunningSoundPath, { loop: true });
 
-            console.log("Engine running sound loaded");
-        };
+    const menuHoverSoundPromise = loadSoundAsync("MenuHoverSound", menuHoverSoundPath, { playbackRate: 0.5 });
 
-        const menuHoverSoundTask = manager.addBinaryFileTask("menuHoverSoundTask", menuHoverSound);
-        menuHoverSoundTask.onSuccess = (task) => {
-            Sounds.MENU_HOVER_SOUND = new Sound("MenuHoverSound", task.data, scene);
-            Sounds.MENU_HOVER_SOUND.updateOptions({
-                playbackRate: 0.5
-            });
+    const menuSelectSoundPromise = loadSoundAsync("MenuSelectSound", menuHoverSoundPath);
 
-            const clonedSound = Sounds.MENU_HOVER_SOUND.clone();
-            if (clonedSound === null) throw new Error("clonedSound is null");
-            Sounds.MENU_SELECT_SOUND = clonedSound;
-            Sounds.MENU_SELECT_SOUND.updateOptions({
-                playbackRate: 1.0
-            });
+    const openPauseMenuSoundPromise = loadSoundAsync("OpenPauseMenuSound", menuHoverSoundPath, { playbackRate: 0.75 });
 
-            const clonedSound2 = Sounds.MENU_HOVER_SOUND.clone();
-            if (clonedSound2 === null) throw new Error("clonedSound2 is null");
-            Sounds.OPEN_PAUSE_MENU_SOUND = clonedSound2;
-            Sounds.OPEN_PAUSE_MENU_SOUND.updateOptions({
-                playbackRate: 0.75
-            });
+    // Target sounds
+    const targetLockSoundPromise = loadSoundAsync("TargetLockSound", targetSoundPath);
 
-            console.log("Menu hover sound loaded");
-        };
+    const targetUnlockSoundPromise = loadSoundAsync("TargetUnlockSound", targetSoundPath, { playbackRate: 0.5 });
 
-        const targetSoundTask = manager.addBinaryFileTask("targetSoundTask", targetSound);
-        targetSoundTask.onSuccess = (task) => {
-            Sounds.TARGET_LOCK_SOUND = new Sound("StarMapClickSound", task.data, scene);
+    // Warp drive sounds
+    const enableWarpDriveSoundPromise = loadSoundAsync("EnableWarpDriveSound", enableWarpDriveSoundPath, {
+        playbackRate: 2
+    });
 
-            const clonedSound = Sounds.TARGET_LOCK_SOUND.clone();
-            if (clonedSound === null) throw new Error("clonedSound is null");
-            Sounds.TARGET_UNLOCK_SOUND = clonedSound;
-            Sounds.TARGET_UNLOCK_SOUND.updateOptions({
-                playbackRate: 0.5
-            });
+    const disableWarpDriveSoundPromise = loadSoundAsync("DisableWarpDriveSound", disableWarpDriveSoundPath);
 
-            const clonedSound2 = Sounds.TARGET_LOCK_SOUND.clone();
-            if (clonedSound2 === null) throw new Error("clonedSound2 is null");
-            Sounds.STAR_MAP_CLICK_SOUND = clonedSound2;
+    const acceleratingWarpDriveSoundPromise = loadSoundAsync(
+        "AcceleratingWarpDriveSound",
+        acceleratingWarpDriveSoundPath,
+        {
+            playbackRate: 1.0,
+            volume: 0.3,
+            loop: true
+        }
+    );
 
-            console.log("Target sound loaded");
-        };
+    const deceleratingWarpDriveSoundPromise = loadSoundAsync(
+        "DeceleratingWarpDriveSound",
+        deceleratingWarpDriveSoundPath,
+        {
+            playbackRate: 1.0,
+            volume: 0.3,
+            loop: true
+        }
+    );
 
-        const enableWarpDriveSoundTask = manager.addBinaryFileTask("enableWarpDriveSoundTask", enableWarpDriveSound);
-        enableWarpDriveSoundTask.onSuccess = (task) => {
-            Sounds.ENABLE_WARP_DRIVE_SOUND = new Sound("EnableWarpDriveSound", task.data, scene);
-            Sounds.ENABLE_WARP_DRIVE_SOUND.updateOptions({
-                playbackRate: 2
-            });
+    const hyperSpaceSoundPromise = loadSoundAsync("HyperSpaceSound", hyperSpaceSoundPath, {
+        playbackRate: 1.5,
+        volume: 0.25,
+        loop: true
+    });
 
-            console.log("Enable warp drive sound loaded");
-        };
+    const thrusterSoundPromise = loadSoundAsync("ThrusterSound", thrusterSoundPath, {
+        playbackRate: 1.0,
+        volume: 0.5,
+        loop: true
+    });
 
-        const disableWarpDriveSoundTask = manager.addBinaryFileTask("disableWarpDriveSoundTask", disableWarpDriveSound);
-        disableWarpDriveSoundTask.onSuccess = (task) => {
-            Sounds.DISABLE_WARP_DRIVE_SOUND = new Sound("DisableWarpDriveSound", task.data, scene);
+    // UI sounds
+    const successSoundPromise = loadSoundAsync("Success", echoedBlipSoundPath);
+    const errorSoundPromise = loadSoundAsync("Error", errorBleepSoundPath);
 
-            console.log("Disable warp drive sound loaded");
-        };
+    enumerateCallback(totalCount);
 
-        const acceleratingWarpDriveSoundTask = manager.addBinaryFileTask(
-            "acceleratingWarpDriveSoundTask",
-            acceleratingWarpDriveSound
-        );
-        acceleratingWarpDriveSoundTask.onSuccess = (task) => {
-            Sounds.ACCELERATING_WARP_DRIVE_SOUND = new Sound("AcceleratingWarpDriveSound", task.data, scene);
-            Sounds.ACCELERATING_WARP_DRIVE_SOUND.updateOptions({
-                playbackRate: 1.0,
-                volume: 0.3,
-                loop: true
-            });
-
-            console.log("Accelerating warp drive sound loaded");
-        };
-
-        const deceleratingWarpDriveSoundTask = manager.addBinaryFileTask(
-            "deceleratingWarpDriveSoundTask",
-            deceleratingWarpDriveSound
-        );
-        deceleratingWarpDriveSoundTask.onSuccess = (task) => {
-            Sounds.DECELERATING_WARP_DRIVE_SOUND = new Sound("DeceleratingWarpDriveSound", task.data, scene);
-            Sounds.DECELERATING_WARP_DRIVE_SOUND.updateOptions({
-                playbackRate: 1.0,
-                volume: 0.3,
-                loop: true
-            });
-
-            console.log("Decelerating warp drive sound loaded");
-        };
-
-        const hyperSpaceSoundTask = manager.addBinaryFileTask("hyperSpaceSoundTask", hyperSpaceSound);
-        hyperSpaceSoundTask.onSuccess = (task) => {
-            Sounds.HYPER_SPACE_SOUND = new Sound("HyperSpaceSound", task.data, scene);
-            Sounds.HYPER_SPACE_SOUND.updateOptions({
-                playbackRate: 1.5,
-                volume: 0.25,
-                loop: true
-            });
-
-            console.log("Hyper space sound loaded");
-        };
-
-        const thrusterSoundTask = manager.addBinaryFileTask("thrusterSoundTask", thrusterSound);
-        thrusterSoundTask.onSuccess = (task) => {
-            Sounds.THRUSTER_SOUND = new Sound("ThrusterSound", task.data, scene);
-            Sounds.THRUSTER_SOUND.updateOptions({
-                playbackRate: 1.0,
-                volume: 0.5,
-                loop: true
-            });
-
-            console.log("Thruster sound loaded");
-        };
-
-        const echoedBlipSoundTask = manager.addBinaryFileTask("echoedBlipSoundTask", echoedBlipSound);
-        echoedBlipSoundTask.onSuccess = (task) => {
-            Sounds.SUCCESS = new Sound("EchoedBlipSound", task.data, scene);
-            console.log("Echoed blip sound loaded");
-        };
-
-        const errorBleepSoundTask = manager.addBinaryFileTask("errorBleepSoundTask", errorBleepSound);
-        errorBleepSoundTask.onSuccess = (task) => {
-            Sounds.ERROR = new Sound("ErrorBleepSound", task.data, scene);
-            console.log("Error bleep sound loaded");
-        };
-
-        const initiatingPlanetaryLandingSoundTask = manager.addBinaryFileTask(
-            "initiatingPlanetaryLandingSoundTask",
-            initiatingPlanetaryLandingSound
-        );
-        initiatingPlanetaryLandingSoundTask.onSuccess = (task) => {
-            Sounds.INITIATING_PLANETARY_LANDING = new Sound("InitiatingPlanetaryLanding", task.data, scene);
-            console.log("Initiating planetary landing sound loaded");
-        };
-
-        const landingRequestSoundTask = manager.addBinaryFileTask("landingRequestSoundTask", landingRequestSound);
-        landingRequestSoundTask.onSuccess = (task) => {
-            Sounds.LANDING_REQUEST_GRANTED = new Sound("LandingRequestGranted", task.data, scene);
-            console.log("Landing request sound loaded");
-        };
-
-        const landingCompleteSoundTask = manager.addBinaryFileTask("landingCompleteSoundTask", landingCompleteSound);
-        landingCompleteSoundTask.onSuccess = (task) => {
-            Sounds.LANDING_COMPLETE = new Sound("LandingComplete", task.data, scene);
-            console.log("Landing complete sound loaded");
-        };
-
-        const missionCompleteSoundTask = manager.addBinaryFileTask("missionCompleteSoundTask", missionCompleteSound);
-        missionCompleteSoundTask.onSuccess = (task) => {
-            Sounds.MISSION_COMPLETE = new Sound("MissionComplete", task.data, scene);
-            console.log("Mission complete sound loaded");
-        };
-
-        const newDiscoverySoundTask = manager.addBinaryFileTask("newDiscoverySoundTask", newDiscoverySound);
-        newDiscoverySoundTask.onSuccess = (task) => {
-            Sounds.NEW_DISCOVERY = new Sound("NewDiscovery", task.data, scene);
-            console.log("New discovery sound loaded");
-        };
-
-        const cannotEngageWarpDriveSoundTask = manager.addBinaryFileTask(
-            "cannotEngageWarpDriveSoundTask",
-            cannotEngageWarpDriveSound
-        );
-        cannotEngageWarpDriveSoundTask.onSuccess = (task) => {
-            Sounds.CANNOT_ENGAGE_WARP_DRIVE = new Sound("CannotEngageWarpDrive", task.data, scene);
-            console.log("Cannot engage warp drive sound loaded");
-        };
-
-        const warpDriveEmergencyShutDownSoundTask = manager.addBinaryFileTask(
-            "warpDriveEmergencyShutDownSoundTask",
-            warpDriveEmergencyShutDownSound
-        );
-        warpDriveEmergencyShutDownSoundTask.onSuccess = (task) => {
-            Sounds.WARP_DRIVE_EMERGENCY_SHUT_DOWN = new Sound("WarpDriveEmergencyShutDown", task.data, scene);
-            console.log("Warp drive emergency shut down sound loaded");
-        };
-
-        const warpDriveDisengagedSoundTask = manager.addBinaryFileTask(
-            "warpDriveDisengagedSoundTask",
-            warpDriveDisengagedSound
-        );
-        warpDriveDisengagedSoundTask.onSuccess = (task) => {
-            Sounds.WARP_DRIVE_DISENGAGED = new Sound("WarpDriveDisengaged", task.data, scene);
-            console.log("Warp drive disengaged sound loaded");
-        };
-
-        const engagingWarpDriveSoundTask = manager.addBinaryFileTask(
-            "engagingWarpDriveSoundTask",
-            engagingWarpDriveSound
-        );
-        engagingWarpDriveSoundTask.onSuccess = (task) => {
-            Sounds.ENGAGING_WARP_DRIVE = new Sound("EngagingWarpDrive", task.data, scene);
-            console.log("Engaging warp drive sound loaded");
-        };
-
-        const fuelScoopingVoiceTask = manager.addBinaryFileTask("fuelScoopingVoiceTask", fuelScoopingVoice);
-        fuelScoopingVoiceTask.onSuccess = (task) => {
-            Sounds.FUEL_SCOOPING_VOICE = new Sound("FuelScoopingVoice", task.data, scene);
-            console.log("Fuel scooping voice loaded");
-        };
-
-        const fuelScoopingCompleteVoiceTask = manager.addBinaryFileTask(
-            "fuelScoopingCompleteVoiceTask",
-            fuelScoopingCompleteVoice
-        );
-        fuelScoopingCompleteVoiceTask.onSuccess = (task) => {
-            Sounds.FUEL_SCOOPING_COMPLETE_VOICE = new Sound("FuelScoopingCompleteVoice", task.data, scene);
-            console.log("Fuel scooping complete voice loaded");
-        };
-    }
+    return {
+        ouch: await ouchSoundPromise,
+        engineRunning: await engineRunningSoundPromise,
+        menuHover: await menuHoverSoundPromise,
+        menuSelect: await menuSelectSoundPromise,
+        openPauseMenu: await openPauseMenuSoundPromise,
+        targetLock: await targetLockSoundPromise,
+        targetUnlock: await targetUnlockSoundPromise,
+        enableWarpDrive: await enableWarpDriveSoundPromise,
+        disableWarpDrive: await disableWarpDriveSoundPromise,
+        acceleratingWarpDrive: await acceleratingWarpDriveSoundPromise,
+        deceleratingWarpDrive: await deceleratingWarpDriveSoundPromise,
+        hyperSpace: await hyperSpaceSoundPromise,
+        thruster: await thrusterSoundPromise,
+        success: await successSoundPromise,
+        error: await errorSoundPromise
+    };
 }

@@ -20,10 +20,10 @@ import { Mission } from "../missions/mission";
 import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
 import { MissionContext } from "../missions/missionContext";
 import { pressInteractionToStrings } from "../utils/strings/inputControlsString";
-import { Sounds } from "../assets/sounds";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import i18n from "../i18n";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
 
 export class CurrentMissionDisplay {
     readonly rootNode: HTMLElement;
@@ -44,7 +44,7 @@ export class CurrentMissionDisplay {
 
     private readonly player: Player;
 
-    constructor(player: Player, starSystemDatabase: StarSystemDatabase) {
+    constructor(player: Player, starSystemDatabase: StarSystemDatabase, soundPlayer: ISoundPlayer) {
         this.player = player;
 
         this.rootNode = document.createElement("div");
@@ -115,7 +115,7 @@ export class CurrentMissionDisplay {
                     easing: "ease"
                 }
             );
-            Sounds.MENU_SELECT_SOUND.play();
+            soundPlayer.playNow(SoundType.CLICK);
         });
 
         SpaceShipControlsInputs.map.nextMission.on("complete", () => {
@@ -127,7 +127,7 @@ export class CurrentMissionDisplay {
                     easing: "ease"
                 }
             );
-            Sounds.MENU_SELECT_SOUND.play();
+            soundPlayer.playNow(SoundType.CLICK);
         });
     }
 

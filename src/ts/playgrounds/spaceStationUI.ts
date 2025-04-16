@@ -27,6 +27,9 @@ import { Assets } from "../assets/assets";
 import { enablePhysics } from "./utils";
 import { Spaceship } from "../spaceship/spaceship";
 import { ShipControls } from "../spaceship/shipControls";
+import { SoundPlayerMock } from "../audio/soundPlayer";
+import { TtsMock } from "../audio/tts";
+import { loadSounds } from "../assets/sounds";
 
 export async function createSpaceStationUIScene(engine: AbstractEngine): Promise<Scene> {
     const scene = new Scene(engine);
@@ -38,6 +41,14 @@ export async function createSpaceStationUIScene(engine: AbstractEngine): Promise
 
     await Assets.Init(scene);
 
+    const sounds = await loadSounds(
+        () => {},
+        () => {}
+    );
+
+    const soundPlayer = new SoundPlayerMock();
+    const tts = new TtsMock();
+
     const systemDatabase = new StarSystemDatabase(getLoneStarSystem());
 
     const player = Player.Default(systemDatabase);
@@ -47,10 +58,10 @@ export async function createSpaceStationUIScene(engine: AbstractEngine): Promise
         throw new Error("No spaceship found in player data");
     }
 
-    const spaceship = Spaceship.Deserialize(serializedSpaceship, player.spareSpaceshipComponents, scene);
+    const spaceship = Spaceship.Deserialize(serializedSpaceship, player.spareSpaceshipComponents, scene, sounds);
     player.instancedSpaceships.push(spaceship);
 
-    const shipControls = new ShipControls(spaceship, scene);
+    const shipControls = new ShipControls(spaceship, scene, soundPlayer, tts);
 
     const camera = shipControls.thirdPersonCamera;
     camera.attachControl();
@@ -60,7 +71,7 @@ export async function createSpaceStationUIScene(engine: AbstractEngine): Promise
 
     const encyclopaedia = new EncyclopaediaGalacticaManager();
 
-    const spaceStationUI = new SpaceStationLayer(player, encyclopaedia, systemDatabase);
+    const spaceStationUI = new SpaceStationLayer(player, encyclopaedia, systemDatabase, soundPlayer);
 
     const stationModel = systemModel.orbitalFacilities[0];
 

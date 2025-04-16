@@ -35,7 +35,7 @@ import { HavokPhysicsWithBindings } from "@babylonjs/havok";
 import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge";
 import { DefaultControls } from "../defaultControls/defaultControls";
 import { CharacterControls } from "../characterControls/characterControls";
-import { Assets } from "../assets/assets";
+import { Assets, Assets2 } from "../assets/assets";
 import {
     getForwardDirection,
     getRotationQuaternion,
@@ -58,7 +58,6 @@ import { PostProcessManager } from "../postProcesses/postProcessManager";
 import { CharacterInputs } from "../characterControls/characterControlsInputs";
 import i18n from "../i18n";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
-import { Sounds } from "../assets/sounds";
 import { Materials } from "../assets/materials";
 import { SpaceStationLayer } from "../ui/spaceStation/spaceStationLayer";
 import { Player } from "../player/player";
@@ -84,6 +83,8 @@ import { starSystemCoordinatesEquals, StarSystemCoordinates } from "../utils/coo
 import { StarSystemLoader } from "./starSystemLoader";
 import { DeepReadonly } from "../utils/types";
 import { LandingPadSize } from "../spacestation/landingPad/landingPadManager";
+import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
+import { ITts, Speaker, VoiceLine } from "../audio/tts";
 
 // register cosmos journeyer as part of window object
 declare global {
@@ -214,6 +215,11 @@ export class StarSystemView implements View {
 
     private keyboardLayoutMap: Map<string, string> = new Map();
 
+    private readonly soundPlayer: ISoundPlayer;
+    private readonly tts: ITts;
+
+    private readonly assets: Assets2;
+
     /**
      * Creates an empty star system view with a scene, a gui and a havok plugin
      * To fill it with a star system, use `loadStarSystem` and then `initStarSystem`
@@ -222,18 +228,30 @@ export class StarSystemView implements View {
      * @param havokInstance The Havok physics instance
      */
     constructor(
+        scene: UberScene,
         player: Player,
         engine: AbstractEngine,
         havokInstance: HavokPhysicsWithBindings,
         encyclopaedia: EncyclopaediaGalacticaManager,
-        starSystemDatabase: StarSystemDatabase
+        starSystemDatabase: StarSystemDatabase,
+        soundPlayer: ISoundPlayer,
+        tts: ITts,
+        assets: Assets2
     ) {
         this.player = player;
         this.encyclopaedia = encyclopaedia;
         this.starSystemDatabase = starSystemDatabase;
 
-        this.spaceShipLayer = new SpaceShipLayer(this.player, this.starSystemDatabase);
+        this.spaceShipLayer = new SpaceShipLayer(this.player, this.starSystemDatabase, soundPlayer);
         document.body.appendChild(this.spaceShipLayer.root);
+
+        this.scene = scene;
+        this.scene.skipPointerMovePicking = true;
+        this.scene.autoClear = false;
+
+        this.soundPlayer = soundPlayer;
+        this.tts = tts;
+        this.assets = assets;
 
         void getGlobalKeyboardLayoutMap().then((keyboardLayoutMap) => {
             this.keyboardLayoutMap = keyboardLayoutMap;
@@ -241,13 +259,13 @@ export class StarSystemView implements View {
 
         StarSystemInputs.map.toggleUi.on("complete", () => {
             this.isUiEnabled = !this.isUiEnabled;
-            Sounds.MENU_HOVER_SOUND.play();
+            this.soundPlayer.playNow(SoundType.CLICK);
         });
 
         StarSystemInputs.map.toggleOrbitsAndAxis.on("complete", () => {
             const enabled = !this.orbitRenderer.isVisible();
-            if (enabled) Sounds.MENU_HOVER_SOUND.play();
-            else Sounds.MENU_HOVER_SOUND.play();
+            if (enabled) this.soundPlayer.playNow(SoundType.ENABLE_ORBIT_DISPLAY);
+            else this.soundPlayer.playNow(SoundType.DISABLE_ORBIT_DISPLAY);
             this.orbitRenderer.setVisibility(enabled);
             this.axisRenderer.setVisibility(enabled);
         });
@@ -296,7 +314,8 @@ export class StarSystemView implements View {
                     NotificationOrigin.SPACESHIP,
                     NotificationIntent.ERROR,
                     i18n.t("notifications:notEnoughFuel"),
-                    5000
+                    5000,
+                    this.soundPlayer
                 );
                 this.jumpLock = false;
                 return;
@@ -414,7 +433,8 @@ export class StarSystemView implements View {
                         i18n.t("notifications:howToLiftOff", {
                             bindingsString: axisCompositeToString(control, keyboardLayoutMap)[1][1]
                         }),
-                        5000
+                        5000,
+                        this.soundPlayer
                     );
                 }
             }
@@ -424,12 +444,6 @@ export class StarSystemView implements View {
             const object = this.getStarSystem().getNearestOrbitalObject(Vector3.Zero());
             console.log(getUniverseObjectId(object.model, this.getStarSystem().model));
         });
-
-        this.scene = new UberScene(engine);
-        // The right-handed system allows to use directly GLTF models without having to flip them with a transform
-        this.scene.useRightHandedSystem = true;
-        this.scene.skipPointerMovePicking = true;
-        this.scene.autoClear = false;
 
         this.havokPlugin = new HavokPlugin(true, havokInstance);
         setMaxLinVel(this.havokPlugin, 10000, 10000);
@@ -458,7 +472,12 @@ export class StarSystemView implements View {
 
         this.spaceShipLayer.setVisibility(false);
 
-        this.spaceStationLayer = new SpaceStationLayer(this.player, this.encyclopaedia, this.starSystemDatabase);
+        this.spaceStationLayer = new SpaceStationLayer(
+            this.player,
+            this.encyclopaedia,
+            this.starSystemDatabase,
+            this.soundPlayer
+        );
         this.spaceStationLayer.setVisibility(false);
         this.spaceStationLayer.onTakeOffObservable.add(() => {
             this.getSpaceshipControls().getSpaceship().takeOff();
@@ -530,7 +549,7 @@ export class StarSystemView implements View {
             });
 
             for (let i = 0; i < Math.ceil(Math.random() * 15); i++) {
-                const aiPlayer = new AiPlayerControls(this.starSystemDatabase, this.scene);
+                const aiPlayer = new AiPlayerControls(this.starSystemDatabase, this.scene, this.assets.sounds);
 
                 const landingPad = spaceStation.getLandingPadManager().handleLandingRequest({
                     minimumPadSize: LandingPadSize.SMALL
@@ -559,6 +578,7 @@ export class StarSystemView implements View {
         let controllerDistanceFactor = 4;
         if (firstBody instanceof BlackHole) controllerDistanceFactor = 50;
         else if (firstBody instanceof NeutronStar) controllerDistanceFactor = 100_000;
+
         if (this.player.visitedSystemHistory.length === 0) {
             positionNearObjectBrightSide(activeControls, firstBody, starSystem, controllerDistanceFactor);
         } else {
@@ -652,11 +672,16 @@ export class StarSystemView implements View {
         const spaceshipSerialized = this.player.serializedSpaceships.shift();
         if (spaceshipSerialized === undefined) throw new Error("No spaceship serialized in player");
 
-        const spaceship = Spaceship.Deserialize(spaceshipSerialized, this.player.spareSpaceshipComponents, this.scene);
+        const spaceship = Spaceship.Deserialize(
+            spaceshipSerialized,
+            this.player.spareSpaceshipComponents,
+            this.scene,
+            this.assets.sounds
+        );
         this.player.instancedSpaceships.push(spaceship);
 
         if (this.spaceshipControls === null) {
-            this.spaceshipControls = new ShipControls(spaceship, this.scene);
+            this.spaceshipControls = new ShipControls(spaceship, this.scene, this.soundPlayer, this.tts);
             this.spaceshipControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
         } else {
             const oldSpaceship = this.spaceshipControls.getSpaceship();
@@ -737,9 +762,10 @@ export class StarSystemView implements View {
                     i18n.t("notifications:newDiscovery", {
                         objectName: nearestCelestialBody.model.name
                     }),
-                    15_000
+                    15_000,
+                    this.soundPlayer
                 );
-                Sounds.EnqueuePlay(Sounds.NEW_DISCOVERY);
+                this.tts.enqueueSay(Speaker.CHARLOTTE, VoiceLine.NEW_DISCOVERY);
                 this.onNewDiscovery.notifyObservers(universeId);
             }
         }
@@ -803,7 +829,7 @@ export class StarSystemView implements View {
             mission.update(missionContext);
             if (mission.isCompleted()) {
                 this.player.earn(mission.getReward());
-                Sounds.EnqueuePlay(Sounds.MISSION_COMPLETE);
+                this.tts.enqueueSay(Speaker.CHARLOTTE, VoiceLine.MISSION_COMPLETE);
                 newlyCompletedMissions.push(mission);
             }
         });
@@ -1024,7 +1050,8 @@ export class StarSystemView implements View {
                 NotificationOrigin.GENERAL,
                 NotificationIntent.INFO,
                 `Move using ${keys.map((key) => key[1].replace("Key", "")).join(", ")}`,
-                20_000
+                20_000,
+                this.soundPlayer
             );
         }
     }
@@ -1063,7 +1090,7 @@ export class StarSystemView implements View {
         if (this.targetCursorLayer.getTarget() === target) {
             this.spaceShipLayer.setTarget(null);
             this.targetCursorLayer.setTarget(null);
-            Sounds.TARGET_UNLOCK_SOUND.play();
+            this.soundPlayer.playNow(SoundType.TARGET_UNLOCK);
             return;
         }
 
@@ -1071,7 +1098,7 @@ export class StarSystemView implements View {
 
         this.spaceShipLayer.setTarget(target.getTransform());
         this.targetCursorLayer.setTarget(target);
-        Sounds.TARGET_LOCK_SOUND.play();
+        this.soundPlayer.playNow(SoundType.TARGET_LOCK);
     }
 
     /**

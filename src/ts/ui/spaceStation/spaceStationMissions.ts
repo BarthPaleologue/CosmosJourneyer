@@ -26,6 +26,7 @@ import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { OrbitalFacilityModel } from "../../architecture/orbitalObjectModel";
 import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
 import { DeepReadonly } from "../../utils/types";
+import { ISoundPlayer } from "../../audio/soundPlayer";
 
 /**
  * Generates all missions available at the given space station for the player. Missions are generated based on the current timestamp (hourly basis).
@@ -36,7 +37,8 @@ import { DeepReadonly } from "../../utils/types";
 export function generateMissionsDom(
     stationModel: DeepReadonly<OrbitalFacilityModel>,
     player: Player,
-    starSystemDatabase: StarSystemDatabase
+    starSystemDatabase: StarSystemDatabase,
+    soundPlayer: ISoundPlayer
 ): HTMLDivElement {
     const starSystemModel = starSystemDatabase.getSystemModelFromCoordinates(stationModel.starSystemCoordinates);
     if (starSystemModel === null) {
@@ -95,7 +97,7 @@ export function generateMissionsDom(
     htmlRoot.appendChild(missionList);
 
     sightSeeingMissions.forEach((mission) => {
-        const missionContainer = new MissionContainer(mission, player, starSystemDatabase);
+        const missionContainer = new MissionContainer(mission, player, starSystemDatabase, soundPlayer);
         missionList.appendChild(missionContainer.rootNode);
     });
 
