@@ -37,6 +37,8 @@ import tradingIcon from "../../../asset/icons/trade.webp";
 import infoIcon from "../../../asset/icons/space-station.webp";
 import liftOffIcon from "../../../asset/icons/launch.webp";
 import { SpaceshipDockUI } from "./spaceshipDock";
+import { Sound } from "@babylonjs/core/Audio/sound";
+import { ISoundPlayer, SoundType } from "../../audio/soundPlayer";
 
 const enum MainPanelState {
     NONE,
@@ -80,7 +82,16 @@ export class SpaceStationLayer {
 
     readonly onTakeOffObservable = new Observable<void>();
 
-    constructor(player: Player, encyclopaedia: EncyclopaediaGalacticaManager, starSystemDatabase: StarSystemDatabase) {
+    private readonly soundPlayer: ISoundPlayer;
+
+    constructor(
+        player: Player,
+        encyclopaedia: EncyclopaediaGalacticaManager,
+        starSystemDatabase: StarSystemDatabase,
+        soundPlayer: ISoundPlayer
+    ) {
+        this.soundPlayer = soundPlayer;
+
         player.onBalanceChangedObservable.add((balance) => {
             this.updatePlayerBalance(balance);
         });
@@ -120,8 +131,12 @@ export class SpaceStationLayer {
         this.editPlayerNameButton = document.createElement("button");
         this.editPlayerNameButton.setAttribute("class", "icon");
         this.editPlayerNameButton.addEventListener("click", async () => {
-            Sounds.MENU_SELECT_SOUND.play();
-            const newName = await promptModalString(i18n.t("spaceStation:cmdrNameChangePrompt"), player.getName());
+            this.soundPlayer.playNow(SoundType.CLICK);
+            const newName = await promptModalString(
+                i18n.t("spaceStation:cmdrNameChangePrompt"),
+                player.getName(),
+                this.soundPlayer
+            );
             if (newName === null) return;
             player.setName(newName);
         });
@@ -140,7 +155,12 @@ export class SpaceStationLayer {
         this.mainPanel.setAttribute("class", "mainContainer hidden");
         this.rootHtml.appendChild(this.mainPanel);
 
-        this.explorationCenterPanel = new ExplorationCenterPanel(encyclopaedia, player, starSystemDatabase);
+        this.explorationCenterPanel = new ExplorationCenterPanel(
+            encyclopaedia,
+            player,
+            starSystemDatabase,
+            this.soundPlayer
+        );
 
         this.actionsContainer = document.createElement("div");
         this.actionsContainer.setAttribute("class", "spaceStationActions");
@@ -253,27 +273,27 @@ export class SpaceStationLayer {
         this.takeOffButton.appendChild(takeOffButtonDescription);
 
         this.missionsButton.addEventListener("click", async () => {
-            Sounds.MENU_SELECT_SOUND.play();
+            this.soundPlayer.playNow(SoundType.CLICK);
             await this.setMainPanelState(MainPanelState.MISSIONS, player, starSystemDatabase);
         });
 
         this.spaceshipHangarButton.addEventListener("click", async () => {
-            Sounds.MENU_SELECT_SOUND.play();
+            this.soundPlayer.playNow(SoundType.CLICK);
             await this.setMainPanelState(MainPanelState.SPACE_SHIP, player, starSystemDatabase);
         });
 
         this.explorationCenterButton.addEventListener("click", async () => {
-            Sounds.MENU_SELECT_SOUND.play();
+            this.soundPlayer.playNow(SoundType.CLICK);
             await this.setMainPanelState(MainPanelState.EXPLORATION_CENTER, player, starSystemDatabase);
         });
 
         this.infoButton.addEventListener("click", async () => {
-            Sounds.MENU_SELECT_SOUND.play();
+            this.soundPlayer.playNow(SoundType.CLICK);
             await this.setMainPanelState(MainPanelState.INFO, player, starSystemDatabase);
         });
 
         this.takeOffButton.addEventListener("click", () => {
-            Sounds.MENU_SELECT_SOUND.play();
+            this.soundPlayer.playNow(SoundType.CLICK);
             this.onTakeOffObservable.notifyObservers();
         });
 
@@ -288,7 +308,7 @@ export class SpaceStationLayer {
         }
 
         if (this.currentStation === null) {
-            return await alertModal("No current station");
+            return await alertModal("No current station", this.soundPlayer);
         }
 
         switch (this.mainPanelState) {
@@ -299,12 +319,14 @@ export class SpaceStationLayer {
             case MainPanelState.MISSIONS:
                 this.mainPanel.classList.remove("hidden");
                 this.mainPanel.innerHTML = "";
-                this.mainPanel.appendChild(generateMissionsDom(this.currentStation, player, starSystemDatabase));
+                this.mainPanel.appendChild(
+                    generateMissionsDom(this.currentStation, player, starSystemDatabase, this.soundPlayer)
+                );
                 break;
             case MainPanelState.SPACE_SHIP:
                 this.mainPanel.classList.remove("hidden");
                 this.mainPanel.innerHTML = "";
-                this.spaceshipDockPanel.generate(this.currentStation, player);
+                this.spaceshipDockPanel.generate(player, this.soundPlayer);
                 this.mainPanel.appendChild(this.spaceshipDockPanel.root);
                 break;
             case MainPanelState.EXPLORATION_CENTER:

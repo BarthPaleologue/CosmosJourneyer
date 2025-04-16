@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Sounds } from "../../assets/sounds";
 import i18n from "../../i18n";
 import { Player } from "../../player/player";
 import { Settings } from "../../settings";
@@ -26,6 +25,7 @@ import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
 import { connectEncyclopaediaGalacticaModal } from "../../utils/dialogModal";
 import { createNotification, NotificationIntent, NotificationOrigin } from "../../utils/notification";
 import { DiscoveryDetails } from "./discoveryDetails";
+import { ISoundPlayer, SoundType } from "../../audio/soundPlayer";
 
 const enum ExplorationCenterFilter {
     LOCAL_ONLY = "localOnly",
@@ -49,9 +49,18 @@ export class ExplorationCenterPanel {
     private readonly player: Player;
     private readonly encyclopaedia: EncyclopaediaGalacticaManager;
 
-    constructor(encyclopaedia: EncyclopaediaGalacticaManager, player: Player, starSystemDatabase: StarSystemDatabase) {
+    private readonly soundPlayer: ISoundPlayer;
+
+    constructor(
+        encyclopaedia: EncyclopaediaGalacticaManager,
+        player: Player,
+        starSystemDatabase: StarSystemDatabase,
+        soundPlayer: ISoundPlayer
+    ) {
         this.player = player;
         this.encyclopaedia = encyclopaedia;
+
+        this.soundPlayer = soundPlayer;
 
         this.htmlRoot = document.createElement("div");
         this.htmlRoot.classList.add("flex-column", "discoveryPanel");
@@ -73,9 +82,9 @@ export class ExplorationCenterPanel {
         const addEncyclopaediaInstanceButton = document.createElement("button");
         addEncyclopaediaInstanceButton.textContent = i18n.t("explorationCenter:addNewInstance");
         addEncyclopaediaInstanceButton.addEventListener("click", async () => {
-            Sounds.MENU_SELECT_SOUND.play();
+            this.soundPlayer.playNow(SoundType.CLICK);
 
-            const connectionInfo = await connectEncyclopaediaGalacticaModal();
+            const connectionInfo = await connectEncyclopaediaGalacticaModal(this.soundPlayer);
             if (connectionInfo === null) return;
 
             const newEncyclopaedia = new EncyclopaediaGalacticaOnline(
@@ -100,12 +109,18 @@ export class ExplorationCenterPanel {
 
         this.sellAllButton = document.createElement("button");
         this.sellAllButton.addEventListener("click", async () => {
-            Sounds.SUCCESS.play();
+            this.soundPlayer.playNow(SoundType.CLICK);
 
             for (const discovery of this.player.discoveries.local) {
                 const valueResult = await encyclopaedia.estimateDiscovery(discovery.objectId);
                 if (!valueResult.success) {
-                    createNotification(NotificationOrigin.GENERAL, NotificationIntent.ERROR, valueResult.error, 5_000);
+                    createNotification(
+                        NotificationOrigin.GENERAL,
+                        NotificationIntent.ERROR,
+                        valueResult.error,
+                        5_000,
+                        this.soundPlayer
+                    );
                     continue;
                 }
                 player.earn(valueResult.value);
@@ -133,7 +148,7 @@ export class ExplorationCenterPanel {
 
         discoveryListSelect.value = ExplorationCenterFilter.ALL;
         discoveryListSelect.addEventListener("change", async () => {
-            Sounds.MENU_SELECT_SOUND.play();
+            this.soundPlayer.playNow(SoundType.CLICK);
 
             switch (discoveryListSelect.value) {
                 case ExplorationCenterFilter.LOCAL_ONLY:
@@ -147,7 +162,7 @@ export class ExplorationCenterPanel {
             }
         });
         discoveryListSelect.addEventListener("click", () => {
-            Sounds.MENU_SELECT_SOUND.play();
+            this.soundPlayer.playNow(SoundType.CLICK);
         });
 
         const horizontalContainer = document.createElement("div");
@@ -158,7 +173,7 @@ export class ExplorationCenterPanel {
         this.discoveryList.classList.add("flex-column", "overflow-y-auto", "discoveryList");
         horizontalContainer.appendChild(this.discoveryList);
 
-        this.discoveryDetails = new DiscoveryDetails(player, encyclopaedia, starSystemDatabase);
+        this.discoveryDetails = new DiscoveryDetails(player, encyclopaedia, starSystemDatabase, this.soundPlayer);
         this.discoveryDetails.onSellDiscovery.add(async (discovery) => {
             await this.populate(starSystemDatabase);
         });
@@ -192,7 +207,13 @@ export class ExplorationCenterPanel {
         for (const discovery of this.player.discoveries.local) {
             const result = await this.encyclopaedia.estimateDiscovery(discovery.objectId);
             if (!result.success) {
-                createNotification(NotificationOrigin.GENERAL, NotificationIntent.ERROR, result.error, 5_000);
+                createNotification(
+                    NotificationOrigin.GENERAL,
+                    NotificationIntent.ERROR,
+                    result.error,
+                    5_000,
+                    this.soundPlayer
+                );
                 continue;
             }
 
@@ -237,7 +258,7 @@ export class ExplorationCenterPanel {
             discoveryItem.classList.add("listItemContainer", "flex-column");
             discoveryItem.classList.toggle("uploaded", this.player.discoveries.uploaded.includes(discovery));
             discoveryItem.addEventListener("click", async () => {
-                Sounds.MENU_SELECT_SOUND.play();
+                this.soundPlayer.playNow(SoundType.CLICK);
 
                 if (this.selectedDiscovery !== null) {
                     this.selectedDiscovery.classList.remove("selected");

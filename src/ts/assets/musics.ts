@@ -51,7 +51,8 @@ export type Musics = {
 };
 
 export async function loadMusics(
-    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void
+    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void,
+    enumerateCallback: (totalCount: number) => void
 ): Promise<Musics> {
     let loadedCount = 0;
     let totalCount = 0;
@@ -89,6 +90,8 @@ export async function loadMusics(
     const reawakeningPromise = loadSoundAsync("Reawakening", reawakeningPath);
     const equatorialComplexPromise = loadSoundAsync("EquatorialComplex", equatorialComplexPath);
     const soaringPromise = loadSoundAsync("Soaring", soaringPath);
+
+    enumerateCallback(totalCount);
 
     return {
         wandering: await wanderingPromise,

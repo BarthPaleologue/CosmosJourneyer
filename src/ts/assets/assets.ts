@@ -18,9 +18,40 @@
 import { AssetsManager } from "@babylonjs/core/Misc/assetsManager";
 import { Scene } from "@babylonjs/core/scene";
 import { Textures } from "./textures";
-import { Sounds } from "./sounds";
+import { loadSounds, Sounds } from "./sounds";
 import { Materials } from "./materials";
 import { Objects } from "./objects";
+import { loadMusics, Musics } from "./musics";
+import { loadVoiceLines, SpeakerVoiceLines } from "./voiceLines";
+
+export type Assets2 = {
+    readonly sounds: Sounds;
+    readonly musics: Musics;
+    readonly speakerVoiceLines: SpeakerVoiceLines;
+};
+
+export async function loadAssets(
+    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void
+): Promise<Assets2> {
+    let allAssetsTotalCount = 0;
+    const increaseTotalCount = (nbItems: number) => {
+        allAssetsTotalCount += nbItems;
+    };
+
+    const progressCallbackWrapped = (loadedCount: number, totalCount: number, lastItemName: string) => {
+        progressCallback(loadedCount, allAssetsTotalCount, lastItemName);
+    };
+
+    const soundsPromise = loadSounds(progressCallbackWrapped, increaseTotalCount);
+    const musicsPromise = loadMusics(progressCallbackWrapped, increaseTotalCount);
+    const voiceLinesPromise = loadVoiceLines(progressCallbackWrapped, increaseTotalCount);
+
+    return {
+        sounds: await soundsPromise,
+        musics: await musicsPromise,
+        speakerVoiceLines: await voiceLinesPromise
+    };
+}
 
 export class Assets {
     static IS_READY = false;
@@ -33,7 +64,6 @@ export class Assets {
         console.log("Initializing assets...");
 
         Textures.EnqueueTasks(Assets.MANAGER, scene);
-        Sounds.EnqueueTasks(Assets.MANAGER, scene);
         Objects.EnqueueTasks(Assets.MANAGER, scene);
 
         Assets.MANAGER.onFinish = () => {

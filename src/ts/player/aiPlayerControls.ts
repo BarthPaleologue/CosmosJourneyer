@@ -20,12 +20,13 @@ import { AiSpaceshipControls } from "../spaceship/aiSpaceshipControls";
 import { Spaceship } from "../spaceship/spaceship";
 import { Player } from "./player";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { Sounds } from "../assets/sounds";
 
 export class AiPlayerControls {
     readonly player: Player;
     readonly spaceshipControls: AiSpaceshipControls;
 
-    constructor(starSystemDatabase: StarSystemDatabase, scene: Scene) {
+    constructor(starSystemDatabase: StarSystemDatabase, scene: Scene, sounds: Sounds) {
         this.player = Player.Default(starSystemDatabase);
         this.player.setName("AI");
 
@@ -34,7 +35,12 @@ export class AiPlayerControls {
             throw new Error("No spaceship serialized for AI player");
         }
 
-        const spaceship = Spaceship.Deserialize(spaceshipSerialized, this.player.spareSpaceshipComponents, scene);
+        const spaceship = Spaceship.Deserialize(
+            spaceshipSerialized,
+            this.player.spareSpaceshipComponents,
+            scene,
+            sounds
+        );
 
         this.spaceshipControls = new AiSpaceshipControls(spaceship, scene);
     }

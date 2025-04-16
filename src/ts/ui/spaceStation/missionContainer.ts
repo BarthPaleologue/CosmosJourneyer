@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { ISoundPlayer } from "../../audio/soundPlayer";
 import { Mission } from "../../missions/mission";
 import { Player } from "../../player/player";
 import { Settings } from "../../settings";
@@ -24,7 +25,7 @@ import { AcceptMissionButton } from "./acceptMissionButton";
 export class MissionContainer {
     readonly rootNode: HTMLElement;
 
-    constructor(mission: Mission, player: Player, starSystemDatabase: StarSystemDatabase) {
+    constructor(mission: Mission, player: Player, starSystemDatabase: StarSystemDatabase, soundPlayer: ISoundPlayer) {
         this.rootNode = document.createElement("div");
         this.rootNode.className = "missionItem";
 
@@ -48,7 +49,7 @@ export class MissionContainer {
         buttonContainer.className = "missionButtonContainer";
         this.rootNode.appendChild(buttonContainer);
 
-        const acceptButton = new AcceptMissionButton(mission, player);
+        const acceptButton = new AcceptMissionButton(mission, player, soundPlayer);
         buttonContainer.appendChild(acceptButton.rootNode);
     }
 }

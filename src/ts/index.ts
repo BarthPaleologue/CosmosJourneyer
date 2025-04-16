@@ -16,12 +16,14 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import "../styles/index.scss";
-
+import { SoundPlayerMock } from "./audio/soundPlayer";
 import { CosmosJourneyer } from "./cosmosJourneyer";
 import { safeParseSave } from "./saveFile/saveFileData";
 import { decodeBase64 } from "./utils/base64";
 import { alertModal } from "./utils/dialogModal";
 import { jsonSafeParse } from "./utils/json";
+
+const soundPlayerMock = new SoundPlayerMock();
 
 async function simpleInit(engine: CosmosJourneyer) {
     await engine.init(false);
@@ -32,13 +34,13 @@ async function initWithSaveString(engine: CosmosJourneyer, saveString: string) {
     const json = jsonSafeParse(jsonString);
     if (json === null) {
         console.error(jsonString);
-        await alertModal("Error, this save file is not a valid json.");
+        await alertModal("Error, this save file is not a valid json.", soundPlayerMock);
         return await simpleInit(engine);
     }
 
     const result = safeParseSave(json, engine.starSystemDatabase);
     if (!result.success) {
-        await alertModal("Error, this save file is invalid. See the console for more details.");
+        await alertModal("Error, this save file is invalid. See the console for more details.", soundPlayerMock);
         return await simpleInit(engine);
     }
 

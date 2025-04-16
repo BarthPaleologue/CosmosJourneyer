@@ -24,6 +24,7 @@ import { CurrentMissionDisplay } from "./currentMissionDisplay";
 import { MissionContext } from "../missions/missionContext";
 import { smoothstep } from "../utils/math";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { ISoundPlayer } from "../audio/soundPlayer";
 
 export class SpaceShipLayer {
     private readonly rootNode: HTMLElement;
@@ -40,7 +41,7 @@ export class SpaceShipLayer {
 
     private readonly player: Player;
 
-    constructor(player: Player, starSystemDatabase: StarSystemDatabase) {
+    constructor(player: Player, starSystemDatabase: StarSystemDatabase, soundPlayer: ISoundPlayer) {
         this.player = player;
 
         this.rootNode = document.getElementById("helmetOverlay") as HTMLElement;
@@ -54,7 +55,7 @@ export class SpaceShipLayer {
 
         this.fuelIndicator = document.getElementById("fuelIndicator") as HTMLElement;
 
-        this.currentMissionDisplay = new CurrentMissionDisplay(player, starSystemDatabase);
+        this.currentMissionDisplay = new CurrentMissionDisplay(player, starSystemDatabase, soundPlayer);
         this.rootNode.appendChild(this.currentMissionDisplay.rootNode);
 
         document.addEventListener("mousemove", (event) => {

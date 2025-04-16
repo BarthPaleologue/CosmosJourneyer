@@ -22,9 +22,8 @@ import { Player } from "../player/player";
 import { EncyclopaediaGalacticaLocal } from "../society/encyclopaediaGalacticaLocal";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
-import { AssetsManager } from "@babylonjs/core";
-import { Sounds } from "../assets/sounds";
 import { initI18n } from "../i18n";
+import { SoundPlayerMock } from "../audio/soundPlayer";
 
 export async function createStarMapScene(engine: AbstractEngine): Promise<Scene> {
     await initI18n();
@@ -35,12 +34,10 @@ export async function createStarMapScene(engine: AbstractEngine): Promise<Scene>
 
     const encyclopaediaGalactica = new EncyclopaediaGalacticaLocal(starSystemDatabase);
 
-    const starMap = new StarMap(player, engine, encyclopaediaGalactica, starSystemDatabase);
-    starMap.setCurrentStarSystem(starSystemDatabase.fallbackSystem.coordinates);
+    const soundPlayerMock = new SoundPlayerMock();
 
-    const assetsManager = new AssetsManager(starMap.scene);
-    Sounds.EnqueueTasks(assetsManager, starMap.scene);
-    await assetsManager.loadAsync();
+    const starMap = new StarMap(player, engine, encyclopaediaGalactica, starSystemDatabase, soundPlayerMock);
+    starMap.setCurrentStarSystem(starSystemDatabase.fallbackSystem.coordinates);
 
     return starMap.scene;
 }

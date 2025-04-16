@@ -1,6 +1,6 @@
+import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
 import i18n from "../i18n";
 import { Player } from "../player/player";
-import { Sounds } from "../assets/sounds";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/starSystemCoordinates";
 
 export class StarMapBookmarkButton {
@@ -10,7 +10,7 @@ export class StarMapBookmarkButton {
     private selectedSystemCoordinates: StarSystemCoordinates | null = null;
     private isSelectedSystemBookmarked = false;
 
-    constructor(player: Player) {
+    constructor(player: Player, soundPlayer: ISoundPlayer) {
         this.rootNode = document.createElement("button");
         this.rootNode.classList.add("bookmarkButton");
         this.rootNode.textContent = i18n.t("starMap:bookmark");
@@ -19,7 +19,7 @@ export class StarMapBookmarkButton {
 
         this.rootNode.addEventListener("click", () => {
             if (this.selectedSystemCoordinates === null) return;
-            Sounds.MENU_SELECT_SOUND.play();
+            soundPlayer.playNow(SoundType.CLICK);
 
             const currentSystemSeed = this.selectedSystemCoordinates;
 

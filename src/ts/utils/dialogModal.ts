@@ -1,7 +1,11 @@
-import { Sounds } from "../assets/sounds";
 import i18n from "../i18n";
+import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
 
-export function promptModalString(prompt: string, defaultValue = ""): Promise<string | null> {
+export function promptModalString(
+    prompt: string,
+    defaultValue: string,
+    soundPlayer: ISoundPlayer
+): Promise<string | null> {
     const modal = document.createElement("dialog");
     modal.innerHTML = `
         <form method="dialog">
@@ -26,13 +30,13 @@ export function promptModalString(prompt: string, defaultValue = ""): Promise<st
 
         // on reset, close the modal and resolve with null
         modal.addEventListener("reset", () => {
-            Sounds.MENU_SELECT_SOUND.play();
+            soundPlayer.playNow(SoundType.CLICK);
             resolve(null);
             modal.remove();
         });
 
         modal.addEventListener("close", () => {
-            Sounds.MENU_SELECT_SOUND.play();
+            soundPlayer.playNow(SoundType.CLICK);
             if (modal.returnValue === "ok") {
                 resolve(input.value);
             } else {
@@ -43,7 +47,7 @@ export function promptModalString(prompt: string, defaultValue = ""): Promise<st
     });
 }
 
-export function promptModalBoolean(prompt: string): Promise<boolean> {
+export function promptModalBoolean(prompt: string, soundPlayer: ISoundPlayer): Promise<boolean> {
     const modal = document.createElement("dialog");
     modal.innerHTML = `
         <form method="dialog">
@@ -59,14 +63,14 @@ export function promptModalBoolean(prompt: string): Promise<boolean> {
 
     return new Promise((resolve) => {
         modal.addEventListener("close", () => {
-            Sounds.MENU_SELECT_SOUND.play();
+            soundPlayer.playNow(SoundType.CLICK);
             resolve(modal.returnValue === "ok");
             modal.remove();
         });
     });
 }
 
-export function alertModal(message: string): Promise<void> {
+export function alertModal(message: string, soundPlayer: ISoundPlayer): Promise<void> {
     const modal = document.createElement("dialog");
     modal.innerHTML = `
         <form method="dialog">
@@ -81,14 +85,14 @@ export function alertModal(message: string): Promise<void> {
 
     return new Promise((resolve) => {
         modal.addEventListener("close", () => {
-            Sounds.MENU_SELECT_SOUND.play();
+            soundPlayer.playNow(SoundType.CLICK);
             resolve();
             modal.remove();
         });
     });
 }
 
-export function connectEncyclopaediaGalacticaModal(): Promise<{
+export function connectEncyclopaediaGalacticaModal(soundPlayer: ISoundPlayer): Promise<{
     encyclopaediaUrlBase: string;
     accountId: string;
     password: string;
@@ -149,13 +153,13 @@ export function connectEncyclopaediaGalacticaModal(): Promise<{
     return new Promise((resolve) => {
         // on reset, close the modal and resolve with null
         modal.addEventListener("reset", () => {
-            Sounds.MENU_SELECT_SOUND.play();
+            soundPlayer.playNow(SoundType.CLICK);
             resolve(null);
             modal.remove();
         });
 
         modal.addEventListener("close", () => {
-            Sounds.MENU_SELECT_SOUND.play();
+            soundPlayer.playNow(SoundType.CLICK);
             if (modal.returnValue === "connect") {
                 resolve({
                     encyclopaediaUrlBase: urlInput.value,

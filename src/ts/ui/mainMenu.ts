@@ -26,7 +26,6 @@ import { TransformTranslationAnimation } from "../uberCore/transforms/animations
 import { Observable } from "@babylonjs/core/Misc/observable";
 import packageInfo from "../../../package.json";
 import i18n from "../i18n";
-import { Sounds } from "../assets/sounds";
 import { PanelType, SidePanels } from "./sidePanels";
 import { StarSystemModel } from "../starSystem/starSystemModel";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
@@ -34,6 +33,7 @@ import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { getUniverseObjectId, UniverseObjectId } from "../utils/coordinates/universeObjectId";
 import { DeepReadonly } from "../utils/types";
 import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
+import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
 
 export class MainMenu {
     readonly scene: UberScene;
@@ -57,7 +57,12 @@ export class MainMenu {
 
     private readonly startAnimationDurationSeconds = 5;
 
-    constructor(sidePanels: SidePanels, starSystemView: StarSystemView, starSystemDatabase: StarSystemDatabase) {
+    constructor(
+        sidePanels: SidePanels,
+        starSystemView: StarSystemView,
+        starSystemDatabase: StarSystemDatabase,
+        soundPlayer: ISoundPlayer
+    ) {
         this.sidePanels = sidePanels;
         this.starSystemView = starSystemView;
 
@@ -109,12 +114,12 @@ export class MainMenu {
         document.querySelectorAll("#menuItems li").forEach((li) => {
             // on mouse hover, play a sound
             li.addEventListener("mouseenter", () => {
-                Sounds.MENU_HOVER_SOUND.play();
+                soundPlayer.playNow(SoundType.HOVER);
             });
 
             // on click, play a sound
             li.addEventListener("click", () => {
-                Sounds.MENU_SELECT_SOUND.play();
+                soundPlayer.playNow(SoundType.CLICK);
             });
         });
 

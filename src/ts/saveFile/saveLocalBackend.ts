@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-import { alertModal } from "../utils/dialogModal";
 import { jsonSafeParse } from "../utils/json";
 import { err, ok, Result } from "../utils/types";
 import { CmdrSaves, Save, SavesSchema, parseSaveArray } from "./saveFileData";
@@ -102,7 +101,7 @@ export class SaveLocalBackend implements SaveBackend {
         localStorage.setItem(SaveLocalBackend.BACKUP_SAVE_KEY, JSON.stringify(corruptedSaves));
 
         if (Object.keys(corruptedSaves).length > 0) {
-            await alertModal("Some save files could not be validated! Check the console for more information.");
+            console.warn("Some save files could not be validated! Check the console for more information.");
         }
 
         return ok(correctSaves);

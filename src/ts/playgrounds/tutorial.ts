@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AssetsManager, FreeCamera, Vector3 } from "@babylonjs/core";
+import { FreeCamera, Vector3 } from "@babylonjs/core";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 import { TutorialLayer } from "../ui/tutorial/tutorialLayer";
@@ -23,8 +23,8 @@ import { FlightTutorial } from "../tutorials/flightTutorial";
 import { FuelScoopTutorial } from "../tutorials/fuelScoopTutorial";
 import { StationLandingTutorial } from "../tutorials/stationLandingTutorial";
 import { initI18n } from "../i18n";
-import { Sounds } from "../assets/sounds";
 import { StarMapTutorial } from "../tutorials/starMapTutorial";
+import { SoundPlayerMock } from "../audio/soundPlayer";
 
 export async function createTutorialScene(engine: AbstractEngine): Promise<Scene> {
     const scene = new Scene(engine);
@@ -40,11 +40,7 @@ export async function createTutorialScene(engine: AbstractEngine): Promise<Scene
 
     await initI18n();
 
-    const assetsManager = new AssetsManager(scene);
-    Sounds.EnqueueTasks(assetsManager, scene);
-    await assetsManager.loadAsync();
-
-    const tutorialLayer = new TutorialLayer();
+    const tutorialLayer = new TutorialLayer(new SoundPlayerMock());
     document.body.appendChild(tutorialLayer.root);
 
     const urlParams = new URLSearchParams(window.location.search);

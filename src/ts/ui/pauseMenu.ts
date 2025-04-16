@@ -16,8 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Observable } from "@babylonjs/core/Misc/observable";
-import { Sounds } from "../assets/sounds";
 import { PanelType, SidePanels } from "./sidePanels";
+import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
 
 export class PauseMenu {
     private readonly rootNode: HTMLElement;
@@ -39,7 +39,7 @@ export class PauseMenu {
     readonly onSave = new Observable<void>();
     readonly onResume = new Observable<void>();
 
-    constructor(sidePanels: SidePanels) {
+    constructor(sidePanels: SidePanels, soundPlayer: ISoundPlayer) {
         this.sidePanels = sidePanels;
 
         this.rootNode = document.getElementById("pauseMenu") as HTMLElement;
@@ -53,28 +53,28 @@ export class PauseMenu {
 
         this.contributeButton = document.getElementById("pauseContributeButton") as HTMLElement;
         this.contributeButton.addEventListener("click", () => {
-            Sounds.MENU_SELECT_SOUND.play();
+            soundPlayer.playNow(SoundType.CLICK);
 
             this.sidePanels.toggleActivePanel(PanelType.CONTRIBUTE);
         });
 
         this.tutorialsButton = document.getElementById("pauseTutorialsButton") as HTMLElement;
         this.tutorialsButton.addEventListener("click", () => {
-            Sounds.MENU_SELECT_SOUND.play();
+            soundPlayer.playNow(SoundType.CLICK);
 
             this.sidePanels.toggleActivePanel(PanelType.TUTORIALS);
         });
 
         this.settingsButton = document.getElementById("pauseSettingsButton") as HTMLElement;
         this.settingsButton.addEventListener("click", () => {
-            Sounds.MENU_SELECT_SOUND.play();
+            soundPlayer.playNow(SoundType.CLICK);
 
             this.sidePanels.toggleActivePanel(PanelType.SETTINGS);
         });
 
         this.loadButton = document.getElementById("loadButton") as HTMLElement;
         this.loadButton.addEventListener("click", () => {
-            Sounds.MENU_SELECT_SOUND.play();
+            soundPlayer.playNow(SoundType.CLICK);
 
             this.sidePanels.toggleActivePanel(PanelType.LOAD_SAVE);
         });
@@ -88,12 +88,12 @@ export class PauseMenu {
         document.querySelectorAll("#pauseMenu li").forEach((li) => {
             // play a sound when hovering over a button
             li.addEventListener("mouseenter", () => {
-                Sounds.MENU_HOVER_SOUND.play();
+                soundPlayer.playNow(SoundType.HOVER);
             });
 
             // play a sound when clicking on a button
             li.addEventListener("click", () => {
-                Sounds.MENU_SELECT_SOUND.play();
+                soundPlayer.playNow(SoundType.CLICK);
             });
         });
 

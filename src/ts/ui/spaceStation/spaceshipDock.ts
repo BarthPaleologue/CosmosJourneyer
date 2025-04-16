@@ -16,11 +16,9 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Player } from "../../player/player";
-import { OrbitalFacilityModel } from "../../architecture/orbitalObjectModel";
-import { Sounds } from "../../assets/sounds";
 import i18n from "../../i18n";
-import { DeepReadonly } from "../../utils/types";
 import { SpaceshipOutfittingUI } from "./spaceshipOutfittingUI";
+import { ISoundPlayer, SoundType } from "../../audio/soundPlayer";
 
 export class SpaceshipDockUI {
     readonly root: HTMLDivElement;
@@ -52,7 +50,7 @@ export class SpaceshipDockUI {
         this.spaceshipOutfittingUI = new SpaceshipOutfittingUI(player);
     }
 
-    public generate(stationModel: DeepReadonly<OrbitalFacilityModel>, player: Player) {
+    public generate(player: Player, soundPlayer: ISoundPlayer) {
         this.currentSpaceshipContainer.innerHTML = "";
 
         const currentSpaceship = player.instancedSpaceships.at(0);
@@ -75,7 +73,7 @@ export class SpaceshipDockUI {
             fuelManagementContainer.appendChild(outfittingButton);
 
             outfittingButton.addEventListener("click", () => {
-                Sounds.MENU_SELECT_SOUND.play();
+                soundPlayer.playNow(SoundType.CLICK);
 
                 if (outfittingButton.classList.contains("active")) {
                     outfittingButton.classList.remove("active");
@@ -92,7 +90,7 @@ export class SpaceshipDockUI {
             refuelButton.innerText = i18n.t("spaceStation:refuel");
 
             refuelButton.addEventListener("click", () => {
-                Sounds.MENU_SELECT_SOUND.play();
+                soundPlayer.playNow(SoundType.CLICK);
                 const fuelAmount = currentSpaceship.getTotalFuelCapacity() - currentSpaceship.getRemainingFuel();
                 const fuelUnitPrice = 10;
                 player.pay(Math.round(fuelAmount * fuelUnitPrice));

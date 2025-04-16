@@ -26,7 +26,7 @@ import { DefaultControls } from "../defaultControls/defaultControls";
 import { Spaceship } from "../spaceship/spaceship";
 import { Objects } from "../assets/objects";
 import { Textures } from "../assets/textures";
-import { Sounds } from "../assets/sounds";
+import { loadSounds } from "../assets/sounds";
 import { randRange } from "extended-random";
 import { CollisionMask } from "../settings";
 import { LandingPadSize } from "../spacestation/landingPad/landingPadManager";
@@ -38,12 +38,16 @@ export async function createAutomaticLandingScene(engine: AbstractEngine): Promi
     await enablePhysics(scene);
 
     const assetsManager = new AssetsManager(scene);
-    Sounds.EnqueueTasks(assetsManager, scene);
     Objects.EnqueueTasks(assetsManager, scene);
     Textures.EnqueueTasks(assetsManager, scene);
     await assetsManager.loadAsync();
 
-    const ship = Spaceship.CreateDefault(scene);
+    const sounds = await loadSounds(
+        () => {},
+        () => {}
+    );
+
+    const ship = Spaceship.CreateDefault(scene, sounds);
     ship.getTransform().position.copyFromFloats(
         randRange(-50, 50, Math.random, 0),
         randRange(30, 50, Math.random, 0),

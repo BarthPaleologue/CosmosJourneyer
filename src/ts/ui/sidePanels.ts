@@ -3,6 +3,7 @@ import { TutorialsPanelContent } from "./tutorial/tutorialsPanelContent";
 import { SaveLoadingPanelContent } from "./saveLoadingPanelContent";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { SaveManager } from "../saveFile/saveManager";
+import { ISoundPlayer } from "../audio/soundPlayer";
 
 export const enum PanelType {
     LOAD_SAVE,
@@ -32,7 +33,7 @@ export class SidePanels {
 
     private readonly saveManager: SaveManager;
 
-    constructor(starSystemDatabase: StarSystemDatabase, saveManager: SaveManager) {
+    constructor(starSystemDatabase: StarSystemDatabase, saveManager: SaveManager, soundPlayer: ISoundPlayer) {
         this.starSystemDatabase = starSystemDatabase;
         this.saveManager = saveManager;
 
@@ -40,7 +41,7 @@ export class SidePanels {
         if (loadSavePanel === null) throw new Error("#loadSavePanel does not exist!");
         this.loadSavePanel = loadSavePanel;
 
-        this.loadSavePanelContent = new SaveLoadingPanelContent(starSystemDatabase);
+        this.loadSavePanelContent = new SaveLoadingPanelContent(starSystemDatabase, soundPlayer);
         this.loadSavePanel.appendChild(this.loadSavePanelContent.htmlRoot);
 
         this.settingsPanel = initSettingsPanel();

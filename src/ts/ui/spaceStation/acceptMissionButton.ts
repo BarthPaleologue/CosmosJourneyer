@@ -1,12 +1,12 @@
 import { Mission } from "../../missions/mission";
 import { Player } from "../../player/player";
-import { Sounds } from "../../assets/sounds";
 import i18n from "../../i18n";
+import { ISoundPlayer, SoundType } from "../../audio/soundPlayer";
 
 export class AcceptMissionButton {
     readonly rootNode: HTMLElement;
 
-    constructor(mission: Mission, player: Player) {
+    constructor(mission: Mission, player: Player, soundPlayer: ISoundPlayer) {
         this.rootNode = document.createElement("button");
         this.rootNode.className = "missionButton";
         this.rootNode.innerText = i18n.t("missions:common:accept");
@@ -17,7 +17,7 @@ export class AcceptMissionButton {
         }
 
         this.rootNode.addEventListener("click", () => {
-            Sounds.MENU_SELECT_SOUND.play();
+            soundPlayer.playNow(SoundType.CLICK);
             if (player.currentMissions.find((m) => m.equals(mission))) {
                 this.rootNode.classList.remove("accepted");
                 this.rootNode.innerText = i18n.t("missions:common:accept");

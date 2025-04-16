@@ -1,8 +1,8 @@
-import { Sounds } from "../assets/sounds";
 import explorationIcon from "../../asset/icons/space-exploration.webp";
 import spaceshipIcon from "../../asset/icons/spaceship_gear.webp";
 import spaceStationIcon from "../../asset/icons/space-station.webp";
 import informationIcon from "../../asset/icons/information.webp";
+import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
 
 export const enum NotificationOrigin {
     GENERAL = "info",
@@ -28,7 +28,13 @@ class Notification {
 
     private isBeingRemoved = false;
 
-    constructor(origin: NotificationOrigin, intent: NotificationIntent, text: string, durationSeconds: number) {
+    constructor(
+        origin: NotificationOrigin,
+        intent: NotificationIntent,
+        text: string,
+        durationSeconds: number,
+        soundPlayer: ISoundPlayer
+    ) {
         let container = document.getElementById("notificationContainer");
         if (container === null) {
             container = document.createElement("div");
@@ -78,16 +84,16 @@ class Notification {
 
         switch (intent) {
             case NotificationIntent.INFO:
-                Sounds.MENU_SELECT_SOUND.play();
+                soundPlayer.playNow(SoundType.INFO);
                 break;
             case NotificationIntent.SUCCESS:
-                Sounds.SUCCESS.play();
+                soundPlayer.playNow(SoundType.SUCCESS);
                 break;
             case NotificationIntent.WARNING:
-                Sounds.MENU_SELECT_SOUND.play();
+                soundPlayer.playNow(SoundType.WARNING);
                 break;
             case NotificationIntent.ERROR:
-                Sounds.ERROR.play();
+                soundPlayer.playNow(SoundType.ERROR);
                 break;
         }
 
@@ -151,8 +157,9 @@ export function createNotification(
     type: NotificationOrigin,
     intent: NotificationIntent,
     text: string,
-    durationMillis: number
+    durationMillis: number,
+    soundPlayer: ISoundPlayer
 ) {
-    const notification = new Notification(type, intent, text, durationMillis / 1000);
+    const notification = new Notification(type, intent, text, durationMillis / 1000, soundPlayer);
     activeNotifications.push(notification);
 }

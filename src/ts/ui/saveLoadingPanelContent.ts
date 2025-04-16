@@ -2,7 +2,6 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import i18n from "../i18n";
 import { createNotification, NotificationIntent, NotificationOrigin } from "../utils/notification";
 import { createUrlFromSave, Save } from "../saveFile/saveFileData";
-import { Sounds } from "../assets/sounds";
 import expandIconPath from "../../asset/icons/expand.webp";
 import collapseIconPath from "../../asset/icons/collapse.webp";
 import loadIconPath from "../../asset/icons/play.webp";
@@ -16,6 +15,7 @@ import { Result } from "../utils/types";
 import { SaveManager } from "../saveFile/saveManager";
 import { parseSaveFile } from "../saveFile/saveFile";
 import { SaveLoadingError, saveLoadingErrorToI18nString } from "../saveFile/saveLoadingError";
+import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
 
 export class SaveLoadingPanelContent {
     readonly htmlRoot: HTMLElement;
@@ -24,9 +24,13 @@ export class SaveLoadingPanelContent {
 
     readonly onLoadSaveObservable: Observable<Save> = new Observable<Save>();
 
-    constructor(starSystemDatabase: StarSystemDatabase) {
+    private readonly soundPlayer: ISoundPlayer;
+
+    constructor(starSystemDatabase: StarSystemDatabase, soundPlayer: ISoundPlayer) {
         this.htmlRoot = document.createElement("div");
         this.htmlRoot.classList.add("saveLoadingPanelContent");
+
+        this.soundPlayer = soundPlayer;
 
         const dropFileZone = document.createElement("div");
         dropFileZone.id = "dropFileZone";
@@ -64,7 +68,7 @@ export class SaveLoadingPanelContent {
         });
 
         dropFileZone.addEventListener("click", () => {
-            Sounds.MENU_SELECT_SOUND.play();
+            this.soundPlayer.playNow(SoundType.CLICK);
             const fileInput = document.createElement("input");
             fileInput.type = "file";
             fileInput.accept = "application/json";
@@ -160,7 +164,7 @@ export class SaveLoadingPanelContent {
             const continueButton = document.createElement("button");
             continueButton.classList.add("icon", "large");
             continueButton.addEventListener("click", () => {
-                Sounds.MENU_SELECT_SOUND.play();
+                this.soundPlayer.playNow(SoundType.CLICK);
                 this.onLoadSaveObservable.notifyObservers(latestSave);
             });
             cmdrHeaderButtons.appendChild(continueButton);
@@ -172,10 +176,10 @@ export class SaveLoadingPanelContent {
             const shareButton = document.createElement("button");
             shareButton.classList.add("icon", "large");
             shareButton.addEventListener("click", async () => {
-                Sounds.MENU_SELECT_SOUND.play();
+                this.soundPlayer.playNow(SoundType.CLICK);
                 const url = createUrlFromSave(latestSave);
                 if (url === null) {
-                    await alertModal("Could not create a URL from the save file.");
+                    await alertModal("Could not create a URL from the save file.", this.soundPlayer);
                     return;
                 }
                 await navigator.clipboard.writeText(url.toString()).then(() => {
@@ -183,7 +187,8 @@ export class SaveLoadingPanelContent {
                         NotificationOrigin.GENERAL,
                         NotificationIntent.SUCCESS,
                         i18n.t("notifications:copiedToClipboard"),
-                        5000
+                        5000,
+                        this.soundPlayer
                     );
                 });
             });
@@ -196,10 +201,11 @@ export class SaveLoadingPanelContent {
             const editNameButton = document.createElement("button");
             editNameButton.classList.add("icon", "large");
             editNameButton.addEventListener("click", async () => {
-                Sounds.MENU_SELECT_SOUND.play();
+                this.soundPlayer.playNow(SoundType.CLICK);
                 const newName = await promptModalString(
                     i18n.t("sidePanel:cmdrNameChangePrompt"),
-                    latestSave.player.name
+                    latestSave.player.name,
+                    this.soundPlayer
                 );
                 if (newName === null) return;
 
@@ -241,7 +247,7 @@ export class SaveLoadingPanelContent {
             expandButton.classList.add("expandButton", "icon", "large");
             expandButton.appendChild(expandIcon);
             expandButton.addEventListener("click", () => {
-                Sounds.MENU_SELECT_SOUND.play();
+                this.soundPlayer.playNow(SoundType.CLICK);
                 savesList.classList.toggle("hidden");
                 expandButton.innerHTML = "";
                 expandButton.appendChild(savesList.classList.contains("hidden") ? expandIcon : collapseIcon);
@@ -292,7 +298,7 @@ export class SaveLoadingPanelContent {
         const loadButton = document.createElement("button");
         loadButton.classList.add("icon", "large");
         loadButton.addEventListener("click", () => {
-            Sounds.MENU_SELECT_SOUND.play();
+            this.soundPlayer.playNow(SoundType.CLICK);
             this.onLoadSaveObservable.notifyObservers(save);
         });
         saveButtons.appendChild(loadButton);
@@ -304,10 +310,10 @@ export class SaveLoadingPanelContent {
         const shareButton = document.createElement("button");
         shareButton.classList.add("icon", "large");
         shareButton.addEventListener("click", async () => {
-            Sounds.MENU_SELECT_SOUND.play();
+            this.soundPlayer.playNow(SoundType.CLICK);
             const url = createUrlFromSave(save);
             if (url === null) {
-                await alertModal("Could not create a URL from the save file.");
+                await alertModal("Could not create a URL from the save file.", this.soundPlayer);
                 return;
             }
             await navigator.clipboard.writeText(url.toString()).then(() => {
@@ -315,7 +321,8 @@ export class SaveLoadingPanelContent {
                     NotificationOrigin.GENERAL,
                     NotificationIntent.INFO,
                     i18n.t("notifications:copiedToClipboard"),
-                    5000
+                    5000,
+                    this.soundPlayer
                 );
             });
         });
@@ -328,7 +335,7 @@ export class SaveLoadingPanelContent {
         const downloadButton = document.createElement("button");
         downloadButton.classList.add("icon", "large");
         downloadButton.addEventListener("click", () => {
-            Sounds.MENU_SELECT_SOUND.play();
+            this.soundPlayer.playNow(SoundType.CLICK);
             const blob = new Blob([JSON.stringify(save)], { type: "application/json" });
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
@@ -346,9 +353,9 @@ export class SaveLoadingPanelContent {
         const deleteButton = document.createElement("button");
         deleteButton.classList.add("danger", "icon", "large");
         deleteButton.addEventListener("click", async () => {
-            Sounds.MENU_SELECT_SOUND.play();
+            this.soundPlayer.playNow(SoundType.CLICK);
 
-            const shouldProceed = await promptModalBoolean(i18n.t("sidePanel:deleteSavePrompt"));
+            const shouldProceed = await promptModalBoolean(i18n.t("sidePanel:deleteSavePrompt"), this.soundPlayer);
             if (!shouldProceed) return;
 
             saveManager.deleteSaveForCmdr(save.player.uuid, save);
@@ -381,7 +388,7 @@ export class SaveLoadingPanelContent {
         const saveFileDataResult = await parseSaveFile(file, starSystemDatabase);
         if (!saveFileDataResult.success) {
             console.error(saveFileDataResult.error);
-            await alertModal(saveLoadingErrorToI18nString(saveFileDataResult.error));
+            await alertModal(saveLoadingErrorToI18nString(saveFileDataResult.error), this.soundPlayer);
             return saveFileDataResult;
         }
 

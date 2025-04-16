@@ -42,7 +42,6 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { View } from "../utils/view";
 import { StarMapInputs } from "./starMapInputs";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
-import { Sounds } from "../assets/sounds";
 import { StarMapControls } from "./starMapControls";
 import { CameraRadiusAnimation } from "../uberCore/transforms/animations/radius";
 import { Camera } from "@babylonjs/core/Cameras/camera";
@@ -56,6 +55,7 @@ import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { EncyclopaediaGalactica } from "../society/encyclopaediaGalactica";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { alertModal } from "../utils/dialogModal";
+import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
 
 // register cosmos journeyer as part of window object
 declare global {
@@ -148,11 +148,14 @@ export class StarMap implements View {
     );
     private static readonly SHIMMER_DURATION = 1000;
 
+    private readonly soundPlayer: ISoundPlayer;
+
     constructor(
         player: Player,
         engine: AbstractEngine,
         encyclopaedia: EncyclopaediaGalactica,
-        starSystemDatabase: StarSystemDatabase
+        starSystemDatabase: StarSystemDatabase,
+        soundPlayer: ISoundPlayer
     ) {
         this.scene = new Scene(engine);
         this.scene.clearColor = new Color4(0, 0, 0, 1);
@@ -160,6 +163,8 @@ export class StarMap implements View {
         this.scene.onDisposeObservable.addOnce(() => {
             this.starMapUI.dispose();
         });
+
+        this.soundPlayer = soundPlayer;
 
         this.controls = new StarMapControls(this.scene);
         this.controls.getCameras().forEach((camera) => (camera.minZ = 0.01));
@@ -173,32 +178,35 @@ export class StarMap implements View {
 
         this.stellarPathfinder = new StellarPathfinder(starSystemDatabase);
 
-        this.starMapUI = new StarMapUI(this.scene, this.player, this.starSystemDatabase);
+        this.starMapUI = new StarMapUI(this.scene, this.player, this.starSystemDatabase, this.soundPlayer);
         this.starMapUI.onSystemFocusObservable.add((starSystemCoordinates) => {
             this.focusOnSystem(starSystemCoordinates);
         });
 
         this.starMapUI.shortHandUIPlotItineraryButton.addEventListener("click", async () => {
-            if (this.currentSystemCoordinates === null) return await alertModal("current system seed is null!");
-            if (this.selectedSystemCoordinates === null) return await alertModal("selected system seed is null!");
+            if (this.currentSystemCoordinates === null)
+                return await alertModal("current system seed is null!", this.soundPlayer);
+            if (this.selectedSystemCoordinates === null)
+                return await alertModal("selected system seed is null!", this.soundPlayer);
 
             const playerCurrentSpaceship = this.player.instancedSpaceships.at(0);
             if (playerCurrentSpaceship === undefined) {
-                return await alertModal("You do not own a spaceship! What have you done???");
+                return await alertModal("You do not own a spaceship! What have you done???", this.soundPlayer);
             }
 
             const warpDrive = playerCurrentSpaceship.getInternals().getWarpDrive();
 
             if (warpDrive === null) {
                 return await alertModal(
-                    "Your current spaceship has no warp drive! Install a warp drive to plot an itinerary."
+                    "Your current spaceship has no warp drive! Install a warp drive to plot an itinerary.",
+                    this.soundPlayer
                 );
             }
 
             const jumpRange = warpDrive.rangeLY;
 
             if (starSystemCoordinatesEquals(this.selectedSystemCoordinates, this.currentSystemCoordinates)) return;
-            Sounds.MENU_SELECT_SOUND.play();
+            this.soundPlayer.playNow(SoundType.CLICK);
             this.stellarPathfinder.init(this.currentSystemCoordinates, this.selectedSystemCoordinates, jumpRange);
         });
 
@@ -328,7 +336,7 @@ export class StarMap implements View {
                 this.stellarPathfinder.update();
 
                 if (this.stellarPathfinder.hasFoundPath()) {
-                    Sounds.TARGET_LOCK_SOUND.play();
+                    this.soundPlayer.playNow(SoundType.ITINERARY_COMPUTED);
                     const path = this.stellarPathfinder.getPath();
                     this.drawPath(path);
 
@@ -340,7 +348,8 @@ export class StarMap implements View {
                         NotificationOrigin.GENERAL,
                         NotificationIntent.ERROR,
                         `Could not find a path to the target system after ${pathfinderMaxIterations} iterations`,
-                        5000
+                        5000,
+                        this.soundPlayer
                     );
                 }
             }
@@ -581,7 +590,7 @@ export class StarMap implements View {
         initializedInstance.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, () => {
                 this.starMapUI.setHoveredSystem(starSystemCoordinates);
-                Sounds.MENU_HOVER_SOUND.play();
+                this.soundPlayer.playNow(SoundType.HOVER);
             })
         );
 
@@ -593,7 +602,7 @@ export class StarMap implements View {
 
         initializedInstance.actionManager?.registerAction(
             new ExecuteCodeAction(ActionManager.OnPickTrigger, () => {
-                Sounds.STAR_MAP_CLICK_SOUND.play();
+                this.soundPlayer.playNow(SoundType.TARGET_LOCK);
 
                 this.starMapUI.setSelectedSystem(starSystemModel, this.currentSystemCoordinates);
 
