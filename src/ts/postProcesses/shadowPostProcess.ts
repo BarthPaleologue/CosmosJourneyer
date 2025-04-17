@@ -31,6 +31,7 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { CloudsUniforms } from "../clouds/cloudsUniforms";
 import { LightEmitter } from "../architecture/lightEmitter";
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
+import { createEmptyTexture } from "../utils/proceduralTexture";
 
 export type ShadowUniforms = {
     hasRings: boolean;
@@ -43,6 +44,8 @@ export class ShadowPostProcess extends PostProcess {
     readonly ringsUniforms: RingsUniforms | null;
 
     private activeCamera: Camera | null = null;
+
+    private readonly emptyTexture: Texture;
 
     constructor(
         transform: TransformNode,
@@ -98,6 +101,8 @@ export class ShadowPostProcess extends PostProcess {
         this.shadowUniforms = shadowUniforms;
         this.ringsUniforms = ringsUniforms;
 
+        this.emptyTexture = createEmptyTexture(scene);
+
         this.onActivateObservable.add((camera) => {
             this.activeCamera = camera;
         });
@@ -124,12 +129,17 @@ export class ShadowPostProcess extends PostProcess {
 
             if (this.ringsUniforms === null) {
                 RingsUniforms.SetEmptyUniforms(effect);
-                RingsUniforms.SetEmptySamplers(effect);
+                RingsUniforms.SetEmptySamplers(effect, this.emptyTexture);
             } else {
                 this.ringsUniforms.setUniforms(effect);
                 this.ringsUniforms.setSamplers(effect);
             }
             setSamplerUniforms(effect, this.activeCamera, scene);
         });
+    }
+
+    override dispose(camera?: Camera): void {
+        super.dispose(camera);
+        this.emptyTexture.dispose();
     }
 }

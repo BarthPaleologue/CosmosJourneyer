@@ -29,6 +29,7 @@ import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { getRngFromSeed } from "../../../utils/getRngFromSeed";
 import { createEnvironmentAggregate } from "../../../utils/havok";
 import { getRotationPeriodForArtificialGravity } from "../../../utils/physics";
+import { Textures } from "../../textures";
 
 export class CylinderHabitat implements Transformable {
     private readonly root: TransformNode;
@@ -44,7 +45,7 @@ export class CylinderHabitat implements Transformable {
 
     readonly habitableSurface: number;
 
-    constructor(requiredHabitableSurface: number, seed: number, scene: Scene) {
+    constructor(requiredHabitableSurface: number, seed: number, textures: Textures, scene: Scene) {
         this.root = new TransformNode("CylinderHabitatRoot", scene);
 
         this.rng = getRngFromSeed(seed);
@@ -68,7 +69,13 @@ export class CylinderHabitat implements Transformable {
         );
         this.cylinder.convertToFlatShadedMesh();
 
-        this.cylinderMaterial = new CylinderHabitatMaterial(this.radius, height, tesselation, scene);
+        this.cylinderMaterial = new CylinderHabitatMaterial(
+            this.radius,
+            height,
+            tesselation,
+            textures.materials.spaceStation,
+            scene
+        );
 
         this.cylinder.material = this.cylinderMaterial;
 

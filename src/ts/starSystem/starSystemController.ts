@@ -43,6 +43,7 @@ import { OrbitalObjectUtils } from "../architecture/orbitalObjectUtils";
 import { OrbitalObjectId } from "../utils/coordinates/orbitalObjectId";
 import { StarSystemLoader } from "./starSystemLoader";
 import { DeepReadonly, NonEmptyArray } from "../utils/types";
+import { Assets2 } from "../assets/assets";
 
 export type PlanetarySystem = {
     readonly planets: Planet[];
@@ -94,6 +95,8 @@ export class StarSystemController {
 
     private elapsedSeconds = 0;
 
+    private readonly assets: Assets2;
+
     /**
      * Creates a new star system controller from a given model and scene
      * Note that the star system is not loaded until the load method is called
@@ -109,11 +112,14 @@ export class StarSystemController {
             anomalies: ReadonlyArray<Anomaly>;
             orbitalFacilities: ReadonlyArray<OrbitalFacility>;
         },
+        assets: Assets2,
         scene: UberScene
     ) {
         this.scene = scene;
-        this.starFieldBox = new StarFieldBox(scene);
+        this.starFieldBox = new StarFieldBox(assets.textures.environment.milkyWay, scene);
         this.model = model;
+
+        this.assets = assets;
 
         this.stellarObjects = orbitalObjects.stellarObjects;
         this.planets = orbitalObjects.planets;
@@ -134,10 +140,11 @@ export class StarSystemController {
     public static async CreateAsync(
         model: DeepReadonly<StarSystemModel>,
         loader: StarSystemLoader,
+        assets: Assets2,
         scene: UberScene
     ): Promise<StarSystemController> {
-        const result = await loader.load(model, scene);
-        return new StarSystemController(model, result, scene);
+        const result = await loader.load(model, assets, scene);
+        return new StarSystemController(model, result, assets, scene);
     }
 
     public getMostInfluentialObject(position: Vector3): OrbitalObject {
@@ -585,9 +592,13 @@ export class StarSystemController {
 
         this.orbitalFacilities.forEach((facility) => facility.dispose());
         this.anomalies.forEach((anomaly) => anomaly.dispose());
-        this.satellites.forEach((satellite) => satellite.dispose());
-        this.planets.forEach((planet) => planet.dispose());
-        this.stellarObjects.forEach((stellarObject) => stellarObject.dispose());
+        this.satellites.forEach((satellite) =>
+            satellite.dispose(this.assets.textures.pools.ringsLut, this.assets.textures.pools.cloudsLut)
+        );
+        this.planets.forEach((planet) =>
+            planet.dispose(this.assets.textures.pools.ringsLut, this.assets.textures.pools.cloudsLut)
+        );
+        this.stellarObjects.forEach((stellarObject) => stellarObject.dispose(this.assets.textures.pools.ringsLut));
 
         this.systemTargets.forEach((target) => target.dispose());
         this.systemTargets.length = 0;

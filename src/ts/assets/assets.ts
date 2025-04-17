@@ -17,7 +17,7 @@
 
 import { AssetsManager } from "@babylonjs/core/Misc/assetsManager";
 import { Scene } from "@babylonjs/core/scene";
-import { Textures } from "./textures";
+import { loadTextures, Textures } from "./textures";
 import { loadSounds, Sounds } from "./sounds";
 import { Materials } from "./materials";
 import { Objects } from "./objects";
@@ -28,10 +28,12 @@ export type Assets2 = {
     readonly sounds: Sounds;
     readonly musics: Musics;
     readonly speakerVoiceLines: SpeakerVoiceLines;
+    readonly textures: Textures;
 };
 
 export async function loadAssets(
-    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void
+    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void,
+    scene: Scene
 ): Promise<Assets2> {
     let allAssetsTotalCount = 0;
     const increaseTotalCount = (nbItems: number) => {
@@ -45,11 +47,13 @@ export async function loadAssets(
     const soundsPromise = loadSounds(progressCallbackWrapped, increaseTotalCount);
     const musicsPromise = loadMusics(progressCallbackWrapped, increaseTotalCount);
     const voiceLinesPromise = loadVoiceLines(progressCallbackWrapped, increaseTotalCount);
+    const texturesPromise = loadTextures(progressCallbackWrapped, increaseTotalCount, scene);
 
     return {
         sounds: await soundsPromise,
         musics: await musicsPromise,
-        speakerVoiceLines: await voiceLinesPromise
+        speakerVoiceLines: await voiceLinesPromise,
+        textures: await texturesPromise
     };
 }
 
@@ -58,16 +62,15 @@ export class Assets {
 
     private static MANAGER: AssetsManager;
 
-    static async Init(scene: Scene): Promise<void> {
+    static async Init(textures: Textures, scene: Scene): Promise<void> {
         Assets.MANAGER = new AssetsManager(scene);
         Assets.MANAGER.autoHideLoadingUI = false;
         console.log("Initializing assets...");
 
-        Textures.EnqueueTasks(Assets.MANAGER, scene);
         Objects.EnqueueTasks(Assets.MANAGER, scene);
 
         Assets.MANAGER.onFinish = () => {
-            Materials.Init(scene);
+            Materials.Init(textures, scene);
 
             Objects.BUTTERFLY.material = Materials.BUTTERFLY_MATERIAL;
             Objects.GRASS_BLADES.forEach((grassBlade) => (grassBlade.material = Materials.GRASS_MATERIAL));

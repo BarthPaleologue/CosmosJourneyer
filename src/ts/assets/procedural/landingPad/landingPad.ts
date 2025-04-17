@@ -12,6 +12,7 @@ import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { Objects } from "../../objects";
 import { ObjectTargetCursorType, TargetInfo } from "../../../architecture/targetable";
 import { ILandingPad, LandingPadSize } from "../../../spacestation/landingPad/landingPadManager";
+import { Textures } from "../../textures";
 
 export class LandingPad implements ILandingPad {
     private readonly deck: Mesh;
@@ -30,7 +31,7 @@ export class LandingPad implements ILandingPad {
 
     readonly padHeight = 0.5;
 
-    constructor(padNumber: number, padSize: LandingPadSize, scene: Scene) {
+    constructor(padNumber: number, padSize: LandingPadSize, textures: Textures, scene: Scene) {
         this.padSize = padSize;
 
         const width = 40 * padSize;
@@ -40,7 +41,12 @@ export class LandingPad implements ILandingPad {
 
         this.padNumber = padNumber;
 
-        this.deckMaterial = new LandingPadMaterial(padNumber, scene);
+        this.deckMaterial = new LandingPadMaterial(
+            padNumber,
+            textures.materials.concrete,
+            textures.pools.landingPad,
+            scene
+        );
 
         this.deck = MeshBuilder.CreateBox(
             `Landing Pad ${padNumber}`,

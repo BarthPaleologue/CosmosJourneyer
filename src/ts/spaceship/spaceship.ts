@@ -43,7 +43,6 @@ import { AudioManager } from "../audio/audioManager";
 import { Thruster } from "./thruster";
 import { AudioMasks } from "../audio/audioMasks";
 import { Objects } from "../assets/objects";
-import { Sounds } from "../assets/sounds";
 import { CelestialBody, OrbitalObject } from "../architecture/orbitalObject";
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
@@ -54,6 +53,7 @@ import { getDefaultSerializedSpaceship, SerializedSpaceship, ShipType } from "./
 import { SpaceshipInternals } from "./spaceshipInternals";
 import { SerializedComponent } from "./serializedComponents/component";
 import { ILandingPad } from "../spacestation/landingPad/landingPadManager";
+import { Assets2 } from "../assets/assets";
 
 const enum ShipState {
     FLYING,
@@ -131,7 +131,7 @@ export class Spaceship implements Transformable {
         serializedSpaceShip: SerializedSpaceship,
         unfitComponents: Set<SerializedComponent>,
         scene: Scene,
-        sounds: Sounds
+        assets: Assets2
     ) {
         this.id = serializedSpaceShip.id ?? crypto.randomUUID();
 
@@ -178,47 +178,51 @@ export class Spaceship implements Transformable {
         this.landingComputer = new LandingComputer(this.aggregate, scene.getPhysicsEngine() as PhysicsEngineV2);
 
         this.warpTunnel = new WarpTunnel(this.getTransform(), scene);
-        this.hyperSpaceTunnel = new HyperSpaceTunnel(this.getTransform().getDirection(Axis.Z), scene);
+        this.hyperSpaceTunnel = new HyperSpaceTunnel(
+            this.getTransform().getDirection(Axis.Z),
+            scene,
+            assets.textures.noises
+        );
         this.hyperSpaceTunnel.setParent(this.getTransform());
         this.hyperSpaceTunnel.setEnabled(false);
 
         this.enableWarpDriveSound = new AudioInstance(
-            sounds.enableWarpDrive,
+            assets.sounds.enableWarpDrive,
             AudioMasks.STAR_SYSTEM_VIEW,
             1,
             true,
             this.getTransform()
         );
         this.disableWarpDriveSound = new AudioInstance(
-            sounds.disableWarpDrive,
+            assets.sounds.disableWarpDrive,
             AudioMasks.STAR_SYSTEM_VIEW,
             1,
             true,
             this.getTransform()
         );
         this.acceleratingWarpDriveSound = new AudioInstance(
-            sounds.acceleratingWarpDrive,
+            assets.sounds.acceleratingWarpDrive,
             AudioMasks.STAR_SYSTEM_VIEW,
             0,
             false,
             this.getTransform()
         );
         this.deceleratingWarpDriveSound = new AudioInstance(
-            sounds.deceleratingWarpDrive,
+            assets.sounds.deceleratingWarpDrive,
             AudioMasks.STAR_SYSTEM_VIEW,
             0,
             false,
             this.getTransform()
         );
         this.hyperSpaceSound = new AudioInstance(
-            sounds.hyperSpace,
+            assets.sounds.hyperSpace,
             AudioMasks.HYPER_SPACE,
             0,
             false,
             this.getTransform()
         );
         this.thrusterSound = new AudioInstance(
-            sounds.thruster,
+            assets.sounds.thruster,
             AudioMasks.STAR_SYSTEM_VIEW,
             0,
             false,
@@ -728,17 +732,17 @@ export class Spaceship implements Transformable {
         return amount - fuelLeftToRefuel;
     }
 
-    public static CreateDefault(scene: Scene, sounds: Sounds): Spaceship {
-        return Spaceship.Deserialize(getDefaultSerializedSpaceship(), new Set(), scene, sounds);
+    public static CreateDefault(scene: Scene, assets: Assets2): Spaceship {
+        return Spaceship.Deserialize(getDefaultSerializedSpaceship(), new Set(), scene, assets);
     }
 
     public static Deserialize(
         serializedSpaceship: SerializedSpaceship,
         unfitComponents: Set<SerializedComponent>,
         scene: Scene,
-        sounds: Sounds
+        assets: Assets2
     ): Spaceship {
-        return new Spaceship(serializedSpaceship, unfitComponents, scene, sounds);
+        return new Spaceship(serializedSpaceship, unfitComponents, scene, assets);
     }
 
     public serialize(): SerializedSpaceship {

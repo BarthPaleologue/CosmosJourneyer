@@ -29,12 +29,12 @@ import {
 } from "@babylonjs/core";
 import { enablePhysics } from "./utils";
 import { Objects } from "../assets/objects";
-import { Textures } from "../assets/textures";
 import { ShipControls } from "../spaceship/shipControls";
 import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
 import { loadSounds } from "../assets/sounds";
 import { SoundPlayerMock } from "../audio/soundPlayer";
 import { TtsMock } from "../audio/tts";
+import { loadAssets } from "../assets/assets";
 
 export async function createFlightDemoScene(engine: AbstractEngine): Promise<Scene> {
     const scene = new Scene(engine);
@@ -45,18 +45,14 @@ export async function createFlightDemoScene(engine: AbstractEngine): Promise<Sce
 
     const assetsManager = new AssetsManager(scene);
     Objects.EnqueueTasks(assetsManager, scene);
-    Textures.EnqueueTasks(assetsManager, scene);
     await assetsManager.loadAsync();
 
-    const sounds = await loadSounds(
-        () => {},
-        () => {}
-    );
+    const assets = await loadAssets(() => {}, scene);
 
     const soundPlayer = new SoundPlayerMock();
     const tts = new TtsMock();
 
-    const ship = ShipControls.CreateDefault(scene, sounds, tts, soundPlayer);
+    const ship = ShipControls.CreateDefault(scene, assets, tts, soundPlayer);
 
     const camera = ship.getActiveCamera();
     camera.minZ = 0.1;

@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AssetsManager } from "@babylonjs/core/Misc/assetsManager";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Scene } from "@babylonjs/core/scene";
 import "@babylonjs/core/Materials/Textures/Loaders/envTextureLoader";
@@ -54,15 +53,11 @@ import solarPanelMetallicRoughness from "../../asset/SolarPanelMaterial/metallic
 import spaceStationAlbedo from "../../asset/spaceStationMaterial/spaceship-panels1-albedo.webp";
 import spaceStationNormal from "../../asset/spaceStationMaterial/spaceship-panels1-normal-dx.webp";
 import spaceStationMetallicRoughness from "../../asset/spaceStationMaterial/metallicRoughness.webp";
-import spaceStationMetallic from "../../asset/spaceStationMaterial/spaceship-panels1-metallic.webp";
-import spaceStationRoughness from "../../asset/spaceStationMaterial/spaceship-panels1-roughness.webp";
 import spaceStationAmbientOcclusion from "../../asset/spaceStationMaterial/spaceship-panels1-ao.webp";
 
 import metalPanelsAlbdeo from "../../asset/metalPanelMaterial/sci-fi-panel1-albedo.webp";
 import metalPanelsNormal from "../../asset/metalPanelMaterial/sci-fi-panel1-normal-dx.webp";
 import metalPanelsMetallicRoughness from "../../asset/metalPanelMaterial/metallicRoughness.webp";
-import metalPanelsRoughness from "../../asset/metalPanelMaterial/sci-fi-panel1-roughness.webp";
-import metalPanelsMetallic from "../../asset/metalPanelMaterial/sci-fi-panel1-metallic.webp";
 import metalPanelsAmbientOcclusion from "../../asset/metalPanelMaterial/sci-fi-panel1-ao.webp";
 
 import concreteAlbedo from "../../asset/degraded-concrete-ue/degraded-concrete_albedo.webp";
@@ -74,184 +69,282 @@ import crateAlbedo from "../../asset/crateMaterial/space-crate1-albedo.webp";
 import crateNormal from "../../asset/crateMaterial/space-crate1-normal-dx.webp";
 import crateMetallicRoughness from "../../asset/crateMaterial/space-crate1-metallic-roughness.webp";
 import crateAmbientOcclusion from "../../asset/crateMaterial/space-crate1-ao.webp";
-import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
-import { Settings } from "../settings";
+import { ItemPool } from "../utils/itemPool";
+import { CloudsLut } from "../clouds/cloudsLut";
+import { RingsLut } from "../rings/ringsLut";
+import { StarMaterialLut } from "../stellarObjects/star/starMaterialLut";
+import { TelluricPlanetMaterialLut } from "../planets/telluricPlanet/telluricPlanetMaterialLut";
+import { LandingPadTexturePool } from "./landingPadTexturePool";
 
-export class Textures {
-    static ROCK_NORMAL_METALLIC_MAP: Texture;
-    static ROCK_ALBEDO_ROUGHNESS_MAP: Texture;
+// Define texture groups types
+export type TerrainTextures = {
+    normalMetallic: Texture;
+    albedoRoughness: Texture;
+};
 
-    static GRASS_NORMAL_METALLIC_MAP: Texture;
-    static GRASS_ALBEDO_ROUGHNESS_MAP: Texture;
+export type AllTerrainTextures = {
+    rock: TerrainTextures;
+    grass: TerrainTextures;
+    snow: TerrainTextures;
+    sand: TerrainTextures;
+};
 
-    static SNOW_NORMAL_METALLIC_MAP: Texture;
-    static SNOW_ALBEDO_ROUGHNESS_MAP: Texture;
+export type PBRTextures = {
+    albedo: Texture;
+    normal: Texture;
+    metallicRoughness: Texture;
+    ambientOcclusion: Texture;
+};
 
-    static SAND_NORMAL_METALLIC_MAP: Texture;
-    static SAND_ALBEDO_ROUGHNESS_MAP: Texture;
+export type WaterTextures = {
+    normalMap1: Texture;
+    normalMap2: Texture;
+};
 
-    static WATER_NORMAL_MAP_1: Texture;
-    static WATER_NORMAL_MAP_2: Texture;
+export type ParticleTextures = {
+    plume: Texture;
+    flare: Texture;
+    butterfly: Texture;
+};
 
-    static PLUME_PARTICLE: Texture;
+export type NoiseTextures = {
+    seamlessPerlin: Texture;
+};
 
-    static FLARE_TEXTURE: Texture;
+export type AllMaterialTextures = {
+    solarPanel: Omit<PBRTextures, "ambientOcclusion">;
+    spaceStation: PBRTextures;
+    metalPanels: PBRTextures;
+    concrete: PBRTextures;
+    crate: PBRTextures;
+};
 
-    static BUTTERFLY: Texture;
+export type TexturePools = {
+    cloudsLut: ItemPool<CloudsLut>;
+    ringsLut: ItemPool<RingsLut>;
+    starMaterialLut: ItemPool<StarMaterialLut>;
+    telluricPlanetMaterialLut: ItemPool<TelluricPlanetMaterialLut>;
+    landingPad: LandingPadTexturePool;
+};
 
-    static EMPTY_TEXTURE: Texture;
+export type Textures = {
+    readonly terrains: Readonly<AllTerrainTextures>;
+    readonly water: Readonly<WaterTextures>;
+    readonly particles: Readonly<ParticleTextures>;
+    readonly materials: Readonly<AllMaterialTextures>;
+    readonly environment: {
+        readonly milkyWay: CubeTexture;
+    };
+    readonly noises: NoiseTextures;
+    readonly ui: {
+        readonly cursorImageUrl: string;
+    };
+    readonly empty: Texture;
+    readonly pools: Readonly<TexturePools>;
+};
 
-    static CURSOR_IMAGE_URL: string;
+/**
+ * Loads all textures required by the game
+ * @param progressCallback - Callback function for loading progress
+ * @param enumerateCallback - Callback function to notify of total number of textures
+ * @param scene - The scene to load textures into
+ * @returns A promise resolving to the Textures object
+ */
+export async function loadTextures(
+    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void,
+    enumerateCallback: (totalCount: number) => void,
+    scene: Scene
+): Promise<Textures> {
+    let loadedCount = 0;
+    let totalCount = 0;
 
-    static SEAMLESS_PERLIN: Texture;
+    const loadTextureAsync = (name: string, url: string): Promise<Texture> => {
+        const loadingPromise = new Promise<Texture>((resolve) => {
+            const texture = new Texture(url, scene, false, false, undefined, () => {
+                resolve(texture);
+            });
+            texture.name = name;
+        });
+        totalCount++;
 
-    static SOLAR_PANEL_ALBEDO: Texture;
-    static SOLAR_PANEL_NORMAL: Texture;
-    static SOLAR_PANEL_METALLIC_ROUGHNESS: Texture;
-
-    static SPACE_STATION_ALBEDO: Texture;
-    static SPACE_STATION_NORMAL: Texture;
-    static SPACE_STATION_METALLIC_ROUGHNESS: Texture;
-    static SPACE_STATION_METALLIC: Texture;
-    static SPACE_STATION_ROUGHNESS: Texture;
-    static SPACE_STATION_AMBIENT_OCCLUSION: Texture;
-
-    static METAL_PANELS_ALBEDO: Texture;
-    static METAL_PANELS_NORMAL: Texture;
-    static METAL_PANELS_METALLIC_ROUGHNESS: Texture;
-    static METAL_PANELS_METALLIC: Texture;
-    static METAL_PANELS_ROUGHNESS: Texture;
-    static METAL_PANELS_AMBIENT_OCCLUSION: Texture;
-
-    static CONCRETE_ALBEDO: Texture;
-    static CONCRETE_NORMAL: Texture;
-    static CONCRETE_METALLIC_ROUGHNESS: Texture;
-    static CONCRETE_AMBIENT_OCCLUSION: Texture;
-
-    static CRATE_ALBEDO: Texture;
-    static CRATE_NORMAL: Texture;
-    static CRATE_METALLIC_ROUGHNESS: Texture;
-    static CRATE_AMBIENT_OCCLUSION: Texture;
-
-    static MILKY_WAY: CubeTexture;
-
-    private static LANDING_PAD_NUMBER_TEXTURES: Map<number, DynamicTexture> = new Map();
-
-    static EnqueueTasks(manager: AssetsManager, scene: Scene) {
-        manager.addTextureTask("RockNormalMetallicMap", rockNormalMetallicMap).onSuccess = (task) =>
-            (Textures.ROCK_NORMAL_METALLIC_MAP = task.texture);
-        manager.addTextureTask("RockAlbedoRoughnessMap", rockAlbedoRoughnessMap).onSuccess = (task) =>
-            (Textures.ROCK_ALBEDO_ROUGHNESS_MAP = task.texture);
-
-        manager.addTextureTask("GrassNormalMetallicMap", grassNormalMetallicMap).onSuccess = (task) =>
-            (Textures.GRASS_NORMAL_METALLIC_MAP = task.texture);
-        manager.addTextureTask("GrassAlbedoRoughnessMap", grassAlbedoRoughnessMap).onSuccess = (task) =>
-            (Textures.GRASS_ALBEDO_ROUGHNESS_MAP = task.texture);
-
-        manager.addTextureTask("SnowNormalMetallicMap", snowNormalMetallicMap).onSuccess = (task) =>
-            (Textures.SNOW_NORMAL_METALLIC_MAP = task.texture);
-        manager.addTextureTask("SnowAlbedoRoughness", snowAlbedoRoughnessMap).onSuccess = (task) =>
-            (Textures.SNOW_ALBEDO_ROUGHNESS_MAP = task.texture);
-
-        manager.addTextureTask("SandNormalMetallicMap", sandNormalMetallicMap).onSuccess = (task) =>
-            (Textures.SAND_NORMAL_METALLIC_MAP = task.texture);
-        manager.addTextureTask("SandAlbedoRoughnessMap", sandAlbedoRoughnessMap).onSuccess = (task) =>
-            (Textures.SAND_ALBEDO_ROUGHNESS_MAP = task.texture);
-
-        manager.addTextureTask("WaterNormalMap1", waterNormal1).onSuccess = (task) =>
-            (Textures.WATER_NORMAL_MAP_1 = task.texture);
-        manager.addTextureTask("WaterNormalMap2", waterNormal2).onSuccess = (task) =>
-            (Textures.WATER_NORMAL_MAP_2 = task.texture);
-
-        manager.addTextureTask("PlumeParticle", plumeParticle).onSuccess = (task) =>
-            (Textures.PLUME_PARTICLE = task.texture);
-        manager.addTextureTask("FlareTexture", flareParticle).onSuccess = (task) =>
-            (Textures.FLARE_TEXTURE = task.texture);
-
-        manager.addTextureTask("Butterfly", butterflyTexture).onSuccess = (task) => (Textures.BUTTERFLY = task.texture);
-
-        manager.addTextureTask("SeamlessPerlin", seamlessPerlin).onSuccess = (task) =>
-            (Textures.SEAMLESS_PERLIN = task.texture);
-
-        manager.addTextureTask("SolarPanelAlbedo", solarPanelAlbedo).onSuccess = (task) =>
-            (Textures.SOLAR_PANEL_ALBEDO = task.texture);
-        manager.addTextureTask("SolarPanelNormal", solarPanelNormal).onSuccess = (task) =>
-            (Textures.SOLAR_PANEL_NORMAL = task.texture);
-        manager.addTextureTask("SolarPanelMetallicRoughness", solarPanelMetallicRoughness).onSuccess = (task) =>
-            (Textures.SOLAR_PANEL_METALLIC_ROUGHNESS = task.texture);
-
-        manager.addTextureTask("SpaceStationAlbedo", spaceStationAlbedo).onSuccess = (task) =>
-            (Textures.SPACE_STATION_ALBEDO = task.texture);
-        manager.addTextureTask("SpaceStationNormal", spaceStationNormal).onSuccess = (task) =>
-            (Textures.SPACE_STATION_NORMAL = task.texture);
-        manager.addTextureTask("SpaceStationMetallicRoughness", spaceStationMetallicRoughness).onSuccess = (task) =>
-            (Textures.SPACE_STATION_METALLIC_ROUGHNESS = task.texture);
-        manager.addTextureTask("SpaceStationMetallic", spaceStationMetallic).onSuccess = (task) =>
-            (Textures.SPACE_STATION_METALLIC = task.texture);
-        manager.addTextureTask("SpaceStationRoughness", spaceStationRoughness).onSuccess = (task) =>
-            (Textures.SPACE_STATION_ROUGHNESS = task.texture);
-        manager.addTextureTask("SpaceStationAmbientOcclusion", spaceStationAmbientOcclusion).onSuccess = (task) =>
-            (Textures.SPACE_STATION_AMBIENT_OCCLUSION = task.texture);
-
-        manager.addTextureTask("MetalPanelsAlbedo", metalPanelsAlbdeo).onSuccess = (task) =>
-            (Textures.METAL_PANELS_ALBEDO = task.texture);
-        manager.addTextureTask("MetalPanelsNormal", metalPanelsNormal).onSuccess = (task) =>
-            (Textures.METAL_PANELS_NORMAL = task.texture);
-        manager.addTextureTask("MetalPanelsMetallicRoughness", metalPanelsMetallicRoughness).onSuccess = (task) =>
-            (Textures.METAL_PANELS_METALLIC_ROUGHNESS = task.texture);
-        manager.addTextureTask("MetalPanelsMetallic", metalPanelsMetallic).onSuccess = (task) =>
-            (Textures.METAL_PANELS_METALLIC = task.texture);
-        manager.addTextureTask("MetalPanelsRoughness", metalPanelsRoughness).onSuccess = (task) =>
-            (Textures.METAL_PANELS_ROUGHNESS = task.texture);
-        manager.addTextureTask("MetalPanelsAmbientOcclusion", metalPanelsAmbientOcclusion).onSuccess = (task) =>
-            (Textures.METAL_PANELS_AMBIENT_OCCLUSION = task.texture);
-
-        manager.addTextureTask("ConcreteAlbedo", concreteAlbedo).onSuccess = (task) =>
-            (Textures.CONCRETE_ALBEDO = task.texture);
-        manager.addTextureTask("ConcreteNormal", concreteNormal).onSuccess = (task) =>
-            (Textures.CONCRETE_NORMAL = task.texture);
-        manager.addTextureTask("ConcreteMetallicRoughness", concreteMetallicRoughness).onSuccess = (task) =>
-            (Textures.CONCRETE_METALLIC_ROUGHNESS = task.texture);
-        manager.addTextureTask("ConcreteAmbientOcclusion", concreteAmbientOcclusion).onSuccess = (task) =>
-            (Textures.CONCRETE_AMBIENT_OCCLUSION = task.texture);
-
-        manager.addTextureTask("CrateAlbedo", crateAlbedo).onSuccess = (task) => (Textures.CRATE_ALBEDO = task.texture);
-        manager.addTextureTask("CrateNormal", crateNormal).onSuccess = (task) => (Textures.CRATE_NORMAL = task.texture);
-        manager.addTextureTask("CrateMetallicRoughness", crateMetallicRoughness).onSuccess = (task) =>
-            (Textures.CRATE_METALLIC_ROUGHNESS = task.texture);
-        manager.addTextureTask("CrateAmbientOcclusion", crateAmbientOcclusion).onSuccess = (task) =>
-            (Textures.CRATE_AMBIENT_OCCLUSION = task.texture);
-
-        manager.addCubeTextureTask("SkyBox", skyBox).onSuccess = (task) => (Textures.MILKY_WAY = task.texture);
-
-        this.CURSOR_IMAGE_URL = cursorImage;
-
-        manager.addTextureTask("EmptyTexture", empty).onSuccess = (task) => (Textures.EMPTY_TEXTURE = task.texture);
-    }
-
-    static GetLandingPadNumberTexture(padNumber: number, scene: Scene): DynamicTexture {
-        const texture = Textures.LANDING_PAD_NUMBER_TEXTURES.get(padNumber);
-        if (texture !== undefined) {
+        return loadingPromise.then((texture) => {
+            progressCallback(++loadedCount, totalCount, texture.name);
             return texture;
-        }
+        });
+    };
 
-        const padNumberTextureResolution = 1024;
-        const numberTexture = new DynamicTexture(
-            `PadNumberTexture${padNumber}`,
-            {
-                width: padNumberTextureResolution,
-                height: padNumberTextureResolution * Settings.LANDING_PAD_ASPECT_RATIO
+    const loadCubeTextureAsync = (name: string, url: string): Promise<CubeTexture> => {
+        const loadingPromise = new Promise<CubeTexture>((resolve) => {
+            const texture = CubeTexture.CreateFromPrefilteredData(url, scene);
+            texture.onLoadObservable.add(() => {
+                resolve(texture);
+            });
+            texture.name = name;
+        });
+        totalCount++;
+
+        return loadingPromise.then((texture) => {
+            progressCallback(++loadedCount, totalCount, texture.name);
+            return texture;
+        });
+    };
+
+    // Terrain textures
+    const rockNormalMetallicPromise = loadTextureAsync("RockNormalMetallicMap", rockNormalMetallicMap);
+    const rockAlbedoRoughnessPromise = loadTextureAsync("RockAlbedoRoughnessMap", rockAlbedoRoughnessMap);
+
+    const grassNormalMetallicPromise = loadTextureAsync("GrassNormalMetallicMap", grassNormalMetallicMap);
+    const grassAlbedoRoughnessPromise = loadTextureAsync("GrassAlbedoRoughnessMap", grassAlbedoRoughnessMap);
+
+    const snowNormalMetallicPromise = loadTextureAsync("SnowNormalMetallicMap", snowNormalMetallicMap);
+    const snowAlbedoRoughnessPromise = loadTextureAsync("SnowAlbedoRoughness", snowAlbedoRoughnessMap);
+
+    const sandNormalMetallicPromise = loadTextureAsync("SandNormalMetallicMap", sandNormalMetallicMap);
+    const sandAlbedoRoughnessPromise = loadTextureAsync("SandAlbedoRoughnessMap", sandAlbedoRoughnessMap);
+
+    // Water textures
+    const waterNormalMap1Promise = loadTextureAsync("WaterNormalMap1", waterNormal1);
+    const waterNormalMap2Promise = loadTextureAsync("WaterNormalMap2", waterNormal2);
+
+    // Particle textures
+    const plumeParticlePromise = loadTextureAsync("PlumeParticle", plumeParticle);
+    const flareTexturePromise = loadTextureAsync("FlareTexture", flareParticle);
+
+    // UI textures
+    const butterflyPromise = loadTextureAsync("Butterfly", butterflyTexture);
+    const emptyTexturePromise = loadTextureAsync("EmptyTexture", empty);
+
+    // Environment textures
+    const seamlessPerlinPromise = loadTextureAsync("SeamlessPerlin", seamlessPerlin);
+    const milkyWayPromise = loadCubeTextureAsync("SkyBox", skyBox);
+
+    // Material textures
+    // Solar Panel
+    const solarPanelAlbedoPromise = loadTextureAsync("SolarPanelAlbedo", solarPanelAlbedo);
+    const solarPanelNormalPromise = loadTextureAsync("SolarPanelNormal", solarPanelNormal);
+    const solarPanelMetallicRoughnessPromise = loadTextureAsync(
+        "SolarPanelMetallicRoughness",
+        solarPanelMetallicRoughness
+    );
+
+    // Space Station
+    const spaceStationAlbedoPromise = loadTextureAsync("SpaceStationAlbedo", spaceStationAlbedo);
+    const spaceStationNormalPromise = loadTextureAsync("SpaceStationNormal", spaceStationNormal);
+    const spaceStationMetallicRoughnessPromise = loadTextureAsync(
+        "SpaceStationMetallicRoughness",
+        spaceStationMetallicRoughness
+    );
+    const spaceStationAmbientOcclusionPromise = loadTextureAsync(
+        "SpaceStationAmbientOcclusion",
+        spaceStationAmbientOcclusion
+    );
+
+    // Metal Panels
+    const metalPanelsAlbedoPromise = loadTextureAsync("MetalPanelsAlbedo", metalPanelsAlbdeo);
+    const metalPanelsNormalPromise = loadTextureAsync("MetalPanelsNormal", metalPanelsNormal);
+    const metalPanelsMetallicRoughnessPromise = loadTextureAsync(
+        "MetalPanelsMetallicRoughness",
+        metalPanelsMetallicRoughness
+    );
+    const metalPanelsAmbientOcclusionPromise = loadTextureAsync(
+        "MetalPanelsAmbientOcclusion",
+        metalPanelsAmbientOcclusion
+    );
+
+    // Concrete
+    const concreteAlbedoPromise = loadTextureAsync("ConcreteAlbedo", concreteAlbedo);
+    const concreteNormalPromise = loadTextureAsync("ConcreteNormal", concreteNormal);
+    const concreteMetallicRoughnessPromise = loadTextureAsync("ConcreteMetallicRoughness", concreteMetallicRoughness);
+    const concreteAmbientOcclusionPromise = loadTextureAsync("ConcreteAmbientOcclusion", concreteAmbientOcclusion);
+
+    // Crate
+    const crateAlbedoPromise = loadTextureAsync("CrateAlbedo", crateAlbedo);
+    const crateNormalPromise = loadTextureAsync("CrateNormal", crateNormal);
+    const crateMetallicRoughnessPromise = loadTextureAsync("CrateMetallicRoughness", crateMetallicRoughness);
+    const crateAmbientOcclusionPromise = loadTextureAsync("CrateAmbientOcclusion", crateAmbientOcclusion);
+
+    enumerateCallback(totalCount);
+
+    // Assemble and return the textures structure
+    return {
+        terrains: {
+            rock: {
+                normalMetallic: await rockNormalMetallicPromise,
+                albedoRoughness: await rockAlbedoRoughnessPromise
             },
-            scene,
-            true
-        );
+            grass: {
+                normalMetallic: await grassNormalMetallicPromise,
+                albedoRoughness: await grassAlbedoRoughnessPromise
+            },
+            snow: {
+                normalMetallic: await snowNormalMetallicPromise,
+                albedoRoughness: await snowAlbedoRoughnessPromise
+            },
+            sand: {
+                normalMetallic: await sandNormalMetallicPromise,
+                albedoRoughness: await sandAlbedoRoughnessPromise
+            }
+        },
+        water: {
+            normalMap1: await waterNormalMap1Promise,
+            normalMap2: await waterNormalMap2Promise
+        },
+        particles: {
+            plume: await plumeParticlePromise,
+            flare: await flareTexturePromise,
+            butterfly: await butterflyPromise
+        },
+        materials: {
+            solarPanel: {
+                albedo: await solarPanelAlbedoPromise,
+                normal: await solarPanelNormalPromise,
+                metallicRoughness: await solarPanelMetallicRoughnessPromise
+            },
+            spaceStation: {
+                albedo: await spaceStationAlbedoPromise,
+                normal: await spaceStationNormalPromise,
+                metallicRoughness: await spaceStationMetallicRoughnessPromise,
+                ambientOcclusion: await spaceStationAmbientOcclusionPromise
+            },
+            metalPanels: {
+                albedo: await metalPanelsAlbedoPromise,
+                normal: await metalPanelsNormalPromise,
+                metallicRoughness: await metalPanelsMetallicRoughnessPromise,
+                ambientOcclusion: await metalPanelsAmbientOcclusionPromise
+            },
+            concrete: {
+                albedo: await concreteAlbedoPromise,
+                normal: await concreteNormalPromise,
+                metallicRoughness: await concreteMetallicRoughnessPromise,
+                ambientOcclusion: await concreteAmbientOcclusionPromise
+            },
+            crate: {
+                albedo: await crateAlbedoPromise,
+                normal: await crateNormalPromise,
+                metallicRoughness: await crateMetallicRoughnessPromise,
+                ambientOcclusion: await crateAmbientOcclusionPromise
+            }
+        },
+        environment: {
+            milkyWay: await milkyWayPromise
+        },
+        noises: {
+            seamlessPerlin: await seamlessPerlinPromise
+        },
+        ui: {
+            cursorImageUrl: cursorImage
+        },
+        empty: await emptyTexturePromise,
+        pools: createTexturePools(scene)
+    };
+}
 
-        //Add text to dynamic texture
-        const font = `bold 256px ${Settings.MAIN_FONT}`;
-        numberTexture.drawText(`${padNumber}`, null, null, font, "white", null, true, true);
-
-        Textures.LANDING_PAD_NUMBER_TEXTURES.set(padNumber, numberTexture);
-
-        return numberTexture;
-    }
+export function createTexturePools(scene: Scene): TexturePools {
+    return {
+        cloudsLut: new ItemPool<CloudsLut>(() => new CloudsLut(scene)),
+        ringsLut: new ItemPool<RingsLut>(() => new RingsLut(scene)),
+        starMaterialLut: new ItemPool<StarMaterialLut>(() => new StarMaterialLut(scene)),
+        telluricPlanetMaterialLut: new ItemPool<TelluricPlanetMaterialLut>(() => new TelluricPlanetMaterialLut(scene)),
+        landingPad: new LandingPadTexturePool()
+    };
 }

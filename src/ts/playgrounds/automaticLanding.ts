@@ -25,11 +25,10 @@ import { enablePhysics } from "./utils";
 import { DefaultControls } from "../defaultControls/defaultControls";
 import { Spaceship } from "../spaceship/spaceship";
 import { Objects } from "../assets/objects";
-import { Textures } from "../assets/textures";
-import { loadSounds } from "../assets/sounds";
 import { randRange } from "extended-random";
 import { CollisionMask } from "../settings";
 import { LandingPadSize } from "../spacestation/landingPad/landingPadManager";
+import { loadAssets } from "../assets/assets";
 
 export async function createAutomaticLandingScene(engine: AbstractEngine): Promise<Scene> {
     const scene = new Scene(engine);
@@ -39,15 +38,11 @@ export async function createAutomaticLandingScene(engine: AbstractEngine): Promi
 
     const assetsManager = new AssetsManager(scene);
     Objects.EnqueueTasks(assetsManager, scene);
-    Textures.EnqueueTasks(assetsManager, scene);
     await assetsManager.loadAsync();
 
-    const sounds = await loadSounds(
-        () => {},
-        () => {}
-    );
+    const assets = await loadAssets(() => {}, scene);
 
-    const ship = Spaceship.CreateDefault(scene, sounds);
+    const ship = Spaceship.CreateDefault(scene, assets);
     ship.getTransform().position.copyFromFloats(
         randRange(-50, 50, Math.random, 0),
         randRange(30, 50, Math.random, 0),
@@ -63,7 +58,7 @@ export async function createAutomaticLandingScene(engine: AbstractEngine): Promi
     camera.minZ = 0.1;
     camera.attachControl();
 
-    const landingPad = new LandingPad(42, LandingPadSize.SMALL, scene);
+    new LandingPad(42, LandingPadSize.SMALL, assets.textures, scene);
 
     const ground = MeshBuilder.CreateBox("ground", { width: 100, height: 1, depth: 100 }, scene);
     ground.position.y = -2;

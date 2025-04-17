@@ -31,7 +31,7 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import { getRngFromSeed } from "../../../utils/getRngFromSeed";
 import { createEnvironmentAggregate } from "../../../utils/havok";
 import { getRotationPeriodForArtificialGravity } from "../../../utils/physics";
-import { OrbitalFacilityModel } from "../../../architecture/orbitalObjectModel";
+import { Textures } from "../../textures";
 
 export class RingHabitat implements Transformable {
     private readonly root: TransformNode;
@@ -54,7 +54,7 @@ export class RingHabitat implements Transformable {
 
     readonly habitableSurface: number;
 
-    constructor(requiredHabitableSurface: number, seed: number, scene: Scene) {
+    constructor(requiredHabitableSurface: number, seed: number, textures: Textures, scene: Scene) {
         this.root = new TransformNode("RingHabitatRoot", scene);
 
         this.rng = getRngFromSeed(seed);
@@ -72,7 +72,11 @@ export class RingHabitat implements Transformable {
 
         const attachmentNbSides = 4 + 2 * Math.floor(this.rng(1) * 2);
 
-        this.metalSectionMaterial = new MetalSectionMaterial("RingHabitatMetalSectionMaterial", scene);
+        this.metalSectionMaterial = new MetalSectionMaterial(
+            "RingHabitatMetalSectionMaterial",
+            textures.materials.metalPanels,
+            scene
+        );
 
         this.habitableSurface = height * (2 * Math.PI * (this.radius + deltaRadius / 2));
 
@@ -96,7 +100,13 @@ export class RingHabitat implements Transformable {
         const nbSteps = Math.ceil(circumference / deltaRadius);
         this.ring = createRing(this.radius, deltaRadius, height, nbSteps, scene);
 
-        this.ringMaterial = new RingHabitatMaterial(this.radius, deltaRadius, yScaling, scene);
+        this.ringMaterial = new RingHabitatMaterial(
+            this.radius,
+            deltaRadius,
+            yScaling,
+            textures.materials.spaceStation,
+            scene
+        );
 
         this.ring.material = this.ringMaterial;
 

@@ -38,6 +38,9 @@ import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/t
 import { VolumetricLightUniforms } from "../../volumetricLight/volumetricLightUniforms";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { DeepReadonly } from "../../utils/types";
+import { TexturePools } from "../../assets/textures";
+import { ItemPool } from "../../utils/itemPool";
+import { RingsLut } from "../../rings/ringsLut";
 
 export class Star implements StellarObjectBase<OrbitalObjectType.STAR>, Cullable {
     readonly mesh: Mesh;
@@ -63,7 +66,7 @@ export class Star implements StellarObjectBase<OrbitalObjectType.STAR>, Cullable
      * @param model The seed of the star in [-1, 1]
      * @param scene
      */
-    constructor(model: DeepReadonly<StarModel>, scene: Scene) {
+    constructor(model: DeepReadonly<StarModel>, texturePools: TexturePools, scene: Scene) {
         this.model = model;
 
         this.mesh = MeshBuilder.CreateSphere(
@@ -93,11 +96,16 @@ export class Star implements StellarObjectBase<OrbitalObjectType.STAR>, Cullable
         this.light.falloffType = Light.FALLOFF_STANDARD;
         this.light.parent = this.getTransform();
 
-        this.material = new StarMaterial(this.model.seed, this.model.blackBodyTemperature, scene);
+        this.material = new StarMaterial(
+            this.model.seed,
+            this.model.blackBodyTemperature,
+            texturePools.starMaterialLut,
+            scene
+        );
         this.mesh.material = this.material;
 
         if (this.model.rings !== null) {
-            this.ringsUniforms = new RingsUniforms(this.model.rings, scene);
+            this.ringsUniforms = new RingsUniforms(this.model.rings, texturePools.ringsLut, scene);
 
             const averageRadius = (this.model.radius * (this.model.rings.ringStart + this.model.rings.ringEnd)) / 2;
             const spread = (this.model.radius * (this.model.rings.ringEnd - this.model.rings.ringStart)) / 2;
@@ -144,12 +152,12 @@ export class Star implements StellarObjectBase<OrbitalObjectType.STAR>, Cullable
         this.mesh.isVisible = isSizeOnScreenEnough(this, camera);
     }
 
-    public dispose(): void {
+    public dispose(ringsLutPool: ItemPool<RingsLut>): void {
         this.aggregate.dispose();
         this.material.dispose();
         this.light.dispose();
         this.asteroidField?.dispose();
-        this.ringsUniforms?.dispose();
+        this.ringsUniforms?.dispose(ringsLutPool);
         this.mesh.dispose();
     }
 }

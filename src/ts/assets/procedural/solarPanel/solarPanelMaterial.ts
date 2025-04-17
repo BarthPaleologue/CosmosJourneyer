@@ -16,13 +16,13 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Scene } from "@babylonjs/core/scene";
-import { Textures } from "../../textures";
 import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import * as BSL from "../../../utils/bsl";
+import { PBRTextures } from "../../textures";
 
 export class SolarPanelMaterial extends NodeMaterial {
-    constructor(scene: Scene) {
+    constructor(textures: Omit<PBRTextures, "ambientOcclusion">, scene: Scene) {
         super("SolarPanelNodeMaterial", scene);
         this.mode = NodeMaterialModes.Material;
 
@@ -45,11 +45,11 @@ export class SolarPanelMaterial extends NodeMaterial {
 
         // Fragment Shader
 
-        const albedoTexture = BSL.textureSample(Textures.SOLAR_PANEL_ALBEDO, uv, {
+        const albedoTexture = BSL.textureSample(textures.albedo, uv, {
             convertToLinearSpace: true
         });
-        const metallicRoughness = BSL.textureSample(Textures.SOLAR_PANEL_METALLIC_ROUGHNESS, uv);
-        const normalMapValue = BSL.textureSample(Textures.SOLAR_PANEL_NORMAL, uv);
+        const metallicRoughness = BSL.textureSample(textures.metallicRoughness, uv);
+        const normalMapValue = BSL.textureSample(textures.normal, uv);
 
         const perturbedNormal = BSL.perturbNormal(uv, positionW, normalW, normalMapValue.rgb, BSL.float(1));
 

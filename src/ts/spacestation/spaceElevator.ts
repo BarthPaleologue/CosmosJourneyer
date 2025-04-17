@@ -48,6 +48,8 @@ import { getSphereRadiatedEnergyFlux } from "../utils/physics";
 import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
 import { getEdibleEnergyPerHaPerDay } from "../utils/agriculture";
 import { StellarObjectModel } from "../architecture/orbitalObjectModel";
+import { Assets2 } from "../assets/assets";
+import { Materials } from "../assets/materials";
 
 export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPACE_ELEVATOR> {
     readonly name: string;
@@ -84,6 +86,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
     constructor(
         model: DeepReadonly<SpaceElevatorModel>,
         stellarObjects: ReadonlyMap<DeepReadonly<StellarObjectModel>, number>,
+        assets: Pick<Assets2, "textures">,
         scene: Scene
     ) {
         this.model = model;
@@ -109,15 +112,20 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
         );
         this.tether.convertToFlatShadedMesh();
 
-        this.tetherMaterial = new MetalSectionMaterial("TetherMaterial", scene);
+        this.tetherMaterial = new MetalSectionMaterial("TetherMaterial", assets.textures.materials.metalPanels, scene);
         this.tether.material = this.tetherMaterial;
 
-        this.climber = new SpaceElevatorClimber(scene);
+        this.climber = new SpaceElevatorClimber(
+            Materials.SOLAR_PANEL,
+            assets.textures.materials.crate,
+            assets.textures.materials.metalPanels,
+            scene
+        );
         this.climber.getTransform().parent = this.tether;
 
         this.climber.getTransform().position.y = this.tetherLength / 2;
 
-        this.generate(stellarObjects);
+        this.generate(stellarObjects, assets);
 
         // Now that landing bays are generated, create the landing pad manager with all pads
         this.landingPadManager = new LandingPadManager(
@@ -167,7 +175,10 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
         this.getTransform().setEnabled(isSizeOnScreenEnough(this, camera));
     }
 
-    private generate(stellarObjects: ReadonlyMap<DeepReadonly<StellarObjectModel>, number>) {
+    private generate(
+        stellarObjects: ReadonlyMap<DeepReadonly<StellarObjectModel>, number>,
+        assets: Pick<Assets2, "textures">
+    ) {
         let totalStellarFlux = 0;
         stellarObjects.forEach((distance, model) => {
             totalStellarFlux += getSphereRadiatedEnergyFlux(model.blackBodyTemperature, model.radius, distance);
@@ -197,7 +208,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
 
         const rng = getRngFromSeed(this.model.seed);
 
-        lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(rng(564) * 5), rng);
+        lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(rng(564) * 5), rng, assets);
 
         const habitatType = wheelOfFortune(
             [
@@ -213,18 +224,25 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
             const helixHabitat = new HelixHabitat(
                 totalHabitatSurfaceM2,
                 Settings.SEED_HALF_RANGE * rng(19),
+                assets.textures,
                 this.scene
             );
             this.helixHabitats.push(helixHabitat);
             newNode = helixHabitat.getTransform();
         } else if (habitatType === SpaceStationNodeType.RING_HABITAT) {
-            const ringHabitat = new RingHabitat(totalHabitatSurfaceM2, Settings.SEED_HALF_RANGE * rng(27), this.scene);
+            const ringHabitat = new RingHabitat(
+                totalHabitatSurfaceM2,
+                Settings.SEED_HALF_RANGE * rng(27),
+                assets.textures,
+                this.scene
+            );
             this.ringHabitats.push(ringHabitat);
             newNode = ringHabitat.getTransform();
         } else if (habitatType === SpaceStationNodeType.CYLINDER_HABITAT) {
             const cylinderHabitat = new CylinderHabitat(
                 totalHabitatSurfaceM2,
                 Settings.SEED_HALF_RANGE * rng(13),
+                assets.textures,
                 this.scene
             );
             this.cylinderHabitats.push(cylinderHabitat);
@@ -239,17 +257,22 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
         newNode.parent = this.root;
         lastNode = newNode;
 
-        lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(rng(23) * 5), rng);
+        lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(rng(23) * 5), rng, assets);
 
-        const solarSection = new SolarSection(solarPanelSurfaceM2, Settings.SEED_HALF_RANGE * rng(31), this.scene);
+        const solarSection = new SolarSection(
+            solarPanelSurfaceM2,
+            Settings.SEED_HALF_RANGE * rng(31),
+            assets.textures,
+            this.scene
+        );
         solarSection.getTransform().parent = this.getTransform();
         this.placeNode(solarSection.getTransform(), lastNode);
         lastNode = solarSection.getTransform();
         this.solarSections.push(solarSection);
 
-        lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(rng(23) * 5), rng);
+        lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(rng(23) * 5), rng, assets);
 
-        const landingBay = new LandingBay(this.model, rng(37) * Settings.SEED_HALF_RANGE, this.scene);
+        const landingBay = new LandingBay(this.model, rng(37) * Settings.SEED_HALF_RANGE, assets.textures, this.scene);
 
         this.landingBays.push(landingBay);
         this.placeNode(landingBay.getTransform(), lastNode);
@@ -259,12 +282,14 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
     private addUtilitySections(
         lastNode: TransformNode,
         nbSections: number,
-        rng: (index: number) => number
+        rng: (index: number) => number,
+        assets: Pick<Assets2, "textures">
     ): TransformNode {
         let newLastNode = lastNode;
         for (let i = 0; i < nbSections; i++) {
             const utilitySection = new UtilitySection(
                 rng(132 + 10 * this.utilitySections.length) * Settings.SEED_HALF_RANGE,
+                assets,
                 this.scene
             );
             this.utilitySections.push(utilitySection);

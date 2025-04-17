@@ -17,7 +17,7 @@
 
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { Textures } from "../assets/textures";
+import { WaterTextures } from "../assets/textures";
 
 const OceanUniformNames = {
     OCEAN_RADIUS: "ocean_radius",
@@ -76,8 +76,8 @@ export class OceanUniforms {
         return Object.values(OceanSamplerNames);
     }
 
-    setSamplers(effect: Effect) {
-        effect.setTexture(OceanSamplerNames.NORMAL_MAP_1, Textures.WATER_NORMAL_MAP_1);
-        effect.setTexture(OceanSamplerNames.NORMAL_MAP_2, Textures.WATER_NORMAL_MAP_2);
+    setSamplers(effect: Effect, textures: WaterTextures) {
+        effect.setTexture(OceanSamplerNames.NORMAL_MAP_1, textures.normalMap1);
+        effect.setTexture(OceanSamplerNames.NORMAL_MAP_2, textures.normalMap2);
     }
 }

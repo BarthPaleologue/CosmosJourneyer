@@ -21,13 +21,13 @@ import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import butterflyFragment from "../../../../shaders/butterflyMaterial/butterflyFragment.glsl";
 import butterflyVertex from "../../../../shaders/butterflyMaterial/butterflyVertex.glsl";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Textures } from "../../textures";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import {
     setStellarObjectUniforms,
     StellarObjectUniformNames
 } from "../../../postProcesses/uniforms/stellarObjectUniforms";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 
 const ButterflyMaterialUniformNames = {
     WORLD: "world",
@@ -56,7 +56,7 @@ export class ButterflyMaterial extends ShaderMaterial {
 
     private scene: Scene;
 
-    constructor(scene: Scene, isDepthMaterial: boolean) {
+    constructor(butterflyTexture: Texture, scene: Scene, isDepthMaterial: boolean) {
         const shaderName = "butterflyMaterial";
         Effect.ShadersStore[`${shaderName}FragmentShader`] = butterflyFragment;
         Effect.ShadersStore[`${shaderName}VertexShader`] = butterflyVertex;
@@ -75,7 +75,7 @@ export class ButterflyMaterial extends ShaderMaterial {
         });
 
         this.backFaceCulling = false;
-        this.setTexture(ButterflyMaterialSamplerNames.BUTTERFLY_TEXTURE, Textures.BUTTERFLY);
+        this.setTexture(ButterflyMaterialSamplerNames.BUTTERFLY_TEXTURE, butterflyTexture);
 
         this.onBindObservable.add(() => {
             setStellarObjectUniforms(this.getEffect(), this.stars);

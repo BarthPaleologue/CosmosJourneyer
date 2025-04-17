@@ -453,7 +453,7 @@ export class StarSystemView implements View {
         const ambientLight = new HemisphericLight("ambientLight", Vector3.Zero(), this.scene);
         ambientLight.intensity = 0.02;
 
-        this.postProcessManager = new PostProcessManager(this.scene);
+        this.postProcessManager = new PostProcessManager(assets.textures, this.scene);
 
         // main update loop for the star system
         this.scene.onBeforePhysicsObservable.add(() => {
@@ -519,7 +519,7 @@ export class StarSystemView implements View {
             this.player.visitedSystemHistory.push(this.starSystem.model.coordinates);
         }
 
-        this.starSystem = await StarSystemController.CreateAsync(starSystemModel, this.loader, this.scene);
+        this.starSystem = await StarSystemController.CreateAsync(starSystemModel, this.loader, this.assets, this.scene);
 
         return this.starSystem;
     }
@@ -549,7 +549,7 @@ export class StarSystemView implements View {
             });
 
             for (let i = 0; i < Math.ceil(Math.random() * 15); i++) {
-                const aiPlayer = new AiPlayerControls(this.starSystemDatabase, this.scene, this.assets.sounds);
+                const aiPlayer = new AiPlayerControls(this.starSystemDatabase, this.scene, this.assets);
 
                 const landingPad = spaceStation.getLandingPadManager().handleLandingRequest({
                     minimumPadSize: LandingPadSize.SMALL
@@ -651,7 +651,7 @@ export class StarSystemView implements View {
      * Initializes the assets using the scene of the star system view.
      */
     public async initAssets() {
-        await Assets.Init(this.scene);
+        await Assets.Init(this.assets.textures, this.scene);
     }
 
     /**
@@ -676,7 +676,7 @@ export class StarSystemView implements View {
             spaceshipSerialized,
             this.player.spareSpaceshipComponents,
             this.scene,
-            this.assets.sounds
+            this.assets
         );
         this.player.instancedSpaceships.push(spaceship);
 

@@ -15,14 +15,21 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { TransformNode } from "@babylonjs/core/Meshes";
+import { Engine } from "@babylonjs/core/Engines/engine";
+import { RawTexture } from "@babylonjs/core/Materials/Textures/rawTexture";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { Scene } from "@babylonjs/core/scene";
 
-/**
- * Describes all objects that can be moved around, rotated and scaled in the scene
- */
-export interface Transformable {
-    /**
-     * Returns the transform node of the Transformable object
-     */
-    getTransform(): TransformNode;
+export function createEmptyTexture(scene: Scene) {
+    const emptyTextureData = new Uint8Array([0, 0, 0, 0]); // RGBA
+    return new RawTexture(
+        emptyTextureData,
+        1,
+        1,
+        Engine.TEXTUREFORMAT_RGBA,
+        scene,
+        false,
+        false,
+        Texture.NEAREST_SAMPLINGMODE
+    );
 }

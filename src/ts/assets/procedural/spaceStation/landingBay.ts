@@ -34,7 +34,8 @@ import { getRotationPeriodForArtificialGravity } from "../../../utils/physics";
 import { OrbitalFacilityModel } from "../../../architecture/orbitalObjectModel";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { DeepReadonly } from "../../../utils/types";
-import { ILandingPad, LandingPadSize } from "../../../spacestation/landingPad/landingPadManager";
+import { LandingPadSize } from "../../../spacestation/landingPad/landingPadManager";
+import { Textures } from "../../textures";
 
 export class LandingBay {
     private readonly root: TransformNode;
@@ -54,9 +55,9 @@ export class LandingBay {
 
     private readonly centralLight: PointLight;
 
-    readonly landingPads: ILandingPad[] = [];
+    readonly landingPads: LandingPad[] = [];
 
-    constructor(stationModel: DeepReadonly<OrbitalFacilityModel>, seed: number, scene: Scene) {
+    constructor(stationModel: DeepReadonly<OrbitalFacilityModel>, seed: number, textures: Textures, scene: Scene) {
         this.root = new TransformNode("LandingBayRoot", scene);
 
         this.centralLight = new PointLight("LandingBayCentralLight", Vector3.Zero(), scene);
@@ -69,7 +70,11 @@ export class LandingBay {
 
         const deltaRadius = this.radius / 3;
 
-        this.metalSectionMaterial = new MetalSectionMaterial("LandingBayMetalSectionMaterial", scene);
+        this.metalSectionMaterial = new MetalSectionMaterial(
+            "LandingBayMetalSectionMaterial",
+            textures.materials.metalPanels,
+            scene
+        );
 
         const heightFactor = 2 + Math.floor(this.rng(0) * 3);
 
@@ -82,7 +87,14 @@ export class LandingBay {
 
         this.ring = createRing(this.radius, deltaRadius, heightFactor * deltaRadius, nbSteps, scene);
 
-        this.landingBayMaterial = new LandingBayMaterial(stationModel, this.radius, deltaRadius, heightFactor, scene);
+        this.landingBayMaterial = new LandingBayMaterial(
+            stationModel,
+            this.radius,
+            deltaRadius,
+            heightFactor,
+            textures.materials.spaceStation,
+            scene
+        );
         this.ring.material = this.landingBayMaterial;
 
         this.ring.parent = this.getTransform();
@@ -132,6 +144,7 @@ export class LandingBay {
                 const landingPad = new LandingPad(
                     padNumber++,
                     (i + row) % 2 === 0 ? LandingPadSize.SMALL : LandingPadSize.MEDIUM,
+                    textures,
                     scene
                 );
                 landingPad.getTransform().parent = this.getTransform();

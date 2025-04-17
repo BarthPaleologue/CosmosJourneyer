@@ -14,6 +14,7 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { createEnvironmentAggregate } from "../../../utils/havok";
 import { Material } from "@babylonjs/core/Materials/material";
+import { Assets2 } from "../../assets";
 
 export class EngineBay implements Transformable {
     private readonly root: TransformNode;
@@ -28,7 +29,7 @@ export class EngineBay implements Transformable {
 
     private readonly scene: Scene;
 
-    constructor(scene: Scene) {
+    constructor(assets: Pick<Assets2, "textures">, scene: Scene) {
         this.root = new TransformNode("EngineBayRoot", scene);
 
         this.scene = scene;
@@ -46,7 +47,11 @@ export class EngineBay implements Transformable {
         );
         this.skirt.convertToFlatShadedMesh();
 
-        this.skirtMaterial = new MetalSectionMaterial("EngineBayMetalSectionMaterial", scene);
+        this.skirtMaterial = new MetalSectionMaterial(
+            "EngineBayMetalSectionMaterial",
+            assets.textures.materials.metalPanels,
+            scene
+        );
 
         this.skirt.material = this.skirtMaterial;
         this.skirt.parent = this.root;

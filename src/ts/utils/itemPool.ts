@@ -15,14 +15,18 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { TransformNode } from "@babylonjs/core/Meshes";
+export class ItemPool<TItem> {
+    private pool: Array<TItem> = [];
 
-/**
- * Describes all objects that can be moved around, rotated and scaled in the scene
- */
-export interface Transformable {
-    /**
-     * Returns the transform node of the Transformable object
-     */
-    getTransform(): TransformNode;
+    constructor(private readonly ctor: () => TItem) {}
+
+    /** Grab one from the pool, or make a fresh one with `new ctor(...args)` */
+    get(): TItem {
+        return this.pool.pop() ?? this.ctor();
+    }
+
+    /** Return an instance to the pool */
+    release(item: TItem): void {
+        this.pool.push(item);
+    }
 }

@@ -32,6 +32,7 @@ import { getRngFromSeed } from "../../../utils/getRngFromSeed";
 import { createEnvironmentAggregate } from "../../../utils/havok";
 import { getRotationPeriodForArtificialGravity } from "../../../utils/physics";
 import { Material } from "@babylonjs/core/Materials/material";
+import { Textures } from "../../textures";
 
 export class HelixHabitat implements Transformable {
     private readonly root: TransformNode;
@@ -55,7 +56,7 @@ export class HelixHabitat implements Transformable {
     private readonly arms: Mesh[] = [];
     private readonly armAggregates: PhysicsAggregate[] = [];
 
-    constructor(requiredHabitableSurface: number, seed: number, scene: Scene) {
+    constructor(requiredHabitableSurface: number, seed: number, textures: Textures, scene: Scene) {
         this.root = new TransformNode("HelixHabitatRoot", scene);
 
         this.rng = getRngFromSeed(seed);
@@ -79,7 +80,11 @@ export class HelixHabitat implements Transformable {
 
         const attachmentNbSides = 6 + 2 * Math.floor(this.rng(4) * 2);
 
-        this.metalSectionMaterial = new MetalSectionMaterial("HelixHabitatMetalSectionMaterial", scene);
+        this.metalSectionMaterial = new MetalSectionMaterial(
+            "HelixHabitatMetalSectionMaterial",
+            textures.materials.metalPanels,
+            scene
+        );
 
         this.attachment = MeshBuilder.CreateCylinder(
             "HelixHabitatAttachment",
@@ -114,7 +119,13 @@ export class HelixHabitat implements Transformable {
         this.helix1.parent = this.getTransform();
         this.helix2.parent = this.getTransform();
 
-        this.helixMaterial = new HelixHabitatMaterial(this.radius, deltaRadius, thicknessMultipler, scene);
+        this.helixMaterial = new HelixHabitatMaterial(
+            this.radius,
+            deltaRadius,
+            thicknessMultipler,
+            textures.materials.spaceStation,
+            scene
+        );
 
         this.helix1.material = this.helixMaterial;
         this.helix2.material = this.helixMaterial;

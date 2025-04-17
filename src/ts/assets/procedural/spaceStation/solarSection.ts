@@ -30,6 +30,7 @@ import { getRngFromSeed } from "../../../utils/getRngFromSeed";
 import { createEnvironmentAggregate } from "../../../utils/havok";
 import { Material } from "@babylonjs/core/Materials/material";
 import { Materials } from "../../materials";
+import { Textures } from "../../textures";
 
 export class SolarSection implements Transformable {
     private readonly attachment: Mesh;
@@ -45,7 +46,7 @@ export class SolarSection implements Transformable {
 
     private readonly metalSectionMaterial: Material;
 
-    constructor(requiredSurface: number, seed: number, scene: Scene) {
+    constructor(requiredSurface: number, seed: number, textures: Textures, scene: Scene) {
         this.rng = getRngFromSeed(seed);
 
         const nbArms = wheelOfFortune(
@@ -84,7 +85,11 @@ export class SolarSection implements Transformable {
         );
         this.attachment.convertToFlatShadedMesh();
 
-        this.metalSectionMaterial = new MetalSectionMaterial("SolarSectionMetalMaterial", scene);
+        this.metalSectionMaterial = new MetalSectionMaterial(
+            "SolarSectionMetalMaterial",
+            textures.materials.metalPanels,
+            scene
+        );
         this.attachment.material = this.metalSectionMaterial;
 
         const hexagonOffset = attachmentThickness * (1 - Math.sqrt(3) / 2);

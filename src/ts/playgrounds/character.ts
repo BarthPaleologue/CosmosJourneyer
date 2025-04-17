@@ -76,8 +76,7 @@ export async function createCharacterDemoScene(engine: AbstractEngine): Promise<
     ground.receiveShadows = true;
 
     character.setClosestWalkableObject({
-        getTransform: () => ground,
-        dispose: () => ground.dispose()
+        getTransform: () => ground
     });
 
     scene.onBeforeRenderObservable.add(() => {

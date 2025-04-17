@@ -35,19 +35,19 @@ export class Materials {
 
     public static SOLAR_PANEL: SolarPanelMaterial;
 
-    public static Init(scene: Scene) {
-        Materials.BUTTERFLY_MATERIAL = new ButterflyMaterial(scene, false);
-        Materials.BUTTERFLY_DEPTH_MATERIAL = new ButterflyMaterial(scene, true);
+    public static Init(textures: Textures, scene: Scene) {
+        Materials.BUTTERFLY_MATERIAL = new ButterflyMaterial(textures.particles.butterfly, scene, false);
+        Materials.BUTTERFLY_DEPTH_MATERIAL = new ButterflyMaterial(textures.particles.butterfly, scene, true);
 
-        Materials.GRASS_MATERIAL = new GrassMaterial(scene, false);
-        Materials.GRASS_DEPTH_MATERIAL = new GrassMaterial(scene, true);
+        Materials.GRASS_MATERIAL = new GrassMaterial(scene, textures.noises, false);
+        Materials.GRASS_DEPTH_MATERIAL = new GrassMaterial(scene, textures.noises, true);
 
         Materials.CRATE_MATERIAL = new PBRMetallicRoughnessMaterial("crateMaterial", scene);
-        Materials.CRATE_MATERIAL.baseTexture = Textures.CRATE_ALBEDO;
-        Materials.CRATE_MATERIAL.normalTexture = Textures.CRATE_NORMAL;
-        Materials.CRATE_MATERIAL.metallicRoughnessTexture = Textures.CRATE_METALLIC_ROUGHNESS;
+        Materials.CRATE_MATERIAL.baseTexture = textures.materials.crate.albedo;
+        Materials.CRATE_MATERIAL.normalTexture = textures.materials.crate.normal;
+        Materials.CRATE_MATERIAL.metallicRoughnessTexture = textures.materials.crate.metallicRoughness;
 
-        Materials.SOLAR_PANEL = new SolarPanelMaterial(scene);
+        Materials.SOLAR_PANEL = new SolarPanelMaterial(textures.materials.solarPanel, scene);
     }
 
     static DebugMaterial(name: string, diffuse: boolean, wireframe: boolean, scene: Scene) {

@@ -440,7 +440,7 @@ export class CosmosJourneyer {
         // The right-handed system allows to use directly GLTF models without having to flip them with a transform
         mainScene.useRightHandedSystem = true;
 
-        const assets = await loadAssets(() => {});
+        const assets = await loadAssets(() => {}, mainScene);
         const soundPlayer = new SoundPlayer(assets.sounds);
         const tts = new Tts(assets.speakerVoiceLines);
 

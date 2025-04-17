@@ -20,10 +20,11 @@ import starMaterialVertex from "../../../shaders/starMaterial/vertex.glsl";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Scene } from "@babylonjs/core/scene";
-import { Textures } from "../../assets/textures";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { getRgbFromTemperature } from "../../utils/specrend";
-import { LutPoolManager } from "../../assets/lutPoolManager";
+import { createEmptyTexture } from "../../utils/proceduralTexture";
+import { ItemPool } from "../../utils/itemPool";
+import { StarMaterialLut } from "./starMaterialLut";
 
 const StarMaterialUniformNames = {
     WORLD: "world",
@@ -44,7 +45,7 @@ export class StarMaterial extends ShaderMaterial {
 
     private elapsedSeconds = 0;
 
-    constructor(seed: number, temperature: number, scene: Scene) {
+    constructor(seed: number, temperature: number, starLutPool: ItemPool<StarMaterialLut>, scene: Scene) {
         const shaderName = "starMaterial";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = starMaterialFragment;
@@ -59,10 +60,13 @@ export class StarMaterial extends ShaderMaterial {
             samplers: [...Object.values(StarMaterialSamplerNames)]
         });
 
-        this.setTexture("lut", Textures.EMPTY_TEXTURE);
-        const lut = LutPoolManager.GetStarMaterialLut(scene);
+        const emptyTexture = createEmptyTexture(scene);
+
+        this.setTexture("lut", emptyTexture);
+        const lut = starLutPool.get();
         lut.getTexture().executeWhenReady(() => {
             this.setTexture(StarMaterialSamplerNames.LUT, lut.getTexture());
+            emptyTexture.dispose();
         });
 
         this.starSeed = seed;
@@ -76,7 +80,8 @@ export class StarMaterial extends ShaderMaterial {
         });
 
         this.onDisposeObservable.addOnce(() => {
-            LutPoolManager.ReturnStarMaterialLut(lut);
+            starLutPool.release(lut);
+            emptyTexture.dispose();
         });
     }
 

@@ -21,7 +21,6 @@ import { TelluricPlanetMaterial } from "./telluricPlanetMaterial";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { ChunkTree } from "./terrain/chunks/chunkTree";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
-import { Transformable } from "../../architecture/transformable";
 import { ChunkForge } from "./terrain/chunks/chunkForge";
 import { PlanetaryMassObjectBase } from "../../architecture/planetaryMassObject";
 import { Cullable } from "../../utils/cullable";
@@ -41,8 +40,11 @@ import { OceanUniforms } from "../../ocean/oceanUniforms";
 import { TelluricPlanetModel } from "./telluricPlanetModel";
 import { TelluricSatelliteModel } from "./telluricSatelliteModel";
 import { DeepReadonly } from "../../utils/types";
-import { LightEmitter } from "../../architecture/lightEmitter";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { Assets2 } from "../../assets/assets";
+import { ItemPool } from "../../utils/itemPool";
+import { RingsLut } from "../../rings/ringsLut";
+import { CloudsLut } from "../../clouds/cloudsLut";
 
 export class TelluricPlanet
     implements
@@ -76,7 +78,11 @@ export class TelluricPlanet
      * @param model The model to build the planet or a seed for the planet in [-1, 1]
      * @param scene
      */
-    constructor(model: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>, scene: Scene) {
+    constructor(
+        model: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>,
+        assets: Assets2,
+        scene: Scene
+    ) {
         this.model = model;
 
         this.type = model.type;
@@ -113,7 +119,7 @@ export class TelluricPlanet
         }
 
         if (this.model.type === OrbitalObjectType.TELLURIC_PLANET && this.model.rings !== null) {
-            this.ringsUniforms = new RingsUniforms(this.model.rings, scene);
+            this.ringsUniforms = new RingsUniforms(this.model.rings, assets.textures.pools.ringsLut, scene);
 
             const averageRadius = (this.model.radius * (this.model.rings.ringStart + this.model.rings.ringEnd)) / 2;
             const spread = (this.model.radius * (this.model.rings.ringEnd - this.model.rings.ringStart)) / 2;
@@ -130,12 +136,17 @@ export class TelluricPlanet
         }
 
         if (this.model.clouds !== null) {
-            this.cloudsUniforms = new CloudsUniforms(this.model.clouds, scene);
+            this.cloudsUniforms = new CloudsUniforms(this.model.clouds, assets.textures.pools.cloudsLut, scene);
         } else {
             this.cloudsUniforms = null;
         }
 
-        this.material = new TelluricPlanetMaterial(this.model, scene);
+        this.material = new TelluricPlanetMaterial(
+            this.model,
+            assets.textures.terrains,
+            assets.textures.pools.telluricPlanetMaterialLut,
+            scene
+        );
 
         this.sides = [
             new ChunkTree(Direction.UP, this.model, this.aggregate, this.material, scene),
@@ -188,12 +199,12 @@ export class TelluricPlanet
         for (const side of this.sides) side.computeCulling(camera);
     }
 
-    public dispose(): void {
+    public dispose(ringsLutPool: ItemPool<RingsLut>, cloudsLutPool: ItemPool<CloudsLut>): void {
         this.sides.forEach((side) => side.dispose());
         this.sides.length = 0;
 
-        this.cloudsUniforms?.dispose();
-        this.ringsUniforms?.dispose();
+        this.cloudsUniforms?.dispose(cloudsLutPool);
+        this.ringsUniforms?.dispose(ringsLutPool);
 
         this.material.dispose();
         this.aggregate.dispose();
