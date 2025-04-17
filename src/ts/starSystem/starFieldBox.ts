@@ -23,7 +23,6 @@ import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 import { Matrix } from "@babylonjs/core/Maths/math.vector";
 import { Transformable } from "../architecture/transformable";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { Textures } from "../assets/textures";
 import { Material } from "@babylonjs/core/Materials/material";
 import { BackgroundMaterial } from "@babylonjs/core/Materials/Background/backgroundMaterial";
 import { RenderingManager } from "@babylonjs/core/Rendering/renderingManager";
@@ -33,13 +32,13 @@ export class StarFieldBox implements Transformable {
     readonly material: Material;
     readonly texture: CubeTexture;
 
-    constructor(scene: Scene) {
+    constructor(texture: CubeTexture, scene: Scene) {
         RenderingManager.MIN_RENDERINGGROUPS = Math.min(-1, RenderingManager.MIN_RENDERINGGROUPS);
 
         this.mesh = MeshBuilder.CreateBox("skybox", { size: 1000e3 }, scene);
         this.mesh.renderingGroupId = -1;
 
-        this.texture = Textures.MILKY_WAY;
+        this.texture = texture;
         this.texture.setReflectionTextureMatrix(Matrix.Identity());
 
         const material = new BackgroundMaterial("skyboxMat", scene);

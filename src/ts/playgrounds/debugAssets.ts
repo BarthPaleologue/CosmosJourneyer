@@ -22,7 +22,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { AssetsManager, BaseTexture, FreeCamera, MeshBuilder, PointLight, StandardMaterial } from "@babylonjs/core";
 import { enablePhysics } from "./utils";
 import { Objects } from "../assets/objects";
-import { Textures } from "../assets/textures";
+import { loadAssets } from "../assets/assets";
 
 export async function createDebugAssetsScene(engine: AbstractEngine): Promise<Scene> {
     const scene = new Scene(engine);
@@ -32,8 +32,9 @@ export async function createDebugAssetsScene(engine: AbstractEngine): Promise<Sc
 
     const assetsManager = new AssetsManager(scene);
     Objects.EnqueueTasks(assetsManager, scene);
-    Textures.EnqueueTasks(assetsManager, scene);
     await assetsManager.loadAsync();
+
+    await loadAssets(() => {}, scene);
 
     const camera = new FreeCamera("camera", new Vector3(0, 1, -1).scale(15), scene);
     camera.setTarget(Vector3.Zero());

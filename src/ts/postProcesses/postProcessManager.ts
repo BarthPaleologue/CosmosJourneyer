@@ -59,6 +59,7 @@ import { SierpinskiPyramidModel } from "../anomalies/sierpinskiPyramid/sierpinsk
 import { MengerSpongeModel } from "../anomalies/mengerSponge/mengerSpongeModel";
 import { CelestialBody, StellarObject } from "../architecture/orbitalObject";
 import { DeepReadonly } from "../utils/types";
+import { Textures } from "../assets/textures";
 
 /**
  * The order in which the post processes are rendered when away from a planet
@@ -207,9 +208,13 @@ export class PostProcessManager {
 
     readonly bloomRenderEffect: BloomEffect;
 
-    constructor(scene: UberScene) {
+    private readonly textures: Textures;
+
+    constructor(textures: Textures, scene: UberScene) {
         this.scene = scene;
         this.engine = scene.getEngine();
+
+        this.textures = textures;
 
         this.renderingPipelineManager = scene.postProcessRenderPipelineManager;
 
@@ -379,6 +384,7 @@ export class PostProcessManager {
                 planet.getBoundingRadius(),
                 planet.oceanUniforms,
                 stellarObjects,
+                this.textures.water,
                 this.scene
             );
             this.oceans.push(ocean);

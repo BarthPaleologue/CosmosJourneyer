@@ -544,7 +544,7 @@ export class StarSystemView implements View {
             this.player.visitedSystemHistory.push(this.starSystem.model.coordinates);
         }
 
-        this.starSystem = await StarSystemController.CreateAsync(starSystemModel, this.loader, this.scene);
+        this.starSystem = await StarSystemController.CreateAsync(starSystemModel, this.loader, this.assets, this.scene);
 
         return this.starSystem;
     }
@@ -574,7 +574,7 @@ export class StarSystemView implements View {
             });
 
             for (let i = 0; i < Math.ceil(Math.random() * 15); i++) {
-                const aiPlayer = new AiPlayerControls(this.starSystemDatabase, this.scene, this.assets.sounds);
+                const aiPlayer = new AiPlayerControls(this.starSystemDatabase, this.scene, this.assets);
 
                 const landingPad = spaceStation.getLandingPadManager().handleLandingRequest({
                     minimumPadSize: LandingPadSize.SMALL
@@ -700,7 +700,7 @@ export class StarSystemView implements View {
             spaceshipSerialized,
             this.player.spareSpaceshipComponents,
             this.scene,
-            this.assets.sounds
+            this.assets
         );
         this.player.instancedSpaceships.push(spaceship);
 

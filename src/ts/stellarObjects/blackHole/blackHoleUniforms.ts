@@ -20,8 +20,10 @@ import { BlackHoleModel } from "./blackHoleModel";
 import { getKerrMetricA } from "./blackHoleModelGenerator";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { getForwardDirection } from "../../uberCore/transforms/basicTransform";
-import { Textures } from "../../assets/textures";
 import { DeepReadonly } from "../../utils/types";
+import { Matrix } from "@babylonjs/core/Maths/math.vector";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 
 export const BlackHoleUniformNames = {
     STARFIELD_ROTATION: "starfieldRotation",
@@ -46,18 +48,20 @@ export class BlackHoleUniforms {
     schwarzschildRadius: number;
     frameDraggingFactor: number;
     time = 0;
+    backgroundTexture: CubeTexture;
 
-    constructor(blackHoleModel: DeepReadonly<BlackHoleModel>) {
+    constructor(blackHoleModel: DeepReadonly<BlackHoleModel>, backgroundTexture: CubeTexture) {
         this.accretionDiskRadius = blackHoleModel.accretionDiskRadius;
         this.rotationPeriod = 1.5;
         this.warpingMinkowskiFactor = 2.0;
         this.schwarzschildRadius = blackHoleModel.radius;
         const kerrMetricA = getKerrMetricA(blackHoleModel.mass, blackHoleModel.siderealDaySeconds);
         this.frameDraggingFactor = kerrMetricA / blackHoleModel.mass;
+        this.backgroundTexture = backgroundTexture;
     }
 
     public setUniforms(effect: Effect, blackHoleTransform: TransformNode) {
-        effect.setMatrix(BlackHoleUniformNames.STARFIELD_ROTATION, Textures.MILKY_WAY.getReflectionTextureMatrix());
+        effect.setMatrix(BlackHoleUniformNames.STARFIELD_ROTATION, this.backgroundTexture.getReflectionTextureMatrix());
         effect.setFloat(BlackHoleUniformNames.TIME, this.time);
         effect.setFloat(BlackHoleUniformNames.SCHWARZSCHILD_RADIUS, this.schwarzschildRadius);
         effect.setFloat(BlackHoleUniformNames.FRAME_DRAGGING_FACTOR, this.frameDraggingFactor);
@@ -69,6 +73,6 @@ export class BlackHoleUniforms {
     }
 
     public setSamplers(effect: Effect) {
-        effect.setTexture(BlackHoleSamplerNames.STARFIELD_TEXTURE, Textures.MILKY_WAY);
+        effect.setTexture(BlackHoleSamplerNames.STARFIELD_TEXTURE, this.backgroundTexture);
     }
 }

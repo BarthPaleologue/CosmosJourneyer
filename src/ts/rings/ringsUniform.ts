@@ -19,10 +19,10 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Scene } from "@babylonjs/core/scene";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { RingsModel } from "./ringsModel";
-import { Textures } from "../assets/textures";
 import { RingsLut } from "./ringsLut";
-import { LutPoolManager } from "../assets/lutPoolManager";
 import { DeepReadonly } from "../utils/types";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { ItemPool } from "../utils/itemPool";
 
 export const RingsUniformNames = {
     RING_START: "rings_start",
@@ -41,10 +41,10 @@ export class RingsUniforms {
 
     readonly model: DeepReadonly<RingsModel>;
 
-    constructor(model: DeepReadonly<RingsModel>, scene: Scene) {
+    constructor(model: DeepReadonly<RingsModel>, texturePool: ItemPool<RingsLut>) {
         this.model = model;
 
-        this.lut = LutPoolManager.GetRingsLut(scene);
+        this.lut = texturePool.get();
         this.lut.setModel(model);
     }
 
@@ -64,19 +64,19 @@ export class RingsUniforms {
         effect.setColor3(RingsUniformNames.RING_COLOR, new Color3(0, 0, 0));
     }
 
-    public setSamplers(effect: Effect) {
+    public setSamplers(effect: Effect, fallbackTexture: Texture) {
         if (this.lut.isReady()) {
             effect.setTexture(RingsSamplerNames.RING_LUT, this.lut.getTexture());
         } else {
-            RingsUniforms.SetEmptySamplers(effect);
+            RingsUniforms.SetEmptySamplers(effect, fallbackTexture);
         }
     }
 
-    public static SetEmptySamplers(effect: Effect) {
-        effect.setTexture(RingsSamplerNames.RING_LUT, Textures.EMPTY_TEXTURE);
+    public static SetEmptySamplers(effect: Effect, fallbackTexture: Texture) {
+        effect.setTexture(RingsSamplerNames.RING_LUT, fallbackTexture);
     }
 
-    public dispose() {
-        LutPoolManager.ReturnRingsLut(this.lut);
+    public dispose(texturePool: RingsLutPool) {
+        texturePool.returnRingsLut(this.lut);
     }
 }

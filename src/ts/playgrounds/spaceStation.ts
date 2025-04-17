@@ -23,16 +23,15 @@ import { DefaultControls } from "../defaultControls/defaultControls";
 import { SpaceStation } from "../spacestation/spaceStation";
 import { newSeededSpaceStationModel } from "../spacestation/spaceStationModelGenerator";
 import { Settings } from "../settings";
-import { newSeededStarModel } from "../stellarObjects/star/starModelGenerator";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { Star } from "../stellarObjects/star/star";
 import { AssetsManager } from "@babylonjs/core";
-import { Textures } from "../assets/textures";
 import { Materials } from "../assets/materials";
 import { Objects } from "../assets/objects";
 import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
 import { StarModel } from "../stellarObjects/star/starModel";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
+import { loadTextures } from "../assets/textures";
 
 export async function createSpaceStationScene(engine: AbstractEngine): Promise<Scene> {
     const scene = new Scene(engine);
@@ -40,11 +39,16 @@ export async function createSpaceStationScene(engine: AbstractEngine): Promise<S
 
     await enablePhysics(scene);
 
+    const textures = await loadTextures(
+        () => {},
+        () => {},
+        scene
+    );
+
     const assetsManager = new AssetsManager(scene);
-    Textures.EnqueueTasks(assetsManager, scene);
     Objects.EnqueueTasks(assetsManager, scene);
     await assetsManager.loadAsync();
-    Materials.Init(scene);
+    Materials.Init(textures, scene);
 
     const defaultControls = new DefaultControls(scene);
     defaultControls.speed = 2000;
@@ -93,7 +97,7 @@ export async function createSpaceStationScene(engine: AbstractEngine): Promise<S
         rings: null
     };
 
-    const sun = new Star(sunModel, scene);
+    const sun = new Star(sunModel, textures.pools, scene);
     sun.getTransform().position = new Vector3(7, 2, 5).normalize().scaleInPlace(distanceToStar);
 
     const spaceStationModel = newSeededSpaceStationModel(

@@ -15,14 +15,21 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { TransformNode } from "@babylonjs/core/Meshes";
+// helper to describe a constructor taking some args and producing an instance
+type Constructor<Args extends unknown[], Instance> = new (...args: Args) => Instance;
 
-/**
- * Describes all objects that can be moved around, rotated and scaled in the scene
- */
-export interface Transformable {
-    /**
-     * Returns the transform node of the Transformable object
-     */
-    getTransform(): TransformNode;
+export class ItemPool<Instance, Args extends unknown[]> {
+    private pool: Instance[] = [];
+
+    constructor(private readonly ctor: Constructor<Args, Instance>) {}
+
+    /** Grab one from the pool, or make a fresh one with `new ctor(...args)` */
+    get(...args: Args): Instance {
+        return this.pool.pop() ?? new this.ctor(...args);
+    }
+
+    /** Return an instance to the pool */
+    release(item: Instance): void {
+        this.pool.push(item);
+    }
 }

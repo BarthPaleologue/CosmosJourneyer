@@ -5,12 +5,11 @@ import { getForwardDirection, rotate } from "../uberCore/transforms/basicTransfo
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
-
 import warpConeFragment from "../../shaders/warpConeMaterial/fragment.glsl";
 import warpConeVertex from "../../shaders/warpConeMaterial/vertex.glsl";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Transformable } from "../architecture/transformable";
-import { Textures } from "../assets/textures";
+import { NoiseTextures } from "../assets/textures";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 
 /**
@@ -31,7 +30,7 @@ export class HyperSpaceTunnel implements Transformable {
 
     private elapsedSeconds = 0;
 
-    constructor(direction: Vector3, scene: Scene) {
+    constructor(direction: Vector3, scene: Scene, noiseTextures: NoiseTextures) {
         this.direction = direction;
 
         // find two orthogonal vectors to the direction vector (see  https://en.wikipedia.org/wiki/Gram%E2%80%93Schmidt_process)
@@ -69,7 +68,7 @@ export class HyperSpaceTunnel implements Transformable {
             uniforms: ["worldViewProjection", "time"],
             samplers: ["warpNoise"]
         });
-        this.warpConeMaterial.setTexture("warpNoise", Textures.SEAMLESS_PERLIN);
+        this.warpConeMaterial.setTexture("warpNoise", noiseTextures.seamlessPerlin);
 
         this.hyperTunnel.material = this.warpConeMaterial;
     }

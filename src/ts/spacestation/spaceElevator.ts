@@ -48,6 +48,8 @@ import { getSphereRadiatedEnergyFlux } from "../utils/physics";
 import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
 import { getEdibleEnergyPerHaPerDay } from "../utils/agriculture";
 import { StellarObjectModel } from "../architecture/orbitalObjectModel";
+import { Assets2 } from "../assets/assets";
+import { Materials } from "../assets/materials";
 
 export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPACE_ELEVATOR> {
     readonly name: string;
@@ -84,6 +86,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
     constructor(
         model: DeepReadonly<SpaceElevatorModel>,
         stellarObjects: ReadonlyMap<DeepReadonly<StellarObjectModel>, number>,
+        assets: Assets2,
         scene: Scene
     ) {
         this.model = model;
@@ -109,10 +112,15 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
         );
         this.tether.convertToFlatShadedMesh();
 
-        this.tetherMaterial = new MetalSectionMaterial("TetherMaterial", scene);
+        this.tetherMaterial = new MetalSectionMaterial("TetherMaterial", assets.textures.materials.metalPanels, scene);
         this.tether.material = this.tetherMaterial;
 
-        this.climber = new SpaceElevatorClimber(scene);
+        this.climber = new SpaceElevatorClimber(
+            Materials.SOLAR_PANEL,
+            assets.textures.materials.crate,
+            assets.textures.materials.metalPanels,
+            scene
+        );
         this.climber.getTransform().parent = this.tether;
 
         this.climber.getTransform().position.y = this.tetherLength / 2;

@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Scene } from "@babylonjs/core/scene";
-import { Textures } from "../../textures";
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
 import {
@@ -50,9 +49,10 @@ import {
     vec3,
     smoothstep
 } from "../../../utils/bsl";
+import { PBRTextures } from "../../textures";
 
 export class CylinderHabitatMaterial extends NodeMaterial {
-    constructor(radius: number, height: number, tesselation: number, scene: Scene) {
+    constructor(radius: number, height: number, tesselation: number, textures: PBRTextures, scene: Scene) {
         super("CylinderHabitatMaterial", scene);
         this.mode = NodeMaterialModes.Material;
 
@@ -91,12 +91,12 @@ export class CylinderHabitatMaterial extends NodeMaterial {
         const proceduralUvY = mix(distanceToCenter, scaledUvY, mask);
         const proceduralUV = vec2(proceduralUvX, proceduralUvY);
 
-        const albedo = textureSample(Textures.SPACE_STATION_ALBEDO, proceduralUV, {
+        const albedo = textureSample(textures.albedo, proceduralUV, {
             convertToLinearSpace: true
         });
-        const normalMap = textureSample(Textures.SPACE_STATION_NORMAL, proceduralUV);
-        const metallicRoughness = textureSample(Textures.SPACE_STATION_METALLIC_ROUGHNESS, proceduralUV);
-        const occlusion = textureSample(Textures.SPACE_STATION_AMBIENT_OCCLUSION, proceduralUV);
+        const normalMap = textureSample(textures.normal, proceduralUV);
+        const metallicRoughness = textureSample(textures.metallicRoughness, proceduralUV);
+        const occlusion = textureSample(textures.ambientOcclusion, proceduralUV);
 
         const perturbedNormal = perturbNormal(proceduralUV, positionW, normalW, normalMap.rgb, f(1));
 

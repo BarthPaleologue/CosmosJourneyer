@@ -29,7 +29,6 @@ import {
 } from "@babylonjs/core";
 import { enablePhysics } from "./utils";
 import { Objects } from "../assets/objects";
-import { Textures } from "../assets/textures";
 import { ShipControls } from "../spaceship/shipControls";
 import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
 import { loadSounds } from "../assets/sounds";
@@ -45,7 +44,6 @@ export async function createFlightDemoScene(engine: AbstractEngine): Promise<Sce
 
     const assetsManager = new AssetsManager(scene);
     Objects.EnqueueTasks(assetsManager, scene);
-    Textures.EnqueueTasks(assetsManager, scene);
     await assetsManager.loadAsync();
 
     const sounds = await loadSounds(

@@ -437,7 +437,7 @@ export class CosmosJourneyer {
 
         const mainScene = new UberScene(engine);
 
-        const assets = await loadAssets(() => {});
+        const assets = await loadAssets(() => {}, mainScene);
         const soundPlayer = new SoundPlayer(assets.sounds);
         const tts = new Tts(assets.speakerVoiceLines);
 

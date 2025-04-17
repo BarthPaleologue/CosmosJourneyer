@@ -21,7 +21,6 @@ import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMate
 import { OrbitalFacilityModel } from "../../../architecture/orbitalObjectModel";
 import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
 import { Settings } from "../../../settings";
-import { Textures } from "../../textures";
 import {
     abs,
     atan2,
@@ -51,6 +50,7 @@ import {
     fract
 } from "../../../utils/bsl";
 import { DeepReadonly } from "../../../utils/types";
+import { PBRTextures } from "../../textures";
 
 export class LandingBayMaterial extends NodeMaterial {
     constructor(
@@ -58,6 +58,7 @@ export class LandingBayMaterial extends NodeMaterial {
         meanRadius: number,
         deltaRadius: number,
         height: number,
+        textures: PBRTextures,
         scene: Scene
     ) {
         super("LandingBayMaterial", scene);
@@ -133,12 +134,12 @@ export class LandingBayMaterial extends NodeMaterial {
         const proceduralUvX = mul(theta, f(meanRadius / deltaRadius));
         const proceduralUV = vec2(proceduralUvX, scaledUvY);
 
-        const albedo = textureSample(Textures.SPACE_STATION_ALBEDO, proceduralUV, {
+        const albedo = textureSample(textures.albedo, proceduralUV, {
             convertToLinearSpace: true
         });
-        const normalMap = textureSample(Textures.SPACE_STATION_NORMAL, proceduralUV);
-        const metallicRoughness = textureSample(Textures.SPACE_STATION_METALLIC_ROUGHNESS, proceduralUV);
-        const occlusion = textureSample(Textures.SPACE_STATION_AMBIENT_OCCLUSION, proceduralUV);
+        const normalMap = textureSample(textures.normal, proceduralUV);
+        const metallicRoughness = textureSample(textures.metallicRoughness, proceduralUV);
+        const occlusion = textureSample(textures.ambientOcclusion, proceduralUV);
 
         const namePlateUvX = mul(theta, f(1.0 / Math.PI));
         const namePlateUvY = distanceToCenter01;

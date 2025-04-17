@@ -27,7 +27,7 @@ import {
     setStellarObjectUniforms,
     StellarObjectUniformNames
 } from "../../../postProcesses/uniforms/stellarObjectUniforms";
-import { Textures } from "../../textures";
+import { NoiseTextures } from "../../textures";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
 const GrassMaterialUniformNames = {
@@ -57,7 +57,7 @@ export class GrassMaterial extends ShaderMaterial {
 
     private planet: TransformNode | null = null;
 
-    constructor(scene: Scene, isDepthMaterial: boolean) {
+    constructor(scene: Scene, noiseTextures: NoiseTextures, isDepthMaterial: boolean) {
         const shaderName = "grassMaterial";
         Effect.ShadersStore[`${shaderName}FragmentShader`] = grassFragment;
         Effect.ShadersStore[`${shaderName}VertexShader`] = grassVertex;
@@ -76,7 +76,7 @@ export class GrassMaterial extends ShaderMaterial {
         });
 
         this.backFaceCulling = false;
-        this.setTexture("perlinNoise", Textures.SEAMLESS_PERLIN);
+        this.setTexture("perlinNoise", noiseTextures.seamlessPerlin);
 
         this.onBindObservable.add(() => {
             setStellarObjectUniforms(this.getEffect(), this.stars);

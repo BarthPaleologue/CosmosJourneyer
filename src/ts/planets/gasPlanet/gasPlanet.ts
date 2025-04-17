@@ -38,6 +38,7 @@ import { Settings } from "../../settings";
 import { PlanetaryMassObjectBase } from "../../architecture/planetaryMassObject";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { DeepReadonly } from "../../utils/types";
+import { RingsLutPool } from "../../assets/texturePools/ringsLutPool";
 
 export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_PLANET>, Cullable {
     readonly model: DeepReadonly<GasPlanetModel>;
@@ -61,7 +62,7 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
      * @param model The model to create the planet from or a seed for the planet in [-1, 1]
      * @param scene
      */
-    constructor(model: DeepReadonly<GasPlanetModel>, scene: Scene) {
+    constructor(model: DeepReadonly<GasPlanetModel>, ringsLutPool: RingsLutPool, scene: Scene) {
         this.model = model;
 
         this.mesh = MeshBuilder.CreateSphere(
@@ -96,7 +97,7 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
         this.atmosphereUniforms = new AtmosphereUniforms(this.getBoundingRadius(), atmosphereThickness);
 
         if (this.model.rings !== null) {
-            this.ringsUniforms = new RingsUniforms(this.model.rings, scene);
+            this.ringsUniforms = new RingsUniforms(this.model.rings, ringsLutPool, scene);
 
             const averageRadius = (this.model.radius * (this.model.rings.ringStart + this.model.rings.ringEnd)) / 2;
             const spread = (this.model.radius * (this.model.rings.ringEnd - this.model.rings.ringStart)) / 2;
@@ -136,12 +137,12 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
         this.mesh.isVisible = isSizeOnScreenEnough(this, camera);
     }
 
-    public dispose(): void {
+    public dispose(ringsLutPool: RingsLutPool): void {
         this.mesh.dispose();
         this.aggregate.dispose();
         this.material.dispose();
         this.asteroidField?.dispose();
-        this.ringsUniforms?.dispose();
+        this.ringsUniforms?.dispose(ringsLutPool);
     }
 
     getTransform(): TransformNode {
