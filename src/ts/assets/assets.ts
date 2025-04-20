@@ -19,7 +19,7 @@ import { AssetsManager } from "@babylonjs/core/Misc/assetsManager";
 import { Scene } from "@babylonjs/core/scene";
 import { loadTextures, Textures } from "./textures";
 import { loadSounds, Sounds } from "./sounds";
-import { Materials } from "./materials";
+import { initMaterials, Materials } from "./materials";
 import { Objects } from "./objects";
 import { loadMusics, Musics } from "./musics";
 import { loadVoiceLines, SpeakerVoiceLines } from "./voiceLines";
@@ -29,6 +29,7 @@ export type Assets2 = {
     readonly musics: Musics;
     readonly speakerVoiceLines: SpeakerVoiceLines;
     readonly textures: Textures;
+    readonly materials: Materials;
 };
 
 export async function loadAssets(
@@ -49,11 +50,14 @@ export async function loadAssets(
     const voiceLinesPromise = loadVoiceLines(progressCallbackWrapped, increaseTotalCount);
     const texturesPromise = loadTextures(progressCallbackWrapped, increaseTotalCount, scene);
 
+    const textures = await texturesPromise;
+
     return {
         sounds: await soundsPromise,
         musics: await musicsPromise,
         speakerVoiceLines: await voiceLinesPromise,
-        textures: await texturesPromise
+        textures: textures,
+        materials: initMaterials(textures, scene)
     };
 }
 
@@ -62,7 +66,7 @@ export class Assets {
 
     private static MANAGER: AssetsManager;
 
-    static async Init(textures: Textures, scene: Scene): Promise<void> {
+    static async Init(materials: Materials, scene: Scene): Promise<void> {
         Assets.MANAGER = new AssetsManager(scene);
         Assets.MANAGER.autoHideLoadingUI = false;
         console.log("Initializing assets...");
@@ -70,11 +74,9 @@ export class Assets {
         Objects.EnqueueTasks(Assets.MANAGER, scene);
 
         Assets.MANAGER.onFinish = () => {
-            Materials.Init(textures, scene);
-
-            Objects.BUTTERFLY.material = Materials.BUTTERFLY_MATERIAL;
-            Objects.GRASS_BLADES.forEach((grassBlade) => (grassBlade.material = Materials.GRASS_MATERIAL));
-            Objects.CRATE.material = Materials.CRATE_MATERIAL;
+            Objects.BUTTERFLY.material = materials.butterfly;
+            Objects.GRASS_BLADES.forEach((grassBlade) => (grassBlade.material = materials.grass));
+            Objects.CRATE.material = materials.crate;
 
             console.log("Assets loaded");
             Assets.IS_READY = true;

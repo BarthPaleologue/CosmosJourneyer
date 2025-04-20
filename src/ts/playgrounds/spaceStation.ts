@@ -26,7 +26,7 @@ import { Settings } from "../settings";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { Star } from "../stellarObjects/star/star";
 import { AssetsManager } from "@babylonjs/core";
-import { Materials } from "../assets/materials";
+import { initMaterials } from "../assets/materials";
 import { Objects } from "../assets/objects";
 import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
 import { StarModel } from "../stellarObjects/star/starModel";
@@ -40,18 +40,22 @@ export async function createSpaceStationScene(engine: AbstractEngine): Promise<S
 
     await enablePhysics(scene);
 
-    const assets: Pick<Assets2, "textures"> = {
-        textures: await loadTextures(
-            () => {},
-            () => {},
-            scene
-        )
+    const textures = await loadTextures(
+        () => {},
+        () => {},
+        scene
+    );
+
+    const materials = initMaterials(textures, scene);
+
+    const assets: Pick<Assets2, "textures" | "materials"> = {
+        textures: textures,
+        materials: materials
     };
 
     const assetsManager = new AssetsManager(scene);
     Objects.EnqueueTasks(assetsManager, scene);
     await assetsManager.loadAsync();
-    Materials.Init(assets.textures, scene);
 
     const defaultControls = new DefaultControls(scene);
     defaultControls.speed = 2000;

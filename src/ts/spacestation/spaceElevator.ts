@@ -49,7 +49,6 @@ import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels"
 import { getEdibleEnergyPerHaPerDay } from "../utils/agriculture";
 import { StellarObjectModel } from "../architecture/orbitalObjectModel";
 import { Assets2 } from "../assets/assets";
-import { Materials } from "../assets/materials";
 
 export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPACE_ELEVATOR> {
     readonly name: string;
@@ -86,7 +85,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
     constructor(
         model: DeepReadonly<SpaceElevatorModel>,
         stellarObjects: ReadonlyMap<DeepReadonly<StellarObjectModel>, number>,
-        assets: Pick<Assets2, "textures">,
+        assets: Pick<Assets2, "textures" | "materials">,
         scene: Scene
     ) {
         this.model = model;
@@ -116,7 +115,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
         this.tether.material = this.tetherMaterial;
 
         this.climber = new SpaceElevatorClimber(
-            Materials.SOLAR_PANEL,
+            assets.materials.solarPanel,
             assets.textures.materials.crate,
             assets.textures.materials.metalPanels,
             scene
@@ -177,7 +176,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
 
     private generate(
         stellarObjects: ReadonlyMap<DeepReadonly<StellarObjectModel>, number>,
-        assets: Pick<Assets2, "textures">
+        assets: Pick<Assets2, "textures" | "materials">
     ) {
         let totalStellarFlux = 0;
         stellarObjects.forEach((distance, model) => {
@@ -262,7 +261,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
         const solarSection = new SolarSection(
             solarPanelSurfaceM2,
             Settings.SEED_HALF_RANGE * rng(31),
-            assets.textures,
+            assets,
             this.scene
         );
         solarSection.getTransform().parent = this.getTransform();

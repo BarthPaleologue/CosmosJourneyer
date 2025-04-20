@@ -73,7 +73,7 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
     constructor(
         model: DeepReadonly<SpaceStationModel>,
         stellarObjects: ReadonlyMap<DeepReadonly<StellarObjectModel>, number>,
-        assets: Pick<Assets2, "textures">,
+        assets: Pick<Assets2, "textures" | "materials">,
         scene: Scene
     ) {
         this.model = model;
@@ -136,7 +136,7 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
 
     private generate(
         stellarObjects: ReadonlyMap<DeepReadonly<StellarObjectModel>, number>,
-        assets: Pick<Assets2, "textures">
+        assets: Pick<Assets2, "textures" | "materials">
     ) {
         let totalStellarFlux = 0;
         stellarObjects.forEach((distance, model) => {
@@ -175,7 +175,7 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
         const solarSection = new SolarSection(
             solarPanelSurfaceM2,
             Settings.SEED_HALF_RANGE * rng(31),
-            assets.textures,
+            assets,
             this.scene
         );
         solarSection.getTransform().parent = this.getTransform();

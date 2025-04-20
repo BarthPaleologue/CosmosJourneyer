@@ -29,8 +29,8 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import { getRngFromSeed } from "../../../utils/getRngFromSeed";
 import { createEnvironmentAggregate } from "../../../utils/havok";
 import { Material } from "@babylonjs/core/Materials/material";
-import { Materials } from "../../materials";
-import { Textures } from "../../textures";
+import { Assets2 } from "../../assets";
+import { SolarPanelMaterial } from "../solarPanel/solarPanelMaterial";
 
 export class SolarSection implements Transformable {
     private readonly attachment: Mesh;
@@ -46,7 +46,7 @@ export class SolarSection implements Transformable {
 
     private readonly metalSectionMaterial: Material;
 
-    constructor(requiredSurface: number, seed: number, textures: Textures, scene: Scene) {
+    constructor(requiredSurface: number, seed: number, assets: Pick<Assets2, "textures" | "materials">, scene: Scene) {
         this.rng = getRngFromSeed(seed);
 
         const nbArms = wheelOfFortune(
@@ -87,7 +87,7 @@ export class SolarSection implements Transformable {
 
         this.metalSectionMaterial = new MetalSectionMaterial(
             "SolarSectionMetalMaterial",
-            textures.materials.metalPanels,
+            assets.textures.materials.metalPanels,
             scene
         );
         this.attachment.material = this.metalSectionMaterial;
@@ -95,7 +95,13 @@ export class SolarSection implements Transformable {
         const hexagonOffset = attachmentThickness * (1 - Math.sqrt(3) / 2);
 
         if (nbArms === 1) {
-            this.generateSpikePattern(this.getTransform(), attachmentLength, attachmentThickness, requiredSurface);
+            this.generateSpikePattern(
+                this.getTransform(),
+                attachmentLength,
+                attachmentThickness,
+                requiredSurface,
+                assets.materials.solarPanel
+            );
         } else if (nbArms === 2) {
             const armLength = attachmentLength / 2.5;
 
@@ -114,7 +120,13 @@ export class SolarSection implements Transformable {
             arm1.rotate(Axis.X, Math.PI / 2);
             arm1.translate(Axis.Y, (armLength + attachmentThickness - hexagonOffset) / 2);
 
-            this.generateSpikePattern(arm1, armLength, attachmentThickness / 2, requiredSurface / 2);
+            this.generateSpikePattern(
+                arm1,
+                armLength,
+                attachmentThickness / 2,
+                requiredSurface / 2,
+                assets.materials.solarPanel
+            );
 
             const arm2 = MeshBuilder.CreateCylinder(
                 "Arm2",
@@ -131,13 +143,25 @@ export class SolarSection implements Transformable {
             arm2.rotate(Axis.X, -Math.PI / 2);
             arm2.translate(Axis.Y, (armLength + attachmentThickness - hexagonOffset) / 2);
 
-            this.generateSpikePattern(arm2, armLength, attachmentThickness / 2, requiredSurface / 2);
+            this.generateSpikePattern(
+                arm2,
+                armLength,
+                attachmentThickness / 2,
+                requiredSurface / 2,
+                assets.materials.solarPanel
+            );
         } else if (nbArms >= 3) {
-            this.generateStarPattern(nbArms, requiredSurface);
+            this.generateStarPattern(nbArms, requiredSurface, assets.materials.solarPanel);
         }
     }
 
-    private generateSpikePattern(arm: TransformNode, armLength: number, armThickness: number, requiredSurface: number) {
+    private generateSpikePattern(
+        arm: TransformNode,
+        armLength: number,
+        armThickness: number,
+        requiredSurface: number,
+        solarPanelMaterial: SolarPanelMaterial
+    ) {
         const scene = this.getTransform().getScene();
         const halfRequiredSurface = requiredSurface / 2;
         const armSize = armLength;
@@ -161,7 +185,7 @@ export class SolarSection implements Transformable {
                 scene
             );
             panel1.parent = arm;
-            panel1.material = Materials.SOLAR_PANEL;
+            panel1.material = solarPanelMaterial;
             panel1.translate(Axis.Y, (panelDimensionY + gap) * (i - (nbPanelsPerSide - 1) / 2));
             panel1.translate(Axis.Z, (panelDimensionX + armThickness - hexagonOffset) / 2);
             panel1.rotate(Axis.Z, Math.PI / 2);
@@ -178,7 +202,7 @@ export class SolarSection implements Transformable {
                 scene
             );
             panel2.parent = arm;
-            panel2.material = Materials.SOLAR_PANEL;
+            panel2.material = solarPanelMaterial;
             panel2.translate(Axis.Y, (panelDimensionY + gap) * (i - (nbPanelsPerSide - 1) / 2));
             panel2.translate(Axis.Z, -(panelDimensionX + armThickness - hexagonOffset) / 2);
             panel2.rotate(Axis.Z, Math.PI / 2);
@@ -187,7 +211,7 @@ export class SolarSection implements Transformable {
         }
     }
 
-    private generateStarPattern(nbArms: number, requiredSurface: number) {
+    private generateStarPattern(nbArms: number, requiredSurface: number, solarPanelMaterial: SolarPanelMaterial) {
         const scene = this.getTransform().getScene();
 
         // there will be two solar array per arm, so the surface is distributed over 2*nbArms
@@ -231,7 +255,7 @@ export class SolarSection implements Transformable {
             solarPanel1.parent = arm;
             solarPanel1.translate(Axis.X, armOffset);
             solarPanel1.translate(Axis.Z, 0.5 * (surfacePerArm / armLength + armThickness - hexagonOffset));
-            solarPanel1.material = Materials.SOLAR_PANEL;
+            solarPanel1.material = solarPanelMaterial;
 
             this.solarPanels.push(solarPanel1);
 
@@ -248,7 +272,7 @@ export class SolarSection implements Transformable {
             solarPanel2.parent = arm;
             solarPanel2.translate(Axis.X, armOffset);
             solarPanel2.translate(Axis.Z, -0.5 * (surfacePerArm / armLength + armThickness - hexagonOffset));
-            solarPanel2.material = Materials.SOLAR_PANEL;
+            solarPanel2.material = solarPanelMaterial;
 
             this.solarPanels.push(solarPanel2);
         }

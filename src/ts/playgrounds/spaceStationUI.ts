@@ -40,7 +40,7 @@ export async function createSpaceStationUIScene(engine: AbstractEngine): Promise
 
     const assets = await loadAssets(() => {}, scene);
 
-    await Assets.Init(assets.textures, scene);
+    await Assets.Init(assets.materials, scene);
 
     const soundPlayer = new SoundPlayerMock();
     const tts = new TtsMock();

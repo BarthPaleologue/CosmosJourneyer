@@ -20,6 +20,7 @@ import { ApplyTask, BuildTask, ReturnedChunkData, TaskType } from "./taskTypes";
 import { WorkerPool } from "./workerPool";
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import { ChunkForge } from "./chunkForge";
+import { Materials } from "../../../../assets/materials";
 
 export class ChunkForgeWorkers implements ChunkForge {
     /**
@@ -111,7 +112,7 @@ export class ChunkForgeWorkers implements ChunkForge {
     /**
      * Apply generated vertexData to waiting chunks
      */
-    private executeNextApplyTask() {
+    private executeNextApplyTask(materials: Materials) {
         let task = this.applyTaskQueue.shift();
         while (task !== undefined && task.chunk.hasBeenDisposed()) {
             // if the chunk has been disposed, we skip it
@@ -122,21 +123,22 @@ export class ChunkForgeWorkers implements ChunkForge {
                 task.vertexData,
                 task.instancesMatrixBuffer,
                 task.alignedInstancesMatrixBuffer,
-                task.averageHeight
+                task.averageHeight,
+                materials
             );
     }
 
     /**
      * Updates the state of the forge : dispatch tasks to workers, remove useless chunks, apply vertexData to new chunks
      */
-    public update() {
+    public update(materials: Materials) {
         for (let i = 0; i < this.workerPool.availableWorkers.length; i++) {
             this.executeNextTask(this.workerPool.availableWorkers.shift() as Worker);
         }
         this.workerPool.availableWorkers = this.workerPool.availableWorkers.concat(this.workerPool.finishedWorkers);
         this.workerPool.finishedWorkers = [];
 
-        this.executeNextApplyTask();
+        this.executeNextApplyTask(materials);
     }
 
     public reset() {

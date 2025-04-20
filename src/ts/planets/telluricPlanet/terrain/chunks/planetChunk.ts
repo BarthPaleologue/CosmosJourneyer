@@ -125,7 +125,8 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
         vertexData: VertexData,
         instancesMatrixBuffer: Float32Array,
         alignedInstancesMatrixBuffer: Float32Array,
-        averageHeight: number
+        averageHeight: number,
+        materials: Materials
     ) {
         if (this.hasBeenDisposed()) {
             throw new Error(`Tried to init ${this.mesh.name} but it has been disposed`);
@@ -184,18 +185,15 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
             ]);
             this.instancePatches.push(grassPatch);
 
-            Materials.GRASS_MATERIAL.setPlanet(this.parent);
-            Materials.GRASS_DEPTH_MATERIAL.setPlanet(this.parent);
+            materials.grass.setPlanet(this.parent);
+            materials.grassDepth.setPlanet(this.parent);
 
-            Materials.BUTTERFLY_MATERIAL.setPlanet(this.parent);
-            Materials.BUTTERFLY_DEPTH_MATERIAL.setPlanet(this.parent);
+            materials.butterfly.setPlanet(this.parent);
+            materials.butterflyDepth.setPlanet(this.parent);
 
             for (const depthRenderer of Object.values(this.getTransform().getScene()._depthRenderer)) {
-                depthRenderer.setMaterialForRendering(
-                    butterflyPatch.getLodMeshes(),
-                    Materials.BUTTERFLY_DEPTH_MATERIAL
-                );
-                depthRenderer.setMaterialForRendering(grassPatch.getLodMeshes(), Materials.GRASS_DEPTH_MATERIAL);
+                depthRenderer.setMaterialForRendering(butterflyPatch.getLodMeshes(), materials.butterflyDepth);
+                depthRenderer.setMaterialForRendering(grassPatch.getLodMeshes(), materials.grassDepth);
             }
         }
     }

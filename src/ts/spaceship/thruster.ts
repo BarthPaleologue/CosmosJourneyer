@@ -19,16 +19,12 @@ import { Vector3 } from "@babylonjs/core/Maths/math";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { SolidPlume } from "../utils/solidPlume";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { Materials } from "../assets/materials";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 
 export class Thruster {
     protected readonly maxAuthority = 3e3;
 
     readonly mesh: AbstractMesh;
-
-    readonly helperMesh: AbstractMesh;
 
     protected throttle = 0;
 
@@ -47,17 +43,6 @@ export class Thruster {
         this.plume.solidParticleSystem.mesh.parent = mesh;
 
         this.parentAggregate = parentAggregate;
-
-        const thrusterHelper = MeshBuilder.CreateCylinder(
-            this.mesh.name + "Helper",
-            { height: 0.5, diameterTop: 0, diameterBottom: 0.5 },
-            mesh.getScene()
-        );
-        thrusterHelper.material = Materials.DebugMaterial("ThrusterHelperMaterial", false, false, mesh.getScene());
-        thrusterHelper.parent = mesh;
-
-        this.helperMesh = thrusterHelper;
-        this.helperMesh.isVisible = true;
 
         this.light = new PointLight("thrusterLight", Vector3.Zero(), mesh.getScene());
         this.light.parent = mesh;
@@ -82,17 +67,10 @@ export class Thruster {
 
         this.light.intensity =
             this.lightMinIntensity + (this.lightMaxIntensity - this.lightMinIntensity) * Math.max(0, this.throttle);
-
-        if (this.throttle > 0) {
-            this.helperMesh.scaling = new Vector3(0.8, 0.8, 0.8);
-        } else {
-            this.helperMesh.scaling = new Vector3(0.5, 0.5, 0.5);
-        }
     }
 
     public dispose() {
         this.plume.solidParticleSystem.dispose();
-        this.helperMesh.dispose();
         this.mesh.dispose();
         this.light.dispose();
     }

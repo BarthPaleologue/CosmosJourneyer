@@ -58,7 +58,6 @@ import { PostProcessManager } from "../postProcesses/postProcessManager";
 import { CharacterInputs } from "../characterControls/characterControlsInputs";
 import i18n from "../i18n";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
-import { Materials } from "../assets/materials";
 import { SpaceStationLayer } from "../ui/spaceStation/spaceStationLayer";
 import { Player } from "../player/player";
 import { getNeighborStarSystemCoordinates } from "../utils/getNeighborStarSystems";
@@ -651,7 +650,7 @@ export class StarSystemView implements View {
      * Initializes the assets using the scene of the star system view.
      */
     public async initAssets() {
-        await Assets.Init(this.assets.textures, this.scene);
+        await Assets.Init(this.assets.materials, this.scene);
     }
 
     /**
@@ -716,7 +715,7 @@ export class StarSystemView implements View {
 
         const starSystem = this.getStarSystem();
 
-        this.chunkForge.update();
+        this.chunkForge.update(this.assets.materials);
 
         starSystem.update(deltaSeconds, this.chunkForge, this.postProcessManager);
     }
@@ -840,22 +839,22 @@ export class StarSystemView implements View {
         const stellarObjects = starSystem.getStellarObjects().map((object) => object.getLight());
 
         // update dynamic materials
-        Materials.BUTTERFLY_MATERIAL.update(
+        this.assets.materials.butterfly.update(
             stellarObjects,
             this.scene.getActiveControls().getTransform().getAbsolutePosition(),
             deltaSeconds
         );
-        Materials.BUTTERFLY_DEPTH_MATERIAL.update(
+        this.assets.materials.butterflyDepth.update(
             stellarObjects,
             this.scene.getActiveControls().getTransform().getAbsolutePosition(),
             deltaSeconds
         );
-        Materials.GRASS_MATERIAL.update(
+        this.assets.materials.grass.update(
             stellarObjects,
             this.scene.getActiveControls().getTransform().getAbsolutePosition(),
             deltaSeconds
         );
-        Materials.GRASS_DEPTH_MATERIAL.update(
+        this.assets.materials.grassDepth.update(
             stellarObjects,
             this.scene.getActiveControls().getTransform().getAbsolutePosition(),
             deltaSeconds
