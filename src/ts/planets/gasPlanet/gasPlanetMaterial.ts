@@ -24,14 +24,13 @@ import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Scene } from "@babylonjs/core/scene";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { Transformable } from "../../architecture/transformable";
 import {
     setStellarObjectUniforms,
     StellarObjectUniformNames
 } from "../../postProcesses/uniforms/stellarObjectUniforms";
-
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { DeepReadonly } from "../../utils/types";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
 
 const GasPlanetMaterialUniformNames = {
     WORLD: "world",
@@ -104,7 +103,7 @@ export class GasPlanetMaterial extends ShaderMaterial {
         this.setFloat(GasPlanetMaterialUniformNames.COLOR_SHARPNESS, this.colorSettings.colorSharpness);
     }
 
-    public update(stellarObjects: ReadonlyArray<Transformable>, deltaSeconds: number) {
+    public update(stellarObjects: ReadonlyArray<PointLight>, deltaSeconds: number) {
         this.elapsedSeconds += deltaSeconds;
 
         this.onBindObservable.addOnce(() => {

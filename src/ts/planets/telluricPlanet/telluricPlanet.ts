@@ -41,6 +41,8 @@ import { OceanUniforms } from "../../ocean/oceanUniforms";
 import { TelluricPlanetModel } from "./telluricPlanetModel";
 import { TelluricSatelliteModel } from "./telluricSatelliteModel";
 import { DeepReadonly } from "../../utils/types";
+import { LightEmitter } from "../../architecture/lightEmitter";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
 
 export class TelluricPlanet
     implements
@@ -170,7 +172,7 @@ export class TelluricPlanet
         for (const side of this.sides) side.update(observerPosition, chunkForge);
     }
 
-    public updateMaterial(stellarObjects: ReadonlyArray<Transformable>, deltaSeconds: number): void {
+    public updateMaterial(stellarObjects: ReadonlyArray<PointLight>, deltaSeconds: number): void {
         this.material.update(this.getTransform().getWorldMatrix(), stellarObjects);
     }
 

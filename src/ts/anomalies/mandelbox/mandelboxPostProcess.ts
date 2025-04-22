@@ -18,7 +18,6 @@
 import mandelboxFragment from "../../../shaders/mandelbox.glsl";
 import { UpdatablePostProcess } from "../../postProcesses/updatablePostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { StellarObject } from "../../architecture/orbitalObject";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { ObjectUniformNames, setObjectUniforms } from "../../postProcesses/uniforms/objectUniforms";
@@ -34,6 +33,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { MandelboxModel } from "./mandelboxModel";
 import { DeepReadonly } from "../../utils/types";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
 
 export class MandelboxPostProcess extends PostProcess implements UpdatablePostProcess {
     private elapsedSeconds = 0;
@@ -45,7 +45,7 @@ export class MandelboxPostProcess extends PostProcess implements UpdatablePostPr
         boundingRadius: number,
         model: DeepReadonly<MandelboxModel>,
         scene: Scene,
-        stellarObjects: ReadonlyArray<StellarObject>
+        stellarObjects: ReadonlyArray<PointLight>
     ) {
         const shaderName = "mandelbox";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {

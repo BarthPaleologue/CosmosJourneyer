@@ -19,7 +19,6 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 
 import oceanFragment from "../../shaders/oceanFragment.glsl";
 import { UpdatablePostProcess } from "../postProcesses/updatablePostProcess";
-import { Transformable } from "../architecture/transformable";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { CameraUniformNames, setCameraUniforms } from "../postProcesses/uniforms/cameraUniforms";
 import { setStellarObjectUniforms, StellarObjectUniformNames } from "../postProcesses/uniforms/stellarObjectUniforms";
@@ -31,6 +30,7 @@ import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { OceanUniforms } from "./oceanUniforms";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
 
 export class OceanPostProcess extends PostProcess implements UpdatablePostProcess {
     readonly planetTransform: TransformNode;
@@ -43,7 +43,7 @@ export class OceanPostProcess extends PostProcess implements UpdatablePostProces
         planetTransform: TransformNode,
         boundingRadius: number,
         oceanUniforms: OceanUniforms,
-        stellarObjects: ReadonlyArray<Transformable>,
+        stellarObjects: ReadonlyArray<PointLight>,
         scene: Scene
     ) {
         const shaderName = "ocean";

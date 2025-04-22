@@ -811,7 +811,7 @@ export class StarSystemView implements View {
         this.player.completedMissions.push(...newlyCompletedMissions);
         this.player.currentMissions = this.player.currentMissions.filter((mission) => !mission.isCompleted());
 
-        const stellarObjects = starSystem.getStellarObjects();
+        const stellarObjects = starSystem.getStellarObjects().map((object) => object.getLight());
 
         // update dynamic materials
         Materials.BUTTERFLY_MATERIAL.update(

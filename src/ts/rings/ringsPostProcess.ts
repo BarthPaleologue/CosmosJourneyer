@@ -27,10 +27,10 @@ import { CameraUniformNames, setCameraUniforms } from "../postProcesses/uniforms
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { SamplerUniformNames, setSamplerUniforms } from "../postProcesses/uniforms/samplerUniforms";
-import { Transformable } from "../architecture/transformable";
 import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { DeepReadonly } from "../utils/types";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
 
 export class RingsPostProcess extends PostProcess {
     readonly ringsUniforms: RingsUniforms;
@@ -41,7 +41,7 @@ export class RingsPostProcess extends PostProcess {
         bodyTransform: TransformNode,
         ringsUniforms: RingsUniforms,
         bodyModel: DeepReadonly<CelestialBodyModel>,
-        stellarObjects: ReadonlyArray<Transformable>,
+        stellarObjects: ReadonlyArray<PointLight>,
         scene: Scene
     ) {
         const shaderName = "rings";

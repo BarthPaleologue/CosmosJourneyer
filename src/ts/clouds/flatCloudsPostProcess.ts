@@ -19,7 +19,6 @@ import flatCloudsFragment from "../../shaders/flatCloudsFragment.glsl";
 
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { UpdatablePostProcess } from "../postProcesses/updatablePostProcess";
-import { Transformable } from "../architecture/transformable";
 import { CloudsSamplerNames, CloudsUniformNames, CloudsUniforms } from "./cloudsUniforms";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Camera } from "@babylonjs/core/Cameras/camera";
@@ -31,6 +30,7 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
 
 export class FlatCloudsPostProcess extends PostProcess implements UpdatablePostProcess {
     readonly cloudUniforms: CloudsUniforms;
@@ -41,7 +41,7 @@ export class FlatCloudsPostProcess extends PostProcess implements UpdatablePostP
         planetTransform: TransformNode,
         boundingRadius: number,
         cloudUniforms: CloudsUniforms,
-        stellarObjects: ReadonlyArray<Transformable>,
+        stellarObjects: ReadonlyArray<PointLight>,
         scene: Scene
     ) {
         const shaderName = "flatClouds";

@@ -301,7 +301,7 @@ export class StarSystemController {
                         object.getTransform(),
                         object.getRadius(),
                         object.model,
-                        stellarObjects
+                        stellarObjects.map((object) => object.getLight())
                     );
                     break;
                 case OrbitalObjectType.JULIA_SET:
@@ -309,7 +309,7 @@ export class StarSystemController {
                         object.getTransform(),
                         object.getRadius(),
                         object.model,
-                        stellarObjects
+                        stellarObjects.map((object) => object.getLight())
                     );
                     break;
                 case OrbitalObjectType.MANDELBOX:
@@ -317,7 +317,7 @@ export class StarSystemController {
                         object.getTransform(),
                         object.getRadius(),
                         object.model,
-                        stellarObjects
+                        stellarObjects.map((object) => object.getLight())
                     );
                     break;
                 case OrbitalObjectType.SIERPINSKI_PYRAMID:
@@ -325,7 +325,7 @@ export class StarSystemController {
                         object.getTransform(),
                         object.getRadius(),
                         object.model,
-                        stellarObjects
+                        stellarObjects.map((object) => object.getLight())
                     );
                     break;
                 case OrbitalObjectType.MENGER_SPONGE:
@@ -333,7 +333,7 @@ export class StarSystemController {
                         object.getTransform(),
                         object.getRadius(),
                         object.model,
-                        stellarObjects
+                        stellarObjects.map((object) => object.getLight())
                     );
                     break;
             }
@@ -525,7 +525,10 @@ export class StarSystemController {
         const planetaryMassObjects = this.getPlanetaryMassObjects();
 
         for (const planet of planetaryMassObjects) {
-            planet.updateMaterial(stellarObjects, deltaSeconds);
+            planet.updateMaterial(
+                stellarObjects.map((object) => object.getLight()),
+                deltaSeconds
+            );
         }
 
         for (const stellarObject of stellarObjects) {

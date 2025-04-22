@@ -28,7 +28,6 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { Cullable } from "../../utils/cullable";
 import { RingsUniforms } from "../../rings/ringsUniform";
-import { Transformable } from "../../architecture/transformable";
 import { Scene } from "@babylonjs/core/scene";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
@@ -38,6 +37,7 @@ import { Settings } from "../../settings";
 import { PlanetaryMassObjectBase } from "../../architecture/planetaryMassObject";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { DeepReadonly } from "../../utils/types";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
 
 export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_PLANET>, Cullable {
     readonly model: DeepReadonly<GasPlanetModel>;
@@ -115,7 +115,7 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
         this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());
     }
 
-    updateMaterial(stellarObjects: ReadonlyArray<Transformable>, deltaSeconds: number): void {
+    updateMaterial(stellarObjects: ReadonlyArray<PointLight>, deltaSeconds: number): void {
         this.material.update(stellarObjects, deltaSeconds);
     }
 

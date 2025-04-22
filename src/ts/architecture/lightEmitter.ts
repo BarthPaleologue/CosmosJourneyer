@@ -16,9 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
-import { CelestialBodyBase } from "./celestialBody";
-import { OrbitalObjectType } from "./orbitalObjectType";
 
-export interface PlanetaryMassObjectBase<T extends OrbitalObjectType> extends CelestialBodyBase<T> {
-    updateMaterial(stellarObjects: ReadonlyArray<PointLight>, deltaSeconds: number): void;
+export interface LightEmitter {
+    getLight(): PointLight;
 }

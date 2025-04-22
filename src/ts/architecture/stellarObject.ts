@@ -15,10 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { CelestialBodyBase } from "./celestialBody";
 import { OrbitalObjectType } from "./orbitalObjectType";
+import { LightEmitter } from "./lightEmitter";
 
-export interface StellarObjectBase<T extends OrbitalObjectType> extends CelestialBodyBase<T> {
-    getLight(): PointLight;
-}
+export interface StellarObjectBase<T extends OrbitalObjectType> extends CelestialBodyBase<T>, LightEmitter {}
