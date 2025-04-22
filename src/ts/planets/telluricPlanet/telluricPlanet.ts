@@ -41,7 +41,7 @@ import { TelluricPlanetModel } from "./telluricPlanetModel";
 import { TelluricSatelliteModel } from "./telluricSatelliteModel";
 import { DeepReadonly } from "../../utils/types";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
-import { Assets2 } from "../../assets/assets";
+import { Assets } from "../../assets/assets";
 import { ItemPool } from "../../utils/itemPool";
 import { RingsLut } from "../../rings/ringsLut";
 import { CloudsLut } from "../../clouds/cloudsLut";
@@ -80,7 +80,7 @@ export class TelluricPlanet
      */
     constructor(
         model: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>,
-        assets: Assets2,
+        assets: Assets,
         scene: Scene
     ) {
         this.model = model;

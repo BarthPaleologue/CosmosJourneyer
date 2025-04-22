@@ -20,13 +20,13 @@ import { AiSpaceshipControls } from "../spaceship/aiSpaceshipControls";
 import { Spaceship } from "../spaceship/spaceship";
 import { Player } from "./player";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-import { Assets2 } from "../assets/assets";
+import { Assets } from "../assets/assets";
 
 export class AiPlayerControls {
     readonly player: Player;
     readonly spaceshipControls: AiSpaceshipControls;
 
-    constructor(starSystemDatabase: StarSystemDatabase, scene: Scene, assets: Assets2) {
+    constructor(starSystemDatabase: StarSystemDatabase, scene: Scene, assets: Assets) {
         this.player = Player.Default(starSystemDatabase);
         this.player.setName("AI");
 

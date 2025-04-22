@@ -75,7 +75,7 @@ export class AsteroidPatch {
         this.clearInstances();
     }
 
-    public update(controlsPosition: Vector3, deltaSeconds: number): void {
+    public update(controlsPosition: Vector3, objects: Objects, deltaSeconds: number): void {
         this.instances.forEach((instance, index) => {
             const distanceToCamera = Vector3.Distance(controlsPosition, instance.getAbsolutePosition());
             if (
@@ -92,7 +92,7 @@ export class AsteroidPatch {
                 instancePhysicsBody.setAngularVelocity(this.rotationAxes[index].scale(this.rotationSpeeds[index]));
                 instancePhysicsBody.setAngularDamping(0);
                 instancePhysicsBody.disablePreStep = false;
-                instancePhysicsBody.shape = Objects.ASTEROID_PHYSICS_SHAPES[this.typeIndices[index]];
+                instancePhysicsBody.shape = objects.asteroidPhysicsShapes[this.typeIndices[index]];
                 this.instancePhysicsBodies.push(instancePhysicsBody);
             } else if (
                 distanceToCamera > this.physicsRadius + 1000 &&
@@ -116,7 +116,7 @@ export class AsteroidPatch {
         for (let i = 0; i < this.batchSize; i++) {
             if (this.nbInstances === this.positions.length) return;
 
-            const instance = Objects.ASTEROIDS[this.typeIndices[this.nbInstances]].createInstance(
+            const instance = objects.asteroids[this.typeIndices[this.nbInstances]].createInstance(
                 `${this.parent.name}_AsteroidInstance${this.nbInstances}`
             );
             instance.position.copyFrom(this.positions[this.nbInstances]);

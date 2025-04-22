@@ -67,7 +67,7 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { OrbitalObjectType } from "./architecture/orbitalObjectType";
 import { positionNearObject } from "./utils/positionNearObject";
 import { StarMapTutorial } from "./tutorials/starMapTutorial";
-import { Assets2, loadAssets } from "./assets/assets";
+import { Assets, loadAssets } from "./assets/assets";
 import { ISoundPlayer, SoundPlayer } from "./audio/soundPlayer";
 import { UberScene } from "./uberCore/uberScene";
 import { Tts } from "./audio/tts";
@@ -93,7 +93,7 @@ declare global {
 export class CosmosJourneyer {
     readonly engine: AbstractEngine;
 
-    readonly assets: Assets2;
+    readonly assets: Assets;
 
     readonly starSystemView: StarSystemView;
     readonly starMap: StarMap;
@@ -139,7 +139,7 @@ export class CosmosJourneyer {
     private constructor(
         player: Player,
         engine: AbstractEngine,
-        assets: Assets2,
+        assets: Assets,
         starSystemView: StarSystemView,
         encyclopaedia: EncyclopaediaGalacticaManager,
         starSystemDatabase: StarSystemDatabase,
@@ -457,7 +457,6 @@ export class CosmosJourneyer {
             assets
         );
 
-        await starSystemView.initAssets();
         await starSystemView.resetPlayer();
 
         if (!navigator.keyboard) {

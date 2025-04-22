@@ -35,7 +35,7 @@ import { HavokPhysicsWithBindings } from "@babylonjs/havok";
 import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge";
 import { DefaultControls } from "../defaultControls/defaultControls";
 import { CharacterControls } from "../characterControls/characterControls";
-import { Assets, Assets2 } from "../assets/assets";
+import { Assets } from "../assets/assets";
 import {
     getForwardDirection,
     getRotationQuaternion,
@@ -84,6 +84,8 @@ import { DeepReadonly } from "../utils/types";
 import { LandingPadSize } from "../spacestation/landingPad/landingPadManager";
 import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
 import { ITts, Speaker, VoiceLine } from "../audio/tts";
+import { alertModal } from "../utils/dialogModal";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
 
 // register cosmos journeyer as part of window object
 declare global {
@@ -217,7 +219,7 @@ export class StarSystemView implements View {
     private readonly soundPlayer: ISoundPlayer;
     private readonly tts: ITts;
 
-    private readonly assets: Assets2;
+    private readonly assets: Assets;
 
     /**
      * Creates an empty star system view with a scene, a gui and a havok plugin
@@ -235,7 +237,7 @@ export class StarSystemView implements View {
         starSystemDatabase: StarSystemDatabase,
         soundPlayer: ISoundPlayer,
         tts: ITts,
-        assets: Assets2
+        assets: Assets
     ) {
         this.player = player;
         this.encyclopaedia = encyclopaedia;
@@ -647,13 +649,6 @@ export class StarSystemView implements View {
     }
 
     /**
-     * Initializes the assets using the scene of the star system view.
-     */
-    public async initAssets() {
-        await Assets.Init(this.assets.materials, this.scene);
-    }
-
-    /**
      * Call this when the player object is changed when loading a save.
      * It will remove the current controls and recreate them based on the player object.
      */
@@ -690,9 +685,14 @@ export class StarSystemView implements View {
         }
 
         if (this.characterControls === null) {
-            this.characterControls = new CharacterControls(this.scene);
-            this.characterControls.getTransform().setEnabled(false);
-            this.characterControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
+            const character = this.assets.objects.character.instantiateHierarchy(null);
+            if (!(character instanceof Mesh)) {
+                await alertModal("Character model is not a mesh!", this.soundPlayer);
+            } else {
+                this.characterControls = new CharacterControls(character, this.scene);
+                this.characterControls.getTransform().setEnabled(false);
+                this.characterControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
+            }
         }
 
         await this.scene.setActiveControls(this.spaceshipControls);
@@ -715,7 +715,7 @@ export class StarSystemView implements View {
 
         const starSystem = this.getStarSystem();
 
-        this.chunkForge.update(this.assets.materials);
+        this.chunkForge.update(this.assets);
 
         starSystem.update(deltaSeconds, this.chunkForge, this.postProcessManager);
     }

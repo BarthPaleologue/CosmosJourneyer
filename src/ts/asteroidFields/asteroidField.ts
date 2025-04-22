@@ -18,9 +18,9 @@
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { IDisposable, Scene } from "@babylonjs/core/scene";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Objects } from "../assets/objects";
 import { AsteroidPatch } from "./asteroidPatch";
 import { getRngFromSeed } from "../utils/getRngFromSeed";
+import { Objects } from "../assets/objects";
 
 /**
  * An asteroid field is basically a collection of instance chunks that can be created and destroyed depending on where the player is.
@@ -78,7 +78,7 @@ export class AsteroidField implements IDisposable {
      * @param cameraWorldPosition The position of the camera in world space
      * @param deltaSeconds The seconds elapsed since last frame
      */
-    public update(cameraWorldPosition: Vector3, deltaSeconds: number) {
+    public update(cameraWorldPosition: Vector3, objects: Objects, deltaSeconds: number) {
         const planetInverseWorld = this.parent.getWorldMatrix().clone().invert();
 
         const cameraLocalPosition = Vector3.TransformCoordinates(cameraWorldPosition, planetInverseWorld);
@@ -102,7 +102,7 @@ export class AsteroidField implements IDisposable {
 
                 this.patches.delete(key);
             } else {
-                patch.update(cameraWorldPosition, deltaSeconds);
+                patch.update(cameraWorldPosition, objects, deltaSeconds);
             }
         }
 
@@ -134,6 +134,7 @@ export class AsteroidField implements IDisposable {
                         this.patchThickness,
                         this.minRadius,
                         this.maxRadius,
+                        objects.asteroids.length - 1,
                         this.rng
                     );
                 const patch = new AsteroidPatch(
@@ -177,6 +178,7 @@ export class AsteroidField implements IDisposable {
         patchThickness: number,
         minRadius: number,
         maxRadius: number,
+        maxTypeIndex: number,
         rng: (index: number) => number
     ): [Vector3[], Quaternion[], number[], Vector3[], number[]] {
         const positions = [];
@@ -202,7 +204,7 @@ export class AsteroidField implements IDisposable {
 
                 const positionY = position.y + (rng(asteroidIndex + 8781) - 0.5) * patchThickness;
 
-                const asteroidTypeIndex = Math.floor(rng(asteroidIndex + 6549) * Objects.ASTEROIDS.length);
+                const asteroidTypeIndex = Math.floor(rng(asteroidIndex + 6549) * (maxTypeIndex + 1));
 
                 positions.push(new Vector3(positionX, positionY, positionZ));
 

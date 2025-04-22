@@ -9,10 +9,9 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { CollisionMask, Settings } from "../../../settings";
 import i18n from "../../../i18n";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
-import { Objects } from "../../objects";
 import { ObjectTargetCursorType, TargetInfo } from "../../../architecture/targetable";
 import { ILandingPad, LandingPadSize } from "../../../spacestation/landingPad/landingPadManager";
-import { Textures } from "../../textures";
+import { Assets } from "../../assets";
 
 export class LandingPad implements ILandingPad {
     private readonly deck: Mesh;
@@ -31,28 +30,36 @@ export class LandingPad implements ILandingPad {
 
     readonly padHeight = 0.5;
 
-    constructor(padNumber: number, padSize: LandingPadSize, textures: Textures, scene: Scene) {
+    private readonly width: number;
+    private readonly depth: number;
+
+    constructor(
+        padNumber: number,
+        padSize: LandingPadSize,
+        assets: Pick<Assets, "textures" | "objects">,
+        scene: Scene
+    ) {
         this.padSize = padSize;
 
-        const width = 40 * padSize;
-        const depth = width * Settings.LANDING_PAD_ASPECT_RATIO;
+        this.width = 40 * padSize;
+        this.depth = this.width * Settings.LANDING_PAD_ASPECT_RATIO;
 
-        this.boundingRadius = depth / 2;
+        this.boundingRadius = this.depth / 2;
 
         this.padNumber = padNumber;
 
         this.deckMaterial = new LandingPadMaterial(
             padNumber,
-            textures.materials.concrete,
-            textures.pools.landingPad,
+            assets.textures.materials.concrete,
+            assets.textures.pools.landingPad,
             scene
         );
 
         this.deck = MeshBuilder.CreateBox(
             `Landing Pad ${padNumber}`,
             {
-                width: width,
-                depth: depth,
+                width: this.width,
+                depth: this.depth,
                 height: this.padHeight
             },
             scene
@@ -65,12 +72,22 @@ export class LandingPad implements ILandingPad {
         this.deckAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
 
         const nbBoxes = Math.floor(Math.random() * 5);
-        for (let i = 0; i < nbBoxes; i++) {
+        this.scatterAssets(assets.objects.crate, nbBoxes);
+
+        this.targetInfo = {
+            type: ObjectTargetCursorType.LANDING_PAD,
+            minDistance: this.getBoundingRadius() * 4.0,
+            maxDistance: this.getBoundingRadius() * 6.0
+        };
+    }
+
+    scatterAssets(asset: Mesh, nbScatter: number) {
+        for (let i = 0; i < nbScatter; i++) {
             const corner1 = Math.random() < 0.5 ? -1 : 1;
             const corner2 = Math.random() < 0.5 ? -1 : 1;
 
             const crateSize = Math.random() < 0.2 ? 0.5 : 1;
-            const crate = Objects.CRATE.createInstance(`crate${i}`);
+            const crate = asset.createInstance(`crate${i}`);
             crate.scaling.scaleInPlace(crateSize);
             crate.parent = this.deck;
             crate.position.y += 0.25 + crateSize / 2;
@@ -78,8 +95,8 @@ export class LandingPad implements ILandingPad {
             let nbTries = 0;
             const maxTries = 10;
             do {
-                crate.position.x = (corner1 * (width - 10 * Math.random() - 3)) / 2;
-                crate.position.z = (corner2 * (depth - 10 * Math.random() - 3)) / 2;
+                crate.position.x = (corner1 * (this.width - 10 * Math.random() - 3)) / 2;
+                crate.position.z = (corner2 * (this.depth - 10 * Math.random() - 3)) / 2;
                 crate.rotation.y = Math.random() * Math.PI * 2;
                 nbTries++;
                 if (nbTries > maxTries) {
@@ -92,12 +109,6 @@ export class LandingPad implements ILandingPad {
                 this.crates.push(crate);
             }
         }
-
-        this.targetInfo = {
-            type: ObjectTargetCursorType.LANDING_PAD,
-            minDistance: this.getBoundingRadius() * 4.0,
-            maxDistance: this.getBoundingRadius() * 6.0
-        };
     }
 
     getPadNumber(): number {

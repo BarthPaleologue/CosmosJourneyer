@@ -15,27 +15,27 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AssetsManager } from "@babylonjs/core/Misc/assetsManager";
 import { Scene } from "@babylonjs/core/scene";
 import { loadTextures, Textures } from "./textures";
 import { loadSounds, Sounds } from "./sounds";
 import { initMaterials, Materials } from "./materials";
-import { Objects } from "./objects";
+import { loadObjects, Objects } from "./objects";
 import { loadMusics, Musics } from "./musics";
 import { loadVoiceLines, SpeakerVoiceLines } from "./voiceLines";
 
-export type Assets2 = {
+export type Assets = {
     readonly sounds: Sounds;
     readonly musics: Musics;
     readonly speakerVoiceLines: SpeakerVoiceLines;
     readonly textures: Textures;
     readonly materials: Materials;
+    readonly objects: Objects;
 };
 
 export async function loadAssets(
     progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void,
     scene: Scene
-): Promise<Assets2> {
+): Promise<Assets> {
     let allAssetsTotalCount = 0;
     const increaseTotalCount = (nbItems: number) => {
         allAssetsTotalCount += nbItems;
@@ -52,36 +52,16 @@ export async function loadAssets(
 
     const textures = await texturesPromise;
 
+    const materials = initMaterials(textures, scene);
+
+    const objectsPromise = loadObjects(materials, textures, scene, progressCallbackWrapped, increaseTotalCount);
+
     return {
         sounds: await soundsPromise,
         musics: await musicsPromise,
         speakerVoiceLines: await voiceLinesPromise,
         textures: textures,
-        materials: initMaterials(textures, scene)
+        materials: materials,
+        objects: await objectsPromise
     };
-}
-
-export class Assets {
-    static IS_READY = false;
-
-    private static MANAGER: AssetsManager;
-
-    static async Init(materials: Materials, scene: Scene): Promise<void> {
-        Assets.MANAGER = new AssetsManager(scene);
-        Assets.MANAGER.autoHideLoadingUI = false;
-        console.log("Initializing assets...");
-
-        Objects.EnqueueTasks(Assets.MANAGER, scene);
-
-        Assets.MANAGER.onFinish = () => {
-            Objects.BUTTERFLY.material = materials.butterfly;
-            Objects.GRASS_BLADES.forEach((grassBlade) => (grassBlade.material = materials.grass));
-            Objects.CRATE.material = materials.crate;
-
-            console.log("Assets loaded");
-            Assets.IS_READY = true;
-        };
-
-        await Assets.MANAGER.loadAsync();
-    }
 }

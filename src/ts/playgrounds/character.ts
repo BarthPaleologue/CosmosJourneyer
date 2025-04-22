@@ -19,7 +19,7 @@ import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import {
-    AssetsManager,
+    AbstractMesh,
     Color3,
     DirectionalLight,
     HemisphericLight,
@@ -30,9 +30,11 @@ import {
     ShadowGenerator
 } from "@babylonjs/core";
 import { enablePhysics } from "./utils";
-import { Objects } from "../assets/objects";
 import { CharacterControls } from "../characterControls/characterControls";
 import { CharacterInputs } from "../characterControls/characterControlsInputs";
+import { loadObjects } from "../assets/objects";
+import { loadTextures } from "../assets/textures";
+import { initMaterials } from "../assets/materials";
 
 export async function createCharacterDemoScene(engine: AbstractEngine): Promise<Scene> {
     const scene = new Scene(engine);
@@ -44,9 +46,27 @@ export async function createCharacterDemoScene(engine: AbstractEngine): Promise<
         await engine.getRenderingCanvas()?.requestPointerLock();
     });
 
-    const assetsManager = new AssetsManager(scene);
-    Objects.EnqueueTasks(assetsManager, scene);
-    await assetsManager.loadAsync();
+    const textures = await loadTextures(
+        () => {
+            console.log("Loading textures...");
+            engine.loadingUIText = "Loading textures...";
+        },
+        () => {},
+        scene
+    );
+
+    const materials = await initMaterials(textures, scene);
+
+    const objects = await loadObjects(
+        materials,
+        textures,
+        scene,
+        () => {
+            console.log("Loading objects...");
+            engine.loadingUIText = "Loading objects...";
+        },
+        () => {}
+    );
 
     const light = new DirectionalLight("dir01", new Vector3(1, -2, -1), scene);
     light.position = new Vector3(5, 5, 5).scaleInPlace(10);
@@ -57,7 +77,12 @@ export async function createCharacterDemoScene(engine: AbstractEngine): Promise<
     const shadowGenerator = new ShadowGenerator(1024, light);
     shadowGenerator.useBlurExponentialShadowMap = true;
 
-    const character = new CharacterControls(scene);
+    const characterObject = objects.character.instantiateHierarchy(null);
+    if (!(characterObject instanceof AbstractMesh)) {
+        throw new Error("Character object is null");
+    }
+
+    const character = new CharacterControls(characterObject, scene);
     character.getTransform().position.y = 30;
 
     character.getActiveCamera().attachControl();

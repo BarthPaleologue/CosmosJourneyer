@@ -23,7 +23,7 @@ import { SpaceStationLayer } from "../ui/spaceStation/spaceStationLayer";
 import { Player } from "../player/player";
 import { EncyclopaediaGalacticaManager } from "../society/encyclopaediaGalacticaManager";
 import { initI18n } from "../i18n";
-import { Assets, loadAssets } from "../assets/assets";
+import { loadAssets } from "../assets/assets";
 import { enablePhysics } from "./utils";
 import { Spaceship } from "../spaceship/spaceship";
 import { ShipControls } from "../spaceship/shipControls";
@@ -38,9 +38,9 @@ export async function createSpaceStationUIScene(engine: AbstractEngine): Promise
 
     await initI18n();
 
-    const assets = await loadAssets(() => {}, scene);
-
-    await Assets.Init(assets.materials, scene);
+    const assets = await loadAssets((current, total, name) => {
+        engine.loadingUIText = `${current} / ${total} - ${name}`;
+    }, scene);
 
     const soundPlayer = new SoundPlayerMock();
     const tts = new TtsMock();

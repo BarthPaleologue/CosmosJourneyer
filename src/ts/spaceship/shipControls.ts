@@ -50,7 +50,7 @@ import { canEngageWarpDrive } from "./components/warpDriveUtils";
 import { LandingPadSize } from "../spacestation/landingPad/landingPadManager";
 import { ITts, Speaker, VoiceLine } from "../audio/tts";
 import { ISoundPlayer } from "../audio/soundPlayer";
-import { Assets2 } from "../assets/assets";
+import { Assets } from "../assets/assets";
 
 export class ShipControls implements Controls {
     private spaceship: Spaceship;
@@ -490,7 +490,7 @@ export class ShipControls implements Controls {
         return this.spaceship;
     }
 
-    static CreateDefault(scene: Scene, assets: Assets2, tts: ITts, soundPlayer: ISoundPlayer) {
+    static CreateDefault(scene: Scene, assets: Assets, tts: ITts, soundPlayer: ISoundPlayer) {
         return new ShipControls(Spaceship.CreateDefault(scene, assets), scene, soundPlayer, tts);
     }
 

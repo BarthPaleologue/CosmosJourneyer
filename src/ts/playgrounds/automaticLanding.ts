@@ -20,11 +20,10 @@ import { Scene } from "@babylonjs/core/scene";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { LandingPad } from "../assets/procedural/landingPad/landingPad";
-import { AssetsManager, MeshBuilder, PhysicsAggregate, PhysicsShapeType, Quaternion } from "@babylonjs/core";
+import { MeshBuilder, PhysicsAggregate, PhysicsShapeType, Quaternion } from "@babylonjs/core";
 import { enablePhysics } from "./utils";
 import { DefaultControls } from "../defaultControls/defaultControls";
 import { Spaceship } from "../spaceship/spaceship";
-import { Objects } from "../assets/objects";
 import { randRange } from "extended-random";
 import { CollisionMask } from "../settings";
 import { LandingPadSize } from "../spacestation/landingPad/landingPadManager";
@@ -35,10 +34,6 @@ export async function createAutomaticLandingScene(engine: AbstractEngine): Promi
     scene.useRightHandedSystem = true;
 
     await enablePhysics(scene);
-
-    const assetsManager = new AssetsManager(scene);
-    Objects.EnqueueTasks(assetsManager, scene);
-    await assetsManager.loadAsync();
 
     const assets = await loadAssets(() => {}, scene);
 
@@ -58,7 +53,7 @@ export async function createAutomaticLandingScene(engine: AbstractEngine): Promi
     camera.minZ = 0.1;
     camera.attachControl();
 
-    new LandingPad(42, LandingPadSize.SMALL, assets.textures, scene);
+    new LandingPad(42, LandingPadSize.SMALL, assets, scene);
 
     const ground = MeshBuilder.CreateBox("ground", { width: 100, height: 1, depth: 100 }, scene);
     ground.position.y = -2;

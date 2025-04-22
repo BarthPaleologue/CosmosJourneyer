@@ -19,9 +19,8 @@ import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { AssetsManager, BaseTexture, FreeCamera, MeshBuilder, PointLight, StandardMaterial } from "@babylonjs/core";
+import { BaseTexture, FreeCamera, MeshBuilder, PointLight, StandardMaterial } from "@babylonjs/core";
 import { enablePhysics } from "./utils";
-import { Objects } from "../assets/objects";
 import { loadAssets } from "../assets/assets";
 
 export async function createDebugAssetsScene(engine: AbstractEngine): Promise<Scene> {
@@ -29,10 +28,6 @@ export async function createDebugAssetsScene(engine: AbstractEngine): Promise<Sc
     scene.useRightHandedSystem = true;
 
     await enablePhysics(scene);
-
-    const assetsManager = new AssetsManager(scene);
-    Objects.EnqueueTasks(assetsManager, scene);
-    await assetsManager.loadAsync();
 
     await loadAssets(() => {}, scene);
 

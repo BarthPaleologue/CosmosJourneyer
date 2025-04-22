@@ -25,14 +25,13 @@ import { newSeededSpaceStationModel } from "../spacestation/spaceStationModelGen
 import { Settings } from "../settings";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { Star } from "../stellarObjects/star/star";
-import { AssetsManager } from "@babylonjs/core";
 import { initMaterials } from "../assets/materials";
-import { Objects } from "../assets/objects";
 import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
 import { StarModel } from "../stellarObjects/star/starModel";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { loadTextures } from "../assets/textures";
-import { Assets2 } from "../assets/assets";
+import { Assets } from "../assets/assets";
+import { loadObjects } from "../assets/objects";
 
 export async function createSpaceStationScene(engine: AbstractEngine): Promise<Scene> {
     const scene = new Scene(engine);
@@ -48,14 +47,19 @@ export async function createSpaceStationScene(engine: AbstractEngine): Promise<S
 
     const materials = initMaterials(textures, scene);
 
-    const assets: Pick<Assets2, "textures" | "materials"> = {
-        textures: textures,
-        materials: materials
-    };
+    const objects = await loadObjects(
+        materials,
+        textures,
+        scene,
+        () => {},
+        () => {}
+    );
 
-    const assetsManager = new AssetsManager(scene);
-    Objects.EnqueueTasks(assetsManager, scene);
-    await assetsManager.loadAsync();
+    const assets: Pick<Assets, "textures" | "materials" | "objects"> = {
+        textures: textures,
+        materials: materials,
+        objects: objects
+    };
 
     const defaultControls = new DefaultControls(scene);
     defaultControls.speed = 2000;

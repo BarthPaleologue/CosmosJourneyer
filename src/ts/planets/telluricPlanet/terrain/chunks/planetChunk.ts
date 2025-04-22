@@ -35,11 +35,10 @@ import { Transformable } from "../../../../architecture/transformable";
 import { CollisionMask } from "../../../../settings";
 import { InstancePatch } from "../instancePatch/instancePatch";
 import { Cullable } from "../../../../utils/cullable";
-import { Materials } from "../../../../assets/materials";
-import { Objects } from "../../../../assets/objects";
 import { TelluricPlanetModel } from "../../telluricPlanetModel";
 import { TelluricSatelliteModel } from "../../telluricSatelliteModel";
 import { DeepReadonly } from "../../../../utils/types";
+import { Assets } from "../../../../assets/assets";
 
 export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
     public readonly mesh: Mesh;
@@ -126,7 +125,7 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
         instancesMatrixBuffer: Float32Array,
         alignedInstancesMatrixBuffer: Float32Array,
         averageHeight: number,
-        materials: Materials
+        assets: Pick<Assets, "materials" | "objects">
     ) {
         if (this.hasBeenDisposed()) {
             throw new Error(`Tried to init ${this.mesh.name} but it has been disposed`);
@@ -162,7 +161,7 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
         if (instancesMatrixBuffer.length === 0) return;
 
         const rockPatch = new InstancePatch(this.parent, randomDownSample(alignedInstancesMatrixBuffer, 3200));
-        rockPatch.createInstances([{ mesh: Objects.ROCK, distance: 0 }]);
+        rockPatch.createInstances([{ mesh: assets.objects.rock, distance: 0 }]);
         this.instancePatches.push(rockPatch);
 
         if (
@@ -171,29 +170,29 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
             this.getAverageHeight() > this.planetModel.ocean.depth + 50
         ) {
             const treePatch = new InstancePatch(this.parent, randomDownSample(instancesMatrixBuffer, 4800));
-            treePatch.createInstances([{ mesh: Objects.TREE, distance: 0 }]);
+            treePatch.createInstances([{ mesh: assets.objects.tree, distance: 0 }]);
             this.instancePatches.push(treePatch);
 
             const butterflyPatch = new ThinInstancePatch(randomDownSample(instancesMatrixBuffer, 800));
-            butterflyPatch.createInstances([{ mesh: Objects.BUTTERFLY, distance: 0 }]);
+            butterflyPatch.createInstances([{ mesh: assets.objects.butterfly, distance: 0 }]);
             this.instancePatches.push(butterflyPatch);
 
             const grassPatch = new ThinInstancePatch(alignedInstancesMatrixBuffer);
             grassPatch.createInstances([
-                { mesh: Objects.GRASS_BLADES[0], distance: 0 },
-                { mesh: Objects.GRASS_BLADES[1], distance: 50 }
+                { mesh: assets.objects.grassBlades[0], distance: 0 },
+                { mesh: assets.objects.grassBlades[1], distance: 50 }
             ]);
             this.instancePatches.push(grassPatch);
 
-            materials.grass.setPlanet(this.parent);
-            materials.grassDepth.setPlanet(this.parent);
+            assets.materials.grass.setPlanet(this.parent);
+            assets.materials.grassDepth.setPlanet(this.parent);
 
-            materials.butterfly.setPlanet(this.parent);
-            materials.butterflyDepth.setPlanet(this.parent);
+            assets.materials.butterfly.setPlanet(this.parent);
+            assets.materials.butterflyDepth.setPlanet(this.parent);
 
             for (const depthRenderer of Object.values(this.getTransform().getScene()._depthRenderer)) {
-                depthRenderer.setMaterialForRendering(butterflyPatch.getLodMeshes(), materials.butterflyDepth);
-                depthRenderer.setMaterialForRendering(grassPatch.getLodMeshes(), materials.grassDepth);
+                depthRenderer.setMaterialForRendering(butterflyPatch.getLodMeshes(), assets.materials.butterflyDepth);
+                depthRenderer.setMaterialForRendering(grassPatch.getLodMeshes(), assets.materials.grassDepth);
             }
         }
     }

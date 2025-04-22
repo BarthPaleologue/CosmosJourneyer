@@ -43,7 +43,7 @@ import { OrbitalObjectUtils } from "../architecture/orbitalObjectUtils";
 import { OrbitalObjectId } from "../utils/coordinates/orbitalObjectId";
 import { StarSystemLoader } from "./starSystemLoader";
 import { DeepReadonly, NonEmptyArray } from "../utils/types";
-import { Assets2 } from "../assets/assets";
+import { Assets } from "../assets/assets";
 
 export type PlanetarySystem = {
     readonly planets: Planet[];
@@ -95,7 +95,7 @@ export class StarSystemController {
 
     private elapsedSeconds = 0;
 
-    private readonly assets: Assets2;
+    private readonly assets: Assets;
 
     /**
      * Creates a new star system controller from a given model and scene
@@ -112,7 +112,7 @@ export class StarSystemController {
             anomalies: ReadonlyArray<Anomaly>;
             orbitalFacilities: ReadonlyArray<OrbitalFacility>;
         },
-        assets: Assets2,
+        assets: Assets,
         scene: UberScene
     ) {
         this.scene = scene;
@@ -140,7 +140,7 @@ export class StarSystemController {
     public static async CreateAsync(
         model: DeepReadonly<StarSystemModel>,
         loader: StarSystemLoader,
-        assets: Assets2,
+        assets: Assets,
         scene: UberScene
     ): Promise<StarSystemController> {
         const result = await loader.load(model, assets, scene);
@@ -472,7 +472,7 @@ export class StarSystemController {
         controls.update(deltaSeconds);
 
         for (const object of celestialBodies) {
-            object.asteroidField?.update(controls.getActiveCamera().globalPosition, deltaSeconds);
+            object.asteroidField?.update(controls.getActiveCamera().globalPosition, this.assets.objects, deltaSeconds);
         }
 
         for (const object of this.getPlanetaryMassObjects()) {

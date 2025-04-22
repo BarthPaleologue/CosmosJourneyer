@@ -48,7 +48,7 @@ import { getSphereRadiatedEnergyFlux } from "../utils/physics";
 import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
 import { getEdibleEnergyPerHaPerDay } from "../utils/agriculture";
 import { StellarObjectModel } from "../architecture/orbitalObjectModel";
-import { Assets2 } from "../assets/assets";
+import { Assets } from "../assets/assets";
 
 export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPACE_ELEVATOR> {
     readonly name: string;
@@ -85,7 +85,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
     constructor(
         model: DeepReadonly<SpaceElevatorModel>,
         stellarObjects: ReadonlyMap<DeepReadonly<StellarObjectModel>, number>,
-        assets: Pick<Assets2, "textures" | "materials">,
+        assets: Pick<Assets, "textures" | "materials" | "objects">,
         scene: Scene
     ) {
         this.model = model;
@@ -176,7 +176,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
 
     private generate(
         stellarObjects: ReadonlyMap<DeepReadonly<StellarObjectModel>, number>,
-        assets: Pick<Assets2, "textures" | "materials">
+        assets: Pick<Assets, "textures" | "materials" | "objects">
     ) {
         let totalStellarFlux = 0;
         stellarObjects.forEach((distance, model) => {
@@ -271,7 +271,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
 
         lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(rng(23) * 5), rng, assets);
 
-        const landingBay = new LandingBay(this.model, rng(37) * Settings.SEED_HALF_RANGE, assets.textures, this.scene);
+        const landingBay = new LandingBay(this.model, rng(37) * Settings.SEED_HALF_RANGE, assets, this.scene);
 
         this.landingBays.push(landingBay);
         this.placeNode(landingBay.getTransform(), lastNode);
@@ -282,7 +282,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
         lastNode: TransformNode,
         nbSections: number,
         rng: (index: number) => number,
-        assets: Pick<Assets2, "textures">
+        assets: Pick<Assets, "textures" | "objects">
     ): TransformNode {
         let newLastNode = lastNode;
         for (let i = 0; i < nbSections; i++) {

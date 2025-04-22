@@ -15,11 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Materials } from "../../../../assets/materials";
+import { Assets } from "../../../../assets/assets";
 import { BuildTask } from "./taskTypes";
 
 export interface ChunkForge {
     addTask(task: BuildTask): void;
-    update(materials: Materials): void;
+    update(assets: Pick<Assets, "objects" | "materials">): void;
     reset(): void;
 }

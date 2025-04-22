@@ -36,6 +36,7 @@ import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { DeepReadonly } from "../../../utils/types";
 import { LandingPadSize } from "../../../spacestation/landingPad/landingPadManager";
 import { Textures } from "../../textures";
+import { Assets } from "../../assets";
 
 export class LandingBay {
     private readonly root: TransformNode;
@@ -57,7 +58,12 @@ export class LandingBay {
 
     readonly landingPads: LandingPad[] = [];
 
-    constructor(stationModel: DeepReadonly<OrbitalFacilityModel>, seed: number, textures: Textures, scene: Scene) {
+    constructor(
+        stationModel: DeepReadonly<OrbitalFacilityModel>,
+        seed: number,
+        assets: Pick<Assets, "textures" | "objects">,
+        scene: Scene
+    ) {
         this.root = new TransformNode("LandingBayRoot", scene);
 
         this.centralLight = new PointLight("LandingBayCentralLight", Vector3.Zero(), scene);
@@ -72,7 +78,7 @@ export class LandingBay {
 
         this.metalSectionMaterial = new MetalSectionMaterial(
             "LandingBayMetalSectionMaterial",
-            textures.materials.metalPanels,
+            assets.textures.materials.metalPanels,
             scene
         );
 
@@ -92,7 +98,7 @@ export class LandingBay {
             this.radius,
             deltaRadius,
             heightFactor,
-            textures.materials.spaceStation,
+            assets.textures.materials.spaceStation,
             scene
         );
         this.ring.material = this.landingBayMaterial;
@@ -144,7 +150,7 @@ export class LandingBay {
                 const landingPad = new LandingPad(
                     padNumber++,
                     (i + row) % 2 === 0 ? LandingPadSize.SMALL : LandingPadSize.MEDIUM,
-                    textures,
+                    assets,
                     scene
                 );
                 landingPad.getTransform().parent = this.getTransform();

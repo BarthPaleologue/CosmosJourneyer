@@ -17,7 +17,6 @@
 
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import {
     IPhysicsCollisionEvent,
@@ -42,7 +41,6 @@ import { AudioInstance } from "../utils/audioInstance";
 import { AudioManager } from "../audio/audioManager";
 import { Thruster } from "./thruster";
 import { AudioMasks } from "../audio/audioMasks";
-import { Objects } from "../assets/objects";
 import { CelestialBody, OrbitalObject } from "../architecture/orbitalObject";
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
@@ -53,7 +51,7 @@ import { getDefaultSerializedSpaceship, SerializedSpaceship, ShipType } from "./
 import { SpaceshipInternals } from "./spaceshipInternals";
 import { SerializedComponent } from "./serializedComponents/component";
 import { ILandingPad } from "../spacestation/landingPad/landingPadManager";
-import { Assets2 } from "../assets/assets";
+import { Assets } from "../assets/assets";
 
 const enum ShipState {
     FLYING,
@@ -68,7 +66,7 @@ export class Spaceship implements Transformable {
 
     readonly name: string;
 
-    readonly instanceRoot: AbstractMesh;
+    readonly instanceRoot: TransformNode;
 
     readonly aggregate: PhysicsAggregate;
     private readonly collisionObservable: Observable<IPhysicsCollisionEvent>;
@@ -131,7 +129,7 @@ export class Spaceship implements Transformable {
         serializedSpaceShip: SerializedSpaceship,
         unfitComponents: Set<SerializedComponent>,
         scene: Scene,
-        assets: Assets2
+        assets: Assets
     ) {
         this.id = serializedSpaceShip.id ?? crypto.randomUUID();
 
@@ -139,7 +137,12 @@ export class Spaceship implements Transformable {
 
         this.shipType = serializedSpaceShip.type;
 
-        this.instanceRoot = Objects.CreateWandererInstance();
+        const root = assets.objects.wanderer.instantiateHierarchy(null);
+        if (root === null) {
+            throw new Error("Wanderer object not found");
+        }
+
+        this.instanceRoot = root;
         this.instanceRoot.rotationQuaternion = Quaternion.Identity();
 
         this.aggregate = new PhysicsAggregate(
@@ -732,7 +735,7 @@ export class Spaceship implements Transformable {
         return amount - fuelLeftToRefuel;
     }
 
-    public static CreateDefault(scene: Scene, assets: Assets2): Spaceship {
+    public static CreateDefault(scene: Scene, assets: Assets): Spaceship {
         return Spaceship.Deserialize(getDefaultSerializedSpaceship(), new Set(), scene, assets);
     }
 
@@ -740,7 +743,7 @@ export class Spaceship implements Transformable {
         serializedSpaceship: SerializedSpaceship,
         unfitComponents: Set<SerializedComponent>,
         scene: Scene,
-        assets: Assets2
+        assets: Assets
     ): Spaceship {
         return new Spaceship(serializedSpaceship, unfitComponents, scene, assets);
     }

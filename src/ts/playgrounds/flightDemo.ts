@@ -19,19 +19,10 @@ import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import {
-    AssetsManager,
-    Color3,
-    MeshBuilder,
-    PBRMetallicRoughnessMaterial,
-    SolidParticle,
-    SolidParticleSystem
-} from "@babylonjs/core";
+import { Color3, MeshBuilder, PBRMetallicRoughnessMaterial, SolidParticle, SolidParticleSystem } from "@babylonjs/core";
 import { enablePhysics } from "./utils";
-import { Objects } from "../assets/objects";
 import { ShipControls } from "../spaceship/shipControls";
 import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
-import { loadSounds } from "../assets/sounds";
 import { SoundPlayerMock } from "../audio/soundPlayer";
 import { TtsMock } from "../audio/tts";
 import { loadAssets } from "../assets/assets";
@@ -42,10 +33,6 @@ export async function createFlightDemoScene(engine: AbstractEngine): Promise<Sce
     scene.defaultCursor = "crosshair";
 
     await enablePhysics(scene);
-
-    const assetsManager = new AssetsManager(scene);
-    Objects.EnqueueTasks(assetsManager, scene);
-    await assetsManager.loadAsync();
 
     const assets = await loadAssets(() => {}, scene);
 

@@ -18,7 +18,6 @@
 import { FreeCamera, Vector3, HemisphericLight, MeshBuilder } from "@babylonjs/core";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
-import { loadMusics } from "../assets/musics";
 
 export function createDefaultScene(engine: AbstractEngine): Scene {
     const scene = new Scene(engine);
@@ -46,10 +45,6 @@ export function createDefaultScene(engine: AbstractEngine): Scene {
 
     // Our built-in 'ground' shape. Params: name, options, scene
     const ground = MeshBuilder.CreateGround("ground", { width: 6, height: 6 }, scene);
-
-    void loadMusics((loadedCount, totalCount, lastItemName) => {
-        console.log(`Loaded ${loadedCount} of ${totalCount} musics. Last item: ${lastItemName}`);
-    }, console.log);
 
     return scene;
 }

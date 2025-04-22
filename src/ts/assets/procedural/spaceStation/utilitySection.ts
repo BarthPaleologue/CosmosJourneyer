@@ -21,7 +21,6 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { Objects } from "../../objects";
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { CollisionMask } from "../../../settings";
@@ -31,7 +30,8 @@ import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/
 import { getRngFromSeed } from "../../../utils/getRngFromSeed";
 import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 import { Material } from "@babylonjs/core/Materials/material";
-import { Assets2 } from "../../assets";
+import { Assets } from "../../assets";
+import { PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
 
 export class UtilitySection implements Transformable {
     private readonly attachment: Mesh;
@@ -45,7 +45,9 @@ export class UtilitySection implements Transformable {
     private readonly tanks: AbstractMesh[] = [];
     private readonly tankBodies: PhysicsBody[] = [];
 
-    constructor(seed: number, assets: Pick<Assets2, "textures">, scene: Scene) {
+    private readonly tankShape: PhysicsShape;
+
+    constructor(seed: number, assets: Pick<Assets, "textures" | "objects">, scene: Scene) {
         this.metalSectionMaterial = new MetalSectionMaterial(
             "UtilitySectionMetalMaterial",
             assets.textures.materials.metalPanels,
@@ -69,10 +71,12 @@ export class UtilitySection implements Transformable {
         const boundingVectors = this.attachment.getHierarchyBoundingVectors();
         const boundingExtendSize = boundingVectors.max.subtract(boundingVectors.min).scale(0.5);
 
+        this.tankShape = assets.objects.sphericalTank.shape;
+
         if (this.rng(0) < 0.3) {
             for (let ring = -3; ring <= 3; ring++) {
                 for (let sideIndex = 0; sideIndex < 6; sideIndex++) {
-                    const tank = Objects.SPHERICAL_TANK.createInstance("SphericalTank");
+                    const tank = assets.objects.sphericalTank.mesh.createInstance("SphericalTank");
                     tank.scalingDeterminant = 2.4;
 
                     const newBoundingVectors = tank.getHierarchyBoundingVectors();
@@ -103,9 +107,7 @@ export class UtilitySection implements Transformable {
                 const tankBody = new PhysicsBody(tank, PhysicsMotionType.STATIC, false, this.getTransform().getScene());
                 tankBody.setMassProperties({ mass: 0 });
                 tankBody.disablePreStep = false;
-                tankBody.shape = Objects.SPHERICAL_TANK_PHYSICS_SHAPE;
-                tankBody.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
-                tankBody.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
+                tankBody.shape = this.tankShape;
 
                 this.tankBodies.push(tankBody);
             });

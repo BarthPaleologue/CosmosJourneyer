@@ -29,7 +29,7 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import { getRngFromSeed } from "../../../utils/getRngFromSeed";
 import { createEnvironmentAggregate } from "../../../utils/havok";
 import { Material } from "@babylonjs/core/Materials/material";
-import { Assets2 } from "../../assets";
+import { Assets } from "../../assets";
 import { SolarPanelMaterial } from "../solarPanel/solarPanelMaterial";
 
 export class SolarSection implements Transformable {
@@ -46,7 +46,7 @@ export class SolarSection implements Transformable {
 
     private readonly metalSectionMaterial: Material;
 
-    constructor(requiredSurface: number, seed: number, assets: Pick<Assets2, "textures" | "materials">, scene: Scene) {
+    constructor(requiredSurface: number, seed: number, assets: Pick<Assets, "textures" | "materials">, scene: Scene) {
         this.rng = getRngFromSeed(seed);
 
         const nbArms = wheelOfFortune(

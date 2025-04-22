@@ -18,7 +18,6 @@
 import { ColorMode } from "./colorSettingsInterface";
 import surfaceMaterialFragment from "../../../shaders/telluricPlanetMaterial/fragment.glsl";
 import surfaceMaterialVertex from "../../../shaders/telluricPlanetMaterial/vertex.glsl";
-import { Assets } from "../../assets/assets";
 import { centeredRand } from "extended-random";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
@@ -130,8 +129,6 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
         this.beachSize = 100 + 50 * centeredRand(rng, 85);
         this.colorMode = ColorMode.DEFAULT;
         this.steepSharpness = 2;
-
-        if (!Assets.IS_READY) throw new Error("You must initialize your assets using the AssetsManager");
 
         this.plainNormalMetallicMap = textures.grass.normalMetallic;
         this.plainAlbedoRoughnessMap = textures.grass.albedoRoughness;

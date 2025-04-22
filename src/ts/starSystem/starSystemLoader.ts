@@ -33,7 +33,7 @@ import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { TelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModel";
 import { DeepReadonly, isNonEmptyArray, NonEmptyArray } from "../utils/types";
 import { getDistancesToStellarObjects } from "../utils/distanceToStellarObject";
-import { Assets2 } from "../assets/assets";
+import { Assets } from "../assets/assets";
 
 export class StarSystemLoader {
     private loadingIndex: number;
@@ -55,7 +55,7 @@ export class StarSystemLoader {
      * Loads the star system from the underlying data model.
      * This instantiates all stars, planets, satellites, anomalies and space stations in the star system.
      */
-    public async load(systemModel: DeepReadonly<StarSystemModel>, assets: Assets2, scene: Scene) {
+    public async load(systemModel: DeepReadonly<StarSystemModel>, assets: Assets, scene: Scene) {
         const numberOfObjects =
             systemModel.stellarObjects.length +
             systemModel.planets.length +
@@ -85,7 +85,7 @@ export class StarSystemLoader {
 
     private async loadStellarObjects(
         stellarObjectModels: DeepReadonly<Array<StellarObjectModel>>,
-        assets: Assets2,
+        assets: Assets,
         scene: Scene
     ): Promise<Readonly<NonEmptyArray<StellarObject>>> {
         const stellarObjects: StellarObject[] = [];
@@ -154,7 +154,7 @@ export class StarSystemLoader {
 
     private async loadOrbitalFacilities(
         systemModel: DeepReadonly<StarSystemModel>,
-        assets: Assets2,
+        assets: Assets,
         scene: Scene
     ): Promise<ReadonlyArray<OrbitalFacility>> {
         const orbitalFacilities: OrbitalFacility[] = [];
@@ -180,7 +180,7 @@ export class StarSystemLoader {
 
     private async loadPlanets(
         planetModels: DeepReadonly<Array<PlanetModel>>,
-        assets: Assets2,
+        assets: Assets,
         scene: Scene
     ): Promise<ReadonlyArray<Planet>> {
         const planets: Planet[] = [];
@@ -209,7 +209,7 @@ export class StarSystemLoader {
 
     private async loadSatellites(
         satelliteModels: DeepReadonly<Array<TelluricSatelliteModel>>,
-        assets: Assets2,
+        assets: Assets,
         scene: Scene
     ): Promise<ReadonlyArray<TelluricPlanet>> {
         const satellites: TelluricPlanet[] = [];
