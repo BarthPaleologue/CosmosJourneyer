@@ -22,7 +22,7 @@ import "@babylonjs/core/Materials/standardMaterial";
 import "@babylonjs/core/Loading/loadingScreen";
 import "@babylonjs/core/Misc/screenshotTools";
 import "@babylonjs/core/Meshes/thinInstanceMesh";
-import { Scene, Tools } from "@babylonjs/core";
+import { PhysicsViewer, Scene, Tools } from "@babylonjs/core";
 import "@babylonjs/inspector";
 import { createDefaultScene } from "./playgrounds/default";
 import { createOrbitalDemoScene } from "./playgrounds/orbitalDemo";
@@ -37,6 +37,7 @@ import { createCharacterDemoScene } from "./playgrounds/character";
 import { createSpaceStationUIScene } from "./playgrounds/spaceStationUI";
 import { createStarMapScene } from "./playgrounds/starMap";
 import { createTutorialScene } from "./playgrounds/tutorial";
+import { createAsteroidFieldScene } from "./playgrounds/asteroidField";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -87,6 +88,9 @@ switch (requestedScene) {
     case "tutorial":
         scene = await createTutorialScene(engine);
         break;
+    case "asteroidField":
+        scene = await createAsteroidFieldScene(engine);
+        break;
     default:
         scene = createDefaultScene(engine);
 }
@@ -97,6 +101,20 @@ if (urlParams.get("debug") !== null) {
     inspectorRoot.id = "inspectorLayer";
     await scene.debugLayer.show({
         globalRoot: inspectorRoot
+    });
+}
+
+if (urlParams.get("physicsViewer") !== null) {
+    const physicsViewer = new PhysicsViewer(scene);
+    scene.onBeforeRenderObservable.add(() => {
+        for (const mesh of scene.meshes) {
+            const physicsBody = mesh.physicsBody;
+            if (physicsBody === null || physicsBody === undefined) {
+                continue;
+            }
+
+            physicsViewer.showBody(physicsBody);
+        }
     });
 }
 
