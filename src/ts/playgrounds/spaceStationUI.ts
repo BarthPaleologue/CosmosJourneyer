@@ -30,7 +30,10 @@ import { ShipControls } from "../spaceship/shipControls";
 import { SoundPlayerMock } from "../audio/soundPlayer";
 import { TtsMock } from "../audio/tts";
 
-export async function createSpaceStationUIScene(engine: AbstractEngine): Promise<Scene> {
+export async function createSpaceStationUIScene(
+    engine: AbstractEngine,
+    progressCallback: (progress: number, text: string) => void
+): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
@@ -39,7 +42,7 @@ export async function createSpaceStationUIScene(engine: AbstractEngine): Promise
     await initI18n();
 
     const assets = await loadAssets((current, total, name) => {
-        engine.loadingUIText = `${current} / ${total} - ${name}`;
+        progressCallback(current / total, `Loading ${name}`);
     }, scene);
 
     const soundPlayer = new SoundPlayerMock();

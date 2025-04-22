@@ -51,12 +51,11 @@ export type VoiceLines = {
 };
 
 export type SpeakerVoiceLines = {
-    charlotte: VoiceLines;
+    readonly charlotte: VoiceLines;
 };
 
 export async function loadVoiceLines(
-    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void,
-    enumerateCallback: (totalCount: number) => void
+    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void
 ): Promise<SpeakerVoiceLines> {
     let loadedCount = 0;
     let totalCount = 0;
@@ -101,8 +100,6 @@ export async function loadVoiceLines(
 
     const fuelScoopingVoicePromise = loadSoundAsync("FuelScoopingVoice", fuelScoopingVoicePath);
     const fuelScoopingCompleteVoicePromise = loadSoundAsync("FuelScoopingCompleteVoice", fuelScoopingCompleteVoicePath);
-
-    enumerateCallback(totalCount);
 
     return {
         charlotte: {

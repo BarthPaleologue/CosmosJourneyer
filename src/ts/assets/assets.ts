@@ -36,25 +36,16 @@ export async function loadAssets(
     progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void,
     scene: Scene
 ): Promise<Assets> {
-    let allAssetsTotalCount = 0;
-    const increaseTotalCount = (nbItems: number) => {
-        allAssetsTotalCount += nbItems;
-    };
-
-    const progressCallbackWrapped = (loadedCount: number, totalCount: number, lastItemName: string) => {
-        progressCallback(loadedCount, allAssetsTotalCount, lastItemName);
-    };
-
-    const soundsPromise = loadSounds(progressCallbackWrapped, increaseTotalCount);
-    const musicsPromise = loadMusics(progressCallbackWrapped, increaseTotalCount);
-    const voiceLinesPromise = loadVoiceLines(progressCallbackWrapped, increaseTotalCount);
-    const texturesPromise = loadTextures(progressCallbackWrapped, increaseTotalCount, scene);
+    const soundsPromise = loadSounds(progressCallback);
+    const musicsPromise = loadMusics(progressCallback);
+    const voiceLinesPromise = loadVoiceLines(progressCallback);
+    const texturesPromise = loadTextures(progressCallback, scene);
 
     const textures = await texturesPromise;
 
     const materials = initMaterials(textures, scene);
 
-    const objectsPromise = loadObjects(materials, textures, scene, progressCallbackWrapped, increaseTotalCount);
+    const objectsPromise = loadObjects(materials, textures, scene, progressCallback);
 
     return {
         sounds: await soundsPromise,

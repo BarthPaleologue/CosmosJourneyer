@@ -27,14 +27,19 @@ import { SoundPlayerMock } from "../audio/soundPlayer";
 import { TtsMock } from "../audio/tts";
 import { loadAssets } from "../assets/assets";
 
-export async function createFlightDemoScene(engine: AbstractEngine): Promise<Scene> {
+export async function createFlightDemoScene(
+    engine: AbstractEngine,
+    progressCallback: (progress: number, text: string) => void
+): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
     scene.defaultCursor = "crosshair";
 
     await enablePhysics(scene);
 
-    const assets = await loadAssets(() => {}, scene);
+    const assets = await loadAssets((loadedCount, totalCount, name) => {
+        progressCallback(loadedCount / totalCount, `Loading ${name}`);
+    }, scene);
 
     const soundPlayer = new SoundPlayerMock();
     const tts = new TtsMock();

@@ -10,17 +10,19 @@ export class LoadingScreen implements ILoadingScreen {
 
     private progressBar: Nullable<HTMLDivElement> = null;
 
+    private loadingText = "";
+
+    private loadingDivBackgroundColor = "black";
+
+    private canvas: HTMLCanvasElement;
+
     /**
      * Creates a new default loading screen
      * @param canvas defines the canvas used to render the scene
-     * @param loadingText defines the default text to display
-     * @param loadingDivBackgroundColor defines the default background color
      */
-    constructor(
-        private canvas: HTMLCanvasElement,
-        private loadingText = "",
-        private loadingDivBackgroundColor = "black"
-    ) {}
+    constructor(canvas: HTMLCanvasElement) {
+        this.canvas = canvas;
+    }
 
     /**
      * Function called to display the loading screen

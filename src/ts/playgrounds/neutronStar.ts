@@ -30,7 +30,10 @@ import { LensFlarePostProcess } from "../postProcesses/lensFlarePostProcess";
 import { getRgbFromTemperature } from "../utils/specrend";
 import { createTexturePools } from "../assets/textures";
 
-export async function createNeutronStarScene(engine: AbstractEngine): Promise<Scene> {
+export async function createNeutronStarScene(
+    engine: AbstractEngine,
+    progressCallback: (progress: number, text: string) => void
+): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
@@ -85,6 +88,8 @@ export async function createNeutronStarScene(engine: AbstractEngine): Promise<Sc
 
         matterJets.update(deltaSeconds);
     });
+
+    progressCallback(1, "Neutron Star Scene Loaded");
 
     return scene;
 }

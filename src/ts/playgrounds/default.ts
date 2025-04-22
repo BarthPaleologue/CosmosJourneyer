@@ -19,7 +19,10 @@ import { FreeCamera, Vector3, HemisphericLight, MeshBuilder } from "@babylonjs/c
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
-export function createDefaultScene(engine: AbstractEngine): Scene {
+export function createDefaultScene(
+    engine: AbstractEngine,
+    progressCallback: (progress: number, text: string) => void
+): Scene {
     const scene = new Scene(engine);
 
     // This creates and positions a free camera (non-mesh)
@@ -45,6 +48,8 @@ export function createDefaultScene(engine: AbstractEngine): Scene {
 
     // Our built-in 'ground' shape. Params: name, options, scene
     const ground = MeshBuilder.CreateGround("ground", { width: 6, height: 6 }, scene);
+
+    progressCallback(1, "Loaded default scene");
 
     return scene;
 }

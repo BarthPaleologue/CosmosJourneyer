@@ -26,7 +26,10 @@ import { initI18n } from "../i18n";
 import { StarMapTutorial } from "../tutorials/starMapTutorial";
 import { SoundPlayerMock } from "../audio/soundPlayer";
 
-export async function createTutorialScene(engine: AbstractEngine): Promise<Scene> {
+export async function createTutorialScene(
+    engine: AbstractEngine,
+    progressCallback: (progress: number, text: string) => void
+): Promise<Scene> {
     const scene = new Scene(engine);
 
     // This creates and positions a free camera (non-mesh)
@@ -60,6 +63,8 @@ export async function createTutorialScene(engine: AbstractEngine): Promise<Scene
             await tutorialLayer.setTutorial(new StarMapTutorial());
             break;
     }
+
+    progressCallback(1, "Loaded tutorial");
 
     return scene;
 }

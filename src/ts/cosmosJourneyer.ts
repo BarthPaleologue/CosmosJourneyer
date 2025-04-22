@@ -395,6 +395,8 @@ export class CosmosJourneyer {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
+        const loadingScreen = new LoadingScreen(canvas);
+
         // Init BabylonJS engine (use webgpu if ?webgpu is in the url)
         const engine = window.location.search.includes("webgpu")
             ? await EngineFactory.CreateAsync(canvas, {
@@ -411,7 +413,7 @@ export class CosmosJourneyer {
               });
 
         engine.useReverseDepthBuffer = true;
-        engine.loadingScreen = new LoadingScreen(canvas);
+        engine.loadingScreen = loadingScreen;
         engine.loadingScreen.displayLoadingUI();
         window.addEventListener("resize", () => {
             engine.resize(true);
@@ -440,7 +442,10 @@ export class CosmosJourneyer {
         // The right-handed system allows to use directly GLTF models without having to flip them with a transform
         mainScene.useRightHandedSystem = true;
 
-        const assets = await loadAssets(() => {}, mainScene);
+        const assets = await loadAssets((loadedCount, totalCount, name) => {
+            loadingScreen.setProgressPercentage((loadedCount / totalCount) * 100);
+        }, mainScene);
+
         const soundPlayer = new SoundPlayer(assets.sounds);
         const tts = new Tts(assets.speakerVoiceLines);
 

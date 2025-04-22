@@ -32,7 +32,10 @@ import { newSeededMengerSpongeModel } from "../anomalies/mengerSponge/mengerSpon
 import { MengerSpongePostProcess } from "../anomalies/mengerSponge/mengerSpongePostProcess";
 import { UpdatablePostProcess } from "../postProcesses/updatablePostProcess";
 
-export async function createXrScene(engine: AbstractEngine): Promise<Scene> {
+export async function createXrScene(
+    engine: AbstractEngine,
+    progressCallback: (progress: number, text: string) => void
+): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
@@ -172,6 +175,8 @@ export async function createXrScene(engine: AbstractEngine): Promise<Scene> {
     scene.onBeforeCameraRenderObservable.add((camera) => {
         depthRenderer.getDepthMap().activeCamera = camera;
     });
+
+    progressCallback(1, "Loading complete");
 
     return scene;
 }

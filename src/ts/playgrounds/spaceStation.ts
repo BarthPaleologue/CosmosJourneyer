@@ -33,27 +33,24 @@ import { loadTextures } from "../assets/textures";
 import { Assets } from "../assets/assets";
 import { loadObjects } from "../assets/objects";
 
-export async function createSpaceStationScene(engine: AbstractEngine): Promise<Scene> {
+export async function createSpaceStationScene(
+    engine: AbstractEngine,
+    progressCallback: (progress: number, text: string) => void
+): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
     await enablePhysics(scene);
 
-    const textures = await loadTextures(
-        () => {},
-        () => {},
-        scene
-    );
+    const textures = await loadTextures((loadedCount, totalCount, name) => {
+        progressCallback(loadedCount / totalCount, `Loading ${name}`);
+    }, scene);
 
     const materials = initMaterials(textures, scene);
 
-    const objects = await loadObjects(
-        materials,
-        textures,
-        scene,
-        () => {},
-        () => {}
-    );
+    const objects = await loadObjects(materials, textures, scene, (loadedCount, totalCount, name) => {
+        progressCallback(loadedCount / totalCount, `Loading ${name}`);
+    });
 
     const assets: Pick<Assets, "textures" | "materials" | "objects"> = {
         textures: textures,

@@ -29,7 +29,10 @@ import { AxisRenderer } from "../orbit/axisRenderer";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { OrbitalObjectUtils } from "../architecture/orbitalObjectUtils";
 
-export function createOrbitalDemoScene(engine: AbstractEngine): Scene {
+export function createOrbitalDemoScene(
+    engine: AbstractEngine,
+    progressCallback: (progress: number, text: string) => void
+): Scene {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
@@ -144,6 +147,8 @@ export function createOrbitalDemoScene(engine: AbstractEngine): Scene {
 
         orbitRenderer.update(referencePlaneRotation);
     });
+
+    progressCallback(1, "Loading complete");
 
     return scene;
 }

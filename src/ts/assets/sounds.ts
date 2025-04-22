@@ -52,8 +52,7 @@ export type Sounds = {
 };
 
 export async function loadSounds(
-    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void,
-    enumerateCallback: (totalCount: number) => void
+    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void
 ): Promise<Sounds> {
     let loadedCount = 0;
     let totalCount = 0;
@@ -135,8 +134,6 @@ export async function loadSounds(
     // UI sounds
     const successSoundPromise = loadSoundAsync("Success", echoedBlipSoundPath);
     const errorSoundPromise = loadSoundAsync("Error", errorBleepSoundPath);
-
-    enumerateCallback(totalCount);
 
     return {
         ouch: await ouchSoundPromise,

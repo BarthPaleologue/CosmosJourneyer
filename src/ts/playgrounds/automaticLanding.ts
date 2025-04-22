@@ -29,13 +29,18 @@ import { CollisionMask } from "../settings";
 import { LandingPadSize } from "../spacestation/landingPad/landingPadManager";
 import { loadAssets } from "../assets/assets";
 
-export async function createAutomaticLandingScene(engine: AbstractEngine): Promise<Scene> {
+export async function createAutomaticLandingScene(
+    engine: AbstractEngine,
+    progressCallback: (progress: number, text: string) => void
+): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
     await enablePhysics(scene);
 
-    const assets = await loadAssets(() => {}, scene);
+    const assets = await loadAssets((loadedCount, totalCount, name) => {
+        progressCallback(loadedCount / totalCount, `Loading ${name}`);
+    }, scene);
 
     const ship = Spaceship.CreateDefault(scene, assets);
     ship.getTransform().position.copyFromFloats(

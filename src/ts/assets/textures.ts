@@ -152,7 +152,6 @@ export type Textures = {
  */
 export async function loadTextures(
     progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void,
-    enumerateCallback: (totalCount: number) => void,
     scene: Scene
 ): Promise<Textures> {
     let loadedCount = 0;
@@ -262,8 +261,6 @@ export async function loadTextures(
     const crateNormalPromise = loadTextureAsync("CrateNormal", crateNormal);
     const crateMetallicRoughnessPromise = loadTextureAsync("CrateMetallicRoughness", crateMetallicRoughness);
     const crateAmbientOcclusionPromise = loadTextureAsync("CrateAmbientOcclusion", crateAmbientOcclusion);
-
-    enumerateCallback(totalCount);
 
     // Assemble and return the textures structure
     return {

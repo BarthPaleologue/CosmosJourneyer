@@ -36,7 +36,10 @@ import { loadTextures } from "../assets/textures";
 import { initMaterials } from "../assets/materials";
 import { AsteroidField } from "../asteroidFields/asteroidField";
 
-export async function createAsteroidFieldScene(engine: Engine): Promise<Scene> {
+export async function createAsteroidFieldScene(
+    engine: Engine,
+    progressCallback: (progress: number, text: string) => void
+): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
@@ -49,21 +52,15 @@ export async function createAsteroidFieldScene(engine: Engine): Promise<Scene> {
 
     scene.enableDepthRenderer(camera, false, true);
 
-    const textures = await loadTextures(
-        () => {},
-        () => {},
-        scene
-    );
+    const textures = await loadTextures((loadedCount, totalCount, name) => {
+        progressCallback(loadedCount / totalCount, `Loading ${name}`);
+    }, scene);
 
     const materials = initMaterials(textures, scene);
 
-    const objects = await loadObjects(
-        materials,
-        textures,
-        scene,
-        () => {},
-        () => {}
-    );
+    const objects = await loadObjects(materials, textures, scene, () => {
+        progressCallback(0, "Loading objects");
+    });
 
     const directionalLight = new DirectionalLight("sun", new Vector3(1, -1, 0), scene);
     directionalLight.intensity = 0.7;

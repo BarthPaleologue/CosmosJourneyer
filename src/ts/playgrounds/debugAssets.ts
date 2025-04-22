@@ -21,31 +21,20 @@ import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { BaseTexture, FreeCamera, MeshBuilder, PointLight, StandardMaterial } from "@babylonjs/core";
 import { enablePhysics } from "./utils";
-import { loadTextures } from "../assets/textures";
-import { initMaterials } from "../assets/materials";
-import { loadObjects } from "../assets/objects";
+import { loadAssets } from "../assets/assets";
 
-export async function createDebugAssetsScene(engine: AbstractEngine): Promise<Scene> {
+export async function createDebugAssetsScene(
+    engine: AbstractEngine,
+    progressCallback: (progress: number, text: string) => void
+): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
     await enablePhysics(scene);
 
-    const textures = await loadTextures(
-        () => {},
-        () => {},
-        scene
-    );
-
-    const materials = initMaterials(textures, scene);
-
-    const objects = await loadObjects(
-        materials,
-        textures,
-        scene,
-        () => {},
-        () => {}
-    );
+    const assets = await loadAssets((loadedCount, totalCount, name) => {
+        progressCallback(loadedCount / totalCount, `Loading ${name}`);
+    }, scene);
 
     const camera = new FreeCamera("camera", new Vector3(0, 1, -1).scale(15), scene);
     camera.setTarget(Vector3.Zero());

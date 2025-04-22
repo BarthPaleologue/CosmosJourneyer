@@ -74,8 +74,7 @@ export async function loadObjects(
     materials: Materials,
     textures: Textures,
     scene: Scene,
-    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void,
-    enumerateCallback: (totalCount: number) => void
+    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void
 ): Promise<Objects> {
     let loadedCount = 0;
     let totalCount = 0;
@@ -100,8 +99,6 @@ export async function loadObjects(
     const treePromise = loadAssetInContainerAsync("Tree", treePath);
     const sphericalTankPromise = loadAssetInContainerAsync("SphericalTank", sphericalTankPath);
     const stationEnginePromise = loadAssetInContainerAsync("StationEngine", stationEnginePath);
-
-    enumerateCallback(totalCount);
 
     const butterfly = createButterfly(scene);
     butterfly.isVisible = false;

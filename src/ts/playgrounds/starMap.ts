@@ -25,7 +25,10 @@ import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
 import { initI18n } from "../i18n";
 import { SoundPlayerMock } from "../audio/soundPlayer";
 
-export async function createStarMapScene(engine: AbstractEngine): Promise<Scene> {
+export async function createStarMapScene(
+    engine: AbstractEngine,
+    progressCallback: (progress: number, text: string) => void
+): Promise<Scene> {
     await initI18n();
 
     const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
@@ -38,6 +41,8 @@ export async function createStarMapScene(engine: AbstractEngine): Promise<Scene>
 
     const starMap = new StarMap(player, engine, encyclopaediaGalactica, starSystemDatabase, soundPlayerMock);
     starMap.setCurrentStarSystem(starSystemDatabase.fallbackSystem.coordinates);
+
+    progressCallback(1, "Loaded star map");
 
     return starMap.scene;
 }

@@ -36,7 +36,10 @@ import { loadObjects } from "../assets/objects";
 import { loadTextures } from "../assets/textures";
 import { initMaterials } from "../assets/materials";
 
-export async function createCharacterDemoScene(engine: AbstractEngine): Promise<Scene> {
+export async function createCharacterDemoScene(
+    engine: AbstractEngine,
+    progressCallback: (progress: number, text: string) => void
+): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
@@ -46,27 +49,15 @@ export async function createCharacterDemoScene(engine: AbstractEngine): Promise<
         await engine.getRenderingCanvas()?.requestPointerLock();
     });
 
-    const textures = await loadTextures(
-        () => {
-            console.log("Loading textures...");
-            engine.loadingUIText = "Loading textures...";
-        },
-        () => {},
-        scene
-    );
+    const textures = await loadTextures((loadedCount, totalCount, name) => {
+        progressCallback(loadedCount / totalCount, `Loading ${name}`);
+    }, scene);
 
     const materials = await initMaterials(textures, scene);
 
-    const objects = await loadObjects(
-        materials,
-        textures,
-        scene,
-        () => {
-            console.log("Loading objects...");
-            engine.loadingUIText = "Loading objects...";
-        },
-        () => {}
-    );
+    const objects = await loadObjects(materials, textures, scene, (loadedCount, totalCount, name) => {
+        progressCallback(loadedCount / totalCount, `Loading ${name}`);
+    });
 
     const light = new DirectionalLight("dir01", new Vector3(1, -2, -1), scene);
     light.position = new Vector3(5, 5, 5).scaleInPlace(10);
