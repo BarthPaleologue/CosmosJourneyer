@@ -43,7 +43,7 @@ import { getEdibleEnergyPerHaPerDay } from "../utils/agriculture";
 import { StellarObjectModel } from "../architecture/orbitalObjectModel";
 import { getSphereRadiatedEnergyFlux } from "../utils/physics";
 import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
-import { Assets } from "../assets/assets";
+import { RenderingAssets } from "../assets/renderingAssets";
 
 export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE_STATION> {
     readonly name: string;
@@ -73,7 +73,7 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
     constructor(
         model: DeepReadonly<SpaceStationModel>,
         stellarObjects: ReadonlyMap<DeepReadonly<StellarObjectModel>, number>,
-        assets: Pick<Assets, "textures" | "materials" | "objects">,
+        assets: RenderingAssets,
         scene: Scene
     ) {
         this.model = model;
@@ -134,10 +134,7 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
         this.getTransform().setEnabled(isSizeOnScreenEnough(this, camera));
     }
 
-    private generate(
-        stellarObjects: ReadonlyMap<DeepReadonly<StellarObjectModel>, number>,
-        assets: Pick<Assets, "textures" | "materials" | "objects">
-    ) {
+    private generate(stellarObjects: ReadonlyMap<DeepReadonly<StellarObjectModel>, number>, assets: RenderingAssets) {
         let totalStellarFlux = 0;
         stellarObjects.forEach((distance, model) => {
             totalStellarFlux += getSphereRadiatedEnergyFlux(model.blackBodyTemperature, model.radius, distance);
@@ -245,7 +242,7 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
         lastNode: TransformNode,
         nbSections: number,
         rng: (index: number) => number,
-        assets: Pick<Assets, "textures" | "objects">
+        assets: RenderingAssets
     ): TransformNode {
         let newLastNode = lastNode;
         for (let i = 0; i < nbSections; i++) {

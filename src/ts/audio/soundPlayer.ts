@@ -29,7 +29,8 @@ export const enum SoundType {
     DISABLE_ORBIT_DISPLAY,
     TARGET_LOCK,
     TARGET_UNLOCK,
-    ITINERARY_COMPUTED
+    ITINERARY_COMPUTED,
+    OPEN_PAUSE_MENU
 }
 
 export interface ISoundPlayer {
@@ -67,6 +68,8 @@ export class SoundPlayer implements ISoundPlayer {
             case SoundType.TARGET_UNLOCK:
             case SoundType.ITINERARY_COMPUTED:
                 return this.sounds.targetUnlock;
+            case SoundType.OPEN_PAUSE_MENU:
+                return this.sounds.openPauseMenu;
         }
     }
 

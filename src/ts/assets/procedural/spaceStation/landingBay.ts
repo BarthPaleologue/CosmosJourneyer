@@ -35,8 +35,7 @@ import { OrbitalFacilityModel } from "../../../architecture/orbitalObjectModel";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { DeepReadonly } from "../../../utils/types";
 import { LandingPadSize } from "../../../spacestation/landingPad/landingPadManager";
-import { Textures } from "../../textures";
-import { Assets } from "../../assets";
+import { RenderingAssets } from "../../renderingAssets";
 
 export class LandingBay {
     private readonly root: TransformNode;
@@ -58,12 +57,7 @@ export class LandingBay {
 
     readonly landingPads: LandingPad[] = [];
 
-    constructor(
-        stationModel: DeepReadonly<OrbitalFacilityModel>,
-        seed: number,
-        assets: Pick<Assets, "textures" | "objects">,
-        scene: Scene
-    ) {
+    constructor(stationModel: DeepReadonly<OrbitalFacilityModel>, seed: number, assets: RenderingAssets, scene: Scene) {
         this.root = new TransformNode("LandingBayRoot", scene);
 
         this.centralLight = new PointLight("LandingBayCentralLight", Vector3.Zero(), scene);

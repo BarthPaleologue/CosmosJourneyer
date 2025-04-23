@@ -38,7 +38,7 @@ import { Cullable } from "../../../../utils/cullable";
 import { TelluricPlanetModel } from "../../telluricPlanetModel";
 import { TelluricSatelliteModel } from "../../telluricSatelliteModel";
 import { DeepReadonly } from "../../../../utils/types";
-import { Assets } from "../../../../assets/assets";
+import { RenderingAssets } from "../../../../assets/renderingAssets";
 
 export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
     public readonly mesh: Mesh;
@@ -125,7 +125,7 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
         instancesMatrixBuffer: Float32Array,
         alignedInstancesMatrixBuffer: Float32Array,
         averageHeight: number,
-        assets: Pick<Assets, "materials" | "objects">
+        assets: RenderingAssets
     ) {
         if (this.hasBeenDisposed()) {
             throw new Error(`Tried to init ${this.mesh.name} but it has been disposed`);

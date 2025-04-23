@@ -15,24 +15,26 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Scene } from "@babylonjs/core/scene";
-import { AudioAssets, loadAudioAssets } from "./audioAssets";
-import { loadRenderingAssets, RenderingAssets } from "./renderingAssets";
+import { Musics, loadMusics } from "./musics";
+import { Sounds, loadSounds } from "./sounds";
+import { SpeakerVoiceLines, loadVoiceLines } from "./voiceLines";
 
-export type Assets = {
-    readonly audio: Readonly<AudioAssets>;
-    readonly rendering: Readonly<RenderingAssets>;
+export type AudioAssets = {
+    readonly sounds: Sounds;
+    readonly musics: Musics;
+    readonly speakerVoiceLines: SpeakerVoiceLines;
 };
 
-export async function loadAssets(
-    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void,
-    scene: Scene
-): Promise<Assets> {
-    const audioAssetsPromise = loadAudioAssets(progressCallback);
-    const renderingAssetsPromise = loadRenderingAssets(progressCallback, scene);
+export async function loadAudioAssets(
+    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void
+): Promise<AudioAssets> {
+    const soundsPromise = loadSounds(progressCallback);
+    const musicsPromise = loadMusics(progressCallback);
+    const voiceLinesPromise = loadVoiceLines(progressCallback);
 
     return {
-        audio: await audioAssetsPromise,
-        rendering: await renderingAssetsPromise
+        sounds: await soundsPromise,
+        musics: await musicsPromise,
+        speakerVoiceLines: await voiceLinesPromise
     };
 }

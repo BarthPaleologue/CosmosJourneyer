@@ -29,7 +29,7 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { createEnvironmentAggregate } from "../../../utils/havok";
 import { Material } from "@babylonjs/core/Materials/material";
-import { Assets } from "../../assets";
+import { RenderingAssets } from "../../renderingAssets";
 
 export class EngineBay implements Transformable {
     private readonly root: TransformNode;
@@ -44,7 +44,7 @@ export class EngineBay implements Transformable {
 
     private readonly scene: Scene;
 
-    constructor(assets: Pick<Assets, "textures" | "objects">, scene: Scene) {
+    constructor(assets: RenderingAssets, scene: Scene) {
         this.root = new TransformNode("EngineBayRoot", scene);
 
         this.scene = scene;

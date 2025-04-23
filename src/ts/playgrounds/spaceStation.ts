@@ -25,13 +25,10 @@ import { newSeededSpaceStationModel } from "../spacestation/spaceStationModelGen
 import { Settings } from "../settings";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { Star } from "../stellarObjects/star/star";
-import { initMaterials } from "../assets/materials";
 import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
 import { StarModel } from "../stellarObjects/star/starModel";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
-import { loadTextures } from "../assets/textures";
-import { Assets } from "../assets/assets";
-import { loadObjects } from "../assets/objects";
+import { loadRenderingAssets } from "../assets/renderingAssets";
 
 export async function createSpaceStationScene(
     engine: AbstractEngine,
@@ -42,21 +39,9 @@ export async function createSpaceStationScene(
 
     await enablePhysics(scene);
 
-    const textures = await loadTextures((loadedCount, totalCount, name) => {
+    const assets = await loadRenderingAssets((loadedCount, totalCount, name) => {
         progressCallback(loadedCount / totalCount, `Loading ${name}`);
     }, scene);
-
-    const materials = initMaterials(textures, scene);
-
-    const objects = await loadObjects(materials, textures, scene, (loadedCount, totalCount, name) => {
-        progressCallback(loadedCount / totalCount, `Loading ${name}`);
-    });
-
-    const assets: Pick<Assets, "textures" | "materials" | "objects"> = {
-        textures: textures,
-        materials: materials,
-        objects: objects
-    };
 
     const defaultControls = new DefaultControls(scene);
     defaultControls.speed = 2000;

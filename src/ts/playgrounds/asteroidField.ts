@@ -31,10 +31,8 @@ import {
 } from "@babylonjs/core";
 import { enablePhysics } from "./utils";
 import { DefaultControls } from "../defaultControls/defaultControls";
-import { loadObjects } from "../assets/objects";
-import { loadTextures } from "../assets/textures";
-import { initMaterials } from "../assets/materials";
 import { AsteroidField } from "../asteroidFields/asteroidField";
+import { loadRenderingAssets } from "../assets/renderingAssets";
 
 export async function createAsteroidFieldScene(
     engine: Engine,
@@ -52,15 +50,9 @@ export async function createAsteroidFieldScene(
 
     scene.enableDepthRenderer(camera, false, true);
 
-    const textures = await loadTextures((loadedCount, totalCount, name) => {
+    const assets = await loadRenderingAssets((loadedCount, totalCount, name) => {
         progressCallback(loadedCount / totalCount, `Loading ${name}`);
     }, scene);
-
-    const materials = initMaterials(textures, scene);
-
-    const objects = await loadObjects(materials, textures, scene, () => {
-        progressCallback(0, "Loading objects");
-    });
 
     const directionalLight = new DirectionalLight("sun", new Vector3(1, -1, 0), scene);
     directionalLight.intensity = 0.7;
@@ -95,7 +87,7 @@ export async function createAsteroidFieldScene(
 
     scene.onBeforeRenderObservable.add(() => {
         defaultControls.update(engine.getDeltaTime() / 1000);
-        belt.update(defaultControls.getTransform().getAbsolutePosition(), objects, engine.getDeltaTime() / 1000);
+        belt.update(defaultControls.getTransform().getAbsolutePosition(), assets.objects, engine.getDeltaTime() / 1000);
     });
 
     return scene;

@@ -21,7 +21,7 @@ import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { BaseTexture, FreeCamera, MeshBuilder, PointLight, StandardMaterial } from "@babylonjs/core";
 import { enablePhysics } from "./utils";
-import { loadAssets } from "../assets/assets";
+import { loadRenderingAssets } from "../assets/renderingAssets";
 
 export async function createDebugAssetsScene(
     engine: AbstractEngine,
@@ -32,7 +32,7 @@ export async function createDebugAssetsScene(
 
     await enablePhysics(scene);
 
-    const assets = await loadAssets((loadedCount, totalCount, name) => {
+    const assets = await loadRenderingAssets((loadedCount, totalCount, name) => {
         progressCallback(loadedCount / totalCount, `Loading ${name}`);
     }, scene);
 

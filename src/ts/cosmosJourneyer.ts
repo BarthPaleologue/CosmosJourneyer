@@ -68,9 +68,11 @@ import { OrbitalObjectType } from "./architecture/orbitalObjectType";
 import { positionNearObject } from "./utils/positionNearObject";
 import { StarMapTutorial } from "./tutorials/starMapTutorial";
 import { Assets, loadAssets } from "./assets/assets";
-import { ISoundPlayer, SoundPlayer } from "./audio/soundPlayer";
+import { ISoundPlayer, SoundPlayer, SoundType } from "./audio/soundPlayer";
 import { UberScene } from "./uberCore/uberScene";
 import { Tts } from "./audio/tts";
+import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
+import { setMaxLinVel } from "./utils/havok";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -186,7 +188,7 @@ export class CosmosJourneyer {
             await this.createAutoSave();
         });
 
-        this.musicConductor = new MusicConductor(this.assets.musics, this.starSystemView);
+        this.musicConductor = new MusicConductor(this.assets.audio.musics, this.starSystemView);
         this.soundPlayer = soundPlayer;
         this.tts = tts;
 
@@ -438,6 +440,9 @@ export class CosmosJourneyer {
         encyclopaedia.backends.push(new EncyclopaediaGalacticaLocal(starSystemDatabase));
 
         const mainScene = new UberScene(engine);
+        const mainHavokPlugin = new HavokPlugin(true, havokInstance);
+        setMaxLinVel(mainHavokPlugin, 10000, 10000);
+        mainScene.enablePhysics(Vector3.Zero(), mainHavokPlugin);
 
         // The right-handed system allows to use directly GLTF models without having to flip them with a transform
         mainScene.useRightHandedSystem = true;
@@ -446,15 +451,15 @@ export class CosmosJourneyer {
             loadingScreen.setProgressPercentage((loadedCount / totalCount) * 100);
         }, mainScene);
 
-        const soundPlayer = new SoundPlayer(assets.sounds);
-        const tts = new Tts(assets.speakerVoiceLines);
+        const soundPlayer = new SoundPlayer(assets.audio.sounds);
+        const tts = new Tts(assets.audio.speakerVoiceLines);
 
         // Init star system view
         const starSystemView = new StarSystemView(
             mainScene,
             player,
             engine,
-            havokInstance,
+            mainHavokPlugin,
             encyclopaedia,
             starSystemDatabase,
             soundPlayer,
@@ -501,14 +506,14 @@ export class CosmosJourneyer {
             this.starSystemView.stopBackgroundSounds();
         }
 
-        this.assets.sounds.openPauseMenu.play();
+        this.soundPlayer.playNow(SoundType.OPEN_PAUSE_MENU);
         this.pauseMenu.setVisibility(true);
     }
 
     public async resume(): Promise<void> {
         if (!this.isPaused()) return;
         this.state = EngineState.RUNNING;
-        this.assets.sounds.menuSelect.play();
+        this.soundPlayer.playNow(SoundType.CLICK);
         this.pauseMenu.setVisibility(false);
 
         if (

@@ -22,6 +22,7 @@ import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import { ChunkForge } from "./chunkForge";
 import { Materials } from "../../../../assets/materials";
 import { Assets } from "../../../../assets/assets";
+import { RenderingAssets } from "../../../../assets/renderingAssets";
 
 export class ChunkForgeWorkers implements ChunkForge {
     /**
@@ -113,7 +114,7 @@ export class ChunkForgeWorkers implements ChunkForge {
     /**
      * Apply generated vertexData to waiting chunks
      */
-    private executeNextApplyTask(assets: Pick<Assets, "objects" | "materials">) {
+    private executeNextApplyTask(assets: RenderingAssets) {
         let task = this.applyTaskQueue.shift();
         while (task !== undefined && task.chunk.hasBeenDisposed()) {
             // if the chunk has been disposed, we skip it
@@ -132,7 +133,7 @@ export class ChunkForgeWorkers implements ChunkForge {
     /**
      * Updates the state of the forge : dispatch tasks to workers, remove useless chunks, apply vertexData to new chunks
      */
-    public update(assets: Pick<Assets, "objects" | "materials">) {
+    public update(assets: RenderingAssets) {
         for (let i = 0; i < this.workerPool.availableWorkers.length; i++) {
             this.executeNextTask(this.workerPool.availableWorkers.shift() as Worker);
         }

@@ -137,7 +137,7 @@ export class Spaceship implements Transformable {
 
         this.shipType = serializedSpaceShip.type;
 
-        const root = assets.objects.wanderer.instantiateHierarchy(null);
+        const root = assets.rendering.objects.wanderer.instantiateHierarchy(null);
         if (root === null) {
             throw new Error("Wanderer object not found");
         }
@@ -184,48 +184,48 @@ export class Spaceship implements Transformable {
         this.hyperSpaceTunnel = new HyperSpaceTunnel(
             this.getTransform().getDirection(Axis.Z),
             scene,
-            assets.textures.noises
+            assets.rendering.textures.noises
         );
         this.hyperSpaceTunnel.setParent(this.getTransform());
         this.hyperSpaceTunnel.setEnabled(false);
 
         this.enableWarpDriveSound = new AudioInstance(
-            assets.sounds.enableWarpDrive,
+            assets.audio.sounds.enableWarpDrive,
             AudioMasks.STAR_SYSTEM_VIEW,
             1,
             true,
             this.getTransform()
         );
         this.disableWarpDriveSound = new AudioInstance(
-            assets.sounds.disableWarpDrive,
+            assets.audio.sounds.disableWarpDrive,
             AudioMasks.STAR_SYSTEM_VIEW,
             1,
             true,
             this.getTransform()
         );
         this.acceleratingWarpDriveSound = new AudioInstance(
-            assets.sounds.acceleratingWarpDrive,
+            assets.audio.sounds.acceleratingWarpDrive,
             AudioMasks.STAR_SYSTEM_VIEW,
             0,
             false,
             this.getTransform()
         );
         this.deceleratingWarpDriveSound = new AudioInstance(
-            assets.sounds.deceleratingWarpDrive,
+            assets.audio.sounds.deceleratingWarpDrive,
             AudioMasks.STAR_SYSTEM_VIEW,
             0,
             false,
             this.getTransform()
         );
         this.hyperSpaceSound = new AudioInstance(
-            assets.sounds.hyperSpace,
+            assets.audio.sounds.hyperSpace,
             AudioMasks.HYPER_SPACE,
             0,
             false,
             this.getTransform()
         );
         this.thrusterSound = new AudioInstance(
-            assets.sounds.thruster,
+            assets.audio.sounds.thruster,
             AudioMasks.STAR_SYSTEM_VIEW,
             0,
             false,

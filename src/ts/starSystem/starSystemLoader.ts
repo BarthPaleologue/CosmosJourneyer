@@ -94,13 +94,17 @@ export class StarSystemLoader {
             let stellarObject: StellarObject;
             switch (stellarObjectModel.type) {
                 case OrbitalObjectType.STAR:
-                    stellarObject = new Star(stellarObjectModel, assets.textures.pools, scene);
+                    stellarObject = new Star(stellarObjectModel, assets.rendering.textures.pools, scene);
                     break;
                 case OrbitalObjectType.BLACK_HOLE:
-                    stellarObject = new BlackHole(stellarObjectModel, assets.textures.environment.milkyWay, scene);
+                    stellarObject = new BlackHole(
+                        stellarObjectModel,
+                        assets.rendering.textures.environment.milkyWay,
+                        scene
+                    );
                     break;
                 case OrbitalObjectType.NEUTRON_STAR:
-                    stellarObject = new NeutronStar(stellarObjectModel, assets.textures.pools, scene);
+                    stellarObject = new NeutronStar(stellarObjectModel, assets.rendering.textures.pools, scene);
                     break;
             }
             stellarObjects.push(stellarObject);
@@ -164,10 +168,20 @@ export class StarSystemLoader {
             let orbitalFacility: OrbitalFacility;
             switch (orbitalFacilityModel.type) {
                 case OrbitalObjectType.SPACE_STATION:
-                    orbitalFacility = new SpaceStation(orbitalFacilityModel, distancesToStellarObjects, assets, scene);
+                    orbitalFacility = new SpaceStation(
+                        orbitalFacilityModel,
+                        distancesToStellarObjects,
+                        assets.rendering,
+                        scene
+                    );
                     break;
                 case OrbitalObjectType.SPACE_ELEVATOR:
-                    orbitalFacility = new SpaceElevator(orbitalFacilityModel, distancesToStellarObjects, assets, scene);
+                    orbitalFacility = new SpaceElevator(
+                        orbitalFacilityModel,
+                        distancesToStellarObjects,
+                        assets.rendering,
+                        scene
+                    );
             }
             orbitalFacilities.push(orbitalFacility);
             orbitalFacility.getTransform().setAbsolutePosition(new Vector3(this.offset * ++this.loadingIndex, 0, 0));
@@ -190,10 +204,10 @@ export class StarSystemLoader {
             let planet: Planet;
             switch (planetModel.type) {
                 case OrbitalObjectType.TELLURIC_PLANET:
-                    planet = new TelluricPlanet(planetModel, assets, scene);
+                    planet = new TelluricPlanet(planetModel, assets.rendering, scene);
                     break;
                 case OrbitalObjectType.GAS_PLANET:
-                    planet = new GasPlanet(planetModel, assets.textures.pools.ringsLut, scene);
+                    planet = new GasPlanet(planetModel, assets.rendering.textures.pools.ringsLut, scene);
                     break;
             }
 
@@ -215,7 +229,7 @@ export class StarSystemLoader {
         const satellites: TelluricPlanet[] = [];
         for (const satelliteModel of satelliteModels) {
             console.log("Loading satellite:", satelliteModel.name);
-            const satellite = new TelluricPlanet(satelliteModel, assets, scene);
+            const satellite = new TelluricPlanet(satelliteModel, assets.rendering, scene);
             satellite.getTransform().setAbsolutePosition(new Vector3(this.offset * ++this.loadingIndex, 0, 0));
             satellites.push(satellite);
 

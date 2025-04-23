@@ -116,7 +116,7 @@ export class StarSystemController {
         scene: UberScene
     ) {
         this.scene = scene;
-        this.starFieldBox = new StarFieldBox(assets.textures.environment.milkyWay, scene);
+        this.starFieldBox = new StarFieldBox(assets.rendering.textures.environment.milkyWay, scene);
         this.model = model;
 
         this.assets = assets;
@@ -472,7 +472,11 @@ export class StarSystemController {
         controls.update(deltaSeconds);
 
         for (const object of celestialBodies) {
-            object.asteroidField?.update(controls.getActiveCamera().globalPosition, this.assets.objects, deltaSeconds);
+            object.asteroidField?.update(
+                controls.getActiveCamera().globalPosition,
+                this.assets.rendering.objects,
+                deltaSeconds
+            );
         }
 
         for (const object of this.getPlanetaryMassObjects()) {
@@ -590,15 +594,13 @@ export class StarSystemController {
     public dispose() {
         this.objectToParents.clear();
 
+        const pools = this.assets.rendering.textures.pools;
+
         this.orbitalFacilities.forEach((facility) => facility.dispose());
         this.anomalies.forEach((anomaly) => anomaly.dispose());
-        this.satellites.forEach((satellite) =>
-            satellite.dispose(this.assets.textures.pools.ringsLut, this.assets.textures.pools.cloudsLut)
-        );
-        this.planets.forEach((planet) =>
-            planet.dispose(this.assets.textures.pools.ringsLut, this.assets.textures.pools.cloudsLut)
-        );
-        this.stellarObjects.forEach((stellarObject) => stellarObject.dispose(this.assets.textures.pools.ringsLut));
+        this.satellites.forEach((satellite) => satellite.dispose(pools.ringsLut, pools.cloudsLut));
+        this.planets.forEach((planet) => planet.dispose(pools.ringsLut, pools.cloudsLut));
+        this.stellarObjects.forEach((stellarObject) => stellarObject.dispose(pools.ringsLut));
 
         this.systemTargets.forEach((target) => target.dispose());
         this.systemTargets.length = 0;

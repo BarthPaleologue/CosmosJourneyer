@@ -11,7 +11,7 @@ import i18n from "../../../i18n";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { ObjectTargetCursorType, TargetInfo } from "../../../architecture/targetable";
 import { ILandingPad, LandingPadSize } from "../../../spacestation/landingPad/landingPadManager";
-import { Assets } from "../../assets";
+import { RenderingAssets } from "../../renderingAssets";
 
 export class LandingPad implements ILandingPad {
     private readonly deck: Mesh;
@@ -33,12 +33,7 @@ export class LandingPad implements ILandingPad {
     private readonly width: number;
     private readonly depth: number;
 
-    constructor(
-        padNumber: number,
-        padSize: LandingPadSize,
-        assets: Pick<Assets, "textures" | "objects">,
-        scene: Scene
-    ) {
+    constructor(padNumber: number, padSize: LandingPadSize, assets: RenderingAssets, scene: Scene) {
         this.padSize = padSize;
 
         this.width = 40 * padSize;

@@ -30,8 +30,8 @@ import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/
 import { getRngFromSeed } from "../../../utils/getRngFromSeed";
 import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 import { Material } from "@babylonjs/core/Materials/material";
-import { Assets } from "../../assets";
 import { PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
+import { RenderingAssets } from "../../renderingAssets";
 
 export class UtilitySection implements Transformable {
     private readonly attachment: Mesh;
@@ -47,7 +47,7 @@ export class UtilitySection implements Transformable {
 
     private readonly tankShape: PhysicsShape;
 
-    constructor(seed: number, assets: Pick<Assets, "textures" | "objects">, scene: Scene) {
+    constructor(seed: number, assets: RenderingAssets, scene: Scene) {
         this.metalSectionMaterial = new MetalSectionMaterial(
             "UtilitySectionMetalMaterial",
             assets.textures.materials.metalPanels,

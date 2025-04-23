@@ -232,7 +232,7 @@ export class StarSystemView implements View {
         scene: UberScene,
         player: Player,
         engine: AbstractEngine,
-        havokInstance: HavokPhysicsWithBindings,
+        havokPlugin: HavokPlugin,
         encyclopaedia: EncyclopaediaGalacticaManager,
         starSystemDatabase: StarSystemDatabase,
         soundPlayer: ISoundPlayer,
@@ -249,6 +249,8 @@ export class StarSystemView implements View {
         this.scene = scene;
         this.scene.skipPointerMovePicking = true;
         this.scene.autoClear = false;
+
+        this.havokPlugin = havokPlugin;
 
         this.soundPlayer = soundPlayer;
         this.tts = tts;
@@ -446,15 +448,11 @@ export class StarSystemView implements View {
             console.log(getUniverseObjectId(object.model, this.getStarSystem().model));
         });
 
-        this.havokPlugin = new HavokPlugin(true, havokInstance);
-        setMaxLinVel(this.havokPlugin, 10000, 10000);
-        this.scene.enablePhysics(Vector3.Zero(), this.havokPlugin);
-
         // small ambient light helps with seeing dark objects. This is unrealistic but I feel it is better.
         const ambientLight = new HemisphericLight("ambientLight", Vector3.Zero(), this.scene);
         ambientLight.intensity = 0.02;
 
-        this.postProcessManager = new PostProcessManager(assets.textures, this.scene);
+        this.postProcessManager = new PostProcessManager(assets.rendering.textures, this.scene);
 
         // main update loop for the star system
         this.scene.onBeforePhysicsObservable.add(() => {
@@ -685,7 +683,7 @@ export class StarSystemView implements View {
         }
 
         if (this.characterControls === null) {
-            const character = this.assets.objects.character.instantiateHierarchy(null);
+            const character = this.assets.rendering.objects.character.instantiateHierarchy(null);
             if (!(character instanceof Mesh)) {
                 await alertModal("Character model is not a mesh!", this.soundPlayer);
             } else {
@@ -715,7 +713,7 @@ export class StarSystemView implements View {
 
         const starSystem = this.getStarSystem();
 
-        this.chunkForge.update(this.assets);
+        this.chunkForge.update(this.assets.rendering);
 
         starSystem.update(deltaSeconds, this.chunkForge, this.postProcessManager);
     }
@@ -839,22 +837,22 @@ export class StarSystemView implements View {
         const stellarObjects = starSystem.getStellarObjects().map((object) => object.getLight());
 
         // update dynamic materials
-        this.assets.materials.butterfly.update(
+        this.assets.rendering.materials.butterfly.update(
             stellarObjects,
             this.scene.getActiveControls().getTransform().getAbsolutePosition(),
             deltaSeconds
         );
-        this.assets.materials.butterflyDepth.update(
+        this.assets.rendering.materials.butterflyDepth.update(
             stellarObjects,
             this.scene.getActiveControls().getTransform().getAbsolutePosition(),
             deltaSeconds
         );
-        this.assets.materials.grass.update(
+        this.assets.rendering.materials.grass.update(
             stellarObjects,
             this.scene.getActiveControls().getTransform().getAbsolutePosition(),
             deltaSeconds
         );
-        this.assets.materials.grassDepth.update(
+        this.assets.rendering.materials.grassDepth.update(
             stellarObjects,
             this.scene.getActiveControls().getTransform().getAbsolutePosition(),
             deltaSeconds

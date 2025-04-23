@@ -32,9 +32,7 @@ import {
 import { enablePhysics } from "./utils";
 import { CharacterControls } from "../characterControls/characterControls";
 import { CharacterInputs } from "../characterControls/characterControlsInputs";
-import { loadObjects } from "../assets/objects";
-import { loadTextures } from "../assets/textures";
-import { initMaterials } from "../assets/materials";
+import { loadRenderingAssets } from "../assets/renderingAssets";
 
 export async function createCharacterDemoScene(
     engine: AbstractEngine,
@@ -49,15 +47,9 @@ export async function createCharacterDemoScene(
         await engine.getRenderingCanvas()?.requestPointerLock();
     });
 
-    const textures = await loadTextures((loadedCount, totalCount, name) => {
+    const assets = await loadRenderingAssets((loadedCount, totalCount, name) => {
         progressCallback(loadedCount / totalCount, `Loading ${name}`);
     }, scene);
-
-    const materials = await initMaterials(textures, scene);
-
-    const objects = await loadObjects(materials, textures, scene, (loadedCount, totalCount, name) => {
-        progressCallback(loadedCount / totalCount, `Loading ${name}`);
-    });
 
     const light = new DirectionalLight("dir01", new Vector3(1, -2, -1), scene);
     light.position = new Vector3(5, 5, 5).scaleInPlace(10);
@@ -68,7 +60,7 @@ export async function createCharacterDemoScene(
     const shadowGenerator = new ShadowGenerator(1024, light);
     shadowGenerator.useBlurExponentialShadowMap = true;
 
-    const characterObject = objects.character.instantiateHierarchy(null);
+    const characterObject = assets.objects.character.instantiateHierarchy(null);
     if (!(characterObject instanceof AbstractMesh)) {
         throw new Error("Character object is null");
     }
