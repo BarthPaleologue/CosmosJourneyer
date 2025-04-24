@@ -109,10 +109,6 @@ body {
         }
     }
 
-    @include meta.load-css("bodyEditor/nav");
-
-    @include meta.load-css("bodyEditor/panels");
-
     @include meta.load-css("helmetOverlay/helmetOverlay");
 
     @include meta.load-css("spaceStationUI/spaceStationUI");
@@ -163,6 +159,4 @@ body {
     .babylonUnmuteIcon {
         background-size: 100% !important;
     }
-
-    @include meta.load-css("bodyEditor/toolbar");
 }

@@ -60,7 +60,6 @@ export const StarSystemInputs = new InputMap<{
     toggleUi: PressInteraction;
     toggleOrbitsAndAxis: PressInteraction;
     cycleViews: PressInteraction;
-    toggleDebugUi: PressInteraction;
     printDebugInfo: PressInteraction;
 }>("StarSystemInputs", {
     setTarget: setTargetInteraction,
@@ -69,6 +68,5 @@ export const StarSystemInputs = new InputMap<{
     toggleUi: toggleUiInteraction,
     toggleOrbitsAndAxis: toggleOrbitsAndAxisInteraction,
     cycleViews: cycleViewsInteraction,
-    toggleDebugUi: toggleDebugUiInteraction,
     printDebugInfo: printDebugInfoInteraction
 });

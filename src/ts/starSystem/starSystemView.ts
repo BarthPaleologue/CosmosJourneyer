@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { SpaceShipLayer } from "../ui/spaceShipLayer";
-import { BodyEditor, EditorVisibility } from "../ui/bodyEditor/bodyEditor";
 import { UberScene } from "../uberCore/uberScene";
 import { AxisRenderer } from "../orbit/axisRenderer";
 import { TargetCursorLayer } from "../ui/targetCursorLayer";
@@ -123,11 +122,6 @@ export class StarSystemView implements View {
     private readonly encyclopaedia: EncyclopaediaGalacticaManager;
 
     private readonly starSystemDatabase: StarSystemDatabase;
-
-    /**
-     * A debug HTML UI to change the properties of the closest celestial body
-     */
-    readonly bodyEditor: BodyEditor;
 
     /**
      * The BabylonJS scene, upgraded with some helper methods and properties
@@ -239,11 +233,6 @@ export class StarSystemView implements View {
         this.starSystemDatabase = starSystemDatabase;
 
         this.spaceShipLayer = new SpaceShipLayer(this.player, this.starSystemDatabase);
-        this.bodyEditor = new BodyEditor(EditorVisibility.HIDDEN);
-
-        const canvas = engine.getRenderingCanvas();
-        if (canvas === null) throw new Error("Canvas is null");
-        this.bodyEditor.setCanvas(canvas);
 
         void getGlobalKeyboardLayoutMap().then((keyboardLayoutMap) => {
             this.keyboardLayoutMap = keyboardLayoutMap;
@@ -260,14 +249,6 @@ export class StarSystemView implements View {
             else Sounds.MENU_HOVER_SOUND.play();
             this.orbitRenderer.setVisibility(enabled);
             this.axisRenderer.setVisibility(enabled);
-        });
-
-        StarSystemInputs.map.toggleDebugUi.on("complete", () => {
-            this.bodyEditor.setVisibility(
-                this.bodyEditor.getVisibility() === EditorVisibility.HIDDEN
-                    ? EditorVisibility.NAVBAR
-                    : EditorVisibility.HIDDEN
-            );
         });
 
         StarSystemInputs.map.cycleViews.on("complete", async () => {
@@ -474,11 +455,6 @@ export class StarSystemView implements View {
             this.updateAfterRender();
         });
 
-        window.addEventListener("resize", () => {
-            this.bodyEditor.resize();
-        });
-
-        this.bodyEditor.resize();
         this.spaceShipLayer.setVisibility(false);
 
         this.spaceStationLayer = new SpaceStationLayer(this.player, this.encyclopaedia, this.starSystemDatabase);
@@ -874,8 +850,6 @@ export class StarSystemView implements View {
 
         const spaceship = this.spaceshipControls.getSpaceship();
 
-        this.bodyEditor.update(nearestCelestialBody, this.postProcessManager, this.scene);
-
         const missionContext: MissionContext = {
             currentSystem: starSystem,
             currentItinerary: this.player.currentItinerary,
@@ -1075,7 +1049,6 @@ export class StarSystemView implements View {
     }
 
     public hideHtmlUI() {
-        this.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
         this.spaceShipLayer.setVisibility(false);
         this.targetCursorLayer.setEnabled(false);
         this.spaceStationLayer.setVisibility(false);
