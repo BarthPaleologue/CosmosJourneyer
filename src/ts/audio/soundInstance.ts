@@ -3,7 +3,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { moveTowards } from "../utils/math";
 
-export class AudioInstance {
+export class SoundInstance {
     readonly sound: Sound;
 
     private targetVolume;

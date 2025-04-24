@@ -37,7 +37,7 @@ import { WarpTunnel } from "../utils/warpTunnel";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { HyperSpaceTunnel } from "../utils/hyperSpaceTunnel";
-import { AudioInstance } from "../audio/audioInstance";
+import { SoundInstance } from "../audio/soundInstance";
 import { AudioManager } from "../audio/audioManager";
 import { Thruster } from "./thruster";
 import { AudioMasks } from "../audio/audioMasks";
@@ -102,12 +102,12 @@ export class Spaceship implements Transformable {
 
     private isFuelScooping = false;
 
-    readonly enableWarpDriveSound: AudioInstance;
-    readonly disableWarpDriveSound: AudioInstance;
-    readonly acceleratingWarpDriveSound: AudioInstance;
-    readonly deceleratingWarpDriveSound: AudioInstance;
-    readonly hyperSpaceSound: AudioInstance;
-    readonly thrusterSound: AudioInstance;
+    readonly enableWarpDriveSound: SoundInstance;
+    readonly disableWarpDriveSound: SoundInstance;
+    readonly acceleratingWarpDriveSound: SoundInstance;
+    readonly deceleratingWarpDriveSound: SoundInstance;
+    readonly hyperSpaceSound: SoundInstance;
+    readonly thrusterSound: SoundInstance;
 
     readonly onFuelScoopStart = new Observable<void>();
     readonly onFuelScoopEnd = new Observable<void>();
@@ -189,42 +189,42 @@ export class Spaceship implements Transformable {
         this.hyperSpaceTunnel.setParent(this.getTransform());
         this.hyperSpaceTunnel.setEnabled(false);
 
-        this.enableWarpDriveSound = new AudioInstance(
+        this.enableWarpDriveSound = new SoundInstance(
             assets.audio.sounds.enableWarpDrive,
             AudioMasks.STAR_SYSTEM_VIEW,
             1,
             true,
             this.getTransform()
         );
-        this.disableWarpDriveSound = new AudioInstance(
+        this.disableWarpDriveSound = new SoundInstance(
             assets.audio.sounds.disableWarpDrive,
             AudioMasks.STAR_SYSTEM_VIEW,
             1,
             true,
             this.getTransform()
         );
-        this.acceleratingWarpDriveSound = new AudioInstance(
+        this.acceleratingWarpDriveSound = new SoundInstance(
             assets.audio.sounds.acceleratingWarpDrive,
             AudioMasks.STAR_SYSTEM_VIEW,
             0,
             false,
             this.getTransform()
         );
-        this.deceleratingWarpDriveSound = new AudioInstance(
+        this.deceleratingWarpDriveSound = new SoundInstance(
             assets.audio.sounds.deceleratingWarpDrive,
             AudioMasks.STAR_SYSTEM_VIEW,
             0,
             false,
             this.getTransform()
         );
-        this.hyperSpaceSound = new AudioInstance(
+        this.hyperSpaceSound = new SoundInstance(
             assets.audio.sounds.hyperSpace,
             AudioMasks.HYPER_SPACE,
             0,
             false,
             this.getTransform()
         );
-        this.thrusterSound = new AudioInstance(
+        this.thrusterSound = new SoundInstance(
             assets.audio.sounds.thruster,
             AudioMasks.STAR_SYSTEM_VIEW,
             0,

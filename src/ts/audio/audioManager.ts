@@ -1,11 +1,11 @@
-import { AudioInstance } from "./audioInstance";
+import { SoundInstance } from "./soundInstance";
 
 export class AudioManager {
     private static ENABLED_MASK = 0b1111;
 
-    private static readonly SOUNDS: AudioInstance[] = [];
+    private static readonly SOUNDS: SoundInstance[] = [];
 
-    public static RegisterSound(sound: AudioInstance) {
+    public static RegisterSound(sound: SoundInstance) {
         this.SOUNDS.push(sound);
     }
 
@@ -21,7 +21,7 @@ export class AudioManager {
         });
     }
 
-    static DisposeSound(audioInstance: AudioInstance) {
+    static DisposeSound(audioInstance: SoundInstance) {
         const index = this.SOUNDS.indexOf(audioInstance);
         if (index === -1) {
             throw new Error("Sound not found");
