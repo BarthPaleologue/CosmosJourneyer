@@ -24,9 +24,16 @@ import { CurrentMissionDisplay } from "./currentMissionDisplay";
 import { MissionContext } from "../missions/missionContext";
 import { smoothstep } from "../utils/math";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import canisterIconPath from "../../asset/icons/fuel_canister.webp";
 
 export class SpaceShipLayer {
-    private readonly rootNode: HTMLElement;
+    readonly root: HTMLElement;
+
+    private readonly throttleContainer: HTMLElement;
+
+    private readonly throttleStripes: HTMLElement;
+
+    private readonly speedIndicator: HTMLElement;
 
     private readonly cursor: HTMLElement;
 
@@ -38,24 +45,46 @@ export class SpaceShipLayer {
 
     private readonly currentMissionDisplay: CurrentMissionDisplay;
 
-    private readonly player: Player;
-
     constructor(player: Player, starSystemDatabase: StarSystemDatabase) {
-        this.player = player;
+        this.root = document.createElement("div");
+        this.root.id = "helmetOverlay";
 
-        this.rootNode = document.getElementById("helmetOverlay") as HTMLElement;
+        this.throttleContainer = document.createElement("div");
+        this.throttleContainer.id = "throttle";
+        this.root.appendChild(this.throttleContainer);
+
+        this.throttleStripes = document.createElement("div");
+        this.throttleStripes.id = "throttleStripes";
+        this.throttleContainer.appendChild(this.throttleStripes);
+
+        this.speedIndicator = document.createElement("div");
+        this.speedIndicator.id = "speed";
+        this.speedIndicator.innerText = "0 km/h";
+        this.root.appendChild(this.speedIndicator);
+
+        this.targetHelper = document.createElement("div");
+        this.targetHelper.id = "targetHelper";
+        this.root.appendChild(this.targetHelper);
+
+        this.targetDot = document.createElement("div");
+        this.targetDot.id = "targetDot";
+        this.targetHelper.appendChild(this.targetDot);
+
+        this.fuelIndicator = document.createElement("div");
+        this.fuelIndicator.id = "fuelIndicator";
+        this.root.appendChild(this.fuelIndicator);
+
+        const fuelIcon = document.createElement("img");
+        fuelIcon.src = canisterIconPath;
+        fuelIcon.alt = "Fuel canister icon";
+        this.fuelIndicator.appendChild(fuelIcon);
+
+        this.currentMissionDisplay = new CurrentMissionDisplay(player, starSystemDatabase);
+        this.root.appendChild(this.currentMissionDisplay.rootNode);
 
         this.cursor = document.createElement("div");
         this.cursor.classList.add("cursor");
-        this.rootNode.appendChild(this.cursor);
-
-        this.targetHelper = document.getElementById("targetHelper") as HTMLElement;
-        this.targetDot = document.getElementById("targetDot") as HTMLElement;
-
-        this.fuelIndicator = document.getElementById("fuelIndicator") as HTMLElement;
-
-        this.currentMissionDisplay = new CurrentMissionDisplay(player, starSystemDatabase);
-        this.rootNode.appendChild(this.currentMissionDisplay.rootNode);
+        this.root.appendChild(this.cursor);
 
         document.addEventListener("mousemove", (event) => {
             this.cursor.style.left = `${event.clientX}px`;
@@ -74,11 +103,11 @@ export class SpaceShipLayer {
     }
 
     public setVisibility(visible: boolean) {
-        this.rootNode.style.visibility = visible ? "visible" : "hidden";
+        this.root.style.visibility = visible ? "visible" : "hidden";
     }
 
     public isVisible(): boolean {
-        return this.rootNode.style.visibility === "visible";
+        return this.root.style.visibility === "visible";
     }
 
     public setTarget(target: TransformNode | null, forcedValue?: boolean) {
@@ -122,18 +151,12 @@ export class SpaceShipLayer {
     }
 
     displaySpeed(shipThrottle: number, speed: number) {
-        const throttleContainer = document.getElementById("throttle");
-        if (throttleContainer === null) throw new Error("Throttle container not found");
-        throttleContainer.style.alignItems = shipThrottle < 0 ? "flex-start" : "flex-end";
+        this.throttleContainer.style.alignItems = shipThrottle < 0 ? "flex-start" : "flex-end";
 
-        const throttleStripes = document.getElementById("throttleStripes");
-        if (throttleStripes === null) throw new Error("Throttle bar not found");
-        throttleStripes.style.height = `${(100 * Math.abs(shipThrottle)).toFixed(0)}%`;
-        throttleStripes.classList.toggle("reversed", shipThrottle < 0);
+        this.throttleStripes.style.height = `${(100 * Math.abs(shipThrottle)).toFixed(0)}%`;
+        this.throttleStripes.classList.toggle("reversed", shipThrottle < 0);
 
-        const speedIndicator = document.getElementById("speed");
-        if (speedIndicator === null) throw new Error("Speed indicator not found");
-        speedIndicator.innerText = parseSpeed(speed);
+        this.speedIndicator.innerText = parseSpeed(speed);
     }
 
     displayFuel(fuelRemainingFraction: number, nextJumpFuelFraction: number) {
@@ -145,6 +168,6 @@ export class SpaceShipLayer {
     }
 
     dispose() {
-        this.rootNode.remove();
+        this.root.remove();
     }
 }

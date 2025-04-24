@@ -233,6 +233,7 @@ export class StarSystemView implements View {
         this.starSystemDatabase = starSystemDatabase;
 
         this.spaceShipLayer = new SpaceShipLayer(this.player, this.starSystemDatabase);
+        document.body.appendChild(this.spaceShipLayer.root);
 
         void getGlobalKeyboardLayoutMap().then((keyboardLayoutMap) => {
             this.keyboardLayoutMap = keyboardLayoutMap;
