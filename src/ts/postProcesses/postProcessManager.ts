@@ -255,14 +255,11 @@ export class PostProcessManager {
     private makeSplitRenderEffects(
         name: string,
         body: CelestialBody,
-        postProcesses: PostProcess[],
+        postProcesses: ReadonlyArray<PostProcess>,
         engine: AbstractEngine
     ): [PostProcessRenderEffect, PostProcessRenderEffect] {
-        const bodyPostProcesses = this.celestialBodyToPostProcesses.get(body.getTransform());
-        if (bodyPostProcesses === undefined) throw new Error(`No post processes found for body ${body.model.name}`);
+        const bodyPostProcesses = this.celestialBodyToPostProcesses.get(body.getTransform()) ?? [];
         const relevantPostProcesses = postProcesses.filter((postProcess) => bodyPostProcesses.includes(postProcess));
-        if (relevantPostProcesses === undefined)
-            throw new Error(`No post process found for body ${body.model.name} in ${name}`);
 
         const otherPostProcesses = postProcesses.filter((postProcess) => !relevantPostProcesses.includes(postProcess));
 
