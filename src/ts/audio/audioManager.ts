@@ -1,4 +1,4 @@
-import { AudioInstance } from "../utils/audioInstance";
+import { AudioInstance } from "./audioInstance";
 
 export class AudioManager {
     private static ENABLED_MASK = 0b1111;

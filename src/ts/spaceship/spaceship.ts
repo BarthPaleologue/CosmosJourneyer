@@ -37,7 +37,7 @@ import { WarpTunnel } from "../utils/warpTunnel";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { HyperSpaceTunnel } from "../utils/hyperSpaceTunnel";
-import { AudioInstance } from "../utils/audioInstance";
+import { AudioInstance } from "../audio/audioInstance";
 import { AudioManager } from "../audio/audioManager";
 import { Thruster } from "./thruster";
 import { AudioMasks } from "../audio/audioMasks";
