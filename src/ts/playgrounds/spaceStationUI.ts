@@ -23,12 +23,12 @@ import { SpaceStationLayer } from "../ui/spaceStation/spaceStationLayer";
 import { Player } from "../player/player";
 import { EncyclopaediaGalacticaManager } from "../society/encyclopaediaGalacticaManager";
 import { initI18n } from "../i18n";
-import { loadAssets } from "../assets/assets";
 import { enablePhysics } from "./utils";
 import { Spaceship } from "../spaceship/spaceship";
 import { ShipControls } from "../spaceship/shipControls";
 import { SoundPlayerMock } from "../audio/soundPlayer";
 import { TtsMock } from "../audio/tts";
+import { loadRenderingAssets } from "../assets/renderingAssets";
 
 export async function createSpaceStationUIScene(
     engine: AbstractEngine,
@@ -41,7 +41,7 @@ export async function createSpaceStationUIScene(
 
     await initI18n();
 
-    const assets = await loadAssets((current, total, name) => {
+    const assets = await loadRenderingAssets((current, total, name) => {
         progressCallback(current / total, `Loading ${name}`);
     }, scene);
 
@@ -57,7 +57,13 @@ export async function createSpaceStationUIScene(
         throw new Error("No spaceship found in player data");
     }
 
-    const spaceship = Spaceship.Deserialize(serializedSpaceship, player.spareSpaceshipComponents, scene, assets);
+    const spaceship = Spaceship.Deserialize(
+        serializedSpaceship,
+        player.spareSpaceshipComponents,
+        scene,
+        assets,
+        soundPlayer
+    );
     player.instancedSpaceships.push(spaceship);
 
     const shipControls = new ShipControls(spaceship, scene, soundPlayer, tts);

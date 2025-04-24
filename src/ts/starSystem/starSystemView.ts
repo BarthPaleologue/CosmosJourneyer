@@ -30,8 +30,6 @@ import { OrbitRenderer } from "../orbit/orbitRenderer";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { ChunkForgeWorkers } from "../planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
 import "@babylonjs/core/Loading/loadingScreen";
-import { setMaxLinVel } from "../utils/havok";
-import { HavokPhysicsWithBindings } from "@babylonjs/havok";
 import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge";
 import { DefaultControls } from "../defaultControls/defaultControls";
 import { CharacterControls } from "../characterControls/characterControls";
@@ -51,7 +49,6 @@ import { createNotification, NotificationIntent, NotificationOrigin } from "../u
 import { axisCompositeToString, dPadCompositeToString } from "../utils/strings/inputControlsString";
 import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
 import { AxisComposite } from "@brianchirls/game-input/browser";
-import { AudioManager } from "../audio/audioManager";
 import { AudioMasks } from "../audio/audioMasks";
 import { TransformRotationAnimation } from "../uberCore/transforms/animations/rotation";
 import { PostProcessManager } from "../postProcesses/postProcessManager";
@@ -357,8 +354,8 @@ export class StarSystemView implements View {
             if (!warpDrive.isEnabled()) spaceship.enableWarpDrive();
             spaceship.hyperSpaceTunnel.setEnabled(true);
             spaceship.warpTunnel.getTransform().setEnabled(false);
-            spaceship.hyperSpaceSound.setTargetVolume(1);
-            AudioManager.SetMask(AudioMasks.HYPER_SPACE);
+            spaceship.hyperSpaceSound.setVolume(1);
+            soundPlayer.setInstanceMask(AudioMasks.HYPER_SPACE);
             const observer = this.scene.onBeforeRenderObservable.add(() => {
                 const deltaSeconds = this.scene.getEngine().getDeltaTime() / 1000;
                 spaceship.hyperSpaceTunnel.update(deltaSeconds);
@@ -377,9 +374,9 @@ export class StarSystemView implements View {
 
             spaceship.hyperSpaceTunnel.setEnabled(false);
             spaceship.warpTunnel.getTransform().setEnabled(true);
-            spaceship.hyperSpaceSound.setTargetVolume(0);
+            spaceship.hyperSpaceSound.setVolume(0);
 
-            AudioManager.SetMask(AudioMasks.STAR_SYSTEM_VIEW);
+            soundPlayer.setInstanceMask(AudioMasks.STAR_SYSTEM_VIEW);
             observer.remove();
             this.jumpLock = false;
 
@@ -415,8 +412,8 @@ export class StarSystemView implements View {
 
                 await this.scene.setActiveControls(characterControls);
 
-                spaceship.acceleratingWarpDriveSound.setTargetVolume(0);
-                spaceship.deceleratingWarpDriveSound.setTargetVolume(0);
+                spaceship.acceleratingWarpDriveSound.setVolume(0);
+                spaceship.deceleratingWarpDriveSound.setVolume(0);
             } else if (this.scene.getActiveControls() === characterControls) {
                 characterControls.getTransform().setEnabled(false);
                 CharacterInputs.setEnabled(false);
@@ -504,7 +501,7 @@ export class StarSystemView implements View {
         this._isLoadingSystem = true;
 
         if (this.starSystem !== null) {
-            this.aiPlayers.forEach((aiPlayer) => aiPlayer.dispose());
+            this.aiPlayers.forEach((aiPlayer) => aiPlayer.dispose(this.soundPlayer));
             this.aiPlayers.length = 0;
 
             this.spaceshipControls?.setClosestLandableFacility(null);
@@ -548,14 +545,19 @@ export class StarSystemView implements View {
             });
 
             for (let i = 0; i < Math.ceil(Math.random() * 15); i++) {
-                const aiPlayer = new AiPlayerControls(this.starSystemDatabase, this.scene, this.assets);
+                const aiPlayer = new AiPlayerControls(
+                    this.starSystemDatabase,
+                    this.scene,
+                    this.assets.rendering,
+                    this.soundPlayer
+                );
 
                 const landingPad = spaceStation.getLandingPadManager().handleLandingRequest({
                     minimumPadSize: LandingPadSize.SMALL
                 });
 
                 if (landingPad === null) {
-                    aiPlayer.dispose();
+                    aiPlayer.dispose(this.soundPlayer);
                     break;
                 }
 
@@ -668,7 +670,8 @@ export class StarSystemView implements View {
             spaceshipSerialized,
             this.player.spareSpaceshipComponents,
             this.scene,
-            this.assets
+            this.assets.rendering,
+            this.soundPlayer
         );
         this.player.instancedSpaceships.push(spaceship);
 
@@ -679,7 +682,7 @@ export class StarSystemView implements View {
             const oldSpaceship = this.spaceshipControls.getSpaceship();
             this.spaceshipControls.reset();
             this.spaceshipControls.setSpaceship(spaceship);
-            oldSpaceship.dispose();
+            oldSpaceship.dispose(this.soundPlayer);
         }
 
         if (this.characterControls === null) {
@@ -1058,9 +1061,9 @@ export class StarSystemView implements View {
      */
     public stopBackgroundSounds() {
         const spaceship = this.getSpaceshipControls().getSpaceship();
-        spaceship.acceleratingWarpDriveSound.setTargetVolume(0);
-        spaceship.deceleratingWarpDriveSound.setTargetVolume(0);
-        spaceship.thrusterSound.setTargetVolume(0);
+        spaceship.acceleratingWarpDriveSound.setVolume(0);
+        spaceship.deceleratingWarpDriveSound.setVolume(0);
+        spaceship.thrusterSound.setVolume(0);
     }
 
     /**

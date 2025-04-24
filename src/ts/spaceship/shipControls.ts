@@ -51,6 +51,7 @@ import { LandingPadSize } from "../spacestation/landingPad/landingPadManager";
 import { ITts, Speaker, VoiceLine } from "../audio/tts";
 import { ISoundPlayer } from "../audio/soundPlayer";
 import { Assets } from "../assets/assets";
+import { RenderingAssets } from "../assets/renderingAssets";
 
 export class ShipControls implements Controls {
     private spaceship: Spaceship;
@@ -490,11 +491,11 @@ export class ShipControls implements Controls {
         return this.spaceship;
     }
 
-    static CreateDefault(scene: Scene, assets: Assets, tts: ITts, soundPlayer: ISoundPlayer) {
-        return new ShipControls(Spaceship.CreateDefault(scene, assets), scene, soundPlayer, tts);
+    static CreateDefault(scene: Scene, assets: RenderingAssets, tts: ITts, soundPlayer: ISoundPlayer) {
+        return new ShipControls(Spaceship.CreateDefault(scene, assets, soundPlayer), scene, soundPlayer, tts);
     }
 
-    dispose() {
+    dispose(soundPlayer: ISoundPlayer) {
         this.onToggleWarpDrive.clear();
         this.onCompleteLanding.clear();
 
@@ -504,7 +505,7 @@ export class ShipControls implements Controls {
         SpaceShipControlsInputs.map.throttleToZero.off("complete", this.throttleToZeroHandler);
         SpaceShipControlsInputs.map.resetCamera.off("complete", this.resetCameraHandler);
 
-        this.spaceship.dispose();
+        this.spaceship.dispose(soundPlayer);
         this.thirdPersonCamera.dispose();
         this.firstPersonCamera.dispose();
     }

@@ -27,7 +27,8 @@ import { Spaceship } from "../spaceship/spaceship";
 import { randRange } from "extended-random";
 import { CollisionMask } from "../settings";
 import { LandingPadSize } from "../spacestation/landingPad/landingPadManager";
-import { loadAssets } from "../assets/assets";
+import { loadRenderingAssets } from "../assets/renderingAssets";
+import { SoundPlayerMock } from "../audio/soundPlayer";
 
 export async function createAutomaticLandingScene(
     engine: AbstractEngine,
@@ -38,11 +39,13 @@ export async function createAutomaticLandingScene(
 
     await enablePhysics(scene);
 
-    const assets = await loadAssets((loadedCount, totalCount, name) => {
+    const assets = await loadRenderingAssets((loadedCount, totalCount, name) => {
         progressCallback(loadedCount / totalCount, `Loading ${name}`);
     }, scene);
 
-    const ship = Spaceship.CreateDefault(scene, assets);
+    const soundPlayer = new SoundPlayerMock();
+
+    const ship = Spaceship.CreateDefault(scene, assets, soundPlayer);
     ship.getTransform().position.copyFromFloats(
         randRange(-50, 50, Math.random, 0),
         randRange(30, 50, Math.random, 0),
@@ -58,7 +61,7 @@ export async function createAutomaticLandingScene(
     camera.minZ = 0.1;
     camera.attachControl();
 
-    new LandingPad(42, LandingPadSize.SMALL, assets.rendering, scene);
+    new LandingPad(42, LandingPadSize.SMALL, assets, scene);
 
     const ground = MeshBuilder.CreateBox("ground", { width: 100, height: 1, depth: 100 }, scene);
     ground.position.y = -2;

@@ -22,6 +22,7 @@ import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
+import { ISoundPlayer } from "../audio/soundPlayer";
 
 export class AiSpaceshipControls implements Controls {
     readonly spaceship: Spaceship;
@@ -54,7 +55,7 @@ export class AiSpaceshipControls implements Controls {
         return Vector3.Zero();
     }
 
-    dispose() {
-        this.spaceship.dispose();
+    dispose(soundPlayer: ISoundPlayer) {
+        this.spaceship.dispose(soundPlayer);
     }
 }

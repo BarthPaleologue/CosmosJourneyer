@@ -17,6 +17,7 @@
 
 import { Sound } from "@babylonjs/core/Audio/sound";
 import { Sounds } from "../assets/sounds";
+import { ISoundInstance, SoundInstance, SoundInstanceMock } from "./soundInstance";
 
 export const enum SoundType {
     CLICK,
@@ -30,12 +31,26 @@ export const enum SoundType {
     TARGET_LOCK,
     TARGET_UNLOCK,
     ITINERARY_COMPUTED,
-    OPEN_PAUSE_MENU
+    OPEN_PAUSE_MENU,
+    ENABLE_WARP_DRIVE,
+    DISABLE_WARP_DRIVE,
+    ACCELERATING_WARP_DRIVE,
+    DECELERATING_WARP_DRIVE,
+    HYPER_SPACE,
+    THRUSTER
 }
 
 export interface ISoundPlayer {
     playNow(soundType: SoundType): void;
     enqueuePlay(soundType: SoundType): void;
+    createInstance(
+        soundType: SoundType,
+        mask: number,
+        initialTargetVolume: number,
+        isPonctual: boolean
+    ): ISoundInstance;
+    freeInstance(instance: ISoundInstance): void;
+    setInstanceMask(mask: number): void;
     update(): void;
 }
 
@@ -44,6 +59,9 @@ export class SoundPlayer implements ISoundPlayer {
 
     private isPlaying = false;
     private soundQueue: Array<Sound> = [];
+
+    private readonly soundInstances: Set<ISoundInstance> = new Set();
+    private soundInstanceMask = 0b1111;
 
     constructor(sounds: Sounds) {
         this.sounds = sounds;
@@ -70,6 +88,18 @@ export class SoundPlayer implements ISoundPlayer {
                 return this.sounds.targetUnlock;
             case SoundType.OPEN_PAUSE_MENU:
                 return this.sounds.openPauseMenu;
+            case SoundType.ENABLE_WARP_DRIVE:
+                return this.sounds.enableWarpDrive;
+            case SoundType.DISABLE_WARP_DRIVE:
+                return this.sounds.disableWarpDrive;
+            case SoundType.ACCELERATING_WARP_DRIVE:
+                return this.sounds.acceleratingWarpDrive;
+            case SoundType.DECELERATING_WARP_DRIVE:
+                return this.sounds.deceleratingWarpDrive;
+            case SoundType.HYPER_SPACE:
+                return this.sounds.hyperSpace;
+            case SoundType.THRUSTER:
+                return this.sounds.thruster;
         }
     }
 
@@ -81,7 +111,34 @@ export class SoundPlayer implements ISoundPlayer {
         this.soundQueue.push(this.getSoundFromType(soundType));
     }
 
+    public createInstance(
+        soundType: SoundType,
+        mask: number,
+        initialTargetVolume: number,
+        isPonctual: boolean
+    ): ISoundInstance {
+        const sound = this.getSoundFromType(soundType);
+        const instance = new SoundInstance(sound, mask, initialTargetVolume, isPonctual);
+        this.soundInstances.add(instance);
+        instance.setMaskFactor((mask & this.soundInstanceMask) !== 0 ? 1 : 0);
+        return instance;
+    }
+
+    freeInstance(instance: ISoundInstance): void {
+        this.soundInstances.delete(instance);
+        instance.dispose();
+    }
+
+    public setInstanceMask(mask: number): void {
+        this.soundInstanceMask = mask;
+    }
+
     public update(): void {
+        for (const soundInstance of this.soundInstances) {
+            const isSoundEnabled = (soundInstance.getMask() & this.soundInstanceMask) !== 0;
+            soundInstance.setMaskFactor(isSoundEnabled ? 1 : 0);
+        }
+
         if (this.isPlaying) {
             return;
         }
@@ -106,6 +163,23 @@ export class SoundPlayerMock implements ISoundPlayer {
     }
 
     enqueuePlay(): void {
+        // No-op
+    }
+
+    createInstance(
+        soundType: SoundType,
+        mask: number,
+        initialTargetVolume: number,
+        isPonctual: boolean
+    ): ISoundInstance {
+        return new SoundInstanceMock();
+    }
+
+    freeInstance(instance: ISoundInstance): void {
+        // No-op
+    }
+
+    setInstanceMask(mask: number): void {
         // No-op
     }
 

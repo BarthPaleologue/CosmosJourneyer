@@ -37,8 +37,7 @@ import { WarpTunnel } from "../utils/warpTunnel";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { HyperSpaceTunnel } from "../utils/hyperSpaceTunnel";
-import { SoundInstance } from "../audio/soundInstance";
-import { AudioManager } from "../audio/audioManager";
+import { ISoundInstance } from "../audio/soundInstance";
 import { Thruster } from "./thruster";
 import { AudioMasks } from "../audio/audioMasks";
 import { CelestialBody, OrbitalObject } from "../architecture/orbitalObject";
@@ -51,7 +50,8 @@ import { getDefaultSerializedSpaceship, SerializedSpaceship, ShipType } from "./
 import { SpaceshipInternals } from "./spaceshipInternals";
 import { SerializedComponent } from "./serializedComponents/component";
 import { ILandingPad } from "../spacestation/landingPad/landingPadManager";
-import { Assets } from "../assets/assets";
+import { RenderingAssets } from "../assets/renderingAssets";
+import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
 
 const enum ShipState {
     FLYING,
@@ -102,12 +102,12 @@ export class Spaceship implements Transformable {
 
     private isFuelScooping = false;
 
-    readonly enableWarpDriveSound: SoundInstance;
-    readonly disableWarpDriveSound: SoundInstance;
-    readonly acceleratingWarpDriveSound: SoundInstance;
-    readonly deceleratingWarpDriveSound: SoundInstance;
-    readonly hyperSpaceSound: SoundInstance;
-    readonly thrusterSound: SoundInstance;
+    readonly enableWarpDriveSound: ISoundInstance;
+    readonly disableWarpDriveSound: ISoundInstance;
+    readonly acceleratingWarpDriveSound: ISoundInstance;
+    readonly deceleratingWarpDriveSound: ISoundInstance;
+    readonly hyperSpaceSound: ISoundInstance;
+    readonly thrusterSound: ISoundInstance;
 
     readonly onFuelScoopStart = new Observable<void>();
     readonly onFuelScoopEnd = new Observable<void>();
@@ -129,7 +129,8 @@ export class Spaceship implements Transformable {
         serializedSpaceShip: SerializedSpaceship,
         unfitComponents: Set<SerializedComponent>,
         scene: Scene,
-        assets: Assets
+        assets: RenderingAssets,
+        soundPlayer: ISoundPlayer
     ) {
         this.id = serializedSpaceShip.id ?? crypto.randomUUID();
 
@@ -137,7 +138,7 @@ export class Spaceship implements Transformable {
 
         this.shipType = serializedSpaceShip.type;
 
-        const root = assets.rendering.objects.wanderer.instantiateHierarchy(null);
+        const root = assets.objects.wanderer.instantiateHierarchy(null);
         if (root === null) {
             throw new Error("Wanderer object not found");
         }
@@ -184,53 +185,41 @@ export class Spaceship implements Transformable {
         this.hyperSpaceTunnel = new HyperSpaceTunnel(
             this.getTransform().getDirection(Axis.Z),
             scene,
-            assets.rendering.textures.noises
+            assets.textures.noises
         );
         this.hyperSpaceTunnel.setParent(this.getTransform());
         this.hyperSpaceTunnel.setEnabled(false);
 
-        this.enableWarpDriveSound = new SoundInstance(
-            assets.audio.sounds.enableWarpDrive,
-            AudioMasks.STAR_SYSTEM_VIEW,
+        this.enableWarpDriveSound = soundPlayer.createInstance(
+            SoundType.ENABLE_WARP_DRIVE,
+            AudioMasks.STAR_MAP_VIEW,
             1,
-            true,
-            this.getTransform()
+            true
         );
-        this.disableWarpDriveSound = new SoundInstance(
-            assets.audio.sounds.disableWarpDrive,
-            AudioMasks.STAR_SYSTEM_VIEW,
+
+        this.disableWarpDriveSound = soundPlayer.createInstance(
+            SoundType.DISABLE_WARP_DRIVE,
+            AudioMasks.STAR_MAP_VIEW,
             1,
-            true,
-            this.getTransform()
+            true
         );
-        this.acceleratingWarpDriveSound = new SoundInstance(
-            assets.audio.sounds.acceleratingWarpDrive,
+
+        this.acceleratingWarpDriveSound = soundPlayer.createInstance(
+            SoundType.ACCELERATING_WARP_DRIVE,
             AudioMasks.STAR_SYSTEM_VIEW,
             0,
-            false,
-            this.getTransform()
+            false
         );
-        this.deceleratingWarpDriveSound = new SoundInstance(
-            assets.audio.sounds.deceleratingWarpDrive,
+
+        this.deceleratingWarpDriveSound = soundPlayer.createInstance(
+            SoundType.DECELERATING_WARP_DRIVE,
             AudioMasks.STAR_SYSTEM_VIEW,
             0,
-            false,
-            this.getTransform()
+            false
         );
-        this.hyperSpaceSound = new SoundInstance(
-            assets.audio.sounds.hyperSpace,
-            AudioMasks.HYPER_SPACE,
-            0,
-            false,
-            this.getTransform()
-        );
-        this.thrusterSound = new SoundInstance(
-            assets.audio.sounds.thruster,
-            AudioMasks.STAR_SYSTEM_VIEW,
-            0,
-            false,
-            this.getTransform()
-        );
+
+        this.hyperSpaceSound = soundPlayer.createInstance(SoundType.HYPER_SPACE, AudioMasks.HYPER_SPACE, 0, false);
+        this.thrusterSound = soundPlayer.createInstance(SoundType.THRUSTER, AudioMasks.STAR_SYSTEM_VIEW, 0, false);
 
         this.internals = new SpaceshipInternals(serializedSpaceShip, unfitComponents);
 
@@ -238,17 +227,10 @@ export class Spaceship implements Transformable {
 
         this.boundingExtent = boundingMax.subtract(boundingMin);
 
-        AudioManager.RegisterSound(this.enableWarpDriveSound);
-        AudioManager.RegisterSound(this.disableWarpDriveSound);
-        AudioManager.RegisterSound(this.acceleratingWarpDriveSound);
-        AudioManager.RegisterSound(this.deceleratingWarpDriveSound);
-        AudioManager.RegisterSound(this.hyperSpaceSound);
-        AudioManager.RegisterSound(this.thrusterSound);
-
-        this.thrusterSound.sound.play();
-        this.acceleratingWarpDriveSound.sound.play();
-        this.deceleratingWarpDriveSound.sound.play();
-        this.hyperSpaceSound.sound.play();
+        this.thrusterSound.play();
+        this.acceleratingWarpDriveSound.play();
+        this.deceleratingWarpDriveSound.play();
+        this.hyperSpaceSound.play();
 
         this.scene = scene;
     }
@@ -290,9 +272,9 @@ export class Spaceship implements Transformable {
         this.aggregate.body.setLinearVelocity(Vector3.Zero());
         this.aggregate.body.setAngularVelocity(Vector3.Zero());
 
-        this.thrusterSound.setTargetVolume(0);
+        this.thrusterSound.setVolume(0);
 
-        this.enableWarpDriveSound.sound.play();
+        this.enableWarpDriveSound.play();
         this.onWarpDriveEnabled.notifyObservers();
     }
 
@@ -305,7 +287,7 @@ export class Spaceship implements Transformable {
         warpDrive.disengage();
         this.aggregate.body.setMotionType(PhysicsMotionType.DYNAMIC);
 
-        this.disableWarpDriveSound.sound.play();
+        this.disableWarpDriveSound.play();
         this.onWarpDriveDisabled.notifyObservers(false);
     }
 
@@ -318,7 +300,7 @@ export class Spaceship implements Transformable {
         warpDrive.emergencyStop();
         this.aggregate.body.setMotionType(PhysicsMotionType.DYNAMIC);
 
-        this.disableWarpDriveSound.sound.play();
+        this.disableWarpDriveSound.play();
         this.onWarpDriveDisabled.notifyObservers(true);
     }
 
@@ -567,14 +549,14 @@ export class Spaceship implements Transformable {
 
             translate(this.getTransform(), warpSpeed.scale(deltaSeconds));
 
-            this.thrusterSound.setTargetVolume(0);
+            this.thrusterSound.setVolume(0);
 
             if (currentForwardSpeed < warpDrive.getWarpSpeed()) {
-                this.acceleratingWarpDriveSound.setTargetVolume(1);
-                this.deceleratingWarpDriveSound.setTargetVolume(0);
+                this.acceleratingWarpDriveSound.setVolume(1);
+                this.deceleratingWarpDriveSound.setVolume(0);
             } else {
-                this.deceleratingWarpDriveSound.setTargetVolume(1);
-                this.acceleratingWarpDriveSound.setTargetVolume(0);
+                this.deceleratingWarpDriveSound.setVolume(1);
+                this.acceleratingWarpDriveSound.setVolume(0);
             }
         }
 
@@ -605,9 +587,9 @@ export class Spaceship implements Transformable {
 
             if (this.mainEngineThrottle !== 0) {
                 const throttleVolume = Math.abs(this.mainEngineThrottle); // Ensure volume is positive
-                this.thrusterSound.setTargetVolume(throttleVolume);
+                this.thrusterSound.setVolume(throttleVolume);
             } else {
-                this.thrusterSound.setTargetVolume(0);
+                this.thrusterSound.setVolume(0);
             }
 
             if (!this.isAutoPiloted()) {
@@ -635,8 +617,8 @@ export class Spaceship implements Transformable {
                 thruster.setThrottle(this.mainEngineThrottle);
             });
 
-            this.acceleratingWarpDriveSound.setTargetVolume(0);
-            this.deceleratingWarpDriveSound.setTargetVolume(0);
+            this.acceleratingWarpDriveSound.setVolume(0);
+            this.deceleratingWarpDriveSound.setVolume(0);
 
             if (this.targetLandingPad !== null && this.landingComputer !== null) {
                 const shipRelativePosition = this.getTransform()
@@ -735,17 +717,18 @@ export class Spaceship implements Transformable {
         return amount - fuelLeftToRefuel;
     }
 
-    public static CreateDefault(scene: Scene, assets: Assets): Spaceship {
-        return Spaceship.Deserialize(getDefaultSerializedSpaceship(), new Set(), scene, assets);
+    public static CreateDefault(scene: Scene, assets: RenderingAssets, soundPlayer: ISoundPlayer): Spaceship {
+        return Spaceship.Deserialize(getDefaultSerializedSpaceship(), new Set(), scene, assets, soundPlayer);
     }
 
     public static Deserialize(
         serializedSpaceship: SerializedSpaceship,
         unfitComponents: Set<SerializedComponent>,
         scene: Scene,
-        assets: Assets
+        assets: RenderingAssets,
+        soundPlayer: ISoundPlayer
     ): Spaceship {
-        return new Spaceship(serializedSpaceship, unfitComponents, scene, assets);
+        return new Spaceship(serializedSpaceship, unfitComponents, scene, assets, soundPlayer);
     }
 
     public serialize(): SerializedSpaceship {
@@ -760,12 +743,12 @@ export class Spaceship implements Transformable {
         }
     }
 
-    public dispose() {
-        AudioManager.DisposeSound(this.enableWarpDriveSound);
-        AudioManager.DisposeSound(this.disableWarpDriveSound);
-        AudioManager.DisposeSound(this.acceleratingWarpDriveSound);
-        AudioManager.DisposeSound(this.deceleratingWarpDriveSound);
-        AudioManager.DisposeSound(this.thrusterSound);
+    public dispose(soundPlayer: ISoundPlayer) {
+        soundPlayer.freeInstance(this.enableWarpDriveSound);
+        soundPlayer.freeInstance(this.disableWarpDriveSound);
+        soundPlayer.freeInstance(this.acceleratingWarpDriveSound);
+        soundPlayer.freeInstance(this.deceleratingWarpDriveSound);
+        soundPlayer.freeInstance(this.thrusterSound);
 
         this.mainThrusters.forEach((thruster) => thruster.dispose());
         this.mainThrusters.length = 0;

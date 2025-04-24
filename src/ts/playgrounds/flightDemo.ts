@@ -25,7 +25,7 @@ import { ShipControls } from "../spaceship/shipControls";
 import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
 import { SoundPlayerMock } from "../audio/soundPlayer";
 import { TtsMock } from "../audio/tts";
-import { loadAssets } from "../assets/assets";
+import { loadRenderingAssets } from "../assets/renderingAssets";
 
 export async function createFlightDemoScene(
     engine: AbstractEngine,
@@ -37,7 +37,7 @@ export async function createFlightDemoScene(
 
     await enablePhysics(scene);
 
-    const assets = await loadAssets((loadedCount, totalCount, name) => {
+    const assets = await loadRenderingAssets((loadedCount, totalCount, name) => {
         progressCallback(loadedCount / totalCount, `Loading ${name}`);
     }, scene);
 
@@ -78,7 +78,7 @@ export async function createFlightDemoScene(
 
     const material = new PBRMetallicRoughnessMaterial("material", scene);
     material.baseColor = new Color3(0.5, 0.5, 0.5);
-    material.metallic = 0.5;
+    material.metallic = 0.0;
     material.roughness = 0.5;
 
     mesh.material = material;

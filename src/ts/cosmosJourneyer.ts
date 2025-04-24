@@ -36,7 +36,6 @@ import {
     UniverseCoordinates
 } from "./utils/coordinates/universeCoordinates";
 import { View } from "./utils/view";
-import { AudioManager } from "./audio/audioManager";
 import { AudioMasks } from "./audio/audioMasks";
 import { GeneralInputs } from "./inputs/generalInputs";
 import { createNotification, NotificationIntent, NotificationOrigin, updateNotifications } from "./utils/notification";
@@ -208,7 +207,7 @@ export class CosmosJourneyer {
         this.starMap.detachControl();
         this.starSystemView.attachControl();
         this.activeView = this.starSystemView;
-        AudioManager.SetMask(AudioMasks.STAR_SYSTEM_VIEW);
+        soundPlayer.setInstanceMask(AudioMasks.STAR_SYSTEM_VIEW);
 
         this.tutorialLayer = new TutorialLayer(this.soundPlayer);
         document.body.appendChild(this.tutorialLayer.root);
@@ -557,7 +556,6 @@ export class CosmosJourneyer {
             }
 
             updateNotifications(deltaSeconds);
-            AudioManager.Update(deltaSeconds);
             this.musicConductor.update(
                 this.isPaused(),
                 this.activeView === this.starSystemView,
@@ -578,7 +576,7 @@ export class CosmosJourneyer {
      */
     public async toggleStarMap(): Promise<void> {
         if (this.activeView === this.starSystemView) {
-            AudioManager.SetMask(AudioMasks.STAR_MAP_VIEW);
+            this.soundPlayer.setInstanceMask(AudioMasks.STAR_MAP_VIEW);
 
             this.starSystemView.targetCursorLayer.setEnabled(false);
             document.exitPointerLock();
@@ -593,7 +591,7 @@ export class CosmosJourneyer {
             this.starMap.detachControl();
             this.starSystemView.attachControl();
 
-            AudioManager.SetMask(AudioMasks.STAR_SYSTEM_VIEW);
+            this.soundPlayer.setInstanceMask(AudioMasks.STAR_SYSTEM_VIEW);
             this.activeView = this.starSystemView;
 
             if (this.starSystemView.scene.getActiveControls().shouldLockPointer()) {
