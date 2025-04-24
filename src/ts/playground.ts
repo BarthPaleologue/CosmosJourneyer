@@ -22,8 +22,8 @@ import "@babylonjs/core/Materials/standardMaterial";
 import "@babylonjs/core/Loading/loadingScreen";
 import "@babylonjs/core/Misc/screenshotTools";
 import "@babylonjs/core/Meshes/thinInstanceMesh";
-import { PhysicsViewer, Scene, Tools } from "@babylonjs/core";
 import "@babylonjs/inspector";
+import { PhysicsViewer, Scene, Tools } from "@babylonjs/core";
 import { createDefaultScene } from "./playgrounds/default";
 import { createOrbitalDemoScene } from "./playgrounds/orbitalDemo";
 import { createAutomaticLandingScene } from "./playgrounds/automaticLanding";
@@ -39,6 +39,7 @@ import { createStarMapScene } from "./playgrounds/starMap";
 import { createTutorialScene } from "./playgrounds/tutorial";
 import { createAsteroidFieldScene } from "./playgrounds/asteroidField";
 import { LoadingScreen } from "./uberCore/loadingScreen";
+import { createStarSystemViewScene } from "./playgrounds/starSystemView";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -98,6 +99,9 @@ switch (requestedScene) {
         break;
     case "asteroidField":
         scene = await createAsteroidFieldScene(engine, progressCallback);
+        break;
+    case "starSystemView":
+        scene = await createStarSystemViewScene(engine, progressCallback);
         break;
     default:
         scene = createDefaultScene(engine, progressCallback);
