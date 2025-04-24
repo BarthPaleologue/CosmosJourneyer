@@ -10,7 +10,6 @@ const htmlPath = path.join(import.meta.dirname, "/src/html/");
 const config = {
     entry: {
         main: "./src/ts/index.ts",
-        alphaTestis: "./src/ts/alphaTestis.ts",
         blackHole: "./src/ts/blackHoleDemo.ts",
         playground: "./src/ts/playground.ts"
     },
@@ -68,16 +67,6 @@ const config = {
             inject: true,
             template: path.join(htmlPath, "index.html"),
             chunks: ["main"],
-            favicon: path.join(htmlPath, "../asset/favicon.png")
-        }),
-        new HtmlWebpackPlugin({
-            title: "Alpha Testis - Cosmos Journeyer",
-            meta: {
-                description: "Testing system for Cosmos Journeyer."
-            },
-            filename: "alphaTestis.html",
-            template: path.join(htmlPath, "index.html"),
-            chunks: ["alphaTestis"],
             favicon: path.join(htmlPath, "../asset/favicon.png")
         }),
         new HtmlWebpackPlugin({

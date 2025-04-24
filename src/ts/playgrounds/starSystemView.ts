@@ -19,7 +19,6 @@ import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 import { Player } from "../player/player";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
 import { initI18n } from "../i18n";
 import { SoundPlayerMock } from "../audio/soundPlayer";
 import { StarSystemView } from "../starSystem/starSystemView";
@@ -28,7 +27,8 @@ import { enablePhysics } from "./utils";
 import { TtsMock } from "../audio/tts";
 import { loadRenderingAssets } from "../assets/renderingAssets";
 import { EncyclopaediaGalacticaManager } from "../society/encyclopaediaGalacticaManager";
-import { positionNearObject, positionNearObjectBrightSide } from "../utils/positionNearObject";
+import { positionNearObjectBrightSide } from "../utils/positionNearObject";
+import { getAlphaTestisSystemModel } from "../starSystem/customSystems/alphaTestis";
 
 export async function createStarSystemViewScene(
     engine: AbstractEngine,
@@ -36,7 +36,7 @@ export async function createStarSystemViewScene(
 ): Promise<Scene> {
     await initI18n();
 
-    const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
+    const starSystemDatabase = new StarSystemDatabase(getAlphaTestisSystemModel());
 
     const player = Player.Default(starSystemDatabase);
 
