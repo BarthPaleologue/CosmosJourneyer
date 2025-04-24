@@ -463,7 +463,7 @@ export class CosmosJourneyer {
             starSystemDatabase,
             soundPlayer,
             tts,
-            assets
+            assets.rendering
         );
 
         await starSystemView.resetPlayer();

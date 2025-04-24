@@ -33,7 +33,6 @@ import "@babylonjs/core/Loading/loadingScreen";
 import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge";
 import { DefaultControls } from "../defaultControls/defaultControls";
 import { CharacterControls } from "../characterControls/characterControls";
-import { Assets } from "../assets/assets";
 import {
     getForwardDirection,
     getRotationQuaternion,
@@ -83,6 +82,7 @@ import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
 import { ITts, Speaker, VoiceLine } from "../audio/tts";
 import { alertModal } from "../utils/dialogModal";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { RenderingAssets } from "../assets/renderingAssets";
 
 // register cosmos journeyer as part of window object
 declare global {
@@ -216,7 +216,7 @@ export class StarSystemView implements View {
     private readonly soundPlayer: ISoundPlayer;
     private readonly tts: ITts;
 
-    private readonly assets: Assets;
+    private readonly assets: RenderingAssets;
 
     /**
      * Creates an empty star system view with a scene, a gui and a havok plugin
@@ -234,7 +234,7 @@ export class StarSystemView implements View {
         starSystemDatabase: StarSystemDatabase,
         soundPlayer: ISoundPlayer,
         tts: ITts,
-        assets: Assets
+        assets: RenderingAssets
     ) {
         this.player = player;
         this.encyclopaedia = encyclopaedia;
@@ -449,7 +449,7 @@ export class StarSystemView implements View {
         const ambientLight = new HemisphericLight("ambientLight", Vector3.Zero(), this.scene);
         ambientLight.intensity = 0.02;
 
-        this.postProcessManager = new PostProcessManager(assets.rendering.textures, this.scene);
+        this.postProcessManager = new PostProcessManager(assets.textures, this.scene);
 
         // main update loop for the star system
         this.scene.onBeforePhysicsObservable.add(() => {
@@ -548,7 +548,7 @@ export class StarSystemView implements View {
                 const aiPlayer = new AiPlayerControls(
                     this.starSystemDatabase,
                     this.scene,
-                    this.assets.rendering,
+                    this.assets,
                     this.soundPlayer
                 );
 
@@ -670,7 +670,7 @@ export class StarSystemView implements View {
             spaceshipSerialized,
             this.player.spareSpaceshipComponents,
             this.scene,
-            this.assets.rendering,
+            this.assets,
             this.soundPlayer
         );
         this.player.instancedSpaceships.push(spaceship);
@@ -686,7 +686,7 @@ export class StarSystemView implements View {
         }
 
         if (this.characterControls === null) {
-            const character = this.assets.rendering.objects.character.instantiateHierarchy(null);
+            const character = this.assets.objects.character.instantiateHierarchy(null);
             if (!(character instanceof Mesh)) {
                 await alertModal("Character model is not a mesh!", this.soundPlayer);
             } else {
@@ -716,7 +716,7 @@ export class StarSystemView implements View {
 
         const starSystem = this.getStarSystem();
 
-        this.chunkForge.update(this.assets.rendering);
+        this.chunkForge.update(this.assets);
 
         starSystem.update(deltaSeconds, this.chunkForge, this.postProcessManager);
     }
@@ -840,22 +840,22 @@ export class StarSystemView implements View {
         const stellarObjects = starSystem.getStellarObjects().map((object) => object.getLight());
 
         // update dynamic materials
-        this.assets.rendering.materials.butterfly.update(
+        this.assets.materials.butterfly.update(
             stellarObjects,
             this.scene.getActiveControls().getTransform().getAbsolutePosition(),
             deltaSeconds
         );
-        this.assets.rendering.materials.butterflyDepth.update(
+        this.assets.materials.butterflyDepth.update(
             stellarObjects,
             this.scene.getActiveControls().getTransform().getAbsolutePosition(),
             deltaSeconds
         );
-        this.assets.rendering.materials.grass.update(
+        this.assets.materials.grass.update(
             stellarObjects,
             this.scene.getActiveControls().getTransform().getAbsolutePosition(),
             deltaSeconds
         );
-        this.assets.rendering.materials.grassDepth.update(
+        this.assets.materials.grassDepth.update(
             stellarObjects,
             this.scene.getActiveControls().getTransform().getAbsolutePosition(),
             deltaSeconds

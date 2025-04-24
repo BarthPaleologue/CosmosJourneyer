@@ -43,7 +43,7 @@ import { OrbitalObjectUtils } from "../architecture/orbitalObjectUtils";
 import { OrbitalObjectId } from "../utils/coordinates/orbitalObjectId";
 import { StarSystemLoader } from "./starSystemLoader";
 import { DeepReadonly, NonEmptyArray } from "../utils/types";
-import { Assets } from "../assets/assets";
+import { RenderingAssets } from "../assets/renderingAssets";
 
 export type PlanetarySystem = {
     readonly planets: Planet[];
@@ -95,7 +95,7 @@ export class StarSystemController {
 
     private elapsedSeconds = 0;
 
-    private readonly assets: Assets;
+    private readonly assets: RenderingAssets;
 
     /**
      * Creates a new star system controller from a given model and scene
@@ -112,11 +112,11 @@ export class StarSystemController {
             anomalies: ReadonlyArray<Anomaly>;
             orbitalFacilities: ReadonlyArray<OrbitalFacility>;
         },
-        assets: Assets,
+        assets: RenderingAssets,
         scene: UberScene
     ) {
         this.scene = scene;
-        this.starFieldBox = new StarFieldBox(assets.rendering.textures.environment.milkyWay, scene);
+        this.starFieldBox = new StarFieldBox(assets.textures.environment.milkyWay, scene);
         this.model = model;
 
         this.assets = assets;
@@ -140,7 +140,7 @@ export class StarSystemController {
     public static async CreateAsync(
         model: DeepReadonly<StarSystemModel>,
         loader: StarSystemLoader,
-        assets: Assets,
+        assets: RenderingAssets,
         scene: UberScene
     ): Promise<StarSystemController> {
         const result = await loader.load(model, assets, scene);
@@ -472,11 +472,7 @@ export class StarSystemController {
         controls.update(deltaSeconds);
 
         for (const object of celestialBodies) {
-            object.asteroidField?.update(
-                controls.getActiveCamera().globalPosition,
-                this.assets.rendering.objects,
-                deltaSeconds
-            );
+            object.asteroidField?.update(controls.getActiveCamera().globalPosition, this.assets.objects, deltaSeconds);
         }
 
         for (const object of this.getPlanetaryMassObjects()) {
@@ -594,7 +590,7 @@ export class StarSystemController {
     public dispose() {
         this.objectToParents.clear();
 
-        const pools = this.assets.rendering.textures.pools;
+        const pools = this.assets.textures.pools;
 
         this.orbitalFacilities.forEach((facility) => facility.dispose());
         this.anomalies.forEach((anomaly) => anomaly.dispose());
