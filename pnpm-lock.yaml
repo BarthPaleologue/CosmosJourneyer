@@ -86,9 +86,6 @@ importers:
       globals:
         specifier: ^15.15.0
         version: 15.15.0
-      handle-sliderjs:
-        specifier: ^1.3.1
-        version: 1.3.1
       html-loader:
         specifier: ^5.1.0
         version: 5.1.0(webpack@5.98.0)
@@ -2280,9 +2277,6 @@ packages:
   gzip-size@6.0.0:
     resolution: {integrity: sha512-ax7ZYomf6jqPTQ4+XCpUGyXKHk5WweS+e05MBO4/y3WJ5RkmPXNKvX+bx1behVILVwr6JSQvZAku021CHPXG3Q==}
     engines: {node: '>=10'}
-
-  handle-sliderjs@1.3.1:
-    resolution: {integrity: sha512-7uB/ZHMMQMSFitSCpOO016OiQJExaMb7guIINR+SJesJWXmhf8DfX9hoA4fyPTBIOTFl9WXNIJhhg+CzxVp/5A==}
 
   handle-thing@2.0.1:
     resolution: {integrity: sha512-9Qn4yBxelxoh2Ow62nP+Ka/kMnOXRi8BXnRaUwezLNhqelnN49xKz4F/dPP8OYLxLxq6JDtZb2i9XznUQbNPTg==}
@@ -6314,8 +6308,6 @@ snapshots:
   gzip-size@6.0.0:
     dependencies:
       duplexer: 0.1.2
-
-  handle-sliderjs@1.3.1: {}
 
   handle-thing@2.0.1: {}
 
