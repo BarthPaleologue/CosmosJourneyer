@@ -33,7 +33,7 @@ export default [
     ...fixupConfigRules(
         compat.extends(
             "eslint:recommended",
-            "plugin:@typescript-eslint/recommended",
+            "plugin:@typescript-eslint/recommended-type-checked",
             "plugin:import/errors",
             "plugin:import/warnings",
             "plugin:import/typescript"
@@ -63,11 +63,17 @@ export default [
             "import/no-unresolved": "warn",
 
             "@typescript-eslint/switch-exhaustiveness-check": "error",
-
-            "@typescript-eslint/no-floating-promises": "error",
             "@typescript-eslint/no-inferrable-types": "warn",
-            "@typescript-eslint/no-unused-vars": "warn",
-            "@typescript-eslint/no-explicit-any": "warn",
+            "@typescript-eslint/require-array-sort-compare": "error",
+            "@typescript-eslint/strict-boolean-expressions": "error",
+
+            "@typescript-eslint/no-misused-promises": [
+                "error",
+                {
+                    checksVoidReturn: false
+                }
+            ],
+
             eqeqeq: "error",
 
             "no-restricted-syntax": [
@@ -127,8 +133,7 @@ export default [
                     format: ["PascalCase"],
                     leadingUnderscore: "forbid"
                 }
-            ],
-            "@typescript-eslint/require-array-sort-compare": "error"
+            ]
         }
     }
 ];
