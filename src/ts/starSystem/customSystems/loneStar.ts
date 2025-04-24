@@ -71,7 +71,7 @@ export function getLoneStarSystem(): StarSystemModel {
                 axialTilt: 0,
                 orbit: OrbitSchema.parse({
                     parentIds: ["loneStar"],
-                    semiMajorAxis: 1e6
+                    semiMajorAxis: Settings.SOLAR_RADIUS * 10
                 }),
                 seed: 0,
                 faction: Faction.SATORI_CONCORD,
