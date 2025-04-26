@@ -439,12 +439,13 @@ export class CosmosJourneyer {
         encyclopaedia.backends.push(new EncyclopaediaGalacticaLocal(starSystemDatabase));
 
         const mainScene = new UberScene(engine);
-        const mainHavokPlugin = new HavokPlugin(true, havokInstance);
-        setMaxLinVel(mainHavokPlugin, 10000, 10000);
-        mainScene.enablePhysics(Vector3.Zero(), mainHavokPlugin);
 
         // The right-handed system allows to use directly GLTF models without having to flip them with a transform
         mainScene.useRightHandedSystem = true;
+
+        const mainHavokPlugin = new HavokPlugin(true, havokInstance);
+        setMaxLinVel(mainHavokPlugin, 10000, 10000);
+        mainScene.enablePhysics(Vector3.Zero(), mainHavokPlugin);
 
         const assets = await loadAssets((loadedCount, totalCount, name) => {
             loadingScreen.setProgressPercentage((loadedCount / totalCount) * 100);
