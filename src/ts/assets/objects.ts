@@ -232,6 +232,7 @@ export async function loadObjects(
     const treeMaterial = new PBRMetallicRoughnessMaterial("treeMaterial", scene);
     treeMaterial.backFaceCulling = false;
     treeMaterial.baseTexture = treeTexture;
+    treeMaterial.transparencyMode = 1;
 
     tree.material = treeMaterial;
 
