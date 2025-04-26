@@ -98,7 +98,12 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
         this.atmosphereUniforms = new AtmosphereUniforms(this.getBoundingRadius(), atmosphereThickness);
 
         if (this.model.rings !== null) {
-            this.ringsUniforms = new RingsUniforms(this.model.rings, ringsLutPool, scene);
+            this.ringsUniforms = new RingsUniforms(
+                this.model.rings,
+                Settings.RINGS_FADE_OUT_DISTANCE,
+                ringsLutPool,
+                scene
+            );
 
             const averageRadius = (this.model.radius * (this.model.rings.ringStart + this.model.rings.ringEnd)) / 2;
             const spread = (this.model.radius * (this.model.rings.ringEnd - this.model.rings.ringStart)) / 2;

@@ -40,6 +40,7 @@ import { createTutorialScene } from "./playgrounds/tutorial";
 import { createAsteroidFieldScene } from "./playgrounds/asteroidField";
 import { LoadingScreen } from "./uberCore/loadingScreen";
 import { createStarSystemViewScene } from "./playgrounds/starSystemView";
+import { createRingsScene } from "./playgrounds/rings";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -102,6 +103,9 @@ switch (requestedScene) {
         break;
     case "starSystemView":
         scene = await createStarSystemViewScene(engine, progressCallback);
+        break;
+    case "rings":
+        scene = createRingsScene(engine, progressCallback);
         break;
     default:
         scene = createDefaultScene(engine, progressCallback);

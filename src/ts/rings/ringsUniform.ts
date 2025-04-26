@@ -30,7 +30,8 @@ export const RingsUniformNames = {
     RING_END: "rings_end",
     RING_FREQUENCY: "rings_frequency",
     RING_OPACITY: "rings_opacity",
-    RING_COLOR: "rings_color"
+    RING_COLOR: "rings_color",
+    RING_FADE_OUT_DISTANCE: "rings_fade_out_distance"
 };
 
 export const RingsSamplerNames = {
@@ -44,8 +45,17 @@ export class RingsUniforms {
 
     private readonly fallbackTexture: Texture;
 
-    constructor(model: DeepReadonly<RingsModel>, texturePool: ItemPool<RingsLut>, scene: Scene) {
+    private readonly fadeOutDistance: number;
+
+    constructor(
+        model: DeepReadonly<RingsModel>,
+        fadeOutDistance: number,
+        texturePool: ItemPool<RingsLut>,
+        scene: Scene
+    ) {
         this.model = model;
+
+        this.fadeOutDistance = fadeOutDistance;
 
         this.lut = texturePool.get();
         this.lut.setModel(model);
@@ -59,6 +69,7 @@ export class RingsUniforms {
         effect.setFloat(RingsUniformNames.RING_FREQUENCY, this.model.ringFrequency);
         effect.setFloat(RingsUniformNames.RING_OPACITY, this.model.ringOpacity);
         effect.setColor3(RingsUniformNames.RING_COLOR, this.model.ringColor);
+        effect.setFloat(RingsUniformNames.RING_FADE_OUT_DISTANCE, this.fadeOutDistance);
     }
 
     public static SetEmptyUniforms(effect: Effect) {
@@ -67,6 +78,7 @@ export class RingsUniforms {
         effect.setFloat(RingsUniformNames.RING_FREQUENCY, 0);
         effect.setFloat(RingsUniformNames.RING_OPACITY, 0);
         effect.setColor3(RingsUniformNames.RING_COLOR, new Color3(0, 0, 0));
+        effect.setFloat(RingsUniformNames.RING_FADE_OUT_DISTANCE, 0);
     }
 
     public setSamplers(effect: Effect) {

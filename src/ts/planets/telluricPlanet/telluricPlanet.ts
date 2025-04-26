@@ -119,7 +119,12 @@ export class TelluricPlanet
         }
 
         if (this.model.type === OrbitalObjectType.TELLURIC_PLANET && this.model.rings !== null) {
-            this.ringsUniforms = new RingsUniforms(this.model.rings, assets.textures.pools.ringsLut, scene);
+            this.ringsUniforms = new RingsUniforms(
+                this.model.rings,
+                Settings.RINGS_FADE_OUT_DISTANCE,
+                assets.textures.pools.ringsLut,
+                scene
+            );
 
             const averageRadius = (this.model.radius * (this.model.rings.ringStart + this.model.rings.ringEnd)) / 2;
             const spread = (this.model.radius * (this.model.rings.ringEnd - this.model.rings.ringStart)) / 2;

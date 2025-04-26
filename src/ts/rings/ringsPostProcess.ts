@@ -40,7 +40,7 @@ export class RingsPostProcess extends PostProcess {
     constructor(
         bodyTransform: TransformNode,
         ringsUniforms: RingsUniforms,
-        bodyModel: DeepReadonly<CelestialBodyModel>,
+        bodyModel: DeepReadonly<Pick<CelestialBodyModel, "radius" | "name">>,
         stellarObjects: ReadonlyArray<PointLight>,
         scene: Scene
     ) {

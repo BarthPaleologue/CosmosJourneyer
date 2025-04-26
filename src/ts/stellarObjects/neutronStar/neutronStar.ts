@@ -42,6 +42,7 @@ import { DeepReadonly } from "../../utils/types";
 import { TexturePools } from "../../assets/textures";
 import { ItemPool } from "../../utils/itemPool";
 import { RingsLut } from "../../rings/ringsLut";
+import { Settings } from "../../settings";
 
 export class NeutronStar implements StellarObjectBase<OrbitalObjectType.NEUTRON_STAR>, Cullable {
     readonly model: DeepReadonly<NeutronStarModel>;
@@ -109,7 +110,12 @@ export class NeutronStar implements StellarObjectBase<OrbitalObjectType.NEUTRON_
         this.mesh.material = this.material;
 
         if (this.model.rings !== null) {
-            this.ringsUniforms = new RingsUniforms(this.model.rings, texturePools.ringsLut, scene);
+            this.ringsUniforms = new RingsUniforms(
+                this.model.rings,
+                Settings.RINGS_FADE_OUT_DISTANCE,
+                texturePools.ringsLut,
+                scene
+            );
 
             const averageRadius = (this.model.radius * (this.model.rings.ringStart + this.model.rings.ringEnd)) / 2;
             const spread = (this.model.radius * (this.model.rings.ringEnd - this.model.rings.ringStart)) / 2;
