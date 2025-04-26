@@ -18,7 +18,6 @@
 import atmosphericScatteringFragment from "../../shaders/atmosphericScatteringFragment.glsl";
 
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { Transformable } from "../architecture/transformable";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { ObjectUniformNames, setObjectUniforms } from "../postProcesses/uniforms/objectUniforms";
@@ -30,6 +29,7 @@ import { Constants } from "@babylonjs/core/Engines/constants";
 import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { AtmosphereUniforms } from "./atmosphereUniforms";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
 
 export class AtmosphericScatteringPostProcess extends PostProcess {
     private activeCamera: Camera | null = null;
@@ -38,7 +38,7 @@ export class AtmosphericScatteringPostProcess extends PostProcess {
         planetTransform: TransformNode,
         planetBoundingRadius: number,
         atmosphereUniforms: AtmosphereUniforms,
-        stellarObjects: ReadonlyArray<Transformable>,
+        stellarObjects: ReadonlyArray<PointLight>,
         scene: Scene
     ) {
         const shaderName = "atmosphericScattering";

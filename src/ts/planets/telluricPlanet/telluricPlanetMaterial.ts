@@ -22,7 +22,6 @@ import { Assets } from "../../assets/assets";
 import { centeredRand } from "extended-random";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
-import { Transformable } from "../../architecture/transformable";
 import { Scene } from "@babylonjs/core/scene";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import {
@@ -36,6 +35,7 @@ import { LutPoolManager } from "../../assets/lutPoolManager";
 import { TelluricPlanetModel } from "./telluricPlanetModel";
 import { TelluricSatelliteModel } from "./telluricSatelliteModel";
 import { DeepReadonly } from "../../utils/types";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
 
 const TelluricPlanetMaterialUniformNames = {
     WORLD: "world",
@@ -216,7 +216,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
         );
     }
 
-    public update(planetWorldMatrix: Matrix, stellarObjects: ReadonlyArray<Transformable>) {
+    public update(planetWorldMatrix: Matrix, stellarObjects: ReadonlyArray<PointLight>) {
         // The add once is important because the material will be bound for every chunk of the planet
         this.onBindObservable.addOnce(() => {
             this.getEffect().setMatrix(TelluricPlanetMaterialUniformNames.PLANET_WORLD_MATRIX, planetWorldMatrix);

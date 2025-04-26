@@ -20,7 +20,6 @@ import volumetricCloudsFragment from "../../shaders/volumetricCloudsFragment.gls
 import { FlatCloudsPostProcess } from "./flatCloudsPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { CloudsUniforms } from "./cloudsUniforms";
-import { StellarObject } from "../architecture/orbitalObject";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { ObjectUniformNames, setObjectUniforms } from "../postProcesses/uniforms/objectUniforms";
@@ -31,6 +30,7 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
 
 export type CloudsPostProcess = FlatCloudsPostProcess | VolumetricCloudsPostProcess;
 
@@ -45,7 +45,7 @@ export class VolumetricCloudsPostProcess extends PostProcess {
         boundingRadius: number,
         cloudsUniforms: CloudsUniforms,
         scene: Scene,
-        stars: StellarObject[]
+        stars: ReadonlyArray<PointLight>
     ) {
         const shaderName = "volumetricClouds";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {

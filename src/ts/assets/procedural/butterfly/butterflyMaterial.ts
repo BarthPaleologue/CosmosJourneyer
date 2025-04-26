@@ -20,15 +20,14 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import butterflyFragment from "../../../../shaders/butterflyMaterial/butterflyFragment.glsl";
 import butterflyVertex from "../../../../shaders/butterflyMaterial/butterflyVertex.glsl";
-
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Transformable } from "../../../architecture/transformable";
 import { Textures } from "../../textures";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import {
     setStellarObjectUniforms,
     StellarObjectUniformNames
 } from "../../../postProcesses/uniforms/stellarObjectUniforms";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
 
 const ButterflyMaterialUniformNames = {
     WORLD: "world",
@@ -50,7 +49,7 @@ const ButterflyMaterialSamplerNames = {
 
 export class ButterflyMaterial extends ShaderMaterial {
     private elapsedSeconds = 0;
-    private stars: ReadonlyArray<Transformable> = [];
+    private stars: ReadonlyArray<PointLight> = [];
     private playerPosition: Vector3 = Vector3.Zero();
 
     private planet: TransformNode | null = null;
@@ -104,7 +103,7 @@ export class ButterflyMaterial extends ShaderMaterial {
         this.planet = planet;
     }
 
-    update(stars: ReadonlyArray<Transformable>, playerPosition: Vector3, deltaSeconds: number) {
+    update(stars: ReadonlyArray<PointLight>, playerPosition: Vector3, deltaSeconds: number) {
         this.elapsedSeconds += deltaSeconds;
         this.stars = stars;
         this.playerPosition = playerPosition;

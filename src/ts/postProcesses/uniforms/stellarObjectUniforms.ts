@@ -16,11 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { Transformable } from "../../architecture/transformable";
-import { Star } from "../../stellarObjects/star/star";
-import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { flattenColor3Array, flattenVector3Array } from "../../utils/algebra";
-import { getRgbFromTemperature } from "../../utils/specrend";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
 
 export const StellarObjectUniformNames = {
     STAR_POSITIONS: "star_positions",
@@ -28,8 +25,7 @@ export const StellarObjectUniformNames = {
     NB_STARS: "nbStars"
 };
 
-//FIXME: take point lights as input instead of transformables
-export function setStellarObjectUniforms(effect: Effect, stellarObjects: ReadonlyArray<Transformable>): void {
+export function setStellarObjectUniforms(effect: Effect, stellarObjects: ReadonlyArray<PointLight>): void {
     effect.setInt(StellarObjectUniformNames.NB_STARS, stellarObjects.length);
 
     if (stellarObjects.length === 0) {
@@ -40,16 +36,10 @@ export function setStellarObjectUniforms(effect: Effect, stellarObjects: Readonl
 
     effect.setArray3(
         StellarObjectUniformNames.STAR_POSITIONS,
-        flattenVector3Array(stellarObjects.map((stellarObject) => stellarObject.getTransform().getAbsolutePosition()))
+        flattenVector3Array(stellarObjects.map((stellarObject) => stellarObject.getAbsolutePosition()))
     );
     effect.setArray3(
         StellarObjectUniformNames.STAR_COLORS,
-        flattenColor3Array(
-            stellarObjects.map((stellarObject) =>
-                stellarObject instanceof Star
-                    ? getRgbFromTemperature(stellarObject.model.blackBodyTemperature)
-                    : Color3.White()
-            )
-        )
+        flattenColor3Array(stellarObjects.map((stellarObject) => stellarObject.diffuse))
     );
 }

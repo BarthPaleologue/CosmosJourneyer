@@ -18,7 +18,6 @@
 import shadowFragment from "../../shaders/shadowFragment.glsl";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { RingsSamplerNames, RingsUniformNames, RingsUniforms } from "../rings/ringsUniform";
-import { StellarObject } from "../architecture/orbitalObject";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { ObjectUniformNames, setObjectUniforms } from "./uniforms/objectUniforms";
@@ -30,6 +29,8 @@ import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUnifo
 import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { CloudsUniforms } from "../clouds/cloudsUniforms";
+import { LightEmitter } from "../architecture/lightEmitter";
+import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 
 export type ShadowUniforms = {
     hasRings: boolean;
@@ -49,7 +50,7 @@ export class ShadowPostProcess extends PostProcess {
         ringsUniforms: RingsUniforms | null,
         cloudsUniforms: CloudsUniforms | null,
         hasOcean: boolean,
-        stellarObjects: ReadonlyArray<StellarObject>,
+        stellarObjects: ReadonlyArray<HasBoundingSphere & LightEmitter>,
         scene: Scene
     ) {
         const shaderName = "shadow";
@@ -107,7 +108,10 @@ export class ShadowPostProcess extends PostProcess {
             }
 
             setCameraUniforms(effect, this.activeCamera);
-            setStellarObjectUniforms(effect, stellarObjects);
+            setStellarObjectUniforms(
+                effect,
+                stellarObjects.map((star) => star.getLight())
+            );
             setObjectUniforms(effect, transform, boundingRadius);
 
             effect.setFloatArray(

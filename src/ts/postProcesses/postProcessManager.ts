@@ -59,6 +59,7 @@ import { SierpinskiPyramidModel } from "../anomalies/sierpinskiPyramid/sierpinsk
 import { MengerSpongeModel } from "../anomalies/mengerSponge/mengerSpongeModel";
 import { CelestialBody, StellarObject } from "../architecture/orbitalObject";
 import { DeepReadonly } from "../utils/types";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
 
 /**
  * The order in which the post processes are rendered when away from a planet
@@ -366,7 +367,7 @@ export class PostProcessManager {
                 planet.getTransform(),
                 planet.getBoundingRadius(),
                 planet.atmosphereUniforms,
-                stellarObjects,
+                stellarObjects.map((star) => star.getLight()),
                 this.scene
             );
             this.atmospheres.push(atmosphere);
@@ -378,7 +379,7 @@ export class PostProcessManager {
                 planet.getTransform(),
                 planet.getBoundingRadius(),
                 planet.oceanUniforms,
-                stellarObjects,
+                stellarObjects.map((star) => star.getLight()),
                 this.scene
             );
             this.oceans.push(ocean);
@@ -390,7 +391,7 @@ export class PostProcessManager {
                 planet.getTransform(),
                 planet.getBoundingRadius(),
                 planet.cloudsUniforms,
-                stellarObjects,
+                stellarObjects.map((star) => star.getLight()),
                 this.scene
             );
             this.clouds.push(clouds);
@@ -402,7 +403,7 @@ export class PostProcessManager {
                 planet.getTransform(),
                 planet.ringsUniforms,
                 planet.model,
-                stellarObjects,
+                stellarObjects.map((star) => star.getLight()),
                 this.scene
             );
             this.rings.push(rings);
@@ -432,7 +433,7 @@ export class PostProcessManager {
                 planet.getTransform(),
                 planet.getBoundingRadius(),
                 planet.atmosphereUniforms,
-                stellarObjects,
+                stellarObjects.map((star) => star.getLight()),
                 this.scene
             );
             this.atmospheres.push(atmosphere);
@@ -444,7 +445,7 @@ export class PostProcessManager {
                 planet.getTransform(),
                 planet.ringsUniforms,
                 planet.model,
-                stellarObjects,
+                stellarObjects.map((star) => star.getLight()),
                 this.scene
             );
             this.rings.push(rings);
@@ -476,7 +477,7 @@ export class PostProcessManager {
         transform: TransformNode,
         radius: number,
         model: DeepReadonly<MandelbulbModel>,
-        stellarObjects: ReadonlyArray<StellarObject>
+        stellarObjects: ReadonlyArray<PointLight>
     ) {
         const mandelbulb = new MandelbulbPostProcess(transform, radius, model, this.scene, stellarObjects);
         this.mandelbulbs.push(mandelbulb);
@@ -495,7 +496,7 @@ export class PostProcessManager {
         transform: TransformNode,
         radius: number,
         model: DeepReadonly<JuliaSetModel>,
-        stellarObjects: ReadonlyArray<StellarObject>
+        stellarObjects: ReadonlyArray<PointLight>
     ) {
         const juliaSetPostProcess = new JuliaSetPostProcess(
             transform,
@@ -513,7 +514,7 @@ export class PostProcessManager {
         transform: TransformNode,
         radius: number,
         model: DeepReadonly<MandelboxModel>,
-        stellarObjects: ReadonlyArray<StellarObject>
+        stellarObjects: ReadonlyArray<PointLight>
     ) {
         const mandelbox = new MandelboxPostProcess(transform, radius, model, this.scene, stellarObjects);
         this.mandelboxes.push(mandelbox);
@@ -525,7 +526,7 @@ export class PostProcessManager {
         transform: TransformNode,
         radius: number,
         model: DeepReadonly<SierpinskiPyramidModel>,
-        stellarObjects: ReadonlyArray<StellarObject>
+        stellarObjects: ReadonlyArray<PointLight>
     ) {
         const sierpinskiPyramid = new SierpinskiPyramidPostProcess(
             transform,
@@ -543,7 +544,7 @@ export class PostProcessManager {
         transform: TransformNode,
         radius: number,
         model: DeepReadonly<MengerSpongeModel>,
-        stellarObjects: ReadonlyArray<StellarObject>
+        stellarObjects: ReadonlyArray<PointLight>
     ) {
         const mengerSponge = new MengerSpongePostProcess(transform, radius, model, this.scene, stellarObjects);
         this.mengerSponges.push(mengerSponge);

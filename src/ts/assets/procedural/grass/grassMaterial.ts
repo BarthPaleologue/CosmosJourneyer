@@ -18,10 +18,8 @@
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Scene } from "@babylonjs/core/scene";
-
 import grassFragment from "../../../../shaders/grassMaterial/grassFragment.glsl";
 import grassVertex from "../../../../shaders/grassMaterial/grassVertex.glsl";
-import { Transformable } from "../../../architecture/transformable";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import {
     setStellarObjectUniforms,
@@ -29,6 +27,7 @@ import {
 } from "../../../postProcesses/uniforms/stellarObjectUniforms";
 import { Textures } from "../../textures";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
 
 const GrassMaterialUniformNames = {
     WORLD: "world",
@@ -50,7 +49,7 @@ const GrassMaterialSamplerNames = {
 
 export class GrassMaterial extends ShaderMaterial {
     private elapsedSeconds = 0;
-    private stars: ReadonlyArray<Transformable> = [];
+    private stars: ReadonlyArray<PointLight> = [];
     private playerPosition: Vector3 = Vector3.Zero();
 
     private scene: Scene;
@@ -104,7 +103,7 @@ export class GrassMaterial extends ShaderMaterial {
         this.planet = planet;
     }
 
-    update(stars: ReadonlyArray<Transformable>, playerPosition: Vector3, deltaSeconds: number) {
+    update(stars: ReadonlyArray<PointLight>, playerPosition: Vector3, deltaSeconds: number) {
         this.elapsedSeconds += deltaSeconds;
         this.stars = stars;
         this.playerPosition = playerPosition;
