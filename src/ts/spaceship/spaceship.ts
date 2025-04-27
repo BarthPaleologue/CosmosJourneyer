@@ -595,8 +595,12 @@ export class Spaceship implements Transformable {
             const forwardDirection = getForwardDirection(this.getTransform());
             const forwardSpeed = Vector3.Dot(linearVelocity, forwardDirection);
 
-            if (this.mainEngineThrottle !== 0) this.thrusterSound.setTargetVolume(1);
-            else this.thrusterSound.setTargetVolume(0);
+            if (this.mainEngineThrottle !== 0) {
+                const throttleVolume = Math.abs(this.mainEngineThrottle); // Ensure volume is positive
+                this.thrusterSound.setTargetVolume(throttleVolume);
+            } else {
+                this.thrusterSound.setTargetVolume(0);
+            }
 
             if (!this.isAutoPiloted()) {
                 const speedDifference = forwardSpeed - this.mainEngineTargetSpeed;
