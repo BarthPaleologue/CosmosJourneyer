@@ -813,6 +813,9 @@ export class PostProcessManager {
      * The pipeline is not destroyed as it is always destroyed and recreated when the closest orbital object changes.
      */
     public reset() {
+        this.renderingPipelineManager.detachCamerasFromRenderPipeline(this.renderingPipeline.name, this.scene.cameras);
+        this.renderingPipelineManager.removePipeline(this.renderingPipeline.name);
+
         // disposing on every camera is necessary because BabylonJS only detaches the post-processes from a single camera at a time
         this.scene.cameras.forEach((camera) => {
             this.objectPostProcesses.forEach((postProcessList) => {
