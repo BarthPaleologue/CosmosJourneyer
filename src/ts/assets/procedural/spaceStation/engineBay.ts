@@ -1,19 +1,35 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Affero General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Affero General Public License for more details.
+//
+//  You should have received a copy of the GNU Affero General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { Transformable } from "../../../architecture/transformable";
 import { Mesh, MeshBuilder } from "@babylonjs/core/Meshes";
 import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
-import { PhysicsShape, PhysicsShapeConvexHull } from "@babylonjs/core/Physics/v2/physicsShape";
-import { Objects } from "../../objects";
+import { PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 import { Scene } from "@babylonjs/core/scene";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { CollisionMask } from "../../../settings";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { createEnvironmentAggregate } from "../../../utils/havok";
 import { Material } from "@babylonjs/core/Materials/material";
+import { RenderingAssets } from "../../renderingAssets";
 
 export class EngineBay implements Transformable {
     private readonly root: TransformNode;
@@ -28,7 +44,7 @@ export class EngineBay implements Transformable {
 
     private readonly scene: Scene;
 
-    constructor(scene: Scene) {
+    constructor(assets: RenderingAssets, scene: Scene) {
         this.root = new TransformNode("EngineBayRoot", scene);
 
         this.scene = scene;
@@ -46,16 +62,20 @@ export class EngineBay implements Transformable {
         );
         this.skirt.convertToFlatShadedMesh();
 
-        this.skirtMaterial = new MetalSectionMaterial("EngineBayMetalSectionMaterial", scene);
+        this.skirtMaterial = new MetalSectionMaterial(
+            "EngineBayMetalSectionMaterial",
+            assets.textures.materials.metalPanels,
+            scene
+        );
 
         this.skirt.material = this.skirtMaterial;
         this.skirt.parent = this.root;
 
-        const centerEngine = Objects.STATION_ENGINE.createInstance("Engine");
+        const centerEngine = assets.objects.stationEngine.mesh.createInstance("Engine");
         this.engines.push(centerEngine);
 
         for (let i = 0; i < nbEngines; i++) {
-            const engine = Objects.STATION_ENGINE.createInstance("Engine");
+            const engine = assets.objects.stationEngine.mesh.createInstance("Engine");
             engine.rotate(Axis.Y, ((Math.PI * 2) / nbEngines) * i, Space.LOCAL);
             engine.translate(Axis.X, 80, Space.LOCAL);
             this.engines.push(engine);
@@ -74,9 +94,7 @@ export class EngineBay implements Transformable {
             node.position.subtractInPlace(center);
         });
 
-        this.engineShape = new PhysicsShapeConvexHull(this.engines[0] as Mesh, scene);
-        this.engineShape.filterMembershipMask = CollisionMask.ENVIRONMENT;
-        this.engineShape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
+        this.engineShape = assets.objects.stationEngine.shape;
     }
 
     update(cameraWorldPosition: Vector3) {
@@ -109,6 +127,5 @@ export class EngineBay implements Transformable {
         this.skirtAggregate?.dispose();
         this.engines.forEach((engine) => engine.dispose());
         this.engineBodies.forEach((body) => body.dispose());
-        this.engineShape.dispose();
     }
 }

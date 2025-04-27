@@ -26,6 +26,7 @@ import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/
 import { Material } from "@babylonjs/core/Materials/material";
 import { MetalSectionMaterial } from "../assets/procedural/spaceStation/metalSectionMaterial";
 import { ClimberRingMaterial } from "../materials/climberRingMaterial";
+import { PBRTextures } from "../assets/textures";
 
 export class SpaceElevatorClimber implements Targetable {
     private readonly transform: TransformNode;
@@ -37,11 +38,20 @@ export class SpaceElevatorClimber implements Targetable {
 
     readonly targetInfo: TargetInfo;
 
-    constructor(scene: Scene) {
+    constructor(
+        solarPanelMaterial: SolarPanelMaterial,
+        climberTextures: PBRTextures,
+        metalTextures: PBRTextures,
+        scene: Scene
+    ) {
         this.transform = new TransformNode("SpaceElevatorClimber", scene);
 
-        this.solarPanelMaterial = new SolarPanelMaterial(scene);
-        this.metalSectionMaterial = new MetalSectionMaterial("SpaceElevatorClimberMetalSectionMaterial", scene);
+        this.solarPanelMaterial = solarPanelMaterial;
+        this.metalSectionMaterial = new MetalSectionMaterial(
+            "SpaceElevatorClimberMetalSectionMaterial",
+            metalTextures,
+            scene
+        );
 
         const angleSubtracted = Math.PI / 6;
         const minAngle = -Math.PI / 2 + angleSubtracted / 2;
@@ -72,7 +82,7 @@ export class SpaceElevatorClimber implements Targetable {
         rightRing.scaling.y = yThickness;
         rightRing.parent = this.transform;
 
-        rightRing.material = new ClimberRingMaterial("ClimberRingMaterial", scene);
+        rightRing.material = new ClimberRingMaterial("ClimberRingMaterial", climberTextures, scene);
 
         const leftRing = rightRing.clone("ClimberLeftRing");
         leftRing.rotate(Axis.Y, Math.PI);

@@ -35,11 +35,10 @@ import { Transformable } from "../../../../architecture/transformable";
 import { CollisionMask } from "../../../../settings";
 import { InstancePatch } from "../instancePatch/instancePatch";
 import { Cullable } from "../../../../utils/cullable";
-import { Materials } from "../../../../assets/materials";
-import { Objects } from "../../../../assets/objects";
 import { TelluricPlanetModel } from "../../telluricPlanetModel";
 import { TelluricSatelliteModel } from "../../telluricSatelliteModel";
 import { DeepReadonly } from "../../../../utils/types";
+import { RenderingAssets } from "../../../../assets/renderingAssets";
 
 export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
     public readonly mesh: Mesh;
@@ -125,7 +124,8 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
         vertexData: VertexData,
         instancesMatrixBuffer: Float32Array,
         alignedInstancesMatrixBuffer: Float32Array,
-        averageHeight: number
+        averageHeight: number,
+        assets: RenderingAssets
     ) {
         if (this.hasBeenDisposed()) {
             throw new Error(`Tried to init ${this.mesh.name} but it has been disposed`);
@@ -161,7 +161,7 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
         if (instancesMatrixBuffer.length === 0) return;
 
         const rockPatch = new InstancePatch(this.parent, randomDownSample(alignedInstancesMatrixBuffer, 3200));
-        rockPatch.createInstances([{ mesh: Objects.ROCK, distance: 0 }]);
+        rockPatch.createInstances([{ mesh: assets.objects.rock, distance: 0 }]);
         this.instancePatches.push(rockPatch);
 
         if (
@@ -170,32 +170,29 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
             this.getAverageHeight() > this.planetModel.ocean.depth + 50
         ) {
             const treePatch = new InstancePatch(this.parent, randomDownSample(instancesMatrixBuffer, 4800));
-            treePatch.createInstances([{ mesh: Objects.TREE, distance: 0 }]);
+            treePatch.createInstances([{ mesh: assets.objects.tree, distance: 0 }]);
             this.instancePatches.push(treePatch);
 
             const butterflyPatch = new ThinInstancePatch(randomDownSample(instancesMatrixBuffer, 800));
-            butterflyPatch.createInstances([{ mesh: Objects.BUTTERFLY, distance: 0 }]);
+            butterflyPatch.createInstances([{ mesh: assets.objects.butterfly, distance: 0 }]);
             this.instancePatches.push(butterflyPatch);
 
             const grassPatch = new ThinInstancePatch(alignedInstancesMatrixBuffer);
             grassPatch.createInstances([
-                { mesh: Objects.GRASS_BLADES[0], distance: 0 },
-                { mesh: Objects.GRASS_BLADES[1], distance: 50 }
+                { mesh: assets.objects.grassBlades[0], distance: 0 },
+                { mesh: assets.objects.grassBlades[1], distance: 50 }
             ]);
             this.instancePatches.push(grassPatch);
 
-            Materials.GRASS_MATERIAL.setPlanet(this.parent);
-            Materials.GRASS_DEPTH_MATERIAL.setPlanet(this.parent);
+            assets.materials.grass.setPlanet(this.parent);
+            assets.materials.grassDepth.setPlanet(this.parent);
 
-            Materials.BUTTERFLY_MATERIAL.setPlanet(this.parent);
-            Materials.BUTTERFLY_DEPTH_MATERIAL.setPlanet(this.parent);
+            assets.materials.butterfly.setPlanet(this.parent);
+            assets.materials.butterflyDepth.setPlanet(this.parent);
 
             for (const depthRenderer of Object.values(this.getTransform().getScene()._depthRenderer)) {
-                depthRenderer.setMaterialForRendering(
-                    butterflyPatch.getLodMeshes(),
-                    Materials.BUTTERFLY_DEPTH_MATERIAL
-                );
-                depthRenderer.setMaterialForRendering(grassPatch.getLodMeshes(), Materials.GRASS_DEPTH_MATERIAL);
+                depthRenderer.setMaterialForRendering(butterflyPatch.getLodMeshes(), assets.materials.butterflyDepth);
+                depthRenderer.setMaterialForRendering(grassPatch.getLodMeshes(), assets.materials.grassDepth);
             }
         }
     }

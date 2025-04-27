@@ -23,12 +23,17 @@ import { SpaceStationLayer } from "../ui/spaceStation/spaceStationLayer";
 import { Player } from "../player/player";
 import { EncyclopaediaGalacticaManager } from "../society/encyclopaediaGalacticaManager";
 import { initI18n } from "../i18n";
-import { Assets } from "../assets/assets";
 import { enablePhysics } from "./utils";
 import { Spaceship } from "../spaceship/spaceship";
 import { ShipControls } from "../spaceship/shipControls";
+import { SoundPlayerMock } from "../audio/soundPlayer";
+import { TtsMock } from "../audio/tts";
+import { loadRenderingAssets } from "../assets/renderingAssets";
 
-export async function createSpaceStationUIScene(engine: AbstractEngine): Promise<Scene> {
+export async function createSpaceStationUIScene(
+    engine: AbstractEngine,
+    progressCallback: (progress: number, text: string) => void
+): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
@@ -36,7 +41,12 @@ export async function createSpaceStationUIScene(engine: AbstractEngine): Promise
 
     await initI18n();
 
-    await Assets.Init(scene);
+    const assets = await loadRenderingAssets((current, total, name) => {
+        progressCallback(current / total, `Loading ${name}`);
+    }, scene);
+
+    const soundPlayer = new SoundPlayerMock();
+    const tts = new TtsMock();
 
     const systemDatabase = new StarSystemDatabase(getLoneStarSystem());
 
@@ -47,10 +57,16 @@ export async function createSpaceStationUIScene(engine: AbstractEngine): Promise
         throw new Error("No spaceship found in player data");
     }
 
-    const spaceship = Spaceship.Deserialize(serializedSpaceship, player.spareSpaceshipComponents, scene);
+    const spaceship = Spaceship.Deserialize(
+        serializedSpaceship,
+        player.spareSpaceshipComponents,
+        scene,
+        assets,
+        soundPlayer
+    );
     player.instancedSpaceships.push(spaceship);
 
-    const shipControls = new ShipControls(spaceship, scene);
+    const shipControls = new ShipControls(spaceship, scene, soundPlayer, tts);
 
     const camera = shipControls.thirdPersonCamera;
     camera.attachControl();
@@ -60,7 +76,7 @@ export async function createSpaceStationUIScene(engine: AbstractEngine): Promise
 
     const encyclopaedia = new EncyclopaediaGalacticaManager();
 
-    const spaceStationUI = new SpaceStationLayer(player, encyclopaedia, systemDatabase);
+    const spaceStationUI = new SpaceStationLayer(player, encyclopaedia, systemDatabase, soundPlayer);
 
     const stationModel = systemModel.orbitalFacilities[0];
 

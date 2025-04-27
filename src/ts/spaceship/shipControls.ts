@@ -48,6 +48,10 @@ import { lerpSmooth, slerpSmoothToRef } from "../utils/math";
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { canEngageWarpDrive } from "./components/warpDriveUtils";
 import { LandingPadSize } from "../spacestation/landingPad/landingPadManager";
+import { ITts, Speaker, VoiceLine } from "../audio/tts";
+import { ISoundPlayer } from "../audio/soundPlayer";
+import { Assets } from "../assets/assets";
+import { RenderingAssets } from "../assets/renderingAssets";
 
 export class ShipControls implements Controls {
     private spaceship: Spaceship;
@@ -79,8 +83,14 @@ export class ShipControls implements Controls {
     private readonly throttleToZeroHandler: () => void;
     private readonly resetCameraHandler: () => void;
 
-    constructor(spaceship: Spaceship, scene: Scene) {
+    private readonly tts: ITts;
+    private readonly soundPlayer: ISoundPlayer;
+
+    constructor(spaceship: Spaceship, scene: Scene, soundPlayer: ISoundPlayer, tts: ITts) {
         this.spaceship = spaceship;
+
+        this.soundPlayer = soundPlayer;
+        this.tts = tts;
 
         this.firstPersonCamera = new FreeCamera("shipFirstPersonCamera", Vector3.Zero(), scene);
         this.firstPersonCamera.parent = this.getTransform();
@@ -122,7 +132,7 @@ export class ShipControls implements Controls {
                 nearestOrbitalObject !== null &&
                 !canEngageWarpDrive(spaceship.getTransform(), 0, nearestOrbitalObject)
             ) {
-                Sounds.CANNOT_ENGAGE_WARP_DRIVE.play();
+                tts.sayNow(Speaker.CHARLOTTE, VoiceLine.CANNOT_ENGAGE_WARP_DRIVE);
                 return;
             }
 
@@ -130,11 +140,11 @@ export class ShipControls implements Controls {
 
             spaceship.toggleWarpDrive();
             if (warpDrive.isEnabled()) {
-                Sounds.ENGAGING_WARP_DRIVE.play();
+                tts.sayNow(Speaker.CHARLOTTE, VoiceLine.ENGAGING_WARP_DRIVE);
                 this.cameraShakeAnimation.reset();
                 spaceship.setMainEngineThrottle(0);
             } else {
-                Sounds.WARP_DRIVE_DISENGAGED.play();
+                tts.sayNow(Speaker.CHARLOTTE, VoiceLine.WARP_DRIVE_DISENGAGED);
                 this.cameraShakeAnimation.reset();
 
                 if (this.closestLandableFacility !== null) {
@@ -152,7 +162,8 @@ export class ShipControls implements Controls {
                             NotificationOrigin.SPACE_STATION,
                             NotificationIntent.INFO,
                             `Don't forget to send a landing request with ${bindingsString} before approaching the facility`,
-                            5000
+                            5000,
+                            soundPlayer
                         );
                     }
                 }
@@ -174,7 +185,8 @@ export class ShipControls implements Controls {
                     NotificationOrigin.SPACESHIP,
                     NotificationIntent.ERROR,
                     `Cannot land while warp drive is enabled. You can use ${relevantKeys} to toggle your warp drive.`,
-                    5000
+                    5000,
+                    soundPlayer
                 );
                 return;
             }
@@ -189,7 +201,13 @@ export class ShipControls implements Controls {
 
             // If the object is too far, don't engage landing
             if (distance > closestWalkableObject.getBoundingRadius() + 100e3) {
-                createNotification(NotificationOrigin.SPACESHIP, NotificationIntent.ERROR, "Too high to land", 2000);
+                createNotification(
+                    NotificationOrigin.SPACESHIP,
+                    NotificationIntent.ERROR,
+                    "Too high to land",
+                    2000,
+                    soundPlayer
+                );
                 return;
             }
 
@@ -210,17 +228,19 @@ export class ShipControls implements Controls {
                     NotificationOrigin.SPACE_STATION,
                     NotificationIntent.ERROR,
                     "Landing request rejected",
-                    2000
+                    2000,
+                    soundPlayer
                 );
                 return;
             }
 
-            Sounds.EnqueuePlay(Sounds.LANDING_REQUEST_GRANTED);
+            tts.enqueueSay(Speaker.CHARLOTTE, VoiceLine.LANDING_REQUEST_GRANTED);
             createNotification(
                 NotificationOrigin.SPACE_STATION,
                 NotificationIntent.SUCCESS,
                 `Landing request granted. Proceed to pad ${landingPad.getPadNumber()}`,
-                30000
+                30000,
+                soundPlayer
             );
             spaceship.engageLandingOnPad(landingPad);
         };
@@ -386,16 +406,16 @@ export class ShipControls implements Controls {
         this.firstPersonCamera.parent = this.getTransform();
 
         this.spaceship.onFuelScoopStart.add(() => {
-            Sounds.EnqueuePlay(Sounds.FUEL_SCOOPING_VOICE);
+            this.tts.enqueueSay(Speaker.CHARLOTTE, VoiceLine.FUEL_SCOOPING);
         });
 
         this.spaceship.onFuelScoopEnd.add(() => {
-            Sounds.EnqueuePlay(Sounds.FUEL_SCOOPING_COMPLETE_VOICE);
+            this.tts.enqueueSay(Speaker.CHARLOTTE, VoiceLine.FUEL_SCOOPING_COMPLETE);
         });
 
         this.spaceship.onLandingObservable.add(async () => {
             const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
-            Sounds.EnqueuePlay(Sounds.LANDING_COMPLETE);
+            this.tts.enqueueSay(Speaker.CHARLOTTE, VoiceLine.LANDING_COMPLETE);
 
             if (!this.getSpaceship().isLandedAtFacility()) {
                 const bindingsString = pressInteractionToStrings(
@@ -406,7 +426,8 @@ export class ShipControls implements Controls {
                     NotificationOrigin.SPACESHIP,
                     NotificationIntent.INFO,
                     i18n.t("notifications:landingComplete", { bindingsString: bindingsString }),
-                    5000
+                    5000,
+                    this.soundPlayer
                 );
             }
         });
@@ -416,9 +437,10 @@ export class ShipControls implements Controls {
                 NotificationOrigin.SPACESHIP,
                 NotificationIntent.INFO,
                 i18n.t("notifications:landingSequenceEngaged"),
-                5000
+                5000,
+                this.soundPlayer
             );
-            Sounds.EnqueuePlay(Sounds.INITIATING_PLANETARY_LANDING);
+            this.tts.enqueueSay(Speaker.CHARLOTTE, VoiceLine.INITIATING_PLANETARY_LANDING);
         });
 
         this.spaceship.onLandingCancelled.add(() => {
@@ -426,7 +448,8 @@ export class ShipControls implements Controls {
                 NotificationOrigin.SPACESHIP,
                 NotificationIntent.INFO,
                 i18n.t("notifications:landingCancelled"),
-                5000
+                5000,
+                this.soundPlayer
             );
         });
 
@@ -435,7 +458,8 @@ export class ShipControls implements Controls {
                 NotificationOrigin.SPACESHIP,
                 NotificationIntent.INFO,
                 i18n.t("notifications:takeOffSuccess"),
-                2000
+                2000,
+                this.soundPlayer
             );
         });
 
@@ -444,12 +468,13 @@ export class ShipControls implements Controls {
                 NotificationOrigin.SPACESHIP,
                 NotificationIntent.INFO,
                 i18n.t("notifications:autoPilotEngaged"),
-                30_000
+                30_000,
+                this.soundPlayer
             );
         });
 
         this.spaceship.onWarpDriveDisabled.add((isEmergency) => {
-            if (isEmergency) Sounds.WARP_DRIVE_EMERGENCY_SHUT_DOWN.play();
+            if (isEmergency) this.tts.sayNow(Speaker.CHARLOTTE, VoiceLine.WARP_DRIVE_EMERGENCY_SHUT_DOWN);
             this.onToggleWarpDrive.notifyObservers(false);
         });
 
@@ -466,11 +491,11 @@ export class ShipControls implements Controls {
         return this.spaceship;
     }
 
-    static CreateDefault(scene: Scene) {
-        return new ShipControls(Spaceship.CreateDefault(scene), scene);
+    static CreateDefault(scene: Scene, assets: RenderingAssets, tts: ITts, soundPlayer: ISoundPlayer) {
+        return new ShipControls(Spaceship.CreateDefault(scene, assets, soundPlayer), scene, soundPlayer, tts);
     }
 
-    dispose() {
+    dispose(soundPlayer: ISoundPlayer) {
         this.onToggleWarpDrive.clear();
         this.onCompleteLanding.clear();
 
@@ -480,7 +505,7 @@ export class ShipControls implements Controls {
         SpaceShipControlsInputs.map.throttleToZero.off("complete", this.throttleToZeroHandler);
         SpaceShipControlsInputs.map.resetCamera.off("complete", this.resetCameraHandler);
 
-        this.spaceship.dispose();
+        this.spaceship.dispose(soundPlayer);
         this.thirdPersonCamera.dispose();
         this.firstPersonCamera.dispose();
     }

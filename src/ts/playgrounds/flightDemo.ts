@@ -19,36 +19,32 @@ import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import {
-    AssetsManager,
-    Color3,
-    DirectionalLight,
-    MeshBuilder,
-    PBRMetallicRoughnessMaterial,
-    SolidParticle,
-    SolidParticleSystem
-} from "@babylonjs/core";
+import { Color3, MeshBuilder, PBRMetallicRoughnessMaterial, SolidParticle, SolidParticleSystem } from "@babylonjs/core";
 import { enablePhysics } from "./utils";
-import { Objects } from "../assets/objects";
-import { Textures } from "../assets/textures";
-import { Sounds } from "../assets/sounds";
 import { ShipControls } from "../spaceship/shipControls";
 import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
+import { SoundPlayerMock } from "../audio/soundPlayer";
+import { TtsMock } from "../audio/tts";
+import { loadRenderingAssets } from "../assets/renderingAssets";
 
-export async function createFlightDemoScene(engine: AbstractEngine): Promise<Scene> {
+export async function createFlightDemoScene(
+    engine: AbstractEngine,
+    progressCallback: (progress: number, text: string) => void
+): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
     scene.defaultCursor = "crosshair";
 
     await enablePhysics(scene);
 
-    const assetsManager = new AssetsManager(scene);
-    Sounds.EnqueueTasks(assetsManager, scene);
-    Objects.EnqueueTasks(assetsManager, scene);
-    Textures.EnqueueTasks(assetsManager, scene);
-    await assetsManager.loadAsync();
+    const assets = await loadRenderingAssets((loadedCount, totalCount, name) => {
+        progressCallback(loadedCount / totalCount, `Loading ${name}`);
+    }, scene);
 
-    const ship = ShipControls.CreateDefault(scene);
+    const soundPlayer = new SoundPlayerMock();
+    const tts = new TtsMock();
+
+    const ship = ShipControls.CreateDefault(scene, assets, tts, soundPlayer);
 
     const camera = ship.getActiveCamera();
     camera.minZ = 0.1;
@@ -82,7 +78,7 @@ export async function createFlightDemoScene(engine: AbstractEngine): Promise<Sce
 
     const material = new PBRMetallicRoughnessMaterial("material", scene);
     material.baseColor = new Color3(0.5, 0.5, 0.5);
-    material.metallic = 0.5;
+    material.metallic = 0.0;
     material.roughness = 0.5;
 
     mesh.material = material;

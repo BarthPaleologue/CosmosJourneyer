@@ -31,6 +31,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { OceanUniforms } from "./oceanUniforms";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { WaterTextures } from "../assets/textures";
 
 export class OceanPostProcess extends PostProcess implements UpdatablePostProcess {
     readonly planetTransform: TransformNode;
@@ -44,6 +45,7 @@ export class OceanPostProcess extends PostProcess implements UpdatablePostProces
         boundingRadius: number,
         oceanUniforms: OceanUniforms,
         stellarObjects: ReadonlyArray<PointLight>,
+        oceanTextures: WaterTextures,
         scene: Scene
     ) {
         const shaderName = "ocean";
@@ -91,7 +93,7 @@ export class OceanPostProcess extends PostProcess implements UpdatablePostProces
             oceanUniforms.setUniforms(effect, planetTransform);
 
             setSamplerUniforms(effect, this.activeCamera, scene);
-            oceanUniforms.setSamplers(effect);
+            oceanUniforms.setSamplers(effect, oceanTextures);
         });
     }
 

@@ -88,6 +88,8 @@
         "build:docs": "typedoc --options typedoc.json",
         "serve:docs": "http-server docs -p 8081",
         "lint:check": "eslint .",
-        "lint:fix": "eslint . --fix"
+        "lint:fix": "eslint . --fix",
+        "typecheck:watch": "tsc --noEmit --watch",
+        "typecheck": "tsc --noEmit"
     }
 }

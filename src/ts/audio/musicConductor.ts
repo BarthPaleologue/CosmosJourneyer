@@ -1,3 +1,20 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Affero General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Affero General Public License for more details.
+//
+//  You should have received a copy of the GNU Affero General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { Sound } from "@babylonjs/core/Audio/sound";
 import { Musics } from "../assets/musics";
 import { StarSystemView } from "../starSystem/starSystemView";
@@ -20,7 +37,10 @@ export class MusicConductor {
 
     private readonly starSystemView: StarSystemView;
 
-    constructor(starSystemView: StarSystemView) {
+    private readonly musics: Musics;
+
+    constructor(musics: Musics, starSystemView: StarSystemView) {
+        this.musics = musics;
         this.starSystemView = starSystemView;
 
         const audioEngine = AbstractEngine.audioEngine;
@@ -38,7 +58,7 @@ export class MusicConductor {
         });
     }
 
-    public setMusicFromSelection(musicSelection: Sound[]) {
+    public setMusicFromSelection(musicSelection: ReadonlyArray<Sound>) {
         if (this.currentMusic !== null && musicSelection.includes(this.currentMusic)) {
             return;
         }
@@ -116,17 +136,17 @@ export class MusicConductor {
         );
 
         if (!isInStarSystemView) {
-            this.setMusic(Musics.STAR_MAP);
+            this.setMusic(this.musics.wandering);
             return;
         }
 
         if (isInMainMenu) {
-            this.setMusic(Musics.MAIN_MENU);
+            this.setMusic(this.musics.wandering);
             return;
         }
 
         if (!spaceship.isLanded() && spaceship.getTargetLandingPad() !== null) {
-            this.setMusic(Musics.STRAUSS_BLUE_DANUBE);
+            this.setMusic(this.musics.straussBlueDanube);
             return;
         }
 
@@ -134,7 +154,7 @@ export class MusicConductor {
 
         switch (closestOrbitalObject.model.type) {
             case OrbitalObjectType.BLACK_HOLE:
-                this.setMusicFromSelection([Musics.SOARING]);
+                this.setMusicFromSelection([this.musics.soaring]);
                 return;
 
             case OrbitalObjectType.MANDELBULB:
@@ -143,7 +163,7 @@ export class MusicConductor {
             case OrbitalObjectType.SIERPINSKI_PYRAMID:
             case OrbitalObjectType.MENGER_SPONGE:
                 if (distanceToClosestObject < closestOrbitalObject.getBoundingRadius() * 100) {
-                    this.setMusicFromSelection([Musics.SPACIAL_WINDS, Musics.ECHOES_OF_TIME]);
+                    this.setMusicFromSelection([this.musics.spacialWinds, this.musics.echoesOfTime]);
                     return;
                 }
                 break;
@@ -161,31 +181,35 @@ export class MusicConductor {
                     !warpDrive?.isEnabled() &&
                     distanceToClosestObject < closestOrbitalObject.getBoundingRadius() * 10
                 ) {
-                    this.setMusic(Musics.EQUATORIAL_COMPLEX);
+                    this.setMusic(this.musics.equatorialComplex);
                     return;
                 }
         }
 
         if (warpDrive?.isEnabled()) {
-            const suitableMusics = [Musics.ATLANTEAN_TWILIGHT, Musics.INFINITE_PERSPECTIVE, Musics.MESMERIZE];
+            const suitableMusics = [
+                this.musics.atlanteanTwilight,
+                this.musics.infinitePerspective,
+                this.musics.mesmerize
+            ];
 
             this.setMusicFromSelection(suitableMusics);
             return;
         }
 
         if (!spaceship.isLanded() && !warpDrive?.isEnabled()) {
-            const suitableMusics = [Musics.THAT_ZEN_MOMENT, Musics.DEEP_RELAXATION, Musics.PEACE_OF_MIND];
+            const suitableMusics = [this.musics.thatZenMoment, this.musics.deepRelaxation, this.musics.peaceOfMind];
             this.setMusicFromSelection(suitableMusics);
             return;
         }
 
         if (isOnFoot || spaceship.isLanded()) {
             const suitableMusics = [
-                Musics.THAT_ZEN_MOMENT,
-                Musics.DEEP_RELAXATION,
-                Musics.PEACE_OF_MIND,
-                Musics.MESMERIZE,
-                Musics.REAWAKENING
+                this.musics.thatZenMoment,
+                this.musics.deepRelaxation,
+                this.musics.peaceOfMind,
+                this.musics.mesmerize,
+                this.musics.reawakening
             ];
 
             this.setMusicFromSelection(suitableMusics);

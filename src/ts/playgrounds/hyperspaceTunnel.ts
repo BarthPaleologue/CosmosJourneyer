@@ -19,13 +19,16 @@ import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 import { DefaultControls } from "../defaultControls/defaultControls";
-import { Assets } from "../assets/assets";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { HyperSpaceTunnel } from "../utils/hyperSpaceTunnel";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { enablePhysics } from "./utils";
+import { loadTextures } from "../assets/textures";
 
-export async function createHyperspaceTunnelDemo(engine: AbstractEngine) {
+export async function createHyperspaceTunnelDemo(
+    engine: AbstractEngine,
+    progressCallback: (progress: number, text: string) => void
+) {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
@@ -38,12 +41,14 @@ export async function createHyperspaceTunnelDemo(engine: AbstractEngine) {
 
     scene.enableDepthRenderer(camera, false, true);
 
-    await Assets.Init(scene);
+    const textures = await loadTextures((loadedCount, totalCount, name) => {
+        progressCallback(loadedCount / totalCount, `Loading ${name}`);
+    }, scene);
 
     const directionalLight = new DirectionalLight("sun", new Vector3(1, -1, 0), scene);
     directionalLight.intensity = 0.7;
 
-    const hyperSpaceTunnel = new HyperSpaceTunnel(Axis.Z, scene);
+    const hyperSpaceTunnel = new HyperSpaceTunnel(Axis.Z, scene, textures.noises);
 
     scene.onBeforeRenderObservable.add(() => {
         defaultControls.update(engine.getDeltaTime() / 1000);

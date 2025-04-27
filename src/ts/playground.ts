@@ -22,8 +22,9 @@ import "@babylonjs/core/Materials/standardMaterial";
 import "@babylonjs/core/Loading/loadingScreen";
 import "@babylonjs/core/Misc/screenshotTools";
 import "@babylonjs/core/Meshes/thinInstanceMesh";
-import { Scene, Tools } from "@babylonjs/core";
 import "@babylonjs/inspector";
+import { PhysicsViewer, Scene, Tools } from "@babylonjs/core";
+import { createDefaultScene } from "./playgrounds/default";
 import { createOrbitalDemoScene } from "./playgrounds/orbitalDemo";
 import { createAutomaticLandingScene } from "./playgrounds/automaticLanding";
 import { createHyperspaceTunnelDemo } from "./playgrounds/hyperspaceTunnel";
@@ -33,17 +34,27 @@ import { createXrScene } from "./playgrounds/xr";
 import { createFlightDemoScene } from "./playgrounds/flightDemo";
 import { createNeutronStarScene } from "./playgrounds/neutronStar";
 import { createCharacterDemoScene } from "./playgrounds/character";
-import { createDefaultScene } from "./playgrounds/default";
 import { createSpaceStationUIScene } from "./playgrounds/spaceStationUI";
 import { createStarMapScene } from "./playgrounds/starMap";
 import { createTutorialScene } from "./playgrounds/tutorial";
+import { createAsteroidFieldScene } from "./playgrounds/asteroidField";
+import { LoadingScreen } from "./uberCore/loadingScreen";
+import { createStarSystemViewScene } from "./playgrounds/starSystemView";
+import { createRingsScene } from "./playgrounds/rings";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+const loadingScreen = new LoadingScreen(canvas);
+const progressCallback = (progress01: number, text: string) => {
+    loadingScreen.setProgressPercentage(progress01 * 100);
+    loadingScreen.loadingUIText = text;
+};
+
 const engine = new Engine(canvas, true);
 engine.useReverseDepthBuffer = true;
+engine.loadingScreen = loadingScreen;
 engine.displayLoadingUI();
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -52,43 +63,52 @@ const requestedScene = urlParams.get("scene") ?? "";
 let scene: Scene;
 switch (requestedScene) {
     case "orbitalDemo":
-        scene = createOrbitalDemoScene(engine);
+        scene = createOrbitalDemoScene(engine, progressCallback);
         break;
     case "tunnel":
-        scene = await createHyperspaceTunnelDemo(engine);
+        scene = await createHyperspaceTunnelDemo(engine, progressCallback);
         break;
     case "automaticLanding":
-        scene = await createAutomaticLandingScene(engine);
+        scene = await createAutomaticLandingScene(engine, progressCallback);
         break;
     case "debugAssets":
-        scene = await createDebugAssetsScene(engine);
+        scene = await createDebugAssetsScene(engine, progressCallback);
         break;
     case "spaceStation":
-        scene = await createSpaceStationScene(engine);
+        scene = await createSpaceStationScene(engine, progressCallback);
         break;
     case "spaceStationUI":
-        scene = await createSpaceStationUIScene(engine);
+        scene = await createSpaceStationUIScene(engine, progressCallback);
         break;
     case "xr":
-        scene = await createXrScene(engine);
+        scene = await createXrScene(engine, progressCallback);
         break;
     case "flightDemo":
-        scene = await createFlightDemoScene(engine);
+        scene = await createFlightDemoScene(engine, progressCallback);
         break;
     case "neutronStar":
-        scene = await createNeutronStarScene(engine);
+        scene = await createNeutronStarScene(engine, progressCallback);
         break;
     case "character":
-        scene = await createCharacterDemoScene(engine);
+        scene = await createCharacterDemoScene(engine, progressCallback);
         break;
     case "starMap":
-        scene = await createStarMapScene(engine);
+        scene = await createStarMapScene(engine, progressCallback);
         break;
     case "tutorial":
-        scene = await createTutorialScene(engine);
+        scene = await createTutorialScene(engine, progressCallback);
+        break;
+    case "asteroidField":
+        scene = await createAsteroidFieldScene(engine, progressCallback);
+        break;
+    case "starSystemView":
+        scene = await createStarSystemViewScene(engine, progressCallback);
+        break;
+    case "rings":
+        scene = createRingsScene(engine, progressCallback);
         break;
     default:
-        scene = createDefaultScene(engine);
+        scene = createDefaultScene(engine, progressCallback);
 }
 
 if (urlParams.get("debug") !== null) {
@@ -97,6 +117,20 @@ if (urlParams.get("debug") !== null) {
     inspectorRoot.id = "inspectorLayer";
     await scene.debugLayer.show({
         globalRoot: inspectorRoot
+    });
+}
+
+if (urlParams.get("physicsViewer") !== null) {
+    const physicsViewer = new PhysicsViewer(scene);
+    scene.onBeforeRenderObservable.add(() => {
+        for (const mesh of scene.meshes) {
+            const physicsBody = mesh.physicsBody;
+            if (physicsBody === null || physicsBody === undefined) {
+                continue;
+            }
+
+            physicsViewer.showBody(physicsBody);
+        }
     });
 }
 

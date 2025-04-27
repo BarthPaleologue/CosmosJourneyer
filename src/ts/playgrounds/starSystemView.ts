@@ -1,0 +1,85 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Affero General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Affero General Public License for more details.
+//
+//  You should have received a copy of the GNU Affero General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { Scene } from "@babylonjs/core/scene";
+import { Player } from "../player/player";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { initI18n } from "../i18n";
+import { SoundPlayerMock } from "../audio/soundPlayer";
+import { StarSystemView } from "../starSystem/starSystemView";
+import { UberScene } from "../uberCore/uberScene";
+import { enablePhysics } from "./utils";
+import { TtsMock } from "../audio/tts";
+import { loadRenderingAssets } from "../assets/renderingAssets";
+import { EncyclopaediaGalacticaManager } from "../society/encyclopaediaGalacticaManager";
+import { positionNearObjectBrightSide } from "../utils/positionNearObject";
+import { getAlphaTestisSystemModel } from "../starSystem/customSystems/alphaTestis";
+
+export async function createStarSystemViewScene(
+    engine: AbstractEngine,
+    progressCallback: (progress: number, text: string) => void
+): Promise<Scene> {
+    await initI18n();
+
+    const starSystemDatabase = new StarSystemDatabase(getAlphaTestisSystemModel());
+
+    const player = Player.Default(starSystemDatabase);
+
+    const encyclopaediaManager = new EncyclopaediaGalacticaManager();
+
+    const soundPlayerMock = new SoundPlayerMock();
+
+    const ttsMock = new TtsMock();
+
+    const scene = new UberScene(engine);
+    scene.useRightHandedSystem = true;
+
+    const havokPlugin = await enablePhysics(scene);
+
+    const assets = await loadRenderingAssets((loadedCount, totalCount, name) => {
+        progressCallback(loadedCount / totalCount, `Loading ${name}`);
+    }, scene);
+
+    const starSystemView = new StarSystemView(
+        scene,
+        player,
+        engine,
+        havokPlugin,
+        encyclopaediaManager,
+        starSystemDatabase,
+        soundPlayerMock,
+        ttsMock,
+        assets
+    );
+
+    await starSystemView.resetPlayer();
+
+    await starSystemView.switchToSpaceshipControls();
+
+    await starSystemView.loadStarSystem(starSystemDatabase.fallbackSystem);
+
+    starSystemView.initStarSystem();
+
+    positionNearObjectBrightSide(
+        starSystemView.getSpaceshipControls(),
+        starSystemView.getStarSystem().getStellarObjects()[0],
+        starSystemView.getStarSystem()
+    );
+
+    return starSystemView.scene;
+}

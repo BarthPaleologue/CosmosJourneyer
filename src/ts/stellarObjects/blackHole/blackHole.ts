@@ -27,6 +27,7 @@ import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/t
 import { BlackHoleUniforms } from "./blackHoleUniforms";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { DeepReadonly } from "../../utils/types";
+import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 
 export class BlackHole implements StellarObjectBase<OrbitalObjectType.BLACK_HOLE> {
     readonly name: string;
@@ -47,7 +48,7 @@ export class BlackHole implements StellarObjectBase<OrbitalObjectType.BLACK_HOLE
 
     readonly targetInfo: TargetInfo;
 
-    constructor(model: DeepReadonly<BlackHoleModel>, scene: Scene) {
+    constructor(model: DeepReadonly<BlackHoleModel>, backgroundTexture: CubeTexture, scene: Scene) {
         this.model = model;
 
         this.name = this.model.name;
@@ -61,7 +62,7 @@ export class BlackHole implements StellarObjectBase<OrbitalObjectType.BLACK_HOLE
         this.light.parent = this.getTransform();
         if (this.model.accretionDiskRadius === 0) this.light.intensity = 0;
 
-        this.blackHoleUniforms = new BlackHoleUniforms(this.model);
+        this.blackHoleUniforms = new BlackHoleUniforms(this.model, backgroundTexture);
 
         this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());
     }

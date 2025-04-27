@@ -33,6 +33,7 @@ import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { TelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModel";
 import { DeepReadonly, isNonEmptyArray, NonEmptyArray } from "../utils/types";
 import { getDistancesToStellarObjects } from "../utils/distanceToStellarObject";
+import { RenderingAssets } from "../assets/renderingAssets";
 
 export class StarSystemLoader {
     private loadingIndex: number;
@@ -54,7 +55,7 @@ export class StarSystemLoader {
      * Loads the star system from the underlying data model.
      * This instantiates all stars, planets, satellites, anomalies and space stations in the star system.
      */
-    public async load(systemModel: DeepReadonly<StarSystemModel>, scene: Scene) {
+    public async load(systemModel: DeepReadonly<StarSystemModel>, assets: RenderingAssets, scene: Scene) {
         const numberOfObjects =
             systemModel.stellarObjects.length +
             systemModel.planets.length +
@@ -65,11 +66,11 @@ export class StarSystemLoader {
 
         await wait(1000);
 
-        const stellarObjects = await this.loadStellarObjects(systemModel.stellarObjects, scene);
-        const planets = await this.loadPlanets(systemModel.planets, scene);
-        const satellites = await this.loadSatellites(systemModel.satellites, scene);
+        const stellarObjects = await this.loadStellarObjects(systemModel.stellarObjects, assets, scene);
+        const planets = await this.loadPlanets(systemModel.planets, assets, scene);
+        const satellites = await this.loadSatellites(systemModel.satellites, assets, scene);
         const anomalies = await this.loadAnomalies(systemModel.anomalies, scene);
-        const orbitalFacilities = await this.loadOrbitalFacilities(systemModel, scene);
+        const orbitalFacilities = await this.loadOrbitalFacilities(systemModel, assets, scene);
 
         await wait(1000);
 
@@ -84,6 +85,7 @@ export class StarSystemLoader {
 
     private async loadStellarObjects(
         stellarObjectModels: DeepReadonly<Array<StellarObjectModel>>,
+        assets: RenderingAssets,
         scene: Scene
     ): Promise<Readonly<NonEmptyArray<StellarObject>>> {
         const stellarObjects: StellarObject[] = [];
@@ -92,13 +94,13 @@ export class StarSystemLoader {
             let stellarObject: StellarObject;
             switch (stellarObjectModel.type) {
                 case OrbitalObjectType.STAR:
-                    stellarObject = new Star(stellarObjectModel, scene);
+                    stellarObject = new Star(stellarObjectModel, assets.textures.pools, scene);
                     break;
                 case OrbitalObjectType.BLACK_HOLE:
-                    stellarObject = new BlackHole(stellarObjectModel, scene);
+                    stellarObject = new BlackHole(stellarObjectModel, assets.textures.environment.milkyWay, scene);
                     break;
                 case OrbitalObjectType.NEUTRON_STAR:
-                    stellarObject = new NeutronStar(stellarObjectModel, scene);
+                    stellarObject = new NeutronStar(stellarObjectModel, assets.textures.pools, scene);
                     break;
             }
             stellarObjects.push(stellarObject);
@@ -152,6 +154,7 @@ export class StarSystemLoader {
 
     private async loadOrbitalFacilities(
         systemModel: DeepReadonly<StarSystemModel>,
+        assets: RenderingAssets,
         scene: Scene
     ): Promise<ReadonlyArray<OrbitalFacility>> {
         const orbitalFacilities: OrbitalFacility[] = [];
@@ -161,10 +164,10 @@ export class StarSystemLoader {
             let orbitalFacility: OrbitalFacility;
             switch (orbitalFacilityModel.type) {
                 case OrbitalObjectType.SPACE_STATION:
-                    orbitalFacility = new SpaceStation(orbitalFacilityModel, distancesToStellarObjects, scene);
+                    orbitalFacility = new SpaceStation(orbitalFacilityModel, distancesToStellarObjects, assets, scene);
                     break;
                 case OrbitalObjectType.SPACE_ELEVATOR:
-                    orbitalFacility = new SpaceElevator(orbitalFacilityModel, distancesToStellarObjects, scene);
+                    orbitalFacility = new SpaceElevator(orbitalFacilityModel, distancesToStellarObjects, assets, scene);
             }
             orbitalFacilities.push(orbitalFacility);
             orbitalFacility.getTransform().setAbsolutePosition(new Vector3(this.offset * ++this.loadingIndex, 0, 0));
@@ -177,6 +180,7 @@ export class StarSystemLoader {
 
     private async loadPlanets(
         planetModels: DeepReadonly<Array<PlanetModel>>,
+        assets: RenderingAssets,
         scene: Scene
     ): Promise<ReadonlyArray<Planet>> {
         const planets: Planet[] = [];
@@ -186,10 +190,10 @@ export class StarSystemLoader {
             let planet: Planet;
             switch (planetModel.type) {
                 case OrbitalObjectType.TELLURIC_PLANET:
-                    planet = new TelluricPlanet(planetModel, scene);
+                    planet = new TelluricPlanet(planetModel, assets, scene);
                     break;
                 case OrbitalObjectType.GAS_PLANET:
-                    planet = new GasPlanet(planetModel, scene);
+                    planet = new GasPlanet(planetModel, assets.textures.pools.ringsLut, scene);
                     break;
             }
 
@@ -205,12 +209,13 @@ export class StarSystemLoader {
 
     private async loadSatellites(
         satelliteModels: DeepReadonly<Array<TelluricSatelliteModel>>,
+        assets: RenderingAssets,
         scene: Scene
     ): Promise<ReadonlyArray<TelluricPlanet>> {
         const satellites: TelluricPlanet[] = [];
         for (const satelliteModel of satelliteModels) {
             console.log("Loading satellite:", satelliteModel.name);
-            const satellite = new TelluricPlanet(satelliteModel, scene);
+            const satellite = new TelluricPlanet(satelliteModel, assets, scene);
             satellite.getTransform().setAbsolutePosition(new Vector3(this.offset * ++this.loadingIndex, 0, 0));
             satellites.push(satellite);
 

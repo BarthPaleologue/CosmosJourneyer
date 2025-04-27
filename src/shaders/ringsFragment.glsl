@@ -65,7 +65,7 @@ void main() {
                 vec3 samplePoint = camera_position + impactPoint * rayDir;
                 float ringDensity = ringDensityAtPoint(samplePoint) * rings_opacity;
 
-                ringDensity *= smoothstep(15000.0 * 2.0, 15000.0 * 5.0, impactPoint);
+                ringDensity *= smoothstep(rings_fade_out_distance * 2.0, rings_fade_out_distance * 5.0, impactPoint);
 
                 vec3 ringShadeColor = rings_color;
 

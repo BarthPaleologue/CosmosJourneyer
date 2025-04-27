@@ -114,6 +114,8 @@ export const Settings = {
 
     LANDING_PAD_ASPECT_RATIO: 1.618,
 
+    RINGS_FADE_OUT_DISTANCE: 15_000,
+
     MAIN_FONT: "Nasalization",
 
     MAX_AUTO_SAVES: 5,

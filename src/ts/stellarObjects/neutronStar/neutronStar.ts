@@ -39,6 +39,10 @@ import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/t
 import { VolumetricLightUniforms } from "../../volumetricLight/volumetricLightUniforms";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { DeepReadonly } from "../../utils/types";
+import { TexturePools } from "../../assets/textures";
+import { ItemPool } from "../../utils/itemPool";
+import { RingsLut } from "../../rings/ringsLut";
+import { Settings } from "../../settings";
 
 export class NeutronStar implements StellarObjectBase<OrbitalObjectType.NEUTRON_STAR>, Cullable {
     readonly model: DeepReadonly<NeutronStarModel>;
@@ -65,7 +69,7 @@ export class NeutronStar implements StellarObjectBase<OrbitalObjectType.NEUTRON_
      * @param model The seed of the star in [-1, 1]
      * @param scene
      */
-    constructor(model: DeepReadonly<NeutronStarModel>, scene: Scene) {
+    constructor(model: DeepReadonly<NeutronStarModel>, texturePools: TexturePools, scene: Scene) {
         this.model = model;
 
         this.mesh = MeshBuilder.CreateSphere(
@@ -97,11 +101,21 @@ export class NeutronStar implements StellarObjectBase<OrbitalObjectType.NEUTRON_
         this.light.falloffType = Light.FALLOFF_STANDARD;
         this.light.parent = this.getTransform();
 
-        this.material = new StarMaterial(this.model.seed, this.model.blackBodyTemperature, scene);
+        this.material = new StarMaterial(
+            this.model.seed,
+            this.model.blackBodyTemperature,
+            texturePools.starMaterialLut,
+            scene
+        );
         this.mesh.material = this.material;
 
         if (this.model.rings !== null) {
-            this.ringsUniforms = new RingsUniforms(this.model.rings, scene);
+            this.ringsUniforms = new RingsUniforms(
+                this.model.rings,
+                Settings.RINGS_FADE_OUT_DISTANCE,
+                texturePools.ringsLut,
+                scene
+            );
 
             const averageRadius = (this.model.radius * (this.model.rings.ringStart + this.model.rings.ringEnd)) / 2;
             const spread = (this.model.radius * (this.model.rings.ringEnd - this.model.rings.ringStart)) / 2;
@@ -148,12 +162,12 @@ export class NeutronStar implements StellarObjectBase<OrbitalObjectType.NEUTRON_
         this.mesh.isVisible = isSizeOnScreenEnough(this, camera);
     }
 
-    public dispose(): void {
+    public dispose(ringsLutPool: ItemPool<RingsLut>): void {
         this.aggregate.dispose();
         this.mesh.dispose();
         this.light.dispose();
         this.material.dispose();
         this.asteroidField?.dispose();
-        this.ringsUniforms?.dispose();
+        this.ringsUniforms?.dispose(ringsLutPool);
     }
 }

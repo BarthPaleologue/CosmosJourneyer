@@ -19,7 +19,7 @@ import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import {
-    AssetsManager,
+    AbstractMesh,
     Color3,
     DirectionalLight,
     HemisphericLight,
@@ -30,11 +30,14 @@ import {
     ShadowGenerator
 } from "@babylonjs/core";
 import { enablePhysics } from "./utils";
-import { Objects } from "../assets/objects";
 import { CharacterControls } from "../characterControls/characterControls";
 import { CharacterInputs } from "../characterControls/characterControlsInputs";
+import { loadRenderingAssets } from "../assets/renderingAssets";
 
-export async function createCharacterDemoScene(engine: AbstractEngine): Promise<Scene> {
+export async function createCharacterDemoScene(
+    engine: AbstractEngine,
+    progressCallback: (progress: number, text: string) => void
+): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
@@ -44,9 +47,9 @@ export async function createCharacterDemoScene(engine: AbstractEngine): Promise<
         await engine.getRenderingCanvas()?.requestPointerLock();
     });
 
-    const assetsManager = new AssetsManager(scene);
-    Objects.EnqueueTasks(assetsManager, scene);
-    await assetsManager.loadAsync();
+    const assets = await loadRenderingAssets((loadedCount, totalCount, name) => {
+        progressCallback(loadedCount / totalCount, `Loading ${name}`);
+    }, scene);
 
     const light = new DirectionalLight("dir01", new Vector3(1, -2, -1), scene);
     light.position = new Vector3(5, 5, 5).scaleInPlace(10);
@@ -57,7 +60,12 @@ export async function createCharacterDemoScene(engine: AbstractEngine): Promise<
     const shadowGenerator = new ShadowGenerator(1024, light);
     shadowGenerator.useBlurExponentialShadowMap = true;
 
-    const character = new CharacterControls(scene);
+    const characterObject = assets.objects.character.instantiateHierarchy(null);
+    if (!(characterObject instanceof AbstractMesh)) {
+        throw new Error("Character object is null");
+    }
+
+    const character = new CharacterControls(characterObject, scene);
     character.getTransform().position.y = 30;
 
     character.getActiveCamera().attachControl();
@@ -76,8 +84,7 @@ export async function createCharacterDemoScene(engine: AbstractEngine): Promise<
     ground.receiveShadows = true;
 
     character.setClosestWalkableObject({
-        getTransform: () => ground,
-        dispose: () => ground.dispose()
+        getTransform: () => ground
     });
 
     scene.onBeforeRenderObservable.add(() => {

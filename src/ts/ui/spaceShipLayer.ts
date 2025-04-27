@@ -25,6 +25,7 @@ import { MissionContext } from "../missions/missionContext";
 import { smoothstep } from "../utils/math";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import canisterIconPath from "../../asset/icons/fuel_canister.webp";
+import { ISoundPlayer } from "../audio/soundPlayer";
 
 export class SpaceShipLayer {
     readonly root: HTMLElement;
@@ -45,7 +46,7 @@ export class SpaceShipLayer {
 
     private readonly currentMissionDisplay: CurrentMissionDisplay;
 
-    constructor(player: Player, starSystemDatabase: StarSystemDatabase) {
+    constructor(player: Player, starSystemDatabase: StarSystemDatabase, soundPlayer: ISoundPlayer) {
         this.root = document.createElement("div");
         this.root.id = "helmetOverlay";
 
@@ -79,7 +80,7 @@ export class SpaceShipLayer {
         fuelIcon.alt = "Fuel canister icon";
         this.fuelIndicator.appendChild(fuelIcon);
 
-        this.currentMissionDisplay = new CurrentMissionDisplay(player, starSystemDatabase);
+        this.currentMissionDisplay = new CurrentMissionDisplay(player, starSystemDatabase, soundPlayer);
         this.root.appendChild(this.currentMissionDisplay.rootNode);
 
         this.cursor = document.createElement("div");

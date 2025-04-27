@@ -18,11 +18,12 @@
 import { Scene } from "@babylonjs/core/scene";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { CloudsModel } from "./cloudsModel";
-import { Textures } from "../assets/textures";
 import { gcd } from "../utils/math";
 import { CloudsLut } from "./cloudsLut";
-import { LutPoolManager } from "../assets/lutPoolManager";
 import { DeepReadonly } from "../utils/types";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { createEmptyTexture } from "../utils/proceduralTexture";
+import { ItemPool } from "../utils/itemPool";
 
 export const CloudsUniformNames = {
     LAYER_RADIUS: "clouds_layerRadius",
@@ -49,11 +50,15 @@ export class CloudsUniforms {
 
     private elapsedSeconds = 0;
 
-    constructor(model: DeepReadonly<CloudsModel>, scene: Scene) {
+    private readonly fallbackTexture: Texture;
+
+    constructor(model: DeepReadonly<CloudsModel>, cloudsLutPool: ItemPool<CloudsLut>, scene: Scene) {
         this.model = model;
 
-        this.lut = LutPoolManager.GetCloudsLut(scene);
+        this.lut = cloudsLutPool.get();
         this.lut.setModel(model);
+
+        this.fallbackTexture = createEmptyTexture(scene);
     }
 
     public update(deltaSeconds: number) {
@@ -83,11 +88,11 @@ export class CloudsUniforms {
         if (this.lut.isReady()) {
             effect.setTexture(CloudsSamplerNames.LUT, this.lut.getTexture());
         } else {
-            effect.setTexture(CloudsSamplerNames.LUT, Textures.EMPTY_TEXTURE);
+            effect.setTexture(CloudsSamplerNames.LUT, this.fallbackTexture);
         }
     }
 
-    public dispose() {
-        LutPoolManager.ReturnCloudsLut(this.lut);
+    public dispose(cloudsLutPool: ItemPool<CloudsLut>) {
+        cloudsLutPool.release(this.lut);
     }
 }

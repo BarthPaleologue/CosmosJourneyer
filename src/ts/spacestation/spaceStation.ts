@@ -43,6 +43,7 @@ import { getEdibleEnergyPerHaPerDay } from "../utils/agriculture";
 import { StellarObjectModel } from "../architecture/orbitalObjectModel";
 import { getSphereRadiatedEnergyFlux } from "../utils/physics";
 import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
+import { RenderingAssets } from "../assets/renderingAssets";
 
 export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE_STATION> {
     readonly name: string;
@@ -72,6 +73,7 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
     constructor(
         model: DeepReadonly<SpaceStationModel>,
         stellarObjects: ReadonlyMap<DeepReadonly<StellarObjectModel>, number>,
+        assets: RenderingAssets,
         scene: Scene
     ) {
         this.model = model;
@@ -84,7 +86,7 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
         this.scene = scene;
 
         // Generate the station first so we can access the landing pads
-        this.generate(stellarObjects);
+        this.generate(stellarObjects, assets);
 
         // Now that landing bays are generated, create the landing pad manager with all pads
         this.landingPadManager = new LandingPadManager(
@@ -132,7 +134,7 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
         this.getTransform().setEnabled(isSizeOnScreenEnough(this, camera));
     }
 
-    private generate(stellarObjects: ReadonlyMap<DeepReadonly<StellarObjectModel>, number>) {
+    private generate(stellarObjects: ReadonlyMap<DeepReadonly<StellarObjectModel>, number>, assets: RenderingAssets) {
         let totalStellarFlux = 0;
         stellarObjects.forEach((distance, model) => {
             totalStellarFlux += getSphereRadiatedEnergyFlux(model.blackBodyTemperature, model.radius, distance);
@@ -158,22 +160,27 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
         });
         const totalHabitatSurfaceM2 = (housingSurfaceHa + agricultureSurfaceHa) * 1000; // convert ha to m²
 
-        const engineBay = new EngineBay(this.scene);
+        const engineBay = new EngineBay(assets, this.scene);
         engineBay.getTransform().parent = this.getTransform();
         let lastNode = engineBay.getTransform();
         this.engineBays.push(engineBay);
 
         const rng = getRngFromSeed(this.model.seed);
 
-        lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(rng(564) * 5), rng);
+        lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(rng(564) * 5), rng, assets);
 
-        const solarSection = new SolarSection(solarPanelSurfaceM2, Settings.SEED_HALF_RANGE * rng(31), this.scene);
+        const solarSection = new SolarSection(
+            solarPanelSurfaceM2,
+            Settings.SEED_HALF_RANGE * rng(31),
+            assets,
+            this.scene
+        );
         solarSection.getTransform().parent = this.getTransform();
         this.placeNode(solarSection.getTransform(), lastNode);
         lastNode = solarSection.getTransform();
         this.solarSections.push(solarSection);
 
-        lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(rng(23) * 5), rng);
+        lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(rng(23) * 5), rng, assets);
 
         const habitatType = wheelOfFortune(
             [
@@ -189,18 +196,25 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
             const helixHabitat = new HelixHabitat(
                 totalHabitatSurfaceM2,
                 Settings.SEED_HALF_RANGE * rng(19),
+                assets.textures,
                 this.scene
             );
             this.helixHabitats.push(helixHabitat);
             newNode = helixHabitat.getTransform();
         } else if (habitatType === SpaceStationNodeType.RING_HABITAT) {
-            const ringHabitat = new RingHabitat(totalHabitatSurfaceM2, Settings.SEED_HALF_RANGE * rng(27), this.scene);
+            const ringHabitat = new RingHabitat(
+                totalHabitatSurfaceM2,
+                Settings.SEED_HALF_RANGE * rng(27),
+                assets.textures,
+                this.scene
+            );
             this.ringHabitats.push(ringHabitat);
             newNode = ringHabitat.getTransform();
         } else if (habitatType === SpaceStationNodeType.CYLINDER_HABITAT) {
             const cylinderHabitat = new CylinderHabitat(
                 totalHabitatSurfaceM2,
                 Settings.SEED_HALF_RANGE * rng(13),
+                assets.textures,
                 this.scene
             );
             this.cylinderHabitats.push(cylinderHabitat);
@@ -215,9 +229,9 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
         newNode.parent = this.root;
         lastNode = newNode;
 
-        lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(rng(23) * 5), rng);
+        lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(rng(23) * 5), rng, assets);
 
-        const landingBay = new LandingBay(this.model, rng(37) * Settings.SEED_HALF_RANGE, this.scene);
+        const landingBay = new LandingBay(this.model, rng(37) * Settings.SEED_HALF_RANGE, assets, this.scene);
 
         this.landingBays.push(landingBay);
         this.placeNode(landingBay.getTransform(), lastNode);
@@ -227,12 +241,14 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
     private addUtilitySections(
         lastNode: TransformNode,
         nbSections: number,
-        rng: (index: number) => number
+        rng: (index: number) => number,
+        assets: RenderingAssets
     ): TransformNode {
         let newLastNode = lastNode;
         for (let i = 0; i < nbSections; i++) {
             const utilitySection = new UtilitySection(
                 rng(132 + 10 * this.utilitySections.length) * Settings.SEED_HALF_RANGE,
+                assets,
                 this.scene
             );
             this.utilitySections.push(utilitySection);

@@ -18,7 +18,6 @@
 import { ColorMode } from "./colorSettingsInterface";
 import surfaceMaterialFragment from "../../../shaders/telluricPlanetMaterial/fragment.glsl";
 import surfaceMaterialVertex from "../../../shaders/telluricPlanetMaterial/vertex.glsl";
-import { Assets } from "../../assets/assets";
 import { centeredRand } from "extended-random";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
@@ -28,14 +27,16 @@ import {
     setStellarObjectUniforms,
     StellarObjectUniformNames
 } from "../../postProcesses/uniforms/stellarObjectUniforms";
-import { Textures } from "../../assets/textures";
+import { AllTerrainTextures } from "../../assets/textures";
 import { Matrix } from "@babylonjs/core/Maths/math";
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
-import { LutPoolManager } from "../../assets/lutPoolManager";
 import { TelluricPlanetModel } from "./telluricPlanetModel";
 import { TelluricSatelliteModel } from "./telluricSatelliteModel";
 import { DeepReadonly } from "../../utils/types";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { createEmptyTexture } from "../../utils/proceduralTexture";
+import { ItemPool } from "../../utils/itemPool";
+import { TelluricPlanetMaterialLut } from "./telluricPlanetMaterialLut";
 
 const TelluricPlanetMaterialUniformNames = {
     WORLD: "world",
@@ -98,7 +99,12 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
      * @param model The model of the planet associated with this material
      * @param scene
      */
-    constructor(model: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>, scene: Scene) {
+    constructor(
+        model: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>,
+        textures: AllTerrainTextures,
+        texturePool: ItemPool<TelluricPlanetMaterialLut>,
+        scene: Scene
+    ) {
         const shaderName = "surfaceMaterial";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
@@ -124,34 +130,34 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
         this.colorMode = ColorMode.DEFAULT;
         this.steepSharpness = 2;
 
-        if (!Assets.IS_READY) throw new Error("You must initialize your assets using the AssetsManager");
+        this.plainNormalMetallicMap = textures.grass.normalMetallic;
+        this.plainAlbedoRoughnessMap = textures.grass.albedoRoughness;
 
-        this.plainNormalMetallicMap = Textures.GRASS_NORMAL_METALLIC_MAP;
-        this.plainAlbedoRoughnessMap = Textures.GRASS_ALBEDO_ROUGHNESS_MAP;
+        this.desertNormalMetallicMap = textures.sand.normalMetallic;
+        this.desertAlbedoRoughnessMap = textures.sand.albedoRoughness;
 
-        this.desertNormalMetallicMap = Textures.SAND_NORMAL_METALLIC_MAP;
-        this.desertAlbedoRoughnessMap = Textures.SAND_ALBEDO_ROUGHNESS_MAP;
+        this.snowNormalMetallic = textures.snow.normalMetallic;
+        this.snowAlbedoRoughnessMap = textures.snow.albedoRoughness;
 
-        this.snowNormalMetallic = Textures.SNOW_NORMAL_METALLIC_MAP;
-        this.snowAlbedoRoughnessMap = Textures.SNOW_ALBEDO_ROUGHNESS_MAP;
-
-        this.steepNormalMetallic = Textures.ROCK_NORMAL_METALLIC_MAP;
-        this.steepAlbedoRoughnessMap = Textures.ROCK_ALBEDO_ROUGHNESS_MAP;
+        this.steepNormalMetallic = textures.rock.normalMetallic;
+        this.steepAlbedoRoughnessMap = textures.rock.albedoRoughness;
 
         if (model.ocean === null) {
             if (model.atmosphere !== null) {
                 // desert world
-                this.plainNormalMetallicMap = Textures.SAND_NORMAL_METALLIC_MAP;
-                this.plainAlbedoRoughnessMap = Textures.SAND_ALBEDO_ROUGHNESS_MAP;
+                this.plainNormalMetallicMap = textures.sand.normalMetallic;
+                this.plainAlbedoRoughnessMap = textures.sand.albedoRoughness;
             } else {
                 // sterile world
-                this.plainNormalMetallicMap = Textures.ROCK_NORMAL_METALLIC_MAP;
-                this.plainAlbedoRoughnessMap = Textures.ROCK_ALBEDO_ROUGHNESS_MAP;
+                this.plainNormalMetallicMap = textures.rock.normalMetallic;
+                this.plainAlbedoRoughnessMap = textures.rock.albedoRoughness;
             }
         }
 
-        this.setTexture("lut", Textures.EMPTY_TEXTURE);
-        const lut = LutPoolManager.GetTelluricPlanetMaterialLut(scene);
+        const emptyTexture = createEmptyTexture(scene);
+
+        this.setTexture("lut", emptyTexture);
+        const lut = texturePool.get();
         lut.setPlanetPhysicsInfo(
             this.planetModel.temperature.min,
             this.planetModel.temperature.max,
@@ -159,10 +165,12 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
         );
         lut.getTexture().executeWhenReady(() => {
             this.setTexture(TelluricPlanetMaterialSamplerNames.LUT, lut.getTexture());
+            emptyTexture.dispose();
         });
 
         this.onDisposeObservable.addOnce(() => {
-            LutPoolManager.ReturnTelluricPlanetMaterialLut(lut);
+            texturePool.release(lut);
+            emptyTexture.dispose();
         });
 
         this.updateTextures();

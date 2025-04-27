@@ -23,28 +23,25 @@ import { DefaultControls } from "../defaultControls/defaultControls";
 import { SpaceStation } from "../spacestation/spaceStation";
 import { newSeededSpaceStationModel } from "../spacestation/spaceStationModelGenerator";
 import { Settings } from "../settings";
-import { newSeededStarModel } from "../stellarObjects/star/starModelGenerator";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { Star } from "../stellarObjects/star/star";
-import { AssetsManager } from "@babylonjs/core";
-import { Textures } from "../assets/textures";
-import { Materials } from "../assets/materials";
-import { Objects } from "../assets/objects";
 import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
 import { StarModel } from "../stellarObjects/star/starModel";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
+import { loadRenderingAssets } from "../assets/renderingAssets";
 
-export async function createSpaceStationScene(engine: AbstractEngine): Promise<Scene> {
+export async function createSpaceStationScene(
+    engine: AbstractEngine,
+    progressCallback: (progress: number, text: string) => void
+): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
     await enablePhysics(scene);
 
-    const assetsManager = new AssetsManager(scene);
-    Textures.EnqueueTasks(assetsManager, scene);
-    Objects.EnqueueTasks(assetsManager, scene);
-    await assetsManager.loadAsync();
-    Materials.Init(scene);
+    const assets = await loadRenderingAssets((loadedCount, totalCount, name) => {
+        progressCallback(loadedCount / totalCount, `Loading ${name}`);
+    }, scene);
 
     const defaultControls = new DefaultControls(scene);
     defaultControls.speed = 2000;
@@ -93,7 +90,7 @@ export async function createSpaceStationScene(engine: AbstractEngine): Promise<S
         rings: null
     };
 
-    const sun = new Star(sunModel, scene);
+    const sun = new Star(sunModel, assets.textures.pools, scene);
     sun.getTransform().position = new Vector3(7, 2, 5).normalize().scaleInPlace(distanceToStar);
 
     const spaceStationModel = newSeededSpaceStationModel(
@@ -104,7 +101,7 @@ export async function createSpaceStationScene(engine: AbstractEngine): Promise<S
     );
     spaceStationModel.orbit.semiMajorAxis = distanceToStar;
 
-    const spaceStation = new SpaceStation(spaceStationModel, new Map([[sunModel, distanceToStar]]), scene);
+    const spaceStation = new SpaceStation(spaceStationModel, new Map([[sunModel, distanceToStar]]), assets, scene);
 
     scene.onBeforePhysicsObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;

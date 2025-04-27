@@ -32,7 +32,6 @@ import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { Transformable } from "../architecture/transformable";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { CharacterInputs } from "./characterControlsInputs";
-import { Objects } from "../assets/objects";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { Skeleton } from "@babylonjs/core/Bones/skeleton";
 
@@ -118,10 +117,10 @@ export class CharacterControls implements Controls {
 
     private jumpVelocity = Vector3.Zero();
 
-    constructor(scene: Scene) {
+    constructor(character: AbstractMesh, scene: Scene) {
         this.scene = scene;
 
-        this.character = Objects.CreateCharacterInstance();
+        this.character = character;
         this.getTransform().rotationQuaternion = Quaternion.Identity();
 
         const walkAnim = scene.getAnimationGroupByName("WalkingForward");

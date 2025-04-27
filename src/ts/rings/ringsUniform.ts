@@ -16,20 +16,22 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { Scene } from "@babylonjs/core/scene";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { RingsModel } from "./ringsModel";
-import { Textures } from "../assets/textures";
 import { RingsLut } from "./ringsLut";
-import { LutPoolManager } from "../assets/lutPoolManager";
 import { DeepReadonly } from "../utils/types";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { ItemPool } from "../utils/itemPool";
+import { createEmptyTexture } from "../utils/proceduralTexture";
+import { Scene } from "@babylonjs/core/scene";
 
 export const RingsUniformNames = {
     RING_START: "rings_start",
     RING_END: "rings_end",
     RING_FREQUENCY: "rings_frequency",
     RING_OPACITY: "rings_opacity",
-    RING_COLOR: "rings_color"
+    RING_COLOR: "rings_color",
+    RING_FADE_OUT_DISTANCE: "rings_fade_out_distance"
 };
 
 export const RingsSamplerNames = {
@@ -41,11 +43,24 @@ export class RingsUniforms {
 
     readonly model: DeepReadonly<RingsModel>;
 
-    constructor(model: DeepReadonly<RingsModel>, scene: Scene) {
+    private readonly fallbackTexture: Texture;
+
+    private readonly fadeOutDistance: number;
+
+    constructor(
+        model: DeepReadonly<RingsModel>,
+        fadeOutDistance: number,
+        texturePool: ItemPool<RingsLut>,
+        scene: Scene
+    ) {
         this.model = model;
 
-        this.lut = LutPoolManager.GetRingsLut(scene);
+        this.fadeOutDistance = fadeOutDistance;
+
+        this.lut = texturePool.get();
         this.lut.setModel(model);
+
+        this.fallbackTexture = createEmptyTexture(scene);
     }
 
     public setUniforms(effect: Effect) {
@@ -54,6 +69,7 @@ export class RingsUniforms {
         effect.setFloat(RingsUniformNames.RING_FREQUENCY, this.model.ringFrequency);
         effect.setFloat(RingsUniformNames.RING_OPACITY, this.model.ringOpacity);
         effect.setColor3(RingsUniformNames.RING_COLOR, this.model.ringColor);
+        effect.setFloat(RingsUniformNames.RING_FADE_OUT_DISTANCE, this.fadeOutDistance);
     }
 
     public static SetEmptyUniforms(effect: Effect) {
@@ -62,21 +78,22 @@ export class RingsUniforms {
         effect.setFloat(RingsUniformNames.RING_FREQUENCY, 0);
         effect.setFloat(RingsUniformNames.RING_OPACITY, 0);
         effect.setColor3(RingsUniformNames.RING_COLOR, new Color3(0, 0, 0));
+        effect.setFloat(RingsUniformNames.RING_FADE_OUT_DISTANCE, 0);
     }
 
     public setSamplers(effect: Effect) {
         if (this.lut.isReady()) {
             effect.setTexture(RingsSamplerNames.RING_LUT, this.lut.getTexture());
         } else {
-            RingsUniforms.SetEmptySamplers(effect);
+            RingsUniforms.SetEmptySamplers(effect, this.fallbackTexture);
         }
     }
 
-    public static SetEmptySamplers(effect: Effect) {
-        effect.setTexture(RingsSamplerNames.RING_LUT, Textures.EMPTY_TEXTURE);
+    public static SetEmptySamplers(effect: Effect, fallbackTexture: Texture) {
+        effect.setTexture(RingsSamplerNames.RING_LUT, fallbackTexture);
     }
 
-    public dispose() {
-        LutPoolManager.ReturnRingsLut(this.lut);
+    public dispose(texturePool: ItemPool<RingsLut>) {
+        texturePool.release(this.lut);
     }
 }

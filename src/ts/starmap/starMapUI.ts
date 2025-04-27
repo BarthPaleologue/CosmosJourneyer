@@ -29,6 +29,7 @@ import { getOrbitalObjectTypeToI18nString } from "../utils/strings/orbitalObject
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { DeepReadonly } from "../utils/types";
+import { ISoundPlayer } from "../audio/soundPlayer";
 
 export class StarMapUI {
     readonly htmlRoot: HTMLDivElement;
@@ -76,7 +77,7 @@ export class StarMapUI {
 
     readonly onSystemFocusObservable = new Observable<StarSystemCoordinates>();
 
-    constructor(scene: Scene, player: Player, starSystemDatabase: StarSystemDatabase) {
+    constructor(scene: Scene, player: Player, starSystemDatabase: StarSystemDatabase, soundPlayer: ISoundPlayer) {
         this.scene = scene;
         this.scene.hoverCursor = "none";
 
@@ -206,7 +207,7 @@ export class StarMapUI {
         this.shortHandUIPlotItineraryButton.textContent = i18n.t("starMap:plotItinerary");
         this.shortHandUIButtonContainer.appendChild(this.shortHandUIPlotItineraryButton);
 
-        this.shortHandUIBookmarkButton = new StarMapBookmarkButton(player);
+        this.shortHandUIBookmarkButton = new StarMapBookmarkButton(player, soundPlayer);
         this.shortHandUIButtonContainer.appendChild(this.shortHandUIBookmarkButton.rootNode);
 
         document.addEventListener("pointermove", (event) => {

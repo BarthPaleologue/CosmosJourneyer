@@ -25,20 +25,21 @@ import { newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutron
 import { MatterJetPostProcess } from "../postProcesses/matterJetPostProcess";
 import { VolumetricLight } from "../volumetricLight/volumetricLight";
 import { translate } from "../uberCore/transforms/basicTransform";
-import { Textures } from "../assets/textures";
-import { AssetsManager, Axis } from "@babylonjs/core";
+import { Axis } from "@babylonjs/core";
 import { LensFlarePostProcess } from "../postProcesses/lensFlarePostProcess";
 import { getRgbFromTemperature } from "../utils/specrend";
+import { createTexturePools } from "../assets/textures";
 
-export async function createNeutronStarScene(engine: AbstractEngine): Promise<Scene> {
+export async function createNeutronStarScene(
+    engine: AbstractEngine,
+    progressCallback: (progress: number, text: string) => void
+): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
     await enablePhysics(scene);
 
-    const assetsManager = new AssetsManager(scene);
-    Textures.EnqueueTasks(assetsManager, scene);
-    await assetsManager.loadAsync();
+    const texturePools = createTexturePools(scene);
 
     const defaultControls = new DefaultControls(scene);
     defaultControls.speed = 2000;
@@ -51,7 +52,7 @@ export async function createNeutronStarScene(engine: AbstractEngine): Promise<Sc
     scene.enableDepthRenderer(camera, false, true);
 
     const neutronStarModel = newSeededNeutronStarModel(456, "Neutron Star Demo", []);
-    const neutronStar = new NeutronStar(neutronStarModel, scene);
+    const neutronStar = new NeutronStar(neutronStarModel, texturePools, scene);
     neutronStar.getTransform().position = new Vector3(0, 0, 1).scaleInPlace(neutronStar.getRadius() * 2000000);
 
     const volumetricLight = new VolumetricLight(neutronStar.mesh, neutronStar.volumetricLightUniforms, [], scene);
@@ -87,6 +88,8 @@ export async function createNeutronStarScene(engine: AbstractEngine): Promise<Sc
 
         matterJets.update(deltaSeconds);
     });
+
+    progressCallback(1, "Neutron Star Scene Loaded");
 
     return scene;
 }

@@ -15,40 +15,24 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AssetsManager } from "@babylonjs/core/Misc/assetsManager";
 import { Scene } from "@babylonjs/core/scene";
-import { Textures } from "./textures";
-import { Sounds } from "./sounds";
-import { Materials } from "./materials";
-import { Objects } from "./objects";
-import { Musics } from "./musics";
+import { AudioAssets, loadAudioAssets } from "./audioAssets";
+import { loadRenderingAssets, RenderingAssets } from "./renderingAssets";
 
-export class Assets {
-    static IS_READY = false;
+export type Assets = {
+    readonly audio: Readonly<AudioAssets>;
+    readonly rendering: Readonly<RenderingAssets>;
+};
 
-    private static MANAGER: AssetsManager;
+export async function loadAssets(
+    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void,
+    scene: Scene
+): Promise<Assets> {
+    const audioAssetsPromise = loadAudioAssets(progressCallback);
+    const renderingAssetsPromise = loadRenderingAssets(progressCallback, scene);
 
-    static async Init(scene: Scene): Promise<void> {
-        Assets.MANAGER = new AssetsManager(scene);
-        Assets.MANAGER.autoHideLoadingUI = false;
-        console.log("Initializing assets...");
-
-        Textures.EnqueueTasks(Assets.MANAGER, scene);
-        Sounds.EnqueueTasks(Assets.MANAGER, scene);
-        Musics.EnqueueTasks(Assets.MANAGER, scene);
-        Objects.EnqueueTasks(Assets.MANAGER, scene);
-
-        Assets.MANAGER.onFinish = () => {
-            Materials.Init(scene);
-
-            Objects.BUTTERFLY.material = Materials.BUTTERFLY_MATERIAL;
-            Objects.GRASS_BLADES.forEach((grassBlade) => (grassBlade.material = Materials.GRASS_MATERIAL));
-            Objects.CRATE.material = Materials.CRATE_MATERIAL;
-
-            console.log("Assets loaded");
-            Assets.IS_READY = true;
-        };
-
-        await Assets.MANAGER.loadAsync();
-    }
+    return {
+        audio: await audioAssetsPromise,
+        rendering: await renderingAssetsPromise
+    };
 }

@@ -16,13 +16,13 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Scene } from "@babylonjs/core/scene";
-import { Textures } from "../../textures";
 import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import * as BSL from "../../../utils/bsl";
+import { PBRTextures } from "../../textures";
 
 export class MetalSectionMaterial extends NodeMaterial {
-    constructor(name: string, scene: Scene) {
+    constructor(name: string, textures: PBRTextures, scene: Scene) {
         super(name, scene);
         this.mode = NodeMaterialModes.Material;
 
@@ -49,12 +49,12 @@ export class MetalSectionMaterial extends NodeMaterial {
 
         // Fragment
 
-        const albedoTexture = BSL.textureSample(Textures.METAL_PANELS_ALBEDO, proceduralUV, {
+        const albedoTexture = BSL.textureSample(textures.albedo, proceduralUV, {
             convertToLinearSpace: true
         });
-        const metallicRoughnesstexture = BSL.textureSample(Textures.METAL_PANELS_METALLIC_ROUGHNESS, proceduralUV);
-        const aoTexture = BSL.textureSample(Textures.METAL_PANELS_AMBIENT_OCCLUSION, proceduralUV);
-        const normalTexture = BSL.textureSample(Textures.METAL_PANELS_NORMAL, proceduralUV);
+        const metallicRoughnesstexture = BSL.textureSample(textures.metallicRoughness, proceduralUV);
+        const aoTexture = BSL.textureSample(textures.ambientOcclusion, proceduralUV);
+        const normalTexture = BSL.textureSample(textures.normal, proceduralUV);
 
         const perturbedNormal = BSL.perturbNormal(proceduralUV, positionW, normalW, normalTexture.rgb, BSL.float(1));
 

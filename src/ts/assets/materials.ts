@@ -24,32 +24,39 @@ import { PBRMetallicRoughnessMaterial } from "@babylonjs/core/Materials/PBR/pbrM
 import { Textures } from "./textures";
 import { SolarPanelMaterial } from "./procedural/solarPanel/solarPanelMaterial";
 
-export class Materials {
-    public static BUTTERFLY_MATERIAL: ButterflyMaterial;
-    public static BUTTERFLY_DEPTH_MATERIAL: ButterflyMaterial;
+export type Materials = {
+    readonly butterfly: ButterflyMaterial;
+    readonly butterflyDepth: ButterflyMaterial;
+    readonly grass: GrassMaterial;
+    readonly grassDepth: GrassMaterial;
+    readonly crate: PBRMetallicRoughnessMaterial;
+    readonly solarPanel: SolarPanelMaterial;
+    readonly tree: PBRMetallicRoughnessMaterial;
+};
 
-    public static GRASS_MATERIAL: GrassMaterial;
-    public static GRASS_DEPTH_MATERIAL: GrassMaterial;
+export function initMaterials(textures: Textures, scene: Scene): Materials {
+    const crateMaterial = new PBRMetallicRoughnessMaterial("crateMaterial", scene);
+    crateMaterial.baseTexture = textures.materials.crate.albedo;
+    crateMaterial.normalTexture = textures.materials.crate.normal;
+    crateMaterial.metallicRoughnessTexture = textures.materials.crate.metallicRoughness;
 
-    public static CRATE_MATERIAL: PBRMetallicRoughnessMaterial;
+    const treeMaterial = new PBRMetallicRoughnessMaterial("treeMaterial", scene);
+    treeMaterial.backFaceCulling = false;
+    treeMaterial.baseTexture = textures.materials.tree.albedo;
+    treeMaterial.transparencyMode = 1;
 
-    public static SOLAR_PANEL: SolarPanelMaterial;
+    return {
+        butterfly: new ButterflyMaterial(textures.particles.butterfly, scene, false),
+        butterflyDepth: new ButterflyMaterial(textures.particles.butterfly, scene, true),
+        grass: new GrassMaterial(scene, textures.noises, false),
+        grassDepth: new GrassMaterial(scene, textures.noises, true),
+        crate: crateMaterial,
+        solarPanel: new SolarPanelMaterial(textures.materials.solarPanel, scene),
+        tree: treeMaterial
+    };
+}
 
-    public static Init(scene: Scene) {
-        Materials.BUTTERFLY_MATERIAL = new ButterflyMaterial(scene, false);
-        Materials.BUTTERFLY_DEPTH_MATERIAL = new ButterflyMaterial(scene, true);
-
-        Materials.GRASS_MATERIAL = new GrassMaterial(scene, false);
-        Materials.GRASS_DEPTH_MATERIAL = new GrassMaterial(scene, true);
-
-        Materials.CRATE_MATERIAL = new PBRMetallicRoughnessMaterial("crateMaterial", scene);
-        Materials.CRATE_MATERIAL.baseTexture = Textures.CRATE_ALBEDO;
-        Materials.CRATE_MATERIAL.normalTexture = Textures.CRATE_NORMAL;
-        Materials.CRATE_MATERIAL.metallicRoughnessTexture = Textures.CRATE_METALLIC_ROUGHNESS;
-
-        Materials.SOLAR_PANEL = new SolarPanelMaterial(scene);
-    }
-
+export class MaterialsUtils {
     static DebugMaterial(name: string, diffuse: boolean, wireframe: boolean, scene: Scene) {
         const mat = new StandardMaterial(`${name}DebugMaterial`, scene);
         if (!diffuse) {

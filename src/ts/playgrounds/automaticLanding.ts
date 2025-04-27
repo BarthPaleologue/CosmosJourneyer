@@ -20,30 +20,32 @@ import { Scene } from "@babylonjs/core/scene";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { LandingPad } from "../assets/procedural/landingPad/landingPad";
-import { AssetsManager, MeshBuilder, PhysicsAggregate, PhysicsShapeType, Quaternion } from "@babylonjs/core";
+import { MeshBuilder, PhysicsAggregate, PhysicsShapeType, Quaternion } from "@babylonjs/core";
 import { enablePhysics } from "./utils";
 import { DefaultControls } from "../defaultControls/defaultControls";
 import { Spaceship } from "../spaceship/spaceship";
-import { Objects } from "../assets/objects";
-import { Textures } from "../assets/textures";
-import { Sounds } from "../assets/sounds";
 import { randRange } from "extended-random";
 import { CollisionMask } from "../settings";
 import { LandingPadSize } from "../spacestation/landingPad/landingPadManager";
+import { loadRenderingAssets } from "../assets/renderingAssets";
+import { SoundPlayerMock } from "../audio/soundPlayer";
 
-export async function createAutomaticLandingScene(engine: AbstractEngine): Promise<Scene> {
+export async function createAutomaticLandingScene(
+    engine: AbstractEngine,
+    progressCallback: (progress: number, text: string) => void
+): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
     await enablePhysics(scene);
 
-    const assetsManager = new AssetsManager(scene);
-    Sounds.EnqueueTasks(assetsManager, scene);
-    Objects.EnqueueTasks(assetsManager, scene);
-    Textures.EnqueueTasks(assetsManager, scene);
-    await assetsManager.loadAsync();
+    const assets = await loadRenderingAssets((loadedCount, totalCount, name) => {
+        progressCallback(loadedCount / totalCount, `Loading ${name}`);
+    }, scene);
 
-    const ship = Spaceship.CreateDefault(scene);
+    const soundPlayer = new SoundPlayerMock();
+
+    const ship = Spaceship.CreateDefault(scene, assets, soundPlayer);
     ship.getTransform().position.copyFromFloats(
         randRange(-50, 50, Math.random, 0),
         randRange(30, 50, Math.random, 0),
@@ -59,7 +61,7 @@ export async function createAutomaticLandingScene(engine: AbstractEngine): Promi
     camera.minZ = 0.1;
     camera.attachControl();
 
-    const landingPad = new LandingPad(42, LandingPadSize.SMALL, scene);
+    new LandingPad(42, LandingPadSize.SMALL, assets, scene);
 
     const ground = MeshBuilder.CreateBox("ground", { width: 100, height: 1, depth: 100 }, scene);
     ground.position.y = -2;

@@ -18,12 +18,12 @@
 import { Scene } from "@babylonjs/core/scene";
 import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
-import { Textures } from "../assets/textures";
+import { PBRTextures } from "../assets/textures";
 import { Vector2 } from "@babylonjs/core/Maths/math.vector";
 import * as BSL from "../utils/bsl";
 
 export class ClimberRingMaterial extends NodeMaterial {
-    constructor(name: string, scene: Scene) {
+    constructor(name: string, textures: PBRTextures, scene: Scene) {
         super(name, scene);
         this.mode = NodeMaterialModes.Material;
 
@@ -47,10 +47,10 @@ export class ClimberRingMaterial extends NodeMaterial {
 
         // Fragment
 
-        const albedoTexture = BSL.textureSample(Textures.CRATE_ALBEDO, proceduralUV, { convertToLinearSpace: true });
-        const metallicRoughnesstexture = BSL.textureSample(Textures.CRATE_METALLIC_ROUGHNESS, proceduralUV);
-        const aoTexture = BSL.textureSample(Textures.CRATE_AMBIENT_OCCLUSION, proceduralUV);
-        const normalTexture = BSL.textureSample(Textures.CRATE_NORMAL, proceduralUV);
+        const albedoTexture = BSL.textureSample(textures.albedo, proceduralUV, { convertToLinearSpace: true });
+        const metallicRoughnesstexture = BSL.textureSample(textures.metallicRoughness, proceduralUV);
+        const aoTexture = BSL.textureSample(textures.ambientOcclusion, proceduralUV);
+        const normalTexture = BSL.textureSample(textures.normal, proceduralUV);
 
         const perturbedNormal = BSL.perturbNormal(proceduralUV, positionW, normalW, normalTexture.rgb, BSL.float(1));
 

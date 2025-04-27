@@ -1,5 +1,4 @@
 import { Scene } from "@babylonjs/core/scene";
-import { Textures } from "../../textures";
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
 import {
@@ -31,13 +30,15 @@ import {
 } from "../../../utils/bsl";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Settings } from "../../../settings";
+import { PBRTextures } from "../../textures";
+import { LandingPadTexturePool } from "../../landingPadTexturePool";
 
 export class LandingPadMaterial extends NodeMaterial {
-    constructor(padNumber: number, scene: Scene) {
+    constructor(padNumber: number, textures: PBRTextures, texturePool: LandingPadTexturePool, scene: Scene) {
         super(`LandingPadMaterial${padNumber}`, scene);
         this.mode = NodeMaterialModes.Material;
 
-        const numberTexture = Textures.GetLandingPadNumberTexture(padNumber, scene);
+        const numberTexture = texturePool.get(padNumber, scene);
         if (numberTexture === undefined) {
             throw new Error(`No texture for pad number ${padNumber}`);
         }
@@ -96,12 +97,12 @@ export class LandingPadMaterial extends NodeMaterial {
 
         const fullPaintWeight = add(add(paintWeight, borderWeight), circleMask);
 
-        const albedoTexture = textureSample(Textures.CONCRETE_ALBEDO, proceduralUV, {
+        const albedoTexture = textureSample(textures.albedo, proceduralUV, {
             convertToLinearSpace: true
         });
-        const metallicRoughness = textureSample(Textures.CONCRETE_METALLIC_ROUGHNESS, proceduralUV);
-        const normalMapValue = textureSample(Textures.CONCRETE_NORMAL, proceduralUV);
-        const ambientOcclusion = textureSample(Textures.CONCRETE_AMBIENT_OCCLUSION, proceduralUV);
+        const metallicRoughness = textureSample(textures.metallicRoughness, proceduralUV);
+        const normalMapValue = textureSample(textures.normal, proceduralUV);
+        const ambientOcclusion = textureSample(textures.ambientOcclusion, proceduralUV);
 
         const finalAlbedo = mix(albedoTexture.rgb, paintAlbedo, fullPaintWeight);
         const finalMetallic = mix(metallicRoughness.r, f(0), fullPaintWeight);

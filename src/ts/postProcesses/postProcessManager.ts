@@ -60,6 +60,7 @@ import { MengerSpongeModel } from "../anomalies/mengerSponge/mengerSpongeModel";
 import { CelestialBody, StellarObject } from "../architecture/orbitalObject";
 import { DeepReadonly } from "../utils/types";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { Textures } from "../assets/textures";
 
 /**
  * The order in which the post processes are rendered when away from a planet
@@ -208,9 +209,13 @@ export class PostProcessManager {
 
     readonly bloomRenderEffect: BloomEffect;
 
-    constructor(scene: UberScene) {
+    private readonly textures: Textures;
+
+    constructor(textures: Textures, scene: UberScene) {
         this.scene = scene;
         this.engine = scene.getEngine();
+
+        this.textures = textures;
 
         this.renderingPipelineManager = scene.postProcessRenderPipelineManager;
 
@@ -250,14 +255,11 @@ export class PostProcessManager {
     private makeSplitRenderEffects(
         name: string,
         body: CelestialBody,
-        postProcesses: PostProcess[],
+        postProcesses: ReadonlyArray<PostProcess>,
         engine: AbstractEngine
     ): [PostProcessRenderEffect, PostProcessRenderEffect] {
-        const bodyPostProcesses = this.celestialBodyToPostProcesses.get(body.getTransform());
-        if (bodyPostProcesses === undefined) throw new Error(`No post processes found for body ${body.model.name}`);
+        const bodyPostProcesses = this.celestialBodyToPostProcesses.get(body.getTransform()) ?? [];
         const relevantPostProcesses = postProcesses.filter((postProcess) => bodyPostProcesses.includes(postProcess));
-        if (relevantPostProcesses === undefined)
-            throw new Error(`No post process found for body ${body.model.name} in ${name}`);
 
         const otherPostProcesses = postProcesses.filter((postProcess) => !relevantPostProcesses.includes(postProcess));
 
@@ -380,6 +382,7 @@ export class PostProcessManager {
                 planet.getBoundingRadius(),
                 planet.oceanUniforms,
                 stellarObjects.map((star) => star.getLight()),
+                this.textures.water,
                 this.scene
             );
             this.oceans.push(ocean);

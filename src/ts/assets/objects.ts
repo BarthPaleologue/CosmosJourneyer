@@ -16,257 +16,278 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { AssetsManager, MeshAssetTask } from "@babylonjs/core/Misc/assetsManager";
 import { Scene } from "@babylonjs/core/scene";
-import wanderer from "../../asset/spaceship/wanderer.glb";
-import banana from "../../asset/banana/banana.glb";
-import character from "../../asset/character/character.glb";
-import rock from "../../asset/rock.glb";
-import asteroid from "../../asset/asteroid/asteroid.glb";
-import asteroid2 from "../../asset/asteroid/asteroid2.glb";
-import tree from "../../asset/tree/tree.babylon";
-import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import treeTexturePath from "../../asset/tree/Tree.png";
+import wandererPath from "../../asset/spaceship/wanderer.glb";
+import bananaPath from "../../asset/banana/banana.glb";
+import characterPath from "../../asset/character/character.glb";
+import rockPath from "../../asset/rock.glb";
+import asteroidPath from "../../asset/asteroid/asteroid.glb";
+import asteroid2Path from "../../asset/asteroid/asteroid2.glb";
+import treePath from "../../asset/tree/tree.babylon";
 import { createButterfly } from "./procedural/butterfly/butterfly";
 import { createGrassBlade } from "./procedural/grass/grassBlade";
-import { LoadingScreen } from "../uberCore/loadingScreen";
-import i18next from "../i18n";
-import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import "@babylonjs/loaders";
 import "@babylonjs/core/Loading/Plugins/babylonFileLoader";
 import "@babylonjs/core/Animations/animatable";
 
-import sphericalTank from "../../asset/SpaceStationParts/sphericalTank.glb";
-import stationEngine from "../../asset/SpaceStationParts/engine.glb";
+import sphericalTankPath from "../../asset/SpaceStationParts/sphericalTank.glb";
+import stationEnginePath from "../../asset/SpaceStationParts/engine.glb";
 
 import { CollisionMask } from "../settings";
-import { PhysicsShape, PhysicsShapeMesh, PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
+import {
+    PhysicsShape,
+    PhysicsShapeConvexHull,
+    PhysicsShapeMesh,
+    PhysicsShapeSphere
+} from "@babylonjs/core/Physics/v2/physicsShape";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { Vector3 } from "@babylonjs/core/Maths/math";
+import { Materials } from "./materials";
+import { LoadAssetContainerAsync } from "@babylonjs/core/Loading";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-export class Objects {
-    private static WANDERER: Mesh;
-    private static BANANA: Mesh;
-    private static CHARACTER: Mesh;
+export type Objects = {
+    crate: Mesh;
+    grassBlades: ReadonlyArray<Mesh>;
+    wanderer: Mesh;
+    butterfly: Mesh;
+    banana: Mesh;
+    character: Mesh;
+    rock: Mesh;
+    asteroids: ReadonlyArray<Mesh>;
+    asteroidPhysicsShapes: ReadonlyArray<PhysicsShape>;
+    tree: Mesh;
+    sphericalTank: {
+        mesh: Mesh;
+        shape: PhysicsShapeSphere;
+    };
+    stationEngine: {
+        mesh: Mesh;
+        shape: PhysicsShapeConvexHull;
+    };
+};
 
-    public static ROCK: Mesh;
+export async function loadObjects(
+    materials: Materials,
+    scene: Scene,
+    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void
+): Promise<Objects> {
+    let loadedCount = 0;
+    let totalCount = 0;
 
-    public static ASTEROIDS: Mesh[] = [];
-    public static ASTEROID_PHYSICS_SHAPES: PhysicsShape[] = [];
+    const loadAssetInContainerAsync = async (name: string, url: string) => {
+        totalCount++;
 
-    public static TREE: Mesh;
+        const container = await LoadAssetContainerAsync(url, scene);
+        progressCallback(++loadedCount, totalCount, name);
+        return container;
+    };
 
-    public static BUTTERFLY: Mesh;
-    public static GRASS_BLADES: Mesh[] = [];
+    // Start loading all mesh assets
+    const wandererPromise = loadAssetInContainerAsync("Wanderer", wandererPath);
+    const bananaPromise = loadAssetInContainerAsync("Banana", bananaPath);
+    const characterPromise = loadAssetInContainerAsync("Character", characterPath);
+    const rockPromise = loadAssetInContainerAsync("Rock", rockPath);
+    const asteroidPromises = [
+        loadAssetInContainerAsync("Asteroid1", asteroidPath),
+        loadAssetInContainerAsync("Asteroid2", asteroid2Path)
+    ];
+    const treePromise = loadAssetInContainerAsync("Tree", treePath);
+    const sphericalTankPromise = loadAssetInContainerAsync("SphericalTank", sphericalTankPath);
+    const stationEnginePromise = loadAssetInContainerAsync("StationEngine", stationEnginePath);
 
-    public static SPHERICAL_TANK: Mesh;
-    public static SPHERICAL_TANK_PHYSICS_SHAPE: PhysicsShape;
-    public static STATION_ENGINE: Mesh;
+    const butterfly = createButterfly(scene);
+    butterfly.isVisible = false;
+    butterfly.material = materials.butterfly;
 
-    public static CRATE: Mesh;
+    const grassBlades = [createGrassBlade(scene, 3), createGrassBlade(scene, 1)];
+    grassBlades.forEach((blade) => {
+        blade.material = materials.grass;
+        blade.isVisible = false;
+    });
 
-    public static EnqueueTasks(manager: AssetsManager, scene: Scene) {
-        const wandererTask = manager.addMeshTask("wandererTask", "", "", wanderer);
-        wandererTask.onSuccess = function (task: MeshAssetTask) {
-            Objects.WANDERER = task.loadedMeshes[0] as Mesh;
+    const crate = MeshBuilder.CreateBox("crate", { size: 1 }, scene);
+    crate.isVisible = false;
+    crate.material = materials.crate;
 
-            for (const mesh of Objects.WANDERER.getChildMeshes()) {
-                mesh.isVisible = false;
-            }
-
-            console.log("Wanderer loaded");
-        };
-
-        const bananaTask = manager.addMeshTask("bananaTask", "", "", banana);
-        bananaTask.onSuccess = function (task: MeshAssetTask) {
-            Objects.BANANA = task.loadedMeshes[0] as Mesh;
-            Objects.BANANA.isVisible = false;
-
-            for (const mesh of Objects.BANANA.getChildMeshes()) {
-                mesh.isVisible = false;
-            }
-
-            console.log("Banana loaded");
-        };
-
-        const characterTask = manager.addMeshTask("characterTask", "", "", character);
-        characterTask.onSuccess = function (task: MeshAssetTask) {
-            Objects.CHARACTER = task.loadedMeshes[0] as Mesh;
-            Objects.CHARACTER.isVisible = false;
-
-            for (const mesh of Objects.CHARACTER.getChildMeshes()) {
-                mesh.isVisible = false;
-            }
-
-            console.log("Character loaded");
-        };
-
-        const rockTask = manager.addMeshTask("rockTask", "", "", rock);
-        rockTask.onSuccess = function (task: MeshAssetTask) {
-            Objects.ROCK = task.loadedMeshes[0].getChildMeshes()[0] as Mesh;
-            Objects.ROCK.setParent(null);
-            Objects.ROCK.position.y = 0.1;
-            Objects.ROCK.scaling.scaleInPlace(0.2);
-            Objects.ROCK.bakeCurrentTransformIntoVertices();
-            Objects.ROCK.checkCollisions = true;
-            Objects.ROCK.isVisible = false;
-
-            console.log("Rock loaded");
-        };
-
-        const asteroidUrls = [asteroid, asteroid2];
-
-        asteroidUrls.forEach((url, index) => {
-            const asteroidTask = manager.addMeshTask(`asteroidTask${index}`, "", "", url);
-            asteroidTask.onSuccess = function (task: MeshAssetTask) {
-                const asteroid = task.loadedMeshes[0].getChildMeshes()[0] as Mesh;
-                asteroid.setParent(null);
-                asteroid.scaling.scaleInPlace(100);
-                asteroid.bakeCurrentTransformIntoVertices();
-                asteroid.setEnabled(false);
-
-                Objects.ASTEROIDS.push(asteroid);
-
-                const physicsShape = new PhysicsShapeMesh(asteroid, scene);
-                physicsShape.filterMembershipMask = CollisionMask.ENVIRONMENT;
-                physicsShape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
-
-                Objects.ASTEROID_PHYSICS_SHAPES.push(physicsShape);
-
-                const scalings = [0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7, 1.9, 2.1];
-                for (let i = 0; i < scalings.length; i++) {
-                    const asteroidClone = asteroid.clone("asteroidClone" + i);
-                    asteroidClone.makeGeometryUnique();
-                    asteroidClone.setParent(null);
-                    asteroidClone.scaling.scaleInPlace(scalings[i]);
-                    asteroidClone.bakeCurrentTransformIntoVertices();
-                    asteroidClone.setEnabled(false);
-
-                    Objects.ASTEROIDS.push(asteroidClone);
-
-                    const physicsShapeClone = new PhysicsShapeMesh(asteroidClone, scene);
-                    physicsShapeClone.filterMembershipMask = CollisionMask.ENVIRONMENT;
-                    physicsShapeClone.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
-
-                    Objects.ASTEROID_PHYSICS_SHAPES.push(physicsShapeClone);
-                }
-
-                console.log(`Asteroid${index} loaded`);
-            };
-        });
-
-        const treeTask = manager.addMeshTask("treeTask", "", "", tree);
-        treeTask.onSuccess = function (task: MeshAssetTask) {
-            Objects.TREE = task.loadedMeshes[0] as Mesh;
-            Objects.TREE.position.y = -1;
-            Objects.TREE.scaling.scaleInPlace(3);
-            Objects.TREE.bakeCurrentTransformIntoVertices();
-            Objects.TREE.checkCollisions = true;
-
-            const treeMaterial = new StandardMaterial("treeMaterial", scene);
-
-            treeMaterial.opacityTexture = null;
-            treeMaterial.backFaceCulling = false;
-
-            const treeTexture = new Texture(treeTexturePath, scene);
-            treeTexture.hasAlpha = true;
-
-            treeMaterial.diffuseTexture = treeTexture;
-            treeMaterial.specularColor.set(0, 0, 0);
-
-            Objects.TREE.material = treeMaterial;
-
-            Objects.TREE.isVisible = false;
-
-            console.log("Tree loaded");
-        };
-
-        const sphericalTankTask = manager.addMeshTask("SphericalTankTask", "", "", sphericalTank);
-        sphericalTankTask.onSuccess = (task: MeshAssetTask) => {
-            Objects.SPHERICAL_TANK = task.loadedMeshes[0].getChildMeshes()[0] as Mesh;
-            Objects.SPHERICAL_TANK.parent = null;
-            Objects.SPHERICAL_TANK.isVisible = false;
-
-            const boundingBox = Objects.SPHERICAL_TANK.getBoundingInfo().boundingBox;
-            const maxDimension = Math.max(boundingBox.extendSize.x, boundingBox.extendSize.y, boundingBox.extendSize.z);
-
-            const targetDimension = 20;
-
-            Objects.SPHERICAL_TANK.scaling.scaleInPlace(targetDimension / maxDimension);
-            Objects.SPHERICAL_TANK.bakeCurrentTransformIntoVertices();
-
-            //FIXME: the scaling of the radius is caused by an issue with the mesh
-            Objects.SPHERICAL_TANK_PHYSICS_SHAPE = new PhysicsShapeSphere(Vector3.Zero(), targetDimension * 2.5, scene);
-
-            console.log("SphericalTank loaded");
-        };
-
-        const stationEngineTask = manager.addMeshTask("StationEngineTask", "", "", stationEngine);
-        stationEngineTask.onSuccess = (task: MeshAssetTask) => {
-            Objects.STATION_ENGINE = task.loadedMeshes[0].getChildMeshes()[0] as Mesh;
-            Objects.STATION_ENGINE.parent = null;
-            Objects.STATION_ENGINE.isVisible = false;
-
-            const boundingBox = Objects.STATION_ENGINE.getBoundingInfo().boundingBox;
-            const maxDimension = Math.max(boundingBox.extendSize.x, boundingBox.extendSize.y, boundingBox.extendSize.z);
-
-            Objects.STATION_ENGINE.scalingDeterminant = 1.0 / maxDimension;
-            Objects.STATION_ENGINE.bakeCurrentTransformIntoVertices();
-
-            console.log("StationEngine loaded");
-        };
-
-        Objects.BUTTERFLY = createButterfly(scene);
-        Objects.BUTTERFLY.isVisible = false;
-
-        Objects.GRASS_BLADES.push(createGrassBlade(scene, 3));
-        Objects.GRASS_BLADES[0].isVisible = false;
-
-        Objects.GRASS_BLADES.push(createGrassBlade(scene, 1));
-        Objects.GRASS_BLADES[1].isVisible = false;
-
-        Objects.CRATE = MeshBuilder.CreateBox("crate", { size: 1 }, scene);
-        Objects.CRATE.isVisible = false;
-
-        manager.onProgress = (remainingCount, totalCount) => {
-            const loadingScreen = scene.getEngine().loadingScreen;
-            if (loadingScreen instanceof LoadingScreen) {
-                loadingScreen.setProgressPercentage((100 * (totalCount - remainingCount)) / totalCount);
-            } else {
-                loadingScreen.loadingUIText =
-                    i18next.t("common:loading") +
-                    " " +
-                    ((100 * (totalCount - remainingCount)) / totalCount).toFixed(0) +
-                    "%";
-            }
-        };
+    const wandererContainer = await wandererPromise;
+    const wanderer = wandererContainer.rootNodes[0];
+    if (!(wanderer instanceof Mesh)) {
+        throw new Error("Wanderer root node is not a Mesh");
     }
 
-    static CreateWandererInstance(): InstancedMesh {
-        return Objects.WANDERER.instantiateHierarchy(null, {
-            doNotInstantiate: false
-        }) as InstancedMesh;
+    for (const mesh of wanderer.getChildMeshes()) {
+        mesh.isVisible = false;
     }
 
-    static CreateBananaInstance(): InstancedMesh {
-        return Objects.BANANA.instantiateHierarchy(null, {
-            doNotInstantiate: false
-        }) as InstancedMesh;
+    wandererContainer.addAllToScene();
+
+    const bananaContainer = await bananaPromise;
+    const banana = bananaContainer.rootNodes[0];
+    if (!(banana instanceof Mesh)) {
+        throw new Error("Banana root node is not a Mesh");
     }
 
-    static CreateBananaClone(sizeInMeters: number): Mesh {
-        const mesh = Objects.BANANA.getChildMeshes()[0]?.clone("bananaClone" + Math.random(), null) as Mesh;
-        mesh.scaling.scaleInPlace(5 * sizeInMeters);
-
-        mesh.isVisible = true;
-
-        return mesh;
+    banana.isVisible = false;
+    for (const mesh of banana.getChildMeshes()) {
+        mesh.isVisible = false;
     }
 
-    static CreateCharacterInstance(): InstancedMesh {
-        return Objects.CHARACTER.instantiateHierarchy(null, {
-            doNotInstantiate: false
-        }) as InstancedMesh;
+    bananaContainer.addAllToScene();
+
+    const characterContainer = await characterPromise;
+    const character = characterContainer.rootNodes[0];
+    if (!(character instanceof Mesh)) {
+        throw new Error("Character root node is not a Mesh");
     }
+    character.isVisible = false;
+    for (const mesh of character.getChildMeshes()) {
+        mesh.isVisible = false;
+    }
+
+    characterContainer.addAllToScene();
+
+    const rockContainer = await rockPromise;
+    const rock = rockContainer.meshes[1];
+    if (!(rock instanceof Mesh)) {
+        throw new Error("Rock root node is not a Mesh");
+    }
+
+    rock.setParent(null);
+    rock.position.y = 0.1;
+    rock.scaling.scaleInPlace(0.2);
+    rock.bakeCurrentTransformIntoVertices();
+    rock.checkCollisions = true;
+    rock.isVisible = false;
+
+    rockContainer.addAllToScene();
+
+    const asteroidContainers = await Promise.all(asteroidPromises);
+    const scalings = [0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7, 1.9, 2.1] as const;
+
+    const asteroids: Array<Mesh> = [];
+    const asteroidPhysicsShapes: Array<PhysicsShape> = [];
+
+    for (const container of asteroidContainers) {
+        const asteroid = container.meshes[1];
+        if (!(asteroid instanceof Mesh)) {
+            throw new Error("Asteroid root node is not a Mesh");
+        }
+
+        asteroid.setParent(null);
+        asteroid.scaling.scaleInPlace(100);
+        asteroid.bakeCurrentTransformIntoVertices();
+        asteroid.setEnabled(false);
+
+        asteroids.push(asteroid);
+
+        const physicsShape = new PhysicsShapeMesh(asteroid, scene);
+        physicsShape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+        physicsShape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
+
+        asteroidPhysicsShapes.push(physicsShape);
+
+        for (let i = 0; i < scalings.length; i++) {
+            const asteroidClone = asteroid.clone("asteroidClone" + i);
+            asteroidClone.makeGeometryUnique();
+            asteroidClone.setParent(null);
+            asteroidClone.scaling.scaleInPlace(scalings[i]);
+            asteroidClone.bakeCurrentTransformIntoVertices();
+            asteroidClone.setEnabled(false);
+
+            asteroids.push(asteroidClone);
+
+            const physicsShapeClone = new PhysicsShapeMesh(asteroidClone, scene);
+            physicsShapeClone.filterMembershipMask = CollisionMask.ENVIRONMENT;
+            physicsShapeClone.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
+
+            asteroidPhysicsShapes.push(physicsShapeClone);
+
+            container.addAllAssetsToContainer(asteroidClone);
+            container.removeAllFromScene();
+        }
+
+        container.addAllToScene();
+    }
+
+    const treeContainer = await treePromise;
+    const tree = treeContainer.meshes[0];
+    if (!(tree instanceof Mesh)) {
+        throw new Error("Tree root node is not a Mesh");
+    }
+
+    tree.position.y = -1;
+    tree.scaling.scaleInPlace(3);
+    tree.bakeCurrentTransformIntoVertices();
+    tree.checkCollisions = true;
+    tree.isVisible = false;
+    tree.material = materials.tree;
+
+    treeContainer.addAllToScene();
+
+    const sphericalTankContainer = await sphericalTankPromise;
+    const sphericalTank = sphericalTankContainer.meshes[1];
+    if (!(sphericalTank instanceof Mesh)) {
+        throw new Error("SphericalTank root node is not a Mesh");
+    }
+
+    sphericalTank.parent = null;
+    sphericalTank.isVisible = false;
+    sphericalTankContainer.addAllToScene();
+
+    const sphericalTankBoundingBox = sphericalTank.getBoundingInfo().boundingBox;
+    const sphericalTankMaxDimension = Math.max(
+        sphericalTankBoundingBox.extendSize.x,
+        sphericalTankBoundingBox.extendSize.y,
+        sphericalTankBoundingBox.extendSize.z
+    );
+
+    const sphericalTankTargetDimension = 20;
+
+    sphericalTank.scaling.scaleInPlace(sphericalTankTargetDimension / sphericalTankMaxDimension);
+    sphericalTank.bakeCurrentTransformIntoVertices();
+
+    const sphericalTankPhysicsShape = new PhysicsShapeSphere(Vector3.Zero(), sphericalTankTargetDimension * 2.5, scene);
+    sphericalTankPhysicsShape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+    sphericalTankPhysicsShape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
+
+    const stationEngineContainer = await stationEnginePromise;
+    const stationEngine = stationEngineContainer.meshes[1];
+    if (!(stationEngine instanceof Mesh)) {
+        throw new Error("StationEngine root node is not a Mesh");
+    }
+
+    stationEngine.parent = null;
+    stationEngine.isVisible = false;
+    stationEngineContainer.addAllToScene();
+
+    const boundingBox = stationEngine.getBoundingInfo().boundingBox;
+    const maxDimension = Math.max(boundingBox.extendSize.x, boundingBox.extendSize.y, boundingBox.extendSize.z);
+
+    stationEngine.scalingDeterminant = 1.0 / maxDimension;
+    stationEngine.bakeCurrentTransformIntoVertices();
+
+    const stationEngineShape = new PhysicsShapeConvexHull(stationEngine, scene);
+    stationEngineShape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+    stationEngineShape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
+
+    return {
+        stationEngine: {
+            mesh: stationEngine,
+            shape: stationEngineShape
+        },
+        sphericalTank: {
+            mesh: sphericalTank,
+            shape: sphericalTankPhysicsShape
+        },
+        tree,
+        asteroids,
+        asteroidPhysicsShapes,
+        rock,
+        character,
+        banana,
+        butterfly,
+        grassBlades,
+        crate,
+        wanderer
+    };
 }
