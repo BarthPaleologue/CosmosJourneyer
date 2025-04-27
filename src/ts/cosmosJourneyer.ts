@@ -404,13 +404,15 @@ export class CosmosJourneyer {
                   twgslOptions: {
                       wasmPath: new URL("./utils/TWGSL/twgsl.wasm", import.meta.url).href,
                       jsPath: new URL("./utils/TWGSL/twgsl.js", import.meta.url).href
-                  }
+                  },
+                  audioEngine: true
               })
             : new Engine(canvas, true, {
                   // the preserveDrawingBuffer option is required for the screenshot feature to work
                   preserveDrawingBuffer: true,
                   useHighPrecisionMatrix: true,
-                  doNotHandleContextLost: true
+                  doNotHandleContextLost: true,
+                  audioEngine: true
               });
 
         engine.useReverseDepthBuffer = true;
