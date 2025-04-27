@@ -417,6 +417,8 @@ export class CosmosJourneyer {
         engine.loadingScreen = loadingScreen;
         engine.loadingScreen.displayLoadingUI();
         window.addEventListener("resize", () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
             engine.resize(true);
         });
 
