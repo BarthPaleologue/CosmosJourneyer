@@ -31,6 +31,7 @@ export type Materials = {
     readonly grassDepth: GrassMaterial;
     readonly crate: PBRMetallicRoughnessMaterial;
     readonly solarPanel: SolarPanelMaterial;
+    readonly tree: PBRMetallicRoughnessMaterial;
 };
 
 export function initMaterials(textures: Textures, scene: Scene): Materials {
@@ -39,13 +40,19 @@ export function initMaterials(textures: Textures, scene: Scene): Materials {
     crateMaterial.normalTexture = textures.materials.crate.normal;
     crateMaterial.metallicRoughnessTexture = textures.materials.crate.metallicRoughness;
 
+    const treeMaterial = new PBRMetallicRoughnessMaterial("treeMaterial", scene);
+    treeMaterial.backFaceCulling = false;
+    treeMaterial.baseTexture = textures.materials.tree.albedo;
+    treeMaterial.transparencyMode = 1;
+
     return {
         butterfly: new ButterflyMaterial(textures.particles.butterfly, scene, false),
         butterflyDepth: new ButterflyMaterial(textures.particles.butterfly, scene, true),
         grass: new GrassMaterial(scene, textures.noises, false),
         grassDepth: new GrassMaterial(scene, textures.noises, true),
         crate: crateMaterial,
-        solarPanel: new SolarPanelMaterial(textures.materials.solarPanel, scene)
+        solarPanel: new SolarPanelMaterial(textures.materials.solarPanel, scene),
+        tree: treeMaterial
     };
 }
 

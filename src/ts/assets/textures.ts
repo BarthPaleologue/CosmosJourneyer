@@ -46,6 +46,8 @@ import cursorImage from "../../asset/textures/hoveredCircle.png";
 
 import butterflyTexture from "../../asset/butterfly.webp";
 
+import treeTexturePath from "../../asset/tree/Tree.png";
+
 import solarPanelAlbedo from "../../asset/SolarPanelMaterial/SolarPanel002_2K-PNG_Color.webp";
 import solarPanelNormal from "../../asset/SolarPanelMaterial/SolarPanel002_2K-PNG_NormalDX.webp";
 import solarPanelMetallicRoughness from "../../asset/SolarPanelMaterial/metallicRougness.webp";
@@ -117,6 +119,7 @@ export type AllMaterialTextures = {
     metalPanels: PBRTextures;
     concrete: PBRTextures;
     crate: PBRTextures;
+    tree: Pick<PBRTextures, "albedo">;
 };
 
 export type TexturePools = {
@@ -250,6 +253,8 @@ export async function loadTextures(
         metalPanelsAmbientOcclusion
     );
 
+    const treeAlbedoPromise = loadTextureAsync("TreeAlbedo", treeTexturePath);
+
     // Concrete
     const concreteAlbedoPromise = loadTextureAsync("ConcreteAlbedo", concreteAlbedo);
     const concreteNormalPromise = loadTextureAsync("ConcreteNormal", concreteNormal);
@@ -261,6 +266,9 @@ export async function loadTextures(
     const crateNormalPromise = loadTextureAsync("CrateNormal", crateNormal);
     const crateMetallicRoughnessPromise = loadTextureAsync("CrateMetallicRoughness", crateMetallicRoughness);
     const crateAmbientOcclusionPromise = loadTextureAsync("CrateAmbientOcclusion", crateAmbientOcclusion);
+
+    const treeAlbedo = await treeAlbedoPromise;
+    treeAlbedo.hasAlpha = true;
 
     // Assemble and return the textures structure
     return {
@@ -320,6 +328,9 @@ export async function loadTextures(
                 normal: await crateNormalPromise,
                 metallicRoughness: await crateMetallicRoughnessPromise,
                 ambientOcclusion: await crateAmbientOcclusionPromise
+            },
+            tree: {
+                albedo: treeAlbedo
             }
         },
         environment: {

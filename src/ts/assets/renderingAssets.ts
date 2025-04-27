@@ -36,7 +36,7 @@ export async function loadRenderingAssets(
 
     const materials = initMaterials(textures, scene);
 
-    const objectsPromise = loadObjects(materials, textures, scene, progressCallback);
+    const objectsPromise = loadObjects(materials, scene, progressCallback);
 
     return {
         textures: textures,

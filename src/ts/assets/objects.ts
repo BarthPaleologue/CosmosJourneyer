@@ -24,8 +24,6 @@ import rockPath from "../../asset/rock.glb";
 import asteroidPath from "../../asset/asteroid/asteroid.glb";
 import asteroid2Path from "../../asset/asteroid/asteroid2.glb";
 import treePath from "../../asset/tree/tree.babylon";
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import treeTexturePath from "../../asset/tree/Tree.png";
 import { createButterfly } from "./procedural/butterfly/butterfly";
 import { createGrassBlade } from "./procedural/grass/grassBlade";
 import "@babylonjs/loaders";
@@ -44,9 +42,7 @@ import {
 } from "@babylonjs/core/Physics/v2/physicsShape";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Materials } from "./materials";
-import { Textures } from "./textures";
 import { LoadAssetContainerAsync } from "@babylonjs/core/Loading";
-import { PBRMetallicRoughnessMaterial } from "@babylonjs/core/Materials/PBR/pbrMetallicRoughnessMaterial";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export type Objects = {
@@ -72,7 +68,6 @@ export type Objects = {
 
 export async function loadObjects(
     materials: Materials,
-    textures: Textures,
     scene: Scene,
     progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void
 ): Promise<Objects> {
@@ -225,16 +220,7 @@ export async function loadObjects(
     tree.bakeCurrentTransformIntoVertices();
     tree.checkCollisions = true;
     tree.isVisible = false;
-
-    const treeTexture = new Texture(treeTexturePath, scene);
-    treeTexture.hasAlpha = true;
-
-    const treeMaterial = new PBRMetallicRoughnessMaterial("treeMaterial", scene);
-    treeMaterial.backFaceCulling = false;
-    treeMaterial.baseTexture = treeTexture;
-    treeMaterial.transparencyMode = 1;
-
-    tree.material = treeMaterial;
+    tree.material = materials.tree;
 
     treeContainer.addAllToScene();
 
