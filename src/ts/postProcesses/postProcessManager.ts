@@ -815,6 +815,15 @@ export class PostProcessManager {
     public reset() {
         this.renderingPipelineManager.detachCamerasFromRenderPipeline(this.renderingPipeline.name, this.scene.cameras);
         this.renderingPipelineManager.removePipeline(this.renderingPipeline.name);
+        this.renderingPipeline.dispose();
+
+        this.renderingPipeline = new PostProcessRenderPipeline(this.scene.getEngine(), "renderingPipeline");
+        this.renderingPipeline.addEffect(this.bloomRenderEffect);
+        this.renderingPipeline.addEffect(this.fxaaRenderEffect);
+        this.renderingPipeline.addEffect(this.colorCorrectionRenderEffect);
+
+        this.renderingPipelineManager.addPipeline(this.renderingPipeline);
+        this.renderingPipelineManager.attachCamerasToRenderPipeline(this.renderingPipeline.name, this.scene.cameras);
 
         // disposing on every camera is necessary because BabylonJS only detaches the post-processes from a single camera at a time
         this.scene.cameras.forEach((camera) => {
