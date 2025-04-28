@@ -72,7 +72,6 @@ import { TypedObject } from "../architecture/typedObject";
 import { EncyclopaediaGalacticaManager } from "../society/encyclopaediaGalacticaManager";
 import { StarSystemDatabase } from "./starSystemDatabase";
 import { AiPlayerControls } from "../player/aiPlayerControls";
-import "@babylonjs/inspector";
 import { getUniverseObjectId, UniverseObjectId } from "../utils/coordinates/universeObjectId";
 import { starSystemCoordinatesEquals, StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
 import { StarSystemLoader } from "./starSystemLoader";
@@ -480,12 +479,6 @@ export class StarSystemView implements View {
         });
 
         this.targetCursorLayer = new TargetCursorLayer();
-
-        /*const inspectorRoot = document.getElementById("inspectorLayer");
-        if (inspectorRoot === null) throw new Error("Inspector root not found");
-        void this.scene.debugLayer.show({
-            globalRoot: inspectorRoot
-        });*/
 
         window.StarSystemView = this;
     }
