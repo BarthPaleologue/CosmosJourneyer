@@ -29,6 +29,7 @@ import { loadRenderingAssets } from "../assets/renderingAssets";
 import { EncyclopaediaGalacticaManager } from "../society/encyclopaediaGalacticaManager";
 import { positionNearObjectBrightSide } from "../utils/positionNearObject";
 import { getAlphaTestisSystemModel } from "../starSystem/customSystems/alphaTestis";
+import { updateNotifications } from "../utils/notification";
 
 export async function createStarSystemViewScene(
     engine: AbstractEngine,
@@ -80,6 +81,11 @@ export async function createStarSystemViewScene(
         starSystemView.getStarSystem().getStellarObjects()[0],
         starSystemView.getStarSystem()
     );
+
+    scene.onBeforeRenderObservable.add(() => {
+        const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;
+        updateNotifications(deltaSeconds);
+    });
 
     return starSystemView.scene;
 }
