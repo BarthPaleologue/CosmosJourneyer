@@ -138,6 +138,11 @@ scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
     engine.runRenderLoop(() => {
         scene.render();
+
+        if (urlParams.get("freeze") !== null) {
+            engine.stopRenderLoop(); // freeze the first stable frame
+            canvas.dataset.ready = "1";
+        }
     });
 });
 
