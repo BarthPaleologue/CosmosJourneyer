@@ -134,6 +134,16 @@ if (urlParams.get("physicsViewer") !== null) {
     });
 }
 
+if (urlParams.get("freeze") !== null) {
+    scene.onAfterRenderObservable.addOnce(() => {
+        engine.stopRenderLoop();
+    });
+}
+
+scene.onAfterRenderObservable.addOnce(() => {
+    canvas.dataset.ready = "1";
+});
+
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
     engine.runRenderLoop(() => {
