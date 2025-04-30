@@ -82,7 +82,7 @@
         "serve:prod": "http-server dist -p 8080",
         "format:check": "prettier . --check",
         "format": "prettier . --write",
-        "test": "vitest run",
+        "test:unit": "vitest run",
         "test:coverage": "vitest run --coverage",
         "test:e2e": "playwright test",
         "test:e2e:update": "playwright test --update-snapshots",

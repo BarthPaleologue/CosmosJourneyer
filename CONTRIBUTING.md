@@ -22,7 +22,7 @@ To contibute follow these steps:
     ```sh
     git checkout -b [name_of_your_new_branch]
     ```
-4. Manually test your changes
+4. Test your changes (`pnpm test:unit` and [end-to-end tests](/tests/e2e/Readme.md))
 5. Commit & push your changes
 6. Open a pull request to the `main` branch
 
