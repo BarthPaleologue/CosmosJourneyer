@@ -134,15 +134,20 @@ if (urlParams.get("physicsViewer") !== null) {
     });
 }
 
+if (urlParams.get("freeze") !== null) {
+    scene.onAfterRenderObservable.addOnce(() => {
+        engine.stopRenderLoop();
+    });
+}
+
+scene.onAfterRenderObservable.addOnce(() => {
+    canvas.dataset.ready = "1";
+});
+
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
     engine.runRenderLoop(() => {
         scene.render();
-
-        if (urlParams.get("freeze") !== null) {
-            engine.stopRenderLoop(); // freeze the first stable frame
-            canvas.dataset.ready = "1";
-        }
     });
 });
 
