@@ -53,5 +53,5 @@ pnpm test:e2e
 If you can't or don't want to setup playwright locally, you can run the tests in a docker container instead:
 
 ```bash
-pnpm test:e2e:docker:build && pnpm test:e2e:docker:run
+pnpm test:e2e:docker
 ```
