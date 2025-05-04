@@ -29,10 +29,10 @@ import { AxisRenderer } from "../orbit/axisRenderer";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { OrbitalObjectUtils } from "../architecture/orbitalObjectUtils";
 
-export function createOrbitalDemoScene(
+export async function createOrbitalDemoScene(
     engine: AbstractEngine,
     progressCallback: (progress: number, text: string) => void
-): Scene {
+): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
@@ -120,6 +120,9 @@ export function createOrbitalDemoScene(
     const referencePlaneDeltaRotation = Matrix.Identity();
 
     let elapsedSeconds = 0;
+
+    defaultControls.getTransform().setAbsolutePosition(new Vector3(0, 0, -10));
+    defaultControls.getTransform().lookAt(Vector3.Zero());
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;

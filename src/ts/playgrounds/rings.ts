@@ -25,10 +25,10 @@ import { RingsLut } from "../rings/ringsLut";
 import { RingsModel } from "../rings/ringsModel";
 import { DefaultControls } from "../defaultControls/defaultControls";
 
-export function createRingsScene(
+export async function createRingsScene(
     engine: AbstractEngine,
     progressCallback: (progress: number, text: string) => void
-): Scene {
+): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 

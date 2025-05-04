@@ -18,26 +18,9 @@
 import "../styles/index.scss";
 
 import "@babylonjs/inspector";
-import { PhysicsViewer, Scene, Tools, Engine } from "@babylonjs/core";
-import { createDefaultScene } from "./playgrounds/default";
-import { createOrbitalDemoScene } from "./playgrounds/orbitalDemo";
-import { createAutomaticLandingScene } from "./playgrounds/automaticLanding";
-import { createHyperspaceTunnelDemo } from "./playgrounds/hyperspaceTunnel";
-import { createDebugAssetsScene } from "./playgrounds/debugAssets";
-import { createSpaceStationScene } from "./playgrounds/spaceStation";
-import { createXrScene } from "./playgrounds/xr";
-import { createFlightDemoScene } from "./playgrounds/flightDemo";
-import { createNeutronStarScene } from "./playgrounds/neutronStar";
-import { createCharacterDemoScene } from "./playgrounds/character";
-import { createSpaceStationUIScene } from "./playgrounds/spaceStationUI";
-import { createStarMapScene } from "./playgrounds/starMap";
-import { createTutorialScene } from "./playgrounds/tutorial";
-import { createAsteroidFieldScene } from "./playgrounds/asteroidField";
+import { PhysicsViewer, Tools, Engine } from "@babylonjs/core";
 import { LoadingScreen } from "./uberCore/loadingScreen";
-import { createStarSystemViewScene } from "./playgrounds/starSystemView";
-import { createRingsScene } from "./playgrounds/rings";
-import { createSierpinskiScene } from "./playgrounds/anomalies/sierpinski";
-import { createMandelboxScene } from "./playgrounds/anomalies/mandelbox";
+import { PlaygroundRegistry } from "./playgrounds/playgroundRegistry";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -57,62 +40,11 @@ engine.displayLoadingUI();
 const urlParams = new URLSearchParams(window.location.search);
 const requestedScene = urlParams.get("scene") ?? "";
 
-let scene: Scene;
-switch (requestedScene) {
-    case "orbitalDemo":
-        scene = createOrbitalDemoScene(engine, progressCallback);
-        break;
-    case "tunnel":
-        scene = await createHyperspaceTunnelDemo(engine, progressCallback);
-        break;
-    case "automaticLanding":
-        scene = await createAutomaticLandingScene(engine, progressCallback);
-        break;
-    case "debugAssets":
-        scene = await createDebugAssetsScene(engine, progressCallback);
-        break;
-    case "spaceStation":
-        scene = await createSpaceStationScene(engine, progressCallback);
-        break;
-    case "spaceStationUI":
-        scene = await createSpaceStationUIScene(engine, progressCallback);
-        break;
-    case "xr":
-        scene = await createXrScene(engine, progressCallback);
-        break;
-    case "flightDemo":
-        scene = await createFlightDemoScene(engine, progressCallback);
-        break;
-    case "neutronStar":
-        scene = await createNeutronStarScene(engine, progressCallback);
-        break;
-    case "character":
-        scene = await createCharacterDemoScene(engine, progressCallback);
-        break;
-    case "starMap":
-        scene = await createStarMapScene(engine, progressCallback);
-        break;
-    case "tutorial":
-        scene = await createTutorialScene(engine, progressCallback);
-        break;
-    case "asteroidField":
-        scene = await createAsteroidFieldScene(engine, progressCallback);
-        break;
-    case "starSystemView":
-        scene = await createStarSystemViewScene(engine, progressCallback);
-        break;
-    case "rings":
-        scene = await createRingsScene(engine, progressCallback);
-        break;
-    case "sierpinski":
-        scene = await createSierpinskiScene(engine, progressCallback);
-        break;
-    case "mandelbox":
-        scene = await createMandelboxScene(engine, progressCallback);
-        break;
-    default:
-        scene = createDefaultScene(engine, progressCallback);
-}
+const playgroundRegistry = new PlaygroundRegistry();
+
+const sceneBuilder = playgroundRegistry.get(requestedScene);
+
+const scene = await sceneBuilder(engine, progressCallback);
 
 if (urlParams.get("debug") !== null) {
     const inspectorRoot = document.createElement("div");
