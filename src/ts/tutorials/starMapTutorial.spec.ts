@@ -17,14 +17,15 @@
 
 import { describe, expect, it } from "vitest";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-import { FuelScoopTutorial } from "./fuelScoopTutorial";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
+import { StarMapTutorial } from "./starMapTutorial";
+import { Mission } from "../missions/mission";
 
-describe("FuelScoopTutorial", () => {
-    it("spawns near a star", () => {
+describe("StarMapTutorial", () => {
+    it("spawns near a space station", () => {
         const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
-        const tutorial = new FuelScoopTutorial();
+        const tutorial = new StarMapTutorial();
 
         const saveDataResult = tutorial.getSaveData(starSystemDatabase);
         expect(saveDataResult.success).toBe(true);
@@ -52,8 +53,38 @@ describe("FuelScoopTutorial", () => {
             throw new Error("shipLocation.location.type is not relative");
         }
 
-        const closestObjectModel = starSystemDatabase.getObjectModelByUniverseId(shipLocation.universeObjectId);
+        const stationModel = starSystemDatabase.getObjectModelByUniverseId(shipLocation.universeObjectId);
 
-        expect(closestObjectModel?.type).toBe(OrbitalObjectType.STAR);
+        expect(stationModel?.type).toBe(OrbitalObjectType.SPACE_STATION);
+    });
+
+    it("has correct mission objectives", () => {
+        const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
+        const tutorial = new StarMapTutorial();
+
+        const saveDataResult = tutorial.getSaveData(starSystemDatabase);
+        expect(saveDataResult.success).toBe(true);
+        if (!saveDataResult.success) {
+            throw new Error("saveData is not successful");
+        }
+
+        const saveData = saveDataResult.value;
+
+        expect(saveData.player.currentMissions.length).toBeGreaterThan(0);
+
+        for (const serializedMission of saveData.player.currentMissions) {
+            const missionGiverId = serializedMission.missionGiver;
+            const missionGiver = starSystemDatabase.getObjectModelByUniverseId(missionGiverId);
+            expect(missionGiver).not.toBe(null);
+
+            const mission = Mission.Deserialize(serializedMission, starSystemDatabase);
+            expect(mission).not.toBe(null);
+
+            const targetSystems = mission?.getTargetSystems();
+            for (const targetSystem of targetSystems ?? []) {
+                const systemModel = starSystemDatabase.getSystemModelFromCoordinates(targetSystem);
+                expect(systemModel).not.toBe(null);
+            }
+        }
     });
 });
