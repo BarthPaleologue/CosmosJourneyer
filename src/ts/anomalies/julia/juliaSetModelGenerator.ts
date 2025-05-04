@@ -25,9 +25,9 @@ import { JuliaSetModel } from "./juliaSetModel";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
-import { createOrbitalObjectId } from "../../utils/coordinates/orbitalObjectId";
 
 export function newSeededJuliaSetModel(
+    id: string,
     seed: number,
     name: string,
     parentBodies: ReadonlyArray<OrbitalObjectModel>
@@ -65,7 +65,7 @@ export function newSeededJuliaSetModel(
 
     return {
         type: OrbitalObjectType.JULIA_SET,
-        id: createOrbitalObjectId(parentIds, name),
+        id: id,
         name,
         radius,
         orbit,

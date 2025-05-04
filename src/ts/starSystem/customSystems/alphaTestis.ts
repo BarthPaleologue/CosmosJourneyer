@@ -38,28 +38,28 @@ export function getAlphaTestisSystemModel(): StarSystemModel {
         localZ: 0
     };
 
-    const weierstrass = newSeededStarModel(420, "Weierstrass", []);
+    const weierstrass = newSeededStarModel("star0", 420, "Weierstrass", []);
     weierstrass.blackBodyTemperature = 5778;
 
-    const hecate = newSeededTelluricPlanetModel(253, "Hécate", [weierstrass]);
+    const hecate = newSeededTelluricPlanetModel("hecate", 253, "Hécate", [weierstrass]);
     hecate.temperature.min = celsiusToKelvin(-40);
     hecate.temperature.max = celsiusToKelvin(30);
 
     hecate.orbit.semiMajorAxis = 21000 * hecate.radius;
 
-    const spaceStation = newSeededSpaceStationModel(0, systemCoordinates, Vector3.Zero(), [hecate]);
+    const spaceStation = newSeededSpaceStationModel("hecate->station", 0, systemCoordinates, Vector3.Zero(), [hecate]);
 
-    const manaleth = newSeededTelluricSatelliteModel(23, "Manaleth", [hecate]);
+    const manaleth = newSeededTelluricSatelliteModel("hecate->manaleth", 23, "Manaleth", [hecate]);
     manaleth.orbit.inclination = Tools.ToRadians(45);
     manaleth.orbit.semiMajorAxis = getOrbitRadiusFromPeriod(manaleth.siderealDaySeconds, hecate.mass);
 
-    const ares = newSeededTelluricPlanetModel(0.3725, "Ares", [weierstrass]);
+    const ares = newSeededTelluricPlanetModel("ares", 0.3725, "Ares", [weierstrass]);
     if (ares.clouds !== null) ares.clouds.coverage = 1;
     if (ares.atmosphere !== null) ares.atmosphere.pressure = Settings.EARTH_SEA_LEVEL_PRESSURE * 0.5;
 
     ares.orbit.semiMajorAxis = 25100 * hecate.radius;
 
-    const andromaque = newSeededGasPlanetModel(0.28711440474126226, "Andromaque", [weierstrass]);
+    const andromaque = newSeededGasPlanetModel("andromaque", 0.28711440474126226, "Andromaque", [weierstrass]);
     andromaque.orbit.semiMajorAxis = 25300 * hecate.radius;
     andromaque.orbit.eccentricity = 0.8;
 

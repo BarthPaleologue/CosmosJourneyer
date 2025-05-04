@@ -31,3 +31,36 @@ export const enum OrbitalObjectType {
     SPACE_ELEVATOR = 3001,
     CUSTOM = 4242
 }
+
+export function getOrbitalObjectTypeStringId(type: OrbitalObjectType): string {
+    switch (type) {
+        case OrbitalObjectType.STAR:
+            return "star";
+        case OrbitalObjectType.NEUTRON_STAR:
+            return "neutronStar";
+        case OrbitalObjectType.BLACK_HOLE:
+            return "blackHole";
+        case OrbitalObjectType.TELLURIC_PLANET:
+            return "telluricPlanet";
+        case OrbitalObjectType.TELLURIC_SATELLITE:
+            return "telluricSatellite";
+        case OrbitalObjectType.GAS_PLANET:
+            return "gasPlanet";
+        case OrbitalObjectType.MANDELBULB:
+            return "mandelbulb";
+        case OrbitalObjectType.JULIA_SET:
+            return "juliaSet";
+        case OrbitalObjectType.MANDELBOX:
+            return "mandelbox";
+        case OrbitalObjectType.SIERPINSKI_PYRAMID:
+            return "sierpinskiPyramid";
+        case OrbitalObjectType.MENGER_SPONGE:
+            return "mengerSponge";
+        case OrbitalObjectType.SPACE_STATION:
+            return "spaceStation";
+        case OrbitalObjectType.SPACE_ELEVATOR:
+            return "spaceElevator";
+        case OrbitalObjectType.CUSTOM:
+            return "custom";
+    }
+}

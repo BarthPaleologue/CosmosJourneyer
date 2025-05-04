@@ -30,9 +30,9 @@ import { generateSpaceStationName } from "../utils/strings/spaceStationNameGener
 import { SpaceStationModel } from "./spacestationModel";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { createOrbitalObjectId } from "../utils/coordinates/orbitalObjectId";
 
 export function newSeededSpaceStationModel(
+    id: string,
     seed: number,
     starSystemCoordinates: StarSystemCoordinates,
     starSystemPosition: Vector3,
@@ -97,7 +97,7 @@ export function newSeededSpaceStationModel(
         type: OrbitalObjectType.SPACE_STATION,
         seed,
         starSystemCoordinates: starSystemCoordinates,
-        id: createOrbitalObjectId(parentIds, name),
+        id: id,
         name,
         orbit,
         mass,

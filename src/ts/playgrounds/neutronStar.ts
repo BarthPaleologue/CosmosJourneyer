@@ -51,7 +51,7 @@ export async function createNeutronStarScene(
 
     scene.enableDepthRenderer(camera, false, true);
 
-    const neutronStarModel = newSeededNeutronStarModel(456, "Neutron Star Demo", []);
+    const neutronStarModel = newSeededNeutronStarModel("neutronStar", 456, "Neutron Star Demo", []);
     const neutronStar = new NeutronStar(neutronStarModel, texturePools, scene);
     neutronStar.getTransform().position = new Vector3(0, 0, 1).scaleInPlace(neutronStar.getRadius() * 2000000);
 

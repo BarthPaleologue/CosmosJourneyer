@@ -48,6 +48,7 @@ import { newSeededSierpinskiPyramidModel } from "../anomalies/sierpinskiPyramid/
 import { newSeededMengerSpongeModel } from "../anomalies/mengerSponge/mengerSpongeModelGenerator";
 import { TelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModel";
 import { isNonEmptyArray } from "../utils/types";
+import { createOrbitalObjectId } from "../utils/coordinates/orbitalObjectId";
 
 const enum GenerationSteps {
     NAME,
@@ -83,13 +84,29 @@ export function newSeededStarSystemModel(
     const stellarObjectName = `${systemName} ${Alphabet[0].toUpperCase()}`;
     switch (stellarObjectType) {
         case OrbitalObjectType.STAR:
-            stellarObjects.push(newSeededStarModel(seed, stellarObjectName, []));
+            stellarObjects.push(
+                newSeededStarModel(createOrbitalObjectId([], OrbitalObjectType.STAR, 0), seed, stellarObjectName, [])
+            );
             break;
         case OrbitalObjectType.BLACK_HOLE:
-            stellarObjects.push(newSeededBlackHoleModel(seed, stellarObjectName, []));
+            stellarObjects.push(
+                newSeededBlackHoleModel(
+                    createOrbitalObjectId([], OrbitalObjectType.NEUTRON_STAR, 0),
+                    seed,
+                    stellarObjectName,
+                    []
+                )
+            );
             break;
         case OrbitalObjectType.NEUTRON_STAR:
-            stellarObjects.push(newSeededNeutronStarModel(seed, stellarObjectName, []));
+            stellarObjects.push(
+                newSeededNeutronStarModel(
+                    createOrbitalObjectId([], OrbitalObjectType.BLACK_HOLE, 0),
+                    seed,
+                    stellarObjectName,
+                    []
+                )
+            );
             break;
     }
 
@@ -107,15 +124,30 @@ export function newSeededStarSystemModel(
             ? OrbitalObjectType.TELLURIC_PLANET
             : OrbitalObjectType.GAS_PLANET;
         const planetName = `${systemName} ${romanNumeral(i + 1)}`;
+        const parentIds = stellarObjects.map((object) => object.id);
 
         const seed = centeredRand(systemRng, GenerationSteps.PLANETS + i) * Settings.SEED_HALF_RANGE;
 
         switch (bodyType) {
             case OrbitalObjectType.TELLURIC_PLANET:
-                planets.push(newSeededTelluricPlanetModel(seed, planetName, stellarObjects));
+                planets.push(
+                    newSeededTelluricPlanetModel(
+                        createOrbitalObjectId(parentIds, OrbitalObjectType.TELLURIC_PLANET, i),
+                        seed,
+                        planetName,
+                        stellarObjects
+                    )
+                );
                 break;
             case OrbitalObjectType.GAS_PLANET:
-                planets.push(newSeededGasPlanetModel(seed, planetName, stellarObjects));
+                planets.push(
+                    newSeededGasPlanetModel(
+                        createOrbitalObjectId(parentIds, OrbitalObjectType.GAS_PLANET, i),
+                        seed,
+                        planetName,
+                        stellarObjects
+                    )
+                );
                 break;
         }
     }
@@ -131,7 +163,8 @@ export function newSeededStarSystemModel(
         for (let j = 0; j < nbMoons; j++) {
             const satelliteName = `${planet.name}${Alphabet[j]}`;
             const satelliteSeed = centeredRand(planetRng, GenerationSteps.MOONS + j) * Settings.SEED_HALF_RANGE;
-            const satelliteModel = newSeededTelluricSatelliteModel(satelliteSeed, satelliteName, [planet]);
+            const satelliteId = createOrbitalObjectId([planet.id], OrbitalObjectType.TELLURIC_SATELLITE, j);
+            const satelliteModel = newSeededTelluricSatelliteModel(satelliteId, satelliteSeed, satelliteName, [planet]);
             satellites.push(satelliteModel);
         }
     });
@@ -158,22 +191,58 @@ export function newSeededStarSystemModel(
             systemRng(GenerationSteps.ANOMALIES + i * 300)
         );
         const anomalyName = `${systemName} ${ReversedGreekAlphabet[i].toUpperCase()}`;
+        const parentIds = stellarObjects.map((object) => object.id);
 
         switch (anomalyType) {
             case OrbitalObjectType.MANDELBULB:
-                anomalies.push(newSeededMandelbulbModel(anomalySeed, anomalyName, [stellarObjects[0]]));
+                anomalies.push(
+                    newSeededMandelbulbModel(
+                        createOrbitalObjectId(parentIds, OrbitalObjectType.MANDELBULB, i),
+                        anomalySeed,
+                        anomalyName,
+                        [stellarObjects[0]]
+                    )
+                );
                 break;
             case OrbitalObjectType.JULIA_SET:
-                anomalies.push(newSeededJuliaSetModel(anomalySeed, anomalyName, [stellarObjects[0]]));
+                anomalies.push(
+                    newSeededJuliaSetModel(
+                        createOrbitalObjectId(parentIds, OrbitalObjectType.JULIA_SET, i),
+                        anomalySeed,
+                        anomalyName,
+                        [stellarObjects[0]]
+                    )
+                );
                 break;
             case OrbitalObjectType.MANDELBOX:
-                anomalies.push(newSeededMandelboxModel(anomalySeed, anomalyName, [stellarObjects[0]]));
+                anomalies.push(
+                    newSeededMandelboxModel(
+                        createOrbitalObjectId(parentIds, OrbitalObjectType.MANDELBOX, i),
+                        anomalySeed,
+                        anomalyName,
+                        [stellarObjects[0]]
+                    )
+                );
                 break;
             case OrbitalObjectType.SIERPINSKI_PYRAMID:
-                anomalies.push(newSeededSierpinskiPyramidModel(anomalySeed, anomalyName, [stellarObjects[0]]));
+                anomalies.push(
+                    newSeededSierpinskiPyramidModel(
+                        createOrbitalObjectId(parentIds, OrbitalObjectType.SIERPINSKI_PYRAMID, i),
+                        anomalySeed,
+                        anomalyName,
+                        [stellarObjects[0]]
+                    )
+                );
                 break;
             case OrbitalObjectType.MENGER_SPONGE:
-                anomalies.push(newSeededMengerSpongeModel(anomalySeed, anomalyName, [stellarObjects[0]]));
+                anomalies.push(
+                    newSeededMengerSpongeModel(
+                        createOrbitalObjectId(parentIds, OrbitalObjectType.MENGER_SPONGE, i),
+                        anomalySeed,
+                        anomalyName,
+                        [stellarObjects[0]]
+                    )
+                );
                 break;
         }
     }
@@ -214,10 +283,22 @@ export function newSeededStarSystemModel(
                 planet.type === OrbitalObjectType.TELLURIC_PLANET && // space elevators can't be built on gas giants yet
                 planet.rings === null // can't have rings because the tether would be at risk
             ) {
-                const spaceElevatorModel = newSeededSpaceElevatorModel(spaceStationSeed, coordinates, position, planet);
+                const spaceElevatorModel = newSeededSpaceElevatorModel(
+                    createOrbitalObjectId([planet.id], OrbitalObjectType.SPACE_ELEVATOR, 0),
+                    spaceStationSeed,
+                    coordinates,
+                    position,
+                    planet
+                );
                 orbitalFacilities.push(spaceElevatorModel);
             } else {
-                const spaceStationModel = newSeededSpaceStationModel(spaceStationSeed, coordinates, position, [planet]);
+                const spaceStationModel = newSeededSpaceStationModel(
+                    createOrbitalObjectId([planet.id], OrbitalObjectType.SPACE_STATION, 0),
+                    spaceStationSeed,
+                    coordinates,
+                    position,
+                    [planet]
+                );
                 orbitalFacilities.push(spaceStationModel);
             }
         });

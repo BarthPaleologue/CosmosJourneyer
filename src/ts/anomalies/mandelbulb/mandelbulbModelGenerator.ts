@@ -25,9 +25,9 @@ import { MandelbulbModel } from "./mandelbulbModel";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
-import { createOrbitalObjectId } from "../../utils/coordinates/orbitalObjectId";
 
 export function newSeededMandelbulbModel(
+    id: string,
     seed: number,
     name: string,
     parentBodies: ReadonlyArray<OrbitalObjectModel>
@@ -66,7 +66,7 @@ export function newSeededMandelbulbModel(
 
     return {
         type: OrbitalObjectType.MANDELBULB,
-        id: createOrbitalObjectId(parentIds, name),
+        id: id,
         name,
         radius,
         mass,

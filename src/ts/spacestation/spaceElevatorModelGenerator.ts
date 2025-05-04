@@ -27,9 +27,9 @@ import { getOrbitRadiusFromPeriod } from "../utils/physics";
 import { randomPieChart } from "../utils/random";
 import { generateSpaceElevatorName } from "../utils/strings/spaceStationNameGenerator";
 import { SpaceElevatorModel } from "./spaceElevatorModel";
-import { createOrbitalObjectId } from "../utils/coordinates/orbitalObjectId";
 
 export function newSeededSpaceElevatorModel(
+    id: string,
     seed: number,
     starSystemCoordinates: StarSystemCoordinates,
     starSystemPosition: Vector3,
@@ -79,7 +79,7 @@ export function newSeededSpaceElevatorModel(
         type: OrbitalObjectType.SPACE_ELEVATOR,
         seed,
         starSystemCoordinates: starSystemCoordinates,
-        id: createOrbitalObjectId([parentBody.id], name),
+        id: id,
         name,
         orbit,
         mass,

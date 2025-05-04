@@ -25,9 +25,9 @@ import { SierpinskiPyramidModel } from "./sierpinskiPyramidModel";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
-import { createOrbitalObjectId } from "../../utils/coordinates/orbitalObjectId";
 
 export function newSeededSierpinskiPyramidModel(
+    id: string,
     seed: number,
     name: string,
     parentBodies: ReadonlyArray<OrbitalObjectModel>
@@ -66,7 +66,7 @@ export function newSeededSierpinskiPyramidModel(
 
     return {
         type: OrbitalObjectType.SIERPINSKI_PYRAMID,
-        id: createOrbitalObjectId(parentIds, name),
+        id: id,
         name,
         radius,
         accentColor,

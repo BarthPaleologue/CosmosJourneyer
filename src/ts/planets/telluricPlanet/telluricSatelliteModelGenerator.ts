@@ -29,9 +29,9 @@ import { celsiusToKelvin, hasLiquidWater } from "../../utils/physics";
 import { TelluricSatelliteModel } from "./telluricSatelliteModel";
 import { AtmosphereModel } from "../../atmosphere/atmosphereModel";
 import { Tools } from "@babylonjs/core/Misc/tools";
-import { createOrbitalObjectId } from "../../utils/coordinates/orbitalObjectId";
 
 export function newSeededTelluricSatelliteModel(
+    id: string,
     seed: number,
     name: string,
     parentBodies: PlanetModel[]
@@ -156,7 +156,7 @@ export function newSeededTelluricSatelliteModel(
 
     return {
         type: OrbitalObjectType.TELLURIC_SATELLITE,
-        id: createOrbitalObjectId(parentIds, name),
+        id: id,
         seed: seed,
         name,
         mass,

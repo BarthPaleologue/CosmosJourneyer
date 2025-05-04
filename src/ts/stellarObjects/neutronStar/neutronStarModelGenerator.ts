@@ -24,7 +24,6 @@ import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
 import { NeutronStarModel } from "./neutronStarModel";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
-import { createOrbitalObjectId } from "../../utils/coordinates/orbitalObjectId";
 
 /**
  * Creates a new pseudo-random neutron star model
@@ -35,6 +34,7 @@ import { createOrbitalObjectId } from "../../utils/coordinates/orbitalObjectId";
  * @see https://arxiv.org/pdf/2402.14030 "On the initial spin period distribution of neutron stars"
  */
 export function newSeededNeutronStarModel(
+    id: string,
     seed: number,
     name: string,
     parentBodies: OrbitalObjectModel[]
@@ -75,7 +75,7 @@ export function newSeededNeutronStarModel(
 
     return {
         type: OrbitalObjectType.NEUTRON_STAR,
-        id: createOrbitalObjectId(parentIds, name),
+        id: id,
         name,
         seed,
         blackBodyTemperature,
