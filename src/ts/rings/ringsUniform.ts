@@ -39,7 +39,7 @@ export const RingsSamplerNames = {
 };
 
 export class RingsUniforms {
-    private readonly lut: RingsLut;
+    readonly lut: RingsLut;
 
     readonly model: DeepReadonly<RingsModel>;
 
