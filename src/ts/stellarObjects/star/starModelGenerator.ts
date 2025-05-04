@@ -25,9 +25,13 @@ import { GenerationSteps } from "../../utils/generationSteps";
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { wheelOfFortune } from "../../utils/random";
 import { StarModel } from "./starModel";
-import { createOrbitalObjectId } from "../../utils/coordinates/orbitalObjectId";
 
-export function newSeededStarModel(seed: number, name: string, parentBodies: OrbitalObjectModel[]): StarModel {
+export function newSeededStarModel(
+    id: string,
+    seed: number,
+    name: string,
+    parentBodies: OrbitalObjectModel[]
+): StarModel {
     const rng = getRngFromSeed(seed);
 
     const RING_PROPORTION = 0.2;
@@ -61,7 +65,7 @@ export function newSeededStarModel(seed: number, name: string, parentBodies: Orb
 
     return {
         type: OrbitalObjectType.STAR,
-        id: createOrbitalObjectId(parentIds, name),
+        id: id,
         name: name,
         seed: seed,
         radius: radius,

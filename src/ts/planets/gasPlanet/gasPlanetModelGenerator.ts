@@ -25,9 +25,9 @@ import { CelestialBodyModel } from "../../architecture/orbitalObjectModel";
 import { GasPlanetModel } from "./gasPlanetModel";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { Tools } from "@babylonjs/core/Misc/tools";
-import { createOrbitalObjectId } from "../../utils/coordinates/orbitalObjectId";
 
 export function newSeededGasPlanetModel(
+    id: string,
     seed: number,
     name: string,
     parentBodies: CelestialBodyModel[]
@@ -76,7 +76,7 @@ export function newSeededGasPlanetModel(
 
     return {
         type: OrbitalObjectType.GAS_PLANET,
-        id: createOrbitalObjectId(parentIds, name),
+        id: id,
         name: name,
         seed: seed,
         radius: radius,

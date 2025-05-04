@@ -24,9 +24,9 @@ import { GenerationSteps } from "../../utils/generationSteps";
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { estimateStarRadiusFromMass } from "../../utils/physics";
 import { BlackHoleModel } from "./blackHoleModel";
-import { createOrbitalObjectId } from "../../utils/coordinates/orbitalObjectId";
 
 export function newSeededBlackHoleModel(
+    id: string,
     seed: number,
     name: string,
     parentBodies: CelestialBodyModel[]
@@ -62,7 +62,7 @@ export function newSeededBlackHoleModel(
 
     return {
         type: OrbitalObjectType.BLACK_HOLE,
-        id: createOrbitalObjectId(parentIds, name),
+        id: id,
         name,
         radius,
         mass: blackHoleMass,

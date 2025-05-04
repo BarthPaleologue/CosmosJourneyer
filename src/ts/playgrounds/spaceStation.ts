@@ -94,6 +94,7 @@ export async function createSpaceStationScene(
     sun.getTransform().position = new Vector3(7, 2, 5).normalize().scaleInPlace(distanceToStar);
 
     const spaceStationModel = newSeededSpaceStationModel(
+        "station",
         Math.random() * Settings.SEED_HALF_RANGE,
         coordinates,
         systemPosition,

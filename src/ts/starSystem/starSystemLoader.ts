@@ -43,7 +43,7 @@ export class StarSystemLoader {
     private readonly timeOut = 500;
 
     constructor() {
-        this.loadingIndex = 1;
+        this.loadingIndex = 0;
         this.maxLoadingIndex = 1;
     }
 
@@ -60,8 +60,10 @@ export class StarSystemLoader {
             systemModel.stellarObjects.length +
             systemModel.planets.length +
             systemModel.satellites.length +
+            systemModel.anomalies.length +
             systemModel.orbitalFacilities.length;
 
+        this.loadingIndex = 0;
         this.maxLoadingIndex = numberOfObjects;
 
         await wait(1000);

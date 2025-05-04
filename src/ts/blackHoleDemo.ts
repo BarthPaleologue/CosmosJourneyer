@@ -30,9 +30,9 @@ const starSystemView = engine.starSystemView;
 
 const scene = starSystemView.scene;
 
-const blackHoleModel = newSeededBlackHoleModel(42, "Gargantua", []);
+const blackHoleModel = newSeededBlackHoleModel("blackHole", 42, "Gargantua", []);
 
-const millerPlanetModel = newSeededTelluricPlanetModel(47, "Miller", [blackHoleModel]);
+const millerPlanetModel = newSeededTelluricPlanetModel("miller", 47, "Miller", [blackHoleModel]);
 millerPlanetModel.orbit.semiMajorAxis = blackHoleModel.accretionDiskRadius * 4;
 millerPlanetModel.orbit.inclination = 0.2;
 

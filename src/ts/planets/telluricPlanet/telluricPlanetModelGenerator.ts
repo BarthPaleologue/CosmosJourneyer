@@ -30,9 +30,9 @@ import { CelestialBodyModel } from "../../architecture/orbitalObjectModel";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { OceanModel } from "../../ocean/oceanModel";
 import { AtmosphereModel } from "../../atmosphere/atmosphereModel";
-import { createOrbitalObjectId } from "../../utils/coordinates/orbitalObjectId";
 
 export function newSeededTelluricPlanetModel(
+    id: string,
     seed: number,
     name: string,
     parentBodies: CelestialBodyModel[]
@@ -132,7 +132,7 @@ export function newSeededTelluricPlanetModel(
 
     return {
         type: OrbitalObjectType.TELLURIC_PLANET,
-        id: createOrbitalObjectId(parentIds, name),
+        id: id,
         seed: seed,
         name,
         mass,
