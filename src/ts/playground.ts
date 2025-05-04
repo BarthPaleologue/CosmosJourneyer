@@ -17,13 +17,8 @@
 
 import "../styles/index.scss";
 
-import { Engine } from "@babylonjs/core/Engines/engine";
-import "@babylonjs/core/Materials/standardMaterial";
-import "@babylonjs/core/Loading/loadingScreen";
-import "@babylonjs/core/Misc/screenshotTools";
-import "@babylonjs/core/Meshes/thinInstanceMesh";
 import "@babylonjs/inspector";
-import { PhysicsViewer, Scene, Tools } from "@babylonjs/core";
+import { PhysicsViewer, Scene, Tools, Engine } from "@babylonjs/core";
 import { createDefaultScene } from "./playgrounds/default";
 import { createOrbitalDemoScene } from "./playgrounds/orbitalDemo";
 import { createAutomaticLandingScene } from "./playgrounds/automaticLanding";
@@ -41,6 +36,7 @@ import { createAsteroidFieldScene } from "./playgrounds/asteroidField";
 import { LoadingScreen } from "./uberCore/loadingScreen";
 import { createStarSystemViewScene } from "./playgrounds/starSystemView";
 import { createRingsScene } from "./playgrounds/rings";
+import { createSierpinskiScene } from "./playgrounds/anomalies/sierpinski";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -105,7 +101,10 @@ switch (requestedScene) {
         scene = await createStarSystemViewScene(engine, progressCallback);
         break;
     case "rings":
-        scene = createRingsScene(engine, progressCallback);
+        scene = await createRingsScene(engine, progressCallback);
+        break;
+    case "sierpinski":
+        scene = await createSierpinskiScene(engine, progressCallback);
         break;
     default:
         scene = createDefaultScene(engine, progressCallback);
