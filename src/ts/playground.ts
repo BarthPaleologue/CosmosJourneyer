@@ -37,6 +37,7 @@ import { LoadingScreen } from "./uberCore/loadingScreen";
 import { createStarSystemViewScene } from "./playgrounds/starSystemView";
 import { createRingsScene } from "./playgrounds/rings";
 import { createSierpinskiScene } from "./playgrounds/anomalies/sierpinski";
+import { createMandelboxScene } from "./playgrounds/anomalies/mandelbox";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -105,6 +106,9 @@ switch (requestedScene) {
         break;
     case "sierpinski":
         scene = await createSierpinskiScene(engine, progressCallback);
+        break;
+    case "mandelbox":
+        scene = await createMandelboxScene(engine, progressCallback);
         break;
     default:
         scene = createDefaultScene(engine, progressCallback);
