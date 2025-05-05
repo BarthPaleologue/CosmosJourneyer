@@ -37,6 +37,7 @@ import { createStarSystemViewScene } from "./starSystemView";
 import { createTutorialScene } from "./tutorial";
 import { createXrScene } from "./xr";
 import { createMengerSpongeScene } from "./anomalies/mengerSponge";
+import { createAtmosphericScatteringScene } from "./atmosphericScattering";
 
 export class PlaygroundRegistry {
     private readonly map: Map<
@@ -62,7 +63,8 @@ export class PlaygroundRegistry {
         ["mandelbox", createMandelboxScene],
         ["mandelbulb", createMandelbulbScene],
         ["juliaSet", createJuliaSetScene],
-        ["mengerSponge", createMengerSpongeScene]
+        ["mengerSponge", createMengerSpongeScene],
+        ["atmosphericScattering", createAtmosphericScatteringScene]
     ]);
 
     register(
