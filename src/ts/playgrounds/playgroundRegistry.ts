@@ -36,6 +36,7 @@ import { createStarMapScene } from "./starMap";
 import { createStarSystemViewScene } from "./starSystemView";
 import { createTutorialScene } from "./tutorial";
 import { createXrScene } from "./xr";
+import { createMengerSpongeScene } from "./anomalies/mengerSponge";
 
 export class PlaygroundRegistry {
     private readonly map: Map<
@@ -60,7 +61,8 @@ export class PlaygroundRegistry {
         ["sierpinski", createSierpinskiScene],
         ["mandelbox", createMandelboxScene],
         ["mandelbulb", createMandelbulbScene],
-        ["juliaSet", createJuliaSetScene]
+        ["juliaSet", createJuliaSetScene],
+        ["mengerSponge", createMengerSpongeScene]
     ]);
 
     register(

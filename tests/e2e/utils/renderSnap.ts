@@ -1,9 +1,16 @@
 import { Page, expect } from "@playwright/test";
 
-export async function renderAndSnap(page: Page, opts: { scene?: string; shotName: string }) {
+export async function renderAndSnap(
+    page: Page,
+    opts: { scene?: string; shotName: string; additionalUrlParams?: Record<string, string> }
+) {
     const urlParams = new URLSearchParams();
     if (opts.scene) urlParams.set("scene", opts.scene);
     urlParams.set("freeze", "");
+
+    for (const [key, value] of Object.entries(opts.additionalUrlParams || {})) {
+        urlParams.set(key, value);
+    }
 
     await page.goto(`/playground.html?${urlParams.toString()}`);
 
