@@ -5,3 +5,9 @@ playwright-report
 .env
 .git
 dist
+tests/e2e
+src-tauri
+.idea
+research
+docs
+coverage

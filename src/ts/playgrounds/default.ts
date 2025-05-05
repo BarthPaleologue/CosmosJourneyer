@@ -19,10 +19,10 @@ import { FreeCamera, Vector3, HemisphericLight, MeshBuilder } from "@babylonjs/c
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
-export function createDefaultScene(
+export async function createDefaultScene(
     engine: AbstractEngine,
     progressCallback: (progress: number, text: string) => void
-): Scene {
+): Promise<Scene> {
     const scene = new Scene(engine);
 
     // This creates and positions a free camera (non-mesh)

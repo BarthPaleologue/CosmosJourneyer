@@ -15,19 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Engine } from "@babylonjs/core/Engines/engine";
-import "@babylonjs/core/Materials/standardMaterial";
-import "@babylonjs/core/Loading/loadingScreen";
-import "@babylonjs/core/Misc/screenshotTools";
-import "@babylonjs/core/Meshes/thinInstanceMesh";
 import {
+    AbstractEngine,
     DirectionalLight,
     HemisphericLight,
     MeshBuilder,
     PhysicsAggregate,
     PhysicsShapeType,
-    Scene
+    Scene,
+    Vector3
 } from "@babylonjs/core";
 import { enablePhysics } from "./utils";
 import { DefaultControls } from "../defaultControls/defaultControls";
@@ -35,7 +31,7 @@ import { AsteroidField } from "../asteroidFields/asteroidField";
 import { loadRenderingAssets } from "../assets/renderingAssets";
 
 export async function createAsteroidFieldScene(
-    engine: Engine,
+    engine: AbstractEngine,
     progressCallback: (progress: number, text: string) => void
 ): Promise<Scene> {
     const scene = new Scene(engine);
