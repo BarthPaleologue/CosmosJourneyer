@@ -343,6 +343,8 @@ export class StarSystemController {
                         stellarObjects.map((object) => object.getLight())
                     );
                     break;
+                case OrbitalObjectType.DARK_KNIGHT:
+                    break;
             }
         }
 

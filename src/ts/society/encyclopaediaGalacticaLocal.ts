@@ -107,6 +107,7 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
                 break;
             case OrbitalObjectType.SPACE_STATION:
             case OrbitalObjectType.SPACE_ELEVATOR:
+            case OrbitalObjectType.DARK_KNIGHT:
             case OrbitalObjectType.CUSTOM:
                 objectTypeMultiplier = 0;
                 break;

@@ -34,6 +34,7 @@ import { TelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatell
 import { DeepReadonly, isNonEmptyArray, NonEmptyArray } from "../utils/types";
 import { getDistancesToStellarObjects } from "../utils/distanceToStellarObject";
 import { RenderingAssets } from "../assets/renderingAssets";
+import { DarkKnight } from "../anomalies/darkKnight/darkKnight";
 
 export class StarSystemLoader {
     private loadingIndex: number;
@@ -142,6 +143,9 @@ export class StarSystemLoader {
                     break;
                 case OrbitalObjectType.MENGER_SPONGE:
                     anomaly = new EmptyCelestialBody(anomalyModel, scene);
+                    break;
+                case OrbitalObjectType.DARK_KNIGHT:
+                    anomaly = new DarkKnight(anomalyModel, scene);
                     break;
             }
             anomalies.push(anomaly);

@@ -487,6 +487,7 @@ export class Spaceship implements Transformable {
             case OrbitalObjectType.MANDELBOX:
             case OrbitalObjectType.SIERPINSKI_PYRAMID:
             case OrbitalObjectType.MENGER_SPONGE:
+            case OrbitalObjectType.DARK_KNIGHT:
                 fuelAvailability = 0;
         }
 

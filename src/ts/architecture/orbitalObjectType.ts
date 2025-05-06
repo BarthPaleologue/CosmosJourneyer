@@ -27,6 +27,7 @@ export const enum OrbitalObjectType {
     MANDELBOX = 2002,
     SIERPINSKI_PYRAMID = 2003,
     MENGER_SPONGE = 2004,
+    DARK_KNIGHT = 2005,
     SPACE_STATION = 3000,
     SPACE_ELEVATOR = 3001,
     CUSTOM = 4242
@@ -56,6 +57,8 @@ export function getOrbitalObjectTypeStringId(type: OrbitalObjectType): string {
             return "sierpinskiPyramid";
         case OrbitalObjectType.MENGER_SPONGE:
             return "mengerSponge";
+        case OrbitalObjectType.DARK_KNIGHT:
+            return "darkKnight";
         case OrbitalObjectType.SPACE_STATION:
             return "spaceStation";
         case OrbitalObjectType.SPACE_ELEVATOR:
