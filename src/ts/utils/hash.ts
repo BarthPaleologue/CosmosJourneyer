@@ -21,3 +21,20 @@ export function hashVec3(x: number, y: number, z: number): number {
     const n = 1000000000;
     return hash % n;
 }
+
+export function hashArray(arr: ReadonlyArray<number>): number {
+    // FNV-1a 32-bit parameters
+    let hash = 0x811c9dc5; // FNV offset basis
+    const FNV_PRIME = 0x01000193; // 16777619
+
+    for (const num of arr) {
+        // Mix in the value
+        hash ^= num;
+        // 32-bit multiply with C semantics
+        hash = Math.imul(hash, FNV_PRIME);
+    }
+
+    // Force unsigned 32-bit and normalize to [0,1]
+    hash >>>= 0;
+    return hash / 0xffffffff;
+}

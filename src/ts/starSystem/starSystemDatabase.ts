@@ -18,7 +18,7 @@
 import { getObjectModelById, StarSystemModel } from "./starSystemModel";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/starSystemCoordinates";
 import { newSeededStarSystemModel } from "./seededStarSystemModel";
-import { hashVec3 } from "../utils/hashVec3";
+import { hashVec3 } from "../utils/hash";
 import { getRngFromSeed } from "../utils/getRngFromSeed";
 import { Settings } from "../settings";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";

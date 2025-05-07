@@ -72,6 +72,8 @@ import { UberScene } from "./uberCore/uberScene";
 import { Tts } from "./audio/tts";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { setMaxLinVel } from "./utils/havok";
+import { hashArray } from "./utils/hash";
+import { generateDarkKnightModel } from "./anomalies/darkKnight/darkKnightModelGenerator";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -436,6 +438,27 @@ export class CosmosJourneyer {
 
         const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
         registerCustomSystems(starSystemDatabase);
+
+        starSystemDatabase.registerGeneralPlugin(
+            (system) => {
+                return (
+                    hashArray([
+                        system.coordinates.starSectorX,
+                        system.coordinates.starSectorY,
+                        system.coordinates.starSectorZ,
+                        system.coordinates.localX,
+                        system.coordinates.localY,
+                        system.coordinates.localZ
+                    ]) > 0.5
+                );
+            },
+            (system) => {
+                const stellarIds = system.stellarObjects.map((stellarObject) => stellarObject.id);
+                system.anomalies.push(generateDarkKnightModel(stellarIds));
+
+                return system;
+            }
+        );
 
         const player = Player.Default(starSystemDatabase);
 
