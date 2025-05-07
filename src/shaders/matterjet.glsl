@@ -69,6 +69,8 @@ float spiralDensity(vec3 p, float coneTheta, float coneHeight) {
     density *= exp(-0.02 * dist * dist);
     
     density *= 1.0 - smoothstep(0.0, 1.0, heightFraction);
+
+    density /= heightFraction;
     
     return density;
 }
