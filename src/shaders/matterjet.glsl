@@ -266,7 +266,7 @@ void main() {
     rayOriginLocalSpace *= -1.0;
     rayDirLocalSpace *= -1.0;
 
-    if(rayIntersectCone(rayOriginLocalSpace, rayDirLocalSpace, coneHeight, cos(coneTheta + + sign(coneTheta) * 0.2), t, distThrough) && t * scaling_factor < maximumDistance) {
+    if(rayIntersectCone(rayOriginLocalSpace, rayDirLocalSpace, coneHeight, cos(coneTheta + sign(coneTheta) * 0.2), t, distThrough) && t * scaling_factor < maximumDistance) {
         vec3 startPoint = rayOriginLocalSpace + t * rayDirLocalSpace;
 
         float transmittance;
