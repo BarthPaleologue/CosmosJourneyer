@@ -25,6 +25,7 @@ import { SpaceStation } from "../spacestation/spaceStation";
 import { SpaceElevator } from "../spacestation/spaceElevator";
 import { CustomOrbitalObject } from "../utils/customOrbitalObject";
 import { OrbitalObjectType } from "./orbitalObjectType";
+import { DarkKnight } from "../anomalies/darkKnight/darkKnight";
 
 export type StellarObject = Star | NeutronStar | BlackHole;
 
@@ -35,7 +36,8 @@ export type Anomaly =
     | EmptyCelestialBody<OrbitalObjectType.MANDELBULB>
     | EmptyCelestialBody<OrbitalObjectType.JULIA_SET>
     | EmptyCelestialBody<OrbitalObjectType.SIERPINSKI_PYRAMID>
-    | EmptyCelestialBody<OrbitalObjectType.MANDELBOX>;
+    | EmptyCelestialBody<OrbitalObjectType.MANDELBOX>
+    | DarkKnight;
 
 export type OrbitalFacility = SpaceStation | SpaceElevator;
 

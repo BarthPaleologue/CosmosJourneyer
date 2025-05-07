@@ -162,6 +162,7 @@ export class MusicConductor {
             case OrbitalObjectType.MANDELBOX:
             case OrbitalObjectType.SIERPINSKI_PYRAMID:
             case OrbitalObjectType.MENGER_SPONGE:
+            case OrbitalObjectType.DARK_KNIGHT:
                 if (distanceToClosestObject < closestOrbitalObject.getBoundingRadius() * 100) {
                     this.setMusicFromSelection([this.musics.spacialWinds, this.musics.echoesOfTime]);
                     return;

@@ -12,7 +12,15 @@ export const enum ObjectTargetCursorType {
 
 export type TargetInfo = {
     type: ObjectTargetCursorType;
+
+    /**
+     * if distance < minDistance, the target cursor is hidden
+     */
     minDistance: number;
+
+    /**
+     * if distance > maxDistance, the target cursor is hidden
+     */
     maxDistance: number;
 };
 

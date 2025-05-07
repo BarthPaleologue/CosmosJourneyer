@@ -15,9 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export function hashVec3(x: number, y: number, z: number): number {
-    const hash = (x * 73856093) ^ (y * 19349663) ^ (z * 83492791);
+import { CelestialBodyModelBase } from "../../architecture/orbitalObjectModelBase";
+import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 
-    const n = 1000000000;
-    return hash % n;
-}
+export type DarkKnightModel = CelestialBodyModelBase<OrbitalObjectType.DARK_KNIGHT>;
