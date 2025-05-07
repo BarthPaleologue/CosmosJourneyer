@@ -344,6 +344,7 @@ export class StarSystemController {
                     );
                     break;
                 case OrbitalObjectType.DARK_KNIGHT:
+                    // Intentionally left blank: No specific post-process required for DARK_KNIGHT.
                     break;
             }
         }
