@@ -98,6 +98,7 @@ export class MissionFlyByNode implements MissionNodeBase<MissionNodeType.FLY_BY>
             case OrbitalObjectType.MANDELBOX:
             case OrbitalObjectType.SIERPINSKI_PYRAMID:
             case OrbitalObjectType.MENGER_SPONGE:
+            case OrbitalObjectType.DARK_KNIGHT:
             case OrbitalObjectType.SPACE_STATION:
             case OrbitalObjectType.SPACE_ELEVATOR:
             case OrbitalObjectType.CUSTOM:
