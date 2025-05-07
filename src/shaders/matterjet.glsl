@@ -69,6 +69,8 @@ float spiralDensity(vec3 p, float coneTheta, float coneHeight) {
     density *= exp(-0.02 * dist * dist);
     
     density *= 1.0 - smoothstep(0.0, 1.0, heightFraction);
+
+    density /= heightFraction;
     
     return density;
 }
@@ -250,7 +252,7 @@ void main() {
     float finalAlpha = screenColor.a;
 
     float t, distThrough;
-    if(rayIntersectCone(rayOriginLocalSpace, rayDirLocalSpace, coneHeight, cos(coneTheta), t, distThrough) && t * scaling_factor < maximumDistance) {
+    if(rayIntersectCone(rayOriginLocalSpace, rayDirLocalSpace, coneHeight, cos(coneTheta + sign(coneTheta) * 0.2), t, distThrough) && t * scaling_factor < maximumDistance) {
         vec3 startPoint = rayOriginLocalSpace + t * rayDirLocalSpace;
 
         float transmittance;
@@ -264,7 +266,7 @@ void main() {
     rayOriginLocalSpace *= -1.0;
     rayDirLocalSpace *= -1.0;
 
-    if(rayIntersectCone(rayOriginLocalSpace, rayDirLocalSpace, coneHeight, cos(coneTheta), t, distThrough) && t * scaling_factor < maximumDistance) {
+    if(rayIntersectCone(rayOriginLocalSpace, rayDirLocalSpace, coneHeight, cos(coneTheta + sign(coneTheta) * 0.2), t, distThrough) && t * scaling_factor < maximumDistance) {
         vec3 startPoint = rayOriginLocalSpace + t * rayDirLocalSpace;
 
         float transmittance;
