@@ -90,7 +90,7 @@
         "test:e2e:docker:update": "docker build -t cosmos-journeyer-e2e --build-arg PW_VERSION=1.52.0 . && docker run --rm --ipc=host -e CI=1 -v \"$(pwd)/tests/e2e:/app/tests/e2e\" -v \"$(pwd)/artifacts:/output\" cosmos-journeyer-e2e npx playwright test --output=/output --reporter=line,html --update-snapshots",
         "build:docs": "typedoc --options typedoc.json",
         "serve:docs": "http-server docs -p 8081",
-        "lint:check": "eslint .",
+        "lint": "eslint .",
         "lint:fix": "eslint . --fix",
         "typecheck:watch": "tsc --noEmit --watch",
         "typecheck": "tsc --noEmit"

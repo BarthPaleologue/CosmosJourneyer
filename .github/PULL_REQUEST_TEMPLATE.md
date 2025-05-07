@@ -34,7 +34,7 @@ Here is a small list of things you can do to check everything is working:
  Serving To Web:- `pnpm serve`
  Run Tests:- `npm run test:unit` or `pnpm test:unit`
  Check Formatting:- `npm run format` or `pnpm run format`
- Eslint Check:- `npm run lint:check` or `pnpm run lint:check`
+ Eslint Check:- `npm run lint` or `pnpm run lint`
 
 Did you document your code?
 -->
