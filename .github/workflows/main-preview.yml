@@ -30,7 +30,7 @@ jobs:
               run: pnpm run format:check
 
             - name: Lint project
-              run: pnpm run lint:check
+              run: pnpm run lint
 
             - name: Test project
               run: pnpm test:unit
