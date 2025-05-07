@@ -105,7 +105,7 @@ export class MissionFlyByNode implements MissionNodeBase<MissionNodeType.FLY_BY>
                 thresholdMultiplier = 3;
                 break;
             case OrbitalObjectType.NEUTRON_STAR:
-                thresholdMultiplier = 50;
+                thresholdMultiplier = 70_000;
                 break;
             case OrbitalObjectType.BLACK_HOLE:
                 thresholdMultiplier = 10;
