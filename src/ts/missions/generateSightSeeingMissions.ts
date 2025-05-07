@@ -129,6 +129,10 @@ function generateAnomalyFlyByMissionsInSystem(
             continue;
         }
 
+        if (systemModel.anomalies[anomalyIndex].type === OrbitalObjectType.DARK_KNIGHT) {
+            continue;
+        }
+
         const mission = newSightSeeingMission(
             spaceStationUniverseId,
             {
