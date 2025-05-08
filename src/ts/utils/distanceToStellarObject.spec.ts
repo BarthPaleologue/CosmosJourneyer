@@ -82,6 +82,10 @@ describe("distanceToStellarObject", () => {
                 atmosphere: {
                     greenHouseEffectFactor: 1,
                     pressure: 1
+                },
+                colorPalette: {
+                    type: "textured",
+                    colorMapUrl: ""
                 }
             }
         ],

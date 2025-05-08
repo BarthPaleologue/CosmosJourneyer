@@ -40,6 +40,8 @@ import { DeepReadonly } from "../../utils/types";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { ItemPool } from "../../utils/itemPool";
 import { RingsLut } from "../../rings/ringsLut";
+import { Material } from "@babylonjs/core/Materials/material";
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 
 export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_PLANET>, Cullable {
     readonly model: DeepReadonly<GasPlanetModel>;
@@ -47,7 +49,7 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
     readonly type = OrbitalObjectType.GAS_PLANET;
 
     private readonly mesh: Mesh;
-    readonly material: GasPlanetMaterial;
+    readonly material: GasPlanetMaterial | Material;
 
     readonly aggregate: PhysicsAggregate;
 
@@ -90,7 +92,12 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
         const physicsShape = new PhysicsShapeSphere(Vector3.Zero(), this.model.radius, scene);
         this.aggregate.shape.addChildFromParent(this.getTransform(), physicsShape, this.mesh);
 
-        this.material = new GasPlanetMaterial(this.model.name, this.model, scene);
+        if (this.model.colorPalette.type === "procedural") {
+            this.material = new GasPlanetMaterial(this.model.name, this.model.seed, this.model.colorPalette, scene);
+        } else {
+            this.material = new StandardMaterial("gasPlanetMaterial", scene);
+        }
+
         this.mesh.material = this.material;
 
         const atmosphereThickness =
@@ -123,7 +130,9 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
     }
 
     updateMaterial(stellarObjects: ReadonlyArray<PointLight>, deltaSeconds: number): void {
-        this.material.update(stellarObjects, deltaSeconds);
+        if (this.material instanceof GasPlanetMaterial) {
+            this.material.update(stellarObjects, deltaSeconds);
+        }
     }
 
     public getRadius(): number {

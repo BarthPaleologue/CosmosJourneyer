@@ -16,14 +16,30 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { HasSeed } from "../../architecture/hasSeed";
-import { OrbitalObjectModelBase } from "../../architecture/orbitalObjectModelBase";
+import { CelestialBodyModelBase } from "../../architecture/orbitalObjectModelBase";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { AtmosphereModel } from "../../atmosphere/atmosphereModel";
 import { RingsModel } from "../../rings/ringsModel";
+import { RGBColor } from "../../utils/colors";
 
-export type GasPlanetModel = OrbitalObjectModelBase<OrbitalObjectType.GAS_PLANET> &
+export type GasPlanetModel = CelestialBodyModelBase<OrbitalObjectType.GAS_PLANET> &
     HasSeed & {
-        readonly radius: number;
-        readonly atmosphere: AtmosphereModel;
-        readonly rings: RingsModel | null;
+        atmosphere: AtmosphereModel;
+        rings: RingsModel | null;
+        colorPalette: GasPlanetColorPalette;
     };
+
+export type GasPlanetColorPalette = GasPlanetProceduralColorPalette | GasPlanetTexturedColorPalette;
+
+export type GasPlanetProceduralColorPalette = {
+    type: "procedural";
+    color1: RGBColor;
+    color2: RGBColor;
+    color3: RGBColor;
+    colorSharpness: number;
+};
+
+export type GasPlanetTexturedColorPalette = {
+    type: "textured";
+    colorMapUrl: string;
+};
