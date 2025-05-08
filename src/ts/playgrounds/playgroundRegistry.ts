@@ -30,6 +30,7 @@ import { createDarkKnightScene } from "./darkKnight";
 import { createDebugAssetsScene } from "./debugAssets";
 import { createDefaultScene } from "./default";
 import { createFlightDemoScene } from "./flightDemo";
+import { createGasPlanetScene } from "./gasPlanet";
 import { createHyperspaceTunnelDemo } from "./hyperspaceTunnel";
 import { createOrbitalDemoScene } from "./orbitalDemo";
 import { createRingsScene } from "./rings";
@@ -70,6 +71,7 @@ export class PlaygroundRegistry {
         ["atmosphericScattering", createAtmosphericScatteringScene],
         ["darkKnight", createDarkKnightScene],
         ["blackHole", createBlackHoleScene],
+        ["gasPlanet", createGasPlanetScene],
     ]);
 
     register(
