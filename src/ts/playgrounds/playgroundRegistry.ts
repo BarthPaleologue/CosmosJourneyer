@@ -39,6 +39,7 @@ import { createXrScene } from "./xr";
 import { createMengerSpongeScene } from "./anomalies/mengerSponge";
 import { createAtmosphericScatteringScene } from "./atmosphericScattering";
 import { createDarkKnightScene } from "./darkKnight";
+import { createGasPlanetScene } from "./gasPlanet";
 
 export class PlaygroundRegistry {
     private readonly map: Map<
@@ -66,7 +67,8 @@ export class PlaygroundRegistry {
         ["juliaSet", createJuliaSetScene],
         ["mengerSponge", createMengerSpongeScene],
         ["atmosphericScattering", createAtmosphericScatteringScene],
-        ["darkKnight", createDarkKnightScene]
+        ["darkKnight", createDarkKnightScene],
+        ["gasPlanet", createGasPlanetScene]
     ]);
 
     register(
