@@ -15,11 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Tools } from "@babylonjs/core/Misc/tools";
-import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
+import { normalRandom, randRange, randRangeInt, uniformRandBool } from "extended-random";
 
 import { GenerationSteps } from "@/utils/generationSteps";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
+import { DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
 
@@ -33,7 +35,7 @@ export function newSeededGasPlanetModel(
     id: string,
     seed: number,
     name: string,
-    parentBodies: CelestialBodyModel[],
+    parentBodies: DeepReadonly<Array<CelestialBodyModel>>,
 ): GasPlanetModel {
     const rng = getRngFromSeed(seed);
 
@@ -77,6 +79,22 @@ export function newSeededGasPlanetModel(
 
     const rings = uniformRandBool(0.8, rng, GenerationSteps.RINGS) ? newSeededRingsModel(rng) : null;
 
+    // color palette
+    const hue1 = normalRandom(240, 30, rng, 70);
+    const hue2 = normalRandom(0, 180, rng, 72);
+
+    const divergence = -180;
+
+    const color1 = Color3.FromHSV(hue1 % 360, randRange(0.4, 0.9, rng, 72), randRange(0.7, 0.9, rng, 73));
+    const color2 = Color3.FromHSV(hue2 % 360, randRange(0.6, 0.9, rng, 74), randRange(0.0, 0.3, rng, 75));
+    const color3 = Color3.FromHSV(
+        (hue1 + divergence) % 360,
+        randRange(0.4, 0.9, rng, 76),
+        randRange(0.7, 0.9, rng, 77),
+    );
+
+    const colorSharpness = randRangeInt(40, 80, rng, 80) / 10;
+
     return {
         type: OrbitalObjectType.GAS_PLANET,
         id: id,
@@ -92,5 +110,12 @@ export function newSeededGasPlanetModel(
             greenHouseEffectFactor: 0.5,
         },
         rings: rings,
+        colorPalette: {
+            type: "procedural",
+            color1: color1,
+            color2: color2,
+            color3: color3,
+            colorSharpness: colorSharpness,
+        },
     };
 }

@@ -15,15 +15,32 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { RGBColor } from "@/utils/colors";
+
 import { AtmosphereModel } from "./atmosphereModel";
 import { HasSeed } from "./hasSeed";
-import { OrbitalObjectModelBase } from "./orbitalObjectModelBase";
+import { CelestialBodyModelBase } from "./orbitalObjectModelBase";
 import { OrbitalObjectType } from "./orbitalObjectType";
 import { RingsModel } from "./ringsModel";
 
-export type GasPlanetModel = OrbitalObjectModelBase<OrbitalObjectType.GAS_PLANET> &
+export type GasPlanetModel = CelestialBodyModelBase<OrbitalObjectType.GAS_PLANET> &
     HasSeed & {
-        readonly radius: number;
-        readonly atmosphere: AtmosphereModel;
-        readonly rings: RingsModel | null;
+        atmosphere: AtmosphereModel;
+        rings: RingsModel | null;
+        colorPalette: GasPlanetColorPalette;
     };
+
+export type GasPlanetColorPalette = GasPlanetProceduralColorPalette | GasPlanetTexturedColorPalette;
+
+export type GasPlanetProceduralColorPalette = {
+    type: "procedural";
+    color1: RGBColor;
+    color2: RGBColor;
+    color3: RGBColor;
+    colorSharpness: number;
+};
+
+export type GasPlanetTexturedColorPalette = {
+    type: "textured";
+    colorMapUrl: string;
+};
