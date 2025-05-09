@@ -24,6 +24,12 @@ import { LoadingScreen } from "@/frontend/uberCore/loadingScreen";
 
 import { PlaygroundRegistry } from "./playgrounds/playgroundRegistry";
 
+declare global {
+    interface Window {
+        scene: Scene;
+    }
+}
+
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
@@ -47,6 +53,7 @@ const playgroundRegistry = new PlaygroundRegistry();
 const sceneBuilder = playgroundRegistry.get(requestedScene);
 
 const scene = await sceneBuilder(engine, progressCallback);
+window.scene = scene;
 
 if (urlParams.get("debug") !== null) {
     const inspectorRoot = document.createElement("div");

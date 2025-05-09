@@ -29,6 +29,8 @@ import { celsiusToKelvin } from "@/utils/physics";
 
 import { Settings } from "@/settings";
 
+import { getJupiterModel } from "./jupiter";
+
 export function getSolSystemModel(): StarSystemModel {
     const sun: StarModel = {
         id: "sun",
@@ -295,35 +297,7 @@ export function getSolSystemModel(): StarSystemModel {
         seed: 0,
     };
 
-    const jupiter: GasPlanetModel = {
-        id: "jupiter",
-        name: "Jupiter",
-        type: OrbitalObjectType.GAS_PLANET,
-        radius: 69_911e3,
-        mass: 1.898e27,
-        axialTilt: Tools.ToRadians(3.13),
-        siderealDaySeconds: 60 * 60 * 9.925,
-        orbit: {
-            parentIds: [sun.id],
-            semiMajorAxis: 778_547_200e3,
-            eccentricity: 0.0934,
-            inclination: Tools.ToRadians(1.85),
-            longitudeOfAscendingNode: Tools.ToRadians(49.558),
-            argumentOfPeriapsis: Tools.ToRadians(286.502),
-            initialMeanAnomaly: 0,
-            p: 2,
-        },
-        atmosphere: {
-            pressure: Settings.BAR_TO_PASCAL,
-            greenHouseEffectFactor: 0.7,
-        },
-        colorPalette: {
-            type: "textured",
-            colorMapUrl: "",
-        },
-        rings: null,
-        seed: 0,
-    };
+    const jupiter: GasPlanetModel = getJupiterModel([sun.id]);
 
     const saturn: GasPlanetModel = {
         id: "saturn",
@@ -349,7 +323,7 @@ export function getSolSystemModel(): StarSystemModel {
         },
         colorPalette: {
             type: "textured",
-            colorMapUrl: "",
+            textureId: "jupiter",
         },
         rings: {
             seed: 0,
@@ -382,7 +356,7 @@ export function getSolSystemModel(): StarSystemModel {
         },
         colorPalette: {
             type: "textured",
-            colorMapUrl: "",
+            textureId: "jupiter",
         },
         atmosphere: {
             pressure: 0.1 * Settings.BAR_TO_PASCAL,
@@ -412,7 +386,7 @@ export function getSolSystemModel(): StarSystemModel {
         },
         colorPalette: {
             type: "textured",
-            colorMapUrl: "",
+            textureId: "jupiter",
         },
         atmosphere: {
             pressure: 0.1 * Settings.BAR_TO_PASCAL,

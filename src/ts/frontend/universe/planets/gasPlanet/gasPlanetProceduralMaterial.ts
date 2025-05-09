@@ -44,7 +44,7 @@ const GasPlanetMaterialUniformNames = {
     COLOR_SHARPNESS: "colorSharpness",
 };
 
-export class GasPlanetMaterial extends ShaderMaterial {
+export class GasPlanetProceduralMaterial extends ShaderMaterial {
     private elapsedSeconds = 0;
 
     constructor(

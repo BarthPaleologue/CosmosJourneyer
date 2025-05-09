@@ -23,15 +23,6 @@ import { CelestialBodyModelBase } from "./orbitalObjectModelBase";
 import { OrbitalObjectType } from "./orbitalObjectType";
 import { RingsModel } from "./ringsModel";
 
-export type GasPlanetModel = CelestialBodyModelBase<OrbitalObjectType.GAS_PLANET> &
-    HasSeed & {
-        atmosphere: AtmosphereModel;
-        rings: RingsModel | null;
-        colorPalette: GasPlanetColorPalette;
-    };
-
-export type GasPlanetColorPalette = GasPlanetProceduralColorPalette | GasPlanetTexturedColorPalette;
-
 export type GasPlanetProceduralColorPalette = {
     type: "procedural";
     color1: RGBColor;
@@ -40,7 +31,18 @@ export type GasPlanetProceduralColorPalette = {
     colorSharpness: number;
 };
 
+export type GasPlanetTextureId = "jupiter";
+
 export type GasPlanetTexturedColorPalette = {
     type: "textured";
-    colorMapUrl: string;
+    textureId: GasPlanetTextureId;
 };
+
+export type GasPlanetColorPalette = GasPlanetProceduralColorPalette | GasPlanetTexturedColorPalette;
+
+export type GasPlanetModel = CelestialBodyModelBase<OrbitalObjectType.GAS_PLANET> &
+    HasSeed & {
+        atmosphere: AtmosphereModel;
+        rings: RingsModel | null;
+        colorPalette: GasPlanetColorPalette;
+    };

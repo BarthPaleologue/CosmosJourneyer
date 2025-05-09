@@ -56,6 +56,7 @@ import rockNormalMetallicMap from "@assets/rockMaterial/layered-planetary_normal
 import sandAlbedoRoughnessMap from "@assets/sandMaterial/wavy-sand_albedo_roughness.webp";
 import sandNormalMetallicMap from "@assets/sandMaterial/wavy-sand_normal_metallic.webp";
 import skyBox from "@assets/skybox/milkyway.env";
+import jupiterTexturePath from "@assets/sol/textures/jupiter.jpg";
 import solarPanelMetallicRoughness from "@assets/SolarPanelMaterial/metallicRougness.webp";
 import solarPanelAlbedo from "@assets/SolarPanelMaterial/SolarPanel002_2K-PNG_Color.webp";
 import solarPanelNormal from "@assets/SolarPanelMaterial/SolarPanel002_2K-PNG_NormalDX.webp";
@@ -121,11 +122,16 @@ export type TexturePools = {
     landingPad: LandingPadTexturePool;
 };
 
+export type GasPlanetTextures = {
+    jupiter: Texture;
+};
+
 export type Textures = {
     readonly terrains: Readonly<AllTerrainTextures>;
     readonly water: Readonly<WaterTextures>;
     readonly particles: Readonly<ParticleTextures>;
     readonly materials: Readonly<AllMaterialTextures>;
+    readonly gasPlanet: Readonly<GasPlanetTextures>;
     readonly environment: {
         readonly milkyWay: CubeTexture;
     };
@@ -258,6 +264,9 @@ export async function loadTextures(
     const crateMetallicRoughnessPromise = loadTextureAsync("CrateMetallicRoughness", crateMetallicRoughness);
     const crateAmbientOcclusionPromise = loadTextureAsync("CrateAmbientOcclusion", crateAmbientOcclusion);
 
+    // Jupiter texture
+    const jupiterTexturePromise = loadTextureAsync("JupiterTexture", jupiterTexturePath);
+
     const treeAlbedo = await treeAlbedoPromise;
     treeAlbedo.hasAlpha = true;
 
@@ -323,6 +332,9 @@ export async function loadTextures(
             tree: {
                 albedo: treeAlbedo,
             },
+        },
+        gasPlanet: {
+            jupiter: await jupiterTexturePromise,
         },
         environment: {
             milkyWay: await milkyWayPromise,

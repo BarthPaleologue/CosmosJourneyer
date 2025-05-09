@@ -88,7 +88,7 @@ describe("distanceToStellarObject", () => {
                 },
                 colorPalette: {
                     type: "textured",
-                    colorMapUrl: "",
+                    textureId: "jupiter",
                 },
             },
         ],

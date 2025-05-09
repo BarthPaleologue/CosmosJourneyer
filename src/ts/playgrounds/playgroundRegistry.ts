@@ -34,6 +34,7 @@ import { createGasPlanetScene } from "./gasPlanet";
 import { createHyperspaceTunnelDemo } from "./hyperspaceTunnel";
 import { createOrbitalDemoScene } from "./orbitalDemo";
 import { createRingsScene } from "./rings";
+import { createJupiterScene } from "./sol/jupiter";
 import { createSpaceStationScene } from "./spaceStation";
 import { createSpaceStationUIScene } from "./spaceStationUI";
 import { createStarMapScene } from "./starMap";
@@ -72,6 +73,8 @@ export class PlaygroundRegistry {
         ["darkKnight", createDarkKnightScene],
         ["blackHole", createBlackHoleScene],
         ["gasPlanet", createGasPlanetScene],
+        ["gasPlanet", createGasPlanetScene],
+        ["jupiter", createJupiterScene],
     ]);
 
     register(
