@@ -16,12 +16,10 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { TransferBuildData } from "./workerDataTypes";
-import { ApplyTask, BuildTask, ReturnedChunkData, TaskType } from "./taskTypes";
+import { ApplyTask, BuildTask, ReturnedChunkDataSchema, TaskType } from "./taskTypes";
 import { WorkerPool } from "./workerPool";
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import { ChunkForge } from "./chunkForge";
-import { Materials } from "../../../../assets/materials";
-import { Assets } from "../../../../assets/assets";
 import { RenderingAssets } from "../../../../assets/renderingAssets";
 
 export class ChunkForgeWorkers implements ChunkForge {
@@ -86,22 +84,25 @@ export class ChunkForgeWorkers implements ChunkForge {
         worker.postMessage(buildData);
 
         worker.onmessage = (e) => {
-            const data: ReturnedChunkData = e.data;
+            const dataResult = ReturnedChunkDataSchema.safeParse(e.data);
+            if (dataResult.success) {
+                const data = dataResult.data;
 
-            const vertexData = new VertexData();
-            vertexData.positions = data.positions;
-            vertexData.normals = data.normals;
-            vertexData.indices = data.indices;
+                const vertexData = new VertexData();
+                vertexData.positions = data.positions;
+                vertexData.normals = data.normals;
+                vertexData.indices = data.indices;
 
-            const applyTask: ApplyTask = {
-                type: TaskType.APPLY,
-                vertexData: vertexData,
-                chunk: task.chunk,
-                instancesMatrixBuffer: data.instancesMatrixBuffer,
-                alignedInstancesMatrixBuffer: data.alignedInstancesMatrixBuffer,
-                averageHeight: data.averageHeight
-            };
-            this.applyTaskQueue.push(applyTask);
+                const applyTask: ApplyTask = {
+                    type: TaskType.APPLY,
+                    vertexData: vertexData,
+                    chunk: task.chunk,
+                    instancesMatrixBuffer: data.instancesMatrixBuffer,
+                    alignedInstancesMatrixBuffer: data.alignedInstancesMatrixBuffer,
+                    averageHeight: data.averageHeight
+                };
+                this.applyTaskQueue.push(applyTask);
+            }
 
             if (this.workerPool.hasTask()) this.dispatchBuildTask(this.workerPool.nextTask(), worker);
             else {
@@ -134,9 +135,12 @@ export class ChunkForgeWorkers implements ChunkForge {
      * Updates the state of the forge : dispatch tasks to workers, remove useless chunks, apply vertexData to new chunks
      */
     public update(assets: RenderingAssets) {
-        for (let i = 0; i < this.workerPool.availableWorkers.length; i++) {
-            this.executeNextTask(this.workerPool.availableWorkers.shift() as Worker);
+        for (const worker of this.workerPool.availableWorkers) {
+            this.executeNextTask(worker);
         }
+        this.workerPool.availableWorkers = this.workerPool.availableWorkers.filter(
+            (w) => !this.workerPool.busyWorkers.includes(w)
+        );
         this.workerPool.availableWorkers = this.workerPool.availableWorkers.concat(this.workerPool.finishedWorkers);
         this.workerPool.finishedWorkers = [];
 

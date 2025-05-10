@@ -20,7 +20,7 @@ import { EmptyCelestialBody } from "../../utils/emptyCelestialBody";
 import { newSeededJuliaSetModel } from "../../anomalies/julia/juliaSetModelGenerator";
 import { JuliaSetPostProcess } from "../../anomalies/julia/juliaSetPostProcess";
 
-export async function createJuliaSetScene(
+export function createJuliaSetScene(
     engine: AbstractEngine,
     progressCallback: (progress: number, text: string) => void
 ): Promise<Scene> {
@@ -71,5 +71,5 @@ export async function createJuliaSetScene(
 
     progressCallback(1, "Loading complete");
 
-    return scene;
+    return Promise.resolve(scene);
 }

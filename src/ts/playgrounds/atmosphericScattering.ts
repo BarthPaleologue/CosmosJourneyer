@@ -22,7 +22,7 @@ import { DefaultControls } from "../defaultControls/defaultControls";
 import { AtmosphericScatteringPostProcess } from "../atmosphere/atmosphericScatteringPostProcess";
 import { AtmosphereUniforms } from "../atmosphere/atmosphereUniforms";
 
-export async function createAtmosphericScatteringScene(
+export function createAtmosphericScatteringScene(
     engine: AbstractEngine,
     progressCallback: (progress: number, text: string) => void
 ): Promise<Scene> {
@@ -68,5 +68,5 @@ export async function createAtmosphericScatteringScene(
 
     progressCallback(1, "Rings scene loaded");
 
-    return scene;
+    return Promise.resolve(scene);
 }

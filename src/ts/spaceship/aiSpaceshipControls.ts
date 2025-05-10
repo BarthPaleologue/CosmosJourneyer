@@ -51,7 +51,7 @@ export class AiSpaceshipControls implements Controls {
         return false;
     }
 
-    update(deltaSeconds: number): Vector3 {
+    update(): Vector3 {
         return Vector3.Zero();
     }
 

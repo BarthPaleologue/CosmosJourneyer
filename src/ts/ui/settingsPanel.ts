@@ -53,7 +53,7 @@ export function initSettingsPanel(): HTMLElement {
                             subActionMap.get(key)?.push(name);
                         });
                     } else if (binding.control instanceof ButtonInputControl) {
-                        const text = buttonInputToString(binding.control, keyboardLayoutMap);
+                        const text = buttonInputToString(binding.control as ButtonInputControl, keyboardLayoutMap);
                         if (!subActionMap.has("BUTTON")) {
                             subActionMap.set("BUTTON", []);
                         }
@@ -77,7 +77,7 @@ export function initSettingsPanel(): HTMLElement {
                             subActionMap.get(key)?.push(name);
                         });
                     } else if (binding.control instanceof Vector2InputControl) {
-                        const strings = vector2ToString(binding.control);
+                        const strings = vector2ToString();
                         strings.forEach((string) => {
                             const [key, name] = string;
                             if (!subActionMap.has(key)) {
@@ -104,13 +104,13 @@ export function initSettingsPanel(): HTMLElement {
                     const valuesContainer = document.createElement("div");
                     valuesContainer.classList.add("valuesContainer");
 
-                    subActionMap.forEach((value, key) => {
+                    for (const value of subActionMap.values()) {
                         value.forEach((v) => {
                             const valueContainer = document.createElement("p");
                             valueContainer.innerText = v;
                             valuesContainer.appendChild(valueContainer);
                         });
-                    });
+                    }
 
                     actionDiv.appendChild(valuesContainer);
                 } else {

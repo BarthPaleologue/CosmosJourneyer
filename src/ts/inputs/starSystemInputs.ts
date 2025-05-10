@@ -35,12 +35,6 @@ const toggleOrbitsAndAxisAction = new Action({
 
 const toggleOrbitsAndAxisInteraction = new PressInteraction(toggleOrbitsAndAxisAction);
 
-const toggleDebugUiAction = new Action({
-    bindings: [keyboard.getControl("KeyN")]
-});
-
-const toggleDebugUiInteraction = new PressInteraction(toggleDebugUiAction);
-
 const cycleViewsAction = new Action({
     bindings: [keyboard.getControl("KeyC")]
 });

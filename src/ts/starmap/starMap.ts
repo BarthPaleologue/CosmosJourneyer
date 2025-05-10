@@ -312,7 +312,7 @@ export class StarMap implements View {
             }
         }
 
-        this.scene.onBeforeRenderObservable.add(() => {
+        this.scene.onBeforeRenderObservable.add(async () => {
             const deltaSeconds = this.scene.getEngine().getDeltaTime() / 1000;
 
             if (this.rotationAnimation !== null) this.rotationAnimation.update(deltaSeconds);
@@ -338,11 +338,15 @@ export class StarMap implements View {
                 if (this.stellarPathfinder.hasFoundPath()) {
                     this.soundPlayer.playNow(SoundType.ITINERARY_COMPUTED);
                     const path = this.stellarPathfinder.getPath();
-                    this.drawPath(path);
+                    if (!path.success) {
+                        await alertModal(path.error.message, this.soundPlayer);
+                        continue;
+                    }
+                    this.drawPath(path.value);
 
-                    this.player.currentItinerary = path;
+                    this.player.currentItinerary = path.value;
 
-                    this.onTargetSetObservable.notifyObservers(path[1]);
+                    this.onTargetSetObservable.notifyObservers(path.value[1]);
                 } else if (this.stellarPathfinder.getNbIterations() >= pathfinderMaxIterations) {
                     createNotification(
                         NotificationOrigin.GENERAL,
@@ -621,7 +625,7 @@ export class StarMap implements View {
 
     public focusOnCurrentSystem(skipAnimation = false) {
         if (this.currentSystemCoordinates === null) return console.warn("No current system seed!");
-        this.focusOnSystem(this.currentSystemCoordinates);
+        this.focusOnSystem(this.currentSystemCoordinates, skipAnimation);
     }
 
     public focusOnSystem(starSystemCoordinates: StarSystemCoordinates, skipAnimation = false) {

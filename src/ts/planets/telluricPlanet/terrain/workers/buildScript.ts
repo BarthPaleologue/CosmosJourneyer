@@ -83,7 +83,7 @@ function handle_build(data: TransferBuildData): void {
             instancesMatrixBuffer: instances_matrix_buffer,
             alignedInstancesMatrixBuffer: aligned_instances_matrix_buffer,
             averageHeight: result.average_height
-        } as ReturnedChunkData,
+        } satisfies ReturnedChunkData,
         {
             transfer: [
                 verticesPositions.buffer,

@@ -1,4 +1,5 @@
 import i18next, { Resource, init, t, ResourceKey, ResourceLanguage } from "i18next";
+import { z } from "zod";
 
 /**
  * Load all the resources from the locales folder and return them in the i18next format.
@@ -8,21 +9,29 @@ function loadResources() {
     const requireContext = require.context("../locales/", true, /\.json$/);
     const resources: Resource = {}; // { "en-US": { "notifications": { ... } }, "es-ES": { "notifications": { ... } } }
 
+    const jsonSchema = z.object({});
+
     requireContext.keys().forEach((key: string) => {
         const parts = key.split("/");
         const languageFolder = parts[1]; // (./en-US/notifications.json) => en-US
         const subFolders: string[] = parts.slice(2, parts.length - 1); // (./en-US/subFolder/subSubFolder/notifications.json) => ["subFolder", "subSubFolder"]
         const nameSpace = parts[parts.length - 1].split(".")[0]; // (./en-US/notifications.json) => notifications
-        const fileContent = requireContext(key);
+        const fileContent = jsonSchema.safeParse(requireContext(key));
+        if (!fileContent.success) {
+            console.warn(`Invalid JSON file: ${key}`);
+            return;
+        }
 
-        resources[languageFolder] = resources[languageFolder] || {};
+        resources[languageFolder] = resources[languageFolder] ?? {};
         let currentResource: ResourceLanguage | ResourceKey = resources[languageFolder];
         subFolders.forEach((subFolder) => {
             if (typeof currentResource === "string") {
                 throw new Error("Encountered recursion error when iterating locale subfolders!");
             }
-            currentResource[subFolder] = currentResource[subFolder] || {};
-            currentResource = currentResource[subFolder];
+            if (!(subFolder in currentResource)) {
+                currentResource[subFolder] = {} as ResourceLanguage;
+            }
+            currentResource = currentResource[subFolder] as ResourceLanguage;
         });
         currentResource[nameSpace] = fileContent;
     });
@@ -33,7 +42,7 @@ function loadResources() {
 export async function initI18n() {
     // init language to url parameter if defined, otherwise use the browser language
     const urlParams = new URLSearchParams(window.location.search);
-    const language = urlParams.get("lang") || navigator.language;
+    const language = urlParams.get("lang") ?? navigator.language;
 
     await init({
         lng: language, // change this if you want to test a specific language

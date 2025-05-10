@@ -19,5 +19,6 @@ import { StarSystemDatabase } from "../starSystemDatabase";
 // import { getSolSystemModel } from "./sol";
 
 export function registerCustomSystems(starSystemDatabase: StarSystemDatabase) {
+    void starSystemDatabase;
     // starSystemDatabase.registerCustomSystem(getSolSystemModel());
 }

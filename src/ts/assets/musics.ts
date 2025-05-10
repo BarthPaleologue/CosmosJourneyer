@@ -57,7 +57,7 @@ export async function loadMusics(
     let totalCount = 0;
 
     const loadSoundAsync = (name: string, url: string, options?: ISoundOptions) => {
-        const loadingPromise = new Promise<Sound>((resolve, reject) => {
+        const loadingPromise = new Promise<Sound>((resolve) => {
             const sound = new Sound(
                 name,
                 url,

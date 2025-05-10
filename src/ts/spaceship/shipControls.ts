@@ -38,7 +38,6 @@ import { pressInteractionToStrings } from "../utils/strings/inputControlsString"
 import i18n from "../i18n";
 import { Transformable } from "../architecture/transformable";
 import { ManagesLandingPads } from "../spacestation/landingPad/managesLandingPads";
-import { Sounds } from "../assets/sounds";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import { CameraShakeAnimation } from "../uberCore/transforms/animations/cameraShake";
 import { Tools } from "@babylonjs/core/Misc/tools";
@@ -50,7 +49,6 @@ import { canEngageWarpDrive } from "./components/warpDriveUtils";
 import { LandingPadSize } from "../spacestation/landingPad/landingPadManager";
 import { ITts, Speaker, VoiceLine } from "../audio/tts";
 import { ISoundPlayer } from "../audio/soundPlayer";
-import { Assets } from "../assets/assets";
 import { RenderingAssets } from "../assets/renderingAssets";
 
 export class ShipControls implements Controls {
@@ -184,7 +182,7 @@ export class ShipControls implements Controls {
                 createNotification(
                     NotificationOrigin.SPACESHIP,
                     NotificationIntent.ERROR,
-                    `Cannot land while warp drive is enabled. You can use ${relevantKeys} to toggle your warp drive.`,
+                    `Cannot land while warp drive is enabled. You can use ${relevantKeys.join(", ")} to toggle your warp drive.`,
                     5000,
                     soundPlayer
                 );
@@ -314,7 +312,7 @@ export class ShipControls implements Controls {
         }
 
         const warpDrive = spaceship.getInternals().getWarpDrive();
-        if (warpDrive?.isDisabled()) {
+        if (warpDrive === null || warpDrive.isDisabled()) {
             spaceship.increaseMainEngineThrottle(deltaSeconds * SpaceShipControlsInputs.map.throttle.value);
 
             if (SpaceShipControlsInputs.map.upDown.value !== 0) {

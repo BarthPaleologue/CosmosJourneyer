@@ -15,9 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { z } from "zod";
+
+const JsonSchema = z.object({});
+
 export function jsonSafeParse(jsonString: string): Record<string, unknown> | null {
     try {
-        return JSON.parse(jsonString);
+        return JsonSchema.parse(JSON.parse(jsonString));
     } catch {
         return null;
     }

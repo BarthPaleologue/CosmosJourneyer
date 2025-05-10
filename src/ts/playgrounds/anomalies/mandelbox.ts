@@ -20,7 +20,7 @@ import { EmptyCelestialBody } from "../../utils/emptyCelestialBody";
 import { newSeededMandelboxModel } from "../../anomalies/mandelbox/mandelboxModelGenerator";
 import { MandelboxPostProcess } from "../../anomalies/mandelbox/mandelboxPostProcess";
 
-export async function createMandelboxScene(
+export function createMandelboxScene(
     engine: AbstractEngine,
     progressCallback: (progress: number, text: string) => void
 ): Promise<Scene> {
@@ -65,5 +65,5 @@ export async function createMandelboxScene(
 
     progressCallback(1, "Loading complete");
 
-    return scene;
+    return Promise.resolve(scene);
 }

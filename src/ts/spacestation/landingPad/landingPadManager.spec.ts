@@ -18,6 +18,7 @@
 import { ILandingPad, LandingPadManager, LandingPadSize, LandingRequest } from "./landingPadManager";
 import { beforeEach, describe, expect, it } from "vitest";
 import { ObjectTargetCursorType, TargetInfo } from "../../architecture/targetable";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
 // Mock LandingPad implementation for testing
 class MockLandingPad implements ILandingPad {
@@ -31,6 +32,8 @@ class MockLandingPad implements ILandingPad {
         minDistance: 0,
         maxDistance: 0
     };
+
+    private readonly transform = new TransformNode("mockLandingPadTransform");
 
     constructor(padSize: LandingPadSize) {
         this.padSize = padSize;
@@ -55,9 +58,11 @@ class MockLandingPad implements ILandingPad {
 
     // Implement other required LandingPad methods with minimal functionality
     getTransform() {
-        return {} as any;
+        return this.transform;
     }
-    dispose() {}
+    dispose() {
+        this.transform.dispose();
+    }
     getBoundingRadius() {
         return 0;
     }

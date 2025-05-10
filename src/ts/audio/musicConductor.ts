@@ -101,18 +101,20 @@ export class MusicConductor {
     }
 
     public update(isPaused: boolean, isInStarSystemView: boolean, isInMainMenu: boolean, deltaSeconds: number) {
-        if (isPaused && this.pauseMusicWhenPaused && this.currentMusic?.isPlaying) {
-            this.currentMusic.pause();
-            return;
-        } else if (!isPaused && this.currentMusic?.isPaused) {
-            this.currentMusic.play();
-            return;
-        }
+        if (this.currentMusic !== null) {
+            if (isPaused && this.pauseMusicWhenPaused && this.currentMusic.isPlaying) {
+                this.currentMusic.pause();
+                return;
+            } else if (!isPaused && this.currentMusic.isPaused) {
+                this.currentMusic.play();
+                return;
+            }
 
-        // if the music has finished playing, set it to null
-        if (!isPaused && this.currentMusic !== null && !this.currentMusic.isPlaying) {
-            this.currentMusic = null;
-            this.silenceSeconds = 30 + (Math.random() - 0.5) * 20;
+            // if the music has finished playing, set it to null
+            if (!isPaused && !this.currentMusic.isPlaying) {
+                this.currentMusic = null;
+                this.silenceSeconds = 30 + (Math.random() - 0.5) * 20;
+            }
         }
 
         if (this.silenceSeconds > 0) {
@@ -179,7 +181,7 @@ export class MusicConductor {
             case OrbitalObjectType.SPACE_STATION:
             case OrbitalObjectType.SPACE_ELEVATOR:
                 if (
-                    !warpDrive?.isEnabled() &&
+                    (warpDrive === null || warpDrive.isDisabled()) &&
                     distanceToClosestObject < closestOrbitalObject.getBoundingRadius() * 10
                 ) {
                     this.setMusic(this.musics.equatorialComplex);
@@ -187,7 +189,7 @@ export class MusicConductor {
                 }
         }
 
-        if (warpDrive?.isEnabled()) {
+        if (warpDrive !== null && warpDrive.isEnabled()) {
             const suitableMusics = [
                 this.musics.atlanteanTwilight,
                 this.musics.infinitePerspective,
@@ -198,7 +200,7 @@ export class MusicConductor {
             return;
         }
 
-        if (!spaceship.isLanded() && !warpDrive?.isEnabled()) {
+        if (!spaceship.isLanded() && (warpDrive === null || warpDrive.isDisabled())) {
             const suitableMusics = [this.musics.thatZenMoment, this.musics.deepRelaxation, this.musics.peaceOfMind];
             this.setMusicFromSelection(suitableMusics);
             return;

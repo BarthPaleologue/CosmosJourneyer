@@ -20,7 +20,7 @@ import { expect, test } from "vitest";
 
 test("pickPseudoRandomItems", () => {
     const items = [0, 1, 2, 3, 4, 5];
-    const rng = (index: number) => Math.random();
+    const rng = () => Math.random();
     for (let i = 0; i < 1000; i++) {
         const nbItemsToPick = Math.floor(Math.random() * 5);
         const results = pickPseudoRandomItems(items, nbItemsToPick, rng, 0);
@@ -37,7 +37,7 @@ test("pickPseudoRandomItems", () => {
 });
 
 test("randomPieChart", () => {
-    const rng = (index: number) => Math.random();
+    const rng = () => Math.random();
     for (let i = 0; i < 1000; i++) {
         const nbSlices = 1 + Math.floor(Math.random() * 20);
         const pieChart = randomPieChart(nbSlices, rng, 0);

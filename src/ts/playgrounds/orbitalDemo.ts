@@ -29,7 +29,7 @@ import { AxisRenderer } from "../orbit/axisRenderer";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { OrbitalObjectUtils } from "../architecture/orbitalObjectUtils";
 
-export async function createOrbitalDemoScene(
+export function createOrbitalDemoScene(
     engine: AbstractEngine,
     progressCallback: (progress: number, text: string) => void
 ): Promise<Scene> {
@@ -153,5 +153,5 @@ export async function createOrbitalDemoScene(
 
     progressCallback(1, "Loading complete");
 
-    return scene;
+    return Promise.resolve(scene);
 }
