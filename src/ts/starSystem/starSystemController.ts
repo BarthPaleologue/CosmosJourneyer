@@ -555,7 +555,10 @@ export class StarSystemController {
         postProcessManager.update(deltaSeconds);
     }
 
-    addSystemTarget(targetCoordinates: StarSystemCoordinates, starSystemDatabase: StarSystemDatabase): SystemTarget {
+    addSystemTarget(
+        targetCoordinates: StarSystemCoordinates,
+        starSystemDatabase: StarSystemDatabase
+    ): SystemTarget | null {
         const currentSystemUniversePosition = starSystemDatabase.getSystemGalacticPosition(this.model.coordinates);
         const targetSystemUniversePosition = starSystemDatabase.getSystemGalacticPosition(targetCoordinates);
 
@@ -569,7 +572,7 @@ export class StarSystemController {
 
         const systemModel = starSystemDatabase.getSystemModelFromCoordinates(targetCoordinates);
         if (systemModel === null) {
-            throw new Error(`System model for coordinates ${targetCoordinates} is null`);
+            return null;
         }
         const placeholderTransform = new SystemTarget(systemModel, direction.scale(distance), this.scene);
 

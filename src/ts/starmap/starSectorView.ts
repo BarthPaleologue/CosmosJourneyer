@@ -73,7 +73,7 @@ export class StarSectorView {
 
     generate(): BuildData[] {
         const sectorString = this.getKey();
-        return this.systems.map(({ model, position }, i) => {
+        return this.systems.map(({ model, position }) => {
             return {
                 coordinates: model.coordinates,
                 sectorString: sectorString,

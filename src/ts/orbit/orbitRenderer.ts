@@ -83,7 +83,7 @@ export class OrbitRenderer {
 
     setVisibility(visible: boolean) {
         this._isVisible = visible;
-        for (const [orbitalObject, orbitMesh] of this.orbitMeshes) {
+        for (const orbitMesh of this.orbitMeshes.values()) {
             orbitMesh.setEnabled(visible);
         }
     }

@@ -20,18 +20,18 @@ import { Player } from "../../player/player";
 import { Settings } from "../../settings";
 import { SpaceDiscoveryData } from "../../society/encyclopaediaGalactica";
 import { EncyclopaediaGalacticaManager } from "../../society/encyclopaediaGalacticaManager";
-import { EncyclopaediaGalacticaOnline } from "../../society/encyclopaediaGalacticaOnline";
 import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
 import { connectEncyclopaediaGalacticaModal } from "../../utils/dialogModal";
 import { createNotification, NotificationIntent, NotificationOrigin } from "../../utils/notification";
 import { DiscoveryDetails } from "./discoveryDetails";
 import { ISoundPlayer, SoundType } from "../../audio/soundPlayer";
 
-const enum ExplorationCenterFilter {
-    LOCAL_ONLY = "localOnly",
-    UPLOADED_ONLY = "uploadedOnly",
-    ALL = "all"
-}
+const ExplorationCenterFilter = {
+    LOCAL_ONLY: "localOnly",
+    UPLOADED_ONLY: "uploadedOnly",
+    ALL: "all"
+} as const;
+type ExplorationCenterFilter = (typeof ExplorationCenterFilter)[keyof typeof ExplorationCenterFilter];
 
 export class ExplorationCenterPanel {
     readonly htmlRoot: HTMLDivElement;
@@ -80,23 +80,13 @@ export class ExplorationCenterPanel {
         encyclopaediaContainer.appendChild(activeInstances);
 
         const addEncyclopaediaInstanceButton = document.createElement("button");
+        addEncyclopaediaInstanceButton.classList.add("disabled");
         addEncyclopaediaInstanceButton.textContent = i18n.t("explorationCenter:addNewInstance");
         addEncyclopaediaInstanceButton.addEventListener("click", async () => {
             this.soundPlayer.playNow(SoundType.CLICK);
 
             const connectionInfo = await connectEncyclopaediaGalacticaModal(this.soundPlayer);
             if (connectionInfo === null) return;
-
-            const newEncyclopaedia = new EncyclopaediaGalacticaOnline(
-                new URL(connectionInfo.encyclopaediaUrlBase),
-                connectionInfo.accountId,
-                connectionInfo.password
-            );
-            encyclopaedia.backends.push(newEncyclopaedia);
-
-            activeInstances.textContent = i18n.t("explorationCenter:activeEncyclopaediaInstances", {
-                value: encyclopaedia.getBackendString()
-            });
         });
         encyclopaediaContainer.appendChild(addEncyclopaediaInstanceButton);
 
@@ -174,7 +164,7 @@ export class ExplorationCenterPanel {
         horizontalContainer.appendChild(this.discoveryList);
 
         this.discoveryDetails = new DiscoveryDetails(player, encyclopaedia, starSystemDatabase, this.soundPlayer);
-        this.discoveryDetails.onSellDiscovery.add(async (discovery) => {
+        this.discoveryDetails.onSellDiscovery.add(async () => {
             await this.populate(starSystemDatabase);
         });
         horizontalContainer.appendChild(this.discoveryDetails.htmlRoot);
@@ -246,12 +236,12 @@ export class ExplorationCenterPanel {
         searchField.addEventListener("keydown", (e) => {
             e.stopPropagation();
         });
-        searchField.addEventListener("input", (e) => {
+        searchField.addEventListener("input", () => {
             this.filterDiscoveryListByQuery(searchField.value.toLowerCase());
         });
         this.discoveryList.appendChild(searchField);
 
-        discoveries.forEach(async (discovery) => {
+        discoveries.forEach((discovery) => {
             const objectModel = starSystemDatabase.getObjectModelByUniverseId(discovery.objectId);
 
             const discoveryItem = document.createElement("div");

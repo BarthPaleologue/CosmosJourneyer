@@ -21,8 +21,6 @@ import { getKerrMetricA } from "./blackHoleModelGenerator";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { getForwardDirection } from "../../uberCore/transforms/basicTransform";
 import { DeepReadonly } from "../../utils/types";
-import { Matrix } from "@babylonjs/core/Maths/math.vector";
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 
 export const BlackHoleUniformNames = {

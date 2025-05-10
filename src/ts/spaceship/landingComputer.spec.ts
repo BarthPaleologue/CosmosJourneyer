@@ -6,6 +6,7 @@ import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { LandingPad } from "../assets/procedural/landingPad/landingPad";
 import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
+import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 
 // Mock BabylonJS classes
 vi.mock("@babylonjs/core/Physics/v2/physicsAggregate", () => ({
@@ -52,10 +53,8 @@ describe("LandingComputer", () => {
         } as unknown as PhysicsAggregate;
 
         mockPhysicsEngine = {
-            raycastToRef: vi.fn().mockImplementation((start, end, result) => {
-                result.hasHit = true;
-                result.hitPointWorld = new Vector3(0, 0, 0);
-                result.hitNormalWorld = Vector3.Up();
+            raycastToRef: vi.fn().mockImplementation((start, end, result: PhysicsRaycastResult) => {
+                result.setHitData(Vector3.Up(), Vector3.Zero(), 0);
             })
         } as unknown as PhysicsEngineV2;
 

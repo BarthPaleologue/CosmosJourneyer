@@ -1,9 +1,4 @@
-import {
-    AxisComposite,
-    ButtonInputControl,
-    StickInputControl,
-    Vector2InputControl
-} from "@brianchirls/game-input/browser";
+import { AxisComposite, ButtonInputControl, StickInputControl } from "@brianchirls/game-input/browser";
 import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import PressInteraction from "@brianchirls/game-input/interactions/PressInteraction";
 
@@ -26,9 +21,7 @@ export function dPadCompositeToString(
         let name = child.name;
         // remove the "key:" prefix
         name = name.replace("key:", "");
-        if (keyboardMap?.has(name)) {
-            name = keyboardMap.get(name)?.toUpperCase() ?? name;
-        }
+        name = keyboardMap?.get(name)?.toUpperCase() ?? name;
         keys.push([key, name]);
     });
 
@@ -39,7 +32,7 @@ export function dPadCompositeToString(
     return [keys[2], keys[0], keys[3], keys[1]];
 }
 
-export function vector2ToString(input: Vector2InputControl): [string, string][] {
+export function vector2ToString(): [string, string][] {
     return [
         ["x", "pointerX"],
         ["y", "pointerY"]
@@ -50,9 +43,7 @@ export function buttonInputToString(input: ButtonInputControl, keyboardMap: Map<
     let name = input.name;
     // remove the "key:" prefix
     name = name.replace("key:", "");
-    if (keyboardMap?.has(name)) {
-        name = keyboardMap.get(name)?.toUpperCase() ?? name;
-    }
+    name = keyboardMap?.get(name)?.toUpperCase() ?? name;
     return name;
 }
 
@@ -65,9 +56,7 @@ export function axisCompositeToString(
         let name = child.name;
         // remove the "key:" prefix
         name = name.replace("key:", "");
-        if (keyboardMap?.has(name)) {
-            name = keyboardMap.get(name)?.toUpperCase() ?? name;
-        }
+        name = keyboardMap?.get(name)?.toUpperCase() ?? name;
         keys.push([key, name]);
     });
     return keys;

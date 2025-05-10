@@ -171,11 +171,9 @@ export async function createXrScene(
     }
 
     const xr = await scene.createDefaultXRExperienceAsync();
-    if (xr.baseExperience) {
-        // web xr code goes here
-        const xrCamera = xr.baseExperience.camera;
-        xrCamera.setTransformationFromNonVRCamera(camera, true);
-    }
+
+    const xrCamera = xr.baseExperience.camera;
+    xrCamera.setTransformationFromNonVRCamera(camera, true);
 
     scene.onBeforeCameraRenderObservable.add((camera) => {
         depthRenderer.getDepthMap().activeCamera = camera;

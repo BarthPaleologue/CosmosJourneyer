@@ -20,7 +20,7 @@ import { newSeededSierpinskiPyramidModel } from "../../anomalies/sierpinskiPyram
 import { SierpinskiPyramidPostProcess } from "../../anomalies/sierpinskiPyramid/sierpinskiPyramidPostProcess";
 import { EmptyCelestialBody } from "../../utils/emptyCelestialBody";
 
-export async function createSierpinskiScene(
+export function createSierpinskiScene(
     engine: AbstractEngine,
     progressCallback: (progress: number, text: string) => void
 ): Promise<Scene> {
@@ -71,5 +71,5 @@ export async function createSierpinskiScene(
 
     progressCallback(1, "Loading complete");
 
-    return scene;
+    return Promise.resolve(scene);
 }

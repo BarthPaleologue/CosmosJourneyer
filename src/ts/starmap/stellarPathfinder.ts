@@ -20,6 +20,7 @@ import { getNeighborStarSystemCoordinates } from "../utils/getNeighborStarSystem
 import { PriorityQueue } from "../utils/priorityQueue";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/starSystemCoordinates";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { err, ok, Result } from "../utils/types";
 
 type Node = {
     coordinates: StarSystemCoordinates;
@@ -106,21 +107,23 @@ export class StellarPathfinder {
         return Vector3.Distance(position, targetPosition);
     }
 
-    private getNeighbors(node: Node): [Node, number][] {
+    private getNeighbors(node: Node): Array<{ node: Node; distance: number }> {
         const stellarNeighbors = getNeighborStarSystemCoordinates(
             node.coordinates,
             this.jumpRange,
             this.starSystemDatabase
         );
-        return stellarNeighbors.map<[Node, number]>(([coordinates, position, distance]) => [
-            {
-                coordinates: coordinates,
-                position,
-                G: 0,
-                H: 0
-            },
-            distance
-        ]);
+        return stellarNeighbors.map<{ node: Node; distance: number }>(({ coordinates, position, distance }) => {
+            return {
+                node: {
+                    coordinates: coordinates,
+                    position,
+                    G: 0,
+                    H: 0
+                },
+                distance: distance
+            };
+        });
     }
 
     /**
@@ -152,7 +155,7 @@ export class StellarPathfinder {
         }
 
         const neighborsWithDistances = this.getNeighbors(currentNode);
-        for (const [neighbor, distance] of neighborsWithDistances) {
+        for (const { node: neighbor, distance } of neighborsWithDistances) {
             if (this.closedList.find((node) => starSystemCoordinatesEquals(node.coordinates, neighbor.coordinates))) {
                 // if the neighbor is already in the closed list, skip it
                 continue;
@@ -189,36 +192,36 @@ export class StellarPathfinder {
     /**
      * Get the path between the start and target systems (ordered from start to target)
      * @returns An array of StarSystemCoordinates objects representing the path between the start and target systems
-     * @throws An error if the pathfinder has not been initialized
-     * @throws An error if no path has been found
      */
-    getPath(): StarSystemCoordinates[] {
+    getPath(): Result<Array<StarSystemCoordinates>, Error> {
         if (this.startSystem === null || this.targetSystem === null) {
-            throw new Error("Cannot get path without initializing the pathfinder first");
+            return err(new Error("Cannot get path without initializing the pathfinder first"));
         }
 
         if (!this.hasPath) {
-            throw new Error("No path found");
+            return err(new Error("No path found"));
         }
 
         const path: StarSystemCoordinates[] = [];
         let currentCoordinates = this.targetSystem.coordinates;
         while (currentCoordinates !== this.startSystem.coordinates) {
             if (path.length >= 2 ** 32) {
-                throw new Error(
-                    `Path between ${this.startSystem.coordinates.toString()} and ${this.targetSystem.coordinates.toString()} is too long, exceeding 2^32 elements! There might be a loop somewhere...`
+                return err(
+                    new Error(
+                        `Path between ${JSON.stringify(this.startSystem.coordinates)} and ${JSON.stringify(this.targetSystem.coordinates)} is too long, exceeding 2^32 elements! There might be a loop somewhere...`
+                    )
                 );
             }
             path.push(currentCoordinates);
             const previous = this.coordinatesToPrevious.get(JSON.stringify(currentCoordinates));
             if (previous === undefined) {
-                throw new Error("Could not find a path to the target system");
+                return err(new Error("Could not find a path to the target system"));
             }
             currentCoordinates = previous;
         }
         path.push(this.startSystem.coordinates);
 
-        return path.reverse();
+        return ok(path.reverse());
     }
 
     /**

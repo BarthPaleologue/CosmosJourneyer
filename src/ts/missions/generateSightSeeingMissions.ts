@@ -53,7 +53,7 @@ export function generateSightseeingMissions(
     const spaceStationUniverseId = getUniverseObjectId(spaceStationModel, starSystemModel);
 
     const neighborSystems = getNeighborStarSystemCoordinates(starSystemModel.coordinates, 75, starSystemDatabase);
-    neighborSystems.forEach(([systemCoordinates, systemPosition, distance]) => {
+    neighborSystems.forEach(({ coordinates: systemCoordinates, position: systemPosition, distance }) => {
         const neighborSystemModel = starSystemDatabase.getSystemModelFromCoordinates(systemCoordinates);
         if (neighborSystemModel === null) {
             return;

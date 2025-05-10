@@ -65,7 +65,7 @@ export async function createAsteroidFieldScene(
 
     const sphere = MeshBuilder.CreateSphere("sphere", { diameter: 20 * scalingFactor }, scene);
 
-    const sphereAggregate = new PhysicsAggregate(sphere, PhysicsShapeType.SPHERE, { mass: 0 }, scene);
+    new PhysicsAggregate(sphere, PhysicsShapeType.SPHERE, { mass: 0 }, scene);
 
     const beltRadius = 100 * scalingFactor;
     const beltSpread = 20 * scalingFactor;

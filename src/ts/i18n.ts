@@ -1,4 +1,5 @@
 import i18next, { Resource, init, t, ResourceKey, ResourceLanguage } from "i18next";
+import { z } from "zod";
 
 /**
  * Load all the resources from the locales folder and return them in the i18next format.
@@ -7,6 +8,8 @@ import i18next, { Resource, init, t, ResourceKey, ResourceLanguage } from "i18ne
 function loadResources() {
     const requireContext = require.context("../locales/", true, /\.json$/);
     const resources: Resource = {}; // { "en-US": { "notifications": { ... } }, "es-ES": { "notifications": { ... } } }
+
+    const jsonSchema = z.object({});
 
     requireContext.keys().forEach((key: string) => {
         const parts = key.split("/");
@@ -26,17 +29,19 @@ function loadResources() {
             throw new Error(`Could not split file name from extension: ${fileName}`);
         }
 
-        resources[languageFolder] = resources[languageFolder] || {};
+        resources[languageFolder] = resources[languageFolder] ?? {};
         let currentResource: ResourceLanguage | ResourceKey = resources[languageFolder];
         subFolders.forEach((subFolder) => {
             if (typeof currentResource === "string") {
                 throw new Error("Encountered recursion error when iterating locale subfolders!");
             }
-            currentResource[subFolder] = currentResource[subFolder] || {};
-            currentResource = currentResource[subFolder];
+            if (!(subFolder in currentResource)) {
+                currentResource[subFolder] = {} as ResourceLanguage;
+            }
+            currentResource = currentResource[subFolder] as ResourceLanguage;
         });
 
-        const fileContent = requireContext(key);
+        const fileContent = jsonSchema.parse(requireContext(key));
         currentResource[nameSpace] = fileContent;
     });
 
@@ -46,7 +51,7 @@ function loadResources() {
 export async function initI18n() {
     // init language to url parameter if defined, otherwise use the browser language
     const urlParams = new URLSearchParams(window.location.search);
-    const language = urlParams.get("lang") || navigator.language;
+    const language = urlParams.get("lang") ?? navigator.language;
 
     await init({
         lng: language, // change this if you want to test a specific language

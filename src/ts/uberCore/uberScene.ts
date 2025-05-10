@@ -101,7 +101,7 @@ export class UberScene extends Scene {
      * @returns The active camera.
      */
     public getActiveCameras(): Camera[] {
-        if (this.activeCameras === null) throw new Error("No active camera in scene: " + this);
+        if (this.activeCameras === null) throw new Error("No active camera in scene");
         return this.activeCameras;
     }
 }

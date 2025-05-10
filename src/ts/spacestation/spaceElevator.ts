@@ -42,7 +42,7 @@ import { clamp, remap, triangleWave } from "../utils/math";
 import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
 import { setUpVector } from "../uberCore/transforms/basicTransform";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
-import { DeepReadonly, NonEmptyArray } from "../utils/types";
+import { DeepReadonly } from "../utils/types";
 import { LandingPadManager } from "./landingPad/landingPadManager";
 import { getSphereRadiatedEnergyFlux } from "../utils/physics";
 import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
