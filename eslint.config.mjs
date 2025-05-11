@@ -17,7 +17,7 @@ export default defineConfig([
         ".eslintcache"
     ]),
     eslint.configs.recommended,
-    ...tseslint.configs.recommendedTypeChecked,
+    ...tseslint.configs.strictTypeChecked,
     importPlugin.flatConfigs.recommended,
     importPlugin.flatConfigs.typescript,
     {
@@ -36,7 +36,7 @@ export default defineConfig([
             "import/no-unresolved": "warn",
 
             "@typescript-eslint/switch-exhaustiveness-check": "error",
-            "@typescript-eslint/no-inferrable-types": "warn",
+            "@typescript-eslint/no-inferrable-types": "error",
             "@typescript-eslint/require-array-sort-compare": "error",
             "@typescript-eslint/strict-boolean-expressions": "error",
 
@@ -46,6 +46,17 @@ export default defineConfig([
                     checksVoidReturn: false
                 }
             ],
+
+            "@typescript-eslint/restrict-template-expressions": [
+                "error",
+                {
+                    allowNumber: true,
+                    allowBoolean: true
+                }
+            ],
+
+            "@typescript-eslint/no-deprecated": "warn",
+            "@typescript-eslint/no-unnecessary-condition": "warn",
 
             // enforce ===
             eqeqeq: "error",
