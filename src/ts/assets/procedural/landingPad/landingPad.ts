@@ -130,7 +130,9 @@ export class LandingPad implements ILandingPad {
         this.deck.dispose();
         this.deckAggregate.dispose();
         this.deckMaterial.dispose();
-        this.crates.forEach((crate) => crate.dispose());
+        this.crates.forEach((crate) => {
+            crate.dispose();
+        });
     }
 
     getTypeName(): string {

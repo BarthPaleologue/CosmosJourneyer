@@ -78,7 +78,10 @@ export class UberScene extends Scene {
      * @param camera The new active camera.
      */
     public setActiveCamera(camera: Camera) {
-        if (this.activeCameras !== null) this.activeCameras.forEach((camera) => camera.detachControl());
+        if (this.activeCameras !== null)
+            this.activeCameras.forEach((camera) => {
+                camera.detachControl();
+            });
         if (this.activeCamera !== null) this.activeCamera.detachControl();
 
         this.activeCamera = camera;

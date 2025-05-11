@@ -226,7 +226,9 @@ export class LandingBay {
             this.ringAggregate.dispose();
             this.ringAggregate = null;
 
-            this.armAggregates.forEach((armAggregate) => armAggregate.dispose());
+            this.armAggregates.forEach((armAggregate) => {
+                armAggregate.dispose();
+            });
             this.armAggregates.length = 0;
         }
     }
@@ -244,12 +246,18 @@ export class LandingBay {
 
         this.landingBayMaterial.dispose();
         this.metalSectionMaterial.dispose();
-        this.arms.forEach((arm) => arm.dispose());
+        this.arms.forEach((arm) => {
+            arm.dispose();
+        });
 
-        this.armAggregates.forEach((armAggregate) => armAggregate.dispose());
+        this.armAggregates.forEach((armAggregate) => {
+            armAggregate.dispose();
+        });
         this.armAggregates.length = 0;
 
-        this.landingPads.forEach((landingPad) => landingPad.dispose());
+        this.landingPads.forEach((landingPad) => {
+            landingPad.dispose();
+        });
 
         this.centralLight.dispose();
     }

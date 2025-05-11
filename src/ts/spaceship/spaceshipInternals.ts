@@ -163,7 +163,7 @@ export class SpaceshipInternals {
     public serialize(): SerializedSpaceship["components"] {
         const primaryComponents = {
             warpDrive: this.getWarpDrive()?.serialize() ?? null,
-            fuelTank: this.getFuelTanks()?.at(0)?.serialize() ?? null,
+            fuelTank: this.getFuelTanks().at(0)?.serialize() ?? null,
             thrusters: this.getThrusters()?.serialize() ?? null
         };
 

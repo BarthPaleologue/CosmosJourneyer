@@ -144,7 +144,10 @@ export class StellarPathfinder {
             });
         }
 
-        const currentNode = this.openList.pop()!;
+        const currentNode = this.openList.pop();
+        if (currentNode === undefined) {
+            throw new Error("No more nodes to explore");
+        }
         this.closedList.push(currentNode);
 
         this.lastExploredNode = currentNode;

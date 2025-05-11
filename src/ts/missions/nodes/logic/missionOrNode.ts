@@ -56,7 +56,9 @@ export class MissionOrNode implements MissionNodeBase<MissionNodeType.OR> {
 
     updateState(context: MissionContext) {
         if (this.hasCompletedLock) return;
-        this.children.forEach((child) => child.updateState(context));
+        this.children.forEach((child) => {
+            child.updateState(context);
+        });
         this.hasCompletedLock = this.children.some((child) => child.isCompleted());
     }
 

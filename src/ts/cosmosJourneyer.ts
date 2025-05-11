@@ -349,11 +349,11 @@ export class CosmosJourneyer {
         });
 
         window.addEventListener("blur", () => {
-            if (!this.mainMenu?.isVisible() && !this.starSystemView.isLoadingSystem()) this.pause();
+            if (!this.mainMenu.isVisible() && !this.starSystemView.isLoadingSystem()) this.pause();
         });
 
         window.addEventListener("mouseleave", () => {
-            if (!this.mainMenu?.isVisible() && !this.starSystemView.isLoadingSystem()) this.pause();
+            if (!this.mainMenu.isVisible() && !this.starSystemView.isLoadingSystem()) this.pause();
         });
 
         window.addEventListener("resize", () => {
@@ -366,22 +366,22 @@ export class CosmosJourneyer {
         });
 
         GeneralInputs.map.toggleStarMap.on("complete", async () => {
-            if (this.mainMenu?.isVisible()) return;
+            if (this.mainMenu.isVisible()) return;
             await this.toggleStarMap();
         });
 
         GeneralInputs.map.screenshot.on("complete", async () => {
-            if (this.mainMenu?.isVisible()) return;
+            if (this.mainMenu.isVisible()) return;
             await this.takeScreenshot();
         });
 
         GeneralInputs.map.videoCapture.on("complete", async () => {
-            if (this.mainMenu?.isVisible()) return;
+            if (this.mainMenu.isVisible()) return;
             await this.takeVideoCapture();
         });
 
         GeneralInputs.map.togglePause.on("complete", () => {
-            if (this.mainMenu?.isVisible()) return;
+            if (this.mainMenu.isVisible()) return;
             if (!this.isPaused()) this.pause();
         });
 
@@ -428,7 +428,7 @@ export class CosmosJourneyer {
         await initI18n();
 
         // Log informations about the gpu and the api used
-        console.log(`API: ${engine.isWebGPU ? "WebGPU" : "WebGL" + engine.version}`);
+        console.log(`API: ${engine.isWebGPU ? "WebGPU" : "WebGL"}`);
         console.log(`GPU detected: ${engine.extractDriverInfo()}`);
 
         // Init Havok physics engine
@@ -578,7 +578,7 @@ export class CosmosJourneyer {
                 if (!this.mainMenu.isVisible() && !this.starSystemView.isJumpingBetweenSystems()) {
                     // don't autosave if the main menu is visible: the player is not in the game yet
                     // don't autosave when jumping between systems
-                    void this.createAutoSave();
+                    this.createAutoSave();
                 }
             }
 
@@ -895,10 +895,7 @@ export class CosmosJourneyer {
             return;
         }
 
-        const newPlayer =
-            saveData.player !== undefined
-                ? Player.Deserialize(saveData.player, this.starSystemDatabase)
-                : Player.Default(this.starSystemDatabase);
+        const newPlayer = Player.Deserialize(saveData.player, this.starSystemDatabase);
         this.player.copyFrom(newPlayer, this.starSystemDatabase);
         this.player.discoveries.uploaded.forEach(async (discovery) => {
             await this.encyclopaedia.contributeDiscoveryIfNew(discovery);

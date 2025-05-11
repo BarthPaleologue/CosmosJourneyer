@@ -140,7 +140,9 @@ export class ChunkTree implements Cullable {
      * @param chunkForge
      */
     public update(observerPosition: Vector3, chunkForge: ChunkForge): void {
-        this.deleteSemaphores.forEach((semaphore) => semaphore.update());
+        this.deleteSemaphores.forEach((semaphore) => {
+            semaphore.update();
+        });
         // remove delete semaphores that have been resolved
         this.deleteSemaphores = this.deleteSemaphores.filter((semaphore) => !semaphore.isResolved());
 

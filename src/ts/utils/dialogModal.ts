@@ -144,11 +144,11 @@ export function connectEncyclopaediaGalacticaModal(soundPlayer: ISoundPlayer): P
 
     urlInput.focus();
     urlInput.select();
-    modal.querySelectorAll("input").forEach((input) =>
+    modal.querySelectorAll("input").forEach((input) => {
         input.addEventListener("keydown", (e) => {
             e.stopPropagation();
-        })
-    );
+        });
+    });
 
     return new Promise((resolve) => {
         // on reset, close the modal and resolve with null

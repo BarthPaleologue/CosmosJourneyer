@@ -27,7 +27,7 @@ import { Tools } from "@babylonjs/core/Misc/tools";
 import { OrbitRenderer } from "../orbit/orbitRenderer";
 import { AxisRenderer } from "../orbit/axisRenderer";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
-import { OrbitalObjectUtils } from "../architecture/orbitalObjectUtils";
+import { setOrbitalPosition, setRotation } from "@/architecture/orbitalObjectUtils";
 
 export function createOrbitalDemoScene(
     engine: AbstractEngine,
@@ -139,13 +139,8 @@ export function createOrbitalDemoScene(
         referencePlaneRotation.multiplyToRef(referencePlaneDeltaRotation, referencePlaneRotation);
 
         bodies.forEach((body) => {
-            OrbitalObjectUtils.SetOrbitalPosition(
-                body,
-                bodyToParents.get(body) ?? [],
-                referencePlaneRotation,
-                elapsedSeconds
-            );
-            OrbitalObjectUtils.SetRotation(body, referencePlaneRotation, elapsedSeconds);
+            setOrbitalPosition(body, bodyToParents.get(body) ?? [], referencePlaneRotation, elapsedSeconds);
+            setRotation(body, referencePlaneRotation, elapsedSeconds);
         });
 
         orbitRenderer.update(referencePlaneRotation);

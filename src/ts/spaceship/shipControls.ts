@@ -361,7 +361,7 @@ export class ShipControls implements Controls {
                 spaceship.aggregate.body.applyAngularImpulse(angularImpulse);
             }
         } else {
-            warpDrive?.increaseThrottle(0.5 * deltaSeconds * SpaceShipControlsInputs.map.throttle.value);
+            warpDrive.increaseThrottle(0.5 * deltaSeconds * SpaceShipControlsInputs.map.throttle.value);
 
             this.rotationInertia.x = lerpSmooth(this.rotationInertia.x, inputRoll, 0.07, deltaSeconds);
             this.rotationInertia.y = lerpSmooth(this.rotationInertia.y, inputPitch, 0.07, deltaSeconds);

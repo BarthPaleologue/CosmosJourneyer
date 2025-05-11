@@ -164,10 +164,12 @@ export class RingHabitat implements Transformable {
                 this.getTransform().getScene()
             );
         } else if (distanceToCamera > 360e3 && this.attachmentAggregate !== null) {
-            this.attachmentAggregate?.dispose();
+            this.attachmentAggregate.dispose();
             this.attachmentAggregate = null;
 
-            this.armAggregates.forEach((armAggregate) => armAggregate.dispose());
+            this.armAggregates.forEach((armAggregate) => {
+                armAggregate.dispose();
+            });
             this.armAggregates.length = 0;
 
             this.ringAggregate?.dispose();
@@ -187,7 +189,11 @@ export class RingHabitat implements Transformable {
         this.ringAggregate?.dispose();
         this.ringMaterial.dispose();
         this.metalSectionMaterial.dispose();
-        this.arms.forEach((arm) => arm.dispose());
-        this.armAggregates.forEach((armAggregate) => armAggregate.dispose());
+        this.arms.forEach((arm) => {
+            arm.dispose();
+        });
+        this.armAggregates.forEach((armAggregate) => {
+            armAggregate.dispose();
+        });
     }
 }

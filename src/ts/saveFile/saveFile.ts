@@ -35,10 +35,11 @@ export async function parseSaveFile(
 
             const parsedData = jsonSafeParse(data);
             if (parsedData === null) {
-                return resolve(err({ type: SaveLoadingErrorType.INVALID_JSON }));
+                resolve(err({ type: SaveLoadingErrorType.INVALID_JSON }));
+                return;
             }
 
-            return resolve(safeParseSave(parsedData, starSystemDatabase));
+            resolve(safeParseSave(parsedData, starSystemDatabase));
         };
         reader.readAsText(rawSaveFile);
     });

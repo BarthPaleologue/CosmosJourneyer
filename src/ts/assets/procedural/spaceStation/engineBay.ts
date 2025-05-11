@@ -112,7 +112,9 @@ export class EngineBay implements Transformable {
             this.skirtAggregate.dispose();
             this.skirtAggregate = null;
 
-            this.engineBodies.forEach((body) => body.dispose());
+            this.engineBodies.forEach((body) => {
+                body.dispose();
+            });
             this.engineBodies.length = 0;
         }
     }
@@ -125,7 +127,11 @@ export class EngineBay implements Transformable {
         this.skirt.dispose();
         this.skirtMaterial.dispose();
         this.skirtAggregate?.dispose();
-        this.engines.forEach((engine) => engine.dispose());
-        this.engineBodies.forEach((body) => body.dispose());
+        this.engines.forEach((engine) => {
+            engine.dispose();
+        });
+        this.engineBodies.forEach((body) => {
+            body.dispose();
+        });
     }
 }

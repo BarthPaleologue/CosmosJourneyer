@@ -62,7 +62,9 @@ export class WorkerPool {
     }
 
     public reset() {
-        this.busyWorkers.forEach((worker) => worker.terminate());
+        this.busyWorkers.forEach((worker) => {
+            worker.terminate();
+        });
         this.availableWorkers = this.availableWorkers.concat(this.finishedWorkers).concat(this.busyWorkers);
         this.finishedWorkers = [];
         this.busyWorkers = [];

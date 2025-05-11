@@ -305,7 +305,8 @@ export class SpaceStationLayer {
         }
 
         if (this.currentStation === null) {
-            return await alertModal("No current station", this.soundPlayer);
+            await alertModal("No current station", this.soundPlayer);
+            return;
         }
 
         switch (this.mainPanelState) {

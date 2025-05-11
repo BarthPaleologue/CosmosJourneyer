@@ -138,6 +138,10 @@ export class DiscoveryDetails {
         }
 
         const objectModel = getObjectModelById(this.currentDiscovery.objectId.idInSystem, systemModel);
+
+        this.objectName.innerText = objectModel?.name ?? i18n.t("common:unknown");
+        this.htmlRoot.appendChild(this.objectName);
+
         if (objectModel === null) {
             console.error(discovery);
             await alertModal(
@@ -146,13 +150,6 @@ export class DiscoveryDetails {
             );
             return;
         }
-
-        const parentIds = objectModel.orbit.parentIds;
-        const parentModels = parentIds.map((id) => getObjectModelById(id, systemModel));
-        const parentMass = parentModels.reduce((acc, model) => acc + (model?.mass ?? 0), 0);
-
-        this.objectName.innerText = objectModel.name ?? i18n.t("common:unknown");
-        this.htmlRoot.appendChild(this.objectName);
 
         this.objectType.innerText = i18n.t("orbitalObject:type", {
             value: getOrbitalObjectTypeToI18nString(objectModel)
@@ -163,6 +160,10 @@ export class DiscoveryDetails {
             value: parseSecondsPrecise(objectModel.siderealDaySeconds)
         });
         this.htmlRoot.appendChild(this.siderealDayDuration);
+
+        const parentIds = objectModel.orbit.parentIds;
+        const parentModels = parentIds.map((id) => getObjectModelById(id, systemModel));
+        const parentMass = parentModels.reduce((acc, model) => acc + (model?.mass ?? 0), 0);
 
         const orbitalPeriod = getOrbitalPeriod(objectModel.orbit.semiMajorAxis, parentMass);
         this.orbitDuration.innerText = i18n.t("orbit:period", {

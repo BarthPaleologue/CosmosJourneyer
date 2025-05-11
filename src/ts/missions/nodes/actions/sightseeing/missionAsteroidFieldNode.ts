@@ -108,9 +108,6 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType
         }
 
         const targetObject = currentSystem.getOrbitalObjectById(this.objectId.idInSystem);
-        if (targetObject === null) {
-            return;
-        }
 
         const celestialBody = currentSystem.getCelestialBodies().find((body) => body === targetObject);
         if (celestialBody === undefined) {

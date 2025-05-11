@@ -20,96 +20,89 @@ import { getPointOnOrbit } from "../orbit/orbit";
 import { OrbitalObject } from "./orbitalObject";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 
-export class OrbitalObjectUtils {
-    /**
-     * Returns the position of the object on its orbit at a given time. This does not update the position of the object (see SetOrbitalPosition)
-     * @param object The object we want to compute the position of
-     * @param parents
-     * @param elapsedSeconds The time elapsed since the beginning of time in seconds
-     * @constructor
-     */
-    static GetOrbitalPosition(
-        object: OrbitalObject,
-        parents: OrbitalObject[],
-        referencePlaneRotation: Matrix,
-        elapsedSeconds: number
-    ): Vector3 {
-        const orbit = object.model.orbit;
-        if (orbit.semiMajorAxis === 0 || parents.length === 0) return object.getTransform().position;
+/**
+ * Returns the position of the object on its orbit at a given time. This does not update the position of the object (see SetOrbitalPosition)
+ * @param object The object we want to compute the position of
+ * @param parents
+ * @param elapsedSeconds The time elapsed since the beginning of time in seconds
+ * @constructor
+ */
+export function getOrbitalPosition(
+    object: OrbitalObject,
+    parents: OrbitalObject[],
+    referencePlaneRotation: Matrix,
+    elapsedSeconds: number
+): Vector3 {
+    const orbit = object.model.orbit;
+    if (orbit.semiMajorAxis === 0 || parents.length === 0) return object.getTransform().position;
 
-        const barycenter = Vector3.Zero();
-        let sumOfMasses = 0;
-        for (const parent of parents) {
-            const mass = parent.model.mass;
-            barycenter.addInPlace(parent.getTransform().position.scale(mass));
-            sumOfMasses += mass;
-        }
-        barycenter.scaleInPlace(1 / sumOfMasses);
+    const barycenter = Vector3.Zero();
+    let sumOfMasses = 0;
+    for (const parent of parents) {
+        const mass = parent.model.mass;
+        barycenter.addInPlace(parent.getTransform().position.scale(mass));
+        sumOfMasses += mass;
+    }
+    barycenter.scaleInPlace(1 / sumOfMasses);
 
-        return getPointOnOrbit(barycenter, sumOfMasses, orbit, elapsedSeconds, referencePlaneRotation);
+    return getPointOnOrbit(barycenter, sumOfMasses, orbit, elapsedSeconds, referencePlaneRotation);
+}
+
+/**
+ * Sets the position of the object on its orbit given the elapsed seconds.
+ * @param object The object we want to update the position of
+ * @param parents
+ * @param elapsedSeconds The time elapsed since the beginning of time in seconds
+ * @constructor
+ */
+export function setOrbitalPosition(
+    object: OrbitalObject,
+    parents: OrbitalObject[],
+    referencePlaneRotation: Matrix,
+    elapsedSeconds: number
+): void {
+    const orbit = object.model.orbit;
+    if (orbit.semiMajorAxis === 0 || parents.length === 0) return;
+
+    const newPosition = getOrbitalPosition(object, parents, referencePlaneRotation, elapsedSeconds);
+
+    object.getTransform().position = newPosition;
+    object.getTransform().computeWorldMatrix(true);
+}
+
+/**
+ * Computes the rotation angle of the object around its axis for a given time
+ * @param object The object we want to compute the rotation of
+ * @param deltaSeconds The time span in seconds
+ * @constructor
+ */
+export function getRotationAngle(object: OrbitalObject, deltaSeconds: number): number {
+    if (object.model.siderealDaySeconds === 0) return 0;
+    return (2 * Math.PI * deltaSeconds) / object.model.siderealDaySeconds;
+}
+
+/**
+ * Sets the rotation of the object around its axis
+ * @param object The object we want to update the rotation of
+ * @param referencePlaneRotation The rotation of the reference plane
+ * @param elapsedSeconds The time elapsed since the beginning of time in seconds
+ */
+export function setRotation(object: OrbitalObject, referencePlaneRotation: Matrix, elapsedSeconds: number) {
+    const rotation = Matrix.RotationAxis(Axis.Z, object.model.orbit.inclination + object.model.axialTilt);
+
+    rotation.multiplyToRef(referencePlaneRotation, rotation);
+
+    let objectRotationQuaternion = object.getTransform().rotationQuaternion;
+    if (objectRotationQuaternion === null) {
+        objectRotationQuaternion = object.getTransform().rotationQuaternion = Quaternion.Identity();
     }
 
-    /**
-     * Sets the position of the object on its orbit given the elapsed seconds.
-     * @param object The object we want to update the position of
-     * @param parents
-     * @param elapsedSeconds The time elapsed since the beginning of time in seconds
-     * @constructor
-     */
-    static SetOrbitalPosition(
-        object: OrbitalObject,
-        parents: OrbitalObject[],
-        referencePlaneRotation: Matrix,
-        elapsedSeconds: number
-    ): void {
-        const orbit = object.model.orbit;
-        if (orbit.semiMajorAxis === 0 || parents.length === 0) return;
+    Quaternion.FromRotationMatrixToRef(rotation, objectRotationQuaternion);
+    object.getTransform().computeWorldMatrix(true);
 
-        const newPosition = OrbitalObjectUtils.GetOrbitalPosition(
-            object,
-            parents,
-            referencePlaneRotation,
-            elapsedSeconds
-        );
+    const rotationAroundAxis = getRotationAngle(object, elapsedSeconds);
+    if (rotationAroundAxis === 0) return;
 
-        object.getTransform().position = newPosition;
-        object.getTransform().computeWorldMatrix(true);
-    }
-
-    /**
-     * Computes the rotation angle of the object around its axis for a given time
-     * @param object The object we want to compute the rotation of
-     * @param deltaSeconds The time span in seconds
-     * @constructor
-     */
-    static GetRotationAngle(object: OrbitalObject, deltaSeconds: number): number {
-        if (object.model.siderealDaySeconds === 0) return 0;
-        return (2 * Math.PI * deltaSeconds) / object.model.siderealDaySeconds;
-    }
-
-    /**
-     * Sets the rotation of the object around its axis
-     * @param object The object we want to update the rotation of
-     * @param referencePlaneRotation The rotation of the reference plane
-     * @param elapsedSeconds The time elapsed since the beginning of time in seconds
-     */
-    static SetRotation(object: OrbitalObject, referencePlaneRotation: Matrix, elapsedSeconds: number) {
-        const rotation = Matrix.RotationAxis(Axis.Z, object.model.orbit.inclination + object.model.axialTilt);
-
-        rotation.multiplyToRef(referencePlaneRotation, rotation);
-
-        let objectRotationQuaternion = object.getTransform().rotationQuaternion;
-        if (objectRotationQuaternion === null) {
-            objectRotationQuaternion = object.getTransform().rotationQuaternion = Quaternion.Identity();
-        }
-
-        Quaternion.FromRotationMatrixToRef(rotation, objectRotationQuaternion);
-        object.getTransform().computeWorldMatrix(true);
-
-        const rotationAroundAxis = OrbitalObjectUtils.GetRotationAngle(object, elapsedSeconds);
-        if (rotationAroundAxis === 0) return;
-
-        object.getTransform().rotate(Axis.Y, rotationAroundAxis, Space.LOCAL);
-        object.getTransform().computeWorldMatrix(true);
-    }
+    object.getTransform().rotate(Axis.Y, rotationAroundAxis, Space.LOCAL);
+    object.getTransform().computeWorldMatrix(true);
 }

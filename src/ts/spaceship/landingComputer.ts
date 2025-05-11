@@ -92,13 +92,15 @@ type LandingPlanStep = {
     };
 };
 
-export const enum LandingComputerStatusBit {
-    PROGRESS = 1 << 0,
-    COMPLETE = 1 << 1,
-    TIMEOUT = 1 << 2,
-    IDLE = 1 << 3,
-    NO_LANDING_SPOT = 1 << 4
-}
+export const LandingComputerStatusBit = {
+    PROGRESS: 1 << 0,
+    COMPLETE: 1 << 1,
+    TIMEOUT: 1 << 2,
+    IDLE: 1 << 3,
+    NO_LANDING_SPOT: 1 << 4
+} as const;
+
+export type LandingComputerStatusBit = (typeof LandingComputerStatusBit)[keyof typeof LandingComputerStatusBit];
 
 export class LandingComputer {
     private readonly physicsEngine: PhysicsEngineV2;

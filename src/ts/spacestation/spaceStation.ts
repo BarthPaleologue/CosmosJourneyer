@@ -277,13 +277,27 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
     }
 
     update(parents: ReadonlyArray<Transformable>, cameraWorldPosition: Vector3, deltaSeconds: number) {
-        this.solarSections.forEach((solarSection) => solarSection.update(cameraWorldPosition));
-        this.utilitySections.forEach((utilitySection) => utilitySection.update(cameraWorldPosition));
-        this.helixHabitats.forEach((helixHabitat) => helixHabitat.update(cameraWorldPosition, deltaSeconds));
-        this.ringHabitats.forEach((ringHabitat) => ringHabitat.update(cameraWorldPosition, deltaSeconds));
-        this.cylinderHabitats.forEach((cylinderHabitat) => cylinderHabitat.update(cameraWorldPosition, deltaSeconds));
-        this.landingBays.forEach((landingBay) => landingBay.update(cameraWorldPosition, deltaSeconds));
-        this.engineBays.forEach((engineBay) => engineBay.update(cameraWorldPosition));
+        this.solarSections.forEach((solarSection) => {
+            solarSection.update(cameraWorldPosition);
+        });
+        this.utilitySections.forEach((utilitySection) => {
+            utilitySection.update(cameraWorldPosition);
+        });
+        this.helixHabitats.forEach((helixHabitat) => {
+            helixHabitat.update(cameraWorldPosition, deltaSeconds);
+        });
+        this.ringHabitats.forEach((ringHabitat) => {
+            ringHabitat.update(cameraWorldPosition, deltaSeconds);
+        });
+        this.cylinderHabitats.forEach((cylinderHabitat) => {
+            cylinderHabitat.update(cameraWorldPosition, deltaSeconds);
+        });
+        this.landingBays.forEach((landingBay) => {
+            landingBay.update(cameraWorldPosition, deltaSeconds);
+        });
+        this.engineBays.forEach((engineBay) => {
+            engineBay.update(cameraWorldPosition);
+        });
     }
 
     getTransform(): TransformNode {
@@ -291,13 +305,27 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
     }
 
     dispose() {
-        this.solarSections.forEach((solarSection) => solarSection.dispose());
-        this.utilitySections.forEach((utilitySection) => utilitySection.dispose());
-        this.helixHabitats.forEach((helixHabitat) => helixHabitat.dispose());
-        this.ringHabitats.forEach((ringHabitat) => ringHabitat.dispose());
-        this.cylinderHabitats.forEach((cylinderHabitat) => cylinderHabitat.dispose());
-        this.landingBays.forEach((landingBay) => landingBay.dispose());
-        this.engineBays.forEach((engineBay) => engineBay.dispose());
+        this.solarSections.forEach((solarSection) => {
+            solarSection.dispose();
+        });
+        this.utilitySections.forEach((utilitySection) => {
+            utilitySection.dispose();
+        });
+        this.helixHabitats.forEach((helixHabitat) => {
+            helixHabitat.dispose();
+        });
+        this.ringHabitats.forEach((ringHabitat) => {
+            ringHabitat.dispose();
+        });
+        this.cylinderHabitats.forEach((cylinderHabitat) => {
+            cylinderHabitat.dispose();
+        });
+        this.landingBays.forEach((landingBay) => {
+            landingBay.dispose();
+        });
+        this.engineBays.forEach((engineBay) => {
+            engineBay.dispose();
+        });
 
         this.root.dispose();
     }

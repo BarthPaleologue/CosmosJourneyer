@@ -50,8 +50,8 @@ const upDownAction = new Action({
 export const StarMapInputs = new InputMap<{
     focusOnCurrentSystem: PressInteraction;
     move: Action<[number, number]>;
-    changeSpeed: Action<number>;
-    upDown: Action<number>;
+    changeSpeed: Action;
+    upDown: Action;
 }>("StarMapInputs", {
     focusOnCurrentSystem: focusOnCurrentSystemInteraction,
     move: moveAction,

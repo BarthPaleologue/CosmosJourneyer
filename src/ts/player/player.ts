@@ -103,7 +103,7 @@ export class Player {
      * @returns True if the player has visited the object, false otherwise.
      */
     hasVisitedObject(objectId: UniverseObjectId): boolean {
-        return this.visitedObjects.has(JSON.stringify(objectId)) ?? false;
+        return this.visitedObjects.has(JSON.stringify(objectId));
     }
 
     /**

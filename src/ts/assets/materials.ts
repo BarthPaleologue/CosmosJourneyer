@@ -56,14 +56,12 @@ export function initMaterials(textures: Textures, scene: Scene): Materials {
     };
 }
 
-export class MaterialsUtils {
-    static DebugMaterial(name: string, diffuse: boolean, wireframe: boolean, scene: Scene) {
-        const mat = new StandardMaterial(`${name}DebugMaterial`, scene);
-        if (!diffuse) {
-            mat.emissiveColor = Color3.Random();
-            mat.disableLighting = true;
-        } else mat.diffuseColor = Color3.Random();
-        mat.wireframe = wireframe;
-        return mat;
-    }
+export function createDebugMaterial(name: string, diffuse: boolean, wireframe: boolean, scene: Scene) {
+    const mat = new StandardMaterial(`${name}DebugMaterial`, scene);
+    if (!diffuse) {
+        mat.emissiveColor = Color3.Random();
+        mat.disableLighting = true;
+    } else mat.diffuseColor = Color3.Random();
+    mat.wireframe = wireframe;
+    return mat;
 }

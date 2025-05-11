@@ -205,7 +205,9 @@ export class TelluricPlanet
     }
 
     public dispose(ringsLutPool: ItemPool<RingsLut>, cloudsLutPool: ItemPool<CloudsLut>): void {
-        this.sides.forEach((side) => side.dispose());
+        this.sides.forEach((side) => {
+            side.dispose();
+        });
         this.sides.length = 0;
 
         this.cloudsUniforms?.dispose(cloudsLutPool);

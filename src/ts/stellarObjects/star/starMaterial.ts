@@ -47,12 +47,8 @@ export class StarMaterial extends ShaderMaterial {
 
     constructor(seed: number, temperature: number, starLutPool: ItemPool<StarMaterialLut>, scene: Scene) {
         const shaderName = "starMaterial";
-        if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
-            Effect.ShadersStore[`${shaderName}FragmentShader`] = starMaterialFragment;
-        }
-        if (Effect.ShadersStore[`${shaderName}VertexShader`] === undefined) {
-            Effect.ShadersStore[`${shaderName}VertexShader`] = starMaterialVertex;
-        }
+        Effect.ShadersStore[`${shaderName}FragmentShader`] ??= starMaterialFragment;
+        Effect.ShadersStore[`${shaderName}VertexShader`] ??= starMaterialVertex;
 
         super("starColor", scene, shaderName, {
             attributes: ["position"],

@@ -162,9 +162,9 @@ export class LoadingScreen implements ILoadingScreen {
         }
 
         this.loadingDiv.style.position = canvasPositioning === "fixed" ? "fixed" : "absolute";
-        this.loadingDiv.style.left = canvasRect.left + "px";
-        this.loadingDiv.style.top = canvasRect.top + "px";
-        this.loadingDiv.style.width = canvasRect.width + "px";
-        this.loadingDiv.style.height = canvasRect.height + "px";
+        this.loadingDiv.style.left = `${canvasRect.left}px`;
+        this.loadingDiv.style.top = `${canvasRect.top}px`;
+        this.loadingDiv.style.width = `${canvasRect.width}px`;
+        this.loadingDiv.style.height = `${canvasRect.height}px`;
     };
 }

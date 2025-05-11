@@ -132,7 +132,7 @@ export class Spaceship implements Transformable {
         assets: RenderingAssets,
         soundPlayer: ISoundPlayer
     ) {
-        this.id = serializedSpaceShip.id ?? crypto.randomUUID();
+        this.id = serializedSpaceShip.id;
 
         this.name = serializedSpaceShip.name;
 
@@ -752,7 +752,9 @@ export class Spaceship implements Transformable {
         soundPlayer.freeInstance(this.deceleratingWarpDriveSound);
         soundPlayer.freeInstance(this.thrusterSound);
 
-        this.mainThrusters.forEach((thruster) => thruster.dispose());
+        this.mainThrusters.forEach((thruster) => {
+            thruster.dispose();
+        });
         this.mainThrusters.length = 0;
 
         this.warpTunnel.dispose();

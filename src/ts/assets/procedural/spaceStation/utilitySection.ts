@@ -112,10 +112,12 @@ export class UtilitySection implements Transformable {
                 this.tankBodies.push(tankBody);
             });
         } else if (distanceToCamera > 360e3 && this.attachmentAggregate !== null) {
-            this.attachmentAggregate?.dispose();
+            this.attachmentAggregate.dispose();
             this.attachmentAggregate = null;
 
-            this.tankBodies.forEach((tankBody) => tankBody.dispose());
+            this.tankBodies.forEach((tankBody) => {
+                tankBody.dispose();
+            });
             this.tankBodies.length = 0;
         }
     }
@@ -128,7 +130,11 @@ export class UtilitySection implements Transformable {
         this.attachment.dispose();
         this.attachmentAggregate?.dispose();
         this.metalSectionMaterial.dispose();
-        this.tanks.forEach((tank) => tank.dispose());
-        this.tankBodies.forEach((tankAggregate) => tankAggregate.dispose());
+        this.tanks.forEach((tank) => {
+            tank.dispose();
+        });
+        this.tankBodies.forEach((tankAggregate) => {
+            tankAggregate.dispose();
+        });
     }
 }

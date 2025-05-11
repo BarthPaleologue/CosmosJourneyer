@@ -184,23 +184,29 @@ export class StarMap implements View {
         });
 
         this.starMapUI.shortHandUIPlotItineraryButton.addEventListener("click", async () => {
-            if (this.currentSystemCoordinates === null)
-                return await alertModal("current system seed is null!", this.soundPlayer);
-            if (this.selectedSystemCoordinates === null)
-                return await alertModal("selected system seed is null!", this.soundPlayer);
+            if (this.currentSystemCoordinates === null) {
+                await alertModal("current system seed is null!", this.soundPlayer);
+                return;
+            }
+            if (this.selectedSystemCoordinates === null) {
+                await alertModal("selected system seed is null!", this.soundPlayer);
+                return;
+            }
 
             const playerCurrentSpaceship = this.player.instancedSpaceships.at(0);
             if (playerCurrentSpaceship === undefined) {
-                return await alertModal("You do not own a spaceship! What have you done???", this.soundPlayer);
+                await alertModal("You do not own a spaceship! What have you done???", this.soundPlayer);
+                return;
             }
 
             const warpDrive = playerCurrentSpaceship.getInternals().getWarpDrive();
 
             if (warpDrive === null) {
-                return await alertModal(
+                await alertModal(
                     "Your current spaceship has no warp drive! Install a warp drive to plot an itinerary.",
                     this.soundPlayer
                 );
+                return;
             }
 
             const jumpRange = warpDrive.rangeLY;
@@ -608,7 +614,7 @@ export class StarMap implements View {
             })
         );
 
-        initializedInstance.actionManager?.registerAction(
+        initializedInstance.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPickTrigger, () => {
                 this.soundPlayer.playNow(SoundType.TARGET_LOCK);
 
@@ -628,7 +634,10 @@ export class StarMap implements View {
     }
 
     public focusOnCurrentSystem(skipAnimation = false) {
-        if (this.currentSystemCoordinates === null) return console.warn("No current system seed!");
+        if (this.currentSystemCoordinates === null) {
+            console.warn("No current system seed!");
+            return;
+        }
         this.focusOnSystem(this.currentSystemCoordinates, skipAnimation);
     }
 

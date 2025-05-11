@@ -494,7 +494,9 @@ export class StarSystemView implements View {
         this._isLoadingSystem = true;
 
         if (this.starSystem !== null) {
-            this.aiPlayers.forEach((aiPlayer) => aiPlayer.dispose(this.soundPlayer));
+            this.aiPlayers.forEach((aiPlayer) => {
+                aiPlayer.dispose(this.soundPlayer);
+            });
             this.aiPlayers.length = 0;
 
             this.spaceshipControls?.setClosestLandableFacility(null);

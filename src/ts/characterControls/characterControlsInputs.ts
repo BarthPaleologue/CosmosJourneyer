@@ -49,8 +49,8 @@ const toggleCameraInteraction = new PressInteraction(
 export const CharacterInputs = new InputMap<{
     move: Action<[number, number]>;
     jump: PressInteraction;
-    samba: Action<number>;
-    run: Action<number>;
+    samba: Action;
+    run: Action;
     toggleCamera: PressInteraction;
 }>("CharacterInputs", {
     move: moveAction,

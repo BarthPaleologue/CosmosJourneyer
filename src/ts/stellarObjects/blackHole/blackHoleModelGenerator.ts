@@ -24,19 +24,20 @@ import { GenerationSteps } from "../../utils/generationSteps";
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { estimateStarRadiusFromMass } from "../../utils/physics";
 import { BlackHoleModel } from "./blackHoleModel";
+import { DeepReadonly } from "../../utils/types";
 
 export function newSeededBlackHoleModel(
     id: string,
     seed: number,
     name: string,
-    parentBodies: CelestialBodyModel[]
+    parentBodies: DeepReadonly<Array<CelestialBodyModel>>
 ): BlackHoleModel {
     const rng = getRngFromSeed(seed);
 
     //FIXME: do not hardcode
     const radius = 1000e3;
 
-    const parentMaxRadius = parentBodies?.reduce((max, body) => Math.max(max, body.radius), 0) ?? 0;
+    const parentMaxRadius = parentBodies.reduce((max, body) => Math.max(max, body.radius), 0);
 
     // TODO: do not hardcode
     const orbitRadius = parentBodies.length === 0 ? 0 : 2 * (parentMaxRadius + radius);
@@ -127,7 +128,7 @@ export function getErgosphereRadius(mass: number, rotationPeriod: number, theta:
     const a = getKerrMetricA(mass, rotationPeriod);
     const cosTheta = Math.cos(theta);
 
-    if (a > m) throw new Error("Black hole angular momentum exceeds maximum value for a Kerr black hole. a > m: " + a);
+    if (a > m) throw new Error(`Black hole angular momentum exceeds maximum value for a Kerr black hole. a > m: ${a}`);
 
     return m + Math.sqrt(m * m - a * a * cosTheta * cosTheta);
 }

@@ -70,11 +70,11 @@ export async function createRingsScene(
 
     const ringsUniforms = new RingsUniforms(ringsModel, 0, ringsLutPool, scene);
 
-    await new Promise<void>((resolve) =>
+    await new Promise<void>((resolve) => {
         ringsUniforms.lut.getTexture().executeWhenReady(() => {
             resolve();
-        })
-    );
+        });
+    });
 
     const rings = new RingsPostProcess(sphere, ringsUniforms, { name: "Sphere", radius: 1 * scalingFactor }, [], scene);
     camera.attachPostProcess(rings);

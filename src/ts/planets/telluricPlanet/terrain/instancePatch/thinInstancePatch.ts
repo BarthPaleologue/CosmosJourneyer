@@ -101,7 +101,9 @@ export class ThinInstancePatch implements IPatch {
 
     public dispose() {
         this.clearInstances();
-        this.lods.forEach((lod) => lod.mesh.dispose());
+        this.lods.forEach((lod) => {
+            lod.mesh.dispose();
+        });
         this.lods.length = 0;
     }
 }

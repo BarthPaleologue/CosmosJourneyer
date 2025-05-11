@@ -148,11 +148,14 @@ describe("LandingPadManager", () => {
         // Allocate a pad
         const request: LandingRequest = { minimumPadSize: LandingPadSize.MEDIUM };
         const assignedPad = landingPadManager.handleLandingRequest(request);
+        if (assignedPad === null) {
+            throw new Error("Assigned pad is null");
+        }
 
         expect(landingPadManager.getAvailableLandingPads().length).toBe(2);
 
         // Cancel the request
-        landingPadManager.cancelLandingRequest(assignedPad!);
+        landingPadManager.cancelLandingRequest(assignedPad);
 
         // The pad should be available again
         expect(landingPadManager.getAvailableLandingPads().length).toBe(3);
@@ -166,9 +169,12 @@ describe("LandingPadManager", () => {
         // Should get medium pad, not large
         const assignedPad = landingPadManager.handleLandingRequest(request);
         expect(assignedPad).toBe(mediumPad);
+        if (assignedPad !== mediumPad) {
+            throw new Error("Assigned pad is not the expected medium pad");
+        }
 
         // Make medium unavailable
-        landingPadManager.cancelLandingRequest(assignedPad!);
+        landingPadManager.cancelLandingRequest(assignedPad);
 
         // Now make both small and medium unavailable
         landingPadManager.handleLandingRequest({ minimumPadSize: LandingPadSize.SMALL });

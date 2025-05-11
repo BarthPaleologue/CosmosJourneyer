@@ -39,11 +39,16 @@ import {
     Planet,
     StellarObject
 } from "../architecture/orbitalObject";
-import { OrbitalObjectUtils } from "../architecture/orbitalObjectUtils";
 import { OrbitalObjectId } from "../utils/coordinates/orbitalObjectId";
 import { StarSystemLoader } from "./starSystemLoader";
 import { DeepReadonly, NonEmptyArray } from "../utils/types";
 import { RenderingAssets } from "../assets/renderingAssets";
+import {
+    getOrbitalPosition,
+    getRotationAngle,
+    setOrbitalPosition,
+    setRotation
+} from "@/architecture/orbitalObjectUtils";
 
 export type PlanetarySystem = {
     readonly planets: Planet[];
@@ -388,8 +393,6 @@ export class StarSystemController {
             controlsPosition
         );
 
-        const shouldCompensateTranslation = true;
-
         // compensate rotation when close to the body
         let shouldCompensateRotation = distanceOfNearestToControls < nearestOrbitalObject.getBoundingRadius() * 3;
         if (nearestOrbitalObject === nearestCelestialBody && ringUniforms !== null) {
@@ -404,7 +407,7 @@ export class StarSystemController {
         // ROTATION COMPENSATION
         // If we have to compensate the rotation of the nearest body, we must rotate the reference plane instead
         if (shouldCompensateRotation) {
-            const dThetaNearest = OrbitalObjectUtils.GetRotationAngle(nearestOrbitalObject, deltaSeconds);
+            const dThetaNearest = getRotationAngle(nearestOrbitalObject, deltaSeconds);
 
             const nearestObjectRotationAxis = nearestOrbitalObject.getTransform().up.clone();
             Vector3.TransformNormalToRef(
@@ -422,7 +425,7 @@ export class StarSystemController {
             this.referencePlaneRotation.transposeToRef(this.starFieldBox.getRotationMatrix());
         } else {
             // if we don't compensate the rotation of the nearest body, we must simply update its rotation
-            OrbitalObjectUtils.SetRotation(nearestOrbitalObject, this.referencePlaneRotation, this.elapsedSeconds);
+            setRotation(nearestOrbitalObject, this.referencePlaneRotation, this.elapsedSeconds);
         }
 
         // TRANSLATION COMPENSATION
@@ -434,7 +437,7 @@ export class StarSystemController {
         if (nearestObjectParents === undefined) {
             throw new Error("Nearest object parents are not defined");
         }
-        const newPosition = OrbitalObjectUtils.GetOrbitalPosition(
+        const newPosition = getOrbitalPosition(
             nearestOrbitalObject,
             nearestObjectParents,
             this.referencePlaneRotation,
@@ -442,20 +445,15 @@ export class StarSystemController {
         );
 
         const nearestBodyDisplacement = newPosition.subtract(initialPosition);
-        if (shouldCompensateTranslation) {
-            const negatedDisplacement = nearestBodyDisplacement.negate();
-            for (const object of orbitalObjects) {
-                if (object === nearestOrbitalObject) continue;
+        const negatedDisplacement = nearestBodyDisplacement.negate();
+        for (const object of orbitalObjects) {
+            if (object === nearestOrbitalObject) continue;
 
-                // the body is translated so that the nearest body can stay in place
-                translate(object.getTransform(), negatedDisplacement);
-            }
-
-            this.referencePosition.addInPlace(negatedDisplacement);
-        } else {
-            // if we don't compensate the translation of the nearest body, we must simply update its position
-            translate(nearestOrbitalObject.getTransform(), nearestBodyDisplacement);
+            // the body is translated so that the nearest body can stay in place
+            translate(object.getTransform(), negatedDisplacement);
         }
+
+        this.referencePosition.addInPlace(negatedDisplacement);
 
         // then, all other objects are updated normally
         for (const object of orbitalObjects) {
@@ -466,8 +464,8 @@ export class StarSystemController {
                 throw new Error(`Parents of ${object.model.name} are not defined`);
             }
 
-            OrbitalObjectUtils.SetOrbitalPosition(object, parents, this.referencePlaneRotation, this.elapsedSeconds);
-            OrbitalObjectUtils.SetRotation(object, this.referencePlaneRotation, this.elapsedSeconds);
+            setOrbitalPosition(object, parents, this.referencePlaneRotation, this.elapsedSeconds);
+            setRotation(object, this.referencePlaneRotation, this.elapsedSeconds);
         }
 
         for (const systemTarget of this.systemTargets) {
@@ -601,13 +599,25 @@ export class StarSystemController {
 
         const pools = this.assets.textures.pools;
 
-        this.orbitalFacilities.forEach((facility) => facility.dispose());
-        this.anomalies.forEach((anomaly) => anomaly.dispose());
-        this.satellites.forEach((satellite) => satellite.dispose(pools.ringsLut, pools.cloudsLut));
-        this.planets.forEach((planet) => planet.dispose(pools.ringsLut, pools.cloudsLut));
-        this.stellarObjects.forEach((stellarObject) => stellarObject.dispose(pools.ringsLut));
+        this.orbitalFacilities.forEach((facility) => {
+            facility.dispose();
+        });
+        this.anomalies.forEach((anomaly) => {
+            anomaly.dispose();
+        });
+        this.satellites.forEach((satellite) => {
+            satellite.dispose(pools.ringsLut, pools.cloudsLut);
+        });
+        this.planets.forEach((planet) => {
+            planet.dispose(pools.ringsLut, pools.cloudsLut);
+        });
+        this.stellarObjects.forEach((stellarObject) => {
+            stellarObject.dispose(pools.ringsLut);
+        });
 
-        this.systemTargets.forEach((target) => target.dispose());
+        this.systemTargets.forEach((target) => {
+            target.dispose();
+        });
         this.systemTargets.length = 0;
 
         this.starFieldBox.dispose();
