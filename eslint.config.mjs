@@ -1,63 +1,35 @@
-import { fixupConfigRules, fixupPluginRules } from "@eslint/compat";
-import typescriptEslint from "@typescript-eslint/eslint-plugin";
-import globals from "globals";
-import tsParser from "@typescript-eslint/parser";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import js from "@eslint/js";
-import { FlatCompat } from "@eslint/eslintrc";
+import eslint from "@eslint/js";
+import { defineConfig, globalIgnores } from "eslint/config";
+import tseslint from "typescript-eslint";
+import importPlugin from "eslint-plugin-import";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const compat = new FlatCompat({
-    baseDirectory: __dirname,
-    recommendedConfig: js.configs.recommended,
-    allConfig: js.configs.all
-});
-
-export default [
+export default defineConfig([
+    globalIgnores([
+        "src/ts/utils/TWGSL/**",
+        "src-tauri",
+        "rspack.config.js",
+        "tsconfig.json",
+        "eslint.config.mjs",
+        "dist",
+        "doc",
+        "src/asset",
+        "coverage"
+    ]),
+    eslint.configs.recommended,
+    ...tseslint.configs.recommendedTypeChecked,
+    importPlugin.flatConfigs.recommended,
+    importPlugin.flatConfigs.typescript,
     {
-        ignores: [
-            "src/ts/utils/TWGSL",
-            "node_modules",
-            "src-tauri",
-            "rspack.config.js",
-            "tsconfig.json",
-            "eslint.config.mjs",
-            "dist",
-            "doc",
-            "src/asset",
-            "coverage"
-        ]
-    },
-    ...fixupConfigRules(
-        compat.extends(
-            "eslint:recommended",
-            "plugin:@typescript-eslint/recommended-type-checked",
-            "plugin:import/errors",
-            "plugin:import/warnings",
-            "plugin:import/typescript"
-        )
-    ),
-    {
-        plugins: {
-            "@typescript-eslint": fixupPluginRules(typescriptEslint)
-        },
-
         languageOptions: {
-            globals: {
-                ...globals.browser
-            },
-
-            parser: tsParser,
-            ecmaVersion: "latest",
-            sourceType: "module",
-
             parserOptions: {
-                project: "./tsconfig.json"
-            }
-        },
-
+                projectService: true,
+                tsconfigRootDir: import.meta.dirname
+            },
+            ecmaVersion: "latest",
+            sourceType: "module"
+        }
+    },
+    {
         rules: {
             "import/no-cycle": "error",
             "import/no-unresolved": "warn",
@@ -74,8 +46,10 @@ export default [
                 }
             ],
 
+            // enforce ===
             eqeqeq: "error",
 
+            // no Promise.reject()
             "no-restricted-syntax": [
                 "error",
                 {
@@ -84,12 +58,10 @@ export default [
                 }
             ],
 
+            // naming conventions
             "@typescript-eslint/naming-convention": [
                 "error",
-                {
-                    selector: "enumMember",
-                    format: ["UPPER_CASE"]
-                },
+                { selector: "enumMember", format: ["UPPER_CASE"] },
                 {
                     selector: "memberLike",
                     modifiers: ["public", "static"],
@@ -102,10 +74,7 @@ export default [
                     format: ["PascalCase", "UPPER_CASE"],
                     leadingUnderscore: "forbid"
                 },
-                {
-                    selector: "typeLike",
-                    format: ["PascalCase"]
-                },
+                { selector: "typeLike", format: ["PascalCase"] },
                 {
                     selector: "variable",
                     modifiers: ["exported", "const", "global"],
@@ -123,17 +92,9 @@ export default [
                     format: ["camelCase"],
                     leadingUnderscore: "forbid"
                 },
-                {
-                    selector: "interface",
-                    format: ["PascalCase"],
-                    leadingUnderscore: "forbid"
-                },
-                {
-                    selector: "class",
-                    format: ["PascalCase"],
-                    leadingUnderscore: "forbid"
-                }
+                { selector: "interface", format: ["PascalCase"], leadingUnderscore: "forbid" },
+                { selector: "class", format: ["PascalCase"], leadingUnderscore: "forbid" }
             ]
         }
     }
-];
+]);
