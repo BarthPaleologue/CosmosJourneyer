@@ -8,6 +8,11 @@ import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
 test("Loading a correct save file", () => {
     const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
     const shipId = crypto.randomUUID();
+    const fallbackStation = starSystemDatabase.fallbackSystem.orbitalFacilities[0];
+    if (fallbackStation === undefined) {
+        throw new Error("Fallback station is undefined!");
+    }
+
     const saveFileString: DeepPartial<SaveV2> = {
         player: {
             name: "Python",
@@ -77,7 +82,7 @@ test("Loading a correct save file", () => {
             currentMissions: [
                 {
                     missionGiver: {
-                        idInSystem: starSystemDatabase.fallbackSystem.orbitalFacilities[0].id,
+                        idInSystem: fallbackStation.id,
                         systemCoordinates: {
                             starSectorX: 0,
                             starSectorY: 0,

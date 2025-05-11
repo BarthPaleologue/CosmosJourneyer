@@ -27,7 +27,7 @@ import { Direction, getQuaternionFromDirection } from "./direction";
 export function getChunkPlaneSpacePositionFromPath(chunkLength: number, path: number[]): Vector3 {
     let x = 0;
     let y = 0;
-    for (let i = 0; i < path.length; ++i) {
+    for (const [i, pathValue] of path.entries()) {
         /*
             3   2
               +
@@ -35,7 +35,7 @@ export function getChunkPlaneSpacePositionFromPath(chunkLength: number, path: nu
         */
         // offset to get to the center of the children from the center of the current chunk
         // (chunkLength / 2) / (2 ** (i + 1)) est la moitié de la taille d'un chunk enfant (offset) donc on simplifie pas : c'est plus clair ainsi
-        switch (path[i]) {
+        switch (pathValue) {
             case 0:
                 x -= chunkLength / 2 / 2 ** (i + 1);
                 y -= chunkLength / 2 / 2 ** (i + 1);
@@ -53,7 +53,7 @@ export function getChunkPlaneSpacePositionFromPath(chunkLength: number, path: nu
                 y += chunkLength / 2 / 2 ** (i + 1);
                 break;
             default:
-                throw new Error(`${path[i]} is not a valid index for a child of a quadtree node !`);
+                throw new Error(`${pathValue} is not a valid index for a child of a quadtree node !`);
         }
     }
     return new Vector3(x, y, 0);

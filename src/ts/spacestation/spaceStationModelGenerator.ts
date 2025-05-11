@@ -87,7 +87,13 @@ export function newSeededSpaceStationModel(
     const populationDensity = 4_000;
 
     const mix = randomPieChart(CropTypes.length, rng, 498);
-    const agricultureMix: [number, CropType][] = mix.map((proportion, index) => [proportion, CropTypes[index]]);
+    const agricultureMix: [number, CropType][] = mix.map((proportion, index) => {
+        const cropType = CropTypes[index];
+        if (cropType === undefined) {
+            throw new Error("CropTypes out of bound!");
+        }
+        return [proportion, cropType];
+    });
 
     const nbHydroponicLayers = 10;
 

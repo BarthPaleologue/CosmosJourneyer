@@ -63,7 +63,12 @@ export class MusicConductor {
             return;
         }
 
-        this.setMusic(musicSelection[Math.floor(Math.random() * musicSelection.length)]);
+        const selectedMusic = musicSelection[Math.floor(Math.random() * musicSelection.length)];
+        if (selectedMusic === undefined) {
+            return;
+        }
+
+        this.setMusic(selectedMusic);
     }
 
     public setMusic(newMusic: Sound | null) {

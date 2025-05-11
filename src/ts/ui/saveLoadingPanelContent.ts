@@ -64,6 +64,11 @@ export class SaveLoadingPanelContent {
             if (event.dataTransfer.files.length === 0) throw new Error("event.dataTransfer.files is empty");
 
             const file = event.dataTransfer.files[0];
+            if (file === undefined) {
+                await alertModal("No file dropped", this.soundPlayer);
+                return;
+            }
+
             await this.loadSaveFile(file, starSystemDatabase);
         });
 
@@ -75,7 +80,13 @@ export class SaveLoadingPanelContent {
             fileInput.onchange = async () => {
                 if (fileInput.files === null) throw new Error("fileInput.files is null");
                 if (fileInput.files.length === 0) throw new Error("fileInput.files is empty");
+
                 const file = fileInput.files[0];
+                if (file === undefined) {
+                    await alertModal("No file selected", this.soundPlayer);
+                    return;
+                }
+
                 await this.loadSaveFile(file, starSystemDatabase);
             };
             fileInput.click();
@@ -112,7 +123,9 @@ export class SaveLoadingPanelContent {
 
         cmdrUuids.forEach((cmdrUuid) => {
             const cmdrSaves = saveManager.getSavesForCmdr(cmdrUuid);
-            if (cmdrSaves === undefined) return;
+            if (cmdrSaves === undefined) {
+                return;
+            }
 
             const cmdrDiv = document.createElement("div");
             cmdrDiv.classList.add("cmdr");
@@ -122,6 +135,9 @@ export class SaveLoadingPanelContent {
             allCmdrSaves.sort((a, b) => b.timestamp - a.timestamp);
 
             const latestSave = allCmdrSaves[0];
+            if (latestSave === undefined) {
+                return;
+            }
 
             const cmdrHeader = document.createElement("div");
             cmdrHeader.classList.add("cmdrHeader");
@@ -278,6 +294,9 @@ export class SaveLoadingPanelContent {
             save.playerLocation.type === "inSpaceship"
                 ? save.shipLocations[save.playerLocation.shipId]
                 : save.playerLocation;
+        if (locationToUse === undefined) {
+            throw new Error("locationToUse is undefined");
+        }
         if (locationToUse.type === "inSpaceship") {
             throw new Error("Spaceship inside a spaceship is not supported yet");
         }

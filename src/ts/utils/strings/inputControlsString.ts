@@ -31,6 +31,11 @@ export function dPadCompositeToString(
         }
         keys.push([key, name]);
     });
+
+    if (keys[0] === undefined || keys[1] === undefined || keys[2] === undefined || keys[3] === undefined) {
+        throw new Error("DPadComposite keys are undefined");
+    }
+
     return [keys[2], keys[0], keys[3], keys[1]];
 }
 

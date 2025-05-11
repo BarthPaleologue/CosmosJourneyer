@@ -153,7 +153,8 @@ export class TutorialLayer implements IDisposable {
     }
 
     private updatePanelState() {
-        this.contentContainer.innerHTML = this.tutorialPanelsHtml[this.currentPanelIndex];
+        this.contentContainer.innerHTML =
+            this.tutorialPanelsHtml[this.currentPanelIndex] ?? "ERROR: panels out of bounds";
 
         this.prevButton.classList.toggle("disabled", this.currentPanelIndex === 0);
     }

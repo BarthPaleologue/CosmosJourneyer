@@ -42,7 +42,7 @@ import { clamp, remap, triangleWave } from "../utils/math";
 import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
 import { setUpVector } from "../uberCore/transforms/basicTransform";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
-import { DeepReadonly } from "../utils/types";
+import { DeepReadonly, NonEmptyArray } from "../utils/types";
 import { LandingPadManager } from "./landingPad/landingPadManager";
 import { getSphereRadiatedEnergyFlux } from "../utils/physics";
 import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
@@ -314,11 +314,11 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
     }
 
     update(parents: ReadonlyArray<Transformable>, cameraWorldPosition: Vector3, deltaSeconds: number) {
-        if (parents.length !== 1) {
+        const parent = parents[0];
+        if (parent === undefined) {
             throw new Error("Space Elevator should have exactly one parent");
         }
 
-        const parent = parents[0];
         const upDirection = this.getTransform().position.subtract(parent.getTransform().position).normalize();
         setUpVector(this.getTransform(), upDirection);
 

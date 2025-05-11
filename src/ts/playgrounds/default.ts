@@ -47,7 +47,7 @@ export async function createDefaultScene(
     sphere.position.y = 1;
 
     // Our built-in 'ground' shape. Params: name, options, scene
-    const ground = MeshBuilder.CreateGround("ground", { width: 6, height: 6 }, scene);
+    MeshBuilder.CreateGround("ground", { width: 6, height: 6 }, scene);
 
     progressCallback(1, "Loaded default scene");
 

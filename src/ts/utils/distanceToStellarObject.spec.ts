@@ -127,7 +127,14 @@ describe("distanceToStellarObject", () => {
 
     it("should be true", () => {
         const station = systemModel.orbitalFacilities[0];
-        const parent = getObjectModelById(station.orbit.parentIds[0], systemModel);
+        if (station === undefined) {
+            throw new Error("Station is undefined");
+        }
+        const parentId = station.orbit.parentIds[0];
+        if (parentId === undefined) {
+            throw new Error("Parent ID is undefined");
+        }
+        const parent = getObjectModelById(parentId, systemModel);
         expect(parent).not.toBeNull();
         const distances = getDistancesToStellarObjects(station, systemModel);
         expect(distances.size).toBe(1);

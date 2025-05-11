@@ -118,8 +118,8 @@ describe("SaveManager", () => {
 
             expect(result.success).toBe(true);
             if (result.success) {
-                expect(result.value.getSavesForCmdr("cmdr1")).toEqual(testSaves.cmdr1);
-                expect(result.value.getSavesForCmdr("cmdr2")).toEqual(testSaves.cmdr2);
+                expect(result.value.getSavesForCmdr("cmdr1")).toEqual(testSaves["cmdr1"]);
+                expect(result.value.getSavesForCmdr("cmdr2")).toEqual(testSaves["cmdr2"]);
             }
         });
 
@@ -156,7 +156,7 @@ describe("SaveManager", () => {
             expect(result.success).toBe(true);
             if (result.success) {
                 const manager = result.value;
-                expect(manager.getSavesForCmdr("cmdr1")).toEqual(testSaves.cmdr1);
+                expect(manager.getSavesForCmdr("cmdr1")).toEqual(testSaves["cmdr1"]);
             }
         });
 

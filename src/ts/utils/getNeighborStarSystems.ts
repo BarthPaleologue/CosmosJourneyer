@@ -64,7 +64,12 @@ export function getNeighborStarSystemCoordinates(
         return starPositions
             .map<[StarSystemCoordinates, Vector3, number]>((position, index) => {
                 const distance = Vector3.Distance(position, currentSystemPosition);
-                return [systemCoordinates[index], position, distance];
+                const coordinates = systemCoordinates[index];
+                if (coordinates === undefined) {
+                    throw new Error("Coordinates not found for the given index");
+                }
+
+                return [coordinates, position, distance];
             })
             .filter(([neighborCoordinates, position, distance]) => {
                 return distance <= radius && !starSystemCoordinatesEquals(neighborCoordinates, starSystemCoordinates);

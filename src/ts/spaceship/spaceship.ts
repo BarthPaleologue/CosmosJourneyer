@@ -561,7 +561,7 @@ export class Spaceship implements Transformable {
             }
         }
 
-        warpDrive.update(currentForwardSpeed, closestDistance, objectHalfThickness, deltaSeconds);
+        warpDrive.update(closestDistance, objectHalfThickness, deltaSeconds);
 
         // the warp throttle goes from 0.1 to 1 smoothly using an inverse function
         if (warpDrive.isEnabled()) this.warpTunnel.setThrottle(1 - 1 / (1.1 * (1 + 1e-7 * warpDrive.getWarpSpeed())));

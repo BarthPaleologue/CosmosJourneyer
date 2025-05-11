@@ -44,18 +44,25 @@ export class MissionSequenceNode implements MissionNodeBase<MissionNodeType.SEQU
     equals(other: MissionNode): boolean {
         if (!(other instanceof MissionSequenceNode)) return false;
         if (this.children.length !== other.children.length) return false;
-        for (let i = 0; i < this.children.length; i++) {
-            if (!this.children[i].equals(other.children[i])) return false;
+        for (const [i, thisChild] of this.children.entries()) {
+            const otherChild = other.children[i];
+            if (otherChild === undefined) {
+                continue;
+            }
+            if (!thisChild.equals(otherChild)) return false;
         }
         return true;
     }
 
     updateState(context: MissionContext) {
         if (this.hasCompletedLock) return;
-        if (this.activeChildIndex >= this.children.length) return;
-        const child = this.children[this.activeChildIndex];
-        child.updateState(context);
-        if (child.isCompleted()) {
+        const activeChild = this.children[this.activeChildIndex];
+        if (activeChild === undefined) {
+            return;
+        }
+
+        activeChild.updateState(context);
+        if (activeChild.isCompleted()) {
             this.activeChildIndex++;
         }
 
@@ -85,12 +92,18 @@ export class MissionSequenceNode implements MissionNodeBase<MissionNodeType.SEQU
         starSystemDatabase: StarSystemDatabase
     ): string {
         if (this.hasCompletedLock) return "Mission completed";
-        if (this.activeChildIndex >= this.children.length) return "Mission completed";
-        return this.children[this.activeChildIndex].describeNextTask(context, keyboardLayout, starSystemDatabase);
+        const activeChild = this.children[this.activeChildIndex];
+        if (activeChild === undefined) return "Mission error: activeChildIndex out of bounds";
+        return activeChild.describeNextTask(context, keyboardLayout, starSystemDatabase);
     }
 
     getTargetSystems(): StarSystemCoordinates[] {
-        return this.children[this.activeChildIndex].getTargetSystems();
+        const activeChild = this.children[this.activeChildIndex];
+        if (activeChild === undefined) {
+            return [];
+        }
+
+        return activeChild.getTargetSystems();
     }
 
     serialize(): MissionSequenceNodeSerialized {

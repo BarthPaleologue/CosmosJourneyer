@@ -152,8 +152,7 @@ export class StellarPathfinder {
         }
 
         const neighborsWithDistances = this.getNeighbors(currentNode);
-        for (let i = 0; i < neighborsWithDistances.length; i++) {
-            const [neighbor, distance] = neighborsWithDistances[i];
+        for (const [neighbor, distance] of neighborsWithDistances) {
             if (this.closedList.find((node) => starSystemCoordinatesEquals(node.coordinates, neighbor.coordinates))) {
                 // if the neighbor is already in the closed list, skip it
                 continue;

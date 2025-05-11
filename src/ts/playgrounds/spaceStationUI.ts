@@ -79,6 +79,9 @@ export async function createSpaceStationUIScene(
     const spaceStationUI = new SpaceStationLayer(player, encyclopaedia, systemDatabase, soundPlayer);
 
     const stationModel = systemModel.orbitalFacilities[0];
+    if (stationModel === undefined) {
+        throw new Error("No station found in system model");
+    }
 
     spaceStationUI.setStation(stationModel, [], player);
     spaceStationUI.setVisibility(true);

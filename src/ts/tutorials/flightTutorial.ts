@@ -75,7 +75,7 @@ export class FlightTutorial implements Tutorial {
             <p>${i18n.t("tutorials:flightTutorial:spaceShipRotationText3")}</p>
         </div>`;
 
-        const control = SpaceShipControlsInputs.map.throttle.bindings[0].control;
+        const control = SpaceShipControlsInputs.map.throttle.bindings[0]?.control;
         if (!(control instanceof AxisComposite)) {
             throw new Error("Expected control to be an AxisComposite");
         }
@@ -85,8 +85,8 @@ export class FlightTutorial implements Tutorial {
         <div class="tutorialContent">
             <h2>${i18n.t("tutorials:flightTutorial:spaceShipThrustTitle")}</h2>
             <p>${i18n.t("tutorials:flightTutorial:spaceShipThrustText1", {
-                keyIncrease: throttleStrings[1][1],
-                keyDecrease: throttleStrings[0][1],
+                keyIncrease: throttleStrings[1]?.[1],
+                keyDecrease: throttleStrings[0]?.[1],
                 keyKill: pressInteractionToStrings(SpaceShipControlsInputs.map.throttleToZero, keybordLayoutMap).join(
                     ` ${i18n.t("common:or")} `
                 )

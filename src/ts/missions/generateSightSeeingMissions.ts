@@ -124,12 +124,12 @@ function generateAnomalyFlyByMissionsInSystem(
     starSystemDatabase: StarSystemDatabase
 ): ReadonlyArray<Mission> {
     const missions: Array<Mission> = [];
-    for (let anomalyIndex = 0; anomalyIndex < systemModel.anomalies.length; anomalyIndex++) {
+    for (const [anomalyIndex, anomaly] of systemModel.anomalies.entries()) {
         if (!uniformRandBool(1.0 / (1.0 + 1.5 * distance), rng, 38 + anomalyIndex + systemPosition.length())) {
             continue;
         }
 
-        if (systemModel.anomalies[anomalyIndex].type === OrbitalObjectType.DARK_KNIGHT) {
+        if (anomaly.type === OrbitalObjectType.DARK_KNIGHT) {
             continue;
         }
 
@@ -139,7 +139,7 @@ function generateAnomalyFlyByMissionsInSystem(
                 type: MissionType.SIGHT_SEEING_FLY_BY,
                 objectId: {
                     systemCoordinates: systemModel.coordinates,
-                    idInSystem: systemModel.anomalies[anomalyIndex].id
+                    idInSystem: anomaly.id
                 }
             },
             starSystemDatabase

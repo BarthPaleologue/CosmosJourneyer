@@ -77,9 +77,9 @@ class ColourSystem {
 
 /* White point chromaticities. */
 
-const IlluminantC = [0.3101, 0.3162]; /* For NTSC television */
-const IlluminantD65 = [0.3127, 0.3291]; /* For EBU and SMPTE */
-const IlluminantE = [0.33333333, 0.33333333]; /* CIE equal-energy illuminant */
+const IlluminantC = [0.3101, 0.3162] as const; /* For NTSC television */
+const IlluminantD65 = [0.3127, 0.3291] as const; /* For EBU and SMPTE */
+const IlluminantE = [0.33333333, 0.33333333] as const; /* CIE equal-energy illuminant */
 
 /*  Gamma of nonlinear correction.
  
@@ -210,7 +210,7 @@ function xy_to_upvp(xc: number, yc: number): number[] {
 
 */
 
-function xyz_to_rgb(cs: ColourSystem, xc: number, yc: number, zc: number): number[] {
+function xyz_to_rgb(cs: ColourSystem, xc: number, yc: number, zc: number): [number, number, number] {
     const xr = cs.xRed;
     const yr = cs.yRed;
     const zr = 1 - (xr + yr);
@@ -287,7 +287,7 @@ function inside_gamut(r: number, g: number, b: number): boolean {
 
 */
 
-function constrain_rgb(r: number, g: number, b: number): number[] {
+function constrain_rgb(r: number, g: number, b: number): [number, number, number] {
     let w: number;
 
     /* Amount of white needed is w = - min(0, *r, *g, *b) */
@@ -349,7 +349,7 @@ function gamma_correct_rgb(cs: ColourSystem, r: number, g: number, b: number): n
 
 */
 
-function norm_rgb(r: number, g: number, b: number): number[] {
+function norm_rgb(r: number, g: number, b: number): [number, number, number] {
     let greatest = Math.max(r, Math.max(g, b));
 
     if (greatest === 0) greatest = 1;
@@ -371,7 +371,7 @@ function norm_rgb(r: number, g: number, b: number): number[] {
             x + y + z = 1.
 */
 
-function spectrum_to_xyz(f: (wavelength: number) => number): number[] {
+function spectrum_to_xyz(f: (wavelength: number) => number): [number, number, number] {
     let i;
     let lambda,
         X = 0,
@@ -393,7 +393,7 @@ function spectrum_to_xyz(f: (wavelength: number) => number): number[] {
         between floating-point types" from certain persnickety
         compilers. */
 
-    const cie_colour_match: number[][] = [
+    const cie_colour_match: [number, number, number][] = [
         [0.0014, 0.0, 0.0065],
         [0.0022, 0.0001, 0.0105],
         [0.0042, 0.0001, 0.0201],
@@ -479,9 +479,13 @@ function spectrum_to_xyz(f: (wavelength: number) => number): number[] {
 
     for (i = 0, lambda = 380; lambda < 780.1; i++, lambda += 5) {
         const Me = f(lambda);
-        X += Me * cie_colour_match[i][0];
-        Y += Me * cie_colour_match[i][1];
-        Z += Me * cie_colour_match[i][2];
+        const cie_colour_match_i = cie_colour_match[i];
+        if (cie_colour_match_i === undefined) {
+            throw new Error("cie_colour_match_i is undefined");
+        }
+        X += Me * cie_colour_match_i[0];
+        Y += Me * cie_colour_match_i[1];
+        Z += Me * cie_colour_match_i[2];
     }
     const XYZ = X + Y + Z;
 
@@ -529,7 +533,7 @@ function bb_spectrum(wavelength: number): number {
 */
 
 export function demonstrate() {
-    let [t, x, y, z, r, g, b]: number[] = [1000, 0, 0, 0, 0, 0, 0];
+    let [t, x, y, z, r, g, b] = [1000, 0, 0, 0, 0, 0, 0];
     const cs = HDTVsystem;
 
     console.log("Temperature       x      y      z       R     G     B");

@@ -112,7 +112,7 @@ export class GasPlanetMaterial extends ShaderMaterial {
         });
     }
 
-    public dispose(forceDisposeEffect?: boolean, forceDisposeTextures?: boolean, notBoundToMesh?: boolean) {
+    public override dispose(forceDisposeEffect?: boolean, forceDisposeTextures?: boolean, notBoundToMesh?: boolean) {
         super.dispose(forceDisposeEffect, forceDisposeTextures, notBoundToMesh);
     }
 }

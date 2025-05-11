@@ -17,8 +17,6 @@
 
 import { ManagesLandingPads } from "./landingPad/managesLandingPads";
 import { Cullable } from "../utils/cullable";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Transformable } from "../architecture/transformable";
 import { Targetable } from "../architecture/targetable";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { OrbitalObjectBase } from "../architecture/orbitalObjectBase";
@@ -29,6 +27,4 @@ export interface OrbitalFacilityBase<T extends OrbitalObjectType>
         Cullable,
         Targetable {
     getSubTargets(): ReadonlyArray<Targetable>;
-
-    update(parents: ReadonlyArray<Transformable>, cameraWorldPosition: Vector3, deltaSeconds: number): void;
 }

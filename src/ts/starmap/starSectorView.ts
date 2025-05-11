@@ -49,31 +49,35 @@ export class StarSectorView {
      */
     readonly position: Vector3;
 
-    readonly systemModels: DeepReadonly<Array<StarSystemModel>>;
-
-    readonly systemPositions: ReadonlyArray<Vector3>;
+    readonly systems: ReadonlyArray<{
+        model: DeepReadonly<StarSystemModel>;
+        position: Vector3;
+    }>;
 
     constructor(coordinates: Vector3, starSystemDatabase: StarSystemDatabase) {
         this.coordinates = coordinates;
         this.position = coordinates.scale(Settings.STAR_SECTOR_SIZE);
 
-        this.systemModels = starSystemDatabase.getSystemModelsInStarSector(
+        const systemModels = starSystemDatabase.getSystemModelsInStarSector(
             this.coordinates.x,
             this.coordinates.y,
             this.coordinates.z
         );
-        this.systemPositions = this.systemModels.map((systemModel) => {
-            return starSystemDatabase.getSystemGalacticPosition(systemModel.coordinates);
+        this.systems = systemModels.map((systemModel) => {
+            return {
+                model: systemModel,
+                position: starSystemDatabase.getSystemGalacticPosition(systemModel.coordinates)
+            };
         });
     }
 
     generate(): BuildData[] {
         const sectorString = this.getKey();
-        return this.systemModels.map((systemModel, i) => {
+        return this.systems.map(({ model, position }, i) => {
             return {
-                coordinates: systemModel.coordinates,
+                coordinates: model.coordinates,
                 sectorString: sectorString,
-                position: this.systemPositions[i]
+                position: position
             };
         });
     }
