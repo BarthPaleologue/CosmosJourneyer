@@ -100,12 +100,12 @@ If you want to contribute, you will find guidelines and ideas [here](./CONTRIBUT
 
 ### Documentation
 
-The documentation is online at https://barthpaleologue.github.io/CosmosJourneyer/docs/
+The documentation is online at https://barthpaleologue.github.io/CosmosJourneyer/doc/
 
 Additionally, the [ARCHITECTURE.md](./ARCHITECTURE.md) file contains a big picture explanation of the architecture of
 the project.
 
-To build it locally, run `npm run build:docs` and then `npm run serve:docs` to serve it at `localhost:8081`.
+To build it locally, run `npm run doc` and then `npm run serve:doc` to serve it at `localhost:8081`.
 
 ## Roadmap
 

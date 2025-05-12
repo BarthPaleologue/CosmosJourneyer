@@ -5,5 +5,5 @@ node_modules
 src-tauri
 src/styles/nasalization
 src/asset
-docs
+doc
 coverage
