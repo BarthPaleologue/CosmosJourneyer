@@ -38,10 +38,7 @@
         // Browser & ambient types
         "lib": ["ES2024", "DOM", "DOM.Iterable", "WebWorker"],
         "typeRoots": ["node_modules/@types"],
-        "types": ["webpack-env"],
-
-        // Plugins
-        "plugins": [{ "name": "typescript-plugin-css-modules" }]
+        "types": ["webpack-env"]
     },
     "include": ["src/**/*.ts", "tests/**/*.ts", "vitest.config.ts", "playwright.config.ts"],
     "exclude": ["node_modules", "dist"]
