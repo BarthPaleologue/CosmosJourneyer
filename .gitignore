@@ -11,3 +11,4 @@ doc
 *.blend1
 *.blend11
 artifacts
+.eslintcache

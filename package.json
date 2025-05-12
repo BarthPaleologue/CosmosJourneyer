@@ -87,7 +87,7 @@
         "doc": "typedoc --options typedoc.json",
         "serve:doc": "http-server doc -p 8081",
         "lint": "eslint .",
-        "lint:fix": "eslint . --fix",
+        "lint:fast": "eslint . --rule \"import/no-cycle: 0\" --rule \"import/namespace: 0\" --cache",
         "typecheck:watch": "tsc --noEmit --watch",
         "typecheck": "tsc --noEmit"
     }

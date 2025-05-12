@@ -13,7 +13,8 @@ export default defineConfig([
         "dist",
         "doc",
         "src/asset",
-        "coverage"
+        "coverage",
+        ".eslintcache"
     ]),
     eslint.configs.recommended,
     ...tseslint.configs.recommendedTypeChecked,
