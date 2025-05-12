@@ -9,5 +9,5 @@ tests/e2e
 src-tauri
 .idea
 research
-docs
+doc
 coverage

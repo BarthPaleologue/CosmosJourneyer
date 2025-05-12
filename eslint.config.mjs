@@ -25,7 +25,7 @@ export default [
             "tsconfig.json",
             "eslint.config.mjs",
             "dist",
-            "docs",
+            "doc",
             "src/asset",
             "coverage"
         ]

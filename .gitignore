@@ -6,7 +6,7 @@ target
 .ipynb_checkpoints
 .idea
 coverage
-docs
+doc
 *.ts~
 *.blend1
 *.blend11

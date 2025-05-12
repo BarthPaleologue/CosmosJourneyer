@@ -34,13 +34,13 @@ jobs:
               run: pnpm test:unit
 
             - name: Build project
-              run: pnpm run build
+              run: pnpm build
 
-            - name: Build docs
-              run: pnpm run build:docs
+            - name: Build doc
+              run: pnpm doc
 
-            - name: Move docs to dist
-              run: mv docs dist/docs
+            - name: Move doc to dist
+              run: mv doc dist/doc
 
             - name: Deploy to GitHub Pages (Production)
               uses: JamesIves/github-pages-deploy-action@v4
