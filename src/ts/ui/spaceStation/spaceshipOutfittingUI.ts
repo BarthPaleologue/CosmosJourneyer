@@ -276,7 +276,7 @@ export class SpaceshipOutfittingUI {
                 componentSlot.maxSize,
                 player.spareSpaceshipComponents
             );
-        } else {
+        } else if (componentSlot.types[0] !== undefined) {
             this.componentBrowser.browse(
                 componentSlot.types[0],
                 componentSlot.maxSize,

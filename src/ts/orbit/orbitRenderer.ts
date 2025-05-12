@@ -58,7 +58,11 @@ export class OrbitRenderer {
             const t = step * timestep;
             points.push(getPointOnOrbitLocal(orbit, parentMassSum, t));
         }
-        points.push(points[0]);
+
+        // wrap around
+        if (points[0] !== undefined) {
+            points.push(points[0]);
+        }
 
         const orbitMesh = CreateGreasedLine(
             `${orbitalObject.getTransform().name}OrbitHelper`,

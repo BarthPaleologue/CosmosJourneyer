@@ -44,8 +44,13 @@ export class MissionAndNode implements MissionNodeBase<MissionNodeType.AND> {
     equals(other: MissionNode): boolean {
         if (!(other instanceof MissionAndNode)) return false;
         if (this.children.length !== other.children.length) return false;
-        for (let i = 0; i < this.children.length; i++) {
-            if (!this.children[i].equals(other.children[i])) return false;
+        for (const [i, thisChild] of this.children.entries()) {
+            const otherChild = other.children[i];
+            if (otherChild === undefined) {
+                continue;
+            }
+
+            if (!thisChild.equals(otherChild)) return false;
         }
         return true;
     }

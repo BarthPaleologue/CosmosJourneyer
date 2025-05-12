@@ -24,7 +24,7 @@ export type WorkerData = {
     planetName: string;
     planetDiameter: number;
     terrainSettings: TerrainSettings;
-    position: number[];
+    position: [number, number, number];
     seed: number;
 };
 

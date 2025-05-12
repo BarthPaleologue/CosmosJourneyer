@@ -72,7 +72,7 @@ export function migrateV1ToV2(saveV1: SaveV1, starSystemDatabase: StarSystemData
     closestObject ??= systemModel.stellarObjects[0];
     radius ??= systemModel.stellarObjects[0].radius;
 
-    const spaceship = saveV1.player.spaceShips[0];
+    const spaceship = saveV1.player.spaceShips[0] ?? getDefaultSerializedSpaceship();
 
     let shipLocation: UniverseCoordinates;
     if (saveV1.padNumber !== undefined) {

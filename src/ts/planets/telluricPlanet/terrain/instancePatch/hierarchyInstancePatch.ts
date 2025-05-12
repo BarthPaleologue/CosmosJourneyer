@@ -23,9 +23,11 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 
 export class HierarchyInstancePatch implements IPatch {
     readonly instances: TransformNode[] = [];
-    private positions: Vector3[] = [];
-    private rotations: Quaternion[] = [];
-    private scalings: Vector3[] = [];
+    private transforms: Array<{
+        position: Vector3;
+        rotation: Quaternion;
+        scaling: Vector3;
+    }> = [];
     readonly parent: TransformNode;
 
     private currentLod: { mesh: TransformNode; lodIndex: number } | null = null;
@@ -42,9 +44,11 @@ export class HierarchyInstancePatch implements IPatch {
             const scaling = Vector3.Zero();
             decomposeModelMatrix(matrixSubBuffer, position, rotation, scaling);
 
-            this.positions.push(position);
-            this.rotations.push(rotation);
-            this.scalings.push(scaling);
+            this.transforms.push({
+                position,
+                rotation,
+                scaling
+            });
         }
     }
 
@@ -81,12 +85,12 @@ export class HierarchyInstancePatch implements IPatch {
 
     private sendToGPU() {
         if (this.currentLod === null) throw new Error("Tried to send matrix buffer to GPU but no base mesh was set.");
-        for (let i = 0; i < this.positions.length; i++) {
+        for (const transform of this.transforms) {
             const instanceRoot = this.currentLod.mesh.instantiateHierarchy(null);
             if (instanceRoot === null) throw new Error("instanceRoot is null");
-            instanceRoot.position.copyFrom(this.positions[i].add(this.currentLod.mesh.position));
-            instanceRoot.rotationQuaternion = this.rotations[i];
-            instanceRoot.scaling.copyFrom(this.scalings[i]);
+            instanceRoot.position.copyFrom(transform.position.add(this.currentLod.mesh.position));
+            instanceRoot.rotationQuaternion = transform.rotation;
+            instanceRoot.scaling.copyFrom(transform.scaling);
 
             this.instances.push(instanceRoot);
         }
@@ -99,8 +103,9 @@ export class HierarchyInstancePatch implements IPatch {
     }
 
     public isEnabled(): boolean {
-        if (this.instances.length === 0) return false;
-        return this.instances[0].isEnabled();
+        const firstInstance = this.instances[0];
+        if (firstInstance === undefined) return false;
+        return firstInstance.isEnabled();
     }
 
     public handleLod(distance: number): void {
@@ -108,12 +113,12 @@ export class HierarchyInstancePatch implements IPatch {
         if (this.currentLod === null) throw new Error("No lod mesh was set.");
 
         // check for furthest away lod
-        for (let i = this.lods.length - 1; i >= 0; i--) {
-            if (distance > this.lods[i].distance) {
+        for (const [i, lod] of Array.from(this.lods.entries()).reverse()) {
+            if (distance > lod.distance) {
                 if (i === this.currentLod.lodIndex) break;
 
                 this.clearInstances();
-                this.currentLod = { mesh: this.lods[i].mesh, lodIndex: i };
+                this.currentLod = { mesh: lod.mesh, lodIndex: i };
                 this.sendToGPU();
                 break;
             }

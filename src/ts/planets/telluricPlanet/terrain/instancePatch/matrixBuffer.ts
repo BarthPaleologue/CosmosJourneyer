@@ -66,6 +66,27 @@ export function createSquareMatrixBuffer(position: Vector3, size: number, resolu
 }
 
 export function decomposeModelMatrix(matrix: Float32Array, position: Vector3, rotation: Quaternion, scaling: Vector3) {
+    if (
+        matrix[0] === undefined ||
+        matrix[1] === undefined ||
+        matrix[2] === undefined ||
+        matrix[3] === undefined ||
+        matrix[4] === undefined ||
+        matrix[5] === undefined ||
+        matrix[6] === undefined ||
+        matrix[7] === undefined ||
+        matrix[8] === undefined ||
+        matrix[9] === undefined ||
+        matrix[10] === undefined ||
+        matrix[11] === undefined ||
+        matrix[12] === undefined ||
+        matrix[13] === undefined ||
+        matrix[14] === undefined ||
+        matrix[15] === undefined
+    ) {
+        throw new Error("Matrix is not defined");
+    }
+
     position.set(matrix[12], matrix[13], matrix[14]);
 
     const uniformScale = Math.sqrt(matrix[0] * matrix[0] + matrix[1] * matrix[1] + matrix[2] * matrix[2]);

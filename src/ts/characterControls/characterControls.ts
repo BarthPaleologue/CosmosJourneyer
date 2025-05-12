@@ -204,10 +204,14 @@ export class CharacterControls implements Controls {
         this.characterNode = characterNode;
 
         const headBoneIndex = skeleton.getBoneIndexByName("mixamorig:HeadTop_End");
+        const headBone = skeleton.bones[headBoneIndex];
+        if (headBone === undefined) {
+            throw new Error("Could not find the head bone in the skeleton");
+        }
 
         this.headTransform = new TransformNode("headTransform", scene);
         this.headTransform.scaling.scaleInPlace(20);
-        this.headTransform.attachToBone(skeleton.bones[headBoneIndex], characterNode);
+        this.headTransform.attachToBone(headBone, characterNode);
 
         this.thirdPersonCamera = new ArcRotateCamera(
             "characterThirdPersonCamera",

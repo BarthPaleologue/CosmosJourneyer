@@ -81,7 +81,7 @@ export function newSeededStarSystemModel(
 
     const stellarObjectType = getBodyTypeOfStellarObject(systemRng, 0);
     const seed = centeredRand(systemRng, GenerationSteps.STARS + 0) * Settings.SEED_HALF_RANGE;
-    const stellarObjectName = `${systemName} ${Alphabet[0].toUpperCase()}`;
+    const stellarObjectName = `${systemName} ${Alphabet.charAt(0).toUpperCase()}`;
     switch (stellarObjectType) {
         case OrbitalObjectType.STAR:
             stellarObjects.push(
@@ -114,9 +114,14 @@ export function newSeededStarSystemModel(
     const planets: Array<PlanetModel> = [];
     const satellites: Array<TelluricSatelliteModel> = [];
 
+    const firstStellarObject = stellarObjects[0];
+    if (firstStellarObject === undefined) {
+        throw new Error("No stellar objects were generated for the star system");
+    }
+
     //Fixme: planets need to work with black holes as well at some point
     const nbPlanets =
-        stellarObjects[0].type === OrbitalObjectType.BLACK_HOLE
+        firstStellarObject.type === OrbitalObjectType.BLACK_HOLE
             ? 0
             : randRangeInt(0, 7, systemRng, GenerationSteps.NB_PLANETS);
     for (let i = 0; i < nbPlanets; i++) {
@@ -190,7 +195,7 @@ export function newSeededStarSystemModel(
             ],
             systemRng(GenerationSteps.ANOMALIES + i * 300)
         );
-        const anomalyName = `${systemName} ${ReversedGreekAlphabet[i].toUpperCase()}`;
+        const anomalyName = `${systemName} ${ReversedGreekAlphabet.charAt(i).toUpperCase()}`;
         const parentIds = stellarObjects.map((object) => object.id);
 
         switch (anomalyType) {
@@ -200,7 +205,7 @@ export function newSeededStarSystemModel(
                         createOrbitalObjectId(parentIds, OrbitalObjectType.MANDELBULB, i),
                         anomalySeed,
                         anomalyName,
-                        [stellarObjects[0]]
+                        [firstStellarObject]
                     )
                 );
                 break;
@@ -210,7 +215,7 @@ export function newSeededStarSystemModel(
                         createOrbitalObjectId(parentIds, OrbitalObjectType.JULIA_SET, i),
                         anomalySeed,
                         anomalyName,
-                        [stellarObjects[0]]
+                        [firstStellarObject]
                     )
                 );
                 break;
@@ -220,7 +225,7 @@ export function newSeededStarSystemModel(
                         createOrbitalObjectId(parentIds, OrbitalObjectType.MANDELBOX, i),
                         anomalySeed,
                         anomalyName,
-                        [stellarObjects[0]]
+                        [firstStellarObject]
                     )
                 );
                 break;
@@ -230,7 +235,7 @@ export function newSeededStarSystemModel(
                         createOrbitalObjectId(parentIds, OrbitalObjectType.SIERPINSKI_PYRAMID, i),
                         anomalySeed,
                         anomalyName,
-                        [stellarObjects[0]]
+                        [firstStellarObject]
                     )
                 );
                 break;
@@ -240,7 +245,7 @@ export function newSeededStarSystemModel(
                         createOrbitalObjectId(parentIds, OrbitalObjectType.MENGER_SPONGE, i),
                         anomalySeed,
                         anomalyName,
-                        [stellarObjects[0]]
+                        [firstStellarObject]
                     )
                 );
                 break;

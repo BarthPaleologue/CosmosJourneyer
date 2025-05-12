@@ -61,10 +61,13 @@ export class LandingPadManager {
                 return a.getPadSize() - b.getPadSize();
             });
 
-        if (availableLandingPads.length === 0) return null;
+        const availablePad = availableLandingPads[0];
+        if (availablePad === undefined) {
+            return null;
+        }
 
-        this.markPadAsUnavailable(availableLandingPads[0]);
-        return availableLandingPads[0];
+        this.markPadAsUnavailable(availablePad);
+        return availablePad;
     }
 
     /**

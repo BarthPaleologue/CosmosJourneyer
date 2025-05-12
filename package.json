@@ -43,7 +43,6 @@
         "typedoc-github-theme": "^0.3.0",
         "typedoc-plugin-missing-exports": "^4.0.0",
         "typescript": "^5.8.3",
-        "typescript-plugin-css-modules": "^5.1.0",
         "vitest": "^3.1.2",
         "zod": "^3.24.3"
     },

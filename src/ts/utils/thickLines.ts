@@ -68,7 +68,7 @@ export class ThickLines {
         // delete useless cylinders
         if (targetNumberOfCylinders < currentNumberOfCylinders) {
             for (let i = targetNumberOfCylinders; i < currentNumberOfCylinders; i++) {
-                this.cylinders[i].dispose();
+                this.cylinders[i]?.dispose();
             }
             this.cylinders.length = targetNumberOfCylinders;
         }
@@ -98,6 +98,10 @@ export class ThickLines {
             const cylinder = this.cylinders[i];
             const start = this.points[i];
             const end = this.points[i + 1];
+
+            if (cylinder === undefined || start === undefined || end === undefined) {
+                continue;
+            }
 
             const middlePoint = start.add(end).scaleInPlace(0.5);
             const distance = end.subtract(start).length();

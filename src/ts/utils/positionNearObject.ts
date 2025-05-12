@@ -27,8 +27,8 @@ import { Lerp } from "@babylonjs/core/Maths/math.scalar.functions";
 
 export function nearestObject(objectPosition: Vector3, bodies: ReadonlyArray<Transformable>): Transformable {
     let distance = -1;
-    if (bodies.length === 0) throw new Error("no bodieees !");
     let nearest = bodies[0];
+    if (nearest === undefined) throw new Error("no bodieees !");
     for (const body of bodies) {
         const newDistance = objectPosition.subtract(body.getTransform().getAbsolutePosition()).length();
         if (distance === -1 || newDistance < distance) {

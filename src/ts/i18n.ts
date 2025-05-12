@@ -11,9 +11,20 @@ function loadResources() {
     requireContext.keys().forEach((key: string) => {
         const parts = key.split("/");
         const languageFolder = parts[1]; // (./en-US/notifications.json) => en-US
+        if (languageFolder === undefined) {
+            throw new Error("Language folder is undefined: some json files are at root level in the locales folder");
+        }
+
         const subFolders: string[] = parts.slice(2, parts.length - 1); // (./en-US/subFolder/subSubFolder/notifications.json) => ["subFolder", "subSubFolder"]
-        const nameSpace = parts[parts.length - 1].split(".")[0]; // (./en-US/notifications.json) => notifications
-        const fileContent = requireContext(key);
+        const fileName = parts.at(-1); // (./en-US/notifications.json) => notifications.json
+        if (fileName === undefined) {
+            throw new Error("File name is undefined");
+        }
+
+        const nameSpace = fileName.split(".")[0]; // (./en-US/notifications.json) => notifications
+        if (nameSpace === undefined) {
+            throw new Error(`Could not split file name from extension: ${fileName}`);
+        }
 
         resources[languageFolder] = resources[languageFolder] || {};
         let currentResource: ResourceLanguage | ResourceKey = resources[languageFolder];
@@ -24,6 +35,8 @@ function loadResources() {
             currentResource[subFolder] = currentResource[subFolder] || {};
             currentResource = currentResource[subFolder];
         });
+
+        const fileContent = requireContext(key);
         currentResource[nameSpace] = fileContent;
     });
 
@@ -37,7 +50,7 @@ export async function initI18n() {
 
     await init({
         lng: language, // change this if you want to test a specific language
-        debug: process.env.NODE_ENV === "development",
+        debug: process.env["NODE_ENV"] === "development",
         fallbackLng: "en-US",
         resources: loadResources()
     });

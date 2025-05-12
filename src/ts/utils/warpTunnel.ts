@@ -104,9 +104,7 @@ export class WarpTunnel implements Transformable {
 
         // initiate particles function
         SPS.initParticles = () => {
-            for (let p = 0; p < SPS.nbParticles; p++) {
-                const particle = SPS.particles[p];
-
+            for (const particle of SPS.particles) {
                 this.initParticle(particle);
                 if (this.nbParticlesAlive >= this.targetNbParticles) {
                     SPS.recycleParticle(particle);

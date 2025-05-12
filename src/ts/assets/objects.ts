@@ -47,7 +47,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export type Objects = {
     crate: Mesh;
-    grassBlades: ReadonlyArray<Mesh>;
+    grassBlades: [Mesh, Mesh];
     wanderer: Mesh;
     butterfly: Mesh;
     banana: Mesh;
@@ -99,7 +99,7 @@ export async function loadObjects(
     butterfly.isVisible = false;
     butterfly.material = materials.butterfly;
 
-    const grassBlades = [createGrassBlade(scene, 3), createGrassBlade(scene, 1)];
+    const grassBlades: [Mesh, Mesh] = [createGrassBlade(scene, 3), createGrassBlade(scene, 1)];
     grassBlades.forEach((blade) => {
         blade.material = materials.grass;
         blade.isVisible = false;
@@ -186,11 +186,11 @@ export async function loadObjects(
 
         asteroidPhysicsShapes.push(physicsShape);
 
-        for (let i = 0; i < scalings.length; i++) {
-            const asteroidClone = asteroid.clone("asteroidClone" + i);
+        for (const scaling of scalings) {
+            const asteroidClone = asteroid.clone(`asteroidClone${asteroids.length}`);
             asteroidClone.makeGeometryUnique();
             asteroidClone.setParent(null);
-            asteroidClone.scaling.scaleInPlace(scalings[i]);
+            asteroidClone.scaling.scaleInPlace(scaling);
             asteroidClone.bakeCurrentTransformIntoVertices();
             asteroidClone.setEnabled(false);
 

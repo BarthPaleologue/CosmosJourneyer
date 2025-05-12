@@ -342,7 +342,11 @@ export class StarMap implements View {
 
                     this.player.currentItinerary = path;
 
-                    this.onTargetSetObservable.notifyObservers(path[1]);
+                    const nextDestination = path[1];
+
+                    if (nextDestination !== undefined) {
+                        this.onTargetSetObservable.notifyObservers(nextDestination);
+                    }
                 } else if (this.stellarPathfinder.getNbIterations() >= pathfinderMaxIterations) {
                     createNotification(
                         NotificationOrigin.GENERAL,
@@ -554,17 +558,17 @@ export class StarMap implements View {
         let recycled = false;
 
         if (stellarObjectModel.type !== OrbitalObjectType.BLACK_HOLE) {
-            if (this.recycledStars.length > 0) {
-                instance = this.recycledStars[0];
+            const recycledStar = this.recycledStars.shift();
+            if (recycledStar !== undefined) {
+                instance = recycledStar;
                 instance.name = instanceName;
-                this.recycledStars.shift();
                 recycled = true;
             } else instance = this.starTemplate.createInstance(instanceName);
         } else {
-            if (this.recycledBlackHoles.length > 0) {
-                instance = this.recycledBlackHoles[0];
+            const recycledBlackHole = this.recycledBlackHoles.shift();
+            if (recycledBlackHole !== undefined) {
+                instance = recycledBlackHole;
                 instance.name = instanceName;
-                this.recycledBlackHoles.shift();
                 recycled = true;
             } else instance = this.blackHoleTemplate.createInstance(instanceName);
         }
@@ -577,7 +581,7 @@ export class StarMap implements View {
         initializedInstance.position = data.position.add(this.starMapCenterPosition);
 
         const objectColor = getRgbFromTemperature(stellarObjectModel.blackBodyTemperature);
-        initializedInstance.instancedBuffers.color = new Color4(objectColor.r, objectColor.g, objectColor.b, 0.0);
+        initializedInstance.instancedBuffers["color"] = new Color4(objectColor.r, objectColor.g, objectColor.b, 0.0);
 
         if (recycled) {
             initializedInstance.setEnabled(true);

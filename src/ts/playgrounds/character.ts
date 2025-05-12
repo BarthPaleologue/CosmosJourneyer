@@ -76,7 +76,7 @@ export async function createCharacterDemoScene(
 
     const ground = MeshBuilder.CreateIcoSphere("ground", { radius: 20 }, scene);
 
-    const groundAggregate = new PhysicsAggregate(ground, PhysicsShapeType.MESH, { mass: 0 }, scene);
+    new PhysicsAggregate(ground, PhysicsShapeType.MESH, { mass: 0 }, scene);
 
     const groundMaterial = new PBRMetallicRoughnessMaterial("groundMaterial", scene);
     groundMaterial.baseColor = new Color3(0.5, 0.5, 0.5);

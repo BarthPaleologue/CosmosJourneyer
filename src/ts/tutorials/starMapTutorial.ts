@@ -87,11 +87,11 @@ export class StarMapTutorial implements Tutorial {
         </div>`;
 
         const horizontalKeys = dPadCompositeToString(
-            StarMapInputs.map.move.bindings[0].control as DPadComposite,
+            StarMapInputs.map.move.bindings[0]?.control as DPadComposite,
             keyboardLayoutMap
         );
         const verticalKeys = axisCompositeToString(
-            StarMapInputs.map.upDown.bindings[0].control as AxisComposite,
+            StarMapInputs.map.upDown.bindings[0]?.control as AxisComposite,
             keyboardLayoutMap
         );
         const rawKeys = horizontalKeys.concat(verticalKeys);

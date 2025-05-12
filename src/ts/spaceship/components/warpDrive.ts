@@ -207,18 +207,11 @@ export class WarpDrive implements ReadonlyWarpDrive {
     public getThrottle(): number {
         return this.throttle;
     }
-
     /**
-     * Updates the current speed of the warp drive speed based on the current speed of the ship and the target speed.
-     * @param currentForwardSpeed The current speed of the warp drive projected on the forward direction of the ship.
-     * @param closestObjectDistance
+     * Updates the current speed of the warp drive based on the target speed.
      * @param deltaSeconds The time elapsed since the last update in seconds.
      */
-    private updateWarpDriveSpeed(
-        currentForwardSpeed: number,
-        closestObjectDistance: number,
-        deltaSeconds: number
-    ): void {
+    private updateWarpDriveSpeed(deltaSeconds: number): void {
         // use lerp smoothing to reach target speed, while making it a bit harder to decelerate
         this.currentSpeed =
             this.currentSpeed < this.maxTargetSpeed
@@ -229,17 +222,11 @@ export class WarpDrive implements ReadonlyWarpDrive {
 
     /**
      * Updates the warp drive based on the current speed of the ship, the distance to the closest body and the time elapsed since the last update.
-     * @param currentForwardSpeed The current speed of the warp drive projected on the forward direction of the ship.
      * @param closestObjectDistance
      * @param closestObjectRadius
      * @param deltaSeconds The time elapsed since the last update in seconds.
      */
-    public update(
-        currentForwardSpeed: number,
-        closestObjectDistance: number,
-        closestObjectRadius: number,
-        deltaSeconds: number
-    ): void {
+    public update(closestObjectDistance: number, closestObjectRadius: number, deltaSeconds: number): void {
         switch (this.state) {
             case WarpDriveState.DISENGAGING:
                 this.maxTargetSpeed *= 0.9;
@@ -249,7 +236,7 @@ export class WarpDrive implements ReadonlyWarpDrive {
                 break;
             case WarpDriveState.ENABLED:
                 this.updateMaxTargetSpeed(closestObjectDistance, closestObjectRadius);
-                this.updateWarpDriveSpeed(currentForwardSpeed, closestObjectDistance, deltaSeconds);
+                this.updateWarpDriveSpeed(deltaSeconds);
                 break;
             case WarpDriveState.DISABLED:
                 this.maxTargetSpeed = 0;

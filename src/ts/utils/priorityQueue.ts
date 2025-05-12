@@ -98,10 +98,18 @@ export class PriorityQueue<T> {
     }
 
     #greater(i: number, j: number): boolean {
+        if (this.#heap[i] === undefined || this.#heap[j] === undefined) {
+            return false;
+        }
+
         return this.#comparator(this.#heap[i], this.#heap[j]);
     }
 
     #swap(i: number, j: number): void {
+        if (this.#heap[i] === undefined || this.#heap[j] === undefined) {
+            return;
+        }
+
         [this.#heap[i], this.#heap[j]] = [this.#heap[j], this.#heap[i]];
     }
 

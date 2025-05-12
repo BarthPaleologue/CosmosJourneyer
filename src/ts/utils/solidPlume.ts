@@ -48,8 +48,7 @@ export class SolidPlume {
 
         // initiate particles function
         this.solidParticleSystem.initParticles = () => {
-            for (let p = 0; p < this.solidParticleSystem.nbParticles; p++) {
-                const particle = this.solidParticleSystem.particles[p];
+            for (const particle of this.solidParticleSystem.particles) {
                 this.initParticle(particle);
                 if (this.nbParticlesAlive >= this.targetNbParticles) {
                     // particle.alive = false;

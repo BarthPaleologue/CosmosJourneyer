@@ -78,6 +78,18 @@ export class AsteroidPatch {
     public update(controlsPosition: Vector3, objects: Objects, deltaSeconds: number): void {
         this.instances.forEach((instance, index) => {
             const distanceToCamera = Vector3.Distance(controlsPosition, instance.getAbsolutePosition());
+            const rotationAxis = this.rotationAxes[index];
+            const rotationSpeed = this.rotationSpeeds[index];
+            const typeIndex = this.typeIndices[index];
+            if (rotationAxis === undefined || rotationSpeed === undefined || typeIndex === undefined) {
+                throw new Error("Rotation axis, speed, or type index is undefined.");
+            }
+
+            const shape = objects.asteroidPhysicsShapes[typeIndex];
+            if (shape === undefined) {
+                throw new Error(`Asteroid physics shape for type index ${typeIndex} is undefined.`);
+            }
+
             if (
                 distanceToCamera < this.physicsRadius &&
                 (instance.physicsBody === null || instance.physicsBody === undefined)
@@ -89,10 +101,10 @@ export class AsteroidPatch {
                     this.parent.getScene()
                 );
                 instancePhysicsBody.setMassProperties({ mass: 1000 });
-                instancePhysicsBody.setAngularVelocity(this.rotationAxes[index].scale(this.rotationSpeeds[index]));
+                instancePhysicsBody.setAngularVelocity(rotationAxis.scale(rotationSpeed));
                 instancePhysicsBody.setAngularDamping(0);
                 instancePhysicsBody.disablePreStep = false;
-                instancePhysicsBody.shape = objects.asteroidPhysicsShapes[this.typeIndices[index]];
+                instancePhysicsBody.shape = shape;
                 this.instancePhysicsBodies.push(instancePhysicsBody);
             } else if (
                 distanceToCamera > this.physicsRadius + 1000 &&
@@ -109,18 +121,32 @@ export class AsteroidPatch {
             }
 
             if (instance.physicsBody === null || instance.physicsBody === undefined) {
-                instance.rotate(this.rotationAxes[index], this.rotationSpeeds[index] * deltaSeconds, Space.WORLD);
+                instance.rotate(rotationAxis, rotationSpeed * deltaSeconds, Space.WORLD);
             }
         });
 
         for (let i = 0; i < this.batchSize; i++) {
-            if (this.nbInstances === this.positions.length) return;
+            if (this.nbInstances === this.positions.length) break;
 
-            const instance = objects.asteroids[this.typeIndices[this.nbInstances]].createInstance(
-                `${this.parent.name}_AsteroidInstance${this.nbInstances}`
-            );
-            instance.position.copyFrom(this.positions[this.nbInstances]);
-            instance.rotationQuaternion = this.rotations[this.nbInstances];
+            const typeIndex = this.typeIndices[this.nbInstances];
+            if (typeIndex === undefined) {
+                throw new Error(`Type index for instance ${this.nbInstances} is undefined.`);
+            }
+
+            const asteroid = objects.asteroids[typeIndex];
+            if (asteroid === undefined) {
+                throw new Error(`Asteroid for type index ${typeIndex} is undefined.`);
+            }
+
+            const position = this.positions[this.nbInstances];
+            const rotation = this.rotations[this.nbInstances];
+            if (position === undefined || rotation === undefined) {
+                throw new Error(`Position or rotation for instance ${this.nbInstances} is undefined.`);
+            }
+
+            const instance = asteroid.createInstance(`${this.parent.name}_AsteroidInstance${this.nbInstances}`);
+            instance.position.copyFrom(position);
+            instance.rotationQuaternion = rotation;
             instance.isPickable = false;
             instance.parent = this.parent;
 

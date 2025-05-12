@@ -422,7 +422,7 @@ export class StarSystemView implements View {
 
                 if (spaceship.isLanded()) {
                     const bindings = SpaceShipControlsInputs.map.upDown.bindings;
-                    const control = bindings[0].control;
+                    const control = bindings[0]?.control;
                     if (!(control instanceof AxisComposite)) {
                         throw new Error("Up down is not an axis composite");
                     }
@@ -430,7 +430,7 @@ export class StarSystemView implements View {
                         NotificationOrigin.SPACESHIP,
                         NotificationIntent.INFO,
                         i18n.t("notifications:howToLiftOff", {
-                            bindingsString: axisCompositeToString(control, keyboardLayoutMap)[1][1]
+                            bindingsString: axisCompositeToString(control, keyboardLayoutMap)[1]?.[1]
                         }),
                         5000,
                         this.soundPlayer
@@ -573,16 +573,15 @@ export class StarSystemView implements View {
         if (firstBody instanceof BlackHole) controllerDistanceFactor = 50;
         else if (firstBody instanceof NeutronStar) controllerDistanceFactor = 100_000;
 
-        if (this.player.visitedSystemHistory.length === 0) {
+        const previousSystem = this.player.visitedSystemHistory.at(-1);
+        if (previousSystem === undefined) {
             positionNearObjectBrightSide(activeControls, firstBody, starSystem, controllerDistanceFactor);
         } else {
             // place player in the direction of the previous system (where we came from)
             const currentSystemPosition = this.starSystemDatabase.getSystemGalacticPosition(
                 starSystem.model.coordinates
             );
-            const previousSystemPosition = this.starSystemDatabase.getSystemGalacticPosition(
-                this.player.visitedSystemHistory[this.player.visitedSystemHistory.length - 1]
-            );
+            const previousSystemPosition = this.starSystemDatabase.getSystemGalacticPosition(previousSystem);
 
             // compute direction from previous system to current system
             const placementDirection = previousSystemPosition.subtract(currentSystemPosition).normalize();
@@ -620,12 +619,15 @@ export class StarSystemView implements View {
 
         if (this.player.currentItinerary.length >= 2) {
             const targetCoordinates = this.player.currentItinerary[1];
-            if (starSystemCoordinatesEquals(starSystem.model.coordinates, targetCoordinates)) {
+            if (
+                targetCoordinates !== undefined &&
+                starSystemCoordinatesEquals(starSystem.model.coordinates, targetCoordinates)
+            ) {
                 // the current system was the first destination of the itinerary, we can remove the system before from the itinerary
                 this.player.currentItinerary.shift();
 
                 // now there are either one or more systems in the itinerary (including the current one)
-                if (this.player.currentItinerary.length >= 2) {
+                if (this.player.currentItinerary[1] !== undefined && this.player.currentItinerary.length >= 2) {
                     // if there are more than 1, the journey continues to the next system
                     this.setSystemAsTarget(this.player.currentItinerary[1]);
                 } else {
@@ -1031,11 +1033,11 @@ export class StarSystemView implements View {
 
         if (showHelpNotification) {
             const horizontalKeys = dPadCompositeToString(
-                DefaultControlsInputs.map.move.bindings[0].control as DPadComposite,
+                DefaultControlsInputs.map.move.bindings[0]?.control as DPadComposite,
                 keyboardLayoutMap
             );
             const verticalKeys = axisCompositeToString(
-                DefaultControlsInputs.map.upDown.bindings[0].control as AxisComposite,
+                DefaultControlsInputs.map.upDown.bindings[0]?.control as AxisComposite,
                 keyboardLayoutMap
             );
             const keys = horizontalKeys.concat(verticalKeys);

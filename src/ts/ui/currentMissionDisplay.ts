@@ -100,10 +100,11 @@ export class CurrentMissionDisplay {
             });
         });
 
-        if (this.player.currentMissions.length === 0) {
+        const firstMission = this.player.currentMissions[0];
+        if (firstMission === undefined) {
             this.setNoMissionActive();
         } else {
-            this.setMission(this.player.currentMissions[0], starSystemDatabase);
+            this.setMission(firstMission, starSystemDatabase);
         }
 
         SpaceShipControlsInputs.map.previousMission.on("complete", () => {
@@ -139,7 +140,7 @@ export class CurrentMissionDisplay {
         const allMissions = this.player.completedMissions.concat(this.player.currentMissions);
         this.buttonContainer.hidden = allMissions.length <= 1;
 
-        if (this.activeMission === null && this.player.currentMissions.length !== 0) {
+        if (this.activeMission === null && this.player.currentMissions[0] !== undefined) {
             this.setMission(this.player.currentMissions[0], starSystemDatabase);
         } else if (this.activeMission === null && allMissions.length !== 0) {
             const defaultMission = allMissions.at(0);

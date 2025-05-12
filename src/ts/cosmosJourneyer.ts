@@ -929,7 +929,7 @@ export class CosmosJourneyer {
 
         this.engine.loadingScreen.hideLoadingUI();
 
-        if (this.player.currentItinerary.length > 1) {
+        if (this.player.currentItinerary[1] !== undefined) {
             this.starSystemView.setSystemAsTarget(this.player.currentItinerary[1]);
         }
     }

@@ -80,9 +80,9 @@ export async function createDebugAssetsScene(
         transform.instantiateHierarchy();
     }
 
-    for (let i = 0; i < scene.textures.length; i++) {
+    for (const [i, texture] of scene.textures.entries()) {
         showTexture(
-            scene.textures[i],
+            texture,
             new Vector3((i % sideLength) - sideLength / 2, 0, Math.floor(i / sideLength) - sideLength / 2)
         );
     }

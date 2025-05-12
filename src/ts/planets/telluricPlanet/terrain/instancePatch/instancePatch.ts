@@ -26,9 +26,12 @@ export class InstancePatch implements IPatch {
     readonly parent: TransformNode;
 
     readonly instances: InstancedMesh[] = [];
-    private positions: Vector3[] = [];
-    private rotations: Quaternion[] = [];
-    private scalings: Vector3[] = [];
+
+    private transforms: Array<{
+        position: Vector3;
+        rotation: Quaternion;
+        scaling: Vector3;
+    }> = [];
 
     private currentLod: { mesh: Mesh; lodIndex: number } | null = null;
     private readonly lods: { mesh: Mesh; distance: number }[] = [];
@@ -44,9 +47,11 @@ export class InstancePatch implements IPatch {
             const scaling = Vector3.Zero();
             decomposeModelMatrix(matrixSubBuffer, position, rotation, scaling);
 
-            this.positions.push(position);
-            this.rotations.push(rotation);
-            this.scalings.push(scaling);
+            this.transforms.push({
+                position,
+                rotation,
+                scaling
+            });
         }
     }
 
@@ -74,11 +79,11 @@ export class InstancePatch implements IPatch {
 
     private sendToGPU() {
         if (this.currentLod === null) throw new Error("Tried to send matrix buffer to GPU but no base mesh was set.");
-        for (let i = 0; i < this.positions.length; i++) {
-            const instance = this.currentLod.mesh.createInstance(`instance${i}`);
-            instance.position.copyFrom(this.positions[i].add(this.currentLod.mesh.position));
-            instance.rotationQuaternion = this.rotations[i];
-            instance.scaling.copyFrom(this.scalings[i]);
+        for (const transform of this.transforms) {
+            const instance = this.currentLod.mesh.createInstance(`instance${this.instances.length}`);
+            instance.position.copyFrom(transform.position.add(this.currentLod.mesh.position));
+            instance.rotationQuaternion = transform.rotation;
+            instance.scaling.copyFrom(transform.scaling);
             this.instances.push(instance);
 
             instance.parent = this.parent;
@@ -94,8 +99,9 @@ export class InstancePatch implements IPatch {
     }
 
     public isEnabled(): boolean {
-        if (this.instances.length === 0) return false;
-        return this.instances[0].isEnabled();
+        const firstInstance = this.instances[0];
+        if (firstInstance === undefined) return false;
+        return firstInstance.isEnabled();
     }
 
     public handleLod(distance: number): void {
@@ -103,12 +109,12 @@ export class InstancePatch implements IPatch {
         if (this.currentLod === null) throw new Error("No lod mesh was set.");
 
         // check for furthest away lod
-        for (let i = this.lods.length - 1; i >= 0; i--) {
-            if (distance > this.lods[i].distance) {
+        for (const [i, lod] of Array.from(this.lods.entries()).reverse()) {
+            if (distance > lod.distance) {
                 if (i === this.currentLod.lodIndex) break;
 
                 this.clearInstances();
-                this.currentLod = { mesh: this.lods[i].mesh, lodIndex: i };
+                this.currentLod = { mesh: lod.mesh, lodIndex: i };
                 this.sendToGPU();
                 break;
             }

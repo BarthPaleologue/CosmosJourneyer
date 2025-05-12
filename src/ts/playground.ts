@@ -76,7 +76,7 @@ if (urlParams.get("freeze") !== null) {
 }
 
 scene.onAfterRenderObservable.addOnce(() => {
-    canvas.dataset.ready = "1";
+    canvas.dataset["ready"] = "1";
 });
 
 scene.executeWhenReady(() => {

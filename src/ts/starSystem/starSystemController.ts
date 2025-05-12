@@ -149,12 +149,12 @@ export class StarSystemController {
 
     public getMostInfluentialObject(position: Vector3): OrbitalObject {
         const orbitalObjects = this.getOrbitalObjects();
-        if (orbitalObjects.length === 0) {
-            throw new Error("There are no orbital objects in the solar system");
-        }
 
         let bestRelativeDistance = Number.POSITIVE_INFINITY;
-        let bestObject: OrbitalObject = orbitalObjects[0];
+        let bestObject = orbitalObjects[0];
+        if (bestObject === undefined) {
+            throw new Error("There are no orbital objects in the solar system");
+        }
         for (const object of orbitalObjects) {
             const distance = Vector3.Distance(object.getTransform().position, position);
             const relativeDistance = distance / object.getBoundingRadius();
@@ -175,8 +175,10 @@ export class StarSystemController {
     public getNearestOrbitalObject(position: Vector3): OrbitalObject {
         const orbitalObjects = this.getOrbitalObjects();
 
-        if (orbitalObjects.length === 0) throw new Error("There are no orbital objects in the solar system");
-        let nearest: OrbitalObject = orbitalObjects[0];
+        let nearest = orbitalObjects[0];
+        if (nearest === undefined) {
+            throw new Error("There are no orbital objects in the solar system");
+        }
         let smallerDistance = Number.POSITIVE_INFINITY;
         for (const body of orbitalObjects) {
             const distance =
@@ -490,7 +492,8 @@ export class StarSystemController {
 
         const cameraWorldPosition = controls.getTransform().getAbsolutePosition();
         for (const orbitalFacility of orbitalFacilities) {
-            orbitalFacility.update(this.objectToParents.get(orbitalFacility) ?? [], cameraWorldPosition, deltaSeconds);
+            const parents = this.objectToParents.get(orbitalFacility) ?? [];
+            orbitalFacility.update(parents, cameraWorldPosition, deltaSeconds);
             orbitalFacility.computeCulling(controls.getActiveCamera());
         }
 

@@ -81,8 +81,13 @@ export class SpaceshipInternals {
 
         for (let i = 0; i < optionals.length; i++) {
             const optional = optionals[i];
-            if (optional === null) {
-                this.optionals[i].setComponent(null);
+            const slot = this.optionals[i];
+            if (slot === undefined) {
+                console.error("Invalid optional component slot");
+                continue;
+            }
+            if (optional === null || optional === undefined) {
+                slot.setComponent(null);
                 continue;
             }
 
@@ -99,7 +104,7 @@ export class SpaceshipInternals {
                     break;
             }
 
-            const success = this.optionals[i].setComponent(component);
+            const success = slot.setComponent(component);
             if (!success) {
                 unfitComponents.add(optional);
             }
@@ -174,6 +179,9 @@ export class SpaceshipInternals {
 
         switch (this.type) {
             case ShipType.WANDERER:
+                if (optionals[0] === undefined || optionals[1] === undefined || optionals[2] === undefined) {
+                    throw new Error("Optional components are undefined");
+                }
                 return {
                     primary: primaryComponents,
                     optional: [optionals[0], optionals[1], optionals[2]]
