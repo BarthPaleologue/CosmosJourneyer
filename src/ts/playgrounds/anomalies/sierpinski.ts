@@ -17,9 +17,10 @@
 
 import { AbstractEngine, ArcRotateCamera, Scene, Vector3 } from "@babylonjs/core";
 
+import { EmptyCelestialBody } from "@/utils/emptyCelestialBody";
+
 import { newSeededSierpinskiPyramidModel } from "../../anomalies/sierpinskiPyramid/sierpinskiPyramidModelGenerator";
 import { SierpinskiPyramidPostProcess } from "../../anomalies/sierpinskiPyramid/sierpinskiPyramidPostProcess";
-import { EmptyCelestialBody } from "../../utils/emptyCelestialBody";
 
 export function createSierpinskiScene(
     engine: AbstractEngine,

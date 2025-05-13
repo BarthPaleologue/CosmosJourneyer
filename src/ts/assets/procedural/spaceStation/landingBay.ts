@@ -25,14 +25,15 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { Scene } from "@babylonjs/core/scene";
 
+import { createRing } from "@/utils/geometry/ringBuilder";
+import { getRngFromSeed } from "@/utils/getRngFromSeed";
+import { createEnvironmentAggregate } from "@/utils/havok";
+import { getRotationPeriodForArtificialGravity } from "@/utils/physics";
+import { DeepReadonly } from "@/utils/types";
+
 import { OrbitalFacilityModel } from "../../../architecture/orbitalObjectModel";
 import { Settings } from "../../../settings";
 import { LandingPadSize } from "../../../spacestation/landingPad/landingPadManager";
-import { createRing } from "../../../utils/geometry/ringBuilder";
-import { getRngFromSeed } from "../../../utils/getRngFromSeed";
-import { createEnvironmentAggregate } from "../../../utils/havok";
-import { getRotationPeriodForArtificialGravity } from "../../../utils/physics";
-import { DeepReadonly } from "../../../utils/types";
 import { RenderingAssets } from "../../renderingAssets";
 import { LandingPad } from "../landingPad/landingPad";
 import { LandingBayMaterial } from "./landingBayMaterial";

@@ -17,7 +17,8 @@
 
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 
-import { clamp } from "../../../utils/math";
+import { clamp } from "@/utils/math";
+
 import { CustomAnimation } from "./animation";
 
 export class CameraShakeAnimation implements CustomAnimation {

@@ -49,7 +49,8 @@ import {
     vec3,
     vertexAttribute,
     xz
-} from "../../../utils/bsl";
+} from "@/utils/bsl";
+
 import { PBRTextures } from "../../textures";
 
 export class CylinderHabitatMaterial extends NodeMaterial {

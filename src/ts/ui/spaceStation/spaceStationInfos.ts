@@ -15,12 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { CropType, cropTypeToString } from "@/utils/agriculture";
+import { makeD3PieChart } from "@/utils/d3PieChart";
+import { DeepReadonly } from "@/utils/types";
+
 import { OrbitalFacilityModel, OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
 import { getOrbitalPeriod } from "../../orbit/orbit";
 import { factionToString } from "../../society/factions";
-import { CropType, cropTypeToString } from "../../utils/agriculture";
-import { makeD3PieChart } from "../../utils/d3PieChart";
-import { DeepReadonly } from "../../utils/types";
 
 export function generateInfoHTML(
     model: DeepReadonly<OrbitalFacilityModel>,

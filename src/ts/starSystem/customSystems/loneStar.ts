@@ -15,11 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { CropType } from "@/utils/agriculture";
+
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { OrbitSchema } from "../../orbit/orbit";
 import { Settings } from "../../settings";
 import { Faction } from "../../society/factions";
-import { CropType } from "../../utils/agriculture";
 import { StarSystemModel } from "../starSystemModel";
 
 export function getLoneStarSystem(): StarSystemModel {

@@ -19,7 +19,8 @@ import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMate
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import { Scene } from "@babylonjs/core/scene";
 
-import * as BSL from "../../../utils/bsl";
+import * as BSL from "@/utils/bsl";
+
 import { PBRTextures } from "../../textures";
 
 export class SolarPanelMaterial extends NodeMaterial {

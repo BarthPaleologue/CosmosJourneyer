@@ -17,16 +17,17 @@
 
 import { uniformRandBool } from "extended-random";
 
+import { getNeighborStarSystemCoordinates } from "@/utils/getNeighborStarSystems";
+import { getRngFromSeed } from "@/utils/getRngFromSeed";
+import { parseDistance } from "@/utils/strings/parseToStrings";
+import { DeepReadonly } from "@/utils/types";
+
 import { OrbitalFacilityModel } from "../../architecture/orbitalObjectModel";
 import { ISoundPlayer } from "../../audio/soundPlayer";
 import { generateSightseeingMissions } from "../../missions/generateSightSeeingMissions";
 import { Player } from "../../player/player";
 import { Settings } from "../../settings";
 import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
-import { getNeighborStarSystemCoordinates } from "../../utils/getNeighborStarSystems";
-import { getRngFromSeed } from "../../utils/getRngFromSeed";
-import { parseDistance } from "../../utils/strings/parseToStrings";
-import { DeepReadonly } from "../../utils/types";
 import { MissionContainer } from "./missionContainer";
 
 /**

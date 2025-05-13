@@ -26,15 +26,16 @@ import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { Scene } from "@babylonjs/core/scene";
 
+import { getChunkPlaneSpacePositionFromPath } from "@/utils/chunkUtils";
+import { Cullable } from "@/utils/cullable";
+import { Direction, getQuaternionFromDirection } from "@/utils/direction";
+import { isSizeOnScreenEnough } from "@/utils/isObjectVisibleOnScreen";
+import { DeepReadonly } from "@/utils/types";
+
 import { HasBoundingSphere } from "../../../../architecture/hasBoundingSphere";
 import { Transformable } from "../../../../architecture/transformable";
 import { RenderingAssets } from "../../../../assets/renderingAssets";
 import { CollisionMask } from "../../../../settings";
-import { getChunkPlaneSpacePositionFromPath } from "../../../../utils/chunkUtils";
-import { Cullable } from "../../../../utils/cullable";
-import { Direction, getQuaternionFromDirection } from "../../../../utils/direction";
-import { isSizeOnScreenEnough } from "../../../../utils/isObjectVisibleOnScreen";
-import { DeepReadonly } from "../../../../utils/types";
 import { TelluricPlanetModel } from "../../telluricPlanetModel";
 import { TelluricSatelliteModel } from "../../telluricSatelliteModel";
 import { InstancePatch } from "../instancePatch/instancePatch";

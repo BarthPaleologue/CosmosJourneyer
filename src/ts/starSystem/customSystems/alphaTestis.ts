@@ -18,14 +18,15 @@
 import { Vector3 } from "@babylonjs/core";
 import { Tools } from "@babylonjs/core/Misc/tools";
 
+import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
+import { celsiusToKelvin, getOrbitRadiusFromPeriod } from "@/utils/physics";
+
 import { newSeededGasPlanetModel } from "../../planets/gasPlanet/gasPlanetModelGenerator";
 import { newSeededTelluricPlanetModel } from "../../planets/telluricPlanet/telluricPlanetModelGenerator";
 import { newSeededTelluricSatelliteModel } from "../../planets/telluricPlanet/telluricSatelliteModelGenerator";
 import { Settings } from "../../settings";
 import { newSeededSpaceStationModel } from "../../spacestation/spaceStationModelGenerator";
 import { newSeededStarModel } from "../../stellarObjects/star/starModelGenerator";
-import { StarSystemCoordinates } from "../../utils/coordinates/starSystemCoordinates";
-import { celsiusToKelvin, getOrbitRadiusFromPeriod } from "../../utils/physics";
 import { StarSystemModel } from "../starSystemModel";
 
 export function getAlphaTestisSystemModel(): StarSystemModel {

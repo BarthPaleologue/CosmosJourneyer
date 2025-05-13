@@ -18,7 +18,8 @@
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { Lerp } from "@babylonjs/core/Maths/math.scalar.functions";
 
-import { clamp } from "../../../utils/math";
+import { clamp } from "@/utils/math";
+
 import { CustomAnimation } from "./animation";
 import { easeInOutInterpolation } from "./interpolations";
 

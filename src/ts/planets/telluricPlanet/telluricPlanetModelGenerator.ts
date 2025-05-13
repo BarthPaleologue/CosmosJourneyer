@@ -18,6 +18,11 @@
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 
+import { GenerationSteps } from "@/utils/generationSteps";
+import { getRngFromSeed } from "@/utils/getRngFromSeed";
+import { clamp } from "@/utils/math";
+import { celsiusToKelvin, hasLiquidWater } from "@/utils/physics";
+
 import { CelestialBodyModel } from "../../architecture/orbitalObjectModel";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { AtmosphereModel } from "../../atmosphere/atmosphereModel";
@@ -26,10 +31,6 @@ import { OceanModel } from "../../ocean/oceanModel";
 import { Orbit } from "../../orbit/orbit";
 import { newSeededRingsModel, RingsModel } from "../../rings/ringsModel";
 import { Settings } from "../../settings";
-import { GenerationSteps } from "../../utils/generationSteps";
-import { getRngFromSeed } from "../../utils/getRngFromSeed";
-import { clamp } from "../../utils/math";
-import { celsiusToKelvin, hasLiquidWater } from "../../utils/physics";
 import { TelluricPlanetModel } from "./telluricPlanetModel";
 
 export function newSeededTelluricPlanetModel(

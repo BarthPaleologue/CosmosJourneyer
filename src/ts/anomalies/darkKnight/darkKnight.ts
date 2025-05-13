@@ -21,13 +21,14 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Scene } from "@babylonjs/core/scene";
 
+import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
+import { DeepReadonly } from "@/utils/types";
+
 import { CelestialBodyBase } from "../../architecture/celestialBody";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { ObjectTargetCursorType, TargetInfo } from "../../architecture/targetable";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { RingsUniforms } from "../../rings/ringsUniform";
-import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
-import { DeepReadonly } from "../../utils/types";
 import { DarkKnightModel } from "./darkKnightModel";
 
 export class DarkKnight implements CelestialBodyBase<OrbitalObjectType.DARK_KNIGHT> {

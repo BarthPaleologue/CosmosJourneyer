@@ -19,7 +19,8 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import { z } from "zod";
 
-import { Direction } from "../../../../utils/direction";
+import { Direction } from "@/utils/direction";
+
 import { TerrainSettings } from "../terrainSettings";
 import { PlanetChunk } from "./planetChunk";
 

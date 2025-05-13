@@ -22,11 +22,12 @@ import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
 
+import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
+import { DeepReadonly } from "@/utils/types";
+
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { StellarObjectBase } from "../../architecture/stellarObject";
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
-import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
-import { DeepReadonly } from "../../utils/types";
 import { BlackHoleModel } from "./blackHoleModel";
 import { BlackHoleUniforms } from "./blackHoleUniforms";
 

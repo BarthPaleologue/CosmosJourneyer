@@ -28,9 +28,10 @@ import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 import { PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Scene } from "@babylonjs/core/scene";
 
+import { getRngFromSeed } from "@/utils/getRngFromSeed";
+
 import { Transformable } from "../../../architecture/transformable";
 import { CollisionMask } from "../../../settings";
-import { getRngFromSeed } from "../../../utils/getRngFromSeed";
 import { RenderingAssets } from "../../renderingAssets";
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 

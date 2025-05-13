@@ -18,13 +18,14 @@
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Tools } from "@babylonjs/core/Misc/tools";
 
+import { celsiusToKelvin } from "@/utils/physics";
+
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { GasPlanetModel } from "../../planets/gasPlanet/gasPlanetModel";
 import { TelluricPlanetModel } from "../../planets/telluricPlanet/telluricPlanetModel";
 import { TelluricSatelliteModel } from "../../planets/telluricPlanet/telluricSatelliteModel";
 import { Settings } from "../../settings";
 import { StarModel } from "../../stellarObjects/star/starModel";
-import { celsiusToKelvin } from "../../utils/physics";
 import { StarSystemModel } from "../starSystemModel";
 
 export function getSolSystemModel(): StarSystemModel {

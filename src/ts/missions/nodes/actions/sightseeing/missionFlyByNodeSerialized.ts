@@ -17,7 +17,8 @@
 
 import { z } from "zod";
 
-import { UniverseObjectIdSchema } from "../../../../utils/coordinates/universeObjectId";
+import { UniverseObjectIdSchema } from "@/utils/coordinates/universeObjectId";
+
 import { MissionNodeType } from "../../missionNodeType";
 
 export enum FlyByState {

@@ -19,8 +19,9 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
+import { DeepReadonly } from "@/utils/types";
+
 import { getForwardDirection } from "../../uberCore/transforms/basicTransform";
-import { DeepReadonly } from "../../utils/types";
 import { BlackHoleModel } from "./blackHoleModel";
 import { getKerrMetricA } from "./blackHoleModelGenerator";
 

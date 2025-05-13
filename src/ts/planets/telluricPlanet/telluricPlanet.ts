@@ -24,6 +24,12 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Scene } from "@babylonjs/core/scene";
 
+import { Cullable } from "@/utils/cullable";
+import { Direction } from "@/utils/direction";
+import { ItemPool } from "@/utils/itemPool";
+import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
+import { DeepReadonly } from "@/utils/types";
+
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { PlanetaryMassObjectBase } from "../../architecture/planetaryMassObject";
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
@@ -36,11 +42,6 @@ import { OceanUniforms } from "../../ocean/oceanUniforms";
 import { RingsLut } from "../../rings/ringsLut";
 import { RingsUniforms } from "../../rings/ringsUniform";
 import { Settings } from "../../settings";
-import { Cullable } from "../../utils/cullable";
-import { Direction } from "../../utils/direction";
-import { ItemPool } from "../../utils/itemPool";
-import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
-import { DeepReadonly } from "../../utils/types";
 import { TelluricPlanetMaterial } from "./telluricPlanetMaterial";
 import { TelluricPlanetModel } from "./telluricPlanetModel";
 import { TelluricSatelliteModel } from "./telluricSatelliteModel";

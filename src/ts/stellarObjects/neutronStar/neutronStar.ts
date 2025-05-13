@@ -27,6 +27,13 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Scene } from "@babylonjs/core/scene";
 
+import { Cullable } from "@/utils/cullable";
+import { isSizeOnScreenEnough } from "@/utils/isObjectVisibleOnScreen";
+import { ItemPool } from "@/utils/itemPool";
+import { getRgbFromTemperature } from "@/utils/specrend";
+import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
+import { DeepReadonly } from "@/utils/types";
+
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { StellarObjectBase } from "../../architecture/stellarObject";
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
@@ -35,12 +42,6 @@ import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { RingsLut } from "../../rings/ringsLut";
 import { RingsUniforms } from "../../rings/ringsUniform";
 import { Settings } from "../../settings";
-import { Cullable } from "../../utils/cullable";
-import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
-import { ItemPool } from "../../utils/itemPool";
-import { getRgbFromTemperature } from "../../utils/specrend";
-import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
-import { DeepReadonly } from "../../utils/types";
 import { VolumetricLightUniforms } from "../../volumetricLight/volumetricLightUniforms";
 import { StarMaterial } from "../star/starMaterial";
 import { NeutronStarModel } from "./neutronStarModel";

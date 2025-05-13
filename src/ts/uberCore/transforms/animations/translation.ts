@@ -18,7 +18,8 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 
-import { clamp } from "../../../utils/math";
+import { clamp } from "@/utils/math";
+
 import { translate } from "../basicTransform";
 import { CustomAnimation } from "./animation";
 import { easeInOutInterpolation } from "./interpolations";

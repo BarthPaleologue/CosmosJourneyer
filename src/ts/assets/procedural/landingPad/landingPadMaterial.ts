@@ -3,7 +3,6 @@ import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
-import { Settings } from "../../../settings";
 import {
     add,
     div,
@@ -30,7 +29,9 @@ import {
     vec2,
     vertexAttribute,
     xz
-} from "../../../utils/bsl";
+} from "@/utils/bsl";
+
+import { Settings } from "../../../settings";
 import { LandingPadTexturePool } from "../../landingPadTexturePool";
 import { PBRTextures } from "../../textures";
 

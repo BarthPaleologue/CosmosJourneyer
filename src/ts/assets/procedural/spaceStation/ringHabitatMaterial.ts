@@ -44,7 +44,8 @@ import {
     vec2,
     vec3,
     vertexAttribute
-} from "../../../utils/bsl";
+} from "@/utils/bsl";
+
 import { PBRTextures } from "../../textures";
 
 export class RingHabitatMaterial extends NodeMaterial {

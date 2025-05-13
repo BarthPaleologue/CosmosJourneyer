@@ -25,6 +25,8 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Scene } from "@babylonjs/core/scene";
 
+import { DeepReadonly } from "@/utils/types";
+
 import { CameraUniformNames, setCameraUniforms } from "../../postProcesses/uniforms/cameraUniforms";
 import { ObjectUniformNames, setObjectUniforms } from "../../postProcesses/uniforms/objectUniforms";
 import { SamplerUniformNames, setSamplerUniforms } from "../../postProcesses/uniforms/samplerUniforms";
@@ -33,7 +35,6 @@ import {
     StellarObjectUniformNames
 } from "../../postProcesses/uniforms/stellarObjectUniforms";
 import { UpdatablePostProcess } from "../../postProcesses/updatablePostProcess";
-import { DeepReadonly } from "../../utils/types";
 
 import juliaFragment from "@shaders/juliaSet.glsl";
 

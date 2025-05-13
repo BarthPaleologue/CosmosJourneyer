@@ -17,9 +17,10 @@
 
 import { AbstractEngine, ArcRotateCamera, Scene, Vector3 } from "@babylonjs/core";
 
+import { EmptyCelestialBody } from "@/utils/emptyCelestialBody";
+
 import { newSeededMandelbulbModel } from "../../anomalies/mandelbulb/mandelbulbModelGenerator";
 import { MandelbulbPostProcess } from "../../anomalies/mandelbulb/mandelbulbPostProcess";
-import { EmptyCelestialBody } from "../../utils/emptyCelestialBody";
 
 export function createMandelbulbScene(
     engine: AbstractEngine,
