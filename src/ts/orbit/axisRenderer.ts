@@ -92,7 +92,9 @@ export class AxisRenderer {
      * @private
      */
     public reset() {
-        this.axisMeshes.forEach((orbitMesh) => orbitMesh.dispose(false, true));
+        this.axisMeshes.forEach((orbitMesh) => {
+            orbitMesh.dispose(false, true);
+        });
         this.axisMeshes = [];
     }
 }

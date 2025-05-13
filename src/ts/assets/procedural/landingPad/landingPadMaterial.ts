@@ -39,9 +39,6 @@ export class LandingPadMaterial extends NodeMaterial {
         this.mode = NodeMaterialModes.Material;
 
         const numberTexture = texturePool.get(padNumber, scene);
-        if (numberTexture === undefined) {
-            throw new Error(`No texture for pad number ${padNumber}`);
-        }
 
         // Vertex Shader
 

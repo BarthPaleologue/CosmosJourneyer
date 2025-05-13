@@ -19,7 +19,7 @@ import { FreeCamera, Vector3, HemisphericLight, MeshBuilder } from "@babylonjs/c
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
-export async function createDefaultScene(
+export function createDefaultScene(
     engine: AbstractEngine,
     progressCallback: (progress: number, text: string) => void
 ): Promise<Scene> {
@@ -51,5 +51,5 @@ export async function createDefaultScene(
 
     progressCallback(1, "Loaded default scene");
 
-    return scene;
+    return Promise.resolve(scene);
 }

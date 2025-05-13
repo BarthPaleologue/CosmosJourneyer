@@ -20,7 +20,7 @@ import { EmptyCelestialBody } from "../../utils/emptyCelestialBody";
 import { newSeededMengerSpongeModel } from "../../anomalies/mengerSponge/mengerSpongeModelGenerator";
 import { MengerSpongePostProcess } from "../../anomalies/mengerSponge/mengerSpongePostProcess";
 
-export async function createMengerSpongeScene(
+export function createMengerSpongeScene(
     engine: AbstractEngine,
     progressCallback: (progress: number, text: string) => void
 ): Promise<Scene> {
@@ -65,5 +65,5 @@ export async function createMengerSpongeScene(
 
     progressCallback(1, "Loading complete");
 
-    return scene;
+    return Promise.resolve(scene);
 }

@@ -22,7 +22,6 @@ import { Transformable } from "../architecture/transformable";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { SolidParticle } from "@babylonjs/core/Particles/solidParticle";
 import { SolidParticleSystem } from "@babylonjs/core/Particles/solidParticleSystem";
-import { Scalar } from "@babylonjs/core/Maths/math.scalar";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
@@ -62,6 +61,8 @@ export class WarpTunnel implements Transformable {
     private readonly particleRotationQuaternion = Quaternion.Identity();
 
     private readonly particleDirection = Vector3.Zero();
+
+    private readonly particleToDirection = new Map<SolidParticle, Vector3>();
 
     private readonly tunnelAxis1 = Vector3.Zero();
     private readonly tunnelAxis2 = Vector3.Zero();
@@ -127,7 +128,10 @@ export class WarpTunnel implements Transformable {
         SPS.updateParticle = (particle) => {
             if (!particle.isVisible) return particle;
 
-            particle.velocity.copyFrom(particle.props.direction.scale(this.particleSpeed));
+            const particleDirection = this.particleToDirection.get(particle) ?? this.particleDirection;
+            this.particleToDirection.set(particle, particleDirection);
+
+            particle.velocity.copyFrom(particleDirection.scale(this.particleSpeed));
 
             particle.position.addInPlace(particle.velocity.scale(this.lastDeltaSeconds));
             particle.position.addInPlace(this.spaceshipDisplacement);
@@ -168,9 +172,7 @@ export class WarpTunnel implements Transformable {
         particle.position.addInPlace(this.particleDirection.scale(Math.random() * 10));
         particle.position.addInPlace(this.anchor.getAbsolutePosition());
 
-        particle.props = {
-            direction: this.particleDirection.clone()
-        };
+        this.particleToDirection.set(particle, this.particleDirection.clone());
 
         particle.rotationQuaternion = this.particleRotationQuaternion;
 
@@ -256,5 +258,6 @@ export class WarpTunnel implements Transformable {
     dispose() {
         this.solidParticleSystem.dispose();
         this.anchor.dispose();
+        this.particleToDirection.clear();
     }
 }

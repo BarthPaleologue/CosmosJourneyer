@@ -88,8 +88,6 @@ export class SidePanels {
                 break;
         }
 
-        if (newPanel === null) throw new Error("Invalid panel type");
-
         return newPanel;
     }
 

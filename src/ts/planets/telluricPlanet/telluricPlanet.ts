@@ -188,7 +188,7 @@ export class TelluricPlanet
         for (const side of this.sides) side.update(observerPosition, chunkForge);
     }
 
-    public updateMaterial(stellarObjects: ReadonlyArray<PointLight>, deltaSeconds: number): void {
+    public updateMaterial(stellarObjects: ReadonlyArray<PointLight>): void {
         this.material.update(this.getTransform().getWorldMatrix(), stellarObjects);
     }
 
@@ -205,7 +205,9 @@ export class TelluricPlanet
     }
 
     public dispose(ringsLutPool: ItemPool<RingsLut>, cloudsLutPool: ItemPool<CloudsLut>): void {
-        this.sides.forEach((side) => side.dispose());
+        this.sides.forEach((side) => {
+            side.dispose();
+        });
         this.sides.length = 0;
 
         this.cloudsUniforms?.dispose(cloudsLutPool);

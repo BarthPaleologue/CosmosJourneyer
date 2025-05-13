@@ -62,8 +62,12 @@ export class AsteroidPatch {
     }
 
     public clearInstances(): void {
-        this.instancePhysicsBodies.forEach((body) => body.dispose());
-        this.instances.forEach((instance) => instance.dispose());
+        this.instancePhysicsBodies.forEach((body) => {
+            body.dispose();
+        });
+        this.instances.forEach((instance) => {
+            instance.dispose();
+        });
 
         this.instancePhysicsBodies.length = 0;
         this.instances.length = 0;
@@ -90,10 +94,7 @@ export class AsteroidPatch {
                 throw new Error(`Asteroid physics shape for type index ${typeIndex} is undefined.`);
             }
 
-            if (
-                distanceToCamera < this.physicsRadius &&
-                (instance.physicsBody === null || instance.physicsBody === undefined)
-            ) {
+            if (distanceToCamera < this.physicsRadius && instance.physicsBody === null) {
                 const instancePhysicsBody = new PhysicsBody(
                     instance,
                     PhysicsMotionType.DYNAMIC,
@@ -106,11 +107,7 @@ export class AsteroidPatch {
                 instancePhysicsBody.disablePreStep = false;
                 instancePhysicsBody.shape = shape;
                 this.instancePhysicsBodies.push(instancePhysicsBody);
-            } else if (
-                distanceToCamera > this.physicsRadius + 1000 &&
-                instance.physicsBody !== null &&
-                instance.physicsBody !== undefined
-            ) {
+            } else if (distanceToCamera > this.physicsRadius + 1000 && instance.physicsBody !== null) {
                 const body = this.instancePhysicsBodies.find((body) => body === instance.physicsBody);
                 if (body) {
                     body.dispose();
@@ -120,7 +117,7 @@ export class AsteroidPatch {
                 }
             }
 
-            if (instance.physicsBody === null || instance.physicsBody === undefined) {
+            if (instance.physicsBody === null) {
                 instance.rotate(rotationAxis, rotationSpeed * deltaSeconds, Space.WORLD);
             }
         });
@@ -161,7 +158,9 @@ export class AsteroidPatch {
     }
 
     public setEnabled(enabled: boolean) {
-        this.instances.forEach((instance) => instance.setEnabled(enabled));
+        this.instances.forEach((instance) => {
+            instance.setEnabled(enabled);
+        });
     }
 
     public dispose() {

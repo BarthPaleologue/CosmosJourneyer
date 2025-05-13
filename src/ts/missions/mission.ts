@@ -110,7 +110,7 @@ export class Mission {
             case MissionType.SIGHT_SEEING_ASTEROID_FIELD:
                 return i18n.t("missions:sightseeing:asteroidFieldTrek");
             default:
-                throw new Error(`Unknown sight seeing type: ${this.missionType}`);
+                throw new Error(`Unknown sight seeing type: ${String(this.missionType)}`);
         }
     }
 

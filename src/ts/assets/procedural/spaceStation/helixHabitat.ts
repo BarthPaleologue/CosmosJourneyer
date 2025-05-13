@@ -192,7 +192,7 @@ export class HelixHabitat implements Transformable {
                 this.armAggregates.push(armAggregate);
             });
         } else if (distanceToCamera > 360e3 && this.attachmentAggregate !== null) {
-            this.attachmentAggregate?.dispose();
+            this.attachmentAggregate.dispose();
             this.attachmentAggregate = null;
 
             this.helix1Aggregate?.dispose();
@@ -201,7 +201,9 @@ export class HelixHabitat implements Transformable {
             this.helix2Aggregate?.dispose();
             this.helix2Aggregate = null;
 
-            this.armAggregates.forEach((armAggregate) => armAggregate.dispose());
+            this.armAggregates.forEach((armAggregate) => {
+                armAggregate.dispose();
+            });
             this.armAggregates.length = 0;
         }
     }
@@ -230,10 +232,14 @@ export class HelixHabitat implements Transformable {
         this.helix2Aggregate?.dispose();
         this.helix2Aggregate = null;
 
-        this.arms.forEach((arm) => arm.dispose());
+        this.arms.forEach((arm) => {
+            arm.dispose();
+        });
         this.arms.length = 0;
 
-        this.armAggregates.forEach((armAggregate) => armAggregate.dispose());
+        this.armAggregates.forEach((armAggregate) => {
+            armAggregate.dispose();
+        });
         this.armAggregates.length = 0;
     }
 }

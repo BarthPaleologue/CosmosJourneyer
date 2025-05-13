@@ -35,13 +35,15 @@ async function initWithSaveString(engine: CosmosJourneyer, saveString: string) {
     if (json === null) {
         console.error(jsonString);
         await alertModal("Error, this save file is not a valid json.", soundPlayerMock);
-        return await simpleInit(engine);
+        await simpleInit(engine);
+        return;
     }
 
     const result = safeParseSave(json, engine.starSystemDatabase);
     if (!result.success) {
         await alertModal("Error, this save file is invalid. See the console for more details.", soundPlayerMock);
-        return await simpleInit(engine);
+        await simpleInit(engine);
+        return;
     }
 
     await engine.loadSave(result.value);
@@ -55,7 +57,8 @@ async function startCosmosJourneyer() {
 
     const saveString = urlParams.get("save");
     if (saveString !== null) {
-        return await initWithSaveString(engine, saveString);
+        await initWithSaveString(engine, saveString);
+        return;
     }
 
     await simpleInit(engine);

@@ -27,9 +27,9 @@ import { Tools } from "@babylonjs/core/Misc/tools";
 import { OrbitRenderer } from "../orbit/orbitRenderer";
 import { AxisRenderer } from "../orbit/axisRenderer";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
-import { OrbitalObjectUtils } from "../architecture/orbitalObjectUtils";
+import { setOrbitalPosition, setRotation } from "@/architecture/orbitalObjectUtils";
 
-export async function createOrbitalDemoScene(
+export function createOrbitalDemoScene(
     engine: AbstractEngine,
     progressCallback: (progress: number, text: string) => void
 ): Promise<Scene> {
@@ -139,13 +139,8 @@ export async function createOrbitalDemoScene(
         referencePlaneRotation.multiplyToRef(referencePlaneDeltaRotation, referencePlaneRotation);
 
         bodies.forEach((body) => {
-            OrbitalObjectUtils.SetOrbitalPosition(
-                body,
-                bodyToParents.get(body) ?? [],
-                referencePlaneRotation,
-                elapsedSeconds
-            );
-            OrbitalObjectUtils.SetRotation(body, referencePlaneRotation, elapsedSeconds);
+            setOrbitalPosition(body, bodyToParents.get(body) ?? [], referencePlaneRotation, elapsedSeconds);
+            setRotation(body, referencePlaneRotation, elapsedSeconds);
         });
 
         orbitRenderer.update(referencePlaneRotation);
@@ -153,5 +148,5 @@ export async function createOrbitalDemoScene(
 
     progressCallback(1, "Loading complete");
 
-    return scene;
+    return Promise.resolve(scene);
 }

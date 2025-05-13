@@ -85,7 +85,7 @@ export class MainMenu {
             throw new Error("Cannot find system");
         }
 
-        const object = system?.planets.at(1);
+        const object = system.planets.at(1);
         if (object === undefined) {
             throw new Error("Cannot find planet with index 2");
         }
@@ -245,8 +245,6 @@ export class MainMenu {
             this.startAnimationDurationSeconds
         );
 
-        if (this.title === null) throw new Error("Title is null");
-
         this.title.animate(
             [
                 {
@@ -272,7 +270,6 @@ export class MainMenu {
             if (!rotationAnimation.isFinished()) rotationAnimation.update(deltaTime);
             else {
                 this.scene.onBeforePhysicsObservable.removeCallback(animationCallback);
-                if (this.htmlRoot === null) throw new Error("MainMenu is null");
                 this.htmlRoot.style.display = "none";
 
                 this.starSystemView.setUIEnabled(true);
@@ -294,7 +291,6 @@ export class MainMenu {
     }
 
     private hideVersion() {
-        if (this.version === null) throw new Error("Version is null");
         this.version.style.transform = "translateY(100%)";
     }
 
@@ -312,6 +308,6 @@ export class MainMenu {
     }
 
     public isVisible() {
-        return this.htmlRoot !== null && this.htmlRoot.style.display !== "none";
+        return this.htmlRoot.style.display !== "none";
     }
 }

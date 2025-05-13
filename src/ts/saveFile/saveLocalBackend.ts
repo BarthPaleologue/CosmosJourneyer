@@ -32,35 +32,37 @@ export class SaveLocalBackend implements SaveBackend {
         return true;
     }
 
-    public async read(
-        starSystemDatabase: StarSystemDatabase
-    ): Promise<Result<Record<string, CmdrSaves>, SaveLoadingError>> {
+    public read(starSystemDatabase: StarSystemDatabase): Promise<Result<Record<string, CmdrSaves>, SaveLoadingError>> {
         const rawSaves = localStorage.getItem(SaveLocalBackend.SAVES_KEY);
         const rawBackupSaves = localStorage.getItem(SaveLocalBackend.BACKUP_SAVE_KEY);
         if (rawSaves === null && rawBackupSaves === null) {
-            return ok({});
+            return Promise.resolve(ok({}));
         }
 
         const parsedSaves = jsonSafeParse(rawSaves ?? "{}");
         if (parsedSaves === null) {
-            return err({ type: SaveLoadingErrorType.INVALID_JSON });
+            return Promise.resolve(err({ type: SaveLoadingErrorType.INVALID_JSON }));
         }
 
         const parsedBackupSaves = jsonSafeParse(rawBackupSaves ?? "{}");
         if (parsedBackupSaves === null) {
-            return err({ type: SaveLoadingErrorType.INVALID_JSON });
+            return Promise.resolve(err({ type: SaveLoadingErrorType.INVALID_JSON }));
         }
 
         const savesResult = SavesSchema.safeParse(parsedSaves);
         if (!savesResult.success) {
             console.error(savesResult.error);
-            return err({ type: SaveLoadingErrorType.INVALID_STORAGE_FORMAT, content: savesResult.error });
+            return Promise.resolve(
+                err({ type: SaveLoadingErrorType.INVALID_STORAGE_FORMAT, content: savesResult.error })
+            );
         }
 
         const backupSavesResult = SavesSchema.safeParse(parsedBackupSaves);
         if (!backupSavesResult.success) {
             console.error(backupSavesResult.error);
-            return err({ type: SaveLoadingErrorType.INVALID_STORAGE_FORMAT, content: backupSavesResult.error });
+            return Promise.resolve(
+                err({ type: SaveLoadingErrorType.INVALID_STORAGE_FORMAT, content: backupSavesResult.error })
+            );
         }
 
         const saves = savesResult.data;
@@ -104,6 +106,6 @@ export class SaveLocalBackend implements SaveBackend {
             console.warn("Some save files could not be validated! Check the console for more information.");
         }
 
-        return ok(correctSaves);
+        return Promise.resolve(ok(correctSaves));
     }
 }

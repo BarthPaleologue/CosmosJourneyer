@@ -132,7 +132,7 @@ export class Spaceship implements Transformable {
         assets: RenderingAssets,
         soundPlayer: ISoundPlayer
     ) {
-        this.id = serializedSpaceShip.id ?? crypto.randomUUID();
+        this.id = serializedSpaceShip.id;
 
         this.name = serializedSpaceShip.name;
 
@@ -326,14 +326,15 @@ export class Spaceship implements Transformable {
      */
     public getSpeed(): number {
         const warpDrive = this.getInternals().getWarpDrive();
-        return warpDrive?.isEnabled()
+
+        return warpDrive !== null && warpDrive.isEnabled()
             ? warpDrive.getWarpSpeed()
             : this.aggregate.body.getLinearVelocity().dot(getForwardDirection(this.getTransform()));
     }
 
     public getThrottle(): number {
         const warpDrive = this.getInternals().getWarpDrive();
-        return warpDrive?.isEnabled() ? warpDrive.getThrottle() : this.mainEngineThrottle;
+        return warpDrive !== null && warpDrive.isEnabled() ? warpDrive.getThrottle() : this.mainEngineThrottle;
     }
 
     public increaseMainEngineThrottle(delta: number) {
@@ -581,7 +582,7 @@ export class Spaceship implements Transformable {
 
         const warpDrive = this.getInternals().getWarpDrive();
 
-        if (!warpDrive?.isEnabled() && this.state !== ShipState.LANDED) {
+        if ((warpDrive === null || warpDrive.isDisabled()) && this.state !== ShipState.LANDED) {
             const linearVelocity = this.aggregate.body.getLinearVelocity();
             const forwardDirection = getForwardDirection(this.getTransform());
             const forwardSpeed = Vector3.Dot(linearVelocity, forwardDirection);
@@ -751,7 +752,9 @@ export class Spaceship implements Transformable {
         soundPlayer.freeInstance(this.deceleratingWarpDriveSound);
         soundPlayer.freeInstance(this.thrusterSound);
 
-        this.mainThrusters.forEach((thruster) => thruster.dispose());
+        this.mainThrusters.forEach((thruster) => {
+            thruster.dispose();
+        });
         this.mainThrusters.length = 0;
 
         this.warpTunnel.dispose();

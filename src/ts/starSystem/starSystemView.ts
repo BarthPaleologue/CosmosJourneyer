@@ -494,7 +494,9 @@ export class StarSystemView implements View {
         this._isLoadingSystem = true;
 
         if (this.starSystem !== null) {
-            this.aiPlayers.forEach((aiPlayer) => aiPlayer.dispose(this.soundPlayer));
+            this.aiPlayers.forEach((aiPlayer) => {
+                aiPlayer.dispose(this.soundPlayer);
+            });
             this.aiPlayers.length = 0;
 
             this.spaceshipControls?.setClosestLandableFacility(null);
@@ -608,14 +610,17 @@ export class StarSystemView implements View {
         const currentSpaceship = this.spaceshipControls?.getSpaceship();
         const currentJumpRange = currentSpaceship?.getInternals().getWarpDrive()?.rangeLY ?? 0;
 
-        getNeighborStarSystemCoordinates(
+        for (const neighbor of getNeighborStarSystemCoordinates(
             starSystem.model.coordinates,
             Math.min(currentJumpRange, Settings.VISIBLE_NEIGHBORHOOD_MAX_RADIUS_LY),
             this.starSystemDatabase
-        ).forEach(([neighborCoordinates, position, distance]) => {
-            const systemTarget = this.getStarSystem().addSystemTarget(neighborCoordinates, this.starSystemDatabase);
+        )) {
+            const systemTarget = this.getStarSystem().addSystemTarget(neighbor.coordinates, this.starSystemDatabase);
+            if (systemTarget === null) {
+                continue;
+            }
             this.targetCursorLayer.addObject(systemTarget);
-        });
+        }
 
         if (this.player.currentItinerary.length >= 2) {
             const targetCoordinates = this.player.currentItinerary[1];
@@ -866,10 +871,6 @@ export class StarSystemView implements View {
 
         const activeControls = this.scene.getActiveControls();
 
-        const nearestCelestialBody = starSystem.getNearestCelestialBody(
-            activeControls.getTransform().getAbsolutePosition()
-        );
-
         const spaceship = this.spaceshipControls.getSpaceship();
 
         const missionContext: MissionContext = {
@@ -1105,12 +1106,19 @@ export class StarSystemView implements View {
         let target = this.getStarSystem()
             .getSystemTargets()
             .find((systemTarget) => starSystemCoordinatesEquals(systemTarget.systemCoordinates, targetSeed));
+
         if (target === undefined) {
-            target = this.getStarSystem().addSystemTarget(targetSeed, this.starSystemDatabase);
-            this.targetCursorLayer.addObject(target);
+            const newTarget = this.getStarSystem().addSystemTarget(targetSeed, this.starSystemDatabase);
+            if (newTarget !== null) {
+                target = newTarget;
+                this.targetCursorLayer.addObject(target);
+            }
         }
-        this.targetCursorLayer.setTarget(target, true);
-        this.spaceShipLayer.setTarget(target.getTransform(), true);
+
+        if (target !== undefined) {
+            this.targetCursorLayer.setTarget(target, true);
+            this.spaceShipLayer.setTarget(target.getTransform(), true);
+        }
     }
 
     public render() {

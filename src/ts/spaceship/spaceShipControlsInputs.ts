@@ -103,11 +103,11 @@ const resetCameraInteraction = new PressInteraction(
 export const SpaceShipControlsInputs = new InputMap<{
     landing: PressInteraction;
     emitLandingRequest: PressInteraction;
-    upDown: Action<number>;
-    throttle: Action<number>;
+    upDown: Action;
+    throttle: Action;
     rollPitch: Action<[number, number]>;
     toggleWarpDrive: PressInteraction;
-    ignorePointer: Action<number>;
+    ignorePointer: Action;
     throttleToZero: PressInteraction;
     previousMission: PressInteraction;
     nextMission: PressInteraction;

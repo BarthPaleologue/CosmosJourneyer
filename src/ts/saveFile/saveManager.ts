@@ -82,12 +82,12 @@ export class SaveManager {
         }
 
         const savesMap = new Map<string, CmdrSaves>();
-        for (const [cmdrstring, cmdrSaves] of Object.entries(saveResult.value)) {
+        for (const [cmdrId, cmdrSaves] of Object.entries(saveResult.value)) {
             if (cmdrSaves.manual.length === 0 && cmdrSaves.auto.length === 0) {
                 continue;
             }
 
-            savesMap.set(cmdrstring as string, cmdrSaves);
+            savesMap.set(cmdrId, cmdrSaves);
         }
 
         return ok(new SaveManager(backend, savesMap));
@@ -95,11 +95,11 @@ export class SaveManager {
 
     /**
      * Retrieves saves for a specific commander.
-     * @param cmdrstring - The commander identifier string
+     * @param cmdrId - The commander identifier string
      * @returns The commander's saves, or undefined if none exist
      */
-    public getSavesForCmdr(cmdrstring: string): CmdrSaves | undefined {
-        return this.saves.get(cmdrstring);
+    public getSavesForCmdr(cmdrId: string): CmdrSaves | undefined {
+        return this.saves.get(cmdrId);
     }
 
     /**

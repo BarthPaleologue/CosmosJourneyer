@@ -77,9 +77,9 @@ class ColourSystem {
 
 /* White point chromaticities. */
 
-const IlluminantC = [0.3101, 0.3162] as const; /* For NTSC television */
+//const IlluminantC = [0.3101, 0.3162] as const; /* For NTSC television */
 const IlluminantD65 = [0.3127, 0.3291] as const; /* For EBU and SMPTE */
-const IlluminantE = [0.33333333, 0.33333333] as const; /* CIE equal-energy illuminant */
+//const IlluminantE = [0.33333333, 0.33333333] as const; /* CIE equal-energy illuminant */
 
 /*  Gamma of nonlinear correction.
  
@@ -93,7 +93,7 @@ const IlluminantE = [0.33333333, 0.33333333] as const; /* CIE equal-energy illum
 const GAMMA_REC709 = 0; /* Rec. 709 */
 
 /* Name                  xRed    yRed    xGreen  yGreen  xBlue  yBlue    White point        Gamma   */
-const NTSCsystem = new ColourSystem(
+/*const NTSCsystem = new ColourSystem(
     "NTSC",
     0.67,
     0.33,
@@ -128,7 +128,7 @@ const SMPTEsystem = new ColourSystem(
     IlluminantD65[0],
     IlluminantD65[1],
     GAMMA_REC709
-);
+);*/
 const HDTVsystem = new ColourSystem(
     "HDTV",
     0.67,
@@ -141,7 +141,7 @@ const HDTVsystem = new ColourSystem(
     IlluminantD65[1],
     GAMMA_REC709
 );
-const CIEsystem = new ColourSystem(
+/*const CIEsystem = new ColourSystem(
     "CIE",
     0.7355,
     0.2645,
@@ -164,7 +164,7 @@ const Rec709system = new ColourSystem(
     IlluminantD65[0],
     IlluminantD65[1],
     GAMMA_REC709
-);
+);*/
 
 /*                          UPVP_TO_XY
 
@@ -172,12 +172,12 @@ const Rec709system = new ColourSystem(
 
 */
 
-function upvp_to_xy(up: number, vp: number): number[] {
+/*function upvp_to_xy(up: number, vp: number): number[] {
     const xc = (9 * up) / (6 * up - 16 * vp + 12);
     const yc = (4 * vp) / (6 * up - 16 * vp + 12);
 
     return [xc, yc];
-}
+}*/
 
 /*                          XY_TO_UPVP
 
@@ -185,12 +185,12 @@ function upvp_to_xy(up: number, vp: number): number[] {
 
 */
 
-function xy_to_upvp(xc: number, yc: number): number[] {
+/*function xy_to_upvp(xc: number, yc: number): number[] {
     const up = (4 * xc) / (-2 * xc + 12 * yc + 3);
     const vp = (9 * yc) / (-2 * xc + 12 * yc + 3);
 
     return [up, vp];
-}
+}*/
 
 /*                             XYZ_TO_RGB
 
@@ -272,9 +272,9 @@ function xyz_to_rgb(cs: ColourSystem, xc: number, yc: number, zc: number): [numb
      system.  This amounts simply to testing whether all the
      primary weights are non-negative. */
 
-function inside_gamut(r: number, g: number, b: number): boolean {
+/*function inside_gamut(r: number, g: number, b: number): boolean {
     return r >= 0 && g >= 0 && b >= 0;
-}
+}*/
 
 /*                          CONSTRAIN_RGB
 
@@ -320,9 +320,10 @@ function constrain_rgb(r: number, g: number, b: number): [number, number, number
        http://www.poynton.com/GammaFAQ.html
 */
 
+/*
 function gamma_correct(cs: ColourSystem, c: number): number {
     if (cs.gamma === GAMMA_REC709) {
-        /* Rec. 709 gamma correction. */
+        // Rec. 709 gamma correction. 
         const cc = 0.018;
 
         if (c < cc) {
@@ -331,16 +332,16 @@ function gamma_correct(cs: ColourSystem, c: number): number {
             c = 1.099 * Math.pow(c, 0.45) - 0.099;
         }
     } else {
-        /* Nonlinear colour = (Linear colour)^(1/gamma) */
+        // Nonlinear colour = (Linear colour)^(1/gamma)
         c = Math.pow(c, 1.0 / cs.gamma);
     }
 
     return c;
-}
+}*/
 
-function gamma_correct_rgb(cs: ColourSystem, r: number, g: number, b: number): number[] {
+/*function gamma_correct_rgb(cs: ColourSystem, r: number, g: number, b: number): number[] {
     return [gamma_correct(cs, r), gamma_correct(cs, g), gamma_correct(cs, b)];
-}
+}*/
 
 /*                          NORM_RGB
 

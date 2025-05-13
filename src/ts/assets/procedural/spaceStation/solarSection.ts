@@ -304,13 +304,17 @@ export class SolarSection implements Transformable {
                 this.solarPanelAggregates.push(solarPanelAggregate);
             });
         } else if (distanceToCamera > 360e3 && this.attachmentAggregate !== null) {
-            this.attachmentAggregate?.dispose();
+            this.attachmentAggregate.dispose();
             this.attachmentAggregate = null;
 
-            this.armAggregates.forEach((armAggregate) => armAggregate.dispose());
+            this.armAggregates.forEach((armAggregate) => {
+                armAggregate.dispose();
+            });
             this.armAggregates.length = 0;
 
-            this.solarPanelAggregates.forEach((solarPanelAggregate) => solarPanelAggregate.dispose());
+            this.solarPanelAggregates.forEach((solarPanelAggregate) => {
+                solarPanelAggregate.dispose();
+            });
             this.solarPanelAggregates.length = 0;
         }
     }
@@ -324,11 +328,19 @@ export class SolarSection implements Transformable {
         this.attachmentAggregate?.dispose();
         this.attachmentAggregate = null;
 
-        this.arms.forEach((arm) => arm.dispose());
-        this.armAggregates.forEach((armAggregate) => armAggregate.dispose());
+        this.arms.forEach((arm) => {
+            arm.dispose();
+        });
+        this.armAggregates.forEach((armAggregate) => {
+            armAggregate.dispose();
+        });
 
-        this.solarPanels.forEach((solarPanel) => solarPanel.dispose());
-        this.solarPanelAggregates.forEach((solarPanelAggregate) => solarPanelAggregate.dispose());
+        this.solarPanels.forEach((solarPanel) => {
+            solarPanel.dispose();
+        });
+        this.solarPanelAggregates.forEach((solarPanelAggregate) => {
+            solarPanelAggregate.dispose();
+        });
 
         this.metalSectionMaterial.dispose();
     }

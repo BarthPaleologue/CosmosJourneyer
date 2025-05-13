@@ -431,17 +431,15 @@ export class PostProcessManager {
     public addGasPlanet(planet: GasPlanet, stellarObjects: ReadonlyArray<StellarObject>) {
         const postProcesses: PostProcess[] = [];
 
-        if (planet.atmosphereUniforms !== null) {
-            const atmosphere = new AtmosphericScatteringPostProcess(
-                planet.getTransform(),
-                planet.getBoundingRadius(),
-                planet.atmosphereUniforms,
-                stellarObjects.map((star) => star.getLight()),
-                this.scene
-            );
-            this.atmospheres.push(atmosphere);
-            postProcesses.push(atmosphere);
-        }
+        const atmosphere = new AtmosphericScatteringPostProcess(
+            planet.getTransform(),
+            planet.getBoundingRadius(),
+            planet.atmosphereUniforms,
+            stellarObjects.map((star) => star.getLight()),
+            this.scene
+        );
+        this.atmospheres.push(atmosphere);
+        postProcesses.push(atmosphere);
 
         if (planet.ringsUniforms !== null) {
             const rings = new RingsPostProcess(

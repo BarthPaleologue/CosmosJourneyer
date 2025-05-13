@@ -17,11 +17,11 @@
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-export class LocalDirection {
-    static readonly FORWARD = new Vector3(0, 0, 1);
-    static readonly BACKWARD = new Vector3(0, 0, -1);
-    static readonly UP = new Vector3(0, 1, 0);
-    static readonly DOWN = new Vector3(0, -1, 0);
-    static readonly RIGHT = new Vector3(-1, 0, 0);
-    static readonly LEFT = new Vector3(1, 0, 0);
-}
+export const LocalDirection = {
+    FORWARD: new Vector3(0, 0, 1),
+    BACKWARD: new Vector3(0, 0, -1),
+    UP: new Vector3(0, 1, 0),
+    DOWN: new Vector3(0, -1, 0),
+    RIGHT: new Vector3(-1, 0, 0),
+    LEFT: new Vector3(1, 0, 0)
+} as const;

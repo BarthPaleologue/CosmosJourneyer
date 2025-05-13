@@ -32,7 +32,7 @@ export async function createDebugAssetsScene(
 
     await enablePhysics(scene);
 
-    const assets = await loadRenderingAssets((loadedCount, totalCount, name) => {
+    await loadRenderingAssets((loadedCount, totalCount, name) => {
         progressCallback(loadedCount / totalCount, `Loading ${name}`);
     }, scene);
 

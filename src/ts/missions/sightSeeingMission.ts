@@ -50,8 +50,6 @@ function generateMissionTree(target: SightSeeingTarget, starSystemDatabase: Star
             return new MissionTerminatorLandingNode(target.objectId);
         case MissionType.SIGHT_SEEING_ASTEROID_FIELD:
             return MissionAsteroidFieldNode.New(target.objectId, starSystemDatabase);
-        default:
-            throw new Error(`Unknown sight seeing type: ${target.type}`);
     }
 }
 

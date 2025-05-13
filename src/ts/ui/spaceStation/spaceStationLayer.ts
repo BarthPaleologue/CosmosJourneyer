@@ -22,13 +22,11 @@ import { generateMissionsDom } from "./spaceStationMissions";
 import { Settings } from "../../settings";
 import { alertModal, promptModalString } from "../../utils/dialogModal";
 import i18n from "../../i18n";
-import { Sounds } from "../../assets/sounds";
 import { ExplorationCenterPanel } from "./explorationCenterPanel";
 import { EncyclopaediaGalacticaManager } from "../../society/encyclopaediaGalacticaManager";
 import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
 import { OrbitalFacilityModel, OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
 import { DeepReadonly } from "../../utils/types";
-
 import editIcon from "../../../asset/icons/edit.webp";
 import missionsIcon from "../../../asset/icons/space-exploration.webp";
 import shipHangarIcon from "../../../asset/icons/spaceship_gear.webp";
@@ -37,7 +35,6 @@ import tradingIcon from "../../../asset/icons/trade.webp";
 import infoIcon from "../../../asset/icons/space-station.webp";
 import liftOffIcon from "../../../asset/icons/launch.webp";
 import { SpaceshipDockUI } from "./spaceshipDock";
-import { Sound } from "@babylonjs/core/Audio/sound";
 import { ISoundPlayer, SoundType } from "../../audio/soundPlayer";
 
 const enum MainPanelState {
@@ -308,7 +305,8 @@ export class SpaceStationLayer {
         }
 
         if (this.currentStation === null) {
-            return await alertModal("No current station", this.soundPlayer);
+            await alertModal("No current station", this.soundPlayer);
+            return;
         }
 
         switch (this.mainPanelState) {

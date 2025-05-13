@@ -25,7 +25,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math";
  * @throws An error if the wheel of fortune failed. (This should never happen.)
  */
 export function wheelOfFortune<T>(options: [T, number][], randomValue: number): T {
-    const total = options.reduce((acc, [_, weight]) => acc + weight, 0);
+    const total = options.reduce((acc, [, weight]) => acc + weight, 0);
     const choice = randomValue * total;
     let current = 0;
     for (const [option, weight] of options) {

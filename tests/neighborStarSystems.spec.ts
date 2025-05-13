@@ -32,7 +32,7 @@ test("getNeighborStarSystemCoordinates", () => {
 
         const neighbors = getNeighborStarSystemCoordinates(systemCoordinates, searchRadius, starSystemDatabase);
         neighbors.forEach((neighbor) => {
-            const [starSystemCoordinates, position, distance] = neighbor;
+            const { coordinates: starSystemCoordinates, position, distance } = neighbor;
             expect(position).toBeInstanceOf(Vector3);
             expect(distance).toBeGreaterThan(0);
             expect(distance).toBeLessThanOrEqual(searchRadius);

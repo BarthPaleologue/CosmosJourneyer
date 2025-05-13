@@ -242,12 +242,16 @@ export class CharacterControls implements Controls {
 
     public setFirstPersonCameraActive() {
         this.activeCamera = this.firstPersonCamera;
-        this.character.getChildMeshes().forEach((mesh) => mesh.setEnabled(false));
+        this.character.getChildMeshes().forEach((mesh) => {
+            mesh.setEnabled(false);
+        });
     }
 
     public setThirdPersonCameraActive() {
         this.activeCamera = this.thirdPersonCamera;
-        this.character.getChildMeshes().forEach((mesh) => mesh.setEnabled(true));
+        this.character.getChildMeshes().forEach((mesh) => {
+            mesh.setEnabled(true);
+        });
     }
 
     public setClosestWalkableObject(object: Transformable | null) {

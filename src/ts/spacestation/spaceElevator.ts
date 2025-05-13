@@ -42,7 +42,7 @@ import { clamp, remap, triangleWave } from "../utils/math";
 import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
 import { setUpVector } from "../uberCore/transforms/basicTransform";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
-import { DeepReadonly, NonEmptyArray } from "../utils/types";
+import { DeepReadonly } from "../utils/types";
 import { LandingPadManager } from "./landingPad/landingPadManager";
 import { getSphereRadiatedEnergyFlux } from "../utils/physics";
 import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
@@ -324,10 +324,18 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
 
         this.elapsedSeconds += deltaSeconds;
 
-        this.helixHabitats.forEach((helixHabitat) => helixHabitat.update(cameraWorldPosition, deltaSeconds));
-        this.ringHabitats.forEach((ringHabitat) => ringHabitat.update(cameraWorldPosition, deltaSeconds));
-        this.cylinderHabitats.forEach((cylinderHabitat) => cylinderHabitat.update(cameraWorldPosition, deltaSeconds));
-        this.landingBays.forEach((landingBay) => landingBay.update(cameraWorldPosition, deltaSeconds));
+        this.helixHabitats.forEach((helixHabitat) => {
+            helixHabitat.update(cameraWorldPosition, deltaSeconds);
+        });
+        this.ringHabitats.forEach((ringHabitat) => {
+            ringHabitat.update(cameraWorldPosition, deltaSeconds);
+        });
+        this.cylinderHabitats.forEach((cylinderHabitat) => {
+            cylinderHabitat.update(cameraWorldPosition, deltaSeconds);
+        });
+        this.landingBays.forEach((landingBay) => {
+            landingBay.update(cameraWorldPosition, deltaSeconds);
+        });
 
         const climberSpeed = 300 / 3.6; // 300 km/h in m/s
         const roundTripDuration = (2 * this.tetherLength) / climberSpeed;
@@ -346,12 +354,24 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
     }
 
     dispose() {
-        this.solarSections.forEach((solarSection) => solarSection.dispose());
-        this.utilitySections.forEach((utilitySection) => utilitySection.dispose());
-        this.helixHabitats.forEach((helixHabitat) => helixHabitat.dispose());
-        this.ringHabitats.forEach((ringHabitat) => ringHabitat.dispose());
-        this.cylinderHabitats.forEach((cylinderHabitat) => cylinderHabitat.dispose());
-        this.landingBays.forEach((landingBay) => landingBay.dispose());
+        this.solarSections.forEach((solarSection) => {
+            solarSection.dispose();
+        });
+        this.utilitySections.forEach((utilitySection) => {
+            utilitySection.dispose();
+        });
+        this.helixHabitats.forEach((helixHabitat) => {
+            helixHabitat.dispose();
+        });
+        this.ringHabitats.forEach((ringHabitat) => {
+            ringHabitat.dispose();
+        });
+        this.cylinderHabitats.forEach((cylinderHabitat) => {
+            cylinderHabitat.dispose();
+        });
+        this.landingBays.forEach((landingBay) => {
+            landingBay.dispose();
+        });
         this.tether.dispose();
         this.tetherMaterial.dispose();
 

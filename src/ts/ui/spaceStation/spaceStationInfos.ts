@@ -48,8 +48,8 @@ export function generateInfoHTML(
 
         ${makeD3PieChart<[number, CropType]>(
             agricultureMix,
-            ([proportion, _]) => proportion,
-            ([_, cropType]) => cropTypeToString(cropType)
+            ([proportion]) => proportion,
+            ([, cropType]) => cropTypeToString(cropType)
         )}
     `;
 }

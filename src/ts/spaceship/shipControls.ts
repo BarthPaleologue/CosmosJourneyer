@@ -182,7 +182,7 @@ export class ShipControls implements Controls {
                 createNotification(
                     NotificationOrigin.SPACESHIP,
                     NotificationIntent.ERROR,
-                    `Cannot land while warp drive is enabled. You can use ${relevantKeys} to toggle your warp drive.`,
+                    `Cannot land while warp drive is enabled. You can use ${relevantKeys.join(", ")} to toggle your warp drive.`,
                     5000,
                     soundPlayer
                 );
@@ -312,7 +312,7 @@ export class ShipControls implements Controls {
         }
 
         const warpDrive = spaceship.getInternals().getWarpDrive();
-        if (warpDrive?.isDisabled()) {
+        if (warpDrive === null || warpDrive.isDisabled()) {
             spaceship.increaseMainEngineThrottle(deltaSeconds * SpaceShipControlsInputs.map.throttle.value);
 
             if (SpaceShipControlsInputs.map.upDown.value !== 0) {
@@ -361,7 +361,7 @@ export class ShipControls implements Controls {
                 spaceship.aggregate.body.applyAngularImpulse(angularImpulse);
             }
         } else {
-            warpDrive?.increaseThrottle(0.5 * deltaSeconds * SpaceShipControlsInputs.map.throttle.value);
+            warpDrive.increaseThrottle(0.5 * deltaSeconds * SpaceShipControlsInputs.map.throttle.value);
 
             this.rotationInertia.x = lerpSmooth(this.rotationInertia.x, inputRoll, 0.07, deltaSeconds);
             this.rotationInertia.y = lerpSmooth(this.rotationInertia.y, inputPitch, 0.07, deltaSeconds);

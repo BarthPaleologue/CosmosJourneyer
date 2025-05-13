@@ -16,8 +16,11 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { ILandingPad, LandingPadManager, LandingPadSize, LandingRequest } from "./landingPadManager";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ObjectTargetCursorType, TargetInfo } from "../../architecture/targetable";
+import { TransformNode } from "@babylonjs/core";
+
+vi.mock("@babylonjs/core");
 
 // Mock LandingPad implementation for testing
 class MockLandingPad implements ILandingPad {
@@ -31,6 +34,8 @@ class MockLandingPad implements ILandingPad {
         minDistance: 0,
         maxDistance: 0
     };
+
+    private readonly transform = new TransformNode("mockLandingPadTransform");
 
     constructor(padSize: LandingPadSize) {
         this.padSize = padSize;
@@ -55,9 +60,11 @@ class MockLandingPad implements ILandingPad {
 
     // Implement other required LandingPad methods with minimal functionality
     getTransform() {
-        return {} as any;
+        return this.transform;
     }
-    dispose() {}
+    dispose() {
+        this.transform.dispose();
+    }
     getBoundingRadius() {
         return 0;
     }
@@ -143,11 +150,14 @@ describe("LandingPadManager", () => {
         // Allocate a pad
         const request: LandingRequest = { minimumPadSize: LandingPadSize.MEDIUM };
         const assignedPad = landingPadManager.handleLandingRequest(request);
+        if (assignedPad === null) {
+            throw new Error("Assigned pad is null");
+        }
 
         expect(landingPadManager.getAvailableLandingPads().length).toBe(2);
 
         // Cancel the request
-        landingPadManager.cancelLandingRequest(assignedPad!);
+        landingPadManager.cancelLandingRequest(assignedPad);
 
         // The pad should be available again
         expect(landingPadManager.getAvailableLandingPads().length).toBe(3);
@@ -161,9 +171,12 @@ describe("LandingPadManager", () => {
         // Should get medium pad, not large
         const assignedPad = landingPadManager.handleLandingRequest(request);
         expect(assignedPad).toBe(mediumPad);
+        if (assignedPad !== mediumPad) {
+            throw new Error("Assigned pad is not the expected medium pad");
+        }
 
         // Make medium unavailable
-        landingPadManager.cancelLandingRequest(assignedPad!);
+        landingPadManager.cancelLandingRequest(assignedPad);
 
         // Now make both small and medium unavailable
         landingPadManager.handleLandingRequest({ minimumPadSize: LandingPadSize.SMALL });

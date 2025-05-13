@@ -231,10 +231,14 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
     public dispose() {
         this.aggregate?.dispose();
 
-        this.helpers.forEach((helper) => helper.dispose());
+        this.helpers.forEach((helper) => {
+            helper.dispose();
+        });
         this.helpers.length = 0;
 
-        this.instancePatches.forEach((patch) => patch.dispose());
+        this.instancePatches.forEach((patch) => {
+            patch.dispose();
+        });
         this.instancePatches.length = 0;
 
         this.mesh.dispose();
@@ -263,7 +267,6 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
         this.mesh.setEnabled(isVisible);
 
         this.instancePatches.forEach((patch) => {
-            let isVisible = false;
             let minDistance = Number.MAX_VALUE;
             const distanceVector = camera.globalPosition.subtract(this.getTransform().getAbsolutePosition());
 
@@ -276,7 +279,7 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
             const normalComponent = sphereNormal.scale(distanceVector.dot(sphereNormal));
             const tangentialDistance = distanceVector.subtract(normalComponent).length();
 
-            isVisible = isVisible || tangentialDistance < 200;
+            const isVisible = tangentialDistance < 200;
             minDistance = Math.min(minDistance, tangentialDistance);
 
             patch.setEnabled(isVisible);

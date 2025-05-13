@@ -24,7 +24,7 @@ export function getNeighborStarSystemCoordinates(
     starSystemCoordinates: StarSystemCoordinates,
     radius: number,
     starSystemDatabase: StarSystemDatabase
-): [StarSystemCoordinates, Vector3, number][] {
+): Array<{ coordinates: StarSystemCoordinates; position: Vector3; distance: number }> {
     const currentSystemPosition = starSystemDatabase.getSystemGalacticPosition(starSystemCoordinates);
     const starSectorSize = Settings.STAR_SECTOR_SIZE;
     const starSectorRadius = Math.ceil(radius / starSectorSize);
@@ -62,17 +62,20 @@ export function getNeighborStarSystemCoordinates(
             starSector.z
         );
         return starPositions
-            .map<[StarSystemCoordinates, Vector3, number]>((position, index) => {
+            .map<{ coordinates: StarSystemCoordinates; position: Vector3; distance: number }>((position, index) => {
                 const distance = Vector3.Distance(position, currentSystemPosition);
                 const coordinates = systemCoordinates[index];
                 if (coordinates === undefined) {
                     throw new Error("Coordinates not found for the given index");
                 }
 
-                return [coordinates, position, distance];
+                return { coordinates, position, distance };
             })
-            .filter(([neighborCoordinates, position, distance]) => {
-                return distance <= radius && !starSystemCoordinatesEquals(neighborCoordinates, starSystemCoordinates);
+            .filter((neighbor) => {
+                return (
+                    neighbor.distance <= radius &&
+                    !starSystemCoordinatesEquals(neighbor.coordinates, starSystemCoordinates)
+                );
             });
     });
 }

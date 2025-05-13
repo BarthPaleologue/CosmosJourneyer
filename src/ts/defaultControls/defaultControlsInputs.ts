@@ -69,11 +69,11 @@ const yawAction = new Action({
 
 export const DefaultControlsInputs = new InputMap<{
     move: Action<[number, number]>;
-    upDown: Action<number>;
-    changeSpeed: Action<number>;
-    roll: Action<number>;
-    pitch: Action<number>;
-    yaw: Action<number>;
+    upDown: Action;
+    changeSpeed: Action;
+    roll: Action;
+    pitch: Action;
+    yaw: Action;
 }>("DefaultControlsInputs", {
     move: moveAction,
     upDown: upDownAction,

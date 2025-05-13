@@ -71,7 +71,6 @@ import { ISoundPlayer, SoundPlayer, SoundType } from "./audio/soundPlayer";
 import { UberScene } from "./uberCore/uberScene";
 import { Tts } from "./audio/tts";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
-import { setMaxLinVel } from "./utils/havok";
 import { hashArray } from "./utils/hash";
 import { generateDarkKnightModel } from "./anomalies/darkKnight/darkKnightModelGenerator";
 
@@ -155,7 +154,7 @@ export class CosmosJourneyer {
         this.assets = assets;
 
         this.player = player;
-        this.player.onNameChangedObservable.add(async (newName) => {
+        this.player.onNameChangedObservable.add((newName) => {
             this.saveManager.renameCmdr(this.player.uuid, newName);
             this.saveManager.save();
         });
@@ -170,13 +169,13 @@ export class CosmosJourneyer {
         });
 
         this.starSystemView = starSystemView;
-        this.starSystemView.onBeforeJump.add(async () => {
+        this.starSystemView.onBeforeJump.add(() => {
             // in case something goes wrong during the jump, we want to save the player's progress
-            await this.createAutoSave();
+            this.createAutoSave();
         });
         this.starSystemView.onAfterJump.add(async () => {
             // always save the player's progress after a jump
-            await this.createAutoSave();
+            this.createAutoSave();
 
             if (!this.player.tutorials.fuelScoopingCompleted) {
                 await this.tutorialLayer.setTutorial(new FuelScoopTutorial());
@@ -185,8 +184,8 @@ export class CosmosJourneyer {
                 });
             }
         });
-        this.starSystemView.onNewDiscovery.add(async () => {
-            await this.createAutoSave();
+        this.starSystemView.onNewDiscovery.add(() => {
+            this.createAutoSave();
         });
 
         this.musicConductor = new MusicConductor(this.assets.audio.musics, this.starSystemView);
@@ -215,10 +214,10 @@ export class CosmosJourneyer {
         document.body.appendChild(this.tutorialLayer.root);
 
         this.sidePanels = new SidePanels(this.starSystemDatabase, this.saveManager, this.soundPlayer);
-        this.sidePanels.loadSavePanelContent.onLoadSaveObservable.add(async (saveData: Save) => {
+        this.sidePanels.loadSavePanelContent.onLoadSaveObservable.add((saveData: Save) => {
             engine.onEndFrameObservable.addOnce(async () => {
                 if (this.isPaused()) {
-                    await this.createAutoSave(); // from the pause menu, create autosave of the current game before loading a save
+                    this.createAutoSave(); // from the pause menu, create autosave of the current game before loading a save
                 }
                 await this.resume();
                 this.starSystemView.setUIEnabled(true);
@@ -249,13 +248,13 @@ export class CosmosJourneyer {
                     return currentDistance < closestDistance ? current : closest;
                 });
             this.starSystemView.setTarget(closestSpaceStation);
-            await this.createAutoSave();
+            this.createAutoSave();
         });
 
         this.sidePanels.tutorialsPanelContent.onTutorialSelected.add(async (tutorial) => {
             if (!this.mainMenu.isVisible()) {
                 // if the main menu is not visible, then we are in game and we need to ask the player if they want to leave their game
-                await this.createAutoSave();
+                this.createAutoSave();
                 const shouldLoadTutorial = await promptModalBoolean(
                     i18n.t("tutorials:common:loadTutorialWillLeaveGame"),
                     this.soundPlayer
@@ -263,7 +262,7 @@ export class CosmosJourneyer {
                 if (!shouldLoadTutorial) return;
             }
             this.sidePanels.hideActivePanel();
-            await this.loadTutorial(tutorial);
+            this.loadTutorial(tutorial);
         });
 
         this.starSystemView.getSpaceshipControls().onToggleWarpDrive.add(async (isWarpDriveEnabled) => {
@@ -285,8 +284,8 @@ export class CosmosJourneyer {
             });
         });
 
-        this.starSystemView.getSpaceshipControls().onCompleteLanding.add(async () => {
-            await this.createAutoSave();
+        this.starSystemView.getSpaceshipControls().onCompleteLanding.add(() => {
+            this.createAutoSave();
         });
 
         this.starSystemView.onInitStarSystem.add(() => {
@@ -350,39 +349,39 @@ export class CosmosJourneyer {
         });
 
         window.addEventListener("blur", () => {
-            if (!this.mainMenu?.isVisible() && !this.starSystemView.isLoadingSystem()) this.pause();
+            if (!this.mainMenu.isVisible() && !this.starSystemView.isLoadingSystem()) this.pause();
         });
 
         window.addEventListener("mouseleave", () => {
-            if (!this.mainMenu?.isVisible() && !this.starSystemView.isLoadingSystem()) this.pause();
+            if (!this.mainMenu.isVisible() && !this.starSystemView.isLoadingSystem()) this.pause();
         });
 
         window.addEventListener("resize", () => {
             this.engine.resize(true);
         });
 
-        window.addEventListener("beforeunload", async () => {
+        window.addEventListener("beforeunload", () => {
             if (this.mainMenu.isVisible()) return; // don't autosave if the main menu is visible: the player is not in the game yet
-            await this.createAutoSave();
+            this.createAutoSave();
         });
 
         GeneralInputs.map.toggleStarMap.on("complete", async () => {
-            if (this.mainMenu?.isVisible()) return;
+            if (this.mainMenu.isVisible()) return;
             await this.toggleStarMap();
         });
 
         GeneralInputs.map.screenshot.on("complete", async () => {
-            if (this.mainMenu?.isVisible()) return;
+            if (this.mainMenu.isVisible()) return;
             await this.takeScreenshot();
         });
 
         GeneralInputs.map.videoCapture.on("complete", async () => {
-            if (this.mainMenu?.isVisible()) return;
+            if (this.mainMenu.isVisible()) return;
             await this.takeVideoCapture();
         });
 
-        GeneralInputs.map.togglePause.on("complete", async () => {
-            if (this.mainMenu?.isVisible()) return;
+        GeneralInputs.map.togglePause.on("complete", () => {
+            if (this.mainMenu.isVisible()) return;
             if (!this.isPaused()) this.pause();
         });
 
@@ -429,7 +428,7 @@ export class CosmosJourneyer {
         await initI18n();
 
         // Log informations about the gpu and the api used
-        console.log(`API: ${engine.isWebGPU ? "WebGPU" : "WebGL" + engine.version}`);
+        console.log(`API: ${engine.isWebGPU ? "WebGPU" : "WebGL"}`);
         console.log(`GPU detected: ${engine.extractDriverInfo()}`);
 
         // Init Havok physics engine
@@ -471,10 +470,10 @@ export class CosmosJourneyer {
         mainScene.useRightHandedSystem = true;
 
         const mainHavokPlugin = new HavokPlugin(true, havokInstance);
-        setMaxLinVel(mainHavokPlugin, 10000, 10000);
+        mainHavokPlugin.setVelocityLimits(10_000, 10_000);
         mainScene.enablePhysics(Vector3.Zero(), mainHavokPlugin);
 
-        const assets = await loadAssets((loadedCount, totalCount, name) => {
+        const assets = await loadAssets((loadedCount, totalCount) => {
             loadingScreen.setProgressPercentage((loadedCount / totalCount) * 100);
         }, mainScene);
 
@@ -579,7 +578,7 @@ export class CosmosJourneyer {
                 if (!this.mainMenu.isVisible() && !this.starSystemView.isJumpingBetweenSystems()) {
                     // don't autosave if the main menu is visible: the player is not in the game yet
                     // don't autosave when jumping between systems
-                    void this.createAutoSave();
+                    this.createAutoSave();
                 }
             }
 
@@ -778,7 +777,7 @@ export class CosmosJourneyer {
     /**
      * Generate save file data and store it in the autosaves hashmap in local storage
      */
-    public async createAutoSave(): Promise<void> {
+    public createAutoSave(): void {
         if (!this.isAutoSaveEnabled) return;
 
         const saveData = this.generateSaveData();
@@ -818,7 +817,7 @@ export class CosmosJourneyer {
         });
     }
 
-    public async loadTutorial(tutorial: Tutorial) {
+    public loadTutorial(tutorial: Tutorial) {
         this.engine.onEndFrameObservable.addOnce(async () => {
             this.mainMenu.hide();
             const saveResult = tutorial.getSaveData(this.starSystemDatabase);
@@ -896,10 +895,7 @@ export class CosmosJourneyer {
             return;
         }
 
-        const newPlayer =
-            saveData.player !== undefined
-                ? Player.Deserialize(saveData.player, this.starSystemDatabase)
-                : Player.Default(this.starSystemDatabase);
+        const newPlayer = Player.Deserialize(saveData.player, this.starSystemDatabase);
         this.player.copyFrom(newPlayer, this.starSystemDatabase);
         this.player.discoveries.uploaded.forEach(async (discovery) => {
             await this.encyclopaedia.contributeDiscoveryIfNew(discovery);

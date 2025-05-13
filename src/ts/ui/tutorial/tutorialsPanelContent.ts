@@ -59,7 +59,7 @@ export class TutorialsPanelContent {
 
             this.htmlRoot.appendChild(tutorialDiv);
 
-            tutorialDiv.addEventListener("click", async () => {
+            tutorialDiv.addEventListener("click", () => {
                 this.onTutorialSelected.notifyObservers(tutorial);
             });
         });

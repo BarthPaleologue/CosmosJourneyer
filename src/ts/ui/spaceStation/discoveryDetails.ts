@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Sounds } from "../../assets/sounds";
 import { Player } from "../../player/player";
 import { EncyclopaediaGalactica, SpaceDiscoveryData } from "../../society/encyclopaediaGalactica";
 import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
@@ -28,7 +27,6 @@ import { createNotification, NotificationIntent, NotificationOrigin } from "../.
 import { alertModal } from "../../utils/dialogModal";
 import { getObjectModelById } from "../../starSystem/starSystemModel";
 import { getOrbitalPeriod } from "../../orbit/orbit";
-import { Sound } from "@babylonjs/core/Audio/sound";
 import { ISoundPlayer, SoundType } from "../../audio/soundPlayer";
 
 export class DiscoveryDetails {
@@ -140,6 +138,10 @@ export class DiscoveryDetails {
         }
 
         const objectModel = getObjectModelById(this.currentDiscovery.objectId.idInSystem, systemModel);
+
+        this.objectName.innerText = objectModel?.name ?? i18n.t("common:unknown");
+        this.htmlRoot.appendChild(this.objectName);
+
         if (objectModel === null) {
             console.error(discovery);
             await alertModal(
@@ -148,13 +150,6 @@ export class DiscoveryDetails {
             );
             return;
         }
-
-        const parentIds = objectModel.orbit.parentIds;
-        const parentModels = parentIds.map((id) => getObjectModelById(id, systemModel));
-        const parentMass = parentModels.reduce((acc, model) => acc + (model?.mass ?? 0), 0);
-
-        this.objectName.innerText = objectModel.name ?? i18n.t("common:unknown");
-        this.htmlRoot.appendChild(this.objectName);
 
         this.objectType.innerText = i18n.t("orbitalObject:type", {
             value: getOrbitalObjectTypeToI18nString(objectModel)
@@ -165,6 +160,10 @@ export class DiscoveryDetails {
             value: parseSecondsPrecise(objectModel.siderealDaySeconds)
         });
         this.htmlRoot.appendChild(this.siderealDayDuration);
+
+        const parentIds = objectModel.orbit.parentIds;
+        const parentModels = parentIds.map((id) => getObjectModelById(id, systemModel));
+        const parentMass = parentModels.reduce((acc, model) => acc + (model?.mass ?? 0), 0);
 
         const orbitalPeriod = getOrbitalPeriod(objectModel.orbit.semiMajorAxis, parentMass);
         this.orbitDuration.innerText = i18n.t("orbit:period", {

@@ -166,20 +166,15 @@ export class SoundPlayerMock implements ISoundPlayer {
         // No-op
     }
 
-    createInstance(
-        soundType: SoundType,
-        mask: number,
-        initialTargetVolume: number,
-        isPonctual: boolean
-    ): ISoundInstance {
+    createInstance(): ISoundInstance {
         return new SoundInstanceMock();
     }
 
-    freeInstance(instance: ISoundInstance): void {
+    freeInstance(): void {
         // No-op
     }
 
-    setInstanceMask(mask: number): void {
+    setInstanceMask(): void {
         // No-op
     }
 

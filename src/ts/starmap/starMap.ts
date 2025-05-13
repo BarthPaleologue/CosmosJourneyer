@@ -184,23 +184,29 @@ export class StarMap implements View {
         });
 
         this.starMapUI.shortHandUIPlotItineraryButton.addEventListener("click", async () => {
-            if (this.currentSystemCoordinates === null)
-                return await alertModal("current system seed is null!", this.soundPlayer);
-            if (this.selectedSystemCoordinates === null)
-                return await alertModal("selected system seed is null!", this.soundPlayer);
+            if (this.currentSystemCoordinates === null) {
+                await alertModal("current system seed is null!", this.soundPlayer);
+                return;
+            }
+            if (this.selectedSystemCoordinates === null) {
+                await alertModal("selected system seed is null!", this.soundPlayer);
+                return;
+            }
 
             const playerCurrentSpaceship = this.player.instancedSpaceships.at(0);
             if (playerCurrentSpaceship === undefined) {
-                return await alertModal("You do not own a spaceship! What have you done???", this.soundPlayer);
+                await alertModal("You do not own a spaceship! What have you done???", this.soundPlayer);
+                return;
             }
 
             const warpDrive = playerCurrentSpaceship.getInternals().getWarpDrive();
 
             if (warpDrive === null) {
-                return await alertModal(
+                await alertModal(
                     "Your current spaceship has no warp drive! Install a warp drive to plot an itinerary.",
                     this.soundPlayer
                 );
+                return;
             }
 
             const jumpRange = warpDrive.rangeLY;
@@ -312,7 +318,7 @@ export class StarMap implements View {
             }
         }
 
-        this.scene.onBeforeRenderObservable.add(() => {
+        this.scene.onBeforeRenderObservable.add(async () => {
             const deltaSeconds = this.scene.getEngine().getDeltaTime() / 1000;
 
             if (this.rotationAnimation !== null) this.rotationAnimation.update(deltaSeconds);
@@ -338,11 +344,15 @@ export class StarMap implements View {
                 if (this.stellarPathfinder.hasFoundPath()) {
                     this.soundPlayer.playNow(SoundType.ITINERARY_COMPUTED);
                     const path = this.stellarPathfinder.getPath();
-                    this.drawPath(path);
+                    if (!path.success) {
+                        await alertModal(path.error.message, this.soundPlayer);
+                        continue;
+                    }
+                    this.drawPath(path.value);
 
-                    this.player.currentItinerary = path;
+                    this.player.currentItinerary = path.value;
 
-                    const nextDestination = path[1];
+                    const nextDestination = path.value[1];
 
                     if (nextDestination !== undefined) {
                         this.onTargetSetObservable.notifyObservers(nextDestination);
@@ -604,7 +614,7 @@ export class StarMap implements View {
             })
         );
 
-        initializedInstance.actionManager?.registerAction(
+        initializedInstance.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPickTrigger, () => {
                 this.soundPlayer.playNow(SoundType.TARGET_LOCK);
 
@@ -624,8 +634,11 @@ export class StarMap implements View {
     }
 
     public focusOnCurrentSystem(skipAnimation = false) {
-        if (this.currentSystemCoordinates === null) return console.warn("No current system seed!");
-        this.focusOnSystem(this.currentSystemCoordinates);
+        if (this.currentSystemCoordinates === null) {
+            console.warn("No current system seed!");
+            return;
+        }
+        this.focusOnSystem(this.currentSystemCoordinates, skipAnimation);
     }
 
     public focusOnSystem(starSystemCoordinates: StarSystemCoordinates, skipAnimation = false) {
