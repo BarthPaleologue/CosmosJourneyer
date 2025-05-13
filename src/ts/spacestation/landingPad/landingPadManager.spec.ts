@@ -16,9 +16,11 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { ILandingPad, LandingPadManager, LandingPadSize, LandingRequest } from "./landingPadManager";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ObjectTargetCursorType, TargetInfo } from "../../architecture/targetable";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { TransformNode } from "@babylonjs/core";
+
+vi.mock("@babylonjs/core");
 
 // Mock LandingPad implementation for testing
 class MockLandingPad implements ILandingPad {
