@@ -94,7 +94,10 @@ export class AsteroidPatch {
                 throw new Error(`Asteroid physics shape for type index ${typeIndex} is undefined.`);
             }
 
-            if (distanceToCamera < this.physicsRadius && instance.physicsBody === null) {
+            if (
+                distanceToCamera < this.physicsRadius &&
+                (instance.physicsBody === null || instance.physicsBody === undefined)
+            ) {
                 const instancePhysicsBody = new PhysicsBody(
                     instance,
                     PhysicsMotionType.DYNAMIC,
@@ -107,13 +110,15 @@ export class AsteroidPatch {
                 instancePhysicsBody.disablePreStep = false;
                 instancePhysicsBody.shape = shape;
                 this.instancePhysicsBodies.push(instancePhysicsBody);
-            } else if (distanceToCamera > this.physicsRadius + 1000 && instance.physicsBody !== null) {
+            } else if (
+                distanceToCamera > this.physicsRadius + 1000 &&
+                instance.physicsBody !== null &&
+                instance.physicsBody !== undefined
+            ) {
                 const body = this.instancePhysicsBodies.find((body) => body === instance.physicsBody);
-                if (body) {
+                if (body !== undefined) {
                     body.dispose();
                     this.instancePhysicsBodies.splice(this.instancePhysicsBodies.indexOf(body), 1);
-                } else {
-                    throw new Error("Physics body not found in instance physics bodies.");
                 }
             }
 

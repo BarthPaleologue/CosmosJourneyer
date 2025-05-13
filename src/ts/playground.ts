@@ -60,7 +60,7 @@ if (urlParams.get("physicsViewer") !== null) {
     scene.onBeforeRenderObservable.add(() => {
         for (const mesh of scene.meshes) {
             const physicsBody = mesh.physicsBody;
-            if (physicsBody === null) {
+            if (!physicsBody) {
                 continue;
             }
 
