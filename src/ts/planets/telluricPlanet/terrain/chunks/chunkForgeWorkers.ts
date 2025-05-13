@@ -135,14 +135,17 @@ export class ChunkForgeWorkers implements ChunkForge {
      * Updates the state of the forge : dispatch tasks to workers, remove useless chunks, apply vertexData to new chunks
      */
     public update(assets: RenderingAssets) {
-        for (const worker of this.workerPool.availableWorkers) {
+        this.workerPool.availableWorkers.push(...this.workerPool.finishedWorkers);
+        this.workerPool.finishedWorkers = [];
+
+        while (this.workerPool.availableWorkers.length > 0) {
+            const worker = this.workerPool.availableWorkers.shift();
+            if (worker === undefined) {
+                break;
+            }
+
             this.executeNextTask(worker);
         }
-        this.workerPool.availableWorkers = this.workerPool.availableWorkers.filter(
-            (w) => !this.workerPool.busyWorkers.includes(w)
-        );
-        this.workerPool.availableWorkers = this.workerPool.availableWorkers.concat(this.workerPool.finishedWorkers);
-        this.workerPool.finishedWorkers = [];
 
         this.executeNextApplyTask(assets);
     }
