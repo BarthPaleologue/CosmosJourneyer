@@ -18,7 +18,7 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { expect, test } from "vitest";
 
-import { getTransformationQuaternion } from "../src/ts/utils/algebra";
+import { getTransformationQuaternion } from "@/utils/algebra";
 
 test("getTransformationQuaternion", () => {
     const from = new Vector3(0, 1, 0);

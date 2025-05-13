@@ -17,11 +17,12 @@
 
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { getLoneStarSystem } from "../src/ts/starSystem/customSystems/loneStar";
-import { getSolSystemModel } from "../src/ts/starSystem/customSystems/sol";
-import { StarSystemDatabase } from "../src/ts/starSystem/starSystemDatabase";
-import { StarSystemModel } from "../src/ts/starSystem/starSystemModel";
-import { StarSystemCoordinates } from "../src/ts/utils/coordinates/starSystemCoordinates";
+import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
+
+import { getLoneStarSystem } from "@/starSystem/customSystems/loneStar";
+import { getSolSystemModel } from "@/starSystem/customSystems/sol";
+import { StarSystemDatabase } from "@/starSystem/starSystemDatabase";
+import { StarSystemModel } from "@/starSystem/starSystemModel";
 
 describe("StarSystemDatabase", () => {
     let database: StarSystemDatabase;

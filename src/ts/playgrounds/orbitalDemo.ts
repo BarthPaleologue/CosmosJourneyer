@@ -15,13 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { setOrbitalPosition, setRotation } from "@/architecture/orbitalObjectUtils";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { Scene } from "@babylonjs/core/scene";
+
+import { setOrbitalPosition, setRotation } from "@/architecture/orbitalObjectUtils";
 
 import { OrbitalObject } from "../architecture/orbitalObject";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";

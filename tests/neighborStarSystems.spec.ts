@@ -18,10 +18,11 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { expect, test } from "vitest";
 
-import { getLoneStarSystem } from "../src/ts/starSystem/customSystems/loneStar";
-import { StarSystemDatabase } from "../src/ts/starSystem/starSystemDatabase";
-import { starSystemCoordinatesEquals } from "../src/ts/utils/coordinates/starSystemCoordinates";
-import { getNeighborStarSystemCoordinates } from "../src/ts/utils/getNeighborStarSystems";
+import { starSystemCoordinatesEquals } from "@/utils/coordinates/starSystemCoordinates";
+import { getNeighborStarSystemCoordinates } from "@/utils/getNeighborStarSystems";
+
+import { getLoneStarSystem } from "@/starSystem/customSystems/loneStar";
+import { StarSystemDatabase } from "@/starSystem/starSystemDatabase";
 
 test("getNeighborStarSystemCoordinates", () => {
     const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());

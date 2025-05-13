@@ -15,14 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Matrix } from "@babylonjs/core/Maths/math";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+
 import {
     getOrbitalPosition,
     getRotationAngle,
     setOrbitalPosition,
     setRotation
 } from "@/architecture/orbitalObjectUtils";
-import { Matrix } from "@babylonjs/core/Maths/math";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import {
     Anomaly,

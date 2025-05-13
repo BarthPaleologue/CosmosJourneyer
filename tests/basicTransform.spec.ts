@@ -28,7 +28,7 @@ import {
     getForwardDirection,
     getLeftDirection,
     getRightDirection
-} from "../src/ts/uberCore/transforms/basicTransform";
+} from "@/uberCore/transforms/basicTransform";
 
 const engine = new NullEngine();
 const scene = new Scene(engine);

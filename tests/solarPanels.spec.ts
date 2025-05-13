@@ -17,8 +17,8 @@
 
 import { expect, test } from "vitest";
 
-import { getSphereRadiatedEnergyFlux } from "../src/ts/utils/physics";
-import { getSolarPanelSurfaceFromEnergyRequirement } from "../src/ts/utils/solarPanels";
+import { getSphereRadiatedEnergyFlux } from "@/utils/physics";
+import { getSolarPanelSurfaceFromEnergyRequirement } from "@/utils/solarPanels";
 
 test("solarPanelSurfaceCalculation", () => {
     // test with ISS data
