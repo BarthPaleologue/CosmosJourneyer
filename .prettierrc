@@ -1,5 +1,7 @@
 {
     "trailingComma": "none",
     "tabWidth": 4,
-    "printWidth": 120
+    "printWidth": 120,
+    "importOrder": ["", "<BUILTIN_MODULES>", "", "<THIRD_PARTY_MODULES>", "", "^@/utils", "", "^[.]", "", "^@assets"],
+    "plugins": ["@ianvs/prettier-plugin-sort-imports"]
 }
