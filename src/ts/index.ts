@@ -17,12 +17,13 @@
 
 import "../styles/index.scss";
 
+import { decodeBase64 } from "@/utils/base64";
+import { alertModal } from "@/utils/dialogModal";
+import { jsonSafeParse } from "@/utils/json";
+
 import { SoundPlayerMock } from "./audio/soundPlayer";
 import { CosmosJourneyer } from "./cosmosJourneyer";
 import { safeParseSave } from "./saveFile/saveFileData";
-import { decodeBase64 } from "./utils/base64";
-import { alertModal } from "./utils/dialogModal";
-import { jsonSafeParse } from "./utils/json";
 
 const soundPlayerMock = new SoundPlayerMock();
 

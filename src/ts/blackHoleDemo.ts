@@ -17,11 +17,12 @@
 
 import "../styles/index.scss";
 
+import { positionNearObjectBrightSide } from "@/utils/positionNearObject";
+
 import { CosmosJourneyer } from "./cosmosJourneyer";
 import { newSeededTelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModelGenerator";
 import { StarSystemModel } from "./starSystem/starSystemModel";
 import { newSeededBlackHoleModel } from "./stellarObjects/blackHole/blackHoleModelGenerator";
-import { positionNearObjectBrightSide } from "./utils/positionNearObject";
 
 const engine = await CosmosJourneyer.CreateAsync();
 engine.setAutoSaveEnabled(false);

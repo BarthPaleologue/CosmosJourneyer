@@ -31,6 +31,19 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import HavokPhysics from "@babylonjs/havok";
 
+import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
+import {
+    AtStationCoordinates,
+    RelativeCoordinates,
+    UniverseCoordinates
+} from "@/utils/coordinates/universeCoordinates";
+import { getUniverseObjectId } from "@/utils/coordinates/universeObjectId";
+import { alertModal, promptModalBoolean, promptModalString } from "@/utils/dialogModal";
+import { hashArray } from "@/utils/hash";
+import { createNotification, NotificationIntent, NotificationOrigin, updateNotifications } from "@/utils/notification";
+import { positionNearObject } from "@/utils/positionNearObject";
+import { View } from "@/utils/view";
+
 import { generateDarkKnightModel } from "./anomalies/darkKnight/darkKnightModelGenerator";
 import { OrbitalObjectType } from "./architecture/orbitalObjectType";
 import { Assets, loadAssets } from "./assets/assets";
@@ -64,18 +77,6 @@ import { MainMenu } from "./ui/mainMenu";
 import { PauseMenu } from "./ui/pauseMenu";
 import { SidePanels } from "./ui/sidePanels";
 import { TutorialLayer } from "./ui/tutorial/tutorialLayer";
-import { StarSystemCoordinates } from "./utils/coordinates/starSystemCoordinates";
-import {
-    AtStationCoordinates,
-    RelativeCoordinates,
-    UniverseCoordinates
-} from "./utils/coordinates/universeCoordinates";
-import { getUniverseObjectId } from "./utils/coordinates/universeObjectId";
-import { alertModal, promptModalBoolean, promptModalString } from "./utils/dialogModal";
-import { hashArray } from "./utils/hash";
-import { createNotification, NotificationIntent, NotificationOrigin, updateNotifications } from "./utils/notification";
-import { positionNearObject } from "./utils/positionNearObject";
-import { View } from "./utils/view";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -406,8 +407,8 @@ export class CosmosJourneyer {
         const engine = window.location.search.includes("webgpu")
             ? await EngineFactory.CreateAsync(canvas, {
                   twgslOptions: {
-                      wasmPath: new URL("./utils/TWGSL/twgsl.wasm", import.meta.url).href,
-                      jsPath: new URL("./utils/TWGSL/twgsl.js", import.meta.url).href
+                      wasmPath: new URL("@/utils/TWGSL/twgsl.wasm", import.meta.url).href,
+                      jsPath: new URL("@/utils/TWGSL/twgsl.js", import.meta.url).href
                   },
                   audioEngine: true
               })
