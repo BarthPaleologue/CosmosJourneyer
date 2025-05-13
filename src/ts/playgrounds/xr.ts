@@ -18,7 +18,7 @@
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { ArcRotateCamera, PostProcess, TransformNode } from "@babylonjs/core";
+import { ArcRotateCamera, Color4, PostProcess, TransformNode } from "@babylonjs/core";
 import { newSeededMandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModelGenerator";
 import { EmptyCelestialBody } from "../utils/emptyCelestialBody";
 import { MandelbulbPostProcess } from "../anomalies/mandelbulb/mandelbulbPostProcess";
@@ -47,7 +47,8 @@ export async function createXrScene(
     camera.wheelPrecision *= 100;
     camera.minZ = 0.01;
 
-    const depthRenderer = scene.enableDepthRenderer(null, false, true);
+    const depthRenderer = scene.enableDepthRenderer(null, true, true);
+    depthRenderer.clearColor = new Color4(0, 0, 0, 1);
 
     function createMandelbulb(): TransformNode {
         const mandelBulbModel = newSeededMandelbulbModel("mandelbulb", Math.random() * 100_000, "XR Anomaly", []);
