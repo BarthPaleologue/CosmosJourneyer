@@ -41,7 +41,6 @@ export default defineConfig([
     {
         rules: {
             "import/no-cycle": "error",
-            "import/no-unresolved": "warn",
 
             "@typescript-eslint/switch-exhaustiveness-check": "error",
             "@typescript-eslint/no-inferrable-types": "error",
