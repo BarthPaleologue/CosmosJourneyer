@@ -23,12 +23,13 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Scene } from "@babylonjs/core/scene";
 
-import butterflyFragment from "../../../../shaders/butterflyMaterial/butterflyFragment.glsl";
-import butterflyVertex from "../../../../shaders/butterflyMaterial/butterflyVertex.glsl";
 import {
     setStellarObjectUniforms,
     StellarObjectUniformNames
 } from "../../../postProcesses/uniforms/stellarObjectUniforms";
+
+import butterflyFragment from "@shaders/butterflyMaterial/butterflyFragment.glsl";
+import butterflyVertex from "@shaders/butterflyMaterial/butterflyVertex.glsl";
 
 const ButterflyMaterialUniformNames = {
     WORLD: "world",

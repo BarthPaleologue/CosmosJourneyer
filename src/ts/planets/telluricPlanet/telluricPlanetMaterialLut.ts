@@ -19,7 +19,7 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import { Scene } from "@babylonjs/core/scene";
 
-import lutFragment from "../../../shaders/telluricPlanetMaterial/utils/lut.glsl";
+import lutFragment from "@shaders/telluricPlanetMaterial/utils/lut.glsl";
 
 export class TelluricPlanetMaterialLut {
     private readonly lut: ProceduralTexture;

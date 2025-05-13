@@ -19,7 +19,7 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import { Scene } from "@babylonjs/core/scene";
 
-import lutFragment from "../../../shaders/starMaterial/utils/lut.glsl";
+import lutFragment from "@shaders/starMaterial/utils/lut.glsl";
 
 export class StarMaterialLut {
     private readonly lut: ProceduralTexture;

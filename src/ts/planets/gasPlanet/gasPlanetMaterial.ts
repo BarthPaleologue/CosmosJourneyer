@@ -22,8 +22,6 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Scene } from "@babylonjs/core/scene";
 import { normalRandom, randRange, randRangeInt } from "extended-random";
 
-import surfaceMaterialFragment from "../../../shaders/gasPlanetMaterial/fragment.glsl";
-import surfaceMaterialVertex from "../../../shaders/gasPlanetMaterial/vertex.glsl";
 import {
     setStellarObjectUniforms,
     StellarObjectUniformNames
@@ -32,6 +30,9 @@ import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { DeepReadonly } from "../../utils/types";
 import { GazColorSettings } from "../telluricPlanet/colorSettingsInterface";
 import { GasPlanetModel } from "./gasPlanetModel";
+
+import surfaceMaterialFragment from "@shaders/gasPlanetMaterial/fragment.glsl";
+import surfaceMaterialVertex from "@shaders/gasPlanetMaterial/vertex.glsl";
 
 const GasPlanetMaterialUniformNames = {
     WORLD: "world",

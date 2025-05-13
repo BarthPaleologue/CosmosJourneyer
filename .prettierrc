@@ -14,7 +14,9 @@
         "",
         "^[.]",
         "",
-        "^@assets"
+        "^@assets",
+        "",
+        "^@shaders"
     ],
     "plugins": ["@ianvs/prettier-plugin-sort-imports"]
 }

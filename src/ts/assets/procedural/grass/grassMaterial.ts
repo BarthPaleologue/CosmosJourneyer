@@ -22,13 +22,14 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Scene } from "@babylonjs/core/scene";
 
-import grassFragment from "../../../../shaders/grassMaterial/grassFragment.glsl";
-import grassVertex from "../../../../shaders/grassMaterial/grassVertex.glsl";
 import {
     setStellarObjectUniforms,
     StellarObjectUniformNames
 } from "../../../postProcesses/uniforms/stellarObjectUniforms";
 import { NoiseTextures } from "../../textures";
+
+import grassFragment from "@shaders/grassMaterial/grassFragment.glsl";
+import grassVertex from "@shaders/grassMaterial/grassVertex.glsl";
 
 const GrassMaterialUniformNames = {
     WORLD: "world",

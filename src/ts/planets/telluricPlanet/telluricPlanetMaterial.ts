@@ -23,8 +23,6 @@ import { Matrix } from "@babylonjs/core/Maths/math";
 import { Scene } from "@babylonjs/core/scene";
 import { centeredRand } from "extended-random";
 
-import surfaceMaterialFragment from "../../../shaders/telluricPlanetMaterial/fragment.glsl";
-import surfaceMaterialVertex from "../../../shaders/telluricPlanetMaterial/vertex.glsl";
 import { AllTerrainTextures } from "../../assets/textures";
 import {
     setStellarObjectUniforms,
@@ -38,6 +36,9 @@ import { ColorMode } from "./colorSettingsInterface";
 import { TelluricPlanetMaterialLut } from "./telluricPlanetMaterialLut";
 import { TelluricPlanetModel } from "./telluricPlanetModel";
 import { TelluricSatelliteModel } from "./telluricSatelliteModel";
+
+import surfaceMaterialFragment from "@shaders/telluricPlanetMaterial/fragment.glsl";
+import surfaceMaterialVertex from "@shaders/telluricPlanetMaterial/vertex.glsl";
 
 const TelluricPlanetMaterialUniformNames = {
     WORLD: "world",
