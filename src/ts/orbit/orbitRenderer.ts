@@ -15,13 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { CreateGreasedLine, GreasedLineBaseMesh } from "@babylonjs/core/Meshes";
-import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math";
-import { getOrbitalPeriod, getPointOnOrbitLocal } from "./orbit";
-import { OrbitalObject } from "../architecture/orbitalObject";
-import { Scene } from "@babylonjs/core/scene";
-import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { GreasedLineMeshColorMode } from "@babylonjs/core/Materials/GreasedLine/greasedLineMaterialInterfaces";
+import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { CreateGreasedLine, GreasedLineBaseMesh } from "@babylonjs/core/Meshes";
+import { Scene } from "@babylonjs/core/scene";
+
+import { OrbitalObject } from "../architecture/orbitalObject";
+import { getOrbitalPeriod, getPointOnOrbitLocal } from "./orbit";
 
 export class OrbitRenderer {
     private orbitMeshes: Map<OrbitalObject, GreasedLineBaseMesh> = new Map();

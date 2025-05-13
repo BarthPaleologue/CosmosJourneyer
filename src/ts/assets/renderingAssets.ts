@@ -16,9 +16,10 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Scene } from "@babylonjs/core/scene";
-import { loadTextures, Textures } from "./textures";
+
 import { initMaterials, Materials } from "./materials";
 import { loadObjects, Objects } from "./objects";
+import { loadTextures, Textures } from "./textures";
 
 export type RenderingAssets = {
     readonly textures: Textures;

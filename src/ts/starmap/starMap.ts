@@ -15,47 +15,49 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import starTexture from "../../asset/textures/starParticle.png";
-import blackHoleTexture from "../../asset/textures/blackholeParticleSmall.png";
+import "@babylonjs/core/Animations/animatable";
+import "@babylonjs/core/Culling/ray";
 
-import { BuildData, StarSectorView, vector3ToString } from "./starSectorView";
-import { StarMapUI } from "./starMapUI";
-import { Scene } from "@babylonjs/core/scene";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
-import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
-import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { ActionManager } from "@babylonjs/core/Actions/actionManager";
 import { ExecuteCodeAction } from "@babylonjs/core/Actions/directActions";
 import { Animation } from "@babylonjs/core/Animations/animation";
+import { Camera } from "@babylonjs/core/Cameras/camera";
+import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { Observable } from "@babylonjs/core/Misc/observable";
 import { DefaultRenderingPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/Pipelines/defaultRenderingPipeline";
-import "@babylonjs/core/Animations/animatable";
-import "@babylonjs/core/Culling/ray";
+import { Scene } from "@babylonjs/core/scene";
+
+import { OrbitalObjectType } from "../architecture/orbitalObjectType";
+import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
+import { Player } from "../player/player";
+import { Settings } from "../settings";
+import { EncyclopaediaGalactica } from "../society/encyclopaediaGalactica";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { CameraRadiusAnimation } from "../uberCore/transforms/animations/radius";
 import { TransformRotationAnimation } from "../uberCore/transforms/animations/rotation";
 import { TransformTranslationAnimation } from "../uberCore/transforms/animations/translation";
 import { translate } from "../uberCore/transforms/basicTransform";
-import { ThickLines } from "../utils/thickLines";
-import { Observable } from "@babylonjs/core/Misc/observable";
-import { View } from "../utils/view";
-import { StarMapInputs } from "./starMapInputs";
-import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
-import { StarMapControls } from "./starMapControls";
-import { CameraRadiusAnimation } from "../uberCore/transforms/animations/radius";
-import { Camera } from "@babylonjs/core/Cameras/camera";
-import { StellarPathfinder } from "./stellarPathfinder";
-import { createNotification, NotificationIntent, NotificationOrigin } from "../utils/notification";
-import { Player } from "../player/player";
-import { Settings } from "../settings";
-import { getRgbFromTemperature } from "../utils/specrend";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/starSystemCoordinates";
-import { OrbitalObjectType } from "../architecture/orbitalObjectType";
-import { EncyclopaediaGalactica } from "../society/encyclopaediaGalactica";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { alertModal } from "../utils/dialogModal";
-import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
+import { createNotification, NotificationIntent, NotificationOrigin } from "../utils/notification";
+import { getRgbFromTemperature } from "../utils/specrend";
+import { ThickLines } from "../utils/thickLines";
+import { View } from "../utils/view";
+import { StarMapControls } from "./starMapControls";
+import { StarMapInputs } from "./starMapInputs";
+import { StarMapUI } from "./starMapUI";
+import { BuildData, StarSectorView, vector3ToString } from "./starSectorView";
+import { StellarPathfinder } from "./stellarPathfinder";
+
+import blackHoleTexture from "@assets/textures/blackholeParticleSmall.png";
+import starTexture from "@assets/textures/starParticle.png";
 
 // register cosmos journeyer as part of window object
 declare global {

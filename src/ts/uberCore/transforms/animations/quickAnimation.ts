@@ -1,5 +1,5 @@
-import { CubicEase, EasingFunction } from "@babylonjs/core/Animations/easing";
 import { Animation } from "@babylonjs/core/Animations/animation";
+import { CubicEase, EasingFunction } from "@babylonjs/core/Animations/easing";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 
 /**

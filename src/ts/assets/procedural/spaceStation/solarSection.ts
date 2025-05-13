@@ -15,22 +15,23 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { wheelOfFortune } from "../../../utils/random";
-import { Transformable } from "../../../architecture/transformable";
+import { Material } from "@babylonjs/core/Materials/material";
+import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { AbstractMesh, Mesh } from "@babylonjs/core/Meshes";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
-import { MetalSectionMaterial } from "./metalSectionMaterial";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { Scene } from "@babylonjs/core/scene";
-import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+
+import { Transformable } from "../../../architecture/transformable";
 import { getRngFromSeed } from "../../../utils/getRngFromSeed";
 import { createEnvironmentAggregate } from "../../../utils/havok";
-import { Material } from "@babylonjs/core/Materials/material";
-import { SolarPanelMaterial } from "../solarPanel/solarPanelMaterial";
+import { wheelOfFortune } from "../../../utils/random";
 import { RenderingAssets } from "../../renderingAssets";
+import { SolarPanelMaterial } from "../solarPanel/solarPanelMaterial";
+import { MetalSectionMaterial } from "./metalSectionMaterial";
 
 export class SolarSection implements Transformable {
     private readonly attachment: Mesh;

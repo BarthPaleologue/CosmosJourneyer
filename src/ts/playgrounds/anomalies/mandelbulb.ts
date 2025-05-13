@@ -15,10 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AbstractEngine, Scene, ArcRotateCamera, Vector3 } from "@babylonjs/core";
-import { EmptyCelestialBody } from "../../utils/emptyCelestialBody";
+import { AbstractEngine, ArcRotateCamera, Scene, Vector3 } from "@babylonjs/core";
+
 import { newSeededMandelbulbModel } from "../../anomalies/mandelbulb/mandelbulbModelGenerator";
 import { MandelbulbPostProcess } from "../../anomalies/mandelbulb/mandelbulbPostProcess";
+import { EmptyCelestialBody } from "../../utils/emptyCelestialBody";
 
 export function createMandelbulbScene(
     engine: AbstractEngine,

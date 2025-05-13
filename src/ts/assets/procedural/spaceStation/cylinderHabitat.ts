@@ -15,21 +15,22 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Scene } from "@babylonjs/core/scene";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { Axis } from "@babylonjs/core/Maths/math.axis";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { Scene } from "@babylonjs/core/scene";
+
 import { Transformable } from "../../../architecture/transformable";
 import { Settings } from "../../../settings";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { CylinderHabitatMaterial } from "./cylinderHabitatMaterial";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
-import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { getRngFromSeed } from "../../../utils/getRngFromSeed";
 import { createEnvironmentAggregate } from "../../../utils/havok";
 import { getRotationPeriodForArtificialGravity } from "../../../utils/physics";
 import { Textures } from "../../textures";
+import { CylinderHabitatMaterial } from "./cylinderHabitatMaterial";
 
 export class CylinderHabitat implements Transformable {
     private readonly root: TransformNode;

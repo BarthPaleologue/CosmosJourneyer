@@ -15,36 +15,37 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Direction } from "../../utils/direction";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { TelluricPlanetMaterial } from "./telluricPlanetMaterial";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { ChunkTree } from "./terrain/chunks/chunkTree";
-import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
-import { ChunkForge } from "./terrain/chunks/chunkForge";
-import { PlanetaryMassObjectBase } from "../../architecture/planetaryMassObject";
-import { Cullable } from "../../utils/cullable";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
-import { RingsUniforms } from "../../rings/ringsUniform";
-import { CloudsUniforms } from "../../clouds/cloudsUniforms";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Scene } from "@babylonjs/core/scene";
-import { AsteroidField } from "../../asteroidFields/asteroidField";
-import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
+
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
+import { PlanetaryMassObjectBase } from "../../architecture/planetaryMassObject";
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
+import { RenderingAssets } from "../../assets/renderingAssets";
+import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { AtmosphereUniforms } from "../../atmosphere/atmosphereUniforms";
-import { Settings } from "../../settings";
+import { CloudsLut } from "../../clouds/cloudsLut";
+import { CloudsUniforms } from "../../clouds/cloudsUniforms";
 import { OceanUniforms } from "../../ocean/oceanUniforms";
+import { RingsLut } from "../../rings/ringsLut";
+import { RingsUniforms } from "../../rings/ringsUniform";
+import { Settings } from "../../settings";
+import { Cullable } from "../../utils/cullable";
+import { Direction } from "../../utils/direction";
+import { ItemPool } from "../../utils/itemPool";
+import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
+import { DeepReadonly } from "../../utils/types";
+import { TelluricPlanetMaterial } from "./telluricPlanetMaterial";
 import { TelluricPlanetModel } from "./telluricPlanetModel";
 import { TelluricSatelliteModel } from "./telluricSatelliteModel";
-import { DeepReadonly } from "../../utils/types";
-import { PointLight } from "@babylonjs/core/Lights/pointLight";
-import { ItemPool } from "../../utils/itemPool";
-import { RingsLut } from "../../rings/ringsLut";
-import { CloudsLut } from "../../clouds/cloudsLut";
-import { RenderingAssets } from "../../assets/renderingAssets";
+import { ChunkForge } from "./terrain/chunks/chunkForge";
+import { ChunkTree } from "./terrain/chunks/chunkTree";
 
 export class TelluricPlanet
     implements

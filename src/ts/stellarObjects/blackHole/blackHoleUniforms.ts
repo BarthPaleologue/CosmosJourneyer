@@ -16,12 +16,13 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { BlackHoleModel } from "./blackHoleModel";
-import { getKerrMetricA } from "./blackHoleModelGenerator";
+import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+
 import { getForwardDirection } from "../../uberCore/transforms/basicTransform";
 import { DeepReadonly } from "../../utils/types";
-import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
+import { BlackHoleModel } from "./blackHoleModel";
+import { getKerrMetricA } from "./blackHoleModelGenerator";
 
 export const BlackHoleUniformNames = {
     STARFIELD_ROTATION: "starfieldRotation",

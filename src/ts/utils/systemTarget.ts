@@ -1,10 +1,11 @@
-import { Scene } from "@babylonjs/core/scene";
+import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import i18n from "../i18n";
+import { Scene } from "@babylonjs/core/scene";
+
 import { ObjectTargetCursorType, Targetable } from "../architecture/targetable";
+import i18n from "../i18n";
 import { Settings } from "../settings";
 import { StarSystemModel } from "../starSystem/starSystemModel";
-import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { StarSystemCoordinates } from "./coordinates/starSystemCoordinates";
 import { DeepReadonly } from "./types";
 

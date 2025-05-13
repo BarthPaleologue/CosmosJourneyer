@@ -15,17 +15,18 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { StarSystemModel } from "../starSystemModel";
-import { Settings } from "../../settings";
-import { celsiusToKelvin, getOrbitRadiusFromPeriod } from "../../utils/physics";
-import { Tools } from "@babylonjs/core/Misc/tools";
-import { newSeededStarModel } from "../../stellarObjects/star/starModelGenerator";
-import { newSeededTelluricPlanetModel } from "../../planets/telluricPlanet/telluricPlanetModelGenerator";
-import { newSeededSpaceStationModel } from "../../spacestation/spaceStationModelGenerator";
-import { newSeededTelluricSatelliteModel } from "../../planets/telluricPlanet/telluricSatelliteModelGenerator";
-import { newSeededGasPlanetModel } from "../../planets/gasPlanet/gasPlanetModelGenerator";
-import { StarSystemCoordinates } from "../../utils/coordinates/starSystemCoordinates";
 import { Vector3 } from "@babylonjs/core";
+import { Tools } from "@babylonjs/core/Misc/tools";
+
+import { newSeededGasPlanetModel } from "../../planets/gasPlanet/gasPlanetModelGenerator";
+import { newSeededTelluricPlanetModel } from "../../planets/telluricPlanet/telluricPlanetModelGenerator";
+import { newSeededTelluricSatelliteModel } from "../../planets/telluricPlanet/telluricSatelliteModelGenerator";
+import { Settings } from "../../settings";
+import { newSeededSpaceStationModel } from "../../spacestation/spaceStationModelGenerator";
+import { newSeededStarModel } from "../../stellarObjects/star/starModelGenerator";
+import { StarSystemCoordinates } from "../../utils/coordinates/starSystemCoordinates";
+import { celsiusToKelvin, getOrbitRadiusFromPeriod } from "../../utils/physics";
+import { StarSystemModel } from "../starSystemModel";
 
 export function getAlphaTestisSystemModel(): StarSystemModel {
     const systemName = "Alpha Testis";

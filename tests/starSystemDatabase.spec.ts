@@ -15,12 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { beforeEach, describe, expect, it } from "vitest";
+
 import { getLoneStarSystem } from "../src/ts/starSystem/customSystems/loneStar";
 import { getSolSystemModel } from "../src/ts/starSystem/customSystems/sol";
 import { StarSystemDatabase } from "../src/ts/starSystem/starSystemDatabase";
 import { StarSystemModel } from "../src/ts/starSystem/starSystemModel";
 import { StarSystemCoordinates } from "../src/ts/utils/coordinates/starSystemCoordinates";
-import { expect, describe, it, beforeEach } from "vitest";
 
 describe("StarSystemDatabase", () => {
     let database: StarSystemDatabase;

@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { ISoundPlayer, SoundType } from "../../audio/soundPlayer";
 import i18n from "../../i18n";
 import { Player } from "../../player/player";
 import { Settings } from "../../settings";
@@ -24,7 +25,6 @@ import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
 import { connectEncyclopaediaGalacticaModal } from "../../utils/dialogModal";
 import { createNotification, NotificationIntent, NotificationOrigin } from "../../utils/notification";
 import { DiscoveryDetails } from "./discoveryDetails";
-import { ISoundPlayer, SoundType } from "../../audio/soundPlayer";
 
 const ExplorationCenterFilter = {
     LOCAL_ONLY: "localOnly",

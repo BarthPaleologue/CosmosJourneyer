@@ -15,8 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { UniverseObjectId, UniverseObjectIdSchema } from "../utils/coordinates/universeObjectId";
 import { z } from "zod";
+
+import { UniverseObjectId, UniverseObjectIdSchema } from "../utils/coordinates/universeObjectId";
 import { Result } from "../utils/types";
 
 export const SpaceDiscoveryDataSchema = z.object({

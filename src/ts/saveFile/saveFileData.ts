@@ -15,12 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { encodeBase64 } from "../utils/base64";
 import { z } from "zod";
+
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { encodeBase64 } from "../utils/base64";
 import { Result } from "../utils/types";
 import { SaveLoadingError } from "./saveLoadingError";
 import { safeParseSaveV2, SaveSchemaV2 } from "./v2/saveV2";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 
 export const SaveSchema = SaveSchemaV2;
 

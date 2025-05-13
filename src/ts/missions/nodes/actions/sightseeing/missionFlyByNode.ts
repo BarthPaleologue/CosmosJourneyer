@@ -15,23 +15,24 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { MissionNode } from "../../missionNode";
-import { MissionNodeType } from "../../missionNodeType";
-import type { MissionNodeBase } from "../../missionNodeBase";
-import { MissionContext } from "../../../missionContext";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+
+import { OrbitalObjectType } from "../../../../architecture/orbitalObjectType";
+import i18n from "../../../../i18n";
+import { Settings } from "../../../../settings";
+import { StarSystemDatabase } from "../../../../starSystem/starSystemDatabase";
 import {
     StarSystemCoordinates,
     starSystemCoordinatesEquals
 } from "../../../../utils/coordinates/starSystemCoordinates";
 import { UniverseObjectId, universeObjectIdEquals } from "../../../../utils/coordinates/universeObjectId";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { parseDistance } from "../../../../utils/strings/parseToStrings";
-import { Settings } from "../../../../settings";
-import i18n from "../../../../i18n";
 import { getOrbitalObjectTypeToI18nString } from "../../../../utils/strings/orbitalObjectTypeToDisplay";
+import { parseDistance } from "../../../../utils/strings/parseToStrings";
 import { getGoToSystemInstructions } from "../../../common";
-import { OrbitalObjectType } from "../../../../architecture/orbitalObjectType";
-import { StarSystemDatabase } from "../../../../starSystem/starSystemDatabase";
+import { MissionContext } from "../../../missionContext";
+import { MissionNode } from "../../missionNode";
+import type { MissionNodeBase } from "../../missionNodeBase";
+import { MissionNodeType } from "../../missionNodeType";
 import { FlyByState, MissionFlyByNodeSerialized } from "./missionFlyByNodeSerialized";
 
 /**

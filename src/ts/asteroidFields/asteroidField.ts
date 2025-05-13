@@ -15,12 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { IDisposable, Scene } from "@babylonjs/core/scene";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { AsteroidPatch } from "./asteroidPatch";
-import { getRngFromSeed } from "../utils/getRngFromSeed";
+
 import { Objects } from "../assets/objects";
+import { getRngFromSeed } from "../utils/getRngFromSeed";
+import { AsteroidPatch } from "./asteroidPatch";
 
 /**
  * An asteroid field is basically a collection of instance chunks that can be created and destroyed depending on where the player is.

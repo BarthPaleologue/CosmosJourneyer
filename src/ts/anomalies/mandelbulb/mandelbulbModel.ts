@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Color3 } from "@babylonjs/core/Maths/math.color";
+
 import { CelestialBodyModelBase } from "../../architecture/orbitalObjectModelBase";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 

@@ -15,9 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Scene } from "@babylonjs/core/scene";
-import { Camera } from "@babylonjs/core/Cameras/camera";
 
 export const SamplerUniformNames = {
     TEXTURE_SAMPLER: "textureSampler",

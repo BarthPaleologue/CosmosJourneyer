@@ -15,9 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { MissionNodeType } from "../../missionNodeType";
-import { UniverseObjectIdSchema } from "../../../../utils/coordinates/universeObjectId";
 import { z } from "zod";
+
+import { UniverseObjectIdSchema } from "../../../../utils/coordinates/universeObjectId";
+import { MissionNodeType } from "../../missionNodeType";
 
 export enum LandMissionState {
     NOT_IN_SYSTEM,

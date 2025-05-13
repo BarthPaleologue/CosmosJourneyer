@@ -15,12 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getNeighborStarSystemCoordinates } from "../src/ts/utils/getNeighborStarSystems";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { starSystemCoordinatesEquals } from "../src/ts/utils/coordinates/starSystemCoordinates";
-import { StarSystemDatabase } from "../src/ts/starSystem/starSystemDatabase";
 import { expect, test } from "vitest";
+
 import { getLoneStarSystem } from "../src/ts/starSystem/customSystems/loneStar";
+import { StarSystemDatabase } from "../src/ts/starSystem/starSystemDatabase";
+import { starSystemCoordinatesEquals } from "../src/ts/utils/coordinates/starSystemCoordinates";
+import { getNeighborStarSystemCoordinates } from "../src/ts/utils/getNeighborStarSystems";
 
 test("getNeighborStarSystemCoordinates", () => {
     const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());

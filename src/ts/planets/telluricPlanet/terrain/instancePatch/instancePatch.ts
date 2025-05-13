@@ -16,11 +16,12 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+
 import { IPatch } from "./iPatch";
 import { decomposeModelMatrix } from "./matrixBuffer";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
 export class InstancePatch implements IPatch {
     readonly parent: TransformNode;

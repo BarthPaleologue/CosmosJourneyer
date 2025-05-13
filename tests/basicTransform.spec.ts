@@ -17,17 +17,18 @@
 
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 
-import { Scene } from "@babylonjs/core/scene";
-import { Vector3 } from "@babylonjs/core/Maths/math";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
+import { Vector3 } from "@babylonjs/core/Maths/math";
 import { TransformNode } from "@babylonjs/core/Meshes";
+import { Scene } from "@babylonjs/core/scene";
+import { describe, expect, it } from "vitest";
+
 import {
     getBackwardDirection,
     getForwardDirection,
     getLeftDirection,
     getRightDirection
 } from "../src/ts/uberCore/transforms/basicTransform";
-import { expect, describe, it } from "vitest";
 
 const engine = new NullEngine();
 const scene = new Scene(engine);

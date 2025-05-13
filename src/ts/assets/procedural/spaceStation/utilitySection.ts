@@ -15,23 +15,24 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Scene } from "@babylonjs/core/scene";
-import { Transformable } from "../../../architecture/transformable";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Axis } from "@babylonjs/core/Maths/math.axis";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { MetalSectionMaterial } from "./metalSectionMaterial";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { CollisionMask } from "../../../settings";
-import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
-import { getRngFromSeed } from "../../../utils/getRngFromSeed";
-import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 import { Material } from "@babylonjs/core/Materials/material";
+import { Axis } from "@babylonjs/core/Maths/math.axis";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 import { PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
+import { Scene } from "@babylonjs/core/scene";
+
+import { Transformable } from "../../../architecture/transformable";
+import { CollisionMask } from "../../../settings";
+import { getRngFromSeed } from "../../../utils/getRngFromSeed";
 import { RenderingAssets } from "../../renderingAssets";
+import { MetalSectionMaterial } from "./metalSectionMaterial";
 
 export class UtilitySection implements Transformable {
     private readonly attachment: Mesh;

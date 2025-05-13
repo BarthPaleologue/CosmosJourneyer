@@ -16,14 +16,15 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { z } from "zod";
-import { DeepReadonly, Result, ok } from "../../utils/types";
-import { SaveLoadingError } from "../saveLoadingError";
-import { SerializedPlayerSchema } from "../../player/serializedPlayer";
-import { UniverseCoordinates, UniverseCoordinatesSchema } from "../../utils/coordinates/universeCoordinates";
-import { safeParseSaveV1, SaveV1, SystemObjectType } from "../v1/saveV1";
-import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
+
 import { OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
+import { SerializedPlayerSchema } from "../../player/serializedPlayer";
 import { getDefaultSerializedSpaceship } from "../../spaceship/serializedSpaceship";
+import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
+import { UniverseCoordinates, UniverseCoordinatesSchema } from "../../utils/coordinates/universeCoordinates";
+import { DeepReadonly, ok, Result } from "../../utils/types";
+import { SaveLoadingError } from "../saveLoadingError";
+import { safeParseSaveV1, SaveV1, SystemObjectType } from "../v1/saveV1";
 
 export const SaveSchemaV2 = z.object({
     /** The timestamp when the save file was created. */

@@ -15,9 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Settings } from "../settings";
 import { Effect } from "@babylonjs/core/Materials/effect";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+
+import { Settings } from "../settings";
 
 const AtmosphereUniformNames = {
     ATMOSPHERE_RADIUS: "atmosphere_radius",

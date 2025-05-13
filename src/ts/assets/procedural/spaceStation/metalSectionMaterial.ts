@@ -15,9 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Scene } from "@babylonjs/core/scene";
 import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
+import { Scene } from "@babylonjs/core/scene";
+
 import * as BSL from "../../../utils/bsl";
 import { PBRTextures } from "../../textures";
 

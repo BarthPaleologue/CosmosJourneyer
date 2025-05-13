@@ -16,8 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { AsteroidField } from "../asteroidFields/asteroidField";
-import { RingsUniforms } from "../rings/ringsUniform";
 import { RingsModel } from "../rings/ringsModel";
+import { RingsUniforms } from "../rings/ringsUniform";
 
 /**
  * Describes objects that can have a ring system

@@ -18,61 +18,64 @@
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { VideoRecorder } from "@babylonjs/core/Misc/videoRecorder";
+
 import "@babylonjs/core/Misc/screenshotTools";
-import { StarMap } from "./starmap/starMap";
 import "@babylonjs/core/Physics/physicsEngineComponent";
-import HavokPhysics from "@babylonjs/havok";
 import "@babylonjs/core/Engines/WebGPU/Extensions/";
-import { PauseMenu } from "./ui/pauseMenu";
-import { StarSystemView } from "./starSystem/starSystemView";
+
+import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
-import { MainMenu } from "./ui/mainMenu";
-import { createUrlFromSave, Save } from "./saveFile/saveFileData";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Quaternion } from "@babylonjs/core/Maths/math";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
+import HavokPhysics from "@babylonjs/havok";
+
+import { generateDarkKnightModel } from "./anomalies/darkKnight/darkKnightModelGenerator";
+import { OrbitalObjectType } from "./architecture/orbitalObjectType";
+import { Assets, loadAssets } from "./assets/assets";
+import { AudioMasks } from "./audio/audioMasks";
+import { MusicConductor } from "./audio/musicConductor";
+import { ISoundPlayer, SoundPlayer, SoundType } from "./audio/soundPlayer";
+import { Tts } from "./audio/tts";
+import i18n, { initI18n } from "./i18n";
+import { GeneralInputs } from "./inputs/generalInputs";
+import { Player } from "./player/player";
+import { createUrlFromSave, Save } from "./saveFile/saveFileData";
+import { saveLoadingErrorToI18nString } from "./saveFile/saveLoadingError";
+import { SaveLocalBackend } from "./saveFile/saveLocalBackend";
+import { SaveManager } from "./saveFile/saveManager";
+import { Settings } from "./settings";
+import { EncyclopaediaGalacticaLocal } from "./society/encyclopaediaGalacticaLocal";
+import { EncyclopaediaGalacticaManager } from "./society/encyclopaediaGalacticaManager";
+import { StarMap } from "./starmap/starMap";
+import { getLoneStarSystem } from "./starSystem/customSystems/loneStar";
+import { registerCustomSystems } from "./starSystem/customSystems/registerCustomSystems";
+import { StarSystemDatabase } from "./starSystem/starSystemDatabase";
+import { StarSystemView } from "./starSystem/starSystemView";
+import { FlightTutorial } from "./tutorials/flightTutorial";
+import { FuelScoopTutorial } from "./tutorials/fuelScoopTutorial";
+import { StarMapTutorial } from "./tutorials/starMapTutorial";
+import { StationLandingTutorial } from "./tutorials/stationLandingTutorial";
+import { Tutorial } from "./tutorials/tutorial";
+import { LoadingScreen } from "./uberCore/loadingScreen";
+import { UberScene } from "./uberCore/uberScene";
+import { MainMenu } from "./ui/mainMenu";
+import { PauseMenu } from "./ui/pauseMenu";
+import { SidePanels } from "./ui/sidePanels";
+import { TutorialLayer } from "./ui/tutorial/tutorialLayer";
+import { StarSystemCoordinates } from "./utils/coordinates/starSystemCoordinates";
 import {
     AtStationCoordinates,
     RelativeCoordinates,
     UniverseCoordinates
 } from "./utils/coordinates/universeCoordinates";
-import { View } from "./utils/view";
-import { AudioMasks } from "./audio/audioMasks";
-import { GeneralInputs } from "./inputs/generalInputs";
-import { createNotification, NotificationIntent, NotificationOrigin, updateNotifications } from "./utils/notification";
-import { LoadingScreen } from "./uberCore/loadingScreen";
-import i18n, { initI18n } from "./i18n";
-import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
-import { TutorialLayer } from "./ui/tutorial/tutorialLayer";
-import { FlightTutorial } from "./tutorials/flightTutorial";
-import { SidePanels } from "./ui/sidePanels";
-import { Settings } from "./settings";
-import { Player } from "./player/player";
-import { Tutorial } from "./tutorials/tutorial";
-import { StationLandingTutorial } from "./tutorials/stationLandingTutorial";
-import { promptModalBoolean, alertModal, promptModalString } from "./utils/dialogModal";
-import { FuelScoopTutorial } from "./tutorials/fuelScoopTutorial";
-import { EncyclopaediaGalacticaManager } from "./society/encyclopaediaGalacticaManager";
-import { EncyclopaediaGalacticaLocal } from "./society/encyclopaediaGalacticaLocal";
-import { MusicConductor } from "./audio/musicConductor";
-import { StarSystemDatabase } from "./starSystem/starSystemDatabase";
-import { registerCustomSystems } from "./starSystem/customSystems/registerCustomSystems";
-import { SaveManager } from "./saveFile/saveManager";
-import { SaveLocalBackend } from "./saveFile/saveLocalBackend";
-import { saveLoadingErrorToI18nString } from "./saveFile/saveLoadingError";
-import { getLoneStarSystem } from "./starSystem/customSystems/loneStar";
-import { StarSystemCoordinates } from "./utils/coordinates/starSystemCoordinates";
 import { getUniverseObjectId } from "./utils/coordinates/universeObjectId";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { OrbitalObjectType } from "./architecture/orbitalObjectType";
-import { positionNearObject } from "./utils/positionNearObject";
-import { StarMapTutorial } from "./tutorials/starMapTutorial";
-import { Assets, loadAssets } from "./assets/assets";
-import { ISoundPlayer, SoundPlayer, SoundType } from "./audio/soundPlayer";
-import { UberScene } from "./uberCore/uberScene";
-import { Tts } from "./audio/tts";
-import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
+import { alertModal, promptModalBoolean, promptModalString } from "./utils/dialogModal";
 import { hashArray } from "./utils/hash";
-import { generateDarkKnightModel } from "./anomalies/darkKnight/darkKnightModelGenerator";
+import { createNotification, NotificationIntent, NotificationOrigin, updateNotifications } from "./utils/notification";
+import { positionNearObject } from "./utils/positionNearObject";
+import { View } from "./utils/view";
 
 const enum EngineState {
     UNINITIALIZED,

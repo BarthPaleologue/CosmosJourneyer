@@ -16,12 +16,13 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { describe, expect, it } from "vitest";
-import { getObjectModelById, StarSystemModel } from "../starSystem/starSystemModel";
-import { DeepReadonly } from "./types";
+
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { Settings } from "../settings";
 import { Faction } from "../society/factions";
+import { getObjectModelById, StarSystemModel } from "../starSystem/starSystemModel";
 import { getDistancesToStellarObjects } from "./distanceToStellarObject";
+import { DeepReadonly } from "./types";
 
 describe("distanceToStellarObject", () => {
     const systemModel: DeepReadonly<StarSystemModel> = {

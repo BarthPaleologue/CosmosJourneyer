@@ -1,7 +1,8 @@
 import Action from "@brianchirls/game-input/Action";
-import PressInteraction from "@brianchirls/game-input/interactions/PressInteraction";
-import { InputDevices } from "../inputs/devices";
 import { AxisComposite } from "@brianchirls/game-input/browser";
+import PressInteraction from "@brianchirls/game-input/interactions/PressInteraction";
+
+import { InputDevices } from "../inputs/devices";
 import { InputMap } from "../inputs/inputMap";
 
 const keyboard = InputDevices.KEYBOARD;

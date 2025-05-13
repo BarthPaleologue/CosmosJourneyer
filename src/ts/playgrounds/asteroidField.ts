@@ -25,11 +25,12 @@ import {
     Scene,
     Vector3
 } from "@babylonjs/core";
-import { enablePhysics } from "./utils";
-import { DefaultControls } from "../defaultControls/defaultControls";
-import { AsteroidField } from "../asteroidFields/asteroidField";
+
 import { loadRenderingAssets } from "../assets/renderingAssets";
-import { AsteroidPatch } from "@/asteroidFields/asteroidPatch";
+import { AsteroidField } from "../asteroidFields/asteroidField";
+import { AsteroidPatch } from "../asteroidFields/asteroidPatch";
+import { DefaultControls } from "../defaultControls/defaultControls";
+import { enablePhysics } from "./utils";
 
 export async function createAsteroidFieldScene(
     engine: AbstractEngine,

@@ -15,9 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getSolarPanelSurfaceFromEnergyRequirement } from "../src/ts/utils/solarPanels";
-import { getSphereRadiatedEnergyFlux } from "../src/ts/utils/physics";
 import { expect, test } from "vitest";
+
+import { getSphereRadiatedEnergyFlux } from "../src/ts/utils/physics";
+import { getSolarPanelSurfaceFromEnergyRequirement } from "../src/ts/utils/solarPanels";
 
 test("solarPanelSurfaceCalculation", () => {
     // test with ISS data

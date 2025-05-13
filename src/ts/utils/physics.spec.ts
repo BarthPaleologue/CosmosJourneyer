@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { describe, expect, test } from "vitest";
+
 import { Settings } from "../settings";
 import {
     celsiusToKelvin,
@@ -32,7 +34,6 @@ import {
     kelvinToCelsius,
     waterBoilingTemperature
 } from "./physics";
-import { expect, test, describe } from "vitest";
 
 test("celsiusToKelvin", () => {
     expect(celsiusToKelvin(0)).toBe(273.15);

@@ -15,20 +15,21 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Axis } from "@babylonjs/core";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
-import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { enablePhysics } from "./utils";
+import { Scene } from "@babylonjs/core/scene";
+
+import { createTexturePools } from "../assets/textures";
 import { DefaultControls } from "../defaultControls/defaultControls";
+import { LensFlarePostProcess } from "../postProcesses/lensFlarePostProcess";
+import { MatterJetPostProcess } from "../postProcesses/matterJetPostProcess";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModelGenerator";
-import { MatterJetPostProcess } from "../postProcesses/matterJetPostProcess";
-import { VolumetricLight } from "../volumetricLight/volumetricLight";
 import { translate } from "../uberCore/transforms/basicTransform";
-import { Axis } from "@babylonjs/core";
-import { LensFlarePostProcess } from "../postProcesses/lensFlarePostProcess";
 import { getRgbFromTemperature } from "../utils/specrend";
-import { createTexturePools } from "../assets/textures";
+import { VolumetricLight } from "../volumetricLight/volumetricLight";
+import { enablePhysics } from "./utils";
 
 export async function createNeutronStarScene(
     engine: AbstractEngine,

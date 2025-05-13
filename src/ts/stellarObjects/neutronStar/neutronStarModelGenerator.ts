@@ -15,15 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Orbit } from "../../orbit/orbit";
 import { normalRandom, randRange, randRangeInt, uniformRandBool } from "extended-random";
-import { clamp } from "../../utils/math";
+
+import { OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
+import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
+import { Orbit } from "../../orbit/orbit";
 import { newSeededRingsModel } from "../../rings/ringsModel";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
-import { OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
+import { clamp } from "../../utils/math";
 import { NeutronStarModel } from "./neutronStarModel";
-import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 
 /**
  * Creates a new pseudo-random neutron star model

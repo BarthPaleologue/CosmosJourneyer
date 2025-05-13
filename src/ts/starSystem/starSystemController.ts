@@ -15,22 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import {
+    getOrbitalPosition,
+    getRotationAngle,
+    setOrbitalPosition,
+    setRotation
+} from "@/architecture/orbitalObjectUtils";
 import { Matrix } from "@babylonjs/core/Maths/math";
-import { PostProcessManager } from "../postProcesses/postProcessManager";
-import { UberScene } from "../uberCore/uberScene";
-import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
-import { translate } from "../uberCore/transforms/basicTransform";
-import { Star } from "../stellarObjects/star/star";
-import { BlackHole } from "../stellarObjects/blackHole/blackHole";
-import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge";
-import { OrbitalObjectType } from "../architecture/orbitalObjectType";
-import { SystemTarget } from "../utils/systemTarget";
-import { StarFieldBox } from "./starFieldBox";
-import { StarSystemModel } from "./starSystemModel";
-import { Settings } from "../settings";
-import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
-import { StarSystemDatabase } from "./starSystemDatabase";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+
 import {
     Anomaly,
     CelestialBody,
@@ -39,16 +32,24 @@ import {
     Planet,
     StellarObject
 } from "../architecture/orbitalObject";
-import { OrbitalObjectId } from "../utils/coordinates/orbitalObjectId";
-import { StarSystemLoader } from "./starSystemLoader";
-import { DeepReadonly, NonEmptyArray } from "../utils/types";
+import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { RenderingAssets } from "../assets/renderingAssets";
-import {
-    getOrbitalPosition,
-    getRotationAngle,
-    setOrbitalPosition,
-    setRotation
-} from "@/architecture/orbitalObjectUtils";
+import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
+import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge";
+import { PostProcessManager } from "../postProcesses/postProcessManager";
+import { Settings } from "../settings";
+import { BlackHole } from "../stellarObjects/blackHole/blackHole";
+import { Star } from "../stellarObjects/star/star";
+import { translate } from "../uberCore/transforms/basicTransform";
+import { UberScene } from "../uberCore/uberScene";
+import { OrbitalObjectId } from "../utils/coordinates/orbitalObjectId";
+import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
+import { SystemTarget } from "../utils/systemTarget";
+import { DeepReadonly, NonEmptyArray } from "../utils/types";
+import { StarFieldBox } from "./starFieldBox";
+import { StarSystemDatabase } from "./starSystemDatabase";
+import { StarSystemLoader } from "./starSystemLoader";
+import { StarSystemModel } from "./starSystemModel";
 
 export type PlanetarySystem = {
     readonly planets: Planet[];

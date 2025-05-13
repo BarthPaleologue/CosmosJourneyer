@@ -15,15 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import starMaterialFragment from "../../../shaders/starMaterial/fragment.glsl";
-import starMaterialVertex from "../../../shaders/starMaterial/vertex.glsl";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
-import { Scene } from "@babylonjs/core/scene";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { getRgbFromTemperature } from "../../utils/specrend";
-import { createEmptyTexture } from "../../utils/proceduralTexture";
+import { Scene } from "@babylonjs/core/scene";
+
+import starMaterialFragment from "../../../shaders/starMaterial/fragment.glsl";
+import starMaterialVertex from "../../../shaders/starMaterial/vertex.glsl";
 import { ItemPool } from "../../utils/itemPool";
+import { createEmptyTexture } from "../../utils/proceduralTexture";
+import { getRgbFromTemperature } from "../../utils/specrend";
 import { StarMaterialLut } from "./starMaterialLut";
 
 const StarMaterialUniformNames = {

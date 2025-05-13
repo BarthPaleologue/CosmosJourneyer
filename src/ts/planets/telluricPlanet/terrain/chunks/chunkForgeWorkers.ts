@@ -15,12 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { TransferBuildData } from "./workerDataTypes";
-import { ApplyTask, BuildTask, ReturnedChunkDataSchema, TaskType } from "./taskTypes";
-import { WorkerPool } from "./workerPool";
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
-import { ChunkForge } from "./chunkForge";
+
 import { RenderingAssets } from "../../../../assets/renderingAssets";
+import { ChunkForge } from "./chunkForge";
+import { ApplyTask, BuildTask, ReturnedChunkDataSchema, TaskType } from "./taskTypes";
+import { TransferBuildData } from "./workerDataTypes";
+import { WorkerPool } from "./workerPool";
 
 export class ChunkForgeWorkers implements ChunkForge {
     /**

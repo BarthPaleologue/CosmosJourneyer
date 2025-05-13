@@ -16,15 +16,19 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { AbstractEngine, Scene } from "@babylonjs/core";
-import { createMandelbulbScene } from "./anomalies/mandelbulb";
-import { createDefaultScene } from "./default";
+
 import { createJuliaSetScene } from "./anomalies/juliaSet";
 import { createMandelboxScene } from "./anomalies/mandelbox";
+import { createMandelbulbScene } from "./anomalies/mandelbulb";
+import { createMengerSpongeScene } from "./anomalies/mengerSponge";
 import { createSierpinskiScene } from "./anomalies/sierpinski";
 import { createAsteroidFieldScene } from "./asteroidField";
+import { createAtmosphericScatteringScene } from "./atmosphericScattering";
 import { createAutomaticLandingScene } from "./automaticLanding";
 import { createCharacterDemoScene } from "./character";
+import { createDarkKnightScene } from "./darkKnight";
 import { createDebugAssetsScene } from "./debugAssets";
+import { createDefaultScene } from "./default";
 import { createFlightDemoScene } from "./flightDemo";
 import { createHyperspaceTunnelDemo } from "./hyperspaceTunnel";
 import { createNeutronStarScene } from "./neutronStar";
@@ -36,9 +40,6 @@ import { createStarMapScene } from "./starMap";
 import { createStarSystemViewScene } from "./starSystemView";
 import { createTutorialScene } from "./tutorial";
 import { createXrScene } from "./xr";
-import { createMengerSpongeScene } from "./anomalies/mengerSponge";
-import { createAtmosphericScatteringScene } from "./atmosphericScattering";
-import { createDarkKnightScene } from "./darkKnight";
 
 export class PlaygroundRegistry {
     private readonly map: Map<

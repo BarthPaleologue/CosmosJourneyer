@@ -1,6 +1,7 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { getPowerPlayData } from "./powerplay";
 import { uniformRandBool } from "extended-random";
+
+import { getPowerPlayData } from "./powerplay";
 
 export const enum Faction {
     FEYNMAN_INTERSTELLAR,

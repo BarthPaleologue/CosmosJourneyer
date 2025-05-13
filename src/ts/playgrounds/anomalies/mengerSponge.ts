@@ -15,10 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AbstractEngine, Scene, ArcRotateCamera, Vector3 } from "@babylonjs/core";
-import { EmptyCelestialBody } from "../../utils/emptyCelestialBody";
+import { AbstractEngine, ArcRotateCamera, Scene, Vector3 } from "@babylonjs/core";
+
 import { newSeededMengerSpongeModel } from "../../anomalies/mengerSponge/mengerSpongeModelGenerator";
 import { MengerSpongePostProcess } from "../../anomalies/mengerSponge/mengerSpongePostProcess";
+import { EmptyCelestialBody } from "../../utils/emptyCelestialBody";
 
 export function createMengerSpongeScene(
     engine: AbstractEngine,

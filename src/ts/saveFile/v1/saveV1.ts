@@ -16,11 +16,12 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { z } from "zod";
+
 import projectInfo from "../../../../package.json";
-import { Result, ok, err } from "../../utils/types";
-import { SaveLoadingError, SaveLoadingErrorType } from "../saveLoadingError";
-import { StarSystemCoordinatesSchema } from "../../utils/coordinates/starSystemCoordinates";
 import { CompletedTutorialsSchema } from "../../player/serializedPlayer";
+import { StarSystemCoordinatesSchema } from "../../utils/coordinates/starSystemCoordinates";
+import { err, ok, Result } from "../../utils/types";
+import { SaveLoadingError, SaveLoadingErrorType } from "../saveLoadingError";
 
 export enum SystemObjectType {
     STELLAR_OBJECT,

@@ -16,10 +16,11 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { describe, expect, it } from "vitest";
-import { StationLandingTutorial } from "./stationLandingTutorial";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { StationLandingTutorial } from "./stationLandingTutorial";
 
 describe("StationLandingTutorial", () => {
     it("spawns near a space station", () => {

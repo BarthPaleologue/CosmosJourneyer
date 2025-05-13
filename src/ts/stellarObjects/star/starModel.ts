@@ -15,9 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { HasSeed } from "../../architecture/hasSeed";
 import { OrbitalObjectModelBase } from "../../architecture/orbitalObjectModelBase";
+import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { RingsModel } from "../../rings/ringsModel";
 
 export type StarModel = OrbitalObjectModelBase<OrbitalObjectType.STAR> &

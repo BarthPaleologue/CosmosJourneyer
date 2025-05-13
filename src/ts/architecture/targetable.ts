@@ -1,5 +1,5 @@
-import { Transformable } from "./transformable";
 import { HasBoundingSphere } from "./hasBoundingSphere";
+import { Transformable } from "./transformable";
 import { TypedObject } from "./typedObject";
 
 export const enum ObjectTargetCursorType {

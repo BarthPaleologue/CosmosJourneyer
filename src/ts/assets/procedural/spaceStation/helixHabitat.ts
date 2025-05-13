@@ -15,24 +15,25 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Scene } from "@babylonjs/core/scene";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { Material } from "@babylonjs/core/Materials/material";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { Transformable } from "../../../architecture/transformable";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { Settings } from "../../../settings";
-import { MetalSectionMaterial } from "./metalSectionMaterial";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { HelixHabitatMaterial } from "./helixHabitatMaterial";
-import { createHelix } from "../../../utils/geometry/helixBuilder";
-import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { Scene } from "@babylonjs/core/scene";
+
+import { Transformable } from "../../../architecture/transformable";
+import { Settings } from "../../../settings";
+import { createHelix } from "../../../utils/geometry/helixBuilder";
 import { getRngFromSeed } from "../../../utils/getRngFromSeed";
 import { createEnvironmentAggregate } from "../../../utils/havok";
 import { getRotationPeriodForArtificialGravity } from "../../../utils/physics";
-import { Material } from "@babylonjs/core/Materials/material";
 import { Textures } from "../../textures";
+import { HelixHabitatMaterial } from "./helixHabitatMaterial";
+import { MetalSectionMaterial } from "./metalSectionMaterial";
 
 export class HelixHabitat implements Transformable {
     private readonly root: TransformNode;

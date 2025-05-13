@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Sound } from "@babylonjs/core/Audio/sound";
+
 import { SpeakerVoiceLines, VoiceLines } from "../assets/voiceLines";
 
 export const enum Speaker {

@@ -15,11 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Scene } from "@babylonjs/core/scene";
 import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
-import { PBRTextures } from "../assets/textures";
 import { Vector2 } from "@babylonjs/core/Maths/math.vector";
+import { Scene } from "@babylonjs/core/scene";
+
+import { PBRTextures } from "../assets/textures";
 import * as BSL from "../utils/bsl";
 
 export class ClimberRingMaterial extends NodeMaterial {

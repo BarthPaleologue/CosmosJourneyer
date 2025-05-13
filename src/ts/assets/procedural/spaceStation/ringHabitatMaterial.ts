@@ -15,36 +15,37 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Scene } from "@babylonjs/core/scene";
-import { PBRTextures } from "../../textures";
-import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
+import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
+import { Scene } from "@babylonjs/core/scene";
+
 import {
-    vertexAttribute,
-    split,
-    uniformWorld,
-    transformPosition,
-    transformDirection,
-    sub,
-    f,
-    step,
     abs,
-    mul,
-    mix,
-    uniformViewProjection,
-    outputVertexPosition,
-    vec2,
-    textureSample,
-    perturbNormal,
-    uniformView,
-    uniformCameraPosition,
-    pbrMetallicRoughnessMaterial,
-    outputFragColor,
-    smoothstep,
+    add,
+    f,
     fract,
+    mix,
+    mul,
+    outputFragColor,
+    outputVertexPosition,
+    pbrMetallicRoughnessMaterial,
+    perturbNormal,
+    smoothstep,
+    split,
+    step,
+    sub,
+    textureSample,
+    transformDirection,
+    transformPosition,
+    uniformCameraPosition,
+    uniformView,
+    uniformViewProjection,
+    uniformWorld,
+    vec2,
     vec3,
-    add
+    vertexAttribute
 } from "../../../utils/bsl";
+import { PBRTextures } from "../../textures";
 
 export class RingHabitatMaterial extends NodeMaterial {
     constructor(meanRadius: number, deltaRadius: number, height: number, textures: PBRTextures, scene: Scene) {

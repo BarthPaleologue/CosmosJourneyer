@@ -15,40 +15,41 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { centeredRand, randRangeInt, uniformRandBool } from "extended-random";
-import { Settings } from "../settings";
-import { generateStarName } from "../utils/strings/starNameGenerator";
-import { wheelOfFortune } from "../utils/random";
-import { StarSystemModel } from "./starSystemModel";
+
+import { newSeededJuliaSetModel } from "../anomalies/julia/juliaSetModelGenerator";
+import { newSeededMandelboxModel } from "../anomalies/mandelbox/mandelboxModelGenerator";
+import { newSeededMandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModelGenerator";
+import { newSeededMengerSpongeModel } from "../anomalies/mengerSponge/mengerSpongeModelGenerator";
+import { newSeededSierpinskiPyramidModel } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidModelGenerator";
 import {
-    StellarObjectModel,
     AnomalyModel,
     AnomalyType,
+    OrbitalFacilityModel,
     PlanetModel,
-    OrbitalFacilityModel
+    StellarObjectModel
 } from "../architecture/orbitalObjectModel";
-import { Alphabet, ReversedGreekAlphabet } from "../utils/strings/parseToStrings";
-import { newSeededStarModel } from "../stellarObjects/star/starModelGenerator";
+import { OrbitalObjectType } from "../architecture/orbitalObjectType";
+import { newSeededGasPlanetModel } from "../planets/gasPlanet/gasPlanetModelGenerator";
+import { newSeededTelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModelGenerator";
+import { TelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModel";
+import { newSeededTelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModelGenerator";
+import { Settings } from "../settings";
+import { newSeededSpaceElevatorModel } from "../spacestation/spaceElevatorModelGenerator";
+import { newSeededSpaceStationModel } from "../spacestation/spaceStationModelGenerator";
 import { newSeededBlackHoleModel } from "../stellarObjects/blackHole/blackHoleModelGenerator";
 import { newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModelGenerator";
-import { newSeededGasPlanetModel } from "../planets/gasPlanet/gasPlanetModelGenerator";
-import { newSeededMandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModelGenerator";
-import { newSeededJuliaSetModel } from "../anomalies/julia/juliaSetModelGenerator";
-import { getRngFromSeed } from "../utils/getRngFromSeed";
-import { romanNumeral } from "../utils/strings/romanNumerals";
-import { newSeededSpaceStationModel } from "../spacestation/spaceStationModelGenerator";
-import { OrbitalObjectType } from "../architecture/orbitalObjectType";
-import { newSeededTelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModelGenerator";
-import { newSeededTelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModelGenerator";
-import { newSeededSpaceElevatorModel } from "../spacestation/spaceElevatorModelGenerator";
-import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { newSeededMandelboxModel } from "../anomalies/mandelbox/mandelboxModelGenerator";
-import { newSeededSierpinskiPyramidModel } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidModelGenerator";
-import { newSeededMengerSpongeModel } from "../anomalies/mengerSponge/mengerSpongeModelGenerator";
-import { TelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModel";
-import { isNonEmptyArray } from "../utils/types";
+import { newSeededStarModel } from "../stellarObjects/star/starModelGenerator";
 import { createOrbitalObjectId } from "../utils/coordinates/orbitalObjectId";
+import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
+import { getRngFromSeed } from "../utils/getRngFromSeed";
+import { wheelOfFortune } from "../utils/random";
+import { Alphabet, ReversedGreekAlphabet } from "../utils/strings/parseToStrings";
+import { romanNumeral } from "../utils/strings/romanNumerals";
+import { generateStarName } from "../utils/strings/starNameGenerator";
+import { isNonEmptyArray } from "../utils/types";
+import { StarSystemModel } from "./starSystemModel";
 
 const enum GenerationSteps {
     NAME,

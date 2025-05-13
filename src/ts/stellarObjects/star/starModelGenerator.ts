@@ -15,7 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { uniformRandBool, randRangeInt, randRange } from "extended-random";
+import { randRange, randRangeInt, uniformRandBool } from "extended-random";
+
 import { OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { Orbit } from "../../orbit/orbit";

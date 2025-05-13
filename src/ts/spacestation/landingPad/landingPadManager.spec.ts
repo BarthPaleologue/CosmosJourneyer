@@ -15,10 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ILandingPad, LandingPadManager, LandingPadSize, LandingRequest } from "./landingPadManager";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ObjectTargetCursorType, TargetInfo } from "../../architecture/targetable";
 import { TransformNode } from "@babylonjs/core";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { ObjectTargetCursorType, TargetInfo } from "../../architecture/targetable";
+import { ILandingPad, LandingPadManager, LandingPadSize, LandingRequest } from "./landingPadManager";
 
 vi.mock("@babylonjs/core");
 

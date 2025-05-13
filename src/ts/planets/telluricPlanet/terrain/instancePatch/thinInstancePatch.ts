@@ -15,8 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import "@babylonjs/core/Meshes/thinInstanceMesh";
+
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+
 import { IPatch } from "./iPatch";
 
 export class ThinInstancePatch implements IPatch {

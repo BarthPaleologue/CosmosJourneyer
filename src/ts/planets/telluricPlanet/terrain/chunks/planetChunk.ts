@@ -15,30 +15,32 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Direction, getQuaternionFromDirection } from "../../../../utils/direction";
-import { getChunkPlaneSpacePositionFromPath } from "../../../../utils/chunkUtils";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { Material } from "@babylonjs/core/Materials/material";
-import { Scene } from "@babylonjs/core/scene";
 import "@babylonjs/core/Engines/Extensions/engine.query";
-import { TransformNode, VertexData } from "@babylonjs/core/Meshes";
-import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { ThinInstancePatch } from "../instancePatch/thinInstancePatch";
-import { randomDownSample } from "../instancePatch/matrixBuffer";
-import { isSizeOnScreenEnough } from "../../../../utils/isObjectVisibleOnScreen";
+
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { IPatch } from "../instancePatch/iPatch";
-import { HasBoundingSphere } from "../../../../architecture/hasBoundingSphere";
+import { Material } from "@babylonjs/core/Materials/material";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { TransformNode, VertexData } from "@babylonjs/core/Meshes";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { Scene } from "@babylonjs/core/scene";
+
+import { HasBoundingSphere } from "../../../../architecture/hasBoundingSphere";
 import { Transformable } from "../../../../architecture/transformable";
+import { RenderingAssets } from "../../../../assets/renderingAssets";
 import { CollisionMask } from "../../../../settings";
-import { InstancePatch } from "../instancePatch/instancePatch";
+import { getChunkPlaneSpacePositionFromPath } from "../../../../utils/chunkUtils";
 import { Cullable } from "../../../../utils/cullable";
+import { Direction, getQuaternionFromDirection } from "../../../../utils/direction";
+import { isSizeOnScreenEnough } from "../../../../utils/isObjectVisibleOnScreen";
+import { DeepReadonly } from "../../../../utils/types";
 import { TelluricPlanetModel } from "../../telluricPlanetModel";
 import { TelluricSatelliteModel } from "../../telluricSatelliteModel";
-import { DeepReadonly } from "../../../../utils/types";
-import { RenderingAssets } from "../../../../assets/renderingAssets";
+import { InstancePatch } from "../instancePatch/instancePatch";
+import { IPatch } from "../instancePatch/iPatch";
+import { randomDownSample } from "../instancePatch/matrixBuffer";
+import { ThinInstancePatch } from "../instancePatch/thinInstancePatch";
 
 export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
     public readonly mesh: Mesh;

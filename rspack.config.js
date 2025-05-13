@@ -1,7 +1,9 @@
 // Generated using webpack-cli https://github.com/webpack/webpack-cli
+
 import path from "path";
-import HtmlWebpackPlugin from "html-webpack-plugin";
+
 import { rspack } from "@rspack/core";
+import HtmlWebpackPlugin from "html-webpack-plugin";
 import { TsCheckerRspackPlugin } from "ts-checker-rspack-plugin";
 
 const isProduction = process.env.NODE_ENV === "production";

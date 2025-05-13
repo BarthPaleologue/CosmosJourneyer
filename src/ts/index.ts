@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import "../styles/index.scss";
+
 import { SoundPlayerMock } from "./audio/soundPlayer";
 import { CosmosJourneyer } from "./cosmosJourneyer";
 import { safeParseSave } from "./saveFile/saveFileData";

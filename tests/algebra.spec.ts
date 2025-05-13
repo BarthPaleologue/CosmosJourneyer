@@ -16,8 +16,9 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { getTransformationQuaternion } from "../src/ts/utils/algebra";
 import { expect, test } from "vitest";
+
+import { getTransformationQuaternion } from "../src/ts/utils/algebra";
 
 test("getTransformationQuaternion", () => {
     const from = new Vector3(0, 1, 0);

@@ -15,9 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Effect } from "@babylonjs/core/Materials/effect";
-import { flattenColor3Array, flattenVector3Array } from "../../utils/algebra";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { Effect } from "@babylonjs/core/Materials/effect";
+
+import { flattenColor3Array, flattenVector3Array } from "../../utils/algebra";
 
 export const StellarObjectUniformNames = {
     STAR_POSITIONS: "star_positions",

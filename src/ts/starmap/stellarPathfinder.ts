@@ -16,10 +16,11 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/starSystemCoordinates";
 import { getNeighborStarSystemCoordinates } from "../utils/getNeighborStarSystems";
 import { PriorityQueue } from "../utils/priorityQueue";
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/starSystemCoordinates";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { err, ok, Result } from "../utils/types";
 
 type Node = {

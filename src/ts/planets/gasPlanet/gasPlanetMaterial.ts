@@ -15,22 +15,23 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { Effect } from "@babylonjs/core/Materials/effect";
+import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { Scene } from "@babylonjs/core/scene";
+import { normalRandom, randRange, randRangeInt } from "extended-random";
+
 import surfaceMaterialFragment from "../../../shaders/gasPlanetMaterial/fragment.glsl";
 import surfaceMaterialVertex from "../../../shaders/gasPlanetMaterial/vertex.glsl";
-import { GazColorSettings } from "../telluricPlanet/colorSettingsInterface";
-import { normalRandom, randRange, randRangeInt } from "extended-random";
-import { GasPlanetModel } from "./gasPlanetModel";
-import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
-import { Effect } from "@babylonjs/core/Materials/effect";
-import { Scene } from "@babylonjs/core/scene";
-import { Color3 } from "@babylonjs/core/Maths/math.color";
 import {
     setStellarObjectUniforms,
     StellarObjectUniformNames
 } from "../../postProcesses/uniforms/stellarObjectUniforms";
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { DeepReadonly } from "../../utils/types";
-import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { GazColorSettings } from "../telluricPlanet/colorSettingsInterface";
+import { GasPlanetModel } from "./gasPlanetModel";
 
 const GasPlanetMaterialUniformNames = {
     WORLD: "world",

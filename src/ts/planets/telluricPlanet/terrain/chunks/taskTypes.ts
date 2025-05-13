@@ -15,12 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Direction } from "../../../../utils/direction";
-import { PlanetChunk } from "./planetChunk";
-import { TerrainSettings } from "../terrainSettings";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import { z } from "zod";
+
+import { Direction } from "../../../../utils/direction";
+import { TerrainSettings } from "../terrainSettings";
+import { PlanetChunk } from "./planetChunk";
 
 export const enum TaskType {
     BUILD,

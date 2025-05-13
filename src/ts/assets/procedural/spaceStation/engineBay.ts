@@ -15,21 +15,22 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Transformable } from "../../../architecture/transformable";
-import { Mesh, MeshBuilder } from "@babylonjs/core/Meshes";
-import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
-import { PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
-import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { MetalSectionMaterial } from "./metalSectionMaterial";
-import { Scene } from "@babylonjs/core/scene";
+import { Material } from "@babylonjs/core/Materials/material";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { Mesh, MeshBuilder } from "@babylonjs/core/Meshes";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
+import { PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
+import { Scene } from "@babylonjs/core/scene";
+
+import { Transformable } from "../../../architecture/transformable";
 import { createEnvironmentAggregate } from "../../../utils/havok";
-import { Material } from "@babylonjs/core/Materials/material";
 import { RenderingAssets } from "../../renderingAssets";
+import { MetalSectionMaterial } from "./metalSectionMaterial";
 
 export class EngineBay implements Transformable {
     private readonly root: TransformNode;

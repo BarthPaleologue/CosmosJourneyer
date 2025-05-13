@@ -15,13 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { BaseTexture, FreeCamera, MeshBuilder, PointLight, StandardMaterial } from "@babylonjs/core";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
-import { Scene } from "@babylonjs/core/scene";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { BaseTexture, FreeCamera, MeshBuilder, PointLight, StandardMaterial } from "@babylonjs/core";
-import { enablePhysics } from "./utils";
+import { Scene } from "@babylonjs/core/scene";
+
 import { loadRenderingAssets } from "../assets/renderingAssets";
+import { enablePhysics } from "./utils";
 
 export async function createDebugAssetsScene(
     engine: AbstractEngine,

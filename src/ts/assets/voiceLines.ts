@@ -15,26 +15,23 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Sound } from "@babylonjs/core/Audio/sound";
-import { ISoundOptions } from "@babylonjs/core/Audio/Interfaces/ISoundOptions";
 import "@babylonjs/core/Audio/audioEngine";
 import "@babylonjs/core/Audio/audioSceneComponent";
 
-import initiatingPlanetaryLandingSoundPath from "../../asset/sound/voice/InitiatingPlanetaryLandingCharlotte.mp3";
-import landingRequestSoundPath from "../../asset/sound/voice/LandingRequestGrantedCharlotte.mp3";
-import landingCompleteSoundPath from "../../asset/sound/voice/LandingCompleteCharlotte.mp3";
+import { ISoundOptions } from "@babylonjs/core/Audio/Interfaces/ISoundOptions";
+import { Sound } from "@babylonjs/core/Audio/sound";
 
-import missionCompleteSoundPath from "../../asset/sound/voice/MissionCompleteCharlotte.mp3";
-
-import newDiscoverySoundPath from "../../asset/sound/voice/NewDiscoveryCharlotte.mp3";
-
-import cannotEngageWarpDriveSoundPath from "../../asset/sound/voice/CannotEngageWarpDriveCharlotte.mp3";
-import warpDriveEmergencyShutDownSoundPath from "../../asset/sound/voice/WarpDriveEmergencyShutdownCharlotte.mp3";
-import warpDriveDisengagedSoundPath from "../../asset/sound/voice/WarpDriveDisengagedCharlotte.mp3";
-import engagingWarpDriveSoundPath from "../../asset/sound/voice/EngagingWarpDriveCharlotte.mp3";
-
-import fuelScoopingVoicePath from "../../asset/sound/voice/FuelScoopingCharlotte.mp3";
-import fuelScoopingCompleteVoicePath from "../../asset/sound/voice/FuelScoopingCompleteCharlotte.mp3";
+import cannotEngageWarpDriveSoundPath from "@assets/sound/voice/CannotEngageWarpDriveCharlotte.mp3";
+import engagingWarpDriveSoundPath from "@assets/sound/voice/EngagingWarpDriveCharlotte.mp3";
+import fuelScoopingVoicePath from "@assets/sound/voice/FuelScoopingCharlotte.mp3";
+import fuelScoopingCompleteVoicePath from "@assets/sound/voice/FuelScoopingCompleteCharlotte.mp3";
+import initiatingPlanetaryLandingSoundPath from "@assets/sound/voice/InitiatingPlanetaryLandingCharlotte.mp3";
+import landingCompleteSoundPath from "@assets/sound/voice/LandingCompleteCharlotte.mp3";
+import landingRequestSoundPath from "@assets/sound/voice/LandingRequestGrantedCharlotte.mp3";
+import missionCompleteSoundPath from "@assets/sound/voice/MissionCompleteCharlotte.mp3";
+import newDiscoverySoundPath from "@assets/sound/voice/NewDiscoveryCharlotte.mp3";
+import warpDriveDisengagedSoundPath from "@assets/sound/voice/WarpDriveDisengagedCharlotte.mp3";
+import warpDriveEmergencyShutDownSoundPath from "@assets/sound/voice/WarpDriveEmergencyShutdownCharlotte.mp3";
 
 export type VoiceLines = {
     readonly initiatingPlanetaryLanding: Sound;

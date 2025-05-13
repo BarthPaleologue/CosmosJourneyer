@@ -15,10 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import { Scene } from "@babylonjs/core/scene";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 // rotation using https://www.wikiwand.com/en/Rodrigues%27_rotation_formula
 function rotateAround(vector: Vector3, axis: Vector3, theta: number) {

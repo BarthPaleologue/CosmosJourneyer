@@ -15,23 +15,24 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import shadowFragment from "../../shaders/shadowFragment.glsl";
-import { Effect } from "@babylonjs/core/Materials/effect";
-import { RingsSamplerNames, RingsUniformNames, RingsUniforms } from "../rings/ringsUniform";
-import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { ObjectUniformNames, setObjectUniforms } from "./uniforms/objectUniforms";
-import { setStellarObjectUniforms, StellarObjectUniformNames } from "./uniforms/stellarObjectUniforms";
-import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms";
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
-import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUniforms";
-import { Scene } from "@babylonjs/core/scene";
+import { Effect } from "@babylonjs/core/Materials/effect";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { CloudsUniforms } from "../clouds/cloudsUniforms";
-import { LightEmitter } from "../architecture/lightEmitter";
+import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
+import { Scene } from "@babylonjs/core/scene";
+
+import shadowFragment from "../../shaders/shadowFragment.glsl";
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
+import { LightEmitter } from "../architecture/lightEmitter";
+import { CloudsUniforms } from "../clouds/cloudsUniforms";
+import { RingsSamplerNames, RingsUniformNames, RingsUniforms } from "../rings/ringsUniform";
 import { createEmptyTexture } from "../utils/proceduralTexture";
+import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms";
+import { ObjectUniformNames, setObjectUniforms } from "./uniforms/objectUniforms";
+import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUniforms";
+import { setStellarObjectUniforms, StellarObjectUniformNames } from "./uniforms/stellarObjectUniforms";
 
 export type ShadowUniforms = {
     hasRings: boolean;

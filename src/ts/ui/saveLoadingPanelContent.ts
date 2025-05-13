@@ -1,21 +1,23 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
-import i18n from "../i18n";
-import { createNotification, NotificationIntent, NotificationOrigin } from "../utils/notification";
-import { createUrlFromSave, Save } from "../saveFile/saveFileData";
-import expandIconPath from "../../asset/icons/expand.webp";
-import collapseIconPath from "../../asset/icons/collapse.webp";
-import loadIconPath from "../../asset/icons/play.webp";
-import editIconPath from "../../asset/icons/edit.webp";
-import downloadIconPath from "../../asset/icons/download.webp";
-import trashIconPath from "../../asset/icons/trash.webp";
-import shareIconPath from "../../asset/icons/link.webp";
-import { alertModal, promptModalBoolean, promptModalString } from "../utils/dialogModal";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-import { Result } from "../utils/types";
-import { SaveManager } from "../saveFile/saveManager";
-import { parseSaveFile } from "../saveFile/saveFile";
-import { SaveLoadingError, saveLoadingErrorToI18nString } from "../saveFile/saveLoadingError";
+
 import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
+import i18n from "../i18n";
+import { parseSaveFile } from "../saveFile/saveFile";
+import { createUrlFromSave, Save } from "../saveFile/saveFileData";
+import { SaveLoadingError, saveLoadingErrorToI18nString } from "../saveFile/saveLoadingError";
+import { SaveManager } from "../saveFile/saveManager";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { alertModal, promptModalBoolean, promptModalString } from "../utils/dialogModal";
+import { createNotification, NotificationIntent, NotificationOrigin } from "../utils/notification";
+import { Result } from "../utils/types";
+
+import collapseIconPath from "@assets/icons/collapse.webp";
+import downloadIconPath from "@assets/icons/download.webp";
+import editIconPath from "@assets/icons/edit.webp";
+import expandIconPath from "@assets/icons/expand.webp";
+import shareIconPath from "@assets/icons/link.webp";
+import loadIconPath from "@assets/icons/play.webp";
+import trashIconPath from "@assets/icons/trash.webp";
 
 export class SaveLoadingPanelContent {
     readonly htmlRoot: HTMLElement;

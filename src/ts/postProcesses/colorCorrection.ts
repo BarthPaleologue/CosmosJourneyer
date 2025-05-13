@@ -15,12 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
-import colorCorrectionFragment from "../../shaders/colorCorrection.glsl";
+import { Constants } from "@babylonjs/core/Engines/constants";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Scene } from "@babylonjs/core/scene";
-import { Constants } from "@babylonjs/core/Engines/constants";
+
+import colorCorrectionFragment from "../../shaders/colorCorrection.glsl";
 
 const shaderName = "colorCorrection";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = colorCorrectionFragment;

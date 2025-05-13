@@ -15,25 +15,26 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import mengerSpongeFragment from "../../../shaders/mengerSponge.glsl";
-import { UpdatablePostProcess } from "../../postProcesses/updatablePostProcess";
-import { Effect } from "@babylonjs/core/Materials/effect";
-import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { ObjectUniformNames, setObjectUniforms } from "../../postProcesses/uniforms/objectUniforms";
+import { Constants } from "@babylonjs/core/Engines/constants";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { Effect } from "@babylonjs/core/Materials/effect";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
+import { Scene } from "@babylonjs/core/scene";
+
+import mengerSpongeFragment from "../../../shaders/mengerSponge.glsl";
 import { CameraUniformNames, setCameraUniforms } from "../../postProcesses/uniforms/cameraUniforms";
+import { ObjectUniformNames, setObjectUniforms } from "../../postProcesses/uniforms/objectUniforms";
+import { SamplerUniformNames, setSamplerUniforms } from "../../postProcesses/uniforms/samplerUniforms";
 import {
     setStellarObjectUniforms,
     StellarObjectUniformNames
 } from "../../postProcesses/uniforms/stellarObjectUniforms";
-import { SamplerUniformNames, setSamplerUniforms } from "../../postProcesses/uniforms/samplerUniforms";
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { Constants } from "@babylonjs/core/Engines/constants";
-import { Scene } from "@babylonjs/core/scene";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { MengerSpongeModel } from "./mengerSpongeModel";
+import { UpdatablePostProcess } from "../../postProcesses/updatablePostProcess";
 import { DeepReadonly } from "../../utils/types";
-import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { MengerSpongeModel } from "./mengerSpongeModel";
 
 export class MengerSpongePostProcess extends PostProcess implements UpdatablePostProcess {
     private elapsedSeconds = 0;

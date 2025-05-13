@@ -16,19 +16,20 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
-import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { enablePhysics } from "./utils";
-import { DefaultControls } from "../defaultControls/defaultControls";
-import { SpaceStation } from "../spacestation/spaceStation";
-import { newSeededSpaceStationModel } from "../spacestation/spaceStationModelGenerator";
-import { Settings } from "../settings";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-import { Star } from "../stellarObjects/star/star";
-import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
-import { StarModel } from "../stellarObjects/star/starModel";
+import { Scene } from "@babylonjs/core/scene";
+
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { loadRenderingAssets } from "../assets/renderingAssets";
+import { DefaultControls } from "../defaultControls/defaultControls";
+import { Settings } from "../settings";
+import { SpaceStation } from "../spacestation/spaceStation";
+import { newSeededSpaceStationModel } from "../spacestation/spaceStationModelGenerator";
+import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { Star } from "../stellarObjects/star/star";
+import { StarModel } from "../stellarObjects/star/starModel";
+import { enablePhysics } from "./utils";
 
 export async function createSpaceStationScene(
     engine: AbstractEngine,

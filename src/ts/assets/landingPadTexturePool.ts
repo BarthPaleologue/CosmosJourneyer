@@ -17,6 +17,7 @@
 
 import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
 import { Scene } from "@babylonjs/core/scene";
+
 import { Settings } from "../settings";
 
 export class LandingPadTexturePool {

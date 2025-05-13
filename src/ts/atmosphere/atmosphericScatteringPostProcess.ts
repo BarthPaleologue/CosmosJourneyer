@@ -15,21 +15,21 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import atmosphericScatteringFragment from "../../shaders/atmosphericScatteringFragment.glsl";
-
-import { Effect } from "@babylonjs/core/Materials/effect";
-import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { ObjectUniformNames, setObjectUniforms } from "../postProcesses/uniforms/objectUniforms";
-import { setStellarObjectUniforms, StellarObjectUniformNames } from "../postProcesses/uniforms/stellarObjectUniforms";
-import { CameraUniformNames, setCameraUniforms } from "../postProcesses/uniforms/cameraUniforms";
-import { SamplerUniformNames, setSamplerUniforms } from "../postProcesses/uniforms/samplerUniforms";
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
-import { Scene } from "@babylonjs/core/scene";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { AtmosphereUniforms } from "./atmosphereUniforms";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { Effect } from "@babylonjs/core/Materials/effect";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
+import { Scene } from "@babylonjs/core/scene";
+
+import atmosphericScatteringFragment from "../../shaders/atmosphericScatteringFragment.glsl";
+import { CameraUniformNames, setCameraUniforms } from "../postProcesses/uniforms/cameraUniforms";
+import { ObjectUniformNames, setObjectUniforms } from "../postProcesses/uniforms/objectUniforms";
+import { SamplerUniformNames, setSamplerUniforms } from "../postProcesses/uniforms/samplerUniforms";
+import { setStellarObjectUniforms, StellarObjectUniformNames } from "../postProcesses/uniforms/stellarObjectUniforms";
+import { AtmosphereUniforms } from "./atmosphereUniforms";
 
 export class AtmosphericScatteringPostProcess extends PostProcess {
     private activeCamera: Camera | null = null;

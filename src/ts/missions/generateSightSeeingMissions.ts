@@ -15,20 +15,21 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getNeighborStarSystemCoordinates } from "../utils/getNeighborStarSystems";
-import { newSightSeeingMission } from "./sightSeeingMission";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { uniformRandBool } from "extended-random";
+
+import { OrbitalFacilityModel } from "../architecture/orbitalObjectModel";
+import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { Player } from "../player/player";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { StarSystemModel } from "../starSystem/starSystemModel";
+import { getUniverseObjectId, UniverseObjectId } from "../utils/coordinates/universeObjectId";
+import { getNeighborStarSystemCoordinates } from "../utils/getNeighborStarSystems";
+import { getRngFromSeed } from "../utils/getRngFromSeed";
+import { DeepReadonly } from "../utils/types";
 import { Mission } from "./mission";
 import { MissionType } from "./missionSerialized";
-import { StarSystemModel } from "../starSystem/starSystemModel";
-import { getRngFromSeed } from "../utils/getRngFromSeed";
-import { OrbitalObjectType } from "../architecture/orbitalObjectType";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-import { OrbitalFacilityModel } from "../architecture/orbitalObjectModel";
-import { getUniverseObjectId, UniverseObjectId } from "../utils/coordinates/universeObjectId";
-import { DeepReadonly } from "../utils/types";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { newSightSeeingMission } from "./sightSeeingMission";
 
 /**
  * Generates sightseeing missions available at the given space station for the player. Missions are generated based on the current timestamp (hourly basis).

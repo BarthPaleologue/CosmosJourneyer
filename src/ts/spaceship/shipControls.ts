@@ -15,8 +15,27 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Scene } from "@babylonjs/core/scene";
+import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
+import { Camera } from "@babylonjs/core/Cameras/camera";
+import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { TransformNode } from "@babylonjs/core/Meshes";
+import { Observable } from "@babylonjs/core/Misc/observable";
+import { Tools } from "@babylonjs/core/Misc/tools";
+import { Scene } from "@babylonjs/core/scene";
+
+import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
+import { Transformable } from "../architecture/transformable";
+import { RenderingAssets } from "../assets/renderingAssets";
+import { ISoundPlayer } from "../audio/soundPlayer";
+import { ITts, Speaker, VoiceLine } from "../audio/tts";
+import i18n from "../i18n";
+import { StarSystemInputs } from "../inputs/starSystemInputs";
+import { LandingPadSize } from "../spacestation/landingPad/landingPadManager";
+import { ManagesLandingPads } from "../spacestation/landingPad/managesLandingPads";
+import { Controls } from "../uberCore/controls";
+import { CameraShakeAnimation } from "../uberCore/transforms/animations/cameraShake";
+import { quickAnimation } from "../uberCore/transforms/animations/quickAnimation";
 import {
     getForwardDirection,
     getRightDirection,
@@ -25,31 +44,13 @@ import {
     roll,
     yaw
 } from "../uberCore/transforms/basicTransform";
-import { TransformNode } from "@babylonjs/core/Meshes";
-import { Controls } from "../uberCore/controls";
-import { Camera } from "@babylonjs/core/Cameras/camera";
-import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
-import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
+import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
+import { lerpSmooth, slerpSmoothToRef } from "../utils/math";
+import { createNotification, NotificationIntent, NotificationOrigin } from "../utils/notification";
+import { pressInteractionToStrings } from "../utils/strings/inputControlsString";
+import { canEngageWarpDrive } from "./components/warpDriveUtils";
 import { Spaceship } from "./spaceship";
 import { SpaceShipControlsInputs } from "./spaceShipControlsInputs";
-import { createNotification, NotificationIntent, NotificationOrigin } from "../utils/notification";
-import { StarSystemInputs } from "../inputs/starSystemInputs";
-import { pressInteractionToStrings } from "../utils/strings/inputControlsString";
-import i18n from "../i18n";
-import { Transformable } from "../architecture/transformable";
-import { ManagesLandingPads } from "../spacestation/landingPad/managesLandingPads";
-import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
-import { CameraShakeAnimation } from "../uberCore/transforms/animations/cameraShake";
-import { Tools } from "@babylonjs/core/Misc/tools";
-import { quickAnimation } from "../uberCore/transforms/animations/quickAnimation";
-import { Observable } from "@babylonjs/core/Misc/observable";
-import { lerpSmooth, slerpSmoothToRef } from "../utils/math";
-import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
-import { canEngageWarpDrive } from "./components/warpDriveUtils";
-import { LandingPadSize } from "../spacestation/landingPad/landingPadManager";
-import { ITts, Speaker, VoiceLine } from "../audio/tts";
-import { ISoundPlayer } from "../audio/soundPlayer";
-import { RenderingAssets } from "../assets/renderingAssets";
 
 export class ShipControls implements Controls {
     private spaceship: Spaceship;

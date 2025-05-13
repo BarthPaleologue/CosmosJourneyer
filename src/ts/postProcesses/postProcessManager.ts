@@ -15,52 +15,54 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { UberScene } from "../uberCore/uberScene";
-import { OceanPostProcess } from "../ocean/oceanPostProcess";
-import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
-import { FlatCloudsPostProcess } from "../clouds/flatCloudsPostProcess";
-import { AtmosphericScatteringPostProcess } from "../atmosphere/atmosphericScatteringPostProcess";
-import { RingsPostProcess } from "../rings/ringsPostProcess";
-import { VolumetricLight } from "../volumetricLight/volumetricLight";
-import { BlackHolePostProcess } from "../stellarObjects/blackHole/blackHolePostProcess";
-import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
-import { ColorCorrection } from "./colorCorrection";
-import { FxaaPostProcess } from "@babylonjs/core/PostProcesses/fxaaPostProcess";
-import { PostProcessRenderEffect } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderEffect";
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManagerSceneComponent";
-import { MandelbulbPostProcess } from "../anomalies/mandelbulb/mandelbulbPostProcess";
-import { ShadowPostProcess } from "./shadowPostProcess";
-import { LensFlarePostProcess } from "./lensFlarePostProcess";
-import { UpdatablePostProcess } from "./updatablePostProcess";
-import { MatterJetPostProcess } from "./matterJetPostProcess";
-import { Star } from "../stellarObjects/star/star";
-import { BlackHole } from "../stellarObjects/blackHole/blackHole";
-import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
+
+import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { Constants } from "@babylonjs/core/Engines/constants";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { BloomEffect } from "@babylonjs/core/PostProcesses/bloomEffect";
+import { FxaaPostProcess } from "@babylonjs/core/PostProcesses/fxaaPostProcess";
+import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
+import { PostProcessRenderEffect } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderEffect";
 import { PostProcessRenderPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipeline";
 import { PostProcessRenderPipelineManager } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManager";
-import { JuliaSetPostProcess } from "../anomalies/julia/juliaSetPostProcess";
-import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
-import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
-import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { BloomEffect } from "@babylonjs/core/PostProcesses/bloomEffect";
-import { Constants } from "@babylonjs/core/Engines/constants";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { getRgbFromTemperature } from "../utils/specrend";
-import { PostProcessType } from "./postProcessTypes";
-import { MandelboxPostProcess } from "../anomalies/mandelbox/mandelboxPostProcess";
-import { SierpinskiPyramidPostProcess } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidPostProcess";
-import { MengerSpongePostProcess } from "../anomalies/mengerSponge/mengerSpongePostProcess";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { MandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModel";
+
 import { JuliaSetModel } from "../anomalies/julia/juliaSetModel";
+import { JuliaSetPostProcess } from "../anomalies/julia/juliaSetPostProcess";
 import { MandelboxModel } from "../anomalies/mandelbox/mandelboxModel";
-import { SierpinskiPyramidModel } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidModel";
+import { MandelboxPostProcess } from "../anomalies/mandelbox/mandelboxPostProcess";
+import { MandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModel";
+import { MandelbulbPostProcess } from "../anomalies/mandelbulb/mandelbulbPostProcess";
 import { MengerSpongeModel } from "../anomalies/mengerSponge/mengerSpongeModel";
+import { MengerSpongePostProcess } from "../anomalies/mengerSponge/mengerSpongePostProcess";
+import { SierpinskiPyramidModel } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidModel";
+import { SierpinskiPyramidPostProcess } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidPostProcess";
 import { CelestialBody, StellarObject } from "../architecture/orbitalObject";
-import { DeepReadonly } from "../utils/types";
-import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Textures } from "../assets/textures";
+import { AtmosphericScatteringPostProcess } from "../atmosphere/atmosphericScatteringPostProcess";
+import { FlatCloudsPostProcess } from "../clouds/flatCloudsPostProcess";
+import { OceanPostProcess } from "../ocean/oceanPostProcess";
+import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
+import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
+import { RingsPostProcess } from "../rings/ringsPostProcess";
+import { BlackHole } from "../stellarObjects/blackHole/blackHole";
+import { BlackHolePostProcess } from "../stellarObjects/blackHole/blackHolePostProcess";
+import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
+import { Star } from "../stellarObjects/star/star";
+import { UberScene } from "../uberCore/uberScene";
+import { getRgbFromTemperature } from "../utils/specrend";
+import { DeepReadonly } from "../utils/types";
+import { VolumetricLight } from "../volumetricLight/volumetricLight";
+import { ColorCorrection } from "./colorCorrection";
+import { LensFlarePostProcess } from "./lensFlarePostProcess";
+import { MatterJetPostProcess } from "./matterJetPostProcess";
+import { PostProcessType } from "./postProcessTypes";
+import { ShadowPostProcess } from "./shadowPostProcess";
+import { UpdatablePostProcess } from "./updatablePostProcess";
 
 /**
  * The order in which the post processes are rendered when away from a planet

@@ -15,21 +15,22 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Scene } from "@babylonjs/core/scene";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import i18n from "../i18n";
-import { factionToString } from "../society/factions";
-import { StarMapBookmarkButton } from "./starMapBookmarkButton";
-import { Player } from "../player/player";
-import { SystemIcons } from "./systemIcons";
-import { getRgbFromTemperature } from "../utils/specrend";
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/starSystemCoordinates";
-import { StarSystemModel } from "../starSystem/starSystemModel";
-import { getOrbitalObjectTypeToI18nString } from "../utils/strings/orbitalObjectTypeToDisplay";
 import { Observable } from "@babylonjs/core/Misc/observable";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-import { DeepReadonly } from "../utils/types";
+import { Scene } from "@babylonjs/core/scene";
+
 import { ISoundPlayer } from "../audio/soundPlayer";
+import i18n from "../i18n";
+import { Player } from "../player/player";
+import { factionToString } from "../society/factions";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { StarSystemModel } from "../starSystem/starSystemModel";
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/starSystemCoordinates";
+import { getRgbFromTemperature } from "../utils/specrend";
+import { getOrbitalObjectTypeToI18nString } from "../utils/strings/orbitalObjectTypeToDisplay";
+import { DeepReadonly } from "../utils/types";
+import { StarMapBookmarkButton } from "./starMapBookmarkButton";
+import { SystemIcons } from "./systemIcons";
 
 export class StarMapUI {
     readonly htmlRoot: HTMLDivElement;

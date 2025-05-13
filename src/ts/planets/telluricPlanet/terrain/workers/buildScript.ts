@@ -15,10 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { TransferBuildData } from "../chunks/workerDataTypes";
 import { build_chunk_vertex_data, BuildData, TerrainSettings } from "terrain-generation";
-import { ReturnedChunkData } from "../chunks/taskTypes";
+
 import { Settings } from "../../../../settings";
+import { ReturnedChunkData } from "../chunks/taskTypes";
+import { TransferBuildData } from "../chunks/workerDataTypes";
 
 function handle_build(data: TransferBuildData): void {
     const nbVerticesPerSide = data.nbVerticesPerSide;

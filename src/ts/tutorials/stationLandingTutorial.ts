@@ -15,21 +15,21 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { TutorialControlsInputs } from "../ui/tutorial/tutorialLayerInputs";
-import { pressInteractionToStrings } from "../utils/strings/inputControlsString";
-import { Tutorial } from "./tutorial";
+import saveData from "../../asset/tutorials/stationLandingTutorial/save.json";
 import station1ImageSrc from "../../asset/tutorials/stationLandingTutorial/station1.webp";
 import stationLandingBayImageSrc from "../../asset/tutorials/stationLandingTutorial/stationLandingBay.webp";
 import stationPadApproachImageSrc from "../../asset/tutorials/stationLandingTutorial/stationPadApproach.webp";
 import stationServicesImageSrc from "../../asset/tutorials/stationLandingTutorial/stationServices.webp";
-import saveData from "../../asset/tutorials/stationLandingTutorial/save.json";
 import i18n from "../i18n";
-import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
-import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
 import { safeParseSave, Save } from "../saveFile/saveFileData";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-import { Result } from "../utils/types";
 import { SaveLoadingError } from "../saveFile/saveLoadingError";
+import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { TutorialControlsInputs } from "../ui/tutorial/tutorialLayerInputs";
+import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
+import { pressInteractionToStrings } from "../utils/strings/inputControlsString";
+import { Result } from "../utils/types";
+import { Tutorial } from "./tutorial";
 
 export class StationLandingTutorial implements Tutorial {
     readonly coverImageSrc: string = station1ImageSrc;

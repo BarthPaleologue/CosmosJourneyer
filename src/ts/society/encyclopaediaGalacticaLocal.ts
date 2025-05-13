@@ -4,7 +4,7 @@ import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetMod
 import { TelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModel";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { UniverseObjectId } from "../utils/coordinates/universeObjectId";
-import { err, ok, Result, DeepReadonly } from "../utils/types";
+import { DeepReadonly, err, ok, Result } from "../utils/types";
 import { EncyclopaediaGalactica, SpaceDiscoveryData } from "./encyclopaediaGalactica";
 
 export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {

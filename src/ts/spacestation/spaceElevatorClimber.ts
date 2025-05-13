@@ -15,18 +15,19 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Scene } from "@babylonjs/core/scene";
-import { CreateBox, CreateTube, TransformNode } from "@babylonjs/core/Meshes";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
-import { SolarPanelMaterial } from "../assets/procedural/solarPanel/solarPanelMaterial";
-import i18n from "../i18n";
-import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
 import { Material } from "@babylonjs/core/Materials/material";
+import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { CreateBox, CreateTube, TransformNode } from "@babylonjs/core/Meshes";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { Scene } from "@babylonjs/core/scene";
+
+import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
+import { SolarPanelMaterial } from "../assets/procedural/solarPanel/solarPanelMaterial";
 import { MetalSectionMaterial } from "../assets/procedural/spaceStation/metalSectionMaterial";
-import { ClimberRingMaterial } from "../materials/climberRingMaterial";
 import { PBRTextures } from "../assets/textures";
+import i18n from "../i18n";
+import { ClimberRingMaterial } from "../materials/climberRingMaterial";
 
 export class SpaceElevatorClimber implements Targetable {
     private readonly transform: TransformNode;

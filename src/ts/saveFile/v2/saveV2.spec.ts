@@ -1,9 +1,10 @@
-import { safeParseSave } from "../saveFileData";
 import { expect, test } from "vitest";
-import { SaveV2 } from "./saveV2";
-import { DeepPartial } from "../../utils/types";
+
 import { getLoneStarSystem } from "../../starSystem/customSystems/loneStar";
 import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
+import { DeepPartial } from "../../utils/types";
+import { safeParseSave } from "../saveFileData";
+import { SaveV2 } from "./saveV2";
 
 test("Loading a correct save file", () => {
     const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());

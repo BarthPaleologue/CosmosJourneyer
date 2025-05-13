@@ -15,15 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { RingsModel } from "./ringsModel";
-import { RingsLut } from "./ringsLut";
-import { DeepReadonly } from "../utils/types";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { Scene } from "@babylonjs/core/scene";
+
 import { ItemPool } from "../utils/itemPool";
 import { createEmptyTexture } from "../utils/proceduralTexture";
-import { Scene } from "@babylonjs/core/scene";
+import { DeepReadonly } from "../utils/types";
+import { RingsLut } from "./ringsLut";
+import { RingsModel } from "./ringsModel";
 
 export const RingsUniformNames = {
     RING_START: "rings_start",

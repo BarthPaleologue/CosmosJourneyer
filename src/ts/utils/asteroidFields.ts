@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+
 import { AsteroidField } from "../asteroidFields/asteroidField";
 
 export function distanceToAsteroidField(position: Vector3, asteroidField: AsteroidField) {

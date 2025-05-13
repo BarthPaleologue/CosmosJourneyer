@@ -15,33 +15,34 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { PointLight } from "@babylonjs/core/Lights/pointLight";
-import { StarMaterial } from "./starMaterial";
-import { StarModel } from "./starModel";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Light } from "@babylonjs/core/Lights/light";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
+import { Light } from "@babylonjs/core/Lights/light";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
-import { StellarObjectBase } from "../../architecture/stellarObject";
-import { Cullable } from "../../utils/cullable";
-import { RingsUniforms } from "../../rings/ringsUniform";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { Scene } from "@babylonjs/core/scene";
+
+import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
+import { StellarObjectBase } from "../../architecture/stellarObject";
+import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
+import { TexturePools } from "../../assets/textures";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
+import { RingsLut } from "../../rings/ringsLut";
+import { RingsUniforms } from "../../rings/ringsUniform";
+import { Settings } from "../../settings";
+import { Cullable } from "../../utils/cullable";
+import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
+import { ItemPool } from "../../utils/itemPool";
 import { getRgbFromTemperature } from "../../utils/specrend";
 import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
-import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
-import { VolumetricLightUniforms } from "../../volumetricLight/volumetricLightUniforms";
-import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { DeepReadonly } from "../../utils/types";
-import { TexturePools } from "../../assets/textures";
-import { ItemPool } from "../../utils/itemPool";
-import { RingsLut } from "../../rings/ringsLut";
-import { Settings } from "../../settings";
+import { VolumetricLightUniforms } from "../../volumetricLight/volumetricLightUniforms";
+import { StarMaterial } from "./starMaterial";
+import { StarModel } from "./starModel";
 
 export class Star implements StellarObjectBase<OrbitalObjectType.STAR>, Cullable {
     readonly mesh: Mesh;

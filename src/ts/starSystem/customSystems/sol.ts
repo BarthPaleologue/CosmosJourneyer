@@ -15,16 +15,17 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
-import { StarModel } from "../../stellarObjects/star/starModel";
-import { StarSystemModel } from "../starSystemModel";
-import { TelluricPlanetModel } from "../../planets/telluricPlanet/telluricPlanetModel";
-import { Settings } from "../../settings";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { celsiusToKelvin } from "../../utils/physics";
-import { TelluricSatelliteModel } from "../../planets/telluricPlanet/telluricSatelliteModel";
 import { Tools } from "@babylonjs/core/Misc/tools";
+
+import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { GasPlanetModel } from "../../planets/gasPlanet/gasPlanetModel";
+import { TelluricPlanetModel } from "../../planets/telluricPlanet/telluricPlanetModel";
+import { TelluricSatelliteModel } from "../../planets/telluricPlanet/telluricSatelliteModel";
+import { Settings } from "../../settings";
+import { StarModel } from "../../stellarObjects/star/starModel";
+import { celsiusToKelvin } from "../../utils/physics";
+import { StarSystemModel } from "../starSystemModel";
 
 export function getSolSystemModel(): StarSystemModel {
     const sun: StarModel = {

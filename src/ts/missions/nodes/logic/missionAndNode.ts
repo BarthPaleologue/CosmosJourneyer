@@ -15,15 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import i18n from "../../../i18n";
+import { StarSystemDatabase } from "../../../starSystem/starSystemDatabase";
+import { StarSystemCoordinates } from "../../../utils/coordinates/starSystemCoordinates";
+import { MissionContext } from "../../missionContext";
+import type { MissionNode } from "../missionNode";
+import { MissionNodeBase } from "../missionNodeBase";
 import { MissionAndNodeSerialized } from "../missionNodeSerialized";
 import { MissionNodeType } from "../missionNodeType";
-import { MissionNodeBase } from "../missionNodeBase";
-import { MissionContext } from "../../missionContext";
-import i18n from "../../../i18n";
-
-import { StarSystemCoordinates } from "../../../utils/coordinates/starSystemCoordinates";
-import { StarSystemDatabase } from "../../../starSystem/starSystemDatabase";
-import type { MissionNode } from "../missionNode";
 
 /**
  * Node used to describe a set of tasks that must all be completed in any order.

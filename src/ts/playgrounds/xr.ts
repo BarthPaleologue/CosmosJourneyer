@@ -15,22 +15,23 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
-import { Scene } from "@babylonjs/core/scene";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { ArcRotateCamera, PostProcess, TransformNode } from "@babylonjs/core";
-import { newSeededMandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModelGenerator";
-import { EmptyCelestialBody } from "../utils/emptyCelestialBody";
-import { MandelbulbPostProcess } from "../anomalies/mandelbulb/mandelbulbPostProcess";
+import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Scene } from "@babylonjs/core/scene";
+
 import { newSeededJuliaSetModel } from "../anomalies/julia/juliaSetModelGenerator";
 import { JuliaSetPostProcess } from "../anomalies/julia/juliaSetPostProcess";
 import { newSeededMandelboxModel } from "../anomalies/mandelbox/mandelboxModelGenerator";
 import { MandelboxPostProcess } from "../anomalies/mandelbox/mandelboxPostProcess";
-import { newSeededSierpinskiPyramidModel } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidModelGenerator";
-import { SierpinskiPyramidPostProcess } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidPostProcess";
+import { newSeededMandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModelGenerator";
+import { MandelbulbPostProcess } from "../anomalies/mandelbulb/mandelbulbPostProcess";
 import { newSeededMengerSpongeModel } from "../anomalies/mengerSponge/mengerSpongeModelGenerator";
 import { MengerSpongePostProcess } from "../anomalies/mengerSponge/mengerSpongePostProcess";
+import { newSeededSierpinskiPyramidModel } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidModelGenerator";
+import { SierpinskiPyramidPostProcess } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidPostProcess";
 import { UpdatablePostProcess } from "../postProcesses/updatablePostProcess";
+import { EmptyCelestialBody } from "../utils/emptyCelestialBody";
 
 export async function createXrScene(
     engine: AbstractEngine,

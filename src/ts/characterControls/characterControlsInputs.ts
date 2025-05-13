@@ -1,6 +1,7 @@
-import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import Action from "@brianchirls/game-input/Action";
+import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import PressInteraction from "@brianchirls/game-input/interactions/PressInteraction";
+
 import { InputDevices } from "../inputs/devices";
 import { InputMap } from "../inputs/inputMap";
 

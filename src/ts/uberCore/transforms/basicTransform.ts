@@ -15,9 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Space } from "@babylonjs/core/Maths/math.axis";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+
 import { LocalDirection } from "../localDirections";
 
 export function translate(transformNode: TransformNode, displacement: Vector3): void {

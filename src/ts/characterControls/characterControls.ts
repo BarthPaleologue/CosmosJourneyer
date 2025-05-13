@@ -15,25 +15,27 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Controls } from "../uberCore/controls";
-import { TransformNode } from "@babylonjs/core/Meshes";
-import { Scene } from "@babylonjs/core/scene";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { setUpVector, translate } from "../uberCore/transforms/basicTransform";
-import { AnimationGroup } from "@babylonjs/core/Animations/animationGroup";
-import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { CollisionMask, Settings } from "../settings";
-import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
-import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
-import { Axis, Quaternion, Space } from "@babylonjs/core/Maths/math";
 import "@babylonjs/core/Collisions/collisionCoordinator";
-import { Camera } from "@babylonjs/core/Cameras/camera";
+
+import { AnimationGroup } from "@babylonjs/core/Animations/animationGroup";
+import { Skeleton } from "@babylonjs/core/Bones/skeleton";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
+import { Camera } from "@babylonjs/core/Cameras/camera";
+import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
+import { Axis, Quaternion, Space } from "@babylonjs/core/Maths/math";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { TransformNode } from "@babylonjs/core/Meshes";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
+import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
+import { Scene } from "@babylonjs/core/scene";
+
 import { Transformable } from "../architecture/transformable";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
+import { CollisionMask, Settings } from "../settings";
+import { Controls } from "../uberCore/controls";
+import { setUpVector, translate } from "../uberCore/transforms/basicTransform";
 import { CharacterInputs } from "./characterControlsInputs";
-import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
-import { Skeleton } from "@babylonjs/core/Bones/skeleton";
 
 class AnimationGroupWrapper {
     name: string;

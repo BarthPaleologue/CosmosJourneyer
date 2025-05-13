@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+
 import { Direction, getQuaternionFromDirection } from "./direction";
 
 /**

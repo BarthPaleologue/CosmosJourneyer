@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { arc, interpolateViridis, pie, PieArcDatum, scaleSequential } from "d3";
+
 import { DeepReadonly } from "./types";
 
 export function makeD3PieChart<T>(

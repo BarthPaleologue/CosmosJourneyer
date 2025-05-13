@@ -16,11 +16,12 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { easeInOutInterpolation } from "./interpolations";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { translate } from "../basicTransform";
+
 import { clamp } from "../../../utils/math";
+import { translate } from "../basicTransform";
 import { CustomAnimation } from "./animation";
+import { easeInOutInterpolation } from "./interpolations";
 
 export class TransformTranslationAnimation implements CustomAnimation {
     private clock = 0;

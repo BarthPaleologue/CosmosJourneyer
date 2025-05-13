@@ -15,22 +15,23 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { MissionNode } from "../../missionNode";
-import { MissionNodeType } from "../../missionNodeType";
-import type { MissionNodeBase } from "../../missionNodeBase";
-import { MissionContext } from "../../../missionContext";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
+
+import i18n from "../../../../i18n";
+import { CollisionMask, Settings } from "../../../../settings";
+import { StarSystemDatabase } from "../../../../starSystem/starSystemDatabase";
 import {
     StarSystemCoordinates,
     starSystemCoordinatesEquals
 } from "../../../../utils/coordinates/starSystemCoordinates";
 import { UniverseObjectId, universeObjectIdEquals } from "../../../../utils/coordinates/universeObjectId";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
-import { CollisionMask, Settings } from "../../../../settings";
-import i18n from "../../../../i18n";
 import { parseDistance } from "../../../../utils/strings/parseToStrings";
 import { getGoToSystemInstructions } from "../../../common";
-import { StarSystemDatabase } from "../../../../starSystem/starSystemDatabase";
+import { MissionContext } from "../../../missionContext";
+import { MissionNode } from "../../missionNode";
+import type { MissionNodeBase } from "../../missionNodeBase";
+import { MissionNodeType } from "../../missionNodeType";
 import { LandMissionState, MissionTerminatorLandingNodeSerialized } from "./missionTerminatorLandingNodeSerialized";
 
 /**

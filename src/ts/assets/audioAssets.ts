@@ -15,9 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Musics, loadMusics } from "./musics";
-import { Sounds, loadSounds } from "./sounds";
-import { SpeakerVoiceLines, loadVoiceLines } from "./voiceLines";
+import { loadMusics, Musics } from "./musics";
+import { loadSounds, Sounds } from "./sounds";
+import { loadVoiceLines, SpeakerVoiceLines } from "./voiceLines";
 
 export type AudioAssets = {
     readonly sounds: Sounds;

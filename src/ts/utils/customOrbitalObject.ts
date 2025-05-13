@@ -15,8 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+
 import { OrbitalObjectBase } from "../architecture/orbitalObjectBase";
 import { OrbitalObjectModelBase } from "../architecture/orbitalObjectModelBase";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";

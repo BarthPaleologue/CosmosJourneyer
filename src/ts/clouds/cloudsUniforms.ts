@@ -15,15 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Scene } from "@babylonjs/core/scene";
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { CloudsModel } from "./cloudsModel";
-import { gcd } from "../utils/math";
-import { CloudsLut } from "./cloudsLut";
-import { DeepReadonly } from "../utils/types";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { createEmptyTexture } from "../utils/proceduralTexture";
+import { Scene } from "@babylonjs/core/scene";
+
 import { ItemPool } from "../utils/itemPool";
+import { gcd } from "../utils/math";
+import { createEmptyTexture } from "../utils/proceduralTexture";
+import { DeepReadonly } from "../utils/types";
+import { CloudsLut } from "./cloudsLut";
+import { CloudsModel } from "./cloudsModel";
 
 export const CloudsUniformNames = {
     LAYER_RADIUS: "clouds_layerRadius",

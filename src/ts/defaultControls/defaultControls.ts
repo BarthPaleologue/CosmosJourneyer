@@ -15,10 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Controls } from "../uberCore/controls";
-import { Scene } from "@babylonjs/core/scene";
+import { Camera } from "@babylonjs/core/Cameras/camera";
+import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
+import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
+import { Scene } from "@babylonjs/core/scene";
+
+import { Settings } from "../settings";
+import { Controls } from "../uberCore/controls";
+import { LocalDirection } from "../uberCore/localDirections";
 import {
     getForwardDirection,
     getRightDirection,
@@ -28,14 +34,9 @@ import {
     translate,
     yaw
 } from "../uberCore/transforms/basicTransform";
-import { Camera } from "@babylonjs/core/Cameras/camera";
-import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { getTransformationQuaternion } from "../utils/algebra";
-import { Quaternion } from "@babylonjs/core/Maths/math";
-import { LocalDirection } from "../uberCore/localDirections";
-import { DefaultControlsInputs } from "./defaultControlsInputs";
-import { Settings } from "../settings";
 import { lerpSmooth } from "../utils/math";
+import { DefaultControlsInputs } from "./defaultControlsInputs";
 
 export class DefaultControls implements Controls {
     private readonly transform: TransformNode;

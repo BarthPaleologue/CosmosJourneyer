@@ -1,6 +1,6 @@
-import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes";
+import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import { Scene } from "@babylonjs/core/scene";
 
 /**

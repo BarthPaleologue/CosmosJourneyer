@@ -15,19 +15,20 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Observable } from "@babylonjs/core/Misc/observable";
+
+import { ISoundPlayer, SoundType } from "../../audio/soundPlayer";
+import i18n from "../../i18n";
+import { getOrbitalPeriod } from "../../orbit/orbit";
 import { Player } from "../../player/player";
+import { Settings } from "../../settings";
 import { EncyclopaediaGalactica, SpaceDiscoveryData } from "../../society/encyclopaediaGalactica";
+import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
+import { getObjectModelById } from "../../starSystem/starSystemModel";
+import { alertModal } from "../../utils/dialogModal";
+import { createNotification, NotificationIntent, NotificationOrigin } from "../../utils/notification";
 import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
 import { parseDistance, parseSecondsPrecise } from "../../utils/strings/parseToStrings";
-import i18n from "../../i18n";
-import { Settings } from "../../settings";
-import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
-import { Observable } from "@babylonjs/core/Misc/observable";
-import { createNotification, NotificationIntent, NotificationOrigin } from "../../utils/notification";
-import { alertModal } from "../../utils/dialogModal";
-import { getObjectModelById } from "../../starSystem/starSystemModel";
-import { getOrbitalPeriod } from "../../orbit/orbit";
-import { ISoundPlayer, SoundType } from "../../audio/soundPlayer";
 
 export class DiscoveryDetails {
     readonly htmlRoot: HTMLElement;

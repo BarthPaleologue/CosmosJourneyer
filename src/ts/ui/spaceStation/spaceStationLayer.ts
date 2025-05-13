@@ -16,26 +16,28 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Observable } from "@babylonjs/core/Misc/observable";
-import { generateInfoHTML } from "./spaceStationInfos";
-import { Player } from "../../player/player";
-import { generateMissionsDom } from "./spaceStationMissions";
-import { Settings } from "../../settings";
-import { alertModal, promptModalString } from "../../utils/dialogModal";
+
+import { OrbitalFacilityModel, OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
+import { ISoundPlayer, SoundType } from "../../audio/soundPlayer";
 import i18n from "../../i18n";
-import { ExplorationCenterPanel } from "./explorationCenterPanel";
+import { Player } from "../../player/player";
+import { Settings } from "../../settings";
 import { EncyclopaediaGalacticaManager } from "../../society/encyclopaediaGalacticaManager";
 import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
-import { OrbitalFacilityModel, OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
+import { alertModal, promptModalString } from "../../utils/dialogModal";
 import { DeepReadonly } from "../../utils/types";
-import editIcon from "../../../asset/icons/edit.webp";
-import missionsIcon from "../../../asset/icons/space-exploration.webp";
-import shipHangarIcon from "../../../asset/icons/spaceship_gear.webp";
-import explorationIcon from "../../../asset/icons/telescope.webp";
-import tradingIcon from "../../../asset/icons/trade.webp";
-import infoIcon from "../../../asset/icons/space-station.webp";
-import liftOffIcon from "../../../asset/icons/launch.webp";
+import { ExplorationCenterPanel } from "./explorationCenterPanel";
 import { SpaceshipDockUI } from "./spaceshipDock";
-import { ISoundPlayer, SoundType } from "../../audio/soundPlayer";
+import { generateInfoHTML } from "./spaceStationInfos";
+import { generateMissionsDom } from "./spaceStationMissions";
+
+import editIcon from "@assets/icons/edit.webp";
+import liftOffIcon from "@assets/icons/launch.webp";
+import missionsIcon from "@assets/icons/space-exploration.webp";
+import infoIcon from "@assets/icons/space-station.webp";
+import shipHangarIcon from "@assets/icons/spaceship_gear.webp";
+import explorationIcon from "@assets/icons/telescope.webp";
+import tradingIcon from "@assets/icons/trade.webp";
 
 const enum MainPanelState {
     NONE,

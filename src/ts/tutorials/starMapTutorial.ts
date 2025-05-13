@@ -15,31 +15,32 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import AxisComposite from "@brianchirls/game-input/controls/AxisComposite";
+import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
+
+import controlsImgSrc from "../../asset/tutorials/starMapTutorial/controls.webp";
+import coverImgSrc from "../../asset/tutorials/starMapTutorial/cover.webp";
+import jumpImgSrc from "../../asset/tutorials/starMapTutorial/jump.webp";
+import missionImgSrc from "../../asset/tutorials/starMapTutorial/mission.webp";
+import openImgSrc from "../../asset/tutorials/starMapTutorial/open.webp";
+import plotItineraryImgSrc from "../../asset/tutorials/starMapTutorial/plotItinerary.webp";
+import saveData from "../../asset/tutorials/starMapTutorial/save.json";
+import i18n from "../i18n";
+import { GeneralInputs } from "../inputs/generalInputs";
+import { StarSystemInputs } from "../inputs/starSystemInputs";
+import { safeParseSave, Save } from "../saveFile/saveFileData";
+import { SaveLoadingError } from "../saveFile/saveLoadingError";
+import { StarMapInputs } from "../starmap/starMapInputs";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { TutorialControlsInputs } from "../ui/tutorial/tutorialLayerInputs";
+import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import {
     axisCompositeToString,
     dPadCompositeToString,
     pressInteractionToStrings
 } from "../utils/strings/inputControlsString";
-import { Tutorial } from "./tutorial";
-import coverImgSrc from "../../asset/tutorials/starMapTutorial/cover.webp";
-import openImgSrc from "../../asset/tutorials/starMapTutorial/open.webp";
-import controlsImgSrc from "../../asset/tutorials/starMapTutorial/controls.webp";
-import missionImgSrc from "../../asset/tutorials/starMapTutorial/mission.webp";
-import plotItineraryImgSrc from "../../asset/tutorials/starMapTutorial/plotItinerary.webp";
-import jumpImgSrc from "../../asset/tutorials/starMapTutorial/jump.webp";
-import saveData from "../../asset/tutorials/starMapTutorial/save.json";
-import i18n from "../i18n";
-import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
-import { safeParseSave, Save } from "../saveFile/saveFileData";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { Result } from "../utils/types";
-import { SaveLoadingError } from "../saveFile/saveLoadingError";
-import { StarMapInputs } from "../starmap/starMapInputs";
-import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
-import { GeneralInputs } from "../inputs/generalInputs";
-import AxisComposite from "@brianchirls/game-input/controls/AxisComposite";
-import { StarSystemInputs } from "../inputs/starSystemInputs";
+import { Tutorial } from "./tutorial";
 
 export class StarMapTutorial implements Tutorial {
     readonly coverImageSrc: string = coverImgSrc;

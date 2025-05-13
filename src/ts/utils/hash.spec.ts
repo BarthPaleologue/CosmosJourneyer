@@ -1,5 +1,7 @@
 // Tests for hash utility functions
+
 import { describe, expect, it } from "vitest";
+
 import { hashArray } from "./hash";
 
 describe("hashArray", () => {

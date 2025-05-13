@@ -1,10 +1,16 @@
-import { Scene } from "@babylonjs/core/scene";
-import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
+import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Scene } from "@babylonjs/core/scene";
+
+import { Settings } from "../../../settings";
 import {
     add,
+    div,
     f,
+    length,
     min,
+    mix,
     mul,
     outputFragColor,
     outputVertexPosition,
@@ -23,15 +29,10 @@ import {
     vec,
     vec2,
     vertexAttribute,
-    length,
-    xz,
-    mix,
-    div
+    xz
 } from "../../../utils/bsl";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Settings } from "../../../settings";
-import { PBRTextures } from "../../textures";
 import { LandingPadTexturePool } from "../../landingPadTexturePool";
+import { PBRTextures } from "../../textures";
 
 export class LandingPadMaterial extends NodeMaterial {
     constructor(padNumber: number, textures: PBRTextures, texturePool: LandingPadTexturePool, scene: Scene) {

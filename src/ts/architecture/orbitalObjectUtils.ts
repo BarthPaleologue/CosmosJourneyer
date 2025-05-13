@@ -15,10 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+
 import { getPointOnOrbit } from "../orbit/orbit";
 import { OrbitalObject } from "./orbitalObject";
-import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 
 /**
  * Returns the position of the object on its orbit at a given time. This does not update the position of the object (see SetOrbitalPosition)

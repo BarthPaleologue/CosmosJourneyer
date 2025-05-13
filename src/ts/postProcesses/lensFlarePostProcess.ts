@@ -15,22 +15,23 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import lensFlareFragment from "../../shaders/lensflare.glsl";
+import { Camera } from "@babylonjs/core/Cameras/camera";
+import { Constants } from "@babylonjs/core/Engines/constants";
 import { Effect } from "@babylonjs/core/Materials/effect";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { Color3, Matrix } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
-import { Color3, Matrix } from "@babylonjs/core/Maths/math";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
-import { ObjectUniformNames, setObjectUniforms } from "./uniforms/objectUniforms";
-import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms";
-import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUniforms";
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { Constants } from "@babylonjs/core/Engines/constants";
-import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Scene } from "@babylonjs/core/scene";
+
+import lensFlareFragment from "../../shaders/lensflare.glsl";
 import { moveTowards } from "../utils/math";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms";
+import { ObjectUniformNames, setObjectUniforms } from "./uniforms/objectUniforms";
+import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUniforms";
 
 export type LensFlareSettings = {
     visibility: number;

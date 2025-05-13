@@ -1,3 +1,5 @@
+import { Color3 } from "@babylonjs/core/Maths/math.color";
+
 /*
                 Colour Rendering of Spectra
 
@@ -551,8 +553,6 @@ export function demonstrate() {
         );
     }
 }
-
-import { Color3 } from "@babylonjs/core/Maths/math.color";
 
 export function getRgbFromTemperature(temperature: number): Color3 {
     const cs = HDTVsystem;

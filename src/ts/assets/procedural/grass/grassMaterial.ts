@@ -15,19 +15,20 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Scene } from "@babylonjs/core/scene";
+
 import grassFragment from "../../../../shaders/grassMaterial/grassFragment.glsl";
 import grassVertex from "../../../../shaders/grassMaterial/grassVertex.glsl";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import {
     setStellarObjectUniforms,
     StellarObjectUniformNames
 } from "../../../postProcesses/uniforms/stellarObjectUniforms";
 import { NoiseTextures } from "../../textures";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { PointLight } from "@babylonjs/core/Lights/pointLight";
 
 const GrassMaterialUniformNames = {
     WORLD: "world",

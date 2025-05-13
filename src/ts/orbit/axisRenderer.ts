@@ -15,13 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { CreateGreasedLine, GreasedLineBaseMesh, GreasedLineMesh, GreasedLineRibbonMesh } from "@babylonjs/core/Meshes";
+import { GreasedLineMeshColorMode } from "@babylonjs/core/Materials/GreasedLine/greasedLineMaterialInterfaces";
 import { Vector3 } from "@babylonjs/core/Maths/math";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { CreateGreasedLine, GreasedLineBaseMesh, GreasedLineMesh, GreasedLineRibbonMesh } from "@babylonjs/core/Meshes";
+import { Scene } from "@babylonjs/core/scene";
+
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { Transformable } from "../architecture/transformable";
-import { Scene } from "@babylonjs/core/scene";
-import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { GreasedLineMeshColorMode } from "@babylonjs/core/Materials/GreasedLine/greasedLineMaterialInterfaces";
 
 /**
  * Visual helper designed to display the rotation axis of given objects

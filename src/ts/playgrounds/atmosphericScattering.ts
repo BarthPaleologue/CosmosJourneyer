@@ -15,12 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Vector3, MeshBuilder, PointLight } from "@babylonjs/core";
+import { MeshBuilder, PointLight, Vector3 } from "@babylonjs/core";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
-import { DefaultControls } from "../defaultControls/defaultControls";
-import { AtmosphericScatteringPostProcess } from "../atmosphere/atmosphericScatteringPostProcess";
+
 import { AtmosphereUniforms } from "../atmosphere/atmosphereUniforms";
+import { AtmosphericScatteringPostProcess } from "../atmosphere/atmosphericScatteringPostProcess";
+import { DefaultControls } from "../defaultControls/defaultControls";
 
 export function createAtmosphericScatteringScene(
     engine: AbstractEngine,

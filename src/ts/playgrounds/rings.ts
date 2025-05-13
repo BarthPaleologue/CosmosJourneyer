@@ -15,15 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Vector3, HemisphericLight, MeshBuilder, Color3 } from "@babylonjs/core";
+import { Color3, HemisphericLight, MeshBuilder, Vector3 } from "@babylonjs/core";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
+
+import { DefaultControls } from "../defaultControls/defaultControls";
+import { RingsLut } from "../rings/ringsLut";
+import { RingsModel } from "../rings/ringsModel";
 import { RingsPostProcess } from "../rings/ringsPostProcess";
 import { RingsUniforms } from "../rings/ringsUniform";
 import { ItemPool } from "../utils/itemPool";
-import { RingsLut } from "../rings/ringsLut";
-import { RingsModel } from "../rings/ringsModel";
-import { DefaultControls } from "../defaultControls/defaultControls";
 
 export async function createRingsScene(
     engine: AbstractEngine,

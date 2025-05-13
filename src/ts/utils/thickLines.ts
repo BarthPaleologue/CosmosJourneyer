@@ -16,11 +16,11 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { CreateCylinder, Mesh } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
-import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export class ThickLines {
     private readonly name: string;

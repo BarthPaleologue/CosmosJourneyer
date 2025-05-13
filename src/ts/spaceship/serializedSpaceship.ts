@@ -16,10 +16,11 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { z } from "zod";
+
 import { SerializedFuelTankSchema } from "./serializedComponents/fuelTank";
 import { SerializedOptionalComponentSchema } from "./serializedComponents/optionalComponents";
-import { SerializedWarpDriveSchema } from "./serializedComponents/warpDrive";
 import { SerializedThrustersSchema } from "./serializedComponents/thrusters";
+import { SerializedWarpDriveSchema } from "./serializedComponents/warpDrive";
 
 export enum ShipType {
     WANDERER = "WANDERER"

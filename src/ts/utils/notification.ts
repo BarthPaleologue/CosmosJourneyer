@@ -1,8 +1,9 @@
-import explorationIcon from "../../asset/icons/space-exploration.webp";
-import spaceshipIcon from "../../asset/icons/spaceship_gear.webp";
-import spaceStationIcon from "../../asset/icons/space-station.webp";
-import informationIcon from "../../asset/icons/information.webp";
 import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
+
+import informationIcon from "@assets/icons/information.webp";
+import explorationIcon from "@assets/icons/space-exploration.webp";
+import spaceStationIcon from "@assets/icons/space-station.webp";
+import spaceshipIcon from "@assets/icons/spaceship_gear.webp";
 
 export const enum NotificationOrigin {
     GENERAL = "info",

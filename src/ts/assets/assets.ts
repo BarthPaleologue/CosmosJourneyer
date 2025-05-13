@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Scene } from "@babylonjs/core/scene";
+
 import { AudioAssets, loadAudioAssets } from "./audioAssets";
 import { loadRenderingAssets, RenderingAssets } from "./renderingAssets";
 

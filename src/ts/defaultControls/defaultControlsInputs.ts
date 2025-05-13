@@ -1,7 +1,8 @@
-import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import Action from "@brianchirls/game-input/Action";
-import { InputDevices } from "../inputs/devices";
 import { AxisComposite } from "@brianchirls/game-input/browser";
+import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
+
+import { InputDevices } from "../inputs/devices";
 import { InputMap } from "../inputs/inputMap";
 
 const keyboard = InputDevices.KEYBOARD;

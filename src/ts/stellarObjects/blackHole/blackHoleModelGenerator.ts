@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { normalRandom } from "extended-random";
+
 import { CelestialBodyModel } from "../../architecture/orbitalObjectModel";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { Orbit } from "../../orbit/orbit";
@@ -23,8 +24,8 @@ import { Settings } from "../../settings";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { estimateStarRadiusFromMass } from "../../utils/physics";
-import { BlackHoleModel } from "./blackHoleModel";
 import { DeepReadonly } from "../../utils/types";
+import { BlackHoleModel } from "./blackHoleModel";
 
 export function newSeededBlackHoleModel(
     id: string,

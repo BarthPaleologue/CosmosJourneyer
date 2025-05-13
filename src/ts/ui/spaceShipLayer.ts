@@ -15,17 +15,20 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { parseSpeed } from "../utils/strings/parseToStrings";
-import { TransformNode } from "@babylonjs/core/Meshes";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Matrix } from "@babylonjs/core/Maths/math";
-import { Player } from "../player/player";
-import { CurrentMissionDisplay } from "./currentMissionDisplay";
-import { MissionContext } from "../missions/missionContext";
-import { smoothstep } from "../utils/math";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-import canisterIconPath from "../../asset/icons/fuel_canister.webp";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { TransformNode } from "@babylonjs/core/Meshes";
+
+import { smoothstep } from "@/utils/math";
+import { parseSpeed } from "@/utils/strings/parseToStrings";
+
 import { ISoundPlayer } from "../audio/soundPlayer";
+import { MissionContext } from "../missions/missionContext";
+import { Player } from "../player/player";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { CurrentMissionDisplay } from "./currentMissionDisplay";
+
+import canisterIconPath from "@assets/icons/fuel_canister.webp";
 
 export class SpaceShipLayer {
     readonly root: HTMLElement;

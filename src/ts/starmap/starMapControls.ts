@@ -15,17 +15,19 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Controls } from "../uberCore/controls";
+import "@babylonjs/core/Collisions/collisionCoordinator";
+
+import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
+import { Camera } from "@babylonjs/core/Cameras/camera";
+import { Quaternion } from "@babylonjs/core/Maths/math";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+
 import { Settings } from "../settings";
-import { Quaternion } from "@babylonjs/core/Maths/math";
-import "@babylonjs/core/Collisions/collisionCoordinator";
-import { Camera } from "@babylonjs/core/Cameras/camera";
-import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
-import { StarMapInputs } from "./starMapInputs";
+import { Controls } from "../uberCore/controls";
 import { lerpSmooth } from "../utils/math";
+import { StarMapInputs } from "./starMapInputs";
 
 export class StarMapControls implements Controls {
     private readonly transform: TransformNode;

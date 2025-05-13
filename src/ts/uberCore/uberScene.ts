@@ -15,13 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Scene } from "@babylonjs/core/scene";
-import { Controls } from "./controls";
 import "@babylonjs/core/Rendering/depthRendererSceneComponent";
+
 import { Camera } from "@babylonjs/core/Cameras/camera";
+import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
 import { DepthRenderer } from "@babylonjs/core/Rendering/depthRenderer";
-import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { Scene } from "@babylonjs/core/scene";
+
+import { Controls } from "./controls";
 
 /**
  * A very thin wrapper around Babylon's Scene class to add some convenience methods.

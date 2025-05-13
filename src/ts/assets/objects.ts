@@ -15,35 +15,36 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { Scene } from "@babylonjs/core/scene";
-import wandererPath from "../../asset/spaceship/wanderer.glb";
-import bananaPath from "../../asset/banana/banana.glb";
-import characterPath from "../../asset/character/character.glb";
-import rockPath from "../../asset/rock.glb";
-import asteroidPath from "../../asset/asteroid/asteroid.glb";
-import asteroid2Path from "../../asset/asteroid/asteroid2.glb";
-import treePath from "../../asset/tree/tree.babylon";
-import { createButterfly } from "./procedural/butterfly/butterfly";
-import { createGrassBlade } from "./procedural/grass/grassBlade";
 import "@babylonjs/loaders";
 import "@babylonjs/core/Loading/Plugins/babylonFileLoader";
 import "@babylonjs/core/Animations/animatable";
 
-import sphericalTankPath from "../../asset/SpaceStationParts/sphericalTank.glb";
-import stationEnginePath from "../../asset/SpaceStationParts/engine.glb";
-
-import { CollisionMask } from "../settings";
+import { LoadAssetContainerAsync } from "@babylonjs/core/Loading";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import {
     PhysicsShape,
     PhysicsShapeConvexHull,
     PhysicsShapeMesh,
     PhysicsShapeSphere
 } from "@babylonjs/core/Physics/v2/physicsShape";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { Scene } from "@babylonjs/core/scene";
+
+import { CollisionMask } from "../settings";
 import { Materials } from "./materials";
-import { LoadAssetContainerAsync } from "@babylonjs/core/Loading";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { createButterfly } from "./procedural/butterfly/butterfly";
+import { createGrassBlade } from "./procedural/grass/grassBlade";
+
+import asteroidPath from "@assets/asteroid/asteroid.glb";
+import asteroid2Path from "@assets/asteroid/asteroid2.glb";
+import bananaPath from "@assets/banana/banana.glb";
+import characterPath from "@assets/character/character.glb";
+import rockPath from "@assets/rock.glb";
+import wandererPath from "@assets/spaceship/wanderer.glb";
+import stationEnginePath from "@assets/SpaceStationParts/engine.glb";
+import sphericalTankPath from "@assets/SpaceStationParts/sphericalTank.glb";
+import treePath from "@assets/tree/tree.babylon";
 
 export type Objects = {
     crate: Mesh;

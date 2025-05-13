@@ -15,28 +15,29 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ColorMode } from "./colorSettingsInterface";
-import surfaceMaterialFragment from "../../../shaders/telluricPlanetMaterial/fragment.glsl";
-import surfaceMaterialVertex from "../../../shaders/telluricPlanetMaterial/vertex.glsl";
-import { centeredRand } from "extended-random";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
-import { Scene } from "@babylonjs/core/scene";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { Matrix } from "@babylonjs/core/Maths/math";
+import { Scene } from "@babylonjs/core/scene";
+import { centeredRand } from "extended-random";
+
+import surfaceMaterialFragment from "../../../shaders/telluricPlanetMaterial/fragment.glsl";
+import surfaceMaterialVertex from "../../../shaders/telluricPlanetMaterial/vertex.glsl";
+import { AllTerrainTextures } from "../../assets/textures";
 import {
     setStellarObjectUniforms,
     StellarObjectUniformNames
 } from "../../postProcesses/uniforms/stellarObjectUniforms";
-import { AllTerrainTextures } from "../../assets/textures";
-import { Matrix } from "@babylonjs/core/Maths/math";
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
+import { ItemPool } from "../../utils/itemPool";
+import { createEmptyTexture } from "../../utils/proceduralTexture";
+import { DeepReadonly } from "../../utils/types";
+import { ColorMode } from "./colorSettingsInterface";
+import { TelluricPlanetMaterialLut } from "./telluricPlanetMaterialLut";
 import { TelluricPlanetModel } from "./telluricPlanetModel";
 import { TelluricSatelliteModel } from "./telluricSatelliteModel";
-import { DeepReadonly } from "../../utils/types";
-import { PointLight } from "@babylonjs/core/Lights/pointLight";
-import { createEmptyTexture } from "../../utils/proceduralTexture";
-import { ItemPool } from "../../utils/itemPool";
-import { TelluricPlanetMaterialLut } from "./telluricPlanetMaterialLut";
 
 const TelluricPlanetMaterialUniformNames = {
     WORLD: "world",

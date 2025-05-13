@@ -16,8 +16,9 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Observable } from "@babylonjs/core/Misc/observable";
-import { PanelType, SidePanels } from "./sidePanels";
+
 import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
+import { PanelType, SidePanels } from "./sidePanels";
 
 export class PauseMenu {
     private readonly rootNode: HTMLElement;

@@ -15,16 +15,17 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { randRange, normalRandom } from "extended-random";
-import { clamp } from "../../utils/math";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { Tools } from "@babylonjs/core/Misc/tools";
+import { normalRandom, randRange } from "extended-random";
+
+import { OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { Orbit } from "../../orbit/orbit";
 import { GenerationSteps } from "../../utils/generationSteps";
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
+import { clamp } from "../../utils/math";
 import { MandelboxModel } from "./mandelboxModel";
-import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { Tools } from "@babylonjs/core/Misc/tools";
-import { OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
 
 export function newSeededMandelboxModel(
     id: string,

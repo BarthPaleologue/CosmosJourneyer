@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { z } from "zod";
+
 import i18n from "../i18n";
 
 export const enum SaveLoadingErrorType {

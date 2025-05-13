@@ -15,23 +15,23 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Camera } from "@babylonjs/core/Cameras/camera";
+import { Constants } from "@babylonjs/core/Engines/constants";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Effect } from "@babylonjs/core/Materials/effect";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
+import { Scene } from "@babylonjs/core/scene";
 
 import oceanFragment from "../../shaders/oceanFragment.glsl";
-import { UpdatablePostProcess } from "../postProcesses/updatablePostProcess";
-import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
+import { WaterTextures } from "../assets/textures";
 import { CameraUniformNames, setCameraUniforms } from "../postProcesses/uniforms/cameraUniforms";
-import { setStellarObjectUniforms, StellarObjectUniformNames } from "../postProcesses/uniforms/stellarObjectUniforms";
 import { ObjectUniformNames, setObjectUniforms } from "../postProcesses/uniforms/objectUniforms";
 import { SamplerUniformNames, setSamplerUniforms } from "../postProcesses/uniforms/samplerUniforms";
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { Constants } from "@babylonjs/core/Engines/constants";
-import { Camera } from "@babylonjs/core/Cameras/camera";
-import { Scene } from "@babylonjs/core/scene";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { setStellarObjectUniforms, StellarObjectUniformNames } from "../postProcesses/uniforms/stellarObjectUniforms";
+import { UpdatablePostProcess } from "../postProcesses/updatablePostProcess";
 import { OceanUniforms } from "./oceanUniforms";
-import { PointLight } from "@babylonjs/core/Lights/pointLight";
-import { WaterTextures } from "../assets/textures";
 
 export class OceanPostProcess extends PostProcess implements UpdatablePostProcess {
     readonly planetTransform: TransformNode;

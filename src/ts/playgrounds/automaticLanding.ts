@@ -15,20 +15,21 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { MeshBuilder, PhysicsAggregate, PhysicsShapeType, Quaternion } from "@babylonjs/core";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
-import { Scene } from "@babylonjs/core/scene";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { LandingPad } from "../assets/procedural/landingPad/landingPad";
-import { MeshBuilder, PhysicsAggregate, PhysicsShapeType, Quaternion } from "@babylonjs/core";
-import { enablePhysics } from "./utils";
-import { DefaultControls } from "../defaultControls/defaultControls";
-import { Spaceship } from "../spaceship/spaceship";
+import { Scene } from "@babylonjs/core/scene";
 import { randRange } from "extended-random";
-import { CollisionMask } from "../settings";
-import { LandingPadSize } from "../spacestation/landingPad/landingPadManager";
+
+import { LandingPad } from "../assets/procedural/landingPad/landingPad";
 import { loadRenderingAssets } from "../assets/renderingAssets";
 import { SoundPlayerMock } from "../audio/soundPlayer";
+import { DefaultControls } from "../defaultControls/defaultControls";
+import { CollisionMask } from "../settings";
+import { Spaceship } from "../spaceship/spaceship";
+import { LandingPadSize } from "../spacestation/landingPad/landingPadManager";
+import { enablePhysics } from "./utils";
 
 export async function createAutomaticLandingScene(
     engine: AbstractEngine,

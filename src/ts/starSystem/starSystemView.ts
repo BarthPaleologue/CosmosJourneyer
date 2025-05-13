@@ -15,73 +15,76 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { SpaceShipLayer } from "../ui/spaceShipLayer";
-import { UberScene } from "../uberCore/uberScene";
-import { AxisRenderer } from "../orbit/axisRenderer";
-import { TargetCursorLayer } from "../ui/targetCursorLayer";
-import { StarSystemController } from "./starSystemController";
-import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
+import "@babylonjs/core/Loading/loadingScreen";
+
+import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math";
-import { Settings } from "../settings";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { Observable } from "@babylonjs/core/Misc/observable";
+import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
+import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
+import { AxisComposite } from "@brianchirls/game-input/browser";
+import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
+
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/utils/coordinates/starSystemCoordinates";
+import { getUniverseObjectId, UniverseObjectId } from "@/utils/coordinates/universeObjectId";
+import { alertModal } from "@/utils/dialogModal";
+import { getNeighborStarSystemCoordinates } from "@/utils/getNeighborStarSystems";
+import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
+import { createNotification, NotificationIntent, NotificationOrigin } from "@/utils/notification";
 import { positionNearObjectBrightSide } from "@/utils/positionNearObject";
-import { ShipControls } from "../spaceship/shipControls";
-import { OrbitRenderer } from "../orbit/orbitRenderer";
-import { BlackHole } from "../stellarObjects/blackHole/blackHole";
-import { ChunkForgeWorkers } from "../planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
-import "@babylonjs/core/Loading/loadingScreen";
-import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge";
-import { DefaultControls } from "../defaultControls/defaultControls";
+import { axisCompositeToString, dPadCompositeToString } from "@/utils/strings/inputControlsString";
+import { SystemTarget } from "@/utils/systemTarget";
+import { DeepReadonly } from "@/utils/types";
+import { View } from "@/utils/view";
+
+import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
+import { OrbitalObjectType } from "../architecture/orbitalObjectType";
+import { Transformable } from "../architecture/transformable";
+import { TypedObject } from "../architecture/typedObject";
+import { RenderingAssets } from "../assets/renderingAssets";
+import { AudioMasks } from "../audio/audioMasks";
+import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
+import { ITts, Speaker, VoiceLine } from "../audio/tts";
 import { CharacterControls } from "../characterControls/characterControls";
+import { CharacterInputs } from "../characterControls/characterControlsInputs";
+import { DefaultControls } from "../defaultControls/defaultControls";
+import { DefaultControlsInputs } from "../defaultControls/defaultControlsInputs";
+import i18n from "../i18n";
+import { StarSystemInputs } from "../inputs/starSystemInputs";
+import { Mission } from "../missions/mission";
+import { MissionContext } from "../missions/missionContext";
+import { AxisRenderer } from "../orbit/axisRenderer";
+import { OrbitRenderer } from "../orbit/orbitRenderer";
+import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge";
+import { ChunkForgeWorkers } from "../planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
+import { AiPlayerControls } from "../player/aiPlayerControls";
+import { Player } from "../player/player";
+import { PostProcessManager } from "../postProcesses/postProcessManager";
+import { Settings } from "../settings";
+import { EncyclopaediaGalacticaManager } from "../society/encyclopaediaGalacticaManager";
+import { ShipControls } from "../spaceship/shipControls";
+import { Spaceship } from "../spaceship/spaceship";
+import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
+import { LandingPadSize } from "../spacestation/landingPad/landingPadManager";
+import { BlackHole } from "../stellarObjects/blackHole/blackHole";
+import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
+import { TransformRotationAnimation } from "../uberCore/transforms/animations/rotation";
 import {
     getForwardDirection,
     getRotationQuaternion,
     setRotationQuaternion,
     translate
 } from "../uberCore/transforms/basicTransform";
-import { Observable } from "@babylonjs/core/Misc/observable";
-import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
-import { View } from "@/utils/view";
-import { SystemTarget } from "@/utils/systemTarget";
-import { StarSystemInputs } from "../inputs/starSystemInputs";
-import { createNotification, NotificationIntent, NotificationOrigin } from "@/utils/notification";
-import { axisCompositeToString, dPadCompositeToString } from "@/utils/strings/inputControlsString";
-import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
-import { AxisComposite } from "@brianchirls/game-input/browser";
-import { AudioMasks } from "../audio/audioMasks";
-import { TransformRotationAnimation } from "../uberCore/transforms/animations/rotation";
-import { PostProcessManager } from "../postProcesses/postProcessManager";
-import { CharacterInputs } from "../characterControls/characterControlsInputs";
-import i18n from "../i18n";
-import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { UberScene } from "../uberCore/uberScene";
+import { SpaceShipLayer } from "../ui/spaceShipLayer";
 import { SpaceStationLayer } from "../ui/spaceStation/spaceStationLayer";
-import { Player } from "../player/player";
-import { getNeighborStarSystemCoordinates } from "@/utils/getNeighborStarSystems";
-import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
-import { DefaultControlsInputs } from "../defaultControls/defaultControlsInputs";
-import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
-import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
-import { MissionContext } from "../missions/missionContext";
-import { Mission } from "../missions/mission";
-import { StarSystemModel } from "./starSystemModel";
-import { OrbitalObjectType } from "../architecture/orbitalObjectType";
-import { Spaceship } from "../spaceship/spaceship";
-import { Transformable } from "../architecture/transformable";
-import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
-import { TypedObject } from "../architecture/typedObject";
-import { EncyclopaediaGalacticaManager } from "../society/encyclopaediaGalacticaManager";
+import { TargetCursorLayer } from "../ui/targetCursorLayer";
+import { StarSystemController } from "./starSystemController";
 import { StarSystemDatabase } from "./starSystemDatabase";
-import { AiPlayerControls } from "../player/aiPlayerControls";
-import { getUniverseObjectId, UniverseObjectId } from "@/utils/coordinates/universeObjectId";
-import { starSystemCoordinatesEquals, StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
 import { StarSystemLoader } from "./starSystemLoader";
-import { DeepReadonly } from "@/utils/types";
-import { LandingPadSize } from "../spacestation/landingPad/landingPadManager";
-import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
-import { ITts, Speaker, VoiceLine } from "../audio/tts";
-import { alertModal } from "@/utils/dialogModal";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { RenderingAssets } from "../assets/renderingAssets";
+import { StarSystemModel } from "./starSystemModel";
 
 // register cosmos journeyer as part of window object
 declare global {

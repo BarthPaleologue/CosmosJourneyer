@@ -15,15 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Player } from "../player/player";
-import { Mission } from "../missions/mission";
-import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
-import { MissionContext } from "../missions/missionContext";
-import { pressInteractionToStrings } from "../utils/strings/inputControlsString";
-import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
-import i18n from "../i18n";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
+import i18n from "../i18n";
+import { Mission } from "../missions/mission";
+import { MissionContext } from "../missions/missionContext";
+import { Player } from "../player/player";
+import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
+import { pressInteractionToStrings } from "../utils/strings/inputControlsString";
 
 export class CurrentMissionDisplay {
     readonly rootNode: HTMLElement;

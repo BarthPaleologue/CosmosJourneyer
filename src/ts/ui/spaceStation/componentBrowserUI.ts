@@ -16,9 +16,10 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Observable } from "@babylonjs/core/Misc/observable";
+
+import i18n from "../../i18n";
 import { Settings } from "../../settings";
 import { getComponentTypeI18n, SerializedComponent } from "../../spaceship/serializedComponents/component";
-import i18n from "../../i18n";
 
 export class ComponentBrowserUI {
     readonly root: HTMLDivElement;

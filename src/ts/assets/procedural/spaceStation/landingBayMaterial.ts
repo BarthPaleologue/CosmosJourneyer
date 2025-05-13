@@ -15,39 +15,40 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Scene } from "@babylonjs/core/scene";
-import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
-import { OrbitalFacilityModel } from "../../../architecture/orbitalObjectModel";
+import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
+import { Scene } from "@babylonjs/core/scene";
+
+import { OrbitalFacilityModel } from "../../../architecture/orbitalObjectModel";
 import { Settings } from "../../../settings";
 import {
     abs,
     atan2,
     f,
+    fract,
+    length,
     mix,
     mul,
+    outputFragColor,
     outputVertexPosition,
+    pbrMetallicRoughnessMaterial,
+    perturbNormal,
+    remap,
     split,
     step,
     sub,
     Target,
+    textureSample,
     transformDirection,
     transformPosition,
+    uniformCameraPosition,
+    uniformView,
     uniformViewProjection,
     uniformWorld,
     vec2,
     vertexAttribute,
-    xz,
-    length,
-    remap,
-    textureSample,
-    perturbNormal,
-    pbrMetallicRoughnessMaterial,
-    uniformView,
-    uniformCameraPosition,
-    outputFragColor,
-    fract
+    xz
 } from "../../../utils/bsl";
 import { DeepReadonly } from "../../../utils/types";
 import { PBRTextures } from "../../textures";

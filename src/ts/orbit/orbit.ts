@@ -15,13 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Settings } from "../settings";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
+import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { z } from "zod";
+
+import { Settings } from "../settings";
+import { OrbitalObjectIdSchema } from "../utils/coordinates/orbitalObjectId";
 import { findMinimumNewtonRaphson } from "../utils/math";
 import { DeepReadonly } from "../utils/types";
-import { z } from "zod";
-import { OrbitalObjectIdSchema } from "../utils/coordinates/orbitalObjectId";
 
 /**
  * Represents an orbit in the p-norm space. (Euclidean space for p=2)

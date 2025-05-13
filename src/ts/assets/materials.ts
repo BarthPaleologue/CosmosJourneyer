@@ -15,14 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ButterflyMaterial } from "./procedural/butterfly/butterflyMaterial";
-import { GrassMaterial } from "./procedural/grass/grassMaterial";
-import { Scene } from "@babylonjs/core/scene";
+import { PBRMetallicRoughnessMaterial } from "@babylonjs/core/Materials/PBR/pbrMetallicRoughnessMaterial";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { PBRMetallicRoughnessMaterial } from "@babylonjs/core/Materials/PBR/pbrMetallicRoughnessMaterial";
-import { Textures } from "./textures";
+import { Scene } from "@babylonjs/core/scene";
+
+import { ButterflyMaterial } from "./procedural/butterfly/butterflyMaterial";
+import { GrassMaterial } from "./procedural/grass/grassMaterial";
 import { SolarPanelMaterial } from "./procedural/solarPanel/solarPanelMaterial";
+import { Textures } from "./textures";
 
 export type Materials = {
     readonly butterfly: ButterflyMaterial;

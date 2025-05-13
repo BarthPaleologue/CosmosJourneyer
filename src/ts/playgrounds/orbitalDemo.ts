@@ -15,19 +15,20 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { setOrbitalPosition, setRotation } from "@/architecture/orbitalObjectUtils";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
-import { Scene } from "@babylonjs/core/scene";
-import { DefaultControls } from "../defaultControls/defaultControls";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { CustomOrbitalObject } from "../utils/customOrbitalObject";
-import { OrbitalObject } from "../architecture/orbitalObject";
 import { Tools } from "@babylonjs/core/Misc/tools";
-import { OrbitRenderer } from "../orbit/orbitRenderer";
-import { AxisRenderer } from "../orbit/axisRenderer";
+import { Scene } from "@babylonjs/core/scene";
+
+import { OrbitalObject } from "../architecture/orbitalObject";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
-import { setOrbitalPosition, setRotation } from "@/architecture/orbitalObjectUtils";
+import { DefaultControls } from "../defaultControls/defaultControls";
+import { AxisRenderer } from "../orbit/axisRenderer";
+import { OrbitRenderer } from "../orbit/orbitRenderer";
+import { CustomOrbitalObject } from "../utils/customOrbitalObject";
 
 export function createOrbitalDemoScene(
     engine: AbstractEngine,
