@@ -19,9 +19,10 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import { Scene } from "@babylonjs/core/scene";
 
-import ringsLUT from "../../shaders/textures/ringsLUT.glsl";
 import { DeepReadonly } from "../utils/types";
 import { RingsModel } from "./ringsModel";
+
+import ringsLUT from "@shaders/textures/ringsLUT.glsl";
 
 export class RingsLut {
     private readonly lut: ProceduralTexture;

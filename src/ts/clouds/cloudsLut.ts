@@ -19,9 +19,11 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import { Scene } from "@babylonjs/core/scene";
 
-import flatCloudLUT from "../../shaders/textures/flatCloudLUT.glsl";
-import { DeepReadonly } from "../utils/types";
+import { DeepReadonly } from "@/utils/types";
+
 import { CloudsModel } from "./cloudsModel";
+
+import flatCloudLUT from "@shaders/textures/flatCloudLUT.glsl";
 
 export class CloudsLut {
     private readonly lut: ProceduralTexture;

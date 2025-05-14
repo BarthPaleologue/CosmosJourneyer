@@ -24,13 +24,14 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Scene } from "@babylonjs/core/scene";
 
-import volumetricCloudsFragment from "../../shaders/volumetricCloudsFragment.glsl";
 import { CameraUniformNames, setCameraUniforms } from "../postProcesses/uniforms/cameraUniforms";
 import { ObjectUniformNames, setObjectUniforms } from "../postProcesses/uniforms/objectUniforms";
 import { SamplerUniformNames, setSamplerUniforms } from "../postProcesses/uniforms/samplerUniforms";
 import { setStellarObjectUniforms, StellarObjectUniformNames } from "../postProcesses/uniforms/stellarObjectUniforms";
 import { CloudsUniforms } from "./cloudsUniforms";
 import { FlatCloudsPostProcess } from "./flatCloudsPostProcess";
+
+import volumetricCloudsFragment from "@shaders/volumetricCloudsFragment.glsl";
 
 export type CloudsPostProcess = FlatCloudsPostProcess | VolumetricCloudsPostProcess;
 

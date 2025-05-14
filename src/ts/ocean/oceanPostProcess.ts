@@ -24,7 +24,6 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Scene } from "@babylonjs/core/scene";
 
-import oceanFragment from "../../shaders/oceanFragment.glsl";
 import { WaterTextures } from "../assets/textures";
 import { CameraUniformNames, setCameraUniforms } from "../postProcesses/uniforms/cameraUniforms";
 import { ObjectUniformNames, setObjectUniforms } from "../postProcesses/uniforms/objectUniforms";
@@ -32,6 +31,8 @@ import { SamplerUniformNames, setSamplerUniforms } from "../postProcesses/unifor
 import { setStellarObjectUniforms, StellarObjectUniformNames } from "../postProcesses/uniforms/stellarObjectUniforms";
 import { UpdatablePostProcess } from "../postProcesses/updatablePostProcess";
 import { OceanUniforms } from "./oceanUniforms";
+
+import oceanFragment from "@shaders/oceanFragment.glsl";
 
 export class OceanPostProcess extends PostProcess implements UpdatablePostProcess {
     readonly planetTransform: TransformNode;

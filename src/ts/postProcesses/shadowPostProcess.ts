@@ -23,7 +23,6 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Scene } from "@babylonjs/core/scene";
 
-import shadowFragment from "../../shaders/shadowFragment.glsl";
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { LightEmitter } from "../architecture/lightEmitter";
 import { CloudsUniforms } from "../clouds/cloudsUniforms";
@@ -33,6 +32,8 @@ import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms
 import { ObjectUniformNames, setObjectUniforms } from "./uniforms/objectUniforms";
 import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUniforms";
 import { setStellarObjectUniforms, StellarObjectUniformNames } from "./uniforms/stellarObjectUniforms";
+
+import shadowFragment from "@shaders/shadowFragment.glsl";
 
 export type ShadowUniforms = {
     hasRings: boolean;

@@ -24,11 +24,12 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Scene } from "@babylonjs/core/scene";
 
-import matterJetFragment from "../../shaders/matterjet.glsl";
 import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms";
 import { ObjectUniformNames, setObjectUniforms } from "./uniforms/objectUniforms";
 import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUniforms";
 import { UpdatablePostProcess } from "./updatablePostProcess";
+
+import matterJetFragment from "@shaders/matterjet.glsl";
 
 export type MatterJetUniforms = {
     elapsedSeconds: number;

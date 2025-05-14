@@ -21,7 +21,7 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Scene } from "@babylonjs/core/scene";
 
-import colorCorrectionFragment from "../../shaders/colorCorrection.glsl";
+import colorCorrectionFragment from "@shaders/colorCorrection.glsl";
 
 const shaderName = "colorCorrection";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = colorCorrectionFragment;

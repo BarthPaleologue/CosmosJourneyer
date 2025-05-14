@@ -24,13 +24,14 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Scene } from "@babylonjs/core/scene";
 
-import flatCloudsFragment from "../../shaders/flatCloudsFragment.glsl";
 import { CameraUniformNames, setCameraUniforms } from "../postProcesses/uniforms/cameraUniforms";
 import { ObjectUniformNames, setObjectUniforms } from "../postProcesses/uniforms/objectUniforms";
 import { SamplerUniformNames, setSamplerUniforms } from "../postProcesses/uniforms/samplerUniforms";
 import { setStellarObjectUniforms, StellarObjectUniformNames } from "../postProcesses/uniforms/stellarObjectUniforms";
 import { UpdatablePostProcess } from "../postProcesses/updatablePostProcess";
 import { CloudsSamplerNames, CloudsUniformNames, CloudsUniforms } from "./cloudsUniforms";
+
+import flatCloudsFragment from "@shaders/flatCloudsFragment.glsl";
 
 export class FlatCloudsPostProcess extends PostProcess implements UpdatablePostProcess {
     readonly cloudUniforms: CloudsUniforms;

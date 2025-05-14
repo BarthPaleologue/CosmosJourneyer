@@ -24,7 +24,6 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Scene } from "@babylonjs/core/scene";
 
-import ringsFragment from "../../shaders/ringsFragment.glsl";
 import { CelestialBodyModel } from "../architecture/orbitalObjectModel";
 import { CameraUniformNames, setCameraUniforms } from "../postProcesses/uniforms/cameraUniforms";
 import { ObjectUniformNames, setObjectUniforms } from "../postProcesses/uniforms/objectUniforms";
@@ -32,6 +31,8 @@ import { SamplerUniformNames, setSamplerUniforms } from "../postProcesses/unifor
 import { setStellarObjectUniforms, StellarObjectUniformNames } from "../postProcesses/uniforms/stellarObjectUniforms";
 import { DeepReadonly } from "../utils/types";
 import { RingsSamplerNames, RingsUniformNames, RingsUniforms } from "./ringsUniform";
+
+import ringsFragment from "@shaders/ringsFragment.glsl";
 
 export class RingsPostProcess extends PostProcess {
     readonly ringsUniforms: RingsUniforms;
