@@ -15,8 +15,7 @@
             "@/*": ["src/ts/*"],
             "@assets/*": ["src/asset/*"],
             "@shaders/*": ["src/shaders/*"],
-            "@styles/*": ["src/styles/*"],
-            "@html/*": ["src/html/*"]
+            "@styles/*": ["src/styles/*"]
         },
 
         // Build speed & debugging
