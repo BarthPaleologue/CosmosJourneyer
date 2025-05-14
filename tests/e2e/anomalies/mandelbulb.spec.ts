@@ -5,7 +5,9 @@ test("The Mandelbulb playground renders correctly", async ({ page }) => {
     await renderAndSnap(page, {
         scene: "mandelbulb",
         shotName: "baseline",
-        additionalUrlParams: {
+        flagToWait: "frozen",
+        urlParams: {
+            freeze: 1,
             seed: "0"
         }
     });

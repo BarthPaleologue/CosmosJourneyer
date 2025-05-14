@@ -41,7 +41,7 @@ export class AsteroidPatch {
 
     private readonly physicsRadius = 15e3;
 
-    private readonly batchSize = 10;
+    public static BATCH_SIZE = 10;
 
     constructor(
         positions: Vector3[],
@@ -127,7 +127,7 @@ export class AsteroidPatch {
             }
         });
 
-        for (let i = 0; i < this.batchSize; i++) {
+        for (let i = 0; i < AsteroidPatch.BATCH_SIZE; i++) {
             if (this.nbInstances === this.positions.length) break;
 
             const typeIndex = this.typeIndices[this.nbInstances];

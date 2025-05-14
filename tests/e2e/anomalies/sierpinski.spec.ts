@@ -5,7 +5,9 @@ test("The Sierpinski Pyramid playground renders correctly", async ({ page }) => 
     await renderAndSnap(page, {
         scene: "sierpinski",
         shotName: "baseline",
-        additionalUrlParams: {
+        flagToWait: "frozen",
+        urlParams: {
+            freeze: 1,
             seed: "0"
         }
     });

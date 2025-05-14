@@ -69,9 +69,16 @@ if (urlParams.get("physicsViewer") !== null) {
     });
 }
 
-if (urlParams.get("freeze") !== null) {
-    scene.onAfterRenderObservable.addOnce(() => {
-        engine.stopRenderLoop();
+const maxFrameCounter = urlParams.get("freeze");
+if (maxFrameCounter !== null) {
+    let frameCounter = 0;
+    scene.onAfterRenderObservable.add(() => {
+        frameCounter++;
+        if (frameCounter === Number(maxFrameCounter)) {
+            engine.stopRenderLoop();
+            canvas.dataset["frozen"] = "1";
+            return;
+        }
     });
 }
 
