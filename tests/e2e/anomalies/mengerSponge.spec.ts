@@ -5,7 +5,9 @@ test("The Menger Sponge playground renders correctly", async ({ page }) => {
     await renderAndSnap(page, {
         scene: "mengerSponge",
         shotName: "baseline",
-        additionalUrlParams: {
+        flagToWait: "frozen",
+        urlParams: {
+            freeze: 1,
             seed: "0"
         }
     });

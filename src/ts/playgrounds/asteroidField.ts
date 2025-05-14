@@ -29,6 +29,7 @@ import { enablePhysics } from "./utils";
 import { DefaultControls } from "../defaultControls/defaultControls";
 import { AsteroidField } from "../asteroidFields/asteroidField";
 import { loadRenderingAssets } from "../assets/renderingAssets";
+import { AsteroidPatch } from "@/asteroidFields/asteroidPatch";
 
 export async function createAsteroidFieldScene(
     engine: AbstractEngine,
@@ -58,8 +59,8 @@ export async function createAsteroidFieldScene(
 
     const scalingFactor = 500;
 
-    defaultControls.getTransform().position.z = -200 * scalingFactor;
-    defaultControls.getTransform().position.y = 20 * scalingFactor;
+    defaultControls.getTransform().position.z = -120 * scalingFactor;
+    defaultControls.getTransform().position.y = 5 * scalingFactor;
     defaultControls.speed *= scalingFactor;
     camera.maxZ *= scalingFactor;
 
@@ -69,6 +70,8 @@ export async function createAsteroidFieldScene(
 
     const beltRadius = 100 * scalingFactor;
     const beltSpread = 20 * scalingFactor;
+
+    AsteroidPatch.BATCH_SIZE = 10_000;
 
     const belt = new AsteroidField(42, sphere, beltRadius, beltSpread, scene);
 

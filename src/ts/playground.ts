@@ -60,7 +60,7 @@ if (urlParams.get("physicsViewer") !== null) {
     scene.onBeforeRenderObservable.add(() => {
         for (const mesh of scene.meshes) {
             const physicsBody = mesh.physicsBody;
-            if (physicsBody === null) {
+            if (!physicsBody) {
                 continue;
             }
 
@@ -69,9 +69,17 @@ if (urlParams.get("physicsViewer") !== null) {
     });
 }
 
-if (urlParams.get("freeze") !== null) {
-    scene.onAfterRenderObservable.addOnce(() => {
-        engine.stopRenderLoop();
+const maxFrameCounter = urlParams.get("freeze");
+const maxFrameCounterValue = Number(maxFrameCounter);
+if (maxFrameCounter !== null && !isNaN(maxFrameCounterValue)) {
+    let frameCounter = 0;
+    scene.onAfterRenderObservable.add(() => {
+        frameCounter++;
+        if (frameCounter >= maxFrameCounterValue) {
+            engine.stopRenderLoop();
+            canvas.dataset["frozen"] = "1";
+            return;
+        }
     });
 }
 

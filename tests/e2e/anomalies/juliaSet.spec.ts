@@ -5,7 +5,9 @@ test("The Julia Set playground renders correctly", async ({ page }) => {
     await renderAndSnap(page, {
         scene: "juliaSet",
         shotName: "baseline",
-        additionalUrlParams: {
+        flagToWait: "frozen",
+        urlParams: {
+            freeze: 1,
             seed: "0"
         }
     });

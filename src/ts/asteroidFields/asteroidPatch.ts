@@ -41,7 +41,7 @@ export class AsteroidPatch {
 
     private readonly physicsRadius = 15e3;
 
-    private readonly batchSize = 10;
+    public static BATCH_SIZE = 10;
 
     constructor(
         positions: Vector3[],
@@ -94,7 +94,10 @@ export class AsteroidPatch {
                 throw new Error(`Asteroid physics shape for type index ${typeIndex} is undefined.`);
             }
 
-            if (distanceToCamera < this.physicsRadius && instance.physicsBody === null) {
+            if (
+                distanceToCamera < this.physicsRadius &&
+                (instance.physicsBody === null || instance.physicsBody === undefined)
+            ) {
                 const instancePhysicsBody = new PhysicsBody(
                     instance,
                     PhysicsMotionType.DYNAMIC,
@@ -107,13 +110,15 @@ export class AsteroidPatch {
                 instancePhysicsBody.disablePreStep = false;
                 instancePhysicsBody.shape = shape;
                 this.instancePhysicsBodies.push(instancePhysicsBody);
-            } else if (distanceToCamera > this.physicsRadius + 1000 && instance.physicsBody !== null) {
+            } else if (
+                distanceToCamera > this.physicsRadius + 1000 &&
+                instance.physicsBody !== null &&
+                instance.physicsBody !== undefined
+            ) {
                 const body = this.instancePhysicsBodies.find((body) => body === instance.physicsBody);
-                if (body) {
+                if (body !== undefined) {
                     body.dispose();
                     this.instancePhysicsBodies.splice(this.instancePhysicsBodies.indexOf(body), 1);
-                } else {
-                    throw new Error("Physics body not found in instance physics bodies.");
                 }
             }
 
@@ -122,7 +127,7 @@ export class AsteroidPatch {
             }
         });
 
-        for (let i = 0; i < this.batchSize; i++) {
+        for (let i = 0; i < AsteroidPatch.BATCH_SIZE; i++) {
             if (this.nbInstances === this.positions.length) break;
 
             const typeIndex = this.typeIndices[this.nbInstances];

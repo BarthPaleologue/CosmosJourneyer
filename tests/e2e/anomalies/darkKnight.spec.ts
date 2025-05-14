@@ -4,6 +4,7 @@ import { renderAndSnap } from "../utils/renderSnap";
 test("The Dark knight playground renders correctly", async ({ page }) => {
     await renderAndSnap(page, {
         scene: "darkKnight",
-        shotName: "baseline"
+        shotName: "baseline",
+        flagToWait: "ready"
     });
 });
