@@ -15,19 +15,18 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Engine } from "@babylonjs/core/Engines/engine";
-import { Tools } from "@babylonjs/core/Misc/tools";
-import { VideoRecorder } from "@babylonjs/core/Misc/videoRecorder";
-
 import "@babylonjs/core/Misc/screenshotTools";
 import "@babylonjs/core/Physics/physicsEngineComponent";
 import "@babylonjs/core/Engines/WebGPU/Extensions/";
 
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { Engine } from "@babylonjs/core/Engines/engine";
 import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { Tools } from "@babylonjs/core/Misc/tools";
+import { VideoRecorder } from "@babylonjs/core/Misc/videoRecorder";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import HavokPhysics from "@babylonjs/havok";
 
