@@ -118,14 +118,8 @@ const config = {
         ],
     },
     resolve: {
+        tsConfig: path.resolve(import.meta.dirname, "tsconfig.json"),
         extensions: [".tsx", ".ts", ".js"],
-        alias: {
-            "@": path.resolve(import.meta.dirname, "src/ts"),
-            "@assets": path.resolve(import.meta.dirname, "src/asset"),
-            "@shaders": path.resolve(import.meta.dirname, "src/shaders"),
-            "@styles": path.resolve(import.meta.dirname, "src/styles"),
-            "@html": path.resolve(import.meta.dirname, "src/html"),
-        },
     },
 };
 
