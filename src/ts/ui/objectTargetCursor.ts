@@ -15,16 +15,17 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { parseDistance, parseSecondsRough } from "../utils/strings/parseToStrings";
-import { getAngularSize } from "../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { Transformable } from "../architecture/transformable";
-import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
-import { TypedObject } from "../architecture/typedObject";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Matrix } from "@babylonjs/core/Maths/math";
-import { smoothstep } from "../utils/math";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+
+import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { ObjectTargetCursorType, Targetable } from "../architecture/targetable";
+import { Transformable } from "../architecture/transformable";
+import { TypedObject } from "../architecture/typedObject";
+import { getAngularSize } from "../utils/isObjectVisibleOnScreen";
+import { smoothstep } from "../utils/math";
+import { parseDistance, parseSecondsRough } from "../utils/strings/parseToStrings";
 
 export class ObjectTargetCursor {
     readonly htmlRoot: HTMLDivElement;
@@ -148,7 +149,7 @@ export class ObjectTargetCursor {
                 Matrix.IdentityReadOnly,
                 camera.getTransformationMatrix(),
                 camera.viewport,
-                this.screenCoordinates
+                this.screenCoordinates,
             );
 
             this.htmlRoot.classList.remove("hidden");
@@ -165,7 +166,7 @@ export class ObjectTargetCursor {
         const angularSize = getAngularSize(
             this.object.getTransform().getAbsolutePosition(),
             this.object.getBoundingRadius(),
-            camera.globalPosition
+            camera.globalPosition,
         );
         const screenRatio = angularSize / camera.fov;
 

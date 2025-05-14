@@ -15,10 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Scene } from "@babylonjs/core/scene";
 import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
-import * as BSL from "../../../utils/bsl";
+import { Scene } from "@babylonjs/core/scene";
+
+import * as BSL from "@/utils/bsl";
+
 import { PBRTextures } from "../../textures";
 
 export class MetalSectionMaterial extends NodeMaterial {
@@ -50,7 +52,7 @@ export class MetalSectionMaterial extends NodeMaterial {
         // Fragment
 
         const albedoTexture = BSL.textureSample(textures.albedo, proceduralUV, {
-            convertToLinearSpace: true
+            convertToLinearSpace: true,
         });
         const metallicRoughnesstexture = BSL.textureSample(textures.metallicRoughness, proceduralUV);
         const aoTexture = BSL.textureSample(textures.ambientOcclusion, proceduralUV);
@@ -70,7 +72,7 @@ export class MetalSectionMaterial extends NodeMaterial {
             normalW,
             view,
             cameraPosition,
-            positionW
+            positionW,
         );
 
         const fragmentOutput = BSL.outputFragColor(pbrColor);

@@ -16,23 +16,24 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
-import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { enablePhysics } from "./utils";
-import { DefaultControls } from "../defaultControls/defaultControls";
-import { SpaceStation } from "../spacestation/spaceStation";
-import { newSeededSpaceStationModel } from "../spacestation/spaceStationModelGenerator";
-import { Settings } from "../settings";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-import { Star } from "../stellarObjects/star/star";
-import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
-import { StarModel } from "../stellarObjects/star/starModel";
+import { Scene } from "@babylonjs/core/scene";
+
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { loadRenderingAssets } from "../assets/renderingAssets";
+import { DefaultControls } from "../defaultControls/defaultControls";
+import { Settings } from "../settings";
+import { SpaceStation } from "../spacestation/spaceStation";
+import { newSeededSpaceStationModel } from "../spacestation/spaceStationModelGenerator";
+import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { Star } from "../stellarObjects/star/star";
+import { StarModel } from "../stellarObjects/star/starModel";
+import { enablePhysics } from "./utils";
 
 export async function createSpaceStationScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void
+    progressCallback: (progress: number, text: string) => void,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -61,7 +62,7 @@ export async function createSpaceStationScene(
         starSectorZ: 0,
         localX: 0,
         localY: 0,
-        localZ: 0
+        localZ: 0,
     };
 
     const systemDatabase = new StarSystemDatabase(getLoneStarSystem());
@@ -82,12 +83,12 @@ export async function createSpaceStationScene(
             longitudeOfAscendingNode: 0,
             inclination: 0,
             initialMeanAnomaly: 0,
-            parentIds: []
+            parentIds: [],
         },
         siderealDaySeconds: 0,
         axialTilt: 0,
         seed: 0,
-        rings: null
+        rings: null,
     };
 
     const sun = new Star(sunModel, assets.textures.pools, scene);
@@ -98,7 +99,7 @@ export async function createSpaceStationScene(
         Math.random() * Settings.SEED_HALF_RANGE,
         coordinates,
         systemPosition,
-        [sunModel]
+        [sunModel],
     );
     spaceStationModel.orbit.semiMajorAxis = distanceToStar;
 

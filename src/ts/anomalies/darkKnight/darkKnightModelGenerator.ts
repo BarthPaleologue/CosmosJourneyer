@@ -15,9 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { OrbitalObjectId } from "@/utils/coordinates/orbitalObjectId";
+
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { Settings } from "../../settings";
-import { OrbitalObjectId } from "../../utils/coordinates/orbitalObjectId";
 import { DarkKnightModel } from "./darkKnightModel";
 
 export function generateDarkKnightModel(parentIds: ReadonlyArray<OrbitalObjectId>): DarkKnightModel {
@@ -37,7 +38,7 @@ export function generateDarkKnightModel(parentIds: ReadonlyArray<OrbitalObjectId
             inclination: 0,
             longitudeOfAscendingNode: 0,
             semiMajorAxis: Settings.AU * 100,
-            initialMeanAnomaly: 0
-        }
+            initialMeanAnomaly: 0,
+        },
     };
 }

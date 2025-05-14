@@ -15,25 +15,28 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import juliaFragment from "../../../shaders/juliaSet.glsl";
-import { UpdatablePostProcess } from "../../postProcesses/updatablePostProcess";
-import { Effect } from "@babylonjs/core/Materials/effect";
-import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { ObjectUniformNames, setObjectUniforms } from "../../postProcesses/uniforms/objectUniforms";
+import { Constants } from "@babylonjs/core/Engines/constants";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { Effect } from "@babylonjs/core/Materials/effect";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
+import { Scene } from "@babylonjs/core/scene";
+
+import { DeepReadonly } from "@/utils/types";
+
 import { CameraUniformNames, setCameraUniforms } from "../../postProcesses/uniforms/cameraUniforms";
+import { ObjectUniformNames, setObjectUniforms } from "../../postProcesses/uniforms/objectUniforms";
+import { SamplerUniformNames, setSamplerUniforms } from "../../postProcesses/uniforms/samplerUniforms";
 import {
     setStellarObjectUniforms,
-    StellarObjectUniformNames
+    StellarObjectUniformNames,
 } from "../../postProcesses/uniforms/stellarObjectUniforms";
-import { SamplerUniformNames, setSamplerUniforms } from "../../postProcesses/uniforms/samplerUniforms";
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { Constants } from "@babylonjs/core/Engines/constants";
-import { Scene } from "@babylonjs/core/scene";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { DeepReadonly } from "../../utils/types";
-import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { UpdatablePostProcess } from "../../postProcesses/updatablePostProcess";
+
+import juliaFragment from "@shaders/juliaSet.glsl";
 
 export class JuliaSetPostProcess extends PostProcess implements UpdatablePostProcess {
     private elapsedSeconds = 0;
@@ -45,7 +48,7 @@ export class JuliaSetPostProcess extends PostProcess implements UpdatablePostPro
         boundingRadius: number,
         accentColor: DeepReadonly<Color3>,
         scene: Scene,
-        stellarObjects: ReadonlyArray<PointLight>
+        stellarObjects: ReadonlyArray<PointLight>,
     ) {
         const shaderName = "julia";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
@@ -54,14 +57,14 @@ export class JuliaSetPostProcess extends PostProcess implements UpdatablePostPro
 
         const JuliaUniformNames = {
             ELAPSED_SECONDS: "elapsedSeconds",
-            ACCENT_COLOR: "accentColor"
+            ACCENT_COLOR: "accentColor",
         };
 
         const uniforms: string[] = [
             ...Object.values(ObjectUniformNames),
             ...Object.values(CameraUniformNames),
             ...Object.values(StellarObjectUniformNames),
-            ...Object.values(JuliaUniformNames)
+            ...Object.values(JuliaUniformNames),
         ];
 
         const samplers: string[] = Object.values(SamplerUniformNames);
@@ -77,7 +80,7 @@ export class JuliaSetPostProcess extends PostProcess implements UpdatablePostPro
             scene.getEngine(),
             false,
             null,
-            Constants.TEXTURETYPE_HALF_FLOAT
+            Constants.TEXTURETYPE_HALF_FLOAT,
         );
 
         this.onActivateObservable.add((camera) => {

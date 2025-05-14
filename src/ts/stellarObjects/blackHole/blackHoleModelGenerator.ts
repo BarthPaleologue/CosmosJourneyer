@@ -16,21 +16,23 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { normalRandom } from "extended-random";
+
+import { GenerationSteps } from "@/utils/generationSteps";
+import { getRngFromSeed } from "@/utils/getRngFromSeed";
+import { estimateStarRadiusFromMass } from "@/utils/physics";
+import { DeepReadonly } from "@/utils/types";
+
 import { CelestialBodyModel } from "../../architecture/orbitalObjectModel";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { Orbit } from "../../orbit/orbit";
 import { Settings } from "../../settings";
-import { GenerationSteps } from "../../utils/generationSteps";
-import { getRngFromSeed } from "../../utils/getRngFromSeed";
-import { estimateStarRadiusFromMass } from "../../utils/physics";
 import { BlackHoleModel } from "./blackHoleModel";
-import { DeepReadonly } from "../../utils/types";
 
 export function newSeededBlackHoleModel(
     id: string,
     seed: number,
     name: string,
-    parentBodies: DeepReadonly<Array<CelestialBodyModel>>
+    parentBodies: DeepReadonly<Array<CelestialBodyModel>>,
 ): BlackHoleModel {
     const rng = getRngFromSeed(seed);
 
@@ -52,7 +54,7 @@ export function newSeededBlackHoleModel(
         inclination: 0,
         longitudeOfAscendingNode: 0,
         argumentOfPeriapsis: 0,
-        initialMeanAnomaly: 0
+        initialMeanAnomaly: 0,
     };
 
     const blackHoleMass = getMassFromSchwarzschildRadius(radius);
@@ -71,7 +73,7 @@ export function newSeededBlackHoleModel(
         siderealDaySeconds: blackHoleSiderealDaySeconds,
         axialTilt: blackHoleAxialTilt,
         accretionDiskRadius: blackHoleAccretionDiskRadius,
-        orbit
+        orbit,
     };
 }
 

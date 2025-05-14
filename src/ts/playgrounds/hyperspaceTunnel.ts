@@ -16,18 +16,19 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
+import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
-import { DefaultControls } from "../defaultControls/defaultControls";
-import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
-import { HyperSpaceTunnel } from "../utils/hyperSpaceTunnel";
-import { Axis } from "@babylonjs/core/Maths/math.axis";
-import { enablePhysics } from "./utils";
+
 import { loadTextures } from "../assets/textures";
+import { DefaultControls } from "../defaultControls/defaultControls";
+import { HyperSpaceTunnel } from "../utils/hyperSpaceTunnel";
+import { enablePhysics } from "./utils";
 
 export async function createHyperspaceTunnelDemo(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void
+    progressCallback: (progress: number, text: string) => void,
 ) {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;

@@ -15,14 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { MissionContext } from "./missionContext";
 import i18n from "../i18n";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
 import { UniverseObjectId } from "../utils/coordinates/universeObjectId";
+import { MissionContext } from "./missionContext";
+import { MissionSerialized, MissionType } from "./missionSerialized";
 import { deserializeMissionNode } from "./nodes/deserializeNode";
 import { MissionNode } from "./nodes/missionNode";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-import { MissionType, MissionSerialized } from "./missionSerialized";
 
 /**
  * General mission abstraction. The mission can have any arbitrary task tree and reward.
@@ -71,7 +71,7 @@ export class Mission {
     describeNextTask(
         context: MissionContext,
         keyboardLayout: Map<string, string>,
-        starSystemDatabase: StarSystemDatabase
+        starSystemDatabase: StarSystemDatabase,
     ): string {
         return this.tree.describeNextTask(context, keyboardLayout, starSystemDatabase);
     }
@@ -136,7 +136,7 @@ export class Mission {
             missionGiver: this.missionGiver,
             tree: this.tree.serialize(),
             reward: this.reward,
-            type: this.missionType
+            type: this.missionType,
         };
     }
 
@@ -159,7 +159,7 @@ export class Mission {
             missionTree,
             missionSerialized.reward,
             missionSerialized.missionGiver,
-            missionSerialized.type
+            missionSerialized.type,
         );
     }
 }

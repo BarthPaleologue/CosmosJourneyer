@@ -16,12 +16,14 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Effect } from "@babylonjs/core/Materials/effect";
+import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+
+import { DeepReadonly } from "@/utils/types";
+
+import { getForwardDirection } from "../../uberCore/transforms/basicTransform";
 import { BlackHoleModel } from "./blackHoleModel";
 import { getKerrMetricA } from "./blackHoleModelGenerator";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { getForwardDirection } from "../../uberCore/transforms/basicTransform";
-import { DeepReadonly } from "../../utils/types";
-import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 
 export const BlackHoleUniformNames = {
     STARFIELD_ROTATION: "starfieldRotation",
@@ -32,11 +34,11 @@ export const BlackHoleUniformNames = {
     WARPING_MINKOWSKI_FACTOR: "warpingMinkowskiFactor",
     ROTATION_PERIOD: "rotationPeriod",
     ROTATION_AXIS: "rotationAxis",
-    FORWARD_AXIS: "forwardAxis"
+    FORWARD_AXIS: "forwardAxis",
 };
 
 export const BlackHoleSamplerNames = {
-    STARFIELD_TEXTURE: "starfieldTexture"
+    STARFIELD_TEXTURE: "starfieldTexture",
 };
 
 export class BlackHoleUniforms {

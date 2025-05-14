@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { z } from "zod";
+
 import { UniverseObjectIdSchema } from "./universeObjectId";
 
 export const RelativeCoordinatesSchema = z.object({
@@ -32,7 +33,7 @@ export const RelativeCoordinatesSchema = z.object({
     position: z.object({
         x: z.number().default(0),
         y: z.number().default(0),
-        z: z.number().default(0)
+        z: z.number().default(0),
     }),
 
     /**
@@ -42,8 +43,8 @@ export const RelativeCoordinatesSchema = z.object({
         x: z.number().default(0),
         y: z.number().default(0),
         z: z.number().default(0),
-        w: z.number().default(1)
-    })
+        w: z.number().default(1),
+    }),
 });
 
 export type RelativeCoordinates = z.infer<typeof RelativeCoordinatesSchema>;
@@ -51,7 +52,7 @@ export type RelativeCoordinates = z.infer<typeof RelativeCoordinatesSchema>;
 export const AtStationCoordinatesSchema = z.object({
     type: z.literal("atStation"),
 
-    universeObjectId: UniverseObjectIdSchema
+    universeObjectId: UniverseObjectIdSchema,
 });
 
 export type AtStationCoordinates = z.infer<typeof AtStationCoordinatesSchema>;
@@ -63,7 +64,7 @@ export const OnSurfaceCoordinatesSchema = z.object({
 
     latitude: z.number().default(0),
 
-    longitude: z.number().default(0)
+    longitude: z.number().default(0),
 });
 
 export type OnSurfaceCoordinates = z.infer<typeof OnSurfaceCoordinatesSchema>;
@@ -71,7 +72,7 @@ export type OnSurfaceCoordinates = z.infer<typeof OnSurfaceCoordinatesSchema>;
 export const InSpaceshipCoordinatesSchema = z.object({
     type: z.literal("inSpaceship"),
 
-    shipId: z.string().uuid()
+    shipId: z.string().uuid(),
 });
 
 export type InSpaceshipCoordinates = z.infer<typeof InSpaceshipCoordinatesSchema>;
@@ -80,7 +81,7 @@ export const UniverseCoordinatesSchema = z.discriminatedUnion("type", [
     RelativeCoordinatesSchema,
     AtStationCoordinatesSchema,
     OnSurfaceCoordinatesSchema,
-    InSpaceshipCoordinatesSchema
+    InSpaceshipCoordinatesSchema,
 ]);
 
 export type UniverseCoordinates = z.infer<typeof UniverseCoordinatesSchema>;

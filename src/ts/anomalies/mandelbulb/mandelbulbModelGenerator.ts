@@ -15,22 +15,24 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { randRange, normalRandom } from "extended-random";
-import { clamp } from "../../utils/math";
-import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
-import { Orbit } from "../../orbit/orbit";
-import { GenerationSteps } from "../../utils/generationSteps";
-import { getRngFromSeed } from "../../utils/getRngFromSeed";
-import { MandelbulbModel } from "./mandelbulbModel";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Tools } from "@babylonjs/core/Misc/tools";
+import { normalRandom, randRange } from "extended-random";
+
+import { GenerationSteps } from "@/utils/generationSteps";
+import { getRngFromSeed } from "@/utils/getRngFromSeed";
+import { clamp } from "@/utils/math";
+
 import { OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
+import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
+import { Orbit } from "../../orbit/orbit";
+import { MandelbulbModel } from "./mandelbulbModel";
 
 export function newSeededMandelbulbModel(
     id: string,
     seed: number,
     name: string,
-    parentBodies: ReadonlyArray<OrbitalObjectModel>
+    parentBodies: ReadonlyArray<OrbitalObjectModel>,
 ): MandelbulbModel {
     const rng = getRngFromSeed(seed);
 
@@ -40,7 +42,7 @@ export function newSeededMandelbulbModel(
     const accentColor = Color3.FromHSV(
         360 * rng(GenerationSteps.ACCENT_COLOR),
         rng(GenerationSteps.ACCENT_COLOR + 123) * 0.5,
-        0.8
+        0.8,
     );
 
     // Todo: do not hardcode
@@ -58,7 +60,7 @@ export function newSeededMandelbulbModel(
         eccentricity: randRange(0.1, 0.9, rng, GenerationSteps.ORBIT + 240),
         longitudeOfAscendingNode: randRange(0, 2 * Math.PI, rng, GenerationSteps.ORBIT + 320),
         argumentOfPeriapsis: randRange(0, 2 * Math.PI, rng, GenerationSteps.ORBIT + 400),
-        initialMeanAnomaly: randRange(0, 2 * Math.PI, rng, GenerationSteps.ORBIT + 480)
+        initialMeanAnomaly: randRange(0, 2 * Math.PI, rng, GenerationSteps.ORBIT + 480),
     };
     const mass = 10;
     const siderealDaySeconds = 0;
@@ -74,6 +76,6 @@ export function newSeededMandelbulbModel(
         axialTilt,
         accentColor,
         power,
-        orbit
+        orbit,
     };
 }

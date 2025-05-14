@@ -15,68 +15,58 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { Scene } from "@babylonjs/core/scene";
 import "@babylonjs/core/Materials/Textures/Loaders/envTextureLoader";
 import "@babylonjs/core/Helpers/sceneHelpers";
+
 import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { Scene } from "@babylonjs/core/scene";
 
-import rockNormalMetallicMap from "../../asset/rockMaterial/layered-planetary_normal_metallic.webp";
-import rockAlbedoRoughnessMap from "../../asset/rockMaterial/layered-planetary_albedo_roughness.webp";
+import { ItemPool } from "@/utils/itemPool";
 
-import grassNormalMetallicMap from "../../asset/grassMaterial/wispy-grass-meadow_normal_metallic.webp";
-import grassAlbedoRoughnessMap from "../../asset/grassMaterial/wispy-grass-meadow_albedo_roughness.webp";
-
-import snowNormalMetallicMap from "../../asset/iceMaterial/ice_field_normal_metallic.webp";
-import snowAlbedoRoughnessMap from "../../asset/iceMaterial/ice_field_albedo_roughness.webp";
-
-import sandNormalMetallicMap from "../../asset/sandMaterial/wavy-sand_normal_metallic.webp";
-import sandAlbedoRoughnessMap from "../../asset/sandMaterial/wavy-sand_albedo_roughness.webp";
-
-import waterNormal1 from "../../asset/textures/waterNormalMap3.jpg";
-import waterNormal2 from "../../asset/textures/waterNormalMap4.jpg";
-import plumeParticle from "../../asset/textures/plume.png";
-import flareParticle from "../../asset/flare.png";
-import seamlessPerlin from "../../asset/perlin.webp";
-import empty from "../../asset/oneBlackPixel.webp";
-
-import skyBox from "../../asset/skybox/milkyway.env";
-
-import cursorImage from "../../asset/textures/hoveredCircle.png";
-
-import butterflyTexture from "../../asset/butterfly.webp";
-
-import treeTexturePath from "../../asset/tree/Tree.png";
-
-import solarPanelAlbedo from "../../asset/SolarPanelMaterial/SolarPanel002_2K-PNG_Color.webp";
-import solarPanelNormal from "../../asset/SolarPanelMaterial/SolarPanel002_2K-PNG_NormalDX.webp";
-import solarPanelMetallicRoughness from "../../asset/SolarPanelMaterial/metallicRougness.webp";
-
-import spaceStationAlbedo from "../../asset/spaceStationMaterial/spaceship-panels1-albedo.webp";
-import spaceStationNormal from "../../asset/spaceStationMaterial/spaceship-panels1-normal-dx.webp";
-import spaceStationMetallicRoughness from "../../asset/spaceStationMaterial/metallicRoughness.webp";
-import spaceStationAmbientOcclusion from "../../asset/spaceStationMaterial/spaceship-panels1-ao.webp";
-
-import metalPanelsAlbdeo from "../../asset/metalPanelMaterial/sci-fi-panel1-albedo.webp";
-import metalPanelsNormal from "../../asset/metalPanelMaterial/sci-fi-panel1-normal-dx.webp";
-import metalPanelsMetallicRoughness from "../../asset/metalPanelMaterial/metallicRoughness.webp";
-import metalPanelsAmbientOcclusion from "../../asset/metalPanelMaterial/sci-fi-panel1-ao.webp";
-
-import concreteAlbedo from "../../asset/degraded-concrete-ue/degraded-concrete_albedo.webp";
-import concreteNormal from "../../asset/degraded-concrete-ue/degraded-concrete_normal-dx.webp";
-import concreteMetallicRoughness from "../../asset/degraded-concrete-ue/degraded-concrete_metallic_roughness.webp";
-import concreteAmbientOcclusion from "../../asset/degraded-concrete-ue/degraded-concrete_ao.webp";
-
-import crateAlbedo from "../../asset/crateMaterial/space-crate1-albedo.webp";
-import crateNormal from "../../asset/crateMaterial/space-crate1-normal-dx.webp";
-import crateMetallicRoughness from "../../asset/crateMaterial/space-crate1-metallic-roughness.webp";
-import crateAmbientOcclusion from "../../asset/crateMaterial/space-crate1-ao.webp";
-import { ItemPool } from "../utils/itemPool";
 import { CloudsLut } from "../clouds/cloudsLut";
+import { TelluricPlanetMaterialLut } from "../planets/telluricPlanet/telluricPlanetMaterialLut";
 import { RingsLut } from "../rings/ringsLut";
 import { StarMaterialLut } from "../stellarObjects/star/starMaterialLut";
-import { TelluricPlanetMaterialLut } from "../planets/telluricPlanet/telluricPlanetMaterialLut";
 import { LandingPadTexturePool } from "./landingPadTexturePool";
+
+import butterflyTexture from "@assets/butterfly.webp";
+import crateAlbedo from "@assets/crateMaterial/space-crate1-albedo.webp";
+import crateAmbientOcclusion from "@assets/crateMaterial/space-crate1-ao.webp";
+import crateMetallicRoughness from "@assets/crateMaterial/space-crate1-metallic-roughness.webp";
+import crateNormal from "@assets/crateMaterial/space-crate1-normal-dx.webp";
+import concreteAlbedo from "@assets/degraded-concrete-ue/degraded-concrete_albedo.webp";
+import concreteAmbientOcclusion from "@assets/degraded-concrete-ue/degraded-concrete_ao.webp";
+import concreteMetallicRoughness from "@assets/degraded-concrete-ue/degraded-concrete_metallic_roughness.webp";
+import concreteNormal from "@assets/degraded-concrete-ue/degraded-concrete_normal-dx.webp";
+import flareParticle from "@assets/flare.png";
+import grassAlbedoRoughnessMap from "@assets/grassMaterial/wispy-grass-meadow_albedo_roughness.webp";
+import grassNormalMetallicMap from "@assets/grassMaterial/wispy-grass-meadow_normal_metallic.webp";
+import snowAlbedoRoughnessMap from "@assets/iceMaterial/ice_field_albedo_roughness.webp";
+import snowNormalMetallicMap from "@assets/iceMaterial/ice_field_normal_metallic.webp";
+import metalPanelsMetallicRoughness from "@assets/metalPanelMaterial/metallicRoughness.webp";
+import metalPanelsAlbdeo from "@assets/metalPanelMaterial/sci-fi-panel1-albedo.webp";
+import metalPanelsAmbientOcclusion from "@assets/metalPanelMaterial/sci-fi-panel1-ao.webp";
+import metalPanelsNormal from "@assets/metalPanelMaterial/sci-fi-panel1-normal-dx.webp";
+import empty from "@assets/oneBlackPixel.webp";
+import seamlessPerlin from "@assets/perlin.webp";
+import rockAlbedoRoughnessMap from "@assets/rockMaterial/layered-planetary_albedo_roughness.webp";
+import rockNormalMetallicMap from "@assets/rockMaterial/layered-planetary_normal_metallic.webp";
+import sandAlbedoRoughnessMap from "@assets/sandMaterial/wavy-sand_albedo_roughness.webp";
+import sandNormalMetallicMap from "@assets/sandMaterial/wavy-sand_normal_metallic.webp";
+import skyBox from "@assets/skybox/milkyway.env";
+import solarPanelMetallicRoughness from "@assets/SolarPanelMaterial/metallicRougness.webp";
+import solarPanelAlbedo from "@assets/SolarPanelMaterial/SolarPanel002_2K-PNG_Color.webp";
+import solarPanelNormal from "@assets/SolarPanelMaterial/SolarPanel002_2K-PNG_NormalDX.webp";
+import spaceStationMetallicRoughness from "@assets/spaceStationMaterial/metallicRoughness.webp";
+import spaceStationAlbedo from "@assets/spaceStationMaterial/spaceship-panels1-albedo.webp";
+import spaceStationAmbientOcclusion from "@assets/spaceStationMaterial/spaceship-panels1-ao.webp";
+import spaceStationNormal from "@assets/spaceStationMaterial/spaceship-panels1-normal-dx.webp";
+import cursorImage from "@assets/textures/hoveredCircle.png";
+import plumeParticle from "@assets/textures/plume.png";
+import waterNormal1 from "@assets/textures/waterNormalMap3.jpg";
+import waterNormal2 from "@assets/textures/waterNormalMap4.jpg";
+import treeTexturePath from "@assets/tree/Tree.png";
 
 // Define texture groups types
 export type TerrainTextures = {
@@ -155,7 +145,7 @@ export type Textures = {
  */
 export async function loadTextures(
     progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void,
-    scene: Scene
+    scene: Scene,
 ): Promise<Textures> {
     let loadedCount = 0;
     let totalCount = 0;
@@ -226,7 +216,7 @@ export async function loadTextures(
     const solarPanelNormalPromise = loadTextureAsync("SolarPanelNormal", solarPanelNormal);
     const solarPanelMetallicRoughnessPromise = loadTextureAsync(
         "SolarPanelMetallicRoughness",
-        solarPanelMetallicRoughness
+        solarPanelMetallicRoughness,
     );
 
     // Space Station
@@ -234,11 +224,11 @@ export async function loadTextures(
     const spaceStationNormalPromise = loadTextureAsync("SpaceStationNormal", spaceStationNormal);
     const spaceStationMetallicRoughnessPromise = loadTextureAsync(
         "SpaceStationMetallicRoughness",
-        spaceStationMetallicRoughness
+        spaceStationMetallicRoughness,
     );
     const spaceStationAmbientOcclusionPromise = loadTextureAsync(
         "SpaceStationAmbientOcclusion",
-        spaceStationAmbientOcclusion
+        spaceStationAmbientOcclusion,
     );
 
     // Metal Panels
@@ -246,11 +236,11 @@ export async function loadTextures(
     const metalPanelsNormalPromise = loadTextureAsync("MetalPanelsNormal", metalPanelsNormal);
     const metalPanelsMetallicRoughnessPromise = loadTextureAsync(
         "MetalPanelsMetallicRoughness",
-        metalPanelsMetallicRoughness
+        metalPanelsMetallicRoughness,
     );
     const metalPanelsAmbientOcclusionPromise = loadTextureAsync(
         "MetalPanelsAmbientOcclusion",
-        metalPanelsAmbientOcclusion
+        metalPanelsAmbientOcclusion,
     );
 
     const treeAlbedoPromise = loadTextureAsync("TreeAlbedo", treeTexturePath);
@@ -275,75 +265,75 @@ export async function loadTextures(
         terrains: {
             rock: {
                 normalMetallic: await rockNormalMetallicPromise,
-                albedoRoughness: await rockAlbedoRoughnessPromise
+                albedoRoughness: await rockAlbedoRoughnessPromise,
             },
             grass: {
                 normalMetallic: await grassNormalMetallicPromise,
-                albedoRoughness: await grassAlbedoRoughnessPromise
+                albedoRoughness: await grassAlbedoRoughnessPromise,
             },
             snow: {
                 normalMetallic: await snowNormalMetallicPromise,
-                albedoRoughness: await snowAlbedoRoughnessPromise
+                albedoRoughness: await snowAlbedoRoughnessPromise,
             },
             sand: {
                 normalMetallic: await sandNormalMetallicPromise,
-                albedoRoughness: await sandAlbedoRoughnessPromise
-            }
+                albedoRoughness: await sandAlbedoRoughnessPromise,
+            },
         },
         water: {
             normalMap1: await waterNormalMap1Promise,
-            normalMap2: await waterNormalMap2Promise
+            normalMap2: await waterNormalMap2Promise,
         },
         particles: {
             plume: await plumeParticlePromise,
             flare: await flareTexturePromise,
-            butterfly: await butterflyPromise
+            butterfly: await butterflyPromise,
         },
         materials: {
             solarPanel: {
                 albedo: await solarPanelAlbedoPromise,
                 normal: await solarPanelNormalPromise,
-                metallicRoughness: await solarPanelMetallicRoughnessPromise
+                metallicRoughness: await solarPanelMetallicRoughnessPromise,
             },
             spaceStation: {
                 albedo: await spaceStationAlbedoPromise,
                 normal: await spaceStationNormalPromise,
                 metallicRoughness: await spaceStationMetallicRoughnessPromise,
-                ambientOcclusion: await spaceStationAmbientOcclusionPromise
+                ambientOcclusion: await spaceStationAmbientOcclusionPromise,
             },
             metalPanels: {
                 albedo: await metalPanelsAlbedoPromise,
                 normal: await metalPanelsNormalPromise,
                 metallicRoughness: await metalPanelsMetallicRoughnessPromise,
-                ambientOcclusion: await metalPanelsAmbientOcclusionPromise
+                ambientOcclusion: await metalPanelsAmbientOcclusionPromise,
             },
             concrete: {
                 albedo: await concreteAlbedoPromise,
                 normal: await concreteNormalPromise,
                 metallicRoughness: await concreteMetallicRoughnessPromise,
-                ambientOcclusion: await concreteAmbientOcclusionPromise
+                ambientOcclusion: await concreteAmbientOcclusionPromise,
             },
             crate: {
                 albedo: await crateAlbedoPromise,
                 normal: await crateNormalPromise,
                 metallicRoughness: await crateMetallicRoughnessPromise,
-                ambientOcclusion: await crateAmbientOcclusionPromise
+                ambientOcclusion: await crateAmbientOcclusionPromise,
             },
             tree: {
-                albedo: treeAlbedo
-            }
+                albedo: treeAlbedo,
+            },
         },
         environment: {
-            milkyWay: await milkyWayPromise
+            milkyWay: await milkyWayPromise,
         },
         noises: {
-            seamlessPerlin: await seamlessPerlinPromise
+            seamlessPerlin: await seamlessPerlinPromise,
         },
         ui: {
-            cursorImageUrl: cursorImage
+            cursorImageUrl: cursorImage,
         },
         empty: await emptyTexturePromise,
-        pools: createTexturePools(scene)
+        pools: createTexturePools(scene),
     };
 }
 
@@ -353,6 +343,6 @@ export function createTexturePools(scene: Scene): TexturePools {
         ringsLut: new ItemPool<RingsLut>(() => new RingsLut(scene)),
         starMaterialLut: new ItemPool<StarMaterialLut>(() => new StarMaterialLut(scene)),
         telluricPlanetMaterialLut: new ItemPool<TelluricPlanetMaterialLut>(() => new TelluricPlanetMaterialLut(scene)),
-        landingPad: new LandingPadTexturePool()
+        landingPad: new LandingPadTexturePool(),
     };
 }

@@ -15,10 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Scene } from "@babylonjs/core/scene";
 import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
-import * as BSL from "../../../utils/bsl";
+import { Scene } from "@babylonjs/core/scene";
+
+import * as BSL from "@/utils/bsl";
+
 import { PBRTextures } from "../../textures";
 
 export class SolarPanelMaterial extends NodeMaterial {
@@ -46,7 +48,7 @@ export class SolarPanelMaterial extends NodeMaterial {
         // Fragment Shader
 
         const albedoTexture = BSL.textureSample(textures.albedo, uv, {
-            convertToLinearSpace: true
+            convertToLinearSpace: true,
         });
         const metallicRoughness = BSL.textureSample(textures.metallicRoughness, uv);
         const normalMapValue = BSL.textureSample(textures.normal, uv);
@@ -65,7 +67,7 @@ export class SolarPanelMaterial extends NodeMaterial {
             normalW,
             view,
             cameraPosition,
-            positionW
+            positionW,
         );
 
         const fragOutput = BSL.outputFragColor(pbrLighting);

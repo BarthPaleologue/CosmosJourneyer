@@ -1,4 +1,4 @@
-import { Page, expect } from "@playwright/test";
+import { expect, Page } from "@playwright/test";
 
 export async function renderAndSnap(
     page: Page,
@@ -10,7 +10,7 @@ export async function renderAndSnap(
             [key: string]: string | number;
         };
         flagToWait: string;
-    }
+    },
 ) {
     const urlParams = new URLSearchParams();
     if (opts.scene !== undefined) urlParams.set("scene", opts.scene);

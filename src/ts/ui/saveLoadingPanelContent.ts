@@ -1,21 +1,23 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
-import i18n from "../i18n";
-import { createNotification, NotificationIntent, NotificationOrigin } from "../utils/notification";
-import { createUrlFromSave, Save } from "../saveFile/saveFileData";
-import expandIconPath from "../../asset/icons/expand.webp";
-import collapseIconPath from "../../asset/icons/collapse.webp";
-import loadIconPath from "../../asset/icons/play.webp";
-import editIconPath from "../../asset/icons/edit.webp";
-import downloadIconPath from "../../asset/icons/download.webp";
-import trashIconPath from "../../asset/icons/trash.webp";
-import shareIconPath from "../../asset/icons/link.webp";
-import { alertModal, promptModalBoolean, promptModalString } from "../utils/dialogModal";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-import { Result } from "../utils/types";
-import { SaveManager } from "../saveFile/saveManager";
-import { parseSaveFile } from "../saveFile/saveFile";
-import { SaveLoadingError, saveLoadingErrorToI18nString } from "../saveFile/saveLoadingError";
+
 import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
+import i18n from "../i18n";
+import { parseSaveFile } from "../saveFile/saveFile";
+import { createUrlFromSave, Save } from "../saveFile/saveFileData";
+import { SaveLoadingError, saveLoadingErrorToI18nString } from "../saveFile/saveLoadingError";
+import { SaveManager } from "../saveFile/saveManager";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { alertModal, promptModalBoolean, promptModalString } from "../utils/dialogModal";
+import { createNotification, NotificationIntent, NotificationOrigin } from "../utils/notification";
+import { Result } from "../utils/types";
+
+import collapseIconPath from "@assets/icons/collapse.webp";
+import downloadIconPath from "@assets/icons/download.webp";
+import editIconPath from "@assets/icons/edit.webp";
+import expandIconPath from "@assets/icons/expand.webp";
+import shareIconPath from "@assets/icons/link.webp";
+import loadIconPath from "@assets/icons/play.webp";
+import trashIconPath from "@assets/icons/trash.webp";
 
 export class SaveLoadingPanelContent {
     readonly htmlRoot: HTMLElement;
@@ -161,15 +163,15 @@ export class SaveLoadingPanelContent {
                         month: "long",
                         day: "numeric",
                         hour: "numeric",
-                        minute: "numeric"
-                    }
-                }
+                        minute: "numeric",
+                    },
+                },
             });
             cmdrHeaderText.appendChild(cmdrLastPlayed);
 
             const cmdrPlayTime = document.createElement("p");
             cmdrPlayTime.innerText = i18n.t("sidePanel:journeyedFor", {
-                nbHours: Math.ceil(latestSave.player.timePlayedSeconds / 60 / 60)
+                nbHours: Math.ceil(latestSave.player.timePlayedSeconds / 60 / 60),
             });
             cmdrHeaderText.appendChild(cmdrPlayTime);
 
@@ -204,7 +206,7 @@ export class SaveLoadingPanelContent {
                         NotificationIntent.SUCCESS,
                         i18n.t("notifications:copiedToClipboard"),
                         5000,
-                        this.soundPlayer
+                        this.soundPlayer,
                     );
                 });
             });
@@ -221,7 +223,7 @@ export class SaveLoadingPanelContent {
                 const newName = await promptModalString(
                     i18n.t("sidePanel:cmdrNameChangePrompt"),
                     latestSave.player.name,
-                    this.soundPlayer
+                    this.soundPlayer,
                 );
                 if (newName === null) return;
 
@@ -248,7 +250,7 @@ export class SaveLoadingPanelContent {
                     save,
                     cmdrSaves.auto.includes(save),
                     starSystemDatabase,
-                    saveManager
+                    saveManager,
                 );
                 savesList.appendChild(saveDiv);
             });
@@ -276,7 +278,7 @@ export class SaveLoadingPanelContent {
         save: Save,
         isAutoSave: boolean,
         starSystemDatabase: StarSystemDatabase,
-        saveManager: SaveManager
+        saveManager: SaveManager,
     ): HTMLElement {
         const saveDiv = document.createElement("div");
         saveDiv.classList.add("saveContainer");
@@ -305,8 +307,8 @@ export class SaveLoadingPanelContent {
         saveLocation.innerText = i18n.t(isLanded ? "sidePanel:landedAt" : "sidePanel:near", {
             location: nearestObject?.name ?? i18n.t("sidePanel:locationNotFound"),
             interpolation: {
-                escapeValue: false
-            }
+                escapeValue: false,
+            },
         });
         saveText.appendChild(saveLocation);
 
@@ -341,7 +343,7 @@ export class SaveLoadingPanelContent {
                     NotificationIntent.INFO,
                     i18n.t("notifications:copiedToClipboard"),
                     5000,
-                    this.soundPlayer
+                    this.soundPlayer,
                 );
             });
         });
@@ -402,7 +404,7 @@ export class SaveLoadingPanelContent {
 
     private async loadSaveFile(
         file: File,
-        starSystemDatabase: StarSystemDatabase
+        starSystemDatabase: StarSystemDatabase,
     ): Promise<Result<Save, SaveLoadingError>> {
         const saveFileDataResult = await parseSaveFile(file, starSystemDatabase);
         if (!saveFileDataResult.success) {

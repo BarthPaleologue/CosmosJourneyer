@@ -16,7 +16,9 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
-import { clamp } from "../../../utils/math";
+
+import { clamp } from "@/utils/math";
+
 import { CustomAnimation } from "./animation";
 
 export class CameraShakeAnimation implements CustomAnimation {

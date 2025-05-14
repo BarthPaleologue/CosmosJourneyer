@@ -7,6 +7,6 @@ test("The i18n should be correctly initialized", async ({ page }) => {
         scene: "tutorial",
         shotName: "baseline",
         flagToWait: "ready",
-        urlParams: { lang: "en-US" }
+        urlParams: { lang: "en-US" },
     });
 });

@@ -15,22 +15,24 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import ringsFragment from "../../shaders/ringsFragment.glsl";
-import { Effect } from "@babylonjs/core/Materials/effect";
-import { RingsSamplerNames, RingsUniformNames, RingsUniforms } from "./ringsUniform";
-import { CelestialBodyModel } from "../architecture/orbitalObjectModel";
-import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { ObjectUniformNames, setObjectUniforms } from "../postProcesses/uniforms/objectUniforms";
-import { setStellarObjectUniforms, StellarObjectUniformNames } from "../postProcesses/uniforms/stellarObjectUniforms";
-import { CameraUniformNames, setCameraUniforms } from "../postProcesses/uniforms/cameraUniforms";
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
-import { SamplerUniformNames, setSamplerUniforms } from "../postProcesses/uniforms/samplerUniforms";
-import { Scene } from "@babylonjs/core/scene";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { DeepReadonly } from "../utils/types";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { Effect } from "@babylonjs/core/Materials/effect";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
+import { Scene } from "@babylonjs/core/scene";
+
+import { CelestialBodyModel } from "../architecture/orbitalObjectModel";
+import { CameraUniformNames, setCameraUniforms } from "../postProcesses/uniforms/cameraUniforms";
+import { ObjectUniformNames, setObjectUniforms } from "../postProcesses/uniforms/objectUniforms";
+import { SamplerUniformNames, setSamplerUniforms } from "../postProcesses/uniforms/samplerUniforms";
+import { setStellarObjectUniforms, StellarObjectUniformNames } from "../postProcesses/uniforms/stellarObjectUniforms";
+import { DeepReadonly } from "../utils/types";
+import { RingsSamplerNames, RingsUniformNames, RingsUniforms } from "./ringsUniform";
+
+import ringsFragment from "@shaders/ringsFragment.glsl";
 
 export class RingsPostProcess extends PostProcess {
     readonly ringsUniforms: RingsUniforms;
@@ -42,7 +44,7 @@ export class RingsPostProcess extends PostProcess {
         ringsUniforms: RingsUniforms,
         bodyModel: DeepReadonly<Pick<CelestialBodyModel, "radius" | "name">>,
         stellarObjects: ReadonlyArray<PointLight>,
-        scene: Scene
+        scene: Scene,
     ) {
         const shaderName = "rings";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
@@ -53,7 +55,7 @@ export class RingsPostProcess extends PostProcess {
             ...Object.values(ObjectUniformNames),
             ...Object.values(StellarObjectUniformNames),
             ...Object.values(CameraUniformNames),
-            ...Object.values(RingsUniformNames)
+            ...Object.values(RingsUniformNames),
         ];
 
         const samplers: string[] = [...Object.values(SamplerUniformNames), ...Object.values(RingsSamplerNames)];
@@ -69,7 +71,7 @@ export class RingsPostProcess extends PostProcess {
             scene.getEngine(),
             false,
             null,
-            Constants.TEXTURETYPE_HALF_FLOAT
+            Constants.TEXTURETYPE_HALF_FLOAT,
         );
 
         this.ringsUniforms = ringsUniforms;

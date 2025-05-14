@@ -30,6 +30,6 @@ export function createEmptyTexture(scene: Scene) {
         scene,
         false,
         false,
-        Texture.NEAREST_SAMPLINGMODE
+        Texture.NEAREST_SAMPLINGMODE,
     );
 }

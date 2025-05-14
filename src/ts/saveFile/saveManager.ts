@@ -74,7 +74,7 @@ export class SaveManager {
      */
     public static async CreateAsync(
         backend: SaveBackend,
-        starSystemDatabase: StarSystemDatabase
+        starSystemDatabase: StarSystemDatabase,
     ): Promise<Result<SaveManager, SaveLoadingError>> {
         const saveResult = await backend.read(starSystemDatabase);
         if (!saveResult.success) {

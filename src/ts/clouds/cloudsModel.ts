@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Color3 } from "@babylonjs/core/Maths/math.color";
+
 import { Settings } from "../settings";
 
 export type CloudsModel = {
@@ -35,7 +36,7 @@ export function newCloudsModel(
     planetRadius: number,
     cloudLayerHeight: number,
     waterAmount: number,
-    pressure: number
+    pressure: number,
 ): CloudsModel {
     return {
         layerRadius: planetRadius + cloudLayerHeight,
@@ -47,6 +48,6 @@ export function newCloudsModel(
         sharpness: 2.5,
         color: new Color3(0.8, 0.8, 0.8),
         worleySpeed: 0.0005,
-        detailSpeed: 0.003
+        detailSpeed: 0.003,
     };
 }

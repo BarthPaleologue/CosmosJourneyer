@@ -15,21 +15,22 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { connectEncyclopaediaGalacticaModal } from "@/utils/dialogModal";
+import { createNotification, NotificationIntent, NotificationOrigin } from "@/utils/notification";
+
+import { ISoundPlayer, SoundType } from "../../audio/soundPlayer";
 import i18n from "../../i18n";
 import { Player } from "../../player/player";
 import { Settings } from "../../settings";
 import { SpaceDiscoveryData } from "../../society/encyclopaediaGalactica";
 import { EncyclopaediaGalacticaManager } from "../../society/encyclopaediaGalacticaManager";
 import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
-import { connectEncyclopaediaGalacticaModal } from "../../utils/dialogModal";
-import { createNotification, NotificationIntent, NotificationOrigin } from "../../utils/notification";
 import { DiscoveryDetails } from "./discoveryDetails";
-import { ISoundPlayer, SoundType } from "../../audio/soundPlayer";
 
 const ExplorationCenterFilter = {
     LOCAL_ONLY: "localOnly",
     UPLOADED_ONLY: "uploadedOnly",
-    ALL: "all"
+    ALL: "all",
 } as const;
 type ExplorationCenterFilter = (typeof ExplorationCenterFilter)[keyof typeof ExplorationCenterFilter];
 
@@ -55,7 +56,7 @@ export class ExplorationCenterPanel {
         encyclopaedia: EncyclopaediaGalacticaManager,
         player: Player,
         starSystemDatabase: StarSystemDatabase,
-        soundPlayer: ISoundPlayer
+        soundPlayer: ISoundPlayer,
     ) {
         this.player = player;
         this.encyclopaedia = encyclopaedia;
@@ -75,7 +76,7 @@ export class ExplorationCenterPanel {
 
         const activeInstances = document.createElement("p");
         activeInstances.textContent = i18n.t("explorationCenter:activeEncyclopaediaInstances", {
-            value: encyclopaedia.getBackendString()
+            value: encyclopaedia.getBackendString(),
         });
         encyclopaediaContainer.appendChild(activeInstances);
 
@@ -109,7 +110,7 @@ export class ExplorationCenterPanel {
                         NotificationIntent.ERROR,
                         valueResult.error,
                         5_000,
-                        this.soundPlayer
+                        this.soundPlayer,
                     );
                     continue;
                 }
@@ -202,7 +203,7 @@ export class ExplorationCenterPanel {
                     NotificationIntent.ERROR,
                     result.error,
                     5_000,
-                    this.soundPlayer
+                    this.soundPlayer,
                 );
                 continue;
             }
@@ -211,7 +212,7 @@ export class ExplorationCenterPanel {
         }
         this.sellAllButton.toggleAttribute("disabled", totalValue === 0);
         this.sellAllButton.innerText = i18n.t("common:sellAllFor", {
-            price: `${totalValue.toLocaleString()}${Settings.CREDIT_SYMBOL}`
+            price: `${totalValue.toLocaleString()}${Settings.CREDIT_SYMBOL}`,
         });
 
         if (discoveries.length === 0) {

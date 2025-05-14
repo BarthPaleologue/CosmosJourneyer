@@ -15,12 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import "../styles/index.scss";
+import "@styles/index.scss";
 
-import { positionNearObjectBrightSide } from "./utils/positionNearObject";
+import { positionNearObjectBrightSide } from "@/utils/positionNearObject";
+
 import { CosmosJourneyer } from "./cosmosJourneyer";
-import { StarSystemModel } from "./starSystem/starSystemModel";
 import { newSeededTelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModelGenerator";
+import { StarSystemModel } from "./starSystem/starSystemModel";
 import { newSeededBlackHoleModel } from "./stellarObjects/blackHole/blackHoleModelGenerator";
 
 const engine = await CosmosJourneyer.CreateAsync();
@@ -44,13 +45,13 @@ const starSystemModel: StarSystemModel = {
         starSectorZ: 0,
         localX: 0,
         localY: 0,
-        localZ: 0
+        localZ: 0,
     },
     stellarObjects: [blackHoleModel],
     planets: [millerPlanetModel],
     satellites: [],
     anomalies: [],
-    orbitalFacilities: []
+    orbitalFacilities: [],
 };
 
 engine.starSystemDatabase.registerCustomSystem(starSystemModel);

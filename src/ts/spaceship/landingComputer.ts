@@ -16,17 +16,18 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
-import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+
 import { CollisionMask } from "../settings";
-import { getAngleFromQuaternion, getAxisFromQuaternion, getDeltaQuaternion } from "../utils/algebra";
 import { ILandingPad } from "../spacestation/landingPad/landingPadManager";
+import { getAngleFromQuaternion, getAxisFromQuaternion, getDeltaQuaternion } from "../utils/algebra";
 
 export const enum LandingTargetKind {
     LANDING_PAD,
-    CELESTIAL_BODY
+    CELESTIAL_BODY,
 }
 
 export type LandingTargetPad = {
@@ -97,7 +98,7 @@ export const LandingComputerStatusBit = {
     COMPLETE: 1 << 1,
     TIMEOUT: 1 << 2,
     IDLE: 1 << 3,
-    NO_LANDING_SPOT: 1 << 4
+    NO_LANDING_SPOT: 1 << 4,
 } as const;
 
 export type LandingComputerStatusBit = (typeof LandingComputerStatusBit)[keyof typeof LandingComputerStatusBit];
@@ -163,21 +164,21 @@ export class LandingComputer {
                             .getTransform()
                             .getAbsolutePosition()
                             .add(landingPad.getTransform().up.scale(50)),
-                        rotation: landingPad.getTransform().absoluteRotationQuaternion
+                        rotation: landingPad.getTransform().absoluteRotationQuaternion,
                     };
                 },
                 maxVelocityAtTarget: {
                     linear: 3,
-                    rotation: 0.1
+                    rotation: 0.1,
                 },
                 maxVelocity: {
                     linearY: 20,
-                    rotation: 0.5
+                    rotation: 0.5,
                 },
                 tolerance: {
                     position: 1.5,
-                    rotation: 0.1
-                }
+                    rotation: 0.1,
+                },
             },
             {
                 getTargetTransform: () => {
@@ -188,24 +189,24 @@ export class LandingComputer {
                             .add(
                                 landingPad
                                     .getTransform()
-                                    .up.scale((landingPad.getPadHeight() + this.boundingExtent.y) / 2)
+                                    .up.scale((landingPad.getPadHeight() + this.boundingExtent.y) / 2),
                             ),
-                        rotation: landingPad.getTransform().absoluteRotationQuaternion
+                        rotation: landingPad.getTransform().absoluteRotationQuaternion,
                     };
                 },
                 maxVelocityAtTarget: {
                     linear: 3,
-                    rotation: 0.1
+                    rotation: 0.1,
                 },
                 maxVelocity: {
                     linearY: 5,
-                    rotation: 0.5
+                    rotation: 0.5,
                 },
                 tolerance: {
                     position: 0.5,
-                    rotation: 0.1
-                }
-            }
+                    rotation: 0.1,
+                },
+            },
         ];
     }
 
@@ -220,7 +221,7 @@ export class LandingComputer {
                     const end = shipPosition.add(gravityDir.scale(500));
 
                     this.physicsEngine.raycastToRef(start, end, this.raycastResult, {
-                        collideWith: CollisionMask.ENVIRONMENT
+                        collideWith: CollisionMask.ENVIRONMENT,
                     });
 
                     if (!this.raycastResult.hasHit) {
@@ -230,7 +231,7 @@ export class LandingComputer {
                     const landingSpotNormal = this.raycastResult.hitNormalWorld;
 
                     const landingSpotPosition = this.raycastResult.hitPointWorld.add(
-                        landingSpotNormal.scale(this.boundingExtent.y / 2)
+                        landingSpotNormal.scale(this.boundingExtent.y / 2),
                     );
 
                     const currentUp = this.transform.up;
@@ -239,7 +240,7 @@ export class LandingComputer {
                     if (currentUp.equalsWithEpsilon(targetUp)) {
                         return {
                             position: landingSpotPosition,
-                            rotation: this.transform.absoluteRotationQuaternion
+                            rotation: this.transform.absoluteRotationQuaternion,
                         };
                     }
 
@@ -249,23 +250,23 @@ export class LandingComputer {
                     return {
                         position: landingSpotPosition,
                         rotation: Quaternion.RotationAxis(axis, theta).multiplyInPlace(
-                            this.transform.absoluteRotationQuaternion
-                        )
+                            this.transform.absoluteRotationQuaternion,
+                        ),
                     };
                 },
                 maxVelocityAtTarget: {
                     linear: 3,
-                    rotation: 0.1
+                    rotation: 0.1,
                 },
                 maxVelocity: {
                     linearY: 5,
-                    rotation: 0.5
+                    rotation: 0.5,
                 },
                 tolerance: {
                     position: 5.0,
-                    rotation: 0.2
-                }
-            }
+                    rotation: 0.2,
+                },
+            },
         ];
     }
 

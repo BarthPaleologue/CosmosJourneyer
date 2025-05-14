@@ -15,13 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Settings } from "../settings";
+import { BoundingBox } from "@babylonjs/core/Culling/boundingBox";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
-import { BoundingBox } from "@babylonjs/core/Culling/boundingBox";
-import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
+
+import { Settings } from "../settings";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { StarSystemModel } from "../starSystem/starSystemModel";
+import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
 import { DeepReadonly } from "../utils/types";
 
 export function vector3ToString(v: Vector3): string {
@@ -61,12 +62,12 @@ export class StarSectorView {
         const systemModels = starSystemDatabase.getSystemModelsInStarSector(
             this.coordinates.x,
             this.coordinates.y,
-            this.coordinates.z
+            this.coordinates.z,
         );
         this.systems = systemModels.map((systemModel) => {
             return {
                 model: systemModel,
-                position: starSystemDatabase.getSystemGalacticPosition(systemModel.coordinates)
+                position: starSystemDatabase.getSystemGalacticPosition(systemModel.coordinates),
             };
         });
     }
@@ -77,7 +78,7 @@ export class StarSectorView {
             return {
                 coordinates: model.coordinates,
                 sectorString: sectorString,
-                position: position
+                position: position,
             };
         });
     }
@@ -97,8 +98,8 @@ export class StarSectorView {
             Matrix.Translation(
                 position.x + globalNodePosition.x,
                 position.y + globalNodePosition.y,
-                position.z + globalNodePosition.z
-            )
+                position.z + globalNodePosition.z,
+            ),
         );
     }
 }

@@ -15,22 +15,24 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import lensFlareFragment from "../../shaders/lensflare.glsl";
+import { Camera } from "@babylonjs/core/Cameras/camera";
+import { Constants } from "@babylonjs/core/Engines/constants";
 import { Effect } from "@babylonjs/core/Materials/effect";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { Color3, Matrix } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
-import { Color3, Matrix } from "@babylonjs/core/Maths/math";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
-import { ObjectUniformNames, setObjectUniforms } from "./uniforms/objectUniforms";
-import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms";
-import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUniforms";
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { Constants } from "@babylonjs/core/Engines/constants";
-import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Scene } from "@babylonjs/core/scene";
+
 import { moveTowards } from "../utils/math";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms";
+import { ObjectUniformNames, setObjectUniforms } from "./uniforms/objectUniforms";
+import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUniforms";
+
+import lensFlareFragment from "@shaders/lensflare.glsl";
 
 export type LensFlareSettings = {
     visibility: number;
@@ -52,20 +54,20 @@ export class LensFlarePostProcess extends PostProcess {
         const settings: LensFlareSettings = {
             visibility: 1,
             behindCamera: false,
-            clipPosition: new Vector3()
+            clipPosition: new Vector3(),
         };
 
         const LensFlareUniformNames = {
             FLARE_COLOR: "flareColor",
             CLIP_POSITION: "clipPosition",
             VISIBILITY: "visibility",
-            ASPECT_RATIO: "aspectRatio"
+            ASPECT_RATIO: "aspectRatio",
         };
 
         const uniforms: string[] = [
             ...Object.values(ObjectUniformNames),
             ...Object.values(CameraUniformNames),
-            ...Object.values(LensFlareUniformNames)
+            ...Object.values(LensFlareUniformNames),
         ];
 
         const samplers: string[] = Object.values(SamplerUniformNames);
@@ -81,7 +83,7 @@ export class LensFlarePostProcess extends PostProcess {
             scene.getEngine(),
             false,
             null,
-            Constants.TEXTURETYPE_HALF_FLOAT
+            Constants.TEXTURETYPE_HALF_FLOAT,
         );
 
         this.settings = settings;
@@ -106,7 +108,7 @@ export class LensFlarePostProcess extends PostProcess {
                 stellarTransform.getAbsolutePosition(),
                 Matrix.IdentityReadOnly,
                 scene.getTransformMatrix(),
-                this.activeCamera.viewport
+                this.activeCamera.viewport,
             );
             settings.behindCamera = clipPosition.z < 0;
             effect.setVector3(LensFlareUniformNames.CLIP_POSITION, clipPosition);

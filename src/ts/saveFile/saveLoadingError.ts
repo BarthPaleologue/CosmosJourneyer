@@ -16,12 +16,13 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { z } from "zod";
+
 import i18n from "../i18n";
 
 export const enum SaveLoadingErrorType {
     INVALID_JSON = "INVALID_JSON",
     INVALID_SAVE = "INVALID_SAVE",
-    INVALID_STORAGE_FORMAT = "INVALID_STORAGE_FORMAT"
+    INVALID_STORAGE_FORMAT = "INVALID_STORAGE_FORMAT",
 }
 
 export type SaveLoadingError =

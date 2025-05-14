@@ -15,13 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
+
+import { StarSystemDatabase } from "../../../starSystem/starSystemDatabase";
+import { MissionContext } from "../../missionContext";
+import type { MissionNode } from "../missionNode";
+import { MissionNodeBase } from "../missionNodeBase";
 import { MissionXorNodeSerialized } from "../missionNodeSerialized";
 import { MissionNodeType } from "../missionNodeType";
-import { MissionNodeBase } from "../missionNodeBase";
-import { MissionContext } from "../../missionContext";
-import { StarSystemCoordinates } from "../../../utils/coordinates/starSystemCoordinates";
-import { StarSystemDatabase } from "../../../starSystem/starSystemDatabase";
-import type { MissionNode } from "../missionNode";
 
 /**
  * Node used to describe a set of tasks where only one must be completed.
@@ -68,7 +69,7 @@ export class MissionXorNode implements MissionNodeBase<MissionNodeType.XOR> {
     describeNextTask(
         context: MissionContext,
         keyboardLayout: Map<string, string>,
-        starSystemDatabase: StarSystemDatabase
+        starSystemDatabase: StarSystemDatabase,
     ): string {
         if (this.hasCompletedLock) return "Mission completed";
         return this.children
@@ -83,7 +84,7 @@ export class MissionXorNode implements MissionNodeBase<MissionNodeType.XOR> {
     serialize(): MissionXorNodeSerialized {
         return {
             type: MissionNodeType.XOR,
-            children: this.children.map((child) => child.serialize())
+            children: this.children.map((child) => child.serialize()),
         };
     }
 }

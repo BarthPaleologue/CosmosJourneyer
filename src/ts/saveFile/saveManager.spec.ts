@@ -16,13 +16,14 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { describe, expect, it, vi } from "vitest";
-import { SaveBackend, SaveManager } from "./saveManager";
-import { CmdrSaves } from "./saveFileData";
-import { err, ok, Result } from "../utils/types";
+
 import { SerializedPlayerSchema } from "../player/serializedPlayer";
-import { SaveLoadingErrorType, SaveLoadingError } from "./saveLoadingError";
 import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { err, ok, Result } from "../utils/types";
+import { CmdrSaves } from "./saveFileData";
+import { SaveLoadingError, SaveLoadingErrorType } from "./saveLoadingError";
+import { SaveBackend, SaveManager } from "./saveManager";
 
 /**
  * Mock implementation of SaveBackend for testing
@@ -72,15 +73,15 @@ describe("SaveManager", () => {
                                 starSectorZ: 0,
                                 localX: 0,
                                 localY: 0,
-                                localZ: 0
+                                localZ: 0,
                             },
-                            idInSystem: "0"
-                        }
+                            idInSystem: "0",
+                        },
                     },
-                    shipLocations: {}
-                }
+                    shipLocations: {},
+                },
             ],
-            auto: []
+            auto: [],
         },
         cmdr2: {
             manual: [],
@@ -99,15 +100,15 @@ describe("SaveManager", () => {
                                 starSectorZ: 0,
                                 localX: 0,
                                 localY: 0,
-                                localZ: 0
+                                localZ: 0,
                             },
-                            idInSystem: "0"
-                        }
+                            idInSystem: "0",
+                        },
                     },
-                    shipLocations: {}
-                }
-            ]
-        }
+                    shipLocations: {},
+                },
+            ],
+        },
     };
 
     describe("Create", () => {

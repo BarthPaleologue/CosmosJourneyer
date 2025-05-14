@@ -15,24 +15,25 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Sound } from "@babylonjs/core/Audio/sound";
-import { ISoundOptions } from "@babylonjs/core/Audio/Interfaces/ISoundOptions";
 import "@babylonjs/core/Audio/audioEngine";
 import "@babylonjs/core/Audio/audioSceneComponent";
 
-import wanderingPath from "../../asset/sound/music/455855__andrewkn__wandering.mp3";
-import straussBlueDanubePath from "../../asset/sound/music/Strauss_The_Blue_Danube_Waltz.ogg";
-import deepRelaxationPath from "../../asset/sound/music/Deep_Relaxation.ogg";
-import atlanteanTwilightPath from "../../asset/sound/music/Atlantean_Twilight.mp3";
-import infinitePerspectivePath from "../../asset/sound/music/Infinite_Perspective.ogg";
-import thatZenMomentPath from "../../asset/sound/music/That_Zen_Moment.ogg";
-import echoesOfTimePath from "../../asset/sound/music/Echoes_of_Time_v2.ogg";
-import peaceOfMindPath from "../../asset/sound/music/Peace_of_Mind.ogg";
-import spacialWindsPath from "../../asset/sound/music/Horror_Spacial_Winds.mp3";
-import mesmerizePath from "../../asset/sound/music/Mesmerize.ogg";
-import reawakeningPath from "../../asset/sound/music/Reawakening.mp3";
-import equatorialComplexPath from "../../asset/sound/music/Equatorial-Complex.ogg";
-import soaringPath from "../../asset/sound/music/Soaring.ogg";
+import { ISoundOptions } from "@babylonjs/core/Audio/Interfaces/ISoundOptions";
+import { Sound } from "@babylonjs/core/Audio/sound";
+
+import wanderingPath from "@assets/sound/music/455855__andrewkn__wandering.mp3";
+import atlanteanTwilightPath from "@assets/sound/music/Atlantean_Twilight.mp3";
+import deepRelaxationPath from "@assets/sound/music/Deep_Relaxation.ogg";
+import echoesOfTimePath from "@assets/sound/music/Echoes_of_Time_v2.ogg";
+import equatorialComplexPath from "@assets/sound/music/Equatorial-Complex.ogg";
+import spacialWindsPath from "@assets/sound/music/Horror_Spacial_Winds.mp3";
+import infinitePerspectivePath from "@assets/sound/music/Infinite_Perspective.ogg";
+import mesmerizePath from "@assets/sound/music/Mesmerize.ogg";
+import peaceOfMindPath from "@assets/sound/music/Peace_of_Mind.ogg";
+import reawakeningPath from "@assets/sound/music/Reawakening.mp3";
+import soaringPath from "@assets/sound/music/Soaring.ogg";
+import straussBlueDanubePath from "@assets/sound/music/Strauss_The_Blue_Danube_Waltz.ogg";
+import thatZenMomentPath from "@assets/sound/music/That_Zen_Moment.ogg";
 
 export type Musics = {
     readonly wandering: Sound;
@@ -51,7 +52,7 @@ export type Musics = {
 };
 
 export async function loadMusics(
-    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void
+    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void,
 ): Promise<Musics> {
     let loadedCount = 0;
     let totalCount = 0;
@@ -65,7 +66,7 @@ export async function loadMusics(
                 () => {
                     resolve(sound);
                 },
-                options
+                options,
             );
         });
         totalCount++;
@@ -103,6 +104,6 @@ export async function loadMusics(
         mesmerize: await mesmerizePromise,
         reawakening: await reawakeningPromise,
         equatorialComplex: await equatorialComplexPromise,
-        soaring: await soaringPromise
+        soaring: await soaringPromise,
     };
 }

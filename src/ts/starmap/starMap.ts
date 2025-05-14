@@ -15,47 +15,49 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import starTexture from "../../asset/textures/starParticle.png";
-import blackHoleTexture from "../../asset/textures/blackholeParticleSmall.png";
+import "@babylonjs/core/Animations/animatable";
+import "@babylonjs/core/Culling/ray";
 
-import { BuildData, StarSectorView, vector3ToString } from "./starSectorView";
-import { StarMapUI } from "./starMapUI";
-import { Scene } from "@babylonjs/core/scene";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
-import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
-import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { ActionManager } from "@babylonjs/core/Actions/actionManager";
 import { ExecuteCodeAction } from "@babylonjs/core/Actions/directActions";
 import { Animation } from "@babylonjs/core/Animations/animation";
+import { Camera } from "@babylonjs/core/Cameras/camera";
+import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { Observable } from "@babylonjs/core/Misc/observable";
 import { DefaultRenderingPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/Pipelines/defaultRenderingPipeline";
-import "@babylonjs/core/Animations/animatable";
-import "@babylonjs/core/Culling/ray";
+import { Scene } from "@babylonjs/core/scene";
+
+import { OrbitalObjectType } from "../architecture/orbitalObjectType";
+import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
+import { Player } from "../player/player";
+import { Settings } from "../settings";
+import { EncyclopaediaGalactica } from "../society/encyclopaediaGalactica";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { CameraRadiusAnimation } from "../uberCore/transforms/animations/radius";
 import { TransformRotationAnimation } from "../uberCore/transforms/animations/rotation";
 import { TransformTranslationAnimation } from "../uberCore/transforms/animations/translation";
 import { translate } from "../uberCore/transforms/basicTransform";
-import { ThickLines } from "../utils/thickLines";
-import { Observable } from "@babylonjs/core/Misc/observable";
-import { View } from "../utils/view";
-import { StarMapInputs } from "./starMapInputs";
-import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
-import { StarMapControls } from "./starMapControls";
-import { CameraRadiusAnimation } from "../uberCore/transforms/animations/radius";
-import { Camera } from "@babylonjs/core/Cameras/camera";
-import { StellarPathfinder } from "./stellarPathfinder";
-import { createNotification, NotificationIntent, NotificationOrigin } from "../utils/notification";
-import { Player } from "../player/player";
-import { Settings } from "../settings";
-import { getRgbFromTemperature } from "../utils/specrend";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/starSystemCoordinates";
-import { OrbitalObjectType } from "../architecture/orbitalObjectType";
-import { EncyclopaediaGalactica } from "../society/encyclopaediaGalactica";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { alertModal } from "../utils/dialogModal";
-import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
+import { createNotification, NotificationIntent, NotificationOrigin } from "../utils/notification";
+import { getRgbFromTemperature } from "../utils/specrend";
+import { ThickLines } from "../utils/thickLines";
+import { View } from "../utils/view";
+import { StarMapControls } from "./starMapControls";
+import { StarMapInputs } from "./starMapInputs";
+import { StarMapUI } from "./starMapUI";
+import { BuildData, StarSectorView, vector3ToString } from "./starSectorView";
+import { StellarPathfinder } from "./stellarPathfinder";
+
+import blackHoleTexture from "@assets/textures/blackholeParticleSmall.png";
+import starTexture from "@assets/textures/starParticle.png";
 
 // register cosmos journeyer as part of window object
 declare global {
@@ -126,7 +128,7 @@ export class StarMap implements View {
         "instancedBuffers.color.a",
         60,
         Animation.ANIMATIONTYPE_FLOAT,
-        Animation.ANIMATIONLOOPMODE_CYCLE
+        Animation.ANIMATIONLOOPMODE_CYCLE,
     );
     private static readonly FADE_OUT_DURATION = 1000;
 
@@ -135,7 +137,7 @@ export class StarMap implements View {
         "instancedBuffers.color.a",
         60,
         Animation.ANIMATIONTYPE_FLOAT,
-        Animation.ANIMATIONLOOPMODE_CYCLE
+        Animation.ANIMATIONLOOPMODE_CYCLE,
     );
     private static readonly FADE_IN_DURATION = 1000;
 
@@ -144,7 +146,7 @@ export class StarMap implements View {
         "instancedBuffers.color.a",
         60,
         Animation.ANIMATIONTYPE_FLOAT,
-        Animation.ANIMATIONLOOPMODE_CYCLE
+        Animation.ANIMATIONLOOPMODE_CYCLE,
     );
     private static readonly SHIMMER_DURATION = 1000;
 
@@ -155,7 +157,7 @@ export class StarMap implements View {
         engine: AbstractEngine,
         encyclopaedia: EncyclopaediaGalactica,
         starSystemDatabase: StarSystemDatabase,
-        soundPlayer: ISoundPlayer
+        soundPlayer: ISoundPlayer,
     ) {
         this.scene = new Scene(engine);
         this.scene.clearColor = new Color4(0, 0, 0, 1);
@@ -204,7 +206,7 @@ export class StarMap implements View {
             if (warpDrive === null) {
                 await alertModal(
                     "Your current spaceship has no warp drive! Install a warp drive to plot an itinerary.",
-                    this.soundPlayer
+                    this.soundPlayer,
                 );
                 return;
             }
@@ -264,38 +266,38 @@ export class StarMap implements View {
         StarMap.FADE_OUT_ANIMATION.setKeys([
             {
                 frame: 0,
-                value: 1
+                value: 1,
             },
             {
                 frame: StarMap.FADE_OUT_DURATION / 60,
-                value: 0
-            }
+                value: 0,
+            },
         ]);
 
         StarMap.FADE_IN_ANIMATION.setKeys([
             {
                 frame: 0,
-                value: 0
+                value: 0,
             },
             {
                 frame: StarMap.FADE_IN_DURATION / 60,
-                value: 1
-            }
+                value: 1,
+            },
         ]);
 
         StarMap.SHIMMER_ANIMATION.setKeys([
             {
                 frame: 0,
-                value: 1.0
+                value: 1.0,
             },
             {
                 frame: StarMap.SHIMMER_DURATION / 60 / 2,
-                value: 1.4
+                value: 1.4,
             },
             {
                 frame: StarMap.SHIMMER_DURATION / 60,
-                value: 1.0
-            }
+                value: 1.0,
+            },
         ]);
 
         this.travelLine = new ThickLines(
@@ -303,9 +305,9 @@ export class StarMap implements View {
             {
                 points: [],
                 thickness: 0.05,
-                color: Color3.Red()
+                color: Color3.Red(),
             },
-            this.scene
+            this.scene,
         );
 
         // then generate missing star sectors
@@ -363,7 +365,7 @@ export class StarMap implements View {
                         NotificationIntent.ERROR,
                         `Could not find a path to the target system after ${pathfinderMaxIterations} iterations`,
                         5000,
-                        this.soundPlayer
+                        this.soundPlayer,
                     );
                 }
             }
@@ -403,7 +405,7 @@ export class StarMap implements View {
         this.currentStarSectorCoordinates = new Vector3(
             Math.round(this.cameraPositionToCenter.x / Settings.STAR_SECTOR_SIZE),
             Math.round(this.cameraPositionToCenter.y / Settings.STAR_SECTOR_SIZE),
-            Math.round(this.cameraPositionToCenter.z / Settings.STAR_SECTOR_SIZE)
+            Math.round(this.cameraPositionToCenter.z / Settings.STAR_SECTOR_SIZE),
         );
     }
 
@@ -440,7 +442,7 @@ export class StarMap implements View {
         const sectorCoordinates = new Vector3(
             starSystemCoordinates.starSectorX,
             starSystemCoordinates.starSectorY,
-            starSystemCoordinates.starSectorZ
+            starSystemCoordinates.starSectorZ,
         );
 
         if (this.loadedStarSectors.has(vector3ToString(sectorCoordinates))) {
@@ -525,7 +527,7 @@ export class StarMap implements View {
             // don't generate star sectors that are not in the frustum
             const bb = StarSectorView.GetBoundingBox(
                 coordinates.scale(Settings.STAR_SECTOR_SIZE),
-                this.starMapCenterPosition
+                this.starMapCenterPosition,
             );
             if (!activeCamera.isInFrustum(bb)) continue;
 
@@ -555,7 +557,7 @@ export class StarMap implements View {
         const starSystemModel = this.starSystemDatabase.getSystemModelFromCoordinates(starSystemCoordinates);
         if (starSystemModel === null) {
             throw new Error(
-                `Could not find star system model for coordinates ${JSON.stringify(starSystemCoordinates)}`
+                `Could not find star system model for coordinates ${JSON.stringify(starSystemCoordinates)}`,
             );
         }
 
@@ -605,13 +607,13 @@ export class StarMap implements View {
             new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, () => {
                 this.starMapUI.setHoveredSystem(starSystemCoordinates);
                 this.soundPlayer.playNow(SoundType.HOVER);
-            })
+            }),
         );
 
         initializedInstance.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, () => {
                 this.starMapUI.setHoveredSystem(null);
-            })
+            }),
         );
 
         initializedInstance.actionManager.registerAction(
@@ -623,7 +625,7 @@ export class StarMap implements View {
                 this.selectedSystemCoordinates = starSystemCoordinates;
 
                 this.focusOnSystem(starSystemCoordinates);
-            })
+            }),
         );
 
         this.fadeIn(initializedInstance);
@@ -647,7 +649,7 @@ export class StarMap implements View {
             .add(this.starMapCenterPosition);
 
         const cameraDir = this.controls.thirdPersonCamera.getDirection(
-            Vector3.Forward(this.scene.useRightHandedSystem)
+            Vector3.Forward(this.scene.useRightHandedSystem),
         );
 
         const cameraToStarDir = starSystemPosition.subtract(this.controls.thirdPersonCamera.globalPosition).normalize();
@@ -666,7 +668,7 @@ export class StarMap implements View {
                 this.controls.getTransform(),
                 rotationAxis,
                 rotationAngle,
-                animationDurationSeconds
+                animationDurationSeconds,
             );
         }
 
@@ -685,7 +687,7 @@ export class StarMap implements View {
             this.translationAnimation = new TransformTranslationAnimation(
                 this.controls.getTransform(),
                 targetPosition,
-                animationDurationSeconds
+                animationDurationSeconds,
             );
         }
 
@@ -695,7 +697,7 @@ export class StarMap implements View {
             this.radiusAnimation = new CameraRadiusAnimation(
                 this.controls.thirdPersonCamera,
                 targetRadius,
-                animationDurationSeconds
+                animationDurationSeconds,
             );
         }
 
@@ -703,7 +705,7 @@ export class StarMap implements View {
         const starSystemModel = this.starSystemDatabase.getSystemModelFromCoordinates(starSystemCoordinates);
         if (starSystemModel === null)
             throw new Error(
-                `Could not find star system model for coordinates ${JSON.stringify(starSystemCoordinates)}`
+                `Could not find star system model for coordinates ${JSON.stringify(starSystemCoordinates)}`,
             );
         this.starMapUI.setSelectedSystem(starSystemModel, this.currentSystemCoordinates);
         this.starMapUI.setHoveredSystem(null);

@@ -15,17 +15,20 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { parseSpeed } from "../utils/strings/parseToStrings";
-import { TransformNode } from "@babylonjs/core/Meshes";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Matrix } from "@babylonjs/core/Maths/math";
-import { Player } from "../player/player";
-import { CurrentMissionDisplay } from "./currentMissionDisplay";
-import { MissionContext } from "../missions/missionContext";
-import { smoothstep } from "../utils/math";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-import canisterIconPath from "../../asset/icons/fuel_canister.webp";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { TransformNode } from "@babylonjs/core/Meshes";
+
+import { smoothstep } from "@/utils/math";
+import { parseSpeed } from "@/utils/strings/parseToStrings";
+
 import { ISoundPlayer } from "../audio/soundPlayer";
+import { MissionContext } from "../missions/missionContext";
+import { Player } from "../player/player";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { CurrentMissionDisplay } from "./currentMissionDisplay";
+
+import canisterIconPath from "@assets/icons/fuel_canister.webp";
 
 export class SpaceShipLayer {
     readonly root: HTMLElement;
@@ -95,7 +98,7 @@ export class SpaceShipLayer {
             this.cursor.style.transform = `translate(-50%, -50%) rotate(${Math.PI / 2 + theta}rad)`;
 
             const distanceToCenter = Math.sqrt(
-                (event.clientX - window.innerWidth / 2) ** 2 + (event.clientY - window.innerHeight / 2) ** 2
+                (event.clientX - window.innerWidth / 2) ** 2 + (event.clientY - window.innerHeight / 2) ** 2,
             );
             const normalizedDistance = Math.min(distanceToCenter / Math.min(window.innerWidth, window.innerHeight), 1);
 
@@ -128,7 +131,7 @@ export class SpaceShipLayer {
         currentControls: TransformNode,
         missionContext: MissionContext,
         keyboardLayout: Map<string, string>,
-        starSystemDatabase: StarSystemDatabase
+        starSystemDatabase: StarSystemDatabase,
     ) {
         if (this.currentTarget !== null) {
             const directionWorld = this.currentTarget
@@ -137,7 +140,7 @@ export class SpaceShipLayer {
                 .normalize();
             const directionLocal = Vector3.TransformNormal(
                 directionWorld,
-                Matrix.Invert(currentControls.getWorldMatrix())
+                Matrix.Invert(currentControls.getWorldMatrix()),
             );
 
             // set class of targetDot based on sign of directionLocal.z
@@ -164,7 +167,7 @@ export class SpaceShipLayer {
         this.fuelIndicator.style.setProperty("--currentFuelLevel", `${(fuelRemainingFraction * 100).toFixed(0)}%`);
         this.fuelIndicator.style.setProperty(
             "--fuelLevelAfterJump",
-            `${((fuelRemainingFraction - nextJumpFuelFraction) * 100).toFixed(0)}%`
+            `${((fuelRemainingFraction - nextJumpFuelFraction) * 100).toFixed(0)}%`,
         );
     }
 

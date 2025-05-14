@@ -15,16 +15,17 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { factionToString } from "../../society/factions";
-import { CropType, cropTypeToString } from "../../utils/agriculture";
-import { makeD3PieChart } from "../../utils/d3PieChart";
-import { getOrbitalPeriod } from "../../orbit/orbit";
+import { CropType, cropTypeToString } from "@/utils/agriculture";
+import { makeD3PieChart } from "@/utils/d3PieChart";
+import { DeepReadonly } from "@/utils/types";
+
 import { OrbitalFacilityModel, OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
-import { DeepReadonly } from "../../utils/types";
+import { getOrbitalPeriod } from "../../orbit/orbit";
+import { factionToString } from "../../society/factions";
 
 export function generateInfoHTML(
     model: DeepReadonly<OrbitalFacilityModel>,
-    parentModels: DeepReadonly<Array<OrbitalObjectModel>>
+    parentModels: DeepReadonly<Array<OrbitalObjectModel>>,
 ): string {
     const agricultureMix = model.agricultureMix;
 
@@ -49,7 +50,7 @@ export function generateInfoHTML(
         ${makeD3PieChart<[number, CropType]>(
             agricultureMix,
             ([proportion]) => proportion,
-            ([, cropType]) => cropTypeToString(cropType)
+            ([, cropType]) => cropTypeToString(cropType),
         )}
     `;
 }

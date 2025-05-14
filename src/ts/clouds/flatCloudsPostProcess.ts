@@ -15,22 +15,23 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import flatCloudsFragment from "../../shaders/flatCloudsFragment.glsl";
-
+import { Camera } from "@babylonjs/core/Cameras/camera";
+import { Constants } from "@babylonjs/core/Engines/constants";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Effect } from "@babylonjs/core/Materials/effect";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
+import { Scene } from "@babylonjs/core/scene";
+
+import { CameraUniformNames, setCameraUniforms } from "../postProcesses/uniforms/cameraUniforms";
+import { ObjectUniformNames, setObjectUniforms } from "../postProcesses/uniforms/objectUniforms";
+import { SamplerUniformNames, setSamplerUniforms } from "../postProcesses/uniforms/samplerUniforms";
+import { setStellarObjectUniforms, StellarObjectUniformNames } from "../postProcesses/uniforms/stellarObjectUniforms";
 import { UpdatablePostProcess } from "../postProcesses/updatablePostProcess";
 import { CloudsSamplerNames, CloudsUniformNames, CloudsUniforms } from "./cloudsUniforms";
-import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
-import { Camera } from "@babylonjs/core/Cameras/camera";
-import { ObjectUniformNames, setObjectUniforms } from "../postProcesses/uniforms/objectUniforms";
-import { setStellarObjectUniforms, StellarObjectUniformNames } from "../postProcesses/uniforms/stellarObjectUniforms";
-import { CameraUniformNames, setCameraUniforms } from "../postProcesses/uniforms/cameraUniforms";
-import { SamplerUniformNames, setSamplerUniforms } from "../postProcesses/uniforms/samplerUniforms";
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { Constants } from "@babylonjs/core/Engines/constants";
-import { Scene } from "@babylonjs/core/scene";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { PointLight } from "@babylonjs/core/Lights/pointLight";
+
+import flatCloudsFragment from "@shaders/flatCloudsFragment.glsl";
 
 export class FlatCloudsPostProcess extends PostProcess implements UpdatablePostProcess {
     readonly cloudUniforms: CloudsUniforms;
@@ -42,7 +43,7 @@ export class FlatCloudsPostProcess extends PostProcess implements UpdatablePostP
         boundingRadius: number,
         cloudUniforms: CloudsUniforms,
         stellarObjects: ReadonlyArray<PointLight>,
-        scene: Scene
+        scene: Scene,
     ) {
         const shaderName = "flatClouds";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
@@ -53,7 +54,7 @@ export class FlatCloudsPostProcess extends PostProcess implements UpdatablePostP
             ...Object.values(ObjectUniformNames),
             ...Object.values(StellarObjectUniformNames),
             ...Object.values(CameraUniformNames),
-            ...Object.values(CloudsUniformNames)
+            ...Object.values(CloudsUniformNames),
         ];
 
         const samplers: string[] = [...Object.values(SamplerUniformNames), ...Object.values(CloudsSamplerNames)];
@@ -69,7 +70,7 @@ export class FlatCloudsPostProcess extends PostProcess implements UpdatablePostP
             scene.getEngine(),
             false,
             null,
-            Constants.TEXTURETYPE_HALF_FLOAT
+            Constants.TEXTURETYPE_HALF_FLOAT,
         );
 
         this.cloudUniforms = cloudUniforms;

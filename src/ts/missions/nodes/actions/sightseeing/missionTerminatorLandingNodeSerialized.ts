@@ -15,20 +15,22 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { MissionNodeType } from "../../missionNodeType";
-import { UniverseObjectIdSchema } from "../../../../utils/coordinates/universeObjectId";
 import { z } from "zod";
+
+import { UniverseObjectIdSchema } from "@/utils/coordinates/universeObjectId";
+
+import { MissionNodeType } from "../../missionNodeType";
 
 export enum LandMissionState {
     NOT_IN_SYSTEM,
     TOO_FAR_IN_SYSTEM,
-    LANDED
+    LANDED,
 }
 
 export const MissionTerminatorLandingNodeSerializedSchema = z.object({
     type: z.literal(MissionNodeType.TERMINATOR_LANDING),
     objectId: UniverseObjectIdSchema,
-    state: z.nativeEnum(LandMissionState)
+    state: z.nativeEnum(LandMissionState),
 });
 
 export type MissionTerminatorLandingNodeSerialized = z.infer<typeof MissionTerminatorLandingNodeSerializedSchema>;

@@ -30,7 +30,7 @@ export const enum OrbitalObjectType {
     DARK_KNIGHT = 2005,
     SPACE_STATION = 3000,
     SPACE_ELEVATOR = 3001,
-    CUSTOM = 4242
+    CUSTOM = 4242,
 }
 
 export function getOrbitalObjectTypeStringId(type: OrbitalObjectType): string {

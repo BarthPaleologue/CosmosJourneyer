@@ -15,23 +15,24 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Camera } from "@babylonjs/core/Cameras/camera";
+import { Constants } from "@babylonjs/core/Engines/constants";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Effect } from "@babylonjs/core/Materials/effect";
-
-import oceanFragment from "../../shaders/oceanFragment.glsl";
-import { UpdatablePostProcess } from "../postProcesses/updatablePostProcess";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
+import { Scene } from "@babylonjs/core/scene";
+
+import { WaterTextures } from "../assets/textures";
 import { CameraUniformNames, setCameraUniforms } from "../postProcesses/uniforms/cameraUniforms";
-import { setStellarObjectUniforms, StellarObjectUniformNames } from "../postProcesses/uniforms/stellarObjectUniforms";
 import { ObjectUniformNames, setObjectUniforms } from "../postProcesses/uniforms/objectUniforms";
 import { SamplerUniformNames, setSamplerUniforms } from "../postProcesses/uniforms/samplerUniforms";
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { Constants } from "@babylonjs/core/Engines/constants";
-import { Camera } from "@babylonjs/core/Cameras/camera";
-import { Scene } from "@babylonjs/core/scene";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { setStellarObjectUniforms, StellarObjectUniformNames } from "../postProcesses/uniforms/stellarObjectUniforms";
+import { UpdatablePostProcess } from "../postProcesses/updatablePostProcess";
 import { OceanUniforms } from "./oceanUniforms";
-import { PointLight } from "@babylonjs/core/Lights/pointLight";
-import { WaterTextures } from "../assets/textures";
+
+import oceanFragment from "@shaders/oceanFragment.glsl";
 
 export class OceanPostProcess extends PostProcess implements UpdatablePostProcess {
     readonly planetTransform: TransformNode;
@@ -46,7 +47,7 @@ export class OceanPostProcess extends PostProcess implements UpdatablePostProces
         oceanUniforms: OceanUniforms,
         stellarObjects: ReadonlyArray<PointLight>,
         oceanTextures: WaterTextures,
-        scene: Scene
+        scene: Scene,
     ) {
         const shaderName = "ocean";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
@@ -57,7 +58,7 @@ export class OceanPostProcess extends PostProcess implements UpdatablePostProces
             ...Object.values(CameraUniformNames),
             ...Object.values(StellarObjectUniformNames),
             ...Object.values(ObjectUniformNames),
-            ...oceanUniforms.getUniformNames()
+            ...oceanUniforms.getUniformNames(),
         ];
 
         const samplers: string[] = [...Object.values(SamplerUniformNames), ...oceanUniforms.getSamplerNames()];
@@ -73,7 +74,7 @@ export class OceanPostProcess extends PostProcess implements UpdatablePostProces
             scene.getEngine(),
             false,
             null,
-            Constants.TEXTURETYPE_HALF_FLOAT
+            Constants.TEXTURETYPE_HALF_FLOAT,
         );
 
         this.planetTransform = planetTransform;

@@ -15,36 +15,38 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Direction } from "../../utils/direction";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { TelluricPlanetMaterial } from "./telluricPlanetMaterial";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { ChunkTree } from "./terrain/chunks/chunkTree";
-import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
-import { ChunkForge } from "./terrain/chunks/chunkForge";
-import { PlanetaryMassObjectBase } from "../../architecture/planetaryMassObject";
-import { Cullable } from "../../utils/cullable";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
-import { RingsUniforms } from "../../rings/ringsUniform";
-import { CloudsUniforms } from "../../clouds/cloudsUniforms";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Scene } from "@babylonjs/core/scene";
-import { AsteroidField } from "../../asteroidFields/asteroidField";
-import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
+
+import { Cullable } from "@/utils/cullable";
+import { Direction } from "@/utils/direction";
+import { ItemPool } from "@/utils/itemPool";
+import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
+import { DeepReadonly } from "@/utils/types";
+
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
+import { PlanetaryMassObjectBase } from "../../architecture/planetaryMassObject";
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
+import { RenderingAssets } from "../../assets/renderingAssets";
+import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { AtmosphereUniforms } from "../../atmosphere/atmosphereUniforms";
-import { Settings } from "../../settings";
+import { CloudsLut } from "../../clouds/cloudsLut";
+import { CloudsUniforms } from "../../clouds/cloudsUniforms";
 import { OceanUniforms } from "../../ocean/oceanUniforms";
+import { RingsLut } from "../../rings/ringsLut";
+import { RingsUniforms } from "../../rings/ringsUniform";
+import { Settings } from "../../settings";
+import { TelluricPlanetMaterial } from "./telluricPlanetMaterial";
 import { TelluricPlanetModel } from "./telluricPlanetModel";
 import { TelluricSatelliteModel } from "./telluricSatelliteModel";
-import { DeepReadonly } from "../../utils/types";
-import { PointLight } from "@babylonjs/core/Lights/pointLight";
-import { ItemPool } from "../../utils/itemPool";
-import { RingsLut } from "../../rings/ringsLut";
-import { CloudsLut } from "../../clouds/cloudsLut";
-import { RenderingAssets } from "../../assets/renderingAssets";
+import { ChunkForge } from "./terrain/chunks/chunkForge";
+import { ChunkTree } from "./terrain/chunks/chunkTree";
 
 export class TelluricPlanet
     implements
@@ -81,7 +83,7 @@ export class TelluricPlanet
     constructor(
         model: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>,
         assets: RenderingAssets,
-        scene: Scene
+        scene: Scene,
     ) {
         this.model = model;
 
@@ -95,9 +97,9 @@ export class TelluricPlanet
             PhysicsShapeType.CONTAINER,
             {
                 mass: 0,
-                restitution: 0.2
+                restitution: 0.2,
             },
-            scene
+            scene,
         );
         this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
         this.aggregate.body.disablePreStep = false;
@@ -123,7 +125,7 @@ export class TelluricPlanet
                 this.model.rings,
                 Settings.RINGS_FADE_OUT_DISTANCE,
                 assets.textures.pools.ringsLut,
-                scene
+                scene,
             );
 
             const averageRadius = (this.model.radius * (this.model.rings.ringStart + this.model.rings.ringEnd)) / 2;
@@ -133,7 +135,7 @@ export class TelluricPlanet
                 this.getTransform(),
                 averageRadius,
                 spread,
-                scene
+                scene,
             );
         } else {
             this.ringsUniforms = null;
@@ -150,7 +152,7 @@ export class TelluricPlanet
             this.model,
             assets.textures.terrains,
             assets.textures.pools.telluricPlanetMaterialLut,
-            scene
+            scene,
         );
 
         this.sides = [
@@ -159,7 +161,7 @@ export class TelluricPlanet
             new ChunkTree(Direction.FORWARD, this.model, this.aggregate, this.material, scene),
             new ChunkTree(Direction.BACKWARD, this.model, this.aggregate, this.material, scene),
             new ChunkTree(Direction.RIGHT, this.model, this.aggregate, this.material, scene),
-            new ChunkTree(Direction.LEFT, this.model, this.aggregate, this.material, scene)
+            new ChunkTree(Direction.LEFT, this.model, this.aggregate, this.material, scene),
         ];
 
         this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());

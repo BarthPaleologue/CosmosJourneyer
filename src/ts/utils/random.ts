@@ -68,7 +68,7 @@ export function pickPseudoRandomItems<T>(
     items: T[],
     nbItemsToPick: number,
     rng: (index: number) => number,
-    baseIndex: number
+    baseIndex: number,
 ): T[] {
     const itemsCopy = Array.from(items);
     const results: T[] = [];

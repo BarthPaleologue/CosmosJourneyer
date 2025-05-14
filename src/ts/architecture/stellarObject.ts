@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { CelestialBodyBase } from "./celestialBody";
-import { OrbitalObjectType } from "./orbitalObjectType";
 import { LightEmitter } from "./lightEmitter";
+import { OrbitalObjectType } from "./orbitalObjectType";
 
 export interface StellarObjectBase<T extends OrbitalObjectType> extends CelestialBodyBase<T>, LightEmitter {}

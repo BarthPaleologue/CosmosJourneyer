@@ -15,25 +15,26 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { UberScene } from "../uberCore/uberScene";
-import { DefaultControls } from "../defaultControls/defaultControls";
-import { StarSystemView } from "../starSystem/starSystemView";
-import { positionNearObjectAsteroidField, positionNearObjectWithStarVisible } from "../utils/positionNearObject";
-import { getForwardDirection } from "../uberCore/transforms/basicTransform";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Observable } from "@babylonjs/core/Misc/observable";
+
+import packageInfo from "../../../package.json";
+import { OrbitalObjectType } from "../architecture/orbitalObjectType";
+import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
+import { DefaultControls } from "../defaultControls/defaultControls";
+import i18n from "../i18n";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { StarSystemModel } from "../starSystem/starSystemModel";
+import { StarSystemView } from "../starSystem/starSystemView";
 import { TransformRotationAnimation } from "../uberCore/transforms/animations/rotation";
 import { TransformTranslationAnimation } from "../uberCore/transforms/animations/translation";
-import { Observable } from "@babylonjs/core/Misc/observable";
-import packageInfo from "../../../package.json";
-import i18n from "../i18n";
-import { PanelType, SidePanels } from "./sidePanels";
-import { StarSystemModel } from "../starSystem/starSystemModel";
-import { OrbitalObjectType } from "../architecture/orbitalObjectType";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-import { getUniverseObjectId, UniverseObjectId } from "../utils/coordinates/universeObjectId";
-import { DeepReadonly } from "../utils/types";
+import { getForwardDirection } from "../uberCore/transforms/basicTransform";
+import { UberScene } from "../uberCore/uberScene";
 import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
-import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
+import { getUniverseObjectId, UniverseObjectId } from "../utils/coordinates/universeObjectId";
+import { positionNearObjectAsteroidField, positionNearObjectWithStarVisible } from "../utils/positionNearObject";
+import { DeepReadonly } from "../utils/types";
+import { PanelType, SidePanels } from "./sidePanels";
 
 export class MainMenu {
     readonly scene: UberScene;
@@ -61,7 +62,7 @@ export class MainMenu {
         sidePanels: SidePanels,
         starSystemView: StarSystemView,
         starSystemDatabase: StarSystemDatabase,
-        soundPlayer: ISoundPlayer
+        soundPlayer: ISoundPlayer,
     ) {
         this.sidePanels = sidePanels;
         this.starSystemView = starSystemView;
@@ -77,7 +78,7 @@ export class MainMenu {
             localZ: 0.38353311777279386,
             starSectorX: 0,
             starSectorY: 0,
-            starSectorZ: 0
+            starSectorZ: 0,
         };
 
         const system = starSystemDatabase.getSystemModelFromCoordinates(coordinates);
@@ -202,7 +203,7 @@ export class MainMenu {
                 this.controls,
                 targetObject,
                 this.starSystemView.getStarSystem(),
-                nbRadius
+                nbRadius,
             );
         });
 
@@ -237,30 +238,30 @@ export class MainMenu {
             this.controls.getTransform(),
             axis,
             angle,
-            this.startAnimationDurationSeconds
+            this.startAnimationDurationSeconds,
         );
         const translationAnimation = new TransformTranslationAnimation(
             this.controls.getTransform(),
             targetPosition,
-            this.startAnimationDurationSeconds
+            this.startAnimationDurationSeconds,
         );
 
         this.title.animate(
             [
                 {
                     marginTop: this.title.style.marginTop,
-                    opacity: 1
+                    opacity: 1,
                 },
                 {
                     marginTop: "30vh",
-                    opacity: 0
-                }
+                    opacity: 0,
+                },
             ],
             {
                 duration: this.startAnimationDurationSeconds * 1000,
                 easing: "ease-in-out",
-                fill: "forwards"
-            }
+                fill: "forwards",
+            },
         );
 
         const animationCallback = () => {

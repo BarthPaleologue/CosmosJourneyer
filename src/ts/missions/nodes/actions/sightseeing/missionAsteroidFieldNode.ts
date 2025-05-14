@@ -15,25 +15,24 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { MissionNode } from "../../missionNode";
-import { MissionNodeType } from "../../missionNodeType";
-import type { MissionNodeBase } from "../../missionNodeBase";
-import { MissionContext } from "../../../missionContext";
-import {
-    StarSystemCoordinates,
-    starSystemCoordinatesEquals
-} from "../../../../utils/coordinates/starSystemCoordinates";
-import { UniverseObjectId, universeObjectIdEquals } from "../../../../utils/coordinates/universeObjectId";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { clamp } from "../../../../utils/math";
-import i18n from "../../../../i18n";
-import { parseDistance } from "../../../../utils/strings/parseToStrings";
-import { Settings } from "../../../../settings";
-import { getGoToSystemInstructions } from "../../../common";
-import { StarSystemDatabase } from "../../../../starSystem/starSystemDatabase";
-import { AsteroidFieldMissionState, MissionAsteroidFieldNodeSerialized } from "./missionAsteroidFieldNodeSerialized";
-import { getObjectModelById } from "../../../../starSystem/starSystemModel";
+
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/utils/coordinates/starSystemCoordinates";
+import { UniverseObjectId, universeObjectIdEquals } from "@/utils/coordinates/universeObjectId";
+import { clamp } from "@/utils/math";
+import { parseDistance } from "@/utils/strings/parseToStrings";
+
 import { OrbitalObjectType } from "../../../../architecture/orbitalObjectType";
+import i18n from "../../../../i18n";
+import { Settings } from "../../../../settings";
+import { StarSystemDatabase } from "../../../../starSystem/starSystemDatabase";
+import { getObjectModelById } from "../../../../starSystem/starSystemModel";
+import { getGoToSystemInstructions } from "../../../common";
+import { MissionContext } from "../../../missionContext";
+import { MissionNode } from "../../missionNode";
+import type { MissionNodeBase } from "../../missionNodeBase";
+import { MissionNodeType } from "../../missionNodeType";
+import { AsteroidFieldMissionState, MissionAsteroidFieldNodeSerialized } from "./missionAsteroidFieldNodeSerialized";
 
 /**
  * Node used to describe a trek to an asteroid field
@@ -52,7 +51,7 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType
 
     public static New(
         objectId: UniverseObjectId,
-        starSystemDatabase: StarSystemDatabase
+        starSystemDatabase: StarSystemDatabase,
     ): MissionAsteroidFieldNode | null {
         const systemModel = starSystemDatabase.getSystemModelFromCoordinates(objectId.systemCoordinates);
         if (systemModel === null) {
@@ -124,7 +123,7 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType
         // everything will be computed in local space from here
         const playerPosition = Vector3.TransformCoordinates(
             playerPositionWorld,
-            celestialBody.getTransform().getWorldMatrix().clone().invert()
+            celestialBody.getTransform().getWorldMatrix().clone().invert(),
         );
 
         const projectionOnPlane = new Vector3(playerPosition.x, 0, playerPosition.z);
@@ -132,7 +131,7 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType
 
         const clampedLocalPosition = projectionOnPlane.scaleInPlace(
             clamp(distanceToCenterOfBodyInPlane, asteroidField.minRadius, asteroidField.maxRadius) /
-                distanceToCenterOfBodyInPlane
+                distanceToCenterOfBodyInPlane,
         );
 
         const distance = Vector3.Distance(playerPosition, clampedLocalPosition);
@@ -149,7 +148,7 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType
     describe(originSystemCoordinates: StarSystemCoordinates, starSystemDatabase: StarSystemDatabase): string {
         const distance = Vector3.Distance(
             starSystemDatabase.getSystemGalacticPosition(originSystemCoordinates),
-            starSystemDatabase.getSystemGalacticPosition(this.targetSystemCoordinates)
+            starSystemDatabase.getSystemGalacticPosition(this.targetSystemCoordinates),
         );
         const objectModel = starSystemDatabase.getObjectModelByUniverseId(this.objectId);
         const systemModel = starSystemDatabase.getSystemModelFromCoordinates(this.targetSystemCoordinates);
@@ -159,14 +158,14 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType
         return i18n.t("missions:sightseeing:describeAsteroidFieldTrek", {
             objectName: objectModel.name,
             systemName: systemModel.name,
-            distance: distance > 0 ? parseDistance(distance * Settings.LIGHT_YEAR) : i18n.t("missions:common:here")
+            distance: distance > 0 ? parseDistance(distance * Settings.LIGHT_YEAR) : i18n.t("missions:common:here"),
         });
     }
 
     describeNextTask(
         context: MissionContext,
         keyboardLayout: Map<string, string>,
-        starSystemDatabase: StarSystemDatabase
+        starSystemDatabase: StarSystemDatabase,
     ): string {
         if (this.isCompleted()) {
             return i18n.t("missions:asteroidField:missionCompleted");
@@ -183,11 +182,11 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType
                     context,
                     this.targetSystemCoordinates,
                     keyboardLayout,
-                    starSystemDatabase
+                    starSystemDatabase,
                 );
             case AsteroidFieldMissionState.TOO_FAR_IN_SYSTEM:
                 return i18n.t("missions:common:getCloserToTarget", {
-                    objectName: targetObject.name
+                    objectName: targetObject.name,
                 });
             case AsteroidFieldMissionState.CLOSE_ENOUGH:
                 return i18n.t("missions:asteroidField:missionCompleted");
@@ -202,7 +201,7 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType
         return {
             type: MissionNodeType.ASTEROID_FIELD,
             objectId: this.objectId,
-            state: this.state
+            state: this.state,
         };
     }
 }

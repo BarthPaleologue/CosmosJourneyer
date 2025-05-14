@@ -15,15 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Scene } from "@babylonjs/core/scene";
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { CloudsModel } from "./cloudsModel";
-import { gcd } from "../utils/math";
-import { CloudsLut } from "./cloudsLut";
-import { DeepReadonly } from "../utils/types";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { createEmptyTexture } from "../utils/proceduralTexture";
+import { Scene } from "@babylonjs/core/scene";
+
 import { ItemPool } from "../utils/itemPool";
+import { gcd } from "../utils/math";
+import { createEmptyTexture } from "../utils/proceduralTexture";
+import { DeepReadonly } from "../utils/types";
+import { CloudsLut } from "./cloudsLut";
+import { CloudsModel } from "./cloudsModel";
 
 export const CloudsUniformNames = {
     LAYER_RADIUS: "clouds_layerRadius",
@@ -36,11 +37,11 @@ export const CloudsUniformNames = {
     COLOR: "clouds_color",
     WORLEY_SPEED: "clouds_worleySpeed",
     DETAIL_SPEED: "clouds_detailSpeed",
-    TIME: "time"
+    TIME: "time",
 };
 
 export const CloudsSamplerNames = {
-    LUT: "clouds_lut"
+    LUT: "clouds_lut",
 };
 
 export class CloudsUniforms {
@@ -80,7 +81,7 @@ export class CloudsUniforms {
             CloudsUniformNames.TIME,
             -this.elapsedSeconds %
                 ((2 * Math.PI * gcd(this.model.worleySpeed * 10000, this.model.detailSpeed * 10000)) /
-                    this.model.worleySpeed)
+                    this.model.worleySpeed),
         );
     }
 

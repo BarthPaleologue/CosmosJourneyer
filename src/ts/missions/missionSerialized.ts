@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { z } from "zod";
+
 import { UniverseObjectIdSchema } from "../utils/coordinates/universeObjectId";
 import { MissionNodeSerializedSchema } from "./nodes/missionNodeSerialized";
 
@@ -25,14 +26,14 @@ import { MissionNodeSerializedSchema } from "./nodes/missionNodeSerialized";
 export enum MissionType {
     SIGHT_SEEING_FLY_BY,
     SIGHT_SEEING_TERMINATOR_LANDING,
-    SIGHT_SEEING_ASTEROID_FIELD
+    SIGHT_SEEING_ASTEROID_FIELD,
 }
 
 export const MissionSerializedSchema = z.object({
     missionGiver: UniverseObjectIdSchema,
     tree: MissionNodeSerializedSchema,
     reward: z.number().default(0),
-    type: z.nativeEnum(MissionType).default(MissionType.SIGHT_SEEING_FLY_BY)
+    type: z.nativeEnum(MissionType).default(MissionType.SIGHT_SEEING_FLY_BY),
 });
 
 /**

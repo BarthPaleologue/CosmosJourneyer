@@ -15,12 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getLoneStarSystem } from "../src/ts/starSystem/customSystems/loneStar";
-import { getSolSystemModel } from "../src/ts/starSystem/customSystems/sol";
-import { StarSystemDatabase } from "../src/ts/starSystem/starSystemDatabase";
-import { StarSystemModel } from "../src/ts/starSystem/starSystemModel";
-import { StarSystemCoordinates } from "../src/ts/utils/coordinates/starSystemCoordinates";
-import { expect, describe, it, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
+
+import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
+
+import { getLoneStarSystem } from "@/starSystem/customSystems/loneStar";
+import { getSolSystemModel } from "@/starSystem/customSystems/sol";
+import { StarSystemDatabase } from "@/starSystem/starSystemDatabase";
+import { StarSystemModel } from "@/starSystem/starSystemModel";
 
 describe("StarSystemDatabase", () => {
     let database: StarSystemDatabase;
@@ -37,7 +39,7 @@ describe("StarSystemDatabase", () => {
             const retrievedSystems = database.getSystemModelsInStarSector(
                 customSystem.coordinates.starSectorX,
                 customSystem.coordinates.starSectorY,
-                customSystem.coordinates.starSectorZ
+                customSystem.coordinates.starSectorZ,
             );
             expect(retrievedSystems).toContain(customSystem);
         });
@@ -66,7 +68,7 @@ describe("StarSystemDatabase", () => {
                 starSectorZ: 0,
                 localX: 0,
                 localY: 0,
-                localZ: 0
+                localZ: 0,
             };
             expect(database.isSystemInHumanBubble(closeCoordinates)).toBe(true);
         });
@@ -78,7 +80,7 @@ describe("StarSystemDatabase", () => {
                 starSectorZ: 1000,
                 localX: 0,
                 localY: 0,
-                localZ: 0
+                localZ: 0,
             };
             expect(database.isSystemInHumanBubble(farCoordinates)).toBe(false);
         });

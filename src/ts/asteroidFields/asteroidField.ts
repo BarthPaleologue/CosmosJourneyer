@@ -15,12 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { IDisposable, Scene } from "@babylonjs/core/scene";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { AsteroidPatch } from "./asteroidPatch";
-import { getRngFromSeed } from "../utils/getRngFromSeed";
+
 import { Objects } from "../assets/objects";
+import { getRngFromSeed } from "../utils/getRngFromSeed";
+import { AsteroidPatch } from "./asteroidPatch";
 
 /**
  * An asteroid field is basically a collection of instance chunks that can be created and destroyed depending on where the player is.
@@ -135,7 +136,7 @@ export class AsteroidField implements IDisposable {
                         this.minRadius,
                         this.maxRadius,
                         objects.asteroids.length - 1,
-                        this.rng
+                        this.rng,
                     );
                 const patch = new AsteroidPatch(
                     positions,
@@ -143,7 +144,7 @@ export class AsteroidField implements IDisposable {
                     typeIndices,
                     rotationAxes,
                     rotationSpeeds,
-                    this.parent
+                    this.parent,
                 );
                 patch.createInstances();
 
@@ -179,7 +180,7 @@ export class AsteroidField implements IDisposable {
         minRadius: number,
         maxRadius: number,
         maxTypeIndex: number,
-        rng: (index: number) => number
+        rng: (index: number) => number,
     ): [Vector3[], Quaternion[], number[], Vector3[], number[]] {
         const positions = [];
         const rotations = [];
@@ -211,7 +212,7 @@ export class AsteroidField implements IDisposable {
                 const initialRotationAxis = new Vector3(
                     rng(asteroidIndex + 9512) - 0.5,
                     rng(asteroidIndex + 7456) - 0.5,
-                    rng(asteroidIndex + 7410) - 0.5
+                    rng(asteroidIndex + 7410) - 0.5,
                 ).normalize();
                 const initialRotationAngle = rng(asteroidIndex + 4239) * 2 * Math.PI;
 
@@ -222,8 +223,8 @@ export class AsteroidField implements IDisposable {
                     new Vector3(
                         rng(asteroidIndex + 9630) - 0.5,
                         rng(asteroidIndex + 3256) - 0.5,
-                        rng(asteroidIndex + 8520) - 0.5
-                    ).normalize()
+                        rng(asteroidIndex + 8520) - 0.5,
+                    ).normalize(),
                 );
                 rotationSpeeds.push(rng(asteroidIndex + 1569) * 0.2);
             }

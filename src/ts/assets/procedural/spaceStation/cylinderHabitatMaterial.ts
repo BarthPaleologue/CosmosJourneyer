@@ -15,40 +15,42 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Scene } from "@babylonjs/core/scene";
-import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
+import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
+import { Scene } from "@babylonjs/core/scene";
+
 import {
+    abs,
+    add,
+    atan2,
+    f,
+    fract,
+    length,
+    mix,
+    mul,
+    outputFragColor,
+    outputVertexPosition,
+    pbrMetallicRoughnessMaterial,
+    perturbNormal,
+    remap,
+    smoothstep,
+    split,
+    step,
+    sub,
+    Target,
+    textureSample,
+    transformDirection,
+    transformPosition,
+    uniformCameraPosition,
+    uniformView,
+    uniformViewProjection,
+    uniformWorld,
+    vec2,
+    vec3,
     vertexAttribute,
     xz,
-    split,
-    uniformWorld,
-    transformPosition,
-    transformDirection,
-    sub,
-    f,
-    step,
-    abs,
-    mul,
-    mix,
-    uniformViewProjection,
-    outputVertexPosition,
-    atan2,
-    Target,
-    vec2,
-    textureSample,
-    perturbNormal,
-    uniformView,
-    uniformCameraPosition,
-    pbrMetallicRoughnessMaterial,
-    outputFragColor,
-    length,
-    remap,
-    fract,
-    add,
-    vec3,
-    smoothstep
-} from "../../../utils/bsl";
+} from "@/utils/bsl";
+
 import { PBRTextures } from "../../textures";
 
 export class CylinderHabitatMaterial extends NodeMaterial {
@@ -92,7 +94,7 @@ export class CylinderHabitatMaterial extends NodeMaterial {
         const proceduralUV = vec2(proceduralUvX, proceduralUvY);
 
         const albedo = textureSample(textures.albedo, proceduralUV, {
-            convertToLinearSpace: true
+            convertToLinearSpace: true,
         });
         const normalMap = textureSample(textures.normal, proceduralUV);
         const metallicRoughness = textureSample(textures.metallicRoughness, proceduralUV);
@@ -112,7 +114,7 @@ export class CylinderHabitatMaterial extends NodeMaterial {
             normalW,
             view,
             cameraPosition,
-            positionW
+            positionW,
         );
 
         const lightEmission = mul(
@@ -120,13 +122,13 @@ export class CylinderHabitatMaterial extends NodeMaterial {
             mul(
                 mul(
                     smoothstep(f(0.48), f(0.5), fract(proceduralUvX)),
-                    sub(f(1), smoothstep(f(0.5), f(0.52), fract(proceduralUvX)))
+                    sub(f(1), smoothstep(f(0.5), f(0.52), fract(proceduralUvX))),
                 ),
                 mul(
                     smoothstep(f(0.4), f(0.45), fract(proceduralUvY)),
-                    sub(f(1), smoothstep(f(0.55), f(0.6), fract(proceduralUvY)))
-                )
-            )
+                    sub(f(1), smoothstep(f(0.55), f(0.6), fract(proceduralUvY))),
+                ),
+            ),
         );
 
         const lightColor = vec3(f(1), f(1), f(0.7));

@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { z } from "zod";
+
 import { getOrbitalObjectTypeStringId, OrbitalObjectType } from "../../architecture/orbitalObjectType";
 
 export const OrbitalObjectIdSchema = z.string();
@@ -28,7 +29,7 @@ export type OrbitalObjectId = z.infer<typeof OrbitalObjectIdSchema>;
 export function createOrbitalObjectId(
     parentIds: ReadonlyArray<OrbitalObjectId>,
     type: OrbitalObjectType,
-    index: number
+    index: number,
 ): OrbitalObjectId {
     const typeString = getOrbitalObjectTypeStringId(type);
     return `[${parentIds.join("|")}]->${typeString}${index}`;

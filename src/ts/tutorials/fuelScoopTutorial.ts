@@ -15,19 +15,19 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { TutorialControlsInputs } from "../ui/tutorial/tutorialLayerInputs";
-import { pressInteractionToStrings } from "../utils/strings/inputControlsString";
-import { Tutorial } from "./tutorial";
-import welcomeImageSrc from "../../asset/tutorials/fuelScoopTutorial/fuelScoop.webp";
 import fuelIconLocation from "../../asset/tutorials/fuelScoopTutorial/fuelIconLocation.webp";
+import welcomeImageSrc from "../../asset/tutorials/fuelScoopTutorial/fuelScoop.webp";
 import howToFuelScoop from "../../asset/tutorials/fuelScoopTutorial/howToFuelScoop.webp";
 import saveData from "../../asset/tutorials/fuelScoopTutorial/save.json";
 import i18n from "../i18n";
-import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import { safeParseSave, Save } from "../saveFile/saveFileData";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-import { Result } from "../utils/types";
 import { SaveLoadingError } from "../saveFile/saveLoadingError";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { TutorialControlsInputs } from "../ui/tutorial/tutorialLayerInputs";
+import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
+import { pressInteractionToStrings } from "../utils/strings/inputControlsString";
+import { Result } from "../utils/types";
+import { Tutorial } from "./tutorial";
 
 export class FuelScoopTutorial implements Tutorial {
     readonly coverImageSrc: string = welcomeImageSrc;
@@ -54,11 +54,11 @@ export class FuelScoopTutorial implements Tutorial {
             ${i18n.t("tutorials:common:navigationInfo", {
                 // This displays a small internationalized text to explain the keys to navigate the tutorial
                 nextKeys: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keyboardLayoutMap).join(
-                    ` ${i18n.t("common:or")} `
+                    ` ${i18n.t("common:or")} `,
                 ),
                 previousKeys: pressInteractionToStrings(TutorialControlsInputs.map.prevPanel, keyboardLayoutMap).join(
-                    ` ${i18n.t("common:or")} `
-                )
+                    ` ${i18n.t("common:or")} `,
+                ),
             })}
         </div>`;
 
@@ -78,8 +78,8 @@ export class FuelScoopTutorial implements Tutorial {
             <p>${i18n.t("tutorials:common:tutorialEnding", {
                 // This displays a small internationalized text to explain the keys to end the tutorial
                 keyQuit: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keyboardLayoutMap).join(
-                    ` ${i18n.t("common:or")} `
-                )
+                    ` ${i18n.t("common:or")} `,
+                ),
             })}
                 </p>
         </div>`;

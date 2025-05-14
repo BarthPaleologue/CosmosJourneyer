@@ -15,10 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Settings } from "../settings";
-import { makeNoise3D } from "fast-simplex-noise";
-import { getRngFromSeed } from "../utils/getRngFromSeed";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { makeNoise3D } from "fast-simplex-noise";
+
+import { Settings } from "../settings";
+import { getRngFromSeed } from "../utils/getRngFromSeed";
 
 const materialistSpiritualistRng = getRngFromSeed(Settings.POWER_PLAY_SEED);
 let materialistSpiritualistSampleStep = 0;
@@ -43,6 +44,6 @@ export function getPowerPlayData(systemGalacticPosition: Vector3) {
 
     return {
         materialistSpiritualist: MaterialistSpiritualistAxis(coords.x, coords.y, coords.z),
-        capitalistCommunist: CapitalistCommunistAxis(coords.x, coords.y, coords.z)
+        capitalistCommunist: CapitalistCommunistAxis(coords.x, coords.y, coords.z),
     };
 }

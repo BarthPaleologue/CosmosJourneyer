@@ -15,19 +15,21 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Scene } from "@babylonjs/core/scene";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PBRMetallicRoughnessMaterial } from "@babylonjs/core/Materials/PBR/pbrMetallicRoughnessMaterial";
-import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
-import { DarkKnightModel } from "./darkKnightModel";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { DeepReadonly } from "../../utils/types";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { Scene } from "@babylonjs/core/scene";
+
+import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
+import { DeepReadonly } from "@/utils/types";
+
 import { CelestialBodyBase } from "../../architecture/celestialBody";
+import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { ObjectTargetCursorType, TargetInfo } from "../../architecture/targetable";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { RingsUniforms } from "../../rings/ringsUniform";
-import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
+import { DarkKnightModel } from "./darkKnightModel";
 
 export class DarkKnight implements CelestialBodyBase<OrbitalObjectType.DARK_KNIGHT> {
     readonly type: OrbitalObjectType.DARK_KNIGHT;
@@ -58,7 +60,7 @@ export class DarkKnight implements CelestialBodyBase<OrbitalObjectType.DARK_KNIG
         this.targetInfo = {
             type: ObjectTargetCursorType.ANOMALY,
             minDistance: this.model.radius * 5,
-            maxDistance: this.model.radius * 100
+            maxDistance: this.model.radius * 100,
         };
     }
 

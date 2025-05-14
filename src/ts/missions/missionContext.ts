@@ -15,9 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { StarSystemController } from "../starSystem/starSystemController";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
+
+import { StarSystemController } from "../starSystem/starSystemController";
 import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
 
 /**

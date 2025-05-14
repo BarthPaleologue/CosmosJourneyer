@@ -15,14 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AbstractEngine, Scene, ArcRotateCamera, Vector3 } from "@babylonjs/core";
-import { EmptyCelestialBody } from "../../utils/emptyCelestialBody";
+import { AbstractEngine, ArcRotateCamera, Scene, Vector3 } from "@babylonjs/core";
+
+import { EmptyCelestialBody } from "@/utils/emptyCelestialBody";
+
 import { newSeededMandelboxModel } from "../../anomalies/mandelbox/mandelboxModelGenerator";
 import { MandelboxPostProcess } from "../../anomalies/mandelbox/mandelboxPostProcess";
 
 export function createMandelboxScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void
+    progressCallback: (progress: number, text: string) => void,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -41,7 +43,7 @@ export function createMandelboxScene(
         "mandelbox",
         Number(urlParams.get("seed") ?? Math.random() * 100_000),
         "Mandelbox",
-        []
+        [],
     );
 
     const anomaly = new EmptyCelestialBody(model, scene);

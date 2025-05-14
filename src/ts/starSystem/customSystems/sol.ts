@@ -15,16 +15,18 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { Tools } from "@babylonjs/core/Misc/tools";
+
+import { celsiusToKelvin } from "@/utils/physics";
+
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
+import { GasPlanetModel } from "../../planets/gasPlanet/gasPlanetModel";
+import { TelluricPlanetModel } from "../../planets/telluricPlanet/telluricPlanetModel";
+import { TelluricSatelliteModel } from "../../planets/telluricPlanet/telluricSatelliteModel";
+import { Settings } from "../../settings";
 import { StarModel } from "../../stellarObjects/star/starModel";
 import { StarSystemModel } from "../starSystemModel";
-import { TelluricPlanetModel } from "../../planets/telluricPlanet/telluricPlanetModel";
-import { Settings } from "../../settings";
-import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { celsiusToKelvin } from "../../utils/physics";
-import { TelluricSatelliteModel } from "../../planets/telluricPlanet/telluricSatelliteModel";
-import { Tools } from "@babylonjs/core/Misc/tools";
-import { GasPlanetModel } from "../../planets/gasPlanet/gasPlanetModel";
 
 export function getSolSystemModel(): StarSystemModel {
     const sun: StarModel = {
@@ -44,10 +46,10 @@ export function getSolSystemModel(): StarSystemModel {
             inclination: 0,
             longitudeOfAscendingNode: 0,
             argumentOfPeriapsis: 0,
-            initialMeanAnomaly: 0
+            initialMeanAnomaly: 0,
         },
         rings: null,
-        seed: 0
+        seed: 0,
     };
 
     const mercury: TelluricPlanetModel = {
@@ -61,7 +63,7 @@ export function getSolSystemModel(): StarSystemModel {
         waterAmount: 0,
         temperature: {
             min: 437,
-            max: 437
+            max: 437,
         },
         orbit: {
             parentIds: [sun.id],
@@ -71,7 +73,7 @@ export function getSolSystemModel(): StarSystemModel {
             inclination: Tools.ToRadians(7),
             longitudeOfAscendingNode: Tools.ToRadians(48.331),
             argumentOfPeriapsis: Tools.ToRadians(29.124),
-            initialMeanAnomaly: 0
+            initialMeanAnomaly: 0,
         },
         terrainSettings: {
             continents_fragmentation: 0.1,
@@ -83,13 +85,13 @@ export function getSolSystemModel(): StarSystemModel {
             max_mountain_height: 0e3,
             continent_base_height: 0,
 
-            mountains_frequency: 0
+            mountains_frequency: 0,
         },
         atmosphere: null,
         rings: null,
         clouds: null,
         ocean: null,
-        seed: 0
+        seed: 0,
     };
 
     const venus: TelluricPlanetModel = {
@@ -103,7 +105,7 @@ export function getSolSystemModel(): StarSystemModel {
         waterAmount: 0,
         temperature: {
             min: 719,
-            max: 763
+            max: 763,
         },
         orbit: {
             parentIds: [sun.id],
@@ -113,7 +115,7 @@ export function getSolSystemModel(): StarSystemModel {
             longitudeOfAscendingNode: Tools.ToRadians(76.68),
             argumentOfPeriapsis: Tools.ToRadians(54.88),
             initialMeanAnomaly: 0,
-            p: 2
+            p: 2,
         },
         terrainSettings: {
             continents_fragmentation: 0.1,
@@ -125,12 +127,12 @@ export function getSolSystemModel(): StarSystemModel {
             max_mountain_height: 20e3,
             continent_base_height: 0,
 
-            mountains_frequency: 5
+            mountains_frequency: 5,
         },
         rings: null,
         atmosphere: {
             pressure: 93 * Settings.BAR_TO_PASCAL,
-            greenHouseEffectFactor: 0.99
+            greenHouseEffectFactor: 0.99,
         },
         clouds: {
             layerRadius: 6_051.8e3 + 10e3,
@@ -142,10 +144,10 @@ export function getSolSystemModel(): StarSystemModel {
             sharpness: 2.5,
             color: new Color3(0.8, 0.8, 0.1),
             worleySpeed: 0.0005,
-            detailSpeed: 0.003
+            detailSpeed: 0.003,
         },
         ocean: null,
-        seed: 0
+        seed: 0,
     };
 
     const earth: TelluricPlanetModel = {
@@ -159,7 +161,7 @@ export function getSolSystemModel(): StarSystemModel {
         waterAmount: 1,
         temperature: {
             min: celsiusToKelvin(-50),
-            max: celsiusToKelvin(50)
+            max: celsiusToKelvin(50),
         },
         orbit: {
             parentIds: [sun.id],
@@ -169,7 +171,7 @@ export function getSolSystemModel(): StarSystemModel {
             longitudeOfAscendingNode: Tools.ToRadians(0),
             argumentOfPeriapsis: Tools.ToRadians(114.20783),
             initialMeanAnomaly: 0,
-            p: 2
+            p: 2,
         },
         terrainSettings: {
             continents_frequency: 1,
@@ -181,12 +183,12 @@ export function getSolSystemModel(): StarSystemModel {
             max_mountain_height: 10e3,
             continent_base_height: 10e3 * 1.9,
 
-            mountains_frequency: 360
+            mountains_frequency: 360,
         },
         rings: null,
         atmosphere: {
             pressure: 1 * Settings.BAR_TO_PASCAL,
-            greenHouseEffectFactor: 0.5
+            greenHouseEffectFactor: 0.5,
         },
         clouds: {
             layerRadius: 6_371e3 + 30e3,
@@ -198,12 +200,12 @@ export function getSolSystemModel(): StarSystemModel {
             sharpness: 2.5,
             color: new Color3(0.8, 0.8, 0.8),
             worleySpeed: 0.0005,
-            detailSpeed: 0.003
+            detailSpeed: 0.003,
         },
         ocean: {
-            depth: 10e3
+            depth: 10e3,
         },
-        seed: 0
+        seed: 0,
     };
 
     const moon: TelluricSatelliteModel = {
@@ -217,7 +219,7 @@ export function getSolSystemModel(): StarSystemModel {
         waterAmount: 0,
         temperature: {
             min: 100,
-            max: 100
+            max: 100,
         },
         orbit: {
             parentIds: [earth.id],
@@ -227,7 +229,7 @@ export function getSolSystemModel(): StarSystemModel {
             longitudeOfAscendingNode: Tools.ToRadians(125.08),
             argumentOfPeriapsis: Tools.ToRadians(318.15),
             initialMeanAnomaly: 0,
-            p: 2
+            p: 2,
         },
         terrainSettings: {
             continents_fragmentation: 0.1,
@@ -239,12 +241,12 @@ export function getSolSystemModel(): StarSystemModel {
             max_mountain_height: 0e3,
             continent_base_height: 0,
 
-            mountains_frequency: 0
+            mountains_frequency: 0,
         },
         atmosphere: null,
         clouds: null,
         ocean: null,
-        seed: 0
+        seed: 0,
     };
 
     const mars: TelluricPlanetModel = {
@@ -258,7 +260,7 @@ export function getSolSystemModel(): StarSystemModel {
         waterAmount: 0,
         temperature: {
             min: celsiusToKelvin(-140),
-            max: celsiusToKelvin(20)
+            max: celsiusToKelvin(20),
         },
         orbit: {
             parentIds: [sun.id],
@@ -268,7 +270,7 @@ export function getSolSystemModel(): StarSystemModel {
             longitudeOfAscendingNode: Tools.ToRadians(49.558),
             argumentOfPeriapsis: Tools.ToRadians(286.502),
             initialMeanAnomaly: 0,
-            p: 2
+            p: 2,
         },
         terrainSettings: {
             continents_fragmentation: 0.1,
@@ -280,16 +282,16 @@ export function getSolSystemModel(): StarSystemModel {
             max_mountain_height: 0e3,
             continent_base_height: 0,
 
-            mountains_frequency: 0
+            mountains_frequency: 0,
         },
         atmosphere: {
             pressure: 0.006 * Settings.BAR_TO_PASCAL,
-            greenHouseEffectFactor: 0.1
+            greenHouseEffectFactor: 0.1,
         },
         rings: null,
         clouds: null,
         ocean: null,
-        seed: 0
+        seed: 0,
     };
 
     const jupiter: GasPlanetModel = {
@@ -308,14 +310,14 @@ export function getSolSystemModel(): StarSystemModel {
             longitudeOfAscendingNode: Tools.ToRadians(49.558),
             argumentOfPeriapsis: Tools.ToRadians(286.502),
             initialMeanAnomaly: 0,
-            p: 2
+            p: 2,
         },
         atmosphere: {
             pressure: Settings.BAR_TO_PASCAL,
-            greenHouseEffectFactor: 0.7
+            greenHouseEffectFactor: 0.7,
         },
         rings: null,
-        seed: 0
+        seed: 0,
     };
 
     const saturn: GasPlanetModel = {
@@ -334,11 +336,11 @@ export function getSolSystemModel(): StarSystemModel {
             longitudeOfAscendingNode: Tools.ToRadians(113.715),
             argumentOfPeriapsis: Tools.ToRadians(336.092),
             initialMeanAnomaly: 0,
-            p: 2
+            p: 2,
         },
         atmosphere: {
             pressure: Settings.BAR_TO_PASCAL,
-            greenHouseEffectFactor: 0.5
+            greenHouseEffectFactor: 0.5,
         },
         rings: {
             seed: 0,
@@ -346,9 +348,9 @@ export function getSolSystemModel(): StarSystemModel {
             ringEnd: 2.27,
             ringColor: new Color3(0.8, 0.8, 0.8),
             ringOpacity: 0.5,
-            ringFrequency: 2
+            ringFrequency: 2,
         },
-        seed: 0
+        seed: 0,
     };
 
     const uranus: GasPlanetModel = {
@@ -367,14 +369,14 @@ export function getSolSystemModel(): StarSystemModel {
             longitudeOfAscendingNode: Tools.ToRadians(74.229),
             argumentOfPeriapsis: Tools.ToRadians(96.541),
             initialMeanAnomaly: 0,
-            p: 2
+            p: 2,
         },
         atmosphere: {
             pressure: 0.1 * Settings.BAR_TO_PASCAL,
-            greenHouseEffectFactor: 0.5
+            greenHouseEffectFactor: 0.5,
         },
         rings: null,
-        seed: 0
+        seed: 0,
     };
 
     const neptune: GasPlanetModel = {
@@ -393,14 +395,14 @@ export function getSolSystemModel(): StarSystemModel {
             longitudeOfAscendingNode: Tools.ToRadians(131.72169),
             argumentOfPeriapsis: Tools.ToRadians(265.646853),
             initialMeanAnomaly: 0,
-            p: 2
+            p: 2,
         },
         atmosphere: {
             pressure: 0.1 * Settings.BAR_TO_PASCAL,
-            greenHouseEffectFactor: 0.7
+            greenHouseEffectFactor: 0.7,
         },
         rings: null,
-        seed: 0
+        seed: 0,
     };
 
     return {
@@ -411,12 +413,12 @@ export function getSolSystemModel(): StarSystemModel {
             starSectorZ: 0,
             localX: 0,
             localY: 0,
-            localZ: 0
+            localZ: 0,
         },
         stellarObjects: [sun],
         planets: [mercury, venus, earth, mars, jupiter, saturn, uranus, neptune],
         satellites: [moon],
         anomalies: [],
-        orbitalFacilities: []
+        orbitalFacilities: [],
     };
 }

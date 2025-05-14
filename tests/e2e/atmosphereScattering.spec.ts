@@ -1,4 +1,5 @@
 import { test } from "@playwright/test";
+
 import { renderAndSnap } from "./utils/renderSnap";
 
 test("The atmosphere playground renders correctly", async ({ page }) => {
@@ -6,6 +7,6 @@ test("The atmosphere playground renders correctly", async ({ page }) => {
         scene: "atmosphericScattering",
         shotName: "baseline",
         flagToWait: "frozen",
-        urlParams: { freeze: 1 }
+        urlParams: { freeze: 1 },
     });
 });

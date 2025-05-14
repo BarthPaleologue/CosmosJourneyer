@@ -1,10 +1,15 @@
-import { Scene } from "@babylonjs/core/scene";
-import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
+import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Scene } from "@babylonjs/core/scene";
+
 import {
     add,
+    div,
     f,
+    length,
     min,
+    mix,
     mul,
     outputFragColor,
     outputVertexPosition,
@@ -23,15 +28,12 @@ import {
     vec,
     vec2,
     vertexAttribute,
-    length,
     xz,
-    mix,
-    div
-} from "../../../utils/bsl";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+} from "@/utils/bsl";
+
 import { Settings } from "../../../settings";
-import { PBRTextures } from "../../textures";
 import { LandingPadTexturePool } from "../../landingPadTexturePool";
+import { PBRTextures } from "../../textures";
 
 export class LandingPadMaterial extends NodeMaterial {
     constructor(padNumber: number, textures: PBRTextures, texturePool: LandingPadTexturePool, scene: Scene) {
@@ -89,13 +91,13 @@ export class LandingPadMaterial extends NodeMaterial {
 
         const circleMask = mul(
             step(sub(circleRadius, circleThickness), distToCenter),
-            step(distToCenter, add(circleRadius, circleThickness))
+            step(distToCenter, add(circleRadius, circleThickness)),
         );
 
         const fullPaintWeight = add(add(paintWeight, borderWeight), circleMask);
 
         const albedoTexture = textureSample(textures.albedo, proceduralUV, {
-            convertToLinearSpace: true
+            convertToLinearSpace: true,
         });
         const metallicRoughness = textureSample(textures.metallicRoughness, proceduralUV);
         const normalMapValue = textureSample(textures.normal, proceduralUV);
@@ -111,7 +113,7 @@ export class LandingPadMaterial extends NodeMaterial {
             positionW,
             normalW,
             normalMapValue.rgb,
-            sub(f(1), mul(fullPaintWeight, f(0.5)))
+            sub(f(1), mul(fullPaintWeight, f(0.5))),
         );
 
         const view = uniformView();
@@ -126,7 +128,7 @@ export class LandingPadMaterial extends NodeMaterial {
             normalW,
             view,
             cameraPosition,
-            positionW
+            positionW,
         );
 
         const additionalLight = mul(finalAlbedo, div(f(0.05), add(f(0.05), mul(distToCenter, distToCenter))));

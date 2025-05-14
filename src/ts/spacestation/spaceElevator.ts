@@ -15,40 +15,41 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Scene } from "@babylonjs/core/scene";
-import { isSizeOnScreenEnough } from "../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { TransformNode } from "@babylonjs/core/Meshes";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { TransformNode } from "@babylonjs/core/Meshes";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { Scene } from "@babylonjs/core/scene";
+
+import { StellarObjectModel } from "../architecture/orbitalObjectModel";
+import { OrbitalObjectType } from "../architecture/orbitalObjectType";
+import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
+import { Transformable } from "../architecture/transformable";
+import { CylinderHabitat } from "../assets/procedural/spaceStation/cylinderHabitat";
+import { HelixHabitat } from "../assets/procedural/spaceStation/helixHabitat";
+import { LandingBay } from "../assets/procedural/spaceStation/landingBay";
+import { MetalSectionMaterial } from "../assets/procedural/spaceStation/metalSectionMaterial";
+import { RingHabitat } from "../assets/procedural/spaceStation/ringHabitat";
+import { SolarSection } from "../assets/procedural/spaceStation/solarSection";
 import { SpaceStationNodeType } from "../assets/procedural/spaceStation/spaceStationNode";
 import { UtilitySection } from "../assets/procedural/spaceStation/utilitySection";
-import { HelixHabitat } from "../assets/procedural/spaceStation/helixHabitat";
-import { RingHabitat } from "../assets/procedural/spaceStation/ringHabitat";
-import { Transformable } from "../architecture/transformable";
-import { SolarSection } from "../assets/procedural/spaceStation/solarSection";
-import { wheelOfFortune } from "../utils/random";
-import { CylinderHabitat } from "../assets/procedural/spaceStation/cylinderHabitat";
-import { LandingBay } from "../assets/procedural/spaceStation/landingBay";
+import { RenderingAssets } from "../assets/renderingAssets";
 import { Settings } from "../settings";
-import { getRngFromSeed } from "../utils/getRngFromSeed";
-import { getOrbitalObjectTypeToI18nString } from "../utils/strings/orbitalObjectTypeToDisplay";
-import { OrbitalFacilityBase } from "./orbitalFacility";
-import { SpaceElevatorModel } from "./spaceElevatorModel";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { MetalSectionMaterial } from "../assets/procedural/spaceStation/metalSectionMaterial";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { SpaceElevatorClimber } from "./spaceElevatorClimber";
-import { clamp, remap, triangleWave } from "../utils/math";
-import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
 import { setUpVector } from "../uberCore/transforms/basicTransform";
-import { OrbitalObjectType } from "../architecture/orbitalObjectType";
+import { getEdibleEnergyPerHaPerDay } from "../utils/agriculture";
+import { getRngFromSeed } from "../utils/getRngFromSeed";
+import { isSizeOnScreenEnough } from "../utils/isObjectVisibleOnScreen";
+import { clamp, remap, triangleWave } from "../utils/math";
+import { getSphereRadiatedEnergyFlux } from "../utils/physics";
+import { wheelOfFortune } from "../utils/random";
+import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
+import { getOrbitalObjectTypeToI18nString } from "../utils/strings/orbitalObjectTypeToDisplay";
 import { DeepReadonly } from "../utils/types";
 import { LandingPadManager } from "./landingPad/landingPadManager";
-import { getSphereRadiatedEnergyFlux } from "../utils/physics";
-import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
-import { getEdibleEnergyPerHaPerDay } from "../utils/agriculture";
-import { StellarObjectModel } from "../architecture/orbitalObjectModel";
-import { RenderingAssets } from "../assets/renderingAssets";
+import { OrbitalFacilityBase } from "./orbitalFacility";
+import { SpaceElevatorClimber } from "./spaceElevatorClimber";
+import { SpaceElevatorModel } from "./spaceElevatorModel";
 
 export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPACE_ELEVATOR> {
     readonly name: string;
@@ -86,7 +87,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
         model: DeepReadonly<SpaceElevatorModel>,
         stellarObjects: ReadonlyMap<DeepReadonly<StellarObjectModel>, number>,
         assets: RenderingAssets,
-        scene: Scene
+        scene: Scene,
     ) {
         this.model = model;
 
@@ -105,9 +106,9 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
             {
                 height: this.tetherLength,
                 diameter: tetherThickness,
-                tessellation: 6
+                tessellation: 6,
             },
-            this.scene
+            this.scene,
         );
         this.tether.convertToFlatShadedMesh();
 
@@ -118,7 +119,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
             assets.materials.solarPanel,
             assets.textures.materials.crate,
             assets.textures.materials.metalPanels,
-            scene
+            scene,
         );
         this.climber.getTransform().parent = this.tether;
 
@@ -130,7 +131,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
         this.landingPadManager = new LandingPadManager(
             this.landingBays.flatMap((landingBay) => {
                 return landingBay.landingPads;
-            })
+            }),
         );
 
         // center the space station on its center of mass
@@ -150,7 +151,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
         this.targetInfo = {
             type: ObjectTargetCursorType.FACILITY,
             minDistance: this.getBoundingRadius() * 6.0,
-            maxDistance: 0.0
+            maxDistance: 0.0,
         };
     }
 
@@ -183,7 +184,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
         const solarPanelSurfaceM2 = getSolarPanelSurfaceFromEnergyRequirement(
             this.model.solarPanelEfficiency,
             this.model.population * this.model.energyConsumptionPerCapitaKWh,
-            totalStellarFlux
+            totalStellarFlux,
         );
 
         const housingSurfaceHa = (100 * this.model.population) / this.model.populationDensity; // convert km² to ha
@@ -210,9 +211,9 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
             [
                 [SpaceStationNodeType.RING_HABITAT, 0.5],
                 [SpaceStationNodeType.HELIX_HABITAT, 0.3],
-                [SpaceStationNodeType.CYLINDER_HABITAT, 0.2]
+                [SpaceStationNodeType.CYLINDER_HABITAT, 0.2],
             ],
-            rng(17)
+            rng(17),
         );
 
         let newNode: TransformNode | null = null;
@@ -221,7 +222,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
                 totalHabitatSurfaceM2,
                 Settings.SEED_HALF_RANGE * rng(19),
                 assets.textures,
-                this.scene
+                this.scene,
             );
             this.helixHabitats.push(helixHabitat);
             newNode = helixHabitat.getTransform();
@@ -230,7 +231,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
                 totalHabitatSurfaceM2,
                 Settings.SEED_HALF_RANGE * rng(27),
                 assets.textures,
-                this.scene
+                this.scene,
             );
             this.ringHabitats.push(ringHabitat);
             newNode = ringHabitat.getTransform();
@@ -239,7 +240,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
                 totalHabitatSurfaceM2,
                 Settings.SEED_HALF_RANGE * rng(13),
                 assets.textures,
-                this.scene
+                this.scene,
             );
             this.cylinderHabitats.push(cylinderHabitat);
             newNode = cylinderHabitat.getTransform();
@@ -259,7 +260,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
             solarPanelSurfaceM2,
             Settings.SEED_HALF_RANGE * rng(31),
             assets,
-            this.scene
+            this.scene,
         );
         solarSection.getTransform().parent = this.getTransform();
         this.placeNode(solarSection.getTransform(), lastNode);
@@ -279,14 +280,14 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
         lastNode: TransformNode,
         nbSections: number,
         rng: (index: number) => number,
-        assets: RenderingAssets
+        assets: RenderingAssets,
     ): TransformNode {
         let newLastNode = lastNode;
         for (let i = 0; i < nbSections; i++) {
             const utilitySection = new UtilitySection(
                 rng(132 + 10 * this.utilitySections.length) * Settings.SEED_HALF_RANGE,
                 assets,
-                this.scene
+                this.scene,
             );
             this.utilitySections.push(utilitySection);
 
@@ -345,7 +346,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
             0,
             1,
             -this.tetherLength / 2,
-            this.tetherLength / 2
+            this.tetherLength / 2,
         );
     }
 

@@ -1,14 +1,15 @@
 import Action from "@brianchirls/game-input/Action";
-import PressInteraction from "@brianchirls/game-input/interactions/PressInteraction";
-import { InputMap } from "../inputs/inputMap";
-import { InputDevices } from "../inputs/devices";
-import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import { AxisComposite } from "@brianchirls/game-input/browser";
+import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
+import PressInteraction from "@brianchirls/game-input/interactions/PressInteraction";
+
+import { InputDevices } from "../inputs/devices";
+import { InputMap } from "../inputs/inputMap";
 
 const keyboard = InputDevices.KEYBOARD;
 
 const focusOnCurrentSystemAction = new Action({
-    bindings: [keyboard.getControl("KeyF")]
+    bindings: [keyboard.getControl("KeyF")],
 });
 
 const focusOnCurrentSystemInteraction = new PressInteraction(focusOnCurrentSystemAction);
@@ -18,7 +19,7 @@ const kbdWASD = new DPadComposite({
     up: keyboard.getControl("KeyW"),
     left: keyboard.getControl("KeyA"),
     down: keyboard.getControl("KeyS"),
-    right: keyboard.getControl("KeyD")
+    right: keyboard.getControl("KeyD"),
 });
 
 /**
@@ -26,25 +27,25 @@ const kbdWASD = new DPadComposite({
  * The action will respond to whichever control is used.
  */
 const moveAction = new Action({
-    bindings: [kbdWASD]
+    bindings: [kbdWASD],
 });
 
 const keyboardSpeed = new AxisComposite({
     positive: keyboard.getControl("NumpadAdd"), // '+'
-    negative: keyboard.getControl("NumpadSubtract") // '-'
+    negative: keyboard.getControl("NumpadSubtract"), // '-'
 });
 
 const changeSpeedAction = new Action({
-    bindings: [keyboardSpeed]
+    bindings: [keyboardSpeed],
 });
 
 const upDown = new AxisComposite({
     positive: keyboard.getControl("Space"),
-    negative: keyboard.getControl("ShiftLeft")
+    negative: keyboard.getControl("ShiftLeft"),
 });
 
 const upDownAction = new Action({
-    bindings: [upDown]
+    bindings: [upDown],
 });
 
 export const StarMapInputs = new InputMap<{
@@ -56,5 +57,5 @@ export const StarMapInputs = new InputMap<{
     focusOnCurrentSystem: focusOnCurrentSystemInteraction,
     move: moveAction,
     changeSpeed: changeSpeedAction,
-    upDown: upDownAction
+    upDown: upDownAction,
 });

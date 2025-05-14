@@ -16,13 +16,14 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { z } from "zod";
+
 import { SerializedFuelTankSchema } from "./serializedComponents/fuelTank";
 import { SerializedOptionalComponentSchema } from "./serializedComponents/optionalComponents";
-import { SerializedWarpDriveSchema } from "./serializedComponents/warpDrive";
 import { SerializedThrustersSchema } from "./serializedComponents/thrusters";
+import { SerializedWarpDriveSchema } from "./serializedComponents/warpDrive";
 
 export enum ShipType {
-    WANDERER = "WANDERER"
+    WANDERER = "WANDERER",
 }
 
 export const BaseSpaceshipSchema = z.object({
@@ -33,10 +34,10 @@ export const BaseSpaceshipSchema = z.object({
         primary: z.object({
             warpDrive: SerializedWarpDriveSchema,
             thrusters: SerializedThrustersSchema,
-            fuelTank: SerializedFuelTankSchema
+            fuelTank: SerializedFuelTankSchema,
         }),
-        optional: z.array(SerializedOptionalComponentSchema)
-    })
+        optional: z.array(SerializedOptionalComponentSchema),
+    }),
 });
 
 export const WandererSchema = BaseSpaceshipSchema.extend({
@@ -45,14 +46,14 @@ export const WandererSchema = BaseSpaceshipSchema.extend({
         primary: z.object({
             warpDrive: SerializedWarpDriveSchema.nullable(),
             thrusters: SerializedThrustersSchema.nullable(),
-            fuelTank: SerializedFuelTankSchema.nullable()
+            fuelTank: SerializedFuelTankSchema.nullable(),
         }),
         optional: z.tuple([
             SerializedOptionalComponentSchema.nullable(),
             SerializedOptionalComponentSchema.nullable(),
-            SerializedOptionalComponentSchema.nullable()
-        ])
-    })
+            SerializedOptionalComponentSchema.nullable(),
+        ]),
+    }),
 });
 
 export type SerializedWanderer = z.infer<typeof WandererSchema>;
@@ -71,33 +72,33 @@ export function getDefaultSerializedSpaceship(): SerializedSpaceship {
                 warpDrive: {
                     type: "warpDrive",
                     size: 3,
-                    quality: 1
+                    quality: 1,
                 },
                 thrusters: {
                     type: "thrusters",
                     size: 3,
-                    quality: 1
+                    quality: 1,
                 },
                 fuelTank: {
                     type: "fuelTank",
                     size: 2,
                     quality: 1,
-                    currentFuel01: 1
-                }
+                    currentFuel01: 1,
+                },
             },
             optional: [
                 null,
                 {
                     type: "fuelScoop",
                     size: 2,
-                    quality: 1
+                    quality: 1,
                 },
                 {
                     type: "discoveryScanner",
                     size: 2,
-                    quality: 1
-                }
-            ]
-        }
+                    quality: 1,
+                },
+            ],
+        },
     } satisfies SerializedSpaceship);
 }

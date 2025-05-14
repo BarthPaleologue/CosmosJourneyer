@@ -16,19 +16,20 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { z } from "zod";
+
+import i18n from "../../i18n";
 import { SerializedDiscoveryScannerSchema } from "./discoveryScanner";
 import { SerializedFuelScoopSchema } from "./fuelScoop";
 import { SerializedFuelTankSchema } from "./fuelTank";
 import { SerializedThrustersSchema } from "./thrusters";
 import { SerializedWarpDriveSchema } from "./warpDrive";
-import i18n from "../../i18n";
 
 export const SerializedComponentSchema = z.discriminatedUnion("type", [
     SerializedWarpDriveSchema,
     SerializedFuelScoopSchema,
     SerializedFuelTankSchema,
     SerializedDiscoveryScannerSchema,
-    SerializedThrustersSchema
+    SerializedThrustersSchema,
 ]);
 
 export type SerializedComponent = z.infer<typeof SerializedComponentSchema>;

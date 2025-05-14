@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Effect } from "@babylonjs/core/Materials/effect";
 import { Camera } from "@babylonjs/core/Cameras/camera";
+import { Effect } from "@babylonjs/core/Materials/effect";
 
 export const CameraUniformNames = {
     CAMERA_POSITION: "camera_position",
@@ -26,7 +26,7 @@ export const CameraUniformNames = {
     CAMERA_INVERSE_VIEW: "camera_inverseView",
     CAMERA_NEAR: "camera_near",
     CAMERA_FAR: "camera_far",
-    CAMERA_FOV: "camera_fov"
+    CAMERA_FOV: "camera_fov",
 };
 
 export function setCameraUniforms(effect: Effect, camera: Camera): void {

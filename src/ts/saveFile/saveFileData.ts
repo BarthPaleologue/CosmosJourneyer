@@ -15,12 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { encodeBase64 } from "../utils/base64";
 import { z } from "zod";
+
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { encodeBase64 } from "../utils/base64";
 import { Result } from "../utils/types";
 import { SaveLoadingError } from "./saveLoadingError";
 import { safeParseSaveV2, SaveSchemaV2 } from "./v2/saveV2";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 
 export const SaveSchema = SaveSchemaV2;
 
@@ -33,7 +34,7 @@ export type Save = z.infer<typeof SaveSchema>;
  */
 export function safeParseSave(
     json: Record<string, unknown>,
-    starSystemDatabase: StarSystemDatabase
+    starSystemDatabase: StarSystemDatabase,
 ): Result<Save, SaveLoadingError> {
     return safeParseSaveV2(json, starSystemDatabase);
 }
@@ -50,7 +51,7 @@ export function createUrlFromSave(data: Save): URL | null {
 
 export function parseSaveArray(
     rawSaves: Record<string, unknown>[],
-    starSystemDatabase: StarSystemDatabase
+    starSystemDatabase: StarSystemDatabase,
 ): { validSaves: Save[]; invalidSaves: { save: unknown; error: SaveLoadingError }[] } {
     const validSaves: Save[] = [];
     const invalidSaves: { save: unknown; error: SaveLoadingError }[] = [];
@@ -72,7 +73,7 @@ export const CmdrSavesShallowSchema = z.object({
     manual: z.array(z.record(z.string(), z.unknown())),
 
     /** The auto saves of the cmdr. */
-    auto: z.array(z.record(z.string(), z.unknown()))
+    auto: z.array(z.record(z.string(), z.unknown())),
 });
 
 export const CmdrSavesDeepSchema = CmdrSavesShallowSchema.extend({
@@ -80,7 +81,7 @@ export const CmdrSavesDeepSchema = CmdrSavesShallowSchema.extend({
     manual: z.array(SaveSchema),
 
     /** The auto saves of the cmdr. */
-    auto: z.array(SaveSchema)
+    auto: z.array(SaveSchema),
 });
 
 export type CmdrSaves = z.infer<typeof CmdrSavesDeepSchema>;

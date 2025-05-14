@@ -15,18 +15,19 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Scene } from "@babylonjs/core/scene";
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import { Quaternion } from "@babylonjs/core/Maths/math";
+import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
+import { RandomRange, RangeToPercent } from "@babylonjs/core/Maths/math.scalar.functions";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { Transformable } from "../architecture/transformable";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { SolidParticle } from "@babylonjs/core/Particles/solidParticle";
 import { SolidParticleSystem } from "@babylonjs/core/Particles/solidParticleSystem";
-import { Quaternion } from "@babylonjs/core/Maths/math";
-import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
+import { Scene } from "@babylonjs/core/scene";
+
+import { Transformable } from "../architecture/transformable";
 import { getForwardDirection } from "../uberCore/transforms/basicTransform";
-import { RandomRange, RangeToPercent } from "@babylonjs/core/Maths/math.scalar.functions";
 
 /**
  * @see https://playground.babylonjs.com/#GLZ1PX#1241 (SPS)
@@ -182,7 +183,7 @@ export class WarpTunnel implements Transformable {
     private updateGlobals() {
         this.particleRotationQuaternion.copyFrom(this.anchor.absoluteRotationQuaternion);
         this.particleDirection.copyFrom(
-            this.parent.getAbsolutePosition().subtract(this.anchor.getAbsolutePosition()).normalize()
+            this.parent.getAbsolutePosition().subtract(this.anchor.getAbsolutePosition()).normalize(),
         );
 
         this.tunnelAxis1.copyFrom(this.particleDirection.add(new Vector3(Math.random(), Math.random(), Math.random())));

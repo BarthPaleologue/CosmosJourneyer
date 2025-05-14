@@ -15,36 +15,38 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Scene } from "@babylonjs/core/scene";
-import { PBRTextures } from "../../textures";
-import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
+import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
+import { Scene } from "@babylonjs/core/scene";
+
 import {
-    vertexAttribute,
-    split,
-    uniformWorld,
-    transformPosition,
-    transformDirection,
-    sub,
-    f,
-    step,
     abs,
-    mul,
-    mix,
-    uniformViewProjection,
-    outputVertexPosition,
-    vec2,
-    textureSample,
-    perturbNormal,
-    uniformView,
-    uniformCameraPosition,
-    pbrMetallicRoughnessMaterial,
-    outputFragColor,
-    smoothstep,
+    add,
+    f,
     fract,
+    mix,
+    mul,
+    outputFragColor,
+    outputVertexPosition,
+    pbrMetallicRoughnessMaterial,
+    perturbNormal,
+    smoothstep,
+    split,
+    step,
+    sub,
+    textureSample,
+    transformDirection,
+    transformPosition,
+    uniformCameraPosition,
+    uniformView,
+    uniformViewProjection,
+    uniformWorld,
+    vec2,
     vec3,
-    add
-} from "../../../utils/bsl";
+    vertexAttribute,
+} from "@/utils/bsl";
+
+import { PBRTextures } from "../../textures";
 
 export class RingHabitatMaterial extends NodeMaterial {
     constructor(meanRadius: number, deltaRadius: number, height: number, textures: PBRTextures, scene: Scene) {
@@ -75,7 +77,7 @@ export class RingHabitatMaterial extends NodeMaterial {
         this.addOutputNode(vertexOutput);
 
         const albedo = textureSample(textures.albedo, proceduralUV, {
-            convertToLinearSpace: true
+            convertToLinearSpace: true,
         });
         const normalMap = textureSample(textures.normal, proceduralUV);
         const metallicRoughness = textureSample(textures.metallicRoughness, proceduralUV);
@@ -95,15 +97,18 @@ export class RingHabitatMaterial extends NodeMaterial {
             normalW,
             view,
             cameraPosition,
-            positionW
+            positionW,
         );
 
         const lightEmission = mul(
             mul(
                 smoothstep(f(0.48), f(0.5), fract(scaledUvX)),
-                sub(f(1), smoothstep(f(0.5), f(0.52), fract(scaledUvX)))
+                sub(f(1), smoothstep(f(0.5), f(0.52), fract(scaledUvX))),
             ),
-            mul(smoothstep(f(0.4), f(0.45), fract(scaledUvY)), sub(f(1), smoothstep(f(0.55), f(0.6), fract(scaledUvY))))
+            mul(
+                smoothstep(f(0.4), f(0.45), fract(scaledUvY)),
+                sub(f(1), smoothstep(f(0.55), f(0.6), fract(scaledUvY))),
+            ),
         );
 
         const lightColor = vec3(f(1), f(1), f(0.7));

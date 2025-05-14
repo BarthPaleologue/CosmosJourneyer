@@ -15,26 +15,28 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { PlanetChunk } from "./planetChunk";
-import { Direction } from "../../../../utils/direction";
-import { BuildTask, TaskType } from "./taskTypes";
-import { Settings } from "../../../../settings";
-import { getChunkSphereSpacePositionFromPath } from "../../../../utils/chunkUtils";
-import { TerrainSettings } from "../terrainSettings";
+import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Material } from "@babylonjs/core/Materials/material";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { Camera } from "@babylonjs/core/Cameras/camera";
-import { DeleteSemaphore } from "./deleteSemaphore";
-import { getRotationQuaternion } from "../../../../uberCore/transforms/basicTransform";
-import { ChunkForge } from "./chunkForge";
-import { clamp } from "../../../../utils/math";
-import { Cullable } from "../../../../utils/cullable";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { Scene } from "@babylonjs/core/scene";
+
+import { getChunkSphereSpacePositionFromPath } from "@/utils/chunkUtils";
+import { Cullable } from "@/utils/cullable";
+import { Direction } from "@/utils/direction";
+import { clamp } from "@/utils/math";
+import { DeepReadonly } from "@/utils/types";
+
+import { Settings } from "../../../../settings";
+import { getRotationQuaternion } from "../../../../uberCore/transforms/basicTransform";
 import { TelluricPlanetModel } from "../../telluricPlanetModel";
 import { TelluricSatelliteModel } from "../../telluricSatelliteModel";
-import { DeepReadonly } from "../../../../utils/types";
+import { TerrainSettings } from "../terrainSettings";
+import { ChunkForge } from "./chunkForge";
+import { DeleteSemaphore } from "./deleteSemaphore";
+import { PlanetChunk } from "./planetChunk";
+import { BuildTask, TaskType } from "./taskTypes";
 
 /**
  * A quadTree is defined recursively
@@ -82,7 +84,7 @@ export class ChunkTree implements Cullable {
         planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>,
         parentAggregate: PhysicsAggregate,
         material: Material,
-        scene: Scene
+        scene: Scene,
     ) {
         this.rootChunkLength = planetModel.radius * 2;
         this.planetName = planetModel.name;
@@ -95,7 +97,7 @@ export class ChunkTree implements Cullable {
 
         // max depth is minimal depth to get a certain minimum space between vertices
         this.maxDepth = Math.ceil(
-            Math.log2(this.rootChunkLength / (Settings.MIN_DISTANCE_BETWEEN_VERTICES * Settings.VERTEX_RESOLUTION))
+            Math.log2(this.rootChunkLength / (Settings.MIN_DISTANCE_BETWEEN_VERTICES * Settings.VERTEX_RESOLUTION)),
         );
 
         this.scene = scene;
@@ -165,7 +167,7 @@ export class ChunkTree implements Cullable {
         observerPositionW: Vector3,
         chunkForge: ChunkForge,
         tree: QuadTree = this.tree,
-        walked: number[] = []
+        walked: number[] = [],
     ): QuadTree {
         if (walked.length === this.maxDepth) return tree;
 
@@ -173,7 +175,7 @@ export class ChunkTree implements Cullable {
             walked,
             this.direction,
             this.rootChunkLength / 2,
-            getRotationQuaternion(this.parent)
+            getRotationQuaternion(this.parent),
         );
 
         const nodePositionSphere = nodeRelativePosition.normalizeToNew();
@@ -194,7 +196,7 @@ export class ChunkTree implements Cullable {
 
         const chunkGreatDistanceFactor = Math.max(
             0.0,
-            nodeGreatCircleDistance - (8 * nodeLength) / (2 * Math.PI * this.planetModel.radius)
+            nodeGreatCircleDistance - (8 * nodeLength) / (2 * Math.PI * this.planetModel.radius),
         );
         const observerDistanceFactor = Math.max(0.0, observerDistanceToCenter - totalRadius) / this.planetModel.radius;
 
@@ -213,7 +215,7 @@ export class ChunkTree implements Cullable {
                 this.createChunk(walked.concat([0]), chunkForge),
                 this.createChunk(walked.concat([1]), chunkForge),
                 this.createChunk(walked.concat([2]), chunkForge),
-                this.createChunk(walked.concat([3]), chunkForge)
+                this.createChunk(walked.concat([3]), chunkForge),
             ];
             this.requestDeletion(tree, newTree);
             return newTree;
@@ -230,7 +232,7 @@ export class ChunkTree implements Cullable {
                 this.updateLODRecursively(observerPositionW, chunkForge, tree[0], walked.concat([0])),
                 this.updateLODRecursively(observerPositionW, chunkForge, tree[1], walked.concat([1])),
                 this.updateLODRecursively(observerPositionW, chunkForge, tree[2], walked.concat([2])),
-                this.updateLODRecursively(observerPositionW, chunkForge, tree[3], walked.concat([3]))
+                this.updateLODRecursively(observerPositionW, chunkForge, tree[3], walked.concat([3])),
             ];
         }
 
@@ -251,7 +253,7 @@ export class ChunkTree implements Cullable {
             this.material,
             this.planetModel,
             this.rootChunkLength,
-            this.scene
+            this.scene,
         );
 
         const buildTask: BuildTask = {
@@ -263,7 +265,7 @@ export class ChunkTree implements Cullable {
             position: chunk.cubePosition,
             depth: path.length,
             direction: this.direction,
-            chunk: chunk
+            chunk: chunk,
         };
 
         chunkForge.addTask(buildTask);

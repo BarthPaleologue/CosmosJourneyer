@@ -15,19 +15,21 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { PointLight } from "@babylonjs/core/Lights/pointLight";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Scene } from "@babylonjs/core/scene";
 import { Light } from "@babylonjs/core/Lights/light";
-import { BlackHoleModel } from "./blackHoleModel";
-import { StellarObjectBase } from "../../architecture/stellarObject";
-import { TransformNode } from "@babylonjs/core/Meshes";
-import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
-import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
-import { BlackHoleUniforms } from "./blackHoleUniforms";
-import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
-import { DeepReadonly } from "../../utils/types";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { TransformNode } from "@babylonjs/core/Meshes";
+import { Scene } from "@babylonjs/core/scene";
+
+import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
+import { DeepReadonly } from "@/utils/types";
+
+import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
+import { StellarObjectBase } from "../../architecture/stellarObject";
+import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
+import { BlackHoleModel } from "./blackHoleModel";
+import { BlackHoleUniforms } from "./blackHoleUniforms";
 
 export class BlackHole implements StellarObjectBase<OrbitalObjectType.BLACK_HOLE> {
     readonly name: string;

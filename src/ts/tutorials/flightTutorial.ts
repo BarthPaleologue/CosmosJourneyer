@@ -15,25 +15,26 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
-import { TutorialControlsInputs } from "../ui/tutorial/tutorialLayerInputs";
-import { axisCompositeToString, pressInteractionToStrings } from "../utils/strings/inputControlsString";
 import { AxisComposite } from "@brianchirls/game-input/browser";
-import { Tutorial } from "./tutorial";
-import i18n from "../i18n";
-import welcomeImageSrc from "../../asset/tutorials/flightTutorial/welcome.webp";
+
+import congratsImageSrc from "../../asset/tutorials/flightTutorial/congrats.webp";
 import rotationImageSrc from "../../asset/tutorials/flightTutorial/rotation.webp";
+import saveData from "../../asset/tutorials/flightTutorial/save.json";
+import targetImageSrc from "../../asset/tutorials/flightTutorial/target.webp";
 import thrustImageSrc from "../../asset/tutorials/flightTutorial/thrust.webp";
 import warpImageSrc from "../../asset/tutorials/flightTutorial/warp.webp";
-import targetImageSrc from "../../asset/tutorials/flightTutorial/target.webp";
-import congratsImageSrc from "../../asset/tutorials/flightTutorial/congrats.webp";
-import saveData from "../../asset/tutorials/flightTutorial/save.json";
-import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
-import { safeParseSave, Save } from "../saveFile/saveFileData";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import welcomeImageSrc from "../../asset/tutorials/flightTutorial/welcome.webp";
+import i18n from "../i18n";
 import { StarSystemInputs } from "../inputs/starSystemInputs";
+import { safeParseSave, Save } from "../saveFile/saveFileData";
 import { SaveLoadingError } from "../saveFile/saveLoadingError";
+import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { TutorialControlsInputs } from "../ui/tutorial/tutorialLayerInputs";
+import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
+import { axisCompositeToString, pressInteractionToStrings } from "../utils/strings/inputControlsString";
 import { Result } from "../utils/types";
+import { Tutorial } from "./tutorial";
 
 export class FlightTutorial implements Tutorial {
     readonly coverImageSrc: string = welcomeImageSrc;
@@ -58,11 +59,11 @@ export class FlightTutorial implements Tutorial {
             <p>${i18n.t("tutorials:flightTutorial:welcome")}</p>
             ${i18n.t("tutorials:common:navigationInfo", {
                 nextKeys: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keybordLayoutMap).join(
-                    ` ${i18n.t("common:or")} `
+                    ` ${i18n.t("common:or")} `,
                 ),
                 previousKeys: pressInteractionToStrings(TutorialControlsInputs.map.prevPanel, keybordLayoutMap).join(
-                    ` ${i18n.t("common:or")} `
-                )
+                    ` ${i18n.t("common:or")} `,
+                ),
             })}
         </div>`;
 
@@ -88,8 +89,8 @@ export class FlightTutorial implements Tutorial {
                 keyIncrease: throttleStrings[1]?.[1],
                 keyDecrease: throttleStrings[0]?.[1],
                 keyKill: pressInteractionToStrings(SpaceShipControlsInputs.map.throttleToZero, keybordLayoutMap).join(
-                    ` ${i18n.t("common:or")} `
-                )
+                    ` ${i18n.t("common:or")} `,
+                ),
             })}</p>
             <img src="${thrustImageSrc}" alt="Spaceship Thrust">
             <p>${i18n.t("tutorials:flightTutorial:spaceShipThrustText2")}</p>
@@ -121,8 +122,8 @@ export class FlightTutorial implements Tutorial {
             
             ${i18n.t("tutorials:common:tutorialEnding", {
                 keyQuit: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keybordLayoutMap).join(
-                    ` ${i18n.t("common:or")} `
-                )
+                    ` ${i18n.t("common:or")} `,
+                ),
             })}
         </div>`;
 
@@ -132,7 +133,7 @@ export class FlightTutorial implements Tutorial {
             thrustPanelHtml,
             warpPanelHtml,
             targetingPanelHtml,
-            congratsPanelHtml
+            congratsPanelHtml,
         ];
     }
 }

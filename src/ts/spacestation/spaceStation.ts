@@ -15,35 +15,36 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Scene } from "@babylonjs/core/scene";
-import { isSizeOnScreenEnough } from "../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { TransformNode } from "@babylonjs/core/Meshes";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { TransformNode } from "@babylonjs/core/Meshes";
+import { Scene } from "@babylonjs/core/scene";
+
+import { StellarObjectModel } from "../architecture/orbitalObjectModel";
+import { OrbitalObjectType } from "../architecture/orbitalObjectType";
+import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
+import { Transformable } from "../architecture/transformable";
+import { CylinderHabitat } from "../assets/procedural/spaceStation/cylinderHabitat";
+import { EngineBay } from "../assets/procedural/spaceStation/engineBay";
+import { HelixHabitat } from "../assets/procedural/spaceStation/helixHabitat";
+import { LandingBay } from "../assets/procedural/spaceStation/landingBay";
+import { RingHabitat } from "../assets/procedural/spaceStation/ringHabitat";
+import { SolarSection } from "../assets/procedural/spaceStation/solarSection";
 import { SpaceStationNodeType } from "../assets/procedural/spaceStation/spaceStationNode";
 import { UtilitySection } from "../assets/procedural/spaceStation/utilitySection";
-import { HelixHabitat } from "../assets/procedural/spaceStation/helixHabitat";
-import { RingHabitat } from "../assets/procedural/spaceStation/ringHabitat";
-import { Transformable } from "../architecture/transformable";
-import { SolarSection } from "../assets/procedural/spaceStation/solarSection";
-import { wheelOfFortune } from "../utils/random";
-import { CylinderHabitat } from "../assets/procedural/spaceStation/cylinderHabitat";
-import { LandingBay } from "../assets/procedural/spaceStation/landingBay";
+import { RenderingAssets } from "../assets/renderingAssets";
 import { Settings } from "../settings";
-import { EngineBay } from "../assets/procedural/spaceStation/engineBay";
+import { getEdibleEnergyPerHaPerDay } from "../utils/agriculture";
 import { getRngFromSeed } from "../utils/getRngFromSeed";
+import { isSizeOnScreenEnough } from "../utils/isObjectVisibleOnScreen";
+import { getSphereRadiatedEnergyFlux } from "../utils/physics";
+import { wheelOfFortune } from "../utils/random";
+import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
 import { getOrbitalObjectTypeToI18nString } from "../utils/strings/orbitalObjectTypeToDisplay";
-import { OrbitalFacilityBase } from "./orbitalFacility";
-import { SpaceStationModel } from "./spacestationModel";
-import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
-import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { DeepReadonly } from "../utils/types";
 import { LandingPadManager } from "./landingPad/landingPadManager";
-import { getEdibleEnergyPerHaPerDay } from "../utils/agriculture";
-import { StellarObjectModel } from "../architecture/orbitalObjectModel";
-import { getSphereRadiatedEnergyFlux } from "../utils/physics";
-import { getSolarPanelSurfaceFromEnergyRequirement } from "../utils/solarPanels";
-import { RenderingAssets } from "../assets/renderingAssets";
+import { OrbitalFacilityBase } from "./orbitalFacility";
+import { SpaceStationModel } from "./spacestationModel";
 
 export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE_STATION> {
     readonly name: string;
@@ -74,7 +75,7 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
         model: DeepReadonly<SpaceStationModel>,
         stellarObjects: ReadonlyMap<DeepReadonly<StellarObjectModel>, number>,
         assets: RenderingAssets,
-        scene: Scene
+        scene: Scene,
     ) {
         this.model = model;
 
@@ -92,7 +93,7 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
         this.landingPadManager = new LandingPadManager(
             this.landingBays.flatMap((landingBay) => {
                 return landingBay.landingPads;
-            })
+            }),
         );
 
         // center the space station on its center of mass
@@ -110,7 +111,7 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
         this.targetInfo = {
             type: ObjectTargetCursorType.FACILITY,
             minDistance: this.getBoundingRadius() * 6.0,
-            maxDistance: 0.0
+            maxDistance: 0.0,
         };
     }
 
@@ -143,7 +144,7 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
         const solarPanelSurfaceM2 = getSolarPanelSurfaceFromEnergyRequirement(
             this.model.solarPanelEfficiency,
             this.model.population * this.model.energyConsumptionPerCapitaKWh,
-            totalStellarFlux
+            totalStellarFlux,
         );
 
         const housingSurfaceHa = (100 * this.model.population) / this.model.populationDensity; // convert km² to ha
@@ -173,7 +174,7 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
             solarPanelSurfaceM2,
             Settings.SEED_HALF_RANGE * rng(31),
             assets,
-            this.scene
+            this.scene,
         );
         solarSection.getTransform().parent = this.getTransform();
         this.placeNode(solarSection.getTransform(), lastNode);
@@ -186,9 +187,9 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
             [
                 [SpaceStationNodeType.RING_HABITAT, 0.4],
                 [SpaceStationNodeType.HELIX_HABITAT, 0.3],
-                [SpaceStationNodeType.CYLINDER_HABITAT, 0.3]
+                [SpaceStationNodeType.CYLINDER_HABITAT, 0.3],
             ],
-            rng(17)
+            rng(17),
         );
 
         let newNode: TransformNode | null = null;
@@ -197,7 +198,7 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
                 totalHabitatSurfaceM2,
                 Settings.SEED_HALF_RANGE * rng(19),
                 assets.textures,
-                this.scene
+                this.scene,
             );
             this.helixHabitats.push(helixHabitat);
             newNode = helixHabitat.getTransform();
@@ -206,7 +207,7 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
                 totalHabitatSurfaceM2,
                 Settings.SEED_HALF_RANGE * rng(27),
                 assets.textures,
-                this.scene
+                this.scene,
             );
             this.ringHabitats.push(ringHabitat);
             newNode = ringHabitat.getTransform();
@@ -215,7 +216,7 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
                 totalHabitatSurfaceM2,
                 Settings.SEED_HALF_RANGE * rng(13),
                 assets.textures,
-                this.scene
+                this.scene,
             );
             this.cylinderHabitats.push(cylinderHabitat);
             newNode = cylinderHabitat.getTransform();
@@ -242,14 +243,14 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
         lastNode: TransformNode,
         nbSections: number,
         rng: (index: number) => number,
-        assets: RenderingAssets
+        assets: RenderingAssets,
     ): TransformNode {
         let newLastNode = lastNode;
         for (let i = 0; i < nbSections; i++) {
             const utilitySection = new UtilitySection(
                 rng(132 + 10 * this.utilitySections.length) * Settings.SEED_HALF_RANGE,
                 assets,
-                this.scene
+                this.scene,
             );
             this.utilitySections.push(utilitySection);
 

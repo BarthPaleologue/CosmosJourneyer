@@ -15,26 +15,27 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
-import { Scene } from "@babylonjs/core/scene";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { ArcRotateCamera, PostProcess, TransformNode } from "@babylonjs/core";
-import { newSeededMandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModelGenerator";
-import { EmptyCelestialBody } from "../utils/emptyCelestialBody";
-import { MandelbulbPostProcess } from "../anomalies/mandelbulb/mandelbulbPostProcess";
+import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Scene } from "@babylonjs/core/scene";
+
 import { newSeededJuliaSetModel } from "../anomalies/julia/juliaSetModelGenerator";
 import { JuliaSetPostProcess } from "../anomalies/julia/juliaSetPostProcess";
 import { newSeededMandelboxModel } from "../anomalies/mandelbox/mandelboxModelGenerator";
 import { MandelboxPostProcess } from "../anomalies/mandelbox/mandelboxPostProcess";
-import { newSeededSierpinskiPyramidModel } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidModelGenerator";
-import { SierpinskiPyramidPostProcess } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidPostProcess";
+import { newSeededMandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModelGenerator";
+import { MandelbulbPostProcess } from "../anomalies/mandelbulb/mandelbulbPostProcess";
 import { newSeededMengerSpongeModel } from "../anomalies/mengerSponge/mengerSpongeModelGenerator";
 import { MengerSpongePostProcess } from "../anomalies/mengerSponge/mengerSpongePostProcess";
+import { newSeededSierpinskiPyramidModel } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidModelGenerator";
+import { SierpinskiPyramidPostProcess } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidPostProcess";
 import { UpdatablePostProcess } from "../postProcesses/updatablePostProcess";
+import { EmptyCelestialBody } from "../utils/emptyCelestialBody";
 
 export async function createXrScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void
+    progressCallback: (progress: number, text: string) => void,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -59,7 +60,7 @@ export async function createXrScene(
             mandelbulb.getBoundingRadius(),
             mandelBulbModel,
             scene,
-            []
+            [],
         );
 
         setupPP(mandelbulbPP);
@@ -77,7 +78,7 @@ export async function createXrScene(
             julia.getBoundingRadius(),
             juliaModel.accentColor,
             scene,
-            []
+            [],
         );
 
         setupPP(juliaPP);
@@ -95,7 +96,7 @@ export async function createXrScene(
             mandelbox.getBoundingRadius(),
             mandelboxModel,
             scene,
-            []
+            [],
         );
 
         setupPP(mandelboxPP);
@@ -108,7 +109,7 @@ export async function createXrScene(
             "sierpinski",
             Math.random() * 100_000,
             "XR Anomaly",
-            []
+            [],
         );
         const sierpinskiPyramid = new EmptyCelestialBody(sierpinskiPyramidModel, scene);
         sierpinskiPyramid.getTransform().scalingDeterminant = 1 / 100e3;
@@ -118,7 +119,7 @@ export async function createXrScene(
             sierpinskiPyramid.getBoundingRadius(),
             sierpinskiPyramidModel,
             scene,
-            []
+            [],
         );
 
         setupPP(sierpinskiPyramidPP);
@@ -136,7 +137,7 @@ export async function createXrScene(
             mengerSponge.getBoundingRadius(),
             mengerSpongeModel,
             scene,
-            []
+            [],
         );
 
         setupPP(mengerSpongePP);

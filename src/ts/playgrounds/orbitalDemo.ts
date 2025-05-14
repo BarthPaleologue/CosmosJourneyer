@@ -16,22 +16,24 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
-import { Scene } from "@babylonjs/core/scene";
-import { DefaultControls } from "../defaultControls/defaultControls";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { CustomOrbitalObject } from "../utils/customOrbitalObject";
-import { OrbitalObject } from "../architecture/orbitalObject";
 import { Tools } from "@babylonjs/core/Misc/tools";
-import { OrbitRenderer } from "../orbit/orbitRenderer";
-import { AxisRenderer } from "../orbit/axisRenderer";
-import { OrbitalObjectType } from "../architecture/orbitalObjectType";
+import { Scene } from "@babylonjs/core/scene";
+
 import { setOrbitalPosition, setRotation } from "@/architecture/orbitalObjectUtils";
+
+import { OrbitalObject } from "../architecture/orbitalObject";
+import { OrbitalObjectType } from "../architecture/orbitalObjectType";
+import { DefaultControls } from "../defaultControls/defaultControls";
+import { AxisRenderer } from "../orbit/axisRenderer";
+import { OrbitRenderer } from "../orbit/orbitRenderer";
+import { CustomOrbitalObject } from "../utils/customOrbitalObject";
 
 export function createOrbitalDemoScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void
+    progressCallback: (progress: number, text: string) => void,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -56,12 +58,12 @@ export function createOrbitalDemoScene(
             longitudeOfAscendingNode: 0,
             inclination: 0,
             eccentricity: 0,
-            p: 2
+            p: 2,
         },
         type: OrbitalObjectType.CUSTOM,
         axialTilt: 0,
         mass: 1e12,
-        siderealDaySeconds: 0
+        siderealDaySeconds: 0,
     });
 
     const earth = new CustomOrbitalObject(MeshBuilder.CreateSphere("earth", { diameter: 0.5 }, scene), {
@@ -75,12 +77,12 @@ export function createOrbitalDemoScene(
             longitudeOfAscendingNode: 1.7,
             inclination: Tools.ToRadians(23.5),
             eccentricity: 0.5,
-            p: 2
+            p: 2,
         },
         type: OrbitalObjectType.CUSTOM,
         axialTilt: Tools.ToRadians(23.5),
         mass: 1e11,
-        siderealDaySeconds: 0
+        siderealDaySeconds: 0,
     });
 
     const moon = new CustomOrbitalObject(MeshBuilder.CreateSphere("moon", { diameter: 0.2 }, scene), {
@@ -94,12 +96,12 @@ export function createOrbitalDemoScene(
             longitudeOfAscendingNode: 0,
             inclination: earth.model.orbit.inclination + earth.model.axialTilt, //Tools.ToRadians(45),
             eccentricity: 0.7,
-            p: 2
+            p: 2,
         },
         type: OrbitalObjectType.CUSTOM,
         mass: 1e10,
         axialTilt: 0,
-        siderealDaySeconds: 0
+        siderealDaySeconds: 0,
     });
 
     const bodies = [sun, earth, moon];
@@ -132,7 +134,7 @@ export function createOrbitalDemoScene(
 
         Matrix.FromQuaternionToRef(
             defaultControls.getTransform().rotationQuaternion?.clone().invertInPlace() ?? Quaternion.Identity(),
-            referencePlaneDeltaRotation
+            referencePlaneDeltaRotation,
         );
         defaultControls.getTransform().rotationQuaternion = Quaternion.Identity();
         defaultControls.getTransform().computeWorldMatrix(true);

@@ -15,13 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
+
+import { StarSystemDatabase } from "../../../starSystem/starSystemDatabase";
+import { MissionContext } from "../../missionContext";
+import type { MissionNode } from "../missionNode";
+import { MissionNodeBase } from "../missionNodeBase";
 import { MissionSequenceNodeSerialized } from "../missionNodeSerialized";
 import { MissionNodeType } from "../missionNodeType";
-import { MissionNodeBase } from "../missionNodeBase";
-import { MissionContext } from "../../missionContext";
-import { StarSystemCoordinates } from "../../../utils/coordinates/starSystemCoordinates";
-import { StarSystemDatabase } from "../../../starSystem/starSystemDatabase";
-import type { MissionNode } from "../missionNode";
 
 /**
  * Node used to describe a sequence of tasks that must be completed in order.
@@ -76,7 +77,7 @@ export class MissionSequenceNode implements MissionNodeBase<MissionNodeType.SEQU
     setActiveChildIndex(index: number) {
         if (index < 0 || index >= this.children.length) {
             throw new Error(
-                `Invalid index ${index} for mission sequence node. Must be between 0 and ${this.children.length - 1}`
+                `Invalid index ${index} for mission sequence node. Must be between 0 and ${this.children.length - 1}`,
             );
         }
         this.activeChildIndex = index;
@@ -89,7 +90,7 @@ export class MissionSequenceNode implements MissionNodeBase<MissionNodeType.SEQU
     describeNextTask(
         context: MissionContext,
         keyboardLayout: Map<string, string>,
-        starSystemDatabase: StarSystemDatabase
+        starSystemDatabase: StarSystemDatabase,
     ): string {
         if (this.hasCompletedLock) return "Mission completed";
         const activeChild = this.children[this.activeChildIndex];
@@ -110,7 +111,7 @@ export class MissionSequenceNode implements MissionNodeBase<MissionNodeType.SEQU
         return {
             type: MissionNodeType.SEQUENCE,
             children: this.children.map((child) => child.serialize()),
-            activeChildIndex: this.activeChildIndex
+            activeChildIndex: this.activeChildIndex,
         };
     }
 }

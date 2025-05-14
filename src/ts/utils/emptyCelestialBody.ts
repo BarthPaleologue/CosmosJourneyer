@@ -15,14 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
-import { Quaternion } from "@babylonjs/core/Maths/math.vector";
+
 import { CelestialBodyBase } from "../architecture/celestialBody";
-import { TargetInfo, defaultTargetInfoCelestialBody } from "../architecture/targetable";
-import { getOrbitalObjectTypeToI18nString } from "./strings/orbitalObjectTypeToDisplay";
 import { CelestialBodyModel } from "../architecture/orbitalObjectModel";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
+import { defaultTargetInfoCelestialBody, TargetInfo } from "../architecture/targetable";
+import { getOrbitalObjectTypeToI18nString } from "./strings/orbitalObjectTypeToDisplay";
 import { DeepReadonly } from "./types";
 
 export class EmptyCelestialBody<TObjectType extends OrbitalObjectType> implements CelestialBodyBase<TObjectType> {

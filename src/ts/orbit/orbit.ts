@@ -15,13 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Settings } from "../settings";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
+import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { z } from "zod";
+
+import { Settings } from "../settings";
+import { OrbitalObjectIdSchema } from "../utils/coordinates/orbitalObjectId";
 import { findMinimumNewtonRaphson } from "../utils/math";
 import { DeepReadonly } from "../utils/types";
-import { z } from "zod";
-import { OrbitalObjectIdSchema } from "../utils/coordinates/orbitalObjectId";
 
 /**
  * Represents an orbit in the p-norm space. (Euclidean space for p=2)
@@ -73,7 +74,7 @@ export const OrbitSchema = z.object({
      * The norm to use for the orbit. 2 for Euclidean space, other numbers for funky shapes.
      * @see https://medium.com/@barth_29567/crazy-orbits-lets-make-squares-c91a427c6b26
      */
-    p: z.number().default(2)
+    p: z.number().default(2),
 });
 
 export type Orbit = z.infer<typeof OrbitSchema>;
@@ -103,7 +104,7 @@ export function getPointOnOrbitLocal(orbit: DeepReadonly<Orbit>, parentMass: num
 
     const trueAnomaly = findMinimumNewtonRaphson(
         (trueAnomaly) => keplerEquation(trueAnomaly, meanAnomaly, orbit.eccentricity),
-        meanAnomaly
+        meanAnomaly,
     );
 
     const x = Math.cos(trueAnomaly);
@@ -144,7 +145,7 @@ export function getPointOnOrbit(
     parentMass: number,
     orbit: DeepReadonly<Orbit>,
     t: number,
-    referencePlaneRotation: Matrix
+    referencePlaneRotation: Matrix,
 ): Vector3 {
     const point = getPointOnOrbitLocal(orbit, parentMass, t);
 

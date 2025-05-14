@@ -15,7 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { clamp, lerpSmooth } from "../../utils/math";
+import { clamp, lerpSmooth } from "@/utils/math";
+
 import { getWarpDriveSpec, SerializedWarpDrive } from "../serializedComponents/warpDrive";
 
 const enum WarpDriveState {
@@ -34,7 +35,7 @@ const enum WarpDriveState {
      * The warp drive is disengaging. The warp speed is decreasing until it reaches 0.
      * When the warp speed reaches 0, the warp drive is disabled.
      */
-    DISENGAGING
+    DISENGAGING,
 }
 
 /**
@@ -130,7 +131,7 @@ export class WarpDrive implements ReadonlyWarpDrive {
         return {
             type: this.type,
             size: this.size,
-            quality: this.quality
+            quality: this.quality,
         };
     }
 

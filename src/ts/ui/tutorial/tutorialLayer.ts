@@ -1,12 +1,14 @@
-import { pressInteractionToStrings } from "../../utils/strings/inputControlsString";
-import { TutorialControlsInputs } from "./tutorialLayerInputs";
-import i18n from "../../i18n";
-import { IDisposable } from "@babylonjs/core/scene";
-import { getGlobalKeyboardLayoutMap } from "../../utils/keyboardAPI";
 import { Observable } from "@babylonjs/core/Misc/observable";
-import { Tutorial } from "../../tutorials/tutorial";
-import { promptModalBoolean } from "../../utils/dialogModal";
+import { IDisposable } from "@babylonjs/core/scene";
+
+import { promptModalBoolean } from "@/utils/dialogModal";
+import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
+import { pressInteractionToStrings } from "@/utils/strings/inputControlsString";
+
 import { ISoundPlayer, SoundType } from "../../audio/soundPlayer";
+import i18n from "../../i18n";
+import { Tutorial } from "../../tutorials/tutorial";
+import { TutorialControlsInputs } from "./tutorialLayerInputs";
 
 export class TutorialLayer implements IDisposable {
     readonly root: HTMLDivElement;
@@ -96,8 +98,8 @@ export class TutorialLayer implements IDisposable {
                 [{ transform: "scale(1)" }, { transform: "scale(1.1)" }, { transform: "scale(1)" }],
                 {
                     duration: 200,
-                    easing: "ease"
-                }
+                    easing: "ease",
+                },
             );
             this.soundPlayer.playNow(SoundType.CLICK);
         });
@@ -121,8 +123,8 @@ export class TutorialLayer implements IDisposable {
                 [{ transform: "scale(1)" }, { transform: "scale(1.1)" }, { transform: "scale(1)" }],
                 {
                     duration: 200,
-                    easing: "ease"
-                }
+                    easing: "ease",
+                },
             );
             this.soundPlayer.playNow(SoundType.CLICK);
         });

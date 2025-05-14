@@ -16,11 +16,12 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+
 import { PlanetModel } from "../architecture/orbitalObjectModel";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { Orbit } from "../orbit/orbit";
 import { getFactionFromGalacticPosition } from "../society/factions";
-import { CropTypes, CropType } from "../utils/agriculture";
+import { CropType, CropTypes } from "../utils/agriculture";
 import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
 import { getRngFromSeed } from "../utils/getRngFromSeed";
 import { getOrbitRadiusFromPeriod } from "../utils/physics";
@@ -33,7 +34,7 @@ export function newSeededSpaceElevatorModel(
     seed: number,
     starSystemCoordinates: StarSystemCoordinates,
     starSystemPosition: Vector3,
-    parentBody: PlanetModel
+    parentBody: PlanetModel,
 ): SpaceElevatorModel {
     const rng = getRngFromSeed(seed);
 
@@ -51,7 +52,7 @@ export function newSeededSpaceElevatorModel(
         eccentricity: 0,
         longitudeOfAscendingNode: 0,
         argumentOfPeriapsis: 0,
-        initialMeanAnomaly: 0
+        initialMeanAnomaly: 0,
     };
 
     const tetherLength = orbitRadius - parentBody.radius;
@@ -98,6 +99,6 @@ export function newSeededSpaceElevatorModel(
         agricultureMix,
         nbHydroponicLayers,
         faction,
-        solarPanelEfficiency
+        solarPanelEfficiency,
     };
 }

@@ -15,11 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { VolumetricLightScatteringPostProcess } from "@babylonjs/core/PostProcesses/volumetricLightScatteringPostProcess";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { Scene } from "@babylonjs/core/scene";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { VolumetricLightScatteringPostProcess } from "@babylonjs/core/PostProcesses/volumetricLightScatteringPostProcess";
+import { Scene } from "@babylonjs/core/scene";
+
 import { VolumetricLightUniforms } from "./volumetricLightUniforms";
 
 export class VolumetricLight extends VolumetricLightScatteringPostProcess {
@@ -27,7 +28,7 @@ export class VolumetricLight extends VolumetricLightScatteringPostProcess {
         starMesh: Mesh,
         volumetricLightUniforms: VolumetricLightUniforms,
         excludedMeshes: AbstractMesh[],
-        scene: Scene
+        scene: Scene,
     ) {
         if (scene.activeCamera === null) throw new Error("no camera");
         super(
@@ -39,7 +40,7 @@ export class VolumetricLight extends VolumetricLightScatteringPostProcess {
             Texture.BILINEAR_SAMPLINGMODE,
             scene.getEngine(),
             false,
-            scene
+            scene,
         );
 
         // This is necessary because BabylonJS post process sets the scene using the camera. However, I don't pass a camera to the constructor as I use a PostProcessRenderPipeline.

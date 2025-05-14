@@ -29,5 +29,5 @@ export const enum PostProcessType {
     MENGER_SPONGE,
     BLACK_HOLE,
     SHADOW,
-    LENS_FLARE
+    LENS_FLARE,
 }

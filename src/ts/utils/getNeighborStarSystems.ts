@@ -16,14 +16,15 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "./coordinates/starSystemCoordinates";
+
 import { Settings } from "../settings";
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "./coordinates/starSystemCoordinates";
 
 export function getNeighborStarSystemCoordinates(
     starSystemCoordinates: StarSystemCoordinates,
     radius: number,
-    starSystemDatabase: StarSystemDatabase
+    starSystemDatabase: StarSystemDatabase,
 ): Array<{ coordinates: StarSystemCoordinates; position: Vector3; distance: number }> {
     const currentSystemPosition = starSystemDatabase.getSystemGalacticPosition(starSystemCoordinates);
     const starSectorSize = Settings.STAR_SECTOR_SIZE;
@@ -54,12 +55,12 @@ export function getNeighborStarSystemCoordinates(
         const starPositions = starSystemDatabase.getSystemPositionsInStarSector(
             starSector.x,
             starSector.y,
-            starSector.z
+            starSector.z,
         );
         const systemCoordinates = starSystemDatabase.getSystemCoordinatesInStarSector(
             starSector.x,
             starSector.y,
-            starSector.z
+            starSector.z,
         );
         return starPositions
             .map<{ coordinates: StarSystemCoordinates; position: Vector3; distance: number }>((position, index) => {

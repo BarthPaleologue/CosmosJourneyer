@@ -16,9 +16,10 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Observable } from "@babylonjs/core/Misc/observable";
+
+import i18n from "../../i18n";
 import { Settings } from "../../settings";
 import { getComponentTypeI18n, SerializedComponent } from "../../spaceship/serializedComponents/component";
-import i18n from "../../i18n";
 
 export class ComponentBrowserUI {
     readonly root: HTMLDivElement;
@@ -47,7 +48,7 @@ export class ComponentBrowserUI {
     public browseCategories(
         types: ReadonlyArray<SerializedComponent["type"]>,
         maxComponentSize: number,
-        spareParts: ReadonlySet<SerializedComponent>
+        spareParts: ReadonlySet<SerializedComponent>,
     ) {
         this.root.innerHTML = "";
 
@@ -64,7 +65,7 @@ export class ComponentBrowserUI {
     public browse(
         componentType: SerializedComponent["type"],
         maxComponentSize: number,
-        spareParts: ReadonlySet<SerializedComponent>
+        spareParts: ReadonlySet<SerializedComponent>,
     ) {
         this.root.innerHTML = "";
 
@@ -124,7 +125,7 @@ export class ComponentBrowserUI {
                             this.select({
                                 type: componentType,
                                 size: size,
-                                quality: quality
+                                quality: quality,
                             });
                             break;
                         case "fuelTank":
@@ -132,7 +133,7 @@ export class ComponentBrowserUI {
                                 type: componentType,
                                 size: size,
                                 quality: quality,
-                                currentFuel01: 1
+                                currentFuel01: 1,
                             });
                             break;
                     }
@@ -149,7 +150,7 @@ export class ComponentBrowserUI {
     private createCategoryButton(
         type: SerializedComponent["type"],
         maxComponentSize: number,
-        spareParts: ReadonlySet<SerializedComponent>
+        spareParts: ReadonlySet<SerializedComponent>,
     ): HTMLElement {
         const categoryButton = document.createElement("button");
         categoryButton.className = "componentCategory";

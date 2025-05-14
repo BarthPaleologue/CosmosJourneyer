@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Scene } from "@babylonjs/core/scene";
+
 import { AudioAssets, loadAudioAssets } from "./audioAssets";
 import { loadRenderingAssets, RenderingAssets } from "./renderingAssets";
 
@@ -26,13 +27,13 @@ export type Assets = {
 
 export async function loadAssets(
     progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void,
-    scene: Scene
+    scene: Scene,
 ): Promise<Assets> {
     const audioAssetsPromise = loadAudioAssets(progressCallback);
     const renderingAssetsPromise = loadRenderingAssets(progressCallback, scene);
 
     return {
         audio: await audioAssetsPromise,
-        rendering: await renderingAssetsPromise
+        rendering: await renderingAssetsPromise,
     };
 }

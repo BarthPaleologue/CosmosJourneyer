@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+
 import { AsteroidField } from "../asteroidFields/asteroidField";
 
 export function distanceToAsteroidField(position: Vector3, asteroidField: AsteroidField) {
@@ -35,6 +36,6 @@ export function distanceToAsteroidField(position: Vector3, asteroidField: Astero
         ? Math.abs(distanceAboveRings)
         : Math.sqrt(
               Math.min((planarDistance - ringsMinDistance) ** 2, (planarDistance - ringsMaxDistance) ** 2) +
-                  distanceAboveRings ** 2
+                  distanceAboveRings ** 2,
           );
 }

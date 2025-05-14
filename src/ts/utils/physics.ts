@@ -76,7 +76,7 @@ export function computeMeanTemperature(
     starRadius: number,
     starDistance: number,
     planetAlbedo: number,
-    planetGreenHouseEffect: number
+    planetGreenHouseEffect: number,
 ) {
     return (
         starTemperature *

@@ -10,22 +10,22 @@ export default defineConfig({
             args: [
                 "--no-sandbox",
                 "--disable-dev-shm-usage",
-                "--use-gl=swiftshader" // software WebGL
-            ]
+                "--use-gl=swiftshader", // software WebGL
+            ],
         },
-        viewport: { width: 1280, height: 720 }
+        viewport: { width: 1280, height: 720 },
     },
 
     expect: {
         toHaveScreenshot: {
             maxDiffPixelRatio: 0.03,
-            threshold: 0.01
-        }
+            threshold: 0.01,
+        },
     },
 
     webServer: {
         command: "npm run serve:prod",
         url: "http://localhost:8080",
-        reuseExistingServer: process.env["CI"] === undefined
-    }
+        reuseExistingServer: process.env["CI"] === undefined,
+    },
 });

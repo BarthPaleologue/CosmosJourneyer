@@ -1,21 +1,22 @@
-import { InputMaps } from "../inputs/inputMaps";
 import Action from "@brianchirls/game-input/Action";
-import Interaction from "@brianchirls/game-input/interactions/Interaction";
+import {
+    AxisComposite,
+    ButtonInputControl,
+    StickInputControl,
+    Vector2InputControl,
+} from "@brianchirls/game-input/browser";
 import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
+import Interaction from "@brianchirls/game-input/interactions/Interaction";
+
+import { InputMaps } from "../inputs/inputMaps";
+import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import {
     axisCompositeToString,
     buttonInputToString,
     dPadCompositeToString,
     stickInputToString,
-    vector2ToString
+    vector2ToString,
 } from "../utils/strings/inputControlsString";
-import {
-    AxisComposite,
-    ButtonInputControl,
-    StickInputControl,
-    Vector2InputControl
-} from "@brianchirls/game-input/browser";
-import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 
 export function initSettingsPanel(): HTMLElement {
     const settingsPanel = document.getElementById("settingsPanel");

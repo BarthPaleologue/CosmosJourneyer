@@ -15,12 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { TransferBuildData } from "./workerDataTypes";
-import { ApplyTask, BuildTask, ReturnedChunkDataSchema, TaskType } from "./taskTypes";
-import { WorkerPool } from "./workerPool";
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
-import { ChunkForge } from "./chunkForge";
+
 import { RenderingAssets } from "../../../../assets/renderingAssets";
+import { ChunkForge } from "./chunkForge";
+import { ApplyTask, BuildTask, ReturnedChunkDataSchema, TaskType } from "./taskTypes";
+import { TransferBuildData } from "./workerDataTypes";
+import { WorkerPool } from "./workerPool";
 
 export class ChunkForgeWorkers implements ChunkForge {
     /**
@@ -76,9 +77,9 @@ export class ChunkForgeWorkers implements ChunkForge {
                 max_mountain_height: task.terrainSettings.max_mountain_height,
                 max_bump_height: task.terrainSettings.max_bump_height,
                 bumps_frequency: task.terrainSettings.bumps_frequency,
-                mountains_frequency: task.terrainSettings.mountains_frequency
+                mountains_frequency: task.terrainSettings.mountains_frequency,
             },
-            seed: task.planetSeed
+            seed: task.planetSeed,
         };
 
         worker.postMessage(buildData);
@@ -99,7 +100,7 @@ export class ChunkForgeWorkers implements ChunkForge {
                     chunk: task.chunk,
                     instancesMatrixBuffer: data.instancesMatrixBuffer,
                     alignedInstancesMatrixBuffer: data.alignedInstancesMatrixBuffer,
-                    averageHeight: data.averageHeight
+                    averageHeight: data.averageHeight,
                 };
                 this.applyTaskQueue.push(applyTask);
             }
@@ -127,7 +128,7 @@ export class ChunkForgeWorkers implements ChunkForge {
                 task.instancesMatrixBuffer,
                 task.alignedInstancesMatrixBuffer,
                 task.averageHeight,
-                assets
+                assets,
             );
     }
 

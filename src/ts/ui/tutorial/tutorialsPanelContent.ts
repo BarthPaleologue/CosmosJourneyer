@@ -15,13 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Tutorial } from "../../tutorials/tutorial";
-import { FlightTutorial } from "../../tutorials/flightTutorial";
-import i18n from "../../i18n";
 import { Observable } from "@babylonjs/core/Misc/observable";
-import { StationLandingTutorial } from "../../tutorials/stationLandingTutorial";
+
+import i18n from "../../i18n";
+import { FlightTutorial } from "../../tutorials/flightTutorial";
 import { FuelScoopTutorial } from "../../tutorials/fuelScoopTutorial";
 import { StarMapTutorial } from "../../tutorials/starMapTutorial";
+import { StationLandingTutorial } from "../../tutorials/stationLandingTutorial";
+import { Tutorial } from "../../tutorials/tutorial";
 
 export class TutorialsPanelContent {
     readonly htmlRoot: HTMLElement;
@@ -37,7 +38,7 @@ export class TutorialsPanelContent {
             new FlightTutorial(),
             new StationLandingTutorial(),
             new StarMapTutorial(),
-            new FuelScoopTutorial()
+            new FuelScoopTutorial(),
         ];
 
         this.availableTutorials.forEach((tutorial) => {

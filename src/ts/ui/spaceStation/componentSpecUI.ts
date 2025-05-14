@@ -20,11 +20,11 @@ import { Settings } from "../../settings";
 import {
     getComponentTypeI18n,
     getComponentValue,
-    SerializedComponent
+    SerializedComponent,
 } from "../../spaceship/serializedComponents/component";
 import {
     getDiscoveryScannerSpec,
-    SerializedDiscoveryScanner
+    SerializedDiscoveryScanner,
 } from "../../spaceship/serializedComponents/discoveryScanner";
 import { getFuelScoopSpec, SerializedFuelScoop } from "../../spaceship/serializedComponents/fuelScoop";
 import { getFuelTankSpecs, SerializedFuelTank } from "../../spaceship/serializedComponents/fuelTank";

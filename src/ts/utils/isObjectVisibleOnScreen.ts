@@ -15,8 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Vector3 } from "@babylonjs/core/Maths/math";
 import { Camera } from "@babylonjs/core/Cameras/camera";
+import { Vector3 } from "@babylonjs/core/Maths/math";
+
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { Transformable } from "../architecture/transformable";
 
@@ -43,7 +44,7 @@ export function isSizeOnScreenEnough(object: HasBoundingSphere & Transformable, 
     const angularSize = getAngularSize(
         object.getTransform().getAbsolutePosition(),
         object.getBoundingRadius(),
-        camera.globalPosition
+        camera.globalPosition,
     );
 
     return angularSize / camera.fov > threshold;

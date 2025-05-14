@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+
 import { Direction, getQuaternionFromDirection } from "./direction";
 
 /**
@@ -71,7 +72,7 @@ export function getChunkSphereSpacePositionFromPath(
     path: number[],
     direction: Direction,
     planetRadius: number,
-    planetRotationQuaternion: Quaternion
+    planetRotationQuaternion: Quaternion,
 ): Vector3 {
     // on récupère la position dans le plan
     const position = getChunkPlaneSpacePositionFromPath(2 * planetRadius, path);

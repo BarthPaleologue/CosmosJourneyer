@@ -15,26 +15,28 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Tools } from "@babylonjs/core/Misc/tools";
 import { normalRandom, randRangeInt } from "extended-random";
-import { clamp } from "../../utils/math";
+
+import { GenerationSteps } from "@/utils/generationSteps";
+import { getRngFromSeed } from "@/utils/getRngFromSeed";
+import { clamp } from "@/utils/math";
+import { celsiusToKelvin, hasLiquidWater } from "@/utils/physics";
+
 import { PlanetModel } from "../../architecture/orbitalObjectModel";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
+import { AtmosphereModel } from "../../atmosphere/atmosphereModel";
 import { CloudsModel, newCloudsModel } from "../../clouds/cloudsModel";
 import { OceanModel } from "../../ocean/oceanModel";
-import { Orbit, getOrbitalPeriod } from "../../orbit/orbit";
+import { getOrbitalPeriod, Orbit } from "../../orbit/orbit";
 import { Settings } from "../../settings";
-import { GenerationSteps } from "../../utils/generationSteps";
-import { getRngFromSeed } from "../../utils/getRngFromSeed";
-import { celsiusToKelvin, hasLiquidWater } from "../../utils/physics";
 import { TelluricSatelliteModel } from "./telluricSatelliteModel";
-import { AtmosphereModel } from "../../atmosphere/atmosphereModel";
-import { Tools } from "@babylonjs/core/Misc/tools";
 
 export function newSeededTelluricSatelliteModel(
     id: string,
     seed: number,
     name: string,
-    parentBodies: PlanetModel[]
+    parentBodies: PlanetModel[],
 ): TelluricSatelliteModel {
     const rng = getRngFromSeed(seed);
 
@@ -65,9 +67,9 @@ export function newSeededTelluricSatelliteModel(
             Settings.EARTH_SEA_LEVEL_PRESSURE,
             0.2 * Settings.EARTH_SEA_LEVEL_PRESSURE,
             rng,
-            GenerationSteps.PRESSURE
+            GenerationSteps.PRESSURE,
         ),
-        0
+        0,
     );
     if (isSatelliteOfTelluric || radius <= 0.3 * Settings.EARTH_RADIUS) {
         pressure = 0;
@@ -87,7 +89,7 @@ export function newSeededTelluricSatelliteModel(
         pressure > 0
             ? {
                   pressure: pressure,
-                  greenHouseEffectFactor: 0.5
+                  greenHouseEffectFactor: 0.5,
               }
             : null;
 
@@ -95,7 +97,7 @@ export function newSeededTelluricSatelliteModel(
 
     const ocean: OceanModel | null = canHaveLiquidWater
         ? {
-              depth: (Settings.OCEAN_DEPTH * waterAmount * pressure) / Settings.EARTH_SEA_LEVEL_PRESSURE
+              depth: (Settings.OCEAN_DEPTH * waterAmount * pressure) / Settings.EARTH_SEA_LEVEL_PRESSURE,
           }
         : null;
 
@@ -129,7 +131,7 @@ export function newSeededTelluricSatelliteModel(
         eccentricity: 0,
         longitudeOfAscendingNode: 0,
         argumentOfPeriapsis: 0,
-        initialMeanAnomaly: 0
+        initialMeanAnomaly: 0,
     };
 
     // tidal lock
@@ -151,7 +153,7 @@ export function newSeededTelluricSatelliteModel(
         max_mountain_height: 10e3,
         continent_base_height: 5e3 + 1.9 * (ocean?.depth ?? 0),
 
-        mountains_frequency: (60 * radius) / 1000e3
+        mountains_frequency: (60 * radius) / 1000e3,
     };
 
     return {
@@ -168,10 +170,10 @@ export function newSeededTelluricSatelliteModel(
         terrainSettings: terrainSettings,
         temperature: {
             min: minTemperature,
-            max: maxTemperature
+            max: maxTemperature,
         },
         atmosphere: atmosphere,
         ocean: ocean,
-        clouds: clouds
+        clouds: clouds,
     };
 }

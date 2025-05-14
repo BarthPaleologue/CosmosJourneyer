@@ -22,7 +22,7 @@ export const ObjectUniformNames = {
     OBJECT_POSITION: "object_position",
     OBJECT_RADIUS: "object_radius",
     OBJECT_ROTATION_AXIS: "object_rotationAxis",
-    OBJECT_SCALING_DETERMINANT: "object_scaling_determinant"
+    OBJECT_SCALING_DETERMINANT: "object_scaling_determinant",
 };
 
 export function setObjectUniforms(effect: Effect, transform: TransformNode, boundingRadius: number): void {

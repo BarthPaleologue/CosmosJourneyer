@@ -15,14 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AbstractEngine, Scene, ArcRotateCamera, Vector3 } from "@babylonjs/core";
+import { AbstractEngine, ArcRotateCamera, Scene, Vector3 } from "@babylonjs/core";
+
+import { EmptyCelestialBody } from "@/utils/emptyCelestialBody";
+
 import { newSeededSierpinskiPyramidModel } from "../../anomalies/sierpinskiPyramid/sierpinskiPyramidModelGenerator";
 import { SierpinskiPyramidPostProcess } from "../../anomalies/sierpinskiPyramid/sierpinskiPyramidPostProcess";
-import { EmptyCelestialBody } from "../../utils/emptyCelestialBody";
 
 export function createSierpinskiScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void
+    progressCallback: (progress: number, text: string) => void,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -41,7 +43,7 @@ export function createSierpinskiScene(
         "sierpinski",
         Number(urlParams.get("seed") ?? Math.random() * 100_000),
         "Sierpinski Pyramid",
-        []
+        [],
     );
 
     const sierpinskiPyramid = new EmptyCelestialBody(sierpinskiPyramidModel, scene);
@@ -52,7 +54,7 @@ export function createSierpinskiScene(
         sierpinskiPyramid.getBoundingRadius(),
         sierpinskiPyramidModel,
         scene,
-        []
+        [],
     );
 
     scene.cameras.forEach((camera) => camera.attachPostProcess(pp));

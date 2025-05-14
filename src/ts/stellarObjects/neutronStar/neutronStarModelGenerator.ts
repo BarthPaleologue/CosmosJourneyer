@@ -15,15 +15,17 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Orbit } from "../../orbit/orbit";
 import { normalRandom, randRange, randRangeInt, uniformRandBool } from "extended-random";
-import { clamp } from "../../utils/math";
-import { newSeededRingsModel } from "../../rings/ringsModel";
-import { GenerationSteps } from "../../utils/generationSteps";
-import { getRngFromSeed } from "../../utils/getRngFromSeed";
+
+import { GenerationSteps } from "@/utils/generationSteps";
+import { getRngFromSeed } from "@/utils/getRngFromSeed";
+import { clamp } from "@/utils/math";
+
 import { OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
-import { NeutronStarModel } from "./neutronStarModel";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
+import { Orbit } from "../../orbit/orbit";
+import { newSeededRingsModel } from "../../rings/ringsModel";
+import { NeutronStarModel } from "./neutronStarModel";
 
 /**
  * Creates a new pseudo-random neutron star model
@@ -37,7 +39,7 @@ export function newSeededNeutronStarModel(
     id: string,
     seed: number,
     name: string,
-    parentBodies: OrbitalObjectModel[]
+    parentBodies: OrbitalObjectModel[],
 ): NeutronStarModel {
     const rng = getRngFromSeed(seed);
 
@@ -66,7 +68,7 @@ export function newSeededNeutronStarModel(
         inclination: 0,
         longitudeOfAscendingNode: 0,
         argumentOfPeriapsis: 0,
-        initialMeanAnomaly: 0
+        initialMeanAnomaly: 0,
     };
 
     const ringProportion = 0.02;
@@ -85,6 +87,6 @@ export function newSeededNeutronStarModel(
         axialTilt,
         radius,
         orbit,
-        rings
+        rings,
     };
 }

@@ -15,17 +15,18 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { BackgroundMaterial } from "@babylonjs/core/Materials/Background/backgroundMaterial";
+import { Material } from "@babylonjs/core/Materials/material";
+import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { Matrix } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { Scene } from "@babylonjs/core/scene";
-import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
-import { Matrix } from "@babylonjs/core/Maths/math.vector";
-import { Transformable } from "../architecture/transformable";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { Material } from "@babylonjs/core/Materials/material";
-import { BackgroundMaterial } from "@babylonjs/core/Materials/Background/backgroundMaterial";
 import { RenderingManager } from "@babylonjs/core/Rendering/renderingManager";
+import { Scene } from "@babylonjs/core/scene";
+
+import { Transformable } from "../architecture/transformable";
 
 export class StarFieldBox implements Transformable {
     readonly mesh: Mesh;

@@ -15,23 +15,24 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Sound } from "@babylonjs/core/Audio/sound";
-import { ISoundOptions } from "@babylonjs/core/Audio/Interfaces/ISoundOptions";
 import "@babylonjs/core/Audio/audioEngine";
 import "@babylonjs/core/Audio/audioSceneComponent";
 
-import ouchSoundPath from "../../asset/sound/ouch.mp3";
-import engineRunningSoundPath from "../../asset/sound/engineRunning.mp3";
-import menuHoverSoundPath from "../../asset/sound/166186__drminky__menu-screen-mouse-over.mp3";
-import targetSoundPath from "../../asset/sound/702805__matrixxx__futuristic-inspect-sound-ui-or-in-game-notification.mp3";
-import enableWarpDriveSoundPath from "../../asset/sound/386992__lollosound__17-distorzione.mp3";
-import disableWarpDriveSoundPath from "../../asset/sound/204418__nhumphrey__large-engine.mp3";
-import acceleratingWarpDriveSoundPath from "../../asset/sound/539503__timbre__endless-acceleration.mp3";
-import deceleratingWarpDriveSoundPath from "../../asset/sound/539503__timbre_endless-deceleration.mp3";
-import hyperSpaceSoundPath from "../../asset/sound/539503__timbre_endless-deceleration-hyperspace.mp3";
-import thrusterSoundPath from "../../asset/sound/318688__limitsnap_creations__rocket-thrust-effect.mp3";
-import echoedBlipSoundPath from "../../asset/sound/554089__copyc4t__echoed-blip.mp3";
-import errorBleepSoundPath from "../../asset/sound/372197__original_sound__error-bleep-4.mp3";
+import { ISoundOptions } from "@babylonjs/core/Audio/Interfaces/ISoundOptions";
+import { Sound } from "@babylonjs/core/Audio/sound";
+
+import menuHoverSoundPath from "@assets/sound/166186__drminky__menu-screen-mouse-over.mp3";
+import disableWarpDriveSoundPath from "@assets/sound/204418__nhumphrey__large-engine.mp3";
+import thrusterSoundPath from "@assets/sound/318688__limitsnap_creations__rocket-thrust-effect.mp3";
+import errorBleepSoundPath from "@assets/sound/372197__original_sound__error-bleep-4.mp3";
+import enableWarpDriveSoundPath from "@assets/sound/386992__lollosound__17-distorzione.mp3";
+import acceleratingWarpDriveSoundPath from "@assets/sound/539503__timbre__endless-acceleration.mp3";
+import hyperSpaceSoundPath from "@assets/sound/539503__timbre_endless-deceleration-hyperspace.mp3";
+import deceleratingWarpDriveSoundPath from "@assets/sound/539503__timbre_endless-deceleration.mp3";
+import echoedBlipSoundPath from "@assets/sound/554089__copyc4t__echoed-blip.mp3";
+import targetSoundPath from "@assets/sound/702805__matrixxx__futuristic-inspect-sound-ui-or-in-game-notification.mp3";
+import engineRunningSoundPath from "@assets/sound/engineRunning.mp3";
+import ouchSoundPath from "@assets/sound/ouch.mp3";
 
 export type Sounds = {
     readonly ouch: Sound;
@@ -52,7 +53,7 @@ export type Sounds = {
 };
 
 export async function loadSounds(
-    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void
+    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void,
 ): Promise<Sounds> {
     let loadedCount = 0;
     let totalCount = 0;
@@ -66,7 +67,7 @@ export async function loadSounds(
                 () => {
                     resolve(sound);
                 },
-                options
+                options,
             );
         });
         totalCount++;
@@ -94,7 +95,7 @@ export async function loadSounds(
 
     // Warp drive sounds
     const enableWarpDriveSoundPromise = loadSoundAsync("EnableWarpDriveSound", enableWarpDriveSoundPath, {
-        playbackRate: 2
+        playbackRate: 2,
     });
 
     const disableWarpDriveSoundPromise = loadSoundAsync("DisableWarpDriveSound", disableWarpDriveSoundPath);
@@ -105,8 +106,8 @@ export async function loadSounds(
         {
             playbackRate: 1.0,
             volume: 0.3,
-            loop: true
-        }
+            loop: true,
+        },
     );
 
     const deceleratingWarpDriveSoundPromise = loadSoundAsync(
@@ -115,20 +116,20 @@ export async function loadSounds(
         {
             playbackRate: 1.0,
             volume: 0.3,
-            loop: true
-        }
+            loop: true,
+        },
     );
 
     const hyperSpaceSoundPromise = loadSoundAsync("HyperSpaceSound", hyperSpaceSoundPath, {
         playbackRate: 1.5,
         volume: 0.25,
-        loop: true
+        loop: true,
     });
 
     const thrusterSoundPromise = loadSoundAsync("ThrusterSound", thrusterSoundPath, {
         playbackRate: 1.0,
         volume: 0.5,
-        loop: true
+        loop: true,
     });
 
     // UI sounds
@@ -150,6 +151,6 @@ export async function loadSounds(
         hyperSpace: await hyperSpaceSoundPromise,
         thruster: await thrusterSoundPromise,
         success: await successSoundPromise,
-        error: await errorSoundPromise
+        error: await errorSoundPromise,
     };
 }

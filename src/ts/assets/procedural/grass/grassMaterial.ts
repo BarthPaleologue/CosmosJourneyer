@@ -15,19 +15,21 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
-import { Scene } from "@babylonjs/core/scene";
-import grassFragment from "../../../../shaders/grassMaterial/grassFragment.glsl";
-import grassVertex from "../../../../shaders/grassMaterial/grassVertex.glsl";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { Scene } from "@babylonjs/core/scene";
+
 import {
     setStellarObjectUniforms,
-    StellarObjectUniformNames
+    StellarObjectUniformNames,
 } from "../../../postProcesses/uniforms/stellarObjectUniforms";
 import { NoiseTextures } from "../../textures";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { PointLight } from "@babylonjs/core/Lights/pointLight";
+
+import grassFragment from "@shaders/grassMaterial/grassFragment.glsl";
+import grassVertex from "@shaders/grassMaterial/grassVertex.glsl";
 
 const GrassMaterialUniformNames = {
     WORLD: "world",
@@ -40,11 +42,11 @@ const GrassMaterialUniformNames = {
     CAMERA_POSITION: "cameraPosition",
     PLAYER_POSITION: "playerPosition",
     PLANET_POSITION: "planetPosition",
-    PLANET_WORLD: "planetWorld"
+    PLANET_WORLD: "planetWorld",
 };
 
 const GrassMaterialSamplerNames = {
-    PERLIN_NOISE: "perlinNoise"
+    PERLIN_NOISE: "perlinNoise",
 };
 
 export class GrassMaterial extends ShaderMaterial {
@@ -71,7 +73,7 @@ export class GrassMaterial extends ShaderMaterial {
             attributes: ["position", "normal"],
             uniforms: uniforms,
             defines: defines,
-            samplers: [...Object.values(GrassMaterialSamplerNames)]
+            samplers: [...Object.values(GrassMaterialSamplerNames)],
         });
 
         this.backFaceCulling = false;
@@ -90,7 +92,7 @@ export class GrassMaterial extends ShaderMaterial {
             if (this.planet !== null) {
                 this.getEffect().setVector3(
                     GrassMaterialUniformNames.PLANET_POSITION,
-                    this.planet.getAbsolutePosition()
+                    this.planet.getAbsolutePosition(),
                 );
                 this.getEffect().setMatrix(GrassMaterialUniformNames.PLANET_WORLD, this.planet.getWorldMatrix());
             }

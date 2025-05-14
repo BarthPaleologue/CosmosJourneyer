@@ -15,19 +15,21 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Player } from "../../player/player";
-import { EncyclopaediaGalactica, SpaceDiscoveryData } from "../../society/encyclopaediaGalactica";
-import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
-import { parseDistance, parseSecondsPrecise } from "../../utils/strings/parseToStrings";
-import i18n from "../../i18n";
-import { Settings } from "../../settings";
-import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
 import { Observable } from "@babylonjs/core/Misc/observable";
-import { createNotification, NotificationIntent, NotificationOrigin } from "../../utils/notification";
-import { alertModal } from "../../utils/dialogModal";
-import { getObjectModelById } from "../../starSystem/starSystemModel";
-import { getOrbitalPeriod } from "../../orbit/orbit";
+
+import { alertModal } from "@/utils/dialogModal";
+import { createNotification, NotificationIntent, NotificationOrigin } from "@/utils/notification";
+import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
+import { parseDistance, parseSecondsPrecise } from "@/utils/strings/parseToStrings";
+
 import { ISoundPlayer, SoundType } from "../../audio/soundPlayer";
+import i18n from "../../i18n";
+import { getOrbitalPeriod } from "../../orbit/orbit";
+import { Player } from "../../player/player";
+import { Settings } from "../../settings";
+import { EncyclopaediaGalactica, SpaceDiscoveryData } from "../../society/encyclopaediaGalactica";
+import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
+import { getObjectModelById } from "../../starSystem/starSystemModel";
 
 export class DiscoveryDetails {
     readonly htmlRoot: HTMLElement;
@@ -60,7 +62,7 @@ export class DiscoveryDetails {
         player: Player,
         encyclopaedia: EncyclopaediaGalactica,
         starSystemDatabase: StarSystemDatabase,
-        soundPlayer: ISoundPlayer
+        soundPlayer: ISoundPlayer,
     ) {
         this.soundPlayer = soundPlayer;
 
@@ -98,7 +100,7 @@ export class DiscoveryDetails {
                     NotificationIntent.ERROR,
                     valueResult.error,
                     5_000,
-                    this.soundPlayer
+                    this.soundPlayer,
                 );
                 return;
             }
@@ -125,14 +127,14 @@ export class DiscoveryDetails {
         }
 
         const systemModel = starSystemDatabase.getSystemModelFromCoordinates(
-            this.currentDiscovery.objectId.systemCoordinates
+            this.currentDiscovery.objectId.systemCoordinates,
         );
 
         if (systemModel === null) {
             console.error(discovery);
             await alertModal(
                 "System could not be found for the discovery. More information in the console.",
-                this.soundPlayer
+                this.soundPlayer,
             );
             return;
         }
@@ -146,18 +148,18 @@ export class DiscoveryDetails {
             console.error(discovery);
             await alertModal(
                 "Object could not be found for the discovery. More information in the console.",
-                this.soundPlayer
+                this.soundPlayer,
             );
             return;
         }
 
         this.objectType.innerText = i18n.t("orbitalObject:type", {
-            value: getOrbitalObjectTypeToI18nString(objectModel)
+            value: getOrbitalObjectTypeToI18nString(objectModel),
         });
         this.htmlRoot.appendChild(this.objectType);
 
         this.siderealDayDuration.innerText = i18n.t("orbitalObject:siderealDayDuration", {
-            value: parseSecondsPrecise(objectModel.siderealDaySeconds)
+            value: parseSecondsPrecise(objectModel.siderealDaySeconds),
         });
         this.htmlRoot.appendChild(this.siderealDayDuration);
 
@@ -167,12 +169,12 @@ export class DiscoveryDetails {
 
         const orbitalPeriod = getOrbitalPeriod(objectModel.orbit.semiMajorAxis, parentMass);
         this.orbitDuration.innerText = i18n.t("orbit:period", {
-            value: parseSecondsPrecise(orbitalPeriod)
+            value: parseSecondsPrecise(orbitalPeriod),
         });
         this.htmlRoot.appendChild(this.orbitDuration);
 
         this.orbitRadius.innerText = i18n.t("orbit:radius", {
-            value: parseDistance(objectModel.orbit.semiMajorAxis)
+            value: parseDistance(objectModel.orbit.semiMajorAxis),
         });
         this.htmlRoot.appendChild(this.orbitRadius);
 
@@ -182,13 +184,13 @@ export class DiscoveryDetails {
                 this.htmlRoot.appendChild(this.sellDiscoveryButton);
 
                 this.sellDiscoveryButton.textContent = i18n.t("common:sellFor", {
-                    price: `${sellingPrice.value.toLocaleString()}${Settings.CREDIT_SYMBOL}`
+                    price: `${sellingPrice.value.toLocaleString()}${Settings.CREDIT_SYMBOL}`,
                 });
             } else {
                 console.error(sellingPrice.error);
                 await alertModal(
                     "Could not estimate the selling price. More information in the console.",
-                    this.soundPlayer
+                    this.soundPlayer,
                 );
             }
         }

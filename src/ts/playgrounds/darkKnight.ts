@@ -15,15 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Vector3, HemisphericLight, AbstractEngine, Scene } from "@babylonjs/core";
-import { DefaultControls } from "../defaultControls/defaultControls";
+import { AbstractEngine, HemisphericLight, Scene, Vector3 } from "@babylonjs/core";
+
 import { DarkKnight } from "../anomalies/darkKnight/darkKnight";
 import { generateDarkKnightModel } from "../anomalies/darkKnight/darkKnightModelGenerator";
 import { loadTextures } from "../assets/textures";
+import { DefaultControls } from "../defaultControls/defaultControls";
 
 export async function createDarkKnightScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void
+    progressCallback: (progress: number, text: string) => void,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;

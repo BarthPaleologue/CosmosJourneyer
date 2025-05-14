@@ -15,26 +15,27 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
-import { AnomalyModel, PlanetModel, StellarObjectModel } from "../architecture/orbitalObjectModel";
-import { wait } from "../utils/wait";
-import { StarSystemModel } from "./starSystemModel";
+
+import { DarkKnight } from "../anomalies/darkKnight/darkKnight";
 import { Anomaly, OrbitalFacility, Planet, StellarObject } from "../architecture/orbitalObject";
+import { AnomalyModel, PlanetModel, StellarObjectModel } from "../architecture/orbitalObjectModel";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
-import { Star } from "../stellarObjects/star/star";
+import { RenderingAssets } from "../assets/renderingAssets";
+import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
+import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
+import { TelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModel";
+import { SpaceElevator } from "../spacestation/spaceElevator";
+import { SpaceStation } from "../spacestation/spaceStation";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { EmptyCelestialBody } from "../utils/emptyCelestialBody";
-import { SpaceStation } from "../spacestation/spaceStation";
-import { SpaceElevator } from "../spacestation/spaceElevator";
-import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
-import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
-import { TelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModel";
-import { DeepReadonly, isNonEmptyArray, NonEmptyArray } from "../utils/types";
+import { Star } from "../stellarObjects/star/star";
 import { getDistancesToStellarObjects } from "../utils/distanceToStellarObject";
-import { RenderingAssets } from "../assets/renderingAssets";
-import { DarkKnight } from "../anomalies/darkKnight/darkKnight";
+import { EmptyCelestialBody } from "../utils/emptyCelestialBody";
+import { DeepReadonly, isNonEmptyArray, NonEmptyArray } from "../utils/types";
+import { wait } from "../utils/wait";
+import { StarSystemModel } from "./starSystemModel";
 
 export class StarSystemLoader {
     private loadingIndex: number;
@@ -82,14 +83,14 @@ export class StarSystemLoader {
             planets,
             satellites,
             anomalies,
-            orbitalFacilities
+            orbitalFacilities,
         };
     }
 
     private async loadStellarObjects(
         stellarObjectModels: DeepReadonly<Array<StellarObjectModel>>,
         assets: RenderingAssets,
-        scene: Scene
+        scene: Scene,
     ): Promise<Readonly<NonEmptyArray<StellarObject>>> {
         const stellarObjects: StellarObject[] = [];
         for (const stellarObjectModel of stellarObjectModels) {
@@ -122,7 +123,7 @@ export class StarSystemLoader {
 
     private async loadAnomalies(
         anomalyModels: DeepReadonly<Array<AnomalyModel>>,
-        scene: Scene
+        scene: Scene,
     ): Promise<ReadonlyArray<Anomaly>> {
         const anomalies: Anomaly[] = [];
         for (const anomalyModel of anomalyModels) {
@@ -161,7 +162,7 @@ export class StarSystemLoader {
     private async loadOrbitalFacilities(
         systemModel: DeepReadonly<StarSystemModel>,
         assets: RenderingAssets,
-        scene: Scene
+        scene: Scene,
     ): Promise<ReadonlyArray<OrbitalFacility>> {
         const orbitalFacilities: OrbitalFacility[] = [];
         for (const orbitalFacilityModel of systemModel.orbitalFacilities) {
@@ -187,7 +188,7 @@ export class StarSystemLoader {
     private async loadPlanets(
         planetModels: DeepReadonly<Array<PlanetModel>>,
         assets: RenderingAssets,
-        scene: Scene
+        scene: Scene,
     ): Promise<ReadonlyArray<Planet>> {
         const planets: Planet[] = [];
         for (const planetModel of planetModels) {
@@ -216,7 +217,7 @@ export class StarSystemLoader {
     private async loadSatellites(
         satelliteModels: DeepReadonly<Array<TelluricSatelliteModel>>,
         assets: RenderingAssets,
-        scene: Scene
+        scene: Scene,
     ): Promise<ReadonlyArray<TelluricPlanet>> {
         const satellites: TelluricPlanet[] = [];
         for (const satelliteModel of satelliteModels) {

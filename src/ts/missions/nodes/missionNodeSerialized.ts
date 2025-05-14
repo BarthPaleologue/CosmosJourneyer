@@ -16,17 +16,18 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { z } from "zod";
+
 import {
     MissionAsteroidFieldNodeSerialized,
-    MissionAsteroidFieldNodeSerializedSchema
+    MissionAsteroidFieldNodeSerializedSchema,
 } from "./actions/sightseeing/missionAsteroidFieldNodeSerialized";
 import {
     MissionFlyByNodeSerialized,
-    MissionFlyByNodeSerializedSchema
+    MissionFlyByNodeSerializedSchema,
 } from "./actions/sightseeing/missionFlyByNodeSerialized";
 import {
     MissionTerminatorLandingNodeSerialized,
-    MissionTerminatorLandingNodeSerializedSchema
+    MissionTerminatorLandingNodeSerializedSchema,
 } from "./actions/sightseeing/missionTerminatorLandingNodeSerialized";
 import { MissionNodeType } from "./missionNodeType";
 
@@ -54,23 +55,23 @@ export type MissionNodeSerializedShape =
 
 export const MissionOrNodeSerializedSchema = z.object({
     type: z.literal(MissionNodeType.OR),
-    children: z.lazy(() => z.array(MissionNodeSerializedSchema))
+    children: z.lazy(() => z.array(MissionNodeSerializedSchema)),
 });
 
 export const MissionAndNodeSerializedSchema = z.object({
     type: z.literal(MissionNodeType.AND),
-    children: z.lazy(() => z.array(MissionNodeSerializedSchema))
+    children: z.lazy(() => z.array(MissionNodeSerializedSchema)),
 });
 
 export const MissionXorNodeSerializedSchema = z.object({
     type: z.literal(MissionNodeType.XOR),
-    children: z.lazy(() => z.array(MissionNodeSerializedSchema))
+    children: z.lazy(() => z.array(MissionNodeSerializedSchema)),
 });
 
 export const MissionSequenceNodeSerializedSchema = z.object({
     type: z.literal(MissionNodeType.SEQUENCE),
     activeChildIndex: z.number(),
-    children: z.lazy(() => z.array(MissionNodeSerializedSchema))
+    children: z.lazy(() => z.array(MissionNodeSerializedSchema)),
 });
 
 export const MissionNodeSerializedSchema: z.ZodType<MissionNodeSerializedShape> = z.discriminatedUnion("type", [
@@ -80,7 +81,7 @@ export const MissionNodeSerializedSchema: z.ZodType<MissionNodeSerializedShape> 
     MissionAndNodeSerializedSchema,
     MissionOrNodeSerializedSchema,
     MissionXorNodeSerializedSchema,
-    MissionSequenceNodeSerializedSchema
+    MissionSequenceNodeSerializedSchema,
 ]);
 
 export type MissionNodeSerialized = z.infer<typeof MissionNodeSerializedSchema>;

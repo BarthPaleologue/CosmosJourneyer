@@ -15,18 +15,19 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getObjectModelById, StarSystemModel } from "./starSystemModel";
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/starSystemCoordinates";
-import { newSeededStarSystemModel } from "./seededStarSystemModel";
-import { hashVec3 } from "../utils/hash";
-import { getRngFromSeed } from "../utils/getRngFromSeed";
-import { Settings } from "../settings";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { centeredRand } from "extended-random";
 import { makeNoise3D } from "fast-simplex-noise/lib/3d";
-import { UniverseObjectId } from "../utils/coordinates/universeObjectId";
+
 import { OrbitalObjectModel } from "../architecture/orbitalObjectModel";
+import { Settings } from "../settings";
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/starSystemCoordinates";
+import { UniverseObjectId } from "../utils/coordinates/universeObjectId";
+import { getRngFromSeed } from "../utils/getRngFromSeed";
+import { hashVec3 } from "../utils/hash";
 import { DeepReadonly } from "../utils/types";
+import { newSeededStarSystemModel } from "./seededStarSystemModel";
+import { getObjectModelById, StarSystemModel } from "./starSystemModel";
 
 /**
  * The StarSystemDatabase defines the content of the universe.
@@ -109,7 +110,7 @@ export class StarSystemDatabase {
         const sectorKey = this.starSectorToString(
             system.coordinates.starSectorX,
             system.coordinates.starSectorY,
-            system.coordinates.starSectorZ
+            system.coordinates.starSectorZ,
         );
         const systems = this.starSectorToCustomSystems.get(sectorKey);
         if (systems === undefined) {
@@ -147,7 +148,7 @@ export class StarSystemDatabase {
      */
     public registerSinglePlugin(
         coordinates: StarSystemCoordinates,
-        plugin: (systemModel: StarSystemModel) => StarSystemModel
+        plugin: (systemModel: StarSystemModel) => StarSystemModel,
     ) {
         this.coordinatesToSinglePlugins.set(JSON.stringify(coordinates), plugin);
     }
@@ -159,7 +160,7 @@ export class StarSystemDatabase {
      */
     public registerGeneralPlugin(
         predicate: (systemModel: StarSystemModel) => boolean,
-        plugin: (systemModel: StarSystemModel) => StarSystemModel
+        plugin: (systemModel: StarSystemModel) => StarSystemModel,
     ) {
         this.generalPlugins.push({ predicate, plugin });
     }
@@ -193,10 +194,10 @@ export class StarSystemDatabase {
         const generatedSystemCoordinates = this.getGeneratedSystemCoordinatesInStarSector(
             coordinates.starSectorX,
             coordinates.starSectorY,
-            coordinates.starSectorZ
+            coordinates.starSectorZ,
         );
         const index = generatedSystemCoordinates.findIndex((otherCoordinates) =>
-            starSystemCoordinatesEquals(coordinates, otherCoordinates)
+            starSystemCoordinatesEquals(coordinates, otherCoordinates),
         );
         if (index === -1) {
             return null;
@@ -204,7 +205,7 @@ export class StarSystemDatabase {
 
         // init pseudo-random number generator
         const cellRNG = getRngFromSeed(
-            hashVec3(coordinates.starSectorX, coordinates.starSectorY, coordinates.starSectorZ)
+            hashVec3(coordinates.starSectorX, coordinates.starSectorY, coordinates.starSectorZ),
         );
         const hash = centeredRand(cellRNG, 1 + index) * Settings.SEED_HALF_RANGE;
         const systemRng = getRngFromSeed(hash);
@@ -214,8 +215,8 @@ export class StarSystemDatabase {
                 systemRng,
                 coordinates,
                 this.getSystemGalacticPosition(coordinates),
-                this.isSystemInHumanBubble(coordinates)
-            )
+                this.isSystemInHumanBubble(coordinates),
+            ),
         );
     }
 
@@ -229,7 +230,7 @@ export class StarSystemDatabase {
                 starSectorZ: sectorZ,
                 localX: localPosition.x,
                 localY: localPosition.y,
-                localZ: localPosition.z
+                localZ: localPosition.z,
             };
         });
     }
@@ -243,7 +244,7 @@ export class StarSystemDatabase {
     public getSystemCoordinatesInStarSector(
         sectorX: number,
         sectorY: number,
-        sectorZ: number
+        sectorZ: number,
     ): DeepReadonly<Array<StarSystemCoordinates>> {
         const result: Array<DeepReadonly<StarSystemCoordinates>> = [];
         const generatedSystemCoordinates = this.getGeneratedSystemCoordinatesInStarSector(sectorX, sectorY, sectorZ);
@@ -275,7 +276,7 @@ export class StarSystemDatabase {
     public getSystemModelsInStarSector(
         sectorX: number,
         sectorY: number,
-        sectorZ: number
+        sectorZ: number,
     ): DeepReadonly<Array<StarSystemModel>> {
         const generatedModels: DeepReadonly<StarSystemModel>[] = [];
 
@@ -315,13 +316,13 @@ export class StarSystemDatabase {
         starSectorX: number,
         starSectorY: number,
         starSectorZ: number,
-        index: number
+        index: number,
     ): StarSystemCoordinates {
         const systemLocalPositions = this.getGeneratedLocalPositionsInStarSector(starSectorX, starSectorY, starSectorZ);
         const systemLocalPosition = systemLocalPositions.at(index);
         if (systemLocalPosition === undefined) {
             throw new Error(
-                `Local position not found for seed ${index} in star sector ${starSectorX}, ${starSectorY}, ${starSectorZ}`
+                `Local position not found for seed ${index} in star sector ${starSectorX}, ${starSectorY}, ${starSectorZ}`,
             );
         }
 
@@ -331,7 +332,7 @@ export class StarSystemDatabase {
             starSectorZ: starSectorZ,
             localX: systemLocalPosition.x,
             localY: systemLocalPosition.y,
-            localZ: systemLocalPosition.z
+            localZ: systemLocalPosition.z,
         };
     }
 
@@ -355,7 +356,7 @@ export class StarSystemDatabase {
         return new Vector3(
             (coordinates.starSectorX + coordinates.localX) * Settings.STAR_SECTOR_SIZE,
             (coordinates.starSectorY + coordinates.localY) * Settings.STAR_SECTOR_SIZE,
-            (coordinates.starSectorZ + coordinates.localZ) * Settings.STAR_SECTOR_SIZE
+            (coordinates.starSectorZ + coordinates.localZ) * Settings.STAR_SECTOR_SIZE,
         );
     }
 
@@ -378,7 +379,7 @@ export class StarSystemDatabase {
             const starLocalPosition = new Vector3(
                 centeredRand(rng, 10 * i + 1) / 2,
                 centeredRand(rng, 10 * i + 2) / 2,
-                centeredRand(rng, 10 * i + 3) / 2
+                centeredRand(rng, 10 * i + 3) / 2,
             );
 
             localPositions.push(starLocalPosition);
@@ -407,8 +408,8 @@ export class StarSystemDatabase {
                 new Vector3(
                     this.fallbackSystem.coordinates.localX,
                     this.fallbackSystem.coordinates.localY,
-                    this.fallbackSystem.coordinates.localZ
-                )
+                    this.fallbackSystem.coordinates.localZ,
+                ),
             );
         }
 
@@ -419,8 +420,8 @@ export class StarSystemDatabase {
                 new Vector3(
                     systemModel.coordinates.localX,
                     systemModel.coordinates.localY,
-                    systemModel.coordinates.localZ
-                )
+                    systemModel.coordinates.localZ,
+                ),
             );
         }
 

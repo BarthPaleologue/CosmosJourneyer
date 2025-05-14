@@ -21,13 +21,13 @@ export const SerializedFuelTankSchema = z.object({
     type: z.literal("fuelTank"),
     size: z.number(),
     quality: z.number(),
-    currentFuel01: z.number().min(0).max(1)
+    currentFuel01: z.number().min(0).max(1),
 });
 
 export type SerializedFuelTank = z.infer<typeof SerializedFuelTankSchema>;
 
 export function getFuelTankSpecs(fuelTank: SerializedFuelTank) {
     return {
-        maxFuel: 50 * (fuelTank.size + fuelTank.quality / 10)
+        maxFuel: 50 * (fuelTank.size + fuelTank.quality / 10),
     };
 }

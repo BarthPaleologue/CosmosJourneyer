@@ -1,4 +1,5 @@
 import { test } from "@playwright/test";
+
 import { renderAndSnap } from "./utils/renderSnap";
 
 test("The neutron star playground renders correctly", async ({ page }) => {
@@ -6,6 +7,6 @@ test("The neutron star playground renders correctly", async ({ page }) => {
         scene: "neutronStar",
         shotName: "baseline",
         flagToWait: "frozen",
-        urlParams: { freeze: 1 }
+        urlParams: { freeze: 1 },
     });
 });

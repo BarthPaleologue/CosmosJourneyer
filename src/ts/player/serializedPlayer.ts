@@ -1,15 +1,16 @@
 import { z } from "zod";
+
 import { MissionSerializedSchema } from "../missions/missionSerialized";
 import { SpaceDiscoveryDataSchema } from "../society/encyclopaediaGalactica";
-import { SerializedSpaceshipSchema, getDefaultSerializedSpaceship } from "../spaceship/serializedSpaceship";
-import { StarSystemCoordinatesSchema } from "../utils/coordinates/starSystemCoordinates";
 import { SerializedComponentSchema } from "../spaceship/serializedComponents/component";
+import { getDefaultSerializedSpaceship, SerializedSpaceshipSchema } from "../spaceship/serializedSpaceship";
+import { StarSystemCoordinatesSchema } from "../utils/coordinates/starSystemCoordinates";
 
 export const CompletedTutorialsSchema = z.object({
     flightCompleted: z.boolean().default(false),
     stationLandingCompleted: z.boolean().default(false),
     starMapCompleted: z.boolean().default(false),
-    fuelScoopingCompleted: z.boolean().default(false)
+    fuelScoopingCompleted: z.boolean().default(false),
 });
 
 export type CompletedTutorials = z.infer<typeof CompletedTutorialsSchema>;
@@ -27,11 +28,11 @@ export const SerializedPlayerSchema = z.object({
     discoveries: z
         .object({
             local: z.array(SpaceDiscoveryDataSchema).default([]),
-            uploaded: z.array(SpaceDiscoveryDataSchema).default([])
+            uploaded: z.array(SpaceDiscoveryDataSchema).default([]),
         })
         .default({
             local: [],
-            uploaded: []
+            uploaded: [],
         }),
     currentItinerary: z.array(StarSystemCoordinatesSchema).default([]),
     systemBookmarks: z.array(StarSystemCoordinatesSchema).default([]),
@@ -43,8 +44,8 @@ export const SerializedPlayerSchema = z.object({
         flightCompleted: false,
         stationLandingCompleted: false,
         starMapCompleted: false,
-        fuelScoopingCompleted: false
-    })
+        fuelScoopingCompleted: false,
+    }),
 });
 
 export type SerializedPlayer = z.infer<typeof SerializedPlayerSchema>;

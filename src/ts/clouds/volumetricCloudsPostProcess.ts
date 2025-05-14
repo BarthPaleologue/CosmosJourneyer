@@ -15,22 +15,23 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import volumetricCloudsFragment from "../../shaders/volumetricCloudsFragment.glsl";
-
-import { FlatCloudsPostProcess } from "./flatCloudsPostProcess";
-import { Effect } from "@babylonjs/core/Materials/effect";
-import { CloudsUniforms } from "./cloudsUniforms";
-import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { ObjectUniformNames, setObjectUniforms } from "../postProcesses/uniforms/objectUniforms";
-import { setStellarObjectUniforms, StellarObjectUniformNames } from "../postProcesses/uniforms/stellarObjectUniforms";
-import { CameraUniformNames, setCameraUniforms } from "../postProcesses/uniforms/cameraUniforms";
-import { SamplerUniformNames, setSamplerUniforms } from "../postProcesses/uniforms/samplerUniforms";
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
-import { Scene } from "@babylonjs/core/scene";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { Effect } from "@babylonjs/core/Materials/effect";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
+import { Scene } from "@babylonjs/core/scene";
+
+import { CameraUniformNames, setCameraUniforms } from "../postProcesses/uniforms/cameraUniforms";
+import { ObjectUniformNames, setObjectUniforms } from "../postProcesses/uniforms/objectUniforms";
+import { SamplerUniformNames, setSamplerUniforms } from "../postProcesses/uniforms/samplerUniforms";
+import { setStellarObjectUniforms, StellarObjectUniformNames } from "../postProcesses/uniforms/stellarObjectUniforms";
+import { CloudsUniforms } from "./cloudsUniforms";
+import { FlatCloudsPostProcess } from "./flatCloudsPostProcess";
+
+import volumetricCloudsFragment from "@shaders/volumetricCloudsFragment.glsl";
 
 export type CloudsPostProcess = FlatCloudsPostProcess | VolumetricCloudsPostProcess;
 
@@ -45,7 +46,7 @@ export class VolumetricCloudsPostProcess extends PostProcess {
         boundingRadius: number,
         cloudsUniforms: CloudsUniforms,
         scene: Scene,
-        stars: ReadonlyArray<PointLight>
+        stars: ReadonlyArray<PointLight>,
     ) {
         const shaderName = "volumetricClouds";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
@@ -54,14 +55,14 @@ export class VolumetricCloudsPostProcess extends PostProcess {
 
         const VolumetricCloudsUniformNames = {
             CLOUD_LAYER_MIN_HEIGHT: "cloudLayerMinHeight",
-            CLOUD_LAYER_MAX_HEIGHT: "cloudLayerMaxHeight"
+            CLOUD_LAYER_MAX_HEIGHT: "cloudLayerMaxHeight",
         };
 
         const uniforms: string[] = [
             ...Object.values(ObjectUniformNames),
             ...Object.values(StellarObjectUniformNames),
             ...Object.values(CameraUniformNames),
-            ...Object.values(VolumetricCloudsUniformNames)
+            ...Object.values(VolumetricCloudsUniformNames),
         ];
 
         const samplers: string[] = Object.values(SamplerUniformNames);
@@ -77,7 +78,7 @@ export class VolumetricCloudsPostProcess extends PostProcess {
             scene.getEngine(),
             false,
             null,
-            Constants.TEXTURETYPE_HALF_FLOAT
+            Constants.TEXTURETYPE_HALF_FLOAT,
         );
 
         this.cloudUniforms = cloudsUniforms;

@@ -18,12 +18,12 @@
 import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { jsonSafeParse } from "../utils/json";
 import { err, Result } from "../utils/types";
-import { Save, safeParseSave } from "./saveFileData";
+import { safeParseSave, Save } from "./saveFileData";
 import { SaveLoadingError, SaveLoadingErrorType } from "./saveLoadingError";
 
 export async function parseSaveFile(
     rawSaveFile: File,
-    starSystemDatabase: StarSystemDatabase
+    starSystemDatabase: StarSystemDatabase,
 ): Promise<Result<Save, SaveLoadingError>> {
     return new Promise((resolve) => {
         const reader = new FileReader();

@@ -15,35 +15,36 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { Scene } from "@babylonjs/core/scene";
-import wandererPath from "../../asset/spaceship/wanderer.glb";
-import bananaPath from "../../asset/banana/banana.glb";
-import characterPath from "../../asset/character/character.glb";
-import rockPath from "../../asset/rock.glb";
-import asteroidPath from "../../asset/asteroid/asteroid.glb";
-import asteroid2Path from "../../asset/asteroid/asteroid2.glb";
-import treePath from "../../asset/tree/tree.babylon";
-import { createButterfly } from "./procedural/butterfly/butterfly";
-import { createGrassBlade } from "./procedural/grass/grassBlade";
 import "@babylonjs/loaders";
 import "@babylonjs/core/Loading/Plugins/babylonFileLoader";
 import "@babylonjs/core/Animations/animatable";
 
-import sphericalTankPath from "../../asset/SpaceStationParts/sphericalTank.glb";
-import stationEnginePath from "../../asset/SpaceStationParts/engine.glb";
-
-import { CollisionMask } from "../settings";
+import { LoadAssetContainerAsync } from "@babylonjs/core/Loading";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import {
     PhysicsShape,
     PhysicsShapeConvexHull,
     PhysicsShapeMesh,
-    PhysicsShapeSphere
+    PhysicsShapeSphere,
 } from "@babylonjs/core/Physics/v2/physicsShape";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { Scene } from "@babylonjs/core/scene";
+
+import { CollisionMask } from "../settings";
 import { Materials } from "./materials";
-import { LoadAssetContainerAsync } from "@babylonjs/core/Loading";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { createButterfly } from "./procedural/butterfly/butterfly";
+import { createGrassBlade } from "./procedural/grass/grassBlade";
+
+import asteroidPath from "@assets/asteroid/asteroid.glb";
+import asteroid2Path from "@assets/asteroid/asteroid2.glb";
+import bananaPath from "@assets/banana/banana.glb";
+import characterPath from "@assets/character/character.glb";
+import rockPath from "@assets/rock.glb";
+import wandererPath from "@assets/spaceship/wanderer.glb";
+import stationEnginePath from "@assets/SpaceStationParts/engine.glb";
+import sphericalTankPath from "@assets/SpaceStationParts/sphericalTank.glb";
+import treePath from "@assets/tree/tree.babylon";
 
 export type Objects = {
     crate: Mesh;
@@ -69,7 +70,7 @@ export type Objects = {
 export async function loadObjects(
     materials: Materials,
     scene: Scene,
-    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void
+    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void,
 ): Promise<Objects> {
     let loadedCount = 0;
     let totalCount = 0;
@@ -89,7 +90,7 @@ export async function loadObjects(
     const rockPromise = loadAssetInContainerAsync("Rock", rockPath);
     const asteroidPromises = [
         loadAssetInContainerAsync("Asteroid1", asteroidPath),
-        loadAssetInContainerAsync("Asteroid2", asteroid2Path)
+        loadAssetInContainerAsync("Asteroid2", asteroid2Path),
     ];
     const treePromise = loadAssetInContainerAsync("Tree", treePath);
     const sphericalTankPromise = loadAssetInContainerAsync("SphericalTank", sphericalTankPath);
@@ -238,7 +239,7 @@ export async function loadObjects(
     const sphericalTankMaxDimension = Math.max(
         sphericalTankBoundingBox.extendSize.x,
         sphericalTankBoundingBox.extendSize.y,
-        sphericalTankBoundingBox.extendSize.z
+        sphericalTankBoundingBox.extendSize.z,
     );
 
     const sphericalTankTargetDimension = 20;
@@ -273,11 +274,11 @@ export async function loadObjects(
     return {
         stationEngine: {
             mesh: stationEngine,
-            shape: stationEngineShape
+            shape: stationEngineShape,
         },
         sphericalTank: {
             mesh: sphericalTank,
-            shape: sphericalTankPhysicsShape
+            shape: sphericalTankPhysicsShape,
         },
         tree,
         asteroids,
@@ -288,6 +289,6 @@ export async function loadObjects(
         butterfly,
         grassBlades,
         crate,
-        wanderer
+        wanderer,
     };
 }

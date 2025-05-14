@@ -16,17 +16,18 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { z } from "zod";
-import { StarSystemCoordinatesSchema, starSystemCoordinatesEquals } from "./starSystemCoordinates";
+
 import { OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
 import { StarSystemModel } from "../../starSystem/starSystemModel";
 import { DeepReadonly } from "../types";
-import { OrbitalObjectIdSchema, orbitalObjectIdEquals } from "./orbitalObjectId";
+import { orbitalObjectIdEquals, OrbitalObjectIdSchema } from "./orbitalObjectId";
+import { starSystemCoordinatesEquals, StarSystemCoordinatesSchema } from "./starSystemCoordinates";
 
 export const UniverseObjectIdSchema = z.object({
     idInSystem: OrbitalObjectIdSchema,
 
     /** The coordinates of the star system. */
-    systemCoordinates: StarSystemCoordinatesSchema
+    systemCoordinates: StarSystemCoordinatesSchema,
 });
 
 /**
@@ -48,10 +49,10 @@ export function universeObjectIdEquals(a: UniverseObjectId, b: UniverseObjectId)
  */
 export function getUniverseObjectId(
     orbitalObject: DeepReadonly<OrbitalObjectModel>,
-    starSystem: DeepReadonly<StarSystemModel>
+    starSystem: DeepReadonly<StarSystemModel>,
 ): UniverseObjectId {
     return {
         systemCoordinates: starSystem.coordinates,
-        idInSystem: orbitalObject.id
+        idInSystem: orbitalObject.id,
     };
 }

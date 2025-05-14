@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
+
 import { CelestialBodyBase } from "./celestialBody";
 import { OrbitalObjectType } from "./orbitalObjectType";
 

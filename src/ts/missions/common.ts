@@ -1,18 +1,19 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+
 import i18n from "../i18n";
+import { GeneralInputs } from "../inputs/generalInputs";
+import { Settings } from "../settings";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/starSystemCoordinates";
+import { pressInteractionToStrings } from "../utils/strings/inputControlsString";
 import { parseDistance } from "../utils/strings/parseToStrings";
 import { MissionContext } from "./missionContext";
-import { Settings } from "../settings";
-import { GeneralInputs } from "../inputs/generalInputs";
-import { pressInteractionToStrings } from "../utils/strings/inputControlsString";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 
 export function getGoToSystemInstructions(
     missionContext: MissionContext,
     targetSystemCoordinates: StarSystemCoordinates,
     keyboardLayout: Map<string, string>,
-    starSystemDatabase: StarSystemDatabase
+    starSystemDatabase: StarSystemDatabase,
 ): string {
     const currentPlayerDestination = missionContext.currentItinerary.at(-1);
     const isPlayerGoingToTargetSystem =
@@ -20,14 +21,14 @@ export function getGoToSystemInstructions(
         starSystemCoordinatesEquals(currentPlayerDestination, targetSystemCoordinates);
 
     const currentSystemPosition = starSystemDatabase.getSystemGalacticPosition(
-        missionContext.currentSystem.model.coordinates
+        missionContext.currentSystem.model.coordinates,
     );
 
     if (!isPlayerGoingToTargetSystem) {
         return i18n.t("missions:common:openStarMap", {
             starMapKey: pressInteractionToStrings(GeneralInputs.map.toggleStarMap, keyboardLayout).join(
-                ` ${i18n.t("common:or")} `
-            )
+                ` ${i18n.t("common:or")} `,
+            ),
         });
     } else {
         const nextSystemCoordinates = missionContext.currentItinerary.at(1);
@@ -37,19 +38,19 @@ export function getGoToSystemInstructions(
                 : null;
         if (nextSystemModel === null) {
             throw new Error(
-                "Next system model in itinerary is null and yet the player has an itinerary to the target system?!"
+                "Next system model in itinerary is null and yet the player has an itinerary to the target system?!",
             );
         }
 
         const distanceToNextSystem = Vector3.Distance(
             starSystemDatabase.getSystemGalacticPosition(nextSystemModel.coordinates),
-            currentSystemPosition
+            currentSystemPosition,
         );
 
         return i18n.t("missions:common:travelToNextSystem", {
             systemName: nextSystemModel.name,
             distance: parseDistance(distanceToNextSystem * Settings.LIGHT_YEAR),
-            nbJumps: missionContext.currentItinerary.length - 1
+            nbJumps: missionContext.currentItinerary.length - 1,
         });
     }
 }

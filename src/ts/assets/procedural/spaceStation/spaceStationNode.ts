@@ -20,5 +20,5 @@ export const enum SpaceStationNodeType {
     SOLAR_SECTION,
     RING_HABITAT,
     HELIX_HABITAT,
-    CYLINDER_HABITAT
+    CYLINDER_HABITAT,
 }

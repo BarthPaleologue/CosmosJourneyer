@@ -17,6 +17,7 @@
 
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+
 import { WaterTextures } from "../assets/textures";
 
 const OceanUniformNames = {
@@ -27,12 +28,12 @@ const OceanUniformNames = {
     OCEAN_DEPTH_MODIFIER: "ocean_depthModifier",
     OCEAN_WAVE_BLENDING_SHARPNESS: "ocean_waveBlendingSharpness",
     PLANET_INVERSE_ROTATION_MATRIX: "planetInverseRotationMatrix",
-    TIME: "time"
+    TIME: "time",
 };
 
 const OceanSamplerNames = {
     NORMAL_MAP_1: "normalMap1",
-    NORMAL_MAP_2: "normalMap2"
+    NORMAL_MAP_2: "normalMap2",
 };
 
 export class OceanUniforms {
@@ -67,7 +68,7 @@ export class OceanUniforms {
         effect.setFloat(OceanUniformNames.OCEAN_WAVE_BLENDING_SHARPNESS, this.waveBlendingSharpness);
         effect.setMatrix(
             OceanUniformNames.PLANET_INVERSE_ROTATION_MATRIX,
-            planetTransform.getWorldMatrix().getRotationMatrix().transpose()
+            planetTransform.getWorldMatrix().getRotationMatrix().transpose(),
         );
         effect.setFloat(OceanUniformNames.TIME, this.time % 100000); //FIXME: do not hardcode the 100000
     }

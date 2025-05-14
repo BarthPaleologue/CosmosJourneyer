@@ -15,13 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
+import { Quaternion } from "@babylonjs/core/Maths/math";
+import { Space } from "@babylonjs/core/Maths/math.axis";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
-import { Quaternion } from "@babylonjs/core/Maths/math";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsMotionType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
-import { Space } from "@babylonjs/core/Maths/math.axis";
+import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
+
 import { Objects } from "../assets/objects";
 
 export class AsteroidPatch {
@@ -49,7 +50,7 @@ export class AsteroidPatch {
         typeIndices: number[],
         rotationAxes: Vector3[],
         rotationSpeeds: number[],
-        parent: TransformNode
+        parent: TransformNode,
     ) {
         this.parent = parent;
 
@@ -102,7 +103,7 @@ export class AsteroidPatch {
                     instance,
                     PhysicsMotionType.DYNAMIC,
                     false,
-                    this.parent.getScene()
+                    this.parent.getScene(),
                 );
                 instancePhysicsBody.setMassProperties({ mass: 1000 });
                 instancePhysicsBody.setAngularVelocity(rotationAxis.scale(rotationSpeed));

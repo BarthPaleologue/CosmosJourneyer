@@ -15,24 +15,25 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { MeshBuilder, PhysicsAggregate, PhysicsShapeType, Quaternion } from "@babylonjs/core";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
-import { Scene } from "@babylonjs/core/scene";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { LandingPad } from "../assets/procedural/landingPad/landingPad";
-import { MeshBuilder, PhysicsAggregate, PhysicsShapeType, Quaternion } from "@babylonjs/core";
-import { enablePhysics } from "./utils";
-import { DefaultControls } from "../defaultControls/defaultControls";
-import { Spaceship } from "../spaceship/spaceship";
+import { Scene } from "@babylonjs/core/scene";
 import { randRange } from "extended-random";
-import { CollisionMask } from "../settings";
-import { LandingPadSize } from "../spacestation/landingPad/landingPadManager";
+
+import { LandingPad } from "../assets/procedural/landingPad/landingPad";
 import { loadRenderingAssets } from "../assets/renderingAssets";
 import { SoundPlayerMock } from "../audio/soundPlayer";
+import { DefaultControls } from "../defaultControls/defaultControls";
+import { CollisionMask } from "../settings";
+import { Spaceship } from "../spaceship/spaceship";
+import { LandingPadSize } from "../spacestation/landingPad/landingPadManager";
+import { enablePhysics } from "./utils";
 
 export async function createAutomaticLandingScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void
+    progressCallback: (progress: number, text: string) => void,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -49,7 +50,7 @@ export async function createAutomaticLandingScene(
     ship.getTransform().position.copyFromFloats(
         randRange(-50, 50, Math.random, 0),
         randRange(30, 50, Math.random, 0),
-        randRange(-50, 50, Math.random, 0)
+        randRange(-50, 50, Math.random, 0),
     );
     ship.getTransform().rotationQuaternion = Quaternion.Random().normalize();
 

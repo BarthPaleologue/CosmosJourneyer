@@ -15,8 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { PriorityQueue } from "@/utils/priorityQueue";
+
 import { BuildTask } from "./taskTypes";
-import { PriorityQueue } from "../../../../utils/priorityQueue";
 
 /*export class BuildTaskQueue {
     array: ArrayBuffer
@@ -41,7 +42,7 @@ export class WorkerPool {
         this.taskQueue = new PriorityQueue<BuildTask>(comparator);
         for (let i = 0; i < nbWorkers; i++) {
             const worker = new Worker(new URL("../workers/buildScript", import.meta.url), {
-                type: "module"
+                type: "module",
             });
             this.availableWorkers.push(worker);
             //worker.postMessage(this.sharedMemoryBuffer);

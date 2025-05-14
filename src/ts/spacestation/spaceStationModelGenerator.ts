@@ -15,28 +15,29 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Tools } from "@babylonjs/core/Misc/tools";
 import { normalRandom } from "extended-random";
-import { clamp } from "../utils/math";
+
 import { CelestialBodyModel } from "../architecture/orbitalObjectModel";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { Orbit } from "../orbit/orbit";
 import { getFactionFromGalacticPosition } from "../society/factions";
-import { CropTypes, CropType } from "../utils/agriculture";
+import { CropType, CropTypes } from "../utils/agriculture";
 import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
 import { GenerationSteps } from "../utils/generationSteps";
 import { getRngFromSeed } from "../utils/getRngFromSeed";
+import { clamp } from "../utils/math";
 import { randomPieChart } from "../utils/random";
 import { generateSpaceStationName } from "../utils/strings/spaceStationNameGenerator";
 import { SpaceStationModel } from "./spacestationModel";
-import { Tools } from "@babylonjs/core/Misc/tools";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export function newSeededSpaceStationModel(
     id: string,
     seed: number,
     starSystemCoordinates: StarSystemCoordinates,
     starSystemPosition: Vector3,
-    parentBodies: CelestialBodyModel[]
+    parentBodies: CelestialBodyModel[],
 ): SpaceStationModel {
     const rng = getRngFromSeed(seed);
 
@@ -71,7 +72,7 @@ export function newSeededSpaceStationModel(
         eccentricity: 0,
         longitudeOfAscendingNode: 0,
         argumentOfPeriapsis: 0,
-        initialMeanAnomaly: 0
+        initialMeanAnomaly: 0,
     };
 
     const mass = 1;
@@ -115,6 +116,6 @@ export function newSeededSpaceStationModel(
         agricultureMix,
         nbHydroponicLayers,
         faction,
-        solarPanelEfficiency
+        solarPanelEfficiency,
     };
 }

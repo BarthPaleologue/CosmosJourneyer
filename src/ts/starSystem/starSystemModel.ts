@@ -20,7 +20,7 @@ import {
     OrbitalFacilityModel,
     OrbitalObjectModel,
     PlanetModel,
-    StellarObjectModel
+    StellarObjectModel,
 } from "../architecture/orbitalObjectModel";
 import { TelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModel";
 import { OrbitalObjectId } from "../utils/coordinates/orbitalObjectId";
@@ -76,7 +76,7 @@ export type StarSystemModel = {
  */
 export function getObjectModelById(
     id: OrbitalObjectId,
-    starSystem: DeepReadonly<StarSystemModel>
+    starSystem: DeepReadonly<StarSystemModel>,
 ): DeepReadonly<OrbitalObjectModel> | null {
     const stellarObject = starSystem.stellarObjects.find((object) => object.id === id);
     if (stellarObject !== undefined) {

@@ -17,23 +17,24 @@
 
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
-import { Player } from "../player/player";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-import { initI18n } from "../i18n";
+
+import { loadRenderingAssets } from "../assets/renderingAssets";
 import { SoundPlayerMock } from "../audio/soundPlayer";
+import { TtsMock } from "../audio/tts";
+import { initI18n } from "../i18n";
+import { Player } from "../player/player";
+import { EncyclopaediaGalacticaManager } from "../society/encyclopaediaGalacticaManager";
+import { getAlphaTestisSystemModel } from "../starSystem/customSystems/alphaTestis";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { StarSystemView } from "../starSystem/starSystemView";
 import { UberScene } from "../uberCore/uberScene";
-import { enablePhysics } from "./utils";
-import { TtsMock } from "../audio/tts";
-import { loadRenderingAssets } from "../assets/renderingAssets";
-import { EncyclopaediaGalacticaManager } from "../society/encyclopaediaGalacticaManager";
-import { positionNearObjectBrightSide } from "../utils/positionNearObject";
-import { getAlphaTestisSystemModel } from "../starSystem/customSystems/alphaTestis";
 import { updateNotifications } from "../utils/notification";
+import { positionNearObjectBrightSide } from "../utils/positionNearObject";
+import { enablePhysics } from "./utils";
 
 export async function createStarSystemViewScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void
+    progressCallback: (progress: number, text: string) => void,
 ): Promise<Scene> {
     await initI18n();
 
@@ -65,7 +66,7 @@ export async function createStarSystemViewScene(
         starSystemDatabase,
         soundPlayerMock,
         ttsMock,
-        assets
+        assets,
     );
 
     await starSystemView.resetPlayer();
@@ -79,7 +80,7 @@ export async function createStarSystemViewScene(
     positionNearObjectBrightSide(
         starSystemView.getSpaceshipControls(),
         starSystemView.getStarSystem().getStellarObjects()[0],
-        starSystemView.getStarSystem()
+        starSystemView.getStarSystem(),
     );
 
     scene.onBeforeRenderObservable.add(() => {

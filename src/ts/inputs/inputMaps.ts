@@ -1,10 +1,10 @@
-import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
 import { CharacterInputs } from "../characterControls/characterControlsInputs";
 import { DefaultControlsInputs } from "../defaultControls/defaultControlsInputs";
-import { GeneralInputs } from "./generalInputs";
-import { StarSystemInputs } from "./starSystemInputs";
+import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
 import { StarMapInputs } from "../starmap/starMapInputs";
 import { TutorialControlsInputs } from "../ui/tutorial/tutorialLayerInputs";
+import { GeneralInputs } from "./generalInputs";
+import { StarSystemInputs } from "./starSystemInputs";
 
 export const InputMaps = [
     GeneralInputs,
@@ -13,5 +13,5 @@ export const InputMaps = [
     SpaceShipControlsInputs,
     CharacterInputs,
     DefaultControlsInputs,
-    TutorialControlsInputs
+    TutorialControlsInputs,
 ] as const;

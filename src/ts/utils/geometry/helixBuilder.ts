@@ -1,6 +1,6 @@
-import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes";
+import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import { Scene } from "@babylonjs/core/scene";
 
 /**
@@ -18,7 +18,7 @@ export function createHelixVertexData(
     height: number,
     nbSpires: number,
     pitch: number,
-    tesselation: number
+    tesselation: number,
 ) {
     const indices: number[] = [];
     const positions: number[] = [];
@@ -135,7 +135,7 @@ export function createHelix(
     tesselation: number,
     nbSpires: number,
     pitch: number,
-    scene: Scene
+    scene: Scene,
 ) {
     const vertexData = createHelixVertexData(radius, thickness, height, nbSpires, pitch, tesselation);
     const ring = new Mesh("ring", scene);

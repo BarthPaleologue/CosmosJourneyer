@@ -15,21 +15,23 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Scene } from "@babylonjs/core/scene";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { Axis } from "@babylonjs/core/Maths/math.axis";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { Scene } from "@babylonjs/core/scene";
+
+import { getRngFromSeed } from "@/utils/getRngFromSeed";
+import { createEnvironmentAggregate } from "@/utils/havok";
+import { getRotationPeriodForArtificialGravity } from "@/utils/physics";
+
 import { Transformable } from "../../../architecture/transformable";
 import { Settings } from "../../../settings";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { CylinderHabitatMaterial } from "./cylinderHabitatMaterial";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
-import { Axis } from "@babylonjs/core/Maths/math.axis";
-import { getRngFromSeed } from "../../../utils/getRngFromSeed";
-import { createEnvironmentAggregate } from "../../../utils/havok";
-import { getRotationPeriodForArtificialGravity } from "../../../utils/physics";
 import { Textures } from "../../textures";
+import { CylinderHabitatMaterial } from "./cylinderHabitatMaterial";
 
 export class CylinderHabitat implements Transformable {
     private readonly root: TransformNode;
@@ -63,9 +65,9 @@ export class CylinderHabitat implements Transformable {
             {
                 diameter: this.radius * 2,
                 height: height,
-                tessellation: tesselation
+                tessellation: tesselation,
             },
-            scene
+            scene,
         );
         this.cylinder.convertToFlatShadedMesh();
 
@@ -74,7 +76,7 @@ export class CylinderHabitat implements Transformable {
             height,
             tesselation,
             textures.materials.spaceStation,
-            scene
+            scene,
         );
 
         this.cylinder.material = this.cylinderMaterial;
@@ -85,7 +87,7 @@ export class CylinderHabitat implements Transformable {
     update(cameraWorldPosition: Vector3, deltaSeconds: number) {
         this.getTransform().rotate(
             Axis.Y,
-            deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, Settings.G_EARTH)
+            deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, Settings.G_EARTH),
         );
 
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
@@ -94,7 +96,7 @@ export class CylinderHabitat implements Transformable {
             this.cylinderAggregate = createEnvironmentAggregate(
                 this.cylinder,
                 PhysicsShapeType.MESH,
-                this.getTransform().getScene()
+                this.getTransform().getScene(),
             );
         } else if (distanceToCamera > 360e3 && this.cylinderAggregate !== null) {
             this.cylinderAggregate.dispose();

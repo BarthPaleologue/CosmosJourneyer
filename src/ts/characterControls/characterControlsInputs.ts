@@ -1,6 +1,7 @@
-import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import Action from "@brianchirls/game-input/Action";
+import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import PressInteraction from "@brianchirls/game-input/interactions/PressInteraction";
+
 import { InputDevices } from "../inputs/devices";
 import { InputMap } from "../inputs/inputMap";
 
@@ -11,7 +12,7 @@ const kbdWASD = new DPadComposite({
     up: keyboard.getControl("KeyW"),
     left: keyboard.getControl("KeyA"),
     down: keyboard.getControl("KeyS"),
-    right: keyboard.getControl("KeyD")
+    right: keyboard.getControl("KeyD"),
 });
 
 /**
@@ -19,31 +20,31 @@ const kbdWASD = new DPadComposite({
  * The action will respond to whichever control is used.
  */
 const moveAction = new Action({
-    bindings: [kbdWASD]
+    bindings: [kbdWASD],
 });
 
 const jumpKey = keyboard.getControl("Space");
 
 const jumpAction = new Action({
-    bindings: [jumpKey]
+    bindings: [jumpKey],
 });
 
 const jumpInteraction = new PressInteraction(jumpAction);
 
 const sambaKey = keyboard.getControl("KeyX");
 const sambaAction = new Action({
-    bindings: [sambaKey]
+    bindings: [sambaKey],
 });
 
 const runKey = keyboard.getControl("ShiftLeft");
 const runAction = new Action({
-    bindings: [runKey]
+    bindings: [runKey],
 });
 
 const toggleCameraInteraction = new PressInteraction(
     new Action({
-        bindings: [keyboard.getControl("KeyB")]
-    })
+        bindings: [keyboard.getControl("KeyB")],
+    }),
 );
 
 export const CharacterInputs = new InputMap<{
@@ -57,7 +58,7 @@ export const CharacterInputs = new InputMap<{
     jump: jumpInteraction,
     samba: sambaAction,
     run: runAction,
-    toggleCamera: toggleCameraInteraction
+    toggleCamera: toggleCameraInteraction,
 });
 
 CharacterInputs.setEnabled(false);

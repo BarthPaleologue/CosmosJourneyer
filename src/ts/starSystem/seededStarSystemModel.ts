@@ -15,40 +15,41 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { centeredRand, randRangeInt, uniformRandBool } from "extended-random";
-import { Settings } from "../settings";
-import { generateStarName } from "../utils/strings/starNameGenerator";
-import { wheelOfFortune } from "../utils/random";
-import { StarSystemModel } from "./starSystemModel";
+
+import { newSeededJuliaSetModel } from "../anomalies/julia/juliaSetModelGenerator";
+import { newSeededMandelboxModel } from "../anomalies/mandelbox/mandelboxModelGenerator";
+import { newSeededMandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModelGenerator";
+import { newSeededMengerSpongeModel } from "../anomalies/mengerSponge/mengerSpongeModelGenerator";
+import { newSeededSierpinskiPyramidModel } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidModelGenerator";
 import {
-    StellarObjectModel,
     AnomalyModel,
     AnomalyType,
+    OrbitalFacilityModel,
     PlanetModel,
-    OrbitalFacilityModel
+    StellarObjectModel,
 } from "../architecture/orbitalObjectModel";
-import { Alphabet, ReversedGreekAlphabet } from "../utils/strings/parseToStrings";
-import { newSeededStarModel } from "../stellarObjects/star/starModelGenerator";
+import { OrbitalObjectType } from "../architecture/orbitalObjectType";
+import { newSeededGasPlanetModel } from "../planets/gasPlanet/gasPlanetModelGenerator";
+import { newSeededTelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModelGenerator";
+import { TelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModel";
+import { newSeededTelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModelGenerator";
+import { Settings } from "../settings";
+import { newSeededSpaceElevatorModel } from "../spacestation/spaceElevatorModelGenerator";
+import { newSeededSpaceStationModel } from "../spacestation/spaceStationModelGenerator";
 import { newSeededBlackHoleModel } from "../stellarObjects/blackHole/blackHoleModelGenerator";
 import { newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModelGenerator";
-import { newSeededGasPlanetModel } from "../planets/gasPlanet/gasPlanetModelGenerator";
-import { newSeededMandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModelGenerator";
-import { newSeededJuliaSetModel } from "../anomalies/julia/juliaSetModelGenerator";
-import { getRngFromSeed } from "../utils/getRngFromSeed";
-import { romanNumeral } from "../utils/strings/romanNumerals";
-import { newSeededSpaceStationModel } from "../spacestation/spaceStationModelGenerator";
-import { OrbitalObjectType } from "../architecture/orbitalObjectType";
-import { newSeededTelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModelGenerator";
-import { newSeededTelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModelGenerator";
-import { newSeededSpaceElevatorModel } from "../spacestation/spaceElevatorModelGenerator";
-import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { newSeededMandelboxModel } from "../anomalies/mandelbox/mandelboxModelGenerator";
-import { newSeededSierpinskiPyramidModel } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidModelGenerator";
-import { newSeededMengerSpongeModel } from "../anomalies/mengerSponge/mengerSpongeModelGenerator";
-import { TelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModel";
-import { isNonEmptyArray } from "../utils/types";
+import { newSeededStarModel } from "../stellarObjects/star/starModelGenerator";
 import { createOrbitalObjectId } from "../utils/coordinates/orbitalObjectId";
+import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
+import { getRngFromSeed } from "../utils/getRngFromSeed";
+import { wheelOfFortune } from "../utils/random";
+import { Alphabet, ReversedGreekAlphabet } from "../utils/strings/parseToStrings";
+import { romanNumeral } from "../utils/strings/romanNumerals";
+import { generateStarName } from "../utils/strings/starNameGenerator";
+import { isNonEmptyArray } from "../utils/types";
+import { StarSystemModel } from "./starSystemModel";
 
 const enum GenerationSteps {
     NAME,
@@ -60,7 +61,7 @@ const enum GenerationSteps {
     NB_MOONS = 10,
     MOONS = 11,
     ANOMALIES = 666,
-    SPACE_STATIONS = 2000
+    SPACE_STATIONS = 2000,
 }
 
 /**
@@ -72,7 +73,7 @@ export function newSeededStarSystemModel(
     systemRng: (step: number) => number,
     coordinates: StarSystemCoordinates,
     position: Vector3,
-    isCivilized: boolean
+    isCivilized: boolean,
 ): StarSystemModel {
     const systemName = generateStarName(systemRng, GenerationSteps.NAME);
 
@@ -85,7 +86,7 @@ export function newSeededStarSystemModel(
     switch (stellarObjectType) {
         case OrbitalObjectType.STAR:
             stellarObjects.push(
-                newSeededStarModel(createOrbitalObjectId([], OrbitalObjectType.STAR, 0), seed, stellarObjectName, [])
+                newSeededStarModel(createOrbitalObjectId([], OrbitalObjectType.STAR, 0), seed, stellarObjectName, []),
             );
             break;
         case OrbitalObjectType.BLACK_HOLE:
@@ -94,8 +95,8 @@ export function newSeededStarSystemModel(
                     createOrbitalObjectId([], OrbitalObjectType.NEUTRON_STAR, 0),
                     seed,
                     stellarObjectName,
-                    []
-                )
+                    [],
+                ),
             );
             break;
         case OrbitalObjectType.NEUTRON_STAR:
@@ -104,8 +105,8 @@ export function newSeededStarSystemModel(
                     createOrbitalObjectId([], OrbitalObjectType.BLACK_HOLE, 0),
                     seed,
                     stellarObjectName,
-                    []
-                )
+                    [],
+                ),
             );
             break;
     }
@@ -140,8 +141,8 @@ export function newSeededStarSystemModel(
                         createOrbitalObjectId(parentIds, OrbitalObjectType.TELLURIC_PLANET, i),
                         seed,
                         planetName,
-                        stellarObjects
-                    )
+                        stellarObjects,
+                    ),
                 );
                 break;
             case OrbitalObjectType.GAS_PLANET:
@@ -150,8 +151,8 @@ export function newSeededStarSystemModel(
                         createOrbitalObjectId(parentIds, OrbitalObjectType.GAS_PLANET, i),
                         seed,
                         planetName,
-                        stellarObjects
-                    )
+                        stellarObjects,
+                    ),
                 );
                 break;
         }
@@ -179,9 +180,9 @@ export function newSeededStarSystemModel(
     const nbAnomalies = wheelOfFortune(
         [
             [0, 0.96],
-            [1, 0.04]
+            [1, 0.04],
         ],
-        systemRng(GenerationSteps.ANOMALIES)
+        systemRng(GenerationSteps.ANOMALIES),
     );
     for (let i = 0; i < nbAnomalies; i++) {
         const anomalySeed = centeredRand(systemRng, GenerationSteps.ANOMALIES + i * 100) * Settings.SEED_HALF_RANGE;
@@ -191,9 +192,9 @@ export function newSeededStarSystemModel(
                 [OrbitalObjectType.MANDELBOX, 1],
                 [OrbitalObjectType.JULIA_SET, 1],
                 [OrbitalObjectType.SIERPINSKI_PYRAMID, 1],
-                [OrbitalObjectType.MENGER_SPONGE, 1]
+                [OrbitalObjectType.MENGER_SPONGE, 1],
             ],
-            systemRng(GenerationSteps.ANOMALIES + i * 300)
+            systemRng(GenerationSteps.ANOMALIES + i * 300),
         );
         const anomalyName = `${systemName} ${ReversedGreekAlphabet.charAt(i).toUpperCase()}`;
         const parentIds = stellarObjects.map((object) => object.id);
@@ -205,8 +206,8 @@ export function newSeededStarSystemModel(
                         createOrbitalObjectId(parentIds, OrbitalObjectType.MANDELBULB, i),
                         anomalySeed,
                         anomalyName,
-                        [firstStellarObject]
-                    )
+                        [firstStellarObject],
+                    ),
                 );
                 break;
             case OrbitalObjectType.JULIA_SET:
@@ -215,8 +216,8 @@ export function newSeededStarSystemModel(
                         createOrbitalObjectId(parentIds, OrbitalObjectType.JULIA_SET, i),
                         anomalySeed,
                         anomalyName,
-                        [firstStellarObject]
-                    )
+                        [firstStellarObject],
+                    ),
                 );
                 break;
             case OrbitalObjectType.MANDELBOX:
@@ -225,8 +226,8 @@ export function newSeededStarSystemModel(
                         createOrbitalObjectId(parentIds, OrbitalObjectType.MANDELBOX, i),
                         anomalySeed,
                         anomalyName,
-                        [firstStellarObject]
-                    )
+                        [firstStellarObject],
+                    ),
                 );
                 break;
             case OrbitalObjectType.SIERPINSKI_PYRAMID:
@@ -235,8 +236,8 @@ export function newSeededStarSystemModel(
                         createOrbitalObjectId(parentIds, OrbitalObjectType.SIERPINSKI_PYRAMID, i),
                         anomalySeed,
                         anomalyName,
-                        [firstStellarObject]
-                    )
+                        [firstStellarObject],
+                    ),
                 );
                 break;
             case OrbitalObjectType.MENGER_SPONGE:
@@ -245,8 +246,8 @@ export function newSeededStarSystemModel(
                         createOrbitalObjectId(parentIds, OrbitalObjectType.MENGER_SPONGE, i),
                         anomalySeed,
                         anomalyName,
-                        [firstStellarObject]
-                    )
+                        [firstStellarObject],
+                    ),
                 );
                 break;
         }
@@ -293,7 +294,7 @@ export function newSeededStarSystemModel(
                     spaceStationSeed,
                     coordinates,
                     position,
-                    planet
+                    planet,
                 );
                 orbitalFacilities.push(spaceElevatorModel);
             } else {
@@ -302,7 +303,7 @@ export function newSeededStarSystemModel(
                     spaceStationSeed,
                     coordinates,
                     position,
-                    [planet]
+                    [planet],
                 );
                 orbitalFacilities.push(spaceStationModel);
             }
@@ -320,7 +321,7 @@ export function newSeededStarSystemModel(
         planets: planets,
         satellites: satellites,
         anomalies: anomalies,
-        orbitalFacilities: orbitalFacilities
+        orbitalFacilities: orbitalFacilities,
     };
 }
 

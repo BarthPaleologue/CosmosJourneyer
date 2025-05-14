@@ -1,3 +1,5 @@
+import { Color3 } from "@babylonjs/core/Maths/math.color";
+
 /*
                 Colour Rendering of Spectra
 
@@ -60,7 +62,7 @@ class ColourSystem {
         yBlue: number,
         xWhite: number,
         yWhite: number,
-        gamma: number
+        gamma: number,
     ) {
         this.name = name;
         this.xRed = xRed;
@@ -139,7 +141,7 @@ const HDTVsystem = new ColourSystem(
     0.06,
     IlluminantD65[0],
     IlluminantD65[1],
-    GAMMA_REC709
+    GAMMA_REC709,
 );
 /*const CIEsystem = new ColourSystem(
     "CIE",
@@ -475,7 +477,7 @@ function spectrum_to_xyz(f: (wavelength: number) => number): [number, number, nu
         [0.0001, 0.0, 0.0],
         [0.0001, 0.0, 0.0],
         [0.0001, 0.0, 0.0],
-        [0.0, 0.0, 0.0]
+        [0.0, 0.0, 0.0],
     ];
 
     for (i = 0, lambda = 380; lambda < 780.1; i++, lambda += 5) {
@@ -547,12 +549,10 @@ export function demonstrate() {
         [r, g, b] = constrain_rgb(r, g, b);
         [r, g, b] = norm_rgb(r, g, b);
         console.log(
-            `  ${t} K      ${x.toFixed(4)} ${y.toFixed(4)} ${z.toFixed(4)}   ${r.toFixed(3)} ${g.toFixed(3)} ${b.toFixed(3)}`
+            `  ${t} K      ${x.toFixed(4)} ${y.toFixed(4)} ${z.toFixed(4)}   ${r.toFixed(3)} ${g.toFixed(3)} ${b.toFixed(3)}`,
         );
     }
 }
-
-import { Color3 } from "@babylonjs/core/Maths/math.color";
 
 export function getRgbFromTemperature(temperature: number): Color3 {
     const cs = HDTVsystem;

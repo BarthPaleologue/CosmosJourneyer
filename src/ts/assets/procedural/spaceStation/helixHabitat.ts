@@ -15,24 +15,26 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Scene } from "@babylonjs/core/scene";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { Transformable } from "../../../architecture/transformable";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { Settings } from "../../../settings";
-import { MetalSectionMaterial } from "./metalSectionMaterial";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { HelixHabitatMaterial } from "./helixHabitatMaterial";
-import { createHelix } from "../../../utils/geometry/helixBuilder";
-import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
-import { getRngFromSeed } from "../../../utils/getRngFromSeed";
-import { createEnvironmentAggregate } from "../../../utils/havok";
-import { getRotationPeriodForArtificialGravity } from "../../../utils/physics";
 import { Material } from "@babylonjs/core/Materials/material";
+import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { Scene } from "@babylonjs/core/scene";
+
+import { createHelix } from "@/utils/geometry/helixBuilder";
+import { getRngFromSeed } from "@/utils/getRngFromSeed";
+import { createEnvironmentAggregate } from "@/utils/havok";
+import { getRotationPeriodForArtificialGravity } from "@/utils/physics";
+
+import { Transformable } from "../../../architecture/transformable";
+import { Settings } from "../../../settings";
 import { Textures } from "../../textures";
+import { HelixHabitatMaterial } from "./helixHabitatMaterial";
+import { MetalSectionMaterial } from "./metalSectionMaterial";
 
 export class HelixHabitat implements Transformable {
     private readonly root: TransformNode;
@@ -69,7 +71,7 @@ export class HelixHabitat implements Transformable {
         const requiredHabitableSurfacePerHelix = requiredHabitableSurface / 2;
 
         const nbSpires = Math.ceil(
-            requiredHabitableSurfacePerHelix / (2 * Math.PI * this.radius * deltaRadius * thicknessMultipler)
+            requiredHabitableSurfacePerHelix / (2 * Math.PI * this.radius * deltaRadius * thicknessMultipler),
         );
 
         this.radius = requiredHabitableSurfacePerHelix / (2 * Math.PI * nbSpires * deltaRadius * thicknessMultipler);
@@ -83,7 +85,7 @@ export class HelixHabitat implements Transformable {
         this.metalSectionMaterial = new MetalSectionMaterial(
             "HelixHabitatMetalSectionMaterial",
             textures.materials.metalPanels,
-            scene
+            scene,
         );
 
         this.attachment = MeshBuilder.CreateCylinder(
@@ -92,9 +94,9 @@ export class HelixHabitat implements Transformable {
                 diameterTop: 100,
                 diameterBottom: 100,
                 height: totalLength + deltaRadius * 4,
-                tessellation: attachmentNbSides
+                tessellation: attachmentNbSides,
             },
-            scene
+            scene,
         );
         this.attachment.convertToFlatShadedMesh();
         this.attachment.material = this.metalSectionMaterial;
@@ -110,7 +112,7 @@ export class HelixHabitat implements Transformable {
             tessellation,
             nbSpires,
             pitch,
-            scene
+            scene,
         );
 
         this.helix2 = this.helix1.clone();
@@ -124,7 +126,7 @@ export class HelixHabitat implements Transformable {
             deltaRadius,
             thicknessMultipler,
             textures.materials.spaceStation,
-            scene
+            scene,
         );
 
         this.helix1.material = this.helixMaterial;
@@ -137,9 +139,9 @@ export class HelixHabitat implements Transformable {
                 {
                     height: 2 * this.radius,
                     diameter: deltaRadius / 3,
-                    tessellation: 6
+                    tessellation: 6,
                 },
-                scene
+                scene,
             );
             arm.convertToFlatShadedMesh();
             arm.rotate(Axis.Z, Math.PI / 2, Space.LOCAL);
@@ -161,7 +163,7 @@ export class HelixHabitat implements Transformable {
     update(cameraWorldPosition: Vector3, deltaSeconds: number) {
         this.getTransform().rotate(
             Axis.Y,
-            deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, Settings.G_EARTH)
+            deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, Settings.G_EARTH),
         );
 
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
@@ -170,24 +172,24 @@ export class HelixHabitat implements Transformable {
             this.attachmentAggregate = createEnvironmentAggregate(
                 this.attachment,
                 PhysicsShapeType.MESH,
-                this.getTransform().getScene()
+                this.getTransform().getScene(),
             );
             this.helix1Aggregate = createEnvironmentAggregate(
                 this.helix1,
                 PhysicsShapeType.MESH,
-                this.getTransform().getScene()
+                this.getTransform().getScene(),
             );
             this.helix2Aggregate = createEnvironmentAggregate(
                 this.helix2,
                 PhysicsShapeType.MESH,
-                this.getTransform().getScene()
+                this.getTransform().getScene(),
             );
 
             this.arms.forEach((arm) => {
                 const armAggregate = createEnvironmentAggregate(
                     arm,
                     PhysicsShapeType.MESH,
-                    this.getTransform().getScene()
+                    this.getTransform().getScene(),
                 );
                 this.armAggregates.push(armAggregate);
             });

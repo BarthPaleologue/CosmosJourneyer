@@ -16,11 +16,12 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { describe, expect, it } from "vitest";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
-import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
-import { StarMapTutorial } from "./starMapTutorial";
 import { Mission } from "../missions/mission";
+import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { StarMapTutorial } from "./starMapTutorial";
 
 describe("StarMapTutorial", () => {
     it("spawns near a space station", () => {

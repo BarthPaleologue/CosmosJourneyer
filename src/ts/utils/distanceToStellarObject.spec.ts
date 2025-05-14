@@ -16,12 +16,13 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { describe, expect, it } from "vitest";
-import { getObjectModelById, StarSystemModel } from "../starSystem/starSystemModel";
-import { DeepReadonly } from "./types";
+
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { Settings } from "../settings";
 import { Faction } from "../society/factions";
+import { getObjectModelById, StarSystemModel } from "../starSystem/starSystemModel";
 import { getDistancesToStellarObjects } from "./distanceToStellarObject";
+import { DeepReadonly } from "./types";
 
 describe("distanceToStellarObject", () => {
     const systemModel: DeepReadonly<StarSystemModel> = {
@@ -32,7 +33,7 @@ describe("distanceToStellarObject", () => {
             starSectorZ: 0,
             localX: 0,
             localY: 0,
-            localZ: 0
+            localZ: 0,
         },
         stellarObjects: [
             {
@@ -47,7 +48,7 @@ describe("distanceToStellarObject", () => {
                     inclination: 0,
                     initialMeanAnomaly: 0,
                     longitudeOfAscendingNode: 0,
-                    eccentricity: 0
+                    eccentricity: 0,
                 },
                 axialTilt: 0,
                 seed: 0,
@@ -55,8 +56,8 @@ describe("distanceToStellarObject", () => {
                 radius: Settings.SOLAR_RADIUS,
                 mass: Settings.SOLAR_MASS,
                 rings: null,
-                blackBodyTemperature: 5778
-            }
+                blackBodyTemperature: 5778,
+            },
         ],
         planets: [
             {
@@ -71,7 +72,7 @@ describe("distanceToStellarObject", () => {
                     inclination: 0,
                     initialMeanAnomaly: 0,
                     longitudeOfAscendingNode: 0,
-                    eccentricity: 0
+                    eccentricity: 0,
                 },
                 axialTilt: 0,
                 seed: 0,
@@ -81,9 +82,9 @@ describe("distanceToStellarObject", () => {
                 rings: null,
                 atmosphere: {
                     greenHouseEffectFactor: 1,
-                    pressure: 1
-                }
-            }
+                    pressure: 1,
+                },
+            },
         ],
         satellites: [],
         anomalies: [],
@@ -100,7 +101,7 @@ describe("distanceToStellarObject", () => {
                     inclination: 0,
                     initialMeanAnomaly: 0,
                     longitudeOfAscendingNode: 0,
-                    eccentricity: 0
+                    eccentricity: 0,
                 },
                 population: 1e6,
                 populationDensity: 1e3,
@@ -114,15 +115,15 @@ describe("distanceToStellarObject", () => {
                     starSectorZ: 0,
                     localX: 0,
                     localY: 0,
-                    localZ: 0
+                    localZ: 0,
                 },
                 nbHydroponicLayers: 15,
                 faction: Faction.SATORI_CONCORD,
                 energyConsumptionPerCapitaKWh: 4000,
                 mass: 1e6,
-                axialTilt: 0
-            }
-        ]
+                axialTilt: 0,
+            },
+        ],
     };
 
     it("should be true", () => {

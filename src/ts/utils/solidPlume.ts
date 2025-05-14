@@ -1,14 +1,14 @@
-import { SolidParticleSystem } from "@babylonjs/core/Particles/solidParticleSystem";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { Scene } from "@babylonjs/core/scene";
-import { Axis } from "@babylonjs/core/Maths/math.axis";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { SolidParticle } from "@babylonjs/core/Particles/solidParticle";
-import { Scalar } from "@babylonjs/core/Maths/math.scalar";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
-import { TransformNode } from "@babylonjs/core/Meshes";
+import { Scalar } from "@babylonjs/core/Maths/math.scalar";
 import { RangeToPercent } from "@babylonjs/core/Maths/math.scalar.functions";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { TransformNode } from "@babylonjs/core/Meshes";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { SolidParticle } from "@babylonjs/core/Particles/solidParticle";
+import { SolidParticleSystem } from "@babylonjs/core/Particles/solidParticleSystem";
+import { Scene } from "@babylonjs/core/scene";
 
 export class SolidPlume {
     static TUNNEL_LENGTH = 5;
@@ -121,7 +121,7 @@ export class SolidPlume {
         const position = new Vector3(
             r * Math.cos(theta),
             r * Math.sin(theta),
-            Math.random() * SolidPlume.TUNNEL_LENGTH
+            Math.random() * SolidPlume.TUNNEL_LENGTH,
         );
 
         particle.position.copyFrom(position);

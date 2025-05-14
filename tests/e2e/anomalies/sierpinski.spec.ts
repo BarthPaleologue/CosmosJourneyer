@@ -1,4 +1,5 @@
 import { test } from "@playwright/test";
+
 import { renderAndSnap } from "../utils/renderSnap";
 
 test("The Sierpinski Pyramid playground renders correctly", async ({ page }) => {
@@ -8,7 +9,7 @@ test("The Sierpinski Pyramid playground renders correctly", async ({ page }) => 
         flagToWait: "frozen",
         urlParams: {
             freeze: 1,
-            seed: "0"
-        }
+            seed: "0",
+        },
     });
 });

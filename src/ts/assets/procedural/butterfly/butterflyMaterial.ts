@@ -15,19 +15,21 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Scene } from "@babylonjs/core/scene";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
-import butterflyFragment from "../../../../shaders/butterflyMaterial/butterflyFragment.glsl";
-import butterflyVertex from "../../../../shaders/butterflyMaterial/butterflyVertex.glsl";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { Scene } from "@babylonjs/core/scene";
+
 import {
     setStellarObjectUniforms,
-    StellarObjectUniformNames
+    StellarObjectUniformNames,
 } from "../../../postProcesses/uniforms/stellarObjectUniforms";
-import { PointLight } from "@babylonjs/core/Lights/pointLight";
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+
+import butterflyFragment from "@shaders/butterflyMaterial/butterflyFragment.glsl";
+import butterflyVertex from "@shaders/butterflyMaterial/butterflyVertex.glsl";
 
 const ButterflyMaterialUniformNames = {
     WORLD: "world",
@@ -40,11 +42,11 @@ const ButterflyMaterialUniformNames = {
     PLAYER_POSITION: "playerPosition",
     CAMERA_POSITION: "cameraPosition",
     PLANET_POSITION: "planetPosition",
-    PLANET_WORLD: "planetWorld"
+    PLANET_WORLD: "planetWorld",
 };
 
 const ButterflyMaterialSamplerNames = {
-    BUTTERFLY_TEXTURE: "butterflyTexture"
+    BUTTERFLY_TEXTURE: "butterflyTexture",
 };
 
 export class ButterflyMaterial extends ShaderMaterial {
@@ -71,7 +73,7 @@ export class ButterflyMaterial extends ShaderMaterial {
             attributes: ["position", "normal", "uv"],
             uniforms: uniforms,
             defines: defines,
-            samplers: [...Object.values(ButterflyMaterialSamplerNames)]
+            samplers: [...Object.values(ButterflyMaterialSamplerNames)],
         });
 
         this.backFaceCulling = false;
@@ -90,7 +92,7 @@ export class ButterflyMaterial extends ShaderMaterial {
             if (this.planet !== null) {
                 this.getEffect().setVector3(
                     ButterflyMaterialUniformNames.PLANET_POSITION,
-                    this.planet.getAbsolutePosition()
+                    this.planet.getAbsolutePosition(),
                 );
                 this.getEffect().setMatrix(ButterflyMaterialUniformNames.PLANET_WORLD, this.planet.getWorldMatrix());
             }

@@ -15,9 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
-import { Scene } from "@babylonjs/core/scene";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import {
     AbstractMesh,
     Color3,
@@ -27,16 +24,20 @@ import {
     PBRMetallicRoughnessMaterial,
     PhysicsAggregate,
     PhysicsShapeType,
-    ShadowGenerator
+    ShadowGenerator,
 } from "@babylonjs/core";
-import { enablePhysics } from "./utils";
+import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Scene } from "@babylonjs/core/scene";
+
+import { loadRenderingAssets } from "../assets/renderingAssets";
 import { CharacterControls } from "../characterControls/characterControls";
 import { CharacterInputs } from "../characterControls/characterControlsInputs";
-import { loadRenderingAssets } from "../assets/renderingAssets";
+import { enablePhysics } from "./utils";
 
 export async function createCharacterDemoScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void
+    progressCallback: (progress: number, text: string) => void,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -84,7 +85,7 @@ export async function createCharacterDemoScene(
     ground.receiveShadows = true;
 
     character.setClosestWalkableObject({
-        getTransform: () => ground
+        getTransform: () => ground,
     });
 
     scene.onBeforeRenderObservable.add(() => {

@@ -15,15 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
+
+import i18n from "../../../i18n";
+import { StarSystemDatabase } from "../../../starSystem/starSystemDatabase";
+import { MissionContext } from "../../missionContext";
+import type { MissionNode } from "../missionNode";
+import { MissionNodeBase } from "../missionNodeBase";
 import { MissionAndNodeSerialized } from "../missionNodeSerialized";
 import { MissionNodeType } from "../missionNodeType";
-import { MissionNodeBase } from "../missionNodeBase";
-import { MissionContext } from "../../missionContext";
-import i18n from "../../../i18n";
-
-import { StarSystemCoordinates } from "../../../utils/coordinates/starSystemCoordinates";
-import { StarSystemDatabase } from "../../../starSystem/starSystemDatabase";
-import type { MissionNode } from "../missionNode";
 
 /**
  * Node used to describe a set of tasks that must all be completed in any order.
@@ -72,7 +72,7 @@ export class MissionAndNode implements MissionNodeBase<MissionNodeType.AND> {
     describeNextTask(
         context: MissionContext,
         keyboardLayout: Map<string, string>,
-        starSystemDatabase: StarSystemDatabase
+        starSystemDatabase: StarSystemDatabase,
     ): string {
         if (this.hasCompletedLock) return "Mission completed";
         return this.children
@@ -87,7 +87,7 @@ export class MissionAndNode implements MissionNodeBase<MissionNodeType.AND> {
     serialize(): MissionAndNodeSerialized {
         return {
             type: MissionNodeType.AND,
-            children: this.children.map((child) => child.serialize())
+            children: this.children.map((child) => child.serialize()),
         };
     }
 }

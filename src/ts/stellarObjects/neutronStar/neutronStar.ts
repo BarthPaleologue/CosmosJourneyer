@@ -15,34 +15,36 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { NeutronStarModel } from "./neutronStarModel";
-import { StellarObjectBase } from "../../architecture/stellarObject";
-import { Cullable } from "../../utils/cullable";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { Camera } from "@babylonjs/core/Cameras/camera";
+import { Light } from "@babylonjs/core/Lights/light";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
-import { StarMaterial } from "../star/starMaterial";
-import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { TransformNode } from "@babylonjs/core/Meshes";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
-import { getRgbFromTemperature } from "../../utils/specrend";
-import { Light } from "@babylonjs/core/Lights/light";
-import { TransformNode } from "@babylonjs/core/Meshes";
-import { RingsUniforms } from "../../rings/ringsUniform";
-import { Camera } from "@babylonjs/core/Cameras/camera";
-import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
 import { Scene } from "@babylonjs/core/scene";
-import { AsteroidField } from "../../asteroidFields/asteroidField";
-import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
-import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
-import { VolumetricLightUniforms } from "../../volumetricLight/volumetricLightUniforms";
+
+import { Cullable } from "@/utils/cullable";
+import { isSizeOnScreenEnough } from "@/utils/isObjectVisibleOnScreen";
+import { ItemPool } from "@/utils/itemPool";
+import { getRgbFromTemperature } from "@/utils/specrend";
+import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
+import { DeepReadonly } from "@/utils/types";
+
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
-import { DeepReadonly } from "../../utils/types";
+import { StellarObjectBase } from "../../architecture/stellarObject";
+import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
 import { TexturePools } from "../../assets/textures";
-import { ItemPool } from "../../utils/itemPool";
+import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { RingsLut } from "../../rings/ringsLut";
+import { RingsUniforms } from "../../rings/ringsUniform";
 import { Settings } from "../../settings";
+import { VolumetricLightUniforms } from "../../volumetricLight/volumetricLightUniforms";
+import { StarMaterial } from "../star/starMaterial";
+import { NeutronStarModel } from "./neutronStarModel";
 
 export class NeutronStar implements StellarObjectBase<OrbitalObjectType.NEUTRON_STAR>, Cullable {
     readonly model: DeepReadonly<NeutronStarModel>;
@@ -76,9 +78,9 @@ export class NeutronStar implements StellarObjectBase<OrbitalObjectType.NEUTRON_
             this.model.name,
             {
                 diameter: this.model.radius * 2,
-                segments: 32
+                segments: 32,
             },
-            scene
+            scene,
         );
         this.mesh.rotationQuaternion = Quaternion.Identity();
 
@@ -87,9 +89,9 @@ export class NeutronStar implements StellarObjectBase<OrbitalObjectType.NEUTRON_
             PhysicsShapeType.CONTAINER,
             {
                 mass: 0,
-                restitution: 0.2
+                restitution: 0.2,
             },
-            scene
+            scene,
         );
         this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
         this.aggregate.body.disablePreStep = false;
@@ -105,7 +107,7 @@ export class NeutronStar implements StellarObjectBase<OrbitalObjectType.NEUTRON_
             this.model.seed,
             this.model.blackBodyTemperature,
             texturePools.starMaterialLut,
-            scene
+            scene,
         );
         this.mesh.material = this.material;
 
@@ -114,7 +116,7 @@ export class NeutronStar implements StellarObjectBase<OrbitalObjectType.NEUTRON_
                 this.model.rings,
                 Settings.RINGS_FADE_OUT_DISTANCE,
                 texturePools.ringsLut,
-                scene
+                scene,
             );
 
             const averageRadius = (this.model.radius * (this.model.rings.ringStart + this.model.rings.ringEnd)) / 2;
@@ -124,7 +126,7 @@ export class NeutronStar implements StellarObjectBase<OrbitalObjectType.NEUTRON_
                 this.getTransform(),
                 averageRadius,
                 spread,
-                scene
+                scene,
             );
         } else {
             this.ringsUniforms = null;

@@ -15,19 +15,21 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import matterJetFragment from "../../shaders/matterjet.glsl";
-import { Effect } from "@babylonjs/core/Materials/effect";
-import { UpdatablePostProcess } from "./updatablePostProcess";
-import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
-import { ObjectUniformNames, setObjectUniforms } from "./uniforms/objectUniforms";
-import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms";
-import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUniforms";
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { Constants } from "@babylonjs/core/Engines/constants";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { Scene } from "@babylonjs/core/scene";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { Constants } from "@babylonjs/core/Engines/constants";
+import { Effect } from "@babylonjs/core/Materials/effect";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Matrix } from "@babylonjs/core/Maths/math.vector";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
+import { Scene } from "@babylonjs/core/scene";
+
+import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms";
+import { ObjectUniformNames, setObjectUniforms } from "./uniforms/objectUniforms";
+import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUniforms";
+import { UpdatablePostProcess } from "./updatablePostProcess";
+
+import matterJetFragment from "@shaders/matterjet.glsl";
 
 export type MatterJetUniforms = {
     elapsedSeconds: number;
@@ -52,19 +54,19 @@ export class MatterJetPostProcess extends PostProcess implements UpdatablePostPr
         const settings: MatterJetUniforms = {
             elapsedSeconds: 0,
             inverseRotation: Matrix.Identity(),
-            dipoleTilt: dipoleTilt
+            dipoleTilt: dipoleTilt,
         };
 
         const MatterJetUniformNames = {
             TIME: "time",
             INVERSE_ROTATION: "inverseRotation",
-            DIPOLE_TILT: "dipoleTilt"
+            DIPOLE_TILT: "dipoleTilt",
         };
 
         const uniforms: string[] = [
             ...Object.values(ObjectUniformNames),
             ...Object.values(CameraUniformNames),
-            ...Object.values(MatterJetUniformNames)
+            ...Object.values(MatterJetUniformNames),
         ];
 
         const samplers: string[] = Object.values(SamplerUniformNames);
@@ -80,7 +82,7 @@ export class MatterJetPostProcess extends PostProcess implements UpdatablePostPr
             scene.getEngine(),
             false,
             null,
-            Constants.TEXTURETYPE_HALF_FLOAT
+            Constants.TEXTURETYPE_HALF_FLOAT,
         );
 
         this.matterJetUniforms = settings;

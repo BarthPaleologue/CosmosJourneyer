@@ -16,12 +16,13 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Scene } from "@babylonjs/core/scene";
-import { AiSpaceshipControls } from "../spaceship/aiSpaceshipControls";
-import { Spaceship } from "../spaceship/spaceship";
-import { Player } from "./player";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+
 import { RenderingAssets } from "../assets/renderingAssets";
 import { ISoundPlayer } from "../audio/soundPlayer";
+import { AiSpaceshipControls } from "../spaceship/aiSpaceshipControls";
+import { Spaceship } from "../spaceship/spaceship";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { Player } from "./player";
 
 export class AiPlayerControls {
     readonly player: Player;
@@ -31,7 +32,7 @@ export class AiPlayerControls {
         starSystemDatabase: StarSystemDatabase,
         scene: Scene,
         assets: RenderingAssets,
-        soundPlayer: ISoundPlayer
+        soundPlayer: ISoundPlayer,
     ) {
         this.player = Player.Default(starSystemDatabase);
         this.player.setName("AI");
@@ -46,7 +47,7 @@ export class AiPlayerControls {
             this.player.spareSpaceshipComponents,
             scene,
             assets,
-            soundPlayer
+            soundPlayer,
         );
 
         this.spaceshipControls = new AiSpaceshipControls(spaceship, scene);

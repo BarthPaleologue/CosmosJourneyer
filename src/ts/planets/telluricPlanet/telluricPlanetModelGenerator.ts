@@ -15,27 +15,29 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getRngFromSeed } from "../../utils/getRngFromSeed";
-import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
-import { GenerationSteps } from "../../utils/generationSteps";
-import { Settings } from "../../settings";
-import { celsiusToKelvin, hasLiquidWater } from "../../utils/physics";
-import { CloudsModel, newCloudsModel } from "../../clouds/cloudsModel";
-import { Orbit } from "../../orbit/orbit";
-import { newSeededRingsModel, RingsModel } from "../../rings/ringsModel";
-import { clamp } from "../../utils/math";
 import { Tools } from "@babylonjs/core/Misc/tools";
-import { TelluricPlanetModel } from "./telluricPlanetModel";
+import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
+
+import { GenerationSteps } from "@/utils/generationSteps";
+import { getRngFromSeed } from "@/utils/getRngFromSeed";
+import { clamp } from "@/utils/math";
+import { celsiusToKelvin, hasLiquidWater } from "@/utils/physics";
+
 import { CelestialBodyModel } from "../../architecture/orbitalObjectModel";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
-import { OceanModel } from "../../ocean/oceanModel";
 import { AtmosphereModel } from "../../atmosphere/atmosphereModel";
+import { CloudsModel, newCloudsModel } from "../../clouds/cloudsModel";
+import { OceanModel } from "../../ocean/oceanModel";
+import { Orbit } from "../../orbit/orbit";
+import { newSeededRingsModel, RingsModel } from "../../rings/ringsModel";
+import { Settings } from "../../settings";
+import { TelluricPlanetModel } from "./telluricPlanetModel";
 
 export function newSeededTelluricPlanetModel(
     id: string,
     seed: number,
     name: string,
-    parentBodies: CelestialBodyModel[]
+    parentBodies: CelestialBodyModel[],
 ): TelluricPlanetModel {
     const rng = getRngFromSeed(seed);
 
@@ -49,9 +51,9 @@ export function newSeededTelluricPlanetModel(
             Settings.EARTH_SEA_LEVEL_PRESSURE,
             0.2 * Settings.EARTH_SEA_LEVEL_PRESSURE,
             rng,
-            GenerationSteps.PRESSURE
+            GenerationSteps.PRESSURE,
         ),
-        0
+        0,
     );
     if (radius <= 0.3 * Settings.EARTH_RADIUS) pressure = 0;
 
@@ -59,7 +61,7 @@ export function newSeededTelluricPlanetModel(
         pressure > 0
             ? {
                   pressure,
-                  greenHouseEffectFactor: 0.5
+                  greenHouseEffectFactor: 0.5,
               }
             : null;
 
@@ -77,7 +79,7 @@ export function newSeededTelluricPlanetModel(
 
     const ocean: OceanModel | null = canHaveLiquidWater
         ? {
-              depth: (Settings.OCEAN_DEPTH * waterAmount * pressure) / Settings.EARTH_SEA_LEVEL_PRESSURE
+              depth: (Settings.OCEAN_DEPTH * waterAmount * pressure) / Settings.EARTH_SEA_LEVEL_PRESSURE,
           }
         : null;
 
@@ -112,7 +114,7 @@ export function newSeededTelluricPlanetModel(
         eccentricity: 0,
         longitudeOfAscendingNode: 0,
         argumentOfPeriapsis: 0,
-        initialMeanAnomaly: 0
+        initialMeanAnomaly: 0,
     };
 
     const terrainSettings = {
@@ -125,7 +127,7 @@ export function newSeededTelluricPlanetModel(
         max_mountain_height: 10e3,
         continent_base_height: (ocean?.depth ?? 0) * 1.9,
 
-        mountains_frequency: (60 * radius) / 1000e3
+        mountains_frequency: (60 * radius) / 1000e3,
     };
 
     const rings: RingsModel | null = uniformRandBool(0.6, rng, GenerationSteps.RINGS) ? newSeededRingsModel(rng) : null;
@@ -142,13 +144,13 @@ export function newSeededTelluricPlanetModel(
         radius: radius,
         temperature: {
             min: minTemperature,
-            max: maxTemperature
+            max: maxTemperature,
         },
         orbit: orbit,
         terrainSettings: terrainSettings,
         rings: rings,
         clouds: clouds,
         ocean,
-        atmosphere
+        atmosphere,
     };
 }

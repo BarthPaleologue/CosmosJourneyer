@@ -16,19 +16,21 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { z } from "zod";
-import { UniverseObjectIdSchema } from "../../../../utils/coordinates/universeObjectId";
+
+import { UniverseObjectIdSchema } from "@/utils/coordinates/universeObjectId";
+
 import { MissionNodeType } from "../../missionNodeType";
 
 export enum FlyByState {
     NOT_IN_SYSTEM,
     TOO_FAR_IN_SYSTEM,
-    CLOSE_ENOUGH
+    CLOSE_ENOUGH,
 }
 
 export const MissionFlyByNodeSerializedSchema = z.object({
     type: z.literal(MissionNodeType.FLY_BY),
     objectId: UniverseObjectIdSchema,
-    state: z.nativeEnum(FlyByState)
+    state: z.nativeEnum(FlyByState),
 });
 
 export type MissionFlyByNodeSerialized = z.infer<typeof MissionFlyByNodeSerializedSchema>;

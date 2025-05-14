@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Sound } from "@babylonjs/core/Audio/sound";
+
 import { Sounds } from "../assets/sounds";
 import { ISoundInstance, SoundInstance, SoundInstanceMock } from "./soundInstance";
 
@@ -37,7 +38,7 @@ export const enum SoundType {
     ACCELERATING_WARP_DRIVE,
     DECELERATING_WARP_DRIVE,
     HYPER_SPACE,
-    THRUSTER
+    THRUSTER,
 }
 
 export interface ISoundPlayer {
@@ -47,7 +48,7 @@ export interface ISoundPlayer {
         soundType: SoundType,
         mask: number,
         initialTargetVolume: number,
-        isPonctual: boolean
+        isPonctual: boolean,
     ): ISoundInstance;
     freeInstance(instance: ISoundInstance): void;
     setInstanceMask(mask: number): void;
@@ -115,7 +116,7 @@ export class SoundPlayer implements ISoundPlayer {
         soundType: SoundType,
         mask: number,
         initialTargetVolume: number,
-        isPonctual: boolean
+        isPonctual: boolean,
     ): ISoundInstance {
         const sound = this.getSoundFromType(soundType);
         const instance = new SoundInstance(sound, mask, initialTargetVolume, isPonctual);

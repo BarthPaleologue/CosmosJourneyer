@@ -15,14 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { Camera } from "@babylonjs/core/Cameras/camera";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { Scene } from "@babylonjs/core/scene";
+
+import { ISoundPlayer } from "../audio/soundPlayer";
 import { Controls } from "../uberCore/controls";
 import { Spaceship } from "./spaceship";
-import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Scene } from "@babylonjs/core/scene";
-import { ISoundPlayer } from "../audio/soundPlayer";
 
 export class AiSpaceshipControls implements Controls {
     readonly spaceship: Spaceship;

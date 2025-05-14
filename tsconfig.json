@@ -12,7 +12,10 @@
         // Ideation-friendly imports
         "baseUrl": "./",
         "paths": {
-            "@/*": ["src/ts/*"]
+            "@/*": ["src/ts/*"],
+            "@assets/*": ["src/asset/*"],
+            "@shaders/*": ["src/shaders/*"],
+            "@styles/*": ["src/styles/*"]
         },
 
         // Build speed & debugging

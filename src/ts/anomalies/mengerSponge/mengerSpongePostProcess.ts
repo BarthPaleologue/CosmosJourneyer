@@ -15,25 +15,28 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import mengerSpongeFragment from "../../../shaders/mengerSponge.glsl";
-import { UpdatablePostProcess } from "../../postProcesses/updatablePostProcess";
-import { Effect } from "@babylonjs/core/Materials/effect";
-import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { ObjectUniformNames, setObjectUniforms } from "../../postProcesses/uniforms/objectUniforms";
+import { Constants } from "@babylonjs/core/Engines/constants";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { Effect } from "@babylonjs/core/Materials/effect";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
+import { Scene } from "@babylonjs/core/scene";
+
+import { DeepReadonly } from "@/utils/types";
+
 import { CameraUniformNames, setCameraUniforms } from "../../postProcesses/uniforms/cameraUniforms";
+import { ObjectUniformNames, setObjectUniforms } from "../../postProcesses/uniforms/objectUniforms";
+import { SamplerUniformNames, setSamplerUniforms } from "../../postProcesses/uniforms/samplerUniforms";
 import {
     setStellarObjectUniforms,
-    StellarObjectUniformNames
+    StellarObjectUniformNames,
 } from "../../postProcesses/uniforms/stellarObjectUniforms";
-import { SamplerUniformNames, setSamplerUniforms } from "../../postProcesses/uniforms/samplerUniforms";
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { Constants } from "@babylonjs/core/Engines/constants";
-import { Scene } from "@babylonjs/core/scene";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { UpdatablePostProcess } from "../../postProcesses/updatablePostProcess";
 import { MengerSpongeModel } from "./mengerSpongeModel";
-import { DeepReadonly } from "../../utils/types";
-import { PointLight } from "@babylonjs/core/Lights/pointLight";
+
+import mengerSpongeFragment from "@shaders/mengerSponge.glsl";
 
 export class MengerSpongePostProcess extends PostProcess implements UpdatablePostProcess {
     private elapsedSeconds = 0;
@@ -45,7 +48,7 @@ export class MengerSpongePostProcess extends PostProcess implements UpdatablePos
         boundingRadius: number,
         model: DeepReadonly<MengerSpongeModel>,
         scene: Scene,
-        stellarObjects: ReadonlyArray<PointLight>
+        stellarObjects: ReadonlyArray<PointLight>,
     ) {
         const shaderName = "MengerSponge";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
@@ -55,14 +58,14 @@ export class MengerSpongePostProcess extends PostProcess implements UpdatablePos
         const MengerSpongeUniformNames = {
             ACCENT_COLOR: "accentColor",
             ELAPSED_SECONDS: "elapsedSeconds",
-            AVERAGE_SCREEN_SIZE: "averageScreenSize"
+            AVERAGE_SCREEN_SIZE: "averageScreenSize",
         };
 
         const uniforms: string[] = [
             ...Object.values(ObjectUniformNames),
             ...Object.values(CameraUniformNames),
             ...Object.values(StellarObjectUniformNames),
-            ...Object.values(MengerSpongeUniformNames)
+            ...Object.values(MengerSpongeUniformNames),
         ];
 
         const samplers: string[] = Object.values(SamplerUniformNames);
@@ -78,7 +81,7 @@ export class MengerSpongePostProcess extends PostProcess implements UpdatablePos
             scene.getEngine(),
             false,
             null,
-            Constants.TEXTURETYPE_HALF_FLOAT
+            Constants.TEXTURETYPE_HALF_FLOAT,
         );
 
         this.onActivateObservable.add((camera) => {
@@ -98,7 +101,7 @@ export class MengerSpongePostProcess extends PostProcess implements UpdatablePos
             effect.setFloat(MengerSpongeUniformNames.ELAPSED_SECONDS, this.elapsedSeconds);
             effect.setFloat(
                 MengerSpongeUniformNames.AVERAGE_SCREEN_SIZE,
-                (scene.getEngine().getRenderWidth() + scene.getEngine().getRenderHeight()) / 2
+                (scene.getEngine().getRenderWidth() + scene.getEngine().getRenderHeight()) / 2,
             );
 
             setSamplerUniforms(effect, this.activeCamera, scene);

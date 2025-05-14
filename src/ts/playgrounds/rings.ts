@@ -15,19 +15,20 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Vector3, HemisphericLight, MeshBuilder, Color3 } from "@babylonjs/core";
+import { Color3, HemisphericLight, MeshBuilder, Vector3 } from "@babylonjs/core";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
+
+import { DefaultControls } from "../defaultControls/defaultControls";
+import { RingsLut } from "../rings/ringsLut";
+import { RingsModel } from "../rings/ringsModel";
 import { RingsPostProcess } from "../rings/ringsPostProcess";
 import { RingsUniforms } from "../rings/ringsUniform";
 import { ItemPool } from "../utils/itemPool";
-import { RingsLut } from "../rings/ringsLut";
-import { RingsModel } from "../rings/ringsModel";
-import { DefaultControls } from "../defaultControls/defaultControls";
 
 export async function createRingsScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void
+    progressCallback: (progress: number, text: string) => void,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -65,7 +66,7 @@ export async function createRingsScene(
         ringFrequency: 5,
         ringOpacity: 0.9,
         ringColor: Color3.White(),
-        seed: 0
+        seed: 0,
     };
 
     const ringsUniforms = new RingsUniforms(ringsModel, 0, ringsLutPool, scene);

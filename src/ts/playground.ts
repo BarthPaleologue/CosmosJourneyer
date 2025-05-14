@@ -15,12 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import "../styles/index.scss";
-
+import "@styles/index.scss";
 import "@babylonjs/inspector";
-import { PhysicsViewer, Tools, Engine } from "@babylonjs/core";
-import { LoadingScreen } from "./uberCore/loadingScreen";
+
+import { Engine, PhysicsViewer, Tools } from "@babylonjs/core";
+
 import { PlaygroundRegistry } from "./playgrounds/playgroundRegistry";
+import { LoadingScreen } from "./uberCore/loadingScreen";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -51,7 +52,7 @@ if (urlParams.get("debug") !== null) {
     document.body.appendChild(inspectorRoot);
     inspectorRoot.id = "inspectorLayer";
     await scene.debugLayer.show({
-        globalRoot: inspectorRoot
+        globalRoot: inspectorRoot,
     });
 }
 

@@ -15,10 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { TransferBuildData } from "../chunks/workerDataTypes";
 import { build_chunk_vertex_data, BuildData, TerrainSettings } from "terrain-generation";
-import { ReturnedChunkData } from "../chunks/taskTypes";
+
 import { Settings } from "../../../../settings";
+import { ReturnedChunkData } from "../chunks/taskTypes";
+import { TransferBuildData } from "../chunks/workerDataTypes";
 
 function handle_build(data: TransferBuildData): void {
     const nbVerticesPerSide = data.nbVerticesPerSide;
@@ -59,7 +60,7 @@ function handle_build(data: TransferBuildData): void {
         data.position[2],
         data.seed,
         data.nbVerticesPerSide,
-        terrain_settings
+        terrain_settings,
     );
 
     const result = build_chunk_vertex_data(
@@ -69,7 +70,7 @@ function handle_build(data: TransferBuildData): void {
         normals,
         instances_matrix_buffer,
         aligned_instances_matrix_buffer,
-        scatter_per_square_meter
+        scatter_per_square_meter,
     );
 
     instances_matrix_buffer = instances_matrix_buffer.subarray(0, result.nb_instances_created * 16);
@@ -82,7 +83,7 @@ function handle_build(data: TransferBuildData): void {
             normals: normals,
             instancesMatrixBuffer: instances_matrix_buffer,
             alignedInstancesMatrixBuffer: aligned_instances_matrix_buffer,
-            averageHeight: result.average_height
+            averageHeight: result.average_height,
         } satisfies ReturnedChunkData,
         {
             transfer: [
@@ -90,9 +91,9 @@ function handle_build(data: TransferBuildData): void {
                 indices.buffer,
                 normals.buffer,
                 instances_matrix_buffer.buffer,
-                aligned_instances_matrix_buffer.buffer
-            ]
-        }
+                aligned_instances_matrix_buffer.buffer,
+            ],
+        },
     );
 
     buildData.free();

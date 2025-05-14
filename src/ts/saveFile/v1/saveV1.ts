@@ -16,17 +16,19 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { z } from "zod";
+
+import { StarSystemCoordinatesSchema } from "@/utils/coordinates/starSystemCoordinates";
+import { err, ok, Result } from "@/utils/types";
+
 import projectInfo from "../../../../package.json";
-import { Result, ok, err } from "../../utils/types";
-import { SaveLoadingError, SaveLoadingErrorType } from "../saveLoadingError";
-import { StarSystemCoordinatesSchema } from "../../utils/coordinates/starSystemCoordinates";
 import { CompletedTutorialsSchema } from "../../player/serializedPlayer";
+import { SaveLoadingError, SaveLoadingErrorType } from "../saveLoadingError";
 
 export enum SystemObjectType {
     STELLAR_OBJECT,
     PLANETARY_MASS_OBJECT,
     ANOMALY,
-    ORBITAL_FACILITY
+    ORBITAL_FACILITY,
 }
 
 const SystemObjectIdSchema = z.object({
@@ -38,27 +40,27 @@ const SystemObjectIdSchema = z.object({
     /**
      * The index of the object inside the array containing all objects of the given type within the star system.
      */
-    objectIndex: z.number()
+    objectIndex: z.number(),
 });
 
 const UniverseObjectIdSchema = z.object({
     ...SystemObjectIdSchema.shape,
 
     /** The coordinates of the star system. */
-    starSystemCoordinates: StarSystemCoordinatesSchema
+    starSystemCoordinates: StarSystemCoordinatesSchema,
 });
 
 enum ShipType {
-    WANDERER
+    WANDERER,
 }
 
 const SerializedFuelTankSchema = z.object({
     currentFuel: z.number(),
-    maxFuel: z.number()
+    maxFuel: z.number(),
 });
 
 const SerializedFuelScoopSchema = z.object({
-    fuelPerSecond: z.number().default(1)
+    fuelPerSecond: z.number().default(1),
 });
 
 const SerializedSpaceshipSchemaV1 = z.object({
@@ -69,7 +71,7 @@ const SerializedSpaceshipSchemaV1 = z.object({
     name: z.string().default("Wanderer"),
     type: z.nativeEnum(ShipType).default(ShipType.WANDERER),
     fuelTanks: z.array(SerializedFuelTankSchema).default([{ currentFuel: 100, maxFuel: 100 }]),
-    fuelScoop: z.nullable(SerializedFuelScoopSchema).nullable().default({ fuelPerSecond: 2.5 })
+    fuelScoop: z.nullable(SerializedFuelScoopSchema).nullable().default({ fuelPerSecond: 2.5 }),
 });
 
 const SpaceDiscoveryDataSchema = z.object({
@@ -84,7 +86,7 @@ const SpaceDiscoveryDataSchema = z.object({
     /**
      * The name of the explorer who discovered the object.
      */
-    explorerName: z.string().default("Unknown")
+    explorerName: z.string().default("Unknown"),
 });
 
 export const SaveSchemaV1 = z.object({
@@ -105,11 +107,11 @@ export const SaveSchemaV1 = z.object({
         discoveries: z
             .object({
                 local: z.array(SpaceDiscoveryDataSchema).default([]),
-                uploaded: z.array(SpaceDiscoveryDataSchema).default([])
+                uploaded: z.array(SpaceDiscoveryDataSchema).default([]),
             })
             .default({
                 local: [],
-                uploaded: []
+                uploaded: [],
             }),
         currentItinerary: z.array(StarSystemCoordinatesSchema).default([]),
         systemBookmarks: z.array(StarSystemCoordinatesSchema).default([]),
@@ -120,8 +122,8 @@ export const SaveSchemaV1 = z.object({
             flightCompleted: false,
             stationLandingCompleted: false,
             starMapCompleted: false,
-            fuelScoopingCompleted: false
-        })
+            fuelScoopingCompleted: false,
+        }),
     }),
 
     /** The coordinates of the current star system and the coordinates inside the star system. */
@@ -141,7 +143,7 @@ export const SaveSchemaV1 = z.object({
             objectIndex: z.number(),
 
             /** The coordinates of the star system. */
-            starSystemCoordinates: StarSystemCoordinatesSchema
+            starSystemCoordinates: StarSystemCoordinatesSchema,
         }),
 
         /**
@@ -177,11 +179,11 @@ export const SaveSchemaV1 = z.object({
         /**
          * The w component of the player's rotation quaternion in the nearest orbital object's frame of reference.
          */
-        rotationQuaternionW: z.number().default(1)
+        rotationQuaternionW: z.number().default(1),
     }),
 
     /** If the player is landed at a facility, store the pad number to allow graceful respawn at the station. */
-    padNumber: z.number().optional()
+    padNumber: z.number().optional(),
 });
 
 /**

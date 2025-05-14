@@ -1,12 +1,13 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { getPowerPlayData } from "./powerplay";
 import { uniformRandBool } from "extended-random";
+
+import { getPowerPlayData } from "./powerplay";
 
 export const enum Faction {
     FEYNMAN_INTERSTELLAR,
     CHURCH_OF_AWAKENING,
     HUMAN_COMMONWEALTH,
-    SATORI_CONCORD
+    SATORI_CONCORD,
 }
 
 export function factionToString(faction: Faction): string {

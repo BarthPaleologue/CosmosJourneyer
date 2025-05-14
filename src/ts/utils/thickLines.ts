@@ -16,11 +16,11 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { CreateCylinder, Mesh } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
-import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export class ThickLines {
     private readonly name: string;
@@ -40,13 +40,13 @@ export class ThickLines {
         {
             points,
             thickness,
-            color
+            color,
         }: {
             points: Vector3[];
             thickness?: number;
             color?: Color3;
         },
-        scene: Scene
+        scene: Scene,
     ) {
         this.name = name;
 
@@ -80,9 +80,9 @@ export class ThickLines {
                     `${this.name}Segment${i}`,
                     {
                         height: 1,
-                        diameter: this.thickness
+                        diameter: this.thickness,
                     },
-                    this.scene
+                    this.scene,
                 );
                 cylinder.alwaysSelectAsActiveMesh = true;
                 cylinder.material = this.material;

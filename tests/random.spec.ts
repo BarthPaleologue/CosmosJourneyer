@@ -15,8 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { pickPseudoRandomItems, randomPieChart } from "../src/ts/utils/random";
 import { expect, test } from "vitest";
+
+import { pickPseudoRandomItems, randomPieChart } from "@/utils/random";
 
 test("pickPseudoRandomItems", () => {
     const items = [0, 1, 2, 3, 4, 5];

@@ -15,15 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Lerp } from "@babylonjs/core/Maths/math.scalar.functions";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { StarSystemController } from "../starSystem/starSystemController";
-import { Transformable } from "../architecture/transformable";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+
+import { CanHaveRings } from "../architecture/canHaveRings";
 import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
+import { Transformable } from "../architecture/transformable";
+import { StarSystemController } from "../starSystem/starSystemController";
 import { Controls } from "../uberCore/controls";
 import { getUpwardDirection, roll, rotateAround, setRotationQuaternion } from "../uberCore/transforms/basicTransform";
-import { CanHaveRings } from "../architecture/canHaveRings";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { Lerp } from "@babylonjs/core/Maths/math.scalar.functions";
 
 export function nearestObject(objectPosition: Vector3, bodies: ReadonlyArray<Transformable>): Transformable {
     let distance = -1;
@@ -43,7 +44,7 @@ export function positionNearObject(
     orbitalObject: Transformable & HasBoundingSphere,
     localPosition: Vector3,
     localRotation: Quaternion,
-    transform: TransformNode
+    transform: TransformNode,
 ) {
     const objectRadius = orbitalObject.getBoundingRadius();
     const currentDistance = localPosition.length();
@@ -67,7 +68,7 @@ export function positionNearObjectBrightSide(
     transformable: Transformable,
     object: Transformable & HasBoundingSphere,
     starSystem: StarSystemController,
-    nRadius = 3
+    nRadius = 3,
 ): void {
     // go from the nearest star to be on the sunny side of the object
     const nearestStar = nearestObject(object.getTransform().getAbsolutePosition(), starSystem.getStellarObjects());
@@ -78,7 +79,7 @@ export function positionNearObjectBrightSide(
             object
                 .getTransform()
                 .getAbsolutePosition()
-                .add(new Vector3(0, 0.2, 1).scaleInPlace(object.getBoundingRadius() * nRadius))
+                .add(new Vector3(0, 0.2, 1).scaleInPlace(object.getBoundingRadius() * nRadius)),
         );
     } else {
         const dirBodyToStar = object
@@ -105,7 +106,7 @@ export function positionNearObjectWithStarVisible(
     transformable: Controls,
     object: Transformable & HasBoundingSphere,
     starSystem: StarSystemController,
-    nRadius = 3
+    nRadius = 3,
 ): void {
     // go from the nearest star to be on the sunny side of the object
     const nearestStar = nearestObject(object.getTransform().getAbsolutePosition(), starSystem.getStellarObjects());
@@ -116,7 +117,7 @@ export function positionNearObjectWithStarVisible(
             object
                 .getTransform()
                 .getAbsolutePosition()
-                .add(new Vector3(0, 0.2, 1).scaleInPlace(object.getBoundingRadius() * nRadius))
+                .add(new Vector3(0, 0.2, 1).scaleInPlace(object.getBoundingRadius() * nRadius)),
         );
     } else {
         const dirBodyToStar = object
@@ -141,7 +142,7 @@ export function positionNearObjectWithStarVisible(
             transformable.getTransform(),
             object.getTransform().getAbsolutePosition(),
             dirBodyToStar,
-            -Math.PI / 16
+            -Math.PI / 16,
         );
     }
 
@@ -171,7 +172,7 @@ export function positionNearObjectWithStarVisible(
 export function positionNearObjectAsteroidField(
     body: Transformable & CanHaveRings & HasBoundingSphere,
     starSystem: StarSystemController,
-    t: number
+    t: number,
 ): Vector3 {
     const asteroidField = body.asteroidField;
     if (asteroidField === null) {

@@ -15,12 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
-import flatCloudLUT from "../../shaders/textures/flatCloudLUT.glsl";
 import { Effect } from "@babylonjs/core/Materials/effect";
+import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import { Scene } from "@babylonjs/core/scene";
+
+import { DeepReadonly } from "@/utils/types";
+
 import { CloudsModel } from "./cloudsModel";
-import { DeepReadonly } from "../utils/types";
+
+import flatCloudLUT from "@shaders/textures/flatCloudLUT.glsl";
 
 export class CloudsLut {
     private readonly lut: ProceduralTexture;

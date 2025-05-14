@@ -24,7 +24,7 @@ export const enum Direction {
     LEFT,
     RIGHT,
     FORWARD,
-    BACKWARD
+    BACKWARD,
 }
 
 export function getQuaternionFromDirection(direction: Direction): Quaternion {

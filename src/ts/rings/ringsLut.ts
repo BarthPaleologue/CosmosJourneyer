@@ -15,12 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
-import { RingsModel } from "./ringsModel";
-import { Scene } from "@babylonjs/core/scene";
 import { Effect } from "@babylonjs/core/Materials/effect";
-import ringsLUT from "../../shaders/textures/ringsLUT.glsl";
+import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
+import { Scene } from "@babylonjs/core/scene";
+
 import { DeepReadonly } from "../utils/types";
+import { RingsModel } from "./ringsModel";
+
+import ringsLUT from "@shaders/textures/ringsLUT.glsl";
 
 export class RingsLut {
     private readonly lut: ProceduralTexture;
@@ -34,13 +36,13 @@ export class RingsLut {
             "ringsLUT",
             {
                 width: 4096,
-                height: 1
+                height: 1,
             },
             "ringsLUT",
             scene,
             undefined,
             true,
-            false
+            false,
         );
 
         this.lut.refreshRate = 0;

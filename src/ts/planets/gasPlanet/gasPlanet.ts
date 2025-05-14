@@ -15,31 +15,33 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Camera } from "@babylonjs/core/Cameras/camera";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { TransformNode } from "@babylonjs/core/Meshes";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
+import { Scene } from "@babylonjs/core/scene";
+
+import { Cullable } from "@/utils/cullable";
+import { isSizeOnScreenEnough } from "@/utils/isObjectVisibleOnScreen";
+import { ItemPool } from "@/utils/itemPool";
+import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
+import { DeepReadonly } from "@/utils/types";
+
+import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
+import { PlanetaryMassObjectBase } from "../../architecture/planetaryMassObject";
+import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
+import { AsteroidField } from "../../asteroidFields/asteroidField";
+import { AtmosphereUniforms } from "../../atmosphere/atmosphereUniforms";
+import { RingsLut } from "../../rings/ringsLut";
+import { RingsUniforms } from "../../rings/ringsUniform";
+import { Settings } from "../../settings";
 import { GasPlanetMaterial } from "./gasPlanetMaterial";
 import { GasPlanetModel } from "./gasPlanetModel";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
-import { Camera } from "@babylonjs/core/Cameras/camera";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
-import { TransformNode } from "@babylonjs/core/Meshes";
-import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
-import { Cullable } from "../../utils/cullable";
-import { RingsUniforms } from "../../rings/ringsUniform";
-import { Scene } from "@babylonjs/core/scene";
-import { AsteroidField } from "../../asteroidFields/asteroidField";
-import { getOrbitalObjectTypeToI18nString } from "../../utils/strings/orbitalObjectTypeToDisplay";
-import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
-import { AtmosphereUniforms } from "../../atmosphere/atmosphereUniforms";
-import { Settings } from "../../settings";
-import { PlanetaryMassObjectBase } from "../../architecture/planetaryMassObject";
-import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
-import { DeepReadonly } from "../../utils/types";
-import { PointLight } from "@babylonjs/core/Lights/pointLight";
-import { ItemPool } from "../../utils/itemPool";
-import { RingsLut } from "../../rings/ringsLut";
 
 export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_PLANET>, Cullable {
     readonly model: DeepReadonly<GasPlanetModel>;
@@ -70,9 +72,9 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
             this.model.name,
             {
                 diameter: this.model.radius * 2,
-                segments: 64
+                segments: 64,
             },
-            scene
+            scene,
         );
         this.mesh.rotationQuaternion = Quaternion.Identity();
 
@@ -81,9 +83,9 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
             PhysicsShapeType.CONTAINER,
             {
                 mass: 0,
-                restitution: 0.2
+                restitution: 0.2,
             },
-            scene
+            scene,
         );
         this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
         this.aggregate.body.disablePreStep = false;
@@ -102,7 +104,7 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
                 this.model.rings,
                 Settings.RINGS_FADE_OUT_DISTANCE,
                 ringsLutPool,
-                scene
+                scene,
             );
 
             const averageRadius = (this.model.radius * (this.model.rings.ringStart + this.model.rings.ringEnd)) / 2;
@@ -112,7 +114,7 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
                 this.getTransform(),
                 averageRadius,
                 spread,
-                scene
+                scene,
             );
         } else {
             this.ringsUniforms = null;

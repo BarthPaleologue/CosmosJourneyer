@@ -16,11 +16,12 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Sound } from "@babylonjs/core/Audio/sound";
-import { Musics } from "../assets/musics";
-import { StarSystemView } from "../starSystem/starSystemView";
-import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+
+import { OrbitalObjectType } from "../architecture/orbitalObjectType";
+import { Musics } from "../assets/musics";
+import { StarSystemView } from "../starSystem/starSystemView";
 
 export class MusicConductor {
     private currentMusic: Sound | null = null;
@@ -139,7 +140,7 @@ export class MusicConductor {
 
         const distanceToClosestObject = Vector3.Distance(
             playerPosition,
-            closestOrbitalObject.getTransform().getAbsolutePosition()
+            closestOrbitalObject.getTransform().getAbsolutePosition(),
         );
 
         if (!isInStarSystemView) {
@@ -198,7 +199,7 @@ export class MusicConductor {
             const suitableMusics = [
                 this.musics.atlanteanTwilight,
                 this.musics.infinitePerspective,
-                this.musics.mesmerize
+                this.musics.mesmerize,
             ];
 
             this.setMusicFromSelection(suitableMusics);
@@ -217,7 +218,7 @@ export class MusicConductor {
                 this.musics.deepRelaxation,
                 this.musics.peaceOfMind,
                 this.musics.mesmerize,
-                this.musics.reawakening
+                this.musics.reawakening,
             ];
 
             this.setMusicFromSelection(suitableMusics);

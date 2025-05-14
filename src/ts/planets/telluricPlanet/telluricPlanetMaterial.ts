@@ -15,28 +15,31 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ColorMode } from "./colorSettingsInterface";
-import surfaceMaterialFragment from "../../../shaders/telluricPlanetMaterial/fragment.glsl";
-import surfaceMaterialVertex from "../../../shaders/telluricPlanetMaterial/vertex.glsl";
-import { centeredRand } from "extended-random";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
-import { Scene } from "@babylonjs/core/scene";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { Matrix } from "@babylonjs/core/Maths/math";
+import { Scene } from "@babylonjs/core/scene";
+import { centeredRand } from "extended-random";
+
+import { getRngFromSeed } from "@/utils/getRngFromSeed";
+import { ItemPool } from "@/utils/itemPool";
+import { createEmptyTexture } from "@/utils/proceduralTexture";
+import { DeepReadonly } from "@/utils/types";
+
+import { AllTerrainTextures } from "../../assets/textures";
 import {
     setStellarObjectUniforms,
-    StellarObjectUniformNames
+    StellarObjectUniformNames,
 } from "../../postProcesses/uniforms/stellarObjectUniforms";
-import { AllTerrainTextures } from "../../assets/textures";
-import { Matrix } from "@babylonjs/core/Maths/math";
-import { getRngFromSeed } from "../../utils/getRngFromSeed";
+import { ColorMode } from "./colorSettingsInterface";
+import { TelluricPlanetMaterialLut } from "./telluricPlanetMaterialLut";
 import { TelluricPlanetModel } from "./telluricPlanetModel";
 import { TelluricSatelliteModel } from "./telluricSatelliteModel";
-import { DeepReadonly } from "../../utils/types";
-import { PointLight } from "@babylonjs/core/Lights/pointLight";
-import { createEmptyTexture } from "../../utils/proceduralTexture";
-import { ItemPool } from "../../utils/itemPool";
-import { TelluricPlanetMaterialLut } from "./telluricPlanetMaterialLut";
+
+import surfaceMaterialFragment from "@shaders/telluricPlanetMaterial/fragment.glsl";
+import surfaceMaterialVertex from "@shaders/telluricPlanetMaterial/vertex.glsl";
 
 const TelluricPlanetMaterialUniformNames = {
     WORLD: "world",
@@ -53,7 +56,7 @@ const TelluricPlanetMaterialUniformNames = {
     MIN_TEMPERATURE: "minTemperature",
     MAX_TEMPERATURE: "maxTemperature",
     PRESSURE: "pressure",
-    WATER_AMOUNT: "waterAmount"
+    WATER_AMOUNT: "waterAmount",
 };
 
 const TelluricPlanetMaterialSamplerNames = {
@@ -65,7 +68,7 @@ const TelluricPlanetMaterialSamplerNames = {
     SNOW_NORMAL_METALLIC_MAP: "snowNormalMetallicMap",
     SNOW_ALBEDO_ROUGHNESS_MAP: "snowAlbedoRoughnessMap",
     STEEP_NORMAL_METALLIC_MAP: "steepNormalMetallicMap",
-    STEEP_ALBEDO_ROUGHNESS_MAP: "steepAlbedoRoughnessMap"
+    STEEP_ALBEDO_ROUGHNESS_MAP: "steepAlbedoRoughnessMap",
 };
 
 /**
@@ -103,7 +106,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
         model: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>,
         textures: AllTerrainTextures,
         texturePool: ItemPool<TelluricPlanetMaterialLut>,
-        scene: Scene
+        scene: Scene,
     ) {
         const shaderName = "surfaceMaterial";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
@@ -117,9 +120,9 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
             attributes: ["position", "normal"],
             uniforms: [
                 ...Object.values(TelluricPlanetMaterialUniformNames),
-                ...Object.values(StellarObjectUniformNames)
+                ...Object.values(StellarObjectUniformNames),
             ],
-            samplers: [...Object.values(TelluricPlanetMaterialSamplerNames)]
+            samplers: [...Object.values(TelluricPlanetMaterialSamplerNames)],
         });
 
         const rng = getRngFromSeed(model.seed);
@@ -161,7 +164,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
         lut.setPlanetPhysicsInfo(
             this.planetModel.temperature.min,
             this.planetModel.temperature.max,
-            this.planetModel.atmosphere?.pressure ?? 0
+            this.planetModel.atmosphere?.pressure ?? 0,
         );
         lut.getTexture().executeWhenReady(() => {
             this.setTexture(TelluricPlanetMaterialSamplerNames.LUT, lut.getTexture());
@@ -182,7 +185,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
             if (activeCamera === null) throw new Error("No active camera in the scene");
             this.getEffect().setVector3(
                 TelluricPlanetMaterialUniformNames.CAMERA_POSITION,
-                activeCamera.globalPosition
+                activeCamera.globalPosition,
             );
             this.getEffect().setVector3(TelluricPlanetMaterialUniformNames.CHUNK_POSITION_PLANET_SPACE, mesh.position);
         });
@@ -220,7 +223,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
             TelluricPlanetMaterialUniformNames.MAX_ELEVATION,
             this.planetModel.terrainSettings.continent_base_height +
                 this.planetModel.terrainSettings.max_mountain_height +
-                this.planetModel.terrainSettings.max_bump_height
+                this.planetModel.terrainSettings.max_bump_height,
         );
     }
 

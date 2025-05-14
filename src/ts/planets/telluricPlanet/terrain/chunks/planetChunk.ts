@@ -15,30 +15,33 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Direction, getQuaternionFromDirection } from "../../../../utils/direction";
-import { getChunkPlaneSpacePositionFromPath } from "../../../../utils/chunkUtils";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { Material } from "@babylonjs/core/Materials/material";
-import { Scene } from "@babylonjs/core/scene";
 import "@babylonjs/core/Engines/Extensions/engine.query";
-import { TransformNode, VertexData } from "@babylonjs/core/Meshes";
-import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { ThinInstancePatch } from "../instancePatch/thinInstancePatch";
-import { randomDownSample } from "../instancePatch/matrixBuffer";
-import { isSizeOnScreenEnough } from "../../../../utils/isObjectVisibleOnScreen";
+
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { IPatch } from "../instancePatch/iPatch";
-import { HasBoundingSphere } from "../../../../architecture/hasBoundingSphere";
+import { Material } from "@babylonjs/core/Materials/material";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { TransformNode, VertexData } from "@babylonjs/core/Meshes";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { Scene } from "@babylonjs/core/scene";
+
+import { getChunkPlaneSpacePositionFromPath } from "@/utils/chunkUtils";
+import { Cullable } from "@/utils/cullable";
+import { Direction, getQuaternionFromDirection } from "@/utils/direction";
+import { isSizeOnScreenEnough } from "@/utils/isObjectVisibleOnScreen";
+import { DeepReadonly } from "@/utils/types";
+
+import { HasBoundingSphere } from "../../../../architecture/hasBoundingSphere";
 import { Transformable } from "../../../../architecture/transformable";
+import { RenderingAssets } from "../../../../assets/renderingAssets";
 import { CollisionMask } from "../../../../settings";
-import { InstancePatch } from "../instancePatch/instancePatch";
-import { Cullable } from "../../../../utils/cullable";
 import { TelluricPlanetModel } from "../../telluricPlanetModel";
 import { TelluricSatelliteModel } from "../../telluricSatelliteModel";
-import { DeepReadonly } from "../../../../utils/types";
-import { RenderingAssets } from "../../../../assets/renderingAssets";
+import { InstancePatch } from "../instancePatch/instancePatch";
+import { IPatch } from "../instancePatch/iPatch";
+import { randomDownSample } from "../instancePatch/matrixBuffer";
+import { ThinInstancePatch } from "../instancePatch/thinInstancePatch";
 
 export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
     public readonly mesh: Mesh;
@@ -71,7 +74,7 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
         material: Material,
         planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>,
         rootLength: number,
-        scene: Scene
+        scene: Scene,
     ) {
         const id = `D${direction}P${path.join("")}`;
 
@@ -125,7 +128,7 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
         instancesMatrixBuffer: Float32Array,
         alignedInstancesMatrixBuffer: Float32Array,
         averageHeight: number,
-        assets: RenderingAssets
+        assets: RenderingAssets,
     ) {
         if (this.hasBeenDisposed()) {
             throw new Error(`Tried to init ${this.mesh.name} but it has been disposed`);
@@ -180,7 +183,7 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
             const grassPatch = new ThinInstancePatch(alignedInstancesMatrixBuffer);
             grassPatch.createInstances([
                 { mesh: assets.objects.grassBlades[0], distance: 0 },
-                { mesh: assets.objects.grassBlades[1], distance: 50 }
+                { mesh: assets.objects.grassBlades[1], distance: 50 },
             ]);
             this.instancePatches.push(grassPatch);
 
@@ -204,7 +207,7 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
     public updatePosition() {
         if (this.aggregate === null) return;
         this.getTransform().setAbsolutePosition(
-            Vector3.TransformCoordinates(this.planetLocalPosition, this.parent.getWorldMatrix())
+            Vector3.TransformCoordinates(this.planetLocalPosition, this.parent.getWorldMatrix()),
         );
     }
 

@@ -16,9 +16,10 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Effect } from "@babylonjs/core/Materials/effect";
-import lutFragment from "../../../shaders/telluricPlanetMaterial/utils/lut.glsl";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import { Scene } from "@babylonjs/core/scene";
+
+import lutFragment from "@shaders/telluricPlanetMaterial/utils/lut.glsl";
 
 export class TelluricPlanetMaterialLut {
     private readonly lut: ProceduralTexture;
@@ -35,7 +36,7 @@ export class TelluricPlanetMaterialLut {
             scene,
             null,
             true,
-            false
+            false,
         );
 
         this.lut.refreshRate = 0;

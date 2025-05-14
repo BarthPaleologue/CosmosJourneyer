@@ -15,14 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { IDisposable } from "@babylonjs/core/scene";
-import { ObjectTargetCursor } from "./objectTargetCursor";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Transformable } from "../architecture/transformable";
-import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
-import { TypedObject } from "../architecture/typedObject";
 import { Camera } from "@babylonjs/core/Cameras/camera";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { IDisposable } from "@babylonjs/core/scene";
+
+import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import { Targetable } from "../architecture/targetable";
+import { Transformable } from "../architecture/transformable";
+import { TypedObject } from "../architecture/typedObject";
+import { ObjectTargetCursor } from "./objectTargetCursor";
 
 export class TargetCursorLayer implements IDisposable {
     private targetCursors: ObjectTargetCursor[] = [];

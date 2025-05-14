@@ -1,16 +1,18 @@
-import { Scene } from "@babylonjs/core/scene";
+import { Effect } from "@babylonjs/core/Materials/effect";
+import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
+import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { getForwardDirection, rotate } from "../uberCore/transforms/basicTransform";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
-import warpConeFragment from "../../shaders/warpConeMaterial/fragment.glsl";
-import warpConeVertex from "../../shaders/warpConeMaterial/vertex.glsl";
-import { Effect } from "@babylonjs/core/Materials/effect";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { Scene } from "@babylonjs/core/scene";
+
 import { Transformable } from "../architecture/transformable";
 import { NoiseTextures } from "../assets/textures";
-import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
+import { getForwardDirection, rotate } from "../uberCore/transforms/basicTransform";
+
+import warpConeFragment from "@shaders/warpConeMaterial/fragment.glsl";
+import warpConeVertex from "@shaders/warpConeMaterial/vertex.glsl";
 
 /**
  * @see https://playground.babylonjs.com/#W9LE0U#28
@@ -56,9 +58,9 @@ export class HyperSpaceTunnel implements Transformable {
                 radius: this.tunnelDiameter / 2,
                 path: path,
                 sideOrientation: Mesh.BACKSIDE,
-                tessellation: 128
+                tessellation: 128,
             },
-            scene
+            scene,
         );
 
         Effect.ShadersStore["warpConeMaterialFragmentShader"] = warpConeFragment;
@@ -66,7 +68,7 @@ export class HyperSpaceTunnel implements Transformable {
         this.warpConeMaterial = new ShaderMaterial("warpConeMaterial", scene, "warpConeMaterial", {
             attributes: ["position", "uv"],
             uniforms: ["worldViewProjection", "time"],
-            samplers: ["warpNoise"]
+            samplers: ["warpNoise"],
         });
         this.warpConeMaterial.setTexture("warpNoise", noiseTextures.seamlessPerlin);
 
@@ -98,7 +100,7 @@ export class HyperSpaceTunnel implements Transformable {
         this.hyperTunnel.rotate(
             Axis.Z,
             0.005 * Math.sin(2.0 * Math.PI * rotationFrequency * this.elapsedSeconds),
-            Space.LOCAL
+            Space.LOCAL,
         );
 
         const targetForward = getForwardDirection(this.parent);

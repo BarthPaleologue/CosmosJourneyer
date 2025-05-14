@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import "@babylonjs/core/Physics/physicsEngineComponent";
+
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { Scene } from "@babylonjs/core/scene";

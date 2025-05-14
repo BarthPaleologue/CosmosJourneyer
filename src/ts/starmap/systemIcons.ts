@@ -2,7 +2,7 @@ import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coo
 
 export const enum SystemIconMask {
     BOOKMARK = 0b01,
-    MISSION = 0b10
+    MISSION = 0b10,
 }
 
 export class SystemIcons {
@@ -72,7 +72,7 @@ export class SystemIcons {
     static IconMaskForSystem(
         system: StarSystemCoordinates,
         bookmarkedSystems: StarSystemCoordinates[],
-        targetSystems: StarSystemCoordinates[]
+        targetSystems: StarSystemCoordinates[],
     ): number {
         let iconMask = 0;
         if (bookmarkedSystems.find((bookmarkedSystem) => starSystemCoordinatesEquals(bookmarkedSystem, system)))

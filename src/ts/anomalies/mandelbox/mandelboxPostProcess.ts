@@ -15,25 +15,28 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import mandelboxFragment from "../../../shaders/mandelbox.glsl";
-import { UpdatablePostProcess } from "../../postProcesses/updatablePostProcess";
-import { Effect } from "@babylonjs/core/Materials/effect";
-import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { ObjectUniformNames, setObjectUniforms } from "../../postProcesses/uniforms/objectUniforms";
+import { Constants } from "@babylonjs/core/Engines/constants";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { Effect } from "@babylonjs/core/Materials/effect";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
+import { Scene } from "@babylonjs/core/scene";
+
+import { DeepReadonly } from "@/utils/types";
+
 import { CameraUniformNames, setCameraUniforms } from "../../postProcesses/uniforms/cameraUniforms";
+import { ObjectUniformNames, setObjectUniforms } from "../../postProcesses/uniforms/objectUniforms";
+import { SamplerUniformNames, setSamplerUniforms } from "../../postProcesses/uniforms/samplerUniforms";
 import {
     setStellarObjectUniforms,
-    StellarObjectUniformNames
+    StellarObjectUniformNames,
 } from "../../postProcesses/uniforms/stellarObjectUniforms";
-import { SamplerUniformNames, setSamplerUniforms } from "../../postProcesses/uniforms/samplerUniforms";
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { Constants } from "@babylonjs/core/Engines/constants";
-import { Scene } from "@babylonjs/core/scene";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { UpdatablePostProcess } from "../../postProcesses/updatablePostProcess";
 import { MandelboxModel } from "./mandelboxModel";
-import { DeepReadonly } from "../../utils/types";
-import { PointLight } from "@babylonjs/core/Lights/pointLight";
+
+import mandelboxFragment from "@shaders/mandelbox.glsl";
 
 export class MandelboxPostProcess extends PostProcess implements UpdatablePostProcess {
     private elapsedSeconds = 0;
@@ -45,7 +48,7 @@ export class MandelboxPostProcess extends PostProcess implements UpdatablePostPr
         boundingRadius: number,
         model: DeepReadonly<MandelboxModel>,
         scene: Scene,
-        stellarObjects: ReadonlyArray<PointLight>
+        stellarObjects: ReadonlyArray<PointLight>,
     ) {
         const shaderName = "mandelbox";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
@@ -57,14 +60,14 @@ export class MandelboxPostProcess extends PostProcess implements UpdatablePostPr
             ELAPSED_SECONDS: "elapsedSeconds",
             MR2: "mr2",
             SPREAD: "spread",
-            AVERAGE_SCREEN_SIZE: "averageScreenSize"
+            AVERAGE_SCREEN_SIZE: "averageScreenSize",
         };
 
         const uniforms: string[] = [
             ...Object.values(ObjectUniformNames),
             ...Object.values(CameraUniformNames),
             ...Object.values(StellarObjectUniformNames),
-            ...Object.values(MandelboxUniformNames)
+            ...Object.values(MandelboxUniformNames),
         ];
 
         const samplers: string[] = Object.values(SamplerUniformNames);
@@ -80,7 +83,7 @@ export class MandelboxPostProcess extends PostProcess implements UpdatablePostPr
             scene.getEngine(),
             false,
             null,
-            Constants.TEXTURETYPE_HALF_FLOAT
+            Constants.TEXTURETYPE_HALF_FLOAT,
         );
 
         this.onActivateObservable.add((camera) => {
@@ -102,7 +105,7 @@ export class MandelboxPostProcess extends PostProcess implements UpdatablePostPr
             effect.setFloat(MandelboxUniformNames.ELAPSED_SECONDS, this.elapsedSeconds);
             effect.setFloat(
                 MandelboxUniformNames.AVERAGE_SCREEN_SIZE,
-                (scene.getEngine().getRenderWidth() + scene.getEngine().getRenderHeight()) / 2
+                (scene.getEngine().getRenderWidth() + scene.getEngine().getRenderHeight()) / 2,
             );
 
             setSamplerUniforms(effect, this.activeCamera, scene);

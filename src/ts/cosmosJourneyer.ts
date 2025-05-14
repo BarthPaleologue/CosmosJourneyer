@@ -15,69 +15,72 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import "@babylonjs/core/Misc/screenshotTools";
+import "@babylonjs/core/Physics/physicsEngineComponent";
+import "@babylonjs/core/Engines/WebGPU/Extensions/";
+
+import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Engine } from "@babylonjs/core/Engines/engine";
+import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
+import { Quaternion } from "@babylonjs/core/Maths/math";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { VideoRecorder } from "@babylonjs/core/Misc/videoRecorder";
-import "@babylonjs/core/Misc/screenshotTools";
-import { StarMap } from "./starmap/starMap";
-import "@babylonjs/core/Physics/physicsEngineComponent";
+import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import HavokPhysics from "@babylonjs/havok";
-import "@babylonjs/core/Engines/WebGPU/Extensions/";
-import { PauseMenu } from "./ui/pauseMenu";
-import { StarSystemView } from "./starSystem/starSystemView";
-import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
-import { MainMenu } from "./ui/mainMenu";
-import { createUrlFromSave, Save } from "./saveFile/saveFileData";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Quaternion } from "@babylonjs/core/Maths/math";
+
+import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
 import {
     AtStationCoordinates,
     RelativeCoordinates,
-    UniverseCoordinates
-} from "./utils/coordinates/universeCoordinates";
-import { View } from "./utils/view";
-import { AudioMasks } from "./audio/audioMasks";
-import { GeneralInputs } from "./inputs/generalInputs";
-import { createNotification, NotificationIntent, NotificationOrigin, updateNotifications } from "./utils/notification";
-import { LoadingScreen } from "./uberCore/loadingScreen";
-import i18n, { initI18n } from "./i18n";
-import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
-import { TutorialLayer } from "./ui/tutorial/tutorialLayer";
-import { FlightTutorial } from "./tutorials/flightTutorial";
-import { SidePanels } from "./ui/sidePanels";
-import { Settings } from "./settings";
-import { Player } from "./player/player";
-import { Tutorial } from "./tutorials/tutorial";
-import { StationLandingTutorial } from "./tutorials/stationLandingTutorial";
-import { promptModalBoolean, alertModal, promptModalString } from "./utils/dialogModal";
-import { FuelScoopTutorial } from "./tutorials/fuelScoopTutorial";
-import { EncyclopaediaGalacticaManager } from "./society/encyclopaediaGalacticaManager";
-import { EncyclopaediaGalacticaLocal } from "./society/encyclopaediaGalacticaLocal";
-import { MusicConductor } from "./audio/musicConductor";
-import { StarSystemDatabase } from "./starSystem/starSystemDatabase";
-import { registerCustomSystems } from "./starSystem/customSystems/registerCustomSystems";
-import { SaveManager } from "./saveFile/saveManager";
-import { SaveLocalBackend } from "./saveFile/saveLocalBackend";
-import { saveLoadingErrorToI18nString } from "./saveFile/saveLoadingError";
-import { getLoneStarSystem } from "./starSystem/customSystems/loneStar";
-import { StarSystemCoordinates } from "./utils/coordinates/starSystemCoordinates";
-import { getUniverseObjectId } from "./utils/coordinates/universeObjectId";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { OrbitalObjectType } from "./architecture/orbitalObjectType";
-import { positionNearObject } from "./utils/positionNearObject";
-import { StarMapTutorial } from "./tutorials/starMapTutorial";
-import { Assets, loadAssets } from "./assets/assets";
-import { ISoundPlayer, SoundPlayer, SoundType } from "./audio/soundPlayer";
-import { UberScene } from "./uberCore/uberScene";
-import { Tts } from "./audio/tts";
-import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
-import { hashArray } from "./utils/hash";
+    UniverseCoordinates,
+} from "@/utils/coordinates/universeCoordinates";
+import { getUniverseObjectId } from "@/utils/coordinates/universeObjectId";
+import { alertModal, promptModalBoolean, promptModalString } from "@/utils/dialogModal";
+import { hashArray } from "@/utils/hash";
+import { createNotification, NotificationIntent, NotificationOrigin, updateNotifications } from "@/utils/notification";
+import { positionNearObject } from "@/utils/positionNearObject";
+import { View } from "@/utils/view";
+
 import { generateDarkKnightModel } from "./anomalies/darkKnight/darkKnightModelGenerator";
+import { OrbitalObjectType } from "./architecture/orbitalObjectType";
+import { Assets, loadAssets } from "./assets/assets";
+import { AudioMasks } from "./audio/audioMasks";
+import { MusicConductor } from "./audio/musicConductor";
+import { ISoundPlayer, SoundPlayer, SoundType } from "./audio/soundPlayer";
+import { Tts } from "./audio/tts";
+import i18n, { initI18n } from "./i18n";
+import { GeneralInputs } from "./inputs/generalInputs";
+import { Player } from "./player/player";
+import { createUrlFromSave, Save } from "./saveFile/saveFileData";
+import { saveLoadingErrorToI18nString } from "./saveFile/saveLoadingError";
+import { SaveLocalBackend } from "./saveFile/saveLocalBackend";
+import { SaveManager } from "./saveFile/saveManager";
+import { Settings } from "./settings";
+import { EncyclopaediaGalacticaLocal } from "./society/encyclopaediaGalacticaLocal";
+import { EncyclopaediaGalacticaManager } from "./society/encyclopaediaGalacticaManager";
+import { StarMap } from "./starmap/starMap";
+import { getLoneStarSystem } from "./starSystem/customSystems/loneStar";
+import { registerCustomSystems } from "./starSystem/customSystems/registerCustomSystems";
+import { StarSystemDatabase } from "./starSystem/starSystemDatabase";
+import { StarSystemView } from "./starSystem/starSystemView";
+import { FlightTutorial } from "./tutorials/flightTutorial";
+import { FuelScoopTutorial } from "./tutorials/fuelScoopTutorial";
+import { StarMapTutorial } from "./tutorials/starMapTutorial";
+import { StationLandingTutorial } from "./tutorials/stationLandingTutorial";
+import { Tutorial } from "./tutorials/tutorial";
+import { LoadingScreen } from "./uberCore/loadingScreen";
+import { UberScene } from "./uberCore/uberScene";
+import { MainMenu } from "./ui/mainMenu";
+import { PauseMenu } from "./ui/pauseMenu";
+import { SidePanels } from "./ui/sidePanels";
+import { TutorialLayer } from "./ui/tutorial/tutorialLayer";
 
 const enum EngineState {
     UNINITIALIZED,
     RUNNING,
-    PAUSED
+    PAUSED,
 }
 
 // register cosmos journeyer as part of window object
@@ -147,7 +150,7 @@ export class CosmosJourneyer {
         starSystemDatabase: StarSystemDatabase,
         saveManager: SaveManager,
         soundPlayer: ISoundPlayer,
-        tts: Tts
+        tts: Tts,
     ) {
         this.engine = engine;
 
@@ -198,7 +201,7 @@ export class CosmosJourneyer {
             this.engine,
             this.encyclopaedia,
             this.starSystemDatabase,
-            this.soundPlayer
+            this.soundPlayer,
         );
         this.starMap.onTargetSetObservable.add((systemCoordinates: StarSystemCoordinates) => {
             this.starSystemView.setSystemAsTarget(systemCoordinates);
@@ -239,11 +242,11 @@ export class CosmosJourneyer {
                 .reduce((closest, current) => {
                     const currentDistance = Vector3.DistanceSquared(
                         spaceshipPosition,
-                        current.getTransform().getAbsolutePosition()
+                        current.getTransform().getAbsolutePosition(),
                     );
                     const closestDistance = Vector3.DistanceSquared(
                         spaceshipPosition,
-                        closest.getTransform().getAbsolutePosition()
+                        closest.getTransform().getAbsolutePosition(),
                     );
                     return currentDistance < closestDistance ? current : closest;
                 });
@@ -257,7 +260,7 @@ export class CosmosJourneyer {
                 this.createAutoSave();
                 const shouldLoadTutorial = await promptModalBoolean(
                     i18n.t("tutorials:common:loadTutorialWillLeaveGame"),
-                    this.soundPlayer
+                    this.soundPlayer,
                 );
                 if (!shouldLoadTutorial) return;
             }
@@ -323,7 +326,7 @@ export class CosmosJourneyer {
                         NotificationIntent.INFO,
                         i18n.t("notifications:copiedToClipboard"),
                         2000,
-                        this.soundPlayer
+                        this.soundPlayer,
                     );
                 });
             });
@@ -336,7 +339,7 @@ export class CosmosJourneyer {
                     NotificationIntent.SUCCESS,
                     i18n.t("notifications:saveOk"),
                     2000,
-                    this.soundPlayer
+                    this.soundPlayer,
                 );
             else
                 createNotification(
@@ -344,7 +347,7 @@ export class CosmosJourneyer {
                     NotificationIntent.ERROR,
                     i18n.t("notifications:cantSaveTutorial"),
                     2000,
-                    this.soundPlayer
+                    this.soundPlayer,
                 );
         });
 
@@ -403,17 +406,17 @@ export class CosmosJourneyer {
         const engine = window.location.search.includes("webgpu")
             ? await EngineFactory.CreateAsync(canvas, {
                   twgslOptions: {
-                      wasmPath: new URL("./utils/TWGSL/twgsl.wasm", import.meta.url).href,
-                      jsPath: new URL("./utils/TWGSL/twgsl.js", import.meta.url).href
+                      wasmPath: new URL("@/utils/TWGSL/twgsl.wasm", import.meta.url).href,
+                      jsPath: new URL("@/utils/TWGSL/twgsl.js", import.meta.url).href,
                   },
-                  audioEngine: true
+                  audioEngine: true,
               })
             : new Engine(canvas, true, {
                   // the preserveDrawingBuffer option is required for the screenshot feature to work
                   preserveDrawingBuffer: true,
                   useHighPrecisionMatrix: true,
                   doNotHandleContextLost: true,
-                  audioEngine: true
+                  audioEngine: true,
               });
 
         engine.useReverseDepthBuffer = true;
@@ -447,7 +450,7 @@ export class CosmosJourneyer {
                         system.coordinates.starSectorZ,
                         system.coordinates.localX,
                         system.coordinates.localY,
-                        system.coordinates.localZ
+                        system.coordinates.localZ,
                     ]) > 0.5
                 );
             },
@@ -456,7 +459,7 @@ export class CosmosJourneyer {
                 system.anomalies.push(generateDarkKnightModel(stellarIds));
 
                 return system;
-            }
+            },
         );
 
         const player = Player.Default(starSystemDatabase);
@@ -490,7 +493,7 @@ export class CosmosJourneyer {
             starSystemDatabase,
             soundPlayer,
             tts,
-            assets.rendering
+            assets.rendering,
         );
 
         await starSystemView.resetPlayer();
@@ -498,7 +501,7 @@ export class CosmosJourneyer {
         if (!navigator.keyboard) {
             await alertModal(
                 "Your keyboard layout could not be detected. The QWERTY layout will be assumed by default.",
-                soundPlayer
+                soundPlayer,
             );
         }
 
@@ -517,7 +520,7 @@ export class CosmosJourneyer {
             starSystemDatabase,
             saveManagerCreateResult.value,
             soundPlayer,
-            tts
+            tts,
         );
     }
 
@@ -568,7 +571,7 @@ export class CosmosJourneyer {
             this.player.timePlayedSeconds += deltaSeconds;
 
             (this.engine.loadingScreen as LoadingScreen).setProgressPercentage(
-                this.starSystemView.loader.getLoadingProgress() * 100
+                this.starSystemView.loader.getLoadingProgress() * 100,
             );
 
             this.autoSaveTimerSeconds += deltaSeconds;
@@ -587,7 +590,7 @@ export class CosmosJourneyer {
                 this.isPaused(),
                 this.activeView === this.starSystemView,
                 this.mainMenu.isVisible(),
-                deltaSeconds
+                deltaSeconds,
             );
             this.soundPlayer.update();
             this.tts.update();
@@ -651,7 +654,7 @@ export class CosmosJourneyer {
             this.videoRecorder = new VideoRecorder(this.engine, {
                 fps: 60,
                 recordChunckSize: 3000000,
-                mimeType: "video/webm;codecs=h264"
+                mimeType: "video/webm;codecs=h264",
             });
         }
 
@@ -682,7 +685,7 @@ export class CosmosJourneyer {
             .invert();
         const currentLocalPosition = Vector3.TransformCoordinates(
             currentWorldPosition,
-            nearestOrbitalObjectInverseWorld
+            nearestOrbitalObjectInverseWorld,
         );
 
         const distanceToNearestOrbitalObject = currentLocalPosition.length();
@@ -705,14 +708,14 @@ export class CosmosJourneyer {
             position: {
                 x: currentLocalPosition.x,
                 y: currentLocalPosition.y,
-                z: currentLocalPosition.z
+                z: currentLocalPosition.z,
             },
             rotation: {
                 x: currentLocalRotation.x,
                 y: currentLocalRotation.y,
                 z: currentLocalRotation.z,
-                w: currentLocalRotation.w
-            }
+                w: currentLocalRotation.w,
+            },
         };
     }
 
@@ -728,7 +731,7 @@ export class CosmosJourneyer {
         const shipLocation: UniverseCoordinates = spaceship.isLandedAtFacility()
             ? {
                   type: "atStation",
-                  universeObjectId: shipUniverseCoordinates.universeObjectId
+                  universeObjectId: shipUniverseCoordinates.universeObjectId,
               }
             : shipUniverseCoordinates;
 
@@ -737,11 +740,11 @@ export class CosmosJourneyer {
             player: Player.Serialize(this.player),
             playerLocation: {
                 type: "inSpaceship",
-                shipId: spaceship.id
+                shipId: spaceship.id,
             },
             shipLocations: {
-                [spaceship.id]: shipLocation
-            }
+                [spaceship.id]: shipLocation,
+            },
         };
     }
 
@@ -753,8 +756,8 @@ export class CosmosJourneyer {
                 (await promptModalString(
                     i18n.t("spaceStation:cmdrNameChangePrompt"),
                     this.player.getName(),
-                    this.soundPlayer
-                )) ?? "Python"
+                    this.soundPlayer,
+                )) ?? "Python",
             );
         }
 
@@ -825,9 +828,9 @@ export class CosmosJourneyer {
                 console.error(saveResult.error);
                 await alertModal(
                     i18n.t(
-                        "The tutorial save has errors and could not be loaded! Check the console for more information."
+                        "The tutorial save has errors and could not be loaded! Check the console for more information.",
                     ),
-                    this.soundPlayer
+                    this.soundPlayer,
                 );
                 return;
             }
@@ -841,7 +844,7 @@ export class CosmosJourneyer {
             const targetObject = this.starSystemView
                 .getStarSystem()
                 .getNearestOrbitalObject(
-                    this.starSystemView.scene.getActiveControls().getTransform().getAbsolutePosition()
+                    this.starSystemView.scene.getActiveControls().getTransform().getAbsolutePosition(),
                 );
 
             this.starSystemView
@@ -867,7 +870,7 @@ export class CosmosJourneyer {
             if (shipLocation === undefined) {
                 await alertModal(
                     "Player is in spaceship, but said spaceship does not exist. The loading procedure has been aborted.",
-                    this.soundPlayer
+                    this.soundPlayer,
                 );
                 return;
             }
@@ -875,7 +878,7 @@ export class CosmosJourneyer {
             if (shipLocation.type === "inSpaceship") {
                 await alertModal(
                     "Spaceship inside spaceships is not yet supported. The loading procedure has been aborted.",
-                    this.soundPlayer
+                    this.soundPlayer,
                 );
                 return;
             }
@@ -884,13 +887,13 @@ export class CosmosJourneyer {
         }
 
         const systemModel = this.starSystemDatabase.getSystemModelFromCoordinates(
-            locationToUse.universeObjectId.systemCoordinates
+            locationToUse.universeObjectId.systemCoordinates,
         );
 
         if (systemModel === null) {
             await alertModal(
                 "Cannot load universe coordinates: system model not found. The loading procedure has been aborted.",
-                this.soundPlayer
+                this.soundPlayer,
             );
             return;
         }
@@ -949,12 +952,12 @@ export class CosmosJourneyer {
                 fallbackObject,
                 new Vector3(0, 0, fallbackObject.getBoundingRadius() * 4),
                 new Quaternion(0, 0, 0, 1),
-                playerTransform
+                playerTransform,
             );
 
             await alertModal(
                 "The object you are trying to spawn near to could not be found. You will spawn around the first stellar object of the system instead.",
-                this.soundPlayer
+                this.soundPlayer,
             );
 
             return;
@@ -964,12 +967,12 @@ export class CosmosJourneyer {
             nearestOrbitalObject,
             new Vector3(location.position.x, location.position.y, location.position.z),
             new Quaternion(location.rotation.x, location.rotation.y, location.rotation.z, location.rotation.w),
-            playerTransform
+            playerTransform,
         );
 
         const distanceToObject = Vector3.Distance(
             playerTransform.getAbsolutePosition(),
-            nearestOrbitalObject.getTransform().getAbsolutePosition()
+            nearestOrbitalObject.getTransform().getAbsolutePosition(),
         );
         const objectRadius = nearestOrbitalObject.getBoundingRadius();
 
@@ -1002,12 +1005,12 @@ export class CosmosJourneyer {
                 fallbackObject,
                 new Vector3(0, 0, fallbackObject.getBoundingRadius() * 4),
                 new Quaternion(0, 0, 0, 1),
-                playerTransform
+                playerTransform,
             );
 
             await alertModal(
                 "The space station you are trying to spawn at could not be found. You will spawn around the first stellar object of the system instead.",
-                this.soundPlayer
+                this.soundPlayer,
             );
 
             return;
@@ -1021,12 +1024,12 @@ export class CosmosJourneyer {
                 fallbackObject,
                 new Vector3(0, 0, fallbackObject.getBoundingRadius() * 4),
                 new Quaternion(0, 0, 0, 1),
-                playerTransform
+                playerTransform,
             );
 
             await alertModal(
                 "There are no available pads at the space station you are trying to spawn at. You have been moved outside of the station instead.",
-                this.soundPlayer
+                this.soundPlayer,
             );
 
             return;

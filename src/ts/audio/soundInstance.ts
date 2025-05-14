@@ -35,7 +35,7 @@ export class SoundInstance implements ISoundInstance {
         this.sound.updateOptions({
             playbackRate: this.playbackSpeedMultiplier,
             volume: this.targetVolume * this.volumeMultiplier * this.maskFactor,
-            loop: !playOnce
+            loop: !playOnce,
         });
     }
 

@@ -67,7 +67,7 @@ export class FuelTank {
             type: "fuelTank",
             size: this.size,
             quality: this.quality,
-            currentFuel01: this.currentFuel / this.maxFuel
+            currentFuel01: this.currentFuel / this.maxFuel,
         };
     }
 }

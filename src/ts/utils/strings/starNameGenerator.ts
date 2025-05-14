@@ -153,7 +153,7 @@ const constellationNames: string[] = [
     "Vulpeculae",
     "Weierstrass",
     "Zeno",
-    "Zimmerman"
+    "Zimmerman",
 ];
 
 const greekLetters: string[] = [
@@ -180,7 +180,7 @@ const greekLetters: string[] = [
     "Phi",
     "Chi",
     "Psi",
-    "Omega"
+    "Omega",
 ];
 
 /**

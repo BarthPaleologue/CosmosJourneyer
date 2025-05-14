@@ -15,22 +15,24 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Tools } from "@babylonjs/core/Misc/tools";
 import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
-import { Settings } from "../../settings";
+
+import { GenerationSteps } from "@/utils/generationSteps";
+import { getRngFromSeed } from "@/utils/getRngFromSeed";
+
+import { CelestialBodyModel } from "../../architecture/orbitalObjectModel";
+import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { Orbit } from "../../orbit/orbit";
 import { newSeededRingsModel } from "../../rings/ringsModel";
-import { GenerationSteps } from "../../utils/generationSteps";
-import { getRngFromSeed } from "../../utils/getRngFromSeed";
-import { CelestialBodyModel } from "../../architecture/orbitalObjectModel";
+import { Settings } from "../../settings";
 import { GasPlanetModel } from "./gasPlanetModel";
-import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
-import { Tools } from "@babylonjs/core/Misc/tools";
 
 export function newSeededGasPlanetModel(
     id: string,
     seed: number,
     name: string,
-    parentBodies: CelestialBodyModel[]
+    parentBodies: CelestialBodyModel[],
 ): GasPlanetModel {
     const rng = getRngFromSeed(seed);
 
@@ -66,7 +68,7 @@ export function newSeededGasPlanetModel(
         eccentricity: 0,
         longitudeOfAscendingNode: 0,
         argumentOfPeriapsis: 0,
-        initialMeanAnomaly: 0
+        initialMeanAnomaly: 0,
     };
     const mass = Settings.JUPITER_MASS * (radius / 69_911e3) ** 3;
     const axialTilt = normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT);
@@ -86,8 +88,8 @@ export function newSeededGasPlanetModel(
         mass,
         atmosphere: {
             pressure: Settings.EARTH_SEA_LEVEL_PRESSURE,
-            greenHouseEffectFactor: 0.5
+            greenHouseEffectFactor: 0.5,
         },
-        rings: rings
+        rings: rings,
     };
 }

@@ -15,17 +15,18 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { BaseTexture, FreeCamera, MeshBuilder, PointLight, StandardMaterial } from "@babylonjs/core";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
-import { Scene } from "@babylonjs/core/scene";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { BaseTexture, FreeCamera, MeshBuilder, PointLight, StandardMaterial } from "@babylonjs/core";
-import { enablePhysics } from "./utils";
+import { Scene } from "@babylonjs/core/scene";
+
 import { loadRenderingAssets } from "../assets/renderingAssets";
+import { enablePhysics } from "./utils";
 
 export async function createDebugAssetsScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void
+    progressCallback: (progress: number, text: string) => void,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -65,13 +66,13 @@ export async function createDebugAssetsScene(
         const maxDimension = Math.max(
             extent.max.x - extent.min.x,
             extent.max.y - extent.min.y,
-            extent.max.z - extent.min.z
+            extent.max.z - extent.min.z,
         );
         rootMesh.scaling.scaleInPlace(1 / maxDimension);
         rootMesh.position = new Vector3(
             sideLength + (meshCounter % sideLength) - sideLength / 2,
             0,
-            Math.floor(meshCounter / sideLength) - sideLength / 2
+            Math.floor(meshCounter / sideLength) - sideLength / 2,
         );
     }
 
@@ -83,7 +84,7 @@ export async function createDebugAssetsScene(
     for (const [i, texture] of scene.textures.entries()) {
         showTexture(
             texture,
-            new Vector3((i % sideLength) - sideLength / 2, 0, Math.floor(i / sideLength) - sideLength / 2)
+            new Vector3((i % sideLength) - sideLength / 2, 0, Math.floor(i / sideLength) - sideLength / 2),
         );
     }
 

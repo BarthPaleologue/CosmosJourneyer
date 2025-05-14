@@ -15,16 +15,18 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Direction } from "../../../../utils/direction";
-import { PlanetChunk } from "./planetChunk";
-import { TerrainSettings } from "../terrainSettings";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import { z } from "zod";
 
+import { Direction } from "@/utils/direction";
+
+import { TerrainSettings } from "../terrainSettings";
+import { PlanetChunk } from "./planetChunk";
+
 export const enum TaskType {
     BUILD,
-    APPLY
+    APPLY,
 }
 
 export type Task = {
@@ -55,7 +57,7 @@ export const ReturnedChunkDataSchema = z.object({
     indices: z.instanceof(Uint16Array),
     instancesMatrixBuffer: z.instanceof(Float32Array),
     alignedInstancesMatrixBuffer: z.instanceof(Float32Array),
-    averageHeight: z.number()
+    averageHeight: z.number(),
 });
 
 export type ReturnedChunkData = z.infer<typeof ReturnedChunkDataSchema>;

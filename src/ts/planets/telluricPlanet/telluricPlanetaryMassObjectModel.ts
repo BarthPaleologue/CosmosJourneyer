@@ -15,12 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { TerrainSettings } from "./terrain/terrainSettings";
-import { CloudsModel } from "../../clouds/cloudsModel";
 import { CelestialBodyModelBase } from "../../architecture/orbitalObjectModelBase";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { AtmosphereModel } from "../../atmosphere/atmosphereModel";
+import { CloudsModel } from "../../clouds/cloudsModel";
 import { OceanModel } from "../../ocean/oceanModel";
+import { TerrainSettings } from "./terrain/terrainSettings";
 
 export type TelluricPlanetaryMassObjectModelBase<T extends OrbitalObjectType> = CelestialBodyModelBase<T> & {
     readonly waterAmount: number;

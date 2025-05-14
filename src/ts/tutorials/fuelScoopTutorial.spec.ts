@@ -16,10 +16,11 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { describe, expect, it } from "vitest";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-import { FuelScoopTutorial } from "./fuelScoopTutorial";
+
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { FuelScoopTutorial } from "./fuelScoopTutorial";
 
 describe("FuelScoopTutorial", () => {
     it("spawns near a star", () => {

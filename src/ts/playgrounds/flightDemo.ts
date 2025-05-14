@@ -15,21 +15,22 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Color3, MeshBuilder, PBRMetallicRoughnessMaterial, SolidParticle, SolidParticleSystem } from "@babylonjs/core";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
-import { Scene } from "@babylonjs/core/scene";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Color3, MeshBuilder, PBRMetallicRoughnessMaterial, SolidParticle, SolidParticleSystem } from "@babylonjs/core";
-import { enablePhysics } from "./utils";
-import { ShipControls } from "../spaceship/shipControls";
-import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
+import { Scene } from "@babylonjs/core/scene";
+
+import { loadRenderingAssets } from "../assets/renderingAssets";
 import { SoundPlayerMock } from "../audio/soundPlayer";
 import { TtsMock } from "../audio/tts";
-import { loadRenderingAssets } from "../assets/renderingAssets";
+import { ShipControls } from "../spaceship/shipControls";
+import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
+import { enablePhysics } from "./utils";
 
 export async function createFlightDemoScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void
+    progressCallback: (progress: number, text: string) => void,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -71,7 +72,7 @@ export async function createFlightDemoScene(
     boxesSPS.addShape(box, 10_000, {
         positionFunction: (particle: SolidParticle) => {
             particle.position = new Vector3(randRange(-1, 1), randRange(-1, 1), randRange(-1, 1)).scaleInPlace(range);
-        }
+        },
     });
 
     const mesh = boxesSPS.buildMesh();

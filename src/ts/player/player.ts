@@ -15,16 +15,17 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Observable } from "@babylonjs/core/Misc/observable";
+
 import { Mission } from "../missions/mission";
+import { SpaceDiscoveryData } from "../society/encyclopaediaGalactica";
+import { SerializedComponent } from "../spaceship/serializedComponents/component";
+import { getDefaultSerializedSpaceship, SerializedSpaceship } from "../spaceship/serializedSpaceship";
+import { Spaceship } from "../spaceship/spaceship";
+import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
 import { UniverseObjectId } from "../utils/coordinates/universeObjectId";
-import { Spaceship } from "../spaceship/spaceship";
-import { getDefaultSerializedSpaceship, SerializedSpaceship } from "../spaceship/serializedSpaceship";
-import { SpaceDiscoveryData } from "../society/encyclopaediaGalactica";
-import { Observable } from "@babylonjs/core/Misc/observable";
 import { CompletedTutorials, SerializedPlayer } from "./serializedPlayer";
-import { SerializedComponent } from "../spaceship/serializedComponents/component";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 
 export class Player {
     uuid: string;
@@ -119,7 +120,7 @@ export class Player {
         this.discoveries.local.push({
             objectId,
             discoveryTimestamp: Date.now(),
-            explorerName: this.getName()
+            explorerName: this.getName(),
         });
 
         return true;
@@ -145,10 +146,10 @@ export class Player {
                     flightCompleted: false,
                     stationLandingCompleted: false,
                     starMapCompleted: false,
-                    fuelScoopingCompleted: false
-                }
+                    fuelScoopingCompleted: false,
+                },
             },
-            starSystemDatabase
+            starSystemDatabase,
         );
     }
 
@@ -170,10 +171,10 @@ export class Player {
             currentMissions: player.currentMissions.map((mission) => mission.serialize()),
             completedMissions: player.completedMissions.map((mission) => mission.serialize()),
             spaceShips: player.serializedSpaceships.concat(
-                player.instancedSpaceships.map((spaceship) => spaceship.serialize())
+                player.instancedSpaceships.map((spaceship) => spaceship.serialize()),
             ),
             spareSpaceshipComponents: Array.from(player.spareSpaceshipComponents),
-            tutorials: player.tutorials
+            tutorials: player.tutorials,
         };
     }
 
@@ -191,7 +192,7 @@ export class Player {
 
         this.discoveries = {
             local: player.discoveries.local.map((objectId) => structuredClone(objectId)),
-            uploaded: player.discoveries.uploaded.map((objectId) => structuredClone(objectId))
+            uploaded: player.discoveries.uploaded.map((objectId) => structuredClone(objectId)),
         };
         this.visitedObjects.clear();
         player.visitedObjects.forEach((objectId) => {

@@ -21,7 +21,7 @@ export function rayIntersectSphere(
     rayOrigin: Vector3,
     rayDir: Vector3,
     spherePosition: Vector3,
-    sphereRadius: number
+    sphereRadius: number,
 ): [boolean, number, number] {
     const relativeOrigin = rayOrigin.subtract(spherePosition); // rayOrigin in sphere space
 

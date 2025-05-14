@@ -16,9 +16,10 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Scene } from "@babylonjs/core/scene";
-import { loadTextures, Textures } from "./textures";
+
 import { initMaterials, Materials } from "./materials";
 import { loadObjects, Objects } from "./objects";
+import { loadTextures, Textures } from "./textures";
 
 export type RenderingAssets = {
     readonly textures: Textures;
@@ -28,7 +29,7 @@ export type RenderingAssets = {
 
 export async function loadRenderingAssets(
     progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void,
-    scene: Scene
+    scene: Scene,
 ): Promise<RenderingAssets> {
     const texturesPromise = loadTextures(progressCallback, scene);
 
@@ -41,6 +42,6 @@ export async function loadRenderingAssets(
     return {
         textures: textures,
         materials: materials,
-        objects: await objectsPromise
+        objects: await objectsPromise,
     };
 }
