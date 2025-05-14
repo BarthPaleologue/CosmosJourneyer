@@ -52,7 +52,7 @@ if (urlParams.get("debug") !== null) {
     document.body.appendChild(inspectorRoot);
     inspectorRoot.id = "inspectorLayer";
     await scene.debugLayer.show({
-        globalRoot: inspectorRoot
+        globalRoot: inspectorRoot,
     });
 }
 

@@ -74,7 +74,7 @@ export async function initI18n() {
         lng: language, // change this if you want to test a specific language
         debug: process.env["NODE_ENV"] === "development",
         fallbackLng: "en-US",
-        resources: loadResources()
+        resources: loadResources(),
     });
 
     // perform all static translations

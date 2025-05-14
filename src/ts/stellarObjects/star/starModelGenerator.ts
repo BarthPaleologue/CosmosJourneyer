@@ -32,7 +32,7 @@ export function newSeededStarModel(
     id: string,
     seed: number,
     name: string,
-    parentBodies: OrbitalObjectModel[]
+    parentBodies: OrbitalObjectModel[],
 ): StarModel {
     const rng = getRngFromSeed(seed);
 
@@ -60,7 +60,7 @@ export function newSeededStarModel(
         inclination: 0,
         longitudeOfAscendingNode: 0,
         argumentOfPeriapsis: 0,
-        initialMeanAnomaly: 0
+        initialMeanAnomaly: 0,
     };
 
     const rings = uniformRandBool(RING_PROPORTION, rng, GenerationSteps.RINGS) ? newSeededRingsModel(rng) : null;
@@ -76,7 +76,7 @@ export function newSeededStarModel(
         mass: mass,
         siderealDaySeconds: siderealDaySeconds,
         axialTilt: axialTilt,
-        rings: rings
+        rings: rings,
     };
 }
 
@@ -94,7 +94,7 @@ export const enum StellarType {
     /** 3,500 - 5,000 K */
     K = "K",
     /** 2,700 - 3,500 K */
-    M = "M"
+    M = "M",
 }
 
 export function getStellarTypeFromTemperature(temperature: number) {
@@ -116,7 +116,7 @@ export function getRandomStellarType(rng: (step: number) => number) {
         [StellarType.F, 0.03],
         [StellarType.A, 0.006],
         [StellarType.B, 0.0013],
-        [StellarType.O, 0.0000003]
+        [StellarType.O, 0.0000003],
     ];
 
     const r = rng(GenerationSteps.STELLAR_TYPE);

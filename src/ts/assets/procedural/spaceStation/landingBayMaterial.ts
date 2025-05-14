@@ -46,7 +46,7 @@ import {
     uniformWorld,
     vec2,
     vertexAttribute,
-    xz
+    xz,
 } from "@/utils/bsl";
 import { DeepReadonly } from "@/utils/types";
 
@@ -61,7 +61,7 @@ export class LandingBayMaterial extends NodeMaterial {
         deltaRadius: number,
         height: number,
         textures: PBRTextures,
-        scene: Scene
+        scene: Scene,
     ) {
         super("LandingBayMaterial", scene);
         this.mode = NodeMaterialModes.Material;
@@ -75,10 +75,10 @@ export class LandingBayMaterial extends NodeMaterial {
             `NamePlateTexture`,
             {
                 width: textureResolution * aspectRatio,
-                height: textureResolution
+                height: textureResolution,
             },
             scene,
-            true
+            true,
         );
 
         const font_size = 128;
@@ -92,7 +92,7 @@ export class LandingBayMaterial extends NodeMaterial {
             "white",
             null,
             true,
-            true
+            true,
         );
 
         this.onDisposeObservable.addOnce(() => {
@@ -130,14 +130,14 @@ export class LandingBayMaterial extends NodeMaterial {
             f(meanRadius - deltaRadius / 2.0),
             f(meanRadius + deltaRadius / 2.0),
             f(0.0),
-            f(1.0)
+            f(1.0),
         );
 
         const proceduralUvX = mul(theta, f(meanRadius / deltaRadius));
         const proceduralUV = vec2(proceduralUvX, scaledUvY);
 
         const albedo = textureSample(textures.albedo, proceduralUV, {
-            convertToLinearSpace: true
+            convertToLinearSpace: true,
         });
         const normalMap = textureSample(textures.normal, proceduralUV);
         const metallicRoughness = textureSample(textures.metallicRoughness, proceduralUV);
@@ -165,7 +165,7 @@ export class LandingBayMaterial extends NodeMaterial {
             positionW,
             normalW,
             normalMap.rgb,
-            sub(f(1), mul(paintWeight, f(0.7)))
+            sub(f(1), mul(paintWeight, f(0.7))),
         );
 
         const view = uniformView();
@@ -180,7 +180,7 @@ export class LandingBayMaterial extends NodeMaterial {
             normalW,
             view,
             cameraPosition,
-            positionW
+            positionW,
         );
 
         const fragOutput = outputFragColor(pbrColor);

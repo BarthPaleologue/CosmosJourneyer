@@ -18,7 +18,7 @@ export function createHelixVertexData(
     height: number,
     nbSpires: number,
     pitch: number,
-    tesselation: number
+    tesselation: number,
 ) {
     const indices: number[] = [];
     const positions: number[] = [];
@@ -135,7 +135,7 @@ export function createHelix(
     tesselation: number,
     nbSpires: number,
     pitch: number,
-    scene: Scene
+    scene: Scene,
 ) {
     const vertexData = createHelixVertexData(radius, thickness, height, nbSpires, pitch, tesselation);
     const ring = new Mesh("ring", scene);

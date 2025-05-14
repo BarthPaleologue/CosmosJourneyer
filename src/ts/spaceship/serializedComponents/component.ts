@@ -29,7 +29,7 @@ export const SerializedComponentSchema = z.discriminatedUnion("type", [
     SerializedFuelScoopSchema,
     SerializedFuelTankSchema,
     SerializedDiscoveryScannerSchema,
-    SerializedThrustersSchema
+    SerializedThrustersSchema,
 ]);
 
 export type SerializedComponent = z.infer<typeof SerializedComponentSchema>;

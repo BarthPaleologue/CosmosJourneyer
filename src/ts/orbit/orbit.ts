@@ -74,7 +74,7 @@ export const OrbitSchema = z.object({
      * The norm to use for the orbit. 2 for Euclidean space, other numbers for funky shapes.
      * @see https://medium.com/@barth_29567/crazy-orbits-lets-make-squares-c91a427c6b26
      */
-    p: z.number().default(2)
+    p: z.number().default(2),
 });
 
 export type Orbit = z.infer<typeof OrbitSchema>;
@@ -104,7 +104,7 @@ export function getPointOnOrbitLocal(orbit: DeepReadonly<Orbit>, parentMass: num
 
     const trueAnomaly = findMinimumNewtonRaphson(
         (trueAnomaly) => keplerEquation(trueAnomaly, meanAnomaly, orbit.eccentricity),
-        meanAnomaly
+        meanAnomaly,
     );
 
     const x = Math.cos(trueAnomaly);
@@ -145,7 +145,7 @@ export function getPointOnOrbit(
     parentMass: number,
     orbit: DeepReadonly<Orbit>,
     t: number,
-    referencePlaneRotation: Matrix
+    referencePlaneRotation: Matrix,
 ): Vector3 {
     const point = getPointOnOrbitLocal(orbit, parentMass, t);
 

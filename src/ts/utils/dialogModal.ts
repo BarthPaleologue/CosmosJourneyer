@@ -4,7 +4,7 @@ import i18n from "../i18n";
 export function promptModalString(
     prompt: string,
     defaultValue: string,
-    soundPlayer: ISoundPlayer
+    soundPlayer: ISoundPlayer,
 ): Promise<string | null> {
     const modal = document.createElement("dialog");
     modal.innerHTML = `
@@ -164,7 +164,7 @@ export function connectEncyclopaediaGalacticaModal(soundPlayer: ISoundPlayer): P
                 resolve({
                     encyclopaediaUrlBase: urlInput.value,
                     accountId: accountIdInput.value,
-                    password: passwordInput.value
+                    password: passwordInput.value,
                 });
             } else {
                 resolve(null);

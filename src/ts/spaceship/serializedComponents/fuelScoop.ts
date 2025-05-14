@@ -20,13 +20,13 @@ import { z } from "zod";
 export const SerializedFuelScoopSchema = z.object({
     type: z.literal("fuelScoop"),
     size: z.number(),
-    quality: z.number()
+    quality: z.number(),
 });
 
 export type SerializedFuelScoop = z.infer<typeof SerializedFuelScoopSchema>;
 
 export function getFuelScoopSpec(fuelScoop: SerializedFuelScoop) {
     return {
-        fuelPerSecond: fuelScoop.size + fuelScoop.quality / 10
+        fuelPerSecond: fuelScoop.size + fuelScoop.quality / 10,
     };
 }

@@ -38,7 +38,7 @@ export function generateDarkKnightModel(parentIds: ReadonlyArray<OrbitalObjectId
             inclination: 0,
             longitudeOfAscendingNode: 0,
             semiMajorAxis: Settings.AU * 100,
-            initialMeanAnomaly: 0
-        }
+            initialMeanAnomaly: 0,
+        },
     };
 }

@@ -229,14 +229,14 @@ export class StarMapUI {
 
         this.systemIcons.forEach((systemIcons) => {
             const systemPosition = this.starSystemDatabase.getSystemGalacticPosition(
-                systemIcons.getSystemCoordinates()
+                systemIcons.getSystemCoordinates(),
             );
             const systemUniversePosition = systemPosition.add(centerOfUniversePosition);
             const screenCoordinates = Vector3.Project(
                 systemUniversePosition,
                 Matrix.IdentityReadOnly,
                 camera.getTransformationMatrix(),
-                camera.viewport
+                camera.viewport,
             );
             systemIcons.htmlRoot.classList.toggle("transparent", screenCoordinates.z < 0);
             systemIcons.htmlRoot.style.left = `${screenCoordinates.x * 100}vw`;
@@ -263,13 +263,13 @@ export class StarMapUI {
                 selectedSystemWorldPosition,
                 Matrix.IdentityReadOnly,
                 camera.getTransformationMatrix(),
-                camera.viewport
+                camera.viewport,
             );
             this.selectedSystemCursorContainer.classList.toggle(
                 "transparent",
                 selectedMeshScreenCoordinates.z < 0 ||
                     (this.currentSystem !== null &&
-                        starSystemCoordinatesEquals(this.selectedSystem, this.currentSystem))
+                        starSystemCoordinatesEquals(this.selectedSystem, this.currentSystem)),
             );
             this.selectedSystemCursorContainer.style.left = `${selectedMeshScreenCoordinates.x * 100}vw`;
             this.selectedSystemCursorContainer.style.top = `${selectedMeshScreenCoordinates.y * 100}vh`;
@@ -300,7 +300,7 @@ export class StarMapUI {
                 hoveredSystemWorldPosition,
                 Matrix.IdentityReadOnly,
                 camera.getTransformationMatrix(),
-                camera.viewport
+                camera.viewport,
             );
             this.hoveredSystemCursorContainer.classList.toggle("transparent", meshScreenCoordinates.z < 0);
             this.hoveredSystemCursorContainer.style.left = `${meshScreenCoordinates.x * 100}vw`;
@@ -321,7 +321,7 @@ export class StarMapUI {
                 currentSystemWorldPosition,
                 Matrix.IdentityReadOnly,
                 camera.getTransformationMatrix(),
-                camera.viewport
+                camera.viewport,
             );
             this.currentSystemCursorContainer.classList.toggle("transparent", meshScreenCoordinates.z < 0);
             this.currentSystemCursorContainer.style.left = `${meshScreenCoordinates.x * 100}vw`;
@@ -346,7 +346,7 @@ export class StarMapUI {
 
     setSelectedSystem(
         targetSystemModel: DeepReadonly<StarSystemModel>,
-        currentSystemCoordinates: StarSystemCoordinates | null
+        currentSystemCoordinates: StarSystemCoordinates | null,
     ) {
         this.selectedSystem = targetSystemModel.coordinates;
 
@@ -357,8 +357,8 @@ export class StarMapUI {
             this.shortHandUIDistanceFromCurrent.textContent = `${i18n.t("starMap:distanceFromCurrent")}: ${i18n.t(
                 "units:shortLy",
                 {
-                    value: Vector3.Distance(currentPosition, targetPosition).toFixed(1)
-                }
+                    value: Vector3.Distance(currentPosition, targetPosition).toFixed(1),
+                },
             )}`;
         }
 
@@ -381,7 +381,7 @@ export class StarMapUI {
         this.nbPlanets.textContent = `${i18n.t("starMap:planets")}: ${targetSystemModel.planets.length}`;
 
         this.distanceToSol.textContent = `${i18n.t("starMap:distanceToSol")}: ${i18n.t("units:shortLy", {
-            value: Vector3.Distance(targetPosition, Vector3.Zero()).toFixed(1)
+            value: Vector3.Distance(targetPosition, Vector3.Zero()).toFixed(1),
         })}`;
 
         if (this.starSystemDatabase.isSystemInHumanBubble(targetSystemModel.coordinates)) {
@@ -436,7 +436,7 @@ export class StarMapUI {
         systemsWithIcons.forEach((system) => {
             const icon = new SystemIcons(
                 system,
-                SystemIcons.IconMaskForSystem(system, bookmarkedSystems, targetSystems)
+                SystemIcons.IconMaskForSystem(system, bookmarkedSystems, targetSystems),
             );
             icon.htmlRoot.addEventListener("click", () => {
                 this.onSystemFocusObservable.notifyObservers(icon.getSystemCoordinates());

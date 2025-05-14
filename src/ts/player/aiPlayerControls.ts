@@ -32,7 +32,7 @@ export class AiPlayerControls {
         starSystemDatabase: StarSystemDatabase,
         scene: Scene,
         assets: RenderingAssets,
-        soundPlayer: ISoundPlayer
+        soundPlayer: ISoundPlayer,
     ) {
         this.player = Player.Default(starSystemDatabase);
         this.player.setName("AI");
@@ -47,7 +47,7 @@ export class AiPlayerControls {
             this.player.spareSpaceshipComponents,
             scene,
             assets,
-            soundPlayer
+            soundPlayer,
         );
 
         this.spaceshipControls = new AiSpaceshipControls(spaceship, scene);

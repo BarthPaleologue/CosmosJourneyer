@@ -83,14 +83,14 @@ export class StarSystemLoader {
             planets,
             satellites,
             anomalies,
-            orbitalFacilities
+            orbitalFacilities,
         };
     }
 
     private async loadStellarObjects(
         stellarObjectModels: DeepReadonly<Array<StellarObjectModel>>,
         assets: RenderingAssets,
-        scene: Scene
+        scene: Scene,
     ): Promise<Readonly<NonEmptyArray<StellarObject>>> {
         const stellarObjects: StellarObject[] = [];
         for (const stellarObjectModel of stellarObjectModels) {
@@ -123,7 +123,7 @@ export class StarSystemLoader {
 
     private async loadAnomalies(
         anomalyModels: DeepReadonly<Array<AnomalyModel>>,
-        scene: Scene
+        scene: Scene,
     ): Promise<ReadonlyArray<Anomaly>> {
         const anomalies: Anomaly[] = [];
         for (const anomalyModel of anomalyModels) {
@@ -162,7 +162,7 @@ export class StarSystemLoader {
     private async loadOrbitalFacilities(
         systemModel: DeepReadonly<StarSystemModel>,
         assets: RenderingAssets,
-        scene: Scene
+        scene: Scene,
     ): Promise<ReadonlyArray<OrbitalFacility>> {
         const orbitalFacilities: OrbitalFacility[] = [];
         for (const orbitalFacilityModel of systemModel.orbitalFacilities) {
@@ -188,7 +188,7 @@ export class StarSystemLoader {
     private async loadPlanets(
         planetModels: DeepReadonly<Array<PlanetModel>>,
         assets: RenderingAssets,
-        scene: Scene
+        scene: Scene,
     ): Promise<ReadonlyArray<Planet>> {
         const planets: Planet[] = [];
         for (const planetModel of planetModels) {
@@ -217,7 +217,7 @@ export class StarSystemLoader {
     private async loadSatellites(
         satelliteModels: DeepReadonly<Array<TelluricSatelliteModel>>,
         assets: RenderingAssets,
-        scene: Scene
+        scene: Scene,
     ): Promise<ReadonlyArray<TelluricPlanet>> {
         const satellites: TelluricPlanet[] = [];
         for (const satelliteModel of satelliteModels) {

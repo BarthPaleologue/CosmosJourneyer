@@ -71,7 +71,7 @@ export class StellarPathfinder {
     public init(
         startSystemCoordinates: StarSystemCoordinates,
         targetSystemCoordinates: StarSystemCoordinates,
-        jumpRange: number
+        jumpRange: number,
     ) {
         this.coordinatesToPrevious.clear();
         this.openList.clear();
@@ -82,12 +82,12 @@ export class StellarPathfinder {
 
         this.startSystem = {
             coordinates: startSystemCoordinates,
-            position: this.starSystemDatabase.getSystemGalacticPosition(startSystemCoordinates)
+            position: this.starSystemDatabase.getSystemGalacticPosition(startSystemCoordinates),
         };
 
         this.targetSystem = {
             coordinates: targetSystemCoordinates,
-            position: this.starSystemDatabase.getSystemGalacticPosition(targetSystemCoordinates)
+            position: this.starSystemDatabase.getSystemGalacticPosition(targetSystemCoordinates),
         };
 
         this.jumpRange = jumpRange;
@@ -112,7 +112,7 @@ export class StellarPathfinder {
         const stellarNeighbors = getNeighborStarSystemCoordinates(
             node.coordinates,
             this.jumpRange,
-            this.starSystemDatabase
+            this.starSystemDatabase,
         );
         return stellarNeighbors.map<{ node: Node; distance: number }>(({ coordinates, position, distance }) => {
             return {
@@ -120,9 +120,9 @@ export class StellarPathfinder {
                     coordinates: coordinates,
                     position,
                     G: 0,
-                    H: 0
+                    H: 0,
                 },
-                distance: distance
+                distance: distance,
             };
         });
     }
@@ -141,7 +141,7 @@ export class StellarPathfinder {
                 coordinates: this.startSystem.coordinates,
                 position: this.startSystem.position,
                 G: 0,
-                H: 0
+                H: 0,
             });
         }
 
@@ -169,7 +169,7 @@ export class StellarPathfinder {
             const H = this.getHeuristic(neighbor);
 
             const openNode = this.openList.find((node) =>
-                starSystemCoordinatesEquals(node.coordinates, neighbor.coordinates)
+                starSystemCoordinatesEquals(node.coordinates, neighbor.coordinates),
             );
             if (openNode !== undefined) {
                 // if the neighbor is already in the open list, update its G value if the new path is shorter
@@ -183,7 +183,7 @@ export class StellarPathfinder {
                     coordinates: neighbor.coordinates,
                     position: neighbor.position,
                     G,
-                    H
+                    H,
                 });
                 this.coordinatesToPrevious.set(JSON.stringify(neighbor.coordinates), currentNode.coordinates);
             }
@@ -212,8 +212,8 @@ export class StellarPathfinder {
             if (path.length >= 2 ** 32) {
                 return err(
                     new Error(
-                        `Path between ${JSON.stringify(this.startSystem.coordinates)} and ${JSON.stringify(this.targetSystem.coordinates)} is too long, exceeding 2^32 elements! There might be a loop somewhere...`
-                    )
+                        `Path between ${JSON.stringify(this.startSystem.coordinates)} and ${JSON.stringify(this.targetSystem.coordinates)} is too long, exceeding 2^32 elements! There might be a loop somewhere...`,
+                    ),
                 );
             }
             path.push(currentCoordinates);

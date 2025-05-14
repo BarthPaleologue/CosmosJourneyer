@@ -60,7 +60,7 @@ function handle_build(data: TransferBuildData): void {
         data.position[2],
         data.seed,
         data.nbVerticesPerSide,
-        terrain_settings
+        terrain_settings,
     );
 
     const result = build_chunk_vertex_data(
@@ -70,7 +70,7 @@ function handle_build(data: TransferBuildData): void {
         normals,
         instances_matrix_buffer,
         aligned_instances_matrix_buffer,
-        scatter_per_square_meter
+        scatter_per_square_meter,
     );
 
     instances_matrix_buffer = instances_matrix_buffer.subarray(0, result.nb_instances_created * 16);
@@ -83,7 +83,7 @@ function handle_build(data: TransferBuildData): void {
             normals: normals,
             instancesMatrixBuffer: instances_matrix_buffer,
             alignedInstancesMatrixBuffer: aligned_instances_matrix_buffer,
-            averageHeight: result.average_height
+            averageHeight: result.average_height,
         } satisfies ReturnedChunkData,
         {
             transfer: [
@@ -91,9 +91,9 @@ function handle_build(data: TransferBuildData): void {
                 indices.buffer,
                 normals.buffer,
                 instances_matrix_buffer.buffer,
-                aligned_instances_matrix_buffer.buffer
-            ]
-        }
+                aligned_instances_matrix_buffer.buffer,
+            ],
+        },
     );
 
     buildData.free();

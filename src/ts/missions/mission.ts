@@ -71,7 +71,7 @@ export class Mission {
     describeNextTask(
         context: MissionContext,
         keyboardLayout: Map<string, string>,
-        starSystemDatabase: StarSystemDatabase
+        starSystemDatabase: StarSystemDatabase,
     ): string {
         return this.tree.describeNextTask(context, keyboardLayout, starSystemDatabase);
     }
@@ -136,7 +136,7 @@ export class Mission {
             missionGiver: this.missionGiver,
             tree: this.tree.serialize(),
             reward: this.reward,
-            type: this.missionType
+            type: this.missionType,
         };
     }
 
@@ -159,7 +159,7 @@ export class Mission {
             missionTree,
             missionSerialized.reward,
             missionSerialized.missionGiver,
-            missionSerialized.type
+            missionSerialized.type,
         );
     }
 }

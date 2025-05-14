@@ -41,7 +41,7 @@ export const StarSystemCoordinatesSchema = z.object({
     /**
      * Floating point Z coordinate of the star system inside the star sector. Must be between -0.5 and 0.5.
      */
-    localZ: z.number()
+    localZ: z.number(),
 });
 
 /**

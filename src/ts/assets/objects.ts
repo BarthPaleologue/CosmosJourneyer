@@ -27,7 +27,7 @@ import {
     PhysicsShape,
     PhysicsShapeConvexHull,
     PhysicsShapeMesh,
-    PhysicsShapeSphere
+    PhysicsShapeSphere,
 } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Scene } from "@babylonjs/core/scene";
 
@@ -70,7 +70,7 @@ export type Objects = {
 export async function loadObjects(
     materials: Materials,
     scene: Scene,
-    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void
+    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void,
 ): Promise<Objects> {
     let loadedCount = 0;
     let totalCount = 0;
@@ -90,7 +90,7 @@ export async function loadObjects(
     const rockPromise = loadAssetInContainerAsync("Rock", rockPath);
     const asteroidPromises = [
         loadAssetInContainerAsync("Asteroid1", asteroidPath),
-        loadAssetInContainerAsync("Asteroid2", asteroid2Path)
+        loadAssetInContainerAsync("Asteroid2", asteroid2Path),
     ];
     const treePromise = loadAssetInContainerAsync("Tree", treePath);
     const sphericalTankPromise = loadAssetInContainerAsync("SphericalTank", sphericalTankPath);
@@ -239,7 +239,7 @@ export async function loadObjects(
     const sphericalTankMaxDimension = Math.max(
         sphericalTankBoundingBox.extendSize.x,
         sphericalTankBoundingBox.extendSize.y,
-        sphericalTankBoundingBox.extendSize.z
+        sphericalTankBoundingBox.extendSize.z,
     );
 
     const sphericalTankTargetDimension = 20;
@@ -274,11 +274,11 @@ export async function loadObjects(
     return {
         stationEngine: {
             mesh: stationEngine,
-            shape: stationEngineShape
+            shape: stationEngineShape,
         },
         sphericalTank: {
             mesh: sphericalTank,
-            shape: sphericalTankPhysicsShape
+            shape: sphericalTankPhysicsShape,
         },
         tree,
         asteroids,
@@ -289,6 +289,6 @@ export async function loadObjects(
         butterfly,
         grassBlades,
         crate,
-        wanderer
+        wanderer,
     };
 }

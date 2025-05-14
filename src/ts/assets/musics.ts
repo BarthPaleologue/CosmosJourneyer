@@ -52,7 +52,7 @@ export type Musics = {
 };
 
 export async function loadMusics(
-    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void
+    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void,
 ): Promise<Musics> {
     let loadedCount = 0;
     let totalCount = 0;
@@ -66,7 +66,7 @@ export async function loadMusics(
                 () => {
                     resolve(sound);
                 },
-                options
+                options,
             );
         });
         totalCount++;
@@ -104,6 +104,6 @@ export async function loadMusics(
         mesmerize: await mesmerizePromise,
         reawakening: await reawakeningPromise,
         equatorialComplex: await equatorialComplexPromise,
-        soaring: await soaringPromise
+        soaring: await soaringPromise,
     };
 }

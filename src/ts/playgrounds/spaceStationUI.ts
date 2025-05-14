@@ -33,7 +33,7 @@ import { enablePhysics } from "./utils";
 
 export async function createSpaceStationUIScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void
+    progressCallback: (progress: number, text: string) => void,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -63,7 +63,7 @@ export async function createSpaceStationUIScene(
         player.spareSpaceshipComponents,
         scene,
         assets,
-        soundPlayer
+        soundPlayer,
     );
     player.instancedSpaceships.push(spaceship);
 

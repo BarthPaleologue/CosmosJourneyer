@@ -9,14 +9,14 @@ export const enum NotificationOrigin {
     GENERAL = "info",
     SPACESHIP = "spaceship",
     EXPLORATION = "exploration",
-    SPACE_STATION = "space-station"
+    SPACE_STATION = "space-station",
 }
 
 export const enum NotificationIntent {
     INFO = "info",
     SUCCESS = "success",
     WARNING = "warning",
-    ERROR = "error"
+    ERROR = "error",
 }
 
 class Notification {
@@ -34,7 +34,7 @@ class Notification {
         intent: NotificationIntent,
         text: string,
         durationSeconds: number,
-        soundPlayer: ISoundPlayer
+        soundPlayer: ISoundPlayer,
     ) {
         let container = document.getElementById("notificationContainer");
         if (container === null) {
@@ -159,7 +159,7 @@ export function createNotification(
     intent: NotificationIntent,
     text: string,
     durationMillis: number,
-    soundPlayer: ISoundPlayer
+    soundPlayer: ISoundPlayer,
 ) {
     const notification = new Notification(type, intent, text, durationMillis / 1000, soundPlayer);
     activeNotifications.push(notification);

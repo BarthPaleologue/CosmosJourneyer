@@ -22,7 +22,7 @@ import {
     getOrbitalPosition,
     getRotationAngle,
     setOrbitalPosition,
-    setRotation
+    setRotation,
 } from "@/architecture/orbitalObjectUtils";
 
 import {
@@ -31,7 +31,7 @@ import {
     OrbitalFacility,
     OrbitalObject,
     Planet,
-    StellarObject
+    StellarObject,
 } from "../architecture/orbitalObject";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { RenderingAssets } from "../assets/renderingAssets";
@@ -120,7 +120,7 @@ export class StarSystemController {
             orbitalFacilities: ReadonlyArray<OrbitalFacility>;
         },
         assets: RenderingAssets,
-        scene: UberScene
+        scene: UberScene,
     ) {
         this.scene = scene;
         this.starFieldBox = new StarFieldBox(assets.textures.environment.milkyWay, scene);
@@ -138,8 +138,8 @@ export class StarSystemController {
             this.objectToParents.set(
                 object,
                 this.getOrbitalObjects().filter((otherObject) =>
-                    object.model.orbit.parentIds.includes(otherObject.model.id)
-                )
+                    object.model.orbit.parentIds.includes(otherObject.model.id),
+                ),
             );
         });
     }
@@ -148,7 +148,7 @@ export class StarSystemController {
         model: DeepReadonly<StarSystemModel>,
         loader: StarSystemLoader,
         assets: RenderingAssets,
-        scene: UberScene
+        scene: UberScene,
     ): Promise<StarSystemController> {
         const result = await loader.load(model, assets, scene);
         return new StarSystemController(model, result, assets, scene);
@@ -278,7 +278,7 @@ export class StarSystemController {
     public initPositions(
         nbWarmUpUpdates: number,
         chunkForge: ChunkForge,
-        postProcessManager: PostProcessManager
+        postProcessManager: PostProcessManager,
     ): void {
         this.update(Date.now() / 1000, chunkForge, postProcessManager);
         for (let i = 0; i < nbWarmUpUpdates; i++) this.update(1 / 60, chunkForge, postProcessManager);
@@ -317,7 +317,7 @@ export class StarSystemController {
                         object.getTransform(),
                         object.getRadius(),
                         object.model,
-                        stellarObjects.map((object) => object.getLight())
+                        stellarObjects.map((object) => object.getLight()),
                     );
                     break;
                 case OrbitalObjectType.JULIA_SET:
@@ -325,7 +325,7 @@ export class StarSystemController {
                         object.getTransform(),
                         object.getRadius(),
                         object.model,
-                        stellarObjects.map((object) => object.getLight())
+                        stellarObjects.map((object) => object.getLight()),
                     );
                     break;
                 case OrbitalObjectType.MANDELBOX:
@@ -333,7 +333,7 @@ export class StarSystemController {
                         object.getTransform(),
                         object.getRadius(),
                         object.model,
-                        stellarObjects.map((object) => object.getLight())
+                        stellarObjects.map((object) => object.getLight()),
                     );
                     break;
                 case OrbitalObjectType.SIERPINSKI_PYRAMID:
@@ -341,7 +341,7 @@ export class StarSystemController {
                         object.getTransform(),
                         object.getRadius(),
                         object.model,
-                        stellarObjects.map((object) => object.getLight())
+                        stellarObjects.map((object) => object.getLight()),
                     );
                     break;
                 case OrbitalObjectType.MENGER_SPONGE:
@@ -349,7 +349,7 @@ export class StarSystemController {
                         object.getTransform(),
                         object.getRadius(),
                         object.model,
-                        stellarObjects.map((object) => object.getLight())
+                        stellarObjects.map((object) => object.getLight()),
                     );
                     break;
                 case OrbitalObjectType.DARK_KNIGHT:
@@ -359,7 +359,7 @@ export class StarSystemController {
         }
 
         postProcessManager.setCelestialBody(
-            this.getNearestCelestialBody(this.scene.getActiveControls().getTransform().getAbsolutePosition())
+            this.getNearestCelestialBody(this.scene.getActiveControls().getTransform().getAbsolutePosition()),
         );
         postProcessManager.rebuild();
     }
@@ -392,7 +392,7 @@ export class StarSystemController {
         // When we are a bit further, we only need to compensate the translation as it would be unnatural not to see the body rotating
         const distanceOfNearestToControls = Vector3.Distance(
             nearestOrbitalObject.getTransform().position,
-            controlsPosition
+            controlsPosition,
         );
 
         // compensate rotation when close to the body
@@ -415,7 +415,7 @@ export class StarSystemController {
             Vector3.TransformNormalToRef(
                 nearestObjectRotationAxis,
                 this.referencePlaneRotation.transpose(),
-                nearestObjectRotationAxis
+                nearestObjectRotationAxis,
             );
 
             const rotation = Matrix.RotationAxis(nearestObjectRotationAxis, -dThetaNearest);
@@ -443,7 +443,7 @@ export class StarSystemController {
             nearestOrbitalObject,
             nearestObjectParents,
             this.referencePlaneRotation,
-            this.elapsedSeconds
+            this.elapsedSeconds,
         );
 
         const nearestBodyDisplacement = newPosition.subtract(initialPosition);
@@ -531,7 +531,7 @@ export class StarSystemController {
      */
     public updateShaders(deltaSeconds: number, postProcessManager: PostProcessManager) {
         const nearestBody = this.getNearestCelestialBody(
-            this.scene.getActiveControls().getTransform().getAbsolutePosition()
+            this.scene.getActiveControls().getTransform().getAbsolutePosition(),
         );
 
         const stellarObjects = this.getStellarObjects();
@@ -540,7 +540,7 @@ export class StarSystemController {
         for (const planet of planetaryMassObjects) {
             planet.updateMaterial(
                 stellarObjects.map((object) => object.getLight()),
-                deltaSeconds
+                deltaSeconds,
             );
         }
 
@@ -557,7 +557,7 @@ export class StarSystemController {
 
     addSystemTarget(
         targetCoordinates: StarSystemCoordinates,
-        starSystemDatabase: StarSystemDatabase
+        starSystemDatabase: StarSystemDatabase,
     ): SystemTarget | null {
         const currentSystemUniversePosition = starSystemDatabase.getSystemGalacticPosition(this.model.coordinates);
         const targetSystemUniversePosition = starSystemDatabase.getSystemGalacticPosition(targetCoordinates);

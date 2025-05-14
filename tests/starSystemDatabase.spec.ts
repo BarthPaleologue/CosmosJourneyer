@@ -39,7 +39,7 @@ describe("StarSystemDatabase", () => {
             const retrievedSystems = database.getSystemModelsInStarSector(
                 customSystem.coordinates.starSectorX,
                 customSystem.coordinates.starSectorY,
-                customSystem.coordinates.starSectorZ
+                customSystem.coordinates.starSectorZ,
             );
             expect(retrievedSystems).toContain(customSystem);
         });
@@ -68,7 +68,7 @@ describe("StarSystemDatabase", () => {
                 starSectorZ: 0,
                 localX: 0,
                 localY: 0,
-                localZ: 0
+                localZ: 0,
             };
             expect(database.isSystemInHumanBubble(closeCoordinates)).toBe(true);
         });
@@ -80,7 +80,7 @@ describe("StarSystemDatabase", () => {
                 starSectorZ: 1000,
                 localX: 0,
                 localY: 0,
-                localZ: 0
+                localZ: 0,
             };
             expect(database.isSystemInHumanBubble(farCoordinates)).toBe(false);
         });

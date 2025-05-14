@@ -32,7 +32,7 @@ export function getLoneStarSystem(): StarSystemModel {
             starSectorZ: 8,
             localX: 0.5,
             localY: 0.2,
-            localZ: 0.8
+            localZ: 0.8,
         },
         stellarObjects: [
             {
@@ -51,12 +51,12 @@ export function getLoneStarSystem(): StarSystemModel {
                     longitudeOfAscendingNode: 0,
                     argumentOfPeriapsis: 0,
                     initialMeanAnomaly: 0,
-                    p: 2
+                    p: 2,
                 },
                 rings: null,
                 siderealDaySeconds: 0,
-                seed: 0
-            }
+                seed: 0,
+            },
         ],
         planets: [],
         satellites: [],
@@ -72,7 +72,7 @@ export function getLoneStarSystem(): StarSystemModel {
                 axialTilt: 0,
                 orbit: OrbitSchema.parse({
                     parentIds: ["loneStar"],
-                    semiMajorAxis: Settings.SOLAR_RADIUS * 10
+                    semiMajorAxis: Settings.SOLAR_RADIUS * 10,
                 }),
                 seed: 0,
                 faction: Faction.SATORI_CONCORD,
@@ -85,11 +85,11 @@ export function getLoneStarSystem(): StarSystemModel {
                     starSectorZ: 8,
                     localX: 0.5,
                     localY: 0.2,
-                    localZ: 0.8
+                    localZ: 0.8,
                 },
                 populationDensity: 1e3,
-                nbHydroponicLayers: 10
-            }
-        ]
+                nbHydroponicLayers: 10,
+            },
+        ],
     };
 }

@@ -46,7 +46,7 @@ export class OceanPostProcess extends PostProcess implements UpdatablePostProces
         oceanUniforms: OceanUniforms,
         stellarObjects: ReadonlyArray<PointLight>,
         oceanTextures: WaterTextures,
-        scene: Scene
+        scene: Scene,
     ) {
         const shaderName = "ocean";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
@@ -57,7 +57,7 @@ export class OceanPostProcess extends PostProcess implements UpdatablePostProces
             ...Object.values(CameraUniformNames),
             ...Object.values(StellarObjectUniformNames),
             ...Object.values(ObjectUniformNames),
-            ...oceanUniforms.getUniformNames()
+            ...oceanUniforms.getUniformNames(),
         ];
 
         const samplers: string[] = [...Object.values(SamplerUniformNames), ...oceanUniforms.getSamplerNames()];
@@ -73,7 +73,7 @@ export class OceanPostProcess extends PostProcess implements UpdatablePostProces
             scene.getEngine(),
             false,
             null,
-            Constants.TEXTURETYPE_HALF_FLOAT
+            Constants.TEXTURETYPE_HALF_FLOAT,
         );
 
         this.planetTransform = planetTransform;

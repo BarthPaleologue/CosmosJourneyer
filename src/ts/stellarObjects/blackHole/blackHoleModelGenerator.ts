@@ -32,7 +32,7 @@ export function newSeededBlackHoleModel(
     id: string,
     seed: number,
     name: string,
-    parentBodies: DeepReadonly<Array<CelestialBodyModel>>
+    parentBodies: DeepReadonly<Array<CelestialBodyModel>>,
 ): BlackHoleModel {
     const rng = getRngFromSeed(seed);
 
@@ -54,7 +54,7 @@ export function newSeededBlackHoleModel(
         inclination: 0,
         longitudeOfAscendingNode: 0,
         argumentOfPeriapsis: 0,
-        initialMeanAnomaly: 0
+        initialMeanAnomaly: 0,
     };
 
     const blackHoleMass = getMassFromSchwarzschildRadius(radius);
@@ -73,7 +73,7 @@ export function newSeededBlackHoleModel(
         siderealDaySeconds: blackHoleSiderealDaySeconds,
         axialTilt: blackHoleAxialTilt,
         accretionDiskRadius: blackHoleAccretionDiskRadius,
-        orbit
+        orbit,
     };
 }
 

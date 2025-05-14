@@ -7,7 +7,7 @@ test("The asteroid field playground renders correctly", async ({ page }) => {
         scene: "asteroidField",
         shotName: "baseline",
         flagToWait: "frozen",
-        urlParams: { freeze: 3 }
+        urlParams: { freeze: 3 },
     });
 });
 
@@ -16,6 +16,6 @@ test("The asteroid field playground has correct physics", async ({ page }) => {
         scene: "asteroidField",
         shotName: "baseline-physics",
         flagToWait: "frozen",
-        urlParams: { physicsViewer: "", freeze: 3 }
+        urlParams: { physicsViewer: "", freeze: 3 },
     });
 });

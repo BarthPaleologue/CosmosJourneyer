@@ -58,16 +58,16 @@ export class EngineBay implements Transformable {
                 diameterTop: 100,
                 height: 400,
                 diameterBottom: 250,
-                tessellation: nbEngines
+                tessellation: nbEngines,
             },
-            scene
+            scene,
         );
         this.skirt.convertToFlatShadedMesh();
 
         this.skirtMaterial = new MetalSectionMaterial(
             "EngineBayMetalSectionMaterial",
             assets.textures.materials.metalPanels,
-            scene
+            scene,
         );
 
         this.skirt.material = this.skirtMaterial;

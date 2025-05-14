@@ -25,7 +25,7 @@ import { factionToString } from "../../society/factions";
 
 export function generateInfoHTML(
     model: DeepReadonly<OrbitalFacilityModel>,
-    parentModels: DeepReadonly<Array<OrbitalObjectModel>>
+    parentModels: DeepReadonly<Array<OrbitalObjectModel>>,
 ): string {
     const agricultureMix = model.agricultureMix;
 
@@ -50,7 +50,7 @@ export function generateInfoHTML(
         ${makeD3PieChart<[number, CropType]>(
             agricultureMix,
             ([proportion]) => proportion,
-            ([, cropType]) => cropTypeToString(cropType)
+            ([, cropType]) => cropTypeToString(cropType),
         )}
     `;
 }

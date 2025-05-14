@@ -37,7 +37,7 @@ import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import {
     axisCompositeToString,
     dPadCompositeToString,
-    pressInteractionToStrings
+    pressInteractionToStrings,
 } from "../utils/strings/inputControlsString";
 import { Result } from "../utils/types";
 import { Tutorial } from "./tutorial";
@@ -67,16 +67,16 @@ export class StarMapTutorial implements Tutorial {
             ${i18n.t("tutorials:common:navigationInfo", {
                 // This displays a small internationalized text to explain the keys to navigate the tutorial
                 nextKeys: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keyboardLayoutMap).join(
-                    ` ${i18n.t("common:or")} `
+                    ` ${i18n.t("common:or")} `,
                 ),
                 previousKeys: pressInteractionToStrings(TutorialControlsInputs.map.prevPanel, keyboardLayoutMap).join(
-                    ` ${i18n.t("common:or")} `
-                )
+                    ` ${i18n.t("common:or")} `,
+                ),
             })}
         </div>`;
 
         const toggleStarMapKeys = pressInteractionToStrings(GeneralInputs.map.toggleStarMap, keyboardLayoutMap).join(
-            ` ${i18n.t("common:or")} `
+            ` ${i18n.t("common:or")} `,
         );
 
         const howToOpenPanelHtml = `
@@ -89,11 +89,11 @@ export class StarMapTutorial implements Tutorial {
 
         const horizontalKeys = dPadCompositeToString(
             StarMapInputs.map.move.bindings[0]?.control as DPadComposite,
-            keyboardLayoutMap
+            keyboardLayoutMap,
         );
         const verticalKeys = axisCompositeToString(
             StarMapInputs.map.upDown.bindings[0]?.control as AxisComposite,
-            keyboardLayoutMap
+            keyboardLayoutMap,
         );
         const rawKeys = horizontalKeys.concat(verticalKeys);
 
@@ -122,7 +122,7 @@ export class StarMapTutorial implements Tutorial {
         </div>`;
 
         const jumpKeys = pressInteractionToStrings(StarSystemInputs.map.jumpToSystem, keyboardLayoutMap).join(
-            ` ${i18n.t("common:or")} `
+            ` ${i18n.t("common:or")} `,
         );
 
         const howToInterstellarTravelPanelHtml = `
@@ -140,8 +140,8 @@ export class StarMapTutorial implements Tutorial {
             ${i18n.t("tutorials:common:tutorialEnding", {
                 // This displays a small internationalized text to explain the keys to end the tutorial
                 keyQuit: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keyboardLayoutMap).join(
-                    ` ${i18n.t("common:or")} `
-                )
+                    ` ${i18n.t("common:or")} `,
+                ),
             })}
         </div>`;
 
@@ -152,7 +152,7 @@ export class StarMapTutorial implements Tutorial {
             howToMissionsPanelHtml,
             howToInteractWithSystemPanelHtml,
             howToInterstellarTravelPanelHtml,
-            endPanelHtml
+            endPanelHtml,
         ];
     }
 }

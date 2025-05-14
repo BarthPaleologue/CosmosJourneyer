@@ -75,7 +75,7 @@ import {
     getForwardDirection,
     getRotationQuaternion,
     setRotationQuaternion,
-    translate
+    translate,
 } from "../uberCore/transforms/basicTransform";
 import { UberScene } from "../uberCore/uberScene";
 import { SpaceShipLayer } from "../ui/spaceShipLayer";
@@ -236,7 +236,7 @@ export class StarSystemView implements View {
         starSystemDatabase: StarSystemDatabase,
         soundPlayer: ISoundPlayer,
         tts: ITts,
-        assets: RenderingAssets
+        assets: RenderingAssets,
     ) {
         this.player = player;
         this.encyclopaedia = encyclopaedia;
@@ -303,7 +303,7 @@ export class StarSystemView implements View {
             else return;
 
             const currentSystemPosition = this.starSystemDatabase.getSystemGalacticPosition(
-                this.getStarSystem().model.coordinates
+                this.getStarSystem().model.coordinates,
             );
             const targetSystemPosition = this.starSystemDatabase.getSystemGalacticPosition(target.systemCoordinates);
 
@@ -317,7 +317,7 @@ export class StarSystemView implements View {
                     NotificationIntent.ERROR,
                     i18n.t("notifications:notEnoughFuel"),
                     5000,
-                    this.soundPlayer
+                    this.soundPlayer,
                 );
                 this.jumpLock = false;
                 return;
@@ -338,7 +338,7 @@ export class StarSystemView implements View {
                 shipControls.getTransform(),
                 rotationAxis,
                 rotationAngle,
-                rotationAngle * 2
+                rotationAngle * 2,
             );
             await new Promise<void>((resolve) => {
                 const observer = this.scene.onBeforePhysicsObservable.add(() => {
@@ -401,13 +401,13 @@ export class StarSystemView implements View {
                 translate(
                     characterControls.getTransform(),
                     getForwardDirection(shipControls.getTransform()).scale(
-                        3 + shipControls.getSpaceship().boundingExtent.z / 2
-                    )
+                        3 + shipControls.getSpaceship().boundingExtent.z / 2,
+                    ),
                 );
 
                 setRotationQuaternion(
                     characterControls.getTransform(),
-                    getRotationQuaternion(shipControls.getTransform()).clone()
+                    getRotationQuaternion(shipControls.getTransform()).clone(),
                 );
                 SpaceShipControlsInputs.setEnabled(false);
                 this.spaceShipLayer.setVisibility(false);
@@ -433,10 +433,10 @@ export class StarSystemView implements View {
                         NotificationOrigin.SPACESHIP,
                         NotificationIntent.INFO,
                         i18n.t("notifications:howToLiftOff", {
-                            bindingsString: axisCompositeToString(control, keyboardLayoutMap)[1]?.[1]
+                            bindingsString: axisCompositeToString(control, keyboardLayoutMap)[1]?.[1],
                         }),
                         5000,
-                        this.soundPlayer
+                        this.soundPlayer,
                     );
                 }
             }
@@ -474,7 +474,7 @@ export class StarSystemView implements View {
             this.player,
             this.encyclopaedia,
             this.starSystemDatabase,
-            this.soundPlayer
+            this.soundPlayer,
         );
         this.spaceStationLayer.setVisibility(false);
         this.spaceStationLayer.onTakeOffObservable.add(() => {
@@ -547,11 +547,11 @@ export class StarSystemView implements View {
                     this.starSystemDatabase,
                     this.scene,
                     this.assets,
-                    this.soundPlayer
+                    this.soundPlayer,
                 );
 
                 const landingPad = spaceStation.getLandingPadManager().handleLandingRequest({
-                    minimumPadSize: LandingPadSize.SMALL
+                    minimumPadSize: LandingPadSize.SMALL,
                 });
 
                 if (landingPad === null) {
@@ -584,7 +584,7 @@ export class StarSystemView implements View {
         } else {
             // place player in the direction of the previous system (where we came from)
             const currentSystemPosition = this.starSystemDatabase.getSystemGalacticPosition(
-                starSystem.model.coordinates
+                starSystem.model.coordinates,
             );
             const previousSystemPosition = this.starSystemDatabase.getSystemGalacticPosition(previousSystem);
 
@@ -593,7 +593,7 @@ export class StarSystemView implements View {
             Vector3.TransformCoordinatesToRef(
                 placementDirection,
                 starSystem.starFieldBox.getRotationMatrix(),
-                placementDirection
+                placementDirection,
             );
 
             // offset the player from the first body
@@ -616,7 +616,7 @@ export class StarSystemView implements View {
         for (const neighbor of getNeighborStarSystemCoordinates(
             starSystem.model.coordinates,
             Math.min(currentJumpRange, Settings.VISIBLE_NEIGHBORHOOD_MAX_RADIUS_LY),
-            this.starSystemDatabase
+            this.starSystemDatabase,
         )) {
             const systemTarget = this.getStarSystem().addSystemTarget(neighbor.coordinates, this.starSystemDatabase);
             if (systemTarget === null) {
@@ -674,7 +674,7 @@ export class StarSystemView implements View {
             this.player.spareSpaceshipComponents,
             this.scene,
             this.assets,
-            this.soundPlayer
+            this.soundPlayer,
         );
         this.player.instancedSpaceships.push(spaceship);
 
@@ -737,15 +737,15 @@ export class StarSystemView implements View {
         }
 
         const nearestOrbitalObject = starSystem.getNearestOrbitalObject(
-            this.scene.getActiveControls().getTransform().getAbsolutePosition()
+            this.scene.getActiveControls().getTransform().getAbsolutePosition(),
         );
         const nearestCelestialBody = starSystem.getNearestCelestialBody(
-            this.scene.getActiveControls().getTransform().getAbsolutePosition()
+            this.scene.getActiveControls().getTransform().getAbsolutePosition(),
         );
 
         const distanceToNearesetCelestialBody2 = Vector3.DistanceSquared(
             nearestCelestialBody.getTransform().getAbsolutePosition(),
-            this.scene.getActiveControls().getTransform().getAbsolutePosition()
+            this.scene.getActiveControls().getTransform().getAbsolutePosition(),
         );
 
         const spaceship = this.spaceshipControls.getSpaceship();
@@ -763,10 +763,10 @@ export class StarSystemView implements View {
                     NotificationOrigin.EXPLORATION,
                     NotificationIntent.SUCCESS,
                     i18n.t("notifications:newDiscovery", {
-                        objectName: nearestCelestialBody.model.name
+                        objectName: nearestCelestialBody.model.name,
                     }),
                     15_000,
-                    this.soundPlayer
+                    this.soundPlayer,
                 );
                 this.tts.enqueueSay(Speaker.CHARLOTTE, VoiceLine.NEW_DISCOVERY);
                 this.onNewDiscovery.notifyObservers(universeId);
@@ -793,7 +793,7 @@ export class StarSystemView implements View {
             target !== null
                 ? Vector3.Distance(
                       this.spaceshipControls.getTransform().getAbsolutePosition(),
-                      target.getTransform().getAbsolutePosition()
+                      target.getTransform().getAbsolutePosition(),
                   ) / Settings.LIGHT_YEAR
                 : 0;
 
@@ -801,7 +801,7 @@ export class StarSystemView implements View {
 
         this.spaceShipLayer.displayFuel(
             spaceship.getRemainingFuel() / spaceship.getTotalFuelCapacity(),
-            fuelRequiredForJump / spaceship.getTotalFuelCapacity()
+            fuelRequiredForJump / spaceship.getTotalFuelCapacity(),
         );
 
         this.characterControls.setClosestWalkableObject(nearestOrbitalObject);
@@ -823,7 +823,7 @@ export class StarSystemView implements View {
             currentSystem: starSystem,
             currentItinerary: this.player.currentItinerary,
             playerPosition: this.scene.getActiveControls().getTransform().getAbsolutePosition(),
-            physicsEngine: this.scene.getPhysicsEngine() as PhysicsEngineV2
+            physicsEngine: this.scene.getPhysicsEngine() as PhysicsEngineV2,
         };
 
         const newlyCompletedMissions: Mission[] = [];
@@ -846,22 +846,22 @@ export class StarSystemView implements View {
         this.assets.materials.butterfly.update(
             stellarObjects,
             this.scene.getActiveControls().getTransform().getAbsolutePosition(),
-            deltaSeconds
+            deltaSeconds,
         );
         this.assets.materials.butterflyDepth.update(
             stellarObjects,
             this.scene.getActiveControls().getTransform().getAbsolutePosition(),
-            deltaSeconds
+            deltaSeconds,
         );
         this.assets.materials.grass.update(
             stellarObjects,
             this.scene.getActiveControls().getTransform().getAbsolutePosition(),
-            deltaSeconds
+            deltaSeconds,
         );
         this.assets.materials.grassDepth.update(
             stellarObjects,
             this.scene.getActiveControls().getTransform().getAbsolutePosition(),
-            deltaSeconds
+            deltaSeconds,
         );
     }
 
@@ -880,14 +880,14 @@ export class StarSystemView implements View {
             currentSystem: starSystem,
             currentItinerary: this.player.currentItinerary,
             playerPosition: activeControls.getTransform().getAbsolutePosition(),
-            physicsEngine: this.scene.getPhysicsEngine() as PhysicsEngineV2
+            physicsEngine: this.scene.getPhysicsEngine() as PhysicsEngineV2,
         };
 
         this.spaceShipLayer.update(
             activeControls.getTransform(),
             missionContext,
             this.keyboardLayoutMap,
-            this.starSystemDatabase
+            this.starSystemDatabase,
         );
 
         this.targetCursorLayer.update(activeControls.getActiveCamera());
@@ -913,7 +913,7 @@ export class StarSystemView implements View {
                                 .getOrbitalObjects()
                                 .map((object) => object.model)
                                 .filter((object) => spaceStation.model.orbit.parentIds.includes(object.id)),
-                            this.player
+                            this.player,
                         );
                         return true;
                     }
@@ -925,7 +925,7 @@ export class StarSystemView implements View {
 
         this.targetCursorLayer.setEnabled(this.isUiEnabled && !spaceship.isLandedAtFacility());
         this.spaceShipLayer.setVisibility(
-            this.isUiEnabled && activeControls === this.spaceshipControls && !spaceship.isLandedAtFacility()
+            this.isUiEnabled && activeControls === this.spaceshipControls && !spaceship.isLandedAtFacility(),
         );
     }
 
@@ -974,7 +974,7 @@ export class StarSystemView implements View {
         await this.scene.setActiveControls(shipControls);
         setRotationQuaternion(
             shipControls.getTransform(),
-            getRotationQuaternion(defaultControls.getTransform()).clone()
+            getRotationQuaternion(defaultControls.getTransform()).clone(),
         );
 
         shipControls.getSpaceship().setEnabled(true, this.havokPlugin);
@@ -997,7 +997,7 @@ export class StarSystemView implements View {
         await this.scene.setActiveControls(characterControls);
         setRotationQuaternion(
             characterControls.getTransform(),
-            getRotationQuaternion(defaultControls.getTransform()).clone()
+            getRotationQuaternion(defaultControls.getTransform()).clone(),
         );
 
         const spaceship = shipControls.getSpaceship();
@@ -1032,17 +1032,17 @@ export class StarSystemView implements View {
         await this.scene.setActiveControls(defaultControls);
         setRotationQuaternion(
             defaultControls.getTransform(),
-            getRotationQuaternion(shipControls.getTransform()).clone()
+            getRotationQuaternion(shipControls.getTransform()).clone(),
         );
 
         if (showHelpNotification) {
             const horizontalKeys = dPadCompositeToString(
                 DefaultControlsInputs.map.move.bindings[0]?.control as DPadComposite,
-                keyboardLayoutMap
+                keyboardLayoutMap,
             );
             const verticalKeys = axisCompositeToString(
                 DefaultControlsInputs.map.upDown.bindings[0]?.control as AxisComposite,
-                keyboardLayoutMap
+                keyboardLayoutMap,
             );
             const keys = horizontalKeys.concat(verticalKeys);
             createNotification(
@@ -1050,7 +1050,7 @@ export class StarSystemView implements View {
                 NotificationIntent.INFO,
                 `Move using ${keys.map((key) => key[1].replace("Key", "")).join(", ")}`,
                 20_000,
-                this.soundPlayer
+                this.soundPlayer,
             );
         }
     }

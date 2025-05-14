@@ -43,7 +43,7 @@ export class SpaceElevatorClimber implements Targetable {
         solarPanelMaterial: SolarPanelMaterial,
         climberTextures: PBRTextures,
         metalTextures: PBRTextures,
-        scene: Scene
+        scene: Scene,
     ) {
         this.transform = new TransformNode("SpaceElevatorClimber", scene);
 
@@ -51,7 +51,7 @@ export class SpaceElevatorClimber implements Targetable {
         this.metalSectionMaterial = new MetalSectionMaterial(
             "SpaceElevatorClimberMetalSectionMaterial",
             metalTextures,
-            scene
+            scene,
         );
 
         const angleSubtracted = Math.PI / 6;
@@ -76,9 +76,9 @@ export class SpaceElevatorClimber implements Targetable {
             {
                 path: rightPath,
                 cap: Mesh.CAP_ALL,
-                radius: innerRadius
+                radius: innerRadius,
             },
-            scene
+            scene,
         );
         rightRing.scaling.y = yThickness;
         rightRing.parent = this.transform;
@@ -93,9 +93,9 @@ export class SpaceElevatorClimber implements Targetable {
             {
                 height: globalRadius * 2,
                 width: (innerRadius * yThickness) / 4,
-                depth: (innerRadius * yThickness) / 4
+                depth: (innerRadius * yThickness) / 4,
             },
-            scene
+            scene,
         );
         arm1.material = this.metalSectionMaterial;
         arm1.rotate(Axis.Z, Math.PI / 2, Space.WORLD);
@@ -120,9 +120,9 @@ export class SpaceElevatorClimber implements Targetable {
             {
                 width: solarPanelWidth,
                 height: solarPanelThickness,
-                depth: solarPanelDepth
+                depth: solarPanelDepth,
             },
-            scene
+            scene,
         );
         solarPanel1.material = this.solarPanelMaterial;
         solarPanel1.position.x = globalRadius + solarPanelWidth / 2;
@@ -133,7 +133,7 @@ export class SpaceElevatorClimber implements Targetable {
             -solarPanelAngleSpacing,
             Math.PI + solarPanelAngleSpacing,
             Math.PI - solarPanelAngleSpacing,
-            Math.PI
+            Math.PI,
         ];
 
         angles.forEach((angle, index) => {
@@ -147,7 +147,7 @@ export class SpaceElevatorClimber implements Targetable {
         this.targetInfo = {
             type: ObjectTargetCursorType.FACILITY,
             minDistance: this.getBoundingRadius() * 7.0,
-            maxDistance: this.getBoundingRadius() * 3000
+            maxDistance: this.getBoundingRadius() * 3000,
         };
     }
 

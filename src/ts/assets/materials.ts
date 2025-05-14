@@ -53,7 +53,7 @@ export function initMaterials(textures: Textures, scene: Scene): Materials {
         grassDepth: new GrassMaterial(scene, textures.noises, true),
         crate: crateMaterial,
         solarPanel: new SolarPanelMaterial(textures.materials.solarPanel, scene),
-        tree: treeMaterial
+        tree: treeMaterial,
     };
 }
 

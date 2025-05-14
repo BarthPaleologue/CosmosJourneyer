@@ -11,11 +11,11 @@ import { LandingComputer, LandingComputerStatusBit, LandingTargetKind } from "./
 
 // Mock BabylonJS classes
 vi.mock("@babylonjs/core/Physics/v2/physicsAggregate", () => ({
-    PhysicsAggregate: vi.fn()
+    PhysicsAggregate: vi.fn(),
 }));
 
 vi.mock("@babylonjs/core/Physics/v2/physicsBody", () => ({
-    PhysicsBody: vi.fn()
+    PhysicsBody: vi.fn(),
 }));
 
 describe("LandingComputer", () => {
@@ -31,13 +31,13 @@ describe("LandingComputer", () => {
             getAbsolutePosition: vi.fn().mockReturnValue(new Vector3(0, 0, 0)),
             getHierarchyBoundingVectors: vi.fn().mockReturnValue({
                 min: new Vector3(-1, -1, -1),
-                max: new Vector3(1, 1, 1)
+                max: new Vector3(1, 1, 1),
             }),
             absoluteRotationQuaternion: new Quaternion(),
             up: Vector3.Up(),
             right: Vector3.Right(),
             forward: Vector3.Forward(),
-            position: new Vector3(0, 0, 0)
+            position: new Vector3(0, 0, 0),
         } as unknown as TransformNode;
 
         mockPhysicsBody = {
@@ -45,18 +45,18 @@ describe("LandingComputer", () => {
             getAngularVelocity: vi.fn().mockReturnValue(new Vector3(0, 0, 0)),
             getMassProperties: vi.fn().mockReturnValue({ mass: 1 }),
             applyForce: vi.fn(),
-            applyAngularImpulse: vi.fn()
+            applyAngularImpulse: vi.fn(),
         } as unknown as PhysicsBody;
 
         mockAggregate = {
             transformNode: mockTransform,
-            body: mockPhysicsBody
+            body: mockPhysicsBody,
         } as unknown as PhysicsAggregate;
 
         mockPhysicsEngine = {
             raycastToRef: vi.fn().mockImplementation((start, end, result: PhysicsRaycastResult) => {
                 result.setHitData(Vector3.Up(), Vector3.Zero(), 0);
-            })
+            }),
         } as unknown as PhysicsEngineV2;
 
         landingComputer = new LandingComputer(mockAggregate, mockPhysicsEngine);
@@ -71,14 +71,14 @@ describe("LandingComputer", () => {
             getTransform: () => ({
                 getAbsolutePosition: () => new Vector3(0, 10, 0),
                 up: Vector3.Up(),
-                absoluteRotationQuaternion: new Quaternion()
+                absoluteRotationQuaternion: new Quaternion(),
             }),
-            padHeight: 2
+            padHeight: 2,
         } as unknown as LandingPad;
 
         landingComputer.setTarget({
             kind: LandingTargetKind.LANDING_PAD,
-            landingPad: mockLandingPad
+            landingPad: mockLandingPad,
         });
 
         expect(landingComputer.getTarget()).not.toBeNull();
@@ -87,12 +87,12 @@ describe("LandingComputer", () => {
 
     it("should set celestial body target", () => {
         const mockCelestialBody = {
-            position: new Vector3(0, 100, 0)
+            position: new Vector3(0, 100, 0),
         } as unknown as TransformNode;
 
         landingComputer.setTarget({
             kind: LandingTargetKind.CELESTIAL_BODY,
-            celestialBody: mockCelestialBody
+            celestialBody: mockCelestialBody,
         });
 
         expect(landingComputer.getTarget()).not.toBeNull();
@@ -109,14 +109,14 @@ describe("LandingComputer", () => {
             getTransform: () => ({
                 getAbsolutePosition: () => new Vector3(0, 10, 0),
                 up: Vector3.Up(),
-                absoluteRotationQuaternion: new Quaternion()
+                absoluteRotationQuaternion: new Quaternion(),
             }),
-            padHeight: 2
+            padHeight: 2,
         } as unknown as LandingPad;
 
         landingComputer.setTarget({
             kind: LandingTargetKind.LANDING_PAD,
-            landingPad: mockLandingPad
+            landingPad: mockLandingPad,
         });
 
         // Simulate passage of time beyond timeout
@@ -130,14 +130,14 @@ describe("LandingComputer", () => {
             getTransform: () => ({
                 getAbsolutePosition: () => new Vector3(0, 10, 0),
                 up: Vector3.Up(),
-                absoluteRotationQuaternion: new Quaternion()
+                absoluteRotationQuaternion: new Quaternion(),
             }),
-            padHeight: 2
+            padHeight: 2,
         } as unknown as LandingPad;
 
         landingComputer.setTarget({
             kind: LandingTargetKind.LANDING_PAD,
-            landingPad: mockLandingPad
+            landingPad: mockLandingPad,
         });
 
         const status = landingComputer.update(0.016);

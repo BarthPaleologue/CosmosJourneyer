@@ -10,7 +10,7 @@ export async function renderAndSnap(
             [key: string]: string | number;
         };
         flagToWait: string;
-    }
+    },
 ) {
     const urlParams = new URLSearchParams();
     if (opts.scene !== undefined) urlParams.set("scene", opts.scene);

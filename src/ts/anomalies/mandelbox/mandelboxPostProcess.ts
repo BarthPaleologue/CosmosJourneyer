@@ -31,7 +31,7 @@ import { ObjectUniformNames, setObjectUniforms } from "../../postProcesses/unifo
 import { SamplerUniformNames, setSamplerUniforms } from "../../postProcesses/uniforms/samplerUniforms";
 import {
     setStellarObjectUniforms,
-    StellarObjectUniformNames
+    StellarObjectUniformNames,
 } from "../../postProcesses/uniforms/stellarObjectUniforms";
 import { UpdatablePostProcess } from "../../postProcesses/updatablePostProcess";
 import { MandelboxModel } from "./mandelboxModel";
@@ -48,7 +48,7 @@ export class MandelboxPostProcess extends PostProcess implements UpdatablePostPr
         boundingRadius: number,
         model: DeepReadonly<MandelboxModel>,
         scene: Scene,
-        stellarObjects: ReadonlyArray<PointLight>
+        stellarObjects: ReadonlyArray<PointLight>,
     ) {
         const shaderName = "mandelbox";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
@@ -60,14 +60,14 @@ export class MandelboxPostProcess extends PostProcess implements UpdatablePostPr
             ELAPSED_SECONDS: "elapsedSeconds",
             MR2: "mr2",
             SPREAD: "spread",
-            AVERAGE_SCREEN_SIZE: "averageScreenSize"
+            AVERAGE_SCREEN_SIZE: "averageScreenSize",
         };
 
         const uniforms: string[] = [
             ...Object.values(ObjectUniformNames),
             ...Object.values(CameraUniformNames),
             ...Object.values(StellarObjectUniformNames),
-            ...Object.values(MandelboxUniformNames)
+            ...Object.values(MandelboxUniformNames),
         ];
 
         const samplers: string[] = Object.values(SamplerUniformNames);
@@ -83,7 +83,7 @@ export class MandelboxPostProcess extends PostProcess implements UpdatablePostPr
             scene.getEngine(),
             false,
             null,
-            Constants.TEXTURETYPE_HALF_FLOAT
+            Constants.TEXTURETYPE_HALF_FLOAT,
         );
 
         this.onActivateObservable.add((camera) => {
@@ -105,7 +105,7 @@ export class MandelboxPostProcess extends PostProcess implements UpdatablePostPr
             effect.setFloat(MandelboxUniformNames.ELAPSED_SECONDS, this.elapsedSeconds);
             effect.setFloat(
                 MandelboxUniformNames.AVERAGE_SCREEN_SIZE,
-                (scene.getEngine().getRenderWidth() + scene.getEngine().getRenderHeight()) / 2
+                (scene.getEngine().getRenderWidth() + scene.getEngine().getRenderHeight()) / 2,
             );
 
             setSamplerUniforms(effect, this.activeCamera, scene);

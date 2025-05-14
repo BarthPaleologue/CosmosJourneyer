@@ -34,11 +34,11 @@ export const BlackHoleUniformNames = {
     WARPING_MINKOWSKI_FACTOR: "warpingMinkowskiFactor",
     ROTATION_PERIOD: "rotationPeriod",
     ROTATION_AXIS: "rotationAxis",
-    FORWARD_AXIS: "forwardAxis"
+    FORWARD_AXIS: "forwardAxis",
 };
 
 export const BlackHoleSamplerNames = {
-    STARFIELD_TEXTURE: "starfieldTexture"
+    STARFIELD_TEXTURE: "starfieldTexture",
 };
 
 export class BlackHoleUniforms {

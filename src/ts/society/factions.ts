@@ -7,7 +7,7 @@ export const enum Faction {
     FEYNMAN_INTERSTELLAR,
     CHURCH_OF_AWAKENING,
     HUMAN_COMMONWEALTH,
-    SATORI_CONCORD
+    SATORI_CONCORD,
 }
 
 export function factionToString(faction: Faction): string {

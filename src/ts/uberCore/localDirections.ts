@@ -23,5 +23,5 @@ export const LocalDirection = {
     UP: new Vector3(0, 1, 0),
     DOWN: new Vector3(0, -1, 0),
     RIGHT: new Vector3(-1, 0, 0),
-    LEFT: new Vector3(1, 0, 0)
+    LEFT: new Vector3(1, 0, 0),
 } as const;

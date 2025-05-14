@@ -113,8 +113,8 @@ export class CurrentMissionDisplay {
                 [{ transform: "scale(1)" }, { transform: "scale(1.1)" }, { transform: "scale(1)" }],
                 {
                     duration: 200,
-                    easing: "ease"
-                }
+                    easing: "ease",
+                },
             );
             soundPlayer.playNow(SoundType.CLICK);
         });
@@ -125,8 +125,8 @@ export class CurrentMissionDisplay {
                 [{ transform: "scale(1)" }, { transform: "scale(1.1)" }, { transform: "scale(1)" }],
                 {
                     duration: 200,
-                    easing: "ease"
-                }
+                    easing: "ease",
+                },
             );
             soundPlayer.playNow(SoundType.CLICK);
         });
@@ -135,7 +135,7 @@ export class CurrentMissionDisplay {
     public update(
         context: MissionContext,
         keyboardLayout: Map<string, string>,
-        starSystemDatabase: StarSystemDatabase
+        starSystemDatabase: StarSystemDatabase,
     ) {
         const allMissions = this.player.completedMissions.concat(this.player.currentMissions);
         this.buttonContainer.hidden = allMissions.length <= 1;

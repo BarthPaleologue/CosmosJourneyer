@@ -120,7 +120,7 @@ export class Player {
         this.discoveries.local.push({
             objectId,
             discoveryTimestamp: Date.now(),
-            explorerName: this.getName()
+            explorerName: this.getName(),
         });
 
         return true;
@@ -146,10 +146,10 @@ export class Player {
                     flightCompleted: false,
                     stationLandingCompleted: false,
                     starMapCompleted: false,
-                    fuelScoopingCompleted: false
-                }
+                    fuelScoopingCompleted: false,
+                },
             },
-            starSystemDatabase
+            starSystemDatabase,
         );
     }
 
@@ -171,10 +171,10 @@ export class Player {
             currentMissions: player.currentMissions.map((mission) => mission.serialize()),
             completedMissions: player.completedMissions.map((mission) => mission.serialize()),
             spaceShips: player.serializedSpaceships.concat(
-                player.instancedSpaceships.map((spaceship) => spaceship.serialize())
+                player.instancedSpaceships.map((spaceship) => spaceship.serialize()),
             ),
             spareSpaceshipComponents: Array.from(player.spareSpaceshipComponents),
-            tutorials: player.tutorials
+            tutorials: player.tutorials,
         };
     }
 
@@ -192,7 +192,7 @@ export class Player {
 
         this.discoveries = {
             local: player.discoveries.local.map((objectId) => structuredClone(objectId)),
-            uploaded: player.discoveries.uploaded.map((objectId) => structuredClone(objectId))
+            uploaded: player.discoveries.uploaded.map((objectId) => structuredClone(objectId)),
         };
         this.visitedObjects.clear();
         player.visitedObjects.forEach((objectId) => {

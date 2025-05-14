@@ -79,7 +79,7 @@ const spaceRenderingOrder: PostProcessType[] = [
     PostProcessType.SIERPINSKI_PYRAMID,
     PostProcessType.MENGER_SPONGE,
     PostProcessType.RING,
-    PostProcessType.BLACK_HOLE
+    PostProcessType.BLACK_HOLE,
 ];
 
 /**
@@ -97,7 +97,7 @@ const surfaceRenderingOrder: PostProcessType[] = [
     PostProcessType.RING,
     PostProcessType.OCEAN,
     PostProcessType.CLOUDS,
-    PostProcessType.ATMOSPHERE
+    PostProcessType.ATMOSPHERE,
 ];
 
 /**
@@ -170,7 +170,7 @@ export class PostProcessManager {
         this.blackHoles,
         this.matterJets,
         this.shadows,
-        this.lensFlares
+        this.lensFlares,
     ];
 
     /**
@@ -184,7 +184,7 @@ export class PostProcessManager {
         this.mandelbulbs,
         this.juliaSets,
         this.mandelboxes,
-        this.sierpinskiPyramids
+        this.sierpinskiPyramids,
     ];
 
     readonly celestialBodyToPostProcesses: Map<TransformNode, PostProcess[]> = new Map();
@@ -233,7 +233,7 @@ export class PostProcessManager {
             Texture.BILINEAR_SAMPLINGMODE,
             scene.getEngine(),
             false,
-            Constants.TEXTURETYPE_HALF_FLOAT
+            Constants.TEXTURETYPE_HALF_FLOAT,
         );
 
         this.colorCorrectionRenderEffect = new PostProcessRenderEffect(
@@ -241,7 +241,7 @@ export class PostProcessManager {
             "colorCorrectionRenderEffect",
             () => {
                 return [this.colorCorrection];
-            }
+            },
         );
         this.fxaaRenderEffect = new PostProcessRenderEffect(scene.getEngine(), "fxaaRenderEffect", () => {
             return [this.fxaa];
@@ -258,7 +258,7 @@ export class PostProcessManager {
         name: string,
         body: CelestialBody,
         postProcesses: ReadonlyArray<PostProcess>,
-        engine: AbstractEngine
+        engine: AbstractEngine,
     ): [PostProcessRenderEffect, PostProcessRenderEffect] {
         const bodyPostProcesses = this.celestialBodyToPostProcesses.get(body.getTransform()) ?? [];
         const relevantPostProcesses = postProcesses.filter((postProcess) => bodyPostProcesses.includes(postProcess));
@@ -281,7 +281,7 @@ export class PostProcessManager {
             star.mesh,
             star.volumetricLightUniforms,
             excludedMeshes,
-            this.scene
+            this.scene,
         );
         this.volumetricLights.push(volumetricLight);
         postProcesses.push(volumetricLight);
@@ -290,7 +290,7 @@ export class PostProcessManager {
             star.getTransform(),
             star.getBoundingRadius(),
             getRgbFromTemperature(star.model.blackBodyTemperature),
-            this.scene
+            this.scene,
         );
         this.lensFlares.push(lensFlare);
         postProcesses.push(lensFlare);
@@ -310,7 +310,7 @@ export class PostProcessManager {
             neutronStar.mesh,
             neutronStar.volumetricLightUniforms,
             excludedMeshes,
-            this.scene
+            this.scene,
         );
         this.volumetricLights.push(volumetricLight);
         postProcesses.push(volumetricLight);
@@ -319,7 +319,7 @@ export class PostProcessManager {
             neutronStar.getTransform(),
             neutronStar.getBoundingRadius(),
             getRgbFromTemperature(neutronStar.model.blackBodyTemperature),
-            this.scene
+            this.scene,
         );
         this.lensFlares.push(lensFlare);
         postProcesses.push(lensFlare);
@@ -328,7 +328,7 @@ export class PostProcessManager {
             neutronStar.getTransform(),
             neutronStar.getBoundingRadius(),
             neutronStar.model.dipoleTilt,
-            this.scene
+            this.scene,
         );
         this.matterJets.push(matterJets);
         postProcesses.push(matterJets);
@@ -339,7 +339,7 @@ export class PostProcessManager {
                 neutronStar.ringsUniforms,
                 neutronStar.model,
                 [],
-                this.scene
+                this.scene,
             );
             this.rings.push(rings);
             postProcesses.push(rings);
@@ -356,7 +356,7 @@ export class PostProcessManager {
         const blackHolePostProcess = new BlackHolePostProcess(
             blackHole.getTransform(),
             blackHole.blackHoleUniforms,
-            this.scene
+            this.scene,
         );
         this.blackHoles.push(blackHolePostProcess);
 
@@ -372,7 +372,7 @@ export class PostProcessManager {
                 planet.getBoundingRadius(),
                 planet.atmosphereUniforms,
                 stellarObjects.map((star) => star.getLight()),
-                this.scene
+                this.scene,
             );
             this.atmospheres.push(atmosphere);
             postProcesses.push(atmosphere);
@@ -385,7 +385,7 @@ export class PostProcessManager {
                 planet.oceanUniforms,
                 stellarObjects.map((star) => star.getLight()),
                 this.textures.water,
-                this.scene
+                this.scene,
             );
             this.oceans.push(ocean);
             postProcesses.push(ocean);
@@ -397,7 +397,7 @@ export class PostProcessManager {
                 planet.getBoundingRadius(),
                 planet.cloudsUniforms,
                 stellarObjects.map((star) => star.getLight()),
-                this.scene
+                this.scene,
             );
             this.clouds.push(clouds);
             postProcesses.push(clouds);
@@ -409,7 +409,7 @@ export class PostProcessManager {
                 planet.ringsUniforms,
                 planet.model,
                 stellarObjects.map((star) => star.getLight()),
-                this.scene
+                this.scene,
             );
             this.rings.push(rings);
             postProcesses.push(rings);
@@ -422,7 +422,7 @@ export class PostProcessManager {
             planet.cloudsUniforms,
             planet.model.ocean !== null,
             stellarObjects,
-            this.scene
+            this.scene,
         );
         this.shadows.push(shadow);
         postProcesses.push(shadow);
@@ -438,7 +438,7 @@ export class PostProcessManager {
             planet.getBoundingRadius(),
             planet.atmosphereUniforms,
             stellarObjects.map((star) => star.getLight()),
-            this.scene
+            this.scene,
         );
         this.atmospheres.push(atmosphere);
         postProcesses.push(atmosphere);
@@ -449,7 +449,7 @@ export class PostProcessManager {
                 planet.ringsUniforms,
                 planet.model,
                 stellarObjects.map((star) => star.getLight()),
-                this.scene
+                this.scene,
             );
             this.rings.push(rings);
             postProcesses.push(rings);
@@ -462,7 +462,7 @@ export class PostProcessManager {
             null,
             false,
             stellarObjects,
-            this.scene
+            this.scene,
         );
         this.shadows.push(shadow);
         postProcesses.push(shadow);
@@ -480,7 +480,7 @@ export class PostProcessManager {
         transform: TransformNode,
         radius: number,
         model: DeepReadonly<MandelbulbModel>,
-        stellarObjects: ReadonlyArray<PointLight>
+        stellarObjects: ReadonlyArray<PointLight>,
     ) {
         const mandelbulb = new MandelbulbPostProcess(transform, radius, model, this.scene, stellarObjects);
         this.mandelbulbs.push(mandelbulb);
@@ -499,14 +499,14 @@ export class PostProcessManager {
         transform: TransformNode,
         radius: number,
         model: DeepReadonly<JuliaSetModel>,
-        stellarObjects: ReadonlyArray<PointLight>
+        stellarObjects: ReadonlyArray<PointLight>,
     ) {
         const juliaSetPostProcess = new JuliaSetPostProcess(
             transform,
             radius,
             model.accentColor,
             this.scene,
-            stellarObjects
+            stellarObjects,
         );
         this.juliaSets.push(juliaSetPostProcess);
 
@@ -517,7 +517,7 @@ export class PostProcessManager {
         transform: TransformNode,
         radius: number,
         model: DeepReadonly<MandelboxModel>,
-        stellarObjects: ReadonlyArray<PointLight>
+        stellarObjects: ReadonlyArray<PointLight>,
     ) {
         const mandelbox = new MandelboxPostProcess(transform, radius, model, this.scene, stellarObjects);
         this.mandelboxes.push(mandelbox);
@@ -529,14 +529,14 @@ export class PostProcessManager {
         transform: TransformNode,
         radius: number,
         model: DeepReadonly<SierpinskiPyramidModel>,
-        stellarObjects: ReadonlyArray<PointLight>
+        stellarObjects: ReadonlyArray<PointLight>,
     ) {
         const sierpinskiPyramid = new SierpinskiPyramidPostProcess(
             transform,
             radius,
             model,
             this.scene,
-            stellarObjects
+            stellarObjects,
         );
         this.sierpinskiPyramids.push(sierpinskiPyramid);
 
@@ -547,7 +547,7 @@ export class PostProcessManager {
         transform: TransformNode,
         radius: number,
         model: DeepReadonly<MengerSpongeModel>,
-        stellarObjects: ReadonlyArray<PointLight>
+        stellarObjects: ReadonlyArray<PointLight>,
     ) {
         const mengerSponge = new MengerSpongePostProcess(transform, radius, model, this.scene, stellarObjects);
         this.mengerSponges.push(mengerSponge);
@@ -570,7 +570,7 @@ export class PostProcessManager {
         const switchLimit = rings !== undefined ? rings.ringsUniforms.model.ringStart : 2;
         const distance2 = Vector3.DistanceSquared(
             body.getTransform().getAbsolutePosition(),
-            this.scene.getActiveControls().getTransform().getAbsolutePosition()
+            this.scene.getActiveControls().getTransform().getAbsolutePosition(),
         );
         if (distance2 < (switchLimit * body.getBoundingRadius()) ** 2) this.setSurfaceOrder();
         else this.setSpaceOrder();
@@ -617,79 +617,79 @@ export class PostProcessManager {
             "VolumetricLights",
             this.getCurrentBody(),
             this.volumetricLights,
-            this.engine
+            this.engine,
         );
         const [otherBlackHolesRenderEffect, bodyBlackHolesRenderEffect] = this.makeSplitRenderEffects(
             "BlackHoles",
             this.getCurrentBody(),
             this.blackHoles,
-            this.engine
+            this.engine,
         );
         const [otherOceansRenderEffect, bodyOceansRenderEffect] = this.makeSplitRenderEffects(
             "Oceans",
             this.getCurrentBody(),
             this.oceans,
-            this.engine
+            this.engine,
         );
         const [otherCloudsRenderEffect, bodyCloudsRenderEffect] = this.makeSplitRenderEffects(
             "Clouds",
             this.getCurrentBody(),
             this.clouds,
-            this.engine
+            this.engine,
         );
         const [otherAtmospheresRenderEffect, bodyAtmospheresRenderEffect] = this.makeSplitRenderEffects(
             "Atmospheres",
             this.getCurrentBody(),
             this.atmospheres,
-            this.engine
+            this.engine,
         );
         const [otherRingsRenderEffect, bodyRingsRenderEffect] = this.makeSplitRenderEffects(
             "Rings",
             this.getCurrentBody(),
             this.rings,
-            this.engine
+            this.engine,
         );
         const [otherMandelbulbsRenderEffect, bodyMandelbulbsRenderEffect] = this.makeSplitRenderEffects(
             "Mandelbulbs",
             this.getCurrentBody(),
             this.mandelbulbs,
-            this.engine
+            this.engine,
         );
         const [otherJuliaSetsRenderEffect, bodyJuliaSetRenderEffect] = this.makeSplitRenderEffects(
             "JuliaSets",
             this.getCurrentBody(),
             this.juliaSets,
-            this.engine
+            this.engine,
         );
         const [otherMandelboxesRenderEffect, bodyMandelboxRenderEffect] = this.makeSplitRenderEffects(
             "Mandelboxes",
             this.getCurrentBody(),
             this.mandelboxes,
-            this.engine
+            this.engine,
         );
         const [otherSierpinskiPyramidsRenderEffect, bodySierpinskiPyramidsRenderEffect] = this.makeSplitRenderEffects(
             "SierpinskiPyramids",
             this.getCurrentBody(),
             this.sierpinskiPyramids,
-            this.engine
+            this.engine,
         );
         const [otherMengerSpongesRenderEffect, bodyMengerSpongesRenderEffect] = this.makeSplitRenderEffects(
             "MengerSponges",
             this.getCurrentBody(),
             this.mengerSponges,
-            this.engine
+            this.engine,
         );
         const [otherMatterJetsRenderEffect, bodyMatterJetsRenderEffect] = this.makeSplitRenderEffects(
             "MatterJets",
             this.getCurrentBody(),
             this.matterJets,
-            this.engine
+            this.engine,
         );
         const shadowRenderEffect = new PostProcessRenderEffect(this.engine, "ShadowRenderEffect", () => this.shadows);
         const lensFlareRenderEffect = new PostProcessRenderEffect(
             this.engine,
             "LensFlareRenderEffect",
-            () => this.lensFlares
+            () => this.lensFlares,
         );
 
         this.renderingPipeline.addEffect(shadowRenderEffect);

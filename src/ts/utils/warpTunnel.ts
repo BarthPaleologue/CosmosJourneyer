@@ -183,7 +183,7 @@ export class WarpTunnel implements Transformable {
     private updateGlobals() {
         this.particleRotationQuaternion.copyFrom(this.anchor.absoluteRotationQuaternion);
         this.particleDirection.copyFrom(
-            this.parent.getAbsolutePosition().subtract(this.anchor.getAbsolutePosition()).normalize()
+            this.parent.getAbsolutePosition().subtract(this.anchor.getAbsolutePosition()).normalize(),
         );
 
         this.tunnelAxis1.copyFrom(this.particleDirection.add(new Vector3(Math.random(), Math.random(), Math.random())));

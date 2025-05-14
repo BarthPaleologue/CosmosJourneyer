@@ -145,7 +145,7 @@ export type Textures = {
  */
 export async function loadTextures(
     progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void,
-    scene: Scene
+    scene: Scene,
 ): Promise<Textures> {
     let loadedCount = 0;
     let totalCount = 0;
@@ -216,7 +216,7 @@ export async function loadTextures(
     const solarPanelNormalPromise = loadTextureAsync("SolarPanelNormal", solarPanelNormal);
     const solarPanelMetallicRoughnessPromise = loadTextureAsync(
         "SolarPanelMetallicRoughness",
-        solarPanelMetallicRoughness
+        solarPanelMetallicRoughness,
     );
 
     // Space Station
@@ -224,11 +224,11 @@ export async function loadTextures(
     const spaceStationNormalPromise = loadTextureAsync("SpaceStationNormal", spaceStationNormal);
     const spaceStationMetallicRoughnessPromise = loadTextureAsync(
         "SpaceStationMetallicRoughness",
-        spaceStationMetallicRoughness
+        spaceStationMetallicRoughness,
     );
     const spaceStationAmbientOcclusionPromise = loadTextureAsync(
         "SpaceStationAmbientOcclusion",
-        spaceStationAmbientOcclusion
+        spaceStationAmbientOcclusion,
     );
 
     // Metal Panels
@@ -236,11 +236,11 @@ export async function loadTextures(
     const metalPanelsNormalPromise = loadTextureAsync("MetalPanelsNormal", metalPanelsNormal);
     const metalPanelsMetallicRoughnessPromise = loadTextureAsync(
         "MetalPanelsMetallicRoughness",
-        metalPanelsMetallicRoughness
+        metalPanelsMetallicRoughness,
     );
     const metalPanelsAmbientOcclusionPromise = loadTextureAsync(
         "MetalPanelsAmbientOcclusion",
-        metalPanelsAmbientOcclusion
+        metalPanelsAmbientOcclusion,
     );
 
     const treeAlbedoPromise = loadTextureAsync("TreeAlbedo", treeTexturePath);
@@ -265,75 +265,75 @@ export async function loadTextures(
         terrains: {
             rock: {
                 normalMetallic: await rockNormalMetallicPromise,
-                albedoRoughness: await rockAlbedoRoughnessPromise
+                albedoRoughness: await rockAlbedoRoughnessPromise,
             },
             grass: {
                 normalMetallic: await grassNormalMetallicPromise,
-                albedoRoughness: await grassAlbedoRoughnessPromise
+                albedoRoughness: await grassAlbedoRoughnessPromise,
             },
             snow: {
                 normalMetallic: await snowNormalMetallicPromise,
-                albedoRoughness: await snowAlbedoRoughnessPromise
+                albedoRoughness: await snowAlbedoRoughnessPromise,
             },
             sand: {
                 normalMetallic: await sandNormalMetallicPromise,
-                albedoRoughness: await sandAlbedoRoughnessPromise
-            }
+                albedoRoughness: await sandAlbedoRoughnessPromise,
+            },
         },
         water: {
             normalMap1: await waterNormalMap1Promise,
-            normalMap2: await waterNormalMap2Promise
+            normalMap2: await waterNormalMap2Promise,
         },
         particles: {
             plume: await plumeParticlePromise,
             flare: await flareTexturePromise,
-            butterfly: await butterflyPromise
+            butterfly: await butterflyPromise,
         },
         materials: {
             solarPanel: {
                 albedo: await solarPanelAlbedoPromise,
                 normal: await solarPanelNormalPromise,
-                metallicRoughness: await solarPanelMetallicRoughnessPromise
+                metallicRoughness: await solarPanelMetallicRoughnessPromise,
             },
             spaceStation: {
                 albedo: await spaceStationAlbedoPromise,
                 normal: await spaceStationNormalPromise,
                 metallicRoughness: await spaceStationMetallicRoughnessPromise,
-                ambientOcclusion: await spaceStationAmbientOcclusionPromise
+                ambientOcclusion: await spaceStationAmbientOcclusionPromise,
             },
             metalPanels: {
                 albedo: await metalPanelsAlbedoPromise,
                 normal: await metalPanelsNormalPromise,
                 metallicRoughness: await metalPanelsMetallicRoughnessPromise,
-                ambientOcclusion: await metalPanelsAmbientOcclusionPromise
+                ambientOcclusion: await metalPanelsAmbientOcclusionPromise,
             },
             concrete: {
                 albedo: await concreteAlbedoPromise,
                 normal: await concreteNormalPromise,
                 metallicRoughness: await concreteMetallicRoughnessPromise,
-                ambientOcclusion: await concreteAmbientOcclusionPromise
+                ambientOcclusion: await concreteAmbientOcclusionPromise,
             },
             crate: {
                 albedo: await crateAlbedoPromise,
                 normal: await crateNormalPromise,
                 metallicRoughness: await crateMetallicRoughnessPromise,
-                ambientOcclusion: await crateAmbientOcclusionPromise
+                ambientOcclusion: await crateAmbientOcclusionPromise,
             },
             tree: {
-                albedo: treeAlbedo
-            }
+                albedo: treeAlbedo,
+            },
         },
         environment: {
-            milkyWay: await milkyWayPromise
+            milkyWay: await milkyWayPromise,
         },
         noises: {
-            seamlessPerlin: await seamlessPerlinPromise
+            seamlessPerlin: await seamlessPerlinPromise,
         },
         ui: {
-            cursorImageUrl: cursorImage
+            cursorImageUrl: cursorImage,
         },
         empty: await emptyTexturePromise,
-        pools: createTexturePools(scene)
+        pools: createTexturePools(scene),
     };
 }
 
@@ -343,6 +343,6 @@ export function createTexturePools(scene: Scene): TexturePools {
         ringsLut: new ItemPool<RingsLut>(() => new RingsLut(scene)),
         starMaterialLut: new ItemPool<StarMaterialLut>(() => new StarMaterialLut(scene)),
         telluricPlanetMaterialLut: new ItemPool<TelluricPlanetMaterialLut>(() => new TelluricPlanetMaterialLut(scene)),
-        landingPad: new LandingPadTexturePool()
+        landingPad: new LandingPadTexturePool(),
     };
 }

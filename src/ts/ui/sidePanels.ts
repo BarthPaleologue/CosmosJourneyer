@@ -11,7 +11,7 @@ export const enum PanelType {
     TUTORIALS,
     CONTRIBUTE,
     CREDITS,
-    ABOUT
+    ABOUT,
 }
 
 export class SidePanels {

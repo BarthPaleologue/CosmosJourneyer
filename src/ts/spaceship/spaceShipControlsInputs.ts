@@ -9,33 +9,33 @@ const keyboard = InputDevices.KEYBOARD;
 const pointer = InputDevices.POINTER;
 
 const landingAction = new Action({
-    bindings: [keyboard.getControl("KeyL")]
+    bindings: [keyboard.getControl("KeyL")],
 });
 
 const landingInteraction = new PressInteraction(landingAction);
 
 const emitLandingRequest = new PressInteraction(
     new Action({
-        bindings: [keyboard.getControl("keyY")]
-    })
+        bindings: [keyboard.getControl("keyY")],
+    }),
 );
 
 const upDown = new AxisComposite({
     positive: keyboard.getControl("KeyR"),
-    negative: keyboard.getControl("KeyF")
+    negative: keyboard.getControl("KeyF"),
 });
 
 const upDownAction = new Action({
-    bindings: [upDown]
+    bindings: [upDown],
 });
 
 const throttle = new AxisComposite({
     positive: keyboard.getControl("KeyW"),
-    negative: keyboard.getControl("KeyS")
+    negative: keyboard.getControl("KeyS"),
 });
 
 const throttleAction = new Action({
-    bindings: [throttle]
+    bindings: [throttle],
 });
 
 const rollPitch = new Action({
@@ -63,42 +63,42 @@ const rollPitch = new Action({
             pointerY = Math.sign(pointerY) * Math.max(0, Math.abs(pointerY) - deadZone) ** 2;
 
             return [pointerX, pointerY];
-        }
-    ]
+        },
+    ],
 });
 
 const toggleWarpDrive = new Action({
-    bindings: [keyboard.getControl("KeyH")]
+    bindings: [keyboard.getControl("KeyH")],
 });
 
 const toggleWarpDriveInteraction = new PressInteraction(toggleWarpDrive);
 
 const ignorePointer = new Action({
-    bindings: [keyboard.getControl("ShiftLeft")]
+    bindings: [keyboard.getControl("ShiftLeft")],
 });
 
 const throttleToZero = new Action({
-    bindings: [keyboard.getControl("KeyX")]
+    bindings: [keyboard.getControl("KeyX")],
 });
 
 const throttleToZeroInteraction = new PressInteraction(throttleToZero);
 
 const previousMissionInteraction = new PressInteraction(
     new Action({
-        bindings: [keyboard.getControl("Numpad1")]
-    })
+        bindings: [keyboard.getControl("Numpad1")],
+    }),
 );
 
 const nextMissionInteraction = new PressInteraction(
     new Action({
-        bindings: [keyboard.getControl("Numpad2")]
-    })
+        bindings: [keyboard.getControl("Numpad2")],
+    }),
 );
 
 const resetCameraInteraction = new PressInteraction(
     new Action({
-        bindings: [keyboard.getControl("Numpad0")]
-    })
+        bindings: [keyboard.getControl("Numpad0")],
+    }),
 );
 
 export const SpaceShipControlsInputs = new InputMap<{
@@ -124,7 +124,7 @@ export const SpaceShipControlsInputs = new InputMap<{
     throttleToZero: throttleToZeroInteraction,
     previousMission: previousMissionInteraction,
     nextMission: nextMissionInteraction,
-    resetCamera: resetCameraInteraction
+    resetCamera: resetCameraInteraction,
 });
 
 SpaceShipControlsInputs.setEnabled(false);

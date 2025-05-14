@@ -54,7 +54,7 @@ export function createSquareMatrixBuffer(position: Vector3, size: number, resolu
             const matrix = Matrix.Compose(
                 new Vector3(scaling, scaling, scaling),
                 Quaternion.RotationAxis(Vector3.Up(), Math.random() * 2 * Math.PI),
-                new Vector3(positionX, 0, positionZ)
+                new Vector3(positionX, 0, positionZ),
             );
             matrix.copyToArray(matrixBuffer, 16 * index);
 
@@ -105,7 +105,7 @@ export function decomposeModelMatrix(matrix: Float32Array, position: Vector3, ro
         matrix[8] / uniformScale,
         matrix[9] / uniformScale,
         matrix[10] / uniformScale,
-        0
+        0,
     );
     rotationMatrix.setRowFromFloats(3, 0, 0, 0, 1);
 

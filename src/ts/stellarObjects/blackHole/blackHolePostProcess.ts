@@ -45,7 +45,7 @@ export class BlackHolePostProcess extends PostProcess implements UpdatablePostPr
         const uniforms: string[] = [
             ...Object.values(ObjectUniformNames),
             ...Object.values(CameraUniformNames),
-            ...Object.values(BlackHoleUniformNames)
+            ...Object.values(BlackHoleUniformNames),
         ];
 
         const samplers: string[] = [...Object.values(SamplerUniformNames), ...Object.values(BlackHoleSamplerNames)];
@@ -61,7 +61,7 @@ export class BlackHolePostProcess extends PostProcess implements UpdatablePostPr
             scene.getEngine(),
             false,
             null,
-            Constants.TEXTURETYPE_HALF_FLOAT
+            Constants.TEXTURETYPE_HALF_FLOAT,
         );
 
         this.blackHoleUniforms = blackHoleUniforms;

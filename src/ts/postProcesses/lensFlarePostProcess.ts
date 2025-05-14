@@ -53,20 +53,20 @@ export class LensFlarePostProcess extends PostProcess {
         const settings: LensFlareSettings = {
             visibility: 1,
             behindCamera: false,
-            clipPosition: new Vector3()
+            clipPosition: new Vector3(),
         };
 
         const LensFlareUniformNames = {
             FLARE_COLOR: "flareColor",
             CLIP_POSITION: "clipPosition",
             VISIBILITY: "visibility",
-            ASPECT_RATIO: "aspectRatio"
+            ASPECT_RATIO: "aspectRatio",
         };
 
         const uniforms: string[] = [
             ...Object.values(ObjectUniformNames),
             ...Object.values(CameraUniformNames),
-            ...Object.values(LensFlareUniformNames)
+            ...Object.values(LensFlareUniformNames),
         ];
 
         const samplers: string[] = Object.values(SamplerUniformNames);
@@ -82,7 +82,7 @@ export class LensFlarePostProcess extends PostProcess {
             scene.getEngine(),
             false,
             null,
-            Constants.TEXTURETYPE_HALF_FLOAT
+            Constants.TEXTURETYPE_HALF_FLOAT,
         );
 
         this.settings = settings;
@@ -107,7 +107,7 @@ export class LensFlarePostProcess extends PostProcess {
                 stellarTransform.getAbsolutePosition(),
                 Matrix.IdentityReadOnly,
                 scene.getTransformMatrix(),
-                this.activeCamera.viewport
+                this.activeCamera.viewport,
             );
             settings.behindCamera = clipPosition.z < 0;
             effect.setVector3(LensFlareUniformNames.CLIP_POSITION, clipPosition);

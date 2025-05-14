@@ -23,7 +23,7 @@ import {
     PhysicsAggregate,
     PhysicsShapeType,
     Scene,
-    Vector3
+    Vector3,
 } from "@babylonjs/core";
 
 import { loadRenderingAssets } from "../assets/renderingAssets";
@@ -34,7 +34,7 @@ import { enablePhysics } from "./utils";
 
 export async function createAsteroidFieldScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void
+    progressCallback: (progress: number, text: string) => void,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -79,7 +79,7 @@ export async function createAsteroidFieldScene(
     const torus = MeshBuilder.CreateTorus(
         "torus",
         { diameter: 2 * beltRadius, thickness: 2 * beltSpread, tessellation: 32 },
-        scene
+        scene,
     );
     torus.visibility = 0.1;
     torus.parent = sphere;

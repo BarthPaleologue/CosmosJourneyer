@@ -24,7 +24,7 @@ import { SerializedFuelTankSchema } from "./fuelTank";
 export const SerializedOptionalComponentSchema = z.discriminatedUnion("type", [
     SerializedFuelScoopSchema,
     SerializedFuelTankSchema,
-    SerializedDiscoveryScannerSchema
+    SerializedDiscoveryScannerSchema,
 ]);
 
 export type SerializedOptionalComponent = z.infer<typeof SerializedOptionalComponentSchema>;

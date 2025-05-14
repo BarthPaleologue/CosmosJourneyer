@@ -32,7 +32,7 @@ export const SpaceDiscoveryDataSchema = z.object({
     /**
      * The name of the explorer who discovered the object.
      */
-    explorerName: z.string().default("Unknown")
+    explorerName: z.string().default("Unknown"),
 });
 
 /**

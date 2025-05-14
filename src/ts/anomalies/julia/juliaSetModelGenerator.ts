@@ -32,7 +32,7 @@ export function newSeededJuliaSetModel(
     id: string,
     seed: number,
     name: string,
-    parentBodies: ReadonlyArray<OrbitalObjectModel>
+    parentBodies: ReadonlyArray<OrbitalObjectModel>,
 ): JuliaSetModel {
     const rng = getRngFromSeed(seed);
 
@@ -41,7 +41,7 @@ export function newSeededJuliaSetModel(
     const accentColor = Color3.FromHSV(
         360 * rng(GenerationSteps.ACCENT_COLOR),
         rng(GenerationSteps.ACCENT_COLOR + 123) * 0.5,
-        0.8
+        0.8,
     );
 
     // Todo: do not hardcode
@@ -59,7 +59,7 @@ export function newSeededJuliaSetModel(
         eccentricity: randRange(0.1, 0.9, rng, GenerationSteps.ORBIT + 240),
         longitudeOfAscendingNode: randRange(0, 2 * Math.PI, rng, GenerationSteps.ORBIT + 320),
         argumentOfPeriapsis: randRange(0, 2 * Math.PI, rng, GenerationSteps.ORBIT + 400),
-        initialMeanAnomaly: randRange(0, 2 * Math.PI, rng, GenerationSteps.ORBIT + 480)
+        initialMeanAnomaly: randRange(0, 2 * Math.PI, rng, GenerationSteps.ORBIT + 480),
     };
     const mass = 10;
     const siderealDaySeconds = 0;
@@ -74,6 +74,6 @@ export function newSeededJuliaSetModel(
         mass,
         siderealDaySeconds,
         axialTilt,
-        accentColor
+        accentColor,
     };
 }

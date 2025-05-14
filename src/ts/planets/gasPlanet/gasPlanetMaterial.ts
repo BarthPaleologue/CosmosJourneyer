@@ -27,7 +27,7 @@ import { DeepReadonly } from "@/utils/types";
 
 import {
     setStellarObjectUniforms,
-    StellarObjectUniformNames
+    StellarObjectUniformNames,
 } from "../../postProcesses/uniforms/stellarObjectUniforms";
 import { GazColorSettings } from "../telluricPlanet/colorSettingsInterface";
 import { GasPlanetModel } from "./gasPlanetModel";
@@ -44,7 +44,7 @@ const GasPlanetMaterialUniformNames = {
     COLOR1: "color1",
     COLOR2: "color2",
     COLOR3: "color3",
-    COLOR_SHARPNESS: "colorSharpness"
+    COLOR_SHARPNESS: "colorSharpness",
 };
 
 export class GasPlanetMaterial extends ShaderMaterial {
@@ -62,7 +62,7 @@ export class GasPlanetMaterial extends ShaderMaterial {
 
         super(`${planetName}GasSurfaceColor`, scene, shaderName, {
             attributes: ["position", "normal"],
-            uniforms: [...Object.values(GasPlanetMaterialUniformNames), ...Object.values(StellarObjectUniformNames)]
+            uniforms: [...Object.values(GasPlanetMaterialUniformNames), ...Object.values(StellarObjectUniformNames)],
         });
 
         const rng = getRngFromSeed(model.seed);
@@ -77,14 +77,14 @@ export class GasPlanetMaterial extends ShaderMaterial {
         const color3 = Color3.FromHSV(
             (hue1 + divergence) % 360,
             randRange(0.4, 0.9, rng, 76),
-            randRange(0.7, 0.9, rng, 77)
+            randRange(0.7, 0.9, rng, 77),
         );
 
         this.colorSettings = {
             color1: color1,
             color2: color2,
             color3: color3,
-            colorSharpness: randRangeInt(40, 80, rng, 80) / 10
+            colorSharpness: randRangeInt(40, 80, rng, 80) / 10,
         };
 
         this.setFloat(GasPlanetMaterialUniformNames.SEED, model.seed);

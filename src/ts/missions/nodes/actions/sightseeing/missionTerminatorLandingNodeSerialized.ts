@@ -24,13 +24,13 @@ import { MissionNodeType } from "../../missionNodeType";
 export enum LandMissionState {
     NOT_IN_SYSTEM,
     TOO_FAR_IN_SYSTEM,
-    LANDED
+    LANDED,
 }
 
 export const MissionTerminatorLandingNodeSerializedSchema = z.object({
     type: z.literal(MissionNodeType.TERMINATOR_LANDING),
     objectId: UniverseObjectIdSchema,
-    state: z.nativeEnum(LandMissionState)
+    state: z.nativeEnum(LandMissionState),
 });
 
 export type MissionTerminatorLandingNodeSerialized = z.infer<typeof MissionTerminatorLandingNodeSerializedSchema>;

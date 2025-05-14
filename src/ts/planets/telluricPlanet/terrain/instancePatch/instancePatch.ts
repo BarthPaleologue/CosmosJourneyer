@@ -51,7 +51,7 @@ export class InstancePatch implements IPatch {
             this.transforms.push({
                 position,
                 rotation,
-                scaling
+                scaling,
             });
         }
     }

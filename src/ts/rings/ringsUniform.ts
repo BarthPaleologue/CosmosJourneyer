@@ -32,11 +32,11 @@ export const RingsUniformNames = {
     RING_FREQUENCY: "rings_frequency",
     RING_OPACITY: "rings_opacity",
     RING_COLOR: "rings_color",
-    RING_FADE_OUT_DISTANCE: "rings_fade_out_distance"
+    RING_FADE_OUT_DISTANCE: "rings_fade_out_distance",
 };
 
 export const RingsSamplerNames = {
-    RING_LUT: "rings_lut"
+    RING_LUT: "rings_lut",
 };
 
 export class RingsUniforms {
@@ -52,7 +52,7 @@ export class RingsUniforms {
         model: DeepReadonly<RingsModel>,
         fadeOutDistance: number,
         texturePool: ItemPool<RingsLut>,
-        scene: Scene
+        scene: Scene,
     ) {
         this.model = model;
 

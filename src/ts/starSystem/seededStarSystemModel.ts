@@ -28,7 +28,7 @@ import {
     AnomalyType,
     OrbitalFacilityModel,
     PlanetModel,
-    StellarObjectModel
+    StellarObjectModel,
 } from "../architecture/orbitalObjectModel";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { newSeededGasPlanetModel } from "../planets/gasPlanet/gasPlanetModelGenerator";
@@ -61,7 +61,7 @@ const enum GenerationSteps {
     NB_MOONS = 10,
     MOONS = 11,
     ANOMALIES = 666,
-    SPACE_STATIONS = 2000
+    SPACE_STATIONS = 2000,
 }
 
 /**
@@ -73,7 +73,7 @@ export function newSeededStarSystemModel(
     systemRng: (step: number) => number,
     coordinates: StarSystemCoordinates,
     position: Vector3,
-    isCivilized: boolean
+    isCivilized: boolean,
 ): StarSystemModel {
     const systemName = generateStarName(systemRng, GenerationSteps.NAME);
 
@@ -86,7 +86,7 @@ export function newSeededStarSystemModel(
     switch (stellarObjectType) {
         case OrbitalObjectType.STAR:
             stellarObjects.push(
-                newSeededStarModel(createOrbitalObjectId([], OrbitalObjectType.STAR, 0), seed, stellarObjectName, [])
+                newSeededStarModel(createOrbitalObjectId([], OrbitalObjectType.STAR, 0), seed, stellarObjectName, []),
             );
             break;
         case OrbitalObjectType.BLACK_HOLE:
@@ -95,8 +95,8 @@ export function newSeededStarSystemModel(
                     createOrbitalObjectId([], OrbitalObjectType.NEUTRON_STAR, 0),
                     seed,
                     stellarObjectName,
-                    []
-                )
+                    [],
+                ),
             );
             break;
         case OrbitalObjectType.NEUTRON_STAR:
@@ -105,8 +105,8 @@ export function newSeededStarSystemModel(
                     createOrbitalObjectId([], OrbitalObjectType.BLACK_HOLE, 0),
                     seed,
                     stellarObjectName,
-                    []
-                )
+                    [],
+                ),
             );
             break;
     }
@@ -141,8 +141,8 @@ export function newSeededStarSystemModel(
                         createOrbitalObjectId(parentIds, OrbitalObjectType.TELLURIC_PLANET, i),
                         seed,
                         planetName,
-                        stellarObjects
-                    )
+                        stellarObjects,
+                    ),
                 );
                 break;
             case OrbitalObjectType.GAS_PLANET:
@@ -151,8 +151,8 @@ export function newSeededStarSystemModel(
                         createOrbitalObjectId(parentIds, OrbitalObjectType.GAS_PLANET, i),
                         seed,
                         planetName,
-                        stellarObjects
-                    )
+                        stellarObjects,
+                    ),
                 );
                 break;
         }
@@ -180,9 +180,9 @@ export function newSeededStarSystemModel(
     const nbAnomalies = wheelOfFortune(
         [
             [0, 0.96],
-            [1, 0.04]
+            [1, 0.04],
         ],
-        systemRng(GenerationSteps.ANOMALIES)
+        systemRng(GenerationSteps.ANOMALIES),
     );
     for (let i = 0; i < nbAnomalies; i++) {
         const anomalySeed = centeredRand(systemRng, GenerationSteps.ANOMALIES + i * 100) * Settings.SEED_HALF_RANGE;
@@ -192,9 +192,9 @@ export function newSeededStarSystemModel(
                 [OrbitalObjectType.MANDELBOX, 1],
                 [OrbitalObjectType.JULIA_SET, 1],
                 [OrbitalObjectType.SIERPINSKI_PYRAMID, 1],
-                [OrbitalObjectType.MENGER_SPONGE, 1]
+                [OrbitalObjectType.MENGER_SPONGE, 1],
             ],
-            systemRng(GenerationSteps.ANOMALIES + i * 300)
+            systemRng(GenerationSteps.ANOMALIES + i * 300),
         );
         const anomalyName = `${systemName} ${ReversedGreekAlphabet.charAt(i).toUpperCase()}`;
         const parentIds = stellarObjects.map((object) => object.id);
@@ -206,8 +206,8 @@ export function newSeededStarSystemModel(
                         createOrbitalObjectId(parentIds, OrbitalObjectType.MANDELBULB, i),
                         anomalySeed,
                         anomalyName,
-                        [firstStellarObject]
-                    )
+                        [firstStellarObject],
+                    ),
                 );
                 break;
             case OrbitalObjectType.JULIA_SET:
@@ -216,8 +216,8 @@ export function newSeededStarSystemModel(
                         createOrbitalObjectId(parentIds, OrbitalObjectType.JULIA_SET, i),
                         anomalySeed,
                         anomalyName,
-                        [firstStellarObject]
-                    )
+                        [firstStellarObject],
+                    ),
                 );
                 break;
             case OrbitalObjectType.MANDELBOX:
@@ -226,8 +226,8 @@ export function newSeededStarSystemModel(
                         createOrbitalObjectId(parentIds, OrbitalObjectType.MANDELBOX, i),
                         anomalySeed,
                         anomalyName,
-                        [firstStellarObject]
-                    )
+                        [firstStellarObject],
+                    ),
                 );
                 break;
             case OrbitalObjectType.SIERPINSKI_PYRAMID:
@@ -236,8 +236,8 @@ export function newSeededStarSystemModel(
                         createOrbitalObjectId(parentIds, OrbitalObjectType.SIERPINSKI_PYRAMID, i),
                         anomalySeed,
                         anomalyName,
-                        [firstStellarObject]
-                    )
+                        [firstStellarObject],
+                    ),
                 );
                 break;
             case OrbitalObjectType.MENGER_SPONGE:
@@ -246,8 +246,8 @@ export function newSeededStarSystemModel(
                         createOrbitalObjectId(parentIds, OrbitalObjectType.MENGER_SPONGE, i),
                         anomalySeed,
                         anomalyName,
-                        [firstStellarObject]
-                    )
+                        [firstStellarObject],
+                    ),
                 );
                 break;
         }
@@ -294,7 +294,7 @@ export function newSeededStarSystemModel(
                     spaceStationSeed,
                     coordinates,
                     position,
-                    planet
+                    planet,
                 );
                 orbitalFacilities.push(spaceElevatorModel);
             } else {
@@ -303,7 +303,7 @@ export function newSeededStarSystemModel(
                     spaceStationSeed,
                     coordinates,
                     position,
-                    [planet]
+                    [planet],
                 );
                 orbitalFacilities.push(spaceStationModel);
             }
@@ -321,7 +321,7 @@ export function newSeededStarSystemModel(
         planets: planets,
         satellites: satellites,
         anomalies: anomalies,
-        orbitalFacilities: orbitalFacilities
+        orbitalFacilities: orbitalFacilities,
     };
 }
 

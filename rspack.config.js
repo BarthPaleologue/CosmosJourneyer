@@ -13,12 +13,12 @@ const config = {
     entry: {
         main: "./src/ts/index.ts",
         blackHole: "./src/ts/blackHoleDemo.ts",
-        playground: "./src/ts/playground.ts"
+        playground: "./src/ts/playground.ts",
     },
     output: {
         filename: "[name].[contenthash].js",
         path: path.resolve(import.meta.dirname, "dist"),
-        clean: true
+        clean: true,
     },
     target: ["web", "es2022"],
     devtool: isProduction ? false : "source-map",
@@ -28,9 +28,9 @@ const config = {
         historyApiFallback: false,
         headers: {
             "Cross-Origin-Opener-Policy": "same-origin",
-            "Cross-Origin-Embedder-Policy": "same-origin"
+            "Cross-Origin-Embedder-Policy": "same-origin",
         },
-        compress: true
+        compress: true,
     },
 
     plugins: [
@@ -56,7 +56,7 @@ const config = {
  */
 `,
             stage: rspack.Compilation.PROCESS_ASSETS_STAGE_REPORT,
-            entryOnly: true
+            entryOnly: true,
         }),
         new TsCheckerRspackPlugin(),
         new HtmlWebpackPlugin({
@@ -64,58 +64,58 @@ const config = {
             filename: "index.html",
             meta: {
                 description:
-                    "Cosmos Journeyer is an immersive space exploration game focused on the beauty and vastness of the universe. Embark on a personal journey through breathtaking cosmic landscapes, uncover strange anomalies, and engage in relaxing activities on alien worlds. Experience seamless transitions from starship to planet surface, and discover a story that reveals the mysteries of existence."
+                    "Cosmos Journeyer is an immersive space exploration game focused on the beauty and vastness of the universe. Embark on a personal journey through breathtaking cosmic landscapes, uncover strange anomalies, and engage in relaxing activities on alien worlds. Experience seamless transitions from starship to planet surface, and discover a story that reveals the mysteries of existence.",
             },
             inject: true,
             template: path.join(htmlPath, "index.html"),
             chunks: ["main"],
-            favicon: path.join(htmlPath, "../asset/favicon.png")
+            favicon: path.join(htmlPath, "../asset/favicon.png"),
         }),
         new HtmlWebpackPlugin({
             title: "Black Hole - Cosmos Journeyer",
             meta: {
-                description: "Black hole simulation for Cosmos Journeyer with light bending and accretion disk."
+                description: "Black hole simulation for Cosmos Journeyer with light bending and accretion disk.",
             },
             filename: "blackhole.html",
             template: path.join(htmlPath, "index.html"),
             chunks: ["blackHole"],
-            favicon: path.join(htmlPath, "../asset/favicon.png")
+            favicon: path.join(htmlPath, "../asset/favicon.png"),
         }),
         new rspack.HtmlRspackPlugin({
             title: "Playground - Cosmos Journeyer",
             filename: "playground.html",
             template: path.join(htmlPath, "emptyIndex.html"),
             chunks: ["playground"],
-            favicon: path.join(htmlPath, "../asset/favicon.png")
-        })
+            favicon: path.join(htmlPath, "../asset/favicon.png"),
+        }),
     ],
     watchOptions: {
-        ignored: /node_modules/
+        ignored: /node_modules/,
     },
     module: {
         rules: [
             {
                 test: /\.(ts|tsx)$/i,
                 loader: "builtin:swc-loader",
-                exclude: [/node_modules/]
+                exclude: [/node_modules/],
             },
             {
                 test: /\.s[ac]ss$/i,
                 use: [{ loader: "sass-loader", options: { sourceMap: !isProduction } }],
                 type: "css/auto",
-                exclude: [/node_modules/]
+                exclude: [/node_modules/],
             },
             {
                 test: /\.(eot|svg|ttf|woff|woff2|otf|png|jpg|gif|webp|glb|obj|mp3|ogg|babylon|env|dds)$/i,
                 type: "asset/resource",
-                exclude: [/node_modules/]
+                exclude: [/node_modules/],
             },
             {
                 test: /\.(glsl|vs|fs|vert|frag|fx)$/,
                 exclude: /node_modules/,
-                use: ["ts-shader-loader"]
-            }
-        ]
+                use: ["ts-shader-loader"],
+            },
+        ],
     },
     resolve: {
         extensions: [".tsx", ".ts", ".js"],
@@ -124,9 +124,9 @@ const config = {
             "@assets": path.resolve(import.meta.dirname, "src/asset"),
             "@shaders": path.resolve(import.meta.dirname, "src/shaders"),
             "@styles": path.resolve(import.meta.dirname, "src/styles"),
-            "@html": path.resolve(import.meta.dirname, "src/html")
-        }
-    }
+            "@html": path.resolve(import.meta.dirname, "src/html"),
+        },
+    },
 };
 
 export default () => {
@@ -138,7 +138,7 @@ export default () => {
     config.experiments = {
         asyncWebAssembly: true,
         topLevelAwait: true,
-        css: true
+        css: true,
     };
     config.optimization = {
         minimize: isProduction,
@@ -152,15 +152,15 @@ export default () => {
                 defaultVendors: {
                     test: /[\\/]node_modules[\\/]/,
                     priority: -10,
-                    reuseExistingChunk: true
+                    reuseExistingChunk: true,
                 },
                 default: {
                     minChunks: 2,
                     priority: -20,
-                    reuseExistingChunk: true
-                }
-            }
-        }
+                    reuseExistingChunk: true,
+                },
+            },
+        },
     };
     return config;
 };

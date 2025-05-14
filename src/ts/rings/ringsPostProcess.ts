@@ -43,7 +43,7 @@ export class RingsPostProcess extends PostProcess {
         ringsUniforms: RingsUniforms,
         bodyModel: DeepReadonly<Pick<CelestialBodyModel, "radius" | "name">>,
         stellarObjects: ReadonlyArray<PointLight>,
-        scene: Scene
+        scene: Scene,
     ) {
         const shaderName = "rings";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
@@ -54,7 +54,7 @@ export class RingsPostProcess extends PostProcess {
             ...Object.values(ObjectUniformNames),
             ...Object.values(StellarObjectUniformNames),
             ...Object.values(CameraUniformNames),
-            ...Object.values(RingsUniformNames)
+            ...Object.values(RingsUniformNames),
         ];
 
         const samplers: string[] = [...Object.values(SamplerUniformNames), ...Object.values(RingsSamplerNames)];
@@ -70,7 +70,7 @@ export class RingsPostProcess extends PostProcess {
             scene.getEngine(),
             false,
             null,
-            Constants.TEXTURETYPE_HALF_FLOAT
+            Constants.TEXTURETYPE_HALF_FLOAT,
         );
 
         this.ringsUniforms = ringsUniforms;

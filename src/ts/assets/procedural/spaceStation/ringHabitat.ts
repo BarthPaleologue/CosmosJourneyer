@@ -77,7 +77,7 @@ export class RingHabitat implements Transformable {
         this.metalSectionMaterial = new MetalSectionMaterial(
             "RingHabitatMetalSectionMaterial",
             textures.materials.metalPanels,
-            scene
+            scene,
         );
 
         this.habitableSurface = height * (2 * Math.PI * (this.radius + deltaRadius / 2));
@@ -88,9 +88,9 @@ export class RingHabitat implements Transformable {
                 diameterTop: 100,
                 diameterBottom: 100,
                 height: height * 1.5,
-                tessellation: attachmentNbSides
+                tessellation: attachmentNbSides,
             },
-            scene
+            scene,
         );
         this.attachment.convertToFlatShadedMesh();
         this.attachment.material = this.metalSectionMaterial;
@@ -107,7 +107,7 @@ export class RingHabitat implements Transformable {
             deltaRadius,
             yScaling,
             textures.materials.spaceStation,
-            scene
+            scene,
         );
 
         this.ring.material = this.ringMaterial;
@@ -121,9 +121,9 @@ export class RingHabitat implements Transformable {
                 {
                     height: 2 * this.radius,
                     diameter: deltaRadius / 3,
-                    tessellation: 6
+                    tessellation: 6,
                 },
-                scene
+                scene,
             );
             arm.convertToFlatShadedMesh();
             arm.rotate(Axis.Z, Math.PI / 2, Space.LOCAL);
@@ -142,7 +142,7 @@ export class RingHabitat implements Transformable {
     update(cameraWorldPosition: Vector3, deltaSeconds: number) {
         this.getTransform().rotate(
             Axis.Y,
-            deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, Settings.G_EARTH)
+            deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, Settings.G_EARTH),
         );
 
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
@@ -150,20 +150,20 @@ export class RingHabitat implements Transformable {
             this.attachmentAggregate = createEnvironmentAggregate(
                 this.attachment,
                 PhysicsShapeType.MESH,
-                this.getTransform().getScene()
+                this.getTransform().getScene(),
             );
             this.arms.forEach((arm) => {
                 const armAggregate = createEnvironmentAggregate(
                     arm,
                     PhysicsShapeType.MESH,
-                    this.getTransform().getScene()
+                    this.getTransform().getScene(),
                 );
                 this.armAggregates.push(armAggregate);
             });
             this.ringAggregate = createEnvironmentAggregate(
                 this.ring,
                 PhysicsShapeType.MESH,
-                this.getTransform().getScene()
+                this.getTransform().getScene(),
             );
         } else if (distanceToCamera > 360e3 && this.attachmentAggregate !== null) {
             this.attachmentAggregate.dispose();

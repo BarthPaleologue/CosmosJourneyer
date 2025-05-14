@@ -48,7 +48,7 @@ export class LandingPad implements ILandingPad {
             padNumber,
             assets.textures.materials.concrete,
             assets.textures.pools.landingPad,
-            scene
+            scene,
         );
 
         this.deck = MeshBuilder.CreateBox(
@@ -56,9 +56,9 @@ export class LandingPad implements ILandingPad {
             {
                 width: this.width,
                 depth: this.depth,
-                height: this.padHeight
+                height: this.padHeight,
             },
-            scene
+            scene,
         );
         this.deck.material = this.deckMaterial;
 
@@ -73,7 +73,7 @@ export class LandingPad implements ILandingPad {
         this.targetInfo = {
             type: ObjectTargetCursorType.LANDING_PAD,
             minDistance: this.getBoundingRadius() * 4.0,
-            maxDistance: this.getBoundingRadius() * 6.0
+            maxDistance: this.getBoundingRadius() * 6.0,
         };
     }
 

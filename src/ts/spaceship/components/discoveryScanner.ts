@@ -38,7 +38,7 @@ export class DiscoveryScanner {
         return {
             type: this.type,
             size: this.size,
-            quality: this.quality
+            quality: this.quality,
         };
     }
 }

@@ -53,7 +53,7 @@ export class SaveLocalBackend implements SaveBackend {
         if (!savesResult.success) {
             console.error(savesResult.error);
             return Promise.resolve(
-                err({ type: SaveLoadingErrorType.INVALID_STORAGE_FORMAT, content: savesResult.error })
+                err({ type: SaveLoadingErrorType.INVALID_STORAGE_FORMAT, content: savesResult.error }),
             );
         }
 
@@ -61,7 +61,7 @@ export class SaveLocalBackend implements SaveBackend {
         if (!backupSavesResult.success) {
             console.error(backupSavesResult.error);
             return Promise.resolve(
-                err({ type: SaveLoadingErrorType.INVALID_STORAGE_FORMAT, content: backupSavesResult.error })
+                err({ type: SaveLoadingErrorType.INVALID_STORAGE_FORMAT, content: backupSavesResult.error }),
             );
         }
 
@@ -70,7 +70,7 @@ export class SaveLocalBackend implements SaveBackend {
 
         const allSaves = {
             ...saves,
-            ...backupSaves
+            ...backupSaves,
         };
 
         const correctSaves: Record<string, { manual: Save[]; auto: Save[] }> = {};
@@ -83,7 +83,7 @@ export class SaveLocalBackend implements SaveBackend {
 
             correctSaves[cmdrUuid] = {
                 manual: parsedManualSaves.validSaves,
-                auto: parsedAutoSaves.validSaves
+                auto: parsedAutoSaves.validSaves,
             };
 
             if (parsedManualSaves.invalidSaves.length > 0 || parsedAutoSaves.invalidSaves.length > 0) {
@@ -95,7 +95,7 @@ export class SaveLocalBackend implements SaveBackend {
                     auto: parsedAutoSaves.invalidSaves.map((save) => {
                         console.error("Corrupted auto save:", save.save, save.error);
                         return save.save;
-                    })
+                    }),
                 };
             }
         }

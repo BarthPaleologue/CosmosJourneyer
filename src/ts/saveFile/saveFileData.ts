@@ -34,7 +34,7 @@ export type Save = z.infer<typeof SaveSchema>;
  */
 export function safeParseSave(
     json: Record<string, unknown>,
-    starSystemDatabase: StarSystemDatabase
+    starSystemDatabase: StarSystemDatabase,
 ): Result<Save, SaveLoadingError> {
     return safeParseSaveV2(json, starSystemDatabase);
 }
@@ -51,7 +51,7 @@ export function createUrlFromSave(data: Save): URL | null {
 
 export function parseSaveArray(
     rawSaves: Record<string, unknown>[],
-    starSystemDatabase: StarSystemDatabase
+    starSystemDatabase: StarSystemDatabase,
 ): { validSaves: Save[]; invalidSaves: { save: unknown; error: SaveLoadingError }[] } {
     const validSaves: Save[] = [];
     const invalidSaves: { save: unknown; error: SaveLoadingError }[] = [];
@@ -73,7 +73,7 @@ export const CmdrSavesShallowSchema = z.object({
     manual: z.array(z.record(z.string(), z.unknown())),
 
     /** The auto saves of the cmdr. */
-    auto: z.array(z.record(z.string(), z.unknown()))
+    auto: z.array(z.record(z.string(), z.unknown())),
 });
 
 export const CmdrSavesDeepSchema = CmdrSavesShallowSchema.extend({
@@ -81,7 +81,7 @@ export const CmdrSavesDeepSchema = CmdrSavesShallowSchema.extend({
     manual: z.array(SaveSchema),
 
     /** The auto saves of the cmdr. */
-    auto: z.array(SaveSchema)
+    auto: z.array(SaveSchema),
 });
 
 export type CmdrSaves = z.infer<typeof CmdrSavesDeepSchema>;

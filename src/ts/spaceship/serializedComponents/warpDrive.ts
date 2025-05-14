@@ -22,7 +22,7 @@ import { Settings } from "../../settings";
 export const SerializedWarpDriveSchema = z.object({
     type: z.literal("warpDrive"),
     size: z.number(),
-    quality: z.number()
+    quality: z.number(),
 });
 
 export type SerializedWarpDrive = z.infer<typeof SerializedWarpDriveSchema>;
@@ -30,6 +30,6 @@ export type SerializedWarpDrive = z.infer<typeof SerializedWarpDriveSchema>;
 export function getWarpDriveSpec(warpDrive: SerializedWarpDrive) {
     return {
         maxSpeed: 5 * Settings.C * (warpDrive.size + warpDrive.quality / 10),
-        rangeLy: 6 * (warpDrive.size + warpDrive.quality / 5)
+        rangeLy: 6 * (warpDrive.size + warpDrive.quality / 5),
     };
 }

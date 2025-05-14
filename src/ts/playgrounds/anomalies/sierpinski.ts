@@ -24,7 +24,7 @@ import { SierpinskiPyramidPostProcess } from "../../anomalies/sierpinskiPyramid/
 
 export function createSierpinskiScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void
+    progressCallback: (progress: number, text: string) => void,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -43,7 +43,7 @@ export function createSierpinskiScene(
         "sierpinski",
         Number(urlParams.get("seed") ?? Math.random() * 100_000),
         "Sierpinski Pyramid",
-        []
+        [],
     );
 
     const sierpinskiPyramid = new EmptyCelestialBody(sierpinskiPyramidModel, scene);
@@ -54,7 +54,7 @@ export function createSierpinskiScene(
         sierpinskiPyramid.getBoundingRadius(),
         sierpinskiPyramidModel,
         scene,
-        []
+        [],
     );
 
     scene.cameras.forEach((camera) => camera.attachPostProcess(pp));

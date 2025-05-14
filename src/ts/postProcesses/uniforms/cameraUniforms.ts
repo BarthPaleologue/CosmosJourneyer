@@ -26,7 +26,7 @@ export const CameraUniformNames = {
     CAMERA_INVERSE_VIEW: "camera_inverseView",
     CAMERA_NEAR: "camera_near",
     CAMERA_FAR: "camera_far",
-    CAMERA_FOV: "camera_fov"
+    CAMERA_FOV: "camera_fov",
 };
 
 export function setCameraUniforms(effect: Effect, camera: Camera): void {

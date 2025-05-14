@@ -14,7 +14,7 @@ export default defineConfig([
         "doc",
         "src/asset",
         "coverage",
-        ".eslintcache"
+        ".eslintcache",
     ]),
     eslint.configs.recommended,
     ...tseslint.configs.strictTypeChecked,
@@ -25,18 +25,18 @@ export default defineConfig([
             "import/resolver": {
                 typescript: {
                     project: "./tsconfig.json",
-                    alwaysTryTypes: true
-                }
-            }
+                    alwaysTryTypes: true,
+                },
+            },
         },
         languageOptions: {
             parserOptions: {
                 projectService: true,
-                tsconfigRootDir: import.meta.dirname
+                tsconfigRootDir: import.meta.dirname,
             },
             ecmaVersion: "latest",
-            sourceType: "module"
-        }
+            sourceType: "module",
+        },
     },
     {
         rules: {
@@ -50,16 +50,16 @@ export default defineConfig([
             "@typescript-eslint/no-misused-promises": [
                 "error",
                 {
-                    checksVoidReturn: false
-                }
+                    checksVoidReturn: false,
+                },
             ],
 
             "@typescript-eslint/restrict-template-expressions": [
                 "error",
                 {
                     allowNumber: true,
-                    allowBoolean: true
-                }
+                    allowBoolean: true,
+                },
             ],
 
             "@typescript-eslint/no-deprecated": "warn",
@@ -73,8 +73,8 @@ export default defineConfig([
                 "error",
                 {
                     selector: "CallExpression[callee.object.name='Promise'][callee.property.name='reject']",
-                    message: "Using Promise.reject() is not allowed. Consider using Promise<Result> instead."
-                }
+                    message: "Using Promise.reject() is not allowed. Consider using Promise<Result> instead.",
+                },
             ],
 
             // naming conventions
@@ -85,35 +85,35 @@ export default defineConfig([
                     selector: "memberLike",
                     modifiers: ["public", "static"],
                     format: ["PascalCase", "UPPER_CASE"],
-                    leadingUnderscore: "forbid"
+                    leadingUnderscore: "forbid",
                 },
                 {
                     selector: "memberLike",
                     modifiers: ["private", "static"],
                     format: ["PascalCase", "UPPER_CASE"],
-                    leadingUnderscore: "forbid"
+                    leadingUnderscore: "forbid",
                 },
                 { selector: "typeLike", format: ["PascalCase"] },
                 {
                     selector: "variable",
                     modifiers: ["exported", "const", "global"],
                     format: ["PascalCase"],
-                    leadingUnderscore: "forbid"
+                    leadingUnderscore: "forbid",
                 },
                 {
                     selector: "function",
                     format: ["camelCase", "snake_case"],
-                    leadingUnderscore: "forbid"
+                    leadingUnderscore: "forbid",
                 },
                 {
                     selector: "function",
                     modifiers: ["exported", "global"],
                     format: ["camelCase"],
-                    leadingUnderscore: "forbid"
+                    leadingUnderscore: "forbid",
                 },
                 { selector: "interface", format: ["PascalCase"], leadingUnderscore: "forbid" },
-                { selector: "class", format: ["PascalCase"], leadingUnderscore: "forbid" }
-            ]
-        }
-    }
+                { selector: "class", format: ["PascalCase"], leadingUnderscore: "forbid" },
+            ],
+        },
+    },
 ]);

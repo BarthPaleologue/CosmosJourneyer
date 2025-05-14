@@ -48,7 +48,7 @@ export class HierarchyInstancePatch implements IPatch {
             this.transforms.push({
                 position,
                 rotation,
-                scaling
+                scaling,
             });
         }
     }

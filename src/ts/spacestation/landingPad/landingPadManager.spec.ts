@@ -33,7 +33,7 @@ class MockLandingPad implements ILandingPad {
     readonly targetInfo: TargetInfo = {
         type: ObjectTargetCursorType.LANDING_PAD,
         minDistance: 0,
-        maxDistance: 0
+        maxDistance: 0,
     };
 
     private readonly transform = new TransformNode("mockLandingPadTransform");

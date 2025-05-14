@@ -140,7 +140,7 @@ export class MusicConductor {
 
         const distanceToClosestObject = Vector3.Distance(
             playerPosition,
-            closestOrbitalObject.getTransform().getAbsolutePosition()
+            closestOrbitalObject.getTransform().getAbsolutePosition(),
         );
 
         if (!isInStarSystemView) {
@@ -199,7 +199,7 @@ export class MusicConductor {
             const suitableMusics = [
                 this.musics.atlanteanTwilight,
                 this.musics.infinitePerspective,
-                this.musics.mesmerize
+                this.musics.mesmerize,
             ];
 
             this.setMusicFromSelection(suitableMusics);
@@ -218,7 +218,7 @@ export class MusicConductor {
                 this.musics.deepRelaxation,
                 this.musics.peaceOfMind,
                 this.musics.mesmerize,
-                this.musics.reawakening
+                this.musics.reawakening,
             ];
 
             this.setMusicFromSelection(suitableMusics);

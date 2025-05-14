@@ -25,7 +25,7 @@ import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import {
     IPhysicsCollisionEvent,
     PhysicsMotionType,
-    PhysicsShapeType
+    PhysicsShapeType,
 } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
@@ -57,7 +57,7 @@ import { Thruster } from "./thruster";
 const enum ShipState {
     FLYING,
     LANDING,
-    LANDED
+    LANDED,
 }
 
 export class Spaceship implements Transformable {
@@ -131,7 +131,7 @@ export class Spaceship implements Transformable {
         unfitComponents: Set<SerializedComponent>,
         scene: Scene,
         assets: RenderingAssets,
-        soundPlayer: ISoundPlayer
+        soundPlayer: ISoundPlayer,
     ) {
         this.id = serializedSpaceShip.id;
 
@@ -152,16 +152,16 @@ export class Spaceship implements Transformable {
             PhysicsShapeType.CONTAINER,
             {
                 mass: 10,
-                restitution: 0.2
+                restitution: 0.2,
             },
-            scene
+            scene,
         );
         for (const child of this.instanceRoot.getChildMeshes()) {
             if (child.name.includes("mainThruster")) {
                 const mainThruster = new Thruster(
                     child,
                     getForwardDirection(this.instanceRoot).negate(),
-                    this.aggregate
+                    this.aggregate,
                 );
                 this.mainThrusters.push(mainThruster);
                 continue;
@@ -186,7 +186,7 @@ export class Spaceship implements Transformable {
         this.hyperSpaceTunnel = new HyperSpaceTunnel(
             this.getTransform().getDirection(Axis.Z),
             scene,
-            assets.textures.noises
+            assets.textures.noises,
         );
         this.hyperSpaceTunnel.setParent(this.getTransform());
         this.hyperSpaceTunnel.setEnabled(false);
@@ -195,28 +195,28 @@ export class Spaceship implements Transformable {
             SoundType.ENABLE_WARP_DRIVE,
             AudioMasks.STAR_MAP_VIEW,
             1,
-            true
+            true,
         );
 
         this.disableWarpDriveSound = soundPlayer.createInstance(
             SoundType.DISABLE_WARP_DRIVE,
             AudioMasks.STAR_MAP_VIEW,
             1,
-            true
+            true,
         );
 
         this.acceleratingWarpDriveSound = soundPlayer.createInstance(
             SoundType.ACCELERATING_WARP_DRIVE,
             AudioMasks.STAR_SYSTEM_VIEW,
             0,
-            false
+            false,
         );
 
         this.deceleratingWarpDriveSound = soundPlayer.createInstance(
             SoundType.DECELERATING_WARP_DRIVE,
             AudioMasks.STAR_SYSTEM_VIEW,
             0,
-            false
+            false,
         );
 
         this.hyperSpaceSound = soundPlayer.createInstance(SoundType.HYPER_SPACE, AudioMasks.HYPER_SPACE, 0, false);
@@ -354,7 +354,7 @@ export class Spaceship implements Transformable {
         this.state = ShipState.LANDING;
         this.landingComputer?.setTarget({
             kind: LandingTargetKind.CELESTIAL_BODY,
-            celestialBody: landingTarget
+            celestialBody: landingTarget,
         });
 
         this.onPlanetaryLandingEngaged.notifyObservers();
@@ -452,7 +452,7 @@ export class Spaceship implements Transformable {
 
         const distanceToBody = Vector3.Distance(
             this.getTransform().getAbsolutePosition(),
-            this.nearestCelestialBody.getTransform().getAbsolutePosition()
+            this.nearestCelestialBody.getTransform().getAbsolutePosition(),
         );
         const currentFuelPercentage = this.getRemainingFuel() / this.getTotalFuelCapacity();
         if (
@@ -507,7 +507,7 @@ export class Spaceship implements Transformable {
 
         const currentForwardSpeed = Vector3.Dot(
             warpSpeed,
-            this.aggregate.transformNode.getDirection(Vector3.Forward(this.scene.useRightHandedSystem))
+            this.aggregate.transformNode.getDirection(Vector3.Forward(this.scene.useRightHandedSystem)),
         );
 
         let closestDistance = Number.POSITIVE_INFINITY;
@@ -521,7 +521,7 @@ export class Spaceship implements Transformable {
 
                 const distanceToClosestOrbitalObject = Vector3.Distance(
                     this.getTransform().getAbsolutePosition(),
-                    this.nearestOrbitalObject.getTransform().getAbsolutePosition()
+                    this.nearestOrbitalObject.getTransform().getAbsolutePosition(),
                 );
                 const orbitalObjectRadius = this.nearestOrbitalObject.getBoundingRadius();
 
@@ -536,7 +536,7 @@ export class Spaceship implements Transformable {
                 if (asteroidField !== null) {
                     const distanceToRings = distanceToAsteroidField(
                         this.getTransform().getAbsolutePosition(),
-                        asteroidField
+                        asteroidField,
                     );
 
                     if (distanceToRings < closestDistance) {
@@ -601,12 +601,12 @@ export class Spaceship implements Transformable {
                     if (speedDifference < 0) {
                         this.aggregate.body.applyForce(
                             forwardDirection.scale(this.thrusterForce),
-                            this.aggregate.body.getObjectCenterWorld()
+                            this.aggregate.body.getObjectCenterWorld(),
                         );
                     } else {
                         this.aggregate.body.applyForce(
                             forwardDirection.scale(-0.7 * this.thrusterForce),
-                            this.aggregate.body.getObjectCenterWorld()
+                            this.aggregate.body.getObjectCenterWorld(),
                         );
                     }
                 }
@@ -633,7 +633,7 @@ export class Spaceship implements Transformable {
                     if (this.state !== ShipState.LANDING) {
                         this.landingComputer.setTarget({
                             kind: LandingTargetKind.LANDING_PAD,
-                            landingPad: this.targetLandingPad
+                            landingPad: this.targetLandingPad,
                         });
 
                         this.state = ShipState.LANDING;
@@ -729,7 +729,7 @@ export class Spaceship implements Transformable {
         unfitComponents: Set<SerializedComponent>,
         scene: Scene,
         assets: RenderingAssets,
-        soundPlayer: ISoundPlayer
+        soundPlayer: ISoundPlayer,
     ): Spaceship {
         return new Spaceship(serializedSpaceship, unfitComponents, scene, assets, soundPlayer);
     }
@@ -741,7 +741,7 @@ export class Spaceship implements Transformable {
                     id: this.id,
                     name: this.name,
                     type: this.shipType,
-                    components: this.getInternals().serialize()
+                    components: this.getInternals().serialize(),
                 };
         }
     }

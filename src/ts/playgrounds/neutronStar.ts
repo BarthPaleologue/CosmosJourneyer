@@ -33,7 +33,7 @@ import { enablePhysics } from "./utils";
 
 export async function createNeutronStarScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void
+    progressCallback: (progress: number, text: string) => void,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -63,7 +63,7 @@ export async function createNeutronStarScene(
         neutronStar.getTransform(),
         neutronStar.getRadius(),
         neutronStar.model.dipoleTilt,
-        scene
+        scene,
     );
     camera.attachPostProcess(matterJets);
 
@@ -71,7 +71,7 @@ export async function createNeutronStarScene(
         neutronStar.getTransform(),
         neutronStar.getRadius(),
         getRgbFromTemperature(neutronStarModel.blackBodyTemperature),
-        scene
+        scene,
     );
     camera.attachPostProcess(lensFlare);
 

@@ -27,7 +27,7 @@ export const UniverseObjectIdSchema = z.object({
     idInSystem: OrbitalObjectIdSchema,
 
     /** The coordinates of the star system. */
-    systemCoordinates: StarSystemCoordinatesSchema
+    systemCoordinates: StarSystemCoordinatesSchema,
 });
 
 /**
@@ -49,10 +49,10 @@ export function universeObjectIdEquals(a: UniverseObjectId, b: UniverseObjectId)
  */
 export function getUniverseObjectId(
     orbitalObject: DeepReadonly<OrbitalObjectModel>,
-    starSystem: DeepReadonly<StarSystemModel>
+    starSystem: DeepReadonly<StarSystemModel>,
 ): UniverseObjectId {
     return {
         systemCoordinates: starSystem.coordinates,
-        idInSystem: orbitalObject.id
+        idInSystem: orbitalObject.id,
     };
 }

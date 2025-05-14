@@ -54,7 +54,7 @@ import { SubtractBlock } from "@babylonjs/core/Materials/Node/Blocks/subtractBlo
 import { TransformBlock } from "@babylonjs/core/Materials/Node/Blocks/transformBlock";
 import {
     TrigonometryBlock,
-    TrigonometryBlockOperations
+    TrigonometryBlockOperations,
 } from "@babylonjs/core/Materials/Node/Blocks/trigonometryBlock";
 import { VectorMergerBlock } from "@babylonjs/core/Materials/Node/Blocks/vectorMergerBlock";
 import { VectorSplitterBlock } from "@babylonjs/core/Materials/Node/Blocks/vectorSplitterBlock";
@@ -70,7 +70,7 @@ export const Target = {
     VERT: NodeMaterialBlockTargets.Vertex,
     FRAG: NodeMaterialBlockTargets.Fragment,
     NEUTRAL: NodeMaterialBlockTargets.Neutral,
-    VERT_AND_FRAG: NodeMaterialBlockTargets.VertexAndFragment
+    VERT_AND_FRAG: NodeMaterialBlockTargets.VertexAndFragment,
 };
 
 export type TargetOptions = {
@@ -143,7 +143,7 @@ export type VertexAttributeName =
  */
 export function vertexAttribute(
     name: VertexAttributeName,
-    options?: Partial<TargetOptions>
+    options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
     const attribute = new InputBlock(name);
     attribute.target = options?.target ?? NodeMaterialBlockTargets.Vertex;
@@ -194,7 +194,7 @@ export function constFloat(name: string, value: number, options?: Partial<Target
 export function uniformFloat(
     name: string,
     value: number,
-    options?: Partial<TargetOptions>
+    options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
     const inputBlock = new InputBlock(name);
     inputBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
@@ -219,7 +219,7 @@ export type TextureBlockOptions = TargetOptions & {
 export function textureSample(
     texture: Texture,
     uv: NodeMaterialConnectionPoint,
-    options?: Partial<TextureBlockOptions>
+    options?: Partial<TextureBlockOptions>,
 ) {
     const textureBlock = new TextureBlock("texture");
     textureBlock.target = options?.target ?? NodeMaterialBlockTargets.Fragment;
@@ -242,7 +242,7 @@ export function textureSample(
 export function transformPosition(
     transformMat4: NodeMaterialConnectionPoint,
     positionVec3: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>
+    options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
     const transformBlock = new TransformBlock("TransformPosition");
     transformBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
@@ -264,7 +264,7 @@ export function transformPosition(
 export function transformDirection(
     transformMat4: NodeMaterialConnectionPoint,
     directionVec3: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>
+    options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
     const transformBlock = new TransformBlock("TransformDirection");
     transformBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
@@ -286,7 +286,7 @@ export function transformDirection(
 export function trig(
     input: NodeMaterialConnectionPoint,
     operation: TrigonometryBlockOperations,
-    options?: Partial<TargetOptions>
+    options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
     const trigBlock = new TrigonometryBlock("trig");
     trigBlock.operation = operation;
@@ -306,7 +306,7 @@ export function trig(
 export function atan2(
     x: NodeMaterialConnectionPoint,
     y: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>
+    options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
     const atan2Block = new ArcTan2Block("atan2");
     atan2Block.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
@@ -324,7 +324,7 @@ export function atan2(
  */
 export function length(
     input: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>
+    options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
     const lengthBlock = new LengthBlock("length");
     lengthBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
@@ -349,7 +349,7 @@ export function remap(
     sourceMax: NodeMaterialConnectionPoint,
     targetMin: NodeMaterialConnectionPoint,
     targetMax: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>
+    options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
     const remapBlock = new RemapBlock("remap");
     remapBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
@@ -370,7 +370,7 @@ export function remap(
  */
 export function fract(
     input: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>
+    options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
     const fractBlock = new TrigonometryBlock("fract");
     fractBlock.operation = TrigonometryBlockOperations.Fract;
@@ -390,7 +390,7 @@ export function fract(
 export function mul(
     left: NodeMaterialConnectionPoint,
     right: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>
+    options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
     const mulBlock = new MultiplyBlock("mul");
     mulBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
@@ -411,7 +411,7 @@ export function mul(
 export function div(
     left: NodeMaterialConnectionPoint,
     right: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>
+    options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
     const mulBlock = new DivideBlock("div");
     mulBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
@@ -435,7 +435,7 @@ export function merge(
     y: NodeMaterialConnectionPoint,
     z: NodeMaterialConnectionPoint | null,
     w: NodeMaterialConnectionPoint | null,
-    options?: Partial<TargetOptions>
+    options?: Partial<TargetOptions>,
 ) {
     const merger = new VectorMergerBlock("Merge");
     merger.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
@@ -463,7 +463,7 @@ export function merge(
 export function withX(
     input: NodeMaterialConnectionPoint,
     x: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>
+    options?: Partial<TargetOptions>,
 ) {
     const splitInput = split(input, options);
     return merge(x, splitInput.y, splitInput.z, splitInput.w, options);
@@ -478,7 +478,7 @@ export function withX(
 export function withY(
     input: NodeMaterialConnectionPoint,
     y: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>
+    options?: Partial<TargetOptions>,
 ) {
     const splitInput = split(input, options);
     return merge(splitInput.x, y, splitInput.z, splitInput.w, options);
@@ -493,7 +493,7 @@ export function withY(
 export function withZ(
     input: NodeMaterialConnectionPoint,
     z: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>
+    options?: Partial<TargetOptions>,
 ) {
     const splitInput = split(input, options);
     return merge(splitInput.x, splitInput.y, z, splitInput.w, options);
@@ -508,7 +508,7 @@ export function withZ(
 export function withW(
     input: NodeMaterialConnectionPoint,
     w: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>
+    options?: Partial<TargetOptions>,
 ) {
     const splitInput = split(input, options);
     return merge(splitInput.x, splitInput.y, splitInput.z, w, options);
@@ -537,7 +537,7 @@ export function vec(vec: Vector2 | Vector3 | Vector4, options?: Partial<TargetOp
 export function vec2(
     x: NodeMaterialConnectionPoint,
     y: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>
+    options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
     return merge(x, y, null, null, options).xyOut;
 }
@@ -553,7 +553,7 @@ export function vec3(
     x: NodeMaterialConnectionPoint,
     y: NodeMaterialConnectionPoint,
     z: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>
+    options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
     return merge(x, y, z, null, options).xyzOut;
 }
@@ -571,7 +571,7 @@ export function vec4(
     y: NodeMaterialConnectionPoint,
     z: NodeMaterialConnectionPoint,
     w: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>
+    options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
     return merge(x, y, z, w, options).xyzw;
 }
@@ -620,7 +620,7 @@ export function split(inputVec: NodeMaterialConnectionPoint, options?: Partial<T
  */
 export function xz(
     inputVec: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>
+    options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
     const inputSplitted = split(inputVec, options);
 
@@ -642,7 +642,7 @@ export function xz(
 export function step(
     edge: NodeMaterialConnectionPoint,
     x: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>
+    options?: Partial<TargetOptions>,
 ) {
     const stepBlock = new StepBlock("step");
     stepBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
@@ -667,7 +667,7 @@ export function smoothstep(
     edge0: NodeMaterialConnectionPoint,
     edge1: NodeMaterialConnectionPoint,
     x: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>
+    options?: Partial<TargetOptions>,
 ) {
     const stepBlock = new SmoothStepBlock("smoothstep");
     stepBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
@@ -705,7 +705,7 @@ export function mix(
     x: NodeMaterialConnectionPoint,
     y: NodeMaterialConnectionPoint,
     a: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>
+    options?: Partial<TargetOptions>,
 ) {
     const mixBlock = new LerpBlock("mix");
     mixBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
@@ -727,7 +727,7 @@ export function mix(
 export function add(
     left: NodeMaterialConnectionPoint,
     right: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>
+    options?: Partial<TargetOptions>,
 ) {
     const addBlock = new AddBlock("add");
     addBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
@@ -747,7 +747,7 @@ export function add(
 export function sub(
     left: NodeMaterialConnectionPoint,
     right: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>
+    options?: Partial<TargetOptions>,
 ) {
     const subBlock = new SubtractBlock("sub");
     subBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
@@ -768,7 +768,7 @@ export function sub(
 export function min(
     left: NodeMaterialConnectionPoint,
     right: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>
+    options?: Partial<TargetOptions>,
 ) {
     const minBlock = new MinBlock("min");
     minBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
@@ -789,7 +789,7 @@ export function min(
 export function max(
     left: NodeMaterialConnectionPoint,
     right: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>
+    options?: Partial<TargetOptions>,
 ) {
     const maxBlock = new MaxBlock("max");
     maxBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
@@ -815,7 +815,7 @@ export function perturbNormal(
     normalWorldVec3: NodeMaterialConnectionPoint,
     normalTexture: NodeMaterialConnectionPoint,
     bumpStrengthFloat: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>
+    options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
     const perturbedNormal = new PerturbNormalBlock("Perturb normal");
     perturbedNormal.target = options?.target ?? NodeMaterialBlockTargets.Fragment;
@@ -858,7 +858,7 @@ export function pbrMetallicRoughnessMaterial(
     viewMat4: NodeMaterialConnectionPoint,
     cameraPositionVec3: NodeMaterialConnectionPoint,
     positionWorldVec3: NodeMaterialConnectionPoint,
-    options?: Partial<PBRMetallicRoughnessMaterialOptions>
+    options?: Partial<PBRMetallicRoughnessMaterialOptions>,
 ): NodeMaterialConnectionPoint {
     const PBRMetallicRoughness = new PBRMetallicRoughnessBlock("PBRMetallicRoughness");
     PBRMetallicRoughness.target = options?.target ?? NodeMaterialBlockTargets.Fragment;
@@ -891,7 +891,7 @@ export type OutputFragColorOptions = {
  */
 export function outputFragColor(
     colorRgb: NodeMaterialConnectionPoint,
-    options?: Partial<OutputFragColorOptions>
+    options?: Partial<OutputFragColorOptions>,
 ): FragmentOutputBlock {
     const FragmentOutput = new FragmentOutputBlock("FragmentOutput");
     FragmentOutput.target = NodeMaterialBlockTargets.Fragment;
@@ -910,7 +910,7 @@ export function outputFragColor(
  */
 export function outputVertexPosition(
     positionVec4: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>
+    options?: Partial<TargetOptions>,
 ): VertexOutputBlock {
     const VertexOutput = new VertexOutputBlock("VertexOutput");
     VertexOutput.target = options?.target ?? NodeMaterialBlockTargets.Vertex;

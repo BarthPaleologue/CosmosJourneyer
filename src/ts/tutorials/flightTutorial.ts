@@ -59,11 +59,11 @@ export class FlightTutorial implements Tutorial {
             <p>${i18n.t("tutorials:flightTutorial:welcome")}</p>
             ${i18n.t("tutorials:common:navigationInfo", {
                 nextKeys: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keybordLayoutMap).join(
-                    ` ${i18n.t("common:or")} `
+                    ` ${i18n.t("common:or")} `,
                 ),
                 previousKeys: pressInteractionToStrings(TutorialControlsInputs.map.prevPanel, keybordLayoutMap).join(
-                    ` ${i18n.t("common:or")} `
-                )
+                    ` ${i18n.t("common:or")} `,
+                ),
             })}
         </div>`;
 
@@ -89,8 +89,8 @@ export class FlightTutorial implements Tutorial {
                 keyIncrease: throttleStrings[1]?.[1],
                 keyDecrease: throttleStrings[0]?.[1],
                 keyKill: pressInteractionToStrings(SpaceShipControlsInputs.map.throttleToZero, keybordLayoutMap).join(
-                    ` ${i18n.t("common:or")} `
-                )
+                    ` ${i18n.t("common:or")} `,
+                ),
             })}</p>
             <img src="${thrustImageSrc}" alt="Spaceship Thrust">
             <p>${i18n.t("tutorials:flightTutorial:spaceShipThrustText2")}</p>
@@ -122,8 +122,8 @@ export class FlightTutorial implements Tutorial {
             
             ${i18n.t("tutorials:common:tutorialEnding", {
                 keyQuit: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keybordLayoutMap).join(
-                    ` ${i18n.t("common:or")} `
-                )
+                    ` ${i18n.t("common:or")} `,
+                ),
             })}
         </div>`;
 
@@ -133,7 +133,7 @@ export class FlightTutorial implements Tutorial {
             thrustPanelHtml,
             warpPanelHtml,
             targetingPanelHtml,
-            congratsPanelHtml
+            congratsPanelHtml,
         ];
     }
 }

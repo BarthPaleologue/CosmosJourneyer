@@ -72,7 +72,7 @@ export function slerpSmoothToRef(
     b: Quaternion,
     halfLifeSeconds: number,
     deltaSeconds: number,
-    ref: Quaternion
+    ref: Quaternion,
 ) {
     return Quaternion.SlerpToRef(a, b, 2 ** (-deltaSeconds / halfLifeSeconds), ref);
 }

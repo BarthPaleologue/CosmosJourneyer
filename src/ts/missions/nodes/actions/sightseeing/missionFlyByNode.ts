@@ -123,7 +123,7 @@ export class MissionFlyByNode implements MissionNodeBase<MissionNodeType.FLY_BY>
     describe(originSystemCoordinates: StarSystemCoordinates, starSystemDatabase: StarSystemDatabase): string {
         const distance = Vector3.Distance(
             starSystemDatabase.getSystemGalacticPosition(originSystemCoordinates),
-            starSystemDatabase.getSystemGalacticPosition(this.targetSystemCoordinates)
+            starSystemDatabase.getSystemGalacticPosition(this.targetSystemCoordinates),
         );
         const objectModel = starSystemDatabase.getObjectModelByUniverseId(this.objectId);
         const systemModel = starSystemDatabase.getSystemModelFromCoordinates(this.targetSystemCoordinates);
@@ -133,14 +133,14 @@ export class MissionFlyByNode implements MissionNodeBase<MissionNodeType.FLY_BY>
         return i18n.t("missions:sightseeing:describeFlyBy", {
             objectType: getOrbitalObjectTypeToI18nString(objectModel),
             systemName: systemModel.name,
-            distance: distance > 0 ? parseDistance(distance * Settings.LIGHT_YEAR) : i18n.t("missions:common:here")
+            distance: distance > 0 ? parseDistance(distance * Settings.LIGHT_YEAR) : i18n.t("missions:common:here"),
         });
     }
 
     describeNextTask(
         context: MissionContext,
         keyboardLayout: Map<string, string>,
-        starSystemDatabase: StarSystemDatabase
+        starSystemDatabase: StarSystemDatabase,
     ): string {
         if (this.isCompleted()) {
             return i18n.t("missions:flyBy:missionCompleted");
@@ -157,11 +157,11 @@ export class MissionFlyByNode implements MissionNodeBase<MissionNodeType.FLY_BY>
                     context,
                     this.targetSystemCoordinates,
                     keyboardLayout,
-                    starSystemDatabase
+                    starSystemDatabase,
                 );
             case FlyByState.TOO_FAR_IN_SYSTEM:
                 return i18n.t("missions:common:getCloserToTarget", {
-                    objectName: targetObject.name
+                    objectName: targetObject.name,
                 });
             case FlyByState.CLOSE_ENOUGH:
                 return i18n.t("missions:flyBy:missionCompleted");
@@ -176,7 +176,7 @@ export class MissionFlyByNode implements MissionNodeBase<MissionNodeType.FLY_BY>
         return {
             type: MissionNodeType.FLY_BY,
             objectId: this.objectId,
-            state: this.state
+            state: this.state,
         };
     }
 }

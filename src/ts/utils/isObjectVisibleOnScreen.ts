@@ -44,7 +44,7 @@ export function isSizeOnScreenEnough(object: HasBoundingSphere & Transformable, 
     const angularSize = getAngularSize(
         object.getTransform().getAbsolutePosition(),
         object.getBoundingRadius(),
-        camera.globalPosition
+        camera.globalPosition,
     );
 
     return angularSize / camera.fov > threshold;

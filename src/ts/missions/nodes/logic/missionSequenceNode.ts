@@ -77,7 +77,7 @@ export class MissionSequenceNode implements MissionNodeBase<MissionNodeType.SEQU
     setActiveChildIndex(index: number) {
         if (index < 0 || index >= this.children.length) {
             throw new Error(
-                `Invalid index ${index} for mission sequence node. Must be between 0 and ${this.children.length - 1}`
+                `Invalid index ${index} for mission sequence node. Must be between 0 and ${this.children.length - 1}`,
             );
         }
         this.activeChildIndex = index;
@@ -90,7 +90,7 @@ export class MissionSequenceNode implements MissionNodeBase<MissionNodeType.SEQU
     describeNextTask(
         context: MissionContext,
         keyboardLayout: Map<string, string>,
-        starSystemDatabase: StarSystemDatabase
+        starSystemDatabase: StarSystemDatabase,
     ): string {
         if (this.hasCompletedLock) return "Mission completed";
         const activeChild = this.children[this.activeChildIndex];
@@ -111,7 +111,7 @@ export class MissionSequenceNode implements MissionNodeBase<MissionNodeType.SEQU
         return {
             type: MissionNodeType.SEQUENCE,
             children: this.children.map((child) => child.serialize()),
-            activeChildIndex: this.activeChildIndex
+            activeChildIndex: this.activeChildIndex,
         };
     }
 }

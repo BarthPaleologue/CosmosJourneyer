@@ -8,7 +8,7 @@ export default defineConfig({
         include: ["**/*.{test,spec}.ts"],
         exclude: ["node_modules", "dist", ".git", "tests/e2e/**"],
         alias: {
-            "@": path.resolve(__dirname, "./src/ts")
-        }
-    }
+            "@": path.resolve(__dirname, "./src/ts"),
+        },
+    },
 });

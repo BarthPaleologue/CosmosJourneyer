@@ -37,7 +37,7 @@ export function getAlphaTestisSystemModel(): StarSystemModel {
         starSectorZ: 0,
         localX: 0,
         localY: 0,
-        localZ: 0
+        localZ: 0,
     };
 
     const weierstrass = newSeededStarModel("star0", 420, "Weierstrass", []);
@@ -72,6 +72,6 @@ export function getAlphaTestisSystemModel(): StarSystemModel {
         planets: [hecate, ares, andromaque],
         satellites: [manaleth],
         anomalies: [],
-        orbitalFacilities: [spaceStation]
+        orbitalFacilities: [spaceStation],
     };
 }

@@ -40,13 +40,13 @@ export class ThickLines {
         {
             points,
             thickness,
-            color
+            color,
         }: {
             points: Vector3[];
             thickness?: number;
             color?: Color3;
         },
-        scene: Scene
+        scene: Scene,
     ) {
         this.name = name;
 
@@ -80,9 +80,9 @@ export class ThickLines {
                     `${this.name}Segment${i}`,
                     {
                         height: 1,
-                        diameter: this.thickness
+                        diameter: this.thickness,
                     },
-                    this.scene
+                    this.scene,
                 );
                 cylinder.alwaysSelectAsActiveMesh = true;
                 cylinder.material = this.material;

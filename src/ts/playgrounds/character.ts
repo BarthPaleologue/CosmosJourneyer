@@ -24,7 +24,7 @@ import {
     PBRMetallicRoughnessMaterial,
     PhysicsAggregate,
     PhysicsShapeType,
-    ShadowGenerator
+    ShadowGenerator,
 } from "@babylonjs/core";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -37,7 +37,7 @@ import { enablePhysics } from "./utils";
 
 export async function createCharacterDemoScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void
+    progressCallback: (progress: number, text: string) => void,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -85,7 +85,7 @@ export async function createCharacterDemoScene(
     ground.receiveShadows = true;
 
     character.setClosestWalkableObject({
-        getTransform: () => ground
+        getTransform: () => ground,
     });
 
     scene.onBeforeRenderObservable.add(() => {

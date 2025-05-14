@@ -24,7 +24,7 @@ import { JuliaSetPostProcess } from "../../anomalies/julia/juliaSetPostProcess";
 
 export function createJuliaSetScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void
+    progressCallback: (progress: number, text: string) => void,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -43,7 +43,7 @@ export function createJuliaSetScene(
         "juliaSet",
         Number(urlParams.get("seed") ?? Math.random() * 100_000),
         "Julia Set",
-        []
+        [],
     );
 
     const anomaly = new EmptyCelestialBody(model, scene);
@@ -54,7 +54,7 @@ export function createJuliaSetScene(
         anomaly.getBoundingRadius(),
         model.accentColor,
         scene,
-        []
+        [],
     );
 
     scene.cameras.forEach((camera) => camera.attachPostProcess(pp));

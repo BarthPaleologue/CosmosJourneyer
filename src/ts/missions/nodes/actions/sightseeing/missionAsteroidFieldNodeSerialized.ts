@@ -24,13 +24,13 @@ import { MissionNodeType } from "../../missionNodeType";
 export enum AsteroidFieldMissionState {
     NOT_IN_SYSTEM,
     TOO_FAR_IN_SYSTEM,
-    CLOSE_ENOUGH
+    CLOSE_ENOUGH,
 }
 
 export const MissionAsteroidFieldNodeSerializedSchema = z.object({
     type: z.literal(MissionNodeType.ASTEROID_FIELD),
     objectId: UniverseObjectIdSchema,
-    state: z.nativeEnum(AsteroidFieldMissionState)
+    state: z.nativeEnum(AsteroidFieldMissionState),
 });
 
 export type MissionAsteroidFieldNodeSerialized = z.infer<typeof MissionAsteroidFieldNodeSerializedSchema>;

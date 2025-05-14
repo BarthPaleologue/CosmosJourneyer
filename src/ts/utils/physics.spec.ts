@@ -32,7 +32,7 @@ import {
     getSphereTotalRadiatedEnergy,
     hasLiquidWater,
     kelvinToCelsius,
-    waterBoilingTemperature
+    waterBoilingTemperature,
 } from "./physics";
 
 test("celsiusToKelvin", () => {
@@ -58,7 +58,7 @@ test("computeMeanTemperature", () => {
         sunRadius,
         sunEarthDistance,
         earthAlbedo,
-        0
+        0,
     );
     const targetEarthTemperatureWithoutGreenHouseEffect = 255; // in Kelvin
     expect(meanTemperatureWithoutGreenHouseEffect).toBeGreaterThan(targetEarthTemperatureWithoutGreenHouseEffect - 5);
@@ -70,7 +70,7 @@ test("computeMeanTemperature", () => {
         sunRadius,
         sunEarthDistance,
         earthAlbedo,
-        greenHouseEffect
+        greenHouseEffect,
     );
     const targetEarthTemperatureWithGreenHouseEffect = 289; // in Kelvin
     expect(meanTemperatureWithGreenHouseEffect).toBeGreaterThan(targetEarthTemperatureWithGreenHouseEffect - 5);
@@ -213,7 +213,7 @@ describe("getApparentGravityOnSpaceTether", () => {
         const apparentGravity = getApparentGravityOnSpaceTether(
             earthSiderealDayDuration,
             earthMass,
-            geostationaryOrbitRadius
+            geostationaryOrbitRadius,
         );
 
         // The apparent gravity should be zero at the geostationary orbit
@@ -223,7 +223,7 @@ describe("getApparentGravityOnSpaceTether", () => {
         const apparentGravityAboveGeoOrbit = getApparentGravityOnSpaceTether(
             earthSiderealDayDuration,
             earthMass,
-            geostationaryOrbitRadius + 10_000e3
+            geostationaryOrbitRadius + 10_000e3,
         );
         expect(apparentGravityAboveGeoOrbit).toBeGreaterThan(0);
 
@@ -231,7 +231,7 @@ describe("getApparentGravityOnSpaceTether", () => {
         const apparentGravityBelowGeoOrbit = getApparentGravityOnSpaceTether(
             earthSiderealDayDuration,
             earthMass,
-            geostationaryOrbitRadius - 10_000e3
+            geostationaryOrbitRadius - 10_000e3,
         );
         expect(apparentGravityBelowGeoOrbit).toBeLessThan(0);
     });

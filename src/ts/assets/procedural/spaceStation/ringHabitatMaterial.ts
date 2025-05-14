@@ -43,7 +43,7 @@ import {
     uniformWorld,
     vec2,
     vec3,
-    vertexAttribute
+    vertexAttribute,
 } from "@/utils/bsl";
 
 import { PBRTextures } from "../../textures";
@@ -77,7 +77,7 @@ export class RingHabitatMaterial extends NodeMaterial {
         this.addOutputNode(vertexOutput);
 
         const albedo = textureSample(textures.albedo, proceduralUV, {
-            convertToLinearSpace: true
+            convertToLinearSpace: true,
         });
         const normalMap = textureSample(textures.normal, proceduralUV);
         const metallicRoughness = textureSample(textures.metallicRoughness, proceduralUV);
@@ -97,15 +97,18 @@ export class RingHabitatMaterial extends NodeMaterial {
             normalW,
             view,
             cameraPosition,
-            positionW
+            positionW,
         );
 
         const lightEmission = mul(
             mul(
                 smoothstep(f(0.48), f(0.5), fract(scaledUvX)),
-                sub(f(1), smoothstep(f(0.5), f(0.52), fract(scaledUvX)))
+                sub(f(1), smoothstep(f(0.5), f(0.52), fract(scaledUvX))),
             ),
-            mul(smoothstep(f(0.4), f(0.45), fract(scaledUvY)), sub(f(1), smoothstep(f(0.55), f(0.6), fract(scaledUvY))))
+            mul(
+                smoothstep(f(0.4), f(0.45), fract(scaledUvY)),
+                sub(f(1), smoothstep(f(0.55), f(0.6), fract(scaledUvY))),
+            ),
         );
 
         const lightColor = vec3(f(1), f(1), f(0.7));

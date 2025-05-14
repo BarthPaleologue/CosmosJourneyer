@@ -21,7 +21,7 @@ import { Scene } from "@babylonjs/core/scene";
 
 export const SamplerUniformNames = {
     TEXTURE_SAMPLER: "textureSampler",
-    DEPTH_SAMPLER: "depthSampler"
+    DEPTH_SAMPLER: "depthSampler",
 };
 
 export function setSamplerUniforms(effect: Effect, camera: Camera, scene: Scene): void {

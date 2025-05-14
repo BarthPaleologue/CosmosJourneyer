@@ -32,7 +32,7 @@ export function getOrbitalPosition(
     object: OrbitalObject,
     parents: OrbitalObject[],
     referencePlaneRotation: Matrix,
-    elapsedSeconds: number
+    elapsedSeconds: number,
 ): Vector3 {
     const orbit = object.model.orbit;
     if (orbit.semiMajorAxis === 0 || parents.length === 0) return object.getTransform().position;
@@ -60,7 +60,7 @@ export function setOrbitalPosition(
     object: OrbitalObject,
     parents: OrbitalObject[],
     referencePlaneRotation: Matrix,
-    elapsedSeconds: number
+    elapsedSeconds: number,
 ): void {
     const orbit = object.model.orbit;
     if (orbit.semiMajorAxis === 0 || parents.length === 0) return;

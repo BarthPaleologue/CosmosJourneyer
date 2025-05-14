@@ -53,17 +53,17 @@ export class AxisRenderer {
             {
                 points: [
                     new Vector3(0, -orbitalObject.getBoundingRadius() * 2, 0),
-                    new Vector3(0, orbitalObject.getBoundingRadius() * 2, 0)
+                    new Vector3(0, orbitalObject.getBoundingRadius() * 2, 0),
                 ],
-                updatable: false
+                updatable: false,
             },
             {
                 color: new Color3(0.4, 0.4, 0.4),
                 width: 5,
                 colorMode: GreasedLineMeshColorMode.COLOR_MODE_SET,
-                sizeAttenuation: true
+                sizeAttenuation: true,
             },
-            scene
+            scene,
         );
 
         rotationAxisHelper.parent = orbitalObject.getTransform();

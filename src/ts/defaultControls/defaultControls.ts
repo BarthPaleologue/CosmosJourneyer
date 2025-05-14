@@ -32,7 +32,7 @@ import {
     pitch,
     roll,
     translate,
-    yaw
+    yaw,
 } from "../uberCore/transforms/basicTransform";
 import { getTransformationQuaternion } from "../utils/algebra";
 import { lerpSmooth } from "../utils/math";
@@ -81,19 +81,19 @@ export class DefaultControls implements Controls {
             this.rotationInertia.x,
             DefaultControlsInputs.map.roll.value,
             inertiaHalfLifeSeconds,
-            deltaSeconds
+            deltaSeconds,
         );
         this.rotationInertia.y = lerpSmooth(
             this.rotationInertia.y,
             DefaultControlsInputs.map.pitch.value,
             inertiaHalfLifeSeconds,
-            deltaSeconds
+            deltaSeconds,
         );
         this.rotationInertia.z = lerpSmooth(
             this.rotationInertia.z,
             DefaultControlsInputs.map.yaw.value,
             inertiaHalfLifeSeconds,
-            deltaSeconds
+            deltaSeconds,
         );
 
         roll(this.transform, this.rotationInertia.x * this.rotationSpeed * deltaSeconds);
@@ -106,7 +106,7 @@ export class DefaultControls implements Controls {
         if (!cameraForward.equalsWithEpsilon(transformForward)) {
             const rotation = getTransformationQuaternion(transformForward, cameraForward);
             this.transform.rotationQuaternion = rotation.multiply(
-                this.transform.rotationQuaternion ?? Quaternion.Identity()
+                this.transform.rotationQuaternion ?? Quaternion.Identity(),
             );
             this.camera.rotationQuaternion = Quaternion.Identity();
         }
@@ -117,19 +117,19 @@ export class DefaultControls implements Controls {
             this.inertia.x,
             DefaultControlsInputs.map.move.value[0],
             inertiaHalfLifeSeconds,
-            deltaSeconds
+            deltaSeconds,
         );
         this.inertia.z = lerpSmooth(
             this.inertia.z,
             DefaultControlsInputs.map.move.value[1],
             inertiaHalfLifeSeconds,
-            deltaSeconds
+            deltaSeconds,
         );
         this.inertia.y = lerpSmooth(
             this.inertia.y,
             DefaultControlsInputs.map.upDown.value,
             inertiaHalfLifeSeconds,
-            deltaSeconds
+            deltaSeconds,
         );
 
         const displacement = Vector3.Zero();

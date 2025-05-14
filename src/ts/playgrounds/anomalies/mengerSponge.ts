@@ -24,7 +24,7 @@ import { MengerSpongePostProcess } from "../../anomalies/mengerSponge/mengerSpon
 
 export function createMengerSpongeScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void
+    progressCallback: (progress: number, text: string) => void,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -43,7 +43,7 @@ export function createMengerSpongeScene(
         "mengerSponge",
         Number(urlParams.get("seed") ?? Math.random() * 100_000),
         "Menger Sponge",
-        []
+        [],
     );
 
     const anomaly = new EmptyCelestialBody(model, scene);

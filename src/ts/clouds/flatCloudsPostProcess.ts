@@ -42,7 +42,7 @@ export class FlatCloudsPostProcess extends PostProcess implements UpdatablePostP
         boundingRadius: number,
         cloudUniforms: CloudsUniforms,
         stellarObjects: ReadonlyArray<PointLight>,
-        scene: Scene
+        scene: Scene,
     ) {
         const shaderName = "flatClouds";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
@@ -53,7 +53,7 @@ export class FlatCloudsPostProcess extends PostProcess implements UpdatablePostP
             ...Object.values(ObjectUniformNames),
             ...Object.values(StellarObjectUniformNames),
             ...Object.values(CameraUniformNames),
-            ...Object.values(CloudsUniformNames)
+            ...Object.values(CloudsUniformNames),
         ];
 
         const samplers: string[] = [...Object.values(SamplerUniformNames), ...Object.values(CloudsSamplerNames)];
@@ -69,7 +69,7 @@ export class FlatCloudsPostProcess extends PostProcess implements UpdatablePostP
             scene.getEngine(),
             false,
             null,
-            Constants.TEXTURETYPE_HALF_FLOAT
+            Constants.TEXTURETYPE_HALF_FLOAT,
         );
 
         this.cloudUniforms = cloudUniforms;

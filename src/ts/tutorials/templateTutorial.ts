@@ -52,11 +52,11 @@ export class TemplateTutorial implements Tutorial {
             ${i18n.t("tutorials:common:navigationInfo", {
                 // This displays a small internationalized text to explain the keys to navigate the tutorial
                 nextKeys: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keyboardLayoutMap).join(
-                    ` ${i18n.t("common:or")} `
+                    ` ${i18n.t("common:or")} `,
                 ),
                 previousKeys: pressInteractionToStrings(TutorialControlsInputs.map.prevPanel, keyboardLayoutMap).join(
-                    ` ${i18n.t("common:or")} `
-                )
+                    ` ${i18n.t("common:or")} `,
+                ),
             })}
         </div>`;
 
@@ -65,8 +65,8 @@ export class TemplateTutorial implements Tutorial {
             ${i18n.t("tutorials:common:tutorialEnding", {
                 // This displays a small internationalized text to explain the keys to end the tutorial
                 keyQuit: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keyboardLayoutMap).join(
-                    ` ${i18n.t("common:or")} `
-                )
+                    ` ${i18n.t("common:or")} `,
+                ),
             })}
         </div>`;
 

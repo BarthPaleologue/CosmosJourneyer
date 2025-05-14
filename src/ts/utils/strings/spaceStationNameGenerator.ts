@@ -79,7 +79,7 @@ export const SpaceStationNames: string[] = [
     "Turing",
     "Verne",
     "Von Braun",
-    "Von Neumann"
+    "Von Neumann",
 ];
 
 export const SpaceStationAdjectives: string[] = [
@@ -127,7 +127,7 @@ export const SpaceStationAdjectives: string[] = [
     "Utopia",
     "Vanguard",
     "Vision",
-    "Zenith"
+    "Zenith",
 ];
 
 export const SpaceElevatorAdjectives: string[] = [
@@ -145,7 +145,7 @@ export const SpaceElevatorAdjectives: string[] = [
     "Rising",
     "Skyward",
     "Soaring",
-    "Upward"
+    "Upward",
 ];
 
 /**

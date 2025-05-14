@@ -67,7 +67,7 @@ export class ClimberRingMaterial extends NodeMaterial {
             normalW,
             view,
             cameraPosition,
-            positionW
+            positionW,
         );
 
         const fragmentOutput = BSL.outputFragColor(pbrColor);

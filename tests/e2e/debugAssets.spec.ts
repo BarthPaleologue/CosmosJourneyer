@@ -7,6 +7,6 @@ test("The debug assets playground renders correctly", async ({ page }) => {
         scene: "debugAssets",
         shotName: "baseline",
         flagToWait: "frozen",
-        urlParams: { freeze: 1 }
+        urlParams: { freeze: 1 },
     });
 });

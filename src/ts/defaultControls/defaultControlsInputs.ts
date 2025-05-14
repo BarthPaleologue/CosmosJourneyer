@@ -12,7 +12,7 @@ const kbdWASD = new DPadComposite({
     up: keyboard.getControl("KeyW"),
     left: keyboard.getControl("KeyA"),
     down: keyboard.getControl("KeyS"),
-    right: keyboard.getControl("KeyD")
+    right: keyboard.getControl("KeyD"),
 });
 
 /**
@@ -20,52 +20,52 @@ const kbdWASD = new DPadComposite({
  * The action will respond to whichever control is used.
  */
 const moveAction = new Action({
-    bindings: [kbdWASD]
+    bindings: [kbdWASD],
 });
 
 const keyboardSpeed = new AxisComposite({
     positive: keyboard.getControl("NumpadAdd"), // '+'
-    negative: keyboard.getControl("NumpadSubtract") // '-'
+    negative: keyboard.getControl("NumpadSubtract"), // '-'
 });
 
 const changeSpeedAction = new Action({
-    bindings: [keyboardSpeed]
+    bindings: [keyboardSpeed],
 });
 
 const upDown = new AxisComposite({
     positive: keyboard.getControl("Space"),
-    negative: keyboard.getControl("ShiftLeft")
+    negative: keyboard.getControl("ShiftLeft"),
 });
 
 const upDownAction = new Action({
-    bindings: [upDown]
+    bindings: [upDown],
 });
 
 const roll = new AxisComposite({
     positive: keyboard.getControl("KeyE"),
-    negative: keyboard.getControl("KeyQ")
+    negative: keyboard.getControl("KeyQ"),
 });
 
 const rollAction = new Action({
-    bindings: [roll]
+    bindings: [roll],
 });
 
 const pitch = new AxisComposite({
     positive: keyboard.getControl("KeyK"),
-    negative: keyboard.getControl("KeyI")
+    negative: keyboard.getControl("KeyI"),
 });
 
 const pitchAction = new Action({
-    bindings: [pitch]
+    bindings: [pitch],
 });
 
 const yaw = new AxisComposite({
     positive: keyboard.getControl("KeyJ"),
-    negative: keyboard.getControl("KeyL")
+    negative: keyboard.getControl("KeyL"),
 });
 
 const yawAction = new Action({
-    bindings: [yaw]
+    bindings: [yaw],
 });
 
 export const DefaultControlsInputs = new InputMap<{
@@ -81,5 +81,5 @@ export const DefaultControlsInputs = new InputMap<{
     changeSpeed: changeSpeedAction,
     roll: rollAction,
     pitch: pitchAction,
-    yaw: yawAction
+    yaw: yawAction,
 });

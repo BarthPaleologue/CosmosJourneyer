@@ -40,7 +40,7 @@ export class AtmosphericScatteringPostProcess extends PostProcess {
         planetBoundingRadius: number,
         atmosphereUniforms: AtmosphereUniforms,
         stellarObjects: ReadonlyArray<PointLight>,
-        scene: Scene
+        scene: Scene,
     ) {
         const shaderName = "atmosphericScattering";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
@@ -51,7 +51,7 @@ export class AtmosphericScatteringPostProcess extends PostProcess {
             ...Object.values(ObjectUniformNames),
             ...Object.values(StellarObjectUniformNames),
             ...Object.values(CameraUniformNames),
-            ...atmosphereUniforms.getUniformNames()
+            ...atmosphereUniforms.getUniformNames(),
         ];
 
         const samplers: string[] = [...Object.values(SamplerUniformNames)];
@@ -67,7 +67,7 @@ export class AtmosphericScatteringPostProcess extends PostProcess {
             scene.getEngine(),
             false,
             null,
-            Constants.TEXTURETYPE_HALF_FLOAT
+            Constants.TEXTURETYPE_HALF_FLOAT,
         );
 
         this.onActivateObservable.add((camera) => {

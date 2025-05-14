@@ -42,7 +42,7 @@ export class WorkerPool {
         this.taskQueue = new PriorityQueue<BuildTask>(comparator);
         for (let i = 0; i < nbWorkers; i++) {
             const worker = new Worker(new URL("../workers/buildScript", import.meta.url), {
-                type: "module"
+                type: "module",
             });
             this.availableWorkers.push(worker);
             //worker.postMessage(this.sharedMemoryBuffer);

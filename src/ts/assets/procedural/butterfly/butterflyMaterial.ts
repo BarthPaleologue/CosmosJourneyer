@@ -25,7 +25,7 @@ import { Scene } from "@babylonjs/core/scene";
 
 import {
     setStellarObjectUniforms,
-    StellarObjectUniformNames
+    StellarObjectUniformNames,
 } from "../../../postProcesses/uniforms/stellarObjectUniforms";
 
 import butterflyFragment from "@shaders/butterflyMaterial/butterflyFragment.glsl";
@@ -42,11 +42,11 @@ const ButterflyMaterialUniformNames = {
     PLAYER_POSITION: "playerPosition",
     CAMERA_POSITION: "cameraPosition",
     PLANET_POSITION: "planetPosition",
-    PLANET_WORLD: "planetWorld"
+    PLANET_WORLD: "planetWorld",
 };
 
 const ButterflyMaterialSamplerNames = {
-    BUTTERFLY_TEXTURE: "butterflyTexture"
+    BUTTERFLY_TEXTURE: "butterflyTexture",
 };
 
 export class ButterflyMaterial extends ShaderMaterial {
@@ -73,7 +73,7 @@ export class ButterflyMaterial extends ShaderMaterial {
             attributes: ["position", "normal", "uv"],
             uniforms: uniforms,
             defines: defines,
-            samplers: [...Object.values(ButterflyMaterialSamplerNames)]
+            samplers: [...Object.values(ButterflyMaterialSamplerNames)],
         });
 
         this.backFaceCulling = false;
@@ -92,7 +92,7 @@ export class ButterflyMaterial extends ShaderMaterial {
             if (this.planet !== null) {
                 this.getEffect().setVector3(
                     ButterflyMaterialUniformNames.PLANET_POSITION,
-                    this.planet.getAbsolutePosition()
+                    this.planet.getAbsolutePosition(),
                 );
                 this.getEffect().setMatrix(ButterflyMaterialUniformNames.PLANET_WORLD, this.planet.getWorldMatrix());
             }

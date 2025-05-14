@@ -44,6 +44,6 @@ export function getPowerPlayData(systemGalacticPosition: Vector3) {
 
     return {
         materialistSpiritualist: MaterialistSpiritualistAxis(coords.x, coords.y, coords.z),
-        capitalistCommunist: CapitalistCommunistAxis(coords.x, coords.y, coords.z)
+        capitalistCommunist: CapitalistCommunistAxis(coords.x, coords.y, coords.z),
     };
 }

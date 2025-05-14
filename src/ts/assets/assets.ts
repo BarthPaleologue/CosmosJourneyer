@@ -27,13 +27,13 @@ export type Assets = {
 
 export async function loadAssets(
     progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void,
-    scene: Scene
+    scene: Scene,
 ): Promise<Assets> {
     const audioAssetsPromise = loadAudioAssets(progressCallback);
     const renderingAssetsPromise = loadRenderingAssets(progressCallback, scene);
 
     return {
         audio: await audioAssetsPromise,
-        rendering: await renderingAssetsPromise
+        rendering: await renderingAssetsPromise,
     };
 }

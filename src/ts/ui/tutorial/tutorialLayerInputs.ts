@@ -8,14 +8,14 @@ const keyboard = InputDevices.KEYBOARD;
 
 const nextPanel = new PressInteraction(
     new Action({
-        bindings: [keyboard.getControl("Space")]
-    })
+        bindings: [keyboard.getControl("Space")],
+    }),
 );
 
 const prevPanel = new PressInteraction(
     new Action({
-        bindings: [keyboard.getControl("Backspace")]
-    })
+        bindings: [keyboard.getControl("Backspace")],
+    }),
 );
 
 export const TutorialControlsInputs = new InputMap<{
@@ -23,7 +23,7 @@ export const TutorialControlsInputs = new InputMap<{
     prevPanel: PressInteraction;
 }>("TutorialControls", {
     nextPanel,
-    prevPanel
+    prevPanel,
 });
 
 TutorialControlsInputs.setEnabled(false);

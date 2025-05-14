@@ -73,15 +73,15 @@ describe("SaveManager", () => {
                                 starSectorZ: 0,
                                 localX: 0,
                                 localY: 0,
-                                localZ: 0
+                                localZ: 0,
                             },
-                            idInSystem: "0"
-                        }
+                            idInSystem: "0",
+                        },
                     },
-                    shipLocations: {}
-                }
+                    shipLocations: {},
+                },
             ],
-            auto: []
+            auto: [],
         },
         cmdr2: {
             manual: [],
@@ -100,15 +100,15 @@ describe("SaveManager", () => {
                                 starSectorZ: 0,
                                 localX: 0,
                                 localY: 0,
-                                localZ: 0
+                                localZ: 0,
                             },
-                            idInSystem: "0"
-                        }
+                            idInSystem: "0",
+                        },
                     },
-                    shipLocations: {}
-                }
-            ]
-        }
+                    shipLocations: {},
+                },
+            ],
+        },
     };
 
     describe("Create", () => {

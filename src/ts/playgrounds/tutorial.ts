@@ -29,7 +29,7 @@ import { TutorialLayer } from "../ui/tutorial/tutorialLayer";
 
 export async function createTutorialScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void
+    progressCallback: (progress: number, text: string) => void,
 ): Promise<Scene> {
     const scene = new Scene(engine);
 

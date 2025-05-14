@@ -69,7 +69,7 @@ export class MissionXorNode implements MissionNodeBase<MissionNodeType.XOR> {
     describeNextTask(
         context: MissionContext,
         keyboardLayout: Map<string, string>,
-        starSystemDatabase: StarSystemDatabase
+        starSystemDatabase: StarSystemDatabase,
     ): string {
         if (this.hasCompletedLock) return "Mission completed";
         return this.children
@@ -84,7 +84,7 @@ export class MissionXorNode implements MissionNodeBase<MissionNodeType.XOR> {
     serialize(): MissionXorNodeSerialized {
         return {
             type: MissionNodeType.XOR,
-            children: this.children.map((child) => child.serialize())
+            children: this.children.map((child) => child.serialize()),
         };
     }
 }

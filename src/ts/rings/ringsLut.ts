@@ -35,13 +35,13 @@ export class RingsLut {
             "ringsLUT",
             {
                 width: 4096,
-                height: 1
+                height: 1,
             },
             "ringsLUT",
             scene,
             undefined,
             true,
-            false
+            false,
         );
 
         this.lut.refreshRate = 0;

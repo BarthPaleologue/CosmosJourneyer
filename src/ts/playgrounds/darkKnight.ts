@@ -24,7 +24,7 @@ import { DefaultControls } from "../defaultControls/defaultControls";
 
 export async function createDarkKnightScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void
+    progressCallback: (progress: number, text: string) => void,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;

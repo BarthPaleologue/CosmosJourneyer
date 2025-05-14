@@ -34,10 +34,10 @@ export class LandingPadTexturePool {
             `PadNumberTexture${padNumber}`,
             {
                 width: padNumberTextureResolution,
-                height: padNumberTextureResolution * Settings.LANDING_PAD_ASPECT_RATIO
+                height: padNumberTextureResolution * Settings.LANDING_PAD_ASPECT_RATIO,
             },
             scene,
-            true
+            true,
         );
 
         //Add text to dynamic texture

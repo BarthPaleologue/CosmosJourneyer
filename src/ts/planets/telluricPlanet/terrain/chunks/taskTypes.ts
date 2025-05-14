@@ -26,7 +26,7 @@ import { PlanetChunk } from "./planetChunk";
 
 export const enum TaskType {
     BUILD,
-    APPLY
+    APPLY,
 }
 
 export type Task = {
@@ -57,7 +57,7 @@ export const ReturnedChunkDataSchema = z.object({
     indices: z.instanceof(Uint16Array),
     instancesMatrixBuffer: z.instanceof(Float32Array),
     alignedInstancesMatrixBuffer: z.instanceof(Float32Array),
-    averageHeight: z.number()
+    averageHeight: z.number(),
 });
 
 export type ReturnedChunkData = z.infer<typeof ReturnedChunkDataSchema>;

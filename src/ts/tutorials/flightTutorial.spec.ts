@@ -71,7 +71,7 @@ describe("flightTutorial", () => {
         }
 
         const distanceToPlanet = Math.sqrt(
-            shipLocation.position.x ** 2 + shipLocation.position.y ** 2 + shipLocation.position.z ** 2
+            shipLocation.position.x ** 2 + shipLocation.position.y ** 2 + shipLocation.position.z ** 2,
         );
 
         const distanceToPlanetNormalized = distanceToPlanet / planetModel.radius;

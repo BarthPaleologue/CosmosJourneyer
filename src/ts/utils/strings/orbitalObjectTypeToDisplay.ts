@@ -42,7 +42,7 @@ export function getOrbitalObjectTypeToI18nString(model: DeepReadonly<OrbitalObje
             return i18n.t("objectTypes:spaceElevator");
         case OrbitalObjectType.STAR:
             return i18n.t("objectTypes:star", {
-                stellarType: getStellarTypeFromTemperature(model.blackBodyTemperature)
+                stellarType: getStellarTypeFromTemperature(model.blackBodyTemperature),
             });
         case OrbitalObjectType.NEUTRON_STAR:
             return i18n.t("objectTypes:neutronStar");

@@ -83,7 +83,7 @@ export class TelluricPlanet
     constructor(
         model: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>,
         assets: RenderingAssets,
-        scene: Scene
+        scene: Scene,
     ) {
         this.model = model;
 
@@ -97,9 +97,9 @@ export class TelluricPlanet
             PhysicsShapeType.CONTAINER,
             {
                 mass: 0,
-                restitution: 0.2
+                restitution: 0.2,
             },
-            scene
+            scene,
         );
         this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
         this.aggregate.body.disablePreStep = false;
@@ -125,7 +125,7 @@ export class TelluricPlanet
                 this.model.rings,
                 Settings.RINGS_FADE_OUT_DISTANCE,
                 assets.textures.pools.ringsLut,
-                scene
+                scene,
             );
 
             const averageRadius = (this.model.radius * (this.model.rings.ringStart + this.model.rings.ringEnd)) / 2;
@@ -135,7 +135,7 @@ export class TelluricPlanet
                 this.getTransform(),
                 averageRadius,
                 spread,
-                scene
+                scene,
             );
         } else {
             this.ringsUniforms = null;
@@ -152,7 +152,7 @@ export class TelluricPlanet
             this.model,
             assets.textures.terrains,
             assets.textures.pools.telluricPlanetMaterialLut,
-            scene
+            scene,
         );
 
         this.sides = [
@@ -161,7 +161,7 @@ export class TelluricPlanet
             new ChunkTree(Direction.FORWARD, this.model, this.aggregate, this.material, scene),
             new ChunkTree(Direction.BACKWARD, this.model, this.aggregate, this.material, scene),
             new ChunkTree(Direction.RIGHT, this.model, this.aggregate, this.material, scene),
-            new ChunkTree(Direction.LEFT, this.model, this.aggregate, this.material, scene)
+            new ChunkTree(Direction.LEFT, this.model, this.aggregate, this.material, scene),
         ];
 
         this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());

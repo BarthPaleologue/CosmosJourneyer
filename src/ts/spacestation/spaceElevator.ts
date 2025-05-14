@@ -87,7 +87,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
         model: DeepReadonly<SpaceElevatorModel>,
         stellarObjects: ReadonlyMap<DeepReadonly<StellarObjectModel>, number>,
         assets: RenderingAssets,
-        scene: Scene
+        scene: Scene,
     ) {
         this.model = model;
 
@@ -106,9 +106,9 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
             {
                 height: this.tetherLength,
                 diameter: tetherThickness,
-                tessellation: 6
+                tessellation: 6,
             },
-            this.scene
+            this.scene,
         );
         this.tether.convertToFlatShadedMesh();
 
@@ -119,7 +119,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
             assets.materials.solarPanel,
             assets.textures.materials.crate,
             assets.textures.materials.metalPanels,
-            scene
+            scene,
         );
         this.climber.getTransform().parent = this.tether;
 
@@ -131,7 +131,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
         this.landingPadManager = new LandingPadManager(
             this.landingBays.flatMap((landingBay) => {
                 return landingBay.landingPads;
-            })
+            }),
         );
 
         // center the space station on its center of mass
@@ -151,7 +151,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
         this.targetInfo = {
             type: ObjectTargetCursorType.FACILITY,
             minDistance: this.getBoundingRadius() * 6.0,
-            maxDistance: 0.0
+            maxDistance: 0.0,
         };
     }
 
@@ -184,7 +184,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
         const solarPanelSurfaceM2 = getSolarPanelSurfaceFromEnergyRequirement(
             this.model.solarPanelEfficiency,
             this.model.population * this.model.energyConsumptionPerCapitaKWh,
-            totalStellarFlux
+            totalStellarFlux,
         );
 
         const housingSurfaceHa = (100 * this.model.population) / this.model.populationDensity; // convert km² to ha
@@ -211,9 +211,9 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
             [
                 [SpaceStationNodeType.RING_HABITAT, 0.5],
                 [SpaceStationNodeType.HELIX_HABITAT, 0.3],
-                [SpaceStationNodeType.CYLINDER_HABITAT, 0.2]
+                [SpaceStationNodeType.CYLINDER_HABITAT, 0.2],
             ],
-            rng(17)
+            rng(17),
         );
 
         let newNode: TransformNode | null = null;
@@ -222,7 +222,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
                 totalHabitatSurfaceM2,
                 Settings.SEED_HALF_RANGE * rng(19),
                 assets.textures,
-                this.scene
+                this.scene,
             );
             this.helixHabitats.push(helixHabitat);
             newNode = helixHabitat.getTransform();
@@ -231,7 +231,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
                 totalHabitatSurfaceM2,
                 Settings.SEED_HALF_RANGE * rng(27),
                 assets.textures,
-                this.scene
+                this.scene,
             );
             this.ringHabitats.push(ringHabitat);
             newNode = ringHabitat.getTransform();
@@ -240,7 +240,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
                 totalHabitatSurfaceM2,
                 Settings.SEED_HALF_RANGE * rng(13),
                 assets.textures,
-                this.scene
+                this.scene,
             );
             this.cylinderHabitats.push(cylinderHabitat);
             newNode = cylinderHabitat.getTransform();
@@ -260,7 +260,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
             solarPanelSurfaceM2,
             Settings.SEED_HALF_RANGE * rng(31),
             assets,
-            this.scene
+            this.scene,
         );
         solarSection.getTransform().parent = this.getTransform();
         this.placeNode(solarSection.getTransform(), lastNode);
@@ -280,14 +280,14 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
         lastNode: TransformNode,
         nbSections: number,
         rng: (index: number) => number,
-        assets: RenderingAssets
+        assets: RenderingAssets,
     ): TransformNode {
         let newLastNode = lastNode;
         for (let i = 0; i < nbSections; i++) {
             const utilitySection = new UtilitySection(
                 rng(132 + 10 * this.utilitySections.length) * Settings.SEED_HALF_RANGE,
                 assets,
-                this.scene
+                this.scene,
             );
             this.utilitySections.push(utilitySection);
 
@@ -346,7 +346,7 @@ export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPAC
             0,
             1,
             -this.tetherLength / 2,
-            this.tetherLength / 2
+            this.tetherLength / 2,
         );
     }
 

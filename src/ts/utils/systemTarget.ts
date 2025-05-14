@@ -20,7 +20,7 @@ export class SystemTarget implements Targetable {
     readonly targetInfo = {
         type: ObjectTargetCursorType.STAR_SYSTEM,
         minDistance: Settings.LIGHT_YEAR * 2,
-        maxDistance: Settings.LIGHT_YEAR * 0.2
+        maxDistance: Settings.LIGHT_YEAR * 0.2,
     };
 
     constructor(systemModel: DeepReadonly<StarSystemModel>, referencePlanePosition: Vector3, scene: Scene) {

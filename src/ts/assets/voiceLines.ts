@@ -52,7 +52,7 @@ export type SpeakerVoiceLines = {
 };
 
 export async function loadVoiceLines(
-    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void
+    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void,
 ): Promise<SpeakerVoiceLines> {
     let loadedCount = 0;
     let totalCount = 0;
@@ -66,7 +66,7 @@ export async function loadVoiceLines(
                 () => {
                     resolve(sound);
                 },
-                options
+                options,
             );
         });
         totalCount++;
@@ -80,7 +80,7 @@ export async function loadVoiceLines(
     // Voice sounds
     const initiatingPlanetaryLandingSoundPromise = loadSoundAsync(
         "InitiatingPlanetaryLanding",
-        initiatingPlanetaryLandingSoundPath
+        initiatingPlanetaryLandingSoundPath,
     );
     const landingRequestGrantedSoundPromise = loadSoundAsync("LandingRequestGranted", landingRequestSoundPath);
     const landingCompleteSoundPromise = loadSoundAsync("LandingComplete", landingCompleteSoundPath);
@@ -90,7 +90,7 @@ export async function loadVoiceLines(
     const cannotEngageWarpDriveSoundPromise = loadSoundAsync("CannotEngageWarpDrive", cannotEngageWarpDriveSoundPath);
     const warpDriveEmergencyShutDownSoundPromise = loadSoundAsync(
         "WarpDriveEmergencyShutDown",
-        warpDriveEmergencyShutDownSoundPath
+        warpDriveEmergencyShutDownSoundPath,
     );
     const warpDriveDisengagedSoundPromise = loadSoundAsync("WarpDriveDisengaged", warpDriveDisengagedSoundPath);
     const engagingWarpDriveSoundPromise = loadSoundAsync("EngagingWarpDrive", engagingWarpDriveSoundPath);
@@ -110,7 +110,7 @@ export async function loadVoiceLines(
             warpDriveDisengaged: await warpDriveDisengagedSoundPromise,
             engagingWarpDrive: await engagingWarpDriveSoundPromise,
             fuelScooping: await fuelScoopingVoicePromise,
-            fuelScoopingComplete: await fuelScoopingCompleteVoicePromise
-        }
+            fuelScoopingComplete: await fuelScoopingCompleteVoicePromise,
+        },
     };
 }

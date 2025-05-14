@@ -20,7 +20,7 @@ import { Targetable } from "../../architecture/targetable";
 export const enum LandingPadSize {
     SMALL = 1,
     MEDIUM = 2,
-    LARGE = 3
+    LARGE = 3,
 }
 
 export type LandingRequest = {

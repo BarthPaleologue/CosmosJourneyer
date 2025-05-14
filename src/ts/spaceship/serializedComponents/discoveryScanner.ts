@@ -20,13 +20,13 @@ import { z } from "zod";
 export const SerializedDiscoveryScannerSchema = z.object({
     type: z.literal("discoveryScanner"),
     size: z.number(),
-    quality: z.number()
+    quality: z.number(),
 });
 
 export type SerializedDiscoveryScanner = z.infer<typeof SerializedDiscoveryScannerSchema>;
 
 export function getDiscoveryScannerSpec(serializedDiscoveryScanner: SerializedDiscoveryScanner) {
     return {
-        relativeRange: serializedDiscoveryScanner.size + serializedDiscoveryScanner.quality / 10
+        relativeRange: serializedDiscoveryScanner.size + serializedDiscoveryScanner.quality / 10,
     };
 }

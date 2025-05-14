@@ -35,7 +35,7 @@ const enum WarpDriveState {
      * The warp drive is disengaging. The warp speed is decreasing until it reaches 0.
      * When the warp speed reaches 0, the warp drive is disabled.
      */
-    DISENGAGING
+    DISENGAGING,
 }
 
 /**
@@ -131,7 +131,7 @@ export class WarpDrive implements ReadonlyWarpDrive {
         return {
             type: this.type,
             size: this.size,
-            quality: this.quality
+            quality: this.quality,
         };
     }
 

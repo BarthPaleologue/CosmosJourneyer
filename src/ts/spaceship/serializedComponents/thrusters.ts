@@ -20,13 +20,13 @@ import { z } from "zod";
 export const SerializedThrustersSchema = z.object({
     type: z.literal("thrusters"),
     size: z.number(),
-    quality: z.number()
+    quality: z.number(),
 });
 
 export type SerializedThrusters = z.infer<typeof SerializedThrustersSchema>;
 
 export function getThrustersSpec(serializedThrusters: SerializedThrusters) {
     return {
-        maxSpeed: 1e3 * (1.0 + serializedThrusters.size / 7.0 + serializedThrusters.quality / 20.0)
+        maxSpeed: 1e3 * (1.0 + serializedThrusters.size / 7.0 + serializedThrusters.quality / 20.0),
     };
 }

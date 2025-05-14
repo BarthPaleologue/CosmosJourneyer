@@ -121,7 +121,7 @@ export class SolidPlume {
         const position = new Vector3(
             r * Math.cos(theta),
             r * Math.sin(theta),
-            Math.random() * SolidPlume.TUNNEL_LENGTH
+            Math.random() * SolidPlume.TUNNEL_LENGTH,
         );
 
         particle.position.copyFrom(position);

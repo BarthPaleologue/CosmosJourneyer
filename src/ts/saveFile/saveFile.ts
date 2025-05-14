@@ -23,7 +23,7 @@ import { SaveLoadingError, SaveLoadingErrorType } from "./saveLoadingError";
 
 export async function parseSaveFile(
     rawSaveFile: File,
-    starSystemDatabase: StarSystemDatabase
+    starSystemDatabase: StarSystemDatabase,
 ): Promise<Result<Save, SaveLoadingError>> {
     return new Promise((resolve) => {
         const reader = new FileReader();

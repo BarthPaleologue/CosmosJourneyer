@@ -33,7 +33,7 @@ import { enablePhysics } from "./utils";
 
 export async function createAutomaticLandingScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void
+    progressCallback: (progress: number, text: string) => void,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -50,7 +50,7 @@ export async function createAutomaticLandingScene(
     ship.getTransform().position.copyFromFloats(
         randRange(-50, 50, Math.random, 0),
         randRange(30, 50, Math.random, 0),
-        randRange(-50, 50, Math.random, 0)
+        randRange(-50, 50, Math.random, 0),
     );
     ship.getTransform().rotationQuaternion = Quaternion.Random().normalize();
 

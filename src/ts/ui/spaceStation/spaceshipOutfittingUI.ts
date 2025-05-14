@@ -274,13 +274,13 @@ export class SpaceshipOutfittingUI {
             this.componentBrowser.browseCategories(
                 componentSlot.types,
                 componentSlot.maxSize,
-                player.spareSpaceshipComponents
+                player.spareSpaceshipComponents,
             );
         } else if (componentSlot.types[0] !== undefined) {
             this.componentBrowser.browse(
                 componentSlot.types[0],
                 componentSlot.maxSize,
-                player.spareSpaceshipComponents
+                player.spareSpaceshipComponents,
             );
         }
     }

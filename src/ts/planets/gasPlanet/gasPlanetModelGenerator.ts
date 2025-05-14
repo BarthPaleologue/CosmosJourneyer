@@ -32,7 +32,7 @@ export function newSeededGasPlanetModel(
     id: string,
     seed: number,
     name: string,
-    parentBodies: CelestialBodyModel[]
+    parentBodies: CelestialBodyModel[],
 ): GasPlanetModel {
     const rng = getRngFromSeed(seed);
 
@@ -68,7 +68,7 @@ export function newSeededGasPlanetModel(
         eccentricity: 0,
         longitudeOfAscendingNode: 0,
         argumentOfPeriapsis: 0,
-        initialMeanAnomaly: 0
+        initialMeanAnomaly: 0,
     };
     const mass = Settings.JUPITER_MASS * (radius / 69_911e3) ** 3;
     const axialTilt = normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT);
@@ -88,8 +88,8 @@ export function newSeededGasPlanetModel(
         mass,
         atmosphere: {
             pressure: Settings.EARTH_SEA_LEVEL_PRESSURE,
-            greenHouseEffectFactor: 0.5
+            greenHouseEffectFactor: 0.5,
         },
-        rings: rings
+        rings: rings,
     };
 }

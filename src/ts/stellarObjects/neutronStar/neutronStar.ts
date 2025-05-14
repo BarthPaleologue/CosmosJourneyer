@@ -78,9 +78,9 @@ export class NeutronStar implements StellarObjectBase<OrbitalObjectType.NEUTRON_
             this.model.name,
             {
                 diameter: this.model.radius * 2,
-                segments: 32
+                segments: 32,
             },
-            scene
+            scene,
         );
         this.mesh.rotationQuaternion = Quaternion.Identity();
 
@@ -89,9 +89,9 @@ export class NeutronStar implements StellarObjectBase<OrbitalObjectType.NEUTRON_
             PhysicsShapeType.CONTAINER,
             {
                 mass: 0,
-                restitution: 0.2
+                restitution: 0.2,
             },
-            scene
+            scene,
         );
         this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
         this.aggregate.body.disablePreStep = false;
@@ -107,7 +107,7 @@ export class NeutronStar implements StellarObjectBase<OrbitalObjectType.NEUTRON_
             this.model.seed,
             this.model.blackBodyTemperature,
             texturePools.starMaterialLut,
-            scene
+            scene,
         );
         this.mesh.material = this.material;
 
@@ -116,7 +116,7 @@ export class NeutronStar implements StellarObjectBase<OrbitalObjectType.NEUTRON_
                 this.model.rings,
                 Settings.RINGS_FADE_OUT_DISTANCE,
                 texturePools.ringsLut,
-                scene
+                scene,
             );
 
             const averageRadius = (this.model.radius * (this.model.rings.ringStart + this.model.rings.ringEnd)) / 2;
@@ -126,7 +126,7 @@ export class NeutronStar implements StellarObjectBase<OrbitalObjectType.NEUTRON_
                 this.getTransform(),
                 averageRadius,
                 spread,
-                scene
+                scene,
             );
         } else {
             this.ringsUniforms = null;

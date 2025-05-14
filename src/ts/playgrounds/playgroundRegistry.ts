@@ -67,21 +67,21 @@ export class PlaygroundRegistry {
         ["juliaSet", createJuliaSetScene],
         ["mengerSponge", createMengerSpongeScene],
         ["atmosphericScattering", createAtmosphericScatteringScene],
-        ["darkKnight", createDarkKnightScene]
+        ["darkKnight", createDarkKnightScene],
     ]);
 
     register(
         name: string,
         createScene: (
             engine: AbstractEngine,
-            progressCallback: (progress: number, text: string) => void
-        ) => Promise<Scene>
+            progressCallback: (progress: number, text: string) => void,
+        ) => Promise<Scene>,
     ) {
         this.map.set(name, createScene);
     }
 
     get(
-        name: string
+        name: string,
     ): (engine: AbstractEngine, progressCallback: (progress: number, text: string) => void) => Promise<Scene> {
         return this.map.get(name) ?? createDefaultScene;
     }

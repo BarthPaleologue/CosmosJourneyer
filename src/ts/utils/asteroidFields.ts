@@ -36,6 +36,6 @@ export function distanceToAsteroidField(position: Vector3, asteroidField: Astero
         ? Math.abs(distanceAboveRings)
         : Math.sqrt(
               Math.min((planarDistance - ringsMinDistance) ** 2, (planarDistance - ringsMaxDistance) ** 2) +
-                  distanceAboveRings ** 2
+                  distanceAboveRings ** 2,
           );
 }

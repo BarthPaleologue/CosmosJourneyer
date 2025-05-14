@@ -48,12 +48,12 @@ export class SpaceshipInternals {
                 this.primary = {
                     warpDrive: ComponentSlot.NewWarpDrive(3),
                     thrusters: ComponentSlot.NewThrusters(3),
-                    fuelTank: ComponentSlot.NewFuelTank(2)
+                    fuelTank: ComponentSlot.NewFuelTank(2),
                 };
                 this.optionals = [
                     ComponentSlot.NewOptional(3),
                     ComponentSlot.NewOptional(2),
-                    ComponentSlot.NewOptional(2)
+                    ComponentSlot.NewOptional(2),
                 ];
                 break;
         }
@@ -120,7 +120,7 @@ export class SpaceshipInternals {
         fuelTanks.push(
             ...this.optionals
                 .map((componentSlot) => componentSlot.getComponent())
-                .filter((component) => component?.type === "fuelTank")
+                .filter((component) => component?.type === "fuelTank"),
         );
 
         return fuelTanks;
@@ -164,7 +164,7 @@ export class SpaceshipInternals {
         const primaryComponents = {
             warpDrive: this.getWarpDrive()?.serialize() ?? null,
             fuelTank: this.getFuelTanks().at(0)?.serialize() ?? null,
-            thrusters: this.getThrusters()?.serialize() ?? null
+            thrusters: this.getThrusters()?.serialize() ?? null,
         };
 
         const optionals: ReadonlyArray<SerializedOptionalComponent | null> = this.optionals
@@ -174,7 +174,7 @@ export class SpaceshipInternals {
                     component === null ||
                     component?.type === "discoveryScanner" ||
                     component?.type === "fuelTank" ||
-                    component?.type === "fuelScoop"
+                    component?.type === "fuelScoop",
             );
 
         switch (this.type) {
@@ -184,7 +184,7 @@ export class SpaceshipInternals {
                 }
                 return {
                     primary: primaryComponents,
-                    optional: [optionals[0], optionals[1], optionals[2]]
+                    optional: [optionals[0], optionals[1], optionals[2]],
                 };
         }
     }

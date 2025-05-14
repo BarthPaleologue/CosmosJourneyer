@@ -29,7 +29,7 @@ export type RenderingAssets = {
 
 export async function loadRenderingAssets(
     progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void,
-    scene: Scene
+    scene: Scene,
 ): Promise<RenderingAssets> {
     const texturesPromise = loadTextures(progressCallback, scene);
 
@@ -42,6 +42,6 @@ export async function loadRenderingAssets(
     return {
         textures: textures,
         materials: materials,
-        objects: await objectsPromise
+        objects: await objectsPromise,
     };
 }

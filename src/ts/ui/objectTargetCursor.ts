@@ -149,7 +149,7 @@ export class ObjectTargetCursor {
                 Matrix.IdentityReadOnly,
                 camera.getTransformationMatrix(),
                 camera.viewport,
-                this.screenCoordinates
+                this.screenCoordinates,
             );
 
             this.htmlRoot.classList.remove("hidden");
@@ -166,7 +166,7 @@ export class ObjectTargetCursor {
         const angularSize = getAngularSize(
             this.object.getTransform().getAbsolutePosition(),
             this.object.getBoundingRadius(),
-            camera.globalPosition
+            camera.globalPosition,
         );
         const screenRatio = angularSize / camera.fov;
 

@@ -31,7 +31,7 @@ import { ObjectUniformNames, setObjectUniforms } from "../../postProcesses/unifo
 import { SamplerUniformNames, setSamplerUniforms } from "../../postProcesses/uniforms/samplerUniforms";
 import {
     setStellarObjectUniforms,
-    StellarObjectUniformNames
+    StellarObjectUniformNames,
 } from "../../postProcesses/uniforms/stellarObjectUniforms";
 import { UpdatablePostProcess } from "../../postProcesses/updatablePostProcess";
 import { MengerSpongeModel } from "./mengerSpongeModel";
@@ -48,7 +48,7 @@ export class MengerSpongePostProcess extends PostProcess implements UpdatablePos
         boundingRadius: number,
         model: DeepReadonly<MengerSpongeModel>,
         scene: Scene,
-        stellarObjects: ReadonlyArray<PointLight>
+        stellarObjects: ReadonlyArray<PointLight>,
     ) {
         const shaderName = "MengerSponge";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
@@ -58,14 +58,14 @@ export class MengerSpongePostProcess extends PostProcess implements UpdatablePos
         const MengerSpongeUniformNames = {
             ACCENT_COLOR: "accentColor",
             ELAPSED_SECONDS: "elapsedSeconds",
-            AVERAGE_SCREEN_SIZE: "averageScreenSize"
+            AVERAGE_SCREEN_SIZE: "averageScreenSize",
         };
 
         const uniforms: string[] = [
             ...Object.values(ObjectUniformNames),
             ...Object.values(CameraUniformNames),
             ...Object.values(StellarObjectUniformNames),
-            ...Object.values(MengerSpongeUniformNames)
+            ...Object.values(MengerSpongeUniformNames),
         ];
 
         const samplers: string[] = Object.values(SamplerUniformNames);
@@ -81,7 +81,7 @@ export class MengerSpongePostProcess extends PostProcess implements UpdatablePos
             scene.getEngine(),
             false,
             null,
-            Constants.TEXTURETYPE_HALF_FLOAT
+            Constants.TEXTURETYPE_HALF_FLOAT,
         );
 
         this.onActivateObservable.add((camera) => {
@@ -101,7 +101,7 @@ export class MengerSpongePostProcess extends PostProcess implements UpdatablePos
             effect.setFloat(MengerSpongeUniformNames.ELAPSED_SECONDS, this.elapsedSeconds);
             effect.setFloat(
                 MengerSpongeUniformNames.AVERAGE_SCREEN_SIZE,
-                (scene.getEngine().getRenderWidth() + scene.getEngine().getRenderHeight()) / 2
+                (scene.getEngine().getRenderWidth() + scene.getEngine().getRenderHeight()) / 2,
             );
 
             setSamplerUniforms(effect, this.activeCamera, scene);

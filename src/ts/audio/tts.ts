@@ -20,7 +20,7 @@ import { Sound } from "@babylonjs/core/Audio/sound";
 import { SpeakerVoiceLines, VoiceLines } from "../assets/voiceLines";
 
 export const enum Speaker {
-    CHARLOTTE
+    CHARLOTTE,
 }
 
 export const enum VoiceLine {
@@ -34,7 +34,7 @@ export const enum VoiceLine {
     WARP_DRIVE_DISENGAGED,
     ENGAGING_WARP_DRIVE,
     FUEL_SCOOPING,
-    FUEL_SCOOPING_COMPLETE
+    FUEL_SCOOPING_COMPLETE,
 }
 
 export interface ITts {

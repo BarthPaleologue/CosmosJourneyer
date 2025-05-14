@@ -53,7 +53,7 @@ export class UtilitySection implements Transformable {
         this.metalSectionMaterial = new MetalSectionMaterial(
             "UtilitySectionMetalMaterial",
             assets.textures.materials.metalPanels,
-            scene
+            scene,
         );
 
         this.rng = getRngFromSeed(seed);
@@ -63,9 +63,9 @@ export class UtilitySection implements Transformable {
             {
                 height: 700,
                 diameter: 100,
-                tessellation: 6
+                tessellation: 6,
             },
-            scene
+            scene,
         );
         this.attachment.convertToFlatShadedMesh();
         this.attachment.material = this.metalSectionMaterial;

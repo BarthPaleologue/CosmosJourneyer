@@ -13,5 +13,5 @@ export const InputMaps = [
     SpaceShipControlsInputs,
     CharacterInputs,
     DefaultControlsInputs,
-    TutorialControlsInputs
+    TutorialControlsInputs,
 ] as const;

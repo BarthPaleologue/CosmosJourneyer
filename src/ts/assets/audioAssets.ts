@@ -26,7 +26,7 @@ export type AudioAssets = {
 };
 
 export async function loadAudioAssets(
-    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void
+    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void,
 ): Promise<AudioAssets> {
     const soundsPromise = loadSounds(progressCallback);
     const musicsPromise = loadMusics(progressCallback);
@@ -35,6 +35,6 @@ export async function loadAudioAssets(
     return {
         sounds: await soundsPromise,
         musics: await musicsPromise,
-        speakerVoiceLines: await voiceLinesPromise
+        speakerVoiceLines: await voiceLinesPromise,
     };
 }

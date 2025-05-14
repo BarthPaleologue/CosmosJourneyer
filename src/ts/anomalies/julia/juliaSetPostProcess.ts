@@ -32,7 +32,7 @@ import { ObjectUniformNames, setObjectUniforms } from "../../postProcesses/unifo
 import { SamplerUniformNames, setSamplerUniforms } from "../../postProcesses/uniforms/samplerUniforms";
 import {
     setStellarObjectUniforms,
-    StellarObjectUniformNames
+    StellarObjectUniformNames,
 } from "../../postProcesses/uniforms/stellarObjectUniforms";
 import { UpdatablePostProcess } from "../../postProcesses/updatablePostProcess";
 
@@ -48,7 +48,7 @@ export class JuliaSetPostProcess extends PostProcess implements UpdatablePostPro
         boundingRadius: number,
         accentColor: DeepReadonly<Color3>,
         scene: Scene,
-        stellarObjects: ReadonlyArray<PointLight>
+        stellarObjects: ReadonlyArray<PointLight>,
     ) {
         const shaderName = "julia";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
@@ -57,14 +57,14 @@ export class JuliaSetPostProcess extends PostProcess implements UpdatablePostPro
 
         const JuliaUniformNames = {
             ELAPSED_SECONDS: "elapsedSeconds",
-            ACCENT_COLOR: "accentColor"
+            ACCENT_COLOR: "accentColor",
         };
 
         const uniforms: string[] = [
             ...Object.values(ObjectUniformNames),
             ...Object.values(CameraUniformNames),
             ...Object.values(StellarObjectUniformNames),
-            ...Object.values(JuliaUniformNames)
+            ...Object.values(JuliaUniformNames),
         ];
 
         const samplers: string[] = Object.values(SamplerUniformNames);
@@ -80,7 +80,7 @@ export class JuliaSetPostProcess extends PostProcess implements UpdatablePostPro
             scene.getEngine(),
             false,
             null,
-            Constants.TEXTURETYPE_HALF_FLOAT
+            Constants.TEXTURETYPE_HALF_FLOAT,
         );
 
         this.onActivateObservable.add((camera) => {

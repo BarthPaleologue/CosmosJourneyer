@@ -37,7 +37,7 @@ export function newSeededSpaceStationModel(
     seed: number,
     starSystemCoordinates: StarSystemCoordinates,
     starSystemPosition: Vector3,
-    parentBodies: CelestialBodyModel[]
+    parentBodies: CelestialBodyModel[],
 ): SpaceStationModel {
     const rng = getRngFromSeed(seed);
 
@@ -72,7 +72,7 @@ export function newSeededSpaceStationModel(
         eccentricity: 0,
         longitudeOfAscendingNode: 0,
         argumentOfPeriapsis: 0,
-        initialMeanAnomaly: 0
+        initialMeanAnomaly: 0,
     };
 
     const mass = 1;
@@ -116,6 +116,6 @@ export function newSeededSpaceStationModel(
         agricultureMix,
         nbHydroponicLayers,
         faction,
-        solarPanelEfficiency
+        solarPanelEfficiency,
     };
 }

@@ -52,7 +52,7 @@ export class MetalSectionMaterial extends NodeMaterial {
         // Fragment
 
         const albedoTexture = BSL.textureSample(textures.albedo, proceduralUV, {
-            convertToLinearSpace: true
+            convertToLinearSpace: true,
         });
         const metallicRoughnesstexture = BSL.textureSample(textures.metallicRoughness, proceduralUV);
         const aoTexture = BSL.textureSample(textures.ambientOcclusion, proceduralUV);
@@ -72,7 +72,7 @@ export class MetalSectionMaterial extends NodeMaterial {
             normalW,
             view,
             cameraPosition,
-            positionW
+            positionW,
         );
 
         const fragmentOutput = BSL.outputFragColor(pbrColor);

@@ -38,7 +38,7 @@ export class TutorialsPanelContent {
             new FlightTutorial(),
             new StationLandingTutorial(),
             new StarMapTutorial(),
-            new FuelScoopTutorial()
+            new FuelScoopTutorial(),
         ];
 
         this.availableTutorials.forEach((tutorial) => {

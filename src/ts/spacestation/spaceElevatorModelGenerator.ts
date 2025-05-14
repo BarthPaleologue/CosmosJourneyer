@@ -34,7 +34,7 @@ export function newSeededSpaceElevatorModel(
     seed: number,
     starSystemCoordinates: StarSystemCoordinates,
     starSystemPosition: Vector3,
-    parentBody: PlanetModel
+    parentBody: PlanetModel,
 ): SpaceElevatorModel {
     const rng = getRngFromSeed(seed);
 
@@ -52,7 +52,7 @@ export function newSeededSpaceElevatorModel(
         eccentricity: 0,
         longitudeOfAscendingNode: 0,
         argumentOfPeriapsis: 0,
-        initialMeanAnomaly: 0
+        initialMeanAnomaly: 0,
     };
 
     const tetherLength = orbitRadius - parentBody.radius;
@@ -99,6 +99,6 @@ export function newSeededSpaceElevatorModel(
         agricultureMix,
         nbHydroponicLayers,
         faction,
-        solarPanelEfficiency
+        solarPanelEfficiency,
     };
 }

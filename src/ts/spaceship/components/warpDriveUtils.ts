@@ -25,7 +25,7 @@ import { getForwardDirection } from "../../uberCore/transforms/basicTransform";
 export function canEngageWarpDrive(
     shipTransform: TransformNode,
     currentVelocity: number,
-    nearestOrbitalObject: OrbitalObject
+    nearestOrbitalObject: OrbitalObject,
 ) {
     const shipPosition = shipTransform.getAbsolutePosition();
     const distanceToObject = Vector3.Distance(shipPosition, nearestOrbitalObject.getTransform().getAbsolutePosition());
@@ -58,7 +58,7 @@ export function canEngageWarpDrive(
     const nextRelativePosition = relativePosition.add(relativeForward.scale(currentVelocity * nbSecondsPrediction));
     const nextDistanceAboveRings = nextRelativePosition.y;
     const nextPlanarDistance = Math.sqrt(
-        nextRelativePosition.x * nextRelativePosition.x + nextRelativePosition.z * nextRelativePosition.z
+        nextRelativePosition.x * nextRelativePosition.x + nextRelativePosition.z * nextRelativePosition.z,
     );
 
     const ringsMinDistance = asteroidField.minRadius;

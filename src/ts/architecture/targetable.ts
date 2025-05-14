@@ -7,7 +7,7 @@ export const enum ObjectTargetCursorType {
     FACILITY,
     ANOMALY,
     LANDING_PAD,
-    STAR_SYSTEM
+    STAR_SYSTEM,
 }
 
 export type TargetInfo = {
@@ -32,6 +32,6 @@ export function defaultTargetInfoCelestialBody(boundingRadius: number): TargetIn
     return {
         type: ObjectTargetCursorType.CELESTIAL_BODY,
         minDistance: boundingRadius * 10.0,
-        maxDistance: 0.0
+        maxDistance: 0.0,
     };
 }

@@ -34,7 +34,7 @@ import { enablePhysics } from "./utils";
 
 export async function createStarSystemViewScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void
+    progressCallback: (progress: number, text: string) => void,
 ): Promise<Scene> {
     await initI18n();
 
@@ -66,7 +66,7 @@ export async function createStarSystemViewScene(
         starSystemDatabase,
         soundPlayerMock,
         ttsMock,
-        assets
+        assets,
     );
 
     await starSystemView.resetPlayer();
@@ -80,7 +80,7 @@ export async function createStarSystemViewScene(
     positionNearObjectBrightSide(
         starSystemView.getSpaceshipControls(),
         starSystemView.getStarSystem().getStellarObjects()[0],
-        starSystemView.getStarSystem()
+        starSystemView.getStarSystem(),
     );
 
     scene.onBeforeRenderObservable.add(() => {

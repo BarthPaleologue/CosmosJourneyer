@@ -3,7 +3,7 @@ import {
     AxisComposite,
     ButtonInputControl,
     StickInputControl,
-    Vector2InputControl
+    Vector2InputControl,
 } from "@brianchirls/game-input/browser";
 import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import Interaction from "@brianchirls/game-input/interactions/Interaction";
@@ -15,7 +15,7 @@ import {
     buttonInputToString,
     dPadCompositeToString,
     stickInputToString,
-    vector2ToString
+    vector2ToString,
 } from "../utils/strings/inputControlsString";
 
 export function initSettingsPanel(): HTMLElement {

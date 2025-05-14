@@ -41,7 +41,7 @@ export function setEnabledBody(body: PhysicsBody, enabled: boolean, havokPlugin:
 export function createEnvironmentAggregate(
     mesh: AbstractMesh,
     physicsShapeType: PhysicsShapeType,
-    scene: Scene
+    scene: Scene,
 ): PhysicsAggregate {
     const aggregate = new PhysicsAggregate(mesh, physicsShapeType, { mass: 0 }, scene);
     aggregate.body.disablePreStep = false;

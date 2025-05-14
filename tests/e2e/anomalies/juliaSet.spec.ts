@@ -9,7 +9,7 @@ test("The Julia Set playground renders correctly", async ({ page }) => {
         flagToWait: "frozen",
         urlParams: {
             freeze: 1,
-            seed: "0"
-        }
+            seed: "0",
+        },
     });
 });

@@ -22,7 +22,7 @@ export const enum ColorMode {
     MOISTURE,
     TEMPERATURE,
     NORMAL,
-    HEIGHT
+    HEIGHT,
 }
 
 export interface GazColorSettings {

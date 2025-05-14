@@ -53,7 +53,7 @@ export type Sounds = {
 };
 
 export async function loadSounds(
-    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void
+    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void,
 ): Promise<Sounds> {
     let loadedCount = 0;
     let totalCount = 0;
@@ -67,7 +67,7 @@ export async function loadSounds(
                 () => {
                     resolve(sound);
                 },
-                options
+                options,
             );
         });
         totalCount++;
@@ -95,7 +95,7 @@ export async function loadSounds(
 
     // Warp drive sounds
     const enableWarpDriveSoundPromise = loadSoundAsync("EnableWarpDriveSound", enableWarpDriveSoundPath, {
-        playbackRate: 2
+        playbackRate: 2,
     });
 
     const disableWarpDriveSoundPromise = loadSoundAsync("DisableWarpDriveSound", disableWarpDriveSoundPath);
@@ -106,8 +106,8 @@ export async function loadSounds(
         {
             playbackRate: 1.0,
             volume: 0.3,
-            loop: true
-        }
+            loop: true,
+        },
     );
 
     const deceleratingWarpDriveSoundPromise = loadSoundAsync(
@@ -116,20 +116,20 @@ export async function loadSounds(
         {
             playbackRate: 1.0,
             volume: 0.3,
-            loop: true
-        }
+            loop: true,
+        },
     );
 
     const hyperSpaceSoundPromise = loadSoundAsync("HyperSpaceSound", hyperSpaceSoundPath, {
         playbackRate: 1.5,
         volume: 0.25,
-        loop: true
+        loop: true,
     });
 
     const thrusterSoundPromise = loadSoundAsync("ThrusterSound", thrusterSoundPath, {
         playbackRate: 1.0,
         volume: 0.5,
-        loop: true
+        loop: true,
     });
 
     // UI sounds
@@ -151,6 +151,6 @@ export async function loadSounds(
         hyperSpace: await hyperSpaceSoundPromise,
         thruster: await thrusterSoundPromise,
         success: await successSoundPromise,
-        error: await errorSoundPromise
+        error: await errorSoundPromise,
     };
 }

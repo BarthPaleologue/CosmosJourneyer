@@ -48,7 +48,7 @@ export class SolarPanelMaterial extends NodeMaterial {
         // Fragment Shader
 
         const albedoTexture = BSL.textureSample(textures.albedo, uv, {
-            convertToLinearSpace: true
+            convertToLinearSpace: true,
         });
         const metallicRoughness = BSL.textureSample(textures.metallicRoughness, uv);
         const normalMapValue = BSL.textureSample(textures.normal, uv);
@@ -67,7 +67,7 @@ export class SolarPanelMaterial extends NodeMaterial {
             normalW,
             view,
             cameraPosition,
-            positionW
+            positionW,
         );
 
         const fragOutput = BSL.outputFragColor(pbrLighting);

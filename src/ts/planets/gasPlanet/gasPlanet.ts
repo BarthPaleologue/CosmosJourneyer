@@ -72,9 +72,9 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
             this.model.name,
             {
                 diameter: this.model.radius * 2,
-                segments: 64
+                segments: 64,
             },
-            scene
+            scene,
         );
         this.mesh.rotationQuaternion = Quaternion.Identity();
 
@@ -83,9 +83,9 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
             PhysicsShapeType.CONTAINER,
             {
                 mass: 0,
-                restitution: 0.2
+                restitution: 0.2,
             },
-            scene
+            scene,
         );
         this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
         this.aggregate.body.disablePreStep = false;
@@ -104,7 +104,7 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
                 this.model.rings,
                 Settings.RINGS_FADE_OUT_DISTANCE,
                 ringsLutPool,
-                scene
+                scene,
             );
 
             const averageRadius = (this.model.radius * (this.model.rings.ringStart + this.model.rings.ringEnd)) / 2;
@@ -114,7 +114,7 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
                 this.getTransform(),
                 averageRadius,
                 spread,
-                scene
+                scene,
             );
         } else {
             this.ringsUniforms = null;

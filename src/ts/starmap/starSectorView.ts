@@ -62,12 +62,12 @@ export class StarSectorView {
         const systemModels = starSystemDatabase.getSystemModelsInStarSector(
             this.coordinates.x,
             this.coordinates.y,
-            this.coordinates.z
+            this.coordinates.z,
         );
         this.systems = systemModels.map((systemModel) => {
             return {
                 model: systemModel,
-                position: starSystemDatabase.getSystemGalacticPosition(systemModel.coordinates)
+                position: starSystemDatabase.getSystemGalacticPosition(systemModel.coordinates),
             };
         });
     }
@@ -78,7 +78,7 @@ export class StarSectorView {
             return {
                 coordinates: model.coordinates,
                 sectorString: sectorString,
-                position: position
+                position: position,
             };
         });
     }
@@ -98,8 +98,8 @@ export class StarSectorView {
             Matrix.Translation(
                 position.x + globalNodePosition.x,
                 position.y + globalNodePosition.y,
-                position.z + globalNodePosition.z
-            )
+                position.z + globalNodePosition.z,
+            ),
         );
     }
 }

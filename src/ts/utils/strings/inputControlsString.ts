@@ -13,7 +13,7 @@ export function stickInputToString(input: StickInputControl): [string, string][]
 
 export function dPadCompositeToString(
     input: DPadComposite,
-    keyboardMap: Map<string, string> | null
+    keyboardMap: Map<string, string> | null,
 ): [string, string][] {
     const keys: [string, string][] = [];
     input.children.forEach((child, key) => {
@@ -35,7 +35,7 @@ export function dPadCompositeToString(
 export function vector2ToString(): [string, string][] {
     return [
         ["x", "pointerX"],
-        ["y", "pointerY"]
+        ["y", "pointerY"],
     ];
 }
 
@@ -49,7 +49,7 @@ export function buttonInputToString(input: ButtonInputControl, keyboardMap: Map<
 
 export function axisCompositeToString(
     input: AxisComposite,
-    keyboardMap: Map<string, string> | null
+    keyboardMap: Map<string, string> | null,
 ): [string, string][] {
     const keys: [string, string][] = [];
     input.children.forEach((child, key) => {
@@ -64,7 +64,7 @@ export function axisCompositeToString(
 
 export function pressInteractionToStrings(
     pressInteraction: PressInteraction,
-    keyboardMap: Map<string, string> | null
+    keyboardMap: Map<string, string> | null,
 ): string[] {
     const bindings = pressInteraction.action.bindings;
     return bindings.map((binding) => buttonInputToString(binding.control as ButtonInputControl, keyboardMap));

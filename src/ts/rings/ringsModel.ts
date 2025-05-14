@@ -39,6 +39,6 @@ export function newSeededRingsModel(rng: (step: number) => number): RingsModel {
         ringOpacity: clamp(normalRandom(0.7, 0.1, rng, 1420), 0, 1),
         ringColor: new Color3(255, 225, 171).scaleInPlace(randRange(0.7, 1.2, rng, 1430) / 255),
 
-        seed: randRange(-1, 1, rng, 1440)
+        seed: randRange(-1, 1, rng, 1440),
     };
 }

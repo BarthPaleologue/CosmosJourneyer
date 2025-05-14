@@ -62,7 +62,7 @@ export class MainMenu {
         sidePanels: SidePanels,
         starSystemView: StarSystemView,
         starSystemDatabase: StarSystemDatabase,
-        soundPlayer: ISoundPlayer
+        soundPlayer: ISoundPlayer,
     ) {
         this.sidePanels = sidePanels;
         this.starSystemView = starSystemView;
@@ -78,7 +78,7 @@ export class MainMenu {
             localZ: 0.38353311777279386,
             starSectorX: 0,
             starSectorY: 0,
-            starSectorZ: 0
+            starSectorZ: 0,
         };
 
         const system = starSystemDatabase.getSystemModelFromCoordinates(coordinates);
@@ -203,7 +203,7 @@ export class MainMenu {
                 this.controls,
                 targetObject,
                 this.starSystemView.getStarSystem(),
-                nbRadius
+                nbRadius,
             );
         });
 
@@ -238,30 +238,30 @@ export class MainMenu {
             this.controls.getTransform(),
             axis,
             angle,
-            this.startAnimationDurationSeconds
+            this.startAnimationDurationSeconds,
         );
         const translationAnimation = new TransformTranslationAnimation(
             this.controls.getTransform(),
             targetPosition,
-            this.startAnimationDurationSeconds
+            this.startAnimationDurationSeconds,
         );
 
         this.title.animate(
             [
                 {
                     marginTop: this.title.style.marginTop,
-                    opacity: 1
+                    opacity: 1,
                 },
                 {
                     marginTop: "30vh",
-                    opacity: 0
-                }
+                    opacity: 0,
+                },
             ],
             {
                 duration: this.startAnimationDurationSeconds * 1000,
                 easing: "ease-in-out",
-                fill: "forwards"
-            }
+                fill: "forwards",
+            },
         );
 
         const animationCallback = () => {

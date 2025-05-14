@@ -55,7 +55,7 @@ export class ShadowPostProcess extends PostProcess {
         cloudsUniforms: CloudsUniforms | null,
         hasOcean: boolean,
         stellarObjects: ReadonlyArray<HasBoundingSphere & LightEmitter>,
-        scene: Scene
+        scene: Scene,
     ) {
         const shaderName = "shadow";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
@@ -65,14 +65,14 @@ export class ShadowPostProcess extends PostProcess {
         const shadowUniforms: ShadowUniforms = {
             hasRings: ringsUniforms !== null,
             hasClouds: cloudsUniforms !== null,
-            hasOcean: hasOcean
+            hasOcean: hasOcean,
         };
 
         const ShadowUniformNames = {
             STAR_RADIUSES: "star_radiuses",
             HAS_RINGS: "shadowUniforms_hasRings",
             HAS_CLOUDS: "shadowUniforms_hasClouds",
-            HAS_OCEAN: "shadowUniforms_hasOcean"
+            HAS_OCEAN: "shadowUniforms_hasOcean",
         };
 
         const uniforms: string[] = [
@@ -80,7 +80,7 @@ export class ShadowPostProcess extends PostProcess {
             ...Object.values(StellarObjectUniformNames),
             ...Object.values(CameraUniformNames),
             ...Object.values(RingsUniformNames),
-            ...Object.values(ShadowUniformNames)
+            ...Object.values(ShadowUniformNames),
         ];
 
         const samplers: string[] = [...Object.values(SamplerUniformNames), ...Object.values(RingsSamplerNames)];
@@ -96,7 +96,7 @@ export class ShadowPostProcess extends PostProcess {
             scene.getEngine(),
             false,
             null,
-            Constants.TEXTURETYPE_HALF_FLOAT
+            Constants.TEXTURETYPE_HALF_FLOAT,
         );
 
         this.shadowUniforms = shadowUniforms;
@@ -116,13 +116,13 @@ export class ShadowPostProcess extends PostProcess {
             setCameraUniforms(effect, this.activeCamera);
             setStellarObjectUniforms(
                 effect,
-                stellarObjects.map((star) => star.getLight())
+                stellarObjects.map((star) => star.getLight()),
             );
             setObjectUniforms(effect, transform, boundingRadius);
 
             effect.setFloatArray(
                 ShadowUniformNames.STAR_RADIUSES,
-                stellarObjects.map((star) => star.getBoundingRadius())
+                stellarObjects.map((star) => star.getBoundingRadius()),
             );
             effect.setBool(ShadowUniformNames.HAS_RINGS, shadowUniforms.hasRings);
             effect.setBool(ShadowUniformNames.HAS_CLOUDS, shadowUniforms.hasClouds);

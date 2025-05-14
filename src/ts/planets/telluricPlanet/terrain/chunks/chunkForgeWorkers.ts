@@ -77,9 +77,9 @@ export class ChunkForgeWorkers implements ChunkForge {
                 max_mountain_height: task.terrainSettings.max_mountain_height,
                 max_bump_height: task.terrainSettings.max_bump_height,
                 bumps_frequency: task.terrainSettings.bumps_frequency,
-                mountains_frequency: task.terrainSettings.mountains_frequency
+                mountains_frequency: task.terrainSettings.mountains_frequency,
             },
-            seed: task.planetSeed
+            seed: task.planetSeed,
         };
 
         worker.postMessage(buildData);
@@ -100,7 +100,7 @@ export class ChunkForgeWorkers implements ChunkForge {
                     chunk: task.chunk,
                     instancesMatrixBuffer: data.instancesMatrixBuffer,
                     alignedInstancesMatrixBuffer: data.alignedInstancesMatrixBuffer,
-                    averageHeight: data.averageHeight
+                    averageHeight: data.averageHeight,
                 };
                 this.applyTaskQueue.push(applyTask);
             }
@@ -128,7 +128,7 @@ export class ChunkForgeWorkers implements ChunkForge {
                 task.instancesMatrixBuffer,
                 task.alignedInstancesMatrixBuffer,
                 task.averageHeight,
-                assets
+                assets,
             );
     }
 

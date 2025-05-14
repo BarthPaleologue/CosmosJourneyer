@@ -48,7 +48,7 @@ import {
     vec2,
     vec3,
     vertexAttribute,
-    xz
+    xz,
 } from "@/utils/bsl";
 
 import { PBRTextures } from "../../textures";
@@ -94,7 +94,7 @@ export class CylinderHabitatMaterial extends NodeMaterial {
         const proceduralUV = vec2(proceduralUvX, proceduralUvY);
 
         const albedo = textureSample(textures.albedo, proceduralUV, {
-            convertToLinearSpace: true
+            convertToLinearSpace: true,
         });
         const normalMap = textureSample(textures.normal, proceduralUV);
         const metallicRoughness = textureSample(textures.metallicRoughness, proceduralUV);
@@ -114,7 +114,7 @@ export class CylinderHabitatMaterial extends NodeMaterial {
             normalW,
             view,
             cameraPosition,
-            positionW
+            positionW,
         );
 
         const lightEmission = mul(
@@ -122,13 +122,13 @@ export class CylinderHabitatMaterial extends NodeMaterial {
             mul(
                 mul(
                     smoothstep(f(0.48), f(0.5), fract(proceduralUvX)),
-                    sub(f(1), smoothstep(f(0.5), f(0.52), fract(proceduralUvX)))
+                    sub(f(1), smoothstep(f(0.5), f(0.52), fract(proceduralUvX))),
                 ),
                 mul(
                     smoothstep(f(0.4), f(0.45), fract(proceduralUvY)),
-                    sub(f(1), smoothstep(f(0.55), f(0.6), fract(proceduralUvY)))
-                )
-            )
+                    sub(f(1), smoothstep(f(0.55), f(0.6), fract(proceduralUvY))),
+                ),
+            ),
         );
 
         const lightColor = vec3(f(1), f(1), f(0.7));

@@ -16,7 +16,7 @@ export function quickAnimation<T>(
     whichProp: string,
     initialValue: T,
     targetValue: T,
-    speed: number
+    speed: number,
 ) {
     const ease = new CubicEase();
     ease.setEasingMode(EasingFunction.EASINGMODE_EASEINOUT);
@@ -29,6 +29,6 @@ export function quickAnimation<T>(
         initialValue,
         targetValue,
         Animation.ANIMATIONLOOPMODE_CONSTANT,
-        ease
+        ease,
     );
 }

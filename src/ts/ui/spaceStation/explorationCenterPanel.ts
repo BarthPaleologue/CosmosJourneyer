@@ -30,7 +30,7 @@ import { DiscoveryDetails } from "./discoveryDetails";
 const ExplorationCenterFilter = {
     LOCAL_ONLY: "localOnly",
     UPLOADED_ONLY: "uploadedOnly",
-    ALL: "all"
+    ALL: "all",
 } as const;
 type ExplorationCenterFilter = (typeof ExplorationCenterFilter)[keyof typeof ExplorationCenterFilter];
 
@@ -56,7 +56,7 @@ export class ExplorationCenterPanel {
         encyclopaedia: EncyclopaediaGalacticaManager,
         player: Player,
         starSystemDatabase: StarSystemDatabase,
-        soundPlayer: ISoundPlayer
+        soundPlayer: ISoundPlayer,
     ) {
         this.player = player;
         this.encyclopaedia = encyclopaedia;
@@ -76,7 +76,7 @@ export class ExplorationCenterPanel {
 
         const activeInstances = document.createElement("p");
         activeInstances.textContent = i18n.t("explorationCenter:activeEncyclopaediaInstances", {
-            value: encyclopaedia.getBackendString()
+            value: encyclopaedia.getBackendString(),
         });
         encyclopaediaContainer.appendChild(activeInstances);
 
@@ -110,7 +110,7 @@ export class ExplorationCenterPanel {
                         NotificationIntent.ERROR,
                         valueResult.error,
                         5_000,
-                        this.soundPlayer
+                        this.soundPlayer,
                     );
                     continue;
                 }
@@ -203,7 +203,7 @@ export class ExplorationCenterPanel {
                     NotificationIntent.ERROR,
                     result.error,
                     5_000,
-                    this.soundPlayer
+                    this.soundPlayer,
                 );
                 continue;
             }
@@ -212,7 +212,7 @@ export class ExplorationCenterPanel {
         }
         this.sellAllButton.toggleAttribute("disabled", totalValue === 0);
         this.sellAllButton.innerText = i18n.t("common:sellAllFor", {
-            price: `${totalValue.toLocaleString()}${Settings.CREDIT_SYMBOL}`
+            price: `${totalValue.toLocaleString()}${Settings.CREDIT_SYMBOL}`,
         });
 
         if (discoveries.length === 0) {

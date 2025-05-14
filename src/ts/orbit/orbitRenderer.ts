@@ -36,7 +36,7 @@ export class OrbitRenderer {
 
         for (const orbitalObject of orbitalObjects) {
             const parents = orbitalObjects.filter((parent) =>
-                orbitalObject.model.orbit.parentIds.includes(parent.model.id)
+                orbitalObject.model.orbit.parentIds.includes(parent.model.id),
             );
 
             this.createOrbitMesh(orbitalObject, parents, scene);
@@ -69,15 +69,15 @@ export class OrbitRenderer {
             `${orbitalObject.getTransform().name}OrbitHelper`,
             {
                 points: points,
-                updatable: false
+                updatable: false,
             },
             {
                 color: new Color3(0.4, 0.4, 0.4),
                 width: 5,
                 colorMode: GreasedLineMeshColorMode.COLOR_MODE_SET,
-                sizeAttenuation: true
+                sizeAttenuation: true,
             },
-            scene
+            scene,
         );
         this.orbitMeshes.set(orbitalObject, orbitMesh);
     }

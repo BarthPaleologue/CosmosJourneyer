@@ -45,7 +45,7 @@ export class VolumetricCloudsPostProcess extends PostProcess {
         boundingRadius: number,
         cloudsUniforms: CloudsUniforms,
         scene: Scene,
-        stars: ReadonlyArray<PointLight>
+        stars: ReadonlyArray<PointLight>,
     ) {
         const shaderName = "volumetricClouds";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
@@ -54,14 +54,14 @@ export class VolumetricCloudsPostProcess extends PostProcess {
 
         const VolumetricCloudsUniformNames = {
             CLOUD_LAYER_MIN_HEIGHT: "cloudLayerMinHeight",
-            CLOUD_LAYER_MAX_HEIGHT: "cloudLayerMaxHeight"
+            CLOUD_LAYER_MAX_HEIGHT: "cloudLayerMaxHeight",
         };
 
         const uniforms: string[] = [
             ...Object.values(ObjectUniformNames),
             ...Object.values(StellarObjectUniformNames),
             ...Object.values(CameraUniformNames),
-            ...Object.values(VolumetricCloudsUniformNames)
+            ...Object.values(VolumetricCloudsUniformNames),
         ];
 
         const samplers: string[] = Object.values(SamplerUniformNames);
@@ -77,7 +77,7 @@ export class VolumetricCloudsPostProcess extends PostProcess {
             scene.getEngine(),
             false,
             null,
-            Constants.TEXTURETYPE_HALF_FLOAT
+            Constants.TEXTURETYPE_HALF_FLOAT,
         );
 
         this.cloudUniforms = cloudsUniforms;

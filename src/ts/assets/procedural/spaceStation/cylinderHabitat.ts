@@ -65,9 +65,9 @@ export class CylinderHabitat implements Transformable {
             {
                 diameter: this.radius * 2,
                 height: height,
-                tessellation: tesselation
+                tessellation: tesselation,
             },
-            scene
+            scene,
         );
         this.cylinder.convertToFlatShadedMesh();
 
@@ -76,7 +76,7 @@ export class CylinderHabitat implements Transformable {
             height,
             tesselation,
             textures.materials.spaceStation,
-            scene
+            scene,
         );
 
         this.cylinder.material = this.cylinderMaterial;
@@ -87,7 +87,7 @@ export class CylinderHabitat implements Transformable {
     update(cameraWorldPosition: Vector3, deltaSeconds: number) {
         this.getTransform().rotate(
             Axis.Y,
-            deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, Settings.G_EARTH)
+            deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, Settings.G_EARTH),
         );
 
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
@@ -96,7 +96,7 @@ export class CylinderHabitat implements Transformable {
             this.cylinderAggregate = createEnvironmentAggregate(
                 this.cylinder,
                 PhysicsShapeType.MESH,
-                this.getTransform().getScene()
+                this.getTransform().getScene(),
             );
         } else if (distanceToCamera > 360e3 && this.cylinderAggregate !== null) {
             this.cylinderAggregate.dispose();

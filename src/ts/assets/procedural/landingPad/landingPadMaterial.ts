@@ -28,7 +28,7 @@ import {
     vec,
     vec2,
     vertexAttribute,
-    xz
+    xz,
 } from "@/utils/bsl";
 
 import { Settings } from "../../../settings";
@@ -91,13 +91,13 @@ export class LandingPadMaterial extends NodeMaterial {
 
         const circleMask = mul(
             step(sub(circleRadius, circleThickness), distToCenter),
-            step(distToCenter, add(circleRadius, circleThickness))
+            step(distToCenter, add(circleRadius, circleThickness)),
         );
 
         const fullPaintWeight = add(add(paintWeight, borderWeight), circleMask);
 
         const albedoTexture = textureSample(textures.albedo, proceduralUV, {
-            convertToLinearSpace: true
+            convertToLinearSpace: true,
         });
         const metallicRoughness = textureSample(textures.metallicRoughness, proceduralUV);
         const normalMapValue = textureSample(textures.normal, proceduralUV);
@@ -113,7 +113,7 @@ export class LandingPadMaterial extends NodeMaterial {
             positionW,
             normalW,
             normalMapValue.rgb,
-            sub(f(1), mul(fullPaintWeight, f(0.5)))
+            sub(f(1), mul(fullPaintWeight, f(0.5))),
         );
 
         const view = uniformView();
@@ -128,7 +128,7 @@ export class LandingPadMaterial extends NodeMaterial {
             normalW,
             view,
             cameraPosition,
-            positionW
+            positionW,
         );
 
         const additionalLight = mul(finalAlbedo, div(f(0.05), add(f(0.05), mul(distToCenter, distToCenter))));

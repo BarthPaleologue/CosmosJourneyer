@@ -45,7 +45,7 @@ const enum MainPanelState {
     INFO,
     MISSIONS,
     SPACE_SHIP,
-    EXPLORATION_CENTER
+    EXPLORATION_CENTER,
 }
 
 export class SpaceStationLayer {
@@ -88,7 +88,7 @@ export class SpaceStationLayer {
         player: Player,
         encyclopaedia: EncyclopaediaGalacticaManager,
         starSystemDatabase: StarSystemDatabase,
-        soundPlayer: ISoundPlayer
+        soundPlayer: ISoundPlayer,
     ) {
         this.soundPlayer = soundPlayer;
 
@@ -135,7 +135,7 @@ export class SpaceStationLayer {
             const newName = await promptModalString(
                 i18n.t("spaceStation:cmdrNameChangePrompt"),
                 player.getName(),
-                this.soundPlayer
+                this.soundPlayer,
             );
             if (newName === null) return;
             player.setName(newName);
@@ -159,7 +159,7 @@ export class SpaceStationLayer {
             encyclopaedia,
             player,
             starSystemDatabase,
-            this.soundPlayer
+            this.soundPlayer,
         );
 
         this.actionsContainer = document.createElement("div");
@@ -321,7 +321,7 @@ export class SpaceStationLayer {
                 this.mainPanel.classList.remove("hidden");
                 this.mainPanel.innerHTML = "";
                 this.mainPanel.appendChild(
-                    generateMissionsDom(this.currentStation, player, starSystemDatabase, this.soundPlayer)
+                    generateMissionsDom(this.currentStation, player, starSystemDatabase, this.soundPlayer),
                 );
                 break;
             case MainPanelState.SPACE_SHIP:
@@ -355,7 +355,7 @@ export class SpaceStationLayer {
     public setStation(
         station: DeepReadonly<OrbitalFacilityModel>,
         stationParents: DeepReadonly<Array<OrbitalObjectModel>>,
-        player: Player
+        player: Player,
     ) {
         if (this.currentStation === station) return;
         this.currentStation = station;

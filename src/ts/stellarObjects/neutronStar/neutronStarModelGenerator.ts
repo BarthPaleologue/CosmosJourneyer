@@ -39,7 +39,7 @@ export function newSeededNeutronStarModel(
     id: string,
     seed: number,
     name: string,
-    parentBodies: OrbitalObjectModel[]
+    parentBodies: OrbitalObjectModel[],
 ): NeutronStarModel {
     const rng = getRngFromSeed(seed);
 
@@ -68,7 +68,7 @@ export function newSeededNeutronStarModel(
         inclination: 0,
         longitudeOfAscendingNode: 0,
         argumentOfPeriapsis: 0,
-        initialMeanAnomaly: 0
+        initialMeanAnomaly: 0,
     };
 
     const ringProportion = 0.02;
@@ -87,6 +87,6 @@ export function newSeededNeutronStarModel(
         axialTilt,
         radius,
         orbit,
-        rings
+        rings,
     };
 }

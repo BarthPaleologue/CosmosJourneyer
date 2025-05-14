@@ -98,8 +98,8 @@ export class TutorialLayer implements IDisposable {
                 [{ transform: "scale(1)" }, { transform: "scale(1.1)" }, { transform: "scale(1)" }],
                 {
                     duration: 200,
-                    easing: "ease"
-                }
+                    easing: "ease",
+                },
             );
             this.soundPlayer.playNow(SoundType.CLICK);
         });
@@ -123,8 +123,8 @@ export class TutorialLayer implements IDisposable {
                 [{ transform: "scale(1)" }, { transform: "scale(1.1)" }, { transform: "scale(1)" }],
                 {
                     duration: 200,
-                    easing: "ease"
-                }
+                    easing: "ease",
+                },
             );
             this.soundPlayer.playNow(SoundType.CLICK);
         });

@@ -40,7 +40,7 @@ export function generateMissionsDom(
     stationModel: DeepReadonly<OrbitalFacilityModel>,
     player: Player,
     starSystemDatabase: StarSystemDatabase,
-    soundPlayer: ISoundPlayer
+    soundPlayer: ISoundPlayer,
 ): HTMLDivElement {
     const starSystemModel = starSystemDatabase.getSystemModelFromCoordinates(stationModel.starSystemCoordinates);
     if (starSystemModel === null) {
@@ -52,7 +52,7 @@ export function generateMissionsDom(
         starSystemModel,
         starSystemDatabase,
         player,
-        Date.now()
+        Date.now(),
     );
 
     const starSystem = starSystemModel;

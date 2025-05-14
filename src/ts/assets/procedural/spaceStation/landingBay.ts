@@ -75,7 +75,7 @@ export class LandingBay {
         this.metalSectionMaterial = new MetalSectionMaterial(
             "LandingBayMetalSectionMaterial",
             assets.textures.materials.metalPanels,
-            scene
+            scene,
         );
 
         const heightFactor = 2 + Math.floor(this.rng(0) * 3);
@@ -95,7 +95,7 @@ export class LandingBay {
             deltaRadius,
             heightFactor,
             assets.textures.materials.spaceStation,
-            scene
+            scene,
         );
         this.ring.material = this.landingBayMaterial;
 
@@ -116,9 +116,9 @@ export class LandingBay {
                 {
                     height: armHeight,
                     diameter: armDiameter,
-                    tessellation: 4
+                    tessellation: 4,
                 },
-                scene
+                scene,
             );
             arm.convertToFlatShadedMesh();
             arm.rotate(Axis.Z, armRotation, Space.LOCAL);
@@ -147,7 +147,7 @@ export class LandingBay {
                     padNumber++,
                     (i + row) % 2 === 0 ? LandingPadSize.SMALL : LandingPadSize.MEDIUM,
                     assets,
-                    scene
+                    scene,
                 );
                 landingPad.getTransform().parent = this.getTransform();
 
@@ -162,7 +162,7 @@ export class LandingBay {
                     .translate(
                         Vector3.Up(),
                         -(this.radius - deltaRadius / 2) * Math.cos(Math.PI / nbPads),
-                        Space.LOCAL
+                        Space.LOCAL,
                     );
 
                 landingPad
@@ -170,7 +170,7 @@ export class LandingBay {
                     .translate(
                         Vector3.Forward(scene.useRightHandedSystem),
                         row * deltaRadius - ((heightFactor - 1) * deltaRadius) / 2,
-                        Space.LOCAL
+                        Space.LOCAL,
                     );
 
                 this.landingPads.push(landingPad);
@@ -195,13 +195,13 @@ export class LandingBay {
     update(cameraWorldPosition: Vector3, deltaSeconds: number) {
         this.getTransform().rotate(
             Axis.Y,
-            deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, Settings.G_EARTH * 0.1)
+            deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, Settings.G_EARTH * 0.1),
         );
 
         this.landingPads.forEach((landingPad) => {
             const padCameraDistance2 = Vector3.DistanceSquared(
                 cameraWorldPosition,
-                landingPad.getTransform().getAbsolutePosition()
+                landingPad.getTransform().getAbsolutePosition(),
             );
             const distanceThreshold = 12e3;
             const isEnabled = padCameraDistance2 < distanceThreshold * distanceThreshold;
@@ -214,13 +214,13 @@ export class LandingBay {
             this.ringAggregate = createEnvironmentAggregate(
                 this.ring,
                 PhysicsShapeType.MESH,
-                this.getTransform().getScene()
+                this.getTransform().getScene(),
             );
             this.arms.forEach((arm) => {
                 const armAggregate = createEnvironmentAggregate(
                     arm,
                     PhysicsShapeType.BOX,
-                    this.getTransform().getScene()
+                    this.getTransform().getScene(),
                 );
                 this.armAggregates.push(armAggregate);
             });

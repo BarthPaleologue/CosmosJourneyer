@@ -7,6 +7,6 @@ test("The tunnel playground renders correctly", async ({ page }) => {
         scene: "tunnel",
         shotName: "baseline",
         flagToWait: "frozen",
-        urlParams: { freeze: 1 }
+        urlParams: { freeze: 1 },
     });
 });

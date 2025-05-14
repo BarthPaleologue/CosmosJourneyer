@@ -37,11 +37,11 @@ export const CloudsUniformNames = {
     COLOR: "clouds_color",
     WORLEY_SPEED: "clouds_worleySpeed",
     DETAIL_SPEED: "clouds_detailSpeed",
-    TIME: "time"
+    TIME: "time",
 };
 
 export const CloudsSamplerNames = {
-    LUT: "clouds_lut"
+    LUT: "clouds_lut",
 };
 
 export class CloudsUniforms {
@@ -81,7 +81,7 @@ export class CloudsUniforms {
             CloudsUniformNames.TIME,
             -this.elapsedSeconds %
                 ((2 * Math.PI * gcd(this.model.worleySpeed * 10000, this.model.detailSpeed * 10000)) /
-                    this.model.worleySpeed)
+                    this.model.worleySpeed),
         );
     }
 

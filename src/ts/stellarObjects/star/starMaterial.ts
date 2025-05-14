@@ -34,11 +34,11 @@ const StarMaterialUniformNames = {
     WORLD_VIEW_PROJECTION: "worldViewProjection",
     SEED: "seed",
     STAR_COLOR: "starColor",
-    TIME: "time"
+    TIME: "time",
 };
 
 const StarMaterialSamplerNames = {
-    LUT: "lut"
+    LUT: "lut",
 };
 
 export class StarMaterial extends ShaderMaterial {
@@ -56,7 +56,7 @@ export class StarMaterial extends ShaderMaterial {
         super("starColor", scene, shaderName, {
             attributes: ["position"],
             uniforms: [...Object.values(StarMaterialUniformNames)],
-            samplers: [...Object.values(StarMaterialSamplerNames)]
+            samplers: [...Object.values(StarMaterialSamplerNames)],
         });
 
         const emptyTexture = createEmptyTexture(scene);

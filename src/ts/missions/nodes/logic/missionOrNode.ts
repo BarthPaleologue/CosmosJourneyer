@@ -72,7 +72,7 @@ export class MissionOrNode implements MissionNodeBase<MissionNodeType.OR> {
     describeNextTask(
         context: MissionContext,
         keyboardLayout: Map<string, string>,
-        starSystemDatabase: StarSystemDatabase
+        starSystemDatabase: StarSystemDatabase,
     ): string {
         if (this.hasCompletedLock) return "Mission completed";
         return this.children
@@ -87,7 +87,7 @@ export class MissionOrNode implements MissionNodeBase<MissionNodeType.OR> {
     serialize(): MissionOrNodeSerialized {
         return {
             type: MissionNodeType.OR,
-            children: this.children.map((child) => child.serialize())
+            children: this.children.map((child) => child.serialize()),
         };
     }
 }

@@ -36,7 +36,7 @@ export class TelluricPlanetMaterialLut {
             scene,
             null,
             true,
-            false
+            false,
         );
 
         this.lut.refreshRate = 0;

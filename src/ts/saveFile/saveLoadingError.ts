@@ -22,7 +22,7 @@ import i18n from "../i18n";
 export const enum SaveLoadingErrorType {
     INVALID_JSON = "INVALID_JSON",
     INVALID_SAVE = "INVALID_SAVE",
-    INVALID_STORAGE_FORMAT = "INVALID_STORAGE_FORMAT"
+    INVALID_STORAGE_FORMAT = "INVALID_STORAGE_FORMAT",
 }
 
 export type SaveLoadingError =

@@ -74,7 +74,7 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
         material: Material,
         planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>,
         rootLength: number,
-        scene: Scene
+        scene: Scene,
     ) {
         const id = `D${direction}P${path.join("")}`;
 
@@ -128,7 +128,7 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
         instancesMatrixBuffer: Float32Array,
         alignedInstancesMatrixBuffer: Float32Array,
         averageHeight: number,
-        assets: RenderingAssets
+        assets: RenderingAssets,
     ) {
         if (this.hasBeenDisposed()) {
             throw new Error(`Tried to init ${this.mesh.name} but it has been disposed`);
@@ -183,7 +183,7 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
             const grassPatch = new ThinInstancePatch(alignedInstancesMatrixBuffer);
             grassPatch.createInstances([
                 { mesh: assets.objects.grassBlades[0], distance: 0 },
-                { mesh: assets.objects.grassBlades[1], distance: 50 }
+                { mesh: assets.objects.grassBlades[1], distance: 50 },
             ]);
             this.instancePatches.push(grassPatch);
 
@@ -207,7 +207,7 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
     public updatePosition() {
         if (this.aggregate === null) return;
         this.getTransform().setAbsolutePosition(
-            Vector3.TransformCoordinates(this.planetLocalPosition, this.parent.getWorldMatrix())
+            Vector3.TransformCoordinates(this.planetLocalPosition, this.parent.getWorldMatrix()),
         );
     }
 

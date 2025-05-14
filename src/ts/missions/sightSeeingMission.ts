@@ -63,7 +63,7 @@ function generateMissionTree(target: SightSeeingTarget, starSystemDatabase: Star
 export function newSightSeeingMission(
     missionGiver: UniverseObjectId,
     target: SightSeeingTarget,
-    starSystemDatabase: StarSystemDatabase
+    starSystemDatabase: StarSystemDatabase,
 ): Mission | null {
     const missionTree = generateMissionTree(target, starSystemDatabase);
     if (missionTree === null) {
@@ -73,7 +73,7 @@ export function newSightSeeingMission(
     const targetSystemCoordinates = target.objectId.systemCoordinates;
 
     const missionGiverGalacticCoordinates = starSystemDatabase.getSystemGalacticPosition(
-        missionGiver.systemCoordinates
+        missionGiver.systemCoordinates,
     );
 
     const targetGalacticCoordinates = starSystemDatabase.getSystemGalacticPosition(targetSystemCoordinates);

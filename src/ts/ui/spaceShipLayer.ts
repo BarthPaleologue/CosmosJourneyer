@@ -98,7 +98,7 @@ export class SpaceShipLayer {
             this.cursor.style.transform = `translate(-50%, -50%) rotate(${Math.PI / 2 + theta}rad)`;
 
             const distanceToCenter = Math.sqrt(
-                (event.clientX - window.innerWidth / 2) ** 2 + (event.clientY - window.innerHeight / 2) ** 2
+                (event.clientX - window.innerWidth / 2) ** 2 + (event.clientY - window.innerHeight / 2) ** 2,
             );
             const normalizedDistance = Math.min(distanceToCenter / Math.min(window.innerWidth, window.innerHeight), 1);
 
@@ -131,7 +131,7 @@ export class SpaceShipLayer {
         currentControls: TransformNode,
         missionContext: MissionContext,
         keyboardLayout: Map<string, string>,
-        starSystemDatabase: StarSystemDatabase
+        starSystemDatabase: StarSystemDatabase,
     ) {
         if (this.currentTarget !== null) {
             const directionWorld = this.currentTarget
@@ -140,7 +140,7 @@ export class SpaceShipLayer {
                 .normalize();
             const directionLocal = Vector3.TransformNormal(
                 directionWorld,
-                Matrix.Invert(currentControls.getWorldMatrix())
+                Matrix.Invert(currentControls.getWorldMatrix()),
             );
 
             // set class of targetDot based on sign of directionLocal.z
@@ -167,7 +167,7 @@ export class SpaceShipLayer {
         this.fuelIndicator.style.setProperty("--currentFuelLevel", `${(fuelRemainingFraction * 100).toFixed(0)}%`);
         this.fuelIndicator.style.setProperty(
             "--fuelLevelAfterJump",
-            `${((fuelRemainingFraction - nextJumpFuelFraction) * 100).toFixed(0)}%`
+            `${((fuelRemainingFraction - nextJumpFuelFraction) * 100).toFixed(0)}%`,
         );
     }
 

@@ -75,7 +75,7 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
         model: DeepReadonly<SpaceStationModel>,
         stellarObjects: ReadonlyMap<DeepReadonly<StellarObjectModel>, number>,
         assets: RenderingAssets,
-        scene: Scene
+        scene: Scene,
     ) {
         this.model = model;
 
@@ -93,7 +93,7 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
         this.landingPadManager = new LandingPadManager(
             this.landingBays.flatMap((landingBay) => {
                 return landingBay.landingPads;
-            })
+            }),
         );
 
         // center the space station on its center of mass
@@ -111,7 +111,7 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
         this.targetInfo = {
             type: ObjectTargetCursorType.FACILITY,
             minDistance: this.getBoundingRadius() * 6.0,
-            maxDistance: 0.0
+            maxDistance: 0.0,
         };
     }
 
@@ -144,7 +144,7 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
         const solarPanelSurfaceM2 = getSolarPanelSurfaceFromEnergyRequirement(
             this.model.solarPanelEfficiency,
             this.model.population * this.model.energyConsumptionPerCapitaKWh,
-            totalStellarFlux
+            totalStellarFlux,
         );
 
         const housingSurfaceHa = (100 * this.model.population) / this.model.populationDensity; // convert km² to ha
@@ -174,7 +174,7 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
             solarPanelSurfaceM2,
             Settings.SEED_HALF_RANGE * rng(31),
             assets,
-            this.scene
+            this.scene,
         );
         solarSection.getTransform().parent = this.getTransform();
         this.placeNode(solarSection.getTransform(), lastNode);
@@ -187,9 +187,9 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
             [
                 [SpaceStationNodeType.RING_HABITAT, 0.4],
                 [SpaceStationNodeType.HELIX_HABITAT, 0.3],
-                [SpaceStationNodeType.CYLINDER_HABITAT, 0.3]
+                [SpaceStationNodeType.CYLINDER_HABITAT, 0.3],
             ],
-            rng(17)
+            rng(17),
         );
 
         let newNode: TransformNode | null = null;
@@ -198,7 +198,7 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
                 totalHabitatSurfaceM2,
                 Settings.SEED_HALF_RANGE * rng(19),
                 assets.textures,
-                this.scene
+                this.scene,
             );
             this.helixHabitats.push(helixHabitat);
             newNode = helixHabitat.getTransform();
@@ -207,7 +207,7 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
                 totalHabitatSurfaceM2,
                 Settings.SEED_HALF_RANGE * rng(27),
                 assets.textures,
-                this.scene
+                this.scene,
             );
             this.ringHabitats.push(ringHabitat);
             newNode = ringHabitat.getTransform();
@@ -216,7 +216,7 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
                 totalHabitatSurfaceM2,
                 Settings.SEED_HALF_RANGE * rng(13),
                 assets.textures,
-                this.scene
+                this.scene,
             );
             this.cylinderHabitats.push(cylinderHabitat);
             newNode = cylinderHabitat.getTransform();
@@ -243,14 +243,14 @@ export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE
         lastNode: TransformNode,
         nbSections: number,
         rng: (index: number) => number,
-        assets: RenderingAssets
+        assets: RenderingAssets,
     ): TransformNode {
         let newLastNode = lastNode;
         for (let i = 0; i < nbSections; i++) {
             const utilitySection = new UtilitySection(
                 rng(132 + 10 * this.utilitySections.length) * Settings.SEED_HALF_RANGE,
                 assets,
-                this.scene
+                this.scene,
             );
             this.utilitySections.push(utilitySection);
 

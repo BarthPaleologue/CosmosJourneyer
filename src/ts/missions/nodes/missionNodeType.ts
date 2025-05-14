@@ -25,5 +25,5 @@ export const enum MissionNodeType {
     AND = 1000,
     OR = 1001,
     XOR = 1002,
-    SEQUENCE = 1003
+    SEQUENCE = 1003,
 }

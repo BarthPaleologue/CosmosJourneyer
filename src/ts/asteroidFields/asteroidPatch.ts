@@ -50,7 +50,7 @@ export class AsteroidPatch {
         typeIndices: number[],
         rotationAxes: Vector3[],
         rotationSpeeds: number[],
-        parent: TransformNode
+        parent: TransformNode,
     ) {
         this.parent = parent;
 
@@ -103,7 +103,7 @@ export class AsteroidPatch {
                     instance,
                     PhysicsMotionType.DYNAMIC,
                     false,
-                    this.parent.getScene()
+                    this.parent.getScene(),
                 );
                 instancePhysicsBody.setMassProperties({ mass: 1000 });
                 instancePhysicsBody.setAngularVelocity(rotationAxis.scale(rotationSpeed));

@@ -6,7 +6,7 @@ export const enum CropType {
     PEANUT,
     WHEAT,
     LENTIL,
-    CASSAVA
+    CASSAVA,
 }
 
 export const CropTypes: CropType[] = [
@@ -17,7 +17,7 @@ export const CropTypes: CropType[] = [
     CropType.PEANUT,
     CropType.WHEAT,
     CropType.LENTIL,
-    CropType.CASSAVA
+    CropType.CASSAVA,
 ];
 
 /**

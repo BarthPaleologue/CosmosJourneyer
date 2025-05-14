@@ -27,7 +27,7 @@ import {
     getBackwardDirection,
     getForwardDirection,
     getLeftDirection,
-    getRightDirection
+    getRightDirection,
 } from "@/uberCore/transforms/basicTransform";
 
 const engine = new NullEngine();

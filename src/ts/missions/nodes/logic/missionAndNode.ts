@@ -72,7 +72,7 @@ export class MissionAndNode implements MissionNodeBase<MissionNodeType.AND> {
     describeNextTask(
         context: MissionContext,
         keyboardLayout: Map<string, string>,
-        starSystemDatabase: StarSystemDatabase
+        starSystemDatabase: StarSystemDatabase,
     ): string {
         if (this.hasCompletedLock) return "Mission completed";
         return this.children
@@ -87,7 +87,7 @@ export class MissionAndNode implements MissionNodeBase<MissionNodeType.AND> {
     serialize(): MissionAndNodeSerialized {
         return {
             type: MissionNodeType.AND,
-            children: this.children.map((child) => child.serialize())
+            children: this.children.map((child) => child.serialize()),
         };
     }
 }

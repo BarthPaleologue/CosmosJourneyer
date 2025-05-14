@@ -25,7 +25,7 @@ import { DefaultControls } from "../defaultControls/defaultControls";
 
 export function createAtmosphericScatteringScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void
+    progressCallback: (progress: number, text: string) => void,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;

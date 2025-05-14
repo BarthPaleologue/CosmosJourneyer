@@ -44,7 +44,7 @@ export function positionNearObject(
     orbitalObject: Transformable & HasBoundingSphere,
     localPosition: Vector3,
     localRotation: Quaternion,
-    transform: TransformNode
+    transform: TransformNode,
 ) {
     const objectRadius = orbitalObject.getBoundingRadius();
     const currentDistance = localPosition.length();
@@ -68,7 +68,7 @@ export function positionNearObjectBrightSide(
     transformable: Transformable,
     object: Transformable & HasBoundingSphere,
     starSystem: StarSystemController,
-    nRadius = 3
+    nRadius = 3,
 ): void {
     // go from the nearest star to be on the sunny side of the object
     const nearestStar = nearestObject(object.getTransform().getAbsolutePosition(), starSystem.getStellarObjects());
@@ -79,7 +79,7 @@ export function positionNearObjectBrightSide(
             object
                 .getTransform()
                 .getAbsolutePosition()
-                .add(new Vector3(0, 0.2, 1).scaleInPlace(object.getBoundingRadius() * nRadius))
+                .add(new Vector3(0, 0.2, 1).scaleInPlace(object.getBoundingRadius() * nRadius)),
         );
     } else {
         const dirBodyToStar = object
@@ -106,7 +106,7 @@ export function positionNearObjectWithStarVisible(
     transformable: Controls,
     object: Transformable & HasBoundingSphere,
     starSystem: StarSystemController,
-    nRadius = 3
+    nRadius = 3,
 ): void {
     // go from the nearest star to be on the sunny side of the object
     const nearestStar = nearestObject(object.getTransform().getAbsolutePosition(), starSystem.getStellarObjects());
@@ -117,7 +117,7 @@ export function positionNearObjectWithStarVisible(
             object
                 .getTransform()
                 .getAbsolutePosition()
-                .add(new Vector3(0, 0.2, 1).scaleInPlace(object.getBoundingRadius() * nRadius))
+                .add(new Vector3(0, 0.2, 1).scaleInPlace(object.getBoundingRadius() * nRadius)),
         );
     } else {
         const dirBodyToStar = object
@@ -142,7 +142,7 @@ export function positionNearObjectWithStarVisible(
             transformable.getTransform(),
             object.getTransform().getAbsolutePosition(),
             dirBodyToStar,
-            -Math.PI / 16
+            -Math.PI / 16,
         );
     }
 
@@ -172,7 +172,7 @@ export function positionNearObjectWithStarVisible(
 export function positionNearObjectAsteroidField(
     body: Transformable & CanHaveRings & HasBoundingSphere,
     starSystem: StarSystemController,
-    t: number
+    t: number,
 ): Vector3 {
     const asteroidField = body.asteroidField;
     if (asteroidField === null) {

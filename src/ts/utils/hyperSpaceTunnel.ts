@@ -57,9 +57,9 @@ export class HyperSpaceTunnel implements Transformable {
                 radius: this.tunnelDiameter / 2,
                 path: path,
                 sideOrientation: Mesh.BACKSIDE,
-                tessellation: 128
+                tessellation: 128,
             },
-            scene
+            scene,
         );
 
         Effect.ShadersStore["warpConeMaterialFragmentShader"] = warpConeFragment;
@@ -67,7 +67,7 @@ export class HyperSpaceTunnel implements Transformable {
         this.warpConeMaterial = new ShaderMaterial("warpConeMaterial", scene, "warpConeMaterial", {
             attributes: ["position", "uv"],
             uniforms: ["worldViewProjection", "time"],
-            samplers: ["warpNoise"]
+            samplers: ["warpNoise"],
         });
         this.warpConeMaterial.setTexture("warpNoise", noiseTextures.seamlessPerlin);
 
@@ -99,7 +99,7 @@ export class HyperSpaceTunnel implements Transformable {
         this.hyperTunnel.rotate(
             Axis.Z,
             0.005 * Math.sin(2.0 * Math.PI * rotationFrequency * this.elapsedSeconds),
-            Space.LOCAL
+            Space.LOCAL,
         );
 
         const targetForward = getForwardDirection(this.parent);

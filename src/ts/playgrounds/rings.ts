@@ -28,7 +28,7 @@ import { ItemPool } from "../utils/itemPool";
 
 export async function createRingsScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void
+    progressCallback: (progress: number, text: string) => void,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -66,7 +66,7 @@ export async function createRingsScene(
         ringFrequency: 5,
         ringOpacity: 0.9,
         ringColor: Color3.White(),
-        seed: 0
+        seed: 0,
     };
 
     const ringsUniforms = new RingsUniforms(ringsModel, 0, ringsLutPool, scene);

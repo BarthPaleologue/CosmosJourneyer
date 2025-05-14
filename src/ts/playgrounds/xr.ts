@@ -35,7 +35,7 @@ import { EmptyCelestialBody } from "../utils/emptyCelestialBody";
 
 export async function createXrScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void
+    progressCallback: (progress: number, text: string) => void,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -60,7 +60,7 @@ export async function createXrScene(
             mandelbulb.getBoundingRadius(),
             mandelBulbModel,
             scene,
-            []
+            [],
         );
 
         setupPP(mandelbulbPP);
@@ -78,7 +78,7 @@ export async function createXrScene(
             julia.getBoundingRadius(),
             juliaModel.accentColor,
             scene,
-            []
+            [],
         );
 
         setupPP(juliaPP);
@@ -96,7 +96,7 @@ export async function createXrScene(
             mandelbox.getBoundingRadius(),
             mandelboxModel,
             scene,
-            []
+            [],
         );
 
         setupPP(mandelboxPP);
@@ -109,7 +109,7 @@ export async function createXrScene(
             "sierpinski",
             Math.random() * 100_000,
             "XR Anomaly",
-            []
+            [],
         );
         const sierpinskiPyramid = new EmptyCelestialBody(sierpinskiPyramidModel, scene);
         sierpinskiPyramid.getTransform().scalingDeterminant = 1 / 100e3;
@@ -119,7 +119,7 @@ export async function createXrScene(
             sierpinskiPyramid.getBoundingRadius(),
             sierpinskiPyramidModel,
             scene,
-            []
+            [],
         );
 
         setupPP(sierpinskiPyramidPP);
@@ -137,7 +137,7 @@ export async function createXrScene(
             mengerSponge.getBoundingRadius(),
             mengerSpongeModel,
             scene,
-            []
+            [],
         );
 
         setupPP(mengerSpongePP);

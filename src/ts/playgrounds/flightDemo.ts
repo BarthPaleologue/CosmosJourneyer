@@ -30,7 +30,7 @@ import { enablePhysics } from "./utils";
 
 export async function createFlightDemoScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void
+    progressCallback: (progress: number, text: string) => void,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -72,7 +72,7 @@ export async function createFlightDemoScene(
     boxesSPS.addShape(box, 10_000, {
         positionFunction: (particle: SolidParticle) => {
             particle.position = new Vector3(randRange(-1, 1), randRange(-1, 1), randRange(-1, 1)).scaleInPlace(range);
-        }
+        },
     });
 
     const mesh = boxesSPS.buildMesh();

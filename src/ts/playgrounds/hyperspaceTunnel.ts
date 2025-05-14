@@ -28,7 +28,7 @@ import { enablePhysics } from "./utils";
 
 export async function createHyperspaceTunnelDemo(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void
+    progressCallback: (progress: number, text: string) => void,
 ) {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;

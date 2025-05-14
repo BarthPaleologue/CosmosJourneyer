@@ -33,7 +33,7 @@ import { enablePhysics } from "./utils";
 
 export async function createSpaceStationScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void
+    progressCallback: (progress: number, text: string) => void,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -62,7 +62,7 @@ export async function createSpaceStationScene(
         starSectorZ: 0,
         localX: 0,
         localY: 0,
-        localZ: 0
+        localZ: 0,
     };
 
     const systemDatabase = new StarSystemDatabase(getLoneStarSystem());
@@ -83,12 +83,12 @@ export async function createSpaceStationScene(
             longitudeOfAscendingNode: 0,
             inclination: 0,
             initialMeanAnomaly: 0,
-            parentIds: []
+            parentIds: [],
         },
         siderealDaySeconds: 0,
         axialTilt: 0,
         seed: 0,
-        rings: null
+        rings: null,
     };
 
     const sun = new Star(sunModel, assets.textures.pools, scene);
@@ -99,7 +99,7 @@ export async function createSpaceStationScene(
         Math.random() * Settings.SEED_HALF_RANGE,
         coordinates,
         systemPosition,
-        [sunModel]
+        [sunModel],
     );
     spaceStationModel.orbit.semiMajorAxis = distanceToStar;
 

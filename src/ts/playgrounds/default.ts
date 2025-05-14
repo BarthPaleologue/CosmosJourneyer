@@ -21,7 +21,7 @@ import { Scene } from "@babylonjs/core/scene";
 
 export function createDefaultScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void
+    progressCallback: (progress: number, text: string) => void,
 ): Promise<Scene> {
     const scene = new Scene(engine);
 

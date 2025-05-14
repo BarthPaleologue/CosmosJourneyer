@@ -24,7 +24,7 @@ import { StarSystemCoordinates, starSystemCoordinatesEquals } from "./coordinate
 export function getNeighborStarSystemCoordinates(
     starSystemCoordinates: StarSystemCoordinates,
     radius: number,
-    starSystemDatabase: StarSystemDatabase
+    starSystemDatabase: StarSystemDatabase,
 ): Array<{ coordinates: StarSystemCoordinates; position: Vector3; distance: number }> {
     const currentSystemPosition = starSystemDatabase.getSystemGalacticPosition(starSystemCoordinates);
     const starSectorSize = Settings.STAR_SECTOR_SIZE;
@@ -55,12 +55,12 @@ export function getNeighborStarSystemCoordinates(
         const starPositions = starSystemDatabase.getSystemPositionsInStarSector(
             starSector.x,
             starSector.y,
-            starSector.z
+            starSector.z,
         );
         const systemCoordinates = starSystemDatabase.getSystemCoordinatesInStarSector(
             starSector.x,
             starSector.y,
-            starSector.z
+            starSector.z,
         );
         return starPositions
             .map<{ coordinates: StarSystemCoordinates; position: Vector3; distance: number }>((position, index) => {

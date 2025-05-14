@@ -28,7 +28,7 @@ import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 
 export async function createStarMapScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void
+    progressCallback: (progress: number, text: string) => void,
 ): Promise<Scene> {
     await initI18n();
 

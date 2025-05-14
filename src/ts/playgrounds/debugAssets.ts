@@ -26,7 +26,7 @@ import { enablePhysics } from "./utils";
 
 export async function createDebugAssetsScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void
+    progressCallback: (progress: number, text: string) => void,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -66,13 +66,13 @@ export async function createDebugAssetsScene(
         const maxDimension = Math.max(
             extent.max.x - extent.min.x,
             extent.max.y - extent.min.y,
-            extent.max.z - extent.min.z
+            extent.max.z - extent.min.z,
         );
         rootMesh.scaling.scaleInPlace(1 / maxDimension);
         rootMesh.position = new Vector3(
             sideLength + (meshCounter % sideLength) - sideLength / 2,
             0,
-            Math.floor(meshCounter / sideLength) - sideLength / 2
+            Math.floor(meshCounter / sideLength) - sideLength / 2,
         );
     }
 
@@ -84,7 +84,7 @@ export async function createDebugAssetsScene(
     for (const [i, texture] of scene.textures.entries()) {
         showTexture(
             texture,
-            new Vector3((i % sideLength) - sideLength / 2, 0, Math.floor(i / sideLength) - sideLength / 2)
+            new Vector3((i % sideLength) - sideLength / 2, 0, Math.floor(i / sideLength) - sideLength / 2),
         );
     }
 

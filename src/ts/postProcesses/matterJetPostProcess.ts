@@ -53,19 +53,19 @@ export class MatterJetPostProcess extends PostProcess implements UpdatablePostPr
         const settings: MatterJetUniforms = {
             elapsedSeconds: 0,
             inverseRotation: Matrix.Identity(),
-            dipoleTilt: dipoleTilt
+            dipoleTilt: dipoleTilt,
         };
 
         const MatterJetUniformNames = {
             TIME: "time",
             INVERSE_ROTATION: "inverseRotation",
-            DIPOLE_TILT: "dipoleTilt"
+            DIPOLE_TILT: "dipoleTilt",
         };
 
         const uniforms: string[] = [
             ...Object.values(ObjectUniformNames),
             ...Object.values(CameraUniformNames),
-            ...Object.values(MatterJetUniformNames)
+            ...Object.values(MatterJetUniformNames),
         ];
 
         const samplers: string[] = Object.values(SamplerUniformNames);
@@ -81,7 +81,7 @@ export class MatterJetPostProcess extends PostProcess implements UpdatablePostPr
             scene.getEngine(),
             false,
             null,
-            Constants.TEXTURETYPE_HALF_FLOAT
+            Constants.TEXTURETYPE_HALF_FLOAT,
         );
 
         this.matterJetUniforms = settings;

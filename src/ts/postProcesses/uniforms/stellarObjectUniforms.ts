@@ -23,7 +23,7 @@ import { flattenColor3Array, flattenVector3Array } from "@/utils/algebra";
 export const StellarObjectUniformNames = {
     STAR_POSITIONS: "star_positions",
     STAR_COLORS: "star_colors",
-    NB_STARS: "nbStars"
+    NB_STARS: "nbStars",
 };
 
 export function setStellarObjectUniforms(effect: Effect, stellarObjects: ReadonlyArray<PointLight>): void {
@@ -37,10 +37,10 @@ export function setStellarObjectUniforms(effect: Effect, stellarObjects: Readonl
 
     effect.setArray3(
         StellarObjectUniformNames.STAR_POSITIONS,
-        flattenVector3Array(stellarObjects.map((stellarObject) => stellarObject.getAbsolutePosition()))
+        flattenVector3Array(stellarObjects.map((stellarObject) => stellarObject.getAbsolutePosition())),
     );
     effect.setArray3(
         StellarObjectUniformNames.STAR_COLORS,
-        flattenColor3Array(stellarObjects.map((stellarObject) => stellarObject.diffuse))
+        flattenColor3Array(stellarObjects.map((stellarObject) => stellarObject.diffuse)),
     );
 }

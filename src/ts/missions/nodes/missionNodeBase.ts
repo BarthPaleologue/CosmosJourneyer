@@ -59,7 +59,7 @@ export interface MissionNodeBase<T extends MissionNodeType> {
     describeNextTask(
         context: MissionContext,
         keyboardLayout: Map<string, string>,
-        starSystemDatabase: StarSystemDatabase
+        starSystemDatabase: StarSystemDatabase,
     ): string;
 
     /**

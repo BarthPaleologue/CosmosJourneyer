@@ -36,7 +36,7 @@ export const SaveSchemaV2 = z.object({
 
     playerLocation: UniverseCoordinatesSchema,
 
-    shipLocations: z.record(z.string().uuid(), UniverseCoordinatesSchema)
+    shipLocations: z.record(z.string().uuid(), UniverseCoordinatesSchema),
 });
 
 /**
@@ -47,7 +47,7 @@ export type SaveV2 = z.infer<typeof SaveSchemaV2>;
 export function migrateV1ToV2(saveV1: SaveV1, starSystemDatabase: StarSystemDatabase): SaveV2 {
     const systemModel =
         starSystemDatabase.getSystemModelFromCoordinates(
-            saveV1.universeCoordinates.universeObjectId.starSystemCoordinates
+            saveV1.universeCoordinates.universeObjectId.starSystemCoordinates,
         ) ?? starSystemDatabase.fallbackSystem;
 
     let closestObject: DeepReadonly<OrbitalObjectModel> | undefined;
@@ -82,18 +82,18 @@ export function migrateV1ToV2(saveV1: SaveV1, starSystemDatabase: StarSystemData
             type: "atStation",
             universeObjectId: {
                 systemCoordinates: systemModel.coordinates,
-                idInSystem: closestObject.id
-            }
+                idInSystem: closestObject.id,
+            },
         };
     } else {
         shipLocation = {
             type: "relative",
             universeObjectId: {
                 systemCoordinates: systemModel.coordinates,
-                idInSystem: closestObject.id
+                idInSystem: closestObject.id,
             },
             position: { x: 0, y: 0, z: -radius * 3 },
-            rotation: { x: 0, y: 0, z: 0, w: 1 }
+            rotation: { x: 0, y: 0, z: 0, w: 1 },
         };
     }
 
@@ -108,7 +108,7 @@ export function migrateV1ToV2(saveV1: SaveV1, starSystemDatabase: StarSystemData
             visitedSystemHistory: saveV1.player.visitedSystemHistory,
             discoveries: {
                 local: [],
-                uploaded: []
+                uploaded: [],
             },
             currentItinerary: saveV1.player.currentItinerary,
             systemBookmarks: saveV1.player.systemBookmarks,
@@ -116,21 +116,21 @@ export function migrateV1ToV2(saveV1: SaveV1, starSystemDatabase: StarSystemData
             completedMissions: [],
             spaceShips: [getDefaultSerializedSpaceship()],
             spareSpaceshipComponents: [],
-            tutorials: saveV1.player.tutorials
+            tutorials: saveV1.player.tutorials,
         },
         playerLocation: {
             type: "inSpaceship",
-            shipId: spaceship.id
+            shipId: spaceship.id,
         },
         shipLocations: {
-            [spaceship.id]: shipLocation
-        }
+            [spaceship.id]: shipLocation,
+        },
     };
 }
 
 export function safeParseSaveV2(
     json: Record<string, unknown>,
-    starSystemDatabase: StarSystemDatabase
+    starSystemDatabase: StarSystemDatabase,
 ): Result<SaveV2, SaveLoadingError> {
     const result = SaveSchemaV2.safeParse(json);
     if (result.success) {

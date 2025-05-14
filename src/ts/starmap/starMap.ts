@@ -128,7 +128,7 @@ export class StarMap implements View {
         "instancedBuffers.color.a",
         60,
         Animation.ANIMATIONTYPE_FLOAT,
-        Animation.ANIMATIONLOOPMODE_CYCLE
+        Animation.ANIMATIONLOOPMODE_CYCLE,
     );
     private static readonly FADE_OUT_DURATION = 1000;
 
@@ -137,7 +137,7 @@ export class StarMap implements View {
         "instancedBuffers.color.a",
         60,
         Animation.ANIMATIONTYPE_FLOAT,
-        Animation.ANIMATIONLOOPMODE_CYCLE
+        Animation.ANIMATIONLOOPMODE_CYCLE,
     );
     private static readonly FADE_IN_DURATION = 1000;
 
@@ -146,7 +146,7 @@ export class StarMap implements View {
         "instancedBuffers.color.a",
         60,
         Animation.ANIMATIONTYPE_FLOAT,
-        Animation.ANIMATIONLOOPMODE_CYCLE
+        Animation.ANIMATIONLOOPMODE_CYCLE,
     );
     private static readonly SHIMMER_DURATION = 1000;
 
@@ -157,7 +157,7 @@ export class StarMap implements View {
         engine: AbstractEngine,
         encyclopaedia: EncyclopaediaGalactica,
         starSystemDatabase: StarSystemDatabase,
-        soundPlayer: ISoundPlayer
+        soundPlayer: ISoundPlayer,
     ) {
         this.scene = new Scene(engine);
         this.scene.clearColor = new Color4(0, 0, 0, 1);
@@ -206,7 +206,7 @@ export class StarMap implements View {
             if (warpDrive === null) {
                 await alertModal(
                     "Your current spaceship has no warp drive! Install a warp drive to plot an itinerary.",
-                    this.soundPlayer
+                    this.soundPlayer,
                 );
                 return;
             }
@@ -266,38 +266,38 @@ export class StarMap implements View {
         StarMap.FADE_OUT_ANIMATION.setKeys([
             {
                 frame: 0,
-                value: 1
+                value: 1,
             },
             {
                 frame: StarMap.FADE_OUT_DURATION / 60,
-                value: 0
-            }
+                value: 0,
+            },
         ]);
 
         StarMap.FADE_IN_ANIMATION.setKeys([
             {
                 frame: 0,
-                value: 0
+                value: 0,
             },
             {
                 frame: StarMap.FADE_IN_DURATION / 60,
-                value: 1
-            }
+                value: 1,
+            },
         ]);
 
         StarMap.SHIMMER_ANIMATION.setKeys([
             {
                 frame: 0,
-                value: 1.0
+                value: 1.0,
             },
             {
                 frame: StarMap.SHIMMER_DURATION / 60 / 2,
-                value: 1.4
+                value: 1.4,
             },
             {
                 frame: StarMap.SHIMMER_DURATION / 60,
-                value: 1.0
-            }
+                value: 1.0,
+            },
         ]);
 
         this.travelLine = new ThickLines(
@@ -305,9 +305,9 @@ export class StarMap implements View {
             {
                 points: [],
                 thickness: 0.05,
-                color: Color3.Red()
+                color: Color3.Red(),
             },
-            this.scene
+            this.scene,
         );
 
         // then generate missing star sectors
@@ -365,7 +365,7 @@ export class StarMap implements View {
                         NotificationIntent.ERROR,
                         `Could not find a path to the target system after ${pathfinderMaxIterations} iterations`,
                         5000,
-                        this.soundPlayer
+                        this.soundPlayer,
                     );
                 }
             }
@@ -405,7 +405,7 @@ export class StarMap implements View {
         this.currentStarSectorCoordinates = new Vector3(
             Math.round(this.cameraPositionToCenter.x / Settings.STAR_SECTOR_SIZE),
             Math.round(this.cameraPositionToCenter.y / Settings.STAR_SECTOR_SIZE),
-            Math.round(this.cameraPositionToCenter.z / Settings.STAR_SECTOR_SIZE)
+            Math.round(this.cameraPositionToCenter.z / Settings.STAR_SECTOR_SIZE),
         );
     }
 
@@ -442,7 +442,7 @@ export class StarMap implements View {
         const sectorCoordinates = new Vector3(
             starSystemCoordinates.starSectorX,
             starSystemCoordinates.starSectorY,
-            starSystemCoordinates.starSectorZ
+            starSystemCoordinates.starSectorZ,
         );
 
         if (this.loadedStarSectors.has(vector3ToString(sectorCoordinates))) {
@@ -527,7 +527,7 @@ export class StarMap implements View {
             // don't generate star sectors that are not in the frustum
             const bb = StarSectorView.GetBoundingBox(
                 coordinates.scale(Settings.STAR_SECTOR_SIZE),
-                this.starMapCenterPosition
+                this.starMapCenterPosition,
             );
             if (!activeCamera.isInFrustum(bb)) continue;
 
@@ -557,7 +557,7 @@ export class StarMap implements View {
         const starSystemModel = this.starSystemDatabase.getSystemModelFromCoordinates(starSystemCoordinates);
         if (starSystemModel === null) {
             throw new Error(
-                `Could not find star system model for coordinates ${JSON.stringify(starSystemCoordinates)}`
+                `Could not find star system model for coordinates ${JSON.stringify(starSystemCoordinates)}`,
             );
         }
 
@@ -607,13 +607,13 @@ export class StarMap implements View {
             new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, () => {
                 this.starMapUI.setHoveredSystem(starSystemCoordinates);
                 this.soundPlayer.playNow(SoundType.HOVER);
-            })
+            }),
         );
 
         initializedInstance.actionManager.registerAction(
             new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, () => {
                 this.starMapUI.setHoveredSystem(null);
-            })
+            }),
         );
 
         initializedInstance.actionManager.registerAction(
@@ -625,7 +625,7 @@ export class StarMap implements View {
                 this.selectedSystemCoordinates = starSystemCoordinates;
 
                 this.focusOnSystem(starSystemCoordinates);
-            })
+            }),
         );
 
         this.fadeIn(initializedInstance);
@@ -649,7 +649,7 @@ export class StarMap implements View {
             .add(this.starMapCenterPosition);
 
         const cameraDir = this.controls.thirdPersonCamera.getDirection(
-            Vector3.Forward(this.scene.useRightHandedSystem)
+            Vector3.Forward(this.scene.useRightHandedSystem),
         );
 
         const cameraToStarDir = starSystemPosition.subtract(this.controls.thirdPersonCamera.globalPosition).normalize();
@@ -668,7 +668,7 @@ export class StarMap implements View {
                 this.controls.getTransform(),
                 rotationAxis,
                 rotationAngle,
-                animationDurationSeconds
+                animationDurationSeconds,
             );
         }
 
@@ -687,7 +687,7 @@ export class StarMap implements View {
             this.translationAnimation = new TransformTranslationAnimation(
                 this.controls.getTransform(),
                 targetPosition,
-                animationDurationSeconds
+                animationDurationSeconds,
             );
         }
 
@@ -697,7 +697,7 @@ export class StarMap implements View {
             this.radiusAnimation = new CameraRadiusAnimation(
                 this.controls.thirdPersonCamera,
                 targetRadius,
-                animationDurationSeconds
+                animationDurationSeconds,
             );
         }
 
@@ -705,7 +705,7 @@ export class StarMap implements View {
         const starSystemModel = this.starSystemDatabase.getSystemModelFromCoordinates(starSystemCoordinates);
         if (starSystemModel === null)
             throw new Error(
-                `Could not find star system model for coordinates ${JSON.stringify(starSystemCoordinates)}`
+                `Could not find star system model for coordinates ${JSON.stringify(starSystemCoordinates)}`,
             );
         this.starMapUI.setSelectedSystem(starSystemModel, this.currentSystemCoordinates);
         this.starMapUI.setHoveredSystem(null);

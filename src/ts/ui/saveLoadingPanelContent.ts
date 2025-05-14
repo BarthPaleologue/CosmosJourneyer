@@ -163,15 +163,15 @@ export class SaveLoadingPanelContent {
                         month: "long",
                         day: "numeric",
                         hour: "numeric",
-                        minute: "numeric"
-                    }
-                }
+                        minute: "numeric",
+                    },
+                },
             });
             cmdrHeaderText.appendChild(cmdrLastPlayed);
 
             const cmdrPlayTime = document.createElement("p");
             cmdrPlayTime.innerText = i18n.t("sidePanel:journeyedFor", {
-                nbHours: Math.ceil(latestSave.player.timePlayedSeconds / 60 / 60)
+                nbHours: Math.ceil(latestSave.player.timePlayedSeconds / 60 / 60),
             });
             cmdrHeaderText.appendChild(cmdrPlayTime);
 
@@ -206,7 +206,7 @@ export class SaveLoadingPanelContent {
                         NotificationIntent.SUCCESS,
                         i18n.t("notifications:copiedToClipboard"),
                         5000,
-                        this.soundPlayer
+                        this.soundPlayer,
                     );
                 });
             });
@@ -223,7 +223,7 @@ export class SaveLoadingPanelContent {
                 const newName = await promptModalString(
                     i18n.t("sidePanel:cmdrNameChangePrompt"),
                     latestSave.player.name,
-                    this.soundPlayer
+                    this.soundPlayer,
                 );
                 if (newName === null) return;
 
@@ -250,7 +250,7 @@ export class SaveLoadingPanelContent {
                     save,
                     cmdrSaves.auto.includes(save),
                     starSystemDatabase,
-                    saveManager
+                    saveManager,
                 );
                 savesList.appendChild(saveDiv);
             });
@@ -278,7 +278,7 @@ export class SaveLoadingPanelContent {
         save: Save,
         isAutoSave: boolean,
         starSystemDatabase: StarSystemDatabase,
-        saveManager: SaveManager
+        saveManager: SaveManager,
     ): HTMLElement {
         const saveDiv = document.createElement("div");
         saveDiv.classList.add("saveContainer");
@@ -307,8 +307,8 @@ export class SaveLoadingPanelContent {
         saveLocation.innerText = i18n.t(isLanded ? "sidePanel:landedAt" : "sidePanel:near", {
             location: nearestObject?.name ?? i18n.t("sidePanel:locationNotFound"),
             interpolation: {
-                escapeValue: false
-            }
+                escapeValue: false,
+            },
         });
         saveText.appendChild(saveLocation);
 
@@ -343,7 +343,7 @@ export class SaveLoadingPanelContent {
                     NotificationIntent.INFO,
                     i18n.t("notifications:copiedToClipboard"),
                     5000,
-                    this.soundPlayer
+                    this.soundPlayer,
                 );
             });
         });
@@ -404,7 +404,7 @@ export class SaveLoadingPanelContent {
 
     private async loadSaveFile(
         file: File,
-        starSystemDatabase: StarSystemDatabase
+        starSystemDatabase: StarSystemDatabase,
     ): Promise<Result<Save, SaveLoadingError>> {
         const saveFileDataResult = await parseSaveFile(file, starSystemDatabase);
         if (!saveFileDataResult.success) {
