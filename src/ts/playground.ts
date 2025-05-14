@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import "../styles/index.scss";
+import "@styles/index.scss";
 import "@babylonjs/inspector";
 
 import { Engine, PhysicsViewer, Tools } from "@babylonjs/core";
