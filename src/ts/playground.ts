@@ -70,11 +70,12 @@ if (urlParams.get("physicsViewer") !== null) {
 }
 
 const maxFrameCounter = urlParams.get("freeze");
-if (maxFrameCounter !== null) {
+const maxFrameCounterValue = Number(maxFrameCounter);
+if (maxFrameCounter !== null && !isNaN(maxFrameCounterValue)) {
     let frameCounter = 0;
     scene.onAfterRenderObservable.add(() => {
         frameCounter++;
-        if (frameCounter === Number(maxFrameCounter)) {
+        if (frameCounter >= maxFrameCounterValue) {
             engine.stopRenderLoop();
             canvas.dataset["frozen"] = "1";
             return;
