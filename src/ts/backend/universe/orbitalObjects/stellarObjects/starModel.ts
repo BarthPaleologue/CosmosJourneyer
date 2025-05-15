@@ -16,9 +16,9 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { HasSeed } from "../../../../frontend/architecture/hasSeed";
-import { OrbitalObjectModelBase } from "../../../../frontend/architecture/orbitalObjectModelBase";
-import { OrbitalObjectType } from "../../../../frontend/architecture/orbitalObjectType";
 import { RingsModel } from "../../../../frontend/rings/ringsModel";
+import { OrbitalObjectModelBase } from "../orbitalObjectModelBase";
+import { OrbitalObjectType } from "../orbitalObjectType";
 
 export type StarModel = OrbitalObjectModelBase<OrbitalObjectType.STAR> &
     HasSeed & {

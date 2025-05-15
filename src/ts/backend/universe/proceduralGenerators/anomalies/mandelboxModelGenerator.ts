@@ -23,21 +23,23 @@ import { GenerationSteps } from "@/utils/generationSteps";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { clamp } from "@/utils/math";
 
-import { OrbitalObjectType } from "../../../../frontend/architecture/orbitalObjectType";
-import { OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
-import { Orbit } from "../orbit";
-import { JuliaSetModel } from "./juliaSetModel";
+import { MandelboxModel } from "../../orbitalObjects/anomalies/mandelboxModel";
+import { OrbitalObjectModel } from "../../orbitalObjects/index";
+import { Orbit } from "../../orbitalObjects/orbit";
+import { OrbitalObjectType } from "../../orbitalObjects/orbitalObjectType";
 
-export function newSeededJuliaSetModel(
+export function newSeededMandelboxModel(
     id: string,
     seed: number,
     name: string,
     parentBodies: ReadonlyArray<OrbitalObjectModel>,
-): JuliaSetModel {
+): MandelboxModel {
     const rng = getRngFromSeed(seed);
 
-    const radius = 1000e3;
+    const radius = 200e3;
 
+    const mr2 = randRange(0.0, 1.0, rng, GenerationSteps.POWER);
+    const spread = randRange(1.0, 1.5, rng, GenerationSteps.POWER + 1);
     const accentColor = Color3.FromHSV(
         360 * rng(GenerationSteps.ACCENT_COLOR),
         rng(GenerationSteps.ACCENT_COLOR + 123) * 0.5,
@@ -61,19 +63,22 @@ export function newSeededJuliaSetModel(
         argumentOfPeriapsis: randRange(0, 2 * Math.PI, rng, GenerationSteps.ORBIT + 400),
         initialMeanAnomaly: randRange(0, 2 * Math.PI, rng, GenerationSteps.ORBIT + 480),
     };
+
     const mass = 10;
     const siderealDaySeconds = 0;
     const axialTilt = normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT);
 
     return {
-        type: OrbitalObjectType.JULIA_SET,
+        type: OrbitalObjectType.MANDELBOX,
         id: id,
         name,
         radius,
-        orbit,
         mass,
         siderealDaySeconds,
         axialTilt,
-        accentColor,
+        mr2,
+        spread,
+        color: accentColor,
+        orbit,
     };
 }

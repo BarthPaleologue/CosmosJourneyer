@@ -21,12 +21,13 @@ import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { GenerationSteps } from "@/utils/generationSteps";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 
-import { CelestialBodyModel } from "../../architecture/orbitalObjectModel";
-import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
-import { GasPlanetModel } from "../../backend/universe/orbitalObjects/gasPlanetModel";
-import { Orbit } from "../../orbit/orbit";
-import { newSeededRingsModel } from "../../rings/ringsModel";
-import { Settings } from "../../settings";
+import { Settings } from "@/settings";
+
+import { GasPlanetModel } from "../orbitalObjects/gasPlanetModel";
+import { CelestialBodyModel } from "../orbitalObjects/index";
+import { Orbit } from "../orbitalObjects/orbit";
+import { OrbitalObjectType } from "../orbitalObjects/orbitalObjectType";
+import { newSeededRingsModel } from "../orbitalObjects/ringsModel";
 
 export function newSeededGasPlanetModel(
     id: string,

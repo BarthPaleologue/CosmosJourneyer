@@ -21,12 +21,12 @@ import { GenerationSteps } from "@/utils/generationSteps";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { wheelOfFortune } from "@/utils/random";
 
-import { OrbitalObjectType } from "../../../../frontend/architecture/orbitalObjectType";
 import { newSeededRingsModel } from "../../../../frontend/rings/ringsModel";
 import { Settings } from "../../../../settings";
 import { OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
-import { Orbit } from "../orbit";
-import { StarModel } from "./starModel";
+import { Orbit } from "../../orbitalObjects/orbit";
+import { OrbitalObjectType } from "../../orbitalObjects/orbitalObjectType";
+import { StarModel } from "../../orbitalObjects/stellarObjects/starModel";
 
 export function newSeededStarModel(
     id: string,

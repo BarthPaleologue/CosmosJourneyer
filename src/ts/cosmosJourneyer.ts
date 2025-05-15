@@ -34,8 +34,8 @@ import { EncyclopaediaGalacticaLocal } from "@/backend/encyclopaedia/encyclopaed
 import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { registerCustomSystems } from "@/backend/universe/customSystems/registerCustomSystems";
-import { generateDarkKnightModel } from "@/backend/universe/orbitalObjects/anomalies/darkKnightModelGenerator";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
+import { generateDarkKnightModel } from "@/backend/universe/proceduralGenerators/anomalies/darkKnightModelGenerator";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { Assets, loadAssets } from "@/frontend/assets/assets";

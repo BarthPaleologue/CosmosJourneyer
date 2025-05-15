@@ -17,7 +17,6 @@
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-import { OrbitalObjectType } from "../../../../frontend/architecture/orbitalObjectType";
 import { CropType, CropTypes } from "../../../../utils/agriculture";
 import { StarSystemCoordinates } from "../../../../utils/coordinates/starSystemCoordinates";
 import { getRngFromSeed } from "../../../../utils/getRngFromSeed";
@@ -27,6 +26,7 @@ import { generateSpaceElevatorName } from "../../../../utils/strings/spaceStatio
 import { getFactionFromGalacticPosition } from "../../../society/factions";
 import { PlanetModel } from "../architecture/orbitalObjectModel";
 import { Orbit } from "../orbit";
+import { OrbitalObjectType } from "../orbitalObjectType";
 import { SpaceElevatorModel } from "./spaceElevatorModel";
 
 export function newSeededSpaceElevatorModel(

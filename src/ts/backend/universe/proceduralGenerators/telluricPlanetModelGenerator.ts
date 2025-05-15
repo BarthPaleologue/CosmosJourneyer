@@ -28,10 +28,10 @@ import { OrbitalObjectType } from "../../../frontend/architecture/orbitalObjectT
 import { newSeededRingsModel, RingsModel } from "../../../frontend/rings/ringsModel";
 import { Settings } from "../../../settings";
 import { CelestialBodyModel } from "../../architecture/orbitalObjectModel";
-import { CloudsModel, newCloudsModel } from "./cloudsModel";
-import { OceanModel } from "./oceanModel";
-import { Orbit } from "./orbit";
-import { TelluricPlanetModel } from "./telluricPlanetModel";
+import { CloudsModel, newCloudsModel } from "../orbitalObjects/cloudsModel";
+import { OceanModel } from "../orbitalObjects/oceanModel";
+import { Orbit } from "../orbitalObjects/orbit";
+import { TelluricPlanetModel } from "../orbitalObjects/telluricPlanetModel";
 
 export function newSeededTelluricPlanetModel(
     id: string,

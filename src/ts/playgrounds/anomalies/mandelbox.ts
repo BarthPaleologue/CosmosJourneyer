@@ -17,7 +17,7 @@
 
 import { AbstractEngine, ArcRotateCamera, Scene, Vector3 } from "@babylonjs/core";
 
-import { newSeededMandelboxModel } from "@/backend/universe/orbitalObjects/anomalies/mandelboxModelGenerator";
+import { newSeededMandelboxModel } from "@/backend/universe/proceduralGenerators/anomalies/mandelboxModelGenerator";
 
 import { EmptyCelestialBody } from "@/utils/emptyCelestialBody";
 

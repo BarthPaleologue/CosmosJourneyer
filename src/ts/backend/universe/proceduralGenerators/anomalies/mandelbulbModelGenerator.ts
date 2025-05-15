@@ -23,23 +23,22 @@ import { GenerationSteps } from "@/utils/generationSteps";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { clamp } from "@/utils/math";
 
-import { OrbitalObjectType } from "../../../../frontend/architecture/orbitalObjectType";
-import { OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
-import { Orbit } from "../orbit";
-import { MandelboxModel } from "./mandelboxModel";
+import { MandelbulbModel } from "../../orbitalObjects/anomalies/mandelbulbModel";
+import { OrbitalObjectModel } from "../../orbitalObjects/index";
+import { Orbit } from "../../orbitalObjects/orbit";
+import { OrbitalObjectType } from "../../orbitalObjects/orbitalObjectType";
 
-export function newSeededMandelboxModel(
+export function newSeededMandelbulbModel(
     id: string,
     seed: number,
     name: string,
     parentBodies: ReadonlyArray<OrbitalObjectModel>,
-): MandelboxModel {
+): MandelbulbModel {
     const rng = getRngFromSeed(seed);
 
-    const radius = 200e3;
+    const radius = 1000e3;
 
-    const mr2 = randRange(0.0, 1.0, rng, GenerationSteps.POWER);
-    const spread = randRange(1.0, 1.5, rng, GenerationSteps.POWER + 1);
+    const power = randRange(7.0, 10.0, rng, GenerationSteps.POWER);
     const accentColor = Color3.FromHSV(
         360 * rng(GenerationSteps.ACCENT_COLOR),
         rng(GenerationSteps.ACCENT_COLOR + 123) * 0.5,
@@ -63,22 +62,20 @@ export function newSeededMandelboxModel(
         argumentOfPeriapsis: randRange(0, 2 * Math.PI, rng, GenerationSteps.ORBIT + 400),
         initialMeanAnomaly: randRange(0, 2 * Math.PI, rng, GenerationSteps.ORBIT + 480),
     };
-
     const mass = 10;
     const siderealDaySeconds = 0;
     const axialTilt = normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT);
 
     return {
-        type: OrbitalObjectType.MANDELBOX,
+        type: OrbitalObjectType.MANDELBULB,
         id: id,
         name,
         radius,
         mass,
         siderealDaySeconds,
         axialTilt,
-        mr2,
-        spread,
-        color: accentColor,
+        accentColor,
+        power,
         orbit,
     };
 }

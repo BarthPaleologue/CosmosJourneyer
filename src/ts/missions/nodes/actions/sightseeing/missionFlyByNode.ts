@@ -24,7 +24,6 @@ import { UniverseObjectId, universeObjectIdEquals } from "@/utils/coordinates/un
 import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
 import { parseDistance } from "@/utils/strings/parseToStrings";
 
-import { OrbitalObjectType } from "../../../../frontend/architecture/orbitalObjectType";
 import i18n from "../../../../i18n";
 import { Settings } from "../../../../settings";
 import { getGoToSystemInstructions } from "../../../common";
@@ -32,6 +31,7 @@ import { MissionContext } from "../../../missionContext";
 import { MissionNode } from "../../missionNode";
 import type { MissionNodeBase } from "../../missionNodeBase";
 import { MissionNodeType } from "../../missionNodeType";
+import { OrbitalObjectType } from "../orbitalObjectType";
 import { FlyByState, MissionFlyByNodeSerialized } from "./missionFlyByNodeSerialized";
 
 /**

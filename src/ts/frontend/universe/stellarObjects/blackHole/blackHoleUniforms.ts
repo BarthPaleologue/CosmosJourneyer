@@ -20,7 +20,7 @@ import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
 import { BlackHoleModel } from "@/backend/universe/orbitalObjects/stellarObjects/blackHoleModel";
-import { getKerrMetricA } from "@/backend/universe/orbitalObjects/stellarObjects/blackHoleModelGenerator";
+import { getKerrMetricA } from "@/backend/universe/proceduralGenerators/stellarObjects/blackHoleModelGenerator";
 
 import { DeepReadonly } from "@/utils/types";
 

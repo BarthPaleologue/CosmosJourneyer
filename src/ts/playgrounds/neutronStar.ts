@@ -20,7 +20,7 @@ import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
-import { newSeededNeutronStarModel } from "@/backend/universe/orbitalObjects/stellarObjects/neutronStarModelGenerator";
+import { newSeededNeutronStarModel } from "@/backend/universe/proceduralGenerators/stellarObjects/neutronStarModelGenerator";
 
 import { createTexturePools } from "../assets/textures";
 import { DefaultControls } from "../defaultControls/defaultControls";

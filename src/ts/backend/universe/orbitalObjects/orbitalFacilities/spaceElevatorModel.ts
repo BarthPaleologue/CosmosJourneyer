@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { HasSeed } from "../../../../frontend/architecture/hasSeed";
-import { OrbitalObjectType } from "../../../../frontend/architecture/orbitalObjectType";
+import { OrbitalObjectType } from "../orbitalObjectType";
 import { OrbitalFacilityModelBase } from "./orbitalFacilityModelBase";
 
 export type SpaceElevatorModel = OrbitalFacilityModelBase<OrbitalObjectType.SPACE_ELEVATOR> &

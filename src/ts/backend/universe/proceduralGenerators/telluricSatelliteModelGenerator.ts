@@ -27,10 +27,10 @@ import { AtmosphereModel } from "../../../atmosphere/atmosphereModel";
 import { OrbitalObjectType } from "../../../frontend/architecture/orbitalObjectType";
 import { Settings } from "../../../settings";
 import { PlanetModel } from "../../architecture/orbitalObjectModel";
-import { CloudsModel, newCloudsModel } from "./cloudsModel";
-import { OceanModel } from "./oceanModel";
-import { getOrbitalPeriod, Orbit } from "./orbit";
-import { TelluricSatelliteModel } from "./telluricSatelliteModel";
+import { CloudsModel, newCloudsModel } from "../orbitalObjects/cloudsModel";
+import { OceanModel } from "../orbitalObjects/oceanModel";
+import { getOrbitalPeriod, Orbit } from "../orbitalObjects/orbit";
+import { TelluricSatelliteModel } from "../orbitalObjects/telluricSatelliteModel";
 
 export function newSeededTelluricSatelliteModel(
     id: string,

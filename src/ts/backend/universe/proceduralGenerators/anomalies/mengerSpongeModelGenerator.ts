@@ -23,17 +23,17 @@ import { GenerationSteps } from "@/utils/generationSteps";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { clamp } from "@/utils/math";
 
-import { OrbitalObjectType } from "../../../../frontend/architecture/orbitalObjectType";
 import { OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
-import { Orbit } from "../orbit";
-import { SierpinskiPyramidModel } from "./sierpinskiPyramidModel";
+import { MengerSpongeModel } from "../../orbitalObjects/anomalies/mengerSpongeModel";
+import { Orbit } from "../../orbitalObjects/orbit";
+import { OrbitalObjectType } from "../../orbitalObjects/orbitalObjectType";
 
-export function newSeededSierpinskiPyramidModel(
+export function newSeededMengerSpongeModel(
     id: string,
     seed: number,
     name: string,
     parentBodies: ReadonlyArray<OrbitalObjectModel>,
-): SierpinskiPyramidModel {
+): MengerSpongeModel {
     const rng = getRngFromSeed(seed);
 
     const radius = 200e3;
@@ -61,20 +61,19 @@ export function newSeededSierpinskiPyramidModel(
         argumentOfPeriapsis: randRange(0, 2 * Math.PI, rng, GenerationSteps.ORBIT + 400),
         initialMeanAnomaly: randRange(0, 2 * Math.PI, rng, GenerationSteps.ORBIT + 480),
     };
-
     const mass = 10;
     const siderealDaySeconds = 0;
     const axialTilt = normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT);
 
     return {
-        type: OrbitalObjectType.SIERPINSKI_PYRAMID,
+        type: OrbitalObjectType.MENGER_SPONGE,
         id: id,
         name,
         radius,
-        accentColor,
-        orbit,
         mass,
         siderealDaySeconds,
         axialTilt,
+        color: accentColor,
+        orbit,
     };
 }

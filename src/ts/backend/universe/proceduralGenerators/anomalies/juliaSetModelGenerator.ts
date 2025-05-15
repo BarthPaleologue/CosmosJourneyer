@@ -23,20 +23,20 @@ import { GenerationSteps } from "@/utils/generationSteps";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { clamp } from "@/utils/math";
 
-import { OrbitalObjectType } from "../../../../frontend/architecture/orbitalObjectType";
-import { OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
-import { Orbit } from "../orbit";
-import { MengerSpongeModel } from "./mengerSpongeModel";
+import { JuliaSetModel } from "../../orbitalObjects/anomalies/juliaSetModel";
+import { OrbitalObjectModel } from "../../orbitalObjects/index";
+import { Orbit } from "../../orbitalObjects/orbit";
+import { OrbitalObjectType } from "../../orbitalObjects/orbitalObjectType";
 
-export function newSeededMengerSpongeModel(
+export function newSeededJuliaSetModel(
     id: string,
     seed: number,
     name: string,
     parentBodies: ReadonlyArray<OrbitalObjectModel>,
-): MengerSpongeModel {
+): JuliaSetModel {
     const rng = getRngFromSeed(seed);
 
-    const radius = 200e3;
+    const radius = 1000e3;
 
     const accentColor = Color3.FromHSV(
         360 * rng(GenerationSteps.ACCENT_COLOR),
@@ -66,14 +66,14 @@ export function newSeededMengerSpongeModel(
     const axialTilt = normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT);
 
     return {
-        type: OrbitalObjectType.MENGER_SPONGE,
+        type: OrbitalObjectType.JULIA_SET,
         id: id,
         name,
         radius,
+        orbit,
         mass,
         siderealDaySeconds,
         axialTilt,
-        color: accentColor,
-        orbit,
+        accentColor,
     };
 }

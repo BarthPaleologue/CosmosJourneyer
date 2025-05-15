@@ -22,11 +22,11 @@ import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { estimateStarRadiusFromMass } from "@/utils/physics";
 import { DeepReadonly } from "@/utils/types";
 
-import { OrbitalObjectType } from "../../../../frontend/architecture/orbitalObjectType";
 import { Settings } from "../../../../settings";
 import { CelestialBodyModel } from "../../architecture/orbitalObjectModel";
-import { Orbit } from "../orbit";
-import { BlackHoleModel } from "./blackHoleModel";
+import { Orbit } from "../../orbitalObjects/orbit";
+import { OrbitalObjectType } from "../../orbitalObjects/orbitalObjectType";
+import { BlackHoleModel } from "../../orbitalObjects/stellarObjects/blackHoleModel";
 
 export function newSeededBlackHoleModel(
     id: string,

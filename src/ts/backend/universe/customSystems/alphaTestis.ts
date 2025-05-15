@@ -25,9 +25,9 @@ import { Settings } from "@/settings";
 
 import { newSeededGasPlanetModel } from "../orbitalObjects/gasPlanetModelGenerator";
 import { newSeededSpaceStationModel } from "../orbitalObjects/orbitalFacilities/spaceStationModelGenerator";
-import { newSeededStarModel } from "../orbitalObjects/stellarObjects/starModelGenerator";
-import { newSeededTelluricPlanetModel } from "../orbitalObjects/telluricPlanetModelGenerator";
-import { newSeededTelluricSatelliteModel } from "../orbitalObjects/telluricSatelliteModelGenerator";
+import { newSeededStarModel } from "../proceduralGenerators/stellarObjects/starModelGenerator";
+import { newSeededTelluricPlanetModel } from "../proceduralGenerators/telluricPlanetModelGenerator";
+import { newSeededTelluricSatelliteModel } from "../proceduralGenerators/telluricSatelliteModelGenerator";
 import { StarSystemModel } from "../starSystemModel";
 
 export function getAlphaTestisSystemModel(): StarSystemModel {

@@ -17,9 +17,10 @@
 
 import { OrbitalObjectId } from "@/utils/coordinates/orbitalObjectId";
 
-import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
-import { Settings } from "../../settings";
-import { DarkKnightModel } from "./darkKnightModel";
+import { Settings } from "@/settings";
+
+import { DarkKnightModel } from "../../orbitalObjects/anomalies/darkKnightModel";
+import { OrbitalObjectType } from "../../orbitalObjects/orbitalObjectType";
 
 export function generateDarkKnightModel(parentIds: ReadonlyArray<OrbitalObjectId>): DarkKnightModel {
     return {

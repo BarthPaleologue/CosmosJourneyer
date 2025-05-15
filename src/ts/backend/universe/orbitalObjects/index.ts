@@ -15,22 +15,22 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { DarkKnightModel } from "../anomalies/darkKnight/darkKnightModel";
-import { JuliaSetModel } from "../anomalies/julia/juliaSetModel";
-import { MandelboxModel } from "../anomalies/mandelbox/mandelboxModel";
-import { MandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModel";
-import { MengerSpongeModel } from "../anomalies/mengerSponge/mengerSpongeModel";
-import { SierpinskiPyramidModel } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidModel";
-import { GasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
-import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
-import { TelluricSatelliteModel } from "../planets/telluricPlanet/telluricSatelliteModel";
-import { SpaceElevatorModel } from "../spacestation/spaceElevatorModel";
-import { SpaceStationModel } from "../spacestation/spacestationModel";
-import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
-import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
-import { StarModel } from "../stellarObjects/star/starModel";
+import { DarkKnightModel } from "./anomalies/darkKnightModel";
+import { JuliaSetModel } from "./anomalies/juliaSetModel";
+import { MandelboxModel } from "./anomalies/mandelboxModel";
+import { MandelbulbModel } from "./anomalies/mandelbulbModel";
+import { MengerSpongeModel } from "./anomalies/mengerSpongeModel";
+import { SierpinskiPyramidModel } from "./anomalies/sierpinskiPyramidModel";
+import { GasPlanetModel } from "./gasPlanetModel";
+import { SpaceElevatorModel } from "./orbitalFacilities/spaceElevatorModel";
+import { SpaceStationModel } from "./orbitalFacilities/spacestationModel";
 import { OrbitalObjectModelBase } from "./orbitalObjectModelBase";
 import { OrbitalObjectType } from "./orbitalObjectType";
+import { BlackHoleModel } from "./stellarObjects/blackHoleModel";
+import { NeutronStarModel } from "./stellarObjects/neutronStarModel";
+import { StarModel } from "./stellarObjects/starModel";
+import { TelluricPlanetModel } from "./telluricPlanetModel";
+import { TelluricSatelliteModel } from "./telluricSatelliteModel";
 
 export type StellarObjectModel = StarModel | NeutronStarModel | BlackHoleModel;
 

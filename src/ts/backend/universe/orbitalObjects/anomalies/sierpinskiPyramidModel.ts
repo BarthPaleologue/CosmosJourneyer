@@ -17,8 +17,8 @@
 
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 
-import { CelestialBodyModelBase } from "../../../../frontend/architecture/orbitalObjectModelBase";
-import { OrbitalObjectType } from "../../../../frontend/architecture/orbitalObjectType";
+import { CelestialBodyModelBase } from "../orbitalObjectModelBase";
+import { OrbitalObjectType } from "../orbitalObjectType";
 
 export type SierpinskiPyramidModel = CelestialBodyModelBase<OrbitalObjectType.SIERPINSKI_PYRAMID> & {
     readonly accentColor: Color3;

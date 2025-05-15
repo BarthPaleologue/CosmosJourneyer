@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getStellarTypeFromTemperature } from "@/backend/universe/orbitalObjects/stellarObjects/starModelGenerator";
+import { getStellarTypeFromTemperature } from "@/backend/universe/proceduralGenerators/stellarObjects/starModelGenerator";
 
 import { OrbitalObjectModel } from "../../frontend/architecture/orbitalObjectModel";
 import { OrbitalObjectType } from "../../frontend/architecture/orbitalObjectType";

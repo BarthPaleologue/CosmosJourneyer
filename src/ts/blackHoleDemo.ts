@@ -17,8 +17,8 @@
 
 import "@styles/index.scss";
 
-import { newSeededBlackHoleModel } from "@/backend/universe/orbitalObjects/stellarObjects/blackHoleModelGenerator";
-import { newSeededTelluricPlanetModel } from "@/backend/universe/orbitalObjects/telluricPlanetModelGenerator";
+import { newSeededBlackHoleModel } from "@/backend/universe/proceduralGenerators/stellarObjects/blackHoleModelGenerator";
+import { newSeededTelluricPlanetModel } from "@/backend/universe/proceduralGenerators/telluricPlanetModelGenerator";
 import { StarSystemModel } from "@/backend/universe/starSystemModel";
 
 import { positionNearObjectBrightSide } from "@/utils/positionNearObject";

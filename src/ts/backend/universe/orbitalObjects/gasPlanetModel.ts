@@ -17,9 +17,9 @@
 
 import { AtmosphereModel } from "../../../atmosphere/atmosphereModel";
 import { HasSeed } from "../../../frontend/architecture/hasSeed";
-import { OrbitalObjectModelBase } from "../../../frontend/architecture/orbitalObjectModelBase";
 import { OrbitalObjectType } from "../../../frontend/architecture/orbitalObjectType";
 import { RingsModel } from "../../../frontend/rings/ringsModel";
+import { OrbitalObjectModelBase } from "../orbitalObjectModelBase";
 
 export type GasPlanetModel = OrbitalObjectModelBase<OrbitalObjectType.GAS_PLANET> &
     HasSeed & {

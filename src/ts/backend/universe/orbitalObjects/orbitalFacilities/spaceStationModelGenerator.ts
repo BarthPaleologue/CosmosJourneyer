@@ -19,7 +19,6 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { normalRandom } from "extended-random";
 
-import { OrbitalObjectType } from "../../../../frontend/architecture/orbitalObjectType";
 import { CropType, CropTypes } from "../../../../utils/agriculture";
 import { StarSystemCoordinates } from "../../../../utils/coordinates/starSystemCoordinates";
 import { GenerationSteps } from "../../../../utils/generationSteps";
@@ -30,6 +29,7 @@ import { generateSpaceStationName } from "../../../../utils/strings/spaceStation
 import { getFactionFromGalacticPosition } from "../../../society/factions";
 import { CelestialBodyModel } from "../architecture/orbitalObjectModel";
 import { Orbit } from "../orbit";
+import { OrbitalObjectType } from "../orbitalObjectType";
 import { SpaceStationModel } from "./spacestationModel";
 
 export function newSeededSpaceStationModel(
