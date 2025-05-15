@@ -30,12 +30,12 @@ import targetImageSrc from "../../asset/tutorials/flightTutorial/target.webp";
 import thrustImageSrc from "../../asset/tutorials/flightTutorial/thrust.webp";
 import warpImageSrc from "../../asset/tutorials/flightTutorial/warp.webp";
 import welcomeImageSrc from "../../asset/tutorials/flightTutorial/welcome.webp";
+import { safeParseSave, Save } from "../backend/save/saveFileData";
+import { SaveLoadingError } from "../backend/save/saveLoadingError";
 import { StarSystemInputs } from "../frontend/inputs/starSystemInputs";
 import { SpaceShipControlsInputs } from "../frontend/spaceship/spaceShipControlsInputs";
 import { TutorialControlsInputs } from "../frontend/ui/tutorial/tutorialLayerInputs";
 import i18n from "../i18n";
-import { safeParseSave, Save } from "../saveFile/saveFileData";
-import { SaveLoadingError } from "../saveFile/saveLoadingError";
 import { Tutorial } from "./tutorial";
 
 export class FlightTutorial implements Tutorial {

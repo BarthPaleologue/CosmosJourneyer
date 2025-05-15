@@ -21,7 +21,7 @@ import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { err, ok, Result } from "@/utils/types";
 
-import { SerializedPlayerSchema } from "../player/serializedPlayer";
+import { SerializedPlayerSchema } from "../../player/serializedPlayer";
 import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
 import { CmdrSaves } from "./saveFileData";
 import { SaveLoadingError, SaveLoadingErrorType } from "./saveLoadingError";

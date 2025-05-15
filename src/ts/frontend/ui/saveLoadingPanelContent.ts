@@ -6,11 +6,11 @@ import { alertModal, promptModalBoolean, promptModalString } from "@/utils/dialo
 import { createNotification, NotificationIntent, NotificationOrigin } from "@/utils/notification";
 import { Result } from "@/utils/types";
 
+import { parseSaveFile } from "../../backend/save/saveFile";
+import { createUrlFromSave, Save } from "../../backend/save/saveFileData";
+import { SaveLoadingError, saveLoadingErrorToI18nString } from "../../backend/save/saveLoadingError";
+import { SaveManager } from "../../backend/save/saveManager";
 import i18n from "../../i18n";
-import { parseSaveFile } from "../../saveFile/saveFile";
-import { createUrlFromSave, Save } from "../../saveFile/saveFileData";
-import { SaveLoadingError, saveLoadingErrorToI18nString } from "../../saveFile/saveLoadingError";
-import { SaveManager } from "../../saveFile/saveManager";
 import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
 
 import collapseIconPath from "@assets/icons/collapse.webp";

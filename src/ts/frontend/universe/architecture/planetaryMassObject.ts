@@ -17,8 +17,9 @@
 
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 
+import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
+
 import { CelestialBodyBase } from "./celestialBody";
-import { OrbitalObjectType } from "./orbitalObjectType";
 
 export interface PlanetaryMassObjectBase<T extends OrbitalObjectType> extends CelestialBodyBase<T> {
     updateMaterial(stellarObjects: ReadonlyArray<PointLight>, deltaSeconds: number): void;

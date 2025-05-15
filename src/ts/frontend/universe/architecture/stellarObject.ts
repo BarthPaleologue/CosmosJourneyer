@@ -15,8 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
+
 import { CelestialBodyBase } from "./celestialBody";
 import { LightEmitter } from "./lightEmitter";
-import { OrbitalObjectType } from "./orbitalObjectType";
 
 export interface StellarObjectBase<T extends OrbitalObjectType> extends CelestialBodyBase<T>, LightEmitter {}

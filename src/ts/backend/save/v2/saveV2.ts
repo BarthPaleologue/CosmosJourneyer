@@ -22,9 +22,9 @@ import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { UniverseCoordinates, UniverseCoordinatesSchema } from "@/utils/coordinates/universeCoordinates";
 import { DeepReadonly, ok, Result } from "@/utils/types";
 
-import { getDefaultSerializedSpaceship } from "../../frontend/spaceship/serializedSpaceship";
+import { getDefaultSerializedSpaceship } from "../../../frontend/spaceship/serializedSpaceship";
+import { SerializedPlayerSchema } from "../../../player/serializedPlayer";
 import { OrbitalObjectModel } from "../../frontend/universe/architecture/orbitalObjectModel";
-import { SerializedPlayerSchema } from "../../player/serializedPlayer";
 import { SaveLoadingError } from "../saveLoadingError";
 import { safeParseSaveV1, SaveV1, SystemObjectType } from "../v1/saveV1";
 

@@ -19,8 +19,8 @@ import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { Result } from "@/utils/types";
 
-import { Save } from "../saveFile/saveFileData";
-import { SaveLoadingError } from "../saveFile/saveLoadingError";
+import { Save } from "../backend/save/saveFileData";
+import { SaveLoadingError } from "../backend/save/saveLoadingError";
 
 export interface Tutorial {
     getTitle(): string;

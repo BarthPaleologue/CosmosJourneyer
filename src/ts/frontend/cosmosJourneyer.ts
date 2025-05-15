@@ -68,11 +68,11 @@ import { View } from "@/utils/view";
 
 import { Player } from "@/player/player";
 
+import { createUrlFromSave, Save } from "../backend/save/saveFileData";
+import { saveLoadingErrorToI18nString } from "../backend/save/saveLoadingError";
+import { SaveLocalBackend } from "../backend/save/saveLocalBackend";
+import { SaveManager } from "../backend/save/saveManager";
 import i18n, { initI18n } from "../i18n";
-import { createUrlFromSave, Save } from "../saveFile/saveFileData";
-import { saveLoadingErrorToI18nString } from "../saveFile/saveLoadingError";
-import { SaveLocalBackend } from "../saveFile/saveLocalBackend";
-import { SaveManager } from "../saveFile/saveManager";
 import { Settings } from "../settings";
 import { FlightTutorial } from "../tutorials/flightTutorial";
 import { FuelScoopTutorial } from "../tutorials/fuelScoopTutorial";

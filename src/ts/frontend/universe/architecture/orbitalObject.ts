@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
+
 import { CustomOrbitalObject } from "@/utils/customOrbitalObject";
 
 import { DarkKnight } from "../darkKnight";
@@ -26,7 +28,6 @@ import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { Star } from "../stellarObjects/star/star";
-import { OrbitalObjectType } from "./orbitalObjectType";
 
 export type StellarObject = Star | NeutronStar | BlackHole;
 

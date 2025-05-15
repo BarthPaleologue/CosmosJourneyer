@@ -24,7 +24,7 @@ import { decodeBase64 } from "@/utils/base64";
 import { alertModal } from "@/utils/dialogModal";
 import { jsonSafeParse } from "@/utils/json";
 
-import { safeParseSave } from "./saveFile/saveFileData";
+import { safeParseSave } from "./backend/save/saveFileData";
 
 const soundPlayerMock = new SoundPlayerMock();
 

@@ -23,10 +23,10 @@ import { Result } from "@/utils/types";
 
 import saveData from "../../asset/tutorials/flightTutorial/save.json";
 import welcomeImageSrc from "../../asset/tutorials/flightTutorial/welcome.webp";
+import { safeParseSave, Save } from "../backend/save/saveFileData";
+import { SaveLoadingError } from "../backend/save/saveLoadingError";
 import { TutorialControlsInputs } from "../frontend/ui/tutorial/tutorialLayerInputs";
 import i18n from "../i18n";
-import { safeParseSave, Save } from "../saveFile/saveFileData";
-import { SaveLoadingError } from "../saveFile/saveLoadingError";
 import { Tutorial } from "./tutorial";
 
 export class TemplateTutorial implements Tutorial {

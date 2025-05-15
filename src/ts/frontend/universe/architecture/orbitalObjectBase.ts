@@ -15,10 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { OrbitalObjectModel } from "@/backend/universe/orbitalObjects/index";
+import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
+
 import { DeepReadonly } from "@/utils/types";
 
-import { OrbitalObjectModel } from "./orbitalObjectModel";
-import { OrbitalObjectType } from "./orbitalObjectType";
 import { Transformable } from "./transformable";
 
 export interface OrbitalObjectBase<T extends OrbitalObjectType> extends Transformable {

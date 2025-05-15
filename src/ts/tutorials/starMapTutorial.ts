@@ -35,12 +35,12 @@ import missionImgSrc from "../../asset/tutorials/starMapTutorial/mission.webp";
 import openImgSrc from "../../asset/tutorials/starMapTutorial/open.webp";
 import plotItineraryImgSrc from "../../asset/tutorials/starMapTutorial/plotItinerary.webp";
 import saveData from "../../asset/tutorials/starMapTutorial/save.json";
+import { safeParseSave, Save } from "../backend/save/saveFileData";
+import { SaveLoadingError } from "../backend/save/saveLoadingError";
 import { GeneralInputs } from "../frontend/inputs/generalInputs";
 import { StarSystemInputs } from "../frontend/inputs/starSystemInputs";
 import { TutorialControlsInputs } from "../frontend/ui/tutorial/tutorialLayerInputs";
 import i18n from "../i18n";
-import { safeParseSave, Save } from "../saveFile/saveFileData";
-import { SaveLoadingError } from "../saveFile/saveLoadingError";
 import { StarMapInputs } from "../starmap/starMapInputs";
 import { Tutorial } from "./tutorial";
 
