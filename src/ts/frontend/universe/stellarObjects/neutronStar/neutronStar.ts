@@ -36,6 +36,8 @@ import { getRgbFromTemperature } from "@/utils/specrend";
 import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
 import { DeepReadonly } from "@/utils/types";
 
+import { Settings } from "@/settings";
+
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { StellarObjectBase } from "../../architecture/stellarObject";
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
@@ -44,7 +46,6 @@ import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { VolumetricLightUniforms } from "../../postProcesses/volumetricLight/volumetricLightUniforms";
 import { RingsLut } from "../../rings/ringsLut";
 import { RingsUniforms } from "../../rings/ringsUniform";
-import { Settings } from "../../settings";
 import { StarMaterial } from "../star/starMaterial";
 
 export class NeutronStar implements StellarObjectBase<OrbitalObjectType.NEUTRON_STAR>, Cullable {

@@ -43,9 +43,10 @@ import { getRgbFromTemperature } from "@/utils/specrend";
 import { ThickLines } from "@/utils/thickLines";
 import { View } from "@/utils/view";
 
+import { Settings } from "@/settings";
+
 import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
 import { Player } from "../player/player";
-import { Settings } from "../settings";
 import { EncyclopaediaGalactica } from "../society/encyclopaediaGalactica";
 import { CameraRadiusAnimation } from "../uberCore/transforms/animations/radius";
 import { TransformRotationAnimation } from "../uberCore/transforms/animations/rotation";

@@ -27,8 +27,9 @@ import { getRgbFromTemperature } from "@/utils/specrend";
 import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
 import { DeepReadonly } from "@/utils/types";
 
+import i18n from "@/i18n";
+
 import { ISoundPlayer } from "../audio/soundPlayer";
-import i18n from "../i18n";
 import { Player } from "../player/player";
 import { factionToString } from "../society/factions";
 import { StarMapBookmarkButton } from "./starMapBookmarkButton";

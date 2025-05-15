@@ -21,6 +21,8 @@ import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { pressInteractionToStrings } from "@/utils/strings/inputControlsString";
 import { Result } from "@/utils/types";
 
+import i18n from "@/i18n";
+
 import fuelIconLocation from "../../asset/tutorials/fuelScoopTutorial/fuelIconLocation.webp";
 import welcomeImageSrc from "../../asset/tutorials/fuelScoopTutorial/fuelScoop.webp";
 import howToFuelScoop from "../../asset/tutorials/fuelScoopTutorial/howToFuelScoop.webp";
@@ -28,7 +30,6 @@ import saveData from "../../asset/tutorials/fuelScoopTutorial/save.json";
 import { safeParseSave, Save } from "../backend/save/saveFileData";
 import { SaveLoadingError } from "../backend/save/saveLoadingError";
 import { TutorialControlsInputs } from "../frontend/ui/tutorial/tutorialLayerInputs";
-import i18n from "../i18n";
 import { Tutorial } from "./tutorial";
 
 export class FuelScoopTutorial implements Tutorial {

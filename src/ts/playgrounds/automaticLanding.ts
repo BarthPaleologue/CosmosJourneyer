@@ -22,13 +22,14 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 import { randRange } from "extended-random";
 
+import { CollisionMask } from "@/settings";
+
 import { LandingPad } from "../assets/procedural/landingPad/landingPad";
 import { loadRenderingAssets } from "../assets/renderingAssets";
 import { SoundPlayerMock } from "../audio/soundPlayer";
 import { DefaultControls } from "../defaultControls/defaultControls";
 import { LandingPadSize } from "../frontend/assets/procedural/spaceStation/landingPad/landingPadManager";
 import { Spaceship } from "../frontend/spaceship/spaceship";
-import { CollisionMask } from "../settings";
 import { enablePhysics } from "./utils";
 
 export async function createAutomaticLandingScene(

@@ -4,9 +4,10 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { StarSystemModel } from "@/backend/universe/starSystemModel";
 
+import i18n from "@/i18n";
+import { Settings } from "@/settings";
+
 import { ObjectTargetCursorType, Targetable } from "../frontend/universe/architecture/targetable";
-import i18n from "../i18n";
-import { Settings } from "../settings";
 import { StarSystemCoordinates } from "./coordinates/starSystemCoordinates";
 import { DeepReadonly } from "./types";
 

@@ -29,7 +29,8 @@ import { lerpSmooth, slerpSmoothToRef } from "@/utils/math";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@/utils/notification";
 import { pressInteractionToStrings } from "@/utils/strings/inputControlsString";
 
-import i18n from "../../i18n";
+import i18n from "@/i18n";
+
 import { Controls } from "../../uberCore/controls";
 import { CameraShakeAnimation } from "../../uberCore/transforms/animations/cameraShake";
 import { quickAnimation } from "../../uberCore/transforms/animations/quickAnimation";

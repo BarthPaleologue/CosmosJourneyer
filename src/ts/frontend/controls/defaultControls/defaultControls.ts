@@ -25,7 +25,8 @@ import { Scene } from "@babylonjs/core/scene";
 import { getTransformationQuaternion } from "@/utils/algebra";
 import { lerpSmooth } from "@/utils/math";
 
-import { Settings } from "../settings";
+import { Settings } from "@/settings";
+
 import { Controls } from "../uberCore/controls";
 import { LocalDirection } from "../uberCore/localDirections";
 import {

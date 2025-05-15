@@ -21,13 +21,14 @@ import { Scene } from "@babylonjs/core/scene";
 import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
+import { initI18n } from "@/i18n";
+
 import { loadRenderingAssets } from "../assets/renderingAssets";
 import { SoundPlayerMock } from "../audio/soundPlayer";
 import { TtsMock } from "../audio/tts";
 import { ShipControls } from "../frontend/spaceship/shipControls";
 import { Spaceship } from "../frontend/spaceship/spaceship";
 import { SpaceStationLayer } from "../frontend/ui/spaceStation/spaceStationLayer";
-import { initI18n } from "../i18n";
 import { Player } from "../player/player";
 import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
 import { enablePhysics } from "./utils";

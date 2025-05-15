@@ -23,9 +23,10 @@ import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { alertModal, promptModalString } from "@/utils/dialogModal";
 import { DeepReadonly } from "@/utils/types";
 
-import i18n from "../../../i18n";
+import i18n from "@/i18n";
+import { Settings } from "@/settings";
+
 import { Player } from "../../../player/player";
-import { Settings } from "../../../settings";
 import { ISoundPlayer, SoundType } from "../../audio/soundPlayer";
 import { OrbitalFacilityModel, OrbitalObjectModel } from "../../frontend/architecture/orbitalObjectModel";
 import { ExplorationCenterPanel } from "./explorationCenterPanel";

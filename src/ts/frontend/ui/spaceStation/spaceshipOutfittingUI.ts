@@ -15,8 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import i18n from "@/i18n";
+
 import { getComponentTypeI18n, getComponentValue } from "../../../backend/spaceship/serializedComponents/component";
-import i18n from "../../../i18n";
 import { Player } from "../../../player/player";
 import { deserializeComponent } from "../../spaceship/components/component";
 import { ComponentSlot } from "../../spaceship/componentSlot";

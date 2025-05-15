@@ -26,7 +26,8 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { lerpSmooth } from "@/utils/math";
 
-import { Settings } from "../settings";
+import { Settings } from "@/settings";
+
 import { Controls } from "../uberCore/controls";
 import { StarMapInputs } from "./starMapInputs";
 

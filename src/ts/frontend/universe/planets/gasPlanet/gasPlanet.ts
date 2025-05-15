@@ -34,6 +34,8 @@ import { ItemPool } from "@/utils/itemPool";
 import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
 import { DeepReadonly } from "@/utils/types";
 
+import { Settings } from "@/settings";
+
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { PlanetaryMassObjectBase } from "../../architecture/planetaryMassObject";
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
@@ -41,7 +43,6 @@ import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { AtmosphereUniforms } from "../../atmosphere/atmosphereUniforms";
 import { RingsLut } from "../../rings/ringsLut";
 import { RingsUniforms } from "../../rings/ringsUniform";
-import { Settings } from "../../settings";
 import { GasPlanetMaterial } from "./gasPlanetMaterial";
 
 export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_PLANET>, Cullable {

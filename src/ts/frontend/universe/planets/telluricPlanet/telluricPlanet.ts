@@ -33,6 +33,8 @@ import { ItemPool } from "@/utils/itemPool";
 import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
 import { DeepReadonly } from "@/utils/types";
 
+import { Settings } from "@/settings";
+
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { PlanetaryMassObjectBase } from "../../architecture/planetaryMassObject";
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
@@ -44,7 +46,6 @@ import { CloudsUniforms } from "../../clouds/cloudsUniforms";
 import { OceanUniforms } from "../../ocean/oceanUniforms";
 import { RingsLut } from "../../rings/ringsLut";
 import { RingsUniforms } from "../../rings/ringsUniform";
-import { Settings } from "../../settings";
 import { TelluricPlanetMaterial } from "./telluricPlanetMaterial";
 import { ChunkForge } from "./terrain/chunks/chunkForge";
 import { ChunkTree } from "./terrain/chunks/chunkTree";

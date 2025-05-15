@@ -22,7 +22,7 @@ import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { Scene } from "@babylonjs/core/scene";
 
-import { CollisionMask } from "../settings";
+import { CollisionMask } from "@/settings";
 
 /**
  *

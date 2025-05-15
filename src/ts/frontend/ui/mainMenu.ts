@@ -26,8 +26,9 @@ import { getUniverseObjectId, UniverseObjectId } from "@/utils/coordinates/unive
 import { positionNearObjectAsteroidField, positionNearObjectWithStarVisible } from "@/utils/positionNearObject";
 import { DeepReadonly } from "@/utils/types";
 
+import i18n from "@/i18n";
+
 import packageInfo from "../../../../package.json";
-import i18n from "../../i18n";
 import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
 import { DefaultControls } from "../defaultControls/defaultControls";
 import { StarSystemView } from "../starSystemView";

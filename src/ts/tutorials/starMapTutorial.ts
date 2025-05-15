@@ -28,6 +28,8 @@ import {
 } from "@/utils/strings/inputControlsString";
 import { Result } from "@/utils/types";
 
+import i18n from "@/i18n";
+
 import controlsImgSrc from "../../asset/tutorials/starMapTutorial/controls.webp";
 import coverImgSrc from "../../asset/tutorials/starMapTutorial/cover.webp";
 import jumpImgSrc from "../../asset/tutorials/starMapTutorial/jump.webp";
@@ -40,7 +42,6 @@ import { SaveLoadingError } from "../backend/save/saveLoadingError";
 import { GeneralInputs } from "../frontend/inputs/generalInputs";
 import { StarSystemInputs } from "../frontend/inputs/starSystemInputs";
 import { TutorialControlsInputs } from "../frontend/ui/tutorial/tutorialLayerInputs";
-import i18n from "../i18n";
 import { StarMapInputs } from "../starmap/starMapInputs";
 import { Tutorial } from "./tutorial";
 

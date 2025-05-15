@@ -15,6 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import i18n from "@/i18n";
+import { Settings } from "@/settings";
+
 import {
     getComponentTypeI18n,
     getComponentValue,
@@ -28,8 +31,6 @@ import { getFuelScoopSpec, SerializedFuelScoop } from "../../../backend/spaceshi
 import { getFuelTankSpecs, SerializedFuelTank } from "../../../backend/spaceship/serializedComponents/fuelTank";
 import { getThrustersSpec, SerializedThrusters } from "../../../backend/spaceship/serializedComponents/thrusters";
 import { getWarpDriveSpec, SerializedWarpDrive } from "../../../backend/spaceship/serializedComponents/warpDrive";
-import i18n from "../../../i18n";
-import { Settings } from "../../../settings";
 
 export class ComponentSpecUI {
     readonly root: HTMLElement;

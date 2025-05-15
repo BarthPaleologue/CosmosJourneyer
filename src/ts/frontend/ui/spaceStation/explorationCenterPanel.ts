@@ -22,9 +22,10 @@ import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { connectEncyclopaediaGalacticaModal } from "@/utils/dialogModal";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@/utils/notification";
 
-import i18n from "../../../i18n";
+import i18n from "@/i18n";
+import { Settings } from "@/settings";
+
 import { Player } from "../../../player/player";
-import { Settings } from "../../../settings";
 import { ISoundPlayer, SoundType } from "../../audio/soundPlayer";
 import { DiscoveryDetails } from "./discoveryDetails";
 

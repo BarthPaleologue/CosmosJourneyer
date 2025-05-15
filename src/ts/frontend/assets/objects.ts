@@ -31,7 +31,8 @@ import {
 } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Scene } from "@babylonjs/core/scene";
 
-import { CollisionMask } from "../settings";
+import { CollisionMask } from "@/settings";
+
 import { Materials } from "./materials";
 import { createButterfly } from "./procedural/butterfly/butterfly";
 import { createGrassBlade } from "./procedural/grass/grassBlade";

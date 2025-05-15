@@ -24,11 +24,12 @@ import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { updateNotifications } from "@/utils/notification";
 import { positionNearObjectBrightSide } from "@/utils/positionNearObject";
 
+import { initI18n } from "@/i18n";
+
 import { loadRenderingAssets } from "../assets/renderingAssets";
 import { SoundPlayerMock } from "../audio/soundPlayer";
 import { TtsMock } from "../audio/tts";
 import { StarSystemView } from "../frontend/starSystemView";
-import { initI18n } from "../i18n";
 import { Player } from "../player/player";
 import { getAlphaTestisSystemModel } from "../starSystem/customSystems/alphaTestis";
 import { UberScene } from "../uberCore/uberScene";

@@ -21,6 +21,8 @@ import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { pressInteractionToStrings } from "@/utils/strings/inputControlsString";
 import { Result } from "@/utils/types";
 
+import i18n from "@/i18n";
+
 import saveData from "../../asset/tutorials/stationLandingTutorial/save.json";
 import station1ImageSrc from "../../asset/tutorials/stationLandingTutorial/station1.webp";
 import stationLandingBayImageSrc from "../../asset/tutorials/stationLandingTutorial/stationLandingBay.webp";
@@ -30,7 +32,6 @@ import { safeParseSave, Save } from "../backend/save/saveFileData";
 import { SaveLoadingError } from "../backend/save/saveLoadingError";
 import { SpaceShipControlsInputs } from "../frontend/spaceship/spaceShipControlsInputs";
 import { TutorialControlsInputs } from "../frontend/ui/tutorial/tutorialLayerInputs";
-import i18n from "../i18n";
 import { Tutorial } from "./tutorial";
 
 export class StationLandingTutorial implements Tutorial {

@@ -50,7 +50,8 @@ import {
 } from "@/utils/bsl";
 import { DeepReadonly } from "@/utils/types";
 
-import { Settings } from "../../../../../settings";
+import { Settings } from "@/settings";
+
 import { OrbitalFacilityModel } from "../../../frontend/architecture/orbitalObjectModel";
 import { PBRTextures } from "../../textures";
 

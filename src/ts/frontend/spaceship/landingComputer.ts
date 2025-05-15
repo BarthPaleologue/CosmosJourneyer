@@ -23,7 +23,8 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 
 import { getAngleFromQuaternion, getAxisFromQuaternion, getDeltaQuaternion } from "@/utils/algebra";
 
-import { CollisionMask } from "../../settings";
+import { CollisionMask } from "@/settings";
+
 import { ILandingPad } from "../assets/procedural/spaceStation/landingPad/landingPadManager";
 
 export const enum LandingTargetKind {

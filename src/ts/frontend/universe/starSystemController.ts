@@ -32,10 +32,11 @@ import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates
 import { SystemTarget } from "@/utils/systemTarget";
 import { DeepReadonly, NonEmptyArray } from "@/utils/types";
 
+import { Settings } from "@/settings";
+
 import { RenderingAssets } from "../../assets/renderingAssets";
 import { OrbitalObjectId } from "../../backend/universe/orbitalObjects/orbitalObjectId";
 import { PostProcessManager } from "../../postProcesses/postProcessManager";
-import { Settings } from "../../settings";
 import { StarFieldBox } from "../../starSystem/starFieldBox";
 import { StarSystemLoader } from "../../starSystem/starSystemLoader";
 import { translate } from "../../uberCore/transforms/basicTransform";

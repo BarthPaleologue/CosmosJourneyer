@@ -19,9 +19,10 @@ import { FreeCamera, Vector3 } from "@babylonjs/core";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
+import { initI18n } from "@/i18n";
+
 import { SoundPlayerMock } from "../audio/soundPlayer";
 import { TutorialLayer } from "../frontend/ui/tutorial/tutorialLayer";
-import { initI18n } from "../i18n";
 import { FlightTutorial } from "../tutorials/flightTutorial";
 import { FuelScoopTutorial } from "../tutorials/fuelScoopTutorial";
 import { StarMapTutorial } from "../tutorials/starMapTutorial";

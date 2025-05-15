@@ -17,12 +17,12 @@
 
 import { describe, expect, it, vi } from "vitest";
 
+import { SerializedPlayerSchema } from "@/backend/player/serializedPlayer";
+import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { err, ok, Result } from "@/utils/types";
 
-import { SerializedPlayerSchema } from "../player/serializedPlayer";
-import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
 import { CmdrSaves } from "./saveFileData";
 import { SaveLoadingError, SaveLoadingErrorType } from "./saveLoadingError";
 import { SaveBackend, SaveManager } from "./saveManager";

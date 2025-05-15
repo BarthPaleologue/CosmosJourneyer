@@ -17,7 +17,8 @@
 
 import { build_chunk_vertex_data, BuildData, TerrainSettings } from "terrain-generation";
 
-import { Settings } from "../../../../settings";
+import { Settings } from "@/settings";
+
 import { ReturnedChunkData } from "../chunks/taskTypes";
 import { TransferBuildData } from "../chunks/workerDataTypes";
 

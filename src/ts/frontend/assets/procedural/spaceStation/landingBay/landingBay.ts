@@ -31,7 +31,8 @@ import { createEnvironmentAggregate } from "@/utils/havok";
 import { getRotationPeriodForArtificialGravity } from "@/utils/physics";
 import { DeepReadonly } from "@/utils/types";
 
-import { Settings } from "../../../../../settings";
+import { Settings } from "@/settings";
+
 import { OrbitalFacilityModel } from "../../../frontend/architecture/orbitalObjectModel";
 import { RenderingAssets } from "../../renderingAssets";
 import { LandingPad } from "../landingPad/landingPad";

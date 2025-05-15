@@ -31,7 +31,8 @@ import { Direction } from "@/utils/direction";
 import { clamp } from "@/utils/math";
 import { DeepReadonly } from "@/utils/types";
 
-import { Settings } from "../../../../settings";
+import { Settings } from "@/settings";
+
 import { getRotationQuaternion } from "../../../../uberCore/transforms/basicTransform";
 import { TerrainSettings } from "../terrainSettings";
 import { ChunkForge } from "./chunkForge";

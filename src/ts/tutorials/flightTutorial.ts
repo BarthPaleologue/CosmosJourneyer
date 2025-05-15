@@ -23,6 +23,8 @@ import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { axisCompositeToString, pressInteractionToStrings } from "@/utils/strings/inputControlsString";
 import { Result } from "@/utils/types";
 
+import i18n from "@/i18n";
+
 import congratsImageSrc from "../../asset/tutorials/flightTutorial/congrats.webp";
 import rotationImageSrc from "../../asset/tutorials/flightTutorial/rotation.webp";
 import saveData from "../../asset/tutorials/flightTutorial/save.json";
@@ -35,7 +37,6 @@ import { SaveLoadingError } from "../backend/save/saveLoadingError";
 import { StarSystemInputs } from "../frontend/inputs/starSystemInputs";
 import { SpaceShipControlsInputs } from "../frontend/spaceship/spaceShipControlsInputs";
 import { TutorialControlsInputs } from "../frontend/ui/tutorial/tutorialLayerInputs";
-import i18n from "../i18n";
 import { Tutorial } from "./tutorial";
 
 export class FlightTutorial implements Tutorial {

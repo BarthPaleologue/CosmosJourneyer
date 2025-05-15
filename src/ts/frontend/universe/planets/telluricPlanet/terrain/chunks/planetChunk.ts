@@ -35,10 +35,11 @@ import { Direction, getQuaternionFromDirection } from "@/utils/direction";
 import { isSizeOnScreenEnough } from "@/utils/isObjectVisibleOnScreen";
 import { DeepReadonly } from "@/utils/types";
 
+import { CollisionMask } from "@/settings";
+
 import { HasBoundingSphere } from "../../../../architecture/hasBoundingSphere";
 import { Transformable } from "../../../../architecture/transformable";
 import { RenderingAssets } from "../../../../assets/renderingAssets";
-import { CollisionMask } from "../../../../settings";
 import { InstancePatch } from "../instancePatch/instancePatch";
 import { IPatch } from "../instancePatch/iPatch";
 import { randomDownSample } from "../instancePatch/matrixBuffer";

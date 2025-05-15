@@ -17,7 +17,7 @@
 
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 
-import { Settings } from "../../../settings";
+import { Settings } from "@/settings";
 
 export type CloudsModel = {
     layerRadius: number;

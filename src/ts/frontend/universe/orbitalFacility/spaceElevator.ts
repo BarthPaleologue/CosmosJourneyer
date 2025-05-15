@@ -34,7 +34,8 @@ import { getSolarPanelSurfaceFromEnergyRequirement } from "@/utils/solarPanels";
 import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
 import { DeepReadonly } from "@/utils/types";
 
-import { Settings } from "../../../settings";
+import { Settings } from "@/settings";
+
 import { SpaceElevatorClimber } from "../../assets/procedural/spaceStation/climber/spaceElevatorClimber";
 import { CylinderHabitat } from "../../assets/procedural/spaceStation/habitats/cylinder/cylinderHabitat";
 import { HelixHabitat } from "../../assets/procedural/spaceStation/habitats/helix/helixHabitat";

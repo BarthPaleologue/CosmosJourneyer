@@ -22,7 +22,8 @@ import { z } from "zod";
 import { findMinimumNewtonRaphson } from "@/utils/math";
 import { DeepReadonly } from "@/utils/types";
 
-import { Settings } from "../../../settings";
+import { Settings } from "@/settings";
+
 import { OrbitalObjectIdSchema } from "./orbitalObjectId";
 
 /**

@@ -27,9 +27,10 @@ import { createNotification, NotificationIntent, NotificationOrigin } from "@/ut
 import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
 import { parseDistance, parseSecondsPrecise } from "@/utils/strings/parseToStrings";
 
-import i18n from "../../../i18n";
+import i18n from "@/i18n";
+import { Settings } from "@/settings";
+
 import { Player } from "../../../player/player";
-import { Settings } from "../../../settings";
 import { ISoundPlayer, SoundType } from "../../audio/soundPlayer";
 
 export class DiscoveryDetails {

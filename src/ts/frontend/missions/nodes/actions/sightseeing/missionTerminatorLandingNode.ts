@@ -24,13 +24,14 @@ import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/utils/coor
 import { UniverseObjectId, universeObjectIdEquals } from "@/utils/coordinates/universeObjectId";
 import { parseDistance } from "@/utils/strings/parseToStrings";
 
+import i18n from "@/i18n";
+import { CollisionMask, Settings } from "@/settings";
+
 import { MissionNodeType } from "../../../../../backend/missions/missionNodeType";
 import {
     LandMissionState,
     MissionTerminatorLandingNodeSerialized,
 } from "../../../../../backend/missions/missionTerminatorLandingNodeSerialized";
-import i18n from "../../../../i18n";
-import { CollisionMask, Settings } from "../../../../settings";
 import { getGoToSystemInstructions } from "../../../common";
 import { MissionContext } from "../../../missionContext";
 import { MissionNode } from "../../missionNode";

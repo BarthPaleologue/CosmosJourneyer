@@ -30,7 +30,8 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 
-import { CollisionMask } from "../../../settings";
+import { CollisionMask } from "@/settings";
+
 import { Transformable } from "../../../universe/architecture/transformable";
 import { RenderingAssets } from "../../renderingAssets";
 import { MetalSectionMaterial } from "./metalSectionMaterial";

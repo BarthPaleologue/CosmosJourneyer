@@ -25,7 +25,7 @@ import { StarSystemModel } from "@/backend/universe/starSystemModel";
 import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
 import { DeepReadonly } from "@/utils/types";
 
-import { Settings } from "../settings";
+import { Settings } from "@/settings";
 
 export function vector3ToString(v: Vector3): string {
     return `${v.x},${v.y},${v.z}`;

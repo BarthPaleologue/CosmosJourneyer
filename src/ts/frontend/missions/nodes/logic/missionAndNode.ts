@@ -19,9 +19,10 @@ import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
 
+import i18n from "@/i18n";
+
 import { MissionAndNodeSerialized } from "../../../../backend/missions/missionNodeSerialized";
 import { MissionNodeType } from "../../../../backend/missions/missionNodeType";
-import i18n from "../../../i18n";
 import { MissionContext } from "../../missionContext";
 import type { MissionNode } from "../missionNode";
 import { MissionNodeBase } from "../missionNodeBase";

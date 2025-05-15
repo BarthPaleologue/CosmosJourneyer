@@ -18,7 +18,7 @@
 import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
 import { Scene } from "@babylonjs/core/scene";
 
-import { Settings } from "../settings";
+import { Settings } from "@/settings";
 
 export class LandingPadTexturePool {
     private readonly landingPadTextures: Map<number, DynamicTexture> = new Map();

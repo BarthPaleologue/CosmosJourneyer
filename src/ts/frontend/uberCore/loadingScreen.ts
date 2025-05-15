@@ -1,7 +1,7 @@
 import { ILoadingScreen } from "@babylonjs/core/Loading/loadingScreen";
 import { Nullable } from "@babylonjs/core/types";
 
-import i18next from "../i18n";
+import i18next from "@/i18n";
 
 export class LoadingScreen implements ILoadingScreen {
     private loadingDiv: Nullable<HTMLDivElement> = null;

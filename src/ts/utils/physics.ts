@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Settings } from "../settings";
+import { Settings } from "@/settings";
 
 /**
  * Applies Stefan-Boltzmann law to calculate the energy flux of a black body.

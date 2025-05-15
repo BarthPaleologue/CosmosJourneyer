@@ -24,9 +24,10 @@ import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { parseDistance } from "@/utils/strings/parseToStrings";
 import { DeepReadonly } from "@/utils/types";
 
+import { Settings } from "@/settings";
+
 import { generateSightseeingMissions } from "../../../missions/generateSightSeeingMissions";
 import { Player } from "../../../player/player";
-import { Settings } from "../../../settings";
 import { ISoundPlayer } from "../../audio/soundPlayer";
 import { OrbitalFacilityModel } from "../../frontend/architecture/orbitalObjectModel";
 import { MissionContainer } from "./missionContainer";

@@ -20,7 +20,7 @@ import { makeNoise3D } from "fast-simplex-noise";
 
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 
-import { Settings } from "../../settings";
+import { Settings } from "@/settings";
 
 const materialistSpiritualistRng = getRngFromSeed(Settings.POWER_PLAY_SEED);
 let materialistSpiritualistSampleStep = 0;

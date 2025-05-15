@@ -31,7 +31,8 @@ import {
     xz,
 } from "@/utils/bsl";
 
-import { Settings } from "../../../settings";
+import { Settings } from "@/settings";
+
 import { LandingPadTexturePool } from "../../landingPadTexturePool";
 import { PBRTextures } from "../../textures";
 

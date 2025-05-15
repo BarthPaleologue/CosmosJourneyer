@@ -43,6 +43,9 @@ import { SystemTarget } from "@/utils/systemTarget";
 import { DeepReadonly } from "@/utils/types";
 import { View } from "@/utils/view";
 
+import i18n from "@/i18n";
+import { Settings } from "@/settings";
+
 import { RenderingAssets } from "../assets/renderingAssets";
 import { AudioMasks } from "../audio/audioMasks";
 import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
@@ -54,7 +57,6 @@ import { DefaultControlsInputs } from "../defaultControls/defaultControlsInputs"
 import { StarSystemInputs } from "../frontend/inputs/starSystemInputs";
 import { StarSystemController } from "../frontend/universe/starSystemController";
 import { StarSystemLoader } from "../frontend/universe/starSystemLoader";
-import i18n from "../i18n";
 import { Mission } from "../missions/mission";
 import { MissionContext } from "../missions/missionContext";
 import { AxisRenderer } from "../orbit/axisRenderer";
@@ -64,7 +66,6 @@ import { ChunkForgeWorkers } from "../planets/telluricPlanet/terrain/chunks/chun
 import { AiPlayerControls } from "../player/aiPlayerControls";
 import { Player } from "../player/player";
 import { PostProcessManager } from "../postProcesses/postProcessManager";
-import { Settings } from "../settings";
 import { ShipControls } from "../spaceship/shipControls";
 import { Spaceship } from "../spaceship/spaceship";
 import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";

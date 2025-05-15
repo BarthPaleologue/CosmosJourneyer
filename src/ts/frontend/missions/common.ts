@@ -6,9 +6,10 @@ import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/utils/coor
 import { pressInteractionToStrings } from "@/utils/strings/inputControlsString";
 import { parseDistance } from "@/utils/strings/parseToStrings";
 
+import i18n from "@/i18n";
+import { Settings } from "@/settings";
+
 import { GeneralInputs } from "../frontend/inputs/generalInputs";
-import i18n from "../i18n";
-import { Settings } from "../settings";
 import { MissionContext } from "./missionContext";
 
 export function getGoToSystemInstructions(

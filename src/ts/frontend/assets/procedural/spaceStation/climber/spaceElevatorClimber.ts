@@ -22,7 +22,8 @@ import { CreateBox, CreateTube, TransformNode } from "@babylonjs/core/Meshes";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Scene } from "@babylonjs/core/scene";
 
-import i18n from "../../../../../i18n";
+import i18n from "@/i18n";
+
 import { ObjectTargetCursorType, Targetable, TargetInfo } from "../../../../universe/architecture/targetable";
 import { PBRTextures } from "../../../textures";
 import { SolarPanelMaterial } from "../../solarPanel/solarPanelMaterial";
