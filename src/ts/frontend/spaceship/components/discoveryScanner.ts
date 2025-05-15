@@ -15,7 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getDiscoveryScannerSpec, SerializedDiscoveryScanner } from "../serializedComponents/discoveryScanner";
+import {
+    getDiscoveryScannerSpec,
+    SerializedDiscoveryScanner,
+} from "../../../backend/spaceship/serializedComponents/discoveryScanner";
 
 export class DiscoveryScanner {
     readonly type;

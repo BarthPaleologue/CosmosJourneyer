@@ -15,21 +15,21 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import i18n from "../../../i18n";
-import { Settings } from "../../../settings";
 import {
     getComponentTypeI18n,
     getComponentValue,
     SerializedComponent,
-} from "../../spaceship/serializedComponents/component";
+} from "../../../backend/spaceship/serializedComponents/component";
 import {
     getDiscoveryScannerSpec,
     SerializedDiscoveryScanner,
-} from "../../spaceship/serializedComponents/discoveryScanner";
-import { getFuelScoopSpec, SerializedFuelScoop } from "../../spaceship/serializedComponents/fuelScoop";
-import { getFuelTankSpecs, SerializedFuelTank } from "../../spaceship/serializedComponents/fuelTank";
-import { getThrustersSpec, SerializedThrusters } from "../../spaceship/serializedComponents/thrusters";
-import { getWarpDriveSpec, SerializedWarpDrive } from "../../spaceship/serializedComponents/warpDrive";
+} from "../../../backend/spaceship/serializedComponents/discoveryScanner";
+import { getFuelScoopSpec, SerializedFuelScoop } from "../../../backend/spaceship/serializedComponents/fuelScoop";
+import { getFuelTankSpecs, SerializedFuelTank } from "../../../backend/spaceship/serializedComponents/fuelTank";
+import { getThrustersSpec, SerializedThrusters } from "../../../backend/spaceship/serializedComponents/thrusters";
+import { getWarpDriveSpec, SerializedWarpDrive } from "../../../backend/spaceship/serializedComponents/warpDrive";
+import i18n from "../../../i18n";
+import { Settings } from "../../../settings";
 
 export class ComponentSpecUI {
     readonly root: HTMLElement;

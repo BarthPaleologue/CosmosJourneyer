@@ -1,10 +1,10 @@
 import { expect, test } from "vitest";
 
+import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { DeepPartial } from "@/utils/types";
 
-import { getLoneStarSystem } from "../../starSystem/customSystems/loneStar";
 import { safeParseSave } from "../saveFileData";
 import { SaveV2 } from "./saveV2";
 

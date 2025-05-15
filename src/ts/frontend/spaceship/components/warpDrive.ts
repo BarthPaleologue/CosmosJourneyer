@@ -17,7 +17,7 @@
 
 import { clamp, lerpSmooth } from "@/utils/math";
 
-import { getWarpDriveSpec, SerializedWarpDrive } from "../serializedComponents/warpDrive";
+import { getWarpDriveSpec, SerializedWarpDrive } from "../../../backend/spaceship/serializedComponents/warpDrive";
 
 const enum WarpDriveState {
     /**
