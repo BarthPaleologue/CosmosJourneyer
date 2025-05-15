@@ -37,6 +37,12 @@ import { setEnabledBody } from "@/utils/havok";
 import { HyperSpaceTunnel } from "@/utils/hyperSpaceTunnel";
 import { WarpTunnel } from "@/utils/warpTunnel";
 
+import { SerializedComponent } from "../../backend/spaceship/serializedComponents/component";
+import {
+    getDefaultSerializedSpaceship,
+    SerializedSpaceship,
+    ShipType,
+} from "../../backend/spaceship/serializedSpaceship";
 import { CollisionMask, Settings } from "../../settings";
 import { getForwardDirection, translate } from "../../uberCore/transforms/basicTransform";
 import { ILandingPad } from "../assets/procedural/spaceStation/landingPad/landingPadManager";
@@ -50,8 +56,6 @@ import { OrbitalObjectType } from "../universe/architecture/orbitalObjectType";
 import { Transformable } from "../universe/architecture/transformable";
 import { canEngageWarpDrive } from "./components/warpDriveUtils";
 import { LandingComputer, LandingComputerStatusBit, LandingTargetKind } from "./landingComputer";
-import { SerializedComponent } from "./serializedComponents/component";
-import { getDefaultSerializedSpaceship, SerializedSpaceship, ShipType } from "./serializedSpaceship";
 import { SpaceshipInternals } from "./spaceshipInternals";
 import { Thruster } from "./thruster";
 

@@ -1,12 +1,12 @@
 import { z } from "zod";
 
-import { SpaceDiscoveryDataSchema } from "@/backend/society/encyclopaediaGalactica";
+import { SpaceDiscoveryDataSchema } from "@/backend/encyclopaedia/encyclopaediaGalactica";
 
 import { StarSystemCoordinatesSchema } from "@/utils/coordinates/starSystemCoordinates";
 
-import { SerializedComponentSchema } from "../frontend/spaceship/serializedComponents/component";
-import { getDefaultSerializedSpaceship, SerializedSpaceshipSchema } from "../frontend/spaceship/serializedSpaceship";
 import { MissionSerializedSchema } from "../missions/missionSerialized";
+import { SerializedComponentSchema } from "../spaceship/serializedComponents/component";
+import { getDefaultSerializedSpaceship, SerializedSpaceshipSchema } from "../spaceship/serializedSpaceship";
 
 export const CompletedTutorialsSchema = z.object({
     flightCompleted: z.boolean().default(false),

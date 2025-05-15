@@ -23,11 +23,11 @@ import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
 import { UniverseObjectId } from "@/utils/coordinates/universeObjectId";
 
-import { SerializedComponent } from "../frontend/spaceship/serializedComponents/component";
-import { getDefaultSerializedSpaceship, SerializedSpaceship } from "../frontend/spaceship/serializedSpaceship";
+import { CompletedTutorials, SerializedPlayer } from "../backend/player/serializedPlayer";
+import { SerializedComponent } from "../backend/spaceship/serializedComponents/component";
+import { getDefaultSerializedSpaceship, SerializedSpaceship } from "../backend/spaceship/serializedSpaceship";
 import { Spaceship } from "../frontend/spaceship/spaceship";
 import { Mission } from "../missions/mission";
-import { CompletedTutorials, SerializedPlayer } from "./serializedPlayer";
 
 export class Player {
     uuid: string;

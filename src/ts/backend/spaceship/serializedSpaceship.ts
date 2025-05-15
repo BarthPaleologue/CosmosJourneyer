@@ -17,10 +17,10 @@
 
 import { z } from "zod";
 
-import { SerializedFuelTankSchema } from "../../frontend/spaceship/serializedComponents/fuelTank";
-import { SerializedOptionalComponentSchema } from "../../frontend/spaceship/serializedComponents/optionalComponents";
-import { SerializedThrustersSchema } from "../../frontend/spaceship/serializedComponents/thrusters";
-import { SerializedWarpDriveSchema } from "../../frontend/spaceship/serializedComponents/warpDrive";
+import { SerializedFuelTankSchema } from "./serializedComponents/fuelTank";
+import { SerializedOptionalComponentSchema } from "./serializedComponents/optionalComponents";
+import { SerializedThrustersSchema } from "./serializedComponents/thrusters";
+import { SerializedWarpDriveSchema } from "./serializedComponents/warpDrive";
 
 export enum ShipType {
     WANDERER = "WANDERER",

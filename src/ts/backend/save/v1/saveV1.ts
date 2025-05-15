@@ -21,7 +21,7 @@ import { StarSystemCoordinatesSchema } from "@/utils/coordinates/starSystemCoord
 import { err, ok, Result } from "@/utils/types";
 
 import projectInfo from "../../../../../package.json";
-import { CompletedTutorialsSchema } from "../../../player/serializedPlayer";
+import { CompletedTutorialsSchema } from "../../player/serializedPlayer";
 import { SaveLoadingError, SaveLoadingErrorType } from "../saveLoadingError";
 
 export enum SystemObjectType {

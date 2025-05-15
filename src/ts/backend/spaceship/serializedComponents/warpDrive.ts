@@ -17,7 +17,7 @@
 
 import { z } from "zod";
 
-import { Settings } from "../../../settings";
+import { Settings } from "@/settings";
 
 export const SerializedWarpDriveSchema = z.object({
     type: z.literal("warpDrive"),

@@ -17,7 +17,8 @@
 
 import { z } from "zod";
 
-import i18n from "../../../i18n";
+import i18n from "@/i18n";
+
 import { SerializedDiscoveryScannerSchema } from "./discoveryScanner";
 import { SerializedFuelScoopSchema } from "./fuelScoop";
 import { SerializedFuelTankSchema } from "./fuelTank";
