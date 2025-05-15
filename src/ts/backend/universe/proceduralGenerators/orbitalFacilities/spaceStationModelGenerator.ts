@@ -19,18 +19,19 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { normalRandom } from "extended-random";
 
-import { CropType, CropTypes } from "../../../../utils/agriculture";
-import { StarSystemCoordinates } from "../../../../utils/coordinates/starSystemCoordinates";
-import { GenerationSteps } from "../../../../utils/generationSteps";
-import { getRngFromSeed } from "../../../../utils/getRngFromSeed";
-import { clamp } from "../../../../utils/math";
-import { randomPieChart } from "../../../../utils/random";
-import { generateSpaceStationName } from "../../../../utils/strings/spaceStationNameGenerator";
-import { getFactionFromGalacticPosition } from "../../../society/factions";
-import { Orbit } from "../../orbitalObjects/orbit";
-import { SpaceStationModel } from "../../orbitalObjects/orbitalFacilities/spacestationModel";
-import { OrbitalObjectType } from "../../orbitalObjects/orbitalObjectType";
-import { CelestialBodyModel } from "../architecture/orbitalObjectModel";
+import { getFactionFromGalacticPosition } from "@/backend/society/factions";
+import { CelestialBodyModel } from "@/backend/universe/orbitalObjects/index";
+import { Orbit } from "@/backend/universe/orbitalObjects/orbit";
+import { SpaceStationModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/spacestationModel";
+import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
+
+import { CropType, CropTypes } from "@/utils/agriculture";
+import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
+import { GenerationSteps } from "@/utils/generationSteps";
+import { getRngFromSeed } from "@/utils/getRngFromSeed";
+import { clamp } from "@/utils/math";
+import { randomPieChart } from "@/utils/random";
+import { generateSpaceStationName } from "@/utils/strings/spaceStationNameGenerator";
 
 export function newSeededSpaceStationModel(
     id: string,

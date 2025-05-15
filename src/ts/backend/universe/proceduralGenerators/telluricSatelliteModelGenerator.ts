@@ -18,19 +18,20 @@
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { normalRandom, randRangeInt } from "extended-random";
 
+import { AtmosphereModel } from "@/backend/universe/orbitalObjects/atmosphereModel";
+import { CloudsModel, newCloudsModel } from "@/backend/universe/orbitalObjects/cloudsModel";
+import { PlanetModel } from "@/backend/universe/orbitalObjects/index";
+import { OceanModel } from "@/backend/universe/orbitalObjects/oceanModel";
+import { getOrbitalPeriod, Orbit } from "@/backend/universe/orbitalObjects/orbit";
+import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
+import { TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
+
 import { GenerationSteps } from "@/utils/generationSteps";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { clamp } from "@/utils/math";
 import { celsiusToKelvin, hasLiquidWater } from "@/utils/physics";
 
-import { AtmosphereModel } from "../../../atmosphere/atmosphereModel";
-import { OrbitalObjectType } from "../../../frontend/architecture/orbitalObjectType";
-import { Settings } from "../../../settings";
-import { PlanetModel } from "../../architecture/orbitalObjectModel";
-import { CloudsModel, newCloudsModel } from "../orbitalObjects/cloudsModel";
-import { OceanModel } from "../orbitalObjects/oceanModel";
-import { getOrbitalPeriod, Orbit } from "../orbitalObjects/orbit";
-import { TelluricSatelliteModel } from "../orbitalObjects/telluricSatelliteModel";
+import { Settings } from "@/settings";
 
 export function newSeededTelluricSatelliteModel(
     id: string,

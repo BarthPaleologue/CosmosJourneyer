@@ -19,14 +19,14 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { normalRandom, randRange } from "extended-random";
 
+import { MengerSpongeModel } from "@/backend/universe/orbitalObjects/anomalies/mengerSpongeModel";
+import { OrbitalObjectModel } from "@/backend/universe/orbitalObjects/index";
+import { Orbit } from "@/backend/universe/orbitalObjects/orbit";
+import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
+
 import { GenerationSteps } from "@/utils/generationSteps";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { clamp } from "@/utils/math";
-
-import { OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
-import { MengerSpongeModel } from "../../orbitalObjects/anomalies/mengerSpongeModel";
-import { Orbit } from "../../orbitalObjects/orbit";
-import { OrbitalObjectType } from "../../orbitalObjects/orbitalObjectType";
 
 export function newSeededMengerSpongeModel(
     id: string,

@@ -23,7 +23,7 @@ import {
     OrbitalObjectModel,
     PlanetModel,
     StellarObjectModel,
-} from "../architecture/orbitalObjectModel";
+} from "./orbitalObjects/index";
 import { OrbitalObjectId } from "./orbitalObjects/orbitalObjectId";
 import { TelluricSatelliteModel } from "./orbitalObjects/telluricSatelliteModel";
 

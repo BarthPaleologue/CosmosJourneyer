@@ -1,10 +1,12 @@
-import { OrbitalObjectType } from "../../frontend/architecture/orbitalObjectType";
-import { UniverseObjectId } from "../../utils/coordinates/universeObjectId";
-import { DeepReadonly, err, ok, Result } from "../../utils/types";
-import { GasPlanetModel } from "../universe/orbitalObjects/gasPlanetModel";
-import { TelluricPlanetModel } from "../universe/orbitalObjects/telluricPlanetModel";
-import { TelluricSatelliteModel } from "../universe/orbitalObjects/telluricSatelliteModel";
-import { StarSystemDatabase } from "../universe/starSystemDatabase";
+import { GasPlanetModel } from "@/backend/universe/orbitalObjects/gasPlanetModel";
+import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
+import { TelluricPlanetModel } from "@/backend/universe/orbitalObjects/telluricPlanetModel";
+import { TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
+import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+
+import { UniverseObjectId } from "@/utils/coordinates/universeObjectId";
+import { DeepReadonly, err, ok, Result } from "@/utils/types";
+
 import { EncyclopaediaGalactica, SpaceDiscoveryData } from "./encyclopaediaGalactica";
 
 export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {

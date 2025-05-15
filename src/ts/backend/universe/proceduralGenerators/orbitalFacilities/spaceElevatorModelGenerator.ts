@@ -17,17 +17,18 @@
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-import { CropType, CropTypes } from "../../../../utils/agriculture";
-import { StarSystemCoordinates } from "../../../../utils/coordinates/starSystemCoordinates";
-import { getRngFromSeed } from "../../../../utils/getRngFromSeed";
-import { getOrbitRadiusFromPeriod } from "../../../../utils/physics";
-import { randomPieChart } from "../../../../utils/random";
-import { generateSpaceElevatorName } from "../../../../utils/strings/spaceStationNameGenerator";
-import { getFactionFromGalacticPosition } from "../../../society/factions";
-import { PlanetModel } from "../../orbitalObjects/index";
-import { Orbit } from "../../orbitalObjects/orbit";
-import { SpaceElevatorModel } from "../../orbitalObjects/orbitalFacilities/spaceElevatorModel";
-import { OrbitalObjectType } from "../../orbitalObjects/orbitalObjectType";
+import { getFactionFromGalacticPosition } from "@/backend/society/factions";
+import { PlanetModel } from "@/backend/universe/orbitalObjects/index";
+import { Orbit } from "@/backend/universe/orbitalObjects/orbit";
+import { SpaceElevatorModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/spaceElevatorModel";
+import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
+
+import { CropType, CropTypes } from "@/utils/agriculture";
+import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
+import { getRngFromSeed } from "@/utils/getRngFromSeed";
+import { getOrbitRadiusFromPeriod } from "@/utils/physics";
+import { randomPieChart } from "@/utils/random";
+import { generateSpaceElevatorName } from "@/utils/strings/spaceStationNameGenerator";
 
 export function newSeededSpaceElevatorModel(
     id: string,

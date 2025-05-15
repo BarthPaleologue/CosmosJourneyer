@@ -15,9 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { CropType } from "../../../../utils/agriculture";
-import { StarSystemCoordinates } from "../../../../utils/coordinates/starSystemCoordinates";
-import { Faction } from "../../../society/factions";
+import { Faction } from "@/backend/society/factions";
+
+import { CropType } from "@/utils/agriculture";
+import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
+
 import { OrbitalObjectModelBase } from "../orbitalObjectModelBase";
 import { OrbitalObjectType } from "../orbitalObjectType";
 

@@ -17,8 +17,8 @@
 
 import { z } from "zod";
 
-import { UniverseObjectId, UniverseObjectIdSchema } from "../utils/coordinates/universeObjectId";
-import { Result } from "../utils/types";
+import { UniverseObjectId, UniverseObjectIdSchema } from "@/utils/coordinates/universeObjectId";
+import { Result } from "@/utils/types";
 
 export const SpaceDiscoveryDataSchema = z.object({
     /**

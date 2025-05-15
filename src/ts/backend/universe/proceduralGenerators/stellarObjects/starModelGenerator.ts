@@ -17,16 +17,17 @@
 
 import { randRange, randRangeInt, uniformRandBool } from "extended-random";
 
+import { OrbitalObjectModel } from "@/backend/universe/orbitalObjects/index";
+import { Orbit } from "@/backend/universe/orbitalObjects/orbit";
+import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
+import { newSeededRingsModel } from "@/backend/universe/orbitalObjects/ringsModel";
+import { StarModel } from "@/backend/universe/orbitalObjects/stellarObjects/starModel";
+
 import { GenerationSteps } from "@/utils/generationSteps";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { wheelOfFortune } from "@/utils/random";
 
-import { newSeededRingsModel } from "../../../../frontend/rings/ringsModel";
-import { Settings } from "../../../../settings";
-import { OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
-import { Orbit } from "../../orbitalObjects/orbit";
-import { OrbitalObjectType } from "../../orbitalObjects/orbitalObjectType";
-import { StarModel } from "../../orbitalObjects/stellarObjects/starModel";
+import { Settings } from "@/settings";
 
 export function newSeededStarModel(
     id: string,

@@ -34,24 +34,24 @@ import {
     OrbitalFacilityModel,
     PlanetModel,
     StellarObjectModel,
-} from "./orbitalObjects/index";
-import { createOrbitalObjectId } from "./orbitalObjects/orbitalObjectId";
-import { OrbitalObjectType } from "./orbitalObjects/orbitalObjectType";
-import { TelluricSatelliteModel } from "./orbitalObjects/telluricSatelliteModel";
-import { newSeededJuliaSetModel } from "./proceduralGenerators/anomalies/juliaSetModelGenerator";
-import { newSeededMandelboxModel } from "./proceduralGenerators/anomalies/mandelboxModelGenerator";
-import { newSeededMandelbulbModel } from "./proceduralGenerators/anomalies/mandelbulbModelGenerator";
-import { newSeededMengerSpongeModel } from "./proceduralGenerators/anomalies/mengerSpongeModelGenerator";
-import { newSeededSierpinskiPyramidModel } from "./proceduralGenerators/anomalies/sierpinskiPyramidModelGenerator";
-import { newSeededGasPlanetModel } from "./proceduralGenerators/gasPlanetModelGenerator";
-import { newSeededSpaceElevatorModel } from "./proceduralGenerators/orbitalFacilities/spaceElevatorModelGenerator";
-import { newSeededSpaceStationModel } from "./proceduralGenerators/orbitalFacilities/spaceStationModelGenerator";
-import { newSeededBlackHoleModel } from "./proceduralGenerators/stellarObjects/blackHoleModelGenerator";
-import { newSeededNeutronStarModel } from "./proceduralGenerators/stellarObjects/neutronStarModelGenerator";
-import { newSeededStarModel } from "./proceduralGenerators/stellarObjects/starModelGenerator";
-import { newSeededTelluricPlanetModel } from "./proceduralGenerators/telluricPlanetModelGenerator";
-import { newSeededTelluricSatelliteModel } from "./proceduralGenerators/telluricSatelliteModelGenerator";
-import { StarSystemModel } from "./starSystemModel";
+} from "../orbitalObjects/index";
+import { createOrbitalObjectId } from "../orbitalObjects/orbitalObjectId";
+import { OrbitalObjectType } from "../orbitalObjects/orbitalObjectType";
+import { TelluricSatelliteModel } from "../orbitalObjects/telluricSatelliteModel";
+import { StarSystemModel } from "../starSystemModel";
+import { newSeededJuliaSetModel } from "./anomalies/juliaSetModelGenerator";
+import { newSeededMandelboxModel } from "./anomalies/mandelboxModelGenerator";
+import { newSeededMandelbulbModel } from "./anomalies/mandelbulbModelGenerator";
+import { newSeededMengerSpongeModel } from "./anomalies/mengerSpongeModelGenerator";
+import { newSeededSierpinskiPyramidModel } from "./anomalies/sierpinskiPyramidModelGenerator";
+import { newSeededGasPlanetModel } from "./gasPlanetModelGenerator";
+import { newSeededSpaceElevatorModel } from "./orbitalFacilities/spaceElevatorModelGenerator";
+import { newSeededSpaceStationModel } from "./orbitalFacilities/spaceStationModelGenerator";
+import { newSeededBlackHoleModel } from "./stellarObjects/blackHoleModelGenerator";
+import { newSeededNeutronStarModel } from "./stellarObjects/neutronStarModelGenerator";
+import { newSeededStarModel } from "./stellarObjects/starModelGenerator";
+import { newSeededTelluricPlanetModel } from "./telluricPlanetModelGenerator";
+import { newSeededTelluricSatelliteModel } from "./telluricSatelliteModelGenerator";
 
 const enum GenerationSteps {
     NAME,

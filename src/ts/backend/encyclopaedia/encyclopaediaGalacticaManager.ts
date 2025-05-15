@@ -1,5 +1,6 @@
-import { UniverseObjectId } from "../../utils/coordinates/universeObjectId";
-import { ok, Result } from "../../utils/types";
+import { UniverseObjectId } from "@/utils/coordinates/universeObjectId";
+import { ok, Result } from "@/utils/types";
+
 import { EncyclopaediaGalactica, SpaceDiscoveryData } from "./encyclopaediaGalactica";
 
 export class EncyclopaediaGalacticaManager implements EncyclopaediaGalactica {

@@ -15,13 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Faction } from "@/backend/society/factions";
+import { OrbitSchema } from "@/backend/universe/orbitalObjects/orbit";
+import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
+import { StarSystemModel } from "@/backend/universe/starSystemModel";
+
 import { CropType } from "@/utils/agriculture";
 
-import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
-import { OrbitSchema } from "../../orbit";
-import { Settings } from "../../settings";
-import { Faction } from "../../society/factions";
-import { StarSystemModel } from "../starSystemModel";
+import { Settings } from "@/settings";
 
 export function getLoneStarSystem(): StarSystemModel {
     return {
