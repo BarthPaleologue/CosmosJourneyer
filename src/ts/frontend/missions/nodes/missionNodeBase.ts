@@ -19,10 +19,10 @@ import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
 
+import { MissionNodeSerialized } from "../../../backend/missions/missionNodeSerialized";
+import { MissionNodeType } from "../../../backend/missions/missionNodeType";
 import { MissionContext } from "../missionContext";
 import { MissionNode } from "./missionNode";
-import { MissionNodeSerialized } from "./missionNodeSerialized";
-import { MissionNodeType } from "./missionNodeType";
 
 /**
  * Describes any node in the mission tree.

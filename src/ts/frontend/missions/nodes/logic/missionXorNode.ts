@@ -19,11 +19,11 @@ import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
 
+import { MissionXorNodeSerialized } from "../../../../backend/missions/missionNodeSerialized";
+import { MissionNodeType } from "../../../../backend/missions/missionNodeType";
 import { MissionContext } from "../../missionContext";
 import type { MissionNode } from "../missionNode";
 import { MissionNodeBase } from "../missionNodeBase";
-import { MissionXorNodeSerialized } from "../missionNodeSerialized";
-import { MissionNodeType } from "../missionNodeType";
 
 /**
  * Node used to describe a set of tasks where only one must be completed.

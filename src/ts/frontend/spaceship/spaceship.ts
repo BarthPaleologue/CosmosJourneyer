@@ -32,28 +32,27 @@ import { PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { Scene } from "@babylonjs/core/scene";
 
+import { SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
+import { getDefaultSerializedSpaceship, SerializedSpaceship, ShipType } from "@/backend/spaceship/serializedSpaceship";
+import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
+
+import { ILandingPad } from "@/frontend/assets/procedural/spaceStation/landingPad/landingPadManager";
+import { RenderingAssets } from "@/frontend/assets/renderingAssets";
+import { AudioMasks } from "@/frontend/audio/audioMasks";
+import { ISoundInstance } from "@/frontend/audio/soundInstance";
+import { ISoundPlayer, SoundType } from "@/frontend/audio/soundPlayer";
+import { getForwardDirection, translate } from "@/frontend/uberCore/transforms/basicTransform";
+import { HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
+import { CelestialBody, OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
+import { Transformable } from "@/frontend/universe/architecture/transformable";
+
 import { distanceToAsteroidField } from "@/utils/asteroidFields";
 import { setEnabledBody } from "@/utils/havok";
 import { HyperSpaceTunnel } from "@/utils/hyperSpaceTunnel";
 import { WarpTunnel } from "@/utils/warpTunnel";
 
-import { SerializedComponent } from "../../backend/spaceship/serializedComponents/component";
-import {
-    getDefaultSerializedSpaceship,
-    SerializedSpaceship,
-    ShipType,
-} from "../../backend/spaceship/serializedSpaceship";
-import { CollisionMask, Settings } from "../../settings";
-import { getForwardDirection, translate } from "../../uberCore/transforms/basicTransform";
-import { ILandingPad } from "../assets/procedural/spaceStation/landingPad/landingPadManager";
-import { RenderingAssets } from "../assets/renderingAssets";
-import { AudioMasks } from "../audio/audioMasks";
-import { ISoundInstance } from "../audio/soundInstance";
-import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
-import { HasBoundingSphere } from "../universe/architecture/hasBoundingSphere";
-import { CelestialBody, OrbitalObject } from "../universe/architecture/orbitalObject";
-import { OrbitalObjectType } from "../universe/architecture/orbitalObjectType";
-import { Transformable } from "../universe/architecture/transformable";
+import { CollisionMask, Settings } from "@/settings";
+
 import { canEngageWarpDrive } from "./components/warpDriveUtils";
 import { LandingComputer, LandingComputerStatusBit, LandingTargetKind } from "./landingComputer";
 import { SpaceshipInternals } from "./spaceshipInternals";

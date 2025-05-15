@@ -24,15 +24,15 @@ import { UniverseObjectId, universeObjectIdEquals } from "@/utils/coordinates/un
 import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
 import { parseDistance } from "@/utils/strings/parseToStrings";
 
+import { FlyByState, MissionFlyByNodeSerialized } from "../../../../../backend/missions/missionFlyByNodeSerialized";
+import { MissionNodeType } from "../../../../../backend/missions/missionNodeType";
 import i18n from "../../../../i18n";
 import { Settings } from "../../../../settings";
 import { getGoToSystemInstructions } from "../../../common";
 import { MissionContext } from "../../../missionContext";
 import { MissionNode } from "../../missionNode";
 import type { MissionNodeBase } from "../../missionNodeBase";
-import { MissionNodeType } from "../../missionNodeType";
 import { OrbitalObjectType } from "../orbitalObjectType";
-import { FlyByState, MissionFlyByNodeSerialized } from "./missionFlyByNodeSerialized";
 
 /**
  * Node used to describe a fly-by mission around a target object

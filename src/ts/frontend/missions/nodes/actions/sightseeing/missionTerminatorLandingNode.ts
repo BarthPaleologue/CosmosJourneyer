@@ -24,14 +24,17 @@ import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/utils/coor
 import { UniverseObjectId, universeObjectIdEquals } from "@/utils/coordinates/universeObjectId";
 import { parseDistance } from "@/utils/strings/parseToStrings";
 
+import { MissionNodeType } from "../../../../../backend/missions/missionNodeType";
+import {
+    LandMissionState,
+    MissionTerminatorLandingNodeSerialized,
+} from "../../../../../backend/missions/missionTerminatorLandingNodeSerialized";
 import i18n from "../../../../i18n";
 import { CollisionMask, Settings } from "../../../../settings";
 import { getGoToSystemInstructions } from "../../../common";
 import { MissionContext } from "../../../missionContext";
 import { MissionNode } from "../../missionNode";
 import type { MissionNodeBase } from "../../missionNodeBase";
-import { MissionNodeType } from "../../missionNodeType";
-import { LandMissionState, MissionTerminatorLandingNodeSerialized } from "./missionTerminatorLandingNodeSerialized";
 
 /**
  * Node used to describe a landing mission on a target object near the terminator line

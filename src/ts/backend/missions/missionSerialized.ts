@@ -19,7 +19,7 @@ import { z } from "zod";
 
 import { UniverseObjectIdSchema } from "@/utils/coordinates/universeObjectId";
 
-import { MissionNodeSerializedSchema } from "./nodes/missionNodeSerialized";
+import { MissionNodeSerializedSchema } from "./missionNodeSerialized";
 
 /**
  * Registered mission types. Those are used to display localized strings in the UI

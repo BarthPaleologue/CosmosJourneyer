@@ -19,11 +19,11 @@ import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
 
+import { MissionSequenceNodeSerialized } from "../../../../backend/missions/missionNodeSerialized";
+import { MissionNodeType } from "../../../../backend/missions/missionNodeType";
 import { MissionContext } from "../../missionContext";
 import type { MissionNode } from "../missionNode";
 import { MissionNodeBase } from "../missionNodeBase";
-import { MissionSequenceNodeSerialized } from "../missionNodeSerialized";
-import { MissionNodeType } from "../missionNodeType";
 
 /**
  * Node used to describe a sequence of tasks that must be completed in order.

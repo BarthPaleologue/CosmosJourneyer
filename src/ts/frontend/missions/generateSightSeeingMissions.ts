@@ -26,11 +26,11 @@ import { getNeighborStarSystemCoordinates } from "@/utils/getNeighborStarSystems
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { DeepReadonly } from "@/utils/types";
 
+import { MissionType } from "../../backend/missions/missionSerialized";
 import { OrbitalFacilityModel } from "../frontend/architecture/orbitalObjectModel";
 import { OrbitalObjectType } from "../frontend/architecture/orbitalObjectType";
 import { Player } from "../player/player";
 import { Mission } from "./mission";
-import { MissionType } from "./missionSerialized";
 import { newSightSeeingMission } from "./sightSeeingMission";
 
 /**

@@ -20,16 +20,13 @@ import { z } from "zod";
 import {
     MissionAsteroidFieldNodeSerialized,
     MissionAsteroidFieldNodeSerializedSchema,
-} from "./actions/sightseeing/missionAsteroidFieldNodeSerialized";
-import {
-    MissionFlyByNodeSerialized,
-    MissionFlyByNodeSerializedSchema,
-} from "./actions/sightseeing/missionFlyByNodeSerialized";
+} from "./missionAsteroidFieldNodeSerialized";
+import { MissionFlyByNodeSerialized, MissionFlyByNodeSerializedSchema } from "./missionFlyByNodeSerialized";
+import { MissionNodeType } from "./missionNodeType";
 import {
     MissionTerminatorLandingNodeSerialized,
     MissionTerminatorLandingNodeSerializedSchema,
-} from "./actions/sightseeing/missionTerminatorLandingNodeSerialized";
-import { MissionNodeType } from "./missionNodeType";
+} from "./missionTerminatorLandingNodeSerialized";
 
 export type MissionNodeSerializedShape =
     | MissionFlyByNodeSerialized

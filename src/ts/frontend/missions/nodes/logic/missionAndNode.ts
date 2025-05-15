@@ -19,12 +19,12 @@ import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
 
+import { MissionAndNodeSerialized } from "../../../../backend/missions/missionNodeSerialized";
+import { MissionNodeType } from "../../../../backend/missions/missionNodeType";
 import i18n from "../../../i18n";
 import { MissionContext } from "../../missionContext";
 import type { MissionNode } from "../missionNode";
 import { MissionNodeBase } from "../missionNodeBase";
-import { MissionAndNodeSerialized } from "../missionNodeSerialized";
-import { MissionNodeType } from "../missionNodeType";
 
 /**
  * Node used to describe a set of tasks that must all be completed in any order.

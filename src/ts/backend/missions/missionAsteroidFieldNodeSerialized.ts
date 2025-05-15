@@ -19,18 +19,18 @@ import { z } from "zod";
 
 import { UniverseObjectIdSchema } from "@/utils/coordinates/universeObjectId";
 
-import { MissionNodeType } from "../../missionNodeType";
+import { MissionNodeType } from "./missionNodeType";
 
-export enum FlyByState {
+export enum AsteroidFieldMissionState {
     NOT_IN_SYSTEM,
     TOO_FAR_IN_SYSTEM,
     CLOSE_ENOUGH,
 }
 
-export const MissionFlyByNodeSerializedSchema = z.object({
-    type: z.literal(MissionNodeType.FLY_BY),
+export const MissionAsteroidFieldNodeSerializedSchema = z.object({
+    type: z.literal(MissionNodeType.ASTEROID_FIELD),
     objectId: UniverseObjectIdSchema,
-    state: z.nativeEnum(FlyByState),
+    state: z.nativeEnum(AsteroidFieldMissionState),
 });
 
-export type MissionFlyByNodeSerialized = z.infer<typeof MissionFlyByNodeSerializedSchema>;
+export type MissionAsteroidFieldNodeSerialized = z.infer<typeof MissionAsteroidFieldNodeSerializedSchema>;

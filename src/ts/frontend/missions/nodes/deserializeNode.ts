@@ -17,25 +17,25 @@
 
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
-import { MissionAsteroidFieldNode } from "./actions/sightseeing/missionAsteroidFieldNode";
-import { MissionAsteroidFieldNodeSerialized } from "./actions/sightseeing/missionAsteroidFieldNodeSerialized";
-import { MissionFlyByNode } from "./actions/sightseeing/missionFlyByNode";
-import { MissionFlyByNodeSerialized } from "./actions/sightseeing/missionFlyByNodeSerialized";
-import { MissionTerminatorLandingNode } from "./actions/sightseeing/missionTerminatorLandingNode";
-import { MissionTerminatorLandingNodeSerialized } from "./actions/sightseeing/missionTerminatorLandingNodeSerialized";
-import { MissionAndNode } from "./logic/missionAndNode";
-import { MissionOrNode } from "./logic/missionOrNode";
-import { MissionSequenceNode } from "./logic/missionSequenceNode";
-import { MissionXorNode } from "./logic/missionXorNode";
-import { MissionNode } from "./missionNode";
+import { MissionAsteroidFieldNodeSerialized } from "../../../backend/missions/missionAsteroidFieldNodeSerialized";
+import { MissionFlyByNodeSerialized } from "../../../backend/missions/missionFlyByNodeSerialized";
 import {
     MissionAndNodeSerialized,
     MissionNodeSerialized,
     MissionOrNodeSerialized,
     MissionSequenceNodeSerialized,
     MissionXorNodeSerialized,
-} from "./missionNodeSerialized";
-import { MissionNodeType } from "./missionNodeType";
+} from "../../../backend/missions/missionNodeSerialized";
+import { MissionNodeType } from "../../../backend/missions/missionNodeType";
+import { MissionTerminatorLandingNodeSerialized } from "../../../backend/missions/missionTerminatorLandingNodeSerialized";
+import { MissionAsteroidFieldNode } from "./actions/sightseeing/missionAsteroidFieldNode";
+import { MissionFlyByNode } from "./actions/sightseeing/missionFlyByNode";
+import { MissionTerminatorLandingNode } from "./actions/sightseeing/missionTerminatorLandingNode";
+import { MissionAndNode } from "./logic/missionAndNode";
+import { MissionOrNode } from "./logic/missionOrNode";
+import { MissionSequenceNode } from "./logic/missionSequenceNode";
+import { MissionXorNode } from "./logic/missionXorNode";
+import { MissionNode } from "./missionNode";
 
 /**
  * Deserialize recursively a mission node.
