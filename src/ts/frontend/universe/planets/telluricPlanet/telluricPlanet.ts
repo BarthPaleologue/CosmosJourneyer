@@ -24,6 +24,9 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Scene } from "@babylonjs/core/scene";
 
+import { TelluricPlanetModel } from "@/backend/universe/orbitalObjects/telluricPlanetModel";
+import { TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
+
 import { Cullable } from "@/utils/cullable";
 import { Direction } from "@/utils/direction";
 import { ItemPool } from "@/utils/itemPool";
@@ -36,8 +39,6 @@ import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/t
 import { RenderingAssets } from "../../assets/renderingAssets";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { AtmosphereUniforms } from "../../atmosphere/atmosphereUniforms";
-import { TelluricPlanetModel } from "../../backend/universe/orbitalObjects/telluricPlanetModel";
-import { TelluricSatelliteModel } from "../../backend/universe/orbitalObjects/telluricSatelliteModel";
 import { CloudsLut } from "../../clouds/cloudsLut";
 import { CloudsUniforms } from "../../clouds/cloudsUniforms";
 import { OceanUniforms } from "../../ocean/oceanUniforms";

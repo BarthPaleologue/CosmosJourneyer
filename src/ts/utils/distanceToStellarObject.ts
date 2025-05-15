@@ -15,7 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getObjectModelById, StarSystemModel } from "../backend/universe/starSystemModel";
+import { getObjectModelById, StarSystemModel } from "@/backend/universe/starSystemModel";
+
 import { OrbitalObjectModel, StellarObjectModel } from "../frontend/architecture/orbitalObjectModel";
 import { OrbitalObjectType } from "../frontend/architecture/orbitalObjectType";
 import { DeepReadonly } from "./types";

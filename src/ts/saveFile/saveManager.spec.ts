@@ -17,7 +17,8 @@
 
 import { describe, expect, it, vi } from "vitest";
 
-import { StarSystemDatabase } from "../backend/universe/starSystemDatabase";
+import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+
 import { SerializedPlayerSchema } from "../player/serializedPlayer";
 import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
 import { err, ok, Result } from "../utils/types";

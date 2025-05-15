@@ -15,7 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { StarSystemDatabase } from "../backend/universe/starSystemDatabase";
+import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+
 import { jsonSafeParse } from "../utils/json";
 import { err, Result } from "../utils/types";
 import { safeParseSave, Save } from "./saveFileData";

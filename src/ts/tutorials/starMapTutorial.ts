@@ -18,6 +18,8 @@
 import AxisComposite from "@brianchirls/game-input/controls/AxisComposite";
 import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 
+import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+
 import controlsImgSrc from "../../asset/tutorials/starMapTutorial/controls.webp";
 import coverImgSrc from "../../asset/tutorials/starMapTutorial/cover.webp";
 import jumpImgSrc from "../../asset/tutorials/starMapTutorial/jump.webp";
@@ -25,7 +27,6 @@ import missionImgSrc from "../../asset/tutorials/starMapTutorial/mission.webp";
 import openImgSrc from "../../asset/tutorials/starMapTutorial/open.webp";
 import plotItineraryImgSrc from "../../asset/tutorials/starMapTutorial/plotItinerary.webp";
 import saveData from "../../asset/tutorials/starMapTutorial/save.json";
-import { StarSystemDatabase } from "../backend/universe/starSystemDatabase";
 import { GeneralInputs } from "../frontend/inputs/generalInputs";
 import { StarSystemInputs } from "../frontend/inputs/starSystemInputs";
 import { TutorialControlsInputs } from "../frontend/ui/tutorial/tutorialLayerInputs";

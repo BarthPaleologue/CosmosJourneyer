@@ -17,10 +17,11 @@
 
 import { z } from "zod";
 
+import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+
 import { UniverseCoordinates, UniverseCoordinatesSchema } from "@/utils/coordinates/universeCoordinates";
 import { DeepReadonly, ok, Result } from "@/utils/types";
 
-import { StarSystemDatabase } from "../../backend/universe/starSystemDatabase";
 import { OrbitalObjectModel } from "../../frontend/architecture/orbitalObjectModel";
 import { getDefaultSerializedSpaceship } from "../../frontend/spaceship/serializedSpaceship";
 import { SerializedPlayerSchema } from "../../player/serializedPlayer";

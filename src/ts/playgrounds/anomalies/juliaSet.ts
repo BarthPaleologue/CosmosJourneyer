@@ -17,9 +17,10 @@
 
 import { AbstractEngine, ArcRotateCamera, Scene, Vector3 } from "@babylonjs/core";
 
+import { newSeededJuliaSetModel } from "@/backend/universe/orbitalObjects/anomalies/juliaSetModelGenerator";
+
 import { EmptyCelestialBody } from "@/utils/emptyCelestialBody";
 
-import { newSeededJuliaSetModel } from "../../backend/universe/orbitalObjects/anomalies/juliaSetModelGenerator";
 import { JuliaSetPostProcess } from "../../frontend/anomalies/julia/juliaSetPostProcess";
 
 export function createJuliaSetScene(

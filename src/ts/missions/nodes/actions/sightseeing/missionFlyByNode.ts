@@ -17,12 +17,13 @@
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
+import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/utils/coordinates/starSystemCoordinates";
 import { UniverseObjectId, universeObjectIdEquals } from "@/utils/coordinates/universeObjectId";
 import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
 import { parseDistance } from "@/utils/strings/parseToStrings";
 
-import { StarSystemDatabase } from "../../../../backend/universe/starSystemDatabase";
 import { OrbitalObjectType } from "../../../../frontend/architecture/orbitalObjectType";
 import i18n from "../../../../i18n";
 import { Settings } from "../../../../settings";

@@ -17,10 +17,11 @@
 
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
-
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { StarSystemModel } from "@/backend/universe/starSystemModel";
+
+import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
+
 import { getLoneStarSystem } from "@/starSystem/customSystems/loneStar";
 import { getSolSystemModel } from "@/starSystem/customSystems/sol";
 

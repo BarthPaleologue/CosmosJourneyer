@@ -17,11 +17,12 @@
 
 import "@styles/index.scss";
 
+import { newSeededBlackHoleModel } from "@/backend/universe/orbitalObjects/stellarObjects/blackHoleModelGenerator";
+import { newSeededTelluricPlanetModel } from "@/backend/universe/orbitalObjects/telluricPlanetModelGenerator";
+import { StarSystemModel } from "@/backend/universe/starSystemModel";
+
 import { positionNearObjectBrightSide } from "@/utils/positionNearObject";
 
-import { newSeededBlackHoleModel } from "./backend/universe/orbitalObjects/stellarObjects/blackHoleModelGenerator";
-import { newSeededTelluricPlanetModel } from "./backend/universe/orbitalObjects/telluricPlanetModelGenerator";
-import { StarSystemModel } from "./backend/universe/starSystemModel";
 import { CosmosJourneyer } from "./cosmosJourneyer";
 
 const engine = await CosmosJourneyer.CreateAsync();

@@ -19,7 +19,8 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Scene } from "@babylonjs/core/scene";
 
-import { CloudsModel } from "../backend/universe/orbitalObjects/cloudsModel";
+import { CloudsModel } from "@/backend/universe/orbitalObjects/cloudsModel";
+
 import { ItemPool } from "../utils/itemPool";
 import { gcd } from "../utils/math";
 import { createEmptyTexture } from "../utils/proceduralTexture";

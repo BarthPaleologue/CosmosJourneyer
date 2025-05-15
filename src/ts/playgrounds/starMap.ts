@@ -18,9 +18,10 @@
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
+import { EncyclopaediaGalacticaLocal } from "@/backend/encyclopaedia/encyclopaediaGalacticaLocal";
+import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+
 import { SoundPlayerMock } from "../audio/soundPlayer";
-import { EncyclopaediaGalacticaLocal } from "../backend/encyclopaedia/encyclopaediaGalacticaLocal";
-import { StarSystemDatabase } from "../backend/universe/starSystemDatabase";
 import { initI18n } from "../i18n";
 import { Player } from "../player/player";
 import { StarMap } from "../starmap/starMap";

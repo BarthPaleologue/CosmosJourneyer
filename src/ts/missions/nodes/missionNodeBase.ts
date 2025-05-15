@@ -15,9 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+
 import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
 
-import { StarSystemDatabase } from "../../backend/universe/starSystemDatabase";
 import { MissionContext } from "../missionContext";
 import { MissionNode } from "./missionNode";
 import { MissionNodeSerialized } from "./missionNodeSerialized";

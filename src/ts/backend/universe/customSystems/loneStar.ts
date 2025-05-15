@@ -18,10 +18,10 @@
 import { CropType } from "@/utils/agriculture";
 
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
-import { StarSystemModel } from "../../backend/universe/starSystemModel";
-import { OrbitSchema } from "../../orbit/orbit";
+import { OrbitSchema } from "../../orbit";
 import { Settings } from "../../settings";
 import { Faction } from "../../society/factions";
+import { StarSystemModel } from "../starSystemModel";
 
 export function getLoneStarSystem(): StarSystemModel {
     return {

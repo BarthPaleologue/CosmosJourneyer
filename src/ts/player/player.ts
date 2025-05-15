@@ -17,8 +17,9 @@
 
 import { Observable } from "@babylonjs/core/Misc/observable";
 
-import { SpaceDiscoveryData } from "../backend/society/encyclopaediaGalactica";
-import { StarSystemDatabase } from "../backend/universe/starSystemDatabase";
+import { SpaceDiscoveryData } from "@/backend/society/encyclopaediaGalactica";
+import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+
 import { SerializedComponent } from "../frontend/spaceship/serializedComponents/component";
 import { getDefaultSerializedSpaceship, SerializedSpaceship } from "../frontend/spaceship/serializedSpaceship";
 import { Spaceship } from "../frontend/spaceship/spaceship";

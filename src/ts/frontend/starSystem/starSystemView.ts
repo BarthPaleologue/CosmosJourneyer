@@ -27,6 +27,10 @@ import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { AxisComposite } from "@brianchirls/game-input/browser";
 import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 
+import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
+import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { StarSystemModel } from "@/backend/universe/starSystemModel";
+
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/utils/coordinates/starSystemCoordinates";
 import { getUniverseObjectId, UniverseObjectId } from "@/utils/coordinates/universeObjectId";
 import { alertModal } from "@/utils/dialogModal";
@@ -43,9 +47,6 @@ import { RenderingAssets } from "../assets/renderingAssets";
 import { AudioMasks } from "../audio/audioMasks";
 import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
 import { ITts, Speaker, VoiceLine } from "../audio/tts";
-import { EncyclopaediaGalacticaManager } from "../backend/encyclopaedia/encyclopaediaGalacticaManager";
-import { StarSystemDatabase } from "../backend/universe/starSystemDatabase";
-import { StarSystemModel } from "../backend/universe/starSystemModel";
 import { CharacterControls } from "../characterControls/characterControls";
 import { CharacterInputs } from "../characterControls/characterControlsInputs";
 import { DefaultControls } from "../defaultControls/defaultControls";

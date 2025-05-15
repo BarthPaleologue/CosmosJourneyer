@@ -30,6 +30,29 @@ import { VideoRecorder } from "@babylonjs/core/Misc/videoRecorder";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import HavokPhysics from "@babylonjs/havok";
 
+import { EncyclopaediaGalacticaLocal } from "@/backend/encyclopaedia/encyclopaediaGalacticaLocal";
+import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
+import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
+import { registerCustomSystems } from "@/backend/universe/customSystems/registerCustomSystems";
+import { generateDarkKnightModel } from "@/backend/universe/orbitalObjects/anomalies/darkKnightModelGenerator";
+import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
+import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+
+import { Assets, loadAssets } from "@/frontend/assets/assets";
+import { AudioMasks } from "@/frontend/audio/audioMasks";
+import { MusicConductor } from "@/frontend/audio/musicConductor";
+import { ISoundPlayer, SoundPlayer, SoundType } from "@/frontend/audio/soundPlayer";
+import { Tts } from "@/frontend/audio/tts";
+import { GeneralInputs } from "@/frontend/inputs/generalInputs";
+import { StarMap } from "@/frontend/starmap/starMap";
+import { StarSystemView } from "@/frontend/starSystem/starSystemView";
+import { LoadingScreen } from "@/frontend/uberCore/loadingScreen";
+import { UberScene } from "@/frontend/uberCore/uberScene";
+import { MainMenu } from "@/frontend/ui/mainMenu";
+import { PauseMenu } from "@/frontend/ui/pauseMenu";
+import { SidePanels } from "@/frontend/ui/sidePanels";
+import { TutorialLayer } from "@/frontend/ui/tutorial/tutorialLayer";
+
 import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
 import {
     AtStationCoordinates,
@@ -43,39 +66,19 @@ import { createNotification, NotificationIntent, NotificationOrigin, updateNotif
 import { positionNearObject } from "@/utils/positionNearObject";
 import { View } from "@/utils/view";
 
-import { Assets, loadAssets } from "./assets/assets";
-import { AudioMasks } from "./audio/audioMasks";
-import { MusicConductor } from "./audio/musicConductor";
-import { ISoundPlayer, SoundPlayer, SoundType } from "./audio/soundPlayer";
-import { Tts } from "./audio/tts";
-import { EncyclopaediaGalacticaLocal } from "./backend/encyclopaedia/encyclopaediaGalacticaLocal";
-import { EncyclopaediaGalacticaManager } from "./backend/encyclopaedia/encyclopaediaGalacticaManager";
-import { StarSystemDatabase } from "./backend/universe/starSystemDatabase";
-import { generateDarkKnightModel } from "./frontend/anomalies/darkKnight/darkKnightModelGenerator";
-import { OrbitalObjectType } from "./frontend/architecture/orbitalObjectType";
-import { GeneralInputs } from "./frontend/inputs/generalInputs";
-import { StarSystemView } from "./frontend/starSystemView";
-import { MainMenu } from "./frontend/ui/mainMenu";
-import { PauseMenu } from "./frontend/ui/pauseMenu";
-import { SidePanels } from "./frontend/ui/sidePanels";
-import { TutorialLayer } from "./frontend/ui/tutorial/tutorialLayer";
+import { Player } from "@/player/player";
+
 import i18n, { initI18n } from "./i18n";
-import { Player } from "./player/player";
 import { createUrlFromSave, Save } from "./saveFile/saveFileData";
 import { saveLoadingErrorToI18nString } from "./saveFile/saveLoadingError";
 import { SaveLocalBackend } from "./saveFile/saveLocalBackend";
 import { SaveManager } from "./saveFile/saveManager";
 import { Settings } from "./settings";
-import { StarMap } from "./starmap/starMap";
-import { getLoneStarSystem } from "./starSystem/customSystems/loneStar";
-import { registerCustomSystems } from "./starSystem/customSystems/registerCustomSystems";
 import { FlightTutorial } from "./tutorials/flightTutorial";
 import { FuelScoopTutorial } from "./tutorials/fuelScoopTutorial";
 import { StarMapTutorial } from "./tutorials/starMapTutorial";
 import { StationLandingTutorial } from "./tutorials/stationLandingTutorial";
 import { Tutorial } from "./tutorials/tutorial";
-import { LoadingScreen } from "./uberCore/loadingScreen";
-import { UberScene } from "./uberCore/uberScene";
 
 const enum EngineState {
     UNINITIALIZED,

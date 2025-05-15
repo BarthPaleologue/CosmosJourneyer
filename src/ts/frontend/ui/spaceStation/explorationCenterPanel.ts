@@ -15,16 +15,17 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
+import { SpaceDiscoveryData } from "@/backend/society/encyclopaediaGalactica";
+import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+
 import { connectEncyclopaediaGalacticaModal } from "@/utils/dialogModal";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@/utils/notification";
 
-import { EncyclopaediaGalacticaManager } from "../../../backend/encyclopaedia/encyclopaediaGalacticaManager";
-import { StarSystemDatabase } from "../../../backend/universe/starSystemDatabase";
 import i18n from "../../../i18n";
 import { Player } from "../../../player/player";
 import { Settings } from "../../../settings";
 import { ISoundPlayer, SoundType } from "../../audio/soundPlayer";
-import { SpaceDiscoveryData } from "../../backend/society/encyclopaediaGalactica";
 import { DiscoveryDetails } from "./discoveryDetails";
 
 const ExplorationCenterFilter = {

@@ -19,9 +19,10 @@ import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { Scene } from "@babylonjs/core/scene";
 
+import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { StarSystemModel } from "@/backend/universe/starSystemModel";
+
 import { ISoundPlayer } from "../audio/soundPlayer";
-import { StarSystemDatabase } from "../backend/universe/starSystemDatabase";
-import { StarSystemModel } from "../backend/universe/starSystemModel";
 import i18n from "../i18n";
 import { Player } from "../player/player";
 import { factionToString } from "../society/factions";

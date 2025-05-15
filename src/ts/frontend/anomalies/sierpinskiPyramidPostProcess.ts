@@ -24,9 +24,10 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Scene } from "@babylonjs/core/scene";
 
+import { SierpinskiPyramidModel } from "@/backend/universe/orbitalObjects/sierpinskiPyramidModel";
+
 import { DeepReadonly } from "@/utils/types";
 
-import { SierpinskiPyramidModel } from "../../backend/universe/orbitalObjects/sierpinskiPyramidModel";
 import { CameraUniformNames, setCameraUniforms } from "../../postProcesses/uniforms/cameraUniforms";
 import { ObjectUniformNames, setObjectUniforms } from "../../postProcesses/uniforms/objectUniforms";
 import { SamplerUniformNames, setSamplerUniforms } from "../../postProcesses/uniforms/samplerUniforms";

@@ -27,6 +27,8 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Scene } from "@babylonjs/core/scene";
 
+import { NeutronStarModel } from "@/backend/universe/orbitalObjects/stellarObjects/neutronStarModel";
+
 import { Cullable } from "@/utils/cullable";
 import { isSizeOnScreenEnough } from "@/utils/isObjectVisibleOnScreen";
 import { ItemPool } from "@/utils/itemPool";
@@ -39,7 +41,6 @@ import { StellarObjectBase } from "../../architecture/stellarObject";
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
 import { TexturePools } from "../../assets/textures";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
-import { NeutronStarModel } from "../../backend/universe/orbitalObjects/stellarObjects/neutronStarModel";
 import { VolumetricLightUniforms } from "../../postProcesses/volumetricLight/volumetricLightUniforms";
 import { RingsLut } from "../../rings/ringsLut";
 import { RingsUniforms } from "../../rings/ringsUniform";

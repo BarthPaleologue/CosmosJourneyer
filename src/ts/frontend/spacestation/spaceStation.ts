@@ -20,8 +20,9 @@ import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
 
+import { SpaceStationModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/spacestationModel";
+
 import { LandingBay } from "../../assets/procedural/spaceStation/landingBay";
-import { SpaceStationModel } from "../../backend/universe/orbitalObjects/orbitalFacilities/spacestationModel";
 import { Settings } from "../../settings";
 import { getEdibleEnergyPerHaPerDay } from "../../utils/agriculture";
 import { getRngFromSeed } from "../../utils/getRngFromSeed";

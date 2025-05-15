@@ -17,12 +17,13 @@
 
 import { uniformRandBool } from "extended-random";
 
+import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+
 import { getNeighborStarSystemCoordinates } from "@/utils/getNeighborStarSystems";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { parseDistance } from "@/utils/strings/parseToStrings";
 import { DeepReadonly } from "@/utils/types";
 
-import { StarSystemDatabase } from "../../../backend/universe/starSystemDatabase";
 import { generateSightseeingMissions } from "../../../missions/generateSightSeeingMissions";
 import { Player } from "../../../player/player";
 import { Settings } from "../../../settings";

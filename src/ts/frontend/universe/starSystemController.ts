@@ -18,6 +18,9 @@
 import { Matrix } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
+import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { StarSystemModel } from "@/backend/universe/starSystemModel";
+
 import {
     getOrbitalPosition,
     getRotationAngle,
@@ -26,8 +29,6 @@ import {
 } from "@/frontend/architecture/orbitalObjectUtils";
 
 import { RenderingAssets } from "../../assets/renderingAssets";
-import { StarSystemDatabase } from "../../backend/universe/starSystemDatabase";
-import { StarSystemModel } from "../../backend/universe/starSystemModel";
 import { PostProcessManager } from "../../postProcesses/postProcessManager";
 import { Settings } from "../../settings";
 import { StarFieldBox } from "../../starSystem/starFieldBox";

@@ -34,9 +34,10 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { DefaultRenderingPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/Pipelines/defaultRenderingPipeline";
 import { Scene } from "@babylonjs/core/scene";
 
+import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
-import { StarSystemDatabase } from "../backend/universe/starSystemDatabase";
 import { Player } from "../player/player";
 import { Settings } from "../settings";
 import { EncyclopaediaGalactica } from "../society/encyclopaediaGalactica";

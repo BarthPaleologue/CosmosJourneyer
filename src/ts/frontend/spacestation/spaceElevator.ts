@@ -22,8 +22,9 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Scene } from "@babylonjs/core/scene";
 
+import { SpaceElevatorModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/spaceElevatorModel";
+
 import { LandingBay } from "../../assets/procedural/spaceStation/landingBay";
-import { SpaceElevatorModel } from "../../backend/universe/orbitalObjects/orbitalFacilities/spaceElevatorModel";
 import { Settings } from "../../settings";
 import { setUpVector } from "../../uberCore/transforms/basicTransform";
 import { getEdibleEnergyPerHaPerDay } from "../../utils/agriculture";

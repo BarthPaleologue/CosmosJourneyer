@@ -22,10 +22,11 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Scene } from "@babylonjs/core/scene";
 import { normalRandom, randRange, randRangeInt } from "extended-random";
 
+import { GasPlanetModel } from "@/backend/universe/orbitalObjects/gasPlanetModel";
+
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { DeepReadonly } from "@/utils/types";
 
-import { GasPlanetModel } from "../../backend/universe/orbitalObjects/gasPlanetModel";
 import {
     setStellarObjectUniforms,
     StellarObjectUniformNames,

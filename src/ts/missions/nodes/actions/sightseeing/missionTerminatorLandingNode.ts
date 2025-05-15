@@ -18,11 +18,12 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 
+import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/utils/coordinates/starSystemCoordinates";
 import { UniverseObjectId, universeObjectIdEquals } from "@/utils/coordinates/universeObjectId";
 import { parseDistance } from "@/utils/strings/parseToStrings";
 
-import { StarSystemDatabase } from "../../../../backend/universe/starSystemDatabase";
 import i18n from "../../../../i18n";
 import { CollisionMask, Settings } from "../../../../settings";
 import { getGoToSystemInstructions } from "../../../common";

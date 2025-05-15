@@ -22,14 +22,15 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { Scene } from "@babylonjs/core/scene";
 
+import { TelluricPlanetModel } from "@/backend/universe/orbitalObjects/telluricPlanetModel";
+import { TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
+
 import { getChunkSphereSpacePositionFromPath } from "@/utils/chunkUtils";
 import { Cullable } from "@/utils/cullable";
 import { Direction } from "@/utils/direction";
 import { clamp } from "@/utils/math";
 import { DeepReadonly } from "@/utils/types";
 
-import { TelluricPlanetModel } from "../../../../backend/universe/orbitalObjects/telluricPlanetModel";
-import { TelluricSatelliteModel } from "../../../../backend/universe/orbitalObjects/telluricSatelliteModel";
 import { Settings } from "../../../../settings";
 import { getRotationQuaternion } from "../../../../uberCore/transforms/basicTransform";
 import { TerrainSettings } from "../terrainSettings";

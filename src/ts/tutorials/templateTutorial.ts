@@ -15,9 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+
 import saveData from "../../asset/tutorials/flightTutorial/save.json";
 import welcomeImageSrc from "../../asset/tutorials/flightTutorial/welcome.webp";
-import { StarSystemDatabase } from "../backend/universe/starSystemDatabase";
 import { TutorialControlsInputs } from "../frontend/ui/tutorial/tutorialLayerInputs";
 import i18n from "../i18n";
 import { safeParseSave, Save } from "../saveFile/saveFileData";

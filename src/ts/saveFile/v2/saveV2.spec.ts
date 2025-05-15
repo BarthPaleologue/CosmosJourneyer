@@ -1,8 +1,9 @@
 import { expect, test } from "vitest";
 
+import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+
 import { DeepPartial } from "@/utils/types";
 
-import { StarSystemDatabase } from "../../backend/universe/starSystemDatabase";
 import { getLoneStarSystem } from "../../starSystem/customSystems/loneStar";
 import { safeParseSave } from "../saveFileData";
 import { SaveV2 } from "./saveV2";

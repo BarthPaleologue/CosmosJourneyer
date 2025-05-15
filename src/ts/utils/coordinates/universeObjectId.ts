@@ -17,7 +17,8 @@
 
 import { z } from "zod";
 
-import { StarSystemModel } from "../../backend/universe/starSystemModel";
+import { StarSystemModel } from "@/backend/universe/starSystemModel";
+
 import { OrbitalObjectModel } from "../../frontend/architecture/orbitalObjectModel";
 import { DeepReadonly } from "../types";
 import { orbitalObjectIdEquals, OrbitalObjectIdSchema } from "./orbitalObjectId";

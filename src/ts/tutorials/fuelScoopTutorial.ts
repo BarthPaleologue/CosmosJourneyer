@@ -15,11 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+
 import fuelIconLocation from "../../asset/tutorials/fuelScoopTutorial/fuelIconLocation.webp";
 import welcomeImageSrc from "../../asset/tutorials/fuelScoopTutorial/fuelScoop.webp";
 import howToFuelScoop from "../../asset/tutorials/fuelScoopTutorial/howToFuelScoop.webp";
 import saveData from "../../asset/tutorials/fuelScoopTutorial/save.json";
-import { StarSystemDatabase } from "../backend/universe/starSystemDatabase";
 import { TutorialControlsInputs } from "../frontend/ui/tutorial/tutorialLayerInputs";
 import i18n from "../i18n";
 import { safeParseSave, Save } from "../saveFile/saveFileData";

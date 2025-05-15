@@ -1,6 +1,7 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
 
-import { StarSystemDatabase } from "../../backend/universe/starSystemDatabase";
+import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+
 import i18n from "../../i18n";
 import { parseSaveFile } from "../../saveFile/saveFile";
 import { createUrlFromSave, Save } from "../../saveFile/saveFileData";

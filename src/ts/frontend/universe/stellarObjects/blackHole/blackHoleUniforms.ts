@@ -19,10 +19,11 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
+import { BlackHoleModel } from "@/backend/universe/orbitalObjects/stellarObjects/blackHoleModel";
+import { getKerrMetricA } from "@/backend/universe/orbitalObjects/stellarObjects/blackHoleModelGenerator";
+
 import { DeepReadonly } from "@/utils/types";
 
-import { BlackHoleModel } from "../../backend/universe/orbitalObjects/stellarObjects/blackHoleModel";
-import { getKerrMetricA } from "../../backend/universe/orbitalObjects/stellarObjects/blackHoleModelGenerator";
 import { getForwardDirection } from "../../uberCore/transforms/basicTransform";
 
 export const BlackHoleUniformNames = {

@@ -18,9 +18,10 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
+import { TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
+import { StarSystemModel } from "@/backend/universe/starSystemModel";
+
 import { RenderingAssets } from "../../assets/renderingAssets";
-import { TelluricSatelliteModel } from "../../backend/universe/orbitalObjects/telluricSatelliteModel";
-import { StarSystemModel } from "../../backend/universe/starSystemModel";
 import { getDistancesToStellarObjects } from "../../utils/distanceToStellarObject";
 import { EmptyCelestialBody } from "../../utils/emptyCelestialBody";
 import { DeepReadonly, isNonEmptyArray, NonEmptyArray } from "../../utils/types";

@@ -2,7 +2,8 @@ import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
 
-import { StarSystemModel } from "../backend/universe/starSystemModel";
+import { StarSystemModel } from "@/backend/universe/starSystemModel";
+
 import { ObjectTargetCursorType, Targetable } from "../frontend/architecture/targetable";
 import i18n from "../i18n";
 import { Settings } from "../settings";

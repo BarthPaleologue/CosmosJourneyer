@@ -31,6 +31,12 @@ import { PostProcessRenderEffect } from "@babylonjs/core/PostProcesses/RenderPip
 import { PostProcessRenderPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipeline";
 import { PostProcessRenderPipelineManager } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManager";
 
+import { JuliaSetModel } from "@/backend/universe/orbitalObjects/anomalies/juliaSetModel";
+import { MandelboxModel } from "@/backend/universe/orbitalObjects/anomalies/mandelboxModel";
+import { MandelbulbModel } from "@/backend/universe/orbitalObjects/anomalies/mandelbulbModel";
+import { MengerSpongeModel } from "@/backend/universe/orbitalObjects/anomalies/mengerSpongeModel";
+import { SierpinskiPyramidModel } from "@/backend/universe/orbitalObjects/anomalies/sierpinskiPyramidModel";
+
 import { JuliaSetPostProcess } from "../anomalies/julia/juliaSetPostProcess";
 import { MandelboxPostProcess } from "../anomalies/mandelbox/mandelboxPostProcess";
 import { MandelbulbPostProcess } from "../anomalies/mandelbulb/mandelbulbPostProcess";
@@ -39,11 +45,6 @@ import { SierpinskiPyramidPostProcess } from "../anomalies/sierpinskiPyramid/sie
 import { CelestialBody, StellarObject } from "../architecture/orbitalObject";
 import { Textures } from "../assets/textures";
 import { AtmosphericScatteringPostProcess } from "../atmosphere/atmosphericScatteringPostProcess";
-import { JuliaSetModel } from "../backend/universe/orbitalObjects/anomalies/juliaSetModel";
-import { MandelboxModel } from "../backend/universe/orbitalObjects/anomalies/mandelboxModel";
-import { MandelbulbModel } from "../backend/universe/orbitalObjects/anomalies/mandelbulbModel";
-import { MengerSpongeModel } from "../backend/universe/orbitalObjects/anomalies/mengerSpongeModel";
-import { SierpinskiPyramidModel } from "../backend/universe/orbitalObjects/anomalies/sierpinskiPyramidModel";
 import { FlatCloudsPostProcess } from "../clouds/flatCloudsPostProcess";
 import { RingsPostProcess } from "../frontend/rings/ringsPostProcess";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";

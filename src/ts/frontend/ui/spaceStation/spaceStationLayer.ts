@@ -17,11 +17,12 @@
 
 import { Observable } from "@babylonjs/core/Misc/observable";
 
+import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
+import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+
 import { alertModal, promptModalString } from "@/utils/dialogModal";
 import { DeepReadonly } from "@/utils/types";
 
-import { EncyclopaediaGalacticaManager } from "../../../backend/encyclopaedia/encyclopaediaGalacticaManager";
-import { StarSystemDatabase } from "../../../backend/universe/starSystemDatabase";
 import i18n from "../../../i18n";
 import { Player } from "../../../player/player";
 import { Settings } from "../../../settings";

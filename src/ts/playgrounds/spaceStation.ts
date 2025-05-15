@@ -19,10 +19,11 @@ import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
+import { newSeededSpaceStationModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/spaceStationModelGenerator";
+import { StarModel } from "@/backend/universe/orbitalObjects/stellarObjects/starModel";
+import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+
 import { loadRenderingAssets } from "../assets/renderingAssets";
-import { newSeededSpaceStationModel } from "../backend/universe/orbitalObjects/orbitalFacilities/spaceStationModelGenerator";
-import { StarModel } from "../backend/universe/orbitalObjects/stellarObjects/starModel";
-import { StarSystemDatabase } from "../backend/universe/starSystemDatabase";
 import { DefaultControls } from "../defaultControls/defaultControls";
 import { OrbitalObjectType } from "../frontend/architecture/orbitalObjectType";
 import { SpaceStation } from "../frontend/spacestation/spaceStation";

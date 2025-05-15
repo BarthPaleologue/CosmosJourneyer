@@ -1,6 +1,7 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-import { StarSystemDatabase } from "../backend/universe/starSystemDatabase";
+import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+
 import { GeneralInputs } from "../frontend/inputs/generalInputs";
 import i18n from "../i18n";
 import { Settings } from "../settings";

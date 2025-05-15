@@ -15,12 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+
 import saveData from "../../asset/tutorials/stationLandingTutorial/save.json";
 import station1ImageSrc from "../../asset/tutorials/stationLandingTutorial/station1.webp";
 import stationLandingBayImageSrc from "../../asset/tutorials/stationLandingTutorial/stationLandingBay.webp";
 import stationPadApproachImageSrc from "../../asset/tutorials/stationLandingTutorial/stationPadApproach.webp";
 import stationServicesImageSrc from "../../asset/tutorials/stationLandingTutorial/stationServices.webp";
-import { StarSystemDatabase } from "../backend/universe/starSystemDatabase";
 import { SpaceShipControlsInputs } from "../frontend/spaceship/spaceShipControlsInputs";
 import { TutorialControlsInputs } from "../frontend/ui/tutorial/tutorialLayerInputs";
 import i18n from "../i18n";

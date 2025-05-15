@@ -17,8 +17,9 @@
 
 import { describe, expect, it } from "vitest";
 
-import { Faction } from "../backend/society/factions";
-import { getObjectModelById, StarSystemModel } from "../backend/universe/starSystemModel";
+import { Faction } from "@/backend/society/factions";
+import { getObjectModelById, StarSystemModel } from "@/backend/universe/starSystemModel";
+
 import { OrbitalObjectType } from "../frontend/architecture/orbitalObjectType";
 import { Settings } from "../settings";
 import { getDistancesToStellarObjects } from "./distanceToStellarObject";

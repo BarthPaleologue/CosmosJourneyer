@@ -17,13 +17,14 @@
 
 import { normalRandom, randRange, randRangeInt, uniformRandBool } from "extended-random";
 
+import { NeutronStarModel } from "@/backend/universe/orbitalObjects/stellarObjects/neutronStarModel";
+
 import { GenerationSteps } from "@/utils/generationSteps";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { clamp } from "@/utils/math";
 
 import { OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
-import { NeutronStarModel } from "../../backend/universe/orbitalObjects/stellarObjects/neutronStarModel";
 import { Orbit } from "../../orbit/orbit";
 import { newSeededRingsModel } from "../../rings/ringsModel";
 

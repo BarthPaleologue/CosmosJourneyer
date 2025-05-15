@@ -17,6 +17,8 @@
 
 import { AxisComposite } from "@brianchirls/game-input/browser";
 
+import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+
 import congratsImageSrc from "../../asset/tutorials/flightTutorial/congrats.webp";
 import rotationImageSrc from "../../asset/tutorials/flightTutorial/rotation.webp";
 import saveData from "../../asset/tutorials/flightTutorial/save.json";
@@ -24,7 +26,6 @@ import targetImageSrc from "../../asset/tutorials/flightTutorial/target.webp";
 import thrustImageSrc from "../../asset/tutorials/flightTutorial/thrust.webp";
 import warpImageSrc from "../../asset/tutorials/flightTutorial/warp.webp";
 import welcomeImageSrc from "../../asset/tutorials/flightTutorial/welcome.webp";
-import { StarSystemDatabase } from "../backend/universe/starSystemDatabase";
 import { StarSystemInputs } from "../frontend/inputs/starSystemInputs";
 import { SpaceShipControlsInputs } from "../frontend/spaceship/spaceShipControlsInputs";
 import { TutorialControlsInputs } from "../frontend/ui/tutorial/tutorialLayerInputs";

@@ -18,11 +18,12 @@
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
+import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
+import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+
 import { loadRenderingAssets } from "../assets/renderingAssets";
 import { SoundPlayerMock } from "../audio/soundPlayer";
 import { TtsMock } from "../audio/tts";
-import { EncyclopaediaGalacticaManager } from "../backend/encyclopaedia/encyclopaediaGalacticaManager";
-import { StarSystemDatabase } from "../backend/universe/starSystemDatabase";
 import { StarSystemView } from "../frontend/starSystemView";
 import { initI18n } from "../i18n";
 import { Player } from "../player/player";

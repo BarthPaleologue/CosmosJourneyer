@@ -17,19 +17,20 @@
 
 import { Observable } from "@babylonjs/core/Misc/observable";
 
+import { EncyclopaediaGalactica, SpaceDiscoveryData } from "@/backend/society/encyclopaediaGalactica";
+import { getOrbitalPeriod } from "@/backend/universe/orbitalObjects/orbit";
+import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { getObjectModelById } from "@/backend/universe/starSystemModel";
+
 import { alertModal } from "@/utils/dialogModal";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@/utils/notification";
 import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
 import { parseDistance, parseSecondsPrecise } from "@/utils/strings/parseToStrings";
 
-import { getOrbitalPeriod } from "../../../backend/universe/orbitalObjects/orbit";
-import { StarSystemDatabase } from "../../../backend/universe/starSystemDatabase";
-import { getObjectModelById } from "../../../backend/universe/starSystemModel";
 import i18n from "../../../i18n";
 import { Player } from "../../../player/player";
 import { Settings } from "../../../settings";
 import { ISoundPlayer, SoundType } from "../../audio/soundPlayer";
-import { EncyclopaediaGalactica, SpaceDiscoveryData } from "../../backend/society/encyclopaediaGalactica";
 
 export class DiscoveryDetails {
     readonly htmlRoot: HTMLElement;

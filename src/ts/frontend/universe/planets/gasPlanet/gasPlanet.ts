@@ -26,6 +26,8 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Scene } from "@babylonjs/core/scene";
 
+import { GasPlanetModel } from "@/backend/universe/orbitalObjects/gasPlanetModel";
+
 import { Cullable } from "@/utils/cullable";
 import { isSizeOnScreenEnough } from "@/utils/isObjectVisibleOnScreen";
 import { ItemPool } from "@/utils/itemPool";
@@ -37,7 +39,6 @@ import { PlanetaryMassObjectBase } from "../../architecture/planetaryMassObject"
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
 import { AtmosphereUniforms } from "../../atmosphere/atmosphereUniforms";
-import { GasPlanetModel } from "../../backend/universe/orbitalObjects/gasPlanetModel";
 import { RingsLut } from "../../rings/ringsLut";
 import { RingsUniforms } from "../../rings/ringsUniform";
 import { Settings } from "../../settings";

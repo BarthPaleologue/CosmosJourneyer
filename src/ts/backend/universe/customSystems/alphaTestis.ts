@@ -21,13 +21,14 @@ import { Tools } from "@babylonjs/core/Misc/tools";
 import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
 import { celsiusToKelvin, getOrbitRadiusFromPeriod } from "@/utils/physics";
 
-import { newSeededGasPlanetModel } from "../../backend/universe/orbitalObjects/gasPlanetModelGenerator";
-import { newSeededSpaceStationModel } from "../../backend/universe/orbitalObjects/orbitalFacilities/spaceStationModelGenerator";
-import { newSeededStarModel } from "../../backend/universe/orbitalObjects/stellarObjects/starModelGenerator";
-import { newSeededTelluricPlanetModel } from "../../backend/universe/orbitalObjects/telluricPlanetModelGenerator";
-import { newSeededTelluricSatelliteModel } from "../../backend/universe/orbitalObjects/telluricSatelliteModelGenerator";
-import { StarSystemModel } from "../../backend/universe/starSystemModel";
-import { Settings } from "../../settings";
+import { Settings } from "@/settings";
+
+import { newSeededGasPlanetModel } from "../orbitalObjects/gasPlanetModelGenerator";
+import { newSeededSpaceStationModel } from "../orbitalObjects/orbitalFacilities/spaceStationModelGenerator";
+import { newSeededStarModel } from "../orbitalObjects/stellarObjects/starModelGenerator";
+import { newSeededTelluricPlanetModel } from "../orbitalObjects/telluricPlanetModelGenerator";
+import { newSeededTelluricSatelliteModel } from "../orbitalObjects/telluricSatelliteModelGenerator";
+import { StarSystemModel } from "../starSystemModel";
 
 export function getAlphaTestisSystemModel(): StarSystemModel {
     const systemName = "Alpha Testis";

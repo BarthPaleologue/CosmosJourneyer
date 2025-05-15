@@ -19,8 +19,9 @@ import { BoundingBox } from "@babylonjs/core/Culling/boundingBox";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 
-import { StarSystemDatabase } from "../backend/universe/starSystemDatabase";
-import { StarSystemModel } from "../backend/universe/starSystemModel";
+import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { StarSystemModel } from "@/backend/universe/starSystemModel";
+
 import { Settings } from "../settings";
 import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
 import { DeepReadonly } from "../utils/types";

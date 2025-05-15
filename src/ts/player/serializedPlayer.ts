@@ -1,6 +1,7 @@
 import { z } from "zod";
 
-import { SpaceDiscoveryDataSchema } from "../backend/society/encyclopaediaGalactica";
+import { SpaceDiscoveryDataSchema } from "@/backend/society/encyclopaediaGalactica";
+
 import { SerializedComponentSchema } from "../frontend/spaceship/serializedComponents/component";
 import { getDefaultSerializedSpaceship, SerializedSpaceshipSchema } from "../frontend/spaceship/serializedSpaceship";
 import { MissionSerializedSchema } from "../missions/missionSerialized";

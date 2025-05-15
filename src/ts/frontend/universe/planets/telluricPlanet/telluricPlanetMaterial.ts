@@ -23,14 +23,15 @@ import { Matrix } from "@babylonjs/core/Maths/math";
 import { Scene } from "@babylonjs/core/scene";
 import { centeredRand } from "extended-random";
 
+import { TelluricPlanetModel } from "@/backend/universe/orbitalObjects/telluricPlanetModel";
+import { TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
+
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { ItemPool } from "@/utils/itemPool";
 import { createEmptyTexture } from "@/utils/proceduralTexture";
 import { DeepReadonly } from "@/utils/types";
 
 import { AllTerrainTextures } from "../../assets/textures";
-import { TelluricPlanetModel } from "../../backend/universe/orbitalObjects/telluricPlanetModel";
-import { TelluricSatelliteModel } from "../../backend/universe/orbitalObjects/telluricSatelliteModel";
 import {
     setStellarObjectUniforms,
     StellarObjectUniformNames,
