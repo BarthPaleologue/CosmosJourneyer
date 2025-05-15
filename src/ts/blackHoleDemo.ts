@@ -23,7 +23,7 @@ import { StarSystemModel } from "@/backend/universe/starSystemModel";
 
 import { positionNearObjectBrightSide } from "@/utils/positionNearObject";
 
-import { CosmosJourneyer } from "./cosmosJourneyer";
+import { CosmosJourneyer } from "./frontend/cosmosJourneyer";
 
 const engine = await CosmosJourneyer.CreateAsync();
 engine.setAutoSaveEnabled(false);
