@@ -19,16 +19,16 @@ import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
-import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { loadRenderingAssets } from "../assets/renderingAssets";
+import { newSeededSpaceStationModel } from "../backend/universe/orbitalObjects/orbitalFacilities/spaceStationModelGenerator";
+import { StarModel } from "../backend/universe/orbitalObjects/stellarObjects/starModel";
+import { StarSystemDatabase } from "../backend/universe/starSystemDatabase";
 import { DefaultControls } from "../defaultControls/defaultControls";
+import { OrbitalObjectType } from "../frontend/architecture/orbitalObjectType";
+import { SpaceStation } from "../frontend/spacestation/spaceStation";
 import { Settings } from "../settings";
-import { SpaceStation } from "../spacestation/spaceStation";
-import { newSeededSpaceStationModel } from "../spacestation/spaceStationModelGenerator";
 import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { Star } from "../stellarObjects/star/star";
-import { StarModel } from "../stellarObjects/star/starModel";
 import { enablePhysics } from "./utils";
 
 export async function createSpaceStationScene(

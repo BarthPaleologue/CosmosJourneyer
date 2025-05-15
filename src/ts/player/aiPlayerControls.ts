@@ -19,9 +19,9 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { RenderingAssets } from "../assets/renderingAssets";
 import { ISoundPlayer } from "../audio/soundPlayer";
-import { AiSpaceshipControls } from "../spaceship/aiSpaceshipControls";
-import { Spaceship } from "../spaceship/spaceship";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { StarSystemDatabase } from "../backend/universe/starSystemDatabase";
+import { AiSpaceshipControls } from "../frontend/spaceship/aiSpaceshipControls";
+import { Spaceship } from "../frontend/spaceship/spaceship";
 import { Player } from "./player";
 
 export class AiPlayerControls {

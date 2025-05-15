@@ -19,10 +19,10 @@ import "@styles/index.scss";
 
 import { positionNearObjectBrightSide } from "@/utils/positionNearObject";
 
+import { newSeededBlackHoleModel } from "./backend/universe/orbitalObjects/stellarObjects/blackHoleModelGenerator";
+import { newSeededTelluricPlanetModel } from "./backend/universe/orbitalObjects/telluricPlanetModelGenerator";
+import { StarSystemModel } from "./backend/universe/starSystemModel";
 import { CosmosJourneyer } from "./cosmosJourneyer";
-import { newSeededTelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModelGenerator";
-import { StarSystemModel } from "./starSystem/starSystemModel";
-import { newSeededBlackHoleModel } from "./stellarObjects/blackHole/blackHoleModelGenerator";
 
 const engine = await CosmosJourneyer.CreateAsync();
 engine.setAutoSaveEnabled(false);

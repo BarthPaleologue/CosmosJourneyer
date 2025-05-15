@@ -19,10 +19,10 @@ import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
 
-import { CelestialBodyBase } from "../architecture/celestialBody";
-import { CelestialBodyModel } from "../architecture/orbitalObjectModel";
-import { OrbitalObjectType } from "../architecture/orbitalObjectType";
-import { defaultTargetInfoCelestialBody, TargetInfo } from "../architecture/targetable";
+import { CelestialBodyBase } from "../frontend/architecture/celestialBody";
+import { CelestialBodyModel } from "../frontend/architecture/orbitalObjectModel";
+import { OrbitalObjectType } from "../frontend/architecture/orbitalObjectType";
+import { defaultTargetInfoCelestialBody, TargetInfo } from "../frontend/architecture/targetable";
 import { getOrbitalObjectTypeToI18nString } from "./strings/orbitalObjectTypeToDisplay";
 import { DeepReadonly } from "./types";
 

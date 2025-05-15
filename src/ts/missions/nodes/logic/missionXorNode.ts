@@ -17,7 +17,7 @@
 
 import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
 
-import { StarSystemDatabase } from "../../../starSystem/starSystemDatabase";
+import { StarSystemDatabase } from "../../../backend/universe/starSystemDatabase";
 import { MissionContext } from "../../missionContext";
 import type { MissionNode } from "../missionNode";
 import { MissionNodeBase } from "../missionNodeBase";

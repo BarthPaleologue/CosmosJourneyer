@@ -20,16 +20,16 @@ import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
-import { newSeededJuliaSetModel } from "../anomalies/julia/juliaSetModelGenerator";
-import { JuliaSetPostProcess } from "../anomalies/julia/juliaSetPostProcess";
-import { newSeededMandelboxModel } from "../anomalies/mandelbox/mandelboxModelGenerator";
-import { MandelboxPostProcess } from "../anomalies/mandelbox/mandelboxPostProcess";
-import { newSeededMandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModelGenerator";
-import { MandelbulbPostProcess } from "../anomalies/mandelbulb/mandelbulbPostProcess";
-import { newSeededMengerSpongeModel } from "../anomalies/mengerSponge/mengerSpongeModelGenerator";
-import { MengerSpongePostProcess } from "../anomalies/mengerSponge/mengerSpongePostProcess";
-import { newSeededSierpinskiPyramidModel } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidModelGenerator";
-import { SierpinskiPyramidPostProcess } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidPostProcess";
+import { newSeededJuliaSetModel } from "../backend/universe/orbitalObjects/anomalies/juliaSetModelGenerator";
+import { newSeededMandelboxModel } from "../backend/universe/orbitalObjects/anomalies/mandelboxModelGenerator";
+import { newSeededMandelbulbModel } from "../backend/universe/orbitalObjects/anomalies/mandelbulbModelGenerator";
+import { newSeededMengerSpongeModel } from "../backend/universe/orbitalObjects/anomalies/mengerSpongeModelGenerator";
+import { newSeededSierpinskiPyramidModel } from "../backend/universe/orbitalObjects/anomalies/sierpinskiPyramidModelGenerator";
+import { JuliaSetPostProcess } from "../frontend/anomalies/julia/juliaSetPostProcess";
+import { MandelboxPostProcess } from "../frontend/anomalies/mandelbox/mandelboxPostProcess";
+import { MandelbulbPostProcess } from "../frontend/anomalies/mandelbulb/mandelbulbPostProcess";
+import { MengerSpongePostProcess } from "../frontend/anomalies/mengerSponge/mengerSpongePostProcess";
+import { SierpinskiPyramidPostProcess } from "../frontend/anomalies/sierpinskiPyramid/sierpinskiPyramidPostProcess";
 import { UpdatablePostProcess } from "../postProcesses/updatablePostProcess";
 import { EmptyCelestialBody } from "../utils/emptyCelestialBody";
 

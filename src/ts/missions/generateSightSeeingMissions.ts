@@ -18,11 +18,11 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { uniformRandBool } from "extended-random";
 
-import { OrbitalFacilityModel } from "../architecture/orbitalObjectModel";
-import { OrbitalObjectType } from "../architecture/orbitalObjectType";
+import { StarSystemDatabase } from "../backend/universe/starSystemDatabase";
+import { StarSystemModel } from "../backend/universe/starSystemModel";
+import { OrbitalFacilityModel } from "../frontend/architecture/orbitalObjectModel";
+import { OrbitalObjectType } from "../frontend/architecture/orbitalObjectType";
 import { Player } from "../player/player";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-import { StarSystemModel } from "../starSystem/starSystemModel";
 import { getUniverseObjectId, UniverseObjectId } from "../utils/coordinates/universeObjectId";
 import { getNeighborStarSystemCoordinates } from "../utils/getNeighborStarSystems";
 import { getRngFromSeed } from "../utils/getRngFromSeed";

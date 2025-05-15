@@ -21,14 +21,14 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
 import { createTexturePools } from "../assets/textures";
+import { newSeededNeutronStarModel } from "../backend/universe/orbitalObjects/stellarObjects/neutronStarModelGenerator";
 import { DefaultControls } from "../defaultControls/defaultControls";
 import { LensFlarePostProcess } from "../postProcesses/lensFlarePostProcess";
 import { MatterJetPostProcess } from "../postProcesses/matterJetPostProcess";
+import { VolumetricLight } from "../postProcesses/volumetricLight/volumetricLight";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
-import { newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModelGenerator";
 import { translate } from "../uberCore/transforms/basicTransform";
 import { getRgbFromTemperature } from "../utils/specrend";
-import { VolumetricLight } from "../volumetricLight/volumetricLight";
 import { enablePhysics } from "./utils";
 
 export async function createNeutronStarScene(

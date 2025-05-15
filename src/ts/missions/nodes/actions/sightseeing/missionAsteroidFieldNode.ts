@@ -22,11 +22,11 @@ import { UniverseObjectId, universeObjectIdEquals } from "@/utils/coordinates/un
 import { clamp } from "@/utils/math";
 import { parseDistance } from "@/utils/strings/parseToStrings";
 
-import { OrbitalObjectType } from "../../../../architecture/orbitalObjectType";
+import { StarSystemDatabase } from "../../../../backend/universe/starSystemDatabase";
+import { getObjectModelById } from "../../../../backend/universe/starSystemModel";
+import { OrbitalObjectType } from "../../../../frontend/architecture/orbitalObjectType";
 import i18n from "../../../../i18n";
 import { Settings } from "../../../../settings";
-import { StarSystemDatabase } from "../../../../starSystem/starSystemDatabase";
-import { getObjectModelById } from "../../../../starSystem/starSystemModel";
 import { getGoToSystemInstructions } from "../../../common";
 import { MissionContext } from "../../../missionContext";
 import { MissionNode } from "../../missionNode";

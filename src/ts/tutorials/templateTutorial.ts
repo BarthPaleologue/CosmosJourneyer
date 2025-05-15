@@ -17,11 +17,11 @@
 
 import saveData from "../../asset/tutorials/flightTutorial/save.json";
 import welcomeImageSrc from "../../asset/tutorials/flightTutorial/welcome.webp";
+import { StarSystemDatabase } from "../backend/universe/starSystemDatabase";
+import { TutorialControlsInputs } from "../frontend/ui/tutorial/tutorialLayerInputs";
 import i18n from "../i18n";
 import { safeParseSave, Save } from "../saveFile/saveFileData";
 import { SaveLoadingError } from "../saveFile/saveLoadingError";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-import { TutorialControlsInputs } from "../ui/tutorial/tutorialLayerInputs";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import { pressInteractionToStrings } from "../utils/strings/inputControlsString";
 import { Result } from "../utils/types";

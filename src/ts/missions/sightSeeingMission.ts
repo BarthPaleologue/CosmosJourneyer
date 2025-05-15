@@ -17,8 +17,8 @@
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-import { OrbitalObjectType } from "../architecture/orbitalObjectType";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
+import { StarSystemDatabase } from "../backend/universe/starSystemDatabase";
+import { OrbitalObjectType } from "../frontend/architecture/orbitalObjectType";
 import { UniverseObjectId } from "../utils/coordinates/universeObjectId";
 import { Mission } from "./mission";
 import { MissionType } from "./missionSerialized";

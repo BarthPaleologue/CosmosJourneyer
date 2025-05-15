@@ -20,12 +20,12 @@ import station1ImageSrc from "../../asset/tutorials/stationLandingTutorial/stati
 import stationLandingBayImageSrc from "../../asset/tutorials/stationLandingTutorial/stationLandingBay.webp";
 import stationPadApproachImageSrc from "../../asset/tutorials/stationLandingTutorial/stationPadApproach.webp";
 import stationServicesImageSrc from "../../asset/tutorials/stationLandingTutorial/stationServices.webp";
+import { StarSystemDatabase } from "../backend/universe/starSystemDatabase";
+import { SpaceShipControlsInputs } from "../frontend/spaceship/spaceShipControlsInputs";
+import { TutorialControlsInputs } from "../frontend/ui/tutorial/tutorialLayerInputs";
 import i18n from "../i18n";
 import { safeParseSave, Save } from "../saveFile/saveFileData";
 import { SaveLoadingError } from "../saveFile/saveLoadingError";
-import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-import { TutorialControlsInputs } from "../ui/tutorial/tutorialLayerInputs";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import { pressInteractionToStrings } from "../utils/strings/inputControlsString";
 import { Result } from "../utils/types";

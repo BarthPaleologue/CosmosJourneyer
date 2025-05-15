@@ -27,9 +27,9 @@ import {
 } from "@babylonjs/core";
 
 import { loadRenderingAssets } from "../assets/renderingAssets";
-import { AsteroidField } from "../asteroidFields/asteroidField";
-import { AsteroidPatch } from "../asteroidFields/asteroidPatch";
 import { DefaultControls } from "../defaultControls/defaultControls";
+import { AsteroidField } from "../frontend/asteroidFields/asteroidField";
+import { AsteroidPatch } from "../frontend/asteroidFields/asteroidPatch";
 import { enablePhysics } from "./utils";
 
 export async function createAsteroidFieldScene(

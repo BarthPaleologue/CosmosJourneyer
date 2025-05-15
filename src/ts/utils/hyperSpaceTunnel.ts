@@ -7,8 +7,8 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Scene } from "@babylonjs/core/scene";
 
-import { Transformable } from "../architecture/transformable";
 import { NoiseTextures } from "../assets/textures";
+import { Transformable } from "../frontend/architecture/transformable";
 import { getForwardDirection, rotate } from "../uberCore/transforms/basicTransform";
 
 import warpConeFragment from "@shaders/warpConeMaterial/fragment.glsl";

@@ -25,14 +25,14 @@ import missionImgSrc from "../../asset/tutorials/starMapTutorial/mission.webp";
 import openImgSrc from "../../asset/tutorials/starMapTutorial/open.webp";
 import plotItineraryImgSrc from "../../asset/tutorials/starMapTutorial/plotItinerary.webp";
 import saveData from "../../asset/tutorials/starMapTutorial/save.json";
+import { StarSystemDatabase } from "../backend/universe/starSystemDatabase";
+import { GeneralInputs } from "../frontend/inputs/generalInputs";
+import { StarSystemInputs } from "../frontend/inputs/starSystemInputs";
+import { TutorialControlsInputs } from "../frontend/ui/tutorial/tutorialLayerInputs";
 import i18n from "../i18n";
-import { GeneralInputs } from "../inputs/generalInputs";
-import { StarSystemInputs } from "../inputs/starSystemInputs";
 import { safeParseSave, Save } from "../saveFile/saveFileData";
 import { SaveLoadingError } from "../saveFile/saveLoadingError";
 import { StarMapInputs } from "../starmap/starMapInputs";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-import { TutorialControlsInputs } from "../ui/tutorial/tutorialLayerInputs";
 import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
 import {
     axisCompositeToString,

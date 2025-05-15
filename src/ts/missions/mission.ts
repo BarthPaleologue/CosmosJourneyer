@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { StarSystemDatabase } from "../backend/universe/starSystemDatabase";
 import i18n from "../i18n";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
 import { UniverseObjectId } from "../utils/coordinates/universeObjectId";
 import { MissionContext } from "./missionContext";

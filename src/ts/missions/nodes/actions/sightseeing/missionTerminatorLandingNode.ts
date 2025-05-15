@@ -22,9 +22,9 @@ import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/utils/coor
 import { UniverseObjectId, universeObjectIdEquals } from "@/utils/coordinates/universeObjectId";
 import { parseDistance } from "@/utils/strings/parseToStrings";
 
+import { StarSystemDatabase } from "../../../../backend/universe/starSystemDatabase";
 import i18n from "../../../../i18n";
 import { CollisionMask, Settings } from "../../../../settings";
-import { StarSystemDatabase } from "../../../../starSystem/starSystemDatabase";
 import { getGoToSystemInstructions } from "../../../common";
 import { MissionContext } from "../../../missionContext";
 import { MissionNode } from "../../missionNode";

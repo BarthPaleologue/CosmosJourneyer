@@ -18,8 +18,8 @@
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 
-import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
-import { Transformable } from "../architecture/transformable";
+import { HasBoundingSphere } from "../frontend/architecture/hasBoundingSphere";
+import { Transformable } from "../frontend/architecture/transformable";
 
 /**
  * Computes the angular size in radians of an object viewed by a camera

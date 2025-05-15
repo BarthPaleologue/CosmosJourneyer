@@ -26,9 +26,9 @@ import { LandingPad } from "../assets/procedural/landingPad/landingPad";
 import { loadRenderingAssets } from "../assets/renderingAssets";
 import { SoundPlayerMock } from "../audio/soundPlayer";
 import { DefaultControls } from "../defaultControls/defaultControls";
+import { Spaceship } from "../frontend/spaceship/spaceship";
+import { LandingPadSize } from "../frontend/spacestation/landingPad/landingPadManager";
 import { CollisionMask } from "../settings";
-import { Spaceship } from "../spaceship/spaceship";
-import { LandingPadSize } from "../spacestation/landingPad/landingPadManager";
 import { enablePhysics } from "./utils";
 
 export async function createAutomaticLandingScene(

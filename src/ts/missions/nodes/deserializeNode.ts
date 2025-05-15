@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
+import { StarSystemDatabase } from "../../backend/universe/starSystemDatabase";
 import { MissionAsteroidFieldNode } from "./actions/sightseeing/missionAsteroidFieldNode";
 import { MissionAsteroidFieldNodeSerialized } from "./actions/sightseeing/missionAsteroidFieldNodeSerialized";
 import { MissionFlyByNode } from "./actions/sightseeing/missionFlyByNode";

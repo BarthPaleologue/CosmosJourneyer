@@ -43,28 +43,32 @@ import { createNotification, NotificationIntent, NotificationOrigin, updateNotif
 import { positionNearObject } from "@/utils/positionNearObject";
 import { View } from "@/utils/view";
 
-import { generateDarkKnightModel } from "./anomalies/darkKnight/darkKnightModelGenerator";
-import { OrbitalObjectType } from "./architecture/orbitalObjectType";
 import { Assets, loadAssets } from "./assets/assets";
 import { AudioMasks } from "./audio/audioMasks";
 import { MusicConductor } from "./audio/musicConductor";
 import { ISoundPlayer, SoundPlayer, SoundType } from "./audio/soundPlayer";
 import { Tts } from "./audio/tts";
+import { EncyclopaediaGalacticaLocal } from "./backend/encyclopaedia/encyclopaediaGalacticaLocal";
+import { EncyclopaediaGalacticaManager } from "./backend/encyclopaedia/encyclopaediaGalacticaManager";
+import { StarSystemDatabase } from "./backend/universe/starSystemDatabase";
+import { generateDarkKnightModel } from "./frontend/anomalies/darkKnight/darkKnightModelGenerator";
+import { OrbitalObjectType } from "./frontend/architecture/orbitalObjectType";
+import { GeneralInputs } from "./frontend/inputs/generalInputs";
+import { StarSystemView } from "./frontend/starSystemView";
+import { MainMenu } from "./frontend/ui/mainMenu";
+import { PauseMenu } from "./frontend/ui/pauseMenu";
+import { SidePanels } from "./frontend/ui/sidePanels";
+import { TutorialLayer } from "./frontend/ui/tutorial/tutorialLayer";
 import i18n, { initI18n } from "./i18n";
-import { GeneralInputs } from "./inputs/generalInputs";
 import { Player } from "./player/player";
 import { createUrlFromSave, Save } from "./saveFile/saveFileData";
 import { saveLoadingErrorToI18nString } from "./saveFile/saveLoadingError";
 import { SaveLocalBackend } from "./saveFile/saveLocalBackend";
 import { SaveManager } from "./saveFile/saveManager";
 import { Settings } from "./settings";
-import { EncyclopaediaGalacticaLocal } from "./society/encyclopaediaGalacticaLocal";
-import { EncyclopaediaGalacticaManager } from "./society/encyclopaediaGalacticaManager";
 import { StarMap } from "./starmap/starMap";
 import { getLoneStarSystem } from "./starSystem/customSystems/loneStar";
 import { registerCustomSystems } from "./starSystem/customSystems/registerCustomSystems";
-import { StarSystemDatabase } from "./starSystem/starSystemDatabase";
-import { StarSystemView } from "./starSystem/starSystemView";
 import { FlightTutorial } from "./tutorials/flightTutorial";
 import { FuelScoopTutorial } from "./tutorials/fuelScoopTutorial";
 import { StarMapTutorial } from "./tutorials/starMapTutorial";
@@ -72,10 +76,6 @@ import { StationLandingTutorial } from "./tutorials/stationLandingTutorial";
 import { Tutorial } from "./tutorials/tutorial";
 import { LoadingScreen } from "./uberCore/loadingScreen";
 import { UberScene } from "./uberCore/uberScene";
-import { MainMenu } from "./ui/mainMenu";
-import { PauseMenu } from "./ui/pauseMenu";
-import { SidePanels } from "./ui/sidePanels";
-import { TutorialLayer } from "./ui/tutorial/tutorialLayer";
 
 const enum EngineState {
     UNINITIALIZED,

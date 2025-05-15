@@ -1,9 +1,9 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
+import { StarSystemDatabase } from "../backend/universe/starSystemDatabase";
+import { GeneralInputs } from "../frontend/inputs/generalInputs";
 import i18n from "../i18n";
-import { GeneralInputs } from "../inputs/generalInputs";
 import { Settings } from "../settings";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/starSystemCoordinates";
 import { pressInteractionToStrings } from "../utils/strings/inputControlsString";
 import { parseDistance } from "../utils/strings/parseToStrings";

@@ -20,10 +20,10 @@ import { z } from "zod";
 import { UniverseCoordinates, UniverseCoordinatesSchema } from "@/utils/coordinates/universeCoordinates";
 import { DeepReadonly, ok, Result } from "@/utils/types";
 
-import { OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
+import { StarSystemDatabase } from "../../backend/universe/starSystemDatabase";
+import { OrbitalObjectModel } from "../../frontend/architecture/orbitalObjectModel";
+import { getDefaultSerializedSpaceship } from "../../frontend/spaceship/serializedSpaceship";
 import { SerializedPlayerSchema } from "../../player/serializedPlayer";
-import { getDefaultSerializedSpaceship } from "../../spaceship/serializedSpaceship";
-import { StarSystemDatabase } from "../../starSystem/starSystemDatabase";
 import { SaveLoadingError } from "../saveLoadingError";
 import { safeParseSaveV1, SaveV1, SystemObjectType } from "../v1/saveV1";
 

@@ -17,12 +17,12 @@
 
 import { Observable } from "@babylonjs/core/Misc/observable";
 
+import { SpaceDiscoveryData } from "../backend/society/encyclopaediaGalactica";
+import { StarSystemDatabase } from "../backend/universe/starSystemDatabase";
+import { SerializedComponent } from "../frontend/spaceship/serializedComponents/component";
+import { getDefaultSerializedSpaceship, SerializedSpaceship } from "../frontend/spaceship/serializedSpaceship";
+import { Spaceship } from "../frontend/spaceship/spaceship";
 import { Mission } from "../missions/mission";
-import { SpaceDiscoveryData } from "../society/encyclopaediaGalactica";
-import { SerializedComponent } from "../spaceship/serializedComponents/component";
-import { getDefaultSerializedSpaceship, SerializedSpaceship } from "../spaceship/serializedSpaceship";
-import { Spaceship } from "../spaceship/spaceship";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { StarSystemCoordinates } from "../utils/coordinates/starSystemCoordinates";
 import { UniverseObjectId } from "../utils/coordinates/universeObjectId";
 import { CompletedTutorials, SerializedPlayer } from "./serializedPlayer";

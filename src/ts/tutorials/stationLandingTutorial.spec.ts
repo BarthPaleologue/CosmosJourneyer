@@ -17,9 +17,9 @@
 
 import { describe, expect, it } from "vitest";
 
-import { OrbitalObjectType } from "../architecture/orbitalObjectType";
+import { StarSystemDatabase } from "../backend/universe/starSystemDatabase";
+import { OrbitalObjectType } from "../frontend/architecture/orbitalObjectType";
 import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
 import { StationLandingTutorial } from "./stationLandingTutorial";
 
 describe("StationLandingTutorial", () => {

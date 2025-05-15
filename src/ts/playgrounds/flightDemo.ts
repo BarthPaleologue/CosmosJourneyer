@@ -24,8 +24,8 @@ import { Scene } from "@babylonjs/core/scene";
 import { loadRenderingAssets } from "../assets/renderingAssets";
 import { SoundPlayerMock } from "../audio/soundPlayer";
 import { TtsMock } from "../audio/tts";
-import { ShipControls } from "../spaceship/shipControls";
-import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
+import { ShipControls } from "../frontend/spaceship/shipControls";
+import { SpaceShipControlsInputs } from "../frontend/spaceship/spaceShipControlsInputs";
 import { enablePhysics } from "./utils";
 
 export async function createFlightDemoScene(

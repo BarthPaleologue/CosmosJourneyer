@@ -17,7 +17,7 @@
 
 import { z } from "zod";
 
-import { getOrbitalObjectTypeStringId, OrbitalObjectType } from "../../architecture/orbitalObjectType";
+import { getOrbitalObjectTypeStringId, OrbitalObjectType } from "../../frontend/architecture/orbitalObjectType";
 
 export const OrbitalObjectIdSchema = z.string();
 

@@ -18,9 +18,9 @@
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
-import { OrbitalObjectBase } from "../architecture/orbitalObjectBase";
-import { OrbitalObjectModelBase } from "../architecture/orbitalObjectModelBase";
-import { OrbitalObjectType } from "../architecture/orbitalObjectType";
+import { OrbitalObjectBase } from "../frontend/architecture/orbitalObjectBase";
+import { OrbitalObjectModelBase } from "../frontend/architecture/orbitalObjectModelBase";
+import { OrbitalObjectType } from "../frontend/architecture/orbitalObjectType";
 import { DeepReadonly } from "./types";
 
 export class CustomOrbitalObject implements OrbitalObjectBase<OrbitalObjectType.CUSTOM> {

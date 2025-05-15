@@ -21,8 +21,8 @@ import { expect, test } from "vitest";
 import { starSystemCoordinatesEquals } from "@/utils/coordinates/starSystemCoordinates";
 import { getNeighborStarSystemCoordinates } from "@/utils/getNeighborStarSystems";
 
+import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { getLoneStarSystem } from "@/starSystem/customSystems/loneStar";
-import { StarSystemDatabase } from "@/starSystem/starSystemDatabase";
 
 test("getNeighborStarSystemCoordinates", () => {
     const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
