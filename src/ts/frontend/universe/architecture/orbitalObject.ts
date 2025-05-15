@@ -17,15 +17,15 @@
 
 import { CustomOrbitalObject } from "@/utils/customOrbitalObject";
 
+import { DarkKnight } from "../darkKnight";
+import { EmptyCelestialBody } from "../emptyCelestialBody";
+import { SpaceElevator } from "../orbitalFacility/spaceElevator";
+import { SpaceStation } from "../orbitalFacility/spaceStation";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { Star } from "../stellarObjects/star/star";
-import { DarkKnight } from "../universe/darkKnight";
-import { EmptyCelestialBody } from "../universe/emptyCelestialBody";
-import { SpaceElevator } from "../universe/orbitalFacility/spaceElevator";
-import { SpaceStation } from "../universe/orbitalFacility/spaceStation";
 import { OrbitalObjectType } from "./orbitalObjectType";
 
 export type StellarObject = Star | NeutronStar | BlackHole;

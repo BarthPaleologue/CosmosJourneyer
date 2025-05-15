@@ -23,10 +23,10 @@ import { getAngularSize } from "@/utils/isObjectVisibleOnScreen";
 import { smoothstep } from "@/utils/math";
 import { parseDistance, parseSecondsRough } from "@/utils/strings/parseToStrings";
 
-import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
-import { ObjectTargetCursorType, Targetable } from "../architecture/targetable";
-import { Transformable } from "../architecture/transformable";
-import { TypedObject } from "../architecture/typedObject";
+import { HasBoundingSphere } from "../universe/architecture/hasBoundingSphere";
+import { ObjectTargetCursorType, Targetable } from "../universe/architecture/targetable";
+import { Transformable } from "../universe/architecture/transformable";
+import { TypedObject } from "../universe/architecture/typedObject";
 
 export class ObjectTargetCursor {
     readonly htmlRoot: HTMLDivElement;

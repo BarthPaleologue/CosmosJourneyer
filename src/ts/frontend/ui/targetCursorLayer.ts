@@ -19,10 +19,10 @@ import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { IDisposable } from "@babylonjs/core/scene";
 
-import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
-import { Targetable } from "../architecture/targetable";
-import { Transformable } from "../architecture/transformable";
-import { TypedObject } from "../architecture/typedObject";
+import { HasBoundingSphere } from "../universe/architecture/hasBoundingSphere";
+import { Targetable } from "../universe/architecture/targetable";
+import { Transformable } from "../universe/architecture/transformable";
+import { TypedObject } from "../universe/architecture/typedObject";
 import { ObjectTargetCursor } from "./objectTargetCursor";
 
 export class TargetCursorLayer implements IDisposable {

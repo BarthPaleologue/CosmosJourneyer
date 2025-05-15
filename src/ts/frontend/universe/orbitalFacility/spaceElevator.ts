@@ -35,8 +35,6 @@ import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectT
 import { DeepReadonly } from "@/utils/types";
 
 import { Settings } from "../../../settings";
-import { ObjectTargetCursorType, Targetable, TargetInfo } from "../../architecture/targetable";
-import { Transformable } from "../../architecture/transformable";
 import { SpaceElevatorClimber } from "../../assets/procedural/spaceStation/climber/spaceElevatorClimber";
 import { CylinderHabitat } from "../../assets/procedural/spaceStation/habitats/cylinder/cylinderHabitat";
 import { HelixHabitat } from "../../assets/procedural/spaceStation/habitats/helix/helixHabitat";
@@ -50,6 +48,8 @@ import { UtilitySection } from "../../assets/procedural/spaceStation/utilitySect
 import { RenderingAssets } from "../../assets/renderingAssets";
 import { setUpVector } from "../../uberCore/transforms/basicTransform";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
+import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
+import { Transformable } from "../architecture/transformable";
 import { StellarObjectModel } from "../frontend/architecture/orbitalObjectModel";
 import { OrbitalFacilityBase } from "./orbitalFacility";
 

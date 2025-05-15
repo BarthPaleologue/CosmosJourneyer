@@ -25,10 +25,10 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { createEmptyTexture } from "@/utils/proceduralTexture";
 
-import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
-import { LightEmitter } from "../architecture/lightEmitter";
 import { CloudsUniforms } from "../clouds/cloudsUniforms";
 import { RingsSamplerNames, RingsUniformNames, RingsUniforms } from "../frontend/rings/ringsUniform";
+import { HasBoundingSphere } from "../universe/architecture/hasBoundingSphere";
+import { LightEmitter } from "../universe/architecture/lightEmitter";
 import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms";
 import { ObjectUniformNames, setObjectUniforms } from "./uniforms/objectUniforms";
 import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUniforms";

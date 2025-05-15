@@ -29,7 +29,7 @@ import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { createEnvironmentAggregate } from "@/utils/havok";
 import { wheelOfFortune } from "@/utils/random";
 
-import { Transformable } from "../../../architecture/transformable";
+import { Transformable } from "../../../universe/architecture/transformable";
 import { RenderingAssets } from "../../renderingAssets";
 import { SolarPanelMaterial } from "../solarPanel/solarPanelMaterial";
 import { MetalSectionMaterial } from "./metalSectionMaterial";

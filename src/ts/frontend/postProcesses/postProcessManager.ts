@@ -40,7 +40,6 @@ import { SierpinskiPyramidModel } from "@/backend/universe/orbitalObjects/anomal
 import { getRgbFromTemperature } from "@/utils/specrend";
 import { DeepReadonly } from "@/utils/types";
 
-import { CelestialBody, StellarObject } from "../architecture/orbitalObject";
 import { Textures } from "../assets/textures";
 import { AtmosphericScatteringPostProcess } from "../atmosphere/atmosphericScatteringPostProcess";
 import { FlatCloudsPostProcess } from "../clouds/flatCloudsPostProcess";
@@ -52,6 +51,7 @@ import { BlackHolePostProcess } from "../stellarObjects/blackHole/blackHolePostP
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { Star } from "../stellarObjects/star/star";
 import { UberScene } from "../uberCore/uberScene";
+import { CelestialBody, StellarObject } from "../universe/architecture/orbitalObject";
 import { JuliaSetPostProcess } from "./anomalies/julia/juliaSetPostProcess";
 import { MandelboxPostProcess } from "./anomalies/mandelbox/mandelboxPostProcess";
 import { MandelbulbPostProcess } from "./anomalies/mandelbulb/mandelbulbPostProcess";

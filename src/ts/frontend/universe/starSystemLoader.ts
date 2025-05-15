@@ -26,14 +26,14 @@ import { DeepReadonly, isNonEmptyArray, NonEmptyArray } from "@/utils/types";
 import { wait } from "@/utils/wait";
 
 import { RenderingAssets } from "../../assets/renderingAssets";
-import { Anomaly, OrbitalFacility, Planet, StellarObject } from "../architecture/orbitalObject";
-import { AnomalyModel, PlanetModel, StellarObjectModel } from "../architecture/orbitalObjectModel";
-import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { Star } from "../stellarObjects/star/star";
+import { Anomaly, OrbitalFacility, Planet, StellarObject } from "./architecture/orbitalObject";
+import { AnomalyModel, PlanetModel, StellarObjectModel } from "./architecture/orbitalObjectModel";
+import { OrbitalObjectType } from "./architecture/orbitalObjectType";
 import { DarkKnight } from "./darkKnight";
 import { EmptyCelestialBody } from "./emptyCelestialBody";
 import { SpaceElevator } from "./orbitalFacility/spaceElevator";

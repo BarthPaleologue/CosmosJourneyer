@@ -41,14 +41,14 @@ import {
     roll,
     yaw,
 } from "../../uberCore/transforms/basicTransform";
-import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
-import { Transformable } from "../architecture/transformable";
 import { LandingPadSize } from "../assets/procedural/spaceStation/landingPad/landingPadManager";
 import { ManagesLandingPads } from "../assets/procedural/spaceStation/landingPad/managesLandingPads";
 import { RenderingAssets } from "../assets/renderingAssets";
 import { ISoundPlayer } from "../audio/soundPlayer";
 import { ITts, Speaker, VoiceLine } from "../audio/tts";
 import { StarSystemInputs } from "../inputs/starSystemInputs";
+import { HasBoundingSphere } from "../universe/architecture/hasBoundingSphere";
+import { Transformable } from "../universe/architecture/transformable";
 import { canEngageWarpDrive } from "./components/warpDriveUtils";
 import { Spaceship } from "./spaceship";
 import { SpaceShipControlsInputs } from "./spaceShipControlsInputs";

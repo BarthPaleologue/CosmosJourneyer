@@ -7,9 +7,9 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { Scene } from "@babylonjs/core/scene";
 
-import { ObjectTargetCursorType, TargetInfo } from "../../../architecture/targetable";
 import i18n from "../../../i18n";
 import { CollisionMask, Settings } from "../../../settings";
+import { ObjectTargetCursorType, TargetInfo } from "../../../universe/architecture/targetable";
 import { RenderingAssets } from "../../renderingAssets";
 import { ILandingPad, LandingPadSize } from "../spaceStation/landingPad/landingPadManager";
 import { LandingPadMaterial } from "./landingPadMaterial";

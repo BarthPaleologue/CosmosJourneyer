@@ -19,7 +19,7 @@ import { describe, expect, it } from "vitest";
 
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
-import { OrbitalObjectType } from "../frontend/architecture/orbitalObjectType";
+import { OrbitalObjectType } from "../frontend/universe/architecture/orbitalObjectType";
 import { Mission } from "../missions/mission";
 import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
 import { StarMapTutorial } from "./starMapTutorial";

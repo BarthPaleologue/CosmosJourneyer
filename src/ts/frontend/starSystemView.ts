@@ -51,10 +51,6 @@ import { CharacterControls } from "../characterControls/characterControls";
 import { CharacterInputs } from "../characterControls/characterControlsInputs";
 import { DefaultControls } from "../defaultControls/defaultControls";
 import { DefaultControlsInputs } from "../defaultControls/defaultControlsInputs";
-import { HasBoundingSphere } from "../frontend/architecture/hasBoundingSphere";
-import { OrbitalObjectType } from "../frontend/architecture/orbitalObjectType";
-import { Transformable } from "../frontend/architecture/transformable";
-import { TypedObject } from "../frontend/architecture/typedObject";
 import { StarSystemInputs } from "../frontend/inputs/starSystemInputs";
 import { StarSystemController } from "../frontend/universe/starSystemController";
 import { StarSystemLoader } from "../frontend/universe/starSystemLoader";
@@ -86,6 +82,10 @@ import { UberScene } from "../uberCore/uberScene";
 import { SpaceShipLayer } from "../ui/spaceShipLayer";
 import { SpaceStationLayer } from "../ui/spaceStation/spaceStationLayer";
 import { TargetCursorLayer } from "../ui/targetCursorLayer";
+import { HasBoundingSphere } from "./universe/architecture/hasBoundingSphere";
+import { OrbitalObjectType } from "./universe/architecture/orbitalObjectType";
+import { Transformable } from "./universe/architecture/transformable";
+import { TypedObject } from "./universe/architecture/typedObject";
 
 // register cosmos journeyer as part of window object
 declare global {

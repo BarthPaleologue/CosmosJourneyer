@@ -25,7 +25,7 @@ import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { loadRenderingAssets } from "../assets/renderingAssets";
 import { DefaultControls } from "../defaultControls/defaultControls";
-import { OrbitalObjectType } from "../frontend/architecture/orbitalObjectType";
+import { OrbitalObjectType } from "../frontend/universe/architecture/orbitalObjectType";
 import { SpaceStation } from "../frontend/universe/orbitalFacility/spaceStation";
 import { Settings } from "../settings";
 import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";

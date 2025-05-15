@@ -17,8 +17,8 @@
 
 import { getStellarTypeFromTemperature } from "@/backend/universe/proceduralGenerators/stellarObjects/starModelGenerator";
 
-import { OrbitalObjectModel } from "../../frontend/architecture/orbitalObjectModel";
-import { OrbitalObjectType } from "../../frontend/architecture/orbitalObjectType";
+import { OrbitalObjectModel } from "../../frontend/universe/architecture/orbitalObjectModel";
+import { OrbitalObjectType } from "../../frontend/universe/architecture/orbitalObjectType";
 import i18n from "../../i18n";
 import { DeepReadonly } from "../types";
 

@@ -32,8 +32,6 @@ import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectT
 import { DeepReadonly } from "@/utils/types";
 
 import { Settings } from "../../../settings";
-import { ObjectTargetCursorType, Targetable, TargetInfo } from "../../architecture/targetable";
-import { Transformable } from "../../architecture/transformable";
 import { EngineBay } from "../../assets/procedural/spaceStation/engineBay";
 import { CylinderHabitat } from "../../assets/procedural/spaceStation/habitats/cylinder/cylinderHabitat";
 import { HelixHabitat } from "../../assets/procedural/spaceStation/habitats/helix/helixHabitat";
@@ -45,6 +43,8 @@ import { SpaceStationNodeType } from "../../assets/procedural/spaceStation/space
 import { UtilitySection } from "../../assets/procedural/spaceStation/utilitySection";
 import { RenderingAssets } from "../../assets/renderingAssets";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
+import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
+import { Transformable } from "../architecture/transformable";
 import { StellarObjectModel } from "../frontend/architecture/orbitalObjectModel";
 import { OrbitalFacilityBase } from "./orbitalFacility";
 

@@ -29,7 +29,7 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { createEnvironmentAggregate } from "@/utils/havok";
 
-import { Transformable } from "../../../architecture/transformable";
+import { Transformable } from "../../../universe/architecture/transformable";
 import { RenderingAssets } from "../../renderingAssets";
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 

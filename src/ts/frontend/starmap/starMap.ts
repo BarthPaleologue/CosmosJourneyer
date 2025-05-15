@@ -43,7 +43,6 @@ import { getRgbFromTemperature } from "@/utils/specrend";
 import { ThickLines } from "@/utils/thickLines";
 import { View } from "@/utils/view";
 
-import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
 import { Player } from "../player/player";
 import { Settings } from "../settings";
@@ -52,6 +51,7 @@ import { CameraRadiusAnimation } from "../uberCore/transforms/animations/radius"
 import { TransformRotationAnimation } from "../uberCore/transforms/animations/rotation";
 import { TransformTranslationAnimation } from "../uberCore/transforms/animations/translation";
 import { translate } from "../uberCore/transforms/basicTransform";
+import { OrbitalObjectType } from "../universe/architecture/orbitalObjectType";
 import { StarMapControls } from "./starMapControls";
 import { StarMapInputs } from "./starMapInputs";
 import { StarMapUI } from "./starMapUI";

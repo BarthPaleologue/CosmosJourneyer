@@ -15,9 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
+
 import { AsteroidField } from "../asteroidFields/asteroidField";
-import { RingsModel } from "../frontend/rings/ringsModel";
-import { RingsUniforms } from "../frontend/rings/ringsUniform";
 
 /**
  * Describes objects that can have a ring system
@@ -32,8 +32,4 @@ export interface CanHaveRings {
      * Returns the asteroid belt of the object's ring, or null if the object has no rings
      */
     readonly asteroidField: AsteroidField | null;
-}
-
-export interface CanHaveRingsModel {
-    readonly rings: RingsModel | null;
 }

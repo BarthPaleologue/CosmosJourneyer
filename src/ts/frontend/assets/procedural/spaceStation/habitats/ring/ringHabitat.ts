@@ -24,8 +24,8 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { Scene } from "@babylonjs/core/scene";
 
-import { Transformable } from "@/frontend/architecture/transformable";
 import { Textures } from "@/frontend/assets/textures";
+import { Transformable } from "@/frontend/universe/architecture/transformable";
 
 import { createRing } from "@/utils/geometry/ringBuilder";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";

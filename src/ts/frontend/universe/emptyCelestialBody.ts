@@ -25,8 +25,8 @@ import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObje
 import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
 import { DeepReadonly } from "@/utils/types";
 
-import { CelestialBodyBase } from "../architecture/celestialBody";
-import { defaultTargetInfoCelestialBody, TargetInfo } from "../architecture/targetable";
+import { CelestialBodyBase } from "./architecture/celestialBody";
+import { defaultTargetInfoCelestialBody, TargetInfo } from "./architecture/targetable";
 
 export class EmptyCelestialBody<TObjectType extends OrbitalObjectType> implements CelestialBodyBase<TObjectType> {
     readonly model: Extract<DeepReadonly<CelestialBodyModel>, { type: TObjectType }>;

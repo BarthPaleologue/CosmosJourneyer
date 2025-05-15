@@ -20,7 +20,7 @@ import { z } from "zod";
 import { StarSystemModel } from "@/backend/universe/starSystemModel";
 
 import { orbitalObjectIdEquals, OrbitalObjectIdSchema } from "../../backend/universe/orbitalObjects/orbitalObjectId";
-import { OrbitalObjectModel } from "../../frontend/architecture/orbitalObjectModel";
+import { OrbitalObjectModel } from "../../frontend/universe/architecture/orbitalObjectModel";
 import { DeepReadonly } from "../types";
 import { starSystemCoordinatesEquals, StarSystemCoordinatesSchema } from "./starSystemCoordinates";
 

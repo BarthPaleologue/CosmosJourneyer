@@ -17,8 +17,8 @@
 
 import { getObjectModelById, StarSystemModel } from "@/backend/universe/starSystemModel";
 
-import { OrbitalObjectModel, StellarObjectModel } from "../frontend/architecture/orbitalObjectModel";
-import { OrbitalObjectType } from "../frontend/architecture/orbitalObjectType";
+import { OrbitalObjectModel, StellarObjectModel } from "../frontend/universe/architecture/orbitalObjectModel";
+import { OrbitalObjectType } from "../frontend/universe/architecture/orbitalObjectType";
 import { DeepReadonly } from "./types";
 
 export function getDistancesToStellarObjects(

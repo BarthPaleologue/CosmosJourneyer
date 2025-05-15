@@ -28,7 +28,6 @@ import { DeepReadonly } from "@/utils/types";
 
 import packageInfo from "../../../../package.json";
 import i18n from "../../i18n";
-import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
 import { DefaultControls } from "../defaultControls/defaultControls";
 import { StarSystemView } from "../starSystemView";
@@ -36,6 +35,7 @@ import { TransformRotationAnimation } from "../uberCore/transforms/animations/ro
 import { TransformTranslationAnimation } from "../uberCore/transforms/animations/translation";
 import { getForwardDirection } from "../uberCore/transforms/basicTransform";
 import { UberScene } from "../uberCore/uberScene";
+import { OrbitalObjectType } from "../universe/architecture/orbitalObjectType";
 import { PanelType, SidePanels } from "./sidePanels";
 
 export class MainMenu {

@@ -17,10 +17,10 @@
 
 import { Cullable } from "@/utils/cullable";
 
-import { OrbitalObjectBase } from "../../architecture/orbitalObjectBase";
-import { Targetable } from "../../architecture/targetable";
 import { ManagesLandingPads } from "../../assets/procedural/spaceStation/landingPad/managesLandingPads";
+import { OrbitalObjectBase } from "../architecture/orbitalObjectBase";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
+import { Targetable } from "../architecture/targetable";
 
 export interface OrbitalFacilityBase<T extends OrbitalObjectType>
     extends OrbitalObjectBase<T>,

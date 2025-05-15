@@ -18,8 +18,8 @@
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
-import { OrbitalObjectBase } from "../frontend/architecture/orbitalObjectBase";
-import { OrbitalObjectType } from "../frontend/architecture/orbitalObjectType";
+import { OrbitalObjectBase } from "../frontend/universe/architecture/orbitalObjectBase";
+import { OrbitalObjectType } from "../frontend/universe/architecture/orbitalObjectType";
 import { OrbitalObjectModelBase } from "../orbitalObjectModelBase";
 import { DeepReadonly } from "./types";
 

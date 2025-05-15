@@ -26,7 +26,7 @@ import {
     getRotationAngle,
     setOrbitalPosition,
     setRotation,
-} from "@/frontend/architecture/orbitalObjectUtils";
+} from "@/frontend/universe/architecture/orbitalObjectUtils";
 
 import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
 import { SystemTarget } from "@/utils/systemTarget";
@@ -40,6 +40,10 @@ import { StarFieldBox } from "../../starSystem/starFieldBox";
 import { StarSystemLoader } from "../../starSystem/starSystemLoader";
 import { translate } from "../../uberCore/transforms/basicTransform";
 import { UberScene } from "../../uberCore/uberScene";
+import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
+import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge";
+import { BlackHole } from "../stellarObjects/blackHole/blackHole";
+import { Star } from "../stellarObjects/star/star";
 import {
     Anomaly,
     CelestialBody,
@@ -47,12 +51,8 @@ import {
     OrbitalObject,
     Planet,
     StellarObject,
-} from "../architecture/orbitalObject";
-import { OrbitalObjectType } from "../architecture/orbitalObjectType";
-import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
-import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge";
-import { BlackHole } from "../stellarObjects/blackHole/blackHole";
-import { Star } from "../stellarObjects/star/star";
+} from "./architecture/orbitalObject";
+import { OrbitalObjectType } from "./architecture/orbitalObjectType";
 
 export type PlanetarySystem = {
     readonly planets: Planet[];
