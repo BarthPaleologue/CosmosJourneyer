@@ -19,13 +19,15 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { centeredRand } from "extended-random";
 import { makeNoise3D } from "fast-simplex-noise/lib/3d";
 
-import { OrbitalObjectModel } from "../../frontend/architecture/orbitalObjectModel";
-import { Settings } from "../../settings";
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../../utils/coordinates/starSystemCoordinates";
-import { UniverseObjectId } from "../../utils/coordinates/universeObjectId";
-import { getRngFromSeed } from "../../utils/getRngFromSeed";
-import { hashVec3 } from "../../utils/hash";
-import { DeepReadonly } from "../../utils/types";
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/utils/coordinates/starSystemCoordinates";
+import { UniverseObjectId } from "@/utils/coordinates/universeObjectId";
+import { getRngFromSeed } from "@/utils/getRngFromSeed";
+import { hashVec3 } from "@/utils/hash";
+import { DeepReadonly } from "@/utils/types";
+
+import { Settings } from "@/settings";
+
+import { OrbitalObjectModel } from "./orbitalObjects/index";
 import { newSeededStarSystemModel } from "./seededStarSystemModel";
 import { getObjectModelById, StarSystemModel } from "./starSystemModel";
 

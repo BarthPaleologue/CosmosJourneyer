@@ -19,8 +19,8 @@ import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
-import { newSeededSpaceStationModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/spaceStationModelGenerator";
 import { StarModel } from "@/backend/universe/orbitalObjects/stellarObjects/starModel";
+import { newSeededSpaceStationModel } from "@/backend/universe/proceduralGenerators/orbitalFacilities/spaceStationModelGenerator";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { loadRenderingAssets } from "../assets/renderingAssets";

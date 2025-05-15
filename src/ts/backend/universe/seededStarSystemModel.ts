@@ -18,32 +18,34 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { centeredRand, randRangeInt, uniformRandBool } from "extended-random";
 
-import { OrbitalObjectType } from "../../frontend/architecture/orbitalObjectType";
-import { Settings } from "../../settings";
-import { StarSystemCoordinates } from "../../utils/coordinates/starSystemCoordinates";
-import { getRngFromSeed } from "../../utils/getRngFromSeed";
-import { wheelOfFortune } from "../../utils/random";
-import { Alphabet, ReversedGreekAlphabet } from "../../utils/strings/parseToStrings";
-import { romanNumeral } from "../../utils/strings/romanNumerals";
-import { generateStarName } from "../../utils/strings/starNameGenerator";
-import { isNonEmptyArray } from "../../utils/types";
+import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
+import { getRngFromSeed } from "@/utils/getRngFromSeed";
+import { wheelOfFortune } from "@/utils/random";
+import { Alphabet, ReversedGreekAlphabet } from "@/utils/strings/parseToStrings";
+import { romanNumeral } from "@/utils/strings/romanNumerals";
+import { generateStarName } from "@/utils/strings/starNameGenerator";
+import { isNonEmptyArray } from "@/utils/types";
+
+import { Settings } from "@/settings";
+
 import {
     AnomalyModel,
     AnomalyType,
     OrbitalFacilityModel,
     PlanetModel,
     StellarObjectModel,
-} from "../architecture/orbitalObjectModel";
-import { newSeededGasPlanetModel } from "./orbitalObjects/gasPlanetModelGenerator";
-import { newSeededSpaceElevatorModel } from "./orbitalObjects/orbitalFacilities/spaceElevatorModelGenerator";
-import { newSeededSpaceStationModel } from "./orbitalObjects/orbitalFacilities/spaceStationModelGenerator";
+} from "./orbitalObjects/index";
 import { createOrbitalObjectId } from "./orbitalObjects/orbitalObjectId";
+import { OrbitalObjectType } from "./orbitalObjects/orbitalObjectType";
 import { TelluricSatelliteModel } from "./orbitalObjects/telluricSatelliteModel";
 import { newSeededJuliaSetModel } from "./proceduralGenerators/anomalies/juliaSetModelGenerator";
 import { newSeededMandelboxModel } from "./proceduralGenerators/anomalies/mandelboxModelGenerator";
 import { newSeededMandelbulbModel } from "./proceduralGenerators/anomalies/mandelbulbModelGenerator";
 import { newSeededMengerSpongeModel } from "./proceduralGenerators/anomalies/mengerSpongeModelGenerator";
 import { newSeededSierpinskiPyramidModel } from "./proceduralGenerators/anomalies/sierpinskiPyramidModelGenerator";
+import { newSeededGasPlanetModel } from "./proceduralGenerators/gasPlanetModelGenerator";
+import { newSeededSpaceElevatorModel } from "./proceduralGenerators/orbitalFacilities/spaceElevatorModelGenerator";
+import { newSeededSpaceStationModel } from "./proceduralGenerators/orbitalFacilities/spaceStationModelGenerator";
 import { newSeededBlackHoleModel } from "./proceduralGenerators/stellarObjects/blackHoleModelGenerator";
 import { newSeededNeutronStarModel } from "./proceduralGenerators/stellarObjects/neutronStarModelGenerator";
 import { newSeededStarModel } from "./proceduralGenerators/stellarObjects/starModelGenerator";

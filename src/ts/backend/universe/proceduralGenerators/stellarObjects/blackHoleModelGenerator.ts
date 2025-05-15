@@ -22,8 +22,9 @@ import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { estimateStarRadiusFromMass } from "@/utils/physics";
 import { DeepReadonly } from "@/utils/types";
 
-import { Settings } from "../../../../settings";
-import { CelestialBodyModel } from "../../architecture/orbitalObjectModel";
+import { Settings } from "@/settings";
+
+import { CelestialBodyModel } from "../../orbitalObjects/index";
 import { Orbit } from "../../orbitalObjects/orbit";
 import { OrbitalObjectType } from "../../orbitalObjects/orbitalObjectType";
 import { BlackHoleModel } from "../../orbitalObjects/stellarObjects/blackHoleModel";

@@ -24,10 +24,10 @@ import { getOrbitRadiusFromPeriod } from "../../../../utils/physics";
 import { randomPieChart } from "../../../../utils/random";
 import { generateSpaceElevatorName } from "../../../../utils/strings/spaceStationNameGenerator";
 import { getFactionFromGalacticPosition } from "../../../society/factions";
-import { PlanetModel } from "../architecture/orbitalObjectModel";
-import { Orbit } from "../orbit";
-import { OrbitalObjectType } from "../orbitalObjectType";
-import { SpaceElevatorModel } from "./spaceElevatorModel";
+import { PlanetModel } from "../../orbitalObjects/index";
+import { Orbit } from "../../orbitalObjects/orbit";
+import { SpaceElevatorModel } from "../../orbitalObjects/orbitalFacilities/spaceElevatorModel";
+import { OrbitalObjectType } from "../../orbitalObjects/orbitalObjectType";
 
 export function newSeededSpaceElevatorModel(
     id: string,

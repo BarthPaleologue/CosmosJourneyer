@@ -15,10 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { RingsModel } from "../../../../frontend/rings/ringsModel";
 import { HasSeed } from "../hasSeed";
 import { CelestialBodyModelBase } from "../orbitalObjectModelBase";
 import { OrbitalObjectType } from "../orbitalObjectType";
+import { RingsModel } from "../ringsModel";
 
 export type NeutronStarModel = CelestialBodyModelBase<OrbitalObjectType.NEUTRON_STAR> &
     HasSeed & {

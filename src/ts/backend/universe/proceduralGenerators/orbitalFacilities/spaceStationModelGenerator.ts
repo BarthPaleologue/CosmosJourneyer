@@ -27,10 +27,10 @@ import { clamp } from "../../../../utils/math";
 import { randomPieChart } from "../../../../utils/random";
 import { generateSpaceStationName } from "../../../../utils/strings/spaceStationNameGenerator";
 import { getFactionFromGalacticPosition } from "../../../society/factions";
+import { Orbit } from "../../orbitalObjects/orbit";
+import { SpaceStationModel } from "../../orbitalObjects/orbitalFacilities/spacestationModel";
+import { OrbitalObjectType } from "../../orbitalObjects/orbitalObjectType";
 import { CelestialBodyModel } from "../architecture/orbitalObjectModel";
-import { Orbit } from "../orbit";
-import { OrbitalObjectType } from "../orbitalObjectType";
-import { SpaceStationModel } from "./spacestationModel";
 
 export function newSeededSpaceStationModel(
     id: string,

@@ -24,7 +24,7 @@ import { celsiusToKelvin, getOrbitRadiusFromPeriod } from "@/utils/physics";
 import { Settings } from "@/settings";
 
 import { newSeededGasPlanetModel } from "../orbitalObjects/gasPlanetModelGenerator";
-import { newSeededSpaceStationModel } from "../orbitalObjects/orbitalFacilities/spaceStationModelGenerator";
+import { newSeededSpaceStationModel } from "../proceduralGenerators/orbitalFacilities/spaceStationModelGenerator";
 import { newSeededStarModel } from "../proceduralGenerators/stellarObjects/starModelGenerator";
 import { newSeededTelluricPlanetModel } from "../proceduralGenerators/telluricPlanetModelGenerator";
 import { newSeededTelluricSatelliteModel } from "../proceduralGenerators/telluricSatelliteModelGenerator";
