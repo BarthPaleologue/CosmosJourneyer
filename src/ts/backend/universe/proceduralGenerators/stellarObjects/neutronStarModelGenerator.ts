@@ -17,16 +17,15 @@
 
 import { normalRandom, randRange, randRangeInt, uniformRandBool } from "extended-random";
 
+import { OrbitalObjectModel } from "@/backend/universe/orbitalObjects/index";
+import { Orbit } from "@/backend/universe/orbitalObjects/orbit";
+import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
+import { newSeededRingsModel } from "@/backend/universe/orbitalObjects/ringsModel";
 import { NeutronStarModel } from "@/backend/universe/orbitalObjects/stellarObjects/neutronStarModel";
 
 import { GenerationSteps } from "@/utils/generationSteps";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { clamp } from "@/utils/math";
-
-import { OrbitalObjectModel } from "../../architecture/orbitalObjectModel";
-import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
-import { Orbit } from "../../orbit/orbit";
-import { newSeededRingsModel } from "../../rings/ringsModel";
 
 /**
  * Creates a new pseudo-random neutron star model
