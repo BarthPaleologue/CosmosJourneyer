@@ -15,11 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AtmosphereModel } from "../../../atmosphere/atmosphereModel";
-import { HasSeed } from "../../../frontend/architecture/hasSeed";
-import { OrbitalObjectType } from "../../../frontend/architecture/orbitalObjectType";
-import { RingsModel } from "../../../frontend/rings/ringsModel";
-import { OrbitalObjectModelBase } from "../orbitalObjectModelBase";
+import { AtmosphereModel } from "./atmosphereModel";
+import { HasSeed } from "./hasSeed";
+import { OrbitalObjectModelBase } from "./orbitalObjectModelBase";
+import { OrbitalObjectType } from "./orbitalObjectType";
+import { RingsModel } from "./ringsModel";
 
 export type GasPlanetModel = OrbitalObjectModelBase<OrbitalObjectType.GAS_PLANET> &
     HasSeed & {

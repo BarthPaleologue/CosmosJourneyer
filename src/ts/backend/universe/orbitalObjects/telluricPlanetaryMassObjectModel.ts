@@ -17,11 +17,11 @@
 
 import { CloudsModel } from "@/backend/universe/orbitalObjects/cloudsModel";
 
+import { TerrainSettings } from "../../../frontend/universe/planets/telluricPlanet/terrain/terrainSettings";
 import { CelestialBodyModelBase } from "../../architecture/orbitalObjectModelBase";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { AtmosphereModel } from "../../atmosphere/atmosphereModel";
 import { OceanModel } from "../../ocean/oceanModel";
-import { TerrainSettings } from "./terrain/terrainSettings";
 
 export type TelluricPlanetaryMassObjectModelBase<T extends OrbitalObjectType> = CelestialBodyModelBase<T> & {
     readonly waterAmount: number;

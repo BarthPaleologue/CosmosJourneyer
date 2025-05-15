@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { OrbitalObjectId } from "../../utils/coordinates/orbitalObjectId";
 import { StarSystemCoordinates } from "../../utils/coordinates/starSystemCoordinates";
 import { DeepReadonly, NonEmptyArray } from "../../utils/types";
 import {
@@ -25,6 +24,7 @@ import {
     PlanetModel,
     StellarObjectModel,
 } from "../architecture/orbitalObjectModel";
+import { OrbitalObjectId } from "./orbitalObjects/orbitalObjectId";
 import { TelluricSatelliteModel } from "./orbitalObjects/telluricSatelliteModel";
 
 /**

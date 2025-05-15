@@ -19,9 +19,9 @@ import { z } from "zod";
 
 import { StarSystemModel } from "@/backend/universe/starSystemModel";
 
+import { orbitalObjectIdEquals, OrbitalObjectIdSchema } from "../../backend/universe/orbitalObjects/orbitalObjectId";
 import { OrbitalObjectModel } from "../../frontend/architecture/orbitalObjectModel";
 import { DeepReadonly } from "../types";
-import { orbitalObjectIdEquals, OrbitalObjectIdSchema } from "./orbitalObjectId";
 import { starSystemCoordinatesEquals, StarSystemCoordinatesSchema } from "./starSystemCoordinates";
 
 export const UniverseObjectIdSchema = z.object({

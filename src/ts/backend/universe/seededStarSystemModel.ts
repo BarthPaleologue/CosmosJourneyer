@@ -20,7 +20,6 @@ import { centeredRand, randRangeInt, uniformRandBool } from "extended-random";
 
 import { OrbitalObjectType } from "../../frontend/architecture/orbitalObjectType";
 import { Settings } from "../../settings";
-import { createOrbitalObjectId } from "../../utils/coordinates/orbitalObjectId";
 import { StarSystemCoordinates } from "../../utils/coordinates/starSystemCoordinates";
 import { getRngFromSeed } from "../../utils/getRngFromSeed";
 import { wheelOfFortune } from "../../utils/random";
@@ -38,6 +37,7 @@ import {
 import { newSeededGasPlanetModel } from "./orbitalObjects/gasPlanetModelGenerator";
 import { newSeededSpaceElevatorModel } from "./orbitalObjects/orbitalFacilities/spaceElevatorModelGenerator";
 import { newSeededSpaceStationModel } from "./orbitalObjects/orbitalFacilities/spaceStationModelGenerator";
+import { createOrbitalObjectId } from "./orbitalObjects/orbitalObjectId";
 import { TelluricSatelliteModel } from "./orbitalObjects/telluricSatelliteModel";
 import { newSeededJuliaSetModel } from "./proceduralGenerators/anomalies/juliaSetModelGenerator";
 import { newSeededMandelboxModel } from "./proceduralGenerators/anomalies/mandelboxModelGenerator";

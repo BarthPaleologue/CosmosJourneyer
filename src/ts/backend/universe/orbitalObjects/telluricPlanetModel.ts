@@ -15,10 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { HasSeed } from "../../../frontend/architecture/hasSeed";
-import { OrbitalObjectType } from "../../../frontend/architecture/orbitalObjectType";
-import { RingsModel } from "../../../frontend/rings/ringsModel";
 import { TelluricPlanetaryMassObjectModelBase } from "../../../planets/telluricPlanet/telluricPlanetaryMassObjectModel";
+import { HasSeed } from "./hasSeed";
+import { OrbitalObjectType } from "./orbitalObjectType";
+import { RingsModel } from "./ringsModel";
 
 export type TelluricPlanetModel = TelluricPlanetaryMassObjectModelBase<OrbitalObjectType.TELLURIC_PLANET> &
     HasSeed & {

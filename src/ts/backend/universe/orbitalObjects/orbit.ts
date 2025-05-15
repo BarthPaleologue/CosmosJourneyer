@@ -20,9 +20,9 @@ import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { z } from "zod";
 
 import { Settings } from "../../../settings";
-import { OrbitalObjectIdSchema } from "../../../utils/coordinates/orbitalObjectId";
 import { findMinimumNewtonRaphson } from "../../../utils/math";
 import { DeepReadonly } from "../../../utils/types";
+import { OrbitalObjectIdSchema } from "./orbitalObjectId";
 
 /**
  * Represents an orbit in the p-norm space. (Euclidean space for p=2)

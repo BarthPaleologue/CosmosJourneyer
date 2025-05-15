@@ -18,7 +18,7 @@
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { normalRandom, randRange } from "extended-random";
 
-import { clamp } from "../utils/math";
+import { clamp } from "@/utils/math";
 
 export type RingsModel = {
     ringStart: number;
