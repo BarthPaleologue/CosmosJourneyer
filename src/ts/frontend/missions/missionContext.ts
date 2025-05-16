@@ -18,7 +18,7 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 
-import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
+import { StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 
 import { StarSystemController } from "../frontend/universe/starSystemController";
 

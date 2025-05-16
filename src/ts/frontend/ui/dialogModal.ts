@@ -1,6 +1,6 @@
-import i18n from "@/i18n";
+import { ISoundPlayer, SoundType } from "@/frontend/audio/soundPlayer";
 
-import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
+import i18n from "@/i18n";
 
 export function promptModalString(
     prompt: string,

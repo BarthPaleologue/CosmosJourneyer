@@ -25,6 +25,10 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { Scene } from "@babylonjs/core/scene";
 
+import { OrbitalFacilityModel } from "@/backend/universe/orbitalObjects/index";
+
+import { RenderingAssets } from "@/frontend/assets/renderingAssets";
+
 import { createRing } from "@/utils/geometry/ringBuilder";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { createEnvironmentAggregate } from "@/utils/havok";
@@ -33,12 +37,10 @@ import { DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
 
-import { OrbitalFacilityModel } from "../../../frontend/architecture/orbitalObjectModel";
-import { RenderingAssets } from "../../renderingAssets";
 import { LandingPad } from "../landingPad/landingPad";
 import { LandingPadSize } from "../landingPad/landingPadManager";
+import { MetalSectionMaterial } from "../metalSectionMaterial";
 import { LandingBayMaterial } from "./landingBayMaterial";
-import { MetalSectionMaterial } from "./metalSectionMaterial";
 
 export class LandingBay {
     private readonly root: TransformNode;

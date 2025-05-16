@@ -15,7 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { safeParseSave, Save } from "@/backend/save/saveFileData";
+import { SaveLoadingError } from "@/backend/save/saveLoadingError";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+
+import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
+import { TutorialControlsInputs } from "@/frontend/ui/tutorial/tutorialLayerInputs";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { pressInteractionToStrings } from "@/utils/strings/inputControlsString";
@@ -23,16 +28,13 @@ import { Result } from "@/utils/types";
 
 import i18n from "@/i18n";
 
-import saveData from "../../asset/tutorials/stationLandingTutorial/save.json";
-import station1ImageSrc from "../../asset/tutorials/stationLandingTutorial/station1.webp";
-import stationLandingBayImageSrc from "../../asset/tutorials/stationLandingTutorial/stationLandingBay.webp";
-import stationPadApproachImageSrc from "../../asset/tutorials/stationLandingTutorial/stationPadApproach.webp";
-import stationServicesImageSrc from "../../asset/tutorials/stationLandingTutorial/stationServices.webp";
-import { safeParseSave, Save } from "../backend/save/saveFileData";
-import { SaveLoadingError } from "../backend/save/saveLoadingError";
-import { SpaceShipControlsInputs } from "../frontend/spaceship/spaceShipControlsInputs";
-import { TutorialControlsInputs } from "../frontend/ui/tutorial/tutorialLayerInputs";
 import { Tutorial } from "./tutorial";
+
+import saveData from "@assets/tutorials/stationLandingTutorial/save.json";
+import station1ImageSrc from "@assets/tutorials/stationLandingTutorial/station1.webp";
+import stationLandingBayImageSrc from "@assets/tutorials/stationLandingTutorial/stationLandingBay.webp";
+import stationPadApproachImageSrc from "@assets/tutorials/stationLandingTutorial/stationPadApproach.webp";
+import stationServicesImageSrc from "@assets/tutorials/stationLandingTutorial/stationServices.webp";
 
 export class StationLandingTutorial implements Tutorial {
     readonly coverImageSrc: string = station1ImageSrc;

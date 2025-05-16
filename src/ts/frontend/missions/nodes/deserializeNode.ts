@@ -15,19 +15,19 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-
-import { MissionAsteroidFieldNodeSerialized } from "../../../backend/missions/missionAsteroidFieldNodeSerialized";
-import { MissionFlyByNodeSerialized } from "../../../backend/missions/missionFlyByNodeSerialized";
+import { MissionAsteroidFieldNodeSerialized } from "@/backend/missions/missionAsteroidFieldNodeSerialized";
+import { MissionFlyByNodeSerialized } from "@/backend/missions/missionFlyByNodeSerialized";
 import {
     MissionAndNodeSerialized,
     MissionNodeSerialized,
     MissionOrNodeSerialized,
     MissionSequenceNodeSerialized,
     MissionXorNodeSerialized,
-} from "../../../backend/missions/missionNodeSerialized";
-import { MissionNodeType } from "../../../backend/missions/missionNodeType";
-import { MissionTerminatorLandingNodeSerialized } from "../../../backend/missions/missionTerminatorLandingNodeSerialized";
+} from "@/backend/missions/missionNodeSerialized";
+import { MissionNodeType } from "@/backend/missions/missionNodeType";
+import { MissionTerminatorLandingNodeSerialized } from "@/backend/missions/missionTerminatorLandingNodeSerialized";
+import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+
 import { MissionAsteroidFieldNode } from "./actions/sightseeing/missionAsteroidFieldNode";
 import { MissionFlyByNode } from "./actions/sightseeing/missionFlyByNode";
 import { MissionTerminatorLandingNode } from "./actions/sightseeing/missionTerminatorLandingNode";

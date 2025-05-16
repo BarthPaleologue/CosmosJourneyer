@@ -24,9 +24,10 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { Scene } from "@babylonjs/core/scene";
 
+import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
+
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { lerpSmooth, slerpSmoothToRef } from "@/utils/math";
-import { createNotification, NotificationIntent, NotificationOrigin } from "@/utils/notification";
 import { pressInteractionToStrings } from "@/utils/strings/inputControlsString";
 
 import i18n from "@/i18n";

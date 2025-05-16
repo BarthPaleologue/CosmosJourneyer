@@ -16,9 +16,9 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Faction } from "@/backend/society/factions";
+import { StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 
 import { CropType } from "@/utils/agriculture";
-import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
 
 import { OrbitalObjectModelBase } from "../orbitalObjectModelBase";
 import { OrbitalObjectType } from "../orbitalObjectType";

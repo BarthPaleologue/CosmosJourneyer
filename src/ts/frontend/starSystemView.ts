@@ -28,15 +28,16 @@ import { AxisComposite } from "@brianchirls/game-input/browser";
 import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 
 import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/backend/universe/starSystemCoordinates";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { StarSystemModel } from "@/backend/universe/starSystemModel";
+import { getUniverseObjectId, UniverseObjectId } from "@/backend/universe/universeObjectId";
 
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/utils/coordinates/starSystemCoordinates";
-import { getUniverseObjectId, UniverseObjectId } from "@/utils/coordinates/universeObjectId";
-import { alertModal } from "@/utils/dialogModal";
+import { alertModal } from "@/frontend/ui/dialogModal";
+import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
+
 import { getNeighborStarSystemCoordinates } from "@/utils/getNeighborStarSystems";
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
-import { createNotification, NotificationIntent, NotificationOrigin } from "@/utils/notification";
 import { positionNearObjectBrightSide } from "@/utils/positionNearObject";
 import { axisCompositeToString, dPadCompositeToString } from "@/utils/strings/inputControlsString";
 import { SystemTarget } from "@/utils/systemTarget";

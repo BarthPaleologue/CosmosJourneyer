@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { safeParseSave, Save } from "@/backend/save/saveFileData";
+import { SaveLoadingError } from "@/backend/save/saveLoadingError";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
@@ -23,16 +25,13 @@ import { Result } from "@/utils/types";
 
 import i18n from "@/i18n";
 
-import fuelIconLocation from "../../asset/tutorials/fuelScoopTutorial/fuelIconLocation.webp";
-import welcomeImageSrc from "../../asset/tutorials/fuelScoopTutorial/fuelScoop.webp";
-import howToFuelScoop from "../../asset/tutorials/fuelScoopTutorial/howToFuelScoop.webp";
-import saveData from "../../asset/tutorials/fuelScoopTutorial/save.json";
-import { safeParseSave, Save } from "../backend/save/saveFileData";
-import { SaveLoadingError } from "../backend/save/saveLoadingError";
-import { TutorialControlsInputs } from "../frontend/ui/tutorial/tutorialLayerInputs";
+import { TutorialControlsInputs } from "../tutorialLayerInputs";
 import { Tutorial } from "./tutorial";
 
-export class FuelScoopTutorial implements Tutorial {
+import saveData from "@assets/tutorials/flightTutorial/save.json";
+import welcomeImageSrc from "@assets/tutorials/flightTutorial/welcome.webp";
+
+export class TemplateTutorial implements Tutorial {
     readonly coverImageSrc: string = welcomeImageSrc;
 
     getSaveData(starSystemDatabase: StarSystemDatabase): Result<Save, SaveLoadingError> {
@@ -40,19 +39,19 @@ export class FuelScoopTutorial implements Tutorial {
     }
 
     getTitle() {
-        return i18n.t("tutorials:fuelScooping:title");
+        return "Template Tutorial";
     }
+
     getDescription() {
-        return i18n.t("tutorials:fuelScooping:description");
+        return "This is a template tutorial to help building more tutorials!";
     }
+
     async getContentPanelsHtml(): Promise<string[]> {
         const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
-        const presentationPanelHtml = `
+        const welcomePanelHtml = `
         <div class="tutorialContent">
-            <img src="${welcomeImageSrc}" alt="Fuel scooping welcome image">
-            <p>${i18n.t("tutorials:fuelScooping:welcome")}</p>
-            
-            <p>${i18n.t("tutorials:fuelScooping:whatIsFuel")}</p>
+            <img src="${welcomeImageSrc}" alt="Welcome to Cosmos Journeyer">
+            <p>Welcome, Commander! This is a tutorial about tutorials! Now this is meta.</p>
             
             ${i18n.t("tutorials:common:navigationInfo", {
                 // This displays a small internationalized text to explain the keys to navigate the tutorial
@@ -65,28 +64,16 @@ export class FuelScoopTutorial implements Tutorial {
             })}
         </div>`;
 
-        const fuelManagement = `
+        const endPanelHtml = `
         <div class="tutorialContent">
-            <img src="${fuelIconLocation}" alt="Fuel icon location">
-            
-            <p>${i18n.t("tutorials:fuelScooping:whereFuelIcon")}</p>            
-        </div>`;
-
-        const howToFuelScoopPanel = `
-        <div class="tutorialContent">
-            <img src="${howToFuelScoop}" alt="How to fuel scoop">
-            
-            <p>${i18n.t("tutorials:fuelScooping:howToFuelScoop")}</p>
-            
-            <p>${i18n.t("tutorials:common:tutorialEnding", {
+            ${i18n.t("tutorials:common:tutorialEnding", {
                 // This displays a small internationalized text to explain the keys to end the tutorial
                 keyQuit: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keyboardLayoutMap).join(
                     ` ${i18n.t("common:or")} `,
                 ),
             })}
-                </p>
         </div>`;
 
-        return [presentationPanelHtml, fuelManagement, howToFuelScoopPanel];
+        return [welcomePanelHtml, endPanelHtml];
     }
 }

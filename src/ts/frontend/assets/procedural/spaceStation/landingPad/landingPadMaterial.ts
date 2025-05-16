@@ -33,8 +33,8 @@ import {
 
 import { Settings } from "@/settings";
 
-import { LandingPadTexturePool } from "../../landingPadTexturePool";
-import { PBRTextures } from "../../textures";
+import { LandingPadTexturePool } from "../../../landingPadTexturePool";
+import { PBRTextures } from "../../../textures";
 
 export class LandingPadMaterial extends NodeMaterial {
     constructor(padNumber: number, textures: PBRTextures, texturePool: LandingPadTexturePool, scene: Scene) {

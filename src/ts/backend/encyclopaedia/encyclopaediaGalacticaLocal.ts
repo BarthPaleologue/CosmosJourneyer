@@ -3,8 +3,8 @@ import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObje
 import { TelluricPlanetModel } from "@/backend/universe/orbitalObjects/telluricPlanetModel";
 import { TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { UniverseObjectId } from "@/backend/universe/universeObjectId";
 
-import { UniverseObjectId } from "@/utils/coordinates/universeObjectId";
 import { DeepReadonly, err, ok, Result } from "@/utils/types";
 
 import { EncyclopaediaGalactica, SpaceDiscoveryData } from "./encyclopaediaGalactica";

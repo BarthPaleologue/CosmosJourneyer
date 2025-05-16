@@ -18,7 +18,7 @@
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-import { Transformable } from "../frontend/architecture/transformable";
+import { Transformable } from "@/frontend/universe/architecture/transformable";
 
 export interface Controls extends Transformable {
     /**

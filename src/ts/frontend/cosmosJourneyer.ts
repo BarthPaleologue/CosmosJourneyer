@@ -32,11 +32,17 @@ import HavokPhysics from "@babylonjs/havok";
 
 import { EncyclopaediaGalacticaLocal } from "@/backend/encyclopaedia/encyclopaediaGalacticaLocal";
 import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
+import { createUrlFromSave, Save } from "@/backend/save/saveFileData";
+import { saveLoadingErrorToI18nString } from "@/backend/save/saveLoadingError";
+import { SaveLocalBackend } from "@/backend/save/saveLocalBackend";
+import { SaveManager } from "@/backend/save/saveManager";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { registerCustomSystems } from "@/backend/universe/customSystems/registerCustomSystems";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { generateDarkKnightModel } from "@/backend/universe/proceduralGenerators/anomalies/darkKnightModelGenerator";
+import { StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { getUniverseObjectId } from "@/backend/universe/universeObjectId";
 
 import { Assets, loadAssets } from "@/frontend/assets/assets";
 import { AudioMasks } from "@/frontend/audio/audioMasks";
@@ -48,21 +54,24 @@ import { StarMap } from "@/frontend/starmap/starMap";
 import { StarSystemView } from "@/frontend/starSystemView";
 import { LoadingScreen } from "@/frontend/uberCore/loadingScreen";
 import { UberScene } from "@/frontend/uberCore/uberScene";
+import { alertModal, promptModalBoolean, promptModalString } from "@/frontend/ui/dialogModal";
 import { MainMenu } from "@/frontend/ui/mainMenu";
+import {
+    createNotification,
+    NotificationIntent,
+    NotificationOrigin,
+    updateNotifications,
+} from "@/frontend/ui/notification";
 import { PauseMenu } from "@/frontend/ui/pauseMenu";
 import { SidePanels } from "@/frontend/ui/sidePanels";
 import { TutorialLayer } from "@/frontend/ui/tutorial/tutorialLayer";
 
-import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
 import {
     AtStationCoordinates,
     RelativeCoordinates,
     UniverseCoordinates,
 } from "@/utils/coordinates/universeCoordinates";
-import { getUniverseObjectId } from "@/utils/coordinates/universeObjectId";
-import { alertModal, promptModalBoolean, promptModalString } from "@/utils/dialogModal";
 import { hashArray } from "@/utils/hash";
-import { createNotification, NotificationIntent, NotificationOrigin, updateNotifications } from "@/utils/notification";
 import { positionNearObject } from "@/utils/positionNearObject";
 import { View } from "@/utils/view";
 
@@ -70,15 +79,11 @@ import i18n, { initI18n } from "@/i18n";
 import { Player } from "@/player/player";
 import { Settings } from "@/settings";
 
-import { createUrlFromSave, Save } from "../backend/save/saveFileData";
-import { saveLoadingErrorToI18nString } from "../backend/save/saveLoadingError";
-import { SaveLocalBackend } from "../backend/save/saveLocalBackend";
-import { SaveManager } from "../backend/save/saveManager";
-import { FlightTutorial } from "../tutorials/flightTutorial";
-import { FuelScoopTutorial } from "../tutorials/fuelScoopTutorial";
-import { StarMapTutorial } from "../tutorials/starMapTutorial";
-import { StationLandingTutorial } from "../tutorials/stationLandingTutorial";
-import { Tutorial } from "../tutorials/tutorial";
+import { FlightTutorial } from "./ui/tutorial/tutorials/flightTutorial";
+import { FuelScoopTutorial } from "./ui/tutorial/tutorials/fuelScoopTutorial";
+import { StarMapTutorial } from "./ui/tutorial/tutorials/starMapTutorial";
+import { StationLandingTutorial } from "./ui/tutorial/tutorials/stationLandingTutorial";
+import { Tutorial } from "./ui/tutorial/tutorials/tutorial";
 
 const enum EngineState {
     UNINITIALIZED,

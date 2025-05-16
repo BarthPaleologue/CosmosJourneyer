@@ -1,15 +1,16 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { IDisposable } from "@babylonjs/core/scene";
 
-import { promptModalBoolean } from "@/utils/dialogModal";
+import { promptModalBoolean } from "@/frontend/ui/dialogModal";
+
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { pressInteractionToStrings } from "@/utils/strings/inputControlsString";
 
 import i18n from "@/i18n";
 
-import { Tutorial } from "../../../tutorials/tutorial";
 import { ISoundPlayer, SoundType } from "../../audio/soundPlayer";
 import { TutorialControlsInputs } from "./tutorialLayerInputs";
+import { Tutorial } from "./tutorials/tutorial";
 
 export class TutorialLayer implements IDisposable {
     readonly root: HTMLDivElement;

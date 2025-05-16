@@ -18,10 +18,12 @@
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
-import { OrbitalObjectBase } from "../frontend/universe/architecture/orbitalObjectBase";
-import { OrbitalObjectType } from "../frontend/universe/architecture/orbitalObjectType";
-import { OrbitalObjectModelBase } from "../orbitalObjectModelBase";
-import { DeepReadonly } from "./types";
+import { OrbitalObjectModelBase } from "@/backend/universe/orbitalObjects/orbitalObjectModelBase";
+import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
+
+import { DeepReadonly } from "@/utils/types";
+
+import { OrbitalObjectBase } from "./architecture/orbitalObjectBase";
 
 export class CustomOrbitalObject implements OrbitalObjectBase<OrbitalObjectType.CUSTOM> {
     private readonly _transform: TransformNode;

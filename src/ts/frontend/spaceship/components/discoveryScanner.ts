@@ -18,7 +18,7 @@
 import {
     getDiscoveryScannerSpec,
     SerializedDiscoveryScanner,
-} from "../../../backend/spaceship/serializedComponents/discoveryScanner";
+} from "@/backend/spaceship/serializedComponents/discoveryScanner";
 
 export class DiscoveryScanner {
     readonly type;

@@ -22,8 +22,9 @@ import { getOrbitalPeriod } from "@/backend/universe/orbitalObjects/orbit";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { getObjectModelById } from "@/backend/universe/starSystemModel";
 
-import { alertModal } from "@/utils/dialogModal";
-import { createNotification, NotificationIntent, NotificationOrigin } from "@/utils/notification";
+import { alertModal } from "@/frontend/ui/dialogModal";
+import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
+
 import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
 import { parseDistance, parseSecondsPrecise } from "@/utils/strings/parseToStrings";
 

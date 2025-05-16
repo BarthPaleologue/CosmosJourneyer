@@ -17,7 +17,7 @@
 
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
+import { StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 
 import { getLoneStarSystem } from "./customSystems/loneStar";
 import { getSolSystemModel } from "./customSystems/sol";

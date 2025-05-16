@@ -26,8 +26,8 @@ import { SolidParticle } from "@babylonjs/core/Particles/solidParticle";
 import { SolidParticleSystem } from "@babylonjs/core/Particles/solidParticleSystem";
 import { Scene } from "@babylonjs/core/scene";
 
-import { Transformable } from "../frontend/universe/architecture/transformable";
-import { getForwardDirection } from "../uberCore/transforms/basicTransform";
+import { getForwardDirection } from "../../uberCore/transforms/basicTransform";
+import { Transformable } from "../../universe/architecture/transformable";
 
 /**
  * @see https://playground.babylonjs.com/#GLZ1PX#1241 (SPS)

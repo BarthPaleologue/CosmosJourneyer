@@ -36,7 +36,9 @@ import { SerializedComponent } from "@/backend/spaceship/serializedComponents/co
 import { getDefaultSerializedSpaceship, SerializedSpaceship, ShipType } from "@/backend/spaceship/serializedSpaceship";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
+import { HyperSpaceTunnel } from "@/frontend/assets/procedural/hyperSpaceTunnel";
 import { ILandingPad } from "@/frontend/assets/procedural/spaceStation/landingPad/landingPadManager";
+import { WarpTunnel } from "@/frontend/assets/procedural/warpTunnel";
 import { RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { AudioMasks } from "@/frontend/audio/audioMasks";
 import { ISoundInstance } from "@/frontend/audio/soundInstance";
@@ -48,8 +50,6 @@ import { Transformable } from "@/frontend/universe/architecture/transformable";
 
 import { distanceToAsteroidField } from "@/utils/asteroidFields";
 import { setEnabledBody } from "@/utils/havok";
-import { HyperSpaceTunnel } from "@/utils/hyperSpaceTunnel";
-import { WarpTunnel } from "@/utils/warpTunnel";
 
 import { CollisionMask, Settings } from "@/settings";
 

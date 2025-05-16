@@ -23,8 +23,7 @@ import { Tools } from "@babylonjs/core/Misc/tools";
 import { Scene } from "@babylonjs/core/scene";
 
 import { setOrbitalPosition, setRotation } from "@/frontend/universe/architecture/orbitalObjectUtils";
-
-import { CustomOrbitalObject } from "@/utils/customOrbitalObject";
+import { CustomOrbitalObject } from "@/frontend/universe/customOrbitalObject";
 
 import { DefaultControls } from "../defaultControls/defaultControls";
 import { OrbitalObject } from "../frontend/universe/architecture/orbitalObject";

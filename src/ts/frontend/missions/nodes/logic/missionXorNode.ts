@@ -15,12 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { MissionXorNodeSerialized } from "@/backend/missions/missionNodeSerialized";
+import { MissionNodeType } from "@/backend/missions/missionNodeType";
+import { StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
-import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
-
-import { MissionXorNodeSerialized } from "../../../../backend/missions/missionNodeSerialized";
-import { MissionNodeType } from "../../../../backend/missions/missionNodeType";
 import { MissionContext } from "../../missionContext";
 import type { MissionNode } from "../missionNode";
 import { MissionNodeBase } from "../missionNodeBase";

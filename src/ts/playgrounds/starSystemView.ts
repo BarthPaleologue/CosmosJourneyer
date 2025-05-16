@@ -21,7 +21,8 @@ import { Scene } from "@babylonjs/core/scene";
 import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
-import { updateNotifications } from "@/utils/notification";
+import { updateNotifications } from "@/frontend/ui/notification";
+
 import { positionNearObjectBrightSide } from "@/utils/positionNearObject";
 
 import { initI18n } from "@/i18n";

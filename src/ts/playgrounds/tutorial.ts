@@ -23,10 +23,10 @@ import { initI18n } from "@/i18n";
 
 import { SoundPlayerMock } from "../audio/soundPlayer";
 import { TutorialLayer } from "../frontend/ui/tutorial/tutorialLayer";
-import { FlightTutorial } from "../tutorials/flightTutorial";
-import { FuelScoopTutorial } from "../tutorials/fuelScoopTutorial";
-import { StarMapTutorial } from "../tutorials/starMapTutorial";
-import { StationLandingTutorial } from "../tutorials/stationLandingTutorial";
+import { FlightTutorial } from "../frontend/ui/tutorial/tutorials/flightTutorial";
+import { FuelScoopTutorial } from "../frontend/ui/tutorial/tutorials/fuelScoopTutorial";
+import { StarMapTutorial } from "../frontend/ui/tutorial/tutorials/starMapTutorial";
+import { StationLandingTutorial } from "../frontend/ui/tutorial/tutorials/stationLandingTutorial";
 
 export async function createTutorialScene(
     engine: AbstractEngine,

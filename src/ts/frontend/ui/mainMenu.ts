@@ -18,11 +18,11 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Observable } from "@babylonjs/core/Misc/observable";
 
+import { StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { StarSystemModel } from "@/backend/universe/starSystemModel";
+import { getUniverseObjectId, UniverseObjectId } from "@/backend/universe/universeObjectId";
 
-import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
-import { getUniverseObjectId, UniverseObjectId } from "@/utils/coordinates/universeObjectId";
 import { positionNearObjectAsteroidField, positionNearObjectWithStarVisible } from "@/utils/positionNearObject";
 import { DeepReadonly } from "@/utils/types";
 

@@ -17,7 +17,7 @@
 
 import { z } from "zod";
 
-import { UniverseObjectIdSchema } from "./universeObjectId";
+import { UniverseObjectIdSchema } from "@/backend/universe/universeObjectId";
 
 export const RelativeCoordinatesSchema = z.object({
     type: z.literal("relative"),

@@ -18,7 +18,8 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { centeredRand, randRangeInt, uniformRandBool } from "extended-random";
 
-import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
+import { StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
+
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { wheelOfFortune } from "@/utils/random";
 import { Alphabet, ReversedGreekAlphabet } from "@/utils/strings/parseToStrings";

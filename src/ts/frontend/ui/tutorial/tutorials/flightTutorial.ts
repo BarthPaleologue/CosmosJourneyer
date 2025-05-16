@@ -17,6 +17,8 @@
 
 import { AxisComposite } from "@brianchirls/game-input/browser";
 
+import { safeParseSave, Save } from "@/backend/save/saveFileData";
+import { SaveLoadingError } from "@/backend/save/saveLoadingError";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
@@ -25,19 +27,18 @@ import { Result } from "@/utils/types";
 
 import i18n from "@/i18n";
 
-import congratsImageSrc from "../../asset/tutorials/flightTutorial/congrats.webp";
-import rotationImageSrc from "../../asset/tutorials/flightTutorial/rotation.webp";
-import saveData from "../../asset/tutorials/flightTutorial/save.json";
-import targetImageSrc from "../../asset/tutorials/flightTutorial/target.webp";
-import thrustImageSrc from "../../asset/tutorials/flightTutorial/thrust.webp";
-import warpImageSrc from "../../asset/tutorials/flightTutorial/warp.webp";
-import welcomeImageSrc from "../../asset/tutorials/flightTutorial/welcome.webp";
-import { safeParseSave, Save } from "../backend/save/saveFileData";
-import { SaveLoadingError } from "../backend/save/saveLoadingError";
-import { StarSystemInputs } from "../frontend/inputs/starSystemInputs";
-import { SpaceShipControlsInputs } from "../frontend/spaceship/spaceShipControlsInputs";
-import { TutorialControlsInputs } from "../frontend/ui/tutorial/tutorialLayerInputs";
+import { StarSystemInputs } from "../../../inputs/starSystemInputs";
+import { SpaceShipControlsInputs } from "../../../spaceship/spaceShipControlsInputs";
+import { TutorialControlsInputs } from "../tutorialLayerInputs";
 import { Tutorial } from "./tutorial";
+
+import congratsImageSrc from "@assets/tutorials/flightTutorial/congrats.webp";
+import rotationImageSrc from "@assets/tutorials/flightTutorial/rotation.webp";
+import saveData from "@assets/tutorials/flightTutorial/save.json";
+import targetImageSrc from "@assets/tutorials/flightTutorial/target.webp";
+import thrustImageSrc from "@assets/tutorials/flightTutorial/thrust.webp";
+import warpImageSrc from "@assets/tutorials/flightTutorial/warp.webp";
+import welcomeImageSrc from "@assets/tutorials/flightTutorial/welcome.webp";
 
 export class FlightTutorial implements Tutorial {
     readonly coverImageSrc: string = welcomeImageSrc;

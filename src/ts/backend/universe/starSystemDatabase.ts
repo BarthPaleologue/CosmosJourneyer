@@ -19,8 +19,9 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { centeredRand } from "extended-random";
 import { makeNoise3D } from "fast-simplex-noise/lib/3d";
 
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/utils/coordinates/starSystemCoordinates";
-import { UniverseObjectId } from "@/utils/coordinates/universeObjectId";
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/backend/universe/starSystemCoordinates";
+import { UniverseObjectId } from "@/backend/universe/universeObjectId";
+
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { hashVec3 } from "@/utils/hash";
 import { DeepReadonly } from "@/utils/types";

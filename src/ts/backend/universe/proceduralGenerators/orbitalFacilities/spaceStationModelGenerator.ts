@@ -24,9 +24,9 @@ import { CelestialBodyModel } from "@/backend/universe/orbitalObjects/index";
 import { Orbit } from "@/backend/universe/orbitalObjects/orbit";
 import { SpaceStationModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/spacestationModel";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
+import { StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 
 import { CropType, CropTypes } from "@/utils/agriculture";
-import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
 import { GenerationSteps } from "@/utils/generationSteps";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { clamp } from "@/utils/math";

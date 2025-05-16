@@ -34,11 +34,12 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { DefaultRenderingPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/Pipelines/defaultRenderingPipeline";
 import { Scene } from "@babylonjs/core/scene";
 
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/backend/universe/starSystemCoordinates";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/utils/coordinates/starSystemCoordinates";
-import { alertModal } from "@/utils/dialogModal";
-import { createNotification, NotificationIntent, NotificationOrigin } from "@/utils/notification";
+import { alertModal } from "@/frontend/ui/dialogModal";
+import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
+
 import { getRgbFromTemperature } from "@/utils/specrend";
 import { ThickLines } from "@/utils/thickLines";
 import { View } from "@/utils/view";

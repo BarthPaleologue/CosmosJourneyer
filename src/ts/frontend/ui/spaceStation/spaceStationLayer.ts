@@ -20,7 +20,8 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
-import { alertModal, promptModalString } from "@/utils/dialogModal";
+import { alertModal, promptModalString } from "@/frontend/ui/dialogModal";
+
 import { DeepReadonly } from "@/utils/types";
 
 import i18n from "@/i18n";

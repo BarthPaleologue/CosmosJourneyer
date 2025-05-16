@@ -1,6 +1,6 @@
+import { SaveManager } from "@/backend/save/saveManager";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
-import { SaveManager } from "../../backend/save/saveManager";
 import { ISoundPlayer } from "../audio/soundPlayer";
 import { SaveLoadingPanelContent } from "./saveLoadingPanelContent";
 import { initSettingsPanel } from "./settingsPanel";

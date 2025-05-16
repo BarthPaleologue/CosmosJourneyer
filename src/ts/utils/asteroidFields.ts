@@ -17,7 +17,7 @@
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-import { AsteroidField } from "../frontend/asteroidFields/asteroidField";
+import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
 
 export function distanceToAsteroidField(position: Vector3, asteroidField: AsteroidField) {
     const celestialBody = asteroidField.parent;

@@ -15,12 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { OrbitalObjectModel } from "@/backend/universe/orbitalObjects/index";
+import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { getStellarTypeFromTemperature } from "@/backend/universe/proceduralGenerators/stellarObjects/starModelGenerator";
 
 import i18n from "@/i18n";
 
-import { OrbitalObjectModel } from "../../frontend/universe/architecture/orbitalObjectModel";
-import { OrbitalObjectType } from "../../frontend/universe/architecture/orbitalObjectType";
 import { DeepReadonly } from "../types";
 
 export function getOrbitalObjectTypeToI18nString(model: DeepReadonly<OrbitalObjectModel>): string {

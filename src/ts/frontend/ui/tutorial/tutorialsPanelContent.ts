@@ -19,11 +19,11 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 
 import i18n from "@/i18n";
 
-import { FlightTutorial } from "../../../tutorials/flightTutorial";
-import { FuelScoopTutorial } from "../../../tutorials/fuelScoopTutorial";
-import { StarMapTutorial } from "../../../tutorials/starMapTutorial";
-import { StationLandingTutorial } from "../../../tutorials/stationLandingTutorial";
-import { Tutorial } from "../../../tutorials/tutorial";
+import { FlightTutorial } from "./tutorials/flightTutorial";
+import { FuelScoopTutorial } from "./tutorials/fuelScoopTutorial";
+import { StarMapTutorial } from "./tutorials/starMapTutorial";
+import { StationLandingTutorial } from "./tutorials/stationLandingTutorial";
+import { Tutorial } from "./tutorials/tutorial";
 
 export class TutorialsPanelContent {
     readonly htmlRoot: HTMLElement;

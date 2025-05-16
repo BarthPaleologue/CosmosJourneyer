@@ -17,7 +17,8 @@
 
 import { z } from "zod";
 
-import { StarSystemCoordinatesSchema } from "@/utils/coordinates/starSystemCoordinates";
+import { StarSystemCoordinatesSchema } from "@/backend/universe/starSystemCoordinates";
+
 import { err, ok, Result } from "@/utils/types";
 
 import projectInfo from "../../../../../package.json";

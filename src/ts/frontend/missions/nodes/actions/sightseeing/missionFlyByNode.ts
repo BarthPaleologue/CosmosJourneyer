@@ -17,18 +17,18 @@
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
+import { FlyByState, MissionFlyByNodeSerialized } from "@/backend/missions/missionFlyByNodeSerialized";
+import { MissionNodeType } from "@/backend/missions/missionNodeType";
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/backend/universe/starSystemCoordinates";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { UniverseObjectId, universeObjectIdEquals } from "@/backend/universe/universeObjectId";
 
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/utils/coordinates/starSystemCoordinates";
-import { UniverseObjectId, universeObjectIdEquals } from "@/utils/coordinates/universeObjectId";
 import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
 import { parseDistance } from "@/utils/strings/parseToStrings";
 
 import i18n from "@/i18n";
 import { Settings } from "@/settings";
 
-import { FlyByState, MissionFlyByNodeSerialized } from "../../../../../backend/missions/missionFlyByNodeSerialized";
-import { MissionNodeType } from "../../../../../backend/missions/missionNodeType";
 import { getGoToSystemInstructions } from "../../../common";
 import { MissionContext } from "../../../missionContext";
 import { MissionNode } from "../../missionNode";

@@ -18,7 +18,13 @@
 import AxisComposite from "@brianchirls/game-input/controls/AxisComposite";
 import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 
+import { safeParseSave, Save } from "@/backend/save/saveFileData";
+import { SaveLoadingError } from "@/backend/save/saveLoadingError";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+
+import { GeneralInputs } from "@/frontend/inputs/generalInputs";
+import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
+import { StarMapInputs } from "@/frontend/starmap/starMapInputs";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import {
@@ -30,20 +36,16 @@ import { Result } from "@/utils/types";
 
 import i18n from "@/i18n";
 
-import controlsImgSrc from "../../asset/tutorials/starMapTutorial/controls.webp";
-import coverImgSrc from "../../asset/tutorials/starMapTutorial/cover.webp";
-import jumpImgSrc from "../../asset/tutorials/starMapTutorial/jump.webp";
-import missionImgSrc from "../../asset/tutorials/starMapTutorial/mission.webp";
-import openImgSrc from "../../asset/tutorials/starMapTutorial/open.webp";
-import plotItineraryImgSrc from "../../asset/tutorials/starMapTutorial/plotItinerary.webp";
-import saveData from "../../asset/tutorials/starMapTutorial/save.json";
-import { safeParseSave, Save } from "../backend/save/saveFileData";
-import { SaveLoadingError } from "../backend/save/saveLoadingError";
-import { GeneralInputs } from "../frontend/inputs/generalInputs";
-import { StarSystemInputs } from "../frontend/inputs/starSystemInputs";
-import { TutorialControlsInputs } from "../frontend/ui/tutorial/tutorialLayerInputs";
-import { StarMapInputs } from "../starmap/starMapInputs";
+import { TutorialControlsInputs } from "../tutorialLayerInputs";
 import { Tutorial } from "./tutorial";
+
+import controlsImgSrc from "@assets/tutorials/starMapTutorial/controls.webp";
+import coverImgSrc from "@assets/tutorials/starMapTutorial/cover.webp";
+import jumpImgSrc from "@assets/tutorials/starMapTutorial/jump.webp";
+import missionImgSrc from "@assets/tutorials/starMapTutorial/mission.webp";
+import openImgSrc from "@assets/tutorials/starMapTutorial/open.webp";
+import plotItineraryImgSrc from "@assets/tutorials/starMapTutorial/plotItinerary.webp";
+import saveData from "@assets/tutorials/starMapTutorial/save.json";
 
 export class StarMapTutorial implements Tutorial {
     readonly coverImageSrc: string = coverImgSrc;

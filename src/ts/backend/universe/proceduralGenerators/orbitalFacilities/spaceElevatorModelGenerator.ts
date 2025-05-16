@@ -22,9 +22,9 @@ import { PlanetModel } from "@/backend/universe/orbitalObjects/index";
 import { Orbit } from "@/backend/universe/orbitalObjects/orbit";
 import { SpaceElevatorModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/spaceElevatorModel";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
+import { StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 
 import { CropType, CropTypes } from "@/utils/agriculture";
-import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { getOrbitRadiusFromPeriod } from "@/utils/physics";
 import { randomPieChart } from "@/utils/random";

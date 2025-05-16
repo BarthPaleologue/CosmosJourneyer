@@ -15,9 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { clamp, lerpSmooth } from "@/utils/math";
+import { getWarpDriveSpec, SerializedWarpDrive } from "@/backend/spaceship/serializedComponents/warpDrive";
 
-import { getWarpDriveSpec, SerializedWarpDrive } from "../../../backend/spaceship/serializedComponents/warpDrive";
+import { clamp, lerpSmooth } from "@/utils/math";
 
 const enum WarpDriveState {
     /**

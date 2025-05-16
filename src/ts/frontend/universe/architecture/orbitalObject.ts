@@ -17,7 +17,7 @@
 
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
-import { CustomOrbitalObject } from "@/utils/customOrbitalObject";
+import { CustomOrbitalObject } from "@/frontend/universe/customOrbitalObject";
 
 import { DarkKnight } from "../darkKnight";
 import { EmptyCelestialBody } from "../emptyCelestialBody";

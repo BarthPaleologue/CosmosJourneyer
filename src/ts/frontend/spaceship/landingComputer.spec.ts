@@ -6,7 +6,7 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { LandingPad } from "../assets/procedural/landingPad/landingPad";
+import { LandingPad } from "../assets/procedural/spaceStation/landingPad/landingPad";
 import { LandingComputer, LandingComputerStatusBit, LandingTargetKind } from "./landingComputer";
 
 // Mock BabylonJS classes

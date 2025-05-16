@@ -1,8 +1,7 @@
 import { z } from "zod";
 
 import { SpaceDiscoveryDataSchema } from "@/backend/encyclopaedia/encyclopaediaGalactica";
-
-import { StarSystemCoordinatesSchema } from "@/utils/coordinates/starSystemCoordinates";
+import { StarSystemCoordinatesSchema } from "@/backend/universe/starSystemCoordinates";
 
 import { MissionSerializedSchema } from "../missions/missionSerialized";
 import { SerializedComponentSchema } from "../spaceship/serializedComponents/component";

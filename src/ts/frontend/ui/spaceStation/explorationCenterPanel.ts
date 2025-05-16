@@ -19,8 +19,8 @@ import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopa
 import { SpaceDiscoveryData } from "@/backend/society/encyclopaediaGalactica";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
-import { connectEncyclopaediaGalacticaModal } from "@/utils/dialogModal";
-import { createNotification, NotificationIntent, NotificationOrigin } from "@/utils/notification";
+import { connectEncyclopaediaGalacticaModal } from "@/frontend/ui/dialogModal";
+import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 
 import i18n from "@/i18n";
 import { Settings } from "@/settings";

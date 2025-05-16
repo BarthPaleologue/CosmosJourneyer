@@ -18,6 +18,8 @@
 import { Matrix } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
+import { OrbitalObjectId } from "@/backend/universe/orbitalObjects/orbitalObjectId";
+import { StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { StarSystemModel } from "@/backend/universe/starSystemModel";
 
@@ -28,14 +30,12 @@ import {
     setRotation,
 } from "@/frontend/universe/architecture/orbitalObjectUtils";
 
-import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
 import { SystemTarget } from "@/utils/systemTarget";
 import { DeepReadonly, NonEmptyArray } from "@/utils/types";
 
 import { Settings } from "@/settings";
 
 import { RenderingAssets } from "../../assets/renderingAssets";
-import { OrbitalObjectId } from "../../backend/universe/orbitalObjects/orbitalObjectId";
 import { PostProcessManager } from "../../postProcesses/postProcessManager";
 import { StarFieldBox } from "../../starSystem/starFieldBox";
 import { StarSystemLoader } from "../../starSystem/starSystemLoader";

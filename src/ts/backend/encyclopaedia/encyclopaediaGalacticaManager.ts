@@ -1,4 +1,5 @@
-import { UniverseObjectId } from "@/utils/coordinates/universeObjectId";
+import { UniverseObjectId } from "@/backend/universe/universeObjectId";
+
 import { ok, Result } from "@/utils/types";
 
 import { EncyclopaediaGalactica, SpaceDiscoveryData } from "./encyclopaediaGalactica";

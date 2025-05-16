@@ -21,19 +21,19 @@ import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
-import { describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it } from "vitest";
 
-import {
-    getBackwardDirection,
-    getForwardDirection,
-    getLeftDirection,
-    getRightDirection,
-} from "@/uberCore/transforms/basicTransform";
-
-const engine = new NullEngine();
-const scene = new Scene(engine);
+import { getBackwardDirection, getForwardDirection, getLeftDirection, getRightDirection } from "./basicTransform";
 
 describe("BasicTransform", () => {
+    const engine = new NullEngine();
+    const scene = new Scene(engine);
+
+    afterAll(() => {
+        scene.dispose();
+        engine.dispose();
+    });
+
     const transform = new TransformNode("transform", scene);
     it("is oriented forward", () => {
         expect(getForwardDirection(transform).equals(new Vector3(0, 0, 1))).to.be.true;

@@ -18,7 +18,8 @@
 import { Vector3 } from "@babylonjs/core";
 import { Tools } from "@babylonjs/core/Misc/tools";
 
-import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
+import { StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
+
 import { celsiusToKelvin, getOrbitRadiusFromPeriod } from "@/utils/physics";
 
 import { Settings } from "@/settings";
