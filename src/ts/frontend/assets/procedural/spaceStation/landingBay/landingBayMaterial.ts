@@ -20,7 +20,9 @@ import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
 import { Scene } from "@babylonjs/core/scene";
 
-import { OrbitalFacilityModel } from "@/frontend/architecture/orbitalObjectModel";
+import { OrbitalFacilityModel } from "@/backend/universe/orbitalObjects/index";
+
+import { PBRTextures } from "@/frontend/assets/textures";
 
 import {
     abs,
@@ -53,8 +55,6 @@ import {
 import { DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
-
-import { PBRTextures } from "../../textures";
 
 export class LandingBayMaterial extends NodeMaterial {
     constructor(

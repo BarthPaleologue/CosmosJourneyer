@@ -28,6 +28,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { OrbitalFacilityModel } from "@/backend/universe/orbitalObjects/index";
 
 import { RenderingAssets } from "@/frontend/assets/renderingAssets";
+import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
 import { createRing } from "@/utils/geometry/ringBuilder";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
@@ -38,7 +39,6 @@ import { DeepReadonly } from "@/utils/types";
 import { Settings } from "@/settings";
 
 import { LandingPad } from "../landingPad/landingPad";
-import { LandingPadSize } from "../landingPad/landingPadManager";
 import { MetalSectionMaterial } from "../metalSectionMaterial";
 import { LandingBayMaterial } from "./landingBayMaterial";
 
