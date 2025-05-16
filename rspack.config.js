@@ -32,13 +32,10 @@ export default defineConfig({
     devtool: isProduction ? false : "source-map",
     devServer: {
         open: false,
-        host: "localhost",
-        historyApiFallback: false,
         headers: {
             "Cross-Origin-Opener-Policy": "same-origin",
             "Cross-Origin-Embedder-Policy": "same-origin",
         },
-        compress: true,
     },
     plugins: [
         new rspack.BannerPlugin({
@@ -136,7 +133,7 @@ export default defineConfig({
     optimization: {
         minimize: isProduction,
         splitChunks: {
-            chunks: "async",
+            chunks: "all",
             minSize: 20000,
             minChunks: 1,
             maxAsyncRequests: 30,
