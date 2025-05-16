@@ -18,11 +18,11 @@
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { Mission } from "@/frontend/missions/mission";
+import { Player } from "@/frontend/player/player";
 
 import { Settings } from "@/settings";
 
-import { Mission } from "../../../missions/mission";
-import { Player } from "../../player/player";
 import { AcceptMissionButton } from "./acceptMissionButton";
 
 export class MissionContainer {

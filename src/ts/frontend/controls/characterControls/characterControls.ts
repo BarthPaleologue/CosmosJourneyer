@@ -33,10 +33,10 @@ import { Scene } from "@babylonjs/core/scene";
 import { Controls } from "@/frontend/uberCore/controls";
 import { setUpVector, translate } from "@/frontend/uberCore/transforms/basicTransform";
 import { Transformable } from "@/frontend/universe/architecture/transformable";
+import { TelluricPlanet } from "@/frontend/universe/planets/telluricPlanet/telluricPlanet";
 
 import { CollisionMask, Settings } from "@/settings";
 
-import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { CharacterInputs } from "./characterControlsInputs";
 
 class AnimationGroupWrapper {

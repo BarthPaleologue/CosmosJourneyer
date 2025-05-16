@@ -19,10 +19,10 @@ import { Sound } from "@babylonjs/core/Audio/sound";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-import { Musics } from "@/frontend/assets/musics";
+import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
-import { StarSystemView } from "../starSystem/starSystemView";
-import { OrbitalObjectType } from "../universe/architecture/orbitalObjectType";
+import { Musics } from "@/frontend/assets/musics";
+import { StarSystemView } from "@/frontend/starSystemView";
 
 export class MusicConductor {
     private currentMusic: Sound | null = null;

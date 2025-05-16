@@ -17,10 +17,12 @@
 
 import { uniformRandBool } from "extended-random";
 
+import { OrbitalFacilityModel } from "@/backend/universe/orbitalObjects/index";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
-import { OrbitalFacilityModel } from "@/frontend/architecture/orbitalObjectModel";
 import { ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { generateSightseeingMissions } from "@/frontend/missions/generateSightSeeingMissions";
+import { Player } from "@/frontend/player/player";
 
 import { getNeighborStarSystemCoordinates } from "@/utils/getNeighborStarSystems";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
@@ -29,8 +31,6 @@ import { DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
 
-import { generateSightseeingMissions } from "../../../missions/generateSightSeeingMissions";
-import { Player } from "../../player/player";
 import { MissionContainer } from "./missionContainer";
 
 /**

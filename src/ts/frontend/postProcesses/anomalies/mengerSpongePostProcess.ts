@@ -24,7 +24,7 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Scene } from "@babylonjs/core/scene";
 
-import { MengerSpongeModel } from "@/backend/universe/orbitalObjects/mengerSpongeModel";
+import { MengerSpongeModel } from "@/backend/universe/orbitalObjects/anomalies/mengerSpongeModel";
 
 import { CameraUniformNames, setCameraUniforms } from "@/frontend/postProcesses/uniforms/cameraUniforms";
 import { ObjectUniformNames, setObjectUniforms } from "@/frontend/postProcesses/uniforms/objectUniforms";

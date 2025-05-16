@@ -18,10 +18,9 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { MissionType } from "@/backend/missions/missionSerialized";
+import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { UniverseObjectId } from "@/backend/universe/universeObjectId";
-
-import { OrbitalObjectType } from "@/frontend/architecture/orbitalObjectType";
 
 import { Mission } from "./mission";
 import { MissionAsteroidFieldNode } from "./nodes/actions/sightseeing/missionAsteroidFieldNode";

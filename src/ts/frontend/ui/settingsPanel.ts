@@ -8,6 +8,8 @@ import {
 import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import Interaction from "@brianchirls/game-input/interactions/Interaction";
 
+import { InputMaps } from "@/frontend/inputs/inputMaps";
+
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import {
     axisCompositeToString,
@@ -16,8 +18,6 @@ import {
     stickInputToString,
     vector2ToString,
 } from "@/utils/strings/inputControlsString";
-
-import { InputMaps } from "../inputs/inputMaps";
 
 export function initSettingsPanel(): HTMLElement {
     const settingsPanel = document.getElementById("settingsPanel");

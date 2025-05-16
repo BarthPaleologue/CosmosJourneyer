@@ -20,12 +20,13 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Scene } from "@babylonjs/core/scene";
 
+import { RingsModel } from "@/backend/universe/orbitalObjects/ringsModel";
+
 import { ItemPool } from "@/utils/itemPool";
 import { createEmptyTexture } from "@/utils/proceduralTexture";
 import { DeepReadonly } from "@/utils/types";
 
 import { RingsLut } from "./ringsLut";
-import { RingsModel } from "./ringsModel";
 
 export const RingsUniformNames = {
     RING_START: "rings_start",

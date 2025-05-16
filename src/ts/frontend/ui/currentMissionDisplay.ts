@@ -18,16 +18,15 @@
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { ISoundPlayer, SoundType } from "@/frontend/audio/soundPlayer";
+import { Mission } from "@/frontend/missions/mission";
+import { MissionContext } from "@/frontend/missions/missionContext";
+import { Player } from "@/frontend/player/player";
+import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { pressInteractionToStrings } from "@/utils/strings/inputControlsString";
 
 import i18n from "@/i18n";
-
-import { Mission } from "../../missions/mission";
-import { MissionContext } from "../../missions/missionContext";
-import { Player } from "../player/player";
-import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
 
 export class CurrentMissionDisplay {
     readonly rootNode: HTMLElement;

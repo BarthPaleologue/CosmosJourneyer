@@ -18,10 +18,11 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
 
 import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
+import { OrbitalFacilityModel, OrbitalObjectModel } from "@/backend/universe/orbitalObjects/index";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
-import { OrbitalFacilityModel, OrbitalObjectModel } from "@/frontend/architecture/orbitalObjectModel";
 import { ISoundPlayer, SoundType } from "@/frontend/audio/soundPlayer";
+import { Player } from "@/frontend/player/player";
 import { alertModal, promptModalString } from "@/frontend/ui/dialogModal";
 
 import { DeepReadonly } from "@/utils/types";
@@ -29,7 +30,6 @@ import { DeepReadonly } from "@/utils/types";
 import i18n from "@/i18n";
 import { Settings } from "@/settings";
 
-import { Player } from "../../player/player";
 import { ExplorationCenterPanel } from "./explorationCenterPanel";
 import { SpaceshipDockUI } from "./spaceshipDock";
 import { generateInfoHTML } from "./spaceStationInfos";

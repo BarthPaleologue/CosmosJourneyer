@@ -23,13 +23,13 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Scene } from "@babylonjs/core/scene";
 
-import { RingsSamplerNames, RingsUniformNames, RingsUniforms } from "@/frontend/rings/ringsUniform";
+import { CloudsUniforms } from "@/frontend/postProcesses/clouds/cloudsUniforms";
+import { RingsSamplerNames, RingsUniformNames, RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
+import { HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
+import { LightEmitter } from "@/frontend/universe/architecture/lightEmitter";
 
 import { createEmptyTexture } from "@/utils/proceduralTexture";
 
-import { CloudsUniforms } from "../clouds/cloudsUniforms";
-import { HasBoundingSphere } from "../universe/architecture/hasBoundingSphere";
-import { LightEmitter } from "../universe/architecture/lightEmitter";
 import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms";
 import { ObjectUniformNames, setObjectUniforms } from "./uniforms/objectUniforms";
 import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUniforms";

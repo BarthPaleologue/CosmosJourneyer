@@ -16,9 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { factionToString } from "@/backend/society/factions";
+import { OrbitalFacilityModel, OrbitalObjectModel } from "@/backend/universe/orbitalObjects/index";
 import { getOrbitalPeriod } from "@/backend/universe/orbitalObjects/orbit";
-
-import { OrbitalFacilityModel, OrbitalObjectModel } from "@/frontend/architecture/orbitalObjectModel";
 
 import { CropType, cropTypeToString } from "@/utils/agriculture";
 import { makeD3PieChart } from "@/utils/d3PieChart";

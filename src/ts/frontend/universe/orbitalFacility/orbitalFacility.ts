@@ -17,9 +17,9 @@
 
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
-import { ManagesLandingPads } from "@/frontend/assets/procedural/spaceStation/landingPad/managesLandingPads";
 import { OrbitalObjectBase } from "@/frontend/universe/architecture/orbitalObjectBase";
 import { Targetable } from "@/frontend/universe/architecture/targetable";
+import { ManagesLandingPads } from "@/frontend/universe/orbitalFacility/managesLandingPads";
 
 import { Cullable } from "@/utils/cullable";
 

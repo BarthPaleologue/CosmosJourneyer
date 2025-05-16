@@ -1,9 +1,9 @@
+import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
 import { DefaultControlsInputs } from "@/frontend/controls/defaultControls/defaultControlsInputs";
+import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
+import { StarMapInputs } from "@/frontend/starmap/starMapInputs";
+import { TutorialControlsInputs } from "@/frontend/ui/tutorial/tutorialLayerInputs";
 
-import { CharacterInputs } from "../characterControls/characterControlsInputs";
-import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
-import { StarMapInputs } from "../starmap/starMapInputs";
-import { TutorialControlsInputs } from "../ui/tutorial/tutorialLayerInputs";
 import { GeneralInputs } from "./generalInputs";
 import { StarSystemInputs } from "./starSystemInputs";
 

@@ -24,11 +24,10 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { Scene } from "@babylonjs/core/scene";
 
-import { LandingPadSize } from "@/frontend/assets/procedural/spaceStation/landingPad/landingPadManager";
-import { ManagesLandingPads } from "@/frontend/assets/procedural/spaceStation/landingPad/managesLandingPads";
 import { RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { ITts, Speaker, VoiceLine } from "@/frontend/audio/tts";
+import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
 import { Controls } from "@/frontend/uberCore/controls";
 import { CameraShakeAnimation } from "@/frontend/uberCore/transforms/animations/cameraShake";
 import { quickAnimation } from "@/frontend/uberCore/transforms/animations/quickAnimation";
@@ -41,6 +40,10 @@ import {
     yaw,
 } from "@/frontend/uberCore/transforms/basicTransform";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
+import { HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
+import { Transformable } from "@/frontend/universe/architecture/transformable";
+import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
+import { ManagesLandingPads } from "@/frontend/universe/orbitalFacility/managesLandingPads";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { lerpSmooth, slerpSmoothToRef } from "@/utils/math";
@@ -48,9 +51,6 @@ import { pressInteractionToStrings } from "@/utils/strings/inputControlsString";
 
 import i18n from "@/i18n";
 
-import { StarSystemInputs } from "../inputs/starSystemInputs";
-import { HasBoundingSphere } from "../universe/architecture/hasBoundingSphere";
-import { Transformable } from "../universe/architecture/transformable";
 import { canEngageWarpDrive } from "./components/warpDriveUtils";
 import { Spaceship } from "./spaceship";
 import { SpaceShipControlsInputs } from "./spaceShipControlsInputs";

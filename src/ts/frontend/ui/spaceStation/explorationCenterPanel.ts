@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { SpaceDiscoveryData } from "@/backend/encyclopaedia/encyclopaediaGalactica";
 import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
-import { SpaceDiscoveryData } from "@/backend/society/encyclopaediaGalactica";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { ISoundPlayer, SoundType } from "@/frontend/audio/soundPlayer";

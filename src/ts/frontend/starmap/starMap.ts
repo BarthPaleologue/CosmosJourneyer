@@ -34,10 +34,13 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { DefaultRenderingPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/Pipelines/defaultRenderingPipeline";
 import { Scene } from "@babylonjs/core/scene";
 
+import { EncyclopaediaGalactica } from "@/backend/encyclopaedia/encyclopaediaGalactica";
+import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/backend/universe/starSystemCoordinates";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { ISoundPlayer, SoundType } from "@/frontend/audio/soundPlayer";
+import { Player } from "@/frontend/player/player";
 import { CameraRadiusAnimation } from "@/frontend/uberCore/transforms/animations/radius";
 import { TransformRotationAnimation } from "@/frontend/uberCore/transforms/animations/rotation";
 import { TransformTranslationAnimation } from "@/frontend/uberCore/transforms/animations/translation";
@@ -51,9 +54,6 @@ import { View } from "@/utils/view";
 
 import { Settings } from "@/settings";
 
-import { Player } from "../player/player";
-import { EncyclopaediaGalactica } from "../society/encyclopaediaGalactica";
-import { OrbitalObjectType } from "../universe/architecture/orbitalObjectType";
 import { StarMapControls } from "./starMapControls";
 import { StarMapInputs } from "./starMapInputs";
 import { StarMapUI } from "./starMapUI";

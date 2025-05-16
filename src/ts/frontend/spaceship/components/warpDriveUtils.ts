@@ -18,10 +18,10 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
-import { getForwardDirection } from "@/frontend/uberCore/transforms/basicTransform";
+import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
-import { OrbitalObject } from "../../universe/architecture/orbitalObject";
-import { OrbitalObjectType } from "../../universe/architecture/orbitalObjectType";
+import { getForwardDirection } from "@/frontend/uberCore/transforms/basicTransform";
+import { OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
 
 export function canEngageWarpDrive(
     shipTransform: TransformNode,

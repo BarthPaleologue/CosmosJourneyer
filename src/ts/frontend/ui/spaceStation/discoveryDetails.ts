@@ -17,7 +17,7 @@
 
 import { Observable } from "@babylonjs/core/Misc/observable";
 
-import { EncyclopaediaGalactica, SpaceDiscoveryData } from "@/backend/society/encyclopaediaGalactica";
+import { EncyclopaediaGalactica, SpaceDiscoveryData } from "@/backend/encyclopaedia/encyclopaediaGalactica";
 import { getOrbitalPeriod } from "@/backend/universe/orbitalObjects/orbit";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { getObjectModelById } from "@/backend/universe/starSystemModel";

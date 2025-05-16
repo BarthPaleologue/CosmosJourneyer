@@ -21,7 +21,7 @@ import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResu
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 
-import { ILandingPad } from "@/frontend/assets/procedural/spaceStation/landingPad/landingPadManager";
+import { ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
 import { getAngleFromQuaternion, getAxisFromQuaternion, getDeltaQuaternion } from "@/utils/algebra";
 

@@ -19,6 +19,7 @@ import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { Scene } from "@babylonjs/core/scene";
 
+import { factionToString } from "@/backend/society/factions";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/backend/universe/starSystemCoordinates";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { StarSystemModel } from "@/backend/universe/starSystemModel";
@@ -32,7 +33,6 @@ import { DeepReadonly } from "@/utils/types";
 import i18n from "@/i18n";
 
 import { Player } from "../player/player";
-import { factionToString } from "../society/factions";
 import { StarMapBookmarkButton } from "./starMapBookmarkButton";
 import { SystemIcons } from "./systemIcons";
 

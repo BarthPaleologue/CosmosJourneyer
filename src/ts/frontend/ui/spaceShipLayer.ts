@@ -22,12 +22,12 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { MissionContext } from "@/frontend/missions/missionContext";
+import { Player } from "@/frontend/player/player";
 
 import { smoothstep } from "@/utils/math";
 import { parseSpeed } from "@/utils/strings/parseToStrings";
 
-import { MissionContext } from "../../missions/missionContext";
-import { Player } from "../player/player";
 import { CurrentMissionDisplay } from "./currentMissionDisplay";
 
 import canisterIconPath from "@assets/icons/fuel_canister.webp";

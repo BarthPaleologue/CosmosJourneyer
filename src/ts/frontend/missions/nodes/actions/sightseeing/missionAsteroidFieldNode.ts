@@ -22,6 +22,7 @@ import {
     MissionAsteroidFieldNodeSerialized,
 } from "@/backend/missions/missionAsteroidFieldNodeSerialized";
 import { MissionNodeType } from "@/backend/missions/missionNodeType";
+import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/backend/universe/starSystemCoordinates";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { getObjectModelById } from "@/backend/universe/starSystemModel";
@@ -37,7 +38,6 @@ import { getGoToSystemInstructions } from "../../../common";
 import { MissionContext } from "../../../missionContext";
 import { MissionNode } from "../../missionNode";
 import type { MissionNodeBase } from "../../missionNodeBase";
-import { OrbitalObjectType } from "../orbitalObjectType";
 
 /**
  * Node used to describe a trek to an asteroid field
