@@ -16,8 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { CloudsModel } from "@/backend/universe/orbitalObjects/cloudsModel";
-
-import { TerrainSettings } from "@/frontend/universe/planets/telluricPlanet/terrain/terrainSettings";
+import { TerrainSettings } from "@/backend/universe/orbitalObjects/terrainSettings";
 
 import { AtmosphereModel } from "./atmosphereModel";
 import { OceanModel } from "./oceanModel";

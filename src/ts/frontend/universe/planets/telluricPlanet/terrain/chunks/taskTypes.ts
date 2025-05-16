@@ -19,9 +19,10 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import { z } from "zod";
 
+import { TerrainSettings } from "@/backend/universe/orbitalObjects/terrainSettings";
+
 import { Direction } from "@/utils/direction";
 
-import { TerrainSettings } from "../terrainSettings";
 import { PlanetChunk } from "./planetChunk";
 
 export const enum TaskType {
